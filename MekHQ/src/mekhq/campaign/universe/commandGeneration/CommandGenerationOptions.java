@@ -147,10 +147,22 @@ public class CommandGenerationOptions {
     private boolean selectStartingContract;
     private boolean startCourseToContractPlanet;
 
-    // Finances - the command is granted free; starting cash is working capital sized as a
-    // percentage of the generated units' total purchase cost.
+    // Finances. Starting cash is working capital sized as a percentage of the generated units'
+    // total purchase cost (or a dice roll when randomized); the pay-for toggles then debit the
+    // command's real generation costs, flooring at the minimum float with an optional loan for the
+    // shortfall.
     private boolean processFinances;
     private int startingCashPercent;
+    private boolean randomizeStartingCash;
+    private int randomStartingCashDiceCount;
+    private int minimumStartingFloat;
+    private boolean startingLoan;
+    private boolean payForSetup;
+    private boolean payForPersonnel;
+    private boolean payForUnits;
+    private boolean payForParts;
+    private boolean payForArmour;
+    private boolean payForAmmunition;
     // endregion Variable Declarations
 
     // region Constructors
@@ -228,9 +240,22 @@ public class CommandGenerationOptions {
         setSelectStartingContract(true);
         setStartCourseToContractPlanet(true);
 
-        // Finances
+        // Finances. Pay for Initial Setup defaults OFF: with the percentage-of-unit-value cash base,
+        // paying for the units would always dwarf the base (10% cash vs 100% cost) and floor every
+        // default build into a maximum loan. Out of the box the command is granted free with its
+        // working capital; players opt into the pay-for accounting.
         setProcessFinances(true);
         setStartingCashPercent(10);
+        setRandomizeStartingCash(false);
+        setRandomStartingCashDiceCount(18);
+        setMinimumStartingFloat(0);
+        setStartingLoan(true);
+        setPayForSetup(false);
+        setPayForPersonnel(true);
+        setPayForUnits(true);
+        setPayForParts(true);
+        setPayForArmour(true);
+        setPayForAmmunition(true);
     }
     // endregion Constructors
 
@@ -607,6 +632,86 @@ public class CommandGenerationOptions {
 
     public void setStartingCashPercent(final int startingCashPercent) {
         this.startingCashPercent = startingCashPercent;
+    }
+
+    public boolean isRandomizeStartingCash() {
+        return randomizeStartingCash;
+    }
+
+    public void setRandomizeStartingCash(final boolean randomizeStartingCash) {
+        this.randomizeStartingCash = randomizeStartingCash;
+    }
+
+    public int getRandomStartingCashDiceCount() {
+        return randomStartingCashDiceCount;
+    }
+
+    public void setRandomStartingCashDiceCount(final int randomStartingCashDiceCount) {
+        this.randomStartingCashDiceCount = randomStartingCashDiceCount;
+    }
+
+    public int getMinimumStartingFloat() {
+        return minimumStartingFloat;
+    }
+
+    public void setMinimumStartingFloat(final int minimumStartingFloat) {
+        this.minimumStartingFloat = minimumStartingFloat;
+    }
+
+    public boolean isStartingLoan() {
+        return startingLoan;
+    }
+
+    public void setStartingLoan(final boolean startingLoan) {
+        this.startingLoan = startingLoan;
+    }
+
+    public boolean isPayForSetup() {
+        return payForSetup;
+    }
+
+    public void setPayForSetup(final boolean payForSetup) {
+        this.payForSetup = payForSetup;
+    }
+
+    public boolean isPayForPersonnel() {
+        return payForPersonnel;
+    }
+
+    public void setPayForPersonnel(final boolean payForPersonnel) {
+        this.payForPersonnel = payForPersonnel;
+    }
+
+    public boolean isPayForUnits() {
+        return payForUnits;
+    }
+
+    public void setPayForUnits(final boolean payForUnits) {
+        this.payForUnits = payForUnits;
+    }
+
+    public boolean isPayForParts() {
+        return payForParts;
+    }
+
+    public void setPayForParts(final boolean payForParts) {
+        this.payForParts = payForParts;
+    }
+
+    public boolean isPayForArmour() {
+        return payForArmour;
+    }
+
+    public void setPayForArmour(final boolean payForArmour) {
+        this.payForArmour = payForArmour;
+    }
+
+    public boolean isPayForAmmunition() {
+        return payForAmmunition;
+    }
+
+    public void setPayForAmmunition(final boolean payForAmmunition) {
+        this.payForAmmunition = payForAmmunition;
     }
     // endregion Getters/Setters
 }

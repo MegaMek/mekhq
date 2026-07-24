@@ -337,7 +337,8 @@ public class CommandGenerationDialog extends AbstractMHQValidationButtonDialog {
                         supportListener),
                   supportPersons -> {
                       generatedPersons.addAll(supportPersons);
-                      CommandGenerator.processStartingCash(getCampaign(), options, preExistingUnitIds);
+                      CommandGenerator.processStartingCash(getCampaign(), options, preExistingUnitIds,
+                            generatedPersons, combatResult.spareCosts());
                       applyPostGenerationExtras(options, generatedPersons);
                   });
         });

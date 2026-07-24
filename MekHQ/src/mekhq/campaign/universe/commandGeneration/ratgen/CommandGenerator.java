@@ -53,12 +53,19 @@ import megamek.client.ratgenerator.ForceDescriptor;
 import megamek.client.ratgenerator.Ruleset;
 import megamek.common.annotations.Nullable;
 import megamek.common.units.Entity;
+import megamek.common.units.Infantry;
 import megamek.logging.MMLogger;
+import mekhq.Utilities;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.finances.Money;
 import mekhq.campaign.finances.enums.TransactionType;
 import mekhq.campaign.force.Formation;
+import mekhq.campaign.finances.Loan;
+import mekhq.campaign.finances.enums.FinancialTerm;
 import mekhq.campaign.market.PartsInUseManager;
+import mekhq.campaign.parts.AmmoStorage;
+import mekhq.campaign.parts.Armor;
+import mekhq.campaign.parts.Part;
 import mekhq.campaign.parts.PartInUse;
 import mekhq.campaign.parts.enums.PartQuality;
 import mekhq.campaign.personnel.Person;
@@ -104,8 +111,25 @@ public final class CommandGenerator {
      *                         {@code null} if the engine layer failed
      * @param generatedPersons every Person added to the campaign by this generation, in the order
      *                         they were created (leaf order)
+     * @param spareCosts       the value of the spare parts the build's warehouse stock-up added, for
+     *                         the finance stage's pay-for debits
      */
-    public record Result(@Nullable ForceDescriptor descriptor, List<Person> generatedPersons) {
+    public record Result(@Nullable ForceDescriptor descriptor, List<Person> generatedPersons,
+          SpareCosts spareCosts) {
+    }
+
+    /**
+     * The value of the spare parts the build's warehouse stock-up added, split by the categories the
+     * pay-for finance toggles gate.
+     *
+     * @param parts      value of the general spare parts added
+     * @param armour     value of the armor added
+     * @param ammunition value of the ammunition added
+     */
+    public record SpareCosts(Money parts, Money armour, Money ammunition) {
+        public static SpareCosts zero() {
+            return new SpareCosts(Money.zero(), Money.zero(), Money.zero());
+        }
     }
 
     private static final MMLogger LOGGER = MMLogger.create(CommandGenerator.class);
@@ -442,12 +466,8 @@ public final class CommandGenerator {
         // on generateSupport so combat can be committed on its own (phase one of two-phase generation).
         if (generateSupport) {
             // generateSupportFromToe applies TOE icons to the support formations it creates, so no
-            // separate re-decoration pass is needed here. In this single-shot path every unit the
-            // build created is new relative to the pre-walk hangar, so the starting-cash stage prices
-            // exactly this build's units. (The two-phase Command Designer flow instead snapshots
-            // before its combat phase and calls processStartingCash itself after support.)
+            // separate re-decoration pass is needed here.
             generatedPersons.addAll(generateSupportFromToe(campaign, options, listener));
-            processStartingCash(campaign, options, preExistingUnitIds);
         }
 
         // 7d. Personnel flags driven by the Setup tab toggles: commander flag on the top-formation
@@ -464,16 +484,24 @@ public final class CommandGenerator {
         // 8. Spare-parts warehouse stock-up. Uses the same PartsInUseManager the daily warehouse
         // and ongoing auto-logistics rely on, so the starting inventory is consistent with the
         // user's ongoing stocking policy: each part type's stocking percentage comes from the
-        // CampaignOptions.getAutoLogistics*() values that the Spares tab writes into. Finance
-        // and contract polish remain deferred.
+        // CampaignOptions.getAutoLogistics*() values that the Spares tab writes into. Contract
+        // polish remains deferred.
         LOGGER.info("[CompanyGen][Pipeline]Stage 8: spare-parts warehouse stock-up");
         if (listener != null) {
             listener.updateProgress(0.0, "Stocking spare parts warehouse...");
         }
-        stockSpareParts(campaign);
+        SpareCosts spareCosts = stockSpareParts(campaign);
+
+        // 9. Starting cash - single-shot path only: every unit the build created is new relative to
+        // the pre-walk hangar snapshot, so this prices exactly this build's units. The two-phase
+        // Command Designer flow (generateSupport=false) instead snapshots before its combat phase
+        // and calls processStartingCash itself after support generation.
+        if (generateSupport) {
+            processStartingCash(campaign, options, preExistingUnitIds, generatedPersons, spareCosts);
+        }
 
         LOGGER.info("[CompanyGen][Pipeline]CommandGenerator.applyToCampaign() DONE");
-        return new Result(fd, generatedPersons);
+        return new Result(fd, generatedPersons, spareCosts);
     }
 
     /**
@@ -554,45 +582,157 @@ public final class CommandGenerator {
     }
 
     /**
-     * Stage 9 - starting cash. The generated command itself is granted free; when Process Finances
-     * is on, the campaign is credited working capital equal to
+     * Stage 9 - starting cash. When Process Finances is on, the base starting cash is either
      * {@link CommandGenerationOptions#getStartingCashPercent()} percent of the generated units'
-     * total purchase cost. Units already in the hangar before the build (per
-     * {@code preExistingUnitIds}) are excluded, so building an additional command into an existing
-     * campaign prices only the new units.
+     * total purchase cost, or - with Randomize Starting Cash - a roll of the configured number of
+     * d6 in millions of C-Bills. If Pay for Initial Setup is on, the command's real generation costs
+     * (personnel hiring at twice salary, unit purchase, and the stocked spare parts / armour /
+     * ammunition, each gated by its own toggle) are then debited; cash floors at the Minimum
+     * Starting Float, with the shortfall taken as a two-year 15% starting loan when Generate
+     * Starting Loan is on. The result is credited as starting capital and reported in the Finances
+     * daily log.
+     *
+     * <p>Units already in the hangar before the build (per {@code preExistingUnitIds}) are excluded
+     * from both the percentage base and the unit-purchase debit, so building an additional command
+     * into an existing campaign prices only the new units.</p>
      *
      * @param campaign           the campaign to credit
      * @param options            the generation options carrying the finance toggles
      * @param preExistingUnitIds hangar unit IDs captured by {@link #snapshotHangarUnitIds} before
      *                           the build; units with these IDs are not priced
+     * @param generatedPersons   every Person this build created, for the hiring-cost debit
+     * @param spareCosts         the stocked spares' value by category, from the build's
+     *                           {@link Result#spareCosts()}; {@code null} is treated as zero
      */
     public static void processStartingCash(Campaign campaign, CommandGenerationOptions options,
-          Set<UUID> preExistingUnitIds) {
+          Set<UUID> preExistingUnitIds, List<Person> generatedPersons, @Nullable SpareCosts spareCosts) {
         if (!options.isProcessFinances()) {
             LOGGER.info("[CompanyGen][Pipeline]Stage 9: finances disabled; no starting cash granted");
             return;
         }
-        int percent = options.getStartingCashPercent();
-        Money totalUnitValue = Money.zero();
+        SpareCosts spares = (spareCosts == null) ? SpareCosts.zero() : spareCosts;
+
+        // Price the units this build created: the base of the percentage model and the
+        // unit-purchase debit both use it.
+        Money newUnitValue = Money.zero();
         int pricedUnits = 0;
         for (Unit unit : campaign.getUnits()) {
             if (!preExistingUnitIds.contains(unit.getId())) {
-                totalUnitValue = totalUnitValue.plus(unit.getBuyCost());
+                newUnitValue = newUnitValue.plus(unit.getBuyCost());
                 pricedUnits++;
             }
         }
-        Money startingCash = totalUnitValue.multipliedBy(percent).dividedBy(100).round();
-        LOGGER.info("[CompanyGen][Pipeline]Stage 9: starting cash = {}% of {} generated unit(s) worth {} -> {}",
-              percent, pricedUnits, totalUnitValue.toAmountAndSymbolString(),
-              startingCash.toAmountAndSymbolString());
+
+        // Base cash: percentage of unit value, or the dice roll when randomized.
+        int percent = options.getStartingCashPercent();
+        Money startingCash;
+        if (options.isRandomizeStartingCash()) {
+            startingCash = Money.of(1_000_000)
+                                 .multipliedBy(Utilities.dice(options.getRandomStartingCashDiceCount(), 6));
+            LOGGER.info("[CompanyGen][Pipeline]Stage 9: randomized starting cash {}d6 million -> {}",
+                  options.getRandomStartingCashDiceCount(), startingCash.toAmountAndSymbolString());
+        } else {
+            startingCash = newUnitValue.multipliedBy(percent).dividedBy(100).round();
+            LOGGER.info("[CompanyGen][Pipeline]Stage 9: starting cash = {}% of {} generated unit(s) worth {} -> {}",
+                  percent, pricedUnits, newUnitValue.toAmountAndSymbolString(),
+                  startingCash.toAmountAndSymbolString());
+        }
+
+        Money minimumStartingFloat = Money.of(options.getMinimumStartingFloat());
+        Money loan = Money.zero();
+
+        if (options.isPayForSetup()) {
+            Money costs = Money.zero();
+            if (options.isPayForPersonnel()) {
+                Money hiringCosts = Money.zero();
+                for (Person person : generatedPersons) {
+                    hiringCosts = hiringCosts.plus(person.getSalary(campaign).multipliedBy(2));
+                }
+                costs = costs.plus(hiringCosts);
+            }
+            if (options.isPayForUnits()) {
+                costs = costs.plus(newUnitValue);
+            }
+            if (options.isPayForParts()) {
+                costs = costs.plus(spares.parts());
+            }
+            if (options.isPayForArmour()) {
+                costs = costs.plus(spares.armour());
+            }
+            if (options.isPayForAmmunition()) {
+                costs = costs.plus(spares.ammunition());
+            }
+            LOGGER.info("[CompanyGen][Pipeline]Stage 9: setup costs {} (personnel={} units={} parts={} armour={} ammo={})",
+                  costs.toAmountAndSymbolString(), options.isPayForPersonnel(), options.isPayForUnits(),
+                  options.isPayForParts(), options.isPayForArmour(), options.isPayForAmmunition());
+
+            Money maximumPreLoanCosts = startingCash.minus(minimumStartingFloat);
+            if (maximumPreLoanCosts.isGreaterOrEqualThan(costs)) {
+                startingCash = startingCash.minus(costs);
+            } else {
+                // Cash floors at the minimum float; the shortfall becomes a loan if enabled.
+                startingCash = minimumStartingFloat;
+                if (options.isStartingLoan()) {
+                    loan = costs.minus(maximumPreLoanCosts).round();
+                }
+            }
+            startingCash = startingCash.round();
+        } else {
+            startingCash = startingCash.isGreaterOrEqualThan(minimumStartingFloat)
+                                 ? startingCash : minimumStartingFloat;
+        }
+
         if (startingCash.isPositive()) {
             campaign.getPlayerForce().getFinances().credit(TransactionType.STARTING_CAPITAL,
                   campaign.getLocalDate(), startingCash,
                   getTextAt(RESOURCE_BUNDLE, "CommandGenerator.startingCapital.reason"));
+        }
+        if (!loan.isZero()) {
+            campaign.getPlayerForce().getFinances().addLoan(new Loan(loan, 15, 2, FinancialTerm.MONTHLY,
+                  100, campaign.getLocalDate()));
+        }
+
+        if (loan.isZero()) {
             campaign.addReport(FINANCES, getFormattedTextAt(RESOURCE_BUNDLE,
                   "CommandGenerator.startingCapital.report",
                   startingCash.toAmountAndSymbolString(), percent));
+        } else {
+            campaign.addReport(FINANCES, getFormattedTextAt(RESOURCE_BUNDLE,
+                  "CommandGenerator.startingCapital.reportWithLoan",
+                  startingCash.toAmountAndSymbolString(), loan.toAmountAndSymbolString()));
         }
+        LOGGER.info("[CompanyGen][Pipeline]Stage 9: credited {} starting capital, loan {}",
+              startingCash.toAmountAndSymbolString(), loan.toAmountAndSymbolString());
+    }
+
+    /**
+     * Estimates the purchase value of a set of rolled entities the way {@link Unit#getBuyCost()}
+     * will price them once materialized: the entity cost (alternate cost for conventional infantry)
+     * times the campaign's tech-base price multiplier. Used by the Command Designer's starting-cash
+     * preview to price the design model before anything is committed.
+     *
+     * @param campaign the campaign supplying the price multipliers
+     * @param entities the rolled entities to price (e.g. from {@link #collectEntities})
+     *
+     * @return the estimated total purchase value
+     */
+    public static Money estimateUnitValue(Campaign campaign, List<Entity> entities) {
+        CampaignOptions campaignOptions = campaign.getCampaignOptions();
+        Money total = Money.zero();
+        for (Entity entity : entities) {
+            Money cost = Money.of((entity instanceof Infantry)
+                                        ? entity.getAlternateCost()
+                                        : entity.getCost(false));
+            if (entity.isMixedTech()) {
+                cost = cost.multipliedBy(campaignOptions.getMixedTechUnitPriceMultiplier());
+            } else if (entity.isClan()) {
+                cost = cost.multipliedBy(campaignOptions.getClanUnitPriceMultiplier());
+            } else {
+                cost = cost.multipliedBy(campaignOptions.getInnerSphereUnitPriceMultiplier());
+            }
+            total = total.plus(cost);
+        }
+        return total;
     }
 
     /**
@@ -689,9 +829,13 @@ public final class CommandGenerator {
      * <p>Setting all percentages to 0 produces an empty warehouse with no shopping list churn -
      * effectively disabling spare-part generation.</p>
      */
-    private static void stockSpareParts(Campaign campaign) {
+    private static SpareCosts stockSpareParts(Campaign campaign) {
         long start = System.nanoTime();
         PartsInUseManager partsInUseManager = new PartsInUseManager(campaign);
+        // Bracket the stock-up with warehouse category totals so the finance stage can price what
+        // was added (the GM stock-up itself is free; the pay-for toggles decide whether the player
+        // is billed for it).
+        Money[] before = warehouseValueByCategory(campaign);
         // ignoreMothballedUnits=true matches WarehouseTab's daily refresh: at generation time
         // nothing is mothballed yet, but keep the call shape consistent with the rest of the
         // codebase. isResupply=false skips the resupply-specific prohibited-unit-type filter.
@@ -699,8 +843,35 @@ public final class CommandGenerator {
         // toward the target.
         Set<PartInUse> partsInUse = partsInUseManager.getPartsInUse(true, false, PartQuality.QUALITY_A);
         partsInUseManager.stockUpPartsInUseGM(partsInUse);
+        Money[] after = warehouseValueByCategory(campaign);
+        SpareCosts spareCosts = new SpareCosts(after[0].minus(before[0]), after[1].minus(before[1]),
+              after[2].minus(before[2]));
         long elapsedMs = (System.nanoTime() - start) / 1_000_000;
-        LOGGER.info("[CompanyGen][Pipeline][Spares] reviewed {} distinct part types; elapsed={}ms",
-              partsInUse.size(), elapsedMs);
+        LOGGER.info("[CompanyGen][Pipeline][Spares] reviewed {} distinct part types; added value parts={} armour={} ammo={}; elapsed={}ms",
+              partsInUse.size(), spareCosts.parts().toAmountAndSymbolString(),
+              spareCosts.armour().toAmountAndSymbolString(),
+              spareCosts.ammunition().toAmountAndSymbolString(), elapsedMs);
+        return spareCosts;
+    }
+
+    /**
+     * Sums the warehouse's spare-part value as {@code [parts, armour, ammunition]}, each part's
+     * actual value times its stack quantity. Used to price the stock-up by delta.
+     */
+    private static Money[] warehouseValueByCategory(Campaign campaign) {
+        Money parts = Money.zero();
+        Money armour = Money.zero();
+        Money ammunition = Money.zero();
+        for (Part part : campaign.getPlayerForce().getWarehouse().getParts()) {
+            Money value = part.getActualValue().multipliedBy(part.getQuantity());
+            if (part instanceof Armor) {
+                armour = armour.plus(value);
+            } else if (part instanceof AmmoStorage) {
+                ammunition = ammunition.plus(value);
+            } else {
+                parts = parts.plus(value);
+            }
+        }
+        return new Money[] { parts, armour, ammunition };
     }
 }

@@ -34,12 +34,14 @@ package mekhq.campaign.universe.commandGeneration.ratgen;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
+import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 
 import megamek.common.equipment.EquipmentType;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.finances.Money;
+import mekhq.campaign.finances.financialInstitutions.FinancialInstitutions;
 import mekhq.campaign.parts.enums.PartQuality;
 import mekhq.campaign.personnel.skills.SkillType;
 import mekhq.campaign.unit.Unit;
@@ -60,13 +62,21 @@ class CommandGeneratorStartingCashTest {
     static void initializeTypes() {
         EquipmentType.initializeTypes();
         SkillType.initializeTypes();
+        // The starting-loan path names a random financial institution on the Loan it creates.
+        FinancialInstitutions.initializeFinancialInstitutions();
     }
 
     private static CommandGenerationOptions optionsWithPercent(int percent) {
         CommandGenerationOptions options = new CommandGenerationOptions();
         options.setProcessFinances(true);
         options.setStartingCashPercent(percent);
+        options.setRandomizeStartingCash(false);
+        options.setPayForSetup(false);
         return options;
+    }
+
+    private static Money balance(Campaign campaign) {
+        return campaign.getPlayerForce().getFinances().getBalance();
     }
 
     @Test
@@ -79,7 +89,8 @@ class CommandGeneratorStartingCashTest {
         Money unitValue = first.getBuyCost().plus(second.getBuyCost());
         Money balanceBefore = campaign.getPlayerForce().getFinances().getBalance();
 
-        CommandGenerator.processStartingCash(campaign, optionsWithPercent(10), preExisting);
+        CommandGenerator.processStartingCash(campaign, optionsWithPercent(10), preExisting, List.of(),
+              CommandGenerator.SpareCosts.zero());
 
         Money expected = unitValue.multipliedBy(10).dividedBy(100).round();
         assertEquals(expected,
@@ -97,12 +108,70 @@ class CommandGeneratorStartingCashTest {
         Unit generated = campaign.addNewUnit(UnitTestUtilities.getLocustLCT1V(), false, 0, PartQuality.QUALITY_D);
         Money balanceBefore = campaign.getPlayerForce().getFinances().getBalance();
 
-        CommandGenerator.processStartingCash(campaign, optionsWithPercent(10), preExisting);
+        CommandGenerator.processStartingCash(campaign, optionsWithPercent(10), preExisting, List.of(),
+              CommandGenerator.SpareCosts.zero());
 
         Money expected = generated.getBuyCost().multipliedBy(10).dividedBy(100).round();
         assertEquals(expected,
               campaign.getPlayerForce().getFinances().getBalance().minus(balanceBefore),
               "pre-existing units must not be priced into the starting cash");
+    }
+
+    @Test
+    void payForUnits_debitsUnitCostAndTakesLoanForTheShortfall() {
+        Campaign campaign = MHQTestUtilities.getTestCampaign();
+        Set<UUID> preExisting = CommandGenerator.snapshotHangarUnitIds(campaign);
+        Unit generated = campaign.addNewUnit(UnitTestUtilities.getLocustLCT1V(), false, 0, PartQuality.QUALITY_D);
+        Money balanceBefore = balance(campaign);
+        int loansBefore = campaign.getPlayerForce().getFinances().getLoans().size();
+
+        // 10% base minus 100% unit cost cannot cover the debit: cash floors at the minimum float
+        // (zero) and the shortfall becomes a starting loan.
+        CommandGenerationOptions options = optionsWithPercent(10);
+        options.setPayForSetup(true);
+        options.setPayForPersonnel(false);
+        options.setPayForUnits(true);
+        options.setPayForParts(false);
+        options.setPayForArmour(false);
+        options.setPayForAmmunition(false);
+        options.setStartingLoan(true);
+        options.setMinimumStartingFloat(0);
+        CommandGenerator.processStartingCash(campaign, options, preExisting, List.of(),
+              CommandGenerator.SpareCosts.zero());
+
+        assertEquals(Money.zero(), balance(campaign).minus(balanceBefore),
+              "cash floors at the minimum float when costs exceed the base");
+        assertEquals(loansBefore + 1, campaign.getPlayerForce().getFinances().getLoans().size(),
+              "the shortfall is taken as a starting loan");
+        Money base = generated.getBuyCost().multipliedBy(10).dividedBy(100).round();
+        Money expectedLoan = generated.getBuyCost().minus(base).round();
+        assertEquals(expectedLoan,
+              campaign.getPlayerForce().getFinances().getLoans().get(loansBefore).getPrincipal(),
+              "loan principal covers costs minus the pre-loan cash");
+    }
+
+    @Test
+    void payForSetupWithCoveringBase_deductsCostsFromCash() {
+        Campaign campaign = MHQTestUtilities.getTestCampaign();
+        Set<UUID> preExisting = CommandGenerator.snapshotHangarUnitIds(campaign);
+        Unit generated = campaign.addNewUnit(UnitTestUtilities.getLocustLCT1V(), false, 0, PartQuality.QUALITY_D);
+        Money balanceBefore = balance(campaign);
+
+        // 200% base covers the 100% unit debit, leaving 100% of unit value as cash.
+        CommandGenerationOptions options = optionsWithPercent(200);
+        options.setPayForSetup(true);
+        options.setPayForPersonnel(false);
+        options.setPayForUnits(true);
+        options.setPayForParts(false);
+        options.setPayForArmour(false);
+        options.setPayForAmmunition(false);
+        CommandGenerator.processStartingCash(campaign, options, preExisting, List.of(),
+              CommandGenerator.SpareCosts.zero());
+
+        Money base = generated.getBuyCost().multipliedBy(200).dividedBy(100).round();
+        Money expected = base.minus(generated.getBuyCost()).round();
+        assertEquals(expected, balance(campaign).minus(balanceBefore),
+              "setup costs are deducted from the covering base");
     }
 
     @Test
@@ -114,7 +183,8 @@ class CommandGeneratorStartingCashTest {
 
         CommandGenerationOptions options = optionsWithPercent(10);
         options.setProcessFinances(false);
-        CommandGenerator.processStartingCash(campaign, options, preExisting);
+        CommandGenerator.processStartingCash(campaign, options, preExisting, List.of(),
+              CommandGenerator.SpareCosts.zero());
 
         assertEquals(Money.zero(),
               campaign.getPlayerForce().getFinances().getBalance().minus(balanceBefore),

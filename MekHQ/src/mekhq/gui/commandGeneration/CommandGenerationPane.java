@@ -99,11 +99,20 @@ public class CommandGenerationPane extends AbstractMHQTabbedPane {
     protected void initialize() {
         setupTab = new SetupTab(campaign, options);
         forceGeneratorTab = new ForceGeneratorTab(getFrame(), campaign, options);
-        sparesAndFinancesTab = new SparesAndFinancesTab(campaign, options);
+        sparesAndFinancesTab = new SparesAndFinancesTab(campaign, options,
+              forceGeneratorTab::getGeneratedForce);
 
         addTab(tabTitle("setupTab"), wrap(setupTab.createTab()));
         addTab(tabTitle("forceGeneratorTab"), wrap(forceGeneratorTab.createTab()));
         addTab(tabTitle("sparesAndFinancesTab"), wrap(sparesAndFinancesTab.createTab()));
+
+        // The starting-cash preview prices the Force Generator tab's current model, which can change
+        // while this tab is hidden - recompute it whenever the user switches onto it.
+        addChangeListener(evt -> {
+            if (getSelectedIndex() == indexOfTab(tabTitle("sparesAndFinancesTab"))) {
+                sparesAndFinancesTab.refreshStartingCashPreview();
+            }
+        });
     }
 
     public SetupTab getSetupTab() {
