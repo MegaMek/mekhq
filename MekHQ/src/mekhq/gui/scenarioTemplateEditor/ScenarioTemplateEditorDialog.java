@@ -32,7 +32,7 @@
  */
 package mekhq.gui.scenarioTemplateEditor;
 
-import java.awt.Color;
+import java.awt.BorderLayout;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.GridLayout;
@@ -42,29 +42,18 @@ import java.awt.event.ActionListener;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
-import javax.swing.JButton;
-import javax.swing.JDialog;
-import javax.swing.JFrame;
-import javax.swing.JLabel;
-import javax.swing.JOptionPane;
-import javax.swing.JPanel;
-import javax.swing.JScrollPane;
-import javax.swing.ScrollPaneConstants;
-import javax.swing.border.LineBorder;
+import javax.swing.*;
 
 import megamek.client.ui.panels.abstractPanels.AbstractScrollablePanel;
 import megamek.client.ui.preferences.JWindowPreference;
 import megamek.client.ui.preferences.PreferencesNode;
 import megamek.common.ui.FastJScrollPane;
-import megamek.common.units.EntityWeightClass;
 import megamek.logging.MMLogger;
 import mekhq.MHQConstants;
 import mekhq.MekHQ;
 import mekhq.campaign.digitalGM.stratCon.StratConBiomeManifest;
 import mekhq.campaign.mission.ScenarioForceTemplate;
-import mekhq.campaign.mission.ScenarioForceTemplate.ForceAlignment;
 import mekhq.campaign.mission.ScenarioTemplate;
 import mekhq.campaign.mission.atb.AtBScenarioModifier;
 import mekhq.gui.FileDialogs;
@@ -83,7 +72,6 @@ public class ScenarioTemplateEditorDialog extends JDialog implements ActionListe
 
     private final JFrame frame;
 
-    JPanel panForceList;
     TemplatePropertiesPanel templatePropertiesPanel;
     MapParametersPanel mapParametersPanel;
     ModifiersPanel modifiersPanel;
@@ -92,7 +80,11 @@ public class ScenarioTemplateEditorDialog extends JDialog implements ActionListe
 
     AbstractScrollablePanel globalPanel;
 
-    JScrollPane forceScrollPane;
+    final ForceTableModel forceTableModel = new ForceTableModel();
+    JTable forceTable;
+    JButton btnEditForce;
+    JButton btnRemoveForce;
+    JPanel forceListContainer;
 
     // the scenario template we're working on
     ScenarioTemplate scenarioTemplate = new ScenarioTemplate();
@@ -278,16 +270,33 @@ public class ScenarioTemplateEditorDialog extends JDialog implements ActionListe
         gbc.gridy++;
         gbc.gridwidth = GridBagConstraints.REMAINDER;
 
-        panForceList = new JPanel(new GridBagLayout());
+        forceTable = new JTable(forceTableModel);
+        forceTable.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+        forceTable.getSelectionModel().addListSelectionListener(e -> updateForceButtonState());
 
-        renderForceList();
+        btnEditForce = new JButton("Edit");
+        btnEditForce.setEnabled(false);
+        btnEditForce.addActionListener(e -> editSelectedForce());
+        btnRemoveForce = new JButton("Remove");
+        btnRemoveForce.setEnabled(false);
+        btnRemoveForce.addActionListener(e -> removeSelectedForce());
 
-        forceScrollPane = new FastJScrollPane(panForceList);
-        forceScrollPane.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED);
+        JPanel buttonRow = new JPanel();
+        buttonRow.add(btnEditForce);
+        buttonRow.add(btnRemoveForce);
 
-        forceScrollPane.setVisible(false);
+        forceListContainer = new JPanel(new BorderLayout());
+        forceListContainer.add(new FastJScrollPane(forceTable), BorderLayout.CENTER);
+        forceListContainer.add(buttonRow, BorderLayout.SOUTH);
+        forceListContainer.setVisible(false);
 
-        globalPanel.add(forceScrollPane, gbc);
+        globalPanel.add(forceListContainer, gbc);
+    }
+
+    private void updateForceButtonState() {
+        boolean hasSelection = forceTable.getSelectedRow() >= 0;
+        btnEditForce.setEnabled(hasSelection);
+        btnRemoveForce.setEnabled(hasSelection);
     }
 
     /**
@@ -342,244 +351,46 @@ public class ScenarioTemplateEditorDialog extends JDialog implements ActionListe
         globalPanel.add(btnLoad, gridBagConstraints);
     }
 
+
     /**
-     * Worker function to re-draw the force template list.
+     * Re-reads the force roster into the force table and shows or hides the list based on whether any forces exist.
      */
     private void renderForceList() {
-        GridBagConstraints gbc = new GridBagConstraints();
-        gbc.gridx = 0;
-        gbc.gridy = 0;
-        gbc.gridwidth = 1;
-        gbc.gridheight = 1;
-        gbc.ipadx = 5;
-        gbc.ipady = 5;
-
-        panForceList.removeAll();
-
-        if (forceScrollPane != null) {
-            forceScrollPane.setVisible(!scenarioTemplate.getScenarioForces().isEmpty());
-        }
-
-        gbc.gridy++;
-        // headers
-        JLabel lblGenerationOrder = new JLabel("Order");
-        lblGenerationOrder.setBorder(new LineBorder(Color.GRAY));
-        panForceList.add(lblGenerationOrder, gbc);
-
-        JLabel lblForceNameHeader = new JLabel("Force ID");
-        gbc.gridx++;
-        lblForceNameHeader.setBorder(new LineBorder(Color.GRAY));
-        panForceList.add(lblForceNameHeader, gbc);
-
-        JLabel lblForceAlignmentHeader = new JLabel("Alignment");
-        lblForceAlignmentHeader.setBorder(new LineBorder(Color.GRAY));
-        gbc.gridx++;
-        panForceList.add(lblForceAlignmentHeader, gbc);
-
-        JLabel lblGenerationMethodHeader = new JLabel("Generation");
-        lblGenerationMethodHeader.setBorder(new LineBorder(Color.GRAY));
-        gbc.gridx++;
-        panForceList.add(lblGenerationMethodHeader, gbc);
-
-        JLabel lblMultiplierHeader = new JLabel("<html>Multiplier /<br/> Unit Count</html>");
-        lblMultiplierHeader.setBorder(new LineBorder(Color.GRAY));
-        gbc.gridx++;
-        panForceList.add(lblMultiplierHeader, gbc);
-
-        JLabel lblDeploymentZonesHeader = new JLabel("Deployment");
-        lblDeploymentZonesHeader.setBorder(new LineBorder(Color.GRAY));
-        gbc.gridx++;
-        panForceList.add(lblDeploymentZonesHeader, gbc);
-
-        JLabel lblDestinationZonesHeader = new JLabel("Destination");
-        lblDestinationZonesHeader.setBorder(new LineBorder(Color.GRAY));
-        gbc.gridx++;
-        panForceList.add(lblDestinationZonesHeader, gbc);
-
-        JLabel lblRetreatThresholdHeader = new JLabel("Retreat %");
-        lblRetreatThresholdHeader.setBorder(new LineBorder(Color.GRAY));
-        gbc.gridx++;
-        panForceList.add(lblRetreatThresholdHeader, gbc);
-
-        JLabel lblAllowedUnitTypesHeader = new JLabel("Unit Type");
-        lblAllowedUnitTypesHeader.setBorder(new LineBorder(Color.GRAY));
-        gbc.gridx++;
-        panForceList.add(lblAllowedUnitTypesHeader, gbc);
-
-        JLabel lblWeightClassHeader = new JLabel("Max Wt Class");
-        lblWeightClassHeader.setBorder(new LineBorder(Color.GRAY));
-        gbc.gridx++;
-        panForceList.add(lblWeightClassHeader, gbc);
-
-        JLabel lblArrivalTurnHeader = new JLabel("Arrival Turn");
-        lblArrivalTurnHeader.setBorder(new LineBorder(Color.GRAY));
-        gbc.gridx++;
-        panForceList.add(lblArrivalTurnHeader, gbc);
-
-        JLabel lblReinforceLinkedHeader = new JLabel("Reinforce?");
-        lblReinforceLinkedHeader.setBorder(new LineBorder(Color.GRAY));
-        gbc.gridx++;
-        panForceList.add(lblReinforceLinkedHeader, gbc);
-
-        JLabel lblContributesToBVHeader = new JLabel("+ BV?");
-        lblContributesToBVHeader.setBorder(new LineBorder(Color.GRAY));
-        gbc.gridx++;
-        panForceList.add(lblContributesToBVHeader, gbc);
-
-        JLabel lblContributesToUnitCountHeader = new JLabel("+ Unit Count?");
-        lblContributesToUnitCountHeader.setBorder(new LineBorder(Color.GRAY));
-        gbc.gridx++;
-        panForceList.add(lblContributesToUnitCountHeader, gbc);
-
-        JLabel lblMapSizeHeader = new JLabel("+ Map size?");
-        lblMapSizeHeader.setBorder(new LineBorder(Color.GRAY));
-        gbc.gridx++;
-        panForceList.add(lblMapSizeHeader, gbc);
-
-        gbc.gridy++;
-        gbc.gridx = 0;
-
-        List<ScenarioForceTemplate> forceTemplateList = new ArrayList<>(scenarioTemplate.getAllScenarioForces());
-        Collections.sort(forceTemplateList);
-
-        for (ScenarioForceTemplate sft : forceTemplateList) {
-            JLabel lblForceOrder = new JLabel(Integer.toString(sft.getGenerationOrder()));
-            panForceList.add(lblForceOrder, gbc);
-
-            JLabel lblForceName = new JLabel(sft.getForceName());
-            gbc.gridx++;
-            panForceList.add(lblForceName, gbc);
-
-            JLabel lblForceAlignment = new JLabel(ScenarioForceTemplate.FORCE_ALIGNMENTS[sft.getForceAlignment()]);
-            gbc.gridx++;
-            panForceList.add(lblForceAlignment, gbc);
-
-            JLabel lblGenerationMethod = new JLabel(ScenarioForceTemplate.FORCE_GENERATION_METHODS[sft.getGenerationMethod()]);
-            gbc.gridx++;
-            panForceList.add(lblGenerationMethod, gbc);
-
-            JLabel lblMultiplier = new JLabel();
-            gbc.gridx++;
-
-            if (!sft.isPlayerForce() &&
-                      (sft.getGenerationMethod() !=
-                             ScenarioForceTemplate.ForceGenerationMethod.FixedUnitCount.ordinal())) {
-                lblMultiplier.setText(((Double) sft.getForceMultiplier()).toString());
-                panForceList.add(lblMultiplier, gbc);
-            } else if (!sft.isPlayerForce() &&
-                             (sft.getGenerationMethod() ==
-                                    ScenarioForceTemplate.ForceGenerationMethod.FixedUnitCount.ordinal())) {
-
-                if (sft.getFixedUnitCount() >= 0) {
-                    lblMultiplier.setText(Integer.toString(sft.getFixedUnitCount()));
-                } else {
-                    lblMultiplier.setText("Lance");
-                }
-                panForceList.add(lblMultiplier, gbc);
-            }
-
-            JLabel lblDeploymentZones = getLblDeploymentZones(sft);
-            gbc.gridx++;
-            panForceList.add(lblDeploymentZones, gbc);
-
-            JLabel lblDestinationZones = new JLabel(ScenarioForceTemplate.BOT_DESTINATION_ZONES[sft.getDestinationZone()]);
-            gbc.gridx++;
-            panForceList.add(lblDestinationZones, gbc);
-
-            JLabel lblRetreatThreshold = new JLabel(Integer.toString(sft.getRetreatThreshold()));
-            gbc.gridx++;
-            panForceList.add(lblRetreatThreshold, gbc);
-
-            JLabel lblAllowedUnitTypes = new JLabel(sft.getAllowedUnitTypeName());
-            gbc.gridx++;
-            if (!sft.isPlayerForce()) {
-                panForceList.add(lblAllowedUnitTypes, gbc);
-            }
-
-            JLabel lblWeightClass = new JLabel(EntityWeightClass.getClassName(sft.getMaxWeightClass()));
-            gbc.gridx++;
-            if (!sft.isPlayerForce()) {
-                panForceList.add(lblWeightClass, gbc);
-            }
-
-            JLabel lblArrivalTurn = new JLabel(sft.getArrivalTurn() < 0 ?
-                                                     ScenarioForceTemplate.SPECIAL_ARRIVAL_TURNS.get(sft.getArrivalTurn()) :
-                                                     Integer.toString(sft.getArrivalTurn()));
-            gbc.gridx++;
-            panForceList.add(lblArrivalTurn, gbc);
-
-            JLabel lblReinforceLinked = new JLabel(sft.getCanReinforceLinked() ? "Yes" : "No");
-            gbc.gridx++;
-            panForceList.add(lblReinforceLinked, gbc);
-
-            JLabel lblContributesToBV = new JLabel(sft.getContributesToBV() ? "Yes" : "No");
-            gbc.gridx++;
-            if (!(sft.isEnemyBotForce() || (sft.getForceAlignment() == ForceAlignment.PlanetOwner.ordinal()))) {
-                panForceList.add(lblContributesToBV, gbc);
-            }
-
-            JLabel lblContributesToUnitCount = new JLabel(sft.getContributesToUnitCount() ? "Yes" : "No");
-            gbc.gridx++;
-            if (!(sft.isEnemyBotForce() || (sft.getForceAlignment() == ForceAlignment.PlanetOwner.ordinal()))) {
-                panForceList.add(lblContributesToUnitCount, gbc);
-            }
-
-            JLabel lblMapSize = new JLabel(sft.getContributesToMapSize() ? "Yes" : "No");
-            gbc.gridx++;
-            panForceList.add(lblMapSize, gbc);
-
-            JButton btnRemoveForce = new JButton("Remove");
-            btnRemoveForce.setActionCommand(ForceListCommand.removeCommand(sft.getForceName()));
-            btnRemoveForce.addActionListener(this);
-            gbc.gridx++;
-            panForceList.add(btnRemoveForce, gbc);
-
-            JButton btnEditForce = new JButton("Edit");
-            btnEditForce.setActionCommand(ForceListCommand.editCommand(sft.getForceName()));
-            btnEditForce.addActionListener(this);
-            gbc.gridx++;
-            panForceList.add(btnEditForce, gbc);
-
-            gbc.gridy++;
-            gbc.gridx = 0;
+        forceTableModel.setForces(scenarioTemplate.getAllScenarioForces());
+        if (forceListContainer != null) {
+            forceListContainer.setVisible(!scenarioTemplate.getScenarioForces().isEmpty());
         }
     }
-
-    private static JLabel getLblDeploymentZones(ScenarioForceTemplate sft) {
-        JLabel lblDeploymentZones = new JLabel();
-        StringBuilder dzBuilder = new StringBuilder();
-
-        if (!sft.getDeploymentZones().isEmpty()) {
-            dzBuilder.append("<html>");
-            for (int zone : sft.getDeploymentZones()) {
-                dzBuilder.append(ScenarioForceTemplate.DEPLOYMENT_ZONES[zone]);
-                dzBuilder.append("<br/>");
-            }
-            dzBuilder.append("</html>");
-        } else {
-            dzBuilder.append(ScenarioForceTemplate.FORCE_DEPLOYMENT_SYNC_TYPES[sft.getSyncDeploymentType()
-                                                                                     .ordinal()]);
-            dzBuilder.append(" as ");
-            dzBuilder.append(sft.getSyncedForceName());
-        }
-
-        lblDeploymentZones.setText(dzBuilder.toString());
-        return lblDeploymentZones;
-    }
-
 
     /**
-     * Event handler for when the "Remove" button is pressed for a particular force template.
-     *
-     * @param command The command string containing the index of the force to remove.
+     * Loads the selected force into the force editor for editing.
      */
-    private void deleteForceButtonHandler(String command) {
-        String forceIndex = ForceListCommand.removeForceId(command);
-        scenarioTemplate.getScenarioForces().remove(forceIndex);
+    private void editSelectedForce() {
+        int row = forceTable.getSelectedRow();
+        if (row < 0) {
+            return;
+        }
+        ScenarioForceTemplate sft = forceTableModel.getForceAt(row);
+        forceEditorPanel.loadForce(sft);
+        // Remember which force we are editing so committing updates it in place (and handles a rename) instead of
+        // adding a duplicate.
+        editedForceId = sft.getForceName();
+    }
+
+    /**
+     * Removes the selected force from the roster.
+     */
+    private void removeSelectedForce() {
+        int row = forceTable.getSelectedRow();
+        if (row < 0) {
+            return;
+        }
+        String forceId = forceTableModel.getForceAt(row).getForceName();
+        scenarioTemplate.getScenarioForces().remove(forceId);
 
         // If we just removed the force being edited, drop back to "add new" mode so a later commit does not resurrect
         // it under a stale ID.
-        if (forceIndex.equals(editedForceId)) {
+        if (forceId.equals(editedForceId)) {
             editedForceId = null;
         }
 
@@ -587,19 +398,6 @@ public class ScenarioTemplateEditorDialog extends JDialog implements ActionListe
         renderForceList();
         pack();
         repaint();
-    }
-
-    /**
-     * Event handler for when the "Edit" button is pressed for a particular force template.
-     *
-     * @param command The command string containing the index of the force to edit.
-     */
-    private void editForceButtonHandler(String command) {
-        String forceIndex = ForceListCommand.editForceId(command);
-        forceEditorPanel.loadForce(scenarioTemplate.getScenarioForces().get(forceIndex));
-        // Remember which force we are editing so committing updates it in place (and handles a rename) instead of
-        // adding a duplicate.
-        editedForceId = forceIndex;
     }
 
     /**
@@ -664,11 +462,7 @@ public class ScenarioTemplateEditorDialog extends JDialog implements ActionListe
      */
     @Override
     public void actionPerformed(ActionEvent e) {
-        if (ForceListCommand.isRemove(e.getActionCommand())) {
-            deleteForceButtonHandler(e.getActionCommand());
-        } else if (ForceListCommand.isEdit(e.getActionCommand())) {
-            editForceButtonHandler(e.getActionCommand());
-        } else if (SAVE_TEMPLATE_COMMAND.equals(e.getActionCommand())) {
+        if (SAVE_TEMPLATE_COMMAND.equals(e.getActionCommand())) {
             saveTemplateButtonHandler();
         } else if (LOAD_TEMPLATE_COMMAND.equals(e.getActionCommand())) {
             loadTemplateButtonHandler();
@@ -680,7 +474,8 @@ public class ScenarioTemplateEditorDialog extends JDialog implements ActionListe
      */
     private void toggleForcePanelVisibility() {
         forceEditorPanel.setVisible(!forceEditorPanel.isVisible());
-        forceScrollPane.setVisible(!forceScrollPane.isVisible() && !scenarioTemplate.getScenarioForces().isEmpty());
+        forceListContainer.setVisible(!forceListContainer.isVisible() &&
+                                            !scenarioTemplate.getScenarioForces().isEmpty());
     }
 
 }
