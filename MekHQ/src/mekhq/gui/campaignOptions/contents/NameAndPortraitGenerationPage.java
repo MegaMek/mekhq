@@ -59,7 +59,7 @@ import megamek.client.ui.comboBoxes.MMComboBox;
 import mekhq.campaign.personnel.enums.PersonnelRole;
 import mekhq.campaign.personnel.enums.PersonnelRoleSubType;
 import mekhq.gui.campaignOptions.components.CampaignOptionsCheckBox;
-import mekhq.gui.campaignOptions.components.CampaignOptionsFormPanel;
+import megamek.client.ui.settings.SettingsFormPanel;
 import mekhq.gui.campaignOptions.components.CampaignOptionsHeaderPanel;
 import mekhq.gui.campaignOptions.components.CampaignOptionsLabel;
 import mekhq.gui.campaignOptions.components.CampaignOptionsPagePanel;
@@ -77,7 +77,7 @@ import mekhq.gui.campaignOptions.components.CampaignOptionsPagePanel;
  * {@link #writeToModel(BiographyOptionsModel)} are no-ops.</p>
  */
 class NameAndPortraitGenerationPage {
-    private static final int LABEL_COLUMN_WIDTH = CampaignOptionsFormPanel.DEFAULT_LABEL_WIDTH;
+    private static final int LABEL_COLUMN_WIDTH = SettingsFormPanel.DEFAULT_LABEL_WIDTH;
     // Wider than the default control column because the Biography combo boxes need the extra room.
     private static final int CONTROL_COLUMN_WIDTH = 240;
 
@@ -177,7 +177,7 @@ class NameAndPortraitGenerationPage {
     }
 
     private @Nonnull JPanel createNameGenerationPanel() {
-        final CampaignOptionsFormPanel panel = new CampaignOptionsFormPanel("NameGenerationPanel",
+        final SettingsFormPanel panel = new SettingsFormPanel("NameGenerationPanel",
                 LABEL_COLUMN_WIDTH,
                 CONTROL_COLUMN_WIDTH);
         panel.addCheckBox(chkUseOriginFactionForNames);
@@ -187,7 +187,7 @@ class NameAndPortraitGenerationPage {
     }
 
     private @Nonnull JPanel createPortraitRulesPanel() {
-        final CampaignOptionsFormPanel panel = new CampaignOptionsFormPanel("PortraitRulesPanel",
+        final SettingsFormPanel panel = new SettingsFormPanel("PortraitRulesPanel",
                 LABEL_COLUMN_WIDTH,
                 CONTROL_COLUMN_WIDTH);
         panel.addCheckBoxGrid(2,
@@ -269,7 +269,7 @@ class NameAndPortraitGenerationPage {
         portraitCheckBoxes[portraitIndex] = jCheckBox;
         chkUsePortrait[personnelRoles.size()] = jCheckBox;
 
-        CampaignOptionsFormPanel rolePanel = new CampaignOptionsFormPanel("RandomPortraitRolePanel",
+        SettingsFormPanel rolePanel = new SettingsFormPanel("RandomPortraitRolePanel",
                 LABEL_COLUMN_WIDTH,
                 CONTROL_COLUMN_WIDTH);
         rolePanel.addCheckBoxGrid(2, portraitCheckBoxes);

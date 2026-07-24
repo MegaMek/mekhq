@@ -30,31 +30,35 @@
  * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
  * affiliated with Microsoft.
  */
-package mekhq.gui.campaignOptions;
+package mekhq.gui.clientOptions;
 
+import static java.awt.Color.BLACK;
+import static megamek.utilities.ImageUtilities.addTintToImageIcon;
+import static megamek.utilities.ImageUtilities.scaleImageIcon;
 import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.getImageDirectory;
-import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.sendTipToDetailsPanel;
-import static mekhq.utilities.MHQInternationalization.getTextAt;
+import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.settingsBadges;
 import static mekhq.utilities.MHQInternationalization.isResourceKeyValid;
 
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.Container;
 import java.awt.Dimension;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import javax.swing.Icon;
+import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JComponent;
 
 import jakarta.annotation.Nullable;
 import megamek.client.ui.buttons.ColourSelectorButton;
-import mekhq.gui.campaignOptions.components.CampaignOptionsCheckBox;
-import mekhq.gui.campaignOptions.components.CampaignOptionsFormPanel;
-import mekhq.gui.campaignOptions.components.CampaignOptionsLabel;
-import mekhq.gui.campaignOptions.components.CampaignOptionsPagePanel;
-import mekhq.gui.campaignOptions.components.CampaignOptionsSpinner;
+import megamek.client.ui.settings.SettingsCheckBox;
+import megamek.client.ui.settings.SettingsFormPanel;
+import megamek.client.ui.settings.SettingsPagePanel;
+import megamek.client.ui.settings.SettingsTextProvider;
+import mekhq.gui.campaignOptions.CampaignOptionsMetadata;
+import mekhq.utilities.MHQInternationalization;
 
 /**
  * Base class for the individual MekHQ Client Options pages (Display, Colours, Fonts, Save, New Day, Reminders,
@@ -63,15 +67,32 @@ import mekhq.gui.campaignOptions.components.CampaignOptionsSpinner;
  * used by the Campaign Options pages (for example {@code AttributesAndTraitsPage}).
  *
  * <p>The shared page-building helpers here are {@code static} so the coordinating {@link MHQOptionsPane} and every
- * page can use them the same way. They resolve their text from the {@code GUI.properties} bundle and render each page
- * with a per-page faction emblem header, matching the Campaign Options pages. This class lives in the
- * {@code campaignOptions} package so it can use the framework's package-private classes; it will move with
- * {@link MHQOptionsPane} once the framework is extracted.</p>
+ * page can use them the same way. They adapt MekHQ's {@code GUI.properties} bundle and option metadata to the shared
+ * MegaMek settings framework and render each page with a fixed faction emblem header.</p>
  */
 abstract class MHQOptionsPage {
-    static final String RESOURCE_BUNDLE = "mekhq.resources.GUI";
-    static final int FORM_LABEL_WIDTH = CampaignOptionsFormPanel.DEFAULT_LABEL_WIDTH;
-    static final int FORM_CONTROL_WIDTH = CampaignOptionsFormPanel.DEFAULT_CONTROL_WIDTH;
+    static final SettingsTextProvider TEXT_PROVIDER = new SettingsTextProvider() {
+        @Override
+        public boolean containsKey(String key) {
+            return isResourceKeyValid(MHQInternationalization.getText(key));
+        }
+
+        @Override
+        public String getText(String key) {
+            return MHQInternationalization.getText(key);
+        }
+
+        @Override
+        public String getFormattedText(String key, Object... arguments) {
+            return arguments.length == 0
+                  ? getText(key)
+                  : MHQInternationalization.getFormattedText(key, arguments);
+        }
+    };
+    static final int FORM_LABEL_WIDTH = SettingsFormPanel.DEFAULT_LABEL_WIDTH;
+    static final int FORM_CONTROL_WIDTH = SettingsFormPanel.DEFAULT_CONTROL_WIDTH;
+    private static final int HEADER_IMAGE_SIZE = 80;
+    private static final Map<String, Icon> PAGE_HEADER_ICONS = new HashMap<>();
 
     /**
      * Faction emblem shown in each page's header, hardcoded per page (chosen arbitrarily) so a page always shows the
@@ -102,7 +123,7 @@ abstract class MHQOptionsPage {
      * Builds this page's UI. Implementations must set {@link #created} to {@code true} before returning so the page's
      * controls are subsequently written back on save.
      *
-     * @return the page component (a {@link CampaignOptionsPagePanel})
+    * @return the page component (a {@link SettingsPagePanel})
      */
     abstract Component createPage();
 
@@ -115,9 +136,8 @@ abstract class MHQOptionsPage {
      * by default. Multi-section pages keep that collapsed default; the single-section {@link #buildMHQPage} wrapper
      * re-expands its lone section. Callers add their section(s) and call {@code build()}.
      */
-    static CampaignOptionsPagePanel.Builder pageBuilder(String pageName, boolean showDetailsPanel) {
-        return CampaignOptionsPagePanel.builder(pageName, pageName, getImageDirectory() + factionLogo(pageName))
-                     .resourceBundle(RESOURCE_BUNDLE)
+    static SettingsPagePanel.Builder pageBuilder(String pageName, boolean showDetailsPanel) {
+        return SettingsPagePanel.builder(pageName, TEXT_PROVIDER, "lbl" + pageName + ".text", pageHeaderIcon(pageName))
                      .showDetailsPanel(showDetailsPanel)
                      .sectionsExpandedByDefault(false);
     }
@@ -143,30 +163,30 @@ abstract class MHQOptionsPage {
         // Route each control's tooltip to the shared "Option Details" box (like Campaign Options) and drop the floating
         // tooltip. Only pages that actually have tip-bearing controls get the box, so tooltip-free pages (the colour
         // grids) are not saddled with an empty details area.
-        CampaignOptionsPagePanel.Builder builder = pageBuilder(pageName, registerDetailsTips(content))
-                                                         .sectionsExpandedByDefault(true);
+        SettingsPagePanel.Builder builder = pageBuilder(pageName, registerDetailsTips(content))
+                                                  .sectionsExpandedByDefault(true);
         if (introKey != null) {
-            builder.intro(introKey);
+            builder.intro(introKey + ".intro");
         }
         return builder.section(sectionTitleKey, sectionSummaryKey, content).build();
     }
 
     /**
-     * Creates a {@link CampaignOptionsCheckBox} whose text/tooltip come from {@code resourceName} in the GUI bundle and
+    * Creates a {@link SettingsCheckBox} whose text/tooltip come from {@code resourceName} in the GUI bundle and
      * sets its initial state to {@code selected}. The value is read back into the model by the owning page's
      * {@code writeToModel} method.
      */
-    static CampaignOptionsCheckBox checkBox(String resourceName, boolean selected) {
+    static SettingsCheckBox checkBox(String resourceName, boolean selected) {
         return checkBox(resourceName, selected, null);
     }
 
     /**
-     * Creates a {@link CampaignOptionsCheckBox} as {@link #checkBox(String, boolean)} does, but with badge metadata
+    * Creates a {@link SettingsCheckBox} as {@link #checkBox(String, boolean)} does, but with badge metadata
      * (such as the "important information" flag) shown after the text.
      */
-    static CampaignOptionsCheckBox checkBox(String resourceName, boolean selected,
+    static SettingsCheckBox checkBox(String resourceName, boolean selected,
           @Nullable CampaignOptionsMetadata metadata) {
-        CampaignOptionsCheckBox checkBox = new CampaignOptionsCheckBox(RESOURCE_BUNDLE, resourceName, metadata);
+        SettingsCheckBox checkBox = new SettingsCheckBox(TEXT_PROVIDER, resourceName, settingsBadges(metadata));
         checkBox.setSelected(selected);
         return checkBox;
     }
@@ -177,17 +197,15 @@ abstract class MHQOptionsPage {
      * {@code writeToModel} method.
      */
     static ColourSelectorButton colourButton(String key, Color colour) {
-        ColourSelectorButton button = new ColourSelectorButton(getTextAt(RESOURCE_BUNDLE, key + ".text"));
+        ColourSelectorButton button = new ColourSelectorButton(MHQInternationalization.getText(key + ".text"));
         button.setName("btn" + key);
         button.setColour(colour);
         return button;
     }
 
     /**
-     * Recursively wires every tip-bearing control under {@code component} to the shared "Option Details" help box: on
-     * mouse-over the control sends its tooltip text there, and its floating Swing tooltip is removed so the help shows
-     * only in the box, mirroring the Campaign Options behaviour. Buttons are skipped so their action tooltips (such as
-     * the user-directory chooser and help buttons) keep working as ordinary tooltips.
+    * Recursively detects tip-bearing controls under {@code component}. The shared content host performs the actual
+    * instance-owned help routing when the page is mounted. Buttons are skipped so action tooltips remain floating.
      *
      * @param component the subtree to process
      *
@@ -199,14 +217,6 @@ abstract class MHQOptionsPage {
         if (component instanceof JComponent jComponent && !(component instanceof JButton)) {
             String tooltip = jComponent.getToolTipText();
             if (tooltip != null && !tooltip.isBlank()) {
-                String detailsText = detailsTextFor(jComponent, tooltip);
-                jComponent.addMouseListener(new MouseAdapter() {
-                    @Override
-                    public void mouseEntered(MouseEvent event) {
-                        sendTipToDetailsPanel(detailsText);
-                    }
-                });
-                jComponent.setToolTipText(null);
                 anyTip = true;
             }
         }
@@ -216,40 +226,6 @@ abstract class MHQOptionsPage {
             }
         }
         return anyTip;
-    }
-
-    /**
-     * Resolves the text a control should show in the "Option Details" box. The shared checkbox, spinner, and label
-     * components word-wrap their Swing tooltip at a fixed character count; for those the raw bundle text is re-resolved
-     * from the control's name so the box can soft-wrap it to its own width (and so intentional line breaks are kept),
-     * matching Campaign Options. Other controls (combo boxes, text fields) already carry raw tooltip text, so their
-     * tooltip is used as-is.
-     *
-     * @param component the tip-bearing control
-     * @param tooltip   the control's current Swing tooltip, used as-is when the raw text cannot be re-resolved
-     *
-     * @return the help text to show in the details box
-     */
-    static String detailsTextFor(JComponent component, String tooltip) {
-        boolean wordWrapsTooltip = component instanceof CampaignOptionsCheckBox
-              || component instanceof CampaignOptionsSpinner
-              || component instanceof CampaignOptionsLabel;
-        if (wordWrapsTooltip) {
-            // These components set their Swing name to a 3-character prefix ("chk"/"spn"/"lbl") plus the resource base
-            // name, so stripping the prefix recovers the base used for the ".tooltip"/".toolTipText" keys.
-            String name = component.getName();
-            if (name != null && name.length() > 3) {
-                String base = name.substring(3);
-                String raw = getTextAt(RESOURCE_BUNDLE, base + ".tooltip");
-                if (!isResourceKeyValid(raw)) {
-                    raw = getTextAt(RESOURCE_BUNDLE, base + ".toolTipText");
-                }
-                if (isResourceKeyValid(raw)) {
-                    return raw;
-                }
-            }
-        }
-        return tooltip;
     }
 
     /**
@@ -272,5 +248,13 @@ abstract class MHQOptionsPage {
      */
     private static String factionLogo(String pageName) {
         return PAGE_FACTION_LOGOS.getOrDefault(pageName, "logo_star_league.png");
+    }
+
+    private static Icon pageHeaderIcon(String pageName) {
+        return PAGE_HEADER_ICONS.computeIfAbsent(pageName, ignored -> {
+            String imageAddress = getImageDirectory() + factionLogo(pageName);
+            ImageIcon icon = scaleImageIcon(new ImageIcon(imageAddress), HEADER_IMAGE_SIZE, true);
+            return addTintToImageIcon(icon.getImage(), BLACK);
+        });
     }
 }

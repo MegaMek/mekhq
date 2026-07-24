@@ -67,12 +67,14 @@ import javax.swing.BorderFactory;
 import javax.swing.JComponent;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
-import javax.swing.JSplitPane;
 import javax.swing.KeyStroke;
-import javax.swing.SwingUtilities;
 
 import jakarta.annotation.Nonnull;
 import jakarta.annotation.Nullable;
+import megamek.client.ui.settings.SettingsContentHost;
+import megamek.client.ui.settings.SettingsNavigationText;
+import megamek.client.ui.settings.SettingsPane;
+import megamek.client.ui.settings.SettingsRoute;
 import megamek.client.ui.util.UIUtil;
 import mekhq.CampaignPreset;
 import mekhq.MekHQ;
@@ -97,10 +99,9 @@ import mekhq.gui.campaignOptions.optionChangeDialogs.*;
 
 /**
  * {@code CampaignOptionsPane} is the central panel of the Campaign Options dialog. It presents every campaign setting
- * through a searchable navigation tree on the left (a {@link CampaignOptionsNavigationPanel}) paired with a scrollable
- * content host on the right (a {@link CampaignOptionsContentHost}) inside a {@link javax.swing.JSplitPane}.
+ * through the shared MegaMek settings framework.
  *
- * <p>The pane registers a flat set of {@link CampaignOptionsRoute}s - each describing a navigable destination and its
+ * <p>The pane registers a flat set of {@link SettingsRoute}s - each describing a navigable destination and its
  * hierarchical path - and maps each one to a page factory. Pages are built lazily the first time they are shown (or
  * when the navigation search index is warmed) and then cached. The per-area builders
  * ({@link mekhq.gui.campaignOptions.contents.GeneralPage GeneralPage},
@@ -150,14 +151,9 @@ public class CampaignOptionsPane extends JPanel {
     private final Campaign campaign;
     private final CampaignOptions campaignOptions;
     private final CampaignOptionsDialogMode mode;
-    private final List<CampaignOptionsRoute> navigationTargets = new ArrayList<>();
+    private final List<SettingsRoute> navigationTargets = new ArrayList<>();
     private final Map<String, Supplier<Component>> directPageFactories = new HashMap<>();
-    private final Map<String, Component> directPageCache = new HashMap<>();
-    private boolean searchIndexInitialized = false;
-
-    private CampaignOptionsContentHost activeContentHost;
-    private CampaignOptionsNavigationPanel navigationPanel;
-    private boolean isSyncingNavigationSelection;
+    private SettingsPane settingsPane;
 
     private GeneralPage generalPage;
     private PersonnelPages personnelPages;
@@ -204,28 +200,21 @@ public class CampaignOptionsPane extends JPanel {
     protected void initialize() {
         JPanel generalPage = createGeneralPage(mode);
         registerRoutes(generalPage);
-        CampaignOptionsRoute initialRoute = navigationTargets.get(0);
-
-        // Bottom margin is 0: the footer's button panel already adds top padding, so a bottom margin here would
-        // stack with it and make the gap above the footer buttons look larger than the gap below them.
-        setBorder(BorderFactory.createEmptyBorder(CONTENT_MARGIN, CONTENT_MARGIN, 0, CONTENT_MARGIN));
-        CampaignOptionsContentHost contentHost = createContentHost(generalPage, initialRoute);
 
         // Abridged startup (preset "Apply") shows only the General page, so skip the navigation tree and its search
         // entirely and let the content fill the dialog.
         if (mode == STARTUP_ABRIDGED) {
+            int margin = CONTENT_MARGIN;
+            setBorder(BorderFactory.createEmptyBorder(margin, margin, 0, margin));
+            SettingsContentHost contentHost = new SettingsContentHost(generalPage,
+                  getTextAt(getCampaignOptionsResourceBundle(), "campaignOptionsHelp.title"), true);
             add(contentHost, BorderLayout.CENTER);
             return;
         }
 
-        JSplitPane splitPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT,
-                createNavigationPanel(),
-                contentHost);
-        splitPane.setName("campaignOptionsSplitPane");
-        splitPane.setResizeWeight(0.0);
-        splitPane.setDividerLocation(UIUtil.scaleForGUI(CampaignOptionsNavigationPanel.NAVIGATION_WIDTH));
-        add(splitPane, BorderLayout.CENTER);
-        navigationPanel.selectRoute(navigationTargets.get(0));
+        settingsPane = new SettingsPane(navigationTargets, directPageFactories, createNavigationText(),
+              getTextAt(getCampaignOptionsResourceBundle(), "campaignOptionsHelp.title"));
+        add(settingsPane, BorderLayout.CENTER);
         registerSearchShortcut();
     }
 
@@ -240,22 +229,20 @@ public class CampaignOptionsPane extends JPanel {
         getActionMap().put("focusCampaignOptionsSearch", new AbstractAction() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                navigationPanel.focusSearchField();
+                settingsPane.focusSearchField();
             }
         });
     }
 
-    private CampaignOptionsNavigationPanel createNavigationPanel() {
-        navigationPanel = new CampaignOptionsNavigationPanel(navigationTargets, this::selectedNavigationTarget);
-        navigationPanel.setSearchIndexInitializer(this::ensureSearchIndexBuilt);
-        return navigationPanel;
-    }
-
-    private CampaignOptionsContentHost createContentHost(Component initialContent, CampaignOptionsRoute initialRoute) {
-        activeContentHost = new CampaignOptionsContentHost(initialContent,
-                getQuoteResourceName(initialRoute),
-                initialRoute.shouldShowHelpPanel());
-        return activeContentHost;
+    private SettingsNavigationText createNavigationText() {
+        String resourceBundle = getCampaignOptionsResourceBundle();
+        return new SettingsNavigationText(
+              getTextAt(resourceBundle, "txtCampaignOptionsFilter.text"),
+              getTextAt(resourceBundle, "txtCampaignOptionsFilter.tooltip"),
+              getTextAt(resourceBundle, "campaignOptionsFilter.noMatches"),
+              getTextAt(resourceBundle, "campaignOptionsFilter.matches"),
+              getTextAt(resourceBundle, "btnExpandAll.text"),
+              getTextAt(resourceBundle, "btnCollapseAll.text"));
     }
 
     private void registerRoutes(JPanel generalPage) {
@@ -399,174 +386,6 @@ public class CampaignOptionsPane extends JPanel {
 
     }
 
-    private void selectedNavigationTarget(CampaignOptionsRoute route) {
-        isSyncingNavigationSelection = true;
-        try {
-            selectRoute(route);
-            resetContentScrollPosition();
-        } finally {
-            isSyncingNavigationSelection = false;
-        }
-    }
-
-    private void resetContentScrollPosition() {
-        if (activeContentHost != null) {
-            activeContentHost.resetScrollPosition();
-        }
-    }
-
-    private void selectRoute(CampaignOptionsRoute route) {
-        // Category (parent) routes now have a landing page of their own, so they normally resolve to themselves;
-        // getDefaultDirectRoute only falls back to a child page for a route with no page at all. We intentionally do
-        // NOT move the tree highlight here: re-selecting a child would trap keyboard navigation, because pressing Up
-        // onto a group row would immediately bounce the selection back down to its first child. Leaving the highlight
-        // where the user put it lets Up/Down move one row at a time in both directions.
-        CampaignOptionsRoute effectiveRoute = getDefaultDirectRoute(route);
-        showDirectRoute(effectiveRoute);
-    }
-
-    private boolean showDirectRoute(CampaignOptionsRoute route) {
-        Component directPage = getDirectPage(route.getId());
-        if (directPage == null) {
-            return false;
-        }
-
-        activeContentHost.setContent(directPage, getQuoteResourceName(route), route.shouldShowHelpPanel());
-        expandSectionsForActiveFilter(directPage);
-        return true;
-    }
-
-    /**
-     * When a page is opened while a navigation search is active, expands the section(s) whose title or summary match
-     * the search so the result the user clicked is revealed, instead of the page opening fully collapsed. When the
-     * search matched the page as a whole (its title or an internal name such as "stratcon" for the renamed "Digital
-     * GMs" page) rather than any single section, every section is expanded so the page is still revealed.
-     *
-     * @param directPage the page component just shown
-     */
-    private void expandSectionsForActiveFilter(Component directPage) {
-        if (navigationPanel == null) {
-            return;
-        }
-
-        String activeFilter = navigationPanel.getActiveFilter();
-        if (activeFilter.isBlank()) {
-            return;
-        }
-
-        CampaignOptionsPagePanel pagePanel = CampaignOptionsContentHost.findPagePanel(directPage);
-        if (pagePanel == null) {
-            return;
-        }
-
-        String[] tokens = activeFilter.split("\\s+");
-        boolean expandedMatchingSection = pagePanel.expandSectionsMatching(
-              sectionText -> sectionMatchesAllTokens(sectionText, tokens));
-        if (!expandedMatchingSection) {
-            pagePanel.expandAllSections();
-        }
-    }
-
-    private static boolean sectionMatchesAllTokens(String rawSectionText, String[] normalizedTokens) {
-        String normalizedSectionText = CampaignOptionsRoute.normalizeSearchText(rawSectionText);
-        for (String token : normalizedTokens) {
-            if (!token.isBlank() && !normalizedSectionText.contains(token)) {
-                return false;
-            }
-        }
-        return true;
-    }
-
-    private String getQuoteResourceName(CampaignOptionsRoute route) {
-        List<String> titleResourceNames = route.getTitleResourceNames();
-        return titleResourceNames.get(titleResourceNames.size() - 1);
-    }
-
-    private Component getDirectPage(String routeId) {
-        Component directPage = directPageCache.get(routeId);
-        if (directPage != null) {
-            return directPage;
-        }
-
-        Supplier<Component> directPageFactory = directPageFactories.get(routeId);
-        if (directPageFactory == null) {
-            return null;
-        }
-
-        directPage = directPageFactory.get();
-        directPageCache.putIfAbsent(routeId, directPage);
-        Component cachedPage = directPageCache.get(routeId);
-        harvestSectionSearchText(routeId, cachedPage);
-        return cachedPage;
-    }
-
-    /**
-     * Copies the resolved section titles and summaries of a freshly built page into its matching route so the
-     * navigation filter can match section headings. This is a no-op when the page has no sections or has already been
-     * harvested.
-     *
-     * @param routeId the id of the route that owns the page
-     * @param page    the built page content
-     */
-    private void harvestSectionSearchText(String routeId, Component page) {
-        if (!(page instanceof CampaignOptionsPagePanel pagePanel)) {
-            return;
-        }
-
-        String sectionSearchText = pagePanel.getSectionSearchText();
-        if (sectionSearchText.isBlank()) {
-            return;
-        }
-
-        for (CampaignOptionsRoute navigationTarget : navigationTargets) {
-            if (navigationTarget.getId().equals(routeId)) {
-                navigationTarget.setSectionSearchText(sectionSearchText);
-                return;
-            }
-        }
-    }
-
-    /**
-     * Builds every direct page once, on demand, so section titles and summaries become searchable across all pages
-     * rather than only the pages the user has already visited. Pages are built progressively, one per Swing event, to
-     * keep the dialog responsive, and the built pages are cached so later navigation is instant. Runs at most once.
-     */
-    void ensureSearchIndexBuilt() {
-        if (searchIndexInitialized) {
-            return;
-        }
-        searchIndexInitialized = true;
-        buildSearchIndexStep(new ArrayList<>(directPageFactories.keySet()), 0);
-    }
-
-    private void buildSearchIndexStep(List<String> routeIds, int index) {
-        if (index >= routeIds.size()) {
-            if (navigationPanel != null) {
-                navigationPanel.refreshFilter();
-            }
-            return;
-        }
-
-        getDirectPage(routeIds.get(index));
-        SwingUtilities.invokeLater(() -> buildSearchIndexStep(routeIds, index + 1));
-    }
-
-    private CampaignOptionsRoute getDefaultDirectRoute(CampaignOptionsRoute route) {
-        if (directPageFactories.containsKey(route.getId())) {
-            return route;
-        }
-
-        String routePrefix = route.getId() + ".";
-        for (CampaignOptionsRoute navigationTarget : navigationTargets) {
-            if (navigationTarget.getId().startsWith(routePrefix)
-                    && directPageFactories.containsKey(navigationTarget.getId())) {
-                return navigationTarget;
-            }
-        }
-
-        return route;
-    }
-
     private void ensureCategoryLoaded(String topLevelResourceName) {
         switch (topLevelResourceName) {
             case "humanResourcesCategory" -> {
@@ -679,9 +498,8 @@ public class CampaignOptionsPane extends JPanel {
             directPageFactories.put(descriptor.getId(), descriptor.getPageFactory());
         }
 
-        navigationTargets
-                .add(new CampaignOptionsRoute(descriptor.getId(), path, descriptor.getTitleResourceNames(),
-                        descriptor.shouldShowHelpPanel()));
+          navigationTargets.add(new SettingsRoute(descriptor.getId(), path, descriptor.getTitleResourceNames(),
+              descriptor.getTitleResourceNames(), descriptor.shouldShowHelpPanel()));
     }
 
     private static class CampaignOptionsRouteOptions {

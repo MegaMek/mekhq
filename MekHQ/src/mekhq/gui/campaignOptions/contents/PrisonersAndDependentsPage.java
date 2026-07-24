@@ -53,7 +53,7 @@ import megamek.client.ui.comboBoxes.MMComboBox;
 import mekhq.campaign.randomEvents.prisoners.PrisonerCaptureStyle;
 import mekhq.gui.campaignOptions.CampaignOptionFlag;
 import mekhq.gui.campaignOptions.components.CampaignOptionsCheckBox;
-import mekhq.gui.campaignOptions.components.CampaignOptionsFormPanel;
+import megamek.client.ui.settings.SettingsFormPanel;
 import mekhq.gui.campaignOptions.components.CampaignOptionsHeaderPanel;
 import mekhq.gui.campaignOptions.components.CampaignOptionsLabel;
 import mekhq.gui.campaignOptions.components.CampaignOptionsPagePanel;
@@ -72,8 +72,8 @@ import mekhq.gui.campaignOptions.components.CampaignOptionsSpinner;
  * {@link #writeToModel(PersonnelOptionsModel)} are no-ops.</p>
  */
 class PrisonersAndDependentsPage {
-    private static final int LABEL_COLUMN_WIDTH = CampaignOptionsFormPanel.DEFAULT_LABEL_WIDTH;
-    private static final int CONTROL_COLUMN_WIDTH = CampaignOptionsFormPanel.DEFAULT_CONTROL_WIDTH;
+    private static final int LABEL_COLUMN_WIDTH = SettingsFormPanel.DEFAULT_LABEL_WIDTH;
+    private static final int CONTROL_COLUMN_WIDTH = SettingsFormPanel.DEFAULT_CONTROL_WIDTH;
 
     private CampaignOptionsHeaderPanel prisonersAndDependentsHeader;
     private JLabel lblPrisonerCaptureStyle;
@@ -158,7 +158,7 @@ class PrisonersAndDependentsPage {
         chkUseFunctionalEscapeArtist.addMouseListener(createTipPanelUpdater("UseFunctionalEscapeArtist"));
 
         // Layout the Panel
-        final CampaignOptionsFormPanel panel = new CampaignOptionsFormPanel("PrisonersPanel",
+        final SettingsFormPanel panel = new SettingsFormPanel("PrisonersPanel",
                 LABEL_COLUMN_WIDTH,
                 CONTROL_COLUMN_WIDTH);
         panel.addRow(lblPrisonerCaptureStyle, comboPrisonerCaptureStyle);
@@ -197,7 +197,7 @@ class PrisonersAndDependentsPage {
         spnCivilianProfessionDieSize.addMouseListener(createTipPanelUpdater("CivilianProfessionDieSize"));
 
         // Layout the Panel
-        final CampaignOptionsFormPanel panel = new CampaignOptionsFormPanel("DependentsPanel",
+        final SettingsFormPanel panel = new SettingsFormPanel("DependentsPanel",
                 LABEL_COLUMN_WIDTH,
                 CONTROL_COLUMN_WIDTH);
         panel.addCheckBoxGrid(2,

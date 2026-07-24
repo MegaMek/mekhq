@@ -30,10 +30,10 @@
  * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
  * affiliated with Microsoft.
  */
-package mekhq.gui.campaignOptions;
+package mekhq.gui.clientOptions;
 
 import static megamek.client.ui.util.FontHandler.symbolIcon;
-import static mekhq.utilities.MHQInternationalization.getTextAt;
+import static mekhq.utilities.MHQInternationalization.getText;
 
 import java.awt.Color;
 import java.awt.Component;
@@ -52,11 +52,11 @@ import javax.swing.JPanel;
 import javax.swing.UIManager;
 
 import megamek.client.ui.comboBoxes.MMComboBox;
+import megamek.client.ui.settings.SettingsCheckBox;
+import megamek.client.ui.settings.SettingsFormPanel;
+import megamek.client.ui.settings.SettingsLabel;
+import megamek.client.ui.settings.SettingsSpinner;
 import megamek.client.ui.util.UIUtil;
-import mekhq.gui.campaignOptions.components.CampaignOptionsCheckBox;
-import mekhq.gui.campaignOptions.components.CampaignOptionsFormPanel;
-import mekhq.gui.campaignOptions.components.CampaignOptionsLabel;
-import mekhq.gui.campaignOptions.components.CampaignOptionsSpinner;
 import mekhq.gui.enums.FormationIconOperationalStatusStyle;
 
 /**
@@ -66,27 +66,27 @@ import mekhq.gui.enums.FormationIconOperationalStatusStyle;
  */
 class MHQNewDayPage extends MHQOptionsPage {
     // New Day - Personnel Pools (keyed by resource name, matching MHQOptionsModel.newDayPools)
-    private final Map<String, CampaignOptionsCheckBox> poolCheckBoxes = new HashMap<>();
+      private final Map<String, SettingsCheckBox> poolCheckBoxes = new HashMap<>();
 
     // New Day - Automation
-    private CampaignOptionsCheckBox chkNewDayAutoLogistics;
-    private CampaignOptionsCheckBox chkNewDayMRMS;
-    private CampaignOptionsCheckBox chkNewDayOptimizeMedicalAssignments;
-    private CampaignOptionsCheckBox chkNewDayAutomaticallyAssignUnmaintainedUnits;
-    private CampaignOptionsCheckBox chkSelfCorrectMaintenance;
+      private SettingsCheckBox chkNewDayAutoLogistics;
+      private SettingsCheckBox chkNewDayMRMS;
+      private SettingsCheckBox chkNewDayOptimizeMedicalAssignments;
+      private SettingsCheckBox chkNewDayAutomaticallyAssignUnmaintainedUnits;
+      private SettingsCheckBox chkSelfCorrectMaintenance;
 
     // New Day - Training
-    private CampaignOptionsCheckBox chkNewMonthQuickTrain;
-    private CampaignOptionsSpinner spinnerQuickTrainTarget;
-    private CampaignOptionsCheckBox chkLevelArtillery;
-    private CampaignOptionsCheckBox chkLevelScoutingSkills;
-    private CampaignOptionsCheckBox chkLevelEscapeSkills;
-    private CampaignOptionsCheckBox chkLevelLeadership;
-    private CampaignOptionsCheckBox chkLevelTraining;
-    private CampaignOptionsCheckBox chkLevelOtherCommandSkills;
+      private SettingsCheckBox chkNewMonthQuickTrain;
+      private SettingsSpinner spinnerQuickTrainTarget;
+      private SettingsCheckBox chkLevelArtillery;
+      private SettingsCheckBox chkLevelScoutingSkills;
+      private SettingsCheckBox chkLevelEscapeSkills;
+      private SettingsCheckBox chkLevelLeadership;
+      private SettingsCheckBox chkLevelTraining;
+      private SettingsCheckBox chkLevelOtherCommandSkills;
 
     // New Day - Formation Icons
-    private CampaignOptionsCheckBox chkNewDayFormationIconOperationalStatus;
+      private SettingsCheckBox chkNewDayFormationIconOperationalStatus;
     private MMComboBox<FormationIconOperationalStatusStyle> comboNewDayFormationIconOperationalStatusStyle;
 
     MHQNewDayPage(MHQOptionsModel model) {
@@ -118,7 +118,7 @@ class MHQNewDayPage extends MHQOptionsPage {
     }
 
     private JPanel createNewDayPoolSection() {
-        CampaignOptionsFormPanel panel = new CampaignOptionsFormPanel("MHQNewDayPoolContent", FORM_LABEL_WIDTH,
+      SettingsFormPanel panel = new SettingsFormPanel("MHQNewDayPoolContent", FORM_LABEL_WIDTH,
               FORM_CONTROL_WIDTH);
         // Two columns of parent/child groups: each "Fill X Pool" parent sits above its indented "Do Not Release
         // Surplus X" child (joined by a subdirectory-arrow connector), and the groups flow two-across so the section
@@ -147,7 +147,7 @@ class MHQNewDayPage extends MHQOptionsPage {
                     model.newDayAutomaticallyAssignUnmaintainedUnits);
         chkSelfCorrectMaintenance = checkBox("chkSelfCorrectMaintenance", model.selfCorrectMaintenance);
 
-        CampaignOptionsFormPanel panel = new CampaignOptionsFormPanel("MHQNewDayTasksContent", FORM_LABEL_WIDTH,
+      SettingsFormPanel panel = new SettingsFormPanel("MHQNewDayTasksContent", FORM_LABEL_WIDTH,
               FORM_CONTROL_WIDTH);
         panel.addCheckBoxGrid(2, chkNewDayAutoLogistics, chkNewDayMRMS, chkNewDayOptimizeMedicalAssignments,
               chkNewDayAutomaticallyAssignUnmaintainedUnits, chkSelfCorrectMaintenance);
@@ -157,9 +157,9 @@ class MHQNewDayPage extends MHQOptionsPage {
     private JPanel createNewDayTrainingSection() {
         chkNewMonthQuickTrain = checkBox("chkNewMonthQuickTrain", model.newMonthQuickTrain);
 
-        CampaignOptionsLabel labelQuickTrainTarget = new CampaignOptionsLabel(RESOURCE_BUNDLE, "lblQuickTrainTarget");
+      SettingsLabel labelQuickTrainTarget = new SettingsLabel(TEXT_PROVIDER, "lblQuickTrainTarget");
         spinnerQuickTrainTarget =
-              new CampaignOptionsSpinner(RESOURCE_BUNDLE, "lblQuickTrainTarget", 5, 1, 10, 1);
+              new SettingsSpinner(TEXT_PROVIDER, "lblQuickTrainTarget", 5, 1, 10, 1);
         spinnerQuickTrainTarget.setValue(model.quickTrainTarget);
 
         chkLevelArtillery = checkBox("chkLevelArtillery", model.levelArtillery);
@@ -169,7 +169,7 @@ class MHQNewDayPage extends MHQOptionsPage {
         chkLevelTraining = checkBox("chkLevelTraining", model.levelTraining);
         chkLevelOtherCommandSkills = checkBox("chkLevelOtherCommandSkills", model.levelOtherCommand);
 
-        CampaignOptionsFormPanel panel = new CampaignOptionsFormPanel("MHQNewDayTrainingContent", FORM_LABEL_WIDTH,
+      SettingsFormPanel panel = new SettingsFormPanel("MHQNewDayTrainingContent", FORM_LABEL_WIDTH,
               FORM_CONTROL_WIDTH);
         panel.addCheckBox(chkNewMonthQuickTrain);
         panel.addRow(labelQuickTrainTarget, spinnerQuickTrainTarget);
@@ -182,13 +182,13 @@ class MHQNewDayPage extends MHQOptionsPage {
         chkNewDayFormationIconOperationalStatus =
               checkBox("chkNewDayFormationIconOperationalStatus", model.newDayFormationIconOperationalStatus);
 
-        CampaignOptionsLabel labelStyle =
-              new CampaignOptionsLabel(RESOURCE_BUNDLE, "lblNewDayFormationIconOperationalStatusStyle");
+        SettingsLabel labelStyle =
+              new SettingsLabel(TEXT_PROVIDER, "lblNewDayFormationIconOperationalStatusStyle");
         comboNewDayFormationIconOperationalStatusStyle = new MMComboBox<>(
               "comboNewDayFormationIconOperationalStatusStyle", FormationIconOperationalStatusStyle.values());
         comboNewDayFormationIconOperationalStatusStyle.setSelectedItem(
               model.newDayFormationIconOperationalStatusStyle);
-        comboNewDayFormationIconOperationalStatusStyle.setToolTipText(getTextAt(RESOURCE_BUNDLE,
+        comboNewDayFormationIconOperationalStatusStyle.setToolTipText(getText(
               "lblNewDayFormationIconOperationalStatusStyle.toolTipText"));
         comboNewDayFormationIconOperationalStatusStyle.setRenderer(new DefaultListCellRenderer() {
             @Override
@@ -211,7 +211,7 @@ class MHQNewDayPage extends MHQOptionsPage {
         chkNewDayFormationIconOperationalStatus.addActionListener(evt -> syncStyleEnabled.run());
         syncStyleEnabled.run();
 
-        CampaignOptionsFormPanel panel = new CampaignOptionsFormPanel("MHQNewDayFormationContent", FORM_LABEL_WIDTH,
+      SettingsFormPanel panel = new SettingsFormPanel("MHQNewDayFormationContent", FORM_LABEL_WIDTH,
               FORM_CONTROL_WIDTH);
         panel.addCheckBox(chkNewDayFormationIconOperationalStatus);
         panel.addRow(labelStyle, comboNewDayFormationIconOperationalStatusStyle);
@@ -225,8 +225,8 @@ class MHQNewDayPage extends MHQOptionsPage {
      * and the child is enabled only while the parent is selected. The caller lays the groups out two-across.
      */
     private JComponent poolPair(String fillKey, String noReleaseKey) {
-        CampaignOptionsCheckBox fill = checkBox(fillKey, Boolean.TRUE.equals(model.newDayPools.get(fillKey)));
-        CampaignOptionsCheckBox noRelease =
+      SettingsCheckBox fill = checkBox(fillKey, Boolean.TRUE.equals(model.newDayPools.get(fillKey)));
+      SettingsCheckBox noRelease =
               checkBox(noReleaseKey, Boolean.TRUE.equals(model.newDayPools.get(noReleaseKey)));
         poolCheckBoxes.put(fillKey, fill);
         poolCheckBoxes.put(noReleaseKey, noRelease);

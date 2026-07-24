@@ -61,11 +61,11 @@ import mekhq.campaign.digitalGM.stratCon.StratConPlayType;
 import mekhq.campaign.personnel.skills.Skills;
 import mekhq.gui.campaignOptions.CampaignOptionFlag;
 import mekhq.gui.campaignOptions.components.CampaignOptionsCheckBox;
-import mekhq.gui.campaignOptions.components.CampaignOptionsFormPanel;
+import megamek.client.ui.settings.SettingsFormPanel;
 import mekhq.gui.campaignOptions.components.CampaignOptionsHeaderPanel;
 import mekhq.gui.campaignOptions.components.CampaignOptionsLabel;
 import mekhq.gui.campaignOptions.components.CampaignOptionsPagePanel;
-import mekhq.gui.campaignOptions.components.CampaignOptionsPairedFieldGridPanel;
+import megamek.client.ui.settings.SettingsPairedFieldGridPanel;
 import mekhq.gui.campaignOptions.components.CampaignOptionsSpinner;
 
 /**
@@ -80,17 +80,16 @@ import mekhq.gui.campaignOptions.components.CampaignOptionsSpinner;
  * called, {@link #readFromModel(RulesetsOptionsModel)} and {@link #writeToModel(RulesetsOptionsModel)} are no-ops.</p>
  */
 class StratConPage {
-    private static final int LABEL_COLUMN_WIDTH = CampaignOptionsFormPanel.DEFAULT_LABEL_WIDTH;
-    private static final int CONTROL_COLUMN_WIDTH = CampaignOptionsFormPanel.DEFAULT_CONTROL_WIDTH;
+    private static final int LABEL_COLUMN_WIDTH = SettingsFormPanel.DEFAULT_LABEL_WIDTH;
+    private static final int CONTROL_COLUMN_WIDTH = SettingsFormPanel.DEFAULT_CONTROL_WIDTH;
     private static final int CHECKBOX_GRID_COLUMNS = 2;
     private static final int FORM_LABEL_CONTROL_GAP = 12;
     private static final int GRID_CONTROL_COLUMN_WIDTH = 100;
     // First pair column = label column + the form's label/control gap, so a
     // two-column grid's column 3 lines up
     // with the control column of the 2-column form sections on the same page. The
-    // following pair is narrower so the
-    // whole grid still stays within the shared page-width floor (312 + 303 -> 640px
-    // section; column 3 at x=312).
+            // following pair is narrower so the whole grid's 640px natural section width
+            // stays within the shared page-width floor (column 3 at x=312).
     private static final int GRID_FIRST_PAIR_COLUMN_WIDTH = LABEL_COLUMN_WIDTH + FORM_LABEL_CONTROL_GAP;
     private static final int GRID_FOLLOWING_PAIR_COLUMN_WIDTH = 303;
 
@@ -461,7 +460,7 @@ class StratConPage {
     }
 
     private @Nonnull JPanel createStratConGeneralOptionsPanel() {
-        final CampaignOptionsFormPanel panel = new CampaignOptionsFormPanel("StratConGeneralOptionsPanel",
+        final SettingsFormPanel panel = new SettingsFormPanel("StratConGeneralOptionsPanel",
               LABEL_COLUMN_WIDTH,
               CONTROL_COLUMN_WIDTH);
         panel.addRow(lblStratConPlayType, comboStratConPlayType);
@@ -477,7 +476,7 @@ class StratConPage {
     }
 
     private @Nonnull JPanel createStratConScenarioGenerationPanel() {
-        final CampaignOptionsFormPanel panel = new CampaignOptionsFormPanel("StratConScenarioGenerationPanel",
+        final SettingsFormPanel panel = new SettingsFormPanel("StratConScenarioGenerationPanel",
               LABEL_COLUMN_WIDTH,
               CONTROL_COLUMN_WIDTH);
         panel.addRow(lblOpForLanceTypeMeks, spnOpForLanceTypeMeks);
@@ -499,7 +498,7 @@ class StratConPage {
     }
 
     private @Nonnull JPanel createStratConScenarioModifiersPanel() {
-        final CampaignOptionsFormPanel panel = new CampaignOptionsFormPanel("StratConScenarioModifiersPanel",
+        final SettingsFormPanel panel = new SettingsFormPanel("StratConScenarioModifiersPanel",
               LABEL_COLUMN_WIDTH,
               CONTROL_COLUMN_WIDTH);
         panel.addRow(lblEnemyFacilityModifierDieSize, spnEnemyFacilityModifierDieSize);
@@ -513,7 +512,7 @@ class StratConPage {
     }
 
     private @Nonnull JPanel createStratConScenarioConditionsPanel() {
-        final CampaignOptionsFormPanel panel = new CampaignOptionsFormPanel("StratConScenarioConditionsPanel",
+        final SettingsFormPanel panel = new SettingsFormPanel("StratConScenarioConditionsPanel",
               LABEL_COLUMN_WIDTH,
               CONTROL_COLUMN_WIDTH);
         panel.addCheckBoxGrid(CHECKBOX_GRID_COLUMNS,
@@ -534,7 +533,7 @@ class StratConPage {
         // paired-grid widths so the grid's third
         // column lines up with the control column of the 2-column sections elsewhere on
         // this page.
-        final CampaignOptionsPairedFieldGridPanel panel = new CampaignOptionsPairedFieldGridPanel("StratConMoralePanel",
+        final SettingsPairedFieldGridPanel panel = new SettingsPairedFieldGridPanel("StratConMoralePanel",
               GRID_FIRST_PAIR_COLUMN_WIDTH,
               GRID_FOLLOWING_PAIR_COLUMN_WIDTH,
               GRID_CONTROL_COLUMN_WIDTH,
@@ -549,7 +548,7 @@ class StratConPage {
     }
 
     private @Nonnull JPanel createStratConAutoResolvePanel() {
-        final CampaignOptionsFormPanel panel = new CampaignOptionsFormPanel("StratConAutoResolvePanel",
+        final SettingsFormPanel panel = new SettingsFormPanel("StratConAutoResolvePanel",
               LABEL_COLUMN_WIDTH,
               CONTROL_COLUMN_WIDTH);
         panel.addRow(lblAutoResolveMethod, comboAutoResolveMethod);

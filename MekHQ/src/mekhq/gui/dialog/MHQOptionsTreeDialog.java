@@ -42,16 +42,18 @@ import javax.swing.JFrame;
 import javax.swing.JPanel;
 
 import megamek.client.ui.dialogs.buttonDialogs.AbstractButtonDialog;
+import megamek.client.ui.settings.SettingsBadge;
+import megamek.client.ui.settings.SettingsIconLegend;
 import megamek.client.ui.util.UIUtil;
 import mekhq.MHQOptionsChangedEvent;
 import mekhq.MekHQ;
 import mekhq.gui.campaignOptions.CampaignOptionFlag;
-import mekhq.gui.campaignOptions.CampaignOptionsIconLegend;
-import mekhq.gui.campaignOptions.MHQOptionsPane;
+import mekhq.gui.campaignOptions.CampaignOptionsUtilities;
+import mekhq.gui.clientOptions.MHQOptionsPane;
 
 /**
- * Hosting dialog for {@link MHQOptionsPane}, the MekHQ Client Options screen built on the reusable Campaign Options
- * tree-navigation framework.
+ * Hosting dialog for {@link MHQOptionsPane}, the MekHQ Client Options screen built on MegaMek's shared settings
+ * framework.
  */
 public class MHQOptionsTreeDialog extends AbstractButtonDialog {
     private static final int BUTTON_GAP = UIUtil.scaleForGUI(8);
@@ -102,10 +104,14 @@ public class MHQOptionsTreeDialog extends AbstractButtonDialog {
 
         // Icons legend on the left, as a reference aid rather than a dialog action (matching the Campaign Options
         // dialog). The right spacer mirrors its width so the Ok/Cancel buttons stay centred on the whole footer.
-        List<CampaignOptionsIconLegend.Entry> legendEntries = List.of(
-              CampaignOptionsIconLegend.flagEntry(CampaignOptionFlag.IMPORTANT),
-              CampaignOptionsIconLegend.flagEntry(CampaignOptionFlag.UNIMPLEMENTED));
-        JButton legendButton = CampaignOptionsIconLegend.createLegendButton(legendEntries);
+          List<SettingsBadge> legendEntries = List.of(
+              CampaignOptionsUtilities.settingsBadge(CampaignOptionFlag.IMPORTANT),
+              CampaignOptionsUtilities.settingsBadge(CampaignOptionFlag.UNIMPLEMENTED));
+          String resourceBundle = CampaignOptionsUtilities.getCampaignOptionsResourceBundle();
+          JButton legendButton = SettingsIconLegend.createLegendButton(
+              mekhq.utilities.MHQInternationalization.getTextAt(resourceBundle, "lblIconsLegend.text"),
+              mekhq.utilities.MHQInternationalization.getTextAt(resourceBundle, "lblIconsLegend.tooltip"),
+              legendEntries);
         JPanel legendPanel = new JPanel(new FlowLayout(FlowLayout.LEFT, BUTTON_GAP, BUTTON_GAP));
         legendPanel.add(legendButton);
         JPanel rightSpacer = new JPanel();

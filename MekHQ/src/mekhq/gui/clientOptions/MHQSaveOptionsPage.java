@@ -30,11 +30,11 @@
  * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
  * affiliated with Microsoft.
  */
-package mekhq.gui.campaignOptions;
+package mekhq.gui.clientOptions;
 
 import static megamek.client.ui.util.FlatLafStyleBuilder.setFontScaling;
 import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.getMetadata;
-import static mekhq.utilities.MHQInternationalization.getTextAt;
+import static mekhq.utilities.MHQInternationalization.getText;
 
 import java.awt.Component;
 import javax.swing.ButtonGroup;
@@ -42,10 +42,11 @@ import javax.swing.JComponent;
 import javax.swing.JPanel;
 import javax.swing.JRadioButton;
 
-import mekhq.gui.campaignOptions.components.CampaignOptionsCheckBox;
-import mekhq.gui.campaignOptions.components.CampaignOptionsFormPanel;
-import mekhq.gui.campaignOptions.components.CampaignOptionsLabel;
-import mekhq.gui.campaignOptions.components.CampaignOptionsSpinner;
+import megamek.client.ui.settings.SettingsCheckBox;
+import megamek.client.ui.settings.SettingsFormPanel;
+import megamek.client.ui.settings.SettingsLabel;
+import megamek.client.ui.settings.SettingsSpinner;
+import mekhq.gui.campaignOptions.CampaignOptionFlag;
 
 /**
  * The Save Options page of the MekHQ Client Options dialog: an Autosave section (frequency radio buttons, save-before
@@ -59,15 +60,15 @@ class MHQSaveOptionsPage extends MHQOptionsPage {
     private JRadioButton optionSaveWeekly;
     private JRadioButton optionSaveMonthly;
     private JRadioButton optionSaveYearly;
-    private CampaignOptionsCheckBox chkSaveBeforeScenarios;
-    private CampaignOptionsCheckBox chkSaveBeforeMissionEnd;
-    private CampaignOptionsSpinner spinnerSavedGamesCount;
+    private SettingsCheckBox chkSaveBeforeScenarios;
+    private SettingsCheckBox chkSaveBeforeMissionEnd;
+    private SettingsSpinner spinnerSavedGamesCount;
 
     // Campaign Save
-    private CampaignOptionsCheckBox chkPreferGzippedOutput;
-    private CampaignOptionsCheckBox chkWriteCustomsToXML;
-    private CampaignOptionsCheckBox chkWriteAllUnitsToXML;
-    private CampaignOptionsCheckBox chkSaveMothballState;
+    private SettingsCheckBox chkPreferGzippedOutput;
+    private SettingsCheckBox chkWriteCustomsToXML;
+    private SettingsCheckBox chkWriteAllUnitsToXML;
+    private SettingsCheckBox chkSaveMothballState;
 
     MHQSaveOptionsPage(MHQOptionsModel model) {
         super(model);
@@ -97,7 +98,7 @@ class MHQSaveOptionsPage extends MHQOptionsPage {
               getMetadata(null, CampaignOptionFlag.IMPORTANT));
         chkSaveMothballState = checkBox("optionSaveMothballState", model.saveMothballState);
 
-        CampaignOptionsFormPanel panel = new CampaignOptionsFormPanel("MHQCampaignSaveContent", FORM_LABEL_WIDTH,
+        SettingsFormPanel panel = new SettingsFormPanel("MHQCampaignSaveContent", FORM_LABEL_WIDTH,
               FORM_CONTROL_WIDTH);
         panel.addCheckBoxGrid(2, chkPreferGzippedOutput, chkWriteCustomsToXML, chkWriteAllUnitsToXML,
               chkSaveMothballState);
@@ -120,12 +121,12 @@ class MHQSaveOptionsPage extends MHQOptionsPage {
         chkSaveBeforeScenarios = checkBox("checkSaveBeforeScenarios", model.autosaveBeforeScenarios);
         chkSaveBeforeMissionEnd = checkBox("checkSaveBeforeMissionEnd", model.autosaveBeforeMissionEnd);
 
-        CampaignOptionsLabel labelSavedGamesCount = new CampaignOptionsLabel(RESOURCE_BUNDLE, "labelSavedGamesCount");
+        SettingsLabel labelSavedGamesCount = new SettingsLabel(TEXT_PROVIDER, "labelSavedGamesCount");
         spinnerSavedGamesCount =
-              new CampaignOptionsSpinner(RESOURCE_BUNDLE, "labelSavedGamesCount", 1, 1, 10, 1);
+              new SettingsSpinner(TEXT_PROVIDER, "labelSavedGamesCount", 1, 1, 10, 1);
         spinnerSavedGamesCount.setValue(model.maximumNumberOfAutoSaves);
 
-        CampaignOptionsFormPanel panel = new CampaignOptionsFormPanel("MHQAutosaveContent", FORM_LABEL_WIDTH,
+        SettingsFormPanel panel = new SettingsFormPanel("MHQAutosaveContent", FORM_LABEL_WIDTH,
               FORM_CONTROL_WIDTH);
         panel.addComponentGrid(1, optionNoSave, optionSaveDaily, optionSaveWeekly, optionSaveMonthly, optionSaveYearly);
         panel.addCheckBoxGrid(2, chkSaveBeforeScenarios, chkSaveBeforeMissionEnd);
@@ -139,7 +140,7 @@ class MHQSaveOptionsPage extends MHQOptionsPage {
      * mutually-exclusive frequency group.
      */
     private JRadioButton createAutosaveFrequencyOption(String resourceName, ButtonGroup group) {
-        JRadioButton radioButton = new JRadioButton(getTextAt(RESOURCE_BUNDLE, resourceName + ".text"));
+        JRadioButton radioButton = new JRadioButton(getText(resourceName + ".text"));
         radioButton.setName(resourceName);
         setFontScaling(radioButton, false, 1);
         group.add(radioButton);
