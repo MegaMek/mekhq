@@ -32,6 +32,8 @@
  */
 package mekhq.gui.scenarioTemplateEditor;
 
+import static megamek.client.ui.WrapLayout.wordWrap;
+
 import java.awt.Dimension;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
@@ -127,7 +129,7 @@ public class MapParametersPanel extends JPanel {
         gbc.gridx = 0;
         gbc.gridy++;
         JLabel lblUseAtBSizing = new JLabel(RESOURCES.getString("MapParametersPanel.useAtBSizing.label"));
-        lblUseAtBSizing.setToolTipText(RESOURCES.getString("MapParametersPanel.useAtBSizing.tooltip"));
+        lblUseAtBSizing.setToolTipText(wordWrap(RESOURCES.getString("MapParametersPanel.useAtBSizing.tooltip")));
         add(lblUseAtBSizing, gbc);
         gbc.gridx = 1;
         add(chkUseAtBSizing, gbc);
@@ -149,6 +151,30 @@ public class MapParametersPanel extends JPanel {
         gbc.gridy = 1;
         gbc.gridheight = GridBagConstraints.RELATIVE;
         add(new FastJScrollPane(lstAllowedTerrainTypes), gbc);
+
+        applyTooltips();
+    }
+
+    /** Applies word-wrapped, behavior-accurate tooltips to the controls. */
+    private void applyTooltips() {
+        setTip(txtBaseWidth, "MapParametersPanel.baseWidth.tooltip");
+        setTip(txtBaseHeight, "MapParametersPanel.baseHeight.tooltip");
+        setTip(txtWidthIncrement, "MapParametersPanel.widthIncrement.tooltip");
+        setTip(txtHeightIncrement, "MapParametersPanel.heightIncrement.tooltip");
+        setTip(spnAdditionalMapSheetWide, "MapParametersPanel.additionalMapSheetWide.tooltip");
+        setTip(spnAdditionalMapSheetTall, "MapParametersPanel.additionalMapSheetTall.tooltip");
+        setTip(chkAllowRotation, "MapParametersPanel.allowRotation.tooltip");
+        setTip(chkUseAtBSizing, "MapParametersPanel.useAtBSizing.tooltip");
+        setTip(btnAllowAllMapTypes, "MapParametersPanel.anyGroundMap.tooltip");
+        setTip(btnUseSpaceMap, "MapParametersPanel.useSpaceMap.tooltip");
+        setTip(btnUseLowAtmosphereMap, "MapParametersPanel.useLowAtmoMap.tooltip");
+        setTip(btnUseSpecificMapTypes, "MapParametersPanel.specificMapTypes.tooltip");
+        setTip(lstAllowedTerrainTypes, "MapParametersPanel.allowedTerrainTypes.tooltip");
+    }
+
+    /** Sets a word-wrapped tooltip (from the resource bundle) on a control. */
+    private static void setTip(JComponent component, String tooltipKey) {
+        component.setToolTipText(wordWrap(RESOURCES.getString(tooltipKey)));
     }
 
     private void addLabeledField(GridBagConstraints gbc, String labelKey, java.awt.Component field) {
@@ -165,7 +191,7 @@ public class MapParametersPanel extends JPanel {
         gbc.gridx = 0;
         gbc.gridy++;
         JLabel label = new JLabel(RESOURCES.getString(labelKey));
-        label.setToolTipText(RESOURCES.getString(tooltipKey));
+        label.setToolTipText(wordWrap(RESOURCES.getString(tooltipKey)));
         add(label, gbc);
         gbc.gridx = 1;
         add(spinner, gbc);

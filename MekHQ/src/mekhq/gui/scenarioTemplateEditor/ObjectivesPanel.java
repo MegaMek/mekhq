@@ -32,6 +32,8 @@
  */
 package mekhq.gui.scenarioTemplateEditor;
 
+import static megamek.client.ui.WrapLayout.wordWrap;
+
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
@@ -77,10 +79,13 @@ public class ObjectivesPanel extends JPanel {
         objectiveList.setFixedCellWidth(400);
         objectiveList.addListSelectionListener(
               e -> btnRemoveObjective.setEnabled(!objectiveList.getSelectedValuesList().isEmpty()));
+        objectiveList.setToolTipText(wordWrap(RESOURCES.getString("ObjectivesPanel.list.tooltip")));
 
         JButton btnAddEditObjective = new JButton(RESOURCES.getString("ObjectivesPanel.addEdit"));
+        btnAddEditObjective.setToolTipText(wordWrap(RESOURCES.getString("ObjectivesPanel.addEdit.tooltip")));
         btnAddEditObjective.addActionListener(evt -> openObjectiveEditor());
 
+        btnRemoveObjective.setToolTipText(wordWrap(RESOURCES.getString("ObjectivesPanel.remove.tooltip")));
         btnRemoveObjective.addActionListener(e -> removeSelectedObjectives());
         btnRemoveObjective.setEnabled(false);
 

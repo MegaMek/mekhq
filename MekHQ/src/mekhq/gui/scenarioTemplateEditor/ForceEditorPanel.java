@@ -32,6 +32,8 @@
  */
 package mekhq.gui.scenarioTemplateEditor;
 
+import static megamek.client.ui.WrapLayout.wordWrap;
+
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.GridBagConstraints;
@@ -162,8 +164,50 @@ public class ForceEditorPanel extends JPanel {
         });
 
         layoutControls();
+        applyTooltips();
         roleSetEditorPanel.setAllowedUnitType(currentAllowedUnitType());
         forceAlignmentChanged();
+    }
+
+    /**
+     * Applies a wrapped, behavior-accurate tooltip to each control. Tooltips MUST be wrapped in
+     * {@link megamek.client.ui.WrapLayout#wordWrap(String)} or the layout breaks, and each string describes what the
+     * generator actually does with the value (see {@code AtBDynamicScenarioFactory}), not the field's older doc text.
+     */
+    private void applyTooltips() {
+        setTip(cboAlignment, "ForceEditorPanel.forceAlignment.tooltip");
+        setTip(cboGenerationMethod, "ForceEditorPanel.generationMethod.tooltip");
+        setTip(spnMultiplier, "ForceEditorPanel.scalingMultiplier.tooltip");
+        setTip(cboDestinationZone, "ForceEditorPanel.destinationZone.tooltip");
+        setTip(spnRetreatThreshold, "ForceEditorPanel.retreatThreshold.tooltip");
+        setTip(chkReinforce, "ForceEditorPanel.reinforce.tooltip");
+        setTip(chkContributesToBV, "ForceEditorPanel.contributesToBV.tooltip");
+        setTip(chkContributesToUnitCount, "ForceEditorPanel.contributesToUnitCount.tooltip");
+        setTip(txtForceName, "ForceEditorPanel.forceId.tooltip");
+        setTip(cboSyncDeploymentType, "ForceEditorPanel.syncDeployment.tooltip");
+        setTip(cboSyncForceName, "ForceEditorPanel.syncForceName.tooltip");
+        setTip(listMULs, "ForceEditorPanel.fixedMul.tooltip");
+        setTip(lstObjectiveLinkedForces, "ForceEditorPanel.objectiveLinkedForces.tooltip");
+        setTip(lstDeployZones, "ForceEditorPanel.deploymentZones.tooltip");
+        setTip(cboUnitType, "ForceEditorPanel.unitType.tooltip");
+        setTip(spnArrivalTurn, "ForceEditorPanel.arrivalTurn.tooltip");
+        setTip(spnFixedUnitCount, "ForceEditorPanel.fixedUnitCount.tooltip");
+        setTip(cboMaxWeightClass, "ForceEditorPanel.maxWeight.tooltip");
+        setTip(cboMinWeightClass, "ForceEditorPanel.minWeight.tooltip");
+        setTip(chkContributesToMapSize, "ForceEditorPanel.contributesToMapSize.tooltip");
+        setTip(spnGenerationOrder, "ForceEditorPanel.generationOrder.tooltip");
+        setTip(chkAllowAeroBombs, "ForceEditorPanel.allowAeroBombs.tooltip");
+        setTip(spnStartingAltitude, "ForceEditorPanel.startAltitude.tooltip");
+        setTip(chkUseArtillery, "ForceEditorPanel.isArtillery.tooltip");
+        setTip(chkOffBoard, "ForceEditorPanel.deployOffBoard.tooltip");
+        setTip(chkSubjectToRandomRemoval, "ForceEditorPanel.subjectToRandomRemoval.tooltip");
+        setTip(chkSyncRetreatThreshold, "ForceEditorPanel.syncRetreatThreshold.tooltip");
+        setTip(btnSave, "ForceEditorPanel.save.tooltip");
+    }
+
+    /** Sets a word-wrapped tooltip (from the resource bundle) on a control. */
+    private static void setTip(JComponent component, String tooltipKey) {
+        component.setToolTipText(wordWrap(RESOURCES.getString(tooltipKey)));
     }
 
     private void layoutControls() {

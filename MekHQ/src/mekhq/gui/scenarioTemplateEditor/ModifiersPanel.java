@@ -32,6 +32,8 @@
  */
 package mekhq.gui.scenarioTemplateEditor;
 
+import static megamek.client.ui.WrapLayout.wordWrap;
+
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.util.List;
@@ -85,16 +87,19 @@ public class ModifiersPanel extends JPanel {
         gbc.gridwidth = 1;
 
         gbc.gridy++;
+        modifierPicker.setToolTipText(wordWrap(RESOURCES.getString("ModifiersPanel.picker.tooltip")));
         add(modifierPicker, gbc);
 
         gbc.gridx++;
         JButton btnAdd = new JButton(RESOURCES.getString("ModifiersPanel.add"));
+        btnAdd.setToolTipText(wordWrap(RESOURCES.getString("ModifiersPanel.add.tooltip")));
         btnAdd.addActionListener(evt -> addSelectedModifier());
         add(btnAdd, gbc);
 
         gbc.gridx = 0;
         gbc.gridy++;
         gbc.gridheight = 3;
+        selectedList.setToolTipText(wordWrap(RESOURCES.getString("ModifiersPanel.selectedList.tooltip")));
         FastJScrollPane scrollPane = new FastJScrollPane(selectedList);
         scrollPane.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED);
         add(scrollPane, gbc);
@@ -102,6 +107,7 @@ public class ModifiersPanel extends JPanel {
         gbc.gridx++;
         gbc.gridheight = 1;
         JButton btnRemove = new JButton(RESOURCES.getString("ModifiersPanel.remove"));
+        btnRemove.setToolTipText(wordWrap(RESOURCES.getString("ModifiersPanel.remove.tooltip")));
         btnRemove.addActionListener(evt -> removeSelectedModifiers());
         add(btnRemove, gbc);
     }

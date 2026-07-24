@@ -32,12 +32,15 @@
  */
 package mekhq.gui.scenarioTemplateEditor;
 
+import static megamek.client.ui.WrapLayout.wordWrap;
+
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
 import java.util.ResourceBundle;
 import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
+import javax.swing.JComponent;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTextArea;
@@ -85,6 +88,8 @@ public class TemplatePropertiesPanel extends JPanel {
         txtShortBriefing.setLineWrap(true);
         txtLongBriefing.setLineWrap(true);
 
+        applyTooltips();
+
         GridBagConstraints gbc = new GridBagConstraints();
         gbc.gridx = 0;
         gbc.gridy = 0;
@@ -121,6 +126,24 @@ public class TemplatePropertiesPanel extends JPanel {
         flagRow.add(chkSuitedForBungledPatrols);
         gbc.gridy++;
         add(flagRow, gbc);
+    }
+
+    /** Applies word-wrapped, behavior-accurate tooltips to the controls. */
+    private void applyTooltips() {
+        setTip(txtName, "TemplatePropertiesPanel.scenarioName.tooltip");
+        setTip(txtShortBriefing, "TemplatePropertiesPanel.shortBriefing.tooltip");
+        setTip(txtLongBriefing, "TemplatePropertiesPanel.detailedBriefing.tooltip");
+        setTip(cboScenarioType, "TemplatePropertiesPanel.scenarioType.tooltip");
+        setTip(cboBattlefieldControl, "TemplatePropertiesPanel.battlefieldControl.tooltip");
+        setTip(chkHostileFacility, "TemplatePropertiesPanel.hostileFacility.tooltip");
+        setTip(chkAlliedFacility, "TemplatePropertiesPanel.alliedFacility.tooltip");
+        setTip(chkSuitedForAmbushes, "TemplatePropertiesPanel.suitedForAmbushes.tooltip");
+        setTip(chkSuitedForBungledPatrols, "TemplatePropertiesPanel.suitedForBungledPatrols.tooltip");
+    }
+
+    /** Sets a word-wrapped tooltip (from the resource bundle) on a control. */
+    private static void setTip(JComponent component, String tooltipKey) {
+        component.setToolTipText(wordWrap(RESOURCES.getString(tooltipKey)));
     }
 
     /**

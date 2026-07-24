@@ -32,6 +32,8 @@
  */
 package mekhq.gui.scenarioTemplateEditor;
 
+import static megamek.client.ui.WrapLayout.wordWrap;
+
 import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.GridBagConstraints;
@@ -93,12 +95,14 @@ public class RoleSetEditorPanel extends JPanel {
 
         add(new JLabel(RESOURCES.getString("RoleSetEditorPanel.validRoles.label")), gbc);
 
+        lstRolePicker.setToolTipText(wordWrap(RESOURCES.getString("RoleSetEditorPanel.validRoles.tooltip")));
         FastJScrollPane scrRolePicker = new FastJScrollPane(lstRolePicker);
         scrRolePicker.setPreferredSize(new Dimension(190, 120));
         gbc.gridy++;
         add(scrRolePicker, gbc);
 
         JButton btnAddRoleSet = new JButton(RESOURCES.getString("RoleSetEditorPanel.addRoleSet"));
+        btnAddRoleSet.setToolTipText(wordWrap(RESOURCES.getString("RoleSetEditorPanel.addRoleSet.tooltip")));
         btnAddRoleSet.addActionListener(evt -> addRoleSet());
         gbc.gridy++;
         gbc.fill = GridBagConstraints.NONE;
@@ -108,12 +112,14 @@ public class RoleSetEditorPanel extends JPanel {
         gbc.gridy++;
         add(new JLabel(RESOURCES.getString("RoleSetEditorPanel.roleSets.label")), gbc);
 
+        lstRoleSets.setToolTipText(wordWrap(RESOURCES.getString("RoleSetEditorPanel.roleSets.tooltip")));
         FastJScrollPane scrRoleSets = new FastJScrollPane(lstRoleSets);
         scrRoleSets.setPreferredSize(new Dimension(190, 100));
         gbc.gridy++;
         add(scrRoleSets, gbc);
 
         JButton btnRemoveRoleSet = new JButton(RESOURCES.getString("RoleSetEditorPanel.removeRoleSet"));
+        btnRemoveRoleSet.setToolTipText(wordWrap(RESOURCES.getString("RoleSetEditorPanel.removeRoleSet.tooltip")));
         btnRemoveRoleSet.addActionListener(evt -> removeRoleSet());
         gbc.gridy++;
         gbc.fill = GridBagConstraints.NONE;
