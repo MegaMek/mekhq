@@ -42,10 +42,8 @@ import java.awt.Dimension;
 import java.io.File;
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.util.Objects;
 import javax.swing.Box;
 import javax.swing.BoxLayout;
-import javax.swing.DefaultListCellRenderer;
 import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JList;
@@ -53,12 +51,10 @@ import javax.swing.JPanel;
 import javax.swing.JTextField;
 
 import megamek.client.ui.Messages;
-import megamek.client.ui.comboBoxes.MMComboBox;
 import megamek.client.ui.dialogs.buttonDialogs.CommonSettingsDialog;
 import megamek.client.ui.dialogs.helpDialogs.HelpDialog;
 import megamek.client.ui.util.UIUtil;
 import megamek.logging.MMLogger;
-import mekhq.campaign.universe.enums.CompanyGenerationMethod;
 import mekhq.gui.campaignOptions.components.CampaignOptionsFormPanel;
 import mekhq.gui.campaignOptions.components.CampaignOptionsLabel;
 import mekhq.gui.campaignOptions.components.CampaignOptionsSpinner;
@@ -81,7 +77,6 @@ class MHQAdvancedPage extends MHQOptionsPage {
     private CampaignOptionsSpinner spinnerStartGameClientRetryCount;
     private CampaignOptionsSpinner spinnerStartGameBotClientDelay;
     private CampaignOptionsSpinner spinnerStartGameBotClientRetryCount;
-    private MMComboBox<CompanyGenerationMethod> comboDefaultCompanyGenerationMethod;
 
     MHQAdvancedPage(MHQOptionsModel model, JFrame frame) {
         super(model);
@@ -154,25 +149,6 @@ class MHQAdvancedPage extends MHQOptionsPage {
         spinnerStartGameBotClientRetryCount = advancedSpinner(panel, "lblStartGameBotClientRetryCount", 250, 100, 2500,
               50, model.startGameBotClientRetryCount);
 
-        CampaignOptionsLabel companyGenerationLabel =
-              new CampaignOptionsLabel(RESOURCE_BUNDLE, "lblDefaultCompanyGenerationMethod");
-        comboDefaultCompanyGenerationMethod =
-              new MMComboBox<>("comboDefaultCompanyGenerationMethod", CompanyGenerationMethod.values());
-        comboDefaultCompanyGenerationMethod.setSelectedItem(model.defaultCompanyGenerationMethod);
-        comboDefaultCompanyGenerationMethod.setToolTipText(
-              getTextAt(RESOURCE_BUNDLE, "lblDefaultCompanyGenerationMethod.toolTipText"));
-        comboDefaultCompanyGenerationMethod.setRenderer(new DefaultListCellRenderer() {
-            @Override
-            public Component getListCellRendererComponent(final JList<?> list, final Object value, final int index,
-                  final boolean isSelected, final boolean cellHasFocus) {
-                super.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);
-                if (value instanceof CompanyGenerationMethod method) {
-                    list.setToolTipText(method.getToolTipText());
-                }
-                return this;
-            }
-        });
-        panel.addRow(companyGenerationLabel, comboDefaultCompanyGenerationMethod);
 
         Component page = buildMHQPage("MHQAdvancedPage", "lblMHQAdvancedSection.text", "lblMHQAdvancedSection.summary",
               panel);
@@ -205,7 +181,5 @@ class MHQAdvancedPage extends MHQOptionsPage {
         model.startGameClientRetryCount = (int) spinnerStartGameClientRetryCount.getValue();
         model.startGameBotClientDelay = (int) spinnerStartGameBotClientDelay.getValue();
         model.startGameBotClientRetryCount = (int) spinnerStartGameBotClientRetryCount.getValue();
-        model.defaultCompanyGenerationMethod =
-              Objects.requireNonNull(comboDefaultCompanyGenerationMethod.getSelectedItem());
     }
 }

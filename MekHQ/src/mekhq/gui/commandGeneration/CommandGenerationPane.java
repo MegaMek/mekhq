@@ -66,10 +66,6 @@ import mekhq.gui.commandGeneration.contents.SparesTab;
  * {@link mekhq.gui.commandGeneration.contents} and are plain Java classes following the same
  * "constructor + {@code createTab()} + {@code loadValuesFromOptions()}" convention used in the
  * Campaign Options package.</p>
- *
- * <p>Construction is currently scaffolding: the four tabs render placeholder content. Tab content
- * migrates over from {@code CompanyGenerationOptionsPanel} in subsequent commits per the Force
- * Generator integration plan.</p>
  */
 public class CommandGenerationPane extends AbstractMHQTabbedPane {
 

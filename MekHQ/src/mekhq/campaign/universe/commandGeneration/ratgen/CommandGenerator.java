@@ -68,13 +68,9 @@ import mekhq.campaign.universe.commandGeneration.SupportUnitGenerator;
  * <p>Composes the helpers in this package — {@link RulesetEngineBootstrap},
  * {@link ForceDescriptorWalker}, {@link MultiCrewAssembler}, {@link CrewDescriptorAdapter},
  * {@link RankAssigner} — into the 8-step pipeline described in
- * {@code docs/plans/force-generator-company-generation.md} (megamek repo). Phase 1 lands steps 1-7
- * (bootstrap → buildDescriptor → processRoot → walk → personnel → units → tree) but defers the
- * polish stage (parts, spares, finances, contracts, naming) until the static helpers are extracted
- * from {@link mekhq.campaign.universe.generators.companyGenerators.AbstractCompanyGenerator}.</p>
- *
- * <p>This class is not yet wired into the public dialog. It is reachable only from the dev-gated
- * {@code RULESET_BASED} branch and from unit tests.</p>
+ * {@code docs/plans/force-generator-company-generation.md} (megamek repo): bootstrap →
+ * buildDescriptor → processRoot → walk → personnel → units → tree → spares. The finance and
+ * contract polish stages remain deferred.</p>
  */
 public final class CommandGenerator {
 
@@ -623,8 +619,8 @@ public final class CommandGenerator {
      * — the same values that drive ongoing auto-logistics restocking during play, written by the
      * Spares tab's spinners.
      *
-     * <p>Setting all percentages to 0 produces an empty warehouse with no shopping list churn,
-     * matching the legacy {@code PartGenerationMethod.DISABLED} behavior.</p>
+     * <p>Setting all percentages to 0 produces an empty warehouse with no shopping list churn -
+     * effectively disabling spare-part generation.</p>
      */
     private static void stockSpareParts(Campaign campaign) {
         long start = System.nanoTime();

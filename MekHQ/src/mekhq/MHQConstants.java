@@ -74,7 +74,6 @@ public final class MHQConstants extends SuiteConstants {
     public static final String HISTORICAL_DAILY_LOG = "historicalDailyLog";
     public static final int MAX_HISTORICAL_LOG_DAYS = 120; // max number of days that will be stored in the history,
     // also used as a limit in the UI
-    public static final String COMPANY_GENERATOR_STARTUP = "companyGeneratorStartup";
     public static final String SHOW_COMPANY_GENERATOR = "showCompanyGenerator";
     public static final String SHOW_UNIT_PICTURES_ON_TOE = "showUnitPicturesOnTOE";
 
@@ -228,7 +227,6 @@ public final class MHQConstants extends SuiteConstants {
     public static final String INDIVIDUAL_RANK_SYSTEM_DIRECTORY_PATH = "individualRankSystemDirectoryPath";
     public static final String UNIT_SPRITE_EXPORT_DIRECTORY_PATH = "unitSpriteExportDirectoryPath";
     public static final String LAYERED_FORCE_ICON_DIRECTORY_PATH = "layeredFormationIconDirectoryPath";
-    public static final String COMPANY_GENERATION_DIRECTORY_PATH = "companyGenerationDirectoryPath";
     public static final String LAUNCHER_NEW_PLAYER_QUICKSTART_PATH = "campaigns/The Learning Ropes.cpnx.gz";
     // endregion File Paths
 
@@ -282,7 +280,6 @@ public final class MHQConstants extends SuiteConstants {
     public static final String START_GAME_CLIENT_RETRY_COUNT = "startGameClientRetryCount";
     public static final String START_GAME_BOT_CLIENT_DELAY = "startGameBotClientDelay";
     public static final String START_GAME_BOT_CLIENT_RETRY_COUNT = "startGameBotClientRetryCount";
-    public static final String DEFAULT_COMPANY_GENERATION_METHOD = "defaultCompanyGenerationMethod";
     // endregion Miscellaneous Options
     // endregion MHQOptions
 

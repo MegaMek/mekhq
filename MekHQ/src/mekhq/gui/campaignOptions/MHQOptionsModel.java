@@ -41,7 +41,6 @@ import megamek.common.preference.PreferenceManager;
 import mekhq.MHQConstants;
 import mekhq.MHQOptions;
 import mekhq.MekHQ;
-import mekhq.campaign.universe.enums.CompanyGenerationMethod;
 import mekhq.gui.enums.FormationIconOperationalStatusStyle;
 import mekhq.gui.enums.PersonnelFilterStyle;
 
@@ -107,7 +106,6 @@ class MHQOptionsModel {
     int guiScaleValue;
     boolean hideUnitFluff;
     boolean historicalDailyLog;
-    boolean companyGeneratorStartup;
     boolean showCompanyGenerator;
     boolean showUnitPicturesOnTOE;
     // endregion Display - General
@@ -191,7 +189,6 @@ class MHQOptionsModel {
     int startGameClientRetryCount;
     int startGameBotClientDelay;
     int startGameBotClientRetryCount;
-    CompanyGenerationMethod defaultCompanyGenerationMethod;
     // endregion Advanced
 
     MHQOptionsModel(MHQOptions options) {
@@ -204,7 +201,6 @@ class MHQOptionsModel {
         guiScaleValue = (int) (GUIPreferences.getInstance().getGUIScale() * 10);
         hideUnitFluff = options.getHideUnitFluff();
         historicalDailyLog = options.getHistoricalDailyLog();
-        companyGeneratorStartup = options.getCompanyGeneratorStartup();
         showCompanyGenerator = options.getShowCompanyGenerator();
         showUnitPicturesOnTOE = options.getShowUnitPicturesOnTOE();
 
@@ -348,7 +344,6 @@ class MHQOptionsModel {
         startGameClientRetryCount = options.getStartGameClientRetryCount();
         startGameBotClientDelay = options.getStartGameBotClientDelay();
         startGameBotClientRetryCount = options.getStartGameBotClientRetryCount();
-        defaultCompanyGenerationMethod = options.getDefaultCompanyGenerationMethod();
     }
 
     /**
@@ -373,7 +368,6 @@ class MHQOptionsModel {
         }
         options.setHideUnitFluff(hideUnitFluff);
         options.setHistoricalDailyLog(historicalDailyLog);
-        options.setCompanyGeneratorStartup(companyGeneratorStartup);
         options.setShowCompanyGenerator(showCompanyGenerator);
         options.setShowUnitPicturesOnTOE(showUnitPicturesOnTOE);
 
@@ -518,6 +512,5 @@ class MHQOptionsModel {
         options.setStartGameClientRetryCount(startGameClientRetryCount);
         options.setStartGameBotClientDelay(startGameBotClientDelay);
         options.setStartGameBotClientRetryCount(startGameBotClientRetryCount);
-        options.setDefaultCompanyGenerationMethod(defaultCompanyGenerationMethod);
     }
 }

@@ -89,15 +89,13 @@ import mekhq.gui.campaignOptions.optionChangeDialogs.AdvancedScoutingCampaignOpt
 import mekhq.gui.dialog.factionStanding.factionJudgment.FactionJudgmentDialog;
 
 /**
- * Top-level dialog for the Company Generation pipeline. Hosts a {@link CommandGenerationPane} with
- * four tabs (Setup, Force Generator, Spares, Other) and runs the ratgen pipeline on OK.
+ * Top-level dialog for the Command Generator (Command Designer). Hosts a
+ * {@link CommandGenerationPane} with four tabs (Setup, Force Generator, Spares, Other) and runs the
+ * ratgen pipeline on Accept &amp; Build.
  *
- * <p>This dialog used to wrap a monolithic {@code CompanyGenerationOptionsPanel} that exposed
- * AtB / Windchild method pickers alongside the ratgen path. With the deletion of those legacy
- * generators, the dialog runs the ratgen pipeline unconditionally: the four tabs persist user
- * preferences into {@link CommandGenerationOptions} and the campaign's auto-logistics percentages,
- * then {@link CommandGenerator#generate(Campaign, CommandGenerationOptions)} performs the actual
- * generation.</p>
+ * <p>The four tabs persist user preferences into {@link CommandGenerationOptions} and the
+ * campaign's auto-logistics percentages, then {@link CommandGenerator} materializes the previewed
+ * command into the campaign.</p>
  *
  * @author Justin "Windchild" Bowen (original)
  */

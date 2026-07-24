@@ -726,8 +726,7 @@ public class SetupTab {
     }
 
     /**
-     * Pushes values from the supplied options onto this tab's controls. Field-by-field copy; matches
-     * the legacy {@code CompanyGenerationOptionsPanel.setOptions(CommandGenerationOptions)} mapping.
+     * Pushes values from the supplied options onto this tab's controls. Field-by-field copy.
      */
     public void loadValuesFromOptions(CommandGenerationOptions sourceOptions) {
         this.options = sourceOptions;

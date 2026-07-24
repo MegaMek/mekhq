@@ -79,7 +79,6 @@ import mekhq.campaign.universe.Faction;
 import mekhq.campaign.universe.Factions;
 import mekhq.campaign.universe.Planet;
 import mekhq.campaign.universe.Systems;
-import mekhq.campaign.universe.companyGeneration.CompanyGenerationOptions;
 import mekhq.utilities.MHQXMLUtility;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -134,7 +133,6 @@ public class CampaignPreset {
     private RankSystem rankSystem;
     private int contractCount;
     private boolean gm;
-    private CompanyGenerationOptions companyGenerationOptions;
 
     // Continuous
     private GameOptions gameOptions;
@@ -162,7 +160,6 @@ public class CampaignPreset {
               null,
               null,
               null,
-              null,
               new HashMap<>(),
               new HashMap<>());
     }
@@ -170,7 +167,7 @@ public class CampaignPreset {
     public CampaignPreset(final String title, final String description, final boolean userData,
           final @Nullable LocalDate date, final @Nullable Faction faction, final @Nullable Planet planet,
           final @Nullable RankSystem rankSystem, final int contractCount, final boolean gm,
-          final @Nullable CompanyGenerationOptions companyGenerationOptions, final @Nullable GameOptions gameOptions,
+          final @Nullable GameOptions gameOptions,
           final @Nullable CampaignOptions campaignOptions,
           final @Nullable RandomSkillPreferences randomSkillPreferences, final Map<String, SkillType> skills,
           final Map<String, SpecialAbility> specialAbilities) {
@@ -186,7 +183,6 @@ public class CampaignPreset {
         setRankSystem(rankSystem);
         setContractCount(contractCount);
         setGM(gm);
-        setCompanyGenerationOptions(companyGenerationOptions);
 
         // Continuous
         setGameOptions(gameOptions);
@@ -279,14 +275,6 @@ public class CampaignPreset {
 
     public void setGM(final boolean gm) {
         this.gm = gm;
-    }
-
-    public CompanyGenerationOptions getCompanyGenerationOptions() {
-        return companyGenerationOptions;
-    }
-
-    public void setCompanyGenerationOptions(final @Nullable CompanyGenerationOptions companyGenerationOptions) {
-        this.companyGenerationOptions = companyGenerationOptions;
     }
     // endregion Startup
 
@@ -458,9 +446,6 @@ public class CampaignPreset {
         }
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "contractCount", getContractCount());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "gm", isGM());
-        if (getCompanyGenerationOptions() != null) {
-            getCompanyGenerationOptions().writeToXML(pw, indent, null);
-        }
         // endregion Startup
 
         // region Continuous
@@ -692,10 +677,6 @@ public class CampaignPreset {
                         break;
                     case "gm":
                         preset.setGM(Boolean.parseBoolean(wn.getTextContent().trim()));
-                        break;
-                    case "companyGenerationOptions":
-                        preset.setCompanyGenerationOptions(CompanyGenerationOptions.parseFromXML(wn.getChildNodes(),
-                              version));
                         break;
                     // endregion Startup
 

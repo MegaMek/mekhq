@@ -79,7 +79,6 @@ class MHQDisplayPage extends MHQOptionsPage {
     private JSlider guiScaleSlider;
     private CampaignOptionsCheckBox chkHideUnitFluff;
     private CampaignOptionsCheckBox chkHistoricalDailyLog;
-    private CampaignOptionsCheckBox chkCompanyGeneratorStartup;
     private CampaignOptionsCheckBox chkShowCompanyGenerator;
     private CampaignOptionsCheckBox chkShowUnitPicturesOnTOE;
 
@@ -165,11 +164,9 @@ class MHQDisplayPage extends MHQOptionsPage {
 
         chkHideUnitFluff = checkBox("optionHideUnitFluff", model.hideUnitFluff);
         chkHistoricalDailyLog = checkBox("optionHistoricalDailyLog", model.historicalDailyLog);
-        chkCompanyGeneratorStartup = checkBox("chkCompanyGeneratorStartup", model.companyGeneratorStartup,
-              getMetadata(null, CampaignOptionFlag.UNIMPLEMENTED));
         chkShowCompanyGenerator = checkBox("chkShowCompanyGenerator", model.showCompanyGenerator);
         chkShowUnitPicturesOnTOE = checkBox("chkShowUnitPicturesOnTOE", model.showUnitPicturesOnTOE);
-        panel.addCheckBoxGrid(2, chkHideUnitFluff, chkHistoricalDailyLog, chkCompanyGeneratorStartup,
+        panel.addCheckBoxGrid(2, chkHideUnitFluff, chkHistoricalDailyLog,
               chkShowCompanyGenerator, chkShowUnitPicturesOnTOE);
 
         return panel;
@@ -348,7 +345,6 @@ class MHQDisplayPage extends MHQOptionsPage {
         model.guiScaleValue = guiScaleSlider.getValue();
         model.hideUnitFluff = chkHideUnitFluff.isSelected();
         model.historicalDailyLog = chkHistoricalDailyLog.isSelected();
-        model.companyGeneratorStartup = chkCompanyGeneratorStartup.isSelected();
         model.showCompanyGenerator = chkShowCompanyGenerator.isSelected();
         model.showUnitPicturesOnTOE = chkShowUnitPicturesOnTOE.isSelected();
 

@@ -39,7 +39,6 @@ import javax.swing.UIManager;
 
 import megamek.SuiteOptions;
 import megamek.common.annotations.Nullable;
-import mekhq.campaign.universe.enums.CompanyGenerationMethod;
 import mekhq.gui.enums.FormationIconOperationalStatusStyle;
 import mekhq.gui.enums.PersonnelFilterStyle;
 import mekhq.gui.utilities.ComponentColors;
@@ -93,15 +92,6 @@ public final class MHQOptions extends SuiteOptions {
 
     public void setHistoricalDailyLog(boolean value) {
         userPreferences.node(MHQConstants.DISPLAY_NODE).putBoolean(MHQConstants.HISTORICAL_DAILY_LOG, value);
-    }
-
-    public boolean getCompanyGeneratorStartup() {
-        return userPreferences.node(MHQConstants.DISPLAY_NODE)
-                     .getBoolean(MHQConstants.COMPANY_GENERATOR_STARTUP, false);
-    }
-
-    public void setCompanyGeneratorStartup(final boolean value) {
-        userPreferences.node(MHQConstants.DISPLAY_NODE).putBoolean(MHQConstants.COMPANY_GENERATOR_STARTUP, value);
     }
 
     public boolean getShowCompanyGenerator() {
@@ -1368,15 +1358,6 @@ public final class MHQOptions extends SuiteOptions {
     public void setLayeredFormationIconPath(final String value) {
         userPreferences.node(MHQConstants.FILE_PATH_NODE).put(MHQConstants.LAYERED_FORCE_ICON_DIRECTORY_PATH, value);
     }
-
-    public String getCompanyGenerationDirectoryPath() {
-        return userPreferences.node(MHQConstants.FILE_PATH_NODE)
-                     .get(MHQConstants.COMPANY_GENERATION_DIRECTORY_PATH, "mmconf/mhqCompanyGenerationPresets/");
-    }
-
-    public void setCompanyGenerationDirectoryPath(final String value) {
-        userPreferences.node(MHQConstants.FILE_PATH_NODE).put(MHQConstants.COMPANY_GENERATION_DIRECTORY_PATH, value);
-    }
     // endregion File Paths
 
     // region Nag Tab
@@ -1435,17 +1416,6 @@ public final class MHQOptions extends SuiteOptions {
     public void setStartGameBotClientRetryCount(final int startGameBotClientRetryCount) {
         userPreferences.node(MHQConstants.MISCELLANEOUS_NODE)
               .putInt(MHQConstants.START_GAME_BOT_CLIENT_RETRY_COUNT, startGameBotClientRetryCount);
-    }
-
-    public CompanyGenerationMethod getDefaultCompanyGenerationMethod() {
-        return CompanyGenerationMethod.valueOf(userPreferences.node(MHQConstants.MISCELLANEOUS_NODE)
-                                                     .get(MHQConstants.DEFAULT_COMPANY_GENERATION_METHOD,
-                                                           CompanyGenerationMethod.WINDCHILD.name()));
-    }
-
-    public void setDefaultCompanyGenerationMethod(final CompanyGenerationMethod value) {
-        userPreferences.node(MHQConstants.MISCELLANEOUS_NODE)
-              .put(MHQConstants.DEFAULT_COMPANY_GENERATION_METHOD, value.name());
     }
     // endregion Miscellaneous Options
 }
