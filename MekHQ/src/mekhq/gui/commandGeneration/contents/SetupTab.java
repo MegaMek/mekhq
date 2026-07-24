@@ -37,6 +37,7 @@ import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.processWrapSize
 import static mekhq.gui.commandGeneration.components.CommandGenerationUtilities.getCommandGenerationResourceBundle;
 import static mekhq.utilities.MHQInternationalization.getTextAt;
 
+import java.awt.Component;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
@@ -49,6 +50,7 @@ import javax.swing.ButtonGroup;
 import javax.swing.DefaultListCellRenderer;
 import javax.swing.JComponent;
 import javax.swing.JLabel;
+import javax.swing.JList;
 import javax.swing.JPanel;
 import javax.swing.JRadioButton;
 import javax.swing.JSpinner;
@@ -106,12 +108,17 @@ public class SetupTab {
      * Heroic / Legendary are deliberately excluded since they're reserved for one-off Person
      * customizations, not bulk generation.
      */
+    // Skill-picker options: a leading null renders as "Random" (each person rolls their own level),
+    // followed by every fixed tier through Legendary.
     private static final SkillLevel[] SUPPORT_SKILL_LEVELS = {
+          null,
           SkillLevel.ULTRA_GREEN,
           SkillLevel.GREEN,
           SkillLevel.REGULAR,
           SkillLevel.VETERAN,
-          SkillLevel.ELITE
+          SkillLevel.ELITE,
+          SkillLevel.HEROIC,
+          SkillLevel.LEGENDARY
     };
 
     /**
@@ -373,9 +380,7 @@ public class SetupTab {
             roleLabel.setLabelFor(spinner);
             spnSupportCoveragePercents.put(role, spinner);
 
-            MMComboBox<SkillLevel> skillCombo = new MMComboBox<>(
-                  "cmbSupportSkill" + role.name(), SUPPORT_SKILL_LEVELS);
-            skillCombo.setSelectedItem(SkillLevel.REGULAR);
+            MMComboBox<SkillLevel> skillCombo = buildSkillLevelCombo("cmbSupportSkill" + role.name());
             if (skillTooltipTemplate != null && !skillTooltipTemplate.isEmpty()) {
                 skillCombo.setToolTipText(String.format(skillTooltipTemplate, roleDisplay));
             }
@@ -420,8 +425,7 @@ public class SetupTab {
         astechGroup.add(rdoAstechsAsPool);
         astechGroup.add(rdoAstechsAsPersonnel);
         rdoAstechsAsPool.setSelected(true);
-        cmbAstechSkillLevel = new MMComboBox<>("cmbAstechSkillLevel", SUPPORT_SKILL_LEVELS);
-        cmbAstechSkillLevel.setSelectedItem(SkillLevel.REGULAR);
+        cmbAstechSkillLevel = buildSkillLevelCombo("cmbAstechSkillLevel");
 
         // Medic block
         chkGenerateMedics = new CommandGenerationCheckBox("GenerateMedics");
@@ -431,8 +435,7 @@ public class SetupTab {
         medicGroup.add(rdoMedicsAsPool);
         medicGroup.add(rdoMedicsAsPersonnel);
         rdoMedicsAsPool.setSelected(true);
-        cmbMedicSkillLevel = new MMComboBox<>("cmbMedicSkillLevel", SUPPORT_SKILL_LEVELS);
-        cmbMedicSkillLevel.setSelectedItem(SkillLevel.REGULAR);
+        cmbMedicSkillLevel = buildSkillLevelCombo("cmbMedicSkillLevel");
 
         // Enable/disable wiring: parent checkbox controls the radios + skill dropdown;
         // "as Personnel" radio controls whether the skill dropdown is live.
@@ -726,6 +729,33 @@ public class SetupTab {
     }
 
     /**
+     * Builds a skill-level picker: the {@link #SUPPORT_SKILL_LEVELS} options (a leading {@code null}
+     * rendered as "Random", then Ultra-Green through Legendary) defaulted to Random. A {@code null}
+     * selection tells the generator to roll each person's own level.
+     *
+     * @param name the component name (for preferences / test lookup)
+     *
+     * @return the configured combo box, defaulted to Random
+     */
+    private MMComboBox<SkillLevel> buildSkillLevelCombo(String name) {
+        MMComboBox<SkillLevel> combo = new MMComboBox<>(name, SUPPORT_SKILL_LEVELS);
+        final String randomLabel = getTextAt(getCommandGenerationResourceBundle(), "skillLevelRandom.text");
+        combo.setRenderer(new DefaultListCellRenderer() {
+            @Override
+            public Component getListCellRendererComponent(JList<?> list, Object value, int index,
+                  boolean isSelected, boolean cellHasFocus) {
+                super.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);
+                if (value == null) {
+                    setText(randomLabel);
+                }
+                return this;
+            }
+        });
+        combo.setSelectedItem(null);
+        return combo;
+    }
+
+    /**
      * Pushes values from the supplied options onto this tab's controls. Field-by-field copy.
      */
     public void loadValuesFromOptions(CommandGenerationOptions sourceOptions) {
@@ -742,8 +772,8 @@ public class SetupTab {
             entry.getValue().setValue(percent == null ? COVERAGE_SPINNER_DEFAULT : percent);
         }
         for (Map.Entry<PersonnelRole, MMComboBox<SkillLevel>> entry : cmbSupportSkillLevels.entrySet()) {
-            SkillLevel level = sourceOptions.getSupportPersonnelSkillLevels().get(entry.getKey());
-            entry.getValue().setSelectedItem(level == null ? SkillLevel.REGULAR : level);
+            // null selects the "Random" option.
+            entry.getValue().setSelectedItem(sourceOptions.getSupportPersonnelSkillLevels().get(entry.getKey()));
         }
 
         // Assistants
@@ -753,9 +783,7 @@ public class SetupTab {
         } else {
             rdoAstechsAsPool.setSelected(true);
         }
-        cmbAstechSkillLevel.setSelectedItem(
-              sourceOptions.getAstechSkillLevel() == null
-                    ? SkillLevel.REGULAR : sourceOptions.getAstechSkillLevel());
+        cmbAstechSkillLevel.setSelectedItem(sourceOptions.getAstechSkillLevel());
         refreshAstechEnablement();
 
         chkGenerateMedics.setSelected(sourceOptions.isGenerateMedics());
@@ -764,9 +792,7 @@ public class SetupTab {
         } else {
             rdoMedicsAsPool.setSelected(true);
         }
-        cmbMedicSkillLevel.setSelectedItem(
-              sourceOptions.getMedicSkillLevel() == null
-                    ? SkillLevel.REGULAR : sourceOptions.getMedicSkillLevel());
+        cmbMedicSkillLevel.setSelectedItem(sourceOptions.getMedicSkillLevel());
         refreshMedicEnablement();
 
         chkGenerateMedicalReserve.setSelected(sourceOptions.isGenerateMedicalReserve());
@@ -833,25 +859,20 @@ public class SetupTab {
         }
         Map<PersonnelRole, SkillLevel> skillMap = targetOptions.getSupportPersonnelSkillLevels();
         for (Map.Entry<PersonnelRole, MMComboBox<SkillLevel>> entry : cmbSupportSkillLevels.entrySet()) {
-            Object selected = entry.getValue().getSelectedItem();
-            if (selected instanceof SkillLevel s) {
-                skillMap.put(entry.getKey(), s);
-            }
+            // A null selection is the "Random" option; store it as-is so the generator rolls per person.
+            skillMap.put(entry.getKey(), entry.getValue().getSelectedItem());
         }
 
         // Assistants
         targetOptions.setGenerateAstechs(chkGenerateAstechs.isSelected());
         targetOptions.setAstechsAsPersonnel(rdoAstechsAsPersonnel.isSelected());
-        if (cmbAstechSkillLevel.getSelectedItem() instanceof SkillLevel s) {
-            targetOptions.setAstechSkillLevel(s);
-        }
+        // A null selection is the "Random" option; store it as-is.
+        targetOptions.setAstechSkillLevel(cmbAstechSkillLevel.getSelectedItem());
         targetOptions.setGenerateMedics(chkGenerateMedics.isSelected());
         targetOptions.setMedicsAsPersonnel(rdoMedicsAsPersonnel.isSelected());
         targetOptions.setGenerateMedicalReserve(chkGenerateMedicalReserve.isSelected());
         targetOptions.setMedicalReservePercent((Integer) spnMedicalReservePercent.getValue());
-        if (cmbMedicSkillLevel.getSelectedItem() instanceof SkillLevel s) {
-            targetOptions.setMedicSkillLevel(s);
-        }
+        targetOptions.setMedicSkillLevel(cmbMedicSkillLevel.getSelectedItem());
         // Tech Assignment
         targetOptions.setAssignTechsToUnits(chkAssignTechsToUnits.isSelected());
         if (cmbTechAssignmentPrimary.getSelectedItem() instanceof TechAssignmentSortFactor f) {

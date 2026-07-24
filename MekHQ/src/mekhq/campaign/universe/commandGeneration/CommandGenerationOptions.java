@@ -88,11 +88,12 @@ public class CommandGenerationOptions {
     private ForceDescriptorSnapshot forceDescriptorSnapshot;
 
     // Support personnel - per-role coverage percentages and skill levels.
-    // 100 = full canonical coverage, 0 = generate none, >100 = redundancy.
+    // Coverage: 100 = full canonical coverage, 0 = generate none, >100 = redundancy.
+    // Skill level: a fixed SkillLevel, or null for "Random" (each person rolls their own level).
     private Map<PersonnelRole, Integer> supportPersonnelCoveragePercents;
     private Map<PersonnelRole, SkillLevel> supportPersonnelSkillLevels;
     // Astech / Medic generation - each auxiliary type can independently be skipped, pooled, or
-    // generated as named Persons.
+    // generated as named Persons. Skill level is a fixed SkillLevel, or null for "Random".
     private boolean generateAstechs;
     private boolean astechsAsPersonnel;
     private SkillLevel astechSkillLevel;
@@ -171,25 +172,26 @@ public class CommandGenerationOptions {
         setSpecifiedFaction(Factions.getInstance().getDefaultFaction());
         setGenerateMercenaryCompanyCommandLance(false);
 
-        // Support personnel: full canonical coverage at Regular skill for every support role - the
-        // user opts into changes via the SetupTab.
+        // Support personnel: full canonical coverage for every support role, with skill level left at
+        // the "Random" default (null) so each generated person rolls their own level. The user opts
+        // into full coverage changes or a fixed skill level via the SetupTab.
         final Map<PersonnelRole, Integer> coveragePercents = new HashMap<>();
         final Map<PersonnelRole, SkillLevel> skillLevels = new HashMap<>();
         for (final PersonnelRole role : SUPPORT_ROLES_FOR_COVERAGE) {
             coveragePercents.put(role, 100);
-            skillLevels.put(role, SkillLevel.REGULAR);
+            skillLevels.put(role, null);
         }
         setSupportPersonnelCoveragePercents(coveragePercents);
         setSupportPersonnelSkillLevels(skillLevels);
 
         // Astech / Medic generation defaults: generated as pools out-of-box; opting into
-        // named-Persons mode is explicit.
+        // named-Persons mode is explicit. Skill level defaults to Random (null).
         setGenerateAstechs(true);
         setAstechsAsPersonnel(false);
-        setAstechSkillLevel(SkillLevel.REGULAR);
+        setAstechSkillLevel(null);
         setGenerateMedics(true);
         setMedicsAsPersonnel(false);
-        setMedicSkillLevel(SkillLevel.REGULAR);
+        setMedicSkillLevel(null);
         setGenerateMedicalReserve(false);
         setMedicalReservePercent(10);
 

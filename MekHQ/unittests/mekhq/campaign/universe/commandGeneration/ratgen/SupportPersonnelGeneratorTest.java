@@ -33,6 +33,7 @@
 package mekhq.campaign.universe.commandGeneration.ratgen;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyBoolean;
@@ -121,20 +122,40 @@ class SupportPersonnelGeneratorTest {
     // ===== Pure conversion =====
 
     @Test
-    void toExperienceLevel_mapsAllFiveSkillTiersToSkillTypeConstants() {
+    void toExperienceLevel_mapsAllSevenSkillTiersToSkillTypeConstants() {
         assertEquals(SkillType.EXP_ULTRA_GREEN, SupportPersonnelGenerator.toExperienceLevel(SkillLevel.ULTRA_GREEN));
         assertEquals(SkillType.EXP_GREEN, SupportPersonnelGenerator.toExperienceLevel(SkillLevel.GREEN));
         assertEquals(SkillType.EXP_REGULAR, SupportPersonnelGenerator.toExperienceLevel(SkillLevel.REGULAR));
         assertEquals(SkillType.EXP_VETERAN, SupportPersonnelGenerator.toExperienceLevel(SkillLevel.VETERAN));
         assertEquals(SkillType.EXP_ELITE, SupportPersonnelGenerator.toExperienceLevel(SkillLevel.ELITE));
+        assertEquals(SkillType.EXP_HEROIC, SupportPersonnelGenerator.toExperienceLevel(SkillLevel.HEROIC));
+        assertEquals(SkillType.EXP_LEGENDARY, SupportPersonnelGenerator.toExperienceLevel(SkillLevel.LEGENDARY));
     }
 
     @Test
-    void toExperienceLevel_nullAndOutOfRangeFallBackToRegular() {
+    void toExperienceLevel_nullAndNoneFallBackToRegular() {
         assertEquals(SkillType.EXP_REGULAR, SupportPersonnelGenerator.toExperienceLevel(null));
         assertEquals(SkillType.EXP_REGULAR, SupportPersonnelGenerator.toExperienceLevel(SkillLevel.NONE));
-        assertEquals(SkillType.EXP_REGULAR, SupportPersonnelGenerator.toExperienceLevel(SkillLevel.HEROIC));
-        assertEquals(SkillType.EXP_REGULAR, SupportPersonnelGenerator.toExperienceLevel(SkillLevel.LEGENDARY));
+    }
+
+    @Test
+    void rollRandomSkillLevel_staysWithinUltraGreenToLegendary() {
+        // The roll is a 2d6 bell curve with rare escalation into Heroic/Legendary; over many rolls it
+        // must never produce NONE or anything outside the Ultra-Green..Legendary band.
+        for (int i = 0; i < 5000; i++) {
+            SkillLevel level = SupportPersonnelGenerator.rollRandomSkillLevel();
+            assertNotNull(level);
+            assertTrue(level.getExperienceLevel() >= SkillLevel.ULTRA_GREEN.getExperienceLevel()
+                          && level.getExperienceLevel() <= SkillLevel.LEGENDARY.getExperienceLevel(),
+                  "rolled " + level + " out of range");
+        }
+    }
+
+    @Test
+    void experienceLevelFor_usesFixedLevelWhenConfigured() {
+        // A configured (non-null) level always maps to that tier - no randomness.
+        assertEquals(SkillType.EXP_VETERAN, SupportPersonnelGenerator.experienceLevelFor(SkillLevel.VETERAN));
+        assertEquals(SkillType.EXP_LEGENDARY, SupportPersonnelGenerator.experienceLevelFor(SkillLevel.LEGENDARY));
     }
 
     // ===== Edge cases =====

@@ -35,6 +35,7 @@ package mekhq.campaign.universe.commandGeneration.ratgen;
 import java.util.ArrayList;
 import java.util.List;
 
+import megamek.common.compute.Compute;
 import megamek.common.enums.SkillLevel;
 import megamek.logging.MMLogger;
 import mekhq.campaign.Campaign;
@@ -221,12 +222,12 @@ public final class SupportPersonnelGenerator {
         if (count <= 0) {
             return 0;
         }
-        SkillLevel skillLevel = options.getSupportPersonnelSkillLevels().getOrDefault(role, SkillLevel.REGULAR);
-        int expLvl = toExperienceLevel(skillLevel);
+        // null = the "Random" picker option: roll each person's level individually (below).
+        SkillLevel skillLevel = options.getSupportPersonnelSkillLevels().get(role);
 
         for (int i = 0; i < count; i++) {
-            Person person = createAndRecruit(campaign, skillGen, role, expLvl, supportRank,
-                  targetRankSystem, rankValidator);
+            Person person = createAndRecruit(campaign, skillGen, role, experienceLevelFor(skillLevel),
+                  supportRank, targetRankSystem, rankValidator);
             if (person != null) {
                 out.add(person);
             }
@@ -266,14 +267,13 @@ public final class SupportPersonnelGenerator {
         if (!campaign.getCampaignOptions().isUseHRStrain()) {
             return 0;
         }
-        SkillLevel skillLevel = options.getSupportPersonnelSkillLevels()
-              .getOrDefault(PersonnelRole.ADMINISTRATOR_HR, SkillLevel.REGULAR);
-        int expLvl = toExperienceLevel(skillLevel);
+        // null = "Random": each HR admin rolls its own level (below).
+        SkillLevel skillLevel = options.getSupportPersonnelSkillLevels().get(PersonnelRole.ADMINISTRATOR_HR);
 
         int added = 0;
         while (RetirementDefectionTracker.getHRStrainModifier(campaign) > 0 && added < MAX_HR_STRAIN_TOPUP) {
-            Person admin = createAndRecruit(campaign, skillGen, PersonnelRole.ADMINISTRATOR_HR, expLvl,
-                  supportRank, targetRankSystem, rankValidator);
+            Person admin = createAndRecruit(campaign, skillGen, PersonnelRole.ADMINISTRATOR_HR,
+                  experienceLevelFor(skillLevel), supportRank, targetRankSystem, rankValidator);
             if (admin == null) {
                 break;
             }
@@ -328,10 +328,10 @@ public final class SupportPersonnelGenerator {
             return 0;
         }
         if (asPersonnel) {
-            int expLvl = toExperienceLevel(skillLevel == null ? SkillLevel.REGULAR : skillLevel);
+            // null = "Random": roll each assistant's level individually.
             for (int i = 0; i < needed; i++) {
-                Person person = createAndRecruit(campaign, skillGen, role, expLvl, supportRank,
-                      targetRankSystem, rankValidator);
+                Person person = createAndRecruit(campaign, skillGen, role, experienceLevelFor(skillLevel),
+                      supportRank, targetRankSystem, rankValidator);
                 if (person != null) {
                     out.add(person);
                 }
@@ -415,9 +415,9 @@ public final class SupportPersonnelGenerator {
     }
 
     /**
-     * Converts a {@link SkillLevel} (where {@code NONE = 0, ULTRA_GREEN = 1, …, ELITE = 5}) to a
-     * {@link SkillType} {@code EXP_*} constant (where {@code EXP_ULTRA_GREEN = 0, …, EXP_ELITE =
-     * 4}). The two enums use different baselines; this is the canonical mapping.
+     * Converts a {@link SkillLevel} (where {@code NONE = 0, ULTRA_GREEN = 1, …, LEGENDARY = 7}) to a
+     * {@link SkillType} {@code EXP_*} constant (where {@code EXP_ULTRA_GREEN = 0, …, EXP_LEGENDARY =
+     * 6}). The two enums use different baselines; this is the canonical mapping.
      */
     static int toExperienceLevel(SkillLevel skillLevel) {
         if (skillLevel == null) {
@@ -429,7 +429,47 @@ public final class SupportPersonnelGenerator {
             case REGULAR -> SkillType.EXP_REGULAR;
             case VETERAN -> SkillType.EXP_VETERAN;
             case ELITE -> SkillType.EXP_ELITE;
+            case HEROIC -> SkillType.EXP_HEROIC;
+            case LEGENDARY -> SkillType.EXP_LEGENDARY;
             default -> SkillType.EXP_REGULAR;
         };
+    }
+
+    /**
+     * The {@link SkillType} experience level for one generated person. When {@code configured} is
+     * {@code null} - the "Random" skill-picker option - each person rolls their own level via
+     * {@link #rollRandomSkillLevel()}; otherwise every person of the role shares the fixed level.
+     *
+     * @param configured the picker's skill level, or {@code null} for a per-person random roll
+     *
+     * @return the experience level to generate this person's skills at
+     */
+    static int experienceLevelFor(SkillLevel configured) {
+        return toExperienceLevel(configured == null ? rollRandomSkillLevel() : configured);
+    }
+
+    /**
+     * Rolls a random skill level for a support person: a 2d6 bell curve centered on Regular
+     * (Ultra-Green on a 2, Elite on a 12), with a rare escalation - an Elite roll can climb to
+     * Heroic, and a Heroic roll to Legendary - so exceptional staff appear but stay uncommon
+     * (Heroic ~0.5%, Legendary ~0.08%).
+     *
+     * @return the rolled {@link SkillLevel}
+     */
+    static SkillLevel rollRandomSkillLevel() {
+        SkillLevel level = switch (Compute.d6(2)) {
+            case 2 -> SkillLevel.ULTRA_GREEN;
+            case 3, 4, 5 -> SkillLevel.GREEN;
+            case 6, 7, 8, 9 -> SkillLevel.REGULAR;
+            case 10, 11 -> SkillLevel.VETERAN;
+            default -> SkillLevel.ELITE; // 12
+        };
+        if (level == SkillLevel.ELITE && Compute.d6() == 6) {
+            level = SkillLevel.HEROIC;
+            if (Compute.d6() == 6) {
+                level = SkillLevel.LEGENDARY;
+            }
+        }
+        return level;
     }
 }
