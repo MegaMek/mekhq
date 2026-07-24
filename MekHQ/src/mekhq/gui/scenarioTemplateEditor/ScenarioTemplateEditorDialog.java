@@ -65,7 +65,6 @@ import mekhq.campaign.mission.ScenarioForceTemplate;
 import mekhq.campaign.mission.ScenarioForceTemplate.ForceAlignment;
 import mekhq.campaign.mission.ScenarioForceTemplate.ForceGenerationMethod;
 import mekhq.campaign.mission.ScenarioForceTemplate.SynchronizedDeploymentType;
-import mekhq.campaign.mission.ScenarioObjective;
 import mekhq.campaign.mission.ScenarioTemplate;
 import mekhq.campaign.mission.atb.AtBScenarioModifier;
 import mekhq.gui.FileDialogs;
@@ -118,9 +117,7 @@ public class ScenarioTemplateEditorDialog extends JDialog implements ActionListe
     TemplatePropertiesPanel templatePropertiesPanel;
     MapParametersPanel mapParametersPanel;
     ModifiersPanel modifiersPanel;
-    JList<ScenarioObjective> objectiveList;
-    JScrollPane objectiveScrollPane;
-    JButton btnRemoveObjective;
+    ObjectivesPanel objectivesPanel;
     JList<String> listMULs;
     JList<String> lstObjectiveLinkedForces;
     JList<MissionRole> lstRolePicker;
@@ -179,7 +176,6 @@ public class ScenarioTemplateEditorDialog extends JDialog implements ActionListe
         forceAlignmentChangeHandler();
         updateForceSyncList();
         renderForceList();
-        updateObjectiveList();
     }
 
     /**
@@ -211,69 +207,14 @@ public class ScenarioTemplateEditorDialog extends JDialog implements ActionListe
     }
 
     private void setupObjectiveEditUI(GridBagConstraints gbc) {
-        gbc.gridy++;
-        gbc.gridwidth = 1;
-        gbc.gridheight = 1;
-
-        JPanel pnlObjectiveEdit = new JPanel();
-        pnlObjectiveEdit.setLayout(new GridBagLayout());
-        GridBagConstraints localGbc = new GridBagConstraints();
-        localGbc.insets = new Insets(0, 0, 0, 5);
-
-        JButton btnAddEditObjective = getBtnAddEditObjective();
-
-        objectiveList = new JList<>();
-        objectiveList.addListSelectionListener(e -> btnRemoveObjective.setEnabled(!objectiveList.getSelectedValuesList()
-                                                                                         .isEmpty()));
-        objectiveList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
-        objectiveList.setVisibleRowCount(5);
-        objectiveList.setFixedCellWidth(400);
-        objectiveScrollPane = new FastJScrollPane();
-        objectiveScrollPane.setViewportView(objectiveList);
-
-        btnRemoveObjective = new JButton("Remove");
-        btnRemoveObjective.addActionListener(e -> this.removeObjective());
-
-        JLabel lblObjectives = new JLabel("Objectives:");
-
-        localGbc.gridx = 0;
-        localGbc.gridy = 0;
-        pnlObjectiveEdit.add(lblObjectives, localGbc);
-
-        localGbc.gridx = 1;
-        localGbc.gridy = 1;
-        localGbc.gridheight = GridBagConstraints.REMAINDER;
-        pnlObjectiveEdit.add(objectiveScrollPane, localGbc);
-
-        localGbc.gridx = 2;
-        localGbc.gridy = 2;
-        localGbc.gridheight = 1;
-        pnlObjectiveEdit.add(btnAddEditObjective, localGbc);
-        localGbc.gridy = 3;
-        pnlObjectiveEdit.add(btnRemoveObjective, localGbc);
+        objectivesPanel = new ObjectivesPanel();
+        objectivesPanel.load(scenarioTemplate);
 
         gbc.gridx = 0;
         gbc.gridy++;
-
-        globalPanel.add(pnlObjectiveEdit, gbc);
-    }
-
-    private JButton getBtnAddEditObjective() {
-        ScenarioTemplateEditorDialog parent = this;
-
-        JButton btnAddEditObjective = new JButton("Add/Edit Objective");
-        btnAddEditObjective.addActionListener(evt -> {
-            ObjectiveEditPanel oep;
-            if (objectiveList.getSelectedValue() != null) {
-                oep = new ObjectiveEditPanel(scenarioTemplate, objectiveList.getSelectedValue(), parent);
-            } else {
-                oep = new ObjectiveEditPanel(scenarioTemplate, parent);
-            }
-            oep.setModal(true);
-            oep.requestFocus();
-            oep.setVisible(true);
-        });
-        return btnAddEditObjective;
+        gbc.gridwidth = 1;
+        gbc.gridheight = 1;
+        globalPanel.add(objectivesPanel, gbc);
     }
 
     /**
@@ -1485,24 +1426,4 @@ public class ScenarioTemplateEditorDialog extends JDialog implements ActionListe
         forceScrollPane.setVisible(!forceScrollPane.isVisible() && !scenarioTemplate.getScenarioForces().isEmpty());
     }
 
-    private void removeObjective() {
-        for (ScenarioObjective objective : objectiveList.getSelectedValuesList()) {
-            scenarioTemplate.scenarioObjectives.remove(objective);
-        }
-
-        btnRemoveObjective.setEnabled(false);
-        updateObjectiveList();
-    }
-
-    public void updateObjectiveList() {
-        DefaultListModel<ScenarioObjective> objectiveModel = new DefaultListModel<>();
-        for (ScenarioObjective currentObjective : scenarioTemplate.scenarioObjectives) {
-            objectiveModel.addElement(currentObjective);
-        }
-
-        objectiveList.setModel(objectiveModel);
-
-        validate();
-        pack();
-    }
 }

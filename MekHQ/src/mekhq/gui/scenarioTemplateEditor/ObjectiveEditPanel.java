@@ -33,6 +33,7 @@
 package mekhq.gui.scenarioTemplateEditor;
 
 import java.awt.Color;
+import java.awt.Component;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
@@ -85,25 +86,25 @@ public class ObjectiveEditPanel extends JDialog {
 
     private final ScenarioTemplate currentScenarioTemplate;
     private final ScenarioObjective objective;
-    private final ScenarioTemplateEditorDialog parent;
+    private final Runnable onSaved;
 
-    public ObjectiveEditPanel(ScenarioTemplate template, ScenarioTemplateEditorDialog parent) {
+    public ObjectiveEditPanel(ScenarioTemplate template, Component owner, Runnable onSaved) {
         currentScenarioTemplate = template;
         objective = new ScenarioObjective();
-        this.parent = parent;
+        this.onSaved = onSaved;
 
         initGUI();
         updateTimeLimitUI();
         validate();
         pack();
-        setLocationRelativeTo(parent);
+        setLocationRelativeTo(owner);
     }
 
-    public ObjectiveEditPanel(ScenarioTemplate template, ScenarioObjective objective,
-          ScenarioTemplateEditorDialog parent) {
+    public ObjectiveEditPanel(ScenarioTemplate template, ScenarioObjective objective, Component owner,
+          Runnable onSaved) {
         currentScenarioTemplate = template;
         this.objective = objective;
-        this.parent = parent;
+        this.onSaved = onSaved;
 
         initGUI();
         updateForceList();
@@ -133,7 +134,7 @@ public class ObjectiveEditPanel extends JDialog {
 
         validate();
         pack();
-        setLocationRelativeTo(parent);
+        setLocationRelativeTo(owner);
     }
 
     private void initGUI() {
@@ -669,7 +670,7 @@ public class ObjectiveEditPanel extends JDialog {
             currentScenarioTemplate.scenarioObjectives.add(objective);
         }
 
-        parent.updateObjectiveList();
+        onSaved.run();
         setVisible(false);
     }
 }
