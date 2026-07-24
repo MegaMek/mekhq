@@ -51,29 +51,25 @@ import mekhq.gui.commandGeneration.components.CommandGenerationLabel;
 import mekhq.gui.commandGeneration.components.CommandGenerationStandardPanel;
 
 /**
- * Spares tab. Eleven percentage spinners bound to {@code CampaignOptions.getAutoLogistics*()}, one per
- * part category MekHQ tracks for {@code PartsInUseManager.findStockUpAmount}:
+ * Spares tab. Mirrors the AutoLogistics restock percentages from Campaign Options' Acquisition &amp;
+ * Delivery page: the same thirteen part categories, in the same order, with the same labels,
+ * tooltips, and 0-10000 range, one spinner per category {@code PartsInUseManager.findStockUpAmount}
+ * tracks.
  *
- * <ul>
- *   <li>Heat sinks, Mek head, Non-repairable locations (CT / tank locations), other Mek locations</li>
- *   <li>Ammunition, Armor</li>
- *   <li>Actuators, Jump jets, Engines</li>
- *   <li>Weapons, Other</li>
- * </ul>
- *
- * <p>The same percentages drive both the starting spare inventory at generation time AND the
- * campaign's ongoing auto-logistics during play, so the player's starting-stock policy persists as
- * their long-term resupply policy. Values are read from and written back to the campaign's
- * {@link CampaignOptions} on load/save — no field duplication on {@link CommandGenerationOptions}.</p>
- *
- * <p>Range 0-500%: 100% targets exact stock parity with units in use; below that = under-stocked,
- * above = bench depth. Step size 5 keeps the spinner snappy.</p>
+ * <p>The values ARE the campaign options: spinners load from and write back to the campaign's
+ * {@link CampaignOptions} {@code autoLogistics*} fields directly, so the tab always opens showing
+ * whatever is set in Campaign Options and edits here apply to the campaign on OK - no field
+ * duplication on {@link CommandGenerationOptions}. The same percentages drive both the starting
+ * spare inventory at generation time and the campaign's ongoing auto-logistics resupply during
+ * play.</p>
  */
 public class SparesTab {
 
+    // Mirror the Campaign Options AutoLogistics spinners (AcquisitionPage.createAutoLogisticsPanel):
+    // 0-10000 in steps of 1, so no value settable there is ever clamped or rounded here.
     private static final int MIN_PERCENT = 0;
-    private static final int MAX_PERCENT = 500;
-    private static final int STEP_PERCENT = 5;
+    private static final int MAX_PERCENT = 10000;
+    private static final int STEP_PERCENT = 1;
 
     private final Campaign campaign;
     private CommandGenerationOptions options;
@@ -104,17 +100,20 @@ public class SparesTab {
         section.setLayout(new GridBagLayout());
         GridBagConstraints gbc = sectionConstraints();
 
+        // Same categories and order as the Campaign Options AutoLogistics grid.
         String[] keys = {
-              "SparesHeatSink",
               "SparesMekHead",
-              "SparesNonRepairableLocation",
               "SparesMekLocation",
-              "SparesAmmunition",
+              "SparesNonRepairableLocation",
               "SparesArmor",
+              "SparesAmmunition",
+              "SparesHeatSink",
+              "SparesWeapons",
               "SparesActuators",
               "SparesJumpJets",
+              "SparesHeadComponents",
               "SparesEngines",
-              "SparesWeapons",
+              "SparesGyros",
               "SparesOther"
         };
 
@@ -177,16 +176,18 @@ public class SparesTab {
         if (co == null) {
             return;
         }
-        spinners.get("SparesHeatSink").setValue(clamp(co.getAutoLogisticsHeatSink()));
         spinners.get("SparesMekHead").setValue(clamp(co.getAutoLogisticsMekHead()));
-        spinners.get("SparesNonRepairableLocation").setValue(clamp(co.getAutoLogisticsNonRepairableLocation()));
         spinners.get("SparesMekLocation").setValue(clamp(co.getAutoLogisticsMekLocation()));
-        spinners.get("SparesAmmunition").setValue(clamp(co.getAutoLogisticsAmmunition()));
+        spinners.get("SparesNonRepairableLocation").setValue(clamp(co.getAutoLogisticsNonRepairableLocation()));
         spinners.get("SparesArmor").setValue(clamp(co.getAutoLogisticsArmor()));
+        spinners.get("SparesAmmunition").setValue(clamp(co.getAutoLogisticsAmmunition()));
+        spinners.get("SparesHeatSink").setValue(clamp(co.getAutoLogisticsHeatSink()));
+        spinners.get("SparesWeapons").setValue(clamp(co.getAutoLogisticsWeapons()));
         spinners.get("SparesActuators").setValue(clamp(co.getAutoLogisticsActuators()));
         spinners.get("SparesJumpJets").setValue(clamp(co.getAutoLogisticsJumpJets()));
+        spinners.get("SparesHeadComponents").setValue(clamp(co.getAutoLogisticsHeadComponents()));
         spinners.get("SparesEngines").setValue(clamp(co.getAutoLogisticsEngines()));
-        spinners.get("SparesWeapons").setValue(clamp(co.getAutoLogisticsWeapons()));
+        spinners.get("SparesGyros").setValue(clamp(co.getAutoLogisticsGyros()));
         spinners.get("SparesOther").setValue(clamp(co.getAutoLogisticsOther()));
     }
 
@@ -205,16 +206,18 @@ public class SparesTab {
         if (co == null) {
             return;
         }
-        co.setAutoLogisticsHeatSink((Integer) spinners.get("SparesHeatSink").getValue());
         co.setAutoLogisticsMekHead((Integer) spinners.get("SparesMekHead").getValue());
-        co.setAutoLogisticsNonRepairableLocation((Integer) spinners.get("SparesNonRepairableLocation").getValue());
         co.setAutoLogisticsMekLocation((Integer) spinners.get("SparesMekLocation").getValue());
-        co.setAutoLogisticsAmmunition((Integer) spinners.get("SparesAmmunition").getValue());
+        co.setAutoLogisticsNonRepairableLocation((Integer) spinners.get("SparesNonRepairableLocation").getValue());
         co.setAutoLogisticsArmor((Integer) spinners.get("SparesArmor").getValue());
+        co.setAutoLogisticsAmmunition((Integer) spinners.get("SparesAmmunition").getValue());
+        co.setAutoLogisticsHeatSink((Integer) spinners.get("SparesHeatSink").getValue());
+        co.setAutoLogisticsWeapons((Integer) spinners.get("SparesWeapons").getValue());
         co.setAutoLogisticsActuators((Integer) spinners.get("SparesActuators").getValue());
         co.setAutoLogisticsJumpJets((Integer) spinners.get("SparesJumpJets").getValue());
+        co.setAutoLogisticsHeadComponents((Integer) spinners.get("SparesHeadComponents").getValue());
         co.setAutoLogisticsEngines((Integer) spinners.get("SparesEngines").getValue());
-        co.setAutoLogisticsWeapons((Integer) spinners.get("SparesWeapons").getValue());
+        co.setAutoLogisticsGyros((Integer) spinners.get("SparesGyros").getValue());
         co.setAutoLogisticsOther((Integer) spinners.get("SparesOther").getValue());
     }
 
