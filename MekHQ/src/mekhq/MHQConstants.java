@@ -361,8 +361,8 @@ public final class MHQConstants extends SuiteConstants {
 
     public static final String STRAT_CON_BIOME_MANIFEST_PATH = "./data/stratconbiomedefinitions/StratConBiomeManifest.xml";
     public static final String TERRAIN_CONDITIONS_ODDS_MANIFEST_PATH = "./data/terrainconditionsodds/TerrainConditionsOddsManifest.xml";
-    public static final String HOSTILE_FACILITY_SCENARIO = "Hostile Facility.xml";
-    public static final String ALLIED_FACILITY_SCENARIO = "Base Defense.xml";
+    public static final String HOSTILE_FACILITY_SCENARIO = "Hostile Facility.json";
+    public static final String ALLIED_FACILITY_SCENARIO = "Base Defense.json";
     public static final String SCENARIO_MODIFIER_HOUSE_CO_GROUND = "HouseOfficerGround.xml";
     public static final String SCENARIO_MODIFIER_HOUSE_CO_AIR = "HouseOfficerAir.xml";
     public static final String SCENARIO_MODIFIER_TRAINEES_AIR = "AlliedTraineesAir.xml";
