@@ -50,7 +50,6 @@ import javax.swing.*;
 import javax.swing.border.LineBorder;
 
 import megamek.client.bot.princess.CardinalEdge;
-import megamek.client.ratgenerator.MissionRole;
 import megamek.client.ui.panels.abstractPanels.AbstractScrollablePanel;
 import megamek.client.ui.preferences.JWindowPreference;
 import megamek.client.ui.preferences.PreferencesNode;
@@ -120,9 +119,7 @@ public class ScenarioTemplateEditorDialog extends JDialog implements ActionListe
     ObjectivesPanel objectivesPanel;
     JList<String> listMULs;
     JList<String> lstObjectiveLinkedForces;
-    JList<MissionRole> lstRolePicker;
-    JList<String> lstRoleSets;
-    DefaultListModel<String> roleSetsModel;
+    RoleSetEditorPanel roleSetEditorPanel;
 
     AbstractScrollablePanel globalPanel;
 
@@ -588,89 +585,12 @@ public class ScenarioTemplateEditorDialog extends JDialog implements ActionListe
         roleGbc.gridheight = GridBagConstraints.REMAINDER;
         roleGbc.anchor = GridBagConstraints.NORTHWEST;
         roleGbc.insets = new Insets(0, 10, 0, 0);
-        forcedPanel.add(buildRoleEditorPanel(), roleGbc);
+        roleSetEditorPanel = new RoleSetEditorPanel();
+        roleSetEditorPanel.setAllowedUnitType(currentAllowedUnitType());
+        forcedPanel.add(roleSetEditorPanel, roleGbc);
 
         globalPanel.add(forcedPanel, externalGBC);
         externalGBC.gridheight = 1;
-    }
-
-    /**
-     * Builds the role-choices editor column for the force editor. A force's roles are stored as a list of "role sets";
-     * each set is a group of {@link MissionRole}s that apply together, and one set is picked at random when the force
-     * is generated. The user selects one or more roles (filtered to those valid for the force's unit type) and adds
-     * them as a set; the accumulated sets are shown in the lower list.
-     */
-    private JPanel buildRoleEditorPanel() {
-        JPanel pnlRoles = new JPanel(new GridBagLayout());
-        pnlRoles.setBorder(BorderFactory.createTitledBorder("Required Roles"));
-
-        GridBagConstraints gbc = new GridBagConstraints();
-        gbc.gridx = 0;
-        gbc.gridy = 0;
-        gbc.anchor = GridBagConstraints.WEST;
-        gbc.fill = GridBagConstraints.HORIZONTAL;
-        gbc.insets = new Insets(2, 2, 2, 2);
-
-        pnlRoles.add(new JLabel("Roles valid for unit type:"), gbc);
-
-        lstRolePicker = new JList<>();
-        lstRolePicker.setModel(new DefaultListModel<>());
-        lstRolePicker.setSelectionMode(ListSelectionModel.MULTIPLE_INTERVAL_SELECTION);
-        lstRolePicker.setCellRenderer(new RoleDisplayRenderer());
-        JScrollPane scrRolePicker = new FastJScrollPane(lstRolePicker);
-        scrRolePicker.setPreferredSize(new Dimension(190, 120));
-        gbc.gridy++;
-        pnlRoles.add(scrRolePicker, gbc);
-
-        JButton btnAddRoleSet = new JButton("Add Role Set");
-        btnAddRoleSet.addActionListener(evt -> addRoleSetHandler());
-        gbc.gridy++;
-        gbc.fill = GridBagConstraints.NONE;
-        pnlRoles.add(btnAddRoleSet, gbc);
-
-        gbc.fill = GridBagConstraints.HORIZONTAL;
-        gbc.gridy++;
-        pnlRoles.add(new JLabel("Role sets (one chosen at random):"), gbc);
-
-        roleSetsModel = new DefaultListModel<>();
-        lstRoleSets = new JList<>(roleSetsModel);
-        lstRoleSets.setSelectionMode(ListSelectionModel.MULTIPLE_INTERVAL_SELECTION);
-        lstRoleSets.setCellRenderer(new RoleSetDisplayRenderer());
-        JScrollPane scrRoleSets = new FastJScrollPane(lstRoleSets);
-        scrRoleSets.setPreferredSize(new Dimension(190, 100));
-        gbc.gridy++;
-        pnlRoles.add(scrRoleSets, gbc);
-
-        JButton btnRemoveRoleSet = new JButton("Remove Role Set");
-        btnRemoveRoleSet.addActionListener(evt -> removeRoleSetHandler());
-        gbc.gridy++;
-        gbc.fill = GridBagConstraints.NONE;
-        pnlRoles.add(btnRemoveRoleSet, gbc);
-
-        refreshRolePicker();
-        return pnlRoles;
-    }
-
-    /** Renders a {@link MissionRole} with underscores shown as spaces. */
-    private static class RoleDisplayRenderer extends DefaultListCellRenderer {
-        @Override
-        public java.awt.Component getListCellRendererComponent(JList<?> list, Object value, int index,
-              boolean isSelected, boolean cellHasFocus) {
-            String text = (value instanceof MissionRole role) ?
-                                role.toString().replace('_', ' ') :
-                                String.valueOf(value);
-            return super.getListCellRendererComponent(list, text, index, isSelected, cellHasFocus);
-        }
-    }
-
-    /** Renders a stored role-set string using its human-readable role names. */
-    private static class RoleSetDisplayRenderer extends DefaultListCellRenderer {
-        @Override
-        public java.awt.Component getListCellRendererComponent(JList<?> list, Object value, int index,
-              boolean isSelected, boolean cellHasFocus) {
-            String text = (value instanceof String entry) ? MissionRoleChoices.describe(entry) : String.valueOf(value);
-            return super.getListCellRendererComponent(list, text, index, isSelected, cellHasFocus);
-        }
     }
 
     /**
@@ -714,10 +634,7 @@ public class ScenarioTemplateEditorDialog extends JDialog implements ActionListe
         chkSyncRetreatThreshold.setSelected(forceTemplate.getSyncRetreatThreshold());
         selectObjectiveLinkedForces(forceTemplate.getObjectiveLinkedForces());
 
-        roleSetsModel.clear();
-        for (String roleSet : forceTemplate.getRoleCollections()) {
-            roleSetsModel.addElement(roleSet);
-        }
+        roleSetEditorPanel.load(forceTemplate.getRoleCollections());
     }
 
     /**
@@ -1093,9 +1010,7 @@ public class ScenarioTemplateEditorDialog extends JDialog implements ActionListe
         sft.setObjectiveLinkedForces(new ArrayList<>(lstObjectiveLinkedForces.getSelectedValuesList()));
 
         sft.getRoleCollections().clear();
-        for (int i = 0; i < roleSetsModel.getSize(); i++) {
-            sft.getRoleCollections().add(roleSetsModel.getElementAt(i));
-        }
+        sft.getRoleCollections().addAll(roleSetEditorPanel.getRoleSets());
 
         // if we have picked "None" for synchronization, then set explicit deployment
         // zones.
@@ -1290,7 +1205,9 @@ public class ScenarioTemplateEditorDialog extends JDialog implements ActionListe
                                selectedItem == UnitType.AEROSPACE_FIGHTER;
 
         chkAllowAeroBombs.setEnabled(isAero);
-        refreshRolePicker();
+        if (roleSetEditorPanel != null) {
+            roleSetEditorPanel.setAllowedUnitType(currentAllowedUnitType());
+        }
     }
 
     /**
@@ -1299,48 +1216,6 @@ public class ScenarioTemplateEditorDialog extends JDialog implements ActionListe
      */
     private int currentAllowedUnitType() {
         return cboUnitType.getSelectedIndex() - ScenarioForceTemplate.SPECIAL_UNIT_TYPES.size();
-    }
-
-    /**
-     * Repopulates the role picker with the roles selectable for the currently selected unit type. Guarded because the
-     * unit-type change handler can fire before the role editor has been built.
-     */
-    private void refreshRolePicker() {
-        if (lstRolePicker == null) {
-            return;
-        }
-
-        DefaultListModel<MissionRole> model = new DefaultListModel<>();
-        for (MissionRole role : MissionRoleChoices.selectableRoles(currentAllowedUnitType())) {
-            model.addElement(role);
-        }
-        lstRolePicker.setModel(model);
-    }
-
-    /**
-     * Event handler for the "Add Role Set" button. Turns the currently selected roles into a single role set and adds
-     * it to the force's list, unless that exact set is already present.
-     */
-    private void addRoleSetHandler() {
-        List<MissionRole> selectedRoles = lstRolePicker.getSelectedValuesList();
-        if (selectedRoles.isEmpty()) {
-            return;
-        }
-
-        String entry = MissionRoleChoices.toEntry(selectedRoles);
-        if (!roleSetsModel.contains(entry)) {
-            roleSetsModel.addElement(entry);
-        }
-        lstRolePicker.clearSelection();
-    }
-
-    /**
-     * Event handler for the "Remove Role Set" button. Removes the selected role sets from the force's list.
-     */
-    private void removeRoleSetHandler() {
-        for (String entry : lstRoleSets.getSelectedValuesList()) {
-            roleSetsModel.removeElement(entry);
-        }
     }
 
     /**
