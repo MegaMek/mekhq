@@ -292,7 +292,7 @@ public class FileDialogs {
         Optional<File> value = GUI.fileDialogOpen(
               frame,
               "Load Scenario Template",
-              FileType.XML,
+              FileType.SCENARIO_TEMPLATE,
               MekHQ.getScenarioTemplatesDirectory().getValue());
 
         value.ifPresent(x -> MekHQ.getScenarioTemplatesDirectory().setValue(x.getParent()));
@@ -306,13 +306,13 @@ public class FileDialogs {
      */
     public static Optional<File> saveScenarioTemplate(JFrame frame, ScenarioTemplate template) {
         String fileName = String.format(
-              "%s.xml",
+              "%s.json",
               template.name);
 
         Optional<File> value = GUI.fileDialogSave(
               frame,
               "Save Scenario Template",
-              FileType.XML,
+              FileType.SCENARIO_TEMPLATE,
               MekHQ.getScenarioTemplatesDirectory().getValue(),
               fileName);
 

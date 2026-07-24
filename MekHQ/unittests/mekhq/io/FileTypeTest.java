@@ -32,6 +32,7 @@
  */
 package mekhq.io;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
@@ -66,5 +67,16 @@ public class FileTypeTest {
               "file.xmlabc",
               "file.abcxml"
         ).forEach(fn -> assertFalse(FileType.CPNX.getNameFilter().test(fn), fn + " was not refused"));
+    }
+
+    /**
+     * Scenario templates are written as JSON (the recommended extension) but legacy XML files must remain selectable in
+     * the open dialog.
+     */
+    @Test
+    public void testScenarioTemplateFormats() {
+        assertEquals("json", FileType.SCENARIO_TEMPLATE.getRecommendedExtension());
+        assertTrue(FileType.SCENARIO_TEMPLATE.getExtensions().contains("xml"),
+              "Legacy XML templates must remain selectable");
     }
 }
