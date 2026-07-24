@@ -664,9 +664,7 @@ public class ScenarioTemplateEditorDialog extends JDialog implements ActionListe
      */
     @Override
     public void actionPerformed(ActionEvent e) {
-        if (ADD_FORCE_COMMAND.equals(e.getActionCommand())) {
-            addForceButtonHandler();
-        } else if (ForceListCommand.isRemove(e.getActionCommand())) {
+        if (ForceListCommand.isRemove(e.getActionCommand())) {
             deleteForceButtonHandler(e.getActionCommand());
         } else if (ForceListCommand.isEdit(e.getActionCommand())) {
             editForceButtonHandler(e.getActionCommand());
@@ -681,7 +679,7 @@ public class ScenarioTemplateEditorDialog extends JDialog implements ActionListe
      * Helper method that hides or reveals the force editor section.
      */
     private void toggleForcePanelVisibility() {
-        forcedPanel.setVisible(!forcedPanel.isVisible());
+        forceEditorPanel.setVisible(!forceEditorPanel.isVisible());
         forceScrollPane.setVisible(!forceScrollPane.isVisible() && !scenarioTemplate.getScenarioForces().isEmpty());
     }
 
