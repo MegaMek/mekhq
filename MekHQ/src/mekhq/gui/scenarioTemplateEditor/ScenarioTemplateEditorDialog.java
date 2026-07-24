@@ -33,37 +33,38 @@
 package mekhq.gui.scenarioTemplateEditor;
 
 import java.awt.Color;
-import java.awt.Dimension;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.GridLayout;
 import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.awt.event.ItemListener;
 import java.io.File;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
-import java.util.Objects;
-import javax.swing.*;
+import javax.swing.JButton;
+import javax.swing.JDialog;
+import javax.swing.JFrame;
+import javax.swing.JLabel;
+import javax.swing.JOptionPane;
+import javax.swing.JPanel;
+import javax.swing.JScrollPane;
+import javax.swing.ScrollPaneConstants;
 import javax.swing.border.LineBorder;
 
-import megamek.client.bot.princess.CardinalEdge;
 import megamek.client.ui.panels.abstractPanels.AbstractScrollablePanel;
 import megamek.client.ui.preferences.JWindowPreference;
 import megamek.client.ui.preferences.PreferencesNode;
 import megamek.common.ui.FastJScrollPane;
 import megamek.common.units.EntityWeightClass;
-import megamek.common.units.UnitType;
 import megamek.logging.MMLogger;
 import mekhq.MHQConstants;
 import mekhq.MekHQ;
 import mekhq.campaign.digitalGM.stratCon.StratConBiomeManifest;
 import mekhq.campaign.mission.ScenarioForceTemplate;
 import mekhq.campaign.mission.ScenarioForceTemplate.ForceAlignment;
-import mekhq.campaign.mission.ScenarioForceTemplate.ForceGenerationMethod;
-import mekhq.campaign.mission.ScenarioForceTemplate.SynchronizedDeploymentType;
 import mekhq.campaign.mission.ScenarioTemplate;
 import mekhq.campaign.mission.atb.AtBScenarioModifier;
 import mekhq.gui.FileDialogs;
@@ -77,53 +78,20 @@ import mekhq.gui.baseComponents.DefaultMHQScrollablePanel;
 public class ScenarioTemplateEditorDialog extends JDialog implements ActionListener {
     private static final MMLogger LOGGER = MMLogger.create(ScenarioTemplateEditorDialog.class);
 
-    private final Dimension spinnerSize = new Dimension(55, 25);
-
-    private final static String ADD_FORCE_COMMAND = "ADD_FORCE";
     private final static String SAVE_TEMPLATE_COMMAND = "SAVE_TEMPLATE";
     private final static String LOAD_TEMPLATE_COMMAND = "LOAD_TEMPLATE";
 
     private final JFrame frame;
-
-    // controls which need to be accessible across the lifetime of this dialog
-    JComboBox<String> cboAlignment;
-    JComboBox<String> cboGenerationMethod;
-    JSpinner spnMultiplier;
-    JList<String> lstDeployZones;
-    JComboBox<String> cboDestinationZone;
-    JSpinner spnRetreatThreshold;
-    JComboBox<String> cboUnitType;
-    JCheckBox chkReinforce;
-    JCheckBox chkContributesToBV;
-    JCheckBox chkContributesToUnitCount;
-    JTextField txtForceName;
-    JComboBox<String> cboSyncForceName;
-    JComboBox<String> cboSyncDeploymentType;
-    JSpinner spnArrivalTurn;
-    JSpinner spnFixedUnitCount;
-    JComboBox<String> cboMaxWeightClass;
-    JComboBox<String> cboMinWeightClass;
-    JCheckBox chkContributesToMapSize;
-    JSpinner spnGenerationOrder;
-    JCheckBox chkAllowAeroBombs;
-    JCheckBox chkUseArtillery;
-    JSpinner spnStartingAltitude;
-    JCheckBox chkOffBoard;
-    JCheckBox chkSubjectToRandomRemoval;
-    JCheckBox chkSyncRetreatThreshold;
 
     JPanel panForceList;
     TemplatePropertiesPanel templatePropertiesPanel;
     MapParametersPanel mapParametersPanel;
     ModifiersPanel modifiersPanel;
     ObjectivesPanel objectivesPanel;
-    JList<String> listMULs;
-    JList<String> lstObjectiveLinkedForces;
-    RoleSetEditorPanel roleSetEditorPanel;
+    ForceEditorPanel forceEditorPanel;
 
     AbstractScrollablePanel globalPanel;
 
-    JPanel forcedPanel;
     JScrollPane forceScrollPane;
 
     // the scenario template we're working on
@@ -170,8 +138,6 @@ public class ScenarioTemplateEditorDialog extends JDialog implements ActionListe
         setupMapParameters(gbc);
         setupBottomButtons(gbc);
 
-        forceAlignmentChangeHandler();
-        updateForceSyncList();
         renderForceList();
     }
 
@@ -241,416 +207,66 @@ public class ScenarioTemplateEditorDialog extends JDialog implements ActionListe
      *
      */
     private void setupForceEditor(GridBagConstraints externalGBC) {
-        forcedPanel = new JPanel();
-        forcedPanel.setLayout(new GridBagLayout());
-        forcedPanel.setBorder(new LineBorder(Color.BLACK));
+        forceEditorPanel = new ForceEditorPanel(readMulFileNames());
+        forceEditorPanel.setOnSave(this::commitForce);
+        forceEditorPanel.setAvailableForceIds(scenarioTemplate.getScenarioForces().keySet());
+
         externalGBC.gridx = 0;
         externalGBC.gridy++;
         externalGBC.gridwidth = GridBagConstraints.REMAINDER;
-
-        GridBagConstraints gbc = new GridBagConstraints();
-
-        gbc.gridx = 0;
-        gbc.gridy = 1;
-        gbc.anchor = GridBagConstraints.WEST;
-        JLabel lblForceAlignment = new JLabel("Force Alignment:");
-        forcedPanel.add(lblForceAlignment, gbc);
-
-        ItemListener dropdownChangeListener = evt -> forceAlignmentChangeHandler();
-
-        cboAlignment = new JComboBox<>(ScenarioForceTemplate.FORCE_ALIGNMENTS);
-        cboAlignment.addItemListener(dropdownChangeListener);
-        gbc.gridx = 1;
-        forcedPanel.add(cboAlignment, gbc);
-
-        JLabel lblGenerationMethod = new JLabel("Generation Method:");
-        gbc.gridx = 0;
-        gbc.gridy++;
-        forcedPanel.add(lblGenerationMethod, gbc);
-
-        cboGenerationMethod = new JComboBox<>(ScenarioForceTemplate.FORCE_GENERATION_METHODS);
-        cboGenerationMethod.addItemListener(dropdownChangeListener);
-        gbc.gridx = 1;
-        forcedPanel.add(cboGenerationMethod, gbc);
-
-        JLabel lblMultiplier = new JLabel("Scaling Multiplier:");
-        lblMultiplier.setToolTipText("For scaling force generation methods, multiplies the metric being scaled against.");
-        gbc.gridx = 0;
-        gbc.gridy++;
-        forcedPanel.add(lblMultiplier, gbc);
-
-        spnMultiplier = new JSpinner(new SpinnerNumberModel(1.0, 0.0, 4.0, .05));
-        spnMultiplier.setPreferredSize(spinnerSize);
-        gbc.gridx = 1;
-        forcedPanel.add(spnMultiplier, gbc);
-
-        JLabel lblDestinationZones = new JLabel("Destination Zone:");
-        gbc.gridx = 0;
-        gbc.gridy++;
-        forcedPanel.add(lblDestinationZones, gbc);
-
-        cboDestinationZone = new JComboBox<>(ScenarioForceTemplate.BOT_DESTINATION_ZONES);
-        cboDestinationZone.setSelectedIndex(CardinalEdge.NONE.getIndex());
-        gbc.gridx = 1;
-        forcedPanel.add(cboDestinationZone, gbc);
-
-        JLabel lblRetreatThreshold = new JLabel("Retreat Threshold:");
-        gbc.gridx = 0;
-        gbc.gridy++;
-        forcedPanel.add(lblRetreatThreshold, gbc);
-
-        spnRetreatThreshold = new JSpinner(new SpinnerNumberModel(50, 0, 100, 5));
-        spnRetreatThreshold.setPreferredSize(spinnerSize);
-        gbc.gridx = 1;
-        forcedPanel.add(spnRetreatThreshold, gbc);
-
-        JLabel lblCanReinforceLinked = new JLabel("Reinforce subsequent scenarios:");
-        gbc.gridx = 0;
-        gbc.gridy++;
-        forcedPanel.add(lblCanReinforceLinked, gbc);
-
-        chkReinforce = new JCheckBox();
-        gbc.gridx = 1;
-        forcedPanel.add(chkReinforce, gbc);
-
-        JLabel lblContributesToBV = new JLabel("Contributes to BV:");
-        gbc.gridx = 0;
-        gbc.gridy++;
-        forcedPanel.add(lblContributesToBV, gbc);
-
-        chkContributesToBV = new JCheckBox();
-        gbc.gridx = 1;
-        forcedPanel.add(chkContributesToBV, gbc);
-
-        JLabel lblContributesToUnitCount = new JLabel("Contributes to Unit Count:");
-        gbc.gridx = 0;
-        gbc.gridy++;
-        forcedPanel.add(lblContributesToUnitCount, gbc);
-
-        chkContributesToUnitCount = new JCheckBox();
-        gbc.gridx = 1;
-        forcedPanel.add(chkContributesToUnitCount, gbc);
-
-        JLabel lblForceID = new JLabel("Force ID:");
-        lblForceID.setToolTipText(
-              "The identifier for this force. Used to synchronize the properties of other forces to this one.");
-        gbc.gridx = 0;
-        gbc.gridy++;
-        forcedPanel.add(lblForceID, gbc);
-
-        txtForceName = new JTextField(10);
-        gbc.gridx = 1;
-        forcedPanel.add(txtForceName, gbc);
-
-        JLabel lblSyncDeployment = new JLabel("Synchronized Deployment:");
-        lblSyncDeployment.setToolTipText(
-              "Whether or not, and how, to synchronize the deployment of this force with another.");
-        gbc.gridx = 0;
-        gbc.gridy++;
-        forcedPanel.add(lblSyncDeployment, gbc);
-
-        cboSyncDeploymentType = new JComboBox<>(ScenarioForceTemplate.FORCE_DEPLOYMENT_SYNC_TYPES);
-
-        ItemListener syncDeploymentChangeListener = evt -> syncDeploymentChangeHandler();
-        cboSyncDeploymentType.addItemListener(syncDeploymentChangeListener);
-
-        gbc.gridx = 1;
-        gbc.anchor = GridBagConstraints.WEST;
-        forcedPanel.add(cboSyncDeploymentType, gbc);
-
-        cboSyncForceName = new JComboBox<>();
-        gbc.gridy++;
-        gbc.gridx = 1;
-        forcedPanel.add(cboSyncForceName, gbc);
-
-        JLabel lblFixedMul = new JLabel("Fixed MUL:");
-        gbc.gridx = 0;
-        gbc.gridy++;
-        forcedPanel.add(lblFixedMul, gbc);
-
-        listMULs = new JList<>();
-        DefaultListModel<String> mulModel = new DefaultListModel<>();
-        JScrollPane scrMulList = new FastJScrollPane(listMULs);
-        File mulDir = new File(MHQConstants.STRAT_CON_MUL_FILES_DIRECTORY);
-
-        if (mulDir.exists() && mulDir.isDirectory()) {
-            for (String mul : Objects.requireNonNull(mulDir.list((d, s) -> s.toLowerCase().endsWith(".mul")))) {
-                mulModel.addElement(mul);
-            }
-        }
-
-        listMULs.setModel(mulModel);
-        listMULs.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
-        gbc.gridx = 1;
-        forcedPanel.add(scrMulList, gbc);
-
-        JLabel lblObjectiveLinkedForces = new JLabel("Objective-Linked Forces:");
-        lblObjectiveLinkedForces.setToolTipText(
-              "Other forces this force counts toward for objective purposes (e.g. an objective to destroy a share of the enemy).");
-        gbc.gridx = 0;
-        gbc.gridy++;
-        forcedPanel.add(lblObjectiveLinkedForces, gbc);
-
-        lstObjectiveLinkedForces = new JList<>();
-        lstObjectiveLinkedForces.setModel(new DefaultListModel<>());
-        lstObjectiveLinkedForces.setSelectionMode(ListSelectionModel.MULTIPLE_INTERVAL_SELECTION);
-        JScrollPane scrObjectiveLinkedForces = new FastJScrollPane(lstObjectiveLinkedForces);
-        gbc.gridx = 1;
-        forcedPanel.add(scrObjectiveLinkedForces, gbc);
-
-        DefaultListModel<String> zoneModel = new DefaultListModel<>();
-        for (String s : ScenarioForceTemplate.DEPLOYMENT_ZONES) {
-            zoneModel.addElement(s);
-        }
-
-        gbc.gridx = 2;
-        gbc.gridy = 0;
-        gbc.anchor = GridBagConstraints.WEST;
-
-        JLabel lblDeploymentZones = new JLabel("Possible Deployment Zones");
-        forcedPanel.add(lblDeploymentZones, gbc);
-
-        lstDeployZones = new JList<>();
-        lstDeployZones.setModel(zoneModel);
-        gbc.gridy = 1;
-        gbc.gridheight = GridBagConstraints.REMAINDER;
-        forcedPanel.add(lstDeployZones, gbc);
-
-        JLabel lblAllowedUnitTypes = new JLabel("Unit Type:");
-        lblAllowedUnitTypes.setToolTipText(
-              "The type of unit. If player-supplied, indicates a limitation on the type of unit the player can deploy.");
-        gbc.gridx = 3;
-        gbc.gridy = 1;
-        gbc.gridheight = 1;
-        forcedPanel.add(lblAllowedUnitTypes, gbc);
-
-        cboUnitType = new JComboBox<>();
-        cboUnitType.addItem(ScenarioForceTemplate.SPECIAL_UNIT_TYPES.get(ScenarioForceTemplate.SPECIAL_UNIT_TYPE_ATB_AERO_MIX));
-        cboUnitType.addItem(ScenarioForceTemplate.SPECIAL_UNIT_TYPES.get(ScenarioForceTemplate.SPECIAL_UNIT_TYPE_ATB_MIX));
-        cboUnitType.addItem(ScenarioForceTemplate.SPECIAL_UNIT_TYPES.get(ScenarioForceTemplate.SPECIAL_UNIT_TYPE_ATB_CIVILIANS));
-
-        for (int unitTypeID = 0; unitTypeID < UnitType.SIZE; unitTypeID++) {
-            cboUnitType.addItem(UnitType.getTypeDisplayableName(unitTypeID));
-        }
-
-        gbc.gridx++;
-        forcedPanel.add(cboUnitType, gbc);
-
-        ItemListener unitTypeChangeListener = evt -> unitTypeChangeHandler();
-        cboUnitType.addItemListener(unitTypeChangeListener);
-
-        JLabel lblArrivalTurn = new JLabel("Arrival Turn:");
-        lblArrivalTurn.setToolTipText(
-              "The turn on which this force arrives. Enter -1 for staggered arrival, -2 for staggered arrival by lance, -3 for 'as reinforcements' arrival time.");
-        gbc.gridy++;
-        gbc.gridx--;
-        forcedPanel.add(lblArrivalTurn, gbc);
-
-        spnArrivalTurn = new JSpinner(new SpinnerNumberModel(0,
-              ScenarioForceTemplate.ARRIVAL_TURN_AS_REINFORCEMENTS,
-              100,
-              1));
-        gbc.gridx++;
-        forcedPanel.add(spnArrivalTurn, gbc);
-
-        JLabel lblFixedUnitCount = new JLabel("Fixed Unit Count:");
-        lblFixedUnitCount.setToolTipText(
-              "How many units in the force, if using the fixed unit count generation method. -1 indicates a lance, appropriate to the owner's faction.\n" +
-                    "If player-supplied, indicates an upper bound on the number of units the player can deploy.");
-        gbc.gridy++;
-        gbc.gridx--;
-        forcedPanel.add(lblFixedUnitCount, gbc);
-
-        spnFixedUnitCount = new JSpinner(new SpinnerNumberModel(0, -1, 100, 1));
-        gbc.gridx++;
-        forcedPanel.add(spnFixedUnitCount, gbc);
-
-        JLabel lblMaxWeight = new JLabel("Max Weight:");
-        gbc.gridx--;
-        gbc.gridy++;
-        forcedPanel.add(lblMaxWeight, gbc);
-
-        cboMaxWeightClass = new JComboBox<>();
-        for (int x = EntityWeightClass.WEIGHT_ULTRA_LIGHT; x <= EntityWeightClass.WEIGHT_ASSAULT; x++) {
-            cboMaxWeightClass.addItem(EntityWeightClass.getClassName(x));
-        }
-        cboMaxWeightClass.setSelectedIndex(EntityWeightClass.WEIGHT_ASSAULT);
-        gbc.gridx++;
-        forcedPanel.add(cboMaxWeightClass, gbc);
-
-        JLabel lblMinWeight = new JLabel("Min Weight:");
-        gbc.gridx--;
-        gbc.gridy++;
-        forcedPanel.add(lblMinWeight, gbc);
-
-        cboMinWeightClass = new JComboBox<>();
-        for (int x = EntityWeightClass.WEIGHT_ULTRA_LIGHT; x <= EntityWeightClass.WEIGHT_ASSAULT; x++) {
-            cboMinWeightClass.addItem(EntityWeightClass.getClassName(x));
-        }
-        cboMinWeightClass.setSelectedIndex(EntityWeightClass.WEIGHT_LIGHT);
-        gbc.gridx++;
-        forcedPanel.add(cboMinWeightClass, gbc);
-
-        JLabel lblContributesToMapSize = new JLabel("Contributes to Map Size:");
-        gbc.gridx--;
-        gbc.gridy++;
-        forcedPanel.add(lblContributesToMapSize, gbc);
-
-        chkContributesToMapSize = new JCheckBox();
-        gbc.gridx++;
-        forcedPanel.add(chkContributesToMapSize, gbc);
-
-        JLabel lblGenerationOrder = new JLabel("Generation Order:");
-        lblGenerationOrder.setToolTipText(
-              "Controls when this force will be generated related to other forces. Higher numbers will be generated later.");
-        gbc.gridy++;
-        gbc.gridx--;
-        forcedPanel.add(lblGenerationOrder, gbc);
-
-        spnGenerationOrder = new JSpinner(new SpinnerNumberModel(1, 1, 100, 1));
-        gbc.gridx++;
-        forcedPanel.add(spnGenerationOrder, gbc);
-
-        JLabel lblAllowAeroBombs = new JLabel("Allow Aero Bombs:");
-        gbc.gridx--;
-        gbc.gridy++;
-        forcedPanel.add(lblAllowAeroBombs, gbc);
-
-        chkAllowAeroBombs = new JCheckBox();
-        chkAllowAeroBombs.setEnabled(false);
-        gbc.gridx++;
-        forcedPanel.add(chkAllowAeroBombs, gbc);
-
-        JLabel lblStartingAltitude = new JLabel("Start Altitude:");
-        lblStartingAltitude.setToolTipText(
-              "Starting elevation for VTOLs or altitude for aeros/ground units. Ignored in space. Use with caution as it may lead to splattering.");
-        gbc.gridy++;
-        gbc.gridx--;
-        forcedPanel.add(lblStartingAltitude, gbc);
-
-        spnStartingAltitude = new JSpinner(new SpinnerNumberModel(0, 0, 10, 1));
-        gbc.gridx++;
-        forcedPanel.add(spnStartingAltitude, gbc);
-
-        JLabel lblUseArtillery = new JLabel("Is Artillery:");
-        gbc.gridx--;
-        gbc.gridy++;
-        forcedPanel.add(lblUseArtillery, gbc);
-
-        chkUseArtillery = new JCheckBox();
-        gbc.gridx++;
-        forcedPanel.add(chkUseArtillery, gbc);
-
-        JLabel lblOffBoard = new JLabel("Deploy Off board:");
-        gbc.gridx--;
-        gbc.gridy++;
-        forcedPanel.add(lblOffBoard, gbc);
-
-        chkOffBoard = new JCheckBox();
-        gbc.gridx++;
-        forcedPanel.add(chkOffBoard, gbc);
-
-        JLabel lblSubjectToRandomRemoval = new JLabel("Subject to Random Removal:");
-        lblSubjectToRandomRemoval.setToolTipText(
-              "Whether this force can lose units to modifiers that randomly remove them, e.g. \"Good Intel\".");
-        gbc.gridx--;
-        gbc.gridy++;
-        forcedPanel.add(lblSubjectToRandomRemoval, gbc);
-
-        chkSubjectToRandomRemoval = new JCheckBox();
-        chkSubjectToRandomRemoval.setSelected(true);
-        gbc.gridx++;
-        forcedPanel.add(chkSubjectToRandomRemoval, gbc);
-
-        JLabel lblSyncRetreatThreshold = new JLabel("Sync Retreat Threshold:");
-        lblSyncRetreatThreshold.setToolTipText(
-              "Whether this force shares a retreat threshold with the force it is synchronized to.");
-        gbc.gridx--;
-        gbc.gridy++;
-        forcedPanel.add(lblSyncRetreatThreshold, gbc);
-
-        chkSyncRetreatThreshold = new JCheckBox();
-        gbc.gridx++;
-        forcedPanel.add(chkSyncRetreatThreshold, gbc);
-
-        JButton btnAdd = new JButton("Save");
-        btnAdd.setActionCommand(ADD_FORCE_COMMAND);
-        btnAdd.addActionListener(this);
-        gbc.gridx++;
-        forcedPanel.add(btnAdd, gbc);
-
-        GridBagConstraints roleGbc = new GridBagConstraints();
-        roleGbc.gridx = 6;
-        roleGbc.gridy = 0;
-        roleGbc.gridheight = GridBagConstraints.REMAINDER;
-        roleGbc.anchor = GridBagConstraints.NORTHWEST;
-        roleGbc.insets = new Insets(0, 10, 0, 0);
-        roleSetEditorPanel = new RoleSetEditorPanel();
-        roleSetEditorPanel.setAllowedUnitType(currentAllowedUnitType());
-        forcedPanel.add(roleSetEditorPanel, roleGbc);
-
-        globalPanel.add(forcedPanel, externalGBC);
+        globalPanel.add(forceEditorPanel, externalGBC);
         externalGBC.gridheight = 1;
     }
 
     /**
-     * Helper function that loads the given force template into the force editor interface.
-     *
-     * @param forceTemplate The force template.
+     * Reads the fixed-MUL file names from the MUL directory, to be offered by the force editor.
      */
-    private void loadForce(ScenarioForceTemplate forceTemplate) {
-        cboAlignment.setSelectedIndex(forceTemplate.getForceAlignment());
-        cboGenerationMethod.setSelectedIndex(forceTemplate.getGenerationMethod());
-        spnMultiplier.setValue(forceTemplate.getForceMultiplier());
-        cboDestinationZone.setSelectedIndex(DestinationZoneMapper.storedZoneToComboIndex(forceTemplate.getDestinationZone()));
-        spnRetreatThreshold.setValue(forceTemplate.getRetreatThreshold());
-        chkReinforce.setSelected(forceTemplate.getCanReinforceLinked());
-        chkContributesToBV.setSelected(forceTemplate.getContributesToBV());
-        chkContributesToUnitCount.setSelected(forceTemplate.getContributesToUnitCount());
-        txtForceName.setText(forceTemplate.getForceName());
-        cboSyncDeploymentType.setSelectedIndex(forceTemplate.getSyncDeploymentType().ordinal());
-        cboSyncForceName.setSelectedItem(forceTemplate.getSyncedForceName());
-        listMULs.setSelectedValue(forceTemplate.getFixedMul(), true);
-
-        int[] deploymentZones = new int[forceTemplate.getDeploymentZones().size()];
-        for (int x = 0; x < forceTemplate.getDeploymentZones().size(); x++) {
-            deploymentZones[x] = forceTemplate.getDeploymentZones().get(x);
+    private static List<String> readMulFileNames() {
+        List<String> names = new ArrayList<>();
+        File mulDir = new File(MHQConstants.STRAT_CON_MUL_FILES_DIRECTORY);
+        if (mulDir.exists() && mulDir.isDirectory()) {
+            String[] muls = mulDir.list((d, s) -> s.toLowerCase().endsWith(".mul"));
+            if (muls != null) {
+                names.addAll(Arrays.asList(muls));
+            }
         }
-
-        lstDeployZones.setSelectedIndices(deploymentZones);
-        cboUnitType.setSelectedIndex(forceTemplate.getAllowedUnitType() +
-                                           ScenarioForceTemplate.SPECIAL_UNIT_TYPES.size());
-        spnArrivalTurn.setValue(forceTemplate.getArrivalTurn());
-        spnFixedUnitCount.setValue(forceTemplate.getFixedUnitCount());
-        cboMaxWeightClass.setSelectedIndex(forceTemplate.getMaxWeightClass());
-        cboMinWeightClass.setSelectedIndex(forceTemplate.getMinWeightClass());
-        chkContributesToMapSize.setSelected(forceTemplate.getContributesToMapSize());
-        spnGenerationOrder.setValue(forceTemplate.getGenerationOrder());
-        chkAllowAeroBombs.setSelected(forceTemplate.getAllowAeroBombs());
-        chkOffBoard.setSelected(forceTemplate.getDeployOffboard());
-        spnStartingAltitude.setValue(forceTemplate.getStartingAltitude());
-        chkUseArtillery.setSelected(forceTemplate.getUseArtillery());
-        chkSubjectToRandomRemoval.setSelected(forceTemplate.isSubjectToRandomRemoval());
-        chkSyncRetreatThreshold.setSelected(forceTemplate.getSyncRetreatThreshold());
-        selectObjectiveLinkedForces(forceTemplate.getObjectiveLinkedForces());
-
-        roleSetEditorPanel.load(forceTemplate.getRoleCollections());
+        return names;
     }
 
     /**
-     * Selects the entries in the objective-linked forces list that match the given force IDs. Any listed ID no longer
-     * present in the roster is simply skipped.
+     * Commits the force currently in the editor into the template's roster (add or update), then refreshes the force
+     * list. Invoked by the force editor's Save button.
      */
-    private void selectObjectiveLinkedForces(List<String> linkedForceIds) {
-        ListModel<String> model = lstObjectiveLinkedForces.getModel();
-        List<Integer> indices = new ArrayList<>();
-        for (int i = 0; i < model.getSize(); i++) {
-            if (linkedForceIds.contains(model.getElementAt(i))) {
-                indices.add(i);
-            }
+    private void commitForce() {
+        String validationResult = forceEditorPanel.validateInput();
+        if (!validationResult.isEmpty()) {
+            JOptionPane.showMessageDialog(this,
+                  validationResult,
+                  "Invalid Force Configuration",
+                  JOptionPane.ERROR_MESSAGE);
+            return;
         }
-        lstObjectiveLinkedForces.setSelectedIndices(indices.stream().mapToInt(Integer::intValue).toArray());
+
+        ScenarioForceTemplate sft = forceEditorPanel.buildForceTemplate();
+        ForceRosterEditor.CommitResult commitResult = ForceRosterEditor.commit(scenarioTemplate.getScenarioForces(),
+              editedForceId,
+              sft);
+        if (!commitResult.committed()) {
+            JOptionPane.showMessageDialog(this,
+                  commitResult.errorMessage(),
+                  "Invalid Force Configuration",
+                  JOptionPane.ERROR_MESSAGE);
+            return;
+        }
+
+        // Back to "add new" mode once the edit has been committed.
+        editedForceId = null;
+        forceEditorPanel.setAvailableForceIds(scenarioTemplate.getScenarioForces().keySet());
+        renderForceList();
+        pack();
+        repaint();
     }
+
 
     /**
      * Worker function called when initializing the dialog to place the force template list on the content pane.
@@ -951,149 +567,6 @@ public class ScenarioTemplateEditorDialog extends JDialog implements ActionListe
         return lblDeploymentZones;
     }
 
-    /**
-     * Event handler for when the Add force button is pressed. Adds a new force with the currently selected parameters
-     * to the scenario template.
-     */
-    private void addForceButtonHandler() {
-        String validationResult = validateAddForce();
-
-        if (!validationResult.isEmpty()) {
-            JOptionPane.showMessageDialog(this,
-                  validationResult,
-                  "Invalid Force Configuration",
-                  JOptionPane.ERROR_MESSAGE);
-            return;
-        }
-
-        int forceAlignment = cboAlignment.getSelectedIndex();
-        int generationMethod = cboGenerationMethod.getSelectedIndex();
-        double forceMultiplier = (double) spnMultiplier.getValue();
-
-        List<Integer> deploymentZones = new ArrayList<>();
-        for (int x : lstDeployZones.getSelectedIndices()) {
-            deploymentZones.add(x);
-        }
-
-        int destinationZone = DestinationZoneMapper.comboIndexToStoredZone(cboDestinationZone.getSelectedIndex());
-        int retreatThreshold = (int) spnRetreatThreshold.getValue();
-
-        int allowedUnitType = cboUnitType.getSelectedIndex() - ScenarioForceTemplate.SPECIAL_UNIT_TYPES.size();
-
-        ScenarioForceTemplate sft = new ScenarioForceTemplate(forceAlignment,
-              generationMethod,
-              forceMultiplier,
-              null,
-              destinationZone,
-              retreatThreshold,
-              allowedUnitType);
-        sft.setCanReinforceLinked(chkReinforce.isSelected());
-        sft.setContributesToBV(chkContributesToBV.isSelected());
-        sft.setContributesToUnitCount(chkContributesToUnitCount.isSelected());
-        sft.setForceName(txtForceName.getText());
-        sft.setArrivalTurn((int) spnArrivalTurn.getValue());
-        sft.setFixedUnitCount((int) spnFixedUnitCount.getValue());
-        sft.setContributesToMapSize(chkContributesToMapSize.isSelected());
-        sft.setMaxWeightClass(cboMaxWeightClass.getSelectedIndex());
-        sft.setMinWeightClass(cboMinWeightClass.getSelectedIndex());
-        sft.setGenerationOrder((int) spnGenerationOrder.getValue());
-        sft.setAllowAeroBombs(chkAllowAeroBombs.isSelected());
-        sft.setStartingAltitude((int) spnStartingAltitude.getValue());
-        sft.setUseArtillery(chkUseArtillery.isSelected());
-        sft.setDeployOffboard(chkOffBoard.isSelected());
-        sft.setSubjectToRandomRemoval(chkSubjectToRandomRemoval.isSelected());
-        sft.setSyncRetreatThreshold(chkSyncRetreatThreshold.isSelected());
-
-        sft.setSyncDeploymentType(SynchronizedDeploymentType.values()[cboSyncDeploymentType.getSelectedIndex()]);
-
-        sft.setFixedMul(listMULs.getSelectedValue());
-        sft.setObjectiveLinkedForces(new ArrayList<>(lstObjectiveLinkedForces.getSelectedValuesList()));
-
-        sft.getRoleCollections().clear();
-        sft.getRoleCollections().addAll(roleSetEditorPanel.getRoleSets());
-
-        // if we have picked "None" for synchronization, then set explicit deployment
-        // zones.
-        // otherwise, set the synced force name
-        if (sft.getSyncDeploymentType() != SynchronizedDeploymentType.None) {
-            sft.setSyncedForceName(Objects.requireNonNull(cboSyncForceName.getSelectedItem()).toString());
-        } else {
-            sft.setDeploymentZones(deploymentZones);
-        }
-
-        ForceRosterEditor.CommitResult commitResult = ForceRosterEditor.commit(scenarioTemplate.getScenarioForces(),
-              editedForceId,
-              sft);
-        if (!commitResult.committed()) {
-            JOptionPane.showMessageDialog(this,
-                  commitResult.errorMessage(),
-                  "Invalid Force Configuration",
-                  JOptionPane.ERROR_MESSAGE);
-            return;
-        }
-
-        // Back to "add new" mode once the edit has been committed.
-        editedForceId = null;
-
-        updateForceSyncList();
-        syncDeploymentChangeHandler();
-        renderForceList();
-        pack();
-        repaint();
-    }
-
-    /**
-     * Function that performs validation when the 'Add' button is clicked for a force and informs the user of any
-     * nonsense configuration they may have specified.
-     *
-     * @return Validation message for display.
-     */
-    private String validateAddForce() {
-        StringBuilder valBuilder = new StringBuilder();
-
-        if (SynchronizedDeploymentType.values()[cboSyncDeploymentType.getSelectedIndex()] ==
-                  SynchronizedDeploymentType.None && lstDeployZones.getSelectedIndices().length == 0) {
-            valBuilder.append("Force needs to be synced or have explicit deployment zones");
-        }
-
-        if (txtForceName.getText().isBlank()) {
-            if (!valBuilder.isEmpty()) {
-                valBuilder.append("\n");
-            }
-
-            valBuilder.append("Force must have an ID.");
-        }
-
-        if ((cboAlignment.getSelectedIndex() != ForceAlignment.Player.ordinal()) &&
-                  (cboGenerationMethod.getSelectedIndex() == ForceGenerationMethod.PlayerSupplied.ordinal())) {
-            if (!valBuilder.isEmpty()) {
-                valBuilder.append("\n");
-            }
-
-            valBuilder.append("Bot-controlled forces cannot be player-supplied.");
-        }
-
-        if (chkOffBoard.isSelected() && !chkUseArtillery.isSelected()) {
-            if (!valBuilder.isEmpty()) {
-                valBuilder.append("\n");
-            }
-
-            valBuilder.append("Non-artillery units cannot be deployed off board.");
-        }
-
-        if (cboMinWeightClass.getSelectedIndex() > cboMaxWeightClass.getSelectedIndex()) {
-            if (!valBuilder.isEmpty()) {
-                valBuilder.append("\n");
-            }
-
-            valBuilder.append("Min weight class is greater than max weight class.");
-        }
-
-        // Duplicate-ID and rename handling is enforced at commit time by ForceRosterEditor, which has the editing
-        // context this method does not.
-
-        return valBuilder.toString();
-    }
 
     /**
      * Event handler for when the "Remove" button is pressed for a particular force template.
@@ -1110,7 +583,7 @@ public class ScenarioTemplateEditorDialog extends JDialog implements ActionListe
             editedForceId = null;
         }
 
-        updateForceSyncList();
+        forceEditorPanel.setAvailableForceIds(scenarioTemplate.getScenarioForces().keySet());
         renderForceList();
         pack();
         repaint();
@@ -1123,99 +596,10 @@ public class ScenarioTemplateEditorDialog extends JDialog implements ActionListe
      */
     private void editForceButtonHandler(String command) {
         String forceIndex = ForceListCommand.editForceId(command);
-        loadForce(scenarioTemplate.getScenarioForces().get(forceIndex));
+        forceEditorPanel.loadForce(scenarioTemplate.getScenarioForces().get(forceIndex));
         // Remember which force we are editing so committing updates it in place (and handles a rename) instead of
         // adding a duplicate.
         editedForceId = forceIndex;
-    }
-
-    /**
-     * Worker method that updates the "Force Sync" list and sets the relevant dropdowns to active or inactive
-     */
-    private void updateForceSyncList() {
-        cboSyncForceName.removeAllItems();
-        DefaultListModel<String> objectiveLinkedModel = new DefaultListModel<>();
-        for (String forceID : scenarioTemplate.getScenarioForces().keySet()) {
-            cboSyncForceName.addItem(forceID);
-            objectiveLinkedModel.addElement(forceID);
-        }
-        // Rebuild the objective-linked candidate list from the current roster. Selection is (re)applied by loadForce
-        // when editing, and left empty when adding a new force.
-        lstObjectiveLinkedForces.setModel(objectiveLinkedModel);
-
-        boolean forcesAvailableToSync = cboSyncForceName.getItemCount() > 0;
-        cboSyncForceName.setEnabled(forcesAvailableToSync);
-        cboSyncDeploymentType.setEnabled(forcesAvailableToSync);
-    }
-
-    /**
-     * Event handler for when the force alignment/generation method is changed. Enables or disables some controls based
-     * on whether the force is a player deployed force, or an enemy force.
-     */
-    private void forceAlignmentChangeHandler() {
-        boolean isPlayerForce = Objects.equals(cboAlignment.getSelectedItem(),
-              ScenarioForceTemplate.FORCE_ALIGNMENTS[0]) &&
-                                      Objects.equals(cboGenerationMethod.getSelectedItem(),
-                                            ScenarioForceTemplate.FORCE_GENERATION_METHODS[0]);
-
-        boolean isEnemyForce = (cboAlignment.getSelectedIndex() ==
-                                      ScenarioForceTemplate.ForceAlignment.Opposing.ordinal()) ||
-                                     (cboAlignment.getSelectedIndex() ==
-                                            ScenarioForceTemplate.ForceAlignment.Third.ordinal()) ||
-                                     (cboAlignment.getSelectedIndex() ==
-                                            ScenarioForceTemplate.ForceAlignment.PlanetOwner.ordinal());
-
-        spnMultiplier.setEnabled(!isPlayerForce);
-        spnRetreatThreshold.setEnabled(!isPlayerForce);
-        cboMaxWeightClass.setEnabled(!isPlayerForce);
-        cboMinWeightClass.setEnabled(!isPlayerForce);
-        chkContributesToBV.setEnabled(!isEnemyForce);
-        chkContributesToBV.setSelected(!isEnemyForce);
-        chkContributesToUnitCount.setEnabled(!isEnemyForce);
-        chkContributesToUnitCount.setSelected(!isEnemyForce);
-        chkContributesToMapSize.setSelected(true);
-
-        spnMultiplier.setEnabled(cboGenerationMethod.getSelectedIndex() !=
-                                       ForceGenerationMethod.FixedUnitCount.ordinal());
-    }
-
-    /**
-     * Event handler for when the force sync dropdown changes value. Enables or disables the "force to sync" and
-     * "deployment zone" UI elements as appropriate.
-     */
-    private void syncDeploymentChangeHandler() {
-        SynchronizedDeploymentType syncDeploymentType = SynchronizedDeploymentType.values()[cboSyncDeploymentType.getSelectedIndex()];
-        boolean syncForceDeployment = syncDeploymentType != SynchronizedDeploymentType.None;
-
-        cboSyncForceName.setEnabled(syncForceDeployment);
-        lstDeployZones.setEnabled(!syncForceDeployment);
-        if (!lstDeployZones.isEnabled()) {
-            lstDeployZones.clearSelection();
-        }
-    }
-
-    /**
-     * Event handler for when the unit type dropdown changes value. Enables or disables the "allow aero bombs" UI
-     * element as appropriate.
-     */
-    private void unitTypeChangeHandler() {
-        int selectedItem = cboUnitType.getSelectedIndex() - ScenarioForceTemplate.SPECIAL_UNIT_TYPES.size();
-        boolean isAero = selectedItem == ScenarioForceTemplate.SPECIAL_UNIT_TYPE_ATB_AERO_MIX ||
-                               selectedItem == UnitType.CONV_FIGHTER ||
-                               selectedItem == UnitType.AEROSPACE_FIGHTER;
-
-        chkAllowAeroBombs.setEnabled(isAero);
-        if (roleSetEditorPanel != null) {
-            roleSetEditorPanel.setAllowedUnitType(currentAllowedUnitType());
-        }
-    }
-
-    /**
-     * The allowed unit type currently selected in the force editor (a {@link UnitType} constant, or a negative special
-     * mixed-type value).
-     */
-    private int currentAllowedUnitType() {
-        return cboUnitType.getSelectedIndex() - ScenarioForceTemplate.SPECIAL_UNIT_TYPES.size();
     }
 
     /**
