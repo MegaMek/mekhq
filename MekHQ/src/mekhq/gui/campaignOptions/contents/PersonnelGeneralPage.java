@@ -195,7 +195,8 @@ class PersonnelGeneralPage {
         chkOnlyCommandersMatterBattleArmor.addMouseListener(createTipPanelUpdater("OnlyCommandersMatterBattleArmor"));
         chkUseEdge = new CampaignOptionsCheckBox("UseEdge");
         chkUseEdge.addMouseListener(createTipPanelUpdater("UseEdge"));
-        chkUseTwistOfFateSurvival = new CampaignOptionsCheckBox("UseTwistOfFateSurvival");
+        chkUseTwistOfFateSurvival = new CampaignOptionsCheckBox("UseTwistOfFateSurvival",
+              getMetadata(new Version(0, 51, 1)));
         chkUseTwistOfFateSurvival.addMouseListener(createTipPanelUpdater("UseTwistOfFateSurvival"));
         chkUseFoundersHavePlotArmor = new CampaignOptionsCheckBox("UseFoundersHavePlotArmor",
               getMetadata(new Version(0, 51, 1)));
