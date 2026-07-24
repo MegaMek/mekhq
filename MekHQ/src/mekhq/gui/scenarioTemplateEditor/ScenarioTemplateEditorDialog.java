@@ -45,7 +45,6 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.Map;
 import java.util.Objects;
 import javax.swing.*;
 import javax.swing.border.LineBorder;
@@ -55,7 +54,6 @@ import megamek.client.ratgenerator.MissionRole;
 import megamek.client.ui.panels.abstractPanels.AbstractScrollablePanel;
 import megamek.client.ui.preferences.JWindowPreference;
 import megamek.client.ui.preferences.PreferencesNode;
-import megamek.codeUtilities.MathUtility;
 import megamek.common.ui.FastJScrollPane;
 import megamek.common.units.EntityWeightClass;
 import megamek.common.units.UnitType;
@@ -67,7 +65,6 @@ import mekhq.campaign.mission.ScenarioForceTemplate;
 import mekhq.campaign.mission.ScenarioForceTemplate.ForceAlignment;
 import mekhq.campaign.mission.ScenarioForceTemplate.ForceGenerationMethod;
 import mekhq.campaign.mission.ScenarioForceTemplate.SynchronizedDeploymentType;
-import mekhq.campaign.mission.ScenarioMapParameters;
 import mekhq.campaign.mission.ScenarioObjective;
 import mekhq.campaign.mission.ScenarioTemplate;
 import mekhq.campaign.mission.atb.AtBScenarioModifier;
@@ -119,19 +116,7 @@ public class ScenarioTemplateEditorDialog extends JDialog implements ActionListe
 
     JPanel panForceList;
     TemplatePropertiesPanel templatePropertiesPanel;
-    JTextField txtBaseWidth;
-    JList<String> lstAllowedTerrainTypes;
-    JTextField txtBaseHeight;
-    JTextField txtXIncrement;
-    JTextField txtYIncrement;
-    JSpinner spnAdditionalMapSheetWide;
-    JSpinner spnAdditionalMapSheetTall;
-    JCheckBox chkAllowRotation;
-    JCheckBox chkUseAtBSizing;
-    JRadioButton btnAllowAllMapTypes;
-    JRadioButton btnUseSpaceMap;
-    JRadioButton btnUseSpecificMapTypes;
-    JRadioButton btnUseLowAtmosphereMap;
+    MapParametersPanel mapParametersPanel;
     JComboBox<String> modifierBox;
     JList<String> selectedModifiersList;
     JList<ScenarioObjective> objectiveList;
@@ -837,220 +822,76 @@ public class ScenarioTemplateEditorDialog extends JDialog implements ActionListe
      *
      */
     private void setupMapParameters(GridBagConstraints gridBagConstraints) {
-        gridBagConstraints.gridx = 0;
+        List<String> terrainTypeKeys = StratConBiomeManifest.getInstance()
+                                             .getBiomeMapTypes()
+                                             .keySet()
+                                             .stream()
+                                             .sorted()
+                                             .toList();
+        mapParametersPanel = new MapParametersPanel(terrainTypeKeys);
+        mapParametersPanel.load(scenarioTemplate.mapParameters);
 
-        JPanel pnlMapParameters = new JPanel();
-        pnlMapParameters.setLayout(new GridBagLayout());
+        JPanel pnlMapRow = new JPanel(new GridBagLayout());
         GridBagConstraints localGbc = new GridBagConstraints();
         localGbc.gridx = 0;
         localGbc.gridy = 0;
-        localGbc.anchor = GridBagConstraints.WEST;
+        localGbc.anchor = GridBagConstraints.NORTHWEST;
+        pnlMapRow.add(mapParametersPanel, localGbc);
 
-        JLabel lblMapParameters = new JLabel("Scenario Map Parameters:");
-        pnlMapParameters.add(lblMapParameters, localGbc);
+        localGbc.gridx = 1;
+        localGbc.insets = new Insets(0, 15, 0, 0);
+        pnlMapRow.add(buildModifiersPanel(), localGbc);
 
-        // the first two columns
-        localGbc.gridy++;
-        localGbc.gridwidth = 1;
-        JLabel lblBaseWidth = new JLabel("Base Width:");
-        pnlMapParameters.add(lblBaseWidth, localGbc);
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy++;
+        globalPanel.add(pnlMapRow, gridBagConstraints);
+    }
 
-        localGbc.gridx++;
-        txtBaseWidth = new JTextField(4);
-        txtBaseWidth.setText(String.valueOf(scenarioTemplate.mapParameters.getBaseWidth()));
-        pnlMapParameters.add(txtBaseWidth, localGbc);
+    /**
+     * Builds the "Fixed Modifiers" editor (add/remove template-level scenario modifiers). This section still lives in
+     * the dialog and is a candidate for its own panel in a later increment.
+     */
+    private JPanel buildModifiersPanel() {
+        JPanel pnlModifiers = new JPanel(new GridBagLayout());
+        GridBagConstraints gbc = new GridBagConstraints();
+        gbc.gridx = 0;
+        gbc.gridy = 0;
+        gbc.anchor = GridBagConstraints.WEST;
 
-        localGbc.gridx = 0;
-        localGbc.gridy++;
-        JLabel lblBaseHeight = new JLabel("Base Height:");
-        pnlMapParameters.add(lblBaseHeight, localGbc);
+        gbc.gridwidth = GridBagConstraints.REMAINDER;
+        pnlModifiers.add(new JLabel("Fixed Modifiers"), gbc);
+        gbc.gridwidth = 1;
 
-        localGbc.gridx++;
-        txtBaseHeight = new JTextField(4);
-        txtBaseHeight.setText(String.valueOf(scenarioTemplate.mapParameters.getBaseHeight()));
-        pnlMapParameters.add(txtBaseHeight, localGbc);
-
-        localGbc.gridy++;
-        localGbc.gridx = 0;
-        JLabel lblXIncrement = new JLabel("Scaled Width Increment:");
-        pnlMapParameters.add(lblXIncrement, localGbc);
-
-        localGbc.gridx++;
-        txtXIncrement = new JTextField(4);
-        txtXIncrement.setText(String.valueOf(scenarioTemplate.mapParameters.getWidthScalingIncrement()));
-        pnlMapParameters.add(txtXIncrement, localGbc);
-
-        localGbc.gridy++;
-        localGbc.gridx = 0;
-        JLabel lblYIncrement = new JLabel("Scaled Height Increment:");
-        pnlMapParameters.add(lblYIncrement, localGbc);
-
-        localGbc.gridx++;
-        txtYIncrement = new JTextField(4);
-        txtYIncrement.setText(String.valueOf(scenarioTemplate.mapParameters.getHeightScalingIncrement()));
-        pnlMapParameters.add(txtYIncrement, localGbc);
-
-        localGbc.gridy++;
-        localGbc.gridx = 0;
-        JLabel lblAdditionalMapSheetWide = new JLabel("Additional Map Sheets Wide:");
-        lblAdditionalMapSheetWide.setToolTipText(
-              "Extra map sheets added to the map's width beyond the base/scaled size.");
-        pnlMapParameters.add(lblAdditionalMapSheetWide, localGbc);
-
-        localGbc.gridx++;
-        spnAdditionalMapSheetWide = new JSpinner(new SpinnerNumberModel(
-              scenarioTemplate.mapParameters.getAdditionalMapSheetWide(), 0, 10, 1));
-        spnAdditionalMapSheetWide.setPreferredSize(spinnerSize);
-        pnlMapParameters.add(spnAdditionalMapSheetWide, localGbc);
-
-        localGbc.gridy++;
-        localGbc.gridx = 0;
-        JLabel lblAdditionalMapSheetTall = new JLabel("Additional Map Sheets Tall:");
-        lblAdditionalMapSheetTall.setToolTipText(
-              "Extra map sheets added to the map's height beyond the base/scaled size.");
-        pnlMapParameters.add(lblAdditionalMapSheetTall, localGbc);
-
-        localGbc.gridx++;
-        spnAdditionalMapSheetTall = new JSpinner(new SpinnerNumberModel(
-              scenarioTemplate.mapParameters.getAdditionalMapSheetTall(), 0, 10, 1));
-        spnAdditionalMapSheetTall.setPreferredSize(spinnerSize);
-        pnlMapParameters.add(spnAdditionalMapSheetTall, localGbc);
-
-        localGbc.gridy++;
-        localGbc.gridx = 0;
-        JLabel lblAllowRotation = new JLabel("Allow 90 Degree Rotation:");
-        pnlMapParameters.add(lblAllowRotation, localGbc);
-
-        localGbc.gridx++;
-        chkAllowRotation = new JCheckBox();
-        chkAllowRotation.setSelected(scenarioTemplate.mapParameters.isAllowRotation());
-        pnlMapParameters.add(chkAllowRotation, localGbc);
-
-        localGbc.gridy++;
-        localGbc.gridx = 0;
-        JLabel lblUseAtBSizing = new JLabel("Use AtB Base Dimensions:");
-        lblUseAtBSizing.setToolTipText("Use the AtB Map Sizes table to determine the base width and height of the map.");
-        pnlMapParameters.add(lblUseAtBSizing, localGbc);
-
-        localGbc.gridx++;
-        chkUseAtBSizing = new JCheckBox();
-        chkUseAtBSizing.addItemListener(evt -> atbSizingCheckboxChangeHandler());
-        chkUseAtBSizing.setSelected(scenarioTemplate.mapParameters.isUseStandardAtBSizing());
-        pnlMapParameters.add(chkUseAtBSizing, localGbc);
-
-        localGbc.gridy = 1;
-        localGbc.gridx = 2;
-
-        // the allowed map types columns
-        JLabel lblAllowedTerrainTypes = new JLabel("Allowed Map Types:");
-        pnlMapParameters.add(lblAllowedTerrainTypes, localGbc);
-
-        localGbc.gridy++;
-        btnAllowAllMapTypes = new JRadioButton();
-        btnAllowAllMapTypes.setText("Any Ground Map");
-        btnAllowAllMapTypes.addItemListener(evt -> mapTypeChangeHandler());
-        pnlMapParameters.add(btnAllowAllMapTypes, localGbc);
-
-        localGbc.gridy++;
-        btnUseSpaceMap = new JRadioButton();
-        btnUseSpaceMap.setText("Use Space Map");
-        btnUseSpaceMap.addItemListener(evt -> mapTypeChangeHandler());
-        pnlMapParameters.add(btnUseSpaceMap, localGbc);
-
-        localGbc.gridy++;
-        btnUseLowAtmosphereMap = new JRadioButton();
-        btnUseLowAtmosphereMap.setText("Use Low Atmo Map");
-        btnUseLowAtmosphereMap.addItemListener(evt -> mapTypeChangeHandler());
-        pnlMapParameters.add(btnUseLowAtmosphereMap, localGbc);
-
-        localGbc.gridy++;
-        btnUseSpecificMapTypes = new JRadioButton();
-        btnUseSpecificMapTypes.setText("Specific Map Types");
-        btnUseSpecificMapTypes.addItemListener(evt -> mapTypeChangeHandler());
-        pnlMapParameters.add(btnUseSpecificMapTypes, localGbc);
-
-        ButtonGroup mapTypeGroup = new ButtonGroup();
-        mapTypeGroup.add(btnAllowAllMapTypes);
-        mapTypeGroup.add(btnUseSpaceMap);
-        mapTypeGroup.add(btnUseLowAtmosphereMap);
-        mapTypeGroup.add(btnUseSpecificMapTypes);
-
-        if (scenarioTemplate.mapParameters.getMapLocation() != null) {
-            switch (scenarioTemplate.mapParameters.getMapLocation()) {
-                case AllGroundTerrain:
-                    btnAllowAllMapTypes.setSelected(true);
-                    break;
-                case Space:
-                    btnUseSpaceMap.setSelected(true);
-                    break;
-                case LowAtmosphere:
-                    btnUseLowAtmosphereMap.setSelected(true);
-                    break;
-                case SpecificGroundTerrain:
-                    btnUseSpecificMapTypes.setSelected(true);
-                    break;
-            }
-        }
-
-        localGbc.gridx++;
-        localGbc.gridy = 1;
-        localGbc.gridheight = GridBagConstraints.RELATIVE;
-        lstAllowedTerrainTypes = new JList<>();
-        DefaultListModel<String> terrainTypeModel = new DefaultListModel<>();
-        Map<String, StratConBiomeManifest.MapTypeList> mapTypes = StratConBiomeManifest.getInstance()
-                                                                        .getBiomeMapTypes();
-        List<String> keys = mapTypes.keySet().stream().sorted().toList();
-        List<Integer> indexes = new ArrayList<>();
-        int i = 0;
-        for (String terrainType : keys) {
-            terrainTypeModel.addElement(terrainType);
-            if (scenarioTemplate.mapParameters.getAllowedTerrainType().contains(terrainType)) {
-                indexes.add(i);
-            }
-            i++;
-        }
-        lstAllowedTerrainTypes.setModel(terrainTypeModel);
-        lstAllowedTerrainTypes.setSelectedIndices(indexes.stream().mapToInt(Integer::intValue).toArray());
-        mapTypeChangeHandler();
-        pnlMapParameters.add(lstAllowedTerrainTypes, localGbc);
-
-        // the fixed events columns
-        localGbc.gridy = 1;
-        localGbc.gridx++;
-        localGbc.gridheight = 1;
-        pnlMapParameters.add(new JLabel("Fixed Modifiers"), localGbc);
-
-        localGbc.gridy++;
+        gbc.gridy++;
         modifierBox = new JComboBox<>();
         for (String modifierKey : AtBScenarioModifier.getOrderedModifierKeys()) {
             modifierBox.addItem(modifierKey);
         }
-        pnlMapParameters.add(modifierBox, localGbc);
+        pnlModifiers.add(modifierBox, gbc);
 
-        localGbc.gridx++;
+        gbc.gridx++;
         JButton btnAddModifier = new JButton("Add");
         btnAddModifier.addActionListener(evt -> addModifierHandler());
-        pnlMapParameters.add(btnAddModifier, localGbc);
+        pnlModifiers.add(btnAddModifier, gbc);
 
-        localGbc.gridx--;
-        localGbc.gridy++;
-        localGbc.gridheight = 3;
-
+        gbc.gridx = 0;
+        gbc.gridy++;
+        gbc.gridheight = 3;
         selectedModifiersList = new JList<>();
         selectedModifiersList.setSelectionMode(ListSelectionModel.MULTIPLE_INTERVAL_SELECTION);
         reloadSelectedModifiers();
 
         JScrollPane modifierScrollPane = new FastJScrollPane(selectedModifiersList);
         modifierScrollPane.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED);
-        pnlMapParameters.add(modifierScrollPane, localGbc);
+        pnlModifiers.add(modifierScrollPane, gbc);
 
-        localGbc.gridx++;
+        gbc.gridx++;
+        gbc.gridheight = 1;
         JButton btnRemoveModifier = new JButton("Remove");
         btnRemoveModifier.addActionListener(evt -> removeModifierHandler());
-        pnlMapParameters.add(btnRemoveModifier, localGbc);
+        pnlModifiers.add(btnRemoveModifier, gbc);
 
-        gridBagConstraints.gridy++;
-        globalPanel.add(pnlMapParameters, gridBagConstraints);
+        return pnlModifiers;
     }
 
     /**
@@ -1498,25 +1339,6 @@ public class ScenarioTemplateEditorDialog extends JDialog implements ActionListe
     }
 
     /**
-     * Event handler for when the "Use AtB sizing" checkboxes state changes. Disables the base height/width textboxes if
-     * it is selected, as their values are meaningless in that situation.
-     */
-    private void atbSizingCheckboxChangeHandler() {
-        txtBaseWidth.setEnabled(!chkUseAtBSizing.isSelected());
-        txtBaseHeight.setEnabled(!chkUseAtBSizing.isSelected());
-    }
-
-    /**
-     * Event handler for when the "allow all map types" checkboxes state changes. Disables/enables the explicit map type
-     * selector.
-     */
-    private void mapTypeChangeHandler() {
-        if (lstAllowedTerrainTypes != null) {
-            lstAllowedTerrainTypes.setEnabled(btnUseSpecificMapTypes.isSelected());
-        }
-    }
-
-    /**
      * Event handler for when the force alignment/generation method is changed. Enables or disables some controls based
      * on whether the force is a player deployed force, or an enemy force.
      */
@@ -1632,10 +1454,7 @@ public class ScenarioTemplateEditorDialog extends JDialog implements ActionListe
     private void saveTemplateButtonHandler() {
         // Validate the free-text map dimensions before mutating anything, so an invalid entry aborts the save cleanly
         // instead of throwing mid-way and leaving the template partially updated.
-        String dimensionErrors = MapDimensionInput.validate(txtBaseWidth.getText(),
-              txtBaseHeight.getText(),
-              txtXIncrement.getText(),
-              txtYIncrement.getText());
+        String dimensionErrors = mapParametersPanel.validateInput();
         if (!dimensionErrors.isEmpty()) {
             JOptionPane.showMessageDialog(this,
                   dimensionErrors,
@@ -1645,30 +1464,7 @@ public class ScenarioTemplateEditorDialog extends JDialog implements ActionListe
         }
 
         templatePropertiesPanel.writeInto(scenarioTemplate);
-
-        scenarioTemplate.mapParameters.allowedTerrainTypes.clear();
-        for (int index : lstAllowedTerrainTypes.getSelectedIndices()) {
-            String terrainType = lstAllowedTerrainTypes.getModel().getElementAt(index);
-            scenarioTemplate.mapParameters.allowedTerrainTypes.add(terrainType);
-        }
-        scenarioTemplate.mapParameters.setBaseHeight(MathUtility.parseInt(txtBaseHeight.getText().trim()));
-        scenarioTemplate.mapParameters.setBaseWidth(MathUtility.parseInt(txtBaseWidth.getText().trim()));
-        scenarioTemplate.mapParameters.setHeightScalingIncrement(MathUtility.parseInt(txtYIncrement.getText().trim()));
-        scenarioTemplate.mapParameters.setWidthScalingIncrement(MathUtility.parseInt(txtXIncrement.getText().trim()));
-        scenarioTemplate.mapParameters.setAdditionalMapSheetWide((int) spnAdditionalMapSheetWide.getValue());
-        scenarioTemplate.mapParameters.setAdditionalMapSheetTall((int) spnAdditionalMapSheetTall.getValue());
-        scenarioTemplate.mapParameters.setAllowRotation(chkAllowRotation.isSelected());
-        scenarioTemplate.mapParameters.setUseStandardAtBSizing(chkUseAtBSizing.isSelected());
-
-        if (btnAllowAllMapTypes.isSelected()) {
-            scenarioTemplate.mapParameters.setMapLocation(ScenarioMapParameters.MapLocation.AllGroundTerrain);
-        } else if (btnUseSpaceMap.isSelected()) {
-            scenarioTemplate.mapParameters.setMapLocation(ScenarioMapParameters.MapLocation.Space);
-        } else if (btnUseLowAtmosphereMap.isSelected()) {
-            scenarioTemplate.mapParameters.setMapLocation(ScenarioMapParameters.MapLocation.LowAtmosphere);
-        } else if (btnUseSpecificMapTypes.isSelected()) {
-            scenarioTemplate.mapParameters.setMapLocation(ScenarioMapParameters.MapLocation.SpecificGroundTerrain);
-        }
+        mapParametersPanel.writeInto(scenarioTemplate.mapParameters);
 
         FileDialogs.saveScenarioTemplate((JFrame) getOwner(), scenarioTemplate)
               .ifPresent(file -> scenarioTemplate.Serialize(file));
