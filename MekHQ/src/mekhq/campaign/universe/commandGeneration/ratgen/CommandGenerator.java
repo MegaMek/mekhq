@@ -341,7 +341,14 @@ public final class CommandGenerator {
         // founder / callsign flags and the dialog hands it to processBonusUnitsBasedOnCampaignOptions
         // so the alt-medical spare-personnel branch can count combatants without re-walking the tree.
         List<Person> generatedPersons = new ArrayList<>();
-        ForceDescriptorWalker.walk(fd, campaign, root, (leaf, parent) -> {
+        // Names for the mirrored Formations come from the player's Formation Naming Method, kept
+        // unique against every formation already in the campaign so repeat builds continue the
+        // sequences ("Able Company" then "Baker Company") instead of restarting them.
+        List<String> existingFormationNames = campaign.getPlayerForce().getAllFormations().stream()
+              .map(Formation::getName)
+              .toList();
+        FormationNamer namer = new FormationNamer(options.getForceNamingMethod(), existingFormationNames);
+        ForceDescriptorWalker.walk(fd, campaign, root, namer, (leaf, parent) -> {
             long leafStart = System.nanoTime();
             String parentInfo = parent == null ? "null"
                   : ("id=" + parent.getId() + " name='" + parent.getName() + "'");

@@ -40,11 +40,13 @@ import java.util.Map;
 import megamek.client.ratgenerator.FactionRecord;
 import megamek.client.ratgenerator.ForceDescriptor;
 import megamek.client.ratgenerator.RATGenerator;
+import megamek.common.annotations.Nullable;
 import megamek.common.units.UnitType;
 import megamek.logging.MMLogger;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.force.Formation;
 import mekhq.campaign.force.FormationLevel;
+import mekhq.campaign.universe.commandGeneration.ratgen.FormationNamer.NamedFormation;
 
 /**
  * Pre-order traversal of a generated {@link ForceDescriptor} tree that mirrors the structure into MekHQ
@@ -55,6 +57,11 @@ import mekhq.campaign.force.FormationLevel;
  * {@code attached} children, and invokes {@link LeafHandler#handle} for each descriptor whose subtree is
  * empty (leaves carry the actual {@code Entity}). The handler is responsible for building the MekHQ
  * {@code Unit}, generating crew, and attaching the unit to the supplied parent Formation.</p>
+ *
+ * <p>Formation names are produced by the supplied {@link FormationNamer} rather than taken verbatim from
+ * the ruleset engine, so every created Formation is unique across the campaign: companies allocate
+ * alphabet designators ("Able Company"), lances get callsigns under them ("Able-1 Battle Lance"), and
+ * repeat generator runs continue the sequences instead of restarting them.</p>
  */
 public final class ForceDescriptorWalker {
 
@@ -87,11 +94,12 @@ public final class ForceDescriptorWalker {
      * @param campaign          the target campaign (receives new Formation nodes)
      * @param parentInCampaign  the Formation under which to root the generated tree (typically the
      *                          campaign's force-tree root)
+     * @param namer             produces campaign-wide unique names for the created Formations
      * @param onLeaf            handler invoked for each leaf descriptor
      * @return total number of leaves visited
      */
     public static int walk(ForceDescriptor root, Campaign campaign, Formation parentInCampaign,
-          LeafHandler onLeaf) {
+          FormationNamer namer, LeafHandler onLeaf) {
         if (root == null) {
             LOGGER.warn("[CompanyGen][Walker] walk called with null root; returning 0");
             return 0;
@@ -123,9 +131,15 @@ public final class ForceDescriptorWalker {
                   root.getAttached() == null ? 0 : root.getAttached().size());
 
             leaves = 0;
+            int nodeOrdinal = 0;
             if (root.getSubForces() != null) {
                 for (ForceDescriptor child : root.getSubForces()) {
-                    leaves += walkInternal(child, campaign, parentInCampaign, onLeaf, 0);
+                    boolean countsAsNode = !childrenOf(child).isEmpty() && hasIncludedLeaf(child);
+                    if (countsAsNode) {
+                        nodeOrdinal++;
+                    }
+                    leaves += walkInternal(child, campaign, parentInCampaign, namer, null,
+                          countsAsNode ? nodeOrdinal : 0, onLeaf, 0);
                 }
             }
             if (root.getAttached() != null) {
@@ -140,17 +154,22 @@ public final class ForceDescriptorWalker {
                         loosePlatoons.add(child);
                     } else {
                         LOGGER.info("[CompanyGen][Walker]   (attached child of root)");
-                        leaves += walkInternal(child, campaign, parentInCampaign, onLeaf, 0);
+                        boolean countsAsNode = !childrenOf(child).isEmpty() && hasIncludedLeaf(child);
+                        if (countsAsNode) {
+                            nodeOrdinal++;
+                        }
+                        leaves += walkInternal(child, campaign, parentInCampaign, namer, null,
+                              countsAsNode ? nodeOrdinal : 0, onLeaf, 0);
                     }
                 }
                 leaves += wrapLoosePlatoonsByUnitType(loosePlatoons, campaign, parentInCampaign,
-                      root.getFaction(), onLeaf);
+                      root.getFaction(), namer, onLeaf);
             }
         } else {
             // Edge cases: the root descriptor is itself a leaf (single-unit generation), or no
             // existing campaign Formation was supplied. Fall through to the normal walkInternal
             // path which creates a Formation for the root and proceeds.
-            leaves = walkInternal(root, campaign, parentInCampaign, onLeaf, 0);
+            leaves = walkInternal(root, campaign, parentInCampaign, namer, null, 0, onLeaf, 0);
         }
 
         LOGGER.info("[CompanyGen][Walker] walk DONE; {} leaves visited", leaves);
@@ -158,6 +177,7 @@ public final class ForceDescriptorWalker {
     }
 
     private static int walkInternal(ForceDescriptor descriptor, Campaign campaign, Formation parent,
+          FormationNamer namer, @Nullable String parentDesignator, int ordinalWithinParent,
           LeafHandler onLeaf, int depth) {
         String indent = "  ".repeat(depth);
         boolean hasChildren = (descriptor.getSubForces() != null && !descriptor.getSubForces().isEmpty())
@@ -183,30 +203,29 @@ public final class ForceDescriptorWalker {
             return 1;
         }
 
-        // Non-leaf — create a Formation for this echelon and recurse.
-        // getName() returns the raw template ("{ordinal} Lance"); parseName() resolves the
-        // {ordinal}/{greek}/{phonetic}/{parent} substitutions populated by Ruleset.assignPositions
-        // into the display string ("First Lance", "Alpha Company", etc.).
-        String name = descriptor.parseName();
-        if (name == null || name.isBlank()) {
-            name = "Unnamed Formation";
-        }
+        String engineName = descriptor.parseName();
         int subCount = descriptor.getSubForces() == null ? 0 : descriptor.getSubForces().size();
         int attCount = descriptor.getAttached() == null ? 0 : descriptor.getAttached().size();
 
         // Drop empty formations: if every unit under this node was excluded in the preview, skip the
-        // whole subtree so no empty Formation is created. A single re-included unit keeps it.
+        // whole subtree so no empty Formation is created (and no designator is spent on it). A single
+        // re-included unit keeps it.
         if (!hasIncludedLeaf(descriptor)) {
             LOGGER.info("[CompanyGen][Walker] {}NODE name='{}' has no included units; dropping empty formation",
-                  indent, name);
+                  indent, engineName);
             return 0;
         }
 
-        LOGGER.info("[CompanyGen][Walker] {}NODE name='{}' echelon={} subForces={} attached={} -> creating Formation",
-              indent, name, descriptor.getEchelon(), subCount, attCount);
-
-        Formation formation = new Formation(name);
+        // Non-leaf — create a Formation for this echelon and recurse. The engine's parseName()
+        // ("A Company", "Battle Lance") repeats across parents, so the namer converts it into a
+        // campaign-wide unique callsign ("Able Company", "Able-1 Battle Lance").
         FormationLevel level = mapEchelonToFormationLevel(descriptor.getEchelon(), descriptor.getFaction());
+        NamedFormation named = namer.nameFormation(engineName, level, parentDesignator, ordinalWithinParent);
+
+        LOGGER.info("[CompanyGen][Walker] {}NODE name='{}' engineName='{}' echelon={} subForces={} attached={} -> creating Formation",
+              indent, named.name(), engineName, descriptor.getEchelon(), subCount, attCount);
+
+        Formation formation = new Formation(named.name());
         if (level != null) {
             formation.setFormationLevel(level);
         }
@@ -216,15 +235,26 @@ public final class ForceDescriptorWalker {
               parent == null ? "null" : parent.getId());
 
         int leaves = 0;
+        int childNodeOrdinal = 0;
         if (descriptor.getSubForces() != null) {
             for (ForceDescriptor child : descriptor.getSubForces()) {
-                leaves += walkInternal(child, campaign, formation, onLeaf, depth + 1);
+                boolean countsAsNode = !childrenOf(child).isEmpty() && hasIncludedLeaf(child);
+                if (countsAsNode) {
+                    childNodeOrdinal++;
+                }
+                leaves += walkInternal(child, campaign, formation, namer, named.designator(),
+                      countsAsNode ? childNodeOrdinal : 0, onLeaf, depth + 1);
             }
         }
         if (descriptor.getAttached() != null) {
             for (ForceDescriptor child : descriptor.getAttached()) {
                 LOGGER.info("[CompanyGen][Walker] {}  (attached child)", indent);
-                leaves += walkInternal(child, campaign, formation, onLeaf, depth + 1);
+                boolean countsAsNode = !childrenOf(child).isEmpty() && hasIncludedLeaf(child);
+                if (countsAsNode) {
+                    childNodeOrdinal++;
+                }
+                leaves += walkInternal(child, campaign, formation, namer, named.designator(),
+                      countsAsNode ? childNodeOrdinal : 0, onLeaf, depth + 1);
             }
         }
         return leaves;
@@ -297,19 +327,20 @@ public final class ForceDescriptorWalker {
 
     /**
      * Groups {@code platoons} by unit type and, for each group, synthesizes a company formation named
-     * for that unit type (for example "Battle Armor Company") under {@code parent}, then walks the
+     * for that unit type (for example "Able Battle Armor Company") under {@code parent}, then walks the
      * group's platoons beneath it.
      *
      * @param platoons    the loose platoons to wrap (may be empty)
      * @param campaign    the campaign the formations are added to
      * @param parent      the formation the synthesized companies hang under
      * @param factionCode the descriptor faction, used to map the company echelon
+     * @param namer       produces the unique names for the synthesized companies and their platoons
      * @param onLeaf      the leaf handler forwarded to {@link #walkInternal}
      *
      * @return the number of leaves visited
      */
     private static int wrapLoosePlatoonsByUnitType(List<ForceDescriptor> platoons, Campaign campaign,
-          Formation parent, String factionCode, LeafHandler onLeaf) {
+          Formation parent, String factionCode, FormationNamer namer, LeafHandler onLeaf) {
         if (platoons.isEmpty()) {
             return 0;
         }
@@ -321,20 +352,24 @@ public final class ForceDescriptorWalker {
         int leaves = 0;
         for (Map.Entry<Integer, List<ForceDescriptor>> entry : byUnitType.entrySet()) {
             List<ForceDescriptor> group = entry.getValue();
-            String companyName = companyNameForUnitType(entry.getKey());
-            Formation company = new Formation(companyName);
             // The company sits one echelon above its platoons.
             Integer platoonEchelon = group.get(0).getEchelon();
             FormationLevel companyLevel = mapEchelonToFormationLevel(
                   platoonEchelon == null ? null : platoonEchelon + 1, factionCode);
+            NamedFormation named = namer.nameFormation(companyNameForUnitType(entry.getKey()),
+                  companyLevel, null, 0);
+            Formation company = new Formation(named.name());
             if (companyLevel != null) {
                 company.setFormationLevel(companyLevel);
             }
             campaign.addFormation(company, parent);
             LOGGER.info("[CompanyGen][Walker] synthesized '{}' (level {}) for {} loose platoon(s)",
-                  companyName, companyLevel, group.size());
+                  named.name(), companyLevel, group.size());
+            int platoonOrdinal = 0;
             for (ForceDescriptor platoon : group) {
-                leaves += walkInternal(platoon, campaign, company, onLeaf, 1);
+                platoonOrdinal++;
+                leaves += walkInternal(platoon, campaign, company, namer, named.designator(),
+                      platoonOrdinal, onLeaf, 1);
             }
         }
         return leaves;

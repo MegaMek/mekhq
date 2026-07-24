@@ -310,11 +310,11 @@ public class SetupTab {
             public java.awt.Component getListCellRendererComponent(javax.swing.JList<?> list, Object value,
                   int index, boolean isSelected, boolean cellHasFocus) {
                 super.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);
-                if (value instanceof ForceNamingMethod m) {
+                if (value instanceof ForceNamingMethod namingMethod) {
                     // Append the first-three preview inline so the user can see what each scheme
                     // produces without hovering for the tooltip.
-                    setText(m.toString() + " — " + m.getExample());
-                    list.setToolTipText(m.getToolTipText());
+                    setText(namingMethod.toString() + " - " + namingMethod.getExample());
+                    list.setToolTipText(namingMethod.getToolTipText());
                 }
                 return this;
             }
@@ -848,8 +848,8 @@ public class SetupTab {
         }
         targetOptions.setGenerateMercenaryCompanyCommandLance(chkGenerateMercenaryCompanyCommandLance.isSelected());
         Object selectedNamingMethod = comboForceNamingMethod.getSelectedItem();
-        if (selectedNamingMethod instanceof ForceNamingMethod m) {
-            targetOptions.setForceNamingMethod(m);
+        if (selectedNamingMethod instanceof ForceNamingMethod namingMethod) {
+            targetOptions.setForceNamingMethod(namingMethod);
         }
 
         // Per-role coverage % and skill level

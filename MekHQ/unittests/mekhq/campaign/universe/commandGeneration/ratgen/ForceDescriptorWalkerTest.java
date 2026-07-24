@@ -49,15 +49,20 @@ import megamek.common.units.Entity;
 import megamek.common.units.UnitType;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.force.Formation;
+import mekhq.campaign.universe.enums.ForceNamingMethod;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
 
 /**
  * Verifies that {@link ForceDescriptorWalker} honors preview exclusions: excluded leaves are skipped,
  * formations whose units are all excluded are dropped, and a single re-included unit keeps its
- * formation.
+ * formation. Created formations are named through {@link FormationNamer}.
  */
 class ForceDescriptorWalkerTest {
+
+    private static FormationNamer namer() {
+        return new FormationNamer(ForceNamingMethod.CCB_1943, List.of());
+    }
 
     /** {@code ForceDescriptor.entity} has no setter (set only during generation), so inject via reflection. */
     private static void injectEntity(ForceDescriptor descriptor) throws Exception {
@@ -112,7 +117,7 @@ class ForceDescriptorWalkerTest {
 
         Campaign campaign = mock(Campaign.class);
         List<String> handledUnits = new ArrayList<>();
-        ForceDescriptorWalker.walk(root, campaign, new Formation("Headquarters"),
+        ForceDescriptorWalker.walk(root, campaign, new Formation("Headquarters"), namer(),
               (leaf, parent) -> handledUnits.add(leaf.parseName()));
 
         assertEquals(List.of("Unit A", "Unit B"), handledUnits, "excluded lance's units must be skipped");
@@ -137,7 +142,7 @@ class ForceDescriptorWalkerTest {
 
         Campaign campaign = mock(Campaign.class);
         List<String> handledUnits = new ArrayList<>();
-        ForceDescriptorWalker.walk(root, campaign, new Formation("Headquarters"),
+        ForceDescriptorWalker.walk(root, campaign, new Formation("Headquarters"), namer(),
               (leaf, parent) -> handledUnits.add(leaf.parseName()));
 
         assertEquals(List.of("Unit C"), handledUnits, "the re-included unit is kept, its excluded sibling dropped");
@@ -154,15 +159,19 @@ class ForceDescriptorWalkerTest {
 
         Campaign campaign = mock(Campaign.class);
         List<String> handledUnits = new ArrayList<>();
-        ForceDescriptorWalker.walk(root, campaign, new Formation("Headquarters"),
+        ForceDescriptorWalker.walk(root, campaign, new Formation("Headquarters"), namer(),
               (leaf, parent) -> handledUnits.add(leaf.parseName()));
 
         assertEquals(4, handledUnits.size(), "all four platoon units are placed");
 
         List<String> createdFormations = namesOfCreatedFormations(campaign);
-        String expectedCompany = UnitType.getTypeDisplayableName(UnitType.BATTLE_ARMOR) + " Company";
+        // The synthesized company is company-tier, so the namer prefixes the first free CCB
+        // designator; its platoons are numbered under that designator.
+        String expectedCompany = "Able " + UnitType.getTypeDisplayableName(UnitType.BATTLE_ARMOR) + " Company";
         assertTrue(createdFormations.contains(expectedCompany),
               "loose BA platoons should nest under a synthesized '" + expectedCompany + "'");
+        assertTrue(createdFormations.contains("Able-1 Platoon") && createdFormations.contains("Able-2 Platoon"),
+              "platoons carry callsigns under the synthesized company's designator");
         assertEquals(1, createdFormations.stream().filter(expectedCompany::equals).count(),
               "both platoons share one synthesized company (grouped by unit type)");
     }
