@@ -33,9 +33,9 @@
 package mekhq.gui.scenarioTemplateEditor;
 
 import static megamek.client.ui.WrapLayout.wordWrap;
+import static megamek.client.ui.util.UIUtil.scaleForGUI;
 
 import java.awt.Component;
-import java.awt.Dimension;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
@@ -86,44 +86,46 @@ public class RoleSetEditorPanel extends JPanel {
         lstRoleSets.setSelectionMode(ListSelectionModel.MULTIPLE_INTERVAL_SELECTION);
         lstRoleSets.setCellRenderer(new RoleSetDisplayRenderer());
 
-        GridBagConstraints gbc = new GridBagConstraints();
-        gbc.gridx = 0;
-        gbc.gridy = 0;
-        gbc.anchor = GridBagConstraints.WEST;
-        gbc.fill = GridBagConstraints.HORIZONTAL;
-        gbc.insets = new Insets(2, 2, 2, 2);
+        GridBagConstraints constraints = new GridBagConstraints();
+        constraints.gridx = 0;
+        constraints.gridy = 0;
+        constraints.anchor = GridBagConstraints.WEST;
+        constraints.fill = GridBagConstraints.HORIZONTAL;
 
-        add(new JLabel(RESOURCES.getString("RoleSetEditorPanel.validRoles.label")), gbc);
+        int padding = scaleForGUI(5);
+        constraints.insets = new Insets(padding, padding, padding, padding);
+
+        add(new JLabel(RESOURCES.getString("RoleSetEditorPanel.validRoles.label")), constraints);
 
         lstRolePicker.setToolTipText(wordWrap(RESOURCES.getString("RoleSetEditorPanel.validRoles.tooltip")));
         FastJScrollPane scrRolePicker = new FastJScrollPane(lstRolePicker);
-        scrRolePicker.setPreferredSize(new Dimension(190, 120));
-        gbc.gridy++;
-        add(scrRolePicker, gbc);
+        scrRolePicker.setPreferredSize(scaleForGUI(190, 120));
+        constraints.gridy++;
+        add(scrRolePicker, constraints);
 
         JButton btnAddRoleSet = new JButton(RESOURCES.getString("RoleSetEditorPanel.addRoleSet"));
         btnAddRoleSet.setToolTipText(wordWrap(RESOURCES.getString("RoleSetEditorPanel.addRoleSet.tooltip")));
         btnAddRoleSet.addActionListener(evt -> addRoleSet());
-        gbc.gridy++;
-        gbc.fill = GridBagConstraints.NONE;
-        add(btnAddRoleSet, gbc);
+        constraints.gridy++;
+        constraints.fill = GridBagConstraints.NONE;
+        add(btnAddRoleSet, constraints);
 
-        gbc.fill = GridBagConstraints.HORIZONTAL;
-        gbc.gridy++;
-        add(new JLabel(RESOURCES.getString("RoleSetEditorPanel.roleSets.label")), gbc);
+        constraints.fill = GridBagConstraints.HORIZONTAL;
+        constraints.gridy++;
+        add(new JLabel(RESOURCES.getString("RoleSetEditorPanel.roleSets.label")), constraints);
 
         lstRoleSets.setToolTipText(wordWrap(RESOURCES.getString("RoleSetEditorPanel.roleSets.tooltip")));
         FastJScrollPane scrRoleSets = new FastJScrollPane(lstRoleSets);
-        scrRoleSets.setPreferredSize(new Dimension(190, 100));
-        gbc.gridy++;
-        add(scrRoleSets, gbc);
+        scrRoleSets.setPreferredSize(scaleForGUI(190, 100));
+        constraints.gridy++;
+        add(scrRoleSets, constraints);
 
         JButton btnRemoveRoleSet = new JButton(RESOURCES.getString("RoleSetEditorPanel.removeRoleSet"));
         btnRemoveRoleSet.setToolTipText(wordWrap(RESOURCES.getString("RoleSetEditorPanel.removeRoleSet.tooltip")));
         btnRemoveRoleSet.addActionListener(evt -> removeRoleSet());
-        gbc.gridy++;
-        gbc.fill = GridBagConstraints.NONE;
-        add(btnRemoveRoleSet, gbc);
+        constraints.gridy++;
+        constraints.fill = GridBagConstraints.NONE;
+        add(btnRemoveRoleSet, constraints);
     }
 
     /**
@@ -177,8 +179,9 @@ public class RoleSetEditorPanel extends JPanel {
         @Override
         public Component getListCellRendererComponent(JList<?> list, Object value, int index, boolean isSelected,
               boolean cellHasFocus) {
-            String text = (value instanceof MissionRole role) ? role.toString().replace('_', ' ')
-                                : String.valueOf(value);
+            String text = (value instanceof MissionRole role) ?
+                                role.toString().replace('_', ' ') :
+                                String.valueOf(value);
             return super.getListCellRendererComponent(list, text, index, isSelected, cellHasFocus);
         }
     }

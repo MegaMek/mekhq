@@ -32,6 +32,8 @@
  */
 package mekhq.gui.scenarioTemplateEditor;
 
+import static megamek.client.ui.util.UIUtil.scaleForGUI;
+
 import java.awt.BorderLayout;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
@@ -62,6 +64,7 @@ import mekhq.campaign.mission.ScenarioTemplate;
 import mekhq.campaign.mission.atb.AtBScenarioModifier;
 import mekhq.gui.FileDialogs;
 import mekhq.gui.baseComponents.DefaultMHQScrollablePanel;
+import org.jspecify.annotations.NonNull;
 
 /**
  * Handles editing, saving and loading of scenario template definitions.
@@ -135,16 +138,16 @@ public class ScenarioTemplateEditorDialog extends JDialog implements ActionListe
         globalScrollPane.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_AS_NEEDED);
         getContentPane().add(globalScrollPane);
 
-        GridBagConstraints gbc = new GridBagConstraints();
-        gbc.gridx = 0;
-        gbc.gridy = 0;
-        setupTemplateProperties(gbc);
-        setupObjectiveEditUI(gbc);
-        setupForceEditorHeaders(gbc);
-        setupForceEditor(gbc);
-        initializeForceList(gbc);
-        setupMapParameters(gbc);
-        setupBottomButtons(gbc);
+        GridBagConstraints constraints = new GridBagConstraints();
+        constraints.gridx = 0;
+        constraints.gridy = 0;
+        setupTemplateProperties(constraints);
+        setupObjectiveEditUI(constraints);
+        setupForceEditorHeaders(constraints);
+        setupForceEditor(constraints);
+        initializeForceList(constraints);
+        setupMapParameters(constraints);
+        setupBottomButtons(constraints);
 
         renderForceList();
     }
@@ -177,15 +180,15 @@ public class ScenarioTemplateEditorDialog extends JDialog implements ActionListe
         gridBagConstraints.gridy++;
     }
 
-    private void setupObjectiveEditUI(GridBagConstraints gbc) {
+    private void setupObjectiveEditUI(GridBagConstraints constraints) {
         objectivesPanel = new ObjectivesPanel();
         objectivesPanel.load(scenarioTemplate);
 
-        gbc.gridx = 0;
-        gbc.gridy++;
-        gbc.gridwidth = 1;
-        gbc.gridheight = 1;
-        globalPanel.add(objectivesPanel, gbc);
+        constraints.gridx = 0;
+        constraints.gridy++;
+        constraints.gridwidth = 1;
+        constraints.gridheight = 1;
+        globalPanel.add(objectivesPanel, constraints);
     }
 
     /**
@@ -219,16 +222,16 @@ public class ScenarioTemplateEditorDialog extends JDialog implements ActionListe
      * Worker function that sets up UI elements for the force template editor.
      *
      */
-    private void setupForceEditor(GridBagConstraints externalGBC) {
+    private void setupForceEditor(GridBagConstraints externalconstraints) {
         forceEditorPanel = new ForceEditorPanel(readMulFileNames());
         forceEditorPanel.setOnSave(this::commitForce);
         forceEditorPanel.setAvailableForceIds(scenarioTemplate.getScenarioForces().keySet());
 
-        externalGBC.gridx = 0;
-        externalGBC.gridy++;
-        externalGBC.gridwidth = GridBagConstraints.REMAINDER;
-        globalPanel.add(forceEditorPanel, externalGBC);
-        externalGBC.gridheight = 1;
+        externalconstraints.gridx = 0;
+        externalconstraints.gridy++;
+        externalconstraints.gridwidth = GridBagConstraints.REMAINDER;
+        globalPanel.add(forceEditorPanel, externalconstraints);
+        externalconstraints.gridheight = 1;
     }
 
     /**
@@ -260,10 +263,10 @@ public class ScenarioTemplateEditorDialog extends JDialog implements ActionListe
             return;
         }
 
-        ScenarioForceTemplate sft = forceEditorPanel.buildForceTemplate();
+        ScenarioForceTemplate forceTemplate = forceEditorPanel.buildForceTemplate();
         ForceRosterEditor.CommitResult commitResult = ForceRosterEditor.commit(scenarioTemplate.getScenarioForces(),
               editedForceId,
-              sft);
+              forceTemplate);
         if (!commitResult.committed()) {
             JOptionPane.showMessageDialog(this,
                   commitResult.errorMessage(),
@@ -284,12 +287,12 @@ public class ScenarioTemplateEditorDialog extends JDialog implements ActionListe
     /**
      * Worker function called when initializing the dialog to place the force template list on the content pane.
      *
-     * @param gbc Grid bag constraints.
+     * @param constraints Grid bag constraints.
      */
-    private void initializeForceList(GridBagConstraints gbc) {
-        gbc.gridx = 0;
-        gbc.gridy++;
-        gbc.gridwidth = GridBagConstraints.REMAINDER;
+    private void initializeForceList(GridBagConstraints constraints) {
+        constraints.gridx = 0;
+        constraints.gridy++;
+        constraints.gridwidth = GridBagConstraints.REMAINDER;
 
         forceTable = new JTable(forceTableModel);
         forceTable.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
@@ -297,9 +300,9 @@ public class ScenarioTemplateEditorDialog extends JDialog implements ActionListe
         // The model has 15 columns; with the default auto-resize they all get squeezed to a few unreadable pixels.
         // Turn auto-resize off and give each column a sensible width so the table scrolls horizontally instead.
         forceTable.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
-        int[] columnWidths = { 50, 130, 90, 120, 150, 150, 100, 70, 120, 100, 90, 80, 60, 100, 90 };
-        for (int col = 0; col < columnWidths.length && col < forceTable.getColumnCount(); col++) {
-            forceTable.getColumnModel().getColumn(col).setPreferredWidth(columnWidths[col]);
+        int[] columnWidths = getColumnWidths();
+        for (int column = 0; column < columnWidths.length && column < forceTable.getColumnCount(); column++) {
+            forceTable.getColumnModel().getColumn(column).setPreferredWidth(columnWidths[column]);
         }
 
         btnEditForce = new JButton("Edit");
@@ -318,7 +321,13 @@ public class ScenarioTemplateEditorDialog extends JDialog implements ActionListe
         forceListContainer.add(buttonRow, BorderLayout.SOUTH);
         forceListContainer.setVisible(false);
 
-        globalPanel.add(forceListContainer, gbc);
+        globalPanel.add(forceListContainer, constraints);
+    }
+
+    private static int @NonNull [] getColumnWidths() {
+        return new int[] { scaleForGUI(50), scaleForGUI(130), scaleForGUI(90), scaleForGUI(120), scaleForGUI(150),
+                           scaleForGUI(150), scaleForGUI(100), scaleForGUI(70), scaleForGUI(120), scaleForGUI(100),
+                           scaleForGUI(90), scaleForGUI(80), scaleForGUI(60), scaleForGUI(100), scaleForGUI(90) };
     }
 
     private void updateForceButtonState() {
@@ -342,17 +351,17 @@ public class ScenarioTemplateEditorDialog extends JDialog implements ActionListe
         mapParametersPanel.load(scenarioTemplate.mapParameters);
 
         JPanel pnlMapRow = new JPanel(new GridBagLayout());
-        GridBagConstraints localGbc = new GridBagConstraints();
-        localGbc.gridx = 0;
-        localGbc.gridy = 0;
-        localGbc.anchor = GridBagConstraints.NORTHWEST;
-        pnlMapRow.add(mapParametersPanel, localGbc);
+        GridBagConstraints localConstraints = new GridBagConstraints();
+        localConstraints.gridx = 0;
+        localConstraints.gridy = 0;
+        localConstraints.anchor = GridBagConstraints.NORTHWEST;
+        pnlMapRow.add(mapParametersPanel, localConstraints);
 
         modifiersPanel = new ModifiersPanel(AtBScenarioModifier.getOrderedModifierKeys());
         modifiersPanel.load(scenarioTemplate.scenarioModifiers);
-        localGbc.gridx = 1;
-        localGbc.insets = new Insets(0, 15, 0, 0);
-        pnlMapRow.add(modifiersPanel, localGbc);
+        localConstraints.gridx = 1;
+        localConstraints.insets = new Insets(0, scaleForGUI(15), 0, 0);
+        pnlMapRow.add(modifiersPanel, localConstraints);
 
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy++;
@@ -460,11 +469,11 @@ public class ScenarioTemplateEditorDialog extends JDialog implements ActionListe
         if (row < 0) {
             return;
         }
-        ScenarioForceTemplate sft = forceTableModel.getForceAt(row);
-        forceEditorPanel.loadForce(sft);
+        ScenarioForceTemplate forceTemplate = forceTableModel.getForceAt(row);
+        forceEditorPanel.loadForce(forceTemplate);
         // Remember which force we are editing so committing updates it in place (and handles a rename) instead of
         // adding a duplicate.
-        editedForceId = sft.getForceName();
+        editedForceId = forceTemplate.getForceName();
     }
 
     /**
@@ -555,10 +564,10 @@ public class ScenarioTemplateEditorDialog extends JDialog implements ActionListe
      * method.
      */
     @Override
-    public void actionPerformed(ActionEvent e) {
-        if (SAVE_TEMPLATE_COMMAND.equals(e.getActionCommand())) {
+    public void actionPerformed(ActionEvent evt) {
+        if (SAVE_TEMPLATE_COMMAND.equals(evt.getActionCommand())) {
             saveTemplateButtonHandler();
-        } else if (LOAD_TEMPLATE_COMMAND.equals(e.getActionCommand())) {
+        } else if (LOAD_TEMPLATE_COMMAND.equals(evt.getActionCommand())) {
             loadTemplateButtonHandler();
         }
     }

@@ -77,39 +77,39 @@ public class ModifiersPanel extends JPanel {
     }
 
     private void initComponents() {
-        GridBagConstraints gbc = new GridBagConstraints();
-        gbc.gridx = 0;
-        gbc.gridy = 0;
-        gbc.anchor = GridBagConstraints.WEST;
+        GridBagConstraints constraints = new GridBagConstraints();
+        constraints.gridx = 0;
+        constraints.gridy = 0;
+        constraints.anchor = GridBagConstraints.WEST;
 
-        gbc.gridwidth = GridBagConstraints.REMAINDER;
-        add(new JLabel(RESOURCES.getString("ModifiersPanel.title")), gbc);
-        gbc.gridwidth = 1;
+        constraints.gridwidth = GridBagConstraints.REMAINDER;
+        add(new JLabel(RESOURCES.getString("ModifiersPanel.title")), constraints);
+        constraints.gridwidth = 1;
 
-        gbc.gridy++;
+        constraints.gridy++;
         modifierPicker.setToolTipText(wordWrap(RESOURCES.getString("ModifiersPanel.picker.tooltip")));
-        add(modifierPicker, gbc);
+        add(modifierPicker, constraints);
 
-        gbc.gridx++;
+        constraints.gridx++;
         JButton btnAdd = new JButton(RESOURCES.getString("ModifiersPanel.add"));
         btnAdd.setToolTipText(wordWrap(RESOURCES.getString("ModifiersPanel.add.tooltip")));
         btnAdd.addActionListener(evt -> addSelectedModifier());
-        add(btnAdd, gbc);
+        add(btnAdd, constraints);
 
-        gbc.gridx = 0;
-        gbc.gridy++;
-        gbc.gridheight = 3;
+        constraints.gridx = 0;
+        constraints.gridy++;
+        constraints.gridheight = 3;
         selectedList.setToolTipText(wordWrap(RESOURCES.getString("ModifiersPanel.selectedList.tooltip")));
         FastJScrollPane scrollPane = new FastJScrollPane(selectedList);
         scrollPane.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED);
-        add(scrollPane, gbc);
+        add(scrollPane, constraints);
 
-        gbc.gridx++;
-        gbc.gridheight = 1;
+        constraints.gridx++;
+        constraints.gridheight = 1;
         JButton btnRemove = new JButton(RESOURCES.getString("ModifiersPanel.remove"));
         btnRemove.setToolTipText(wordWrap(RESOURCES.getString("ModifiersPanel.remove.tooltip")));
         btnRemove.addActionListener(evt -> removeSelectedModifiers());
-        add(btnRemove, gbc);
+        add(btnRemove, constraints);
     }
 
     private void addSelectedModifier() {

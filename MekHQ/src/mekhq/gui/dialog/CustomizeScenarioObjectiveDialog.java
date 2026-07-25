@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2024-2025 The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2024-2026 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -57,6 +57,11 @@ import mekhq.campaign.mission.ScenarioObjective.ObjectiveCriterion;
 import mekhq.campaign.mission.ScenarioObjective.TimeLimitType;
 
 public class CustomizeScenarioObjectiveDialog extends JDialog {
+
+    private static final String RESOURCE_BUNDLE = "mekhq.resources.CustomizeScenarioObjectiveDialog";
+    private static final ResourceBundle resourceMap = ResourceBundle.getBundle(
+          "mekhq.resources.CustomizeScenarioObjectiveDialog",
+          MekHQ.getMHQOptions().getLocale());
 
     private final ScenarioObjective objective;
     private final List<String> botForceNames;
@@ -148,10 +153,6 @@ public class CustomizeScenarioObjectiveDialog extends JDialog {
     }
 
     private void initialize() {
-
-        final ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.CustomizeScenarioObjectiveDialog",
-              MekHQ.getMHQOptions().getLocale());
-
         setTitle(resourceMap.getString("dialog.title"));
         getContentPane().setLayout(new BorderLayout());
         JPanel panMain = new JPanel(new GridBagLayout());

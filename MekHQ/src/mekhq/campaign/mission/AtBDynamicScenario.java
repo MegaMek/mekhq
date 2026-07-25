@@ -680,10 +680,8 @@ public class AtBDynamicScenario extends AtBScenario {
     @Override
     public String getBattlefieldControlDescription() {
         ScenarioTemplate template = getTemplate();
-        ScenarioTemplate.BattlefieldControlType battlefieldControl = (template != null)
-                                                                           ?
-                                                                           template.getBattlefieldControl()
-                                                                           :
+        ScenarioTemplate.BattlefieldControlType battlefieldControl = (template != null) ?
+                                                                           template.getBattlefieldControl() :
                                                                            ScenarioTemplate.BattlefieldControlType.UNDEFINED;
         if (battlefieldControl == null) {
             battlefieldControl = ScenarioTemplate.BattlefieldControlType.UNDEFINED;

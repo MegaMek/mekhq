@@ -211,7 +211,7 @@ public class ScenarioObjective {
      * not have to hand-write text that merely restates the objective's fields.
      */
     public String getDescription() {
-        if ((description != null) && !description.isBlank()) {
+        if (description != null && !description.isBlank()) {
             return description;
         }
         return getGeneratedDescription();

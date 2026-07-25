@@ -33,9 +33,11 @@
 package mekhq.gui.scenarioTemplateEditor;
 
 import static megamek.client.ui.WrapLayout.wordWrap;
+import static megamek.client.ui.util.UIUtil.scaleForGUI;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
+import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
@@ -44,6 +46,7 @@ import java.awt.event.ItemListener;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.Objects;
 import java.util.ResourceBundle;
 import javax.swing.*;
 import javax.swing.border.LineBorder;
@@ -215,45 +218,47 @@ public class ForceEditorPanel extends JPanel {
         // Each logical group is its own sub-panel, laid out side by side and pinned to the top. Keeping the columns
         // independent avoids the cross-column GridBag height juggling that previously let the deployment-zone list
         // float to the vertical center, away from its label.
-        GridBagConstraints gbc = new GridBagConstraints();
-        gbc.gridy = 0;
-        gbc.anchor = GridBagConstraints.NORTHWEST;
-        gbc.insets = new Insets(4, 4, 4, 4);
+        GridBagConstraints constraints = new GridBagConstraints();
+        constraints.gridy = 0;
+        constraints.anchor = GridBagConstraints.NORTHWEST;
+        int padding = scaleForGUI(5);
+        constraints.insets = new Insets(padding, padding, padding, padding);
 
-        gbc.gridx = 0;
-        add(buildGeneralColumn(), gbc);
-        gbc.gridx = 1;
-        add(buildDeploymentZonesColumn(), gbc);
-        gbc.gridx = 2;
-        add(buildUnitColumn(), gbc);
-        gbc.gridx = 3;
-        add(roleSetEditorPanel, gbc);
+        constraints.gridx = 0;
+        add(buildGeneralColumn(), constraints);
+        constraints.gridx = 1;
+        add(buildDeploymentZonesColumn(), constraints);
+        constraints.gridx = 2;
+        add(buildUnitColumn(), constraints);
+        constraints.gridx = 3;
+        add(roleSetEditorPanel, constraints);
     }
 
     /** Left column: alignment, generation, deployment sync, and the MUL / objective-linked pickers. */
     private JPanel buildGeneralColumn() {
         JPanel panel = new JPanel(new GridBagLayout());
-        GridBagConstraints gbc = newColumnConstraints();
+        GridBagConstraints constraints = newColumnConstraints();
 
-        addLabeledRow(panel, gbc, "ForceEditorPanel.forceAlignment.label", cboAlignment);
-        addLabeledRow(panel, gbc, "ForceEditorPanel.generationMethod.label", cboGenerationMethod);
-        addLabeledRow(panel, gbc, "ForceEditorPanel.scalingMultiplier.label", spnMultiplier);
-        addLabeledRow(panel, gbc, "ForceEditorPanel.destinationZone.label", cboDestinationZone);
-        addLabeledRow(panel, gbc, "ForceEditorPanel.retreatThreshold.label", spnRetreatThreshold);
-        addLabeledRow(panel, gbc, "ForceEditorPanel.reinforce.label", chkReinforce);
-        addLabeledRow(panel, gbc, "ForceEditorPanel.contributesToBV.label", chkContributesToBV);
-        addLabeledRow(panel, gbc, "ForceEditorPanel.contributesToUnitCount.label", chkContributesToUnitCount);
-        addLabeledRow(panel, gbc, "ForceEditorPanel.forceId.label", txtForceName);
-        addLabeledRow(panel, gbc, "ForceEditorPanel.syncDeployment.label", cboSyncDeploymentType);
+        addLabeledRow(panel, constraints, "ForceEditorPanel.forceAlignment.label", cboAlignment);
+        addLabeledRow(panel, constraints, "ForceEditorPanel.generationMethod.label", cboGenerationMethod);
+        addLabeledRow(panel, constraints, "ForceEditorPanel.scalingMultiplier.label", spnMultiplier);
+        addLabeledRow(panel, constraints, "ForceEditorPanel.destinationZone.label", cboDestinationZone);
+        addLabeledRow(panel, constraints, "ForceEditorPanel.retreatThreshold.label", spnRetreatThreshold);
+        addLabeledRow(panel, constraints, "ForceEditorPanel.reinforce.label", chkReinforce);
+        addLabeledRow(panel, constraints, "ForceEditorPanel.contributesToBV.label", chkContributesToBV);
+        addLabeledRow(panel, constraints, "ForceEditorPanel.contributesToUnitCount.label", chkContributesToUnitCount);
+        addLabeledRow(panel, constraints, "ForceEditorPanel.forceId.label", txtForceName);
+        addLabeledRow(panel, constraints, "ForceEditorPanel.syncDeployment.label", cboSyncDeploymentType);
 
         // the synced-force picker sits directly beneath the sync-deployment dropdown, in the control column
-        gbc.gridx = 1;
-        panel.add(cboSyncForceName, gbc);
-        gbc.gridy++;
+        constraints.gridx = 1;
+        panel.add(cboSyncForceName, constraints);
+        constraints.gridy++;
 
-        addLabeledRow(panel, gbc, "ForceEditorPanel.fixedMul.label", sizedScroll(listMULs, 170, 120));
-        addLabeledRow(panel, gbc, "ForceEditorPanel.objectiveLinkedForces.label",
-              sizedScroll(lstObjectiveLinkedForces, 170, 100));
+        addLabeledRow(panel, constraints, "ForceEditorPanel.fixedMul.label", sizedScroll(listMULs, scaleForGUI(170),
+              scaleForGUI(120)));
+        addLabeledRow(panel, constraints, "ForceEditorPanel.objectiveLinkedForces.label",
+              sizedScroll(lstObjectiveLinkedForces, scaleForGUI(170), scaleForGUI(100)));
         return panel;
     }
 
@@ -261,32 +266,32 @@ public class ForceEditorPanel extends JPanel {
     private JPanel buildDeploymentZonesColumn() {
         JPanel panel = new JPanel(new BorderLayout(0, 2));
         panel.add(new JLabel(RESOURCES.getString("ForceEditorPanel.deploymentZones.label")), BorderLayout.NORTH);
-        panel.add(sizedScroll(lstDeployZones, 130, 240), BorderLayout.CENTER);
+        panel.add(sizedScroll(lstDeployZones, scaleForGUI(130), scaleForGUI(240)), BorderLayout.CENTER);
         return panel;
     }
 
     /** Right column: unit type and the per-unit generation settings, ending with Save. */
     private JPanel buildUnitColumn() {
         JPanel panel = new JPanel(new GridBagLayout());
-        GridBagConstraints gbc = newColumnConstraints();
+        GridBagConstraints constraints = newColumnConstraints();
 
-        addLabeledRow(panel, gbc, "ForceEditorPanel.unitType.label", cboUnitType);
-        addLabeledRow(panel, gbc, "ForceEditorPanel.arrivalTurn.label", spnArrivalTurn);
-        addLabeledRow(panel, gbc, "ForceEditorPanel.fixedUnitCount.label", spnFixedUnitCount);
-        addLabeledRow(panel, gbc, "ForceEditorPanel.maxWeight.label", cboMaxWeightClass);
-        addLabeledRow(panel, gbc, "ForceEditorPanel.minWeight.label", cboMinWeightClass);
-        addLabeledRow(panel, gbc, "ForceEditorPanel.contributesToMapSize.label", chkContributesToMapSize);
-        addLabeledRow(panel, gbc, "ForceEditorPanel.generationOrder.label", spnGenerationOrder);
-        addLabeledRow(panel, gbc, "ForceEditorPanel.allowAeroBombs.label", chkAllowAeroBombs);
-        addLabeledRow(panel, gbc, "ForceEditorPanel.startAltitude.label", spnStartingAltitude);
-        addLabeledRow(panel, gbc, "ForceEditorPanel.isArtillery.label", chkUseArtillery);
-        addLabeledRow(panel, gbc, "ForceEditorPanel.deployOffBoard.label", chkOffBoard);
-        addLabeledRow(panel, gbc, "ForceEditorPanel.subjectToRandomRemoval.label", chkSubjectToRandomRemoval);
-        addLabeledRow(panel, gbc, "ForceEditorPanel.syncRetreatThreshold.label", chkSyncRetreatThreshold);
+        addLabeledRow(panel, constraints, "ForceEditorPanel.unitType.label", cboUnitType);
+        addLabeledRow(panel, constraints, "ForceEditorPanel.arrivalTurn.label", spnArrivalTurn);
+        addLabeledRow(panel, constraints, "ForceEditorPanel.fixedUnitCount.label", spnFixedUnitCount);
+        addLabeledRow(panel, constraints, "ForceEditorPanel.maxWeight.label", cboMaxWeightClass);
+        addLabeledRow(panel, constraints, "ForceEditorPanel.minWeight.label", cboMinWeightClass);
+        addLabeledRow(panel, constraints, "ForceEditorPanel.contributesToMapSize.label", chkContributesToMapSize);
+        addLabeledRow(panel, constraints, "ForceEditorPanel.generationOrder.label", spnGenerationOrder);
+        addLabeledRow(panel, constraints, "ForceEditorPanel.allowAeroBombs.label", chkAllowAeroBombs);
+        addLabeledRow(panel, constraints, "ForceEditorPanel.startAltitude.label", spnStartingAltitude);
+        addLabeledRow(panel, constraints, "ForceEditorPanel.isArtillery.label", chkUseArtillery);
+        addLabeledRow(panel, constraints, "ForceEditorPanel.deployOffBoard.label", chkOffBoard);
+        addLabeledRow(panel, constraints, "ForceEditorPanel.subjectToRandomRemoval.label", chkSubjectToRandomRemoval);
+        addLabeledRow(panel, constraints, "ForceEditorPanel.syncRetreatThreshold.label", chkSyncRetreatThreshold);
 
-        gbc.gridx = 1;
-        gbc.anchor = GridBagConstraints.EAST;
-        panel.add(btnSave, gbc);
+        constraints.gridx = 1;
+        constraints.anchor = GridBagConstraints.EAST;
+        panel.add(btnSave, constraints);
         return panel;
     }
 
@@ -300,15 +305,15 @@ public class ForceEditorPanel extends JPanel {
     }
 
     /** Adds a resource-keyed label (column 0) and its control (column 1) on the current row, then advances a row. */
-    private void addLabeledRow(JPanel panel, GridBagConstraints gbc, String labelKey, java.awt.Component control) {
-        gbc.gridx = 0;
-        panel.add(new JLabel(RESOURCES.getString(labelKey)), gbc);
-        gbc.gridx = 1;
-        panel.add(control, gbc);
-        gbc.gridy++;
+    private void addLabeledRow(JPanel panel, GridBagConstraints constraints, String labelKey, Component control) {
+        constraints.gridx = 0;
+        panel.add(new JLabel(RESOURCES.getString(labelKey)), constraints);
+        constraints.gridx = 1;
+        panel.add(control, constraints);
+        constraints.gridy++;
     }
 
-    private static FastJScrollPane sizedScroll(java.awt.Component view, int width, int height) {
+    private static FastJScrollPane sizedScroll(Component view, int width, int height) {
         FastJScrollPane scrollPane = new FastJScrollPane(view);
         scrollPane.setPreferredSize(new Dimension(width, height));
         return scrollPane;
@@ -491,44 +496,44 @@ public class ForceEditorPanel extends JPanel {
         int retreatThreshold = (int) spnRetreatThreshold.getValue();
         int allowedUnitType = currentAllowedUnitType();
 
-        ScenarioForceTemplate sft = new ScenarioForceTemplate(forceAlignment,
+        ScenarioForceTemplate forceTemplate = new ScenarioForceTemplate(forceAlignment,
               generationMethod,
               forceMultiplier,
               null,
               destinationZone,
               retreatThreshold,
               allowedUnitType);
-        sft.setCanReinforceLinked(chkReinforce.isSelected());
-        sft.setContributesToBV(chkContributesToBV.isSelected());
-        sft.setContributesToUnitCount(chkContributesToUnitCount.isSelected());
-        sft.setForceName(txtForceName.getText());
-        sft.setArrivalTurn((int) spnArrivalTurn.getValue());
-        sft.setFixedUnitCount((int) spnFixedUnitCount.getValue());
-        sft.setContributesToMapSize(chkContributesToMapSize.isSelected());
-        sft.setMaxWeightClass(cboMaxWeightClass.getSelectedIndex());
-        sft.setMinWeightClass(cboMinWeightClass.getSelectedIndex());
-        sft.setGenerationOrder((int) spnGenerationOrder.getValue());
-        sft.setAllowAeroBombs(chkAllowAeroBombs.isSelected());
-        sft.setStartingAltitude((int) spnStartingAltitude.getValue());
-        sft.setUseArtillery(chkUseArtillery.isSelected());
-        sft.setDeployOffboard(chkOffBoard.isSelected());
-        sft.setSubjectToRandomRemoval(chkSubjectToRandomRemoval.isSelected());
-        sft.setSyncRetreatThreshold(chkSyncRetreatThreshold.isSelected());
-        sft.setSyncDeploymentType(SynchronizedDeploymentType.values()[cboSyncDeploymentType.getSelectedIndex()]);
-        sft.setFixedMul(listMULs.getSelectedValue());
-        sft.setObjectiveLinkedForces(new ArrayList<>(lstObjectiveLinkedForces.getSelectedValuesList()));
+        forceTemplate.setCanReinforceLinked(chkReinforce.isSelected());
+        forceTemplate.setContributesToBV(chkContributesToBV.isSelected());
+        forceTemplate.setContributesToUnitCount(chkContributesToUnitCount.isSelected());
+        forceTemplate.setForceName(txtForceName.getText());
+        forceTemplate.setArrivalTurn((int) spnArrivalTurn.getValue());
+        forceTemplate.setFixedUnitCount((int) spnFixedUnitCount.getValue());
+        forceTemplate.setContributesToMapSize(chkContributesToMapSize.isSelected());
+        forceTemplate.setMaxWeightClass(cboMaxWeightClass.getSelectedIndex());
+        forceTemplate.setMinWeightClass(cboMinWeightClass.getSelectedIndex());
+        forceTemplate.setGenerationOrder((int) spnGenerationOrder.getValue());
+        forceTemplate.setAllowAeroBombs(chkAllowAeroBombs.isSelected());
+        forceTemplate.setStartingAltitude((int) spnStartingAltitude.getValue());
+        forceTemplate.setUseArtillery(chkUseArtillery.isSelected());
+        forceTemplate.setDeployOffboard(chkOffBoard.isSelected());
+        forceTemplate.setSubjectToRandomRemoval(chkSubjectToRandomRemoval.isSelected());
+        forceTemplate.setSyncRetreatThreshold(chkSyncRetreatThreshold.isSelected());
+        forceTemplate.setSyncDeploymentType(SynchronizedDeploymentType.values()[cboSyncDeploymentType.getSelectedIndex()]);
+        forceTemplate.setFixedMul(listMULs.getSelectedValue());
+        forceTemplate.setObjectiveLinkedForces(new ArrayList<>(lstObjectiveLinkedForces.getSelectedValuesList()));
 
-        sft.getRoleCollections().clear();
-        sft.getRoleCollections().addAll(roleSetEditorPanel.getRoleSets());
+        forceTemplate.getRoleCollections().clear();
+        forceTemplate.getRoleCollections().addAll(roleSetEditorPanel.getRoleSets());
 
-        if (sft.getSyncDeploymentType() != SynchronizedDeploymentType.None) {
+        if (forceTemplate.getSyncDeploymentType() != SynchronizedDeploymentType.None) {
             Object syncedForce = cboSyncForceName.getSelectedItem();
-            sft.setSyncedForceName(syncedForce == null ? null : syncedForce.toString());
+            forceTemplate.setSyncedForceName(syncedForce == null ? null : syncedForce.toString());
         } else {
-            sft.setDeploymentZones(deploymentZones);
+            forceTemplate.setDeploymentZones(deploymentZones);
         }
 
-        return sft;
+        return forceTemplate;
     }
 
     private int currentAllowedUnitType() {
@@ -536,10 +541,11 @@ public class ForceEditorPanel extends JPanel {
     }
 
     private void forceAlignmentChanged() {
-        boolean isPlayerForce = java.util.Objects.equals(cboAlignment.getSelectedItem(),
-              ScenarioForceTemplate.FORCE_ALIGNMENTS[0]) &&
-                                      java.util.Objects.equals(cboGenerationMethod.getSelectedItem(),
-                                            ScenarioForceTemplate.FORCE_GENERATION_METHODS[0]);
+        boolean rightAlignment = Objects.equals(cboAlignment.getSelectedItem(),
+              ScenarioForceTemplate.FORCE_ALIGNMENTS[0]);
+        boolean rightMethod = Objects.equals(cboGenerationMethod.getSelectedItem(),
+              ScenarioForceTemplate.FORCE_GENERATION_METHODS[0]);
+        boolean isPlayerForce = rightAlignment && rightMethod;
 
         boolean isEnemyForce = (cboAlignment.getSelectedIndex() == ForceAlignment.Opposing.ordinal()) ||
                                      (cboAlignment.getSelectedIndex() == ForceAlignment.Third.ordinal()) ||

@@ -33,6 +33,7 @@
 package mekhq.gui.scenarioTemplateEditor;
 
 import static megamek.client.ui.WrapLayout.wordWrap;
+import static megamek.client.ui.util.UIUtil.scaleForGUI;
 
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
@@ -48,6 +49,7 @@ import javax.swing.ListSelectionModel;
 import megamek.common.ui.FastJScrollPane;
 import mekhq.campaign.mission.ScenarioObjective;
 import mekhq.campaign.mission.ScenarioTemplate;
+import org.jspecify.annotations.NonNull;
 
 /**
  * Editor panel for a scenario template's objectives: the objective list plus add/edit (via {@link ObjectiveEditPanel})
@@ -76,9 +78,9 @@ public class ObjectivesPanel extends JPanel {
     private void initComponents() {
         objectiveList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
         objectiveList.setVisibleRowCount(5);
-        objectiveList.setFixedCellWidth(400);
+        objectiveList.setFixedCellWidth(scaleForGUI(400));
         objectiveList.addListSelectionListener(
-              e -> btnRemoveObjective.setEnabled(!objectiveList.getSelectedValuesList().isEmpty()));
+              evt -> btnRemoveObjective.setEnabled(!objectiveList.getSelectedValuesList().isEmpty()));
         objectiveList.setToolTipText(wordWrap(RESOURCES.getString("ObjectivesPanel.list.tooltip")));
 
         JButton btnAddEditObjective = new JButton(RESOURCES.getString("ObjectivesPanel.addEdit"));
@@ -86,27 +88,27 @@ public class ObjectivesPanel extends JPanel {
         btnAddEditObjective.addActionListener(evt -> openObjectiveEditor());
 
         btnRemoveObjective.setToolTipText(wordWrap(RESOURCES.getString("ObjectivesPanel.remove.tooltip")));
-        btnRemoveObjective.addActionListener(e -> removeSelectedObjectives());
+        btnRemoveObjective.addActionListener(evt -> removeSelectedObjectives());
         btnRemoveObjective.setEnabled(false);
 
-        GridBagConstraints gbc = new GridBagConstraints();
-        gbc.insets = new Insets(0, 0, 0, 5);
+        GridBagConstraints constraints = new GridBagConstraints();
+        constraints.insets = new Insets(0, 0, 0, scaleForGUI(5));
 
-        gbc.gridx = 0;
-        gbc.gridy = 0;
-        add(new JLabel(RESOURCES.getString("ObjectivesPanel.title")), gbc);
+        constraints.gridx = 0;
+        constraints.gridy = 0;
+        add(new JLabel(RESOURCES.getString("ObjectivesPanel.title")), constraints);
 
-        gbc.gridx = 1;
-        gbc.gridy = 1;
-        gbc.gridheight = GridBagConstraints.REMAINDER;
-        add(new FastJScrollPane(objectiveList), gbc);
+        constraints.gridx = 1;
+        constraints.gridy = 1;
+        constraints.gridheight = GridBagConstraints.REMAINDER;
+        add(new FastJScrollPane(objectiveList), constraints);
 
-        gbc.gridx = 2;
-        gbc.gridy = 2;
-        gbc.gridheight = 1;
-        add(btnAddEditObjective, gbc);
-        gbc.gridy = 3;
-        add(btnRemoveObjective, gbc);
+        constraints.gridx = 2;
+        constraints.gridy = 2;
+        constraints.gridheight = 1;
+        add(btnAddEditObjective, constraints);
+        constraints.gridy = 3;
+        add(btnRemoveObjective, constraints);
     }
 
     /**
@@ -151,16 +153,15 @@ public class ObjectivesPanel extends JPanel {
         if (template == null) {
             return;
         }
-        ObjectiveEditPanel editPanel = (objectiveList.getSelectedValue() != null)
-                                             ?
-                                             new ObjectiveEditPanel(template,
-                                                   objectiveList.getSelectedValue(),
-                                                   this,
-                                                   this::refresh)
-                                             :
+        ObjectiveEditPanel editPanel = objectiveList.getSelectedValue() != null ?
+                                             createObjectiveEditPanel() :
                                              new ObjectiveEditPanel(template, this, this::refresh);
         editPanel.setModal(true);
         editPanel.requestFocus();
         editPanel.setVisible(true);
+    }
+
+    private @NonNull ObjectiveEditPanel createObjectiveEditPanel() {
+        return new ObjectiveEditPanel(template, objectiveList.getSelectedValue(), this, this::refresh);
     }
 }

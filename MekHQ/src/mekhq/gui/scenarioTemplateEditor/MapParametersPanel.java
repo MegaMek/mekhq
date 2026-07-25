@@ -108,49 +108,49 @@ public class MapParametersPanel extends JPanel {
         mapTypeGroup.add(btnUseLowAtmosphereMap);
         mapTypeGroup.add(btnUseSpecificMapTypes);
 
-        GridBagConstraints gbc = new GridBagConstraints();
-        gbc.gridx = 0;
-        gbc.gridy = 0;
-        gbc.anchor = GridBagConstraints.WEST;
+        GridBagConstraints constraints = new GridBagConstraints();
+        constraints.gridx = 0;
+        constraints.gridy = 0;
+        constraints.anchor = GridBagConstraints.WEST;
 
-        gbc.gridwidth = 1;
-        add(new JLabel(RESOURCES.getString("MapParametersPanel.title")), gbc);
+        constraints.gridwidth = 1;
+        add(new JLabel(RESOURCES.getString("MapParametersPanel.title")), constraints);
 
-        addLabeledField(gbc, "MapParametersPanel.baseWidth.label", txtBaseWidth);
-        addLabeledField(gbc, "MapParametersPanel.baseHeight.label", txtBaseHeight);
-        addLabeledField(gbc, "MapParametersPanel.widthIncrement.label", txtWidthIncrement);
-        addLabeledField(gbc, "MapParametersPanel.heightIncrement.label", txtHeightIncrement);
-        addLabeledSpinner(gbc, "MapParametersPanel.additionalMapSheetWide.label",
+        addLabeledField(constraints, "MapParametersPanel.baseWidth.label", txtBaseWidth);
+        addLabeledField(constraints, "MapParametersPanel.baseHeight.label", txtBaseHeight);
+        addLabeledField(constraints, "MapParametersPanel.widthIncrement.label", txtWidthIncrement);
+        addLabeledField(constraints, "MapParametersPanel.heightIncrement.label", txtHeightIncrement);
+        addLabeledSpinner(constraints, "MapParametersPanel.additionalMapSheetWide.label",
               "MapParametersPanel.additionalMapSheetWide.tooltip", spnAdditionalMapSheetWide);
-        addLabeledSpinner(gbc, "MapParametersPanel.additionalMapSheetTall.label",
+        addLabeledSpinner(constraints, "MapParametersPanel.additionalMapSheetTall.label",
               "MapParametersPanel.additionalMapSheetTall.tooltip", spnAdditionalMapSheetTall);
-        addLabeledField(gbc, "MapParametersPanel.allowRotation.label", chkAllowRotation);
+        addLabeledField(constraints, "MapParametersPanel.allowRotation.label", chkAllowRotation);
 
-        gbc.gridx = 0;
-        gbc.gridy++;
+        constraints.gridx = 0;
+        constraints.gridy++;
         JLabel lblUseAtBSizing = new JLabel(RESOURCES.getString("MapParametersPanel.useAtBSizing.label"));
         lblUseAtBSizing.setToolTipText(wordWrap(RESOURCES.getString("MapParametersPanel.useAtBSizing.tooltip")));
-        add(lblUseAtBSizing, gbc);
-        gbc.gridx = 1;
-        add(chkUseAtBSizing, gbc);
+        add(lblUseAtBSizing, constraints);
+        constraints.gridx = 1;
+        add(chkUseAtBSizing, constraints);
 
         // map type / terrain columns
-        gbc.gridx = 2;
-        gbc.gridy = 1;
-        add(new JLabel(RESOURCES.getString("MapParametersPanel.allowedMapTypes.label")), gbc);
-        gbc.gridy++;
-        add(btnAllowAllMapTypes, gbc);
-        gbc.gridy++;
-        add(btnUseSpaceMap, gbc);
-        gbc.gridy++;
-        add(btnUseLowAtmosphereMap, gbc);
-        gbc.gridy++;
-        add(btnUseSpecificMapTypes, gbc);
+        constraints.gridx = 2;
+        constraints.gridy = 1;
+        add(new JLabel(RESOURCES.getString("MapParametersPanel.allowedMapTypes.label")), constraints);
+        constraints.gridy++;
+        add(btnAllowAllMapTypes, constraints);
+        constraints.gridy++;
+        add(btnUseSpaceMap, constraints);
+        constraints.gridy++;
+        add(btnUseLowAtmosphereMap, constraints);
+        constraints.gridy++;
+        add(btnUseSpecificMapTypes, constraints);
 
-        gbc.gridx = 3;
-        gbc.gridy = 1;
-        gbc.gridheight = GridBagConstraints.RELATIVE;
-        add(new FastJScrollPane(lstAllowedTerrainTypes), gbc);
+        constraints.gridx = 3;
+        constraints.gridy = 1;
+        constraints.gridheight = GridBagConstraints.RELATIVE;
+        add(new FastJScrollPane(lstAllowedTerrainTypes), constraints);
 
         applyTooltips();
     }

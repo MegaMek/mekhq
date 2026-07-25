@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2018-2025 The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2018-2026 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -358,10 +358,11 @@ public class AtBScenarioModifier implements Cloneable {
             }
 
             JAXBContext context = JAXBContext.newInstance(AtBScenarioModifier.class);
-            Unmarshaller um = context.createUnmarshaller();
+            Unmarshaller unmarshaller = context.createUnmarshaller();
             try (FileInputStream fileStream = new FileInputStream(inputFile)) {
                 Source inputSource = MHQXMLUtility.createSafeXmlSource(fileStream);
-                JAXBElement<AtBScenarioModifier> modifierElement = um.unmarshal(inputSource, AtBScenarioModifier.class);
+                JAXBElement<AtBScenarioModifier> modifierElement = unmarshaller.unmarshal(inputSource,
+                      AtBScenarioModifier.class);
                 resultingModifier = modifierElement.getValue();
             }
         } catch (Exception ex) {

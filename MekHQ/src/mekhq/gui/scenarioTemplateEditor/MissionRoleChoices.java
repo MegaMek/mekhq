@@ -32,10 +32,9 @@
  */
 package mekhq.gui.scenarioTemplateEditor;
 
-import java.util.Arrays;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
-import java.util.Objects;
 import java.util.stream.Collectors;
 
 import megamek.client.ratgenerator.MissionRole;
@@ -63,10 +62,17 @@ public final class MissionRoleChoices {
      * @return the selectable roles, in enum declaration order
      */
     public static List<MissionRole> selectableRoles(int allowedUnitType) {
-        return Arrays.stream(MissionRole.values())
-                     .filter(role -> allowedUnitType < 0 || role.fitsUnitType(allowedUnitType))
-                     .filter(MissionRoleChoices::roundTrips)
-                     .toList();
+        List<MissionRole> selectableRoles = new ArrayList<>();
+
+        for (MissionRole role : MissionRole.values()) {
+            if (allowedUnitType < 0 || role.fitsUnitType(allowedUnitType)) {
+                if (roundTrips(role)) {
+                    selectableRoles.add(role);
+                }
+            }
+        }
+
+        return selectableRoles;
     }
 
     private static boolean roundTrips(MissionRole role) {
@@ -93,12 +99,22 @@ public final class MissionRoleChoices {
      * @return the roles it names
      */
     public static List<MissionRole> fromEntry(String entry) {
-        return Arrays.stream(entry.split(","))
-                     .map(String::trim)
-                     .filter(token -> !token.isEmpty())
-                     .map(MissionRole::parseRole)
-                     .filter(Objects::nonNull)
-                     .toList();
+        List<MissionRole> roles = new ArrayList<>();
+
+        for (String token : entry.split(",")) {
+            token = token.trim();
+
+            if (token.isEmpty()) {
+                continue;
+            }
+
+            MissionRole role = MissionRole.parseRole(token);
+            if (role != null) {
+                roles.add(role);
+            }
+        }
+
+        return roles;
     }
 
     /**
@@ -110,9 +126,17 @@ public final class MissionRoleChoices {
      * @return a display label
      */
     public static String describe(String entry) {
-        String described = fromEntry(entry).stream()
-                                 .map(role -> role.toString().replace('_', ' '))
-                                 .collect(Collectors.joining(", "));
-        return described.isEmpty() ? entry : described;
+        List<MissionRole> roles = fromEntry(entry);
+        StringBuilder described = new StringBuilder();
+
+        for (MissionRole role : roles) {
+            if (!described.isEmpty()) {
+                described.append(", ");
+            }
+
+            described.append(role.toString().replace('_', ' '));
+        }
+
+        return described.isEmpty() ? entry : described.toString();
     }
 }

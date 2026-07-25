@@ -33,6 +33,7 @@
 package mekhq.gui.scenarioTemplateEditor;
 
 import static megamek.client.ui.WrapLayout.wordWrap;
+import static megamek.client.ui.util.UIUtil.scaleForGUI;
 
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
@@ -90,42 +91,44 @@ public class TemplatePropertiesPanel extends JPanel {
 
         applyTooltips();
 
-        GridBagConstraints gbc = new GridBagConstraints();
-        gbc.gridx = 0;
-        gbc.gridy = 0;
-        gbc.gridwidth = GridBagConstraints.REMAINDER;
-        gbc.anchor = GridBagConstraints.WEST;
-        gbc.insets = new Insets(2, 2, 2, 2);
+        GridBagConstraints constraints = new GridBagConstraints();
+        constraints.gridx = 0;
+        constraints.gridy = 0;
+        constraints.gridwidth = GridBagConstraints.REMAINDER;
+        constraints.anchor = GridBagConstraints.WEST;
 
-        add(new JLabel(RESOURCES.getString("TemplatePropertiesPanel.scenarioName.label")), gbc);
-        gbc.gridy++;
-        add(txtName, gbc);
+        int padding = scaleForGUI(5);
+        constraints.insets = new Insets(padding, padding, padding, padding);
 
-        gbc.gridy++;
-        add(new JLabel(RESOURCES.getString("TemplatePropertiesPanel.shortBriefing.label")), gbc);
-        gbc.gridy++;
-        add(new FastJScrollPane(txtShortBriefing), gbc);
+        add(new JLabel(RESOURCES.getString("TemplatePropertiesPanel.scenarioName.label")), constraints);
+        constraints.gridy++;
+        add(txtName, constraints);
 
-        gbc.gridy++;
-        add(new JLabel(RESOURCES.getString("TemplatePropertiesPanel.detailedBriefing.label")), gbc);
-        gbc.gridy++;
-        add(new FastJScrollPane(txtLongBriefing), gbc);
+        constraints.gridy++;
+        add(new JLabel(RESOURCES.getString("TemplatePropertiesPanel.shortBriefing.label")), constraints);
+        constraints.gridy++;
+        add(new FastJScrollPane(txtShortBriefing), constraints);
+
+        constraints.gridy++;
+        add(new JLabel(RESOURCES.getString("TemplatePropertiesPanel.detailedBriefing.label")), constraints);
+        constraints.gridy++;
+        add(new FastJScrollPane(txtLongBriefing), constraints);
 
         JPanel typeRow = new JPanel();
         typeRow.add(new JLabel(RESOURCES.getString("TemplatePropertiesPanel.scenarioType.label")));
         typeRow.add(cboScenarioType);
         typeRow.add(new JLabel(RESOURCES.getString("TemplatePropertiesPanel.battlefieldControl.label")));
         typeRow.add(cboBattlefieldControl);
-        gbc.gridy++;
-        add(typeRow, gbc);
+        constraints.gridy++;
+        add(typeRow, constraints);
 
         JPanel flagRow = new JPanel();
         flagRow.add(chkHostileFacility);
         flagRow.add(chkAlliedFacility);
         flagRow.add(chkSuitedForAmbushes);
         flagRow.add(chkSuitedForBungledPatrols);
-        gbc.gridy++;
-        add(flagRow, gbc);
+        constraints.gridy++;
+        add(flagRow, constraints);
     }
 
     /** Applies word-wrapped, behavior-accurate tooltips to the controls. */
@@ -168,8 +171,17 @@ public class TemplatePropertiesPanel extends JPanel {
         template.name = txtName.getText();
         template.shortBriefing = txtShortBriefing.getText();
         template.detailedBriefing = txtLongBriefing.getText();
-        template.setStratConScenarioType(((ScenarioType) cboScenarioType.getSelectedItem()).name());
-        template.battlefieldControl = (BattlefieldControlType) cboBattlefieldControl.getSelectedItem();
+
+        ScenarioType selectedScenarioType = (ScenarioType) cboScenarioType.getSelectedItem();
+        if (selectedScenarioType != null) {
+            template.setStratConScenarioType(selectedScenarioType.name());
+        }
+
+        BattlefieldControlType selectedBattlefieldControl = (BattlefieldControlType) cboBattlefieldControl.getSelectedItem();
+        if (selectedBattlefieldControl != null) {
+            template.battlefieldControl = selectedBattlefieldControl;
+        }
+
         template.isHostileFacility = chkHostileFacility.isSelected();
         template.isAlliedFacility = chkAlliedFacility.isSelected();
         template.isSuitedForAmbushes = chkSuitedForAmbushes.isSelected();

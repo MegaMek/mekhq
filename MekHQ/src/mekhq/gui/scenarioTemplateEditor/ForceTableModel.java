@@ -111,55 +111,61 @@ public class ForceTableModel extends AbstractTableModel {
 
     @Override
     public Object getValueAt(int rowIndex, int columnIndex) {
-        ScenarioForceTemplate sft = forces.get(rowIndex);
-        boolean isPlayerForce = sft.isPlayerForce();
-        boolean hidesContributionFlags = sft.isEnemyBotForce()
-                                               || (sft.getForceAlignment() == ForceAlignment.PlanetOwner.ordinal());
+        ScenarioForceTemplate forceTemplate = forces.get(rowIndex);
+        boolean isPlayerForce = forceTemplate.isPlayerForce();
+        boolean hidesContributionFlags = forceTemplate.isEnemyBotForce()
+                                               ||
+                                               (forceTemplate.getForceAlignment() ==
+                                                      ForceAlignment.PlanetOwner.ordinal());
 
         return switch (columnIndex) {
-            case COL_ORDER -> Integer.toString(sft.getGenerationOrder());
-            case COL_FORCE_ID -> sft.getForceName();
-            case COL_ALIGNMENT -> ScenarioForceTemplate.FORCE_ALIGNMENTS[sft.getForceAlignment()];
-            case COL_GENERATION -> ScenarioForceTemplate.FORCE_GENERATION_METHODS[sft.getGenerationMethod()];
-            case COL_MULTIPLIER -> multiplierText(sft, isPlayerForce);
-            case COL_DEPLOYMENT -> deploymentText(sft);
-            case COL_DESTINATION -> ScenarioForceTemplate.BOT_DESTINATION_ZONES[sft.getDestinationZone()];
-            case COL_RETREAT -> Integer.toString(sft.getRetreatThreshold());
-            case COL_UNIT_TYPE -> isPlayerForce ? "" : sft.getAllowedUnitTypeName();
-            case COL_MAX_WEIGHT -> isPlayerForce ? "" : EntityWeightClass.getClassName(sft.getMaxWeightClass());
-            case COL_ARRIVAL -> arrivalText(sft);
-            case COL_REINFORCE -> yesNo(sft.getCanReinforceLinked());
-            case COL_CONTRIBUTES_BV -> hidesContributionFlags ? "" : yesNo(sft.getContributesToBV());
-            case COL_CONTRIBUTES_UNIT_COUNT -> hidesContributionFlags ? "" : yesNo(sft.getContributesToUnitCount());
-            case COL_CONTRIBUTES_MAP_SIZE -> yesNo(sft.getContributesToMapSize());
+            case COL_ORDER -> Integer.toString(forceTemplate.getGenerationOrder());
+            case COL_FORCE_ID -> forceTemplate.getForceName();
+            case COL_ALIGNMENT -> ScenarioForceTemplate.FORCE_ALIGNMENTS[forceTemplate.getForceAlignment()];
+            case COL_GENERATION -> ScenarioForceTemplate.FORCE_GENERATION_METHODS[forceTemplate.getGenerationMethod()];
+            case COL_MULTIPLIER -> multiplierText(forceTemplate, isPlayerForce);
+            case COL_DEPLOYMENT -> deploymentText(forceTemplate);
+            case COL_DESTINATION -> ScenarioForceTemplate.BOT_DESTINATION_ZONES[forceTemplate.getDestinationZone()];
+            case COL_RETREAT -> Integer.toString(forceTemplate.getRetreatThreshold());
+            case COL_UNIT_TYPE -> isPlayerForce ? "" : forceTemplate.getAllowedUnitTypeName();
+            case COL_MAX_WEIGHT ->
+                  isPlayerForce ? "" : EntityWeightClass.getClassName(forceTemplate.getMaxWeightClass());
+            case COL_ARRIVAL -> arrivalText(forceTemplate);
+            case COL_REINFORCE -> yesNo(forceTemplate.getCanReinforceLinked());
+            case COL_CONTRIBUTES_BV -> hidesContributionFlags ? "" : yesNo(forceTemplate.getContributesToBV());
+            case COL_CONTRIBUTES_UNIT_COUNT ->
+                  hidesContributionFlags ? "" : yesNo(forceTemplate.getContributesToUnitCount());
+            case COL_CONTRIBUTES_MAP_SIZE -> yesNo(forceTemplate.getContributesToMapSize());
             default -> "";
         };
     }
 
-    private static String multiplierText(ScenarioForceTemplate sft, boolean isPlayerForce) {
+    private static String multiplierText(ScenarioForceTemplate forceTemplate, boolean isPlayerForce) {
         if (isPlayerForce) {
             return "";
         }
-        if (sft.getGenerationMethod() == ForceGenerationMethod.FixedUnitCount.ordinal()) {
-            return sft.getFixedUnitCount() >= 0 ? Integer.toString(sft.getFixedUnitCount()) : "Lance";
+        if (forceTemplate.getGenerationMethod() == ForceGenerationMethod.FixedUnitCount.ordinal()) {
+            return forceTemplate.getFixedUnitCount() >= 0 ?
+                         Integer.toString(forceTemplate.getFixedUnitCount()) :
+                         "Lance";
         }
-        return Double.toString(sft.getForceMultiplier());
+        return Double.toString(forceTemplate.getForceMultiplier());
     }
 
-    private static String deploymentText(ScenarioForceTemplate sft) {
-        if (!sft.getDeploymentZones().isEmpty()) {
-            return sft.getDeploymentZones().stream()
+    private static String deploymentText(ScenarioForceTemplate forceTemplate) {
+        if (!forceTemplate.getDeploymentZones().isEmpty()) {
+            return forceTemplate.getDeploymentZones().stream()
                          .map(zone -> ScenarioForceTemplate.DEPLOYMENT_ZONES[zone])
                          .collect(Collectors.joining(", "));
         }
-        return ScenarioForceTemplate.FORCE_DEPLOYMENT_SYNC_TYPES[sft.getSyncDeploymentType().ordinal()]
-                     + " as " + sft.getSyncedForceName();
+        return ScenarioForceTemplate.FORCE_DEPLOYMENT_SYNC_TYPES[forceTemplate.getSyncDeploymentType().ordinal()]
+                     + " as " + forceTemplate.getSyncedForceName();
     }
 
-    private static String arrivalText(ScenarioForceTemplate sft) {
-        return sft.getArrivalTurn() < 0
-                     ? ScenarioForceTemplate.SPECIAL_ARRIVAL_TURNS.get(sft.getArrivalTurn())
-                     : Integer.toString(sft.getArrivalTurn());
+    private static String arrivalText(ScenarioForceTemplate forceTemplate) {
+        return forceTemplate.getArrivalTurn() < 0
+                     ? ScenarioForceTemplate.SPECIAL_ARRIVAL_TURNS.get(forceTemplate.getArrivalTurn())
+                     : Integer.toString(forceTemplate.getArrivalTurn());
     }
 
     private static String yesNo(boolean value) {
