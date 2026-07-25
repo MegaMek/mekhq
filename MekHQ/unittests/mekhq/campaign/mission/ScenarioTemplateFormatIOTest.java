@@ -61,9 +61,10 @@ class ScenarioTemplateFormatIOTest {
         Path out = tempDir.resolve("Assassination.json");
         original.Serialize(out.toFile());
 
-        // The written file is JSON, not XML.
+        // The written file leads with the '#' license header, then the JSON object (not XML).
         String written = Files.readString(out);
-        assertTrue(written.stripLeading().startsWith("{"), () -> "expected JSON, got: " + written);
+        assertTrue(written.startsWith("# MegaMek Data (C)"), () -> "expected leading license header, got: " + written);
+        assertTrue(written.contains("\n{"), () -> "expected a JSON object after the header, got: " + written);
 
         // And it reloads through the format-detecting deserializer to an equivalent template (compared via canonical
         // XML, since that is the format-neutral reference).

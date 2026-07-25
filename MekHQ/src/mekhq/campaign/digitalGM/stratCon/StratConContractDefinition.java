@@ -391,10 +391,10 @@ public class StratConContractDefinition {
             }
 
             JAXBContext context = JAXBContext.newInstance(StratConContractDefinition.class);
-            Unmarshaller um = context.createUnmarshaller();
+            Unmarshaller unmarshaller = context.createUnmarshaller();
             try (FileInputStream fileStream = new FileInputStream(inputFile)) {
                 Source inputSource = MHQXMLUtility.createSafeXmlSource(fileStream);
-                JAXBElement<StratConContractDefinition> definitionElement = um.unmarshal(inputSource,
+                JAXBElement<StratConContractDefinition> definitionElement = unmarshaller.unmarshal(inputSource,
                       StratConContractDefinition.class);
                 resultingDefinition = definitionElement.getValue();
             }
@@ -416,11 +416,16 @@ public class StratConContractDefinition {
      * @throws IOException if the file cannot be read
      */
     private static boolean isJsonContent(File inputFile) throws IOException {
+        return jsonBufferReader(inputFile);
+    }
+
+    public static boolean jsonBufferReader(File inputFile) throws IOException {
         try (BufferedReader reader = Files.newBufferedReader(inputFile.toPath(), StandardCharsets.UTF_8)) {
             int character;
             while ((character = reader.read()) != -1) {
                 if (!Character.isWhitespace(character)) {
-                    return character == '{';
+                    // '{' is the object; '#' is the leading license-header comment lines every saved file carries.
+                    return (character == '{') || (character == '#');
                 }
             }
         }

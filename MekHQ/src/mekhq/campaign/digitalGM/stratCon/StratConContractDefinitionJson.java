@@ -34,14 +34,16 @@ package mekhq.campaign.digitalGM.stratCon;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
 
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.PropertyAccessor;
+import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
-import com.fasterxml.jackson.databind.node.ArrayNode;
-import com.fasterxml.jackson.databind.node.ObjectNode;
+import mekhq.utilities.MMDataLicenseHeader;
 
 /**
  * JSON serialization for {@link StratConContractDefinition}. JSON is the write format for the shipped contract
@@ -55,27 +57,6 @@ public final class StratConContractDefinitionJson {
 
     private static final ObjectMapper MAPPER = buildMapper();
 
-    /**
-     * The MegaMek Data legal notice, emitted as a leading {@code _license} array in every saved definition. JSON has no
-     * comment syntax, so the notice the XML files carried in an XML comment is written as data instead. It is ignored
-     * on read (the mapper tolerates unknown properties), so it never reaches the model.
-     */
-    private static final String[] LICENSE_NOTICE = {
-          "MegaMek Data (C) 2025-2026 by The MegaMek Team is licensed under CC BY-NC-SA 4.0.",
-          "To view a copy of this license, visit https://creativecommons.org/licenses/by-nc-sa/4.0/",
-          "",
-          "NOTICE: The MegaMek organization is a non-profit group of volunteers creating free software for the "
-                + "BattleTech community.",
-          "",
-          "MechWarrior, BattleMech, `Mech and AeroTech are registered trademarks of The Topps Company, Inc. "
-                + "All Rights Reserved.",
-          "",
-          "Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of InMediaRes Productions, LLC.",
-          "",
-          "MechWarrior Copyright Microsoft Corporation. MegaMek Data was created under Microsoft's "
-                + "\"Game Content Usage Rules\" <https://www.xbox.com/en-US/developers/rules> and it is not endorsed "
-                + "by or affiliated with Microsoft." };
-
     private StratConContractDefinitionJson() {
     }
 
@@ -86,8 +67,10 @@ public final class StratConContractDefinitionJson {
         mapper.setVisibility(PropertyAccessor.ALL, JsonAutoDetect.Visibility.NONE);
         mapper.setVisibility(PropertyAccessor.FIELD, JsonAutoDetect.Visibility.ANY);
         mapper.enable(SerializationFeature.INDENT_OUTPUT);
-        // Tolerate fields absent from older files (and the injected _license) rather than failing the whole load.
+        // Tolerate fields absent from older files rather than failing the whole load.
         mapper.disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES);
+        // Skip the leading '#' license-header comment lines that lead every saved file.
+        mapper.enable(JsonParser.Feature.ALLOW_YAML_COMMENTS);
         return mapper;
     }
 
@@ -113,14 +96,9 @@ public final class StratConContractDefinitionJson {
      * @throws IOException if the file cannot be written
      */
     static void toFile(StratConContractDefinition definition, File outputFile) throws IOException {
-        // Emit the license notice as the first property, then the definition's own fields. Injecting it into the tree
-        // (rather than adding a model field) keeps it out of the model entirely.
-        ObjectNode root = MAPPER.createObjectNode();
-        ArrayNode license = root.putArray("_license");
-        for (String line : LICENSE_NOTICE) {
-            license.add(line);
-        }
-        root.setAll((ObjectNode) MAPPER.valueToTree(definition));
-        MAPPER.writeValue(outputFile, root);
+        // Lead the file with the MegaMek Data license header (as '#' comment lines) followed by a blank line, then the
+        // JSON. The header carries the file's copyright year forward; ALLOW_YAML_COMMENTS skips it on read.
+        String content = MMDataLicenseHeader.licenseHeader(outputFile) + '\n' + MAPPER.writeValueAsString(definition);
+        Files.writeString(outputFile.toPath(), content, StandardCharsets.UTF_8);
     }
 }

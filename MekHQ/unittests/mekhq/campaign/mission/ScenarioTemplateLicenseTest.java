@@ -59,11 +59,12 @@ class ScenarioTemplateLicenseTest {
         template.Serialize(out);
 
         String content = Files.readString(out.toPath());
-        int licenseIdx = content.indexOf("\"_license\"");
-        int nameIdx = content.indexOf("\"name\"");
-        assertTrue(licenseIdx >= 0, "saved JSON should include a _license block");
-        assertTrue(nameIdx >= 0 && licenseIdx < nameIdx, "the _license block should precede the template fields");
+        assertTrue(content.startsWith("# MegaMek Data (C)"), "saved JSON should begin with the '#' license header");
         assertTrue(content.contains("CC BY-NC-SA 4.0"), "the license text should be the MegaMek Data notice");
+        assertTrue(content.contains("affiliated with Microsoft."), "the license header should be complete");
+        int objectStart = content.indexOf('{');
+        assertTrue(objectStart > 0 && content.substring(0, objectStart).contains("# MegaMek Data"),
+              "the license header must precede the JSON object");
 
         ScenarioTemplate reloaded = ScenarioTemplate.Deserialize(out);
         assertNotNull(reloaded, "a template carrying a _license block should still deserialize");

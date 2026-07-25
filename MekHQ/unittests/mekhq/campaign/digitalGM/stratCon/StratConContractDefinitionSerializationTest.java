@@ -73,14 +73,14 @@ class StratConContractDefinitionSerializationTest {
         original.Serialize(out);
 
         String content = Files.readString(out.toPath());
-        int licenseIdx = content.indexOf("\"_license\"");
-        int briefingIdx = content.indexOf("\"briefing\"");
-        assertTrue(licenseIdx >= 0, "saved JSON should include a _license block");
-        assertTrue(briefingIdx >= 0 && licenseIdx < briefingIdx, "_license should precede the definition fields");
+        assertTrue(content.startsWith("# MegaMek Data (C)"), "saved JSON should begin with the '#' license header");
         assertTrue(content.contains("CC BY-NC-SA 4.0"), "license text should be the MegaMek Data notice");
+        assertTrue(content.contains("affiliated with Microsoft."), "the license header should be complete");
+        assertTrue(content.substring(0, content.indexOf('{')).contains("# MegaMek Data"),
+              "the license header must precede the JSON object");
 
         StratConContractDefinition reloaded = StratConContractDefinition.Deserialize(out);
-        assertNotNull(reloaded, "a definition carrying a _license block should still deserialize");
+        assertNotNull(reloaded, "a definition carrying a leading license header should still deserialize");
         assertEquals("Destroy designated targets.", reloaded.getBriefing());
         assertEquals(-0.3, reloaded.getAlliedFacilityCount());
         assertEquals(-0.5, reloaded.getHostileFacilityCount());

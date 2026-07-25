@@ -32,13 +32,12 @@
  */
 package mekhq.campaign.mission;
 
-import java.io.BufferedReader;
+import static mekhq.campaign.digitalGM.stratCon.StratConContractDefinition.jsonBufferReader;
+
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.PrintWriter;
-import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -376,15 +375,7 @@ public class ScenarioTemplate implements Cloneable {
      * @throws IOException if the file cannot be read
      */
     private static boolean isJsonContent(File inputFile) throws IOException {
-        try (BufferedReader reader = Files.newBufferedReader(inputFile.toPath(), StandardCharsets.UTF_8)) {
-            int character;
-            while ((character = reader.read()) != -1) {
-                if (!Character.isWhitespace(character)) {
-                    return character == '{';
-                }
-            }
-        }
-        return false;
+        return jsonBufferReader(inputFile);
     }
 
     /**
