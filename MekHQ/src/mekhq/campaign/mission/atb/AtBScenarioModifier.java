@@ -32,18 +32,20 @@
  */
 package mekhq.campaign.mission.atb;
 
+import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.IOException;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import javax.xml.namespace.QName;
 import javax.xml.transform.Source;
 
 import jakarta.xml.bind.JAXBContext;
 import jakarta.xml.bind.JAXBElement;
-import jakarta.xml.bind.Marshaller;
 import jakarta.xml.bind.Unmarshaller;
 import jakarta.xml.bind.annotation.XmlElement;
 import jakarta.xml.bind.annotation.XmlElementWrapper;
@@ -343,15 +345,21 @@ public class AtBScenarioModifier implements Cloneable {
         AtBScenarioModifier resultingModifier = null;
 
         try {
-            JAXBContext context = JAXBContext.newInstance(AtBScenarioModifier.class);
-            Unmarshaller um = context.createUnmarshaller();
-            File xmlFile = new File(fileName);
-            if (!xmlFile.exists()) {
+            File inputFile = new File(fileName);
+            if (!inputFile.exists()) {
                 LOGGER.warn("Specified file {} does not exist", fileName);
                 return null;
             }
 
-            try (FileInputStream fileStream = new FileInputStream(xmlFile)) {
+            // JSON is the write format; XML is still read for legacy/user files. Detect by content (a leading '{' or
+            // '#' license-header comment is JSON) rather than file extension.
+            if (isJsonContent(inputFile)) {
+                return AtBScenarioModifierJson.fromFile(inputFile);
+            }
+
+            JAXBContext context = JAXBContext.newInstance(AtBScenarioModifier.class);
+            Unmarshaller um = context.createUnmarshaller();
+            try (FileInputStream fileStream = new FileInputStream(inputFile)) {
                 Source inputSource = MHQXMLUtility.createSafeXmlSource(fileStream);
                 JAXBElement<AtBScenarioModifier> modifierElement = um.unmarshal(inputSource, AtBScenarioModifier.class);
                 resultingModifier = modifierElement.getValue();
@@ -364,18 +372,30 @@ public class AtBScenarioModifier implements Cloneable {
     }
 
     /**
-     * Serialize this instance of a scenario template to a File Please pass in a non-null file.
+     * Determines whether a file holds JSON by inspecting its first non-whitespace character. A leading '{' (the object)
+     * or '#' (the license-header comment lines that lead every saved file) indicates JSON; an XML document begins with
+     * '<' and is treated as XML.
+     */
+    private static boolean isJsonContent(File inputFile) throws IOException {
+        try (BufferedReader reader = Files.newBufferedReader(inputFile.toPath(), StandardCharsets.UTF_8)) {
+            int character;
+            while ((character = reader.read()) != -1) {
+                if (!Character.isWhitespace(character)) {
+                    return (character == '{') || (character == '#');
+                }
+            }
+        }
+        return false;
+    }
+
+    /**
+     * Serialize this scenario modifier to a JSON File. Please pass in a non-null file.
      *
      * @param outputFile The destination file.
      */
     public void Serialize(File outputFile) {
         try {
-            JAXBContext context = JAXBContext.newInstance(AtBScenarioModifier.class);
-            JAXBElement<AtBScenarioModifier> templateElement = new JAXBElement<>(new QName("AtBScenarioModifier"),
-                  AtBScenarioModifier.class, this);
-            Marshaller m = context.createMarshaller();
-            m.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, true);
-            m.marshal(templateElement, outputFile);
+            AtBScenarioModifierJson.toFile(this, outputFile);
         } catch (Exception ex) {
             LOGGER.error("", ex);
         }
