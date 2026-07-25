@@ -1726,10 +1726,11 @@ public final class BriefingTab extends CampaignGuiTab {
         if ((objectives != null) && !objectives.isEmpty()) {
             briefingBody.append("<hr><b>")
                   .append(getTextAt(RESOURCE_BUNDLE, "dialogScenarioAcceptance.objectives.header"))
-                  .append("</b>");
+                  .append("</b><ul>");
             for (ScenarioObjective objective : objectives) {
-                briefingBody.append("<br>").append(objective.getDescription());
+                briefingBody.append("<li>").append(objective.getDescription()).append("</li>");
             }
+            briefingBody.append("</ul>");
         }
 
         description = briefingBody.toString();
