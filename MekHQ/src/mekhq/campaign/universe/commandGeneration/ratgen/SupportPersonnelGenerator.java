@@ -226,8 +226,12 @@ public final class SupportPersonnelGenerator {
         SkillLevel skillLevel = options.getSupportPersonnelSkillLevels().get(role);
 
         for (int i = 0; i < count; i++) {
-            Person person = createAndRecruit(campaign, skillGen, role, experienceLevelFor(skillLevel),
-                  supportRank, targetRankSystem, rankValidator);
+            // Resolve the level here rather than inside experienceLevelFor, so the rank can follow the
+            // level this person actually rolled. With the "Random" picker each one differs.
+            SkillLevel rolled = (skillLevel == null) ? rollRandomSkillLevel() : skillLevel;
+            Person person = createAndRecruit(campaign, skillGen, role, toExperienceLevel(rolled),
+                  RulesetRankAssigner.supportRankFor(role, rolled, campaign.getFaction()),
+                  targetRankSystem, rankValidator);
             if (person != null) {
                 out.add(person);
             }
@@ -330,8 +334,10 @@ public final class SupportPersonnelGenerator {
         if (asPersonnel) {
             // null = "Random": roll each assistant's level individually.
             for (int i = 0; i < needed; i++) {
-                Person person = createAndRecruit(campaign, skillGen, role, experienceLevelFor(skillLevel),
-                      supportRank, targetRankSystem, rankValidator);
+                SkillLevel rolled = (skillLevel == null) ? rollRandomSkillLevel() : skillLevel;
+                Person person = createAndRecruit(campaign, skillGen, role, toExperienceLevel(rolled),
+                      RulesetRankAssigner.supportRankFor(role, rolled, campaign.getFaction()),
+                      targetRankSystem, rankValidator);
                 if (person != null) {
                     out.add(person);
                 }

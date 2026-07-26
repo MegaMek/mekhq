@@ -47,6 +47,8 @@ import mekhq.campaign.force.FormationLevel;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.enums.Profession;
 import mekhq.campaign.personnel.ranks.Rank;
+import megamek.common.enums.SkillLevel;
+import mekhq.campaign.personnel.enums.PersonnelRole;
 import mekhq.campaign.personnel.ranks.RankSystem;
 import mekhq.campaign.personnel.ranks.RankValidator;
 import mekhq.campaign.unit.Unit;
@@ -366,6 +368,88 @@ public final class RulesetRankAssigner {
      */
     static int supportRankForFaction(Faction faction) {
         return (faction != null && (faction.isComStarOrWoB() || faction.isClan())) ? 4 : 8;
+    }
+
+    // Rank indices, using the bands fixed by Rank: enlisted 0-20, warrant 21-30, officer 31-50. The
+    // warrant band is left alone because the shipped rank systems barely populate it - one of twenty
+    // names anything there - so a warrant rank would almost always fall back anyway.
+    private static final int RANK_CORPORAL = 8;         // E8
+    private static final int RANK_SERGEANT = 12;        // E12
+    private static final int RANK_SENIOR_SERGEANT = 16; // E16
+    private static final int RANK_MASTER_SERGEANT = 20; // E20, top of the enlisted band
+    private static final int RANK_LIEUTENANT = 33;      // O3
+    private static final int RANK_CAPTAIN = 34;         // O4
+    private static final int RANK_MAJOR = 35;           // O5
+    private static final int RANK_LT_COLONEL = 37;      // O7
+
+    /**
+     * The rank a generated support person should hold, from their role and how good they are.
+     *
+     * <p>Support staff were all given one index regardless of role or skill, which in the shipped rank
+     * systems is Corporal - so a command's chief surgeon and its greenest astech ranked identically.
+     * This spreads them across the ladder instead, so skill shows in the roster.</p>
+     *
+     * <p>Which band a role sits in follows real practice rather than canon, because canon does not
+     * define separate medical or technical rank ladders - factions publish one ladder and MekHQ renders
+     * it through each profession's column. Physicians and administrators are commissioned and sit in
+     * the officer band; technicians and medics are enlisted and top out at the senior NCO ranks.</p>
+     *
+     * <p>Commissioned roles are capped at Lieutenant Colonel so a command's surgeon never outranks the
+     * officer commanding it. Sparse rank systems are handled by the caller, which walks down from the
+     * requested index until it finds a rank that profession actually names.</p>
+     *
+     * <p>Clan and ComStar/WoB keep their existing flat index: neither organises medical or technical
+     * staff as a commissioned corps, and imposing this ladder on them would misrepresent both.</p>
+     *
+     * @param role    the support role being generated
+     * @param skill   the skill level that person was generated at
+     * @param faction the faction the command is being generated for
+     *
+     * @return the preferred rank index
+     */
+    static int supportRankFor(PersonnelRole role, SkillLevel skill, Faction faction) {
+        if ((faction != null) && (faction.isComStarOrWoB() || faction.isClan())) {
+            return supportRankForFaction(faction);
+        }
+        return isCommissionedSupportRole(role) ? commissionedRank(skill) : enlistedSupportRank(skill);
+    }
+
+    /**
+     * Whether a support role is commissioned. Physicians and administrators hold commissions in the
+     * services this ladder is modelled on; technicians, astechs and medics do not.
+     */
+    private static boolean isCommissionedSupportRole(PersonnelRole role) {
+        return switch (role) {
+            case DOCTOR, ADMINISTRATOR_COMMAND, ADMINISTRATOR_LOGISTICS, ADMINISTRATOR_TRANSPORT,
+                 ADMINISTRATOR_HR -> true;
+            default -> false;
+        };
+    }
+
+    private static int commissionedRank(SkillLevel skill) {
+        if (skill == null) {
+            return RANK_CAPTAIN;
+        }
+        return switch (skill) {
+            case NONE, ULTRA_GREEN, GREEN -> RANK_LIEUTENANT;
+            case REGULAR -> RANK_CAPTAIN;
+            case VETERAN -> RANK_MAJOR;
+            // Elite and above share the cap: the ladder stops below Colonel on purpose.
+            default -> RANK_LT_COLONEL;
+        };
+    }
+
+    private static int enlistedSupportRank(SkillLevel skill) {
+        if (skill == null) {
+            return RANK_SERGEANT;
+        }
+        return switch (skill) {
+            case NONE, ULTRA_GREEN, GREEN -> RANK_CORPORAL;
+            case REGULAR -> RANK_SERGEANT;
+            case VETERAN -> RANK_SENIOR_SERGEANT;
+            // Elite and above share the top of the enlisted band; the warrant band is unusable.
+            default -> RANK_MASTER_SERGEANT;
+        };
     }
 
     /**
