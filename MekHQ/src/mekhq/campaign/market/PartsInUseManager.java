@@ -283,8 +283,11 @@ public class PartsInUseManager {
                 return;
             }
 
-            // Ignore parts if they are from mothballed units and the flag is set
-            if (ignoreMothballedUnits && incomingPart.getUnit() != null && incomingPart.getUnit().isMothballed()) {
+            // Ignore parts if they are from mothballed units and the flag is set.
+            // Uses the unit captured above rather than re-reading getUnit(): the warehouse can be
+            // refreshed on the EDT while a generation worker is still attaching and detaching parts, and
+            // re-fetching left a window where the part was detached between the null check and the call.
+            if (ignoreMothballedUnits && unit.isMothballed()) {
                 return;
             }
 
