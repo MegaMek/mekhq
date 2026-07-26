@@ -104,6 +104,42 @@ public class AddSupportUnitsToTOE {
      * @author Illiani
      * @since 0.51.0
      */
+    /**
+     * Adds units to a formation nested one level deeper than {@link #addSupportUnitsToTOE}, so related
+     * sub-commands can be grouped under a shared parent rather than sitting as siblings directly under
+     * the HQ.
+     *
+     * <p>Both the parent and the child are reused when they already exist, matching the top-up
+     * behaviour of the flat version: regenerating against a grown force lands in the existing
+     * formations instead of creating duplicates beside them.</p>
+     *
+     * @param campaign the active campaign that owns the TOE
+     * @param units    the units to place in the child formation; may be empty, in which case the
+     *                 formations are still created so the structure is present
+     * @param parent   the umbrella formation created under the HQ
+     * @param child    the formation the units are placed in, created under {@code parent}
+     */
+    public static void addSupportUnitsToTOE(Campaign campaign, List<Unit> units,
+          SupportTOEFormationTypes parent, SupportTOEFormationTypes child) {
+        Formation hqFormation = getHqFormation(campaign);
+        Formation parentFormation = findOrCreateChild(campaign, hqFormation, parent.getLabel(),
+              parent.getType());
+        createSubFormation(campaign, child.getLabel(), child.getType(), units, parentFormation);
+    }
+
+    /** Finds the named child of {@code parent}, creating and attaching it when absent. */
+    private static Formation findOrCreateChild(Campaign campaign, Formation parent, String label,
+          FormationType type) {
+        Formation existing = findChildFormationByName(campaign, parent, label);
+        if (existing != null) {
+            return existing;
+        }
+        Formation created = new Formation(label);
+        campaign.getPlayerForce().addFormation(created, parent, campaign);
+        created.setFormationType(type, true);
+        return created;
+    }
+
     private static void createSubFormation(Campaign campaign, String label, FormationType type,
           List<Unit> units, Formation hqFormation) {
         // Reuse an existing sub-formation of this label under the HQ, so a top-up generation (for
