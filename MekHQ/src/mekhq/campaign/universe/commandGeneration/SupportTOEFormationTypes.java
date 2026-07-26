@@ -42,7 +42,12 @@ public enum SupportTOEFormationTypes {
     MEDICAL_FORMATION("MEDICAL_FORMATION", FormationType.SUPPORT),
     SECURITY_FORMATION("SECURITY_FORMATION", FormationType.SECURITY),
     SALVAGE_FORMATION("SALVAGE_FORMATION", FormationType.SALVAGE),
-    LOGISTICS_FORMATION("LOGISTICS_FORMATION", FormationType.CONVOY);
+    LOGISTICS_FORMATION("LOGISTICS_FORMATION", FormationType.CONVOY),
+    /**
+     * The hulls that haul the command's own supplies, kept separate from the Troopships that
+     * carry its combat units so the order of battle shows at a glance what lifts what.
+     */
+    CARGO_FORMATION("CARGO_FORMATION", FormationType.CONVOY);
     //endregion Enum Declarations
 
     //region Variable Declarations
