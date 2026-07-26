@@ -234,13 +234,21 @@ class SupportPersonnelGeneratorTest {
         CommandGenerationOptions options = baseOptions();
         options.getSupportPersonnelSkillLevels().put(PersonnelRole.MEK_TECH, SkillLevel.ELITE);
 
+        // Pin the Mek Tech so the assertion below can name the person it is about. Only this role is
+        // fixed to Elite; every other role stays on the "Random" picker and rolls its own level via
+        // rollRandomSkillLevel(), which returns Elite on a 12. Counting EXP_ELITE calls across the whole
+        // run therefore failed roughly one time in thirty-six per additional support hire, whenever an
+        // unrelated person happened to roll a 12.
+        Person mekTech = mock(Person.class);
+        when(campaign.newPerson(PersonnelRole.MEK_TECH)).thenReturn(mekTech);
+
         SupportPersonnelGenerator.generate(campaign, options, stubSkillGen);
 
-        // We pass a stubbed AbstractSkillGenerator into the package-private overload, so verify
-        // it was called once per generated Mek Tech (the role under test) with the converted
-        // experience level. This proves the SkillLevel-to-EXP conversion is wired correctly.
+        // We pass a stubbed AbstractSkillGenerator into the package-private overload, so verify it was
+        // called for the generated Mek Tech (the role under test) with the converted experience level.
+        // This proves the SkillLevel-to-EXP conversion is wired correctly.
         verify(campaign, times(1)).newPerson(PersonnelRole.MEK_TECH);
-        verify(stubSkillGen, times(1)).generateSkills(eq(campaign), any(), eq(SkillType.EXP_ELITE));
+        verify(stubSkillGen).generateSkills(campaign, mekTech, SkillType.EXP_ELITE);
     }
 
     @Test
