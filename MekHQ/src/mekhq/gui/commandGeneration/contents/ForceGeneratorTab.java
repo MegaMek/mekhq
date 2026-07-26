@@ -35,6 +35,7 @@ package mekhq.gui.commandGeneration.contents;
 import java.awt.BorderLayout;
 import java.util.List;
 import java.util.Map;
+import java.util.function.BooleanSupplier;
 import java.util.function.Supplier;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
@@ -54,6 +55,7 @@ import mekhq.campaign.universe.commandGeneration.CommandGenerationOptions;
 import mekhq.campaign.universe.commandGeneration.ratgen.ForceDescriptorWalker;
 import mekhq.campaign.universe.commandGeneration.ratgen.FormationNamer;
 import mekhq.campaign.universe.enums.ForceNamingMethod;
+import mekhq.gui.commandGeneration.components.CommandGenerationCheckBox;
 
 /**
  * Wraps the embedded {@link ForceGeneratorOptionsView} from MegaMek. The faction / echelon / unit
@@ -90,6 +92,8 @@ public class ForceGeneratorTab {
     // Live source of the Setup tab's Formation Naming Method combo. The options object only receives
     // the combo's value on OK, so the preview must read the control itself to stay in sync mid-dialog.
     private Supplier<ForceNamingMethod> namingMethodSupplier;
+    private BooleanSupplier numberRegimentsSupplier;
+    private CommandGenerationCheckBox chkGenerateMercenaryCompanyCommandLance;
 
     public ForceGeneratorTab(JFrame frame, Campaign campaign, CommandGenerationOptions options) {
         this.frame = frame;
@@ -117,6 +121,12 @@ public class ForceGeneratorTab {
         viewUi.setFormationNameProvider(this::previewNameFor);
 
         ForceGeneratorOptionsView optionsView = viewUi.getOptionsView();
+        // "Generate Company Command Lance" is a campaign-layer option, so it cannot live in the
+        // MegaMek view's own controls - but it modifies what Generate produces, so it belongs beside
+        // the other Generate options rather than on the Setup tab.
+        chkGenerateMercenaryCompanyCommandLance =
+              new CommandGenerationCheckBox("GenerateMercenaryCompanyCommandLance");
+        optionsView.addGenerateOption(chkGenerateMercenaryCompanyCommandLance);
         optionsView.setExportMULButtonVisible(false);
         optionsView.setYearFieldEditable(false);
         if (campaign != null) {
@@ -182,6 +192,27 @@ public class ForceGeneratorTab {
     }
 
     /**
+     * Wires the live source of the Setup tab's "Always number regiments" checkbox into the preview
+     * naming, and is invoked by the pane during construction.
+     *
+     * @param supplier reads the checkbox's current state; {@code null} falls back to the options value
+     */
+    public void setNumberRegimentsSupplier(@Nullable BooleanSupplier supplier) {
+        this.numberRegimentsSupplier = supplier;
+    }
+
+    /**
+     * @return whether the build would number regiments right now: the Setup tab's live checkbox when
+     *       wired, otherwise the value already on the options
+     */
+    private boolean currentNumberRegiments() {
+        if (numberRegimentsSupplier != null) {
+            return numberRegimentsSupplier.getAsBoolean();
+        }
+        return (options != null) && options.isAlwaysNumberRegiments();
+    }
+
+    /**
      * Drops the cached preview names and repaints the tree. Called by the view after each Generate and
      * Include/Exclude toggle, and by the pane when the Setup tab's naming method changes.
      */
@@ -208,6 +239,7 @@ public class ForceGeneratorTab {
                           .map(Formation::getName)
                           .toList();
             FormationNamer namer = new FormationNamer(currentNamingMethod(), existingFormationNames);
+            namer.setAlwaysNumberRegiments(currentNumberRegiments());
             previewNameCache = ForceDescriptorWalker.previewNames(getGeneratedForce(), namer);
         }
         return previewNameCache.get(descriptor);
@@ -251,6 +283,10 @@ public class ForceGeneratorTab {
      */
     public void loadValuesFromOptions(CommandGenerationOptions sourceOptions) {
         this.options = sourceOptions;
+        if ((sourceOptions != null) && (chkGenerateMercenaryCompanyCommandLance != null)) {
+            chkGenerateMercenaryCompanyCommandLance.setSelected(
+                  sourceOptions.isGenerateMercenaryCompanyCommandLance());
+        }
     }
 
     /**
@@ -261,6 +297,10 @@ public class ForceGeneratorTab {
         ForceGeneratorOptionsView optionsView = getOptionsView();
         if (targetOptions == null || optionsView == null) {
             return;
+        }
+        if (chkGenerateMercenaryCompanyCommandLance != null) {
+            targetOptions.setGenerateMercenaryCompanyCommandLance(
+                  chkGenerateMercenaryCompanyCommandLance.isSelected());
         }
         ForceDescriptor fd = optionsView.buildForceDescriptor();
         if (fd != null) {

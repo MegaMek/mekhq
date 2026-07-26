@@ -110,6 +110,7 @@ public class CommandGenerationPane extends AbstractMHQTabbedPane {
         // Naming Method: read the combo live (options only get the value on OK) and refresh the
         // preview names whenever it changes.
         forceGeneratorTab.setNamingMethodSupplier(setupTab::getSelectedForceNamingMethod);
+        forceGeneratorTab.setNumberRegimentsSupplier(setupTab::isAlwaysNumberRegimentsSelected);
         setupTab.setNamingMethodChangeListener(forceGeneratorTab::invalidatePreviewNames);
 
         // The starting-cash preview prices the Force Generator tab's current model, which can change

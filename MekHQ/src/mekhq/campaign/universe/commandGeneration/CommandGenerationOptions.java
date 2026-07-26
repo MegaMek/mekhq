@@ -132,6 +132,7 @@ public class CommandGenerationOptions {
 
     // Force naming and formation icons
     private ForceNamingMethod forceNamingMethod;
+    private boolean alwaysNumberRegiments;
     private boolean generateFormationIcons;
     private boolean useSpecifiedFactionToGenerateFormationIcons;
     private boolean generateOriginNodeFormationIcon;
@@ -225,6 +226,9 @@ public class CommandGenerationOptions {
 
         // Force naming and formation icons
         setForceNamingMethod(ForceNamingMethod.CCB_1943);
+        // On by default: numbered regiments ("1st Mek Regiment") are the form players expect,
+        // and the naming alphabet still drives every echelon below regiment level.
+        setAlwaysNumberRegiments(true);
         setGenerateFormationIcons(true);
         setUseSpecifiedFactionToGenerateFormationIcons(false);
         setGenerateOriginNodeFormationIcon(true);
@@ -530,6 +534,18 @@ public class CommandGenerationOptions {
 
     public void setForceNamingMethod(final ForceNamingMethod forceNamingMethod) {
         this.forceNamingMethod = forceNamingMethod;
+    }
+
+    /**
+     * @return {@code true} when regiment-level formations take a numeric ordinal ("1st Mek Regiment")
+     *       instead of the selected naming alphabet, with each type of regiment counted separately
+     */
+    public boolean isAlwaysNumberRegiments() {
+        return alwaysNumberRegiments;
+    }
+
+    public void setAlwaysNumberRegiments(final boolean alwaysNumberRegiments) {
+        this.alwaysNumberRegiments = alwaysNumberRegiments;
     }
 
     public boolean isGenerateFormationIcons() {

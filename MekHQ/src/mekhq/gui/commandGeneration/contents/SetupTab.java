@@ -164,8 +164,8 @@ public class SetupTab {
     private CommandGenerationOptions options;
 
     // Force shape
-    private CommandGenerationCheckBox chkGenerateMercenaryCompanyCommandLance;
     private MMComboBox<ForceNamingMethod> comboForceNamingMethod;
+    private CommandGenerationCheckBox chkAlwaysNumberRegiments;
     // Notified when the naming-method combo changes, so the Force Generator tab can refresh its
     // preview callsigns mid-dialog (the options object only receives the combo's value on OK).
     private Runnable namingMethodChangeListener;
@@ -305,9 +305,6 @@ public class SetupTab {
         section.setLayout(new GridBagLayout());
         GridBagConstraints gbc = sectionConstraints();
 
-        chkGenerateMercenaryCompanyCommandLance =
-              new CommandGenerationCheckBox("GenerateMercenaryCompanyCommandLance");
-
         comboForceNamingMethod = new MMComboBox<>("comboForceNamingMethod", ForceNamingMethod.values());
         comboForceNamingMethod.setRenderer(new DefaultListCellRenderer() {
             @Override
@@ -329,10 +326,12 @@ public class SetupTab {
             }
         });
 
-        gbc.gridy = 0;
-        gbc.gridx = 0;
-        gbc.gridwidth = 2;
-        section.add(chkGenerateMercenaryCompanyCommandLance, gbc);
+        chkAlwaysNumberRegiments = new CommandGenerationCheckBox("AlwaysNumberRegiments");
+        chkAlwaysNumberRegiments.addActionListener(actionEvent -> {
+            if (namingMethodChangeListener != null) {
+                namingMethodChangeListener.run();
+            }
+        });
 
         gbc.gridwidth = 1;
         gbc.gridy = 1;
@@ -341,7 +340,12 @@ public class SetupTab {
         gbc.gridx = 1;
         section.add(comboForceNamingMethod, gbc);
 
-        addLeftAlignFiller(section, 2);
+        gbc.gridwidth = 2;
+        gbc.gridy = 2;
+        gbc.gridx = 0;
+        section.add(chkAlwaysNumberRegiments, gbc);
+
+        addLeftAlignFiller(section, 3);
         return section;
     }
 
@@ -786,6 +790,15 @@ public class SetupTab {
      *
      * @param listener the callback, or {@code null} to clear
      */
+    /**
+     * Whether the player asked for regiments to be numbered ("1st Mek Regiment") rather than taking the
+     * selected naming alphabet. Read live, like {@link #getSelectedForceNamingMethod()}, so the Force
+     * Generator tab's preview tracks the checkbox before OK writes it to the options.
+     */
+    public boolean isAlwaysNumberRegimentsSelected() {
+        return (chkAlwaysNumberRegiments != null) && chkAlwaysNumberRegiments.isSelected();
+    }
+
     public void setNamingMethodChangeListener(@Nullable Runnable listener) {
         this.namingMethodChangeListener = listener;
     }
@@ -795,8 +808,8 @@ public class SetupTab {
         if (sourceOptions == null) {
             return;
         }
-        chkGenerateMercenaryCompanyCommandLance.setSelected(sourceOptions.isGenerateMercenaryCompanyCommandLance());
         comboForceNamingMethod.setSelectedItem(sourceOptions.getForceNamingMethod());
+        chkAlwaysNumberRegiments.setSelected(sourceOptions.isAlwaysNumberRegiments());
 
         // Per-role coverage % and skill level
         for (Map.Entry<PersonnelRole, JSpinner> entry : spnSupportCoveragePercents.entrySet()) {
@@ -878,11 +891,11 @@ public class SetupTab {
         if (targetOptions == null) {
             return;
         }
-        targetOptions.setGenerateMercenaryCompanyCommandLance(chkGenerateMercenaryCompanyCommandLance.isSelected());
         Object selectedNamingMethod = comboForceNamingMethod.getSelectedItem();
         if (selectedNamingMethod instanceof ForceNamingMethod namingMethod) {
             targetOptions.setForceNamingMethod(namingMethod);
         }
+        targetOptions.setAlwaysNumberRegiments(chkAlwaysNumberRegiments.isSelected());
 
         // Per-role coverage % and skill level
         Map<PersonnelRole, Integer> coverageMap = targetOptions.getSupportPersonnelCoveragePercents();
