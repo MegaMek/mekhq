@@ -33,6 +33,7 @@
 package mekhq.campaign.universe.commandGeneration;
 
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.EnumSet;
 import java.util.List;
 
@@ -44,6 +45,7 @@ import megamek.client.ratgenerator.TransportCalculator;
 import megamek.client.ratgenerator.TransportCalculator.CargoCapacity;
 import megamek.client.ratgenerator.UnitTable;
 import megamek.common.annotations.Nullable;
+import megamek.common.compute.Compute;
 import megamek.common.loaders.MekSummary;
 import megamek.common.units.EntityMovementMode;
 import megamek.common.units.UnitType;
@@ -76,6 +78,14 @@ public final class CargoShipGenerator {
 
     /** Stop after this many hulls, so a pathological requirement cannot generate a fleet forever. */
     private static final int MAX_SHIPS = 50;
+
+    /**
+     * Size band a hull's hold must fall in to be considered for the tonnage still outstanding,
+     * as a fraction of that tonnage. The lower bound keeps a big lift from being met by a swarm
+     * of nearly-empty hulls; the upper bound keeps a small one from buying a leviathan.
+     */
+    private static final double BAND_LOWER_FRACTION = 0.25;
+    private static final double BAND_UPPER_FRACTION = 1.5;
 
     /**
      * What a generation run produced.
@@ -144,29 +154,39 @@ public final class CargoShipGenerator {
             return new Result(List.of(), requiredTons, 0, 0, shortfall);
         }
 
+        List<Candidate> candidates = cargoCapableHulls(table);
+        if (candidates.isEmpty()) {
+            LOGGER.warn("[CompanyGen][Cargo] the DropShip table holds no design with solid cargo holds;"
+                        + " {} tons will be missing", round(shortfall));
+            return new Result(List.of(), requiredTons, 0, 0, shortfall);
+        }
+        LOGGER.debug("[CompanyGen][Cargo] {} cargo-capable hull(s) available, {} to {} solid tons",
+              candidates.size(), round(candidates.getFirst().solidTons()),
+              round(candidates.getLast().solidTons()));
+
         List<Unit> ships = new ArrayList<>();
         double provided = 0;
         double liquidProvided = 0;
         double remaining = shortfall;
         while ((remaining > 0) && (ships.size() < MAX_SHIPS)) {
-            MekSummary hull = table.generateUnit(summary -> TransportCalculator.cargoCapacity(summary).solidTons() > 0);
-            if (hull == null) {
-                LOGGER.warn("[CompanyGen][Cargo] the DropShip table holds no design with solid cargo"
-                            + " holds; {} tons still uncovered", round(remaining));
-                break;
-            }
-            CargoCapacity capacity = TransportCalculator.cargoCapacity(hull);
-            Unit ship = addCrewedShip(campaign, hull);
+            Candidate chosen = pickHull(candidates, remaining);
+            Unit ship = addCrewedShip(campaign, chosen.hull());
             if (ship == null) {
-                // Loading failed and was logged; try another hull rather than spinning on this one.
+                // Loading failed and was logged. Drop the hull so the loop cannot spin on it, and try
+                // again with what is left.
+                candidates.remove(chosen);
+                if (candidates.isEmpty()) {
+                    break;
+                }
                 continue;
             }
             ships.add(ship);
-            provided += capacity.solidTons();
-            liquidProvided += capacity.liquidTons();
-            remaining -= capacity.solidTons();
+            provided += chosen.solidTons();
+            liquidProvided += chosen.liquidTons();
+            remaining -= chosen.solidTons();
             LOGGER.debug("[CompanyGen][Cargo] added '{}' (+{} solid, +{} liquid tons); {} tons remaining",
-                  hull.getName(), round(capacity.solidTons()), round(capacity.liquidTons()), round(remaining));
+                  chosen.hull().getName(), round(chosen.solidTons()), round(chosen.liquidTons()),
+                  round(remaining));
         }
 
         if (ships.size() >= MAX_SHIPS) {
@@ -177,6 +197,102 @@ public final class CargoShipGenerator {
                     + " {} tons short",
               ships.size(), round(provided), round(liquidProvided), round(Math.max(0, remaining)));
         return new Result(ships, requiredTons, provided, liquidProvided, Math.max(0, remaining));
+    }
+
+    /**
+     * A hull the run could buy, with the three numbers selection needs.
+     *
+     * @param hull               the design
+     * @param solidTons          its dry cargo capacity
+     * @param liquidTons         its liquid cargo capacity, carried along but never used to size the run
+     * @param availabilityWeight the design's weight in the faction/era availability table, preserved so
+     *                           the ruleset data still decides which freighter is picked
+     */
+    record Candidate(MekSummary hull, double solidTons, double liquidTons,
+                     int availabilityWeight) {}
+
+    /**
+     * Every cargo-capable hull in the table, smallest hold first.
+     *
+     * <p>Eligibility is measured from the unit file rather than taken from the {@code CARGO} mission
+     * role. The role is a hard filter that excludes anything untagged, and tagging covers only a
+     * fraction of the DropShip designs, so filtering on it would hide most of the hulls that can
+     * actually do the job.</p>
+     */
+    private static List<Candidate> cargoCapableHulls(UnitTable table) {
+        List<Candidate> candidates = new ArrayList<>();
+        for (int index = 0; index < table.getNumEntries(); index++) {
+            MekSummary hull = table.getMekSummary(index);
+            if (hull == null) {
+                // Salvage and other non-unit entries have no summary.
+                continue;
+            }
+            CargoCapacity capacity = TransportCalculator.cargoCapacity(hull);
+            if (capacity.solidTons() <= 0) {
+                continue;
+            }
+            candidates.add(new Candidate(hull, capacity.solidTons(), capacity.liquidTons(),
+                  Math.max(1, table.getEntryWeight(index))));
+        }
+        candidates.sort(Comparator.comparingDouble(Candidate::solidTons));
+        return candidates;
+    }
+
+    /**
+     * Chooses the next hull to buy for a lift with {@code remaining} tons still to cover.
+     *
+     * <p>Candidates are narrowed to those whose hold is a sensible size for the job, and the choice
+     * among them is then made by availability weight. That ordering matters: constraining the size
+     * class first stops a large lift being met by a swarm of hulls that each carry a little, while
+     * drawing by weight second keeps the ruleset's availability data in charge of <em>which</em>
+     * freighter turns up.</p>
+     *
+     * <p>When nothing sits in the band the run falls back deliberately rather than giving up: if any
+     * hull can cover what is left, the smallest such hull is taken so the last ship of a lift is not
+     * wildly oversized; otherwise the largest available hull is taken to chip away at a requirement
+     * bigger than any single design.</p>
+     */
+    static Candidate pickHull(List<Candidate> candidates, double remaining) {
+        double lowerBound = remaining * BAND_LOWER_FRACTION;
+        double upperBound = remaining * BAND_UPPER_FRACTION;
+
+        List<Candidate> banded = candidates.stream()
+              .filter(candidate -> (candidate.solidTons() >= lowerBound)
+                    && (candidate.solidTons() <= upperBound))
+              .toList();
+        if (!banded.isEmpty()) {
+            return drawByAvailability(banded);
+        }
+
+        // Nothing well-sized. Prefer the least overshoot among hulls that finish the job.
+        Candidate smallestThatCovers = null;
+        for (Candidate candidate : candidates) {
+            if (candidate.solidTons() >= remaining) {
+                smallestThatCovers = candidate;
+                break; // sorted ascending, so the first match is the smallest
+            }
+        }
+        if (smallestThatCovers != null) {
+            return smallestThatCovers;
+        }
+        // Every hull is smaller than what is left: take the biggest and go round again.
+        return candidates.getLast();
+    }
+
+    /** Weighted random draw honouring the availability table's weights. */
+    private static Candidate drawByAvailability(List<Candidate> candidates) {
+        int totalWeight = 0;
+        for (Candidate candidate : candidates) {
+            totalWeight += candidate.availabilityWeight();
+        }
+        int roll = Compute.randomInt(totalWeight);
+        for (Candidate candidate : candidates) {
+            roll -= candidate.availabilityWeight();
+            if (roll < 0) {
+                return candidate;
+            }
+        }
+        return candidates.getLast();
     }
 
     /** Builds the DropShip availability table the hulls are drawn from, or {@code null} if unavailable. */
