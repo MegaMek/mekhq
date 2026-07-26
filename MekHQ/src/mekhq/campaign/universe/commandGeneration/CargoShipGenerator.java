@@ -36,6 +36,7 @@ import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.EnumSet;
 import java.util.List;
+import java.util.Set;
 
 import megamek.client.ratgenerator.FactionRecord;
 import megamek.client.ratgenerator.MissionRole;
@@ -120,11 +121,14 @@ public final class CargoShipGenerator {
      * @param rating    the equipment rating to draw hulls at, or {@code null} for any
      * @param cargoPct  percentage of the requirement to provision for; 100 covers it exactly, above
      *                  100 adds headroom, 0 or less generates nothing
+     * @param jumpshipPct the player's JumpShip percentage. At zero no JumpShips are generated for the
+     *                    new hulls, because a zero there is a deliberate instruction not to produce
+     *                    them and this pass has no business overriding it
      *
      * @return what was generated; never {@code null}
      */
     public static Result generate(Campaign campaign, @Nullable String factionCode, int year,
-          @Nullable String rating, double cargoPct) {
+          @Nullable String rating, double cargoPct, double jumpshipPct) {
         if (cargoPct <= 0) {
             LOGGER.debug("[CompanyGen][Cargo] cargo percentage is {}; generating no cargo ships", cargoPct);
             return Result.none();
@@ -153,7 +157,7 @@ public final class CargoShipGenerator {
 
         if (shortfall <= 0) {
             LOGGER.info("[CompanyGen][Cargo] the command can already haul its cargo; no ships needed");
-            return berthAndFile(campaign, factionCode, year, rating, new ArrayList<>(),
+            return berthAndFile(campaign, factionCode, year, rating, jumpshipPct, new ArrayList<>(),
                   requiredTons, 0, 0, 0);
         }
 
@@ -162,15 +166,17 @@ public final class CargoShipGenerator {
             LOGGER.warn("[CompanyGen][Cargo] no DropShip table for faction={} year={} rating={};"
                         + " {} tons of cargo capacity will be missing",
                   factionCode, year, rating, round(shortfall));
-            return berthAndFile(campaign, factionCode, year, rating, new ArrayList<>(),
+            return berthAndFile(campaign, factionCode, year, rating, jumpshipPct, new ArrayList<>(),
                   requiredTons, 0, 0, shortfall);
         }
 
         List<Candidate> candidates = cargoCapableHulls(table);
         if (candidates.isEmpty()) {
-            LOGGER.warn("[CompanyGen][Cargo] the DropShip table holds no design with solid cargo holds;"
-                        + " {} tons will be missing", round(shortfall));
-            return berthAndFile(campaign, factionCode, year, rating, new ArrayList<>(),
+            LOGGER.warn("[CompanyGen][Cargo] faction {} has no cargo-tagged DropShip with holds"
+                        + " available in {}; {} tons will go unhauled rather than be given to combat"
+                        + " hulls. Tag a suitable design with the cargo mission role to fix this.",
+                  factionCode, year, round(shortfall));
+            return berthAndFile(campaign, factionCode, year, rating, jumpshipPct, new ArrayList<>(),
                   requiredTons, 0, 0, shortfall);
         }
         LOGGER.debug("[CompanyGen][Cargo] {} cargo-capable hull(s) available, {} to {} solid tons",
@@ -209,8 +215,8 @@ public final class CargoShipGenerator {
         LOGGER.info("[CompanyGen][Cargo] generated {} cargo ship(s): +{} solid tons, +{} liquid tons,"
                     + " {} tons short",
               ships.size(), round(provided), round(liquidProvided), round(Math.max(0, remaining)));
-        return berthAndFile(campaign, factionCode, year, rating, ships, requiredTons, provided,
-              liquidProvided, Math.max(0, remaining));
+        return berthAndFile(campaign, factionCode, year, rating, jumpshipPct, ships, requiredTons,
+              provided, liquidProvided, Math.max(0, remaining));
     }
 
     /**
@@ -241,6 +247,12 @@ public final class CargoShipGenerator {
                 // Salvage and other non-unit entries have no summary.
                 continue;
             }
+            if (!isFreighter(hull)) {
+                // A warship with a spare hold is not a cargo ship. Keeping it out of the pool entirely,
+                // rather than merely ranking it lower, is what stops an Intruder or a Union turning up
+                // in the Cargo Command.
+                continue;
+            }
             CargoCapacity capacity = TransportCalculator.cargoCapacity(hull);
             if (capacity.solidTons() <= 0) {
                 continue;
@@ -250,6 +262,28 @@ public final class CargoShipGenerator {
         }
         candidates.sort(Comparator.comparingDouble(Candidate::solidTons));
         return candidates;
+    }
+
+    /**
+     * Whether a design is meant to haul cargo, as opposed to a warship that happens to have a hold.
+     *
+     * <p>Measured capacity establishes what a hull <em>can</em> do; the cargo role establishes what it
+     * is <em>for</em>, and is the only thing separating a Mule from a Union with space in the hold. The
+     * role is required rather than preferred: a command's cargo train should be freighters, and no
+     * amount of spare hold makes an assault DropShip one. A design tagged civilian as well as cargo
+     * still qualifies - the cargo tag is what matters.</p>
+     *
+     * <p>The cost of requiring it is that an era or faction with no tagged design generates no lift at
+     * all. That is reported rather than worked around, because quietly substituting warships is the
+     * behaviour this rule exists to prevent.</p>
+     *
+     * @param hull the design to test
+     *
+     * @return {@code true} when the design carries the cargo mission role
+     */
+    private static boolean isFreighter(MekSummary hull) {
+        ModelRecord model = RATGenerator.getInstance().getModelRecord(hull.getName());
+        return (model != null) && model.getRoles().contains(MissionRole.CARGO);
     }
 
     /**
@@ -276,7 +310,7 @@ public final class CargoShipGenerator {
               .toList();
         if (!banded.isEmpty()) {
             Candidate drawn = drawByAvailability(banded);
-            LOGGER.debug("[CompanyGen][Cargo]   {} tons left -> band {}-{}t, {} candidate(s), drew {}t"
+            LOGGER.debug("[CompanyGen][Cargo]   {} tons left -> band {}-{}t, {} freighter(s), drew {}t"
                         + " by availability", round(remaining), round(lowerBound), round(upperBound),
                   banded.size(), round(drawn.solidTons()));
             return drawn;
@@ -371,11 +405,11 @@ public final class CargoShipGenerator {
      * @param ships the cargo hulls this run added, extended in place with any JumpShips generated
      */
     private static Result berthAndFile(Campaign campaign, @Nullable String factionCode, int year,
-          @Nullable String rating, List<Unit> ships, double requiredTons, double providedTons,
-          double liquidTons, double shortfallTons) {
+          @Nullable String rating, double jumpshipPct, List<Unit> ships, double requiredTons,
+          double providedTons, double liquidTons, double shortfallTons) {
         List<Unit> cargoHulls = List.copyOf(ships);
         List<Unit> jumpShips = generateDockingCollars(campaign, factionCode, year, rating,
-              cargoHulls.size());
+              jumpshipPct, cargoHulls.size());
 
         // addNewUnit only reaches the hangar, so without this the player owns and pays for ships that
         // never appear in their order of battle.
@@ -386,11 +420,11 @@ public final class CargoShipGenerator {
         // are general logistics rather than part of the cargo train.
         if (!cargoHulls.isEmpty()) {
             AddSupportUnitsToTOE.addSupportUnitsToTOE(campaign, cargoHulls,
-                  SupportTOEFormationTypes.CARGO_FORMATION);
+                  SupportTOEFormationTypes.TRANSPORT_COMMAND, SupportTOEFormationTypes.CARGO_COMMAND);
         }
         if (!jumpShips.isEmpty()) {
             AddSupportUnitsToTOE.addSupportUnitsToTOE(campaign, jumpShips,
-                  SupportTOEFormationTypes.LOGISTICS_FORMATION);
+                  SupportTOEFormationTypes.TRANSPORT_COMMAND, SupportTOEFormationTypes.JUMPSHIP_COMMAND);
         }
         return new Result(cargoHulls, requiredTons, providedTons, liquidTons, shortfallTons);
     }
@@ -408,14 +442,29 @@ public final class CargoShipGenerator {
      * @return the JumpShips added, empty when none were needed or none could be found
      */
     private static List<Unit> generateDockingCollars(Campaign campaign, @Nullable String factionCode,
-          int year, @Nullable String rating, int newCargoShips) {
+          int year, @Nullable String rating, double jumpshipPct, int newCargoShips) {
+        if (jumpshipPct <= 0) {
+            // A zero here is an instruction, not an omission. The player gets cargo hulls with no
+            // JumpShips to berth them, which is exactly what they asked for.
+            LOGGER.info("[CompanyGen][Cargo] JumpShip percentage is 0; generating none, so any new"
+                        + " cargo hulls have no berth of their own");
+            return List.of();
+        }
+        if (newCargoShips <= 0) {
+            return List.of();
+        }
         int dropshipsOwned = campaign.getHangarStatistics()
               .getNumberOfUnitsByType(Entity.ETYPE_DROPSHIP);
         int collarsOwned = campaign.getHangarStatistics().getTotalDockingCollars();
-        int shortfall = dropshipsOwned - collarsOwned;
+        // Only the hulls this run added are berthed. How the rest of the fleet gets its collars is the
+        // player's call through the JumpShip percentage, and berthing everything here silently
+        // overrode a deliberate choice of zero.
+        int freeCollars = Math.max(0, collarsOwned - (dropshipsOwned - newCargoShips));
+        int shortfall = newCargoShips - freeCollars;
 
-        LOGGER.info("[CompanyGen][Cargo] docking: {} DropShip(s) ({} added here), {} collar(s) available",
-              dropshipsOwned, newCargoShips, collarsOwned);
+        LOGGER.info("[CompanyGen][Cargo] docking: {} cargo hull(s) added, {} collar(s) free of {} for"
+                    + " {} DropShip(s) in the command", newCargoShips, freeCollars, collarsOwned,
+              dropshipsOwned);
         if (shortfall <= 0) {
             return List.of();
         }
@@ -446,7 +495,7 @@ public final class CargoShipGenerator {
             LOGGER.debug("[CompanyGen][Cargo]   added '{}' (+{} collars); {} berth(s) still needed",
                   hull.getName(), collars, Math.max(0, remaining));
         }
-        LOGGER.info("[CompanyGen][Cargo] generated {} JumpShip(s) for {} unberthed DropShip(s)",
+        LOGGER.info("[CompanyGen][Cargo] generated {} JumpShip(s) to berth {} new cargo hull(s)",
               jumpShips.size(), shortfall);
         return jumpShips;
     }

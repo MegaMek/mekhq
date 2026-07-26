@@ -864,7 +864,8 @@ public final class CommandGenerator {
         }
         try {
             CargoShipGenerator.Result result = CargoShipGenerator.generate(campaign,
-                  snapshot.getFaction(), snapshot.getYear(), snapshot.getRating(), snapshot.getCargoPct());
+                  snapshot.getFaction(), snapshot.getYear(), snapshot.getRating(),
+                  snapshot.getCargoPct(), snapshot.getJumpshipPct());
             if (result.shortfallTons() > 0) {
                 LOGGER.warn("[CompanyGen][Cargo] the command is {} tons short of hauling its own cargo",
                       result.shortfallTons());

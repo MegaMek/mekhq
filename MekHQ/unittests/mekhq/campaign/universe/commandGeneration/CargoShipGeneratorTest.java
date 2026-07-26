@@ -57,7 +57,7 @@ class CargoShipGeneratorTest {
     /** A stand-in fleet spanning the range of real DropShip holds, smallest first. */
     private static List<Candidate> fleet() {
         List<Candidate> candidates = new ArrayList<>(List.of(
-              new Candidate(null, 75, 0, 10),      // combat hull with an incidental hold
+              new Candidate(null, 75, 0, 10),      // small freighter
               new Candidate(null, 200, 0, 10),
               new Candidate(null, 800, 100, 5),
               new Candidate(null, 3000, 0, 3),     // dedicated freighter
