@@ -73,6 +73,7 @@ import mekhq.campaign.personnel.enums.PersonnelRole;
 import mekhq.campaign.unit.Unit;
 import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.universe.Faction;
+import mekhq.campaign.universe.commandGeneration.CargoShipGenerator;
 import mekhq.campaign.universe.commandGeneration.CommandGenerationOptions;
 import mekhq.campaign.universe.commandGeneration.SupportPersonnelToTOE;
 import mekhq.campaign.universe.commandGeneration.SupportUnitGenerator;
@@ -196,11 +197,11 @@ public final class CommandGenerator {
         if (listener != null) {
             listener.updateProgress(0.0, "Preparing generation parameters...");
         }
-        LOGGER.info("[CompanyGen][Pipeline]snapshot: faction={} year={} echelon={} unitType={} rating={} experience={} weightClass={} augmented={} sizeMod={} dropshipPct={} jumpshipPct={} cargo={} flags={} roles={}",
+        LOGGER.info("[CompanyGen][Pipeline]snapshot: faction={} year={} echelon={} unitType={} rating={} experience={} weightClass={} augmented={} sizeMod={} dropshipPct={} jumpshipPct={} cargoPct={} flags={} roles={}",
               snap.getFaction(), snap.getYear(), snap.getEchelon(), snap.getUnitType(),
               snap.getRating(), snap.getExperience(), snap.getWeightClass(),
               snap.isAugmented(), snap.getSizeMod(),
-              snap.getDropshipPct(), snap.getJumpshipPct(), snap.getCargo(),
+              snap.getDropshipPct(), snap.getJumpshipPct(), snap.getCargoPct(),
               snap.getFlags(), snap.getRoles());
 
         // 1. Bootstrap MegaMek-side state for the target year.
@@ -341,13 +342,15 @@ public final class CommandGenerator {
         // founder / callsign flags and the dialog hands it to processBonusUnitsBasedOnCampaignOptions
         // so the alt-medical spare-personnel branch can count combatants without re-walking the tree.
         List<Person> generatedPersons = new ArrayList<>();
-        // Names for the mirrored Formations come from the player's Formation Naming Method, kept
-        // unique against every formation already in the campaign so repeat builds continue the
-        // sequences ("Able Company" then "Baker Company") instead of restarting them.
+        // Names for the mirrored Formations follow the generating faction's convention (declared in its
+        // ruleset), with the player's Formation Naming Method supplying the alphabet wherever that
+        // convention calls for one. Seeding the namer with every formation already in the campaign is
+        // what stops a repeat build from reusing names the previous one took.
         List<String> existingFormationNames = campaign.getPlayerForce().getAllFormations().stream()
               .map(Formation::getName)
               .toList();
         FormationNamer namer = new FormationNamer(options.getForceNamingMethod(), existingFormationNames);
+        namer.setAlwaysNumberRegiments(options.isAlwaysNumberRegiments());
         ForceDescriptorWalker.walk(fd, campaign, root, namer, (leaf, parent) -> {
             long leafStart = System.nanoTime();
             String parentInfo = parent == null ? "null"
@@ -498,6 +501,15 @@ public final class CommandGenerator {
             listener.updateProgress(0.0, "Stocking spare parts warehouse...");
         }
         SpareCosts spareCosts = stockSpareParts(campaign);
+
+        // 8b. Cargo lift. Runs after the warehouse is stocked, because the tonnage the ships have to
+        // haul is exactly what stocking just put in it, and before starting cash below so the hulls are
+        // priced along with everything else the build produced rather than arriving free.
+        LOGGER.info("[CompanyGen][Pipeline]Stage 8b: cargo lift");
+        if (listener != null) {
+            listener.updateProgress(0.0, "Provisioning cargo lift...");
+        }
+        generateCargoLift(campaign, options);
 
         // 9. Starting cash - single-shot path only: every unit the build created is new relative to
         // the pre-walk hangar snapshot, so this prices exactly this build's units. The two-phase
@@ -836,6 +848,33 @@ public final class CommandGenerator {
      * <p>Setting all percentages to 0 produces an empty warehouse with no shopping list churn -
      * effectively disabling spare-part generation.</p>
      */
+    /**
+     * Stage 8b: provisions the cargo DropShips the command needs to haul its own warehouse, per the
+     * Cargo Capacity percentage on the Force Generator tab.
+     *
+     * <p>Failures here are logged and swallowed: a command that cannot lift all of its spares is a
+     * playable outcome the player can fix by buying a hull, whereas losing the whole build over it is
+     * not.</p>
+     */
+    private static void generateCargoLift(Campaign campaign, CommandGenerationOptions options) {
+        ForceDescriptorSnapshot snapshot = options.getForceDescriptorSnapshot();
+        if (snapshot == null) {
+            LOGGER.debug("[CompanyGen][Cargo] no force snapshot; skipping cargo lift");
+            return;
+        }
+        try {
+            CargoShipGenerator.Result result = CargoShipGenerator.generate(campaign,
+                  snapshot.getFaction(), snapshot.getYear(), snapshot.getRating(), snapshot.getCargoPct());
+            if (result.shortfallTons() > 0) {
+                LOGGER.warn("[CompanyGen][Cargo] the command is {} tons short of hauling its own cargo",
+                      result.shortfallTons());
+            }
+        } catch (Exception exception) {
+            LOGGER.error(exception, "[CompanyGen][Cargo] cargo lift generation failed;"
+                        + " the command keeps whatever cargo capacity it already had");
+        }
+    }
+
     private static SpareCosts stockSpareParts(Campaign campaign) {
         long start = System.nanoTime();
         PartsInUseManager partsInUseManager = new PartsInUseManager(campaign);

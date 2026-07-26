@@ -75,7 +75,8 @@ public final class ForceDescriptorSnapshot {
     private final Set<String> roles = new LinkedHashSet<>();
     private double dropshipPct;
     private double jumpshipPct;
-    private double cargo;
+    /** Percentage of the command's cargo requirement to provision hauling for; 100 covers it all. */
+    private double cargoPct = 100.0;
 
     public ForceDescriptorSnapshot() {
         // Defaults are deliberately conservative; the dialog populates real values before generate.
@@ -181,12 +182,12 @@ public final class ForceDescriptorSnapshot {
         this.jumpshipPct = jumpshipPct;
     }
 
-    public double getCargo() {
-        return cargo;
+    public double getCargoPct() {
+        return cargoPct;
     }
 
-    public void setCargo(double cargo) {
-        this.cargo = cargo;
+    public void setCargoPct(double cargoPct) {
+        this.cargoPct = cargoPct;
     }
 
     // ---- Population from a built ForceDescriptor ---------------------------
@@ -222,6 +223,7 @@ public final class ForceDescriptorSnapshot {
         int rawSizeMod = fd.getSizeMod();
         this.sizeMod = rawSizeMod == 0 ? null : rawSizeMod;
         this.dropshipPct = fd.getDropshipPct();
+        this.cargoPct = fd.getCargoPct();
         // ForceDescriptor.getJumpshipPct() doesn't exist on the engine type; the panel writes the value
         // back into its own text field but the engine has no setter. Leave snapshot's jumpshipPct alone.
         this.flags.clear();
@@ -278,8 +280,8 @@ public final class ForceDescriptorSnapshot {
         if (jumpshipPct != 0d) {
             MHQXMLUtility.writeSimpleXMLTag(pw, indent + 1, "jumpshipPct", jumpshipPct);
         }
-        if (cargo != 0d) {
-            MHQXMLUtility.writeSimpleXMLTag(pw, indent + 1, "cargo", cargo);
+        if (cargoPct != 100d) {
+            MHQXMLUtility.writeSimpleXMLTag(pw, indent + 1, "cargoPct", cargoPct);
         }
         MHQXMLUtility.writeSimpleXMLCloseTag(pw, indent, "forceDescriptorSnapshot");
     }
@@ -332,7 +334,7 @@ public final class ForceDescriptorSnapshot {
                     }
                     case "dropshipPct" -> snap.dropshipPct = Double.parseDouble(text);
                     case "jumpshipPct" -> snap.jumpshipPct = Double.parseDouble(text);
-                    case "cargo" -> snap.cargo = Double.parseDouble(text);
+                    case "cargoPct" -> snap.cargoPct = Double.parseDouble(text);
                     default -> {
                         // forward-compatible: unknown tags are ignored
                     }
