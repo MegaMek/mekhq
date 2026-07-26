@@ -581,6 +581,13 @@ public final class CommandGenerator {
         // (not only at the tail of applyToCampaign) because the two-phase Command Designer flow calls
         // this method directly, after applyToCampaign already ran its icon pass with no support
         // formations in the tree - so without this call the support command commits with blank icons.
+        // Appoint the senior staff - CMO, head technician, chief administrator. Runs
+        // here rather than in stage 7d because the eligible people are exactly the support staff
+        // generated above, and because the two-phase Command Designer flow reaches this method
+        // directly; anywhere else and a design-then-generate-support build would commit with the posts
+        // vacant.
+        SeniorAppointmentAssigner.assign(campaign, supportResult.generatedPersons());
+
         LOGGER.info("[CompanyGen][Pipeline]Stage 7e: applying formation icons to support formations");
         FormationIconBuilder.applyIcons(campaign.getFormations(), campaign, options);
 
@@ -822,6 +829,7 @@ public final class CommandGenerator {
         if (options.isAssignCompanyCommanderFlag() && rootCommander != null) {
             rootCommander.setCommander(true);
             LOGGER.info("[CompanyGen][Pipeline][Flags] commander flag set on '{}'", rootCommander.getFullName());
+            assignSecondInCommand(campaign, generatedPersons);
         }
         int founderCount = 0;
         int callsignCount = 0;
@@ -840,6 +848,41 @@ public final class CommandGenerator {
         }
         LOGGER.info("[CompanyGen][Pipeline][Flags] founder={} callsigns={} (clanCampaign={})",
               founderCount, callsignCount, campaign.isClanCampaign());
+    }
+
+    /**
+     * Flags the executive officer of a generated command, so the campaign records a second-in-command
+     * rather than re-deriving one every time it is asked.
+     *
+     * <p>Without the flag {@link ForceHumanResources#findTopCommanders} still produces an answer, but
+     * it is inferred from whoever currently ranks highest - so it moves when people are promoted,
+     * killed or hired. Flagging pins the appointment the way the commander's is pinned. The choice
+     * itself is delegated to that same method so the generator does not invent a second, divergent
+     * notion of who ranks next.</p>
+     *
+     * @param campaign         the campaign supplying the rank comparison rules
+     * @param generatedPersons the people this generation created
+     */
+    private static void assignSecondInCommand(Campaign campaign, List<Person> generatedPersons) {
+        Person existingSecondInCommand = campaign.getFlaggedSecondInCommand();
+        if (existingSecondInCommand != null) {
+            LOGGER.debug("[CompanyGen][Pipeline][Flags] second-in-command left as is; already held by '{}'",
+                  existingSecondInCommand.getFullName());
+            return;
+        }
+
+        Person[] topCommanders = ForceHumanResources.findTopCommanders(generatedPersons,
+              campaign.getCampaignOptions(), campaign.isClanCampaign(), campaign.getLocalDate());
+        Person secondInCommand = topCommanders[1];
+        if (secondInCommand == null) {
+            LOGGER.debug("[CompanyGen][Pipeline][Flags] second-in-command left vacant; the generated "
+                  + "roster of {} offers no candidate below the commander", generatedPersons.size());
+            return;
+        }
+
+        secondInCommand.setSecondInCommand(true);
+        LOGGER.info("[CompanyGen][Pipeline][Flags] second-in-command flag set on '{}'",
+              secondInCommand.getFullName());
     }
 
     /**

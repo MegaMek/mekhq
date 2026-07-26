@@ -429,6 +429,12 @@ public class Person implements ILocatable {
     private boolean immortal;
     private boolean quickTrainIgnore;
     private boolean salvageSupervisor;
+    // Senior appointments. Booleans in the same mould as secondInCommand and salvageSupervisor, so a
+    // caller can ask "who is the CMO?" as a predicate rather than matching a string. A post is a
+    // position within a command, distinct from rank (what someone is) and role (what they do).
+    private boolean chiefMedicalOfficer;
+    private boolean headTechnician;
+    private boolean chiefAdministrator;
     private boolean trainer;
     private boolean underProtection;
     private boolean neverAssignMaintenanceAutomatically;
@@ -3341,6 +3347,33 @@ public class Person implements ILocatable {
         this.salvageSupervisor = salvageSupervisor;
     }
 
+    /** @return whether this person is the command's chief medical officer */
+    public boolean isChiefMedicalOfficer() {
+        return chiefMedicalOfficer;
+    }
+
+    public void setChiefMedicalOfficer(final boolean chiefMedicalOfficer) {
+        this.chiefMedicalOfficer = chiefMedicalOfficer;
+    }
+
+    /** @return whether this person is the command's head technician */
+    public boolean isHeadTechnician() {
+        return headTechnician;
+    }
+
+    public void setHeadTechnician(final boolean headTechnician) {
+        this.headTechnician = headTechnician;
+    }
+
+    /** @return whether this person is the command's chief administrator */
+    public boolean isChiefAdministrator() {
+        return chiefAdministrator;
+    }
+
+    public void setChiefAdministrator(final boolean chiefAdministrator) {
+        this.chiefAdministrator = chiefAdministrator;
+    }
+
     public boolean isTrainer() {
         return trainer;
     }
@@ -3982,6 +4015,15 @@ public class Person implements ILocatable {
             MHQXMLUtility.writeSimpleXMLTag(pw, indent, "immortal", immortal);
             MHQXMLUtility.writeSimpleXMLTag(pw, indent, "quickTrainIgnore", quickTrainIgnore);
             MHQXMLUtility.writeSimpleXMLTag(pw, indent, "salvageSupervisor", salvageSupervisor);
+            if (chiefMedicalOfficer) {
+                MHQXMLUtility.writeSimpleXMLTag(pw, indent, "chiefMedicalOfficer", true);
+            }
+            if (headTechnician) {
+                MHQXMLUtility.writeSimpleXMLTag(pw, indent, "headTechnician", true);
+            }
+            if (chiefAdministrator) {
+                MHQXMLUtility.writeSimpleXMLTag(pw, indent, "chiefAdministrator", true);
+            }
             MHQXMLUtility.writeSimpleXMLTag(pw, indent, "trainer", trainer);
             MHQXMLUtility.writeSimpleXMLTag(pw, indent, "underProtection", underProtection);
             MHQXMLUtility.writeSimpleXMLTag(pw,
@@ -4621,6 +4663,12 @@ public class Person implements ILocatable {
                     person.setQuickTrainIgnore(Boolean.parseBoolean(wn2.getTextContent().trim()));
                 } else if (nodeName.equalsIgnoreCase("salvageSupervisor")) {
                     person.setSalvageSupervisor(Boolean.parseBoolean(wn2.getTextContent().trim()));
+                } else if (nodeName.equalsIgnoreCase("chiefMedicalOfficer")) {
+                    person.setChiefMedicalOfficer(Boolean.parseBoolean(wn2.getTextContent().trim()));
+                } else if (nodeName.equalsIgnoreCase("headTechnician")) {
+                    person.setHeadTechnician(Boolean.parseBoolean(wn2.getTextContent().trim()));
+                } else if (nodeName.equalsIgnoreCase("chiefAdministrator")) {
+                    person.setChiefAdministrator(Boolean.parseBoolean(wn2.getTextContent().trim()));
                 } else if (nodeName.equalsIgnoreCase("trainer")) {
                     person.setTrainer(Boolean.parseBoolean(wn2.getTextContent().trim()));
                 } else if (nodeName.equalsIgnoreCase("underProtection")) {
