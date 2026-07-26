@@ -57,6 +57,7 @@ import megamek.common.units.Infantry;
 import megamek.logging.MMLogger;
 import mekhq.Utilities;
 import mekhq.campaign.Campaign;
+import mekhq.campaign.ForceHumanResources;
 import mekhq.campaign.finances.Money;
 import mekhq.campaign.finances.enums.TransactionType;
 import mekhq.campaign.force.Formation;
@@ -496,6 +497,11 @@ public final class CommandGenerator {
         // user's ongoing stocking policy: each part type's stocking percentage comes from the
         // CampaignOptions.getAutoLogistics*() values that the Spares tab writes into. Contract
         // polish remains deferred.
+        // 7f. Temporary crew. The assembler left the seats of any temporary-crew role empty behind a
+        // single named crew member, so the pool has to be topped up to cover them or the generated
+        // units arrive undercrewed.
+        topUpTemporaryCrewPools(campaign);
+
         LOGGER.info("[CompanyGen][Pipeline]Stage 8: spare-parts warehouse stock-up");
         if (listener != null) {
             listener.updateProgress(0.0, "Stocking spare parts warehouse...");
@@ -873,6 +879,33 @@ public final class CommandGenerator {
         } catch (Exception exception) {
             LOGGER.error(exception, "[CompanyGen][Cargo] cargo lift generation failed;"
                         + " the command keeps whatever cargo capacity it already had");
+        }
+    }
+
+    /**
+     * Stage 7f: sizes the temporary crew pool to cover the seats the generated units left unfilled.
+     *
+     * <p>Only roles the campaign has Temporary Crews enabled for are touched, and
+     * {@code fillTempCrewPoolForRole} is a no-op for the rest, so a campaign not using the feature is
+     * unaffected.</p>
+     */
+    private static void topUpTemporaryCrewPools(Campaign campaign) {
+        CampaignOptions campaignOptions = campaign.getCampaignOptions();
+        ForceHumanResources humanResources = campaign.getPlayerForce().getHumanResources();
+        int rolesFilled = 0;
+        for (PersonnelRole role : humanResources.getTempCrewRoleKeys()) {
+            if (!humanResources.isBlobCrewEnabled(role, campaignOptions)) {
+                continue;
+            }
+            humanResources.fillTempCrewPoolForRole(campaign, campaignOptions, role);
+            rolesFilled++;
+        }
+        if (rolesFilled > 0) {
+            LOGGER.info("[CompanyGen][Pipeline][TempCrew] topped up the pool for {} temporary crew"
+                        + " role(s)", rolesFilled);
+        } else {
+            LOGGER.debug("[CompanyGen][Pipeline][TempCrew] no temporary crew roles enabled;"
+                        + " units were crewed in full");
         }
     }
 

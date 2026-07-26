@@ -114,7 +114,7 @@ public final class MultiCrewAssembler {
         // The commander is one of the squad; remaining troopers share the skill profile but get
         // random names.
         if (unit.usesSoldiers() || unit.isBattleArmor()) {
-            int squadSize = Math.max(1, unit.getFullCrewSize());
+            int squadSize = namedSeats(campaign, primary, Math.max(1, unit.getFullCrewSize()), false);
             for (int i = 0; i < squadSize; i++) {
                 boolean isCommander = (i == 0);
                 Person trooper = newPerson(campaign, primary, commander, entity,
@@ -138,7 +138,8 @@ public final class MultiCrewAssembler {
               unitType, driverNeeds, gunnerNeeds, vesselCrewNeeds, needsNavigator, totalSeats);
 
         // Drivers. Commander becomes the first driver when at least one driver seat exists.
-        for (int i = 0; i < driverNeeds; i++) {
+        int namedDrivers = namedSeats(campaign, primary, driverNeeds, !crew.isEmpty());
+        for (int i = 0; i < namedDrivers; i++) {
             boolean isCommander = crew.isEmpty();
             Person driver = newPerson(campaign, primary, commander, entity,
                   isCommander && overrideName);
@@ -146,7 +147,8 @@ public final class MultiCrewAssembler {
             crew.add(driver);
         }
         // Gunners.
-        for (int i = 0; i < gunnerNeeds; i++) {
+        int namedGunners = namedSeats(campaign, gunner, gunnerNeeds, !crew.isEmpty());
+        for (int i = 0; i < namedGunners; i++) {
             boolean isCommander = crew.isEmpty();
             Person g = newPerson(campaign, gunner, commander, entity,
                   isCommander && overrideName);
@@ -156,7 +158,8 @@ public final class MultiCrewAssembler {
         // Generic vessel crew.
         if (vesselCrewNeeds > 0) {
             PersonnelRole crewRole = PersonnelRoleResolver.vesselCrewRole();
-            for (int i = 0; i < vesselCrewNeeds; i++) {
+            int namedVesselCrew = namedSeats(campaign, crewRole, vesselCrewNeeds, !crew.isEmpty());
+            for (int i = 0; i < namedVesselCrew; i++) {
                 Person c = newPerson(campaign, crewRole, commander, entity, false);
                 unit.addVesselCrew(c);
                 crew.add(c);
@@ -183,6 +186,47 @@ public final class MultiCrewAssembler {
         LOGGER.info("[CompanyGen]     MultiCrewAssembler.assemble unitType={} attached {} persons; commander={}",
               unitType, crew.size(), crew.get(0).getFullName());
         return crew;
+    }
+
+    /**
+     * How many of a unit's seats in one role should be filled with named personnel.
+     *
+     * <p>When the campaign has Temporary Crews enabled for a role, those seats are meant to be held by
+     * unnamed crew drawn from a pool, with only one named person aboard - generating a named Person per
+     * seat produces exactly the roster the option exists to avoid. The rule is MekHQ's own
+     * ({@code ForceHumanResources.isBlobCrewEnabled}) rather than a parallel one defined here.</p>
+     *
+     * <p>Every unit keeps at least one named crew member, so a unit whose roles are all temporary still
+     * has someone identifiable aboard: the first role to be filled contributes the commander, and later
+     * roles on the same unit contribute none.</p>
+     *
+     * @param role             the role filling these seats
+     * @param seats            how many seats the unit has in this role
+     * @param unitHasNamedCrew whether a named crew member has already been attached to this unit
+     *
+     * @return the number of named personnel to create, which is {@code seats} unless temporary crew is
+     *       enabled for the role
+     */
+    private static int namedSeats(Campaign campaign, PersonnelRole role, int seats,
+          boolean unitHasNamedCrew) {
+        if (seats <= 0) {
+            return 0;
+        }
+        if (!isTemporaryCrewEnabled(campaign, role)) {
+            return seats;
+        }
+        return unitHasNamedCrew ? 0 : 1;
+    }
+
+    /** Whether the campaign fills this role from the temporary crew pool. */
+    private static boolean isTemporaryCrewEnabled(Campaign campaign, PersonnelRole role) {
+        try {
+            return campaign.getPlayerForce().getHumanResources()
+                  .isBlobCrewEnabled(role, campaign.getCampaignOptions());
+        } catch (Exception exception) {
+            // A campaign without human resources wired up (as in unit tests) crews normally.
+            return false;
+        }
     }
 
     private static Person newPerson(Campaign campaign, PersonnelRole role, CrewDescriptor descriptor,
