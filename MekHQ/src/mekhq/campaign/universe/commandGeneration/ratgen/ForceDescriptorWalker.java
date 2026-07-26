@@ -47,6 +47,7 @@ import megamek.logging.MMLogger;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.force.Formation;
 import mekhq.campaign.force.FormationLevel;
+import mekhq.campaign.universe.commandGeneration.ratgen.FormationNamer.FormationRequest;
 import mekhq.campaign.universe.commandGeneration.ratgen.FormationNamer.NamedFormation;
 
 /**
@@ -59,10 +60,12 @@ import mekhq.campaign.universe.commandGeneration.ratgen.FormationNamer.NamedForm
  * empty (leaves carry the actual {@code Entity}). The handler is responsible for building the MekHQ
  * {@code Unit}, generating crew, and attaching the unit to the supplied parent Formation.</p>
  *
- * <p>Formation names are produced by the supplied {@link FormationNamer} rather than taken verbatim from
- * the ruleset engine, so every created Formation is unique across the campaign: companies allocate
- * alphabet designators ("Able Company"), lances get callsigns under them ("Able-1 Battle Lance"), and
- * repeat generator runs continue the sequences instead of restarting them.</p>
+ * <p>Formation names come from the supplied {@link FormationNamer}, which is handed each sibling group
+ * as a whole rather than one formation at a time. That is what lets designator sequences restart under
+ * each parent - company letters begin again in every battalion ("1/Alpha Company", "2/Alpha Company") -
+ * and what lets a name collision be resolved the same way for every member of a group. Names the
+ * faction ruleset already got right, such as Clan "Trinary [Battle]" and ComStar "IV-alpha", are passed
+ * through untouched.</p>
  *
  * <p>{@link #previewNames(ForceDescriptor, FormationNamer)} runs the same traversal without touching the
  * campaign and returns the name each descriptor would receive, so the Command Designer's preview tree can
@@ -251,51 +254,94 @@ public final class ForceDescriptorWalker {
     private static int traverse(ForceDescriptor root, FormationNamer namer, FormationSink sink,
           @Nullable Object rootHandle, boolean mergeRoot) {
         if (!mergeRoot) {
-            return walkNode(root, namer, sink, rootHandle, null, 0, 0);
+            List<NamedFormation> rootName = namer.nameSiblings(List.of(requestFor(root)), null);
+            return walkNode(root, rootName.get(0), namer, sink, rootHandle, 0);
         }
 
-        int leaves = 0;
-        int nodeOrdinal = 0;
+        // RATGenerator often hands support/attachment forces in as loose platoons directly under the
+        // root (a stack of BA or infantry platoons with no company wrapper). Group those by unit type
+        // under a synthesized company so the TOE reads as "<Unit Type> Company -> platoons"; anything
+        // that is already a proper formation (its children are sub-formations, e.g. an aerospace
+        // squadron) walks through as a normal child of the root.
+        List<ForceDescriptor> directChildren = new ArrayList<>();
+        List<ForceDescriptor> loosePlatoons = new ArrayList<>();
         if (root.getSubForces() != null) {
-            for (ForceDescriptor child : root.getSubForces()) {
-                boolean countsAsNode = !childrenOf(child).isEmpty() && hasIncludedLeaf(child);
-                if (countsAsNode) {
-                    nodeOrdinal++;
-                }
-                leaves += walkNode(child, namer, sink, rootHandle, null,
-                      countsAsNode ? nodeOrdinal : 0, 0);
-            }
+            directChildren.addAll(root.getSubForces());
         }
         if (root.getAttached() != null) {
-            // RATGenerator often hands support/attachment forces in as loose platoons directly
-            // under the root (a stack of BA or infantry platoons with no company wrapper). Group
-            // those by unit type under a synthesized company so the TOE reads as
-            // "<Unit Type> Company -> platoons"; anything that is already a proper formation
-            // (its children are sub-formations, e.g. an aerospace squadron) walks through as-is.
-            List<ForceDescriptor> loosePlatoons = new ArrayList<>();
             for (ForceDescriptor child : root.getAttached()) {
                 if (isLoosePlatoon(child)) {
                     loosePlatoons.add(child);
                 } else {
-                    if (sink.verbose()) {
-                        LOGGER.info("[CompanyGen][Walker]   (attached child of root)");
-                    }
-                    boolean countsAsNode = !childrenOf(child).isEmpty() && hasIncludedLeaf(child);
-                    if (countsAsNode) {
-                        nodeOrdinal++;
-                    }
-                    leaves += walkNode(child, namer, sink, rootHandle, null,
-                          countsAsNode ? nodeOrdinal : 0, 0);
+                    directChildren.add(child);
                 }
             }
-            leaves += wrapLoosePlatoonsByUnitType(loosePlatoons, root.getFaction(), namer, sink, rootHandle);
+        }
+
+        int leaves = walkChildren(directChildren, namer, sink, rootHandle, null, 0);
+        leaves += wrapLoosePlatoonsByUnitType(loosePlatoons, root.getFaction(), namer, sink, rootHandle);
+        return leaves;
+    }
+
+    /**
+     * Names one sibling group and walks it.
+     *
+     * <p>Naming the whole group in a single call is what lets the namer restart designator sequences
+     * under each parent, and what lets it resolve a name collision the same way for every member of
+     * the group rather than leaving the first sibling bare and suffixing the rest.</p>
+     *
+     * @param children         every child of one parent, in tree order; leaves and empty formations may
+     *                         be included and are skipped for naming purposes
+     * @param parentDesignator the parent's designator, or {@code null} at the top of the command
+     *
+     * @return the number of included leaves visited beneath {@code children}
+     */
+    private static int walkChildren(List<ForceDescriptor> children, FormationNamer namer,
+          FormationSink sink, @Nullable Object parentHandle, @Nullable String parentDesignator,
+          int depth) {
+        // Only nodes that will actually become a Formation take part in naming: a leaf carries a unit
+        // label rather than a formation name, and a formation whose units were all excluded is dropped
+        // without ever spending a designator.
+        List<ForceDescriptor> namedChildren = new ArrayList<>();
+        for (ForceDescriptor child : children) {
+            if (!childrenOf(child).isEmpty() && hasIncludedLeaf(child)) {
+                namedChildren.add(child);
+            }
+        }
+
+        List<FormationRequest> requests = new ArrayList<>(namedChildren.size());
+        for (ForceDescriptor child : namedChildren) {
+            requests.add(requestFor(child));
+        }
+        List<NamedFormation> names = namer.nameSiblings(requests, parentDesignator);
+
+        int leaves = 0;
+        int nameIndex = 0;
+        for (ForceDescriptor child : children) {
+            NamedFormation named = null;
+            if ((nameIndex < namedChildren.size()) && (namedChildren.get(nameIndex) == child)) {
+                named = names.get(nameIndex);
+                nameIndex++;
+            }
+            leaves += walkNode(child, named, namer, sink, parentHandle, depth);
         }
         return leaves;
     }
 
-    private static int walkNode(ForceDescriptor descriptor, FormationNamer namer, FormationSink sink,
-          @Nullable Object parentHandle, @Nullable String parentDesignator, int ordinalWithinParent,
-          int depth) {
+    /** Describes {@code descriptor} to the namer: its engine name plus the faction and echelon that
+     * select the naming rule. */
+    private static FormationRequest requestFor(ForceDescriptor descriptor) {
+        return new FormationRequest(descriptor.parseName(),
+              mapEchelonToFormationLevel(descriptor.getEchelon(), descriptor.getFaction()),
+              descriptor.getEchelon(), descriptor.getUnitType(), descriptor.getFaction());
+    }
+
+    /**
+     * @param named the name the caller's sibling-group naming pass chose for this node, or
+     *              {@code null} when the node is a leaf or an empty formation and so was never named
+     */
+    private static int walkNode(ForceDescriptor descriptor, @Nullable NamedFormation named,
+          FormationNamer namer, FormationSink sink, @Nullable Object parentHandle, int depth) {
         String indent = "  ".repeat(depth);
         boolean hasChildren = hasChildDescriptors(descriptor);
 
@@ -334,11 +380,17 @@ public final class ForceDescriptorWalker {
             return 0;
         }
 
-        // Non-leaf — resolve this echelon's formation and recurse. The engine's parseName()
-        // ("A Company", "Battle Lance") repeats across parents, so the namer converts it into a
-        // campaign-wide unique callsign ("Able Company", "Able-1 Battle Lance").
+        // Non-leaf — mirror this echelon into a Formation and recurse.
         FormationLevel level = mapEchelonToFormationLevel(descriptor.getEchelon(), descriptor.getFaction());
-        NamedFormation named = namer.nameFormation(engineName, level, parentDesignator, ordinalWithinParent);
+        if (named == null) {
+            // Defensive: every node reaching this point should have been named with its siblings. Name
+            // it alone rather than dropping it, and say so, because a silently unnamed formation would
+            // be very hard to trace back from a TOE screenshot.
+            LOGGER.warn("[CompanyGen][Walker] node '{}' (echelon={}) reached naming without a"
+                        + " sibling-group name; naming it in isolation",
+                  engineName, descriptor.getEchelon());
+            named = namer.nameSiblings(List.of(requestFor(descriptor)), null).get(0);
+        }
 
         if (sink.verbose()) {
             LOGGER.info("[CompanyGen][Walker] {}NODE name='{}' engineName='{}' echelon={} subForces={} attached={}",
@@ -349,32 +401,9 @@ public final class ForceDescriptorWalker {
 
         Object handle = sink.formation(descriptor, named, level, parentHandle);
 
-        int leaves = 0;
-        int childNodeOrdinal = 0;
-        if (descriptor.getSubForces() != null) {
-            for (ForceDescriptor child : descriptor.getSubForces()) {
-                boolean countsAsNode = !childrenOf(child).isEmpty() && hasIncludedLeaf(child);
-                if (countsAsNode) {
-                    childNodeOrdinal++;
-                }
-                leaves += walkNode(child, namer, sink, handle, named.designator(),
-                      countsAsNode ? childNodeOrdinal : 0, depth + 1);
-            }
-        }
-        if (descriptor.getAttached() != null) {
-            for (ForceDescriptor child : descriptor.getAttached()) {
-                if (sink.verbose()) {
-                    LOGGER.info("[CompanyGen][Walker] {}  (attached child)", indent);
-                }
-                boolean countsAsNode = !childrenOf(child).isEmpty() && hasIncludedLeaf(child);
-                if (countsAsNode) {
-                    childNodeOrdinal++;
-                }
-                leaves += walkNode(child, namer, sink, handle, named.designator(),
-                      countsAsNode ? childNodeOrdinal : 0, depth + 1);
-            }
-        }
-        return leaves;
+        // Subforces and attached forces are one sibling group for naming purposes: they sit at the same
+        // level of the tree, so their designators have to come from a single sequence.
+        return walkChildren(childrenOf(descriptor), namer, sink, handle, named.designator(), depth + 1);
     }
 
     /** Whether {@code descriptor} has any subforce or attached children. */
@@ -469,26 +498,33 @@ public final class ForceDescriptorWalker {
             byUnitType.computeIfAbsent(platoon.getUnitType(), key -> new ArrayList<>()).add(platoon);
         }
 
+        // The synthesized companies are siblings of one another, so they are named as one group and
+        // draw from a single designator sequence.
+        List<FormationRequest> companyRequests = new ArrayList<>(byUnitType.size());
+        for (Map.Entry<Integer, List<ForceDescriptor>> entry : byUnitType.entrySet()) {
+            // The company sits one echelon above its platoons.
+            Integer platoonEchelon = entry.getValue().get(0).getEchelon();
+            Integer companyEchelon = (platoonEchelon == null) ? null : platoonEchelon + 1;
+            companyRequests.add(new FormationRequest(companyNameForUnitType(entry.getKey()),
+                  mapEchelonToFormationLevel(companyEchelon, factionCode), companyEchelon,
+                  entry.getKey(), factionCode));
+        }
+        List<NamedFormation> companyNames = namer.nameSiblings(companyRequests, null);
+
         int leaves = 0;
+        int companyIndex = 0;
         for (Map.Entry<Integer, List<ForceDescriptor>> entry : byUnitType.entrySet()) {
             List<ForceDescriptor> group = entry.getValue();
-            // The company sits one echelon above its platoons.
-            Integer platoonEchelon = group.get(0).getEchelon();
-            FormationLevel companyLevel = mapEchelonToFormationLevel(
-                  platoonEchelon == null ? null : platoonEchelon + 1, factionCode);
-            NamedFormation named = namer.nameFormation(companyNameForUnitType(entry.getKey()),
-                  companyLevel, null, 0);
+            NamedFormation named = companyNames.get(companyIndex);
+            FormationLevel companyLevel = companyRequests.get(companyIndex).level();
+            companyIndex++;
+
             Object companyHandle = sink.formation(null, named, companyLevel, rootHandle);
             if (sink.verbose()) {
                 LOGGER.info("[CompanyGen][Walker] synthesized '{}' (level {}) for {} loose platoon(s)",
                       named.name(), companyLevel, group.size());
             }
-            int platoonOrdinal = 0;
-            for (ForceDescriptor platoon : group) {
-                platoonOrdinal++;
-                leaves += walkNode(platoon, namer, sink, companyHandle, named.designator(),
-                      platoonOrdinal, 1);
-            }
+            leaves += walkChildren(group, namer, sink, companyHandle, named.designator(), 1);
         }
         return leaves;
     }

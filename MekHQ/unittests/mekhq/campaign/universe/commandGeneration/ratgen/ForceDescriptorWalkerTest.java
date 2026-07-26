@@ -43,10 +43,13 @@ import static org.mockito.Mockito.verify;
 import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 import megamek.client.ratgenerator.ForceDescriptor;
 import megamek.common.units.Entity;
 import megamek.common.units.UnitType;
+import megamek.client.ratgenerator.FormationNamingConvention.DesignatorStyle;
+import megamek.client.ratgenerator.FormationNamingConvention.Tier;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.force.Formation;
 import mekhq.campaign.universe.enums.ForceNamingMethod;
@@ -60,8 +63,24 @@ import org.mockito.ArgumentCaptor;
  */
 class ForceDescriptorWalkerTest {
 
+    private static final int ECHELON_LANCE = 3;
+    private static final int ECHELON_COMPANY = 4;
+    private static final int ECHELON_BATTALION = 5;
+
+    /**
+     * The Inner Sphere naming rules, supplied directly rather than read from the faction rulesets: this
+     * test suite does not load MegaMek's data set, so the production resolver would find no rule for
+     * any echelon and every formation would fall back to keeping its ruleset name. That the shipped
+     * rulesets really do declare these rules is covered by
+     * {@code megamek.client.ratgenerator.FormationNamingConventionTest}.
+     */
     private static FormationNamer namer() {
-        return new FormationNamer(ForceNamingMethod.CCB_1943, List.of());
+        Map<Integer, Tier> innerSphereRules = Map.of(
+              ECHELON_BATTALION, new Tier(ECHELON_BATTALION, DesignatorStyle.ALPHABET, false),
+              ECHELON_COMPANY, new Tier(ECHELON_COMPANY, DesignatorStyle.ALPHABET, false),
+              ECHELON_LANCE, new Tier(ECHELON_LANCE, DesignatorStyle.ALPHABET, false));
+        return new FormationNamer(ForceNamingMethod.CCB_1943, List.of(),
+              (faction, echelon) -> innerSphereRules.get(echelon));
     }
 
     /** {@code ForceDescriptor.entity} has no setter (set only during generation), so inject via reflection. */
@@ -187,10 +206,10 @@ class ForceDescriptorWalkerTest {
         assertEquals(builtNames.size(), previewNames.size(),
               "every built formation (no synthesized companies here) must have a previewed name");
         assertEquals("Able Company", previewNames.get(firstCompany));
-        assertEquals("Able-1 Battle Lance", previewNames.get(battleLance));
-        assertEquals("Able-2 Fire Lance", previewNames.get(fireLance));
+        assertEquals("Able Battle Lance", previewNames.get(battleLance));
+        assertEquals("Baker Fire Lance", previewNames.get(fireLance));
         assertEquals("Baker Company", previewNames.get(secondCompany));
-        assertEquals("Baker-1 Battle Lance", previewNames.get(secondBattleLance));
+        assertEquals("Able Battle Lance", previewNames.get(secondBattleLance));
         assertTrue(builtNames.containsAll(previewNames.values()),
               "the preview must show exactly the names the build produces");
     }
@@ -210,13 +229,13 @@ class ForceDescriptorWalkerTest {
         assertEquals(4, handledUnits.size(), "all four platoon units are placed");
 
         List<String> createdFormations = namesOfCreatedFormations(campaign);
-        // The synthesized company is company-tier, so the namer prefixes the first free CCB
-        // designator; its platoons are numbered under that designator.
+        // The synthesized company is company-tier, so the namer prefixes the first CCB
+        // designator; its platoons restart the same alphabet inside it.
         String expectedCompany = "Able " + UnitType.getTypeDisplayableName(UnitType.BATTLE_ARMOR) + " Company";
         assertTrue(createdFormations.contains(expectedCompany),
               "loose BA platoons should nest under a synthesized '" + expectedCompany + "'");
-        assertTrue(createdFormations.contains("Able-1 Platoon") && createdFormations.contains("Able-2 Platoon"),
-              "platoons carry callsigns under the synthesized company's designator");
+        assertTrue(createdFormations.contains("Able Platoon") && createdFormations.contains("Baker Platoon"),
+              "platoons take the selected alphabet within their synthesized company");
         assertEquals(1, createdFormations.stream().filter(expectedCompany::equals).count(),
               "both platoons share one synthesized company (grouped by unit type)");
     }
