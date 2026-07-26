@@ -46,6 +46,7 @@ import java.awt.event.ActionEvent;
 import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.ExecutionException;
 import java.util.Set;
 import java.util.UUID;
 import java.util.function.Consumer;
@@ -452,9 +453,14 @@ public class CommandGenerationDialog extends AbstractMHQValidationButtonDialog {
                 try {
                     result = get();
                 } catch (Exception ex) {
-                    LOGGER.error(ex, "[CompanyGen][Worker] generation phase failed");
+                    // SwingWorker wraps the real failure in an ExecutionException whose own stack is
+                    // just the EDT plumbing, so logging it alone says nothing about where generation
+                    // actually broke. Log the cause separately to get the failing frames.
+                    Throwable cause = (ex instanceof ExecutionException) ? ex.getCause() : ex;
+                    LOGGER.error(cause, "[CompanyGen][Worker] generation phase failed");
                     new ImmersiveDialogNotification(campaign,
-                          "Force generation failed: " + ex.getMessage(), true);
+                          "Force generation failed: "
+                                + ((cause == null) ? ex.getMessage() : cause.toString()), true);
                     return;
                 }
                 onSuccess.accept(result);
