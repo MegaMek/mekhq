@@ -468,7 +468,7 @@ public final class RulesetRankAssigner {
      * is empty at the chosen rank index by stepping down through lower indices until it
      * finds one that resolves to a real name.</p>
      */
-    private static void setRankWithFallback(Person person, int preferredIndex,
+    static void setRankWithFallback(Person person, int preferredIndex,
           RankSystem targetRankSystem, RankValidator rankValidator) {
         if (targetRankSystem != null) {
             RankSystem currentSystem = person.getRankSystem();

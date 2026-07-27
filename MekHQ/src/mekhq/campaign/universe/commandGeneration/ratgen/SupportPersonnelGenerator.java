@@ -369,24 +369,10 @@ public final class SupportPersonnelGenerator {
         // newPerson already runs skill generation at the campaign's default level; regenerate at
         // the user-selected experience tier so the role's primary skills land at the right level.
         skillGen.generateSkills(campaign, person, expLvl);
-        if (targetRankSystem != null) {
-            RankSystem currentSystem = person.getRankSystem();
-            if (currentSystem == null || !targetRankSystem.equals(currentSystem)) {
-                LOGGER.info("[CompanyGen][Support][RankSystem] swap person='{}' role={} oldSystem={} newSystem={} supportRank={}",
-                      person.getFullName(), person.getPrimaryRole().name(),
-                      currentSystem == null ? "null" : currentSystem.getCode(),
-                      targetRankSystem.getCode(), supportRank);
-                person.setRankSystem(rankValidator, targetRankSystem);
-            } else {
-                LOGGER.info("[CompanyGen][Support][RankSystem] no-swap person='{}' already on system={} supportRank={}",
-                      person.getFullName(), targetRankSystem.getCode(), supportRank);
-            }
-        } else {
-            LOGGER.warn("[CompanyGen][Support][RankSystem] targetRankSystem is null for person='{}' — leaving on existing system={} (this is the wrong-rank-names path)",
-                  person.getFullName(),
-                  person.getRankSystem() == null ? "null" : person.getRankSystem().getCode());
-        }
-        person.setRank(supportRank);
+        // Shared with the combat path so support staff get the same empty-rung handling. A ladder
+        // index that no rank system is obliged to fill - SLDF leaves both 16 and 37 blank in every
+        // profession column - otherwise renders as a bare "-" where the rank should be.
+        RulesetRankAssigner.setRankWithFallback(person, supportRank, targetRankSystem, rankValidator);
         boolean recruited = campaign.recruitPerson(person, PrisonerStatus.FREE, true, true);
         if (!recruited) {
             LOGGER.warn("[CompanyGen][Pipeline][Support] failed to recruit {} ({})",

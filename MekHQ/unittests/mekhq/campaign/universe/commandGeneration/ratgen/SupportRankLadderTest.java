@@ -33,14 +33,25 @@
 package mekhq.campaign.universe.commandGeneration.ratgen;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.Mockito.atLeastOnce;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import megamek.common.enums.SkillLevel;
+import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.enums.PersonnelRole;
+import mekhq.campaign.personnel.enums.Profession;
 import mekhq.campaign.personnel.ranks.Rank;
+import mekhq.campaign.personnel.ranks.RankSystem;
+import mekhq.campaign.personnel.ranks.RankValidator;
+import mekhq.campaign.personnel.ranks.Ranks;
 import mekhq.campaign.universe.Faction;
+import org.junit.jupiter.api.BeforeAll;
+import org.mockito.ArgumentCaptor;
 import org.junit.jupiter.api.Test;
 
 /**
@@ -51,6 +62,11 @@ import org.junit.jupiter.api.Test;
  * ranked identically. These tests pin the ladder that replaced it.</p>
  */
 class SupportRankLadderTest {
+
+    @BeforeAll
+    static void loadRankSystems() {
+        Ranks.initializeRankSystems();
+    }
 
     private static Faction innerSphereFaction() {
         Faction faction = mock(Faction.class);
@@ -147,6 +163,42 @@ class SupportRankLadderTest {
         int clanTech = RulesetRankAssigner.supportRankFor(PersonnelRole.MEK_TECH, SkillLevel.GREEN,
               clanFaction());
         assertEquals(clanDoctor, clanTech, "Clan support staff keep one flat index for now");
+    }
+
+    /**
+     * The ladder picks an index; no rank system is obliged to fill it. SLDF leaves 16 and 37 blank in
+     * every profession column, so a support person handed one of those rendered with a bare "-" where
+     * their rank should be. The generator must walk down to a rung that system actually names.
+     */
+    @Test
+    void anIndexTheRankSystemLeavesBlankFallsBackToARealRank() {
+        RankSystem sldf = Ranks.getRankSystems().get("SLDF");
+        assertNotNull(sldf, "the shipped rank data should contain SLDF");
+
+        for (int blankIndex : new int[] { 16, 37 }) {
+            Rank blank = sldf.getRank(blankIndex);
+            assertNotNull(blank);
+            assertTrue(blank.isEmpty(Profession.MEDICAL),
+                  "index " + blankIndex + " is expected to be blank in SLDF; if the data changed, "
+                        + "this test needs a different index rather than deleting");
+
+            Person person = mock(Person.class);
+            when(person.getPrimaryRole()).thenReturn(PersonnelRole.DOCTOR);
+            when(person.getRankSystem()).thenReturn(sldf);
+            when(person.getFullName()).thenReturn("Test Subject");
+
+            RulesetRankAssigner.setRankWithFallback(person, blankIndex, sldf, mock(RankValidator.class));
+
+            ArgumentCaptor<Integer> assigned = ArgumentCaptor.forClass(Integer.class);
+            verify(person, atLeastOnce()).setRank(assigned.capture());
+            int finalRank = assigned.getAllValues().get(assigned.getAllValues().size() - 1);
+
+            assertTrue(finalRank < blankIndex,
+                  "a blank rung should step down, but index " + blankIndex + " stayed put");
+            assertFalse(sldf.getRank(finalRank).isEmpty(
+                        Profession.MEDICAL.getProfession(sldf, sldf.getRank(finalRank))),
+                  "the chosen rank should render a real name, not \"-\"");
+        }
     }
 
     @Test
