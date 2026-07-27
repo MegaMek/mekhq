@@ -91,6 +91,7 @@ import mekhq.campaign.personnel.PersonnelOptions;
 import mekhq.campaign.personnel.divorce.AbstractDivorce;
 import mekhq.campaign.personnel.enums.PersonnelRole;
 import mekhq.campaign.personnel.enums.PersonnelStatus;
+import mekhq.campaign.personnel.enums.GeneticLegacyRole;
 import mekhq.campaign.personnel.enums.Phenotype;
 import mekhq.campaign.personnel.generator.AbstractPersonnelGenerator;
 import mekhq.campaign.personnel.generator.AbstractSpecialAbilityGenerator;
@@ -1902,6 +1903,17 @@ public class ForceHumanResources {
      */
     static final int MAXIMUM_BLOODNAME_TARGET = 12;
 
+    /**
+     * One Bloodnamed warrior in this many has their genetic legacy in active use in the breeding
+     * program.
+     *
+     * <p>Winning a Bloodname makes a legacy eligible, not used. A House holds twenty-five Bloodrights
+     * and a Clan runs far fewer sibkos than it has Bloodnamed warriors, so most carry no role. The
+     * exact share is not given in any source; this is a judgement that keeps genefathers and
+     * genemothers uncommon enough to be worth remarking on.</p>
+     */
+    private static final int LEGACY_IN_USE_DENOMINATOR = 4;
+
     public void checkBloodnameAdd(Campaign campaign, Person person, boolean ignoreDice) {
         checkBloodnameAdd(campaign, person, ignoreDice, 0);
     }
@@ -2093,8 +2105,34 @@ public class ForceHumanResources {
             // A warrior competes for a Bloodright within their own House, so the name they win is that
             // House's - not an unrelated legacy drawn afresh.
             person.setBloodname(person.getBloodhouse());
+            assignGeneticLegacyRole(person);
             personUpdated(campaign, person);
         }
+    }
+
+    /**
+     * Decides whether a newly Bloodnamed warrior's genetic legacy has been taken into their Clan's
+     * breeding program, and in which role.
+     *
+     * <p>Winning a Bloodname makes a warrior's legacy eligible; it does not put it to use. Only a
+     * minority are drawn on at any one time, so most Bloodnamed warriors carry no role.</p>
+     *
+     * <p>Neither role follows from the warrior's own sex. Clan scientists implant the DNA of either
+     * sex into either cell, so a woman may be a genefather and a man a genemother.</p>
+     *
+     * @param person the warrior who has just won their Bloodname
+     */
+    private static void assignGeneticLegacyRole(Person person) {
+        if (randomInt(LEGACY_IN_USE_DENOMINATOR) != 0) {
+            return;
+        }
+
+        GeneticLegacyRole role = (randomInt(2) == 0)
+              ? GeneticLegacyRole.GENEFATHER
+              : GeneticLegacyRole.GENEMOTHER;
+        person.setGeneticLegacyRole(role);
+        LOGGER.debug("[Bloodname] {}'s legacy taken into the breeding program as {}",
+              person.getFullName(), role);
     }
 
     /**

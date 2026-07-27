@@ -83,6 +83,7 @@ import mekhq.campaign.location.AcademyCampusLocation;
 import mekhq.campaign.personnel.education.Academy;
 import mekhq.campaign.personnel.education.EducationController;
 import mekhq.campaign.personnel.enums.AwardBonus;
+import mekhq.campaign.personnel.enums.GeneticLegacyRole;
 import mekhq.campaign.personnel.enums.PersonnelStatus;
 import mekhq.campaign.personnel.enums.education.EducationLevel;
 import mekhq.campaign.personnel.enums.education.EducationStage;
@@ -1817,6 +1818,35 @@ public class PersonTest {
             assertEquals("Test Academy", loaded.getEduAcademyNameInSet());
             assertEquals("Test Academy (Galatea)", loaded.getEduAcademyName());
             assertEquals(EducationStage.JOURNEY_TO_CAMPUS, loaded.getEduEducationStage());
+        }
+
+        @Test
+        void savePredatingGeneticLegacyRole_loadsWithNoRole() throws Exception {
+            Person loaded = parsePerson(LEGACY_EDUCATION_XML);
+            assertEquals(GeneticLegacyRole.NONE, loaded.getGeneticLegacyRole());
+        }
+
+        @Test
+        void geneticLegacyRole_isReadBackFromTheSave() throws Exception {
+            Person loaded = parsePerson("""
+                  <person>
+                    <givenName>Natasha</givenName>
+                    <bloodname>Kerensky</bloodname>
+                    <geneticLegacyRole>GENEMOTHER</geneticLegacyRole>
+                  </person>
+                  """);
+            assertEquals(GeneticLegacyRole.GENEMOTHER, loaded.getGeneticLegacyRole());
+        }
+
+        @Test
+        void unreadableGeneticLegacyRole_loadsAsNoRole() throws Exception {
+            Person loaded = parsePerson("""
+                  <person>
+                    <givenName>Natasha</givenName>
+                    <geneticLegacyRole>Genefather of the Sixth</geneticLegacyRole>
+                  </person>
+                  """);
+            assertEquals(GeneticLegacyRole.NONE, loaded.getGeneticLegacyRole());
         }
     }
     // endregion Nested Test Classes for Education Travel

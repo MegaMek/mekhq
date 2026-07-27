@@ -126,6 +126,7 @@ import mekhq.campaign.personnel.education.EducationController;
 import mekhq.campaign.personnel.enums.BloodmarkLevel;
 import mekhq.campaign.personnel.enums.ExtraIncome;
 import mekhq.campaign.personnel.enums.GenderDescriptors;
+import mekhq.campaign.personnel.enums.GeneticLegacyRole;
 import mekhq.campaign.personnel.enums.PersonnelRole;
 import mekhq.campaign.personnel.enums.PersonnelStatus;
 import mekhq.campaign.personnel.enums.education.EducationLevel;
@@ -603,11 +604,63 @@ public class PersonViewPanel extends JScrollablePanel {
         pnlHeritage.setBorder(RoundedLineBorder.createRoundedLineBorder(
               getTextAt(RESOURCE_BUNDLE, "pnlBloodnameHeritage.title")));
 
-        addBloodnameHeadline(pnlHeritage, 0, describeHeritage());
-        addBloodnameRow(pnlHeritage, 1, getTextAt(RESOURCE_BUNDLE, "lblPhenotype.text"),
+        int gridY = 0;
+        addBloodnameHeadline(pnlHeritage, gridY++, describeHeritage());
+        addBloodnameRow(pnlHeritage, gridY++, getTextAt(RESOURCE_BUNDLE, "lblPhenotype.text"),
               person.getPhenotype().getLabel());
 
+        // A legacy held against its origin Clan's exclusivity can only have arrived by capture, so
+        // the tab says so rather than leaving the House panel's "Exclusive to its origin Clan" to
+        // read as a contradiction.
+        Faction capturedFrom = isorlaOriginClanOf(person);
+        if (capturedFrom != null) {
+            addBloodnameRow(pnlHeritage, gridY++, getTextAt(RESOURCE_BUNDLE, "lblBloodnameIsorla.text"),
+                  getFormattedTextAt(RESOURCE_BUNDLE, "lblBloodnameIsorla.value",
+                        capturedFrom.getFullName(campaign.getGameYear())));
+        }
+
+        GeneticLegacyRole legacyRole = person.getGeneticLegacyRole();
+        if (legacyRole.isInUse()) {
+            addBloodnameRow(pnlHeritage, gridY, getTextAt(RESOURCE_BUNDLE, "lblGeneticLegacyRole.text"),
+                  legacyRole.getLabel());
+        }
+
         return pnlHeritage;
+    }
+
+    /**
+     * The Clan a warrior's legacy was taken from, when they carry a Bloodname that Clan holds
+     * exclusively.
+     *
+     * <p>A Clan may not breed from a captured warrior's legacy - that needs a Trial of Possession -
+     * so an exclusive name in another Clan's ranks means the warrior themselves was taken, as isorla
+     * or as a bondsman later reinstated. Jal Steiner served Clan Nova Cat while the Steiner name
+     * stayed exclusive to the Cloud Cobras.</p>
+     *
+     * <p>Derived rather than recorded, so it holds for hand-built and imported characters too.</p>
+     *
+     * @param person the warrior
+     *
+     * @return the Clan the legacy belongs to, or {@code null} when the name is not held against
+     *       another Clan's exclusivity
+     */
+    private @Nullable Faction isorlaOriginClanOf(Person person) {
+        String houseName = houseNameOf(person);
+        if (houseName == null) {
+            return null;
+        }
+
+        Bloodname bloodname = Bloodname.getBloodname(houseName);
+        if ((bloodname == null) || !bloodname.isExclusive()) {
+            return null;
+        }
+
+        Faction originClan = bloodnameOriginClanOf(person);
+        Faction servingClan = servingClanOf(person);
+        if ((originClan == null) || (servingClan == null)) {
+            return null;
+        }
+        return originClan.getShortName().equals(servingClan.getShortName()) ? null : originClan;
     }
 
     /**
@@ -749,6 +802,14 @@ public class PersonViewPanel extends JScrollablePanel {
         addBloodnameRow(pnlBloodnameDetails, gridY++,
               getTextAt(RESOURCE_BUNDLE, "lblBloodnameStanding.text"),
               bloodnameStanding(bloodname));
+
+        Faction capturedFrom = isorlaOriginClanOf(person);
+        if (capturedFrom != null) {
+            addBloodnameRow(pnlBloodnameDetails, gridY++,
+                  getTextAt(RESOURCE_BUNDLE, "lblBloodnameExclusivity.text"),
+                  getFormattedTextAt(RESOURCE_BUNDLE, "lblBloodnameExclusivity.value",
+                        capturedFrom.getFullName(campaign.getGameYear())));
+        }
 
         gridY = addNotableHolders(pnlBloodnameDetails, gridY, houseRecord);
         gridY = addLegacyFate(pnlBloodnameDetails, gridY, houseRecord);

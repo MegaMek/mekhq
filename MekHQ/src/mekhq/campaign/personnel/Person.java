@@ -326,6 +326,12 @@ public class Person implements ILocatable {
      * Trial of Bloodright earn the right to carry its name, which is what {@link #bloodname} records.
      */
     private String bloodhouse;
+
+    /**
+     * How this warrior's genetic legacy is used in their Clan's breeding program. Only a Bloodnamed
+     * trueborn's legacy is ever in use, and the role does not follow from the warrior's own sex.
+     */
+    private GeneticLegacyRole geneticLegacyRole;
     private Faction originFaction;
     private Planet originPlanet;
     private LocalDate becomingBondsmanEndDate;
@@ -563,6 +569,7 @@ public class Person implements ILocatable {
         phenotype = Phenotype.NONE;
         bloodname = "";
         bloodhouse = "";
+        geneticLegacyRole = GeneticLegacyRole.NONE;
         biography = "";
         this.genealogy = new Genealogy(this);
         dueDate = null;
@@ -740,6 +747,21 @@ public class Person implements ILocatable {
     /**
      * @return {@code true} if this person descends from a recorded Bloodname House
      */
+    /**
+     * @return how this warrior's legacy is used in the breeding program; never {@code null}
+     */
+    public GeneticLegacyRole getGeneticLegacyRole() {
+        return geneticLegacyRole;
+    }
+
+    /**
+     * @param geneticLegacyRole the role to record; {@code null} is stored as
+     *                          {@link GeneticLegacyRole#NONE}
+     */
+    public void setGeneticLegacyRole(final @Nullable GeneticLegacyRole geneticLegacyRole) {
+        this.geneticLegacyRole = (geneticLegacyRole == null) ? GeneticLegacyRole.NONE : geneticLegacyRole;
+    }
+
     public boolean hasBloodhouse() {
         return (bloodhouse != null) && !bloodhouse.isBlank();
     }
@@ -3657,6 +3679,13 @@ public class Person implements ILocatable {
                 MHQXMLUtility.writeSimpleXMLTag(pw, indent, "bloodhouse", bloodhouse);
             }
 
+            // As above: written only when the legacy is actually in use, so nothing changes for a
+            // campaign without Clan personnel and an older save loads with no role rather than a
+            // wrong one.
+            if (geneticLegacyRole.isInUse()) {
+                MHQXMLUtility.writeSimpleXMLTag(pw, indent, "geneticLegacyRole", geneticLegacyRole.name());
+            }
+
             if (!isNullOrBlank(biography)) {
                 MHQXMLUtility.writeSimpleXMLTag(pw, indent, "biography", biography);
             }
@@ -4235,6 +4264,8 @@ public class Person implements ILocatable {
                     person.bloodname = wn2.getTextContent();
                 } else if (nodeName.equalsIgnoreCase("bloodhouse")) {
                     person.bloodhouse = wn2.getTextContent();
+                } else if (nodeName.equalsIgnoreCase("geneticLegacyRole")) {
+                    person.geneticLegacyRole = GeneticLegacyRole.parseFromString(wn2.getTextContent());
                 } else if (nodeName.equalsIgnoreCase("biography")) {
                     person.biography = wn2.getTextContent();
                 } else if (nodeName.equalsIgnoreCase("primaryRole")) {
