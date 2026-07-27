@@ -551,13 +551,13 @@ public class PersonViewPanel extends JScrollablePanel {
     }
 
     /**
-     * Builds the Bloodname tab as stacked sections: what this warrior personally carries, the Clan
-     * emblems, then the House the name belongs to and what is known of it.
+     * Builds the Bloodname tab as stacked sections: what this warrior personally carries, the House
+     * the name belongs to and what is known of it, then the Clan emblems.
      */
     private void initializeBloodname(JPanel pnlBloodname) {
         int gridY = addBloodnameSection(pnlBloodname, 0, fillWarriorHeritage());
-        gridY = addBloodnameSection(pnlBloodname, gridY, fillBloodhouseEmblems());
         gridY = addBloodnameSection(pnlBloodname, gridY, fillBloodnameHouse());
+        gridY = addBloodnameSection(pnlBloodname, gridY, fillBloodhouseEmblems());
         addGlue(gridY, pnlBloodname);
     }
 
