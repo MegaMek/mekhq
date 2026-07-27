@@ -37,6 +37,7 @@ import static megamek.client.ui.util.FlatLafStyleBuilder.setFontScaling;
 import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.getCampaignOptionsResourceBundle;
 import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.processWrapSize;
 import static mekhq.utilities.MHQInternationalization.getTextAt;
+import static mekhq.utilities.MHQInternationalization.isResourceKeyValid;
 
 import megamek.common.annotations.Nullable;
 import mekhq.gui.baseComponents.roundedComponents.RoundedJButton;
@@ -132,6 +133,27 @@ public class CampaignOptionsButton extends RoundedJButton {
         setName("btn" + name);
 
         // Applies font scaling with default scaling disabled
+        setFontScaling(this, false, 1);
+    }
+
+    /**
+     * Generic constructor for reuse outside Campaign Options. Resolves the text and tooltip from {@code name + ".text"}
+     * and {@code name + ".tooltip"} in the given resource bundle, without the Campaign Options {@code "lbl"} key
+     * prefix.
+     *
+     * @param resourceBundleName the resource bundle to resolve the text and tooltip from
+     * @param name               the resource key base and internal name (no {@code "lbl"} prefix is added)
+     */
+    public CampaignOptionsButton(String resourceBundleName, String name) {
+        super(getTextAt(resourceBundleName, name + ".text"));
+        String tooltipText = getTextAt(resourceBundleName, name + ".tooltip");
+        if (!isResourceKeyValid(tooltipText)) {
+            tooltipText = getTextAt(resourceBundleName, name + ".toolTipText");
+        }
+        if (isResourceKeyValid(tooltipText)) {
+            setToolTipText(wordWrap(tooltipText, processWrapSize(null)));
+        }
+        setName("btn" + name);
         setFontScaling(this, false, 1);
     }
 }

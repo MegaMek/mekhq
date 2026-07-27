@@ -36,6 +36,7 @@ import static mekhq.campaign.randomEvents.prisoners.PrisonerEventManager.DEFAULT
 
 import jakarta.annotation.Nonnull;
 import mekhq.campaign.Campaign;
+import mekhq.campaign.campaignOptions.CampaignOption;
 import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.personnel.enums.AwardBonus;
 import mekhq.campaign.personnel.enums.EdgeRefreshPeriod;
@@ -54,6 +55,8 @@ class PersonnelOptionsModel {
     boolean onlyCommandersMatterInfantry;
     boolean onlyCommandersMatterBattleArmor;
     boolean useEdge;
+    boolean useTwistOfFateSurvival;
+    boolean useFoundersHavePlotArmor;
     EdgeRefreshPeriod edgeRefreshPeriod;
     int edgeRefreshCost;
     boolean useImplants;
@@ -91,6 +94,7 @@ class PersonnelOptionsModel {
     boolean trackTotalXPEarnings;
     boolean showOriginFaction;
     AwardBonus awardBonusStyle;
+    boolean useReplaceEdgeAwards;
     int awardTierSize;
     boolean enableAutoAwards;
     boolean issuePosthumousAwards;
@@ -116,7 +120,8 @@ class PersonnelOptionsModel {
     boolean useRandomHitsForVehicles;
     boolean tougherHealing;
     boolean useAlternativeAdvancedMedical;
-    boolean useKinderAlternativeAdvancedMedical;
+    boolean useAlternativeAdvancedMedicalFewerPermanentInjuries;
+    double alternativeAdvancedMedicalHealingTimeMultiplier;
     boolean useRandomDiseases;
     int maximumPatients;
     boolean doctorsUseAdministration;
@@ -143,6 +148,8 @@ class PersonnelOptionsModel {
         onlyCommandersMatterInfantry = options.isOnlyCommandersMatterInfantry();
         onlyCommandersMatterBattleArmor = options.isOnlyCommandersMatterBattleArmor();
         useEdge = options.isUseEdge();
+        useTwistOfFateSurvival = options.isUseTwistOfFateSurvival();
+        useFoundersHavePlotArmor = options.get(CampaignOption.USE_FOUNDER_PLOT_ARMOR);
         edgeRefreshPeriod = options.getEdgeRefreshPeriod();
         edgeRefreshCost = options.getEdgeRefreshCost();
         useImplants = options.isUseImplants();
@@ -180,6 +187,7 @@ class PersonnelOptionsModel {
         trackTotalXPEarnings = options.isTrackTotalXPEarnings();
         showOriginFaction = options.isShowOriginFaction();
         awardBonusStyle = options.getAwardBonusStyle();
+        useReplaceEdgeAwards = options.isUseReplaceEdgeAwards();
         awardTierSize = options.getAwardTierSize();
         enableAutoAwards = options.isEnableAutoAwards();
         issuePosthumousAwards = options.isIssuePosthumousAwards();
@@ -205,7 +213,8 @@ class PersonnelOptionsModel {
         useRandomHitsForVehicles = options.isUseRandomHitsForVehicles();
         tougherHealing = options.isTougherHealing();
         useAlternativeAdvancedMedical = options.isUseAlternativeAdvancedMedical();
-        useKinderAlternativeAdvancedMedical = options.isUseKinderAlternativeAdvancedMedical();
+        useAlternativeAdvancedMedicalFewerPermanentInjuries = options.isUseAlternativeAdvancedMedicalFewerPermanentInjuries();
+        alternativeAdvancedMedicalHealingTimeMultiplier = options.getAlternativeAdvancedMedicalHealingTimeMultiplier();
         useRandomDiseases = options.isUseRandomDiseases();
         maximumPatients = options.getMaximumPatients();
         doctorsUseAdministration = options.isDoctorsUseAdministration();
@@ -233,6 +242,8 @@ class PersonnelOptionsModel {
         options.setOnlyCommandersMatterInfantry(onlyCommandersMatterInfantry);
         options.setOnlyCommandersMatterBattleArmor(onlyCommandersMatterBattleArmor);
         options.setUseEdge(useEdge);
+        options.setUseTwistOfFateSurvival(useTwistOfFateSurvival);
+        options.set(CampaignOption.USE_FOUNDER_PLOT_ARMOR, useFoundersHavePlotArmor);
         options.setEdgeRefreshPeriod(edgeRefreshPeriod);
         options.setEdgeRefreshCost(edgeRefreshCost);
         options.setUseImplants(useImplants);
@@ -271,6 +282,7 @@ class PersonnelOptionsModel {
         options.setShowOriginFaction(showOriginFaction);
         options.setAwardBonusStyle(awardBonusStyle);
         options.setAwardTierSize(awardTierSize);
+        options.setUseReplaceEdgeAwards(useReplaceEdgeAwards);
         options.setEnableAutoAwards(enableAutoAwards);
         options.setIssuePosthumousAwards(issuePosthumousAwards);
         options.setIssueBestAwardOnly(issueBestAwardOnly);
@@ -295,7 +307,9 @@ class PersonnelOptionsModel {
         options.setUseRandomHitsForVehicles(useRandomHitsForVehicles);
         options.setTougherHealing(tougherHealing);
         options.setUseAlternativeAdvancedMedical(useAlternativeAdvancedMedical);
-        options.setUseKinderAlternativeAdvancedMedical(useKinderAlternativeAdvancedMedical);
+        options.setUseAlternativeAdvancedMedicalFewerPermanentInjuries(
+              useAlternativeAdvancedMedicalFewerPermanentInjuries);
+        options.setAlternativeAdvancedMedicalHealingTimeMultiplier(alternativeAdvancedMedicalHealingTimeMultiplier);
         options.setUseRandomDiseases(useRandomDiseases);
         options.setMaximumPatients(maximumPatients);
         options.setDoctorsUseAdministration(doctorsUseAdministration);

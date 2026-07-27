@@ -43,6 +43,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyBoolean;
 import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.ArgumentMatchers.isNull;
 import static org.mockito.Mockito.CALLS_REAL_METHODS;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.mockConstruction;
@@ -539,6 +540,168 @@ class StratConRulesManagerTest {
             scenarioFactory.verify(() -> StratConScenarioFactory.getRandomScenario(anyInt(), eq(true), anyBoolean()),
                   never());
             assertTrue(dialogBungledArgs.isEmpty());
+        }
+    }
+
+    /**
+     * Bundles the mocks a {@link StratConRulesManager#generateDailyScenariosForTrack} ambush test needs.
+     */
+    private record DailyAmbushFixture(Campaign campaign, StratConCampaignState campaignState, AtBContract contract,
+          StratConTrackState track, StratConCoords coords, Set<Integer> assignedForceIDs, int forceID) {}
+
+    /**
+     * Builds the mock infrastructure for a daily-generated scenario whose target hex is selected by
+     * {@code getUnoccupiedCoords}. Whether that hex already holds a deployed force is controlled by
+     * {@code hasAssignedForce}.
+     *
+     * @param hasAssignedForce whether the target hex already has a player force assigned (the spawn-on-force path)
+     * @param isPatrol         whether the force sitting on the hex is on a patrol role (a bungled patrol)
+     */
+    private DailyAmbushFixture buildDailyAmbushFixture(boolean hasAssignedForce, boolean isPatrol) {
+        Campaign campaign = MHQTestUtilities.mockCampaign();
+        CampaignOptions options = mock(CampaignOptions.class);
+        when(campaign.getCampaignOptions()).thenReturn(options);
+        when(campaign.getLocalDate()).thenReturn(LocalDate.of(3025, 1, 15));
+
+        AtBContract contract = mock(AtBContract.class);
+        when(contract.getEndingDate()).thenReturn(LocalDate.of(3025, 2, 1));
+
+        StratConCampaignState campaignState = mock(StratConCampaignState.class);
+        StratConTrackState track = mock(StratConTrackState.class);
+        when(campaignState.getTracks()).thenReturn(List.of(track));
+        when(campaignState.getContract()).thenReturn(contract);
+        when(track.getDeploymentTime()).thenReturn(1);
+
+        StratConCoords coords = new StratConCoords(2, 3);
+        int forceID = 7;
+
+        // The force sitting on the hex determines the ambush template's unit type and bungled-patrol flag.
+        Formation formation = mock(Formation.class);
+        when(formation.getPrimaryUnitType(campaign)).thenReturn(UnitType.TANK);
+        when(campaign.getPlayerForce().getFormation(forceID)).thenReturn(formation);
+
+        CombatTeam combatTeam = mock(CombatTeam.class);
+        CombatRole combatRole = mock(CombatRole.class);
+        when(combatRole.isPatrol()).thenReturn(isPatrol);
+        when(combatTeam.getRole()).thenReturn(combatRole);
+        var combatTeamsMap = new Hashtable<Integer, CombatTeam>();
+        combatTeamsMap.put(forceID, combatTeam);
+        when(campaign.getPlayerForce().getCombatTeamsAsMap(campaign)).thenReturn(combatTeamsMap);
+
+        Set<Integer> assignedForceIDs = new LinkedHashSet<>(Set.of(forceID));
+        Map<StratConCoords, Set<Integer>> assignedCoordForces = new HashMap<>();
+        if (hasAssignedForce) {
+            assignedCoordForces.put(coords, assignedForceIDs);
+        }
+        when(track.getAssignedCoordForces()).thenReturn(assignedCoordForces);
+        when(track.getScenarios()).thenReturn(new HashMap<>());
+
+        return new DailyAmbushFixture(campaign, campaignState, contract, track, coords, assignedForceIDs, forceID);
+    }
+
+    /**
+     * Stubs the collaborators so {@code generateDailyScenariosForTrack} runs to the point where it decides the scenario
+     * template: {@code getUnoccupiedCoords} returns the fixture hex, force lookups return empty, and existing-force
+     * generation is neutralized so only the template-selection logic is exercised.
+     *
+     * @return the ambush template that {@code getRandomScenario} is stubbed to return
+     */
+    private ScenarioTemplate stubDailyGeneration(MockedStatic<StratConScenarioFactory> scenarioFactory,
+          MockedStatic<StratConRulesManager> rulesManager,
+          MockedStatic<StratConContractInitializer> contractInitializer, StratConCoords coords) {
+        ScenarioTemplate ambushTemplate = mock(ScenarioTemplate.class);
+        scenarioFactory.when(() -> StratConScenarioFactory.getRandomScenario(anyInt(), anyBoolean(), anyBoolean()))
+              .thenReturn(ambushTemplate);
+        rulesManager.when(() -> StratConRulesManager.getAvailableForceIDs(any(), any(), anyBoolean()))
+              .thenReturn(new ArrayList<>());
+        rulesManager.when(() -> StratConRulesManager.sortForcesByMapType(any(), any(), any()))
+              .thenReturn(new HashMap<>());
+        rulesManager.when(() -> StratConRulesManager.generateScenarioForExistingForces(any(), any(), any(), any(),
+              any(), any(), any())).thenReturn(null);
+        contractInitializer.when(() -> StratConContractInitializer.getUnoccupiedCoords(any(), anyBoolean(),
+              anyBoolean(), anyBoolean())).thenReturn(coords);
+        return ambushTemplate;
+    }
+
+    /**
+     * A daily-generated scenario that spawns on top of an already-deployed (non-patrol) force is an ambush: template
+     * selection is restricted to ambush-suited templates, and that template is passed through to the existing-forces
+     * generation for the occupied hex.
+     */
+    @Test
+    void generateDailyScenariosForTrack_spawnOnDeployedForce_usesAmbushTemplate() {
+        DailyAmbushFixture fixture = buildDailyAmbushFixture(true, false);
+
+        try (MockedStatic<StratConScenarioFactory> scenarioFactory = mockStatic(StratConScenarioFactory.class);
+              MockedStatic<StratConContractInitializer> contractInitializer =
+                    mockStatic(StratConContractInitializer.class);
+              MockedStatic<StratConRulesManager> rulesManager = mockStatic(StratConRulesManager.class,
+                    CALLS_REAL_METHODS)) {
+            ScenarioTemplate ambushTemplate = stubDailyGeneration(scenarioFactory, rulesManager, contractInitializer,
+                  fixture.coords());
+
+            StratConRulesManager.generateDailyScenariosForTrack(fixture.campaign(), fixture.campaignState(),
+                  fixture.contract(), 1);
+
+            // Ambush template requested for the deployed force (non-patrol, so not a bungled patrol) ...
+            scenarioFactory.verify(() -> StratConScenarioFactory.getRandomScenario(anyInt(), eq(true), eq(false)));
+            // ... and passed through to the existing-forces generation for the occupied hex.
+            rulesManager.verify(() -> StratConRulesManager.generateScenarioForExistingForces(eq(fixture.coords()),
+                  eq(fixture.assignedForceIDs()), eq(fixture.contract()), eq(fixture.campaign()), eq(fixture.track()),
+                  eq(ambushTemplate), isNull()));
+        }
+    }
+
+    /**
+     * A daily-generated scenario that spawns on top of a deployed patrol is a bungled patrol: template selection is
+     * restricted to bungled-patrol-suited templates.
+     */
+    @Test
+    void generateDailyScenariosForTrack_spawnOnDeployedPatrol_usesBungledPatrolTemplate() {
+        DailyAmbushFixture fixture = buildDailyAmbushFixture(true, true);
+
+        try (MockedStatic<StratConScenarioFactory> scenarioFactory = mockStatic(StratConScenarioFactory.class);
+              MockedStatic<StratConContractInitializer> contractInitializer =
+                    mockStatic(StratConContractInitializer.class);
+              MockedStatic<StratConRulesManager> rulesManager = mockStatic(StratConRulesManager.class,
+                    CALLS_REAL_METHODS)) {
+            ScenarioTemplate ambushTemplate = stubDailyGeneration(scenarioFactory, rulesManager, contractInitializer,
+                  fixture.coords());
+
+            StratConRulesManager.generateDailyScenariosForTrack(fixture.campaign(), fixture.campaignState(),
+                  fixture.contract(), 1);
+
+            scenarioFactory.verify(() -> StratConScenarioFactory.getRandomScenario(anyInt(), eq(true), eq(true)));
+            rulesManager.verify(() -> StratConRulesManager.generateScenarioForExistingForces(eq(fixture.coords()),
+                  any(), any(), any(), any(), eq(ambushTemplate), isNull()));
+        }
+    }
+
+    /**
+     * A daily-generated scenario on an empty hex (no already-deployed force) is not an ambush: no ambush template is
+     * requested and the existing-forces generation path is not taken.
+     */
+    @Test
+    void generateDailyScenariosForTrack_emptyHex_doesNotUseAmbushTemplate() {
+        DailyAmbushFixture fixture = buildDailyAmbushFixture(false, false);
+
+        try (MockedStatic<StratConScenarioFactory> scenarioFactory = mockStatic(StratConScenarioFactory.class);
+              MockedStatic<StratConContractInitializer> contractInitializer =
+                    mockStatic(StratConContractInitializer.class);
+              MockedStatic<StratConRulesManager> rulesManager = mockStatic(StratConRulesManager.class,
+                    CALLS_REAL_METHODS)) {
+            stubDailyGeneration(scenarioFactory, rulesManager, contractInitializer, fixture.coords());
+            // The empty-hex branch generates a fresh scenario; neutralize it so only the ambush decision matters.
+            rulesManager.when(() -> StratConRulesManager.setupScenario(any(), any(), any(), any(), any()))
+                  .thenReturn(null);
+
+            StratConRulesManager.generateDailyScenariosForTrack(fixture.campaign(), fixture.campaignState(),
+                  fixture.contract(), 1);
+
+            scenarioFactory.verify(() -> StratConScenarioFactory.getRandomScenario(anyInt(), eq(true), anyBoolean()),
+                  never());
+            rulesManager.verify(() -> StratConRulesManager.generateScenarioForExistingForces(any(), any(), any(),
+                  any(), any(), any(), any()), never());
         }
     }
 

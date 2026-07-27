@@ -43,7 +43,9 @@ import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 import java.util.Map;
 import java.util.ResourceBundle;
 import java.util.Set;
@@ -167,6 +169,23 @@ public class CampaignOptionsUtilities {
     }
 
     /**
+     * The legend entries shown for the Campaign Options dialog: the four option-flag markers plus the "added since"
+     * version badges. Shared by the dialog's footer legend button and the General page's inline legend so both list
+     * the same markers.
+     *
+     * @return the Campaign Options legend rows, in display order
+     */
+    public static List<CampaignOptionsIconLegend.Entry> campaignOptionsLegendEntries() {
+        List<CampaignOptionsIconLegend.Entry> entries = new ArrayList<>(List.of(
+              CampaignOptionsIconLegend.flagEntry(CampaignOptionFlag.CUSTOM_SYSTEM),
+              CampaignOptionsIconLegend.flagEntry(CampaignOptionFlag.DOCUMENTED),
+              CampaignOptionsIconLegend.flagEntry(CampaignOptionFlag.IMPORTANT),
+              CampaignOptionsIconLegend.flagEntry(CampaignOptionFlag.RECOMMENDED)));
+        entries.addAll(CampaignOptionsIconLegend.versionBadgeEntries());
+        return entries;
+    }
+
+    /**
      * Applies the FlatLaf "small" size variant to the given component. Centralizes the
      * {@code "JComponent.sizeVariant"} / {@code "small"} client-property strings so they live in one place.
      *
@@ -236,7 +255,12 @@ public class CampaignOptionsUtilities {
     }
 
     static Component createContentWithQuote(Component content, @Nullable String quoteResourceName) {
-        if (quoteResourceName == null || !ResourceBundle.getBundle(RESOURCE_BUNDLE)
+        return createContentWithQuote(content, quoteResourceName, RESOURCE_BUNDLE);
+    }
+
+    static Component createContentWithQuote(Component content, @Nullable String quoteResourceName,
+          String resourceBundleName) {
+        if (quoteResourceName == null || !ResourceBundle.getBundle(resourceBundleName)
                                                  .containsKey(quoteResourceName + ".border")) {
             return content;
         }
@@ -245,10 +269,12 @@ public class CampaignOptionsUtilities {
 
         JPanel quotePanel = new JPanel(new GridBagLayout());
         quotePanel.setBorder(BorderFactory.createEmptyBorder(QUOTE_TOP_PADDING, 0, QUOTE_BOTTOM_PADDING, 0));
-        JLabel quote = new JLabel(String.format(
+        String resolvedQuoteText = getTextAt(resourceBundleName, quoteResourceName + ".border");
+        String quoteHtml = String.format(
               "<html><div style='width: %spx; text-align:center;'>%s</div></html>",
               quoteWidth,
-              getTextAt(RESOURCE_BUNDLE, quoteResourceName + ".border")));
+                            resolvedQuoteText);
+        JLabel quote = new JLabel(quoteHtml);
 
         GridBagConstraints quoteConstraints = new GridBagConstraints();
         quoteConstraints.gridx = GridBagConstraints.RELATIVE;

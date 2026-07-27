@@ -32,7 +32,6 @@
  */
 package mekhq.gui.campaignOptions;
 
-import static megamek.client.ui.util.FontHandler.symbolIcon;
 import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.getCampaignOptionsResourceBundle;
 import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
 import static mekhq.utilities.MHQInternationalization.getTextAt;
@@ -45,7 +44,6 @@ import java.awt.FlowLayout;
 import java.awt.GridBagLayout;
 import java.io.File;
 import java.util.ResourceBundle;
-import javax.swing.BorderFactory;
 import javax.swing.BoxLayout;
 import javax.swing.Icon;
 import javax.swing.ImageIcon;
@@ -54,7 +52,6 @@ import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
-import javax.swing.JPopupMenu;
 import javax.swing.JTextField;
 import javax.swing.UIManager;
 
@@ -203,11 +200,8 @@ public class CampaignOptionsDialog extends AbstractButtonDialog {
 
         // Icons legend: kept apart on the left so it reads as a reference aid rather than a dialog action. Its popup
         // opens upward over the help/content area instead of past the bottom of the dialog.
-        JButton legendButton = new JButton(getTextAt(getCampaignOptionsResourceBundle(), "lblIconsLegend.text"));
-        legendButton.setName("btnIconsLegend");
-        legendButton.setToolTipText(getTextAt(getCampaignOptionsResourceBundle(), "lblIconsLegend.tooltip"));
-        legendButton.setIcon(symbolIcon(0xE88E, legendButton.getFont().getSize(), legendButton.getForeground()));
-        legendButton.addActionListener(evt -> showIconLegend(legendButton));
+        JButton legendButton =
+              CampaignOptionsIconLegend.createLegendButton(CampaignOptionsUtilities.campaignOptionsLegendEntries());
         JPanel legendPanel = new JPanel(new FlowLayout(FlowLayout.LEFT, BUTTON_GAP, BUTTON_GAP));
         legendPanel.add(legendButton);
 
@@ -223,30 +217,6 @@ public class CampaignOptionsDialog extends AbstractButtonDialog {
         pnlButtons.add(rightSpacer, BorderLayout.EAST);
 
         return pnlButtons;
-    }
-
-    /**
-     * Shows the icon legend popup anchored above the given button, overlaying the content/help area. The legend
-     * explains the badge glyphs (custom-system, important, recommended, documented, and recently-added markers) used
-     * on option labels and section titles throughout the dialog.
-     *
-     * @param anchor the footer button the popup opens above
-     */
-    private void showIconLegend(JButton anchor) {
-        CampaignOptionsIconLegend legend = new CampaignOptionsIconLegend();
-        legend.setBorder(BorderFactory.createEmptyBorder(UIUtil.scaleForGUI(8),
-              UIUtil.scaleForGUI(8),
-              UIUtil.scaleForGUI(8),
-              UIUtil.scaleForGUI(8)));
-
-        JPopupMenu legendPopup = new JPopupMenu();
-        legendPopup.setName("campaignOptionsLegendPopup");
-        legendPopup.setLayout(new BorderLayout());
-        legendPopup.add(legend, BorderLayout.CENTER);
-
-        Dimension popupSize = legendPopup.getPreferredSize();
-        // The button is in the footer, so open the popup above it (negative y) to overlay the content above.
-        legendPopup.show(anchor, 0, -popupSize.height);
     }
 
     /**

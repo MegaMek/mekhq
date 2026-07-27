@@ -205,7 +205,9 @@ public abstract class AbstractContractMarket {
                           clauseMods.get(contract.getId()).mods[clause],
                           campaign.getCampaignOptions().getContractMaxSalvagePercentage());
 
-                    contract.clanTechSalvageOverride();
+                    if (campaign.getCampaignOptions().isLimitClanTech()) {
+                        contract.clanTechSalvageOverride();
+                    }
                 }
                 case CLAUSE_TRANSPORT -> rollTransportClause(contract, clauseMods.get(contract.getId()).mods[clause]);
                 case CLAUSE_SUPPORT -> rollSupportClause(contract, clauseMods.get(contract.getId()).mods[clause]);

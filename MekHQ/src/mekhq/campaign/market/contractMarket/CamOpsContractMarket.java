@@ -330,7 +330,9 @@ public class CamOpsContractMarket extends AbstractContractMarket {
               contract.getSystem().getName(contract.getStartDate()),
               contract.getContractType()));
 
-        contract.clanTechSalvageOverride();
+        if (campaign.getCampaignOptions().isLimitClanTech()) {
+            contract.clanTechSalvageOverride();
+        }
 
         return Optional.of(contract);
     }

@@ -232,7 +232,7 @@ public class MedicalLogger {
 
     public static void dismissedFromInfirmary(Person person, Campaign campaign) {
         String message = person.getHyperlinkedName() + " " +
-                         logEntriesResourceMap.getString("dismissedFromInfirmary.text").toLowerCase();
+                               logEntriesResourceMap.getString("dismissedFromInfirmary.text").toLowerCase();
         campaign.addReport(MEDICAL, message);
     }
 
@@ -253,13 +253,13 @@ public class MedicalLogger {
         patient.addMedicalLogEntry(new MedicalLogEntry(date, message));
     }
 
-    public static void unsuccessfullyTreatedAltAdvancedMedical(Person patient, LocalDate date, String injuryName) {
-        String message = logEntriesResourceMap.getString("unsuccessfullyTreatedAltAdvancedMedical.text");
+    public static void permanentInjuryAltAdvancedMedical(Person patient, LocalDate date, String injuryName) {
+        String message = logEntriesResourceMap.getString("permanentInjuryAltAdvancedMedical.text");
         patient.addMedicalLogEntry(new MedicalLogEntry(date, MessageFormat.format(message, injuryName)));
     }
 
-    public static void permanentInjuryAltAdvancedMedical(Person patient, LocalDate date, String injuryName) {
-        String message = logEntriesResourceMap.getString("permanentInjuryAltAdvancedMedical.text");
+    public static void medicalComplicationAltAdvancedMedical(Person patient, LocalDate date, String injuryName) {
+        String message = logEntriesResourceMap.getString("medicalComplicationAltAdvancedMedical.text");
         patient.addMedicalLogEntry(new MedicalLogEntry(date, MessageFormat.format(message, injuryName)));
     }
 }

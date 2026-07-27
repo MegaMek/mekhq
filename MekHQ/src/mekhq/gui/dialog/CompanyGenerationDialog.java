@@ -227,7 +227,10 @@ public class CompanyGenerationDialog extends AbstractMHQValidationButtonDialog {
     private void processBonusUnitsBasedOnCampaignOptions(List<CompanyGenerationPersonTracker> trackers,
           CompanyGenerationOptions options) {
         CampaignOptions campaignOptions = campaign.getCampaignOptions();
-        if (campaignOptions.isUseAlternativeAdvancedMedical()) {
+        boolean isUseAltAdvancedMedical = campaignOptions.isUseAlternativeAdvancedMedical();
+        double altAdvancedMedicalHealingTimeMultiplier = campaignOptions.getAlternativeAdvancedMedicalHealingTimeMultiplier();
+        boolean isUseHardAltAdvancedMedical = altAdvancedMedicalHealingTimeMultiplier >= 2.0;
+        if (isUseAltAdvancedMedical && isUseHardAltAdvancedMedical) {
             int combatants = 0;
             for (CompanyGenerationPersonTracker tracker : trackers) {
                 if (tracker.getPersonType().isCombat()) {

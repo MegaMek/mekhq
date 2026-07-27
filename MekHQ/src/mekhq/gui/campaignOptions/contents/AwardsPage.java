@@ -54,6 +54,7 @@ import javax.swing.ScrollPaneConstants;
 
 import jakarta.annotation.Nonnull;
 import jakarta.annotation.Nullable;
+import megamek.Version;
 import megamek.client.ui.comboBoxes.MMComboBox;
 import megamek.common.ui.FastJScrollPane;
 import mekhq.campaign.personnel.enums.AwardBonus;
@@ -72,9 +73,9 @@ import mekhq.gui.campaignOptions.components.CampaignOptionsSpinner;
  *
  * <p>This view is a sub-component of {@link PersonnelPages}: the model snapshot and the overall load/apply lifecycle
  * still live on {@code PersonnelPages}, while this class is responsible only for constructing the Awards panel and
- * copying award values to and from the model. The page is built lazily; until {@link #createPanel(PersonnelOptionsModel)}
- * is called, {@link #readFromModel(PersonnelOptionsModel)} and {@link #writeToModel(PersonnelOptionsModel)} are
- * no-ops.</p>
+ * copying award values to and from the model. The page is built lazily; until
+ * {@link #createPanel(PersonnelOptionsModel)} is called, {@link #readFromModel(PersonnelOptionsModel)} and
+ * {@link #writeToModel(PersonnelOptionsModel)} are no-ops.</p>
  */
 class AwardsPage {
     private static final int LABEL_COLUMN_WIDTH = CampaignOptionsFormPanel.DEFAULT_LABEL_WIDTH;
@@ -84,6 +85,7 @@ class AwardsPage {
     private JPanel pnlAwardsGeneralOptions;
     private JLabel lblAwardBonusStyle;
     private MMComboBox<AwardBonus> comboAwardBonusStyle;
+    private JCheckBox chkUseReplaceEdgeAwards;
     private JLabel lblAwardTierSize;
     private JSpinner spnAwardTierSize;
     private JCheckBox chkEnableAutoAwards;
@@ -115,7 +117,8 @@ class AwardsPage {
      *
      * @return a {@link JPanel} representing the Awards Page
      */
-    @Nonnull JPanel createPanel(@Nullable PersonnelOptionsModel model) {
+    @Nonnull
+    JPanel createPanel(@Nullable PersonnelOptionsModel model) {
         // Header
         String imageAddress = getImageDirectory() + "logo_outworld_alliance.png";
         awardsHeader = new CampaignOptionsHeaderPanel("AwardsPage", imageAddress);
@@ -130,7 +133,7 @@ class AwardsPage {
         txtAwardSetFilterList.setWrapStyleWord(true);
         txtAwardSetFilterList.addMouseListener(createTipPanelUpdater("AwardSetFilterList"));
         txtAwardSetFilterList.setToolTipText(wordWrap(getTextAt(getCampaignOptionsResourceBundle(),
-                "lblAwardSetFilterList.tooltip")));
+              "lblAwardSetFilterList.tooltip")));
         txtAwardSetFilterList.setName("txtAwardSetFilterList");
         txtAwardSetFilterList.setText("");
         JScrollPane scrollAwardSetFilterList = new FastJScrollPane(txtAwardSetFilterList);
@@ -138,17 +141,17 @@ class AwardsPage {
         scrollAwardSetFilterList.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED);
         JPanel pnlAwardSetFilter = createAwardSetFilterPanel(scrollAwardSetFilterList);
         JPanel panel = CampaignOptionsPagePanel.builder("AwardsPage", "AwardsPage", imageAddress)
-                .header(awardsHeader)
-                .quote("awardsPage")
-                .section("lblAwardsPage.text", "lblAwardsPage.summary", pnlAwardsGeneralOptions)
-                .section("lblAutoAwardsFilterPanel.text",
-                        "lblAutoAwardsFilterPanel.summary",
-                        pnlAutoAwardsFilter)
-                .section("lblAwardsPageBottom.text",
-                        "lblAwardsPageBottom.summary",
-                        pnlAwardSetFilter,
-                        getMetadata(LEGACY_RULE_BEFORE_METADATA, CampaignOptionFlag.IMPORTANT))
-                .build();
+                             .header(awardsHeader)
+                             .quote("awardsPage")
+                             .section("lblAwardsPage.text", "lblAwardsPage.summary", pnlAwardsGeneralOptions)
+                             .section("lblAutoAwardsFilterPanel.text",
+                                   "lblAutoAwardsFilterPanel.summary",
+                                   pnlAutoAwardsFilter)
+                             .section("lblAwardsPageBottom.text",
+                                   "lblAwardsPageBottom.summary",
+                                   pnlAwardSetFilter,
+                                   getMetadata(LEGACY_RULE_BEFORE_METADATA, CampaignOptionFlag.IMPORTANT))
+                             .build();
 
         created = true;
         readFromModel(model);
@@ -168,8 +171,8 @@ class AwardsPage {
         comboAwardBonusStyle.setRenderer(new DefaultListCellRenderer() {
             @Override
             public Component getListCellRendererComponent(final JList<?> list, final Object value,
-                    final int index,
-                    final boolean isSelected, final boolean cellHasFocus) {
+                  final int index,
+                  final boolean isSelected, final boolean cellHasFocus) {
                 super.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);
                 if (value instanceof AwardBonus) {
                     list.setToolTipText(((AwardBonus) value).getToolTipText());
@@ -187,6 +190,10 @@ class AwardsPage {
         chkEnableAutoAwards = new CampaignOptionsCheckBox("EnableAutoAwards");
         chkEnableAutoAwards.addMouseListener(createTipPanelUpdater("EnableAutoAwards"));
 
+        chkUseReplaceEdgeAwards = new CampaignOptionsCheckBox("UseReplaceEdgeAwards",
+              getMetadata(new Version(0, 51, 1)));
+        chkUseReplaceEdgeAwards.addMouseListener(createTipPanelUpdater("UseReplaceEdgeAwards"));
+
         chkIssuePosthumousAwards = new CampaignOptionsCheckBox("IssuePosthumousAwards");
         chkIssuePosthumousAwards.addMouseListener(createTipPanelUpdater("IssuePosthumousAwards"));
 
@@ -198,15 +205,16 @@ class AwardsPage {
 
         // Layout the Panel
         final CampaignOptionsFormPanel panel = new CampaignOptionsFormPanel("AwardsGeneralOptionsPanel",
-                LABEL_COLUMN_WIDTH,
-                CONTROL_COLUMN_WIDTH);
+              LABEL_COLUMN_WIDTH,
+              CONTROL_COLUMN_WIDTH);
         panel.addRow(lblAwardBonusStyle, comboAwardBonusStyle);
         panel.addRow(lblAwardTierSize, spnAwardTierSize);
         panel.addCheckBoxGrid(2,
-                chkEnableAutoAwards,
-                chkIssuePosthumousAwards,
-                chkIssueBestAwardOnly,
-                chkIgnoreStandardSet);
+              chkUseReplaceEdgeAwards,
+              chkEnableAutoAwards,
+              chkIssuePosthumousAwards,
+              chkIssueBestAwardOnly,
+              chkIgnoreStandardSet);
 
         return panel;
     }
@@ -221,17 +229,17 @@ class AwardsPage {
         chkEnableContractAwards = new CampaignOptionsCheckBox("EnableContractAwards");
         chkEnableContractAwards.addMouseListener(createTipPanelUpdater("EnableContractAwards"));
         chkEnableFactionHunterAwards = new CampaignOptionsCheckBox("EnableFactionHunterAwards",
-                getMetadata(LEGACY_RULE_BEFORE_METADATA, CampaignOptionFlag.IMPORTANT));
+              getMetadata(LEGACY_RULE_BEFORE_METADATA, CampaignOptionFlag.IMPORTANT));
         chkEnableFactionHunterAwards
-                .addMouseListener(createTipPanelUpdater("EnableFactionHunterAwards"));
+              .addMouseListener(createTipPanelUpdater("EnableFactionHunterAwards"));
         chkEnableInjuryAwards = new CampaignOptionsCheckBox("EnableInjuryAwards",
-                getMetadata(LEGACY_RULE_BEFORE_METADATA, CampaignOptionFlag.IMPORTANT));
+              getMetadata(LEGACY_RULE_BEFORE_METADATA, CampaignOptionFlag.IMPORTANT));
         chkEnableInjuryAwards.addMouseListener(createTipPanelUpdater("EnableInjuryAwards"));
         chkEnableIndividualKillAwards = new CampaignOptionsCheckBox("EnableIndividualKillAwards");
         chkEnableIndividualKillAwards.addMouseListener(createTipPanelUpdater("EnableIndividualKillAwards"));
         chkEnableFormationKillAwards = new CampaignOptionsCheckBox("EnableFormationKillAwards");
         chkEnableFormationKillAwards
-                .addMouseListener(createTipPanelUpdater("EnableFormationKillAwards"));
+              .addMouseListener(createTipPanelUpdater("EnableFormationKillAwards"));
         chkEnableRankAwards = new CampaignOptionsCheckBox("EnableRankAwards");
         chkEnableRankAwards.addMouseListener(createTipPanelUpdater("EnableRankAwards"));
         chkEnableScenarioAwards = new CampaignOptionsCheckBox("EnableScenarioAwards");
@@ -240,33 +248,33 @@ class AwardsPage {
         chkEnableSkillAwards.addMouseListener(createTipPanelUpdater("EnableSkillAwards"));
         chkEnableTheatreOfWarAwards = new CampaignOptionsCheckBox("EnableTheatreOfWarAwards");
         chkEnableTheatreOfWarAwards
-                .addMouseListener(createTipPanelUpdater("EnableTheatreOfWarAwards"));
+              .addMouseListener(createTipPanelUpdater("EnableTheatreOfWarAwards"));
         chkEnableTimeAwards = new CampaignOptionsCheckBox("EnableTimeAwards",
-                getMetadata(LEGACY_RULE_BEFORE_METADATA, CampaignOptionFlag.IMPORTANT));
+              getMetadata(LEGACY_RULE_BEFORE_METADATA, CampaignOptionFlag.IMPORTANT));
         chkEnableTimeAwards.addMouseListener(createTipPanelUpdater("EnableTimeAwards"));
         chkEnableTrainingAwards = new CampaignOptionsCheckBox("EnableTrainingAwards",
-                getMetadata(LEGACY_RULE_BEFORE_METADATA, CampaignOptionFlag.IMPORTANT));
+              getMetadata(LEGACY_RULE_BEFORE_METADATA, CampaignOptionFlag.IMPORTANT));
         chkEnableTrainingAwards.addMouseListener(createTipPanelUpdater("EnableTrainingAwards"));
         chkEnableMiscAwards = new CampaignOptionsCheckBox("EnableMiscAwards");
         chkEnableMiscAwards.addMouseListener(createTipPanelUpdater("EnableMiscAwards"));
 
         // Layout the Panel
         final CampaignOptionsFormPanel panel = new CampaignOptionsFormPanel("AutoAwardsFilterPanel",
-                LABEL_COLUMN_WIDTH,
-                CONTROL_COLUMN_WIDTH);
+              LABEL_COLUMN_WIDTH,
+              CONTROL_COLUMN_WIDTH);
         panel.addCheckBoxGrid(2,
-                chkEnableContractAwards,
-                chkEnableFactionHunterAwards,
-                chkEnableInjuryAwards,
-                chkEnableIndividualKillAwards,
-                chkEnableFormationKillAwards,
-                chkEnableRankAwards,
-                chkEnableScenarioAwards,
-                chkEnableSkillAwards,
-                chkEnableTheatreOfWarAwards,
-                chkEnableTimeAwards,
-                chkEnableTrainingAwards,
-                chkEnableMiscAwards);
+              chkEnableContractAwards,
+              chkEnableFactionHunterAwards,
+              chkEnableInjuryAwards,
+              chkEnableIndividualKillAwards,
+              chkEnableFormationKillAwards,
+              chkEnableRankAwards,
+              chkEnableScenarioAwards,
+              chkEnableSkillAwards,
+              chkEnableTheatreOfWarAwards,
+              chkEnableTimeAwards,
+              chkEnableTrainingAwards,
+              chkEnableMiscAwards);
 
         return panel;
     }
@@ -293,6 +301,7 @@ class AwardsPage {
         comboAwardBonusStyle.setSelectedItem(model.awardBonusStyle);
         spnAwardTierSize.setValue(model.awardTierSize);
         chkEnableAutoAwards.setSelected(model.enableAutoAwards);
+        chkUseReplaceEdgeAwards.setSelected(model.useReplaceEdgeAwards);
         chkIssuePosthumousAwards.setSelected(model.issuePosthumousAwards);
         chkIssueBestAwardOnly.setSelected(model.issueBestAwardOnly);
         chkIgnoreStandardSet.setSelected(model.ignoreStandardSet);
@@ -325,6 +334,7 @@ class AwardsPage {
         model.awardBonusStyle = comboAwardBonusStyle.getSelectedItem();
         model.awardTierSize = (int) spnAwardTierSize.getValue();
         model.enableAutoAwards = chkEnableAutoAwards.isSelected();
+        model.useReplaceEdgeAwards = chkUseReplaceEdgeAwards.isSelected();
         model.issuePosthumousAwards = chkIssuePosthumousAwards.isSelected();
         model.issueBestAwardOnly = chkIssueBestAwardOnly.isSelected();
         model.ignoreStandardSet = chkIgnoreStandardSet.isSelected();
