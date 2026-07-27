@@ -68,6 +68,8 @@ public class PersonnelReport extends AbstractReport {
         int countDead = 0;
         int countStudents = 0;
         int countRetired = 0;
+        int countBloodnamed = 0;
+        int countTrueborn = 0;
         Money salary = Money.zero();
 
         for (Person person : getCampaign().getPlayerForce().getPersonnel().values()) {
@@ -85,6 +87,15 @@ public class PersonnelReport extends AbstractReport {
                     countInjured++;
                 }
                 salary = salary.plus(person.getSalary(getCampaign()));
+                // Counted among the active only, so the figure describes the warriors currently
+                // serving rather than everyone the command has ever had on its books.
+                if (person.getPhenotype().isTrueborn()) {
+                    countTrueborn++;
+                }
+                String bloodname = person.getBloodname();
+                if ((bloodname != null) && !bloodname.isBlank()) {
+                    countBloodnamed++;
+                }
             } else if ((person.getPrisonerStatus().isBondsman()) && (person.getStatus().isActive())) {
                 if (!person.getInjuries().isEmpty() || (person.getHits() > 0)) {
                     countInjured++;
@@ -148,6 +159,16 @@ public class PersonnelReport extends AbstractReport {
                     }
                 }
             }
+        }
+
+        // Bloodnamed warriors, shown only where there are trueborns to count them against - the line
+        // means nothing in a command with no Clan personnel.
+        if (countTrueborn > 0) {
+            sb.append('\n')
+                  .append(String.format("%-30s        %4s\n",
+                        resources.getString("combat.trueborn.text"), countTrueborn))
+                  .append(String.format("%-30s        %4s\n",
+                        resources.getString("combat.bloodnamed.text"), countBloodnamed));
         }
 
         sb.append(getSecondaryCombatPersonnelDetails());
