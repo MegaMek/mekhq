@@ -125,7 +125,9 @@ public class CommandGenerationPane extends AbstractMHQTabbedPane {
                 LOGGER.debug("[NamingMethod] faction change with no record; leaving naming alone");
                 return;
             }
-            LOGGER.debug("[NamingMethod] faction now {} (isClan={})",
+            // At INFO because it fires once per faction selection, and because a report that the
+            // naming method did not switch cannot be placed without it.
+            LOGGER.info("[NamingMethod] faction now {} (isClan={})",
                   factionRecord.getKey(), factionRecord.isClan());
             if (factionRecord.isClan()) {
                 setupTab.setSelectedForceNamingMethod(ForceNamingMethod.GREEK_ALPHABET);

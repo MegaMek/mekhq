@@ -794,7 +794,7 @@ public class SetupTab {
             return;
         }
         if (namingMethod == comboForceNamingMethod.getSelectedItem()) {
-            LOGGER.debug("[NamingMethod] already {}; leaving it", namingMethod);
+            LOGGER.info("[NamingMethod] already {}; leaving it", namingMethod);
             return;
         }
         LOGGER.info("[NamingMethod] switching from {} to {}",
