@@ -57,53 +57,53 @@ class SupportPersonnelToTOETest {
     // --- Inner Sphere packing: platoon 28, squad 7. Remainder becomes squads unless > 3.5 squads (>= 25). ---
 
     @Test
-    void packPool_is_lone_isSquadNotPerson() {
-        assertEquals(List.of("Support Squad:1"), pack(1, IS));
+    void packPool_is_lone_ridesInSmallestSquadNotItsOwnUnit() {
+        assertEquals(List.of("Support Squad (2 person):1"), pack(1, IS));
     }
 
     @Test
     void packPool_is_belowSquad_singleUnderstaffedSquad() {
-        assertEquals(List.of("Support Squad:2"), pack(2, IS));
+        assertEquals(List.of("Support Squad (2 person):2"), pack(2, IS));
     }
 
     @Test
     void packPool_is_fullSquad() {
-        assertEquals(List.of("Support Squad:7"), pack(7, IS));
+        assertEquals(List.of("Support Squad (7 person):7"), pack(7, IS));
     }
 
     @Test
     void packPool_is_aboveSquad_overflowsToSquadsNotPlatoon() {
         // 8 is only ~1.1 squads, well under the 3.5-squad threshold -> two squads, not a platoon of 8.
-        assertEquals(List.of("Support Squad:7", "Support Squad:1"), pack(8, IS));
+        assertEquals(List.of("Support Squad (7 person):7", "Support Squad (2 person):1"), pack(8, IS));
     }
 
     @Test
     void packPool_is_justBelowThreshold_staysSquads() {
         // 24 = 3.43 squads (<= 3.5) -> four squads (7,7,7,3), not an understaffed platoon.
-        assertEquals(List.of("Support Squad:7", "Support Squad:7", "Support Squad:7", "Support Squad:3"),
+        assertEquals(List.of("Support Squad (7 person):7", "Support Squad (7 person):7", "Support Squad (7 person):7", "Support Squad (3 person):3"),
               pack(24, IS));
     }
 
     @Test
     void packPool_is_aboveThreshold_becomesPlatoon() {
         // 25 = 3.57 squads (> 3.5) -> one understaffed platoon rather than a near-full squad stack.
-        assertEquals(List.of("Support Platoon:25"), pack(25, IS));
+        assertEquals(List.of("Support Platoon (28 person):25"), pack(25, IS));
     }
 
     @Test
     void packPool_is_fullPlatoon() {
-        assertEquals(List.of("Support Platoon:28"), pack(28, IS));
+        assertEquals(List.of("Support Platoon (28 person):28"), pack(28, IS));
     }
 
     @Test
     void packPool_is_platoonPlusLoneRemainder() {
-        assertEquals(List.of("Support Platoon:28", "Support Squad:1"), pack(29, IS));
+        assertEquals(List.of("Support Platoon (28 person):28", "Support Squad (2 person):1"), pack(29, IS));
     }
 
     @Test
     void packPool_is_battalionMekTechs() {
         // 36 = one full platoon + remainder 8 -> two squads (7,1).
-        assertEquals(List.of("Support Platoon:28", "Support Squad:7", "Support Squad:1"), pack(36, IS));
+        assertEquals(List.of("Support Platoon (28 person):28", "Support Squad (7 person):7", "Support Squad (2 person):1"), pack(36, IS));
     }
 
     @Test
@@ -111,8 +111,8 @@ class SupportPersonnelToTOETest {
         // 216 = 7 full platoons (196) + remainder 20 (2.86 squads) -> three squads (7,7,6).
         List<String> carriers = pack(216, IS);
         assertEquals(10, carriers.size());
-        assertEquals("Support Platoon:28", carriers.get(0));
-        assertEquals(List.of("Support Squad:7", "Support Squad:7", "Support Squad:6"),
+        assertEquals("Support Platoon (28 person):28", carriers.get(0));
+        assertEquals(List.of("Support Squad (7 person):7", "Support Squad (7 person):7", "Support Squad (6 person):6"),
               carriers.subList(7, 10));
     }
 
@@ -120,24 +120,24 @@ class SupportPersonnelToTOETest {
 
     @Test
     void packPool_clan_fullPoint() {
-        assertEquals(List.of("Clan Support Point:25"), pack(25, CLAN));
+        assertEquals(List.of("Clan Support Point (25 person):25"), pack(25, CLAN));
     }
 
     @Test
     void packPool_clan_pointPlusSquad() {
-        assertEquals(List.of("Clan Support Point:25", "Clan Support Squad:5"), pack(30, CLAN));
+        assertEquals(List.of("Clan Support Point (25 person):25", "Clan Support Squad (5 person):5"), pack(30, CLAN));
     }
 
     @Test
     void packPool_clan_belowThreshold_staysSquads() {
-        assertEquals(List.of("Clan Support Squad:5", "Clan Support Squad:5", "Clan Support Squad:2"),
+        assertEquals(List.of("Clan Support Squad (5 person):5", "Clan Support Squad (5 person):5", "Clan Support Squad (2 person):2"),
               pack(12, CLAN));
     }
 
     @Test
     void packPool_clan_aboveThreshold_becomesPoint() {
         // 23 = 4.6 squads (> 4.5) -> understaffed Point.
-        assertEquals(List.of("Clan Support Point:23"), pack(23, CLAN));
+        assertEquals(List.of("Clan Support Point (25 person):23"), pack(23, CLAN));
     }
 
     // --- Invariants ---

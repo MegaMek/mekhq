@@ -80,12 +80,21 @@ public final class SupportPersonnelToTOE {
     private static final MMLogger LOGGER = MMLogger.create(SupportPersonnelToTOE.class);
     private static final String RESOURCE_BUNDLE = "mekhq.resources.SupportPersonnelToTOE";
 
-    // Carrier unit names (looked up by MekSummaryCache by <Name>; see
-    // mm-data/data/mekfiles/infantry/Support Units). Filenames differ from these names.
-    private static final String IS_PLATOON_UNIT = "Support Platoon";
-    private static final String IS_SQUAD_UNIT = "Support Squad";
-    private static final String CLAN_POINT_UNIT = "Clan Support Point";
-    private static final String CLAN_SQUAD_UNIT = "Clan Support Squad";
+    // Carrier units are looked up by their full name, which MekSummary builds as chassis + model (see
+    // mm-data/data/mekfiles/infantry/Support Units; filenames differ from these names). Every squad
+    // size is a model of one chassis - "Support Squad (3 person)" - so the carrier for a given number
+    // of people is named rather than searched for.
+    private static final String UNIT_NAME_FORMAT = "%s (%d person)";
+    private static final String IS_PLATOON_CHASSIS = "Support Platoon";
+    private static final String IS_SQUAD_CHASSIS = "Support Squad";
+    private static final String CLAN_POINT_CHASSIS = "Clan Support Point";
+    private static final String CLAN_SQUAD_CHASSIS = "Clan Support Squad";
+
+    /**
+     * The smallest squad the data provides. A remainder below this rides in one of these rather than
+     * getting a carrier of its own - a lone straggler is not given a single-person unit.
+     */
+    private static final int SMALLEST_SQUAD = 2;
 
     // Echelon sizes (troopers per carrier).
     private static final int IS_PLATOON_SIZE = 28;
@@ -102,9 +111,28 @@ public final class SupportPersonnelToTOE {
      * their trooper capacities, the roll-up formation label ("Company" / "Star"), and the formation
      * levels used for the section and its companies.
      */
-    record EchelonProfile(String topUnitName, int topUnitSize, String squadUnitName,
+    record EchelonProfile(String topUnitChassis, int topUnitSize, String squadUnitChassis,
           int squadUnitSize, String rollupLabel,
-          FormationLevel sectionLevel, FormationLevel rollupLevel) {}
+          FormationLevel sectionLevel, FormationLevel rollupLevel) {
+
+        /** @return the full name of the top-tier carrier, at its full strength */
+        String topUnitName() {
+            return UNIT_NAME_FORMAT.formatted(topUnitChassis, topUnitSize);
+        }
+
+        /**
+         * The carrier sized for this many people. The data provides a squad for every size from
+         * {@link #SMALLEST_SQUAD} up to the full squad, so a partial squad now gets a carrier built for
+         * it instead of a full-size one left mostly empty.
+         *
+         * @param crewSize how many people the carrier must hold
+         *
+         * @return the full name of the carrier to load
+         */
+        String squadUnitNameFor(int crewSize) {
+            return UNIT_NAME_FORMAT.formatted(squadUnitChassis, Math.max(SMALLEST_SQUAD, crewSize));
+        }
+    }
 
     /**
      * Organizes {@code supportPersonnel} into the campaign TOE. No-op when the list is empty or holds
@@ -186,13 +214,14 @@ public final class SupportPersonnelToTOE {
     }
 
     static EchelonProfile innerSphereProfile() {
-        return new EchelonProfile(IS_PLATOON_UNIT, IS_PLATOON_SIZE, IS_SQUAD_UNIT, IS_SQUAD_SIZE,
+        return new EchelonProfile(IS_PLATOON_CHASSIS, IS_PLATOON_SIZE, IS_SQUAD_CHASSIS, IS_SQUAD_SIZE,
               label("company"), FormationLevel.BATTALION, FormationLevel.COMPANY);
     }
 
     static EchelonProfile clanProfile() {
-        return new EchelonProfile(CLAN_POINT_UNIT, CLAN_POINT_SIZE, CLAN_SQUAD_UNIT, CLAN_SQUAD_SIZE,
-              label("star"), FormationLevel.BINARY_OR_TRINARY, FormationLevel.STAR_OR_NOVA);
+        return new EchelonProfile(CLAN_POINT_CHASSIS, CLAN_POINT_SIZE, CLAN_SQUAD_CHASSIS,
+              CLAN_SQUAD_SIZE, label("star"), FormationLevel.BINARY_OR_TRINARY,
+              FormationLevel.STAR_OR_NOVA);
     }
 
     /**
@@ -333,7 +362,7 @@ public final class SupportPersonnelToTOE {
 
     /**
      * Packs a pool of people into carriers, filling smallest-to-largest: a full platoon / Point unit
-     * for each whole platoon's worth, then the remainder as squads (the last understaffed) - unless
+     * for each whole platoon's worth, then the remainder as squads sized to the people in them - unless
      * the remainder is more than 3.5 squads' worth (4.5 for Clan), in which case it becomes a single
      * understaffed platoon / Point rather than a near-full stack of squads. Never a single-person
      * carrier. Platoon / Point carriers are top-tier (they roll up); squads hang off the section.
@@ -370,13 +399,14 @@ public final class SupportPersonnelToTOE {
         int squadCount = 0;
         while (remainder > 0) {
             int crewSize = Math.min(profile.squadUnitSize(), remainder);
-            specs.add(new CarrierSpec(profile.squadUnitName(), crewSlice(people, index, crewSize), false, label));
+            specs.add(new CarrierSpec(profile.squadUnitNameFor(crewSize),
+                  crewSlice(people, index, crewSize), false, label));
             index += crewSize;
             remainder -= crewSize;
             squadCount++;
         }
-        LOGGER.info("[CompanyGen][SupportTOE]     packPool '{}': total={} -> {} full {} + {} detachment {}(s)",
-              label, total, fullTopUnits, profile.topUnitName(), squadCount, profile.squadUnitName());
+        LOGGER.info("[CompanyGen][SupportTOE]     packPool '{}': total={} -> {} full {} + {} detachment squad(s)",
+              label, total, fullTopUnits, profile.topUnitName(), squadCount);
         return specs;
     }
 
