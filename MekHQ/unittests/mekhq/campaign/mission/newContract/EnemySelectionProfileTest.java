@@ -35,6 +35,7 @@ package mekhq.campaign.mission.newContract;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import mekhq.campaign.mission.enums.AtBContractType;
+import mekhq.campaign.mission.newContract.targetFinder.EnemySelectionProfile;
 import org.junit.jupiter.api.Test;
 
 /**

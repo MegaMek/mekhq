@@ -56,9 +56,9 @@ import java.util.Set;
 import megamek.common.compute.Compute;
 import megamek.common.util.weightedMaps.WeightedIntMap;
 import mekhq.campaign.location.ILocation;
-import mekhq.campaign.mission.mission.contractGeneration.GlobalEmployerTableValue;
-import mekhq.campaign.mission.newContract.EnemySelectionProfile;
-import mekhq.campaign.mission.newContract.MissionLocationProfile;
+import mekhq.campaign.mission.newContract.contractGeneration.GlobalEmployerTableValue;
+import mekhq.campaign.mission.newContract.targetFinder.EnemySelectionProfile;
+import mekhq.campaign.mission.newContract.targetFinder.MissionLocationProfile;
 import mekhq.campaign.universe.PlanetarySystem.PlanetaryRating;
 import mekhq.campaign.universe.PlanetarySystem.PlanetarySophistication;
 import mekhq.campaign.universe.enums.HPGRating;
@@ -1021,8 +1021,8 @@ public class RandomFactionGeneratorTest {
     /**
      * AT_WAR (and by extension OCCUPYING_POWER, which shares the same belligerent search): an aggregate-faction
      * employer can be matched against itself with no war record, since
-     * {@code RandomFactionGenerator#findEnemiesAtWarWith(Faction, LocalDate)} carries the
-     * same self-conflict exception as {@link RandomFactionGenerator#buildEnemyMap}.
+     * {@code RandomFactionGenerator#findEnemiesAtWarWith(Faction, LocalDate)} carries the same self-conflict exception
+     * as {@link RandomFactionGenerator#buildEnemyMap}.
      */
     @Test
     public void testGetRandomEnemyProfileAtWarAllowsMercenaryEmployerToFightItselfWithoutAWarRecord() {

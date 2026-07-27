@@ -35,7 +35,7 @@ package mekhq.campaign.market.contractMarket;
 import static megamek.common.compute.Compute.d6;
 import static megamek.common.enums.SkillLevel.GREEN;
 import static megamek.common.enums.SkillLevel.REGULAR;
-import static mekhq.campaign.mission.newContract.ClanHomeworldsExclusion.violatesHomeworldsExclusion;
+import static mekhq.campaign.mission.newContract.targetFinder.ClanHomeworldsExclusion.violatesHomeworldsExclusion;
 import static mekhq.campaign.personnel.PersonnelOptions.ADMIN_NETWORKER;
 import static mekhq.campaign.personnel.skills.SkillType.S_NEGOTIATION;
 import static mekhq.campaign.randomEvents.other.GrayMonday.isGrayMonday;
@@ -260,7 +260,7 @@ public class CamOpsContractMarket extends AbstractContractMarket {
     }
 
     private Optional<AtBContract> generateContract(Campaign campaign,
-            mekhq.campaign.camOpsReputation.ForceReputationController reputation,
+          mekhq.campaign.camOpsReputation.ForceReputationController reputation,
           HiringHallModifiers hiringHallModifiers) {
         AtBContract contract = new AtBContract("UnnamedContract");
         lastId++;

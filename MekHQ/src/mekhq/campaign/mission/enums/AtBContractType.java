@@ -35,18 +35,18 @@ package mekhq.campaign.mission.enums;
 import static java.lang.Math.round;
 import static megamek.common.compute.Compute.randomInt;
 import static mekhq.campaign.mission.enums.AtBEventType.*;
-import static mekhq.campaign.mission.newContract.EnemySelectionProfile.AT_WAR;
-import static mekhq.campaign.mission.newContract.EnemySelectionProfile.COVERT;
-import static mekhq.campaign.mission.newContract.EnemySelectionProfile.OCCUPYING_POWER;
-import static mekhq.campaign.mission.newContract.EnemySelectionProfile.PIRATES;
-import static mekhq.campaign.mission.newContract.EnemySelectionProfile.RAIDERS;
-import static mekhq.campaign.mission.newContract.EnemySelectionProfile.REBELS;
-import static mekhq.campaign.mission.newContract.MissionLocationProfile.DEEP_RAID;
-import static mekhq.campaign.mission.newContract.MissionLocationProfile.HIGH_VALUE;
-import static mekhq.campaign.mission.newContract.MissionLocationProfile.INTERIOR_POPULATED;
-import static mekhq.campaign.mission.newContract.MissionLocationProfile.INVASION;
-import static mekhq.campaign.mission.newContract.MissionLocationProfile.OCCUPIED_TERRITORY;
-import static mekhq.campaign.mission.newContract.MissionLocationProfile.REAR_AREA;
+import static mekhq.campaign.mission.newContract.targetFinder.EnemySelectionProfile.AT_WAR;
+import static mekhq.campaign.mission.newContract.targetFinder.EnemySelectionProfile.COVERT;
+import static mekhq.campaign.mission.newContract.targetFinder.EnemySelectionProfile.OCCUPYING_POWER;
+import static mekhq.campaign.mission.newContract.targetFinder.EnemySelectionProfile.PIRATES;
+import static mekhq.campaign.mission.newContract.targetFinder.EnemySelectionProfile.RAIDERS;
+import static mekhq.campaign.mission.newContract.targetFinder.EnemySelectionProfile.REBELS;
+import static mekhq.campaign.mission.newContract.targetFinder.MissionLocationProfile.DEEP_RAID;
+import static mekhq.campaign.mission.newContract.targetFinder.MissionLocationProfile.HIGH_VALUE;
+import static mekhq.campaign.mission.newContract.targetFinder.MissionLocationProfile.INTERIOR_POPULATED;
+import static mekhq.campaign.mission.newContract.targetFinder.MissionLocationProfile.INVASION;
+import static mekhq.campaign.mission.newContract.targetFinder.MissionLocationProfile.OCCUPIED_TERRITORY;
+import static mekhq.campaign.mission.newContract.targetFinder.MissionLocationProfile.REAR_AREA;
 
 import java.util.ResourceBundle;
 
@@ -56,8 +56,8 @@ import megamek.logging.MMLogger;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.mission.AtBScenario;
-import mekhq.campaign.mission.newContract.EnemySelectionProfile;
-import mekhq.campaign.mission.newContract.MissionLocationProfile;
+import mekhq.campaign.mission.newContract.targetFinder.EnemySelectionProfile;
+import mekhq.campaign.mission.newContract.targetFinder.MissionLocationProfile;
 
 public enum AtBContractType {
     // NEVER SORT THESE ENUM ENTRIES. IT WILL BREAK ATB CONTRACT GENERATION.

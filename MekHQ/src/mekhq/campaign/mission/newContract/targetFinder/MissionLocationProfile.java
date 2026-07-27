@@ -30,14 +30,13 @@
  * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
  * affiliated with Microsoft.
  */
-package mekhq.campaign.mission.newContract;
+package mekhq.campaign.mission.newContract.targetFinder;
 
 import java.time.LocalDate;
 import java.util.Collections;
 import java.util.List;
 
 import mekhq.campaign.location.ILocation;
-import mekhq.campaign.mission.newContract.targetFinder.MissionTargetFinder;
 import mekhq.campaign.universe.Faction;
 import mekhq.campaign.universe.PlanetarySystem;
 

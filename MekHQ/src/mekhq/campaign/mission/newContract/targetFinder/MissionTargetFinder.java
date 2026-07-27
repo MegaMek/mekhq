@@ -46,7 +46,6 @@ import java.util.Set;
 
 import megamek.common.annotations.Nullable;
 import mekhq.campaign.location.ILocation;
-import mekhq.campaign.mission.newContract.MissionLocationProfile;
 import mekhq.campaign.universe.Faction;
 import mekhq.campaign.universe.FactionBorderTracker;
 import mekhq.campaign.universe.FactionBorders;
