@@ -114,6 +114,7 @@ import javax.swing.SwingConstants;
 import mekhq.campaign.universe.Faction;
 import megamek.common.universe.BloodnameHolder;
 import megamek.common.universe.BloodnameHouse;
+import megamek.common.universe.BloodnameNote;
 import megamek.common.universe.BloodnameTransfer;
 import megamek.common.universe.Bloodnames2;
 import mekhq.campaign.personnel.Bloodname;
@@ -659,7 +660,7 @@ public class PersonViewPanel extends JScrollablePanel {
         }
 
         Bloodname bloodname = Bloodname.getBloodname(houseName);
-        if ((bloodname == null) || !bloodname.isExclusive()) {
+        if ((bloodname == null) || !bloodname.isExclusive(campaign.getGameYear())) {
             return null;
         }
 
@@ -914,6 +915,29 @@ public class PersonViewPanel extends JScrollablePanel {
     }
 
     /**
+     * Things recorded about this House that only became true in a given year, each withheld until the
+     * campaign reaches it.
+     *
+     * <p>A warrior in 3050 should not read that their name was noted as Limited in 3085. The
+     * undated part of a House's description stays in its Legacy; anything that happened at a point in
+     * time is held here so it can be gated.</p>
+     *
+     * @return the next free row
+     */
+    private int addDatedNotes(JPanel panel, int gridY, @Nullable BloodnameHouse house) {
+        if (house == null) {
+            return gridY;
+        }
+
+        List<BloodnameNote> notes = house.getDatedNotesBy(campaign.getGameYear());
+        for (int index = 0; index < notes.size(); index++) {
+            addBloodnameRow(panel, gridY++, "lblBloodnameDatedNote", (index != 0),
+                  notes.get(index).getText());
+        }
+        return gridY;
+    }
+
+    /**
      * What became of the legacy, shown only once the campaign has reached the year it happened.
      *
      * <p>A campaign in 3050 should not be reading about a Clan that inherits the name in 3075. Each
@@ -1013,10 +1037,10 @@ public class PersonViewPanel extends JScrollablePanel {
         if (bloodname.isAbjured(year)) {
             standings.add(getTextAt(RESOURCE_BUNDLE, "bloodnameStanding.abjured"));
         }
-        if (bloodname.isExclusive()) {
+        if (bloodname.isExclusive(year)) {
             standings.add(getTextAt(RESOURCE_BUNDLE, "bloodnameStanding.exclusive"));
         }
-        if (bloodname.isLimited()) {
+        if (bloodname.isLimited(year)) {
             standings.add(getTextAt(RESOURCE_BUNDLE, "bloodnameStanding.limited"));
         }
         return standings.isEmpty()

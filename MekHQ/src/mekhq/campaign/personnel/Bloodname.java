@@ -73,7 +73,14 @@ public class Bloodname {
     private String founder;
     private Clan origClan;
     private boolean exclusive;
+
+    /** Year exclusivity ended, or {@code null} while it still holds. */
+    private Integer exclusiveUntil;
+
     private boolean limited;
+
+    /** Year the name became Limited, or {@code null} when the data does not say. */
+    private Integer limitedSince;
     private int inactive;
     private int abjured;
     private int reactivated;
@@ -119,8 +126,37 @@ public class Bloodname {
         return exclusive;
     }
 
+    /**
+     * Whether the name is still exclusive to its origin Clan in the given year.
+     *
+     * <p>Exclusivity is not permanent - the Council of Six Clans ended it for several names in 3084,
+     * and a Trial of Possession can end it at any time.</p>
+     *
+     * @param year the year to judge it in
+     *
+     * @return {@code true} if exclusivity is recorded and has not yet ended
+     */
+    public boolean isExclusive(int year) {
+        return exclusive && ((exclusiveUntil == null) || (year < exclusiveUntil));
+    }
+
     public boolean isLimited() {
         return limited;
+    }
+
+    /**
+     * Whether the name counts as Limited in the given year.
+     *
+     * <p>A name becomes Limited as its Bloodcount falls; it is not so from its founding. Judging it
+     * without a year put a thirty-second-century state of affairs in front of campaigns centuries
+     * earlier. A name with no recorded year is treated as having always been Limited.</p>
+     *
+     * @param year the year to judge it in
+     *
+     * @return {@code true} if the name is Limited and the campaign has reached the year it became so
+     */
+    public boolean isLimited(int year) {
+        return limited && ((limitedSince == null) || (year >= limitedSince));
     }
 
     /**
@@ -462,7 +498,9 @@ public class Bloodname {
         bloodname.founder = house.getFounder();
         bloodname.origClan = Clan.getClan(record.getClan());
         bloodname.exclusive = house.isExclusive();
+        bloodname.exclusiveUntil = house.getExclusiveUntil();
         bloodname.limited = house.isLimited();
+        bloodname.limitedSince = house.getLimitedSince();
 
         if (house.getPhenotype() != null) {
             bloodname.phenotype = Phenotype.fromString(house.getPhenotype());
