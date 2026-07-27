@@ -471,4 +471,60 @@ class SeniorAppointmentAssignerTest {
         assertNotEquals(37, promotedTo.getValue().intValue(),
               "index 37 is blank in SLDF and must be skipped");
     }
+
+    @Test
+    void aHeadIsNeverPromotedPastTheUnitCommander() {
+        // Support services do not outrank the officer commanding the force, however senior their own
+        // staff happen to be.
+        Campaign campaign = mock(Campaign.class);
+        Person commander = mock(Person.class);
+        when(commander.getRankNumeric()).thenReturn(34);
+        LocalPersonnel roster = new LocalPersonnel();
+        roster.put(UUID.randomUUID(), commander);
+        when(campaign.getPersonnel()).thenReturn(roster);
+
+        Person chosen = junior(PersonnelRole.DOCTOR);
+        withSkill(chosen, SkillType.S_SURGERY, 9);
+        when(chosen.getRankNumeric()).thenReturn(20);
+        when(chosen.getRankSystem()).thenReturn(sldf());
+
+        Person seniorStaff = junior(PersonnelRole.DOCTOR);
+        withSkill(seniorStaff, SkillType.S_SURGERY, 2);
+        when(seniorStaff.getRankNumeric()).thenReturn(33);
+
+        SeniorAppointmentAssigner.assign(campaign, List.of(chosen, seniorStaff));
+
+        verify(chosen).setChiefMedicalOfficer(true);
+        ArgumentCaptor<Integer> promotedTo = ArgumentCaptor.forClass(Integer.class);
+        verify(chosen).setRank(promotedTo.capture());
+        assertTrue(promotedTo.getValue() <= 34,
+              "the CMO should not be promoted past the commander at 34, but reached "
+                    + promotedTo.getValue());
+    }
+
+    @Test
+    void aHeadStaysPutRatherThanPassingTheCommander() {
+        // Staff already level with the commander leaves no room to step into, so the head keeps the
+        // rank they have instead of breaching the cap.
+        Campaign campaign = mock(Campaign.class);
+        Person commander = mock(Person.class);
+        when(commander.getRankNumeric()).thenReturn(35);
+        LocalPersonnel roster = new LocalPersonnel();
+        roster.put(UUID.randomUUID(), commander);
+        when(campaign.getPersonnel()).thenReturn(roster);
+
+        Person chosen = junior(PersonnelRole.DOCTOR);
+        withSkill(chosen, SkillType.S_SURGERY, 9);
+        when(chosen.getRankNumeric()).thenReturn(35);
+        when(chosen.getRankSystem()).thenReturn(sldf());
+
+        Person seniorStaff = junior(PersonnelRole.DOCTOR);
+        withSkill(seniorStaff, SkillType.S_SURGERY, 2);
+        when(seniorStaff.getRankNumeric()).thenReturn(35);
+
+        SeniorAppointmentAssigner.assign(campaign, List.of(chosen, seniorStaff));
+
+        verify(chosen).setChiefMedicalOfficer(true);
+        verify(chosen, never()).setRank(anyInt());
+    }
 }

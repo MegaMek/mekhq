@@ -34,6 +34,8 @@ package mekhq.campaign.universe.commandGeneration.ratgen;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
+import java.util.IdentityHashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -75,8 +77,8 @@ import mekhq.campaign.personnel.skills.SkillType;
  * <p>Every appointee is then promoted one populated rung above the highest-ranked of the staff they
  * lead, so a head outranks their people rather than sharing a rank with one of them. Departments are
  * filled first, so an overall head is raised above their department heads in turn. The step skips
- * rungs the rank system leaves unnamed, and stops below the general officer ranks so no section head
- * outranks the officer commanding the force.</p>
+ * rungs the rank system leaves unnamed, and never carries anyone past the rank of the officer
+ * commanding the force - support services do not outrank the unit commander.</p>
  *
  * <p>Taking a post also confers Leadership, at the experience level of the appointee's own discipline
  * competence. Support staff are generated without any command skills - {@code DefaultSkillGenerator}
@@ -97,16 +99,13 @@ public final class SeniorAppointmentAssigner {
     private static final int MINIMUM_DEPARTMENT_SIZE = 2;
 
     /**
-     * The highest rank a post-holder may be promoted to, one rung above the support ladder's own
-     * ceiling of {@link RulesetRankAssigner#RANK_LT_COLONEL}.
-     *
-     * <p>The extra rung is what makes "a head outranks their staff" achievable. Rank systems do not
-     * name every index: SLDF names Major at 35 and then nothing until Colonel at 38, so a head whose
-     * staff includes a Major has no rung to step to below Colonel. Stopping here still keeps every
-     * post-holder below the general officer ranks, so a section head cannot outrank the officer
-     * commanding the force.</p>
+     * The rank ceiling used when no commander can be found to measure against - an empty campaign, or
+     * one whose ranks have not been assigned. One rung above the support ladder's own ceiling of
+     * {@link RulesetRankAssigner#RANK_LT_COLONEL}, which is what makes "a head outranks their staff"
+     * reachable at all: rank systems do not name every index, and SLDF names Major at 35 then nothing
+     * again until Colonel at 38.
      */
-    private static final int APPOINTMENT_RANK_CEILING = RulesetRankAssigner.RANK_LT_COLONEL + 1;
+    private static final int FALLBACK_RANK_CEILING = RulesetRankAssigner.RANK_LT_COLONEL + 1;
 
     private SeniorAppointmentAssigner() {
     }
@@ -211,12 +210,56 @@ public final class SeniorAppointmentAssigner {
         }
 
         Collection<Person> existingPersonnel = campaign.getPersonnel().values();
+        int rankCeiling = commanderRankCeiling(existingPersonnel, candidates);
         // Departments first: an overall head is promoted above the heads below them, which only works
         // if those heads already hold the rank they are entitled to.
-        assignDepartmentHeads(campaign, candidates, existingPersonnel);
+        assignDepartmentHeads(campaign, candidates, existingPersonnel, rankCeiling);
         for (Appointment appointment : Appointment.values()) {
-            assignOne(campaign, appointment, candidates, existingPersonnel);
+            assignOne(campaign, appointment, candidates, existingPersonnel, rankCeiling);
         }
+    }
+
+    /**
+     * Works out how far a post-holder may be promoted: no further than the officer commanding the
+     * force, because support services do not outrank the unit commander.
+     *
+     * <p>The commander is identified by rank rather than by the commander flag, which the pipeline
+     * does not set until after support generation has run. Ranks have been assigned by that point, so
+     * the highest-ranked person on the books is the commander.</p>
+     *
+     * <p>The staff being appointed are excluded from the search. They are already on the books by this
+     * point, and letting them count would have a section measuring itself against its own people
+     * rather than against the officer commanding the force.</p>
+     *
+     * @param existingPersonnel everyone already on the books, including the ranked combat command
+     * @param candidates        the people this generation created, excluded from the search
+     *
+     * @return the highest rank a post-holder may reach, or {@link #FALLBACK_RANK_CEILING} if nobody
+     *       outside the generated staff holds a rank to measure against
+     */
+    private static int commanderRankCeiling(Collection<Person> existingPersonnel,
+          Collection<Person> candidates) {
+        Set<Person> generatedStaff = Collections.newSetFromMap(new IdentityHashMap<>());
+        for (Person candidate : candidates) {
+            if (candidate != null) {
+                generatedStaff.add(candidate);
+            }
+        }
+
+        int highestRank = Integer.MIN_VALUE;
+        for (Person person : existingPersonnel) {
+            if ((person != null) && !generatedStaff.contains(person)) {
+                highestRank = Math.max(highestRank, person.getRankNumeric());
+            }
+        }
+        if (highestRank == Integer.MIN_VALUE) {
+            LOGGER.debug("[CompanyGen][Appointments] no commander outside the generated staff; "
+                  + "capping promotions at {}", FALLBACK_RANK_CEILING);
+            return FALLBACK_RANK_CEILING;
+        }
+        LOGGER.debug("[CompanyGen][Appointments] capping promotions at rank {}, the force commander's",
+              highestRank);
+        return highestRank;
     }
 
     /**
@@ -228,12 +271,13 @@ public final class SeniorAppointmentAssigner {
      * beneath the branch-wide posts, so medicine is excluded - the chief medical officer already heads
      * it.</p>
      *
-     * @param campaign           the campaign supplying rank comparison rules
-     * @param candidates         the people this generation created
-     * @param existingPersonnel  everyone already on the books, used to spot posts that are filled
+     * @param campaign          the campaign supplying rank comparison rules
+     * @param candidates        the people this generation created
+     * @param existingPersonnel everyone already on the books, used to spot posts that are filled
+     * @param rankCeiling       the highest rank a head may be promoted to
      */
     private static void assignDepartmentHeads(Campaign campaign, Collection<Person> candidates,
-          Collection<Person> existingPersonnel) {
+          Collection<Person> existingPersonnel, int rankCeiling) {
         Map<PersonnelRole, List<Person>> byDepartment = new LinkedHashMap<>();
         for (Person candidate : candidates) {
             if (candidate == null) {
@@ -271,7 +315,7 @@ public final class SeniorAppointmentAssigner {
             head.setDepartmentHead(true);
             LOGGER.info("[CompanyGen][Appointments] head of {} -> '{}', chosen from {} in the department",
                   role, head.getFullName(), staff.size());
-            promoteToOutrankTheirStaff(head, staff, "head of " + role);
+            promoteToOutrankTheirStaff(head, staff, "head of " + role, rankCeiling);
             grantLeadership(head, disciplineSkills, "head of " + role);
         }
     }
@@ -314,7 +358,7 @@ public final class SeniorAppointmentAssigner {
      * qualifies.
      */
     private static void assignOne(Campaign campaign, Appointment appointment, Collection<Person> candidates,
-          Collection<Person> existingPersonnel) {
+          Collection<Person> existingPersonnel, int rankCeiling) {
         Person incumbent = firstMatching(existingPersonnel, appointment.isHeldBy);
         if (incumbent != null) {
             LOGGER.debug("[CompanyGen][Appointments] {} left as is; already held by '{}'",
@@ -340,7 +384,7 @@ public final class SeniorAppointmentAssigner {
         LOGGER.info("[CompanyGen][Appointments] {} -> '{}' ({}), chosen from {} eligible",
               appointment.description, bestCandidate.getFullName(),
               bestCandidate.getPrimaryRole(), eligibleStaff.size());
-        promoteToOutrankTheirStaff(bestCandidate, eligibleStaff, appointment.description);
+        promoteToOutrankTheirStaff(bestCandidate, eligibleStaff, appointment.description, rankCeiling);
         grantLeadership(bestCandidate, appointment.disciplineSkills, appointment.description);
     }
 
@@ -395,15 +439,15 @@ public final class SeniorAppointmentAssigner {
      *
      * <p>Ranks are stepped to rather than calculated: the search walks up until it finds a rung this
      * rank system actually names, so a promotion can never strand someone on a blank rung. It stops at
-     * {@link #APPOINTMENT_RANK_CEILING}, which keeps every post-holder below the general officer ranks
-     * so none of them ends up outranking the force commander.</p>
+     * {@code rankCeiling}, so no post-holder is carried past the officer commanding the force.</p>
      *
      * @param appointee   the person who just took the post
      * @param staff       everyone eligible for the post, including the appointee, who is skipped
      * @param description the post, for logging
+     * @param rankCeiling the highest rank this promotion may reach
      */
     private static void promoteToOutrankTheirStaff(Person appointee, List<Person> staff,
-          String description) {
+          String description, int rankCeiling) {
         int topStaffRank = Integer.MIN_VALUE;
         for (Person member : staff) {
             if (!member.equals(appointee)) {
@@ -417,7 +461,7 @@ public final class SeniorAppointmentAssigner {
         }
 
         int floorRank = Math.max(topStaffRank, appointee.getRankNumeric());
-        int targetRank = nextNamedRankAbove(appointee, floorRank);
+        int targetRank = nextNamedRankAbove(appointee, floorRank, rankCeiling);
         if (targetRank <= appointee.getRankNumeric()) {
             LOGGER.debug("[CompanyGen][Appointments] {} '{}' stays at rank {}; no named rung above {} "
                         + "within the ladder ceiling", description, appointee.getFullName(),
@@ -434,19 +478,20 @@ public final class SeniorAppointmentAssigner {
      * Finds the lowest rank above {@code floorRank} that this person's rank system gives a real name,
      * so a promotion never lands on a blank rung.
      *
-     * @param person    the person whose rank system and profession decide which rungs are named
-     * @param floorRank the rank to step up from
+     * @param person      the person whose rank system and profession decide which rungs are named
+     * @param floorRank   the rank to step up from
+     * @param rankCeiling the highest rank this search may reach
      *
      * @return the next named rank above {@code floorRank}, or {@code floorRank} if the system names
      *       none below the ceiling
      */
-    private static int nextNamedRankAbove(Person person, int floorRank) {
+    private static int nextNamedRankAbove(Person person, int floorRank, int rankCeiling) {
         RankSystem rankSystem = person.getRankSystem();
         if (rankSystem == null) {
             return floorRank;
         }
         Profession baseProfession = Profession.getProfessionFromPersonnelRole(person.getPrimaryRole());
-        int ceiling = Math.min(APPOINTMENT_RANK_CEILING, rankSystem.getRanks().size() - 1);
+        int ceiling = Math.min(rankCeiling, rankSystem.getRanks().size() - 1);
         for (int index = floorRank + 1; index <= ceiling; index++) {
             Rank candidate = rankSystem.getRank(index);
             if ((candidate != null)
