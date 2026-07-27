@@ -778,6 +778,24 @@ public class SetupTab {
      *
      * @return the selected naming method, or {@code null} if the combo has no selection
      */
+    /**
+     * Sets the Formation Naming Method combo.
+     *
+     * <p>Used when another part of the dialog implies a naming convention - picking a Clan faction
+     * switches this to the Greek alphabet, which is how the Clans name their formations.</p>
+     *
+     * @param namingMethod the method to select; ignored when {@code null} or already selected
+     */
+    public void setSelectedForceNamingMethod(@Nullable ForceNamingMethod namingMethod) {
+        if ((namingMethod == null) || (comboForceNamingMethod == null)) {
+            return;
+        }
+        if (namingMethod == comboForceNamingMethod.getSelectedItem()) {
+            return;
+        }
+        comboForceNamingMethod.setSelectedItem(namingMethod);
+    }
+
     public @Nullable ForceNamingMethod getSelectedForceNamingMethod() {
         Object selectedNamingMethod = comboForceNamingMethod == null
               ? null

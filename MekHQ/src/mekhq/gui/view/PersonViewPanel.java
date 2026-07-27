@@ -571,8 +571,7 @@ public class PersonViewPanel extends JScrollablePanel {
         if (!holdsBloodname(person)) {
             addBloodnameRow(pnlBloodnameDetails, gridY,
                   getTextAt(RESOURCE_BUNDLE, "lblBloodname.text"),
-                  getTextAt(RESOURCE_BUNDLE,
-                        isTrueborn ? "lblBloodname.notWon" : "lblBloodname.none"));
+                  getTextAt(RESOURCE_BUNDLE, "lblBloodname.notAchieved"));
             return pnlBloodnameDetails;
         }
 

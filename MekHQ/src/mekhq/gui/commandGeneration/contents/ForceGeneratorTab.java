@@ -36,11 +36,13 @@ import java.awt.BorderLayout;
 import java.util.List;
 import java.util.Map;
 import java.util.function.BooleanSupplier;
+import java.util.function.Consumer;
 import java.util.function.Supplier;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.JSplitPane;
 
+import megamek.client.ratgenerator.FactionRecord;
 import megamek.client.ratgenerator.ForceDescriptor;
 import megamek.client.ui.dialogs.randomArmy.ForceGeneratorOptionsView;
 import megamek.client.ui.dialogs.randomArmy.ForceGeneratorViewUi;
@@ -92,6 +94,7 @@ public class ForceGeneratorTab {
     // Live source of the Setup tab's Formation Naming Method combo. The options object only receives
     // the combo's value on OK, so the preview must read the control itself to stay in sync mid-dialog.
     private Supplier<ForceNamingMethod> namingMethodSupplier;
+    private Consumer<FactionRecord> factionChangeListener;
     private BooleanSupplier numberRegimentsSupplier;
     private CommandGenerationCheckBox chkGenerateMercenaryCompanyCommandLance;
 
@@ -126,6 +129,7 @@ public class ForceGeneratorTab {
         // the other Generate options rather than on the Setup tab.
         chkGenerateMercenaryCompanyCommandLance =
               new CommandGenerationCheckBox("GenerateMercenaryCompanyCommandLance");
+        optionsView.setOnFactionChanged(factionChangeListener);
         optionsView.addGenerateOption(chkGenerateMercenaryCompanyCommandLance);
         optionsView.setExportMULButtonVisible(false);
         optionsView.setYearFieldEditable(false);
@@ -187,6 +191,19 @@ public class ForceGeneratorTab {
      *
      * @param supplier reads the combo's current selection; {@code null} falls back to the options value
      */
+    /**
+     * Registers a listener notified when the Force Generator panel's faction selection changes, so the
+     * dialog can adjust settings that depend on it.
+     *
+     * @param listener the listener to notify, or {@code null} to stop notifying
+     */
+    public void setFactionChangeListener(@Nullable Consumer<FactionRecord> listener) {
+        this.factionChangeListener = listener;
+        if (viewUi != null) {
+            viewUi.getOptionsView().setOnFactionChanged(listener);
+        }
+    }
+
     public void setNamingMethodSupplier(@Nullable Supplier<ForceNamingMethod> supplier) {
         this.namingMethodSupplier = supplier;
     }

@@ -41,6 +41,7 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 
 import mekhq.campaign.Campaign;
+import mekhq.campaign.universe.enums.ForceNamingMethod;
 import mekhq.campaign.universe.commandGeneration.CommandGenerationOptions;
 import mekhq.gui.baseComponents.AbstractMHQTabbedPane;
 import mekhq.gui.commandGeneration.contents.ForceGeneratorTab;
@@ -112,6 +113,15 @@ public class CommandGenerationPane extends AbstractMHQTabbedPane {
         forceGeneratorTab.setNamingMethodSupplier(setupTab::getSelectedForceNamingMethod);
         forceGeneratorTab.setNumberRegimentsSupplier(setupTab::isAlwaysNumberRegimentsSelected);
         setupTab.setNamingMethodChangeListener(forceGeneratorTab::invalidatePreviewNames);
+
+        // The Clans name their formations with the Greek alphabet, so picking a Clan faction sets the
+        // naming method to match. Only Clans are switched: a non-Clan selection leaves whatever the
+        // user chose alone rather than overwriting a deliberate choice.
+        forceGeneratorTab.setFactionChangeListener(factionRecord -> {
+            if ((factionRecord != null) && factionRecord.isClan()) {
+                setupTab.setSelectedForceNamingMethod(ForceNamingMethod.GREEK_ALPHABET);
+            }
+        });
 
         // The starting-cash preview prices the Force Generator tab's current model, which can change
         // while this tab is hidden - recompute it whenever the user switches onto it.
