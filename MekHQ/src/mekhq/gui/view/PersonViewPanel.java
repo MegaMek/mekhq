@@ -111,6 +111,10 @@ import megamek.utilities.ImageUtilities;
 import mekhq.campaign.universe.Factions;
 import javax.swing.SwingConstants;
 import mekhq.campaign.universe.Faction;
+import megamek.common.universe.BloodnameHolder;
+import megamek.common.universe.BloodnameHouse;
+import megamek.common.universe.BloodnameTransfer;
+import megamek.common.universe.Bloodnames2;
 import mekhq.campaign.personnel.Bloodname;
 import mekhq.campaign.personnel.Clan;
 import mekhq.campaign.personnel.Person;
@@ -152,6 +156,16 @@ import mekhq.utilities.ReportingUtilities;
 public class PersonViewPanel extends JScrollablePanel {
     /** Width the Clan emblems are scaled to on the Bloodhouse tab. */
     private static final int CLAN_EMBLEM_WIDTH = 100;
+
+    /**
+     * How many recorded holders a House lists before the rest are summarised. The Houses are very
+     * uneven - the median records one and Ward records sixty-nine - so an uncapped list would let a
+     * single House run off the panel.
+     */
+    private static final int MAX_NOTABLE_HOLDERS = 10;
+
+    /** The Wars of Reaving ended in 3075; used when a legacy does not record its own reaving year. */
+    private static final int WARS_OF_REAVING_END = 3075;
 
     private static final MMLogger LOGGER = MMLogger.create(PersonViewPanel.class);
 
@@ -613,12 +627,19 @@ public class PersonViewPanel extends JScrollablePanel {
               getTextAt(RESOURCE_BUNDLE, "lblBloodnameHouse.text"),
               getFormattedTextAt(RESOURCE_BUNDLE, "lblBloodnameHouse.value", bloodname.getName()));
 
+        BloodnameHouse houseRecord = houseRecordFor(bloodname, person);
+        if ((houseRecord != null) && !isNullOrBlankText(houseRecord.getSummary())) {
+            addBloodnameRow(pnlBloodnameDetails, gridY++,
+                  getTextAt(RESOURCE_BUNDLE, "lblBloodnameSummary.text"), houseRecord.getSummary());
+        }
+
         String founder = bloodname.getFounder();
         if ((founder != null) && !founder.isBlank()) {
             addBloodnameRow(pnlBloodnameDetails, gridY++,
                   getTextAt(RESOURCE_BUNDLE, "lblBloodnameFounder.text"),
-                  getFormattedTextAt(RESOURCE_BUNDLE, "lblBloodnameFounder.value",
-                        founder, bloodname.getName()));
+                  describeHolder(founderFullNameOf(houseRecord, founder, bloodname.getName()),
+                        (houseRecord == null) ? null : houseRecord.getFounderRank(),
+                        (houseRecord == null) ? null : houseRecord.getFounderAffiliation()));
         }
 
         Clan originClan = bloodname.getOriginClan();
@@ -638,6 +659,9 @@ public class PersonViewPanel extends JScrollablePanel {
               getTextAt(RESOURCE_BUNDLE, "lblBloodnameStanding.text"),
               bloodnameStanding(bloodname));
 
+        gridY = addNotableHolders(pnlBloodnameDetails, gridY, houseRecord);
+        gridY = addLegacyFate(pnlBloodnameDetails, gridY, houseRecord);
+
         // Placeholder until the house histories are written. Kept as its own resource string so
         // filling them in later is a data change rather than a code change.
         addBloodnameRow(pnlBloodnameDetails, gridY,
@@ -645,6 +669,167 @@ public class PersonViewPanel extends JScrollablePanel {
               getTextAt(RESOURCE_BUNDLE, "lblBloodnameHistory.placeholder"));
 
         return pnlBloodnameDetails;
+    }
+
+    /**
+     * Finds the House record behind a Bloodname, preferring the one this warrior descends from.
+     *
+     * <p>Sixteen Bloodnames descend from more than one founder, so a warrior of the Kerensky name is
+     * of Andery's House or Nicholas's, not both. Where the warrior's own House is not recorded the
+     * first is used, which is the only sensible guess.</p>
+     *
+     * @param bloodname the Bloodname as the game holds it
+     * @param person    the warrior, whose recorded House disambiguates
+     *
+     * @return the House record, or {@code null} when the data has none
+     */
+    private @Nullable BloodnameHouse houseRecordFor(Bloodname bloodname, Person person) {
+        List<BloodnameHouse> houses = Bloodnames2.getInstance().getHouses(bloodname.getName());
+        if (houses.isEmpty()) {
+            return null;
+        }
+        for (BloodnameHouse house : houses) {
+            if ((bloodname.getFounder() != null) && bloodname.getFounder().equals(house.getFounder())) {
+                return house;
+            }
+        }
+        return houses.get(0);
+    }
+
+    /**
+     * @return the founder's full name where the data records one, otherwise the given name joined to
+     *       the Bloodname
+     */
+    private static String founderFullNameOf(@Nullable BloodnameHouse house, String founder,
+          String bloodnameText) {
+        if ((house != null) && !isNullOrBlankText(house.getFounderFullName())) {
+            return house.getFounderFullName();
+        }
+        return founder + " " + bloodnameText;
+    }
+
+    /**
+     * Renders one warrior as "Khan Natasha Kerensky, Clan Wolf", omitting whichever parts the data
+     * does not record.
+     */
+    private static String describeHolder(String name, @Nullable String rank,
+          @Nullable String affiliation) {
+        StringBuilder description = new StringBuilder();
+        if (!isNullOrBlankText(rank)) {
+            description.append(rank).append(' ');
+        }
+        description.append(name);
+        if (!isNullOrBlankText(affiliation)) {
+            description.append(", ").append(affiliation);
+        }
+        return description.toString();
+    }
+
+    /**
+     * Lists the warriors recorded as having held this Bloodname, one per row beneath a single label -
+     * the same shape the family panel uses for children and siblings.
+     *
+     * <p>Capped, because the Houses are wildly uneven: the median records one holder and Ward records
+     * sixty-nine. The count of those left out is stated rather than silently dropped.</p>
+     *
+     * @return the next free row
+     */
+    private int addNotableHolders(JPanel panel, int gridY, @Nullable BloodnameHouse house) {
+        if (house == null) {
+            return gridY;
+        }
+        List<BloodnameHolder> holders = house.getNotableHolders();
+        if (holders.isEmpty()) {
+            return gridY;
+        }
+
+        String label = getTextAt(RESOURCE_BUNDLE, "lblBloodnameHolders.text");
+        int shown = Math.min(holders.size(), MAX_NOTABLE_HOLDERS);
+        for (int index = 0; index < shown; index++) {
+            BloodnameHolder holder = holders.get(index);
+            addBloodnameRow(panel, gridY++, (index == 0) ? label : "",
+                  describeHolder(holder.getName(), holder.getRank(), holder.getAffiliation()));
+        }
+        if (holders.size() > shown) {
+            addBloodnameRow(panel, gridY++, "",
+                  getFormattedTextAt(RESOURCE_BUNDLE, "lblBloodnameHolders.more",
+                        holders.size() - shown));
+        }
+        return gridY;
+    }
+
+    /**
+     * What became of the legacy, shown only once the campaign has reached the year it happened.
+     *
+     * <p>A campaign in 3050 should not be reading about a Clan that inherits the name in 3075. Each
+     * entry carries its own year and is withheld until the campaign passes it; the post-Reaving
+     * inheritors are withheld until the legacy was actually reaved.</p>
+     *
+     * @return the next free row
+     */
+    private int addLegacyFate(JPanel panel, int gridY, @Nullable BloodnameHouse house) {
+        if (house == null) {
+            return gridY;
+        }
+        int year = campaign.getGameYear();
+
+        if (!house.getPostReaving().isEmpty() && hasReachedReaving(house, year)) {
+            List<String> clanNames = new ArrayList<>();
+            for (String clanCode : house.getPostReaving()) {
+                Faction inheritor = Factions.getInstance().getFaction(clanCode);
+                clanNames.add((inheritor == null) ? clanCode : inheritor.getFullName(year));
+            }
+            addBloodnameRow(panel, gridY++, getTextAt(RESOURCE_BUNDLE, "lblBloodnamePostReaving.text"),
+                  String.join(", ", clanNames));
+        }
+
+        gridY = addTransfer(panel, gridY, house.getAbsorbed(), "lblBloodnameAbsorbed.text", year);
+        for (BloodnameTransfer transfer : house.getAcquired()) {
+            gridY = addTransfer(panel, gridY, transfer, "lblBloodnameAcquired.text", year);
+        }
+        for (BloodnameTransfer transfer : house.getShared()) {
+            gridY = addTransfer(panel, gridY, transfer, "lblBloodnameShared.text", year);
+        }
+        return gridY;
+    }
+
+    /**
+     * @return {@code true} once the campaign has reached the year this legacy was reaved, or the end
+     *       of the Wars of Reaving where the data does not say
+     */
+    private static boolean hasReachedReaving(BloodnameHouse house, int year) {
+        Integer reaved = house.getReaved();
+        return (reaved == null) ? (year >= WARS_OF_REAVING_END) : (year >= reaved);
+    }
+
+    /**
+     * Adds one Clan transfer row, if the campaign has reached the year it happened.
+     *
+     * @return the next free row
+     */
+    private int addTransfer(JPanel panel, int gridY, @Nullable BloodnameTransfer transfer,
+          String labelKey, int year) {
+        if ((transfer == null) || (transfer.getClan() == null)) {
+            return gridY;
+        }
+        Integer date = transfer.getDate();
+        if ((date != null) && (year < date)) {
+            return gridY;
+        }
+        Faction clan = Factions.getInstance().getFaction(transfer.getClan());
+        String clanName = (clan == null) ? transfer.getClan() : clan.getFullName(year);
+        String value = (date == null)
+              ? clanName
+              : getFormattedTextAt(RESOURCE_BUNDLE, "lblBloodnameTransfer.value", clanName, date);
+        addBloodnameRow(panel, gridY++, getTextAt(RESOURCE_BUNDLE, labelKey), value);
+        return gridY;
+    }
+
+    /**
+     * @return {@code true} when the text is absent or holds nothing but whitespace
+     */
+    private static boolean isNullOrBlankText(@Nullable String text) {
+        return (text == null) || text.isBlank();
     }
 
     /**
