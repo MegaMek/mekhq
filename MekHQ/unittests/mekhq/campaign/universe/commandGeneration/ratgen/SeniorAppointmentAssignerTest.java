@@ -34,6 +34,7 @@ package mekhq.campaign.universe.commandGeneration.ratgen;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyBoolean;
+import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
@@ -46,6 +47,10 @@ import mekhq.campaign.Campaign;
 import mekhq.campaign.LocalPersonnel;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.enums.PersonnelRole;
+import mekhq.campaign.personnel.skills.Skill;
+import mekhq.campaign.personnel.skills.SkillType;
+import mekhq.campaign.personnel.skills.Skills;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
 /**
@@ -57,6 +62,12 @@ import org.junit.jupiter.api.Test;
  * because a mocked setter records nothing for a getter to read back.</p>
  */
 class SeniorAppointmentAssignerTest {
+
+    @BeforeAll
+    static void loadSkillTypes() {
+        // Scoring resolves skills by name, which needs the skill table initialised.
+        SkillType.initializeTypes();
+    }
 
     /** A campaign with nobody yet on the books, so every post starts vacant. */
     private static Campaign campaign() {
@@ -72,6 +83,13 @@ class SeniorAppointmentAssignerTest {
     private static Person junior(PersonnelRole role) {
         Person person = mock(Person.class);
         when(person.getPrimaryRole()).thenReturn(role);
+        when(person.getSkills()).thenReturn(new Skills());
+        return person;
+    }
+
+    /** Gives a person a skill at the given level, so scoring has something to weigh. */
+    private static Person withSkill(Person person, String skillName, int level) {
+        person.getSkills().addSkill(skillName, new Skill(skillName, level, 0));
         return person;
     }
 
@@ -166,5 +184,101 @@ class SeniorAppointmentAssignerTest {
     @Test
     void anEmptyRosterAppointsNobody() {
         SeniorAppointmentAssigner.assign(campaign(), List.of());
+    }
+
+    @Test
+    void theBestQualifiedCandidateTakesThePostEvenIfOutranked() {
+        // The rule this encodes: the post follows competence. A highly skilled doctor should become CMO
+        // ahead of a better-ranked but less capable one.
+        Campaign campaign = campaign();
+        Person seniorButLessSkilled = senior(PersonnelRole.DOCTOR);
+        withSkill(seniorButLessSkilled, SkillType.S_SURGERY, 3);
+        Person skilled = junior(PersonnelRole.DOCTOR);
+        withSkill(skilled, SkillType.S_SURGERY, 8);
+
+        SeniorAppointmentAssigner.assign(campaign, List.of(seniorButLessSkilled, skilled));
+
+        verify(skilled).setChiefMedicalOfficer(true);
+        verify(seniorButLessSkilled, never()).setChiefMedicalOfficer(anyBoolean());
+    }
+
+    @Test
+    void leadershipAndAdministrationCountTowardsThePost() {
+        // Two equally capable technicians; the one who can also lead and administer gets the post.
+        Campaign campaign = campaign();
+        Person pureTechnician = junior(PersonnelRole.MEK_TECH);
+        withSkill(pureTechnician, SkillType.S_TECH_MEK, 6);
+        Person managerTechnician = junior(PersonnelRole.MEK_TECH);
+        withSkill(managerTechnician, SkillType.S_TECH_MEK, 6);
+        withSkill(managerTechnician, SkillType.S_LEADER, 4);
+        withSkill(managerTechnician, SkillType.S_ADMIN, 3);
+
+        SeniorAppointmentAssigner.assign(campaign, List.of(pureTechnician, managerTechnician));
+
+        verify(managerTechnician).setHeadTechnician(true);
+        verify(pureTechnician, never()).setHeadTechnician(anyBoolean());
+    }
+
+    @Test
+    void administrationIsNotCountedTwiceForTheChiefAdministrator() {
+        // Administration is that post's discipline skill. Counting it again as a management skill would
+        // let a pure administrator beat someone equally administrative who can also lead.
+        Campaign campaign = campaign();
+        Person pureAdministrator = junior(PersonnelRole.ADMINISTRATOR_COMMAND);
+        withSkill(pureAdministrator, SkillType.S_ADMIN, 6);
+        Person leadingAdministrator = junior(PersonnelRole.ADMINISTRATOR_HR);
+        withSkill(leadingAdministrator, SkillType.S_ADMIN, 6);
+        withSkill(leadingAdministrator, SkillType.S_LEADER, 2);
+
+        SeniorAppointmentAssigner.assign(campaign, List.of(pureAdministrator, leadingAdministrator));
+
+        verify(leadingAdministrator).setChiefAdministrator(true);
+        verify(pureAdministrator, never()).setChiefAdministrator(anyBoolean());
+    }
+
+    @Test
+    void theAppointeeIsPromotedToMatchTheirHighestRankedStaff() {
+        // A section head outranked by their own staff is the thing this prevents.
+        Campaign campaign = campaign();
+        Person skilledButJunior = junior(PersonnelRole.DOCTOR);
+        withSkill(skilledButJunior, SkillType.S_SURGERY, 9);
+        when(skilledButJunior.getRankNumeric()).thenReturn(12);
+
+        Person seniorDoctor = senior(PersonnelRole.DOCTOR);
+        withSkill(seniorDoctor, SkillType.S_SURGERY, 2);
+        when(seniorDoctor.getRankNumeric()).thenReturn(35);
+
+        SeniorAppointmentAssigner.assign(campaign, List.of(skilledButJunior, seniorDoctor));
+
+        verify(skilledButJunior).setChiefMedicalOfficer(true);
+        verify(skilledButJunior).setRank(35);
+    }
+
+    @Test
+    void anAppointeeWhoAlreadyOutranksEveryoneIsNotPromoted() {
+        Campaign campaign = campaign();
+        Person topDoctor = senior(PersonnelRole.DOCTOR);
+        withSkill(topDoctor, SkillType.S_SURGERY, 9);
+        when(topDoctor.getRankNumeric()).thenReturn(35);
+        Person otherDoctor = junior(PersonnelRole.DOCTOR);
+        withSkill(otherDoctor, SkillType.S_SURGERY, 2);
+        when(otherDoctor.getRankNumeric()).thenReturn(12);
+
+        SeniorAppointmentAssigner.assign(campaign, List.of(topDoctor, otherDoctor));
+
+        verify(topDoctor).setChiefMedicalOfficer(true);
+        verify(topDoctor, never()).setRank(anyInt());
+    }
+
+    @Test
+    void staffWithNoSkillsAtAllStillProduceAnAppointment() {
+        // Support staff are currently generated without Leadership, and Administration is gated behind
+        // campaign options, so scoring must cope with candidates who have none of the three.
+        Campaign campaign = campaign();
+        Person doctor = junior(PersonnelRole.DOCTOR);
+
+        SeniorAppointmentAssigner.assign(campaign, List.of(doctor));
+
+        verify(doctor).setChiefMedicalOfficer(true);
     }
 }

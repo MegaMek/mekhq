@@ -34,6 +34,7 @@ package mekhq.campaign.universe.commandGeneration.ratgen;
 
 import java.util.Collection;
 import java.util.List;
+import java.util.Set;
 import java.util.function.BiConsumer;
 import java.util.function.Predicate;
 
@@ -42,6 +43,8 @@ import megamek.logging.MMLogger;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.enums.PersonnelRole;
+import mekhq.campaign.personnel.skills.Skill;
+import mekhq.campaign.personnel.skills.SkillType;
 
 /**
  * Fills the senior staff appointments of a generated command - chief medical officer, head technician
@@ -51,11 +54,18 @@ import mekhq.campaign.personnel.enums.PersonnelRole;
  * and from role (what they do). A command's most senior doctor is its chief medical officer whatever
  * rank the ladder gave them, and the post is what lets the campaign name a person rather than a job.</p>
  *
- * <p>Each post goes to the highest-ranking eligible person the generation produced, resolved with
- * {@link Person#outRanksUsingSkillTiebreaker(Campaign, Person)} so that a tie on rank falls to the more
- * skilled candidate - the same comparison MekHQ already uses to pick a commander. A post with no
- * eligible candidate is simply left vacant, which is correct rather than a failure: a command that
- * generated no administrators has nobody to be its chief administrator.</p>
+ * <p>Each post goes to the best-qualified eligible person the generation produced. "Best qualified"
+ * is scored on the skills the post actually calls for: competence in the discipline itself, plus
+ * Leadership and Administration, because running a section is a management job on top of a technical
+ * one. Ties fall to whoever already outranks the other, so the result is stable rather than dependent
+ * on the order people happened to be generated in.</p>
+ *
+ * <p>The appointee is then promoted to match the highest-ranked person eligible for the same post, so
+ * a section head is never outranked by their own staff. That rank is copied from the peer rather than
+ * calculated, so it can only land on a rung the rank system actually names.</p>
+ *
+ * <p>A post with no eligible candidate is simply left vacant, which is correct rather than a failure:
+ * a command that generated no administrators has nobody to be its chief administrator.</p>
  */
 public final class SeniorAppointmentAssigner {
     private static final MMLogger LOGGER = MMLogger.create(SeniorAppointmentAssigner.class);
@@ -70,6 +80,7 @@ public final class SeniorAppointmentAssigner {
     private enum Appointment {
         CHIEF_MEDICAL_OFFICER("chief medical officer",
               PersonnelRole::isDoctor,
+              Set.of(SkillType.S_SURGERY),
               Person::isChiefMedicalOfficer,
               Person::setChiefMedicalOfficer),
 
@@ -80,26 +91,67 @@ public final class SeniorAppointmentAssigner {
          */
         HEAD_TECHNICIAN("head technician",
               PersonnelRole::isTech,
+              Set.of(SkillType.S_TECH_MEK, SkillType.S_TECH_MECHANIC, SkillType.S_TECH_AERO,
+                    SkillType.S_TECH_BA, SkillType.S_TECH_VESSEL),
               Person::isHeadTechnician,
               Person::setHeadTechnician),
 
         CHIEF_ADMINISTRATOR("chief administrator",
               PersonnelRole::isAdministrator,
+              Set.of(SkillType.S_ADMIN),
               Person::isChiefAdministrator,
               Person::setChiefAdministrator);
 
         private final String description;
         private final Predicate<PersonnelRole> isEligible;
+        private final Set<String> disciplineSkills;
         private final Predicate<Person> isHeldBy;
         private final BiConsumer<Person, Boolean> appoint;
 
-        Appointment(String description, Predicate<PersonnelRole> isEligible, Predicate<Person> isHeldBy,
-              BiConsumer<Person, Boolean> appoint) {
+        Appointment(String description, Predicate<PersonnelRole> isEligible, Set<String> disciplineSkills,
+              Predicate<Person> isHeldBy, BiConsumer<Person, Boolean> appoint) {
             this.description = description;
             this.isEligible = isEligible;
+            this.disciplineSkills = disciplineSkills;
             this.isHeldBy = isHeldBy;
             this.appoint = appoint;
         }
+    }
+
+    /**
+     * Scores a candidate for a post: their best skill in the discipline, plus the two skills running a
+     * section calls for whatever the discipline is.
+     *
+     * <p>A skill the person does not have scores zero rather than excluding them. Support staff are
+     * currently generated without Leadership, so that term contributes nothing today and the pick rests
+     * on the skills they do have; it starts counting the moment they have it.</p>
+     *
+     * @param person      the candidate to score
+     * @param appointment the post being filled, which decides the discipline skills
+     *
+     * @return the candidate's score, higher being better qualified
+     */
+    private static int scoreFor(Person person, Appointment appointment) {
+        int disciplineScore = 0;
+        for (String skillName : appointment.disciplineSkills) {
+            disciplineScore = Math.max(disciplineScore, skillLevel(person, skillName));
+        }
+
+        int managementScore = skillLevel(person, SkillType.S_LEADER);
+        // Administration is the discipline skill for the chief administrator, so adding it again would
+        // count it twice for that post alone.
+        if (!appointment.disciplineSkills.contains(SkillType.S_ADMIN)) {
+            managementScore += skillLevel(person, SkillType.S_ADMIN);
+        }
+        return disciplineScore + managementScore;
+    }
+
+    /**
+     * @return the person's level in the named skill, or {@code 0} if they do not have it
+     */
+    private static int skillLevel(Person person, String skillName) {
+        Skill skill = person.getSkills().getSkill(skillName);
+        return (skill == null) ? 0 : skill.getLevel();
     }
 
     /**
@@ -139,29 +191,70 @@ public final class SeniorAppointmentAssigner {
             return;
         }
 
-        Person seniorCandidate = null;
+        Person bestCandidate = null;
+        int bestScore = Integer.MIN_VALUE;
+        Person highestRankedPeer = null;
         int eligibleCount = 0;
         for (Person candidate : candidates) {
             if ((candidate == null) || !appointment.isEligible.test(candidate.getPrimaryRole())) {
                 continue;
             }
             eligibleCount++;
-            if ((seniorCandidate == null)
-                      || candidate.outRanksUsingSkillTiebreaker(campaign, seniorCandidate)) {
-                seniorCandidate = candidate;
+
+            if ((highestRankedPeer == null)
+                      || candidate.outRanksUsingSkillTiebreaker(campaign, highestRankedPeer)) {
+                highestRankedPeer = candidate;
+            }
+
+            int score = scoreFor(candidate, appointment);
+            boolean outscoresBest = (bestCandidate == null) || (score > bestScore);
+            boolean tiedButOutranksBest = (bestCandidate != null) && (score == bestScore)
+                  && candidate.outRanksUsingSkillTiebreaker(campaign, bestCandidate);
+            if (outscoresBest || tiedButOutranksBest) {
+                bestCandidate = candidate;
+                bestScore = score;
             }
         }
 
-        if (seniorCandidate == null) {
+        if (bestCandidate == null) {
             LOGGER.debug("[CompanyGen][Appointments] {} left vacant; no generated person holds an "
                   + "eligible primary role", appointment.description);
             return;
         }
 
-        appointment.appoint.accept(seniorCandidate, true);
-        LOGGER.info("[CompanyGen][Appointments] {} -> '{}' ({}), chosen from {} eligible",
-              appointment.description, seniorCandidate.getFullName(),
-              seniorCandidate.getPrimaryRole(), eligibleCount);
+        appointment.appoint.accept(bestCandidate, true);
+        LOGGER.info("[CompanyGen][Appointments] {} -> '{}' ({}) score={}, chosen from {} eligible",
+              appointment.description, bestCandidate.getFullName(),
+              bestCandidate.getPrimaryRole(), bestScore, eligibleCount);
+        promoteToOutrankTheirStaff(bestCandidate, highestRankedPeer, appointment);
+    }
+
+    /**
+     * Raises the appointee to the rank of the highest-ranked person eligible for the same post, so a
+     * section head is not outranked by their own staff.
+     *
+     * <p>The rank is copied from that peer rather than calculated. A peer's rank already resolves to a
+     * real name in this rank system, so copying it cannot strand the appointee on an unnamed rung the
+     * way picking an index can.</p>
+     *
+     * @param appointee         the person who just took the post
+     * @param highestRankedPeer the highest-ranked candidate for the same post, or {@code null} if
+     *                          there were none
+     * @param appointment       the post, for logging
+     */
+    private static void promoteToOutrankTheirStaff(Person appointee, @Nullable Person highestRankedPeer,
+          Appointment appointment) {
+        if ((highestRankedPeer == null) || highestRankedPeer.equals(appointee)) {
+            return;
+        }
+        int peerRank = highestRankedPeer.getRankNumeric();
+        if (appointee.getRankNumeric() >= peerRank) {
+            return;
+        }
+        LOGGER.info("[CompanyGen][Appointments] promoting {} '{}' from rank {} to {}, matching their "
+                    + "highest-ranked peer '{}'", appointment.description, appointee.getFullName(),
+              appointee.getRankNumeric(), peerRank, highestRankedPeer.getFullName());
+        appointee.setRank(peerRank);
     }
 
     /**
