@@ -3752,22 +3752,12 @@ public class AtBDynamicScenarioFactory {
 
     private static boolean isDoomed(boolean isSpace, Entity entity, boolean isLowAtmosphere) {
         if (isSpace) {
-            if (entity.doomedInSpace()) {
-                isFormationValid = false;
-                return true;
-            }
+            return entity.doomedInSpace();
         } else if (isLowAtmosphere) {
-            if (entity.doomedInAtmosphere()) {
-                isFormationValid = false;
-                return true;
-            }
+            return entity.doomedInAtmosphere();
         } else {
-            if (entity.doomedOnGround()) {
-                isFormationValid = false;
-                return true;
-            }
+            return entity.doomedOnGround();
         }
-        return false;
     }
 
     public static int calculateEffectiveUnitCount(AtBDynamicScenario scenario, Campaign campaign,
