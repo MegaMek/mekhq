@@ -911,6 +911,16 @@ public final class CommandGenerator {
             LOGGER.debug("[CompanyGen][Cargo] no force snapshot; skipping cargo lift");
             return;
         }
+        // A command generated with no DropShips owns no lift of any kind, so it gets no cargo hulls
+        // either however high the cargo percentage is set. That is a real and playable starting
+        // position - a unit that has to hire its transport - and the Cargo Summary still reports the
+        // requirement, which now simply shows as a shortfall.
+        if (snapshot.getDropshipPct() <= 0d) {
+            LOGGER.info("[CompanyGen][Cargo] DropShip percentage is {}; generating no cargo hulls "
+                        + "regardless of the {}% cargo setting (the command must hire its lift)",
+                  snapshot.getDropshipPct(), snapshot.getCargoPct());
+            return;
+        }
         try {
             CargoShipGenerator.Result result = CargoShipGenerator.generate(campaign,
                   snapshot.getFaction(), snapshot.getYear(), snapshot.getRating(),
