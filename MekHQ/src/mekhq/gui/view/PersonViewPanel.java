@@ -107,6 +107,9 @@ import mekhq.campaign.finances.Money;
 import mekhq.campaign.log.LogEntry;
 import mekhq.campaign.personnel.Award;
 import mekhq.campaign.personnel.Injury;
+import mekhq.campaign.universe.Factions;
+import javax.swing.SwingConstants;
+import mekhq.campaign.universe.Faction;
 import mekhq.campaign.personnel.Bloodname;
 import mekhq.campaign.personnel.Clan;
 import mekhq.campaign.personnel.Person;
@@ -146,6 +149,9 @@ import mekhq.utilities.ReportingUtilities;
  * @author Jay Lawson (jaylawson39 at yahoo.com)
  */
 public class PersonViewPanel extends JScrollablePanel {
+    /** Width the Clan emblems are scaled to on the Bloodhouse tab. */
+    private static final int CLAN_EMBLEM_WIDTH = 100;
+
     private static final MMLogger LOGGER = MMLogger.create(PersonViewPanel.class);
 
     private static final int MAX_NUMBER_OF_RIBBON_AWARDS_PER_ROW = 5;
@@ -610,7 +616,7 @@ public class PersonViewPanel extends JScrollablePanel {
 
         if (bloodname.getPhenotype() != null) {
             addBloodnameRow(pnlBloodnameDetails, gridY++,
-                  getTextAt(RESOURCE_BUNDLE, "lblBloodnamePhenotype.text"),
+                  getTextAt(RESOURCE_BUNDLE, "lblBloodnameHousePhenotype.text"),
                   bloodname.getPhenotype().getLabel());
         }
 
@@ -676,6 +682,100 @@ public class PersonViewPanel extends JScrollablePanel {
         gridBagConstraints.weightx = 1.0;
         gridBagConstraints.insets = new Insets(0, 10, 0, 0);
         panel.add(fieldValue, gridBagConstraints);
+    }
+
+    /**
+     * The Clan emblems for this warrior: the Clan they serve, and beside it the Clan their Bloodname
+     * came from where that is a different Clan.
+     *
+     * <p>A warrior usually carries a legacy of their own Clan, so the second emblem appears only when
+     * the descent crosses Clans - the Wars of Reaving moved many legacies, and a warrior taken as
+     * isorla carries the name of the Clan they were taken from.</p>
+     *
+     * @return the emblem panel, or {@code null} when there is no Clan to show
+     */
+    private @Nullable JPanel fillBloodhouseEmblems() {
+        Faction servingClan = servingClanOf(person);
+        Faction originClan = bloodnameOriginClanOf(person);
+
+        boolean showOrigin = (originClan != null)
+              && ((servingClan == null) || !originClan.getShortName().equals(servingClan.getShortName()));
+        if ((servingClan == null) && !showOrigin) {
+            return null;
+        }
+
+        JPanel pnlEmblems = new JPanel(new GridBagLayout());
+        int gridX = 0;
+        if (servingClan != null) {
+            addClanEmblem(pnlEmblems, gridX++, servingClan,
+                  getTextAt(RESOURCE_BUNDLE, "lblServingClan.text"));
+        }
+        if (showOrigin) {
+            addClanEmblem(pnlEmblems, gridX, originClan,
+                  getTextAt(RESOURCE_BUNDLE, "lblBloodnameOriginClan.text"));
+        }
+        return pnlEmblems;
+    }
+
+    /**
+     * Adds one captioned Clan emblem to the emblem row.
+     *
+     * @param panel   the row to add to
+     * @param gridX   the column to place it in
+     * @param faction the Clan whose emblem is shown
+     * @param caption the caption beneath it
+     */
+    private void addClanEmblem(JPanel panel, int gridX, Faction faction, String caption) {
+        GridBagConstraints gridBagConstraints = new GridBagConstraints();
+        gridBagConstraints.gridx = gridX;
+        gridBagConstraints.gridy = 0;
+        gridBagConstraints.insets = new Insets(0, 0, 0, 20);
+        gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
+
+        JLabel lblEmblem = new JLabel();
+        lblEmblem.setName("lblClanEmblem" + gridX);
+        lblEmblem.setIcon(Factions.getFactionLogoWithScaling(campaign.getGameYear(),
+              faction.getShortName(), CLAN_EMBLEM_WIDTH));
+        lblEmblem.setHorizontalAlignment(SwingConstants.CENTER);
+        lblEmblem.setVerticalTextPosition(SwingConstants.BOTTOM);
+        lblEmblem.setHorizontalTextPosition(SwingConstants.CENTER);
+        lblEmblem.setText(String.format("<html><div style=\'text-align: center;\'>%s<br>%s</div></html>",
+              caption, faction.getFullName(campaign.getGameYear())));
+        lblEmblem.setToolTipText(faction.getFullName(campaign.getGameYear()));
+        panel.add(lblEmblem, gridBagConstraints);
+    }
+
+    /**
+     * The Clan this warrior serves with, which is the campaign's own faction when that is a Clan and
+     * otherwise the Clan they came from - so a Clan warrior in a mercenary command still shows theirs.
+     *
+     * @param person the warrior
+     *
+     * @return the Clan, or {@code null} if neither is one
+     */
+    private @Nullable Faction servingClanOf(Person person) {
+        Faction campaignFaction = campaign.getFaction();
+        if ((campaignFaction != null) && campaignFaction.isClan()) {
+            return campaignFaction;
+        }
+        Faction originFaction = person.getOriginFaction();
+        return ((originFaction != null) && originFaction.isClan()) ? originFaction : null;
+    }
+
+    /**
+     * The Clan that founded this warrior's Bloodname House.
+     *
+     * @param person the warrior
+     *
+     * @return the founding Clan, or {@code null} when no House is recorded or its Clan is unknown
+     */
+    private @Nullable Faction bloodnameOriginClanOf(Person person) {
+        String houseName = person.hasBloodhouse() ? person.getBloodhouse() : person.getBloodname();
+        Bloodname house = Bloodname.getBloodname(houseName);
+        if ((house == null) || (house.getOriginClan() == null)) {
+            return null;
+        }
+        return Factions.getInstance().getFaction(house.getOriginClan().getGenerationCode());
     }
 
     private static void addGlue(int gridY, JPanel panel) {
