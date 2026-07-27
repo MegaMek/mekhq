@@ -64,6 +64,12 @@ import mekhq.campaign.personnel.skills.SkillType;
  * a section head is never outranked by their own staff. That rank is copied from the peer rather than
  * calculated, so it can only land on a rung the rank system actually names.</p>
  *
+ * <p>Taking a post also confers Leadership, at the experience level of the appointee's own discipline
+ * competence. Support staff are generated without any command skills - {@code DefaultSkillGenerator}
+ * grants those to combat roles only - so a section head would otherwise be running a section with no
+ * ability to lead one. This is granted after the pick, never before, so it cannot feed back into the
+ * scoring that chose them.</p>
+ *
  * <p>A post with no eligible candidate is simply left vacant, which is correct rather than a failure:
  * a command that generated no administrators has nobody to be its chief administrator.</p>
  */
@@ -227,6 +233,50 @@ public final class SeniorAppointmentAssigner {
               appointment.description, bestCandidate.getFullName(),
               bestCandidate.getPrimaryRole(), bestScore, eligibleCount);
         promoteToOutrankTheirStaff(bestCandidate, highestRankedPeer, appointment);
+        grantLeadership(bestCandidate, appointment);
+    }
+
+    /**
+     * Gives the appointee the Leadership skill their new post requires, at the experience level of
+     * their own discipline competence - an elite surgeon leads their medical section as capably as they
+     * operate.
+     *
+     * <p>Does nothing if they already lead at least that well, so a person who arrived with Leadership
+     * is never downgraded. Does nothing either if they have no discipline skill to scale from, since
+     * there is then no defensible level to grant.</p>
+     *
+     * @param appointee   the person who just took the post
+     * @param appointment the post, which decides the discipline skills to scale from
+     */
+    private static void grantLeadership(Person appointee, Appointment appointment) {
+        int disciplineLevel = 0;
+        String disciplineSkillName = null;
+        for (String skillName : appointment.disciplineSkills) {
+            int level = skillLevel(appointee, skillName);
+            if (level > disciplineLevel) {
+                disciplineLevel = level;
+                disciplineSkillName = skillName;
+            }
+        }
+        if (disciplineSkillName == null) {
+            LOGGER.debug("[CompanyGen][Appointments] no Leadership granted to {} '{}'; they have no "
+                  + "discipline skill to scale from", appointment.description, appointee.getFullName());
+            return;
+        }
+
+        int experienceLevel = SkillType.getType(disciplineSkillName).getExperienceLevel(disciplineLevel);
+        Skill granted = Skill.createFromExperience(SkillType.S_LEADER, experienceLevel, 0);
+        Skill existing = appointee.getSkills().getSkill(SkillType.S_LEADER);
+        if ((existing != null) && (existing.getLevel() >= granted.getLevel())) {
+            LOGGER.debug("[CompanyGen][Appointments] {} '{}' already leads at level {}; leaving it",
+                  appointment.description, appointee.getFullName(), existing.getLevel());
+            return;
+        }
+
+        appointee.addSkill(SkillType.S_LEADER, granted);
+        LOGGER.info("[CompanyGen][Appointments] granted Leadership {} to {} '{}', scaled from {} {}",
+              granted.getLevel(), appointment.description, appointee.getFullName(),
+              disciplineSkillName, disciplineLevel);
     }
 
     /**

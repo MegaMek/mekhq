@@ -32,9 +32,11 @@
  */
 package mekhq.campaign.universe.commandGeneration.ratgen;
 
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyBoolean;
 import static org.mockito.ArgumentMatchers.anyInt;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
@@ -52,6 +54,7 @@ import mekhq.campaign.personnel.skills.SkillType;
 import mekhq.campaign.personnel.skills.Skills;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
+import org.mockito.ArgumentCaptor;
 
 /**
  * Verifies that a generated command's senior posts are filled by the right people.
@@ -280,5 +283,70 @@ class SeniorAppointmentAssignerTest {
         SeniorAppointmentAssigner.assign(campaign, List.of(doctor));
 
         verify(doctor).setChiefMedicalOfficer(true);
+    }
+
+    @Test
+    void takingAPostConfersLeadership() {
+        // Support staff are generated with no command skills at all, so without this a section head
+        // would be running a section with no ability to lead one.
+        Campaign campaign = campaign();
+        Person doctor = junior(PersonnelRole.DOCTOR);
+        withSkill(doctor, SkillType.S_SURGERY, 7);
+
+        SeniorAppointmentAssigner.assign(campaign, List.of(doctor));
+
+        verify(doctor).setChiefMedicalOfficer(true);
+        ArgumentCaptor<Skill> granted = ArgumentCaptor.forClass(Skill.class);
+        verify(doctor).addSkill(eq(SkillType.S_LEADER), granted.capture());
+        assertTrue(granted.getValue().getLevel() > 0, "the granted Leadership should be a real level");
+    }
+
+    @Test
+    void leadershipIsScaledToTheirDisciplineCompetence() {
+        // An elite surgeon should lead their section better than a green one, so the grant tracks the
+        // skill that got them the post rather than being a flat value.
+        Campaign campaign = campaign();
+        Person greenDoctor = junior(PersonnelRole.DOCTOR);
+        withSkill(greenDoctor, SkillType.S_SURGERY, 2);
+        SeniorAppointmentAssigner.assign(campaign, List.of(greenDoctor));
+
+        Campaign secondCampaign = campaign();
+        Person eliteDoctor = junior(PersonnelRole.DOCTOR);
+        withSkill(eliteDoctor, SkillType.S_SURGERY, 9);
+        SeniorAppointmentAssigner.assign(secondCampaign, List.of(eliteDoctor));
+
+        ArgumentCaptor<Skill> greenGrant = ArgumentCaptor.forClass(Skill.class);
+        verify(greenDoctor).addSkill(eq(SkillType.S_LEADER), greenGrant.capture());
+        ArgumentCaptor<Skill> eliteGrant = ArgumentCaptor.forClass(Skill.class);
+        verify(eliteDoctor).addSkill(eq(SkillType.S_LEADER), eliteGrant.capture());
+
+        assertTrue(eliteGrant.getValue().getLevel() > greenGrant.getValue().getLevel(),
+              "the elite surgeon should be granted the stronger Leadership");
+    }
+
+    @Test
+    void anExistingBetterLeadershipIsNotDowngraded() {
+        Campaign campaign = campaign();
+        Person doctor = junior(PersonnelRole.DOCTOR);
+        withSkill(doctor, SkillType.S_SURGERY, 2);
+        withSkill(doctor, SkillType.S_LEADER, 10);
+
+        SeniorAppointmentAssigner.assign(campaign, List.of(doctor));
+
+        verify(doctor).setChiefMedicalOfficer(true);
+        verify(doctor, never()).addSkill(eq(SkillType.S_LEADER), any(Skill.class));
+    }
+
+    @Test
+    void noLeadershipIsGrantedWithoutADisciplineSkillToScaleFrom() {
+        // Nothing to scale from means no defensible level, so the post is filled but the skill is not
+        // invented out of thin air.
+        Campaign campaign = campaign();
+        Person doctor = junior(PersonnelRole.DOCTOR);
+
+        SeniorAppointmentAssigner.assign(campaign, List.of(doctor));
+
+        verify(doctor).setChiefMedicalOfficer(true);
+        verify(doctor, never()).addSkill(eq(SkillType.S_LEADER), any(Skill.class));
     }
 }
