@@ -498,7 +498,7 @@ public class Bloodname {
         bloodname.founder = house.getFounder();
         bloodname.origClan = Clan.getClan(record.getClan());
         bloodname.exclusive = house.isExclusive();
-        bloodname.exclusiveUntil = house.getExclusiveUntil();
+        bloodname.exclusiveUntil = house.getEffectiveExclusiveUntil();
         bloodname.limited = house.isLimited();
         bloodname.limitedSince = house.getLimitedSince();
 
