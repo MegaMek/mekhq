@@ -170,6 +170,17 @@ public class PersonViewPanel extends JScrollablePanel {
     /** How many HTML sizes the Bloodname tab's headline is raised above the panel's ordinary text. */
     private static final int HEADLINE_FONT_STEP = 2;
 
+    /**
+     * The width a Bloodname row's value wraps at, before GUI scaling.
+     *
+     * <p>Needed because some values are a paragraph - a House's Legacy runs to a couple of
+     * sentences. An unconstrained HTML label reports the whole sentence as its preferred width, which
+     * pushes the panel wider than the tab, and GridBagLayout answers by shrinking every column to its
+     * minimum instead. The minimum width of wrapping HTML is its longest word, so the panel ends up
+     * one word per line. Fixing the wrap point gives the layout a width it can honour.</p>
+     */
+    private static final int BLOODNAME_VALUE_WIDTH = 380;
+
     private static final MMLogger LOGGER = MMLogger.create(PersonViewPanel.class);
 
     private static final int MAX_NUMBER_OF_RIBBON_AWARDS_PER_ROW = 5;
@@ -954,7 +965,8 @@ public class PersonViewPanel extends JScrollablePanel {
         gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
         panel.add(fieldLabel, gridBagConstraints);
 
-        JLabel fieldValue = new JLabel(String.format("<html>%s</html>", value));
+        JLabel fieldValue = new JLabel(String.format("<html><div style='width:%dpx'>%s</div></html>",
+              UIUtil.scaleForGUI(BLOODNAME_VALUE_WIDTH), value));
         fieldValue.setName("lblBloodnameValue" + gridY);
         fieldLabel.setLabelFor(fieldValue);
         gridBagConstraints.gridx = 1;
