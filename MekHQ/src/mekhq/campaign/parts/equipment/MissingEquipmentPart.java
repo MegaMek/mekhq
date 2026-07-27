@@ -1,6 +1,6 @@
 /*
  * Copyright (c) 2009 Jay Lawson (jaylawson39 at yahoo.com). All rights reserved.
- * Copyright (C) 2013-2025 The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2013-2026 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -33,6 +33,8 @@
  */
 package mekhq.campaign.parts.equipment;
 
+import static megamek.common.units.Entity.LOC_NONE;
+
 import java.io.PrintWriter;
 
 import megamek.common.CriticalSlot;
@@ -40,10 +42,9 @@ import megamek.common.TechAdvancement;
 import megamek.common.annotations.Nullable;
 import megamek.common.equipment.EquipmentType;
 import megamek.common.equipment.MiscType;
-import megamek.common.weapons.infantry.InfantryWeapon;
 import megamek.common.equipment.Mounted;
 import megamek.common.equipment.WeaponType;
-import megamek.common.units.Entity;
+import megamek.common.weapons.infantry.InfantryWeapon;
 import megamek.logging.MMLogger;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.finances.Money;
@@ -297,6 +298,10 @@ public class MissingEquipmentPart extends MissingPart {
         final Mounted<?> m = getMounted();
         if ((unit != null) && (m != null)) {
             int loc = m.getLocation();
+            if (loc == LOC_NONE) {
+                return "location doesn't exist";
+            }
+
             if (unit.isLocationBreached(loc)) {
                 return unit.getEntity().getLocationName(loc) + " is breached.";
             }
@@ -349,7 +354,7 @@ public class MissingEquipmentPart extends MissingPart {
     @Override
     public int getLocation() {
         final Mounted<?> mounted = getMounted();
-        return (mounted != null) ? mounted.getLocation() : Entity.LOC_NONE;
+        return (mounted != null) ? mounted.getLocation() : LOC_NONE;
     }
 
     public double getSize() {
@@ -398,7 +403,7 @@ public class MissingEquipmentPart extends MissingPart {
     @Override
     public String getLocationName() {
         final Mounted<?> mounted = getMounted();
-        if ((mounted != null) && (mounted.getLocation() != Entity.LOC_NONE)) {
+        if ((mounted != null) && (mounted.getLocation() != LOC_NONE)) {
             return getUnit().getEntity().getLocationName(mounted.getLocation());
         }
 
