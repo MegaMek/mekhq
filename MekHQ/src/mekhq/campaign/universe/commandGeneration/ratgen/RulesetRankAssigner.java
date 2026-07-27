@@ -68,13 +68,18 @@ import mekhq.campaign.universe.commandGeneration.CommandGenerationOptions;
  * <p>FormationLevel → officer rank index ({@code Rank.RWO_MAX + N}):</p>
  *
  * <ul>
- *   <li>LANCE / STAR_OR_NOVA / LEVEL_II_OR_CHOIR → O3 (Lieutenant / Star Captain / Adept)</li>
- *   <li>COMPANY / BINARY_OR_TRINARY / LEVEL_III → O4 (Captain / Star Colonel / Demi-Precentor)</li>
- *   <li>BATTALION / CLUSTER / LEVEL_IV → O5 (Major / Galaxy Commander / Precentor)</li>
- *   <li>REGIMENT / GALAXY / LEVEL_V → O7 (Brigadier General / Khan / Precentor Martial)</li>
- *   <li>BRIGADE / TOUMAN / LEVEL_VI → O8 (Major General)</li>
- *   <li>DIVISION → O9, CORPS → O10, ARMY → O11, ARMY_GROUP → O12</li>
+ *   <li>LANCE / STAR_OR_NOVA / LEVEL_II_OR_CHOIR → +3 (Lieutenant / Nova Commander / Adept)</li>
+ *   <li>COMPANY / BINARY_OR_TRINARY / LEVEL_III → +4 (Captain / Star Captain / Demi-Precentor)</li>
+ *   <li>BATTALION → +5 (Major); LEVEL_IV and LEVEL_V → +7 (Precentor)</li>
+ *   <li>REGIMENT / CLUSTER → +8 (Colonel / Star Colonel)</li>
+ *   <li>BRIGADE / GALAXY → +9 (Brigadier General / Galaxy Commander)</li>
+ *   <li>DIVISION → +10, CORPS → +11, ARMY → +12, ARMY_GROUP → +13</li>
+ *   <li>LEVEL_VI → +12 (Precentor Martial); TOUMAN → +18 (Khan)</li>
  * </ul>
+ *
+ * <p>Which level a Formation counts as is taken from the echelon the generator was asked for, not
+ * from the Formation's own {@code formationLevel}. See {@code requestedRootLevel} for why the
+ * latter cannot be trusted at this point in the pipeline.</p>
  *
  * <p>Non-officer combat crew get an enlisted Sergeant rank (E12 IS, E4 Clan/CS); support staff get
  * a Corporal-equivalent (E8 IS, E4 Clan/CS) matching the legacy generator's convention. The campaign's
@@ -156,11 +161,13 @@ public final class RulesetRankAssigner {
         // Pass 1: walk the tree post-order so lance / star commanders claim their officer rank
         // before their parent company / binary looks for ITS commander among remaining unranked
         // crew. Each Formation promotes the first not-yet-promoted combat Person in its subtree.
-        LOGGER.info("[CompanyGen][RankAssign][Pass1] BEFORE walkPostOrder");
+        FormationLevel rootLevel = requestedRootLevel(campaign, options, root);
+        LOGGER.info("[CompanyGen][RankAssign][Pass1] BEFORE walkPostOrder rootLevel={}", rootLevel);
         long pass1Start = System.nanoTime();
         Set<Person> promoted = new LinkedHashSet<>();
         int[] officerCount = { 0 };
-        Person rootCommander = walkPostOrder(campaign, root, promoted, officerCount, targetRankSystem, rankValidator);
+        Person rootCommander = walkPostOrder(campaign, root, rootLevel, promoted, officerCount,
+              targetRankSystem, rankValidator);
         int officersAssigned = officerCount[0];
         long pass1Ms = (System.nanoTime() - pass1Start) / 1_000_000;
         LOGGER.info("[CompanyGen][RankAssign][Pass1] AFTER walkPostOrder officers={} rootCommander={} elapsed={}ms",
@@ -220,15 +227,17 @@ public final class RulesetRankAssigner {
      *         force commander.
      */
     @Nullable
-    private static Person walkPostOrder(Campaign campaign, Formation formation, Set<Person> promoted,
-          int[] officerCount, RankSystem targetRankSystem, RankValidator rankValidator) {
+    private static Person walkPostOrder(Campaign campaign, Formation formation,
+          @Nullable FormationLevel level, Set<Person> promoted, int[] officerCount,
+          RankSystem targetRankSystem, RankValidator rankValidator) {
+        FormationLevel subLevel = oneLevelBelow(campaign, level);
         for (Formation sub : formation.getSubFormations()) {
-            walkPostOrder(campaign, sub, promoted, officerCount, targetRankSystem, rankValidator);
+            walkPostOrder(campaign, sub, subLevel, promoted, officerCount, targetRankSystem, rankValidator);
         }
-        int rankIndex = rankIndexForLevel(formation.getFormationLevel());
+        int rankIndex = rankIndexForLevel(level);
         if (rankIndex < 0) {
             LOGGER.info("[CompanyGen][RankAssign][Pass1]   formation '{}' (level={}) -> no rank mapping, skip",
-                  formation.getName(), formation.getFormationLevel());
+                  formation.getName(), level);
             return null;
         }
         Person commander = pickCommander(campaign, formation, promoted);
@@ -237,13 +246,66 @@ public final class RulesetRankAssigner {
             promoted.add(commander);
             officerCount[0]++;
             LOGGER.info("[CompanyGen][RankAssign][Pass1]   formation '{}' (level={}) -> '{}' promoted to rank index {} (effective={})",
-                  formation.getName(), formation.getFormationLevel(),
-                  commander.getFullName(), rankIndex, commander.getRankNumeric());
+                  formation.getName(), level, commander.getFullName(), rankIndex,
+                  commander.getRankNumeric());
         } else {
             LOGGER.info("[CompanyGen][RankAssign][Pass1]   formation '{}' (level={}) -> no unpromoted combat Person available",
-                  formation.getName(), formation.getFormationLevel());
+                  formation.getName(), level);
         }
         return commander;
+    }
+
+    /**
+     * The command level of the force as a whole, taken from the echelon the user asked the generator
+     * for rather than from the Formation's own level.
+     *
+     * <p>The Formation's level cannot be trusted here. Generation fires an
+     * {@link mekhq.campaign.events.OrganizationChangedEvent}, and that recomputes every level in the
+     * tree from its depth - deepest formation counts as 1, each parent one higher. That model is
+     * built for the Inner Sphere ladder of Lance, Company, Battalion. A Clan force has an extra rung
+     * in it, Point below Star below Binary or Trinary below Cluster, so every level above the bottom
+     * comes out one too high and the campaign's own root force lands above the Cluster entirely. A
+     * requested Cluster was being commanded by a Khan.</p>
+     *
+     * @param campaign the campaign, for resolving a depth to its faction-family level
+     * @param options  the generation options, carrying the echelon that was asked for
+     * @param root     the campaign's root Formation, used only as a fallback
+     *
+     * @return the level to rank the root commander at, or {@code null} if neither source knows
+     */
+    private static @Nullable FormationLevel requestedRootLevel(Campaign campaign,
+          CommandGenerationOptions options, Formation root) {
+        Integer echelon = options.getForceDescriptorSnapshot().getEchelon();
+        if (echelon == null) {
+            LOGGER.info("[CompanyGen][RankAssign] no echelon requested; falling back to the Formation's own level {}",
+                  root.getFormationLevel());
+            return root.getFormationLevel();
+        }
+
+        FormationLevel level = ForceDescriptorWalker.mapEchelonToFormationLevel(echelon,
+              campaign.getFaction().getShortName());
+        if (level == null) {
+            LOGGER.info("[CompanyGen][RankAssign] echelon {} has no level mapping; falling back to the Formation's own level {}",
+                  echelon, root.getFormationLevel());
+            return root.getFormationLevel();
+        }
+        return level;
+    }
+
+    /**
+     * @param campaign the campaign, whose faction decides which ladder a depth resolves against
+     * @param level    the parent's level, or {@code null} when it is unknown
+     *
+     * @return the level one rung below {@code level}, or {@code null} once the bottom is reached
+     */
+    private static @Nullable FormationLevel oneLevelBelow(Campaign campaign,
+          @Nullable FormationLevel level) {
+        if (level == null) {
+            return null;
+        }
+
+        int depth = level.getDepth() - 1;
+        return (depth < 0) ? null : FormationLevel.parseFromDepth(campaign, depth);
     }
 
     /**
