@@ -107,6 +107,7 @@ import mekhq.campaign.finances.Money;
 import mekhq.campaign.log.LogEntry;
 import mekhq.campaign.personnel.Award;
 import mekhq.campaign.personnel.Injury;
+import megamek.utilities.ImageUtilities;
 import mekhq.campaign.universe.Factions;
 import javax.swing.SwingConstants;
 import mekhq.campaign.universe.Faction;
@@ -543,6 +544,19 @@ public class PersonViewPanel extends JScrollablePanel {
         pnlBloodname.add(fillBloodname(), gridBagConstraints);
         gridY++;
 
+        JPanel pnlEmblems = fillBloodhouseEmblems();
+        if (pnlEmblems != null) {
+            gridBagConstraints = new GridBagConstraints();
+            gridBagConstraints.gridx = 0;
+            gridBagConstraints.gridy = gridY;
+            gridBagConstraints.weightx = 1.0;
+            gridBagConstraints.insets = new Insets(0, 5, 10, 0);
+            gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
+            gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
+            pnlBloodname.add(pnlEmblems, gridBagConstraints);
+            gridY++;
+        }
+
         addGlue(gridY, pnlBloodname);
     }
 
@@ -701,8 +715,14 @@ public class PersonViewPanel extends JScrollablePanel {
         boolean showOrigin = (originClan != null)
               && ((servingClan == null) || !originClan.getShortName().equals(servingClan.getShortName()));
         if ((servingClan == null) && !showOrigin) {
+            LOGGER.debug("[Bloodhouse][Emblem] none shown for '{}': no serving Clan and no differing "
+                        + "origin Clan (bloodhouse='{}')", person.getFullName(), person.getBloodhouse());
             return null;
         }
+        LOGGER.debug("[Bloodhouse][Emblem] '{}': serving={} origin={} showOrigin={}",
+              person.getFullName(),
+              servingClan == null ? "none" : servingClan.getShortName(),
+              originClan == null ? "none" : originClan.getShortName(), showOrigin);
 
         JPanel pnlEmblems = new JPanel(new GridBagLayout());
         int gridX = 0;
@@ -734,8 +754,15 @@ public class PersonViewPanel extends JScrollablePanel {
 
         JLabel lblEmblem = new JLabel();
         lblEmblem.setName("lblClanEmblem" + gridX);
-        lblEmblem.setIcon(Factions.getFactionLogoWithScaling(campaign.getGameYear(),
-              faction.getShortName(), CLAN_EMBLEM_WIDTH));
+        // Matches how faction emblems are rendered elsewhere - fetch, then scale - rather than the
+        // combined call, which is not the path the rest of the GUI uses.
+        ImageIcon emblem = Factions.getFactionLogo(campaign.getGameYear(), faction.getShortName());
+        emblem = ImageUtilities.scaleImageIcon(emblem, CLAN_EMBLEM_WIDTH, true);
+        if ((emblem == null) || (emblem.getIconWidth() <= 0)) {
+            LOGGER.warn("[Bloodhouse][Emblem] no usable emblem image for {} in {}",
+                  faction.getShortName(), campaign.getGameYear());
+        }
+        lblEmblem.setIcon(emblem);
         lblEmblem.setHorizontalAlignment(SwingConstants.CENTER);
         lblEmblem.setVerticalTextPosition(SwingConstants.BOTTOM);
         lblEmblem.setHorizontalTextPosition(SwingConstants.CENTER);
