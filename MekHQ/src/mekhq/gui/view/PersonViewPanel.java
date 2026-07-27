@@ -167,14 +167,8 @@ public class PersonViewPanel extends JScrollablePanel {
     /** The Wars of Reaving ended in 3075; used when a legacy does not record its own reaving year. */
     private static final int WARS_OF_REAVING_END = 3075;
 
-    /** Leaves a Bloodname row at the panel's ordinary text size. */
-    private static final int NO_FONT_STEP = 0;
-
-    /** The Bloodname is the headline of the tab, so it is set largest. */
-    private static final int BLOODNAME_FONT_STEP = 2;
-
-    /** The Bloodhouse sits just under the Bloodname, and is set one step below it. */
-    private static final int BLOODHOUSE_FONT_STEP = 1;
+    /** How many HTML sizes the Bloodname tab's headline is raised above the panel's ordinary text. */
+    private static final int HEADLINE_FONT_STEP = 2;
 
     private static final MMLogger LOGGER = MMLogger.create(PersonViewPanel.class);
 
@@ -598,30 +592,70 @@ public class PersonViewPanel extends JScrollablePanel {
         pnlHeritage.setBorder(RoundedLineBorder.createRoundedLineBorder(
               getTextAt(RESOURCE_BUNDLE, "pnlBloodnameHeritage.title")));
 
-        int gridY = 0;
-
-        // Most Clan warriors never win a Bloodname, so saying so plainly is the ordinary case and not
-        // missing information.
-        String heldBloodname = holdsBloodname(person)
-              ? person.getBloodname()
-              : getTextAt(RESOURCE_BUNDLE, "lblBloodname.notAchieved");
-        addBloodnameRow(pnlHeritage, gridY++, getTextAt(RESOURCE_BUNDLE, "lblBloodname.text"),
-              heldBloodname, BLOODNAME_FONT_STEP);
-
-        String houseName = houseNameOf(person);
-        if (houseName != null) {
-            addBloodnameRow(pnlHeritage, gridY++, getTextAt(RESOURCE_BUNDLE, "lblBloodhouse.text"),
-                  getFormattedTextAt(RESOURCE_BUNDLE, "lblBloodhouse.value", houseName),
-                  BLOODHOUSE_FONT_STEP);
-        } else if (person.getPhenotype().isTrueborn()) {
-            addBloodnameRow(pnlHeritage, gridY++, getTextAt(RESOURCE_BUNDLE, "lblBloodhouse.text"),
-                  getTextAt(RESOURCE_BUNDLE, "lblBloodhouse.unrecorded"), BLOODHOUSE_FONT_STEP);
-        }
-
-        addBloodnameRow(pnlHeritage, gridY, getTextAt(RESOURCE_BUNDLE, "lblPhenotype.text"),
+        addBloodnameHeadline(pnlHeritage, 0, describeHeritage());
+        addBloodnameRow(pnlHeritage, 1, getTextAt(RESOURCE_BUNDLE, "lblPhenotype.text"),
               person.getPhenotype().getLabel());
 
         return pnlHeritage;
+    }
+
+    /**
+     * The one line at the head of the tab, saying where this warrior stands with their House.
+     *
+     * <p>Four things it can say, and which one it says is the point of the tab:</p>
+     * <ul>
+     *   <li>they hold the name, and are addressed by it</li>
+     *   <li>they were bred from a House and may yet win its name, which is where most trueborns
+     *       stay</li>
+     *   <li>they are trueborn but no House was recorded against them</li>
+     *   <li>they are freeborn, so no House bred them at all</li>
+     * </ul>
+     *
+     * @return the headline text
+     */
+    private String describeHeritage() {
+        String houseName = houseNameOf(person);
+
+        if (holdsBloodname(person)) {
+            // The name a warrior wins is the House's own, so stating the two separately said the same
+            // word twice. Named as one line instead, the way the Clans say it.
+            return getFormattedTextAt(RESOURCE_BUNDLE, "lblBloodnameHeritage.bloodnamed",
+                  person.getFullName(), houseName);
+        }
+
+        if (houseName != null) {
+            return getFormattedTextAt(RESOURCE_BUNDLE, "lblBloodnameHeritage.eligible", houseName);
+        }
+
+        return person.getPhenotype().isTrueborn()
+              ? getTextAt(RESOURCE_BUNDLE, "lblBloodnameHeritage.unrecorded")
+              : getTextAt(RESOURCE_BUNDLE, "lblBloodnameHeritage.freeborn");
+    }
+
+    /**
+     * Adds the Bloodname tab's headline, spanning both columns and set larger and bold.
+     *
+     * <p>Sized in HTML steps rather than by deriving a font, so it still tracks whatever text size
+     * the user's GUI scaling settles on.</p>
+     *
+     * @param panel the panel to add to
+     * @param gridY the row to place it on
+     * @param text  the headline text
+     */
+    private static void addBloodnameHeadline(JPanel panel, int gridY, String text) {
+        JLabel headline = new JLabel(String.format("<html><font size='+%d'><b>%s</b></font></html>",
+              HEADLINE_FONT_STEP, text));
+        headline.setName("lblBloodnameHeadline" + gridY);
+
+        GridBagConstraints gridBagConstraints = new GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = gridY;
+        gridBagConstraints.gridwidth = 2;
+        gridBagConstraints.weightx = 1.0;
+        gridBagConstraints.insets = new Insets(0, 0, 5, 0);
+        gridBagConstraints.fill = GridBagConstraints.NONE;
+        gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
+        panel.add(headline, gridBagConstraints);
     }
 
     /**
@@ -903,30 +937,15 @@ public class PersonViewPanel extends JScrollablePanel {
     }
 
     /**
-     * Adds one label-and-value row to the Bloodname panel, at the panel's ordinary text size.
-     *
-     * @param panel the panel to add to
-     * @param gridY the row to place it on
-     * @param label the field name
-     * @param value the field value
-     */
-    private static void addBloodnameRow(JPanel panel, int gridY, String label, String value) {
-        addBloodnameRow(panel, gridY, label, value, NO_FONT_STEP);
-    }
-
-    /**
      * Adds one label-and-value row to the Bloodname panel.
      *
-     * @param panel        the panel to add to
-     * @param gridY        the row to place it on
-     * @param label        the field name
-     * @param value        the field value
-     * @param fontSizeStep how many HTML sizes to raise the row above the panel's ordinary text, which
-     *                     also sets it bold; {@link #NO_FONT_STEP} for an ordinary row
+     * @param panel  the panel to add to
+     * @param gridY  the row to place it on
+     * @param label  the field name
+     * @param value  the field value
      */
-    private static void addBloodnameRow(JPanel panel, int gridY, String label, String value,
-          int fontSizeStep) {
-        JLabel fieldLabel = new JLabel(emphasise(label, fontSizeStep));
+    private static void addBloodnameRow(JPanel panel, int gridY, String label, String value) {
+        JLabel fieldLabel = new JLabel(label);
         fieldLabel.setName("lblBloodnameField" + gridY);
         GridBagConstraints gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 0;
@@ -935,33 +954,13 @@ public class PersonViewPanel extends JScrollablePanel {
         gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
         panel.add(fieldLabel, gridBagConstraints);
 
-        JLabel fieldValue = new JLabel(emphasise(value, fontSizeStep));
+        JLabel fieldValue = new JLabel(String.format("<html>%s</html>", value));
         fieldValue.setName("lblBloodnameValue" + gridY);
         fieldLabel.setLabelFor(fieldValue);
         gridBagConstraints.gridx = 1;
         gridBagConstraints.weightx = 1.0;
         gridBagConstraints.insets = new Insets(0, 10, 0, 0);
         panel.add(fieldValue, gridBagConstraints);
-    }
-
-    /**
-     * Wraps one Bloodname row's text for display, raising it above the panel's ordinary text and
-     * setting it bold when asked.
-     *
-     * <p>Sized in HTML steps rather than by deriving a font, so the row still tracks whatever text
-     * size the user's GUI scaling settles on.</p>
-     *
-     * @param text         the text to wrap
-     * @param fontSizeStep how many HTML sizes to raise it, or {@link #NO_FONT_STEP} to leave it alone
-     *
-     * @return the text as an HTML label string
-     */
-    private static String emphasise(String text, int fontSizeStep) {
-        if (fontSizeStep == NO_FONT_STEP) {
-            return String.format("<html>%s</html>", text);
-        }
-
-        return String.format("<html><font size='+%d'><b>%s</b></font></html>", fontSizeStep, text);
     }
 
     /**
