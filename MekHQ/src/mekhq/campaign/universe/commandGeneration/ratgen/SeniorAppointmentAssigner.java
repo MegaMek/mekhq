@@ -494,15 +494,53 @@ public final class SeniorAppointmentAssigner {
             return floorRank;
         }
         Profession baseProfession = Profession.getProfessionFromPersonnelRole(person.getPrimaryRole());
+        boolean hasOwnLadder = namesRanksOfItsOwn(rankSystem, baseProfession);
         int ceiling = Math.min(rankCeiling, rankSystem.getRanks().size() - 1);
         for (int index = floorRank + 1; index <= ceiling; index++) {
             Rank candidate = rankSystem.getRank(index);
-            if ((candidate != null)
-                      && !candidate.isEmpty(baseProfession.getProfession(rankSystem, candidate))) {
+            if (candidate == null) {
+                continue;
+            }
+            boolean isNamedForThisPerson = hasOwnLadder
+                  ? namesThisProfession(candidate, baseProfession)
+                  : !candidate.isEmpty(baseProfession.getProfession(rankSystem, candidate));
+            if (isNamedForThisPerson) {
                 return index;
             }
         }
         return floorRank;
+    }
+
+    /**
+     * Whether this profession has ranks of its own in this system, as opposed to borrowing another
+     * profession's column.
+     *
+     * <p>Most systems name only the warrior column and point everything else at it, so a doctor's rank
+     * legitimately comes from there. The Clan system names technicians, medics and administrators
+     * separately, and a promotion inside those professions must stay in their own column - stepping up
+     * from Head Technician would otherwise land on the warrior rung above it and retitle the person a
+     * Point Commander.</p>
+     *
+     * @param rankSystem the rank system to inspect
+     * @param profession the profession to look for
+     *
+     * @return {@code true} if any rank in the system names this profession directly
+     */
+    private static boolean namesRanksOfItsOwn(RankSystem rankSystem, Profession profession) {
+        for (Rank rank : rankSystem.getRanks()) {
+            if ((rank != null) && namesThisProfession(rank, profession)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    /**
+     * @return {@code true} if this rank gives the profession a name of its own, rather than being blank
+     *       or a pointer at another profession's column
+     */
+    private static boolean namesThisProfession(Rank rank, Profession profession) {
+        return !rank.isEmpty(profession) && !rank.indicatesAlternativeSystem(profession);
     }
 
     /**

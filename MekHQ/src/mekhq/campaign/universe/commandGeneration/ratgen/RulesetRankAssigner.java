@@ -403,8 +403,11 @@ public final class RulesetRankAssigner {
      * <p>Sparse rank systems are handled by the caller, which walks down from the requested index
      * until it finds a rank that profession actually names.</p>
      *
-     * <p>Clan and ComStar/WoB keep their existing flat index: neither organises medical or technical
-     * staff as a commissioned corps, and imposing this ladder on them would misrepresent both.</p>
+     * <p>Clan and ComStar/WoB keep a single flat index rather than this ladder. For the Clans that
+     * index now resolves to real names - the rank system gives technicians, medics and administrators
+     * their own columns, so one index reads as Technician, Doctor or Administrator according to the
+     * holder's profession, and the rung above it carries the department heads. ComStar and WoB still
+     * borrow the warrior column and remain outstanding work.</p>
      *
      * @param role    the support role being generated
      * @param skill   the skill level that person was generated at

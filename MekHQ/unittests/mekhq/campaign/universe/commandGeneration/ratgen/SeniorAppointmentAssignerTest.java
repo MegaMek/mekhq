@@ -32,6 +32,7 @@
  */
 package mekhq.campaign.universe.commandGeneration.ratgen;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
@@ -53,6 +54,8 @@ import mekhq.campaign.Campaign;
 import mekhq.campaign.LocalPersonnel;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.enums.PersonnelRole;
+import mekhq.campaign.personnel.enums.Profession;
+import mekhq.campaign.personnel.ranks.Rank;
 import mekhq.campaign.personnel.ranks.RankSystem;
 import mekhq.campaign.personnel.ranks.Ranks;
 import mekhq.campaign.personnel.skills.Skill;
@@ -635,5 +638,88 @@ class SeniorAppointmentAssignerTest {
         int headRank = logisticsRank.getAllValues().get(logisticsRank.getAllValues().size() - 1);
         assertTrue(headRank > CAPTAIN, "a department head should sit above their staff, got " + headRank);
         assertTrue(headRank <= COLONEL, "and no higher than Colonel, got " + headRank);
+    }
+
+    /**
+     * A rank system shaped like the Clan one: the profession names two rungs of its own, and every rung
+     * above those belongs to another profession's column. Built here rather than read from the shipped
+     * data so the test does not depend on data staging.
+     */
+    private static RankSystem twoRungProfessionLadder(Profession profession, int firstRung,
+          int secondRung, int size) {
+        RankSystem rankSystem = mock(RankSystem.class);
+        List<Rank> ranks = new ArrayList<>();
+        for (int index = 0; index < size; index++) {
+            Rank rank = mock(Rank.class);
+            boolean namedForProfession = (index == firstRung) || (index == secondRung);
+            when(rank.isEmpty(profession)).thenReturn(!namedForProfession);
+            when(rank.indicatesAlternativeSystem(profession)).thenReturn(false);
+            ranks.add(rank);
+        }
+        when(rankSystem.getRanks()).thenReturn(ranks);
+        for (int index = 0; index < size; index++) {
+            when(rankSystem.getRank(index)).thenReturn(ranks.get(index));
+        }
+        return rankSystem;
+    }
+
+    private static Campaign campaignCommandedAtRank(int commanderRank) {
+        Campaign campaign = mock(Campaign.class);
+        Person commander = mock(Person.class);
+        when(commander.getRankNumeric()).thenReturn(commanderRank);
+        LocalPersonnel roster = new LocalPersonnel();
+        roster.put(UUID.randomUUID(), commander);
+        when(campaign.getPersonnel()).thenReturn(roster);
+        return campaign;
+    }
+
+    @Test
+    void aDepartmentHeadStepsUpWithinTheirOwnProfessionsRanks() {
+        Campaign campaign = campaignCommandedAtRank(COLONEL);
+        RankSystem ladder = twoRungProfessionLadder(Profession.TECH, 4, 5, 20);
+
+        Person bestTechnician = junior(PersonnelRole.MEK_TECH);
+        withSkill(bestTechnician, SkillType.S_TECH_MEK, 8);
+        when(bestTechnician.getRankNumeric()).thenReturn(4);
+        when(bestTechnician.getRankSystem()).thenReturn(ladder);
+
+        Person otherTechnician = junior(PersonnelRole.MEK_TECH);
+        withSkill(otherTechnician, SkillType.S_TECH_MEK, 2);
+        when(otherTechnician.getRankNumeric()).thenReturn(4);
+        when(otherTechnician.getRankSystem()).thenReturn(ladder);
+
+        SeniorAppointmentAssigner.assign(campaign, List.of(bestTechnician, otherTechnician));
+
+        verify(bestTechnician).setDepartmentHead(true);
+        // This technician heads both their department and the technical branch, so the promotion is
+        // computed twice; every promotion must land on the one rung above them, never past it.
+        ArgumentCaptor<Integer> promotedTo = ArgumentCaptor.forClass(Integer.class);
+        verify(bestTechnician, atLeastOnce()).setRank(promotedTo.capture());
+        for (Integer rank : promotedTo.getAllValues()) {
+            assertEquals(5, rank, "a technician should step to the technician rung, not past it");
+        }
+    }
+
+    @Test
+    void aHeadNeverStepsIntoAnotherProfessionsRanks() {
+        // The Clan system names two technician rungs and warrior ranks above them. Walking past the top
+        // technician rung would retitle a technician as a warrior, so the search has to stop.
+        Campaign campaign = campaignCommandedAtRank(COLONEL);
+        RankSystem ladder = twoRungProfessionLadder(Profession.TECH, 4, 5, 20);
+
+        Person bestTechnician = junior(PersonnelRole.MEK_TECH);
+        withSkill(bestTechnician, SkillType.S_TECH_MEK, 8);
+        when(bestTechnician.getRankNumeric()).thenReturn(5);
+        when(bestTechnician.getRankSystem()).thenReturn(ladder);
+
+        Person otherTechnician = junior(PersonnelRole.MEK_TECH);
+        withSkill(otherTechnician, SkillType.S_TECH_MEK, 2);
+        when(otherTechnician.getRankNumeric()).thenReturn(5);
+        when(otherTechnician.getRankSystem()).thenReturn(ladder);
+
+        SeniorAppointmentAssigner.assign(campaign, List.of(bestTechnician, otherTechnician));
+
+        verify(bestTechnician).setDepartmentHead(true);
+        verify(bestTechnician, never()).setRank(anyInt());
     }
 }
