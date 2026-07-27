@@ -763,6 +763,18 @@ public final class WarehouseTab extends CampaignGuiTab implements ITechWorkPanel
     }
 
     public void refreshPartsList() {
+        // While a bulk generation is adding units/parts off the EDT, skip this refresh: the In Use
+        // computation walks every part in the warehouse and asks each one what it would cost to
+        // replace, which reads the part's owning unit. The worker is concurrently detaching parts
+        // from units, so a part could pass its own "do I have a unit" check here and have lost it a
+        // moment later, throwing NullPointerException out of the modal progress dialog's event pump.
+        // The generation fires an OrganizationChangedEvent when it completes, which reschedules this
+        // refresh against the finished, consistent campaign.
+        if (getCampaign().isBulkGenerationInProgress()) {
+            LOGGER.debug("[CompanyGen] warehouse refresh skipped - bulk generation in progress");
+            return;
+        }
+
         // Recompute the In Use snapshot on every refresh. PartsTableModel renders the In Use column
         // from a one-shot map; without this call it stays at whatever it was at construction time,
         // so a campaign that adds units after the WarehouseTab exists (force-generated or imported)
