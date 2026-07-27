@@ -3751,7 +3751,6 @@ public class AtBDynamicScenarioFactory {
     }
 
     private static boolean isDoomed(boolean isSpace, Entity entity, boolean isLowAtmosphere) {
-        boolean isFormationValid;
         if (isSpace) {
             if (entity.doomedInSpace()) {
                 isFormationValid = false;
