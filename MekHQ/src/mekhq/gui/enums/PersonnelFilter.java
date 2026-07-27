@@ -39,7 +39,9 @@ import java.util.ResourceBundle;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import megamek.common.annotations.Nullable;
 import mekhq.MekHQ;
+import mekhq.campaign.Campaign;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.enums.PersonnelRole;
 import mekhq.campaign.personnel.enums.PersonnelStatus;
@@ -101,6 +103,7 @@ public enum PersonnelFilter {
 
     // region Expanded Personnel Tab Filters
     FOUNDER("PersonnelFilter.FOUNDER.text", "PersonnelFilter.FOUNDER.toolTipText", false, false),
+    BLOODNAMED("PersonnelFilter.BLOODNAMED.text", "PersonnelFilter.BLOODNAMED.toolTipText", false, false),
     KIDS("PersonnelFilter.KIDS.text", "PersonnelFilter.KIDS.toolTipText"),
     PRISONER("PersonnelFilter.PRISONER.text", "PersonnelFilter.PRISONER.toolTipText", false, false),
     INACTIVE("PersonnelFilter.INACTIVE.text", "PersonnelFilter.INACTIVE.toolTipText", false, false),
@@ -356,7 +359,36 @@ public enum PersonnelFilter {
     public boolean isDead() {
         return this == DEAD;
     }
+
+    /**
+     * @return {@code true} if this filter only makes sense for a Clan command
+     */
+    public boolean isClanOnly() {
+        return this == BLOODNAMED;
+    }
     // endregion Boolean Comparison Methods
+
+    /**
+     * Drops filters that do not apply to the given command.
+     *
+     * <p>Only the Clans award Bloodnames, so an Inner Sphere command is not offered a filter that
+     * could only ever come back empty.</p>
+     *
+     * @param filters  the filters the user's chosen style offers
+     * @param campaign the campaign the list is being built for; may be {@code null}, which is
+     *                 treated as not a Clan command
+     *
+     * @return the filters that apply to this command
+     */
+    public static List<PersonnelFilter> applicableTo(final List<PersonnelFilter> filters,
+          final @Nullable Campaign campaign) {
+        boolean isClanCommand = (campaign != null) && campaign.getFaction().isClan();
+        if (isClanCommand) {
+            return filters;
+        }
+
+        return filters.stream().filter(filter -> !filter.isClanOnly()).toList();
+    }
 
     public static List<PersonnelFilter> getStandardPersonnelFilters() {
         return Stream.of(values()).filter(filter -> filter.isBaseline() || filter.isStandard())
@@ -500,6 +532,7 @@ public enum PersonnelFilter {
             case CAMP_FOLLOWER -> ((!dead) && (active && person.getStatus().isCampFollower()));
             case BACKGROUND_CHARACTER -> person.getStatus().isBackground();
             case FOUNDER -> ((!dead) && (person.isFounder()));
+            case BLOODNAMED -> ((!dead) && (person.getBloodname() != null) && !person.getBloodname().isBlank());
             case KIDS -> ((!dead) && (!status.isLeft()) && (person.isChild(currentDate)));
             case PRISONER -> ((!dead) &&
                                     ((person.getPrisonerStatus().isCurrentPrisoner()) ||
