@@ -167,6 +167,15 @@ public class PersonViewPanel extends JScrollablePanel {
     /** The Wars of Reaving ended in 3075; used when a legacy does not record its own reaving year. */
     private static final int WARS_OF_REAVING_END = 3075;
 
+    /** Leaves a Bloodname row at the panel's ordinary text size. */
+    private static final int NO_FONT_STEP = 0;
+
+    /** The Bloodname is the headline of the tab, so it is set largest. */
+    private static final int BLOODNAME_FONT_STEP = 2;
+
+    /** The Bloodhouse sits just under the Bloodname, and is set one step below it. */
+    private static final int BLOODHOUSE_FONT_STEP = 1;
+
     private static final MMLogger LOGGER = MMLogger.create(PersonViewPanel.class);
 
     private static final int MAX_NUMBER_OF_RIBBON_AWARDS_PER_ROW = 5;
@@ -542,90 +551,127 @@ public class PersonViewPanel extends JScrollablePanel {
     }
 
     /**
-     * Builds the Bloodname tab: the name this warrior carries, the house behind it, and what is known
-     * of that house.
+     * Builds the Bloodname tab as stacked sections: what this warrior personally carries, the Clan
+     * emblems, then the House the name belongs to and what is known of it.
      */
     private void initializeBloodname(JPanel pnlBloodname) {
-        int gridY = 0;
+        int gridY = addBloodnameSection(pnlBloodname, 0, fillWarriorHeritage());
+        gridY = addBloodnameSection(pnlBloodname, gridY, fillBloodhouseEmblems());
+        gridY = addBloodnameSection(pnlBloodname, gridY, fillBloodnameHouse());
+        addGlue(gridY, pnlBloodname);
+    }
+
+    /**
+     * Stacks one section onto the Bloodname tab, skipping sections that had nothing to show.
+     *
+     * @param pnlBloodname the tab to add to
+     * @param gridY        the row to place the section on
+     * @param section      the section, or {@code null} when it has nothing to show
+     *
+     * @return the next free row
+     */
+    private static int addBloodnameSection(JPanel pnlBloodname, int gridY, @Nullable JPanel section) {
+        if (section == null) {
+            return gridY;
+        }
 
         GridBagConstraints gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = gridY;
         gridBagConstraints.weightx = 1.0;
         gridBagConstraints.insets = new Insets(0, 0, 10, 0);
-        gridBagConstraints.fill = GridBagConstraints.BOTH;
+        gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
         gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
-        pnlBloodname.add(fillBloodname(), gridBagConstraints);
-        gridY++;
-
-        JPanel pnlEmblems = fillBloodhouseEmblems();
-        if (pnlEmblems != null) {
-            gridBagConstraints = new GridBagConstraints();
-            gridBagConstraints.gridx = 0;
-            gridBagConstraints.gridy = gridY;
-            gridBagConstraints.weightx = 1.0;
-            gridBagConstraints.insets = new Insets(0, 5, 10, 0);
-            gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
-            gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
-            pnlBloodname.add(pnlEmblems, gridBagConstraints);
-            gridY++;
-        }
-
-        addGlue(gridY, pnlBloodname);
+        pnlBloodname.add(section, gridBagConstraints);
+        return gridY + 1;
     }
 
     /**
-     * The Bloodname panel. An unbloodnamed warrior gets a single line saying so rather than a set of
-     * empty fields - most Clan warriors never win one, so it is the ordinary case and not a gap.
+     * What this particular warrior carries: the Bloodname if they have won one, the House they were
+     * bred from, and their phenotype.
+     *
+     * <p>The name and the House are set larger and bold. They are the two facts the tab exists to
+     * answer, and everything in the section below them describes the second of the two.</p>
      */
-    private JPanel fillBloodname() {
-        JPanel pnlBloodnameDetails = new JPanel(new GridBagLayout());
-        pnlBloodnameDetails.setBorder(RoundedLineBorder.createRoundedLineBorder(
-              getTextAt(RESOURCE_BUNDLE, "pnlBloodnameDetails.title")));
+    private JPanel fillWarriorHeritage() {
+        JPanel pnlHeritage = new JPanel(new GridBagLayout());
+        pnlHeritage.setBorder(RoundedLineBorder.createRoundedLineBorder(
+              getTextAt(RESOURCE_BUNDLE, "pnlBloodnameHeritage.title")));
 
         int gridY = 0;
 
-        // Descent first: every trueborn has a House, and only a minority ever win its name.
-        boolean isTrueborn = person.getPhenotype().isTrueborn();
-        if (person.hasBloodhouse()) {
-            addBloodnameRow(pnlBloodnameDetails, gridY++,
-                  getTextAt(RESOURCE_BUNDLE, "lblBloodhouse.text"),
-                  getFormattedTextAt(RESOURCE_BUNDLE, "lblBloodhouse.value", person.getBloodhouse()));
-        } else if (isTrueborn) {
-            addBloodnameRow(pnlBloodnameDetails, gridY++,
-                  getTextAt(RESOURCE_BUNDLE, "lblBloodhouse.text"),
-                  getTextAt(RESOURCE_BUNDLE, "lblBloodhouse.unrecorded"));
+        // Most Clan warriors never win a Bloodname, so saying so plainly is the ordinary case and not
+        // missing information.
+        String heldBloodname = holdsBloodname(person)
+              ? person.getBloodname()
+              : getTextAt(RESOURCE_BUNDLE, "lblBloodname.notAchieved");
+        addBloodnameRow(pnlHeritage, gridY++, getTextAt(RESOURCE_BUNDLE, "lblBloodname.text"),
+              heldBloodname, BLOODNAME_FONT_STEP);
+
+        String houseName = houseNameOf(person);
+        if (houseName != null) {
+            addBloodnameRow(pnlHeritage, gridY++, getTextAt(RESOURCE_BUNDLE, "lblBloodhouse.text"),
+                  getFormattedTextAt(RESOURCE_BUNDLE, "lblBloodhouse.value", houseName),
+                  BLOODHOUSE_FONT_STEP);
+        } else if (person.getPhenotype().isTrueborn()) {
+            addBloodnameRow(pnlHeritage, gridY++, getTextAt(RESOURCE_BUNDLE, "lblBloodhouse.text"),
+                  getTextAt(RESOURCE_BUNDLE, "lblBloodhouse.unrecorded"), BLOODHOUSE_FONT_STEP);
         }
 
-        addBloodnameRow(pnlBloodnameDetails, gridY++,
-              getTextAt(RESOURCE_BUNDLE, "lblPhenotype.text"),
+        addBloodnameRow(pnlHeritage, gridY, getTextAt(RESOURCE_BUNDLE, "lblPhenotype.text"),
               person.getPhenotype().getLabel());
 
-        String heldBloodname = person.getBloodname();
-        if (!holdsBloodname(person)) {
-            addBloodnameRow(pnlBloodnameDetails, gridY,
-                  getTextAt(RESOURCE_BUNDLE, "lblBloodname.text"),
-                  getTextAt(RESOURCE_BUNDLE, "lblBloodname.notAchieved"));
-            return pnlBloodnameDetails;
+        return pnlHeritage;
+    }
+
+    /**
+     * The House this warrior descends from, by name.
+     *
+     * <p>A Bloodnamed warrior's House is the name they carry; an unbloodnamed trueborn's is the one
+     * recorded against them when they were bred.</p>
+     *
+     * @param person the warrior
+     *
+     * @return the House name, or {@code null} when none is recorded
+     */
+    private static @Nullable String houseNameOf(Person person) {
+        if (holdsBloodname(person)) {
+            return person.getBloodname();
         }
 
-        addBloodnameRow(pnlBloodnameDetails, gridY++, getTextAt(RESOURCE_BUNDLE, "lblBloodname.text"),
-              heldBloodname);
+        String bloodhouse = person.getBloodhouse();
+        return isNullOrBlankText(bloodhouse) ? null : bloodhouse;
+    }
 
-        // The House the name belongs to, which for a Bloodnamed warrior is their own.
-        Bloodname bloodname = Bloodname.getBloodname(heldBloodname);
+    /**
+     * The House panel: the legacy behind the name, who founded it, and what became of it.
+     *
+     * <p>Shown for an unbloodnamed trueborn as well. They were bred from the House, so its history is
+     * theirs whether or not they ever win the right to its name.</p>
+     *
+     * @return the House panel, or {@code null} when no House is recorded for this warrior or the data
+     *       does not describe it
+     */
+    private @Nullable JPanel fillBloodnameHouse() {
+        String houseName = houseNameOf(person);
+        if (houseName == null) {
+            return null;
+        }
+
+        // The name is stored as free text, so it can be one the data does not describe - a hand-typed
+        // name, or one retired from the tables.
+        Bloodname bloodname = Bloodname.getBloodname(houseName);
         if (bloodname == null) {
-            // The name is stored as free text, so it can be one the data does not describe - a
-            // hand-typed name, or one retired from the tables.
-            addBloodnameRow(pnlBloodnameDetails, gridY,
-                  getTextAt(RESOURCE_BUNDLE, "lblBloodnameHouse.text"),
-                  getTextAt(RESOURCE_BUNDLE, "lblBloodnameHouse.unknown"));
-            return pnlBloodnameDetails;
+            LOGGER.debug("[Bloodhouse] no House record for '{}', carried by '{}'",
+                  houseName, person.getFullName());
+            return null;
         }
 
-        addBloodnameRow(pnlBloodnameDetails, gridY++,
-              getTextAt(RESOURCE_BUNDLE, "lblBloodnameHouse.text"),
-              getFormattedTextAt(RESOURCE_BUNDLE, "lblBloodnameHouse.value", bloodname.getName()));
+        JPanel pnlBloodnameDetails = new JPanel(new GridBagLayout());
+        pnlBloodnameDetails.setBorder(RoundedLineBorder.createRoundedLineBorder(
+              getFormattedTextAt(RESOURCE_BUNDLE, "pnlBloodnameDetails.title", bloodname.getName())));
+
+        int gridY = 0;
 
         BloodnameHouse houseRecord = houseRecordFor(bloodname, person);
         if ((houseRecord != null) && !isNullOrBlankText(houseRecord.getSummary())) {
@@ -857,15 +903,30 @@ public class PersonViewPanel extends JScrollablePanel {
     }
 
     /**
-     * Adds one label-and-value row to the Bloodname panel.
+     * Adds one label-and-value row to the Bloodname panel, at the panel's ordinary text size.
      *
-     * @param panel  the panel to add to
-     * @param gridY  the row to place it on
-     * @param label  the field name
-     * @param value  the field value
+     * @param panel the panel to add to
+     * @param gridY the row to place it on
+     * @param label the field name
+     * @param value the field value
      */
     private static void addBloodnameRow(JPanel panel, int gridY, String label, String value) {
-        JLabel fieldLabel = new JLabel(label);
+        addBloodnameRow(panel, gridY, label, value, NO_FONT_STEP);
+    }
+
+    /**
+     * Adds one label-and-value row to the Bloodname panel.
+     *
+     * @param panel        the panel to add to
+     * @param gridY        the row to place it on
+     * @param label        the field name
+     * @param value        the field value
+     * @param fontSizeStep how many HTML sizes to raise the row above the panel's ordinary text, which
+     *                     also sets it bold; {@link #NO_FONT_STEP} for an ordinary row
+     */
+    private static void addBloodnameRow(JPanel panel, int gridY, String label, String value,
+          int fontSizeStep) {
+        JLabel fieldLabel = new JLabel(emphasise(label, fontSizeStep));
         fieldLabel.setName("lblBloodnameField" + gridY);
         GridBagConstraints gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 0;
@@ -874,13 +935,33 @@ public class PersonViewPanel extends JScrollablePanel {
         gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
         panel.add(fieldLabel, gridBagConstraints);
 
-        JLabel fieldValue = new JLabel(String.format("<html>%s</html>", value));
+        JLabel fieldValue = new JLabel(emphasise(value, fontSizeStep));
         fieldValue.setName("lblBloodnameValue" + gridY);
         fieldLabel.setLabelFor(fieldValue);
         gridBagConstraints.gridx = 1;
         gridBagConstraints.weightx = 1.0;
         gridBagConstraints.insets = new Insets(0, 10, 0, 0);
         panel.add(fieldValue, gridBagConstraints);
+    }
+
+    /**
+     * Wraps one Bloodname row's text for display, raising it above the panel's ordinary text and
+     * setting it bold when asked.
+     *
+     * <p>Sized in HTML steps rather than by deriving a font, so the row still tracks whatever text
+     * size the user's GUI scaling settles on.</p>
+     *
+     * @param text         the text to wrap
+     * @param fontSizeStep how many HTML sizes to raise it, or {@link #NO_FONT_STEP} to leave it alone
+     *
+     * @return the text as an HTML label string
+     */
+    private static String emphasise(String text, int fontSizeStep) {
+        if (fontSizeStep == NO_FONT_STEP) {
+            return String.format("<html>%s</html>", text);
+        }
+
+        return String.format("<html><font size='+%d'><b>%s</b></font></html>", fontSizeStep, text);
     }
 
     /**
