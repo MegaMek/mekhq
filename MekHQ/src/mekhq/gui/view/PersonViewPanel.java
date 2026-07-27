@@ -48,6 +48,7 @@ import static mekhq.campaign.personnel.skills.enums.SkillSubType.*;
 import static mekhq.campaign.personnel.turnoverAndRetention.Fatigue.getEffectiveFatigue;
 import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
 import static mekhq.utilities.MHQInternationalization.getTextAt;
+import static mekhq.utilities.MHQInternationalization.isResourceKeyValid;
 import static mekhq.utilities.ReportingUtilities.CLOSING_SPAN_TAG;
 import static mekhq.utilities.ReportingUtilities.getAmazingColor;
 import static mekhq.utilities.ReportingUtilities.getNegativeColor;
@@ -181,6 +182,13 @@ public class PersonViewPanel extends JScrollablePanel {
      * one word per line. Fixing the wrap point gives the layout a width it can honour.</p>
      */
     private static final int BLOODNAME_VALUE_WIDTH = 380;
+
+    /**
+     * The width the Heritage headline wraps at, before GUI scaling. Wider than a value row because
+     * the headline spans both columns, and needed for the same reason: without a width to work to,
+     * the layout falls back to the label's minimum and breaks it after every word.
+     */
+    private static final int BLOODNAME_HEADLINE_WIDTH = 500;
 
     private static final MMLogger LOGGER = MMLogger.create(PersonViewPanel.class);
 
@@ -606,7 +614,7 @@ public class PersonViewPanel extends JScrollablePanel {
 
         int gridY = 0;
         addBloodnameHeadline(pnlHeritage, gridY++, describeHeritage());
-        addBloodnameRow(pnlHeritage, gridY++, getTextAt(RESOURCE_BUNDLE, "lblPhenotype.text"),
+        addBloodnameRow(pnlHeritage, gridY++, "lblPhenotype",
               person.getPhenotype().getLabel());
 
         // A legacy held against its origin Clan's exclusivity can only have arrived by capture, so
@@ -614,14 +622,14 @@ public class PersonViewPanel extends JScrollablePanel {
         // read as a contradiction.
         Faction capturedFrom = isorlaOriginClanOf(person);
         if (capturedFrom != null) {
-            addBloodnameRow(pnlHeritage, gridY++, getTextAt(RESOURCE_BUNDLE, "lblBloodnameIsorla.text"),
+            addBloodnameRow(pnlHeritage, gridY++, "lblBloodnameIsorla",
                   getFormattedTextAt(RESOURCE_BUNDLE, "lblBloodnameIsorla.value",
                         capturedFrom.getFullName(campaign.getGameYear())));
         }
 
         GeneticLegacyRole legacyRole = person.getGeneticLegacyRole();
         if (legacyRole.isInUse()) {
-            addBloodnameRow(pnlHeritage, gridY, getTextAt(RESOURCE_BUNDLE, "lblGeneticLegacyRole.text"),
+            addBloodnameRow(pnlHeritage, gridY, "lblGeneticLegacyRole",
                   legacyRole.getLabel());
         }
 
@@ -707,9 +715,11 @@ public class PersonViewPanel extends JScrollablePanel {
      * @param text  the headline text
      */
     private static void addBloodnameHeadline(JPanel panel, int gridY, String text) {
-        JLabel headline = new JLabel(String.format("<html><font size='+%d'><b>%s</b></font></html>",
-              HEADLINE_FONT_STEP, text));
+        JLabel headline = new JLabel(String.format(
+              "<html><div style='width:%dpx'><font size='+%d'><b>%s</b></font></div></html>",
+              UIUtil.scaleForGUI(BLOODNAME_HEADLINE_WIDTH), HEADLINE_FONT_STEP, text));
         headline.setName("lblBloodnameHeadline" + gridY);
+        headline.setToolTipText(tooltipFor("lblBloodnameHeritage"));
 
         GridBagConstraints gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 0;
@@ -773,14 +783,12 @@ public class PersonViewPanel extends JScrollablePanel {
 
         BloodnameHouse houseRecord = houseRecordFor(bloodname, person);
         if ((houseRecord != null) && !isNullOrBlankText(houseRecord.getSummary())) {
-            addBloodnameRow(pnlBloodnameDetails, gridY++,
-                  getTextAt(RESOURCE_BUNDLE, "lblBloodnameSummary.text"), houseRecord.getSummary());
+            addBloodnameRow(pnlBloodnameDetails, gridY++, "lblBloodnameSummary", houseRecord.getSummary());
         }
 
         String founder = bloodname.getFounder();
         if ((founder != null) && !founder.isBlank()) {
-            addBloodnameRow(pnlBloodnameDetails, gridY++,
-                  getTextAt(RESOURCE_BUNDLE, "lblBloodnameFounder.text"),
+            addBloodnameRow(pnlBloodnameDetails, gridY++, "lblBloodnameFounder",
                   describeHolder(founderFullNameOf(houseRecord, founder, bloodname.getName()),
                         (houseRecord == null) ? null : houseRecord.getFounderRank(),
                         (houseRecord == null) ? null : houseRecord.getFounderAffiliation()));
@@ -788,25 +796,21 @@ public class PersonViewPanel extends JScrollablePanel {
 
         Clan originClan = bloodname.getOriginClan();
         if (originClan != null) {
-            addBloodnameRow(pnlBloodnameDetails, gridY++,
-                  getTextAt(RESOURCE_BUNDLE, "lblBloodnameOriginClan.text"),
+            addBloodnameRow(pnlBloodnameDetails, gridY++, "lblBloodnameOriginClan",
                   originClan.getFullName(campaign.getGameYear()));
         }
 
         if (bloodname.getPhenotype() != null) {
-            addBloodnameRow(pnlBloodnameDetails, gridY++,
-                  getTextAt(RESOURCE_BUNDLE, "lblBloodnameHousePhenotype.text"),
+            addBloodnameRow(pnlBloodnameDetails, gridY++, "lblBloodnameHousePhenotype",
                   bloodname.getPhenotype().getLabel());
         }
 
-        addBloodnameRow(pnlBloodnameDetails, gridY++,
-              getTextAt(RESOURCE_BUNDLE, "lblBloodnameStanding.text"),
+        addBloodnameRow(pnlBloodnameDetails, gridY++, "lblBloodnameStanding",
               bloodnameStanding(bloodname));
 
         Faction capturedFrom = isorlaOriginClanOf(person);
         if (capturedFrom != null) {
-            addBloodnameRow(pnlBloodnameDetails, gridY++,
-                  getTextAt(RESOURCE_BUNDLE, "lblBloodnameExclusivity.text"),
+            addBloodnameRow(pnlBloodnameDetails, gridY++, "lblBloodnameExclusivity",
                   getFormattedTextAt(RESOURCE_BUNDLE, "lblBloodnameExclusivity.value",
                         capturedFrom.getFullName(campaign.getGameYear())));
         }
@@ -816,8 +820,7 @@ public class PersonViewPanel extends JScrollablePanel {
 
         // Placeholder until the house histories are written. Kept as its own resource string so
         // filling them in later is a data change rather than a code change.
-        addBloodnameRow(pnlBloodnameDetails, gridY,
-              getTextAt(RESOURCE_BUNDLE, "lblBloodnameHistory.text"),
+        addBloodnameRow(pnlBloodnameDetails, gridY, "lblBloodnameHistory",
               getTextAt(RESOURCE_BUNDLE, "lblBloodnameHistory.placeholder"));
 
         return pnlBloodnameDetails;
@@ -895,15 +898,15 @@ public class PersonViewPanel extends JScrollablePanel {
             return gridY;
         }
 
-        String label = getTextAt(RESOURCE_BUNDLE, "lblBloodnameHolders.text");
         int shown = Math.min(holders.size(), MAX_NOTABLE_HOLDERS);
         for (int index = 0; index < shown; index++) {
             BloodnameHolder holder = holders.get(index);
-            addBloodnameRow(panel, gridY++, (index == 0) ? label : "",
+            // Only the first row carries the label; the rest read as a list beneath it.
+            addBloodnameRow(panel, gridY++, "lblBloodnameHolders", (index != 0),
                   describeHolder(holder.getName(), holder.getRank(), holder.getAffiliation()));
         }
         if (holders.size() > shown) {
-            addBloodnameRow(panel, gridY++, "",
+            addBloodnameRow(panel, gridY++, "lblBloodnameHolders", true,
                   getFormattedTextAt(RESOURCE_BUNDLE, "lblBloodnameHolders.more",
                         holders.size() - shown));
         }
@@ -931,16 +934,16 @@ public class PersonViewPanel extends JScrollablePanel {
                 Faction inheritor = Factions.getInstance().getFaction(clanCode);
                 clanNames.add((inheritor == null) ? clanCode : inheritor.getFullName(year));
             }
-            addBloodnameRow(panel, gridY++, getTextAt(RESOURCE_BUNDLE, "lblBloodnamePostReaving.text"),
+            addBloodnameRow(panel, gridY++, "lblBloodnamePostReaving",
                   String.join(", ", clanNames));
         }
 
-        gridY = addTransfer(panel, gridY, house.getAbsorbed(), "lblBloodnameAbsorbed.text", year);
+        gridY = addTransfer(panel, gridY, house.getAbsorbed(), "lblBloodnameAbsorbed", year);
         for (BloodnameTransfer transfer : house.getAcquired()) {
-            gridY = addTransfer(panel, gridY, transfer, "lblBloodnameAcquired.text", year);
+            gridY = addTransfer(panel, gridY, transfer, "lblBloodnameAcquired", year);
         }
         for (BloodnameTransfer transfer : house.getShared()) {
-            gridY = addTransfer(panel, gridY, transfer, "lblBloodnameShared.text", year);
+            gridY = addTransfer(panel, gridY, transfer, "lblBloodnameShared", year);
         }
         return gridY;
     }
@@ -973,8 +976,21 @@ public class PersonViewPanel extends JScrollablePanel {
         String value = (date == null)
               ? clanName
               : getFormattedTextAt(RESOURCE_BUNDLE, "lblBloodnameTransfer.value", clanName, date);
-        addBloodnameRow(panel, gridY++, getTextAt(RESOURCE_BUNDLE, labelKey), value);
+        addBloodnameRow(panel, gridY++, labelKey, value);
         return gridY;
+    }
+
+    /**
+     * The helper text explaining a Bloodname field, wrapped so a long explanation does not run off
+     * the screen as a single line.
+     *
+     * @param labelKey the field's resource key, without a suffix
+     *
+     * @return the helper text, or {@code null} when the bundle has none for this field
+     */
+    private static @Nullable String tooltipFor(String labelKey) {
+        String tooltip = getTextAt(RESOURCE_BUNDLE, labelKey + ".tooltip");
+        return isResourceKeyValid(tooltip) ? wordWrap(tooltip) : null;
     }
 
     /**
@@ -1011,13 +1027,34 @@ public class PersonViewPanel extends JScrollablePanel {
     /**
      * Adds one label-and-value row to the Bloodname panel.
      *
-     * @param panel  the panel to add to
-     * @param gridY  the row to place it on
-     * @param label  the field name
-     * @param value  the field value
+     * @param panel    the panel to add to
+     * @param gridY    the row to place it on
+     * @param labelKey the field's resource key, without a suffix; {@code .text} names it and
+     *                 {@code .tooltip} explains it
+     * @param value    the field value
      */
-    private static void addBloodnameRow(JPanel panel, int gridY, String label, String value) {
-        JLabel fieldLabel = new JLabel(label);
+    private static void addBloodnameRow(JPanel panel, int gridY, String labelKey, String value) {
+        addBloodnameRow(panel, gridY, labelKey, false, value);
+    }
+
+    /**
+     * Adds one label-and-value row to the Bloodname panel, optionally with the label left off.
+     *
+     * <p>A blank label continues the row above it, so a field with several values reads as a list
+     * under one heading rather than repeating the heading on every line. The helper text is attached
+     * either way, so hovering any line of the list explains the field.</p>
+     *
+     * @param panel        the panel to add to
+     * @param gridY        the row to place it on
+     * @param labelKey     the field's resource key, without a suffix
+     * @param continuesRow {@code true} to leave the label blank because the row above named the field
+     * @param value        the field value
+     */
+    private static void addBloodnameRow(JPanel panel, int gridY, String labelKey,
+          boolean continuesRow, String value) {
+        String tooltip = tooltipFor(labelKey);
+        JLabel fieldLabel = new JLabel(continuesRow ? "" : getTextAt(RESOURCE_BUNDLE, labelKey + ".text"));
+        fieldLabel.setToolTipText(tooltip);
         fieldLabel.setName("lblBloodnameField" + gridY);
         GridBagConstraints gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 0;
@@ -1029,6 +1066,7 @@ public class PersonViewPanel extends JScrollablePanel {
         JLabel fieldValue = new JLabel(String.format("<html><div style='width:%dpx'>%s</div></html>",
               UIUtil.scaleForGUI(BLOODNAME_VALUE_WIDTH), value));
         fieldValue.setName("lblBloodnameValue" + gridY);
+        fieldValue.setToolTipText(tooltip);
         fieldLabel.setLabelFor(fieldValue);
         gridBagConstraints.gridx = 1;
         gridBagConstraints.weightx = 1.0;
