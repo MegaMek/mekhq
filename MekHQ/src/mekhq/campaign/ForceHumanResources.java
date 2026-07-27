@@ -1896,6 +1896,12 @@ public class ForceHumanResources {
      * @param person     the bloodname candidate
      * @param ignoreDice if true, skips the random roll and assigns a bloodname automatically
      */
+    /**
+     * The hardest a Bloodname roll can get. 2d6 reaches 12, so a target above this could never be met
+     * and a warrior on it still has one chance in thirty-six.
+     */
+    static final int MAXIMUM_BLOODNAME_TARGET = 12;
+
     public void checkBloodnameAdd(Campaign campaign, Person person, boolean ignoreDice) {
         checkBloodnameAdd(campaign, person, ignoreDice, 0);
     }
@@ -2063,7 +2069,15 @@ public class ForceHumanResources {
 
             bloodnameTarget += Math.min(0,
                   campaign.getPlayerForce().getRankSystem().getOfficerCut() - person.getRankNumeric());
-            bloodnameTarget += targetModifier;
+            // 2d6 cannot beat 12, so a higher target is not "hard", it is impossible - and the target
+            // starts at 6 plus two skill values, which puts every tier below Elite out of reach on
+            // skill alone. Winning a Trial of Bloodright is meant to be a long shot for an ordinary
+            // warrior, not something the dice forbid outright.
+            bloodnameTarget = Math.min(bloodnameTarget, MAXIMUM_BLOODNAME_TARGET);
+
+            // The caller's adjustment lands on the capped target rather than being absorbed by it, so
+            // a better force is genuinely better off instead of being levelled with a green one.
+            bloodnameTarget = Math.min(bloodnameTarget + targetModifier, MAXIMUM_BLOODNAME_TARGET);
         }
 
         if (ignoreDice || (d6(2) >= bloodnameTarget)) {
