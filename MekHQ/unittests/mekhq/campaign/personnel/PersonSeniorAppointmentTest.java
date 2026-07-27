@@ -248,4 +248,59 @@ class PersonSeniorAppointmentTest {
         assertNotNull(loaded);
         assertTrue(loaded.isDepartmentHead(), "the department head flag should survive a save and load");
     }
+
+    @Test
+    void aBloodhouseIsSeparateFromTheBloodnameEarnedFromIt() {
+        // The distinction the two fields exist for: every trueborn descends from a House, and only
+        // those who win a Trial of Bloodright carry its name.
+        Person person = new Person("", "Jane", "Smith", "", campaign(), "MERC");
+        person.setBloodhouse("Ward");
+
+        assertTrue(person.hasBloodhouse());
+        assertEquals("Ward", person.getBloodhouse());
+        assertTrue(isNullOrBlankString(person.getBloodname()),
+              "descent alone must not give the warrior the name");
+    }
+
+    @Test
+    void aBloodhouseDoesNotBecomePartOfTheName() {
+        // Winning the name changes what the warrior is called; descent alone does not.
+        Person person = new Person("", "Jane", "Smith", "", campaign(), "MERC");
+        String nameBeforeHouse = person.getFullName();
+        person.setBloodhouse("Ward");
+        assertEquals(nameBeforeHouse, person.getFullName(),
+              "a warrior of the Ward House is not called Ward until they win the name");
+    }
+
+    @Test
+    void aBloodhouseSurvivesTheSaveAndLoadRoundTrip() throws Exception {
+        Person person = new Person("", "Jane", "Smith", "", campaign(), "MERC");
+        person.setBloodhouse("Kerensky");
+
+        Campaign campaign = campaign();
+        Element written = roundTrip(person, campaign);
+        assertTrue(containsTag(written, "bloodhouse"));
+
+        Person loaded = Person.generateInstanceFromXML(written, campaign, VERSION);
+        assertNotNull(loaded);
+        assertEquals("Kerensky", loaded.getBloodhouse());
+    }
+
+    @Test
+    void aSaveWithNoBloodhouseWritesNoTagAndLoadsClean() throws Exception {
+        // A campaign with no Clan personnel must write the save it always wrote, and one from an
+        // older build must load with no descent rather than a wrong one.
+        Person person = new Person("", "Jane", "Smith", "", campaign(), "MERC");
+        Element written = roundTrip(person, campaign());
+        assertFalse(containsTag(written, "bloodhouse"));
+
+        Person loaded = Person.generateInstanceFromXML(written, campaign(), VERSION);
+        assertNotNull(loaded);
+        assertFalse(loaded.hasBloodhouse());
+    }
+
+    /** Local helper so the test does not depend on a particular string utility being imported. */
+    private static boolean isNullOrBlankString(String value) {
+        return (value == null) || value.isBlank();
+    }
 }

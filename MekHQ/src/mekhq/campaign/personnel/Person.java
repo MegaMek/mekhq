@@ -321,6 +321,11 @@ public class Person implements ILocatable {
     // phenotype and background
     private Phenotype phenotype;
     private String bloodname;
+    /**
+     * The Bloodname House this warrior was bred from. Every trueborn has one; only those who win a
+     * Trial of Bloodright earn the right to carry its name, which is what {@link #bloodname} records.
+     */
+    private String bloodhouse;
     private Faction originFaction;
     private Planet originPlanet;
     private LocalDate becomingBondsmanEndDate;
@@ -557,6 +562,7 @@ public class Person implements ILocatable {
         becomingBondsmanEndDate = null;
         phenotype = Phenotype.NONE;
         bloodname = "";
+        bloodhouse = "";
         biography = "";
         this.genealogy = new Genealogy(this);
         dueDate = null;
@@ -712,6 +718,30 @@ public class Person implements ILocatable {
     public void setBloodname(final String bloodname) {
         this.bloodname = bloodname;
         setFullName();
+    }
+
+    /**
+     * The Bloodname House this warrior descends from, which every trueborn has whether or not they
+     * have won the right to use its name.
+     *
+     * <p>Unlike {@link #getBloodname()} this does not form part of the warrior's name. A warrior of the
+     * Ward House is not called Ward until they win a Trial of Bloodright.</p>
+     *
+     * @return the House's Bloodname, or an empty string for a freeborn or an unrecorded descent
+     */
+    public @Nullable String getBloodhouse() {
+        return bloodhouse;
+    }
+
+    public void setBloodhouse(final String bloodhouse) {
+        this.bloodhouse = bloodhouse;
+    }
+
+    /**
+     * @return {@code true} if this person descends from a recorded Bloodname House
+     */
+    public boolean hasBloodhouse() {
+        return (bloodhouse != null) && !bloodhouse.isBlank();
     }
 
     public Faction getOriginFaction() {
@@ -3621,6 +3651,11 @@ public class Person implements ILocatable {
             if (!isNullOrBlank(bloodname)) {
                 MHQXMLUtility.writeSimpleXMLTag(pw, indent, "bloodname", bloodname);
             }
+            // Written only when set, so a campaign with no Clan personnel writes the save it always did
+            // and one from an older build loads with no descent recorded rather than a wrong one.
+            if (!isNullOrBlank(bloodhouse)) {
+                MHQXMLUtility.writeSimpleXMLTag(pw, indent, "bloodhouse", bloodhouse);
+            }
 
             if (!isNullOrBlank(biography)) {
                 MHQXMLUtility.writeSimpleXMLTag(pw, indent, "biography", biography);
@@ -4198,6 +4233,8 @@ public class Person implements ILocatable {
                     person.phenotype = Phenotype.fromString(wn2.getTextContent().trim());
                 } else if (nodeName.equalsIgnoreCase("bloodname")) {
                     person.bloodname = wn2.getTextContent();
+                } else if (nodeName.equalsIgnoreCase("bloodhouse")) {
+                    person.bloodhouse = wn2.getTextContent();
                 } else if (nodeName.equalsIgnoreCase("biography")) {
                     person.biography = wn2.getTextContent();
                 } else if (nodeName.equalsIgnoreCase("primaryRole")) {

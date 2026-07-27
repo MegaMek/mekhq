@@ -243,10 +243,10 @@ public class PersonViewPanel extends JScrollablePanel {
         // than a family. Added alongside Genealogy rather than in place of it, because Clan characters
         // can still carry ordinary family links.
         //
-        // Also shown to anyone actually holding a Bloodname even if they are not flagged as Clan
-        // personnel: that flag is user-toggleable and story arcs set Bloodnames without consulting it,
-        // so keying purely off it would hide a name the character demonstrably has.
-        if (person.isClanPersonnel() || holdsBloodname(person)) {
+        // Also shown to anyone actually holding a Bloodname or a House even if they are not flagged as
+        // Clan personnel: that flag is user-toggleable and story arcs set Bloodnames without consulting
+        // it, so keying purely off it would hide descent the character demonstrably has.
+        if (person.isClanPersonnel() || holdsBloodname(person) || person.hasBloodhouse()) {
             JPanel pnlBloodname = new JPanel();
             pnlBloodname.setLayout(new GridBagLayout());
             initializeBloodname(pnlBloodname);
@@ -550,17 +550,36 @@ public class PersonViewPanel extends JScrollablePanel {
               getTextAt(RESOURCE_BUNDLE, "pnlBloodnameDetails.title")));
 
         int gridY = 0;
+
+        // Descent first: every trueborn has a House, and only a minority ever win its name.
+        boolean isTrueborn = person.getPhenotype().isTrueborn();
+        if (person.hasBloodhouse()) {
+            addBloodnameRow(pnlBloodnameDetails, gridY++,
+                  getTextAt(RESOURCE_BUNDLE, "lblBloodhouse.text"),
+                  getFormattedTextAt(RESOURCE_BUNDLE, "lblBloodhouse.value", person.getBloodhouse()));
+        } else if (isTrueborn) {
+            addBloodnameRow(pnlBloodnameDetails, gridY++,
+                  getTextAt(RESOURCE_BUNDLE, "lblBloodhouse.text"),
+                  getTextAt(RESOURCE_BUNDLE, "lblBloodhouse.unrecorded"));
+        }
+
+        addBloodnameRow(pnlBloodnameDetails, gridY++,
+              getTextAt(RESOURCE_BUNDLE, "lblPhenotype.text"),
+              person.getPhenotype().getLabel());
+
         String heldBloodname = person.getBloodname();
         if (!holdsBloodname(person)) {
             addBloodnameRow(pnlBloodnameDetails, gridY,
                   getTextAt(RESOURCE_BUNDLE, "lblBloodname.text"),
-                  getTextAt(RESOURCE_BUNDLE, "lblBloodname.none"));
+                  getTextAt(RESOURCE_BUNDLE,
+                        isTrueborn ? "lblBloodname.notWon" : "lblBloodname.none"));
             return pnlBloodnameDetails;
         }
 
         addBloodnameRow(pnlBloodnameDetails, gridY++, getTextAt(RESOURCE_BUNDLE, "lblBloodname.text"),
               heldBloodname);
 
+        // The House the name belongs to, which for a Bloodnamed warrior is their own.
         Bloodname bloodname = Bloodname.getBloodname(heldBloodname);
         if (bloodname == null) {
             // The name is stored as free text, so it can be one the data does not describe - a

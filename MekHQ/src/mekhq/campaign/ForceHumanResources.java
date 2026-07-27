@@ -2080,19 +2080,57 @@ public class ForceHumanResources {
             bloodnameTarget = Math.min(bloodnameTarget + targetModifier, MAXIMUM_BLOODNAME_TARGET);
         }
 
-        if (ignoreDice || (d6(2) >= bloodnameTarget)) {
-            final Phenotype phenotype = person.getPhenotype().isNone() ? Phenotype.GENERAL : person.getPhenotype();
+        // Every trueborn descends from a House whether or not they ever win its name, so the descent is
+        // settled first and the roll only decides whether they may carry it.
+        assignBloodhouse(campaign, person);
 
-            final Bloodname bloodname = Bloodname.randomBloodname((campaign.getFaction().isClan() ?
-                                                                         campaign.getFaction() :
-                                                                         person.getOriginFaction()).getShortName(),
-                  phenotype,
-                  campaign.getGameYear());
-            if (bloodname != null) {
-                person.setBloodname(bloodname.getName());
-                personUpdated(campaign, person);
+        if (ignoreDice || (d6(2) >= bloodnameTarget)) {
+            if (!person.hasBloodhouse()) {
+                LOGGER.debug("[Bloodname] {} won a Bloodright but has no House to take a name from",
+                      person.getFullName());
+                return;
             }
+            // A warrior competes for a Bloodright within their own House, so the name they win is that
+            // House's - not an unrelated legacy drawn afresh.
+            person.setBloodname(person.getBloodhouse());
+            personUpdated(campaign, person);
         }
+    }
+
+    /**
+     * Records which Bloodname House a trueborn warrior was bred from, if it is not already known.
+     *
+     * <p>Every trueborn comes out of a House's genetic legacy; only a minority ever win the right to
+     * carry its name. This is the first of those two facts, and it holds for a warrior who never wins a
+     * Trial of Bloodright at all.</p>
+     *
+     * <p>The House is drawn with the same weighting that decides which name a warrior could win, so a
+     * warrior descends from a legacy their Clan actually holds, of a phenotype it breeds for.</p>
+     *
+     * @param campaign the campaign the warrior belongs to, supplying the Clan and the year
+     * @param person   the warrior whose descent is being settled
+     */
+    public void assignBloodhouse(Campaign campaign, Person person) {
+        if (!person.isClanPersonnel() || !person.getPhenotype().isTrueborn()) {
+            return;
+        }
+        if (person.hasBloodhouse()) {
+            return;
+        }
+
+        Phenotype phenotype = person.getPhenotype().isNone() ? Phenotype.GENERAL : person.getPhenotype();
+        Faction bloodhouseFaction = campaign.getFaction().isClan()
+              ? campaign.getFaction()
+              : person.getOriginFaction();
+        Bloodname house = Bloodname.randomBloodname(bloodhouseFaction.getShortName(), phenotype,
+              campaign.getGameYear());
+        if (house == null) {
+            LOGGER.debug("[Bloodname] no House available for {} of {} in {}", person.getFullName(),
+                  bloodhouseFaction.getShortName(), campaign.getGameYear());
+            return;
+        }
+        person.setBloodhouse(house.getName());
+        personUpdated(campaign, person);
     }
 
     /**
