@@ -378,9 +378,7 @@ public final class RulesetRankAssigner {
     private static final int RANK_SENIOR_SERGEANT = 16; // E16
     private static final int RANK_MASTER_SERGEANT = 20; // E20, top of the enlisted band
     private static final int RANK_LIEUTENANT = 33;      // O3
-    private static final int RANK_CAPTAIN = 34;         // O4
-    private static final int RANK_MAJOR = 35;           // O5
-    static final int RANK_LT_COLONEL = 37;              // O7 - the ladder's officer ceiling
+    private static final int RANK_CAPTAIN = 34;         // O4 - the ceiling for a post-less officer
 
     /**
      * The rank a generated support person should hold, from their role and how good they are.
@@ -394,9 +392,16 @@ public final class RulesetRankAssigner {
      * it through each profession's column. Physicians and administrators are commissioned and sit in
      * the officer band; technicians and medics are enlisted and top out at the senior NCO ranks.</p>
      *
-     * <p>Commissioned roles are capped at Lieutenant Colonel so a command's surgeon never outranks the
-     * officer commanding it. Sparse rank systems are handled by the caller, which walks down from the
-     * requested index until it finds a rank that profession actually names.</p>
+     * <p>Commissioned staff top out at Captain. Rank follows position rather than competence: mapping
+     * skill straight onto seniority made every doctor in a command generated at Veteran a Major, and
+     * every doctor in an Elite one a Lieutenant Colonel, because the generator creates the whole
+     * cohort at a single experience level. Field grade is instead earned by holding a post -
+     * {@link SeniorAppointmentAssigner} raises department heads above their staff and branch heads
+     * above them - which produces a pyramid that scales with the size of the command rather than a
+     * flat block of senior officers.</p>
+     *
+     * <p>Sparse rank systems are handled by the caller, which walks down from the requested index
+     * until it finds a rank that profession actually names.</p>
      *
      * <p>Clan and ComStar/WoB keep their existing flat index: neither organises medical or technical
      * staff as a commissioned corps, and imposing this ladder on them would misrepresent both.</p>
@@ -428,14 +433,13 @@ public final class RulesetRankAssigner {
 
     private static int commissionedRank(SkillLevel skill) {
         if (skill == null) {
-            return RANK_CAPTAIN;
+            return RANK_LIEUTENANT;
         }
         return switch (skill) {
-            case NONE, ULTRA_GREEN, GREEN -> RANK_LIEUTENANT;
-            case REGULAR -> RANK_CAPTAIN;
-            case VETERAN -> RANK_MAJOR;
-            // Elite and above share the cap: the ladder stops below Colonel on purpose.
-            default -> RANK_LT_COLONEL;
+            case NONE, ULTRA_GREEN, GREEN, REGULAR -> RANK_LIEUTENANT;
+            // Veteran and above share Captain, the ceiling for a post-less officer. Anything higher is
+            // reserved for the heads the appointment pass promotes.
+            default -> RANK_CAPTAIN;
         };
     }
 

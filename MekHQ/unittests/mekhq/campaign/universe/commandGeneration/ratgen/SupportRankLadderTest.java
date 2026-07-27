@@ -60,6 +60,11 @@ import org.junit.jupiter.api.Test;
  * <p>Every support person previously received one rank index regardless of role or skill, which in the
  * shipped rank systems renders as Corporal - so a command's chief surgeon and its greenest astech
  * ranked identically. These tests pin the ladder that replaced it.</p>
+ *
+ * <p>Commissioned staff stop at Captain on purpose. Field grade belongs to the posts
+ * {@link SeniorAppointmentAssigner} fills, not to raw skill: the generator creates a whole cohort at
+ * one experience level, so mapping skill straight onto seniority turned every doctor in a Veteran
+ * command into a Major.</p>
  */
 class SupportRankLadderTest {
 
@@ -88,13 +93,25 @@ class SupportRankLadderTest {
     @Test
     void doctorRankRisesWithSkill() {
         int green = rankFor(PersonnelRole.DOCTOR, SkillLevel.GREEN);
-        int regular = rankFor(PersonnelRole.DOCTOR, SkillLevel.REGULAR);
         int veteran = rankFor(PersonnelRole.DOCTOR, SkillLevel.VETERAN);
-        int elite = rankFor(PersonnelRole.DOCTOR, SkillLevel.ELITE);
 
-        assertTrue(green < regular, "a regular doctor should outrank a green one");
-        assertTrue(regular < veteran, "a veteran doctor should outrank a regular one");
-        assertTrue(veteran < elite, "an elite doctor should outrank a veteran one");
+        assertTrue(green < veteran, "a veteran doctor should outrank a green one");
+    }
+
+    @Test
+    void commissionedStaffStopAtCaptainWhateverTheirSkill() {
+        // The reported problem: a command generated at Veteran gave every doctor and administrator a
+        // field-grade rank, because the whole cohort shares one experience level. Field grade is now
+        // reserved for the heads the appointment pass promotes.
+        int captain = 34;
+        for (SkillLevel skill : new SkillLevel[] { SkillLevel.GREEN, SkillLevel.REGULAR,
+                                                   SkillLevel.VETERAN, SkillLevel.ELITE,
+                                                   SkillLevel.HEROIC, SkillLevel.LEGENDARY }) {
+            assertTrue(rankFor(PersonnelRole.DOCTOR, skill) <= captain,
+                  skill + " doctors should be no higher than Captain");
+            assertTrue(rankFor(PersonnelRole.ADMINISTRATOR_COMMAND, skill) <= captain,
+                  skill + " administrators should be no higher than Captain");
+        }
     }
 
     @Test
@@ -122,14 +139,13 @@ class SupportRankLadderTest {
     }
 
     @Test
-    void commissionedRanksStopBelowColonel() {
-        // Capped on purpose: a command's surgeon should not outrank the officer commanding it. Colonel
-        // sits at index 38 in the shipped systems.
-        int colonel = 38;
+    void commissionedRanksStayBelowFieldGrade() {
+        // Major sits at 35. Nothing the skill ladder produces should reach it.
+        int major = 35;
         for (SkillLevel skill : new SkillLevel[] { SkillLevel.ELITE, SkillLevel.HEROIC,
                                                    SkillLevel.LEGENDARY }) {
-            assertTrue(rankFor(PersonnelRole.DOCTOR, skill) < colonel,
-                  skill + " doctors should rank below Colonel");
+            assertTrue(rankFor(PersonnelRole.DOCTOR, skill) < major,
+                  skill + " doctors should rank below Major until they hold a post");
         }
     }
 
@@ -139,6 +155,9 @@ class SupportRankLadderTest {
         // sit at the cap.
         assertEquals(rankFor(PersonnelRole.DOCTOR, SkillLevel.ELITE),
               rankFor(PersonnelRole.DOCTOR, SkillLevel.LEGENDARY));
+        assertEquals(rankFor(PersonnelRole.DOCTOR, SkillLevel.VETERAN),
+              rankFor(PersonnelRole.DOCTOR, SkillLevel.ELITE),
+              "Veteran and above share Captain");
         assertEquals(rankFor(PersonnelRole.MEK_TECH, SkillLevel.ELITE),
               rankFor(PersonnelRole.MEK_TECH, SkillLevel.LEGENDARY));
     }

@@ -39,11 +39,13 @@ import static org.mockito.ArgumentMatchers.anyBoolean;
 import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.atLeast;
+import static org.mockito.Mockito.atLeastOnce;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
@@ -72,6 +74,9 @@ class SeniorAppointmentAssignerTest {
 
     /** Colonel, the hard ceiling for any support post. */
     private static final int COLONEL = 38;
+
+    /** Captain, where the skill ladder now stops for commissioned support staff. */
+    private static final int CAPTAIN = 34;
 
     @BeforeAll
     static void loadSkillTypesAndRanks() {
@@ -587,5 +592,48 @@ class SeniorAppointmentAssignerTest {
         verify(chosen).setRank(promotedTo.capture());
         assertTrue(promotedTo.getValue() <= 34,
               "the commander's rank is the lower cap here, got " + promotedTo.getValue());
+    }
+
+    @Test
+    void thePostsBuildAPyramidRatherThanABlockOfSeniorOfficers() {
+        // The whole point of reserving field grade for posts. Staff all arrive at Captain, because the
+        // generator creates the cohort at one experience level; the appointment pass is what produces
+        // the spread above them.
+        Campaign campaign = mock(Campaign.class);
+        Person commander = mock(Person.class);
+        when(commander.getRankNumeric()).thenReturn(COLONEL);
+        LocalPersonnel roster = new LocalPersonnel();
+        roster.put(UUID.randomUUID(), commander);
+        when(campaign.getPersonnel()).thenReturn(roster);
+
+        List<Person> staff = new ArrayList<>();
+        Person bestLogistics = null;
+        for (int index = 0; index < 2; index++) {
+            Person person = junior(PersonnelRole.ADMINISTRATOR_LOGISTICS);
+            withSkill(person, SkillType.S_ADMIN, index == 0 ? 8 : 3);
+            when(person.getRankNumeric()).thenReturn(CAPTAIN);
+            when(person.getRankSystem()).thenReturn(sldf());
+            staff.add(person);
+            if (index == 0) {
+                bestLogistics = person;
+            }
+        }
+        for (int index = 0; index < 2; index++) {
+            Person person = junior(PersonnelRole.ADMINISTRATOR_HR);
+            withSkill(person, SkillType.S_ADMIN, 2);
+            when(person.getRankNumeric()).thenReturn(CAPTAIN);
+            when(person.getRankSystem()).thenReturn(sldf());
+            staff.add(person);
+        }
+
+        SeniorAppointmentAssigner.assign(campaign, staff);
+
+        // The strongest logistics administrator heads that department and is raised above Captain.
+        verify(bestLogistics).setDepartmentHead(true);
+        ArgumentCaptor<Integer> logisticsRank = ArgumentCaptor.forClass(Integer.class);
+        verify(bestLogistics, atLeastOnce()).setRank(logisticsRank.capture());
+        int headRank = logisticsRank.getAllValues().get(logisticsRank.getAllValues().size() - 1);
+        assertTrue(headRank > CAPTAIN, "a department head should sit above their staff, got " + headRank);
+        assertTrue(headRank <= COLONEL, "and no higher than Colonel, got " + headRank);
     }
 }
