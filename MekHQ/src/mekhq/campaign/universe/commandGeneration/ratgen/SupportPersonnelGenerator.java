@@ -36,6 +36,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import megamek.common.compute.Compute;
+import megamek.common.enums.Gender;
 import megamek.common.enums.SkillLevel;
 import megamek.logging.MMLogger;
 import mekhq.campaign.Campaign;
@@ -162,37 +163,37 @@ public final class SupportPersonnelGenerator {
         List<Person> generated = new ArrayList<>();
 
         int mekTechs = generateRole(campaign, options, skillGen, PersonnelRole.MEK_TECH,
-              demand.mekTechsNeeded(), supportRank, targetRankSystem, rankValidator, generated);
+              demand.mekTechsNeeded(), supportRank, faction, targetRankSystem, rankValidator, generated);
         int mechanics = generateRole(campaign, options, skillGen, PersonnelRole.MECHANIC,
-              demand.mechanicsNeeded(), supportRank, targetRankSystem, rankValidator, generated);
+              demand.mechanicsNeeded(), supportRank, faction, targetRankSystem, rankValidator, generated);
         int aeroTeks = generateRole(campaign, options, skillGen, PersonnelRole.AERO_TEK,
-              demand.aeroTeksNeeded(), supportRank, targetRankSystem, rankValidator, generated);
+              demand.aeroTeksNeeded(), supportRank, faction, targetRankSystem, rankValidator, generated);
         int baTechs = generateRole(campaign, options, skillGen, PersonnelRole.BA_TECH,
-              demand.baTechsNeeded(), supportRank, targetRankSystem, rankValidator, generated);
+              demand.baTechsNeeded(), supportRank, faction, targetRankSystem, rankValidator, generated);
         int doctors = generateRole(campaign, options, skillGen, PersonnelRole.DOCTOR,
-              demand.doctorsNeeded(), supportRank, targetRankSystem, rankValidator, generated);
+              demand.doctorsNeeded(), supportRank, faction, targetRankSystem, rankValidator, generated);
 
         // Equal split of total admin demand across the four administrator roles. Each role then
         // applies its own per-role coverage percentage in generateRole().
         int adminBaselinePerRole = (int) Math.ceil(demand.administratorsNeeded() / (double) ADMIN_ROLE_COUNT);
         int adminCmd = generateRole(campaign, options, skillGen, PersonnelRole.ADMINISTRATOR_COMMAND,
-              adminBaselinePerRole, supportRank, targetRankSystem, rankValidator, generated);
+              adminBaselinePerRole, supportRank, faction, targetRankSystem, rankValidator, generated);
         int adminLog = generateRole(campaign, options, skillGen, PersonnelRole.ADMINISTRATOR_LOGISTICS,
-              adminBaselinePerRole, supportRank, targetRankSystem, rankValidator, generated);
+              adminBaselinePerRole, supportRank, faction, targetRankSystem, rankValidator, generated);
         int adminTpt = generateRole(campaign, options, skillGen, PersonnelRole.ADMINISTRATOR_TRANSPORT,
-              adminBaselinePerRole, supportRank, targetRankSystem, rankValidator, generated);
+              adminBaselinePerRole, supportRank, faction, targetRankSystem, rankValidator, generated);
         int adminHR = generateRole(campaign, options, skillGen, PersonnelRole.ADMINISTRATOR_HR,
-              adminBaselinePerRole, supportRank, targetRankSystem, rankValidator, generated);
+              adminBaselinePerRole, supportRank, faction, targetRankSystem, rankValidator, generated);
 
         // A freshly generated command should not open with an HR-strain turnover penalty, so top up
         // HR administrators until the strain modifier reaches zero (no-op when the rule is off).
-        adminHR += topUpHumanResourcesToZeroStrain(campaign, options, skillGen, supportRank,
+        adminHR += topUpHumanResourcesToZeroStrain(campaign, options, skillGen, supportRank, faction,
               targetRankSystem, rankValidator, generated);
 
         int totalTechs = mekTechs + mechanics + aeroTeks + baTechs;
-        int astechs = applyAstechs(campaign, options, skillGen, supportRank, targetRankSystem,
+        int astechs = applyAstechs(campaign, options, skillGen, supportRank, faction, targetRankSystem,
               rankValidator, totalTechs, generated);
-        int medics = applyMedics(campaign, options, skillGen, supportRank, targetRankSystem,
+        int medics = applyMedics(campaign, options, skillGen, supportRank, faction, targetRankSystem,
               rankValidator, doctors, generated);
 
         long elapsedMs = (System.nanoTime() - start) / 1_000_000;
@@ -212,7 +213,7 @@ public final class SupportPersonnelGenerator {
      */
     private static int generateRole(Campaign campaign, CommandGenerationOptions options,
           AbstractSkillGenerator skillGen, PersonnelRole role, int baselineDemand, int supportRank,
-          RankSystem targetRankSystem, RankValidator rankValidator, List<Person> out) {
+          Faction faction, RankSystem targetRankSystem, RankValidator rankValidator, List<Person> out) {
         int percent = options.getSupportPersonnelCoveragePercents().getOrDefault(role, 100);
         int target = SupportPersonnelCalculator.applyPercent(baselineDemand, percent);
         // Reconcile against staff already present so re-running support (for example after adding
@@ -231,7 +232,7 @@ public final class SupportPersonnelGenerator {
             SkillLevel rolled = (skillLevel == null) ? rollRandomSkillLevel() : skillLevel;
             Person person = createAndRecruit(campaign, skillGen, role, toExperienceLevel(rolled),
                   RulesetRankAssigner.supportRankFor(role, rolled, campaign.getFaction()),
-                  targetRankSystem, rankValidator);
+                  faction, targetRankSystem, rankValidator);
             if (person != null) {
                 out.add(person);
             }
@@ -266,8 +267,8 @@ public final class SupportPersonnelGenerator {
      * @return the number of HR administrators added
      */
     private static int topUpHumanResourcesToZeroStrain(Campaign campaign, CommandGenerationOptions options,
-          AbstractSkillGenerator skillGen, int supportRank, RankSystem targetRankSystem,
-          RankValidator rankValidator, List<Person> out) {
+          AbstractSkillGenerator skillGen, int supportRank, Faction faction,
+          RankSystem targetRankSystem, RankValidator rankValidator, List<Person> out) {
         if (!campaign.getCampaignOptions().isUseHRStrain()) {
             return 0;
         }
@@ -277,7 +278,7 @@ public final class SupportPersonnelGenerator {
         int added = 0;
         while (RetirementDefectionTracker.getHRStrainModifier(campaign) > 0 && added < MAX_HR_STRAIN_TOPUP) {
             Person admin = createAndRecruit(campaign, skillGen, PersonnelRole.ADMINISTRATOR_HR,
-                  experienceLevelFor(skillLevel), supportRank, targetRankSystem, rankValidator);
+                  experienceLevelFor(skillLevel), supportRank, faction, targetRankSystem, rankValidator);
             if (admin == null) {
                 break;
             }
@@ -294,15 +295,15 @@ public final class SupportPersonnelGenerator {
      * count or Person count, semantics depend on the mode).
      */
     private static int applyAstechs(Campaign campaign, CommandGenerationOptions options,
-          AbstractSkillGenerator skillGen, int supportRank, RankSystem targetRankSystem,
-          RankValidator rankValidator, int totalTechs, List<Person> out) {
+          AbstractSkillGenerator skillGen, int supportRank, Faction faction,
+          RankSystem targetRankSystem, RankValidator rankValidator, int totalTechs, List<Person> out) {
         if (!options.isGenerateAstechs() || totalTechs <= 0) {
             return 0;
         }
         int needed = ASTECHS_PER_TECH * totalTechs;
         return applyAssistant(campaign, skillGen, PersonnelRole.ASTECH, needed,
               options.isAstechsAsPersonnel(),
-              options.getAstechSkillLevel(), supportRank, targetRankSystem, rankValidator,
+              options.getAstechSkillLevel(), supportRank, faction, targetRankSystem, rankValidator,
               out, AssistantPool.ASTECH);
     }
 
@@ -310,15 +311,15 @@ public final class SupportPersonnelGenerator {
      * Pool-or-Person dispatch for medic generation. Returns the number of medics added.
      */
     private static int applyMedics(Campaign campaign, CommandGenerationOptions options,
-          AbstractSkillGenerator skillGen, int supportRank, RankSystem targetRankSystem,
-          RankValidator rankValidator, int totalDoctors, List<Person> out) {
+          AbstractSkillGenerator skillGen, int supportRank, Faction faction,
+          RankSystem targetRankSystem, RankValidator rankValidator, int totalDoctors, List<Person> out) {
         if (!options.isGenerateMedics() || totalDoctors <= 0) {
             return 0;
         }
         int needed = MEDICS_PER_DOCTOR * totalDoctors;
         return applyAssistant(campaign, skillGen, PersonnelRole.MEDIC, needed,
               options.isMedicsAsPersonnel(),
-              options.getMedicSkillLevel(), supportRank, targetRankSystem, rankValidator,
+              options.getMedicSkillLevel(), supportRank, faction, targetRankSystem, rankValidator,
               out, AssistantPool.MEDIC);
     }
 
@@ -326,7 +327,7 @@ public final class SupportPersonnelGenerator {
 
     private static int applyAssistant(Campaign campaign, AbstractSkillGenerator skillGen,
           PersonnelRole role, int needed, boolean asPersonnel, SkillLevel skillLevel,
-          int supportRank, RankSystem targetRankSystem, RankValidator rankValidator,
+          int supportRank, Faction faction, RankSystem targetRankSystem, RankValidator rankValidator,
           List<Person> out, AssistantPool pool) {
         if (needed <= 0) {
             return 0;
@@ -337,7 +338,7 @@ public final class SupportPersonnelGenerator {
                 SkillLevel rolled = (skillLevel == null) ? rollRandomSkillLevel() : skillLevel;
                 Person person = createAndRecruit(campaign, skillGen, role, toExperienceLevel(rolled),
                       RulesetRankAssigner.supportRankFor(role, rolled, campaign.getFaction()),
-                      targetRankSystem, rankValidator);
+                      faction, targetRankSystem, rankValidator);
                 if (person != null) {
                     out.add(person);
                 }
@@ -363,9 +364,18 @@ public final class SupportPersonnelGenerator {
      * "Corporal" instead of the Clan equivalent.</p>
      */
     private static Person createAndRecruit(Campaign campaign, AbstractSkillGenerator skillGen,
-          PersonnelRole role, int expLvl, int supportRank, RankSystem targetRankSystem,
+          PersonnelRole role, int expLvl, int supportRank, Faction faction, RankSystem targetRankSystem,
           RankValidator rankValidator) {
-        Person person = campaign.newPerson(role);
+        // A Clan's support castes are Clan-born, so their origin is pinned to the Clan rather than
+        // drawn from the campaign's random origin options. That matters for names as much as for
+        // descent: Clan personnel carry a given name alone, and a randomly assigned Inner Sphere
+        // origin was giving freeborn support staff surnames no Clan member would have.
+        //
+        // Only Clans are pinned. An Inner Sphere command keeps the origin variety the campaign's
+        // options ask for, since its staff genuinely can come from anywhere.
+        Person person = faction.isClan()
+              ? campaign.newPerson(role, faction.getShortName(), Gender.RANDOMIZE)
+              : campaign.newPerson(role);
         // newPerson already runs skill generation at the campaign's default level; regenerate at
         // the user-selected experience tier so the role's primary skills land at the right level.
         skillGen.generateSkills(campaign, person, expLvl);
