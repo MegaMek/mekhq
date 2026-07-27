@@ -49,6 +49,7 @@ import java.time.LocalDate;
 import megamek.Version;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.campaignOptions.CampaignOptions;
+import mekhq.campaign.personnel.enums.PersonnelRole;
 import mekhq.campaign.personnel.ranks.Ranks;
 import mekhq.utilities.MHQXMLUtility;
 import org.junit.jupiter.api.BeforeAll;
@@ -209,5 +210,42 @@ class PersonSeniorAppointmentTest {
         assertEquals("CMO, CA", person.getSeniorAppointmentAbbreviations(),
               "posts should be listed in a fixed order so the display does not reshuffle");
         assertEquals("Chief Medical Officer, Chief Administrator", person.getSeniorAppointmentTitles());
+    }
+
+    @Test
+    void theDepartmentHeadTitleNamesTheDepartment() {
+        // The title is built through MessageFormat, so a printf-style placeholder in the resource
+        // bundle would survive into the display untouched. This is what catches that.
+        Campaign campaign = campaign();
+        Person person = new Person("", "Jane", "Smith", "", campaign, "MERC");
+        person.setPrimaryRole(LocalDate.of(3067, 1, 1), PersonnelRole.MEK_TECH);
+        person.setDepartmentHead(true);
+
+        String title = person.getDepartmentHeadTitle();
+        assertFalse(title.contains("%s"), "the placeholder should have been substituted, got: " + title);
+        assertFalse(title.contains("{0}"), "the placeholder should have been substituted, got: " + title);
+        assertTrue(title.startsWith("Head "), "got: " + title);
+        assertTrue(title.length() > "Head ".length(), "the department should be named, got: " + title);
+    }
+
+    @Test
+    void aPersonHeadingNoDepartmentHasNoDepartmentTitle() {
+        Person person = new Person("", "Jane", "Smith", "", campaign(), "MERC");
+        person.setPrimaryRole(LocalDate.of(3067, 1, 1), PersonnelRole.MEK_TECH);
+        assertEquals("", person.getDepartmentHeadTitle());
+    }
+
+    @Test
+    void aDepartmentHeadFlagSurvivesTheSaveAndLoadRoundTrip() throws Exception {
+        Person person = new Person("", "Jane", "Smith", "", campaign(), "MERC");
+        person.setDepartmentHead(true);
+
+        Campaign campaign = campaign();
+        Element written = roundTrip(person, campaign);
+        assertTrue(containsTag(written, "departmentHead"));
+
+        Person loaded = Person.generateInstanceFromXML(written, campaign, VERSION);
+        assertNotNull(loaded);
+        assertTrue(loaded.isDepartmentHead(), "the department head flag should survive a save and load");
     }
 }
