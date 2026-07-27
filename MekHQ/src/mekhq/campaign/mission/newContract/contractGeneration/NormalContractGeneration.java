@@ -32,5 +32,23 @@
  */
 package mekhq.campaign.mission.newContract.contractGeneration;
 
+import java.time.LocalDate;
+
+import mekhq.campaign.location.ILocation;
+
 public class NormalContractGeneration extends AbstractContractGeneration {
+    private ChaosContractType playerContractType;
+    private ChaosContractType opposingContractType;
+
+    public void generateInitialContractTerms(ILocation currentLocation, LocalDate today, int contractGenerationModifier,
+          boolean isMercenary) {
+        // Step 1: Contract Types
+        generateContractTypes(contractGenerationModifier);
+    }
+
+    private void generateContractTypes(int contractGenerationModifier) {
+        ContractTypeGeneration typeGeneration = new ContractTypeGeneration(contractGenerationModifier);
+        playerContractType = typeGeneration.getPlayerContractType();
+        opposingContractType = typeGeneration.getOpposingContractType();
+    }
 }
