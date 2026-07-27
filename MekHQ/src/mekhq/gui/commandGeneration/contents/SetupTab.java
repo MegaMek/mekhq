@@ -58,6 +58,7 @@ import javax.swing.SpinnerNumberModel;
 
 import megamek.client.ui.comboBoxes.MMComboBox;
 import megamek.common.annotations.Nullable;
+import megamek.logging.MMLogger;
 import megamek.common.enums.SkillLevel;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.personnel.enums.PersonnelRole;
@@ -97,6 +98,8 @@ import mekhq.gui.panels.RandomOriginOptionsPanel;
  * generateMedics} on write so old presets stay compatible.</p>
  */
 public class SetupTab {
+    private static final MMLogger LOGGER = MMLogger.create(SetupTab.class);
+
 
     /** Coverage spinner range. 100 = full canonical coverage; >100 = redundancy. */
     private static final int COVERAGE_SPINNER_MIN = 0;
@@ -791,8 +794,11 @@ public class SetupTab {
             return;
         }
         if (namingMethod == comboForceNamingMethod.getSelectedItem()) {
+            LOGGER.debug("[NamingMethod] already {}; leaving it", namingMethod);
             return;
         }
+        LOGGER.info("[NamingMethod] switching from {} to {}",
+              comboForceNamingMethod.getSelectedItem(), namingMethod);
         comboForceNamingMethod.setSelectedItem(namingMethod);
     }
 

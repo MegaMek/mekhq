@@ -32,6 +32,7 @@
  */
 package mekhq.gui.commandGeneration;
 
+import megamek.logging.MMLogger;
 import static mekhq.gui.commandGeneration.components.CommandGenerationUtilities.getCommandGenerationResourceBundle;
 import static mekhq.utilities.MHQInternationalization.getTextAt;
 
@@ -69,6 +70,8 @@ import mekhq.gui.commandGeneration.contents.SparesAndFinancesTab;
  * Campaign Options package.</p>
  */
 public class CommandGenerationPane extends AbstractMHQTabbedPane {
+    private static final MMLogger LOGGER = MMLogger.create(CommandGenerationPane.class);
+
 
     private final Campaign campaign;
     private final CommandGenerationOptions options;
@@ -118,7 +121,13 @@ public class CommandGenerationPane extends AbstractMHQTabbedPane {
         // naming method to match. Only Clans are switched: a non-Clan selection leaves whatever the
         // user chose alone rather than overwriting a deliberate choice.
         forceGeneratorTab.setFactionChangeListener(factionRecord -> {
-            if ((factionRecord != null) && factionRecord.isClan()) {
+            if (factionRecord == null) {
+                LOGGER.debug("[NamingMethod] faction change with no record; leaving naming alone");
+                return;
+            }
+            LOGGER.debug("[NamingMethod] faction now {} (isClan={})",
+                  factionRecord.getKey(), factionRecord.isClan());
+            if (factionRecord.isClan()) {
                 setupTab.setSelectedForceNamingMethod(ForceNamingMethod.GREEK_ALPHABET);
             }
         });
