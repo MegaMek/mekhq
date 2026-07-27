@@ -153,6 +153,11 @@ public class CommandGenerationDialog extends AbstractMHQValidationButtonDialog {
         pane.getForceGeneratorTab().loadValuesFromOptions(startingOptions);
         pane.getSparesAndFinancesTab().loadValuesFromOptions(startingOptions);
 
+        // Settings that follow from the faction are applied after the tabs are populated, not before.
+        // Loading the options sets the naming method directly, so a Clan's Greek naming would
+        // otherwise be applied while the pane is built and then overwritten a moment later.
+        pane.applyFactionDrivenDefaults();
+
         // Persistent design-stage banner so the player always knows this workspace is a draft: nothing
         // reaches the campaign until "Accept & Build Command". Text-only with a bottom separator (no
         // background fill) so it reads cleanly under both the light and Darcula look-and-feels.
@@ -232,6 +237,9 @@ public class CommandGenerationDialog extends AbstractMHQValidationButtonDialog {
         pane.getSetupTab().loadValuesFromOptions(defaults);
         pane.getForceGeneratorTab().loadValuesFromOptions(defaults);
         pane.getSparesAndFinancesTab().loadValuesFromOptions(defaults);
+        // As on first show: restoring defaults sets the naming method directly, so the faction's own
+        // convention is re-applied afterwards rather than being overwritten by it.
+        pane.applyFactionDrivenDefaults();
     }
 
     /**

@@ -41,6 +41,7 @@ import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 
+import megamek.client.ratgenerator.FactionRecord;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.universe.enums.ForceNamingMethod;
 import mekhq.campaign.universe.commandGeneration.CommandGenerationOptions;
@@ -71,6 +72,12 @@ import mekhq.gui.commandGeneration.contents.SparesAndFinancesTab;
  */
 public class CommandGenerationPane extends AbstractMHQTabbedPane {
     private static final MMLogger LOGGER = MMLogger.create(CommandGenerationPane.class);
+
+    /**
+     * The faction the Force Generator panel last reported, kept so the settings that follow from it can
+     * be re-applied after the tabs are populated from saved options.
+     */
+    private FactionRecord lastFactionRecord;
 
 
     private final Campaign campaign;
@@ -121,17 +128,8 @@ public class CommandGenerationPane extends AbstractMHQTabbedPane {
         // naming method to match. Only Clans are switched: a non-Clan selection leaves whatever the
         // user chose alone rather than overwriting a deliberate choice.
         forceGeneratorTab.setFactionChangeListener(factionRecord -> {
-            if (factionRecord == null) {
-                LOGGER.debug("[NamingMethod] faction change with no record; leaving naming alone");
-                return;
-            }
-            // At INFO because it fires once per faction selection, and because a report that the
-            // naming method did not switch cannot be placed without it.
-            LOGGER.info("[NamingMethod] faction now {} (isClan={})",
-                  factionRecord.getKey(), factionRecord.isClan());
-            if (factionRecord.isClan()) {
-                setupTab.setSelectedForceNamingMethod(ForceNamingMethod.GREEK_ALPHABET);
-            }
+            lastFactionRecord = factionRecord;
+            applyFactionDrivenDefaults();
         });
 
         // The starting-cash preview prices the Force Generator tab's current model, which can change
@@ -141,6 +139,29 @@ public class CommandGenerationPane extends AbstractMHQTabbedPane {
                 sparesAndFinancesTab.refreshStartingCashPreview();
             }
         });
+    }
+
+    /**
+     * Applies the settings that follow from the selected faction - currently only that a Clan names its
+     * formations with the Greek alphabet.
+     *
+     * <p>Called again once every tab has been populated from its options. Loading those options sets
+     * the naming method directly, so applying this only when the faction is first reported would leave
+     * it overwritten a moment later.</p>
+     */
+    public void applyFactionDrivenDefaults() {
+        FactionRecord factionRecord = lastFactionRecord;
+        if (factionRecord == null) {
+            LOGGER.debug("[NamingMethod] no faction reported yet; leaving naming alone");
+            return;
+        }
+        // At INFO because it fires once per faction selection, and because a report that the naming
+        // method did not switch cannot be placed without it.
+        LOGGER.info("[NamingMethod] faction now {} (isClan={})",
+              factionRecord.getKey(), factionRecord.isClan());
+        if (factionRecord.isClan()) {
+            setupTab.setSelectedForceNamingMethod(ForceNamingMethod.GREEK_ALPHABET);
+        }
     }
 
     public SetupTab getSetupTab() {
