@@ -33,30 +33,38 @@
  */
 package mekhq.campaign.personnel;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import javax.xml.parsers.DocumentBuilder;
 
 import megamek.common.annotations.Nullable;
 import megamek.common.compute.Compute;
+import megamek.common.universe.Bloodname2;
+import megamek.common.universe.BloodnameHouse;
+import megamek.common.universe.BloodnameTransfer;
+import megamek.common.universe.Bloodnames2;
 import megamek.logging.MMLogger;
 import mekhq.campaign.personnel.enums.Phenotype;
-import mekhq.utilities.MHQXMLUtility;
-import org.w3c.dom.Document;
-import org.w3c.dom.Element;
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
 
 /**
  * @author Neoancient
  */
 public class Bloodname {
     private static final MMLogger LOGGER = MMLogger.create(Bloodname.class);
+
+    /** The Clans were founded in 2807; a Bloodname with no date of its own dates from then. */
+    private static final int DEFAULT_START_DATE = 2807;
+
+    /**
+     * How long a change takes to show up in a breeding programme. A legacy that falls dormant keeps
+     * producing warriors for about this long, and a Clan that takes a name on does not grant it
+     * immediately.
+     */
+    private static final int BREEDING_LAG_YEARS = 10;
+
+    /** As above, for a legacy created or brought back, which takes a full generation to bear warriors. */
+    private static final int GENERATION_LAG_YEARS = 20;
 
     // region Variable Declarations
     private static List<Bloodname> bloodnames;
@@ -65,7 +73,7 @@ public class Bloodname {
     private String founder;
     private Clan origClan;
     private boolean exclusive;
-    private final boolean limited;
+    private boolean limited;
     private int inactive;
     private int abjured;
     private int reactivated;
@@ -115,31 +123,6 @@ public class Bloodname {
         return limited;
     }
 
-    public boolean isInactive(int year) {
-        return (year < startDate) ||
-                     ((inactive > 0) && (inactive < year) && !((reactivated > 0) && (reactivated <= year)));
-    }
-
-    public boolean isAbjured(int year) {
-        return ((abjured > 0) && (abjured < year));
-    }
-
-    public Phenotype getPhenotype() {
-        return phenotype;
-    }
-
-    public List<Clan> getPostReavingClans() {
-        return postReavingClans;
-    }
-
-    public List<NameAcquired> getAcquiringClans() {
-        return acquiringClans;
-    }
-
-    public NameAcquired getAbsorbed() {
-        return absorbed;
-    }
-
     /**
      * @param warriorType A Phenotype constant
      * @param year        The current year of the campaign setting
@@ -172,60 +155,29 @@ public class Bloodname {
         };
     }
 
-    public static Bloodname loadFromXml(Node node) {
-        Bloodname retVal = new Bloodname();
-        NodeList nl = node.getChildNodes();
-        for (int i = 0; i < nl.getLength(); i++) {
-            Node wn = nl.item(i);
+    public boolean isInactive(int year) {
+        return (year < startDate) ||
+                     ((inactive > 0) && (inactive < year) && !((reactivated > 0) && (reactivated <= year)));
+    }
 
-            try {
-                if (wn.getNodeName().equalsIgnoreCase("name")) {
-                    retVal.name = wn.getTextContent().trim();
-                } else if (wn.getNodeName().equalsIgnoreCase("founder")) {
-                    retVal.founder = wn.getTextContent().trim();
-                } else if (wn.getNodeName().equalsIgnoreCase("clan")) {
-                    retVal.origClan = Clan.getClan(wn.getTextContent().trim());
-                } else if (wn.getNodeName().equalsIgnoreCase("exclusive")) {
-                    retVal.exclusive = true;
-                } else if (wn.getNodeName().equalsIgnoreCase("reaved")) {
-                    retVal.inactive = Integer.parseInt(wn.getTextContent().trim());
-                } else if (wn.getNodeName().equalsIgnoreCase("dormant")) {
-                    retVal.inactive = Integer.parseInt(wn.getTextContent().trim()) + 10;
-                } else if (wn.getNodeName().equalsIgnoreCase("abjured")) {
-                    retVal.abjured = Integer.parseInt(wn.getTextContent().trim());
-                } else if (wn.getNodeName().equalsIgnoreCase("reactivated")) {
-                    retVal.reactivated = Integer.parseInt(wn.getTextContent().trim() + 20);
-                } else if (wn.getNodeName().equalsIgnoreCase("phenotype")) {
-                    retVal.phenotype = Phenotype.fromString(wn.getTextContent().trim());
-                } else if (wn.getNodeName().equalsIgnoreCase("postReaving")) {
-                    String[] clans = wn.getTextContent().trim().split(",");
-                    for (String c : clans) {
-                        retVal.postReavingClans.add(Clan.getClan(c));
-                    }
-                } else if (wn.getNodeName().equalsIgnoreCase("acquired")) {
-                    retVal.acquiringClans.add(new NameAcquired(Integer.parseInt(wn.getAttributes()
-                                                                                      .getNamedItem("date")
-                                                                                      .getTextContent()) + 10,
-                          wn.getTextContent().trim()));
-                } else if (wn.getNodeName().equalsIgnoreCase("shared")) {
-                    retVal.acquiringClans.add(new NameAcquired(Integer.parseInt(wn.getAttributes()
-                                                                                      .getNamedItem("date")
-                                                                                      .getTextContent()),
-                          wn.getTextContent().trim()));
-                } else if (wn.getNodeName().equalsIgnoreCase("absorbed")) {
-                    retVal.absorbed = new NameAcquired(Integer.parseInt(wn.getAttributes()
-                                                                              .getNamedItem("date")
-                                                                              .getTextContent()),
-                          wn.getTextContent().trim());
-                } else if (wn.getNodeName().equalsIgnoreCase("created")) {
-                    retVal.startDate = Integer.parseInt(wn.getTextContent().trim()) + 20;
-                }
-            } catch (Exception e) {
-                LOGGER.error("", e);
-            }
-        }
+    public boolean isAbjured(int year) {
+        return ((abjured > 0) && (abjured < year));
+    }
 
-        return retVal;
+    public Phenotype getPhenotype() {
+        return phenotype;
+    }
+
+    public List<Clan> getPostReavingClans() {
+        return postReavingClans;
+    }
+
+    public List<NameAcquired> getAcquiringClans() {
+        return acquiringClans;
+    }
+
+    public NameAcquired getAbsorbed() {
+        return absorbed;
     }
 
     /**
@@ -284,7 +236,7 @@ public class Bloodname {
         if (faction == null) {
             LOGGER.error(
                   "Random Bloodname attempted for a clan that does not exist.{}Please ensure that your clan exists " +
-                        "in both the clans.xml and bloodnames.xml files as appropriate. This can be ignored for the " +
+                        "in both clans.xml and data/universe/bloodnames as appropriate. This can be ignored for the " +
                         "Bandit Caste",
                   System.lineSeparator());
             return null;
@@ -466,43 +418,98 @@ public class Bloodname {
         }
     }
 
+    /**
+     * Loads the Bloodname data from {@code data/universe/bloodnames}, one folder per Clan and one file
+     * per Bloodname.
+     *
+     * <p>This replaced {@code bloodnames.xml}. The data is the same, but held per Bloodname rather
+     * than in one file, and it no longer loses the Clans and years attached to shared, acquired and
+     * abjured records.</p>
+     */
     public static void loadBloodnameData() {
         Clan.loadClanData();
         bloodnames = new ArrayList<>();
 
-        File f = new File("data/names/bloodnames/bloodnames.xml"); // TODO : Remove inline file path
-        FileInputStream fis;
-        try {
-            fis = new FileInputStream(f);
-        } catch (FileNotFoundException e) {
-            LOGGER.error("Cannot find file bloodnames.xml");
+        Bloodnames2 source = Bloodnames2.getInstance();
+        if (source.isEmpty()) {
+            LOGGER.error("No Bloodname data was loaded. Check that data/universe/bloodnames is present.");
             return;
         }
-
-        Document doc;
-
-        try {
-            DocumentBuilder db = MHQXMLUtility.newSafeDocumentBuilder();
-            doc = db.parse(fis);
-            fis.close();
-        } catch (Exception ex) {
-            LOGGER.error("Could not parse bloodnames.xml", ex);
-            return;
-        }
-
-        Element bloodnameElement = doc.getDocumentElement();
-        NodeList nl = bloodnameElement.getChildNodes();
-        bloodnameElement.normalize();
-
-        for (int i = 0; i < nl.getLength(); i++) {
-            Node wn = nl.item(i);
-            if (wn.getNodeType() == Node.ELEMENT_NODE) {
-                if (wn.getNodeName().equalsIgnoreCase("bloodname")) {
-                    bloodnames.add(Bloodname.loadFromXml(wn));
-                }
+        for (Bloodname2 record : source.getAllBloodnames()) {
+            for (BloodnameHouse house : record.getHouses()) {
+                bloodnames.add(fromHouse(record, house));
             }
         }
-        LOGGER.info("Loaded {} Bloodname records.", bloodnames.size());
+        LOGGER.info("Loaded {} Bloodname houses", bloodnames.size());
+    }
+
+    /**
+     * Builds one Bloodname from a House record.
+     *
+     * <p>Several fields are shifted forward in time on the way in, which the previous loader also did:
+     * a legacy takes a generation to show up in a breeding programme, so a name that fell dormant is
+     * treated as available for another decade, and one created or taken on is treated as unavailable
+     * for a further ten or twenty years.</p>
+     *
+     * @param record the Bloodname the House belongs to
+     * @param house  the House to convert
+     *
+     * @return the Bloodname as the selection code expects it
+     */
+    private static Bloodname fromHouse(Bloodname2 record, BloodnameHouse house) {
+        Bloodname bloodname = new Bloodname();
+        bloodname.name = record.getName();
+        bloodname.founder = house.getFounder();
+        bloodname.origClan = Clan.getClan(record.getClan());
+        bloodname.exclusive = house.isExclusive();
+        bloodname.limited = house.isLimited();
+
+        if (house.getPhenotype() != null) {
+            bloodname.phenotype = Phenotype.fromString(house.getPhenotype());
+        }
+        if (house.getReaved() != null) {
+            bloodname.inactive = house.getReaved();
+        }
+        if (house.getDormant() != null) {
+            bloodname.inactive = house.getDormant() + BREEDING_LAG_YEARS;
+        }
+        if (house.getAbjured() != null) {
+            bloodname.abjured = house.getAbjured();
+        }
+        if (house.getReactivated() != null) {
+            bloodname.reactivated = house.getReactivated() + GENERATION_LAG_YEARS;
+        }
+        if (house.getCreated() != null) {
+            bloodname.startDate = house.getCreated() + GENERATION_LAG_YEARS;
+        }
+
+        for (String clanCode : house.getPostReaving()) {
+            Clan clan = Clan.getClan(clanCode);
+            if (clan != null) {
+                bloodname.postReavingClans.add(clan);
+            }
+        }
+        // A Clan that took the name on only starts granting it a decade later; one it is shared with
+        // grants it from the same year.
+        for (BloodnameTransfer transfer : house.getAcquired()) {
+            bloodname.acquiringClans.add(new NameAcquired(
+                  yearOf(transfer) + BREEDING_LAG_YEARS, transfer.getClan()));
+        }
+        for (BloodnameTransfer transfer : house.getShared()) {
+            bloodname.acquiringClans.add(new NameAcquired(yearOf(transfer), transfer.getClan()));
+        }
+        if (house.getAbsorbed() != null) {
+            bloodname.absorbed = new NameAcquired(yearOf(house.getAbsorbed()),
+                  house.getAbsorbed().getClan());
+        }
+        return bloodname;
+    }
+
+    /**
+     * @return the year of a transfer, or the founding of the Clans when the record does not give one
+     */
+    private static int yearOf(BloodnameTransfer transfer) {
+        return (transfer.getDate() == null) ? DEFAULT_START_DATE : transfer.getDate();
     }
 
 }

@@ -39,6 +39,7 @@ import static org.junit.jupiter.api.Assumptions.assumeTrue;
 
 import java.io.File;
 
+import megamek.common.universe.Bloodnames2;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
@@ -47,6 +48,10 @@ import org.junit.jupiter.api.Test;
  *
  * <p>{@link Person} stores only the name string, so the Bloodname tab has to find the record again to
  * say anything about the house behind it. These tests pin that lookup.</p>
+ *
+ * <p>The data now comes from {@code data/universe/bloodnames} rather than the retired
+ * {@code bloodnames.xml}, and is loaded through {@link Bloodnames2} so the tests do not depend on the
+ * data having been staged into this project.</p>
  */
 class BloodnameLookupTest {
 
@@ -54,14 +59,27 @@ class BloodnameLookupTest {
     private static final String KNOWN_BLOODNAME = "Blackburn";
     private static final String KNOWN_FOUNDER = "Annie";
 
+    /** Where the Bloodname data lives, tried in the staged location and then in mm-data itself. */
+    private static final String[] CANDIDATE_DIRECTORIES = {
+          "data/universe/bloodnames",
+          "../mm-data/data/universe/bloodnames",
+          "D:/MegaMek Projects/mm-data/data/universe/bloodnames",
+    };
+
     private static boolean dataLoaded;
 
     @BeforeAll
     static void loadBloodnames() {
-        // loadBloodnameData resolves a path relative to the working directory, so the data is not
-        // guaranteed to be reachable from every test environment. The null-safety tests below hold
-        // either way; the lookup tests skip rather than fail spuriously when it is absent.
-        dataLoaded = new File("data/names/bloodnames/bloodnames.xml").exists();
+        // The data is resolved relative to the working directory, which differs between environments,
+        // so the lookup tests skip rather than fail spuriously when it cannot be found. The
+        // null-safety tests below hold either way.
+        for (String directory : CANDIDATE_DIRECTORIES) {
+            if (new File(directory).isDirectory()) {
+                Bloodnames2.setInstance(new Bloodnames2(directory));
+                dataLoaded = true;
+                break;
+            }
+        }
         if (dataLoaded) {
             Bloodname.loadBloodnameData();
         }
@@ -83,7 +101,7 @@ class BloodnameLookupTest {
 
     @Test
     void aKnownNameFindsItsHouse() {
-        assumeTrue(dataLoaded, "bloodnames.xml not reachable from this working directory");
+        assumeTrue(dataLoaded, "Bloodname data not reachable from this working directory");
 
         Bloodname bloodname = Bloodname.getBloodname(KNOWN_BLOODNAME);
         assertNotNull(bloodname, KNOWN_BLOODNAME + " should exist in the shipped data");
@@ -95,7 +113,7 @@ class BloodnameLookupTest {
     @Test
     void theLookupIgnoresCase() {
         // Nothing normalises the stored string, so a name that differs only in case must still match.
-        assumeTrue(dataLoaded, "bloodnames.xml not reachable from this working directory");
+        assumeTrue(dataLoaded, "Bloodname data not reachable from this working directory");
 
         assertNotNull(Bloodname.getBloodname(KNOWN_BLOODNAME.toUpperCase()));
         assertNotNull(Bloodname.getBloodname(KNOWN_BLOODNAME.toLowerCase()));
