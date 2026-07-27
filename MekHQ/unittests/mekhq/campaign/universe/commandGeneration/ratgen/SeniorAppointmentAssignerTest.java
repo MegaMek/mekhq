@@ -32,6 +32,7 @@
  */
 package mekhq.campaign.universe.commandGeneration.ratgen;
 
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyBoolean;
@@ -49,6 +50,8 @@ import mekhq.campaign.Campaign;
 import mekhq.campaign.LocalPersonnel;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.enums.PersonnelRole;
+import mekhq.campaign.personnel.ranks.RankSystem;
+import mekhq.campaign.personnel.ranks.Ranks;
 import mekhq.campaign.personnel.skills.Skill;
 import mekhq.campaign.personnel.skills.SkillType;
 import mekhq.campaign.personnel.skills.Skills;
@@ -67,9 +70,10 @@ import org.mockito.ArgumentCaptor;
 class SeniorAppointmentAssignerTest {
 
     @BeforeAll
-    static void loadSkillTypes() {
-        // Scoring resolves skills by name, which needs the skill table initialised.
+    static void loadSkillTypesAndRanks() {
+        // Scoring resolves skills by name and promotion walks a real rank table, so both need loading.
         SkillType.initializeTypes();
+        Ranks.initializeRankSystems();
     }
 
     /** A campaign with nobody yet on the books, so every post starts vacant. */
@@ -94,6 +98,11 @@ class SeniorAppointmentAssignerTest {
     private static Person withSkill(Person person, String skillName, int level) {
         person.getSkills().addSkill(skillName, new Skill(skillName, level, 0));
         return person;
+    }
+
+    /** The shipped SLDF rank system, which leaves indices 16 and 37 unnamed. */
+    private static RankSystem sldf() {
+        return Ranks.getRankSystems().get("SLDF");
     }
 
     /** A person in the given role who wins every rank comparison. */
@@ -240,7 +249,7 @@ class SeniorAppointmentAssignerTest {
     }
 
     @Test
-    void theAppointeeIsPromotedToMatchTheirHighestRankedStaff() {
+    void theAppointeeIsPromotedAboveTheirHighestRankedStaff() {
         // A section head outranked by their own staff is the thing this prevents.
         Campaign campaign = campaign();
         Person skilledButJunior = junior(PersonnelRole.DOCTOR);
@@ -250,11 +259,15 @@ class SeniorAppointmentAssignerTest {
         Person seniorDoctor = senior(PersonnelRole.DOCTOR);
         withSkill(seniorDoctor, SkillType.S_SURGERY, 2);
         when(seniorDoctor.getRankNumeric()).thenReturn(35);
+        when(skilledButJunior.getRankSystem()).thenReturn(sldf());
 
         SeniorAppointmentAssigner.assign(campaign, List.of(skilledButJunior, seniorDoctor));
 
         verify(skilledButJunior).setChiefMedicalOfficer(true);
-        verify(skilledButJunior).setRank(35);
+        // One named rung above the senior doctor at 35, not level with them.
+        ArgumentCaptor<Integer> promotedTo = ArgumentCaptor.forClass(Integer.class);
+        verify(skilledButJunior).setRank(promotedTo.capture());
+        assertTrue(promotedTo.getValue() > 35, "the head should outrank their staff");
     }
 
     @Test
@@ -348,5 +361,114 @@ class SeniorAppointmentAssignerTest {
 
         verify(doctor).setChiefMedicalOfficer(true);
         verify(doctor, never()).addSkill(eq(SkillType.S_LEADER), any(Skill.class));
+    }
+
+    @Test
+    void eachTechSpecialityGetsItsOwnDepartmentHead() {
+        // The point of the second tier: a Mek Tech department and a Mechanic department each get their
+        // own head, judged on their own speciality rather than lumped together.
+        Campaign campaign = campaign();
+        Person bestMekTech = junior(PersonnelRole.MEK_TECH);
+        withSkill(bestMekTech, SkillType.S_TECH_MEK, 8);
+        Person otherMekTech = junior(PersonnelRole.MEK_TECH);
+        withSkill(otherMekTech, SkillType.S_TECH_MEK, 3);
+        Person bestMechanic = junior(PersonnelRole.MECHANIC);
+        withSkill(bestMechanic, SkillType.S_TECH_MECHANIC, 7);
+        Person otherMechanic = junior(PersonnelRole.MECHANIC);
+        withSkill(otherMechanic, SkillType.S_TECH_MECHANIC, 2);
+
+        SeniorAppointmentAssigner.assign(campaign,
+              List.of(bestMekTech, otherMekTech, bestMechanic, otherMechanic));
+
+        verify(bestMekTech).setDepartmentHead(true);
+        verify(bestMechanic).setDepartmentHead(true);
+        verify(otherMekTech, never()).setDepartmentHead(anyBoolean());
+        verify(otherMechanic, never()).setDepartmentHead(anyBoolean());
+    }
+
+    @Test
+    void administrativeSpecialitiesGetDepartmentHeadsToo() {
+        Campaign campaign = campaign();
+        Person bestLogistics = junior(PersonnelRole.ADMINISTRATOR_LOGISTICS);
+        withSkill(bestLogistics, SkillType.S_ADMIN, 8);
+        Person otherLogistics = junior(PersonnelRole.ADMINISTRATOR_LOGISTICS);
+        withSkill(otherLogistics, SkillType.S_ADMIN, 2);
+
+        SeniorAppointmentAssigner.assign(campaign, List.of(bestLogistics, otherLogistics));
+
+        verify(bestLogistics).setDepartmentHead(true);
+        verify(otherLogistics, never()).setDepartmentHead(anyBoolean());
+    }
+
+    @Test
+    void aDepartmentOfOneGetsNoHead() {
+        // Titling a lone technician the head of a department they are the entirety of adds nothing.
+        Campaign campaign = campaign();
+        Person loneMekTech = junior(PersonnelRole.MEK_TECH);
+        withSkill(loneMekTech, SkillType.S_TECH_MEK, 8);
+
+        SeniorAppointmentAssigner.assign(campaign, List.of(loneMekTech));
+
+        verify(loneMekTech, never()).setDepartmentHead(anyBoolean());
+        // The branch-wide post still goes to them - they are the whole technical staff.
+        verify(loneMekTech).setHeadTechnician(true);
+    }
+
+    @Test
+    void doctorsGetNoDepartmentHeadBecauseTheChiefMedicalOfficerHeadsMedicine() {
+        Campaign campaign = campaign();
+        Person seniorDoctor = junior(PersonnelRole.DOCTOR);
+        withSkill(seniorDoctor, SkillType.S_SURGERY, 8);
+        Person otherDoctor = junior(PersonnelRole.DOCTOR);
+        withSkill(otherDoctor, SkillType.S_SURGERY, 3);
+
+        SeniorAppointmentAssigner.assign(campaign, List.of(seniorDoctor, otherDoctor));
+
+        verify(seniorDoctor).setChiefMedicalOfficer(true);
+        verify(seniorDoctor, never()).setDepartmentHead(anyBoolean());
+        verify(otherDoctor, never()).setDepartmentHead(anyBoolean());
+    }
+
+    @Test
+    void aHeadIsPromotedAboveTheirStaffRatherThanLevelWithThem() {
+        // The reported problem: the chief shared a rank with one of the people they run.
+        Campaign campaign = campaign();
+        Person chosen = junior(PersonnelRole.DOCTOR);
+        withSkill(chosen, SkillType.S_SURGERY, 9);
+        when(chosen.getRankNumeric()).thenReturn(30);
+        when(chosen.getRankSystem()).thenReturn(sldf());
+
+        Person seniorStaff = junior(PersonnelRole.DOCTOR);
+        withSkill(seniorStaff, SkillType.S_SURGERY, 2);
+        when(seniorStaff.getRankNumeric()).thenReturn(34);
+
+        SeniorAppointmentAssigner.assign(campaign, List.of(chosen, seniorStaff));
+
+        verify(chosen).setChiefMedicalOfficer(true);
+        ArgumentCaptor<Integer> promotedTo = ArgumentCaptor.forClass(Integer.class);
+        verify(chosen).setRank(promotedTo.capture());
+        assertTrue(promotedTo.getValue() > 34,
+              "the chief should outrank their staff, not share a rank with them");
+    }
+
+    @Test
+    void promotionSkipsRungsTheRankSystemLeavesBlank() {
+        // SLDF names nothing at 37, so a chief stepping up from 36 must not stop there.
+        Campaign campaign = campaign();
+        Person chosen = junior(PersonnelRole.DOCTOR);
+        withSkill(chosen, SkillType.S_SURGERY, 9);
+        when(chosen.getRankNumeric()).thenReturn(30);
+        when(chosen.getRankSystem()).thenReturn(sldf());
+
+        Person seniorStaff = junior(PersonnelRole.DOCTOR);
+        withSkill(seniorStaff, SkillType.S_SURGERY, 2);
+        when(seniorStaff.getRankNumeric()).thenReturn(36);
+
+        SeniorAppointmentAssigner.assign(campaign, List.of(chosen, seniorStaff));
+
+        ArgumentCaptor<Integer> promotedTo = ArgumentCaptor.forClass(Integer.class);
+        verify(chosen).setRank(promotedTo.capture());
+        assertNotEquals(37, promotedTo.getValue().intValue(),
+              "index 37 is blank in SLDF and must be skipped");
     }
 }

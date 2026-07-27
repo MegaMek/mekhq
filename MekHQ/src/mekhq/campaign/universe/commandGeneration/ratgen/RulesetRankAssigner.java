@@ -380,7 +380,7 @@ public final class RulesetRankAssigner {
     private static final int RANK_LIEUTENANT = 33;      // O3
     private static final int RANK_CAPTAIN = 34;         // O4
     private static final int RANK_MAJOR = 35;           // O5
-    private static final int RANK_LT_COLONEL = 37;      // O7
+    static final int RANK_LT_COLONEL = 37;              // O7 - the ladder's officer ceiling
 
     /**
      * The rank a generated support person should hold, from their role and how good they are.

@@ -436,6 +436,10 @@ public class Person implements ILocatable {
     private boolean chiefMedicalOfficer;
     private boolean headTechnician;
     private boolean chiefAdministrator;
+    // The head of one specific department, which their primary role identifies - a Mek Tech holding
+    // this is the head Mek Tech. One flag rather than one per department, so adding a personnel role
+    // does not mean adding a field here.
+    private boolean departmentHead;
     private boolean trainer;
     private boolean underProtection;
     private boolean neverAssignMaintenanceAutomatically;
@@ -1338,7 +1342,24 @@ public class Person implements ILocatable {
         if (isChiefAdministrator()) {
             joiner.add(getTextAt(RESOURCE_BUNDLE, chiefAdministratorKey));
         }
+        if (isDepartmentHead()) {
+            joiner.add(getDepartmentHeadTitle());
+        }
         return joiner.toString();
+    }
+
+    /**
+     * The department head title for this person, built from the department their primary role names -
+     * a Mek Tech becomes "Head Mek Tech".
+     *
+     * @return the derived title, or an empty string if this person heads no department
+     */
+    public String getDepartmentHeadTitle() {
+        if (!isDepartmentHead()) {
+            return "";
+        }
+        return getFormattedTextAt(RESOURCE_BUNDLE, "seniorAppointment.departmentHead.title",
+              getPrimaryRole().getLabel(isClanPersonnel()));
     }
 
     public String getPrimaryRoleDesc() {
@@ -3425,6 +3446,21 @@ public class Person implements ILocatable {
         this.chiefAdministrator = chiefAdministrator;
     }
 
+    /**
+     * Whether this person heads the department their primary role names - the head Mek Tech, the head
+     * logistics administrator, and so on. Which department is not stored: it is whichever their primary
+     * role identifies, so the two can never disagree.
+     *
+     * @return {@code true} if this person heads their department
+     */
+    public boolean isDepartmentHead() {
+        return departmentHead;
+    }
+
+    public void setDepartmentHead(final boolean departmentHead) {
+        this.departmentHead = departmentHead;
+    }
+
     public boolean isTrainer() {
         return trainer;
     }
@@ -4075,6 +4111,9 @@ public class Person implements ILocatable {
             if (chiefAdministrator) {
                 MHQXMLUtility.writeSimpleXMLTag(pw, indent, "chiefAdministrator", true);
             }
+            if (departmentHead) {
+                MHQXMLUtility.writeSimpleXMLTag(pw, indent, "departmentHead", true);
+            }
             MHQXMLUtility.writeSimpleXMLTag(pw, indent, "trainer", trainer);
             MHQXMLUtility.writeSimpleXMLTag(pw, indent, "underProtection", underProtection);
             MHQXMLUtility.writeSimpleXMLTag(pw,
@@ -4720,6 +4759,8 @@ public class Person implements ILocatable {
                     person.setHeadTechnician(Boolean.parseBoolean(wn2.getTextContent().trim()));
                 } else if (nodeName.equalsIgnoreCase("chiefAdministrator")) {
                     person.setChiefAdministrator(Boolean.parseBoolean(wn2.getTextContent().trim()));
+                } else if (nodeName.equalsIgnoreCase("departmentHead")) {
+                    person.setDepartmentHead(Boolean.parseBoolean(wn2.getTextContent().trim()));
                 } else if (nodeName.equalsIgnoreCase("trainer")) {
                     person.setTrainer(Boolean.parseBoolean(wn2.getTextContent().trim()));
                 } else if (nodeName.equalsIgnoreCase("underProtection")) {

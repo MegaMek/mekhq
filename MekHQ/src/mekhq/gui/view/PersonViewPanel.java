@@ -1296,7 +1296,7 @@ public class PersonViewPanel extends JScrollablePanel {
         String roleAndAppointment = appointmentTitles.isEmpty()
               ? person.getRoleDesc()
               : person.getRoleDesc() + " - " + appointmentTitles;
-        lblType.setText(String.format(resourceMap.getString("format.italic"), roleAndAppointment));
+        lblType.setText(String.format(resourceMap.getString("format.italicNoWrap"), roleAndAppointment));
         lblType.getAccessibleContext().setAccessibleName("Role: " + roleAndAppointment);
         gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 0;

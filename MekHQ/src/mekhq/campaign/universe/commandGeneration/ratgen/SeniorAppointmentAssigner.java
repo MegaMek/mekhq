@@ -32,8 +32,11 @@
  */
 package mekhq.campaign.universe.commandGeneration.ratgen;
 
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.function.BiConsumer;
 import java.util.function.Predicate;
@@ -43,6 +46,9 @@ import megamek.logging.MMLogger;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.enums.PersonnelRole;
+import mekhq.campaign.personnel.enums.Profession;
+import mekhq.campaign.personnel.ranks.Rank;
+import mekhq.campaign.personnel.ranks.RankSystem;
 import mekhq.campaign.personnel.skills.Skill;
 import mekhq.campaign.personnel.skills.SkillType;
 
@@ -60,9 +66,17 @@ import mekhq.campaign.personnel.skills.SkillType;
  * one. Ties fall to whoever already outranks the other, so the result is stable rather than dependent
  * on the order people happened to be generated in.</p>
  *
- * <p>The appointee is then promoted to match the highest-ranked person eligible for the same post, so
- * a section head is never outranked by their own staff. That rank is copied from the peer rather than
- * calculated, so it can only land on a rung the rank system actually names.</p>
+ * <p>Posts come in two tiers. Each specific role that has a department of its own gets a department
+ * head - the head Mek Tech, the head logistics administrator - and above them sit the overall posts
+ * that span a whole branch: head technician across every technical role, chief administrator across
+ * every administrative one, chief medical officer over medicine. Both tiers are filled on the same
+ * criteria, a department head simply being judged against their own speciality.</p>
+ *
+ * <p>Every appointee is then promoted one populated rung above the highest-ranked of the staff they
+ * lead, so a head outranks their people rather than sharing a rank with one of them. Departments are
+ * filled first, so an overall head is raised above their department heads in turn. The step skips
+ * rungs the rank system leaves unnamed, and stops below the general officer ranks so no section head
+ * outranks the officer commanding the force.</p>
  *
  * <p>Taking a post also confers Leadership, at the experience level of the appointee's own discipline
  * competence. Support staff are generated without any command skills - {@code DefaultSkillGenerator}
@@ -75,6 +89,24 @@ import mekhq.campaign.personnel.skills.SkillType;
  */
 public final class SeniorAppointmentAssigner {
     private static final MMLogger LOGGER = MMLogger.create(SeniorAppointmentAssigner.class);
+
+    /**
+     * A department needs at least this many people before it gets a head. A lone technician leads
+     * nobody, and titling them head of a department they are the entirety of adds nothing.
+     */
+    private static final int MINIMUM_DEPARTMENT_SIZE = 2;
+
+    /**
+     * The highest rank a post-holder may be promoted to, one rung above the support ladder's own
+     * ceiling of {@link RulesetRankAssigner#RANK_LT_COLONEL}.
+     *
+     * <p>The extra rung is what makes "a head outranks their staff" achievable. Rank systems do not
+     * name every index: SLDF names Major at 35 and then nothing until Colonel at 38, so a head whose
+     * staff includes a Major has no rung to step to below Colonel. Stopping here still keeps every
+     * post-holder below the general officer ranks, so a section head cannot outrank the officer
+     * commanding the force.</p>
+     */
+    private static final int APPOINTMENT_RANK_CEILING = RulesetRankAssigner.RANK_LT_COLONEL + 1;
 
     private SeniorAppointmentAssigner() {
     }
@@ -132,21 +164,21 @@ public final class SeniorAppointmentAssigner {
      * currently generated without Leadership, so that term contributes nothing today and the pick rests
      * on the skills they do have; it starts counting the moment they have it.</p>
      *
-     * @param person      the candidate to score
-     * @param appointment the post being filled, which decides the discipline skills
+     * @param person           the candidate to score
+     * @param disciplineSkills the skills that define competence for the post being filled
      *
      * @return the candidate's score, higher being better qualified
      */
-    private static int scoreFor(Person person, Appointment appointment) {
+    private static int scoreFor(Person person, Set<String> disciplineSkills) {
         int disciplineScore = 0;
-        for (String skillName : appointment.disciplineSkills) {
+        for (String skillName : disciplineSkills) {
             disciplineScore = Math.max(disciplineScore, skillLevel(person, skillName));
         }
 
         int managementScore = skillLevel(person, SkillType.S_LEADER);
-        // Administration is the discipline skill for the chief administrator, so adding it again would
-        // count it twice for that post alone.
-        if (!appointment.disciplineSkills.contains(SkillType.S_ADMIN)) {
+        // Administration is itself a discipline skill for administrative posts, so adding it again
+        // would count it twice for those alone.
+        if (!disciplineSkills.contains(SkillType.S_ADMIN)) {
             managementScore += skillLevel(person, SkillType.S_ADMIN);
         }
         return disciplineScore + managementScore;
@@ -179,9 +211,102 @@ public final class SeniorAppointmentAssigner {
         }
 
         Collection<Person> existingPersonnel = campaign.getPersonnel().values();
+        // Departments first: an overall head is promoted above the heads below them, which only works
+        // if those heads already hold the rank they are entitled to.
+        assignDepartmentHeads(campaign, candidates, existingPersonnel);
         for (Appointment appointment : Appointment.values()) {
             assignOne(campaign, appointment, candidates, existingPersonnel);
         }
+    }
+
+    /**
+     * Gives every department represented in the generated staff its own head, judged on that
+     * department's own skills.
+     *
+     * <p>A department of one is left without a head: a lone Mek Tech leads nobody, and titling them
+     * head of a department they are the entirety of adds nothing. Departments are the specific roles
+     * beneath the branch-wide posts, so medicine is excluded - the chief medical officer already heads
+     * it.</p>
+     *
+     * @param campaign           the campaign supplying rank comparison rules
+     * @param candidates         the people this generation created
+     * @param existingPersonnel  everyone already on the books, used to spot posts that are filled
+     */
+    private static void assignDepartmentHeads(Campaign campaign, Collection<Person> candidates,
+          Collection<Person> existingPersonnel) {
+        Map<PersonnelRole, List<Person>> byDepartment = new LinkedHashMap<>();
+        for (Person candidate : candidates) {
+            if (candidate == null) {
+                continue;
+            }
+            PersonnelRole role = candidate.getPrimaryRole();
+            if (!isDepartmentRole(role)) {
+                continue;
+            }
+            byDepartment.computeIfAbsent(role, key -> new ArrayList<>()).add(candidate);
+        }
+
+        for (Map.Entry<PersonnelRole, List<Person>> department : byDepartment.entrySet()) {
+            PersonnelRole role = department.getKey();
+            List<Person> staff = department.getValue();
+            if (staff.size() < MINIMUM_DEPARTMENT_SIZE) {
+                LOGGER.debug("[CompanyGen][Appointments] no head for {}; only {} in the department",
+                      role, staff.size());
+                continue;
+            }
+
+            Person incumbent = firstMatching(existingPersonnel,
+                  person -> person.isDepartmentHead() && (person.getPrimaryRole() == role));
+            if (incumbent != null) {
+                LOGGER.debug("[CompanyGen][Appointments] head of {} left as is; already held by '{}'",
+                      role, incumbent.getFullName());
+                continue;
+            }
+
+            Set<String> disciplineSkills = Set.copyOf(role.getSkillsForProfession());
+            Person head = bestCandidate(campaign, staff, disciplineSkills);
+            if (head == null) {
+                continue;
+            }
+            head.setDepartmentHead(true);
+            LOGGER.info("[CompanyGen][Appointments] head of {} -> '{}', chosen from {} in the department",
+                  role, head.getFullName(), staff.size());
+            promoteToOutrankTheirStaff(head, staff, "head of " + role);
+            grantLeadership(head, disciplineSkills, "head of " + role);
+        }
+    }
+
+    /**
+     * @return {@code true} if this role runs as a department of its own, beneath a branch-wide post
+     */
+    private static boolean isDepartmentRole(PersonnelRole role) {
+        return role.isTech() || role.isAdministrator();
+    }
+
+    /**
+     * Picks the best-qualified person from a pool, scoring on the given discipline skills.
+     *
+     * @param campaign         the campaign supplying rank comparison rules
+     * @param pool             the people to choose between
+     * @param disciplineSkills the skills that define competence for this post
+     *
+     * @return the best-qualified person, or {@code null} if the pool is empty
+     */
+    private static @Nullable Person bestCandidate(Campaign campaign, List<Person> pool,
+          Set<String> disciplineSkills) {
+        Person bestCandidate = null;
+        int bestScore = Integer.MIN_VALUE;
+        for (Person candidate : pool) {
+            int score = scoreFor(candidate, disciplineSkills);
+            boolean outscoresBest = (bestCandidate == null) || (score > bestScore);
+            boolean tiedButOutranksBest = (bestCandidate != null) && (score == bestScore)
+                  && candidate.outRanksUsingSkillTiebreaker(campaign, bestCandidate);
+            if (outscoresBest || tiedButOutranksBest) {
+                bestCandidate = candidate;
+                bestScore = score;
+            }
+        }
+        return bestCandidate;
     }
 
     /**
@@ -197,31 +322,14 @@ public final class SeniorAppointmentAssigner {
             return;
         }
 
-        Person bestCandidate = null;
-        int bestScore = Integer.MIN_VALUE;
-        Person highestRankedPeer = null;
-        int eligibleCount = 0;
+        List<Person> eligibleStaff = new ArrayList<>();
         for (Person candidate : candidates) {
-            if ((candidate == null) || !appointment.isEligible.test(candidate.getPrimaryRole())) {
-                continue;
-            }
-            eligibleCount++;
-
-            if ((highestRankedPeer == null)
-                      || candidate.outRanksUsingSkillTiebreaker(campaign, highestRankedPeer)) {
-                highestRankedPeer = candidate;
-            }
-
-            int score = scoreFor(candidate, appointment);
-            boolean outscoresBest = (bestCandidate == null) || (score > bestScore);
-            boolean tiedButOutranksBest = (bestCandidate != null) && (score == bestScore)
-                  && candidate.outRanksUsingSkillTiebreaker(campaign, bestCandidate);
-            if (outscoresBest || tiedButOutranksBest) {
-                bestCandidate = candidate;
-                bestScore = score;
+            if ((candidate != null) && appointment.isEligible.test(candidate.getPrimaryRole())) {
+                eligibleStaff.add(candidate);
             }
         }
 
+        Person bestCandidate = bestCandidate(campaign, eligibleStaff, appointment.disciplineSkills);
         if (bestCandidate == null) {
             LOGGER.debug("[CompanyGen][Appointments] {} left vacant; no generated person holds an "
                   + "eligible primary role", appointment.description);
@@ -229,11 +337,11 @@ public final class SeniorAppointmentAssigner {
         }
 
         appointment.appoint.accept(bestCandidate, true);
-        LOGGER.info("[CompanyGen][Appointments] {} -> '{}' ({}) score={}, chosen from {} eligible",
+        LOGGER.info("[CompanyGen][Appointments] {} -> '{}' ({}), chosen from {} eligible",
               appointment.description, bestCandidate.getFullName(),
-              bestCandidate.getPrimaryRole(), bestScore, eligibleCount);
-        promoteToOutrankTheirStaff(bestCandidate, highestRankedPeer, appointment);
-        grantLeadership(bestCandidate, appointment);
+              bestCandidate.getPrimaryRole(), eligibleStaff.size());
+        promoteToOutrankTheirStaff(bestCandidate, eligibleStaff, appointment.description);
+        grantLeadership(bestCandidate, appointment.disciplineSkills, appointment.description);
     }
 
     /**
@@ -245,13 +353,15 @@ public final class SeniorAppointmentAssigner {
      * is never downgraded. Does nothing either if they have no discipline skill to scale from, since
      * there is then no defensible level to grant.</p>
      *
-     * @param appointee   the person who just took the post
-     * @param appointment the post, which decides the discipline skills to scale from
+     * @param appointee        the person who just took the post
+     * @param disciplineSkills the skills to scale the granted Leadership from
+     * @param description      the post, for logging
      */
-    private static void grantLeadership(Person appointee, Appointment appointment) {
+    private static void grantLeadership(Person appointee, Set<String> disciplineSkills,
+          String description) {
         int disciplineLevel = 0;
         String disciplineSkillName = null;
-        for (String skillName : appointment.disciplineSkills) {
+        for (String skillName : disciplineSkills) {
             int level = skillLevel(appointee, skillName);
             if (level > disciplineLevel) {
                 disciplineLevel = level;
@@ -260,7 +370,7 @@ public final class SeniorAppointmentAssigner {
         }
         if (disciplineSkillName == null) {
             LOGGER.debug("[CompanyGen][Appointments] no Leadership granted to {} '{}'; they have no "
-                  + "discipline skill to scale from", appointment.description, appointee.getFullName());
+                  + "discipline skill to scale from", description, appointee.getFullName());
             return;
         }
 
@@ -269,42 +379,82 @@ public final class SeniorAppointmentAssigner {
         Skill existing = appointee.getSkills().getSkill(SkillType.S_LEADER);
         if ((existing != null) && (existing.getLevel() >= granted.getLevel())) {
             LOGGER.debug("[CompanyGen][Appointments] {} '{}' already leads at level {}; leaving it",
-                  appointment.description, appointee.getFullName(), existing.getLevel());
+                  description, appointee.getFullName(), existing.getLevel());
             return;
         }
 
         appointee.addSkill(SkillType.S_LEADER, granted);
         LOGGER.info("[CompanyGen][Appointments] granted Leadership {} to {} '{}', scaled from {} {}",
-              granted.getLevel(), appointment.description, appointee.getFullName(),
+              granted.getLevel(), description, appointee.getFullName(),
               disciplineSkillName, disciplineLevel);
     }
 
     /**
-     * Raises the appointee to the rank of the highest-ranked person eligible for the same post, so a
-     * section head is not outranked by their own staff.
+     * Raises the appointee one named rung above the highest-ranked of the staff they lead, so a head
+     * outranks their people instead of sharing a rank with one of them.
      *
-     * <p>The rank is copied from that peer rather than calculated. A peer's rank already resolves to a
-     * real name in this rank system, so copying it cannot strand the appointee on an unnamed rung the
-     * way picking an index can.</p>
+     * <p>Ranks are stepped to rather than calculated: the search walks up until it finds a rung this
+     * rank system actually names, so a promotion can never strand someone on a blank rung. It stops at
+     * {@link #APPOINTMENT_RANK_CEILING}, which keeps every post-holder below the general officer ranks
+     * so none of them ends up outranking the force commander.</p>
      *
-     * @param appointee         the person who just took the post
-     * @param highestRankedPeer the highest-ranked candidate for the same post, or {@code null} if
-     *                          there were none
-     * @param appointment       the post, for logging
+     * @param appointee   the person who just took the post
+     * @param staff       everyone eligible for the post, including the appointee, who is skipped
+     * @param description the post, for logging
      */
-    private static void promoteToOutrankTheirStaff(Person appointee, @Nullable Person highestRankedPeer,
-          Appointment appointment) {
-        if ((highestRankedPeer == null) || highestRankedPeer.equals(appointee)) {
+    private static void promoteToOutrankTheirStaff(Person appointee, List<Person> staff,
+          String description) {
+        int topStaffRank = Integer.MIN_VALUE;
+        for (Person member : staff) {
+            if (!member.equals(appointee)) {
+                topStaffRank = Math.max(topStaffRank, member.getRankNumeric());
+            }
+        }
+        if (topStaffRank == Integer.MIN_VALUE) {
+            LOGGER.debug("[CompanyGen][Appointments] {} '{}' leads nobody; rank unchanged",
+                  description, appointee.getFullName());
             return;
         }
-        int peerRank = highestRankedPeer.getRankNumeric();
-        if (appointee.getRankNumeric() >= peerRank) {
+
+        int floorRank = Math.max(topStaffRank, appointee.getRankNumeric());
+        int targetRank = nextNamedRankAbove(appointee, floorRank);
+        if (targetRank <= appointee.getRankNumeric()) {
+            LOGGER.debug("[CompanyGen][Appointments] {} '{}' stays at rank {}; no named rung above {} "
+                        + "within the ladder ceiling", description, appointee.getFullName(),
+                  appointee.getRankNumeric(), floorRank);
             return;
         }
-        LOGGER.info("[CompanyGen][Appointments] promoting {} '{}' from rank {} to {}, matching their "
-                    + "highest-ranked peer '{}'", appointment.description, appointee.getFullName(),
-              appointee.getRankNumeric(), peerRank, highestRankedPeer.getFullName());
-        appointee.setRank(peerRank);
+        LOGGER.info("[CompanyGen][Appointments] promoting {} '{}' from rank {} to {}, one step above "
+                    + "their highest-ranked staff at {}", description, appointee.getFullName(),
+              appointee.getRankNumeric(), targetRank, topStaffRank);
+        appointee.setRank(targetRank);
+    }
+
+    /**
+     * Finds the lowest rank above {@code floorRank} that this person's rank system gives a real name,
+     * so a promotion never lands on a blank rung.
+     *
+     * @param person    the person whose rank system and profession decide which rungs are named
+     * @param floorRank the rank to step up from
+     *
+     * @return the next named rank above {@code floorRank}, or {@code floorRank} if the system names
+     *       none below the ceiling
+     */
+    private static int nextNamedRankAbove(Person person, int floorRank) {
+        RankSystem rankSystem = person.getRankSystem();
+        if (rankSystem == null) {
+            return floorRank;
+        }
+        Profession baseProfession = Profession.getProfessionFromPersonnelRole(person.getPrimaryRole());
+        int ceiling = Math.min(APPOINTMENT_RANK_CEILING, rankSystem.getRanks().size() - 1);
+        for (int index = floorRank + 1; index <= ceiling; index++) {
+            Rank candidate = rankSystem.getRank(index);
+            if ((candidate != null)
+                      && !candidate.isEmpty(baseProfession.getProfession(rankSystem, candidate))) {
+                return index;
+            }
+        }
+        return floorRank;
     }
 
     /**
