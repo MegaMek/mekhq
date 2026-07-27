@@ -240,6 +240,30 @@ public class Bloodname {
      *       Though based as much as possible on official sources, the method employed here involves a considerable
      *       amount of speculation.
      */
+    /**
+     * Finds a Bloodname by name.
+     *
+     * <p>{@link Person} stores only the name it was given, so anything that
+     * wants the house behind it - its founder, the Clan it originates with, whether it is exclusive -
+     * has to look the record back up.</p>
+     *
+     * @param name the Bloodname to find, matched without regard to case
+     *
+     * @return the matching Bloodname, or {@code null} if the name is blank, the data has not loaded,
+     *       or no such Bloodname exists
+     */
+    public static @Nullable Bloodname getBloodname(final @Nullable String name) {
+        if ((bloodnames == null) || (name == null) || name.isBlank()) {
+            return null;
+        }
+        for (Bloodname bloodname : bloodnames) {
+            if (name.equalsIgnoreCase(bloodname.getName())) {
+                return bloodname;
+            }
+        }
+        return null;
+    }
+
     public static @Nullable Bloodname randomBloodname(String factionCode, Phenotype phenotype, int year) {
         return randomBloodname(Clan.getClan(factionCode), phenotype, year);
     }

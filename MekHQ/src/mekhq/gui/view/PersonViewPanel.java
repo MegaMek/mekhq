@@ -107,6 +107,8 @@ import mekhq.campaign.finances.Money;
 import mekhq.campaign.log.LogEntry;
 import mekhq.campaign.personnel.Award;
 import mekhq.campaign.personnel.Injury;
+import mekhq.campaign.personnel.Bloodname;
+import mekhq.campaign.personnel.Clan;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.PersonAwardController;
 import mekhq.campaign.personnel.PersonnelOptions;
@@ -236,6 +238,16 @@ public class PersonViewPanel extends JScrollablePanel {
         pnlGenealogy.setLayout(new GridBagLayout());
         initializeGenealogy(pnlGenealogy);
         tabbedPane.addTab(getTextAt(RESOURCE_BUNDLE, "pnlGenealogy.title"), pnlGenealogy);
+
+        // The Clan counterpart to Genealogy. Shown only for Clan personnel, for whom descent runs
+        // through a Bloodname House rather than a family, and added alongside Genealogy rather than in
+        // place of it because Clan characters can still carry ordinary family links.
+        if (person.isClanPersonnel()) {
+            JPanel pnlBloodname = new JPanel();
+            pnlBloodname.setLayout(new GridBagLayout());
+            initializeBloodname(pnlBloodname);
+            tabbedPane.addTab(getTextAt(RESOURCE_BUNDLE, "pnlBloodname.title"), pnlBloodname);
+        }
 
         JPanel pnlPersonnelRecordTab = new JPanel();
         pnlPersonnelRecordTab.setLayout(new GridBagLayout());
@@ -494,6 +506,146 @@ public class PersonViewPanel extends JScrollablePanel {
 
         // use glue to fill up the remaining space so everything is aligned to the top
         addGlue(gridY, pnlGenealogy);
+    }
+
+    /**
+     * Builds the Bloodname tab: the name this warrior carries, the house behind it, and what is known
+     * of that house.
+     */
+    private void initializeBloodname(JPanel pnlBloodname) {
+        int gridY = 0;
+
+        GridBagConstraints gridBagConstraints = new GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = gridY;
+        gridBagConstraints.weightx = 1.0;
+        gridBagConstraints.insets = new Insets(0, 0, 10, 0);
+        gridBagConstraints.fill = GridBagConstraints.BOTH;
+        gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
+        pnlBloodname.add(fillBloodname(), gridBagConstraints);
+        gridY++;
+
+        addGlue(gridY, pnlBloodname);
+    }
+
+    /**
+     * The Bloodname panel. An unbloodnamed warrior gets a single line saying so rather than a set of
+     * empty fields - most Clan warriors never win one, so it is the ordinary case and not a gap.
+     */
+    private JPanel fillBloodname() {
+        JPanel pnlBloodnameDetails = new JPanel(new GridBagLayout());
+        pnlBloodnameDetails.setBorder(RoundedLineBorder.createRoundedLineBorder(
+              getTextAt(RESOURCE_BUNDLE, "pnlBloodnameDetails.title")));
+
+        int gridY = 0;
+        String heldBloodname = person.getBloodname();
+        if ((heldBloodname == null) || heldBloodname.isBlank()) {
+            addBloodnameRow(pnlBloodnameDetails, gridY,
+                  getTextAt(RESOURCE_BUNDLE, "lblBloodname.text"),
+                  getTextAt(RESOURCE_BUNDLE, "lblBloodname.none"));
+            return pnlBloodnameDetails;
+        }
+
+        addBloodnameRow(pnlBloodnameDetails, gridY++, getTextAt(RESOURCE_BUNDLE, "lblBloodname.text"),
+              heldBloodname);
+
+        Bloodname bloodname = Bloodname.getBloodname(heldBloodname);
+        if (bloodname == null) {
+            // The name is stored as free text, so it can be one the data does not describe - a
+            // hand-typed name, or one retired from the tables.
+            addBloodnameRow(pnlBloodnameDetails, gridY,
+                  getTextAt(RESOURCE_BUNDLE, "lblBloodnameHouse.text"),
+                  getTextAt(RESOURCE_BUNDLE, "lblBloodnameHouse.unknown"));
+            return pnlBloodnameDetails;
+        }
+
+        addBloodnameRow(pnlBloodnameDetails, gridY++,
+              getTextAt(RESOURCE_BUNDLE, "lblBloodnameHouse.text"),
+              getFormattedTextAt(RESOURCE_BUNDLE, "lblBloodnameHouse.value", bloodname.getName()));
+
+        String founder = bloodname.getFounder();
+        if ((founder != null) && !founder.isBlank()) {
+            addBloodnameRow(pnlBloodnameDetails, gridY++,
+                  getTextAt(RESOURCE_BUNDLE, "lblBloodnameFounder.text"),
+                  getFormattedTextAt(RESOURCE_BUNDLE, "lblBloodnameFounder.value",
+                        founder, bloodname.getName()));
+        }
+
+        Clan originClan = bloodname.getOriginClan();
+        if (originClan != null) {
+            addBloodnameRow(pnlBloodnameDetails, gridY++,
+                  getTextAt(RESOURCE_BUNDLE, "lblBloodnameOriginClan.text"),
+                  originClan.getFullName(campaign.getGameYear()));
+        }
+
+        if (bloodname.getPhenotype() != null) {
+            addBloodnameRow(pnlBloodnameDetails, gridY++,
+                  getTextAt(RESOURCE_BUNDLE, "lblBloodnamePhenotype.text"),
+                  bloodname.getPhenotype().getLabel());
+        }
+
+        addBloodnameRow(pnlBloodnameDetails, gridY++,
+              getTextAt(RESOURCE_BUNDLE, "lblBloodnameStanding.text"),
+              bloodnameStanding(bloodname));
+
+        // Placeholder until the house histories are written. Kept as its own resource string so
+        // filling them in later is a data change rather than a code change.
+        addBloodnameRow(pnlBloodnameDetails, gridY,
+              getTextAt(RESOURCE_BUNDLE, "lblBloodnameHistory.text"),
+              getTextAt(RESOURCE_BUNDLE, "lblBloodnameHistory.placeholder"));
+
+        return pnlBloodnameDetails;
+    }
+
+    /**
+     * How this Bloodname stands in the year the campaign has reached - whether it is still granted,
+     * held only by its own Clan, or no longer awarded at all.
+     */
+    private String bloodnameStanding(Bloodname bloodname) {
+        int year = campaign.getGameYear();
+        List<String> standings = new ArrayList<>();
+        if (bloodname.isInactive(year)) {
+            standings.add(getTextAt(RESOURCE_BUNDLE, "bloodnameStanding.inactive"));
+        }
+        if (bloodname.isAbjured(year)) {
+            standings.add(getTextAt(RESOURCE_BUNDLE, "bloodnameStanding.abjured"));
+        }
+        if (bloodname.isExclusive()) {
+            standings.add(getTextAt(RESOURCE_BUNDLE, "bloodnameStanding.exclusive"));
+        }
+        if (bloodname.isLimited()) {
+            standings.add(getTextAt(RESOURCE_BUNDLE, "bloodnameStanding.limited"));
+        }
+        return standings.isEmpty()
+              ? getTextAt(RESOURCE_BUNDLE, "bloodnameStanding.active")
+              : String.join(", ", standings);
+    }
+
+    /**
+     * Adds one label-and-value row to the Bloodname panel.
+     *
+     * @param panel  the panel to add to
+     * @param gridY  the row to place it on
+     * @param label  the field name
+     * @param value  the field value
+     */
+    private static void addBloodnameRow(JPanel panel, int gridY, String label, String value) {
+        JLabel fieldLabel = new JLabel(label);
+        fieldLabel.setName("lblBloodnameField" + gridY);
+        GridBagConstraints gridBagConstraints = new GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = gridY;
+        gridBagConstraints.fill = GridBagConstraints.NONE;
+        gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
+        panel.add(fieldLabel, gridBagConstraints);
+
+        JLabel fieldValue = new JLabel(String.format("<html>%s</html>", value));
+        fieldValue.setName("lblBloodnameValue" + gridY);
+        fieldLabel.setLabelFor(fieldValue);
+        gridBagConstraints.gridx = 1;
+        gridBagConstraints.weightx = 1.0;
+        gridBagConstraints.insets = new Insets(0, 10, 0, 0);
+        panel.add(fieldValue, gridBagConstraints);
     }
 
     private static void addGlue(int gridY, JPanel panel) {
