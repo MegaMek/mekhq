@@ -137,6 +137,12 @@ public final class CommandGenerator {
     private static final MMLogger LOGGER = MMLogger.create(CommandGenerator.class);
     private static final String RESOURCE_BUNDLE = "mekhq.resources.CommandGenerator";
 
+    // Bloodname target shifts for the calibre of the force. Negative lowers the target a 2d6 roll has
+    // to beat, so these make a Bloodname likelier; kept small because the warrior's own skills
+    // already weigh on the same roll.
+    private static final int BLOODNAME_MODIFIER_VETERAN = -1;
+    private static final int BLOODNAME_MODIFIER_ELITE = -2;
+
     // Single-thread daemon executor used by the addNewUnit watchdog. Scheduled tasks fire 5s after
     // each addNewUnit call begins; if addNewUnit returns first, the task is cancelled. If it hangs,
     // the task wins the race and dumps interesting thread stacks so the deadlock site is captured
@@ -486,11 +492,17 @@ public final class CommandGenerator {
         // and random callsigns for non-Clan MekWarriors (support staff don't have the MEKWARRIOR
         // primary role so they're naturally skipped). These are pure Person-state mutations with
         // no algorithmic logic, so they live in the pipeline rather than in a dedicated helper.
+        // Clan campaigns skip callsigns because their warriors carry a bloodname instead, which
+        // assignBloodnames below awards.
         LOGGER.info("[CompanyGen][Pipeline]Stage 7d: personnel flags");
         if (listener != null) {
             listener.updateProgress(0.0, "Applying personnel flags...");
         }
         applyPersonnelFlags(campaign, options, generatedPersons, rootCommander);
+
+        // Bloodnames, for the Clan warriors who earn one. Runs here because the roll is made against
+        // the person's rank, which stage 7c has just assigned.
+        assignBloodnames(campaign, options, generatedPersons);
 
         // 8. Spare-parts warehouse stock-up. Uses the same PartsInUseManager the daily warehouse
         // and ongoing auto-logistics rely on, so the starting inventory is consistent with the
@@ -883,6 +895,86 @@ public final class CommandGenerator {
         secondInCommand.setSecondInCommand(true);
         LOGGER.info("[CompanyGen][Pipeline][Flags] second-in-command flag set on '{}'",
               secondInCommand.getFullName());
+    }
+
+    /**
+     * Awards bloodnames to the Clan warriors this generation produced who earn one.
+     *
+     * <p>A generated Clan command previously had none at all. The ratgen layer carries a bloodname
+     * field on its crew descriptor, but the engine call that would fill it is commented out in
+     * {@code Ruleset.processRoot} and the method it referred to no longer exists, so the field is
+     * always empty - and nothing on this path asked MekHQ for one either. Hiring a Clan MekWarrior
+     * through the normal personnel generator has always rolled for a bloodname; generating a whole
+     * Galaxy did not.</p>
+     *
+     * <p>Every generated person is offered to
+     * {@link ForceHumanResources#checkBloodnameAdd(Campaign, Person, boolean)}, which applies the
+     * existing rules rather than a second set: non-Clan personnel and anyone without a phenotype are
+     * turned away, so support staff and Inner Sphere commands are untouched. The dice are rolled
+     * normally, so era, unit rating, rank and the warrior's own skills decide it exactly as they do
+     * for a hire.</p>
+     *
+     * <p>The calibre of the force shifts the target: a veteran or elite command carries more
+     * Bloodnamed warriors than a garrison unit whose members happen to have the same individual
+     * skills, because the Clans post their Bloodnamed to their better formations. The individual
+     * warrior's own skills already count towards the roll, so this is a modest thumb on the scale
+     * rather than a second helping of the same thing.</p>
+     *
+     * @param campaign         the campaign the warriors belong to, supplying era and unit rating
+     * @param options          the generation options, read for the force's experience level
+     * @param generatedPersons every person this generation created
+     */
+    private static void assignBloodnames(Campaign campaign, CommandGenerationOptions options,
+          List<Person> generatedPersons) {
+        ForceHumanResources humanResources = campaign.getPlayerForce().getHumanResources();
+        int targetModifier = bloodnameTargetModifier(options);
+        int awarded = 0;
+        int alreadyHeld = 0;
+        for (Person person : generatedPersons) {
+            if (person == null) {
+                continue;
+            }
+            if (holdsBloodname(person)) {
+                alreadyHeld++;
+                continue;
+            }
+            humanResources.checkBloodnameAdd(campaign, person, false, targetModifier);
+            if (holdsBloodname(person)) {
+                awarded++;
+            }
+        }
+        LOGGER.info("[CompanyGen][Pipeline][Bloodname] awarded {} bloodname(s) across {} generated "
+                    + "person(s); {} already held one (force calibre modifier {})",
+              awarded, generatedPersons.size(), alreadyHeld, targetModifier);
+    }
+
+    /**
+     * @return {@code true} if this person already carries a Bloodname
+     */
+    private static boolean holdsBloodname(Person person) {
+        String bloodname = person.getBloodname();
+        return (bloodname != null) && !bloodname.isBlank();
+    }
+
+    /**
+     * How much the force's own experience level shifts the Bloodname target. Negative makes a
+     * Bloodname likelier, and only the top two tiers get one so a green or regular command rolls
+     * exactly as it did before.
+     *
+     * @param options the generation options, read for the force's experience level
+     *
+     * @return the target modifier, or {@code 0} when the experience level was left to chance
+     */
+    static int bloodnameTargetModifier(CommandGenerationOptions options) {
+        ForceDescriptorSnapshot snapshot = options.getForceDescriptorSnapshot();
+        if ((snapshot == null) || (snapshot.getExperience() == null)) {
+            return 0;
+        }
+        return switch (snapshot.getExperience()) {
+            case ForceDescriptor.EXP_VETERAN -> BLOODNAME_MODIFIER_VETERAN;
+            case ForceDescriptor.EXP_ELITE -> BLOODNAME_MODIFIER_ELITE;
+            default -> 0;
+        };
     }
 
     /**

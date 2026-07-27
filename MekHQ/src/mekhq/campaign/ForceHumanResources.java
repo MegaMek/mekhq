@@ -1897,6 +1897,26 @@ public class ForceHumanResources {
      * @param ignoreDice if true, skips the random roll and assigns a bloodname automatically
      */
     public void checkBloodnameAdd(Campaign campaign, Person person, boolean ignoreDice) {
+        checkBloodnameAdd(campaign, person, ignoreDice, 0);
+    }
+
+    /**
+     * As {@link #checkBloodnameAdd(Campaign, Person, boolean)}, with an adjustment to the target
+     * number the roll has to beat.
+     *
+     * <p>The roll is made on 2d6 against a target built from the warrior's skills, the unit's rating,
+     * the era and their rank, so a lower target means a better chance. A caller that knows something
+     * about the warrior's standing which those inputs do not capture can shift it here - the Force
+     * Generator uses this to reflect the calibre of the force as a whole, a veteran or front-line
+     * Cluster carrying more Bloodnamed warriors than a garrison unit of the same individual skills.
+     *
+     * @param campaign       the campaign the person belongs to
+     * @param person         the person who may earn a Bloodname
+     * @param ignoreDice     {@code true} to award one outright, bypassing the roll entirely
+     * @param targetModifier added to the target number; negative values make a Bloodname likelier
+     */
+    public void checkBloodnameAdd(Campaign campaign, Person person, boolean ignoreDice,
+          int targetModifier) {
         if (!person.isClanPersonnel() || person.getPhenotype().isNone()) {
             return;
         }
@@ -2043,6 +2063,7 @@ public class ForceHumanResources {
 
             bloodnameTarget += Math.min(0,
                   campaign.getPlayerForce().getRankSystem().getOfficerCut() - person.getRankNumeric());
+            bloodnameTarget += targetModifier;
         }
 
         if (ignoreDice || (d6(2) >= bloodnameTarget)) {
