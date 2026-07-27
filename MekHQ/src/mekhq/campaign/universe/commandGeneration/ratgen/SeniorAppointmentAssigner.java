@@ -77,8 +77,8 @@ import mekhq.campaign.personnel.skills.SkillType;
  * <p>Every appointee is then promoted one populated rung above the highest-ranked of the staff they
  * lead, so a head outranks their people rather than sharing a rank with one of them. Departments are
  * filled first, so an overall head is raised above their department heads in turn. The step skips
- * rungs the rank system leaves unnamed, and never carries anyone past the rank of the officer
- * commanding the force - support services do not outrank the unit commander.</p>
+ * rungs the rank system leaves unnamed, and stops at whichever is lower of the force commander's rank
+ * and Colonel - support services neither outrank the unit commander nor rise above Colonel.</p>
  *
  * <p>Taking a post also confers Leadership, at the experience level of the appointee's own discipline
  * competence. Support staff are generated without any command skills - {@code DefaultSkillGenerator}
@@ -99,13 +99,14 @@ public final class SeniorAppointmentAssigner {
     private static final int MINIMUM_DEPARTMENT_SIZE = 2;
 
     /**
-     * The rank ceiling used when no commander can be found to measure against - an empty campaign, or
-     * one whose ranks have not been assigned. One rung above the support ladder's own ceiling of
-     * {@link RulesetRankAssigner#RANK_LT_COLONEL}, which is what makes "a head outranks their staff"
-     * reachable at all: rank systems do not name every index, and SLDF names Major at 35 then nothing
-     * again until Colonel at 38.
+     * Colonel, the highest rank any support post may reach. Index 38 is the Colonel equivalent across
+     * the shipped rank systems - Colonel, Sang-shao, Tai-sa, Star Colonel - and the systems that leave
+     * it unnamed simply stop lower, since promotions only ever step to a named rung.
+     *
+     * <p>This is a hard cap on the post itself. A head is separately held to no higher than the
+     * officer commanding the force, so the effective ceiling is whichever of the two is lower.</p>
      */
-    private static final int FALLBACK_RANK_CEILING = RulesetRankAssigner.RANK_LT_COLONEL + 1;
+    private static final int RANK_COLONEL = 38;
 
     private SeniorAppointmentAssigner() {
     }
@@ -210,7 +211,9 @@ public final class SeniorAppointmentAssigner {
         }
 
         Collection<Person> existingPersonnel = campaign.getPersonnel().values();
-        int rankCeiling = commanderRankCeiling(existingPersonnel, candidates);
+        // Two limits, both of which must hold: no support post outranks the force commander, and no
+        // support post exceeds Colonel however senior that commander is.
+        int rankCeiling = Math.min(RANK_COLONEL, commanderRankCeiling(existingPersonnel, candidates));
         // Departments first: an overall head is promoted above the heads below them, which only works
         // if those heads already hold the rank they are entitled to.
         assignDepartmentHeads(campaign, candidates, existingPersonnel, rankCeiling);
@@ -234,8 +237,8 @@ public final class SeniorAppointmentAssigner {
      * @param existingPersonnel everyone already on the books, including the ranked combat command
      * @param candidates        the people this generation created, excluded from the search
      *
-     * @return the highest rank a post-holder may reach, or {@link #FALLBACK_RANK_CEILING} if nobody
-     *       outside the generated staff holds a rank to measure against
+     * @return the commander's rank, or {@link #RANK_COLONEL} if nobody outside the generated staff
+     *       holds a rank to measure against
      */
     private static int commanderRankCeiling(Collection<Person> existingPersonnel,
           Collection<Person> candidates) {
@@ -254,8 +257,8 @@ public final class SeniorAppointmentAssigner {
         }
         if (highestRank == Integer.MIN_VALUE) {
             LOGGER.debug("[CompanyGen][Appointments] no commander outside the generated staff; "
-                  + "capping promotions at {}", FALLBACK_RANK_CEILING);
-            return FALLBACK_RANK_CEILING;
+                  + "capping promotions at {}", RANK_COLONEL);
+            return RANK_COLONEL;
         }
         LOGGER.debug("[CompanyGen][Appointments] capping promotions at rank {}, the force commander's",
               highestRank);

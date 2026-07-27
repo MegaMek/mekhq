@@ -38,6 +38,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyBoolean;
 import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.atLeast;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
@@ -68,6 +69,9 @@ import org.mockito.ArgumentCaptor;
  * because a mocked setter records nothing for a getter to read back.</p>
  */
 class SeniorAppointmentAssignerTest {
+
+    /** Colonel, the hard ceiling for any support post. */
+    private static final int COLONEL = 38;
 
     @BeforeAll
     static void loadSkillTypesAndRanks() {
@@ -526,5 +530,62 @@ class SeniorAppointmentAssignerTest {
 
         verify(chosen).setChiefMedicalOfficer(true);
         verify(chosen, never()).setRank(anyInt());
+    }
+
+    @Test
+    void noSupportPostRisesAboveColonel() {
+        // A general officer commanding the force does not entitle their chief administrator to keep
+        // climbing: Colonel is the ceiling for the post itself.
+        Campaign campaign = mock(Campaign.class);
+        Person generalOfficer = mock(Person.class);
+        when(generalOfficer.getRankNumeric()).thenReturn(45);
+        LocalPersonnel roster = new LocalPersonnel();
+        roster.put(UUID.randomUUID(), generalOfficer);
+        when(campaign.getPersonnel()).thenReturn(roster);
+
+        Person chosen = junior(PersonnelRole.ADMINISTRATOR_COMMAND);
+        withSkill(chosen, SkillType.S_ADMIN, 9);
+        when(chosen.getRankNumeric()).thenReturn(20);
+        when(chosen.getRankSystem()).thenReturn(sldf());
+
+        Person seniorStaff = junior(PersonnelRole.ADMINISTRATOR_COMMAND);
+        withSkill(seniorStaff, SkillType.S_ADMIN, 2);
+        when(seniorStaff.getRankNumeric()).thenReturn(38);
+
+        SeniorAppointmentAssigner.assign(campaign, List.of(chosen, seniorStaff));
+
+        verify(chosen).setChiefAdministrator(true);
+        ArgumentCaptor<Integer> promotedTo = ArgumentCaptor.forClass(Integer.class);
+        verify(chosen, atLeast(0)).setRank(promotedTo.capture());
+        for (Integer rank : promotedTo.getAllValues()) {
+            assertTrue(rank <= COLONEL, "no support post should exceed Colonel, got " + rank);
+        }
+    }
+
+    @Test
+    void theLowerOfTheTwoCapsWins() {
+        // A Captain commanding a small unit caps their chief medical officer well below Colonel.
+        Campaign campaign = mock(Campaign.class);
+        Person captain = mock(Person.class);
+        when(captain.getRankNumeric()).thenReturn(34);
+        LocalPersonnel roster = new LocalPersonnel();
+        roster.put(UUID.randomUUID(), captain);
+        when(campaign.getPersonnel()).thenReturn(roster);
+
+        Person chosen = junior(PersonnelRole.DOCTOR);
+        withSkill(chosen, SkillType.S_SURGERY, 9);
+        when(chosen.getRankNumeric()).thenReturn(20);
+        when(chosen.getRankSystem()).thenReturn(sldf());
+
+        Person seniorStaff = junior(PersonnelRole.DOCTOR);
+        withSkill(seniorStaff, SkillType.S_SURGERY, 2);
+        when(seniorStaff.getRankNumeric()).thenReturn(33);
+
+        SeniorAppointmentAssigner.assign(campaign, List.of(chosen, seniorStaff));
+
+        ArgumentCaptor<Integer> promotedTo = ArgumentCaptor.forClass(Integer.class);
+        verify(chosen).setRank(promotedTo.capture());
+        assertTrue(promotedTo.getValue() <= 34,
+              "the commander's rank is the lower cap here, got " + promotedTo.getValue());
     }
 }
