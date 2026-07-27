@@ -32,6 +32,7 @@
  */
 package mekhq.campaign.personnel;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -171,5 +172,42 @@ class PersonSeniorAppointmentTest {
         assertFalse(loaded.isChiefMedicalOfficer(), "and must not come back holding a post");
         assertFalse(loaded.isHeadTechnician());
         assertFalse(loaded.isChiefAdministrator());
+    }
+
+    @Test
+    void aPersonHoldingNoPostShowsNoAppointmentText() {
+        Person person = new Person("", "Jane", "Smith", "", campaign(), "MERC");
+        assertEquals("", person.getSeniorAppointmentAbbreviations());
+        assertEquals("", person.getSeniorAppointmentTitles());
+    }
+
+    @Test
+    void eachPostHasAnAbbreviationAndAFullTitle() {
+        Person chiefMedicalOfficer = new Person("", "Jane", "Smith", "", campaign(), "MERC");
+        chiefMedicalOfficer.setChiefMedicalOfficer(true);
+        assertEquals("CMO", chiefMedicalOfficer.getSeniorAppointmentAbbreviations());
+        assertEquals("Chief Medical Officer", chiefMedicalOfficer.getSeniorAppointmentTitles());
+
+        Person headTechnician = new Person("", "John", "Smith", "", campaign(), "MERC");
+        headTechnician.setHeadTechnician(true);
+        assertEquals("HT", headTechnician.getSeniorAppointmentAbbreviations());
+        assertEquals("Head Technician", headTechnician.getSeniorAppointmentTitles());
+
+        Person chiefAdministrator = new Person("", "Alex", "Smith", "", campaign(), "MERC");
+        chiefAdministrator.setChiefAdministrator(true);
+        assertEquals("CA", chiefAdministrator.getSeniorAppointmentAbbreviations());
+        assertEquals("Chief Administrator", chiefAdministrator.getSeniorAppointmentTitles());
+    }
+
+    @Test
+    void severalPostsHeldByOnePersonAreListedTogether() {
+        // A small command can put the same person in charge of more than one section.
+        Person person = new Person("", "Jane", "Smith", "", campaign(), "MERC");
+        person.setChiefMedicalOfficer(true);
+        person.setChiefAdministrator(true);
+
+        assertEquals("CMO, CA", person.getSeniorAppointmentAbbreviations(),
+              "posts should be listed in a fixed order so the display does not reshuffle");
+        assertEquals("Chief Medical Officer, Chief Administrator", person.getSeniorAppointmentTitles());
     }
 }

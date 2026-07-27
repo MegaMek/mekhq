@@ -68,6 +68,7 @@ import static mekhq.campaign.randomEvents.personalities.PersonalityController.ge
 import static mekhq.campaign.randomEvents.personalities.PersonalityController.getTraitIndex;
 import static mekhq.utilities.MHQInternationalization.getFormattedText;
 import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
+import static mekhq.utilities.MHQInternationalization.getTextAt;
 import static mekhq.utilities.ReportingUtilities.CLOSING_SPAN_TAG;
 import static mekhq.utilities.ReportingUtilities.getAmazingColor;
 import static mekhq.utilities.ReportingUtilities.getNegativeColor;
@@ -1288,6 +1289,56 @@ public class Person implements ILocatable {
             role += '/' + getSecondaryRoleDesc();
         }
         return role;
+    }
+
+    /**
+     * The senior posts this person holds, abbreviated for display alongside their name - "CMO", "HT",
+     * "CA". A person may hold more than one, in which case they are comma separated.
+     *
+     * @return the abbreviations, or an empty string if this person holds no senior post
+     */
+    public String getSeniorAppointmentAbbreviations() {
+        return joinSeniorAppointments("seniorAppointment.chiefMedicalOfficer.abbreviation",
+              "seniorAppointment.headTechnician.abbreviation",
+              "seniorAppointment.chiefAdministrator.abbreviation");
+    }
+
+    /**
+     * The senior posts this person holds, written out in full - "Chief Medical Officer", "Head
+     * Technician", "Chief Administrator". A person may hold more than one, in which case they are
+     * comma separated.
+     *
+     * @return the post names, or an empty string if this person holds no senior post
+     */
+    public String getSeniorAppointmentTitles() {
+        return joinSeniorAppointments("seniorAppointment.chiefMedicalOfficer.title",
+              "seniorAppointment.headTechnician.title",
+              "seniorAppointment.chiefAdministrator.title");
+    }
+
+    /**
+     * Joins the resource strings for whichever senior posts this person holds, in a fixed order so the
+     * display does not reorder itself between refreshes.
+     *
+     * @param chiefMedicalOfficerKey resource key used when this person is the chief medical officer
+     * @param headTechnicianKey      resource key used when this person is the head technician
+     * @param chiefAdministratorKey  resource key used when this person is the chief administrator
+     *
+     * @return the joined strings, or an empty string if this person holds no senior post
+     */
+    private String joinSeniorAppointments(String chiefMedicalOfficerKey, String headTechnicianKey,
+          String chiefAdministratorKey) {
+        StringJoiner joiner = new StringJoiner(", ");
+        if (isChiefMedicalOfficer()) {
+            joiner.add(getTextAt(RESOURCE_BUNDLE, chiefMedicalOfficerKey));
+        }
+        if (isHeadTechnician()) {
+            joiner.add(getTextAt(RESOURCE_BUNDLE, headTechnicianKey));
+        }
+        if (isChiefAdministrator()) {
+            joiner.add(getTextAt(RESOURCE_BUNDLE, chiefAdministratorKey));
+        }
+        return joiner.toString();
     }
 
     public String getPrimaryRoleDesc() {
@@ -5731,7 +5782,10 @@ public class Person implements ILocatable {
      *       among other places
      */
     public String getFullDesc(final Campaign campaign) {
-        return "<b>" + getFullTitle() + "</b><br/>" + getSkillLevel(campaign, false, true) + ' ' + getRoleDesc();
+        String appointments = getSeniorAppointmentAbbreviations();
+        String appointmentSuffix = appointments.isEmpty() ? "" : " (" + appointments + ')';
+        return "<b>" + getFullTitle() + appointmentSuffix + "</b><br/>"
+                     + getSkillLevel(campaign, false, true) + ' ' + getRoleDesc();
     }
 
     public String getHTMLTitle() {

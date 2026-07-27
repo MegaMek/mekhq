@@ -1290,8 +1290,14 @@ public class PersonViewPanel extends JScrollablePanel {
         }
 
         lblType.setName("lblType");
-        lblType.setText(String.format(resourceMap.getString("format.italic"), person.getRoleDesc()));
-        lblType.getAccessibleContext().setAccessibleName("Role: " + person.getRoleDesc());
+        // A senior post sits beside the role because it is a different fact about the person: the role
+        // is the job they do, the post is the position they hold within the command.
+        String appointmentTitles = person.getSeniorAppointmentTitles();
+        String roleAndAppointment = appointmentTitles.isEmpty()
+              ? person.getRoleDesc()
+              : person.getRoleDesc() + " - " + appointmentTitles;
+        lblType.setText(String.format(resourceMap.getString("format.italic"), roleAndAppointment));
+        lblType.getAccessibleContext().setAccessibleName("Role: " + roleAndAppointment);
         gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = y;
