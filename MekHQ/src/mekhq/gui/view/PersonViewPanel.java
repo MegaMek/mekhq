@@ -239,10 +239,14 @@ public class PersonViewPanel extends JScrollablePanel {
         initializeGenealogy(pnlGenealogy);
         tabbedPane.addTab(getTextAt(RESOURCE_BUNDLE, "pnlGenealogy.title"), pnlGenealogy);
 
-        // The Clan counterpart to Genealogy. Shown only for Clan personnel, for whom descent runs
-        // through a Bloodname House rather than a family, and added alongside Genealogy rather than in
-        // place of it because Clan characters can still carry ordinary family links.
-        if (person.isClanPersonnel()) {
+        // The Clan counterpart to Genealogy, for whom descent runs through a Bloodname House rather
+        // than a family. Added alongside Genealogy rather than in place of it, because Clan characters
+        // can still carry ordinary family links.
+        //
+        // Also shown to anyone actually holding a Bloodname even if they are not flagged as Clan
+        // personnel: that flag is user-toggleable and story arcs set Bloodnames without consulting it,
+        // so keying purely off it would hide a name the character demonstrably has.
+        if (person.isClanPersonnel() || holdsBloodname(person)) {
             JPanel pnlBloodname = new JPanel();
             pnlBloodname.setLayout(new GridBagLayout());
             initializeBloodname(pnlBloodname);
@@ -509,6 +513,14 @@ public class PersonViewPanel extends JScrollablePanel {
     }
 
     /**
+     * @return {@code true} if this person carries a Bloodname
+     */
+    private static boolean holdsBloodname(Person person) {
+        String bloodname = person.getBloodname();
+        return (bloodname != null) && !bloodname.isBlank();
+    }
+
+    /**
      * Builds the Bloodname tab: the name this warrior carries, the house behind it, and what is known
      * of that house.
      */
@@ -539,7 +551,7 @@ public class PersonViewPanel extends JScrollablePanel {
 
         int gridY = 0;
         String heldBloodname = person.getBloodname();
-        if ((heldBloodname == null) || heldBloodname.isBlank()) {
+        if (!holdsBloodname(person)) {
             addBloodnameRow(pnlBloodnameDetails, gridY,
                   getTextAt(RESOURCE_BUNDLE, "lblBloodname.text"),
                   getTextAt(RESOURCE_BUNDLE, "lblBloodname.none"));
