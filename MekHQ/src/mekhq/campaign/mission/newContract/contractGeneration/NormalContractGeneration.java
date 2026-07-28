@@ -33,18 +33,26 @@
 package mekhq.campaign.mission.newContract.contractGeneration;
 
 import java.time.LocalDate;
+import java.util.Collection;
 
+import megamek.codeUtilities.ObjectUtility;
 import mekhq.campaign.campaignOptions.CampaignOption;
 import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.location.ILocation;
 import mekhq.campaign.mission.newContract.ContractObjectiveData;
 import mekhq.campaign.universe.Faction;
+import mekhq.campaign.universe.Planet;
+import mekhq.campaign.universe.PlanetarySystem;
+import mekhq.campaign.universe.Systems;
 
 public class NormalContractGeneration extends AbstractContractGeneration {
     private boolean generationWasSuccessful = false;
 
-    private ContractObjectiveData objectiveData;
     private EmployerGenerationData employerGenerationData;
+    private ContractObjectiveData objectiveData;
+    private Faction enemyFaction;
+    PlanetarySystem targetSystem;
+    Planet targetPlanet;
     private int monthsLength;
 
     public NormalContractGeneration(CampaignOptions campaignOptions, LocalDate currentDate, ILocation currentLocation,
@@ -64,7 +72,7 @@ public class NormalContractGeneration extends AbstractContractGeneration {
               contractGenerationModifier);
 
         // Step 3: Enemy
-        Faction enemyFaction = ChaosContractDeterminationEnemy.generateEnemyFactionForObjective(currentLocation,
+        enemyFaction = ChaosContractDeterminationEnemy.generateEnemyFactionForObjective(currentLocation,
               currentDate, employerGenerationData.faction(), objectiveData.playerObjectiveType());
 
         // Step 4: Location
@@ -73,6 +81,10 @@ public class NormalContractGeneration extends AbstractContractGeneration {
               employerGenerationData.faction().getShortName(),
               enemyFaction.getShortName(),
               currentLocation);
+        PlanetarySystem targetSystem = Systems.getInstance().getSystemById(targetSystemId);
+        Collection<Planet> candidatePlanets = targetSystem.getPlanets();
+        // TODO use same planetary picker profile as System picker
+        targetPlanet = ObjectUtility.getRandomItem(candidatePlanets);
 
         // Step 5: Length
         boolean useVariableContractLength = campaignOptions.get(CampaignOption.VARIABLE_CONTRACT_LENGTH);
@@ -81,6 +93,7 @@ public class NormalContractGeneration extends AbstractContractGeneration {
                              .calculateLength(useVariableContractLength);
 
         // Step 6: Pay Rate
+
         // Step 7: Support
         // Step 8: Transportation
         // Step 9: Salvage Rights
