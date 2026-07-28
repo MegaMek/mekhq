@@ -1,4 +1,4 @@
-package mekhq.campaign.mission.newContract;
+package mekhq.campaign.mission.newContract.contractData;
 
 import java.time.LocalDate;
 

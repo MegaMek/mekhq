@@ -40,6 +40,14 @@ import mekhq.campaign.JumpPath;
 import mekhq.campaign.digitalGM.stratCon.StratConCampaignState;
 import mekhq.campaign.mission.Scenario;
 import mekhq.campaign.mission.enums.MissionStatus;
+import mekhq.campaign.mission.newContract.contractData.ContractFinanceData;
+import mekhq.campaign.mission.newContract.contractData.ContractObjectiveData;
+import mekhq.campaign.mission.newContract.contractData.ContractScheduleData;
+import mekhq.campaign.mission.newContract.contractData.EmployerData;
+import mekhq.campaign.mission.newContract.contractData.EnemyData;
+import mekhq.campaign.mission.newContract.contractData.MoraleData;
+import mekhq.campaign.mission.newContract.contractData.RentedFacilitiesData;
+import mekhq.campaign.mission.newContract.contractData.SystemsTargetData;
 import mekhq.campaign.mission.newContract.contractGeneration.ContractTermsData;
 
 public abstract class AbstractContract {

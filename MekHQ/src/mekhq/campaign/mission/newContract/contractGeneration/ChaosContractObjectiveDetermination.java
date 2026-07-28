@@ -36,7 +36,7 @@ import static java.lang.Math.clamp;
 import static megamek.common.compute.Compute.d6;
 
 import mekhq.campaign.mission.enums.AtBContractType;
-import mekhq.campaign.mission.newContract.ContractObjectiveData;
+import mekhq.campaign.mission.newContract.contractData.ContractObjectiveData;
 import org.jspecify.annotations.NonNull;
 
 public class ChaosContractObjectiveDetermination {

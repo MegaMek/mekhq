@@ -30,9 +30,22 @@
  * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
  * affiliated with Microsoft.
  */
-package mekhq.campaign.mission.newContract;
+package mekhq.campaign.mission.newContract.contractData;
 
-import mekhq.campaign.mission.enums.AtBContractType;
+import jakarta.annotation.Nullable;
+import megamek.client.ui.util.PlayerColour;
+import megamek.common.enums.SkillLevel;
+import megamek.common.icons.Camouflage;
+import mekhq.campaign.personnel.Person;
 
-public record ContractObjectiveData(AtBContractType playerObjectiveType, AtBContractType opposingObjectiveType) {
+public record EnemyData(String directFactionCode,
+      @Nullable String sponsorFactionCode,
+      String displayName,
+      Person commander,
+      SkillLevel forceSkill,
+      int equipmentRating,
+      Camouflage camouflage,
+      PlayerColour color,
+      boolean batchallAccepted
+) {
 }

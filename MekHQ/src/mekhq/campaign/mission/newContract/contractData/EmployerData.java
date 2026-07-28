@@ -30,7 +30,22 @@
  * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
  * affiliated with Microsoft.
  */
-package mekhq.campaign.mission.newContract;
+package mekhq.campaign.mission.newContract.contractData;
 
-public record SystemsTargetData(String systemId, String planetId) {
+import megamek.client.ui.util.PlayerColour;
+import megamek.common.enums.SkillLevel;
+import megamek.common.icons.Camouflage;
+import mekhq.campaign.mission.newContract.contractGeneration.ChaosEmployerType;
+import mekhq.campaign.personnel.Person;
+
+public record EmployerData(ChaosEmployerType type,
+      String factionCode,
+      String displayName,
+      Person negotiator,
+      Person liaison,
+      SkillLevel forceSkill,
+      int equipmentRating,
+      Camouflage camouflage,
+      PlayerColour color
+) {
 }

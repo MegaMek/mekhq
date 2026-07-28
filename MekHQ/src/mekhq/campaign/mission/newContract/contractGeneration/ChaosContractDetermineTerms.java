@@ -2,7 +2,7 @@ package mekhq.campaign.mission.newContract.contractGeneration;
 
 import static megamek.common.compute.Compute.d6;
 
-import mekhq.campaign.mission.newContract.ChaosContractStepsTable;
+import mekhq.campaign.mission.newContract.contractData.ChaosContractStepsTable;
 
 public class ChaosContractDetermineTerms {
     public static ContractTermsData determineInitialTerms(ChaosObjectiveType objectiveType,
