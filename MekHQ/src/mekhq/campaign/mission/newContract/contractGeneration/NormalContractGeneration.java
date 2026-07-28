@@ -34,17 +34,21 @@ package mekhq.campaign.mission.newContract.contractGeneration;
 
 import java.time.LocalDate;
 
+import mekhq.campaign.campaignOptions.CampaignOption;
+import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.location.ILocation;
 import mekhq.campaign.mission.newContract.ContractObjectiveData;
 import mekhq.campaign.universe.Faction;
 
 public class NormalContractGeneration extends AbstractContractGeneration {
     private boolean generationWasSuccessful = false;
+
     private ContractObjectiveData objectiveData;
     private EmployerGenerationData employerGenerationData;
+    private int monthsLength;
 
-    public NormalContractGeneration(LocalDate currentDate, ILocation currentLocation, boolean isMercenarySearch,
-          int contractGenerationModifier) {
+    public NormalContractGeneration(CampaignOptions campaignOptions, LocalDate currentDate, ILocation currentLocation,
+          boolean isMercenarySearch, int contractGenerationModifier, int scale) {
         // Step 1: Employer
         employerGenerationData = ChaosContractEmployerDetermination.getEmployerGenerationData(currentDate,
               currentLocation,
@@ -69,5 +73,22 @@ public class NormalContractGeneration extends AbstractContractGeneration {
               employerGenerationData.faction().getShortName(),
               enemyFaction.getShortName(),
               currentLocation);
+
+        // Step 5: Length
+        boolean useVariableContractLength = campaignOptions.get(CampaignOption.VARIABLE_CONTRACT_LENGTH);
+        monthsLength = objectiveData.playerObjectiveType()
+                             .getChaosObjectiveType()
+                             .calculateLength(useVariableContractLength);
+
+        // Step 6: Pay Rate
+        // Step 7: Support
+        // Step 8: Transportation
+        // Step 9: Salvage Rights
+        // Step 10: Command Rights
+        // Step 12: Track Count & Intensity
+        // Step 13: Special Objective Type Considerations
+
+        // step n^n: Roll for follow-up objectives
+        // Step n+1: Re-Negotiate Contract
     }
 }

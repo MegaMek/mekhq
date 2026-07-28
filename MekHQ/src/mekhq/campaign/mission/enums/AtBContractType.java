@@ -180,10 +180,6 @@ public enum AtBContractType {
         return toolTipText;
     }
 
-    public int getConstantLength() {
-        return chaosObjectiveType.getMonthsLength();
-    }
-
     public ChaosObjectiveType getChaosObjectiveType() {
         return chaosObjectiveType;
     }

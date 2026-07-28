@@ -53,7 +53,7 @@ public class ContractTerms {
 
     public ContractTerms(AtBContractType mission, Faction employer, double reputationFactor, LocalDate date) {
         operationsTempoMultiplier = mission.getOperationsTempoMultiplier();
-        baseLength = mission.getConstantLength();
+        baseLength = mission.getChaosObjectiveType().getMonthsLength();
         addMissionTypeModifiers(mission);
         addEmployerModifiers(employer, date);
         addUnitReputationModifiers(reputationFactor);
