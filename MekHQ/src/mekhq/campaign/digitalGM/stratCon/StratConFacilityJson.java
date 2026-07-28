@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2020-2026 The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2026 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -33,32 +33,37 @@
 package mekhq.campaign.digitalGM.stratCon;
 
 import java.io.File;
-import java.util.List;
+import java.io.IOException;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
 
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.PropertyAccessor;
 import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import megamek.logging.MMLogger;
+import com.fasterxml.jackson.databind.SerializationFeature;
+import mekhq.utilities.MMDataLicenseHeader;
 
 /**
- * A manifest containing IDs and file names of StratCon facility definitions
- *
- * @author NickAragua
+ * JSON serialization for {@link StratConFacility}. Mirrors {@code AtBScenarioModifierJson} and
+ * {@code StratConContractDefinitionJson}: a field-based mapper, a leading {@code #} license header on write, and
+ * {@code #}-comment skipping on read.
  */
-public class StratConFacilityManifest {
-    private static final MMLogger LOGGER = MMLogger.create(StratConFacilityManifest.class);
+public final class StratConFacilityJson {
 
     private static final ObjectMapper MAPPER = buildMapper();
 
-    public List<String> facilityFileNames;
+    private StratConFacilityJson() {
+    }
 
     private static ObjectMapper buildMapper() {
         ObjectMapper mapper = new ObjectMapper();
-        // Use fields as the single source of truth, matching the shipped facility JSON files.
+        // Use fields as the single source of truth; ignore getters/setters/creators so accessor naming and the many
+        // computed getters (isVisible, isAvailable, getBiomeTempMap, ...) do not distort the JSON shape.
         mapper.setVisibility(PropertyAccessor.ALL, JsonAutoDetect.Visibility.NONE);
         mapper.setVisibility(PropertyAccessor.FIELD, JsonAutoDetect.Visibility.ANY);
+        mapper.enable(SerializationFeature.INDENT_OUTPUT);
         // Tolerate fields absent from older files rather than failing the whole load.
         mapper.disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES);
         // Skip the leading '#' license-header comment lines that lead every saved file.
@@ -67,22 +72,30 @@ public class StratConFacilityManifest {
     }
 
     /**
-     * Attempt to deserialize an instance of a StratConFacilityManifest from the passed-in file path
+     * Reads a StratCon facility from a JSON file.
      *
-     * @return Possibly an instance of a StratConFacilityManifest
+     * @param inputFile the JSON file
+     *
+     * @return the deserialized facility
+     *
+     * @throws IOException if the file cannot be read or parsed
      */
-    public static StratConFacilityManifest deserialize(String fileName) {
-        File inputFile = new File(fileName);
-        if (!inputFile.exists()) {
-            LOGGER.warn("Specified file {} does not exist", fileName);
-            return null;
-        }
+    static StratConFacility fromFile(File inputFile) throws IOException {
+        return MAPPER.readValue(inputFile, StratConFacility.class);
+    }
 
-        try {
-            return MAPPER.readValue(inputFile, StratConFacilityManifest.class);
-        } catch (Exception e) {
-            LOGGER.error("Error Deserializing Facility Manifest", e);
-            return null;
-        }
+    /**
+     * Writes a StratCon facility to a JSON file, led by the MegaMek Data license header.
+     *
+     * @param facility   the facility to write
+     * @param outputFile the destination file
+     *
+     * @throws IOException if the file cannot be written
+     */
+    static void toFile(StratConFacility facility, File outputFile) throws IOException {
+        // Lead the file with the license header (as '#' comment lines) then a blank line, then the JSON. The header
+        // carries the file's copyright year forward; ALLOW_YAML_COMMENTS skips it on read.
+        String content = MMDataLicenseHeader.licenseHeader(outputFile) + '\n' + MAPPER.writeValueAsString(facility);
+        Files.writeString(outputFile.toPath(), content, StandardCharsets.UTF_8);
     }
 }

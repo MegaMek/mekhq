@@ -33,26 +33,18 @@
 package mekhq.campaign.digitalGM.stratCon;
 
 import java.io.File;
-import java.io.FileInputStream;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.TreeMap;
-import javax.xml.transform.Source;
 
-import jakarta.xml.bind.JAXBContext;
-import jakarta.xml.bind.JAXBElement;
-import jakarta.xml.bind.Unmarshaller;
-import jakarta.xml.bind.annotation.XmlRootElement;
 import megamek.logging.MMLogger;
 import mekhq.campaign.mission.ScenarioForceTemplate.ForceAlignment;
-import mekhq.utilities.MHQXMLUtility;
 
 /**
  * This represents a facility in the StratCon context
  *
  * @author NickAragua
  */
-@XmlRootElement(name = "StratConFacility")
 public class StratConFacility implements Cloneable {
     private static final MMLogger LOGGER = MMLogger.create(StratConFacility.class);
 
@@ -329,23 +321,18 @@ public class StratConFacility implements Cloneable {
      * @return Possibly an instance of a StratConFacility
      */
     public static StratConFacility deserialize(String fileName) {
-        StratConFacility resultingFacility = null;
         File inputFile = new File(fileName);
         if (!inputFile.exists()) {
             LOGGER.warn("Specified file {} does not exist", fileName);
             return null;
         }
 
+        StratConFacility resultingFacility;
         try {
-            JAXBContext context = JAXBContext.newInstance(StratConFacility.class);
-            Unmarshaller um = context.createUnmarshaller();
-            try (FileInputStream fileStream = new FileInputStream(inputFile)) {
-                Source inputSource = MHQXMLUtility.createSafeXmlSource(fileStream);
-                JAXBElement<StratConFacility> facilityElement = um.unmarshal(inputSource, StratConFacility.class);
-                resultingFacility = facilityElement.getValue();
-            }
+            resultingFacility = StratConFacilityJson.fromFile(inputFile);
         } catch (Exception e) {
             LOGGER.error("Error Deserializing Facility {}", fileName, e);
+            return null;
         }
 
         if (resultingFacility == null) {

@@ -352,8 +352,8 @@ public final class MHQConstants extends SuiteConstants {
     public static final String STRAT_CON_SCENARIO_MANIFEST = "./data/scenariotemplates/ScenarioManifest.json";
     public static final String STRAT_CON_USER_SCENARIO_MANIFEST = "./data/scenariotemplates/UserScenarioManifest.json";
     public static final String STRAT_CON_SCENARIO_TEMPLATE_PATH = "./data/scenariotemplates/";
-    public static final String STRAT_CON_FACILITY_MANIFEST = "./data/stratconfacilities/facilitymanifest.xml";
-    public static final String STRAT_CON_USER_FACILITY_MANIFEST = "./data/stratconfacilities/userfacilitymanifest.xml";
+    public static final String STRAT_CON_FACILITY_MANIFEST = "./data/stratconfacilities/facilitymanifest.json";
+    public static final String STRAT_CON_USER_FACILITY_MANIFEST = "./data/stratconfacilities/userfacilitymanifest.json";
     public static final String STRAT_CON_FACILITY_PATH = "./data/stratconfacilities/";
     public static final String STRAT_CON_CONTRACT_MANIFEST = "./data/stratconcontractdefinitions/ContractDefinitionManifest.json";
     public static final String STRAT_CON_USER_CONTRACT_MANIFEST = "./data/stratconcontractdefinitions/UserContractDefinitionManifest.json";
