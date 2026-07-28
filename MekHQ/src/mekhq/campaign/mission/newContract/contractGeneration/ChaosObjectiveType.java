@@ -51,21 +51,21 @@ import megamek.logging.MMLogger;
 import mekhq.campaign.mission.enums.AtBContractType;
 
 public enum ChaosObjectiveType {
-    EXPEDITION(3, 0, 1, 0, 0, 2,
+    EXPEDITION(3, 0, 1, 0, 0, 2, -1,
           Collections.emptyList()),
-    PIRATE_HUNT(3, 0, 0, 0, -1, 2,
+    PIRATE_HUNT(3, 0, 0, 0, -1, 2, -1,
           List.of(END_CONTRACT_AFTER_TWO_CONSECUTIVE_TRACKS)),
-    GUERILLA_OPERATION(3, 0, 0, 0, -1, 2,
+    GUERILLA_OPERATION(3, 0, 0, 0, -1, 2, -1,
           List.of(DOUBLE_ALL_COSTS, NO_IN_CONTRACT_SUPPORT, DOUBLE_SUPPORT_PAYOUTS)),
-    GARRISON(6, 1, 0, 1, -2, 0,
+    GARRISON(6, 1, 0, 1, -2, 0, 1,
           Collections.emptyList()),
-    CADRE_DUTY(6, 1, 0, 1, -2, 0,
+    CADRE_DUTY(6, 1, 0, 1, -2, 0, -2,
           List.of(SIMULATED_DAMAGE)),
-    RAID(3, 0, 0, 0, -1, 0,
+    RAID(3, 0, 0, 0, -1, 0, 0,
           Collections.emptyList()),
-    INVASION(6, -1, 2, -1, 1, -2,
+    INVASION(6, -1, 2, -1, 1, -2, 3,
           Collections.emptyList()),
-    PIRATE_RAID(3, 0, 0, 0, -1, 0,
+    PIRATE_RAID(3, 0, 0, 0, -1, 0, -2,
           List.of(END_CONTRACT_AFTER_TWO_CONSECUTIVE_TRACKS, USE_PIRATE_LOOTING));
 
     private static final MMLogger LOGGER = MMLogger.create(ChaosObjectiveType.class);
@@ -76,17 +76,21 @@ public enum ChaosObjectiveType {
     private final int transportModifier; // Hot Spots Draconis Reach pg 144 first printing
     private final int salvageRightsModifier; // Hot Spots Draconis Reach pg 144 first printing
     private final int commandRightsModifier; // Hot Spots Draconis Reach pg 144 first printing
+    // MekHQ force-commitment heuristic (not from Hot Spots): how much force quality an employer or enemy commits to an
+    // objective of this strategic scope. Positive fields better-skilled, better-equipped forces; negative fields less.
+    private final int forceCommitmentModifier;
     private final List<ChaosObjectiveSpecialRules> specialRules;  // Hot Spots Draconis Reach pg 146 first printing
 
     ChaosObjectiveType(final int monthsLength, final int payRateModifier, final int supportModifier,
           final int transportModifier, final int salvageRightsModifier, final int commandRightsModifier,
-          final List<ChaosObjectiveSpecialRules> specialRules) {
+          final int forceCommitmentModifier, final List<ChaosObjectiveSpecialRules> specialRules) {
         this.monthsLength = monthsLength;
         this.payRateModifier = payRateModifier;
         this.supportModifier = supportModifier;
         this.transportModifier = transportModifier;
         this.salvageRightsModifier = salvageRightsModifier;
         this.commandRightsModifier = commandRightsModifier;
+        this.forceCommitmentModifier = forceCommitmentModifier;
         this.specialRules = specialRules;
     }
 
@@ -162,6 +166,10 @@ public enum ChaosObjectiveType {
 
     public int getCommandRightsModifier() {
         return commandRightsModifier;
+    }
+
+    public int getForceCommitmentModifier() {
+        return forceCommitmentModifier;
     }
 
     public List<ChaosObjectiveSpecialRules> getSpecialRules() {

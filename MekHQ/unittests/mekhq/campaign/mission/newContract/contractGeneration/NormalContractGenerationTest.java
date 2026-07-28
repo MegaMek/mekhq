@@ -32,12 +32,31 @@
  */
 package mekhq.campaign.mission.newContract.contractGeneration;
 
-import mekhq.campaign.mission.newContract.contractData.ChaosContractStepsTable;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
-public record ContractTermsData(ChaosContractStepsTable payRate,
-      ChaosContractStepsTable support,
-      ChaosContractStepsTable transport,
-      ChaosContractStepsTable salvageRights,
-      ChaosContractStepsTable commandRights
-) {
+import java.util.EnumSet;
+import java.util.Set;
+
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.EnumSource;
+
+class NormalContractGenerationTest {
+
+    /** The objectives on which the player holds ground rather than takes it. */
+    private static final Set<ChaosObjectiveType> DEFENSIVE_OBJECTIVES =
+          EnumSet.of(ChaosObjectiveType.GARRISON, ChaosObjectiveType.CADRE_DUTY);
+
+    @ParameterizedTest
+    @EnumSource(ChaosObjectiveType.class)
+    void isPlayerAttackerIsFalseOnlyForDefensiveObjectives(final ChaosObjectiveType objectiveType) {
+        boolean expectedAttacker = !DEFENSIVE_OBJECTIVES.contains(objectiveType);
+        if (expectedAttacker) {
+            assertTrue(NormalContractGeneration.isPlayerAttacker(objectiveType),
+                  objectiveType + " is an offensive objective and should make the player the attacker");
+        } else {
+            assertFalse(NormalContractGeneration.isPlayerAttacker(objectiveType),
+                  objectiveType + " is a defensive objective and should not make the player the attacker");
+        }
+    }
 }

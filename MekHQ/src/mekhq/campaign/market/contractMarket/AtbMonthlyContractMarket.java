@@ -310,7 +310,7 @@ public class AtbMonthlyContractMarket extends AbstractContractMarket {
                 while ((retries > 0) && (contract == null)) {
                     Faction employer =
                           RandomFactionGenerator.getInstance().getRandomEmployerFaction(campaign.getCurrentLocation(),
-                                campaign.getLocalDate(), null, isMercenaryCampaign);
+                                campaign.getLocalDate(), isMercenaryCampaign);
                     if (employer == null) {
                         retries--;
                         continue;
@@ -480,7 +480,6 @@ public class AtbMonthlyContractMarket extends AbstractContractMarket {
                 Faction rerolledEmployer = RandomFactionGenerator.getInstance()
                                                  .getRandomEmployerFaction(campaign.getCurrentLocation(),
                                                        campaign.getLocalDate(),
-                                                       null,
                                                        true);
                 employer = rerolledEmployer == null ? null : rerolledEmployer.getShortName();
                 if ((employer != null) && !Factions.getInstance().getFaction(employer).isMercenary()) {

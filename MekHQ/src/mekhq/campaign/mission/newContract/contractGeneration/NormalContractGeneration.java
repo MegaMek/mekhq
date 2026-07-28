@@ -39,8 +39,10 @@ import java.util.Collection;
 
 import jakarta.annotation.Nullable;
 import megamek.codeUtilities.ObjectUtility;
+import megamek.common.enums.SkillLevel;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.JumpPath;
+import mekhq.campaign.camOpsReputation.ForceReputationController;
 import mekhq.campaign.campaignOptions.CampaignOption;
 import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.location.ILocation;
@@ -83,7 +85,17 @@ public class NormalContractGeneration extends AbstractContractGeneration {
               enemyData,
               contract);
 
-        // Step 5: Length
+        // Step 5: Force Ratings (skill and equipment of both sides)
+        setForceRatings(campaign,
+              campaignOptions,
+              currentDate,
+              targetSystem,
+              employerData,
+              enemyData,
+              objectiveData,
+              contract);
+
+        // Step 6: Length
         boolean useVariableContractLength = campaignOptions.get(CampaignOption.VARIABLE_CONTRACT_LENGTH);
         ChaosObjectiveType objectiveType = determineSchedule(campaign,
               useVariableContractLength,
@@ -97,19 +109,83 @@ public class NormalContractGeneration extends AbstractContractGeneration {
               objectiveData.playerObjectiveType().getChaosObjectiveType(),
               contract);
 
-        // Step 6: Initial Terms
+        // Step 7: Initial Terms
         setContractTerms(objectiveType, employerData.type(), contract);
 
-        // Step 7: Track Count & Intensity
+        // Step 8: Track Count & Intensity
         setTrackCount(objectiveType, contract);
 
-        // Step 8: Return the Contract
+        // Step 9: Return the Contract
         return contract;
     }
 
     private static void setTrackCount(ChaosObjectiveType objectiveType, ChaosContract contract) {
         int trackCount = ChaosContractDetermineIntensity.determineTrackCount(objectiveType);
         contract.setTrackCount(trackCount);
+    }
+
+    /**
+     * Rates the skill and equipment both sides commit to the contract, then rebuilds the employer and enemy data with
+     * those ratings in place of the placeholder defaults.
+     *
+     * <p>The rating is grounded in the galaxy: it synthesizes the contract's {@link ContractImportance} from who is
+     * hiring, what for, and the strategic value of the world being fought over, then hands that &mdash; alongside each
+     * side's faction, role, and the era &mdash; to {@link ChaosEmployerForceRating}. When the campaign has opted into
+     * dynamic difficulty, the ratings are additionally scaled toward the player's own skill.</p>
+     *
+     * @param campaign        the active campaign, for player skill and options
+     * @param campaignOptions the campaign options
+     * @param currentDate     the current date, for era context and reading the target world's data
+     * @param targetSystem    the target system, used to resolve the specific target planet
+     * @param employerData    the employer data to re-rate
+     * @param enemyData       the enemy data to re-rate
+     * @param objectiveData   the contract's objectives, for the player objective's strategic scope
+     * @param contract        the contract being built
+     */
+    private static void setForceRatings(Campaign campaign, CampaignOptions campaignOptions, LocalDate currentDate,
+          PlanetarySystem targetSystem, EmployerData employerData, EnemyData enemyData,
+          ContractObjectiveData objectiveData, ChaosContract contract) {
+        Planet targetPlanet = targetSystem.getPlanetById(contract.getSystemsTargetData().planetId());
+        int planetStrategicValue = (targetPlanet == null) ? 0
+                                         : ChaosPlanetStrategicValue.calculate(targetPlanet, currentDate);
+
+        ChaosObjectiveType objectiveType = objectiveData.playerObjectiveType().getChaosObjectiveType();
+        ContractImportance importance = ContractImportance.from(employerData.type(), objectiveType,
+              planetStrategicValue);
+
+        boolean isPlayerAttacker = isPlayerAttacker(objectiveType);
+        int year = currentDate.getYear();
+        boolean scaleToPlayer = campaignOptions.get(CampaignOption.USE_DYNAMIC_DIFFICULTY);
+        SkillLevel averageSkill = campaignAverageSkill(campaign);
+
+        ChaosEmployerForceRating.ForceRating employerRating = ChaosEmployerForceRating.determine(
+              employerData.getFaction(), isPlayerAttacker, true, year, importance, scaleToPlayer, averageSkill);
+        ChaosEmployerForceRating.ForceRating enemyRating = ChaosEmployerForceRating.determine(enemyData.getFaction(),
+              !isPlayerAttacker, false, year, importance, scaleToPlayer, averageSkill);
+
+        EmployerData updatedEmployerData = new EmployerData(employerData, employerRating.forceSkill(),
+              employerRating.equipmentRating());
+        contract.setEmployerData(updatedEmployerData);
+
+        EnemyData updatedEnemyData = new EnemyData(enemyData, enemyRating.forceSkill(), enemyRating.equipmentRating());
+        contract.setEnemyData(updatedEnemyData);
+    }
+
+    /**
+     * A player fielding a garrison or training cadre is holding ground rather than taking it; every other objective is
+     * an offensive one.
+     */
+    static boolean isPlayerAttacker(ChaosObjectiveType objectiveType) {
+        return switch (objectiveType) {
+            case GARRISON, CADRE_DUTY -> false;
+            default -> true;
+        };
+    }
+
+    private static SkillLevel campaignAverageSkill(Campaign campaign) {
+        // TODO replace with new reputation system
+        ForceReputationController reputation = campaign.getReputation();
+        return (reputation == null) ? SkillLevel.REGULAR : reputation.getAverageSkillLevel();
     }
 
     private static void setContractTerms(ChaosObjectiveType objectiveType, ChaosEmployerType employerType,

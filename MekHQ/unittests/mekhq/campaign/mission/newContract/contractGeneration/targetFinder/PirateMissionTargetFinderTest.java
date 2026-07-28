@@ -30,7 +30,7 @@
  * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
  * affiliated with Microsoft.
  */
-package mekhq.campaign.mission.newContract.targetFinder;
+package mekhq.campaign.mission.newContract.contractGeneration.targetFinder;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -44,8 +44,6 @@ import java.util.Collections;
 import java.util.List;
 
 import mekhq.campaign.location.ILocation;
-import mekhq.campaign.mission.newContract.contractGeneration.targetFinder.MissionTargetFinder;
-import mekhq.campaign.mission.newContract.contractGeneration.targetFinder.PirateMissionTargetFinder;
 import mekhq.campaign.universe.Faction;
 import mekhq.campaign.universe.FactionBorderTracker;
 import mekhq.campaign.universe.Planet;
