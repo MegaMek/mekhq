@@ -1,3 +1,35 @@
+/*
+ * Copyright (C) 2026 The MegaMek Team. All Rights Reserved.
+ *
+ * This file is part of MekHQ.
+ *
+ * MekHQ is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License (GPL),
+ * version 3 or (at your option) any later version,
+ * as published by the Free Software Foundation.
+ *
+ * MekHQ is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty
+ * of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+ * See the GNU General Public License for more details.
+ *
+ * A copy of the GPL should have been included with this project;
+ * if not, see <https://www.gnu.org/licenses/>.
+ *
+ * NOTICE: The MegaMek organization is a non-profit group of volunteers
+ * creating free software for the BattleTech community.
+ *
+ * MechWarrior, BattleMech, `Mech and AeroTech are registered trademarks
+ * of The Topps Company, Inc. All Rights Reserved.
+ *
+ * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
+ * InMediaRes Productions, LLC.
+ *
+ * MechWarrior Copyright Microsoft Corporation. MekHQ was created under
+ * Microsoft's "Game Content Usage Rules"
+ * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+ * affiliated with Microsoft.
+ */
 package mekhq.campaign.mission.newContract.contractGeneration;
 
 import static java.lang.Math.clamp;
@@ -41,29 +73,29 @@ public class ChaosContractObjectiveDetermination {
     private static @NonNull AtBContractType getInvasionOpposingObjective() {
         int roll = d6(2);
         return switch (roll) {
-            case 2, 3, 4 -> AtBContractType.EXPEDITION;
-            case 5, 6, 7, 8 -> AtBContractType.GARRISON;
-            case 9 -> AtBContractType.RAID;
-            case 10, 11, 12 -> AtBContractType.INVASION;
+            case 2, 3, 4 -> ChaosObjectiveType.EXPEDITION.getCamOpsObjectiveType();
+            case 5, 6, 7, 8 -> ChaosObjectiveType.GARRISON.getCamOpsObjectiveType();
+            case 9 -> ChaosObjectiveType.RAID.getCamOpsObjectiveType();
+            case 10, 11, 12 -> ChaosObjectiveType.INVASION.getCamOpsObjectiveType();
             default -> throw new IllegalStateException("Illegal roll number: " + roll);
         };
     }
 
     private static AtBContractType getInvasionPlayerObjective() {
-        return AtBContractType.INVASION;
+        return ChaosObjectiveType.INVASION.getCamOpsObjectiveType();
     }
 
     private static @NonNull AtBContractType getRaidPlayerObjective() {
-        return AtBContractType.RAID;
+        return ChaosObjectiveType.RAID.getCamOpsObjectiveType();
     }
 
     private static AtBContractType getRaidOpposingObjective() {
         int roll = d6(2);
         return switch (roll) {
-            case 2, 3, 4, 5, 6, 7 -> AtBContractType.EXPEDITION;
-            case 8, 9, 10 -> AtBContractType.GARRISON;
-            case 11 -> AtBContractType.RAID;
-            case 12 -> AtBContractType.INVASION;
+            case 2, 3, 4, 5, 6, 7 -> ChaosObjectiveType.EXPEDITION.getCamOpsObjectiveType();
+            case 8, 9, 10 -> ChaosObjectiveType.GARRISON.getCamOpsObjectiveType();
+            case 11 -> ChaosObjectiveType.RAID.getCamOpsObjectiveType();
+            case 12 -> ChaosObjectiveType.INVASION.getCamOpsObjectiveType();
             default -> throw new IllegalStateException("Illegal roll number: " + roll);
         };
     }
@@ -71,9 +103,9 @@ public class ChaosContractObjectiveDetermination {
     private static @NonNull AtBContractType getGarrisonOpposingObjective() {
         int roll = d6(2);
         return switch (roll) {
-            case 2, 3, 4 -> AtBContractType.EXPEDITION;
-            case 5, 6, 7, 8 -> AtBContractType.RAID;
-            case 9, 10, 11, 12 -> AtBContractType.INVASION;
+            case 2, 3, 4 -> ChaosObjectiveType.EXPEDITION.getCamOpsObjectiveType();
+            case 5, 6, 7, 8 -> ChaosObjectiveType.RAID.getCamOpsObjectiveType();
+            case 9, 10, 11, 12 -> ChaosObjectiveType.INVASION.getCamOpsObjectiveType();
             default -> throw new IllegalStateException("Illegal roll number: " + roll);
         };
     }
@@ -81,8 +113,8 @@ public class ChaosContractObjectiveDetermination {
     private static AtBContractType getGarrisonPlayerObjective() {
         int roll = d6(2);
         return switch (roll) {
-            case 2, 3, 4, 5 -> AtBContractType.CADRE_DUTY;
-            case 6, 7, 8, 9, 10, 11, 12 -> AtBContractType.GARRISON;
+            case 2, 3, 4, 5 -> ChaosObjectiveType.CADRE_DUTY.getCamOpsObjectiveType();
+            case 6, 7, 8, 9, 10, 11, 12 -> ChaosObjectiveType.GARRISON.getCamOpsObjectiveType();
             default -> throw new IllegalStateException("Illegal roll number: " + roll);
         };
     }
@@ -90,8 +122,8 @@ public class ChaosContractObjectiveDetermination {
     private static AtBContractType getExpeditionOpposingObjective() {
         int roll = d6(2);
         return switch (roll) {
-            case 2, 8, 7, 3, 4, 5, 6 -> AtBContractType.GARRISON;
-            case 9, 10, 11, 12 -> AtBContractType.RAID;
+            case 2, 8, 7, 3, 4, 5, 6 -> ChaosObjectiveType.GARRISON.getCamOpsObjectiveType();
+            case 9, 10, 11, 12 -> ChaosObjectiveType.RAID.getCamOpsObjectiveType();
             default -> throw new IllegalStateException("Illegal roll number: " + roll);
         };
     }
@@ -99,9 +131,9 @@ public class ChaosContractObjectiveDetermination {
     private static AtBContractType getExpeditionPlayerObjective() {
         int roll = d6(2);
         return switch (roll) {
-            case 1, 8, 7, 6, 5, 4, 3, 2 -> AtBContractType.EXPEDITION;
-            case 9, 10, 11 -> AtBContractType.PIRATE_HUNT;
-            case 12 -> AtBContractType.GUERILLA_OPERATION;
+            case 1, 8, 7, 6, 5, 4, 3, 2 -> ChaosObjectiveType.EXPEDITION.getCamOpsObjectiveType();
+            case 9, 10, 11 -> ChaosObjectiveType.PIRATE_HUNT.getCamOpsObjectiveType();
+            case 12 -> ChaosObjectiveType.GUERILLA_OPERATION.getCamOpsObjectiveType();
             default -> throw new IllegalStateException("Unexpected value: " + roll);
         };
     }
