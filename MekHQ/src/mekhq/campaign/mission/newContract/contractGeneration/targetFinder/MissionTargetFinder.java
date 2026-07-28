@@ -30,7 +30,7 @@
  * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
  * affiliated with Microsoft.
  */
-package mekhq.campaign.mission.newContract.targetFinder;
+package mekhq.campaign.mission.newContract.contractGeneration.targetFinder;
 
 import static mekhq.campaign.universe.Faction.BANDIT_CASTE_FACTION_CODE;
 import static mekhq.campaign.universe.Faction.MERCENARY_FACTION_CODE;

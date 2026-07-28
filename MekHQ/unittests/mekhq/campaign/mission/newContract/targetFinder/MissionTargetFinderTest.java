@@ -52,6 +52,10 @@ import java.util.List;
 import java.util.Set;
 
 import mekhq.campaign.location.ILocation;
+import mekhq.campaign.mission.newContract.contractGeneration.targetFinder.ComStarMissionTargetFinder;
+import mekhq.campaign.mission.newContract.contractGeneration.targetFinder.MissionLocationProfile;
+import mekhq.campaign.mission.newContract.contractGeneration.targetFinder.MissionTargetFinder;
+import mekhq.campaign.mission.newContract.contractGeneration.targetFinder.PirateMissionTargetFinder;
 import mekhq.campaign.universe.Faction;
 import mekhq.campaign.universe.FactionBorderTracker;
 import mekhq.campaign.universe.Factions;

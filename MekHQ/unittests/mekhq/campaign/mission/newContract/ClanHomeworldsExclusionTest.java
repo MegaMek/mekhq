@@ -32,7 +32,7 @@
  */
 package mekhq.campaign.mission.newContract;
 
-import static mekhq.campaign.mission.newContract.targetFinder.ClanHomeworldsExclusion.violatesHomeworldsExclusion;
+import static mekhq.campaign.mission.newContract.contractGeneration.targetFinder.ClanHomeworldsExclusion.violatesHomeworldsExclusion;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;

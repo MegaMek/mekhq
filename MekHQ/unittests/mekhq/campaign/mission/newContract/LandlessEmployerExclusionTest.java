@@ -40,7 +40,7 @@ import static org.mockito.Mockito.when;
 
 import java.time.LocalDate;
 
-import mekhq.campaign.mission.newContract.targetFinder.LandlessEmployerExclusion;
+import mekhq.campaign.mission.newContract.contractGeneration.targetFinder.LandlessEmployerExclusion;
 import mekhq.campaign.universe.Faction;
 import mekhq.campaign.universe.RandomFactionGenerator;
 import org.junit.jupiter.api.Test;

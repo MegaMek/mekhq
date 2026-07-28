@@ -44,8 +44,8 @@ import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.mission.AtBScenario;
 import mekhq.campaign.mission.newContract.contractGeneration.ChaosObjectiveType;
-import mekhq.campaign.mission.newContract.targetFinder.EnemySelectionProfile;
-import mekhq.campaign.mission.newContract.targetFinder.MissionLocationProfile;
+import mekhq.campaign.mission.newContract.contractGeneration.targetFinder.EnemySelectionProfile;
+import mekhq.campaign.mission.newContract.contractGeneration.targetFinder.MissionLocationProfile;
 
 public enum AtBContractType {
     // NEVER SORT THESE ENUM ENTRIES. IT WILL BREAK ATB CONTRACT GENERATION.

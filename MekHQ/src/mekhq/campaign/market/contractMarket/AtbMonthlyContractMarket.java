@@ -42,7 +42,7 @@ import static mekhq.campaign.enums.DailyReportType.GENERAL;
 import static mekhq.campaign.enums.DailyReportType.PERSONNEL;
 import static mekhq.campaign.enums.DailyReportType.SKILL_CHECKS;
 import static mekhq.campaign.mission.ContractDifficulty.calculateContractDifficulty;
-import static mekhq.campaign.mission.newContract.targetFinder.ClanHomeworldsExclusion.violatesHomeworldsExclusion;
+import static mekhq.campaign.mission.newContract.contractGeneration.targetFinder.ClanHomeworldsExclusion.violatesHomeworldsExclusion;
 import static mekhq.campaign.personnel.PersonnelOptions.ADMIN_NETWORKER;
 import static mekhq.campaign.personnel.PersonnelOptions.EDGE_COMMANDER_NEGOTIATION;
 import static mekhq.campaign.personnel.skills.SkillType.S_NEGOTIATION;
