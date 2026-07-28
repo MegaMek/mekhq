@@ -35,8 +35,15 @@ package mekhq.campaign.mission.newContract.contractGeneration;
 import static java.lang.Math.max;
 import static java.lang.Math.round;
 import static megamek.common.compute.Compute.randomInt;
+import static mekhq.campaign.mission.newContract.contractGeneration.ChaosObjectiveSpecialRules.DOUBLE_ALL_COSTS;
+import static mekhq.campaign.mission.newContract.contractGeneration.ChaosObjectiveSpecialRules.DOUBLE_SUPPORT_PAYOUTS;
+import static mekhq.campaign.mission.newContract.contractGeneration.ChaosObjectiveSpecialRules.END_CONTRACT_AFTER_TWO_CONSECUTIVE_TRACKS;
+import static mekhq.campaign.mission.newContract.contractGeneration.ChaosObjectiveSpecialRules.NO_IN_CONTRACT_SUPPORT;
+import static mekhq.campaign.mission.newContract.contractGeneration.ChaosObjectiveSpecialRules.SIMULATED_DAMAGE;
+import static mekhq.campaign.mission.newContract.contractGeneration.ChaosObjectiveSpecialRules.USE_PIRATE_LOOTING;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import megamek.codeUtilities.ObjectUtility;
@@ -44,37 +51,43 @@ import megamek.logging.MMLogger;
 import mekhq.campaign.mission.enums.AtBContractType;
 
 public enum ChaosObjectiveType {
-    EXPEDITION(3, 0, 1, 0, 0, 2),
-    PIRATE_HUNT(3, 0, 0, 0, -1, 2),
-    GUERILLA_OPERATION(3, 0, 0, 0, -1, 2),
-    GARRISON(6, 1, 0, 1, -2, 0),
-    CADRE_DUTY(6, 1, 0, 1, -2, 0),
-    RAID(3, 0, 0, 0, -1, 0),
-    INVASION(6, -1, 2, -1, 1, -2),
-    PIRATE_RAID(3, 0, 0, 0, -1, 0);
+    EXPEDITION(3, 0, 1, 0, 0, 2,
+          Collections.emptyList()),
+    PIRATE_HUNT(3, 0, 0, 0, -1, 2,
+          List.of(END_CONTRACT_AFTER_TWO_CONSECUTIVE_TRACKS)),
+    GUERILLA_OPERATION(3, 0, 0, 0, -1, 2,
+          List.of(DOUBLE_ALL_COSTS, NO_IN_CONTRACT_SUPPORT, DOUBLE_SUPPORT_PAYOUTS)),
+    GARRISON(6, 1, 0, 1, -2, 0,
+          Collections.emptyList()),
+    CADRE_DUTY(6, 1, 0, 1, -2, 0,
+          List.of(SIMULATED_DAMAGE)),
+    RAID(3, 0, 0, 0, -1, 0,
+          Collections.emptyList()),
+    INVASION(6, -1, 2, -1, 1, -2,
+          Collections.emptyList()),
+    PIRATE_RAID(3, 0, 0, 0, -1, 0,
+          List.of(END_CONTRACT_AFTER_TWO_CONSECUTIVE_TRACKS, USE_PIRATE_LOOTING));
 
     private static final MMLogger LOGGER = MMLogger.create(ChaosObjectiveType.class);
 
-    // Hot Spots Draconis Reach pg 144 first printing
-    private final int monthsLength;
-    // Hot Spots Draconis Reach pg 144 first printing
-    private final int payRateModifier;
-    // Hot Spots Draconis Reach pg 144 first printing
-    private final int supportModifier;
-    // Hot Spots Draconis Reach pg 144 first printing
-    private final int transportModifier;
-    // Hot Spots Draconis Reach pg 144 first printing
-    private final int salvageRightsModifier;
-    private final int commandRightsModifier;
+    private final int monthsLength; // Hot Spots Draconis Reach pg 144 first printing
+    private final int payRateModifier; // Hot Spots Draconis Reach pg 144 first printing
+    private final int supportModifier; // Hot Spots Draconis Reach pg 144 first printing
+    private final int transportModifier; // Hot Spots Draconis Reach pg 144 first printing
+    private final int salvageRightsModifier; // Hot Spots Draconis Reach pg 144 first printing
+    private final int commandRightsModifier; // Hot Spots Draconis Reach pg 144 first printing
+    private final List<ChaosObjectiveSpecialRules> specialRules;  // Hot Spots Draconis Reach pg 146 first printing
 
     ChaosObjectiveType(final int monthsLength, final int payRateModifier, final int supportModifier,
-          final int transportModifier, final int salvageRightsModifier, final int commandRightsModifier) {
+          final int transportModifier, final int salvageRightsModifier, final int commandRightsModifier,
+          final List<ChaosObjectiveSpecialRules> specialRules) {
         this.monthsLength = monthsLength;
         this.payRateModifier = payRateModifier;
         this.supportModifier = supportModifier;
         this.transportModifier = transportModifier;
         this.salvageRightsModifier = salvageRightsModifier;
         this.commandRightsModifier = commandRightsModifier;
+        this.specialRules = specialRules;
     }
 
     public int getMonthsLength() {
@@ -149,5 +162,13 @@ public enum ChaosObjectiveType {
 
     public int getCommandRightsModifier() {
         return commandRightsModifier;
+    }
+
+    public List<ChaosObjectiveSpecialRules> getSpecialRules() {
+        return specialRules;
+    }
+
+    public boolean usesSpecialRule(ChaosObjectiveSpecialRules specialRule) {
+        return specialRules.contains(specialRule);
     }
 }

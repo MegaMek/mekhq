@@ -55,9 +55,10 @@ public class NormalContractGeneration extends AbstractContractGeneration {
     Planet targetPlanet;
     private int monthsLength;
     private ContractTermsData initialContractTerms;
+    private int trackCount;
 
     public NormalContractGeneration(CampaignOptions campaignOptions, LocalDate currentDate, ILocation currentLocation,
-          boolean isMercenarySearch, int contractGenerationModifier, int scale) {
+          boolean isMercenarySearch, int contractGenerationModifier) {
         // Step 1: Employer
         employerGenerationData = ChaosContractEmployerDetermination.getEmployerGenerationData(currentDate,
               currentLocation,
@@ -98,9 +99,10 @@ public class NormalContractGeneration extends AbstractContractGeneration {
         initialContractTerms = ChaosContractDetermineTerms.determineInitialTerms(objectiveType, employerType);
 
         // Step 7: Track Count & Intensity
-
+        trackCount = ChaosContractDetermineIntensity.determineTrackCount(objectiveType);
 
         // Step 13: Special Objective Type Considerations
+
 
         // step n^n: Roll for follow-up objectives
         // Step n+1: Re-Negotiate Contract
