@@ -33,24 +33,23 @@
 package mekhq.campaign.digitalGM.stratCon;
 
 import java.io.File;
-import java.io.FileInputStream;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import javax.xml.transform.Source;
 
-import jakarta.xml.bind.JAXBContext;
-import jakarta.xml.bind.JAXBElement;
-import jakarta.xml.bind.Unmarshaller;
+import com.fasterxml.jackson.annotation.JsonAutoDetect;
+import com.fasterxml.jackson.annotation.PropertyAccessor;
+import com.fasterxml.jackson.core.JsonParser;
+import com.fasterxml.jackson.databind.DeserializationFeature;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.xml.bind.annotation.XmlElement;
 import jakarta.xml.bind.annotation.XmlElementWrapper;
 import jakarta.xml.bind.annotation.XmlRootElement;
 import megamek.logging.MMLogger;
 import mekhq.MHQConstants;
 import mekhq.campaign.mission.enums.AtBContractType;
-import mekhq.utilities.MHQXMLUtility;
 
 /**
  * This class holds data relevant to the various types of contract that can occur in the StratCon campaign system.
@@ -421,11 +420,22 @@ public class StratConContractDefinition {
      *
      * @author NickAragua
      */
-    @XmlRootElement(name = "contractDefinitionManifest")
     private static class ContractDefinitionManifest {
-        @XmlElementWrapper(name = "contractDefinitions")
-        @XmlElement(name = "contractDefinition")
+        private static final ObjectMapper MAPPER = buildMapper();
+
         public Map<AtBContractType, String> definitionFileNames;
+
+        private static ObjectMapper buildMapper() {
+            ObjectMapper mapper = new ObjectMapper();
+            // Use fields as the single source of truth, matching the shipped contract definition JSON files.
+            mapper.setVisibility(PropertyAccessor.ALL, JsonAutoDetect.Visibility.NONE);
+            mapper.setVisibility(PropertyAccessor.FIELD, JsonAutoDetect.Visibility.ANY);
+            // Tolerate fields absent from older files rather than failing the whole load.
+            mapper.disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES);
+            // Skip the leading '#' license-header comment lines that lead every saved file.
+            mapper.enable(JsonParser.Feature.ALLOW_YAML_COMMENTS);
+            return mapper;
+        }
 
         /**
          * Attempt to deserialize an instance of a contract definition manifest from the passed-in file path
@@ -433,7 +443,6 @@ public class StratConContractDefinition {
          * @return Possibly an instance of a contract definition Manifest
          */
         public static ContractDefinitionManifest Deserialize(String fileName) {
-            ContractDefinitionManifest resultingManifest = null;
             File inputFile = new File(fileName);
             if (!inputFile.exists()) {
                 LOGGER.warn("Specified file {} does not exist", fileName);
@@ -441,19 +450,11 @@ public class StratConContractDefinition {
             }
 
             try {
-                JAXBContext context = JAXBContext.newInstance(ContractDefinitionManifest.class);
-                Unmarshaller um = context.createUnmarshaller();
-                try (FileInputStream fileStream = new FileInputStream(inputFile)) {
-                    Source inputSource = MHQXMLUtility.createSafeXmlSource(fileStream);
-                    JAXBElement<ContractDefinitionManifest> manifestElement = um.unmarshal(inputSource,
-                          ContractDefinitionManifest.class);
-                    resultingManifest = manifestElement.getValue();
-                }
+                return MAPPER.readValue(inputFile, ContractDefinitionManifest.class);
             } catch (Exception e) {
                 LOGGER.error("Error deserializing contract definition manifest", e);
+                return null;
             }
-
-            return resultingManifest;
         }
     }
 }

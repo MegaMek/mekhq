@@ -61,14 +61,14 @@ import mekhq.campaign.mission.ScenarioObjective;
 public class AtBScenarioModifier implements Cloneable {
     private static final MMLogger LOGGER = MMLogger.create(AtBScenarioModifier.class);
 
-    private static final String MODIFIER_DIRECTORY = "./data/scenariomodifiers/modifiermanifest.xml";
+    private static final String MODIFIER_DIRECTORY = "./data/scenariomodifiers/modifiermanifest.json";
     private static final String MODIFIER_DIRECTORY_WILDCARD = "./data/scenariomodifiers/%s";
 
     private static final String MODIFIER_TEST_DIRECTORY = "testresources/data/scenariomodifiers" +
-                                                                "/modifiermanifest_test.xml";
+                                                                "/modifiermanifest_test.json";
     private static final String MODIFIER_TEST_DIRECTORY_WILDCARD = "testresources/data/scenariomodifiers/%s";
 
-    private static final String MODIFIER_USER_DIRECTORY = "./data/scenariomodifiers/usermodifiermanifest.xml";
+    private static final String MODIFIER_USER_DIRECTORY = "./data/scenariomodifiers/usermodifiermanifest.json";
 
     /**
      * Possible values for when a scenario modifier may occur: before or after primary force generation.

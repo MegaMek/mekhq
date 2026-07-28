@@ -79,7 +79,7 @@ class ScenarioTemplateSerializationTest {
      * The manifest file is not a scenario template and must never be part of the corpus. It is excluded when the
      * fixtures are staged, but is guarded here as well so an accidental copy fails loudly.
      */
-    private static final String SCENARIO_MANIFEST_FILE_NAME = "ScenarioManifest.xml";
+    private static final String SCENARIO_MANIFEST_FILE_NAME = "ScenarioManifest.json";
 
     /**
      * Provides every shipped scenario template file in the corpus, sorted for stable ordering.

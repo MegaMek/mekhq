@@ -1,6 +1,5 @@
-<!--
-# MegaMek Data (C) 2025 by The MegaMek Team is licensed under CC BY-NC-SA 4.0.
-# To view a copy of this license, visit https://creativecommons.org/licenses/by-nc-sa/4.0/
+# MegaMek Data (C) 2025-2026 by The MegaMek Team is licensed under CC BY-NC-SA 4.0.
+# To view a copy of this license, visit https: //creativecommons.org/licenses/by-nc-sa/4.0/
 #
 # NOTICE: The MegaMek organization is a non-profit group of volunteers
 # creating free software for the BattleTech community.
@@ -13,13 +12,11 @@
 #
 # MechWarrior Copyright Microsoft Corporation. MegaMek Data was created under
 # Microsoft's "Game Content Usage Rules"
-# <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+# <https: //www.xbox.com/en-US/developers/rules> and it is not endorsed by or
 # affiliated with Microsoft.
---><!-- This is *all* possible scenario modifiers -->
-<scenarioModifierManifest>
-    <modifiers>
-        <modifier>
-            EnemyAirSupport_test.json
-        </modifier>
-    </modifiers>
-</scenarioModifierManifest>
+
+{
+"fileNameList": [
+"EnemyAirSupport_test.json"
+]
+}
