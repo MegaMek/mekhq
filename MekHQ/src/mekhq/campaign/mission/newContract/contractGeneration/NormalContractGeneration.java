@@ -51,7 +51,7 @@ public class NormalContractGeneration extends AbstractContractGeneration {
     public static @Nullable ChaosContract createChaosContract(CampaignOptions campaignOptions, LocalDate currentDate,
           ILocation currentLocation,
           boolean isMercenarySearch, int contractGenerationModifier) {
-        ChaosContract contract = new ChaosContract();
+        final ChaosContract contract = new ChaosContract();
 
         // Step 1: Employer
         EmployerGenerationData employerGenerationData =
