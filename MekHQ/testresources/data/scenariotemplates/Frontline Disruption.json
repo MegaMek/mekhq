@@ -1,0 +1,148 @@
+# MegaMek Data (C) 2025-2026 by The MegaMek Team is licensed under CC BY-NC-SA 4.0.
+# To view a copy of this license, visit https: //creativecommons.org/licenses/by-nc-sa/4.0/
+#
+# NOTICE: The MegaMek organization is a non-profit group of volunteers
+# creating free software for the BattleTech community.
+#
+# MechWarrior, BattleMech, `Mech and AeroTech are registered trademarks
+# of The Topps Company, Inc. All Rights Reserved.
+#
+# Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
+# InMediaRes Productions, LLC.
+#
+# MechWarrior Copyright Microsoft Corporation. MegaMek Data was created under
+# Microsoft's "Game Content Usage Rules"
+# <https: //www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+# affiliated with Microsoft.
+
+{
+"name": "Frontline Disruption",
+"stratConScenarioType": "NONE",
+"shortBriefing": "Disrupt and delay frontline force.",
+"detailedBriefing": "A large enemy force is advancing toward a critical objective, and it is your responsibility to stop them. Your mission is to disrupt their advance by preventing at least 33% of their forces from reaching the opposite edge of the engagement zone. If they succeed in breaking through in large numbers, the consequences for our campaign will be severe.\n\nExpect a determined push, as the enemy will prioritize speed and aggression to force their way through. They may attempt to overwhelm your defenses with sheer numbers or concentrated strikes against weak points. You must hold firm, break their momentum, and deny them passage. Use the terrain, stagger your defenses, and eliminate high-value targets to throw their advance into disarray.\n\nWe will control the battlefield at the conclusion of this engagement, ensuring that any remaining enemy assets are left for us to claim or destroy. This is our ground—stand fast, hold the line, and make certain they go no further.",
+"isHostileFacility": false,
+"isAlliedFacility": false,
+"isSuitedForAmbushes": false,
+"isSuitedForBungledPatrols": false,
+"battlefieldControl": "PLAYER",
+"mapParameters": {
+"baseWidth": 17,
+"baseHeight": 70,
+"widthScalingIncrement": 1,
+"heightScalingIncrement": 0,
+"additionalMapSheetTall": 1,
+"additionalMapSheetWide": 0,
+"allowRotation": false,
+"useStandardAtBSizing": true,
+"mapLocation": "SpecificGroundTerrain",
+"allowedTerrainTypes": [
+"Plains",
+"Steppe",
+"Savannah",
+"Tundra",
+"SnowField"
+]
+},
+"scenarioModifiers": [
+],
+"scenarioForces": {
+"Player": {
+"forceAlignment": 0,
+"generationMethod": 0,
+"forceMultiplier": 1.0,
+"deploymentZones": [],
+"destinationZone": 5,
+"retreatThreshold": 50,
+"allowedUnitType": -2,
+"canReinforceLinked": false,
+"contributesToBV": true,
+"contributesToUnitCount": true,
+"forceName": "Player",
+"syncedForceName": "OpFor",
+"syncDeploymentType": "OppositeEdge",
+"syncRetreatThreshold": false,
+"arrivalTurn": 0,
+"maxWeightClass": 4,
+"minWeightClass": 0,
+"contributesToMapSize": true,
+"actualDeploymentZone": -1,
+"fixedUnitCount": 0,
+"generationOrder": 1,
+"allowAeroBombs": false,
+"startingAltitude": 0,
+"useArtillery": false,
+"deployOffBoard": false,
+"objectiveLinkedForces": [
+],
+"subjectToRandomRemoval": true,
+"fixedMul": null,
+"forceRoleStrings": []
+},
+"OpFor": {
+"forceAlignment": 2,
+"generationMethod": 1,
+"forceMultiplier": 1.0,
+"deploymentZones": [
+2
+],
+"destinationZone": 6,
+"retreatThreshold": 50,
+"allowedUnitType": -2,
+"canReinforceLinked": false,
+"contributesToBV": false,
+"contributesToUnitCount": false,
+"forceName": "OpFor",
+"syncedForceName": null,
+"syncDeploymentType": "None",
+"syncRetreatThreshold": false,
+"arrivalTurn": 0,
+"maxWeightClass": 4,
+"minWeightClass": 2,
+"contributesToMapSize": true,
+"actualDeploymentZone": -1,
+"fixedUnitCount": 0,
+"generationOrder": 5,
+"allowAeroBombs": false,
+"startingAltitude": 0,
+"useArtillery": false,
+"deployOffBoard": false,
+"objectiveLinkedForces": [],
+"subjectToRandomRemoval": true,
+"fixedMul": null,
+"forceRoleStrings": [
+]
+}
+},
+"scenarioObjectives": [
+{
+"objectiveCriterion": "Destroy",
+"description": "",
+"destinationEdge": "NONE",
+"percentage": 33,
+"fixedAmount": null,
+"timeLimitType": "None",
+"timeLimitAtMost": true,
+"timeLimit": 0,
+"timeLimitScaleFactor": null,
+"associatedForceNames": [
+"OpFor"
+],
+"associatedUnitIDs": [],
+"successEffects": [
+{
+"effectType": "ScenarioVictory",
+"effectScaling": "Fixed",
+"howMuch": 1
+}
+],
+"failureEffects": [
+{
+"effectType": "ScenarioDefeat",
+"effectScaling": "Fixed",
+"howMuch": 1
+}
+],
+"additionalDetails": []
+}
+]
+}

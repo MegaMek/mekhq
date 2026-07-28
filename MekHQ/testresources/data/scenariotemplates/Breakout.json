@@ -1,0 +1,217 @@
+# MegaMek Data (C) 2026 by The MegaMek Team is licensed under CC BY-NC-SA 4.0.
+# To view a copy of this license, visit https: //creativecommons.org/licenses/by-nc-sa/4.0/
+#
+# NOTICE: The MegaMek organization is a non-profit group of volunteers
+# creating free software for the BattleTech community.
+#
+# MechWarrior, BattleMech, `Mech and AeroTech are registered trademarks
+# of The Topps Company, Inc. All Rights Reserved.
+#
+# Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
+# InMediaRes Productions, LLC.
+#
+# MechWarrior Copyright Microsoft Corporation. MegaMek Data was created under
+# Microsoft's "Game Content Usage Rules"
+# <https: //www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+# affiliated with Microsoft.
+
+{
+"name": "Breakout",
+"stratConScenarioType": "NONE",
+"shortBriefing": "Surrounded—punch through the ring and get the force out.",
+"detailedBriefing": "We are encircled. The enemy has closed a ring around your position and is tightening it. Staying put means annihilation; the only answer is to pick a direction, mass everything against it, and break out.",
+"isHostileFacility": false,
+"isAlliedFacility": false,
+"isSuitedForAmbushes": true,
+"isSuitedForBungledPatrols": true,
+"battlefieldControl": "ENEMY",
+"mapParameters": {
+"baseWidth": 0,
+"baseHeight": 0,
+"widthScalingIncrement": 5,
+"heightScalingIncrement": 5,
+"additionalMapSheetTall": 1,
+"additionalMapSheetWide": 0,
+"allowRotation": false,
+"useStandardAtBSizing": true,
+"mapLocation": "AllGroundTerrain",
+"allowedTerrainTypes": [
+"ColdMountain",
+"HotMountainsDry",
+"HotMountainsWet",
+"Mountain"
+]
+},
+"scenarioModifiers": [
+],
+"scenarioForces": {
+"Player": {
+"forceAlignment": 0,
+"generationMethod": 0,
+"forceMultiplier": 1.0,
+"deploymentZones": [
+10
+],
+"destinationZone": 5,
+"retreatThreshold": 50,
+"allowedUnitType": -2,
+"canReinforceLinked": true,
+"contributesToBV": true,
+"contributesToUnitCount": true,
+"forceName": "Player",
+"syncedForceName": null,
+"syncDeploymentType": "None",
+"syncRetreatThreshold": false,
+"arrivalTurn": 0,
+"maxWeightClass": 4,
+"minWeightClass": 0,
+"contributesToMapSize": true,
+"actualDeploymentZone": -1,
+"fixedUnitCount": 0,
+"generationOrder": 1,
+"allowAeroBombs": false,
+"startingAltitude": 0,
+"useArtillery": false,
+"deployOffBoard": false,
+"objectiveLinkedForces": [],
+"subjectToRandomRemoval": false,
+"fixedMul": null,
+"forceRoleStrings": [
+]
+},
+"OpForNorth": {
+"forceAlignment": 2,
+"generationMethod": 1,
+"forceMultiplier": 0.75,
+"deploymentZones": [
+2
+],
+"destinationZone": 5,
+"retreatThreshold": 50,
+"allowedUnitType": -2,
+"canReinforceLinked": true,
+"contributesToBV": false,
+"contributesToUnitCount": false,
+"forceName": "OpForNorth",
+"syncedForceName": null,
+"syncDeploymentType": "None",
+"syncRetreatThreshold": false,
+"arrivalTurn": 0,
+"maxWeightClass": 4,
+"minWeightClass": 0,
+"contributesToMapSize": true,
+"actualDeploymentZone": -1,
+"fixedUnitCount": 0,
+"generationOrder": 5,
+"allowAeroBombs": false,
+"startingAltitude": 0,
+"useArtillery": false,
+"deployOffBoard": false,
+"objectiveLinkedForces": [],
+"subjectToRandomRemoval": true,
+"fixedMul": null,
+"forceRoleStrings": [
+"SR_FIRE_SUPPORT",
+"CAVALRY"
+]
+},
+"OpForSouth": {
+"forceAlignment": 2,
+"generationMethod": 1,
+"forceMultiplier": 0.75,
+"deploymentZones": [
+6
+],
+"destinationZone": 5,
+"retreatThreshold": 50,
+"allowedUnitType": -2,
+"canReinforceLinked": true,
+"contributesToBV": false,
+"contributesToUnitCount": false,
+"forceName": "OpForSouth",
+"syncedForceName": null,
+"syncDeploymentType": "None",
+"syncRetreatThreshold": false,
+"arrivalTurn": 0,
+"maxWeightClass": 4,
+"minWeightClass": 0,
+"contributesToMapSize": true,
+"actualDeploymentZone": -1,
+"fixedUnitCount": 0,
+"generationOrder": 5,
+"allowAeroBombs": false,
+"startingAltitude": 0,
+"useArtillery": false,
+"deployOffBoard": false,
+"objectiveLinkedForces": [],
+"subjectToRandomRemoval": true,
+"fixedMul": null,
+"forceRoleStrings": [
+"SR_FIRE_SUPPORT",
+"CAVALRY"
+]
+}
+},
+"scenarioObjectives": [
+{
+"objectiveCriterion": "ReachMapEdge",
+"description": "",
+"destinationEdge": "NORTH",
+"percentage": 50,
+"fixedAmount": null,
+"timeLimitType": "None",
+"timeLimitAtMost": false,
+"timeLimit": null,
+"timeLimitScaleFactor": 2,
+"associatedForceNames": [
+"Player"
+],
+"associatedUnitIDs": [],
+"successEffects": [
+{
+"effectType": "ScenarioVictory",
+"effectScaling": "Fixed",
+"howMuch": 2
+}
+],
+"failureEffects": [
+{
+"effectType": "ScenarioDefeat",
+"effectScaling": "Fixed",
+"howMuch": 1
+}
+],
+"additionalDetails": []
+},
+{
+"objectiveCriterion": "ReachMapEdge",
+"description": "",
+"destinationEdge": "SOUTH",
+"percentage": 50,
+"fixedAmount": null,
+"timeLimitType": "None",
+"timeLimitAtMost": true,
+"timeLimit": null,
+"timeLimitScaleFactor": null,
+"associatedForceNames": [
+"Player"
+],
+"associatedUnitIDs": [],
+"successEffects": [
+{
+"effectType": "ScenarioVictory",
+"effectScaling": "Fixed",
+"howMuch": 2
+}
+],
+"failureEffects": [
+{
+"effectType": "ScenarioDefeat",
+"effectScaling": "Fixed",
+"howMuch": 1
+}
+],
+"additionalDetails": []
+}
+]
+}
