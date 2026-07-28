@@ -35,6 +35,7 @@ package mekhq.campaign.mission.newContract.contractGeneration;
 import java.time.LocalDate;
 import java.util.Collection;
 
+import jakarta.annotation.Nullable;
 import megamek.codeUtilities.ObjectUtility;
 import mekhq.campaign.campaignOptions.CampaignOption;
 import mekhq.campaign.campaignOptions.CampaignOptions;
@@ -47,41 +48,30 @@ import mekhq.campaign.universe.PlanetarySystem;
 import mekhq.campaign.universe.Systems;
 
 public class NormalContractGeneration extends AbstractContractGeneration {
-    private boolean generationWasSuccessful = false;
-
-    private EmployerGenerationData employerGenerationData;
-    private ContractObjectiveData objectiveData;
-    private Faction enemyFaction;
-    PlanetarySystem targetSystem;
-    Planet targetPlanet; // TODO uses placeholder code
-    private int monthsLength;
-    private ContractTermsData initialContractTerms;
-    private int trackCount; // TODO future proofing
-
-    public NormalContractGeneration(CampaignOptions campaignOptions, LocalDate currentDate, ILocation currentLocation,
+    public static @Nullable ChaosContract createChaosContract(CampaignOptions campaignOptions, LocalDate currentDate,
+          ILocation currentLocation,
           boolean isMercenarySearch, int contractGenerationModifier) {
         ChaosContract contract = new ChaosContract();
 
-
         // Step 1: Employer
-        employerGenerationData = ChaosContractEmployerDetermination.getEmployerGenerationData(currentDate,
-              currentLocation,
-              isMercenarySearch);
-
+        EmployerGenerationData employerGenerationData =
+              ChaosContractEmployerDetermination.getEmployerGenerationData(currentDate,
+                    currentLocation,
+                    isMercenarySearch);
         if (employerGenerationData.faction() == null) {
             // No employer means no contract
-            return;
+            return null;
         }
 
         ChaosEmployerType employerType = employerGenerationData.type();
 
         // Step 2: Type
-        objectiveData = ChaosContractObjectiveDetermination.determineContractObjectiveType(
+        ContractObjectiveData objectiveData = ChaosContractObjectiveDetermination.determineContractObjectiveType(
               contractGenerationModifier);
         ChaosObjectiveType objectiveType = objectiveData.playerObjectiveType().getChaosObjectiveType();
 
         // Step 3: Enemy
-        enemyFaction = ChaosContractDeterminationEnemy.generateEnemyFactionForObjective(currentLocation,
+        Faction enemyFaction = ChaosContractDeterminationEnemy.generateEnemyFactionForObjective(currentLocation,
               currentDate, employerGenerationData.faction(), objectiveData.playerObjectiveType());
 
         // Step 4: Location
@@ -90,22 +80,23 @@ public class NormalContractGeneration extends AbstractContractGeneration {
               employerGenerationData.faction().getShortName(),
               enemyFaction.getShortName(),
               currentLocation);
-        targetSystem = Systems.getInstance().getSystemById(targetSystemId);
+        PlanetarySystem targetSystem = Systems.getInstance().getSystemById(targetSystemId);
         Collection<Planet> candidatePlanets = targetSystem.getPlanets();
         // TODO use same planetary picker profile as System picker
-        targetPlanet = ObjectUtility.getRandomItem(candidatePlanets);
+        Planet targetPlanet = ObjectUtility.getRandomItem(candidatePlanets);
 
         // Step 5: Length
         boolean useVariableContractLength = campaignOptions.get(CampaignOption.VARIABLE_CONTRACT_LENGTH);
-        monthsLength = objectiveType.calculateLength(useVariableContractLength);
+        int monthsLength = objectiveType.calculateLength(useVariableContractLength);
 
         // Step 6: Initial Terms
-        initialContractTerms = ChaosContractDetermineTerms.determineInitialTerms(objectiveType, employerType);
+        ContractTermsData initialContractTerms = ChaosContractDetermineTerms.determineInitialTerms(objectiveType,
+              employerType);
 
         // Step 7: Track Count & Intensity
-        trackCount = ChaosContractDetermineIntensity.determineTrackCount(objectiveType);
+        int trackCount = ChaosContractDetermineIntensity.determineTrackCount(objectiveType);
 
-        // Step 8: sign off
-        generationWasSuccessful = true;
+        // Step 8: Return
+        return contract;
     }
 }
