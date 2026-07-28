@@ -93,26 +93,4 @@ class StratConContractDefinitionSerializationTest {
         assertEquals(List.of("Covert Strike.json", "Deep Raid.json"),
               reloaded.getObjectiveParameters().get(0).objectiveScenarios);
     }
-
-    @Test
-    void legacyXmlStillReads(@TempDir Path tempDir) throws IOException {
-        String legacyXml = """
-              <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-              <ScenarioTemplate>
-                  <contractTypeName>Objective Raid</contractTypeName>
-                  <briefing>Legacy XML briefing.</briefing>
-                  <alliedFacilityCount>-0.3</alliedFacilityCount>
-                  <hostileFacilityCount>-0.5</hostileFacilityCount>
-                  <allowEarlyVictory>true</allowEarlyVictory>
-              </ScenarioTemplate>
-              """;
-        File xml = tempDir.resolve("legacy.xml").toFile();
-        Files.writeString(xml.toPath(), legacyXml);
-
-        StratConContractDefinition fromXml = StratConContractDefinition.Deserialize(xml);
-        assertNotNull(fromXml, "legacy XML contract definitions must still be readable");
-        assertEquals("Legacy XML briefing.", fromXml.getBriefing());
-        assertEquals(-0.3, fromXml.getAlliedFacilityCount());
-        assertTrue(fromXml.isAllowEarlyVictory());
-    }
 }

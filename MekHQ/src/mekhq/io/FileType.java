@@ -87,10 +87,9 @@ public enum FileType {
     CPNX("Campaign file", "cpnx", "cpnx.gz", "xml"),
 
     /**
-     * Value for scenario template files. JSON is the current format; XML is still accepted for legacy files. The
-     * recommended (first) extension is used when suggesting a save file name.
+     * Value for scenario template files. JSON is the only supported format.
      */
-    SCENARIO_TEMPLATE("Scenario template", "json", "xml");
+    SCENARIO_TEMPLATE("Scenario template", "json");
 
     FileType(String description, String... extensions) {
         this.description = description;

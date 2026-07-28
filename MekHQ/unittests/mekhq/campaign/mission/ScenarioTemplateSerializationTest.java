@@ -88,7 +88,7 @@ class ScenarioTemplateSerializationTest {
      */
     private static Stream<Path> shippedScenarioTemplateFiles() throws IOException {
         try (Stream<Path> paths = Files.list(CORPUS_DIRECTORY)) {
-            return paths.filter(path -> path.getFileName().toString().endsWith(".xml"))
+            return paths.filter(path -> path.getFileName().toString().endsWith(".json"))
                          .filter(path -> !path.getFileName().toString().equals(SCENARIO_MANIFEST_FILE_NAME))
                          .sorted(Comparator.comparing(Path::toString))
                          .toList()
@@ -131,7 +131,7 @@ class ScenarioTemplateSerializationTest {
 
         String firstSerialization = serialize(firstLoad);
 
-        ScenarioTemplate secondLoad = deserialize(firstSerialization, tempDir.resolve("round-trip.xml"));
+        ScenarioTemplate secondLoad = roundTripViaJson(firstLoad, tempDir.resolve("round-trip.json"));
         assertNotNull(secondLoad, "Failed to re-deserialize round-tripped template: " + templateFile);
 
         String secondSerialization = serialize(secondLoad);
@@ -159,7 +159,7 @@ class ScenarioTemplateSerializationTest {
 
         String firstSerialization = serialize(maximal);
 
-        ScenarioTemplate reloaded = deserialize(firstSerialization, tempDir.resolve("maximal.xml"));
+        ScenarioTemplate reloaded = roundTripViaJson(maximal, tempDir.resolve("maximal.json"));
         assertNotNull(reloaded, "Failed to deserialize the maximal template");
 
         String secondSerialization = serialize(reloaded);
@@ -180,10 +180,10 @@ class ScenarioTemplateSerializationTest {
      */
     @Test
     void additionalMapSheetFieldsSurviveLoad() {
-        Path gauntletRun = CORPUS_DIRECTORY.resolve("Gauntlet Run.xml");
+        Path gauntletRun = CORPUS_DIRECTORY.resolve("Gauntlet Run.json");
         ScenarioTemplate template = ScenarioTemplate.Deserialize(gauntletRun.toFile());
 
-        assertNotNull(template, "Failed to deserialize Gauntlet Run.xml");
+        assertNotNull(template, "Failed to deserialize Gauntlet Run.json");
         assertEquals(2, template.mapParameters.getAdditionalMapSheetTall(),
               "additionalMapSheetTall authored in Gauntlet Run.xml (2) was lost on load");
     }
@@ -320,10 +320,11 @@ class ScenarioTemplateSerializationTest {
     }
 
     /**
-     * Writes the given serialized XML to a scratch file and deserializes it back through the production file path.
+     * Round-trips a template through the production JSON file path: saves it to a scratch {@code .json} file and reads it
+     * back. JSON is the only standalone format, so a save/load cycle goes through it.
      */
-    private static ScenarioTemplate deserialize(String serializedXml, Path scratchFile) throws IOException {
-        Files.writeString(scratchFile, serializedXml);
+    private static ScenarioTemplate roundTripViaJson(ScenarioTemplate template, Path scratchFile) {
+        template.Serialize(scratchFile.toFile());
         return ScenarioTemplate.Deserialize(scratchFile.toFile());
     }
 }

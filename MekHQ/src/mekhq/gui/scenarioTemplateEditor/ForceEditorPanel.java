@@ -34,6 +34,7 @@ package mekhq.gui.scenarioTemplateEditor;
 
 import static megamek.client.ui.WrapLayout.wordWrap;
 import static megamek.client.ui.util.UIUtil.scaleForGUI;
+import static mekhq.utilities.MHQInternationalization.getTextAt;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
@@ -47,7 +48,6 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Objects;
-import java.util.ResourceBundle;
 import javax.swing.*;
 import javax.swing.border.LineBorder;
 
@@ -71,8 +71,7 @@ import mekhq.campaign.mission.ScenarioForceTemplate.SynchronizedDeploymentType;
  */
 public class ForceEditorPanel extends JPanel {
 
-    private static final ResourceBundle RESOURCES = ResourceBundle.getBundle(
-          "mekhq.resources.ScenarioTemplateEditorDialog");
+    private static final String RESOURCE_BUNDLE = "mekhq.resources.ScenarioTemplateEditorDialog";
 
     private final Dimension spinnerSize = new Dimension(75, 25);
 
@@ -106,7 +105,7 @@ public class ForceEditorPanel extends JPanel {
     private final JCheckBox chkSubjectToRandomRemoval = new JCheckBox();
     private final JCheckBox chkSyncRetreatThreshold = new JCheckBox();
     private final RoleSetEditorPanel roleSetEditorPanel = new RoleSetEditorPanel();
-    private final JButton btnSave = new JButton(RESOURCES.getString("ForceEditorPanel.save"));
+    private final JButton btnSave = new JButton(getTextAt(RESOURCE_BUNDLE, "ForceEditorPanel.save"));
 
     private Runnable onSave;
 
@@ -211,7 +210,7 @@ public class ForceEditorPanel extends JPanel {
 
     /** Sets a word-wrapped tooltip (from the resource bundle) on a control. */
     private static void setTip(JComponent component, String tooltipKey) {
-        component.setToolTipText(wordWrap(RESOURCES.getString(tooltipKey)));
+        component.setToolTipText(wordWrap(getTextAt(RESOURCE_BUNDLE, tooltipKey)));
     }
 
     private void layoutControls() {
@@ -265,7 +264,7 @@ public class ForceEditorPanel extends JPanel {
     /** Middle column: the deployment-zone list, with its label sitting directly above it. */
     private JPanel buildDeploymentZonesColumn() {
         JPanel panel = new JPanel(new BorderLayout(0, 2));
-        panel.add(new JLabel(RESOURCES.getString("ForceEditorPanel.deploymentZones.label")), BorderLayout.NORTH);
+        panel.add(new JLabel(getTextAt(RESOURCE_BUNDLE, "ForceEditorPanel.deploymentZones.label")), BorderLayout.NORTH);
         panel.add(sizedScroll(lstDeployZones, scaleForGUI(130), scaleForGUI(240)), BorderLayout.CENTER);
         return panel;
     }
@@ -307,7 +306,7 @@ public class ForceEditorPanel extends JPanel {
     /** Adds a resource-keyed label (column 0) and its control (column 1) on the current row, then advances a row. */
     private void addLabeledRow(JPanel panel, GridBagConstraints constraints, String labelKey, Component control) {
         constraints.gridx = 0;
-        panel.add(new JLabel(RESOURCES.getString(labelKey)), constraints);
+        panel.add(new JLabel(getTextAt(RESOURCE_BUNDLE, labelKey)), constraints);
         constraints.gridx = 1;
         panel.add(control, constraints);
         constraints.gridy++;

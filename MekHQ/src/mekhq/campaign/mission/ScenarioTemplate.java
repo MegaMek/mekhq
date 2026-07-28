@@ -32,11 +32,7 @@
  */
 package mekhq.campaign.mission;
 
-import static mekhq.campaign.digitalGM.stratCon.StratConContractDefinition.jsonBufferReader;
-
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -44,7 +40,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 import javax.xml.namespace.QName;
-import javax.xml.transform.Source;
 
 import jakarta.xml.bind.JAXBContext;
 import jakarta.xml.bind.JAXBElement;
@@ -60,7 +55,6 @@ import mekhq.campaign.mission.ScenarioForceTemplate.ForceAlignment;
 import mekhq.campaign.mission.ScenarioForceTemplate.ForceGenerationMethod;
 import mekhq.campaign.mission.ScenarioMapParameters.MapLocation;
 import mekhq.campaign.mission.enums.ScenarioType;
-import mekhq.utilities.MHQXMLUtility;
 import org.w3c.dom.Node;
 
 /**
@@ -341,41 +335,12 @@ public class ScenarioTemplate implements Cloneable {
      * @return Possibly an instance of a ScenarioTemplate
      */
     public static ScenarioTemplate Deserialize(File inputFile) {
-        ScenarioTemplate resultingTemplate = null;
-
         try {
-            // JSON is the write format; XML is still read for legacy/user files. Detect by content (a leading '{' is
-            // JSON) rather than extension, so a file is parsed correctly regardless of what it is named.
-            if (isJsonContent(inputFile)) {
-                return ScenarioTemplateJson.fromFile(inputFile);
-            }
-
-            JAXBContext context = JAXBContext.newInstance(ScenarioTemplate.class);
-            Unmarshaller um = context.createUnmarshaller();
-            try (FileInputStream fileStream = new FileInputStream(inputFile)) {
-                Source inputSource = MHQXMLUtility.createSafeXmlSource(fileStream);
-                JAXBElement<ScenarioTemplate> templateElement = um.unmarshal(inputSource, ScenarioTemplate.class);
-                resultingTemplate = templateElement.getValue();
-            }
+            return ScenarioTemplateJson.fromFile(inputFile);
         } catch (Exception e) {
             LOGGER.error("Error Deserializing Scenario Template", e);
+            return null;
         }
-
-        return resultingTemplate;
-    }
-
-    /**
-     * Determines whether a file holds JSON by inspecting its first non-whitespace character. A leading '{' indicates
-     * JSON; anything else (a scenario template XML document begins with '<') is treated as XML.
-     *
-     * @param inputFile the file to inspect
-     *
-     * @return true if the file appears to contain JSON
-     *
-     * @throws IOException if the file cannot be read
-     */
-    private static boolean isJsonContent(File inputFile) throws IOException {
-        return jsonBufferReader(inputFile);
     }
 
     /**

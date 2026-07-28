@@ -33,11 +33,11 @@
 package mekhq.gui.scenarioTemplateEditor;
 
 import static megamek.client.ui.WrapLayout.wordWrap;
+import static mekhq.utilities.MHQInternationalization.getTextAt;
 
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.util.List;
-import java.util.ResourceBundle;
 import javax.swing.DefaultListModel;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
@@ -59,8 +59,7 @@ import megamek.common.ui.FastJScrollPane;
  */
 public class ModifiersPanel extends JPanel {
 
-    private static final ResourceBundle RESOURCES = ResourceBundle.getBundle(
-          "mekhq.resources.ScenarioTemplateEditorDialog");
+    private static final String RESOURCE_BUNDLE = "mekhq.resources.ScenarioTemplateEditorDialog";
 
     private final JComboBox<String> modifierPicker = new JComboBox<>();
     private final DefaultListModel<String> selectedModel = new DefaultListModel<>();
@@ -83,31 +82,31 @@ public class ModifiersPanel extends JPanel {
         constraints.anchor = GridBagConstraints.WEST;
 
         constraints.gridwidth = GridBagConstraints.REMAINDER;
-        add(new JLabel(RESOURCES.getString("ModifiersPanel.title")), constraints);
+        add(new JLabel(getTextAt(RESOURCE_BUNDLE, "ModifiersPanel.title")), constraints);
         constraints.gridwidth = 1;
 
         constraints.gridy++;
-        modifierPicker.setToolTipText(wordWrap(RESOURCES.getString("ModifiersPanel.picker.tooltip")));
+        modifierPicker.setToolTipText(wordWrap(getTextAt(RESOURCE_BUNDLE, "ModifiersPanel.picker.tooltip")));
         add(modifierPicker, constraints);
 
         constraints.gridx++;
-        JButton btnAdd = new JButton(RESOURCES.getString("ModifiersPanel.add"));
-        btnAdd.setToolTipText(wordWrap(RESOURCES.getString("ModifiersPanel.add.tooltip")));
+        JButton btnAdd = new JButton(getTextAt(RESOURCE_BUNDLE, "ModifiersPanel.add"));
+        btnAdd.setToolTipText(wordWrap(getTextAt(RESOURCE_BUNDLE, "ModifiersPanel.add.tooltip")));
         btnAdd.addActionListener(evt -> addSelectedModifier());
         add(btnAdd, constraints);
 
         constraints.gridx = 0;
         constraints.gridy++;
         constraints.gridheight = 3;
-        selectedList.setToolTipText(wordWrap(RESOURCES.getString("ModifiersPanel.selectedList.tooltip")));
+        selectedList.setToolTipText(wordWrap(getTextAt(RESOURCE_BUNDLE, "ModifiersPanel.selectedList.tooltip")));
         FastJScrollPane scrollPane = new FastJScrollPane(selectedList);
         scrollPane.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED);
         add(scrollPane, constraints);
 
         constraints.gridx++;
         constraints.gridheight = 1;
-        JButton btnRemove = new JButton(RESOURCES.getString("ModifiersPanel.remove"));
-        btnRemove.setToolTipText(wordWrap(RESOURCES.getString("ModifiersPanel.remove.tooltip")));
+        JButton btnRemove = new JButton(getTextAt(RESOURCE_BUNDLE, "ModifiersPanel.remove"));
+        btnRemove.setToolTipText(wordWrap(getTextAt(RESOURCE_BUNDLE, "ModifiersPanel.remove.tooltip")));
         btnRemove.addActionListener(evt -> removeSelectedModifiers());
         add(btnRemove, constraints);
     }

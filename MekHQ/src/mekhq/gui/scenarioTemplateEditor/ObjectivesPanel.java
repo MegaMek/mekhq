@@ -34,11 +34,11 @@ package mekhq.gui.scenarioTemplateEditor;
 
 import static megamek.client.ui.WrapLayout.wordWrap;
 import static megamek.client.ui.util.UIUtil.scaleForGUI;
+import static mekhq.utilities.MHQInternationalization.getTextAt;
 
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
-import java.util.ResourceBundle;
 import javax.swing.DefaultListModel;
 import javax.swing.JButton;
 import javax.swing.JLabel;
@@ -62,11 +62,10 @@ import org.jspecify.annotations.NonNull;
  */
 public class ObjectivesPanel extends JPanel {
 
-    private static final ResourceBundle RESOURCES = ResourceBundle.getBundle(
-          "mekhq.resources.ScenarioTemplateEditorDialog");
+    private static final String RESOURCE_BUNDLE = "mekhq.resources.ScenarioTemplateEditorDialog";
 
     private final JList<ScenarioObjective> objectiveList = new JList<>();
-    private final JButton btnRemoveObjective = new JButton(RESOURCES.getString("ObjectivesPanel.remove"));
+    private final JButton btnRemoveObjective = new JButton(getTextAt(RESOURCE_BUNDLE, "ObjectivesPanel.remove"));
 
     private ScenarioTemplate template;
 
@@ -81,13 +80,13 @@ public class ObjectivesPanel extends JPanel {
         objectiveList.setFixedCellWidth(scaleForGUI(400));
         objectiveList.addListSelectionListener(
               evt -> btnRemoveObjective.setEnabled(!objectiveList.getSelectedValuesList().isEmpty()));
-        objectiveList.setToolTipText(wordWrap(RESOURCES.getString("ObjectivesPanel.list.tooltip")));
+        objectiveList.setToolTipText(wordWrap(getTextAt(RESOURCE_BUNDLE, "ObjectivesPanel.list.tooltip")));
 
-        JButton btnAddEditObjective = new JButton(RESOURCES.getString("ObjectivesPanel.addEdit"));
-        btnAddEditObjective.setToolTipText(wordWrap(RESOURCES.getString("ObjectivesPanel.addEdit.tooltip")));
+        JButton btnAddEditObjective = new JButton(getTextAt(RESOURCE_BUNDLE, "ObjectivesPanel.addEdit"));
+        btnAddEditObjective.setToolTipText(wordWrap(getTextAt(RESOURCE_BUNDLE, "ObjectivesPanel.addEdit.tooltip")));
         btnAddEditObjective.addActionListener(evt -> openObjectiveEditor());
 
-        btnRemoveObjective.setToolTipText(wordWrap(RESOURCES.getString("ObjectivesPanel.remove.tooltip")));
+        btnRemoveObjective.setToolTipText(wordWrap(getTextAt(RESOURCE_BUNDLE, "ObjectivesPanel.remove.tooltip")));
         btnRemoveObjective.addActionListener(evt -> removeSelectedObjectives());
         btnRemoveObjective.setEnabled(false);
 
@@ -96,7 +95,7 @@ public class ObjectivesPanel extends JPanel {
 
         constraints.gridx = 0;
         constraints.gridy = 0;
-        add(new JLabel(RESOURCES.getString("ObjectivesPanel.title")), constraints);
+        add(new JLabel(getTextAt(RESOURCE_BUNDLE, "ObjectivesPanel.title")), constraints);
 
         constraints.gridx = 1;
         constraints.gridy = 1;

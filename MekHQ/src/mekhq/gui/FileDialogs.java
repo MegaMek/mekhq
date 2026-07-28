@@ -41,8 +41,10 @@ import mekhq.MHQConstants;
 import mekhq.MekHQ;
 import mekhq.Utilities;
 import mekhq.campaign.Campaign;
+import mekhq.campaign.digitalGM.stratCon.StratConContractDefinition;
 import mekhq.campaign.mission.Scenario;
 import mekhq.campaign.mission.ScenarioTemplate;
+import mekhq.campaign.mission.atb.AtBScenarioModifier;
 import mekhq.gui.utilities.ObservableString;
 import mekhq.io.FileType;
 import mekhq.utilities.MHQInternationalization;
@@ -320,6 +322,53 @@ public class FileDialogs {
         return value;
     }
 
+    private static final String SCENARIO_MODIFIER_DIRECTORY = "./data/scenariomodifiers";
+    private static final String CONTRACT_DEFINITION_DIRECTORY = "./data/stratconcontractdefinitions";
+
+    /**
+     * Displays a dialog window from which the user can select a scenario modifier file to open.
+     *
+     * @return the file selected, if any
+     */
+    public static Optional<File> openScenarioModifier(JFrame frame) {
+        return GUI.fileDialogOpen(frame, "Load Scenario Modifier", FileType.JSON, SCENARIO_MODIFIER_DIRECTORY);
+    }
+
+    /**
+     * Displays a dialog window from which the user can select a scenario modifier file to save to.
+     *
+     * @return the file selected, if any
+     */
+    public static Optional<File> saveScenarioModifier(JFrame frame, AtBScenarioModifier modifier) {
+        String fileName = (modifier.getModifierName() == null ? "modifier" : modifier.getModifierName()) + ".json";
+        return GUI.fileDialogSave(frame,
+              "Save Scenario Modifier",
+              FileType.JSON,
+              SCENARIO_MODIFIER_DIRECTORY,
+              fileName);
+    }
+
+    /**
+     * Displays a dialog window from which the user can select a contract definition file to open.
+     *
+     * @return the file selected, if any
+     */
+    public static Optional<File> openContractDefinition(JFrame frame) {
+        return GUI.fileDialogOpen(frame, "Load Contract Definition", FileType.JSON, CONTRACT_DEFINITION_DIRECTORY);
+    }
+
+    /**
+     * Displays a dialog window from which the user can select a contract definition file to save to.
+     *
+     * @return the file selected, if any
+     */
+    public static Optional<File> saveContractDefinition(JFrame frame, StratConContractDefinition definition) {
+        String name = definition.getContractTypeName();
+        String fileName = ((name == null) || name.isBlank() ? "contract" : name) + ".json";
+        return GUI.fileDialogSave(frame, "Save Contract Definition", FileType.JSON, CONTRACT_DEFINITION_DIRECTORY,
+              fileName);
+    }
+
     /**
      * Displays a dialog window from which the user can select a <code>.tsv</code> file to open.
      *
@@ -355,8 +404,8 @@ public class FileDialogs {
     }
 
     /**
-     * Displays a dialog window from which the user can select a <code>.csv</code> file to save personnel to.
-     * Uses <code>[Campaign Name]</code><code>[Date]</code>_ExportPersonnel.csv as default filename.
+     * Displays a dialog window from which the user can select a <code>.csv</code> file to save personnel to. Uses
+     * <code>[Campaign Name]</code><code>[Date]</code>_ExportPersonnel.csv as default filename.
      */
     public static Optional<File> savePersonnelCSV(JFrame frame, Campaign campaign) {
         return saveWithBackup(frame, getTextAt("dlgSavePersonnelCSV.title"), MekHQ.getPersonnelDirectory(),
@@ -364,8 +413,8 @@ public class FileDialogs {
     }
 
     /**
-     * Displays a dialog window from which the user can select a <code>.csv</code> file to save units to.
-     * Uses <code>[Campaign Name]</code><code>[Date]</code>_ExportUnits.csv as default filename.
+     * Displays a dialog window from which the user can select a <code>.csv</code> file to save units to. Uses
+     * <code>[Campaign Name]</code><code>[Date]</code>_ExportUnits.csv as default filename.
      */
     public static Optional<File> saveUnitsCSV(JFrame frame, Campaign campaign) {
         return saveWithBackup(frame, getTextAt("dlgSaveUnitsCSV.title"), MekHQ.getUnitsDirectory(),
@@ -373,8 +422,8 @@ public class FileDialogs {
     }
 
     /**
-     * Displays a dialog window from which the user can select a <code>.csv</code> file to save finances to.
-     * Uses <code>[Campaign Name]</code><code>[Date]</code>_ExportFinances.csv as default filename.
+     * Displays a dialog window from which the user can select a <code>.csv</code> file to save finances to. Uses
+     * <code>[Campaign Name]</code><code>[Date]</code>_ExportFinances.csv as default filename.
      */
     public static Optional<File> saveFinancesCSV(JFrame frame, Campaign campaign) {
         return saveWithBackup(frame, getTextAt("dlgSaveFinancesCSV.title"), MekHQ.getFinancesDirectory(),
@@ -382,12 +431,12 @@ public class FileDialogs {
     }
 
     /**
-     * Displays a dialog pointing at the default directory where the user can save a file,
-     * ensures its extension, and creates a backup if it already exists.
+     * Displays a dialog pointing at the default directory where the user can save a file, ensures its extension, and
+     * creates a backup if it already exists.
      *
      * <p>
-     * To streamline UX, the dialog show default directory and pre-populates output file.
-     * After file selection is done, makes file's parent directory default.
+     * To streamline UX, the dialog show default directory and pre-populates output file. After file selection is done,
+     * makes file's parent directory default.
      * </p>
      *
      * @param frame           dialog parent frame
@@ -401,7 +450,11 @@ public class FileDialogs {
     public static Optional<File> saveWithBackup(JFrame frame, String dialogTitle,
           ObservableString defaultDir, String defaultFilename, FileType fileType) {
         String saveFilename = defaultFilename + '.' + fileType.getRecommendedExtension();
-        Optional<File> selectedFile = GUI.fileDialogSave(frame, dialogTitle, fileType, defaultDir.getValue(), saveFilename);
+        Optional<File> selectedFile = GUI.fileDialogSave(frame,
+              dialogTitle,
+              fileType,
+              defaultDir.getValue(),
+              saveFilename);
         Optional<File> outputFile = selectedFile.map(file -> enforceFileExtension(file, fileType));
 
         outputFile.ifPresent(file -> defaultDir.setValue(file.getParent()));

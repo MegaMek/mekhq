@@ -32,6 +32,8 @@
  */
 package mekhq.gui.scenarioTemplateEditor;
 
+import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
+
 import java.util.Map;
 
 import megamek.common.annotations.Nullable;
@@ -49,6 +51,8 @@ import mekhq.campaign.mission.ScenarioForceTemplate;
  * </ul>
  */
 public final class ForceRosterEditor {
+
+    private static final String RESOURCE_BUNDLE = "mekhq.resources.ScenarioTemplateEditorDialog";
 
     private ForceRosterEditor() {
     }
@@ -87,7 +91,9 @@ public final class ForceRosterEditor {
 
         // A brand-new force, or a rename, must not collide with a different existing force.
         if ((!editingExisting || renamed) && roster.containsKey(newForceId)) {
-            return CommitResult.failure("A force with the ID '" + newForceId + "' already exists.");
+            return CommitResult.failure(getFormattedTextAt(RESOURCE_BUNDLE,
+                  "ForceRosterEditor.duplicateId",
+                  newForceId));
         }
 
         // On a rename, drop the entry under the old ID so it is not left orphaned in the map.

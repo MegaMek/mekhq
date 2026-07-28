@@ -112,6 +112,8 @@ import mekhq.campaign.universe.Systems;
 import mekhq.gui.CampaignGUI;
 import mekhq.gui.FileDialogs;
 import mekhq.gui.campaignOptions.CampaignOptionsDialog;
+import mekhq.gui.developerTools.ContractDefinitionEditorDialog;
+import mekhq.gui.developerTools.ScenarioModifierEditorDialog;
 import mekhq.gui.dialog.*;
 import mekhq.gui.dialog.reportDialogs.CargoReportDialog;
 import mekhq.gui.dialog.reportDialogs.HangarReportDialog;
@@ -167,6 +169,7 @@ public class MekHQMenuBar extends JMenuBar {
         add(initReportsMenu());
         add(initViewMenu());
         add(initManageCampaignMenu());
+        add(initDeveloperToolsMenu());
         add(initHelpMenu());
     }
 
@@ -203,8 +206,7 @@ public class MekHQMenuBar extends JMenuBar {
     }
 
     /**
-     * The File menu uses the following Mnemonic keys as of 25-MAR-2022:
-     * C, E, H, I, L, M, N, R, S, T, U, X
+     * The File menu uses the following Mnemonic keys as of 25-MAR-2022: C, E, H, I, L, M, N, R, S, T, U, X
      */
     private JMenu initFileMenu() {
         // TODO : Implement "Export All" versions for Personnel and Parts
@@ -280,8 +282,7 @@ public class MekHQMenuBar extends JMenuBar {
     }
 
     /**
-     * The Import menu uses the following Mnemonic keys as of 25-MAR-2022:
-     * A, C, F, I, P
+     * The Import menu uses the following Mnemonic keys as of 25-MAR-2022: A, C, F, I, P
      */
     private JMenu initImportMenu() {
         JMenu menuImport = new JMenu(getTextAt("menuImport.text"));
@@ -306,12 +307,9 @@ public class MekHQMenuBar extends JMenuBar {
     }
 
     /**
-     * The Export menu uses the following Mnemonic keys as of 25-MAR-2022:
-     * C, X, S
-     * The CSV menu uses the following Mnemonic keys as of 25-MAR-2022:
-     * F, P, U
-     * The XML menu uses the following Mnemonic keys as of 25-MAR-2022:
-     * C, I, P, R
+     * The Export menu uses the following Mnemonic keys as of 25-MAR-2022: C, X, S The CSV menu uses the following
+     * Mnemonic keys as of 25-MAR-2022: F, P, U The XML menu uses the following Mnemonic keys as of 25-MAR-2022: C, I,
+     * P, R
      */
     private JMenu initExportMenu() {
         JMenu menuExport = new JMenu(getTextAt("menuExport.text"));
@@ -370,8 +368,7 @@ public class MekHQMenuBar extends JMenuBar {
     }
 
     /**
-     * The Refresh menu uses the following Mnemonic keys as of 12-APR-2022:
-     * A, C, D, F, P, R, U
+     * The Refresh menu uses the following Mnemonic keys as of 12-APR-2022: A, C, D, F, P, R, U
      */
     private JMenu initRefreshMenu() {
         JMenu menuRefresh = new JMenu(getTextAt("menuRefresh.text"));
@@ -411,8 +408,7 @@ public class MekHQMenuBar extends JMenuBar {
     }
 
     /**
-     * The Marketplace menu uses the following Mnemonic keys as of 19-March-2020:
-     * A, B, C, H, M, N, P, R, S, U
+     * The Marketplace menu uses the following Mnemonic keys as of 19-March-2020: A, B, C, H, M, N, P, R, S, U
      */
     private JMenu initMarketMenu() {
         JMenu menuMarket = new JMenu(getTextAt("menuMarket.text"));
@@ -495,8 +491,7 @@ public class MekHQMenuBar extends JMenuBar {
 
 
     /**
-     * The Reports menu uses the following Mnemonic keys as of 19-March-2020:
-     * C, H, P, T, U
+     * The Reports menu uses the following Mnemonic keys as of 19-March-2020: C, H, P, T, U
      */
     private JMenu initReportsMenu() {
         JMenu menuReports = new JMenu(getTextAt("menuReports.text"));
@@ -515,19 +510,21 @@ public class MekHQMenuBar extends JMenuBar {
     }
 
     /**
-     * The View menu uses the following Mnemonic keys as of 02-June-2020:
-     * H, R
+     * The View menu uses the following Mnemonic keys as of 02-June-2020: H, R
      */
     private JMenu initViewMenu() {
         JMenu menuView = new JMenu(getTextAt("menuView.text"));
         menuView.setMnemonic(KeyEvent.VK_V);
 
-        JMenuItem miHistoricalDailyReportDialog = createMenuItem("miShowHistoricalReportLog.text", KeyEvent.VK_H, evt -> {
-            HistoricalDailyReportDialog histDailyReportDialog = new HistoricalDailyReportDialog(getFrame(), getGui());
-            histDailyReportDialog.setModal(true);
-            histDailyReportDialog.setVisible(true);
-            histDailyReportDialog.dispose();
-        });
+        JMenuItem miHistoricalDailyReportDialog = createMenuItem("miShowHistoricalReportLog.text",
+              KeyEvent.VK_H,
+              evt -> {
+                  HistoricalDailyReportDialog histDailyReportDialog = new HistoricalDailyReportDialog(getFrame(),
+                        getGui());
+                  histDailyReportDialog.setModal(true);
+                  histDailyReportDialog.setVisible(true);
+                  histDailyReportDialog.dispose();
+              });
         menuView.add(miHistoricalDailyReportDialog);
 
         miRetirementDefectionDialog = createMenuItem("miRetirementDefectionDialog.text", KeyEvent.VK_R,
@@ -565,20 +562,19 @@ public class MekHQMenuBar extends JMenuBar {
         });
         menuManage.add(miBloodnames);
 
-        JMenuItem miScenarioEditor = createMenuItem("miScenarioEditor.text", KeyEvent.VK_S,
-              evt -> new ScenarioTemplateEditorDialog(getFrame()).setVisible(true));
-        menuManage.add(miScenarioEditor);
-
         miCompanyGenerator = createMenuItem("miCompanyGenerator.text", KeyEvent.VK_C,
               evt -> new CompanyGenerationDialog(getFrame(), getCampaign()).setVisible(true));
         miCompanyGenerator.setVisible(MekHQ.getMHQOptions().getShowCompanyGenerator());
         menuManage.add(miCompanyGenerator);
 
-        JMenuItem miAutoResolveBehaviorEditor = createMenuItem("miAutoResolveBehaviorSettings.text", KeyEvent.VK_T, evt -> {
-            var autoResolveBehaviorSettingsDialog = new AutoResolveBehaviorSettingsDialog(getFrame(), getCampaign());
-            autoResolveBehaviorSettingsDialog.setVisible(true);
-            autoResolveBehaviorSettingsDialog.pack();
-        });
+        JMenuItem miAutoResolveBehaviorEditor = createMenuItem("miAutoResolveBehaviorSettings.text",
+              KeyEvent.VK_T,
+              evt -> {
+                  var autoResolveBehaviorSettingsDialog = new AutoResolveBehaviorSettingsDialog(getFrame(),
+                        getCampaign());
+                  autoResolveBehaviorSettingsDialog.setVisible(true);
+                  autoResolveBehaviorSettingsDialog.pack();
+              });
 
         menuManage.add(miAutoResolveBehaviorEditor);
 
@@ -586,8 +582,31 @@ public class MekHQMenuBar extends JMenuBar {
     }
 
     /**
-     * The Help menu uses the following Mnemonic keys as of 19-March-2020:
-     * A
+     * Builds the "Developer Tools" menu, which groups the data-file editors: the scenario template editor and the new
+     * scenario modifier and contract definition editors.
+     */
+    private JMenu initDeveloperToolsMenu() {
+        JMenu menuDeveloperTools = new JMenu(getTextAt("menuDeveloperTools.text"));
+        menuDeveloperTools.setMnemonic(KeyEvent.VK_D);
+        menuDeveloperTools.setName("developerToolsMenu");
+
+        JMenuItem miScenarioEditor = createMenuItem("miScenarioEditor.text", KeyEvent.VK_S,
+              evt -> new ScenarioTemplateEditorDialog(getFrame()).setVisible(true));
+        menuDeveloperTools.add(miScenarioEditor);
+
+        JMenuItem miScenarioModifierEditor = createMenuItem("miScenarioModifierEditor.text", KeyEvent.VK_M,
+              evt -> new ScenarioModifierEditorDialog(getFrame()).setVisible(true));
+        menuDeveloperTools.add(miScenarioModifierEditor);
+
+        JMenuItem miContractDefinitionEditor = createMenuItem("miContractDefinitionEditor.text", KeyEvent.VK_C,
+              evt -> new ContractDefinitionEditorDialog(getFrame()).setVisible(true));
+        menuDeveloperTools.add(miContractDefinitionEditor);
+
+        return menuDeveloperTools;
+    }
+
+    /**
+     * The Help menu uses the following Mnemonic keys as of 19-March-2020: A
      */
     private JMenu initHelpMenu() {
         JMenu menuHelp = new JMenu(getTextAt("menuHelp.text"));

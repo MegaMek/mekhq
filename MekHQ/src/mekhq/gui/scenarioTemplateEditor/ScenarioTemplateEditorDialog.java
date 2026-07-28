@@ -33,6 +33,7 @@
 package mekhq.gui.scenarioTemplateEditor;
 
 import static megamek.client.ui.util.UIUtil.scaleForGUI;
+import static mekhq.utilities.MHQInternationalization.getTextAt;
 
 import java.awt.BorderLayout;
 import java.awt.GridBagConstraints;
@@ -76,6 +77,8 @@ public class ScenarioTemplateEditorDialog extends JDialog implements ActionListe
 
     private final static String SAVE_TEMPLATE_COMMAND = "SAVE_TEMPLATE";
     private final static String LOAD_TEMPLATE_COMMAND = "LOAD_TEMPLATE";
+
+    private static final String RESOURCE_BUNDLE = "mekhq.resources.ScenarioTemplateEditorDialog";
 
     private final JFrame frame;
 
@@ -128,7 +131,7 @@ public class ScenarioTemplateEditorDialog extends JDialog implements ActionListe
      * Initialize dialog components.
      */
     protected void initComponents() {
-        this.setTitle("Scenario Template Editor");
+        this.setTitle(getTextAt(RESOURCE_BUNDLE, "ScenarioTemplateEditorDialog.title"));
         getContentPane().setLayout(new GridLayout());
 
         globalPanel = new DefaultMHQScrollablePanel(frame, "globalPanel", new GridBagLayout());
@@ -199,11 +202,12 @@ public class ScenarioTemplateEditorDialog extends JDialog implements ActionListe
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridwidth = 1;
 
-        JLabel lblForces = new JLabel("Participating Forces:");
+        JLabel lblForces = new JLabel(getTextAt(RESOURCE_BUNDLE,
+              "ScenarioTemplateEditorDialog.participatingForces.label"));
         gridBagConstraints.gridy++;
         globalPanel.add(lblForces, gridBagConstraints);
 
-        JButton btnHideShow = new JButton("Hide/Show");
+        JButton btnHideShow = new JButton(getTextAt(RESOURCE_BUNDLE, "ScenarioTemplateEditorDialog.hideShow"));
         btnHideShow.addActionListener(evt -> toggleForcePanelVisibility());
 
         gridBagConstraints.gridx++;
@@ -211,7 +215,7 @@ public class ScenarioTemplateEditorDialog extends JDialog implements ActionListe
         gridBagConstraints.anchor = GridBagConstraints.WEST;
         globalPanel.add(btnHideShow, gridBagConstraints);
 
-        JButton btnNewForce = new JButton("New Force");
+        JButton btnNewForce = new JButton(getTextAt(RESOURCE_BUNDLE, "ScenarioTemplateEditorDialog.newForce"));
         btnNewForce.addActionListener(evt -> newForce());
         gridBagConstraints.gridx++;
         globalPanel.add(btnNewForce, gridBagConstraints);
@@ -258,7 +262,7 @@ public class ScenarioTemplateEditorDialog extends JDialog implements ActionListe
         if (!validationResult.isEmpty()) {
             JOptionPane.showMessageDialog(this,
                   validationResult,
-                  "Invalid Force Configuration",
+                  getTextAt(RESOURCE_BUNDLE, "ScenarioTemplateEditorDialog.invalidForce.title"),
                   JOptionPane.ERROR_MESSAGE);
             return;
         }
@@ -270,7 +274,7 @@ public class ScenarioTemplateEditorDialog extends JDialog implements ActionListe
         if (!commitResult.committed()) {
             JOptionPane.showMessageDialog(this,
                   commitResult.errorMessage(),
-                  "Invalid Force Configuration",
+                  getTextAt(RESOURCE_BUNDLE, "ScenarioTemplateEditorDialog.invalidForce.title"),
                   JOptionPane.ERROR_MESSAGE);
             return;
         }
@@ -305,10 +309,10 @@ public class ScenarioTemplateEditorDialog extends JDialog implements ActionListe
             forceTable.getColumnModel().getColumn(column).setPreferredWidth(columnWidths[column]);
         }
 
-        btnEditForce = new JButton("Edit");
+        btnEditForce = new JButton(getTextAt(RESOURCE_BUNDLE, "button.edit"));
         btnEditForce.setEnabled(false);
         btnEditForce.addActionListener(e -> editSelectedForce());
-        btnRemoveForce = new JButton("Remove");
+        btnRemoveForce = new JButton(getTextAt(RESOURCE_BUNDLE, "button.remove"));
         btnRemoveForce.setEnabled(false);
         btnRemoveForce.addActionListener(e -> removeSelectedForce());
 
@@ -376,19 +380,19 @@ public class ScenarioTemplateEditorDialog extends JDialog implements ActionListe
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy++;
 
-        JButton btnSave = new JButton("Save");
+        JButton btnSave = new JButton(getTextAt(RESOURCE_BUNDLE, "button.save"));
         btnSave.setActionCommand(SAVE_TEMPLATE_COMMAND);
         btnSave.addActionListener(this);
         globalPanel.add(btnSave, gridBagConstraints);
 
         gridBagConstraints.gridx++;
-        JButton btnLoad = new JButton("Load");
+        JButton btnLoad = new JButton(getTextAt(RESOURCE_BUNDLE, "button.load"));
         btnLoad.setActionCommand(LOAD_TEMPLATE_COMMAND);
         btnLoad.addActionListener(this);
         globalPanel.add(btnLoad, gridBagConstraints);
 
         gridBagConstraints.gridx++;
-        JButton btnClose = new JButton("Close");
+        JButton btnClose = new JButton(getTextAt(RESOURCE_BUNDLE, "button.close"));
         btnClose.addActionListener(e -> closeWithConfirmation());
         globalPanel.add(btnClose, gridBagConstraints);
     }
@@ -407,8 +411,8 @@ public class ScenarioTemplateEditorDialog extends JDialog implements ActionListe
     private void closeWithConfirmation() {
         if (isDirty()) {
             int choice = JOptionPane.showConfirmDialog(this,
-                  "You have unsaved changes. Close anyway?",
-                  "Unsaved Changes",
+                  getTextAt(RESOURCE_BUNDLE, "ScenarioTemplateEditorDialog.unsavedChanges.message"),
+                  getTextAt(RESOURCE_BUNDLE, "ScenarioTemplateEditorDialog.unsavedChanges.title"),
                   JOptionPane.YES_NO_OPTION,
                   JOptionPane.WARNING_MESSAGE);
             if (choice != JOptionPane.YES_OPTION) {
@@ -509,7 +513,7 @@ public class ScenarioTemplateEditorDialog extends JDialog implements ActionListe
         if (!dimensionErrors.isEmpty()) {
             JOptionPane.showMessageDialog(this,
                   dimensionErrors,
-                  "Invalid Map Parameters",
+                  getTextAt(RESOURCE_BUNDLE, "ScenarioTemplateEditorDialog.invalidMapParameters.title"),
                   JOptionPane.ERROR_MESSAGE);
             return;
         }
@@ -539,8 +543,8 @@ public class ScenarioTemplateEditorDialog extends JDialog implements ActionListe
 
         if (scenarioTemplate == null) {
             JOptionPane.showMessageDialog(this,
-                  "Error loading specified file. See log for details.",
-                  "Load Error",
+                  getTextAt(RESOURCE_BUNDLE, "ScenarioTemplateEditorDialog.loadError.message"),
+                  getTextAt(RESOURCE_BUNDLE, "ScenarioTemplateEditorDialog.loadError.title"),
                   JOptionPane.ERROR_MESSAGE);
             return;
         }

@@ -32,6 +32,8 @@
  */
 package mekhq.gui.scenarioTemplateEditor;
 
+import static mekhq.utilities.MHQInternationalization.getTextAt;
+
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -70,10 +72,24 @@ public class ForceTableModel extends AbstractTableModel {
     static final int COL_CONTRIBUTES_UNIT_COUNT = 13;
     static final int COL_CONTRIBUTES_MAP_SIZE = 14;
 
-    private static final String[] COLUMN_NAMES = { "Order", "Force ID", "Alignment", "Generation",
-                                                   "Multiplier / Unit Count", "Deployment", "Destination", "Retreat %",
-                                                   "Unit Type", "Max Wt Class", "Arrival Turn", "Reinforce?", "+ BV?",
-                                                   "+ Unit Count?", "+ Map size?" };
+    private static final String RESOURCE_BUNDLE = "mekhq.resources.ScenarioTemplateEditorDialog";
+
+    private static final String[] COLUMN_NAMES = {
+          getTextAt(RESOURCE_BUNDLE, "ForceTableModel.column.order"),
+          getTextAt(RESOURCE_BUNDLE, "ForceTableModel.column.forceId"),
+          getTextAt(RESOURCE_BUNDLE, "ForceTableModel.column.alignment"),
+          getTextAt(RESOURCE_BUNDLE, "ForceTableModel.column.generation"),
+          getTextAt(RESOURCE_BUNDLE, "ForceTableModel.column.multiplier"),
+          getTextAt(RESOURCE_BUNDLE, "ForceTableModel.column.deployment"),
+          getTextAt(RESOURCE_BUNDLE, "ForceTableModel.column.destination"),
+          getTextAt(RESOURCE_BUNDLE, "ForceTableModel.column.retreat"),
+          getTextAt(RESOURCE_BUNDLE, "ForceTableModel.column.unitType"),
+          getTextAt(RESOURCE_BUNDLE, "ForceTableModel.column.maxWeight"),
+          getTextAt(RESOURCE_BUNDLE, "ForceTableModel.column.arrival"),
+          getTextAt(RESOURCE_BUNDLE, "ForceTableModel.column.reinforce"),
+          getTextAt(RESOURCE_BUNDLE, "ForceTableModel.column.contributesBV"),
+          getTextAt(RESOURCE_BUNDLE, "ForceTableModel.column.contributesUnitCount"),
+          getTextAt(RESOURCE_BUNDLE, "ForceTableModel.column.contributesMapSize") };
 
     private final List<ScenarioForceTemplate> forces = new ArrayList<>();
 
@@ -147,7 +163,7 @@ public class ForceTableModel extends AbstractTableModel {
         if (forceTemplate.getGenerationMethod() == ForceGenerationMethod.FixedUnitCount.ordinal()) {
             return forceTemplate.getFixedUnitCount() >= 0 ?
                          Integer.toString(forceTemplate.getFixedUnitCount()) :
-                         "Lance";
+                         getTextAt(RESOURCE_BUNDLE, "ForceTableModel.lance");
         }
         return Double.toString(forceTemplate.getForceMultiplier());
     }
@@ -169,6 +185,8 @@ public class ForceTableModel extends AbstractTableModel {
     }
 
     private static String yesNo(boolean value) {
-        return value ? "Yes" : "No";
+        return value ?
+                     getTextAt(RESOURCE_BUNDLE, "ForceTableModel.yes") :
+                     getTextAt(RESOURCE_BUNDLE, "ForceTableModel.no");
     }
 }

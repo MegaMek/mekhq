@@ -33,6 +33,7 @@
 package mekhq.gui.scenarioTemplateEditor;
 
 import static megamek.client.ui.WrapLayout.wordWrap;
+import static mekhq.utilities.MHQInternationalization.getTextAt;
 
 import java.awt.Color;
 import java.awt.Component;
@@ -59,6 +60,8 @@ import mekhq.campaign.mission.ScenarioTemplate;
  * UI for creating or editing a single scenario objective
  */
 public class ObjectiveEditPanel extends JDialog {
+
+    private static final String RESOURCE_BUNDLE = "mekhq.resources.ScenarioTemplateEditorDialog";
     private JTextArea txtShortDescription;
     private JComboBox<ObjectiveCriterion> cboObjectiveType;
     private JComboBox<String> cboDirection;
@@ -188,9 +191,9 @@ public class ObjectiveEditPanel extends JDialog {
         localGbc.gridy = 0;
         localGbc.insets = new Insets(0, 0, 0, 5);
 
-        JButton btnCancel = new JButton("Cancel");
+        JButton btnCancel = new JButton(getTextAt(RESOURCE_BUNDLE, "button.cancel"));
         btnCancel.addActionListener(e -> this.setVisible(false));
-        JButton btnSaveAndClose = new JButton("Save and Close");
+        JButton btnSaveAndClose = new JButton(getTextAt(RESOURCE_BUNDLE, "ObjectiveEditPanel.saveAndClose"));
         btnSaveAndClose.addActionListener(e -> this.saveObjectiveAndClose());
 
         saveClosePanel.add(btnCancel);
@@ -203,13 +206,13 @@ public class ObjectiveEditPanel extends JDialog {
      * Handles the "description" row.
      */
     private void addDescriptionUI(GridBagConstraints gbc) {
-        JLabel lblShortDescription = new JLabel("Short Description:");
+        JLabel lblShortDescription = new JLabel(getTextAt(RESOURCE_BUNDLE,
+              "ObjectiveEditPanel.shortDescription.label"));
 
         JScrollPane txtScroll = new FastJScrollPane();
         txtShortDescription = new JTextArea();
-        txtShortDescription.setToolTipText(wordWrap("Leave blank to auto-generate the description from the "
-                                                          +
-                                                          "objective's settings. Custom objectives require text here."));
+        txtShortDescription.setToolTipText(wordWrap(getTextAt(RESOURCE_BUNDLE,
+              "ObjectiveEditPanel.shortDescription.tooltip")));
         txtShortDescription.setColumns(40);
         txtShortDescription.setRows(5);
         txtShortDescription.setLineWrap(true);
@@ -218,10 +221,10 @@ public class ObjectiveEditPanel extends JDialog {
 
         JTextField txtDetail = new JTextField();
         txtDetail.setColumns(40);
-        JLabel lblDetail = new JLabel("Details (shows up after force/unit list):");
+        JLabel lblDetail = new JLabel(getTextAt(RESOURCE_BUNDLE, "ObjectiveEditPanel.details.label"));
         lstDetails = new JList<>();
-        JButton btnAddDetail = new JButton("Add");
-        JButton btnRemoveDetail = new JButton("Remove");
+        JButton btnAddDetail = new JButton(getTextAt(RESOURCE_BUNDLE, "button.add"));
+        JButton btnRemoveDetail = new JButton(getTextAt(RESOURCE_BUNDLE, "button.remove"));
 
         lstDetails.addListSelectionListener(e -> btnRemoveDetail.setEnabled(!lstDetails.getSelectedValuesList()
                                                                                    .isEmpty()));
@@ -260,7 +263,7 @@ public class ObjectiveEditPanel extends JDialog {
     private void addObjectiveTypeUI(GridBagConstraints gbc) {
         JPanel objectivePanel = new JPanel();
 
-        JLabel lblObjectiveType = new JLabel("Objective Type:");
+        JLabel lblObjectiveType = new JLabel(getTextAt(RESOURCE_BUNDLE, "ObjectiveEditPanel.objectiveType.label"));
         cboObjectiveType = new JComboBox<>();
         for (ObjectiveCriterion objectiveType : ObjectiveCriterion.values()) {
             cboObjectiveType.addItem(objectiveType);
@@ -271,12 +274,12 @@ public class ObjectiveEditPanel extends JDialog {
         txtPercentage.setColumns(4);
 
         cboCountType = new JComboBox<>();
-        cboCountType.addItem("Percent");
-        cboCountType.addItem("Fixed Amount");
+        cboCountType.addItem(getTextAt(RESOURCE_BUNDLE, "ObjectiveEditPanel.amountType.percent"));
+        cboCountType.addItem(getTextAt(RESOURCE_BUNDLE, "ObjectiveEditPanel.amountType.fixed"));
 
 
         cboDirection = new JComboBox<>();
-        cboDirection.addItem("Force Destination Edge");
+        cboDirection.addItem(getTextAt(RESOURCE_BUNDLE, "ObjectiveEditPanel.forceDestinationEdge.label"));
         for (int x = 1; x < OffBoardDirection.values().length; x++) {
             cboDirection.addItem(OffBoardDirection.values()[x].toString());
         }
@@ -309,8 +312,9 @@ public class ObjectiveEditPanel extends JDialog {
         JPanel effectPanel = new JPanel();
 
 
-        JLabel lblSuccessEffects = new JLabel("Effects on completion:");
-        JLabel lblFailureEffects = new JLabel("Effects on failure:");
+        JLabel lblSuccessEffects = new JLabel(getTextAt(RESOURCE_BUNDLE,
+              "ObjectiveEditPanel.effectsOnCompletion.label"));
+        JLabel lblFailureEffects = new JLabel(getTextAt(RESOURCE_BUNDLE, "ObjectiveEditPanel.effectsOnFailure.label"));
 
         successEffects = new JList<>();
         successEffects.addListSelectionListener(e -> btnRemoveSuccess.setEnabled(!successEffects.getSelectedValuesList()
@@ -319,11 +323,11 @@ public class ObjectiveEditPanel extends JDialog {
         failureEffects.addListSelectionListener(e -> btnRemoveFailure.setEnabled(!failureEffects.getSelectedValuesList()
                                                                                         .isEmpty()));
 
-        btnRemoveSuccess = new JButton("Remove");
+        btnRemoveSuccess = new JButton(getTextAt(RESOURCE_BUNDLE, "button.remove"));
         btnRemoveSuccess.addActionListener(e -> this.removeEffect(ObjectiveEffectConditionType.ObjectiveSuccess));
         btnRemoveSuccess.setEnabled(false);
 
-        btnRemoveFailure = new JButton("Remove");
+        btnRemoveFailure = new JButton(getTextAt(RESOURCE_BUNDLE, "button.remove"));
         btnRemoveFailure.addActionListener(e -> this.removeEffect(ObjectiveEffectConditionType.ObjectiveFailure));
         btnRemoveFailure.setEnabled(false);
 
@@ -354,7 +358,7 @@ public class ObjectiveEditPanel extends JDialog {
     private void addSubjectForce(GridBagConstraints gbc) {
         JPanel forcePanel = new JPanel();
 
-        JLabel forcesLabel = new JLabel("Force Names:");
+        JLabel forcesLabel = new JLabel(getTextAt(RESOURCE_BUNDLE, "ObjectiveEditPanel.forceNames.label"));
 
         cboForceName = new JComboBox<>();
         for (ScenarioForceTemplate forceTemplate : currentScenarioTemplate.getAllScenarioForces()) {
@@ -365,10 +369,10 @@ public class ObjectiveEditPanel extends JDialog {
         forceNames.setVisibleRowCount(5);
         forceNames.addListSelectionListener(e -> btnRemove.setEnabled(!forceNames.getSelectedValuesList().isEmpty()));
 
-        JButton btnAdd = new JButton("Add");
+        JButton btnAdd = new JButton(getTextAt(RESOURCE_BUNDLE, "button.add"));
         btnAdd.addActionListener(e -> this.addForce());
 
-        btnRemove = new JButton("Remove");
+        btnRemove = new JButton(getTextAt(RESOURCE_BUNDLE, "button.remove"));
         btnRemove.addActionListener(e -> this.removeForce());
         btnRemove.setEnabled(false);
 
@@ -396,8 +400,8 @@ public class ObjectiveEditPanel extends JDialog {
         JPanel timeLimitPanel = new JPanel();
 
         cboTimeLimitDirection = new JComboBox<>();
-        cboTimeLimitDirection.addItem("at most");
-        cboTimeLimitDirection.addItem("at least");
+        cboTimeLimitDirection.addItem(getTextAt(RESOURCE_BUNDLE, "ObjectiveEditPanel.timeLimit.atMost"));
+        cboTimeLimitDirection.addItem(getTextAt(RESOURCE_BUNDLE, "ObjectiveEditPanel.timeLimit.atLeast"));
 
         cboTimeScaling = new JComboBox<>();
         for (TimeLimitType timeLimitType : TimeLimitType.values()) {
@@ -429,28 +433,28 @@ public class ObjectiveEditPanel extends JDialog {
     private void addEffectUI(GridBagConstraints gbc) {
         JPanel effectPanel = new JPanel();
 
-        lblMagnitude = new JLabel("Amount:");
+        lblMagnitude = new JLabel(getTextAt(RESOURCE_BUNDLE, "ObjectiveEditPanel.amount.label"));
         txtAmount = new JTextField();
         txtAmount.setColumns(5);
 
-        JLabel lblScaling = new JLabel("Effect Scaling:");
+        JLabel lblScaling = new JLabel(getTextAt(RESOURCE_BUNDLE, "ObjectiveEditPanel.effectScaling.label"));
         cboScalingType = new JComboBox<>();
         for (EffectScalingType scalingType : EffectScalingType.values()) {
             cboScalingType.addItem(scalingType);
         }
 
-        JLabel lblEffectType = new JLabel("Effect Type:");
+        JLabel lblEffectType = new JLabel(getTextAt(RESOURCE_BUNDLE, "ObjectiveEditPanel.effectType.label"));
         cboEffectType = new JComboBox<>();
         for (ObjectiveEffectType scalingType : ObjectiveEffectType.values()) {
             cboEffectType.addItem(scalingType);
         }
 
-        JLabel lblEffectCondition = new JLabel("Effect Condition:");
+        JLabel lblEffectCondition = new JLabel(getTextAt(RESOURCE_BUNDLE, "ObjectiveEditPanel.effectCondition.label"));
         cboEffectCondition = new JComboBox<>();
         cboEffectCondition.addItem(ObjectiveEffectConditionType.ObjectiveSuccess);
         cboEffectCondition.addItem(ObjectiveEffectConditionType.ObjectiveFailure);
 
-        JButton btnAdd = new JButton("Add");
+        JButton btnAdd = new JButton(getTextAt(RESOURCE_BUNDLE, "button.add"));
         btnAdd.addActionListener(e -> this.addEffect());
 
         GridBagConstraints localGbc = new GridBagConstraints();

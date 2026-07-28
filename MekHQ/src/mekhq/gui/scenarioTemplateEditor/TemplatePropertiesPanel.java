@@ -34,11 +34,11 @@ package mekhq.gui.scenarioTemplateEditor;
 
 import static megamek.client.ui.WrapLayout.wordWrap;
 import static megamek.client.ui.util.UIUtil.scaleForGUI;
+import static mekhq.utilities.MHQInternationalization.getTextAt;
 
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
-import java.util.ResourceBundle;
 import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
 import javax.swing.JComponent;
@@ -62,8 +62,7 @@ import mekhq.campaign.mission.enums.ScenarioType;
  */
 public class TemplatePropertiesPanel extends JPanel {
 
-    private static final ResourceBundle RESOURCES = ResourceBundle.getBundle(
-          "mekhq.resources.ScenarioTemplateEditorDialog");
+    private static final String RESOURCE_BUNDLE = "mekhq.resources.ScenarioTemplateEditorDialog";
 
     private final JTextField txtName = new JTextField(80);
     private final JTextArea txtShortBriefing = new JTextArea(3, 80);
@@ -72,13 +71,13 @@ public class TemplatePropertiesPanel extends JPanel {
     private final JComboBox<BattlefieldControlType> cboBattlefieldControl =
           new JComboBox<>(BattlefieldControlType.values());
     private final JCheckBox chkHostileFacility = new JCheckBox(
-          RESOURCES.getString("TemplatePropertiesPanel.hostileFacility.label"));
+          getTextAt(RESOURCE_BUNDLE, "TemplatePropertiesPanel.hostileFacility.label"));
     private final JCheckBox chkAlliedFacility = new JCheckBox(
-          RESOURCES.getString("TemplatePropertiesPanel.alliedFacility.label"));
+          getTextAt(RESOURCE_BUNDLE, "TemplatePropertiesPanel.alliedFacility.label"));
     private final JCheckBox chkSuitedForAmbushes = new JCheckBox(
-          RESOURCES.getString("TemplatePropertiesPanel.suitedForAmbushes.label"));
+          getTextAt(RESOURCE_BUNDLE, "TemplatePropertiesPanel.suitedForAmbushes.label"));
     private final JCheckBox chkSuitedForBungledPatrols = new JCheckBox(
-          RESOURCES.getString("TemplatePropertiesPanel.suitedForBungledPatrols.label"));
+          getTextAt(RESOURCE_BUNDLE, "TemplatePropertiesPanel.suitedForBungledPatrols.label"));
 
     public TemplatePropertiesPanel() {
         super(new GridBagLayout());
@@ -100,24 +99,24 @@ public class TemplatePropertiesPanel extends JPanel {
         int padding = scaleForGUI(5);
         constraints.insets = new Insets(padding, padding, padding, padding);
 
-        add(new JLabel(RESOURCES.getString("TemplatePropertiesPanel.scenarioName.label")), constraints);
+        add(new JLabel(getTextAt(RESOURCE_BUNDLE, "TemplatePropertiesPanel.scenarioName.label")), constraints);
         constraints.gridy++;
         add(txtName, constraints);
 
         constraints.gridy++;
-        add(new JLabel(RESOURCES.getString("TemplatePropertiesPanel.shortBriefing.label")), constraints);
+        add(new JLabel(getTextAt(RESOURCE_BUNDLE, "TemplatePropertiesPanel.shortBriefing.label")), constraints);
         constraints.gridy++;
         add(new FastJScrollPane(txtShortBriefing), constraints);
 
         constraints.gridy++;
-        add(new JLabel(RESOURCES.getString("TemplatePropertiesPanel.detailedBriefing.label")), constraints);
+        add(new JLabel(getTextAt(RESOURCE_BUNDLE, "TemplatePropertiesPanel.detailedBriefing.label")), constraints);
         constraints.gridy++;
         add(new FastJScrollPane(txtLongBriefing), constraints);
 
         JPanel typeRow = new JPanel();
-        typeRow.add(new JLabel(RESOURCES.getString("TemplatePropertiesPanel.scenarioType.label")));
+        typeRow.add(new JLabel(getTextAt(RESOURCE_BUNDLE, "TemplatePropertiesPanel.scenarioType.label")));
         typeRow.add(cboScenarioType);
-        typeRow.add(new JLabel(RESOURCES.getString("TemplatePropertiesPanel.battlefieldControl.label")));
+        typeRow.add(new JLabel(getTextAt(RESOURCE_BUNDLE, "TemplatePropertiesPanel.battlefieldControl.label")));
         typeRow.add(cboBattlefieldControl);
         constraints.gridy++;
         add(typeRow, constraints);
@@ -146,7 +145,7 @@ public class TemplatePropertiesPanel extends JPanel {
 
     /** Sets a word-wrapped tooltip (from the resource bundle) on a control. */
     private static void setTip(JComponent component, String tooltipKey) {
-        component.setToolTipText(wordWrap(RESOURCES.getString(tooltipKey)));
+        component.setToolTipText(wordWrap(getTextAt(RESOURCE_BUNDLE, tooltipKey)));
     }
 
     /**

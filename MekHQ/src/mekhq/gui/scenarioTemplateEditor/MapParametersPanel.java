@@ -33,13 +33,13 @@
 package mekhq.gui.scenarioTemplateEditor;
 
 import static megamek.client.ui.WrapLayout.wordWrap;
+import static mekhq.utilities.MHQInternationalization.getTextAt;
 
 import java.awt.Dimension;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.ResourceBundle;
 import javax.swing.*;
 
 import megamek.codeUtilities.MathUtility;
@@ -57,8 +57,7 @@ import mekhq.campaign.mission.ScenarioMapParameters.MapLocation;
  */
 public class MapParametersPanel extends JPanel {
 
-    private static final ResourceBundle RESOURCES = ResourceBundle.getBundle(
-          "mekhq.resources.ScenarioTemplateEditorDialog");
+    private static final String RESOURCE_BUNDLE = "mekhq.resources.ScenarioTemplateEditorDialog";
 
     private final Dimension spinnerSize = new Dimension(55, 25);
 
@@ -71,13 +70,13 @@ public class MapParametersPanel extends JPanel {
     private final JCheckBox chkAllowRotation = new JCheckBox();
     private final JCheckBox chkUseAtBSizing = new JCheckBox();
     private final JRadioButton btnAllowAllMapTypes = new JRadioButton(
-          RESOURCES.getString("MapParametersPanel.anyGroundMap.label"));
+          getTextAt(RESOURCE_BUNDLE, "MapParametersPanel.anyGroundMap.label"));
     private final JRadioButton btnUseSpaceMap = new JRadioButton(
-          RESOURCES.getString("MapParametersPanel.useSpaceMap.label"));
+          getTextAt(RESOURCE_BUNDLE, "MapParametersPanel.useSpaceMap.label"));
     private final JRadioButton btnUseLowAtmosphereMap = new JRadioButton(
-          RESOURCES.getString("MapParametersPanel.useLowAtmoMap.label"));
+          getTextAt(RESOURCE_BUNDLE, "MapParametersPanel.useLowAtmoMap.label"));
     private final JRadioButton btnUseSpecificMapTypes = new JRadioButton(
-          RESOURCES.getString("MapParametersPanel.specificMapTypes.label"));
+          getTextAt(RESOURCE_BUNDLE, "MapParametersPanel.specificMapTypes.label"));
     private final JList<String> lstAllowedTerrainTypes = new JList<>();
 
     /**
@@ -114,7 +113,7 @@ public class MapParametersPanel extends JPanel {
         constraints.anchor = GridBagConstraints.WEST;
 
         constraints.gridwidth = 1;
-        add(new JLabel(RESOURCES.getString("MapParametersPanel.title")), constraints);
+        add(new JLabel(getTextAt(RESOURCE_BUNDLE, "MapParametersPanel.title")), constraints);
 
         addLabeledField(constraints, "MapParametersPanel.baseWidth.label", txtBaseWidth);
         addLabeledField(constraints, "MapParametersPanel.baseHeight.label", txtBaseHeight);
@@ -128,8 +127,8 @@ public class MapParametersPanel extends JPanel {
 
         constraints.gridx = 0;
         constraints.gridy++;
-        JLabel lblUseAtBSizing = new JLabel(RESOURCES.getString("MapParametersPanel.useAtBSizing.label"));
-        lblUseAtBSizing.setToolTipText(wordWrap(RESOURCES.getString("MapParametersPanel.useAtBSizing.tooltip")));
+        JLabel lblUseAtBSizing = new JLabel(getTextAt(RESOURCE_BUNDLE, "MapParametersPanel.useAtBSizing.label"));
+        lblUseAtBSizing.setToolTipText(wordWrap(getTextAt(RESOURCE_BUNDLE, "MapParametersPanel.useAtBSizing.tooltip")));
         add(lblUseAtBSizing, constraints);
         constraints.gridx = 1;
         add(chkUseAtBSizing, constraints);
@@ -137,7 +136,7 @@ public class MapParametersPanel extends JPanel {
         // map type / terrain columns
         constraints.gridx = 2;
         constraints.gridy = 1;
-        add(new JLabel(RESOURCES.getString("MapParametersPanel.allowedMapTypes.label")), constraints);
+        add(new JLabel(getTextAt(RESOURCE_BUNDLE, "MapParametersPanel.allowedMapTypes.label")), constraints);
         constraints.gridy++;
         add(btnAllowAllMapTypes, constraints);
         constraints.gridy++;
@@ -174,14 +173,14 @@ public class MapParametersPanel extends JPanel {
 
     /** Sets a word-wrapped tooltip (from the resource bundle) on a control. */
     private static void setTip(JComponent component, String tooltipKey) {
-        component.setToolTipText(wordWrap(RESOURCES.getString(tooltipKey)));
+        component.setToolTipText(wordWrap(getTextAt(RESOURCE_BUNDLE, tooltipKey)));
     }
 
     private void addLabeledField(GridBagConstraints gbc, String labelKey, java.awt.Component field) {
         gbc.gridheight = 1;
         gbc.gridx = 0;
         gbc.gridy++;
-        add(new JLabel(RESOURCES.getString(labelKey)), gbc);
+        add(new JLabel(getTextAt(RESOURCE_BUNDLE, labelKey)), gbc);
         gbc.gridx = 1;
         add(field, gbc);
     }
@@ -190,8 +189,8 @@ public class MapParametersPanel extends JPanel {
         gbc.gridheight = 1;
         gbc.gridx = 0;
         gbc.gridy++;
-        JLabel label = new JLabel(RESOURCES.getString(labelKey));
-        label.setToolTipText(wordWrap(RESOURCES.getString(tooltipKey)));
+        JLabel label = new JLabel(getTextAt(RESOURCE_BUNDLE, labelKey));
+        label.setToolTipText(wordWrap(getTextAt(RESOURCE_BUNDLE, tooltipKey)));
         add(label, gbc);
         gbc.gridx = 1;
         add(spinner, gbc);

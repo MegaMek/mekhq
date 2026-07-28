@@ -32,21 +32,12 @@
  */
 package mekhq.campaign.mission.atb;
 
-import java.io.BufferedReader;
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import javax.xml.transform.Source;
 
-import jakarta.xml.bind.JAXBContext;
-import jakarta.xml.bind.JAXBElement;
-import jakarta.xml.bind.Unmarshaller;
 import jakarta.xml.bind.annotation.XmlElement;
 import jakarta.xml.bind.annotation.XmlElementWrapper;
 import jakarta.xml.bind.annotation.XmlRootElement;
@@ -60,7 +51,6 @@ import mekhq.campaign.mission.ScenarioForceTemplate;
 import mekhq.campaign.mission.ScenarioForceTemplate.ForceAlignment;
 import mekhq.campaign.mission.ScenarioMapParameters.MapLocation;
 import mekhq.campaign.mission.ScenarioObjective;
-import mekhq.utilities.MHQXMLUtility;
 
 /**
  * Data structure representing a scenario modifier for dynamic AtB scenarios
@@ -342,51 +332,18 @@ public class AtBScenarioModifier implements Cloneable {
      * @return Possibly an instance of a scenario modifier list
      */
     public static AtBScenarioModifier Deserialize(String fileName) {
-        AtBScenarioModifier resultingModifier = null;
+        File inputFile = new File(fileName);
+        if (!inputFile.exists()) {
+            LOGGER.warn("Specified file {} does not exist", fileName);
+            return null;
+        }
 
         try {
-            File inputFile = new File(fileName);
-            if (!inputFile.exists()) {
-                LOGGER.warn("Specified file {} does not exist", fileName);
-                return null;
-            }
-
-            // JSON is the write format; XML is still read for legacy/user files. Detect by content (a leading '{' or
-            // '#' license-header comment is JSON) rather than file extension.
-            if (isJsonContent(inputFile)) {
-                return AtBScenarioModifierJson.fromFile(inputFile);
-            }
-
-            JAXBContext context = JAXBContext.newInstance(AtBScenarioModifier.class);
-            Unmarshaller unmarshaller = context.createUnmarshaller();
-            try (FileInputStream fileStream = new FileInputStream(inputFile)) {
-                Source inputSource = MHQXMLUtility.createSafeXmlSource(fileStream);
-                JAXBElement<AtBScenarioModifier> modifierElement = unmarshaller.unmarshal(inputSource,
-                      AtBScenarioModifier.class);
-                resultingModifier = modifierElement.getValue();
-            }
+            return AtBScenarioModifierJson.fromFile(inputFile);
         } catch (Exception ex) {
             LOGGER.error("Error Deserializing Scenario Modifier: {}", fileName, ex);
+            return null;
         }
-
-        return resultingModifier;
-    }
-
-    /**
-     * Determines whether a file holds JSON by inspecting its first non-whitespace character. A leading '{' (the object)
-     * or '#' (the license-header comment lines that lead every saved file) indicates JSON; an XML document begins with
-     * '<' and is treated as XML.
-     */
-    private static boolean isJsonContent(File inputFile) throws IOException {
-        try (BufferedReader reader = Files.newBufferedReader(inputFile.toPath(), StandardCharsets.UTF_8)) {
-            int character;
-            while ((character = reader.read()) != -1) {
-                if (!Character.isWhitespace(character)) {
-                    return (character == '{') || (character == '#');
-                }
-            }
-        }
-        return false;
     }
 
     /**

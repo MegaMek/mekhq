@@ -75,23 +75,4 @@ class AtBScenarioModifierSerializationTest {
         assertEquals("Enemy reinforcements inbound.", reloaded.getAdditionalBriefingText());
         assertEquals(EventTiming.PostForceGeneration, reloaded.getEventTiming());
     }
-
-    @Test
-    void legacyXmlStillReads(@TempDir Path tempDir) throws IOException {
-        String legacyXml = """
-              <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-              <AtBScenarioModifier>
-                  <modifierName>Legacy Modifier</modifierName>
-                  <additionalBriefingText>Legacy briefing.</additionalBriefingText>
-                  <eventTiming>PostForceGeneration</eventTiming>
-              </AtBScenarioModifier>
-              """;
-        File xml = tempDir.resolve("legacy.xml").toFile();
-        Files.writeString(xml.toPath(), legacyXml);
-
-        AtBScenarioModifier fromXml = AtBScenarioModifier.Deserialize(xml.getPath());
-        assertNotNull(fromXml, "legacy XML scenario modifiers must still be readable");
-        assertEquals("Legacy Modifier", fromXml.getModifierName());
-        assertEquals("Legacy briefing.", fromXml.getAdditionalBriefingText());
-    }
 }

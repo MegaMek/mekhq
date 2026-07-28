@@ -32,6 +32,9 @@
  */
 package mekhq.gui.scenarioTemplateEditor;
 
+import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
+import static mekhq.utilities.MHQInternationalization.getTextAt;
+
 /**
  * Validation and parsing for the four free-text map-dimension inputs in {@link ScenarioTemplateEditorDialog} (base
  * width/height and the width/height scaling increments). The dialog previously fed these straight into
@@ -40,6 +43,8 @@ package mekhq.gui.scenarioTemplateEditor;
  * UI.
  */
 public final class MapDimensionInput {
+
+    private static final String RESOURCE_BUNDLE = "mekhq.resources.ScenarioTemplateEditorDialog";
 
     private MapDimensionInput() {
     }
@@ -59,10 +64,12 @@ public final class MapDimensionInput {
     public static String validate(String baseWidth, String baseHeight, String widthScalingIncrement,
           String heightScalingIncrement) {
         StringBuilder errors = new StringBuilder();
-        appendIfInvalid(errors, "Base Width", baseWidth);
-        appendIfInvalid(errors, "Base Height", baseHeight);
-        appendIfInvalid(errors, "Scaled Width Increment", widthScalingIncrement);
-        appendIfInvalid(errors, "Scaled Height Increment", heightScalingIncrement);
+        appendIfInvalid(errors, getTextAt(RESOURCE_BUNDLE, "MapDimensionInput.baseWidth"), baseWidth);
+        appendIfInvalid(errors, getTextAt(RESOURCE_BUNDLE, "MapDimensionInput.baseHeight"), baseHeight);
+        appendIfInvalid(errors, getTextAt(RESOURCE_BUNDLE, "MapDimensionInput.widthIncrement"), widthScalingIncrement);
+        appendIfInvalid(errors,
+              getTextAt(RESOURCE_BUNDLE, "MapDimensionInput.heightIncrement"),
+              heightScalingIncrement);
         return errors.toString();
     }
 
@@ -71,7 +78,7 @@ public final class MapDimensionInput {
             if (!errors.isEmpty()) {
                 errors.append("\n");
             }
-            errors.append(label).append(" must be a non-negative whole number.");
+            errors.append(getFormattedTextAt(RESOURCE_BUNDLE, "MapDimensionInput.invalid", label));
         }
     }
 

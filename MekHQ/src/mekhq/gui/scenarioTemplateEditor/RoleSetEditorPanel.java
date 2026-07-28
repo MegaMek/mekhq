@@ -34,6 +34,7 @@ package mekhq.gui.scenarioTemplateEditor;
 
 import static megamek.client.ui.WrapLayout.wordWrap;
 import static megamek.client.ui.util.UIUtil.scaleForGUI;
+import static mekhq.utilities.MHQInternationalization.getTextAt;
 
 import java.awt.Component;
 import java.awt.GridBagConstraints;
@@ -41,7 +42,6 @@ import java.awt.GridBagLayout;
 import java.awt.Insets;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.ResourceBundle;
 import javax.swing.BorderFactory;
 import javax.swing.DefaultListCellRenderer;
 import javax.swing.DefaultListModel;
@@ -65,8 +65,7 @@ import megamek.common.ui.FastJScrollPane;
  */
 public class RoleSetEditorPanel extends JPanel {
 
-    private static final ResourceBundle RESOURCES = ResourceBundle.getBundle(
-          "mekhq.resources.ScenarioTemplateEditorDialog");
+    private static final String RESOURCE_BUNDLE = "mekhq.resources.ScenarioTemplateEditorDialog";
 
     private final JList<MissionRole> lstRolePicker = new JList<>();
     private final DefaultListModel<String> roleSetsModel = new DefaultListModel<>();
@@ -78,7 +77,7 @@ public class RoleSetEditorPanel extends JPanel {
     }
 
     private void initComponents() {
-        setBorder(BorderFactory.createTitledBorder(RESOURCES.getString("RoleSetEditorPanel.title")));
+        setBorder(BorderFactory.createTitledBorder(getTextAt(RESOURCE_BUNDLE, "RoleSetEditorPanel.title")));
 
         lstRolePicker.setModel(new DefaultListModel<>());
         lstRolePicker.setSelectionMode(ListSelectionModel.MULTIPLE_INTERVAL_SELECTION);
@@ -95,16 +94,16 @@ public class RoleSetEditorPanel extends JPanel {
         int padding = scaleForGUI(5);
         constraints.insets = new Insets(padding, padding, padding, padding);
 
-        add(new JLabel(RESOURCES.getString("RoleSetEditorPanel.validRoles.label")), constraints);
+        add(new JLabel(getTextAt(RESOURCE_BUNDLE, "RoleSetEditorPanel.validRoles.label")), constraints);
 
-        lstRolePicker.setToolTipText(wordWrap(RESOURCES.getString("RoleSetEditorPanel.validRoles.tooltip")));
+        lstRolePicker.setToolTipText(wordWrap(getTextAt(RESOURCE_BUNDLE, "RoleSetEditorPanel.validRoles.tooltip")));
         FastJScrollPane scrRolePicker = new FastJScrollPane(lstRolePicker);
         scrRolePicker.setPreferredSize(scaleForGUI(190, 120));
         constraints.gridy++;
         add(scrRolePicker, constraints);
 
-        JButton btnAddRoleSet = new JButton(RESOURCES.getString("RoleSetEditorPanel.addRoleSet"));
-        btnAddRoleSet.setToolTipText(wordWrap(RESOURCES.getString("RoleSetEditorPanel.addRoleSet.tooltip")));
+        JButton btnAddRoleSet = new JButton(getTextAt(RESOURCE_BUNDLE, "RoleSetEditorPanel.addRoleSet"));
+        btnAddRoleSet.setToolTipText(wordWrap(getTextAt(RESOURCE_BUNDLE, "RoleSetEditorPanel.addRoleSet.tooltip")));
         btnAddRoleSet.addActionListener(evt -> addRoleSet());
         constraints.gridy++;
         constraints.fill = GridBagConstraints.NONE;
@@ -112,16 +111,17 @@ public class RoleSetEditorPanel extends JPanel {
 
         constraints.fill = GridBagConstraints.HORIZONTAL;
         constraints.gridy++;
-        add(new JLabel(RESOURCES.getString("RoleSetEditorPanel.roleSets.label")), constraints);
+        add(new JLabel(getTextAt(RESOURCE_BUNDLE, "RoleSetEditorPanel.roleSets.label")), constraints);
 
-        lstRoleSets.setToolTipText(wordWrap(RESOURCES.getString("RoleSetEditorPanel.roleSets.tooltip")));
+        lstRoleSets.setToolTipText(wordWrap(getTextAt(RESOURCE_BUNDLE, "RoleSetEditorPanel.roleSets.tooltip")));
         FastJScrollPane scrRoleSets = new FastJScrollPane(lstRoleSets);
         scrRoleSets.setPreferredSize(scaleForGUI(190, 100));
         constraints.gridy++;
         add(scrRoleSets, constraints);
 
-        JButton btnRemoveRoleSet = new JButton(RESOURCES.getString("RoleSetEditorPanel.removeRoleSet"));
-        btnRemoveRoleSet.setToolTipText(wordWrap(RESOURCES.getString("RoleSetEditorPanel.removeRoleSet.tooltip")));
+        JButton btnRemoveRoleSet = new JButton(getTextAt(RESOURCE_BUNDLE, "RoleSetEditorPanel.removeRoleSet"));
+        btnRemoveRoleSet.setToolTipText(wordWrap(getTextAt(RESOURCE_BUNDLE,
+              "RoleSetEditorPanel.removeRoleSet.tooltip")));
         btnRemoveRoleSet.addActionListener(evt -> removeRoleSet());
         constraints.gridy++;
         constraints.fill = GridBagConstraints.NONE;

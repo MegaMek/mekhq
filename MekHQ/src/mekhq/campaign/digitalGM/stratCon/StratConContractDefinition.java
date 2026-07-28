@@ -32,12 +32,8 @@
  */
 package mekhq.campaign.digitalGM.stratCon;
 
-import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.IOException;
-import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -358,6 +354,35 @@ public class StratConContractDefinition {
         @XmlElementWrapper(name = "objectiveScenarioModifiers")
         @XmlElement(name = "objectiveScenarioModifier")
         List<String> objectiveScenarioModifiers = new ArrayList<>();
+
+        public StrategicObjectiveType getObjectiveType() {
+            return objectiveType;
+        }
+
+        public void setObjectiveType(StrategicObjectiveType objectiveType) {
+            this.objectiveType = objectiveType;
+        }
+
+        public double getObjectiveCount() {
+            return objectiveCount;
+        }
+
+        public void setObjectiveCount(double objectiveCount) {
+            this.objectiveCount = objectiveCount;
+        }
+
+        public List<String> getObjectiveScenarios() {
+            return objectiveScenarios;
+        }
+
+        public List<String> getObjectiveScenarioModifiers() {
+            return objectiveScenarioModifiers;
+        }
+
+        @Override
+        public String toString() {
+            return objectiveType + " (" + objectiveCount + ")";
+        }
     }
 
     /**
@@ -383,53 +408,12 @@ public class StratConContractDefinition {
      * @return Possibly an instance of a StratConContractDefinition
      */
     public static StratConContractDefinition Deserialize(File inputFile) {
-        StratConContractDefinition resultingDefinition = null;
-
         try {
-            if (isJsonContent(inputFile)) {
-                return StratConContractDefinitionJson.fromFile(inputFile);
-            }
-
-            JAXBContext context = JAXBContext.newInstance(StratConContractDefinition.class);
-            Unmarshaller unmarshaller = context.createUnmarshaller();
-            try (FileInputStream fileStream = new FileInputStream(inputFile)) {
-                Source inputSource = MHQXMLUtility.createSafeXmlSource(fileStream);
-                JAXBElement<StratConContractDefinition> definitionElement = unmarshaller.unmarshal(inputSource,
-                      StratConContractDefinition.class);
-                resultingDefinition = definitionElement.getValue();
-            }
+            return StratConContractDefinitionJson.fromFile(inputFile);
         } catch (Exception e) {
             LOGGER.error("Error deserializing contract definition {}", inputFile.getPath(), e);
+            return null;
         }
-
-        return resultingDefinition;
-    }
-
-    /**
-     * Determines whether a file holds JSON by inspecting its first non-whitespace character. A leading '{' indicates
-     * JSON; anything else (a contract definition XML document begins with '<') is treated as XML.
-     *
-     * @param inputFile the file to inspect
-     *
-     * @return true if the file appears to contain JSON
-     *
-     * @throws IOException if the file cannot be read
-     */
-    private static boolean isJsonContent(File inputFile) throws IOException {
-        return jsonBufferReader(inputFile);
-    }
-
-    public static boolean jsonBufferReader(File inputFile) throws IOException {
-        try (BufferedReader reader = Files.newBufferedReader(inputFile.toPath(), StandardCharsets.UTF_8)) {
-            int character;
-            while ((character = reader.read()) != -1) {
-                if (!Character.isWhitespace(character)) {
-                    // '{' is the object; '#' is the leading license-header comment lines every saved file carries.
-                    return (character == '{') || (character == '#');
-                }
-            }
-        }
-        return false;
     }
 
     /**
