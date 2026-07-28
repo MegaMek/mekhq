@@ -49,31 +49,32 @@ public enum ConnectionsLevel {
     // If these values are changed, you must update the CONNECTIONS glossary entry.
 
     /** Burn chance: 10 - Wealth: 0 - Recruits: 0 */
-    CONNECTIONS_ZERO(0, 10, Money.of(0), 0),
+    CONNECTIONS_ZERO(0, 0, 10, Money.of(0), 0),
     /** Burn chance: 7 - Wealth: 1000 - Recruits: 0 */
-    CONNECTIONS_ONE(1, 7, Money.of(1000), 0),
+    CONNECTIONS_ONE(1, 0, 7, Money.of(1000), 0),
     /** Burn chance: 7 - Wealth: 2500 - Recruits: 0 */
-    CONNECTIONS_TWO(2, 7, Money.of(2500), 0),
+    CONNECTIONS_TWO(2, 0, 7, Money.of(2500), 0),
     /** Burn chance: 6 - Wealth: 5000 - Recruits: 0 */
-    CONNECTIONS_THREE(3, 6, Money.of(5000), 0),
+    CONNECTIONS_THREE(3, 1, 6, Money.of(5000), 0),
     /** Burn Chance: 6 - Wealth: 10,000 - Recruits: 1 */
-    CONNECTIONS_FOUR(4, 6, Money.of(10000), 1),
+    CONNECTIONS_FOUR(4, 2, 6, Money.of(10000), 1),
     /** Burn chance: 5 - Wealth: 25,000 - Recruits: 2 */
-    CONNECTIONS_FIVE(5, 5, Money.of(25000), 2),
+    CONNECTIONS_FIVE(5, 3, 5, Money.of(25000), 2),
     /** Burn Chance: 5 - Wealth: 50,000 - Recruits: 3 */
-    CONNECTIONS_SIX(6, 5, Money.of(50000), 3),
+    CONNECTIONS_SIX(6, 4, 5, Money.of(50000), 3),
     /** Burn chance: 4 - Wealth: 100,000 - Recruits: 4 */
-    CONNECTIONS_SEVEN(7, 4, Money.of(100000), 4),
+    CONNECTIONS_SEVEN(7, 5, 4, Money.of(100000), 4),
     /** Burn chance: 4 - Wealth: 250,000 - Recruits: 6 */
-    CONNECTIONS_EIGHT(8, 4, Money.of(250000), 6),
+    CONNECTIONS_EIGHT(8, 6, 4, Money.of(250000), 6),
     /** Burn chance: 3 - Wealth: 500,000 - Recruits: 8 */
-    CONNECTIONS_NINE(9, 3, Money.of(500000), 8),
+    CONNECTIONS_NINE(9, 7, 3, Money.of(500000), 8),
     /** Burn chance: 3 - Wealth: 1,000,000 - Recruits: 10 */
-    CONNECTIONS_TEN(10, 3, Money.of(1000000), 10);
+    CONNECTIONS_TEN(10, 8, 3, Money.of(1000000), 10);
 
     private static final MMLogger LOGGER = MMLogger.create(ConnectionsLevel.class);
 
     private final int level;
+    private final int equipLevel;
     private final int burnChance;
     private final Money wealth;
     private final int recruits;
@@ -86,8 +87,10 @@ public enum ConnectionsLevel {
      * @param wealth     the wealth or resources represented by this level
      * @param recruits   the maximum number of recruits accessible with this level of connection
      */
-    ConnectionsLevel(int level, int burnChance, Money wealth, int recruits) {
+    ConnectionsLevel(final int level, final int equipLevel, final int burnChance, final Money wealth,
+          final int recruits) {
         this.level = level;
+        this.equipLevel = equipLevel;
         this.burnChance = burnChance;
         this.wealth = wealth;
         this.recruits = recruits;
@@ -100,6 +103,15 @@ public enum ConnectionsLevel {
      */
     public int getLevel() {
         return level;
+    }
+
+    /**
+     * Retrieves the equipment level associated with this connection level.
+     *
+     * @return the equipment level as an integer
+     */
+    public int getEquipLevel() {
+        return equipLevel;
     }
 
     /**

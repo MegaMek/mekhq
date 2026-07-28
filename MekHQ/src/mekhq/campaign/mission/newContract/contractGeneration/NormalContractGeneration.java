@@ -35,20 +35,39 @@ package mekhq.campaign.mission.newContract.contractGeneration;
 import java.time.LocalDate;
 
 import mekhq.campaign.location.ILocation;
+import mekhq.campaign.mission.newContract.ContractObjectiveData;
+import mekhq.campaign.universe.Faction;
 
 public class NormalContractGeneration extends AbstractContractGeneration {
-    private ChaosContractType playerContractType;
-    private ChaosContractType opposingContractType;
+    private boolean generationWasSuccessful = false;
+    private ContractObjectiveData objectiveData;
+    private EmployerGenerationData employerGenerationData;
 
-    public void generateInitialContractTerms(ILocation currentLocation, LocalDate today, int contractGenerationModifier,
-          boolean isMercenary) {
-        // Step 1: Contract Types
-        generateContractTypes(contractGenerationModifier);
-    }
+    public NormalContractGeneration(LocalDate currentDate, ILocation currentLocation, boolean isMercenarySearch,
+          int contractGenerationModifier) {
+        // Step 1: Employer
+        employerGenerationData = ChaosContractEmployerDetermination.getEmployerGenerationData(currentDate,
+              currentLocation,
+              isMercenarySearch);
 
-    private void generateContractTypes(int contractGenerationModifier) {
-        ContractTypeGeneration typeGeneration = new ContractTypeGeneration(contractGenerationModifier);
-        playerContractType = typeGeneration.getPlayerContractType();
-        opposingContractType = typeGeneration.getOpposingContractType();
+        if (employerGenerationData.faction() == null) {
+            // No employer means no contract
+            return;
+        }
+
+        // Step 2: Type
+        objectiveData = ChaosContractObjectiveDetermination.determineContractObjectiveType(
+              contractGenerationModifier);
+
+        // Step 3: Enemy
+        Faction enemyFaction = ChaosContractDeterminationEnemy.generateEnemyFactionForObjective(currentLocation,
+              currentDate, employerGenerationData.faction(), objectiveData.playerObjectiveType());
+
+        // Step 4: Location
+        String targetSystemId = ChaosContractDeterminationLocation.determineContractLocation(objectiveData.playerObjectiveType(),
+              true,
+              employerGenerationData.faction().getShortName(),
+              enemyFaction.getShortName(),
+              currentLocation);
     }
 }

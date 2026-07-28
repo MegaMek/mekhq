@@ -32,15 +32,8 @@
  */
 package mekhq.campaign.mission.newContract.contractGeneration;
 
-public enum ChaosContractType {
-    STANDARD_EXPEDITION,
-    EXPEDITION,
-    PIRATE_HUNT,
-    GUERILLA_OPERATION,
-    GARRISON,
-    RAID,
-    CADRE_DUTY,
-    INVASION,
-    ACTS_OF_PIRACY,
-    GAME_WORLDS
+import jakarta.annotation.Nullable;
+import mekhq.campaign.universe.Faction;
+
+public record EmployerGenerationData(ChaosEmployerType type, @Nullable Faction faction) {
 }

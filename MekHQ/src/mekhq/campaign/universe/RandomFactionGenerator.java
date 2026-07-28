@@ -62,7 +62,6 @@ import mekhq.MHQConstants;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.location.ILocation;
-import mekhq.campaign.mission.newContract.contractGeneration.GlobalEmployerTableValue;
 import mekhq.campaign.mission.newContract.targetFinder.EnemySelectionProfile;
 import mekhq.campaign.mission.newContract.targetFinder.MissionLocationProfile;
 import mekhq.campaign.mission.newContract.targetFinder.MissionTargetFinder;
@@ -251,18 +250,13 @@ public class RandomFactionGenerator {
      * @param faction             the candidate faction to check
      * @param currentDate         the date to check faction eligibility against
      * @param currentYear         the year of {@code currentDate}
-     * @param employerType        the type of employer to return, or {@code null} for no power-tier filtering
      * @param isMercenaryCampaign if the player campaign is considered part of the 'mercenary' faction
      *
      * @return {@code true} if the faction should be excluded from employer selection
      */
     private static boolean checkForEarlyExit(@Nullable Faction faction, LocalDate currentDate, int currentYear,
-          @Nullable GlobalEmployerTableValue employerType, boolean isMercenaryCampaign) {
+          boolean isMercenaryCampaign) {
         if ((faction == null) || !isEligibleFaction(faction, currentDate)) {
-            return true;
-        }
-
-        if (applyFactionFilter(faction, employerType)) {
             return true;
         }
 
@@ -272,22 +266,6 @@ public class RandomFactionGenerator {
 
         // We don't add mercenary employers here, they're handled explicitly elsewhere
         return faction.getShortName().equals(MERCENARY_FACTION_CODE);
-    }
-
-    /**
-     * Checks whether the given faction should be filtered out based on the requested employer power tier.
-     *
-     * @param faction      the candidate faction to check
-     * @param employerType the type of employer to return, or {@code null} for no power-tier filtering
-     *
-     * @return {@code true} if the faction does not match the requested employer type and should be filtered out
-     */
-    private static boolean applyFactionFilter(Faction faction, @Nullable GlobalEmployerTableValue employerType) {
-        if (employerType == null) {
-            return false;
-        }
-
-        return !GlobalEmployerTableValue.getFactionTableType(faction).equals(employerType);
     }
 
     /**
@@ -312,8 +290,7 @@ public class RandomFactionGenerator {
     /**
      * Selects a random employer faction from those controlling (or hosted by a controller of) systems within the search
      * area around the given location, with no employer-type filtering. Equivalent to calling
-     * {@link #getRandomEmployerFaction(ILocation, LocalDate, GlobalEmployerTableValue, boolean)} with a {@code null}
-     * employer type.
+     * {@link #getRandomEmployerFaction(ILocation, LocalDate, boolean)}  with a {@code null} employer type.
      *
      * @param location the location to check
      * @param date     the date to check faction control and eligibility against
@@ -323,7 +300,7 @@ public class RandomFactionGenerator {
      */
     @Deprecated(since = "0.51.01", forRemoval = true)
     public @Nullable Faction getEmployerFaction(ILocation location, LocalDate date) {
-        return getRandomEmployerFaction(location, date, null, true);
+        return getRandomEmployerFaction(location, date, true);
     }
 
     /**
@@ -336,16 +313,13 @@ public class RandomFactionGenerator {
      *
      * @param location            The current location used to determine the system context for employer selection.
      * @param date                The date to use for filtering factions by temporal availability.
-     * @param employerType        The type of employer being considered, which may further filter faction selection. Can
-     *                            be null if no specific type is required.
      * @param isMercenaryCampaign A flag indicating if the selection is being made in the context of a mercenary
      *                            campaign. May alter filtering and weighting logic.
      *
      * @return A randomly selected {@code Faction} that can act as an employer under the provided criteria, or
      *       {@code null} if the location has no current system or no eligible faction controls anything in range.
      */
-    public @Nullable Faction getRandomEmployerFaction(ILocation location, LocalDate date,
-          @Nullable GlobalEmployerTableValue employerType, boolean isMercenaryCampaign) {
+    public @Nullable Faction getRandomEmployerFaction(ILocation location, LocalDate date, boolean isMercenaryCampaign) {
         PlanetarySystem system = location.getCurrentSystem();
         if (system == null) {
             return null;
@@ -359,14 +333,14 @@ public class RandomFactionGenerator {
             Faction faction = entry.getKey();
             int weight = entry.getValue();
 
-            if (checkForEarlyExit(faction, date, currentYear, employerType, isMercenaryCampaign)) {
+            if (checkForEarlyExit(faction, date, currentYear, isMercenaryCampaign)) {
                 continue;
             }
 
             finalWeights.merge(faction, weight, Integer::sum);
 
             for (Faction containedFaction : factionHints.getContainedFactions(faction, date)) {
-                if (!checkForEarlyExit(containedFaction, date, currentYear, employerType, isMercenaryCampaign)) {
+                if (!checkForEarlyExit(containedFaction, date, currentYear, isMercenaryCampaign)) {
                     double fractionalPresence = factionHints.getAltLocationFraction(faction, containedFaction, date);
                     int adjustedWeight = (int) ceil(weight * fractionalPresence);
                     finalWeights.merge(containedFaction, adjustedWeight, Integer::sum);
@@ -545,7 +519,7 @@ public class RandomFactionGenerator {
 
     /**
      * Checks whether {@code occupier} currently holds a system within the search radius that {@code formerOwner} held
-     * {@value MissionLocationProfile#OCCUPIED_TERRITORY_LOOKBACK_YEARS} years ago, stopping at the first match.
+     * {@value MissionLocationProfile#OCCUPIED_TERRITORY_LOOK_BACK_YEARS} years ago, stopping at the first match.
      *
      * @param occupier    the faction suspected of occupying the former owner's territory
      * @param formerOwner the faction whose lost worlds are being looked for
@@ -561,7 +535,7 @@ public class RandomFactionGenerator {
             return false;
         }
 
-        LocalDate beforeConquest = date.minusYears(MissionLocationProfile.OCCUPIED_TERRITORY_LOOKBACK_YEARS);
+        LocalDate beforeConquest = date.minusYears(MissionLocationProfile.OCCUPIED_TERRITORY_LOOK_BACK_YEARS);
         for (PlanetarySystem system : borderTracker.systemsNear(origin, borderTracker.getRadius())) {
             if (system.getFactionSet(date).contains(occupier) &&
                       system.getFactionSet(beforeConquest).contains(formerOwner)) {
