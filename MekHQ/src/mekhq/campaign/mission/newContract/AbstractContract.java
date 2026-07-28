@@ -32,18 +32,13 @@
  */
 package mekhq.campaign.mission.newContract;
 
-import static mekhq.campaign.mission.enums.AtBMoraleLevel.STALEMATE;
-
-import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
 import mekhq.campaign.JumpPath;
 import mekhq.campaign.digitalGM.stratCon.StratConCampaignState;
-import mekhq.campaign.finances.Money;
 import mekhq.campaign.mission.Scenario;
-import mekhq.campaign.mission.enums.AtBMoraleLevel;
 import mekhq.campaign.mission.enums.MissionStatus;
 import mekhq.campaign.mission.newContract.contractGeneration.ContractTermsData;
 
@@ -59,29 +54,24 @@ public abstract class AbstractContract {
     private ContractObjectiveData objectiveData;
     private ContractFinanceData contractFinanceData;
 
-    private MissionStatus missionStatus = MissionStatus.ACTIVE;
+    private MissionStatus missionStatus;
     private ContractScheduleData scheduleData;
     private SystemsTargetData systemsTargetData;
+
+    private RentedFacilitiesData rentedFacilitiesData;
+    private MoraleData moraleData;
+
+    private StratConCampaignState stratConCampaignState;
+    private int scale;
+    private int trackCount; // TODO future proofing
+
+    private final List<Scenario> scenarios = new ArrayList<>();
+
     /*
      * This is a transient variable meant to keep track of a single jump path while the contract runs through initial
      * calculations, as the same jump path is referenced multiple times and calculating it each time is expensive. No
      * need to preserve it in save data.
      */
     private transient JumpPath cachedJumpPath;
-    private int cachedContractDifficulty;
-
-    private StratConCampaignState stratConCampaignState;
-    private int scale;
-    private int trackCount; // TODO future proofing
-
-    private int hospitalBedsRented;
-    private int kitchensRented;
-    private int holdingCellsRented;
-    private int partsAvailabilityLevel;
-
-    private AtBMoraleLevel moraleLevel = STALEMATE;
-    private LocalDate routEndDate;
-    private Money routedPayout = null;
-
-    private final List<Scenario> scenarios = new ArrayList<>();
+    private transient int cachedContractDifficulty;
 }
