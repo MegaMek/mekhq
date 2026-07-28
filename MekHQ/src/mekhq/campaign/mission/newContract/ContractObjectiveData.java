@@ -32,7 +32,7 @@
  */
 package mekhq.campaign.mission.newContract;
 
-import mekhq.campaign.mission.newContract.contractGeneration.ChaosObjectiveType;
+import mekhq.campaign.mission.enums.AtBContractType;
 
-public record ContractObjectiveData(ChaosObjectiveType playerObjectiveType, ChaosObjectiveType opposingObjectiveType) {
+public record ContractObjectiveData(AtBContractType playerObjectiveType, AtBContractType opposingObjectiveType) {
 }

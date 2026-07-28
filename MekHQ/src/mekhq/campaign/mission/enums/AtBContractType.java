@@ -32,21 +32,8 @@
  */
 package mekhq.campaign.mission.enums;
 
-import static java.lang.Math.round;
 import static megamek.common.compute.Compute.randomInt;
 import static mekhq.campaign.mission.enums.AtBEventType.*;
-import static mekhq.campaign.mission.newContract.targetFinder.EnemySelectionProfile.AT_WAR;
-import static mekhq.campaign.mission.newContract.targetFinder.EnemySelectionProfile.COVERT;
-import static mekhq.campaign.mission.newContract.targetFinder.EnemySelectionProfile.OCCUPYING_POWER;
-import static mekhq.campaign.mission.newContract.targetFinder.EnemySelectionProfile.PIRATES;
-import static mekhq.campaign.mission.newContract.targetFinder.EnemySelectionProfile.RAIDERS;
-import static mekhq.campaign.mission.newContract.targetFinder.EnemySelectionProfile.REBELS;
-import static mekhq.campaign.mission.newContract.targetFinder.MissionLocationProfile.DEEP_RAID;
-import static mekhq.campaign.mission.newContract.targetFinder.MissionLocationProfile.HIGH_VALUE;
-import static mekhq.campaign.mission.newContract.targetFinder.MissionLocationProfile.INTERIOR_POPULATED;
-import static mekhq.campaign.mission.newContract.targetFinder.MissionLocationProfile.INVASION;
-import static mekhq.campaign.mission.newContract.targetFinder.MissionLocationProfile.OCCUPIED_TERRITORY;
-import static mekhq.campaign.mission.newContract.targetFinder.MissionLocationProfile.REAR_AREA;
 
 import java.util.ResourceBundle;
 
@@ -56,108 +43,109 @@ import megamek.logging.MMLogger;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.mission.AtBScenario;
+import mekhq.campaign.mission.newContract.contractGeneration.ChaosObjectiveType;
 import mekhq.campaign.mission.newContract.targetFinder.EnemySelectionProfile;
 import mekhq.campaign.mission.newContract.targetFinder.MissionLocationProfile;
 
 public enum AtBContractType {
     // NEVER SORT THESE ENUM ENTRIES. IT WILL BREAK ATB CONTRACT GENERATION.
     GARRISON_DUTY("AtBContractType.GARRISON_DUTY.text", "AtBContractType.GARRISON_DUTY.toolTipText",
-          18,
+          ChaosObjectiveType.GARRISON,
           1.0,
           EnemySelectionProfile.DEFAULT,
           MissionLocationProfile.DEFAULT),
     CADRE_DUTY("AtBContractType.CADRE_DUTY.text", "AtBContractType.CADRE_DUTY.toolTipText",
-          12,
+          ChaosObjectiveType.CADRE_DUTY,
           0.8,
-          RAIDERS,
-          REAR_AREA),
+          EnemySelectionProfile.RAIDERS,
+          MissionLocationProfile.REAR_AREA),
     SECURITY_DUTY("AtBContractType.SECURITY_DUTY.text", "AtBContractType.SECURITY_DUTY.toolTipText",
-          6,
+          ChaosObjectiveType.GARRISON,
           1.2,
           EnemySelectionProfile.DEFAULT,
-          INTERIOR_POPULATED),
+          MissionLocationProfile.INTERIOR_POPULATED),
     RIOT_DUTY("AtBContractType.RIOT_DUTY.text", "AtBContractType.RIOT_DUTY.toolTipText",
-          4,
+          ChaosObjectiveType.GARRISON,
           1.0,
-          REBELS,
-          INTERIOR_POPULATED),
+          EnemySelectionProfile.REBELS,
+          MissionLocationProfile.INTERIOR_POPULATED),
     PLANETARY_ASSAULT("AtBContractType.PLANETARY_ASSAULT.text", "AtBContractType.PLANETARY_ASSAULT.toolTipText",
-          9,
+          ChaosObjectiveType.INVASION,
           1.5,
-          AT_WAR,
-          INVASION),
+          EnemySelectionProfile.AT_WAR,
+          MissionLocationProfile.INVASION),
     RELIEF_DUTY("AtBContractType.RELIEF_DUTY.text", "AtBContractType.RELIEF_DUTY.toolTipText",
-          9,
+          ChaosObjectiveType.INVASION,
           1.4,
-          AT_WAR,
+          EnemySelectionProfile.AT_WAR,
           MissionLocationProfile.DEFAULT),
     GUERRILLA_WARFARE("AtBContractType.GUERRILLA_WARFARE.text", "AtBContractType.GUERRILLA_WARFARE.toolTipText",
-          24,
+          ChaosObjectiveType.GUERILLA_OPERATION,
           2.1,
-          OCCUPYING_POWER,
-          OCCUPIED_TERRITORY),
+          EnemySelectionProfile.OCCUPYING_POWER,
+          MissionLocationProfile.OCCUPIED_TERRITORY),
     PIRATE_HUNTING("AtBContractType.PIRATE_HUNTING.text", "AtBContractType.PIRATE_HUNTING.toolTipText",
-          6,
+          ChaosObjectiveType.PIRATE_HUNT,
           1.0,
-          PIRATES,
+          EnemySelectionProfile.PIRATES,
           MissionLocationProfile.DEFAULT),
     DIVERSIONARY_RAID("AtBContractType.DIVERSIONARY_RAID.text", "AtBContractType.DIVERSIONARY_RAID.toolTipText",
-          3,
+          ChaosObjectiveType.RAID,
           1.8,
           EnemySelectionProfile.DEFAULT,
-          DEEP_RAID),
+          MissionLocationProfile.DEEP_RAID),
     OBJECTIVE_RAID("AtBContractType.OBJECTIVE_RAID.text", "AtBContractType.OBJECTIVE_RAID.toolTipText",
-          3,
+          ChaosObjectiveType.RAID,
           1.6,
           EnemySelectionProfile.DEFAULT,
-          DEEP_RAID),
+          MissionLocationProfile.DEEP_RAID),
     RECON_RAID("AtBContractType.RECON_RAID.text", "AtBContractType.RECON_RAID.toolTipText",
-          3,
+          ChaosObjectiveType.RAID,
           1.6,
           EnemySelectionProfile.DEFAULT,
-          DEEP_RAID),
+          MissionLocationProfile.DEEP_RAID),
     EXTRACTION_RAID("AtBContractType.EXTRACTION_RAID.text", "AtBContractType.EXTRACTION_RAID.toolTipText",
-          3,
+          ChaosObjectiveType.RAID,
           1.6,
           EnemySelectionProfile.DEFAULT,
-          DEEP_RAID),
+          MissionLocationProfile.DEEP_RAID),
     ASSASSINATION("AtBContractType.ASSASSINATION.text", "AtBContractType.ASSASSINATION.toolTipText",
-          3,
+          ChaosObjectiveType.GUERILLA_OPERATION,
           1.9,
-          COVERT,
-          DEEP_RAID),
+          EnemySelectionProfile.COVERT,
+          MissionLocationProfile.DEEP_RAID),
     ESPIONAGE("AtBContractType.ESPIONAGE.text", "AtBContractType.ESPIONAGE.toolTipText",
-          12,
+          ChaosObjectiveType.EXPEDITION,
           2.4,
-          COVERT,
-          HIGH_VALUE),
+          EnemySelectionProfile.COVERT,
+          MissionLocationProfile.HIGH_VALUE),
     MOLE_HUNTING("AtBContractType.MOLE_HUNTING.text", "AtBContractType.MOLE_HUNTING.toolTipText",
-          6,
+          ChaosObjectiveType.EXPEDITION,
           1.2,
           EnemySelectionProfile.DEFAULT,
           MissionLocationProfile.DEFAULT),
     OBSERVATION_RAID("AtBContractType.OBSERVATION_RAID.text", "AtBContractType.OBSERVATION_RAID.toolTipText",
-          3,
+          ChaosObjectiveType.RAID,
           1.6,
           EnemySelectionProfile.DEFAULT,
-          DEEP_RAID),
+          MissionLocationProfile.DEEP_RAID),
     RETAINER("AtBContractType.RETAINER.text", "AtBContractType.RETAINER.toolTipText",
-          12,
+          ChaosObjectiveType.GARRISON,
           1.3,
           EnemySelectionProfile.DEFAULT,
-          REAR_AREA),
+          MissionLocationProfile.REAR_AREA),
     SABOTAGE("AtBContractType.SABOTAGE.text", "AtBContractType.SABOTAGE.toolTipText",
-          24,
+          ChaosObjectiveType.EXPEDITION,
           2.4,
-          COVERT,
-          HIGH_VALUE),
+          EnemySelectionProfile.COVERT,
+          MissionLocationProfile.HIGH_VALUE),
     TERRORISM("AtBContractType.TERRORISM.text", "AtBContractType.TERRORISM.toolTipText",
-          3,
+          ChaosObjectiveType.EXPEDITION,
           1.9,
-          COVERT,
-          HIGH_VALUE),
+          EnemySelectionProfile.COVERT,
+          MissionLocationProfile.HIGH_VALUE),
     UNDEFINED("AtBContractType.UNDEFINED.text", "AtBContractType.UNDEFINED.toolTipText",
-          1,
+          ChaosObjectiveType.RAID,
           1.0,
           EnemySelectionProfile.DEFAULT,
           MissionLocationProfile.DEFAULT);
@@ -166,22 +154,22 @@ public enum AtBContractType {
     // region Variable Declarations
     private final String name;
     private final String toolTipText;
-    private final int constantLength;
     private final double operationsTempoMultiplier;
+    private final ChaosObjectiveType chaosObjectiveType;
     private final EnemySelectionProfile enemySelectionProfile;
     private final MissionLocationProfile missionLocationProfile;
     // endregion Variable Declarations
 
     // region Constructors
-    AtBContractType(final String name, final String toolTipText, final int constantLength,
+    AtBContractType(final String name, final String toolTipText, final ChaosObjectiveType chaosObjectiveType,
           final double operationsTempoMultiplier, final EnemySelectionProfile enemySelectionProfile,
           final MissionLocationProfile missionLocationProfile) {
         final ResourceBundle resources = ResourceBundle.getBundle("mekhq.resources.Mission",
               MekHQ.getMHQOptions().getLocale());
         this.name = resources.getString(name);
         this.toolTipText = resources.getString(toolTipText);
-        this.constantLength = constantLength;
         this.operationsTempoMultiplier = operationsTempoMultiplier;
+        this.chaosObjectiveType = chaosObjectiveType;
         this.enemySelectionProfile = enemySelectionProfile;
         this.missionLocationProfile = missionLocationProfile;
     }
@@ -193,7 +181,11 @@ public enum AtBContractType {
     }
 
     public int getConstantLength() {
-        return constantLength;
+        return chaosObjectiveType.getMonthsLength();
+    }
+
+    public ChaosObjectiveType getChaosObjectiveType() {
+        return chaosObjectiveType;
     }
 
     public double getOperationsTempoMultiplier() {
@@ -307,50 +299,15 @@ public enum AtBContractType {
     // endregion Boolean Comparison Methods
 
     /**
-     * Calculates the length of the contract in months.
-     *
-     * <p>If variable contract lengths are enabled, the length is calculated with randomization around the base
-     * contract type's standard duration. Otherwise, the constant length defined by the contract type is used.</p>
-     *
-     * @param useVariableContractLengths whether to use variable length calculation
-     *
-     * @return the calculated contract length in months
-     */
-    public int calculateLength(final boolean useVariableContractLengths) {
-        return useVariableContractLengths ? calculateVariableLength() : getConstantLength();
-    }
-
-    /**
-     * Calculates a variable contract length with randomization.
-     *
-     * <p>The length is calculated as 75% of the constant length plus a random variance of up to 50% of the constant
-     * length. For example, a contract type with a constant length of 12 months would have a base of 9 months plus 0-6
-     * months variance, resulting in a range of 9-15 months.</p>
-     *
-     * @return the calculated variable contract length in months
-     */
-    private int calculateVariableLength() {
-        int baseLength = (int) round(constantLength * 0.75);
-        int variance = (int) round(constantLength * 0.5);
-
-        if (variance > 0) {
-            return baseLength + randomInt(variance);
-        } else {
-            // If we can't determine variance return the constantLength
-            return constantLength;
-        }
-    }
-
-    /**
      * Determines the parts availability level for the current contract type.
      *
      * <p>The returned value is a modifier added to the target number of procurement checks, so a higher value makes
      * parts harder to acquire and a lower (negative) value makes them easier. In other words, higher is worse. The
      * modifier is only applied when StratCon and "restrict parts by mission" are both enabled.</p>
      *
-     * <p>Values range from {@code 2} for deep covert operations cut off behind enemy lines (worst availability) down
-     * to {@code -2} (best availability). The {@code -2} value is the {@code default} branch, applied to garrison-style
-     * postings and to any other contract type that lacks a more restrictive case.</p>
+     * <p>Values range from {@code 2} for deep EnemySelectionProfile.COVERT operations cut off behind enemy lines
+     * (worst availability) down to {@code -2} (best availability). The {@code -2} value is the {@code default} branch,
+     * applied to garrison-style postings and to any other contract type that lacks a more restrictive case.</p>
      *
      * @return the parts availability modifier for the current contract type, where higher values mean worse
      *       availability
@@ -376,12 +333,11 @@ public enum AtBContractType {
      */
     public CombatRole getRequiredCombatRole() {
         return switch (this) {
+            case GARRISON_DUTY, SECURITY_DUTY, RIOT_DUTY, RETAINER -> CombatRole.FRONTLINE;
             case CADRE_DUTY -> CombatRole.CADRE;
-            case GARRISON_DUTY, SECURITY_DUTY, RIOT_DUTY, SABOTAGE, TERRORISM, RETAINER, ASSASSINATION ->
-                  CombatRole.MANEUVER;
-            case GUERRILLA_WARFARE, PIRATE_HUNTING, PLANETARY_ASSAULT, RELIEF_DUTY, UNDEFINED -> CombatRole.FRONTLINE;
-            case DIVERSIONARY_RAID, EXTRACTION_RAID, OBJECTIVE_RAID, RECON_RAID, OBSERVATION_RAID, MOLE_HUNTING,
-                 ESPIONAGE -> CombatRole.PATROL;
+            case PLANETARY_ASSAULT, RELIEF_DUTY, GUERRILLA_WARFARE, DIVERSIONARY_RAID, OBJECTIVE_RAID,
+                 EXTRACTION_RAID, ASSASSINATION, SABOTAGE, TERRORISM, UNDEFINED -> CombatRole.MANEUVER;
+            case PIRATE_HUNTING, RECON_RAID, ESPIONAGE, MOLE_HUNTING, OBSERVATION_RAID -> CombatRole.PATROL;
         };
     }
 
