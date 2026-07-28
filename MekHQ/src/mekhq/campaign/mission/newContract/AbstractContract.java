@@ -82,4 +82,152 @@ public abstract class AbstractContract {
      */
     private transient JumpPath cachedJumpPath;
     private transient int cachedContractDifficulty;
+
+    public List<Scenario> getScenarios() {
+        return scenarios;
+    }
+
+    public UUID getContractId() {
+        return contractId;
+    }
+
+    public void setContractId(UUID contractId) {
+        this.contractId = contractId;
+    }
+
+    public String getContractName() {
+        return contractName;
+    }
+
+    public void setContractName(String contractName) {
+        this.contractName = contractName;
+    }
+
+    public String getDescription() {
+        return description;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
+    }
+
+    public EmployerData getEmployerData() {
+        return employerData;
+    }
+
+    public void setEmployerData(EmployerData employerData) {
+        this.employerData = employerData;
+    }
+
+    public EnemyData getEnemyData() {
+        return enemyData;
+    }
+
+    public void setEnemyData(EnemyData enemyData) {
+        this.enemyData = enemyData;
+    }
+
+    public ContractTermsData getContractTerms() {
+        return contractTerms;
+    }
+
+    public void setContractTerms(ContractTermsData contractTerms) {
+        this.contractTerms = contractTerms;
+    }
+
+    public ContractObjectiveData getObjectiveData() {
+        return objectiveData;
+    }
+
+    public void setObjectiveData(ContractObjectiveData objectiveData) {
+        this.objectiveData = objectiveData;
+    }
+
+    public ContractFinanceData getContractFinanceData() {
+        return contractFinanceData;
+    }
+
+    public void setContractFinanceData(ContractFinanceData contractFinanceData) {
+        this.contractFinanceData = contractFinanceData;
+    }
+
+    public MissionStatus getMissionStatus() {
+        return missionStatus;
+    }
+
+    public void setMissionStatus(MissionStatus missionStatus) {
+        this.missionStatus = missionStatus;
+    }
+
+    public ContractScheduleData getScheduleData() {
+        return scheduleData;
+    }
+
+    public void setScheduleData(ContractScheduleData scheduleData) {
+        this.scheduleData = scheduleData;
+    }
+
+    public SystemsTargetData getSystemsTargetData() {
+        return systemsTargetData;
+    }
+
+    public void setSystemsTargetData(SystemsTargetData systemsTargetData) {
+        this.systemsTargetData = systemsTargetData;
+    }
+
+    public RentedFacilitiesData getRentedFacilitiesData() {
+        return rentedFacilitiesData;
+    }
+
+    public void setRentedFacilitiesData(RentedFacilitiesData rentedFacilitiesData) {
+        this.rentedFacilitiesData = rentedFacilitiesData;
+    }
+
+    public MoraleData getMoraleData() {
+        return moraleData;
+    }
+
+    public void setMoraleData(MoraleData moraleData) {
+        this.moraleData = moraleData;
+    }
+
+    public StratConCampaignState getStratConCampaignState() {
+        return stratConCampaignState;
+    }
+
+    public void setStratConCampaignState(StratConCampaignState stratConCampaignState) {
+        this.stratConCampaignState = stratConCampaignState;
+    }
+
+    public int getScale() {
+        return scale;
+    }
+
+    public void setScale(int scale) {
+        this.scale = scale;
+    }
+
+    public int getTrackCount() {
+        return trackCount;
+    }
+
+    public void setTrackCount(int trackCount) {
+        this.trackCount = trackCount;
+    }
+
+    public JumpPath getCachedJumpPath() {
+        return cachedJumpPath;
+    }
+
+    public void setCachedJumpPath(JumpPath cachedJumpPath) {
+        this.cachedJumpPath = cachedJumpPath;
+    }
+
+    public int getCachedContractDifficulty() {
+        return cachedContractDifficulty;
+    }
+
+    public void setCachedContractDifficulty(int cachedContractDifficulty) {
+        this.cachedContractDifficulty = cachedContractDifficulty;
+    }
 }

@@ -39,6 +39,7 @@ import megamek.codeUtilities.ObjectUtility;
 import mekhq.campaign.campaignOptions.CampaignOption;
 import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.location.ILocation;
+import mekhq.campaign.mission.newContract.ChaosContract;
 import mekhq.campaign.mission.newContract.contractData.ContractObjectiveData;
 import mekhq.campaign.universe.Faction;
 import mekhq.campaign.universe.Planet;
@@ -59,6 +60,9 @@ public class NormalContractGeneration extends AbstractContractGeneration {
 
     public NormalContractGeneration(CampaignOptions campaignOptions, LocalDate currentDate, ILocation currentLocation,
           boolean isMercenarySearch, int contractGenerationModifier) {
+        ChaosContract contract = new ChaosContract();
+
+
         // Step 1: Employer
         employerGenerationData = ChaosContractEmployerDetermination.getEmployerGenerationData(currentDate,
               currentLocation,

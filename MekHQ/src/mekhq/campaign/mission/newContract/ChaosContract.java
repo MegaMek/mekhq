@@ -32,8 +32,5 @@
  */
 package mekhq.campaign.mission.newContract;
 
-import mekhq.campaign.mission.newContract.contractGeneration.ChaosContractType;
-
 public class ChaosContract extends AbstractContract {
-    ChaosContractType contractType;
 }
