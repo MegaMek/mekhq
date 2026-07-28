@@ -19,7 +19,7 @@
 <scenarioModifierManifest>
     <modifiers>
         <modifier>
-            EnemyAirSupport_test.xml
+            EnemyAirSupport_test.json
         </modifier>
     </modifiers>
 </scenarioModifierManifest>
