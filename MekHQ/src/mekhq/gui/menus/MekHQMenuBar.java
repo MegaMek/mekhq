@@ -114,6 +114,7 @@ import mekhq.gui.FileDialogs;
 import mekhq.gui.campaignOptions.CampaignOptionsDialog;
 import mekhq.gui.developerTools.ContractDefinitionEditorDialog;
 import mekhq.gui.developerTools.ScenarioModifierEditorDialog;
+import mekhq.gui.developerTools.StratConFacilityEditorDialog;
 import mekhq.gui.dialog.*;
 import mekhq.gui.dialog.reportDialogs.CargoReportDialog;
 import mekhq.gui.dialog.reportDialogs.HangarReportDialog;
@@ -601,6 +602,10 @@ public class MekHQMenuBar extends JMenuBar {
         JMenuItem miContractDefinitionEditor = createMenuItem("miContractDefinitionEditor.text", KeyEvent.VK_C,
               evt -> new ContractDefinitionEditorDialog(getFrame()).setVisible(true));
         menuDeveloperTools.add(miContractDefinitionEditor);
+
+        JMenuItem miFacilityEditor = createMenuItem("miFacilityEditor.text", KeyEvent.VK_F,
+              evt -> new StratConFacilityEditorDialog(getFrame()).setVisible(true));
+        menuDeveloperTools.add(miFacilityEditor);
 
         return menuDeveloperTools;
     }

@@ -154,7 +154,6 @@ public class StratConFacility implements Cloneable {
         return displayableName;
     }
 
-    @Deprecated(since = "0.51.0", forRemoval = true)
     public void setDisplayableName(String displayableName) {
         this.displayableName = displayableName;
     }
@@ -163,7 +162,6 @@ public class StratConFacility implements Cloneable {
         return facilityType;
     }
 
-    @Deprecated(since = "0.51.0", forRemoval = true)
     public void setFacilityType(FacilityType facilityType) {
         this.facilityType = facilityType;
     }
@@ -342,6 +340,19 @@ public class StratConFacility implements Cloneable {
         ReconstructTransientData(resultingFacility);
 
         return resultingFacility;
+    }
+
+    /**
+     * Serialize this facility to a JSON file, led by the MegaMek Data license header. Please pass in a non-null file.
+     *
+     * @param outputFile The destination file.
+     */
+    public void Serialize(File outputFile) {
+        try {
+            StratConFacilityJson.toFile(this, outputFile);
+        } catch (Exception e) {
+            LOGGER.error("Error serializing {}", outputFile.getPath(), e);
+        }
     }
 
     private static void ReconstructTransientData(StratConFacility facility) {

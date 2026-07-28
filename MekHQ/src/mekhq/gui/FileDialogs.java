@@ -42,6 +42,7 @@ import mekhq.MekHQ;
 import mekhq.Utilities;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.digitalGM.stratCon.StratConContractDefinition;
+import mekhq.campaign.digitalGM.stratCon.StratConFacility;
 import mekhq.campaign.mission.Scenario;
 import mekhq.campaign.mission.ScenarioTemplate;
 import mekhq.campaign.mission.atb.AtBScenarioModifier;
@@ -324,6 +325,7 @@ public class FileDialogs {
 
     private static final String SCENARIO_MODIFIER_DIRECTORY = "./data/scenariomodifiers";
     private static final String CONTRACT_DEFINITION_DIRECTORY = "./data/stratconcontractdefinitions";
+    private static final String STRAT_CON_FACILITY_DIRECTORY = "./data/stratconfacilities";
 
     /**
      * Displays a dialog window from which the user can select a scenario modifier file to open.
@@ -367,6 +369,34 @@ public class FileDialogs {
         String fileName = ((name == null) || name.isBlank() ? "contract" : name) + ".json";
         return GUI.fileDialogSave(frame, "Save Contract Definition", FileType.JSON, CONTRACT_DEFINITION_DIRECTORY,
               fileName);
+    }
+
+    /**
+     * Displays a dialog window from which the user can select a StratCon facility file to open.
+     *
+     * @return the file selected, if any
+     */
+    public static Optional<File> openStratConFacility(JFrame frame) {
+        return GUI.fileDialogOpen(frame, "Load StratCon Facility", FileType.JSON, STRAT_CON_FACILITY_DIRECTORY);
+    }
+
+    /**
+     * Displays a dialog window from which the user can select a StratCon facility file to save to. The suggested file
+     * name follows the shipped convention of an owner prefix plus the display name (e.g. {@code AlliedAirBase.json}).
+     *
+     * @return the file selected, if any
+     */
+    public static Optional<File> saveStratConFacility(JFrame frame, StratConFacility facility) {
+        String display = facility.getDisplayableName();
+        String fileName;
+        if ((display == null) || display.isBlank()) {
+            fileName = "facility";
+        } else {
+            String prefix = facility.isOwnerAlliedToPlayer() ? "Allied" : "Hostile";
+            fileName = prefix + display.replaceAll("[^A-Za-z0-9]", "");
+        }
+        return GUI.fileDialogSave(frame, "Save StratCon Facility", FileType.JSON, STRAT_CON_FACILITY_DIRECTORY,
+              fileName + ".json");
     }
 
     /**
