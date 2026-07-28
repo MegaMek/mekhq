@@ -545,7 +545,7 @@ public class Unit implements ITechnology, ILocatable {
         this.entity = en;
     }
 
-    public Entity getEntity() {
+    public @Nullable Entity getEntity() {
         return entity;
     }
 
