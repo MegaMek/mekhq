@@ -100,5 +100,8 @@ public class NormalContractGeneration extends AbstractContractGeneration {
 
         // Step 7: Track Count & Intensity
         trackCount = ChaosContractDetermineIntensity.determineTrackCount(objectiveType);
+
+        // Step 8: sign off
+        generationWasSuccessful = true;
     }
 }
