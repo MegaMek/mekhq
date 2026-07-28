@@ -100,11 +100,5 @@ public class NormalContractGeneration extends AbstractContractGeneration {
 
         // Step 7: Track Count & Intensity
         trackCount = ChaosContractDetermineIntensity.determineTrackCount(objectiveType);
-
-        // Step 13: Special Objective Type Considerations
-
-
-        // step n^n: Roll for follow-up objectives
-        // Step n+1: Re-Negotiate Contract
     }
 }
