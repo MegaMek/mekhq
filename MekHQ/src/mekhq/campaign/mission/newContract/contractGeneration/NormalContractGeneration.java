@@ -54,6 +54,7 @@ public class NormalContractGeneration extends AbstractContractGeneration {
     PlanetarySystem targetSystem;
     Planet targetPlanet;
     private int monthsLength;
+    private ContractTermsData initialContractTerms;
 
     public NormalContractGeneration(CampaignOptions campaignOptions, LocalDate currentDate, ILocation currentLocation,
           boolean isMercenarySearch, int contractGenerationModifier, int scale) {
@@ -67,9 +68,12 @@ public class NormalContractGeneration extends AbstractContractGeneration {
             return;
         }
 
+        ChaosEmployerType employerType = employerGenerationData.type();
+
         // Step 2: Type
         objectiveData = ChaosContractObjectiveDetermination.determineContractObjectiveType(
               contractGenerationModifier);
+        ChaosObjectiveType objectiveType = objectiveData.playerObjectiveType().getChaosObjectiveType();
 
         // Step 3: Enemy
         enemyFaction = ChaosContractDeterminationEnemy.generateEnemyFactionForObjective(currentLocation,
@@ -88,17 +92,14 @@ public class NormalContractGeneration extends AbstractContractGeneration {
 
         // Step 5: Length
         boolean useVariableContractLength = campaignOptions.get(CampaignOption.VARIABLE_CONTRACT_LENGTH);
-        monthsLength = objectiveData.playerObjectiveType()
-                             .getChaosObjectiveType()
-                             .calculateLength(useVariableContractLength);
+        monthsLength = objectiveType.calculateLength(useVariableContractLength);
 
-        // Step 6: Pay Rate
+        // Step 6: Initial Terms
+        initialContractTerms = ChaosContractDetermineTerms.determineInitialTerms(objectiveType, employerType);
 
-        // Step 7: Support
-        // Step 8: Transportation
-        // Step 9: Salvage Rights
-        // Step 10: Command Rights
-        // Step 12: Track Count & Intensity
+        // Step 7: Track Count & Intensity
+
+
         // Step 13: Special Objective Type Considerations
 
         // step n^n: Roll for follow-up objectives

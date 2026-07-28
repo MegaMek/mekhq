@@ -44,22 +44,37 @@ import megamek.logging.MMLogger;
 import mekhq.campaign.mission.enums.AtBContractType;
 
 public enum ChaosObjectiveType {
-    EXPEDITION(3),
-    PIRATE_HUNT(3),
-    GUERILLA_OPERATION(3),
-    GARRISON(6),
-    CADRE_DUTY(6),
-    RAID(3),
-    INVASION(6),
-    PIRATE_RAID(3);
+    EXPEDITION(3, 0, 1, 0, 0, 2),
+    PIRATE_HUNT(3, 0, 0, 0, -1, 2),
+    GUERILLA_OPERATION(3, 0, 0, 0, -1, 2),
+    GARRISON(6, 1, 0, 1, -2, 0),
+    CADRE_DUTY(6, 1, 0, 1, -2, 0),
+    RAID(3, 0, 0, 0, -1, 0),
+    INVASION(6, -1, 2, -1, 1, -2),
+    PIRATE_RAID(3, 0, 0, 0, -1, 0);
 
     private static final MMLogger LOGGER = MMLogger.create(ChaosObjectiveType.class);
 
     // Hot Spots Draconis Reach pg 144 first printing
     private final int monthsLength;
+    // Hot Spots Draconis Reach pg 144 first printing
+    private final int payRateModifier;
+    // Hot Spots Draconis Reach pg 144 first printing
+    private final int supportModifier;
+    // Hot Spots Draconis Reach pg 144 first printing
+    private final int transportModifier;
+    // Hot Spots Draconis Reach pg 144 first printing
+    private final int salvageRightsModifier;
+    private final int commandRightsModifier;
 
-    ChaosObjectiveType(final int monthsLength) {
+    ChaosObjectiveType(final int monthsLength, final int payRateModifier, final int supportModifier,
+          final int transportModifier, final int salvageRightsModifier, final int commandRightsModifier) {
         this.monthsLength = monthsLength;
+        this.payRateModifier = payRateModifier;
+        this.supportModifier = supportModifier;
+        this.transportModifier = transportModifier;
+        this.salvageRightsModifier = salvageRightsModifier;
+        this.commandRightsModifier = commandRightsModifier;
     }
 
     public int getMonthsLength() {
@@ -114,5 +129,25 @@ public enum ChaosObjectiveType {
         }
 
         return ObjectUtility.getRandomItem(candidates);
+    }
+
+    public int getPayRateModifier() {
+        return payRateModifier;
+    }
+
+    public int getSupportModifier() {
+        return supportModifier;
+    }
+
+    public int getTransportModifier() {
+        return transportModifier;
+    }
+
+    public int getSalvageRightsModifier() {
+        return salvageRightsModifier;
+    }
+
+    public int getCommandRightsModifier() {
+        return commandRightsModifier;
     }
 }

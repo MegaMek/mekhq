@@ -33,16 +33,31 @@
 package mekhq.campaign.mission.newContract.contractGeneration;
 
 public enum ChaosEmployerType {
-    ANY_PLANETARY_GOVERNMENT,
-    ANY_SYSTEM_OWNER,
-    CIVILIAN_ORGANIZATION_BUSINESS,
-    CIVILIAN_ORGANIZATION_MILITIA,
-    CIVILIAN_ORGANIZATION_REBELS,
-    CORPORATION,
-    LOCAL_PLANETARY_GOVERNMENT,
-    LOCAL_SYSTEM_OWNER,
-    MERCENARY_SUBCONTRACT,
-    NOBLE;
+    ANY_PLANETARY_GOVERNMENT(0, 1, 0, 1, 0),
+    ANY_SYSTEM_OWNER(1, 2, 1, -2, -3),
+    CIVILIAN_ORGANIZATION_BUSINESS(-2, -2, -1, 4, 4),
+    CIVILIAN_ORGANIZATION_MILITIA(-2, -2, -1, 4, 4),
+    CIVILIAN_ORGANIZATION_REBELS(-2, -2, -1, 4, 4),
+    CORPORATION(2, -2, 1, 2, 0),
+    LOCAL_PLANETARY_GOVERNMENT(0, 1, 0, 1, 0),
+    LOCAL_SYSTEM_OWNER(0, 2, 1, -2, -3),
+    MERCENARY_SUBCONTRACT(0, 0, 0, 0, 3),
+    NOBLE(0, 0, 0, 0, 0);
+
+    private final int payRateModifier; // Hot Spots Draconis Reach pg 144 first printing
+    private final int supportModifier; // Hot Spots Draconis Reach pg 144 first printing
+    private final int transportModifier; // Hot Spots Draconis Reach pg 144 first printing
+    private final int salvageRightsModifier; // Hot Spots Draconis Reach pg 144 first printing
+    private final int commandRightsModifier; // Hot Spots Draconis Reach pg 144 first printing
+
+    ChaosEmployerType(final int payRateModifier, final int supportModifier, final int transportModifier,
+          final int salvageRightsModifier, final int commandRightsModifier) {
+        this.payRateModifier = payRateModifier;
+        this.supportModifier = supportModifier;
+        this.transportModifier = transportModifier;
+        this.salvageRightsModifier = salvageRightsModifier;
+        this.commandRightsModifier = commandRightsModifier;
+    }
 
     public boolean isCurrentSystemEmployer() {
         return this == LOCAL_SYSTEM_OWNER ||
@@ -52,5 +67,25 @@ public enum ChaosEmployerType {
     public boolean isSystemOwner() {
         return this == LOCAL_SYSTEM_OWNER ||
                      this == ANY_SYSTEM_OWNER;
+    }
+
+    public int getPayRateModifier() {
+        return payRateModifier;
+    }
+
+    public int getSupportModifier() {
+        return supportModifier;
+    }
+
+    public int getTransportModifier() {
+        return transportModifier;
+    }
+
+    public int getSalvageRightsModifier() {
+        return salvageRightsModifier;
+    }
+
+    public int getCommandRightsModifier() {
+        return commandRightsModifier;
     }
 }
