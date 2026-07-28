@@ -52,10 +52,10 @@ public class NormalContractGeneration extends AbstractContractGeneration {
     private ContractObjectiveData objectiveData;
     private Faction enemyFaction;
     PlanetarySystem targetSystem;
-    Planet targetPlanet;
+    Planet targetPlanet; // TODO uses placeholder code
     private int monthsLength;
     private ContractTermsData initialContractTerms;
-    private int trackCount;
+    private int trackCount; // TODO future proofing
 
     public NormalContractGeneration(CampaignOptions campaignOptions, LocalDate currentDate, ILocation currentLocation,
           boolean isMercenarySearch, int contractGenerationModifier) {
@@ -86,7 +86,7 @@ public class NormalContractGeneration extends AbstractContractGeneration {
               employerGenerationData.faction().getShortName(),
               enemyFaction.getShortName(),
               currentLocation);
-        PlanetarySystem targetSystem = Systems.getInstance().getSystemById(targetSystemId);
+        targetSystem = Systems.getInstance().getSystemById(targetSystemId);
         Collection<Planet> candidatePlanets = targetSystem.getPlanets();
         // TODO use same planetary picker profile as System picker
         targetPlanet = ObjectUtility.getRandomItem(candidatePlanets);
