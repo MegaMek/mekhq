@@ -34,6 +34,7 @@ package mekhq.campaign.mission.newContract.contractGeneration;
 
 import static megamek.common.compute.Compute.d6;
 import static megamek.common.compute.Compute.randomInt;
+import static mekhq.campaign.mission.RandomFactionCamouflage.pickRandomCamouflage;
 import static mekhq.campaign.universe.Faction.COMSTAR_FACTION_CODE;
 import static mekhq.campaign.universe.Faction.WORD_OF_BLAKE_FACTION_CODE;
 
@@ -42,12 +43,18 @@ import java.util.Collections;
 import java.util.List;
 
 import jakarta.annotation.Nullable;
+import megamek.common.icons.Camouflage;
 import megamek.logging.MMLogger;
+import mekhq.campaign.Campaign;
 import mekhq.campaign.location.ILocation;
+import mekhq.campaign.mission.newContract.contractData.EmployerData;
+import mekhq.campaign.personnel.Person;
 import mekhq.campaign.universe.Faction;
 import mekhq.campaign.universe.Factions;
+import mekhq.campaign.universe.Planet;
 import mekhq.campaign.universe.PlanetarySystem;
 import mekhq.campaign.universe.RandomFactionGenerator;
+import mekhq.campaign.universe.enums.HiringHallLevel;
 import org.jspecify.annotations.NonNull;
 
 public class ChaosContractEmployerDetermination {
@@ -56,11 +63,40 @@ public class ChaosContractEmployerDetermination {
     private static final int COMSTAR_EMPLOYER_CHANCE = 100;
     private static final int WORD_OF_BLAKE_EMPLOYER_CHANCE = 40;
 
-    public static EmployerGenerationData getEmployerGenerationData(LocalDate currentDate, ILocation currentLocation,
-          boolean isMercenarySearch) {
-        ChaosEmployerType employerType = determineEmployerType();
-        Faction employer = determineEmployerFaction(employerType, currentDate, currentLocation, isMercenarySearch);
-        return new EmployerGenerationData(employerType, employer);
+    // TODO remove campaign
+    public static @Nullable EmployerData getEmployerGenerationData(LocalDate currentDate, ILocation currentLocation,
+          Campaign campaign, ContractSearchType searchType) {
+        ChaosEmployerType type = determineEmployerType();
+
+        boolean isMercenarySearch = searchType == ContractSearchType.MERCENARY;
+        Faction employer = determineEmployerFaction(type, currentDate, currentLocation, isMercenarySearch);
+        if (employer == null) {
+            LOGGER.info("Failed to select an employer for current location. Contract generation failed");
+            return null;
+        }
+
+        int currentYear = currentDate.getYear();
+        String factionCode = employer.getShortName();
+        String displayName = employer.getFullName(currentYear);
+
+        Planet currentPlanet = currentLocation.getPlanet();
+        if (currentPlanet == null) {
+            LOGGER.info("Player is not on a planet, unable to negotiate contracts.");
+            return null;
+        }
+        HiringHallLevel hiringHall = currentPlanet.getHiringHallLevel(currentDate);
+
+        Person negotiator = EmployerNegotiator.generateNegotiator(campaign, searchType, employer, hiringHall);
+        Person liaison = EmployerLiaison.generateLiaison(campaign, searchType, employer);
+
+        Camouflage camouflage = pickRandomCamouflage(currentYear, factionCode);
+
+        return new EmployerData(type,
+              factionCode,
+              displayName,
+              negotiator,
+              liaison,
+              camouflage);
     }
 
     private static ChaosEmployerType determineEmployerType() {

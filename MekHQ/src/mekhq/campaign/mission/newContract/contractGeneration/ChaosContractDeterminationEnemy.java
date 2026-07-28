@@ -33,18 +33,18 @@
 package mekhq.campaign.mission.newContract.contractGeneration;
 
 import static megamek.common.compute.Compute.randomInt;
+import static mekhq.campaign.mission.RandomFactionCamouflage.pickRandomCamouflage;
 import static mekhq.campaign.universe.Faction.MERCENARY_FACTION_CODE;
-import static mekhq.campaign.universe.Faction.REBEL_FACTION_CODE;
 
 import java.time.LocalDate;
 
-import jakarta.annotation.Nullable;
+import megamek.common.icons.Camouflage;
 import megamek.logging.MMLogger;
 import mekhq.campaign.location.ILocation;
 import mekhq.campaign.mission.enums.AtBContractType;
+import mekhq.campaign.mission.newContract.contractData.EnemyData;
 import mekhq.campaign.mission.newContract.contractGeneration.targetFinder.EnemySelectionProfile;
 import mekhq.campaign.universe.Faction;
-import mekhq.campaign.universe.Factions;
 import mekhq.campaign.universe.RandomFactionGenerator;
 
 /**
@@ -59,31 +59,39 @@ public class ChaosContractDeterminationEnemy {
 
     private ChaosContractDeterminationEnemy() {}
 
-    static Faction generateEnemyFactionForObjective(ILocation currentLocation, LocalDate currentDate,
+    static EnemyData generateEnemyFactionForObjective(ILocation currentLocation, LocalDate currentDate,
           Faction employerFaction, AtBContractType objectiveType) {
         RandomFactionGenerator randomFactionGenerator = RandomFactionGenerator.getInstance();
+
         EnemySelectionProfile enemySelectionProfile = objectiveType.getEnemySelectionProfile();
         Faction enemyFaction = randomFactionGenerator.getRandomEnemy(currentLocation, currentDate, employerFaction,
               enemySelectionProfile);
+        String factionCode = enemyFaction.getShortName();
 
-        if (enemyFaction == null) {
-            LOGGER.warn("Failed to fetch random enemy faction for employer code {}. Returning Rebels.",
-                  employerFaction.getShortName());
-            return Factions.getInstance().getFaction(REBEL_FACTION_CODE);
+        String sponsorFactionCode = null;
+        boolean hasEmployedMercenaries = hasEmployedMercenaries(employerFaction, currentDate);
+        if (hasEmployedMercenaries) {
+            sponsorFactionCode = factionCode;
+            factionCode = MERCENARY_FACTION_CODE;
         }
 
-        return enemyFaction;
+        int currentYear = currentDate.getYear();
+        String displayName = employerFaction.getFullName(currentYear);
+
+        Camouflage camouflage = pickRandomCamouflage(currentYear, factionCode);
+
+        return new EnemyData(factionCode, sponsorFactionCode, displayName, camouflage);
     }
 
-    private static @Nullable Faction hasEmployedMercenaries(Faction employerFaction, LocalDate currentDate) {
+    private static boolean hasEmployedMercenaries(Faction employerFaction, LocalDate currentDate) {
         boolean allowsMercenaries = employerFaction.isUsesMercenaries(currentDate.getYear());
         if (allowsMercenaries) {
             int roll = randomInt(MERCENARY_ENEMY_CHANCE);
             if (roll == 0) {
-                return Factions.getInstance().getFaction(MERCENARY_FACTION_CODE);
+                return true;
             }
         }
 
-        return null;
+        return false;
     }
 }

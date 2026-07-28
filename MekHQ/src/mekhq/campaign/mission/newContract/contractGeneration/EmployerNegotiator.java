@@ -96,15 +96,15 @@ public class EmployerNegotiator {
      * baseline.
      *
      * @param campaign        the current campaign, used to create and adjust the person
-     * @param campaignType    the campaign type, which drives the negotiator's role
+     * @param searchType      the campaign type, which drives the negotiator's role
      * @param employerFaction the employer faction (its Clan status affects the role and rank system)
      * @param hiringHallLevel the local hiring hall level, which can affect the mercenary negotiator's role
      *
      * @return the generated negotiator
      */
-    public static Person generateNegotiator(Campaign campaign, ContractSearchType campaignType,
+    public static Person generateNegotiator(Campaign campaign, ContractSearchType searchType,
           Faction employerFaction, HiringHallLevel hiringHallLevel) {
-        PersonnelRole role = getNegotiatorRole(hiringHallLevel, campaignType, employerFaction);
+        PersonnelRole role = getNegotiatorRole(hiringHallLevel, searchType, employerFaction);
 
         Person negotiator = campaign.newPerson(role, employerFaction.getShortName(), Gender.RANDOMIZE);
 

@@ -32,11 +32,16 @@
  */
 package mekhq.campaign.mission.newContract.contractData;
 
+import static megamek.client.ui.util.PlayerColour.BLUE;
+
 import megamek.client.ui.util.PlayerColour;
 import megamek.common.enums.SkillLevel;
 import megamek.common.icons.Camouflage;
+import mekhq.campaign.enums.DragoonRating;
 import mekhq.campaign.mission.newContract.contractGeneration.ChaosEmployerType;
 import mekhq.campaign.personnel.Person;
+import mekhq.campaign.universe.Faction;
+import mekhq.campaign.universe.Factions;
 
 public record EmployerData(ChaosEmployerType type,
       String factionCode,
@@ -48,4 +53,33 @@ public record EmployerData(ChaosEmployerType type,
       Camouflage camouflage,
       PlayerColour color
 ) {
+    public EmployerData(ChaosEmployerType type, String factionCode, String displayName, Person negotiator,
+          Person liaison, Camouflage camouflage) {
+        this(type,
+              factionCode,
+              displayName,
+              negotiator,
+              liaison,
+              SkillLevel.REGULAR,
+              DragoonRating.DRAGOON_C.getRating(),
+              camouflage,
+              BLUE);
+    }
+
+    public EmployerData(EmployerData existingData, SkillLevel forceSkill, int equipmentRating) {
+        this(existingData.type,
+              existingData.factionCode,
+              existingData.displayName,
+              existingData.negotiator,
+              existingData.liaison,
+              forceSkill,
+              equipmentRating,
+              existingData.camouflage,
+              existingData.color
+        );
+    }
+
+    public Faction getFaction() {
+        return Factions.getInstance().getFaction(factionCode);
+    }
 }

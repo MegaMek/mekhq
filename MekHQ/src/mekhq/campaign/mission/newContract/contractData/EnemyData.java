@@ -32,20 +32,62 @@
  */
 package mekhq.campaign.mission.newContract.contractData;
 
+import static megamek.client.ui.util.PlayerColour.RED;
+
 import jakarta.annotation.Nullable;
 import megamek.client.ui.util.PlayerColour;
 import megamek.common.enums.SkillLevel;
 import megamek.common.icons.Camouflage;
-import mekhq.campaign.personnel.Person;
+import mekhq.campaign.enums.DragoonRating;
+import mekhq.campaign.universe.Faction;
+import mekhq.campaign.universe.Factions;
 
-public record EnemyData(String directFactionCode,
+public record EnemyData(String factionCode,
       @Nullable String sponsorFactionCode,
       String displayName,
-      Person commander,
       SkillLevel forceSkill,
       int equipmentRating,
       Camouflage camouflage,
       PlayerColour color,
       boolean batchallAccepted
 ) {
+    public EnemyData(String factionCode, @Nullable String sponsorFactionCode, String displayName,
+          Camouflage camouflage) {
+        this(factionCode,
+              sponsorFactionCode,
+              displayName,
+              SkillLevel.REGULAR,
+              DragoonRating.DRAGOON_C.getRating(),
+              camouflage,
+              RED,
+              true);
+    }
+
+    public EnemyData(EnemyData existingData, SkillLevel forceSkill, int equipmentRating) {
+        this(existingData.factionCode,
+              existingData.sponsorFactionCode,
+              existingData.displayName,
+              forceSkill,
+              equipmentRating,
+              existingData.camouflage,
+              existingData.color,
+              existingData.batchallAccepted
+        );
+    }
+
+    public EnemyData(EnemyData existingData, boolean batchallAccepted) {
+        this(existingData.factionCode,
+              existingData.sponsorFactionCode,
+              existingData.displayName,
+              existingData.forceSkill,
+              existingData.equipmentRating,
+              existingData.camouflage,
+              existingData.color,
+              batchallAccepted
+        );
+    }
+
+    public Faction getFaction() {
+        return Factions.getInstance().getFaction(factionCode);
+    }
 }
