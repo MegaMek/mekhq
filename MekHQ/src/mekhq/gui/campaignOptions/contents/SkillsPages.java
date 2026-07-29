@@ -43,6 +43,7 @@ import static mekhq.utilities.MHQInternationalization.getTextAt;
 import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.FontMetrics;
+import java.awt.GraphicsEnvironment;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
@@ -499,7 +500,9 @@ public class SkillsPages {
     }
 
     private static int shortcutMask() {
-        return Toolkit.getDefaultToolkit().getMenuShortcutKeyMaskEx();
+        return GraphicsEnvironment.isHeadless()
+              ? InputEvent.CTRL_DOWN_MASK
+              : Toolkit.getDefaultToolkit().getMenuShortcutKeyMaskEx();
     }
 
     /**
