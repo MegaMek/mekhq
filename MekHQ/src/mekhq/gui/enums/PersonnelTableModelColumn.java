@@ -292,8 +292,8 @@ public enum PersonnelTableModelColumn implements MHQTableColumn {
           Person::getWealth, Object::toString),
     EXTRA_INCOME("Column.EXTRA_INCOME.title", Comparators.INT_COMPARATOR,
           Person::getExtraIncomeTraitLevel, Object::toString),
-    REPUTATION("Column.REPUTATION.title", Comparators.INT_COMPARATOR,
-          (person, campaign) -> person.getAdjustedReputation(campaign.getCampaignOptions().isUseAgeEffects(),
+    FAME("Column.FAME.title", Comparators.INT_COMPARATOR,
+          (person, campaign) -> person.getAdjustedFame(campaign.getCampaignOptions().isUseAgeEffects(),
                 campaign.isClanCampaign(), campaign.getLocalDate(), person.getRankNumeric()), Object::toString),
     UNLUCKY("Column.UNLUCKY.title", Comparators.INT_COMPARATOR,
           Person::getUnlucky, Object::toString),
@@ -683,23 +683,19 @@ public enum PersonnelTableModelColumn implements MHQTableColumn {
         PersonnelRole secondaryProfession = person.getSecondaryRole();
         PersonnelRole profession = primaryProfession.isTech() ? primaryProfession : secondaryProfession;
         return switch (profession) {
-            case PersonnelRole.MEK_TECH ->
-                  new SkillPair(skillValue.apply(SkillType.S_TECH_MEK), SkillType.S_TECH_MEK,
-                        skillValue.apply(SkillType.S_ZERO_G_OPERATIONS), SkillType.S_ZERO_G_OPERATIONS);
-            case PersonnelRole.BA_TECH ->
-                  new SkillPair(skillValue.apply(SkillType.S_TECH_BA), SkillType.S_TECH_BA,
-                        skillValue.apply(SkillType.S_ZERO_G_OPERATIONS), SkillType.S_ZERO_G_OPERATIONS);
+            case PersonnelRole.MEK_TECH -> new SkillPair(skillValue.apply(SkillType.S_TECH_MEK), SkillType.S_TECH_MEK,
+                  skillValue.apply(SkillType.S_ZERO_G_OPERATIONS), SkillType.S_ZERO_G_OPERATIONS);
+            case PersonnelRole.BA_TECH -> new SkillPair(skillValue.apply(SkillType.S_TECH_BA), SkillType.S_TECH_BA,
+                  skillValue.apply(SkillType.S_ZERO_G_OPERATIONS), SkillType.S_ZERO_G_OPERATIONS);
             case PersonnelRole.MECHANIC ->
                   new SkillPair(skillValue.apply(SkillType.S_TECH_MECHANIC), SkillType.S_TECH_MECHANIC,
                         skillValue.apply(SkillType.S_ZERO_G_OPERATIONS), SkillType.S_ZERO_G_OPERATIONS);
-            case PersonnelRole.AERO_TEK ->
-                  new SkillPair(skillValue.apply(SkillType.S_TECH_AERO), SkillType.S_TECH_AERO,
-                        skillValue.apply(SkillType.S_ZERO_G_OPERATIONS), SkillType.S_ZERO_G_OPERATIONS);
+            case PersonnelRole.AERO_TEK -> new SkillPair(skillValue.apply(SkillType.S_TECH_AERO), SkillType.S_TECH_AERO,
+                  skillValue.apply(SkillType.S_ZERO_G_OPERATIONS), SkillType.S_ZERO_G_OPERATIONS);
             case PersonnelRole.VESSEL_CREW ->
                   new SkillPair(skillValue.apply(SkillType.S_TECH_VESSEL), SkillType.S_TECH_VESSEL,
                         skillValue.apply(SkillType.S_ZERO_G_OPERATIONS), SkillType.S_ZERO_G_OPERATIONS);
-            default ->
-                  new SkillPair(null, SkillType.S_TECH_MEK, null, SkillType.S_ZERO_G_OPERATIONS);
+            default -> new SkillPair(null, SkillType.S_TECH_MEK, null, SkillType.S_ZERO_G_OPERATIONS);
         };
     }
 
@@ -789,8 +785,14 @@ public enum PersonnelTableModelColumn implements MHQTableColumn {
         int maintainedUnitCount = person.getTechUnits().size();
         if (maintainedUnitCount > 0) {
             List<String> assignments = person.getTechUnits().stream().map(unit ->
-                unit.getName() + ((unit.isRefitting() && unit.getRefit().getTech() == person) ?
-                                        getTextAt("Cell.TECH_UNIT_ASSIGNMENT.text.refit") : "")
+                                                                                unit.getName() +
+                                                                                      ((unit.isRefitting() &&
+                                                                                              unit.getRefit()
+                                                                                                    .getTech() ==
+                                                                                                    person) ?
+                                                                                             getTextAt(
+                                                                                                   "Cell.TECH_UNIT_ASSIGNMENT.text.refit") :
+                                                                                             "")
             ).toList();
             return "<html>" + String.join(", ", assignments) + "</html>";
         }
@@ -910,6 +912,7 @@ public enum PersonnelTableModelColumn implements MHQTableColumn {
 
     /**
      * Returns optional preferred size.
+     *
      * @return null if the column has no size preference, a preferred width otherwise.
      */
     @Override

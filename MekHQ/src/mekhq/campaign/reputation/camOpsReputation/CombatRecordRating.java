@@ -46,6 +46,7 @@ import mekhq.campaign.mission.AtBContract;
 import mekhq.campaign.mission.Mission;
 import mekhq.campaign.mission.enums.MissionStatus;
 
+@Deprecated(since = "0.51.01", forRemoval = true)
 public class CombatRecordRating {
     private static final MMLogger LOGGER = MMLogger.create(CombatRecordRating.class);
 

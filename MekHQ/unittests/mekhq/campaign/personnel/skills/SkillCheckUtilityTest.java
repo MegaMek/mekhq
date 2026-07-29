@@ -275,7 +275,7 @@ class SkillCheckUtilityTest {
             when(mockPerson.getSkill("MISSING_NAME")).thenReturn(skill);
             when(mockPerson.getATOWAttributes()).thenReturn(characterAttributes);
             when(mockPerson.getOptions()).thenReturn(new PersonnelOptions());
-            when(mockPerson.getReputation()).thenReturn(0);
+            when(mockPerson.getFame()).thenReturn(0);
             when(mockPerson.getSkillModifierData(anyBoolean(), anyBoolean(), any(LocalDate.class))).thenReturn(
                   skillModifierData);
 
@@ -323,7 +323,7 @@ class SkillCheckUtilityTest {
         when(mockPerson.getSkill("MISSING_NAME")).thenReturn(skill);
         when(mockPerson.getATOWAttributes()).thenReturn(characterAttributes);
         when(mockPerson.getOptions()).thenReturn(new PersonnelOptions());
-        when(mockPerson.getReputation()).thenReturn(0);
+        when(mockPerson.getFame()).thenReturn(0);
         when(mockPerson.getSkillModifierData(anyBoolean(), anyBoolean(), any(LocalDate.class))).thenReturn(
               skillModifierData);
 
@@ -364,7 +364,7 @@ class SkillCheckUtilityTest {
             when(mockPerson.getSkill("MISSING_NAME")).thenReturn(skill);
             when(mockPerson.getATOWAttributes()).thenReturn(characterAttributes);
             when(mockPerson.getOptions()).thenReturn(new PersonnelOptions());
-            when(mockPerson.getReputation()).thenReturn(0);
+            when(mockPerson.getFame()).thenReturn(0);
             when(mockPerson.getSkillModifierData(anyBoolean(), anyBoolean(), any(LocalDate.class))).thenReturn(
                   skillModifierData);
 

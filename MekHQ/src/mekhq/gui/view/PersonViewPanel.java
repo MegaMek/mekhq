@@ -2105,7 +2105,7 @@ public class PersonViewPanel extends JScrollablePanel {
 
         Attributes attributes = person.getATOWAttributes();
         PersonnelOptions options = person.getOptions();
-        int adjustedReputation = person.getAdjustedReputation(campaignOptions.isUseAgeEffects(),
+        int adjustedReputation = person.getAdjustedFame(campaignOptions.isUseAgeEffects(),
               campaign.isClanCampaign(),
               campaign.getLocalDate(),
               person.getRankNumeric());
@@ -2602,8 +2602,8 @@ public class PersonViewPanel extends JScrollablePanel {
         }
 
         JLabel lblReputation = null;
-        int baseReputation = person.getReputation();
-        int adjustedReputation = person.getAdjustedReputation(campaignOptions.isUseAgeEffects(),
+        int baseReputation = person.getFame();
+        int adjustedReputation = person.getAdjustedFame(campaignOptions.isUseAgeEffects(),
               campaign.isClanCampaign(),
               campaign.getLocalDate(),
               person.getRankNumeric());

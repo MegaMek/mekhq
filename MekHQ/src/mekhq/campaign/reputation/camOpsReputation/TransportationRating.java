@@ -45,6 +45,7 @@ import mekhq.campaign.Campaign;
 import mekhq.campaign.force.Formation;
 import mekhq.campaign.unit.Unit;
 
+@Deprecated(since = "0.51.01", forRemoval = true)
 public class TransportationRating {
     final static int BELOW_CAPACITY = 0;
     final static int AT_CAPACITY = 1;

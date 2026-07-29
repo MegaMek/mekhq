@@ -38,6 +38,7 @@ import java.util.stream.Collectors;
 import megamek.logging.MMLogger;
 import mekhq.campaign.finances.Finances;
 
+@Deprecated(since = "0.51.01", forRemoval = true)
 public class FinancialRating {
     private static final MMLogger LOGGER = MMLogger.create(FinancialRating.class);
 

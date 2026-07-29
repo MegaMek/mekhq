@@ -59,7 +59,7 @@ import static mekhq.campaign.personnel.enums.BloodGroup.getRandomBloodGroup;
 import static mekhq.campaign.personnel.medical.BodyLocation.GENERIC;
 import static mekhq.campaign.personnel.medical.BodyLocation.INTERNAL;
 import static mekhq.campaign.personnel.medical.advancedMedicalAlternate.AdvancedMedicalAlternate.getAllActiveInjuryEffects;
-import static mekhq.campaign.personnel.skills.Aging.getReputationAgeModifier;
+import static mekhq.campaign.personnel.skills.Aging.getFameAgeModifier;
 import static mekhq.campaign.personnel.skills.Attributes.MAXIMUM_ATTRIBUTE_SCORE;
 import static mekhq.campaign.personnel.skills.InfantryGunnerySkills.INFANTRY_GUNNERY_SKILLS;
 import static mekhq.campaign.personnel.skills.SkillModifierData.IGNORE_AGE;
@@ -191,9 +191,9 @@ public class Person implements ILocatable {
     public static final int MINIMUM_CONNECTIONS = 0;
     public static final int MAXIMUM_CONNECTIONS = 10;
 
-    public static final String REPUTATION_LABEL = "REPUTATION";
-    public static final int MINIMUM_REPUTATION = -5;
-    public static final int MAXIMUM_REPUTATION = 5;
+    public static final String FAME_LABEL = "FAME";
+    public static final int MINIMUM_FAME = -5;
+    public static final int MAXIMUM_FAME = 5;
 
     public static final String WEALTH_LABEL = "WEALTH";
     public static final int MINIMUM_WEALTH = -1;
@@ -299,7 +299,7 @@ public class Person implements ILocatable {
     private int wealth;
     private ExtraIncome extraIncome;
     private boolean hasPerformedExtremeExpenditure;
-    private int reputation;
+    private int fame;
     private int unlucky;
     private int bloodmark;
     private List<LocalDate> bloodhuntSchedule;
@@ -573,7 +573,7 @@ public class Person implements ILocatable {
         wealth = 0;
         extraIncome = ExtraIncome.ZERO;
         hasPerformedExtremeExpenditure = false;
-        reputation = 0;
+        fame = 0;
         unlucky = 0;
         bloodmark = 0;
         bloodhuntSchedule = new ArrayList<>();
@@ -3598,8 +3598,8 @@ public class Person implements ILocatable {
                 MHQXMLUtility.writeSimpleXMLTag(pw, indent, "hasPerformedExtremeExpenditure", true);
             }
 
-            if (reputation != 0) {
-                MHQXMLUtility.writeSimpleXMLTag(pw, indent, "reputation", reputation);
+            if (fame != 0) {
+                MHQXMLUtility.writeSimpleXMLTag(pw, indent, "fame", fame);
             }
 
             if (unlucky != 0) {
@@ -4174,7 +4174,10 @@ public class Person implements ILocatable {
                 } else if (nodeName.equalsIgnoreCase("hasPerformedExtremeExpenditure")) {
                     person.hasPerformedExtremeExpenditure = Boolean.parseBoolean(wn2.getTextContent().trim());
                 } else if (nodeName.equalsIgnoreCase("reputation")) {
-                    person.reputation = MathUtility.parseInt(wn2.getTextContent().trim());
+                    // <51.01 compatibility handler
+                    person.fame = MathUtility.parseInt(wn2.getTextContent().trim());
+                } else if (nodeName.equalsIgnoreCase("fame")) {
+                    person.fame = MathUtility.parseInt(wn2.getTextContent().trim());
                 } else if (nodeName.equalsIgnoreCase("unlucky")) {
                     person.unlucky = MathUtility.parseInt(wn2.getTextContent().trim());
                 } else if (nodeName.equalsIgnoreCase("bloodmark")) {
@@ -5813,7 +5816,7 @@ public class Person implements ILocatable {
      * campaign context, and the current date. If the skill is not found, {@code 0} is returned.</p>
      *
      * @param skillName         the name of the skill to retrieve
-     * @param isUseAgingEffects {@code true} to include aging effects in reputation adjustment, {@code false} otherwise
+     * @param isUseAgingEffects {@code true} to include aging effects in fame adjustment, {@code false} otherwise
      * @param isClanCampaign    {@code true} if the context is a Clan campaign, {@code false} otherwise
      * @param today             the current date used for age-related calculations
      *
@@ -7383,45 +7386,45 @@ public class Person implements ILocatable {
     }
 
     /**
-     * Retrieves the raw reputation value of the character.
+     * Retrieves the raw fame value of the character.
      *
-     * <p>This method returns the unadjusted reputation value associated with the character.</p>
+     * <p>This method returns the unadjusted fame value associated with the character.</p>
      *
      * <p><b>Usage:</b> If aging effects are enabled, you likely want to use
-     * {@link #getAdjustedReputation(boolean, boolean, LocalDate, int)}  instead.</p>
+     * {@link #getAdjustedFame(boolean, boolean, LocalDate, int)}  instead.</p>
      *
-     * @return The raw reputation value.
+     * @return The raw fame value.
      */
-    public int getReputation() {
-        return reputation;
+    public int getFame() {
+        return fame;
     }
 
     /**
-     * Calculates the adjusted reputation value for the character based on aging effects, the current campaign type,
-     * date, and rank.
+     * Calculates the adjusted fame value for the character based on aging effects, the current campaign type, date, and
+     * rank.
      *
-     * <p>This method computes the character's reputation by applying age-based modifiers, which depend on factors such
+     * <p>This method computes the character's fame by applying age-based modifiers, which depend on factors such
      * as whether aging effects are enabled, whether the campaign is clan-specific, the character's bloodname status,
-     * and their rank in the clan hierarchy. If aging effects are disabled, the reputation remains unchanged.</p>
+     * and their rank in the clan hierarchy. If aging effects are disabled, the fame remains unchanged.</p>
      *
-     * <p><b>Usage:</b> If aging effects are disabled, the result will be equivalent to the base reputation value
-     * provided by {@link #getReputation()}.</p>
+     * <p><b>Usage:</b> If aging effects are disabled, the result will be equivalent to the base fame value
+     * provided by {@link #getFame()}.</p>
      *
-     * @param isUseAgingEffects Indicates whether aging effects should be applied to the reputation calculation.
+     * @param isUseAgingEffects Indicates whether aging effects should be applied to the fame calculation.
      * @param isClanCampaign    Indicates whether the current campaign is specific to a clan.
      * @param today             The current date used to calculate the character's age.
-     * @param rankNumeric       The rank index of the character, which can adjust the reputation modifier in clan-based
+     * @param rankNumeric       The rank index of the character, which can adjust the fame modifier in clan-based
      *                          campaigns.
      *
-     * @return The adjusted reputation value, accounting for factors like age, clan campaign status, bloodname
-     *       possession, and rank. If aging effects are disabled, the base reputation value is returned.
+     * @return The adjusted fame value, accounting for factors like age, clan campaign status, bloodname possession, and
+     *       rank. If aging effects are disabled, the base fame value is returned.
      */
-    public int getAdjustedReputation(boolean isUseAgingEffects, boolean isClanCampaign, LocalDate today,
+    public int getAdjustedFame(boolean isUseAgingEffects, boolean isClanCampaign, LocalDate today,
           int rankNumeric) {
-        final int PATHOLOGIC_RACISM_REPUTATION_PENALTY = -2;
+        final int PATHOLOGIC_RACISM_FAME_PENALTY = -2;
 
         int modifiers = isUseAgingEffects ?
-                              getReputationAgeModifier(getAge(today),
+                              getFameAgeModifier(getAge(today),
                                     isClanCampaign,
                                     !isNullOrBlank(bloodname),
                                     rankNumeric) :
@@ -7431,31 +7434,31 @@ public class Person implements ILocatable {
         modifiers -= hasRacism ? 1 : 0;
 
         boolean hasPathologicRacism = options.booleanOption(COMPULSION_PATHOLOGIC_RACISM);
-        modifiers += hasPathologicRacism ? PATHOLOGIC_RACISM_REPUTATION_PENALTY : 0;
+        modifiers += hasPathologicRacism ? PATHOLOGIC_RACISM_FAME_PENALTY : 0;
 
         boolean hasXenophobia = options.booleanOption(COMPULSION_XENOPHOBIA);
         modifiers -= hasXenophobia ? 1 : 0;
 
         modifiers += getDarkSecretModifier(true);
 
-        return clamp(reputation + modifiers, MINIMUM_REPUTATION, MAXIMUM_REPUTATION);
+        return clamp(fame + modifiers, MINIMUM_FAME, MAXIMUM_FAME);
     }
 
-    public void setReputation(final int reputation) {
-        this.reputation = clamp(reputation, MINIMUM_REPUTATION, MAXIMUM_REPUTATION);
+    public void setFame(final int fame) {
+        this.fame = clamp(fame, MINIMUM_FAME, MAXIMUM_FAME);
     }
 
     /**
-     * Adjusts the person's reputation by the specified amount.
+     * Adjusts the person's fame by the specified amount.
      *
-     * <p>The change in reputation can be positive or negative, depending on the provided delta value.</p>
+     * <p>The change in fame can be positive or negative, depending on the provided delta value.</p>
      *
-     * @param delta The amount by which to adjust the reputation. A positive value increases the reputation, while a
-     *              negative value decreases it.
+     * @param delta The amount by which to adjust the fame. A positive value increases the fame, while a negative value
+     *              decreases it.
      */
-    public void changeReputation(final int delta) {
-        int newValue = reputation + delta;
-        reputation = clamp(newValue, MINIMUM_REPUTATION, MAXIMUM_REPUTATION);
+    public void changeFame(final int delta) {
+        int newValue = fame + delta;
+        fame = clamp(newValue, MINIMUM_FAME, MAXIMUM_FAME);
     }
 
     public int getUnlucky() {
@@ -9277,11 +9280,9 @@ public class Person implements ILocatable {
      * Calculates the modifier associated with a character's Dark Secret.
      *
      * <p>If the dark secret is not revealed and the character does not have a dark secret, the modifier is 0.
-     * Otherwise, returns a value based on enabled options and the type of modifier requested (reputation or
-     * other).</p>
+     * Otherwise, returns a value based on enabled options and the type of modifier requested (fame or other).</p>
      *
-     * @param isReputation {@code true} to retrieve the Reputation modifier; {@code false} to retrieve the Connections
-     *                     modifier.
+     * @param isFame {@code true} to retrieve the Fame modifier; {@code false} to retrieve the Connections modifier.
      *
      * @return the appropriate Dark Secret modifier, or 0 if no relevant option is enabled or the secret is not
      *       present/revealed.
@@ -9289,7 +9290,7 @@ public class Person implements ILocatable {
      * @author Illiani
      * @since 0.50.07
      */
-    public int getDarkSecretModifier(final boolean isReputation) {
+    public int getDarkSecretModifier(final boolean isFame) {
         // Only apply modifiers if the character has a dark secret AND it is revealed; otherwise, return 0
         if (!darkSecretRevealed || !hasDarkSecret()) {
             return 0;
@@ -9298,7 +9299,7 @@ public class Person implements ILocatable {
         // If the dark secret is revealed, calculate the appropriate modifier
         for (Map.Entry<String, int[]> entry : DARK_SECRET_MODIFIERS.entrySet()) {
             if (options.booleanOption(entry.getKey())) {
-                return isReputation ? entry.getValue()[0] : entry.getValue()[1];
+                return isFame ? entry.getValue()[0] : entry.getValue()[1];
             }
         }
 
@@ -9454,23 +9455,23 @@ public class Person implements ILocatable {
     }
 
     /**
-     * Gets skill modifier data for this person without reputation adjustments.
+     * Gets skill modifier data for this person without fame adjustments.
      *
      * <p>This is a convenience method that returns skill modifier data with:</p>
      * <ul>
      *   <li>Personnel options (character traits and abilities)</li>
      *   <li>Attributes (physical and mental stats)</li>
      *   <li>Active injury effects (considering ambidextrous trait)</li>
-     *   <li>Adjusted reputation set to 0 (no reputation modifier)</li>
+     *   <li>Adjusted fame set to 0 (no fame modifier)</li>
      *   <li>Illiteracy status</li>
      * </ul>
      *
-     * <p>Use {@link #getSkillModifierData(boolean, boolean, LocalDate)} if reputation adjustments based on age,
+     * <p>Use {@link #getSkillModifierData(boolean, boolean, LocalDate)} if fame adjustments based on age,
      * campaign type, and rank are needed.</p>
      *
      * @param excludeInjuryEffects {@code true} to ignore all skill modifiers from injury effects.
      *
-     * @return a {@link SkillModifierData} object with reputation set to 0
+     * @return a {@link SkillModifierData} object with fame set to 0
      *
      * @author Illiani
      * @since 0.50.10
@@ -9511,12 +9512,12 @@ public class Person implements ILocatable {
      *   <li>Personnel options (character traits and abilities)</li>
      *   <li>Attributes (physical and mental stats)</li>
      *   <li>Active injury effects (considering ambidextrous trait)</li>
-     *   <li>Adjusted reputation (affected by age, campaign type, and rank)</li>
+     *   <li>Adjusted fame (affected by age, campaign type, and rank)</li>
      *   <li>Illiteracy status</li>
      * </ul>
      *
-     * @param isUseAgingEffects    whether aging effects should be applied to reputation
-     * @param isClanCampaign       whether this is a Clan campaign (affects reputation calculation)
+     * @param isUseAgingEffects    whether aging effects should be applied to fame
+     * @param isClanCampaign       whether this is a Clan campaign (affects fame calculation)
      * @param today                the current campaign date (used for age-based calculations)
      * @param excludeInjuryEffects {@code true} to ignore all skill modifiers from injury effects.
      *
@@ -9527,7 +9528,7 @@ public class Person implements ILocatable {
      */
     public SkillModifierData getSkillModifierData(boolean isUseAgingEffects, boolean isClanCampaign, LocalDate today,
           boolean excludeInjuryEffects) {
-        int adjustedReputation = getAdjustedReputation(isUseAgingEffects, isClanCampaign, today, rank);
+        int adjustedFame = getAdjustedFame(isUseAgingEffects, isClanCampaign, today, rank);
 
         boolean isAmbidextrous = options.booleanOption(PersonnelOptions.ATOW_AMBIDEXTROUS);
         List<InjuryEffect> injuryEffects = excludeInjuryEffects ?
@@ -9537,7 +9538,7 @@ public class Person implements ILocatable {
 
         return new SkillModifierData(options,
               atowAttributes,
-              adjustedReputation,
+              adjustedFame,
               injuryEffects,
               ageForAttributeModifiers);
     }

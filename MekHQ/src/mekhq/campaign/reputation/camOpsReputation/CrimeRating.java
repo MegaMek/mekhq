@@ -39,6 +39,7 @@ import java.util.stream.Collectors;
 import megamek.logging.MMLogger;
 import mekhq.campaign.Campaign;
 
+@Deprecated(since = "0.51.01", forRemoval = true)
 public class CrimeRating {
     private static final MMLogger LOGGER = MMLogger.create(CrimeRating.class);
 

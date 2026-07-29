@@ -50,6 +50,7 @@ import mekhq.campaign.personnel.PersonnelOptions;
 import mekhq.campaign.personnel.skills.SkillType;
 import mekhq.campaign.personnel.skills.enums.SkillAttribute;
 
+@Deprecated(since = "0.51.01", forRemoval = true)
 public class CommandRating {
     private static final MMLogger logger = MMLogger.create(CommandRating.class);
 
@@ -157,7 +158,7 @@ public class CommandRating {
         traitScore += commander.getWealth() >= 7 ? 1 : 0;
 
         // Reputation
-        int reputation = commander.getAdjustedReputation(isUseAgingEffects,
+        int reputation = commander.getAdjustedFame(isUseAgingEffects,
               isClanCampaign,
               today,
               commander.getRankNumeric());

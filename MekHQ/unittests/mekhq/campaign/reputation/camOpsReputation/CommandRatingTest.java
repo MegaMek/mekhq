@@ -62,6 +62,7 @@ import org.mockito.Answers;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 
+@Deprecated(since = "0.51.01", forRemoval = true)
 class CommandRatingTest {
     @Mock(answer = Answers.RETURNS_DEEP_STUBS)
     private Campaign campaign;
@@ -186,7 +187,7 @@ class CommandRatingTest {
     @ValueSource(ints = { -5, -1, 1, 5 })
     void testReputation(int reputation) {
         var commander = commanderWithLeadership(5);
-        commander.setReputation(reputation);
+        commander.setFame(reputation);
         int expectedTraits = Integer.compare(reputation, 0);
         assertRating(commander, Map.of("traits", expectedTraits, "leadership", 5, "total", 5 + expectedTraits));
     }

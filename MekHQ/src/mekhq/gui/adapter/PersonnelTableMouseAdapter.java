@@ -606,7 +606,8 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
                             // won't land them — force the transit to finish with the GM override so the arrival
                             // processing below advances the education stage.
                             if (LocationUtils.isInTransit(person)) {
-                                getCampaign().getCampaignLocationManager().gmCompleteTravel(getCampaign(), List.of(person));
+                                getCampaign().getCampaignLocationManager()
+                                      .gmCompleteTravel(getCampaign(), List.of(person));
                             }
                             break;
                         case EDUCATION:
@@ -741,7 +742,7 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
 
                 switch (type) {
                     case CONNECTIONS_LABEL -> selectedPerson.setConnections(target);
-                    case REPUTATION_LABEL -> selectedPerson.setReputation(target);
+                    case FAME_LABEL -> selectedPerson.setFame(target);
                     case WEALTH_LABEL -> selectedPerson.setWealth(target);
                     case UNLUCKY_LABEL -> selectedPerson.setUnlucky(target);
                     case BLOODMARK_LABEL -> selectedPerson.setBloodmark(target);
@@ -3245,31 +3246,31 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
             traitsMenu.add(menuItem);
 
             // Reputation
-            int reputation = person.getReputation();
+            int reputation = person.getFame();
             target = reputation + 1;
             menuItem = new JMenuItem(String.format(resources.getString("spendOnReputation.text"), target, traitCost));
             menuItem.setToolTipText(wordWrap(String.format(resources.getString("spendOnReputation.tooltip"),
                   (target == 0 ? 0 : (target > 0 ? "+" : "-") + target),
                   target)));
             menuItem.setActionCommand(makeCommand(CMD_BUY_TRAIT,
-                  REPUTATION_LABEL,
+                  FAME_LABEL,
                   String.valueOf(traitCost),
                   String.valueOf(target)));
             menuItem.addActionListener(this);
-            menuItem.setEnabled(target <= MAXIMUM_REPUTATION && person.getXP() >= traitCost);
+            menuItem.setEnabled(target <= MAXIMUM_FAME && person.getXP() >= traitCost);
             traitsMenu.add(menuItem);
 
             target = reputation - 1;
-            menuItem = new JMenuItem(String.format(resources.getString("spendOnReputation.text"), target, -traitCost));
-            menuItem.setToolTipText(wordWrap(String.format(resources.getString("spendOnReputation.tooltip"),
+            menuItem = new JMenuItem(String.format(resources.getString("spendOnFame.text"), target, -traitCost));
+            menuItem.setToolTipText(wordWrap(String.format(resources.getString("spendOnFame.tooltip"),
                   (target == 0 ? 0 : (target > 0 ? "+" : "-") + target),
                   target)));
             menuItem.setActionCommand(makeCommand(CMD_BUY_TRAIT,
-                  REPUTATION_LABEL,
+                  FAME_LABEL,
                   String.valueOf(-traitCost),
                   String.valueOf(target)));
             menuItem.addActionListener(this);
-            menuItem.setEnabled(target >= MINIMUM_REPUTATION);
+            menuItem.setEnabled(target >= MINIMUM_FAME);
             traitsMenu.add(menuItem);
 
             // Wealth
@@ -4103,11 +4104,12 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
                       .stream()
                       .filter(Person::isCommander)
                       .forEach(commander -> {
-                    commander.setCommander(false);
-                    getCampaign().addReport(PERSONNEL, String.format(resources.getString("removedCommander.format"),
-                          commander.getHyperlinkedFullTitle()));
-                    MekHQ.triggerEvent(new PersonChangedEvent(commander));
-                });
+                          commander.setCommander(false);
+                          getCampaign().addReport(PERSONNEL,
+                                String.format(resources.getString("removedCommander.format"),
+                                      commander.getHyperlinkedFullTitle()));
+                          MekHQ.triggerEvent(new PersonChangedEvent(commander));
+                      });
                 if (miCommander.isSelected()) {
                     person.setCommander(true);
                     person.setSecondInCommand(false);
@@ -4656,9 +4658,9 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
      * Creates a menu for changing the primary role of the selected personnel.
      * <p>
      * Evaluates the provided roles against the currently selected people to determine eligibility. Roles are
-     * categorized into combat, support, and civilian types. Roles that all selected people can perform are added
-     * as available, selectable items. Roles that cannot be performed by one or more selected people are grouped into
-     * a disabled "Unavailable" submenu.
+     * categorized into combat, support, and civilian types. Roles that all selected people can perform are added as
+     * available, selectable items. Roles that cannot be performed by one or more selected people are grouped into a
+     * disabled "Unavailable" submenu.
      * </p>
      *
      * @param person the selected {@link Person} used to determine which menu item should be visually checked as the

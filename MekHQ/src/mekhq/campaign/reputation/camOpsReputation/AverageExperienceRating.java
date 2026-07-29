@@ -53,6 +53,7 @@ import mekhq.campaign.personnel.skills.SkillModifierData;
 import mekhq.campaign.personnel.skills.SkillType;
 import mekhq.campaign.unit.Unit;
 
+@Deprecated(since = "0.51.01", forRemoval = true)
 public class AverageExperienceRating {
     private static final MMLogger LOGGER = MMLogger.create(AverageExperienceRating.class);
 
