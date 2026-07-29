@@ -66,6 +66,7 @@ import static mekhq.campaign.personnel.skills.SkillModifierData.IGNORE_AGE;
 import static mekhq.campaign.personnel.skills.SkillType.*;
 import static mekhq.campaign.randomEvents.personalities.PersonalityController.generateReasoning;
 import static mekhq.campaign.randomEvents.personalities.PersonalityController.getTraitIndex;
+import static mekhq.campaign.reputation.chaosReputation.ChaosReputation.STARTING_REPUTATION_SCORE;
 import static mekhq.utilities.MHQInternationalization.getFormattedText;
 import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
 import static mekhq.utilities.ReportingUtilities.CLOSING_SPAN_TAG;
@@ -292,6 +293,8 @@ public class Person implements ILocatable {
     private PersonnelOptions options;
     private boolean hasGainedVeterancySPA;
     private int toughness;
+    private int chaosCampaignReputation;
+    private int chaosCampaignCriminalRecord;
     private Attributes atowAttributes;
 
     // If new Traits are added, make sure to also add them to LifePathDataTraitLookup
@@ -568,6 +571,8 @@ public class Person implements ILocatable {
         hits = 0;
         hitsPrior = 0;
         toughness = 0;
+        chaosCampaignReputation = STARTING_REPUTATION_SCORE;
+        chaosCampaignCriminalRecord = 0;
         hasGainedVeterancySPA = false;
         connections = 0;
         wealth = 0;
@@ -3578,6 +3583,14 @@ public class Person implements ILocatable {
                 MHQXMLUtility.writeSimpleXMLTag(pw, indent, "toughness", toughness);
             }
 
+            if (chaosCampaignReputation != STARTING_REPUTATION_SCORE) {
+                MHQXMLUtility.writeSimpleXMLTag(pw, indent, "chaosCampaignReputation", chaosCampaignReputation);
+            }
+
+            if (chaosCampaignCriminalRecord != 0) {
+                MHQXMLUtility.writeSimpleXMLTag(pw, indent, "chaosCampaignCriminalRecord", chaosCampaignCriminalRecord);
+            }
+
             if (hasGainedVeterancySPA) {
                 MHQXMLUtility.writeSimpleXMLTag(pw, indent, "hasGainedVeterancySPA", hasGainedVeterancySPA);
             }
@@ -4163,6 +4176,11 @@ public class Person implements ILocatable {
                     implants = wn2.getTextContent();
                 } else if (nodeName.equalsIgnoreCase("toughness")) {
                     person.toughness = MathUtility.parseInt(wn2.getTextContent().trim());
+                } else if (nodeName.equalsIgnoreCase("chaosCampaignReputation")) {
+                    person.chaosCampaignReputation = MathUtility.parseInt(wn2.getTextContent().trim(),
+                          STARTING_REPUTATION_SCORE);
+                } else if (nodeName.equalsIgnoreCase("chaosCampaignCriminalRecord")) {
+                    person.chaosCampaignCriminalRecord = MathUtility.parseInt(wn2.getTextContent().trim());
                 } else if (nodeName.equalsIgnoreCase("hasGainedVeterancySPA")) {
                     person.hasGainedVeterancySPA = Boolean.parseBoolean(wn2.getTextContent().trim());
                 } else if (nodeName.equalsIgnoreCase("connections")) {
@@ -7209,6 +7227,36 @@ public class Person implements ILocatable {
 
     public void setToughness(final int toughness) {
         this.toughness = toughness;
+    }
+
+    public int getAdjustedReputation(boolean isUseAgingEffects, boolean isClanCampaign, LocalDate currentDate) {
+        return chaosCampaignReputation + chaosCampaignCriminalRecord + getAdjustedFame(isUseAgingEffects,
+              isClanCampaign, currentDate, getRankNumeric());
+    }
+
+    /** Generally you will want to call {@link #getAdjustedReputation(boolean, boolean, LocalDate)} instead */
+    public int getReputationDirect() {
+        return chaosCampaignReputation;
+    }
+
+    public void setReputationDirect(int chaosCampaignReputation) {
+        this.chaosCampaignReputation = chaosCampaignReputation;
+    }
+
+    public void changeReputation(int delta) {
+        chaosCampaignReputation += delta;
+    }
+
+    public int getCriminalRecord() {
+        return chaosCampaignCriminalRecord;
+    }
+
+    public void setCriminalRecord(int chaosCampaignCriminalRecord) {
+        this.chaosCampaignCriminalRecord = chaosCampaignCriminalRecord;
+    }
+
+    public void changeCriminalRecord(int delta) {
+        this.chaosCampaignCriminalRecord += delta;
     }
 
     public boolean getHasGainedVeterancySPA() {

@@ -57,18 +57,24 @@ public class PlayerForce extends AbstractForce implements SingleDetachmentForce 
     private final Detachment forceDetachment = new Detachment();
 
     /**
-     * @param faction              the force's starting faction
-     * @param techFaction          the resolved MegaMek tech faction
-     * @param rankSystem           the force's rank system
-     * @param finances             the force's finances ledger
-     * @param reputationController the force's reputation controller
-     * @param factionStandings     the force's standings with the wider universe
-     * @param campaignOptions      the campaign options the force's {@link ForceOptions} passes through to
+     * @param faction                 the force's starting faction
+     * @param techFaction             the resolved MegaMek tech faction
+     * @param rankSystem              the force's rank system
+     * @param finances                the force's finances ledger
+     * @param reputationController    the force's reputation controller
+     * @param chaosCampaignReputation the force's overall reputation
+     * @param factionStandings        the force's standings with the wider universe
+     * @param campaignOptions         the campaign options the force's {@link ForceOptions} passes through to
      */
     public PlayerForce(Faction faction, megamek.common.enums.Faction techFaction, RankSystem rankSystem,
-          Finances finances, ForceReputationController reputationController, FactionStandings factionStandings,
-          CampaignOptions campaignOptions) {
-        super(new ForceOptions(campaignOptions, faction), techFaction, rankSystem, finances, reputationController,
+          Finances finances, ForceReputationController reputationController, int chaosCampaignReputation,
+          FactionStandings factionStandings, CampaignOptions campaignOptions) {
+        super(new ForceOptions(campaignOptions, faction),
+              techFaction,
+              rankSystem,
+              finances,
+              reputationController,
+              chaosCampaignReputation,
               factionStandings);
     }
 
