@@ -40,10 +40,13 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.EnumMap;
 import java.util.List;
+import java.util.Map;
 
 import mekhq.campaign.digitalGM.stratCon.StratConContractDefinition.ObjectiveParameters;
 import mekhq.campaign.digitalGM.stratCon.StratConContractDefinition.StrategicObjectiveType;
+import mekhq.campaign.mission.enums.AtBContractType;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
 
@@ -92,5 +95,49 @@ class StratConContractDefinitionSerializationTest {
               reloaded.getObjectiveParameters().get(0).objectiveType);
         assertEquals(List.of("Covert Strike.json", "Deep Raid.json"),
               reloaded.getObjectiveParameters().get(0).objectiveScenarios);
+    }
+
+    @Test
+    void manifestMappingRoundTripsAndCarriesLicense(@TempDir Path tempDir) throws IOException {
+        Map<AtBContractType, String> mapping = new EnumMap<>(AtBContractType.class);
+        mapping.put(AtBContractType.GARRISON_DUTY, "GarrisonDuty.json");
+        mapping.put(AtBContractType.OBJECTIVE_RAID, "ObjectiveRaid.json");
+
+        File out = tempDir.resolve("ContractDefinitionManifest.json").toFile();
+        assertTrue(StratConContractDefinition.writeManifestMapping(out, mapping));
+
+        String content = Files.readString(out.toPath());
+        assertTrue(content.startsWith("# MegaMek Data (C)"), "manifest should begin with the '#' license header");
+
+        Map<AtBContractType, String> reloaded = StratConContractDefinition.readManifestMapping(out);
+        assertEquals(2, reloaded.size());
+        assertEquals("GarrisonDuty.json", reloaded.get(AtBContractType.GARRISON_DUTY));
+        assertEquals("ObjectiveRaid.json", reloaded.get(AtBContractType.OBJECTIVE_RAID));
+    }
+
+    @Test
+    void manifestMappingOverwritesExistingTypeMapping(@TempDir Path tempDir) {
+        Map<AtBContractType, String> mapping = new EnumMap<>(AtBContractType.class);
+        mapping.put(AtBContractType.GARRISON_DUTY, "GarrisonDuty.json");
+        File out = tempDir.resolve("ContractDefinitionManifest.json").toFile();
+        assertTrue(StratConContractDefinition.writeManifestMapping(out, mapping));
+
+        // re-mapping the same contract type replaces the file name rather than adding a duplicate
+        Map<AtBContractType, String> updated = StratConContractDefinition.readManifestMapping(out);
+        updated.put(AtBContractType.GARRISON_DUTY, "CustomGarrison.json");
+        assertTrue(StratConContractDefinition.writeManifestMapping(out, updated));
+
+        Map<AtBContractType, String> reloaded = StratConContractDefinition.readManifestMapping(out);
+        assertEquals(1, reloaded.size());
+        assertEquals("CustomGarrison.json", reloaded.get(AtBContractType.GARRISON_DUTY));
+    }
+
+    @Test
+    void readManifestMappingReturnsEmptyForMissingFile(@TempDir Path tempDir) {
+        // a checkout without a user manifest must yield an empty (never null) map so registration can start fresh
+        Map<AtBContractType, String> mapping =
+              StratConContractDefinition.readManifestMapping(tempDir.resolve("absent.json").toFile());
+        assertNotNull(mapping);
+        assertTrue(mapping.isEmpty());
     }
 }
