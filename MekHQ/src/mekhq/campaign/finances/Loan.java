@@ -37,6 +37,7 @@ import static mekhq.campaign.randomEvents.other.GrayMonday.isGrayMonday;
 
 import java.io.PrintWriter;
 import java.time.LocalDate;
+import java.time.temporal.ChronoUnit;
 import java.util.Objects;
 
 import megamek.common.compute.Compute;
@@ -66,6 +67,7 @@ public class Loan {
     private int remainingPayments;
     private Money paymentAmount;
     private LocalDate nextPayment;
+    private LocalDate origination;
     private boolean overdue;
     // endregion Variable Declarations
 
@@ -96,6 +98,7 @@ public class Loan {
         setFinancialTerm(financialTerm);
         setCollateral(collateral);
         setNextPayment(getFinancialTerm().nextValidDate(today));
+        setOrigination(today);
         setOverdue(false);
 
         calculateAmortization();
@@ -183,6 +186,14 @@ public class Loan {
         this.nextPayment = nextPayment;
     }
 
+    public LocalDate getOrigination() {
+        return origination;
+    }
+
+    public void setOrigination(final LocalDate origination) {
+        this.origination = origination;
+    }
+
     public boolean isOverdue() {
         return overdue;
     }
@@ -200,6 +211,24 @@ public class Loan {
     public Money determineRemainingValue() {
         return getPaymentAmount()
                      .multipliedBy(getRemainingPayments());
+    }
+
+    /**
+     * @param today the date to measure against, normally the current campaign date
+     *
+     * @return the number of days this loan has been active as of {@code today}
+     */
+    public long getAgeInDays(final LocalDate today) {
+        return ChronoUnit.DAYS.between(getOrigination(), today);
+    }
+
+    /**
+     * @param today the date to measure against, normally the current campaign date
+     *
+     * @return the number of whole months this loan has been active as of {@code today}
+     */
+    public long getAgeInMonths(final LocalDate today) {
+        return ChronoUnit.MONTHS.between(getOrigination(), today);
     }
     // endregion Determination Methods
 
@@ -387,6 +416,7 @@ public class Loan {
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "remainingPayments", getRemainingPayments());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "paymentAmount", getPaymentAmount());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "nextPayment", getNextPayment());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "origination", getOrigination());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "overdue", isOverdue());
         MHQXMLUtility.writeSimpleXMLCloseTag(pw, --indent, "loan");
     }
@@ -417,6 +447,8 @@ public class Loan {
                     loan.setPaymentAmount(Money.fromXmlString(wn2.getTextContent().trim()));
                 } else if (wn2.getNodeName().equalsIgnoreCase("nextPayment")) {
                     loan.setNextPayment(MHQXMLUtility.parseDate(wn2.getTextContent().trim()));
+                } else if (wn2.getNodeName().equalsIgnoreCase("origination")) {
+                    loan.setOrigination(MHQXMLUtility.parseDate(wn2.getTextContent().trim()));
                 } else if (wn2.getNodeName().equalsIgnoreCase("overdue")) {
                     loan.setOverdue(Boolean.parseBoolean(wn2.getTextContent().trim()));
                 }
@@ -424,7 +456,38 @@ public class Loan {
                 logger.error("", e);
             }
         }
+
+        // < 51.01 compatibility handler
+        if ((loan.getOrigination() == null) && (loan.getNextPayment() != null)) {
+            loan.setOrigination(loan.approximateOriginationFromProgress());
+        }
+
         return loan;
+    }
+
+    /**
+     * Estimates when this loan began, for loans loaded from saves predating the stored origination date.
+     *
+     * <p>Derives the number of payments already made from the amortization schedule and walks back from
+     * {@link #getNextPayment()} by that many payment periods (plus the initial grace period). This is only an
+     * approximation: it ignores the calendar snapping done by {@link FinancialTerm#nextValidDate} and any overdue
+     * periods.</p>
+     *
+     * @return an approximate origination date, or {@code null} if {@link #getNextPayment()} is unknown
+     */
+    @Deprecated(since = "0.51.01", forRemoval = true)
+    private LocalDate approximateOriginationFromProgress() {
+        if (getNextPayment() == null) {
+            return null;
+        }
+
+        final double paymentsPerYear = getFinancialTerm().determineYearlyDenominator();
+        final int totalPayments = (int) Math.ceil(getYears() * paymentsPerYear);
+        final int paymentsMade = totalPayments - getRemainingPayments();
+        // 12 / paymentsPerYear is the number of months in one payment period. The loan began roughly one
+        // grace period before its first installment, hence paymentsMade + 1.
+        final long monthsElapsed = Math.round((paymentsMade + 1) * (12.0 / paymentsPerYear));
+        return getNextPayment().minusMonths(monthsElapsed);
     }
     // endregion File I/O
 
@@ -450,6 +513,7 @@ public class Loan {
                          && (getRemainingPayments() == loan.getRemainingPayments())
                          && getPaymentAmount().equals(loan.getPaymentAmount())
                          && getNextPayment().isEqual(loan.getNextPayment())
+                         && Objects.equals(getOrigination(), loan.getOrigination())
                          && (isOverdue() == loan.isOverdue());
         } else {
             return false;
@@ -460,6 +524,6 @@ public class Loan {
     public int hashCode() {
         return Objects.hash(getInstitution(), getReferenceNumber(), getPrincipal(), getRate(),
               getYears(), getFinancialTerm(), getCollateral(), getRemainingPayments(),
-              getPaymentAmount(), getNextPayment(), isOverdue());
+              getPaymentAmount(), getNextPayment(), getOrigination(), isOverdue());
     }
 }
