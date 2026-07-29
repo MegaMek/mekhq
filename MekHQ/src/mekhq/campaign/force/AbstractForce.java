@@ -122,6 +122,7 @@ public abstract class AbstractForce {
 
     // Reputation / standing / crime / initiative
     private ForceReputationController reputation;
+    private int chaosCampaignReputation;
     private FactionStandings factionStandings;
     private int crimeRating = 0;
     private int crimePirateModifier = 0;
@@ -149,12 +150,14 @@ public abstract class AbstractForce {
     private Hashtable<Integer, CombatTeam> combatTeams = new Hashtable<>();
 
     protected AbstractForce(ForceOptions forceOptions, megamek.common.enums.Faction techFaction, RankSystem rankSystem,
-          Finances finances, ForceReputationController reputation, FactionStandings factionStandings) {
+          Finances finances, ForceReputationController reputation, int chaosCampaignReputation,
+          FactionStandings factionStandings) {
         this.forceOptions = forceOptions;
         this.techFaction = techFaction;
         this.rankSystem = rankSystem;
         this.finances = finances;
         this.reputation = reputation;
+        this.chaosCampaignReputation = chaosCampaignReputation;
         this.factionStandings = factionStandings;
     }
 
@@ -380,6 +383,14 @@ public abstract class AbstractForce {
 
     public void setReputation(ForceReputationController reputation) {
         this.reputation = reputation;
+    }
+
+    public int getChaosCampaignReputation() {
+        return chaosCampaignReputation;
+    }
+
+    public void setChaosCampaignReputation(int chaosCampaignReputation) {
+        this.chaosCampaignReputation = chaosCampaignReputation;
     }
 
     public FactionStandings getFactionStandings() {

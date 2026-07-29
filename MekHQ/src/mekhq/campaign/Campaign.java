@@ -466,7 +466,7 @@ public class Campaign implements ITechManager {
         // The player force owns faction identity, finances, reputation, and the hangar/warehouse/personnel. It is the
         // IPlace anchored into the location tree, so it must exist before we set the campaign's location.
         playerForce = new PlayerForce(faction, techFaction, rankSystem, finances, reputationController,
-              factionStandings, campaignOpts);
+              STARTING_REPUTATION_SCORE, factionStandings, campaignOpts);
         playerForce.setName(name);
 
         setLocation(startLocation);
@@ -1942,7 +1942,7 @@ public class Campaign implements ITechManager {
 
     /**
      * @return all hangars across all locations associated with this campaign.
-     *                                                                                                                                           TODO: This won't work once we support multiple hangars. Method separated from getHangar() for future refactor
+     *                                                                                                                                                       TODO: This won't work once we support multiple hangars. Method separated from getHangar() for future refactor
      *
      * @deprecated Use {@link PlayerForce#getHangar()} directly.
      */
@@ -5362,6 +5362,8 @@ public class Campaign implements ITechManager {
 
         MHQXMLUtility.writeSimpleXMLOpenTag(writer, indent++, "reputation");
         getPlayerForce().getReputation().writeReputationToXML(writer, indent);
+        MHQXMLUtility.writeSimpleXMLTag(writer, indent, "chaosCampaignReputation",
+              getPlayerForce().getChaosCampaignReputation());
         MHQXMLUtility.writeSimpleXMLCloseTag(writer, --indent, "reputation");
         if (getPlayerForce().getHumanResources().getNewPersonnelMarket() != null) {
             MHQXMLUtility.writeSimpleXMLOpenTag(writer, indent++, "newPersonnelMarket");
