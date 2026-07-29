@@ -147,12 +147,106 @@ tasks.withType(Checkstyle).configureEach {
     maxHeapSize = "4g"
 }
 
-tasks.register('stageDataFiles', Sync) {
-    dependsOn gradle.includedBuild('mm-data').task(':stageFiles')
+// Data is staged directly out of mm-data/data (no intermediate staging copy) and split
+// into several Sync tasks by how often the content changes. The large, rarely-edited
+// binary trees (images, boards, fonts) each own a disjoint subtree of data/, so editing
+// loose data (units, scenarios, universe) only re-copies the small text payload and
+// leaves ~800 MB of assets untouched (UP-TO-DATE). stageDataFiles aggregates them.
+def mmDataDir = "../../mm-data"
+def mhqDataDir = "${layout.projectDirectory.asFile}/data"
+
+// Never stage macOS/Windows directory-metadata junk, regardless of what a developer's
+// file browser may have dropped into the source tree.
+tasks.withType(Sync).configureEach {
+    exclude "**/.DS_Store"
+    exclude "**/Thumbs.db"
+}
+
+tasks.register('stageDataImages', Sync) {
+    description = "Syncs image data from mm-data"
+    group = 'build'
+    from "${mmDataDir}/data/images"
+    // Mirror faction logos into images/force/Units so MekHQ's force-icon code can resolve
+    // them under data/images/force/ without duplicating the files in the source tree.
+    from("${mmDataDir}/data/images/universe/factions") {
+        into "force/Units"
+    }
+    into "${mhqDataDir}/images"
+}
+
+tasks.register('stageDataBoards', Sync) {
+    description = "Syncs board data from mm-data"
+    group = 'build'
+    from "${mmDataDir}/data/boards"
+    into "${mhqDataDir}/boards"
+}
+
+tasks.register('stageDataFonts', Sync) {
+    description = "Syncs font data from mm-data"
+    group = 'build'
+    from "${mmDataDir}/data/fonts"
+    into "${mhqDataDir}/fonts"
+}
+
+tasks.register('stageDataMekfiles', Sync) {
+    dependsOn gradle.includedBuild('mm-data').task(':unitFilesZip')
+    description = "Syncs unit files (loose text plus the zipped unit archive) from mm-data"
+    group = 'build'
+    from("${mmDataDir}/data/mekfiles") {
+        include "*.txt"
+        include "*.xml"
+    }
+    from "${mmDataDir}/build/staging/mekfiles"
+    into "${mhqDataDir}/mekfiles"
+}
+
+tasks.register('stageDataRat', Sync) {
+    dependsOn gradle.includedBuild('mm-data').task(':ratZip')
+    description = "Syncs the random assignment table archive from mm-data"
+    group = 'build'
+    from "${mmDataDir}/build/staging/rat"
+    into "${mhqDataDir}/rat"
+}
+
+tasks.register('stageData', Sync) {
+    dependsOn gradle.includedBuild('mm-data').task(':canonSystemZip')
+    dependsOn gradle.includedBuild('mm-data').task(':connectorSystemZip')
+    description = "Syncs all remaining loose data from mm-data"
+    group = 'build'
+    from("${mmDataDir}/data") {
+        exclude "images"
+        exclude "boards"
+        exclude "fonts"
+        exclude "mekfiles"
+        exclude "rat"
+        exclude "universe/planetary_systems/canon_systems"
+        exclude "universe/planetary_systems/connector_systems"
+        include "**/*.*"
+    }
+    // Zipped planetary systems substitute for the loose canon/connector directories.
+    from("${mmDataDir}/build/staging/universe/planetary_systems") {
+        into "universe/planetary_systems"
+    }
+    into mhqDataDir
+    // The big asset trees are owned by the dedicated tasks above; don't delete them.
+    preserve {
+        include "images/**"
+        include "boards/**"
+        include "fonts/**"
+        include "mekfiles/**"
+        include "rat/**"
+    }
+}
+
+tasks.register('stageDataFiles') {
     description = "Syncs Data Files from MHQ Data"
     group = 'build'
-    from "../../mm-data/build/staging/all"
-    into "${layout.projectDirectory.asFile}/data"
+    dependsOn stageDataImages
+    dependsOn stageDataBoards
+    dependsOn stageDataFonts
+    dependsOn stageDataMekfiles
+    dependsOn stageDataRat
+    dependsOn stageData
 }
 
 tasks.register('generateDynamicFiles') {
