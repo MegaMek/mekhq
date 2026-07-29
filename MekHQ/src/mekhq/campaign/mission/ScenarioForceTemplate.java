@@ -724,7 +724,6 @@ public class ScenarioForceTemplate implements Comparable<ScenarioForceTemplate> 
         return subjectToRandomRemoval;
     }
 
-    @Deprecated(since = "0.51.0", forRemoval = true)
     public void setSubjectToRandomRemoval(boolean subjectToRandomRemoval) {
         this.subjectToRandomRemoval = subjectToRandomRemoval;
     }
@@ -744,7 +743,6 @@ public class ScenarioForceTemplate implements Comparable<ScenarioForceTemplate> 
         return objectiveLinkedForces;
     }
 
-    @Deprecated(since = "0.51.0", forRemoval = true)
     public void setObjectiveLinkedForces(List<String> objectiveLinkedForces) {
         this.objectiveLinkedForces = objectiveLinkedForces;
     }
