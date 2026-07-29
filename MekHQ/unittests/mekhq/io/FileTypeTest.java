@@ -70,13 +70,15 @@ public class FileTypeTest {
     }
 
     /**
-     * Scenario templates are written as JSON (the recommended extension) but legacy XML files must remain selectable in
-     * the open dialog.
+     * Scenario templates are written and read as JSON. XML support was dropped with the JSON migration, so the file
+     * filter offers JSON only and no longer lists the (now unreadable) legacy XML extension.
      */
     @Test
     public void testScenarioTemplateFormats() {
         assertEquals("json", FileType.SCENARIO_TEMPLATE.getRecommendedExtension());
-        assertTrue(FileType.SCENARIO_TEMPLATE.getExtensions().contains("xml"),
-              "Legacy XML templates must remain selectable");
+        assertTrue(FileType.SCENARIO_TEMPLATE.getExtensions().contains("json"),
+              "Scenario templates must be selectable as JSON");
+        assertFalse(FileType.SCENARIO_TEMPLATE.getExtensions().contains("xml"),
+              "Legacy XML templates are no longer readable, so they must not be offered");
     }
 }
