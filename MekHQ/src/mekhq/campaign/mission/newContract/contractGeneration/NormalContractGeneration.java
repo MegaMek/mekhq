@@ -81,22 +81,24 @@ public class NormalContractGeneration extends AbstractContractGeneration {
         EnemyData enemyData = pickEnemy(currentDate, currentLocation, employerData, objectiveData, contract);
 
         // Step 4: Location
-        PlanetarySystem targetSystem = pickTargetLocation(currentLocation,
+        SystemsTargetData systemsTargetData = pickTargetLocation(currentLocation,
               currentDate,
               objectiveData,
               employerData,
               enemyData,
               contract);
-        if (targetSystem == null) {
+        if (systemsTargetData == null) {
             // No valid target planet means nowhere to situate the contract.
             return null;
         }
 
         // Step 5: Force Ratings (skill and equipment of both sides)
+        PlanetarySystem targetSystem = Systems.getInstance().getSystemById(systemsTargetData.systemId());
+        Planet targetPlanet = targetSystem.getPlanetById(systemsTargetData.planetId());
         setForceRatings(campaign,
               campaignOptions,
               currentDate,
-              targetSystem,
+              targetPlanet,
               employerData,
               enemyData,
               objectiveData,
@@ -108,6 +110,7 @@ public class NormalContractGeneration extends AbstractContractGeneration {
               useVariableContractLength,
               currentDate,
               currentLocation.getCurrentSystem(),
+              targetPlanet,
               factionStandings,
               overridingCommandCircuitRequirements,
               isGM,
@@ -143,16 +146,15 @@ public class NormalContractGeneration extends AbstractContractGeneration {
      * @param campaign        the active campaign, for player skill and options
      * @param campaignOptions the campaign options
      * @param currentDate     the current date, for era context and reading the target world's data
-     * @param targetSystem    the target system, used to resolve the specific target planet
+     * @param targetPlanet    the target planet
      * @param employerData    the employer data to re-rate
      * @param enemyData       the enemy data to re-rate
      * @param objectiveData   the contract's objectives, for the player objective's strategic scope
      * @param contract        the contract being built
      */
     private static void setForceRatings(Campaign campaign, CampaignOptions campaignOptions, LocalDate currentDate,
-          PlanetarySystem targetSystem, EmployerData employerData, EnemyData enemyData,
+          Planet targetPlanet, EmployerData employerData, EnemyData enemyData,
           ContractObjectiveData objectiveData, ChaosContract contract) {
-        Planet targetPlanet = targetSystem.getPlanetById(contract.getSystemsTargetData().planetId());
         int planetStrategicValue = (targetPlanet == null) ? 0
                                          : ChaosPlanetStrategicValue.calculate(targetPlanet, currentDate);
 
@@ -203,11 +205,13 @@ public class NormalContractGeneration extends AbstractContractGeneration {
     }
 
     private static @Nonnull ChaosObjectiveType determineSchedule(Campaign campaign, boolean useVariableContractLength,
-          LocalDate currentDate, PlanetarySystem currentSystem, FactionStandings factionStandings,
+          LocalDate currentDate, PlanetarySystem currentSystem, Planet targetPlanet, FactionStandings factionStandings,
           boolean overridingCommandCircuitRequirements, boolean isGM, PlanetarySystem targetSystem,
           String employerFactionCode, ChaosObjectiveType objectiveType, ChaosContract contract) {
-        // Jump Path
+        // Jump Path, terminating at the specific target planet so both the journey time below and the actual travel
+        // end at the world the contract is fought over rather than the system's primary world.
         JumpPath jumpPath = campaign.calculateJumpPath(currentSystem, targetSystem);
+        jumpPath.setTargetPlanet(targetPlanet);
         contract.setCachedJumpPath(jumpPath);
 
         // Journey Duration
@@ -235,7 +239,7 @@ public class NormalContractGeneration extends AbstractContractGeneration {
         return enemyData;
     }
 
-    private static @Nullable PlanetarySystem pickTargetLocation(ILocation currentLocation, LocalDate currentDate,
+    private static @Nullable SystemsTargetData pickTargetLocation(ILocation currentLocation, LocalDate currentDate,
           ContractObjectiveData objectiveData, EmployerData employerData, EnemyData enemyData, ChaosContract contract) {
         String targetSystemId = ChaosContractDeterminationLocation.determineContractLocation(objectiveData.playerObjectiveType(),
               true,
@@ -262,7 +266,7 @@ public class NormalContractGeneration extends AbstractContractGeneration {
 
         SystemsTargetData systemsTargetData = new SystemsTargetData(targetSystemId, targetPlanet.getId());
         contract.setSystemsTargetData(systemsTargetData);
-        return targetSystem;
+        return systemsTargetData;
     }
 
     private static @Nonnull ContractObjectiveData pickObjective(int contractGenerationModifier,
