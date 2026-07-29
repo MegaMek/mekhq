@@ -430,13 +430,13 @@ class ContractMarketPage {
         return card;
     }
 
-        private static GridBagConstraints defaultGridBagConstraints() {
-                GridBagConstraints layout = new GridBagConstraints();
-                layout.anchor = GridBagConstraints.NORTHWEST;
-                layout.fill = GridBagConstraints.HORIZONTAL;
-                layout.insets = new Insets(5, 5, 5, 5);
-                return layout;
-        }
+    private static GridBagConstraints defaultGridBagConstraints() {
+        GridBagConstraints layout = new GridBagConstraints();
+        layout.anchor = GridBagConstraints.NORTHWEST;
+        layout.fill = GridBagConstraints.HORIZONTAL;
+        layout.insets = new Insets(5, 5, 5, 5);
+        return layout;
+    }
 
     /**
      * Enables the contract-pay options belonging to the currently selected payment basis and disables the options of

@@ -33,7 +33,6 @@
 package mekhq.campaign.universe.generators.companyGenerators;
 
 import static mekhq.campaign.enums.DailyReportType.FINANCES;
-import static mekhq.campaign.personnel.education.EducationController.setInitialEducationLevel;
 import static mekhq.campaign.personnel.skills.SkillType.S_LEADER;
 import static mekhq.campaign.personnel.skills.SkillType.S_STRATEGY;
 import static mekhq.campaign.personnel.skills.SkillType.S_TACTICS;
@@ -732,10 +731,6 @@ public abstract class AbstractCompanyGenerator {
 
         // Now that they are recruited, we can simulate backwards a few years and
         // generate marriages and children
-        for (final CompanyGenerationPersonTracker tracker : trackers) {
-            Person person = tracker.getPerson();
-            setInitialEducationLevel(campaign, person);
-        }
 
         if (getOptions().isRunStartingSimulation()) {
             LocalDate date = campaign.getLocalDate().minusYears(getOptions().getSimulationDuration()).minusWeeks(1);

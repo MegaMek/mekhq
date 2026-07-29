@@ -104,11 +104,11 @@ public class MHQOptionsTreeDialog extends AbstractButtonDialog {
 
         // Icons legend on the left, as a reference aid rather than a dialog action (matching the Campaign Options
         // dialog). The right spacer mirrors its width so the Ok/Cancel buttons stay centred on the whole footer.
-          List<SettingsBadge> legendEntries = List.of(
+        List<SettingsBadge> legendEntries = List.of(
               CampaignOptionsUtilities.settingsBadge(CampaignOptionFlag.IMPORTANT),
               CampaignOptionsUtilities.settingsBadge(CampaignOptionFlag.UNIMPLEMENTED));
-          String resourceBundle = CampaignOptionsUtilities.getCampaignOptionsResourceBundle();
-          JButton legendButton = SettingsIconLegend.createLegendButton(
+        String resourceBundle = CampaignOptionsUtilities.getCampaignOptionsResourceBundle();
+        JButton legendButton = SettingsIconLegend.createLegendButton(
               mekhq.utilities.MHQInternationalization.getTextAt(resourceBundle, "lblIconsLegend.text"),
               mekhq.utilities.MHQInternationalization.getTextAt(resourceBundle, "lblIconsLegend.tooltip"),
               legendEntries);

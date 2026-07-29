@@ -498,7 +498,7 @@ public class CampaignOptionsPane extends JPanel {
             directPageFactories.put(descriptor.getId(), descriptor.getPageFactory());
         }
 
-          navigationTargets.add(new SettingsRoute(descriptor.getId(), path, descriptor.getTitleResourceNames(),
+        navigationTargets.add(new SettingsRoute(descriptor.getId(), path, descriptor.getTitleResourceNames(),
               descriptor.getTitleResourceNames(), descriptor.shouldShowHelpPanel()));
     }
 
