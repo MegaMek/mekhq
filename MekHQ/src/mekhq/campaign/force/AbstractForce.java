@@ -235,6 +235,15 @@ public abstract class AbstractForce {
         forceOptions.setFaction(faction);
     }
 
+    /**
+     * Determines whether the current force is a clan campaign.
+     *
+     * @return {@code true} if the force belongs to a clan faction, {@code false} otherwise.
+     */
+    public boolean isClanForce() {
+        return getFaction().isClan();
+    }
+
     public megamek.common.enums.Faction getTechFaction() {
         return techFaction;
     }

@@ -181,6 +181,7 @@ import mekhq.campaign.randomEvents.other.RiotScenario;
 import mekhq.campaign.randomEvents.other.VoiceOfKerensky;
 import mekhq.campaign.randomEvents.prisoners.PrisonerEventManager;
 import mekhq.campaign.randomEvents.prisoners.RecoverMIAPersonnel;
+import mekhq.campaign.reputation.chaosReputation.ChaosReputation;
 import mekhq.campaign.unit.Maintenance;
 import mekhq.campaign.unit.Unit;
 import mekhq.campaign.universe.Faction;
@@ -578,7 +579,8 @@ public class CampaignNewDayManager {
             processNewDayATB();
         }
 
-        processReputationChanges();
+        processCamOpsReputationChanges();
+        processChaosCampaignReputationChanges();
 
         if (campaignOptions.isUseEducationModule()) {
             processEducationNewDay();
@@ -1340,7 +1342,7 @@ public class CampaignNewDayManager {
     /**
      * Processes reputation changes based on various conditions.
      */
-    private void processReputationChanges() {
+    private void processCamOpsReputationChanges() {
         if (faction.isPirate()) {
             campaign.getPlayerForce().setDateOfLastCrime(today);
             campaign.getPlayerForce().setCrimePirateModifier(-100);
@@ -1371,6 +1373,12 @@ public class CampaignNewDayManager {
 
         if (today.getDayOfWeek().equals(DayOfWeek.MONDAY)) {
             campaign.getPlayerForce().getReputation().initializeReputation(campaign);
+        }
+    }
+
+    private void processChaosCampaignReputationChanges() {
+        if (today.getDayOfMonth() == 1) {
+            ChaosReputation.calculateForceReputation(campaign);
         }
     }
 

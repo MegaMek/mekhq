@@ -20,6 +20,7 @@ import java.util.Map;
 
 import megamek.logging.MMLogger;
 import mekhq.campaign.Campaign;
+import mekhq.campaign.campaignOptions.CampaignOption;
 import mekhq.campaign.chaosCampaign.ChaosCampaignUtilities;
 import mekhq.campaign.enums.DailyReportType;
 import mekhq.campaign.finances.Loan;
@@ -46,12 +47,14 @@ public class ChaosReputation {
     private static final int GOING_INTO_DEBT_DELTA = -1; // Hot Spots Draconis Reach pg25 1st printing
     private static final double GOING_INT_DEBT_MONTHLY_FREQUENCY = 6.0; // Hot Spots Draconis Reach pg25 1st printing
 
-    public static void calculateForceReputation(Campaign campaign, PlayerForce playerForce, boolean isUseAgingEffects,
-          boolean isClanCampaign, LocalDate currentDate) {
+    public static void calculateForceReputation(Campaign campaign) {
+        PlayerForce playerForce = campaign.getPlayerForce();
         Collection<Person> personnel = playerForce.allPersonnel();
+        LocalDate currentDate = campaign.getLocalDate();
+
         int modeReputation = calculateMostCommonReputation(personnel,
-              isUseAgingEffects,
-              isClanCampaign,
+              campaign.getCampaignOptions().get(CampaignOption.USE_AGE_EFFECTS),
+              playerForce.isClanForce(),
               currentDate);
 
         int debtModifier = getDebtModifier(playerForce, currentDate);
@@ -70,12 +73,14 @@ public class ChaosReputation {
         playerForce.setChaosCampaignReputation(total);
     }
 
-    public static int getDetachmentReputation(Campaign campaign, PlayerForce playerForce, Detachment detachment,
-          boolean isUseAgingEffects, boolean isClanCampaign, LocalDate currentDate) {
+    public static int getDetachmentReputation(Campaign campaign, Detachment detachment, boolean isUseAgingEffects) {
+        PlayerForce playerForce = campaign.getPlayerForce();
         Collection<Person> personnel = detachment.getPersonnel().values();
+        LocalDate currentDate = campaign.getLocalDate();
+
         int modeReputation = calculateMostCommonReputation(personnel,
               isUseAgingEffects,
-              isClanCampaign,
+              playerForce.isClanForce(),
               currentDate);
 
         int debtModifier = getDebtModifier(playerForce, currentDate);
