@@ -128,8 +128,6 @@ import mekhq.Utilities;
 import mekhq.campaign.ForceQuartermaster.PartAcquisitionResult;
 import mekhq.campaign.againstTheBot.AtBConfiguration;
 import mekhq.campaign.base.PlayerBase;
-import mekhq.campaign.camOpsReputation.ForceReputationController;
-import mekhq.campaign.camOpsReputation.IUnitRating;
 import mekhq.campaign.campaignOptions.AcquisitionsType;
 import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.campaignOptions.CampaignOptionsMarshaller;
@@ -227,6 +225,7 @@ import mekhq.campaign.personnel.skills.SkillType;
 import mekhq.campaign.personnel.turnoverAndRetention.RetirementDefectionTracker;
 import mekhq.campaign.randomEvents.prisoners.PrisonerStatus;
 import mekhq.campaign.randomEvents.randomEventsSystem.RandomEventLibraries;
+import mekhq.campaign.reputation.camOpsReputation.ForceReputationController;
 import mekhq.campaign.storyArc.StoryArc;
 import mekhq.campaign.unit.CargoStatistics;
 import mekhq.campaign.unit.CrewType;
@@ -350,8 +349,6 @@ public class Campaign implements ITechManager {
 
     private AtBConfiguration atbConfig; // AtB
     private IUnitGenerator unitGenerator; // deprecated
-    @Deprecated(since = "0.50.10", forRemoval = true)
-    private IUnitRating unitRating; // deprecated
     private CampaignSummary campaignSummary;
     // TODO (campaign split): the transporter maps hold a Campaign back-reference. Remove that coupling so they
     //   can move onto the force (AbstractForce/PlayerForce) alongside the other owned state.
@@ -1945,7 +1942,7 @@ public class Campaign implements ITechManager {
 
     /**
      * @return all hangars across all locations associated with this campaign.
-     *                                                                                                                               TODO: This won't work once we support multiple hangars. Method separated from getHangar() for future refactor
+     *                                                                                                                                           TODO: This won't work once we support multiple hangars. Method separated from getHangar() for future refactor
      *
      * @deprecated Use {@link PlayerForce#getHangar()} directly.
      */
@@ -8296,22 +8293,6 @@ public class Campaign implements ITechManager {
                      .anyMatch(s -> (s.getDate() != null) &&
                                           !(s instanceof AtBScenario) &&
                                           !getLocalDate().isBefore(s.getDate()));
-    }
-
-    /**
-     * Sets the type of rating method used.
-     */
-    public void setUnitRating(IUnitRating rating) {
-        unitRating = rating;
-    }
-
-    /**
-     * Returns the type of rating method as selected in the Campaign Options dialog. Lazy-loaded for performance.
-     * Default is CampaignOpsReputation
-     */
-    @Deprecated(since = "0.50.10", forRemoval = true)
-    public IUnitRating getUnitRating() {
-        return unitRating;
     }
 
     @Override

@@ -66,6 +66,7 @@ import mekhq.campaign.mission.AtBContract;
 import mekhq.campaign.mission.enums.AtBContractType;
 import mekhq.campaign.mission.newContract.EnemySelectionProfile;
 import mekhq.campaign.mission.utilities.ContractUtilities;
+import mekhq.campaign.reputation.camOpsReputation.ForceReputationController;
 import mekhq.campaign.universe.Faction;
 import mekhq.campaign.universe.Factions;
 import mekhq.campaign.universe.PlanetarySystem;
@@ -148,7 +149,7 @@ class AtbMonthlyContractMarketTest {
             CampaignOptions campaignOptions = mock(CampaignOptions.class);
             when(campaignOptions.getContractMaxSalvagePercentage()).thenReturn(100);
 
-            mekhq.campaign.camOpsReputation.ForceReputationController reputation = mock(mekhq.campaign.camOpsReputation.ForceReputationController.class);
+            ForceReputationController reputation = mock(ForceReputationController.class);
             when(reputation.getReputationFactor()).thenReturn(1.0);
             when(reputation.getAverageSkillLevel()).thenReturn(REGULAR);
 

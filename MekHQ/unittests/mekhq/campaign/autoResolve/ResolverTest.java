@@ -84,6 +84,7 @@ import mekhq.campaign.personnel.generator.AbstractSkillGenerator;
 import mekhq.campaign.personnel.generator.DefaultSkillGenerator;
 import mekhq.campaign.personnel.skills.RandomSkillPreferences;
 import mekhq.campaign.personnel.skills.SkillType;
+import mekhq.campaign.reputation.camOpsReputation.ForceReputationController;
 import mekhq.campaign.unit.Unit;
 import mekhq.campaign.universe.Systems;
 import org.junit.jupiter.api.AfterAll;
@@ -231,7 +232,7 @@ public class ResolverTest {
     Campaign createCampaign() {
         var campaign = MHQTestUtilities.getTestCampaign();
         campaign.getPlayerForce().setName("Test Player");
-        var reputationController = mock(mekhq.campaign.camOpsReputation.ForceReputationController.class);
+        var reputationController = mock(ForceReputationController.class);
         when(reputationController.getAverageSkillLevel()).thenReturn(SkillLevel.REGULAR);
 
         campaign.getPlayerForce().setReputation(reputationController);

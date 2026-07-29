@@ -63,6 +63,7 @@ import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.autoAwards.AutoAwardsController;
 import mekhq.campaign.personnel.enums.PersonnelRole;
 import mekhq.campaign.personnel.ranks.AutoAssignRankForCompanyGenerator;
+import mekhq.campaign.reputation.camOpsReputation.ForceReputationController;
 import mekhq.campaign.unit.Unit;
 import mekhq.campaign.universe.Faction;
 import mekhq.campaign.universe.companyGeneration.CompanyGenerationOptions;
@@ -217,7 +218,7 @@ public class CompanyGenerationDialog extends AbstractMHQValidationButtonDialog {
             autoAwardsController.ManualController(campaign, false);
         }
 
-        mekhq.campaign.camOpsReputation.ForceReputationController reputationController = new mekhq.campaign.camOpsReputation.ForceReputationController();
+        ForceReputationController reputationController = new ForceReputationController();
         reputationController.initializeReputation(campaign);
         campaign.getPlayerForce().setReputation(reputationController);
 

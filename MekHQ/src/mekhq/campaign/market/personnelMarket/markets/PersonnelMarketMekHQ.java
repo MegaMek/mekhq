@@ -62,6 +62,7 @@ import mekhq.campaign.market.personnelMarket.yaml.PersonnelMarketLibraries;
 import mekhq.campaign.mission.AtBContract;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.enums.PersonnelRole;
+import mekhq.campaign.reputation.camOpsReputation.ForceReputationController;
 import mekhq.campaign.universe.Faction;
 import mekhq.campaign.universe.Factions;
 import mekhq.campaign.universe.PlanetarySystem;
@@ -246,8 +247,8 @@ public class PersonnelMarketMekHQ extends NewPersonnelMarket {
      */
     @Override
     public void generateApplicants() {
-        mekhq.campaign.camOpsReputation.ForceReputationController reputation = getCampaign().getPlayerForce()
-                                                                                     .getReputation();
+        ForceReputationController reputation = getCampaign().getPlayerForce()
+                                                     .getReputation();
         int averageSkillLevel = reputation.getAverageSkillLevel().getExperienceLevel();
 
         calculateNumberOfRecruitmentRolls();

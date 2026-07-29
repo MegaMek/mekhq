@@ -30,7 +30,7 @@
  * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
  * affiliated with Microsoft.
  */
-package mekhq.campaign.camOpsReputation;
+package mekhq.campaign.reputation.camOpsReputation;
 
 import static java.lang.Math.max;
 import static megamek.common.options.OptionsConstants.ATOW_COMBAT_PARALYSIS;
@@ -54,8 +54,8 @@ public class CommandRating {
     private static final MMLogger logger = MMLogger.create(CommandRating.class);
 
     /**
-     * Calculates the rating of a commander based on their skills, traits, and (optionally) personality.
-     * Follows the rules outlined in CamOps (revised 2021) pages 33-34.
+     * Calculates the rating of a commander based on their skills, traits, and (optionally) personality. Follows the
+     * rules outlined in CamOps (revised 2021) pages 33-34.
      *
      * @param campaign  the campaign the commander belongs to
      * @param commander the commander to calculate the rating for
