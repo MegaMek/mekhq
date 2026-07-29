@@ -38,8 +38,8 @@ import java.time.LocalDate;
 import java.util.Collection;
 
 import jakarta.annotation.Nullable;
-import megamek.codeUtilities.ObjectUtility;
 import megamek.common.enums.SkillLevel;
+import megamek.logging.MMLogger;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.JumpPath;
 import mekhq.campaign.camOpsReputation.ForceReputationController;
@@ -60,6 +60,8 @@ import mekhq.campaign.universe.factionStanding.FactionStandings;
 import org.jspecify.annotations.NonNull;
 
 public class NormalContractGeneration extends AbstractContractGeneration {
+    private static final MMLogger LOGGER = MMLogger.create(NormalContractGeneration.class);
+
     public static @Nullable ChaosContract createChaosContract(Campaign campaign, CampaignOptions campaignOptions,
           LocalDate currentDate, ILocation currentLocation, int contractGenerationModifier,
           ContractSearchType searchType, FactionStandings factionStandings,
@@ -80,10 +82,15 @@ public class NormalContractGeneration extends AbstractContractGeneration {
 
         // Step 4: Location
         PlanetarySystem targetSystem = pickTargetLocation(currentLocation,
+              currentDate,
               objectiveData,
               employerData,
               enemyData,
               contract);
+        if (targetSystem == null) {
+            // No valid target planet means nowhere to situate the contract.
+            return null;
+        }
 
         // Step 5: Force Ratings (skill and equipment of both sides)
         setForceRatings(campaign,
@@ -228,7 +235,7 @@ public class NormalContractGeneration extends AbstractContractGeneration {
         return enemyData;
     }
 
-    private static @NonNull PlanetarySystem pickTargetLocation(ILocation currentLocation,
+    private static @Nullable PlanetarySystem pickTargetLocation(ILocation currentLocation, LocalDate currentDate,
           ContractObjectiveData objectiveData, EmployerData employerData, EnemyData enemyData, ChaosContract contract) {
         String targetSystemId = ChaosContractDeterminationLocation.determineContractLocation(objectiveData.playerObjectiveType(),
               true,
@@ -236,9 +243,23 @@ public class NormalContractGeneration extends AbstractContractGeneration {
               enemyData.factionCode(),
               currentLocation);
         PlanetarySystem targetSystem = Systems.getInstance().getSystemById(targetSystemId);
+        if (targetSystem == null) {
+            LOGGER.warn("Target system {} could not be resolved. Contract generation failed.", targetSystemId);
+            return null;
+        }
+
         Collection<Planet> candidatePlanets = targetSystem.getPlanets();
-        // TODO use same planetary picker profile as System picker
-        Planet targetPlanet = ObjectUtility.getRandomItem(candidatePlanets);
+        // Weight the pick toward (or, for pirate hunts, away from) strategically valuable worlds, the same way the
+        // target system itself is chosen.
+        Planet targetPlanet = ChaosPlanetSelector.selectTargetPlanet(candidatePlanets,
+              objectiveData.playerObjectiveType().getChaosObjectiveType(),
+              currentDate);
+        if (targetPlanet == null) {
+            LOGGER.warn("Target system {} has no planets to situate a contract on. Contract generation failed.",
+                  targetSystemId);
+            return null;
+        }
+
         SystemsTargetData systemsTargetData = new SystemsTargetData(targetSystemId, targetPlanet.getId());
         contract.setSystemsTargetData(systemsTargetData);
         return targetSystem;
