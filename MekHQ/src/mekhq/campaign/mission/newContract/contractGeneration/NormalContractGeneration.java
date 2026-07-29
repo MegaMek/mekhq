@@ -37,6 +37,7 @@ import static java.lang.Math.ceil;
 import java.time.LocalDate;
 import java.util.Collection;
 
+import jakarta.annotation.Nonnull;
 import jakarta.annotation.Nullable;
 import megamek.common.enums.SkillLevel;
 import megamek.logging.MMLogger;
@@ -57,7 +58,6 @@ import mekhq.campaign.universe.PlanetarySystem;
 import mekhq.campaign.universe.Systems;
 import mekhq.campaign.universe.factionStanding.FactionStandingUtilities;
 import mekhq.campaign.universe.factionStanding.FactionStandings;
-import org.jspecify.annotations.NonNull;
 
 public class NormalContractGeneration extends AbstractContractGeneration {
     private static final MMLogger LOGGER = MMLogger.create(NormalContractGeneration.class);
@@ -202,7 +202,7 @@ public class NormalContractGeneration extends AbstractContractGeneration {
         contract.setContractTerms(initialContractTerms);
     }
 
-    private static @NonNull ChaosObjectiveType determineSchedule(Campaign campaign, boolean useVariableContractLength,
+    private static @Nonnull ChaosObjectiveType determineSchedule(Campaign campaign, boolean useVariableContractLength,
           LocalDate currentDate, PlanetarySystem currentSystem, FactionStandings factionStandings,
           boolean overridingCommandCircuitRequirements, boolean isGM, PlanetarySystem targetSystem,
           String employerFactionCode, ChaosObjectiveType objectiveType, ChaosContract contract) {
@@ -227,7 +227,7 @@ public class NormalContractGeneration extends AbstractContractGeneration {
         return objectiveType;
     }
 
-    private static @NonNull EnemyData pickEnemy(LocalDate currentDate, ILocation currentLocation,
+    private static @Nonnull EnemyData pickEnemy(LocalDate currentDate, ILocation currentLocation,
           EmployerData employerData, ContractObjectiveData objectiveData, ChaosContract contract) {
         EnemyData enemyData = ChaosContractDeterminationEnemy.generateEnemyFactionForObjective(currentLocation,
               currentDate, employerData.getFaction(), objectiveData.playerObjectiveType());
@@ -265,7 +265,7 @@ public class NormalContractGeneration extends AbstractContractGeneration {
         return targetSystem;
     }
 
-    private static @NonNull ContractObjectiveData pickObjective(int contractGenerationModifier,
+    private static @Nonnull ContractObjectiveData pickObjective(int contractGenerationModifier,
           ChaosContract contract) {
         ContractObjectiveData objectiveData = ChaosContractObjectiveDetermination.determineContractObjectiveType(
               contractGenerationModifier);
@@ -273,7 +273,7 @@ public class NormalContractGeneration extends AbstractContractGeneration {
         return objectiveData;
     }
 
-    private static @org.jspecify.annotations.Nullable EmployerData pickEmployer(Campaign campaign,
+    private static @Nullable EmployerData pickEmployer(Campaign campaign,
           LocalDate currentDate, ILocation currentLocation, ContractSearchType searchType, ChaosContract contract) {
         EmployerData employerData = ChaosContractEmployerDetermination.getEmployerGenerationData(currentDate,
               currentLocation,
