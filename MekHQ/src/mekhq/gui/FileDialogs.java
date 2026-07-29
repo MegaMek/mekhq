@@ -296,10 +296,25 @@ public class FileDialogs {
               frame,
               "Load Scenario Template",
               FileType.SCENARIO_TEMPLATE,
-              MekHQ.getScenarioTemplatesDirectory().getValue());
+              scenarioTemplateStartDirectory());
 
         value.ifPresent(x -> MekHQ.getScenarioTemplatesDirectory().setValue(x.getParent()));
         return value;
+    }
+
+    /**
+     * The directory the scenario template file dialogs open at: the user's remembered location once they have picked
+     * one, otherwise the canonical {@code mm-data/data/scenariotemplates} tree (falling back to {@code ./data} in a
+     * packaged release). Mirrors how the other StratCon/scenario Developer Tools default to the authoritative data.
+     *
+     * @return the starting directory path
+     */
+    private static String scenarioTemplateStartDirectory() {
+        String remembered = MekHQ.getScenarioTemplatesDirectory().getValue();
+        if ((remembered == null) || remembered.isBlank() || remembered.equals(".")) {
+            return developerDataDirectory("scenariotemplates");
+        }
+        return remembered;
     }
 
     /**
@@ -316,16 +331,35 @@ public class FileDialogs {
               frame,
               "Save Scenario Template",
               FileType.SCENARIO_TEMPLATE,
-              MekHQ.getScenarioTemplatesDirectory().getValue(),
+              scenarioTemplateStartDirectory(),
               fileName);
 
         value.ifPresent(x -> MekHQ.getScenarioTemplatesDirectory().setValue(x.getParent()));
         return value;
     }
 
-    private static final String SCENARIO_MODIFIER_DIRECTORY = "./data/scenariomodifiers";
-    private static final String CONTRACT_DEFINITION_DIRECTORY = "./data/stratconcontractdefinitions";
-    private static final String STRAT_CON_FACILITY_DIRECTORY = "./data/stratconfacilities";
+    private static final String SCENARIO_MODIFIER_DIRECTORY = developerDataDirectory("scenariomodifiers");
+    private static final String CONTRACT_DEFINITION_DIRECTORY = developerDataDirectory("stratconcontractdefinitions");
+    private static final String STRAT_CON_FACILITY_DIRECTORY = developerDataDirectory("stratconfacilities");
+
+    /**
+     * Resolves a data subdirectory for the StratCon/scenario Developer Tools editors. In a source checkout the
+     * canonical {@code mm-data/data} tree sits two levels above the MekHQ working directory; editing there keeps the
+     * authoritative files in sync rather than the disposable staged {@code ./data} copy (which a build overwrites from
+     * mm-data). Packaged releases have no sibling {@code mm-data}, so this falls back to the runtime {@code ./data}
+     * tree.
+     *
+     * @param subdirectory the data subdirectory name (e.g. {@code "scenariomodifiers"})
+     *
+     * @return the canonical mm-data path when it exists, otherwise the {@code ./data} path
+     */
+    private static String developerDataDirectory(String subdirectory) {
+        File canonical = new File("../../mm-data/data/" + subdirectory);
+        if (canonical.isDirectory()) {
+            return canonical.getPath();
+        }
+        return "./data/" + subdirectory;
+    }
 
     /**
      * Displays a dialog window from which the user can select a scenario modifier file to open.

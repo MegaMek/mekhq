@@ -33,6 +33,8 @@
 package mekhq.campaign.digitalGM.stratCon;
 
 import java.io.File;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -44,12 +46,14 @@ import com.fasterxml.jackson.annotation.PropertyAccessor;
 import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.SerializationFeature;
 import jakarta.xml.bind.annotation.XmlElement;
 import jakarta.xml.bind.annotation.XmlElementWrapper;
 import jakarta.xml.bind.annotation.XmlRootElement;
 import megamek.logging.MMLogger;
 import mekhq.MHQConstants;
 import mekhq.campaign.mission.enums.AtBContractType;
+import mekhq.utilities.MMDataLicenseHeader;
 
 /**
  * This class holds data relevant to the various types of contract that can occur in the StratCon campaign system.
@@ -416,6 +420,35 @@ public class StratConContractDefinition {
     }
 
     /**
+     * Reads the contract-type-to-file-name mapping from a contract definition manifest file.
+     *
+     * @param manifestFile the manifest file
+     *
+     * @return the mapping, or an empty map if the file is absent or unreadable
+     */
+    public static Map<AtBContractType, String> readManifestMapping(File manifestFile) {
+        ContractDefinitionManifest manifest = ContractDefinitionManifest.Deserialize(manifestFile.getPath());
+        if ((manifest == null) || (manifest.definitionFileNames == null)) {
+            return new HashMap<>();
+        }
+        return manifest.definitionFileNames;
+    }
+
+    /**
+     * Writes a contract definition manifest file mapping each {@link AtBContractType} to its definition file name.
+     *
+     * @param manifestFile the destination file
+     * @param mapping      the contract-type-to-file-name mapping to write
+     *
+     * @return {@code true} if the file was written, {@code false} on error (logged)
+     */
+    public static boolean writeManifestMapping(File manifestFile, Map<AtBContractType, String> mapping) {
+        ContractDefinitionManifest manifest = new ContractDefinitionManifest();
+        manifest.definitionFileNames = mapping;
+        return manifest.serialize(manifestFile);
+    }
+
+    /**
      * A manifest containing IDs and file names of scenario template definitions
      *
      * @author NickAragua
@@ -430,11 +463,29 @@ public class StratConContractDefinition {
             // Use fields as the single source of truth, matching the shipped contract definition JSON files.
             mapper.setVisibility(PropertyAccessor.ALL, JsonAutoDetect.Visibility.NONE);
             mapper.setVisibility(PropertyAccessor.FIELD, JsonAutoDetect.Visibility.ANY);
+            mapper.enable(SerializationFeature.INDENT_OUTPUT);
             // Tolerate fields absent from older files rather than failing the whole load.
             mapper.disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES);
             // Skip the leading '#' license-header comment lines that lead every saved file.
             mapper.enable(JsonParser.Feature.ALLOW_YAML_COMMENTS);
             return mapper;
+        }
+
+        /**
+         * Writes this manifest to a JSON file, led by the MegaMek Data license header. The manifest is a plain
+         * key/value map with no comments, so a full rewrite is lossless.
+         *
+         * @return {@code true} if the file was written, {@code false} on error (logged)
+         */
+        public boolean serialize(File outputFile) {
+            try {
+                String content = MMDataLicenseHeader.licenseHeader(outputFile) + '\n' + MAPPER.writeValueAsString(this);
+                Files.writeString(outputFile.toPath(), content, StandardCharsets.UTF_8);
+                return true;
+            } catch (Exception e) {
+                LOGGER.error("Error serializing contract definition manifest {}", outputFile.getPath(), e);
+                return false;
+            }
         }
 
         /**

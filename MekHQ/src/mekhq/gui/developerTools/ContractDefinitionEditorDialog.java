@@ -32,6 +32,7 @@
  */
 package mekhq.gui.developerTools;
 
+import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
 import static mekhq.utilities.MHQInternationalization.getTextAt;
 
 import java.awt.BorderLayout;
@@ -41,12 +42,14 @@ import java.awt.Insets;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import javax.swing.*;
 
 import megamek.codeUtilities.MathUtility;
 import megamek.common.ui.FastJScrollPane;
 import mekhq.campaign.digitalGM.stratCon.StratConContractDefinition;
 import mekhq.campaign.digitalGM.stratCon.StratConContractDefinition.ObjectiveParameters;
+import mekhq.campaign.mission.enums.AtBContractType;
 import mekhq.gui.FileDialogs;
 
 /**
@@ -57,8 +60,14 @@ public class ContractDefinitionEditorDialog extends JDialog {
 
     private static final String RESOURCE_BUNDLE = "mekhq.resources.DeveloperTools";
 
+    private static final String CONTRACT_MANIFEST_FILE_NAME = "ContractDefinitionManifest.json";
+
     private final JFrame frame;
     private StratConContractDefinition definition = new StratConContractDefinition();
+    // The file the current definition was last loaded from or saved to; null until then. Registering with the manifest
+    // needs a concrete file name, so the button stays disabled until this is set.
+    private File currentFile;
+    private final JButton btnAddToManifest = new JButton(getTextAt(RESOURCE_BUNDLE, "button.addToManifest"));
 
     private final JTextField txtContractTypeName = new JTextField(30);
     private final JTextArea txtBriefing = new JTextArea(4, 40);
@@ -152,19 +161,29 @@ public class ContractDefinitionEditorDialog extends JDialog {
         JButton btnNew = new JButton(getTextAt(RESOURCE_BUNDLE, "button.new"));
         btnNew.addActionListener(e -> {
             definition = new StratConContractDefinition();
+            currentFile = null;
             load(definition);
+            updateManifestButtonState();
         });
         JButton btnLoad = new JButton(getTextAt(RESOURCE_BUNDLE, "button.load"));
         btnLoad.addActionListener(e -> loadFromFile());
         JButton btnSave = new JButton(getTextAt(RESOURCE_BUNDLE, "button.save"));
         btnSave.addActionListener(e -> saveToFile());
+        btnAddToManifest.addActionListener(e -> addToManifest());
+        btnAddToManifest.setToolTipText(getTextAt(RESOURCE_BUNDLE, "contractEditor.addToManifest.tooltip"));
         JButton btnClose = new JButton(getTextAt(RESOURCE_BUNDLE, "button.close"));
         btnClose.addActionListener(e -> dispose());
         bar.add(btnNew);
         bar.add(btnLoad);
         bar.add(btnSave);
+        bar.add(btnAddToManifest);
         bar.add(btnClose);
+        updateManifestButtonState();
         return bar;
+    }
+
+    private void updateManifestButtonState() {
+        btnAddToManifest.setEnabled(currentFile != null);
     }
 
     private void load(StratConContractDefinition source) {
@@ -210,12 +229,78 @@ public class ContractDefinitionEditorDialog extends JDialog {
             return;
         }
         definition = loaded;
+        currentFile = file;
         load(definition);
+        updateManifestButtonState();
     }
 
     private void saveToFile() {
         writeInto(definition);
-        FileDialogs.saveContractDefinition(frame, definition).ifPresent(definition::Serialize);
+        FileDialogs.saveContractDefinition(frame, definition).ifPresent(file -> {
+            definition.Serialize(file);
+            currentFile = file;
+            updateManifestButtonState();
+        });
+    }
+
+    /**
+     * Registers the current definition's file name in the {@code ContractDefinitionManifest.json} that sits alongside
+     * it, so the game will use it. The manifest maps each {@link AtBContractType} to a file name, so the user is asked
+     * which contract type this file should serve; the chosen mapping is then written (overwriting any prior mapping for
+     * that type, after confirmation).
+     */
+    private void addToManifest() {
+        if (currentFile == null) {
+            return;
+        }
+
+        String fileName = currentFile.getName();
+        File manifestFile = new File(currentFile.getParentFile(), CONTRACT_MANIFEST_FILE_NAME);
+
+        AtBContractType type = (AtBContractType) JOptionPane.showInputDialog(this,
+              getTextAt(RESOURCE_BUNDLE, "contractEditor.manifest.pickType.message"),
+              getTextAt(RESOURCE_BUNDLE, "contractEditor.manifest.title"),
+              JOptionPane.QUESTION_MESSAGE, null, AtBContractType.values(), AtBContractType.GARRISON_DUTY);
+        if (type == null) {
+            return;
+        }
+
+        Map<AtBContractType, String> mapping = StratConContractDefinition.readManifestMapping(manifestFile);
+
+        if (fileName.equals(mapping.get(type))) {
+            showManifestResult("contractEditor.manifest.alreadyPresent.message", fileName, type,
+                  JOptionPane.INFORMATION_MESSAGE);
+            return;
+        }
+
+        String existing = mapping.get(type);
+        if (existing != null) {
+            int choice = JOptionPane.showConfirmDialog(this,
+                  getFormattedTextAt(RESOURCE_BUNDLE, "contractEditor.manifest.overwrite.message", type.toString(),
+                        existing, fileName),
+                  getTextAt(RESOURCE_BUNDLE, "contractEditor.manifest.title"), JOptionPane.YES_NO_OPTION,
+                  JOptionPane.WARNING_MESSAGE);
+            if (choice != JOptionPane.YES_OPTION) {
+                return;
+            }
+        }
+
+        mapping.put(type, fileName);
+        if (StratConContractDefinition.writeManifestMapping(manifestFile, mapping)) {
+            showManifestResult("contractEditor.manifest.added.message",
+                  fileName,
+                  type,
+                  JOptionPane.INFORMATION_MESSAGE);
+        } else {
+            JOptionPane.showMessageDialog(this, getTextAt(RESOURCE_BUNDLE, "contractEditor.manifest.error.message"),
+                  getTextAt(RESOURCE_BUNDLE, "contractEditor.manifest.title"), JOptionPane.ERROR_MESSAGE);
+        }
+    }
+
+    private void showManifestResult(String messageKey, String fileName, AtBContractType type, int messageType) {
+        JOptionPane.showMessageDialog(this,
+              getFormattedTextAt(RESOURCE_BUNDLE, messageKey, fileName, type.toString()),
+              getTextAt(RESOURCE_BUNDLE, "contractEditor.manifest.title"), messageType);
     }
 
     private void editObjective(ObjectiveParameters existing) {

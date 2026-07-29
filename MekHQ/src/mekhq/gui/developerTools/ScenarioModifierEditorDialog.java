@@ -32,6 +32,7 @@
  */
 package mekhq.gui.developerTools;
 
+import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
 import static mekhq.utilities.MHQInternationalization.getTextAt;
 
 import java.awt.BorderLayout;
@@ -40,7 +41,11 @@ import java.awt.GridBagLayout;
 import java.awt.GridLayout;
 import java.awt.Insets;
 import java.io.File;
+import java.io.IOException;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.EnumMap;
 import java.util.List;
 import java.util.Map;
@@ -52,6 +57,7 @@ import mekhq.campaign.mission.ScenarioMapParameters.MapLocation;
 import mekhq.campaign.mission.atb.AtBScenarioModifier;
 import mekhq.campaign.mission.atb.AtBScenarioModifier.EventTiming;
 import mekhq.gui.FileDialogs;
+import mekhq.utilities.MMDataLicenseHeader;
 
 /**
  * A developer tool for editing scenario modifier files (JSON). The complex nested pieces of a modifier - its force
@@ -61,9 +67,14 @@ import mekhq.gui.FileDialogs;
 public class ScenarioModifierEditorDialog extends JDialog {
 
     private static final String RESOURCE_BUNDLE = "mekhq.resources.DeveloperTools";
+    private static final String MODIFIER_MANIFEST_FILE_NAME = "modifiermanifest.json";
 
     private final JFrame frame;
     private AtBScenarioModifier modifier = new AtBScenarioModifier();
+    // The file the current modifier was last loaded from or saved to; null until then. Registering with the manifest
+    // needs a concrete file name, so the button stays disabled until this is set.
+    private File currentFile;
+    private final JButton btnAddToManifest = new JButton(getTextAt(RESOURCE_BUNDLE, "button.addToManifest"));
 
     private final JTextField txtModifierName = new JTextField(30);
     private final JTextArea txtAdditionalBriefingText = new JTextArea(3, 40);
@@ -156,19 +167,29 @@ public class ScenarioModifierEditorDialog extends JDialog {
         JButton btnNew = new JButton(getTextAt(RESOURCE_BUNDLE, "button.new"));
         btnNew.addActionListener(e -> {
             modifier = new AtBScenarioModifier();
+            currentFile = null;
             load(modifier);
+            updateManifestButtonState();
         });
         JButton btnLoad = new JButton(getTextAt(RESOURCE_BUNDLE, "button.load"));
         btnLoad.addActionListener(e -> loadFromFile());
         JButton btnSave = new JButton(getTextAt(RESOURCE_BUNDLE, "button.save"));
         btnSave.addActionListener(e -> saveToFile());
+        btnAddToManifest.addActionListener(e -> addToManifest());
+        btnAddToManifest.setToolTipText(getTextAt(RESOURCE_BUNDLE, "modifierEditor.addToManifest.tooltip"));
         JButton btnClose = new JButton(getTextAt(RESOURCE_BUNDLE, "button.close"));
         btnClose.addActionListener(e -> dispose());
         bar.add(btnNew);
         bar.add(btnLoad);
         bar.add(btnSave);
+        bar.add(btnAddToManifest);
         bar.add(btnClose);
+        updateManifestButtonState();
         return bar;
+    }
+
+    private void updateManifestButtonState() {
+        btnAddToManifest.setEnabled(currentFile != null);
     }
 
     private void load(AtBScenarioModifier source) {
@@ -233,12 +254,114 @@ public class ScenarioModifierEditorDialog extends JDialog {
             return;
         }
         modifier = loaded;
+        currentFile = file;
         load(modifier);
+        updateManifestButtonState();
     }
 
     private void saveToFile() {
         writeInto(modifier);
-        FileDialogs.saveScenarioModifier(frame, modifier).ifPresent(modifier::Serialize);
+        FileDialogs.saveScenarioModifier(frame, modifier).ifPresent(file -> {
+            modifier.Serialize(file);
+            currentFile = file;
+            updateManifestButtonState();
+        });
+    }
+
+    /**
+     * Registers the current modifier's file name in the {@code modifiermanifest.json} that sits alongside it, so the
+     * game will load it. The manifest carries curated {@code #} comments documenting disabled modifiers, so the entry
+     * is inserted with a comment-preserving text edit rather than a full JSON rewrite.
+     */
+    private void addToManifest() {
+        if (currentFile == null) {
+            return;
+        }
+
+        String fileName = currentFile.getName();
+        File manifestFile = new File(currentFile.getParentFile(), MODIFIER_MANIFEST_FILE_NAME);
+
+        try {
+            if (!manifestFile.exists()) {
+                String content = MMDataLicenseHeader.licenseHeader(manifestFile) +
+                                       "\n{\n  \"fileNameList\": [\n    \"" + fileName + "\"\n  ]\n}\n";
+                Files.writeString(manifestFile.toPath(), content, StandardCharsets.UTF_8);
+                showManifestResult("modifierEditor.manifest.added.message", fileName, JOptionPane.INFORMATION_MESSAGE);
+                return;
+            }
+
+            String text = Files.readString(manifestFile.toPath(), StandardCharsets.UTF_8);
+            String updated = insertEntryPreservingComments(text, fileName);
+            if (updated == null) {
+                showManifestResult("modifierEditor.manifest.alreadyPresent.message", fileName,
+                      JOptionPane.INFORMATION_MESSAGE);
+                return;
+            }
+            Files.writeString(manifestFile.toPath(), updated, StandardCharsets.UTF_8);
+            showManifestResult("modifierEditor.manifest.added.message", fileName, JOptionPane.INFORMATION_MESSAGE);
+        } catch (IOException ex) {
+            JOptionPane.showMessageDialog(this, getTextAt(RESOURCE_BUNDLE, "modifierEditor.manifest.error.message"),
+                  getTextAt(RESOURCE_BUNDLE, "modifierEditor.manifest.title"), JOptionPane.ERROR_MESSAGE);
+        }
+    }
+
+    private void showManifestResult(String messageKey, String fileName, int messageType) {
+        JOptionPane.showMessageDialog(this, getFormattedTextAt(RESOURCE_BUNDLE, messageKey, fileName),
+              getTextAt(RESOURCE_BUNDLE, "modifierEditor.manifest.title"), messageType);
+    }
+
+    /**
+     * Returns {@code manifestText} with {@code entry} appended to the {@code fileNameList} array, preserving the file's
+     * existing comments and formatting; returns {@code null} if the entry (as a quoted token) is already present. A new
+     * entry is inserted right after the last quoted element, so interspersed comment lines before the closing bracket
+     * are left untouched, and the previous last element gains a trailing comma.
+     */
+    static String insertEntryPreservingComments(String manifestText, String entry) {
+        if (manifestText.contains("\"" + entry + "\"")) {
+            return null;
+        }
+
+        List<String> lines = new ArrayList<>(Arrays.asList(manifestText.split("\n", -1)));
+
+        int closeIdx = -1;
+        for (int i = lines.size() - 1; i >= 0; i--) {
+            if (lines.get(i).trim().startsWith("]")) {
+                closeIdx = i;
+                break;
+            }
+        }
+        if (closeIdx < 0) {
+            return null;
+        }
+
+        int lastElementIdx = -1;
+        for (int i = closeIdx - 1; i >= 0; i--) {
+            String trimmed = lines.get(i).trim();
+            if (trimmed.matches("\"[^\"]*\",?")) {
+                lastElementIdx = i;
+                break;
+            }
+            if (trimmed.endsWith("[")) {
+                break;
+            }
+        }
+
+        String quotedEntry = "\"" + entry + "\"";
+        if (lastElementIdx >= 0) {
+            String line = lines.get(lastElementIdx);
+            String indent = line.substring(0, line.indexOf('"'));
+            if (!line.trim().endsWith(",")) {
+                lines.set(lastElementIdx, line + ",");
+            }
+            lines.add(lastElementIdx + 1, indent + quotedEntry);
+        } else {
+            // empty array: indent one level past the closing bracket line
+            String closeLine = lines.get(closeIdx);
+            String closeIndent = closeLine.substring(0, closeLine.length() - closeLine.stripLeading().length());
+            lines.add(closeIdx, closeIndent + "  " + quotedEntry);
+        }
+
+        return String.join("\n", lines);
     }
 
     private static String nullToEmpty(String value) {
