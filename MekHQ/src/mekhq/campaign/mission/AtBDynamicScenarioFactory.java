@@ -50,7 +50,9 @@ import static mekhq.campaign.digitalGM.stratCon.StratConRulesManager.scenarioMod
 import static mekhq.campaign.enums.DailyReportType.BATTLE;
 import static mekhq.campaign.mission.AtBScenario.selectBotTeamCommanders;
 import static mekhq.campaign.mission.RandomFactionCamouflage.pickRandomCamouflage;
+import static mekhq.campaign.mission.Scenario.T_ATMOSPHERE;
 import static mekhq.campaign.mission.Scenario.T_GROUND;
+import static mekhq.campaign.mission.Scenario.T_SPACE;
 import static mekhq.campaign.mission.ScenarioForceTemplate.SPECIAL_UNIT_TYPE_ATB_AERO_MIX;
 import static mekhq.campaign.mission.ScenarioForceTemplate.SPECIAL_UNIT_TYPE_ATB_CIVILIANS;
 import static mekhq.campaign.mission.ScenarioForceTemplate.SPECIAL_UNIT_TYPE_ATB_MIX;
@@ -123,6 +125,7 @@ import mekhq.campaign.digitalGM.stratCon.StratConTrackState;
 import mekhq.campaign.enums.DragoonRating;
 import mekhq.campaign.force.CombatTeam;
 import mekhq.campaign.force.Formation;
+import mekhq.campaign.force.PlayerForce;
 import mekhq.campaign.mission.AtBDynamicScenario.BenchedEntityData;
 import mekhq.campaign.mission.ScenarioForceTemplate.ForceAlignment;
 import mekhq.campaign.mission.ScenarioForceTemplate.ForceGenerationMethod;
@@ -1860,7 +1863,7 @@ public class AtBDynamicScenarioFactory {
             scenario.setTerrainType(allowedTerrain.get(terrainIndex));
             scenario.setMapFile();
         } else if (scenario.getTemplate().mapParameters.getMapLocation() == MapLocation.Space) {
-            scenario.setBoardType(AtBScenario.T_SPACE);
+            scenario.setBoardType(T_SPACE);
             scenario.setTerrainType("Space");
         } else if (scenario.getTemplate().mapParameters.getMapLocation() == MapLocation.LowAtmosphere) {
             scenario.setBoardType(AtBScenario.T_ATMOSPHERE);
@@ -1908,7 +1911,7 @@ public class AtBDynamicScenarioFactory {
      * @param campaign The current campaign
      */
     private static void setPlanetaryConditions(AtBDynamicScenario scenario, AtBContract mission, Campaign campaign) {
-        if (scenario.getBoardType() == AtBScenario.T_SPACE) {
+        if (scenario.getBoardType() == T_SPACE) {
             return;
         }
 
@@ -3513,7 +3516,8 @@ public class AtBDynamicScenarioFactory {
         if (isStratConSingles) {
             bvBudget = getBVBudgetForStratConSingles(campaign, forceStandardBattleValue);
         } else if (isUseNoSeedForce) {
-            bvBudget = getBVBudgetWithoutUsingASeedForce(campaign, forceStandardBattleValue);
+            bvBudget = getBVBudgetWithoutUsingASeedForce(campaign, campaign.getPlayerForce(),
+                  forceStandardBattleValue, scenario);
         } else {
             // deployed player forces
             for (int forceID : scenario.getForceIDs()) {
@@ -3668,15 +3672,23 @@ public class AtBDynamicScenarioFactory {
      * @author Illiani
      * @since 0.50.10
      */
-    private static int getBVBudgetWithoutUsingASeedForce(Campaign campaign, boolean forceStandardBattleValue) {
+    private static int getBVBudgetWithoutUsingASeedForce(Campaign campaign, PlayerForce playerForce,
+          boolean forceStandardBattleValue,
+          AtBDynamicScenario scenario) {
         int defaultBVBudget = 10000; // We use this value if the player has no valid forces
 
         // We need to start by gathering the different battle values. This is because we need that information for
         // calculating the gaussian-weighted average. Specifically, we need it to calculate the crude mean (which the
         // averages will be weighted against).
+
+        int boardType = scenario.getBoardType();
+        boolean isSpace = boardType == T_SPACE;
+        boolean isLowAtmosphere = boardType == T_ATMOSPHERE;
+
         List<Integer> battleValues = new ArrayList<>();
         List<CombatRole> validRoles = List.of(FRONTLINE, MANEUVER);
-        for (CombatTeam combatTeam : campaign.getPlayerForce().getCombatTeamsAsList(campaign)) {
+        LocalHangar localHangar = playerForce.getHangar();
+        for (CombatTeam combatTeam : playerForce.getCombatTeamsAsList(campaign)) {
             CombatRole role = combatTeam.getRole();
             if (!validRoles.contains(role)) {
                 continue;
@@ -3684,7 +3696,13 @@ public class AtBDynamicScenarioFactory {
 
             Formation formation = combatTeam.getFormation(campaign);
             if (formation != null) {
-                int battleValue = formation.getTotalBV(campaign, forceStandardBattleValue);
+                int battleValue = getBattleValue(campaign,
+                      forceStandardBattleValue,
+                      formation,
+                      localHangar,
+                      isSpace,
+                      isLowAtmosphere);
+
                 if (battleValue > 0) {
                     battleValues.add(battleValue);
                 }
@@ -3700,6 +3718,45 @@ public class AtBDynamicScenarioFactory {
             LOGGER.info("Not using a seed force: gaussian-weighted BV budget {} from {} forces",
                   gaussianAverage, battleValues.size());
             return gaussianAverage;
+        }
+    }
+
+    /**
+     * Calculates the battle value for a given formation within a campaign context.
+     *
+     * @param campaign                 The campaign in which the battle occurs.
+     * @param forceStandardBattleValue A boolean flag indicating whether to force the use of the standard battle value
+     *                                 calculation.
+     * @param formation                The formation containing the units for which the battle value is calculated.
+     * @param localHangar              The local hangar containing unit-specific data.
+     * @param isSpace                  A boolean flag indicating if the battle takes place in space.
+     * @param isLowAtmosphere          A boolean flag indicating if the battle takes place in a low-atmosphere
+     *                                 environment.
+     *
+     * @return The calculated battle value for the formation, or 0 if the battle conditions make it unviable for certain
+     *       units.
+     */
+    private static int getBattleValue(Campaign campaign, boolean forceStandardBattleValue, Formation formation,
+          LocalHangar localHangar, boolean isSpace, boolean isLowAtmosphere) {
+        for (Unit unit : formation.getUnitsAsUnits(localHangar)) {
+            Entity entity = unit.getEntity();
+            if (entity != null) {
+                if (isDoomed(isSpace, entity, isLowAtmosphere)) {
+                    return 0;
+                }
+            }
+        }
+
+        return formation.getTotalBV(campaign, forceStandardBattleValue);
+    }
+
+    private static boolean isDoomed(boolean isSpace, Entity entity, boolean isLowAtmosphere) {
+        if (isSpace) {
+            return entity.doomedInSpace();
+        } else if (isLowAtmosphere) {
+            return entity.doomedInAtmosphere();
+        } else {
+            return entity.doomedOnGround();
         }
     }
 
@@ -5096,7 +5153,7 @@ public class AtBDynamicScenarioFactory {
      */
     private static void correctNonAeroFlyerBehavior(List<Entity> entityList, int boardType) {
         for (Entity entity : entityList) {
-            boolean inSpace = boardType == AtBScenario.T_SPACE;
+            boolean inSpace = boardType == T_SPACE;
             boolean inAtmosphere = boardType == AtBScenario.T_ATMOSPHERE;
 
             // hack for land-air meks

@@ -35,7 +35,6 @@ package mekhq.campaign.camOpsReputation;
 import static java.lang.Math.max;
 import static java.lang.Math.round;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
@@ -45,6 +44,7 @@ import megamek.common.units.Jumpship;
 import megamek.common.units.SmallCraft;
 import megamek.logging.MMLogger;
 import mekhq.campaign.Campaign;
+import mekhq.campaign.LocalHangar;
 import mekhq.campaign.force.CombatTeam;
 import mekhq.campaign.force.Formation;
 import mekhq.campaign.personnel.Person;
@@ -122,8 +122,8 @@ public class AverageExperienceRating {
         int unitCount = 0;
         double totalExperience = 0;
 
-        mekhq.campaign.LocalHangar hangar = campaign.getPlayerForce().getHangar();
-        ArrayList<CombatTeam> combatTeams = campaign.getPlayerForce().getCombatTeamsAsList(campaign);
+        LocalHangar hangar = campaign.getPlayerForce().getHangar();
+        List<CombatTeam> combatTeams = campaign.getPlayerForce().getCombatTeamsAsList(campaign);
 
         if (combatTeams.isEmpty()) {
             return NO_CAMPAIGN_EXPERIENCE;
