@@ -585,7 +585,6 @@ public class ScenarioForceTemplate implements Comparable<ScenarioForceTemplate> 
      */
     @XmlElementWrapper(name = "roleChoices")
     @XmlElement(name = "forceRole")
-    @Deprecated(since = "0.51.0", forRemoval = true)
     public List<String> getRoleCollections() {
         return forceRoleStrings;
     }
