@@ -89,19 +89,43 @@ public final class ManeiDominiAugmentor {
                 ManeiDominiRank.OMICRON, new ImplantAllowance(6, 10, 5)));
 
     /**
-     * One issuable implant: the game options it may be satisfied by, and the level it sits at.
+     * Who an implant actually does something for, according to the effect MegaMek gives it.
+     *
+     * <p>Most of the catalogue is explicitly conventional-infantry-only: the effusers, the sensory and
+     * optical implants, the enhanced prosthetics and prosthetic leg MASC all say so in their own
+     * descriptions, and dermal armour and the triple-strength myomer implant are read only by the
+     * infantry and BattleArmor calculators. The neural interfaces are the reverse, being what lets a
+     * warrior drive the unit they are sitting in.</p>
+     */
+    private enum ImplantAudience {
+        /** Does something only for a warrior fighting on foot. */
+        ON_FOOT,
+        /** Does something only for a warrior piloting a unit. */
+        PILOTING,
+        /** Useful whoever carries it. */
+        ANYONE;
+
+        boolean servesA(boolean warriorFightsOnFoot) {
+            return (this == ANYONE) || (warriorFightsOnFoot ? (this == ON_FOOT) : (this == PILOTING));
+        }
+    }
+
+    /**
+     * One issuable implant: the game options it may be satisfied by, the level it sits at, and who it
+     * benefits.
      *
      * <p>Most entries name a single option. The source's "Cybernetic Eye Implants" is one entry that
      * MegaMek splits into three optical implants, so that entry carries all three and one is rolled -
      * a Level III fields a mix of optics rather than every warrior carrying identical eyes.</p>
      *
-     * @param level        the implant level, which the warrior's rank caps
+     * @param level         the implant level, which the warrior's rank caps
+     * @param audience      who this implant actually does something for
      * @param optionChoices the game options this entry may be satisfied by; one is chosen at random
      */
-    private record ImplantEntry(int level, List<String> optionChoices) {
+    private record ImplantEntry(int level, ImplantAudience audience, List<String> optionChoices) {
 
-        private ImplantEntry(int level, String singleOption) {
-            this(level, List.of(singleOption));
+        private ImplantEntry(int level, ImplantAudience audience, String singleOption) {
+            this(level, audience, List.of(singleOption));
         }
     }
 
@@ -111,24 +135,24 @@ public final class ManeiDominiAugmentor {
      * model.
      */
     private static final List<ImplantEntry> CATALOGUE = List.of(
-          new ImplantEntry(1, OptionsConstants.MD_PL_ENHANCED),
-          new ImplantEntry(2, OptionsConstants.MD_PAIN_SHUNT),
-          new ImplantEntry(2, OptionsConstants.MD_CYBER_IMP_AUDIO),
-          new ImplantEntry(2, List.of(OptionsConstants.MD_CYBER_IMP_VISUAL,
+          new ImplantEntry(1, ImplantAudience.ON_FOOT, OptionsConstants.MD_PL_ENHANCED),
+          new ImplantEntry(2, ImplantAudience.ANYONE, OptionsConstants.MD_PAIN_SHUNT),
+          new ImplantEntry(2, ImplantAudience.ON_FOOT, OptionsConstants.MD_CYBER_IMP_AUDIO),
+          new ImplantEntry(2, ImplantAudience.ON_FOOT, List.of(OptionsConstants.MD_CYBER_IMP_VISUAL,
                 OptionsConstants.MD_CYBER_IMP_LASER,
                 OptionsConstants.MD_CYBER_IMP_TELE)),
-          new ImplantEntry(2, OptionsConstants.MD_COMM_IMPLANT),
-          new ImplantEntry(3, OptionsConstants.MD_PL_I_ENHANCED),
-          new ImplantEntry(3, OptionsConstants.MD_PL_MASC),
-          new ImplantEntry(3, OptionsConstants.MD_GAS_EFFUSER_PHEROMONE),
-          new ImplantEntry(3, OptionsConstants.MD_VDNI),
-          new ImplantEntry(3, OptionsConstants.MD_BOOST_COMM_IMPLANT),
-          new ImplantEntry(3, OptionsConstants.MD_MM_IMPLANTS),
-          new ImplantEntry(4, OptionsConstants.MD_GAS_EFFUSER_TOXIN),
-          new ImplantEntry(4, OptionsConstants.MD_DERMAL_ARMOR),
-          new ImplantEntry(4, OptionsConstants.MD_TSM_IMPLANT),
-          new ImplantEntry(5, OptionsConstants.MD_ENH_MM_IMPLANTS),
-          new ImplantEntry(5, OptionsConstants.MD_BVDNI));
+          new ImplantEntry(2, ImplantAudience.ANYONE, OptionsConstants.MD_COMM_IMPLANT),
+          new ImplantEntry(3, ImplantAudience.ON_FOOT, OptionsConstants.MD_PL_I_ENHANCED),
+          new ImplantEntry(3, ImplantAudience.ON_FOOT, OptionsConstants.MD_PL_MASC),
+          new ImplantEntry(3, ImplantAudience.ON_FOOT, OptionsConstants.MD_GAS_EFFUSER_PHEROMONE),
+          new ImplantEntry(3, ImplantAudience.PILOTING, OptionsConstants.MD_VDNI),
+          new ImplantEntry(3, ImplantAudience.ANYONE, OptionsConstants.MD_BOOST_COMM_IMPLANT),
+          new ImplantEntry(3, ImplantAudience.ANYONE, OptionsConstants.MD_MM_IMPLANTS),
+          new ImplantEntry(4, ImplantAudience.ON_FOOT, OptionsConstants.MD_GAS_EFFUSER_TOXIN),
+          new ImplantEntry(4, ImplantAudience.ON_FOOT, OptionsConstants.MD_DERMAL_ARMOR),
+          new ImplantEntry(4, ImplantAudience.ON_FOOT, OptionsConstants.MD_TSM_IMPLANT),
+          new ImplantEntry(5, ImplantAudience.ANYONE, OptionsConstants.MD_ENH_MM_IMPLANTS),
+          new ImplantEntry(5, ImplantAudience.PILOTING, OptionsConstants.MD_BVDNI));
 
     /**
      * Implants that supersede a lesser version of themselves. Holding both is meaningless, so taking
@@ -171,6 +195,16 @@ public final class ManeiDominiAugmentor {
             LOGGER.debug("[ManeiDomini] skipped - the campaign has implants switched off");
             return;
         }
+        // The campaign option above is MekHQ's mirror of MegaMek's Manei Domini rule, and the two are
+        // only synced when the options dialog is used. The game option is what actually decides
+        // whether implants survive into a battle: with it off, ChatLounge clears the whole implant
+        // group as the unit enters the lobby and MULParser refuses to restore it. Issuing implants
+        // then would leave the roster claiming augmentations that silently vanish in play.
+        if (!campaign.getGameOptions().booleanOption(OptionsConstants.RPG_MANEI_DOMINI)) {
+            LOGGER.debug("[ManeiDomini] skipped - MegaMek's Manei Domini rule is switched off, so any"
+                        + " implants issued would be stripped when the unit reaches the lobby");
+            return;
+        }
 
         int augmented = 0;
         int implantsIssued = 0;
@@ -208,12 +242,14 @@ public final class ManeiDominiAugmentor {
         PersonnelOptions options = person.getOptions();
         options.acquireAbility(PersonnelOptions.MD_ADVANTAGES, OptionsConstants.MD_SUICIDE_IMPLANTS, true);
 
-        List<String> issued = selectImplants(maneiDominiRank);
+        boolean warriorFightsOnFoot = fightsOnFoot(person);
+        List<String> issued = selectImplants(maneiDominiRank, warriorFightsOnFoot);
         for (String option : issued) {
             options.acquireAbility(PersonnelOptions.MD_ADVANTAGES, option, true);
         }
-        LOGGER.debug("[ManeiDomini] {}: rank {} -> {} implant(s) {}",
-              person.getFullName(), maneiDominiRank, issued.size(), issued);
+        LOGGER.debug("[ManeiDomini] {}: rank {}, fights {} -> {} implant(s) {}",
+              person.getFullName(), maneiDominiRank,
+              warriorFightsOnFoot ? "on foot" : "from a cockpit", issued.size(), issued);
         return issued.size();
     }
 
@@ -228,21 +264,50 @@ public final class ManeiDominiAugmentor {
      *
      * @return the game options to fit, excluding the explosive charge every Manei Domini receives
      */
-    static List<String> selectImplants(ManeiDominiRank maneiDominiRank) {
+    static List<String> selectImplants(ManeiDominiRank maneiDominiRank, boolean warriorFightsOnFoot) {
         ImplantAllowance allowance = ALLOWANCE_BY_RANK.get(maneiDominiRank);
         if (allowance == null) {
             LOGGER.warn("[ManeiDomini] no implant allowance for rank {}; issuing none", maneiDominiRank);
             return List.of();
         }
 
-        List<ImplantEntry> eligible = new ArrayList<>(CATALOGUE.stream()
-              .filter(entry -> entry.level() <= allowance.maximumLevel())
+        List<ImplantEntry> withinLevel = CATALOGUE.stream()
+                                               .filter(entry -> entry.level() <= allowance.maximumLevel())
+                                               .toList();
+        List<ImplantEntry> useful = new ArrayList<>(withinLevel.stream()
+              .filter(entry -> entry.audience().servesA(warriorFightsOnFoot))
               .toList());
-        int target = randomBetween(allowance.minimumImplants(), allowance.maximumImplants());
+        // Kept only to make up the numbers. A MekWarrior has just two implants that do anything for
+        // them at the level 2 ceiling, so drawing strictly from the useful ones would leave the junior
+        // ranks short of the minimum the chart states they carry.
+        List<ImplantEntry> remainder = new ArrayList<>(withinLevel.stream()
+              .filter(entry -> !entry.audience().servesA(warriorFightsOnFoot))
+              .toList());
 
+        int target = randomBetween(allowance.minimumImplants(), allowance.maximumImplants());
         List<String> issued = new ArrayList<>();
-        while ((issued.size() < target) && !eligible.isEmpty()) {
-            ImplantEntry entry = eligible.remove((int) (Math.random() * eligible.size()));
+        // Guarantee the first one is useful, so nobody comes out carrying nothing but implants that
+        // do nothing for the way they fight.
+        drawInto(issued, useful, 1);
+        if (issued.isEmpty()) {
+            LOGGER.warn("[ManeiDomini] rank {} has no implant useful to a warrior who fights {}",
+                  maneiDominiRank, warriorFightsOnFoot ? "on foot" : "from a cockpit");
+        }
+        drawInto(issued, useful, target);
+        drawInto(issued, remainder, target);
+
+        ensureNeuralInterface(issued, allowance, warriorFightsOnFoot);
+        return issued;
+    }
+
+    /**
+     * Draws at random from {@code available} until the issued list reaches {@code target}, skipping
+     * anything ruled out by an implant already issued. Drawn entries are removed, so a later call
+     * cannot re-offer them.
+     */
+    private static void drawInto(List<String> issued, List<ImplantEntry> available, int target) {
+        while ((issued.size() < target) && !available.isEmpty()) {
+            ImplantEntry entry = available.remove((int) (Math.random() * available.size()));
             String option = entry.optionChoices()
                                   .get((int) (Math.random() * entry.optionChoices().size()));
             if (isRuledOutBySupersession(option, issued)) {
@@ -250,8 +315,32 @@ public final class ManeiDominiAugmentor {
             }
             issued.add(option);
         }
-        ensureNeuralInterface(issued, allowance);
-        return issued;
+    }
+
+    /**
+     * Whether this warrior fights with their own body rather than from inside a unit, which decides
+     * which implants do anything for them. BattleArmor counts: the infantry calculators read dermal
+     * armour and the myomer implants for them the same way they do for a foot platoon.
+     *
+     * @param person the warrior being augmented
+     *
+     * @return {@code true} if their implants act on them directly rather than through a unit
+     */
+    static boolean fightsOnFoot(Person person) {
+        PersonnelRole role = person.getPrimaryRole();
+        return role.isSoldier() || role.isBattleArmour();
+    }
+
+    /**
+     * @param option             a game option from the catalogue
+     * @param warriorFightsOnFoot whether the warrior fights with their own body rather than a unit
+     *
+     * @return {@code true} if this implant does something for such a warrior
+     */
+    static boolean servesWarrior(String option, boolean warriorFightsOnFoot) {
+        return CATALOGUE.stream()
+                     .filter(entry -> entry.optionChoices().contains(option))
+                     .anyMatch(entry -> entry.audience().servesA(warriorFightsOnFoot));
     }
 
     /**
@@ -298,7 +387,14 @@ public final class ManeiDominiAugmentor {
      * else to give up, the multi-modal implant itself is what goes - better a working interface than a
      * sensory implant with nothing to plug into.</p>
      */
-    private static void ensureNeuralInterface(List<String> issued, ImplantAllowance allowance) {
+    private static void ensureNeuralInterface(List<String> issued, ImplantAllowance allowance,
+          boolean warriorFightsOnFoot) {
+        // Only non-infantry need the interface: a warrior on foot carries the sensors on their own
+        // body, so a multi-modal implant works for them with nothing to sync it to. Fitting one anyway
+        // would spend a slot of their allowance on an implant that does nothing for them.
+        if (warriorFightsOnFoot) {
+            return;
+        }
         boolean needsInterface = issued.stream().anyMatch(REQUIRE_NEURAL_INTERFACE::contains);
         boolean hasInterface = issued.stream().anyMatch(NEURAL_INTERFACES::contains);
         if (!needsInterface || hasInterface) {
