@@ -78,6 +78,7 @@ import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.universe.Faction;
 import mekhq.campaign.universe.commandGeneration.CargoShipGenerator;
 import mekhq.campaign.universe.commandGeneration.CommandGenerationOptions;
+import mekhq.campaign.universe.commandGeneration.ManeiDominiAugmentor;
 import mekhq.campaign.universe.commandGeneration.SupportPersonnelToTOE;
 import mekhq.campaign.universe.commandGeneration.SupportUnitGenerator;
 
@@ -505,6 +506,11 @@ public final class CommandGenerator {
         // Bloodnames, for the Clan warriors who earn one. Runs here because the roll is made against
         // the person's rank, which stage 7c has just assigned.
         assignBloodnames(campaign, options, generatedPersons);
+
+        // Manei Domini rank, class and cybernetics, for a Word of Blake Shadow Division. Runs here for
+        // the same reason as bloodnames: implant availability is read off the person's rank.
+        ManeiDominiAugmentor.augment(campaign,
+              options.getForceDescriptorSnapshot().getFaction(), generatedPersons);
 
         // 8. Spare-parts warehouse stock-up. Uses the same PartsInUseManager the daily warehouse
         // and ongoing auto-logistics rely on, so the starting inventory is consistent with the
