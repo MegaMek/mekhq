@@ -451,7 +451,6 @@ public class Person implements ILocatable {
     // this is the head Mek Tech. One flag rather than one per department, so adding a personnel role
     // does not mean adding a field here.
     private boolean departmentHead;
-    private boolean trainer;
     private boolean underProtection;
     private boolean neverAssignMaintenanceAutomatically;
     private boolean coverIllicitMedicalExpenses;
@@ -3513,14 +3512,6 @@ public class Person implements ILocatable {
         this.departmentHead = departmentHead;
     }
 
-    public boolean isTrainer() {
-        return trainer;
-    }
-
-    public void setTrainer(final boolean trainer) {
-        this.trainer = trainer;
-    }
-
     public boolean isUnderProtection() {
         return underProtection;
     }
@@ -4178,7 +4169,6 @@ public class Person implements ILocatable {
             if (departmentHead) {
                 MHQXMLUtility.writeSimpleXMLTag(pw, indent, "departmentHead", true);
             }
-            MHQXMLUtility.writeSimpleXMLTag(pw, indent, "trainer", trainer);
             MHQXMLUtility.writeSimpleXMLTag(pw, indent, "underProtection", underProtection);
             MHQXMLUtility.writeSimpleXMLTag(pw,
                   indent,
@@ -4829,8 +4819,6 @@ public class Person implements ILocatable {
                     person.setChiefAdministrator(Boolean.parseBoolean(wn2.getTextContent().trim()));
                 } else if (nodeName.equalsIgnoreCase("departmentHead")) {
                     person.setDepartmentHead(Boolean.parseBoolean(wn2.getTextContent().trim()));
-                } else if (nodeName.equalsIgnoreCase("trainer")) {
-                    person.setTrainer(Boolean.parseBoolean(wn2.getTextContent().trim()));
                 } else if (nodeName.equalsIgnoreCase("underProtection")) {
                     person.setUnderProtection(Boolean.parseBoolean(wn2.getTextContent().trim()));
                 } else if (nodeName.equalsIgnoreCase("neverAssignMaintenanceAutomatically")) {

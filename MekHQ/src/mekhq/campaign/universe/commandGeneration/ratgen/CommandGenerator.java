@@ -71,7 +71,9 @@ import mekhq.campaign.parts.PartInUse;
 import mekhq.campaign.parts.enums.PartQuality;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.enums.PersonnelRole;
+import mekhq.campaign.personnel.skills.enums.SkillAttribute;
 import mekhq.campaign.unit.Unit;
+import mekhq.campaign.campaignOptions.CampaignOption;
 import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.universe.Faction;
 import mekhq.campaign.universe.commandGeneration.CargoShipGenerator;
@@ -830,7 +832,9 @@ public final class CommandGenerator {
      *   <li>{@code isAssignCompanyCommanderFlag} → {@link Person#setCommander(boolean)} on the
      *       commander {@link RulesetRankAssigner} promoted at the campaign-root formation.</li>
      *   <li>{@code isAssignFounderFlag} → {@link Person#setFounder(boolean)} on every Person this
-     *       generation created.</li>
+     *       generation created. Where the campaign also has {@code USE_FOUNDER_PLOT_ARMOR} set, each
+     *       founder gains a point of Edge, matching what newborn founders receive in
+     *       {@code AbstractProcreation}.</li>
      *   <li>{@code isAssignMekWarriorsCallSigns} → {@link Person#setCallsign(String)} from
      *       {@link RandomCallsignGenerator} for every primary-role MekWarrior, skipped in Clan
      *       campaigns (Clan MekWarriors get their bloodname instead of a fixed-wing-style callsign).</li>
@@ -847,19 +851,23 @@ public final class CommandGenerator {
         int callsignCount = 0;
         boolean applyFounder = options.isAssignFounderFlag();
         boolean applyCallsigns = options.isAssignMekWarriorsCallSigns() && !campaign.isClanCampaign();
+        boolean applyFounderPlotArmor = campaign.getCampaignOptions().get(CampaignOption.USE_FOUNDER_PLOT_ARMOR);
         RandomCallsignGenerator callsigns = applyCallsigns ? RandomCallsignGenerator.getInstance() : null;
         for (Person person : generatedPersons) {
             if (applyFounder) {
                 person.setFounder(true);
                 founderCount++;
+                if (applyFounderPlotArmor) {
+                    person.changeAttributeScore(SkillAttribute.EDGE, 1);
+                }
             }
             if (applyCallsigns && person.getPrimaryRole() == PersonnelRole.MEKWARRIOR) {
                 person.setCallsign(callsigns.generate());
                 callsignCount++;
             }
         }
-        LOGGER.info("[CompanyGen][Pipeline][Flags] founder={} callsigns={} (clanCampaign={})",
-              founderCount, callsignCount, campaign.isClanCampaign());
+        LOGGER.info("[CompanyGen][Pipeline][Flags] founder={} callsigns={} (clanCampaign={}, founderPlotArmor={})",
+              founderCount, callsignCount, campaign.isClanCampaign(), applyFounderPlotArmor);
     }
 
     /**

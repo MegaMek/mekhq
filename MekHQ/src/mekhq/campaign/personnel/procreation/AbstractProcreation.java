@@ -34,7 +34,6 @@ package mekhq.campaign.personnel.procreation;
 
 import static mekhq.campaign.enums.DailyReportType.PERSONNEL;
 import static mekhq.campaign.personnel.PersonnelOptions.UNOFFICIAL_DOBROWSKI_SYNDROME;
-import static mekhq.campaign.personnel.education.EducationController.setInitialEducationLevel;
 import static mekhq.campaign.personnel.enums.BloodGroup.getInheritedBloodGroup;
 import static mekhq.campaign.personnel.enums.BloodGroup.getRandomBloodGroup;
 import static mekhq.campaign.personnel.medical.BodyLocation.GENERIC;
@@ -61,6 +60,7 @@ import mekhq.MHQConstants;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.ExtraData.IntKey;
 import mekhq.campaign.ExtraData.StringKey;
+import mekhq.campaign.campaignOptions.CampaignOption;
 import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.log.MedicalLogger;
 import mekhq.campaign.log.PersonalLogger;
@@ -78,6 +78,7 @@ import mekhq.campaign.personnel.lifeEvents.BirthAnnouncement;
 import mekhq.campaign.personnel.medical.advancedMedical.InjuryTypes;
 import mekhq.campaign.personnel.medical.advancedMedicalAlternate.AdvancedMedicalAlternate;
 import mekhq.campaign.personnel.medical.advancedMedicalAlternate.AlternateInjuries;
+import mekhq.campaign.personnel.skills.enums.SkillAttribute;
 import mekhq.campaign.randomEvents.prisoners.PrisonerStatus;
 import mekhq.campaign.universe.Faction;
 import mekhq.campaign.universe.Planet;
@@ -431,6 +432,8 @@ public abstract class AbstractProcreation {
         if (father != null) {
             activeInjuryTypes.addAll(father.getActiveInjuryTypes());
         }
+
+        final boolean useFoundersHavePlotArmor = campaignOptions.get(CampaignOption.USE_FOUNDER_PLOT_ARMOR);
         for (int i = 0; i < size; i++) {
             // Create a baby
             Faction originFaction = mother.getOriginFaction();
@@ -471,6 +474,10 @@ public abstract class AbstractProcreation {
                 baby.setFounder(true);
             } else if (campaignOptions.isAssignChildrenOfFoundersFounderTag()) {
                 baby.setFounder(baby.getGenealogy().getParents().stream().anyMatch(Person::isFounder));
+            }
+
+            if (baby.isFounder() && useFoundersHavePlotArmor) {
+                baby.changeAttributeScore(SkillAttribute.EDGE, 1);
             }
 
             // set education
@@ -631,9 +638,6 @@ public abstract class AbstractProcreation {
             }
 
             baby.setLoyalty(Compute.d6(3) + 2);
-
-            // set education based on age
-            setInitialEducationLevel(campaign, baby);
 
             // Create reports and log the birth
             logAndUpdateFamily(campaign, today, mother, baby, father);

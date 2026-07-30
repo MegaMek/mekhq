@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2025 The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2025-2026 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -32,7 +32,15 @@
  */
 package mekhq.campaign.mission;
 
+import static megamek.common.units.UnitType.MEK;
 import static mekhq.campaign.mission.AtBDynamicScenarioFactory.createEntityWithCrew;
+import static mekhq.campaign.mission.Scenario.T_GROUND;
+import static mekhq.campaign.mission.Scenario.T_SPACE;
+import static mekhq.campaign.mission.enums.CombatRole.CADRE;
+import static mekhq.campaign.mission.enums.CombatRole.FRONTLINE;
+import static mekhq.campaign.mission.enums.CombatRole.MANEUVER;
+import static mekhq.campaign.mission.enums.CombatRole.PATROL;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -41,14 +49,22 @@ import static org.mockito.Mockito.when;
 import static testUtilities.MHQTestUtilities.getEntityForUnitTesting;
 import static testUtilities.MHQTestUtilities.mockCampaign;
 
+import java.util.List;
+
 import megamek.common.Player;
 import megamek.common.enums.SkillLevel;
 import megamek.common.equipment.EquipmentType;
 import megamek.common.game.Game;
 import megamek.common.units.Entity;
 import mekhq.campaign.Campaign;
+import mekhq.campaign.LocalHangar;
 import mekhq.campaign.campaignOptions.CampaignOptions;
+import mekhq.campaign.force.CombatTeam;
+import mekhq.campaign.force.Formation;
+import mekhq.campaign.force.PlayerForce;
+import mekhq.campaign.mission.enums.CombatRole;
 import mekhq.campaign.personnel.skills.RandomSkillPreferences;
+import mekhq.campaign.unit.Unit;
 import mekhq.campaign.universe.Faction;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
@@ -178,5 +194,236 @@ class AtBDynamicScenarioFactoryTest {
         skill = SkillLevel.LEGENDARY;
         createEntityWithCrew(faction, skill, campaign, entity3, true);
         assertFalse(entity3.getCrew().getNickname(0).isEmpty());
+    }
+
+    @Test
+    void calculateEffectiveBVNoSeedForceReturnsDefaultWhenNoValidCombatTeamsExist() {
+        Campaign campaign = mockCampaignWithNoSeedForces();
+        PlayerForce playerForce = mock(PlayerForce.class);
+        AtBDynamicScenario scenario = mockScenario(T_GROUND);
+
+        when(campaign.getPlayerForce()).thenReturn(playerForce);
+        when(playerForce.getCombatTeamsAsList(campaign)).thenReturn(List.of());
+
+        int actual = AtBDynamicScenarioFactory.calculateEffectiveBV(scenario, campaign, false);
+
+        assertEquals(10000, actual);
+    }
+
+    @Test
+    void calculateEffectiveBVNoSeedForceIgnoresInvalidCombatRoles() {
+        Campaign campaign = mockCampaignWithNoSeedForces();
+        PlayerForce playerForce = mock(PlayerForce.class);
+        LocalHangar hangar = mock(LocalHangar.class);
+        AtBDynamicScenario scenario = mockScenario(T_GROUND);
+
+        CombatTeam cadreTeam = mockCombatTeam(CADRE, mockFormationWithBV(campaign, hangar, false, 4000));
+        CombatTeam patrolTeam = mockCombatTeam(PATROL, mockFormationWithBV(campaign, hangar, false, 6000));
+
+        when(campaign.getPlayerForce()).thenReturn(playerForce);
+        when(playerForce.getHangar()).thenReturn(hangar);
+        when(playerForce.getCombatTeamsAsList(campaign)).thenReturn(List.of(cadreTeam, patrolTeam));
+
+        int actual = AtBDynamicScenarioFactory.calculateEffectiveBV(scenario, campaign, false);
+
+        assertEquals(10000, actual);
+    }
+
+    @Test
+    void calculateEffectiveBVNoSeedForceUsesFrontlineFormationBV() {
+        Campaign campaign = mockCampaignWithNoSeedForces();
+        PlayerForce playerForce = mock(PlayerForce.class);
+        LocalHangar hangar = mock(LocalHangar.class);
+        AtBDynamicScenario scenario = mockScenario(T_GROUND);
+
+        CombatTeam frontlineTeam = mockCombatTeam(FRONTLINE, mockFormationWithBV(campaign, hangar, false, 4500));
+
+        when(campaign.getPlayerForce()).thenReturn(playerForce);
+        when(playerForce.getHangar()).thenReturn(hangar);
+        when(playerForce.getCombatTeamsAsList(campaign)).thenReturn(List.of(frontlineTeam));
+
+        int actual = AtBDynamicScenarioFactory.calculateEffectiveBV(scenario, campaign, false);
+
+        assertEquals(4500, actual);
+    }
+
+    @Test
+    void calculateEffectiveBVNoSeedForceUsesManeuverFormationBV() {
+        Campaign campaign = mockCampaignWithNoSeedForces();
+        PlayerForce playerForce = mock(PlayerForce.class);
+        LocalHangar hangar = mock(LocalHangar.class);
+        AtBDynamicScenario scenario = mockScenario(T_GROUND);
+
+        CombatTeam maneuverTeam = mockCombatTeam(MANEUVER, mockFormationWithBV(campaign, hangar, false, 7250));
+
+        when(campaign.getPlayerForce()).thenReturn(playerForce);
+        when(playerForce.getHangar()).thenReturn(hangar);
+        when(playerForce.getCombatTeamsAsList(campaign)).thenReturn(List.of(maneuverTeam));
+
+        int actual = AtBDynamicScenarioFactory.calculateEffectiveBV(scenario, campaign, false);
+
+        assertEquals(7250, actual);
+    }
+
+    @Test
+    void calculateEffectiveBVNoSeedForceIgnoresZeroBVFormations() {
+        Campaign campaign = mockCampaignWithNoSeedForces();
+        PlayerForce playerForce = mock(PlayerForce.class);
+        LocalHangar hangar = mock(LocalHangar.class);
+        AtBDynamicScenario scenario = mockScenario(T_GROUND);
+
+        CombatTeam zeroBvTeam = mockCombatTeam(FRONTLINE, mockFormationWithBV(campaign, hangar, false, 0));
+        CombatTeam validTeam = mockCombatTeam(MANEUVER, mockFormationWithBV(campaign, hangar, false, 5000));
+
+        when(campaign.getPlayerForce()).thenReturn(playerForce);
+        when(playerForce.getHangar()).thenReturn(hangar);
+        when(playerForce.getCombatTeamsAsList(campaign)).thenReturn(List.of(zeroBvTeam, validTeam));
+
+        int actual = AtBDynamicScenarioFactory.calculateEffectiveBV(scenario, campaign, false);
+
+        assertEquals(5000, actual);
+    }
+
+    @Test
+    void calculateEffectiveBVNoSeedForceUsesStandardBVWhenForced() {
+        Campaign campaign = mockCampaignWithNoSeedForces();
+        PlayerForce playerForce = mock(PlayerForce.class);
+        LocalHangar hangar = mock(LocalHangar.class);
+        AtBDynamicScenario scenario = mockScenario(T_GROUND);
+
+        Formation formation = mock(Formation.class);
+        when(formation.getUnitsAsUnits(hangar)).thenReturn(List.of());
+        when(formation.getTotalBV(campaign, false)).thenReturn(3000);
+        when(formation.getTotalBV(campaign, true)).thenReturn(3500);
+
+        CombatTeam frontlineTeam = mockCombatTeam(FRONTLINE, formation);
+
+        when(campaign.getPlayerForce()).thenReturn(playerForce);
+        when(playerForce.getHangar()).thenReturn(hangar);
+        when(playerForce.getCombatTeamsAsList(campaign)).thenReturn(List.of(frontlineTeam));
+
+        int actual = AtBDynamicScenarioFactory.calculateEffectiveBV(scenario, campaign, true);
+
+        assertEquals(3500, actual);
+    }
+
+    @Test
+    void calculateEffectiveBVNoSeedForceSkipsFormationDoomedOnGround() {
+        Campaign campaign = mockCampaignWithNoSeedForces();
+        PlayerForce playerForce = mock(PlayerForce.class);
+        LocalHangar hangar = mock(LocalHangar.class);
+        AtBDynamicScenario scenario = mockScenario(T_GROUND);
+
+        Formation doomedFormation = mockFormationWithBVAndEntity(campaign, hangar, false, 9000, true, false, false);
+        CombatTeam doomedTeam = mockCombatTeam(FRONTLINE, doomedFormation);
+
+        when(campaign.getPlayerForce()).thenReturn(playerForce);
+        when(playerForce.getHangar()).thenReturn(hangar);
+        when(playerForce.getCombatTeamsAsList(campaign)).thenReturn(List.of(doomedTeam));
+
+        int actual = AtBDynamicScenarioFactory.calculateEffectiveBV(scenario, campaign, false);
+
+        assertEquals(10000, actual);
+    }
+
+    @Test
+    void calculateEffectiveBVNoSeedForceSkipsFormationDoomedInSpace() {
+        Campaign campaign = mockCampaignWithNoSeedForces();
+        PlayerForce playerForce = mock(PlayerForce.class);
+        LocalHangar hangar = mock(LocalHangar.class);
+        AtBDynamicScenario scenario = mockScenario(T_SPACE);
+
+        Formation doomedFormation = mockFormationWithBVAndEntity(campaign, hangar, false, 9000, false, true, false);
+        CombatTeam doomedTeam = mockCombatTeam(FRONTLINE, doomedFormation);
+
+        when(campaign.getPlayerForce()).thenReturn(playerForce);
+        when(playerForce.getHangar()).thenReturn(hangar);
+        when(playerForce.getCombatTeamsAsList(campaign)).thenReturn(List.of(doomedTeam));
+
+        int actual = AtBDynamicScenarioFactory.calculateEffectiveBV(scenario, campaign, false);
+
+        assertEquals(10000, actual);
+    }
+
+    @Test
+    void calculateEffectiveBVNoSeedForceSkipsFormationDoomedInLowAtmosphere() {
+        Campaign campaign = mockCampaignWithNoSeedForces();
+        PlayerForce playerForce = mock(PlayerForce.class);
+        LocalHangar hangar = mock(LocalHangar.class);
+        AtBDynamicScenario scenario = mockScenario(AtBScenario.T_ATMOSPHERE);
+
+        Formation doomedFormation = mockFormationWithBVAndEntity(campaign, hangar, false, 9000, false, false, true);
+        CombatTeam doomedTeam = mockCombatTeam(FRONTLINE, doomedFormation);
+
+        when(campaign.getPlayerForce()).thenReturn(playerForce);
+        when(playerForce.getHangar()).thenReturn(hangar);
+        when(playerForce.getCombatTeamsAsList(campaign)).thenReturn(List.of(doomedTeam));
+
+        int actual = AtBDynamicScenarioFactory.calculateEffectiveBV(scenario, campaign, false);
+
+        assertEquals(10000, actual);
+    }
+
+    private static Campaign mockCampaignWithNoSeedForces() {
+        Campaign campaign = mock(Campaign.class);
+        CampaignOptions campaignOptions = mock(CampaignOptions.class);
+
+        when(campaign.getCampaignOptions()).thenReturn(campaignOptions);
+        when(campaignOptions.isNoSeedForces()).thenReturn(true);
+        when(campaignOptions.isUseStratConSinglesMode()).thenReturn(false);
+        when(campaignOptions.isUseGenericBattleValue()).thenReturn(false);
+
+        Faction faction = mock(Faction.class);
+        when(campaign.getFaction()).thenReturn(faction);
+
+        return campaign;
+    }
+
+    private static AtBDynamicScenario mockScenario(int boardType) {
+        AtBDynamicScenario scenario = mock(AtBDynamicScenario.class);
+
+        when(scenario.getBoardType()).thenReturn(boardType);
+        when(scenario.getEffectivePlayerBVMultiplier()).thenReturn(0.0);
+        when(scenario.getNumBots()).thenReturn(0);
+
+        return scenario;
+    }
+
+    private static CombatTeam mockCombatTeam(CombatRole role, Formation formation) {
+        CombatTeam combatTeam = mock(CombatTeam.class);
+
+        when(combatTeam.getRole()).thenReturn(role);
+        when(combatTeam.getFormation(org.mockito.ArgumentMatchers.any(Campaign.class))).thenReturn(formation);
+
+        return combatTeam;
+    }
+
+    private static Formation mockFormationWithBV(Campaign campaign, LocalHangar hangar,
+          boolean forceStandardBattleValue, int battleValue) {
+        Formation formation = mock(Formation.class);
+
+        when(formation.getUnitsAsUnits(hangar)).thenReturn(List.of());
+        when(formation.getTotalBV(campaign, forceStandardBattleValue)).thenReturn(battleValue);
+
+        return formation;
+    }
+
+    private static Formation mockFormationWithBVAndEntity(Campaign campaign, LocalHangar hangar,
+          boolean forceStandardBattleValue, int battleValue, boolean doomedOnGround, boolean doomedInSpace,
+          boolean doomedInAtmosphere) {
+        Entity entity = mock(Entity.class);
+        when(entity.getUnitType()).thenReturn(MEK);
+        when(entity.doomedOnGround()).thenReturn(doomedOnGround);
+        when(entity.doomedInSpace()).thenReturn(doomedInSpace);
+        when(entity.doomedInAtmosphere()).thenReturn(doomedInAtmosphere);
+
+        Unit unit = mock(Unit.class);
+        when(unit.getEntity()).thenReturn(entity);
+
+        Formation formation = mock(Formation.class);
+        when(formation.getUnitsAsUnits(hangar)).thenReturn(List.of(unit));
+        when(formation.getTotalBV(campaign, forceStandardBattleValue)).thenReturn(battleValue);
+
+        return formation;
     }
 }

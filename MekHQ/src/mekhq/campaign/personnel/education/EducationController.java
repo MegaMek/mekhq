@@ -75,6 +75,7 @@ import mekhq.campaign.CurrentLocation;
 import mekhq.campaign.JumpPath;
 import mekhq.campaign.LocalPersonnel;
 import mekhq.campaign.base.PlayerBase;
+import mekhq.campaign.campaignOptions.CampaignOption;
 import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.events.persons.PersonChangedEvent;
 import mekhq.campaign.finances.Money;
@@ -2349,7 +2350,7 @@ public class EducationController {
 
         // We base passRate on US averages
         int passRate = 60 - (Reasoning.values().length / 2);
-        final int reasoningModifier = campaign.getCampaignOptions().isUseRandomPersonalities() ?
+        final int reasoningModifier = campaign.getCampaignOptions().get(CampaignOption.USE_RANDOM_PERSONALITIES) ?
                                             person.getReasoning().getReasoningScore() :
                                             Reasoning.values().length / 2;
         passRate += reasoningModifier;
@@ -2362,7 +2363,7 @@ public class EducationController {
             educationLevel = getCombatEducationLevel(experienceLevel, flunked, passRate);
         } else {
             // Calculate effective experience level (boost for doctors)
-            final int effectiveExperienceLevel = isDoctor ? max(experienceLevel, EXP_VETERAN) : experienceLevel;
+            final int effectiveExperienceLevel = isDoctor ? experienceLevel + EXP_VETERAN : experienceLevel;
             // Determine education levels for non-combat roles
             educationLevel = getNonCombatEducationLevel(effectiveExperienceLevel, flunked, passRate);
         }

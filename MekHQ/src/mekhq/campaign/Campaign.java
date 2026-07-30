@@ -877,7 +877,7 @@ public class Campaign implements ITechManager {
      * @deprecated Use {@link PlayerForce#getCombatTeamsAsList(Campaign)} directly.
      */
     @Deprecated(since = "0.51.01", forRemoval = true)
-    public ArrayList<CombatTeam> getCombatTeamsAsList() {
+    public List<CombatTeam> getCombatTeamsAsList() {
         return getPlayerForce().getCombatTeamsAsList(this);
     }
 
@@ -1954,7 +1954,7 @@ public class Campaign implements ITechManager {
 
     /**
      * @return all hangars across all locations associated with this campaign.
-     *                                                                                                                         TODO: This won't work once we support multiple hangars. Method separated from getHangar() for future refactor
+     *                                                                                                                               TODO: This won't work once we support multiple hangars. Method separated from getHangar() for future refactor
      *
      * @deprecated Use {@link PlayerForce#getHangar()} directly.
      */
