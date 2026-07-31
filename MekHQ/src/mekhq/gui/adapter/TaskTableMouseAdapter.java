@@ -477,14 +477,16 @@ public class TaskTableMouseAdapter extends JPopupMenuAdapter {
             }
         }
 
+        // Eligibility (and the displayed cost) can depend on the tech
+        Person fabricationTech = techWorkPanel.getSelectedTech();
         if (gui.getCampaign().getCampaignOptions().get(CampaignOption.USE_FABRICATION)
                   && (rows.length == 1) && (partWork instanceof MissingPart missingPart)
-                  && missingPart.canFabricate()) {
+                  && missingPart.canFabricate(fabricationTech)) {
             // Fabricate replacement: choose the mode. "Single attempt" behaves like a normal replacement task;
             // "Until success" re-assigns the tech after each failed attempt (paying the cost again) until it succeeds.
             menu = new JMenu(getTextAt(RESOURCE_BUNDLE, "TaskTableMouseAdapter.FABRICATE"));
             menu.setToolTipText(getFormattedTextAt(RESOURCE_BUNDLE, "TaskTableMouseAdapter.FABRICATE.tooltip",
-                  missingPart.getFabricationCost().toAmountAndSymbolString()));
+                  missingPart.getFabricationCost(fabricationTech).toAmountAndSymbolString()));
             menu.setEnabled(!isBeingWorked);
 
             ButtonGroup fabricateGroup = new ButtonGroup();

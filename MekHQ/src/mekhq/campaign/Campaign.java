@@ -4172,7 +4172,7 @@ public class Campaign implements ITechManager {
                   && (partWork instanceof MissingPart missingPart)
                   && missingPart.isFabricating()
                   && missingPart.isFabricateUntilSuccess()
-                  && missingPart.canFabricate()
+                  && missingPart.canFabricate(tech)
                   && (tech.getSkillForWorkingOn(partWork) != null)) {
             final Money nextCost = missingPart.getFabricationCost(tech);
             if (nextCost.isZero() || !getFinances().getBalance().isLessThan(nextCost)) {
@@ -6430,7 +6430,7 @@ public class Campaign implements ITechManager {
             if (missingPart.isFabricating()) {
                 // A part flagged for fabrication that is no longer eligible (tech rating above C without a
                 // factory-grade facility) cannot be worked on.
-                if (!missingPart.canFabricate()) {
+                if (!missingPart.canFabricate(tech)) {
                     return new TargetRoll(TargetRoll.IMPOSSIBLE,
                           "This part cannot be fabricated here (requires base Tech Rating A-C or a factory-grade facility).");
                 }

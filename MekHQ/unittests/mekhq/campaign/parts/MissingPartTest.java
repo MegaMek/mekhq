@@ -482,6 +482,32 @@ public class MissingPartTest {
     }
 
     @Test
+    public void macGyverAbilityLowersTheEffectiveTechRatingByOne() {
+        Campaign mockCampaign = mockCampaign();
+        when(mockCampaign.getCampaignOptions()).thenReturn(new CampaignOptions());
+        // Standard mek internal structure is Tech Rating D - not fabricable in the field by a plain tech.
+        MissingPart missingPart = new MissingMekLocation(Mek.LOC_LEFT_ARM, 20, EquipmentType.T_STRUCTURE_STANDARD,
+              false, false, false, mockCampaign);
+
+        Unit unit = mock(Unit.class, org.mockito.Mockito.RETURNS_DEEP_STUBS);
+        when(unit.getEntity().getWeight()).thenReturn(20.0);
+        when(unit.getSite()).thenReturn(Unit.SITE_FIELD_WORKSHOP);
+        missingPart.setUnit(unit);
+
+        Person plainTech = mock(Person.class);
+        when(plainTech.getOptions()).thenReturn(new PersonnelOptions());
+
+        Person macGyverTech = mock(Person.class);
+        PersonnelOptions macGyverOptions = new PersonnelOptions();
+        macGyverOptions.getOption(PersonnelOptions.TECH_MACGYVER).setValue(true);
+        when(macGyverTech.getOptions()).thenReturn(macGyverOptions);
+
+        // MacGyver treats the Tech Rating D part as C, so it becomes fabricable in the field.
+        assertFalse(missingPart.canFabricate(plainTech));
+        assertTrue(missingPart.canFabricate(macGyverTech));
+    }
+
+    @Test
     public void maintenanceFacilityOptionAllowsTechRatingDFabrication() {
         Campaign mockCampaign = mockCampaign();
         CampaignOptions options = new CampaignOptions();

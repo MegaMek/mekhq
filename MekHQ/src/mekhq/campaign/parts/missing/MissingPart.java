@@ -226,13 +226,29 @@ public abstract class MissingPart extends Part implements IAcquisitionWork {
     }
 
     /**
-     * Determines whether this part may be fabricated from scratch. Without factory-grade facilities, fabrication is
-     * limited to components with a base Tech Rating of A, B, or C (Campaign Ops, p.221); a factory-conditions site
-     * removes that restriction.
+     * Determines whether this part may be fabricated from scratch by its assigned tech.
+     *
+     * @return {@code true} if the part can be fabricated
+     *
+     * @see #canFabricate(Person)
+     */
+    public boolean canFabricate() {
+        return canFabricate(getTech());
+    }
+
+    /**
+     * Determines whether this part may be fabricated from scratch by the given tech. Without factory-grade facilities,
+     * fabrication is limited to components with a base Tech Rating of A, B, or C (Campaign Ops, p.202 rev 5th
+     * printing); a factory-conditions site removes that restriction, and an optional rule additionally permits Tech
+     * Rating D at a maintenance facility. The MacGyver Special Ability, if the tech has it, treats the part's Tech
+     * Rating as one lower for this determination.
+     *
+     * @param tech the tech who would perform the fabrication, or {@code null} to judge eligibility without any tech
+     *             ability
      *
      * @return {@code true} if the part can be fabricated
      */
-    public boolean canFabricate() {
+    public boolean canFabricate(final @Nullable Person tech) {
         if (unit == null) {
             return false;
         }
@@ -247,6 +263,11 @@ public abstract class MissingPart extends Part implements IAcquisitionWork {
             return false;
         }
 
+        int effectiveRating = rating.ordinal();
+        if ((tech != null) && tech.getOptions().booleanOption(PersonnelOptions.TECH_MACGYVER)) {
+            effectiveRating = Math.max(0, effectiveRating - 1);
+        }
+
         // Base limit is Tech Rating C. An optional rule additionally permits Tech Rating D at a maintenance facility
         // (or better).
         int maxRating = TechRating.C.ordinal();
@@ -255,7 +276,7 @@ public abstract class MissingPart extends Part implements IAcquisitionWork {
             maxRating = TechRating.D.ordinal();
         }
 
-        return rating.ordinal() <= maxRating;
+        return effectiveRating <= maxRating;
     }
 
     /**

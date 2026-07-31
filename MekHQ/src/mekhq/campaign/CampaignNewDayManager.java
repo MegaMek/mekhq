@@ -1399,16 +1399,21 @@ public class CampaignNewDayManager {
     }
 
     /**
-     * Cancels any in-progress part fabrication that is no longer permitted (for example, a part above Tech Rating C
-     * whose unit has left factory-grade facilities). Such a task would otherwise be stuck showing an impossible target
-     * number, so it is reverted to a normal replacement and the player is notified.
+     * Cancels any in-progress part fabrication that is no longer permitted for its assigned tech (for example, a part
+     * above Tech Rating C whose unit has left factory-grade facilities). Such a task would otherwise be stuck showing
+     * an impossible target number, so it is reverted to a normal replacement and the player is notified.
+     *
+     * <p>Fabrications with no assigned tech are left alone: eligibility can depend on the tech's abilities (e.g.
+     * MacGyver), so a paused/unassigned fabrication is not judged here - {@code getTargetFor} gates it once a tech is
+     * assigned.</p>
      */
     private void cancelIneligibleFabrications() {
         for (Unit unit : campaign.getUnits()) {
             for (Part part : unit.getParts()) {
                 if ((part instanceof MissingPart missingPart)
                           && missingPart.isFabricating()
-                          && !missingPart.canFabricate()) {
+                          && (missingPart.getTech() != null)
+                          && !missingPart.canFabricate(missingPart.getTech())) {
                     missingPart.cancelFabrication();
                     campaign.addReport(TECHNICAL, getFormattedTextAt(RESOURCE_BUNDLE,
                           "fabrication.canceled.report", missingPart.getName(), unit.getName()));
