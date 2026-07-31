@@ -65,7 +65,7 @@ import megamek.common.planetaryConditions.Weather;
 import megamek.common.planetaryConditions.Wind;
 import megamek.logging.MMLogger;
 import mekhq.MHQConstants;
-import mekhq.campaign.digitalGM.stratCon.StratConBiomeManifest;
+import mekhq.campaign.digitalGM.stratCon.biome.StratConBiomeManifest;
 import mekhq.utilities.MHQXMLUtility;
 
 @XmlRootElement(name = "TerrainConditionsOddsManifest")
