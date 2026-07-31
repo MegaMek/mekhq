@@ -44,7 +44,7 @@ import javax.swing.SpinnerNumberModel;
 import jakarta.annotation.Nonnull;
 import jakarta.annotation.Nullable;
 import mekhq.campaign.personnel.enums.PersonnelRole;
-import mekhq.gui.campaignOptions.components.CampaignOptionsFormPanel;
+import megamek.client.ui.settings.SettingsFormPanel;
 import mekhq.gui.campaignOptions.components.CampaignOptionsHeaderPanel;
 import mekhq.gui.campaignOptions.components.CampaignOptionsPagePanel;
 import mekhq.gui.campaignOptions.components.CampaignOptionsSpinner;
@@ -137,7 +137,7 @@ class RecruitmentBonusesPage {
         lblRecruitmentBonusCombat = new JLabel[roles.size()];
         spnRecruitmentBonusCombat = new JSpinner[roles.size()];
 
-        final CampaignOptionsFormPanel panel = new CampaignOptionsFormPanel("RecruitmentBonusesCombatPanel",
+        final SettingsFormPanel panel = new SettingsFormPanel("RecruitmentBonusesCombatPanel",
                 LABEL_COLUMN_WIDTH,
                 CONTROL_COLUMN_WIDTH);
 
@@ -175,7 +175,7 @@ class RecruitmentBonusesPage {
         lblRecruitmentBonusSupport = new JLabel[roles.size()];
         spnRecruitmentBonusSupport = new JSpinner[roles.size()];
 
-        final CampaignOptionsFormPanel panel = new CampaignOptionsFormPanel("RecruitmentBonusesSupportPanel",
+        final SettingsFormPanel panel = new SettingsFormPanel("RecruitmentBonusesSupportPanel",
                 LABEL_COLUMN_WIDTH,
                 CONTROL_COLUMN_WIDTH);
 

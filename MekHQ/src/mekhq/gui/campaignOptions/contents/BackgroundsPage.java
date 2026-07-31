@@ -59,7 +59,7 @@ import mekhq.campaign.universe.Planet;
 import mekhq.campaign.universe.PlanetarySystem;
 import mekhq.gui.campaignOptions.CampaignOptionFlag;
 import mekhq.gui.campaignOptions.components.CampaignOptionsCheckBox;
-import mekhq.gui.campaignOptions.components.CampaignOptionsFormPanel;
+import megamek.client.ui.settings.SettingsFormPanel;
 import mekhq.gui.campaignOptions.components.CampaignOptionsHeaderPanel;
 import mekhq.gui.campaignOptions.components.CampaignOptionsLabel;
 import mekhq.gui.campaignOptions.components.CampaignOptionsPagePanel;
@@ -79,7 +79,7 @@ import mekhq.gui.campaignOptions.components.CampaignOptionsSpinner;
  * {@link #readFromModel(BiographyOptionsModel)} and {@link #writeToModel(BiographyOptionsModel)} are no-ops.</p>
  */
 class BackgroundsPage {
-    private static final int LABEL_COLUMN_WIDTH = CampaignOptionsFormPanel.DEFAULT_LABEL_WIDTH;
+    private static final int LABEL_COLUMN_WIDTH = SettingsFormPanel.DEFAULT_LABEL_WIDTH;
     // Wider than the default control column because the Biography combo boxes need the extra room.
     private static final int CONTROL_COLUMN_WIDTH = 240;
 
@@ -183,7 +183,7 @@ class BackgroundsPage {
         chkUseSimulatedRelationships.addMouseListener(createTipPanelUpdater("UseSimulatedRelationships"));
 
         // Layout the Panels
-        final CampaignOptionsFormPanel panel = new CampaignOptionsFormPanel("RandomBackgroundsPanel",
+        final SettingsFormPanel panel = new SettingsFormPanel("RandomBackgroundsPanel",
             LABEL_COLUMN_WIDTH,
             CONTROL_COLUMN_WIDTH);
         panel.addCheckBoxGrid(2,
@@ -294,7 +294,7 @@ class BackgroundsPage {
         capComboWidthWithTooltip(comboSpecifiedPlanet);
 
         // Layout the Panel
-        final CampaignOptionsFormPanel panel = new CampaignOptionsFormPanel("RandomOriginOptionsPanel",
+        final SettingsFormPanel panel = new SettingsFormPanel("RandomOriginOptionsPanel",
             LABEL_COLUMN_WIDTH,
             CONTROL_COLUMN_WIDTH);
         panel.addCheckBoxGrid(2,

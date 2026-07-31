@@ -39,7 +39,7 @@ import static mekhq.gui.campaignOptions.enums.ProcurementPersonnelPick.SUPPORT;
 
 import megamek.Version;
 import megamek.logging.MMLogger;
-import mekhq.campaign.digitalGM.stratCon.StratConPlayType;
+import mekhq.campaign.digitalGM.stratCon.gm.StratConPlayType;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
