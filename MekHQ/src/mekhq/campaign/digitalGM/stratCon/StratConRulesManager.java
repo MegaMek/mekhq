@@ -1375,7 +1375,7 @@ public class StratConRulesManager {
                 // If the player doesn't have any available forces, we grab a force at random to
                 // seed the scenario
                 if (availableForceIDs.isEmpty()) {
-                    ArrayList<CombatTeam> combatTeams = campaign.getPlayerForce().getCombatTeamsAsList(campaign);
+                    List<CombatTeam> combatTeams = campaign.getPlayerForce().getCombatTeamsAsList(campaign);
                     if (!combatTeams.isEmpty()) {
                         combatTeam = getRandomItem(combatTeams);
 
@@ -3133,7 +3133,7 @@ public class StratConRulesManager {
     public static List<Integer> getAvailableForceIDs(Campaign campaign, AtBContract contract,
           boolean bypassRoleRestrictions) {
         // First, build a list of all combat teams in the campaign
-        ArrayList<CombatTeam> combatTeams = campaign.getPlayerForce().getCombatTeamsAsList(campaign);
+        List<CombatTeam> combatTeams = campaign.getPlayerForce().getCombatTeamsAsList(campaign);
 
         if (combatTeams.isEmpty()) {
             // If we don't have any combat teams, there is no point in continuing, so we exit early

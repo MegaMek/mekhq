@@ -54,7 +54,7 @@ import megamek.client.ui.comboBoxes.MMComboBox;
 import mekhq.campaign.personnel.enums.EdgeRefreshPeriod;
 import mekhq.gui.campaignOptions.CampaignOptionFlag;
 import mekhq.gui.campaignOptions.components.CampaignOptionsCheckBox;
-import mekhq.gui.campaignOptions.components.CampaignOptionsFormPanel;
+import megamek.client.ui.settings.SettingsFormPanel;
 import mekhq.gui.campaignOptions.components.CampaignOptionsHeaderPanel;
 import mekhq.gui.campaignOptions.components.CampaignOptionsLabel;
 import mekhq.gui.campaignOptions.components.CampaignOptionsPagePanel;
@@ -73,8 +73,8 @@ import mekhq.gui.campaignOptions.components.CampaignOptionsSpinner;
  * no-ops.</p>
  */
 class PersonnelGeneralPage {
-    private static final int LABEL_COLUMN_WIDTH = CampaignOptionsFormPanel.DEFAULT_LABEL_WIDTH;
-    private static final int CONTROL_COLUMN_WIDTH = CampaignOptionsFormPanel.DEFAULT_CONTROL_WIDTH;
+    private static final int LABEL_COLUMN_WIDTH = SettingsFormPanel.DEFAULT_LABEL_WIDTH;
+    private static final int CONTROL_COLUMN_WIDTH = SettingsFormPanel.DEFAULT_CONTROL_WIDTH;
 
     private CampaignOptionsHeaderPanel generalHeader;
     private JCheckBox chkUseTactics;
@@ -195,7 +195,8 @@ class PersonnelGeneralPage {
         chkOnlyCommandersMatterBattleArmor.addMouseListener(createTipPanelUpdater("OnlyCommandersMatterBattleArmor"));
         chkUseEdge = new CampaignOptionsCheckBox("UseEdge");
         chkUseEdge.addMouseListener(createTipPanelUpdater("UseEdge"));
-        chkUseTwistOfFateSurvival = new CampaignOptionsCheckBox("UseTwistOfFateSurvival");
+        chkUseTwistOfFateSurvival = new CampaignOptionsCheckBox("UseTwistOfFateSurvival",
+              getMetadata(new Version(0, 51, 1)));
         chkUseTwistOfFateSurvival.addMouseListener(createTipPanelUpdater("UseTwistOfFateSurvival"));
         chkUseFoundersHavePlotArmor = new CampaignOptionsCheckBox("UseFoundersHavePlotArmor",
               getMetadata(new Version(0, 51, 1)));
@@ -227,7 +228,7 @@ class PersonnelGeneralPage {
         chkUseAlternativeQualityAveraging.addMouseListener(createTipPanelUpdater("UseAlternativeQualityAveraging"));
 
         // Layout the Panel
-        final CampaignOptionsFormPanel panel = new CampaignOptionsFormPanel("PersonnelGeneralPage",
+        final SettingsFormPanel panel = new SettingsFormPanel("PersonnelGeneralPage",
               LABEL_COLUMN_WIDTH,
               CONTROL_COLUMN_WIDTH);
         panel.addCheckBoxGrid(2,
@@ -269,7 +270,7 @@ class PersonnelGeneralPage {
               .addMouseListener(createTipPanelUpdater("UseRemovalExemptRetirees"));
 
         // Layout the Panel
-        final CampaignOptionsFormPanel panel = new CampaignOptionsFormPanel("PersonnelCleanUpPanel",
+        final SettingsFormPanel panel = new SettingsFormPanel("PersonnelCleanUpPanel",
               LABEL_COLUMN_WIDTH,
               CONTROL_COLUMN_WIDTH);
         panel.addCheckBoxGrid(2,
@@ -295,7 +296,7 @@ class PersonnelGeneralPage {
               "AdminExperienceLevelIncludeNegotiation"));
 
         // Layout the Panel
-        final CampaignOptionsFormPanel panel = new CampaignOptionsFormPanel("AdministratorsPanel",
+        final SettingsFormPanel panel = new SettingsFormPanel("AdministratorsPanel",
               LABEL_COLUMN_WIDTH,
               CONTROL_COLUMN_WIDTH);
         panel.addCheckBoxGrid(2,
@@ -339,7 +340,7 @@ class PersonnelGeneralPage {
         chkUseBlobVesselCrew.addMouseListener(createTipPanelUpdater("UseBlobVesselCrew"));
 
         // Layout the Panel
-        final CampaignOptionsFormPanel panel = new CampaignOptionsFormPanel("BlobCrewPanel",
+        final SettingsFormPanel panel = new SettingsFormPanel("BlobCrewPanel",
               LABEL_COLUMN_WIDTH,
               CONTROL_COLUMN_WIDTH);
         panel.addCheckBoxGrid(2,

@@ -52,12 +52,12 @@ import mekhq.campaign.personnel.enums.Phenotype;
 import mekhq.campaign.personnel.skills.SkillType;
 import mekhq.gui.campaignOptions.CampaignOptionFlag;
 import mekhq.gui.campaignOptions.components.CampaignOptionsCheckBox;
-import mekhq.gui.campaignOptions.components.CampaignOptionsFormPanel;
+import megamek.client.ui.settings.SettingsFormPanel;
 import mekhq.gui.campaignOptions.components.CampaignOptionsHeaderPanel;
 import mekhq.gui.campaignOptions.components.CampaignOptionsLabel;
 import mekhq.gui.campaignOptions.components.CampaignOptionsModifierTablePanel;
 import mekhq.gui.campaignOptions.components.CampaignOptionsPagePanel;
-import mekhq.gui.campaignOptions.components.CampaignOptionsPairedFieldGridPanel;
+import megamek.client.ui.settings.SettingsPairedFieldGridPanel;
 import mekhq.gui.campaignOptions.components.CampaignOptionsSpinner;
 
 /**
@@ -74,8 +74,8 @@ import mekhq.gui.campaignOptions.components.CampaignOptionsSpinner;
  * are no-ops.</p>
  */
 class RandomizationPage {
-    private static final int LABEL_COLUMN_WIDTH = CampaignOptionsFormPanel.DEFAULT_LABEL_WIDTH;
-    private static final int CONTROL_COLUMN_WIDTH = CampaignOptionsFormPanel.DEFAULT_CONTROL_WIDTH;
+    private static final int LABEL_COLUMN_WIDTH = SettingsFormPanel.DEFAULT_LABEL_WIDTH;
+    private static final int CONTROL_COLUMN_WIDTH = SettingsFormPanel.DEFAULT_CONTROL_WIDTH;
     private static final int ADVANCEMENT_GRID_CONTROL_COLUMN_WIDTH = 100;
     private static final int ADVANCEMENT_GRID_MEDIUM_PAIR_COLUMN_WIDTH = 290;
     private static final int MODIFIER_ROW_LABEL_COLUMN_WIDTH = 120;
@@ -194,7 +194,7 @@ class RandomizationPage {
                 getMetadata(LEGACY_RULE_BEFORE_METADATA, CampaignOptionFlag.IMPORTANT));
         chkExtraRandomness.addMouseListener(createTipPanelUpdater("ExtraRandomness"));
 
-        final CampaignOptionsFormPanel panel = new CampaignOptionsFormPanel("SkillRandomizationOptionsPanel",
+        final SettingsFormPanel panel = new SettingsFormPanel("SkillRandomizationOptionsPanel",
                 LABEL_COLUMN_WIDTH,
                 CONTROL_COLUMN_WIDTH);
         panel.addCheckBox(chkExtraRandomness);
@@ -271,7 +271,7 @@ class RandomizationPage {
                 spnCommandSkillsLegendary,
                 spnUtilitySkillsLegendary);
 
-        final CampaignOptionsFormPanel wrapper = new CampaignOptionsFormPanel("ExperienceLevelModifiersWrapperPanel",
+        final SettingsFormPanel wrapper = new SettingsFormPanel("ExperienceLevelModifiersWrapperPanel",
                 MODIFIER_ROW_LABEL_COLUMN_WIDTH,
                 MODIFIER_CONTROL_COLUMN_WIDTH);
         wrapper.addFullWidthComponent(panel);
@@ -393,9 +393,9 @@ class RandomizationPage {
         spnNonCombatSmallArms.addMouseListener(createTipPanelUpdater("NonCombatSmallArms"));
     }
 
-    private @Nonnull CampaignOptionsPairedFieldGridPanel createAdvancementPairedGrid(String name, JComponent[] labels,
+    private @Nonnull SettingsPairedFieldGridPanel createAdvancementPairedGrid(String name, JComponent[] labels,
             JComponent[] controls, int pairColumnWidth) {
-        final CampaignOptionsPairedFieldGridPanel panel = new CampaignOptionsPairedFieldGridPanel(name,
+        final SettingsPairedFieldGridPanel panel = new SettingsPairedFieldGridPanel(name,
                 pairColumnWidth,
                 pairColumnWidth,
                 ADVANCEMENT_GRID_CONTROL_COLUMN_WIDTH,

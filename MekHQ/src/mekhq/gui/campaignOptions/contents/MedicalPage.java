@@ -48,7 +48,7 @@ import jakarta.annotation.Nullable;
 import megamek.Version;
 import mekhq.gui.campaignOptions.CampaignOptionFlag;
 import mekhq.gui.campaignOptions.components.CampaignOptionsCheckBox;
-import mekhq.gui.campaignOptions.components.CampaignOptionsFormPanel;
+import megamek.client.ui.settings.SettingsFormPanel;
 import mekhq.gui.campaignOptions.components.CampaignOptionsHeaderPanel;
 import mekhq.gui.campaignOptions.components.CampaignOptionsLabel;
 import mekhq.gui.campaignOptions.components.CampaignOptionsPagePanel;
@@ -66,8 +66,8 @@ import mekhq.gui.campaignOptions.components.CampaignOptionsSpinner;
  * {@link #writeToModel(PersonnelOptionsModel)} are no-ops.</p>
  */
 class MedicalPage {
-    private static final int LABEL_COLUMN_WIDTH = CampaignOptionsFormPanel.DEFAULT_LABEL_WIDTH;
-    private static final int CONTROL_COLUMN_WIDTH = CampaignOptionsFormPanel.DEFAULT_CONTROL_WIDTH;
+    private static final int LABEL_COLUMN_WIDTH = SettingsFormPanel.DEFAULT_LABEL_WIDTH;
+    private static final int CONTROL_COLUMN_WIDTH = SettingsFormPanel.DEFAULT_CONTROL_WIDTH;
 
     private CampaignOptionsHeaderPanel medicalHeader;
     private JCheckBox chkUseAdvancedMedical;
@@ -194,7 +194,7 @@ class MedicalPage {
         spnMASHTheatreCapacity.addMouseListener(createTipPanelUpdater("MASHTheatreCapacity"));
 
         // Layout the Panels
-        final CampaignOptionsFormPanel medicalCapacityPanel = new CampaignOptionsFormPanel("MedicalCapacityPanel",
+        final SettingsFormPanel medicalCapacityPanel = new SettingsFormPanel("MedicalCapacityPanel",
               LABEL_COLUMN_WIDTH,
               CONTROL_COLUMN_WIDTH);
         medicalCapacityPanel.addRow(lblMaximumPatients, spnMaximumPatients);
@@ -204,7 +204,7 @@ class MedicalPage {
               chkUseMASHTheatres);
         medicalCapacityPanel.addRow(lblMASHTheatreCapacity, spnMASHTheatreCapacity);
 
-        final CampaignOptionsFormPanel healingChecksPanel = new CampaignOptionsFormPanel("HealingChecksPanel",
+        final SettingsFormPanel healingChecksPanel = new SettingsFormPanel("HealingChecksPanel",
               LABEL_COLUMN_WIDTH,
               CONTROL_COLUMN_WIDTH);
         healingChecksPanel.addRow(lblHealWaitingPeriod, spnHealWaitingPeriod);
@@ -212,7 +212,7 @@ class MedicalPage {
         healingChecksPanel.addCheckBox(chkUseRandomHitsForVehicles);
         healingChecksPanel.addRow(lblMinimumHitsForVehicles, spnMinimumHitsForVehicles);
 
-        final CampaignOptionsFormPanel advancedMedicalRulesPanel = new CampaignOptionsFormPanel(
+        final SettingsFormPanel advancedMedicalRulesPanel = new SettingsFormPanel(
               "AdvancedMedicalRulesPanel",
               LABEL_COLUMN_WIDTH,
               CONTROL_COLUMN_WIDTH);

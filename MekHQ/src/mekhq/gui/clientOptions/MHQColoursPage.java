@@ -30,7 +30,7 @@
  * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
  * affiliated with Microsoft.
  */
-package mekhq.gui.campaignOptions;
+package mekhq.gui.clientOptions;
 
 import java.awt.Component;
 import java.util.ArrayList;
@@ -42,7 +42,7 @@ import javax.swing.JPanel;
 import javax.swing.SwingConstants;
 
 import megamek.client.ui.buttons.ColourSelectorButton;
-import mekhq.gui.campaignOptions.components.CampaignOptionsFormPanel;
+import megamek.client.ui.settings.SettingsFormPanel;
 
 /**
  * The Colours page of the MekHQ Client Options dialog: grids of foreground/background colour swatches for unit status,
@@ -86,7 +86,7 @@ class MHQColoursPage extends MHQOptionsPage {
         // The disclaimer that some colours live in MegaMek's Client Options is shown as the page intro, above the
         // sections.
         Component page = pageBuilder("MHQColoursPage", hasTooltips)
-                     .intro("coloursTab.disclaimer")
+                     .intro("coloursTab.disclaimer.intro")
                      .section("lblMHQColoursUnitStatusSection.text", "lblMHQColoursUnitStatusSection.summary",
                            unitStatusContent)
                      .section("lblMHQColoursPersonnelStatusSection.text",
@@ -166,7 +166,7 @@ class MHQColoursPage extends MHQOptionsPage {
 
     /** Lays {@code buttons} out in a 2-column colour grid panel named {@code name}. */
     private JPanel colourButtonGrid(String name, List<JComponent> buttons) {
-        CampaignOptionsFormPanel panel = new CampaignOptionsFormPanel(name);
+        SettingsFormPanel panel = new SettingsFormPanel(name);
         panel.addComponentGrid(2, buttons.toArray(new JComponent[0]));
         return panel;
     }

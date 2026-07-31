@@ -30,7 +30,7 @@
  * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
  * affiliated with Microsoft.
  */
-package mekhq.gui.campaignOptions;
+package mekhq.gui.clientOptions;
 
 import java.awt.Component;
 import java.util.ArrayList;
@@ -41,9 +41,9 @@ import javax.swing.JCheckBox;
 import javax.swing.JComponent;
 import javax.swing.JPanel;
 
+import megamek.client.ui.settings.SettingsCheckBox;
+import megamek.client.ui.settings.SettingsFormPanel;
 import mekhq.MHQConstants;
-import mekhq.gui.campaignOptions.components.CampaignOptionsCheckBox;
-import mekhq.gui.campaignOptions.components.CampaignOptionsFormPanel;
 
 /**
  * The Reminders &amp; Confirmations page of the MekHQ Client Options dialog: two sections of "ignore this warning"
@@ -52,7 +52,7 @@ import mekhq.gui.campaignOptions.components.CampaignOptionsFormPanel;
  */
 class MHQRemindersPage extends MHQOptionsPage {
     // Reminders & Confirmations (keyed by MHQConstants nag/confirmation key, matching MHQOptionsModel.nagIgnores)
-    private final Map<String, CampaignOptionsCheckBox> nagCheckBoxes = new HashMap<>();
+    private final Map<String, SettingsCheckBox> nagCheckBoxes = new HashMap<>();
 
     MHQRemindersPage(MHQOptionsModel model) {
         super(model);
@@ -130,16 +130,16 @@ class MHQRemindersPage extends MHQOptionsPage {
      * pair. Each check box loads its state from {@link MHQOptionsModel#nagIgnores} and is registered in
      * {@link #nagCheckBoxes} under its ignore key so {@link #writeToModel()} can read it back.
      */
-    private CampaignOptionsFormPanel nagCheckBoxGrid(String name, String[][] entries) {
+    private SettingsFormPanel nagCheckBoxGrid(String name, String[][] entries) {
         List<JCheckBox> checkBoxes = new ArrayList<>();
         for (String[] entry : entries) {
             String ignoreKey = entry[1];
-            CampaignOptionsCheckBox checkBox = new CampaignOptionsCheckBox(RESOURCE_BUNDLE, entry[0]);
+            SettingsCheckBox checkBox = new SettingsCheckBox(TEXT_PROVIDER, entry[0]);
             checkBox.setSelected(Boolean.TRUE.equals(model.nagIgnores.get(ignoreKey)));
             nagCheckBoxes.put(ignoreKey, checkBox);
             checkBoxes.add(checkBox);
         }
-        CampaignOptionsFormPanel panel = new CampaignOptionsFormPanel(name, FORM_LABEL_WIDTH, FORM_CONTROL_WIDTH);
+        SettingsFormPanel panel = new SettingsFormPanel(name, FORM_LABEL_WIDTH, FORM_CONTROL_WIDTH);
         panel.addCheckBoxGrid(2, checkBoxes.toArray(new JCheckBox[0]));
         return panel;
     }

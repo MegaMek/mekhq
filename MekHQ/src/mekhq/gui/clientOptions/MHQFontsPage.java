@@ -30,16 +30,16 @@
  * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
  * affiliated with Microsoft.
  */
-package mekhq.gui.campaignOptions;
+package mekhq.gui.clientOptions;
 
-import static mekhq.utilities.MHQInternationalization.getTextAt;
+import static mekhq.utilities.MHQInternationalization.getText;
 
 import java.awt.Component;
 
 import megamek.client.ui.comboBoxes.FontComboBox;
 import megamek.client.ui.displayWrappers.FontDisplay;
-import mekhq.gui.campaignOptions.components.CampaignOptionsFormPanel;
-import mekhq.gui.campaignOptions.components.CampaignOptionsLabel;
+import megamek.client.ui.settings.SettingsFormPanel;
+import megamek.client.ui.settings.SettingsLabel;
 
 /**
  * The Fonts page of the MekHQ Client Options dialog: a single section with the handwriting font used by the medical
@@ -54,14 +54,14 @@ class MHQFontsPage extends MHQOptionsPage {
 
     @Override
     Component createPage() {
-        CampaignOptionsLabel label = new CampaignOptionsLabel(RESOURCE_BUNDLE, "lblMedicalViewDialogHandwritingFont");
+        SettingsLabel label = new SettingsLabel(TEXT_PROVIDER, "lblMedicalViewDialogHandwritingFont");
 
         comboMedicalViewDialogHandwritingFont = new FontComboBox("comboMedicalViewDialogHandwritingFont");
         comboMedicalViewDialogHandwritingFont.setToolTipText(
-              getTextAt(RESOURCE_BUNDLE, "lblMedicalViewDialogHandwritingFont.toolTipText"));
+              getText("lblMedicalViewDialogHandwritingFont.toolTipText"));
         comboMedicalViewDialogHandwritingFont.setSelectedItem(new FontDisplay(model.medicalViewDialogHandwritingFont));
 
-        CampaignOptionsFormPanel panel = new CampaignOptionsFormPanel("MHQFontsContent", FORM_LABEL_WIDTH,
+        SettingsFormPanel panel = new SettingsFormPanel("MHQFontsContent", FORM_LABEL_WIDTH,
               FORM_CONTROL_WIDTH);
         panel.addRow(label, comboMedicalViewDialogHandwritingFont);
         Component page = buildMHQPage("MHQFontsPage", "lblMHQFontsSection.text", "lblMHQFontsSection.summary", panel);

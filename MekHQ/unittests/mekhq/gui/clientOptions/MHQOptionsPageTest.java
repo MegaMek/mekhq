@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2025-2026 The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2026 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -30,27 +30,19 @@
  * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
  * affiliated with Microsoft.
  */
-package mekhq.gui.campaignOptions.components;
+package mekhq.gui.clientOptions;
 
-import static mekhq.gui.campaignOptions.components.CampaignOptionsComponentSupport.campaignTextProvider;
-import static mekhq.gui.campaignOptions.components.CampaignOptionsComponentSupport.textProvider;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static mekhq.utilities.MHQInternationalization.getFormattedText;
+import static mekhq.utilities.MHQInternationalization.getText;
 
-import megamek.common.annotations.Nullable;
-import megamek.client.ui.settings.SettingsTextField;
+import org.junit.jupiter.api.Test;
 
-/** Campaign-specific resource-key adapter over {@link SettingsTextField}. */
-public class CampaignOptionsTextField extends SettingsTextField {
-    public CampaignOptionsTextField(String name) {
-        this(name, (Integer) null);
-    }
-
-    public CampaignOptionsTextField(String name, @Nullable Integer customWrapSize) {
-        super(campaignTextProvider(), "lbl" + name, customWrapSize);
-        setName("lbl" + name);
-    }
-
-    public CampaignOptionsTextField(String resourceBundleName, String name) {
-        super(textProvider(resourceBundleName), name);
-        setName("lbl" + name);
+class MHQOptionsPageTest {
+    @Test
+    void clientOptionsProviderUsesDefaultBundleLookups() {
+        assertEquals(getText("displayPage.title"), MHQOptionsPage.TEXT_PROVIDER.getText("displayPage.title"));
+        assertEquals(getFormattedText("editLog.dialog.title", "Test"),
+              MHQOptionsPage.TEXT_PROVIDER.getFormattedText("editLog.dialog.title", "Test"));
     }
 }

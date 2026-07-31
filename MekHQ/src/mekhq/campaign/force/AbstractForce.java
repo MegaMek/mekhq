@@ -656,8 +656,8 @@ public abstract class AbstractForce {
         return combatTeams;
     }
 
-    public ArrayList<CombatTeam> getCombatTeamsAsList(Campaign campaign) {
-        ArrayList<CombatTeam> combatTeamsList = new ArrayList<>();
+    public List<CombatTeam> getCombatTeamsAsList(Campaign campaign) {
+        List<CombatTeam> combatTeamsList = new ArrayList<>();
         for (CombatTeam combatTeam : getCombatTeamsAsMap(campaign).values()) {
             if (formationIds.containsKey(combatTeam.getFormationId())) {
                 combatTeamsList.add(combatTeam);
