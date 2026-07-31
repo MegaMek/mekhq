@@ -33,8 +33,9 @@
 package mekhq.gui.utilities;
 
 import megamek.common.annotations.Nullable;
+import megamek.common.enums.NeuralInterfaceMode;
 import megamek.common.options.OptionsConstants;
-import megamek.common.units.Entity;
+import mekhq.campaign.Campaign;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.unit.Unit;
 
@@ -46,11 +47,14 @@ import mekhq.campaign.unit.Unit;
  * EI warriors are generated in whole formations rather than one to a star, what a reader wants to see
  * is which formations are EI units - a question the badge answers by looking down the tree.</p>
  *
- * <p>The implant alone does nothing. It works through an EI interface fitted to the unit, which
- * ProtoMeks carry built in and other units carry as equipment, so a warrior implanted in a machine
- * without one gains no benefit from it. The two cases are told apart rather than run together: an
- * implant that is working is coloured, and one that is inert is greyed and says so. The colour never
- * carries the meaning by itself - the inert case is labelled in text.</p>
+ * <p>Whether an implant does anything is a game option rather than a property of the warrior, so the
+ * badge reads {@link NeuralInterfaceMode} from the campaign's options and says what the campaign will
+ * actually see. With the rules off the implant is inert whatever the machine carries; under Pilot
+ * Abilities Only the implant alone is enough; under Full Tracking the machine must carry an EI
+ * interface too - built into every ProtoMek, equipment on anything else.</p>
+ *
+ * <p>A working implant is coloured and an inert one is greyed and says why. The colour never carries
+ * the meaning by itself - every inert case is labelled in text.</p>
  */
 public final class EnhancedImagingBadge {
 
@@ -61,7 +65,7 @@ public final class EnhancedImagingBadge {
      */
     private static final String ACTIVE_COLOUR = "#CC79A7";
 
-    /** Implanted, but in a unit with no interface for the implant to work through. */
+    /** Implanted, but under rules or in a machine that give the implant nothing to do. */
     private static final String INERT_COLOUR = "#808080";
 
     private EnhancedImagingBadge() {
@@ -94,10 +98,18 @@ public final class EnhancedImagingBadge {
         // A squad only partly implanted is worth saying so; the whole-crew case is the ordinary one and
         // reads better without a count cluttering it.
         String label = (implanted < crewSize) ? "EI %d/%d".formatted(implanted, crewSize) : "EI";
-        if (hasInterface(unit.getEntity())) {
-            return "<font color='%s'><b>[%s]</b></font> ".formatted(ACTIVE_COLOUR, label);
+        NeuralInterfaceMode mode = neuralInterfaceModeOf(unit);
+        if (!mode.isOn()) {
+            return greyed(label + ", rules off");
         }
-        return "<font color='%s'><b>[%s, no interface]</b></font> ".formatted(INERT_COLOUR, label);
+        if (mode.requiresInterfaceHardware() && !unit.getEntity().hasEiCockpit()) {
+            return greyed(label + ", no interface");
+        }
+        return "<font color='%s'><b>[%s]</b></font> ".formatted(ACTIVE_COLOUR, label);
+    }
+
+    private static String greyed(String label) {
+        return "<font color='%s'><b>[%s]</b></font> ".formatted(INERT_COLOUR, label);
     }
 
     /**
@@ -109,10 +121,12 @@ public final class EnhancedImagingBadge {
     }
 
     /**
-     * @return {@code true} if the unit can put the implant to use, which needs an EI interface fitted -
-     *       built into every ProtoMek, equipment on anything else
+     * @return the neural interface rules the unit's campaign is playing under, or
+     *       {@link NeuralInterfaceMode#OFF} for a unit with no campaign behind it
      */
-    private static boolean hasInterface(Entity entity) {
-        return entity.hasEiCockpit();
+    private static NeuralInterfaceMode neuralInterfaceModeOf(Unit unit) {
+        Campaign campaign = unit.getCampaign();
+        return (campaign == null) ? NeuralInterfaceMode.OFF
+                     : NeuralInterfaceMode.from(campaign.getGameOptions());
     }
 }

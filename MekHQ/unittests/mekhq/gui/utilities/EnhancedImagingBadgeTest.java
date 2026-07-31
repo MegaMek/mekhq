@@ -41,8 +41,11 @@ import static org.mockito.Mockito.when;
 import java.util.ArrayList;
 import java.util.List;
 
+import megamek.common.enums.NeuralInterfaceMode;
+import megamek.common.options.GameOptions;
 import megamek.common.options.OptionsConstants;
 import megamek.common.units.Entity;
+import mekhq.campaign.Campaign;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.PersonnelOptions;
 import mekhq.campaign.unit.Unit;
@@ -65,12 +68,28 @@ class EnhancedImagingBadgeTest {
         return person;
     }
 
+    /** A campaign playing under the given neural interface setting. */
+    private static Campaign campaignUnder(NeuralInterfaceMode mode) {
+        GameOptions gameOptions = new GameOptions();
+        gameOptions.getOption(OptionsConstants.ADVANCED_NEURAL_INTERFACE_MODE)
+              .setValue(mode.optionValue());
+        Campaign campaign = mock(Campaign.class);
+        when(campaign.getGameOptions()).thenReturn(gameOptions);
+        return campaign;
+    }
+
+    private static Unit unitWith(int implanted, int crewSize, boolean hasInterface) {
+        return unitWith(implanted, crewSize, hasInterface, NeuralInterfaceMode.FULL_TRACKING);
+    }
+
     /**
      * @param implanted    how many of the crew carry the implant
      * @param crewSize     how many crew the unit has
      * @param hasInterface whether the unit has an EI interface for the implant to work through
+     * @param mode         the neural interface setting the campaign is playing under
      */
-    private static Unit unitWith(int implanted, int crewSize, boolean hasInterface) {
+    private static Unit unitWith(int implanted, int crewSize, boolean hasInterface,
+          NeuralInterfaceMode mode) {
         List<Person> crew = new ArrayList<>();
         for (int seat = 0; seat < crewSize; seat++) {
             crew.add(warrior(seat < implanted));
@@ -78,9 +97,14 @@ class EnhancedImagingBadgeTest {
         Entity entity = mock(Entity.class);
         when(entity.hasEiCockpit()).thenReturn(hasInterface);
 
+        // Built before the stubbing rather than inside it: Mockito refuses a stub whose argument does
+        // its own stubbing.
+        Campaign campaign = campaignUnder(mode);
+
         Unit unit = mock(Unit.class);
         when(unit.getEntity()).thenReturn(entity);
         when(unit.getActiveCrew()).thenReturn(crew);
+        when(unit.getCampaign()).thenReturn(campaign);
         return unit;
     }
 
@@ -130,5 +154,38 @@ class EnhancedImagingBadgeTest {
         when(unit.getEntity()).thenReturn(null);
 
         assertEquals("", EnhancedImagingBadge.forUnit(unit));
+    }
+
+    /**
+     * Whether an implant does anything is a game option, and Pilot Abilities Only says the implant
+     * alone is enough. Reporting "no interface" there would tell the player their warrior is inert
+     * when the rules they are playing say otherwise.
+     */
+    @Test
+    void underPilotAbilitiesOnlyNoInterfaceIsNeeded() {
+        String badge = EnhancedImagingBadge.forUnit(
+              unitWith(5, 5, false, NeuralInterfaceMode.PILOT_ABILITIES_ONLY));
+
+        assertTrue(badge.contains("[EI]"), "the implant works on its own here, got: " + badge);
+        assertFalse(badge.contains("no interface"),
+              "the machine needs no interface under this setting");
+    }
+
+    /** With the rules off no implant does anything, whatever the machine carries. */
+    @Test
+    void withTheRulesOffTheImplantIsInert() {
+        String badge = EnhancedImagingBadge.forUnit(unitWith(5, 5, true, NeuralInterfaceMode.OFF));
+
+        assertTrue(badge.contains("rules off"),
+              "an implant the rules ignore must say so, got: " + badge);
+    }
+
+    /** Under Full Tracking the machine must carry the interface, and does. */
+    @Test
+    void underFullTrackingAnInterfaceIsEnough() {
+        String badge = EnhancedImagingBadge.forUnit(
+              unitWith(5, 5, true, NeuralInterfaceMode.FULL_TRACKING));
+
+        assertTrue(badge.contains("[EI]"), "got: " + badge);
     }
 }
