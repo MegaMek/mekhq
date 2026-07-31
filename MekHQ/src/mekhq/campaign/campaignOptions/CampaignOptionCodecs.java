@@ -51,7 +51,8 @@ import megamek.logging.MMLogger;
 import mekhq.Utilities;
 import mekhq.campaign.RandomOriginOptions;
 import mekhq.campaign.autoResolve.AutoResolveMethod;
-import mekhq.campaign.digitalGM.stratCon.StratConPlayType;
+import mekhq.campaign.digitalGM.stratCon.gm.StratConPlayType;
+import mekhq.campaign.digitalGM.stratCon.sectorGeneration.StratConSectorCountMethod;
 import mekhq.campaign.enums.PlanetaryAcquisitionFactionLimit;
 import mekhq.campaign.finances.Money;
 import mekhq.campaign.finances.enums.FinancialYearDuration;
@@ -172,6 +173,8 @@ final class CampaignOptionCodecs {
               enumCodec(EdgeRefreshPeriod::fromString, EdgeRefreshPeriod::getLookupKey));
         register(CampaignOption.STRAT_CON_PLAY_TYPE,
               enumCodec(StratConPlayType::fromLookupName, StratConPlayType::getLookupName));
+        register(CampaignOption.STRAT_CON_SECTOR_COUNT_METHOD,
+              enumCodec(StratConSectorCountMethod::fromLookupName, StratConSectorCountMethod::getLookupName));
     }
 
     /** The four contract percents clamp on write; their setters enforce the ceiling, so read routes through them. */

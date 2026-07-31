@@ -1,0 +1,251 @@
+/*
+ * Copyright (C) 2026 The MegaMek Team. All Rights Reserved.
+ *
+ * This file is part of MekHQ.
+ *
+ * MekHQ is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License (GPL),
+ * version 3 or (at your option) any later version,
+ * as published by the Free Software Foundation.
+ *
+ * MekHQ is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty
+ * of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+ * See the GNU General Public License for more details.
+ *
+ * A copy of the GPL should have been included with this project;
+ * if not, see <https://www.gnu.org/licenses/>.
+ *
+ * NOTICE: The MegaMek organization is a non-profit group of volunteers
+ * creating free software for the BattleTech community.
+ *
+ * MechWarrior, BattleMech, `Mech and AeroTech are registered trademarks
+ * of The Topps Company, Inc. All Rights Reserved.
+ *
+ * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
+ * InMediaRes Productions, LLC.
+ *
+ * MechWarrior Copyright Microsoft Corporation. MekHQ was created under
+ * Microsoft's "Game Content Usage Rules"
+ * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+ * affiliated with Microsoft.
+ */
+package mekhq.campaign.digitalGM.stratCon.sectorGeneration;
+
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+
+import megamek.common.board.Coords;
+import megamek.common.compute.Compute;
+import mekhq.campaign.digitalGM.stratCon.StratConCoords;
+import mekhq.campaign.digitalGM.stratCon.StratConTrackState;
+import mekhq.campaign.digitalGM.stratCon.biome.StratConBiomeManifest;
+
+/**
+ * Shared hex-grid helpers used by the improved sector generation placers: bounds checks, neighbor lookup, and growing
+ * an organic connected region. Keeping these in one place avoids duplicating the geometry (and the
+ * {@link StratConCoords#equals} class-sensitivity pitfall) across the ocean and mountain placers.
+ *
+ * @author Illiani
+ * @since 0.51.01
+ */
+public final class StratConHexGeometry {
+    private StratConHexGeometry() {}
+
+    /** The number of directions out of a hex. */
+    public static final int HEX_DIRECTIONS = 6;
+
+    /**
+     * @return {@code true} if the coordinates fall within the track's bounds
+     */
+    public static boolean inBounds(StratConTrackState track, Coords coords) {
+        return (coords.getX() >= 0) &&
+                     (coords.getX() < track.getWidth()) &&
+                     (coords.getY() >= 0) &&
+                     (coords.getY() < track.getHeight());
+    }
+
+    /**
+     * @return the in-bounds hex neighbors of the given coordinates
+     */
+    public static List<StratConCoords> neighbors(StratConTrackState track, StratConCoords coords) {
+        List<StratConCoords> result = new ArrayList<>();
+        for (int direction = 0; direction < HEX_DIRECTIONS; direction++) {
+            StratConCoords neighbor = coords.translate(direction);
+            if (inBounds(track, neighbor)) {
+                result.add(neighbor);
+            }
+        }
+        return result;
+    }
+
+    /**
+     * Collects every in-bounds hex within {@code radius} steps of {@code center}, the center included: 1 hex at radius
+     * 0, 7 at radius 1, 19 at radius 2, less where the sector edge clips it.
+     *
+     * <p>The area is grown a ring at a time through {@link #neighbors} rather than measured with
+     * {@link StratConCoords#distance}. {@link StratConCoords} inherits {@code distance} from MegaMek's {@code Coords}
+     * but overrides {@link StratConCoords#translate} to correct for the parity-offset layout StratCon stores its hexes
+     * in, so the inherited distance is measured in a different coordinate convention than the map actually uses. Using
+     * it as a radius yields a lopsided blob that is shifted a row off in the neighboring columns - always prefer this
+     * method for "hexes near a hex".</p>
+     *
+     * @param track  the track providing bounds and adjacency
+     * @param center the hex at the middle of the area
+     * @param radius how many steps out to reach, 0 for the center hex alone
+     *
+     * @return the hexes covered, including {@code center}
+     */
+    public static Set<StratConCoords> withinRadius(StratConTrackState track, StratConCoords center, int radius) {
+        return stepDistancesWithin(track, center, radius).keySet();
+    }
+
+    /**
+     * @param track  the track providing bounds and adjacency
+     * @param center the hex to measure from
+     * @param radius how many steps out to reach
+     *
+     * @return each in-bounds hex within {@code radius} of {@code center}, mapped to how many steps away it is
+     *       ({@code center} itself maps to 0)
+     */
+    public static Map<StratConCoords, Integer> stepDistancesWithin(StratConTrackState track, StratConCoords center,
+          int radius) {
+        return stepDistancesFrom(track, List.of(center), radius);
+    }
+
+    /**
+     * Multi-source breadth-first sweep over the track's hexes, measuring how many steps each hex lies from the nearest
+     * source. Terrain is ignored - this is straight-line hex distance across the map, not travel cost.
+     *
+     * <p>Always prefer this to {@link StratConCoords#distance} when the answer feeds back into the map. See
+     * {@link #withinRadius} for why the inherited coordinate distance disagrees with StratCon's own adjacency.</p>
+     *
+     * @param track     the track providing bounds and adjacency
+     * @param sources   the hexes to measure from; each maps to 0
+     * @param maxRadius how far to sweep, or {@link Integer#MAX_VALUE} to cover the whole track
+     *
+     * @return each reached hex mapped to its distance from the nearest source
+     */
+    public static Map<StratConCoords, Integer> stepDistancesFrom(StratConTrackState track,
+          Collection<StratConCoords> sources, int maxRadius) {
+        Map<StratConCoords, Integer> distances = new HashMap<>();
+        Set<StratConCoords> frontier = new HashSet<>();
+
+        for (StratConCoords source : sources) {
+            if (inBounds(track, source) && (distances.putIfAbsent(source, 0) == null)) {
+                frontier.add(source);
+            }
+        }
+
+        for (int step = 1; (step <= maxRadius) && !frontier.isEmpty(); step++) {
+            Set<StratConCoords> nextRing = new HashSet<>();
+            for (StratConCoords coords : frontier) {
+                for (StratConCoords neighbor : neighbors(track, coords)) {
+                    if (distances.putIfAbsent(neighbor, step) == null) {
+                        nextRing.add(neighbor);
+                    }
+                }
+            }
+            frontier = nextRing;
+        }
+
+        return distances;
+    }
+
+    /**
+     * Grows a connected region from {@code seed} up to {@code size} hexes, never entering a {@code blocked} hex. The
+     * region expands from a randomly chosen frontier hex each step, producing an organic (non-circular) blob.
+     *
+     * @param track   the track providing bounds
+     * @param seed    the starting hex
+     * @param size    the desired region size in hexes
+     * @param blocked hexes the region may not enter
+     *
+     * @return the grown region (possibly smaller than {@code size} if it runs out of room)
+     */
+    public static Set<StratConCoords> growBlob(StratConTrackState track, StratConCoords seed, int size,
+          Set<StratConCoords> blocked) {
+        Set<StratConCoords> region = new HashSet<>();
+        if ((size <= 0) || !inBounds(track, seed) || blocked.contains(seed)) {
+            return region;
+        }
+
+        List<StratConCoords> frontier = new ArrayList<>();
+        region.add(seed);
+        frontier.add(seed);
+
+        while ((region.size() < size) && !frontier.isEmpty()) {
+            StratConCoords current = frontier.get(Compute.randomInt(frontier.size()));
+
+            List<StratConCoords> candidates = new ArrayList<>();
+            for (StratConCoords neighbor : neighbors(track, current)) {
+                if (!region.contains(neighbor) && !blocked.contains(neighbor)) {
+                    candidates.add(neighbor);
+                }
+            }
+
+            if (candidates.isEmpty()) {
+                frontier.remove(current);
+                continue;
+            }
+
+            StratConCoords next = candidates.get(Compute.randomInt(candidates.size()));
+            region.add(next);
+            frontier.add(next);
+        }
+        return region;
+    }
+
+    /**
+     * @return a uniformly random hex anywhere in the sector. Used to seed a feature that may start anywhere - a lake, a
+     *       scattered peak - as opposed to one that has to start at an edge or the middle.
+     */
+    public static StratConCoords randomCoords(StratConTrackState track) {
+        return new StratConCoords(Compute.randomInt(track.getWidth()), Compute.randomInt(track.getHeight()));
+    }
+
+    /**
+     * @return a uniformly random hex on one of the sector's four edges. Used to seed features that read as running in
+     *       from off the map, such as a coastline or a mountain range crossing the sector.
+     */
+    public static StratConCoords randomEdgeCoords(StratConTrackState track) {
+        int width = track.getWidth();
+        int height = track.getHeight();
+
+        // Pick one of the four edges, then a random position along it.
+        return switch (Compute.randomInt(4)) {
+            case 0 -> new StratConCoords(Compute.randomInt(width), 0);
+            case 1 -> new StratConCoords(Compute.randomInt(width), height - 1);
+            case 2 -> new StratConCoords(0, Compute.randomInt(height));
+            default -> new StratConCoords(width - 1, Compute.randomInt(height));
+        };
+    }
+
+    /** @return the sector's middle hex, for a feature meant to sit centrally such as a single inland sea or upland. */
+    public static StratConCoords centerCoords(StratConTrackState track) {
+        return new StratConCoords(track.getWidth() / 2, track.getHeight() / 2);
+    }
+
+    /**
+     * @return every ocean hex in the sector. Collected in one sweep because several placers need the whole set - to
+     *       keep mountains out of the water, to stop a city blob growing into it, and to reveal it, since open water
+     *       carries no fog of war.
+     */
+    public static Set<StratConCoords> oceanHexes(StratConTrackState track) {
+        Set<StratConCoords> ocean = new HashSet<>();
+        for (int x = 0; x < track.getWidth(); x++) {
+            for (int y = 0; y < track.getHeight(); y++) {
+                StratConCoords coords = new StratConCoords(x, y);
+                if (StratConBiomeManifest.isOceanTerrain(track.getTerrainTile(coords))) {
+                    ocean.add(coords);
+                }
+            }
+        }
+        return ocean;
+    }
+}
