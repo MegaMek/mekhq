@@ -38,6 +38,7 @@ import static java.lang.Math.floor;
 import static java.lang.Math.max;
 import static megamek.common.board.Board.START_NONE;
 import static megamek.common.equipment.MiscType.F_CARGO;
+import static megamek.common.units.EntityWeightClass.WEIGHT_ASSAULT;
 import static megamek.common.units.EntityWeightClass.WEIGHT_HEAVY;
 import static megamek.common.units.EntityWeightClass.WEIGHT_LIGHT;
 import static megamek.common.units.EntityWeightClass.WEIGHT_MEDIUM;
@@ -107,6 +108,7 @@ import mekhq.MHQStaticDirectoryManager;
 import mekhq.MekHQ;
 import mekhq.Utilities;
 import mekhq.campaign.Campaign;
+import mekhq.campaign.campaignOptions.CampaignOption;
 import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.enums.CampaignTransportType;
 import mekhq.campaign.events.persons.PersonCrewAssignmentEvent;
@@ -4952,6 +4954,95 @@ public class Unit implements ITechnology, ILocatable {
         }
     }
 
+    /**
+     * Returns the Piloting skill modifier granted to the given crew member by their weight-class Affinity/Antipathy
+     * Special Pilot Ability or Flaw on this unit, or {@code 0} if none applies.
+     *
+     * @param person the crew member whose abilities are being applied; may be {@code null}
+     *
+     * @return the piloting-skill modifier to add (negative improves the skill, positive worsens it)
+     */
+    private int getWeightClassAffinityModifier(@Nullable Person person) {
+        if ((person == null) || !getCampaign().getCampaignOptions().get(CampaignOption.USE_ABILITIES)) {
+            return 0;
+        }
+
+        // Resolve the ability pair (affinity, antipathy) for this unit's family and weight class.
+        String affinity;
+        String antipathy;
+        int weightClass = entity.getWeightClass();
+
+        if (entity.isMek()) {
+            switch (weightClass) {
+                case WEIGHT_LIGHT -> {
+                    affinity = PersonnelOptions.MEK_AFFINITY_LIGHT;
+                    antipathy = PersonnelOptions.MEK_ANTIPATHY_LIGHT;
+                }
+                case WEIGHT_MEDIUM -> {
+                    affinity = PersonnelOptions.MEK_AFFINITY_MEDIUM;
+                    antipathy = PersonnelOptions.MEK_ANTIPATHY_MEDIUM;
+                }
+                case WEIGHT_HEAVY -> {
+                    affinity = PersonnelOptions.MEK_AFFINITY_HEAVY;
+                    antipathy = PersonnelOptions.MEK_ANTIPATHY_HEAVY;
+                }
+                case WEIGHT_ASSAULT -> {
+                    affinity = PersonnelOptions.MEK_AFFINITY_ASSAULT;
+                    antipathy = PersonnelOptions.MEK_ANTIPATHY_ASSAULT;
+                }
+                default -> {return 0;}
+            }
+        } else if (entity.isFighter()) {
+            switch (weightClass) {
+                case WEIGHT_LIGHT -> {
+                    affinity = PersonnelOptions.FLIGHT_AFFINITY_LIGHT;
+                    antipathy = PersonnelOptions.FLIGHT_ANTIPATHY_LIGHT;
+                }
+                case WEIGHT_MEDIUM -> {
+                    affinity = PersonnelOptions.FLIGHT_AFFINITY_MEDIUM;
+                    antipathy = PersonnelOptions.FLIGHT_ANTIPATHY_MEDIUM;
+                }
+                case WEIGHT_HEAVY -> {
+                    affinity = PersonnelOptions.FLIGHT_AFFINITY_HEAVY;
+                    antipathy = PersonnelOptions.FLIGHT_ANTIPATHY_HEAVY;
+                }
+                default -> {return 0;}
+            }
+        } else if (entity.isVehicle()) {
+            switch (weightClass) {
+                case WEIGHT_LIGHT -> {
+                    affinity = PersonnelOptions.VEHICULAR_AFFINITY_LIGHT;
+                    antipathy = PersonnelOptions.VEHICULAR_ANTIPATHY_LIGHT;
+                }
+                case WEIGHT_MEDIUM -> {
+                    affinity = PersonnelOptions.VEHICULAR_AFFINITY_MEDIUM;
+                    antipathy = PersonnelOptions.VEHICULAR_ANTIPATHY_MEDIUM;
+                }
+                case WEIGHT_HEAVY -> {
+                    affinity = PersonnelOptions.VEHICULAR_AFFINITY_HEAVY;
+                    antipathy = PersonnelOptions.VEHICULAR_ANTIPATHY_HEAVY;
+                }
+                case WEIGHT_ASSAULT -> {
+                    affinity = PersonnelOptions.VEHICULAR_AFFINITY_ASSAULT;
+                    antipathy = PersonnelOptions.VEHICULAR_ANTIPATHY_ASSAULT;
+                }
+                default -> {return 0;}
+            }
+        } else {
+            return 0;
+        }
+
+        PersonnelOptions options = person.getOptions();
+        int modifier = 0;
+        if (options.booleanOption(affinity)) {
+            modifier -= 1; // +1 skill bonus lowers the target number
+        }
+        if (options.booleanOption(antipathy)) {
+            modifier += 1; // -1 skill penalty raises the target number
+        }
+        return modifier;
+    }
+
     public boolean isOnlyCommandersMatter(CampaignOptions campaignOptions) {
         return (isVehicle() && campaignOptions.isOnlyCommandersMatterVehicles()) ||
                      (isConventionalInfantry() && campaignOptions.isOnlyCommandersMatterInfantry()) ||
@@ -5147,10 +5238,10 @@ public class Unit implements ITechnology, ILocatable {
                                                                                      .filter(e -> (cyberOptionNames.contains(
                                                                                            e.getKey()) ?
                                                                                                          e.getValue() >=
-                                                                                                         crewSize :
+                                                                                                               crewSize :
                                                                                                          e.getValue() >
-                                                                                                         crewSize /
-                                                                                                         2))
+                                                                                                               crewSize /
+                                                                                                                     2))
                                                                                      .max(Entry.comparingByValue())
                                                                                      .map(Entry::getKey))));
 
@@ -5313,7 +5404,8 @@ public class Unit implements ITechnology, ILocatable {
             SkillModifierData skillModifierData = person.getSkillModifierData();
 
             if (person.hasSkill(driveType)) {
-                sumPiloting += person.getSkill(driveType).getFinalSkillValue(skillModifierData);
+                sumPiloting += person.getSkill(driveType).getFinalSkillValue(skillModifierData)
+                                     + getWeightClassAffinityModifier(person);
                 nDrivers++;
             } else if (entity instanceof Infantry) {
                 // For infantry, we need to assign an 8 if they have no anti-mek skill
@@ -5389,7 +5481,9 @@ public class Unit implements ITechnology, ILocatable {
             SkillModifierData skillModifierData = getCommander().getSkillModifierData();
 
             Skill drivingSkill = getCommander().getSkill(driveType);
-            piloting = drivingSkill == null ? 13 : drivingSkill.getFinalSkillValue(skillModifierData);
+            piloting = drivingSkill == null ? 13
+                             : (drivingSkill.getFinalSkillValue(skillModifierData)
+                                      + getWeightClassAffinityModifier(getCommander()));
             if (entity instanceof Infantry && drivingSkill == null) {
                 piloting = 8;
             }
@@ -5679,7 +5773,8 @@ public class Unit implements ITechnology, ILocatable {
             gunnery += person.getInjuryModifiers(false);
         }
         if (person.hasSkill(driveType)) {
-            piloting = person.getSkill(driveType).getFinalSkillValue(skillModifierData);
+            piloting = person.getSkill(driveType).getFinalSkillValue(skillModifierData)
+                             + getWeightClassAffinityModifier(person);
         }
         if (person.hasSkill(SkillType.S_ARTILLERY) &&
                   person.getSkill(SkillType.S_ARTILLERY).getFinalSkillValue(skillModifierData) < artillery) {
