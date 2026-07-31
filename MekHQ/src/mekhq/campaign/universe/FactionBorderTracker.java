@@ -552,11 +552,15 @@ public class FactionBorderTracker {
      *
      * @see #setDefaultBorderSize(double, double, double)
      */
-    public void setBorderSize(Faction faction, double borderSize) {
-        if (borderSize >= 0) {
-            factionBorderSize.put(faction, borderSize);
-        } else {
-            factionBorderSize.remove(faction);
+    public synchronized void setBorderSize(Faction faction, double borderSize) {
+        Double previous = (borderSize >= 0)
+                                ? factionBorderSize.put(faction, borderSize)
+                                : factionBorderSize.remove(faction);
+        double effectivePrevious = (previous != null) ? previous : getDefaultBorderSize(faction);
+        double effectiveNew = (borderSize >= 0) ? borderSize : getDefaultBorderSize(faction);
+        if (Math.abs(effectivePrevious - effectiveNew) > RegionPerimeter.EPSILON) {
+            invalid = true;
+            recalculate();
         }
     }
 
@@ -568,10 +572,17 @@ public class FactionBorderTracker {
      * @param periphery Default border size for Periphery factions
      * @param clan      Default border size for Clan factions
      */
-    public void setDefaultBorderSize(double is, double periphery, double clan) {
+    public synchronized void setDefaultBorderSize(double is, double periphery, double clan) {
+        boolean changed = (Math.abs(isBorderSize - is) > RegionPerimeter.EPSILON)
+                                || (Math.abs(peripheryBorderSize - periphery) > RegionPerimeter.EPSILON)
+                                || (Math.abs(clanBorderSize - clan) > RegionPerimeter.EPSILON);
         isBorderSize = is;
         peripheryBorderSize = periphery;
         clanBorderSize = clan;
+        if (changed) {
+            invalid = true;
+            recalculate();
+        }
     }
 
     /**

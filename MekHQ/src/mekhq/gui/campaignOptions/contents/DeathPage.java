@@ -49,7 +49,7 @@ import jakarta.annotation.Nullable;
 import mekhq.campaign.personnel.enums.AgeGroup;
 import mekhq.gui.campaignOptions.CampaignOptionFlag;
 import mekhq.gui.campaignOptions.components.CampaignOptionsCheckBox;
-import mekhq.gui.campaignOptions.components.CampaignOptionsFormPanel;
+import megamek.client.ui.settings.SettingsFormPanel;
 import mekhq.gui.campaignOptions.components.CampaignOptionsHeaderPanel;
 import mekhq.gui.campaignOptions.components.CampaignOptionsLabel;
 import mekhq.gui.campaignOptions.components.CampaignOptionsPagePanel;
@@ -67,7 +67,7 @@ import mekhq.gui.campaignOptions.components.CampaignOptionsSpinner;
  * no-ops.</p>
  */
 class DeathPage {
-    private static final int LABEL_COLUMN_WIDTH = CampaignOptionsFormPanel.DEFAULT_LABEL_WIDTH;
+    private static final int LABEL_COLUMN_WIDTH = SettingsFormPanel.DEFAULT_LABEL_WIDTH;
     // Wider than the default control column because the Biography combo boxes need the extra room.
     private static final int CONTROL_COLUMN_WIDTH = 240;
 
@@ -118,7 +118,7 @@ class DeathPage {
     }
 
     private @Nonnull JPanel createDeathOptionsPanel() {
-        final CampaignOptionsFormPanel panel = new CampaignOptionsFormPanel("DeathOptionsPanel",
+        final SettingsFormPanel panel = new SettingsFormPanel("DeathOptionsPanel",
                 LABEL_COLUMN_WIDTH,
                 CONTROL_COLUMN_WIDTH);
         panel.addRow(lblRandomDeathMultiplier, spnRandomDeathMultiplier);
@@ -150,7 +150,7 @@ class DeathPage {
         }
 
         // Layout the Panel
-        final CampaignOptionsFormPanel panel = new CampaignOptionsFormPanel("DeathAgeGroupsPanel",
+        final SettingsFormPanel panel = new SettingsFormPanel("DeathAgeGroupsPanel",
                 LABEL_COLUMN_WIDTH,
                 CONTROL_COLUMN_WIDTH);
         panel.addCheckBoxGrid(2, ageGroupCheckBoxes);

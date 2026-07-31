@@ -34,10 +34,10 @@ package mekhq.campaign.digitalGM;
 
 import mekhq.campaign.Campaign;
 import mekhq.campaign.ResolveScenarioTracker;
-import mekhq.campaign.digitalGM.stratCon.AbstractStratConGM;
 import mekhq.campaign.digitalGM.stratCon.StratConCampaignState;
 import mekhq.campaign.digitalGM.stratCon.StratConScenario;
 import mekhq.campaign.digitalGM.stratCon.StratConTrackState;
+import mekhq.campaign.digitalGM.stratCon.gm.AbstractStratConGM;
 
 /**
  * Strategy for advancing scenarios through their lifecycle: expiring scenarios the player ignored, returning committed

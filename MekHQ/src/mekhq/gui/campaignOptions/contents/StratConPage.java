@@ -32,6 +32,7 @@
  */
 package mekhq.gui.campaignOptions.contents;
 
+import static megamek.client.ui.WrapLayout.wordWrap;
 import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.LEGACY_RULE_BEFORE_METADATA;
 import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.MILESTONE_BEFORE_METADATA;
 import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.createTipPanelUpdater;
@@ -57,15 +58,16 @@ import megamek.client.ui.models.FileNameComboBoxModel;
 import megamek.common.enums.SkillLevel;
 import mekhq.campaign.autoResolve.AutoResolveMethod;
 import mekhq.campaign.campaignOptions.BoardScalingType;
-import mekhq.campaign.digitalGM.stratCon.StratConPlayType;
+import mekhq.campaign.digitalGM.stratCon.gm.StratConPlayType;
+import mekhq.campaign.digitalGM.stratCon.sectorGeneration.StratConSectorCountMethod;
 import mekhq.campaign.personnel.skills.Skills;
 import mekhq.gui.campaignOptions.CampaignOptionFlag;
 import mekhq.gui.campaignOptions.components.CampaignOptionsCheckBox;
-import mekhq.gui.campaignOptions.components.CampaignOptionsFormPanel;
+import megamek.client.ui.settings.SettingsFormPanel;
 import mekhq.gui.campaignOptions.components.CampaignOptionsHeaderPanel;
 import mekhq.gui.campaignOptions.components.CampaignOptionsLabel;
 import mekhq.gui.campaignOptions.components.CampaignOptionsPagePanel;
-import mekhq.gui.campaignOptions.components.CampaignOptionsPairedFieldGridPanel;
+import megamek.client.ui.settings.SettingsPairedFieldGridPanel;
 import mekhq.gui.campaignOptions.components.CampaignOptionsSpinner;
 
 /**
@@ -80,17 +82,16 @@ import mekhq.gui.campaignOptions.components.CampaignOptionsSpinner;
  * called, {@link #readFromModel(RulesetsOptionsModel)} and {@link #writeToModel(RulesetsOptionsModel)} are no-ops.</p>
  */
 class StratConPage {
-    private static final int LABEL_COLUMN_WIDTH = CampaignOptionsFormPanel.DEFAULT_LABEL_WIDTH;
-    private static final int CONTROL_COLUMN_WIDTH = CampaignOptionsFormPanel.DEFAULT_CONTROL_WIDTH;
+    private static final int LABEL_COLUMN_WIDTH = SettingsFormPanel.DEFAULT_LABEL_WIDTH;
+    private static final int CONTROL_COLUMN_WIDTH = SettingsFormPanel.DEFAULT_CONTROL_WIDTH;
     private static final int CHECKBOX_GRID_COLUMNS = 2;
     private static final int FORM_LABEL_CONTROL_GAP = 12;
     private static final int GRID_CONTROL_COLUMN_WIDTH = 100;
     // First pair column = label column + the form's label/control gap, so a
     // two-column grid's column 3 lines up
     // with the control column of the 2-column form sections on the same page. The
-    // following pair is narrower so the
-    // whole grid still stays within the shared page-width floor (312 + 303 -> 640px
-    // section; column 3 at x=312).
+            // following pair is narrower so the whole grid's 640px natural section width
+            // stays within the shared page-width floor (column 3 at x=312).
     private static final int GRID_FIRST_PAIR_COLUMN_WIDTH = LABEL_COLUMN_WIDTH + FORM_LABEL_CONTROL_GAP;
     private static final int GRID_FOLLOWING_PAIR_COLUMN_WIDTH = 303;
 
@@ -169,6 +170,11 @@ class StratConPage {
     private JCheckBox chkNoSeedForces;
     private JCheckBox chkUseGenericBattleValue;
     private JCheckBox chkUseVerboseBidding;
+    private JLabel lblStratConSectorCountMethod;
+    private MMComboBox<StratConSectorCountMethod> comboStratConSectorCountMethod;
+    private JCheckBox chkUseStratConAlternateSectorTerrain;
+    private JLabel lblStratConSectorSizeMultiplier;
+    private JSpinner spnStratConSectorSizeMultiplier;
     // end StratCon
 
     private boolean created;
@@ -190,6 +196,27 @@ class StratConPage {
         comboAutoResolveMethod = new MMComboBox<>("comboAutoResolveMethod", autoResolveTypeModel);
         minimapThemeSelector = new MMComboBox<>("minimapThemeSelector",
               new FileNameComboBoxModel(GUIPreferences.getInstance().getMinimapThemes()));
+        comboStratConSectorCountMethod = new MMComboBox<>("StratConSectorCountMethod",
+              StratConSectorCountMethod.values());
+        comboStratConSectorCountMethod.setRenderer(new DefaultListCellRenderer() {
+            @Override
+            public Component getListCellRendererComponent(
+                  JList<?> list,
+                  Object value,
+                  int index,
+                  boolean isSelected,
+                  boolean cellHasFocus) {
+
+                JLabel label = (JLabel) super.getListCellRendererComponent(
+                      list, value, index, isSelected, cellHasFocus);
+
+                if (value instanceof StratConSectorCountMethod method) {
+                    label.setToolTipText(wordWrap(method.getTooltip()));
+                }
+
+                return label;
+            }
+        });
         comboStratConPlayType = new MMComboBox<>("StratConPlayType", StratConPlayType.values());
         comboStratConPlayType.setRenderer(new DefaultListCellRenderer() {
             @Override
@@ -294,6 +321,17 @@ class StratConPage {
         chkUseGenericBattleValue.addMouseListener(createTipPanelUpdater("UseGenericBattleValue"));
         chkUseVerboseBidding = new CampaignOptionsCheckBox("UseVerboseBidding");
         chkUseVerboseBidding.addMouseListener(createTipPanelUpdater("UseVerboseBidding"));
+        lblStratConSectorCountMethod = new CampaignOptionsLabel("StratConSectorCountMethod",
+              getMetadata(new Version(0, 51, 1)));
+        lblStratConSectorCountMethod.addMouseListener(createTipPanelUpdater("StratConSectorCountMethod"));
+        comboStratConSectorCountMethod.addMouseListener(createTipPanelUpdater("StratConSectorCountMethod"));
+        chkUseStratConAlternateSectorTerrain = new CampaignOptionsCheckBox("UseStratConAlternateSectorTerrain",
+              getMetadata(new Version(0, 51, 1)));
+        chkUseStratConAlternateSectorTerrain.addMouseListener(createTipPanelUpdater("UseStratConAlternateSectorTerrain"));
+        lblStratConSectorSizeMultiplier = new CampaignOptionsLabel("StratConSectorSizeMultiplier",
+              getMetadata(new Version(0, 51, 1)));
+        spnStratConSectorSizeMultiplier = new CampaignOptionsSpinner("StratConSectorSizeMultiplier", 1.0, 0.25, 2.0,
+              0.1);
 
         JPanel generalOptionsPanel = createStratConGeneralOptionsPanel();
         JPanel scenarioGenerationPanel = createStratConScenarioGenerationPanel();
@@ -461,7 +499,7 @@ class StratConPage {
     }
 
     private @Nonnull JPanel createStratConGeneralOptionsPanel() {
-        final CampaignOptionsFormPanel panel = new CampaignOptionsFormPanel("StratConGeneralOptionsPanel",
+        final SettingsFormPanel panel = new SettingsFormPanel("StratConGeneralOptionsPanel",
               LABEL_COLUMN_WIDTH,
               CONTROL_COLUMN_WIDTH);
         panel.addRow(lblStratConPlayType, comboStratConPlayType);
@@ -471,13 +509,16 @@ class StratConPage {
               chkUseAdvancedScouting,
               chkNoSeedForces,
               chkUseGenericBattleValue,
-              chkUseVerboseBidding);
+              chkUseVerboseBidding,
+              chkUseStratConAlternateSectorTerrain);
+        panel.addRow(lblStratConSectorCountMethod, comboStratConSectorCountMethod);
+        panel.addRow(lblStratConSectorSizeMultiplier, spnStratConSectorSizeMultiplier);
 
         return panel;
     }
 
     private @Nonnull JPanel createStratConScenarioGenerationPanel() {
-        final CampaignOptionsFormPanel panel = new CampaignOptionsFormPanel("StratConScenarioGenerationPanel",
+        final SettingsFormPanel panel = new SettingsFormPanel("StratConScenarioGenerationPanel",
               LABEL_COLUMN_WIDTH,
               CONTROL_COLUMN_WIDTH);
         panel.addRow(lblOpForLanceTypeMeks, spnOpForLanceTypeMeks);
@@ -499,7 +540,7 @@ class StratConPage {
     }
 
     private @Nonnull JPanel createStratConScenarioModifiersPanel() {
-        final CampaignOptionsFormPanel panel = new CampaignOptionsFormPanel("StratConScenarioModifiersPanel",
+        final SettingsFormPanel panel = new SettingsFormPanel("StratConScenarioModifiersPanel",
               LABEL_COLUMN_WIDTH,
               CONTROL_COLUMN_WIDTH);
         panel.addRow(lblEnemyFacilityModifierDieSize, spnEnemyFacilityModifierDieSize);
@@ -513,7 +554,7 @@ class StratConPage {
     }
 
     private @Nonnull JPanel createStratConScenarioConditionsPanel() {
-        final CampaignOptionsFormPanel panel = new CampaignOptionsFormPanel("StratConScenarioConditionsPanel",
+        final SettingsFormPanel panel = new SettingsFormPanel("StratConScenarioConditionsPanel",
               LABEL_COLUMN_WIDTH,
               CONTROL_COLUMN_WIDTH);
         panel.addCheckBoxGrid(CHECKBOX_GRID_COLUMNS,
@@ -534,7 +575,7 @@ class StratConPage {
         // paired-grid widths so the grid's third
         // column lines up with the control column of the 2-column sections elsewhere on
         // this page.
-        final CampaignOptionsPairedFieldGridPanel panel = new CampaignOptionsPairedFieldGridPanel("StratConMoralePanel",
+        final SettingsPairedFieldGridPanel panel = new SettingsPairedFieldGridPanel("StratConMoralePanel",
               GRID_FIRST_PAIR_COLUMN_WIDTH,
               GRID_FOLLOWING_PAIR_COLUMN_WIDTH,
               GRID_CONTROL_COLUMN_WIDTH,
@@ -549,7 +590,7 @@ class StratConPage {
     }
 
     private @Nonnull JPanel createStratConAutoResolvePanel() {
-        final CampaignOptionsFormPanel panel = new CampaignOptionsFormPanel("StratConAutoResolvePanel",
+        final SettingsFormPanel panel = new SettingsFormPanel("StratConAutoResolvePanel",
               LABEL_COLUMN_WIDTH,
               CONTROL_COLUMN_WIDTH);
         panel.addRow(lblAutoResolveMethod, comboAutoResolveMethod);
@@ -614,6 +655,9 @@ class StratConPage {
         chkNoSeedForces.setSelected(model.noSeedForces);
         chkUseGenericBattleValue.setSelected(model.useGenericBattleValue);
         chkUseVerboseBidding.setSelected(model.useVerboseBidding);
+        comboStratConSectorCountMethod.setSelectedItem(model.stratConSectorCountMethod);
+        chkUseStratConAlternateSectorTerrain.setSelected(model.useStratConAlternateSectorTerrain);
+        spnStratConSectorSizeMultiplier.setValue(model.stratConSectorSizeMultiplier);
     }
 
     /**
@@ -668,5 +712,8 @@ class StratConPage {
         model.noSeedForces = chkNoSeedForces.isSelected();
         model.useGenericBattleValue = chkUseGenericBattleValue.isSelected();
         model.useVerboseBidding = chkUseVerboseBidding.isSelected();
+        model.stratConSectorCountMethod = comboStratConSectorCountMethod.getSelectedItem();
+        model.useStratConAlternateSectorTerrain = chkUseStratConAlternateSectorTerrain.isSelected();
+        model.stratConSectorSizeMultiplier = (double) spnStratConSectorSizeMultiplier.getValue();
     }
 }
