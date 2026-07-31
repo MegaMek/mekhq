@@ -41,6 +41,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -638,47 +639,72 @@ public class StratConContractInitializer {
         track.setHeight(height);
         track.trimToBounds();
 
-        for (StratConCoords source : displacedFacilities) {
+        for (StratConCoords source : occupiedCoords(displacedFacilities, displacedScenarios)) {
             StratConCoords destination = getUnoccupiedCoords(track);
             if (destination == null) {
-                // The capacity check above should have prevented this; drop the facility rather than strand it outside
+                // The capacity check above should have prevented this; drop the occupant rather than strand it outside
                 // the sector, where it would be invisible and unreachable but still counted.
-                LOGGER.warn("No room to relocate facility at {} on track {}; removing it.",
+                LOGGER.warn("No room to relocate occupant at {} on track {}; removing it.",
                       source,
                       track.getDisplayableName());
-                track.removeFacility(source);
-                removeObjectiveAt(track, source);
+                dropOccupant(track, source);
                 continue;
             }
 
-            StratConFacility facility = track.getFacility(source);
-            track.removeFacility(source);
-            track.addFacility(destination, facility);
-            track.moveObjective(source, destination);
-            moveAssignedForces(track, source, destination);
-        }
-
-        for (StratConCoords source : displacedScenarios) {
-            StratConCoords destination = getUnoccupiedCoords(track);
-            if (destination == null) {
-                LOGGER.warn("No room to relocate scenario at {} on track {}; removing it.",
-                      source,
-                      track.getDisplayableName());
-                track.getScenarios().remove(source);
-                removeObjectiveAt(track, source);
-                continue;
-            }
-
-            StratConScenario scenario = track.getScenario(source);
-            track.getScenarios().remove(source);
-            scenario.setCoords(destination);
-            track.getScenarios().put(destination, scenario);
-            track.moveObjective(source, destination);
-            moveAssignedForces(track, source, destination);
+            relocateOccupant(track, source, destination);
         }
 
         // Forces left standing on ground that no longer exists are recalled.
         recallForcesOutsideBounds(track);
+    }
+
+    /**
+     * Collects the distinct hexes holding a displaced facility or scenario, facility hexes first, so that a hex shared
+     * by both is visited once.
+     *
+     * <p>A facility scenario is created on its facility's coordinates, and later completion, capture, or destruction
+     * resolves the facility by looking it up from the scenario's coordinates. Relocating the facility and the scenario
+     * separately - each to its own free hex - splits that pair, and the battle can no longer act on its facility. So
+     * the two must move together, as one occupant of a single hex.</p>
+     */
+    private static Collection<StratConCoords> occupiedCoords(Collection<StratConCoords> facilityCoords,
+          Collection<StratConCoords> scenarioCoords) {
+        Set<StratConCoords> coords = new LinkedHashSet<>(facilityCoords);
+        coords.addAll(scenarioCoords);
+        return coords;
+    }
+
+    /**
+     * Moves everything sitting on {@code source} - a facility, a scenario, or the facility scenario that is both - to
+     * {@code destination} as one occupant, carrying its strategic objective and any forces deployed to it. This keeps a
+     * facility and its co-located scenario on the same hex, which their capture and destruction rules depend on.
+     */
+    private static void relocateOccupant(StratConTrackState track, StratConCoords source, StratConCoords destination) {
+        StratConFacility facility = track.getFacility(source);
+        if (facility != null) {
+            track.removeFacility(source);
+            track.addFacility(destination, facility);
+        }
+
+        StratConScenario scenario = track.getScenario(source);
+        if (scenario != null) {
+            track.getScenarios().remove(source);
+            scenario.setCoords(destination);
+            track.getScenarios().put(destination, scenario);
+        }
+
+        track.moveObjective(source, destination);
+        moveAssignedForces(track, source, destination);
+    }
+
+    /**
+     * Removes whatever occupies {@code source} - facility, scenario, and its strategic objective - when no free hex can
+     * receive it.
+     */
+    private static void dropOccupant(StratConTrackState track, StratConCoords source) {
+        track.removeFacility(source);
+        track.getScenarios().remove(source);
+        removeObjectiveAt(track, source);
     }
 
     /** Drops any strategic objective tied to a hex whose occupant could not be saved, so nothing points at dead ground. */
@@ -842,49 +868,32 @@ public class StratConContractInitializer {
      * @param track the freshly regenerated track to clean up
      */
     private static void relocateOccupantsOffOcean(StratConTrackState track) {
-        List<StratConCoords> floodedFacilities = new ArrayList<>();
-        for (StratConCoords coords : track.getFacilities().keySet()) {
-            if (StratConBiomeManifest.isOceanTerrain(track.getTerrainTile(coords))) {
-                floodedFacilities.add(coords);
-            }
-        }
+        List<StratConCoords> floodedFacilities = floodedCoords(track, track.getFacilities().keySet());
+        List<StratConCoords> floodedScenarios = floodedCoords(track, track.getScenarios().keySet());
 
-        for (StratConCoords source : floodedFacilities) {
+        for (StratConCoords source : occupiedCoords(floodedFacilities, floodedScenarios)) {
             StratConCoords destination = getUnoccupiedCoords(track);
             if (destination == null) {
+                // No dry land left to receive it; leave the occupant where it is rather than destroy it.
                 break;
             }
 
-            StratConFacility facility = track.getFacility(source);
-            track.removeFacility(source);
-            track.addFacility(destination, facility);
-            track.moveObjective(source, destination);
-            moveAssignedForces(track, source, destination);
-        }
-
-        List<StratConCoords> floodedScenarios = new ArrayList<>();
-        for (StratConCoords coords : track.getScenarios().keySet()) {
-            if (StratConBiomeManifest.isOceanTerrain(track.getTerrainTile(coords))) {
-                floodedScenarios.add(coords);
-            }
-        }
-
-        for (StratConCoords source : floodedScenarios) {
-            StratConCoords destination = getUnoccupiedCoords(track);
-            if (destination == null) {
-                break;
-            }
-
-            StratConScenario scenario = track.getScenario(source);
-            track.getScenarios().remove(source);
-            scenario.setCoords(destination);
-            track.getScenarios().put(destination, scenario);
-            track.moveObjective(source, destination);
-            moveAssignedForces(track, source, destination);
+            relocateOccupant(track, source, destination);
         }
 
         // A force standing on ground that just flooded, with no facility or scenario to carry it ashore, is recalled.
         recallForcesOnOcean(track);
+    }
+
+    /** @return those of the given occupant hexes that a terrain change has left sitting on ocean. */
+    private static List<StratConCoords> floodedCoords(StratConTrackState track, Collection<StratConCoords> coords) {
+        List<StratConCoords> flooded = new ArrayList<>();
+        for (StratConCoords candidate : coords) {
+            if (StratConBiomeManifest.isOceanTerrain(track.getTerrainTile(candidate))) {
+                flooded.add(candidate);
+            }
+        }
+        return flooded;
     }
 
     /**

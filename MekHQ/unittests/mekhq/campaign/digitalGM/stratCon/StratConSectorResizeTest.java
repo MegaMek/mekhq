@@ -273,6 +273,28 @@ class StratConSectorResizeTest {
     }
 
     @Test
+    void shrink_keepsAFacilityAndItsScenarioOnTheSameHex() {
+        // A facility scenario is created on its facility's hex, and capture/destruction later resolves the facility
+        // from the scenario's coords. Relocating the two separately would split the pair and break that resolution, so
+        // a displaced facility and its co-located scenario must land on one hex.
+        StratConTrackState track = track(8, 8);
+        StratConCoords shared = new StratConCoords(7, 7);
+        track.addFacility(shared, new StratConFacility());
+        StratConScenario scenario = new StratConScenario();
+        scenario.setCoords(shared);
+        track.addScenario(scenario);
+
+        resize(track, 4, 4);
+
+        StratConCoords movedScenario = scenario.getCoords();
+        assertFalse(track.isOutOfBounds(movedScenario), "the scenario should have been moved inside the new bounds");
+        assertNotNull(track.getFacility(movedScenario),
+              "the facility must stay on the scenario's hex so the battle can still resolve it");
+        assertEquals(1, track.getFacilities().size(), "the facility should not have been duplicated or lost");
+        assertEquals(1, track.getScenarios().size(), "the scenario should not have been duplicated or lost");
+    }
+
+    @Test
     void shrink_recallsForcesLeftOutside() {
         StratConTrackState track = track(8, 8);
         track.assignForce(42, new StratConCoords(7, 7), LocalDate.of(3151, 1, 1), false);
@@ -300,6 +322,29 @@ class StratConSectorResizeTest {
               "a force was left standing on water at " + moved);
         assertTrue(track.getFacilities().containsKey(moved),
               "the force should have travelled with the facility it garrisoned");
+    }
+
+    @Test
+    void flooding_keepsAFacilityAndItsScenarioOnTheSameHex() {
+        // The ocean parallel of shrink_keepsAFacilityAndItsScenarioOnTheSameHex: when their shared hex floods, the
+        // facility and its co-located scenario must be carried ashore together, not to two separate hexes.
+        StratConTrackState track = track(8, 8);
+        StratConCoords shared = new StratConCoords(3, 3);
+        track.addFacility(shared, new StratConFacility());
+        StratConScenario scenario = new StratConScenario();
+        scenario.setCoords(shared);
+        track.addScenario(scenario);
+        track.setTerrainTile(shared, OCEAN);
+
+        StratConContractInitializer.applyTerrainChange(track, contract(), campaign());
+
+        StratConCoords movedScenario = scenario.getCoords();
+        assertFalse(StratConBiomeManifest.isOceanTerrain(track.getTerrainTile(movedScenario)),
+              "the scenario should have been moved off the water");
+        assertNotNull(track.getFacility(movedScenario),
+              "the facility must stay on the scenario's hex so the battle can still resolve it");
+        assertEquals(1, track.getFacilities().size(), "the facility should not have been duplicated or lost");
+        assertEquals(1, track.getScenarios().size(), "the scenario should not have been duplicated or lost");
     }
 
     @Test
