@@ -62,10 +62,10 @@ import mekhq.utilities.MHQXMLUtility;
  *
  * <p>Temperature offsets and tileset themes are authored here too, per terrain, so a terrain added to mm-data brings
  * its own climate and look rather than needing a matching edit in the Java. The two are separate fields on purpose:
- * {@code Steppe} takes the desert tileset while being no warmer than temperate, and {@code HotForest} is warm but
- * lush. A few name matches do remain outside this class - the fallback terrain constants in
- * {@code StratConMountainPlacer}, {@code StratConTerrainFiller} and {@code StratConSectorGenerator} - but those name a
- * single default apiece rather than classifying the whole catalogue.</p>
+ * {@code Steppe} takes the desert tileset while being no warmer than temperate, and {@code HotForest} is warm but lush.
+ * A few name matches do remain outside this class - the fallback terrain constants in {@code StratConMountainPlacer},
+ * {@code StratConTerrainFiller} and {@code StratConSectorGenerator} - but those name a single default apiece rather
+ * than classifying the whole catalogue.</p>
  *
  * <p>It carries four things:</p>
  * <ul>

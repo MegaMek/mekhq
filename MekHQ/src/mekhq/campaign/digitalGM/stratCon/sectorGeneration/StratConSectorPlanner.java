@@ -121,8 +121,8 @@ public final class StratConSectorPlanner {
      * so a contract fielding up to a regiment gets a single sector and larger ones get a sector per regiment.
      *
      * <p>Uncapped, like the alternate count it scales from. The cap that
-     * {@link StratConSectorCountMethod#ALTERNATE_CONDENSED}
-     * applies would need 450 combat teams to bite here - ten regiments - so there is nothing to guard against.</p>
+     * {@link StratConSectorCountMethod#ALTERNATE_CONDENSED} applies would need 450 combat teams to bite here - ten
+     * regiments - so there is nothing to guard against.</p>
      */
     private static List<SectorSpec> generateRegimentalSpecs(int requiredCombatFormations, int maximumTeamsPerSector) {
         int desiredSectors = max(1,

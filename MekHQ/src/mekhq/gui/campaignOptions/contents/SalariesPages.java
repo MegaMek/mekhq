@@ -50,20 +50,8 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Map.Entry;
-import javax.swing.BorderFactory;
-import javax.swing.JCheckBox;
-import javax.swing.JComponent;
-import javax.swing.JLabel;
-import javax.swing.JPanel;
-import javax.swing.JScrollPane;
-import javax.swing.JSpinner;
+import javax.swing.*;
 import javax.swing.JSpinner.DefaultEditor;
-import javax.swing.JTable;
-import javax.swing.JTextField;
-import javax.swing.RowFilter;
-import javax.swing.SpinnerNumberModel;
-import javax.swing.SwingConstants;
-import javax.swing.SwingUtilities;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 import javax.swing.table.AbstractTableModel;
@@ -81,26 +69,26 @@ import mekhq.campaign.personnel.enums.PersonnelRoleSubType;
 import mekhq.campaign.personnel.skills.Skills;
 import mekhq.gui.campaignOptions.CampaignOptionFlag;
 import mekhq.gui.campaignOptions.components.CampaignOptionsCheckBox;
-import megamek.client.ui.settings.SettingsFormPanel;
+import mekhq.gui.campaignOptions.components.CampaignOptionsFormPanel;
 import mekhq.gui.campaignOptions.components.CampaignOptionsHeaderPanel;
 import mekhq.gui.campaignOptions.components.CampaignOptionsLabel;
 import mekhq.gui.campaignOptions.components.CampaignOptionsPagePanel;
-import megamek.client.ui.settings.SettingsPairedFieldGridPanel;
+import mekhq.gui.campaignOptions.components.CampaignOptionsPairedFieldGridPanel;
 import mekhq.gui.campaignOptions.components.CampaignOptionsSpinner;
 import mekhq.gui.campaignOptions.components.CampaignOptionsStandardPanel;
 
 /**
- * The {@link SalariesPages} class represents the user interface components for configuring salary-related options in the
- * MekHQ Campaign Options dialog. This class handles the initialization, layout, and logic for various salary settings
- * spanning multiple pages.
+ * The {@link SalariesPages} class represents the user interface components for configuring salary-related options in
+ * the MekHQ Campaign Options dialog. This class handles the initialization, layout, and logic for various salary
+ * settings spanning multiple pages.
  */
 public class SalariesPages {
-    private static final int FORM_LABEL_COLUMN_WIDTH = SettingsFormPanel.DEFAULT_LABEL_WIDTH;
+    private static final int FORM_LABEL_COLUMN_WIDTH = CampaignOptionsFormPanel.DEFAULT_LABEL_WIDTH;
     // Wider than the default control column so the salary-amount spinners have room for large figures.
     private static final int FORM_CONTROL_COLUMN_WIDTH = 300;
     private static final int FORM_LABEL_CONTROL_GAP = 12;
     private static final int SECTION_CONTENT_WIDTH = FORM_LABEL_COLUMN_WIDTH + FORM_LABEL_CONTROL_GAP
-          + FORM_CONTROL_COLUMN_WIDTH;
+                                                           + FORM_CONTROL_COLUMN_WIDTH;
     private static final int GRID_CONTROL_COLUMN_WIDTH = 100;
     private static final int CIVILIAN_TABLE_WIDTH = SECTION_CONTENT_WIDTH;
     private static final int CIVILIAN_SALARY_COLUMN_WIDTH = 120;
@@ -194,28 +182,30 @@ public class SalariesPages {
         String imageAddress = getImageDirectory() + "logo_clan_coyote.png";
         String headerName = getHeaderName(type);
         salariesHeader = new CampaignOptionsHeaderPanel(headerName, imageAddress);
-        CampaignOptionsPagePanel.Builder builder = CampaignOptionsPagePanel.builder(headerName, headerName, imageAddress)
-            .header(salariesHeader)
-            .quote(getQuoteResourceName(type));
+        CampaignOptionsPagePanel.Builder builder = CampaignOptionsPagePanel.builder(headerName,
+                    headerName,
+                    imageAddress)
+                                                         .header(salariesHeader)
+                                                         .quote(getQuoteResourceName(type));
 
         if (type == PersonnelRoleSubType.COMBAT) {
             chkDisableSecondaryRoleSalary = new CampaignOptionsCheckBox("DisableSecondaryRoleSalary",
-                getMetadata(null, CampaignOptionFlag.CUSTOM_SYSTEM));
+                  getMetadata(null, CampaignOptionFlag.CUSTOM_SYSTEM));
             chkDisableSecondaryRoleSalary.addMouseListener(createTipPanelUpdater("DisableSecondaryRoleSalary"));
 
             builder.section("lblSalaryRulesPanel.text", "lblSalaryRulesPanel.summary", createSalaryRulesPanel())
-                    .section("lblSalaryMultipliersPanel.text",
-                            "lblSalaryMultipliersPanel.summary",
-                            createSalaryMultipliersPanel())
-                    .section("lblExperienceMultipliersPanel.text",
-                            "lblExperienceMultipliersPanel.summary",
-                            createExperienceMultipliersPanel());
+                  .section("lblSalaryMultipliersPanel.text",
+                        "lblSalaryMultipliersPanel.summary",
+                        createSalaryMultipliersPanel())
+                  .section("lblExperienceMultipliersPanel.text",
+                        "lblExperienceMultipliersPanel.summary",
+                        createExperienceMultipliersPanel());
         }
 
         JPanel panel = builder.section("lblBaseSalariesPanel.text",
-                getBaseSalariesSummaryKey(type),
-                createBaseSalariesPanel(type))
-                .build();
+                    getBaseSalariesSummaryKey(type),
+                    createBaseSalariesPanel(type))
+                             .build();
 
         markPageCreated(type);
         updateSalariesControlsFromModel(type);
@@ -248,7 +238,7 @@ public class SalariesPages {
     }
 
     private @Nonnull JPanel createSalaryRulesPanel() {
-        final SettingsFormPanel panel = new SettingsFormPanel("SalaryRulesPanel",
+        final CampaignOptionsFormPanel panel = new CampaignOptionsFormPanel("SalaryRulesPanel",
               FORM_LABEL_COLUMN_WIDTH,
               FORM_CONTROL_COLUMN_WIDTH);
         panel.addCheckBox(chkDisableSecondaryRoleSalary);
@@ -397,14 +387,14 @@ public class SalariesPages {
     }
 
     private @Nonnull JPanel createPairedFieldGridPanel(String name, JComponent[] labels, JComponent[] controls,
-            int columnCount, int controlWidth) {
-        SettingsPairedFieldGridPanel panel = new SettingsPairedFieldGridPanel(name,
+          int columnCount, int controlWidth) {
+        CampaignOptionsPairedFieldGridPanel panel = new CampaignOptionsPairedFieldGridPanel(name,
               FORM_LABEL_COLUMN_WIDTH + FORM_LABEL_CONTROL_GAP,
               FORM_CONTROL_COLUMN_WIDTH,
               controlWidth,
               columnCount);
         panel.addPairs(labels, controls);
-          return panel;
+        return panel;
     }
 
     private @Nonnull JPanel createCivilianBaseSalariesPanel() {
@@ -457,7 +447,7 @@ public class SalariesPages {
                 }
 
                 lastModelRow = modelRow;
-                sendTipToDetailsPanel(table, tableModel.getRole(modelRow).getDescription(false));
+                sendTipToDetailsPanel(tableModel.getRole(modelRow).getDescription(false));
             }
         });
 
@@ -506,8 +496,8 @@ public class SalariesPages {
         int rowCount = Math.max(1, civilianSalaryTable.getRowCount());
         int tableBodyHeight = civilianSalaryTable.getRowHeight() * rowCount;
         int scrollPaneHeight = tableBodyHeight
-              + civilianSalaryTable.getTableHeader().getPreferredSize().height
-              + UIUtil.scaleForGUI(4);
+                                     + civilianSalaryTable.getTableHeader().getPreferredSize().height
+                                     + UIUtil.scaleForGUI(4);
         Dimension viewportSize = UIUtil.scaleForGUI(CIVILIAN_TABLE_WIDTH, tableBodyHeight);
         Dimension scrollPaneSize = UIUtil.scaleForGUI(CIVILIAN_TABLE_WIDTH, scrollPaneHeight);
 

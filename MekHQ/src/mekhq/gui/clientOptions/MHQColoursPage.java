@@ -74,7 +74,8 @@ class MHQColoursPage extends MHQOptionsPage {
         setUniformWidth(allButtons);
 
         JComponent unitStatusContent = colourButtonGrid("MHQColoursUnitStatusContent", unitStatusButtons);
-        JComponent personnelStatusContent = colourButtonGrid("MHQColoursPersonnelStatusContent", personnelStatusButtons);
+        JComponent personnelStatusContent = colourButtonGrid("MHQColoursPersonnelStatusContent",
+              personnelStatusButtons);
         JComponent otherContent = colourButtonGrid("MHQColoursOtherContent", otherButtons);
         JComponent skillFeedbackContent = colourButtonGrid("MHQColoursSkillFeedbackContent", skillFeedbackButtons);
         // Register each section body's tips before the page is built; |= always evaluates its right side, so no
@@ -86,15 +87,18 @@ class MHQColoursPage extends MHQOptionsPage {
         // The disclaimer that some colours live in MegaMek's Client Options is shown as the page intro, above the
         // sections.
         Component page = pageBuilder("MHQColoursPage", hasTooltips)
-                     .intro("coloursTab.disclaimer.intro")
-                     .section("lblMHQColoursUnitStatusSection.text", "lblMHQColoursUnitStatusSection.summary",
-                           unitStatusContent)
-                     .section("lblMHQColoursPersonnelStatusSection.text",
-                           "lblMHQColoursPersonnelStatusSection.summary", personnelStatusContent)
-                     .section("lblMHQColoursOtherSection.text", "lblMHQColoursOtherSection.summary", otherContent)
-                     .section("lblMHQColoursSkillFeedbackSection.text", "lblMHQColoursSkillFeedbackSection.summary",
-                           skillFeedbackContent)
-                     .build();
+                               .intro("coloursTab.disclaimer.intro")
+                               .section("lblMHQColoursUnitStatusSection.text", "lblMHQColoursUnitStatusSection.summary",
+                                     unitStatusContent)
+                               .section("lblMHQColoursPersonnelStatusSection.text",
+                                     "lblMHQColoursPersonnelStatusSection.summary", personnelStatusContent)
+                               .section("lblMHQColoursOtherSection.text",
+                                     "lblMHQColoursOtherSection.summary",
+                                     otherContent)
+                               .section("lblMHQColoursSkillFeedbackSection.text",
+                                     "lblMHQColoursSkillFeedbackSection.summary",
+                                     skillFeedbackContent)
+                               .build();
         created = true;
         return page;
     }
@@ -149,8 +153,8 @@ class MHQColoursPage extends MHQOptionsPage {
     /**
      * Creates a colour button for each of {@code keys} (loading its initial colour from
      * {@link MHQOptionsModel#statusColours}), registers it in {@link #colourButtons} under its key so
-     * {@link #writeToModel()} can read it back, left-aligns its swatch and text, and returns the buttons in
-     * order for placement in a grid. Button widths are equalised later, once every section's buttons exist (see
+     * {@link #writeToModel()} can read it back, left-aligns its swatch and text, and returns the buttons in order for
+     * placement in a grid. Button widths are equalised later, once every section's buttons exist (see
      * {@link #setUniformWidth(List)}), so the sections' grid columns line up with each other.
      */
     private List<JComponent> buildColourButtons(String... keys) {
