@@ -33,6 +33,7 @@
 package mekhq.gui.commandGeneration.contents;
 
 import java.awt.BorderLayout;
+import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.function.BooleanSupplier;
@@ -330,7 +331,7 @@ public class ForceGeneratorTab {
             // rank assignment so the rank picker and the unit picker stay aligned.
             String snapshotFactionCode = fd.getFaction();
             if (snapshotFactionCode != null && !snapshotFactionCode.isBlank()) {
-                Faction override = Factions.getInstance().getFaction(snapshotFactionCode);
+                Faction override = resolveRankAuthority(snapshotFactionCode);
                 if (override != null) {
                     Faction previous = targetOptions.getSpecifiedFaction();
                     targetOptions.setSpecifiedFaction(override);
@@ -338,7 +339,7 @@ public class ForceGeneratorTab {
                           previous == null ? "null" : previous.getShortName(),
                           override.getShortName());
                 } else {
-                    LOGGER.warn("[CompanyGen][ForceGenTab][Faction] cbFaction code '{}' has no matching mekhq.campaign.universe.Faction; leaving specifiedFaction='{}' unchanged",
+                    LOGGER.warn("[CompanyGen][ForceGenTab][Faction] cbFaction code '{}' has no matching mekhq.campaign.universe.Faction, nor does any parent of it; leaving specifiedFaction='{}' unchanged",
                           snapshotFactionCode,
                           targetOptions.getSpecifiedFaction() == null
                                 ? "null"
@@ -346,6 +347,46 @@ public class ForceGeneratorTab {
                 }
             }
         }
+    }
+
+    /**
+     * Finds the faction whose ranks a command generated for the given RAT Generator faction key should
+     * use.
+     *
+     * <p>Sub-faction keys are a RAT Generator idea and mostly have no {@link Faction} of their own -
+     * there is no Word of Blake Shadow Divisions faction, only Word of Blake. Read literally, picking
+     * a sub-faction therefore found nothing and left the rank authority as whatever it already was,
+     * which is the campaign's own faction, so a Shadow Division came out wearing the player's ranks
+     * instead of the Word of Blake Militia's. Falling back through the parents fixes that, and does
+     * the same for every other sub-faction: {@code CFM.MiKrKl} resolves to {@code CFM}.</p>
+     *
+     * @param factionCode the RAT Generator faction key the force was generated for
+     *
+     * @return the closest matching faction, or {@code null} if neither it nor any parent of it is one
+     */
+    static @Nullable Faction resolveRankAuthority(String factionCode) {
+        // Membership has to be tested against the key list: getFaction never returns null, handing
+        // back a blank "Unknown" faction for anything it does not have. A null check therefore always
+        // passed, and picking a sub-faction set the rank authority to that placeholder - which is what
+        // put a Shadow Division in the wrong ranks rather than merely leaving them alone.
+        Collection<String> knownFactionCodes = Factions.getInstance().getFactionList();
+        String candidate = factionCode;
+        while (!candidate.isBlank()) {
+            if (knownFactionCodes.contains(candidate)) {
+                if (!candidate.equals(factionCode)) {
+                    LOGGER.info("[CompanyGen][ForceGenTab][Faction] '{}' is a sub-faction with no"
+                                + " faction of its own; taking ranks from its parent '{}'",
+                          factionCode, candidate);
+                }
+                return Factions.getInstance().getFaction(candidate);
+            }
+            int lastSeparator = candidate.lastIndexOf('.');
+            if (lastSeparator < 0) {
+                return null;
+            }
+            candidate = candidate.substring(0, lastSeparator);
+        }
+        return null;
     }
 
     public Campaign getCampaign() {
