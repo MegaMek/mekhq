@@ -49,6 +49,7 @@ import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
 
 import megamek.client.generator.RandomCallsignGenerator;
+import megamek.client.ratgenerator.C3NetworkConfigurator;
 import megamek.client.ratgenerator.ForceDescriptor;
 import megamek.client.ratgenerator.Ruleset;
 import megamek.common.annotations.Nullable;
@@ -513,6 +514,15 @@ public final class CommandGenerator {
               options.getForceDescriptorSnapshot().getFaction());
         ManeiDominiAugmentor.augment(campaign,
               options.getForceDescriptorSnapshot().getFaction(), generatedPersons);
+
+        // C3 and C3i networks. Generation picks units carrying the equipment but leaves them
+        // unlinked, so a ComStar Level II arrived with six C3i sets and no network. The wiring is
+        // MegaMek's, shared with its own force generator, and writes both the running net id and the
+        // C3 UUIDs a campaign rebuilds from after a save. The units are the same Entity instances the
+        // campaign wrapped - addNewUnit does not copy them - so wiring the descriptor wires the TOE.
+        LOGGER.info("[CompanyGen][Pipeline] Stage 7g: C3 network configuration");
+        C3NetworkConfigurator.configure(fd);
+        campaign.getPlayerForce().refreshNetworks(campaign.getGame());
 
         // 8. Spare-parts warehouse stock-up. Uses the same PartsInUseManager the daily warehouse
         // and ongoing auto-logistics rely on, so the starting inventory is consistent with the

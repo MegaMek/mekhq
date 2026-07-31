@@ -50,6 +50,7 @@ import mekhq.campaign.force.Formation;
 import mekhq.campaign.force.FormationType;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.unit.Unit;
+import mekhq.gui.utilities.C3NetworkBadge;
 import mekhq.utilities.ReportingUtilities;
 
 public class ForceRenderer extends DefaultTreeCellRenderer {
@@ -158,7 +159,11 @@ public class ForceRenderer extends DefaultTreeCellRenderer {
                                     .getName());
             }
 
-            String text = name + ", " + unitName + c3network + transport + tacticalTransport + towTransport;
+            // The network is already named under the unit; the badge puts the same information where
+            // it can be taken in without reading, so a formation sharing one network looks like one.
+            String networkBadge = C3NetworkBadge.forEntity(entity);
+            String text = networkBadge + name + ", " + unitName + c3network + transport
+                                + tacticalTransport + towTransport;
 
             mekhq.campaign.Campaign campaign = unit.getCampaign();
             int id = unit.getFormationId();
