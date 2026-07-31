@@ -80,6 +80,8 @@ public abstract class MissingPart extends Part implements IAcquisitionWork {
     private static final int FABRICATOR_ABILITY_MODIFIER = -2;
     /** The Jury-Rigger Special Ability reduces all fabrication costs by 25% (i.e. to 75% of normal). */
     private static final double JURY_RIGGER_COST_MULTIPLIER = 0.75;
+    /** The Wasteful flaw increases all fabrication (and repair) costs by 25% (i.e. to 125% of normal). */
+    private static final double WASTEFUL_COST_MULTIPLIER = 1.25;
     /** Fraction of a part's undamaged value charged as the cost of a normal repair when 'Pay For Repairs' is enabled. */
     private static final double REPAIR_COST_FRACTION = 0.2;
     /** The purchase price of a fabricated part is half the sale price of a new component. */
@@ -308,7 +310,7 @@ public abstract class MissingPart extends Part implements IAcquisitionWork {
     /**
      * Computes the cost of a single fabrication attempt performed by the given tech. Identical to
      * {@link #getFabricationCost()} except that the Jury-Rigger Special Ability, if the tech has it, reduces the total
-     * by 25%.
+     * by 25%, or the Wasteful flaw increases it by 25%.
      *
      * @param tech the tech who would perform the fabrication, or {@code null} to price it without any tech ability
      *
@@ -333,9 +335,13 @@ public abstract class MissingPart extends Part implements IAcquisitionWork {
             cost = cost.plus(newPart.getActualValue().multipliedBy(partFraction));
         }
 
-        // The Jury-Rigger Special Ability reduces all fabrication costs by 25%.
-        if ((tech != null) && tech.getOptions().booleanOption(PersonnelOptions.TECH_JURY_RIGGER)) {
-            cost = cost.multipliedBy(JURY_RIGGER_COST_MULTIPLIER);
+        // The Jury-Rigger and Wasteful Special Abilities adjust all fabrication costs (they are mutually exclusive).
+        if (tech != null) {
+            if (tech.getOptions().booleanOption(PersonnelOptions.TECH_JURY_RIGGER)) {
+                cost = cost.multipliedBy(JURY_RIGGER_COST_MULTIPLIER);
+            } else if (tech.getOptions().booleanOption(PersonnelOptions.TECH_WASTEFUL)) {
+                cost = cost.multipliedBy(WASTEFUL_COST_MULTIPLIER);
+            }
         }
         return cost;
     }

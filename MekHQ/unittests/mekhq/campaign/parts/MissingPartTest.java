@@ -370,6 +370,32 @@ public class MissingPartTest {
     }
 
     @Test
+    public void wastefulFlawIncreasesFabricationCostByAQuarter() {
+        Campaign mockCampaign = mockCampaign();
+        CampaignOptions options = new CampaignOptions();
+        options.set(CampaignOption.USE_BALANCED_FABRICATION, true);
+        options.set(CampaignOption.PAY_FOR_PARTS, true);
+        options.set(CampaignOption.PAY_FOR_REPAIRS, true);
+        when(mockCampaign.getCampaignOptions()).thenReturn(options);
+        MissingPart missingPart = new MissingMekLocation(Mek.LOC_LEFT_ARM, 20, EquipmentType.T_STRUCTURE_STANDARD,
+              false, false, false, mockCampaign);
+        missingPart.setFabricating(true);
+
+        Person plainTech = mock(Person.class);
+        when(plainTech.getOptions()).thenReturn(new PersonnelOptions());
+
+        Person wastefulTech = mock(Person.class);
+        PersonnelOptions wastefulOptions = new PersonnelOptions();
+        wastefulOptions.getOption(PersonnelOptions.TECH_WASTEFUL).setValue(true);
+        when(wastefulTech.getOptions()).thenReturn(wastefulOptions);
+
+        Money fullCost = missingPart.getFabricationCost(plainTech);
+        Money surchargedCost = missingPart.getFabricationCost(wastefulTech);
+
+        assertEquals(fullCost.multipliedBy(1.25), surchargedCost);
+    }
+
+    @Test
     public void balancedFabricationCostsTenTimesThePartPrice() {
         Campaign mockCampaign = mockCampaign();
         CampaignOptions options = new CampaignOptions();
