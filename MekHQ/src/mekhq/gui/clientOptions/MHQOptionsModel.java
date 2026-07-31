@@ -159,6 +159,7 @@ class MHQOptionsModel {
 
     // region New Day - Training
     boolean newMonthQuickTrain;
+    boolean quickTrainIgnoreTrainingFormations;
     int quickTrainTarget;
     boolean levelArtillery;
     boolean levelScouting;
@@ -318,6 +319,7 @@ class MHQOptionsModel {
 
         // New Day - Training
         newMonthQuickTrain = options.getNewMonthQuickTrain();
+        quickTrainIgnoreTrainingFormations = options.getQuickTrainIgnoreTrainingFormations();
         quickTrainTarget = options.getQuickTrainTarget();
         levelArtillery = options.getLevelArtillery();
         levelScouting = options.getLevelScouting();
@@ -487,6 +489,7 @@ class MHQOptionsModel {
 
         // New Day - Training
         options.setNewMonthQuickTrain(newMonthQuickTrain);
+        options.setQuickTrainIgnoreTrainingFormations(quickTrainIgnoreTrainingFormations);
         options.setQuickTrainTarget(quickTrainTarget);
         options.setLevelArtillery(levelArtillery);
         options.setLevelScouting(levelScouting);
