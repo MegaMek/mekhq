@@ -59,6 +59,7 @@ import mekhq.campaign.parts.Part;
 import mekhq.campaign.parts.PartInventory;
 import mekhq.campaign.parts.equipment.MissingAmmoBin;
 import mekhq.campaign.personnel.Person;
+import mekhq.campaign.personnel.PersonnelOptions;
 import mekhq.campaign.personnel.skills.SkillType;
 import mekhq.campaign.unit.Unit;
 import mekhq.campaign.work.IAcquisitionWork;
@@ -75,6 +76,8 @@ public abstract class MissingPart extends Part implements IAcquisitionWork {
     private static final int FABRICATION_MULTIPLIER = 10;
     /** A fabrication attempt receives an additional +2 to its target number. */
     private static final int FABRICATION_MODIFIER = 2;
+    /** The Fabricator Special Ability reduces the fabrication target number by 2. */
+    private static final int FABRICATOR_ABILITY_MODIFIER = -2;
     /** Fraction of a part's undamaged value charged as the cost of a normal repair when 'Pay For Repairs' is enabled. */
     private static final double REPAIR_COST_FRACTION = 0.2;
     /** The purchase price of a fabricated part is half the sale price of a new component. */
@@ -303,6 +306,10 @@ public abstract class MissingPart extends Part implements IAcquisitionWork {
         TargetRoll mods = super.getAllMods(tech);
         if (isFabricating()) {
             mods.addModifier(FABRICATION_MODIFIER, "fabricating");
+            // The Fabricator Special Ability offsets the fabrication penalty.
+            if ((tech != null) && tech.getOptions().booleanOption(PersonnelOptions.TECH_FABRICATOR)) {
+                mods.addModifier(FABRICATOR_ABILITY_MODIFIER, "Fabricator");
+            }
         }
         return mods;
     }

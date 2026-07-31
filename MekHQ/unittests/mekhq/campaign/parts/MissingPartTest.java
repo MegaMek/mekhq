@@ -55,6 +55,7 @@ import mekhq.campaign.parts.meks.MekLocation;
 import mekhq.campaign.parts.missing.MissingMekLocation;
 import mekhq.campaign.parts.missing.MissingPart;
 import mekhq.campaign.personnel.Person;
+import mekhq.campaign.personnel.PersonnelOptions;
 import mekhq.campaign.unit.Unit;
 import org.junit.jupiter.api.Test;
 
@@ -317,6 +318,29 @@ public class MissingPartTest {
         missingPart.setFabricating(true);
 
         assertEquals(normalMod + 2, missingPart.getAllMods(null).getValue());
+    }
+
+    @Test
+    public void fabricatorAbilityOffsetsTheFabricationPenalty() {
+        Campaign mockCampaign = mockCampaign();
+        when(mockCampaign.getCampaignOptions()).thenReturn(new CampaignOptions());
+        MissingPart missingPart = new MissingMekLocation(Mek.LOC_LEFT_ARM, 20, EquipmentType.T_STRUCTURE_STANDARD,
+              false, false, false, mockCampaign);
+        missingPart.setFabricating(true);
+
+        Person plainTech = mock(Person.class);
+        when(plainTech.getOptions()).thenReturn(new PersonnelOptions());
+
+        Person fabricatorTech = mock(Person.class);
+        PersonnelOptions fabricatorOptions = new PersonnelOptions();
+        fabricatorOptions.getOption(PersonnelOptions.TECH_FABRICATOR).setValue(true);
+        when(fabricatorTech.getOptions()).thenReturn(fabricatorOptions);
+
+        int withoutSpa = missingPart.getAllMods(plainTech).getValue();
+        int withSpa = missingPart.getAllMods(fabricatorTech).getValue();
+
+        // The Fabricator SPA reduces the fabrication target number by 2.
+        assertEquals(withoutSpa - 2, withSpa);
     }
 
     @Test
