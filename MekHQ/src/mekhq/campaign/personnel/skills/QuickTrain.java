@@ -497,15 +497,15 @@ public class QuickTrain {
           boolean isLevelEscapeSkills,
           boolean isLevelLeadership,
           boolean isLevelTraining,
-            boolean isLevelOtherCommandSkills,
-            boolean ignoreTrainingFormations
+                    boolean isLevelOtherCommandSkills,
+                    boolean ignoreTrainingFormations
     ) {
-              public QuickTrainOptions(boolean isLevelArtillery, boolean isLevelScoutingSkills,
-                  boolean isLevelEscapeSkills, boolean isLevelLeadership, boolean isLevelTraining,
-                  boolean isLevelOtherCommandSkills) {
-                this(isLevelArtillery, isLevelScoutingSkills, isLevelEscapeSkills, isLevelLeadership, isLevelTraining,
-                    isLevelOtherCommandSkills, false);
-              }
+                public QuickTrainOptions(boolean isLevelArtillery, boolean isLevelScoutingSkills,
+                            boolean isLevelEscapeSkills, boolean isLevelLeadership, boolean isLevelTraining,
+                            boolean isLevelOtherCommandSkills) {
+                        this(isLevelArtillery, isLevelScoutingSkills, isLevelEscapeSkills, isLevelLeadership, isLevelTraining,
+                                    isLevelOtherCommandSkills, false);
+                }
 
         // Additional logic to provide defaults for missing properties
         public static QuickTrainOptions buildQuickTrainOptions(CampaignOptions campaignOptions) {
@@ -546,7 +546,7 @@ public class QuickTrain {
                   isLevelLeadership,
                   isLevelTraining,
                   isLevelOtherCommandSkills,
-                ignoreTrainingFormations);
+                                    ignoreTrainingFormations);
         }
     }
 }

@@ -157,10 +157,10 @@ class MHQNewDayPage extends MHQOptionsPage {
 
     private JPanel createNewDayTrainingSection() {
         chkNewMonthQuickTrain = checkBox("chkNewMonthQuickTrain", model.newMonthQuickTrain);
-                        chkQuickTrainIgnoreTrainingFormations = checkBox("chkQuickTrainIgnoreTrainingFormations",
-                                          model.quickTrainIgnoreTrainingFormations);
+            chkQuickTrainIgnoreTrainingFormations = checkBox("chkQuickTrainIgnoreTrainingFormations",
+                    model.quickTrainIgnoreTrainingFormations);
 
-      SettingsLabel labelQuickTrainTarget = new SettingsLabel(TEXT_PROVIDER, "lblQuickTrainTarget");
+            SettingsLabel labelQuickTrainTarget = new SettingsLabel(TEXT_PROVIDER, "lblQuickTrainTarget");
         spinnerQuickTrainTarget =
               new SettingsSpinner(TEXT_PROVIDER, "lblQuickTrainTarget", 5, 1, 10, 1);
         spinnerQuickTrainTarget.setValue(model.quickTrainTarget);
@@ -172,9 +172,9 @@ class MHQNewDayPage extends MHQOptionsPage {
         chkLevelTraining = checkBox("chkLevelTraining", model.levelTraining);
         chkLevelOtherCommandSkills = checkBox("chkLevelOtherCommandSkills", model.levelOtherCommand);
 
-      SettingsFormPanel panel = new SettingsFormPanel("MHQNewDayTrainingContent", FORM_LABEL_WIDTH,
+                        SettingsFormPanel panel = new SettingsFormPanel("MHQNewDayTrainingContent", FORM_LABEL_WIDTH,
               FORM_CONTROL_WIDTH);
-            panel.addCheckBoxGrid(2, chkNewMonthQuickTrain, chkQuickTrainIgnoreTrainingFormations);
+                        panel.addCheckBoxGrid(2, chkNewMonthQuickTrain, chkQuickTrainIgnoreTrainingFormations);
         panel.addRow(labelQuickTrainTarget, spinnerQuickTrainTarget);
         panel.addCheckBoxGrid(2, chkLevelArtillery, chkLevelScoutingSkills, chkLevelEscapeSkills, chkLevelLeadership,
               chkLevelTraining, chkLevelOtherCommandSkills);
