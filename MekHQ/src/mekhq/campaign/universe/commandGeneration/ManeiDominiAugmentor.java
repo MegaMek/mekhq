@@ -65,10 +65,6 @@ public final class ManeiDominiAugmentor {
     /** The RAT Generator faction key for the Word of Blake Shadow Divisions. */
     public static final String SHADOW_DIVISION_FACTION_KEY = "WOB.SD";
 
-    /** Manei Domini ranks in order of standing, lowest first, for deriving one from a campaign rank. */
-    private static final ManeiDominiAugmentationRank[] BY_STANDING =
-          ManeiDominiAugmentationRank.values();
-
     private ManeiDominiAugmentor() {
     }
 
@@ -189,19 +185,16 @@ public final class ManeiDominiAugmentor {
      * count against the allowance.</p>
      */
     private static int issueImplants(Person person, ManeiDominiAugmentationRank augmentationRank) {
-        PersonnelOptions options = person.getOptions();
-        options.acquireAbility(PersonnelOptions.MD_ADVANTAGES,
-              ManeiDominiImplants.getExplosiveCharge(), true);
-
         boolean warriorFightsOnFoot = fightsOnFoot(person);
-        List<String> issued = ManeiDominiImplants.selectFor(augmentationRank, warriorFightsOnFoot);
-        for (String option : issued) {
-            options.acquireAbility(PersonnelOptions.MD_ADVANTAGES, option, true);
-        }
+        // Selected and fitted by the shared code, so a warrior raised in MegaMek's generator is
+        // augmented exactly as one raised here. A campaign's PersonnelOptions is a PilotOptions, which
+        // is what lets the one method serve both.
+        List<String> issued = ManeiDominiImplants.fitTo(person.getOptions(), augmentationRank,
+              warriorFightsOnFoot);
 
-        // Read every implant back off the person. acquireAbility silently does nothing if the option
-        // name is not in the group, so a typo or a renamed constant would otherwise leave the log
-        // claiming implants the warrior does not actually carry.
+        // Read every implant back off the person. Setting an option the group does not carry does
+        // nothing, so a typo or a renamed constant would otherwise leave the log claiming implants the
+        // warrior does not actually carry.
         List<String> confirmed = new ArrayList<>();
         List<String> failed = new ArrayList<>();
         for (String option : issued) {
@@ -247,13 +240,13 @@ public final class ManeiDominiAugmentor {
      * allow.
      */
     private static ManeiDominiAugmentationRank rankFor(Person person) {
-        int rankIndex = Math.max(0, person.getRankNumeric());
-        int rankCount = Math.max(1, person.getRankSystem().getRanks().size() - 1);
-        int band = (rankIndex * BY_STANDING.length) / rankCount;
-        ManeiDominiAugmentationRank derived = BY_STANDING[Math.min(band, BY_STANDING.length - 1)];
-        LOGGER.debug("[ManeiDomini]     rank derivation for '{}': militaryRank='{}' index={} of {}"
-                    + " -> band {} -> {}",
-              person.getFullName(), person.getRankName(), rankIndex, rankCount, band, derived);
+        int rankIndex = person.getRankNumeric();
+        int highestRankIndex = person.getRankSystem().getRanks().size() - 1;
+        // Shared with MegaMek's generator so a Shadow Division raised in either comes out the same.
+        ManeiDominiAugmentationRank derived =
+              ManeiDominiAugmentationRank.forRankIndex(rankIndex, highestRankIndex);
+        LOGGER.debug("[ManeiDomini]     rank derivation for '{}': militaryRank='{}' index={} of {} -> {}",
+              person.getFullName(), person.getRankName(), rankIndex, highestRankIndex, derived);
         return derived;
     }
 
