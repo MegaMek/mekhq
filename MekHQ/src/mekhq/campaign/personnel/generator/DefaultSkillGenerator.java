@@ -226,7 +226,7 @@ public class DefaultSkillGenerator extends AbstractSkillGenerator {
     @Override
     public void generateAttributes(Person person, CampaignOptions campaignOptions) {
         RandomSkillPreferences skillPreferences = getSkillPreferences();
-        boolean isUseEdge = campaignOptions.isUseEdge();
+        boolean isUseEdge = campaignOptions.get(CampaignOption.USE_EDGE);
         int maximumEdge = campaignOptions.get(CampaignOption.MAXIMUM_EDGE);
 
         // Reset Attribute Scores to default
@@ -255,23 +255,21 @@ public class DefaultSkillGenerator extends AbstractSkillGenerator {
             if (attribute.isNoAttribute()) {
                 continue;
             }
+            boolean isEdge = attribute == SkillAttribute.EDGE;
+            if (isEdge && !isUseEdge) {
+                continue;
+            }
 
             // Profession && Phenotype adjustments
             int baseAttributeScore = profession.getAttributeModifier(attribute);
             int attributeModifier = phenotype.getAttributeModifier(attribute);
             int generatedScore = baseAttributeScore + attributeModifier;
             person.setAttributeScore(attribute,
-                attribute == SkillAttribute.EDGE ? Math.min(generatedScore, maximumEdge) : generatedScore);
+                  isEdge ? Math.min(generatedScore, maximumEdge) : generatedScore);
 
             // Attribute randomization
             if (randomizeAttributes) {
-                boolean isEdge = attribute == SkillAttribute.EDGE;
-                int delta;
-                if (isEdge && isUseEdge) {
-                    delta = d6(2) == 12 ? 1 : 0;
-                } else {
-                    delta = performTraitRoll();
-                }
+                int delta = isEdge ? (d6(2) == 12 ? 1 : 0) : performTraitRoll();
 
                 if (delta != 0) {
                     if (isEdge && delta > 0) {

@@ -90,8 +90,8 @@ public abstract class AbstractSkillGenerator {
     /**
      * Generates attributes for a specified person based on their phenotype.
      *
-    * @param person          The {@link Person} for whom attributes are to be generated.
-    * @param campaignOptions The campaign options controlling attribute generation.
+     * @param person          The {@link Person} for whom attributes are to be generated.
+     * @param campaignOptions The campaign options controlling attribute generation.
      */
     public abstract void generateAttributes(Person person, CampaignOptions campaignOptions);
 

@@ -92,7 +92,7 @@ class PersonnelGeneralPage {
     private JCheckBox chkUseEdge;
     private JCheckBox chkUseTwistOfFateSurvival;
     private JCheckBox chkUseFoundersHavePlotArmor;
-      private JSpinner spnMaximumEdge;
+    private JSpinner spnMaximumEdge;
     private MMComboBox<EdgeRefreshPeriod> comboEdgeRefreshPeriod;
     private JSpinner spnEdgeRefreshCost;
     private JCheckBox chkUseImplants;
@@ -388,7 +388,7 @@ class PersonnelGeneralPage {
         chkOnlyCommandersMatterInfantry.setSelected(model.onlyCommandersMatterInfantry);
         chkOnlyCommandersMatterBattleArmor.setSelected(model.onlyCommandersMatterBattleArmor);
         chkUseEdge.setSelected(model.useEdge);
-      spnMaximumEdge.setValue(model.maximumEdge);
+        spnMaximumEdge.setValue(model.maximumEdge);
         chkUseTwistOfFateSurvival.setSelected(model.useTwistOfFateSurvival);
         chkUseFoundersHavePlotArmor.setSelected(model.useFoundersHavePlotArmor);
         comboEdgeRefreshPeriod.setSelectedItem(model.edgeRefreshPeriod);
@@ -432,7 +432,7 @@ class PersonnelGeneralPage {
         model.onlyCommandersMatterInfantry = chkOnlyCommandersMatterInfantry.isSelected();
         model.onlyCommandersMatterBattleArmor = chkOnlyCommandersMatterBattleArmor.isSelected();
         model.useEdge = chkUseEdge.isSelected();
-      model.maximumEdge = (int) spnMaximumEdge.getValue();
+        model.maximumEdge = (int) spnMaximumEdge.getValue();
         model.useTwistOfFateSurvival = chkUseTwistOfFateSurvival.isSelected();
         model.useFoundersHavePlotArmor = chkUseFoundersHavePlotArmor.isSelected();
         model.edgeRefreshPeriod = comboEdgeRefreshPeriod.getSelectedItem();

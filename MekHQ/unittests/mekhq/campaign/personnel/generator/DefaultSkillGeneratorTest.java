@@ -66,4 +66,24 @@ class DefaultSkillGeneratorTest {
 
         assertEquals(0, person.getEdge());
     }
+
+    @Test
+    void generatedEdgeRemainsZeroWhenEdgeIsDisabled() {
+        RandomSkillPreferences preferences = new RandomSkillPreferences();
+        preferences.setUseAttributes(true);
+        preferences.setRandomizeAttributes(true);
+        CampaignOptions options = new CampaignOptions();
+        options.set(CampaignOption.USE_EDGE, false);
+        Person person = new Person("GivenName", "Surname", null, "MERC");
+        person.setPrimaryRoleDirect(PersonnelRole.MEKWARRIOR);
+        person.setEdge(5);
+
+        try (MockedStatic<Compute> compute = mockStatic(Compute.class, CALLS_REAL_METHODS)) {
+            compute.when(() -> Compute.d6(2)).thenReturn(12);
+
+            new DefaultSkillGenerator(preferences).generateAttributes(person, options);
+        }
+
+        assertEquals(0, person.getEdge());
+    }
 }
