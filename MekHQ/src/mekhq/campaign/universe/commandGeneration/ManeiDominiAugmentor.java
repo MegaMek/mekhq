@@ -36,6 +36,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import megamek.common.annotations.Nullable;
+import megamek.common.enums.AugmentedUnitType;
 import megamek.common.enums.ManeiDominiAugmentationRank;
 import megamek.common.enums.ManeiDominiImplants;
 import megamek.common.options.OptionsConstants;
@@ -186,12 +187,12 @@ public final class ManeiDominiAugmentor {
      */
     private static int issueImplants(Person person, ManeiDominiAugmentationRank augmentationRank,
           String factionCode) {
-        boolean warriorFightsOnFoot = fightsOnFoot(person);
+        AugmentedUnitType unitType = unitTypeFor(person);
         // Selected and fitted by the shared code, so a warrior raised in MegaMek's generator is
         // augmented exactly as one raised here. A campaign's PersonnelOptions is a PilotOptions, which
         // is what lets the one method serve both.
         List<String> issued = ManeiDominiImplants.fitTo(person.getOptions(), augmentationRank,
-              warriorFightsOnFoot, factionCode);
+              unitType, factionCode);
 
         // Read every implant back off the person. Setting an option the group does not carry does
         // nothing, so a typo or a renamed constant would otherwise leave the log claiming implants the
@@ -207,9 +208,9 @@ public final class ManeiDominiAugmentor {
         }
         boolean chargeFitted =
               person.getOptions().booleanOption(ManeiDominiImplants.getExplosiveCharge());
-        LOGGER.info("[ManeiDomini]   '{}': role={} fights={} rank={} -> chose {} implant(s) {}",
+        LOGGER.info("[ManeiDomini]   '{}': role={} unitType={} rank={} -> chose {} implant(s) {}",
               person.getFullName(), person.getPrimaryRole(),
-              warriorFightsOnFoot ? "on foot" : "from a cockpit", augmentationRank,
+              unitType, augmentationRank,
               issued.size(), issued);
         LOGGER.info("[ManeiDomini]     confirmed on the person: {} of {} {}; explosive charge fitted={}",
               confirmed.size(), issued.size(), confirmed, chargeFitted);
@@ -222,17 +223,35 @@ public final class ManeiDominiAugmentor {
     }
 
     /**
-     * Whether this warrior fights with their own body rather than from inside a unit, which decides
-     * which implants do anything for them. BattleArmor counts: the infantry calculators read dermal
-     * armour and the myomer implants for them the same way they do for a foot platoon.
+     * The unit type the construction rules read this warrior as, which decides both what they may
+     * carry and what does anything for them. Battle armour is its own category rather than infantry:
+     * a battle armour trooper may carry a neural interface where a foot trooper may not.
      *
      * @param person the warrior being augmented
      *
-     * @return {@code true} if their implants act on them directly rather than through a unit
+     * @return the unit type their augmentations are read against
      */
-    static boolean fightsOnFoot(Person person) {
+    static AugmentedUnitType unitTypeFor(Person person) {
         PersonnelRole role = person.getPrimaryRole();
-        return role.isSoldier() || role.isBattleArmour();
+        if (role.isBattleArmour()) {
+            return AugmentedUnitType.BATTLE_ARMOR;
+        }
+        if (role.isSoldier()) {
+            return AugmentedUnitType.CONVENTIONAL_INFANTRY;
+        }
+        if (role.isMekWarrior()) {
+            return AugmentedUnitType.BATTLE_MEK;
+        }
+        if (role.isAerospacePilot()) {
+            return AugmentedUnitType.AEROSPACE_FIGHTER;
+        }
+        if (role.isConventionalAircraftPilot()) {
+            return AugmentedUnitType.CONVENTIONAL_FIGHTER;
+        }
+        if (role.isVehicleCrewMember() || role.isGroundVehicleCrew() || role.isVTOLCrew()) {
+            return AugmentedUnitType.COMBAT_VEHICLE;
+        }
+        return AugmentedUnitType.OTHER;
     }
 
     /**
