@@ -131,7 +131,7 @@ public final class ManeiDominiAugmentor {
             ManeiDominiAugmentationRank augmentationRank = rankFor(person);
             person.setManeiDominiRank(toCampaignRank(augmentationRank));
             person.setManeiDominiClass(classFor(person));
-            implantsIssued += issueImplants(person, augmentationRank);
+            implantsIssued += issueImplants(person, augmentationRank, generationFaction);
             // Read the values back rather than trusting the setters, and show the rank name the
             // roster will actually display. If the rank system is not flagged for Manei Domini the
             // name comes out plain, which is the difference between "not assigned" and "assigned but
@@ -184,13 +184,14 @@ public final class ManeiDominiAugmentor {
      * <p>The explosive charge every Manei Domini implant carries is fitted separately and does not
      * count against the allowance.</p>
      */
-    private static int issueImplants(Person person, ManeiDominiAugmentationRank augmentationRank) {
+    private static int issueImplants(Person person, ManeiDominiAugmentationRank augmentationRank,
+          String factionCode) {
         boolean warriorFightsOnFoot = fightsOnFoot(person);
         // Selected and fitted by the shared code, so a warrior raised in MegaMek's generator is
         // augmented exactly as one raised here. A campaign's PersonnelOptions is a PilotOptions, which
         // is what lets the one method serve both.
         List<String> issued = ManeiDominiImplants.fitTo(person.getOptions(), augmentationRank,
-              warriorFightsOnFoot);
+              warriorFightsOnFoot, factionCode);
 
         // Read every implant back off the person. Setting an option the group does not carry does
         // nothing, so a typo or a renamed constant would otherwise leave the log claiming implants the
