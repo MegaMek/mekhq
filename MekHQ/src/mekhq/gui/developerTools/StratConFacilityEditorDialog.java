@@ -45,10 +45,10 @@ import java.util.List;
 import javax.swing.*;
 
 import megamek.common.ui.FastJScrollPane;
-import mekhq.campaign.digitalGM.stratCon.StratConBiome;
-import mekhq.campaign.digitalGM.stratCon.StratConFacility;
-import mekhq.campaign.digitalGM.stratCon.StratConFacility.FacilityType;
-import mekhq.campaign.digitalGM.stratCon.StratConFacilityManifest;
+import mekhq.campaign.digitalGM.stratCon.biome.StratConBiome;
+import mekhq.campaign.digitalGM.stratCon.facility.StratConFacility;
+import mekhq.campaign.digitalGM.stratCon.facility.StratConFacility.FacilityType;
+import mekhq.campaign.digitalGM.stratCon.facility.StratConFacilityManifest;
 import mekhq.campaign.mission.ScenarioForceTemplate.ForceAlignment;
 import mekhq.gui.FileDialogs;
 

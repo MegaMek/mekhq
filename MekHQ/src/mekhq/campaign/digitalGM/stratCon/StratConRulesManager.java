@@ -91,6 +91,13 @@ import mekhq.campaign.ResolveScenarioTracker;
 import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.digitalGM.stratCon.StratConContractDefinition.StrategicObjectiveType;
 import mekhq.campaign.digitalGM.stratCon.StratConScenario.ScenarioState;
+import mekhq.campaign.digitalGM.stratCon.biome.StratConBiome;
+import mekhq.campaign.digitalGM.stratCon.biome.StratConBiomeManifest;
+import mekhq.campaign.digitalGM.stratCon.facility.StratConFacility;
+import mekhq.campaign.digitalGM.stratCon.facility.StratConFacilityFactory;
+import mekhq.campaign.digitalGM.stratCon.gm.StratConGMs;
+import mekhq.campaign.digitalGM.stratCon.sectorGeneration.StratConOceanPlacer;
+import mekhq.campaign.digitalGM.stratCon.sectorGeneration.StratConRoadPlacer;
 import mekhq.campaign.events.StratConDeploymentEvent;
 import mekhq.campaign.events.scenarios.ScenarioChangedEvent;
 import mekhq.campaign.force.CombatTeam;
@@ -874,10 +881,14 @@ public class StratConRulesManager {
         AtBDynamicScenario backingScenario = scenario.getBackingScenario();
         StratConBiomeManifest biomeManifest = StratConBiomeManifest.getInstance();
 
-        // for non-surface scenarios, we will skip the temperature update
-        if (backingScenario.getBoardType() != Scenario.T_SPACE &&
-                  backingScenario.getBoardType() != Scenario.T_ATMOSPHERE) {
-            backingScenario.setTemperature(track.getTemperature());
+        // Take the sector's average temperature shifted by the local terrain climate, so a volcano hex fights hot and a
+        // glacier hex fights cold. Only space is exempt: a low-atmosphere fight is still happening over that hex, and
+        // takes its map and light from the hex below, so it should take its temperature from there too. (Wind and
+        // precipitation are a separate matter - AtBScenario skips those in atmosphere regardless.)
+        if (backingScenario.getBoardType() != Scenario.T_SPACE) {
+            backingScenario.setTemperature(track.getTemperature() +
+                                                 StratConBiomeManifest.terrainTemperatureOffset(track.getTerrainTile(
+                                                       coords)));
         }
 
         StratConFacility facility = track.getFacility(scenario.getCoords());
@@ -885,39 +896,62 @@ public class StratConRulesManager {
 
         // facilities have their own terrain lists
         if (facility != null) {
-            int kelvinTemp = track.getTemperature() + StratConContractInitializer.ZERO_CELSIUS_IN_KELVIN;
-            StratConBiome facilityBiome;
+            // A base belongs on ground that matches the hex it occupies, so prefer the facility pool declared for this
+            // terrain (terrain names already carry their climate). Only when the terrain declares no facility pool do
+            // we fall back to the generic temperature-banded facility biome below.
+            String hexTerrain = track.getTerrainTile(coords);
+            String facilityPoolKey = biomeManifest.getFacilityPoolKey(hexTerrain);
 
-            // if facility doesn't have a biome temp map or no entry for the current
-            // temperature, use the default one
-            if (facility.getBiomes().isEmpty() || (facility.getBiomeTempMap().floorEntry(kelvinTemp) == null)) {
-                var defaultTempMap = biomeManifest.getTempMap(StratConBiomeManifest.TERRAN_FACILITY_BIOME);
-                var biomeEntry = defaultTempMap.floorEntry(kelvinTemp);
-                if (biomeEntry == null) {
-                    biomeEntry = defaultTempMap.firstEntry();
-                }
-                facilityBiome = biomeEntry.getValue();
+            if (facilityPoolKey != null) {
+                terrainType = facilityPoolKey;
             } else {
-                facilityBiome = facility.getBiomeTempMap().floorEntry(kelvinTemp).getValue();
+                // Band on the hex's own temperature, not the sector average, so a volcano hex is treated as hot and a
+                // glacier hex as frozen - matching the scenario temperature set above.
+                int kelvinTemp = track.getTemperature() +
+                                       StratConBiomeManifest.terrainTemperatureOffset(hexTerrain) +
+                                       StratConContractInitializer.ZERO_CELSIUS_IN_KELVIN;
+                StratConBiome facilityBiome;
+
+                // if facility doesn't have a biome temp map or no entry for the current
+                // temperature, use the default one
+                if (facility.getBiomes().isEmpty() || (facility.getBiomeTempMap().floorEntry(kelvinTemp) == null)) {
+                    var defaultTempMap = biomeManifest.getTempMap(StratConBiomeManifest.TERRAN_FACILITY_BIOME);
+                    var biomeEntry = defaultTempMap.floorEntry(kelvinTemp);
+                    if (biomeEntry == null) {
+                        biomeEntry = defaultTempMap.firstEntry();
+                    }
+                    facilityBiome = biomeEntry.getValue();
+                } else {
+                    facilityBiome = facility.getBiomeTempMap().floorEntry(kelvinTemp).getValue();
+                }
+                terrainType = facilityBiome.allowedTerrainTypes.get(randomInt(facilityBiome.allowedTerrainTypes.size()));
             }
-            terrainType = facilityBiome.allowedTerrainTypes.get(randomInt(facilityBiome.allowedTerrainTypes.size()));
         } else {
             terrainType = track.getTerrainTile(coords);
         }
 
-        var mapTypes = biomeManifest.getBiomeMapTypes();
-
-        // don't have a map list for the given terrain, leave it alone
-        if (!mapTypes.containsKey(terrainType)) {
+        // Resolve the battle-map pool: an exact terrain-name pool, else the terrain's category fallback pool, so
+        // terrains without their own pool (and any added later) still land on an appropriate board. If neither exists,
+        // leave the map alone.
+        StratConBiomeManifest.MapTypeList mapPool = biomeManifest.getMapTypesForTerrain(terrainType);
+        if (mapPool == null) {
             return;
         }
 
         // if we are in space, do not update the map; note that it's ok to do so in low
         // atmosphere
         if (backingScenario.getBoardType() != Scenario.T_SPACE) {
-            var mapTypeList = mapTypes.get(terrainType).mapTypes;
+            var mapTypeList = mapPool.mapTypes;
             backingScenario.setHasTrack(true);
             backingScenario.setTerrainType(terrainType);
+            // Record which sector-road edges cross this hex, so the launched board can trace matching roads onto it.
+            backingScenario.setStratConRoadEntryEdges(StratConRoadPlacer.roadEntryEdges(track, coords));
+            // Record whether the hex borders water, so the launched board can be biased toward including some.
+            backingScenario.setStratConWaterAdjacent(StratConOceanPlacer.isWaterAdjacent(track, coords));
+            // Record whether the hex holds a city, so the launched board can lay an urban area onto any base terrain,
+            // and how built-up the sector is so the city scales appropriately.
+            backingScenario.setStratConUrban(track.isCity(coords));
+            backingScenario.setStratConUrbanization(track.getUrbanizationLevel());
             // for now, if we're using a fixed map or in a facility, don't replace the
             // scenario
             // TODO: facility spaces will always have a relevant biome
@@ -1341,7 +1375,7 @@ public class StratConRulesManager {
                 // If the player doesn't have any available forces, we grab a force at random to
                 // seed the scenario
                 if (availableForceIDs.isEmpty()) {
-                    ArrayList<CombatTeam> combatTeams = campaign.getPlayerForce().getCombatTeamsAsList(campaign);
+                    List<CombatTeam> combatTeams = campaign.getPlayerForce().getCombatTeamsAsList(campaign);
                     if (!combatTeams.isEmpty()) {
                         combatTeam = getRandomItem(combatTeams);
 
@@ -1566,6 +1600,9 @@ public class StratConRulesManager {
                     facility.setVisible(true);
                     track.addFacility(coords, facility);
                     setupFacilityScenario(scenario, facility);
+                    // A new base belongs on the road grid if the planet's owner holds it, same as one placed at
+                    // contract start.
+                    StratConContractInitializer.connectFacilitiesToRoads(track, contract, campaign);
                 }
             }
         }
@@ -1616,7 +1653,7 @@ public class StratConRulesManager {
     /**
      * Applies time-sensitive facility effects.
      */
-    static void processFacilityEffects(StratConTrackState track, StratConCampaignState campaignState,
+    public static void processFacilityEffects(StratConTrackState track, StratConCampaignState campaignState,
           boolean isStartOfMonth) {
         for (StratConFacility facility : track.getFacilities().values()) {
             if (isStartOfMonth) {
@@ -3096,7 +3133,7 @@ public class StratConRulesManager {
     public static List<Integer> getAvailableForceIDs(Campaign campaign, AtBContract contract,
           boolean bypassRoleRestrictions) {
         // First, build a list of all combat teams in the campaign
-        ArrayList<CombatTeam> combatTeams = campaign.getPlayerForce().getCombatTeamsAsList(campaign);
+        List<CombatTeam> combatTeams = campaign.getPlayerForce().getCombatTeamsAsList(campaign);
 
         if (combatTeams.isEmpty()) {
             // If we don't have any combat teams, there is no point in continuing, so we exit early
@@ -3736,7 +3773,7 @@ public class StratConRulesManager {
         Mission mission = tracker.getMission();
 
         if (mission instanceof AtBContract) {
-            StratConCampaignState campaignState = ((AtBContract) mission).getStratConCampaignState();
+            StratConCampaignState campaignState = mission.getStratConCampaignState();
             if (campaignState == null) {
                 return;
             }
@@ -3777,6 +3814,11 @@ public class StratConRulesManager {
                     if ((facility != null) && (facility.getOwnershipChangeScore() > 0)) {
                         switchFacilityOwner(facility);
                     }
+
+                    // Deliberately does not touch the road network. Roads are laid when the sector is generated, and
+                    // afterwards only when a GM edits the map - adding or removing a city or a facility. Resolving a
+                    // scenario is playing on the map, not editing it: taking a base, or losing one, changes who holds
+                    // the ground at the end of a road, not whether the road was ever built.
 
                     processTrackForceReturnDates(track, campaign);
 

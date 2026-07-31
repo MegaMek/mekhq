@@ -44,8 +44,7 @@ import jakarta.xml.bind.annotation.XmlElement;
 import jakarta.xml.bind.annotation.XmlElementWrapper;
 import jakarta.xml.bind.annotation.XmlRootElement;
 import jakarta.xml.bind.annotation.XmlTransient;
-import megamek.common.annotations.Nullable;
-import mekhq.campaign.mission.ScenarioForceTemplate.ForceAlignment;
+import mekhq.campaign.digitalGM.stratCon.facility.StratConFacility;
 import mekhq.utilities.MHQXMLUtility;
 
 /**
@@ -56,6 +55,12 @@ import mekhq.utilities.MHQXMLUtility;
 @XmlRootElement(name = "campaignTrack")
 public class StratConTrackState {
     public static final String ROOT_XML_ELEMENT_NAME = "StratConTrackState";
+
+    /**
+     * The six sides of a hex. Kept here rather than taken from {@code StratConHexGeometry} so this core state class
+     * stays independent of the sector-generation package, as its environment fields already do.
+     */
+    private static final int HEX_DIRECTIONS = 6;
 
     // a track has the following characteristics:
     // width/height
@@ -79,6 +84,13 @@ public class StratConTrackState {
 
     private Map<StratConCoords, String> terrainTypes;
 
+    // city overlay: a city sits on top of the base terrain of its hex; rendered with the generic urban sprite
+    private Set<StratConCoords> cities;
+
+    // road overlay: hexes carrying a road, plus the border hexes whose road branches off the map into a neighbor sector
+    private Set<StratConCoords> roads;
+    private Set<StratConCoords> roadExits;
+
     // don't serialize this
     private transient Map<Integer, StratConScenario> backingScenarioMap;
     private transient Map<StratConCoords, StratConStrategicObjective> specificStrategicObjectives;
@@ -88,6 +100,17 @@ public class StratConTrackState {
     private int requiredLanceCount;
 
     private int temperature;
+
+    // how built-up this sector's cities are, 0.0 (hamlets) to 1.0 (dense metropolis), from the planet's population;
+    // carried onto city-hex scenarios to scale the urban area laid onto their battle maps
+    private double urbanizationLevel;
+
+    // Environment summary recorded by the improved generator, for the sector info panel (all null on legacy tracks).
+    // Stored as the profile/band enum names (prettified for display) to keep this core class off the generation package.
+    private String latitudeBand;
+    private String hydrologyProfile;
+    private String orogenyProfile;
+    private String urbanProfile;
 
     public StratConTrackState() {
         facilities = new HashMap<>();
@@ -100,6 +123,9 @@ public class StratConTrackState {
         stickyForces = new HashSet<>();
         strategicObjectives = new ArrayList<>();
         terrainTypes = new HashMap<>();
+        cities = new HashSet<>();
+        roads = new HashSet<>();
+        roadExits = new HashSet<>();
     }
 
     public String getDisplayableName() {
@@ -378,30 +404,6 @@ public class StratConTrackState {
     }
 
     /**
-     * Returns the allied facility coordinates closest to the given coordinates. Null if no allied facilities on the
-     * board.
-     */
-    @Nullable
-    @Deprecated(since = "0.51.0", forRemoval = true)
-    public StratConCoords findClosestAlliedFacilityCoords(StratConCoords coords) {
-        int minDistance = Integer.MAX_VALUE;
-        StratConCoords closestFacilityCoords = null;
-
-        for (StratConCoords facilityCoords : facilities.keySet()) {
-            if (facilities.get(facilityCoords).getOwner() == ForceAlignment.Allied) {
-                int distance = facilityCoords.distance(coords);
-
-                if (distance < minDistance) {
-                    minDistance = distance;
-                    closestFacilityCoords = facilityCoords;
-                }
-            }
-        }
-
-        return closestFacilityCoords;
-    }
-
-    /**
      * Returns (and possibly initializes, if necessary) a map between scenario IDs and StratCon scenario pointers
      */
     public Map<Integer, StratConScenario> getBackingScenariosMap() {
@@ -437,7 +439,6 @@ public class StratConTrackState {
      *
      * @return True if the operation succeeded, false if it failed
      */
-    @Deprecated(since = "0.51.0", forRemoval = true)
     public boolean moveObjective(StratConCoords source, StratConCoords destination) {
         // safety: don't move it if it's not there; logic prevents two objectives in the same coords
         if (getObjectivesByCoords().containsKey(source) &&
@@ -564,6 +565,49 @@ public class StratConTrackState {
         temperature = temp;
     }
 
+    /**
+     * @return how built-up this sector's cities are, 0.0 (hamlets) to 1.0 (dense metropolis)
+     */
+    public double getUrbanizationLevel() {
+        return urbanizationLevel;
+    }
+
+    public void setUrbanizationLevel(double urbanizationLevel) {
+        this.urbanizationLevel = urbanizationLevel;
+    }
+
+    public String getLatitudeBand() {
+        return latitudeBand;
+    }
+
+    public void setLatitudeBand(String latitudeBand) {
+        this.latitudeBand = latitudeBand;
+    }
+
+    public String getHydrologyProfile() {
+        return hydrologyProfile;
+    }
+
+    public void setHydrologyProfile(String hydrologyProfile) {
+        this.hydrologyProfile = hydrologyProfile;
+    }
+
+    public String getOrogenyProfile() {
+        return orogenyProfile;
+    }
+
+    public void setOrogenyProfile(String orogenyProfile) {
+        this.orogenyProfile = orogenyProfile;
+    }
+
+    public String getUrbanProfile() {
+        return urbanProfile;
+    }
+
+    public void setUrbanProfile(String urbanProfile) {
+        this.urbanProfile = urbanProfile;
+    }
+
     public void setTerrainTile(StratConCoords coords, String terrainTypeName) {
         terrainTypes.put(coords, terrainTypeName);
     }
@@ -594,5 +638,99 @@ public class StratConTrackState {
     @Deprecated(since = "0.51.0", forRemoval = true)
     public void setStrategicObjectives(Map<StratConCoords, String> terrainTypes) {
         this.terrainTypes = terrainTypes;
+    }
+
+    /**
+     * @param coords the hex to test
+     *
+     * @return {@code true} if a city sits on the given hex
+     */
+    public boolean isCity(StratConCoords coords) {
+        return cities.contains(coords);
+    }
+
+    /**
+     * Marks the given hex as holding a city. Cities are an overlay: the hex keeps its base terrain.
+     *
+     * @param coords the hex to make a city
+     */
+    public void addCity(StratConCoords coords) {
+        cities.add(coords);
+    }
+
+    @XmlElementWrapper(name = "cities")
+    @XmlElement(name = "city")
+    public Set<StratConCoords> getCities() {
+        return cities;
+    }
+
+    public void setCities(Set<StratConCoords> cities) {
+        this.cities = cities;
+    }
+
+    /**
+     * @param coords the hex to test
+     *
+     * @return {@code true} if a road runs through the given hex
+     */
+    public boolean isRoad(StratConCoords coords) {
+        return roads.contains(coords);
+    }
+
+    @XmlElementWrapper(name = "roads")
+    @XmlElement(name = "road")
+    public Set<StratConCoords> getRoads() {
+        return roads;
+    }
+
+    public void setRoads(Set<StratConCoords> roads) {
+        this.roads = roads;
+    }
+
+    /**
+     * @return the border hexes whose road branches off the map into a neighboring sector
+     */
+    @XmlElementWrapper(name = "roadExits")
+    @XmlElement(name = "roadExit")
+    public Set<StratConCoords> getRoadExits() {
+        return roadExits;
+    }
+
+    public void setRoadExits(Set<StratConCoords> roadExits) {
+        this.roadExits = roadExits;
+    }
+
+    /**
+     * Clears all generated terrain, cities, roads, and hex reveals so the sector can be regenerated from scratch.
+     * Scenarios, facilities, and assigned forces are left untouched.
+     */
+    public void clearForRegeneration() {
+        terrainTypes.clear();
+        cities.clear();
+        roads.clear();
+        roadExits.clear();
+        revealedCoords.clear();
+    }
+
+    /**
+     * Drops every terrain tile and overlay now lying outside the sector, after its width or height has been reduced.
+     *
+     * <p>Occupants - facilities, scenarios, and deployed forces - are deliberately left alone here: they are moved
+     * back inside by the caller rather than quietly destroyed along with the ground they stood on.</p>
+     */
+    public void trimToBounds() {
+        terrainTypes.keySet().removeIf(this::isOutOfBounds);
+        cities.removeIf(this::isOutOfBounds);
+        roads.removeIf(this::isOutOfBounds);
+        roadExits.removeIf(this::isOutOfBounds);
+        revealedCoords.removeIf(this::isOutOfBounds);
+    }
+
+    /** @return {@code true} if the given hex lies outside this sector's current bounds. */
+    public boolean isOutOfBounds(StratConCoords coords) {
+        return (coords.getX() < 0) ||
+                     (coords.getY() < 0) ||
+                     (coords.getX() >= width) ||
+                     (coords.getY() >= height);
     }
 }

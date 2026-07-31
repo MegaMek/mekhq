@@ -42,6 +42,8 @@ import static mekhq.utilities.MHQInternationalization.getTextAt;
 import java.awt.Component;
 import java.awt.Container;
 import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
+import java.awt.Insets;
 import javax.swing.BorderFactory;
 import javax.swing.ButtonGroup;
 import javax.swing.DefaultComboBoxModel;
@@ -59,8 +61,7 @@ import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.market.enums.ContractMarketMethod;
 import mekhq.gui.campaignOptions.CampaignOptionFlag;
 import mekhq.gui.campaignOptions.components.CampaignOptionsCheckBox;
-import mekhq.gui.campaignOptions.components.CampaignOptionsFormPanel;
-import mekhq.gui.campaignOptions.components.CampaignOptionsGridBagConstraints;
+import megamek.client.ui.settings.SettingsFormPanel;
 import mekhq.gui.campaignOptions.components.CampaignOptionsHeaderPanel;
 import mekhq.gui.campaignOptions.components.CampaignOptionsLabel;
 import mekhq.gui.campaignOptions.components.CampaignOptionsPagePanel;
@@ -80,8 +81,8 @@ import mekhq.gui.campaignOptions.components.CampaignOptionsStandardPanel;
  * {@link #writeToModel(MarketsOptionsModel)} are no-ops.</p>
  */
 class ContractMarketPage {
-    private static final int LABEL_COLUMN_WIDTH = CampaignOptionsFormPanel.DEFAULT_LABEL_WIDTH;
-    private static final int CONTROL_COLUMN_WIDTH = CampaignOptionsFormPanel.DEFAULT_CONTROL_WIDTH;
+    private static final int LABEL_COLUMN_WIDTH = SettingsFormPanel.DEFAULT_LABEL_WIDTH;
+    private static final int CONTROL_COLUMN_WIDTH = SettingsFormPanel.DEFAULT_CONTROL_WIDTH;
     private static final int CHECKBOX_GRID_COLUMNS = 2;
     private static final int CONTRACT_PAY_OPTION_INDENT = 24;
     // The contract-pay option panels are indented under their radio-button headers,
@@ -248,7 +249,7 @@ class ContractMarketPage {
         // A normal two-column form: one label/control pair per row, with the checkboxes laid out in the standard
         // two-column checkbox grid. addRow and addCheckBoxGrid both use the same two underlying grid columns, so they
         // line up cleanly within a single form panel.
-        final CampaignOptionsFormPanel panel = new CampaignOptionsFormPanel("ContractMarketGeneralOptionsPanel",
+        final SettingsFormPanel panel = new SettingsFormPanel("ContractMarketGeneralOptionsPanel",
                 LABEL_COLUMN_WIDTH,
                 CONTROL_COLUMN_WIDTH);
         panel.addRow(lblContractMarketMethod, comboContractMarketMethod);
@@ -352,7 +353,7 @@ class ContractMarketPage {
         chkOverageRepaymentInFinalPayment.addMouseListener(createTipPanelUpdater("OverageRepaymentInFinalPayment"));
 
         // Layout the Panel
-        final CampaignOptionsFormPanel equipmentValuePanel = new CampaignOptionsFormPanel(
+        final SettingsFormPanel equipmentValuePanel = new SettingsFormPanel(
                 "ContractPayPanelValuePercent",
                 CONTRACT_PAY_LABEL_COLUMN_WIDTH,
                 CONTROL_COLUMN_WIDTH);
@@ -366,7 +367,7 @@ class ContractMarketPage {
         equipmentValuePanel.addRow(lblWarShipPercent, spnWarShipPercent);
         pnlContractPayEquipmentOptions = equipmentValuePanel;
 
-        final CampaignOptionsFormPanel personnelPayPanel = new CampaignOptionsFormPanel(
+        final SettingsFormPanel personnelPayPanel = new SettingsFormPanel(
                 "ContractPayPersonnelPanel",
                 CONTRACT_PAY_LABEL_COLUMN_WIDTH,
                 CONTROL_COLUMN_WIDTH);
@@ -380,7 +381,8 @@ class ContractMarketPage {
         btnContractPersonnel.addActionListener(event -> updateContractPayEnabledState());
 
         final JPanel panel = new CampaignOptionsStandardPanel("ContractPayPanel");
-        final GridBagConstraints layout = new CampaignOptionsGridBagConstraints(panel);
+        panel.setLayout(new GridBagLayout());
+        final GridBagConstraints layout = defaultGridBagConstraints();
         layout.weightx = 1.0;
         layout.fill = GridBagConstraints.HORIZONTAL;
 
@@ -411,7 +413,8 @@ class ContractMarketPage {
      */
     private @Nonnull JPanel createContractPaySubsection(String name, JRadioButton radioButton, JPanel options) {
         final JPanel card = new CampaignOptionsStandardPanel(name, true);
-        final GridBagConstraints layout = new CampaignOptionsGridBagConstraints(card);
+        card.setLayout(new GridBagLayout());
+        final GridBagConstraints layout = defaultGridBagConstraints();
         layout.weightx = 1.0;
         layout.anchor = GridBagConstraints.NORTHWEST;
         layout.fill = GridBagConstraints.HORIZONTAL;
@@ -425,6 +428,14 @@ class ContractMarketPage {
         card.add(options, layout);
 
         return card;
+    }
+
+    private static GridBagConstraints defaultGridBagConstraints() {
+        GridBagConstraints layout = new GridBagConstraints();
+        layout.anchor = GridBagConstraints.NORTHWEST;
+        layout.fill = GridBagConstraints.HORIZONTAL;
+        layout.insets = new Insets(5, 5, 5, 5);
+        return layout;
     }
 
     /**

@@ -52,7 +52,7 @@ import megamek.client.ui.comboBoxes.MMComboBox;
 import mekhq.campaign.personnel.enums.TurnoverFrequency;
 import mekhq.gui.campaignOptions.CampaignOptionFlag;
 import mekhq.gui.campaignOptions.components.CampaignOptionsCheckBox;
-import mekhq.gui.campaignOptions.components.CampaignOptionsFormPanel;
+import megamek.client.ui.settings.SettingsFormPanel;
 import mekhq.gui.campaignOptions.components.CampaignOptionsHeaderPanel;
 import mekhq.gui.campaignOptions.components.CampaignOptionsLabel;
 import mekhq.gui.campaignOptions.components.CampaignOptionsPagePanel;
@@ -71,8 +71,8 @@ import mekhq.gui.campaignOptions.components.CampaignOptionsSpinner;
  * are no-ops.</p>
  */
 class TurnoverPage {
-    private static final int LABEL_COLUMN_WIDTH = CampaignOptionsFormPanel.DEFAULT_LABEL_WIDTH;
-    private static final int CONTROL_COLUMN_WIDTH = CampaignOptionsFormPanel.DEFAULT_CONTROL_WIDTH;
+    private static final int LABEL_COLUMN_WIDTH = SettingsFormPanel.DEFAULT_LABEL_WIDTH;
+    private static final int CONTROL_COLUMN_WIDTH = SettingsFormPanel.DEFAULT_CONTROL_WIDTH;
 
     private CampaignOptionsHeaderPanel turnoverHeader;
     private JCheckBox chkUseRandomRetirement;
@@ -206,7 +206,7 @@ class TurnoverPage {
         chkIncludeCivilians.addMouseListener(createTipPanelUpdater("IncludeCivilians"));
 
         // Layout the Panel
-        final CampaignOptionsFormPanel panel = new CampaignOptionsFormPanel("TurnoverGeneralPanel",
+        final SettingsFormPanel panel = new SettingsFormPanel("TurnoverGeneralPanel",
                 LABEL_COLUMN_WIDTH,
                 CONTROL_COLUMN_WIDTH);
         panel.addCheckBox(chkUseRandomRetirement);
@@ -254,7 +254,7 @@ class TurnoverPage {
                 .addMouseListener(createTipPanelUpdater("ServiceContractModifier"));
 
         // Layout the Panel
-        final CampaignOptionsFormPanel panel = new CampaignOptionsFormPanel("TurnoverContractRulesPanel",
+        final SettingsFormPanel panel = new SettingsFormPanel("TurnoverContractRulesPanel",
                 LABEL_COLUMN_WIDTH,
                 CONTROL_COLUMN_WIDTH);
         panel.addCheckBoxGrid(2,
@@ -283,7 +283,7 @@ class TurnoverPage {
                 .addMouseListener(createTipPanelUpdater("PayBonusDefaultThreshold"));
 
         // Layout the Panel
-        final CampaignOptionsFormPanel panel = new CampaignOptionsFormPanel("TurnoverRetentionBonusPanel",
+        final SettingsFormPanel panel = new SettingsFormPanel("TurnoverRetentionBonusPanel",
                 LABEL_COLUMN_WIDTH,
                 CONTROL_COLUMN_WIDTH);
         panel.addCheckBox(chkPayBonusDefault);
@@ -325,7 +325,7 @@ class TurnoverPage {
         chkUseHideLoyalty.addMouseListener(createTipPanelUpdater("UseHideLoyalty"));
 
         // Layout the Panel
-        final CampaignOptionsFormPanel panel = new CampaignOptionsFormPanel("TurnoverModifiersPanel",
+        final SettingsFormPanel panel = new SettingsFormPanel("TurnoverModifiersPanel",
                 LABEL_COLUMN_WIDTH,
                 CONTROL_COLUMN_WIDTH);
         panel.addCheckBoxGrid(2,
@@ -381,7 +381,7 @@ class TurnoverPage {
         spnPayoutServiceBonusRate.addMouseListener(createTipPanelUpdater("PayoutServiceBonusRate"));
 
         // Layout the Panel
-        final CampaignOptionsFormPanel panel = new CampaignOptionsFormPanel("PayoutsPanel",
+        final SettingsFormPanel panel = new SettingsFormPanel("PayoutsPanel",
                 LABEL_COLUMN_WIDTH,
                 CONTROL_COLUMN_WIDTH);
         panel.addRow(lblPayoutRateOfficer, spnPayoutRateOfficer);
@@ -424,7 +424,7 @@ class TurnoverPage {
         spnManagementSkillPenalty.addMouseListener(createTipPanelUpdater("ManagementSkillPenalty"));
 
         // Layout the Panel
-        final CampaignOptionsFormPanel panel = new CampaignOptionsFormPanel("UnitCohesionPanel",
+        final SettingsFormPanel panel = new SettingsFormPanel("UnitCohesionPanel",
                 LABEL_COLUMN_WIDTH,
                 CONTROL_COLUMN_WIDTH);
         panel.addCheckBox(chkUseHRStrain);

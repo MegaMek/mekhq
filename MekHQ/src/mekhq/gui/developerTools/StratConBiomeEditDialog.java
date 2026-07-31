@@ -50,7 +50,7 @@ import javax.swing.JTextField;
 import javax.swing.SpinnerNumberModel;
 
 import megamek.common.ui.FastJScrollPane;
-import mekhq.campaign.digitalGM.stratCon.StratConBiome;
+import mekhq.campaign.digitalGM.stratCon.biome.StratConBiome;
 
 /**
  * Modal sub-editor for a single {@link StratConBiome}, used by {@link StratConFacilityEditorDialog}.

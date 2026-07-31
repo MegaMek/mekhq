@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2025 The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2025-2026 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -32,81 +32,25 @@
  */
 package mekhq.gui.campaignOptions.components;
 
-import static megamek.client.ui.WrapLayout.wordWrap;
-import static megamek.client.ui.util.FlatLafStyleBuilder.setFontScaling;
-import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.getCampaignOptionsResourceBundle;
-import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.processWrapSize;
-import static mekhq.utilities.MHQInternationalization.getTextAt;
-import static mekhq.utilities.MHQInternationalization.isResourceKeyValid;
-
-import javax.swing.JTextField;
+import static mekhq.gui.campaignOptions.components.CampaignOptionsComponentSupport.campaignTextProvider;
+import static mekhq.gui.campaignOptions.components.CampaignOptionsComponentSupport.textProvider;
 
 import megamek.common.annotations.Nullable;
+import megamek.client.ui.settings.SettingsTextField;
 
-/**
- * A specialized {@link JTextField} component designed for use in campaign options dialogs.
- * <p>
- * This text field fetches its tooltip text dynamically from a resource bundle based on the provided name. It also
- * supports a customizable tooltip wrap size while maintaining consistent UI scaling.
- */
-public class CampaignOptionsTextField extends JTextField {
-    /**
-     * Constructs a {@link CampaignOptionsTextField} with a default tooltip wrap size.
-     * <p>
-     * The name of the text field is set to {@code "lbl" + name}, and its tooltip text is fetched using the key
-     * {@code "lbl" + name + ".tooltip"} from the resource bundle. Tooltips are word-wrapped to a default width of 100
-     * characters.
-     *
-     * @param name the base name used to generate the text field's name and tooltip text.
-     */
+/** Campaign-specific resource-key adapter over {@link SettingsTextField}. */
+public class CampaignOptionsTextField extends SettingsTextField {
     public CampaignOptionsTextField(String name) {
         this(name, (Integer) null);
     }
 
-    /**
-     * Constructs a {@link CampaignOptionsTextField} with a customizable tooltip wrap size.
-     * <p>
-     * The name of the text field is set to {@code "lbl" + name}, and its tooltip text is fetched using the key
-     * {@code "lbl" + name + ".tooltip"} from the resource bundle. Tooltips are word-wrapped to the specified width in
-     * {@code customWrapSize}.
-     *
-     * @param name           the base name used to generate the text field's name and tooltip text.
-     * @param customWrapSize the maximum number of characters (including spaces) per line in the tooltip text. If
-     *                       {@code null}, a default wrap size of 100 characters is used.
-     */
     public CampaignOptionsTextField(String name, @Nullable Integer customWrapSize) {
-        super();
-
-        // Set the tooltip text with word wrapping
-        String tooltipText = getTextAt(getCampaignOptionsResourceBundle(), "lbl" + name + ".tooltip");
-        if (!tooltipText.isEmpty()) {
-            setToolTipText(wordWrap(tooltipText, processWrapSize(customWrapSize)));
-        }
-
-        // Set the component name
+        super(campaignTextProvider(), "lbl" + name, customWrapSize);
         setName("lbl" + name);
-
-        // Apply UI font scaling
-        setFontScaling(this, false, 1);
     }
 
-    /**
-     * Generic constructor for reuse outside Campaign Options. Resolves the tooltip from {@code name + ".tooltip"} in
-     * the given resource bundle, without the Campaign Options {@code "lbl"} key prefix.
-     *
-     * @param resourceBundleName the resource bundle to resolve the tooltip from
-     * @param name               the resource key base and internal name (no {@code "lbl"} prefix is added)
-     */
     public CampaignOptionsTextField(String resourceBundleName, String name) {
-        super();
-        String tooltipText = getTextAt(resourceBundleName, name + ".tooltip");
-        if (!isResourceKeyValid(tooltipText)) {
-            tooltipText = getTextAt(resourceBundleName, name + ".toolTipText");
-        }
-        if (isResourceKeyValid(tooltipText)) {
-            setToolTipText(wordWrap(tooltipText, processWrapSize(null)));
-        }
+        super(textProvider(resourceBundleName), name);
         setName("lbl" + name);
-        setFontScaling(this, false, 1);
     }
 }

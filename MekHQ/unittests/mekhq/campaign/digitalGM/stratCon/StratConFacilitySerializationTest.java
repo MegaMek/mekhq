@@ -43,7 +43,10 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.List;
 
-import mekhq.campaign.digitalGM.stratCon.StratConFacility.FacilityType;
+import mekhq.campaign.digitalGM.stratCon.biome.StratConBiome;
+import mekhq.campaign.digitalGM.stratCon.facility.StratConFacility;
+import mekhq.campaign.digitalGM.stratCon.facility.StratConFacility.FacilityType;
+import mekhq.campaign.digitalGM.stratCon.facility.StratConFacilityManifest;
 import mekhq.campaign.mission.ScenarioForceTemplate.ForceAlignment;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;

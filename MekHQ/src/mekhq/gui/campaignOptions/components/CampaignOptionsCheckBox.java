@@ -32,154 +32,42 @@
  */
 package mekhq.gui.campaignOptions.components;
 
-import static megamek.client.ui.WrapLayout.wordWrap;
-import static megamek.client.ui.util.FlatLafStyleBuilder.setFontScaling;
-import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.getCampaignOptionsResourceBundle;
-import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.processWrapSize;
-import static mekhq.utilities.MHQInternationalization.getTextAt;
-import static mekhq.utilities.MHQInternationalization.isResourceKeyValid;
-
-import javax.swing.JCheckBox;
+import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.settingsBadges;
+import static mekhq.gui.campaignOptions.components.CampaignOptionsComponentSupport.campaignTextProvider;
+import static mekhq.gui.campaignOptions.components.CampaignOptionsComponentSupport.textProvider;
 
 import jakarta.annotation.Nonnull;
 import jakarta.annotation.Nullable;
+import megamek.client.ui.settings.SettingsCheckBox;
 import mekhq.gui.campaignOptions.CampaignOptionsMetadata;
-import mekhq.gui.campaignOptions.CampaignOptionsUtilities;
 
-/**
- * A specialized {@link JCheckBox} used in the campaign options dialog.
- * <p>
- * This check box's text and tooltip are dynamically loaded from a resource bundle based on a given name. The tooltip
- * can optionally include word wrapping with a configurable wrap size.
- * <p>
- * The checkbox also supports font scaling adjustments.
- */
-public class CampaignOptionsCheckBox extends JCheckBox {
-    /**
-     * Constructs a new instance of {@link CampaignOptionsCheckBox} with the specified name.
-     * <p>
-     * The name is used to determine the checkbox's visible text and tooltip, as well as to generate its unique internal
-     * name.
-     * <p>
-     * The text is located in the resource bundle key {@code "lbl" + name + ".text"}. The tooltip is located in the
-     * resource bundle key {@code "lbl" + name + ".tooltip"}.
-     * <p>
-     * A default wrap size is used for the tooltip text if {@link CampaignOptionsUtilities#processWrapSize} is not
-     * overridden.
-     *
-     * @param name the name used to fetch the checkbox's text and tooltip, and to set its name
-     */
+/** Campaign-specific resource-key and metadata adapter over {@link SettingsCheckBox}. */
+public class CampaignOptionsCheckBox extends SettingsCheckBox {
     public CampaignOptionsCheckBox(@Nonnull String name) {
         this(name, (Integer) null, null);
     }
 
-    /**
-     * Constructs a new instance of {@link CampaignOptionsCheckBox} with the specified name and a custom tooltip wrap
-     * size.
-     * <p>
-     * The name is used to determine the checkbox's visible text and tooltip, as well as to generate its unique internal
-     * name. The text and tooltip are fetched from the resource bundle, located at keys {@code "lbl" + name + ".text"}
-     * and {@code "lbl" + name + ".tooltip"} respectively.
-     * <p>
-     * If a custom wrap size is provided, the tooltip text will be word-wrapped accordingly. If {@code customWrapSize}
-     * is {@code null}, a default wrap size is used.
-     *
-     * @param name           the name used to fetch the checkbox's text and tooltip, and to set its name
-     * @param customWrapSize the maximum number of characters per tooltip line, or {@code null} for the default wrap
-     *                       size
-     */
     public CampaignOptionsCheckBox(@Nonnull String name, @Nullable Integer customWrapSize) {
         this(name, customWrapSize, null);
     }
 
-    /**
-     * Constructs a new instance of {@link CampaignOptionsCheckBox} with the specified name and metadata.
-     * <p>
-     * The metadata is used to display version badges and special flag symbols alongside the checkbox text.
-     *
-     * @param name     the name used to fetch the checkbox's text and tooltip, and to set its name
-     * @param metadata version and flag metadata for displaying badges, or {@code null} for no badges
-     */
     public CampaignOptionsCheckBox(@Nonnull String name, @Nullable CampaignOptionsMetadata metadata) {
         this(name, (Integer) null, metadata);
     }
 
-    /**
-     * Constructs a new instance of {@link CampaignOptionsCheckBox} with the specified name, custom tooltip wrap size,
-     * and metadata.
-     * <p>
-     * The name is used to determine the checkbox's visible text and tooltip, as well as to generate its unique internal
-     * name. The text and tooltip are fetched from the resource bundle, located at keys {@code "lbl" + name + ".text"}
-     * and {@code "lbl" + name + ".tooltip"} respectively.
-     * <p>
-     * If a custom wrap size is provided, the tooltip text will be word-wrapped accordingly. If {@code customWrapSize}
-     * is {@code null}, a default wrap size is used.
-     * <p>
-     * The metadata is used to display version badges and special flag symbols alongside the checkbox text.
-     *
-     * @param name           the name used to fetch the checkbox's text and tooltip, and to set its name
-     * @param customWrapSize the maximum number of characters per tooltip line, or {@code null} for the default wrap
-     *                       size
-     * @param metadata       version and flag metadata for displaying badges, or {@code null} for no badges
-     */
     public CampaignOptionsCheckBox(@Nonnull String name, @Nullable Integer customWrapSize,
-                                   @Nullable CampaignOptionsMetadata metadata) {
-        // Fetch base text and append badges
-        // Sets the checkbox's text from the resource bundle, wrapped in HTML tags. The <nobr> keeps the label and its
-        // trailing badges on a single line so the badge symbols do not wrap onto a second line in tight grid columns.
-        super(String.format("<html><nobr>%s%s</nobr></html>",
-              getTextAt(getCampaignOptionsResourceBundle(), "lbl" + name + ".text"),
-              CampaignOptionsUtilities.formatBadges(metadata)));
-
-
-
-        // Sets the checkbox's internal name
+          @Nullable CampaignOptionsMetadata metadata) {
+        super(campaignTextProvider(), "lbl" + name, customWrapSize, settingsBadges(metadata));
         setName("chk" + name);
-
-        // Sets the checkbox's tooltip, applying word wrapping based on customWrapSize
-        String tooltipText = getTextAt(getCampaignOptionsResourceBundle(), "lbl" + name + ".tooltip");
-        if (!tooltipText.isEmpty()) {
-            setToolTipText(wordWrap(tooltipText, processWrapSize(customWrapSize)));
-        }
-
-        // Applies font scaling with default scaling disabled
-        setFontScaling(this, false, 1);
     }
 
-    /**
-     * Generic constructor for reuse outside Campaign Options. Resolves the text and tooltip from {@code name + ".text"}
-     * and {@code name + ".tooltip"} in the given resource bundle, without the Campaign Options {@code "lbl"} key
-     * prefix.
-     *
-     * @param resourceBundleName the resource bundle to resolve the text and tooltip from
-     * @param name               the resource key base and internal name (no {@code "lbl"} prefix is added)
-     */
     public CampaignOptionsCheckBox(@Nonnull String resourceBundleName, @Nonnull String name) {
         this(resourceBundleName, name, null);
     }
 
-    /**
-     * Generic constructor for reuse outside Campaign Options, with option badges. Resolves the text and tooltip from
-     * {@code name + ".text"} and {@code name + ".tooltip"} (or {@code name + ".toolTipText"}) in the given resource
-     * bundle, without the Campaign Options {@code "lbl"} key prefix, and appends the badge symbols for {@code metadata}
-     * (for example the "important information" flag) after the text.
-     *
-     * @param resourceBundleName the resource bundle to resolve the text and tooltip from
-     * @param name               the resource key base and internal name (no {@code "lbl"} prefix is added)
-     * @param metadata           the option's badge metadata, or {@code null} for no badges
-     */
     public CampaignOptionsCheckBox(@Nonnull String resourceBundleName, @Nonnull String name,
           @Nullable CampaignOptionsMetadata metadata) {
-        super(String.format("<html><nobr>%s%s</nobr></html>", getTextAt(resourceBundleName, name + ".text"),
-              CampaignOptionsUtilities.formatBadges(metadata)));
+        super(textProvider(resourceBundleName), name, settingsBadges(metadata));
         setName("chk" + name);
-        String tooltipText = getTextAt(resourceBundleName, name + ".tooltip");
-        if (!isResourceKeyValid(tooltipText)) {
-            tooltipText = getTextAt(resourceBundleName, name + ".toolTipText");
-        }
-        if (isResourceKeyValid(tooltipText)) {
-            setToolTipText(wordWrap(tooltipText, processWrapSize(null)));
-        }
-        setFontScaling(this, false, 1);
     }
 }

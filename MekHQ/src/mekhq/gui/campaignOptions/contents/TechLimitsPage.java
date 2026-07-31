@@ -50,7 +50,7 @@ import megamek.client.ui.comboBoxes.MMComboBox;
 import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.gui.campaignOptions.CampaignOptionFlag;
 import mekhq.gui.campaignOptions.components.CampaignOptionsCheckBox;
-import mekhq.gui.campaignOptions.components.CampaignOptionsFormPanel;
+import megamek.client.ui.settings.SettingsFormPanel;
 import mekhq.gui.campaignOptions.components.CampaignOptionsHeaderPanel;
 import mekhq.gui.campaignOptions.components.CampaignOptionsLabel;
 import mekhq.gui.campaignOptions.components.CampaignOptionsPagePanel;
@@ -69,8 +69,8 @@ import mekhq.gui.campaignOptions.components.CampaignOptionsPagePanel;
  * are no-ops.</p>
  */
 class TechLimitsPage {
-    private static final int LABEL_COLUMN_WIDTH = CampaignOptionsFormPanel.DEFAULT_LABEL_WIDTH;
-    private static final int CONTROL_COLUMN_WIDTH = CampaignOptionsFormPanel.DEFAULT_CONTROL_WIDTH;
+    private static final int LABEL_COLUMN_WIDTH = SettingsFormPanel.DEFAULT_LABEL_WIDTH;
+    private static final int CONTROL_COLUMN_WIDTH = SettingsFormPanel.DEFAULT_CONTROL_WIDTH;
 
     private JCheckBox limitByYearBox;
     private JCheckBox disallowExtinctStuffBox;
@@ -162,7 +162,7 @@ class TechLimitsPage {
     }
 
     private @Nonnull JPanel createTechLevelPanel() {
-        final CampaignOptionsFormPanel panel = new CampaignOptionsFormPanel("TechLevelPanel",
+        final SettingsFormPanel panel = new SettingsFormPanel("TechLevelPanel",
               LABEL_COLUMN_WIDTH,
               CONTROL_COLUMN_WIDTH);
         panel.addRow(lblChoiceTechLevel, choiceTechLevel);
@@ -173,7 +173,7 @@ class TechLimitsPage {
     }
 
     private @Nonnull JPanel createPurchaseRulesPanel() {
-        final CampaignOptionsFormPanel panel = new CampaignOptionsFormPanel("TechPurchaseRulesPanel",
+        final SettingsFormPanel panel = new SettingsFormPanel("TechPurchaseRulesPanel",
               LABEL_COLUMN_WIDTH,
               CONTROL_COLUMN_WIDTH);
         panel.addCheckBoxGrid(2,

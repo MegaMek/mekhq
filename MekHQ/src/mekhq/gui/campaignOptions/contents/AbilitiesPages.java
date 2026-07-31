@@ -86,7 +86,7 @@ import mekhq.gui.campaignOptions.components.AbilitySelectorDialog;
 import mekhq.gui.campaignOptions.components.CampaignOptionsHeaderPanel;
 import mekhq.gui.campaignOptions.components.CampaignOptionsPagePanel;
 import mekhq.gui.campaignOptions.components.CampaignOptionsSpinner;
-import mekhq.gui.campaignOptions.components.SectionHeaderControlProvider;
+import megamek.client.ui.settings.SectionHeaderControlProvider;
 import mekhq.gui.campaignOptions.components.SkillPrerequisitesDialog;
 import mekhq.utilities.ReportingUtilities;
 import mekhq.utilities.spaUtilities.enums.AbilityCategory;
