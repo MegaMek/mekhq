@@ -37,12 +37,15 @@ import java.util.IdentityHashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 import megamek.client.ratgenerator.FactionRecord;
 import megamek.client.ratgenerator.ForceDescriptor;
 import megamek.client.ratgenerator.RATGenerator;
 import megamek.common.annotations.Nullable;
 import megamek.common.units.UnitType;
+import megamek.common.universe.Faction2;
+import megamek.common.universe.Factions2;
 import megamek.logging.MMLogger;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.force.Formation;
@@ -600,32 +603,15 @@ public final class ForceDescriptorWalker {
     private enum FactionFamily { INNER_SPHERE, CLAN, COMSTAR }
 
     /**
-     * ComStar and Word of Blake sub-commands whose rulesets are built on the Inner Sphere echelons
-     * rather than the Level I to Level VI ladder.
+     * The formation base size that marks a command organised on the Level I to Level VI ladder.
      *
-     * <p>The Protectorate Militia is raised and organised as a conventional planetary force, so its
-     * ruleset declares lances, companies, battalions and regiments. Those share echelon numbers with
-     * the ComStar ladder without sharing its meaning: read as ComStar, a lance and a company both come
-     * out labelled Level II, and a regiment as a Level IV. The formation names would then contradict
-     * the formations the ruleset actually built.</p>
+     * <p>ComStar and the Word of Blake build on sixes, and their sub-commands inherit that through
+     * {@code fallBackFactions} unless they declare otherwise - which is what tells the Protectorate
+     * Militia apart, since it is raised as a conventional planetary force and declares four. Reading
+     * the size rather than the faction code keeps that knowledge in the data describing the command,
+     * where a new sub-command gets it right without a code change.</p>
      */
-    private static final List<String> COMSTAR_COMMANDS_ON_INNER_SPHERE_ECHELONS = List.of("WOB.PM");
-
-    /**
-     * @param factionCode the primary faction code from the descriptor
-     *
-     * @return {@code true} if this is a ComStar-family command whose ruleset nonetheless uses the
-     *       Inner Sphere echelons
-     */
-    private static boolean buildsOnInnerSphereEchelons(String factionCode) {
-        String upperCaseCode = factionCode.toUpperCase();
-        for (String command : COMSTAR_COMMANDS_ON_INNER_SPHERE_ECHELONS) {
-            if (upperCaseCode.equals(command) || upperCaseCode.startsWith(command + ".")) {
-                return true;
-            }
-        }
-        return false;
-    }
+    private static final int COMSTAR_LADDER_FORMATION_BASE_SIZE = 6;
 
     private static FactionFamily resolveFactionFamily(String factionCode) {
         if (factionCode == null || factionCode.isBlank()) {
@@ -633,15 +619,21 @@ public final class ForceDescriptorWalker {
         }
         // Take the first comma-separated token; ratgen sometimes packs an "FS,FedSuns,3030" style code.
         String primary = factionCode.split(",")[0].trim();
-        if (buildsOnInnerSphereEchelons(primary)) {
-            return FactionFamily.INNER_SPHERE;
+        Optional<Faction2> faction = Factions2.getInstance().getFaction(primary);
+        if (faction.isPresent()) {
+            if (faction.get().getFormationBaseSize() == COMSTAR_LADDER_FORMATION_BASE_SIZE) {
+                return FactionFamily.COMSTAR;
+            }
+            // Clan-ness is asked directly rather than read off the base size. The Clans do build on
+            // fives, but so does the Marian Hegemony, and taking a five to mean Clan would have
+            // labelled Marian lances and companies as Stars and Clusters.
+            if (faction.get().isClan()) {
+                return FactionFamily.CLAN;
+            }
         }
-        if ("CS".equalsIgnoreCase(primary) || "WOB".equalsIgnoreCase(primary)
-              || primary.toUpperCase().startsWith("CS.") || primary.toUpperCase().startsWith("WOB.")) {
-            return FactionFamily.COMSTAR;
-        }
-        FactionRecord faction = RATGenerator.getInstance().getFaction(primary);
-        if (faction != null && faction.isClan()) {
+        // A key the faction data does not carry can still be a ratgen faction, so ask there too.
+        FactionRecord factionRecord = RATGenerator.getInstance().getFaction(primary);
+        if (factionRecord != null && factionRecord.isClan()) {
             return FactionFamily.CLAN;
         }
         return FactionFamily.INNER_SPHERE;

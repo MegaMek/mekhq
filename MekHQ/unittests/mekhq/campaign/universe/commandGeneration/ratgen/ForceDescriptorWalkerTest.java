@@ -48,6 +48,7 @@ import java.util.Map;
 import megamek.client.ratgenerator.ForceDescriptor;
 import megamek.common.units.Entity;
 import megamek.common.units.UnitType;
+import megamek.common.universe.Factions2;
 import megamek.client.ratgenerator.FormationNamingConvention.DesignatorStyle;
 import megamek.client.ratgenerator.FormationNamingConvention.Tier;
 import mekhq.campaign.Campaign;
@@ -270,5 +271,54 @@ class ForceDescriptorWalkerTest {
               "the Shadow Divisions are organised the Word of Blake way");
         assertEquals(FormationLevel.LEVEL_IV,
               ForceDescriptorWalker.mapEchelonToFormationLevel(6, "CS"));
+    }
+
+    /**
+     * The family now comes from the command's declared formation base size, so this is the assertion
+     * that fails loudly if WOB.PM.yml ever loses its {@code formationBaseSize: 4}.
+     */
+    @Test
+    void theProtectorateMilitiaStillDeclaresItsOwnFormationSize() {
+        assertEquals(4,
+              Factions2.getInstance().getFaction("WOB.PM")
+                    .orElseThrow(() -> new AssertionError("WOB.PM must be a known command"))
+                    .getFormationBaseSize(),
+              "WOB.PM.yml must keep formationBaseSize: 4 - it is the only thing separating the"
+                    + " Protectorate Militia from the ComStar ladder");
+    }
+
+    /**
+     * The Marian Hegemony builds on fives like the Clans do, but is not one. Reading a five as Clan
+     * would have labelled Marian lances and companies as Stars and Clusters.
+     */
+    @Test
+    void theMarianHegemonyIsNotMistakenForAClan() {
+        assertEquals(FormationLevel.LANCE,
+              ForceDescriptorWalker.mapEchelonToFormationLevel(3, "MH"));
+        assertEquals(FormationLevel.COMPANY,
+              ForceDescriptorWalker.mapEchelonToFormationLevel(4, "MH"));
+        assertEquals(FormationLevel.REGIMENT,
+              ForceDescriptorWalker.mapEchelonToFormationLevel(6, "MH"));
+    }
+
+    @Test
+    void ordinaryInnerSphereAndClanFactionsAreUnchanged() {
+        assertEquals(FormationLevel.COMPANY,
+              ForceDescriptorWalker.mapEchelonToFormationLevel(4, "FS"));
+        assertEquals(FormationLevel.CLUSTER,
+              ForceDescriptorWalker.mapEchelonToFormationLevel(6, "CJF"));
+        // ratgen sometimes packs extra tokens onto the code; only the first is the faction.
+        assertEquals(FormationLevel.COMPANY,
+              ForceDescriptorWalker.mapEchelonToFormationLevel(4, "FS,FedSuns,3030"));
+    }
+
+    @Test
+    void anUnknownOrAbsentFactionFallsBackToTheInnerSphere() {
+        assertEquals(FormationLevel.COMPANY,
+              ForceDescriptorWalker.mapEchelonToFormationLevel(4, null));
+        assertEquals(FormationLevel.COMPANY,
+              ForceDescriptorWalker.mapEchelonToFormationLevel(4, "   "));
+        assertEquals(FormationLevel.COMPANY,
+              ForceDescriptorWalker.mapEchelonToFormationLevel(4, "NOT_A_FACTION"));
     }
 }
