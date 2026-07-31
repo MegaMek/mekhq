@@ -147,6 +147,9 @@ public final class CommandGenerator {
     private static final int BLOODNAME_MODIFIER_VETERAN = -1;
     private static final int BLOODNAME_MODIFIER_ELITE = -2;
 
+    /** How many undercrewed units the diagnostic names before it summarises the rest. */
+    private static final int UNDERCREWED_UNITS_NAMED_IN_LOG = 20;
+
     // Single-thread daemon executor used by the addNewUnit watchdog. Scheduled tasks fire 5s after
     // each addNewUnit call begins; if addNewUnit returns first, the task is cancelled. If it hangs,
     // the task wins the race and dumps interesting thread stacks so the deadlock site is captured
@@ -1054,30 +1057,68 @@ public final class CommandGenerator {
     }
 
     /**
-     * Stage 7f: sizes the temporary crew pool to cover the seats the generated units left unfilled.
+     * Stage 7f: crews the seats the assembler deliberately left empty on temporary-crew roles.
      *
-     * <p>Only roles the campaign has Temporary Crews enabled for are touched, and
-     * {@code fillTempCrewPoolForRole} is a no-op for the rest, so a campaign not using the feature is
-     * unaffected.</p>
+     * <p>Where a role draws on the temporary crew pool the assembler puts one named person aboard and
+     * leaves the rest of the seats empty, which is the roster the option exists to produce. Those seats
+     * still have to be filled or the unit arrives undercrewed - a battle armour squad with one trooper
+     * aboard reports four suits empty, and MegaMek marks the empty suits as having no one in them.</p>
+     *
+     * <p>Filling them takes both halves of MekHQ's own two-step: {@code fillTempCrewPoolForRole} sizes
+     * the campaign pool to the shortfall, and {@code distributeTempCrewPoolToUnits} seats it. Sizing
+     * alone leaves the crew in the pool and the units still empty.</p>
+     *
+     * <p>Which roles those are is asked of {@link ForceHumanResources#isBlobCrewEnabled}, the same
+     * switch the rest of MekHQ reads, so a role added there is picked up here without change. Every
+     * role is offered to it rather than only those already in the pool: a freshly generated campaign
+     * has an empty pool, so reading the pool's keys finds nothing to fill and the units stay empty.</p>
      */
-    private static void topUpTemporaryCrewPools(Campaign campaign) {
+    // Package-private so the regression test can run the stage against a real campaign; nothing
+    // outside this class calls it.
+    static void topUpTemporaryCrewPools(Campaign campaign) {
         CampaignOptions campaignOptions = campaign.getCampaignOptions();
         ForceHumanResources humanResources = campaign.getPlayerForce().getHumanResources();
         int rolesFilled = 0;
-        for (PersonnelRole role : humanResources.getTempCrewRoleKeys()) {
+        for (PersonnelRole role : PersonnelRole.values()) {
             if (!humanResources.isBlobCrewEnabled(role, campaignOptions)) {
                 continue;
             }
             humanResources.fillTempCrewPoolForRole(campaign, campaignOptions, role);
+            humanResources.distributeTempCrewPoolToUnits(campaign, campaignOptions, role);
             rolesFilled++;
+            LOGGER.info("[CompanyGen][Pipeline][TempCrew] role {}: pool sized to {} and seated",
+                  role, humanResources.getTempCrewPool(role));
         }
-        if (rolesFilled > 0) {
-            LOGGER.info("[CompanyGen][Pipeline][TempCrew] topped up the pool for {} temporary crew"
-                        + " role(s)", rolesFilled);
-        } else {
+        if (rolesFilled == 0) {
             LOGGER.debug("[CompanyGen][Pipeline][TempCrew] no temporary crew roles enabled;"
-                        + " units were crewed in full");
+                        + " every seat was filled with a named person");
         }
+        reportUndercrewedUnits(campaign);
+    }
+
+    /**
+     * Names any generated unit still short of a full crew, so a roster that looks wrong can be traced
+     * from the log rather than by opening each unit.
+     */
+    private static void reportUndercrewedUnits(Campaign campaign) {
+        List<String> undercrewed = new ArrayList<>();
+        for (Unit unit : campaign.getUnits()) {
+            if ((unit.getEntity() != null) && !unit.isMothballed() && !unit.isFullyCrewed()) {
+                undercrewed.add("%s (%d/%d)".formatted(unit.getName(), unit.getTotalCrewSize(),
+                      unit.getFullCrewSize()));
+            }
+        }
+        if (undercrewed.isEmpty()) {
+            LOGGER.info("[CompanyGen][Pipeline][TempCrew] every generated unit is fully crewed");
+            return;
+        }
+        // A whole command short of crew would otherwise put every unit on one line. The count is
+        // always exact; only the naming is cut, and the line says by how much.
+        int named = Math.min(undercrewed.size(), UNDERCREWED_UNITS_NAMED_IN_LOG);
+        String tail = (named < undercrewed.size())
+                            ? ", and %d more".formatted(undercrewed.size() - named) : "";
+        LOGGER.warn("[CompanyGen][Pipeline][TempCrew] {} unit(s) left undercrewed: {}{}",
+              undercrewed.size(), String.join(", ", undercrewed.subList(0, named)), tail);
     }
 
     private static SpareCosts stockSpareParts(Campaign campaign) {
