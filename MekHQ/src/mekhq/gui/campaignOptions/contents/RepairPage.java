@@ -47,7 +47,7 @@ import jakarta.annotation.Nonnull;
 import jakarta.annotation.Nullable;
 import mekhq.gui.campaignOptions.CampaignOptionFlag;
 import mekhq.gui.campaignOptions.components.CampaignOptionsCheckBox;
-import mekhq.gui.campaignOptions.components.CampaignOptionsFormPanel;
+import megamek.client.ui.settings.SettingsFormPanel;
 import mekhq.gui.campaignOptions.components.CampaignOptionsHeaderPanel;
 import mekhq.gui.campaignOptions.components.CampaignOptionsLabel;
 import mekhq.gui.campaignOptions.components.CampaignOptionsPagePanel;
@@ -66,8 +66,8 @@ import mekhq.gui.campaignOptions.components.CampaignOptionsSpinner;
  * are no-ops.</p>
  */
 class RepairPage {
-    private static final int LABEL_COLUMN_WIDTH = CampaignOptionsFormPanel.DEFAULT_LABEL_WIDTH;
-    private static final int CONTROL_COLUMN_WIDTH = CampaignOptionsFormPanel.DEFAULT_CONTROL_WIDTH;
+    private static final int LABEL_COLUMN_WIDTH = SettingsFormPanel.DEFAULT_LABEL_WIDTH;
+    private static final int CONTROL_COLUMN_WIDTH = SettingsFormPanel.DEFAULT_CONTROL_WIDTH;
 
     private JCheckBox chkTechsUseAdministration;
     private JCheckBox chkUsefulAsTechs;
@@ -158,7 +158,7 @@ class RepairPage {
     }
 
     private @Nonnull JPanel createRepairOptionsPanel() {
-        final CampaignOptionsFormPanel panel = new CampaignOptionsFormPanel("RepairOptionsPanel",
+        final SettingsFormPanel panel = new SettingsFormPanel("RepairOptionsPanel",
                 LABEL_COLUMN_WIDTH,
                 CONTROL_COLUMN_WIDTH);
         panel.addCheckBoxGrid(2,
@@ -173,7 +173,7 @@ class RepairPage {
     }
 
     private @Nonnull JPanel createComponentDamagePanel() {
-        final CampaignOptionsFormPanel panel = new CampaignOptionsFormPanel("ComponentDamagePanel",
+        final SettingsFormPanel panel = new SettingsFormPanel("ComponentDamagePanel",
                 LABEL_COLUMN_WIDTH,
                 CONTROL_COLUMN_WIDTH);
         panel.addCheckBoxGrid(2,

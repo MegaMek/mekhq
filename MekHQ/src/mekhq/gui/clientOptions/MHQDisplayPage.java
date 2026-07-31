@@ -30,10 +30,10 @@
  * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
  * affiliated with Microsoft.
  */
-package mekhq.gui.campaignOptions;
+package mekhq.gui.clientOptions;
 
 import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.getMetadata;
-import static mekhq.utilities.MHQInternationalization.getTextAt;
+import static mekhq.utilities.MHQInternationalization.getText;
 
 import java.awt.Component;
 import java.awt.Dimension;
@@ -58,12 +58,13 @@ import javax.swing.event.DocumentListener;
 
 import megamek.client.ui.Messages;
 import megamek.client.ui.buttons.ColourSelectorButton;
+import megamek.client.ui.settings.SettingsCheckBox;
+import megamek.client.ui.settings.SettingsFormPanel;
+import megamek.client.ui.settings.SettingsLabel;
+import megamek.client.ui.settings.SettingsSpinner;
 import megamek.client.ui.util.UIUtil;
 import mekhq.MekHQ;
-import mekhq.gui.campaignOptions.components.CampaignOptionsCheckBox;
-import mekhq.gui.campaignOptions.components.CampaignOptionsFormPanel;
-import mekhq.gui.campaignOptions.components.CampaignOptionsLabel;
-import mekhq.gui.campaignOptions.components.CampaignOptionsSpinner;
+import mekhq.gui.campaignOptions.CampaignOptionFlag;
 import mekhq.gui.enums.PersonnelFilterStyle;
 
 /**
@@ -77,27 +78,27 @@ class MHQDisplayPage extends MHQOptionsPage {
     private JTextField fieldDisplayDateFormat;
     private JTextField fieldLongDisplayDateFormat;
     private JSlider guiScaleSlider;
-    private CampaignOptionsCheckBox chkHideUnitFluff;
-    private CampaignOptionsCheckBox chkHistoricalDailyLog;
-    private CampaignOptionsCheckBox chkCompanyGeneratorStartup;
-    private CampaignOptionsCheckBox chkShowCompanyGenerator;
-    private CampaignOptionsCheckBox chkShowUnitPicturesOnTOE;
+      private SettingsCheckBox chkHideUnitFluff;
+      private SettingsCheckBox chkHistoricalDailyLog;
+      private SettingsCheckBox chkCompanyGeneratorStartup;
+      private SettingsCheckBox chkShowCompanyGenerator;
+      private SettingsCheckBox chkShowUnitPicturesOnTOE;
 
     // Display - Interstellar Map
-    private CampaignOptionsCheckBox chkInterstellarMapShowJumpRadius;
-    private CampaignOptionsSpinner spinnerInterstellarMapShowJumpRadiusMinimumZoom;
+      private SettingsCheckBox chkInterstellarMapShowJumpRadius;
+      private SettingsSpinner spinnerInterstellarMapShowJumpRadiusMinimumZoom;
     private ColourSelectorButton btnInterstellarMapJumpRadiusColour;
-    private CampaignOptionsCheckBox chkInterstellarMapShowPlanetaryAcquisitionRadius;
-    private CampaignOptionsSpinner spinnerInterstellarMapShowPlanetaryAcquisitionRadiusMinimumZoom;
+      private SettingsCheckBox chkInterstellarMapShowPlanetaryAcquisitionRadius;
+      private SettingsSpinner spinnerInterstellarMapShowPlanetaryAcquisitionRadiusMinimumZoom;
     private ColourSelectorButton btnInterstellarMapPlanetaryAcquisitionRadiusColour;
-    private CampaignOptionsCheckBox chkInterstellarMapShowContractSearchRadius;
+      private SettingsCheckBox chkInterstellarMapShowContractSearchRadius;
     private ColourSelectorButton btnInterstellarMapContractSearchRadiusColour;
 
     // Display - Personnel List
     private JComboBox<PersonnelFilterStyle> comboPersonnelFilterStyle;
-    private CampaignOptionsCheckBox chkPersonnelFilterOnPrimaryRole;
-    private CampaignOptionsCheckBox chkUnifiedDailyReport;
-    private CampaignOptionsCheckBox chkEnableDailyReportAggregateTab;
+      private SettingsCheckBox chkPersonnelFilterOnPrimaryRole;
+      private SettingsCheckBox chkUnifiedDailyReport;
+      private SettingsCheckBox chkEnableDailyReportAggregateTab;
 
     MHQDisplayPage(MHQOptionsModel model) {
         super(model);
@@ -126,16 +127,16 @@ class MHQDisplayPage extends MHQOptionsPage {
     }
 
     private JPanel createDisplayGeneralSection() {
-        CampaignOptionsFormPanel panel = new CampaignOptionsFormPanel("MHQDisplayGeneralContent", FORM_LABEL_WIDTH,
+      SettingsFormPanel panel = new SettingsFormPanel("MHQDisplayGeneralContent", FORM_LABEL_WIDTH,
               FORM_CONTROL_WIDTH);
 
         fieldDisplayDateFormat = new JTextField(model.displayDateFormat, 14);
         fieldDisplayDateFormat.setName("txtlabelDisplayDateFormat");
-        panel.addRow(new CampaignOptionsLabel(RESOURCE_BUNDLE, "labelDisplayDateFormat"),
+      panel.addRow(new SettingsLabel(TEXT_PROVIDER, "labelDisplayDateFormat"),
               dateFormatControl(fieldDisplayDateFormat));
         fieldLongDisplayDateFormat = new JTextField(model.longDisplayDateFormat, 14);
         fieldLongDisplayDateFormat.setName("txtlabelLongDisplayDateFormat");
-        panel.addRow(new CampaignOptionsLabel(RESOURCE_BUNDLE, "labelLongDisplayDateFormat"),
+      panel.addRow(new SettingsLabel(TEXT_PROVIDER, "labelLongDisplayDateFormat"),
               dateFormatControl(fieldLongDisplayDateFormat));
 
         String guiScaleText = Messages.getString("CommonSettingsDialog.guiScale");
@@ -182,7 +183,7 @@ class MHQDisplayPage extends MHQOptionsPage {
      */
     private JComponent dateFormatControl(JTextField field) {
         JLabel example = new JLabel();
-        String invalidDateFormatText = getTextAt(RESOURCE_BUNDLE, "invalidDateFormat.error");
+        String invalidDateFormatText = getText("invalidDateFormat.error");
         Runnable updateExample = () -> example.setText(validateDateFormat(field.getText())
               ? LocalDate.now().format(DateTimeFormatter.ofPattern(field.getText())
                     .withLocale(MekHQ.getMHQOptions().getDateLocale()))
@@ -225,14 +226,14 @@ class MHQDisplayPage extends MHQOptionsPage {
     }
 
     private JPanel createDisplayInterstellarSection() {
-        CampaignOptionsFormPanel panel = new CampaignOptionsFormPanel("MHQDisplayInterstellarContent", FORM_LABEL_WIDTH,
+      SettingsFormPanel panel = new SettingsFormPanel("MHQDisplayInterstellarContent", FORM_LABEL_WIDTH,
               FORM_CONTROL_WIDTH);
 
         chkInterstellarMapShowJumpRadius =
               checkBox("chkInterstellarMapShowJumpRadius", model.interstellarMapShowJumpRadius);
-        CampaignOptionsLabel jumpZoomLabel =
-              new CampaignOptionsLabel(RESOURCE_BUNDLE, "lblInterstellarMapShowJumpRadiusMinimumZoom");
-        spinnerInterstellarMapShowJumpRadiusMinimumZoom = new CampaignOptionsSpinner(RESOURCE_BUNDLE,
+        SettingsLabel jumpZoomLabel =
+              new SettingsLabel(TEXT_PROVIDER, "lblInterstellarMapShowJumpRadiusMinimumZoom");
+        spinnerInterstellarMapShowJumpRadiusMinimumZoom = new SettingsSpinner(TEXT_PROVIDER,
               "lblInterstellarMapShowJumpRadiusMinimumZoom", 3d, 0d, 10d, 0.5);
         spinnerInterstellarMapShowJumpRadiusMinimumZoom.setValue(model.interstellarMapShowJumpRadiusMinimumZoom);
         btnInterstellarMapJumpRadiusColour =
@@ -242,9 +243,9 @@ class MHQDisplayPage extends MHQOptionsPage {
 
         chkInterstellarMapShowPlanetaryAcquisitionRadius = checkBox(
               "chkInterstellarMapShowPlanetaryAcquisitionRadius", model.interstellarMapShowPlanetaryAcquisitionRadius);
-        CampaignOptionsLabel acquisitionZoomLabel = new CampaignOptionsLabel(RESOURCE_BUNDLE,
+      SettingsLabel acquisitionZoomLabel = new SettingsLabel(TEXT_PROVIDER,
               "lblInterstellarMapShowPlanetaryAcquisitionRadiusMinimumZoom");
-        spinnerInterstellarMapShowPlanetaryAcquisitionRadiusMinimumZoom = new CampaignOptionsSpinner(RESOURCE_BUNDLE,
+      spinnerInterstellarMapShowPlanetaryAcquisitionRadiusMinimumZoom = new SettingsSpinner(TEXT_PROVIDER,
               "lblInterstellarMapShowPlanetaryAcquisitionRadiusMinimumZoom", 2d, 0d, 10d, 0.5);
         spinnerInterstellarMapShowPlanetaryAcquisitionRadiusMinimumZoom.setValue(
               model.interstellarMapShowPlanetaryAcquisitionRadiusMinimumZoom);
@@ -301,8 +302,8 @@ class MHQDisplayPage extends MHQOptionsPage {
     }
 
     private JPanel createDisplayPersonnelSection() {
-        CampaignOptionsLabel filterStyleLabel =
-              new CampaignOptionsLabel(RESOURCE_BUNDLE, "optionPersonnelFilterStyle");
+        SettingsLabel filterStyleLabel =
+              new SettingsLabel(TEXT_PROVIDER, "optionPersonnelFilterStyle");
         comboPersonnelFilterStyle = new JComboBox<>(PersonnelFilterStyle.values());
         comboPersonnelFilterStyle.setName("optionPersonnelFilterStyle");
         comboPersonnelFilterStyle.setSelectedItem(model.personnelFilterStyle);
@@ -324,7 +325,7 @@ class MHQDisplayPage extends MHQOptionsPage {
         chkEnableDailyReportAggregateTab = checkBox("chkEnableDailyReportAggregateTab", model.aggregateDailyReport,
               getMetadata(null, CampaignOptionFlag.IMPORTANT));
 
-        CampaignOptionsFormPanel panel = new CampaignOptionsFormPanel("MHQDisplayPersonnelContent", FORM_LABEL_WIDTH,
+      SettingsFormPanel panel = new SettingsFormPanel("MHQDisplayPersonnelContent", FORM_LABEL_WIDTH,
               FORM_CONTROL_WIDTH);
         panel.addRow(filterStyleLabel, comboPersonnelFilterStyle);
         panel.addCheckBoxGrid(2, chkPersonnelFilterOnPrimaryRole, chkUnifiedDailyReport,

@@ -71,11 +71,11 @@ import mekhq.campaign.universe.StartingLocationChoice;
 import mekhq.campaign.universe.enums.StartingLocationMode;
 import mekhq.gui.baseComponents.AbstractMHQTabbedPane;
 import mekhq.gui.campaignOptions.CampaignOptionsDialog.CampaignOptionsDialogMode;
-import mekhq.gui.campaignOptions.CampaignOptionsIconLegend;
+import megamek.client.ui.settings.SettingsIconLegend;
 import mekhq.gui.campaignOptions.CampaignOptionsMetadata;
 import mekhq.gui.campaignOptions.components.CampaignOptionsCheckBox;
-import mekhq.gui.campaignOptions.components.CampaignOptionsFormPanel;
-import mekhq.gui.campaignOptions.components.CampaignOptionsIntroPanel;
+import megamek.client.ui.settings.SettingsFormPanel;
+import megamek.client.ui.settings.SettingsIntroPanel;
 import mekhq.gui.campaignOptions.components.CampaignOptionsLabel;
 import mekhq.gui.campaignOptions.components.CampaignOptionsPagePanel;
 import mekhq.gui.campaignOptions.components.CampaignOptionsTextField;
@@ -97,7 +97,7 @@ import mekhq.gui.displayWrappers.FactionDisplay;
  * This class extends the user interface features provided by {@link AbstractMHQTabbedPane}.
  */
 public class GeneralPage {
-    // Intentional exception to the shared CampaignOptionsFormPanel default widths: the landing page uses a narrow
+    // Intentional exception to the shared SettingsFormPanel default widths: the landing page uses a narrow
     // label column and a wide control column to fit the faction and date pickers.
     private static final int FORM_LABEL_COLUMN_WIDTH = 150;
     private static final int FORM_CONTROL_COLUMN_WIDTH = 360;
@@ -295,7 +295,7 @@ public class GeneralPage {
               .showDetailsPanel(false)
               .sectionsExpandedByDefault(true)
               .quote("generalPanel")
-              .introComponent(new CampaignOptionsIconLegend(campaignOptionsLegendEntries()))
+              .introComponent(new SettingsIconLegend(campaignOptionsLegendEntries()))
               .section("lblGeneralCampaignBasicsPanel.text",
                     "lblGeneralCampaignBasicsPanel.summary",
                     createCampaignBasicsPanel())
@@ -309,7 +309,7 @@ public class GeneralPage {
     }
 
     private @Nonnull JPanel createCampaignBasicsPanel() {
-        CampaignOptionsFormPanel panel = new CampaignOptionsFormPanel("GeneralCampaignBasicsPanel",
+        SettingsFormPanel panel = new SettingsFormPanel("GeneralCampaignBasicsPanel",
               FORM_LABEL_COLUMN_WIDTH,
               FORM_CONTROL_COLUMN_WIDTH);
         panel.addRow(lblDate, createInlineControls(btnDate, btnRandomDate));
@@ -355,7 +355,7 @@ public class GeneralPage {
     }
 
     private @Nonnull JPanel createIdentityArtworkPanel() {
-        CampaignOptionsFormPanel panel = new CampaignOptionsFormPanel("GeneralIdentityArtworkPanel",
+        SettingsFormPanel panel = new SettingsFormPanel("GeneralIdentityArtworkPanel",
               FORM_LABEL_COLUMN_WIDTH,
               UIUtil.scaleForGUI(120));
         panel.addRow(lblIcon, createInlineControls(btnIcon));
@@ -542,7 +542,7 @@ public class GeneralPage {
      * @return A {@link JPanel} containing additional informational components.
      */
     private @Nonnull JPanel createFurtherReadingPanel() {
-        return new CampaignOptionsIntroPanel("FurtherReadingPanel",
+        return new SettingsIntroPanel("FurtherReadingPanel",
               getFurtherReadingText(),
               UIUtil.scaleForGUI(FURTHER_READING_TEXT_WIDTH));
     }

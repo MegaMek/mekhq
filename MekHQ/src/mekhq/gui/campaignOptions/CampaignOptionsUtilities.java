@@ -35,12 +35,9 @@ package mekhq.gui.campaignOptions;
 import static megamek.client.ui.util.UIUtil.scaleForGUI;
 import static mekhq.utilities.MHQInternationalization.getTextAt;
 
-import java.awt.BorderLayout;
+import java.awt.Color;
 import java.awt.Component;
-import java.awt.Container;
 import java.awt.Dimension;
-import java.awt.GridBagConstraints;
-import java.awt.GridBagLayout;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.util.ArrayList;
@@ -50,18 +47,17 @@ import java.util.Map;
 import java.util.ResourceBundle;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.function.Consumer;
 import java.util.stream.Collectors;
-import javax.swing.BorderFactory;
 import javax.swing.GroupLayout;
 import javax.swing.JComponent;
-import javax.swing.JLabel;
 import javax.swing.JPanel;
+import javax.swing.SwingUtilities;
 
 import jakarta.annotation.Nonnull;
 import jakarta.annotation.Nullable;
 import megamek.Version;
-import mekhq.gui.baseComponents.MHQCollapsiblePanel;
+import megamek.client.ui.settings.SettingsBadge;
+import megamek.client.ui.settings.SettingsContentHost;
 
 /**
  * The {@code CampaignOptionsUtilities} class provides utility methods and constants for managing, creating, and
@@ -105,16 +101,6 @@ public class CampaignOptionsUtilities {
     public static int campaignOptionsPageContentWidth() {
         return scaleForGUI(860);
     }
-    private static final int QUOTE_TOP_PADDING = scaleForGUI(12);
-    private static final int QUOTE_BOTTOM_PADDING = scaleForGUI(8);
-    // Ambient sink for contextual help text. Campaign Options is a single-instance modal dialog, and this sink is
-    // reached from hundreds of hover registrations across every page (see createTipPanelUpdater), so it is
-    // deliberately static rather than a parameter threaded through the whole page-construction tree. The owning
-    // CampaignOptionsContentHost registers its consumer in its constructor and clears it (compare-and-clear) on
-    // teardown so a reparented or superseded host can never wipe a still-active wiring.
-    private static Consumer<String> tipTextConsumer;
-
-
     /**
      * Version marker for campaign options that existed before the metadata system was implemented and shouldn't have a
      * version badge.
@@ -175,14 +161,33 @@ public class CampaignOptionsUtilities {
      *
      * @return the Campaign Options legend rows, in display order
      */
-    public static List<CampaignOptionsIconLegend.Entry> campaignOptionsLegendEntries() {
-        List<CampaignOptionsIconLegend.Entry> entries = new ArrayList<>(List.of(
-              CampaignOptionsIconLegend.flagEntry(CampaignOptionFlag.CUSTOM_SYSTEM),
-              CampaignOptionsIconLegend.flagEntry(CampaignOptionFlag.DOCUMENTED),
-              CampaignOptionsIconLegend.flagEntry(CampaignOptionFlag.IMPORTANT),
-              CampaignOptionsIconLegend.flagEntry(CampaignOptionFlag.RECOMMENDED)));
-        entries.addAll(CampaignOptionsIconLegend.versionBadgeEntries());
+    public static List<SettingsBadge> campaignOptionsLegendEntries() {
+        List<SettingsBadge> entries = new ArrayList<>(List.of(
+              settingsBadge(CampaignOptionFlag.CUSTOM_SYSTEM),
+              settingsBadge(CampaignOptionFlag.DOCUMENTED),
+              settingsBadge(CampaignOptionFlag.IMPORTANT),
+              settingsBadge(CampaignOptionFlag.RECOMMENDED)));
+        entries.add(new SettingsBadge(
+              getTextAt(RESOURCE_BUNDLE, "badge.development.symbol").codePointAt(0),
+              Color.decode(getTextAt(RESOURCE_BUNDLE, "badge.development.color")),
+              getTextAt(RESOURCE_BUNDLE, "legend.development")));
+        entries.add(new SettingsBadge(
+              getTextAt(RESOURCE_BUNDLE, "badge.milestone.symbol").codePointAt(0),
+              Color.decode(getTextAt(RESOURCE_BUNDLE, "badge.milestone.color")),
+              getTextAt(RESOURCE_BUNDLE, "legend.milestone")));
         return entries;
+    }
+
+    /** Resolves a campaign option flag into the generic badge value used by controls and legends. */
+    public static SettingsBadge settingsBadge(CampaignOptionFlag flag) {
+        String descriptionKey = switch (flag) {
+            case CUSTOM_SYSTEM -> "legend.customSystem";
+            case DOCUMENTED -> "legend.documented";
+            case IMPORTANT -> "legend.important";
+            case RECOMMENDED -> "legend.recommended";
+            case UNIMPLEMENTED -> "legend.unimplemented";
+        };
+        return new SettingsBadge(flag.getSymbol().codePointAt(0), null, getTextAt(RESOURCE_BUNDLE, descriptionKey));
     }
 
     /**
@@ -193,23 +198,6 @@ public class CampaignOptionsUtilities {
      */
     public static void setSmallSizeVariant(@Nonnull JComponent component) {
         component.putClientProperty("JComponent.sizeVariant", "small");
-    }
-
-    static void setTipTextConsumer(@Nullable Consumer<String> tipTextConsumer) {
-        CampaignOptionsUtilities.tipTextConsumer = tipTextConsumer;
-    }
-
-    /**
-     * Clears the active tip-text sink, but only if it is still the {@code expected} consumer. This compare-and-clear
-     * lets a host release its own wiring on teardown without wiping a sink that a different (still-live) host has since
-     * registered.
-     *
-     * @param expected the consumer the caller previously registered via {@link #setTipTextConsumer(Consumer)}
-     */
-    static void clearTipTextConsumer(Consumer<String> expected) {
-        if (tipTextConsumer == expected) {
-            tipTextConsumer = null;
-        }
     }
 
     /**
@@ -239,118 +227,6 @@ public class CampaignOptionsUtilities {
         layout.setAutoCreateContainerGaps(true);
 
         return layout;
-    }
-
-    /**
-     * Creates a parent panel for the specified child panel and configures its layout. The child panel is encapsulated
-     * in the parent {@link JPanel}, ensuring consistent spacing and margins.
-     *
-     * @param panel the child {@link JPanel} that will be added to the parent panel.
-     * @param name  the identifier name for the parent panel, used for UI tracking and debugging purposes.
-     *
-     * @return a fully initialized {@link JPanel} configured as a parent container.
-     */
-    public static @Nonnull JPanel createParentPanel(JPanel panel, String name) {
-        return new CampaignOptionsPageWrapper(panel, name);
-    }
-
-    static Component createContentWithQuote(Component content, @Nullable String quoteResourceName) {
-        return createContentWithQuote(content, quoteResourceName, RESOURCE_BUNDLE);
-    }
-
-    static Component createContentWithQuote(Component content, @Nullable String quoteResourceName,
-          String resourceBundleName) {
-        if (quoteResourceName == null || !ResourceBundle.getBundle(resourceBundleName)
-                                                 .containsKey(quoteResourceName + ".border")) {
-            return content;
-        }
-
-        int quoteWidth = Math.max(1, Math.min(getQuoteReferenceWidth(content), campaignOptionsPanelWidth()));
-
-        JPanel quotePanel = new JPanel(new GridBagLayout());
-        quotePanel.setBorder(BorderFactory.createEmptyBorder(QUOTE_TOP_PADDING, 0, QUOTE_BOTTOM_PADDING, 0));
-        String resolvedQuoteText = getTextAt(resourceBundleName, quoteResourceName + ".border");
-        String quoteHtml = String.format(
-              "<html><div style='width: %spx; text-align:center;'>%s</div></html>",
-              quoteWidth,
-                            resolvedQuoteText);
-        JLabel quote = new JLabel(quoteHtml);
-
-        GridBagConstraints quoteConstraints = new GridBagConstraints();
-        quoteConstraints.gridx = GridBagConstraints.RELATIVE;
-        quoteConstraints.gridy = GridBagConstraints.RELATIVE;
-        quotePanel.add(quote, quoteConstraints);
-
-        JPanel quotedContent = new JPanel(new BorderLayout());
-        quotedContent.setName("pnl" + quoteResourceName + "QuotedContent");
-        quotedContent.add(content, BorderLayout.CENTER);
-        quotedContent.add(quotePanel, BorderLayout.SOUTH);
-        return quotedContent;
-    }
-
-    /**
-     * Determines the width that the closing quote should be sized to.
-     *
-     * <p>
-     * The page header reserves a fixed (wide) body text width, so sizing the quote to the whole content's preferred
-     * width makes the quote noticeably wider than the option sections beneath it. To keep the quote aligned with the
-     * visible sections, this method returns the width of the widest {@link MHQCollapsiblePanel} section found within the
-     * content tree, falling back to the content's preferred width when no section is present.
-     * </p>
-     *
-     * @param content the content whose section widths should be inspected
-     *
-     * @return the reference width to use for the quote
-     */
-    private static int getQuoteReferenceWidth(Component content) {
-        int widestSection = findWidestSection(content);
-        return widestSection > 0 ? widestSection : content.getPreferredSize().width;
-    }
-
-    private static int findWidestSection(Component component) {
-        int widest = 0;
-        if (component instanceof MHQCollapsiblePanel) {
-            widest = component.getPreferredSize().width;
-        }
-
-        if (component instanceof Container container) {
-            for (Component child : container.getComponents()) {
-                widest = Math.max(widest, findWidestSection(child));
-            }
-        }
-
-        return widest;
-    }
-
-    private static class CampaignOptionsPageWrapper extends JPanel {
-        private final Component content;
-
-        private CampaignOptionsPageWrapper(Component content, String name) {
-            super(null);
-            this.content = content;
-            setName("pnl" + name);
-            add(content);
-        }
-
-        @Override
-        public Dimension getPreferredSize() {
-            Dimension preferredSize = content.getPreferredSize();
-            return new Dimension(Math.min(preferredSize.width, campaignOptionsPanelWidth()), preferredSize.height);
-        }
-
-        @Override
-        public Dimension getMinimumSize() {
-            return new Dimension(0, content.getMinimumSize().height);
-        }
-
-        @Override
-        public void doLayout() {
-            Dimension preferredSize = content.getPreferredSize();
-            int contentWidth = Math.min(preferredSize.width, campaignOptionsPanelWidth());
-            contentWidth = Math.min(contentWidth, getWidth());
-            int x = Math.max(0, (getWidth() - contentWidth) / 2);
-            content.setBounds(x, 0, contentWidth, preferredSize.height);
-        }
     }
 
     /**
@@ -408,12 +284,14 @@ public class CampaignOptionsUtilities {
         return new MouseAdapter() {
             @Override
             public void mouseEntered(MouseEvent mouseEvent) {
-                String tipText = replacementText;
-                if (replacementText == null) {
-                    tipText = getTextAt(RESOURCE_BUNDLE, "lbl" + sourceComponentBaseName + ".tooltip");
-                }
-
-                sendTipToDetailsPanel(tipText);
+                String tipText = replacementText == null
+                      ? getTextAt(RESOURCE_BUNDLE, "lbl" + sourceComponentBaseName + ".tooltip")
+                      : replacementText;
+                Component source = mouseEvent.getComponent();
+                // The shared host also installs its generic control-help listener after page creation. Defer explicit
+                // page help by one event turn so replacement/dynamic text wins regardless of listener registration
+                // order.
+                SwingUtilities.invokeLater(() -> sendTipToDetailsPanel(source, tipText));
             }
         };
     }
@@ -426,20 +304,16 @@ public class CampaignOptionsUtilities {
      *
      * <p>Blank or {@code null} text is ignored so the previously shown details are left in place.</p>
      *
+     * @param source  a component mounted beneath the target settings content host
      * @param rawText the unformatted text to display, or {@code null}/blank to leave the panel unchanged
      */
-    public static void sendTipToDetailsPanel(@Nullable String rawText) {
+    public static void sendTipToDetailsPanel(Component source, @Nullable String rawText) {
         if (rawText == null || rawText.isBlank()) {
             return;
         }
-
-        // Wrap as HTML and let the help pane soft-wrap to its own width. We deliberately avoid inserting hard line
-        // breaks here (this previously hard-wrapped at a fixed character count, producing ragged breaks that did not
-        // match the panel width); any <br> already in the text is an intentional break and is preserved.
-        String tipText = rawText.startsWith("<html>") ? rawText : "<html>" + rawText + "</html>";
-
-        if (tipTextConsumer != null) {
-            tipTextConsumer.accept(tipText);
+        SettingsContentHost host = SettingsContentHost.findHost(source);
+        if (host != null) {
+            host.setHelpText(rawText);
         }
     }
 
@@ -482,6 +356,22 @@ public class CampaignOptionsUtilities {
         badges.append(metadata.getAddedSinceBadgeHtml());
 
         return badges.toString();
+    }
+
+    /** Converts MekHQ campaign metadata into the resolved badge values consumed by the shared settings framework. */
+    public static List<SettingsBadge> settingsBadges(@Nullable CampaignOptionsMetadata metadata) {
+        if (metadata == null) {
+            return List.of();
+        }
+        List<SettingsBadge> badges = new ArrayList<>();
+        for (CampaignOptionFlag flag : metadata.flags()) {
+            badges.add(settingsBadge(flag));
+        }
+        SettingsBadge versionBadge = metadata.getAddedSinceSettingsBadge();
+        if (versionBadge != null) {
+            badges.add(versionBadge);
+        }
+        return List.copyOf(badges);
     }
 
     // endregion Badge Formatting

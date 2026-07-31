@@ -58,6 +58,7 @@ import javax.swing.UIManager;
 import jakarta.annotation.Nonnull;
 import jakarta.annotation.Nullable;
 import megamek.client.ui.dialogs.buttonDialogs.AbstractButtonDialog;
+import megamek.client.ui.settings.SettingsIconLegend;
 import megamek.client.ui.util.UIUtil;
 import megamek.logging.MMLogger;
 import mekhq.CampaignPreset;
@@ -200,8 +201,11 @@ public class CampaignOptionsDialog extends AbstractButtonDialog {
 
         // Icons legend: kept apart on the left so it reads as a reference aid rather than a dialog action. Its popup
         // opens upward over the help/content area instead of past the bottom of the dialog.
-        JButton legendButton =
-              CampaignOptionsIconLegend.createLegendButton(CampaignOptionsUtilities.campaignOptionsLegendEntries());
+          String resourceBundle = CampaignOptionsUtilities.getCampaignOptionsResourceBundle();
+          JButton legendButton = SettingsIconLegend.createLegendButton(
+              getTextAt(resourceBundle, "lblIconsLegend.text"),
+              getTextAt(resourceBundle, "lblIconsLegend.tooltip"),
+              CampaignOptionsUtilities.campaignOptionsLegendEntries());
         JPanel legendPanel = new JPanel(new FlowLayout(FlowLayout.LEFT, BUTTON_GAP, BUTTON_GAP));
         legendPanel.add(legendButton);
 

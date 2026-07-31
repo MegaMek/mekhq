@@ -30,7 +30,7 @@
  * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
  * affiliated with Microsoft.
  */
-package mekhq.gui.campaignOptions;
+package mekhq.gui.clientOptions;
 
 import java.awt.Color;
 import java.util.HashMap;

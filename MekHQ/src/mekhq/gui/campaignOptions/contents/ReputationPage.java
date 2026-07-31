@@ -53,7 +53,7 @@ import megamek.Version;
 import mekhq.gui.campaignOptions.CampaignOptionFlag;
 import mekhq.gui.campaignOptions.CampaignOptionsMetadata;
 import mekhq.gui.campaignOptions.components.CampaignOptionsCheckBox;
-import mekhq.gui.campaignOptions.components.CampaignOptionsFormPanel;
+import megamek.client.ui.settings.SettingsFormPanel;
 import mekhq.gui.campaignOptions.components.CampaignOptionsHeaderPanel;
 import mekhq.gui.campaignOptions.components.CampaignOptionsLabel;
 import mekhq.gui.campaignOptions.components.CampaignOptionsPagePanel;
@@ -73,8 +73,8 @@ import mekhq.gui.campaignOptions.components.CampaignOptionsSpinner;
  * {@link #writeToModel(SystemsOptionsModel)} are no-ops.</p>
  */
 class ReputationPage {
-    private static final int FORM_LABEL_COLUMN_WIDTH = CampaignOptionsFormPanel.DEFAULT_LABEL_WIDTH;
-    private static final int FORM_CONTROL_COLUMN_WIDTH = CampaignOptionsFormPanel.DEFAULT_CONTROL_WIDTH;
+    private static final int FORM_LABEL_COLUMN_WIDTH = SettingsFormPanel.DEFAULT_LABEL_WIDTH;
+    private static final int FORM_CONTROL_COLUMN_WIDTH = SettingsFormPanel.DEFAULT_CONTROL_WIDTH;
     private static final int CHECKBOX_GRID_COLUMNS = 2;
 
     private CampaignOptionsHeaderPanel reputationHeader;
@@ -146,7 +146,7 @@ class ReputationPage {
         btnResetCriminalRecord = createResetCriminalRecordButton();
 
         // Layout the Panel
-        final CampaignOptionsFormPanel panel = new CampaignOptionsFormPanel("ReputationGeneralOptionsPanel",
+        final SettingsFormPanel panel = new SettingsFormPanel("ReputationGeneralOptionsPanel",
                 FORM_LABEL_COLUMN_WIDTH,
                 FORM_CONTROL_COLUMN_WIDTH);
         panel.addRow(lblManualUnitRatingModifier, manualUnitRatingModifier);
@@ -205,7 +205,7 @@ class ReputationPage {
         chkReputationPerformanceModifierCutOff.addMouseListener(createTipPanelUpdater("ReputationPerformanceModifierCutOff"));
 
         // Layout the Panel
-        final CampaignOptionsFormPanel panel = new CampaignOptionsFormPanel("ReputationSanityOptionsPanel",
+        final SettingsFormPanel panel = new SettingsFormPanel("ReputationSanityOptionsPanel",
                 FORM_LABEL_COLUMN_WIDTH,
                 FORM_CONTROL_COLUMN_WIDTH);
         panel.addCheckBoxGrid(CHECKBOX_GRID_COLUMNS,

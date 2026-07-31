@@ -30,11 +30,10 @@
  * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
  * affiliated with Microsoft.
  */
-package mekhq.gui.campaignOptions;
+package mekhq.gui.clientOptions;
 
 import static megamek.client.ui.util.FontHandler.symbolIcon;
-import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.setSmallSizeVariant;
-import static mekhq.utilities.MHQInternationalization.getTextAt;
+import static mekhq.utilities.MHQInternationalization.getText;
 
 import java.awt.BorderLayout;
 import java.awt.Component;
@@ -56,12 +55,12 @@ import megamek.client.ui.Messages;
 import megamek.client.ui.comboBoxes.MMComboBox;
 import megamek.client.ui.dialogs.buttonDialogs.CommonSettingsDialog;
 import megamek.client.ui.dialogs.helpDialogs.HelpDialog;
+import megamek.client.ui.settings.SettingsFormPanel;
+import megamek.client.ui.settings.SettingsLabel;
+import megamek.client.ui.settings.SettingsSpinner;
 import megamek.client.ui.util.UIUtil;
 import megamek.logging.MMLogger;
 import mekhq.campaign.universe.enums.CompanyGenerationMethod;
-import mekhq.gui.campaignOptions.components.CampaignOptionsFormPanel;
-import mekhq.gui.campaignOptions.components.CampaignOptionsLabel;
-import mekhq.gui.campaignOptions.components.CampaignOptionsSpinner;
 
 /**
  * The Advanced page of the MekHQ Client Options dialog: the user-data directory (with chooser and help buttons), the
@@ -76,11 +75,11 @@ class MHQAdvancedPage extends MHQOptionsPage {
 
     // Advanced
     private JTextField userDirField;
-    private CampaignOptionsSpinner spinnerStartGameDelay;
-    private CampaignOptionsSpinner spinnerStartGameClientDelay;
-    private CampaignOptionsSpinner spinnerStartGameClientRetryCount;
-    private CampaignOptionsSpinner spinnerStartGameBotClientDelay;
-    private CampaignOptionsSpinner spinnerStartGameBotClientRetryCount;
+      private SettingsSpinner spinnerStartGameDelay;
+      private SettingsSpinner spinnerStartGameClientDelay;
+      private SettingsSpinner spinnerStartGameClientRetryCount;
+      private SettingsSpinner spinnerStartGameBotClientDelay;
+      private SettingsSpinner spinnerStartGameBotClientRetryCount;
     private MMComboBox<CompanyGenerationMethod> comboDefaultCompanyGenerationMethod;
 
     MHQAdvancedPage(MHQOptionsModel model, JFrame frame) {
@@ -90,13 +89,13 @@ class MHQAdvancedPage extends MHQOptionsPage {
 
     @Override
     Component createPage() {
-        CampaignOptionsLabel userDirLabel = new CampaignOptionsLabel(RESOURCE_BUNDLE, "lblUserDir");
+        SettingsLabel userDirLabel = new SettingsLabel(TEXT_PROVIDER, "lblUserDir");
         userDirField = new JTextField(model.userDir, 20);
         userDirField.setName("txtUserDir");
-        userDirField.setToolTipText(getTextAt(RESOURCE_BUNDLE, "lblUserDir.toolTipText"));
+        userDirField.setToolTipText(getText("lblUserDir.toolTipText"));
         JButton userDirChooser = new JButton();
         userDirChooser.setName("btnUserDirChooser");
-        userDirChooser.setToolTipText(getTextAt(RESOURCE_BUNDLE, "userDirChooser.title"));
+        userDirChooser.setToolTipText(getText("userDirChooser.title"));
         // Material Symbols "folder_open" glyph (https://fonts.google.com/icons), matching the icon buttons elsewhere in
         // the dialog, in place of a "..." text button. Sized a little above the label font so it fills the enlarged
         // square chooser button.
@@ -104,27 +103,33 @@ class MHQAdvancedPage extends MHQOptionsPage {
               userDirChooser.getForeground()));
         userDirChooser.addActionListener(evt -> CommonSettingsDialog.fileChooseUserDir(userDirField, frame));
 
-        JButton userDirHelp = new JButton("Help");
+        JButton userDirHelp = new JButton();
         userDirHelp.setName("btnUserDirHelp");
+        String helpTitle = Messages.getString("UserDirHelpDialog.title");
+        userDirHelp.setToolTipText(helpTitle);
+        userDirHelp.getAccessibleContext().setAccessibleName(helpTitle);
+        // Material Symbols "help" glyph (https://fonts.google.com/icons).
+        userDirHelp.setIcon(symbolIcon(0xE887, userDirHelp.getFont().getSize() + UIUtil.scaleForGUI(2),
+              userDirHelp.getForeground()));
         // MekHQ ships its own copy of the user-directory help under docs/Customization/MekHQ; MMConstants points at
         // MegaMek's docs/Customization/UserDir path, which is absent from MekHQ's working directory.
         String userDirHelpPath = "docs/Customization/MekHQ/UserDirHelp.html";
         try {
-            String helpTitle = Messages.getString("UserDirHelpDialog.title");
             URL helpFile = new File(userDirHelpPath).toURI().toURL();
             userDirHelp.addActionListener(evt -> new HelpDialog(helpTitle, helpFile, frame).setVisible(true));
         } catch (MalformedURLException ex) {
             LOGGER.error("Could not find the user data directory help file at {}", userDirHelpPath);
         }
 
-        // Render Help a touch more compact, and enlarge the icon-only chooser to a square as tall as the path field so
-        // it is an easier click target.
-        setSmallSizeVariant(userDirHelp);
-        int chooserSide = userDirField.getPreferredSize().height;
-        Dimension chooserSize = new Dimension(chooserSide, chooserSide);
-        userDirChooser.setPreferredSize(chooserSize);
-        userDirChooser.setMinimumSize(chooserSize);
-        userDirChooser.setMaximumSize(chooserSize);
+                        // Keep both icon controls square and as tall as the path field.
+                        int buttonSide = userDirField.getPreferredSize().height;
+                        Dimension buttonSize = new Dimension(buttonSide, buttonSide);
+                        userDirChooser.setPreferredSize(buttonSize);
+                        userDirChooser.setMinimumSize(buttonSize);
+                        userDirChooser.setMaximumSize(buttonSize);
+                        userDirHelp.setPreferredSize(buttonSize);
+                        userDirHelp.setMinimumSize(buttonSize);
+                        userDirHelp.setMaximumSize(buttonSize);
 
         // Let the path field fill the control column so its left edge lines up with the spinners below (and its right
         // edge, past the buttons, with theirs) instead of sitting at a fixed width nudged over by FlowLayout's leading
@@ -141,7 +146,7 @@ class MHQAdvancedPage extends MHQOptionsPage {
         userDirControls.add(userDirField, BorderLayout.CENTER);
         userDirControls.add(userDirButtons, BorderLayout.LINE_END);
 
-        CampaignOptionsFormPanel panel = new CampaignOptionsFormPanel("MHQAdvancedContent", FORM_LABEL_WIDTH,
+      SettingsFormPanel panel = new SettingsFormPanel("MHQAdvancedContent", FORM_LABEL_WIDTH,
               FORM_CONTROL_WIDTH);
         panel.addRow(userDirLabel, userDirControls);
         spinnerStartGameDelay = advancedSpinner(panel, "lblStartGameDelay", 1000, 250, 2500, 25, model.startGameDelay);
@@ -154,13 +159,13 @@ class MHQAdvancedPage extends MHQOptionsPage {
         spinnerStartGameBotClientRetryCount = advancedSpinner(panel, "lblStartGameBotClientRetryCount", 250, 100, 2500,
               50, model.startGameBotClientRetryCount);
 
-        CampaignOptionsLabel companyGenerationLabel =
-              new CampaignOptionsLabel(RESOURCE_BUNDLE, "lblDefaultCompanyGenerationMethod");
+        SettingsLabel companyGenerationLabel =
+              new SettingsLabel(TEXT_PROVIDER, "lblDefaultCompanyGenerationMethod");
         comboDefaultCompanyGenerationMethod =
               new MMComboBox<>("comboDefaultCompanyGenerationMethod", CompanyGenerationMethod.values());
         comboDefaultCompanyGenerationMethod.setSelectedItem(model.defaultCompanyGenerationMethod);
         comboDefaultCompanyGenerationMethod.setToolTipText(
-              getTextAt(RESOURCE_BUNDLE, "lblDefaultCompanyGenerationMethod.toolTipText"));
+              getText("lblDefaultCompanyGenerationMethod.toolTipText"));
         comboDefaultCompanyGenerationMethod.setRenderer(new DefaultListCellRenderer() {
             @Override
             public Component getListCellRendererComponent(final JList<?> list, final Object value, final int index,
@@ -184,11 +189,11 @@ class MHQAdvancedPage extends MHQOptionsPage {
      * Creates a labelled integer spinner, initialises it to {@code value}, adds it to {@code panel} as a row, and
      * returns it so the caller can store it in a field for {@link #writeToModel()}.
      */
-    private CampaignOptionsSpinner advancedSpinner(CampaignOptionsFormPanel panel, String labelKey, int defaultValue,
+    private SettingsSpinner advancedSpinner(SettingsFormPanel panel, String labelKey, int defaultValue,
           int minimum, int maximum, int step, int value) {
-        CampaignOptionsLabel label = new CampaignOptionsLabel(RESOURCE_BUNDLE, labelKey);
-        CampaignOptionsSpinner spinner =
-              new CampaignOptionsSpinner(RESOURCE_BUNDLE, labelKey, defaultValue, minimum, maximum, step);
+        SettingsLabel label = new SettingsLabel(TEXT_PROVIDER, labelKey);
+        SettingsSpinner spinner =
+              new SettingsSpinner(TEXT_PROVIDER, labelKey, defaultValue, minimum, maximum, step);
         spinner.setValue(value);
         panel.addRow(label, spinner);
         return spinner;
