@@ -1945,7 +1945,7 @@ public class Campaign implements ITechManager {
 
     /**
      * @return all hangars across all locations associated with this campaign.
-     *                                                                                                                                     TODO: This won't work once we support multiple hangars. Method separated from getHangar() for future refactor
+     *                                                                                                                                           TODO: This won't work once we support multiple hangars. Method separated from getHangar() for future refactor
      *
      * @deprecated Use {@link PlayerForce#getHangar()} directly.
      */
@@ -4113,7 +4113,8 @@ public class Campaign implements ITechManager {
             }
         }
 
-        if (roll >= target.getValue()) {
+        final boolean taskSucceeded = roll >= target.getValue();
+        if (taskSucceeded) {
             report = report + partWork.succeed();
             if (getCampaignOptions().isPayForRepairs() && action.equals(" fix ") && !(partWork instanceof Armor)) {
                 Money cost = partWork.getUndamagedValue().multipliedBy(0.2);
@@ -4166,6 +4167,27 @@ public class Campaign implements ITechManager {
         }
         report += wrongType;
         partWork.cancelAssignment(true);
+
+        if (!taskSucceeded
+                  && (partWork instanceof MissingPart missingPart)
+                  && missingPart.isFabricating()
+                  && missingPart.isFabricateUntilSuccess()
+                  && missingPart.canFabricate()
+                  && (tech.getSkillForWorkingOn(partWork) != null)) {
+            final Money nextCost = missingPart.getFabricationCost();
+            if (nextCost.isZero() || !getFinances().getBalance().isLessThan(nextCost)) {
+                partWork.setTech(tech);
+                partWork.reservePart();
+                report += ' ' + getFormattedTextAt(RESOURCE_BUNDLE, "fixPart.retryFabrication.report",
+                      tech.getHyperlinkedFullTitle(), partWork.getPartName());
+            } else {
+                // Can't afford the next attempt: leave the tech unassigned so the job pauses (rather than wasting the
+                // tech's time each cycle). The fabrication mode is kept, so re-assigning a tech once funded resumes it.
+                report += ' ' + getFormattedTextAt(RESOURCE_BUNDLE, "fixPart.retryFabrication.unaffordable.report",
+                      partWork.getPartName());
+            }
+        }
+
         MekHQ.triggerEvent(new PartWorkEvent(tech, partWork));
         addReport(TECHNICAL, report);
         return report;
@@ -6411,6 +6433,11 @@ public class Campaign implements ITechManager {
                 if (!missingPart.canFabricate()) {
                     return new TargetRoll(TargetRoll.IMPOSSIBLE,
                           "This part cannot be fabricated here (requires base Tech Rating A-C or a factory-grade facility).");
+                }
+                // Each fabrication attempt is paid up front
+                final Money fabricationCost = missingPart.getFabricationCost();
+                if (!fabricationCost.isZero() && getFinances().getBalance().isLessThan(fabricationCost)) {
+                    return new TargetRoll(TargetRoll.IMPOSSIBLE, "Cannot afford this fabrication attempt.");
                 }
             } else if (missingPart.findReplacement(false) == null) {
                 return new TargetRoll(TargetRoll.IMPOSSIBLE, "Replacement part not available.");

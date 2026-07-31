@@ -160,6 +160,8 @@ public abstract class Part implements IPartWork, ITechnology, ILocatable {
     private boolean isTeamSalvaging;
     // when true, this (missing) part is being fabricated from scratch rather than replaced from stock
     private boolean isFabricating;
+    // when true (and fabricating), a failed attempt is automatically retried until it succeeds
+    private boolean fabricateUntilSuccess;
 
     // null is valid. It indicates parts that are not attached to units.
     protected Unit unit;
@@ -748,6 +750,10 @@ public abstract class Part implements IPartWork, ITechnology, ILocatable {
             MHQXMLUtility.writeSimpleXMLTag(pw, indent, "isFabricating", true);
         }
 
+        if (fabricateUntilSuccess) {
+            MHQXMLUtility.writeSimpleXMLTag(pw, indent, "fabricateUntilSuccess", true);
+        }
+
         if (parentPart != null) {
             MHQXMLUtility.writeSimpleXMLTag(pw, indent, "parentPartId", parentPart.getId());
         }
@@ -921,6 +927,8 @@ public abstract class Part implements IPartWork, ITechnology, ILocatable {
                     retVal.isTeamSalvaging = wn2.getTextContent().equalsIgnoreCase("true");
                 } else if (wn2.getNodeName().equalsIgnoreCase("isFabricating")) {
                     retVal.isFabricating = wn2.getTextContent().equalsIgnoreCase("true");
+                } else if (wn2.getNodeName().equalsIgnoreCase("fabricateUntilSuccess")) {
+                    retVal.fabricateUntilSuccess = wn2.getTextContent().equalsIgnoreCase("true");
                 } else if (wn2.getNodeName().equalsIgnoreCase("brandNew")) {
                     retVal.brandNew = Boolean.parseBoolean(wn2.getTextContent().trim());
                 } else if (wn2.getNodeName().equalsIgnoreCase("replacementId")) {
@@ -1226,6 +1234,23 @@ public abstract class Part implements IPartWork, ITechnology, ILocatable {
      */
     public void setFabricating(final boolean isFabricating) {
         this.isFabricating = isFabricating;
+    }
+
+    /**
+     * @return {@code true} if a failed fabrication attempt should be automatically retried until it succeeds. Only
+     *       meaningful while {@link #isFabricating()} is {@code true}.
+     */
+    public boolean isFabricateUntilSuccess() {
+        return fabricateUntilSuccess;
+    }
+
+    /**
+     * Sets whether a failed fabrication attempt is automatically retried until it succeeds.
+     *
+     * @param fabricateUntilSuccess whether to retry fabrication until success
+     */
+    public void setFabricateUntilSuccess(final boolean fabricateUntilSuccess) {
+        this.fabricateUntilSuccess = fabricateUntilSuccess;
     }
 
     /**

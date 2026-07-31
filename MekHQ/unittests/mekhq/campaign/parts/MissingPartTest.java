@@ -425,6 +425,7 @@ public class MissingPartTest {
         MissingPart missingPart = new MissingMekLocation(Mek.LOC_LEFT_ARM, 20, EquipmentType.T_STRUCTURE_STANDARD,
               false, false, false, mockCampaign);
         missingPart.setFabricating(true);
+        missingPart.setFabricateUntilSuccess(true);
         Person person = mock(Person.class);
         when(person.getId()).thenReturn(UUID.randomUUID());
         missingPart.setTech(person);
@@ -433,6 +434,7 @@ public class MissingPartTest {
         missingPart.cancelFabrication();
 
         assertFalse(missingPart.isFabricating());
+        assertFalse(missingPart.isFabricateUntilSuccess());
         assertNull(missingPart.getTech());
         assertEquals(0, missingPart.getTimeSpent());
     }

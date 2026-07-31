@@ -38,11 +38,13 @@ import static mekhq.utilities.MHQInternationalization.getTextAt;
 
 import java.awt.event.ActionEvent;
 import java.util.Optional;
+import javax.swing.ButtonGroup;
 import javax.swing.JCheckBoxMenuItem;
 import javax.swing.JMenu;
 import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
 import javax.swing.JPopupMenu;
+import javax.swing.JRadioButtonMenuItem;
 import javax.swing.JTable;
 
 import megamek.common.rolls.TargetRoll;
@@ -181,12 +183,29 @@ public class TaskTableMouseAdapter extends JPopupMenuAdapter {
                 }
             }
             taskTable.repaint();
-        } else if (command.equalsIgnoreCase("FABRICATE")) {
+        } else if (command.startsWith("FABRICATE_")) {
             if ((partWork instanceof MissingPart missingPart) && !missingPart.isBeingWorkedOn()) {
-                // Toggle fabrication. Switching between replace and fabricate changes the total work time
-                // drastically, so drop any partial progress.
-                missingPart.setFabricating(!missingPart.isFabricating());
-                missingPart.resetTimeSpent();
+                boolean wasFabricating = missingPart.isFabricating();
+                switch (command) {
+                    case "FABRICATE_OFF" -> {
+                        missingPart.setFabricating(false);
+                        missingPart.setFabricateUntilSuccess(false);
+                    }
+                    case "FABRICATE_SINGLE" -> {
+                        missingPart.setFabricating(true);
+                        missingPart.setFabricateUntilSuccess(false);
+                    }
+                    case "FABRICATE_UNTIL" -> {
+                        missingPart.setFabricating(true);
+                        missingPart.setFabricateUntilSuccess(true);
+                    }
+                    default -> {}
+                }
+                // Turning fabrication on or off changes the total work time drastically (10x), so drop any partial
+                // progress. Switching only the retry mode leaves the time basis unchanged.
+                if (wasFabricating != missingPart.isFabricating()) {
+                    missingPart.resetTimeSpent();
+                }
                 MekHQ.triggerEvent(new PartChangedEvent(missingPart));
                 taskTable.repaint();
             }
@@ -461,14 +480,40 @@ public class TaskTableMouseAdapter extends JPopupMenuAdapter {
         if (gui.getCampaign().getCampaignOptions().get(CampaignOption.USE_FABRICATION)
                   && (rows.length == 1) && (partWork instanceof MissingPart missingPart)
                   && missingPart.canFabricate()) {
-            cbMenuItem = new JCheckBoxMenuItem(getTextAt(RESOURCE_BUNDLE, "TaskTableMouseAdapter.FABRICATE"));
-            cbMenuItem.setSelected(missingPart.isFabricating());
-            cbMenuItem.setToolTipText(getFormattedTextAt(RESOURCE_BUNDLE, "TaskTableMouseAdapter.FABRICATE.tooltip",
+            // Fabricate replacement: choose the mode. "Single attempt" behaves like a normal replacement task;
+            // "Until success" re-assigns the tech after each failed attempt (paying the cost again) until it succeeds.
+            menu = new JMenu(getTextAt(RESOURCE_BUNDLE, "TaskTableMouseAdapter.FABRICATE"));
+            menu.setToolTipText(getFormattedTextAt(RESOURCE_BUNDLE, "TaskTableMouseAdapter.FABRICATE.tooltip",
                   missingPart.getFabricationCost().toAmountAndSymbolString()));
-            cbMenuItem.setActionCommand("FABRICATE");
-            cbMenuItem.addActionListener(this);
-            cbMenuItem.setEnabled(!isBeingWorked);
-            popup.add(cbMenuItem);
+            menu.setEnabled(!isBeingWorked);
+
+            ButtonGroup fabricateGroup = new ButtonGroup();
+
+            JRadioButtonMenuItem offItem = new JRadioButtonMenuItem(
+                  getTextAt(RESOURCE_BUNDLE, "TaskTableMouseAdapter.FABRICATE.off"));
+            offItem.setSelected(!missingPart.isFabricating());
+            offItem.setActionCommand("FABRICATE_OFF");
+            offItem.addActionListener(this);
+            fabricateGroup.add(offItem);
+            menu.add(offItem);
+
+            JRadioButtonMenuItem singleItem = new JRadioButtonMenuItem(
+                  getTextAt(RESOURCE_BUNDLE, "TaskTableMouseAdapter.FABRICATE.single"));
+            singleItem.setSelected(missingPart.isFabricating() && !missingPart.isFabricateUntilSuccess());
+            singleItem.setActionCommand("FABRICATE_SINGLE");
+            singleItem.addActionListener(this);
+            fabricateGroup.add(singleItem);
+            menu.add(singleItem);
+
+            JRadioButtonMenuItem untilItem = new JRadioButtonMenuItem(
+                  getTextAt(RESOURCE_BUNDLE, "TaskTableMouseAdapter.FABRICATE.untilSuccess"));
+            untilItem.setSelected(missingPart.isFabricating() && missingPart.isFabricateUntilSuccess());
+            untilItem.setActionCommand("FABRICATE_UNTIL");
+            untilItem.addActionListener(this);
+            fabricateGroup.add(untilItem);
+            menu.add(untilItem);
+
+            popup.add(menu);
         }
 
         if (gui.getCampaign().isGM()) {

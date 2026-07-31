@@ -131,6 +131,9 @@ public abstract class MissingPart extends Part implements IAcquisitionWork {
         if (isUnitTonnageMatters()) {
             toReturn.append(" (").append(getUnitTonnage()).append(" ton)");
         }
+        if (isFabricating() && isFabricateUntilSuccess()) {
+            toReturn.append(" (until success)");
+        }
         toReturn.append(" - ")
               .append(messageSurroundedBySpanWithColor(SkillType.getExperienceLevelColor(getSkillMin()),
                     SkillType.getExperienceLevelName(getSkillMin()) + "+"))
@@ -259,6 +262,7 @@ public abstract class MissingPart extends Part implements IAcquisitionWork {
      */
     public void cancelFabrication() {
         setFabricating(false);
+        setFabricateUntilSuccess(false);
         cancelAssignment(true);
     }
 
