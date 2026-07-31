@@ -62,7 +62,10 @@ import megamek.common.units.Entity;
 import megamek.common.units.Mek;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.LocalWarehouse;
+import mekhq.campaign.campaignOptions.CampaignOption;
+import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.parts.Part;
+import mekhq.campaign.parts.enums.PartQuality;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.unit.Unit;
 import mekhq.utilities.MHQXMLUtility;
@@ -1030,6 +1033,74 @@ public class MissingEquipmentPartTest {
         verify(mounted, times(1)).setHit(eq(false));
         verify(mounted, times(1)).setDestroyed(eq(false));
         verify(mounted, times(1)).setRepairable(eq(true));
+        verify(unit, times(1)).repairSystem(eq(CriticalSlot.TYPE_EQUIPMENT), eq(equipmentNum));
+    }
+
+    @Test
+    public void fabricationInstallsANewPartWithoutStock() {
+        Campaign mockCampaign = mockCampaign();
+        LocalWarehouse warehouse = new LocalWarehouse();
+        when(mockCampaign.getPlayerForce().getWarehouse()).thenReturn(warehouse);
+        mekhq.campaign.ForceQuartermaster quartermaster = new mekhq.campaign.ForceQuartermaster(mockCampaign);
+        when(mockCampaign.getQuartermaster()).thenReturn(quartermaster);
+
+        // Charge nothing for the attempt (both pay options off) so no Finances interaction is needed.
+        CampaignOptions options = new CampaignOptions();
+        options.set(CampaignOption.PAY_FOR_PARTS, false);
+        options.set(CampaignOption.PAY_FOR_REPAIRS, false);
+        when(mockCampaign.getCampaignOptions()).thenReturn(options);
+
+        Unit unit = mock(Unit.class);
+        Entity entity = mock(Entity.class);
+        when(unit.getEntity()).thenReturn(entity);
+        when(unit.getQuality()).thenReturn(PartQuality.QUALITY_D);
+        doAnswer(inv -> {
+            Part part = inv.getArgument(0);
+            part.setUnit(unit);
+            return null;
+        }).when(unit).addPart(any());
+        doAnswer(inv -> {
+            Part part = inv.getArgument(0);
+            part.setUnit(null);
+            return null;
+        }).when(unit).removePart(any());
+
+        double equipTonnage = 2.0;
+        double size = 3.0;
+        EquipmentType type = mock(EquipmentType.class);
+        doReturn(equipTonnage).when(type).getTonnage(any(), anyDouble());
+
+        int equipmentNum = 42;
+        Mounted mounted = mock(Mounted.class);
+        doReturn(mounted).when(entity).getEquipment(eq(equipmentNum));
+
+        MissingEquipmentPart missingPart = new MissingEquipmentPart(75,
+              type,
+              equipmentNum,
+              mockCampaign,
+              equipTonnage,
+              size,
+              false);
+        missingPart.setId(25);
+        missingPart.setUnit(unit);
+        warehouse.addPart(missingPart);
+
+        // No spare part in stock: fabricate one from scratch.
+        missingPart.setFabricating(true);
+        missingPart.succeed();
+
+        // The missing part is gone and a fabricated equipment part has been installed on the unit.
+        assertFalse(warehouse.getParts().contains(missingPart));
+        assertTrue(missingPart.getId() < 0);
+        assertNull(missingPart.getUnit());
+
+        ArgumentCaptor<Part> replacementCaptor = ArgumentCaptor.forClass(Part.class);
+        verify(unit, times(1)).addPart(replacementCaptor.capture());
+
+        Part replacement = replacementCaptor.getValue();
+        assertInstanceOf(EquipmentPart.class, replacement);
+        assertEquals(equipmentNum, ((EquipmentPart) replacement).getEquipmentNum());
+        assertEquals(unit, replacement.getUnit());
         verify(unit, times(1)).repairSystem(eq(CriticalSlot.TYPE_EQUIPMENT), eq(equipmentNum));
     }
 

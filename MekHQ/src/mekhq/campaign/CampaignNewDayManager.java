@@ -119,6 +119,7 @@ import mekhq.campaign.events.DayEndingEvent;
 import mekhq.campaign.events.DeploymentChangedEvent;
 import mekhq.campaign.events.InterruptAdvanceMultipleDaysEvent;
 import mekhq.campaign.events.NewDayEvent;
+import mekhq.campaign.events.parts.PartChangedEvent;
 import mekhq.campaign.events.persons.PersonChangedEvent;
 import mekhq.campaign.finances.Finances;
 import mekhq.campaign.finances.Money;
@@ -141,7 +142,9 @@ import mekhq.campaign.mission.enums.ScenarioType;
 import mekhq.campaign.mission.rentals.ContractRentalType;
 import mekhq.campaign.mission.rentals.FacilityRentals;
 import mekhq.campaign.mission.resupplyAndCaches.Resupply;
+import mekhq.campaign.parts.Part;
 import mekhq.campaign.parts.PartInUse;
+import mekhq.campaign.parts.missing.MissingPart;
 import mekhq.campaign.personnel.Bloodmark;
 import mekhq.campaign.personnel.Injury;
 import mekhq.campaign.personnel.InjuryType;
@@ -1379,6 +1382,8 @@ public class CampaignNewDayManager {
             Maintenance.checkAndCorrectMaintenanceSchedule(campaign);
         }
 
+        cancelIneligibleFabrications();
+
         LocationNewDayUtil.processAllLocationUnits(campaign);
 
         // Finally, run Mass Repair Mass Salvage if desired
@@ -1389,6 +1394,26 @@ public class CampaignNewDayManager {
                 LOGGER.error("Could not perform mass repair/salvage on units due to an error", ex);
                 campaign.addReport(TECHNICAL,
                       "ERROR: an error occurred performing mass repair/salvage on units, check the log");
+            }
+        }
+    }
+
+    /**
+     * Cancels any in-progress part fabrication that is no longer permitted (for example, a part above Tech Rating C
+     * whose unit has left factory-grade facilities). Such a task would otherwise be stuck showing an impossible target
+     * number, so it is reverted to a normal replacement and the player is notified.
+     */
+    private void cancelIneligibleFabrications() {
+        for (Unit unit : campaign.getUnits()) {
+            for (Part part : unit.getParts()) {
+                if ((part instanceof MissingPart missingPart)
+                          && missingPart.isFabricating()
+                          && !missingPart.canFabricate()) {
+                    missingPart.cancelFabrication();
+                    campaign.addReport(TECHNICAL, getFormattedTextAt(RESOURCE_BUNDLE,
+                          "fabrication.canceled.report", missingPart.getName(), unit.getName()));
+                    MekHQ.triggerEvent(new PartChangedEvent(missingPart));
+                }
             }
         }
     }

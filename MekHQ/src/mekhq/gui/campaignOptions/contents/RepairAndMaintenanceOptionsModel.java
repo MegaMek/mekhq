@@ -33,6 +33,7 @@
 package mekhq.gui.campaignOptions.contents;
 
 import jakarta.annotation.Nonnull;
+import mekhq.campaign.campaignOptions.CampaignOption;
 import mekhq.campaign.campaignOptions.CampaignOptions;
 
 class RepairAndMaintenanceOptionsModel {
@@ -56,6 +57,9 @@ class RepairAndMaintenanceOptionsModel {
     boolean usePlanetaryModifiers;
     boolean useUnofficialMaintenance;
     boolean logMaintenance;
+    boolean useFabrication;
+    boolean useBalancedFabrication;
+    boolean MaintenanceFabrication;
 
     RepairAndMaintenanceOptionsModel(@Nonnull CampaignOptions options) {
         techsUseAdministration = options.isTechsUseAdministration();
@@ -78,6 +82,9 @@ class RepairAndMaintenanceOptionsModel {
         usePlanetaryModifiers = options.isUsePlanetaryModifiers();
         useUnofficialMaintenance = options.isUseUnofficialMaintenance();
         logMaintenance = options.isLogMaintenance();
+        useFabrication = options.get(CampaignOption.USE_FABRICATION);
+        useBalancedFabrication = options.get(CampaignOption.USE_BALANCED_FABRICATION);
+        MaintenanceFabrication = options.get(CampaignOption.FABRICATE_D_IN_MAINTENANCE_FACILITY);
     }
 
     void applyTo(@Nonnull CampaignOptions options) {
@@ -101,5 +108,8 @@ class RepairAndMaintenanceOptionsModel {
         options.setUsePlanetaryModifiers(usePlanetaryModifiers);
         options.setUseUnofficialMaintenance(useUnofficialMaintenance);
         options.setLogMaintenance(logMaintenance);
+        options.set(CampaignOption.USE_FABRICATION, useFabrication);
+        options.set(CampaignOption.USE_BALANCED_FABRICATION, useBalancedFabrication);
+        options.set(CampaignOption.FABRICATE_D_IN_MAINTENANCE_FACILITY, MaintenanceFabrication);
     }
 }

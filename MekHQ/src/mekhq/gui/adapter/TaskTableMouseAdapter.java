@@ -48,6 +48,7 @@ import javax.swing.JTable;
 import megamek.common.rolls.TargetRoll;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
+import mekhq.campaign.campaignOptions.CampaignOption;
 import mekhq.campaign.events.AcquisitionEvent;
 import mekhq.campaign.events.parts.PartChangedEvent;
 import mekhq.campaign.events.parts.PartModeChangedEvent;
@@ -180,6 +181,15 @@ public class TaskTableMouseAdapter extends JPopupMenuAdapter {
                 }
             }
             taskTable.repaint();
+        } else if (command.equalsIgnoreCase("FABRICATE")) {
+            if ((partWork instanceof MissingPart missingPart) && !missingPart.isBeingWorkedOn()) {
+                // Toggle fabrication. Switching between replace and fabricate changes the total work time
+                // drastically, so drop any partial progress.
+                missingPart.setFabricating(!missingPart.isFabricating());
+                missingPart.resetTimeSpent();
+                MekHQ.triggerEvent(new PartChangedEvent(missingPart));
+                taskTable.repaint();
+            }
         }
     }
 
@@ -416,7 +426,7 @@ public class TaskTableMouseAdapter extends JPopupMenuAdapter {
         // Strip part: one-click salvage removal using the currently selected tech, even though the unit is set to
         // repair. Only offered for a single installed, damaged component so the target number and time can be shown.
         if (!isBeingWorked && (rows.length == 1) && (partWork instanceof Part stripCandidate)
-              && isStripCandidate(stripCandidate)) {
+                  && isStripCandidate(stripCandidate)) {
             if (stripCandidate instanceof MekLocation) {
                 // Locations can't be stripped from here (armor and equipment must come off first, in order); show a
                 // disabled entry that explains why and points the player at Scrap.
@@ -427,10 +437,9 @@ public class TaskTableMouseAdapter extends JPopupMenuAdapter {
             } else {
                 Person tech = techWorkPanel.getSelectedTech();
                 TargetRoll target = getStripTarget(stripCandidate, tech);
-                boolean canPerformStrip = !isBeingWorked
-                                                && (tech != null)
-                                                && (target != null)
-                                                && (target.getValue() != TargetRoll.IMPOSSIBLE);
+                boolean canPerformStrip = tech != null &&
+                                                target != null &&
+                                                target.getValue() != TargetRoll.IMPOSSIBLE;
 
                 if (canPerformStrip) {
                     menuItem = new JMenuItem(getFormattedTextAt(RESOURCE_BUNDLE, "TaskTableMouseAdapter.strip",
@@ -447,6 +456,19 @@ public class TaskTableMouseAdapter extends JPopupMenuAdapter {
                 menuItem.setEnabled(canPerformStrip);
                 popup.add(menuItem);
             }
+        }
+
+        if (gui.getCampaign().getCampaignOptions().get(CampaignOption.USE_FABRICATION)
+                  && (rows.length == 1) && (partWork instanceof MissingPart missingPart)
+                  && missingPart.canFabricate()) {
+            cbMenuItem = new JCheckBoxMenuItem(getTextAt(RESOURCE_BUNDLE, "TaskTableMouseAdapter.FABRICATE"));
+            cbMenuItem.setSelected(missingPart.isFabricating());
+            cbMenuItem.setToolTipText(getFormattedTextAt(RESOURCE_BUNDLE, "TaskTableMouseAdapter.FABRICATE.tooltip",
+                  missingPart.getFabricationCost().toAmountAndSymbolString()));
+            cbMenuItem.setActionCommand("FABRICATE");
+            cbMenuItem.addActionListener(this);
+            cbMenuItem.setEnabled(!isBeingWorked);
+            popup.add(cbMenuItem);
         }
 
         if (gui.getCampaign().isGM()) {

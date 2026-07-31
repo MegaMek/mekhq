@@ -1945,7 +1945,7 @@ public class Campaign implements ITechManager {
 
     /**
      * @return all hangars across all locations associated with this campaign.
-     *                                                                                                                               TODO: This won't work once we support multiple hangars. Method separated from getHangar() for future refactor
+     *                                                                                                                                     TODO: This won't work once we support multiple hangars. Method separated from getHangar() for future refactor
      *
      * @deprecated Use {@link PlayerForce#getHangar()} directly.
      */
@@ -6404,8 +6404,17 @@ public class Campaign implements ITechManager {
             return new TargetRoll(TargetRoll.IMPOSSIBLE, "Task is impossible.");
         } else if (!partWork.needsFixing() && !partWork.isSalvaging()) {
             return new TargetRoll(TargetRoll.IMPOSSIBLE, "Task is not needed.");
-        } else if ((partWork instanceof MissingPart) && (((MissingPart) partWork).findReplacement(false) == null)) {
-            return new TargetRoll(TargetRoll.IMPOSSIBLE, "Replacement part not available.");
+        } else if (partWork instanceof MissingPart missingPart) {
+            if (missingPart.isFabricating()) {
+                // A part flagged for fabrication that is no longer eligible (tech rating above C without a
+                // factory-grade facility) cannot be worked on.
+                if (!missingPart.canFabricate()) {
+                    return new TargetRoll(TargetRoll.IMPOSSIBLE,
+                          "This part cannot be fabricated here (requires base Tech Rating A-C or a factory-grade facility).");
+                }
+            } else if (missingPart.findReplacement(false) == null) {
+                return new TargetRoll(TargetRoll.IMPOSSIBLE, "Replacement part not available.");
+            }
         }
 
         final int techTime = isOvertimeAllowed() ?

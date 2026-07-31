@@ -46,13 +46,19 @@ import megamek.common.annotations.Nullable;
 import megamek.common.enums.AvailabilityValue;
 import megamek.common.enums.Faction;
 import megamek.common.enums.TechBase;
+import megamek.common.enums.TechRating;
 import megamek.common.rolls.TargetRoll;
 import mekhq.campaign.Campaign;
+import mekhq.campaign.campaignOptions.CampaignOption;
+import mekhq.campaign.campaignOptions.CampaignOptions;
+import mekhq.campaign.finances.Finances;
 import mekhq.campaign.finances.Money;
+import mekhq.campaign.finances.enums.TransactionType;
 import mekhq.campaign.parts.Availability;
 import mekhq.campaign.parts.Part;
 import mekhq.campaign.parts.PartInventory;
 import mekhq.campaign.parts.equipment.MissingAmmoBin;
+import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.skills.SkillType;
 import mekhq.campaign.unit.Unit;
 import mekhq.campaign.work.IAcquisitionWork;
@@ -65,6 +71,15 @@ import mekhq.utilities.ReportingUtilities;
  * @author Jay Lawson (jaylawson39 at yahoo.com)
  */
 public abstract class MissingPart extends Part implements IAcquisitionWork {
+    /** Fabrication takes ten times the normal replacement time and cost (Campaign Ops, p.202 rev 5th printing). */
+    private static final int FABRICATION_MULTIPLIER = 10;
+    /** A fabrication attempt receives an additional +2 to its target number. */
+    private static final int FABRICATION_MODIFIER = 2;
+    /** Fraction of a part's undamaged value charged as the cost of a normal repair when 'Pay For Repairs' is enabled. */
+    private static final double REPAIR_COST_FRACTION = 0.2;
+    /** The purchase price of a fabricated part is half the sale price of a new component. */
+    private static final double FABRICATED_PART_PRICE_FRACTION = 0.5;
+
     public MissingPart(int tonnage, Campaign c) {
         super(tonnage, false, c);
     }
@@ -109,7 +124,7 @@ public abstract class MissingPart extends Part implements IAcquisitionWork {
     @Override
     public String getDesc() {
         StringBuilder toReturn = new StringBuilder();
-        toReturn.append("<html><b>Replace ").append(getName());
+        toReturn.append("<html><b>").append(isFabricating() ? "Fabricate " : "Replace ").append(getName());
         if (isUnitTonnageMatters()) {
             toReturn.append(" (").append(getUnitTonnage()).append(" ton)");
         }
@@ -137,9 +152,18 @@ public abstract class MissingPart extends Part implements IAcquisitionWork {
 
     @Override
     public String succeed() {
+        boolean wasFabricating = isFabricating();
+        if (wasFabricating) {
+            // The fabrication cost is charged per attempt, whether it succeeds or fails.
+            chargeFabricationAttempt(campaign.getPlayerForce().getFinances());
+            // Supply the freshly fabricated component as this part's replacement so the normal fix() path below
+            // installs it - with the correct slot/location linkage handled by each part type's own fix() override -
+            // exactly as if it had been pulled from stock.
+            prepareFabricatedReplacement();
+        }
         fix();
         return messageSurroundedBySpanWithColor(ReportingUtilities.getPositiveColor(),
-              " <b>replaced</b>.");
+              wasFabricating ? " <b>fabricated</b>." : " <b>replaced</b>.");
     }
 
     @Override
@@ -160,6 +184,127 @@ public abstract class MissingPart extends Part implements IAcquisitionWork {
 
             actualReplacement.updateConditionFromPart();
         }
+    }
+
+    /**
+     * Creates a brand-new fabricated component and assigns it as this part's replacement, so the normal {@link #fix()}
+     * path for this specific part type installs it (with the correct slot/location linkage). The fabricated component's
+     * quality matches that of the unit it is installed in (individual per-part quality tracking from the margin of
+     * success is not modeled). The monetary cost of the attempt is charged separately, per attempt, by
+     * {@link #chargeFabricationAttempt(Finances)}.
+     */
+    private void prepareFabricatedReplacement() {
+        if (unit == null) {
+            return;
+        }
+
+        Part fabricated = getNewPart();
+        fabricated.setBrandNew(true);
+        fabricated.setQuality(unit.getQuality());
+        setReplacementPart(fabricated);
+    }
+
+    /**
+     * Debits the cost of a single fabrication attempt (per attempt, regardless of success or failure).
+     */
+    private void chargeFabricationAttempt(Finances finances) {
+        Money cost = getFabricationCost();
+        if (!cost.isZero()) {
+            finances.debit(TransactionType.EQUIPMENT_PURCHASE,
+                  campaign.getLocalDate(),
+                  cost,
+                  "Fabrication of " + getName());
+        }
+    }
+
+    /**
+     * Determines whether this part may be fabricated from scratch. Without factory-grade facilities, fabrication is
+     * limited to components with a base Tech Rating of A, B, or C (Campaign Ops, p.221); a factory-conditions site
+     * removes that restriction.
+     *
+     * @return {@code true} if the part can be fabricated
+     */
+    public boolean canFabricate() {
+        if (unit == null) {
+            return false;
+        }
+
+        // A factory-grade installation lifts the tech-rating restriction.
+        if (unit.getSite() >= Unit.SITE_FACTORY_CONDITIONS) {
+            return true;
+        }
+
+        TechRating rating = getTechRating();
+        if (rating == null) {
+            return false;
+        }
+
+        // Base limit is Tech Rating C. An optional rule additionally permits Tech Rating D at a maintenance facility
+        // (or better).
+        int maxRating = TechRating.C.ordinal();
+        if (campaign.getCampaignOptions().get(CampaignOption.FABRICATE_D_IN_MAINTENANCE_FACILITY)
+                  && (unit.getSite() >= Unit.SITE_FACILITY_MAINTENANCE)) {
+            maxRating = TechRating.D.ordinal();
+        }
+
+        return rating.ordinal() <= maxRating;
+    }
+
+    /**
+     * Cancels an in-progress fabrication, reverting this task to a normal replacement. Clears the fabrication flag and
+     * unassigns any tech, resetting accumulated overtime and time spent (spent minutes are not refunded as money).
+     */
+    public void cancelFabrication() {
+        setFabricating(false);
+        cancelAssignment(true);
+    }
+
+    /**
+     * Computes the cost of a single fabrication attempt (charged per attempt, not only on success).
+     *
+     * <p>Both profiles charge ten times the normal repair/replacement cost (when the campaign pays for repairs). They
+     * differ only in the part-price component, charged when the campaign pays for parts:</p>
+     * <ul>
+     *     <li><b>Balanced fabrication</b> (default): ten times the new part's price.</li>
+     *     <li><b>Rules-accurate</b>: half the new part's price.</li>
+     * </ul>
+     *
+     * @return the money cost of one fabrication attempt (may be {@link Money#zero()})
+     */
+    public Money getFabricationCost() {
+        final CampaignOptions options = campaign.getCampaignOptions();
+        final Part newPart = getNewPart();
+
+        Money cost = Money.zero();
+        if (options.get(CampaignOption.PAY_FOR_REPAIRS)) {
+            // Ten times the cost of a normal repair of this part.
+            cost = cost.plus(newPart.getUndamagedValue()
+                                   .multipliedBy(REPAIR_COST_FRACTION)
+                                   .multipliedBy(FABRICATION_MULTIPLIER));
+        }
+        if (options.get(CampaignOption.PAY_FOR_PARTS)) {
+            // Part price: ten times under the balanced profile, half under the rules-accurate profile.
+            double partFraction = options.get(CampaignOption.USE_BALANCED_FABRICATION)
+                                        ? FABRICATION_MULTIPLIER
+                                        : FABRICATED_PART_PRICE_FRACTION;
+            cost = cost.plus(newPart.getActualValue().multipliedBy(partFraction));
+        }
+        return cost;
+    }
+
+    @Override
+    public int getActualTime() {
+        int time = super.getActualTime();
+        return isFabricating() ? time * FABRICATION_MULTIPLIER : time;
+    }
+
+    @Override
+    public TargetRoll getAllMods(final @Nullable Person tech) {
+        TargetRoll mods = super.getAllMods(tech);
+        if (isFabricating()) {
+            mods.addModifier(FABRICATION_MODIFIER, "fabricating");
+        }
+        return mods;
     }
 
     @Override
@@ -283,6 +428,16 @@ public abstract class MissingPart extends Part implements IAcquisitionWork {
 
     @Override
     public String fail(int rating) {
+        if (isFabricating()) {
+            // A failed fabrication wastes the time and effort, but another attempt can be made at the same
+            // difficulty (Campaign Ops, p.202). The cost is still charged, per attempt.
+            chargeFabricationAttempt(campaign.getPlayerForce().getFinances());
+            timeSpent = 0;
+            shorthandedMod = 0;
+            return messageSurroundedBySpanWithColor(getNegativeColor(),
+                  "<b> fabrication failed - time and effort wasted</b>") + '.';
+        }
+
         skillMin = ++rating;
         timeSpent = 0;
         shorthandedMod = 0;

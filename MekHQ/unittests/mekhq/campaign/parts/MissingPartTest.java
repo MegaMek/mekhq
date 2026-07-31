@@ -48,6 +48,9 @@ import megamek.common.equipment.EquipmentType;
 import megamek.common.units.Mek;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.LocalWarehouse;
+import mekhq.campaign.campaignOptions.CampaignOption;
+import mekhq.campaign.campaignOptions.CampaignOptions;
+import mekhq.campaign.finances.Money;
 import mekhq.campaign.parts.meks.MekLocation;
 import mekhq.campaign.parts.missing.MissingMekLocation;
 import mekhq.campaign.parts.missing.MissingPart;
@@ -287,6 +290,193 @@ public class MissingPartTest {
         assertTrue(leftArm.isSpare());
         assertFalse(leftArm.isReservedForReplacement());
         assertEquals(startingQuantity, leftArm.getQuantity());
+    }
+
+    @Test
+    public void fabricationMultipliesActualTimeByTen() {
+        Campaign mockCampaign = mockCampaign();
+        MissingPart missingPart = new MissingMekLocation(Mek.LOC_LEFT_ARM, 20, EquipmentType.T_STRUCTURE_STANDARD,
+              false, false, false, mockCampaign);
+
+        int normalTime = missingPart.getActualTime();
+
+        missingPart.setFabricating(true);
+
+        assertEquals(normalTime * 10, missingPart.getActualTime());
+    }
+
+    @Test
+    public void fabricationAddsTwoToTargetModifiers() {
+        Campaign mockCampaign = mockCampaign();
+        when(mockCampaign.getCampaignOptions()).thenReturn(new CampaignOptions());
+        MissingPart missingPart = new MissingMekLocation(Mek.LOC_LEFT_ARM, 20, EquipmentType.T_STRUCTURE_STANDARD,
+              false, false, false, mockCampaign);
+
+        int normalMod = missingPart.getAllMods(null).getValue();
+
+        missingPart.setFabricating(true);
+
+        assertEquals(normalMod + 2, missingPart.getAllMods(null).getValue());
+    }
+
+    @Test
+    public void balancedFabricationCostsTenTimesThePartPrice() {
+        Campaign mockCampaign = mockCampaign();
+        CampaignOptions options = new CampaignOptions();
+        options.set(CampaignOption.USE_BALANCED_FABRICATION, true);
+        options.setPayForParts(true);
+        options.setPayForRepairs(false);
+        when(mockCampaign.getCampaignOptions()).thenReturn(options);
+
+        MissingPart missingPart = new MissingMekLocation(Mek.LOC_LEFT_ARM, 20, EquipmentType.T_STRUCTURE_STANDARD,
+              false, false, false, mockCampaign);
+
+        Money expected = missingPart.getNewPart().getActualValue().multipliedBy(10);
+        assertEquals(expected, missingPart.getFabricationCost());
+    }
+
+    @Test
+    public void balancedFabricationCombinesTenTimesRepairAndPartCosts() {
+        Campaign mockCampaign = mockCampaign();
+        CampaignOptions options = new CampaignOptions();
+        options.set(CampaignOption.USE_BALANCED_FABRICATION, true);
+        options.setPayForParts(true);
+        options.setPayForRepairs(true);
+        when(mockCampaign.getCampaignOptions()).thenReturn(options);
+
+        MissingPart missingPart = new MissingMekLocation(Mek.LOC_LEFT_ARM, 20, EquipmentType.T_STRUCTURE_STANDARD,
+              false, false, false, mockCampaign);
+
+        Part newPart = missingPart.getNewPart();
+        Money expected = newPart.getUndamagedValue().multipliedBy(0.2).multipliedBy(10)
+                               .plus(newPart.getActualValue().multipliedBy(10));
+        assertEquals(expected, missingPart.getFabricationCost());
+    }
+
+    @Test
+    public void fabricationIsFreeWhenNotPayingForParts() {
+        Campaign mockCampaign = mockCampaign();
+        CampaignOptions options = new CampaignOptions();
+        options.set(CampaignOption.USE_BALANCED_FABRICATION, true);
+        options.setPayForParts(false);
+        options.setPayForRepairs(false);
+        when(mockCampaign.getCampaignOptions()).thenReturn(options);
+
+        MissingPart missingPart = new MissingMekLocation(Mek.LOC_LEFT_ARM, 20, EquipmentType.T_STRUCTURE_STANDARD,
+              false, false, false, mockCampaign);
+
+        assertTrue(missingPart.getFabricationCost().isZero());
+    }
+
+    @Test
+    public void rulesAccurateFabricationCombinesRepairAndPartCosts() {
+        Campaign mockCampaign = mockCampaign();
+        CampaignOptions options = new CampaignOptions();
+        options.set(CampaignOption.USE_BALANCED_FABRICATION, false);
+        options.setPayForParts(true);
+        options.setPayForRepairs(true);
+        when(mockCampaign.getCampaignOptions()).thenReturn(options);
+
+        MissingPart missingPart = new MissingMekLocation(Mek.LOC_LEFT_ARM, 20, EquipmentType.T_STRUCTURE_STANDARD,
+              false, false, false, mockCampaign);
+
+        Part newPart = missingPart.getNewPart();
+        Money expected = newPart.getUndamagedValue().multipliedBy(0.2).multipliedBy(10)
+                               .plus(newPart.getActualValue().multipliedBy(0.5));
+        assertEquals(expected, missingPart.getFabricationCost());
+    }
+
+    @Test
+    public void cannotFabricateWithoutAUnit() {
+        Campaign mockCampaign = mockCampaign();
+        MissingPart missingPart = new MissingMekLocation(Mek.LOC_LEFT_ARM, 20, EquipmentType.T_STRUCTURE_STANDARD,
+              false, false, false, mockCampaign);
+
+        assertFalse(missingPart.canFabricate());
+    }
+
+    @Test
+    public void cancelFabricationClearsTheFlagAndTech() {
+        Campaign mockCampaign = mockCampaign();
+        MissingPart missingPart = new MissingMekLocation(Mek.LOC_LEFT_ARM, 20, EquipmentType.T_STRUCTURE_STANDARD,
+              false, false, false, mockCampaign);
+        missingPart.setFabricating(true);
+        Person person = mock(Person.class);
+        when(person.getId()).thenReturn(UUID.randomUUID());
+        missingPart.setTech(person);
+        missingPart.addTimeSpent(500);
+
+        missingPart.cancelFabrication();
+
+        assertFalse(missingPart.isFabricating());
+        assertNull(missingPart.getTech());
+        assertEquals(0, missingPart.getTimeSpent());
+    }
+
+    @Test
+    public void cannotFabricateAboveTechRatingCWithoutAFactory() {
+        Campaign mockCampaign = mockCampaign();
+        when(mockCampaign.getCampaignOptions()).thenReturn(new CampaignOptions());
+        // Standard mek internal structure is Tech Rating D, above the A-C fabrication limit.
+        MissingPart missingPart = new MissingMekLocation(Mek.LOC_LEFT_ARM, 20, EquipmentType.T_STRUCTURE_STANDARD,
+              false, false, false, mockCampaign);
+
+        Unit unit = mock(Unit.class, org.mockito.Mockito.RETURNS_DEEP_STUBS);
+        when(unit.getEntity().getWeight()).thenReturn(20.0);
+        when(unit.getSite()).thenReturn(Unit.SITE_FIELD_WORKSHOP);
+        missingPart.setUnit(unit);
+
+        assertFalse(missingPart.canFabricate());
+    }
+
+    @Test
+    public void maintenanceFacilityOptionAllowsTechRatingDFabrication() {
+        Campaign mockCampaign = mockCampaign();
+        CampaignOptions options = new CampaignOptions();
+        options.set(CampaignOption.FABRICATE_D_IN_MAINTENANCE_FACILITY, true);
+        when(mockCampaign.getCampaignOptions()).thenReturn(options);
+        // Standard mek internal structure is Tech Rating D.
+        MissingPart missingPart = new MissingMekLocation(Mek.LOC_LEFT_ARM, 20, EquipmentType.T_STRUCTURE_STANDARD,
+              false, false, false, mockCampaign);
+
+        Unit unit = mock(Unit.class, org.mockito.Mockito.RETURNS_DEEP_STUBS);
+        when(unit.getEntity().getWeight()).thenReturn(20.0);
+        when(unit.getSite()).thenReturn(Unit.SITE_FACILITY_MAINTENANCE);
+        missingPart.setUnit(unit);
+
+        assertTrue(missingPart.canFabricate());
+    }
+
+    @Test
+    public void maintenanceFacilityOptionDoesNotApplyBelowAMaintenanceFacility() {
+        Campaign mockCampaign = mockCampaign();
+        CampaignOptions options = new CampaignOptions();
+        options.set(CampaignOption.FABRICATE_D_IN_MAINTENANCE_FACILITY, true);
+        when(mockCampaign.getCampaignOptions()).thenReturn(options);
+        MissingPart missingPart = new MissingMekLocation(Mek.LOC_LEFT_ARM, 20, EquipmentType.T_STRUCTURE_STANDARD,
+              false, false, false, mockCampaign);
+
+        Unit unit = mock(Unit.class, org.mockito.Mockito.RETURNS_DEEP_STUBS);
+        when(unit.getEntity().getWeight()).thenReturn(20.0);
+        // A basic facility is below the maintenance-facility threshold, so Tech Rating D is still disallowed.
+        when(unit.getSite()).thenReturn(Unit.SITE_FACILITY_BASIC);
+        missingPart.setUnit(unit);
+
+        assertFalse(missingPart.canFabricate());
+    }
+
+    @Test
+    public void factoryConditionsAllowFabricationRegardlessOfTechRating() {
+        Campaign mockCampaign = mockCampaign();
+        MissingPart missingPart = new MissingMekLocation(Mek.LOC_LEFT_ARM, 20, EquipmentType.T_STRUCTURE_STANDARD,
+              false, false, false, mockCampaign);
+
+        Unit unit = mock(Unit.class, org.mockito.Mockito.RETURNS_DEEP_STUBS);
+        when(unit.getEntity().getWeight()).thenReturn(20.0);
+        when(unit.getSite()).thenReturn(Unit.SITE_FACTORY_CONDITIONS);
+        missingPart.setUnit(unit);
+
+        assertTrue(missingPart.canFabricate());
     }
 
     @Test

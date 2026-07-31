@@ -45,6 +45,7 @@ import javax.swing.JSpinner;
 
 import jakarta.annotation.Nonnull;
 import jakarta.annotation.Nullable;
+import megamek.Version;
 import mekhq.gui.campaignOptions.CampaignOptionFlag;
 import mekhq.gui.campaignOptions.components.CampaignOptionsCheckBox;
 import mekhq.gui.campaignOptions.components.CampaignOptionsFormPanel;
@@ -56,9 +57,9 @@ import mekhq.gui.campaignOptions.components.CampaignOptionsSpinner;
 /**
  * The {@code RepairPage} class builds and manages the Repair leaf page of the Campaign Options dialog. It owns the
  * widgets for repair configuration - era modifications, technician assignment, equipment quirks, damage margins, and
- * destruction thresholds - and synchronises them with a shared {@link RepairAndMaintenanceOptionsModel}.
+ * destruction thresholds - and synchronizes them with a shared {@link RepairAndMaintenanceOptionsModel}.
  *
- * <p>This view is a sub-component of {@link RepairAndMaintenancePages}: the model snapshot and the overall load/apply
+ * <p>This view is a subcomponent of {@link RepairAndMaintenancePages}: the model snapshot and the overall load/apply
  * lifecycle still live on {@code RepairAndMaintenancePages}, while this class is responsible only for constructing the
  * Repair panel and copying repair values to and from the model. The page is built lazily; until
  * {@link #createPanel(RepairAndMaintenanceOptionsModel)} is called,
@@ -75,6 +76,9 @@ class RepairPage {
     private JCheckBox assignedTechFirstCheckBox;
     private JCheckBox resetToFirstTechCheckBox;
     private JCheckBox useQuirksBox;
+    private JCheckBox chkUseFabrication;
+    private JCheckBox chkUseBalancedFabrication;
+    private JCheckBox chkMaintenanceFabrication;
     private JCheckBox useAeroSystemHitsBox;
     private JCheckBox useDamageMargin;
     private JLabel lblDamageMargin;
@@ -87,8 +91,7 @@ class RepairPage {
     /**
      * Creates the panel for the Repair Page.
      * <p>
-     * This page provides configurable options for managing repair rules, handling
-     * quirks, setting margins for equipment
+     * This page provides configurable options for managing repair rules, handling quirks, setting margins for equipment
      * survival, and incorporating era modifications.
      * </p>
      *
@@ -96,17 +99,18 @@ class RepairPage {
      *
      * @return a {@link JPanel} representing the Repair Page.
      */
-    @Nonnull JPanel createPanel(@Nullable RepairAndMaintenanceOptionsModel model) {
+    @Nonnull
+    JPanel createPanel(@Nullable RepairAndMaintenanceOptionsModel model) {
         // Header
         String imageAddress = getImageDirectory() + "logo_clan_burrock.png";
         CampaignOptionsHeaderPanel repairHeader = new CampaignOptionsHeaderPanel("RepairPage", imageAddress);
 
         chkTechsUseAdministration = new CampaignOptionsCheckBox("TechsUseAdministration",
-                getMetadata(LEGACY_RULE_BEFORE_METADATA, CampaignOptionFlag.CUSTOM_SYSTEM));
+              getMetadata(LEGACY_RULE_BEFORE_METADATA, CampaignOptionFlag.CUSTOM_SYSTEM));
         chkTechsUseAdministration.addMouseListener(createTipPanelUpdater("TechsUseAdministration"));
 
         chkUsefulAsTechs = new CampaignOptionsCheckBox("UsefulAsTechs",
-                getMetadata(MILESTONE_BEFORE_METADATA, CampaignOptionFlag.CUSTOM_SYSTEM));
+              getMetadata(MILESTONE_BEFORE_METADATA, CampaignOptionFlag.CUSTOM_SYSTEM));
         chkUsefulAsTechs.addMouseListener(createTipPanelUpdater("UsefulAsTechs"));
 
         useEraModsCheckBox = new CampaignOptionsCheckBox("UseEraModsCheckBox");
@@ -120,6 +124,22 @@ class RepairPage {
         useQuirksBox = new CampaignOptionsCheckBox("UseQuirksBox");
         useQuirksBox.addMouseListener(createTipPanelUpdater("UseQuirksBox"));
 
+        chkUseFabrication = new CampaignOptionsCheckBox("UseFabrication",
+              getMetadata(new Version(0, 51, 1)));
+        chkUseFabrication.addMouseListener(createTipPanelUpdater("UseFabrication"));
+
+        chkUseBalancedFabrication = new CampaignOptionsCheckBox("UseBalancedFabrication",
+              getMetadata(new Version(0, 51, 1),
+                    CampaignOptionFlag.CUSTOM_SYSTEM,
+                    CampaignOptionFlag.IMPORTANT,
+                    CampaignOptionFlag.RECOMMENDED));
+        chkUseBalancedFabrication.addMouseListener(createTipPanelUpdater("UseBalancedFabrication"));
+
+        chkMaintenanceFabrication = new CampaignOptionsCheckBox("MaintenanceFabrication",
+              getMetadata(new Version(0, 51, 1), CampaignOptionFlag.CUSTOM_SYSTEM));
+        chkMaintenanceFabrication.addMouseListener(
+              createTipPanelUpdater("MaintenanceFabrication"));
+
         useAeroSystemHitsBox = new CampaignOptionsCheckBox("UseAeroSystemHitsBox");
         useAeroSystemHitsBox.addMouseListener(createTipPanelUpdater("UseAeroSystemHitsBox"));
 
@@ -129,13 +149,13 @@ class RepairPage {
         lblDamageMargin = new CampaignOptionsLabel("DamageMargin");
         lblDamageMargin.addMouseListener(createTipPanelUpdater("DamageMargin"));
         spnDamageMargin = new CampaignOptionsSpinner("DamageMargin",
-                1, 1, 20, 1);
+              1, 1, 20, 1);
         spnDamageMargin.addMouseListener(createTipPanelUpdater("DamageMargin"));
 
         lblDestroyPartTarget = new CampaignOptionsLabel("DestroyPartTarget");
         lblDestroyPartTarget.addMouseListener(createTipPanelUpdater("DestroyPartTarget"));
         spnDestroyPartTarget = new CampaignOptionsSpinner("DestroyPartTarget",
-                2, 2, 13, 1);
+              2, 2, 13, 1);
         spnDestroyPartTarget.addMouseListener(createTipPanelUpdater("DestroyPartTarget"));
 
         JPanel repairOptionsPanel = createRepairOptionsPanel();
@@ -145,40 +165,43 @@ class RepairPage {
         readFromModel(model);
 
         return CampaignOptionsPagePanel.builder("RepairPage", "RepairPage", imageAddress)
-                .header(repairHeader)
-                .quote("repairPage")
-                .section("lblRepairPage.text",
-                        "lblRepairPage.summary",
-                        repairOptionsPanel)
-                .section("lblRepairPageRight.text",
-                        "lblRepairPageRight.summary",
-                        componentDamagePanel,
-                        getMetadata(LEGACY_RULE_BEFORE_METADATA, CampaignOptionFlag.CUSTOM_SYSTEM))
-                .build();
+                     .header(repairHeader)
+                     .quote("repairPage")
+                     .section("lblRepairPage.text",
+                           "lblRepairPage.summary",
+                           repairOptionsPanel)
+                     .section("lblRepairPageRight.text",
+                           "lblRepairPageRight.summary",
+                           componentDamagePanel,
+                           getMetadata(LEGACY_RULE_BEFORE_METADATA, CampaignOptionFlag.CUSTOM_SYSTEM))
+                     .build();
     }
 
     private @Nonnull JPanel createRepairOptionsPanel() {
         final CampaignOptionsFormPanel panel = new CampaignOptionsFormPanel("RepairOptionsPanel",
-                LABEL_COLUMN_WIDTH,
-                CONTROL_COLUMN_WIDTH);
+              LABEL_COLUMN_WIDTH,
+              CONTROL_COLUMN_WIDTH);
         panel.addCheckBoxGrid(2,
-                chkTechsUseAdministration,
-                chkUsefulAsTechs,
-                useEraModsCheckBox,
-                assignedTechFirstCheckBox,
-                resetToFirstTechCheckBox,
-                useQuirksBox);
+              chkTechsUseAdministration,
+              chkUsefulAsTechs,
+              useEraModsCheckBox,
+              assignedTechFirstCheckBox,
+              resetToFirstTechCheckBox,
+              useQuirksBox,
+              chkUseFabrication,
+              chkUseBalancedFabrication,
+              chkMaintenanceFabrication);
 
         return panel;
     }
 
     private @Nonnull JPanel createComponentDamagePanel() {
         final CampaignOptionsFormPanel panel = new CampaignOptionsFormPanel("ComponentDamagePanel",
-                LABEL_COLUMN_WIDTH,
-                CONTROL_COLUMN_WIDTH);
+              LABEL_COLUMN_WIDTH,
+              CONTROL_COLUMN_WIDTH);
         panel.addCheckBoxGrid(2,
-                useAeroSystemHitsBox,
-                useDamageMargin);
+              useAeroSystemHitsBox,
+              useDamageMargin);
         panel.addRow(lblDamageMargin, spnDamageMargin);
         panel.addRow(lblDestroyPartTarget, spnDestroyPartTarget);
 
@@ -202,6 +225,9 @@ class RepairPage {
         assignedTechFirstCheckBox.setSelected(model.assignedTechFirst);
         resetToFirstTechCheckBox.setSelected(model.resetToFirstTech);
         useQuirksBox.setSelected(model.useQuirks);
+        chkUseFabrication.setSelected(model.useFabrication);
+        chkUseBalancedFabrication.setSelected(model.useBalancedFabrication);
+        chkMaintenanceFabrication.setSelected(model.MaintenanceFabrication);
         useAeroSystemHitsBox.setSelected(model.useAeroSystemHits);
         useDamageMargin.setSelected(model.destroyByMargin);
         spnDamageMargin.setValue(model.destroyMargin);
@@ -225,6 +251,9 @@ class RepairPage {
         model.assignedTechFirst = assignedTechFirstCheckBox.isSelected();
         model.resetToFirstTech = resetToFirstTechCheckBox.isSelected();
         model.useQuirks = useQuirksBox.isSelected();
+        model.useFabrication = chkUseFabrication.isSelected();
+        model.useBalancedFabrication = chkUseBalancedFabrication.isSelected();
+        model.MaintenanceFabrication = chkMaintenanceFabrication.isSelected();
         model.useAeroSystemHits = useAeroSystemHitsBox.isSelected();
         model.destroyByMargin = useDamageMargin.isSelected();
         model.destroyMargin = (int) spnDamageMargin.getValue();
