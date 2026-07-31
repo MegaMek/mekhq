@@ -52,6 +52,7 @@ import java.util.List;
 import megamek.common.compute.Compute;
 import mekhq.Utilities;
 import mekhq.campaign.Campaign;
+import mekhq.campaign.campaignOptions.CampaignOption;
 import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.enums.PersonnelRole;
@@ -223,8 +224,10 @@ public class DefaultSkillGenerator extends AbstractSkillGenerator {
      * @param person the {@link Person} whose attributes will be generated and assigned
      */
     @Override
-    public void generateAttributes(Person person, boolean isUseEdge) {
+    public void generateAttributes(Person person, CampaignOptions campaignOptions) {
         RandomSkillPreferences skillPreferences = getSkillPreferences();
+        boolean isUseEdge = campaignOptions.isUseEdge();
+        int maximumEdge = campaignOptions.get(CampaignOption.MAXIMUM_EDGE);
 
         // Reset Attribute Scores to default
         for (SkillAttribute attribute : SkillAttribute.values()) {
@@ -256,7 +259,9 @@ public class DefaultSkillGenerator extends AbstractSkillGenerator {
             // Profession && Phenotype adjustments
             int baseAttributeScore = profession.getAttributeModifier(attribute);
             int attributeModifier = phenotype.getAttributeModifier(attribute);
-            person.setAttributeScore(attribute, baseAttributeScore + attributeModifier);
+            int generatedScore = baseAttributeScore + attributeModifier;
+            person.setAttributeScore(attribute,
+                attribute == SkillAttribute.EDGE ? Math.min(generatedScore, maximumEdge) : generatedScore);
 
             // Attribute randomization
             if (randomizeAttributes) {
@@ -269,7 +274,11 @@ public class DefaultSkillGenerator extends AbstractSkillGenerator {
                 }
 
                 if (delta != 0) {
-                    person.changeAttributeScore(attribute, delta);
+                    if (isEdge && delta > 0) {
+                        person.gainEdge(delta, maximumEdge);
+                    } else {
+                        person.changeAttributeScore(attribute, delta);
+                    }
                 }
             }
         }

@@ -716,7 +716,7 @@ public abstract class AbstractCompanyGenerator {
                 person.setFounder(true);
 
                 if (useFoundersHavePlotArmor) {
-                    person.changeAttributeScore(SkillAttribute.EDGE, 1);
+                    person.gainEdge(1, campaignOptions.get(CampaignOption.MAXIMUM_EDGE));
                 }
             }
         }

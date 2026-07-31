@@ -253,6 +253,8 @@ public final class CampaignOption<T> {
           of(EdgeRefreshPeriod.class, EdgeRefreshPeriod.WEEKLY, "edgeRefreshPeriod");
     public static final CampaignOption<Boolean> USE_EDGE =
           of(Boolean.class, false, "useEdge");
+    public static final CampaignOption<Integer> MAXIMUM_EDGE =
+          of(Integer.class, 10, "maximumEdge");
     public static final CampaignOption<Boolean> USE_FOUNDER_PLOT_ARMOR =
           of(Boolean.class, false, "useFounderPlotArmor");
     public static final CampaignOption<Boolean> USE_IMPLANTS =
