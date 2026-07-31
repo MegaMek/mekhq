@@ -78,6 +78,8 @@ public abstract class MissingPart extends Part implements IAcquisitionWork {
     private static final int FABRICATION_MODIFIER = 2;
     /** The Fabricator Special Ability reduces the fabrication target number by 2. */
     private static final int FABRICATOR_ABILITY_MODIFIER = -2;
+    /** The Jury-Rigger Special Ability reduces all fabrication costs by 25% (i.e. to 75% of normal). */
+    private static final double JURY_RIGGER_COST_MULTIPLIER = 0.75;
     /** Fraction of a part's undamaged value charged as the cost of a normal repair when 'Pay For Repairs' is enabled. */
     private static final double REPAIR_COST_FRACTION = 0.2;
     /** The purchase price of a fabricated part is half the sale price of a new component. */
@@ -276,9 +278,22 @@ public abstract class MissingPart extends Part implements IAcquisitionWork {
      *     <li><b>Rules-accurate</b>: half the new part's price.</li>
      * </ul>
      *
-     * @return the money cost of one fabrication attempt (may be {@link Money#zero()})
+     * @return the money cost of one fabrication attempt for this part's assigned tech (can be {@link Money#zero()})
      */
     public Money getFabricationCost() {
+        return getFabricationCost(getTech());
+    }
+
+    /**
+     * Computes the cost of a single fabrication attempt performed by the given tech. Identical to
+     * {@link #getFabricationCost()} except that the Jury-Rigger Special Ability, if the tech has it, reduces the total
+     * by 25%.
+     *
+     * @param tech the tech who would perform the fabrication, or {@code null} to price it without any tech ability
+     *
+     * @return the money cost of one fabrication attempt (may be {@link Money#zero()})
+     */
+    public Money getFabricationCost(final @Nullable Person tech) {
         final CampaignOptions options = campaign.getCampaignOptions();
         final Part newPart = getNewPart();
 
@@ -295,6 +310,11 @@ public abstract class MissingPart extends Part implements IAcquisitionWork {
                                         ? FABRICATION_MULTIPLIER
                                         : FABRICATED_PART_PRICE_FRACTION;
             cost = cost.plus(newPart.getActualValue().multipliedBy(partFraction));
+        }
+
+        // The Jury-Rigger Special Ability reduces all fabrication costs by 25%.
+        if ((tech != null) && tech.getOptions().booleanOption(PersonnelOptions.TECH_JURY_RIGGER)) {
+            cost = cost.multipliedBy(JURY_RIGGER_COST_MULTIPLIER);
         }
         return cost;
     }

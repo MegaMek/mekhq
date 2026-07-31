@@ -82,6 +82,7 @@ public class PersonnelOptions extends PilotOptions {
     public static final String UNOFFICIAL_ILL_DO_IT_MYSELF = "unofficial_ill_do_it_myself";
     public static final String TECH_MAINTAINER = "tech_maintainer";
     public static final String TECH_FABRICATOR = "tech_fabricator";
+    public static final String TECH_JURY_RIGGER = "tech_jury_rigger";
     public static final String FLAW_GLASS_JAW = "flaw_glass_jaw";
     public static final String ATOW_TOUGHNESS = "atow_toughness";
     public static final String FLAW_SLOW_LEARNER = "flaw_slow_learner";
@@ -271,6 +272,7 @@ public class PersonnelOptions extends PilotOptions {
         addOption(l3a, UNOFFICIAL_ILL_DO_IT_MYSELF, false);
         addOption(l3a, TECH_MAINTAINER, false);
         addOption(l3a, TECH_FABRICATOR, false);
+        addOption(l3a, TECH_JURY_RIGGER, false);
         addOption(l3a, FLAW_GLASS_JAW, false);
         addOption(l3a, ATOW_TOUGHNESS, false);
         addOption(l3a, FLAW_SLOW_LEARNER, false);

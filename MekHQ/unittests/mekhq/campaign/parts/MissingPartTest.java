@@ -344,6 +344,32 @@ public class MissingPartTest {
     }
 
     @Test
+    public void juryRiggerAbilityReducesFabricationCostByAQuarter() {
+        Campaign mockCampaign = mockCampaign();
+        CampaignOptions options = new CampaignOptions();
+        options.set(CampaignOption.USE_BALANCED_FABRICATION, true);
+        options.set(CampaignOption.PAY_FOR_PARTS, true);
+        options.set(CampaignOption.PAY_FOR_REPAIRS, true);
+        when(mockCampaign.getCampaignOptions()).thenReturn(options);
+        MissingPart missingPart = new MissingMekLocation(Mek.LOC_LEFT_ARM, 20, EquipmentType.T_STRUCTURE_STANDARD,
+              false, false, false, mockCampaign);
+        missingPart.setFabricating(true);
+
+        Person plainTech = mock(Person.class);
+        when(plainTech.getOptions()).thenReturn(new PersonnelOptions());
+
+        Person juryRiggerTech = mock(Person.class);
+        PersonnelOptions juryRiggerOptions = new PersonnelOptions();
+        juryRiggerOptions.getOption(PersonnelOptions.TECH_JURY_RIGGER).setValue(true);
+        when(juryRiggerTech.getOptions()).thenReturn(juryRiggerOptions);
+
+        Money fullCost = missingPart.getFabricationCost(plainTech);
+        Money discountedCost = missingPart.getFabricationCost(juryRiggerTech);
+
+        assertEquals(fullCost.multipliedBy(0.75), discountedCost);
+    }
+
+    @Test
     public void balancedFabricationCostsTenTimesThePartPrice() {
         Campaign mockCampaign = mockCampaign();
         CampaignOptions options = new CampaignOptions();

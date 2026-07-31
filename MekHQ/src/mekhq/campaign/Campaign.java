@@ -4174,7 +4174,7 @@ public class Campaign implements ITechManager {
                   && missingPart.isFabricateUntilSuccess()
                   && missingPart.canFabricate()
                   && (tech.getSkillForWorkingOn(partWork) != null)) {
-            final Money nextCost = missingPart.getFabricationCost();
+            final Money nextCost = missingPart.getFabricationCost(tech);
             if (nextCost.isZero() || !getFinances().getBalance().isLessThan(nextCost)) {
                 partWork.setTech(tech);
                 partWork.reservePart();
@@ -6435,7 +6435,7 @@ public class Campaign implements ITechManager {
                           "This part cannot be fabricated here (requires base Tech Rating A-C or a factory-grade facility).");
                 }
                 // Each fabrication attempt is paid up front
-                final Money fabricationCost = missingPart.getFabricationCost();
+                final Money fabricationCost = missingPart.getFabricationCost(tech);
                 if (!fabricationCost.isZero() && getFinances().getBalance().isLessThan(fabricationCost)) {
                     return new TargetRoll(TargetRoll.IMPOSSIBLE, "Cannot afford this fabrication attempt.");
                 }
