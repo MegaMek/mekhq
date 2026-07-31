@@ -94,10 +94,12 @@ class QuickTrainTest {
         Person person = activePerson();
         when(person.getUnit()).thenReturn(null);
         Campaign campaign = campaign(person, null);
-                Formation trainingFormation = formation(CombatRole.TRAINING, List.of());
-                when(campaign.getPlayerForce().getFormationFor(person)).thenReturn(trainingFormation);
+        PlayerForce playerForce = campaign.getPlayerForce();
+        Formation trainingFormation = formation(CombatRole.TRAINING, List.of());
+        when(playerForce.getFormationFor(person)).thenReturn(trainingFormation);
 
         assertFalse(QuickTrain.isInTrainingFormation(person, campaign));
+        verify(playerForce, never()).getFormationFor(person);
     }
 
     @Test
