@@ -796,6 +796,8 @@ public final class CampaignOption<T> {
           of(Integer.class, 10, "edgeCost");
     public static final CampaignOption<Integer> EDGE_REFRESH_COST =
           of(Integer.class, 20, "edgeRefreshCost");
+    public static final CampaignOption<Integer> MAXIMUM_EDGE =
+          of(Integer.class, 0, "maximumEdge");
     public static final CampaignOption<Boolean> USE_ORIGIN_FACTION_FOR_NAMES =
           of(Boolean.class, true, "useFactionForNames");
     public static final CampaignOption<Boolean> ASSIGN_PORTRAIT_ON_ROLE_CHANGE =

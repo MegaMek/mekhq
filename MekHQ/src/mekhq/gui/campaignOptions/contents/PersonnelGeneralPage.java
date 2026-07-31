@@ -92,6 +92,7 @@ class PersonnelGeneralPage {
     private JCheckBox chkUseFoundersHavePlotArmor;
     private MMComboBox<EdgeRefreshPeriod> comboEdgeRefreshPeriod;
     private JSpinner spnEdgeRefreshCost;
+    private JSpinner spnMaximumEdge;
     private JCheckBox chkUseImplants;
     private JCheckBox chkUseAlternativeQualityAveraging;
 
@@ -221,6 +222,12 @@ class PersonnelGeneralPage {
         lblEdgeRefreshCost.addMouseListener(createTipPanelUpdater("EdgeRefreshCost"));
         spnEdgeRefreshCost = new CampaignOptionsSpinner("EdgeRefreshCost", 20, 0, 100, 1);
         spnEdgeRefreshCost.addMouseListener(createTipPanelUpdater("EdgeRefreshCost"));
+
+        JLabel lblMaximumEdge = new CampaignOptionsLabel("MaximumEdge", getMetadata(new Version(0, 51, 1)));
+        lblMaximumEdge.addMouseListener(createTipPanelUpdater("MaximumEdge"));
+        spnMaximumEdge = new CampaignOptionsSpinner("MaximumEdge", 0, 0, 10, 1);
+        spnMaximumEdge.addMouseListener(createTipPanelUpdater("MaximumEdge"));
+
         chkUseImplants = new CampaignOptionsCheckBox("UseImplants");
         chkUseImplants.addMouseListener(createTipPanelUpdater("UseImplants"));
         chkUseAlternativeQualityAveraging = new CampaignOptionsCheckBox("UseAlternativeQualityAveraging",
@@ -248,6 +255,7 @@ class PersonnelGeneralPage {
               chkUseImplants,
               chkUseAlternativeQualityAveraging);
         panel.addRow(lblEdgeRefreshCost, spnEdgeRefreshCost);
+        panel.addRow(lblMaximumEdge, spnMaximumEdge);
         panel.addRow(lblEdgeRefreshPeriod, comboEdgeRefreshPeriod);
 
         return panel;
@@ -382,6 +390,7 @@ class PersonnelGeneralPage {
         chkUseFoundersHavePlotArmor.setSelected(model.useFoundersHavePlotArmor);
         comboEdgeRefreshPeriod.setSelectedItem(model.edgeRefreshPeriod);
         spnEdgeRefreshCost.setValue(model.edgeRefreshCost);
+        spnMaximumEdge.setValue(model.maximumEdge);
         chkUseImplants.setSelected(model.useImplants);
         chkUseAlternativeQualityAveraging.setSelected(model.alternativeQualityAveraging);
         chkUsePersonnelRemoval.setSelected(model.usePersonnelRemoval);
@@ -425,6 +434,7 @@ class PersonnelGeneralPage {
         model.useFoundersHavePlotArmor = chkUseFoundersHavePlotArmor.isSelected();
         model.edgeRefreshPeriod = comboEdgeRefreshPeriod.getSelectedItem();
         model.edgeRefreshCost = (int) spnEdgeRefreshCost.getValue();
+        model.maximumEdge = (int) spnMaximumEdge.getValue();
         model.useImplants = chkUseImplants.isSelected();
         model.alternativeQualityAveraging = chkUseAlternativeQualityAveraging.isSelected();
         model.usePersonnelRemoval = chkUsePersonnelRemoval.isSelected();

@@ -119,6 +119,7 @@ import mekhq.MekHQ;
 import mekhq.Utilities;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.Kill;
+import mekhq.campaign.campaignOptions.CampaignOption;
 import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.events.persons.PersonChangedEvent;
 import mekhq.campaign.events.persons.PersonLogEvent;
@@ -3402,6 +3403,12 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
                       String.valueOf(attributeCost)));
                 menuItem.addActionListener(this);
                 int attributeCap = person.getAttributeCap(attribute);
+                if (isEdge) {
+                    int maximumEdge = getCampaignOptions().get(CampaignOption.MAXIMUM_EDGE);
+                    if (maximumEdge > 0) {
+                        attributeCap = Math.min(attributeCap, maximumEdge);
+                    }
+                }
                 menuItem.setEnabled(target <= attributeCap && person.getXP() >= attributeCost);
                 attributesMenuIncrease.add(menuItem);
             }

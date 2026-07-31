@@ -59,6 +59,7 @@ class PersonnelOptionsModel {
     boolean useFoundersHavePlotArmor;
     EdgeRefreshPeriod edgeRefreshPeriod;
     int edgeRefreshCost;
+    int maximumEdge;
     boolean useImplants;
     boolean alternativeQualityAveraging;
     boolean usePersonnelRemoval;
@@ -152,6 +153,7 @@ class PersonnelOptionsModel {
         useFoundersHavePlotArmor = options.get(CampaignOption.USE_FOUNDER_PLOT_ARMOR);
         edgeRefreshPeriod = options.getEdgeRefreshPeriod();
         edgeRefreshCost = options.getEdgeRefreshCost();
+        maximumEdge = options.get(CampaignOption.MAXIMUM_EDGE);
         useImplants = options.isUseImplants();
         alternativeQualityAveraging = options.isAlternativeQualityAveraging();
         usePersonnelRemoval = options.isUsePersonnelRemoval();
@@ -246,6 +248,7 @@ class PersonnelOptionsModel {
         options.set(CampaignOption.USE_FOUNDER_PLOT_ARMOR, useFoundersHavePlotArmor);
         options.setEdgeRefreshPeriod(edgeRefreshPeriod);
         options.setEdgeRefreshCost(edgeRefreshCost);
+        options.set(CampaignOption.MAXIMUM_EDGE, maximumEdge);
         options.setUseImplants(useImplants);
         options.setAlternativeQualityAveraging(alternativeQualityAveraging);
         options.setUsePersonnelRemoval(usePersonnelRemoval);
