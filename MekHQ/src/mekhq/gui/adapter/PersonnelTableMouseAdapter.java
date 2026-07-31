@@ -606,7 +606,8 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
                             // won't land them — force the transit to finish with the GM override so the arrival
                             // processing below advances the education stage.
                             if (LocationUtils.isInTransit(person)) {
-                                getCampaign().getCampaignLocationManager().gmCompleteTravel(getCampaign(), List.of(person));
+                                getCampaign().getCampaignLocationManager()
+                                      .gmCompleteTravel(getCampaign(), List.of(person));
                             }
                             break;
                         case EDUCATION:
@@ -4103,11 +4104,12 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
                       .stream()
                       .filter(Person::isCommander)
                       .forEach(commander -> {
-                    commander.setCommander(false);
-                    getCampaign().addReport(PERSONNEL, String.format(resources.getString("removedCommander.format"),
-                          commander.getHyperlinkedFullTitle()));
-                    MekHQ.triggerEvent(new PersonChangedEvent(commander));
-                });
+                          commander.setCommander(false);
+                          getCampaign().addReport(PERSONNEL,
+                                String.format(resources.getString("removedCommander.format"),
+                                      commander.getHyperlinkedFullTitle()));
+                          MekHQ.triggerEvent(new PersonChangedEvent(commander));
+                      });
                 if (miCommander.isSelected()) {
                     person.setCommander(true);
                     person.setSecondInCommand(false);
@@ -4656,9 +4658,9 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
      * Creates a menu for changing the primary role of the selected personnel.
      * <p>
      * Evaluates the provided roles against the currently selected people to determine eligibility. Roles are
-     * categorized into combat, support, and civilian types. Roles that all selected people can perform are added
-     * as available, selectable items. Roles that cannot be performed by one or more selected people are grouped into
-     * a disabled "Unavailable" submenu.
+     * categorized into combat, support, and civilian types. Roles that all selected people can perform are added as
+     * available, selectable items. Roles that cannot be performed by one or more selected people are grouped into a
+     * disabled "Unavailable" submenu.
      * </p>
      *
      * @param person the selected {@link Person} used to determine which menu item should be visually checked as the
@@ -5264,6 +5266,33 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
                       combatAbilityMenu,
                       maneuveringAbilityMenu,
                       characterFlawMenu, utilityAbilityMenu,
+                      characterOriginMenu);
+            }
+        } else if (spa.getName().equals(PersonnelOptions.UNIT_SPECIALIST)) {
+            JMenu specialistMenu = new JMenu(spa.getDisplayName());
+            boolean isSpecialist = person.getOptions().booleanOption(spa.getName());
+            String currentChoice = isSpecialist ? person.getOptions().getOption(spa.getName()).stringValue() : "";
+            for (String choice : spa.getChoiceValues()) {
+                if (choice.equalsIgnoreCase("none") || choice.equals(currentChoice)) {
+                    continue;
+                }
+                menuItem = new JMenuItem(String.format(resources.getString("abilityDesc.format"), choice, costDesc));
+                menuItem.setToolTipText(wordWrap(spa.getDescription() + "<br><br>" + spa.getAllPrereqDesc()));
+                menuItem.setActionCommand(makeCommand(CMD_ACQUIRE_CUSTOM_CHOICE,
+                      choice,
+                      String.valueOf(cost),
+                      spa.getName()));
+                menuItem.addActionListener(this);
+                menuItem.setEnabled(available && isEligible);
+                specialistMenu.add(menuItem);
+            }
+            if (specialistMenu.getMenuComponentCount() > 0) {
+                placeInAppropriateSPASubMenu(spa,
+                      specialistMenu,
+                      combatAbilityMenu,
+                      maneuveringAbilityMenu,
+                      characterFlawMenu,
+                      utilityAbilityMenu,
                       characterOriginMenu);
             }
         } else if (Optional.ofNullable((person.getOptions().getOption(spa.getName()))).isPresent() &&

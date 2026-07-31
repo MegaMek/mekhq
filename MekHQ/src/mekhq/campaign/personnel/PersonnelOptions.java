@@ -188,6 +188,20 @@ public class PersonnelOptions extends PilotOptions {
     public static final String FLIGHT_ANTIPATHY_MEDIUM = "flight_antipathy_medium";
     public static final String FLIGHT_ANTIPATHY_HEAVY = "flight_antipathy_heavy";
 
+    // Unit Specialist.
+    public static final String UNIT_SPECIALIST = "unit_specialist";
+    public static final String SPECIALIST_CHOICE_MEK_LIGHT = "'Mek: Light";
+    public static final String SPECIALIST_CHOICE_MEK_MEDIUM = "'Mek: Medium";
+    public static final String SPECIALIST_CHOICE_MEK_HEAVY = "'Mek: Heavy";
+    public static final String SPECIALIST_CHOICE_MEK_ASSAULT = "'Mek: Assault";
+    public static final String SPECIALIST_CHOICE_VEHICULAR_LIGHT = "Vehicular: Light";
+    public static final String SPECIALIST_CHOICE_VEHICULAR_MEDIUM = "Vehicular: Medium";
+    public static final String SPECIALIST_CHOICE_VEHICULAR_HEAVY = "Vehicular: Heavy";
+    public static final String SPECIALIST_CHOICE_VEHICULAR_ASSAULT = "Vehicular: Assault";
+    public static final String SPECIALIST_CHOICE_FLIGHT_LIGHT = "Flight: Light";
+    public static final String SPECIALIST_CHOICE_FLIGHT_MEDIUM = "Flight: Medium";
+    public static final String SPECIALIST_CHOICE_FLIGHT_HEAVY = "Flight: Heavy";
+
     public static final String ADMIN_MEDIATOR = "admin_mediator";
     public static final String ADMIN_LOGISTICIAN = "admin_logistician";
     public static final String ADMIN_COORDINATOR = "admin_coordinator";
@@ -405,6 +419,7 @@ public class PersonnelOptions extends PilotOptions {
         addOption(l3a, FLIGHT_ANTIPATHY_LIGHT, false);
         addOption(l3a, FLIGHT_ANTIPATHY_MEDIUM, false);
         addOption(l3a, FLIGHT_ANTIPATHY_HEAVY, false);
+        addOption(l3a, UNIT_SPECIALIST, new Vector<>());
 
         addOption(l3a, COMPULSION_UNPLEASANT_PERSONALITY, false);
         addOption(l3a, COMPULSION_MILD_PARANOIA, false);

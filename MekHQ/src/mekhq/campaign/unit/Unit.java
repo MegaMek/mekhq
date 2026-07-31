@@ -5043,6 +5043,67 @@ public class Unit implements ITechnology, ILocatable {
         return modifier;
     }
 
+    /**
+     * Returns the Gunnery/Piloting skill modifier granted to the given crew member by the Unit Specialist SPA on this
+     * unit, or {@code 0} if the person has no specialty chosen.
+     *
+     * @param person the crew member whose specialty is being applied; may be {@code null}
+     *
+     * @return the skill modifier to add (negative improves the skill, positive worsens it)
+     */
+    private int getSpecialistModifier(@Nullable Person person) {
+        if ((person == null) || !getCampaign().getCampaignOptions().get(CampaignOption.USE_ABILITIES)) {
+            return 0;
+        }
+
+        IOption option = person.getOptions().getOption(PersonnelOptions.UNIT_SPECIALIST);
+        if ((option == null) || !option.booleanValue()) {
+            return 0; // no specialty chosen
+        }
+
+        String specialty = option.stringValue();
+        String entitySpecialty = getEntitySpecialtyKey();
+
+        return specialty.equalsIgnoreCase(entitySpecialty) ? -1 : 1;
+    }
+
+    /**
+     * Returns the Unit Specialist choice value that this unit satisfies (one of the
+     * {@code PersonnelOptions.SPECIALIST_CHOICE_*} constants), or {@code null} if the unit belongs to no specialist
+     * family/weight-class combination. The returned strings must match the {@code <choiceValues>} defined for the
+     * {@code unit_specialist} ability in defaultspa.xml.
+     *
+     * @return the specialty key for this unit, or {@code null}
+     */
+    private @Nullable String getEntitySpecialtyKey() {
+        int weightClass = entity.getWeightClass();
+        if (entity instanceof Mek) {
+            return switch (weightClass) {
+                case WEIGHT_LIGHT -> PersonnelOptions.SPECIALIST_CHOICE_MEK_LIGHT;
+                case WEIGHT_MEDIUM -> PersonnelOptions.SPECIALIST_CHOICE_MEK_MEDIUM;
+                case WEIGHT_HEAVY -> PersonnelOptions.SPECIALIST_CHOICE_MEK_HEAVY;
+                case WEIGHT_ASSAULT -> PersonnelOptions.SPECIALIST_CHOICE_MEK_ASSAULT;
+                default -> null;
+            };
+        } else if ((entity instanceof AeroSpaceFighter) && !entity.isSupportVehicle()) {
+            return switch (weightClass) {
+                case WEIGHT_LIGHT -> PersonnelOptions.SPECIALIST_CHOICE_FLIGHT_LIGHT;
+                case WEIGHT_MEDIUM -> PersonnelOptions.SPECIALIST_CHOICE_FLIGHT_MEDIUM;
+                case WEIGHT_HEAVY -> PersonnelOptions.SPECIALIST_CHOICE_FLIGHT_HEAVY;
+                default -> null;
+            };
+        } else if ((entity instanceof Tank) && !entity.isSupportVehicle()) {
+            return switch (weightClass) {
+                case WEIGHT_LIGHT -> PersonnelOptions.SPECIALIST_CHOICE_VEHICULAR_LIGHT;
+                case WEIGHT_MEDIUM -> PersonnelOptions.SPECIALIST_CHOICE_VEHICULAR_MEDIUM;
+                case WEIGHT_HEAVY -> PersonnelOptions.SPECIALIST_CHOICE_VEHICULAR_HEAVY;
+                case WEIGHT_ASSAULT -> PersonnelOptions.SPECIALIST_CHOICE_VEHICULAR_ASSAULT;
+                default -> null;
+            };
+        }
+        return null;
+    }
+
     public boolean isOnlyCommandersMatter(CampaignOptions campaignOptions) {
         return (isVehicle() && campaignOptions.isOnlyCommandersMatterVehicles()) ||
                      (isConventionalInfantry() && campaignOptions.isOnlyCommandersMatterInfantry()) ||
@@ -5405,7 +5466,8 @@ public class Unit implements ITechnology, ILocatable {
 
             if (person.hasSkill(driveType)) {
                 sumPiloting += person.getSkill(driveType).getFinalSkillValue(skillModifierData)
-                                     + getWeightClassAffinityModifier(person);
+                                     + getWeightClassAffinityModifier(person)
+                                     + getSpecialistModifier(person);
                 nDrivers++;
             } else if (entity instanceof Infantry) {
                 // For infantry, we need to assign an 8 if they have no anti-mek skill
@@ -5414,7 +5476,8 @@ public class Unit implements ITechnology, ILocatable {
             }
 
             if (entity instanceof Tank && Compute.getFullCrewSize(entity) == 1 && person.hasSkill(gunType)) {
-                sumGunnery += person.getSkill(gunType).getFinalSkillValue(skillModifierData);
+                sumGunnery += person.getSkill(gunType).getFinalSkillValue(skillModifierData)
+                                    + getSpecialistModifier(person);
                 nGunners++;
             }
             if (getCampaign().getCampaignOptions().isUseAdvancedMedical()) {
@@ -5440,7 +5503,8 @@ public class Unit implements ITechnology, ILocatable {
             }
 
             if (person.hasSkill(tempGunType)) {
-                sumGunnery += person.getSkill(tempGunType).getFinalSkillValue(skillModifierData);
+                sumGunnery += person.getSkill(tempGunType).getFinalSkillValue(skillModifierData)
+                                    + getSpecialistModifier(person);
                 nGunners++;
             }
             if (person.hasSkill(SkillType.S_ARTILLERY) &&
@@ -5483,7 +5547,8 @@ public class Unit implements ITechnology, ILocatable {
             Skill drivingSkill = getCommander().getSkill(driveType);
             piloting = drivingSkill == null ? 13
                              : (drivingSkill.getFinalSkillValue(skillModifierData)
-                                      + getWeightClassAffinityModifier(getCommander()));
+                                      + getWeightClassAffinityModifier(getCommander())
+                                      + getSpecialistModifier(getCommander()));
             if (entity instanceof Infantry && drivingSkill == null) {
                 piloting = 8;
             }
@@ -5497,7 +5562,9 @@ public class Unit implements ITechnology, ILocatable {
             }
 
             Skill gunnerySkill = getCommander().getSkill(tempGunType);
-            gunnery = gunnerySkill == null ? 13 : gunnerySkill.getFinalSkillValue(skillModifierData);
+            gunnery = gunnerySkill == null ? 13
+                            : (gunnerySkill.getFinalSkillValue(skillModifierData)
+                                     + getSpecialistModifier(getCommander()));
         }
 
         if (entity instanceof Infantry) {
@@ -5767,14 +5834,16 @@ public class Unit implements ITechnology, ILocatable {
         int artillery = 7;
         int piloting = 8;
         if (person.hasSkill(gunType)) {
-            gunnery = person.getSkill(gunType).getFinalSkillValue(skillModifierData);
+            gunnery = person.getSkill(gunType).getFinalSkillValue(skillModifierData)
+                            + getSpecialistModifier(person);
         }
         if (getCampaign().getCampaignOptions().isUseAdvancedMedical()) {
             gunnery += person.getInjuryModifiers(false);
         }
         if (person.hasSkill(driveType)) {
             piloting = person.getSkill(driveType).getFinalSkillValue(skillModifierData)
-                             + getWeightClassAffinityModifier(person);
+                             + getWeightClassAffinityModifier(person)
+                             + getSpecialistModifier(person);
         }
         if (person.hasSkill(SkillType.S_ARTILLERY) &&
                   person.getSkill(SkillType.S_ARTILLERY).getFinalSkillValue(skillModifierData) < artillery) {
