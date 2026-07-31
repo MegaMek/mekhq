@@ -36,6 +36,7 @@ import megamek.logging.MMLogger;
 import static mekhq.gui.commandGeneration.components.CommandGenerationUtilities.getCommandGenerationResourceBundle;
 import static mekhq.utilities.MHQInternationalization.getTextAt;
 
+import java.util.List;
 import java.util.ResourceBundle;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
@@ -72,6 +73,12 @@ import mekhq.gui.commandGeneration.contents.SparesAndFinancesTab;
  */
 public class CommandGenerationPane extends AbstractMHQTabbedPane {
     private static final MMLogger LOGGER = MMLogger.create(CommandGenerationPane.class);
+
+    /**
+     * The non-Clan factions that name their formations with the Greek alphabet. Sub-commands of these
+     * are matched too, so the Word of Blake Shadow Divisions follow the Word of Blake.
+     */
+    private static final List<String> GREEK_NAMED_FACTION_KEYS = List.of("CS", "WOB");
 
     /**
      * The faction the Force Generator panel last reported, kept so the settings that follow from it can
@@ -142,8 +149,8 @@ public class CommandGenerationPane extends AbstractMHQTabbedPane {
     }
 
     /**
-     * Applies the settings that follow from the selected faction - currently only that a Clan names its
-     * formations with the Greek alphabet.
+     * Applies the settings that follow from the selected faction - currently only which alphabet names
+     * its formations.
      *
      * <p>Called again once every tab has been populated from its options. Loading those options sets
      * the naming method directly, so applying this only when the faction is first reported would leave
@@ -155,13 +162,48 @@ public class CommandGenerationPane extends AbstractMHQTabbedPane {
             LOGGER.debug("[NamingMethod] no faction reported yet; leaving naming alone");
             return;
         }
+        boolean namesFormationsInGreek = usesGreekFormationNames(factionRecord);
         // At INFO because it fires once per faction selection, and because a report that the naming
         // method did not switch cannot be placed without it.
-        LOGGER.info("[NamingMethod] faction now {} (isClan={})",
-              factionRecord.getKey(), factionRecord.isClan());
-        if (factionRecord.isClan()) {
+        LOGGER.info("[NamingMethod] faction now {} (isClan={}, ComStar/Word of Blake={}) -> {}",
+              factionRecord.getKey(), factionRecord.isClan(),
+              isComStarOrWordOfBlake(factionRecord),
+              namesFormationsInGreek ? "defaulting to the Greek alphabet" : "leaving naming alone");
+        if (namesFormationsInGreek) {
             setupTab.setSelectedForceNamingMethod(ForceNamingMethod.GREEK_ALPHABET);
         }
+    }
+
+    /**
+     * Whether this faction names its formations with the Greek alphabet.
+     *
+     * <p>The Clans do it for their galaxies. ComStar and the Word of Blake do it throughout: their
+     * Level IVs and Level IIIs carry names the ruleset fixes itself ("IV-alpha", "III-beta"), and the
+     * Level II beneath them is the one echelon that follows the player's choice - so anything but
+     * Greek there puts an "Able" or a "Bravo" inside a Greek-named Level III.</p>
+     *
+     * <p>Only a switch to such a faction changes the setting. A faction that does not use Greek leaves
+     * whatever the player chose alone rather than overwriting a deliberate choice.</p>
+     */
+    static boolean usesGreekFormationNames(FactionRecord factionRecord) {
+        return factionRecord.isClan() || isComStarOrWordOfBlake(factionRecord);
+    }
+
+    /**
+     * @return {@code true} for ComStar, the Word of Blake, and any sub-command of either - the key of
+     *       a sub-faction is its parent's followed by a dot, as in {@code WOB.SD}
+     */
+    private static boolean isComStarOrWordOfBlake(FactionRecord factionRecord) {
+        String key = factionRecord.getKey();
+        if (key == null) {
+            return false;
+        }
+        for (String greekNamedFaction : GREEK_NAMED_FACTION_KEYS) {
+            if (key.equals(greekNamedFaction) || key.startsWith(greekNamedFaction + ".")) {
+                return true;
+            }
+        }
+        return false;
     }
 
     public SetupTab getSetupTab() {
