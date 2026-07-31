@@ -52,6 +52,7 @@ import megamek.client.ratgenerator.FormationNamingConvention.DesignatorStyle;
 import megamek.client.ratgenerator.FormationNamingConvention.Tier;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.force.Formation;
+import mekhq.campaign.force.FormationLevel;
 import mekhq.campaign.universe.enums.ForceNamingMethod;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
@@ -238,5 +239,36 @@ class ForceDescriptorWalkerTest {
               "platoons take the selected alphabet within their synthesized company");
         assertEquals(1, createdFormations.stream().filter(expectedCompany::equals).count(),
               "both platoons share one synthesized company (grouped by unit type)");
+    }
+    /**
+     * The Word of Blake Protectorate Militia is raised as a conventional planetary force, and its
+     * ruleset builds lances, companies, battalions and regiments rather than the Level I to VI ladder.
+     * Read as ComStar, those echelon numbers mean something else entirely - a lance and a company both
+     * come out as Level II - so the labels contradicted the formations actually built.
+     */
+    @Test
+    void theProtectorateMilitiaIsLabelledOnInnerSphereEchelons() {
+        assertEquals(FormationLevel.LANCE,
+              ForceDescriptorWalker.mapEchelonToFormationLevel(3, "WOB.PM"));
+        assertEquals(FormationLevel.COMPANY,
+              ForceDescriptorWalker.mapEchelonToFormationLevel(4, "WOB.PM"));
+        assertEquals(FormationLevel.BATTALION,
+              ForceDescriptorWalker.mapEchelonToFormationLevel(5, "WOB.PM"));
+        assertEquals(FormationLevel.REGIMENT,
+              ForceDescriptorWalker.mapEchelonToFormationLevel(6, "WOB.PM"));
+    }
+
+    /** The rest of the Word of Blake keeps the ComStar ladder its rulesets are written on. */
+    @Test
+    void theRestOfTheWordOfBlakeKeepsTheComStarLadder() {
+        assertEquals(FormationLevel.LEVEL_III,
+              ForceDescriptorWalker.mapEchelonToFormationLevel(5, "WOB"));
+        assertEquals(FormationLevel.LEVEL_IV,
+              ForceDescriptorWalker.mapEchelonToFormationLevel(6, "WOB"));
+        assertEquals(FormationLevel.LEVEL_IV,
+              ForceDescriptorWalker.mapEchelonToFormationLevel(6, "WOB.SD"),
+              "the Shadow Divisions are organised the Word of Blake way");
+        assertEquals(FormationLevel.LEVEL_IV,
+              ForceDescriptorWalker.mapEchelonToFormationLevel(6, "CS"));
     }
 }

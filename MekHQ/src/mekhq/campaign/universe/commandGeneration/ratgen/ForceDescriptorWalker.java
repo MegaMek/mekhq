@@ -599,12 +599,43 @@ public final class ForceDescriptorWalker {
 
     private enum FactionFamily { INNER_SPHERE, CLAN, COMSTAR }
 
+    /**
+     * ComStar and Word of Blake sub-commands whose rulesets are built on the Inner Sphere echelons
+     * rather than the Level I to Level VI ladder.
+     *
+     * <p>The Protectorate Militia is raised and organised as a conventional planetary force, so its
+     * ruleset declares lances, companies, battalions and regiments. Those share echelon numbers with
+     * the ComStar ladder without sharing its meaning: read as ComStar, a lance and a company both come
+     * out labelled Level II, and a regiment as a Level IV. The formation names would then contradict
+     * the formations the ruleset actually built.</p>
+     */
+    private static final List<String> COMSTAR_COMMANDS_ON_INNER_SPHERE_ECHELONS = List.of("WOB.PM");
+
+    /**
+     * @param factionCode the primary faction code from the descriptor
+     *
+     * @return {@code true} if this is a ComStar-family command whose ruleset nonetheless uses the
+     *       Inner Sphere echelons
+     */
+    private static boolean buildsOnInnerSphereEchelons(String factionCode) {
+        String upperCaseCode = factionCode.toUpperCase();
+        for (String command : COMSTAR_COMMANDS_ON_INNER_SPHERE_ECHELONS) {
+            if (upperCaseCode.equals(command) || upperCaseCode.startsWith(command + ".")) {
+                return true;
+            }
+        }
+        return false;
+    }
+
     private static FactionFamily resolveFactionFamily(String factionCode) {
         if (factionCode == null || factionCode.isBlank()) {
             return FactionFamily.INNER_SPHERE;
         }
         // Take the first comma-separated token; ratgen sometimes packs an "FS,FedSuns,3030" style code.
         String primary = factionCode.split(",")[0].trim();
+        if (buildsOnInnerSphereEchelons(primary)) {
+            return FactionFamily.INNER_SPHERE;
+        }
         if ("CS".equalsIgnoreCase(primary) || "WOB".equalsIgnoreCase(primary)
               || primary.toUpperCase().startsWith("CS.") || primary.toUpperCase().startsWith("WOB.")) {
             return FactionFamily.COMSTAR;
