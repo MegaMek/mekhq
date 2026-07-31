@@ -60,6 +60,8 @@ import javax.swing.table.TableRowSorter;
 
 import jakarta.annotation.Nonnull;
 import jakarta.annotation.Nullable;
+import megamek.client.ui.settings.SettingsFormPanel;
+import megamek.client.ui.settings.SettingsPairedFieldGridPanel;
 import megamek.client.ui.util.UIUtil;
 import megamek.common.enums.SkillLevel;
 import megamek.common.ui.FastJScrollPane;
@@ -69,11 +71,9 @@ import mekhq.campaign.personnel.enums.PersonnelRoleSubType;
 import mekhq.campaign.personnel.skills.Skills;
 import mekhq.gui.campaignOptions.CampaignOptionFlag;
 import mekhq.gui.campaignOptions.components.CampaignOptionsCheckBox;
-import mekhq.gui.campaignOptions.components.CampaignOptionsFormPanel;
 import mekhq.gui.campaignOptions.components.CampaignOptionsHeaderPanel;
 import mekhq.gui.campaignOptions.components.CampaignOptionsLabel;
 import mekhq.gui.campaignOptions.components.CampaignOptionsPagePanel;
-import mekhq.gui.campaignOptions.components.CampaignOptionsPairedFieldGridPanel;
 import mekhq.gui.campaignOptions.components.CampaignOptionsSpinner;
 import mekhq.gui.campaignOptions.components.CampaignOptionsStandardPanel;
 
@@ -83,7 +83,7 @@ import mekhq.gui.campaignOptions.components.CampaignOptionsStandardPanel;
  * settings spanning multiple pages.
  */
 public class SalariesPages {
-    private static final int FORM_LABEL_COLUMN_WIDTH = CampaignOptionsFormPanel.DEFAULT_LABEL_WIDTH;
+    private static final int FORM_LABEL_COLUMN_WIDTH = SettingsFormPanel.DEFAULT_LABEL_WIDTH;
     // Wider than the default control column so the salary-amount spinners have room for large figures.
     private static final int FORM_CONTROL_COLUMN_WIDTH = 300;
     private static final int FORM_LABEL_CONTROL_GAP = 12;
@@ -238,7 +238,7 @@ public class SalariesPages {
     }
 
     private @Nonnull JPanel createSalaryRulesPanel() {
-        final CampaignOptionsFormPanel panel = new CampaignOptionsFormPanel("SalaryRulesPanel",
+        final SettingsFormPanel panel = new SettingsFormPanel("SalaryRulesPanel",
               FORM_LABEL_COLUMN_WIDTH,
               FORM_CONTROL_COLUMN_WIDTH);
         panel.addCheckBox(chkDisableSecondaryRoleSalary);
@@ -388,7 +388,7 @@ public class SalariesPages {
 
     private @Nonnull JPanel createPairedFieldGridPanel(String name, JComponent[] labels, JComponent[] controls,
           int columnCount, int controlWidth) {
-        CampaignOptionsPairedFieldGridPanel panel = new CampaignOptionsPairedFieldGridPanel(name,
+        SettingsPairedFieldGridPanel panel = new SettingsPairedFieldGridPanel(name,
               FORM_LABEL_COLUMN_WIDTH + FORM_LABEL_CONTROL_GAP,
               FORM_CONTROL_COLUMN_WIDTH,
               controlWidth,
@@ -447,7 +447,7 @@ public class SalariesPages {
                 }
 
                 lastModelRow = modelRow;
-                sendTipToDetailsPanel(tableModel.getRole(modelRow).getDescription(false));
+                sendTipToDetailsPanel(table, tableModel.getRole(modelRow).getDescription(false));
             }
         });
 

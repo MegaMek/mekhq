@@ -40,6 +40,8 @@ import static mekhq.utilities.MHQInternationalization.isResourceKeyValid;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
+import megamek.client.ui.settings.SettingsTextProvider;
+
 final class CampaignOptionsComponentSupport {
     private static final Map<String, SettingsTextProvider> TEXT_PROVIDERS = new ConcurrentHashMap<>();
 
