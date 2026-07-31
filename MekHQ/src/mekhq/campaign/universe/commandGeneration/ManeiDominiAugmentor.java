@@ -186,13 +186,30 @@ public final class ManeiDominiAugmentor {
      */
     public static void augment(Campaign campaign, @Nullable String generationFaction,
           List<Person> generatedPersons) {
+        boolean campaignAllowsImplants = campaign.getCampaignOptions().get(CampaignOption.USE_IMPLANTS);
+        boolean gameAllowsImplants =
+              campaign.getGameOptions().booleanOption(OptionsConstants.RPG_MANEI_DOMINI);
+        // One line that answers "did this even get a chance to run", so a playtest never has to infer
+        // it from the absence of later lines. Logged before any gate so it appears whatever happens.
+        LOGGER.info("[ManeiDomini] ENTER: generationFaction='{}' (Shadow Divisions key '{}'),"
+                    + " campaign Use Implants={}, MegaMek Manei Domini rule={}, generatedPersons={}",
+              generationFaction, SHADOW_DIVISION_FACTION_KEY, campaignAllowsImplants,
+              gameAllowsImplants, generatedPersons.size());
+
         if (!isShadowDivision(generationFaction)) {
-            LOGGER.debug("[ManeiDomini] skipped - faction '{}' is not the Shadow Divisions ({})",
+            LOGGER.info("[ManeiDomini] SKIPPED - the command was generated for faction '{}', not the"
+                        + " Word of Blake Shadow Divisions ('{}'). Only a Shadow Division is Manei"
+                        + " Domini. Pick Word of Blake in MekHQ's Command Generator, then Shadow"
+                        + " Divisions in the sub-faction picker beneath it. Note this runs only in"
+                        + " MekHQ's Command Generator - MegaMek's own Force Generator builds crews"
+                        + " directly and has no MekHQ personnel to augment.",
                   generationFaction, SHADOW_DIVISION_FACTION_KEY);
             return;
         }
-        if (!campaign.getCampaignOptions().get(CampaignOption.USE_IMPLANTS)) {
-            LOGGER.debug("[ManeiDomini] skipped - the campaign has implants switched off");
+        if (!campaignAllowsImplants) {
+            LOGGER.info("[ManeiDomini] SKIPPED - a Shadow Division was generated but the campaign has"
+                        + " implants switched off. Turn on Campaign Options > Personnel > General >"
+                        + " Use Implants and generate again; this cannot be applied retrospectively.");
             return;
         }
         // The campaign option above is MekHQ's mirror of MegaMek's Manei Domini rule, and the two are
@@ -200,25 +217,43 @@ public final class ManeiDominiAugmentor {
         // whether implants survive into a battle: with it off, ChatLounge clears the whole implant
         // group as the unit enters the lobby and MULParser refuses to restore it. Issuing implants
         // then would leave the roster claiming augmentations that silently vanish in play.
-        if (!campaign.getGameOptions().booleanOption(OptionsConstants.RPG_MANEI_DOMINI)) {
-            LOGGER.debug("[ManeiDomini] skipped - MegaMek's Manei Domini rule is switched off, so any"
-                        + " implants issued would be stripped when the unit reaches the lobby");
+        if (!gameAllowsImplants) {
+            LOGGER.info("[ManeiDomini] SKIPPED - a Shadow Division was generated with campaign implants"
+                        + " on, but MegaMek's Manei Domini rule is off in this campaign's game options,"
+                        + " so any implants issued would be stripped the moment a unit reached the"
+                        + " lobby. Re-open Campaign Options and accept it to push the rule across.");
             return;
         }
 
         int augmented = 0;
         int implantsIssued = 0;
+        // Logging one line per warrior is deliberate: a generated command is a bounded list of a few
+        // dozen people, and the whole point of this trail is to answer "why did this one get that"
+        // without a debugger.
         for (Person person : generatedPersons) {
             if (person == null) {
+                LOGGER.warn("[ManeiDomini] a null person was in the generated list; skipped");
                 continue;
             }
             ManeiDominiRank maneiDominiRank = rankFor(person);
+            ManeiDominiClass maneiDominiClass = classFor(person);
             person.setManeiDominiRank(maneiDominiRank);
-            person.setManeiDominiClass(classFor(person));
+            person.setManeiDominiClass(maneiDominiClass);
             implantsIssued += issueImplants(person, maneiDominiRank);
+            // Read the values back rather than trusting the setters, and show the rank name the
+            // roster will actually display. If the rank system is not flagged for Manei Domini the
+            // name comes out plain, which is the difference between "not assigned" and "assigned but
+            // not shown" - the two failures look identical in the UI.
+            LOGGER.info("[ManeiDomini]   '{}' -> class={} rank={} | rankSystem={} usesManeiDomini={}"
+                        + " | displayed as '{}'",
+                  person.getFullName(), person.getManeiDominiClass(), person.getManeiDominiRank(),
+                  person.getRankSystem() == null ? "null" : person.getRankSystem().getCode(),
+                  person.getRankSystem() != null && person.getRankSystem().isUseManeiDomini(),
+                  person.getRankName());
             augmented++;
         }
-        LOGGER.info("[ManeiDomini] augmented {} of {} generated person(s) with {} implant(s) in total",
+        LOGGER.info("[ManeiDomini] DONE: augmented {} of {} generated person(s), {} implant(s) issued"
+                    + " in total (plus one explosive charge each)",
               augmented, generatedPersons.size(), implantsIssued);
     }
 
@@ -247,9 +282,31 @@ public final class ManeiDominiAugmentor {
         for (String option : issued) {
             options.acquireAbility(PersonnelOptions.MD_ADVANTAGES, option, true);
         }
-        LOGGER.debug("[ManeiDomini] {}: rank {}, fights {} -> {} implant(s) {}",
-              person.getFullName(), maneiDominiRank,
-              warriorFightsOnFoot ? "on foot" : "from a cockpit", issued.size(), issued);
+
+        // Read every implant back off the person. acquireAbility silently does nothing if the option
+        // name is not in the group, so a typo or a renamed constant would otherwise leave the log
+        // claiming implants the warrior does not actually carry.
+        List<String> confirmed = new ArrayList<>();
+        List<String> failed = new ArrayList<>();
+        for (String option : issued) {
+            if (person.getOptions().booleanOption(option)) {
+                confirmed.add(option);
+            } else {
+                failed.add(option);
+            }
+        }
+        boolean chargeFitted = person.getOptions().booleanOption(OptionsConstants.MD_SUICIDE_IMPLANTS);
+        LOGGER.info("[ManeiDomini]   '{}': role={} fights={} rank={} -> chose {} implant(s) {}",
+              person.getFullName(), person.getPrimaryRole(),
+              warriorFightsOnFoot ? "on foot" : "from a cockpit", maneiDominiRank,
+              issued.size(), issued);
+        LOGGER.info("[ManeiDomini]     confirmed on the person: {} of {} {}; explosive charge fitted={}",
+              confirmed.size(), issued.size(), confirmed, chargeFitted);
+        if (!failed.isEmpty()) {
+            LOGGER.error("[ManeiDomini]     these implants did NOT take on '{}': {} - the option name"
+                        + " is probably not in the {} group",
+                  person.getFullName(), failed, PersonnelOptions.MD_ADVANTAGES);
+        }
         return issued.size();
     }
 
@@ -426,7 +483,11 @@ public final class ManeiDominiAugmentor {
                                          ManeiDominiRank.DELTA, ManeiDominiRank.SIGMA,
                                          ManeiDominiRank.OMICRON };
         int band = (rankIndex * byStanding.length) / rankCount;
-        return byStanding[Math.min(band, byStanding.length - 1)];
+        ManeiDominiRank derived = byStanding[Math.min(band, byStanding.length - 1)];
+        LOGGER.debug("[ManeiDomini]     rank derivation for '{}': militaryRank='{}' index={} of {}"
+                    + " -> band {} -> {}",
+              person.getFullName(), person.getRankName(), rankIndex, rankCount, band, derived);
+        return derived;
     }
 
     /**

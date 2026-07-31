@@ -509,6 +509,8 @@ public final class CommandGenerator {
 
         // Manei Domini rank, class and cybernetics, for a Word of Blake Shadow Division. Runs here for
         // the same reason as bloodnames: implant availability is read off the person's rank.
+        LOGGER.info("[CompanyGen][Pipeline] Stage 7f: Manei Domini augmentation (snapshot faction '{}')",
+              options.getForceDescriptorSnapshot().getFaction());
         ManeiDominiAugmentor.augment(campaign,
               options.getForceDescriptorSnapshot().getFaction(), generatedPersons);
 
