@@ -666,8 +666,8 @@ public final class MHQOptions extends SuiteOptions {
     }
 
     /**
-     * @return whether the StratCon map renders unscouted hexes as half-transparent terrain rather than under the blue
-     *       fog-of-war layer
+     * @return whether the StratCon map renders unscouted hexes as heavily faded terrain (25% opacity) rather than under
+     *       the blue fog-of-war layer
      */
     public boolean getUseAlternateStratConFogOfWarDisplay() {
         return userPreferences.node(MHQConstants.DISPLAY_NODE)
