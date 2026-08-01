@@ -151,7 +151,6 @@ public class ScenarioTemplate implements Cloneable {
         return (this.stratConScenarioType != null) ? this.stratConScenarioType : ScenarioType.NONE;
     }
 
-    @Deprecated(since = "0.51.0", forRemoval = true)
     public void setStratConScenarioType(String scenarioType) {
         try {
             this.stratConScenarioType = ScenarioType.valueOf(scenarioType.trim().toUpperCase());

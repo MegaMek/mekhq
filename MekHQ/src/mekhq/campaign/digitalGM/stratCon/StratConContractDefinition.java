@@ -192,7 +192,6 @@ public class StratConContractDefinition {
     /**
      * @return the contract type name
      */
-    @Deprecated(since = "0.51.0", forRemoval = true)
     public String getContractTypeName() {
         return contractTypeName;
     }
