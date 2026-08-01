@@ -67,8 +67,8 @@ final class CampaignOptionsComponentSupport {
             @Override
             public String getFormattedText(String key, Object... arguments) {
                 return arguments.length == 0
-                             ? getText(key)
-                             : getFormattedTextAt(resourceBundleName, key, arguments);
+                      ? getText(key)
+                      : getFormattedTextAt(resourceBundleName, key, arguments);
             }
         });
     }

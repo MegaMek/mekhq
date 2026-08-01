@@ -85,8 +85,8 @@ abstract class MHQOptionsPage {
         @Override
         public String getFormattedText(String key, Object... arguments) {
             return arguments.length == 0
-                         ? getText(key)
-                         : MHQInternationalization.getFormattedText(key, arguments);
+                  ? getText(key)
+                  : MHQInternationalization.getFormattedText(key, arguments);
         }
     };
     static final int FORM_LABEL_WIDTH = SettingsFormPanel.DEFAULT_LABEL_WIDTH;
@@ -123,7 +123,7 @@ abstract class MHQOptionsPage {
      * Builds this page's UI. Implementations must set {@link #created} to {@code true} before returning so the page's
      * controls are subsequently written back on save.
      *
-     * @return the page component (a {@link SettingsPagePanel})
+    * @return the page component (a {@link SettingsPagePanel})
      */
     abstract Component createPage();
 
@@ -172,8 +172,8 @@ abstract class MHQOptionsPage {
     }
 
     /**
-     * Creates a {@link SettingsCheckBox} whose text/tooltip come from {@code resourceName} in the GUI bundle and sets
-     * its initial state to {@code selected}. The value is read back into the model by the owning page's
+    * Creates a {@link SettingsCheckBox} whose text/tooltip come from {@code resourceName} in the GUI bundle and
+     * sets its initial state to {@code selected}. The value is read back into the model by the owning page's
      * {@code writeToModel} method.
      */
     static SettingsCheckBox checkBox(String resourceName, boolean selected) {
@@ -181,8 +181,8 @@ abstract class MHQOptionsPage {
     }
 
     /**
-     * Creates a {@link SettingsCheckBox} as {@link #checkBox(String, boolean)} does, but with badge metadata (such as
-     * the "important information" flag) shown after the text.
+    * Creates a {@link SettingsCheckBox} as {@link #checkBox(String, boolean)} does, but with badge metadata
+     * (such as the "important information" flag) shown after the text.
      */
     static SettingsCheckBox checkBox(String resourceName, boolean selected,
           @Nullable CampaignOptionsMetadata metadata) {
@@ -193,8 +193,8 @@ abstract class MHQOptionsPage {
 
     /**
      * Creates a {@link ColourSelectorButton} whose text comes from {@code key} in the GUI bundle and whose initial
-     * colour is {@code colour}. The chosen colour is read back into the model by the owning page's {@code writeToModel}
-     * method.
+     * colour is {@code colour}. The chosen colour is read back into the model by the owning page's
+     * {@code writeToModel} method.
      */
     static ColourSelectorButton colourButton(String key, Color colour) {
         ColourSelectorButton button = new ColourSelectorButton(MHQInternationalization.getText(key + ".text"));
@@ -204,8 +204,8 @@ abstract class MHQOptionsPage {
     }
 
     /**
-     * Recursively detects tip-bearing controls under {@code component}. The shared content host performs the actual
-     * instance-owned help routing when the page is mounted. Buttons are skipped so action tooltips remain floating.
+    * Recursively detects tip-bearing controls under {@code component}. The shared content host performs the actual
+    * instance-owned help routing when the page is mounted. Buttons are skipped so action tooltips remain floating.
      *
      * @param component the subtree to process
      *

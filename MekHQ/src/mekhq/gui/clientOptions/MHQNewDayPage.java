@@ -66,14 +66,14 @@ import mekhq.gui.enums.FormationIconOperationalStatusStyle;
  */
 class MHQNewDayPage extends MHQOptionsPage {
     // New Day - Personnel Pools (keyed by resource name, matching MHQOptionsModel.newDayPools)
-    private final Map<String, SettingsCheckBox> poolCheckBoxes = new HashMap<>();
+      private final Map<String, SettingsCheckBox> poolCheckBoxes = new HashMap<>();
 
     // New Day - Automation
-    private SettingsCheckBox chkNewDayAutoLogistics;
-    private SettingsCheckBox chkNewDayMRMS;
-    private SettingsCheckBox chkNewDayOptimizeMedicalAssignments;
-    private SettingsCheckBox chkNewDayAutomaticallyAssignUnmaintainedUnits;
-    private SettingsCheckBox chkSelfCorrectMaintenance;
+      private SettingsCheckBox chkNewDayAutoLogistics;
+      private SettingsCheckBox chkNewDayMRMS;
+      private SettingsCheckBox chkNewDayOptimizeMedicalAssignments;
+      private SettingsCheckBox chkNewDayAutomaticallyAssignUnmaintainedUnits;
+      private SettingsCheckBox chkSelfCorrectMaintenance;
 
     // New Day - Training
       private SettingsCheckBox chkNewMonthQuickTrain;
@@ -87,7 +87,7 @@ class MHQNewDayPage extends MHQOptionsPage {
       private SettingsCheckBox chkLevelOtherCommandSkills;
 
     // New Day - Formation Icons
-    private SettingsCheckBox chkNewDayFormationIconOperationalStatus;
+      private SettingsCheckBox chkNewDayFormationIconOperationalStatus;
     private MMComboBox<FormationIconOperationalStatusStyle> comboNewDayFormationIconOperationalStatusStyle;
 
     MHQNewDayPage(MHQOptionsModel model) {
@@ -107,21 +107,19 @@ class MHQNewDayPage extends MHQOptionsPage {
         hasTooltips |= registerDetailsTips(trainingContent);
         hasTooltips |= registerDetailsTips(formationContent);
         Component page = pageBuilder("MHQNewDayPage", hasTooltips)
-                               .section("lblMHQNewDayPoolSection.text", "lblMHQNewDayPoolSection.summary", poolContent)
-                               .section("lblMHQNewDayTasksSection.text",
-                                     "lblMHQNewDayTasksSection.summary",
-                                     tasksContent)
-                               .section("lblMHQNewDayTrainingSection.text", "lblMHQNewDayTrainingSection.summary",
-                                     trainingContent)
-                               .section("lblMHQNewDayFormationSection.text", "lblMHQNewDayFormationSection.summary",
-                                     formationContent)
-                               .build();
+                     .section("lblMHQNewDayPoolSection.text", "lblMHQNewDayPoolSection.summary", poolContent)
+                     .section("lblMHQNewDayTasksSection.text", "lblMHQNewDayTasksSection.summary", tasksContent)
+                     .section("lblMHQNewDayTrainingSection.text", "lblMHQNewDayTrainingSection.summary",
+                           trainingContent)
+                     .section("lblMHQNewDayFormationSection.text", "lblMHQNewDayFormationSection.summary",
+                           formationContent)
+                     .build();
         created = true;
         return page;
     }
 
     private JPanel createNewDayPoolSection() {
-        SettingsFormPanel panel = new SettingsFormPanel("MHQNewDayPoolContent", FORM_LABEL_WIDTH,
+      SettingsFormPanel panel = new SettingsFormPanel("MHQNewDayPoolContent", FORM_LABEL_WIDTH,
               FORM_CONTROL_WIDTH);
         // Two columns of parent/child groups: each "Fill X Pool" parent sits above its indented "Do Not Release
         // Surplus X" child (joined by a subdirectory-arrow connector), and the groups flow two-across so the section
@@ -150,7 +148,7 @@ class MHQNewDayPage extends MHQOptionsPage {
                     model.newDayAutomaticallyAssignUnmaintainedUnits);
         chkSelfCorrectMaintenance = checkBox("chkSelfCorrectMaintenance", model.selfCorrectMaintenance);
 
-        SettingsFormPanel panel = new SettingsFormPanel("MHQNewDayTasksContent", FORM_LABEL_WIDTH,
+      SettingsFormPanel panel = new SettingsFormPanel("MHQNewDayTasksContent", FORM_LABEL_WIDTH,
               FORM_CONTROL_WIDTH);
         panel.addCheckBoxGrid(2, chkNewDayAutoLogistics, chkNewDayMRMS, chkNewDayOptimizeMedicalAssignments,
               chkNewDayAutomaticallyAssignUnmaintainedUnits, chkSelfCorrectMaintenance);
@@ -162,7 +160,7 @@ class MHQNewDayPage extends MHQOptionsPage {
         chkQuickTrainIgnoreTrainingFormations = checkBox("chkQuickTrainIgnoreTrainingFormations",
               model.quickTrainIgnoreTrainingFormations);
 
-        SettingsLabel labelQuickTrainTarget = new SettingsLabel(TEXT_PROVIDER, "lblQuickTrainTarget");
+      SettingsLabel labelQuickTrainTarget = new SettingsLabel(TEXT_PROVIDER, "lblQuickTrainTarget");
         spinnerQuickTrainTarget =
               new SettingsSpinner(TEXT_PROVIDER, "lblQuickTrainTarget", 5, 1, 10, 1);
         spinnerQuickTrainTarget.setValue(model.quickTrainTarget);
@@ -174,7 +172,7 @@ class MHQNewDayPage extends MHQOptionsPage {
         chkLevelTraining = checkBox("chkLevelTraining", model.levelTraining);
         chkLevelOtherCommandSkills = checkBox("chkLevelOtherCommandSkills", model.levelOtherCommand);
 
-        SettingsFormPanel panel = new SettingsFormPanel("MHQNewDayTrainingContent", FORM_LABEL_WIDTH,
+      SettingsFormPanel panel = new SettingsFormPanel("MHQNewDayTrainingContent", FORM_LABEL_WIDTH,
               FORM_CONTROL_WIDTH);
         panel.addCheckBoxGrid(2, chkNewMonthQuickTrain, chkQuickTrainIgnoreTrainingFormations);
         panel.addRow(labelQuickTrainTarget, spinnerQuickTrainTarget);
@@ -216,7 +214,7 @@ class MHQNewDayPage extends MHQOptionsPage {
         chkNewDayFormationIconOperationalStatus.addActionListener(evt -> syncStyleEnabled.run());
         syncStyleEnabled.run();
 
-        SettingsFormPanel panel = new SettingsFormPanel("MHQNewDayFormationContent", FORM_LABEL_WIDTH,
+      SettingsFormPanel panel = new SettingsFormPanel("MHQNewDayFormationContent", FORM_LABEL_WIDTH,
               FORM_CONTROL_WIDTH);
         panel.addCheckBox(chkNewDayFormationIconOperationalStatus);
         panel.addRow(labelStyle, comboNewDayFormationIconOperationalStatusStyle);
@@ -230,8 +228,8 @@ class MHQNewDayPage extends MHQOptionsPage {
      * and the child is enabled only while the parent is selected. The caller lays the groups out two-across.
      */
     private JComponent poolPair(String fillKey, String noReleaseKey) {
-        SettingsCheckBox fill = checkBox(fillKey, Boolean.TRUE.equals(model.newDayPools.get(fillKey)));
-        SettingsCheckBox noRelease =
+      SettingsCheckBox fill = checkBox(fillKey, Boolean.TRUE.equals(model.newDayPools.get(fillKey)));
+      SettingsCheckBox noRelease =
               checkBox(noReleaseKey, Boolean.TRUE.equals(model.newDayPools.get(noReleaseKey)));
         poolCheckBoxes.put(fillKey, fill);
         poolCheckBoxes.put(noReleaseKey, noRelease);
@@ -266,11 +264,8 @@ class MHQNewDayPage extends MHQOptionsPage {
         boolean enabled = parent.isSelected();
         child.setEnabled(enabled);
         Color color = enabled
-                            ?
-                            child.getForeground()
-                            :
-                            Objects.requireNonNullElse(UIManager.getColor("Label.disabledForeground"),
-                                  child.getForeground());
+              ? child.getForeground()
+              : Objects.requireNonNullElse(UIManager.getColor("Label.disabledForeground"), child.getForeground());
         connector.setIcon(symbolIcon(0xE5DA, child.getFont().getSize(), color));
     }
 

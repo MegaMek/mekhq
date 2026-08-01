@@ -75,11 +75,11 @@ class MHQAdvancedPage extends MHQOptionsPage {
 
     // Advanced
     private JTextField userDirField;
-    private SettingsSpinner spinnerStartGameDelay;
-    private SettingsSpinner spinnerStartGameClientDelay;
-    private SettingsSpinner spinnerStartGameClientRetryCount;
-    private SettingsSpinner spinnerStartGameBotClientDelay;
-    private SettingsSpinner spinnerStartGameBotClientRetryCount;
+      private SettingsSpinner spinnerStartGameDelay;
+      private SettingsSpinner spinnerStartGameClientDelay;
+      private SettingsSpinner spinnerStartGameClientRetryCount;
+      private SettingsSpinner spinnerStartGameBotClientDelay;
+      private SettingsSpinner spinnerStartGameBotClientRetryCount;
     private MMComboBox<CompanyGenerationMethod> comboDefaultCompanyGenerationMethod;
 
     MHQAdvancedPage(MHQOptionsModel model, JFrame frame) {
@@ -121,15 +121,15 @@ class MHQAdvancedPage extends MHQOptionsPage {
             LOGGER.error("Could not find the user data directory help file at {}", userDirHelpPath);
         }
 
-        // Keep both icon controls square and as tall as the path field.
-        int buttonSide = userDirField.getPreferredSize().height;
-        Dimension buttonSize = new Dimension(buttonSide, buttonSide);
-        userDirChooser.setPreferredSize(buttonSize);
-        userDirChooser.setMinimumSize(buttonSize);
-        userDirChooser.setMaximumSize(buttonSize);
-        userDirHelp.setPreferredSize(buttonSize);
-        userDirHelp.setMinimumSize(buttonSize);
-        userDirHelp.setMaximumSize(buttonSize);
+                        // Keep both icon controls square and as tall as the path field.
+                        int buttonSide = userDirField.getPreferredSize().height;
+                        Dimension buttonSize = new Dimension(buttonSide, buttonSide);
+                        userDirChooser.setPreferredSize(buttonSize);
+                        userDirChooser.setMinimumSize(buttonSize);
+                        userDirChooser.setMaximumSize(buttonSize);
+                        userDirHelp.setPreferredSize(buttonSize);
+                        userDirHelp.setMinimumSize(buttonSize);
+                        userDirHelp.setMaximumSize(buttonSize);
 
         // Let the path field fill the control column so its left edge lines up with the spinners below (and its right
         // edge, past the buttons, with theirs) instead of sitting at a fixed width nudged over by FlowLayout's leading
@@ -146,7 +146,7 @@ class MHQAdvancedPage extends MHQOptionsPage {
         userDirControls.add(userDirField, BorderLayout.CENTER);
         userDirControls.add(userDirButtons, BorderLayout.LINE_END);
 
-        SettingsFormPanel panel = new SettingsFormPanel("MHQAdvancedContent", FORM_LABEL_WIDTH,
+      SettingsFormPanel panel = new SettingsFormPanel("MHQAdvancedContent", FORM_LABEL_WIDTH,
               FORM_CONTROL_WIDTH);
         panel.addRow(userDirLabel, userDirControls);
         spinnerStartGameDelay = advancedSpinner(panel, "lblStartGameDelay", 1000, 250, 2500, 25, model.startGameDelay);
