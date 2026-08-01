@@ -4401,13 +4401,6 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
                 skillsXpMenu.add(menuItem);
             }
 
-            if (oneSelected && getCampaignOptions().get(CampaignOption.CHASSIS_FAMILIARITY_MODE).isEnabled()) {
-                menuItem = new JMenuItem(resources.getString("editFamiliarity.text"));
-                menuItem.setActionCommand(CMD_EDIT_FAMILIARITY);
-                menuItem.addActionListener(this);
-                skillsXpMenu.add(menuItem);
-            }
-
             JMenu attributesMenu = new JMenu(resources.getString("spendOnAttributes.set"));
             for (SkillAttribute attribute : SkillAttribute.values()) {
                 if (attribute.isNoAttribute()) {
@@ -4653,6 +4646,13 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
             menuItem.setActionCommand(CMD_REMOVE_ROLEPLAY_SKILLS);
             menuItem.addActionListener(this);
             personalityMenu.add(menuItem);
+            
+            if (oneSelected && getCampaignOptions().get(CampaignOption.CHASSIS_FAMILIARITY_MODE).isEnabled()) {
+                menuItem = new JMenuItem(getText("editFamiliarity.text"));
+                menuItem.setActionCommand(CMD_EDIT_FAMILIARITY);
+                menuItem.addActionListener(this);
+                personalityMenu.add(menuItem);
+            }
 
             gmMenu.add(personalityMenu);
 
