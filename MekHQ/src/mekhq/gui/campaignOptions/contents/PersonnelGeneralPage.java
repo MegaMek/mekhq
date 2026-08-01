@@ -499,5 +499,7 @@ class PersonnelGeneralPage {
         model.useBlobVesselPilot = chkUseBlobVesselPilot.isSelected();
         model.useBlobVesselGunner = chkUseBlobVesselGunner.isSelected();
         model.useBlobVesselCrew = chkUseBlobVesselCrew.isSelected();
+        model.chassisFamiliarityMode = comboChassisFamiliarityMode.getSelectedItem();
+        model.chassisFamiliarityDice = (int) spnChassisFamiliarityDice.getValue();
     }
 }
