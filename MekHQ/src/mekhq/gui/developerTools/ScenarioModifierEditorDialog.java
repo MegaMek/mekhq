@@ -188,7 +188,9 @@ public class ScenarioModifierEditorDialog extends JDialog {
         gbc.gridwidth = 1;
         gbc.gridx = 0;
         gbc.gridy++;
-        panel.add(new JLabel(getTextAt(RESOURCE_BUNDLE, labelKey)), gbc);
+        JLabel label = new JLabel(getTextAt(RESOURCE_BUNDLE, labelKey));
+        DeveloperToolsUI.applyRowTooltip(RESOURCE_BUNDLE, labelKey, label, control);
+        panel.add(label, gbc);
         gbc.gridx = 1;
         panel.add(control, gbc);
     }

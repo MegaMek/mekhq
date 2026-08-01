@@ -101,7 +101,9 @@ class StratConBiomeEditDialog extends JDialog {
     private void addRow(JPanel panel, GridBagConstraints constraints, String labelKey, java.awt.Component control) {
         constraints.gridx = 0;
         constraints.gridy++;
-        panel.add(new JLabel(getTextAt(RESOURCE_BUNDLE, labelKey)), constraints);
+        JLabel label = new JLabel(getTextAt(RESOURCE_BUNDLE, labelKey));
+        DeveloperToolsUI.applyRowTooltip(RESOURCE_BUNDLE, labelKey, label, control);
+        panel.add(label, constraints);
         constraints.gridx = 1;
         panel.add(control, constraints);
     }
