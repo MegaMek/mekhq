@@ -360,7 +360,7 @@ public final class MHQConstants extends SuiteConstants {
     public static final String STRAT_CON_USER_CONTRACT_MANIFEST = "./data/stratconcontractdefinitions/UserContractDefinitionManifest.json";
     public static final String STRAT_CON_CONTRACT_PATH = "./data/stratconcontractdefinitions/";
 
-    public static final String STRAT_CON_BIOME_MANIFEST_PATH = "./data/stratconbiomedefinitions/StratConBiomeManifest.xml";
+    public static final String STRAT_CON_BIOME_MANIFEST_PATH = "./data/stratconbiomedefinitions/StratConBiomeManifest.json";
     public static final String STRAT_CON_HYDROLOGY_PROFILES_PATH = "./data/stratconbiomedefinitions/HydrologyProfiles.yaml";
     public static final String STRAT_CON_OROGENY_PROFILES_PATH = "./data/stratconbiomedefinitions/OrogenyProfiles.yaml";
     public static final String STRAT_CON_URBAN_PROFILES_PATH = "./data/stratconbiomedefinitions/UrbanProfiles.yaml";

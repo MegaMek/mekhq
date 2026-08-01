@@ -33,7 +33,6 @@
 package mekhq.campaign.digitalGM.stratCon.biome;
 
 import java.io.File;
-import java.io.FileInputStream;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -41,19 +40,18 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.TreeMap;
-import javax.xml.transform.Source;
 
-import jakarta.xml.bind.JAXBContext;
-import jakarta.xml.bind.JAXBElement;
-import jakarta.xml.bind.Unmarshaller;
-import jakarta.xml.bind.annotation.XmlAccessType;
-import jakarta.xml.bind.annotation.XmlAccessorType;
-import jakarta.xml.bind.annotation.XmlElement;
+import com.fasterxml.jackson.annotation.JsonAutoDetect;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.PropertyAccessor;
+import com.fasterxml.jackson.core.JsonParser;
+import com.fasterxml.jackson.databind.DeserializationFeature;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.SerializationFeature;
 import megamek.common.annotations.Nullable;
 import megamek.logging.MMLogger;
 import mekhq.MHQConstants;
 import mekhq.campaign.digitalGM.stratCon.StratConTrackState;
-import mekhq.utilities.MHQXMLUtility;
 
 /**
  * The authored catalogue of StratCon terrain, loaded once from {@code StratConBiomeManifest.xml} and reachable through
@@ -88,7 +86,6 @@ import mekhq.utilities.MHQXMLUtility;
  * one all-temperatures biome holding nothing but grasslands, so the symptom is uniformly bland sectors rather than an
  * exception.</p>
  */
-@XmlAccessorType(XmlAccessType.NONE)
 public class StratConBiomeManifest {
     private static final MMLogger logger = MMLogger.create(StratConBiomeManifest.class);
 
@@ -275,21 +272,33 @@ public class StratConBiomeManifest {
         public List<String> mapTypes = new ArrayList<>();
     }
 
-    @XmlElement(name = "biomes")
     private List<StratConBiome> biomes = new ArrayList<>();
-    @XmlElement(name = "terrainType")
     private List<StratConTerrainType> terrainTypes = new ArrayList<>();
-    @XmlElement(name = "biomeMapTypes")
     private Map<String, MapTypeList> biomeMapTypes = new HashMap<>();
-    @XmlElement(name = "biomeImages")
     private Map<String, String> biomeImages = new HashMap<>();
-    @XmlElement(name = "facilityImages")
     private Map<String, String> facilityImages = new HashMap<>();
 
-    // derived fields, populated at load time
+    // derived fields, populated at load time (never serialized; reconstructed by load())
+    @JsonIgnore
     private final Map<String, TreeMap<Integer, StratConBiome>> biomeTempMap = new HashMap<>();
+    @JsonIgnore
     private final Map<String, List<StratConBiome>> biomeCategoryMap = new HashMap<>();
+    @JsonIgnore
     private final Map<String, StratConTerrainType> terrainTypeMap = new HashMap<>();
+
+    private static final ObjectMapper MAPPER = buildMapper();
+
+    private static ObjectMapper buildMapper() {
+        ObjectMapper mapper = new ObjectMapper();
+        // Field-based binding matches the authored data shape and the other StratCon JSON readers.
+        mapper.setVisibility(PropertyAccessor.ALL, JsonAutoDetect.Visibility.NONE);
+        mapper.setVisibility(PropertyAccessor.FIELD, JsonAutoDetect.Visibility.ANY);
+        mapper.enable(SerializationFeature.INDENT_OUTPUT);
+        mapper.disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES);
+        // Skip the leading '#' license-header comment lines that lead every saved file.
+        mapper.enable(JsonParser.Feature.ALLOW_YAML_COMMENTS);
+        return mapper;
+    }
 
     /**
      * @param terrainType a StratCon terrain type name (as returned by {@link StratConTrackState#getTerrainTile})
@@ -498,14 +507,7 @@ public class StratConBiomeManifest {
         }
 
         try {
-            JAXBContext context = JAXBContext.newInstance(StratConBiomeManifest.class);
-            Unmarshaller um = context.createUnmarshaller();
-            try (FileInputStream fileStream = new FileInputStream(inputFile)) {
-                Source inputSource = MHQXMLUtility.createSafeXmlSource(fileStream);
-                JAXBElement<StratConBiomeManifest> manifestElement = um.unmarshal(inputSource,
-                      StratConBiomeManifest.class);
-                resultingManifest = manifestElement.getValue();
-            }
+            resultingManifest = MAPPER.readValue(inputFile, StratConBiomeManifest.class);
         } catch (Exception e) {
             logger.error("Error Deserializing Biome Manifest", e);
             return null;

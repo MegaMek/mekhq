@@ -76,7 +76,7 @@ public final class StratConTestData {
             return;
         }
 
-        StratConBiomeManifest.loadForTest(fixture("StratConBiomeManifest.xml"));
+        StratConBiomeManifest.loadForTest(fixture("StratConBiomeManifest.json"));
         StratConHydrology.loadForTest(fixture("HydrologyProfiles.yaml"));
         StratConOrogeny.loadForTest(fixture("OrogenyProfiles.yaml"));
         StratConUrban.loadForTest(fixture("UrbanProfiles.yaml"));
