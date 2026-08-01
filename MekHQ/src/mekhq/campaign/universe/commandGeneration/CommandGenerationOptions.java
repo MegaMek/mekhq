@@ -38,6 +38,7 @@ import java.util.Map;
 import megamek.common.enums.SkillLevel;
 import mekhq.campaign.personnel.enums.PersonnelRole;
 import mekhq.campaign.universe.Faction;
+import megamek.common.enums.NeuralInterfaceMode;
 import mekhq.campaign.universe.Factions;
 import mekhq.campaign.universe.commandGeneration.ratgen.CommandGenerator;
 import mekhq.campaign.universe.commandGeneration.ratgen.ForceDescriptorSnapshot;
@@ -129,6 +130,15 @@ public class CommandGenerationOptions {
     private boolean useSpecifiedFactionToAssignRanks;
     private boolean assignMekWarriorsCallSigns;
     private boolean assignFounderFlag;
+
+    // Augmentation rules. These mirror settings that live on the campaign and on MegaMek's game
+    // options rather than belonging to a generation run, and are carried here so the Command
+    // Generator can both read them and write the player's choice back - a new campaign has them all
+    // off, and a player who has never opened either options dialog would otherwise have no way to
+    // generate an augmented command.
+    private boolean useImplants;
+    private boolean useManeiDomini;
+    private NeuralInterfaceMode neuralInterfaceMode;
 
     // Force naming and formation icons
     private ForceNamingMethod forceNamingMethod;
@@ -223,6 +233,12 @@ public class CommandGenerationOptions {
         setUseSpecifiedFactionToAssignRanks(true);
         setAssignMekWarriorsCallSigns(true);
         setAssignFounderFlag(true);
+
+        // Left off, matching a fresh campaign. The dialog replaces these with whatever the campaign
+        // currently has, so the defaults here only matter to a caller that never opens it.
+        setUseImplants(false);
+        setUseManeiDomini(false);
+        setNeuralInterfaceMode(NeuralInterfaceMode.OFF);
 
         // Force naming and formation icons
         setForceNamingMethod(ForceNamingMethod.CCB_1943);
@@ -526,6 +542,42 @@ public class CommandGenerationOptions {
 
     public void setAssignFounderFlag(final boolean assignFounderFlag) {
         this.assignFounderFlag = assignFounderFlag;
+    }
+
+    /**
+     * @return whether the campaign should track cybernetic implants, MekHQ's gate on every kind of
+     *       augmentation
+     */
+    public boolean isUseImplants() {
+        return useImplants;
+    }
+
+    public void setUseImplants(final boolean useImplants) {
+        this.useImplants = useImplants;
+    }
+
+    /**
+     * @return whether MegaMek's Manei Domini rule is in play, without which a Shadow Division's
+     *       implants do nothing
+     */
+    public boolean isUseManeiDomini() {
+        return useManeiDomini;
+    }
+
+    public void setUseManeiDomini(final boolean useManeiDomini) {
+        this.useManeiDomini = useManeiDomini;
+    }
+
+    /**
+     * @return which of MegaMek's neural interface rules is in play, which decides whether an enhanced
+     *       imaging or direct neural implant does anything
+     */
+    public NeuralInterfaceMode getNeuralInterfaceMode() {
+        return neuralInterfaceMode;
+    }
+
+    public void setNeuralInterfaceMode(final NeuralInterfaceMode neuralInterfaceMode) {
+        this.neuralInterfaceMode = neuralInterfaceMode;
     }
 
     public ForceNamingMethod getForceNamingMethod() {

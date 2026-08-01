@@ -58,9 +58,12 @@ import javax.swing.SpinnerNumberModel;
 
 import megamek.client.ui.comboBoxes.MMComboBox;
 import megamek.common.annotations.Nullable;
-import megamek.logging.MMLogger;
+import megamek.common.enums.NeuralInterfaceMode;
 import megamek.common.enums.SkillLevel;
+import megamek.common.options.OptionsConstants;
+import megamek.logging.MMLogger;
 import mekhq.campaign.Campaign;
+import mekhq.campaign.campaignOptions.CampaignOption;
 import mekhq.campaign.personnel.enums.PersonnelRole;
 import mekhq.campaign.universe.commandGeneration.CommandGenerationOptions;
 import mekhq.campaign.universe.enums.ForceNamingMethod;
@@ -215,6 +218,13 @@ public class SetupTab {
     private CommandGenerationCheckBox chkAssignMekWarriorsCallSigns;
     private CommandGenerationCheckBox chkAssignFounderFlag;
 
+    // Augmentation. These three live on the campaign and on MegaMek's game options rather than on a
+    // generation run; they are surfaced here because all three are off in a new campaign and a player
+    // who has not gone looking through two other options dialogs cannot generate an augmented command.
+    private CommandGenerationCheckBox chkUseImplants;
+    private CommandGenerationCheckBox chkUseManeiDomini;
+    private MMComboBox<NeuralInterfaceMode> cmbNeuralInterfaceMode;
+
     // Random origin
     private RandomOriginOptionsPanel randomOriginOptionsPanel;
 
@@ -285,6 +295,8 @@ public class SetupTab {
         rightColumn.add(buildOfficerSelectionSection());
         rightColumn.add(Box.createVerticalStrut(6));
         rightColumn.add(buildTechAssignmentSection());
+        rightColumn.add(Box.createVerticalStrut(6));
+        rightColumn.add(buildAugmentationSection());
         gbc.gridx = 1;
         gbc.gridy = 2;
         gbc.gridwidth = 1;
@@ -701,6 +713,77 @@ public class SetupTab {
         return section;
     }
 
+    /**
+     * Cybernetic augmentation: whether the campaign tracks implants at all, and which of MegaMek's
+     * augmentation rules are in play.
+     *
+     * <p>All three are off in a new campaign, and all three have to be on before the generator will
+     * fit anything - Manei Domini implants to a Shadow Division, enhanced imaging to Clan warriors.
+     * Setting them anywhere else means finding one in Campaign Options and two in MegaMek's game
+     * options, which is why they are repeated here: this is the screen where the decision is being
+     * made. What is chosen here is written to the campaign, so it holds for the saved game too.</p>
+     *
+     * <p>Neither rule can be applied to warriors after the fact, so the choice has to be made before
+     * generating rather than discovered afterwards.</p>
+     */
+    private JPanel buildAugmentationSection() {
+        CommandGenerationStandardPanel section = new CommandGenerationStandardPanel(
+              "Augmentation", true, "Augmentation");
+        section.setLayout(new GridBagLayout());
+        GridBagConstraints gbc = sectionConstraints();
+
+        chkUseImplants = new CommandGenerationCheckBox("UseImplants");
+        chkUseManeiDomini = new CommandGenerationCheckBox("UseManeiDomini");
+        cmbNeuralInterfaceMode = new MMComboBox<>("cmbNeuralInterfaceMode",
+              NeuralInterfaceMode.values());
+        cmbNeuralInterfaceMode.setRenderer(new DefaultListCellRenderer() {
+            @Override
+            public Component getListCellRendererComponent(JList<?> list, Object value,
+                  int index, boolean isSelected, boolean cellHasFocus) {
+                super.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);
+                if (value instanceof NeuralInterfaceMode mode) {
+                    // The option's own stored wording, which is what MegaMek's game options dialog
+                    // shows, so the same setting reads the same in both places.
+                    setText(mode.optionValue());
+                }
+                return this;
+            }
+        });
+
+        // Implants gate the other two: with the campaign not tracking them, neither rule has anything
+        // to act on.
+        chkUseImplants.addActionListener(actionEvent -> refreshAugmentationEnablement());
+
+        gbc.gridy = 0;
+        gbc.gridx = 0;
+        gbc.gridwidth = 2;
+        section.add(chkUseImplants, gbc);
+
+        gbc.gridy = 1;
+        gbc.gridwidth = 2;
+        indentAsSubOption(chkUseManeiDomini);
+        section.add(chkUseManeiDomini, gbc);
+
+        CommandGenerationLabel neuralInterfaceLabel = new CommandGenerationLabel("NeuralInterfaceMode");
+        indentAsSubOption(neuralInterfaceLabel);
+        gbc.gridy = 2;
+        gbc.gridwidth = 1;
+        gbc.gridx = 0;
+        section.add(neuralInterfaceLabel, gbc);
+        gbc.gridx = 1;
+        section.add(cmbNeuralInterfaceMode, gbc);
+
+        addLeftAlignFiller(section, 2);
+        return section;
+    }
+
+    /** Greys the two rules out while the campaign is not tracking implants at all. */
+    private void refreshAugmentationEnablement() {
+        boolean tracksImplants = chkUseImplants.isSelected();
+        chkUseManeiDomini.setEnabled(tracksImplants);
+        cmbNeuralInterfaceMode.setEnabled(tracksImplants);
+    }
+
     private static GridBagConstraints sectionConstraints() {
         GridBagConstraints gbc = new GridBagConstraints();
         gbc.gridx = 0;
@@ -905,6 +988,15 @@ public class SetupTab {
         chkUseSpecifiedFactionToAssignRanks.setEnabled(chkAutomaticallyAssignRanks.isSelected());
         chkAssignMekWarriorsCallSigns.setSelected(sourceOptions.isAssignMekWarriorsCallSigns());
         chkAssignFounderFlag.setSelected(sourceOptions.isAssignFounderFlag());
+
+        // Seeded from the campaign rather than the options object: these mirror live campaign and game
+        // settings, so the dialog has to open showing what is actually in force.
+        chkUseImplants.setSelected(campaign.getCampaignOptions().get(CampaignOption.USE_IMPLANTS));
+        chkUseManeiDomini.setSelected(
+              campaign.getGameOptions().booleanOption(OptionsConstants.RPG_MANEI_DOMINI));
+        cmbNeuralInterfaceMode.setSelectedItem(
+              NeuralInterfaceMode.from(campaign.getGameOptions()));
+        refreshAugmentationEnablement();
     }
 
     /**
@@ -976,6 +1068,12 @@ public class SetupTab {
         targetOptions.setUseSpecifiedFactionToAssignRanks(chkUseSpecifiedFactionToAssignRanks.isSelected());
         targetOptions.setAssignMekWarriorsCallSigns(chkAssignMekWarriorsCallSigns.isSelected());
         targetOptions.setAssignFounderFlag(chkAssignFounderFlag.isSelected());
+
+        targetOptions.setUseImplants(chkUseImplants.isSelected());
+        targetOptions.setUseManeiDomini(chkUseManeiDomini.isSelected());
+        if (cmbNeuralInterfaceMode.getSelectedItem() instanceof NeuralInterfaceMode mode) {
+            targetOptions.setNeuralInterfaceMode(mode);
+        }
     }
 
     public RandomOriginOptionsPanel getRandomOriginOptionsPanel() {

@@ -53,6 +53,9 @@ import megamek.client.ratgenerator.C3NetworkConfigurator;
 import megamek.client.ratgenerator.ForceDescriptor;
 import megamek.client.ratgenerator.Ruleset;
 import megamek.common.annotations.Nullable;
+import megamek.common.enums.NeuralInterfaceMode;
+import megamek.common.options.IOption;
+import megamek.common.options.OptionsConstants;
 import megamek.common.units.Entity;
 import megamek.common.units.Infantry;
 import megamek.logging.MMLogger;
@@ -514,6 +517,10 @@ public final class CommandGenerator {
 
         // Manei Domini rank, class and cybernetics, for a Word of Blake Shadow Division. Runs here for
         // the same reason as bloodnames: implant availability is read off the person's rank.
+        // Before either augmentation stage, since both read these and neither can be applied to
+        // warriors afterwards.
+        applyAugmentationRules(campaign, options);
+
         LOGGER.info("[CompanyGen][Pipeline] Stage 7f: Manei Domini augmentation (snapshot faction '{}')",
               options.getForceDescriptorSnapshot().getFaction());
         ManeiDominiAugmentor.augment(campaign,
@@ -1063,6 +1070,43 @@ public final class CommandGenerator {
             LOGGER.error(exception, "[CompanyGen][Cargo] cargo lift generation failed;"
                         + " the command keeps whatever cargo capacity it already had");
         }
+    }
+
+    /**
+     * Writes the augmentation rules chosen on the Setup tab onto the campaign.
+     *
+     * <p>These are not generation settings - they belong to the campaign and to MegaMek's game
+     * options - but they are chosen on the Setup tab because that is where the decision is made and
+     * because neither rule can be applied to warriors after they are generated. Writing them here
+     * makes the choice take effect for the generation that follows and, because both option sets are
+     * saved with the campaign, hold for the saved game.</p>
+     */
+    // Package-private so the regression test can check the choice reaches the campaign.
+    static void applyAugmentationRules(Campaign campaign, CommandGenerationOptions options) {
+        CampaignOptions campaignOptions = campaign.getCampaignOptions();
+        boolean tracksImplants = options.isUseImplants();
+        campaignOptions.set(CampaignOption.USE_IMPLANTS, tracksImplants);
+
+        IOption maneiDomini = campaign.getGameOptions().getOption(OptionsConstants.RPG_MANEI_DOMINI);
+        if (maneiDomini != null) {
+            maneiDomini.setValue(tracksImplants && options.isUseManeiDomini());
+        }
+        IOption neuralInterface = campaign.getGameOptions()
+                                        .getOption(OptionsConstants.ADVANCED_NEURAL_INTERFACE_MODE);
+        if (neuralInterface != null) {
+            // With implants untracked there is nothing for the rule to act on, so it is written off
+            // rather than left saying a rule is in play that cannot reach anyone.
+            NeuralInterfaceMode mode = tracksImplants
+                                             ? options.getNeuralInterfaceMode()
+                                             : NeuralInterfaceMode.OFF;
+            neuralInterface.setValue((mode == null) ? NeuralInterfaceMode.OFF.optionValue()
+                                           : mode.optionValue());
+        }
+        LOGGER.info("[CompanyGen][Pipeline] Stage 7e2: augmentation rules written to the campaign -"
+                    + " Use Implants={}, Manei Domini={}, Neural Interface='{}'",
+              campaignOptions.get(CampaignOption.USE_IMPLANTS),
+              (maneiDomini == null) ? "unavailable" : maneiDomini.booleanValue(),
+              (neuralInterface == null) ? "unavailable" : neuralInterface.stringValue());
     }
 
     /**
