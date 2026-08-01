@@ -6817,7 +6817,7 @@ public class Person implements ILocatable {
         return chassis;
     }
 
-    private int getChassisFamiliarityCombatBonus(FamiliarityMode mode, boolean isGunnery) {
+    public int getChassisFamiliarityCombatBonus(FamiliarityMode mode, boolean isGunnery) {
         Entity entity = getUnitFromEntity();
         if (!mode.isEnabled() ||
                   entity == null ||

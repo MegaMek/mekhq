@@ -62,10 +62,7 @@ import megamek.common.equipment.EquipmentType;
 import megamek.common.equipment.Mounted;
 import megamek.common.equipment.WeaponType;
 import megamek.common.options.IOption;
-import megamek.common.units.AeroSpaceFighter;
 import megamek.common.units.Entity;
-import megamek.common.units.Mek;
-import megamek.common.units.Tank;
 import megamek.common.util.weightedMaps.WeightedIntMap;
 import megamek.common.weapons.attacks.InfantryAttack;
 import megamek.common.weapons.autoCannons.ACWeapon;
@@ -714,17 +711,18 @@ public class SpecialAbility {
     }
 
     private static @Nullable WeightClassFamily crewedUnitFamily(final Entity entity) {
-        if (entity instanceof Mek) {
+        if (entity.isMek()) {
             return WeightClassFamily.MEK;
         }
-        // Conventional fighters are a subclass of AeroSpaceFighter; exclude fixed-wing support via the support guard.
-        if ((entity instanceof AeroSpaceFighter) && !entity.isSupportVehicle()) {
+
+        if (entity.isFighter()) {
             return WeightClassFamily.FLIGHT;
         }
-        // Tank covers ground, naval, and VTOL combat vehicles.
-        if ((entity instanceof Tank) && !entity.isSupportVehicle()) {
+
+        if (entity.isVehicle()) {
             return WeightClassFamily.VEHICULAR;
         }
+
         return null;
     }
 
