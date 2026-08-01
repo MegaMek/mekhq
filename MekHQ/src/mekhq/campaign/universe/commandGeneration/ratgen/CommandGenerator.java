@@ -79,6 +79,7 @@ import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.universe.Faction;
 import mekhq.campaign.universe.commandGeneration.CargoShipGenerator;
 import mekhq.campaign.universe.commandGeneration.CommandGenerationOptions;
+import mekhq.campaign.universe.commandGeneration.EnhancedImagingAugmentor;
 import mekhq.campaign.universe.commandGeneration.ManeiDominiAugmentor;
 import mekhq.campaign.universe.commandGeneration.SupportPersonnelToTOE;
 import mekhq.campaign.universe.commandGeneration.SupportUnitGenerator;
@@ -516,6 +517,14 @@ public final class CommandGenerator {
         LOGGER.info("[CompanyGen][Pipeline] Stage 7f: Manei Domini augmentation (snapshot faction '{}')",
               options.getForceDescriptorSnapshot().getFaction());
         ManeiDominiAugmentor.augment(campaign,
+              options.getForceDescriptorSnapshot().getFaction(), generatedPersons);
+
+        // The Clans' own augmentation, unrelated to the Manei Domini and gated on its own rules. Runs
+        // on the campaign's Persons rather than the descriptor's entity crews, because a unit's crew is
+        // rebuilt from its people whenever it is reset and an implant written to the crew would be
+        // lost with it.
+        LOGGER.info("[CompanyGen][Pipeline] Stage 7f2: Clan enhanced imaging");
+        EnhancedImagingAugmentor.augment(campaign,
               options.getForceDescriptorSnapshot().getFaction(), generatedPersons);
 
         // C3 and C3i networks. Generation picks units carrying the equipment but leaves them
