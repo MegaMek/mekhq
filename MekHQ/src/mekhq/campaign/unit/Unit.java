@@ -5147,10 +5147,10 @@ public class Unit implements ITechnology, ILocatable {
                                                                                      .filter(e -> (cyberOptionNames.contains(
                                                                                            e.getKey()) ?
                                                                                                          e.getValue() >=
-                                                                                                         crewSize :
+                                                                                                               crewSize :
                                                                                                          e.getValue() >
-                                                                                                         crewSize /
-                                                                                                         2))
+                                                                                                               crewSize /
+                                                                                                                     2))
                                                                                      .max(Entry.comparingByValue())
                                                                                      .map(Entry::getKey))));
 
@@ -5313,7 +5313,8 @@ public class Unit implements ITechnology, ILocatable {
             SkillModifierData skillModifierData = person.getSkillModifierData();
 
             if (person.hasSkill(driveType)) {
-                sumPiloting += person.getSkill(driveType).getFinalSkillValue(skillModifierData);
+                sumPiloting += person.getSkill(driveType)
+                                     .getFinalSkillValue(skillModifierData, entity.getWeightClass());
                 nDrivers++;
             } else if (entity instanceof Infantry) {
                 // For infantry, we need to assign an 8 if they have no anti-mek skill
@@ -5322,7 +5323,7 @@ public class Unit implements ITechnology, ILocatable {
             }
 
             if (entity instanceof Tank && Compute.getFullCrewSize(entity) == 1 && person.hasSkill(gunType)) {
-                sumGunnery += person.getSkill(gunType).getFinalSkillValue(skillModifierData);
+                sumGunnery += person.getSkill(gunType).getFinalSkillValue(skillModifierData, entity.getWeightClass());
                 nGunners++;
             }
             if (getCampaign().getCampaignOptions().isUseAdvancedMedical()) {
@@ -5348,7 +5349,8 @@ public class Unit implements ITechnology, ILocatable {
             }
 
             if (person.hasSkill(tempGunType)) {
-                sumGunnery += person.getSkill(tempGunType).getFinalSkillValue(skillModifierData);
+                sumGunnery += person.getSkill(tempGunType)
+                                    .getFinalSkillValue(skillModifierData, entity.getWeightClass());
                 nGunners++;
             }
             if (person.hasSkill(SkillType.S_ARTILLERY) &&
@@ -5389,7 +5391,8 @@ public class Unit implements ITechnology, ILocatable {
             SkillModifierData skillModifierData = getCommander().getSkillModifierData();
 
             Skill drivingSkill = getCommander().getSkill(driveType);
-            piloting = drivingSkill == null ? 13 : drivingSkill.getFinalSkillValue(skillModifierData);
+            piloting = drivingSkill == null ? 13
+                             : drivingSkill.getFinalSkillValue(skillModifierData, entity.getWeightClass());
             if (entity instanceof Infantry && drivingSkill == null) {
                 piloting = 8;
             }
@@ -5403,7 +5406,8 @@ public class Unit implements ITechnology, ILocatable {
             }
 
             Skill gunnerySkill = getCommander().getSkill(tempGunType);
-            gunnery = gunnerySkill == null ? 13 : gunnerySkill.getFinalSkillValue(skillModifierData);
+            gunnery = gunnerySkill == null ? 13
+                            : gunnerySkill.getFinalSkillValue(skillModifierData, entity.getWeightClass());
         }
 
         if (entity instanceof Infantry) {
@@ -5673,13 +5677,13 @@ public class Unit implements ITechnology, ILocatable {
         int artillery = 7;
         int piloting = 8;
         if (person.hasSkill(gunType)) {
-            gunnery = person.getSkill(gunType).getFinalSkillValue(skillModifierData);
+            gunnery = person.getSkill(gunType).getFinalSkillValue(skillModifierData, entity.getWeightClass());
         }
         if (getCampaign().getCampaignOptions().isUseAdvancedMedical()) {
             gunnery += person.getInjuryModifiers(false);
         }
         if (person.hasSkill(driveType)) {
-            piloting = person.getSkill(driveType).getFinalSkillValue(skillModifierData);
+            piloting = person.getSkill(driveType).getFinalSkillValue(skillModifierData, entity.getWeightClass());
         }
         if (person.hasSkill(SkillType.S_ARTILLERY) &&
                   person.getSkill(SkillType.S_ARTILLERY).getFinalSkillValue(skillModifierData) < artillery) {
