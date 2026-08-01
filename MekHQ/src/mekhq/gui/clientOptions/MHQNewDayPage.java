@@ -76,14 +76,15 @@ class MHQNewDayPage extends MHQOptionsPage {
     private SettingsCheckBox chkSelfCorrectMaintenance;
 
     // New Day - Training
-    private SettingsCheckBox chkNewMonthQuickTrain;
-    private SettingsSpinner spinnerQuickTrainTarget;
-    private SettingsCheckBox chkLevelArtillery;
-    private SettingsCheckBox chkLevelScoutingSkills;
-    private SettingsCheckBox chkLevelEscapeSkills;
-    private SettingsCheckBox chkLevelLeadership;
-    private SettingsCheckBox chkLevelTraining;
-    private SettingsCheckBox chkLevelOtherCommandSkills;
+      private SettingsCheckBox chkNewMonthQuickTrain;
+      private SettingsCheckBox chkQuickTrainIgnoreTrainingFormations;
+      private SettingsSpinner spinnerQuickTrainTarget;
+      private SettingsCheckBox chkLevelArtillery;
+      private SettingsCheckBox chkLevelScoutingSkills;
+      private SettingsCheckBox chkLevelEscapeSkills;
+      private SettingsCheckBox chkLevelLeadership;
+      private SettingsCheckBox chkLevelTraining;
+      private SettingsCheckBox chkLevelOtherCommandSkills;
 
     // New Day - Formation Icons
     private SettingsCheckBox chkNewDayFormationIconOperationalStatus;
@@ -158,6 +159,8 @@ class MHQNewDayPage extends MHQOptionsPage {
 
     private JPanel createNewDayTrainingSection() {
         chkNewMonthQuickTrain = checkBox("chkNewMonthQuickTrain", model.newMonthQuickTrain);
+        chkQuickTrainIgnoreTrainingFormations = checkBox("chkQuickTrainIgnoreTrainingFormations",
+              model.quickTrainIgnoreTrainingFormations);
 
         SettingsLabel labelQuickTrainTarget = new SettingsLabel(TEXT_PROVIDER, "lblQuickTrainTarget");
         spinnerQuickTrainTarget =
@@ -173,7 +176,7 @@ class MHQNewDayPage extends MHQOptionsPage {
 
         SettingsFormPanel panel = new SettingsFormPanel("MHQNewDayTrainingContent", FORM_LABEL_WIDTH,
               FORM_CONTROL_WIDTH);
-        panel.addCheckBox(chkNewMonthQuickTrain);
+        panel.addCheckBoxGrid(2, chkNewMonthQuickTrain, chkQuickTrainIgnoreTrainingFormations);
         panel.addRow(labelQuickTrainTarget, spinnerQuickTrainTarget);
         panel.addCheckBoxGrid(2, chkLevelArtillery, chkLevelScoutingSkills, chkLevelEscapeSkills, chkLevelLeadership,
               chkLevelTraining, chkLevelOtherCommandSkills);
@@ -285,6 +288,7 @@ class MHQNewDayPage extends MHQOptionsPage {
         model.selfCorrectMaintenance = chkSelfCorrectMaintenance.isSelected();
 
         model.newMonthQuickTrain = chkNewMonthQuickTrain.isSelected();
+        model.quickTrainIgnoreTrainingFormations = chkQuickTrainIgnoreTrainingFormations.isSelected();
         model.quickTrainTarget = (int) spinnerQuickTrainTarget.getValue();
         model.levelArtillery = chkLevelArtillery.isSelected();
         model.levelScouting = chkLevelScoutingSkills.isSelected();

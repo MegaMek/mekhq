@@ -1163,6 +1163,16 @@ public final class MHQOptions extends SuiteOptions {
               .putBoolean(MHQConstants.NEW_DAY_QUICK_TRAIN, value);
     }
 
+    public boolean getQuickTrainIgnoreTrainingFormations() {
+        return userPreferences.node(MHQConstants.NEW_DAY_NODE)
+              .getBoolean(MHQConstants.NEW_DAY_QUICK_TRAIN_IGNORE_TRAINING_FORMATIONS, false);
+    }
+
+    public void setQuickTrainIgnoreTrainingFormations(final boolean value) {
+        userPreferences.node(MHQConstants.NEW_DAY_NODE)
+              .putBoolean(MHQConstants.NEW_DAY_QUICK_TRAIN_IGNORE_TRAINING_FORMATIONS, value);
+    }
+
     public int getQuickTrainTarget() {
         return userPreferences.node(MHQConstants.NEW_DAY_NODE).getInt(MHQConstants.NEW_DAY_QUICK_TRAIN_TARGET, 5);
     }
