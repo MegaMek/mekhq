@@ -3841,10 +3841,14 @@ public class Person implements ILocatable {
                 MHQXMLUtility.writeSimpleXMLTag(pw, indent, "edgeAvailable", getCurrentEdge());
             }
 
-            if (countOptions(PersonnelOptions.MD_ADVANTAGES) > 0) {
-                MHQXMLUtility.writeSimpleXMLTag(pw, indent,
-                      "implants",
-                      getOptionList(DELIMITER, PersonnelOptions.MD_ADVANTAGES));
+            // Enhanced imaging is an implant held in a group of its own rather than with the Manei
+            // Domini implants, and writing only that group dropped it: an implanted Clan warrior
+            // reloaded without their implant. It is written into the same tag because the reader
+            // restores each entry by looking its name up across every group, so both groups come back
+            // from one tag and a save written before this still loads.
+            String implantList = implantOptionList();
+            if (!implantList.isEmpty()) {
+                MHQXMLUtility.writeSimpleXMLTag(pw, indent, "implants", implantList);
             }
 
             if (!techUnits.isEmpty()) {
@@ -6383,6 +6387,34 @@ public class Person implements ILocatable {
     /**
      * Returns a string of all the option "codes" for this pilot, for a given group, using sep as the separator
      */
+    /**
+     * Every implant this person carries, across the groups that hold them.
+     *
+     * <p>The Manei Domini implants and enhanced imaging sit in separate option groups but are one
+     * thing to a reader and to the save file alike, so they are gathered here rather than at each of
+     * the two call sites that would otherwise have to remember both.</p>
+     *
+     * @return the implants as a delimited list, empty if this person carries none
+     */
+    public String implantOptionList() {
+        String maneiDomini = getOptionList(DELIMITER, PersonnelOptions.MD_ADVANTAGES);
+        String enhancedImaging = getOptionList(DELIMITER, PilotOptions.EI_ADVANTAGES);
+        if (maneiDomini.isEmpty()) {
+            return enhancedImaging;
+        }
+        if (enhancedImaging.isEmpty()) {
+            return maneiDomini;
+        }
+        return maneiDomini + DELIMITER + enhancedImaging;
+    }
+
+    /**
+     * @return how many implants this person carries, across the groups that hold them
+     */
+    public int countImplants() {
+        return countOptions(PersonnelOptions.MD_ADVANTAGES) + countOptions(PilotOptions.EI_ADVANTAGES);
+    }
+
     public String getOptionList(@Nullable String sep, final String groupKey) {
         final StringBuilder adv = new StringBuilder();
 
@@ -6429,6 +6461,24 @@ public class Person implements ILocatable {
         }
 
         return (abilityString.isEmpty()) ? null : "<html>" + abilityString + "</html>";
+    }
+
+    /**
+     * Every implant this person carries, named for display, across the groups that hold them.
+     *
+     * @return the implants as displayable HTML, or {@code null} if this person carries none
+     */
+    public @Nullable String getImplantListAsString() {
+        String maneiDomini = getAbilityListAsString(PersonnelOptions.MD_ADVANTAGES);
+        String enhancedImaging = getAbilityListAsString(PilotOptions.EI_ADVANTAGES);
+        if (maneiDomini == null) {
+            return enhancedImaging;
+        }
+        if (enhancedImaging == null) {
+            return maneiDomini;
+        }
+        // Both arrive wrapped in their own <html> tags; splice them into one list.
+        return maneiDomini.replace("</html>", "") + enhancedImaging.replace("<html>", "");
     }
     // endregion Personnel Options
 

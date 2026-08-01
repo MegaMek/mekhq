@@ -36,6 +36,7 @@ import static java.awt.Color.BLACK;
 import static java.awt.Color.RED;
 import static java.lang.Math.ceil;
 import static megamek.client.ui.WrapLayout.wordWrap;
+import static megamek.common.options.PilotOptions.EI_ADVANTAGES;
 import static megamek.common.options.PilotOptions.LVL3_ADVANTAGES;
 import static megamek.common.options.PilotOptions.MD_ADVANTAGES;
 import static megamek.common.units.EntityWeightClass.WEIGHT_ULTRA_LIGHT;
@@ -1577,6 +1578,19 @@ public class PersonViewPanel extends JScrollablePanel {
                 if (option.booleanValue()) {
                     IOption ability = options.getOption(option.getName());
                     relevantAbilities.put(ability, MD_ADVANTAGES);
+                }
+            }
+        }
+
+        // Enhanced imaging is an implant, but it sits in a group of its own rather than with the
+        // Manei Domini implants above, so reading only that group left an implanted Clan warrior
+        // showing nothing here.
+        if (campaignOptions.isUseImplants() && (person.countOptions(EI_ADVANTAGES) > 0)) {
+            for (Enumeration<IOption> i = person.getOptions(EI_ADVANTAGES); i.hasMoreElements(); ) {
+                IOption option = i.nextElement();
+                if (option.booleanValue()) {
+                    IOption ability = options.getOption(option.getName());
+                    relevantAbilities.put(ability, EI_ADVANTAGES);
                 }
             }
         }
