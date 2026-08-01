@@ -41,6 +41,9 @@ import static mekhq.campaign.parts.enums.PartQuality.QUALITY_D;
 import static mekhq.campaign.randomEvents.prisoners.NonCombatPrisoners.getCivilianCaptives;
 import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
 import static mekhq.utilities.MHQInternationalization.getTextAt;
+import static mekhq.utilities.ReportingUtilities.CLOSING_SPAN_TAG;
+import static mekhq.utilities.ReportingUtilities.getAmazingColor;
+import static mekhq.utilities.ReportingUtilities.spanOpeningWithCustomColor;
 
 import java.io.File;
 import java.util.*;
@@ -70,6 +73,7 @@ import mekhq.MekHQ;
 import mekhq.Utilities;
 import mekhq.campaign.campaignOptions.CampaignOption;
 import mekhq.campaign.campaignOptions.CampaignOptions;
+import mekhq.campaign.enums.DailyReportType;
 import mekhq.campaign.events.persons.PersonBattleFinishedEvent;
 import mekhq.campaign.finances.Money;
 import mekhq.campaign.finances.enums.TransactionType;
@@ -2040,11 +2044,29 @@ public class ResolveScenarioTracker {
                 }
                 String chassis = unitEntity.getChassis();
                 for (Person crew : unit.getCrew()) {
+                    boolean alreadyCapped = crew.getChassisFamiliarity(chassis) == cap;
                     crew.addChassisFamiliarity(chassis, Compute.d6(familiarityDice), cap);
+                    boolean nowCapped = crew.getChassisFamiliarity(chassis) == cap;
+
+                    if (!alreadyCapped && nowCapped) {
+                        String report = getFormattedTextAt(RESOURCE_BUNDLE, "ResolveScenarioTracker.cappedFamiliarity",
+                              crew.getHyperlinkedFullTitle(), spanOpeningWithCustomColor(getAmazingColor()),
+                              CLOSING_SPAN_TAG);
+                        campaign.addReport(DailyReportType.PERSONNEL, report);
+                    }
                 }
                 Person unitTech = unit.getTech();
                 if (unitTech != null) {
+                    boolean alreadyCapped = unitTech.getChassisFamiliarity(chassis) == cap;
                     unitTech.addChassisFamiliarity(chassis, Compute.d6(familiarityDice), cap);
+                    boolean nowCapped = unitTech.getChassisFamiliarity(chassis) == cap;
+
+                    if (!alreadyCapped && nowCapped) {
+                        String report = getFormattedTextAt(RESOURCE_BUNDLE, "ResolveScenarioTracker.cappedFamiliarity",
+                              unitTech.getHyperlinkedFullTitle(), spanOpeningWithCustomColor(getAmazingColor()),
+                              CLOSING_SPAN_TAG);
+                        campaign.addReport(DailyReportType.PERSONNEL, report);
+                    }
                 }
             }
         }
