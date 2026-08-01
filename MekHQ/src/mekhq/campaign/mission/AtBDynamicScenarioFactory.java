@@ -2915,7 +2915,6 @@ public class AtBDynamicScenarioFactory {
         entity.setGame(campaign.getGame());
 
         RandomNameGenerator nameGenerator = RandomNameGenerator.getInstance();
-        nameGenerator.setChosenFaction(faction.getNameGenerator());
 
         Gender gender;
         int nonBinaryDiceSize = campaign.getCampaignOptions().getNonBinaryDiceSize();
@@ -2928,7 +2927,7 @@ public class AtBDynamicScenarioFactory {
 
         String[] crewNameArray = nameGenerator.generateGivenNameSurnameSplit(gender,
               faction.isClan(),
-              faction.getShortName());
+              faction.getNameGenerator());
         String crewName = crewNameArray[0];
         crewName += !StringUtility.isNullOrBlank(crewNameArray[1]) ? ' ' + crewNameArray[1] : "";
 

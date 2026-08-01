@@ -52,6 +52,7 @@ import megamek.logging.MMLogger;
 import mekhq.MHQOptions;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.campaignOptions.CampaignOptions;
+import mekhq.campaign.force.Formation;
 import mekhq.campaign.log.PerformanceLogger;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.enums.PersonnelRole;
@@ -135,6 +136,9 @@ public class QuickTrain {
             if (status.isDepartedUnit() || status.isStudent()) {
                 continue;
             }
+            if (options.ignoreTrainingFormations() && isInTrainingFormation(person, campaign)) {
+                continue;
+            }
 
             List<String> targetSkills = new ArrayList<>();
 
@@ -162,6 +166,18 @@ public class QuickTrain {
             // Do this last so we're not spamming person update events
             campaign.getPlayerForce().getHumanResources().personUpdated(campaign, person);
         }
+    }
+
+    static boolean isInTrainingFormation(Person person, Campaign campaign) {
+        Formation formation = campaign.getPlayerForce().getFormationFor(person.getUnit());
+        if (formation == null) {
+            return false;
+        }
+        if (formation.getCombatRoleInMemory().isTraining()) {
+            return true;
+        }
+        return formation.getAllParents().stream()
+              .anyMatch(parent -> parent.getCombatRoleInMemory().isTraining());
     }
 
     /**
@@ -481,8 +497,16 @@ public class QuickTrain {
           boolean isLevelEscapeSkills,
           boolean isLevelLeadership,
           boolean isLevelTraining,
-          boolean isLevelOtherCommandSkills
+          boolean isLevelOtherCommandSkills,
+          boolean ignoreTrainingFormations
     ) {
+        public QuickTrainOptions(boolean isLevelArtillery, boolean isLevelScoutingSkills,
+              boolean isLevelEscapeSkills, boolean isLevelLeadership, boolean isLevelTraining,
+              boolean isLevelOtherCommandSkills) {
+            this(isLevelArtillery, isLevelScoutingSkills, isLevelEscapeSkills, isLevelLeadership, isLevelTraining,
+                  isLevelOtherCommandSkills, false);
+        }
+
         // Additional logic to provide defaults for missing properties
         public static QuickTrainOptions buildQuickTrainOptions(CampaignOptions campaignOptions) {
             boolean isLevelArtillery = campaignOptions.isUseArtillery();
@@ -503,7 +527,8 @@ public class QuickTrain {
                   isLevelEscapeSkills,
                   isLevelLeadership,
                   isLevelTraining,
-                  isLevelOtherCommandSkills);
+                  isLevelOtherCommandSkills,
+                  false);
         }
 
         public static QuickTrain.@NonNull QuickTrainOptions getQuickTrainOptionsForNewDay(MHQOptions mekhqOptions) {
@@ -513,13 +538,15 @@ public class QuickTrain {
             final boolean isLevelLeadership = mekhqOptions.getLevelLeadership();
             final boolean isLevelTraining = mekhqOptions.getLevelTraining();
             final boolean isLevelOtherCommandSkills = mekhqOptions.getLevelOtherCommand();
+            final boolean ignoreTrainingFormations = mekhqOptions.getQuickTrainIgnoreTrainingFormations();
 
             return new QuickTrainOptions(isLevelArtillery,
                   isLevelScoutingSkills,
                   isLevelEscapeSkills,
                   isLevelLeadership,
                   isLevelTraining,
-                  isLevelOtherCommandSkills);
+                  isLevelOtherCommandSkills,
+                  ignoreTrainingFormations);
         }
     }
 }

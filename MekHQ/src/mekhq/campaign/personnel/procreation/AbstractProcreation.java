@@ -477,7 +477,7 @@ public abstract class AbstractProcreation {
             }
 
             if (baby.isFounder() && useFoundersHavePlotArmor) {
-                baby.changeAttributeScore(SkillAttribute.EDGE, 1);
+                baby.gainEdge(1, campaignOptions.get(CampaignOption.MAXIMUM_EDGE));
             }
 
             // set education
