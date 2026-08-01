@@ -43,6 +43,7 @@ import megamek.common.annotations.Nullable;
 import megamek.logging.MMLogger;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
+import mekhq.campaign.campaignOptions.CampaignOption;
 import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.events.persons.PersonChangedEvent;
 import mekhq.campaign.log.AwardLogger;
@@ -167,9 +168,12 @@ public class PersonAwardController {
                 if (isReplaceEdgeAwards) {
                     person.awardXP(campaign, award.getEdgeReward() * EDGE_AWARD_REPLACEMENT_XP);
                 } else {
-                    person.changeEdge(award.getEdgeReward());
-                    person.changeCurrentEdge(award.getEdgeReward());
-                    PerformanceLogger.gainedEdge(campaign, person, campaign.getLocalDate());
+                    int gained = person.gainEdge(award.getEdgeReward(),
+                          campaignOptions.get(CampaignOption.MAXIMUM_EDGE));
+                    if (gained > 0) {
+                        person.changeCurrentEdge(gained);
+                        PerformanceLogger.gainedEdge(campaign, person, campaign.getLocalDate());
+                    }
                 }
             }
         }
