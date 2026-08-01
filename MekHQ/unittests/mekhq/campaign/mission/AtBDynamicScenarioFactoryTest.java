@@ -51,6 +51,7 @@ import static testUtilities.MHQTestUtilities.mockCampaign;
 
 import java.util.List;
 
+import megamek.client.generator.RandomNameGenerator;
 import megamek.common.Player;
 import megamek.common.enums.SkillLevel;
 import megamek.common.equipment.EquipmentType;
@@ -117,6 +118,24 @@ class AtBDynamicScenarioFactoryTest {
         createEntityWithCrew(faction, skill, campaign, entity, true);
 
         assertTrue(entity.getCrew().getNickname(0).isEmpty());
+    }
+
+    @Test
+    void createEntityWithCrewPreservesConfiguredNameFaction() {
+        RandomNameGenerator nameGenerator = RandomNameGenerator.getInstance();
+        String previousFaction = nameGenerator.getChosenFaction();
+        Faction capellanFaction = mock(Faction.class);
+        when(capellanFaction.getNameGenerator()).thenReturn("CC");
+        when(capellanFaction.getShortName()).thenReturn("CC");
+
+        try {
+            nameGenerator.setChosenFaction("FS");
+            createEntityWithCrew(capellanFaction, SkillLevel.VETERAN, campaign, getShadowHawk(), true);
+
+            assertEquals("FS", nameGenerator.getChosenFaction());
+        } finally {
+            nameGenerator.setChosenFaction(previousFaction);
+        }
     }
 
     private static Entity getShadowHawk() {

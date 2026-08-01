@@ -55,6 +55,7 @@ class PersonnelOptionsModel {
     boolean onlyCommandersMatterInfantry;
     boolean onlyCommandersMatterBattleArmor;
     boolean useEdge;
+    int maximumEdge;
     boolean useTwistOfFateSurvival;
     boolean useFoundersHavePlotArmor;
     EdgeRefreshPeriod edgeRefreshPeriod;
@@ -148,6 +149,7 @@ class PersonnelOptionsModel {
         onlyCommandersMatterInfantry = options.isOnlyCommandersMatterInfantry();
         onlyCommandersMatterBattleArmor = options.isOnlyCommandersMatterBattleArmor();
         useEdge = options.isUseEdge();
+        maximumEdge = options.get(CampaignOption.MAXIMUM_EDGE);
         useTwistOfFateSurvival = options.isUseTwistOfFateSurvival();
         useFoundersHavePlotArmor = options.get(CampaignOption.USE_FOUNDER_PLOT_ARMOR);
         edgeRefreshPeriod = options.getEdgeRefreshPeriod();
@@ -242,6 +244,7 @@ class PersonnelOptionsModel {
         options.setOnlyCommandersMatterInfantry(onlyCommandersMatterInfantry);
         options.setOnlyCommandersMatterBattleArmor(onlyCommandersMatterBattleArmor);
         options.setUseEdge(useEdge);
+        options.set(CampaignOption.MAXIMUM_EDGE, maximumEdge);
         options.setUseTwistOfFateSurvival(useTwistOfFateSurvival);
         options.set(CampaignOption.USE_FOUNDER_PLOT_ARMOR, useFoundersHavePlotArmor);
         options.setEdgeRefreshPeriod(edgeRefreshPeriod);
