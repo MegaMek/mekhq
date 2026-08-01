@@ -131,6 +131,7 @@ import mekhq.campaign.base.PlayerBase;
 import mekhq.campaign.camOpsReputation.ForceReputationController;
 import mekhq.campaign.camOpsReputation.IUnitRating;
 import mekhq.campaign.campaignOptions.AcquisitionsType;
+import mekhq.campaign.campaignOptions.CampaignOption;
 import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.campaignOptions.CampaignOptionsMarshaller;
 import mekhq.campaign.dailyReportLog.DailyReportLog;
@@ -211,6 +212,7 @@ import mekhq.campaign.personnel.divorce.AbstractDivorce;
 import mekhq.campaign.personnel.enums.PersonnelRole;
 import mekhq.campaign.personnel.enums.PersonnelStatus;
 import mekhq.campaign.personnel.enums.SplittingSurnameStyle;
+import mekhq.campaign.personnel.familiarity.FamiliarityMode;
 import mekhq.campaign.personnel.generator.AbstractPersonnelGenerator;
 import mekhq.campaign.personnel.marriage.AbstractMarriage;
 import mekhq.campaign.personnel.procreation.AbstractProcreation;
@@ -224,6 +226,7 @@ import mekhq.campaign.personnel.skills.Skill;
 import mekhq.campaign.personnel.skills.SkillCheck;
 import mekhq.campaign.personnel.skills.SkillModifierData;
 import mekhq.campaign.personnel.skills.SkillType;
+import mekhq.campaign.personnel.skills.TechChassisModifiers;
 import mekhq.campaign.personnel.turnoverAndRetention.RetirementDefectionTracker;
 import mekhq.campaign.randomEvents.prisoners.PrisonerStatus;
 import mekhq.campaign.randomEvents.randomEventsSystem.RandomEventLibraries;
@@ -1945,7 +1948,7 @@ public class Campaign implements ITechManager {
 
     /**
      * @return all hangars across all locations associated with this campaign.
-     *                                                                                                                               TODO: This won't work once we support multiple hangars. Method separated from getHangar() for future refactor
+     *                                                                                                                                                 TODO: This won't work once we support multiple hangars. Method separated from getHangar() for future refactor
      *
      * @deprecated Use {@link PlayerForce#getHangar()} directly.
      */
@@ -6462,6 +6465,26 @@ public class Campaign implements ITechManager {
 
         if (getCampaignOptions().isUseEraMods()) {
             target.addModifier(getFaction().getEraMod(getGameYear()), "era");
+        }
+
+        FamiliarityMode familiarityMode = getCampaignOptions().get(CampaignOption.CHASSIS_FAMILIARITY_MODE);
+        Unit partUnit = partWork.getUnit();
+        if (familiarityMode.isEnabled() && partUnit != null) {
+            Entity partEntity = partUnit.getEntity();
+
+            if (partEntity != null) {
+                int bonus = tech.getChassisFamiliarityTechBonus(familiarityMode, partEntity, true);
+                if (bonus != 0) {
+                    target.addModifier(-bonus, "Chassis Familiarity");
+                }
+            }
+        }
+
+        if (partWork.getUnit() != null) {
+            int techSpaModifier = TechChassisModifiers.getRepairModifier(tech, partWork.getUnit().getEntity());
+            if (techSpaModifier != 0) {
+                target.addModifier(techSpaModifier, "Chassis Specialization");
+            }
         }
 
         final boolean isOvertime;

@@ -32,7 +32,6 @@
  */
 package mekhq.campaign.personnel.familiarity;
 
-import static java.lang.Math.min;
 import static mekhq.utilities.MHQInternationalization.getTextAt;
 
 public enum FamiliarityMode {
@@ -60,7 +59,7 @@ public enum FamiliarityMode {
     private final static int FAMILIARITY_ZERO = 0;
     private final static int FAMILIARITY_ONE_HUNDRED = 100;
     private final static int FAMILIARITY_TWO_HUNDRED = 200;
-    private final static int FAMILIARITY_THREE_HUNDRED = 300;
+    public final static int FAMILIARITY_THREE_HUNDRED = 300;
 
     private final String lookUpName;
     private final int familiarityCap;
@@ -107,34 +106,31 @@ public enum FamiliarityMode {
         return tooltip;
     }
 
-    public static int getPilotingMaintenanceBonus(final int familiarity, FamiliarityMode mode) {
-        int level = getFamiliarityLevel(familiarity, mode);
+    public int getPilotingMaintenanceBonus(final int familiarity) {
+        int level = getFamiliarityLevel(familiarity);
 
         return switch (level) {
-            case FAMILIARITY_ZERO -> mode.zero.pilotingMaintenance();
-            case FAMILIARITY_ONE_HUNDRED -> mode.oneHundred.pilotingMaintenance();
-            case FAMILIARITY_TWO_HUNDRED -> mode.twoHundred.pilotingMaintenance();
-            case FAMILIARITY_THREE_HUNDRED -> mode.threeHundred.pilotingMaintenance();
+            case FAMILIARITY_ZERO -> zero.pilotingMaintenance();
+            case FAMILIARITY_ONE_HUNDRED -> oneHundred.pilotingMaintenance();
+            case FAMILIARITY_TWO_HUNDRED -> twoHundred.pilotingMaintenance();
+            case FAMILIARITY_THREE_HUNDRED -> threeHundred.pilotingMaintenance();
             default -> throw new IllegalStateException("Unexpected value: " + level);
         };
     }
 
-    public static int getGunneryRepairBonus(final int familiarity, FamiliarityMode mode) {
-        int level = getFamiliarityLevel(familiarity, mode);
+    public int getGunneryRepairBonus(final int familiarity) {
+        int level = getFamiliarityLevel(familiarity);
 
         return switch (level) {
-            case FAMILIARITY_ZERO -> mode.zero.gunneryRepairs();
-            case FAMILIARITY_ONE_HUNDRED -> mode.oneHundred.gunneryRepairs();
-            case FAMILIARITY_TWO_HUNDRED -> mode.twoHundred.gunneryRepairs();
-            case FAMILIARITY_THREE_HUNDRED -> mode.threeHundred.gunneryRepairs();
+            case FAMILIARITY_ZERO -> zero.gunneryRepairs();
+            case FAMILIARITY_ONE_HUNDRED -> oneHundred.gunneryRepairs();
+            case FAMILIARITY_TWO_HUNDRED -> twoHundred.gunneryRepairs();
+            case FAMILIARITY_THREE_HUNDRED -> threeHundred.gunneryRepairs();
             default -> throw new IllegalStateException("Unexpected value: " + level);
         };
     }
 
-    private static int getFamiliarityLevel(int familiarity, FamiliarityMode mode) {
-        int cap = mode.getFamiliarityCap();
-        familiarity = min(cap, familiarity);
-
+    private static int getFamiliarityLevel(int familiarity) {
         if (familiarity < FAMILIARITY_ONE_HUNDRED) {
             return FAMILIARITY_ZERO;
         }

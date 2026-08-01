@@ -301,7 +301,23 @@ public class Skill {
      * @return the calculated final skill value, after applying all modifiers and bounds
      */
     public int getFinalSkillValue(SkillModifierData skillModifierData, int unitWeightClass) {
-        int modifiers = getModifiers(skillModifierData, unitWeightClass);
+        return getFinalSkillValue(skillModifierData, unitWeightClass, 0);
+    }
+
+    /**
+     * As {@link #getFinalSkillValue(SkillModifierData, int)}, but also applies the combat Chassis Familiarity bonus the
+     * caller has already computed for this skill's role (piloting or gunnery) from the crew member's familiarity and
+     * the active {@code FamiliarityMode}. The bonus may be negative (Hard mode). Pass {@code 0} for no bonus.
+     *
+     * @param skillModifierData the modifiers that affect this skill
+     * @param unitWeightClass   the {@link megamek.common.units.EntityWeightClass} of the unit being crewed, or
+     *                          {@link #NO_UNIT_WEIGHT_CLASS}
+     * @param familiarityBonus  the (signed) chassis familiarity bonus for this skill's role
+     *
+     * @return the calculated final skill value, after applying all modifiers and bounds
+     */
+    public int getFinalSkillValue(SkillModifierData skillModifierData, int unitWeightClass, int familiarityBonus) {
+        int modifiers = getModifiers(skillModifierData, unitWeightClass, familiarityBonus);
 
         if (isCountUp()) {
             return min(COUNT_UP_MAX_VALUE, getSkillValue() + modifiers);
@@ -338,6 +354,24 @@ public class Skill {
      * @return the calculated skill modifier for the current skill type
      */
     public int getSPAModifiers(PersonnelOptions characterOptions, int reputation, int unitWeightClass) {
+        return getSPAModifiers(characterOptions, reputation, unitWeightClass, 0);
+    }
+
+    /**
+     * As {@link #getSPAModifiers(PersonnelOptions, int, int)}, but also adds the combat Chassis Familiarity bonus the
+     * caller has already computed for this skill's role (piloting or gunnery); it applies only to combat
+     * piloting/gunnery skills and may be negative (Hard mode). Pass {@code 0} for no bonus.
+     *
+     * @param characterOptions the character's options and special traits
+     * @param reputation       the character's reputation
+     * @param unitWeightClass  the {@link megamek.common.units.EntityWeightClass} of the unit being crewed, or
+     *                         {@link #NO_UNIT_WEIGHT_CLASS}
+     * @param familiarityBonus the (signed) chassis familiarity bonus for this skill's role
+     *
+     * @return the calculated skill modifier for the current skill type
+     */
+    public int getSPAModifiers(PersonnelOptions characterOptions, int reputation, int unitWeightClass,
+          int familiarityBonus) {
         int modifier = 0;
 
         if (characterOptions == null) {
@@ -582,6 +616,13 @@ public class Skill {
         // 'Mek / Vehicular / Flight Affinity & Antipathy (piloting only) and Unit Specialist (gunnery and piloting).
         // The unit family is inferred from this skill's type; the weight class is that of the unit being crewed.
         modifier += getUnitFamilyModifiers(characterOptions, name, unitWeightClass);
+
+        // Chassis Familiarity (combat): the caller supplies the bonus already computed for this skill's role (piloting
+        // or gunnery) from the crew member's familiarity and the active FamiliarityMode; it may be negative (Hard
+        // mode). It applies only to combat piloting/gunnery skills (those tied to a specialist family).
+        if ((familiarityBonus != 0) && (familyForSkill(name) != null)) {
+            modifier += familiarityBonus;
+        }
 
         return modifier;
     }
@@ -892,8 +933,12 @@ public class Skill {
     }
 
     private int getModifiers(SkillModifierData skillModifierData, int unitWeightClass) {
+        return getModifiers(skillModifierData, unitWeightClass, 0);
+    }
+
+    private int getModifiers(SkillModifierData skillModifierData, int unitWeightClass, int familiarityBonus) {
         int spaModifiers = getSPAModifiers(skillModifierData.characterOptions(),
-              skillModifierData.adjustedReputation(), unitWeightClass);
+              skillModifierData.adjustedReputation(), unitWeightClass, familiarityBonus);
         int attributeModifiers = getTotalAttributeModifier(new TargetRoll(), skillModifierData.attributes(), type,
               skillModifierData.injuryEffects(), skillModifierData.characterOptions(), skillModifierData.age());
         int totalInjuryModifier = getTotalInjuryModifier(skillModifierData, type);
