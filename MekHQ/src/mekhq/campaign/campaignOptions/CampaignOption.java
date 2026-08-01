@@ -54,6 +54,7 @@ import mekhq.campaign.market.enums.ContractMarketMethod;
 import mekhq.campaign.market.enums.UnitMarketMethod;
 import mekhq.campaign.market.personnelMarket.enums.PersonnelMarketStyle;
 import mekhq.campaign.personnel.enums.*;
+import mekhq.campaign.personnel.familiarity.FamiliarityMode;
 import mekhq.campaign.randomEvents.prisoners.PrisonerCaptureStyle;
 import mekhq.campaign.universe.PlanetarySystem.PlanetaryRating;
 import mekhq.campaign.universe.PlanetarySystem.PlanetarySophistication;
@@ -98,6 +99,13 @@ public final class CampaignOption<T> {
     public static final CampaignOption<Integer> DEFAULT_MAINTENANCE_TIME =
           of(Integer.class, 4, "defaultMaintenanceTime");
     // endregion Repair and Maintenance
+
+    // region Chassis Familiarity
+    public static final CampaignOption<FamiliarityMode> CHASSIS_FAMILIARITY_MODE =
+          of(FamiliarityMode.class, FamiliarityMode.DISABLED, "chassisFamiliarityMode");
+    public static final CampaignOption<Integer> CHASSIS_FAMILIARITY_SCENARIO_DICE =
+          of(Integer.class, 2, "chassisFamiliarityScenarioDice");
+    // endregion Chassis Familiarity
 
     // region Migrated Options (generated storage-only migration)
     public static final CampaignOption<Boolean> REQUIRE_SUPPORT_FORCE_TRANSPORTATION =
