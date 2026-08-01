@@ -68,6 +68,7 @@ import megamek.logging.MMLogger;
 import mekhq.MHQConstants;
 import mekhq.MekHQ;
 import mekhq.Utilities;
+import mekhq.campaign.campaignOptions.CampaignOption;
 import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.events.persons.PersonBattleFinishedEvent;
 import mekhq.campaign.finances.Money;
@@ -87,6 +88,7 @@ import mekhq.campaign.parts.Part;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.enums.PersonnelRole;
 import mekhq.campaign.personnel.enums.PersonnelStatus;
+import mekhq.campaign.personnel.familiarity.FamiliarityMode;
 import mekhq.campaign.personnel.medical.InjurySPAUtility;
 import mekhq.campaign.personnel.turnoverAndRetention.Fatigue;
 import mekhq.campaign.randomEvents.prisoners.CapturePrisoners;
@@ -1843,6 +1845,11 @@ public class ResolveScenarioTracker {
             }
         }
 
+        FamiliarityMode familiarityMode = campaignOptions.get(CampaignOption.CHASSIS_FAMILIARITY_MODE);
+        if (familiarityMode.isEnabled()) {
+            processFamiliarity(campaignOptions, familiarityMode);
+        }
+
         // Process payouts for killed temp crew (blob crew)
         if (!killedTempCrew.isEmpty()) {
             processTempCrewDeathPayouts();
@@ -2017,6 +2024,28 @@ public class ResolveScenarioTracker {
         campaign.refreshNetworks();
         scenario.setDate(campaign.getLocalDate());
         client = null;
+    }
+
+    private void processFamiliarity(CampaignOptions campaignOptions, FamiliarityMode familiarityMode) {
+        // Techs gaining familiarity even if the unit is undamaged is intentional
+        int familiarityDice = campaignOptions.get(CampaignOption.CHASSIS_FAMILIARITY_SCENARIO_DICE);
+        int cap = familiarityMode.getFamiliarityCap();
+        if (familiarityDice > 0) {
+            for (Unit unit : units) {
+                Entity unitEntity = unit.getEntity();
+                if (unitEntity == null || !unitEntity.isChassisFamiliarityEligible()) {
+                    continue;
+                }
+                String chassis = unitEntity.getChassis();
+                for (Person crew : unit.getCrew()) {
+                    crew.addChassisFamiliarity(chassis, Compute.d6(familiarityDice), cap);
+                }
+                Person unitTech = unit.getTech();
+                if (unitTech != null) {
+                    unitTech.addChassisFamiliarity(chassis, Compute.d6(familiarityDice), cap);
+                }
+            }
+        }
     }
 
     @Deprecated(since = "0.51.0", forRemoval = true)
