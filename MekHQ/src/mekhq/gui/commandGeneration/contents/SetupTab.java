@@ -62,6 +62,7 @@ import megamek.common.enums.NeuralInterfaceMode;
 import megamek.common.enums.SkillLevel;
 import megamek.common.options.OptionsConstants;
 import megamek.logging.MMLogger;
+import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.campaignOptions.CampaignOption;
 import mekhq.campaign.personnel.enums.PersonnelRole;
@@ -989,13 +990,34 @@ public class SetupTab {
         chkAssignMekWarriorsCallSigns.setSelected(sourceOptions.isAssignMekWarriorsCallSigns());
         chkAssignFounderFlag.setSelected(sourceOptions.isAssignFounderFlag());
 
-        // Seeded from the campaign rather than the options object: these mirror live campaign and game
-        // settings, so the dialog has to open showing what is actually in force.
-        chkUseImplants.setSelected(campaign.getCampaignOptions().get(CampaignOption.USE_IMPLANTS));
-        chkUseManeiDomini.setSelected(
-              campaign.getGameOptions().booleanOption(OptionsConstants.RPG_MANEI_DOMINI));
-        cmbNeuralInterfaceMode.setSelectedItem(
-              NeuralInterfaceMode.from(campaign.getGameOptions()));
+        loadAugmentationValues();
+    }
+
+    /**
+     * Fills the augmentation controls from the campaign, or from the last choice made where the
+     * campaign has none of its own.
+     *
+     * <p>These mirror live campaign and game settings, so a campaign that has made a choice must see
+     * it reported rather than overridden. A new campaign has made none - all three sit at their
+     * all-off defaults - and seeding from those meant answering the same question again for every new
+     * campaign, which is the one case where the remembered answer is the better one to show.</p>
+     */
+    private void loadAugmentationValues() {
+        boolean tracksImplants = campaign.getCampaignOptions().get(CampaignOption.USE_IMPLANTS);
+        boolean usesManeiDomini =
+              campaign.getGameOptions().booleanOption(OptionsConstants.RPG_MANEI_DOMINI);
+        NeuralInterfaceMode mode = NeuralInterfaceMode.from(campaign.getGameOptions());
+
+        boolean campaignHasChosen = tracksImplants || usesManeiDomini || mode.isOn();
+        if (!campaignHasChosen) {
+            tracksImplants = MekHQ.getMHQOptions().getLastUseImplants();
+            usesManeiDomini = MekHQ.getMHQOptions().getLastUseManeiDomini();
+            mode = MekHQ.getMHQOptions().getLastNeuralInterfaceMode();
+        }
+
+        chkUseImplants.setSelected(tracksImplants);
+        chkUseManeiDomini.setSelected(usesManeiDomini);
+        cmbNeuralInterfaceMode.setSelectedItem(mode);
         refreshAugmentationEnablement();
     }
 
@@ -1071,9 +1093,18 @@ public class SetupTab {
 
         targetOptions.setUseImplants(chkUseImplants.isSelected());
         targetOptions.setUseManeiDomini(chkUseManeiDomini.isSelected());
-        if (cmbNeuralInterfaceMode.getSelectedItem() instanceof NeuralInterfaceMode mode) {
-            targetOptions.setNeuralInterfaceMode(mode);
+        NeuralInterfaceMode mode = NeuralInterfaceMode.OFF;
+        if (cmbNeuralInterfaceMode.getSelectedItem() instanceof NeuralInterfaceMode selected) {
+            mode = selected;
+            targetOptions.setNeuralInterfaceMode(selected);
         }
+
+        // Remembered as the player's own answer, so the next new campaign opens on it rather than
+        // asking again. The campaign still holds its own copy; this only decides what a campaign that
+        // has chosen nothing is shown.
+        MekHQ.getMHQOptions().setLastUseImplants(chkUseImplants.isSelected());
+        MekHQ.getMHQOptions().setLastUseManeiDomini(chkUseManeiDomini.isSelected());
+        MekHQ.getMHQOptions().setLastNeuralInterfaceMode(mode);
     }
 
     public RandomOriginOptionsPanel getRandomOriginOptionsPanel() {

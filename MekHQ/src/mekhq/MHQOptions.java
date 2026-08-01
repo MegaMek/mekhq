@@ -39,6 +39,7 @@ import javax.swing.UIManager;
 
 import megamek.SuiteOptions;
 import megamek.common.annotations.Nullable;
+import megamek.common.enums.NeuralInterfaceMode;
 import mekhq.gui.enums.FormationIconOperationalStatusStyle;
 import mekhq.gui.enums.PersonnelFilterStyle;
 import mekhq.gui.utilities.ComponentColors;
@@ -1417,5 +1418,52 @@ public final class MHQOptions extends SuiteOptions {
         userPreferences.node(MHQConstants.MISCELLANEOUS_NODE)
               .putInt(MHQConstants.START_GAME_BOT_CLIENT_RETRY_COUNT, startGameBotClientRetryCount);
     }
+
+    // region Command Generator augmentation
+
+    /**
+     * @return whether the Command Generator last had the campaign tracking cybernetic implants
+     */
+    public boolean getLastUseImplants() {
+        return userPreferences.node(MHQConstants.MISCELLANEOUS_NODE)
+                     .getBoolean(MHQConstants.LAST_USE_IMPLANTS, false);
+    }
+
+    public void setLastUseImplants(final boolean value) {
+        userPreferences.node(MHQConstants.MISCELLANEOUS_NODE)
+              .putBoolean(MHQConstants.LAST_USE_IMPLANTS, value);
+    }
+
+    /**
+     * @return whether the Command Generator last had MegaMek's Manei Domini rules switched on
+     */
+    public boolean getLastUseManeiDomini() {
+        return userPreferences.node(MHQConstants.MISCELLANEOUS_NODE)
+                     .getBoolean(MHQConstants.LAST_USE_MANEI_DOMINI, false);
+    }
+
+    public void setLastUseManeiDomini(final boolean value) {
+        userPreferences.node(MHQConstants.MISCELLANEOUS_NODE)
+              .putBoolean(MHQConstants.LAST_USE_MANEI_DOMINI, value);
+    }
+
+    /**
+     * @return the neural interface setting the Command Generator was last used with, stored by its
+     *       option value so an unreadable entry settles on the rules being off
+     */
+    public NeuralInterfaceMode getLastNeuralInterfaceMode() {
+        return NeuralInterfaceMode.fromOptionValue(
+              userPreferences.node(MHQConstants.MISCELLANEOUS_NODE)
+                    .get(MHQConstants.LAST_NEURAL_INTERFACE_MODE,
+                          NeuralInterfaceMode.OFF.optionValue()));
+    }
+
+    public void setLastNeuralInterfaceMode(final NeuralInterfaceMode value) {
+        userPreferences.node(MHQConstants.MISCELLANEOUS_NODE)
+              .put(MHQConstants.LAST_NEURAL_INTERFACE_MODE,
+                    (value == null) ? NeuralInterfaceMode.OFF.optionValue() : value.optionValue());
+    }
+    // endregion Command Generator augmentation
+
     // endregion Miscellaneous Options
 }
