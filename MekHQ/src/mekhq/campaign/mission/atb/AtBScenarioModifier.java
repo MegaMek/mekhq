@@ -91,6 +91,9 @@ public class AtBScenarioModifier implements Cloneable {
     private Integer ammoExpenditureIntensity = null;
     private Integer unitRemovalCount = null;
     private List<MapLocation> allowedMapLocations = null;
+    // When non-empty, the modifier only applies to scenarios whose assigned terrain is in this list. Used to target a
+    // SpecificGroundTerrain modifier at particular terrain types (e.g. only Desert). Null/empty means no restriction.
+    private List<String> allowedTerrainTypes = null;
     private Boolean useAmbushLogic = null;
     private Boolean switchSides = null;
     private Integer numExtraEvents = null;
@@ -360,12 +363,38 @@ public class AtBScenarioModifier implements Cloneable {
     }
 
     /**
+     * @return {@code true} if this modifier may apply to the scenario's assigned terrain. Terrain targeting is only
+     *       honored when the modifier is scoped to {@link MapLocation#SpecificGroundTerrain}; otherwise, or when no
+     *       terrain restriction is set ({@link #allowedTerrainTypes} null or empty), the modifier always applies. When
+     *       a restriction is in effect, the scenario's assigned terrain type must be one of the allowed types (so a
+     *       terrain-restricted modifier is skipped on a non-matching or terrain-less scenario, such as a space
+     *       battle).
+     */
+    boolean appliesToScenarioTerrain(AtBDynamicScenario scenario) {
+        // terrain targeting only applies to modifiers scoped to SpecificGroundTerrain
+        if ((allowedMapLocations == null) || !allowedMapLocations.contains(MapLocation.SpecificGroundTerrain)) {
+            return true;
+        }
+        if ((allowedTerrainTypes == null) || allowedTerrainTypes.isEmpty()) {
+            return true;
+        }
+        String terrainType = scenario.getTerrainType();
+        // a terrain-restricted modifier never applies to a terrain-less scenario (e.g. a space battle); the explicit
+        // null guard also avoids contains(null) throwing on an immutable allowedTerrainTypes list
+        return (terrainType != null) && allowedTerrainTypes.contains(terrainType);
+    }
+
+    /**
      * Process this scenario modifier for a particular scenario, given a particular timing indicator.
      *
      * @param eventTiming Whether this is occurring before or after primary forces have been generated.
      */
     public void processModifier(AtBDynamicScenario scenario, Campaign campaign, EventTiming eventTiming) {
         if (eventTiming == getEventTiming()) {
+            if (!appliesToScenarioTerrain(scenario)) {
+                return;
+            }
+
             if ((getAdditionalBriefingText() != null) && !getAdditionalBriefingText().isBlank()) {
                 AtBScenarioModifierApplicator.appendScenarioBriefingText(scenario,
                       getAdditionalBriefingText());
@@ -443,6 +472,7 @@ public class AtBScenarioModifier implements Cloneable {
         copy.additionalBriefingText = additionalBriefingText;
         copy.allowedMapLocations = allowedMapLocations == null ? new ArrayList<>()
                                          : new ArrayList<>(allowedMapLocations);
+        copy.allowedTerrainTypes = allowedTerrainTypes == null ? null : new ArrayList<>(allowedTerrainTypes);
         copy.ammoExpenditureIntensity = ammoExpenditureIntensity;
         copy.battleDamageIntensity = battleDamageIntensity;
         copy.benefitsPlayer = benefitsPlayer;
@@ -568,6 +598,18 @@ public class AtBScenarioModifier implements Cloneable {
 
     public void setAllowedMapLocations(List<MapLocation> allowedMapLocations) {
         this.allowedMapLocations = allowedMapLocations;
+    }
+
+    /**
+     * @return the terrain types this modifier is restricted to, or {@code null}/empty for no terrain restriction. When
+     *       set, the modifier only applies to a scenario whose assigned terrain type is in this list.
+     */
+    public List<String> getAllowedTerrainTypes() {
+        return allowedTerrainTypes;
+    }
+
+    public void setAllowedTerrainTypes(List<String> allowedTerrainTypes) {
+        this.allowedTerrainTypes = allowedTerrainTypes;
     }
 
     public Boolean getUseAmbushLogic() {

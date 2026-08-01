@@ -52,6 +52,7 @@ import java.util.Map;
 import javax.swing.*;
 
 import megamek.common.ui.FastJScrollPane;
+import mekhq.campaign.digitalGM.stratCon.biome.StratConBiomeManifest;
 import mekhq.campaign.mission.ScenarioForceTemplate.ForceAlignment;
 import mekhq.campaign.mission.ScenarioMapParameters.MapLocation;
 import mekhq.campaign.mission.atb.AtBScenarioModifier;
@@ -93,6 +94,8 @@ public class ScenarioModifierEditorDialog extends JDialog {
     private final JCheckBox chkUseAmbushLogic = new JCheckBox();
     private final JCheckBox chkSwitchSides = new JCheckBox();
     private final Map<MapLocation, JCheckBox> mapLocationChecks = new EnumMap<>(MapLocation.class);
+    private final DefaultListModel<String> terrainTypeModel = new DefaultListModel<>();
+    private final JList<String> lstTerrainTypes = new JList<>(terrainTypeModel);
 
     public ScenarioModifierEditorDialog(JFrame parent) {
         super(parent, true);
@@ -145,12 +148,40 @@ public class ScenarioModifierEditorDialog extends JDialog {
         }
         addRow(panel, gbc, "modifierEditor.allowedMapLocations", locationsPanel);
 
+        // Terrain-type targeting: only meaningful when SpecificGroundTerrain is an allowed location, so the list is
+        // enabled by that checkbox. An empty selection means "any terrain".
+        for (String terrainType : sortedTerrainTypeNames()) {
+            terrainTypeModel.addElement(terrainType);
+        }
+        lstTerrainTypes.setSelectionMode(ListSelectionModel.MULTIPLE_INTERVAL_SELECTION);
+        lstTerrainTypes.setVisibleRowCount(6);
+        lstTerrainTypes.setToolTipText(getTextAt(RESOURCE_BUNDLE, "modifierEditor.allowedTerrainTypes.tooltip"));
+        JCheckBox specificGroundTerrainCheck = mapLocationChecks.get(MapLocation.SpecificGroundTerrain);
+        specificGroundTerrainCheck.addActionListener(e -> updateTerrainListEnabled());
+        addRow(panel, gbc, "modifierEditor.allowedTerrainTypes", new FastJScrollPane(lstTerrainTypes));
+
         gbc.gridx = 0;
         gbc.gridy++;
         gbc.gridwidth = 2;
         panel.add(new JLabel("<html><i>" + getTextAt(RESOURCE_BUNDLE, "modifierEditor.advancedNote") + "</i></html>"),
               gbc);
         return panel;
+    }
+
+    /** @return every declared StratCon terrain type name, sorted, for the terrain-targeting list. */
+    private static List<String> sortedTerrainTypeNames() {
+        List<String> names = new ArrayList<>(StratConBiomeManifest.getInstance().getTerrainTypeNames());
+        names.sort(String.CASE_INSENSITIVE_ORDER);
+        return names;
+    }
+
+    /** The terrain list is only relevant when SpecificGroundTerrain is an allowed location. */
+    private void updateTerrainListEnabled() {
+        boolean enabled = mapLocationChecks.get(MapLocation.SpecificGroundTerrain).isSelected();
+        lstTerrainTypes.setEnabled(enabled);
+        if (!enabled) {
+            lstTerrainTypes.clearSelection();
+        }
     }
 
     private void addRow(JPanel panel, GridBagConstraints gbc, String labelKey, java.awt.Component control) {
@@ -213,6 +244,16 @@ public class ScenarioModifierEditorDialog extends JDialog {
         for (Map.Entry<MapLocation, JCheckBox> entry : mapLocationChecks.entrySet()) {
             entry.getValue().setSelected((allowed != null) && allowed.contains(entry.getKey()));
         }
+        List<String> allowedTerrain = source.getAllowedTerrainTypes();
+        lstTerrainTypes.clearSelection();
+        if (allowedTerrain != null) {
+            for (int i = 0; i < terrainTypeModel.size(); i++) {
+                if (allowedTerrain.contains(terrainTypeModel.get(i))) {
+                    lstTerrainTypes.addSelectionInterval(i, i);
+                }
+            }
+        }
+        updateTerrainListEnabled();
     }
 
     private void writeInto(AtBScenarioModifier target) {
@@ -240,6 +281,11 @@ public class ScenarioModifierEditorDialog extends JDialog {
         }
         // no locations checked means "no restriction", which the model represents as null
         target.setAllowedMapLocations(allowed.isEmpty() ? null : allowed);
+        // terrain targeting only applies when SpecificGroundTerrain is allowed; an empty selection means "any terrain"
+        List<String> allowedTerrain = lstTerrainTypes.getSelectedValuesList();
+        boolean terrainRelevant = mapLocationChecks.get(MapLocation.SpecificGroundTerrain).isSelected();
+        target.setAllowedTerrainTypes((!terrainRelevant || allowedTerrain.isEmpty()) ? null
+                                            : new ArrayList<>(allowedTerrain));
     }
 
     private void loadFromFile() {
