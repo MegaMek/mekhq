@@ -2027,7 +2027,9 @@ public class ResolveScenarioTracker {
     }
 
     private void processFamiliarity(CampaignOptions campaignOptions, FamiliarityMode familiarityMode) {
-        // Techs gaining familiarity even if the unit is undamaged is intentional
+        // Techs gaining familiarity even if the unit is undamaged is intentional. I opted not to have techs gain
+        // familiarity when repairing or maintaining directly because otherwise tech familiarity gain would skyrocket
+        // - Illiani Aug/1/26
         int familiarityDice = campaignOptions.get(CampaignOption.CHASSIS_FAMILIARITY_SCENARIO_DICE);
         int cap = familiarityMode.getFamiliarityCap();
         if (familiarityDice > 0) {
