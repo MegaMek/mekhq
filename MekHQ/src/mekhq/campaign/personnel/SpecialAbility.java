@@ -688,6 +688,14 @@ public class SpecialAbility {
             return null;
         }
         int weightClass = entity.getWeightClass();
+        // Normalize to supported weight classes so these SPAs also work for ultra-light/super-heavy/etc.
+        if (weightClass < WEIGHT_LIGHT) {
+            weightClass = WEIGHT_LIGHT;
+        } else if ((family == WeightClassFamily.FLIGHT) && (weightClass > WEIGHT_HEAVY)) {
+            weightClass = WEIGHT_HEAVY;
+        } else if ((family != WeightClassFamily.FLIGHT) && (weightClass > WEIGHT_ASSAULT)) {
+            weightClass = WEIGHT_ASSAULT;
+        }
         return switch (kind) {
             // Specialist and Affinity reward the unit being crewed, so they match its exact type + weight class.
             case SPECIALIST -> specialtyKey(family, weightClass);
