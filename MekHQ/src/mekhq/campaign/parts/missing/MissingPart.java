@@ -33,6 +33,7 @@
  */
 package mekhq.campaign.parts.missing;
 
+import static mekhq.utilities.MHQInternationalization.getTextAt;
 import static mekhq.utilities.ReportingUtilities.CLOSING_SPAN_TAG;
 import static mekhq.utilities.ReportingUtilities.getNegativeColor;
 import static mekhq.utilities.ReportingUtilities.getWarningColor;
@@ -72,6 +73,8 @@ import mekhq.utilities.ReportingUtilities;
  * @author Jay Lawson (jaylawson39 at yahoo.com)
  */
 public abstract class MissingPart extends Part implements IAcquisitionWork {
+    private static final String RESOURCE_BUNDLE = "mekhq.resources.Parts";
+
     /** Fabrication takes ten times the normal replacement time and cost (Campaign Ops, p.202 rev 5th printing). */
     private static final int FABRICATION_MULTIPLIER = 10;
     /** A fabrication attempt receives an additional +2 to its target number. */
@@ -230,11 +233,11 @@ public abstract class MissingPart extends Part implements IAcquisitionWork {
     /**
      * Determines whether this part may be fabricated from scratch by its assigned tech.
      *
-     * @return {@code true} if the part can be fabricated
+     * @return an empty string if the part can be fabricated, otherwise an explanation of why it cannot
      *
      * @see #canFabricate(Person)
      */
-    public boolean canFabricate() {
+    public String canFabricate() {
         return canFabricate(getTech());
     }
 
@@ -248,21 +251,22 @@ public abstract class MissingPart extends Part implements IAcquisitionWork {
      * @param tech the tech who would perform the fabrication, or {@code null} to judge eligibility without any tech
      *             ability
      *
-     * @return {@code true} if the part can be fabricated
+     * @return an empty string if the part can be fabricated, otherwise an explanation of why it cannot (and, for a Tech
+     *       Rating that is too high, what site would fix that)
      */
-    public boolean canFabricate(final @Nullable Person tech) {
+    public String canFabricate(final @Nullable Person tech) {
         if (unit == null) {
-            return false;
+            return getTextAt(RESOURCE_BUNDLE, "MissingPart.noUnit");
         }
 
         // A factory-grade installation lifts the tech-rating restriction.
         if (unit.getSite() >= Unit.SITE_FACTORY_CONDITIONS) {
-            return true;
+            return "";
         }
 
         TechRating rating = getTechRating();
         if (rating == null) {
-            return false;
+            return getTextAt(RESOURCE_BUNDLE, "MissingPart.noTechRating");
         }
 
         int effectiveRating = rating.ordinal();
@@ -272,13 +276,24 @@ public abstract class MissingPart extends Part implements IAcquisitionWork {
 
         // Base limit is Tech Rating C. An optional rule additionally permits Tech Rating D at a maintenance facility
         // (or better).
+        boolean maintenanceFacilityAllowsD = campaign.getCampaignOptions()
+                                                   .get(CampaignOption.FABRICATE_D_IN_MAINTENANCE_FACILITY);
         int maxRating = TechRating.C.ordinal();
-        if (campaign.getCampaignOptions().get(CampaignOption.FABRICATE_D_IN_MAINTENANCE_FACILITY)
-                  && (unit.getSite() >= Unit.SITE_FACILITY_MAINTENANCE)) {
+        if (maintenanceFacilityAllowsD && (unit.getSite() >= Unit.SITE_FACILITY_MAINTENANCE)) {
             maxRating = TechRating.D.ordinal();
         }
 
-        return effectiveRating <= maxRating;
+        if (effectiveRating <= maxRating) {
+            return "";
+        }
+
+        // Tech Rating D can be unlocked at a maintenance facility when the optional rule is on; anything higher (or
+        // Tech Rating D without the optional rule) needs factory conditions.
+        if (maintenanceFacilityAllowsD && (effectiveRating == TechRating.D.ordinal())) {
+            return getTextAt(RESOURCE_BUNDLE, "MissingPart.complex.maintenance");
+        }
+
+        return getTextAt(RESOURCE_BUNDLE, "MissingPart.complex.factory");
     }
 
     /**

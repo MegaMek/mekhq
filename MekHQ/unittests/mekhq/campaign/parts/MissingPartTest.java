@@ -468,7 +468,7 @@ public class MissingPartTest {
         MissingPart missingPart = new MissingMekLocation(Mek.LOC_LEFT_ARM, 20, EquipmentType.T_STRUCTURE_STANDARD,
               false, false, false, mockCampaign);
 
-        assertFalse(missingPart.canFabricate());
+        assertFalse(missingPart.canFabricate().isEmpty());
     }
 
     @Test
@@ -504,7 +504,8 @@ public class MissingPartTest {
         when(unit.getSite()).thenReturn(Unit.SITE_FIELD_WORKSHOP);
         missingPart.setUnit(unit);
 
-        assertFalse(missingPart.canFabricate());
+        // Without the optional rule, Tech Rating D can only be fabricated at a factory.
+        assertEquals("Too Complex: needs factory conditions", missingPart.canFabricate());
     }
 
     @Test
@@ -529,8 +530,8 @@ public class MissingPartTest {
         when(macGyverTech.getOptions()).thenReturn(macGyverOptions);
 
         // MacGyver treats the Tech Rating D part as C, so it becomes fabricable in the field.
-        assertFalse(missingPart.canFabricate(plainTech));
-        assertTrue(missingPart.canFabricate(macGyverTech));
+        assertFalse(missingPart.canFabricate(plainTech).isBlank());
+        assertTrue(missingPart.canFabricate(macGyverTech).isBlank());
     }
 
     @Test
@@ -548,7 +549,7 @@ public class MissingPartTest {
         when(unit.getSite()).thenReturn(Unit.SITE_FACILITY_MAINTENANCE);
         missingPart.setUnit(unit);
 
-        assertTrue(missingPart.canFabricate());
+        assertTrue(missingPart.canFabricate().isEmpty());
     }
 
     @Test
@@ -566,7 +567,8 @@ public class MissingPartTest {
         when(unit.getSite()).thenReturn(Unit.SITE_FACILITY_BASIC);
         missingPart.setUnit(unit);
 
-        assertFalse(missingPart.canFabricate());
+        // The optional rule is on, so the explanation should point at the maintenance facility it still needs.
+        assertEquals("Too Complex: needs a maintenance facility or better", missingPart.canFabricate());
     }
 
     @Test
@@ -580,7 +582,7 @@ public class MissingPartTest {
         when(unit.getSite()).thenReturn(Unit.SITE_FACTORY_CONDITIONS);
         missingPart.setUnit(unit);
 
-        assertTrue(missingPart.canFabricate());
+        assertTrue(missingPart.canFabricate().isEmpty());
     }
 
     @Test

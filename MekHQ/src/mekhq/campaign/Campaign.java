@@ -1945,7 +1945,7 @@ public class Campaign implements ITechManager {
 
     /**
      * @return all hangars across all locations associated with this campaign.
-     *                                                                                                                                                 TODO: This won't work once we support multiple hangars. Method separated from getHangar() for future refactor
+     *                                                                                                                                                       TODO: This won't work once we support multiple hangars. Method separated from getHangar() for future refactor
      *
      * @deprecated Use {@link PlayerForce#getHangar()} directly.
      */
@@ -4172,7 +4172,7 @@ public class Campaign implements ITechManager {
                   && (partWork instanceof MissingPart missingPart)
                   && missingPart.isFabricating()
                   && missingPart.isFabricateUntilSuccess()
-                  && missingPart.canFabricate(tech)
+                  && missingPart.canFabricate(tech).isBlank()
                   && (tech.getSkillForWorkingOn(partWork) != null)) {
             final Money nextCost = missingPart.getFabricationCost(tech);
             if (nextCost.isZero() || !getFinances().getBalance().isLessThan(nextCost)) {
@@ -6430,9 +6430,10 @@ public class Campaign implements ITechManager {
             if (missingPart.isFabricating()) {
                 // A part flagged for fabrication that is no longer eligible (tech rating above C without a
                 // factory-grade facility) cannot be worked on.
-                if (!missingPart.canFabricate(tech)) {
+                String cannotFabricateReason = missingPart.canFabricate(tech);
+                if (!cannotFabricateReason.isBlank()) {
                     return new TargetRoll(TargetRoll.IMPOSSIBLE,
-                          "This part cannot be fabricated here (requires base Tech Rating A-C or a factory-grade facility).");
+                          "This part cannot be fabricated here: " + cannotFabricateReason);
                 }
                 // Each fabrication attempt is paid up front
                 final Money fabricationCost = missingPart.getFabricationCost(tech);

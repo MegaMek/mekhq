@@ -1413,7 +1413,7 @@ public class CampaignNewDayManager {
                 if ((part instanceof MissingPart missingPart)
                           && missingPart.isFabricating()
                           && (missingPart.getTech() != null)
-                          && !missingPart.canFabricate(missingPart.getTech())) {
+                          && !missingPart.canFabricate(missingPart.getTech()).isBlank()) {
                     missingPart.cancelFabrication();
                     campaign.addReport(TECHNICAL, getFormattedTextAt(RESOURCE_BUNDLE,
                           "fabrication.canceled.report", missingPart.getName(), unit.getName()));
