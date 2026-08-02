@@ -54,7 +54,7 @@ import megamek.common.event.Subscribe;
 import megamek.common.ui.FastJScrollPane;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
-import mekhq.campaign.digitalGM.stratCon.MaplessStratCon;
+import mekhq.campaign.digitalGM.stratCon.gm.MaplessStratCon;
 import mekhq.campaign.events.DeploymentChangedEvent;
 import mekhq.campaign.events.NetworkChangedEvent;
 import mekhq.campaign.events.OrganizationChangedEvent;

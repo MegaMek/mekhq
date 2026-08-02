@@ -33,8 +33,8 @@
 package mekhq.campaign.digitalGM;
 
 import mekhq.campaign.digitalGM.stratCon.StratConCampaignState;
-import mekhq.campaign.digitalGM.stratCon.StratConFacility;
 import mekhq.campaign.digitalGM.stratCon.StratConTrackState;
+import mekhq.campaign.digitalGM.stratCon.facility.StratConFacility;
 import mekhq.campaign.mission.AtBContract;
 import mekhq.campaign.mission.AtBScenario;
 

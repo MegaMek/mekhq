@@ -656,6 +656,20 @@ public final class MHQOptions extends SuiteOptions {
               .putInt(MHQConstants.AWAY_FROM_MAIN_FORCE_BACKGROUND, value.getRGB());
     }
 
+    /**
+     * @return whether the StratCon map renders unscouted hexes as heavily faded terrain (25% opacity) rather than under
+     *       the blue fog-of-war layer
+     */
+    public boolean getUseAlternateStratConFogOfWarDisplay() {
+        return userPreferences.node(MHQConstants.DISPLAY_NODE)
+                     .getBoolean(MHQConstants.USE_ALTERNATE_STRAT_CON_FOG_OF_WAR, true);
+    }
+
+    public void setUseAlternateStratConFogOfWarDisplay(boolean value) {
+        userPreferences.node(MHQConstants.DISPLAY_NODE)
+              .putBoolean(MHQConstants.USE_ALTERNATE_STRAT_CON_FOG_OF_WAR, value);
+    }
+
     public Color getStratConHexCoordForeground() {
         return new Color(userPreferences.node(MHQConstants.DISPLAY_NODE)
                                .getInt(MHQConstants.STRAT_CON_HEX_COORD_FOREGROUND, Color.GREEN.getRGB()));
@@ -1138,6 +1152,16 @@ public final class MHQOptions extends SuiteOptions {
     public void setNewMonthQuickTrain(final boolean value) {
         userPreferences.node(MHQConstants.NEW_DAY_NODE)
               .putBoolean(MHQConstants.NEW_DAY_QUICK_TRAIN, value);
+    }
+
+    public boolean getQuickTrainIgnoreTrainingFormations() {
+        return userPreferences.node(MHQConstants.NEW_DAY_NODE)
+              .getBoolean(MHQConstants.NEW_DAY_QUICK_TRAIN_IGNORE_TRAINING_FORMATIONS, false);
+    }
+
+    public void setQuickTrainIgnoreTrainingFormations(final boolean value) {
+        userPreferences.node(MHQConstants.NEW_DAY_NODE)
+              .putBoolean(MHQConstants.NEW_DAY_QUICK_TRAIN_IGNORE_TRAINING_FORMATIONS, value);
     }
 
     public int getQuickTrainTarget() {

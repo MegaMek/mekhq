@@ -6518,10 +6518,6 @@ public class Campaign implements ITechManager {
         }
 
         final int minutes = Math.min(partWork.getTimeLeft(), techTime);
-        if (!(partWork instanceof Refit) && minutes <= 0) {
-            LOGGER.error("Attempting to get the target number for a part with zero time left.");
-            return new TargetRoll(TargetRoll.AUTOMATIC_FAIL, "No part repair time remaining.");
-        }
 
         int helpMod;
         if ((partWork.getUnit() != null) && partWork.getUnit().isSelfCrewed()) {

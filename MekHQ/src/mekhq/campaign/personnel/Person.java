@@ -61,6 +61,7 @@ import static mekhq.campaign.personnel.medical.BodyLocation.INTERNAL;
 import static mekhq.campaign.personnel.medical.advancedMedicalAlternate.AdvancedMedicalAlternate.getAllActiveInjuryEffects;
 import static mekhq.campaign.personnel.skills.Aging.getReputationAgeModifier;
 import static mekhq.campaign.personnel.skills.Attributes.MAXIMUM_ATTRIBUTE_SCORE;
+import static mekhq.campaign.personnel.skills.Attributes.MINIMUM_EDGE_SCORE;
 import static mekhq.campaign.personnel.skills.InfantryGunnerySkills.INFANTRY_GUNNERY_SKILLS;
 import static mekhq.campaign.personnel.skills.SkillModifierData.IGNORE_AGE;
 import static mekhq.campaign.personnel.skills.SkillType.*;
@@ -6522,6 +6523,35 @@ public class Person implements ILocatable {
 
     public void changeEdge(final int amount) {
         atowAttributes.changeEdge(amount);
+    }
+
+    /**
+     * Adds permanent Edge without exceeding a campaign-defined maximum. Unlike {@link #setEdge(int)}, this method is
+     * intended for progression and automated rewards rather than GM assignment.
+     *
+     * @param amount      the positive amount of Edge to add
+     * @param maximumEdge the campaign-defined maximum permanent Edge
+     *
+     * @return the amount of Edge actually added
+     */
+    public int gainEdge(final int amount, final int maximumEdge) {
+        if (amount <= 0) {
+            return 0;
+        }
+
+        int previousEdge = getEdge();
+        int effectiveMaximum = clamp(maximumEdge, MINIMUM_EDGE_SCORE, getAttributeCap(SkillAttribute.EDGE));
+        if (previousEdge >= effectiveMaximum) {
+            return 0;
+        }
+
+        setEdge(Math.min(previousEdge + amount, effectiveMaximum));
+        return getEdge() - previousEdge;
+    }
+
+    public boolean canGainEdge(final int maximumEdge) {
+        int effectiveMaximum = clamp(maximumEdge, MINIMUM_EDGE_SCORE, getAttributeCap(SkillAttribute.EDGE));
+        return getEdge() < effectiveMaximum;
     }
 
     /**

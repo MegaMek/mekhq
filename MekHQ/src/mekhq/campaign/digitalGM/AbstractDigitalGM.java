@@ -35,7 +35,7 @@ package mekhq.campaign.digitalGM;
 import megamek.common.event.Subscribe;
 import megamek.logging.MMLogger;
 import mekhq.MekHQ;
-import mekhq.campaign.digitalGM.stratCon.AbstractStratConGM;
+import mekhq.campaign.digitalGM.stratCon.gm.AbstractStratConGM;
 import mekhq.campaign.events.NewDayEvent;
 
 /**

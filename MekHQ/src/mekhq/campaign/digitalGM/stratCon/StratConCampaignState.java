@@ -70,7 +70,6 @@ public class StratConCampaignState {
     private AtBContract contract;
 
     // these are all state variables that affect the current Stratcon Campaign
-    private double globalOpForBVMultiplier;
     private int supportPoints;
     private int victoryPoints;
     private String briefingText;
@@ -104,16 +103,6 @@ public class StratConCampaignState {
         tracks = new ArrayList<>();
         weeklyScenarios = new ArrayList<>();
         setContract(contract);
-    }
-
-    /**
-     * The op for BV multiplier. Intended to be additive.
-     *
-     * @return The additive op for BV multiplier.
-     */
-    @Deprecated(since = "0.51.0", forRemoval = true)
-    public double getGlobalOpForBVMultiplier() {
-        return globalOpForBVMultiplier;
     }
 
     public StratConTrackState getTrack(int index) {
@@ -168,7 +157,6 @@ public class StratConCampaignState {
         supportPoints += change;
     }
 
-    @Deprecated(since = "0.51.0", forRemoval = true)
     public void setSupportPoints(int supportPoints) {
         this.supportPoints = supportPoints;
     }
@@ -177,7 +165,6 @@ public class StratConCampaignState {
         return victoryPoints;
     }
 
-    @Deprecated(since = "0.51.0", forRemoval = true)
     public void setVictoryPoints(int victoryPoints) {
         this.victoryPoints = victoryPoints;
     }

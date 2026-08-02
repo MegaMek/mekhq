@@ -71,12 +71,11 @@ import mekhq.campaign.universe.StartingLocationChoice;
 import mekhq.campaign.universe.enums.StartingLocationMode;
 import mekhq.gui.baseComponents.AbstractMHQTabbedPane;
 import mekhq.gui.campaignOptions.CampaignOptionsDialog.CampaignOptionsDialogMode;
-import mekhq.gui.campaignOptions.CampaignOptionsIconLegend;
+import megamek.client.ui.settings.SettingsIconLegend;
 import mekhq.gui.campaignOptions.CampaignOptionsMetadata;
-import mekhq.gui.campaignOptions.components.CampaignOptionsButton;
 import mekhq.gui.campaignOptions.components.CampaignOptionsCheckBox;
-import mekhq.gui.campaignOptions.components.CampaignOptionsFormPanel;
-import mekhq.gui.campaignOptions.components.CampaignOptionsIntroPanel;
+import megamek.client.ui.settings.SettingsFormPanel;
+import megamek.client.ui.settings.SettingsIntroPanel;
 import mekhq.gui.commandGeneration.CommandGenerationDialog;
 import mekhq.gui.campaignOptions.components.CampaignOptionsLabel;
 import mekhq.gui.campaignOptions.components.CampaignOptionsPagePanel;
@@ -99,7 +98,7 @@ import mekhq.gui.displayWrappers.FactionDisplay;
  * This class extends the user interface features provided by {@link AbstractMHQTabbedPane}.
  */
 public class GeneralPage {
-    // Intentional exception to the shared CampaignOptionsFormPanel default widths: the landing page uses a narrow
+    // Intentional exception to the shared SettingsFormPanel default widths: the landing page uses a narrow
     // label column and a wide control column to fit the faction and date pickers.
     private static final int FORM_LABEL_COLUMN_WIDTH = 150;
     private static final int FORM_CONTROL_COLUMN_WIDTH = 360;
@@ -122,7 +121,7 @@ public class GeneralPage {
     private JLabel lblFaction;
     private MMComboBox<FactionDisplay> comboFaction;
     private JButton btnRandomFaction;
-    private CampaignOptionsButton btnCommandGenerator;
+    private JButton btnCommandGenerator;
     private JLabel lblDate;
     private JButton btnDate;
     private JButton btnRandomDate;
@@ -241,7 +240,7 @@ public class GeneralPage {
         // the generator's purpose (seeding the starting force) doesn't apply. The button is disabled in
         // those modes (matching how btnDate / btnRandomDate are gated) so it stays visually consistent in
         // the layout but can't be clicked.
-        btnCommandGenerator = new CampaignOptionsButton("CommandGenerator");
+        btnCommandGenerator = createButton("CommandGenerator");
         btnCommandGenerator.addActionListener(e -> new CommandGenerationDialog(frame, campaign).setVisible(true));
         if (mode != CampaignOptionsDialogMode.STARTUP && mode != CampaignOptionsDialogMode.STARTUP_ABRIDGED) {
             btnCommandGenerator.setEnabled(false);
@@ -309,7 +308,7 @@ public class GeneralPage {
               .showDetailsPanel(false)
               .sectionsExpandedByDefault(true)
               .quote("generalPanel")
-              .introComponent(new CampaignOptionsIconLegend(campaignOptionsLegendEntries()))
+              .introComponent(new SettingsIconLegend(campaignOptionsLegendEntries()))
               .section("lblGeneralCampaignBasicsPanel.text",
                     "lblGeneralCampaignBasicsPanel.summary",
                     createCampaignBasicsPanel())
@@ -323,7 +322,7 @@ public class GeneralPage {
     }
 
     private @Nonnull JPanel createCampaignBasicsPanel() {
-        CampaignOptionsFormPanel panel = new CampaignOptionsFormPanel("GeneralCampaignBasicsPanel",
+        SettingsFormPanel panel = new SettingsFormPanel("GeneralCampaignBasicsPanel",
               FORM_LABEL_COLUMN_WIDTH,
               FORM_CONTROL_COLUMN_WIDTH);
         panel.addRow(lblDate, createInlineControls(btnDate, btnRandomDate));
@@ -370,7 +369,7 @@ public class GeneralPage {
     }
 
     private @Nonnull JPanel createIdentityArtworkPanel() {
-        CampaignOptionsFormPanel panel = new CampaignOptionsFormPanel("GeneralIdentityArtworkPanel",
+        SettingsFormPanel panel = new SettingsFormPanel("GeneralIdentityArtworkPanel",
               FORM_LABEL_COLUMN_WIDTH,
               UIUtil.scaleForGUI(120));
         panel.addRow(lblIcon, createInlineControls(btnIcon));
@@ -557,7 +556,7 @@ public class GeneralPage {
      * @return A {@link JPanel} containing additional informational components.
      */
     private @Nonnull JPanel createFurtherReadingPanel() {
-        return new CampaignOptionsIntroPanel("FurtherReadingPanel",
+        return new SettingsIntroPanel("FurtherReadingPanel",
               getFurtherReadingText(),
               UIUtil.scaleForGUI(FURTHER_READING_TEXT_WIDTH));
     }

@@ -2055,6 +2055,65 @@ public class PersonTest {
         }
     }
 
+    @Nested
+    class EdgeGain {
+        @Test
+        void gainEdgeStopsAtConfiguredMaximum() {
+            Person person = new Person("GivenName", "Surname", null, "MERC");
+            person.setEdge(2);
+
+            int gained = person.gainEdge(3, 3);
+
+            assertEquals(1, gained);
+            assertEquals(3, person.getEdge());
+            assertFalse(person.canGainEdge(3));
+        }
+
+        @Test
+        void gainEdgeDoesNotReduceGmAssignedEdgeAboveMaximum() {
+            Person person = new Person("GivenName", "Surname", null, "MERC");
+            person.setEdge(4);
+
+            int gained = person.gainEdge(1, 3);
+
+            assertEquals(0, gained);
+            assertEquals(4, person.getEdge());
+        }
+
+        @Test
+        void zeroMaximumPreventsEdgeGain() {
+            Person person = new Person("GivenName", "Surname", null, "MERC");
+
+            int gained = person.gainEdge(1, 0);
+
+            assertEquals(0, gained);
+            assertEquals(0, person.getEdge());
+        }
+
+        @Test
+        void configuredMaximumCannotExceedAttributeCap() {
+            Person person = new Person("GivenName", "Surname", null, "MERC");
+            int attributeCap = person.getAttributeCap(SkillAttribute.EDGE);
+            person.setEdge(attributeCap - 1);
+
+            int gained = person.gainEdge(5, attributeCap + 10);
+
+            assertEquals(1, gained);
+            assertEquals(attributeCap, person.getEdge());
+        }
+
+        @Test
+        void setEdgeAllowsGmAssignmentAboveConfiguredMaximum() {
+            Person person = new Person("GivenName", "Surname", null, "MERC");
+            person.gainEdge(3, 3);
+
+            person.setEdge(4);
+
+            assertEquals(4, person.getEdge());
+            assertEquals(0, person.getCurrentEdge());
+        }
+    }
+
     /**
      * Tests for {@code Person#attemptToCheatDeath(Campaign)} (the "Twist of Fate Survival" ability). The method is
      * private, so it is exercised here via reflection.

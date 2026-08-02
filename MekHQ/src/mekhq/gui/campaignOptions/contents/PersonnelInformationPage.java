@@ -48,7 +48,7 @@ import megamek.client.ui.comboBoxes.MMComboBox;
 import mekhq.campaign.personnel.enums.TimeInDisplayFormat;
 import mekhq.gui.campaignOptions.CampaignOptionFlag;
 import mekhq.gui.campaignOptions.components.CampaignOptionsCheckBox;
-import mekhq.gui.campaignOptions.components.CampaignOptionsFormPanel;
+import megamek.client.ui.settings.SettingsFormPanel;
 import mekhq.gui.campaignOptions.components.CampaignOptionsHeaderPanel;
 import mekhq.gui.campaignOptions.components.CampaignOptionsLabel;
 import mekhq.gui.campaignOptions.components.CampaignOptionsPagePanel;
@@ -66,8 +66,8 @@ import mekhq.gui.campaignOptions.components.CampaignOptionsPagePanel;
  * {@link #writeToModel(PersonnelOptionsModel)} are no-ops.</p>
  */
 class PersonnelInformationPage {
-    private static final int LABEL_COLUMN_WIDTH = CampaignOptionsFormPanel.DEFAULT_LABEL_WIDTH;
-    private static final int CONTROL_COLUMN_WIDTH = CampaignOptionsFormPanel.DEFAULT_CONTROL_WIDTH;
+    private static final int LABEL_COLUMN_WIDTH = SettingsFormPanel.DEFAULT_LABEL_WIDTH;
+    private static final int CONTROL_COLUMN_WIDTH = SettingsFormPanel.DEFAULT_CONTROL_WIDTH;
 
     private CampaignOptionsHeaderPanel personnelInformationHeader;
     private JCheckBox chkUseTimeInService;
@@ -134,7 +134,7 @@ class PersonnelInformationPage {
         JPanel pnlPersonnelLogs = createPersonnelLogsPanel();
 
         // Layout the Panel
-        final CampaignOptionsFormPanel personnelInformationPanel = new CampaignOptionsFormPanel(
+        final SettingsFormPanel personnelInformationPanel = new SettingsFormPanel(
                 "PersonnelInformation",
                 LABEL_COLUMN_WIDTH,
                 CONTROL_COLUMN_WIDTH);
@@ -200,7 +200,7 @@ class PersonnelInformationPage {
         chkDisplayPerformanceRecord.addMouseListener(createTipPanelUpdater("DisplayPerformanceRecord"));
 
         // Layout the Panel
-        final CampaignOptionsFormPanel panel = new CampaignOptionsFormPanel("PersonnelLogsPanel",
+        final SettingsFormPanel panel = new SettingsFormPanel("PersonnelLogsPanel",
                 LABEL_COLUMN_WIDTH,
                 CONTROL_COLUMN_WIDTH);
         panel.addCheckBoxGrid(2,
