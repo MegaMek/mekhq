@@ -60,6 +60,7 @@ import mekhq.campaign.market.enums.ContractMarketMethod;
 import mekhq.campaign.market.enums.UnitMarketMethod;
 import mekhq.campaign.market.personnelMarket.enums.PersonnelMarketStyle;
 import mekhq.campaign.personnel.enums.*;
+import mekhq.campaign.personnel.familiarity.FamiliarityMode;
 import mekhq.campaign.randomEvents.prisoners.PrisonerCaptureStyle;
 import mekhq.campaign.universe.PlanetarySystem.PlanetaryRating;
 import mekhq.campaign.universe.PlanetarySystem.PlanetarySophistication;
@@ -163,6 +164,7 @@ final class CampaignOptionCodecs {
         register(CampaignOption.SKILL_LEVEL, enumCodec(SkillLevel::parseFromString));
         register(CampaignOption.MINIMUM_CALLSIGN_SKILL_LEVEL, enumCodec(SkillLevel::parseFromString));
         register(CampaignOption.AUTO_RESOLVE_METHOD, enumCodec(AutoResolveMethod::valueOf));
+        register(CampaignOption.CHASSIS_FAMILIARITY_MODE, enumCodec(FamiliarityMode::valueOf));
 
         // Enums persisted by a lookup name/key rather than Enum.name().
         register(CampaignOption.ACQUISITIONS_TYPE,
