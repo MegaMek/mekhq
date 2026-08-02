@@ -2097,7 +2097,8 @@ public class ResolveScenarioTracker {
         if (!alreadyCapped && nowCapped) {
             String report = getFormattedTextAt(RESOURCE_BUNDLE, "ResolveScenarioTracker.cappedFamiliarity",
                   crew.getHyperlinkedFullTitle(), spanOpeningWithCustomColor(getAmazingColor()),
-                  CLOSING_SPAN_TAG);
+                  CLOSING_SPAN_TAG,
+                  chassis);
             campaign.addReport(DailyReportType.PERSONNEL, report);
         }
     }

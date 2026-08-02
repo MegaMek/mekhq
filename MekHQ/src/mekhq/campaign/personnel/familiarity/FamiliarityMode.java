@@ -140,7 +140,7 @@ public enum FamiliarityMode {
         }
 
         if (familiarity < FAMILIARITY_THREE_HUNDRED) {
-            return FAMILIARITY_ONE_HUNDRED;
+            return FAMILIARITY_TWO_HUNDRED;
         }
 
         return FAMILIARITY_THREE_HUNDRED;

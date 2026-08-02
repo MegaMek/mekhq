@@ -5318,7 +5318,7 @@ public class Unit implements ITechnology, ILocatable {
 
             SkillModifierData skillModifierData = person.getSkillModifierData();
             int familiarityBonusPiloting = person.getChassisFamiliarityCombatBonus(familiarityMode, false);
-            int familiarityBonusGunnery = person.getChassisFamiliarityCombatBonus(familiarityMode, false);
+            int familiarityBonusGunnery = person.getChassisFamiliarityCombatBonus(familiarityMode, true);
 
             if (person.hasSkill(driveType)) {
                 sumPiloting += person.getSkill(driveType)
@@ -5348,8 +5348,7 @@ public class Unit implements ITechnology, ILocatable {
             }
 
             SkillModifierData skillModifierData = person.getSkillModifierData();
-            int familiarityBonusPiloting = person.getChassisFamiliarityCombatBonus(familiarityMode, false);
-            int familiarityBonusGunnery = person.getChassisFamiliarityCombatBonus(familiarityMode, false);
+            int familiarityBonusGunnery = person.getChassisFamiliarityCombatBonus(familiarityMode, true);
 
             String tempGunType = gunType;
             if (entityIsConventionalInfantry) {
@@ -5403,7 +5402,7 @@ public class Unit implements ITechnology, ILocatable {
         if (isOnlyCommandersMatter && getCommander() != null) {
             SkillModifierData skillModifierData = getCommander().getSkillModifierData();
             int familiarityBonusPiloting = getCommander().getChassisFamiliarityCombatBonus(familiarityMode, false);
-            int familiarityBonusGunnery = getCommander().getChassisFamiliarityCombatBonus(familiarityMode, false);
+            int familiarityBonusGunnery = getCommander().getChassisFamiliarityCombatBonus(familiarityMode, true);
 
             Skill drivingSkill = getCommander().getSkill(driveType);
             piloting = drivingSkill == null ?
@@ -5648,7 +5647,7 @@ public class Unit implements ITechnology, ILocatable {
         FamiliarityMode familiarityMode = getCampaign().getCampaignOptions()
                                                 .get(CampaignOption.CHASSIS_FAMILIARITY_MODE);
         int familiarityBonusPiloting = pilot.getChassisFamiliarityCombatBonus(familiarityMode, false);
-        int familiarityBonusGunnery = pilot.getChassisFamiliarityCombatBonus(familiarityMode, false);
+        int familiarityBonusGunnery = pilot.getChassisFamiliarityCombatBonus(familiarityMode, true);
 
         int pilotingMek = 13;
         int gunneryMek = 13;
@@ -5704,7 +5703,7 @@ public class Unit implements ITechnology, ILocatable {
         FamiliarityMode familiarityMode = getCampaign().getCampaignOptions()
                                                 .get(CampaignOption.CHASSIS_FAMILIARITY_MODE);
         int familiarityBonusPiloting = person.getChassisFamiliarityCombatBonus(familiarityMode, false);
-        int familiarityBonusGunnery = person.getChassisFamiliarityCombatBonus(familiarityMode, false);
+        int familiarityBonusGunnery = person.getChassisFamiliarityCombatBonus(familiarityMode, true);
 
         entity.getCrew().setName(person.getFullTitle(), slot);
         entity.getCrew().setNickname(person.getCallsign(), slot);

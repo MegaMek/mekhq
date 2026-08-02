@@ -504,7 +504,7 @@ public class Maintenance {
             }
         }
 
-        if (null != tech) {
+        if (tech != null && partUnit != null) {
             // the AsTech issue is crazy, because you can actually be better off
             // not maintaining
             // than going it short-handed, but that is just the way it is.
