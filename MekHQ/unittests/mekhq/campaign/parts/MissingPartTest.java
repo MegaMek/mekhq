@@ -434,7 +434,7 @@ public class MissingPartTest {
         Campaign mockCampaign = mockCampaign();
         CampaignOptions options = new CampaignOptions();
         options.set(CampaignOption.USE_BALANCED_FABRICATION, true);
-        options.set(CampaignOption.PAY_FOR_PARTS, true);
+        options.set(CampaignOption.PAY_FOR_PARTS, false);
         options.set(CampaignOption.PAY_FOR_REPAIRS, false);
         when(mockCampaign.getCampaignOptions()).thenReturn(options);
 
