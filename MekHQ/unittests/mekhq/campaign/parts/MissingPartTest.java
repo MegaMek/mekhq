@@ -400,8 +400,8 @@ public class MissingPartTest {
         Campaign mockCampaign = mockCampaign();
         CampaignOptions options = new CampaignOptions();
         options.set(CampaignOption.USE_BALANCED_FABRICATION, true);
-        options.setPayForParts(true);
-        options.setPayForRepairs(false);
+        options.set(CampaignOption.PAY_FOR_PARTS, true);
+        options.set(CampaignOption.PAY_FOR_REPAIRS, false);
         when(mockCampaign.getCampaignOptions()).thenReturn(options);
 
         MissingPart missingPart = new MissingMekLocation(Mek.LOC_LEFT_ARM, 20, EquipmentType.T_STRUCTURE_STANDARD,
@@ -416,8 +416,8 @@ public class MissingPartTest {
         Campaign mockCampaign = mockCampaign();
         CampaignOptions options = new CampaignOptions();
         options.set(CampaignOption.USE_BALANCED_FABRICATION, true);
-        options.setPayForParts(true);
-        options.setPayForRepairs(true);
+        options.set(CampaignOption.PAY_FOR_PARTS, true);
+        options.set(CampaignOption.PAY_FOR_REPAIRS, true);
         when(mockCampaign.getCampaignOptions()).thenReturn(options);
 
         MissingPart missingPart = new MissingMekLocation(Mek.LOC_LEFT_ARM, 20, EquipmentType.T_STRUCTURE_STANDARD,
@@ -434,8 +434,8 @@ public class MissingPartTest {
         Campaign mockCampaign = mockCampaign();
         CampaignOptions options = new CampaignOptions();
         options.set(CampaignOption.USE_BALANCED_FABRICATION, true);
-        options.setPayForParts(false);
-        options.setPayForRepairs(false);
+        options.set(CampaignOption.PAY_FOR_PARTS, true);
+        options.set(CampaignOption.PAY_FOR_REPAIRS, false);
         when(mockCampaign.getCampaignOptions()).thenReturn(options);
 
         MissingPart missingPart = new MissingMekLocation(Mek.LOC_LEFT_ARM, 20, EquipmentType.T_STRUCTURE_STANDARD,
@@ -449,8 +449,8 @@ public class MissingPartTest {
         Campaign mockCampaign = mockCampaign();
         CampaignOptions options = new CampaignOptions();
         options.set(CampaignOption.USE_BALANCED_FABRICATION, false);
-        options.setPayForParts(true);
-        options.setPayForRepairs(true);
+        options.set(CampaignOption.PAY_FOR_PARTS, true);
+        options.set(CampaignOption.PAY_FOR_REPAIRS, true);
         when(mockCampaign.getCampaignOptions()).thenReturn(options);
 
         MissingPart missingPart = new MissingMekLocation(Mek.LOC_LEFT_ARM, 20, EquipmentType.T_STRUCTURE_STANDARD,
