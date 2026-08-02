@@ -43,6 +43,7 @@ import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
 import static mekhq.utilities.MHQInternationalization.getTextAt;
 import static mekhq.utilities.ReportingUtilities.CLOSING_SPAN_TAG;
 import static mekhq.utilities.ReportingUtilities.getAmazingColor;
+import static mekhq.utilities.ReportingUtilities.getWarningColor;
 import static mekhq.utilities.ReportingUtilities.spanOpeningWithCustomColor;
 
 import java.io.File;
@@ -2044,31 +2045,56 @@ public class ResolveScenarioTracker {
                 }
                 String chassis = unitEntity.getChassis();
                 for (Person crew : unit.getCrew()) {
-                    boolean alreadyCapped = crew.getChassisFamiliarity(chassis) == cap;
-                    crew.addChassisFamiliarity(chassis, Compute.d6(familiarityDice), cap);
-                    boolean nowCapped = crew.getChassisFamiliarity(chassis) == cap;
-
-                    if (!alreadyCapped && nowCapped) {
-                        String report = getFormattedTextAt(RESOURCE_BUNDLE, "ResolveScenarioTracker.cappedFamiliarity",
-                              crew.getHyperlinkedFullTitle(), spanOpeningWithCustomColor(getAmazingColor()),
-                              CLOSING_SPAN_TAG);
-                        campaign.addReport(DailyReportType.PERSONNEL, report);
-                    }
+                    awardCombatFamiliarity(crew, chassis, cap, familiarityDice);
                 }
+
                 Person unitTech = unit.getTech();
                 if (unitTech != null) {
-                    boolean alreadyCapped = unitTech.getChassisFamiliarity(chassis) == cap;
-                    unitTech.addChassisFamiliarity(chassis, Compute.d6(familiarityDice), cap);
-                    boolean nowCapped = unitTech.getChassisFamiliarity(chassis) == cap;
-
-                    if (!alreadyCapped && nowCapped) {
-                        String report = getFormattedTextAt(RESOURCE_BUNDLE, "ResolveScenarioTracker.cappedFamiliarity",
-                              unitTech.getHyperlinkedFullTitle(), spanOpeningWithCustomColor(getAmazingColor()),
-                              CLOSING_SPAN_TAG);
-                        campaign.addReport(DailyReportType.PERSONNEL, report);
-                    }
+                    awardTechFamiliarity(unitTech, chassis, cap, familiarityDice);
                 }
             }
+        }
+    }
+
+    private void awardTechFamiliarity(Person unitTech, String chassis, int cap, int familiarityDice) {
+        String report = "";
+
+        boolean singleUnitAssignment = unitTech.getTechUnits().size() == 1;
+        if (singleUnitAssignment) {
+            boolean alreadyCapped = unitTech.getChassisFamiliarity(chassis) == cap;
+            unitTech.addChassisFamiliarity(chassis, Compute.d6(familiarityDice), cap);
+            boolean nowCapped = unitTech.getChassisFamiliarity(chassis) == cap;
+
+            if (!alreadyCapped && nowCapped) {
+                report = getFormattedTextAt(RESOURCE_BUNDLE,
+                      "ResolveScenarioTracker.cappedFamiliarity",
+                      unitTech.getHyperlinkedFullTitle(),
+                      spanOpeningWithCustomColor(getAmazingColor()),
+                      CLOSING_SPAN_TAG);
+            }
+        } else {
+            report = getFormattedTextAt(RESOURCE_BUNDLE,
+                  "ResolveScenarioTracker.multiTechAssignment",
+                  unitTech.getHyperlinkedFullTitle(),
+                  spanOpeningWithCustomColor(getWarningColor()),
+                  CLOSING_SPAN_TAG);
+        }
+
+        if (!report.isBlank()) {
+            campaign.addReport(DailyReportType.PERSONNEL, report);
+        }
+    }
+
+    private void awardCombatFamiliarity(Person crew, String chassis, int cap, int familiarityDice) {
+        boolean alreadyCapped = crew.getChassisFamiliarity(chassis) == cap;
+        crew.addChassisFamiliarity(chassis, Compute.d6(familiarityDice), cap);
+        boolean nowCapped = crew.getChassisFamiliarity(chassis) == cap;
+
+        if (!alreadyCapped && nowCapped) {
+            String report = getFormattedTextAt(RESOURCE_BUNDLE, "ResolveScenarioTracker.cappedFamiliarity",
+                  crew.getHyperlinkedFullTitle(), spanOpeningWithCustomColor(getAmazingColor()),
+                  CLOSING_SPAN_TAG);
+            campaign.addReport(DailyReportType.PERSONNEL, report);
         }
     }
 
