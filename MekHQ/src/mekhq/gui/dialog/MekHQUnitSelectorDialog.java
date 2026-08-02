@@ -39,10 +39,14 @@ import static mekhq.utilities.ReportingUtilities.spanOpeningWithCustomColor;
 
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
+import java.awt.event.ActionEvent;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
+import java.io.Serial;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.ResourceBundle;
-import java.util.regex.PatternSyntaxException;
+import javax.swing.AbstractAction;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JFrame;
@@ -51,7 +55,6 @@ import javax.swing.RowFilter;
 
 import megamek.client.ui.Messages;
 import megamek.client.ui.dialogs.UnitLoadingDialog;
-import megamek.client.ui.dialogs.advancedsearch.MekSearchFilter;
 import megamek.client.ui.dialogs.unitSelectorDialogs.AbstractUnitSelectorDialog;
 import megamek.common.TechConstants;
 import megamek.common.annotations.Nullable;
@@ -73,6 +76,8 @@ public class MekHQUnitSelectorDialog extends AbstractUnitSelectorDialog {
     private final Campaign campaign;
     private final boolean addToCampaign;
     private UnitOrder selectedUnit = null;
+    private Entity selectedLootEntity = null;
+    private boolean lootSelectionComplete = false;
     private JButton buttonBuy;
     private JButton buttonAddGM;
 
@@ -95,8 +100,30 @@ public class MekHQUnitSelectorDialog extends AbstractUnitSelectorDialog {
         this.campaign = campaign;
         this.addToCampaign = addToCampaign;
 
+        // MekHQ persists selections from both acquisition and loot modes as campaign units. Standalone Battlefield
+        // Support Assets have no persistent Unit representation, while their linked base-unit rows remain valid.
+        setUnitSelectionScopeFilter(MekHQUnitSelectorDialog::isPersistentCampaignUnitSummary);
+
         updateOptionValues();
         initialize();
+        if (!addToCampaign) {
+            setDefaultCloseOperation(DO_NOTHING_ON_CLOSE);
+            getRootPane().getActionMap().put(CLOSE_ACTION, new AbstractAction() {
+                @Serial
+                private static final long serialVersionUID = -5955140519962310618L;
+
+                @Override
+                public void actionPerformed(ActionEvent event) {
+                    cancelLootSelection();
+                }
+            });
+            addWindowListener(new WindowAdapter() {
+                @Override
+                public void windowClosing(WindowEvent event) {
+                    cancelLootSelection();
+                }
+            });
+        }
         run();
     }
 
@@ -161,10 +188,7 @@ public class MekHQUnitSelectorDialog extends AbstractUnitSelectorDialog {
 
             buttonClose.setText(Messages.getString("Cancel"));
             buttonClose.setName("buttonCancel");
-            buttonClose.addActionListener(evt -> {
-                selectedUnit = null;
-                setVisible(false);
-            });
+            buttonClose.addActionListener(evt -> cancelLootSelection());
         }
         buttonClose.setEnabled(true);
         panelButtons.add(buttonClose, new GridBagConstraints());
@@ -183,33 +207,23 @@ public class MekHQUnitSelectorDialog extends AbstractUnitSelectorDialog {
      *
      * @return boolean True if invalid, false if valid.
      */
-    private boolean isBadSelection() {
-        if (getSelectedEntity() != null) {
-            Entity entity = selectedUnit.getEntity();
-            if (entity == null || isUnsupportedEntity(entity)) {
-                final ResourceBundle resources = ResourceBundle.getBundle("mekhq.resources.CampaignGUI",
-                      MekHQ.getMHQOptions().getLocale());
-
-                String reason;
-                if (entity == null) {
-                    reason = MHQInternationalization.getTextAt(resources.getBaseBundleName(),
-                          "mekSelectorDialog.unsupported.null");
-                } else if (entity.getUnitType() == UnitType.GUN_EMPLACEMENT) {
-                    reason = MHQInternationalization.getTextAt(resources.getBaseBundleName(),
-                          "mekSelectorDialog.unsupported.gunEmplacement");
-                } else {
-                    reason = MHQInternationalization.getTextAt(resources.getBaseBundleName(),
-                          "mekSelectorDialog.unsupported.droneOs");
-                }
-                campaign.addReport(ACQUISITIONS, String.format(reason,
-                      spanOpeningWithCustomColor(ReportingUtilities.getNegativeColor()),
-                      CLOSING_SPAN_TAG));
-
-                return true;
-            }
+    private boolean isBadSelection(@Nullable Entity entity) {
+        if (isCampaignAcquisitionCandidate(entity)) {
             return false;
         }
-        // In this case, getSelectedEntity() == null, and this selection is bad
+        if ((entity == null) || entity.isBattlefieldSupportAsset()) {
+            return true;
+        }
+
+        final ResourceBundle resources = ResourceBundle.getBundle("mekhq.resources.CampaignGUI",
+              MekHQ.getMHQOptions().getLocale());
+        String reason = MHQInternationalization.getTextAt(resources.getBaseBundleName(),
+              (entity.getUnitType() == UnitType.GUN_EMPLACEMENT)
+                    ? "mekSelectorDialog.unsupported.gunEmplacement"
+                    : "mekSelectorDialog.unsupported.droneOs");
+        campaign.addReport(ACQUISITIONS, String.format(reason,
+              spanOpeningWithCustomColor(ReportingUtilities.getNegativeColor()),
+              CLOSING_SPAN_TAG));
         return true;
     }
 
@@ -217,7 +231,7 @@ public class MekHQUnitSelectorDialog extends AbstractUnitSelectorDialog {
      * Processes the event from the buy button.
      */
     private void buyUnit() {
-        if (isBadSelection()) {
+        if (isBadSelection(getSelectedEntity())) {
             return;
         }
         campaign.getPlayerForce().getShoppingList().addShoppingItem(selectedUnit, 1, campaign);
@@ -227,8 +241,7 @@ public class MekHQUnitSelectorDialog extends AbstractUnitSelectorDialog {
      * This function processes the Add GM button's functions.
      */
     private void addGM() {
-
-        if (isBadSelection()) {
+        if (isBadSelection(getSelectedEntity())) {
             return;
         }
 
@@ -244,9 +257,25 @@ public class MekHQUnitSelectorDialog extends AbstractUnitSelectorDialog {
      * Select processes the select button. This overrides a function in the AbstractUnitSelectorDialog.
      */
     @Override
-    protected void select(boolean NoOP) {
-        // No actions are needed in the case for the loot dialog to function, which is the only location this is
-        // now called.
+    protected void select(boolean ignored) {
+        // Enter is bound to select() by the base dialog, but acquisition mode requires an explicit Buy or Add action.
+        if (addToCampaign) {
+            return;
+        }
+        Entity entity = getSelectedEntity();
+        if (isBadSelection(entity)) {
+            return;
+        }
+        selectedLootEntity = entity;
+        lootSelectionComplete = true;
+        setVisible(false);
+    }
+
+    private void cancelLootSelection() {
+        selectedLootEntity = null;
+        selectedUnit = null;
+        lootSelectionComplete = true;
+        setVisible(false);
     }
 
     /**
@@ -258,11 +287,26 @@ public class MekHQUnitSelectorDialog extends AbstractUnitSelectorDialog {
     @Nullable
     @Override
     public Entity getSelectedEntity() {
+        if (!addToCampaign && lootSelectionComplete) {
+            return selectedLootEntity;
+        }
+        if (!isPersistentCampaignUnitSummary(getSelectedMekSummary())) {
+            synchronizeSelectedUnit(null);
+            return null;
+        }
+
         Entity entity = super.getSelectedEntity();
+        // Defend against stale or mismatched summary-cache data returning an asset despite the row-level filter.
+        if ((entity != null) && entity.isBattlefieldSupportAsset()) {
+            entity = null;
+        }
+        synchronizeSelectedUnit(entity);
+        return entity;
+    }
+
+    private void synchronizeSelectedUnit(@Nullable Entity entity) {
         if (entity == null) {
             selectedUnit = null;
-            // If we are currently in the Purchase Unit dialog, we need to update the state of the Buy and AddGM
-            // buttons to be disabled when no unit is selected.
             if (addToCampaign) {
                 buttonBuy.setEnabled(false);
                 buttonBuy.setText(Messages.getString("MekSelectorDialog.Buy", TARGET_UNKNOWN));
@@ -271,29 +315,40 @@ public class MekHQUnitSelectorDialog extends AbstractUnitSelectorDialog {
             }
         } else {
             selectedUnit = new UnitOrder(entity, campaign);
-            // Here also, we need to update the Buy and AddGM buttons  when a unit is selected.
             if (addToCampaign) {
                 buttonBuy.setEnabled(true);
+                buttonAddGM.setEnabled(true);
                 TargetRoll target = campaign.checkAcquisition(selectedUnit).getTargetNumber();
                 buttonBuy.setText(Messages.getString("MekSelectorDialog.Buy", target.getValueAsString()));
                 buttonBuy.setToolTipText(target.getDesc());
-                buttonAddGM.setEnabled(true);
             }
         }
-
-        return entity;
     }
 
     @Override
     protected Entity refreshUnitView() {
         Entity selectedEntity = super.refreshUnitView();
-        if (selectedEntity != null) {
+        // The base selector previews standalone assets without calling getSelectedEntity(). Do not expose one as a
+        // selectable MekHQ campaign unit if stale filtering leaves an asset row selected.
+        if ((selectedEntity != null) && selectedEntity.isBattlefieldSupportAsset()) {
+            selectedEntity = null;
+            synchronizeSelectedUnit(null);
+        }
+        if (selectedUnit != null) {
             labelImage.setIcon(new ImageIcon(selectedUnit.getImage(this)));
         } else {
             labelImage.setIcon(null);
         }
 
         return selectedEntity;
+    }
+
+    static boolean isPersistentCampaignUnitSummary(@Nullable MekSummary unitSummary) {
+        return (unitSummary != null) && !unitSummary.isBattlefieldSupportAsset();
+    }
+
+    static boolean isCampaignAcquisitionCandidate(@Nullable Entity entity) {
+        return (entity != null) && !entity.isBattlefieldSupportAsset() && !isUnsupportedEntity(entity);
     }
 
     /**
@@ -337,23 +392,15 @@ public class MekHQUnitSelectorDialog extends AbstractUnitSelectorDialog {
             return false;
         }
 
-        // if we have an advanced filter set, does it match that filter?
-        if ((searchFilter != null) && !MekSearchFilter.isMatch(unitSummary, searchFilter)) {
-            return false;
-        }
-
-        if (!textFilter.getText().isBlank()) {
-            String text = textFilter.getText();
-            return unitSummary.getName().toLowerCase().contains(text.toLowerCase());
-        }
-
         return true;
     }
 
     @Override
     protected void filterUnits() {
-        RowFilter<MekTableModel, Integer> unitTypeFilter;
-
+        // Preserve every shared selector predicate, including Alpha Strike/BFS advanced search and BFS card
+        // title/subtitle text matching, then layer MekHQ's campaign legality checks over that result.
+        super.filterUnits();
+        final RowFilter<? super MekTableModel, ? super Integer> inheritedFilter = sorter.getRowFilter();
         List<Integer> techLevels = new ArrayList<>();
         for (Integer selectedIdx : listTechLevel.getSelectedIndices()) {
             techLevels.add(techLevelListToIndex.get(selectedIdx));
@@ -365,32 +412,30 @@ public class MekHQUnitSelectorDialog extends AbstractUnitSelectorDialog {
         // Use the base class's gap-robust mapping (the shared combo omits AERO, so a positional
         // selectedIndex - 1 would mismap types that follow it).
         final int unitTypeCode = unitTypeCodeForComboIndex(comboUnitType.getSelectedIndex());
-        // If the current expression doesn't parse, don't update.
-        try {
-            unitTypeFilter = new RowFilter<>() {
-                @Override
-                public boolean include(Entry<? extends MekTableModel, ? extends Integer> entry) {
-                    MekTableModel mekModel = entry.getModel();
-                    MekSummary mek = mekModel.getMekSummary(entry.getIdentifier());
-                    ITechnology tech = UnitTechProgression.getProgression(mek, campaign.getTechFaction(), true);
-                    boolean techLevelMatch = false;
-                    int type = enableYearLimits ? mek.getType(allowedYear) : mek.getType();
-                    for (int tl : nTypes) {
-                        if (type == tl) {
-                            techLevelMatch = true;
-                            break;
-                        }
-                    }
-                    return isAllowedUnit(mek,
-                          weightClassSelectorIndex,
-                          tech,
-                          techLevelMatch,
-                          unitTypeCode);
+        RowFilter<MekTableModel, Integer> unitTypeFilter = new RowFilter<>() {
+            @Override
+            public boolean include(Entry<? extends MekTableModel, ? extends Integer> entry) {
+                if ((inheritedFilter != null) && !inheritedFilter.include(entry)) {
+                    return false;
                 }
-            };
-        } catch (PatternSyntaxException ignored) {
-            return;
-        }
+                MekTableModel mekModel = entry.getModel();
+                MekSummary mek = mekModel.getMekSummary(entry.getIdentifier());
+                ITechnology tech = UnitTechProgression.getProgression(mek, campaign.getTechFaction(), true);
+                boolean techLevelMatch = false;
+                int type = enableYearLimits ? mek.getType(allowedYear) : mek.getType();
+                for (int techLevel : nTypes) {
+                    if (type == techLevel) {
+                        techLevelMatch = true;
+                        break;
+                    }
+                }
+                return isAllowedUnit(mek,
+                      weightClassSelectorIndex,
+                      tech,
+                      techLevelMatch,
+                      unitTypeCode);
+            }
+        };
         sorter.setRowFilter(unitTypeFilter);
     }
 }
