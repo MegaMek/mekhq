@@ -38,6 +38,8 @@ import static mekhq.campaign.enums.DailyReportType.FINANCES;
 import static mekhq.campaign.enums.DailyReportType.TECHNICAL;
 import static mekhq.campaign.mission.Scenario.T_SPACE;
 import static mekhq.campaign.parts.enums.PartQuality.QUALITY_D;
+import static mekhq.campaign.personnel.PersonnelOptions.FAMILIARITY_EMOTIONALLY_UNAVAILABLE;
+import static mekhq.campaign.personnel.PersonnelOptions.FAMILIARITY_IRON_BOND;
 import static mekhq.campaign.randomEvents.prisoners.NonCombatPrisoners.getCivilianCaptives;
 import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
 import static mekhq.utilities.MHQInternationalization.getTextAt;
@@ -91,6 +93,7 @@ import mekhq.campaign.mission.camOpsSalvage.CamOpsSalvageUtilities;
 import mekhq.campaign.mission.enums.ScenarioStatus;
 import mekhq.campaign.parts.Part;
 import mekhq.campaign.personnel.Person;
+import mekhq.campaign.personnel.PersonnelOptions;
 import mekhq.campaign.personnel.enums.PersonnelRole;
 import mekhq.campaign.personnel.enums.PersonnelStatus;
 import mekhq.campaign.personnel.familiarity.FamiliarityMode;
@@ -2045,7 +2048,7 @@ public class ResolveScenarioTracker {
                 }
                 String chassis = unitEntity.getChassis();
                 for (Person crew : unit.getCrew()) {
-                    awardCombatFamiliarity(crew, chassis, cap, familiarityDice);
+                    awardFamiliarity(crew, chassis, cap, familiarityDice);
                 }
 
                 Person unitTech = unit.getTech();
@@ -2057,37 +2060,38 @@ public class ResolveScenarioTracker {
     }
 
     private void awardTechFamiliarity(Person unitTech, String chassis, int cap, int familiarityDice) {
-        String report = "";
-
         boolean singleUnitAssignment = unitTech.getTechUnits().size() == 1;
         if (singleUnitAssignment) {
-            boolean alreadyCapped = unitTech.getChassisFamiliarity(chassis) == cap;
-            unitTech.addChassisFamiliarity(chassis, Compute.d6(familiarityDice), cap);
-            boolean nowCapped = unitTech.getChassisFamiliarity(chassis) == cap;
-
-            if (!alreadyCapped && nowCapped) {
-                report = getFormattedTextAt(RESOURCE_BUNDLE,
-                      "ResolveScenarioTracker.cappedFamiliarity",
-                      unitTech.getHyperlinkedFullTitle(),
-                      spanOpeningWithCustomColor(getAmazingColor()),
-                      CLOSING_SPAN_TAG);
-            }
+            awardFamiliarity(unitTech, chassis, cap, familiarityDice);
         } else {
-            report = getFormattedTextAt(RESOURCE_BUNDLE,
+            String report = getFormattedTextAt(RESOURCE_BUNDLE,
                   "ResolveScenarioTracker.multiTechAssignment",
                   unitTech.getHyperlinkedFullTitle(),
                   spanOpeningWithCustomColor(getWarningColor()),
                   CLOSING_SPAN_TAG);
-        }
-
-        if (!report.isBlank()) {
             campaign.addReport(DailyReportType.PERSONNEL, report);
         }
     }
 
-    private void awardCombatFamiliarity(Person crew, String chassis, int cap, int familiarityDice) {
-        boolean alreadyCapped = crew.getChassisFamiliarity(chassis) == cap;
-        crew.addChassisFamiliarity(chassis, Compute.d6(familiarityDice), cap);
+    private void awardFamiliarity(Person crew, String chassis, int cap, int familiarityDice) {
+        PersonnelOptions options = crew.getOptions();
+        boolean hasFreeLove = options.booleanOption(FAMILIARITY_IRON_BOND);
+        boolean isEmotionallyUnavailable = options.booleanOption(FAMILIARITY_EMOTIONALLY_UNAVAILABLE);
+
+        int currentFamiliarity = crew.getChassisFamiliarity(chassis);
+
+        double multiplier = 1.0;
+        if (hasFreeLove) {
+            multiplier = 1.5;
+        }
+
+        if (isEmotionallyUnavailable && currentFamiliarity == 0) {
+            multiplier = 0.0;
+        }
+
+        boolean alreadyCapped = currentFamiliarity == cap;
+        int familiarity = (int) Math.round(Compute.d6(familiarityDice) * multiplier);
+        crew.addChassisFamiliarity(chassis, familiarity, cap);
         boolean nowCapped = crew.getChassisFamiliarity(chassis) == cap;
 
         if (!alreadyCapped && nowCapped) {

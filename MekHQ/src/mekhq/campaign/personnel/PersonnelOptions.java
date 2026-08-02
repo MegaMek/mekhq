@@ -163,6 +163,8 @@ public class PersonnelOptions extends PilotOptions {
     public static final String EXCEPTIONAL_ATTRIBUTE_CHARISMA = "exceptional_attribute_charisma";
     public static final String EXCEPTIONAL_ATTRIBUTE_EDGE = "exceptional_attribute_edge";
     public static final String UNOFFICIAL_BELOVED_PET = "unofficial_beloved_pet";
+    public static final String FAMILIARITY_IRON_BOND = "familiarity_iron_bond";
+    public static final String FAMILIARITY_EMOTIONALLY_UNAVAILABLE = "familiarity_emotionally_unavailable";
 
     // Weight-class affinity/antipathy SPAs and Flaws.
     public static final String MEK_AFFINITY_LIGHT = "mek_affinity_light";
@@ -412,6 +414,8 @@ public class PersonnelOptions extends PilotOptions {
         addOption(l3a, EXCEPTIONAL_ATTRIBUTE_CHARISMA, false);
         addOption(l3a, EXCEPTIONAL_ATTRIBUTE_EDGE, false);
         addOption(l3a, UNOFFICIAL_BELOVED_PET, false);
+        addOption(l3a, FAMILIARITY_IRON_BOND, false);
+        addOption(l3a, FAMILIARITY_EMOTIONALLY_UNAVAILABLE, false);
 
         addOption(l3a, ADMIN_MEDIATOR, false);
         addOption(l3a, ADMIN_LOGISTICIAN, false);
