@@ -43,7 +43,9 @@ import static mekhq.utilities.MHQInternationalization.getTextAt;
 import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.FontMetrics;
+import java.awt.GraphicsEnvironment;
 import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
 import java.awt.Insets;
 import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
@@ -89,7 +91,6 @@ import megamek.common.ui.FastJScrollPane;
 import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.personnel.skills.SkillType;
 import mekhq.campaign.personnel.skills.enums.SkillSubType;
-import mekhq.gui.campaignOptions.components.CampaignOptionsGridBagConstraints;
 import mekhq.gui.campaignOptions.components.CampaignOptionsHeaderPanel;
 import mekhq.gui.campaignOptions.components.CampaignOptionsLabel;
 import mekhq.gui.campaignOptions.components.CampaignOptionsPagePanel;
@@ -244,7 +245,8 @@ public class SkillsPages {
      */
     private JComponent createSkillsSectionContent(SkillSubType category, JTable table, SkillsTableModel tableModel) {
         final JPanel content = new CampaignOptionsStandardPanel("SkillsSectionContent", false);
-        final GridBagConstraints layout = new CampaignOptionsGridBagConstraints(content);
+        content.setLayout(new GridBagLayout());
+        final GridBagConstraints layout = defaultGridBagConstraints();
 
         installCopyPasteBindings(table, tableModel);
 
@@ -427,7 +429,8 @@ public class SkillsPages {
 
         // Borderless content panel with both cost controls side by side
         final JPanel content = new CampaignOptionsStandardPanel("EdgeCostPanel", false);
-        final GridBagConstraints layout = new CampaignOptionsGridBagConstraints(content);
+        content.setLayout(new GridBagLayout());
+        final GridBagConstraints layout = defaultGridBagConstraints();
 
         layout.gridwidth = 1;
         layout.gridy = 0;
@@ -441,6 +444,14 @@ public class SkillsPages {
         content.add(spnAttributeCost, layout);
 
         return content;
+    }
+
+    private static GridBagConstraints defaultGridBagConstraints() {
+        GridBagConstraints layout = new GridBagConstraints();
+        layout.anchor = GridBagConstraints.NORTHWEST;
+        layout.fill = GridBagConstraints.HORIZONTAL;
+        layout.insets = new Insets(5, 5, 5, 5);
+        return layout;
     }
 
     /**
@@ -489,7 +500,9 @@ public class SkillsPages {
     }
 
     private static int shortcutMask() {
-        return Toolkit.getDefaultToolkit().getMenuShortcutKeyMaskEx();
+        return GraphicsEnvironment.isHeadless()
+              ? InputEvent.CTRL_DOWN_MASK
+              : Toolkit.getDefaultToolkit().getMenuShortcutKeyMaskEx();
     }
 
     /**

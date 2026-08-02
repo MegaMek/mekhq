@@ -42,10 +42,10 @@ import java.util.List;
 
 import mekhq.campaign.Campaign;
 import mekhq.campaign.campaignOptions.CampaignOptions;
-import mekhq.campaign.digitalGM.stratCon.MaplessStratConGM;
-import mekhq.campaign.digitalGM.stratCon.SinglesStratConGM;
-import mekhq.campaign.digitalGM.stratCon.StratConDigitalGM;
-import mekhq.campaign.digitalGM.stratCon.StratConPlayType;
+import mekhq.campaign.digitalGM.stratCon.gm.MaplessStratConGM;
+import mekhq.campaign.digitalGM.stratCon.gm.SinglesStratConGM;
+import mekhq.campaign.digitalGM.stratCon.gm.StratConDigitalGM;
+import mekhq.campaign.digitalGM.stratCon.gm.StratConPlayType;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 

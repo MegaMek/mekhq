@@ -47,7 +47,7 @@ import java.util.Set;
 
 import megamek.Version;
 import megamek.common.enums.SkillLevel;
-import mekhq.campaign.digitalGM.stratCon.StratConPlayType;
+import mekhq.campaign.digitalGM.stratCon.gm.StratConPlayType;
 import mekhq.campaign.finances.Money;
 import mekhq.campaign.personnel.enums.PersonnelRole;
 import mekhq.campaign.universe.PlanetarySystem.PlanetarySophistication;

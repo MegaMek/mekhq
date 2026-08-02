@@ -46,7 +46,7 @@ import jakarta.annotation.Nonnull;
 import jakarta.annotation.Nullable;
 import mekhq.gui.campaignOptions.CampaignOptionFlag;
 import mekhq.gui.campaignOptions.components.CampaignOptionsCheckBox;
-import mekhq.gui.campaignOptions.components.CampaignOptionsFormPanel;
+import megamek.client.ui.settings.SettingsFormPanel;
 import mekhq.gui.campaignOptions.components.CampaignOptionsHeaderPanel;
 import mekhq.gui.campaignOptions.components.CampaignOptionsLabel;
 import mekhq.gui.campaignOptions.components.CampaignOptionsPagePanel;
@@ -65,8 +65,8 @@ import mekhq.gui.campaignOptions.components.CampaignOptionsSpinner;
  * are no-ops.</p>
  */
 class FatiguePage {
-    private static final int LABEL_COLUMN_WIDTH = CampaignOptionsFormPanel.DEFAULT_LABEL_WIDTH;
-    private static final int CONTROL_COLUMN_WIDTH = CampaignOptionsFormPanel.DEFAULT_CONTROL_WIDTH;
+    private static final int LABEL_COLUMN_WIDTH = SettingsFormPanel.DEFAULT_LABEL_WIDTH;
+    private static final int CONTROL_COLUMN_WIDTH = SettingsFormPanel.DEFAULT_CONTROL_WIDTH;
 
     private JCheckBox chkUseFatigue;
     private JLabel lblFatigueRate;
@@ -156,7 +156,7 @@ class FatiguePage {
     }
 
     private @Nonnull JPanel createFatigueRulesPanel() {
-        final CampaignOptionsFormPanel panel = new CampaignOptionsFormPanel("FatigueRulesPanel",
+        final SettingsFormPanel panel = new SettingsFormPanel("FatigueRulesPanel",
                 LABEL_COLUMN_WIDTH,
                 CONTROL_COLUMN_WIDTH);
         panel.addCheckBox(chkUseFatigue);
@@ -167,7 +167,7 @@ class FatiguePage {
     }
 
     private @Nonnull JPanel createFatigueFieldKitchenPanel() {
-        final CampaignOptionsFormPanel panel = new CampaignOptionsFormPanel("FatigueFieldKitchenPanel",
+        final SettingsFormPanel panel = new SettingsFormPanel("FatigueFieldKitchenPanel",
                 LABEL_COLUMN_WIDTH,
                 CONTROL_COLUMN_WIDTH);
         panel.addRow(lblFieldKitchenCapacity, spnFieldKitchenCapacity);
@@ -177,7 +177,7 @@ class FatiguePage {
     }
 
     private @Nonnull JPanel createFatigueAutomationPanel() {
-        final CampaignOptionsFormPanel panel = new CampaignOptionsFormPanel("FatigueAutomationPanel",
+        final SettingsFormPanel panel = new SettingsFormPanel("FatigueAutomationPanel",
                 LABEL_COLUMN_WIDTH,
                 CONTROL_COLUMN_WIDTH);
         panel.addRow(lblFatigueUndeploymentThreshold, spnFatigueUndeploymentThreshold);

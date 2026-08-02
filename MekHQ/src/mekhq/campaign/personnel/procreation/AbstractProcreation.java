@@ -34,7 +34,6 @@ package mekhq.campaign.personnel.procreation;
 
 import static mekhq.campaign.enums.DailyReportType.PERSONNEL;
 import static mekhq.campaign.personnel.PersonnelOptions.UNOFFICIAL_DOBROWSKI_SYNDROME;
-import static mekhq.campaign.personnel.education.EducationController.setInitialEducationLevel;
 import static mekhq.campaign.personnel.enums.BloodGroup.getInheritedBloodGroup;
 import static mekhq.campaign.personnel.enums.BloodGroup.getRandomBloodGroup;
 import static mekhq.campaign.personnel.medical.BodyLocation.GENERIC;
@@ -478,7 +477,7 @@ public abstract class AbstractProcreation {
             }
 
             if (baby.isFounder() && useFoundersHavePlotArmor) {
-                baby.changeAttributeScore(SkillAttribute.EDGE, 1);
+                baby.gainEdge(1, campaignOptions.get(CampaignOption.MAXIMUM_EDGE));
             }
 
             // set education
@@ -639,9 +638,6 @@ public abstract class AbstractProcreation {
             }
 
             baby.setLoyalty(Compute.d6(3) + 2);
-
-            // set education based on age
-            setInitialEducationLevel(campaign, baby);
 
             // Create reports and log the birth
             logAndUpdateFamily(campaign, today, mother, baby, father);

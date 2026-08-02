@@ -38,6 +38,7 @@ import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.MILESTONE_BEFOR
 import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.createTipPanelUpdater;
 import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.getImageDirectory;
 import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.getMetadata;
+import static mekhq.campaign.personnel.skills.Attributes.MAXIMUM_ATTRIBUTE_SCORE;
 
 import java.awt.Component;
 import javax.swing.DefaultListCellRenderer;
@@ -51,10 +52,11 @@ import jakarta.annotation.Nonnull;
 import jakarta.annotation.Nullable;
 import megamek.Version;
 import megamek.client.ui.comboBoxes.MMComboBox;
+import megamek.client.ui.settings.SettingsFormPanel;
+import mekhq.campaign.campaignOptions.CampaignOption;
 import mekhq.campaign.personnel.enums.EdgeRefreshPeriod;
 import mekhq.gui.campaignOptions.CampaignOptionFlag;
 import mekhq.gui.campaignOptions.components.CampaignOptionsCheckBox;
-import mekhq.gui.campaignOptions.components.CampaignOptionsFormPanel;
 import mekhq.gui.campaignOptions.components.CampaignOptionsHeaderPanel;
 import mekhq.gui.campaignOptions.components.CampaignOptionsLabel;
 import mekhq.gui.campaignOptions.components.CampaignOptionsPagePanel;
@@ -73,8 +75,8 @@ import mekhq.gui.campaignOptions.components.CampaignOptionsSpinner;
  * no-ops.</p>
  */
 class PersonnelGeneralPage {
-    private static final int LABEL_COLUMN_WIDTH = CampaignOptionsFormPanel.DEFAULT_LABEL_WIDTH;
-    private static final int CONTROL_COLUMN_WIDTH = CampaignOptionsFormPanel.DEFAULT_CONTROL_WIDTH;
+    private static final int LABEL_COLUMN_WIDTH = SettingsFormPanel.DEFAULT_LABEL_WIDTH;
+    private static final int CONTROL_COLUMN_WIDTH = SettingsFormPanel.DEFAULT_CONTROL_WIDTH;
 
     private CampaignOptionsHeaderPanel generalHeader;
     private JCheckBox chkUseTactics;
@@ -90,6 +92,7 @@ class PersonnelGeneralPage {
     private JCheckBox chkUseEdge;
     private JCheckBox chkUseTwistOfFateSurvival;
     private JCheckBox chkUseFoundersHavePlotArmor;
+    private JSpinner spnMaximumEdge;
     private MMComboBox<EdgeRefreshPeriod> comboEdgeRefreshPeriod;
     private JSpinner spnEdgeRefreshCost;
     private JCheckBox chkUseImplants;
@@ -202,6 +205,12 @@ class PersonnelGeneralPage {
               getMetadata(new Version(0, 51, 1)));
         chkUseFoundersHavePlotArmor.addMouseListener(createTipPanelUpdater("UseFoundersHavePlotArmor"));
 
+        JLabel lblMaximumEdge = new CampaignOptionsLabel("MaximumEdge", getMetadata(new Version(0, 51, 1)));
+        lblMaximumEdge.addMouseListener(createTipPanelUpdater("MaximumEdge"));
+        spnMaximumEdge = new CampaignOptionsSpinner("MaximumEdge",
+              CampaignOption.MAXIMUM_EDGE.defaultValue(), 0, MAXIMUM_ATTRIBUTE_SCORE, 1);
+        spnMaximumEdge.addMouseListener(createTipPanelUpdater("MaximumEdge"));
+
         JLabel lblEdgeRefreshPeriod = new CampaignOptionsLabel("EdgeRefreshPeriod", getMetadata(new Version(0, 51, 0)));
         lblEdgeRefreshPeriod.addMouseListener(createTipPanelUpdater("EdgeRefreshPeriod"));
         comboEdgeRefreshPeriod.setRenderer(new DefaultListCellRenderer() {
@@ -228,7 +237,7 @@ class PersonnelGeneralPage {
         chkUseAlternativeQualityAveraging.addMouseListener(createTipPanelUpdater("UseAlternativeQualityAveraging"));
 
         // Layout the Panel
-        final CampaignOptionsFormPanel panel = new CampaignOptionsFormPanel("PersonnelGeneralPage",
+        final SettingsFormPanel panel = new SettingsFormPanel("PersonnelGeneralPage",
               LABEL_COLUMN_WIDTH,
               CONTROL_COLUMN_WIDTH);
         panel.addCheckBoxGrid(2,
@@ -247,6 +256,7 @@ class PersonnelGeneralPage {
               chkUseFoundersHavePlotArmor,
               chkUseImplants,
               chkUseAlternativeQualityAveraging);
+        panel.addRow(lblMaximumEdge, spnMaximumEdge);
         panel.addRow(lblEdgeRefreshCost, spnEdgeRefreshCost);
         panel.addRow(lblEdgeRefreshPeriod, comboEdgeRefreshPeriod);
 
@@ -270,7 +280,7 @@ class PersonnelGeneralPage {
               .addMouseListener(createTipPanelUpdater("UseRemovalExemptRetirees"));
 
         // Layout the Panel
-        final CampaignOptionsFormPanel panel = new CampaignOptionsFormPanel("PersonnelCleanUpPanel",
+        final SettingsFormPanel panel = new SettingsFormPanel("PersonnelCleanUpPanel",
               LABEL_COLUMN_WIDTH,
               CONTROL_COLUMN_WIDTH);
         panel.addCheckBoxGrid(2,
@@ -296,7 +306,7 @@ class PersonnelGeneralPage {
               "AdminExperienceLevelIncludeNegotiation"));
 
         // Layout the Panel
-        final CampaignOptionsFormPanel panel = new CampaignOptionsFormPanel("AdministratorsPanel",
+        final SettingsFormPanel panel = new SettingsFormPanel("AdministratorsPanel",
               LABEL_COLUMN_WIDTH,
               CONTROL_COLUMN_WIDTH);
         panel.addCheckBoxGrid(2,
@@ -340,7 +350,7 @@ class PersonnelGeneralPage {
         chkUseBlobVesselCrew.addMouseListener(createTipPanelUpdater("UseBlobVesselCrew"));
 
         // Layout the Panel
-        final CampaignOptionsFormPanel panel = new CampaignOptionsFormPanel("BlobCrewPanel",
+        final SettingsFormPanel panel = new SettingsFormPanel("BlobCrewPanel",
               LABEL_COLUMN_WIDTH,
               CONTROL_COLUMN_WIDTH);
         panel.addCheckBoxGrid(2,
@@ -378,6 +388,7 @@ class PersonnelGeneralPage {
         chkOnlyCommandersMatterInfantry.setSelected(model.onlyCommandersMatterInfantry);
         chkOnlyCommandersMatterBattleArmor.setSelected(model.onlyCommandersMatterBattleArmor);
         chkUseEdge.setSelected(model.useEdge);
+        spnMaximumEdge.setValue(model.maximumEdge);
         chkUseTwistOfFateSurvival.setSelected(model.useTwistOfFateSurvival);
         chkUseFoundersHavePlotArmor.setSelected(model.useFoundersHavePlotArmor);
         comboEdgeRefreshPeriod.setSelectedItem(model.edgeRefreshPeriod);
@@ -421,6 +432,7 @@ class PersonnelGeneralPage {
         model.onlyCommandersMatterInfantry = chkOnlyCommandersMatterInfantry.isSelected();
         model.onlyCommandersMatterBattleArmor = chkOnlyCommandersMatterBattleArmor.isSelected();
         model.useEdge = chkUseEdge.isSelected();
+        model.maximumEdge = (int) spnMaximumEdge.getValue();
         model.useTwistOfFateSurvival = chkUseTwistOfFateSurvival.isSelected();
         model.useFoundersHavePlotArmor = chkUseFoundersHavePlotArmor.isSelected();
         model.edgeRefreshPeriod = comboEdgeRefreshPeriod.getSelectedItem();

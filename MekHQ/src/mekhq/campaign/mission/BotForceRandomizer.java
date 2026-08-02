@@ -459,7 +459,6 @@ public class BotForceRandomizer {
         en.setGame(campaign.getGame());
 
         RandomNameGenerator rng = RandomNameGenerator.getInstance();
-        rng.setChosenFaction(faction.getNameGenerator());
 
         Gender gender;
         int nonBinaryDiceSize = campaign.getCampaignOptions().getNonBinaryDiceSize();
@@ -470,7 +469,7 @@ public class BotForceRandomizer {
             gender = RandomGenderGenerator.generate();
         }
 
-        String[] crewNameArray = rng.generateGivenNameSurnameSplit(gender, faction.isClan(), faction.getShortName());
+        String[] crewNameArray = rng.generateGivenNameSurnameSplit(gender, faction.isClan(), faction.getNameGenerator());
         String crewName = crewNameArray[0];
         crewName += !StringUtility.isNullOrBlank(crewNameArray[1]) ? ' ' + crewNameArray[1] : "";
 

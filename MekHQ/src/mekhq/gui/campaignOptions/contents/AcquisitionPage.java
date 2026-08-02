@@ -50,10 +50,11 @@ import jakarta.annotation.Nonnull;
 import jakarta.annotation.Nullable;
 import megamek.Version;
 import megamek.client.ui.comboBoxes.MMComboBox;
+import megamek.client.ui.util.UIUtil;
 import mekhq.campaign.campaignOptions.AcquisitionsType;
 import mekhq.gui.campaignOptions.CampaignOptionFlag;
 import mekhq.gui.campaignOptions.components.CampaignOptionsCheckBox;
-import mekhq.gui.campaignOptions.components.CampaignOptionsFormPanel;
+import megamek.client.ui.settings.SettingsFormPanel;
 import mekhq.gui.campaignOptions.components.CampaignOptionsHeaderPanel;
 import mekhq.gui.campaignOptions.components.CampaignOptionsLabel;
 import mekhq.gui.campaignOptions.components.CampaignOptionsPagePanel;
@@ -73,8 +74,8 @@ import mekhq.gui.campaignOptions.enums.ProcurementPersonnelPick;
  * are no-ops.</p>
  */
 class AcquisitionPage {
-    private static final int LABEL_COLUMN_WIDTH = CampaignOptionsFormPanel.DEFAULT_LABEL_WIDTH;
-    private static final int CONTROL_COLUMN_WIDTH = CampaignOptionsFormPanel.DEFAULT_CONTROL_WIDTH;
+    private static final int LABEL_COLUMN_WIDTH = SettingsFormPanel.DEFAULT_LABEL_WIDTH;
+    private static final int CONTROL_COLUMN_WIDTH = SettingsFormPanel.DEFAULT_CONTROL_WIDTH;
     private static final int AUTO_LOGISTICS_LABEL_COLUMN_WIDTH = 190;
     private static final int AUTO_LOGISTICS_CONTROL_COLUMN_WIDTH = 90;
     private static final int AUTO_LOGISTICS_PAIRS_PER_ROW = 2;
@@ -231,7 +232,7 @@ class AcquisitionPage {
         spnMaxAcquisitions.addMouseListener(createTipPanelUpdater("MaxAcquisitions"));
 
         // Layout the Panel
-        final CampaignOptionsFormPanel panel = new CampaignOptionsFormPanel("AcquisitionPanel",
+        final SettingsFormPanel panel = new SettingsFormPanel("AcquisitionPanel",
                 acquisitionSectionLabelWidth,
                 CONTROL_COLUMN_WIDTH);
         panel.addRow(lblChoiceAcquireSkill, choiceAcquireSkill);
@@ -254,7 +255,7 @@ class AcquisitionPage {
               getMetadata(MILESTONE_BEFORE_METADATA));
         chkNoDeliveriesInTransit.addMouseListener(createTipPanelUpdater("NoDeliveriesInTransit"));
 
-        final CampaignOptionsFormPanel panel = new CampaignOptionsFormPanel("DeliveryPanel",
+        final SettingsFormPanel panel = new SettingsFormPanel("DeliveryPanel",
                 acquisitionSectionLabelWidth,
                 CONTROL_COLUMN_WIDTH);
         panel.addRow(lblTransitTimeUnits, choiceTransitTimeUnits);
@@ -343,7 +344,7 @@ class AcquisitionPage {
         spnAutoLogisticsOther.addMouseListener(createTipPanelUpdater("AutoLogisticsOther"));
 
         // Layout the Panel
-        final CampaignOptionsFormPanel panel = new CampaignOptionsFormPanel("AutoLogisticsPanel",
+        final SettingsFormPanel panel = new SettingsFormPanel("AutoLogisticsPanel",
               AUTO_LOGISTICS_LABEL_COLUMN_WIDTH,
               AUTO_LOGISTICS_CONTROL_COLUMN_WIDTH);
         panel.addRowGrid(AUTO_LOGISTICS_PAIRS_PER_ROW,
@@ -390,7 +391,7 @@ class AcquisitionPage {
         // the first label column, the first control column, and the inter-pair gap
         // between them.
         acquisitionSectionLabelWidth = firstColumnLabelWidth + firstColumnControlWidth
-                + CampaignOptionsFormPanel.GRID_COLUMN_GAP;
+            + UIUtil.scaleForGUI(SettingsFormPanel.GRID_COLUMN_GAP);
 
         return panel;
     }

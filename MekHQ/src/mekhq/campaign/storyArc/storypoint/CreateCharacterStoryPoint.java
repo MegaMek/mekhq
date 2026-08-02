@@ -45,6 +45,7 @@ import megamek.common.options.IOptionGroup;
 import megamek.logging.MMLogger;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
+import mekhq.campaign.campaignOptions.CampaignOption;
 import mekhq.campaign.events.persons.PersonNewEvent;
 import mekhq.campaign.force.Formation;
 import mekhq.campaign.personnel.Person;
@@ -194,8 +195,11 @@ public class CreateCharacterStoryPoint extends StoryPoint {
         person.setBiography(biography);
         person.setRank(rank);
         if (edge > 0) {
-            person.changeEdge(edge);
-            setEdgeTriggers(person);
+            int gained = person.gainEdge(edge,
+                  campaign.getCampaignOptions().get(CampaignOption.MAXIMUM_EDGE));
+            if (gained > 0) {
+                setEdgeTriggers(person);
+            }
         }
 
         if (null != personId) {
