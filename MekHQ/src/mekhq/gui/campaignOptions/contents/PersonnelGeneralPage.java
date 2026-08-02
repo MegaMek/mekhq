@@ -175,7 +175,8 @@ class PersonnelGeneralPage {
     }
 
     private JPanel createChassisFamiliarityPanel() {
-        lblChassisFamiliarityMode = new CampaignOptionsLabel("ChassisFamiliarityMode");
+        lblChassisFamiliarityMode = new CampaignOptionsLabel("ChassisFamiliarityMode",
+              getMetadata(new Version(0, 51, 1), CampaignOptionFlag.CUSTOM_SYSTEM, CampaignOptionFlag.DOCUMENTED));
         lblChassisFamiliarityMode.addMouseListener(createTipPanelUpdater("ChassisFamiliarityMode"));
         comboChassisFamiliarityMode = new MMComboBox<>("comboChassisFamiliarityMode", FamiliarityMode.values());
         comboChassisFamiliarityMode.setRenderer(new DefaultListCellRenderer() {
@@ -191,7 +192,8 @@ class PersonnelGeneralPage {
         });
         comboChassisFamiliarityMode.addMouseListener(createTipPanelUpdater("ChassisFamiliarityMode"));
 
-        lblChassisFamiliarityDice = new CampaignOptionsLabel("ChassisFamiliarityDice");
+        lblChassisFamiliarityDice = new CampaignOptionsLabel("ChassisFamiliarityDice",
+              getMetadata(new Version(0, 51, 1), CampaignOptionFlag.CUSTOM_SYSTEM, CampaignOptionFlag.RECOMMENDED));
         lblChassisFamiliarityDice.addMouseListener(createTipPanelUpdater("ChassisFamiliarityDice"));
         spnChassisFamiliarityDice = new CampaignOptionsSpinner("ChassisFamiliarityDice",
               1, 0, 20, 1);
