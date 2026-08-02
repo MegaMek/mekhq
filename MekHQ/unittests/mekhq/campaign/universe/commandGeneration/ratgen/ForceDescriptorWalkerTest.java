@@ -55,6 +55,7 @@ import mekhq.campaign.Campaign;
 import mekhq.campaign.force.Formation;
 import mekhq.campaign.force.FormationLevel;
 import mekhq.campaign.universe.enums.ForceNamingMethod;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
 
@@ -64,6 +65,22 @@ import org.mockito.ArgumentCaptor;
  * formation. Created formations are named through {@link FormationNamer}.
  */
 class ForceDescriptorWalkerTest {
+
+    /**
+     * Drops any {@link Factions2} left behind by an earlier test class, so the assertions below read the real
+     * universe data rather than whatever the previous class happened to install.
+     *
+     * <p>{@code Factions2} is a static singleton, and {@code Factions.load(true)} resolves it through
+     * {@code Factions2.getInstance(true)}, which caches an instance built from the cut-down test directory. That
+     * directory holds factions but no commands, so once any of the dozen test classes that load faction data for
+     * testing has run, {@code WOB.PM} and every other subcommand has vanished for the rest of the JVM. Clearing the
+     * singleton here forces the no-argument constructor to reload both factions and commands, which makes this class
+     * independent of the order it runs in.</p>
+     */
+    @BeforeAll
+    static void useRealUniverseData() {
+        Factions2.setInstance(null);
+    }
 
     private static final int ECHELON_LANCE = 3;
     private static final int ECHELON_COMPANY = 4;
