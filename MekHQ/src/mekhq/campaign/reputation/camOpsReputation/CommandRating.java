@@ -160,8 +160,7 @@ public class CommandRating {
         // Reputation
         int reputation = commander.getAdjustedFame(isUseAgingEffects,
               isClanCampaign,
-              today,
-              commander.getRankNumeric());
+              today);
         if (reputation < 0) {
             traitScore -= 1;
         } else if (reputation > 0) {

@@ -33,11 +33,13 @@
 package mekhq.gui.campaignOptions.contents;
 
 import jakarta.annotation.Nonnull;
+import mekhq.campaign.campaignOptions.CampaignOption;
 import mekhq.campaign.campaignOptions.CampaignOptions;
 
 class SystemsOptionsModel {
     int manualUnitRatingModifier;
     boolean resetCriminalRecord;
+    boolean useChaosReputation;
     boolean requireSupportForceTransportation;
     boolean clampReputationPayMultiplier;
     boolean reduceReputationPerformanceModifier;
@@ -59,6 +61,7 @@ class SystemsOptionsModel {
     SystemsOptionsModel(@Nonnull CampaignOptions options) {
         manualUnitRatingModifier = options.getManualUnitRatingModifier();
         resetCriminalRecord = false;
+        useChaosReputation = options.get(CampaignOption.USE_CHAOS_REPUTATION);
         requireSupportForceTransportation = options.isRequireSupportForceTransportation();
         clampReputationPayMultiplier = options.isClampReputationPayMultiplier();
         reduceReputationPerformanceModifier = options.isReduceReputationPerformanceModifier();
@@ -80,6 +83,7 @@ class SystemsOptionsModel {
 
     void applyTo(@Nonnull CampaignOptions options) {
         options.setManualUnitRatingModifier(manualUnitRatingModifier);
+        options.set(CampaignOption.USE_CHAOS_REPUTATION, useChaosReputation);
         options.setRequireSupportForceTransportation(requireSupportForceTransportation);
         options.setClampReputationPayMultiplier(clampReputationPayMultiplier);
         options.setReduceReputationPerformanceModifier(reduceReputationPerformanceModifier);

@@ -110,6 +110,8 @@ public final class CampaignOption<T> {
           of(Boolean.class, false, "reduceReputationPerformanceModifier");
     public static final CampaignOption<Boolean> REPUTATION_PERFORMANCE_MODIFIER_CUT_OFF =
           of(Boolean.class, false, "reputationPerformanceModifierCutOff");
+    public static final CampaignOption<Boolean> USE_CHAOS_REPUTATION =
+          of(Boolean.class, false, "useChaosReputation");
     public static final CampaignOption<Boolean> USE_ERA_MODS =
           of(Boolean.class, false, "useEraMods");
     public static final CampaignOption<Boolean> ASSIGNED_TECH_FIRST =

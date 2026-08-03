@@ -294,7 +294,7 @@ public enum PersonnelTableModelColumn implements MHQTableColumn {
           Person::getExtraIncomeTraitLevel, Object::toString),
     FAME("Column.FAME.title", Comparators.INT_COMPARATOR,
           (person, campaign) -> person.getAdjustedFame(campaign.getCampaignOptions().isUseAgeEffects(),
-                campaign.isClanCampaign(), campaign.getLocalDate(), person.getRankNumeric()), Object::toString),
+                campaign.isClanCampaign(), campaign.getLocalDate()), Object::toString),
     UNLUCKY("Column.UNLUCKY.title", Comparators.INT_COMPARATOR,
           Person::getUnlucky, Object::toString),
     BLOODMARK("Column.BLOODMARK.title", Comparators.INT_COMPARATOR,

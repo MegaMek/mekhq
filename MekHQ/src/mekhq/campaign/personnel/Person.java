@@ -7261,7 +7261,7 @@ public class Person implements ILocatable {
 
     public int getAdjustedReputation(boolean isUseAgingEffects, boolean isClanCampaign, LocalDate currentDate) {
         return chaosCampaignReputation + chaosCampaignCriminalRecord + getAdjustedFame(isUseAgingEffects,
-              isClanCampaign, currentDate, getRankNumeric());
+              isClanCampaign, currentDate);
     }
 
     /** Generally you will want to call {@link #getAdjustedReputation(boolean, boolean, LocalDate)} instead */
@@ -7491,22 +7491,16 @@ public class Person implements ILocatable {
      * @param isUseAgingEffects Indicates whether aging effects should be applied to the fame calculation.
      * @param isClanCampaign    Indicates whether the current campaign is specific to a clan.
      * @param today             The current date used to calculate the character's age.
-     * @param rankNumeric       The rank index of the character, which can adjust the fame modifier in clan-based
-     *                          campaigns.
      *
      * @return The adjusted fame value, accounting for factors like age, clan campaign status, bloodname possession, and
      *       rank. If aging effects are disabled, the base fame value is returned.
      */
-    public int getAdjustedFame(boolean isUseAgingEffects, boolean isClanCampaign, LocalDate today,
-          int rankNumeric) {
+    public int getAdjustedFame(boolean isUseAgingEffects, boolean isClanCampaign, LocalDate today) {
         final int PATHOLOGIC_RACISM_FAME_PENALTY = -2;
 
-        int modifiers = isUseAgingEffects ?
-                              getFameAgeModifier(getAge(today),
-                                    isClanCampaign,
-                                    !isNullOrBlank(bloodname),
-                                    rankNumeric) :
-                              0;
+        int fameModifier = getFameAgeModifier(getAge(today), isClanCampaign, !isNullOrBlank(bloodname),
+              getRankNumeric());
+        int modifiers = isUseAgingEffects ? fameModifier : 0;
 
         boolean hasRacism = options.booleanOption(COMPULSION_RACISM);
         modifiers -= hasRacism ? 1 : 0;
@@ -9606,7 +9600,7 @@ public class Person implements ILocatable {
      */
     public SkillModifierData getSkillModifierData(boolean isUseAgingEffects, boolean isClanCampaign, LocalDate today,
           boolean excludeInjuryEffects) {
-        int adjustedFame = getAdjustedFame(isUseAgingEffects, isClanCampaign, today, rank);
+        int adjustedFame = getAdjustedFame(isUseAgingEffects, isClanCampaign, today);
 
         boolean isAmbidextrous = options.booleanOption(PersonnelOptions.ATOW_AMBIDEXTROUS);
         List<InjuryEffect> injuryEffects = excludeInjuryEffects ?

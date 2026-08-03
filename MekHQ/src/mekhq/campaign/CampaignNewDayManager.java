@@ -109,6 +109,7 @@ import megamek.logging.MMLogger;
 import mekhq.MHQOptions;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign.AdministratorSpecialization;
+import mekhq.campaign.campaignOptions.CampaignOption;
 import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.digitalGM.stratCon.StratConCampaignState;
 import mekhq.campaign.digitalGM.stratCon.StratConCoords;
@@ -579,8 +580,11 @@ public class CampaignNewDayManager {
             processNewDayATB();
         }
 
-        processCamOpsReputationChanges();
-        processChaosCampaignReputationChanges();
+        if (campaignOptions.get(CampaignOption.USE_CHAOS_REPUTATION)) {
+            processChaosCampaignReputationChanges();
+        } else {
+            processCamOpsReputationChanges();
+        }
 
         if (campaignOptions.isUseEducationModule()) {
             processEducationNewDay();
