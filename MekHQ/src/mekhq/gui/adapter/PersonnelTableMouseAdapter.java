@@ -273,6 +273,8 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
     private static final String CMD_REMOVE_ROLEPLAY_SKILLS = "REMOVE_ROLEPLAY_SKILLS";
     private static final String CMD_GENERATE_ROLEPLAY_ATTRIBUTES = "GENERATE_ROLEPLAY_ATTRIBUTES";
     private static final String CMD_GENERATE_ROLEPLAY_TRAITS = "GENERATE_ROLEPLAY_TRAITS";
+    private static final String CMD_SET_REPUTATION = "CMD_SET_REPUTATION";
+    private static final String CMD_SET_CRIMINAL_RECORD = "CMD_SET_CRIMINAL_RECORD";
 
     private static final String CMD_FREE = "FREE";
     private static final String CMD_EXECUTE = "EXECUTE";
@@ -787,8 +789,7 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
                 choiceDialog.setVisible(true);
 
                 int choice = choiceDialog.getValue();
-                if (choice < 0) {
-                    // <0 indicates Cancellation
+                if (choiceDialog.wasCanceled()) {
                     return;
                 }
 
@@ -1472,19 +1473,18 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
                 PopupValueChoiceDialog popupValueChoiceDialog = new PopupValueChoiceDialog(getFrame(),
                       true,
                       resources.getString("xp.text"),
-                      1,
-                      0);
+                      0,
+                      Integer.MIN_VALUE,
+                      Integer.MAX_VALUE);
                 popupValueChoiceDialog.setVisible(true);
 
-                int ia = popupValueChoiceDialog.getValue();
-                if (ia <= 0) {
-                    // <0 indicates Cancellation
-                    // =0 is a No-Op
+                int xpChange = popupValueChoiceDialog.getValue();
+                if (popupValueChoiceDialog.wasCanceled()) {
                     return;
                 }
 
                 for (Person person : people) {
-                    person.awardXP(getCampaign(), ia);
+                    person.awardXP(getCampaign(), xpChange);
                     MekHQ.triggerEvent(new PersonChangedEvent(person));
                 }
                 break;
@@ -1494,14 +1494,15 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
                       true,
                       resources.getString("xp.text"),
                       selectedPerson.getXP(),
-                      0);
+                      0,
+                      Integer.MAX_VALUE);
                 popupValueChoiceDialog.setVisible(true);
-                if (popupValueChoiceDialog.getValue() < 0) {
+                if (popupValueChoiceDialog.wasCanceled()) {
                     return;
                 }
-                int i = popupValueChoiceDialog.getValue();
+                int newXp = popupValueChoiceDialog.getValue();
                 for (Person person : people) {
-                    person.setXP(getCampaign(), i);
+                    person.setXP(getCampaign(), newXp);
                     MekHQ.triggerEvent(new PersonChangedEvent(person));
                 }
                 break;
@@ -1771,7 +1772,7 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
 
                 int newSalary = salaryDialog.getValue();
 
-                if (newSalary < -1) {
+                if (salaryDialog.wasCanceled()) {
                     return;
                 }
 
@@ -1783,18 +1784,16 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
                 break;
             }
             case CMD_GIVE_PAYMENT: {
-                PopupValueChoiceDialog popupValueChoiceDialog = new PopupValueChoiceDialog(getFrame(),
+                PopupValueChoiceDialog givePaymentDialog = new PopupValueChoiceDialog(getFrame(),
                       true,
                       resources.getString("givePayment.title"),
                       1000,
                       1,
                       1000000);
-                popupValueChoiceDialog.setVisible(true);
+                givePaymentDialog.setVisible(true);
 
-                int payment = popupValueChoiceDialog.getValue();
-                if (payment <= 0) {
-                    // <0 indicates Cancellation
-                    // =0 is a No-Op
+                int payment = givePaymentDialog.getValue();
+                if (givePaymentDialog.wasCanceled()) {
                     return;
                 }
 
@@ -1869,6 +1868,47 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
                 AbstractSkillGenerator skillGenerator = new DefaultSkillGenerator(skillPreferences);
                 for (Person person : people) {
                     skillGenerator.generateTraits(person);
+                    MekHQ.triggerEvent(new PersonChangedEvent(person));
+                }
+                break;
+            }
+            case CMD_SET_REPUTATION: {
+                PopupValueChoiceDialog setReputationDialog = new PopupValueChoiceDialog(getFrame(),
+                      true,
+                      getText("setReputation.text"),
+                      0,
+                      Integer.MIN_VALUE,
+                      Integer.MAX_VALUE);
+                setReputationDialog.setVisible(true);
+
+                int choice = setReputationDialog.getValue();
+                if (setReputationDialog.wasCanceled()) {
+                    return;
+                }
+
+                for (Person person : people) {
+                    person.setReputationDirect(choice);
+                    MekHQ.triggerEvent(new PersonChangedEvent(person));
+                }
+                break;
+            }
+            case CMD_SET_CRIMINAL_RECORD: {
+                PopupValueChoiceDialog setCriminalRecord = new PopupValueChoiceDialog(getFrame(),
+                      true,
+                      getText("setCriminalRecord.text"),
+                      0,
+                      Integer.MIN_VALUE,
+                      0);
+                setCriminalRecord.setVisible(true);
+
+                int choice = setCriminalRecord.getValue();
+                if (setCriminalRecord.wasCanceled()) {
+                    // 0 indicates Cancellation
+                    return;
+                }
+
+                for (Person person : people) {
+                    person.setCriminalRecord(choice);
                     MekHQ.triggerEvent(new PersonChangedEvent(person));
                 }
                 break;
@@ -3243,7 +3283,7 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
             int connections = person.getConnections();
             int target = connections + 1;
             menuItem = new JMenuItem(String.format(resources.getString("spendOnConnections.text"), target, traitCost));
-            menuItem.setToolTipText(wordWrap(String.format(resources.getString("spendOnConnections.tooltip"),
+            menuItem.setToolTipText(wordWrap(getFormattedText("spendOnConnections.tooltip",
                   ((target > 0 ? "+" : "-") + target))));
             menuItem.setActionCommand(makeCommand(CMD_BUY_TRAIT,
                   CONNECTIONS_LABEL,
@@ -4639,6 +4679,16 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
 
             menuItem = new JMenuItem(resources.getString("removeRoleplaySkills.text"));
             menuItem.setActionCommand(CMD_REMOVE_ROLEPLAY_SKILLS);
+            menuItem.addActionListener(this);
+            personalityMenu.add(menuItem);
+
+            menuItem = new JMenuItem(getText("setReputation.text"));
+            menuItem.setActionCommand(CMD_SET_REPUTATION);
+            menuItem.addActionListener(this);
+            personalityMenu.add(menuItem);
+
+            menuItem = new JMenuItem(getText("setCriminalRecord.text"));
+            menuItem.setActionCommand(CMD_SET_CRIMINAL_RECORD);
             menuItem.addActionListener(this);
             personalityMenu.add(menuItem);
 

@@ -214,12 +214,12 @@ public class PartsReportDialog extends JDialog {
                 int row = Integer.parseInt(e.getActionCommand());
                 PartInUse partInUse = overviewPartsModel.getPartInUse(row);
                 int quantity = 1;
-                PopupValueChoiceDialog pcd = new PopupValueChoiceDialog(gui.getFrame(), true,
+                PopupValueChoiceDialog bulkPurchaseDialog = new PopupValueChoiceDialog(gui.getFrame(), true,
                       "How Many " + partInUse.getPartToBuy().getAcquisitionName(), quantity, 1,
                       CampaignGUI.MAX_QUANTITY_SPINNER);
-                pcd.setVisible(true);
-                quantity = pcd.getValue();
-                if (quantity <= 0) {
+                bulkPurchaseDialog.setVisible(true);
+                quantity = bulkPurchaseDialog.getValue();
+                if (bulkPurchaseDialog.wasCanceled()) {
                     return;
                 }
                 IAcquisitionWork partToBuy = partInUse.getPartToBuy();
@@ -252,15 +252,15 @@ public class PartsReportDialog extends JDialog {
                 }
                 int spareQty = spares.stream().mapToInt(Part::getSellableQuantity).sum();
                 int sellQty = 1;
-                PopupValueChoiceDialog popupValueChoiceDialog = new PopupValueChoiceDialog(gui.getFrame(),
+                PopupValueChoiceDialog sellQuantityDialog = new PopupValueChoiceDialog(gui.getFrame(),
                       true,
                       "Sell how many " + spares.getFirst().getName(),
                       sellQty,
                       1,
                       CampaignGUI.MAX_QUANTITY_SPINNER);
-                popupValueChoiceDialog.setVisible(true);
-                sellQty = popupValueChoiceDialog.getValue();
-                if (sellQty <= 0) {
+                sellQuantityDialog.setVisible(true);
+                sellQty = sellQuantityDialog.getValue();
+                if (sellQuantityDialog.wasCanceled()) {
                     return;
                 }
                 if (sellQty > spareQty) {
@@ -302,13 +302,13 @@ public class PartsReportDialog extends JDialog {
                 int row = Integer.parseInt(e.getActionCommand());
                 PartInUse partInUse = overviewPartsModel.getPartInUse(row);
                 int quantity = 1;
-                PopupValueChoiceDialog pcd = new PopupValueChoiceDialog(gui.getFrame(), true,
+                PopupValueChoiceDialog addBulkDialog = new PopupValueChoiceDialog(gui.getFrame(), true,
                       "How Many " + partInUse.getPartToBuy().getAcquisitionName(), quantity, 1,
                       CampaignGUI.MAX_QUANTITY_SPINNER);
-                pcd.setVisible(true);
-                quantity = pcd.getValue();
+                addBulkDialog.setVisible(true);
+                quantity = addBulkDialog.getValue();
                 IAcquisitionWork partToBuy = partInUse.getPartToBuy();
-                while (quantity > 0) {
+                while (addBulkDialog.wasCanceled()) {
                     campaign.getQuartermaster()
                           .addPart((Part) partToBuy.getNewEquipment(), 0, false, getSelectedPlace().getWarehouse());
                     --quantity;
