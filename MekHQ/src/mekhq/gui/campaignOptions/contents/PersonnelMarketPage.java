@@ -48,7 +48,7 @@ import megamek.client.ui.comboBoxes.MMComboBox;
 import mekhq.campaign.market.personnelMarket.enums.PersonnelMarketStyle;
 import mekhq.gui.campaignOptions.CampaignOptionFlag;
 import mekhq.gui.campaignOptions.components.CampaignOptionsCheckBox;
-import mekhq.gui.campaignOptions.components.CampaignOptionsFormPanel;
+import megamek.client.ui.settings.SettingsFormPanel;
 import mekhq.gui.campaignOptions.components.CampaignOptionsHeaderPanel;
 import mekhq.gui.campaignOptions.components.CampaignOptionsLabel;
 import mekhq.gui.campaignOptions.components.CampaignOptionsPagePanel;
@@ -65,8 +65,8 @@ import mekhq.gui.campaignOptions.components.CampaignOptionsPagePanel;
  * {@link #writeToModel(MarketsOptionsModel)} are no-ops.</p>
  */
 class PersonnelMarketPage {
-    private static final int LABEL_COLUMN_WIDTH = CampaignOptionsFormPanel.DEFAULT_LABEL_WIDTH;
-    private static final int CONTROL_COLUMN_WIDTH = CampaignOptionsFormPanel.DEFAULT_CONTROL_WIDTH;
+    private static final int LABEL_COLUMN_WIDTH = SettingsFormPanel.DEFAULT_LABEL_WIDTH;
+    private static final int CONTROL_COLUMN_WIDTH = SettingsFormPanel.DEFAULT_CONTROL_WIDTH;
     private static final int CHECKBOX_GRID_COLUMNS = 2;
 
     private CampaignOptionsHeaderPanel personnelMarketHeader;
@@ -138,7 +138,7 @@ class PersonnelMarketPage {
         chkUsePersonnelHireHiringHallOnly.addMouseListener(createTipPanelUpdater("UsePersonnelHireHiringHallOnly"));
 
         // Layout the Panel
-        final CampaignOptionsFormPanel panel = new CampaignOptionsFormPanel("PersonnelMarketGeneralOptionsPanel",
+        final SettingsFormPanel panel = new SettingsFormPanel("PersonnelMarketGeneralOptionsPanel",
                 LABEL_COLUMN_WIDTH,
                 CONTROL_COLUMN_WIDTH);
         panel.addRow(lblPersonnelMarketStyle, comboPersonnelMarketStyle);

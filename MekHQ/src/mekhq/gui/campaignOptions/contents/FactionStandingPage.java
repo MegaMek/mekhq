@@ -46,7 +46,7 @@ import jakarta.annotation.Nonnull;
 import jakarta.annotation.Nullable;
 import mekhq.gui.campaignOptions.CampaignOptionFlag;
 import mekhq.gui.campaignOptions.components.CampaignOptionsCheckBox;
-import mekhq.gui.campaignOptions.components.CampaignOptionsFormPanel;
+import megamek.client.ui.settings.SettingsFormPanel;
 import mekhq.gui.campaignOptions.components.CampaignOptionsHeaderPanel;
 import mekhq.gui.campaignOptions.components.CampaignOptionsLabel;
 import mekhq.gui.campaignOptions.components.CampaignOptionsPagePanel;
@@ -64,8 +64,8 @@ import mekhq.gui.campaignOptions.components.CampaignOptionsSpinner;
  * {@link #writeToModel(SystemsOptionsModel)} are no-ops.</p>
  */
 class FactionStandingPage {
-    private static final int FORM_LABEL_COLUMN_WIDTH = CampaignOptionsFormPanel.DEFAULT_LABEL_WIDTH;
-    private static final int FORM_CONTROL_COLUMN_WIDTH = CampaignOptionsFormPanel.DEFAULT_CONTROL_WIDTH;
+    private static final int FORM_LABEL_COLUMN_WIDTH = SettingsFormPanel.DEFAULT_LABEL_WIDTH;
+    private static final int FORM_CONTROL_COLUMN_WIDTH = SettingsFormPanel.DEFAULT_CONTROL_WIDTH;
     private static final int CHECKBOX_GRID_COLUMNS = 2;
 
     private CampaignOptionsHeaderPanel factionStandingHeader;
@@ -141,7 +141,7 @@ class FactionStandingPage {
         spnRegardMultiplier.addMouseListener(createTipPanelUpdater("RegardMultiplier"));
 
         // Layout the Panel
-        final CampaignOptionsFormPanel panel = new CampaignOptionsFormPanel("FactionStandingTrackingPanel",
+        final SettingsFormPanel panel = new SettingsFormPanel("FactionStandingTrackingPanel",
                 FORM_LABEL_COLUMN_WIDTH,
                 FORM_CONTROL_COLUMN_WIDTH);
         panel.addCheckBoxGrid(CHECKBOX_GRID_COLUMNS,
@@ -202,7 +202,7 @@ class FactionStandingPage {
         chkUseFactionStandingSupportPoints.addMouseListener(createTipPanelUpdater("UseFactionStandingSupportPoints"));
 
         // Layout the Panel
-        final CampaignOptionsFormPanel panel = new CampaignOptionsFormPanel("FactionStandingEffectsPanel",
+        final SettingsFormPanel panel = new SettingsFormPanel("FactionStandingEffectsPanel",
                 FORM_LABEL_COLUMN_WIDTH,
                 FORM_CONTROL_COLUMN_WIDTH);
         panel.addCheckBoxGrid(CHECKBOX_GRID_COLUMNS,

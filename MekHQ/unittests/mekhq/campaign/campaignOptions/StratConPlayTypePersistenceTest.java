@@ -47,10 +47,10 @@ import javax.xml.parsers.DocumentBuilderFactory;
 
 import megamek.Version;
 import mekhq.campaign.Campaign;
-import mekhq.campaign.digitalGM.stratCon.MaplessStratConGM;
-import mekhq.campaign.digitalGM.stratCon.SinglesStratConGM;
-import mekhq.campaign.digitalGM.stratCon.StratConDigitalGM;
-import mekhq.campaign.digitalGM.stratCon.StratConPlayType;
+import mekhq.campaign.digitalGM.stratCon.gm.MaplessStratConGM;
+import mekhq.campaign.digitalGM.stratCon.gm.SinglesStratConGM;
+import mekhq.campaign.digitalGM.stratCon.gm.StratConDigitalGM;
+import mekhq.campaign.digitalGM.stratCon.gm.StratConPlayType;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.EnumSource;

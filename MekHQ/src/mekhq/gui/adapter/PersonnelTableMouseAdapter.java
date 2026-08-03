@@ -119,6 +119,7 @@ import mekhq.MekHQ;
 import mekhq.Utilities;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.Kill;
+import mekhq.campaign.campaignOptions.CampaignOption;
 import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.events.persons.PersonChangedEvent;
 import mekhq.campaign.events.persons.PersonLogEvent;
@@ -759,7 +760,14 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
             case CMD_CHANGE_ATTRIBUTE: {
                 SkillAttribute attribute = SkillAttribute.fromString(data[1]);
 
-                selectedPerson.changeAttributeScore(attribute, 1);
+                if (attribute == SkillAttribute.EDGE) {
+                    int maximumEdge = getCampaignOptions().get(CampaignOption.MAXIMUM_EDGE);
+                    if (selectedPerson.gainEdge(1, maximumEdge) == 0) {
+                        return;
+                    }
+                } else {
+                    selectedPerson.changeAttributeScore(attribute, 1);
+                }
 
                 int cost = MathUtility.parseInt(data[2]);
                 selectedPerson.spendXP(cost);
@@ -1851,7 +1859,7 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
                 RandomSkillPreferences skillPreferences = getCampaign().getRandomSkillPreferences();
                 AbstractSkillGenerator skillGenerator = new DefaultSkillGenerator(skillPreferences);
                 for (Person person : people) {
-                    skillGenerator.generateAttributes(person, getCampaign().getCampaignOptions().isUseEdge());
+                    skillGenerator.generateAttributes(person, getCampaignOptions());
                     MekHQ.triggerEvent(new PersonChangedEvent(person));
                 }
                 break;
@@ -3376,6 +3384,7 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
             JMenu attributesMenuIncrease = new JMenu(resources.getString("spendOnAttributes.increase"));
             int attributeImprovementCost = (int) round(getCampaignOptions().getAttributeCost() * costMultiplier);
             int edgeCost = (int) round(getCampaignOptions().getEdgeCost() * costMultiplier);
+            int maximumEdge = getCampaignOptions().get(CampaignOption.MAXIMUM_EDGE);
             for (SkillAttribute attribute : SkillAttribute.values()) {
                 if (attribute.isNoAttribute()) {
                     continue;
@@ -3389,7 +3398,7 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
                 int attributeCost = (int) round((isEdge ? edgeCost : attributeImprovementCost)
                                                       * reasoningXpCostMultiplier);
 
-                int current = person.getAttributeScore(attribute);
+                int current = isEdge ? person.getEdge() : person.getAttributeScore(attribute);
                 // Improve
                 target = current + 1;
                 menuItem = new JMenuItem(String.format(resources.getString("spendOnAttributes.format"),
@@ -3402,8 +3411,11 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
                       String.valueOf(attribute),
                       String.valueOf(attributeCost)));
                 menuItem.addActionListener(this);
-                int attributeCap = person.getAttributeCap(attribute);
-                menuItem.setEnabled(target <= attributeCap && person.getXP() >= attributeCost);
+                int attributeCap = isEdge
+                      ? Math.min(person.getAttributeCap(attribute), maximumEdge)
+                      : person.getAttributeCap(attribute);
+                boolean canImprove = !isEdge || person.canGainEdge(maximumEdge);
+                menuItem.setEnabled(canImprove && target <= attributeCap && person.getXP() >= attributeCost);
                 attributesMenuIncrease.add(menuItem);
             }
             menu.add(attributesMenuIncrease);
@@ -5266,6 +5278,33 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
                       combatAbilityMenu,
                       maneuveringAbilityMenu,
                       characterFlawMenu, utilityAbilityMenu,
+                      characterOriginMenu);
+            }
+        } else if (spa.getName().equals(PersonnelOptions.UNIT_SPECIALIST)) {
+            JMenu specialistMenu = new JMenu(spa.getDisplayName());
+            boolean isSpecialist = person.getOptions().booleanOption(spa.getName());
+            String currentChoice = isSpecialist ? person.getOptions().getOption(spa.getName()).stringValue() : "";
+            for (String choice : spa.getChoiceValues()) {
+                if (choice.equalsIgnoreCase("none") || choice.equals(currentChoice)) {
+                    continue;
+                }
+                menuItem = new JMenuItem(String.format(resources.getString("abilityDesc.format"), choice, costDesc));
+                menuItem.setToolTipText(wordWrap(spa.getDescription() + "<br><br>" + spa.getAllPrereqDesc()));
+                menuItem.setActionCommand(makeCommand(CMD_ACQUIRE_CUSTOM_CHOICE,
+                      choice,
+                      String.valueOf(cost),
+                      spa.getName()));
+                menuItem.addActionListener(this);
+                menuItem.setEnabled(available && isEligible);
+                specialistMenu.add(menuItem);
+            }
+            if (specialistMenu.getMenuComponentCount() > 0) {
+                placeInAppropriateSPASubMenu(spa,
+                      specialistMenu,
+                      combatAbilityMenu,
+                      maneuveringAbilityMenu,
+                      characterFlawMenu,
+                      utilityAbilityMenu,
                       characterOriginMenu);
             }
         } else if (Optional.ofNullable((person.getOptions().getOption(spa.getName()))).isPresent() &&

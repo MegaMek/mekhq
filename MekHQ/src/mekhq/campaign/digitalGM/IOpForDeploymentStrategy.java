@@ -33,9 +33,9 @@
 package mekhq.campaign.digitalGM;
 
 import megamek.common.annotations.Nullable;
-import mekhq.campaign.digitalGM.stratCon.AbstractStratConGM;
 import mekhq.campaign.digitalGM.stratCon.StratConCoords;
 import mekhq.campaign.digitalGM.stratCon.StratConTrackState;
+import mekhq.campaign.digitalGM.stratCon.gm.AbstractStratConGM;
 
 /**
  * Strategy for deciding <i>where on the track</i> the OpFor deploys &mdash; which coordinates a generated scenario is
