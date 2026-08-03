@@ -115,13 +115,13 @@ import mekhq.campaign.againstTheBot.AtBConfiguration;
 import mekhq.campaign.camOpsReputation.IUnitRating;
 import mekhq.campaign.campaignOptions.BoardScalingType;
 import mekhq.campaign.campaignOptions.CampaignOptions;
-import mekhq.campaign.digitalGM.stratCon.StratConBiomeManifest;
 import mekhq.campaign.digitalGM.stratCon.StratConCampaignState;
 import mekhq.campaign.digitalGM.stratCon.StratConContractInitializer;
-import mekhq.campaign.digitalGM.stratCon.StratConFacility;
-import mekhq.campaign.digitalGM.stratCon.StratConFacility.FacilityType;
 import mekhq.campaign.digitalGM.stratCon.StratConScenario;
 import mekhq.campaign.digitalGM.stratCon.StratConTrackState;
+import mekhq.campaign.digitalGM.stratCon.biome.StratConBiomeManifest;
+import mekhq.campaign.digitalGM.stratCon.facility.StratConFacility;
+import mekhq.campaign.digitalGM.stratCon.facility.StratConFacility.FacilityType;
 import mekhq.campaign.enums.DragoonRating;
 import mekhq.campaign.force.CombatTeam;
 import mekhq.campaign.force.Formation;
@@ -1206,8 +1206,10 @@ public class AtBDynamicScenarioFactory {
                         continue;
                     }
 
+                    boolean forceIsEmpty = forceBV == 0;
                     // The +10% bound allows us to have a degree of leeway when building the force
-                    if ((forceBV + battleValue) <= (forceBVBudget * 1.1)) {
+                    boolean hasNotExceededForceBudget = forceBV <= forceBVBudget * 1.1;
+                    if (forceIsEmpty || hasNotExceededForceBudget) {
                         forceComposition.add(entity);
 
                         for (Transporter transporter : entity.getTransports()) {
@@ -2913,7 +2915,6 @@ public class AtBDynamicScenarioFactory {
         entity.setGame(campaign.getGame());
 
         RandomNameGenerator nameGenerator = RandomNameGenerator.getInstance();
-        nameGenerator.setChosenFaction(faction.getNameGenerator());
 
         Gender gender;
         int nonBinaryDiceSize = campaign.getCampaignOptions().getNonBinaryDiceSize();
@@ -2926,7 +2927,7 @@ public class AtBDynamicScenarioFactory {
 
         String[] crewNameArray = nameGenerator.generateGivenNameSurnameSplit(gender,
               faction.isClan(),
-              faction.getShortName());
+              faction.getNameGenerator());
         String crewName = crewNameArray[0];
         crewName += !StringUtility.isNullOrBlank(crewNameArray[1]) ? ' ' + crewNameArray[1] : "";
 

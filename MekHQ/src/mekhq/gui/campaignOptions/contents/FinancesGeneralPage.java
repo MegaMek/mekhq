@@ -49,7 +49,7 @@ import megamek.client.ui.comboBoxes.MMComboBox;
 import mekhq.campaign.finances.enums.FinancialYearDuration;
 import mekhq.gui.campaignOptions.CampaignOptionFlag;
 import mekhq.gui.campaignOptions.components.CampaignOptionsCheckBox;
-import mekhq.gui.campaignOptions.components.CampaignOptionsFormPanel;
+import megamek.client.ui.settings.SettingsFormPanel;
 import mekhq.gui.campaignOptions.components.CampaignOptionsHeaderPanel;
 import mekhq.gui.campaignOptions.components.CampaignOptionsLabel;
 import mekhq.gui.campaignOptions.components.CampaignOptionsPagePanel;
@@ -68,8 +68,8 @@ import mekhq.gui.campaignOptions.components.CampaignOptionsSpinner;
  * {@link #writeToModel(FinancesOptionsModel)} are no-ops.</p>
  */
 class FinancesGeneralPage {
-    private static final int LABEL_COLUMN_WIDTH = CampaignOptionsFormPanel.DEFAULT_LABEL_WIDTH;
-    private static final int CONTROL_COLUMN_WIDTH = CampaignOptionsFormPanel.DEFAULT_CONTROL_WIDTH;
+    private static final int LABEL_COLUMN_WIDTH = SettingsFormPanel.DEFAULT_LABEL_WIDTH;
+    private static final int CONTROL_COLUMN_WIDTH = SettingsFormPanel.DEFAULT_CONTROL_WIDTH;
 
     private CampaignOptionsHeaderPanel financesGeneralOptions;
     private JPanel pnlGeneralOptions;
@@ -227,7 +227,7 @@ class FinancesGeneralPage {
         payForHousingBox.addMouseListener(createTipPanelUpdater("PayForHousingBox"));
 
         // Layout the Panel
-        final CampaignOptionsFormPanel panel = new CampaignOptionsFormPanel("PaymentsPanel",
+        final SettingsFormPanel panel = new SettingsFormPanel("PaymentsPanel",
                 LABEL_COLUMN_WIDTH,
                 CONTROL_COLUMN_WIDTH);
         panel.addCheckBoxGrid(2,
@@ -284,7 +284,7 @@ class FinancesGeneralPage {
         chkSimulateGrayMonday.addMouseListener(createTipPanelUpdater("SimulateGrayMonday"));
 
         // Layout the Panel
-        final CampaignOptionsFormPanel panel = new CampaignOptionsFormPanel("GeneralOptionsPanel",
+        final SettingsFormPanel panel = new SettingsFormPanel("GeneralOptionsPanel",
                 LABEL_COLUMN_WIDTH,
                 CONTROL_COLUMN_WIDTH);
         panel.addCheckBoxGrid(2,
@@ -317,7 +317,7 @@ class FinancesGeneralPage {
         sellPartsBox.addMouseListener(createTipPanelUpdater("SellPartsBox"));
 
         // Layout the Panel
-        final CampaignOptionsFormPanel panel = new CampaignOptionsFormPanel("SalesPanel",
+        final SettingsFormPanel panel = new SettingsFormPanel("SalesPanel",
                 LABEL_COLUMN_WIDTH,
                 CONTROL_COLUMN_WIDTH);
         panel.addCheckBoxGrid(2, sellUnitsBox, sellPartsBox);
@@ -344,7 +344,7 @@ class FinancesGeneralPage {
         spnTaxesPercentage.addMouseListener(createTipPanelUpdater("TaxesPercentage"));
 
         // Layout the Panel
-        final CampaignOptionsFormPanel panel = new CampaignOptionsFormPanel("TaxesPanel",
+        final SettingsFormPanel panel = new SettingsFormPanel("TaxesPanel",
                 LABEL_COLUMN_WIDTH,
                 CONTROL_COLUMN_WIDTH);
         panel.addCheckBox(chkUseTaxes);
@@ -371,7 +371,7 @@ class FinancesGeneralPage {
         chkSharesForAll.addMouseListener(createTipPanelUpdater("SharesForAll"));
 
         // Layout the Panel
-        final CampaignOptionsFormPanel panel = new CampaignOptionsFormPanel("SharesPanel",
+        final SettingsFormPanel panel = new SettingsFormPanel("SharesPanel",
                 LABEL_COLUMN_WIDTH,
                 CONTROL_COLUMN_WIDTH);
         panel.addCheckBoxGrid(2, chkUseShareSystem, chkSharesForAll);
@@ -397,7 +397,7 @@ class FinancesGeneralPage {
         chkUseBetterExtraIncome.addMouseListener(createTipPanelUpdater("UseBetterExtraIncome"));
 
         // Layout the Panel
-        final CampaignOptionsFormPanel panel = new CampaignOptionsFormPanel("ATimeOfWarIncomePanel",
+        final SettingsFormPanel panel = new SettingsFormPanel("ATimeOfWarIncomePanel",
                 LABEL_COLUMN_WIDTH,
                 CONTROL_COLUMN_WIDTH);
         panel.addCheckBoxGrid(2,
@@ -439,7 +439,7 @@ class FinancesGeneralPage {
         spnRentedFacilitiesCostRepairBays.addMouseListener(createTipPanelUpdater("RentedFacilitiesCostRepairBays"));
 
         // Layout the Panel
-        final CampaignOptionsFormPanel panel = new CampaignOptionsFormPanel("RentedFacilitiesPanel",
+        final SettingsFormPanel panel = new SettingsFormPanel("RentedFacilitiesPanel",
                 LABEL_COLUMN_WIDTH,
                 CONTROL_COLUMN_WIDTH);
         panel.addRow(lblRentedFacilitiesCostHospitalBeds, spnRentedFacilitiesCostHospitalBeds);

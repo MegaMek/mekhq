@@ -33,6 +33,7 @@
 package mekhq.campaign.mission;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
@@ -41,10 +42,12 @@ import static testUtilities.MHQTestUtilities.mockCampaign;
 import java.io.File;
 import java.util.List;
 
+import megamek.client.generator.RandomNameGenerator;
 import megamek.common.Player;
 import megamek.common.equipment.EquipmentType;
 import megamek.common.loaders.MekSummary;
 import megamek.common.units.Entity;
+import megamek.common.units.EntityWeightClass;
 import megamek.common.units.UnitType;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.campaignOptions.CampaignOptions;
@@ -123,5 +126,24 @@ public class BotForceRandomizerTest {
         // There should be two units generated, as the player units score 1449BV, the same as the
         // Sparky.
         assertEquals(2, generated.size());
+    }
+
+    @Test
+    void testCrewGenerationPreservesConfiguredNameFaction() {
+        initializeTest();
+        RandomNameGenerator nameGenerator = RandomNameGenerator.getInstance();
+        String previousFaction = nameGenerator.getChosenFaction();
+        BotForceRandomizer randomizer = new BotForceRandomizer();
+        randomizer.setFactionCode("CC");
+
+        try {
+            nameGenerator.setChosenFaction("FS");
+            Entity generated = randomizer.getEntity(UnitType.MEK, EntityWeightClass.WEIGHT_MEDIUM, mockCampaign);
+
+            assertNotNull(generated);
+            assertEquals("FS", nameGenerator.getChosenFaction());
+        } finally {
+            nameGenerator.setChosenFaction(previousFaction);
+        }
     }
 }

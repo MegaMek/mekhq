@@ -48,7 +48,7 @@ import jakarta.annotation.Nullable;
 import megamek.client.ui.comboBoxes.MMComboBox;
 import mekhq.campaign.personnel.enums.RandomMarriageMethod;
 import mekhq.gui.campaignOptions.components.CampaignOptionsCheckBox;
-import mekhq.gui.campaignOptions.components.CampaignOptionsFormPanel;
+import megamek.client.ui.settings.SettingsFormPanel;
 import mekhq.gui.campaignOptions.components.CampaignOptionsHeaderPanel;
 import mekhq.gui.campaignOptions.components.CampaignOptionsLabel;
 import mekhq.gui.campaignOptions.components.CampaignOptionsPagePanel;
@@ -67,8 +67,8 @@ import mekhq.gui.campaignOptions.components.CampaignOptionsSpinner;
  * {@link #writeToModel(RelationshipsOptionsModel)} are no-ops.</p>
  */
 class MarriagePage {
-    private static final int LABEL_COLUMN_WIDTH = CampaignOptionsFormPanel.DEFAULT_LABEL_WIDTH;
-    private static final int CONTROL_COLUMN_WIDTH = CampaignOptionsFormPanel.DEFAULT_CONTROL_WIDTH;
+    private static final int LABEL_COLUMN_WIDTH = SettingsFormPanel.DEFAULT_LABEL_WIDTH;
+    private static final int CONTROL_COLUMN_WIDTH = SettingsFormPanel.DEFAULT_CONTROL_WIDTH;
 
     private CampaignOptionsHeaderPanel marriageHeader;
     private JPanel pnlMarriageGeneralOptions;
@@ -151,7 +151,7 @@ class MarriagePage {
         chkLogMarriageNameChanges.addMouseListener(createTipPanelUpdater("LogMarriageNameChanges"));
 
         // Layout the Panel
-        final CampaignOptionsFormPanel panel = new CampaignOptionsFormPanel("MarriageGeneralOptionsPanel",
+        final SettingsFormPanel panel = new SettingsFormPanel("MarriageGeneralOptionsPanel",
                 LABEL_COLUMN_WIDTH,
                 CONTROL_COLUMN_WIDTH);
         panel.addCheckBoxGrid(2,
@@ -213,7 +213,7 @@ class MarriagePage {
         spnRandomNewDependentMarriage.addMouseListener(createTipPanelUpdater("RandomNewDependentMarriage"));
 
         // Layout the Panel
-        final CampaignOptionsFormPanel panel = new CampaignOptionsFormPanel("RandomMarriages",
+        final SettingsFormPanel panel = new SettingsFormPanel("RandomMarriages",
                 LABEL_COLUMN_WIDTH,
                 CONTROL_COLUMN_WIDTH);
         panel.addRow(lblRandomMarriageMethod, comboRandomMarriageMethod);

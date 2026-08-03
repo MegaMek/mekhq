@@ -60,7 +60,7 @@ import megamek.common.ui.FastJScrollPane;
 import mekhq.campaign.personnel.enums.AwardBonus;
 import mekhq.gui.campaignOptions.CampaignOptionFlag;
 import mekhq.gui.campaignOptions.components.CampaignOptionsCheckBox;
-import mekhq.gui.campaignOptions.components.CampaignOptionsFormPanel;
+import megamek.client.ui.settings.SettingsFormPanel;
 import mekhq.gui.campaignOptions.components.CampaignOptionsHeaderPanel;
 import mekhq.gui.campaignOptions.components.CampaignOptionsLabel;
 import mekhq.gui.campaignOptions.components.CampaignOptionsPagePanel;
@@ -78,8 +78,8 @@ import mekhq.gui.campaignOptions.components.CampaignOptionsSpinner;
  * {@link #writeToModel(PersonnelOptionsModel)} are no-ops.</p>
  */
 class AwardsPage {
-    private static final int LABEL_COLUMN_WIDTH = CampaignOptionsFormPanel.DEFAULT_LABEL_WIDTH;
-    private static final int CONTROL_COLUMN_WIDTH = CampaignOptionsFormPanel.DEFAULT_CONTROL_WIDTH;
+    private static final int LABEL_COLUMN_WIDTH = SettingsFormPanel.DEFAULT_LABEL_WIDTH;
+    private static final int CONTROL_COLUMN_WIDTH = SettingsFormPanel.DEFAULT_CONTROL_WIDTH;
 
     private CampaignOptionsHeaderPanel awardsHeader;
     private JPanel pnlAwardsGeneralOptions;
@@ -204,7 +204,7 @@ class AwardsPage {
         chkIgnoreStandardSet.addMouseListener(createTipPanelUpdater("IgnoreStandardSet"));
 
         // Layout the Panel
-        final CampaignOptionsFormPanel panel = new CampaignOptionsFormPanel("AwardsGeneralOptionsPanel",
+        final SettingsFormPanel panel = new SettingsFormPanel("AwardsGeneralOptionsPanel",
               LABEL_COLUMN_WIDTH,
               CONTROL_COLUMN_WIDTH);
         panel.addRow(lblAwardBonusStyle, comboAwardBonusStyle);
@@ -259,7 +259,7 @@ class AwardsPage {
         chkEnableMiscAwards.addMouseListener(createTipPanelUpdater("EnableMiscAwards"));
 
         // Layout the Panel
-        final CampaignOptionsFormPanel panel = new CampaignOptionsFormPanel("AutoAwardsFilterPanel",
+        final SettingsFormPanel panel = new SettingsFormPanel("AutoAwardsFilterPanel",
               LABEL_COLUMN_WIDTH,
               CONTROL_COLUMN_WIDTH);
         panel.addCheckBoxGrid(2,

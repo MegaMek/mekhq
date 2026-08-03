@@ -45,7 +45,7 @@ import jakarta.annotation.Nullable;
 import megamek.client.ui.comboBoxes.MMComboBox;
 import mekhq.campaign.market.enums.UnitMarketMethod;
 import mekhq.gui.campaignOptions.components.CampaignOptionsCheckBox;
-import mekhq.gui.campaignOptions.components.CampaignOptionsFormPanel;
+import megamek.client.ui.settings.SettingsFormPanel;
 import mekhq.gui.campaignOptions.components.CampaignOptionsHeaderPanel;
 import mekhq.gui.campaignOptions.components.CampaignOptionsLabel;
 import mekhq.gui.campaignOptions.components.CampaignOptionsPagePanel;
@@ -62,8 +62,8 @@ import mekhq.gui.campaignOptions.components.CampaignOptionsSpinner;
  * called, {@link #readFromModel(MarketsOptionsModel)} and {@link #writeToModel(MarketsOptionsModel)} are no-ops.</p>
  */
 class UnitMarketPage {
-    private static final int LABEL_COLUMN_WIDTH = CampaignOptionsFormPanel.DEFAULT_LABEL_WIDTH;
-    private static final int CONTROL_COLUMN_WIDTH = CampaignOptionsFormPanel.DEFAULT_CONTROL_WIDTH;
+    private static final int LABEL_COLUMN_WIDTH = SettingsFormPanel.DEFAULT_LABEL_WIDTH;
+    private static final int CONTROL_COLUMN_WIDTH = SettingsFormPanel.DEFAULT_CONTROL_WIDTH;
     private static final int CHECKBOX_GRID_COLUMNS = 2;
 
     private JLabel lblUnitMarketMethod;
@@ -145,7 +145,7 @@ class UnitMarketPage {
     }
 
     private @Nonnull JPanel createUnitMarketGenerationPanel() {
-        final CampaignOptionsFormPanel panel = new CampaignOptionsFormPanel("UnitMarketGenerationPanel",
+        final SettingsFormPanel panel = new SettingsFormPanel("UnitMarketGenerationPanel",
                 LABEL_COLUMN_WIDTH,
                 CONTROL_COLUMN_WIDTH);
         panel.addRow(lblUnitMarketMethod, comboUnitMarketMethod);
@@ -157,7 +157,7 @@ class UnitMarketPage {
     }
 
     private @Nonnull JPanel createUnitMarketDeliveryPanel() {
-        final CampaignOptionsFormPanel panel = new CampaignOptionsFormPanel("UnitMarketDeliveryPanel",
+        final SettingsFormPanel panel = new SettingsFormPanel("UnitMarketDeliveryPanel",
                 LABEL_COLUMN_WIDTH,
                 CONTROL_COLUMN_WIDTH);
         panel.addCheckBoxGrid(CHECKBOX_GRID_COLUMNS,

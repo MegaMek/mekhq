@@ -51,7 +51,7 @@ import mekhq.campaign.universe.PlanetarySystem.PlanetaryRating;
 import mekhq.campaign.universe.PlanetarySystem.PlanetarySophistication;
 import mekhq.gui.campaignOptions.CampaignOptionFlag;
 import mekhq.gui.campaignOptions.components.CampaignOptionsCheckBox;
-import mekhq.gui.campaignOptions.components.CampaignOptionsFormPanel;
+import megamek.client.ui.settings.SettingsFormPanel;
 import mekhq.gui.campaignOptions.components.CampaignOptionsHeaderPanel;
 import mekhq.gui.campaignOptions.components.CampaignOptionsLabel;
 import mekhq.gui.campaignOptions.components.CampaignOptionsModifierTablePanel;
@@ -72,8 +72,8 @@ import mekhq.gui.campaignOptions.components.CampaignOptionsSpinner;
  * are no-ops.</p>
  */
 class PlanetaryAcquisitionPage {
-    private static final int LABEL_COLUMN_WIDTH = CampaignOptionsFormPanel.DEFAULT_LABEL_WIDTH;
-    private static final int CONTROL_COLUMN_WIDTH = CampaignOptionsFormPanel.DEFAULT_CONTROL_WIDTH;
+    private static final int LABEL_COLUMN_WIDTH = SettingsFormPanel.DEFAULT_LABEL_WIDTH;
+    private static final int CONTROL_COLUMN_WIDTH = SettingsFormPanel.DEFAULT_CONTROL_WIDTH;
     private static final int MODIFIER_ROW_LABEL_COLUMN_WIDTH = 120;
     private static final int MODIFIER_CONTROL_COLUMN_WIDTH = 104;
 
@@ -176,7 +176,7 @@ class PlanetaryAcquisitionPage {
         usePlanetaryAcquisitionsVerbose.addMouseListener(createTipPanelUpdater("UsePlanetaryAcquisitionsVerbose"));
 
         // Layout the Panel
-        final CampaignOptionsFormPanel panel = new CampaignOptionsFormPanel("PlanetaryAcquisitionOptionsPanel",
+        final SettingsFormPanel panel = new SettingsFormPanel("PlanetaryAcquisitionOptionsPanel",
               LABEL_COLUMN_WIDTH,
               CONTROL_COLUMN_WIDTH);
         panel.addCheckBox(usePlanetaryAcquisitions);
@@ -219,7 +219,7 @@ class PlanetaryAcquisitionPage {
             i++;
         }
 
-        final CampaignOptionsFormPanel panel = new CampaignOptionsFormPanel("PlanetaryAcquisitionPageModifiersPanel",
+        final SettingsFormPanel panel = new SettingsFormPanel("PlanetaryAcquisitionPageModifiersPanel",
               MODIFIER_ROW_LABEL_COLUMN_WIDTH,
               MODIFIER_CONTROL_COLUMN_WIDTH);
         panel.addFullWidthComponent(tablePanel);
