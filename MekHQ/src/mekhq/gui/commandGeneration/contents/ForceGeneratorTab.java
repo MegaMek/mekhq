@@ -123,6 +123,10 @@ public class ForceGeneratorTab {
         // changes so the tree always matches what Accept will commit.
         viewUi.setToeChangeListener(this::invalidatePreviewNames);
         viewUi.setFormationNameProvider(this::previewNameFor);
+        // The chosen-units table below the controls is a Random Army concept - it collects units to add to a running
+        // game - and the Command Designer never reads it, committing the preview tree instead. That inert panel
+        // holds the formation mix editor here, so the mix is always on screen rather than behind a dialog.
+        viewUi.setFormationMixEditorVisible(true);
 
         ForceGeneratorOptionsView optionsView = viewUi.getOptionsView();
         // "Generate Company Command Lance" is a campaign-layer option, so it cannot live in the
