@@ -14,9 +14,7 @@ import static mekhq.utilities.ReportingUtilities.spanOpeningWithCustomColor;
 
 import java.time.LocalDate;
 import java.util.Collection;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import megamek.logging.MMLogger;
 import mekhq.campaign.Campaign;
@@ -52,14 +50,14 @@ public class ChaosReputation {
         Collection<Person> personnel = playerForce.allPersonnel();
         LocalDate currentDate = campaign.getLocalDate();
 
-        int modeReputation = calculateMostCommonReputation(personnel,
+        int modeReputation = calculateAverageReputation(personnel,
               campaign.getCampaignOptions().get(CampaignOption.USE_AGE_EFFECTS),
               playerForce.isClanForce(),
               currentDate);
 
         int debtModifier = getDebtModifier(playerForce, currentDate);
 
-        int total = modeReputation - debtModifier;
+        int total = modeReputation + debtModifier;
 
         String report = getFormattedTextAt(RESOURCE_BUNDLE, "ChaosReputation.update",
               spanOpeningWithCustomColor(getAmazingColor()),
@@ -78,14 +76,14 @@ public class ChaosReputation {
         Collection<Person> personnel = detachment.getPersonnel().values();
         LocalDate currentDate = campaign.getLocalDate();
 
-        int modeReputation = calculateMostCommonReputation(personnel,
+        int modeReputation = calculateAverageReputation(personnel,
               isUseAgingEffects,
               playerForce.isClanForce(),
               currentDate);
 
         int debtModifier = getDebtModifier(playerForce, currentDate);
 
-        int total = modeReputation - debtModifier;
+        int total = modeReputation + debtModifier;
 
         String report = getFormattedTextAt(RESOURCE_BUNDLE, "ChaosReputation.update",
               spanOpeningWithCustomColor(getAmazingColor()),
@@ -96,13 +94,14 @@ public class ChaosReputation {
               total);
         campaign.addReport(DailyReportType.GENERAL, report);
 
-        return modeReputation - debtModifier;
+        return modeReputation + debtModifier;
     }
 
-    private static int calculateMostCommonReputation(Collection<Person> personnel, boolean isUseAgingEffects,
+    private static int calculateAverageReputation(Collection<Person> personnel, boolean isUseAgingEffects,
           boolean isClanCampaign, LocalDate currentDate) {
         // Tallies how often each adjusted reputation value appears among valid personnel.
-        Map<Integer, Integer> reputationCounts = new HashMap<>();
+        double personCount = 0;
+        int totalReputation = 0;
 
         for (Person person : personnel) {
             // Is the person even here?
@@ -112,38 +111,18 @@ public class ChaosReputation {
 
             // Is the person active and employed?
             if (person.getStatus().isActive() && person.isEmployed()) {
+                personCount++;
                 int reputation = person.getAdjustedReputation(isUseAgingEffects, isClanCampaign, currentDate);
-                reputationCounts.merge(reputation, 1, Integer::sum);
+                totalReputation += reputation;
             }
         }
+
+        int averageReputation = (int) round(totalReputation / personCount);
 
         LOGGER.info("Gathered all reputation from combat personnel in the force");
-        LOGGER.info(reputationCounts);
+        LOGGER.info("People: {}, Reputation: {}, Avg: {}", personCount, totalReputation, averageReputation);
 
-        return getModeReputation(reputationCounts);
-    }
-
-    private static int getModeReputation(Map<Integer, Integer> reputationCounts) {
-        int bestReputation = STARTING_REPUTATION_SCORE;
-        int bestCount = 0;
-
-        for (Map.Entry<Integer, Integer> entry : reputationCounts.entrySet()) {
-            int reputation = entry.getKey();
-            int count = entry.getValue();
-
-            // Higher count wins; on a tie, prefer the higher reputation value.
-            boolean beatsBestCount = count > bestCount;
-            boolean beatsOnADraw = count == bestCount && reputation > bestReputation;
-
-            if (beatsBestCount || beatsOnADraw) {
-                bestCount = count;
-                bestReputation = reputation;
-            }
-        }
-
-        LOGGER.info("Mode Reputation: {}", bestReputation);
-
-        return bestReputation;
+        return averageReputation;
     }
 
     private static int getDebtModifier(PlayerForce playerForce, LocalDate currentDate) {
@@ -156,7 +135,7 @@ public class ChaosReputation {
             }
         }
 
-        int debtModifier = (int) floor(maxLoanAge / GOING_INT_DEBT_MONTHLY_FREQUENCY);
+        int debtModifier = (int) floor(maxLoanAge / GOING_INT_DEBT_MONTHLY_FREQUENCY) * GOING_INTO_DEBT_DELTA;
         if (!activeLoans.isEmpty()) {
             debtModifier++;
         }
