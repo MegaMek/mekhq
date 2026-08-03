@@ -228,6 +228,7 @@ import mekhq.campaign.personnel.turnoverAndRetention.RetirementDefectionTracker;
 import mekhq.campaign.randomEvents.prisoners.PrisonerStatus;
 import mekhq.campaign.randomEvents.randomEventsSystem.RandomEventLibraries;
 import mekhq.campaign.reputation.camOpsReputation.ForceReputationController;
+import mekhq.campaign.reputation.chaosReputation.ChaosReputation;
 import mekhq.campaign.storyArc.StoryArc;
 import mekhq.campaign.unit.CargoStatistics;
 import mekhq.campaign.unit.CrewType;
@@ -7455,6 +7456,9 @@ public class Campaign implements ITechManager {
         boolean useChaosReputation = getCampaignOptions().get(CampaignOption.USE_CHAOS_REPUTATION);
 
         if (useChaosReputation) {
+            if (getCampaignOptions().get(CampaignOption.CAMPAIGN_LEVEL_CHAOS_REPUTATION)) {
+                return String.valueOf(ChaosReputation.getCampaignLevelReputation(this));
+            }
             return String.valueOf(getPlayerForce().getChaosCampaignReputation());
         } else {
             return String.valueOf(getPlayerForce().getReputation().getReputationRating());

@@ -83,6 +83,7 @@ class ReputationPage {
 
     private JSpinner manualUnitRatingModifier;
     private JCheckBox chkUseChaosReputation;
+    private JCheckBox chkCampaignLevelChaosReputation;
     private JCheckBox chkRequireSupportForceTransportation;
     private JCheckBox chkClampReputationPayMultiplier;
     private JCheckBox chkReduceReputationPerformanceModifier;
@@ -139,11 +140,15 @@ class ReputationPage {
         chkUseChaosReputation = new CampaignOptionsCheckBox("UseChaosReputation");
         chkUseChaosReputation.addMouseListener(createTipPanelUpdater("UseChaosReputation"));
 
+        chkCampaignLevelChaosReputation = new CampaignOptionsCheckBox("CampaignLevelChaosReputation");
+        chkCampaignLevelChaosReputation.addMouseListener(createTipPanelUpdater("CampaignLevelChaosReputation"));
+
         // Layout the Panel
         final SettingsFormPanel panel = new SettingsFormPanel("ReputationGeneralOptionsPanel",
               FORM_LABEL_COLUMN_WIDTH,
               FORM_CONTROL_COLUMN_WIDTH);
         panel.addCheckBox(chkUseChaosReputation);
+        panel.addCheckBox(chkCampaignLevelChaosReputation);
 
         return panel;
     }
@@ -260,6 +265,7 @@ class ReputationPage {
 
         manualUnitRatingModifier.setValue(model.manualUnitRatingModifier);
         chkUseChaosReputation.setSelected(model.useChaosReputation);
+        chkCampaignLevelChaosReputation.setSelected(model.campaignLevelChaosReputation);
         updateResetCriminalRecordButtonFromModel();
         chkRequireSupportForceTransportation.setSelected(model.requireSupportForceTransportation);
         chkClampReputationPayMultiplier.setSelected(model.clampReputationPayMultiplier);
@@ -280,6 +286,7 @@ class ReputationPage {
 
         model.manualUnitRatingModifier = (int) manualUnitRatingModifier.getValue();
         model.useChaosReputation = chkUseChaosReputation.isSelected();
+        model.campaignLevelChaosReputation = chkCampaignLevelChaosReputation.isSelected();
         model.requireSupportForceTransportation = chkRequireSupportForceTransportation.isSelected();
         model.clampReputationPayMultiplier = chkClampReputationPayMultiplier.isSelected();
         model.reduceReputationPerformanceModifier = chkReduceReputationPerformanceModifier.isSelected();

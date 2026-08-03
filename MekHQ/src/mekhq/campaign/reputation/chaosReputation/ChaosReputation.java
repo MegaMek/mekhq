@@ -52,13 +52,57 @@ public class ChaosReputation {
     private static final int GOING_INTO_DEBT_DELTA = -1; // Hot Spots Draconis Reach pg25 1st printing
     private static final double GOING_INT_DEBT_MONTHLY_FREQUENCY = 6.0; // Hot Spots Draconis Reach pg25 1st printing
 
+
     public static void calculateForceReputation(Campaign campaign) {
+        // When tracking at the campaign level, the stored reputation is authoritative and is not derived from
+        // personnel. The debt penalty is applied live at display time (see getCampaignLevelReputation), so there is
+        // nothing to recalculate here.
+        if (campaign.getCampaignOptions().get(CampaignOption.CAMPAIGN_LEVEL_CHAOS_REPUTATION)) {
+            return;
+        }
+
         PlayerForce playerForce = campaign.getPlayerForce();
         Collection<Person> personnel = playerForce.allPersonnel();
         String formationName = playerForce.getName();
         int total = getTotalReputation(campaign, personnel, playerForce, formationName);
 
         playerForce.setChaosCampaignReputation(total);
+    }
+
+    /**
+     * Returns the force's campaign-level Chaos Reputation: the stored campaign reputation value plus the current debt
+     * penalty. Used when {@link CampaignOption#CAMPAIGN_LEVEL_CHAOS_REPUTATION} is enabled, where the reputation is
+     * tracked as a single campaign-wide value rather than being derived from personnel.
+     *
+     * @param campaign the campaign to report on
+     *
+     * @return the campaign-level reputation total, including the debt penalty
+     */
+    public static int getCampaignLevelReputation(Campaign campaign) {
+        PlayerForce playerForce = campaign.getPlayerForce();
+        int base = playerForce.getChaosCampaignReputation();
+        int debtModifier = getDebtModifier(playerForce.getFinances().getLoans(), campaign.getLocalDate());
+        return base + debtModifier;
+    }
+
+    /**
+     * Builds an HTML tooltip breaking the campaign-level Chaos Reputation down into its stored value, debt penalty, and
+     * resulting total. This mirrors the per-character reputation tooltip shown in the personnel view.
+     *
+     * @param campaign the campaign to report on
+     *
+     * @return an HTML tooltip string
+     */
+    public static String getCampaignLevelTooltip(Campaign campaign) {
+        PlayerForce playerForce = campaign.getPlayerForce();
+        int base = playerForce.getChaosCampaignReputation();
+        int debtModifier = getDebtModifier(playerForce.getFinances().getLoans(), campaign.getLocalDate());
+        int total = base + debtModifier;
+
+        return getFormattedTextAt(RESOURCE_BUNDLE, "campaignLevel.tooltip",
+              Integer.toString(base),
+              Integer.toString(debtModifier),
+              Integer.toString(total));
     }
 
     public static int getDetachmentReputation(Campaign campaign, Detachment detachment) {

@@ -40,6 +40,7 @@ class SystemsOptionsModel {
     int manualUnitRatingModifier;
     boolean resetCriminalRecord;
     boolean useChaosReputation;
+    boolean campaignLevelChaosReputation;
     boolean requireSupportForceTransportation;
     boolean clampReputationPayMultiplier;
     boolean reduceReputationPerformanceModifier;
@@ -62,6 +63,7 @@ class SystemsOptionsModel {
         manualUnitRatingModifier = options.getManualUnitRatingModifier();
         resetCriminalRecord = false;
         useChaosReputation = options.get(CampaignOption.USE_CHAOS_REPUTATION);
+        campaignLevelChaosReputation = options.get(CampaignOption.CAMPAIGN_LEVEL_CHAOS_REPUTATION);
         requireSupportForceTransportation = options.isRequireSupportForceTransportation();
         clampReputationPayMultiplier = options.isClampReputationPayMultiplier();
         reduceReputationPerformanceModifier = options.isReduceReputationPerformanceModifier();
@@ -84,6 +86,7 @@ class SystemsOptionsModel {
     void applyTo(@Nonnull CampaignOptions options) {
         options.setManualUnitRatingModifier(manualUnitRatingModifier);
         options.set(CampaignOption.USE_CHAOS_REPUTATION, useChaosReputation);
+        options.set(CampaignOption.CAMPAIGN_LEVEL_CHAOS_REPUTATION, campaignLevelChaosReputation);
         options.setRequireSupportForceTransportation(requireSupportForceTransportation);
         options.setClampReputationPayMultiplier(clampReputationPayMultiplier);
         options.setReduceReputationPerformanceModifier(reduceReputationPerformanceModifier);
