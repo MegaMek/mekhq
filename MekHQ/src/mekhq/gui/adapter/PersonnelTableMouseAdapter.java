@@ -3254,10 +3254,10 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
             traitsMenu.add(menuItem);
 
             // Reputation
-            int reputation = person.getFame();
-            target = reputation + 1;
-            menuItem = new JMenuItem(String.format(resources.getString("spendOnReputation.text"), target, traitCost));
-            menuItem.setToolTipText(wordWrap(String.format(resources.getString("spendOnReputation.tooltip"),
+            int fame = person.getFame();
+            target = fame + 1;
+            menuItem = new JMenuItem(String.format(resources.getString("spendOnFame.text"), target, traitCost));
+            menuItem.setToolTipText(wordWrap(String.format(resources.getString("spendOnFame.tooltip"),
                   (target == 0 ? 0 : (target > 0 ? "+" : "-") + target),
                   target)));
             menuItem.setActionCommand(makeCommand(CMD_BUY_TRAIT,
@@ -3268,7 +3268,7 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
             menuItem.setEnabled(target <= MAXIMUM_FAME && person.getXP() >= traitCost);
             traitsMenu.add(menuItem);
 
-            target = reputation - 1;
+            target = fame - 1;
             menuItem = new JMenuItem(String.format(resources.getString("spendOnFame.text"), target, -traitCost));
             menuItem.setToolTipText(wordWrap(String.format(resources.getString("spendOnFame.tooltip"),
                   (target == 0 ? 0 : (target > 0 ? "+" : "-") + target),
@@ -3412,8 +3412,8 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
                       String.valueOf(attributeCost)));
                 menuItem.addActionListener(this);
                 int attributeCap = isEdge
-                      ? Math.min(person.getAttributeCap(attribute), maximumEdge)
-                      : person.getAttributeCap(attribute);
+                                         ? Math.min(person.getAttributeCap(attribute), maximumEdge)
+                                         : person.getAttributeCap(attribute);
                 boolean canImprove = !isEdge || person.canGainEdge(maximumEdge);
                 menuItem.setEnabled(canImprove && target <= attributeCap && person.getXP() >= attributeCost);
                 attributesMenuIncrease.add(menuItem);
