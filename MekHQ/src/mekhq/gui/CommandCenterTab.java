@@ -64,6 +64,7 @@ import megamek.utilities.ImageUtilities;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.CampaignSummary;
+import mekhq.campaign.campaignOptions.CampaignOption;
 import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.dailyReportLog.DailyReportLog;
 import mekhq.campaign.enums.DailyReportType;
@@ -312,6 +313,7 @@ public final class CommandCenterTab extends CampaignGuiTab {
         int y = 0;
 
         /* Unit Rating */
+        boolean isUseChaosReputation = getCampaignOptions().get(CampaignOption.USE_CHAOS_REPUTATION);
         JLabel lblRatingHead = new JLabel(resourceMap.getString("lblRating.text"));
         gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 0;
@@ -320,10 +322,15 @@ public final class CommandCenterTab extends CampaignGuiTab {
         gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
         gridBagConstraints.insets = new Insets(5, 5, 1, 5);
         panInfo.add(lblRatingHead, gridBagConstraints);
-        lblRating = new ClickableLabel(
-              evt -> new ReputationReportDialog(getCampaignGui().getFrame(),
-                    getCampaign()).setVisible(true));
-        lblRating.setHyperlinkMode(true);
+        if (isUseChaosReputation) {
+            lblRating = new ClickableLabel(evt -> {});
+            lblRating.setHyperlinkMode(false);
+        } else {
+            lblRating = new ClickableLabel(
+                  evt -> new ReputationReportDialog(getCampaignGui().getFrame(),
+                        getCampaign()).setVisible(true));
+            lblRating.setHyperlinkMode(true);
+        }
         lblRatingHead.setLabelFor(lblRating);
         gridBagConstraints.gridx = 1;
         gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
@@ -343,7 +350,9 @@ public final class CommandCenterTab extends CampaignGuiTab {
         gridBagConstraints.gridx = 1;
         gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
         gridBagConstraints.weightx = 1.0;
-        panInfo.add(lblExperience, gridBagConstraints);
+        if (!isUseChaosReputation) {
+            panInfo.add(lblExperience, gridBagConstraints);
+        }
 
         JLabel lblMissionSuccessHead = new JLabel(resourceMap.getString("lblMissionSuccess.text"));
         gridBagConstraints = new GridBagConstraints();
@@ -946,7 +955,8 @@ public final class CommandCenterTab extends CampaignGuiTab {
                                                                            .getFontColorWarningHexColor() +
                                                                      "'>" +
                                                                      ChronoUnit.DAYS.between(getCampaign().getLocalDate(),
-                                                                           scenario.getDate())) + " days</font></html>");
+                                                                           scenario.getDate())) +
+                                                       " days</font></html>");
                             }
                         }
                     }

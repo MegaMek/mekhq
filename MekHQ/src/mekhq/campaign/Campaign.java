@@ -130,6 +130,7 @@ import mekhq.campaign.ForceQuartermaster.PartAcquisitionResult;
 import mekhq.campaign.againstTheBot.AtBConfiguration;
 import mekhq.campaign.base.PlayerBase;
 import mekhq.campaign.campaignOptions.AcquisitionsType;
+import mekhq.campaign.campaignOptions.CampaignOption;
 import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.campaignOptions.CampaignOptionsMarshaller;
 import mekhq.campaign.dailyReportLog.DailyReportLog;
@@ -1943,7 +1944,7 @@ public class Campaign implements ITechManager {
 
     /**
      * @return all hangars across all locations associated with this campaign.
-     *                                                                                                                                                                   TODO: This won't work once we support multiple hangars. Method separated from getHangar() for future refactor
+     *                                                                                                                                                                         TODO: This won't work once we support multiple hangars. Method separated from getHangar() for future refactor
      *
      * @deprecated Use {@link PlayerForce#getHangar()} directly.
      */
@@ -7451,7 +7452,13 @@ public class Campaign implements ITechManager {
      * @return The text representation of the unit rating
      */
     public String getUnitRatingText() {
-        return String.valueOf(getPlayerForce().getReputation().getReputationRating());
+        boolean useChaosReputation = getCampaignOptions().get(CampaignOption.USE_CHAOS_REPUTATION);
+
+        if (useChaosReputation) {
+            return String.valueOf(getPlayerForce().getChaosCampaignReputation());
+        } else {
+            return String.valueOf(getPlayerForce().getReputation().getReputationRating());
+        }
     }
 
     /**
