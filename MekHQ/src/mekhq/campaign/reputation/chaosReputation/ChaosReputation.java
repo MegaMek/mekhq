@@ -1,10 +1,13 @@
 package mekhq.campaign.reputation.chaosReputation;
 
 import static java.lang.Math.ceil;
+import static java.lang.Math.clamp;
 import static java.lang.Math.floor;
 import static java.lang.Math.min;
 import static java.lang.Math.round;
 import static megamek.common.compute.Compute.d6;
+import static mekhq.campaign.personnel.skills.SkillType.EXP_LEGENDARY;
+import static mekhq.campaign.personnel.skills.SkillType.EXP_NONE;
 import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
 import static mekhq.utilities.ReportingUtilities.CLOSING_SPAN_TAG;
 import static mekhq.utilities.ReportingUtilities.getAmazingColor;
@@ -16,6 +19,7 @@ import java.time.LocalDate;
 import java.util.Collection;
 import java.util.List;
 
+import megamek.common.enums.SkillLevel;
 import megamek.logging.MMLogger;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.campaignOptions.CampaignOption;
@@ -26,6 +30,9 @@ import mekhq.campaign.finances.Money;
 import mekhq.campaign.force.Detachment;
 import mekhq.campaign.force.PlayerForce;
 import mekhq.campaign.personnel.Person;
+import mekhq.campaign.personnel.enums.PersonnelRole;
+import mekhq.campaign.personnel.enums.PersonnelStatus;
+import mekhq.campaign.personnel.skills.SkillType;
 
 public class ChaosReputation {
     private static final MMLogger LOGGER = MMLogger.create(ChaosReputation.class);
@@ -96,12 +103,13 @@ public class ChaosReputation {
 
         for (Person person : personnel) {
             // Is the person even here?
-            if (person.getStatus().isDepartedUnit()) {
+            PersonnelStatus status = person.getStatus();
+            if (status.isDepartedUnit()) {
                 continue;
             }
 
             // Is the person active and employed?
-            if (person.getStatus().isActive() && person.isEmployed()) {
+            if (status.isActive() && person.isEmployed()) {
                 personCount++;
                 int reputation = person.getAdjustedReputation(isUseAgingEffects, isClanCampaign, currentDate);
                 totalReputation += reputation;
@@ -185,5 +193,47 @@ public class ChaosReputation {
         }
 
         campaign.addReport(DailyReportType.GENERAL, report);
+    }
+
+    public static SkillLevel getAverageSkillLevel(final Campaign campaign, final Collection<Person> personnel) {
+        double personCount = 0;
+        int totalExperienceLevel = 0;
+
+        for (Person person : personnel) {
+            PersonnelStatus status = person.getStatus();
+            if (status.isDepartedUnit()) {
+                continue;
+            }
+
+            // Is the person active and employed?
+            if (status.isActive() && person.isEmployed()) {
+                int primaryExperienceLevel = getExperienceLevel(campaign, person, true);
+                if (primaryExperienceLevel != EXP_NONE) {
+                    personCount++;
+                    totalExperienceLevel += primaryExperienceLevel;
+                }
+
+                int secondaryExperienceLevel = getExperienceLevel(campaign, person, false);
+                if (secondaryExperienceLevel != EXP_NONE) {
+                    personCount++;
+                    totalExperienceLevel += secondaryExperienceLevel;
+                }
+            }
+        }
+
+        int meanExperienceLevel = personCount == 0 ? EXP_NONE : (int) round(totalExperienceLevel / personCount);
+        meanExperienceLevel = clamp(meanExperienceLevel, EXP_NONE, EXP_LEGENDARY);
+
+        return SkillType.skillLevelFromExperienceLevel(meanExperienceLevel);
+    }
+
+    private static int getExperienceLevel(Campaign campaign, Person person, boolean isPrimary) {
+        PersonnelRole role = isPrimary ? person.getPrimaryRole() : person.getSecondaryRole();
+
+        if (!role.isCivilian()) {
+            return person.getExperienceLevel(campaign, !isPrimary, true);
+        }
+
+        return EXP_NONE;
     }
 }

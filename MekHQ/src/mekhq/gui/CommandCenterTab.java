@@ -57,6 +57,7 @@ import javax.swing.table.TableRowSorter;
 
 import megamek.client.ui.util.ClickableLabel;
 import megamek.client.ui.util.UIUtil;
+import megamek.common.enums.SkillLevel;
 import megamek.common.event.Subscribe;
 import megamek.common.ui.EnhancedTabbedPane;
 import megamek.common.ui.FastJScrollPane;
@@ -64,6 +65,7 @@ import megamek.utilities.ImageUtilities;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.CampaignSummary;
+import mekhq.campaign.campaignOptions.CampaignOption;
 import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.dailyReportLog.DailyReportLog;
 import mekhq.campaign.enums.DailyReportType;
@@ -90,6 +92,7 @@ import mekhq.campaign.report.CargoReport;
 import mekhq.campaign.report.HangarReport;
 import mekhq.campaign.report.PersonnelReport;
 import mekhq.campaign.report.TransportReport;
+import mekhq.campaign.reputation.chaosReputation.ChaosReputation;
 import mekhq.campaign.work.IAcquisitionWork;
 import mekhq.gui.adapter.ProcurementTableMouseAdapter;
 import mekhq.gui.baseComponents.roundedComponents.RoundedJButton;
@@ -880,10 +883,13 @@ public final class CommandCenterTab extends CampaignGuiTab {
             panInfo.repaint();
         }
 
+        boolean isUseChaosReputation = getCampaignOptions().get(CampaignOption.USE_CHAOS_REPUTATION);
+        SkillLevel averageSkillLevel = isUseChaosReputation ?
+                                             ChaosReputation.getAverageSkillLevel(getCampaign(),
+                                                   getCampaign().getPlayerForce().allPersonnel()) :
+                                             campaign.getPlayerForce().getReputation().getAverageSkillLevel();
         String experienceString = "<html><b>" +
-                                        SkillType.getColoredExperienceLevelName(campaign.getPlayerForce()
-                                                                                      .getReputation()
-                                                                                      .getAverageSkillLevel()) +
+                                        SkillType.getColoredExperienceLevelName(averageSkillLevel) +
                                         "</b></html>";
         lblExperience.setText(experienceString);
 

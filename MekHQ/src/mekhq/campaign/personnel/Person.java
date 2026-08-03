@@ -5471,7 +5471,7 @@ public class Person implements ILocatable {
      * @return the calculated experience level for the relevant role, or {@link SkillType#EXP_NONE} if not qualified
      */
     public int getExperienceLevel(final Campaign campaign, final boolean secondary, boolean excludeInjuryEffects) {
-        return getExperienceLevel(campaign.getCampaignOptions(), campaign.isClanCampaign(),
+        return getExperienceLevel(campaign.getCampaignOptions(), campaign.getPlayerForce().isClanForce(),
               campaign.getLocalDate(), secondary, excludeInjuryEffects);
     }
 

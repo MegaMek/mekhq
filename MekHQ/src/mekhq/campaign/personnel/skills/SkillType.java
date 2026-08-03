@@ -3298,4 +3298,27 @@ public class SkillType {
               new Integer[] { 20, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100 }
         );
     }
+
+    /**
+     * Converts an experience level to its corresponding skill level.
+     *
+     * @param experienceLevel an integer representing the experience level.
+     *
+     * @return the corresponding {@code SkillLevel} value based on the given experience level.
+     *
+     * @throws IllegalStateException if the experience level does not match any predefined constants.
+     */
+    public static SkillLevel skillLevelFromExperienceLevel(int experienceLevel) {
+        return switch (experienceLevel) {
+            case EXP_NONE -> SkillLevel.NONE;
+            case EXP_ULTRA_GREEN -> SkillLevel.ULTRA_GREEN;
+            case EXP_GREEN -> SkillLevel.GREEN;
+            case EXP_REGULAR -> SkillLevel.REGULAR;
+            case EXP_VETERAN -> SkillLevel.VETERAN;
+            case EXP_ELITE -> SkillLevel.ELITE;
+            case EXP_HEROIC -> SkillLevel.HEROIC;
+            case EXP_LEGENDARY -> SkillLevel.LEGENDARY;
+            default -> throw new IllegalStateException("Unexpected value: " + experienceLevel);
+        };
+    }
 }
