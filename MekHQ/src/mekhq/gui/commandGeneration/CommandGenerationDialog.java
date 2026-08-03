@@ -186,6 +186,10 @@ public class CommandGenerationDialog extends AbstractMHQValidationButtonDialog {
         JPanel leftButtons = new JPanel(new FlowLayout(FlowLayout.LEFT, 4, 0));
         leftButtons.add(new MMButton("btnRestore", resources, "RestoreDefaults.text",
               "CommandGenerationDialog.btnRestore.toolTipText", this::restoreDefaultsActionListener));
+        // The Force Generator's own Generate, its options and Clear Force belong on this bar rather than mid-tab:
+        // they are dialog-level actions like the ones either side of them, and the tab needs the vertical room for
+        // the formation mix. Adding them here re-parents them out of the tab.
+        pane.getForceGeneratorTab().getGenerateControls().forEach(control -> leftButtons.add(control));
         panel.add(leftButtons, BorderLayout.WEST);
 
         JPanel rightButtons = new JPanel(new FlowLayout(FlowLayout.RIGHT, 4, 0));
@@ -236,6 +240,9 @@ public class CommandGenerationDialog extends AbstractMHQValidationButtonDialog {
         seedSpecifiedFactionFromCampaign(defaults, "restoreDefaults");
         pane.getSetupTab().loadValuesFromOptions(defaults);
         pane.getForceGeneratorTab().loadValuesFromOptions(defaults);
+        // The formation mix lives on the embedded MegaMek view rather than in CommandGenerationOptions, so loading
+        // defaults does not reach it and it has to be cleared explicitly.
+        pane.getForceGeneratorTab().clearFormationMix();
         pane.getSparesAndFinancesTab().loadValuesFromOptions(defaults);
         // As on first show: restoring defaults sets the naming method directly, so the faction's own
         // convention is re-applied afterwards rather than being overwritten by it.

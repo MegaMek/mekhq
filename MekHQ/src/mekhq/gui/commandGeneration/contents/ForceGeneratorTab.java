@@ -39,6 +39,7 @@ import java.util.Map;
 import java.util.function.BooleanSupplier;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
+import javax.swing.JComponent;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.JSplitPane;
@@ -303,6 +304,28 @@ public class ForceGeneratorTab {
      * driving them. If a future preset round-trip needs to set the view's controls from saved values,
      * that goes here.
      */
+    /**
+     * The Force Generator's own action controls, so the dialog can host them in its button bar rather than leaving a
+     * second row of buttons in the middle of the tab.
+     *
+     * @return Generate, its options, and Clear Force, or an empty list before the tab is built
+     */
+    public List<JComponent> getGenerateControls() {
+        return (viewUi == null) ? List.of() : viewUi.getOptionsView().getGenerateControls();
+    }
+
+    /**
+     * Clears any requested formation mix, so Restore Defaults resets it along with everything else. The mix lives on
+     * the embedded MegaMek view rather than in {@code CommandGenerationOptions}, so it is not covered by loading
+     * default options.
+     */
+    public void clearFormationMix() {
+        if (viewUi != null) {
+            viewUi.getOptionsView().setFormationMix(null);
+            viewUi.refreshFormationMixEditor();
+        }
+    }
+
     public void loadValuesFromOptions(CommandGenerationOptions sourceOptions) {
         this.options = sourceOptions;
         if ((sourceOptions != null) && (chkGenerateMercenaryCompanyCommandLance != null)) {
