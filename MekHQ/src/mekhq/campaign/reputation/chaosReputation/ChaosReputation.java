@@ -124,7 +124,7 @@ public class ChaosReputation {
         return averageReputation;
     }
 
-    private static int getDebtModifier(List<Loan> loans, LocalDate currentDate) {
+    public static int getDebtModifier(List<Loan> loans, LocalDate currentDate) {
         long maxLoanAge = 0;
         for (Loan loan : loans) {
             long age = loan.getAgeInMonths(currentDate);
@@ -227,7 +227,7 @@ public class ChaosReputation {
         return SkillType.skillLevelFromExperienceLevel(meanExperienceLevel);
     }
 
-    private static int getExperienceLevel(Campaign campaign, Person person, boolean isPrimary) {
+    public static int getExperienceLevel(Campaign campaign, Person person, boolean isPrimary) {
         PersonnelRole role = isPrimary ? person.getPrimaryRole() : person.getSecondaryRole();
 
         if (!role.isCivilian()) {

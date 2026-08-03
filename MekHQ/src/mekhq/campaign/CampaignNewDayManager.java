@@ -1381,9 +1381,7 @@ public class CampaignNewDayManager {
     }
 
     private void processChaosCampaignReputationChanges() {
-        if (today.getDayOfWeek().equals(DayOfWeek.MONDAY)) {
-            ChaosReputation.calculateForceReputation(campaign);
-        }
+        ChaosReputation.calculateForceReputation(campaign);
     }
 
     public void processNewDayUnits() {
