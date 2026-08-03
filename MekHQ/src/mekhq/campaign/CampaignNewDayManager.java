@@ -1381,7 +1381,7 @@ public class CampaignNewDayManager {
     }
 
     private void processChaosCampaignReputationChanges() {
-        if (today.getDayOfMonth() == 1) {
+        if (today.getDayOfWeek().equals(DayOfWeek.MONDAY)) {
             ChaosReputation.calculateForceReputation(campaign);
         }
     }
