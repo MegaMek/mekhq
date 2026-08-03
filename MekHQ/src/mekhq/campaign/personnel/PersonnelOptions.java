@@ -164,6 +164,44 @@ public class PersonnelOptions extends PilotOptions {
     public static final String EXCEPTIONAL_ATTRIBUTE_EDGE = "exceptional_attribute_edge";
     public static final String UNOFFICIAL_BELOVED_PET = "unofficial_beloved_pet";
 
+    // Weight-class affinity/antipathy SPAs and Flaws.
+    public static final String MEK_AFFINITY_LIGHT = "mek_affinity_light";
+    public static final String MEK_AFFINITY_MEDIUM = "mek_affinity_medium";
+    public static final String MEK_AFFINITY_HEAVY = "mek_affinity_heavy";
+    public static final String MEK_AFFINITY_ASSAULT = "mek_affinity_assault";
+    public static final String MEK_ANTIPATHY_LIGHT = "mek_antipathy_light";
+    public static final String MEK_ANTIPATHY_MEDIUM = "mek_antipathy_medium";
+    public static final String MEK_ANTIPATHY_HEAVY = "mek_antipathy_heavy";
+    public static final String MEK_ANTIPATHY_ASSAULT = "mek_antipathy_assault";
+    public static final String VEHICULAR_AFFINITY_LIGHT = "vehicular_affinity_light";
+    public static final String VEHICULAR_AFFINITY_MEDIUM = "vehicular_affinity_medium";
+    public static final String VEHICULAR_AFFINITY_HEAVY = "vehicular_affinity_heavy";
+    public static final String VEHICULAR_AFFINITY_ASSAULT = "vehicular_affinity_assault";
+    public static final String VEHICULAR_ANTIPATHY_LIGHT = "vehicular_antipathy_light";
+    public static final String VEHICULAR_ANTIPATHY_MEDIUM = "vehicular_antipathy_medium";
+    public static final String VEHICULAR_ANTIPATHY_HEAVY = "vehicular_antipathy_heavy";
+    public static final String VEHICULAR_ANTIPATHY_ASSAULT = "vehicular_antipathy_assault";
+    public static final String FLIGHT_AFFINITY_LIGHT = "flight_affinity_light";
+    public static final String FLIGHT_AFFINITY_MEDIUM = "flight_affinity_medium";
+    public static final String FLIGHT_AFFINITY_HEAVY = "flight_affinity_heavy";
+    public static final String FLIGHT_ANTIPATHY_LIGHT = "flight_antipathy_light";
+    public static final String FLIGHT_ANTIPATHY_MEDIUM = "flight_antipathy_medium";
+    public static final String FLIGHT_ANTIPATHY_HEAVY = "flight_antipathy_heavy";
+
+    // Unit Specialist.
+    public static final String UNIT_SPECIALIST = "unit_specialist";
+    public static final String SPECIALIST_CHOICE_MEK_LIGHT = "'Mek: Light";
+    public static final String SPECIALIST_CHOICE_MEK_MEDIUM = "'Mek: Medium";
+    public static final String SPECIALIST_CHOICE_MEK_HEAVY = "'Mek: Heavy";
+    public static final String SPECIALIST_CHOICE_MEK_ASSAULT = "'Mek: Assault";
+    public static final String SPECIALIST_CHOICE_VEHICULAR_LIGHT = "Vehicular: Light";
+    public static final String SPECIALIST_CHOICE_VEHICULAR_MEDIUM = "Vehicular: Medium";
+    public static final String SPECIALIST_CHOICE_VEHICULAR_HEAVY = "Vehicular: Heavy";
+    public static final String SPECIALIST_CHOICE_VEHICULAR_ASSAULT = "Vehicular: Assault";
+    public static final String SPECIALIST_CHOICE_FLIGHT_LIGHT = "Flight: Light";
+    public static final String SPECIALIST_CHOICE_FLIGHT_MEDIUM = "Flight: Medium";
+    public static final String SPECIALIST_CHOICE_FLIGHT_HEAVY = "Flight: Heavy";
+
     public static final String ADMIN_MEDIATOR = "admin_mediator";
     public static final String ADMIN_LOGISTICIAN = "admin_logistician";
     public static final String ADMIN_COORDINATOR = "admin_coordinator";
@@ -358,6 +396,30 @@ public class PersonnelOptions extends PilotOptions {
         addOption(l3a, ADMIN_NETWORKER, false);
         addOption(l3a, ADMIN_INTERSTELLAR_NEGOTIATOR, false);
         addOption(l3a, ADMIN_SCROUNGE, false);
+
+        addOption(l3a, MEK_AFFINITY_LIGHT, false);
+        addOption(l3a, MEK_AFFINITY_MEDIUM, false);
+        addOption(l3a, MEK_AFFINITY_HEAVY, false);
+        addOption(l3a, MEK_AFFINITY_ASSAULT, false);
+        addOption(l3a, MEK_ANTIPATHY_LIGHT, false);
+        addOption(l3a, MEK_ANTIPATHY_MEDIUM, false);
+        addOption(l3a, MEK_ANTIPATHY_HEAVY, false);
+        addOption(l3a, MEK_ANTIPATHY_ASSAULT, false);
+        addOption(l3a, VEHICULAR_AFFINITY_LIGHT, false);
+        addOption(l3a, VEHICULAR_AFFINITY_MEDIUM, false);
+        addOption(l3a, VEHICULAR_AFFINITY_HEAVY, false);
+        addOption(l3a, VEHICULAR_AFFINITY_ASSAULT, false);
+        addOption(l3a, VEHICULAR_ANTIPATHY_LIGHT, false);
+        addOption(l3a, VEHICULAR_ANTIPATHY_MEDIUM, false);
+        addOption(l3a, VEHICULAR_ANTIPATHY_HEAVY, false);
+        addOption(l3a, VEHICULAR_ANTIPATHY_ASSAULT, false);
+        addOption(l3a, FLIGHT_AFFINITY_LIGHT, false);
+        addOption(l3a, FLIGHT_AFFINITY_MEDIUM, false);
+        addOption(l3a, FLIGHT_AFFINITY_HEAVY, false);
+        addOption(l3a, FLIGHT_ANTIPATHY_LIGHT, false);
+        addOption(l3a, FLIGHT_ANTIPATHY_MEDIUM, false);
+        addOption(l3a, FLIGHT_ANTIPATHY_HEAVY, false);
+        addOption(l3a, UNIT_SPECIALIST, new Vector<>());
 
         addOption(l3a, COMPULSION_UNPLEASANT_PERSONALITY, false);
         addOption(l3a, COMPULSION_MILD_PARANOIA, false);
