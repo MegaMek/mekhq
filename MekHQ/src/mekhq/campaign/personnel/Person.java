@@ -7260,8 +7260,10 @@ public class Person implements ILocatable {
     }
 
     public int getAdjustedReputation(boolean isUseAgingEffects, boolean isClanCampaign, LocalDate currentDate) {
-        return chaosCampaignReputation + chaosCampaignCriminalRecord + getAdjustedFame(isUseAgingEffects,
-              isClanCampaign, currentDate);
+        return chaosCampaignReputation +
+                     chaosCampaignCriminalRecord +
+                     getAdjustedFame(isUseAgingEffects, isClanCampaign, currentDate) +
+                     getAdjustedConnections(false);
     }
 
     /** Generally you will want to call {@link #getAdjustedReputation(boolean, boolean, LocalDate)} instead */

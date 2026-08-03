@@ -48,6 +48,22 @@ public class ChaosReputation {
     public static void calculateForceReputation(Campaign campaign) {
         PlayerForce playerForce = campaign.getPlayerForce();
         Collection<Person> personnel = playerForce.allPersonnel();
+        String formationName = playerForce.getName();
+        int total = getTotalReputation(campaign, personnel, playerForce, formationName);
+
+        playerForce.setChaosCampaignReputation(total);
+    }
+
+    public static int getDetachmentReputation(Campaign campaign, Detachment detachment) {
+        PlayerForce playerForce = campaign.getPlayerForce();
+        Collection<Person> personnel = detachment.getPersonnel().values();
+        String formationName = playerForce.getName(); // TODO replace with detachment name, once possible
+
+        return getTotalReputation(campaign, personnel, playerForce, formationName);
+    }
+
+    private static int getTotalReputation(Campaign campaign, Collection<Person> personnel, PlayerForce playerForce,
+          String formationName) {
         LocalDate currentDate = campaign.getLocalDate();
 
         int modeReputation = calculateAverageReputation(personnel,
@@ -55,46 +71,21 @@ public class ChaosReputation {
               playerForce.isClanForce(),
               currentDate);
 
-        int debtModifier = getDebtModifier(playerForce, currentDate);
+        List<Loan> loans = playerForce.getFinances().getLoans();
+        int debtModifier = getDebtModifier(loans, currentDate);
 
         int total = modeReputation + debtModifier;
 
         String report = getFormattedTextAt(RESOURCE_BUNDLE, "ChaosReputation.update",
               spanOpeningWithCustomColor(getAmazingColor()),
               CLOSING_SPAN_TAG,
-              playerForce.getName(),
+              formationName,
               modeReputation,
               debtModifier,
               total);
         campaign.addReport(DailyReportType.GENERAL, report);
 
-        playerForce.setChaosCampaignReputation(total);
-    }
-
-    public static int getDetachmentReputation(Campaign campaign, Detachment detachment, boolean isUseAgingEffects) {
-        PlayerForce playerForce = campaign.getPlayerForce();
-        Collection<Person> personnel = detachment.getPersonnel().values();
-        LocalDate currentDate = campaign.getLocalDate();
-
-        int modeReputation = calculateAverageReputation(personnel,
-              isUseAgingEffects,
-              playerForce.isClanForce(),
-              currentDate);
-
-        int debtModifier = getDebtModifier(playerForce, currentDate);
-
-        int total = modeReputation + debtModifier;
-
-        String report = getFormattedTextAt(RESOURCE_BUNDLE, "ChaosReputation.update",
-              spanOpeningWithCustomColor(getAmazingColor()),
-              CLOSING_SPAN_TAG,
-              playerForce.getName(), // TODO detachment name (this functionality doesn't yet exist)
-              modeReputation,
-              debtModifier,
-              total);
-        campaign.addReport(DailyReportType.GENERAL, report);
-
-        return modeReputation + debtModifier;
+        return total;
     }
 
     private static int calculateAverageReputation(Collection<Person> personnel, boolean isUseAgingEffects,
@@ -125,10 +116,9 @@ public class ChaosReputation {
         return averageReputation;
     }
 
-    private static int getDebtModifier(PlayerForce playerForce, LocalDate currentDate) {
-        List<Loan> activeLoans = playerForce.getFinances().getLoans();
+    private static int getDebtModifier(List<Loan> loans, LocalDate currentDate) {
         long maxLoanAge = 0;
-        for (Loan loan : activeLoans) {
+        for (Loan loan : loans) {
             long age = loan.getAgeInMonths(currentDate);
             if (age > maxLoanAge) {
                 maxLoanAge = age;
@@ -136,7 +126,7 @@ public class ChaosReputation {
         }
 
         int debtModifier = (int) floor(maxLoanAge / GOING_INT_DEBT_MONTHLY_FREQUENCY) * GOING_INTO_DEBT_DELTA;
-        if (!activeLoans.isEmpty()) {
+        if (!loans.isEmpty()) {
             debtModifier++;
         }
         return debtModifier;
