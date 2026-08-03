@@ -48,7 +48,7 @@ import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.personnel.skills.RandomSkillPreferences;
 import mekhq.gui.campaignOptions.CampaignOptionFlag;
 import mekhq.gui.campaignOptions.components.CampaignOptionsCheckBox;
-import mekhq.gui.campaignOptions.components.CampaignOptionsFormPanel;
+import megamek.client.ui.settings.SettingsFormPanel;
 import mekhq.gui.campaignOptions.components.CampaignOptionsHeaderPanel;
 import mekhq.gui.campaignOptions.components.CampaignOptionsPagePanel;
 
@@ -67,8 +67,8 @@ import mekhq.gui.campaignOptions.components.CampaignOptionsPagePanel;
  * {@link #createPage()} is called, {@code readFromModel} and {@code writeToModel} are no-ops.</p>
  */
 public class AttributesAndTraitsPage {
-    private static final int FORM_LABEL_COLUMN_WIDTH = CampaignOptionsFormPanel.DEFAULT_LABEL_WIDTH;
-    private static final int FORM_CONTROL_COLUMN_WIDTH = CampaignOptionsFormPanel.DEFAULT_CONTROL_WIDTH;
+    private static final int FORM_LABEL_COLUMN_WIDTH = SettingsFormPanel.DEFAULT_LABEL_WIDTH;
+    private static final int FORM_CONTROL_COLUMN_WIDTH = SettingsFormPanel.DEFAULT_CONTROL_WIDTH;
     private static final int CHECKBOX_GRID_COLUMNS = 2;
 
     private final CampaignOptions campaignOptions;
@@ -151,7 +151,7 @@ public class AttributesAndTraitsPage {
                 getMetadata(MILESTONE_BEFORE_METADATA));
         chkUseSmallArmsOnly.addMouseListener(createTipPanelUpdater("UseSmallArmsOnly"));
 
-        final CampaignOptionsFormPanel panel = new CampaignOptionsFormPanel("AttributesAndTraitsPanel",
+        final SettingsFormPanel panel = new SettingsFormPanel("AttributesAndTraitsPanel",
                 FORM_LABEL_COLUMN_WIDTH,
                 FORM_CONTROL_COLUMN_WIDTH);
         panel.addCheckBoxGrid(CHECKBOX_GRID_COLUMNS,

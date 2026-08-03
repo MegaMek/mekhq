@@ -33,6 +33,7 @@
 package mekhq.campaign.digitalGM.stratCon;
 
 import mekhq.campaign.digitalGM.stratCon.StratConContractDefinition.StrategicObjectiveType;
+import mekhq.campaign.digitalGM.stratCon.facility.StratConFacility;
 import mekhq.campaign.mission.ScenarioForceTemplate.ForceAlignment;
 
 /**

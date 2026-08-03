@@ -133,6 +133,7 @@ import mekhq.campaign.camOpsReputation.IUnitRating;
 import mekhq.campaign.campaignOptions.AcquisitionsType;
 import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.campaignOptions.CampaignOptionsMarshaller;
+import mekhq.campaign.dailyReportLog.DailyReportLog;
 import mekhq.campaign.digitalGM.stratCon.StratConContractInitializer;
 import mekhq.campaign.digitalGM.stratCon.StratConRulesManager;
 import mekhq.campaign.enums.CampaignTransportType;
@@ -316,45 +317,7 @@ public class Campaign implements ITechManager {
 
     private transient CampaignNewDayManager newDayManager = null;
 
-    private final ArrayList<String> currentReport;
-    private transient String currentReportHTML;
-    private transient List<String> newReports;
-
-    private final ArrayList<String> personnelReport;
-    private transient String personnelReportHTML;
-    private transient List<String> newPersonnelReports;
-
-    private final ArrayList<String> skillReport;
-    private transient String skillReportHTML;
-    private transient List<String> newSkillReports;
-
-    private final ArrayList<String> technicalReport;
-    private transient String technicalReportHTML;
-    private transient List<String> newTechnicalReports;
-
-    private final ArrayList<String> financesReport;
-    private transient String financesReportHTML;
-    private transient List<String> newFinancesReports;
-
-    private final ArrayList<String> acquisitionsReport;
-    private transient String acquisitionsReportHTML;
-    private transient List<String> newAcquisitionsReports;
-
-    private final ArrayList<String> medicalReport;
-    private transient String medicalReportHTML;
-    private transient List<String> newMedicalReports;
-
-    private final ArrayList<String> battleReport;
-    private transient String battleReportHTML;
-    private transient List<String> newBattleReports;
-
-    private final ArrayList<String> politicsReport;
-    private transient String politicsReportHTML;
-    private transient List<String> newPoliticsReports;
-
-    private final ArrayList<String> aggregateReport;
-    private transient String aggregateReportHTML;
-    private transient List<String> newAggregateReports;
+    private final DailyReportLog dailyReportLog = new DailyReportLog();
 
     private Person genericAcquisitionPerson;
 
@@ -553,47 +516,6 @@ public class Campaign implements ITechManager {
         // The force initializes the migrated settings/capacities to their static defaults; only the
         // MHQ-options-derived one is asserted here where those options are available.
         playerForce.setTopUpWeekly(mekhqOptions.getNewDayAutoLogistics());
-
-        // Reports
-        currentReport = new ArrayList<>();
-        currentReportHTML = "";
-        newReports = new ArrayList<>();
-
-        personnelReport = new ArrayList<>();
-        personnelReportHTML = "";
-        newPersonnelReports = new ArrayList<>();
-
-        skillReport = new ArrayList<>();
-        skillReportHTML = "";
-        newSkillReports = new ArrayList<>();
-
-        technicalReport = new ArrayList<>();
-        technicalReportHTML = "";
-        newTechnicalReports = new ArrayList<>();
-
-        financesReport = new ArrayList<>();
-        financesReportHTML = "";
-        newFinancesReports = new ArrayList<>();
-
-        acquisitionsReport = new ArrayList<>();
-        acquisitionsReportHTML = "";
-        newAcquisitionsReports = new ArrayList<>();
-
-        medicalReport = new ArrayList<>();
-        medicalReportHTML = "";
-        newMedicalReports = new ArrayList<>();
-
-        battleReport = new ArrayList<>();
-        battleReportHTML = "";
-        newBattleReports = new ArrayList<>();
-
-        politicsReport = new ArrayList<>();
-        politicsReportHTML = "";
-        newPoliticsReports = new ArrayList<>();
-
-        aggregateReport = new ArrayList<>();
-        aggregateReportHTML = "";
-        newAggregateReports = new ArrayList<>();
 
         // Secondary initialization from passed / derived values
         news = new News(getGameYear(), id.getLeastSignificantBits());
@@ -962,7 +884,7 @@ public class Campaign implements ITechManager {
      * @deprecated Use {@link PlayerForce#getCombatTeamsAsList(Campaign)} directly.
      */
     @Deprecated(since = "0.51.01", forRemoval = true)
-    public ArrayList<CombatTeam> getCombatTeamsAsList() {
+    public List<CombatTeam> getCombatTeamsAsList() {
         return getPlayerForce().getCombatTeamsAsList(this);
     }
 
@@ -1447,15 +1369,24 @@ public class Campaign implements ITechManager {
     }
 
     /**
-     * @return missions List sorted with complete missions at the bottom
+     * @return missions sorted with active missions from oldest to newest, followed by completed missions from newest to
+     *       oldest; active missions without a start date use the campaign date, while completed missions without one
+     *       sort last
      */
     public List<Mission> getSortedMissions() {
-        return getMissions().stream()
-                     .sorted(Comparator.comparing(Mission::getStatus)
-                                   .thenComparing(m -> (m instanceof Contract) ?
-                                                             ((Contract) m).getStartDate() :
-                                                             LocalDate.now()))
-                     .collect(Collectors.toList());
+        List<Mission> sortedMissions = new ArrayList<>(getMissions());
+        sortedMissions.sort(Comparator.comparing((Mission mission) -> mission.getStatus().isCompleted())
+                                  .thenComparingLong(this::getMissionSortKey));
+        return sortedMissions;
+    }
+
+    private long getMissionSortKey(Mission mission) {
+        LocalDate startDate = mission.getStartDate();
+        if (startDate == null) {
+            return mission.getStatus().isCompleted() ? Long.MAX_VALUE : getLocalDate().toEpochDay();
+        }
+        long startDay = startDate.toEpochDay();
+        return mission.getStatus().isCompleted() ? -startDay : startDay;
     }
 
     public List<Mission> getActiveMissions(final boolean excludeEndDateCheck) {
@@ -2028,7 +1959,7 @@ public class Campaign implements ITechManager {
 
     /**
      * @return all hangars across all locations associated with this campaign.
-     *                                                                                                                         TODO: This won't work once we support multiple hangars. Method separated from getHangar() for future refactor
+     *                                                                                                                               TODO: This won't work once we support multiple hangars. Method separated from getHangar() for future refactor
      *
      * @deprecated Use {@link PlayerForce#getHangar()} directly.
      */
@@ -2890,264 +2821,8 @@ public class Campaign implements ITechManager {
         return getPlayerForce().getFormation(id);
     }
 
-    public List<String> getCurrentReport() {
-        return currentReport;
-    }
-
-    public void setCurrentReportHTML(String html) {
-        currentReportHTML = html;
-    }
-
-    public String getCurrentReportHTML() {
-        return currentReportHTML;
-    }
-
-    public List<String> getNewReports() {
-        return newReports;
-    }
-
-    public void setNewReports(List<String> reports) {
-        newReports = reports;
-    }
-
-    public List<String> fetchAndClearNewReports() {
-        List<String> oldReports = newReports;
-        setNewReports(new ArrayList<>());
-        return oldReports;
-    }
-
-    public List<String> getSkillReport() {
-        return skillReport;
-    }
-
-    public void setSkillReportHTML(String html) {
-        skillReportHTML = html;
-    }
-
-    public String getSkillReportHTML() {
-        return skillReportHTML;
-    }
-
-    public List<String> getNewSkillReports() {
-        return newSkillReports;
-    }
-
-    public void setNewSkillReports(List<String> reports) {
-        newSkillReports = reports;
-    }
-
-    public List<String> fetchAndClearNewSkillReports() {
-        List<String> oldSkillReports = newSkillReports;
-        setNewSkillReports(new ArrayList<>());
-        return oldSkillReports;
-    }
-
-    public List<String> getTechnicalReport() {
-        return technicalReport;
-    }
-
-    public void setTechnicalReportHTML(String html) {
-        technicalReportHTML = html;
-    }
-
-    public String getTechnicalReportHTML() {
-        return technicalReportHTML;
-    }
-
-    public List<String> getNewTechnicalReports() {
-        return newTechnicalReports;
-    }
-
-    public void setNewTechnicalReports(List<String> reports) {
-        newTechnicalReports = reports;
-    }
-
-    public List<String> fetchAndClearNewTechnicalReports() {
-        List<String> oldTechnicalReports = newTechnicalReports;
-        setNewTechnicalReports(new ArrayList<>());
-        return oldTechnicalReports;
-    }
-
-    public List<String> getFinancesReport() {
-        return financesReport;
-    }
-
-    public void setFinancesReportHTML(String html) {
-        financesReportHTML = html;
-    }
-
-    public String getFinancesReportHTML() {
-        return financesReportHTML;
-    }
-
-    public List<String> getNewFinancesReports() {
-        return newFinancesReports;
-    }
-
-    public void setNewFinancesReports(List<String> reports) {
-        newFinancesReports = reports;
-    }
-
-    public List<String> fetchAndClearNewFinancesReports() {
-        List<String> oldFinancesReports = newFinancesReports;
-        setNewFinancesReports(new ArrayList<>());
-        return oldFinancesReports;
-    }
-
-    public List<String> getAcquisitionsReport() {
-        return acquisitionsReport;
-    }
-
-    public void setAcquisitionsReportHTML(String html) {
-        acquisitionsReportHTML = html;
-    }
-
-    public String getAcquisitionsReportHTML() {
-        return acquisitionsReportHTML;
-    }
-
-    public List<String> getNewAcquisitionsReports() {
-        return newAcquisitionsReports;
-    }
-
-    public void setNewAcquisitionsReports(List<String> reports) {
-        newAcquisitionsReports = reports;
-    }
-
-    public List<String> fetchAndClearNewAcquisitionsReports() {
-        List<String> oldAcquisitionsReports = newAcquisitionsReports;
-        setNewAcquisitionsReports(new ArrayList<>());
-        return oldAcquisitionsReports;
-    }
-
-    public List<String> getMedicalReport() {
-        return medicalReport;
-    }
-
-    public void setMedicalReportHTML(String html) {
-        medicalReportHTML = html;
-    }
-
-    public String getMedicalReportHTML() {
-        return medicalReportHTML;
-    }
-
-    public List<String> getNewMedicalReports() {
-        return newMedicalReports;
-    }
-
-    public void setNewMedicalReports(List<String> reports) {
-        newMedicalReports = reports;
-    }
-
-    public List<String> fetchAndClearNewMedicalReports() {
-        List<String> oldMedicalReports = newMedicalReports;
-        setNewMedicalReports(new ArrayList<>());
-        return oldMedicalReports;
-    }
-
-    public List<String> getPersonnelReport() {
-        return personnelReport;
-    }
-
-    public void setPersonnelReportHTML(String html) {
-        personnelReportHTML = html;
-    }
-
-    public String getPersonnelReportHTML() {
-        return personnelReportHTML;
-    }
-
-    public List<String> getNewPersonnelReports() {
-        return newPersonnelReports;
-    }
-
-    public void setNewPersonnelReports(List<String> reports) {
-        newPersonnelReports = reports;
-    }
-
-    public List<String> fetchAndClearNewPersonnelReports() {
-        List<String> oldPersonnelReports = newPersonnelReports;
-        setNewPersonnelReports(new ArrayList<>());
-        return oldPersonnelReports;
-    }
-
-    public List<String> getBattleReport() {
-        return battleReport;
-    }
-
-    public void setBattleReportHTML(String html) {
-        battleReportHTML = html;
-    }
-
-    public String getBattleReportHTML() {
-        return battleReportHTML;
-    }
-
-    public List<String> getNewBattleReports() {
-        return newBattleReports;
-    }
-
-    public void setNewBattleReports(List<String> reports) {
-        newBattleReports = reports;
-    }
-
-    public List<String> fetchAndClearNewBattleReports() {
-        List<String> oldBattleReports = newBattleReports;
-        setNewBattleReports(new ArrayList<>());
-        return oldBattleReports;
-    }
-
-    public List<String> getPoliticsReport() {
-        return politicsReport;
-    }
-
-    public void setPoliticsReportHTML(String html) {
-        politicsReportHTML = html;
-    }
-
-    public String getPoliticsReportHTML() {
-        return politicsReportHTML;
-    }
-
-    public List<String> getNewPoliticsReports() {
-        return newPoliticsReports;
-    }
-
-    public void setNewPoliticsReports(List<String> reports) {
-        newPoliticsReports = reports;
-    }
-
-    public List<String> fetchAndClearNewPoliticsReports() {
-        List<String> oldPoliticsReports = newPoliticsReports;
-        setNewPoliticsReports(new ArrayList<>());
-        return oldPoliticsReports;
-    }
-
-    public List<String> getAggregateReport() {
-        return aggregateReport;
-    }
-
-    public void setAggregateReportHTML(String html) {
-        aggregateReportHTML = html;
-    }
-
-    public String getAggregateReportHTML() {
-        return aggregateReportHTML;
-    }
-
-    public List<String> getNewAggregateReports() {
-        return newAggregateReports;
-    }
-
-    public void setNewAggregateReports(List<String> reports) {
-        newAggregateReports = reports;
-    }
-
-    public List<String> fetchAndClearNewAggregateReports() {
-        List<String> oldAggregateReports = newAggregateReports;
-        setNewAggregateReports(new ArrayList<>());
-        return oldAggregateReports;
+    public DailyReportLog getDailyReportLog() {
+        return dailyReportLog;
     }
 
     /**
@@ -5426,118 +5101,7 @@ public class Campaign implements ITechManager {
     }
 
     private void addReportInternal(final DailyReportType type, final String report) {
-        switch (type) {
-            case GENERAL -> {
-                currentReport.add(report);
-                if (!currentReportHTML.isEmpty()) {
-                    currentReportHTML = currentReportHTML + REPORT_LINEBREAK + report;
-                    newReports.add(REPORT_LINEBREAK);
-                } else {
-                    currentReportHTML = report;
-                }
-
-                newReports.add(report);
-            }
-            case SKILL_CHECKS -> {
-                skillReport.add(report);
-                if (!skillReportHTML.isEmpty()) {
-                    skillReportHTML = skillReportHTML + REPORT_LINEBREAK + report;
-                    newSkillReports.add(REPORT_LINEBREAK);
-                } else {
-                    skillReportHTML = report;
-                }
-
-                newSkillReports.add(report);
-            }
-            case TECHNICAL -> {
-                technicalReport.add(report);
-                if (!technicalReportHTML.isEmpty()) {
-                    technicalReportHTML = technicalReportHTML + REPORT_LINEBREAK + report;
-                    newTechnicalReports.add(REPORT_LINEBREAK);
-                } else {
-                    technicalReportHTML = report;
-                }
-
-                newTechnicalReports.add(report);
-            }
-            case FINANCES -> {
-                financesReport.add(report);
-                if (!financesReportHTML.isEmpty()) {
-                    financesReportHTML = financesReportHTML + REPORT_LINEBREAK + report;
-                    newFinancesReports.add(REPORT_LINEBREAK);
-                } else {
-                    financesReportHTML = report;
-                }
-
-                newFinancesReports.add(report);
-            }
-            case ACQUISITIONS -> {
-                acquisitionsReport.add(report);
-                if (!acquisitionsReportHTML.isEmpty()) {
-                    acquisitionsReportHTML = acquisitionsReportHTML + REPORT_LINEBREAK + report;
-                    newAcquisitionsReports.add(REPORT_LINEBREAK);
-                } else {
-                    acquisitionsReportHTML = report;
-                }
-
-                newAcquisitionsReports.add(report);
-            }
-            case MEDICAL -> {
-                medicalReport.add(report);
-                if (!medicalReportHTML.isEmpty()) {
-                    medicalReportHTML = medicalReportHTML + REPORT_LINEBREAK + report;
-                    newMedicalReports.add(REPORT_LINEBREAK);
-                } else {
-                    medicalReportHTML = report;
-                }
-
-                newMedicalReports.add(report);
-            }
-            case PERSONNEL -> {
-                personnelReport.add(report);
-                if (!personnelReportHTML.isEmpty()) {
-                    personnelReportHTML = personnelReportHTML + REPORT_LINEBREAK + report;
-                    newPersonnelReports.add(REPORT_LINEBREAK);
-                } else {
-                    personnelReportHTML = report;
-                }
-
-                newPersonnelReports.add(report);
-            }
-            case BATTLE -> {
-                battleReport.add(report);
-                if (!battleReportHTML.isEmpty()) {
-                    battleReportHTML = battleReportHTML + REPORT_LINEBREAK + report;
-                    newBattleReports.add(REPORT_LINEBREAK);
-                } else {
-                    battleReportHTML = report;
-                }
-
-                newBattleReports.add(report);
-            }
-            case POLITICS -> {
-                politicsReport.add(report);
-                if (!politicsReportHTML.isEmpty()) {
-                    politicsReportHTML = politicsReportHTML + REPORT_LINEBREAK + report;
-                    newPoliticsReports.add(REPORT_LINEBREAK);
-                } else {
-                    politicsReportHTML = report;
-                }
-
-                newPoliticsReports.add(report);
-            }
-            case AGGREGATE -> {
-                aggregateReport.add(report);
-                if (!aggregateReportHTML.isEmpty()) {
-                    aggregateReportHTML = aggregateReportHTML + REPORT_LINEBREAK + report;
-                    newAggregateReports.add(REPORT_LINEBREAK);
-                } else {
-                    aggregateReportHTML = report;
-                }
-
-                newAggregateReports.add(report);
-            }
-        }
+        dailyReportLog.add(type, report);
         MekHQ.triggerEvent(new ReportEvent(this, report));
     }
 
@@ -5869,75 +5433,7 @@ public class Campaign implements ITechManager {
         MHQXMLUtility.writeSimpleXMLTag(writer, indent, "percentFemale", RandomGenderGenerator.getPercentFemale());
         MHQXMLUtility.writeSimpleXMLCloseTag(writer, --indent, "nameGen");
 
-        MHQXMLUtility.writeSimpleXMLOpenTag(writer, indent++, "currentReport");
-        for (String report : currentReport) {
-            // This cannot use the MHQXMLUtility as it cannot be escaped
-            writer.println(MHQXMLUtility.indentStr(indent) + "<reportLine><![CDATA[" + report + "]]></reportLine>");
-        }
-        MHQXMLUtility.writeSimpleXMLCloseTag(writer, --indent, "currentReport");
-
-        MHQXMLUtility.writeSimpleXMLOpenTag(writer, indent++, "skillReport");
-        for (String report : skillReport) {
-            // This cannot use the MHQXMLUtility as it cannot be escaped
-            writer.println(MHQXMLUtility.indentStr(indent) + "<reportLine><![CDATA[" + report + "]]></reportLine>");
-        }
-        MHQXMLUtility.writeSimpleXMLCloseTag(writer, --indent, "skillReport");
-
-        MHQXMLUtility.writeSimpleXMLOpenTag(writer, indent++, "technicalReport");
-        for (String report : technicalReport) {
-            // This cannot use the MHQXMLUtility as it cannot be escaped
-            writer.println(MHQXMLUtility.indentStr(indent) + "<reportLine><![CDATA[" + report + "]]></reportLine>");
-        }
-        MHQXMLUtility.writeSimpleXMLCloseTag(writer, --indent, "technicalReport");
-
-        MHQXMLUtility.writeSimpleXMLOpenTag(writer, indent++, "financesReport");
-        for (String report : financesReport) {
-            // This cannot use the MHQXMLUtility as it cannot be escaped
-            writer.println(MHQXMLUtility.indentStr(indent) + "<reportLine><![CDATA[" + report + "]]></reportLine>");
-        }
-        MHQXMLUtility.writeSimpleXMLCloseTag(writer, --indent, "financesReport");
-
-        MHQXMLUtility.writeSimpleXMLOpenTag(writer, indent++, "acquisitionsReport");
-        for (String report : acquisitionsReport) {
-            // This cannot use the MHQXMLUtility as it cannot be escaped
-            writer.println(MHQXMLUtility.indentStr(indent) + "<reportLine><![CDATA[" + report + "]]></reportLine>");
-        }
-        MHQXMLUtility.writeSimpleXMLCloseTag(writer, --indent, "acquisitionsReport");
-
-        MHQXMLUtility.writeSimpleXMLOpenTag(writer, indent++, "medicalReport");
-        for (String report : medicalReport) {
-            // This cannot use the MHQXMLUtility as it cannot be escaped
-            writer.println(MHQXMLUtility.indentStr(indent) + "<reportLine><![CDATA[" + report + "]]></reportLine>");
-        }
-        MHQXMLUtility.writeSimpleXMLCloseTag(writer, --indent, "medicalReport");
-
-        MHQXMLUtility.writeSimpleXMLOpenTag(writer, indent++, "personnelReport");
-        for (String report : personnelReport) {
-            // This cannot use the MHQXMLUtility as it cannot be escaped
-            writer.println(MHQXMLUtility.indentStr(indent) + "<reportLine><![CDATA[" + report + "]]></reportLine>");
-        }
-        MHQXMLUtility.writeSimpleXMLCloseTag(writer, --indent, "personnelReport");
-
-        MHQXMLUtility.writeSimpleXMLOpenTag(writer, indent++, "battleReport");
-        for (String report : battleReport) {
-            // This cannot use the MHQXMLUtility as it cannot be escaped
-            writer.println(MHQXMLUtility.indentStr(indent) + "<reportLine><![CDATA[" + report + "]]></reportLine>");
-        }
-        MHQXMLUtility.writeSimpleXMLCloseTag(writer, --indent, "battleReport");
-
-        MHQXMLUtility.writeSimpleXMLOpenTag(writer, indent++, "politicsReport");
-        for (String report : politicsReport) {
-            // This cannot use the MHQXMLUtility as it cannot be escaped
-            writer.println(MHQXMLUtility.indentStr(indent) + "<reportLine><![CDATA[" + report + "]]></reportLine>");
-        }
-        MHQXMLUtility.writeSimpleXMLCloseTag(writer, --indent, "politicsReport");
-
-        MHQXMLUtility.writeSimpleXMLOpenTag(writer, indent++, "aggregateReport");
-        for (String report : aggregateReport) {
-            // This cannot use the MHQXMLUtility as it cannot be escaped
-            writer.println(MHQXMLUtility.indentStr(indent) + "<reportLine><![CDATA[" + report + "]]></reportLine>");
-        }
-        MHQXMLUtility.writeSimpleXMLCloseTag(writer, --indent, "aggregateReport");
+        dailyReportLog.writeToXML(writer, indent);
 
         MHQXMLUtility.writeSimpleXMLCloseTag(writer, --indent, "info");
         // endregion Basic Campaign Info
@@ -7003,10 +6499,6 @@ public class Campaign implements ITechManager {
         }
 
         final int minutes = Math.min(partWork.getTimeLeft(), techTime);
-        if (!(partWork instanceof Refit) && minutes <= 0) {
-            LOGGER.error("Attempting to get the target number for a part with zero time left.");
-            return new TargetRoll(TargetRoll.AUTOMATIC_FAIL, "No part repair time remaining.");
-        }
 
         int helpMod;
         if ((partWork.getUnit() != null) && partWork.getUnit().isSelfCrewed()) {
@@ -7877,6 +7369,11 @@ public class Campaign implements ITechManager {
 
     public void setGameOptions(final GameOptions gameOptions) {
         this.gameOptions = gameOptions;
+        // Keep the Game's reference in sync: MegaMek code (e.g. TeamLoadOutGenerator during scenario setup) reads
+        // options through campaign.getGame().getOptions(). Without this, replacing the campaign's options (e.g. when
+        // applying a campaign preset) leaves the Game holding a stale GameOptions object, so later updates such as
+        // the ALLOWED_YEAR sync are never seen there and bot forces get munitions from the wrong era.
+        game.setOptions(gameOptions);
     }
 
     public void setGameOptions(final Vector<IBasicOption> options) {

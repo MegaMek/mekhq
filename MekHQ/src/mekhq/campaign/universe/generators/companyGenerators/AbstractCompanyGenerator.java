@@ -33,7 +33,6 @@
 package mekhq.campaign.universe.generators.companyGenerators;
 
 import static mekhq.campaign.enums.DailyReportType.FINANCES;
-import static mekhq.campaign.personnel.education.EducationController.setInitialEducationLevel;
 import static mekhq.campaign.personnel.skills.SkillType.S_LEADER;
 import static mekhq.campaign.personnel.skills.SkillType.S_STRATEGY;
 import static mekhq.campaign.personnel.skills.SkillType.S_TACTICS;
@@ -65,6 +64,7 @@ import mekhq.MHQStaticDirectoryManager;
 import mekhq.MekHQ;
 import mekhq.Utilities;
 import mekhq.campaign.Campaign;
+import mekhq.campaign.campaignOptions.CampaignOption;
 import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.finances.Loan;
 import mekhq.campaign.finances.Money;
@@ -86,6 +86,7 @@ import mekhq.campaign.personnel.generator.AbstractPersonnelGenerator;
 import mekhq.campaign.personnel.ranks.Rank;
 import mekhq.campaign.personnel.skills.Skill;
 import mekhq.campaign.personnel.skills.SkillType;
+import mekhq.campaign.personnel.skills.enums.SkillAttribute;
 import mekhq.campaign.unit.Unit;
 import mekhq.campaign.universe.Faction;
 import mekhq.campaign.universe.companyGeneration.AtBRandomMekParameters;
@@ -237,7 +238,7 @@ public abstract class AbstractCompanyGenerator {
     private int determineNumberOfCaptains() {
         return getOptions().isGenerateCaptains()
                      ? Math.max((getOptions().getCompanyCount()
-                                 - (getOptions().isGenerateMercenaryCompanyCommandLance() ? 0 : 1)), 0)
+                                       - (getOptions().isGenerateMercenaryCompanyCommandLance() ? 0 : 1)), 0)
                      : 0;
     }
     // endregion Determination Methods
@@ -705,9 +706,19 @@ public abstract class AbstractCompanyGenerator {
      */
     private void finalizePersonnel(final Campaign campaign,
           final List<CompanyGenerationPersonTracker> trackers) {
+        final CampaignOptions campaignOptions = campaign.getCampaignOptions();
+        final boolean useFoundersHavePlotArmor = campaignOptions.get(CampaignOption.USE_FOUNDER_PLOT_ARMOR);
+
         // Assign the founder flag if we need to
         if (getOptions().isAssignFounderFlag()) {
-            trackers.forEach(tracker -> tracker.getPerson().setFounder(true));
+            for (final CompanyGenerationPersonTracker tracker : trackers) {
+                Person person = tracker.getPerson();
+                person.setFounder(true);
+
+                if (useFoundersHavePlotArmor) {
+                    person.gainEdge(1, campaignOptions.get(CampaignOption.MAXIMUM_EDGE));
+                }
+            }
         }
 
         // Recruit all the personnel, GM-style so that the initial hiring cost is
@@ -720,10 +731,6 @@ public abstract class AbstractCompanyGenerator {
 
         // Now that they are recruited, we can simulate backwards a few years and
         // generate marriages and children
-        for (final CompanyGenerationPersonTracker tracker : trackers) {
-            Person person = tracker.getPerson();
-            setInitialEducationLevel(campaign, person);
-        }
 
         if (getOptions().isRunStartingSimulation()) {
             LocalDate date = campaign.getLocalDate().minusYears(getOptions().getSimulationDuration()).minusWeeks(1);
@@ -748,7 +755,6 @@ public abstract class AbstractCompanyGenerator {
             }
             //remove any post-partum injuries/hits that may have been applied due to giving birth
             for (final CompanyGenerationPersonTracker tracker : trackers) {
-                CampaignOptions campaignOptions = campaign.getCampaignOptions();
                 Person person = tracker.getPerson();
                 if (person.needsFixing()) {
                     if (campaignOptions.isUseAdvancedMedical()) {

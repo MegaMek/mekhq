@@ -78,11 +78,11 @@ import mekhq.campaign.Campaign;
 import mekhq.campaign.againstTheBot.AtBConfiguration;
 import mekhq.campaign.againstTheBot.AtBStaticWeightGenerator;
 import mekhq.campaign.campaignOptions.CampaignOptions;
-import mekhq.campaign.digitalGM.stratCon.StratConBiomeManifest;
-import mekhq.campaign.digitalGM.stratCon.StratConBiomeManifest.MapTypeList;
 import mekhq.campaign.digitalGM.stratCon.StratConCampaignState;
 import mekhq.campaign.digitalGM.stratCon.StratConScenario;
 import mekhq.campaign.digitalGM.stratCon.StratConTrackState;
+import mekhq.campaign.digitalGM.stratCon.biome.StratConBiomeManifest;
+import mekhq.campaign.digitalGM.stratCon.biome.StratConBiomeManifest.MapTypeList;
 import mekhq.campaign.enums.DragoonRating;
 import mekhq.campaign.force.CombatTeam;
 import mekhq.campaign.force.Formation;
@@ -407,8 +407,9 @@ public abstract class AtBScenario extends Scenario implements IAtBScenario {
     }
 
     public void setWeatherConditions(boolean isNoTornadoes) {
-        // weather is irrelevant in these situations.
-        if (getBoardType() == AtBScenario.T_SPACE || getBoardType() == AtBScenario.T_ATMOSPHERE) {
+        // Vacuum has no weather. Low atmosphere does: wind and visibility bear on a fight in a planet's air just as
+        // they do on the ground beneath it, so only space is exempt.
+        if (getBoardType() == AtBScenario.T_SPACE) {
             return;
         }
 

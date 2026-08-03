@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2018-2025 The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2018-2026 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -32,6 +32,8 @@
  */
 package mekhq.campaign.log;
 
+import static mekhq.utilities.MHQInternationalization.getTextAt;
+
 import java.text.MessageFormat;
 import java.time.LocalDate;
 import java.util.ResourceBundle;
@@ -47,8 +49,11 @@ import mekhq.campaign.personnel.enums.GenderDescriptors;
  * @author Miguel Azevedo
  */
 public class PersonalLogger {
+    @Deprecated(since = "0.51.01")
     private static final ResourceBundle resources = ResourceBundle.getBundle("mekhq.resources.LogEntries",
           MekHQ.getMHQOptions().getLocale());
+
+    private static final String RESOURCE_BUNDLE = "mekhq.resources.LogEntries";
 
     public static void spouseKia(Person spouse, Person person, LocalDate date) {
         String message = resources.getString("spouseKia.text");
@@ -106,5 +111,10 @@ public class PersonalLogger {
               MessageFormat.format(resources.getString("ourChildBorn.text"),
                     spouseName,
                     GenderDescriptors.BOY_GIRL.getDescriptor(baby.getGender()))));
+    }
+
+    public static void cheatedDeath(Person person, LocalDate date) {
+        String message = getTextAt(RESOURCE_BUNDLE, "cheatedDeath.text");
+        person.addPersonalLogEntry(new PersonalLogEntry(date, message));
     }
 }

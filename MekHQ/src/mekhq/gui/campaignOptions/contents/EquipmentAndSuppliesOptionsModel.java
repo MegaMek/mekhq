@@ -82,6 +82,7 @@ class EquipmentAndSuppliesOptionsModel {
     int techLevel;
     boolean variableTechLevel;
     boolean useAmmoByType;
+    boolean limitClanTech;
 
     EquipmentAndSuppliesOptionsModel(@Nonnull CampaignOptions options) {
         acquisitionType = options.getAcquisitionType();
@@ -132,6 +133,7 @@ class EquipmentAndSuppliesOptionsModel {
         allowISPurchases = options.isAllowISPurchases();
         allowCanonOnly = options.isAllowCanonOnly();
         allowCanonRefitOnly = options.isAllowCanonRefitOnly();
+        limitClanTech = options.isLimitClanTech();
         techLevel = options.getTechLevel();
         variableTechLevel = options.isVariableTechLevel();
         useAmmoByType = options.isUseAmmoByType();
@@ -189,5 +191,6 @@ class EquipmentAndSuppliesOptionsModel {
         options.setTechLevel(techLevel);
         options.setVariableTechLevel(variableTechLevel);
         options.setUseAmmoByType(useAmmoByType);
+        options.setLimitClanTech(limitClanTech);
     }
 }

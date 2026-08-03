@@ -1,0 +1,87 @@
+# MegaMek Data (C) 2026 by The MegaMek Team is licensed under CC BY-NC-SA 4.0.
+# To view a copy of this license, visit https://creativecommons.org/licenses/by-nc-sa/4.0/
+#
+# NOTICE: The MegaMek organization is a non-profit group of volunteers
+# creating free software for the BattleTech community.
+#
+# MechWarrior, BattleMech, `Mech and AeroTech are registered trademarks
+# of The Topps Company, Inc. All Rights Reserved.
+#
+# Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
+# InMediaRes Productions, LLC.
+#
+# MechWarrior Copyright Microsoft Corporation. MegaMek Data was created under
+# Microsoft's "Game Content Usage Rules"
+# <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+# affiliated with Microsoft.
+#
+# StratCon improved-sector-generation urban (settlement) profiles. A profile is chosen for a planet by multi-factor
+# weighting: weight = (Gaussian on log10 population) * (Gaussian on water%) * (Gaussian on habitability 0..1) *
+# (Gaussian on tech level 0..1). A null Gaussian center means the profile is indifferent to that condition. The 'type'
+# must match an UrbanProfileType constant, which also selects the city-placement algorithm. Placement parameters:
+# cityCountModifier scales the population-derived city count; clustering is 0 (spread) to 1 (tight); coastalBias is 0
+# to 1 (favor the coast). Agriculture: farmReach is how many hexes out from a city its farmland catchment extends;
+# farmDensity is the base chance (0..1) that an arable hex within reach becomes farmland (both scaled at runtime by the
+# planet's population, habitability, and tech level).
+#
+# Sigmas: population in log10 units, water in percent, habitability and tech in 0..1.
+
+populationSigma: 1.5
+waterSigma: 20
+habitabilitySigma: 0.3
+techSigma: 0.3
+
+profiles:
+  # Ports: cities on the coast, on wet worlds.
+  - type: COASTAL_PORTS
+    waterCenter: 65
+    coastalBias: 0.9
+    clustering: 0.3
+    farmReach: 2
+    farmDensity: 0.5
+
+  # Cities hugging rivers and lakes, on moderately wet worlds.
+  - type: RIVERINE
+    waterCenter: 35
+    coastalBias: 0.7
+    clustering: 0.3
+    farmReach: 2
+    farmDensity: 0.6
+
+  # Evenly spread farming settlements, on habitable, moderately populated worlds.
+  - type: DISPERSED
+    populationCenter: 6.5
+    habitabilityCenter: 0.8
+    cityCountModifier: 1.2
+    clustering: 0.0
+    coastalBias: 0.2
+    farmReach: 3
+    farmDensity: 0.8
+
+  # One dominant metropolis with a few satellites, on centralized, well-populated worlds. Primate city is the correct
+  # term. It does not mean the city has been overthrown by unusually intelligent simians.
+  - type: PRIMATE_CITY
+    populationCenter: 7.5
+    clustering: 0.5
+    coastalBias: 0.3
+    farmReach: 3
+    farmDensity: 0.6
+
+  # A tight megalopolis belt, on teeming, industrial worlds.
+  - type: CONURBATION
+    populationCenter: 9.5
+    techCenter: 0.8
+    clustering: 0.9
+    coastalBias: 0.3
+    farmReach: 1
+    farmDensity: 0.35
+
+  # A few scattered outposts in the liveable spots, on lightly-populated, harsher worlds.
+  - type: FRONTIER_OUTPOSTS
+    populationCenter: 4.5
+    habitabilityCenter: 0.25
+    cityCountModifier: 0.5
+    clustering: 0.1
+    coastalBias: 0.2
+    farmReach: 1
+    farmDensity: 0.3

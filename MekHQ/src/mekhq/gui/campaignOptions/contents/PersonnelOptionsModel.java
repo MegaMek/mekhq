@@ -36,6 +36,7 @@ import static mekhq.campaign.randomEvents.prisoners.PrisonerEventManager.DEFAULT
 
 import jakarta.annotation.Nonnull;
 import mekhq.campaign.Campaign;
+import mekhq.campaign.campaignOptions.CampaignOption;
 import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.personnel.enums.AwardBonus;
 import mekhq.campaign.personnel.enums.EdgeRefreshPeriod;
@@ -54,6 +55,9 @@ class PersonnelOptionsModel {
     boolean onlyCommandersMatterInfantry;
     boolean onlyCommandersMatterBattleArmor;
     boolean useEdge;
+    int maximumEdge;
+    boolean useTwistOfFateSurvival;
+    boolean useFoundersHavePlotArmor;
     EdgeRefreshPeriod edgeRefreshPeriod;
     int edgeRefreshCost;
     boolean useImplants;
@@ -91,6 +95,7 @@ class PersonnelOptionsModel {
     boolean trackTotalXPEarnings;
     boolean showOriginFaction;
     AwardBonus awardBonusStyle;
+    boolean useReplaceEdgeAwards;
     int awardTierSize;
     boolean enableAutoAwards;
     boolean issuePosthumousAwards;
@@ -144,6 +149,9 @@ class PersonnelOptionsModel {
         onlyCommandersMatterInfantry = options.isOnlyCommandersMatterInfantry();
         onlyCommandersMatterBattleArmor = options.isOnlyCommandersMatterBattleArmor();
         useEdge = options.isUseEdge();
+        maximumEdge = options.get(CampaignOption.MAXIMUM_EDGE);
+        useTwistOfFateSurvival = options.isUseTwistOfFateSurvival();
+        useFoundersHavePlotArmor = options.get(CampaignOption.USE_FOUNDER_PLOT_ARMOR);
         edgeRefreshPeriod = options.getEdgeRefreshPeriod();
         edgeRefreshCost = options.getEdgeRefreshCost();
         useImplants = options.isUseImplants();
@@ -181,6 +189,7 @@ class PersonnelOptionsModel {
         trackTotalXPEarnings = options.isTrackTotalXPEarnings();
         showOriginFaction = options.isShowOriginFaction();
         awardBonusStyle = options.getAwardBonusStyle();
+        useReplaceEdgeAwards = options.isUseReplaceEdgeAwards();
         awardTierSize = options.getAwardTierSize();
         enableAutoAwards = options.isEnableAutoAwards();
         issuePosthumousAwards = options.isIssuePosthumousAwards();
@@ -235,6 +244,9 @@ class PersonnelOptionsModel {
         options.setOnlyCommandersMatterInfantry(onlyCommandersMatterInfantry);
         options.setOnlyCommandersMatterBattleArmor(onlyCommandersMatterBattleArmor);
         options.setUseEdge(useEdge);
+        options.set(CampaignOption.MAXIMUM_EDGE, maximumEdge);
+        options.setUseTwistOfFateSurvival(useTwistOfFateSurvival);
+        options.set(CampaignOption.USE_FOUNDER_PLOT_ARMOR, useFoundersHavePlotArmor);
         options.setEdgeRefreshPeriod(edgeRefreshPeriod);
         options.setEdgeRefreshCost(edgeRefreshCost);
         options.setUseImplants(useImplants);
@@ -273,6 +285,7 @@ class PersonnelOptionsModel {
         options.setShowOriginFaction(showOriginFaction);
         options.setAwardBonusStyle(awardBonusStyle);
         options.setAwardTierSize(awardTierSize);
+        options.setUseReplaceEdgeAwards(useReplaceEdgeAwards);
         options.setEnableAutoAwards(enableAutoAwards);
         options.setIssuePosthumousAwards(issuePosthumousAwards);
         options.setIssueBestAwardOnly(issueBestAwardOnly);

@@ -146,6 +146,7 @@ public final class MHQConstants extends SuiteConstants {
     public static final String AWAY_FROM_MAIN_FORCE_FOREGROUND = "awayFromMainForceForeground";
     public static final String AWAY_FROM_MAIN_FORCE_BACKGROUND = "awayFromMainForceBackground";
     public static final String STRAT_CON_HEX_COORD_FOREGROUND = "stratconHexCoordForeground";
+    public static final String USE_ALTERNATE_STRAT_CON_FOG_OF_WAR = "useAlternateStratConFogOfWar";
     public static final String FONT_COLOR_NEGATIVE = "fontColorNegative";
     public static final String FONT_COLOR_AMAZING = "fontColorAmazing";
     public static final String FONT_COLOR_POSITIVE = "fontColorPositive";
@@ -202,6 +203,8 @@ public final class MHQConstants extends SuiteConstants {
     public static final String NEW_DAY_OPTIMIZE_MEDICAL_ASSIGNMENTS = "NewDayOptimizeMedicalAssignments";
     public static final String NEW_DAY_AUTOMATE_MAINTENANCE_ASSIGNMENTS = "NewDayAutomateMaintenanceAssignments";
     public static final String NEW_DAY_QUICK_TRAIN = "NewDayQuickTrain";
+    public static final String NEW_DAY_QUICK_TRAIN_IGNORE_TRAINING_FORMATIONS =
+          "NewDayQuickTrainIgnoreTrainingFormations";
     public static final String NEW_DAY_QUICK_TRAIN_TARGET = "QuickTrainTarget";
     public static final String NEW_DAY_ARTILLERY = "NewDayArtillery";
     public static final String NEW_DAY_SCOUTING = "NewDayScouting";
@@ -365,6 +368,11 @@ public final class MHQConstants extends SuiteConstants {
     public static final String STRAT_CON_CONTRACT_PATH = "./data/stratconcontractdefinitions/";
 
     public static final String STRAT_CON_BIOME_MANIFEST_PATH = "./data/stratconbiomedefinitions/StratConBiomeManifest.xml";
+    public static final String STRAT_CON_HYDROLOGY_PROFILES_PATH = "./data/stratconbiomedefinitions/HydrologyProfiles.yaml";
+    public static final String STRAT_CON_OROGENY_PROFILES_PATH = "./data/stratconbiomedefinitions/OrogenyProfiles.yaml";
+    public static final String STRAT_CON_URBAN_PROFILES_PATH = "./data/stratconbiomedefinitions/UrbanProfiles.yaml";
+    public static final String STRAT_CON_SECTOR_SHAPE_PROFILES_PATH =
+          "./data/stratconbiomedefinitions/SectorShapeProfiles.yaml";
     public static final String TERRAIN_CONDITIONS_ODDS_MANIFEST_PATH = "./data/terrainconditionsodds/TerrainConditionsOddsManifest.xml";
     public static final String HOSTILE_FACILITY_SCENARIO = "Hostile Facility.xml";
     public static final String ALLIED_FACILITY_SCENARIO = "Base Defense.xml";

@@ -46,7 +46,7 @@ import jakarta.annotation.Nonnull;
 import jakarta.annotation.Nullable;
 import mekhq.gui.campaignOptions.CampaignOptionFlag;
 import mekhq.gui.campaignOptions.components.CampaignOptionsCheckBox;
-import mekhq.gui.campaignOptions.components.CampaignOptionsFormPanel;
+import megamek.client.ui.settings.SettingsFormPanel;
 import mekhq.gui.campaignOptions.components.CampaignOptionsHeaderPanel;
 import mekhq.gui.campaignOptions.components.CampaignOptionsLabel;
 import mekhq.gui.campaignOptions.components.CampaignOptionsPagePanel;
@@ -64,7 +64,7 @@ import mekhq.gui.campaignOptions.components.CampaignOptionsSpinner;
  * no-ops.</p>
  */
 class EducationPage {
-    private static final int LABEL_COLUMN_WIDTH = CampaignOptionsFormPanel.DEFAULT_LABEL_WIDTH;
+    private static final int LABEL_COLUMN_WIDTH = SettingsFormPanel.DEFAULT_LABEL_WIDTH;
     // Wider than the default control column because the Biography combo boxes need the extra room.
     private static final int CONTROL_COLUMN_WIDTH = 240;
 
@@ -163,7 +163,7 @@ class EducationPage {
     }
 
     private @Nonnull JPanel createEducationOptionsPanel() {
-        final CampaignOptionsFormPanel panel = new CampaignOptionsFormPanel("EducationOptionsPanel",
+        final SettingsFormPanel panel = new SettingsFormPanel("EducationOptionsPanel",
                 LABEL_COLUMN_WIDTH,
                 CONTROL_COLUMN_WIDTH);
         panel.addCheckBox(chkUseEducationModule);
@@ -198,7 +198,7 @@ class EducationPage {
         chkEnableUnitEducation = new CampaignOptionsCheckBox("EnableUnitEducation");
         chkEnableUnitEducation.addMouseListener(createTipPanelUpdater("EnableUnitEducation"));
 
-        final CampaignOptionsFormPanel panel = new CampaignOptionsFormPanel("EnableStandardSetsPanel",
+        final SettingsFormPanel panel = new SettingsFormPanel("EnableStandardSetsPanel",
             LABEL_COLUMN_WIDTH,
             CONTROL_COLUMN_WIDTH);
         panel.addCheckBoxGrid(2,
@@ -231,7 +231,7 @@ class EducationPage {
         spnFacultyXpMultiplier.addMouseListener(createTipPanelUpdater("FacultyXpMultiplier"));
 
         // Layout the Panel
-        final CampaignOptionsFormPanel panel = new CampaignOptionsFormPanel("XpAndSkillBonusesPanel",
+        final SettingsFormPanel panel = new SettingsFormPanel("XpAndSkillBonusesPanel",
             LABEL_COLUMN_WIDTH,
             CONTROL_COLUMN_WIDTH);
         panel.addCheckBox(chkEnableBonuses);
@@ -264,7 +264,7 @@ class EducationPage {
         spnChildrenDropoutChance.addMouseListener(createTipPanelUpdater("ChildrenDropoutChance"));
 
         // Layout the Panel
-        final CampaignOptionsFormPanel panel = new CampaignOptionsFormPanel("DropoutChancePanel",
+        final SettingsFormPanel panel = new SettingsFormPanel("DropoutChancePanel",
             LABEL_COLUMN_WIDTH,
             CONTROL_COLUMN_WIDTH);
         panel.addRow(lblAdultDropoutChance, spnAdultDropoutChance);
@@ -297,7 +297,7 @@ class EducationPage {
         spnMilitaryAcademyAccidents.addMouseListener(createTipPanelUpdater("MilitaryAcademyAccidents"));
 
         // Layout the Panel
-        final CampaignOptionsFormPanel panel = new CampaignOptionsFormPanel("AccidentsAndEventsPanel",
+        final SettingsFormPanel panel = new SettingsFormPanel("AccidentsAndEventsPanel",
             LABEL_COLUMN_WIDTH,
             CONTROL_COLUMN_WIDTH);
         panel.addCheckBox(chkAllAges);

@@ -40,7 +40,7 @@ import javax.swing.JPopupMenu;
 import javax.swing.JTable;
 
 import mekhq.MekHQ;
-import mekhq.campaign.digitalGM.stratCon.MaplessStratCon;
+import mekhq.campaign.digitalGM.stratCon.gm.MaplessStratCon;
 import mekhq.campaign.events.scenarios.ScenarioChangedEvent;
 import mekhq.campaign.mission.AtBDynamicScenario;
 import mekhq.campaign.mission.Mission;

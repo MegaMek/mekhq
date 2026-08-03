@@ -32,6 +32,8 @@
  */
 package mekhq.campaign.personnel;
 
+import static mekhq.campaign.campaignOptions.CampaignOptions.EDGE_AWARD_REPLACEMENT_XP;
+
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -41,9 +43,12 @@ import megamek.common.annotations.Nullable;
 import megamek.logging.MMLogger;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
+import mekhq.campaign.campaignOptions.CampaignOption;
+import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.events.persons.PersonChangedEvent;
 import mekhq.campaign.log.AwardLogger;
 import mekhq.campaign.log.PerformanceLogger;
+import mekhq.campaign.personnel.enums.AwardBonus;
 
 /**
  * This class is responsible for the awards given to a person.
@@ -143,8 +148,14 @@ public class PersonAwardController {
             awards.add(award);
         }
 
-        if ((campaign.getCampaignOptions().getAwardBonusStyle().isBoth()) ||
-                  (campaign.getCampaignOptions().getAwardBonusStyle().isXP())) {
+        CampaignOptions campaignOptions = campaign.getCampaignOptions();
+        AwardBonus awardStyle = campaignOptions.getAwardBonusStyle();
+        boolean isBoth = awardStyle.isBoth();
+        boolean isXP = awardStyle.isXP();
+        boolean isEdge = awardStyle.isEdge();
+        boolean isReplaceEdgeAwards = campaignOptions.isUseReplaceEdgeAwards();
+
+        if (isBoth || isXP) {
             if (award.getXPReward() < 0) {
                 person.spendXP(-award.getXPReward());
             } else {
@@ -152,12 +163,18 @@ public class PersonAwardController {
             }
         }
 
-        if ((campaign.getCampaignOptions().getAwardBonusStyle().isBoth()) ||
-                  (campaign.getCampaignOptions().getAwardBonusStyle().isEdge())) {
+        if (isBoth || isEdge) {
             if (award.getEdgeReward() > 0) {
-                person.changeEdge(award.getEdgeReward());
-                person.changeCurrentEdge(award.getEdgeReward());
-                PerformanceLogger.gainedEdge(campaign, person, campaign.getLocalDate());
+                if (isReplaceEdgeAwards) {
+                    person.awardXP(campaign, award.getEdgeReward() * EDGE_AWARD_REPLACEMENT_XP);
+                } else {
+                    int gained = person.gainEdge(award.getEdgeReward(),
+                          campaignOptions.get(CampaignOption.MAXIMUM_EDGE));
+                    if (gained > 0) {
+                        person.changeCurrentEdge(gained);
+                        PerformanceLogger.gainedEdge(campaign, person, campaign.getLocalDate());
+                    }
+                }
             }
         }
 

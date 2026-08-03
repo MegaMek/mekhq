@@ -1,0 +1,68 @@
+# MegaMek Data (C) 2026 by The MegaMek Team is licensed under CC BY-NC-SA 4.0.
+# To view a copy of this license, visit https://creativecommons.org/licenses/by-nc-sa/4.0/
+#
+# NOTICE: The MegaMek organization is a non-profit group of volunteers
+# creating free software for the BattleTech community.
+#
+# MechWarrior, BattleMech, `Mech and AeroTech are registered trademarks
+# of The Topps Company, Inc. All Rights Reserved.
+#
+# Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
+# InMediaRes Productions, LLC.
+#
+# MechWarrior Copyright Microsoft Corporation. MegaMek Data was created under
+# Microsoft's "Game Content Usage Rules"
+# <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+# affiliated with Microsoft.
+#
+# StratCon improved-sector-generation hydrology profiles. Each profile is chosen for a planet by Gaussian weighting on
+# its water coverage: weight = exp(-(water - gaussianCenter)^2 / (2 * sigma^2)). A larger sigma spreads the choice
+# across more profiles (more variety). The actual ocean coverage is then rolled uniformly within the profile's band.
+# The 'type' must match a HydrologyProfileType constant, which also selects the ocean-shape algorithm.
+#
+# IMPORTANT: 'gaussianCenter' is the PLANET's water coverage at which the profile peaks - it is deliberately much
+# higher than that profile's own ocean band, and the two should not be matched up. A sector is one small patch of a
+# world, not the whole world, and the patches armies fight over are mostly continental interior: even an ocean-rich
+# planet is mostly interior where it is dry land at all. Setting each center near its own ocean band (as this file
+# originally did) treats every sector as if it were an average slice of the entire globe, which made a merely
+# Earth-like planet hand out islands and archipelagos and left landlocked sectors almost impossible.
+
+sigma: 18
+
+profiles:
+  - type: INLAND
+    minOceanPercent: 0
+    maxOceanPercent: 10
+    gaussianCenter: 35
+  - type: RIVERLANDS
+    minOceanPercent: 10
+    maxOceanPercent: 25
+    gaussianCenter: 45
+  - type: LAKELANDS
+    minOceanPercent: 15
+    maxOceanPercent: 30
+    gaussianCenter: 52
+  - type: MARSHLANDS
+    minOceanPercent: 25
+    maxOceanPercent: 40
+    gaussianCenter: 60
+  - type: COASTAL
+    minOceanPercent: 25
+    maxOceanPercent: 45
+    gaussianCenter: 65
+  - type: INLAND_SEA
+    minOceanPercent: 30
+    maxOceanPercent: 50
+    gaussianCenter: 72
+  - type: PENINSULA
+    minOceanPercent: 40
+    maxOceanPercent: 55
+    gaussianCenter: 80
+  - type: ISLAND
+    minOceanPercent: 50
+    maxOceanPercent: 70
+    gaussianCenter: 90
+  - type: ARCHIPELAGO
+    minOceanPercent: 60
+    maxOceanPercent: 80
+    gaussianCenter: 97

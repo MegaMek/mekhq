@@ -65,6 +65,7 @@ import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.CampaignSummary;
 import mekhq.campaign.campaignOptions.CampaignOptions;
+import mekhq.campaign.dailyReportLog.DailyReportLog;
 import mekhq.campaign.enums.DailyReportType;
 import mekhq.campaign.events.AcquisitionEvent;
 import mekhq.campaign.events.NewDayEvent;
@@ -1016,88 +1017,80 @@ public final class CommandCenterTab extends CampaignGuiTab {
      * Initialize a new daily log report
      */
     private void initLog() {
-        String generalReport = getCampaign().getCurrentReportHTML();
-        pnlGeneralLog.refreshLog(generalReport, GENERAL);
-        getCampaign().fetchAndClearNewReports();
+        DailyReportLog reportLog = getCampaign().getDailyReportLog();
 
-        String skillReport = getCampaign().getSkillReportHTML();
-        pnlSkillLog.refreshLog(skillReport, SKILL_CHECKS);
-        getCampaign().fetchAndClearNewSkillReports();
+        pnlGeneralLog.refreshLog(reportLog.getHtml(GENERAL), GENERAL);
+        reportLog.fetchAndClearNew(GENERAL);
 
-        String battleReport = getCampaign().getBattleReportHTML();
-        pnlBattleLog.refreshLog(battleReport, BATTLE);
-        getCampaign().fetchAndClearNewBattleReports();
+        pnlSkillLog.refreshLog(reportLog.getHtml(SKILL_CHECKS), SKILL_CHECKS);
+        reportLog.fetchAndClearNew(SKILL_CHECKS);
 
-        String politicsReport = getCampaign().getPoliticsReportHTML();
-        pnlPoliticsLog.refreshLog(politicsReport, POLITICS);
-        getCampaign().fetchAndClearNewPoliticsReports();
+        pnlBattleLog.refreshLog(reportLog.getHtml(BATTLE), BATTLE);
+        reportLog.fetchAndClearNew(BATTLE);
 
-        String personnelReport = getCampaign().getPersonnelReportHTML();
-        pnlPersonnelLog.refreshLog(personnelReport, PERSONNEL);
-        getCampaign().fetchAndClearNewPersonnelReports();
+        pnlPoliticsLog.refreshLog(reportLog.getHtml(POLITICS), POLITICS);
+        reportLog.fetchAndClearNew(POLITICS);
 
-        String medicalReport = getCampaign().getMedicalReportHTML();
-        pnlMedicalLog.refreshLog(medicalReport, MEDICAL);
-        getCampaign().fetchAndClearNewMedicalReports();
+        pnlPersonnelLog.refreshLog(reportLog.getHtml(PERSONNEL), PERSONNEL);
+        reportLog.fetchAndClearNew(PERSONNEL);
 
-        String financesReport = getCampaign().getFinancesReportHTML();
-        pnlFinancesLog.refreshLog(financesReport, FINANCES);
-        getCampaign().fetchAndClearNewFinancesReports();
+        pnlMedicalLog.refreshLog(reportLog.getHtml(MEDICAL), MEDICAL);
+        reportLog.fetchAndClearNew(MEDICAL);
 
-        String acquisitionsReport = getCampaign().getAcquisitionsReportHTML();
-        pnlAcquisitionsLog.refreshLog(acquisitionsReport, ACQUISITIONS);
-        getCampaign().fetchAndClearNewAcquisitionsReports();
+        pnlFinancesLog.refreshLog(reportLog.getHtml(FINANCES), FINANCES);
+        reportLog.fetchAndClearNew(FINANCES);
 
-        String technicalReport = getCampaign().getTechnicalReportHTML();
-        pnlTechnicalLog.refreshLog(technicalReport, TECHNICAL);
-        getCampaign().fetchAndClearNewTechnicalReports();
+        pnlAcquisitionsLog.refreshLog(reportLog.getHtml(ACQUISITIONS), ACQUISITIONS);
+        reportLog.fetchAndClearNew(ACQUISITIONS);
 
-        String aggregateReport = getCampaign().getAggregateReportHTML();
-        pnlAggregateLog.refreshLog(aggregateReport, AGGREGATE);
-        getCampaign().fetchAndClearNewAggregateReports();
+        pnlTechnicalLog.refreshLog(reportLog.getHtml(TECHNICAL), TECHNICAL);
+        reportLog.fetchAndClearNew(TECHNICAL);
+
+        pnlAggregateLog.refreshLog(reportLog.getHtml(AGGREGATE), AGGREGATE);
+        reportLog.fetchAndClearNew(AGGREGATE);
     }
 
     /**
      * append new reports to the daily log report
      */
     synchronized private void refreshGeneralLog() {
-        pnlGeneralLog.appendLog(getCampaign().fetchAndClearNewReports(), GENERAL);
+        pnlGeneralLog.appendLog(getCampaign().getDailyReportLog().fetchAndClearNew(GENERAL), GENERAL);
     }
 
     synchronized private void refreshSkillLog() {
-        pnlSkillLog.appendLog(getCampaign().fetchAndClearNewSkillReports(), SKILL_CHECKS);
+        pnlSkillLog.appendLog(getCampaign().getDailyReportLog().fetchAndClearNew(SKILL_CHECKS), SKILL_CHECKS);
     }
 
     synchronized private void refreshBattleLog() {
-        pnlBattleLog.appendLog(getCampaign().fetchAndClearNewBattleReports(), BATTLE);
+        pnlBattleLog.appendLog(getCampaign().getDailyReportLog().fetchAndClearNew(BATTLE), BATTLE);
     }
 
     synchronized private void refreshPoliticsLog() {
-        pnlPoliticsLog.appendLog(getCampaign().fetchAndClearNewPoliticsReports(), POLITICS);
+        pnlPoliticsLog.appendLog(getCampaign().getDailyReportLog().fetchAndClearNew(POLITICS), POLITICS);
     }
 
     synchronized private void refreshPersonnelLog() {
-        pnlPersonnelLog.appendLog(getCampaign().fetchAndClearNewPersonnelReports(), PERSONNEL);
+        pnlPersonnelLog.appendLog(getCampaign().getDailyReportLog().fetchAndClearNew(PERSONNEL), PERSONNEL);
     }
 
     synchronized private void refreshMedicalLog() {
-        pnlMedicalLog.appendLog(getCampaign().fetchAndClearNewMedicalReports(), MEDICAL);
+        pnlMedicalLog.appendLog(getCampaign().getDailyReportLog().fetchAndClearNew(MEDICAL), MEDICAL);
     }
 
     synchronized private void refreshFinancesLog() {
-        pnlFinancesLog.appendLog(getCampaign().fetchAndClearNewFinancesReports(), FINANCES);
+        pnlFinancesLog.appendLog(getCampaign().getDailyReportLog().fetchAndClearNew(FINANCES), FINANCES);
     }
 
     synchronized private void refreshAcquisitionsLog() {
-        pnlAcquisitionsLog.appendLog(getCampaign().fetchAndClearNewAcquisitionsReports(), ACQUISITIONS);
+        pnlAcquisitionsLog.appendLog(getCampaign().getDailyReportLog().fetchAndClearNew(ACQUISITIONS), ACQUISITIONS);
     }
 
     synchronized private void refreshTechnicalLog() {
-        pnlTechnicalLog.appendLog(getCampaign().fetchAndClearNewTechnicalReports(), TECHNICAL);
+        pnlTechnicalLog.appendLog(getCampaign().getDailyReportLog().fetchAndClearNew(TECHNICAL), TECHNICAL);
     }
 
     synchronized private void refreshAggregateLog() {
-        pnlAggregateLog.appendLog(getCampaign().fetchAndClearNewAggregateReports(), AGGREGATE);
+        pnlAggregateLog.appendLog(getCampaign().getDailyReportLog().fetchAndClearNew(AGGREGATE), AGGREGATE);
     }
 
     private final ActionScheduler procurementListScheduler = new ActionScheduler(this::refreshProcurementList);

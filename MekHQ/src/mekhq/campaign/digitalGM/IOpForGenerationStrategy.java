@@ -33,7 +33,7 @@
 package mekhq.campaign.digitalGM;
 
 import mekhq.campaign.Campaign;
-import mekhq.campaign.digitalGM.stratCon.AbstractStratConGM;
+import mekhq.campaign.digitalGM.stratCon.gm.AbstractStratConGM;
 import mekhq.campaign.mission.AtBContract;
 import mekhq.campaign.mission.AtBDynamicScenario;
 
