@@ -59,7 +59,7 @@ public class ChaosReputation {
 
     // When migrating a CamOps campaign to Chaos reputation, the CamOps crime rating is divided by this to seed each
     // character's Chaos criminal record.
-    private static final int CRIME_RATING_TO_CRIMINAL_RECORD_DIVIDER = 10;
+    private static final double CRIME_RATING_TO_CRIMINAL_RECORD_DIVIDER = 10.0;
 
     public static void calculateForceReputation(Campaign campaign) {
         // When tracking at the campaign level, the stored reputation is authoritative and is not derived from
@@ -194,7 +194,7 @@ public class ChaosReputation {
         // Carry over any CamOps crime standing as a Chaos criminal record. The adjusted crime rating is negative, so
         // dividing by CRIME_RATING_TO_CRIMINAL_RECORD_DIVIDER yields a (negative) criminal record penalty.
         int adjustedCrimeRating = campaign.getPlayerForce().getAdjustedCrimeRating();
-        int criminalRecordFromCrime = adjustedCrimeRating / CRIME_RATING_TO_CRIMINAL_RECORD_DIVIDER;
+        int criminalRecordFromCrime = (int) floor(adjustedCrimeRating / CRIME_RATING_TO_CRIMINAL_RECORD_DIVIDER);
 
         for (Person person : campaign.getPlayerForce().getHumanResources().getPersonnel()) {
             LocalDate departure = earliestDate(person.getDateOfDeath(), person.getRetirement());
