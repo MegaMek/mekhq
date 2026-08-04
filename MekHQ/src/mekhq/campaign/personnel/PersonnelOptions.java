@@ -89,6 +89,8 @@ public class PersonnelOptions extends PilotOptions {
     public static final String ATOW_CITIZENSHIP = "atow_citizenship";
     public static final String DONT_YOU_KNOW_WHO_I_AM = "dont_you_know_who_i_am";
     public static final String CERTIFIED_NOBODY = "certified_nobody";
+    public static final String FRIENDS_IN_HIGH_PLACES = "friends_in_high_places";
+    public static final String FORGETS_TO_SEND_MESSAGES = "forgets_to_send_messages";
     public static final String FLAW_ANIMAL_ANTIPATHY = "flaw_animal_antipathy";
     public static final String ATOW_ANIMAL_EMPATHY = "atow_animal_empathy";
     public static final String ATOW_AMBIDEXTROUS = "atow_ambidextrous";
@@ -317,6 +319,8 @@ public class PersonnelOptions extends PilotOptions {
         addOption(l3a, ATOW_CITIZENSHIP, false);
         addOption(l3a, DONT_YOU_KNOW_WHO_I_AM, false);
         addOption(l3a, CERTIFIED_NOBODY, false);
+        addOption(l3a, FRIENDS_IN_HIGH_PLACES, false);
+        addOption(l3a, FORGETS_TO_SEND_MESSAGES, false);
         addOption(l3a, FLAW_ANIMAL_ANTIPATHY, false);
         addOption(l3a, ATOW_ANIMAL_EMPATHY, false);
         addOption(l3a, ATOW_AMBIDEXTROUS, false);

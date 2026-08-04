@@ -7268,10 +7268,18 @@ public class Person implements ILocatable {
             fameContribution = (int) round(fameContribution * 0.75);
         }
 
+        int connectionsContribution = getAdjustedConnections(false);
+
+        if (options.booleanOption(FRIENDS_IN_HIGH_PLACES)) {
+            connectionsContribution = (int) round(connectionsContribution * 1.25);
+        } else if (options.booleanOption(FORGETS_TO_SEND_MESSAGES)) {
+            connectionsContribution = (int) round(connectionsContribution * 0.75);
+        }
+
         return chaosCampaignReputation +
                      chaosCampaignCriminalRecord +
                      fameContribution +
-                     getAdjustedConnections(false);
+                     connectionsContribution;
     }
 
     /** Generally you will want to call {@link #getAdjustedReputation(boolean, boolean, LocalDate)} instead */
