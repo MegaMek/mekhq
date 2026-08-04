@@ -179,18 +179,23 @@ public class ChaosReputationReportDialog extends AbstractReportDialog {
                 continue;
             }
 
+            int weight = ChaosReputation.getPersonnelReputationWeight(person);
+            if (weight == 0) {
+                continue;
+            }
+
             int primaryExperienceLevel = ChaosReputation.getExperienceLevel(campaign, person, true);
             int secondaryExperienceLevel = ChaosReputation.getExperienceLevel(campaign, person, false);
 
             if (primaryExperienceLevel != EXP_NONE) {
-                roleCount++;
-                totalExperienceLevel += primaryExperienceLevel;
-                experienceCounts.merge(primaryExperienceLevel, 1, Integer::sum);
+                roleCount += weight;
+                totalExperienceLevel += primaryExperienceLevel * weight;
+                experienceCounts.merge(primaryExperienceLevel, weight, Integer::sum);
             }
             if (secondaryExperienceLevel != EXP_NONE) {
-                roleCount++;
-                totalExperienceLevel += secondaryExperienceLevel;
-                experienceCounts.merge(secondaryExperienceLevel, 1, Integer::sum);
+                roleCount += weight;
+                totalExperienceLevel += secondaryExperienceLevel * weight;
+                experienceCounts.merge(secondaryExperienceLevel, weight, Integer::sum);
             }
         }
 
@@ -252,10 +257,15 @@ public class ChaosReputationReportDialog extends AbstractReportDialog {
                 continue;
             }
 
-            personCount++;
+            int weight = ChaosReputation.getPersonnelReputationWeight(person);
+            if (weight == 0) {
+                continue;
+            }
+
+            personCount += weight;
             int adjustedReputation = person.getAdjustedReputation(isUseAgeEffects, isClanForce, currentDate);
-            totalReputation += adjustedReputation;
-            reputationCounts.merge(adjustedReputation, 1, Integer::sum);
+            totalReputation += adjustedReputation * weight;
+            reputationCounts.merge(adjustedReputation, weight, Integer::sum);
         }
 
         description.append("<table>");

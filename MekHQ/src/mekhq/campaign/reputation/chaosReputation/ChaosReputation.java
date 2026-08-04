@@ -70,6 +70,7 @@ import mekhq.campaign.mission.AbstractMissionTransition;
 import mekhq.campaign.mission.Scenario;
 import mekhq.campaign.mission.enums.MissionStatus;
 import mekhq.campaign.personnel.Person;
+import mekhq.campaign.personnel.PersonnelOptions;
 import mekhq.campaign.personnel.enums.PersonnelRole;
 import mekhq.campaign.personnel.enums.PersonnelStatus;
 import mekhq.campaign.personnel.skills.SkillType;
@@ -404,9 +405,14 @@ public class ChaosReputation {
 
             // Is the person active and employed?
             if (status.isActive() && person.isEmployed()) {
-                personCount++;
+                int weight = getPersonnelReputationWeight(person);
+                if (weight == 0) {
+                    continue;
+                }
+
+                personCount += weight;
                 int reputation = person.getAdjustedReputation(isUseAgingEffects, isClanCampaign, currentDate);
-                totalReputation += reputation;
+                totalReputation += reputation * weight;
             }
         }
 
@@ -759,6 +765,28 @@ public class ChaosReputation {
     }
 
     /**
+     * Returns how many times a character counts toward the force's average experience and Chaos Reputation.
+     *
+     * <p>The "Unrecorded Presence" SPA makes the character count {@code 0} times (they are ignored), while the "Big
+     * Personality" SPA makes them count twice. Ordinary characters count once. Unrecorded Presence takes precedence if
+     * both are somehow present.</p>
+     *
+     * @param person the character
+     *
+     * @return {@code 0}, {@code 1}, or {@code 2}
+     */
+    public static int getPersonnelReputationWeight(Person person) {
+        PersonnelOptions options = person.getOptions();
+        if (options.booleanOption(PersonnelOptions.UNRECORDED_PRESENCE)) {
+            return 0;
+        }
+        if (options.booleanOption(PersonnelOptions.BIG_PERSONALITY)) {
+            return 2;
+        }
+        return 1;
+    }
+
+    /**
      * Computes the force's average experience as a {@link SkillLevel}.
      *
      * <p>Each active, employed character contributes their primary and secondary combat-role experience levels
@@ -783,16 +811,21 @@ public class ChaosReputation {
 
             // Is the person active and employed?
             if (status.isActive() && person.isEmployed()) {
+                int weight = getPersonnelReputationWeight(person);
+                if (weight == 0) {
+                    continue;
+                }
+
                 int primaryExperienceLevel = getExperienceLevel(campaign, person, true);
                 if (primaryExperienceLevel != EXP_NONE) {
-                    personCount++;
-                    totalExperienceLevel += primaryExperienceLevel;
+                    personCount += weight;
+                    totalExperienceLevel += primaryExperienceLevel * weight;
                 }
 
                 int secondaryExperienceLevel = getExperienceLevel(campaign, person, false);
                 if (secondaryExperienceLevel != EXP_NONE) {
-                    personCount++;
-                    totalExperienceLevel += secondaryExperienceLevel;
+                    personCount += weight;
+                    totalExperienceLevel += secondaryExperienceLevel * weight;
                 }
             }
         }
