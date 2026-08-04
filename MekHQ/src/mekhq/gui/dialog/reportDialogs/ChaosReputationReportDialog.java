@@ -67,16 +67,30 @@ public class ChaosReputationReportDialog extends AbstractReportDialog {
 
     private final Campaign campaign;
 
+    /**
+     * Creates and displays the Chaos Reputation report dialog for the given campaign.
+     *
+     * @param frame    the parent frame the dialog is anchored to
+     * @param campaign the campaign whose Chaos Reputation is reported on
+     */
     public ChaosReputationReportDialog(final JFrame frame, final Campaign campaign) {
         super(frame, "ChaosReputationReportDialog", "ChaosReputationReportDialog.title");
         this.campaign = campaign;
         initialize();
     }
 
+    /**
+     * @return the campaign this dialog reports on
+     */
     public Campaign getCampaign() {
         return campaign;
     }
 
+    /**
+     * Builds the report's text pane, populated with the HTML produced by {@link #getReportText(Campaign)}.
+     *
+     * @return a non-editable, HTML {@link JTextPane} containing the report
+     */
     @Override
     protected JTextPane createTxtReport() {
         final JTextPane txtReport = new JTextPane();
@@ -136,6 +150,18 @@ public class ChaosReputationReportDialog extends AbstractReportDialog {
         return description.toString();
     }
 
+    /**
+     * Appends the "Average Experience" section to the report.
+     *
+     * <p>Tallies how many combat roles (primary and secondary) sit at each experience level across the active,
+     * employed personnel, then appends a distribution table followed by summary rows for the total experience points,
+     * the number of roles counted, and the resulting mean skill level.</p>
+     *
+     * @param description      the buffer the section HTML is appended to
+     * @param campaign         the campaign whose personnel are examined
+     * @param personnel        the personnel to consider
+     * @param subtitleFontSize the GUI-scaled font size for the section subtitle
+     */
     private static void appendAverageExperienceSection(StringBuilder description, Campaign campaign,
           Collection<Person> personnel, int subtitleFontSize) {
         description.append(String.format("<b><font size='%d'>%s</font></b><br>",
@@ -193,6 +219,21 @@ public class ChaosReputationReportDialog extends AbstractReportDialog {
         description.append("</table><br>");
     }
 
+    /**
+     * Appends the "Chaos Reputation" section to the report.
+     *
+     * <p>Tallies how many active, employed personnel share each adjusted reputation value and appends a distribution
+     * table, followed by summary rows for the personnel average, the debt penalty, the manual modifier, and the final
+     * (cap-limited) total.</p>
+     *
+     * @param description      the buffer the section HTML is appended to
+     * @param campaign         the campaign whose options and finances drive the totals
+     * @param personnel        the personnel to consider
+     * @param currentDate      the date used for age effects and loan-age calculations
+     * @param isUseAgeEffects  whether age effects apply to adjusted reputation
+     * @param isClanForce      whether the force is a Clan force
+     * @param subtitleFontSize the GUI-scaled font size for the section subtitle
+     */
     private static void appendChaosReputationSection(StringBuilder description, Campaign campaign,
           Collection<Person> personnel, LocalDate currentDate, boolean isUseAgeEffects, boolean isClanForce,
           int subtitleFontSize) {
@@ -249,6 +290,14 @@ public class ChaosReputationReportDialog extends AbstractReportDialog {
         description.append("</table><br>");
     }
 
+    /**
+     * Formats a single indented "label: value" summary row as an HTML table row.
+     *
+     * @param label the row label
+     * @param value the row value
+     *
+     * @return the HTML {@code <tr>} for the summary row
+     */
     private static String summaryRow(String label, String value) {
         String indent = "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;";
         return String.format("<tr><td>%s<b>%s:</b></td> <td>%s</td></tr>", indent, label, value);

@@ -1,3 +1,35 @@
+/*
+ * Copyright (C) 2026 The MegaMek Team. All Rights Reserved.
+ *
+ * This file is part of MekHQ.
+ *
+ * MekHQ is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License (GPL),
+ * version 3 or (at your option) any later version,
+ * as published by the Free Software Foundation.
+ *
+ * MekHQ is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty
+ * of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+ * See the GNU General Public License for more details.
+ *
+ * A copy of the GPL should have been included with this project;
+ * if not, see <https://www.gnu.org/licenses/>.
+ *
+ * NOTICE: The MegaMek organization is a non-profit group of volunteers
+ * creating free software for the BattleTech community.
+ *
+ * MechWarrior, BattleMech, `Mech and AeroTech are registered trademarks
+ * of The Topps Company, Inc. All Rights Reserved.
+ *
+ * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
+ * InMediaRes Productions, LLC.
+ *
+ * MechWarrior Copyright Microsoft Corporation. MekHQ was created under
+ * Microsoft's "Game Content Usage Rules"
+ * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+ * affiliated with Microsoft.
+ */
 package mekhq.campaign.reputation.chaosReputation;
 
 import static java.lang.Math.ceil;
@@ -43,6 +75,15 @@ import mekhq.campaign.personnel.enums.PersonnelStatus;
 import mekhq.campaign.personnel.skills.SkillType;
 import mekhq.gui.baseComponents.immersiveDialogs.ImmersiveDialogSimple;
 
+/**
+ * Static helpers implementing the Chaos Campaign reputation system (Hot Spots: Draconis Reach).
+ *
+ * <p>Reputation can be tracked either per character - where the force's value is the average of its personnel - or as
+ * a single campaign-wide value stored on the {@link PlayerForce}. These helpers cover recalculating the force value,
+ * applying the configured cap, deriving the debt penalty from outstanding loans, applying reputation changes when a
+ * contract is completed or an act of piracy is resolved, retroactively initializing reputation from past contracts, and
+ * computing the force's average experience level.</p>
+ */
 public class ChaosReputation {
     private static final MMLogger LOGGER = MMLogger.create(ChaosReputation.class);
     private static final String RESOURCE_BUNDLE = "mekhq.resources.ChaosReputation";
@@ -65,6 +106,17 @@ public class ChaosReputation {
     // character's Chaos criminal record.
     private static final double CRIME_RATING_TO_CRIMINAL_RECORD_DIVIDER = 10.0;
 
+    /**
+     * Recalculates and stores the force's Chaos Reputation according to the active tracking mode.
+     *
+     * <p>When {@link CampaignOption#CAMPAIGN_LEVEL_CHAOS_REPUTATION} is enabled the stored campaign-wide value is
+     * refreshed with the current debt penalty and manual modifier; otherwise the value is re-derived from the force's
+     * personnel. In both cases the configured debt-stacking, manual-modifier, and cap options are applied.</p>
+     *
+     * @param campaignOptions the campaign options driving the calculation
+     * @param playerForce     the force whose reputation is recalculated and stored
+     * @param today           the current date, used for loan-age (debt) calculations
+     */
     public static void processChaosCampaignReputationChanges(CampaignOptions campaignOptions, PlayerForce playerForce,
           LocalDate today) {
         boolean debtPenaltiesStack = campaignOptions.get(CampaignOption.CHAOS_DEBT_PENALTIES_STACK);
@@ -87,6 +139,17 @@ public class ChaosReputation {
         }
     }
 
+    /**
+     * Derives the force reputation from its personnel (the average adjusted reputation plus debt and manual modifiers,
+     * capped) and stores it on the force.
+     *
+     * @param playerForce        the force whose personnel are averaged and whose reputation is stored
+     * @param currentDate        the current date, used for age effects and loan-age calculations
+     * @param debtPenaltiesStack whether each loan contributes its own debt penalty
+     * @param manualModifier     the manual reputation modifier to add
+     * @param cap                the reputation cap ({@code 0} for none)
+     * @param useAgeEffects      whether age effects apply to adjusted reputation
+     */
     private static void calculatePersonnelLevelReputation(PlayerForce playerForce, LocalDate currentDate,
           boolean debtPenaltiesStack, int manualModifier, int cap, boolean useAgeEffects) {
         Collection<Person> personnel = playerForce.allPersonnel();
@@ -105,6 +168,20 @@ public class ChaosReputation {
         playerForce.setChaosCampaignReputation(total);
     }
 
+    /**
+     * Combines the personnel average reputation with the debt penalty and manual modifier, then applies the cap.
+     *
+     * @param personnel       the personnel to average
+     * @param currentDate     the current date, used for age effects and loan-age calculations
+     * @param isUseAgeEffects whether age effects apply to adjusted reputation
+     * @param isClanForce     whether the force is a Clan force
+     * @param loans           the outstanding loans used to compute the debt penalty
+     * @param stackPenalties  whether each loan contributes its own debt penalty
+     * @param manualModifier  the manual reputation modifier to add
+     * @param cap             the reputation cap ({@code 0} for none)
+     *
+     * @return the capped total reputation
+     */
     private static int processReputation(Collection<Person> personnel, LocalDate currentDate, boolean isUseAgeEffects,
           boolean isClanForce, List<Loan> loans, boolean stackPenalties, int manualModifier, int cap) {
         int modeReputation = calculateAverageReputation(personnel,
@@ -119,6 +196,16 @@ public class ChaosReputation {
         return applyReputationCap(cap, modeReputation + debtModifier + manualModifier);
     }
 
+    /**
+     * Refreshes the stored campaign-wide reputation by re-applying the current debt penalty and manual modifier to the
+     * stored base value, then storing the capped result.
+     *
+     * @param playerForce        the force whose stored reputation is refreshed
+     * @param currentDate        the current date, used for loan-age calculations
+     * @param debtPenaltiesStack whether each loan contributes its own debt penalty
+     * @param manualModifier     the manual reputation modifier to add
+     * @param cap                the reputation cap ({@code 0} for none)
+     */
     private static void calculateCampaignLevelReputation(PlayerForce playerForce, LocalDate currentDate,
           boolean debtPenaltiesStack, int manualModifier, int cap) {
         int base = playerForce.getChaosCampaignReputation();
@@ -131,6 +218,14 @@ public class ChaosReputation {
         playerForce.setChaosCampaignReputation(total);
     }
 
+    /**
+     * Limits a reputation value to the configured cap.
+     *
+     * @param cap        the maximum allowed reputation; {@code 0} disables the cap
+     * @param reputation the reputation value to cap
+     *
+     * @return {@code reputation} unchanged when {@code cap} is {@code 0}, otherwise the lesser of the two
+     */
     public static int applyReputationCap(int cap, int reputation) {
         if (cap != 0) {
             return min(reputation, cap);
@@ -138,6 +233,21 @@ public class ChaosReputation {
         return reputation;
     }
 
+    /**
+     * Tabulates the base Chaos Reputation accrued from completed contracts that ended within a given window.
+     *
+     * <p>Contracts are processed in chronological order (by ending date). Only contracts whose ending date falls on or
+     * between {@code windowStart} and {@code windowEnd} (inclusive) are counted; a {@code null} bound is treated as
+     * open-ended, and a contract with no recorded ending date is always counted. A success (and, unless
+     * {@link CampaignOption#CHAOS_NO_PARTIAL_SUCCESS_REPUTATION} is set, a partial success) raises reputation; a breach
+     * halves the running total, losing at least {@link #BREAKING_CONTRACT_MIN_DELTA}.</p>
+     *
+     * @param campaign    the campaign whose completed contracts to tabulate
+     * @param windowStart the earliest ending date to count, or {@code null} for no lower bound
+     * @param windowEnd   the latest ending date to count, or {@code null} for no upper bound
+     *
+     * @return the base reputation earned from contracts within the window
+     */
     private static int tabulateReputationFromContracts(Campaign campaign, LocalDate windowStart, LocalDate windowEnd) {
         int reputation = STARTING_REPUTATION_SCORE;
 
@@ -167,6 +277,16 @@ public class ChaosReputation {
         return reputation;
     }
 
+    /**
+     * Tests whether a date falls within an inclusive window. A {@code null} bound is treated as open-ended, and a
+     * {@code null} date is always considered within the window.
+     *
+     * @param date        the date to test, or {@code null}
+     * @param windowStart the earliest allowed date, or {@code null} for no lower bound
+     * @param windowEnd   the latest allowed date, or {@code null} for no upper bound
+     *
+     * @return {@code true} if the date is within the window
+     */
     private static boolean isWithinWindow(LocalDate date, LocalDate windowStart, LocalDate windowEnd) {
         if (date == null) {
             return true;
@@ -177,6 +297,14 @@ public class ChaosReputation {
         return windowEnd == null || !date.isAfter(windowEnd);
     }
 
+    /**
+     * Returns the earlier of two dates, treating {@code null} as "no date".
+     *
+     * @param first  the first date, or {@code null}
+     * @param second the second date, or {@code null}
+     *
+     * @return the earlier non-null date, or {@code null} if both are {@code null}
+     */
     private static LocalDate earliestDate(LocalDate first, LocalDate second) {
         if (first == null) {
             return second;
@@ -194,7 +322,8 @@ public class ChaosReputation {
      * recruitment date and their departure (the earlier of death or retirement) are counted - so late-joining or
      * long-departed personnel are not credited for contracts they were not present for. The force-wide campaign
      * Reputation is tabulated over the full contract history. Both are written, so the result is correct whether
-     * Reputation is tracked per character or at the campaign level. This is a permanent change.</p>
+     * Reputation is tracked per character or at the campaign level. Any CamOps crime standing is also carried over as a
+     * (negative) Chaos criminal record. This is a permanent change.</p>
      *
      * @param campaign the campaign to update
      *
@@ -249,6 +378,17 @@ public class ChaosReputation {
               Integer.toString(total));
     }
 
+    /**
+     * Computes the mean adjusted reputation across the force's active, employed personnel. Departed, inactive, or
+     * unemployed characters are ignored.
+     *
+     * @param personnel         the personnel to average
+     * @param isUseAgingEffects whether age effects apply to adjusted reputation
+     * @param isClanCampaign    whether the force is a Clan force
+     * @param currentDate       the current date, used for age effects
+     *
+     * @return the rounded mean adjusted reputation
+     */
     private static int calculateAverageReputation(Collection<Person> personnel, boolean isUseAgingEffects,
           boolean isClanCampaign, LocalDate currentDate) {
         // Tallies how often each adjusted reputation value appears among valid personnel.
@@ -278,6 +418,19 @@ public class ChaosReputation {
         return averageReputation;
     }
 
+    /**
+     * Computes the reputation debt penalty from outstanding loans.
+     *
+     * <p>When {@code stackPenalties} is {@code true} every outstanding loan contributes its own penalty and they are
+     * summed; otherwise only the oldest loan is penalized. Each loan's penalty grows with its age. Returns {@code 0}
+     * when there are no loans.</p>
+     *
+     * @param loans          the outstanding loans
+     * @param currentDate    the current date, used to determine each loan's age
+     * @param stackPenalties whether each loan contributes its own penalty
+     *
+     * @return the (non-positive) debt penalty
+     */
     public static int getDebtModifier(List<Loan> loans, LocalDate currentDate, boolean stackPenalties) {
         if (loans.isEmpty()) {
             return 0;
@@ -303,10 +456,22 @@ public class ChaosReputation {
         return getLoanDebtPenalty(maxLoanAge);
     }
 
+    /**
+     * Returns the debt penalty for a single loan of the given age: {@code -(floor(age / frequency) + 1)}.
+     *
+     * @param ageInMonths the loan's age in months
+     *
+     * @return the (negative) penalty contributed by the loan
+     */
     private static int getLoanDebtPenalty(long ageInMonths) {
         return ((int) floor(ageInMonths / GOING_INT_DEBT_MONTHLY_FREQUENCY) + 1) * GOING_INTO_DEBT_DELTA;
     }
 
+    /**
+     * Raises the reputation of every employed character by the contract-success delta.
+     *
+     * @param personnel the personnel to reward
+     */
     private static void updatePersonnelForContractSuccess(List<Person> personnel) {
         for (Person person : personnel) {
             if (person.isEmployed()) {
@@ -315,6 +480,11 @@ public class ChaosReputation {
         }
     }
 
+    /**
+     * Lowers the reputation of every employed character by the contract-break penalty.
+     *
+     * @param personnel the personnel to penalize
+     */
     private static void updatePersonnelForContractBreak(List<Person> personnel) {
         for (Person person : personnel) {
             if (person.isEmployed()) {
@@ -325,12 +495,33 @@ public class ChaosReputation {
         }
     }
 
+    /**
+     * Returns the reputation delta applied when a contract is broken: half the current reputation, but at least
+     * {@link #BREAKING_CONTRACT_MIN_DELTA}, expressed as a negative value.
+     *
+     * @param baseReputation the current reputation value
+     *
+     * @return the (negative) reputation delta
+     */
     private static int getContractBreakDelta(int baseReputation) {
         int delta = (int) round(baseReputation * BREAKING_CONTRACT_MULTIPLIER);
         delta = max(delta, BREAKING_CONTRACT_MIN_DELTA);
         return -delta;
     }
 
+    /**
+     * Applies the Chaos Reputation change for a completed contract, based on its outcome, and refreshes the force
+     * reputation and UI.
+     *
+     * <p>Does nothing unless Chaos Reputation is in use. A success (or, unless
+     * {@link CampaignOption#CHAOS_NO_PARTIAL_SUCCESS_REPUTATION} is set, a partial success) raises reputation; a breach
+     * lowers it; other outcomes have no effect. In campaign-level mode the single stored value is adjusted; otherwise
+     * the passed personnel are adjusted individually.</p>
+     *
+     * @param campaign  the campaign whose reputation to update
+     * @param status    the completed contract's final status
+     * @param personnel the personnel whose reputation is adjusted in per-character mode
+     */
     public static void processContractCompletion(Campaign campaign, MissionStatus status, List<Person> personnel) {
         CampaignOptions campaignOptions = campaign.getCampaignOptions();
         boolean useChaosReputation = campaignOptions.get(CampaignOption.USE_CHAOS_REPUTATION);
@@ -376,6 +567,17 @@ public class ChaosReputation {
         campaign.getGUI().refreshAllTabs();
     }
 
+    /**
+     * Resolves an act of piracy: rolls to avoid getting caught, credits the looted booty to the force's finances, and -
+     * if caught - applies a criminal-record penalty to the force or its personnel. Finally shows a summary dialog.
+     *
+     * @param campaign         the campaign performing the piracy
+     * @param personnel        the personnel involved (penalized in per-character mode)
+     * @param scale            the loot scale factor
+     * @param scenarios        the contract's scenarios, used to value component loot
+     * @param actWasSuccessful whether the underlying act succeeded (affects the avoidance target number)
+     * @param contractName     the contract name, used in the finance and dialog text
+     */
     public static void resolveActOfPiracy(Campaign campaign, List<Person> personnel, int scale,
           List<Scenario> scenarios, boolean actWasSuccessful, String contractName) {
         int roll = d6(2);
@@ -399,6 +601,13 @@ public class ChaosReputation {
         triggerPiracyDialog(campaign, roll, targetNumber, gotCaught, delta, booty);
     }
 
+    /**
+     * Credits looted booty to the force's finances as a theft transaction.
+     *
+     * @param campaign     the campaign whose finances are credited
+     * @param contractName the contract name shown on the transaction
+     * @param booty        the amount to credit
+     */
     private static void creditFinancesForBooty(Campaign campaign, String contractName, Money booty) {
         campaign.getPlayerForce()
               .getFinances()
@@ -408,6 +617,16 @@ public class ChaosReputation {
                     getFormattedTextAt(RESOURCE_BUNDLE, "ChaosReputation.piracy.booty", contractName));
     }
 
+    /**
+     * Shows the in-character summary dialog reporting the outcome of an act of piracy.
+     *
+     * @param campaign     the campaign the dialog belongs to
+     * @param roll         the avoidance roll made
+     * @param targetNumber the target number the roll was compared against
+     * @param gotCaught    whether the force was caught
+     * @param delta        the (negative) reputation/criminal-record delta applied when caught
+     * @param booty        the looted amount
+     */
     private static void triggerPiracyDialog(Campaign campaign, int roll, int targetNumber, boolean gotCaught, int delta,
           Money booty) {
         PlayerForce playerForce = campaign.getPlayerForce();
@@ -435,6 +654,15 @@ public class ChaosReputation {
               getFormattedTextAt(RESOURCE_BUNDLE, "ChaosReputation.piracy.dialog.ooc", roll, targetNumber, -delta));
     }
 
+    /**
+     * Determines the total support-point value of piracy loot: a random contract-loot roll plus component loot earned
+     * from victorious scenarios, each scaled by {@code scale}.
+     *
+     * @param scale     the loot scale factor
+     * @param scenarios the contract's scenarios
+     *
+     * @return the total looted support points
+     */
     private static int determinePiracySP(int scale, List<Scenario> scenarios) {
         int roll = d6(1);
         int contractLootSP = determineContractLoot(roll, scale);
@@ -443,6 +671,14 @@ public class ChaosReputation {
         return contractLootSP + componentLootSP;
     }
 
+    /**
+     * Returns the contract-loot support points for a d6 roll, scaled by {@code scale}.
+     *
+     * @param roll  the 1-6 roll
+     * @param scale the loot scale factor
+     *
+     * @return the scaled contract-loot support points
+     */
     private static int determineContractLoot(int roll, int scale) {
         int base = switch (roll) {
             case 1 -> 0;
@@ -457,6 +693,15 @@ public class ChaosReputation {
         return base * scale;
     }
 
+    /**
+     * Returns the component-loot support points earned from the number of victorious scenarios, scaled by
+     * {@code scale}.
+     *
+     * @param scenarios the contract's scenarios
+     * @param scale     the loot scale factor
+     *
+     * @return the scaled component-loot support points
+     */
     private static int determineComponentLoot(List<Scenario> scenarios, int scale) {
         int runningTotal = 0;
         for (Scenario scenario : scenarios) {
@@ -479,6 +724,12 @@ public class ChaosReputation {
         return value * scale;
     }
 
+    /**
+     * Applies a criminal-record change to every employed character (used when an act of piracy is discovered).
+     *
+     * @param personnel the personnel to penalize
+     * @param delta     the criminal-record change (typically negative)
+     */
     private static void updatePersonnelForActOfPiracy(List<Person> personnel, int delta) {
         for (Person person : personnel) {
             if (person.isEmployed()) {
@@ -487,6 +738,16 @@ public class ChaosReputation {
         }
     }
 
+    /**
+     * Returns a character's experience level for their primary or secondary role, or {@link SkillType#EXP_NONE} when
+     * that role is civilian.
+     *
+     * @param campaign  the campaign, used to resolve experience-affecting options
+     * @param person    the character
+     * @param isPrimary {@code true} for the primary role, {@code false} for the secondary role
+     *
+     * @return the experience level, or {@code EXP_NONE} for a civilian role
+     */
     public static int getExperienceLevel(Campaign campaign, Person person, boolean isPrimary) {
         PersonnelRole role = isPrimary ? person.getPrimaryRole() : person.getSecondaryRole();
 
@@ -497,6 +758,19 @@ public class ChaosReputation {
         return EXP_NONE;
     }
 
+    /**
+     * Computes the force's average experience as a {@link SkillLevel}.
+     *
+     * <p>Each active, employed character contributes their primary and secondary combat-role experience levels
+     * separately (civilian roles are skipped), so a character with two combat roles is counted twice. The mean of the
+     * contributing levels is clamped to the valid range and converted to a skill level; an empty result yields the
+     * skill level for {@code EXP_NONE}.</p>
+     *
+     * @param campaign  the campaign, used to resolve experience-affecting options
+     * @param personnel the personnel to average
+     *
+     * @return the force's average skill level
+     */
     public static SkillLevel getAverageSkillLevel(final Campaign campaign, final Collection<Person> personnel) {
         double personCount = 0;
         int totalExperienceLevel = 0;
