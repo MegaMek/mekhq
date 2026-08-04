@@ -1847,7 +1847,11 @@ public class ForceHumanResources {
     }
 
     public static void applyStartingReputation(Campaign campaign, Person person) {
-        int skillLevel = person.getExperienceLevel(campaign, false, true);
+        int skillLevel = person.getExperienceLevel(campaign.getCampaignOptions(),
+              campaign.getPlayerForce().isClanForce(),
+              campaign.getLocalDate(),
+              false,
+              true);
         int startingReputation = STARTING_REPUTATION_SCORE + switch (skillLevel) {
             case EXP_VETERAN -> 1;
             case EXP_ELITE -> 2;
@@ -2230,7 +2234,11 @@ public class ForceHumanResources {
                 child.getOptions().getOption(option.getName()).clearValue();
             }
 
-            int experienceLevel = child.getExperienceLevel(campaign, false);
+            int experienceLevel = child.getExperienceLevel(campaign.getCampaignOptions(),
+                  campaign.getPlayerForce().isClanForce(),
+                  campaign.getLocalDate(),
+                  false,
+                  false);
 
             if (experienceLevel <= 0) {
                 person.setLoyalty(d6(3) + 2);

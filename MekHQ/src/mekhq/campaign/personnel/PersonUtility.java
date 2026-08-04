@@ -209,7 +209,11 @@ public class PersonUtility {
 
         boolean useSecondaryProfession = false;
         boolean excludeInjuryEffects = true;
-        int experienceLevel = person.getExperienceLevel(campaign, useSecondaryProfession, excludeInjuryEffects);
+        int experienceLevel = person.getExperienceLevel(campaign.getCampaignOptions(),
+              campaign.getPlayerForce().isClanForce(),
+              campaign.getLocalDate(),
+              useSecondaryProfession,
+              excludeInjuryEffects);
 
         boolean isIneligibleForVeterancyAward = experienceLevel >= EXP_VETERAN;
 

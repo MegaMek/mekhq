@@ -849,7 +849,11 @@ public class ChaosReputation {
             return EXP_NONE;
         }
 
-        int experienceLevel = person.getExperienceLevel(campaign, !isPrimary, true);
+        int experienceLevel = person.getExperienceLevel(campaign.getCampaignOptions(),
+              campaign.getPlayerForce().isClanForce(),
+              campaign.getLocalDate(),
+              !isPrimary,
+              true);
 
         // "Above Their Weight" / "Looks Good on Paper" shift how experienced this character is counted as, clamped so
         // they are never dropped from the tally (EXP_NONE).

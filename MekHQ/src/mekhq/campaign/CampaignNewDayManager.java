@@ -2005,7 +2005,11 @@ public class CampaignNewDayManager {
         int score = 0;
 
         if (person.getPrimaryRole().isSupport(true)) {
-            int dice = person.getExperienceLevel(campaign, false);
+            int dice = person.getExperienceLevel(campaign.getCampaignOptions(),
+                  campaign.getPlayerForce().isClanForce(),
+                  campaign.getLocalDate(),
+                  false,
+                  false);
 
             if (dice > 0) {
                 score = d6(dice);
@@ -2015,7 +2019,11 @@ public class CampaignNewDayManager {
         }
 
         if (person.getSecondaryRole().isSupport(true)) {
-            int dice = person.getExperienceLevel(campaign, true);
+            int dice = person.getExperienceLevel(campaign.getCampaignOptions(),
+                  campaign.getPlayerForce().isClanForce(),
+                  campaign.getLocalDate(),
+                  true,
+                  false);
 
             if (dice > 0) {
                 score += d6(dice);

@@ -167,7 +167,11 @@ public class PersonTableModel extends AbstractTableModel {
                 }
             }
             case EXPERIENCE -> {
-                int experienceLevel = person.getExperienceLevel(campaign, false, true);
+                int experienceLevel = person.getExperienceLevel(campaign.getCampaignOptions(),
+                      campaign.getPlayerForce().isClanForce(),
+                      campaign.getLocalDate(),
+                      false,
+                      true);
                 yield "<html>" + getColoredExperienceLevelName(experienceLevel) + "</html>";
             }
             case AGE -> Integer.toString(person.getAge(campaign.getLocalDate()));

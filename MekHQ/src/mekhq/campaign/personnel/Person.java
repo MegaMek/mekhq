@@ -2699,7 +2699,11 @@ public class Person implements ILocatable {
         }
 
         // Is the character a veteran in their primary profession?
-        int experienceLevel = getExperienceLevel(campaign, false, true);
+        int experienceLevel = getExperienceLevel(campaignOptions,
+              campaign.getPlayerForce().isClanForce(),
+              campaign.getLocalDate(),
+              false,
+              true);
         if (experienceLevel < EXP_VETERAN) {
             return;
         }
@@ -5398,8 +5402,8 @@ public class Person implements ILocatable {
     /**
      * Returns the {@link SkillLevel} for this person's primary or secondary role.
      *
-     * <p>Delegates to {@link #getExperienceLevel(Campaign, boolean, boolean)} and maps the result to the
-     * corresponding {@link SkillLevel} constant.</p>
+     * <p>Delegates to {@link #getSkillLevel(CampaignOptions, boolean, LocalDate, boolean, boolean)} after unpacking
+     * the required values from the {@link Campaign}.</p>
      *
      * @param campaign             the campaign context
      * @param secondary            {@code true} to evaluate the secondary role; {@code false} for the primary role
@@ -5409,7 +5413,11 @@ public class Person implements ILocatable {
      */
     public SkillLevel getSkillLevel(final Campaign campaign, final boolean secondary,
           final boolean excludeInjuryEffects) {
-        return Skills.SKILL_LEVELS[getExperienceLevel(campaign, secondary, excludeInjuryEffects) + 1];
+        return getSkillLevel(campaign.getCampaignOptions(),
+              campaign.getPlayerForce().isClanForce(),
+              campaign.getLocalDate(),
+              secondary,
+              excludeInjuryEffects);
     }
 
     /**
@@ -5436,12 +5444,8 @@ public class Person implements ILocatable {
               excludeInjuryEffects) + 1];
     }
 
-    public int getExperienceLevel(final Campaign campaign, final boolean secondary) {
-        return getExperienceLevel(campaign, secondary, false);
-    }
-
     /**
-     * Determines the experience level of a person in their current profession within the context of a campaign.
+     * Determines the experience level of a person in their current profession.
      *
      * <p>The calculation varies depending on the person's role and campaign options:</p>
      * <ul>
@@ -5463,25 +5467,11 @@ public class Person implements ILocatable {
      *     </li>
      * </ul>
      *
-     * @param campaign             the campaign context, providing options and relevant configuration
-     * @param secondary            if {@code true}, evaluates the person's secondary role; if {@code false}, evaluates
-     *                             the primary role
-     * @param excludeInjuryEffects if {@code true} injury effect modifiers will be excluded from calculations
-     *
-     * @return the calculated experience level for the relevant role, or {@link SkillType#EXP_NONE} if not qualified
-     */
-    public int getExperienceLevel(final Campaign campaign, final boolean secondary, boolean excludeInjuryEffects) {
-        return getExperienceLevel(campaign.getCampaignOptions(), campaign.getPlayerForce().isClanForce(),
-              campaign.getLocalDate(), secondary, excludeInjuryEffects);
-    }
-
-    /**
-     * Determines the experience level of a person in their current profession.
-     *
      * @param campaignOptions      the campaign options providing configuration
      * @param isClanCampaign       whether this is a Clan campaign
      * @param today                the current in-game date
-     * @param secondary            if {@code true}, evaluates the person's secondary role
+     * @param secondary            if {@code true}, evaluates the person's secondary role; if {@code false}, evaluates
+     *                             the primary role
      * @param excludeInjuryEffects if {@code true} injury effect modifiers will be excluded from calculations
      *
      * @return the calculated experience level for the relevant role, or {@link SkillType#EXP_NONE} if not qualified
@@ -8298,7 +8288,12 @@ public class Person implements ILocatable {
         if (isFounder()) {
             shares++;
         }
-        shares += max(-1, getExperienceLevel(campaign, false, true) - 2);
+        shares += max(-1,
+              getExperienceLevel(campaign.getCampaignOptions(),
+                    campaign.getPlayerForce().isClanForce(),
+                    campaign.getLocalDate(),
+                    false,
+                    true) - 2);
 
         if (getRank().isOfficer()) {
             final Profession profession = Profession.getProfessionFromPersonnelRole(getPrimaryRole());
@@ -8342,7 +8337,11 @@ public class Person implements ILocatable {
         // MekWarriors and aero pilots are worth more than the other types of scrubs
         return (getPrimaryRole().isMekWarriorGrouping() || getPrimaryRole().isAerospacePilot() ?
                       MEKWARRIOR_AERO_RANSOM_VALUES :
-                      OTHER_RANSOM_VALUES).get(getExperienceLevel(campaign, false, true));
+                      OTHER_RANSOM_VALUES).get(getExperienceLevel(campaign.getCampaignOptions(),
+              campaign.getPlayerForce().isClanForce(),
+              campaign.getLocalDate(),
+              false,
+              true));
     }
 
     @Override

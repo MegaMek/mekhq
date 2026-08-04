@@ -86,7 +86,6 @@ import mekhq.campaign.personnel.generator.AbstractPersonnelGenerator;
 import mekhq.campaign.personnel.ranks.Rank;
 import mekhq.campaign.personnel.skills.Skill;
 import mekhq.campaign.personnel.skills.SkillType;
-import mekhq.campaign.personnel.skills.enums.SkillAttribute;
 import mekhq.campaign.unit.Unit;
 import mekhq.campaign.universe.Faction;
 import mekhq.campaign.universe.companyGeneration.AtBRandomMekParameters;
@@ -304,7 +303,12 @@ public abstract class AbstractCompanyGenerator {
             // Then prioritize either combat or command skills based on the selected option
             if (getOptions().isPrioritizeCompanyCommanderCombatSkills()) {
                 personnelSorter = personnelSorter
-                                        .thenComparingInt(t -> t.getPerson().getExperienceLevel(campaign, false))
+                                        .thenComparingInt(t -> t.getPerson()
+                                                                     .getExperienceLevel(campaign.getCampaignOptions(),
+                                                                           campaign.getPlayerForce().isClanForce(),
+                                                                           campaign.getLocalDate(),
+                                                                           false,
+                                                                           false))
                                         .thenComparingInt(t -> Stream.of(S_LEADER, S_STRATEGY, S_TACTICS)
                                                                      .mapToInt(s -> t.getPerson()
                                                                                           .getSkillLevel(s,
@@ -320,7 +324,12 @@ public abstract class AbstractCompanyGenerator {
                                                                                                          isClanCampaign,
                                                                                                          today))
                                                                               .sum())
-                                        .thenComparingInt(t -> t.getPerson().getExperienceLevel(campaign, false));
+                                        .thenComparingInt(t -> t.getPerson()
+                                                                     .getExperienceLevel(campaign.getCampaignOptions(),
+                                                                           campaign.getPlayerForce().isClanForce(),
+                                                                           campaign.getLocalDate(),
+                                                                           false,
+                                                                           false));
             }
             // Always need to reverse it at the end
             personnelSorter = personnelSorter.reversed();
@@ -353,7 +362,12 @@ public abstract class AbstractCompanyGenerator {
             // Then prioritize either combat or command skills based on the selected option
             if (getOptions().isPrioritizeOfficerCombatSkills()) {
                 personnelSorter = personnelSorter
-                                        .thenComparingInt(t -> t.getPerson().getExperienceLevel(campaign, false))
+                                        .thenComparingInt(t -> t.getPerson()
+                                                                     .getExperienceLevel(campaign.getCampaignOptions(),
+                                                                           campaign.getPlayerForce().isClanForce(),
+                                                                           campaign.getLocalDate(),
+                                                                           false,
+                                                                           false))
                                         .thenComparingInt(t -> Stream.of(S_LEADER, S_STRATEGY, S_TACTICS)
                                                                      .mapToInt(s -> t.getPerson()
                                                                                           .getSkillLevel(s,
@@ -369,7 +383,12 @@ public abstract class AbstractCompanyGenerator {
                                                                                                          isClanCampaign,
                                                                                                          today))
                                                                               .sum())
-                                        .thenComparingInt(t -> t.getPerson().getExperienceLevel(campaign, false));
+                                        .thenComparingInt(t -> t.getPerson()
+                                                                     .getExperienceLevel(campaign.getCampaignOptions(),
+                                                                           campaign.getPlayerForce().isClanForce(),
+                                                                           campaign.getLocalDate(),
+                                                                           false,
+                                                                           false));
             }
             // Always need to reverse it at the end
             personnelSorter = personnelSorter.reversed();
@@ -397,7 +416,12 @@ public abstract class AbstractCompanyGenerator {
             // Unless we are prioritizing the most skilled, then we also care about
             // experience level
             personnelSorter = personnelSorter
-                                    .thenComparingInt(t -> t.getPerson().getExperienceLevel(campaign, false));
+                                    .thenComparingInt(t -> t.getPerson()
+                                                                 .getExperienceLevel(campaign.getCampaignOptions(),
+                                                                       campaign.getPlayerForce().isClanForce(),
+                                                                       campaign.getLocalDate(),
+                                                                       false,
+                                                                       false));
         }
 
         // Sort whatever is left of the initial trackers before adding them to the
