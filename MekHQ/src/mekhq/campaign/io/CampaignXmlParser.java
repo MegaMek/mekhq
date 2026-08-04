@@ -250,7 +250,7 @@ public record CampaignXmlParser(InputStream is, MekHQ app) {
                     playerForce.setRetainerStartDate(LocalDate.parse(childNode.getTextContent()));
                 } else if (nodeName.equalsIgnoreCase("crimeRating")) {
                     int crimeRating = parseInt(childNode.getTextContent());
-                    playerForce.setCrimeRating(crimeRating);
+                    playerForce.setCamOpsCrimeRating(crimeRating);
                 } else if (nodeName.equalsIgnoreCase("initiativeBonus")) {
                     int bonus = parseInt(childNode.getTextContent());
                     playerForce.setInitiativeBonus(bonus);
@@ -259,9 +259,9 @@ public record CampaignXmlParser(InputStream is, MekHQ app) {
                     playerForce.setInitiativeMaxBonus(bonus);
                 } else if (nodeName.equalsIgnoreCase("crimePirateModifier")) {
                     int crimePirateModifier = parseInt(childNode.getTextContent());
-                    playerForce.setCrimePirateModifier(crimePirateModifier);
+                    playerForce.setCampOpsCrimePirateModifier(crimePirateModifier);
                 } else if (nodeName.equalsIgnoreCase("dateOfLastCrime")) {
-                    playerForce.setDateOfLastCrime(LocalDate.parse(childNode.getTextContent()));
+                    playerForce.setCampOpsDateOfLastCrime(LocalDate.parse(childNode.getTextContent()));
                 } else if (nodeName.equalsIgnoreCase("reputation")) {
                     ForceReputationController reputation = new ForceReputationController().generateInstanceFromXML(
                           childNode);

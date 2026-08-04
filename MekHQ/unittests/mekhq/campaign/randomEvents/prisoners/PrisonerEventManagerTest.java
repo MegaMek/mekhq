@@ -1046,7 +1046,7 @@ public class PrisonerEventManagerTest {
             }
 
             verify(playerForce).changeCrimeRating(-(victims * 2));
-            verify(playerForce).setDateOfLastCrime(TODAY);
+            verify(playerForce).setCampOpsDateOfLastCrime(TODAY);
         }
 
         @Test

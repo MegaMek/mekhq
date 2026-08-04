@@ -1348,12 +1348,12 @@ public class CampaignNewDayManager {
      */
     private void processCamOpsReputationChanges() {
         if (faction.isPirate()) {
-            campaign.getPlayerForce().setDateOfLastCrime(today);
-            campaign.getPlayerForce().setCrimePirateModifier(-100);
+            campaign.getPlayerForce().setCampOpsDateOfLastCrime(today);
+            campaign.getPlayerForce().setCampOpsCrimePirateModifier(-100);
         }
 
-        LocalDate dateOfLastCrime = campaign.getPlayerForce().getDateOfLastCrime();
-        int crimePirateModifier = campaign.getPlayerForce().getCrimePirateModifier();
+        LocalDate dateOfLastCrime = campaign.getPlayerForce().getCampOpsDateOfLastCrime();
+        int crimePirateModifier = campaign.getPlayerForce().getCampOpsCrimePirateModifier();
 
         if (today.getDayOfMonth() == 1) {
             if (dateOfLastCrime != null) {

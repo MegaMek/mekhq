@@ -72,7 +72,7 @@ class ForceReputationControllerTest {
                          campaign.isClanCampaign(),
                          campaign.getLocalDate())).thenReturn(null);
         when(campaign.getPlayerForce().getFinances()).thenReturn(null);
-        when(campaign.getPlayerForce().getDateOfLastCrime()).thenReturn(null);
+        when(campaign.getPlayerForce().getCampOpsDateOfLastCrime()).thenReturn(null);
         averageExperienceRating = mockStatic(AverageExperienceRating.class);
         commandRating = mockStatic(CommandRating.class);
         combatRecordRating = mockStatic(CombatRecordRating.class);

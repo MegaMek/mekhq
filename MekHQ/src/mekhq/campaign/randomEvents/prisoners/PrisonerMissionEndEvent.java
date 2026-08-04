@@ -237,7 +237,7 @@ public class PrisonerMissionEndEvent {
      */
     int determineGoodEventChance(boolean isAllied) {
         if (isAllied) {
-            LocalDate lastCrime = campaign.getPlayerForce().getDateOfLastCrime();
+            LocalDate lastCrime = campaign.getPlayerForce().getCampOpsDateOfLastCrime();
             LocalDate startDate = getContractOrMissionStartDate();
 
             if ((startDate != null) && (lastCrime != null)) {
@@ -452,7 +452,7 @@ public class PrisonerMissionEndEvent {
             int change = -penalty;
             campaign.getPlayerForce().changeCrimeRating(change);
             LocalDate dateOfLastCrime = campaign.getLocalDate();
-            campaign.getPlayerForce().setDateOfLastCrime(dateOfLastCrime);
+            campaign.getPlayerForce().setCampOpsDateOfLastCrime(dateOfLastCrime);
         }
 
         // Build the report

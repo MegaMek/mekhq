@@ -124,12 +124,12 @@ public abstract class AbstractForce {
     private Finances finances;
 
     // Reputation / standing / crime / initiative
-    private ForceReputationController reputation;
     private int chaosCampaignReputation;
+    private ForceReputationController reputation;
+    private int camOpsCrimeRating = 0;
+    private int campOpsCrimePirateModifier = 0;
+    private LocalDate campOpsDateOfLastCrime = null;
     private FactionStandings factionStandings;
-    private int crimeRating = 0;
-    private int crimePirateModifier = 0;
-    private LocalDate dateOfLastCrime = null;
     private int initiativeBonus = 0;
     private int initiativeMaxBonus = 1;
 
@@ -438,39 +438,39 @@ public abstract class AbstractForce {
     }
 
     public int getRawCrimeRating() {
-        return crimeRating;
+        return camOpsCrimeRating;
     }
 
-    public void setCrimeRating(int crimeRating) {
-        this.crimeRating = crimeRating;
+    public void setCamOpsCrimeRating(int camOpsCrimeRating) {
+        this.camOpsCrimeRating = camOpsCrimeRating;
     }
 
     public void changeCrimeRating(int change) {
-        this.crimeRating = Math.min(0, crimeRating + change);
+        this.camOpsCrimeRating = Math.min(0, camOpsCrimeRating + change);
     }
 
-    public int getCrimePirateModifier() {
-        return crimePirateModifier;
+    public int getCampOpsCrimePirateModifier() {
+        return campOpsCrimePirateModifier;
     }
 
-    public void setCrimePirateModifier(int crimePirateModifier) {
-        this.crimePirateModifier = crimePirateModifier;
+    public void setCampOpsCrimePirateModifier(int campOpsCrimePirateModifier) {
+        this.campOpsCrimePirateModifier = campOpsCrimePirateModifier;
     }
 
     public void changeCrimePirateModifier(int change) {
-        this.crimePirateModifier = Math.min(0, crimePirateModifier + change);
+        this.campOpsCrimePirateModifier = Math.min(0, campOpsCrimePirateModifier + change);
     }
 
     public int getAdjustedCrimeRating() {
-        return crimeRating + crimePirateModifier;
+        return camOpsCrimeRating + campOpsCrimePirateModifier;
     }
 
-    public @Nullable LocalDate getDateOfLastCrime() {
-        return dateOfLastCrime;
+    public @Nullable LocalDate getCampOpsDateOfLastCrime() {
+        return campOpsDateOfLastCrime;
     }
 
-    public void setDateOfLastCrime(LocalDate dateOfLastCrime) {
-        this.dateOfLastCrime = dateOfLastCrime;
+    public void setCampOpsDateOfLastCrime(LocalDate campOpsDateOfLastCrime) {
+        this.campOpsDateOfLastCrime = campOpsDateOfLastCrime;
     }
 
     public int getInitiativeBonus() {

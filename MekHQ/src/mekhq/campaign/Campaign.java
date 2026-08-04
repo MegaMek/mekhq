@@ -1944,7 +1944,7 @@ public class Campaign implements ITechManager {
 
     /**
      * @return all hangars across all locations associated with this campaign.
-     *                                                                                                                                                                                           TODO: This won't work once we support multiple hangars. Method separated from getHangar() for future refactor
+     *                                                                                                                                                                                                 TODO: This won't work once we support multiple hangars. Method separated from getHangar() for future refactor
      *
      * @deprecated Use {@link PlayerForce#getHangar()} directly.
      */
@@ -4914,11 +4914,11 @@ public class Campaign implements ITechManager {
     }
 
     /**
-     * @deprecated Use {@link PlayerForce#setCrimeRating(int)} directly.
+     * @deprecated Use {@link PlayerForce#setCamOpsCrimeRating(int)} directly.
      */
     @Deprecated(since = "0.51.01", forRemoval = true)
     public void setCrimeRating(int crimeRating) {
-        getPlayerForce().setCrimeRating(crimeRating);
+        getPlayerForce().setCamOpsCrimeRating(crimeRating);
     }
 
     /**
@@ -4935,19 +4935,19 @@ public class Campaign implements ITechManager {
     }
 
     /**
-     * @deprecated Use {@link PlayerForce#getCrimePirateModifier()} directly.
+     * @deprecated Use {@link PlayerForce#getCampOpsCrimePirateModifier()} directly.
      */
     @Deprecated(since = "0.51.01", forRemoval = true)
     public int getCrimePirateModifier() {
-        return getPlayerForce().getCrimePirateModifier();
+        return getPlayerForce().getCampOpsCrimePirateModifier();
     }
 
     /**
-     * @deprecated Use {@link PlayerForce#setCrimePirateModifier(int)} directly.
+     * @deprecated Use {@link PlayerForce#setCampOpsCrimePirateModifier(int)} directly.
      */
     @Deprecated(since = "0.51.01", forRemoval = true)
     public void setCrimePirateModifier(int crimePirateModifier) {
-        getPlayerForce().setCrimePirateModifier(crimePirateModifier);
+        getPlayerForce().setCampOpsCrimePirateModifier(crimePirateModifier);
     }
 
     /**
@@ -4976,19 +4976,19 @@ public class Campaign implements ITechManager {
     }
 
     /**
-     * @deprecated Use {@link PlayerForce#getDateOfLastCrime()} directly.
+     * @deprecated Use {@link PlayerForce#getCampOpsDateOfLastCrime()} directly.
      */
     @Deprecated(since = "0.51.01", forRemoval = true)
     public @Nullable LocalDate getDateOfLastCrime() {
-        return getPlayerForce().getDateOfLastCrime();
+        return getPlayerForce().getCampOpsDateOfLastCrime();
     }
 
     /**
-     * @deprecated Use {@link PlayerForce#setDateOfLastCrime(LocalDate)} directly.
+     * @deprecated Use {@link PlayerForce#setCampOpsDateOfLastCrime(LocalDate)} directly.
      */
     @Deprecated(since = "0.51.01", forRemoval = true)
     public void setDateOfLastCrime(LocalDate dateOfLastCrime) {
-        getPlayerForce().setDateOfLastCrime(dateOfLastCrime);
+        getPlayerForce().setCampOpsDateOfLastCrime(dateOfLastCrime);
     }
 
     /**
@@ -5361,10 +5361,13 @@ public class Campaign implements ITechManager {
         }
         MHQXMLUtility.writeSimpleXMLTag(writer, indent, "crimeRating", getPlayerForce().getRawCrimeRating());
         MHQXMLUtility.writeSimpleXMLTag(writer, indent, "crimePirateModifier",
-              getPlayerForce().getCrimePirateModifier());
+              getPlayerForce().getCampOpsCrimePirateModifier());
 
-        if (getPlayerForce().getDateOfLastCrime() != null) {
-            MHQXMLUtility.writeSimpleXMLTag(writer, indent, "dateOfLastCrime", getPlayerForce().getDateOfLastCrime());
+        if (getPlayerForce().getCampOpsDateOfLastCrime() != null) {
+            MHQXMLUtility.writeSimpleXMLTag(writer,
+                  indent,
+                  "dateOfLastCrime",
+                  getPlayerForce().getCampOpsDateOfLastCrime());
         }
 
         MHQXMLUtility.writeSimpleXMLOpenTag(writer, indent++, "reputation");

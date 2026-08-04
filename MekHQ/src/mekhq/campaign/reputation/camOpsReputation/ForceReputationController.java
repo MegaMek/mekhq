@@ -195,7 +195,7 @@ public class ForceReputationController {
         // step seven: calculate crime rating
         crimeRatingMap = calculateCrimeRating(campaign);
         crimeRating = crimeRatingMap.get("total");
-        dateOfLastCrime = campaign.getPlayerForce().getDateOfLastCrime();
+        dateOfLastCrime = campaign.getPlayerForce().getCampOpsDateOfLastCrime();
 
         // step eight: calculate other modifiers
         otherModifiersMap = calculateOtherModifiers(campaign);

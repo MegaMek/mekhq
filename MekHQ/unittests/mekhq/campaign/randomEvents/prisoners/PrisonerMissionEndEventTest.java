@@ -87,7 +87,7 @@ class PrisonerMissionEndEventTest {
         when(campaignFaction.getShortName()).thenReturn("MERC");
 
         LocalDate today = LocalDate.of(3151, 1, 1);
-        when(mockCampaign.getPlayerForce().getDateOfLastCrime()).thenReturn(null);
+        when(mockCampaign.getPlayerForce().getCampOpsDateOfLastCrime()).thenReturn(null);
 
         AtBContract contract = new AtBContract("TEST");
         contract.setStartDate(today.minusYears(1));
@@ -114,7 +114,7 @@ class PrisonerMissionEndEventTest {
         when(campaignFaction.getShortName()).thenReturn("MERC");
 
         LocalDate today = LocalDate.of(3151, 1, 1);
-        when(mockCampaign.getPlayerForce().getDateOfLastCrime()).thenReturn(today);
+        when(mockCampaign.getPlayerForce().getCampOpsDateOfLastCrime()).thenReturn(today);
 
         AtBContract contract = new AtBContract("TEST");
         contract.setStartDate(today.minusYears(1));
@@ -142,7 +142,7 @@ class PrisonerMissionEndEventTest {
         when(campaignFaction.getShortName()).thenReturn("MERC");
 
         LocalDate today = LocalDate.of(3151, 1, 1);
-        when(mockCampaign.getPlayerForce().getDateOfLastCrime()).thenReturn(today);
+        when(mockCampaign.getPlayerForce().getCampOpsDateOfLastCrime()).thenReturn(today);
 
         AtBContract contract = new AtBContract("TEST");
         contract.setStartDate(today.minusYears(1));
@@ -300,7 +300,7 @@ class PrisonerMissionEndEventTest {
 
         // Assert — penalty = min(MAX_CRIME_PENALTY, 3 * 2) = 6
         verify(mockCampaign.getPlayerForce()).changeCrimeRating(-6);
-        verify(mockCampaign.getPlayerForce()).setDateOfLastCrime(today);
+        verify(mockCampaign.getPlayerForce()).setCampOpsDateOfLastCrime(today);
     }
 
     @Test

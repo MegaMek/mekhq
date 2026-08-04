@@ -207,7 +207,7 @@ public class PrisonerEventManager {
             int change = -penalty;
             campaign.getPlayerForce().changeCrimeRating(change);
             LocalDate dateOfLastCrime = campaign.getLocalDate();
-            campaign.getPlayerForce().setDateOfLastCrime(dateOfLastCrime);
+            campaign.getPlayerForce().setCampOpsDateOfLastCrime(dateOfLastCrime);
         }
 
         // Build the report
@@ -441,14 +441,14 @@ public class PrisonerEventManager {
                             prisonerCapacity += isMekHQCaptureStyle ?
                                                       PRISONER_CAPACITY_BATTLE_ARMOR :
                                                       PRISONER_CAPACITY_BATTLE_ARMOR *
-                                                      PRISONER_CAPACITY_CAM_OPS_MULTIPLIER;
+                                                            PRISONER_CAPACITY_CAM_OPS_MULTIPLIER;
                         }
                     }
 
                     prisonerCapacity += unit.getTotalTempCrew() * (isMekHQCaptureStyle ?
                                                                          PRISONER_CAPACITY_BATTLE_ARMOR :
                                                                          PRISONER_CAPACITY_BATTLE_ARMOR *
-                                                                         PRISONER_CAPACITY_CAM_OPS_MULTIPLIER);
+                                                                               PRISONER_CAPACITY_CAM_OPS_MULTIPLIER);
 
                     continue;
                 }
@@ -459,14 +459,14 @@ public class PrisonerEventManager {
                             prisonerCapacity += isMekHQCaptureStyle ?
                                                       PRISONER_CAPACITY_CONVENTIONAL_INFANTRY :
                                                       PRISONER_CAPACITY_CONVENTIONAL_INFANTRY *
-                                                      PRISONER_CAPACITY_CAM_OPS_MULTIPLIER;
+                                                            PRISONER_CAPACITY_CAM_OPS_MULTIPLIER;
                         }
                     }
 
                     prisonerCapacity += unit.getTotalTempCrew() * (isMekHQCaptureStyle ?
                                                                          PRISONER_CAPACITY_CONVENTIONAL_INFANTRY :
                                                                          PRISONER_CAPACITY_CONVENTIONAL_INFANTRY *
-                                                                         PRISONER_CAPACITY_CAM_OPS_MULTIPLIER);
+                                                                               PRISONER_CAPACITY_CAM_OPS_MULTIPLIER);
 
                     continue;
                 }

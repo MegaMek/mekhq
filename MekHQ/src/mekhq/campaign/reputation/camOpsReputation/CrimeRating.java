@@ -53,7 +53,7 @@ public class CrimeRating {
     protected static Map<String, Integer> calculateCrimeRating(Campaign campaign) {
         Map<String, Integer> crimeRating = new HashMap<>();
 
-        crimeRating.put("piracy", campaign.getPlayerForce().getCrimePirateModifier());
+        crimeRating.put("piracy", campaign.getPlayerForce().getCampOpsCrimePirateModifier());
         crimeRating.put("other", campaign.getPlayerForce().getRawCrimeRating());
 
         int adjustedCrimeRating = campaign.getPlayerForce().getAdjustedCrimeRating();

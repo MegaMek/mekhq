@@ -1224,7 +1224,7 @@ public class RandomEventEffectsManager {
 
         if (crimeChange > 0) {
             LocalDate dateOfLastCrime = campaign.getLocalDate();
-            campaign.getPlayerForce().setDateOfLastCrime(dateOfLastCrime);
+            campaign.getPlayerForce().setCampOpsDateOfLastCrime(dateOfLastCrime);
             campaign.getPlayerForce().changeCrimeRating(crimeChange);
         }
 
