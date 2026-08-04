@@ -45,7 +45,6 @@ import mekhq.campaign.Campaign;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.unit.Unit;
 
-@Deprecated(since = "0.51.01", forRemoval = true)
 public class SupportRating {
     private static final MMLogger LOGGER = MMLogger.create(SupportRating.class);
     private static final int VEHICLE_WEIGHT_DIVIDER = 15;

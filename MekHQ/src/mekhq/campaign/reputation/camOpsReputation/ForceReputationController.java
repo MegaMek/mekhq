@@ -65,7 +65,6 @@ import mekhq.utilities.MHQXMLUtility;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
-@Deprecated(since = "0.51.01", forRemoval = true)
 public class ForceReputationController {
     // utilities
     private static final MMLogger LOGGER = MMLogger.create(ForceReputationController.class);

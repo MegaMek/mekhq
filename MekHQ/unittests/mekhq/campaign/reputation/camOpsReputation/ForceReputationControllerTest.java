@@ -50,7 +50,6 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.MockedStatic;
 
-@Deprecated(since = "0.51.01", forRemoval = true)
 class ForceReputationControllerTest {
     private ForceReputationController reputation;
     private Campaign campaign;
