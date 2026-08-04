@@ -81,7 +81,9 @@ public class ChaosReputation {
     public static int getCampaignLevelReputation(Campaign campaign) {
         PlayerForce playerForce = campaign.getPlayerForce();
         int base = playerForce.getChaosCampaignReputation();
-        int debtModifier = getDebtModifier(playerForce.getFinances().getLoans(), campaign.getLocalDate());
+        int debtModifier = getDebtModifier(playerForce.getFinances().getLoans(),
+              campaign.getLocalDate(),
+              campaign.getCampaignOptions().get(CampaignOption.CHAOS_DEBT_PENALTIES_STACK));
         int manualModifier = campaign.getCampaignOptions().get(CampaignOption.MANUAL_UNIT_RATING_MODIFIER);
         return applyReputationCap(campaign, base + debtModifier + manualModifier);
     }
@@ -115,7 +117,9 @@ public class ChaosReputation {
     public static String getCampaignLevelTooltip(Campaign campaign) {
         PlayerForce playerForce = campaign.getPlayerForce();
         int base = playerForce.getChaosCampaignReputation();
-        int debtModifier = getDebtModifier(playerForce.getFinances().getLoans(), campaign.getLocalDate());
+        int debtModifier = getDebtModifier(playerForce.getFinances().getLoans(),
+              campaign.getLocalDate(),
+              campaign.getCampaignOptions().get(CampaignOption.CHAOS_DEBT_PENALTIES_STACK));
         int manualModifier = campaign.getCampaignOptions().get(CampaignOption.MANUAL_UNIT_RATING_MODIFIER);
         int total = applyReputationCap(campaign, base + debtModifier + manualModifier);
 
@@ -144,7 +148,9 @@ public class ChaosReputation {
               currentDate);
 
         List<Loan> loans = playerForce.getFinances().getLoans();
-        int debtModifier = getDebtModifier(loans, currentDate);
+        int debtModifier = getDebtModifier(loans,
+              currentDate,
+              campaign.getCampaignOptions().get(CampaignOption.CHAOS_DEBT_PENALTIES_STACK));
         int manualModifier = campaign.getCampaignOptions().get(CampaignOption.MANUAL_UNIT_RATING_MODIFIER);
 
         int total = applyReputationCap(campaign, modeReputation + debtModifier + manualModifier);
@@ -191,7 +197,21 @@ public class ChaosReputation {
         return averageReputation;
     }
 
-    public static int getDebtModifier(List<Loan> loans, LocalDate currentDate) {
+    public static int getDebtModifier(List<Loan> loans, LocalDate currentDate, boolean stackPenalties) {
+        if (loans.isEmpty()) {
+            return 0;
+        }
+
+        // When penalties stack, every outstanding loan contributes its own debt penalty; otherwise only the oldest
+        // loan is penalized.
+        if (stackPenalties) {
+            int debtModifier = 0;
+            for (Loan loan : loans) {
+                debtModifier += getLoanDebtPenalty(loan.getAgeInMonths(currentDate));
+            }
+            return debtModifier;
+        }
+
         long maxLoanAge = 0;
         for (Loan loan : loans) {
             long age = loan.getAgeInMonths(currentDate);
@@ -199,12 +219,11 @@ public class ChaosReputation {
                 maxLoanAge = age;
             }
         }
+        return getLoanDebtPenalty(maxLoanAge);
+    }
 
-        int debtModifier = (int) floor(maxLoanAge / GOING_INT_DEBT_MONTHLY_FREQUENCY) * GOING_INTO_DEBT_DELTA;
-        if (!loans.isEmpty()) {
-            debtModifier += GOING_INTO_DEBT_DELTA;
-        }
-        return debtModifier;
+    private static int getLoanDebtPenalty(long ageInMonths) {
+        return ((int) floor(ageInMonths / GOING_INT_DEBT_MONTHLY_FREQUENCY) + 1) * GOING_INTO_DEBT_DELTA;
     }
 
     public static void updatePersonnelForContractSuccess(Campaign campaign, Collection<Person> personnel) {

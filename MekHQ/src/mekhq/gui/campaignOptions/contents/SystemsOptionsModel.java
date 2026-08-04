@@ -42,6 +42,7 @@ class SystemsOptionsModel {
     boolean useChaosReputation;
     boolean campaignLevelChaosReputation;
     int chaosReputationCap;
+    boolean chaosDebtPenaltiesStack;
     boolean requireSupportForceTransportation;
     boolean clampReputationPayMultiplier;
     boolean reduceReputationPerformanceModifier;
@@ -66,6 +67,7 @@ class SystemsOptionsModel {
         useChaosReputation = options.get(CampaignOption.USE_CHAOS_REPUTATION);
         campaignLevelChaosReputation = options.get(CampaignOption.CAMPAIGN_LEVEL_CHAOS_REPUTATION);
         chaosReputationCap = options.get(CampaignOption.CHAOS_REPUTATION_CAP);
+        chaosDebtPenaltiesStack = options.get(CampaignOption.CHAOS_DEBT_PENALTIES_STACK);
         requireSupportForceTransportation = options.isRequireSupportForceTransportation();
         clampReputationPayMultiplier = options.isClampReputationPayMultiplier();
         reduceReputationPerformanceModifier = options.isReduceReputationPerformanceModifier();
@@ -90,6 +92,7 @@ class SystemsOptionsModel {
         options.set(CampaignOption.USE_CHAOS_REPUTATION, useChaosReputation);
         options.set(CampaignOption.CAMPAIGN_LEVEL_CHAOS_REPUTATION, campaignLevelChaosReputation);
         options.set(CampaignOption.CHAOS_REPUTATION_CAP, chaosReputationCap);
+        options.set(CampaignOption.CHAOS_DEBT_PENALTIES_STACK, chaosDebtPenaltiesStack);
         options.setRequireSupportForceTransportation(requireSupportForceTransportation);
         options.setClampReputationPayMultiplier(clampReputationPayMultiplier);
         options.setReduceReputationPerformanceModifier(reduceReputationPerformanceModifier);

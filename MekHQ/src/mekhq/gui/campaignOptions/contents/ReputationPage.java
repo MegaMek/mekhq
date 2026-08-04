@@ -85,6 +85,7 @@ class ReputationPage {
     private JCheckBox chkUseChaosReputation;
     private JCheckBox chkCampaignLevelChaosReputation;
     private JSpinner chaosReputationCap;
+    private JCheckBox chkChaosDebtPenaltiesStack;
     private JCheckBox chkRequireSupportForceTransportation;
     private JCheckBox chkClampReputationPayMultiplier;
     private JCheckBox chkReduceReputationPerformanceModifier;
@@ -172,6 +173,9 @@ class ReputationPage {
               getMetadata(new Version(0, 51, 1)));
         chkCampaignLevelChaosReputation.addMouseListener(createTipPanelUpdater("CampaignLevelChaosReputation"));
 
+        chkChaosDebtPenaltiesStack = new CampaignOptionsCheckBox("ChaosDebtPenaltiesStack");
+        chkChaosDebtPenaltiesStack.addMouseListener(createTipPanelUpdater("ChaosDebtPenaltiesStack"));
+
         JLabel lblChaosReputationCap = new CampaignOptionsLabel("ChaosReputationCap");
         lblChaosReputationCap.addMouseListener(createTipPanelUpdater("ChaosReputationCap"));
         chaosReputationCap = new CampaignOptionsSpinner("ChaosReputationCap", 0, 0, 1000, 1);
@@ -182,6 +186,7 @@ class ReputationPage {
               FORM_LABEL_COLUMN_WIDTH,
               FORM_CONTROL_COLUMN_WIDTH);
         panel.addCheckBox(chkCampaignLevelChaosReputation);
+        panel.addCheckBox(chkChaosDebtPenaltiesStack);
         panel.addRow(lblChaosReputationCap, chaosReputationCap);
 
         return panel;
@@ -293,6 +298,7 @@ class ReputationPage {
         manualUnitRatingModifier.setValue(model.manualUnitRatingModifier);
         chkUseChaosReputation.setSelected(model.useChaosReputation);
         chkCampaignLevelChaosReputation.setSelected(model.campaignLevelChaosReputation);
+        chkChaosDebtPenaltiesStack.setSelected(model.chaosDebtPenaltiesStack);
         chaosReputationCap.setValue(model.chaosReputationCap);
         updateResetCriminalRecordButtonFromModel();
         chkRequireSupportForceTransportation.setSelected(model.requireSupportForceTransportation);
@@ -315,6 +321,7 @@ class ReputationPage {
         model.manualUnitRatingModifier = (int) manualUnitRatingModifier.getValue();
         model.useChaosReputation = chkUseChaosReputation.isSelected();
         model.campaignLevelChaosReputation = chkCampaignLevelChaosReputation.isSelected();
+        model.chaosDebtPenaltiesStack = chkChaosDebtPenaltiesStack.isSelected();
         model.chaosReputationCap = (int) chaosReputationCap.getValue();
         model.requireSupportForceTransportation = chkRequireSupportForceTransportation.isSelected();
         model.clampReputationPayMultiplier = chkClampReputationPayMultiplier.isSelected();
