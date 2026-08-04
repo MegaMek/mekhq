@@ -122,6 +122,8 @@ public final class CampaignOption<T> {
           of(Boolean.class, false, "chaosNoPartialSuccessReputation");
     public static final CampaignOption<Boolean> CHAOS_PERSONALITY_AFFECTS_REPUTATION =
           of(Boolean.class, false, "chaosPersonalityAffectsReputation");
+    public static final CampaignOption<Boolean> CHAOS_NEW_RECRUITS_HAVE_REPUTATION =
+          of(Boolean.class, false, "chaosNewRecruitsHaveReputation");
     public static final CampaignOption<Boolean> USE_ERA_MODS =
           of(Boolean.class, false, "useEraMods");
     public static final CampaignOption<Boolean> ASSIGNED_TECH_FIRST =

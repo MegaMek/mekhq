@@ -59,6 +59,8 @@ import megamek.common.icons.Portrait;
 import megamek.logging.MMLogger;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
+import mekhq.campaign.ForceHumanResources;
+import mekhq.campaign.campaignOptions.CampaignOption;
 import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.enums.PersonnelRole;
@@ -397,6 +399,12 @@ public class HireBulkPersonnelDialog extends JDialog {
             // We need to override Veterancy eligibility to factor in any fixed experience level generation that
             // might have occurred via GM Mode or age restrictions.
             setVeterancyAwardEligibility(campaign, person);
+
+            boolean applyStartingReputation = campaignOptions.get(CampaignOption.CAMPAIGN_LEVEL_CHAOS_REPUTATION) &&
+                                                    campaignOptions.get(CampaignOption.CHAOS_NEW_RECRUITS_HAVE_REPUTATION);
+            if (applyStartingReputation) {
+                ForceHumanResources.applyStartingReputation(campaign, person);
+            }
 
             if (!campaign.getPlayerForce().getHumanResources().recruitPerson(campaign, person, isGmHire, true)) {
                 number = 0;

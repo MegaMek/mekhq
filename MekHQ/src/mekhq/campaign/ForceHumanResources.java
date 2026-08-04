@@ -43,9 +43,14 @@ import static mekhq.campaign.personnel.PersonnelOptions.UNOFFICIAL_ILL_DO_IT_MYS
 import static mekhq.campaign.personnel.medical.advancedMedicalAlternate.AdvancedMedicalAlternateImplants.giveEIImplant;
 import static mekhq.campaign.personnel.medical.advancedMedicalAlternate.CanonicalDiseaseType.getAllActiveDiseases;
 import static mekhq.campaign.personnel.medical.advancedMedicalAlternate.CanonicalDiseaseType.getAllSystemSpecificDiseasesWithCures;
+import static mekhq.campaign.personnel.skills.SkillType.EXP_ELITE;
+import static mekhq.campaign.personnel.skills.SkillType.EXP_HEROIC;
+import static mekhq.campaign.personnel.skills.SkillType.EXP_LEGENDARY;
+import static mekhq.campaign.personnel.skills.SkillType.EXP_VETERAN;
 import static mekhq.campaign.personnel.skills.SkillType.S_ADMIN;
 import static mekhq.campaign.personnel.skills.SkillType.S_MEDTECH;
 import static mekhq.campaign.personnel.skills.SkillType.S_NEGOTIATION;
+import static mekhq.campaign.reputation.chaosReputation.ChaosReputation.STARTING_REPUTATION_SCORE;
 import static mekhq.gui.campaignOptions.enums.ProcurementPersonnelPick.isIneligibleToPerformProcurement;
 
 import java.io.PrintWriter;
@@ -71,6 +76,7 @@ import mekhq.MHQConstants;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign.AdministratorSpecialization;
 import mekhq.campaign.campaignOptions.AcquisitionsType;
+import mekhq.campaign.campaignOptions.CampaignOption;
 import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.enums.DailyReportType;
 import mekhq.campaign.enums.DragoonRating;
@@ -1831,7 +1837,26 @@ public class ForceHumanResources {
 
         setVeterancyAwardEligibility(campaign, person);
 
+        boolean applyStartingReputation = campaignOptions.get(CampaignOption.CAMPAIGN_LEVEL_CHAOS_REPUTATION) &&
+                                                campaignOptions.get(CampaignOption.CHAOS_NEW_RECRUITS_HAVE_REPUTATION);
+        if (applyStartingReputation) {
+            applyStartingReputation(campaign, person);
+        }
+
         return person;
+    }
+
+    public static void applyStartingReputation(Campaign campaign, Person person) {
+        int skillLevel = person.getExperienceLevel(campaign, false, true);
+        int startingReputation = STARTING_REPUTATION_SCORE + switch (skillLevel) {
+            case EXP_VETERAN -> 1;
+            case EXP_ELITE -> 2;
+            case EXP_HEROIC -> 3;
+            case EXP_LEGENDARY -> 4;
+            default -> 0;
+        };
+
+        person.setReputationDirect(startingReputation);
     }
 
     private static List<Person> parsePersonnelWhoAdvancedInXP(Node workingNode, Campaign campaign) {

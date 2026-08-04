@@ -43,6 +43,8 @@ import java.util.List;
 import megamek.common.enums.SkillLevel;
 import megamek.common.options.IOption;
 import mekhq.campaign.Campaign;
+import mekhq.campaign.ForceHumanResources;
+import mekhq.campaign.campaignOptions.CampaignOption;
 import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.personnel.enums.PersonnelRole;
 import mekhq.campaign.personnel.generator.AbstractSpecialAbilityGenerator;
@@ -101,25 +103,6 @@ public class PersonUtility {
         } else {
             person.setLoyalty(d6(3));
         }
-    }
-
-    /**
-     * @deprecated use
-     *       {@link #overrideSkills(boolean, boolean, boolean, boolean, boolean, Person, PersonnelRole, SkillLevel)}
-     */
-    @Deprecated(since = "0.50.06", forRemoval = true)
-    public static void overrideSkills(boolean isAdminsHaveNegotiation, boolean isDoctorsUseAdministration,
-          boolean isTechsUseAdministration, boolean isUseExtraRandom, Person person, PersonnelRole primaryRole,
-          SkillLevel skillLevel) {
-        overrideSkills(isAdminsHaveNegotiation,
-              isDoctorsUseAdministration,
-              isTechsUseAdministration,
-              false,
-              isUseExtraRandom,
-              person,
-              primaryRole,
-              skillLevel);
-
     }
 
     /**
@@ -192,6 +175,12 @@ public class PersonUtility {
 
         overrideSkills(isAdminsHaveNegotiation, isDoctorsUseAdministration, isTechsUseAdministration, isUseArtillery,
               isUseExtraRandom, person, personnelRole, skillLevel);
+
+        boolean applyStartingReputation = campaignOptions.get(CampaignOption.CAMPAIGN_LEVEL_CHAOS_REPUTATION) &&
+                                                campaignOptions.get(CampaignOption.CHAOS_NEW_RECRUITS_HAVE_REPUTATION);
+        if (applyStartingReputation) {
+            ForceHumanResources.applyStartingReputation(campaign, person);
+        }
 
         if (checkVeterancyEligibility) {
             setVeterancyAwardEligibility(campaign, person);
