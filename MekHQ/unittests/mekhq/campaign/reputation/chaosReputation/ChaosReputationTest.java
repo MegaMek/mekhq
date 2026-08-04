@@ -433,6 +433,8 @@ class ChaosReputationTest {
         when(options.get(CampaignOption.MANUAL_UNIT_RATING_MODIFIER)).thenReturn(0);
         when(options.get(CampaignOption.CHAOS_REPUTATION_CAP)).thenReturn(0);
         when(options.get(CampaignOption.USE_AGE_EFFECTS)).thenReturn(false);
+        when(options.get(CampaignOption.CHAOS_PERSONALITY_AFFECTS_REPUTATION)).thenReturn(false);
+        when(options.get(CampaignOption.USE_RANDOM_PERSONALITIES)).thenReturn(false);
 
         return campaign;
     }
