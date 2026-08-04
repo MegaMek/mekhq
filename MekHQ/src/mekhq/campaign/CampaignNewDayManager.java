@@ -581,7 +581,7 @@ public class CampaignNewDayManager {
         }
 
         if (campaignOptions.get(CampaignOption.USE_CHAOS_REPUTATION)) {
-            processChaosCampaignReputationChanges();
+            ChaosReputation.processChaosCampaignReputationChanges(campaignOptions, campaign.getPlayerForce(), today);
         } else {
             processCamOpsReputationChanges();
         }
@@ -1378,10 +1378,6 @@ public class CampaignNewDayManager {
         if (today.getDayOfWeek().equals(DayOfWeek.MONDAY)) {
             campaign.getPlayerForce().getReputation().initializeReputation(campaign);
         }
-    }
-
-    private void processChaosCampaignReputationChanges() {
-        ChaosReputation.calculateForceReputation(campaign);
     }
 
     public void processNewDayUnits() {

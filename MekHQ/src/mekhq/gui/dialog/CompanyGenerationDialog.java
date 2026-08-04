@@ -225,7 +225,9 @@ public class CompanyGenerationDialog extends AbstractMHQValidationButtonDialog {
         reputationController.initializeReputation(campaign);
         playerForce.setReputation(reputationController);
 
-        ChaosReputation.calculateForceReputation(campaign);
+        ChaosReputation.processChaosCampaignReputationChanges(campaign.getCampaignOptions(),
+              campaign.getPlayerForce(),
+              campaign.getLocalDate());
 
         processBonusUnitsBasedOnCampaignOptions(trackers, options);
     }

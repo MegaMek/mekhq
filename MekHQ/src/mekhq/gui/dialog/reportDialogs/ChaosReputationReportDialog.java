@@ -50,6 +50,7 @@ import megamek.client.ui.util.UIUtil;
 import megamek.common.enums.SkillLevel;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.campaignOptions.CampaignOption;
+import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.force.PlayerForce;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.enums.PersonnelStatus;
@@ -128,7 +129,7 @@ public class ChaosReputationReportDialog extends AbstractReportDialog {
               isUseAgeEffects,
               isClanForce,
               subtitleFontSize);
-        
+
         appendAverageExperienceSection(description, campaign, personnel, subtitleFontSize);
 
         description.append("</html>");
@@ -227,12 +228,14 @@ public class ChaosReputationReportDialog extends AbstractReportDialog {
         }
         description.append("</table>");
 
+        CampaignOptions campaignOptions = campaign.getCampaignOptions();
         int averageReputation = personCount == 0 ? 0 : (int) round(totalReputation / personCount);
         int debtModifier = ChaosReputation.getDebtModifier(campaign.getPlayerForce().getFinances().getLoans(),
               currentDate,
-              campaign.getCampaignOptions().get(CampaignOption.CHAOS_DEBT_PENALTIES_STACK));
-        int manualModifier = campaign.getCampaignOptions().get(CampaignOption.MANUAL_UNIT_RATING_MODIFIER);
-        int total = ChaosReputation.applyReputationCap(campaign, averageReputation + debtModifier + manualModifier);
+              campaignOptions.get(CampaignOption.CHAOS_DEBT_PENALTIES_STACK));
+        int manualModifier = campaignOptions.get(CampaignOption.MANUAL_UNIT_RATING_MODIFIER);
+        int cap = campaignOptions.get(CampaignOption.CHAOS_REPUTATION_CAP);
+        int total = ChaosReputation.applyReputationCap(cap, averageReputation + debtModifier + manualModifier);
 
         description.append("<table>");
         description.append(summaryRow(getTextAt(RESOURCE_BUNDLE, "report.averageReputation"),

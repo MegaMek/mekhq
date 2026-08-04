@@ -1023,7 +1023,9 @@ public class CampaignOptionsPane extends JPanel {
         if (!isStartUp && newIsUseChaosReputation && !oldIsUseChaosReputation) { // Has tracking changed?
             new ChaosReputationCampaignOptionsChangedConfirmationDialog(campaign);
             // Recalculate immediately so the reputation is current, rather than stale until the next monthly update.
-            ChaosReputation.calculateForceReputation(campaign);
+            ChaosReputation.processChaosCampaignReputationChanges(campaign.getCampaignOptions(),
+                  campaign.getPlayerForce(),
+                  campaign.getLocalDate());
             MekHQ.triggerEvent(new OptionsChangedEvent(campaign));
         }
     }

@@ -402,6 +402,10 @@ public abstract class AbstractForce {
         this.chaosCampaignReputation = chaosCampaignReputation;
     }
 
+    public void changeChaosCampaignReputation(int delta) {
+        this.chaosCampaignReputation = chaosCampaignReputation + delta;
+    }
+
     public FactionStandings getFactionStandings() {
         return factionStandings;
     }

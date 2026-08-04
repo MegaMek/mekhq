@@ -79,6 +79,10 @@ public enum MissionStatus {
         return this == PARTIAL;
     }
 
+    public boolean isOverallSuccess() {
+        return isSuccess() || isPartialSuccess();
+    }
+
     public boolean isFailed() {
         return this == FAILED;
     }

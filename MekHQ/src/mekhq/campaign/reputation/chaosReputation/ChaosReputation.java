@@ -10,8 +10,8 @@ import static megamek.common.compute.Compute.d6;
 import static mekhq.campaign.personnel.skills.SkillType.EXP_LEGENDARY;
 import static mekhq.campaign.personnel.skills.SkillType.EXP_NONE;
 import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
+import static mekhq.utilities.MHQInternationalization.getTextAt;
 import static mekhq.utilities.ReportingUtilities.CLOSING_SPAN_TAG;
-import static mekhq.utilities.ReportingUtilities.getAmazingColor;
 import static mekhq.utilities.ReportingUtilities.getNegativeColor;
 import static mekhq.utilities.ReportingUtilities.getPositiveColor;
 import static mekhq.utilities.ReportingUtilities.spanOpeningWithCustomColor;
@@ -25,19 +25,23 @@ import java.util.List;
 import megamek.common.enums.SkillLevel;
 import megamek.logging.MMLogger;
 import mekhq.campaign.Campaign;
+import mekhq.campaign.ForceHumanResources;
 import mekhq.campaign.campaignOptions.CampaignOption;
+import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.chaosCampaign.ChaosCampaignUtilities;
 import mekhq.campaign.enums.DailyReportType;
 import mekhq.campaign.finances.Loan;
 import mekhq.campaign.finances.Money;
-import mekhq.campaign.force.Detachment;
+import mekhq.campaign.finances.enums.TransactionType;
 import mekhq.campaign.force.PlayerForce;
 import mekhq.campaign.mission.AbstractMissionTransition;
+import mekhq.campaign.mission.Scenario;
 import mekhq.campaign.mission.enums.MissionStatus;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.enums.PersonnelRole;
 import mekhq.campaign.personnel.enums.PersonnelStatus;
 import mekhq.campaign.personnel.skills.SkillType;
+import mekhq.gui.baseComponents.immersiveDialogs.ImmersiveDialogSimple;
 
 public class ChaosReputation {
     private static final MMLogger LOGGER = MMLogger.create(ChaosReputation.class);
@@ -61,74 +65,80 @@ public class ChaosReputation {
     // character's Chaos criminal record.
     private static final double CRIME_RATING_TO_CRIMINAL_RECORD_DIVIDER = 10.0;
 
-    public static void calculateForceReputation(Campaign campaign) {
-        // When tracking at the campaign level, the stored reputation is authoritative and is not derived from
-        // personnel. The debt penalty is applied live at display time (see getCampaignLevelReputation), so there is
-        // nothing to recalculate here.
-        if (campaign.getCampaignOptions().get(CampaignOption.CAMPAIGN_LEVEL_CHAOS_REPUTATION)) {
-            return;
-        }
+    public static void processChaosCampaignReputationChanges(CampaignOptions campaignOptions, PlayerForce playerForce,
+          LocalDate today) {
+        boolean debtPenaltiesStack = campaignOptions.get(CampaignOption.CHAOS_DEBT_PENALTIES_STACK);
+        int manualModifier = campaignOptions.get(CampaignOption.MANUAL_UNIT_RATING_MODIFIER);
+        int cap = campaignOptions.get(CampaignOption.CHAOS_REPUTATION_CAP);
 
-        PlayerForce playerForce = campaign.getPlayerForce();
+        if (campaignOptions.get(CampaignOption.CAMPAIGN_LEVEL_CHAOS_REPUTATION)) {
+            ChaosReputation.calculateCampaignLevelReputation(playerForce,
+                  today,
+                  debtPenaltiesStack,
+                  manualModifier,
+                  cap);
+        } else {
+            ChaosReputation.calculatePersonnelLevelReputation(playerForce,
+                  today,
+                  debtPenaltiesStack,
+                  manualModifier,
+                  cap,
+                  campaignOptions.get(CampaignOption.USE_AGE_EFFECTS));
+        }
+    }
+
+    private static void calculatePersonnelLevelReputation(PlayerForce playerForce, LocalDate currentDate,
+          boolean debtPenaltiesStack, int manualModifier, int cap, boolean useAgeEffects) {
         Collection<Person> personnel = playerForce.allPersonnel();
-        String formationName = playerForce.getName();
-        int total = getTotalReputation(campaign, personnel, playerForce, formationName);
+        boolean isClanForce = playerForce.isClanForce();
+        List<Loan> loans = playerForce.getFinances().getLoans();
+
+        int total = processReputation(personnel,
+              currentDate,
+              useAgeEffects,
+              isClanForce,
+              loans,
+              debtPenaltiesStack,
+              manualModifier,
+              cap);
 
         playerForce.setChaosCampaignReputation(total);
     }
 
-    /**
-     * Returns the force's campaign-level Chaos Reputation: the stored campaign reputation value plus the current debt
-     * penalty. Used when {@link CampaignOption#CAMPAIGN_LEVEL_CHAOS_REPUTATION} is enabled, where the reputation is
-     * tracked as a single campaign-wide value rather than being derived from personnel.
-     *
-     * @param campaign the campaign to report on
-     *
-     * @return the campaign-level reputation total, including the debt penalty
-     */
-    public static int getCampaignLevelReputation(Campaign campaign) {
-        PlayerForce playerForce = campaign.getPlayerForce();
-        int base = playerForce.getChaosCampaignReputation();
-        int debtModifier = getDebtModifier(playerForce.getFinances().getLoans(),
-              campaign.getLocalDate(),
-              campaign.getCampaignOptions().get(CampaignOption.CHAOS_DEBT_PENALTIES_STACK));
-        int manualModifier = campaign.getCampaignOptions().get(CampaignOption.MANUAL_UNIT_RATING_MODIFIER);
-        return applyReputationCap(campaign, base + debtModifier + manualModifier);
+    private static int processReputation(Collection<Person> personnel, LocalDate currentDate, boolean isUseAgeEffects,
+          boolean isClanForce, List<Loan> loans, boolean stackPenalties, int manualModifier, int cap) {
+        int modeReputation = calculateAverageReputation(personnel,
+              isUseAgeEffects,
+              isClanForce,
+              currentDate);
+
+        int debtModifier = getDebtModifier(loans,
+              currentDate,
+              stackPenalties);
+
+        return applyReputationCap(cap, modeReputation + debtModifier + manualModifier);
     }
 
-    /**
-     * Applies the configured Chaos Reputation cap to a reputation value. When the cap
-     * ({@link CampaignOption#CHAOS_REPUTATION_CAP}) is {@code 0}, the reputation is uncapped and returned unchanged;
-     * otherwise the reputation is limited to at most the cap.
-     *
-     * @param campaign   the campaign whose cap option to read
-     * @param reputation the reputation value to cap
-     *
-     * @return the capped reputation value
-     */
-    public static int applyReputationCap(Campaign campaign, int reputation) {
-        int cap = campaign.getCampaignOptions().get(CampaignOption.CHAOS_REPUTATION_CAP);
+    private static void calculateCampaignLevelReputation(PlayerForce playerForce, LocalDate currentDate,
+          boolean debtPenaltiesStack, int manualModifier, int cap) {
+        int base = playerForce.getChaosCampaignReputation();
+        int debtModifier = getDebtModifier(playerForce.getFinances().getLoans(),
+              currentDate,
+              debtPenaltiesStack);
+
+        int total = applyReputationCap(cap, base + debtModifier + manualModifier);
+
+        playerForce.setChaosCampaignReputation(total);
+    }
+
+    public static int applyReputationCap(int cap, int reputation) {
         if (cap != 0) {
             return min(reputation, cap);
         }
         return reputation;
     }
 
-    /**
-     * Tabulates the base Chaos Reputation accrued from completed contracts that ended within a given window.
-     *
-     * <p>Contracts are processed in chronological order (by ending date). Only contracts whose ending date falls on or
-     * between {@code windowStart} and {@code windowEnd} (inclusive) are counted; a {@code null} bound is treated as
-     * open-ended, and a contract with no recorded ending date is always counted. This lets the caller restrict the
-     * tally to a single character's tenure - from recruitment until death or retirement.</p>
-     *
-     * @param campaign    the campaign whose completed contracts to tabulate
-     * @param windowStart the earliest ending date to count, or {@code null} for no lower bound
-     * @param windowEnd   the latest ending date to count, or {@code null} for no upper bound
-     *
-     * @return the base reputation earned from contracts within the window
-     */
-    public static int tabulateReputationFromContracts(Campaign campaign, LocalDate windowStart, LocalDate windowEnd) {
+    private static int tabulateReputationFromContracts(Campaign campaign, LocalDate windowStart, LocalDate windowEnd) {
         int reputation = STARTING_REPUTATION_SCORE;
 
         boolean noPartialSuccessReputation =
@@ -183,8 +193,8 @@ public class ChaosReputation {
      * <p>Each character's base reputation is tabulated over their own tenure - only contracts that ended between their
      * recruitment date and their departure (the earlier of death or retirement) are counted - so late-joining or
      * long-departed personnel are not credited for contracts they were not present for. The force-wide campaign
-     * reputation is tabulated over the full contract history. Both are written, so the result is correct whether
-     * reputation is tracked per character or at the campaign level. This is a permanent change.</p>
+     * Reputation is tabulated over the full contract history. Both are written, so the result is correct whether
+     * Reputation is tracked per character or at the campaign level. This is a permanent change.</p>
      *
      * @param campaign the campaign to update
      *
@@ -224,55 +234,19 @@ public class ChaosReputation {
     public static String getCampaignLevelTooltip(Campaign campaign) {
         PlayerForce playerForce = campaign.getPlayerForce();
         int base = playerForce.getChaosCampaignReputation();
+        CampaignOptions campaignOptions = campaign.getCampaignOptions();
         int debtModifier = getDebtModifier(playerForce.getFinances().getLoans(),
               campaign.getLocalDate(),
-              campaign.getCampaignOptions().get(CampaignOption.CHAOS_DEBT_PENALTIES_STACK));
-        int manualModifier = campaign.getCampaignOptions().get(CampaignOption.MANUAL_UNIT_RATING_MODIFIER);
-        int total = applyReputationCap(campaign, base + debtModifier + manualModifier);
+              campaignOptions.get(CampaignOption.CHAOS_DEBT_PENALTIES_STACK));
+        int manualModifier = campaignOptions.get(CampaignOption.MANUAL_UNIT_RATING_MODIFIER);
+        int cap = campaignOptions.get(CampaignOption.CHAOS_REPUTATION_CAP);
+        int total = applyReputationCap(cap, base + debtModifier + manualModifier);
 
         return getFormattedTextAt(RESOURCE_BUNDLE, "campaignLevel.tooltip",
               Integer.toString(base),
               Integer.toString(debtModifier),
               Integer.toString(manualModifier),
               Integer.toString(total));
-    }
-
-    public static int getDetachmentReputation(Campaign campaign, Detachment detachment) {
-        PlayerForce playerForce = campaign.getPlayerForce();
-        Collection<Person> personnel = detachment.getPersonnel().values();
-        String formationName = playerForce.getName(); // TODO replace with detachment name, once possible
-
-        return getTotalReputation(campaign, personnel, playerForce, formationName);
-    }
-
-    private static int getTotalReputation(Campaign campaign, Collection<Person> personnel, PlayerForce playerForce,
-          String formationName) {
-        LocalDate currentDate = campaign.getLocalDate();
-
-        int modeReputation = calculateAverageReputation(personnel,
-              campaign.getCampaignOptions().get(CampaignOption.USE_AGE_EFFECTS),
-              playerForce.isClanForce(),
-              currentDate);
-
-        List<Loan> loans = playerForce.getFinances().getLoans();
-        int debtModifier = getDebtModifier(loans,
-              currentDate,
-              campaign.getCampaignOptions().get(CampaignOption.CHAOS_DEBT_PENALTIES_STACK));
-        int manualModifier = campaign.getCampaignOptions().get(CampaignOption.MANUAL_UNIT_RATING_MODIFIER);
-
-        int total = applyReputationCap(campaign, modeReputation + debtModifier + manualModifier);
-
-        String report = getFormattedTextAt(RESOURCE_BUNDLE, "ChaosReputation.update",
-              spanOpeningWithCustomColor(getAmazingColor()),
-              CLOSING_SPAN_TAG,
-              formationName,
-              modeReputation,
-              debtModifier,
-              manualModifier,
-              total);
-        campaign.addReport(DailyReportType.GENERAL, report);
-
-        return total;
     }
 
     private static int calculateAverageReputation(Collection<Person> personnel, boolean isUseAgingEffects,
@@ -333,59 +307,194 @@ public class ChaosReputation {
         return ((int) floor(ageInMonths / GOING_INT_DEBT_MONTHLY_FREQUENCY) + 1) * GOING_INTO_DEBT_DELTA;
     }
 
-    public static void updatePersonnelForContractSuccess(Campaign campaign, Collection<Person> personnel) {
+    private static void updatePersonnelForContractSuccess(List<Person> personnel) {
         for (Person person : personnel) {
-            person.changeReputation(CONTRACT_SUCCESS_DELTA);
+            if (person.isEmployed()) {
+                person.changeReputation(CONTRACT_SUCCESS_DELTA);
+            }
         }
-
-        String report = getFormattedTextAt(RESOURCE_BUNDLE, "ChaosReputation.contractSuccess",
-              spanOpeningWithCustomColor(getPositiveColor()), CLOSING_SPAN_TAG, CONTRACT_SUCCESS_DELTA);
-        campaign.addReport(DailyReportType.GENERAL, report);
     }
 
-    public static void updatePersonnelForContractBreak(Campaign campaign, Collection<Person> personnel) {
+    private static void updatePersonnelForContractBreak(List<Person> personnel) {
         for (Person person : personnel) {
-            int baseReputation = person.getReputationDirect();
-            int delta = (int) round(baseReputation * BREAKING_CONTRACT_MULTIPLIER);
-            delta = max(delta, BREAKING_CONTRACT_MIN_DELTA);
-            person.changeReputation(-delta);
+            if (person.isEmployed()) {
+                int baseReputation = person.getReputationDirect();
+                int delta = getContractBreakDelta(baseReputation);
+                person.changeReputation(-delta);
+            }
         }
-
-        String report = getFormattedTextAt(RESOURCE_BUNDLE, "ChaosReputation.brokenContract",
-              spanOpeningWithCustomColor(getNegativeColor()), CLOSING_SPAN_TAG, BREAKING_CONTRACT_MIN_DELTA);
-        campaign.addReport(DailyReportType.GENERAL, report);
     }
 
-    public static void updatePersonnelForActOfPiracy(Campaign campaign, Collection<Person> personnel,
-          boolean actWasSuccessful, Money lootValue) {
-        int roll = d6(2);
-        int targetNumber = actWasSuccessful ? PIRACY_AVOIDANCE_TN_SUCCESS : PIRACY_AVOIDANCE_TN_FAILURE;
+    private static int getContractBreakDelta(int baseReputation) {
+        int delta = (int) round(baseReputation * BREAKING_CONTRACT_MULTIPLIER);
+        delta = max(delta, BREAKING_CONTRACT_MIN_DELTA);
+        return -delta;
+    }
 
-        int supperPointsFromMoney = ChaosCampaignUtilities.getChaosSupportPointsFromMoney(lootValue);
-        int delta = (int) ceil(supperPointsFromMoney / PIRACY_PENALTY_PROFIT_DIVIDER);
+    public static void processContractCompletion(Campaign campaign, MissionStatus status, List<Person> personnel) {
+        CampaignOptions campaignOptions = campaign.getCampaignOptions();
+        boolean useChaosReputation = campaignOptions.get(CampaignOption.USE_CHAOS_REPUTATION);
+        boolean isCampaignLevelReputation = campaignOptions.get(CampaignOption.CAMPAIGN_LEVEL_CHAOS_REPUTATION);
+        if (!useChaosReputation && !isCampaignLevelReputation) {
+            return;
+        }
 
-        String report;
-        boolean gotCaught = roll < targetNumber;
-        if (gotCaught) {
-            for (Person person : personnel) {
-                person.changeCriminalRecord(-delta);
+        boolean rewardsReputation = !campaignOptions.get(CampaignOption.CHAOS_NO_PARTIAL_SUCCESS_REPUTATION) ?
+                                          status.isOverallSuccess() :
+                                          status.isSuccess();
+        boolean penalizesReputation = status.isBreach();
+
+        if (!rewardsReputation && !penalizesReputation) {
+            return;
+        }
+
+        PlayerForce playerForce = campaign.getPlayerForce();
+        int base = playerForce.getChaosCampaignReputation();
+        if (rewardsReputation) {
+            if (isCampaignLevelReputation) {
+                playerForce.changeChaosCampaignReputation(CONTRACT_SUCCESS_DELTA);
+            } else {
+                updatePersonnelForContractSuccess(personnel);
             }
 
-            report = getFormattedTextAt(RESOURCE_BUNDLE, "ChaosReputation.piracy.caught",
-                  spanOpeningWithCustomColor(getNegativeColor()),
-                  CLOSING_SPAN_TAG,
-                  roll,
-                  targetNumber,
-                  delta);
+            String report = getFormattedTextAt(RESOURCE_BUNDLE, "ChaosReputation.contractSuccess",
+                  spanOpeningWithCustomColor(getPositiveColor()), CLOSING_SPAN_TAG, CONTRACT_SUCCESS_DELTA);
+            campaign.addReport(DailyReportType.GENERAL, report);
         } else {
-            report = getFormattedTextAt(RESOURCE_BUNDLE, "ChaosReputation.piracy.gotAway",
-                  spanOpeningWithCustomColor(getPositiveColor()),
-                  CLOSING_SPAN_TAG,
-                  roll,
-                  targetNumber);
+            if (isCampaignLevelReputation) {
+                playerForce.changeChaosCampaignReputation(getContractBreakDelta(base));
+            } else {
+                updatePersonnelForContractBreak(personnel);
+            }
+
+            String report = getFormattedTextAt(RESOURCE_BUNDLE, "ChaosReputation.brokenContract",
+                  spanOpeningWithCustomColor(getNegativeColor()), CLOSING_SPAN_TAG, BREAKING_CONTRACT_MIN_DELTA);
+            campaign.addReport(DailyReportType.GENERAL, report);
         }
 
-        campaign.addReport(DailyReportType.GENERAL, report);
+        processChaosCampaignReputationChanges(campaignOptions, playerForce, campaign.getLocalDate());
+        campaign.getGUI().refreshAllTabs();
+    }
+
+    public static void resolveActOfPiracy(Campaign campaign, List<Person> personnel, int scale,
+          List<Scenario> scenarios, boolean actWasSuccessful, String contractName) {
+        int roll = d6(2);
+        int targetNumber = actWasSuccessful ? PIRACY_AVOIDANCE_TN_SUCCESS : PIRACY_AVOIDANCE_TN_FAILURE;
+        boolean gotCaught = roll < targetNumber;
+
+        int supportPointsLoot = determinePiracySP(scale, scenarios);
+        Money booty = ChaosCampaignUtilities.getMoneyFromChaosSupportPoints(supportPointsLoot);
+        creditFinancesForBooty(campaign, contractName, booty);
+
+        int delta = (int) -ceil(supportPointsLoot / PIRACY_PENALTY_PROFIT_DIVIDER);
+
+        if (gotCaught) {
+            if (campaign.getCampaignOptions().get(CampaignOption.CAMPAIGN_LEVEL_CHAOS_REPUTATION)) {
+                campaign.getPlayerForce().changeChaosCampaignReputation(delta);
+            } else {
+                updatePersonnelForActOfPiracy(personnel, delta);
+            }
+        }
+
+        triggerPiracyDialog(campaign, roll, targetNumber, gotCaught, delta, booty);
+    }
+
+    private static void creditFinancesForBooty(Campaign campaign, String contractName, Money booty) {
+        campaign.getPlayerForce()
+              .getFinances()
+              .credit(TransactionType.THEFT,
+                    campaign.getLocalDate(),
+                    booty,
+                    getFormattedTextAt(RESOURCE_BUNDLE, "ChaosReputation.piracy.booty", contractName));
+    }
+
+    private static void triggerPiracyDialog(Campaign campaign, int roll, int targetNumber, boolean gotCaught, int delta,
+          Money booty) {
+        PlayerForce playerForce = campaign.getPlayerForce();
+        ForceHumanResources forceHumanResources = playerForce.getHumanResources();
+        boolean isClanForce = playerForce.isClanForce();
+        Person seniorAdmin = forceHumanResources.getSeniorAdminPerson(Campaign.AdministratorSpecialization.COMMAND,
+              campaign.getCampaignOptions(),
+              isClanForce,
+              campaign.getLocalDate());
+
+        String captureKey = gotCaught ? "caught" : "notCaught";
+        String reportKey = "ChaosReputation.piracy.dialog." + captureKey;
+        String addendum = getTextAt(RESOURCE_BUNDLE, reportKey);
+
+        String inCharacterMessage = getFormattedTextAt(RESOURCE_BUNDLE,
+              "ChaosReputation.piracy.dialog.ic",
+              campaign.getCommanderAddress(),
+              booty.toAmountString(),
+              addendum);
+
+        new ImmersiveDialogSimple(campaign,
+              seniorAdmin,
+              inCharacterMessage,
+              null,
+              getFormattedTextAt(RESOURCE_BUNDLE, "ChaosReputation.piracy.dialog.ooc", roll, targetNumber, -delta));
+    }
+
+    private static int determinePiracySP(int scale, List<Scenario> scenarios) {
+        int roll = d6(1);
+        int contractLootSP = determineContractLoot(roll, scale);
+        int componentLootSP = determineComponentLoot(scenarios, scale);
+
+        return contractLootSP + componentLootSP;
+    }
+
+    private static int determineContractLoot(int roll, int scale) {
+        int base = switch (roll) {
+            case 1 -> 0;
+            case 2 -> 375;
+            case 3 -> 750;
+            case 4 -> 1250;
+            case 5 -> 1500;
+            case 6 -> 1650;
+            default -> throw new IllegalStateException("Unexpected value: " + roll);
+        };
+
+        return base * scale;
+    }
+
+    private static int determineComponentLoot(List<Scenario> scenarios, int scale) {
+        int runningTotal = 0;
+        for (Scenario scenario : scenarios) {
+            if (scenario.getStatus().isVictory()) {
+                runningTotal++;
+            }
+        }
+
+        int value = switch (runningTotal) {
+            case 0 -> 0;
+            case 1 -> 250;
+            case 2 -> 300;
+            case 3 -> 400;
+            case 4 -> 500;
+            case 5 -> 550;
+            case 6 -> 600;
+            default -> 650;
+        };
+
+        return value * scale;
+    }
+
+    private static void updatePersonnelForActOfPiracy(List<Person> personnel, int delta) {
+        for (Person person : personnel) {
+            if (person.isEmployed()) {
+                person.changeCriminalRecord(delta);
+            }
+        }
+    }
+
+    public static int getExperienceLevel(Campaign campaign, Person person, boolean isPrimary) {
+        PersonnelRole role = isPrimary ? person.getPrimaryRole() : person.getSecondaryRole();
+
+        if (!role.isCivilian()) {
+            return person.getExperienceLevel(campaign, !isPrimary, true);
+        }
+
+        return EXP_NONE;
     }
 
     public static SkillLevel getAverageSkillLevel(final Campaign campaign, final Collection<Person> personnel) {
@@ -418,15 +527,5 @@ public class ChaosReputation {
         meanExperienceLevel = clamp(meanExperienceLevel, EXP_NONE, EXP_LEGENDARY);
 
         return SkillType.skillLevelFromExperienceLevel(meanExperienceLevel);
-    }
-
-    public static int getExperienceLevel(Campaign campaign, Person person, boolean isPrimary) {
-        PersonnelRole role = isPrimary ? person.getPrimaryRole() : person.getSecondaryRole();
-
-        if (!role.isCivilian()) {
-            return person.getExperienceLevel(campaign, !isPrimary, true);
-        }
-
-        return EXP_NONE;
     }
 }
