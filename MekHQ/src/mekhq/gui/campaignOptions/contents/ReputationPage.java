@@ -84,6 +84,7 @@ class ReputationPage {
     private JSpinner manualUnitRatingModifier;
     private JCheckBox chkUseChaosReputation;
     private JCheckBox chkCampaignLevelChaosReputation;
+    private JSpinner chaosReputationCap;
     private JCheckBox chkRequireSupportForceTransportation;
     private JCheckBox chkClampReputationPayMultiplier;
     private JCheckBox chkReduceReputationPerformanceModifier;
@@ -109,6 +110,7 @@ class ReputationPage {
 
         // Contents
         JPanel pnlReputationGeneralOptions = createReputationGeneralPanel();
+        JPanel pnlChaosReputationOptions = createChaosReputationPanel();
         JPanel pnlReputationSanityOptions = createReputationSanityPanel();
 
         // Layout the Panel
@@ -118,6 +120,9 @@ class ReputationPage {
                                    .section("lblReputationGeneralOptionsPanel.text",
                                          "lblReputationGeneralOptionsPanel.summary",
                                          pnlReputationGeneralOptions)
+                                   .section("lblChaosReputationOptionsPanel.text",
+                                         "lblChaosReputationOptionsPanel.summary",
+                                         pnlChaosReputationOptions)
                                    .section("lblReputationSanityOptionsPanel.text",
                                          "lblReputationSanityOptionsPanel.summary",
                                          pnlReputationSanityOptions)
@@ -137,18 +142,47 @@ class ReputationPage {
      */
     private @Nonnull JPanel createReputationGeneralPanel() {
         // Contents
-        chkUseChaosReputation = new CampaignOptionsCheckBox("UseChaosReputation");
+        chkUseChaosReputation = new CampaignOptionsCheckBox("UseChaosReputation", getMetadata(new Version(0, 51, 1)));
         chkUseChaosReputation.addMouseListener(createTipPanelUpdater("UseChaosReputation"));
 
-        chkCampaignLevelChaosReputation = new CampaignOptionsCheckBox("CampaignLevelChaosReputation");
-        chkCampaignLevelChaosReputation.addMouseListener(createTipPanelUpdater("CampaignLevelChaosReputation"));
+        JLabel lblManualUnitRatingModifier = new CampaignOptionsLabel("ManualUnitRatingModifier");
+        lblManualUnitRatingModifier.addMouseListener(createTipPanelUpdater("ManualUnitRatingModifier"));
+        manualUnitRatingModifier = new CampaignOptionsSpinner("ManualUnitRatingModifier", 0, -1000, 1000, 1);
+        manualUnitRatingModifier.addMouseListener(createTipPanelUpdater("ManualUnitRatingModifier"));
 
         // Layout the Panel
         final SettingsFormPanel panel = new SettingsFormPanel("ReputationGeneralOptionsPanel",
               FORM_LABEL_COLUMN_WIDTH,
               FORM_CONTROL_COLUMN_WIDTH);
         panel.addCheckBox(chkUseChaosReputation);
+        panel.addRow(lblManualUnitRatingModifier, manualUnitRatingModifier);
+
+        return panel;
+    }
+
+    /**
+     * Creates and lays out the Chaos Reputation options panel, holding the settings specific to the Chaos Campaign
+     * reputation system (other than the master toggle in the general panel).
+     *
+     * @return a {@link JPanel} containing the Chaos Reputation controls
+     */
+    private @Nonnull JPanel createChaosReputationPanel() {
+        // Contents
+        chkCampaignLevelChaosReputation = new CampaignOptionsCheckBox("CampaignLevelChaosReputation",
+              getMetadata(new Version(0, 51, 1)));
+        chkCampaignLevelChaosReputation.addMouseListener(createTipPanelUpdater("CampaignLevelChaosReputation"));
+
+        JLabel lblChaosReputationCap = new CampaignOptionsLabel("ChaosReputationCap");
+        lblChaosReputationCap.addMouseListener(createTipPanelUpdater("ChaosReputationCap"));
+        chaosReputationCap = new CampaignOptionsSpinner("ChaosReputationCap", 0, 0, 1000, 1);
+        chaosReputationCap.addMouseListener(createTipPanelUpdater("ChaosReputationCap"));
+
+        // Layout the Panel
+        final SettingsFormPanel panel = new SettingsFormPanel("ChaosReputationOptionsPanel",
+              FORM_LABEL_COLUMN_WIDTH,
+              FORM_CONTROL_COLUMN_WIDTH);
         panel.addCheckBox(chkCampaignLevelChaosReputation);
+        panel.addRow(lblChaosReputationCap, chaosReputationCap);
 
         return panel;
     }
@@ -183,12 +217,6 @@ class ReputationPage {
      */
     private @Nonnull JPanel createReputationSanityPanel() {
         // Contents
-        JLabel lblManualUnitRatingModifier = new CampaignOptionsLabel("ManualUnitRatingModifier");
-        lblManualUnitRatingModifier.addMouseListener(createTipPanelUpdater("ManualUnitRatingModifier"));
-        manualUnitRatingModifier = new CampaignOptionsSpinner("ManualUnitRatingModifier", 0, -1000, 1000, 1);
-        manualUnitRatingModifier
-              .addMouseListener(createTipPanelUpdater("ManualUnitRatingModifier"));
-
         JLabel lblResetCriminalRecord = new CampaignOptionsLabel("ResetCriminalRecord",
               getResetCriminalRecordMetadata());
         lblResetCriminalRecord.addMouseListener(createTipPanelUpdater("ResetCriminalRecord"));
@@ -219,7 +247,6 @@ class ReputationPage {
         final SettingsFormPanel panel = new SettingsFormPanel("ReputationSanityOptionsPanel",
               FORM_LABEL_COLUMN_WIDTH,
               FORM_CONTROL_COLUMN_WIDTH);
-        panel.addRow(lblManualUnitRatingModifier, manualUnitRatingModifier);
         panel.addRow(lblResetCriminalRecord, createLeftAlignedButtonPanel(btnResetCriminalRecord));
         panel.addCheckBoxGrid(CHECKBOX_GRID_COLUMNS,
               chkClampReputationPayMultiplier,
@@ -266,6 +293,7 @@ class ReputationPage {
         manualUnitRatingModifier.setValue(model.manualUnitRatingModifier);
         chkUseChaosReputation.setSelected(model.useChaosReputation);
         chkCampaignLevelChaosReputation.setSelected(model.campaignLevelChaosReputation);
+        chaosReputationCap.setValue(model.chaosReputationCap);
         updateResetCriminalRecordButtonFromModel();
         chkRequireSupportForceTransportation.setSelected(model.requireSupportForceTransportation);
         chkClampReputationPayMultiplier.setSelected(model.clampReputationPayMultiplier);
@@ -287,6 +315,7 @@ class ReputationPage {
         model.manualUnitRatingModifier = (int) manualUnitRatingModifier.getValue();
         model.useChaosReputation = chkUseChaosReputation.isSelected();
         model.campaignLevelChaosReputation = chkCampaignLevelChaosReputation.isSelected();
+        model.chaosReputationCap = (int) chaosReputationCap.getValue();
         model.requireSupportForceTransportation = chkRequireSupportForceTransportation.isSelected();
         model.clampReputationPayMultiplier = chkClampReputationPayMultiplier.isSelected();
         model.reduceReputationPerformanceModifier = chkReduceReputationPerformanceModifier.isSelected();

@@ -114,6 +114,8 @@ public final class CampaignOption<T> {
           of(Boolean.class, false, "useChaosReputation");
     public static final CampaignOption<Boolean> CAMPAIGN_LEVEL_CHAOS_REPUTATION =
           of(Boolean.class, false, "campaignLevelChaosReputation");
+    public static final CampaignOption<Integer> CHAOS_REPUTATION_CAP =
+          of(Integer.class, 0, "chaosReputationCap");
     public static final CampaignOption<Boolean> USE_ERA_MODS =
           of(Boolean.class, false, "useEraMods");
     public static final CampaignOption<Boolean> ASSIGNED_TECH_FIRST =

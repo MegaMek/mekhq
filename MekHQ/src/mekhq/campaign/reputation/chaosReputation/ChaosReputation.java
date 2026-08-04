@@ -82,7 +82,26 @@ public class ChaosReputation {
         PlayerForce playerForce = campaign.getPlayerForce();
         int base = playerForce.getChaosCampaignReputation();
         int debtModifier = getDebtModifier(playerForce.getFinances().getLoans(), campaign.getLocalDate());
-        return base + debtModifier;
+        int manualModifier = campaign.getCampaignOptions().get(CampaignOption.MANUAL_UNIT_RATING_MODIFIER);
+        return applyReputationCap(campaign, base + debtModifier + manualModifier);
+    }
+
+    /**
+     * Applies the configured Chaos Reputation cap to a reputation value. When the cap
+     * ({@link CampaignOption#CHAOS_REPUTATION_CAP}) is {@code 0}, the reputation is uncapped and returned unchanged;
+     * otherwise the reputation is limited to at most the cap.
+     *
+     * @param campaign   the campaign whose cap option to read
+     * @param reputation the reputation value to cap
+     *
+     * @return the capped reputation value
+     */
+    public static int applyReputationCap(Campaign campaign, int reputation) {
+        int cap = campaign.getCampaignOptions().get(CampaignOption.CHAOS_REPUTATION_CAP);
+        if (cap != 0) {
+            return min(reputation, cap);
+        }
+        return reputation;
     }
 
     /**
@@ -97,11 +116,13 @@ public class ChaosReputation {
         PlayerForce playerForce = campaign.getPlayerForce();
         int base = playerForce.getChaosCampaignReputation();
         int debtModifier = getDebtModifier(playerForce.getFinances().getLoans(), campaign.getLocalDate());
-        int total = base + debtModifier;
+        int manualModifier = campaign.getCampaignOptions().get(CampaignOption.MANUAL_UNIT_RATING_MODIFIER);
+        int total = applyReputationCap(campaign, base + debtModifier + manualModifier);
 
         return getFormattedTextAt(RESOURCE_BUNDLE, "campaignLevel.tooltip",
               Integer.toString(base),
               Integer.toString(debtModifier),
+              Integer.toString(manualModifier),
               Integer.toString(total));
     }
 
@@ -124,8 +145,9 @@ public class ChaosReputation {
 
         List<Loan> loans = playerForce.getFinances().getLoans();
         int debtModifier = getDebtModifier(loans, currentDate);
+        int manualModifier = campaign.getCampaignOptions().get(CampaignOption.MANUAL_UNIT_RATING_MODIFIER);
 
-        int total = modeReputation + debtModifier;
+        int total = applyReputationCap(campaign, modeReputation + debtModifier + manualModifier);
 
         String report = getFormattedTextAt(RESOURCE_BUNDLE, "ChaosReputation.update",
               spanOpeningWithCustomColor(getAmazingColor()),
@@ -133,6 +155,7 @@ public class ChaosReputation {
               formationName,
               modeReputation,
               debtModifier,
+              manualModifier,
               total);
         campaign.addReport(DailyReportType.GENERAL, report);
 
@@ -179,7 +202,7 @@ public class ChaosReputation {
 
         int debtModifier = (int) floor(maxLoanAge / GOING_INT_DEBT_MONTHLY_FREQUENCY) * GOING_INTO_DEBT_DELTA;
         if (!loans.isEmpty()) {
-            debtModifier++;
+            debtModifier += GOING_INTO_DEBT_DELTA;
         }
         return debtModifier;
     }
