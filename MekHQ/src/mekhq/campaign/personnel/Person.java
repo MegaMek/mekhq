@@ -7508,7 +7508,7 @@ public class Person implements ILocatable {
      * <p>This method returns the unadjusted fame value associated with the character.</p>
      *
      * <p><b>Usage:</b> If aging effects are enabled, you likely want to use
-     * {@link #getAdjustedFame(boolean, boolean, LocalDate, int)}  instead.</p>
+     * {@link #getAdjustedFame(boolean, boolean, LocalDate)}   instead.</p>
      *
      * @return The raw fame value.
      */
