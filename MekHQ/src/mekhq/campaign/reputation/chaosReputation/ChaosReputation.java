@@ -136,13 +136,16 @@ public class ChaosReputation {
                   cap,
                   commander);
         } else {
+            boolean applyPersonality = campaignOptions.get(CampaignOption.CHAOS_PERSONALITY_AFFECTS_REPUTATION) &&
+                                             campaignOptions.get(CampaignOption.USE_RANDOM_PERSONALITIES);
             ChaosReputation.calculatePersonnelLevelReputation(playerForce,
                   today,
                   debtPenaltiesStack,
                   manualModifier,
                   cap,
                   campaignOptions.get(CampaignOption.USE_AGE_EFFECTS),
-                  commander);
+                  commander,
+                  applyPersonality);
         }
     }
 
@@ -157,9 +160,11 @@ public class ChaosReputation {
      * @param cap                the reputation cap ({@code 0} for none)
      * @param useAgeEffects      whether age effects apply to adjusted reputation
      * @param commander          the campaign commander, whose SPAs may modify the debt penalty (may be {@code null})
+     * @param applyPersonality   whether each character's personality value is added to their reputation
      */
     private static void calculatePersonnelLevelReputation(PlayerForce playerForce, LocalDate currentDate,
-          boolean debtPenaltiesStack, int manualModifier, int cap, boolean useAgeEffects, Person commander) {
+          boolean debtPenaltiesStack, int manualModifier, int cap, boolean useAgeEffects, Person commander,
+          boolean applyPersonality) {
         Collection<Person> personnel = playerForce.allPersonnel();
         boolean isClanForce = playerForce.isClanForce();
         List<Loan> loans = playerForce.getFinances().getLoans();
@@ -172,7 +177,8 @@ public class ChaosReputation {
               debtPenaltiesStack,
               manualModifier,
               cap,
-              commander);
+              commander,
+              applyPersonality);
 
         playerForce.setChaosCampaignReputation(total);
     }
@@ -189,16 +195,18 @@ public class ChaosReputation {
      * @param manualModifier  the manual reputation modifier to add
      * @param cap             the reputation cap ({@code 0} for none)
      * @param commander       the campaign commander, whose SPAs may modify the debt penalty (may be {@code null})
+     * @param applyPersonality whether each character's personality value is added to their reputation
      *
      * @return the capped total reputation
      */
     private static int processReputation(Collection<Person> personnel, LocalDate currentDate, boolean isUseAgeEffects,
           boolean isClanForce, List<Loan> loans, boolean stackPenalties, int manualModifier, int cap,
-          Person commander) {
+          Person commander, boolean applyPersonality) {
         int modeReputation = calculateAverageReputation(personnel,
               isUseAgeEffects,
               isClanForce,
-              currentDate);
+              currentDate,
+              applyPersonality);
 
         int debtModifier = applyCommanderDebtModifier(getDebtModifier(loans, currentDate, stackPenalties), commander);
 
@@ -425,11 +433,12 @@ public class ChaosReputation {
      * @param isUseAgingEffects whether age effects apply to adjusted reputation
      * @param isClanCampaign    whether the force is a Clan force
      * @param currentDate       the current date, used for age effects
+     * @param applyPersonality  whether each character's personality value is added to their reputation
      *
      * @return the rounded mean adjusted reputation
      */
     private static int calculateAverageReputation(Collection<Person> personnel, boolean isUseAgingEffects,
-          boolean isClanCampaign, LocalDate currentDate) {
+          boolean isClanCampaign, LocalDate currentDate, boolean applyPersonality) {
         // Tallies how often each adjusted reputation value appears among valid personnel.
         double personCount = 0;
         int totalReputation = 0;
@@ -449,7 +458,10 @@ public class ChaosReputation {
                 }
 
                 personCount += weight;
-                int reputation = person.getAdjustedReputation(isUseAgingEffects, isClanCampaign, currentDate);
+                int reputation = person.getAdjustedReputation(isUseAgingEffects,
+                      isClanCampaign,
+                      currentDate,
+                      applyPersonality);
                 totalReputation += reputation * weight;
             }
         }

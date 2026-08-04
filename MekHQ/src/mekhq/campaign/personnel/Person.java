@@ -7260,6 +7260,11 @@ public class Person implements ILocatable {
     }
 
     public int getAdjustedReputation(boolean isUseAgingEffects, boolean isClanCampaign, LocalDate currentDate) {
+        return getAdjustedReputation(isUseAgingEffects, isClanCampaign, currentDate, false);
+    }
+
+    public int getAdjustedReputation(boolean isUseAgingEffects, boolean isClanCampaign, LocalDate currentDate,
+          boolean applyPersonality) {
         int fameContribution = getAdjustedFame(isUseAgingEffects, isClanCampaign, currentDate);
 
         if (options.booleanOption(DONT_YOU_KNOW_WHO_I_AM)) {
@@ -7284,10 +7289,18 @@ public class Person implements ILocatable {
             criminalRecordContribution++;
         }
 
+
+        int personalityContribution = PersonalityController.getPersonalityValue(applyPersonality,
+              getAggression(),
+              getAmbition(),
+              getGreed(),
+              getSocial());
+
         return chaosCampaignReputation +
                      criminalRecordContribution +
                      fameContribution +
-                     connectionsContribution;
+                     connectionsContribution +
+                     personalityContribution;
     }
 
     /** Generally you will want to call {@link #getAdjustedReputation(boolean, boolean, LocalDate)} instead */

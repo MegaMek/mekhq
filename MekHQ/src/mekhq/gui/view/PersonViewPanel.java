@@ -1738,12 +1738,22 @@ public class PersonViewPanel extends JScrollablePanel {
                 criminalRecord++;
             }
 
-            int adjustedReputation = baseReputation + criminalRecord + adjustedFame + adjustedConnections;
+            boolean applyPersonality = campaignOptions.get(CampaignOption.CHAOS_PERSONALITY_AFFECTS_REPUTATION) &&
+                                             campaignOptions.get(CampaignOption.USE_RANDOM_PERSONALITIES);
+            int personality = PersonalityController.getPersonalityValue(applyPersonality,
+                  person.getAggression(),
+                  person.getAmbition(),
+                  person.getGreed(),
+                  person.getSocial());
+
+            int adjustedReputation =
+                  baseReputation + criminalRecord + adjustedFame + adjustedConnections + personality;
             String chaosReputationTooltip = wordWrap(String.format(resourceMap.getString("lblChaosReputation.tooltip"),
                   baseReputation,
                   criminalRecord,
                   adjustedFame,
                   adjustedConnections,
+                  personality,
                   adjustedReputation));
 
             lblChaosReputation1.setName("lblChaosReputation1");

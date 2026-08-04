@@ -87,6 +87,7 @@ class ReputationPage {
     private JSpinner chaosReputationCap;
     private JCheckBox chkChaosDebtPenaltiesStack;
     private JCheckBox chkChaosNoPartialSuccessReputation;
+    private JCheckBox chkChaosPersonalityAffectsReputation;
     private JCheckBox chkRequireSupportForceTransportation;
     private JCheckBox chkClampReputationPayMultiplier;
     private JCheckBox chkReduceReputationPerformanceModifier;
@@ -180,6 +181,9 @@ class ReputationPage {
         chkChaosNoPartialSuccessReputation = new CampaignOptionsCheckBox("ChaosNoPartialSuccessReputation");
         chkChaosNoPartialSuccessReputation.addMouseListener(createTipPanelUpdater("ChaosNoPartialSuccessReputation"));
 
+        chkChaosPersonalityAffectsReputation = new CampaignOptionsCheckBox("ChaosPersonalityAffectsReputation");
+        chkChaosPersonalityAffectsReputation.addMouseListener(createTipPanelUpdater("ChaosPersonalityAffectsReputation"));
+
         JLabel lblChaosReputationCap = new CampaignOptionsLabel("ChaosReputationCap");
         lblChaosReputationCap.addMouseListener(createTipPanelUpdater("ChaosReputationCap"));
         chaosReputationCap = new CampaignOptionsSpinner("ChaosReputationCap", 0, 0, 1000, 1);
@@ -192,6 +196,7 @@ class ReputationPage {
         panel.addCheckBox(chkCampaignLevelChaosReputation);
         panel.addCheckBox(chkChaosDebtPenaltiesStack);
         panel.addCheckBox(chkChaosNoPartialSuccessReputation);
+        panel.addCheckBox(chkChaosPersonalityAffectsReputation);
         panel.addRow(lblChaosReputationCap, chaosReputationCap);
 
         return panel;
@@ -305,6 +310,7 @@ class ReputationPage {
         chkCampaignLevelChaosReputation.setSelected(model.campaignLevelChaosReputation);
         chkChaosDebtPenaltiesStack.setSelected(model.chaosDebtPenaltiesStack);
         chkChaosNoPartialSuccessReputation.setSelected(model.chaosNoPartialSuccessReputation);
+        chkChaosPersonalityAffectsReputation.setSelected(model.chaosPersonalityAffectsReputation);
         chaosReputationCap.setValue(model.chaosReputationCap);
         updateResetCriminalRecordButtonFromModel();
         chkRequireSupportForceTransportation.setSelected(model.requireSupportForceTransportation);
@@ -329,6 +335,7 @@ class ReputationPage {
         model.campaignLevelChaosReputation = chkCampaignLevelChaosReputation.isSelected();
         model.chaosDebtPenaltiesStack = chkChaosDebtPenaltiesStack.isSelected();
         model.chaosNoPartialSuccessReputation = chkChaosNoPartialSuccessReputation.isSelected();
+        model.chaosPersonalityAffectsReputation = chkChaosPersonalityAffectsReputation.isSelected();
         model.chaosReputationCap = (int) chaosReputationCap.getValue();
         model.requireSupportForceTransportation = chkRequireSupportForceTransportation.isSelected();
         model.clampReputationPayMultiplier = chkClampReputationPayMultiplier.isSelected();

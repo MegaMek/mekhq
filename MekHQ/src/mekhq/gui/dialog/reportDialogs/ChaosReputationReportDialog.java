@@ -249,6 +249,9 @@ public class ChaosReputationReportDialog extends AbstractReportDialog {
         // Tally how many personnel share each adjusted reputation value, rather than listing every person, so the
         // report stays compact for large campaigns.
         Map<Integer, Integer> reputationCounts = new TreeMap<>(Collections.reverseOrder());
+        boolean applyPersonality =
+              campaign.getCampaignOptions().get(CampaignOption.CHAOS_PERSONALITY_AFFECTS_REPUTATION) &&
+                    campaign.getCampaignOptions().get(CampaignOption.USE_RANDOM_PERSONALITIES);
         double personCount = 0;
         int totalReputation = 0;
         for (Person person : personnel) {
@@ -263,7 +266,10 @@ public class ChaosReputationReportDialog extends AbstractReportDialog {
             }
 
             personCount += weight;
-            int adjustedReputation = person.getAdjustedReputation(isUseAgeEffects, isClanForce, currentDate);
+            int adjustedReputation = person.getAdjustedReputation(isUseAgeEffects,
+                  isClanForce,
+                  currentDate,
+                  applyPersonality);
             totalReputation += adjustedReputation * weight;
             reputationCounts.merge(adjustedReputation, weight, Integer::sum);
         }
