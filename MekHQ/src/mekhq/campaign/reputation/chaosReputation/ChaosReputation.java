@@ -56,6 +56,10 @@ public class ChaosReputation {
     private static final int GOING_INTO_DEBT_DELTA = -1; // Hot Spots Draconis Reach pg25 1st printing
     private static final double GOING_INT_DEBT_MONTHLY_FREQUENCY = 6.0; // Hot Spots Draconis Reach pg25 1st printing
 
+    // When migrating a CamOps campaign to Chaos reputation, the CamOps crime rating is divided by this to seed each
+    // character's Chaos criminal record.
+    private static final int CRIME_RATING_TO_CRIMINAL_RECORD_DIVIDER = 10;
+
 
     public static void calculateForceReputation(Campaign campaign) {
         // When tracking at the campaign level, the stored reputation is authoritative and is not derived from
@@ -189,11 +193,20 @@ public class ChaosReputation {
      * @return the force-wide reputation value applied
      */
     public static int applyRetroactiveContractReputation(Campaign campaign) {
+        // Carry over any CamOps crime standing as a Chaos criminal record. The adjusted crime rating is negative, so
+        // dividing by CRIME_RATING_TO_CRIMINAL_RECORD_DIVIDER yields a (negative) criminal record penalty.
+        int adjustedCrimeRating = campaign.getPlayerForce().getAdjustedCrimeRating();
+        int criminalRecordFromCrime = adjustedCrimeRating / CRIME_RATING_TO_CRIMINAL_RECORD_DIVIDER;
+
         for (Person person : campaign.getPlayerForce().getHumanResources().getPersonnel()) {
             LocalDate departure = earliestDate(person.getDateOfDeath(), person.getRetirement());
             person.setReputationDirect(tabulateReputationFromContracts(campaign,
                   person.getRecruitment(),
                   departure));
+
+            if (adjustedCrimeRating != 0) {
+                person.setCriminalRecord(criminalRecordFromCrime);
+            }
         }
 
         int forceReputation = tabulateReputationFromContracts(campaign, null, null);
