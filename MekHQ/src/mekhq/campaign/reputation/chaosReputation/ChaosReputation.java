@@ -127,6 +127,9 @@ public class ChaosReputation {
     public static int tabulateReputationFromContracts(Campaign campaign, LocalDate windowStart, LocalDate windowEnd) {
         int reputation = STARTING_REPUTATION_SCORE;
 
+        boolean noPartialSuccessReputation =
+              campaign.getCampaignOptions().get(CampaignOption.CHAOS_NO_PARTIAL_SUCCESS_REPUTATION);
+
         List<AbstractMissionTransition> completedMissions = new ArrayList<>(campaign.getCompletedMissions());
         completedMissions.sort(Comparator.comparing(AbstractMissionTransition::getEndingDate,
               Comparator.nullsFirst(Comparator.naturalOrder())));
@@ -138,6 +141,8 @@ public class ChaosReputation {
 
             MissionStatus status = mission.getStatus();
             if (status.isSuccess()) {
+                reputation += CONTRACT_SUCCESS_DELTA;
+            } else if (status.isPartialSuccess() && !noPartialSuccessReputation) {
                 reputation += CONTRACT_SUCCESS_DELTA;
             } else if (status.isBreach()) {
                 int loss = clamp((int) round(reputation * BREAKING_CONTRACT_MULTIPLIER),

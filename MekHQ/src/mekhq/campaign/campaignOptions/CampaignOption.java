@@ -118,6 +118,8 @@ public final class CampaignOption<T> {
           of(Integer.class, 0, "chaosReputationCap");
     public static final CampaignOption<Boolean> CHAOS_DEBT_PENALTIES_STACK =
           of(Boolean.class, false, "chaosDebtPenaltiesStack");
+    public static final CampaignOption<Boolean> CHAOS_NO_PARTIAL_SUCCESS_REPUTATION =
+          of(Boolean.class, false, "chaosNoPartialSuccessReputation");
     public static final CampaignOption<Boolean> USE_ERA_MODS =
           of(Boolean.class, false, "useEraMods");
     public static final CampaignOption<Boolean> ASSIGNED_TECH_FIRST =
