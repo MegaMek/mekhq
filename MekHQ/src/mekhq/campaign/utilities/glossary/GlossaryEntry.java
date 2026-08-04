@@ -93,7 +93,7 @@ public enum GlossaryEntry {
     FIELD_CONTROL("FIELD_CONTROL", new Version("0.50.06")),
     FIELD_KITCHENS("FIELD_KITCHENS", new Version("0.50.06")),
     FORCE_GENERATION("FORCE_GENERATION", new Version("0.50.11")),
-    FORCE_REPUTATION("FORCE_REPUTATION", new Version("0.50.06")),
+    FORCE_REPUTATION("FORCE_REPUTATION", new Version("0.51.01")),
     FORCE_TYPE_COMBAT("FORCE_TYPE_COMBAT", new Version("0.50.06")),
     FORCE_TYPE_CONVOY("FORCE_TYPE_CONVOY", new Version("0.50.06")),
     FORCE_TYPE_SALVAGE("FORCE_TYPE_SALVAGE", new Version("0.50.10")),
