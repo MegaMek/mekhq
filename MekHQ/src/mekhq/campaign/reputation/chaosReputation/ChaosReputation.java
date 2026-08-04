@@ -3,6 +3,7 @@ package mekhq.campaign.reputation.chaosReputation;
 import static java.lang.Math.ceil;
 import static java.lang.Math.clamp;
 import static java.lang.Math.floor;
+import static java.lang.Math.max;
 import static java.lang.Math.min;
 import static java.lang.Math.round;
 import static megamek.common.compute.Compute.d6;
@@ -52,6 +53,7 @@ public class ChaosReputation {
     private static final int PIRACY_AVOIDANCE_TN_SUCCESS = 7; // Hot Spots Draconis Reach pg25 1st printing
     private static final int PIRACY_AVOIDANCE_TN_FAILURE = 9; // Hot Spots Draconis Reach pg25 1st printing
     private static final double PIRACY_PENALTY_PROFIT_DIVIDER = 500; // Hot Spots Draconis Reach pg25 1st printing
+    private static final double PIRACY_MINIMUM_CHANGE = 3; // Hot Spots Draconis Reach pg25 1st printing
 
     private static final int GOING_INTO_DEBT_DELTA = -1; // Hot Spots Draconis Reach pg25 1st printing
     private static final double GOING_INT_DEBT_MONTHLY_FREQUENCY = 6.0; // Hot Spots Draconis Reach pg25 1st printing
@@ -351,6 +353,7 @@ public class ChaosReputation {
 
         int supperPointsFromMoney = ChaosCampaignUtilities.getChaosSupportPointsFromMoney(lootValue);
         int delta = (int) ceil(supperPointsFromMoney / PIRACY_PENALTY_PROFIT_DIVIDER);
+        delta = (int) max(PIRACY_MINIMUM_CHANGE, delta);
 
         String report;
         boolean gotCaught = roll < targetNumber;
