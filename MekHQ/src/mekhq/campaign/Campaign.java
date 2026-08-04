@@ -5372,9 +5372,9 @@ public class Campaign implements ITechManager {
 
         MHQXMLUtility.writeSimpleXMLOpenTag(writer, indent++, "reputation");
         getPlayerForce().getReputation().writeReputationToXML(writer, indent);
+        MHQXMLUtility.writeSimpleXMLCloseTag(writer, --indent, "reputation");
         MHQXMLUtility.writeSimpleXMLTag(writer, indent, "chaosCampaignReputation",
               getPlayerForce().getChaosCampaignReputation());
-        MHQXMLUtility.writeSimpleXMLCloseTag(writer, --indent, "reputation");
         if (getPlayerForce().getHumanResources().getNewPersonnelMarket() != null) {
             MHQXMLUtility.writeSimpleXMLOpenTag(writer, indent++, "newPersonnelMarket");
             getPlayerForce().getHumanResources().getNewPersonnelMarket().writePersonnelMarketDataToXML(writer, indent);
