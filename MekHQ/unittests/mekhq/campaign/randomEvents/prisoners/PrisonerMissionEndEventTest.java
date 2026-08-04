@@ -285,6 +285,7 @@ class PrisonerMissionEndEventTest {
     void testExecutePrisoners_crimeNoticed_appliesNegativePenaltyAndRecordsDate() {
         // Setup
         Campaign mockCampaign = mockCampaign();
+        when(mockCampaign.getCampaignOptions()).thenReturn(new CampaignOptions());
         LocalDate today = LocalDate.of(3151, 1, 1);
         when(mockCampaign.getLocalDate()).thenReturn(today);
         AtBContract contract = new AtBContract("TEST");
@@ -307,6 +308,7 @@ class PrisonerMissionEndEventTest {
     void testExecutePrisoners_crimeNoticed_penaltyCappedAtMaximum() {
         // Setup
         Campaign mockCampaign = mockCampaign();
+        when(mockCampaign.getCampaignOptions()).thenReturn(new CampaignOptions());
         when(mockCampaign.getLocalDate()).thenReturn(LocalDate.of(3151, 1, 1));
         AtBContract contract = new AtBContract("TEST");
         PrisonerMissionEndEvent endEvent = new PrisonerMissionEndEvent(mockCampaign, contract);
@@ -330,6 +332,7 @@ class PrisonerMissionEndEventTest {
     void testExecutePrisoners_crimeUnnoticed_doesNotChangeCrimeRating() {
         // Setup
         Campaign mockCampaign = mockCampaign();
+        when(mockCampaign.getCampaignOptions()).thenReturn(new CampaignOptions());
         when(mockCampaign.getLocalDate()).thenReturn(LocalDate.of(3151, 1, 1));
         AtBContract contract = new AtBContract("TEST");
         PrisonerMissionEndEvent endEvent = new PrisonerMissionEndEvent(mockCampaign, contract);

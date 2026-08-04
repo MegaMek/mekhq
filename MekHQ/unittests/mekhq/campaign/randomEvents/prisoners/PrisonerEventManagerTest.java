@@ -997,6 +997,8 @@ public class PrisonerEventManagerTest {
         private Campaign newCampaign() {
             Campaign campaign = mockCampaign();
             when(campaign.getLocalDate()).thenReturn(TODAY);
+            // Default options (Chaos Reputation disabled) so the CamOps crime-rating path is exercised.
+            when(campaign.getCampaignOptions()).thenReturn(new CampaignOptions());
             return campaign;
         }
 
