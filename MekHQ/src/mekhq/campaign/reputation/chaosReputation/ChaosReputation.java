@@ -833,6 +833,24 @@ public class ChaosReputation {
     }
 
     /**
+     * Updates the criminal record of employed personnel by a specified delta value. Iterates through the provided list
+     * of personnel, and for each person that is currently employed, modifies their criminal record by the delta
+     * amount.
+     *
+     * @param personnel the list of personnel to update
+     * @param delta     the amount by which to adjust the criminal record for employed personnel
+     */
+    public static void updatePersonnelCriminalRecord(List<Person> personnel, int delta) {
+        for (Person person : personnel) {
+            if (!person.isEmployed()) {
+                continue;
+            }
+
+            person.changeCriminalRecord(delta);
+        }
+    }
+
+    /**
      * Calculates the experience level of a person based on various campaign parameters, role-specific adjustments, and
      * personnel options.
      *

@@ -60,6 +60,7 @@ import megamek.common.compute.Compute;
 import megamek.common.units.Entity;
 import megamek.logging.MMLogger;
 import mekhq.campaign.Campaign;
+import mekhq.campaign.campaignOptions.CampaignOption;
 import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.force.Formation;
 import mekhq.campaign.mission.AtBContract;
@@ -70,6 +71,7 @@ import mekhq.campaign.personnel.Person;
 import mekhq.campaign.randomEvents.prisoners.prisonerEvents.PrisonEscapeScenario;
 import mekhq.campaign.randomEvents.randomEventsSystem.RandomEventData;
 import mekhq.campaign.randomEvents.randomEventsSystem.RandomEventEffectsManager;
+import mekhq.campaign.reputation.chaosReputation.ChaosReputation;
 import mekhq.campaign.unit.Unit;
 import mekhq.campaign.universe.factionStanding.FactionStandings;
 import mekhq.gui.dialog.PrisonerIntelBreachDialog;
@@ -202,12 +204,29 @@ public class PrisonerEventManager {
         int crimeNoticeRoll = Compute.randomInt(100);
         boolean crimeNoticed = crimeNoticeRoll < victims;
 
-        int penalty = min(MAX_CRIME_PENALTY, victims * 2);
-        if (crimeNoticed) {
-            int change = -penalty;
-            campaign.getPlayerForce().changeCrimeRating(change);
-            LocalDate dateOfLastCrime = campaign.getLocalDate();
-            campaign.getPlayerForce().setCampOpsDateOfLastCrime(dateOfLastCrime);
+        int penalty;
+        CampaignOptions campaignOptions = campaign.getCampaignOptions();
+        boolean isUseChaosReputation = campaignOptions.get(CampaignOption.USE_CHAOS_REPUTATION);
+        if (isUseChaosReputation) {
+            penalty = -min(MAX_CRIME_PENALTY, victims) / 10;
+            if (crimeNoticed) {
+                boolean isUsePersonnelReputation = campaignOptions.get(CampaignOption.CAMPAIGN_LEVEL_CHAOS_REPUTATION);
+                if (isUsePersonnelReputation) {
+                    campaign.getPlayerForce().changeChaosCampaignReputation(penalty);
+                } else {
+                    ChaosReputation.updatePersonnelCriminalRecord(
+                          campaign.getPlayerForce().getHumanResources().getPersonnelFilteringOutDepartedAndAbsent(),
+                          penalty);
+                }
+            }
+        } else {
+            penalty = min(MAX_CRIME_PENALTY, victims * 2);
+            if (crimeNoticed) {
+                int change = -penalty;
+                campaign.getPlayerForce().changeCrimeRating(change);
+                LocalDate dateOfLastCrime = campaign.getLocalDate();
+                campaign.getPlayerForce().setCampOpsDateOfLastCrime(dateOfLastCrime);
+            }
         }
 
         // Build the report

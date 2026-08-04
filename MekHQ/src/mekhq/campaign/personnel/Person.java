@@ -37,6 +37,7 @@ import static java.lang.Math.abs;
 import static java.lang.Math.clamp;
 import static java.lang.Math.floor;
 import static java.lang.Math.max;
+import static java.lang.Math.min;
 import static java.lang.Math.round;
 import static megamek.codeUtilities.StringUtility.isNullOrBlank;
 import static megamek.common.compute.Compute.d6;
@@ -6295,7 +6296,7 @@ public class Person implements ILocatable {
             return 0;
         }
 
-        setEdge(Math.min(previousEdge + amount, effectiveMaximum));
+        setEdge(min(previousEdge + amount, effectiveMaximum));
         return getEdge() - previousEdge;
     }
 
@@ -7315,7 +7316,7 @@ public class Person implements ILocatable {
     }
 
     public void changeCriminalRecord(int delta) {
-        this.chaosCampaignCriminalRecord += delta;
+        this.chaosCampaignCriminalRecord = min(0, chaosCampaignCriminalRecord + delta);
     }
 
     public boolean getHasGainedVeterancySPA() {

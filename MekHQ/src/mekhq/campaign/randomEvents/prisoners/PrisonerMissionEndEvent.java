@@ -36,6 +36,7 @@ import static java.lang.Math.max;
 import static java.lang.Math.min;
 import static megamek.common.compute.Compute.randomInt;
 import static mekhq.campaign.enums.DailyReportType.GENERAL;
+import static mekhq.campaign.enums.DailyReportType.POLITICS;
 import static mekhq.campaign.finances.enums.TransactionType.RANSOM;
 import static mekhq.campaign.personnel.enums.PersonnelStatus.ACTIVE;
 import static mekhq.campaign.personnel.enums.PersonnelStatus.HOMICIDE;
@@ -50,12 +51,16 @@ import java.util.ArrayList;
 import java.util.List;
 
 import mekhq.campaign.Campaign;
+import mekhq.campaign.campaignOptions.CampaignOption;
+import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.finances.Money;
 import mekhq.campaign.mission.Contract;
 import mekhq.campaign.mission.Mission;
 import mekhq.campaign.mission.Scenario;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.enums.PersonnelStatus;
+import mekhq.campaign.reputation.chaosReputation.ChaosReputation;
+import mekhq.campaign.universe.factionStanding.FactionStandings;
 import mekhq.gui.baseComponents.immersiveDialogs.ImmersiveDialogSimple;
 import mekhq.utilities.ReportingUtilities;
 
@@ -177,7 +182,7 @@ public class PrisonerMissionEndEvent {
               null,
               false);
 
-        processPlayerResponse(ransom, isGoodEvent, dialog.getDialogChoice(), prisoners);
+        processPlayerResponse(ransom, isGoodEvent, dialog.getDialogChoice(), prisoners, campaign);
     }
 
     /**
@@ -317,13 +322,28 @@ public class PrisonerMissionEndEvent {
      * @param choiceIndex The player's choice index from the dialog.
      * @param prisoners   The list of prisoners involved in the event.
      */
-    private void processPlayerResponse(Money ransom, boolean isGoodEvent, int choiceIndex, List<Person> prisoners) {
+    private void processPlayerResponse(Money ransom, boolean isGoodEvent, int choiceIndex, List<Person> prisoners,
+          Campaign campaign) {
         if (choiceIndex == CHOICE_RELEASE_THEM) {
             removeAllPrisoners(prisoners);
             return;
         }
 
         if (choiceIndex == CHOICE_EXECUTE_THEM) {
+            if (campaign.getCampaignOptions().get(CampaignOption.TRACK_FACTION_STANDING)) {
+                FactionStandings factionStandings = campaign.getPlayerForce().getFactionStandings();
+
+                List<String> reports = factionStandings.executePrisonersOfWar(
+                      campaign.getPlayerForce().getFaction().getShortName(),
+                      prisoners,
+                      campaign.getGameYear(),
+                      campaign.getCampaignOptions().get(CampaignOption.REGARD_MULTIPLIER));
+
+                for (String report : reports) {
+                    campaign.addReport(POLITICS, report);
+                }
+            }
+
             executePrisoners(prisoners);
             removeAllPrisoners(prisoners);
             return;
@@ -446,13 +466,30 @@ public class PrisonerMissionEndEvent {
         // Was the crime noticed?
         int crimeNoticeRoll = randomInt(100);
         boolean crimeNoticed = crimeNoticeRoll < prisoners.size();
+        int penalty;
 
-        int penalty = min(MAX_CRIME_PENALTY, prisoners.size() * 2);
-        if (crimeNoticed) {
-            int change = -penalty;
-            campaign.getPlayerForce().changeCrimeRating(change);
-            LocalDate dateOfLastCrime = campaign.getLocalDate();
-            campaign.getPlayerForce().setCampOpsDateOfLastCrime(dateOfLastCrime);
+        CampaignOptions campaignOptions = campaign.getCampaignOptions();
+        boolean isUseChaosReputation = campaignOptions.get(CampaignOption.USE_CHAOS_REPUTATION);
+        if (isUseChaosReputation) {
+            penalty = -min(MAX_CRIME_PENALTY, prisoners.size()) / 10;
+            if (crimeNoticed) {
+                boolean isUsePersonnelReputation = campaignOptions.get(CampaignOption.CAMPAIGN_LEVEL_CHAOS_REPUTATION);
+                if (isUsePersonnelReputation) {
+                    campaign.getPlayerForce().changeChaosCampaignReputation(penalty);
+                } else {
+                    ChaosReputation.updatePersonnelCriminalRecord(
+                          campaign.getPlayerForce().getHumanResources().getPersonnelFilteringOutDepartedAndAbsent(),
+                          penalty);
+                }
+            }
+        } else {
+            penalty = min(MAX_CRIME_PENALTY, prisoners.size() * 2);
+            if (crimeNoticed) {
+                int change = -penalty;
+                campaign.getPlayerForce().changeCrimeRating(change);
+                LocalDate dateOfLastCrime = campaign.getLocalDate();
+                campaign.getPlayerForce().setCampOpsDateOfLastCrime(dateOfLastCrime);
+            }
         }
 
         // Build the report

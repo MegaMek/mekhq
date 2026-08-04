@@ -65,6 +65,7 @@ import megamek.logging.MMLogger;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.RandomOriginOptions;
+import mekhq.campaign.campaignOptions.CampaignOption;
 import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.digitalGM.stratCon.StratConCampaignState;
 import mekhq.campaign.events.persons.PersonChangedEvent;
@@ -1263,11 +1264,14 @@ public class RandomEventEffectsManager {
         String haveOrHas = getFormattedTextAt(RESOURCE_BUNDLE,
               prisonerCount != 1 ? "pluralizer.have" : "pluralizer.has");
 
-        String crimeReport = getFormattedTextAt(RESOURCE_BUNDLE,
-              "ABANDONED_TO_DIE.report.crime",
-              colorOpen,
-              CLOSING_SPAN_TAG,
-              crimeChange);
+        String crimeReport = "";
+        if (!campaign.getCampaignOptions().get(CampaignOption.USE_CHAOS_REPUTATION)) {
+            crimeReport = getFormattedTextAt(RESOURCE_BUNDLE,
+                  "ABANDONED_TO_DIE.report.crime",
+                  colorOpen,
+                  CLOSING_SPAN_TAG,
+                  crimeChange);
+        }
 
         return getFormattedTextAt(RESOURCE_BUNDLE,
               "ABANDONED_TO_DIE.report.prisoners",
