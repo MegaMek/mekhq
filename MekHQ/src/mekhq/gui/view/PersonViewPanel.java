@@ -1346,7 +1346,9 @@ public class PersonViewPanel extends JScrollablePanel {
             String factionName = person.getOriginFaction().getFullName(campaign.getGameYear());
             if (person.getOriginPlanet() != null) {
                 String planetName = person.getOriginPlanet().getName(today);
-                lblOrigin2.setText(String.format("<html><a href='#'>%s</a> (%s)</html>", planetName, factionName));
+                lblOrigin2.setText(String.format("<html><nobr><a href='#'>%s</a> (%s)</nobr></html>",
+                      planetName,
+                      factionName));
                 lblOrigin2.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
                 lblOrigin2.addMouseListener(new MouseAdapter() {
                     @Override
@@ -1728,7 +1730,7 @@ public class PersonViewPanel extends JScrollablePanel {
             pnlInfo.add(lblChaosReputation1, gridBagConstraints);
 
             lblChaosReputation2.setName("lblChaosReputation2");
-            lblChaosReputation2.setText(String.format("<html>%s%s</html>",
+            lblChaosReputation2.setText(String.format("<html><nobr>%s%s</nobr></html>",
                   adjustedReputation,
                   getTraitAdjustmentIcon(baseReputation, adjustedReputation)));
             lblChaosReputation2.setToolTipText(chaosReputationTooltip);

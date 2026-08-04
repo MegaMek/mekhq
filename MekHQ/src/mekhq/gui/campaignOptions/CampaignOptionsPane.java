@@ -1024,6 +1024,7 @@ public class CampaignOptionsPane extends JPanel {
             new ChaosReputationCampaignOptionsChangedConfirmationDialog(campaign);
             // Recalculate immediately so the reputation is current, rather than stale until the next monthly update.
             ChaosReputation.calculateForceReputation(campaign);
+            MekHQ.triggerEvent(new OptionsChangedEvent(campaign));
         }
     }
 
