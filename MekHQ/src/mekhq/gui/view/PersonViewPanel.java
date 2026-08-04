@@ -35,6 +35,7 @@ package mekhq.gui.view;
 import static java.awt.Color.BLACK;
 import static java.awt.Color.RED;
 import static java.lang.Math.ceil;
+import static java.lang.Math.max;
 import static java.lang.Math.round;
 import static megamek.client.ui.WrapLayout.wordWrap;
 import static megamek.common.options.PilotOptions.LVL3_ADVANTAGES;
@@ -46,6 +47,8 @@ import static mekhq.campaign.personnel.PersonnelOptions.CERTIFIED_NOBODY;
 import static mekhq.campaign.personnel.PersonnelOptions.DONT_YOU_KNOW_WHO_I_AM;
 import static mekhq.campaign.personnel.PersonnelOptions.FORGETS_TO_SEND_MESSAGES;
 import static mekhq.campaign.personnel.PersonnelOptions.FRIENDS_IN_HIGH_PLACES;
+import static mekhq.campaign.personnel.PersonnelOptions.RAP_SHEET;
+import static mekhq.campaign.personnel.PersonnelOptions.SPOTLESS_RECORD;
 import static mekhq.campaign.personnel.enums.PersonnelStatus.ACTIVE;
 import static mekhq.campaign.personnel.skills.Skill.getIndividualAttributeModifier;
 import static mekhq.campaign.personnel.skills.Skill.getTotalAttributeModifier;
@@ -1727,6 +1730,12 @@ public class PersonViewPanel extends JScrollablePanel {
                 adjustedConnections = (int) round(adjustedConnections * 1.25);
             } else if (options.booleanOption(FORGETS_TO_SEND_MESSAGES)) {
                 adjustedConnections = (int) round(adjustedConnections * 0.75);
+            }
+
+            if (options.booleanOption(SPOTLESS_RECORD)) {
+                criminalRecord = max(0, criminalRecord - 1);
+            } else if (options.booleanOption(RAP_SHEET)) {
+                criminalRecord++;
             }
 
             int adjustedReputation = baseReputation + criminalRecord + adjustedFame + adjustedConnections;

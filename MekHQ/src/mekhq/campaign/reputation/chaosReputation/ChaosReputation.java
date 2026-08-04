@@ -41,6 +41,7 @@ import static java.lang.Math.round;
 import static megamek.common.compute.Compute.d6;
 import static mekhq.campaign.personnel.skills.SkillType.EXP_LEGENDARY;
 import static mekhq.campaign.personnel.skills.SkillType.EXP_NONE;
+import static mekhq.campaign.personnel.skills.SkillType.EXP_ULTRA_GREEN;
 import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
 import static mekhq.utilities.MHQInternationalization.getTextAt;
 import static mekhq.utilities.ReportingUtilities.CLOSING_SPAN_TAG;
@@ -54,6 +55,7 @@ import java.util.Collection;
 import java.util.Comparator;
 import java.util.List;
 
+import jakarta.annotation.Nullable;
 import megamek.common.enums.SkillLevel;
 import megamek.logging.MMLogger;
 import mekhq.campaign.Campaign;
@@ -123,20 +125,24 @@ public class ChaosReputation {
         boolean debtPenaltiesStack = campaignOptions.get(CampaignOption.CHAOS_DEBT_PENALTIES_STACK);
         int manualModifier = campaignOptions.get(CampaignOption.MANUAL_UNIT_RATING_MODIFIER);
         int cap = campaignOptions.get(CampaignOption.CHAOS_REPUTATION_CAP);
+        Person commander = playerForce.getHumanResources().getCommander(campaignOptions, playerForce.isClanForce(),
+              today);
 
         if (campaignOptions.get(CampaignOption.CAMPAIGN_LEVEL_CHAOS_REPUTATION)) {
             ChaosReputation.calculateCampaignLevelReputation(playerForce,
                   today,
                   debtPenaltiesStack,
                   manualModifier,
-                  cap);
+                  cap,
+                  commander);
         } else {
             ChaosReputation.calculatePersonnelLevelReputation(playerForce,
                   today,
                   debtPenaltiesStack,
                   manualModifier,
                   cap,
-                  campaignOptions.get(CampaignOption.USE_AGE_EFFECTS));
+                  campaignOptions.get(CampaignOption.USE_AGE_EFFECTS),
+                  commander);
         }
     }
 
@@ -150,9 +156,10 @@ public class ChaosReputation {
      * @param manualModifier     the manual reputation modifier to add
      * @param cap                the reputation cap ({@code 0} for none)
      * @param useAgeEffects      whether age effects apply to adjusted reputation
+     * @param commander          the campaign commander, whose SPAs may modify the debt penalty (may be {@code null})
      */
     private static void calculatePersonnelLevelReputation(PlayerForce playerForce, LocalDate currentDate,
-          boolean debtPenaltiesStack, int manualModifier, int cap, boolean useAgeEffects) {
+          boolean debtPenaltiesStack, int manualModifier, int cap, boolean useAgeEffects, Person commander) {
         Collection<Person> personnel = playerForce.allPersonnel();
         boolean isClanForce = playerForce.isClanForce();
         List<Loan> loans = playerForce.getFinances().getLoans();
@@ -164,7 +171,8 @@ public class ChaosReputation {
               loans,
               debtPenaltiesStack,
               manualModifier,
-              cap);
+              cap,
+              commander);
 
         playerForce.setChaosCampaignReputation(total);
     }
@@ -180,19 +188,19 @@ public class ChaosReputation {
      * @param stackPenalties  whether each loan contributes its own debt penalty
      * @param manualModifier  the manual reputation modifier to add
      * @param cap             the reputation cap ({@code 0} for none)
+     * @param commander       the campaign commander, whose SPAs may modify the debt penalty (may be {@code null})
      *
      * @return the capped total reputation
      */
     private static int processReputation(Collection<Person> personnel, LocalDate currentDate, boolean isUseAgeEffects,
-          boolean isClanForce, List<Loan> loans, boolean stackPenalties, int manualModifier, int cap) {
+          boolean isClanForce, List<Loan> loans, boolean stackPenalties, int manualModifier, int cap,
+          Person commander) {
         int modeReputation = calculateAverageReputation(personnel,
               isUseAgeEffects,
               isClanForce,
               currentDate);
 
-        int debtModifier = getDebtModifier(loans,
-              currentDate,
-              stackPenalties);
+        int debtModifier = applyCommanderDebtModifier(getDebtModifier(loans, currentDate, stackPenalties), commander);
 
         return applyReputationCap(cap, modeReputation + debtModifier + manualModifier);
     }
@@ -206,17 +214,44 @@ public class ChaosReputation {
      * @param debtPenaltiesStack whether each loan contributes its own debt penalty
      * @param manualModifier     the manual reputation modifier to add
      * @param cap                the reputation cap ({@code 0} for none)
+     * @param commander          the campaign commander, whose SPAs may modify the debt penalty (may be {@code null})
      */
     private static void calculateCampaignLevelReputation(PlayerForce playerForce, LocalDate currentDate,
-          boolean debtPenaltiesStack, int manualModifier, int cap) {
+          boolean debtPenaltiesStack, int manualModifier, int cap, Person commander) {
         int base = playerForce.getChaosCampaignReputation();
-        int debtModifier = getDebtModifier(playerForce.getFinances().getLoans(),
+        int debtModifier = applyCommanderDebtModifier(getDebtModifier(playerForce.getFinances().getLoans(),
               currentDate,
-              debtPenaltiesStack);
+              debtPenaltiesStack), commander);
 
         int total = applyReputationCap(cap, base + debtModifier + manualModifier);
 
         playerForce.setChaosCampaignReputation(total);
+    }
+
+    /**
+     * Applies the campaign commander's debt-related SPAs to a debt penalty.
+     *
+     * <p>"Silver Tongue" halves the (negative) debt penalty, while "Loan Shark Victim" doubles it. Only the campaign
+     * commander's SPAs matter; other personnel have no effect.</p>
+     *
+     * @param debtModifier the base debt penalty (non-positive)
+     * @param commander    the campaign commander, or {@code null} if there is none
+     *
+     * @return the adjusted debt penalty
+     */
+    public static int applyCommanderDebtModifier(int debtModifier, Person commander) {
+        if (commander == null) {
+            return debtModifier;
+        }
+
+        PersonnelOptions options = commander.getOptions();
+        if (options.booleanOption(PersonnelOptions.SILVER_TONGUE)) {
+            return (int) round(debtModifier * 0.5);
+        }
+        if (options.booleanOption(PersonnelOptions.LOAN_SHARK_VICTIM)) {
+            return (int) round(debtModifier * 2.0);
+        }
+        return debtModifier;
     }
 
     /**
@@ -365,9 +400,11 @@ public class ChaosReputation {
         PlayerForce playerForce = campaign.getPlayerForce();
         int base = playerForce.getChaosCampaignReputation();
         CampaignOptions campaignOptions = campaign.getCampaignOptions();
-        int debtModifier = getDebtModifier(playerForce.getFinances().getLoans(),
+        Person commander = playerForce.getHumanResources().getCommander(campaignOptions, playerForce.isClanForce(),
+              campaign.getLocalDate());
+        int debtModifier = applyCommanderDebtModifier(getDebtModifier(playerForce.getFinances().getLoans(),
               campaign.getLocalDate(),
-              campaignOptions.get(CampaignOption.CHAOS_DEBT_PENALTIES_STACK));
+              campaignOptions.get(CampaignOption.CHAOS_DEBT_PENALTIES_STACK)), commander);
         int manualModifier = campaignOptions.get(CampaignOption.MANUAL_UNIT_RATING_MODIFIER);
         int cap = campaignOptions.get(CampaignOption.CHAOS_REPUTATION_CAP);
         int total = applyReputationCap(cap, base + debtModifier + manualModifier);
@@ -586,11 +623,24 @@ public class ChaosReputation {
      */
     public static void resolveActOfPiracy(Campaign campaign, List<Person> personnel, int scale,
           List<Scenario> scenarios, boolean actWasSuccessful, String contractName) {
+        PlayerForce playerForce = campaign.getPlayerForce();
+        Person commander = playerForce.getHumanResources().getCommander(campaign.getCampaignOptions(),
+              playerForce.isClanForce(),
+              campaign.getLocalDate());
+
         int roll = d6(2);
         int targetNumber = actWasSuccessful ? PIRACY_AVOIDANCE_TN_SUCCESS : PIRACY_AVOIDANCE_TN_FAILURE;
+        // A "Slippery" commander makes the force harder to catch; a "Conspicuous" one makes it easier.
+        if (commander != null) {
+            if (commander.getOptions().booleanOption(PersonnelOptions.SLIPPERY)) {
+                targetNumber -= 1;
+            } else if (commander.getOptions().booleanOption(PersonnelOptions.CONSPICUOUS)) {
+                targetNumber += 1;
+            }
+        }
         boolean gotCaught = roll < targetNumber;
 
-        int supportPointsLoot = determinePiracySP(scale, scenarios);
+        int supportPointsLoot = determinePiracySP(scale, scenarios, commander);
         Money booty = ChaosCampaignUtilities.getMoneyFromChaosSupportPoints(supportPointsLoot);
         creditFinancesForBooty(campaign, contractName, booty);
 
@@ -666,14 +716,20 @@ public class ChaosReputation {
      * Determines the total support-point value of piracy loot: a random contract-loot roll plus component loot earned
      * from victorious scenarios, each scaled by {@code scale}.
      *
-     * @param scale     the loot scale factor
-     * @param scenarios the contract's scenarios
+     * @param scale             the loot scale factor
+     * @param scenarios         the contract's scenarios
+     * @param campaignCommander the campaign commander
      *
      * @return the total looted support points
      */
-    private static int determinePiracySP(int scale, List<Scenario> scenarios) {
+    private static int determinePiracySP(int scale, List<Scenario> scenarios, @Nullable Person campaignCommander) {
         int roll = d6(1);
+        if (campaignCommander != null && campaignCommander.getOptions().booleanOption(PersonnelOptions.LOOT_GOBLIN)) {
+            roll = min(6, roll + 1);
+        }
+
         int contractLootSP = determineContractLoot(roll, scale);
+
         int componentLootSP = determineComponentLoot(scenarios, scale);
 
         return contractLootSP + componentLootSP;
@@ -737,11 +793,11 @@ public class ChaosReputation {
      *
      * <p>Each employed character receives {@code baseDelta} (the negative penalty when the detachment was caught, or
      * {@code 0} for a clean getaway), adjusted by their SPAs: "Leaves Paper Trail" always records one extra point of
-     * criminal record (even on a clean getaway), while "Leaves No Trail" reduces the criminal record gained by one,
-     * but never turns a penalty into a bonus.</p>
+     * criminal record (even on a clean getaway), while "Leaves No Trail" reduces the criminal record gained by one, but
+     * never turns a penalty into a bonus.</p>
      *
      * @param personnel the personnel involved in the act of piracy
-     * @param baseDelta  the base criminal-record change (negative when caught, {@code 0} otherwise)
+     * @param baseDelta the base criminal-record change (negative when caught, {@code 0} otherwise)
      */
     private static void updatePersonnelForActOfPiracy(List<Person> personnel, int baseDelta) {
         for (Person person : personnel) {
@@ -776,11 +832,22 @@ public class ChaosReputation {
     public static int getExperienceLevel(Campaign campaign, Person person, boolean isPrimary) {
         PersonnelRole role = isPrimary ? person.getPrimaryRole() : person.getSecondaryRole();
 
-        if (!role.isCivilian()) {
-            return person.getExperienceLevel(campaign, !isPrimary, true);
+        if (role.isCivilian()) {
+            return EXP_NONE;
         }
 
-        return EXP_NONE;
+        int experienceLevel = person.getExperienceLevel(campaign, !isPrimary, true);
+
+        // "Above Their Weight" / "Looks Good on Paper" shift how experienced this character is counted as, clamped so
+        // they are never dropped from the tally (EXP_NONE).
+        PersonnelOptions options = person.getOptions();
+        if (options.booleanOption(PersonnelOptions.ABOVE_THEIR_WEIGHT)) {
+            experienceLevel = min(experienceLevel + 1, EXP_LEGENDARY);
+        } else if (options.booleanOption(PersonnelOptions.LOOKS_GOOD_ON_PAPER)) {
+            experienceLevel = max(experienceLevel - 1, EXP_ULTRA_GREEN);
+        }
+
+        return experienceLevel;
     }
 
     /**

@@ -7276,8 +7276,16 @@ public class Person implements ILocatable {
             connectionsContribution = (int) round(connectionsContribution * 0.75);
         }
 
+        int criminalRecordContribution = chaosCampaignCriminalRecord;
+
+        if (options.booleanOption(SPOTLESS_RECORD)) {
+            criminalRecordContribution = max(0, criminalRecordContribution - 1);
+        } else if (options.booleanOption(RAP_SHEET)) {
+            criminalRecordContribution++;
+        }
+
         return chaosCampaignReputation +
-                     chaosCampaignCriminalRecord +
+                     criminalRecordContribution +
                      fameContribution +
                      connectionsContribution;
     }

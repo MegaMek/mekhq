@@ -281,9 +281,15 @@ public class ChaosReputationReportDialog extends AbstractReportDialog {
 
         CampaignOptions campaignOptions = campaign.getCampaignOptions();
         int averageReputation = personCount == 0 ? 0 : (int) round(totalReputation / personCount);
-        int debtModifier = ChaosReputation.getDebtModifier(campaign.getPlayerForce().getFinances().getLoans(),
-              currentDate,
-              campaignOptions.get(CampaignOption.CHAOS_DEBT_PENALTIES_STACK));
+        PlayerForce playerForce = campaign.getPlayerForce();
+        Person commander = playerForce.getHumanResources().getCommander(campaignOptions,
+              playerForce.isClanForce(),
+              currentDate);
+        int debtModifier = ChaosReputation.applyCommanderDebtModifier(
+              ChaosReputation.getDebtModifier(playerForce.getFinances().getLoans(),
+                    currentDate,
+                    campaignOptions.get(CampaignOption.CHAOS_DEBT_PENALTIES_STACK)),
+              commander);
         int manualModifier = campaignOptions.get(CampaignOption.MANUAL_UNIT_RATING_MODIFIER);
         int cap = campaignOptions.get(CampaignOption.CHAOS_REPUTATION_CAP);
         int total = ChaosReputation.applyReputationCap(cap, averageReputation + debtModifier + manualModifier);
