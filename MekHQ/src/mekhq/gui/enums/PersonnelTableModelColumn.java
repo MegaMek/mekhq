@@ -53,6 +53,7 @@ import megamek.common.units.UnitType;
 import megamek.common.util.sorter.NaturalOrderComparator;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
+import mekhq.campaign.campaignOptions.CampaignOption;
 import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.finances.Money;
 import mekhq.campaign.force.Formation;
@@ -293,9 +294,13 @@ public enum PersonnelTableModelColumn implements MHQTableColumn {
           Person::getWealth, Object::toString),
     EXTRA_INCOME("Column.EXTRA_INCOME.title", Comparators.INT_COMPARATOR,
           Person::getExtraIncomeTraitLevel, Object::toString),
-    FAME("Column.FAME.title", Comparators.INT_COMPARATOR,
-          (person, campaign) -> person.getAdjustedFame(campaign.getCampaignOptions().isUseAgeEffects(),
-                campaign.isClanCampaign(), campaign.getLocalDate()), Object::toString),
+    FAME("Column.FAME.title",
+          Comparators.INT_COMPARATOR,
+          (person, campaign) -> person.getAdjustedFame(campaign.getCampaignOptions()
+                                                             .get(CampaignOption.USE_AGE_EFFECTS),
+                campaign.getPlayerForce().isClanForce(),
+                campaign.getLocalDate()),
+          Object::toString),
     UNLUCKY("Column.UNLUCKY.title", Comparators.INT_COMPARATOR,
           Person::getUnlucky, Object::toString),
     BLOODMARK("Column.BLOODMARK.title", Comparators.INT_COMPARATOR,

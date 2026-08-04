@@ -80,6 +80,7 @@ import mekhq.CampaignPreset;
 import mekhq.MekHQ;
 import mekhq.campaign.AbstractLocation;
 import mekhq.campaign.Campaign;
+import mekhq.campaign.campaignOptions.CampaignOption;
 import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.campaignOptions.CampaignOptionsFreebieTracker;
 import mekhq.campaign.events.OptionsChangedEvent;
@@ -942,14 +943,12 @@ public class CampaignOptionsPane extends JPanel {
         boolean newIsTrackFactionStandings = newOptions.trackFactionStanding();
         if (!isStartUp && newIsTrackFactionStandings && !oldIsTrackFactionStanding) { // Has tracking changed?
             FactionStandingCampaignOptionsChangedConfirmationDialog dialog = new FactionStandingCampaignOptionsChangedConfirmationDialog(
-                  null,
                   campaign.getCampaignFactionIcon(),
-                  campaign.getFaction(),
+                  campaign.getPlayerForce().getFaction(),
                   campaign.getLocalDate(),
                   campaign.getPlayerForce().getFactionStandings(),
                   campaign.getMissions(),
-                  newIsTrackFactionStandings,
-                  campaign.getCampaignOptions().getRegardMultiplier());
+                  campaign.getCampaignOptions().get(CampaignOption.REGARD_MULTIPLIER));
 
             List<String> reports = dialog.getReports();
             for (String report : reports) {

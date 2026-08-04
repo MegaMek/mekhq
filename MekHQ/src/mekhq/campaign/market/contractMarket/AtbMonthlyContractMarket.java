@@ -561,7 +561,7 @@ public class AtbMonthlyContractMarket extends AbstractContractMarket {
             return generateAtBContract(campaign, employer, unitRatingMod, retries - 1);
         }
 
-        final ForceReputationController reputation = campaign.getReputation();
+        final ForceReputationController reputation = campaign.getPlayerForce().getReputation();
         final SkillLevel campaignSkillLevel = reputation == null ?
                                                     REGULAR :
                                                     campaign.getPlayerForce()
