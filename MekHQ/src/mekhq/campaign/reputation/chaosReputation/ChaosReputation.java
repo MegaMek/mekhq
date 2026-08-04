@@ -284,7 +284,8 @@ public class ChaosReputation {
      *
      * @return the base reputation earned from contracts within the window
      */
-    private static int tabulateReputationFromContracts(Campaign campaign, LocalDate windowStart, LocalDate windowEnd) {
+    // Package-private for testing (see ChaosReputationTest); logically private to this class.
+    static int tabulateReputationFromContracts(Campaign campaign, LocalDate windowStart, LocalDate windowEnd) {
         int reputation = STARTING_REPUTATION_SCORE;
 
         boolean noPartialSuccessReputation =

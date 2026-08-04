@@ -33,12 +33,16 @@
 package mekhq.campaign.reputation.chaosReputation;
 
 import static mekhq.campaign.personnel.skills.SkillType.EXP_ELITE;
+import static mekhq.campaign.personnel.skills.SkillType.EXP_LEGENDARY;
 import static mekhq.campaign.personnel.skills.SkillType.EXP_NONE;
 import static mekhq.campaign.personnel.skills.SkillType.EXP_REGULAR;
+import static mekhq.campaign.personnel.skills.SkillType.EXP_ULTRA_GREEN;
 import static mekhq.campaign.personnel.skills.SkillType.skillLevelFromExperienceLevel;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyBoolean;
 import static org.mockito.ArgumentMatchers.anyInt;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
@@ -46,18 +50,22 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
 import mekhq.campaign.Campaign;
+import mekhq.campaign.ForceHumanResources;
 import mekhq.campaign.campaignOptions.CampaignOption;
 import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.enums.DailyReportType;
 import mekhq.campaign.finances.Finances;
 import mekhq.campaign.finances.Loan;
 import mekhq.campaign.force.PlayerForce;
+import mekhq.campaign.mission.Mission;
 import mekhq.campaign.mission.enums.MissionStatus;
 import mekhq.campaign.personnel.Person;
+import mekhq.campaign.personnel.PersonnelOptions;
 import mekhq.campaign.personnel.enums.PersonnelRole;
 import mekhq.campaign.personnel.enums.PersonnelStatus;
 import mekhq.gui.CampaignGUI;
@@ -69,6 +77,24 @@ import org.junit.jupiter.api.Test;
  */
 class ChaosReputationTest {
     private static final LocalDate DATE = LocalDate.of(3151, 1, 1);
+
+    /** A {@link PersonnelOptions} mock whose {@code booleanOption} is {@code false} except for the named SPAs. */
+    private static PersonnelOptions options(String... enabledSpas) {
+        PersonnelOptions options = mock(PersonnelOptions.class);
+        when(options.booleanOption(anyString())).thenReturn(false);
+        for (String spa : enabledSpas) {
+            when(options.booleanOption(spa)).thenReturn(true);
+        }
+        return options;
+    }
+
+    /** A character mock with the given SPAs enabled and everything else off. */
+    private static Person personWith(String... enabledSpas) {
+        PersonnelOptions options = options(enabledSpas);
+        Person person = mock(Person.class);
+        when(person.getOptions()).thenReturn(options);
+        return person;
+    }
 
     // region applyReputationCap
     @Test
@@ -136,19 +162,52 @@ class ChaosReputationTest {
     @Test
     void getExperienceLevel_combatRoleDelegatesToPerson() {
         Campaign campaign = mock(Campaign.class);
-        Person person = mock(Person.class);
+        Person person = personWith();
         when(person.getPrimaryRole()).thenReturn(PersonnelRole.MEKWARRIOR);
         when(person.getExperienceLevel(campaign, false, true)).thenReturn(EXP_REGULAR);
 
         assertEquals(EXP_REGULAR, ChaosReputation.getExperienceLevel(campaign, person, true));
+    }
+
+    /** A combat-role character with a fixed primary experience level and the given SPAs. */
+    private static Person combatRolePerson(int primaryExperienceLevel, String... spas) {
+        Person person = personWith(spas);
+        when(person.getPrimaryRole()).thenReturn(PersonnelRole.MEKWARRIOR);
+        when(person.getExperienceLevel(any(), eq(false), eq(true))).thenReturn(primaryExperienceLevel);
+        return person;
+    }
+
+    @Test
+    void getExperienceLevel_aboveTheirWeightRaisesByOne() {
+        Person person = combatRolePerson(EXP_REGULAR, PersonnelOptions.ABOVE_THEIR_WEIGHT);
+        assertEquals(EXP_REGULAR + 1, ChaosReputation.getExperienceLevel(mock(Campaign.class), person, true));
+    }
+
+    @Test
+    void getExperienceLevel_looksGoodOnPaperLowersByOne() {
+        Person person = combatRolePerson(EXP_REGULAR, PersonnelOptions.LOOKS_GOOD_ON_PAPER);
+        assertEquals(EXP_REGULAR - 1, ChaosReputation.getExperienceLevel(mock(Campaign.class), person, true));
+    }
+
+    @Test
+    void getExperienceLevel_aboveTheirWeightClampsAtLegendary() {
+        Person person = combatRolePerson(EXP_LEGENDARY, PersonnelOptions.ABOVE_THEIR_WEIGHT);
+        assertEquals(EXP_LEGENDARY, ChaosReputation.getExperienceLevel(mock(Campaign.class), person, true));
+    }
+
+    @Test
+    void getExperienceLevel_looksGoodOnPaperNeverDropsToNone() {
+        // Ultra-green minus one must clamp to ultra-green, not EXP_NONE (which would drop the role from the tally).
+        Person person = combatRolePerson(EXP_ULTRA_GREEN, PersonnelOptions.LOOKS_GOOD_ON_PAPER);
+        assertEquals(EXP_ULTRA_GREEN, ChaosReputation.getExperienceLevel(mock(Campaign.class), person, true));
     }
     // endregion getExperienceLevel
 
     // region getAverageSkillLevel
 
     /** Builds an active character whose primary combat role has the given experience level and no secondary role. */
-    private static Person combatPerson(boolean employed, int primaryExperienceLevel) {
-        Person person = mock(Person.class);
+    private static Person combatPerson(boolean employed, int primaryExperienceLevel, String... spas) {
+        Person person = personWith(spas);
         when(person.getStatus()).thenReturn(PersonnelStatus.ACTIVE);
         when(person.isEmployed()).thenReturn(employed);
         when(person.getPrimaryRole()).thenReturn(PersonnelRole.MEKWARRIOR);
@@ -186,13 +245,81 @@ class ChaosReputationTest {
         assertEquals(skillLevelFromExperienceLevel(EXP_NONE),
               ChaosReputation.getAverageSkillLevel(campaign, Collections.emptyList()));
     }
+
+    @Test
+    void getAverageSkillLevel_bigPersonalityCountsTwice() {
+        Campaign campaign = mock(Campaign.class);
+        // REGULAR(2) x1 + ELITE(4) x2 -> total 2 + 8 = 10, count 1 + 2 = 3, mean round(10/3) = 3.
+        List<Person> personnel = List.of(combatPerson(true, EXP_REGULAR),
+              combatPerson(true, EXP_ELITE, PersonnelOptions.BIG_PERSONALITY));
+
+        assertEquals(skillLevelFromExperienceLevel(3), ChaosReputation.getAverageSkillLevel(campaign, personnel));
+    }
+
+    @Test
+    void getAverageSkillLevel_unrecordedPresenceIsExcluded() {
+        Campaign campaign = mock(Campaign.class);
+        // The ELITE character is ignored, leaving only the REGULAR average.
+        List<Person> personnel = List.of(combatPerson(true, EXP_REGULAR),
+              combatPerson(true, EXP_ELITE, PersonnelOptions.UNRECORDED_PRESENCE));
+
+        assertEquals(skillLevelFromExperienceLevel(EXP_REGULAR),
+              ChaosReputation.getAverageSkillLevel(campaign, personnel));
+    }
     // endregion getAverageSkillLevel
+
+    // region getPersonnelReputationWeight
+    @Test
+    void getPersonnelReputationWeight_defaultIsOne() {
+        assertEquals(1, ChaosReputation.getPersonnelReputationWeight(personWith()));
+    }
+
+    @Test
+    void getPersonnelReputationWeight_bigPersonalityCountsTwice() {
+        assertEquals(2, ChaosReputation.getPersonnelReputationWeight(personWith(PersonnelOptions.BIG_PERSONALITY)));
+    }
+
+    @Test
+    void getPersonnelReputationWeight_unrecordedPresenceCountsZero() {
+        assertEquals(0, ChaosReputation.getPersonnelReputationWeight(personWith(PersonnelOptions.UNRECORDED_PRESENCE)));
+    }
+
+    @Test
+    void getPersonnelReputationWeight_unrecordedPresenceTakesPrecedence() {
+        Person person = personWith(PersonnelOptions.BIG_PERSONALITY, PersonnelOptions.UNRECORDED_PRESENCE);
+        assertEquals(0, ChaosReputation.getPersonnelReputationWeight(person));
+    }
+    // endregion getPersonnelReputationWeight
+
+    // region applyCommanderDebtModifier
+    @Test
+    void applyCommanderDebtModifier_nullCommanderIsUnchanged() {
+        assertEquals(-3, ChaosReputation.applyCommanderDebtModifier(-3, null));
+    }
+
+    @Test
+    void applyCommanderDebtModifier_commanderWithoutRelevantSpaIsUnchanged() {
+        assertEquals(-3, ChaosReputation.applyCommanderDebtModifier(-3, personWith()));
+    }
+
+    @Test
+    void applyCommanderDebtModifier_silverTongueHalvesThePenalty() {
+        assertEquals(-2, ChaosReputation.applyCommanderDebtModifier(-4, personWith(PersonnelOptions.SILVER_TONGUE)));
+    }
+
+    @Test
+    void applyCommanderDebtModifier_loanSharkVictimDoublesThePenalty() {
+        assertEquals(-8,
+              ChaosReputation.applyCommanderDebtModifier(-4, personWith(PersonnelOptions.LOAN_SHARK_VICTIM)));
+    }
+    // endregion applyCommanderDebtModifier
 
     // region processContractCompletion
     private static Campaign campaignLevelCampaign(int storedReputation, PlayerForce playerForce) {
         Campaign campaign = mock(Campaign.class);
         CampaignOptions options = mock(CampaignOptions.class);
         Finances finances = mock(Finances.class);
+        ForceHumanResources humanResources = mock(ForceHumanResources.class);
 
         when(campaign.getCampaignOptions()).thenReturn(options);
         when(campaign.getPlayerForce()).thenReturn(playerForce);
@@ -202,6 +329,8 @@ class ChaosReputationTest {
         when(playerForce.getChaosCampaignReputation()).thenReturn(storedReputation);
         when(playerForce.getFinances()).thenReturn(finances);
         when(finances.getLoans()).thenReturn(Collections.emptyList());
+        when(playerForce.getHumanResources()).thenReturn(humanResources);
+        when(humanResources.getCommander(any(), anyBoolean(), any())).thenReturn(null);
 
         when(options.get(CampaignOption.USE_CHAOS_REPUTATION)).thenReturn(true);
         when(options.get(CampaignOption.CAMPAIGN_LEVEL_CHAOS_REPUTATION)).thenReturn(true);
@@ -259,5 +388,164 @@ class ChaosReputationTest {
         verify(playerForce, never()).changeChaosCampaignReputation(anyInt());
         verify(campaign, never()).addReport(any(DailyReportType.class), any());
     }
+
+    /** An active, employed character with no SPAs, usable both in the passed personnel and in the recalculation. */
+    private static Person contractPerson() {
+        Person person = personWith();
+        when(person.getStatus()).thenReturn(PersonnelStatus.ACTIVE);
+        when(person.isEmployed()).thenReturn(true);
+        when(person.getAdjustedReputation(anyBoolean(), anyBoolean(), any())).thenReturn(3);
+        return person;
+    }
+
+    private static Campaign personnelLevelCampaign(List<Person> personnel, boolean noPartialReputation) {
+        Campaign campaign = mock(Campaign.class);
+        CampaignOptions options = mock(CampaignOptions.class);
+        PlayerForce playerForce = mock(PlayerForce.class);
+        ForceHumanResources humanResources = mock(ForceHumanResources.class);
+        Finances finances = mock(Finances.class);
+
+        when(campaign.getCampaignOptions()).thenReturn(options);
+        when(campaign.getPlayerForce()).thenReturn(playerForce);
+        when(campaign.getLocalDate()).thenReturn(DATE);
+        when(campaign.getGUI()).thenReturn(mock(CampaignGUI.class));
+
+        when(playerForce.getHumanResources()).thenReturn(humanResources);
+        when(humanResources.getCommander(any(), anyBoolean(), any())).thenReturn(null);
+        when(playerForce.allPersonnel()).thenReturn(new ArrayList<>(personnel));
+        when(playerForce.isClanForce()).thenReturn(false);
+        when(playerForce.getFinances()).thenReturn(finances);
+        when(finances.getLoans()).thenReturn(Collections.emptyList());
+
+        when(options.get(CampaignOption.USE_CHAOS_REPUTATION)).thenReturn(true);
+        when(options.get(CampaignOption.CAMPAIGN_LEVEL_CHAOS_REPUTATION)).thenReturn(false);
+        when(options.get(CampaignOption.CHAOS_NO_PARTIAL_SUCCESS_REPUTATION)).thenReturn(noPartialReputation);
+        when(options.get(CampaignOption.CHAOS_DEBT_PENALTIES_STACK)).thenReturn(false);
+        when(options.get(CampaignOption.MANUAL_UNIT_RATING_MODIFIER)).thenReturn(0);
+        when(options.get(CampaignOption.CHAOS_REPUTATION_CAP)).thenReturn(0);
+        when(options.get(CampaignOption.USE_AGE_EFFECTS)).thenReturn(false);
+
+        return campaign;
+    }
+
+    @Test
+    void processContractCompletion_personnelLevelSuccessRewardsEachCharacter() {
+        Person first = contractPerson();
+        Person second = contractPerson();
+        List<Person> personnel = List.of(first, second);
+        Campaign campaign = personnelLevelCampaign(personnel, false);
+
+        ChaosReputation.processContractCompletion(campaign, MissionStatus.SUCCESS, personnel);
+
+        verify(first).changeReputation(1);
+        verify(second).changeReputation(1);
+    }
+
+    @Test
+    void processContractCompletion_partialSuccessRewardsWhenNotSuppressed() {
+        PlayerForce playerForce = mock(PlayerForce.class);
+        Campaign campaign = campaignLevelCampaign(5, playerForce); // CHAOS_NO_PARTIAL_SUCCESS_REPUTATION = false
+
+        ChaosReputation.processContractCompletion(campaign, MissionStatus.PARTIAL, Collections.emptyList());
+
+        verify(playerForce).changeChaosCampaignReputation(1);
+    }
+
+    @Test
+    void processContractCompletion_partialSuccessIgnoredWhenSuppressed() {
+        PlayerForce playerForce = mock(PlayerForce.class);
+        Campaign campaign = campaignLevelCampaign(5, playerForce);
+        when(campaign.getCampaignOptions().get(CampaignOption.CHAOS_NO_PARTIAL_SUCCESS_REPUTATION)).thenReturn(true);
+
+        ChaosReputation.processContractCompletion(campaign, MissionStatus.PARTIAL, Collections.emptyList());
+
+        verify(playerForce, never()).changeChaosCampaignReputation(anyInt());
+    }
     // endregion processContractCompletion
+
+    // region tabulateReputationFromContracts
+    private static Mission mission(MissionStatus status, LocalDate endingDate) {
+        Mission mission = mock(Mission.class);
+        when(mission.getStatus()).thenReturn(status);
+        when(mission.getEndingDate()).thenReturn(endingDate);
+        return mission;
+    }
+
+    private static Campaign tabulationCampaign(boolean noPartialReputation, List<Mission> missions) {
+        Campaign campaign = mock(Campaign.class);
+        CampaignOptions options = mock(CampaignOptions.class);
+        when(campaign.getCampaignOptions()).thenReturn(options);
+        when(options.get(CampaignOption.CHAOS_NO_PARTIAL_SUCCESS_REPUTATION)).thenReturn(noPartialReputation);
+        when(campaign.getCompletedMissions()).thenReturn(missions);
+        return campaign;
+    }
+
+    @Test
+    void tabulate_noMissionsReturnsStartingScore() {
+        Campaign campaign = tabulationCampaign(false, List.of());
+        assertEquals(ChaosReputation.STARTING_REPUTATION_SCORE,
+              ChaosReputation.tabulateReputationFromContracts(campaign, null, null));
+    }
+
+    @Test
+    void tabulate_successAddsOne() {
+        Campaign campaign = tabulationCampaign(false, List.of(mission(MissionStatus.SUCCESS, DATE)));
+        assertEquals(2, ChaosReputation.tabulateReputationFromContracts(campaign, null, null));
+    }
+
+    @Test
+    void tabulate_partialSuccessAddsOneUnlessSuppressed() {
+        Campaign rewarding = tabulationCampaign(false, List.of(mission(MissionStatus.PARTIAL, DATE)));
+        assertEquals(2, ChaosReputation.tabulateReputationFromContracts(rewarding, null, null));
+
+        Campaign suppressed = tabulationCampaign(true, List.of(mission(MissionStatus.PARTIAL, DATE)));
+        assertEquals(1, ChaosReputation.tabulateReputationFromContracts(suppressed, null, null));
+    }
+
+    @Test
+    void tabulate_failedContractDoesNotChangeReputation() {
+        Campaign campaign = tabulationCampaign(false, List.of(mission(MissionStatus.FAILED, DATE)));
+        assertEquals(1, ChaosReputation.tabulateReputationFromContracts(campaign, null, null));
+    }
+
+    @Test
+    void tabulate_breachHalvesWithMinimumLossOfThree() {
+        // From the starting score of 1: loss = max(round(1 * 0.5), 3) = 3 -> 1 - 3 = -2.
+        Campaign campaign = tabulationCampaign(false, List.of(mission(MissionStatus.BREACH, DATE)));
+        assertEquals(-2, ChaosReputation.tabulateReputationFromContracts(campaign, null, null));
+    }
+
+    @Test
+    void tabulate_ignoresContractsEndingBeforeTheWindow() {
+        Mission early = mission(MissionStatus.SUCCESS, LocalDate.of(3150, 1, 1));
+        Mission late = mission(MissionStatus.SUCCESS, LocalDate.of(3151, 6, 1));
+        Campaign campaign = tabulationCampaign(false, List.of(early, late));
+
+        // Window starts after the early contract, so only the late success counts: 1 + 1 = 2.
+        assertEquals(2, ChaosReputation.tabulateReputationFromContracts(campaign, LocalDate.of(3151, 1, 1), null));
+    }
+
+    @Test
+    void tabulate_countsContractsWithNoEndingDateRegardlessOfWindow() {
+        Campaign campaign = tabulationCampaign(false, List.of(mission(MissionStatus.SUCCESS, null)));
+
+        assertEquals(2, ChaosReputation.tabulateReputationFromContracts(campaign,
+              LocalDate.of(9999, 1, 1),
+              LocalDate.of(9999, 12, 31)));
+    }
+
+    @Test
+    void tabulate_processesContractsChronologicallyByEndingDate() {
+        // Supplied breach-first, but the breach ends last. Chronologically: eight successes (1 -> 9), then the breach
+        // loses max(round(9 * 0.5), 3) = 5 -> 4. In list order it would instead be 6, so the result proves the sort.
+        List<Mission> missions = new ArrayList<>();
+        missions.add(mission(MissionStatus.BREACH, LocalDate.of(3151, 12, 1)));
+        for (int month = 1; month <= 8; month++) {
+            missions.add(mission(MissionStatus.SUCCESS, LocalDate.of(3151, month, 1)));
+        }
+        Campaign campaign = tabulationCampaign(false, missions);
+
+        assertEquals(4, ChaosReputation.tabulateReputationFromContracts(campaign, null, null));
+    }
+    // endregion tabulateReputationFromContracts
 }
