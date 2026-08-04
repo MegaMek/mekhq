@@ -57,6 +57,7 @@ import java.util.Optional;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.JumpPath;
 import mekhq.campaign.LocalHangar;
+import mekhq.campaign.campaignOptions.CampaignOption;
 import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.enums.DragoonRating;
 import mekhq.campaign.finances.Accountant;
@@ -148,10 +149,10 @@ class AtbMonthlyContractMarketTest {
         private void setupCampaign() {
             CampaignOptions campaignOptions = mock(CampaignOptions.class);
             when(campaignOptions.getContractMaxSalvagePercentage()).thenReturn(100);
+            when(campaignOptions.get(CampaignOption.USE_CHAOS_REPUTATION)).thenReturn(false);
 
             ForceReputationController reputation = mock(ForceReputationController.class);
             when(reputation.getReputationFactor()).thenReturn(1.0);
-            when(reputation.getAverageSkillLevel()).thenReturn(REGULAR);
 
             Accountant accountant = mock(Accountant.class);
             when(accountant.getContractBase()).thenReturn(Money.of(1));
@@ -167,6 +168,7 @@ class AtbMonthlyContractMarketTest {
             when(campaign.getGameYear()).thenReturn(GAME_YEAR);
             when(campaign.getCampaignOptions()).thenReturn(campaignOptions);
             when(campaign.getPlayerForce().getReputation()).thenReturn(reputation);
+            when(campaign.getPlayerForce().getAverageSkillLevel(anyBoolean(), any(), any())).thenReturn(REGULAR);
             when(campaign.getAccountant()).thenReturn(accountant);
             when(campaign.getPlayerForce().getHangar()).thenReturn(hangar);
             when(campaign.getCurrentSystem()).thenReturn(currentSystem);

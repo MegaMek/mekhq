@@ -58,6 +58,8 @@ import megamek.common.enums.SkillLevel;
 import megamek.logging.MMLogger;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
+import mekhq.campaign.campaignOptions.CampaignOptions;
+import mekhq.campaign.force.AbstractForce;
 import mekhq.campaign.personnel.Person;
 import mekhq.utilities.MHQXMLUtility;
 import org.w3c.dom.Node;
@@ -113,6 +115,15 @@ public class ForceReputationController {
     private int reputationRating = 0;
 
     // region Getters and Setters
+
+    /**
+     * Retrieves the average skill level of the force from the calculated data.
+     *
+     * <p><b>Usage Note:</b> generally you want to use
+     * {@link AbstractForce#getAverageSkillLevel(boolean, CampaignOptions, LocalDate)}</p>
+     *
+     * @return the average skill level as a SkillLevel object.
+     */
     public SkillLevel getAverageSkillLevel() {
         return this.averageSkillLevel;
     }

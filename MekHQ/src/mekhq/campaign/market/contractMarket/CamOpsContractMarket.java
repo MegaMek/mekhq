@@ -54,6 +54,7 @@ import megamek.common.universe.FactionTag;
 import megamek.logging.MMLogger;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
+import mekhq.campaign.campaignOptions.CampaignOption;
 import mekhq.campaign.enums.DragoonRating;
 import mekhq.campaign.market.enums.ContractMarketMethod;
 import mekhq.campaign.mission.AtBContract;
@@ -292,7 +293,11 @@ public class CamOpsContractMarket extends AbstractContractMarket {
             return Optional.empty();
         }
         // Step 4: Populate some information about enemies and allies
-        final SkillLevel campaignSkillLevel = reputation.getAverageSkillLevel();
+        final SkillLevel campaignSkillLevel = campaign.getPlayerForce()
+                                                    .getAverageSkillLevel(campaign.getCampaignOptions()
+                                                                                .get(CampaignOption.USE_CHAOS_REPUTATION),
+                                                          campaign.getCampaignOptions(),
+                                                          campaign.getLocalDate());
         final boolean useDynamicDifficulty = campaign.getCampaignOptions().isUseDynamicDifficulty();
         final boolean useBolsterContractSkill = campaign.getCampaignOptions().isUseBolsterContractSkill();
         setAllyRating(contract,

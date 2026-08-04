@@ -173,6 +173,9 @@ public class ChaosReputationReportDialog extends AbstractReportDialog {
         Map<Integer, Integer> experienceCounts = new TreeMap<>(Collections.reverseOrder());
         double roleCount = 0;
         int totalExperienceLevel = 0;
+        final CampaignOptions campaignOptions = campaign.getCampaignOptions();
+        final boolean isClanForce = campaign.getPlayerForce().isClanForce();
+        final LocalDate currentDate = campaign.getLocalDate();
         for (Person person : personnel) {
             PersonnelStatus status = person.getStatus();
             if (status.isDepartedUnit() || !status.isActive() || !person.isEmployed()) {
@@ -184,8 +187,16 @@ public class ChaosReputationReportDialog extends AbstractReportDialog {
                 continue;
             }
 
-            int primaryExperienceLevel = ChaosReputation.getExperienceLevel(campaign, person, true);
-            int secondaryExperienceLevel = ChaosReputation.getExperienceLevel(campaign, person, false);
+            int primaryExperienceLevel = ChaosReputation.getExperienceLevel(campaignOptions,
+                  isClanForce,
+                  currentDate,
+                  person,
+                  true);
+            int secondaryExperienceLevel = ChaosReputation.getExperienceLevel(campaignOptions,
+                  isClanForce,
+                  currentDate,
+                  person,
+                  false);
 
             if (primaryExperienceLevel != EXP_NONE) {
                 roleCount += weight;

@@ -67,6 +67,7 @@ import mekhq.MHQConstants;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.JumpPath;
+import mekhq.campaign.campaignOptions.CampaignOption;
 import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.enums.DragoonRating;
 import mekhq.campaign.market.enums.ContractMarketMethod;
@@ -561,7 +562,13 @@ public class AtbMonthlyContractMarket extends AbstractContractMarket {
         }
 
         final ForceReputationController reputation = campaign.getReputation();
-        final SkillLevel campaignSkillLevel = reputation == null ? REGULAR : reputation.getAverageSkillLevel();
+        final SkillLevel campaignSkillLevel = reputation == null ?
+                                                    REGULAR :
+                                                    campaign.getPlayerForce()
+                                                          .getAverageSkillLevel(campaign.getCampaignOptions()
+                                                                                      .get(CampaignOption.USE_CHAOS_REPUTATION),
+                                                                campaign.getCampaignOptions(),
+                                                                campaign.getLocalDate());
         final boolean useDynamicDifficulty = campaign.getCampaignOptions().isUseDynamicDifficulty();
         final boolean useBolsterContractSkill = campaign.getCampaignOptions().isUseBolsterContractSkill();
         setAllyRating(contract,
@@ -672,14 +679,13 @@ public class AtbMonthlyContractMarket extends AbstractContractMarket {
         setAttacker(contract);
         contract.setSystemId(parent.getSystemId());
         final boolean useBolsterContractSkill = campaign.getCampaignOptions().isUseBolsterContractSkill();
-        setAllyRating(contract,
-              campaign.getGameYear(),
-              campaign.getPlayerForce().getReputation().getAverageSkillLevel(),
-              useBolsterContractSkill);
-        setEnemyRating(contract,
-              campaign.getGameYear(),
-              campaign.getPlayerForce().getReputation().getAverageSkillLevel(),
-              useBolsterContractSkill);
+        final SkillLevel campaignSkillLevel = campaign.getPlayerForce()
+                                                    .getAverageSkillLevel(campaign.getCampaignOptions()
+                                                                                .get(CampaignOption.USE_CHAOS_REPUTATION),
+                                                          campaign.getCampaignOptions(),
+                                                          campaign.getLocalDate());
+        setAllyRating(contract, campaign.getGameYear(), campaignSkillLevel, useBolsterContractSkill);
+        setEnemyRating(contract, campaign.getGameYear(), campaignSkillLevel, useBolsterContractSkill);
 
         if (contract.getContractType().isCadreDuty()) {
             contract.setAllySkill(campaign.getCampaignOptions().isUseBolsterContractSkill() ? REGULAR : GREEN);

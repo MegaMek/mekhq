@@ -55,6 +55,7 @@ import megamek.common.enums.Gender;
 import mekhq.MekHQ;
 import mekhq.campaign.AbstractLocation;
 import mekhq.campaign.Campaign;
+import mekhq.campaign.campaignOptions.CampaignOption;
 import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.finances.Money;
 import mekhq.campaign.market.personnelMarket.records.PersonnelMarketEntry;
@@ -62,7 +63,6 @@ import mekhq.campaign.market.personnelMarket.yaml.PersonnelMarketLibraries;
 import mekhq.campaign.mission.AtBContract;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.enums.PersonnelRole;
-import mekhq.campaign.reputation.camOpsReputation.ForceReputationController;
 import mekhq.campaign.universe.Faction;
 import mekhq.campaign.universe.Factions;
 import mekhq.campaign.universe.PlanetarySystem;
@@ -247,9 +247,12 @@ public class PersonnelMarketMekHQ extends NewPersonnelMarket {
      */
     @Override
     public void generateApplicants() {
-        ForceReputationController reputation = getCampaign().getPlayerForce()
-                                                     .getReputation();
-        int averageSkillLevel = reputation.getAverageSkillLevel().getExperienceLevel();
+        int averageSkillLevel = getCampaign().getPlayerForce()
+                                      .getAverageSkillLevel(getCampaign().getCampaignOptions()
+                                                                  .get(CampaignOption.USE_CHAOS_REPUTATION),
+                                            getCampaign().getCampaignOptions(),
+                                            getCampaign().getLocalDate())
+                                      .getExperienceLevel();
 
         calculateNumberOfRecruitmentRolls();
 

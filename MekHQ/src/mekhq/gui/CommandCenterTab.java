@@ -894,10 +894,10 @@ public final class CommandCenterTab extends CampaignGuiTab {
         }
 
         boolean isUseChaosReputation = getCampaignOptions().get(CampaignOption.USE_CHAOS_REPUTATION);
-        SkillLevel averageSkillLevel = isUseChaosReputation ?
-                                             ChaosReputation.getAverageSkillLevel(getCampaign(),
-                                                   getCampaign().getPlayerForce().allPersonnel()) :
-                                             campaign.getPlayerForce().getReputation().getAverageSkillLevel();
+        SkillLevel averageSkillLevel = campaign.getPlayerForce()
+                                             .getAverageSkillLevel(isUseChaosReputation,
+                                                   getCampaignOptions(),
+                                                   campaign.getLocalDate());
         String experienceString = "<html><b>" +
                                         SkillType.getColoredExperienceLevelName(averageSkillLevel) +
                                         "</b></html>";

@@ -41,6 +41,7 @@ import javax.swing.JLabel;
 import megamek.common.event.Subscribe;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
+import mekhq.campaign.campaignOptions.CampaignOption;
 import mekhq.campaign.events.NewDayEvent;
 import mekhq.campaign.events.OptionsChangedEvent;
 import mekhq.campaign.events.assets.AssetEvent;
@@ -138,8 +139,10 @@ public class CommandSummaryPanel extends ScalingWidthConstrainedPanel {
      */
     private void refreshAll() {
         String experience = SkillType.getColoredExperienceLevelName(campaign.getPlayerForce()
-                                                                          .getReputation()
-                                                                          .getAverageSkillLevel());
+                                                                          .getAverageSkillLevel(campaign.getCampaignOptions()
+                                                                                                      .get(CampaignOption.USE_CHAOS_REPUTATION),
+                                                                                campaign.getCampaignOptions(),
+                                                                                campaign.getLocalDate()));
         lblUnitReputationValue.setText(getFormattedTextAt("reputation.text", campaign.getUnitRatingText(), experience));
         int totalBv = AtBDynamicScenarioFactory.getBVBudgetForStratConSingles(campaign, true);
         lblCombatStrengthValue.setText(getFormattedTextAt("combatStrength.text", totalBv));

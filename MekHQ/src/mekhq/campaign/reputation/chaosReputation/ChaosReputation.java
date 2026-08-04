@@ -186,15 +186,15 @@ public class ChaosReputation {
     /**
      * Combines the personnel average reputation with the debt penalty and manual modifier, then applies the cap.
      *
-     * @param personnel       the personnel to average
-     * @param currentDate     the current date, used for age effects and loan-age calculations
-     * @param isUseAgeEffects whether age effects apply to adjusted reputation
-     * @param isClanForce     whether the force is a Clan force
-     * @param loans           the outstanding loans used to compute the debt penalty
-     * @param stackPenalties  whether each loan contributes its own debt penalty
-     * @param manualModifier  the manual reputation modifier to add
-     * @param cap             the reputation cap ({@code 0} for none)
-     * @param commander       the campaign commander, whose SPAs may modify the debt penalty (may be {@code null})
+     * @param personnel        the personnel to average
+     * @param currentDate      the current date, used for age effects and loan-age calculations
+     * @param isUseAgeEffects  whether age effects apply to adjusted reputation
+     * @param isClanForce      whether the force is a Clan force
+     * @param loans            the outstanding loans used to compute the debt penalty
+     * @param stackPenalties   whether each loan contributes its own debt penalty
+     * @param manualModifier   the manual reputation modifier to add
+     * @param cap              the reputation cap ({@code 0} for none)
+     * @param commander        the campaign commander, whose SPAs may modify the debt penalty (may be {@code null})
      * @param applyPersonality whether each character's personality value is added to their reputation
      *
      * @return the capped total reputation
@@ -833,25 +833,29 @@ public class ChaosReputation {
     }
 
     /**
-     * Returns a character's experience level for their primary or secondary role, or {@link SkillType#EXP_NONE} when
-     * that role is civilian.
+     * Calculates the experience level of a person based on various campaign parameters, role-specific adjustments, and
+     * personnel options.
      *
-     * @param campaign  the campaign, used to resolve experience-affecting options
-     * @param person    the character
-     * @param isPrimary {@code true} for the primary role, {@code false} for the secondary role
+     * @param campaignOptions The campaign options that affect experience calculation.
+     * @param isClanForce     A boolean indicating if the force being evaluated is a Clan force.
+     * @param currentDate     The current date used for calculating experience-related metrics.
+     * @param person          The person whose experience level is to be calculated.
+     * @param isPrimary       A boolean indicating whether the primary or secondary role of the person should be
+     *                        evaluated.
      *
-     * @return the experience level, or {@code EXP_NONE} for a civilian role
+     * @return The calculated experience level of the person, adjusted for specific conditions and constraints.
      */
-    public static int getExperienceLevel(Campaign campaign, Person person, boolean isPrimary) {
+    public static int getExperienceLevel(CampaignOptions campaignOptions, boolean isClanForce, LocalDate currentDate,
+          Person person, boolean isPrimary) {
         PersonnelRole role = isPrimary ? person.getPrimaryRole() : person.getSecondaryRole();
 
         if (role.isCivilian()) {
             return EXP_NONE;
         }
 
-        int experienceLevel = person.getExperienceLevel(campaign.getCampaignOptions(),
-              campaign.getPlayerForce().isClanForce(),
-              campaign.getLocalDate(),
+        int experienceLevel = person.getExperienceLevel(campaignOptions,
+              isClanForce,
+              currentDate,
               !isPrimary,
               true);
 
@@ -890,19 +894,20 @@ public class ChaosReputation {
     }
 
     /**
-     * Computes the force's average experience as a {@link SkillLevel}.
+     * Calculates the average skill level of the given personnel, considering their employment status, activity, and
+     * skill weights. The average is determined based on both primary and secondary experience levels, while accounting
+     * for personnel who are departed or have no valid weight.
      *
-     * <p>Each active, employed character contributes their primary and secondary combat-role experience levels
-     * separately (civilian roles are skipped), so a character with two combat roles is counted twice. The mean of the
-     * contributing levels is clamped to the valid range and converted to a skill level; an empty result yields the
-     * skill level for {@code EXP_NONE}.</p>
+     * @param campaignOptions The campaign options that provide configuration for determining skill levels.
+     * @param isClanForce     A boolean indicating whether the current force is a Clan force.
+     * @param currentDate     The current date used to evaluate skill levels and statuses.
+     * @param personnel       A collection of Person objects representing the unit's members.
      *
-     * @param campaign  the campaign, used to resolve experience-affecting options
-     * @param personnel the personnel to average
-     *
-     * @return the force's average skill level
+     * @return The average {@link SkillLevel} for the personnel, or a default skill level if no valid personnel are
+     *       eligible.
      */
-    public static SkillLevel getAverageSkillLevel(final Campaign campaign, final Collection<Person> personnel) {
+    public static SkillLevel getAverageSkillLevel(CampaignOptions campaignOptions, boolean isClanForce,
+          LocalDate currentDate, final Collection<Person> personnel) {
         double personCount = 0;
         int totalExperienceLevel = 0;
 
@@ -919,13 +924,21 @@ public class ChaosReputation {
                     continue;
                 }
 
-                int primaryExperienceLevel = getExperienceLevel(campaign, person, true);
+                int primaryExperienceLevel = getExperienceLevel(campaignOptions,
+                      isClanForce,
+                      currentDate,
+                      person,
+                      true);
                 if (primaryExperienceLevel != EXP_NONE) {
                     personCount += weight;
                     totalExperienceLevel += primaryExperienceLevel * weight;
                 }
 
-                int secondaryExperienceLevel = getExperienceLevel(campaign, person, false);
+                int secondaryExperienceLevel = getExperienceLevel(campaignOptions,
+                      isClanForce,
+                      currentDate,
+                      person,
+                      false);
                 if (secondaryExperienceLevel != EXP_NONE) {
                     personCount += weight;
                     totalExperienceLevel += secondaryExperienceLevel * weight;

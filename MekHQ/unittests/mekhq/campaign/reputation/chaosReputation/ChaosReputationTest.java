@@ -152,28 +152,21 @@ class ChaosReputationTest {
     // region getExperienceLevel
     @Test
     void getExperienceLevel_civilianRoleReturnsNone() {
-        Campaign campaign = mock(Campaign.class);
         Person person = mock(Person.class);
         when(person.getPrimaryRole()).thenReturn(PersonnelRole.NONE);
 
-        assertEquals(EXP_NONE, ChaosReputation.getExperienceLevel(campaign, person, true));
-    }
-
-    /** A campaign mock whose player force is non-Clan, sufficient for {@link ChaosReputation#getExperienceLevel}. */
-    private static Campaign experienceLevelCampaign() {
-        Campaign campaign = mock(Campaign.class);
-        when(campaign.getPlayerForce()).thenReturn(mock(PlayerForce.class));
-        return campaign;
+        assertEquals(EXP_NONE,
+              ChaosReputation.getExperienceLevel(mock(CampaignOptions.class), false, DATE, person, true));
     }
 
     @Test
     void getExperienceLevel_combatRoleDelegatesToPerson() {
-        Campaign campaign = experienceLevelCampaign();
         Person person = personWith();
         when(person.getPrimaryRole()).thenReturn(PersonnelRole.MEKWARRIOR);
         when(person.getExperienceLevel(any(), anyBoolean(), any(), eq(false), eq(true))).thenReturn(EXP_REGULAR);
 
-        assertEquals(EXP_REGULAR, ChaosReputation.getExperienceLevel(campaign, person, true));
+        assertEquals(EXP_REGULAR,
+              ChaosReputation.getExperienceLevel(mock(CampaignOptions.class), false, DATE, person, true));
     }
 
     /** A combat-role character with a fixed primary experience level and the given SPAs. */
@@ -188,26 +181,30 @@ class ChaosReputationTest {
     @Test
     void getExperienceLevel_aboveTheirWeightRaisesByOne() {
         Person person = combatRolePerson(EXP_REGULAR, PersonnelOptions.ABOVE_THEIR_WEIGHT);
-        assertEquals(EXP_REGULAR + 1, ChaosReputation.getExperienceLevel(experienceLevelCampaign(), person, true));
+        assertEquals(EXP_REGULAR + 1,
+              ChaosReputation.getExperienceLevel(mock(CampaignOptions.class), false, DATE, person, true));
     }
 
     @Test
     void getExperienceLevel_looksGoodOnPaperLowersByOne() {
         Person person = combatRolePerson(EXP_REGULAR, PersonnelOptions.LOOKS_GOOD_ON_PAPER);
-        assertEquals(EXP_REGULAR - 1, ChaosReputation.getExperienceLevel(experienceLevelCampaign(), person, true));
+        assertEquals(EXP_REGULAR - 1,
+              ChaosReputation.getExperienceLevel(mock(CampaignOptions.class), false, DATE, person, true));
     }
 
     @Test
     void getExperienceLevel_aboveTheirWeightClampsAtLegendary() {
         Person person = combatRolePerson(EXP_LEGENDARY, PersonnelOptions.ABOVE_THEIR_WEIGHT);
-        assertEquals(EXP_LEGENDARY, ChaosReputation.getExperienceLevel(experienceLevelCampaign(), person, true));
+        assertEquals(EXP_LEGENDARY,
+              ChaosReputation.getExperienceLevel(mock(CampaignOptions.class), false, DATE, person, true));
     }
 
     @Test
     void getExperienceLevel_looksGoodOnPaperNeverDropsToNone() {
         // Ultra-green minus one must clamp to ultra-green, not EXP_NONE (which would drop the role from the tally).
         Person person = combatRolePerson(EXP_ULTRA_GREEN, PersonnelOptions.LOOKS_GOOD_ON_PAPER);
-        assertEquals(EXP_ULTRA_GREEN, ChaosReputation.getExperienceLevel(experienceLevelCampaign(), person, true));
+        assertEquals(EXP_ULTRA_GREEN,
+              ChaosReputation.getExperienceLevel(mock(CampaignOptions.class), false, DATE, person, true));
     }
     // endregion getExperienceLevel
 
@@ -227,53 +224,49 @@ class ChaosReputationTest {
 
     @Test
     void getAverageSkillLevel_averagesContributingRoles() {
-        Campaign campaign = experienceLevelCampaign();
         // Two REGULAR (2) and two ELITE (4) -> mean 3.
         List<Person> personnel = List.of(combatPerson(true, EXP_REGULAR),
               combatPerson(true, EXP_REGULAR),
               combatPerson(true, EXP_ELITE),
               combatPerson(true, EXP_ELITE));
 
-        assertEquals(skillLevelFromExperienceLevel(3), ChaosReputation.getAverageSkillLevel(campaign, personnel));
+        assertEquals(skillLevelFromExperienceLevel(3),
+              ChaosReputation.getAverageSkillLevel(mock(CampaignOptions.class), false, DATE, personnel));
     }
 
     @Test
     void getAverageSkillLevel_ignoresUnemployedPersonnel() {
-        Campaign campaign = experienceLevelCampaign();
         // The unemployed ELITE character is excluded, leaving only the REGULAR average.
         List<Person> personnel = List.of(combatPerson(true, EXP_REGULAR), combatPerson(false, EXP_ELITE));
 
         assertEquals(skillLevelFromExperienceLevel(EXP_REGULAR),
-              ChaosReputation.getAverageSkillLevel(campaign, personnel));
+              ChaosReputation.getAverageSkillLevel(mock(CampaignOptions.class), false, DATE, personnel));
     }
 
     @Test
     void getAverageSkillLevel_emptyRosterUsesNone() {
-        Campaign campaign = mock(Campaign.class);
-
         assertEquals(skillLevelFromExperienceLevel(EXP_NONE),
-              ChaosReputation.getAverageSkillLevel(campaign, Collections.emptyList()));
+              ChaosReputation.getAverageSkillLevel(mock(CampaignOptions.class), false, DATE, Collections.emptyList()));
     }
 
     @Test
     void getAverageSkillLevel_bigPersonalityCountsTwice() {
-        Campaign campaign = experienceLevelCampaign();
         // REGULAR(2) x1 + ELITE(4) x2 -> total 2 + 8 = 10, count 1 + 2 = 3, mean round(10/3) = 3.
         List<Person> personnel = List.of(combatPerson(true, EXP_REGULAR),
               combatPerson(true, EXP_ELITE, PersonnelOptions.BIG_PERSONALITY));
 
-        assertEquals(skillLevelFromExperienceLevel(3), ChaosReputation.getAverageSkillLevel(campaign, personnel));
+        assertEquals(skillLevelFromExperienceLevel(3),
+              ChaosReputation.getAverageSkillLevel(mock(CampaignOptions.class), false, DATE, personnel));
     }
 
     @Test
     void getAverageSkillLevel_unrecordedPresenceIsExcluded() {
-        Campaign campaign = experienceLevelCampaign();
         // The ELITE character is ignored, leaving only the REGULAR average.
         List<Person> personnel = List.of(combatPerson(true, EXP_REGULAR),
               combatPerson(true, EXP_ELITE, PersonnelOptions.UNRECORDED_PRESENCE));
 
         assertEquals(skillLevelFromExperienceLevel(EXP_REGULAR),
-              ChaosReputation.getAverageSkillLevel(campaign, personnel));
+              ChaosReputation.getAverageSkillLevel(mock(CampaignOptions.class), false, DATE, personnel));
     }
     // endregion getAverageSkillLevel
 

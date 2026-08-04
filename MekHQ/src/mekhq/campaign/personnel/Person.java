@@ -7527,9 +7527,14 @@ public class Person implements ILocatable {
     public int getAdjustedFame(boolean isUseAgingEffects, boolean isClanCampaign, LocalDate today) {
         final int PATHOLOGIC_RACISM_FAME_PENALTY = -2;
 
-        int fameModifier = getFameAgeModifier(getAge(today), isClanCampaign, !isNullOrBlank(bloodname),
-              getRankNumeric());
-        int modifiers = isUseAgingEffects ? fameModifier : 0;
+        // The age-based modifier is only applied when aging effects are enabled, so avoid the age lookup entirely
+        // otherwise (today may be unavailable when aging is disabled).
+        int modifiers = isUseAgingEffects ?
+                              getFameAgeModifier(getAge(today),
+                                    isClanCampaign,
+                                    !isNullOrBlank(bloodname),
+                                    getRankNumeric()) :
+                              0;
 
         boolean hasRacism = options.booleanOption(COMPULSION_RACISM);
         modifiers -= hasRacism ? 1 : 0;

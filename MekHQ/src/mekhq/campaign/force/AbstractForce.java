@@ -56,12 +56,14 @@ import javax.swing.JOptionPane;
 
 import megamek.client.ui.util.PlayerColour;
 import megamek.common.annotations.Nullable;
+import megamek.common.enums.SkillLevel;
 import megamek.common.game.Game;
 import megamek.common.icons.Camouflage;
 import megamek.common.units.Entity;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.ForceHumanResources;
+import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.digitalGM.stratCon.StratConTrackState;
 import mekhq.campaign.events.NetworkChangedEvent;
 import mekhq.campaign.events.OrganizationChangedEvent;
@@ -81,6 +83,7 @@ import mekhq.campaign.personnel.medical.MASHCapacity;
 import mekhq.campaign.personnel.ranks.RankSystem;
 import mekhq.campaign.personnel.ranks.RankValidator;
 import mekhq.campaign.reputation.camOpsReputation.ForceReputationController;
+import mekhq.campaign.reputation.chaosReputation.ChaosReputation;
 import mekhq.campaign.unit.Unit;
 import mekhq.campaign.unit.UnitTechProgression;
 import mekhq.campaign.universe.Faction;
@@ -404,6 +407,26 @@ public abstract class AbstractForce {
 
     public void changeChaosCampaignReputation(int delta) {
         this.chaosCampaignReputation = chaosCampaignReputation + delta;
+    }
+
+    /**
+     * Calculates the average skill level of the personnel based on the specified parameters.
+     *
+     * @param isUseChaosReputation a boolean flag indicating whether to use chaos reputation for skill level
+     *                             calculation
+     * @param campaignOptions      an instance of CampaignOptions containing options for the current campaign
+     * @param currentDate          the current date used in skill level computation
+     *
+     * @return the average skill level as a SkillLevel object
+     */
+    public SkillLevel getAverageSkillLevel(boolean isUseChaosReputation, CampaignOptions campaignOptions,
+          LocalDate currentDate) {
+        return isUseChaosReputation ?
+                     ChaosReputation.getAverageSkillLevel(campaignOptions,
+                           isClanForce(),
+                           currentDate,
+                           getHumanResources().getPersonnelFilteringOutDeparted()) :
+                     reputation.getAverageSkillLevel();
     }
 
     public FactionStandings getFactionStandings() {
