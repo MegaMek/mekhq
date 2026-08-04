@@ -1707,13 +1707,13 @@ public class PersonViewPanel extends JScrollablePanel {
             int adjustedFame = person.getAdjustedFame(isUseAgeEffects,
                   isClanForce,
                   today);
-            int adjustedReputation = person.getAdjustedReputation(isUseAgeEffects,
-                  isClanForce,
-                  today);
+            int adjustedConnections = person.getAdjustedConnections(false);
+            int adjustedReputation = baseReputation + criminalRecord + adjustedFame + adjustedConnections;
             String chaosReputationTooltip = wordWrap(String.format(resourceMap.getString("lblChaosReputation.tooltip"),
                   baseReputation,
                   criminalRecord,
                   adjustedFame,
+                  adjustedConnections,
                   adjustedReputation));
 
             lblChaosReputation1.setName("lblChaosReputation1");
