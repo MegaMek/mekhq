@@ -184,12 +184,14 @@ public class CommandGenerationDialog extends AbstractMHQValidationButtonDialog {
         final JPanel panel = new JPanel(new BorderLayout());
 
         JPanel leftButtons = new JPanel(new FlowLayout(FlowLayout.LEFT, 4, 0));
-        leftButtons.add(new MMButton("btnRestore", resources, "RestoreDefaults.text",
-              "CommandGenerationDialog.btnRestore.toolTipText", this::restoreDefaultsActionListener));
         // The Force Generator's own Generate, its options and Clear Force belong on this bar rather than mid-tab:
         // they are dialog-level actions like the ones either side of them, and the tab needs the vertical room for
         // the formation mix. Adding them here re-parents them out of the tab.
         pane.getForceGeneratorTab().getGenerateControls().forEach(control -> leftButtons.add(control));
+        // Restore Defaults sits after them: it undoes the settings those buttons act on, so it reads as the end of
+        // that group rather than as something to pass over on the way to Generate.
+        leftButtons.add(new MMButton("btnRestore", resources, "RestoreDefaults.text",
+              "CommandGenerationDialog.btnRestore.toolTipText", this::restoreDefaultsActionListener));
         panel.add(leftButtons, BorderLayout.WEST);
 
         JPanel rightButtons = new JPanel(new FlowLayout(FlowLayout.RIGHT, 4, 0));

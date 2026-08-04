@@ -315,14 +315,13 @@ public class ForceGeneratorTab {
     }
 
     /**
-     * Clears any requested formation mix, so Restore Defaults resets it along with everything else. The mix lives on
+     * Clears the picked formation, so Restore Defaults resets it along with everything else. The selection lives on
      * the embedded MegaMek view rather than in {@code CommandGenerationOptions}, so it is not covered by loading
      * default options.
      */
     public void clearFormationMix() {
         if (viewUi != null) {
-            viewUi.getOptionsView().setFormationMix(null);
-            viewUi.refreshFormationMixEditor();
+            viewUi.getOptionsView().clearFormationSelection();
         }
     }
 
