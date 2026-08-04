@@ -35,12 +35,15 @@ package mekhq.gui.view;
 import static java.awt.Color.BLACK;
 import static java.awt.Color.RED;
 import static java.lang.Math.ceil;
+import static java.lang.Math.round;
 import static megamek.client.ui.WrapLayout.wordWrap;
 import static megamek.common.options.PilotOptions.LVL3_ADVANTAGES;
 import static megamek.common.options.PilotOptions.MD_ADVANTAGES;
 import static megamek.common.units.EntityWeightClass.WEIGHT_ULTRA_LIGHT;
 import static megamek.utilities.ImageUtilities.addTintToImageIcon;
 import static mekhq.campaign.personnel.Person.getLoyaltyName;
+import static mekhq.campaign.personnel.PersonnelOptions.CERTIFIED_NOBODY;
+import static mekhq.campaign.personnel.PersonnelOptions.DONT_YOU_KNOW_WHO_I_AM;
 import static mekhq.campaign.personnel.enums.PersonnelStatus.ACTIVE;
 import static mekhq.campaign.personnel.skills.Skill.getIndividualAttributeModifier;
 import static mekhq.campaign.personnel.skills.Skill.getTotalAttributeModifier;
@@ -1709,6 +1712,14 @@ public class PersonViewPanel extends JScrollablePanel {
             int adjustedFame = person.getAdjustedFame(isUseAgeEffects,
                   isClanForce,
                   today);
+
+            PersonnelOptions options = person.getOptions();
+            if (options.booleanOption(DONT_YOU_KNOW_WHO_I_AM)) {
+                adjustedFame = (int) round(adjustedFame * 1.25);
+            } else if (options.booleanOption(CERTIFIED_NOBODY)) {
+                adjustedFame = (int) round(adjustedFame * 0.75);
+            }
+
             int adjustedConnections = person.getAdjustedConnections(false);
             int adjustedReputation = baseReputation + criminalRecord + adjustedFame + adjustedConnections;
             String chaosReputationTooltip = wordWrap(String.format(resourceMap.getString("lblChaosReputation.tooltip"),

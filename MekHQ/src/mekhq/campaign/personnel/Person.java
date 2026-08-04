@@ -7260,9 +7260,17 @@ public class Person implements ILocatable {
     }
 
     public int getAdjustedReputation(boolean isUseAgingEffects, boolean isClanCampaign, LocalDate currentDate) {
+        int fameContribution = getAdjustedFame(isUseAgingEffects, isClanCampaign, currentDate);
+
+        if (options.booleanOption(DONT_YOU_KNOW_WHO_I_AM)) {
+            fameContribution = (int) round(fameContribution * 1.25);
+        } else if (options.booleanOption(CERTIFIED_NOBODY)) {
+            fameContribution = (int) round(fameContribution * 0.75);
+        }
+
         return chaosCampaignReputation +
                      chaosCampaignCriminalRecord +
-                     getAdjustedFame(isUseAgingEffects, isClanCampaign, currentDate) +
+                     fameContribution +
                      getAdjustedConnections(false);
     }
 
