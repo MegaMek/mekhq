@@ -952,6 +952,7 @@ public class CampaignOptionsPane extends JPanel {
         boolean oldIsUseDiseases = oldIsUseAltAdvancedMedical && oldOptions.useDiseases();
         boolean oldUseNormalizedContractPayModel = oldOptions.useNormalizedContractPayModel();
         boolean oldIsDiminishReturnsContractPay = oldOptions.useDiminishingContractPay();
+        boolean oldIsUseChaosReputation = oldOptions.useChaosReputation();
 
         boolean newIsTrackFactionStandings = newOptions.trackFactionStanding();
         if (!isStartUp && newIsTrackFactionStandings && !oldIsTrackFactionStanding) { // Has tracking changed?
@@ -1031,6 +1032,11 @@ public class CampaignOptionsPane extends JPanel {
         boolean newIsDiminishReturnsContractPay = newOptions.useDiminishingContractPay();
         if (!isStartUp && newIsDiminishReturnsContractPay && !oldIsDiminishReturnsContractPay) {
             new DiminishingReturnsCampaignOptionsChangedConfirmationDialog(campaign);
+        }
+
+        boolean newIsUseChaosReputation = newOptions.useChaosReputation();
+        if (!isStartUp && newIsUseChaosReputation && !oldIsUseChaosReputation) { // Has tracking changed?
+            new ChaosReputationCampaignOptionsChangedConfirmationDialog(campaign);
         }
     }
 

@@ -69,7 +69,8 @@ package mekhq.campaign.campaignOptions;
 public record CampaignOptionsFreebieTracker(boolean awardVeterancySPAs, boolean trackFactionStanding,
       boolean trackPrisoners, boolean useMASHTheatres, boolean useFatigue, boolean useAdvancedSalvage,
       boolean useStratCon, boolean useMapless, boolean useAdvancedScouting, boolean useAltAdvancedMedical,
-      boolean useDiseases, boolean useNormalizedContractPayModel, boolean useDiminishingContractPay) {
+      boolean useDiseases, boolean useNormalizedContractPayModel, boolean useDiminishingContractPay,
+      boolean useChaosReputation) {
     /**
      * Creates a tracker snapshot from the provided {@link CampaignOptions}.
      *
@@ -100,7 +101,8 @@ public record CampaignOptionsFreebieTracker(boolean awardVeterancySPAs, boolean 
               options.isUseAlternativeAdvancedMedical(),
               options.isUseAlternativeAdvancedMedical() && options.isUseRandomDiseases(),
               options.isUseAlternatePaymentMode(),
-              options.isUseDiminishingContractPay() && isDiminishingContractPayRelevant(options)
+              options.isUseDiminishingContractPay() && isDiminishingContractPayRelevant(options),
+              options.get(CampaignOption.USE_CHAOS_REPUTATION)
         );
     }
 

@@ -16,7 +16,9 @@ import static mekhq.utilities.ReportingUtilities.getPositiveColor;
 import static mekhq.utilities.ReportingUtilities.spanOpeningWithCustomColor;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Comparator;
 import java.util.List;
 
 import megamek.common.enums.SkillLevel;
@@ -29,6 +31,8 @@ import mekhq.campaign.finances.Loan;
 import mekhq.campaign.finances.Money;
 import mekhq.campaign.force.Detachment;
 import mekhq.campaign.force.PlayerForce;
+import mekhq.campaign.mission.AbstractMissionTransition;
+import mekhq.campaign.mission.enums.MissionStatus;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.enums.PersonnelRole;
 import mekhq.campaign.personnel.enums.PersonnelStatus;
@@ -104,6 +108,93 @@ public class ChaosReputation {
             return min(reputation, cap);
         }
         return reputation;
+    }
+
+    /**
+     * Tabulates the base Chaos Reputation accrued from completed contracts that ended within a given window.
+     *
+     * <p>Contracts are processed in chronological order (by ending date). Only contracts whose ending date falls on or
+     * between {@code windowStart} and {@code windowEnd} (inclusive) are counted; a {@code null} bound is treated as
+     * open-ended, and a contract with no recorded ending date is always counted. This lets the caller restrict the
+     * tally to a single character's tenure - from recruitment until death or retirement.</p>
+     *
+     * @param campaign    the campaign whose completed contracts to tabulate
+     * @param windowStart the earliest ending date to count, or {@code null} for no lower bound
+     * @param windowEnd   the latest ending date to count, or {@code null} for no upper bound
+     *
+     * @return the base reputation earned from contracts within the window
+     */
+    public static int tabulateReputationFromContracts(Campaign campaign, LocalDate windowStart, LocalDate windowEnd) {
+        int reputation = STARTING_REPUTATION_SCORE;
+
+        List<AbstractMissionTransition> completedMissions = new ArrayList<>(campaign.getCompletedMissions());
+        completedMissions.sort(Comparator.comparing(AbstractMissionTransition::getEndingDate,
+              Comparator.nullsFirst(Comparator.naturalOrder())));
+
+        for (AbstractMissionTransition mission : completedMissions) {
+            if (!isWithinWindow(mission.getEndingDate(), windowStart, windowEnd)) {
+                continue;
+            }
+
+            MissionStatus status = mission.getStatus();
+            if (status.isSuccess()) {
+                reputation += CONTRACT_SUCCESS_DELTA;
+            } else if (status.isBreach()) {
+                int loss = clamp((int) round(reputation * BREAKING_CONTRACT_MULTIPLIER),
+                      0,
+                      -BREAKING_CONTRACT_MAX_DELTA);
+                reputation -= loss;
+            }
+        }
+
+        return reputation;
+    }
+
+    private static boolean isWithinWindow(LocalDate date, LocalDate windowStart, LocalDate windowEnd) {
+        if (date == null) {
+            return true;
+        }
+        if (windowStart != null && date.isBefore(windowStart)) {
+            return false;
+        }
+        return windowEnd == null || !date.isAfter(windowEnd);
+    }
+
+    private static LocalDate earliestDate(LocalDate first, LocalDate second) {
+        if (first == null) {
+            return second;
+        }
+        if (second == null) {
+            return first;
+        }
+        return first.isBefore(second) ? first : second;
+    }
+
+    /**
+     * Retroactively initializes the campaign's Chaos Reputation from its completed contracts.
+     *
+     * <p>Each character's base reputation is tabulated over their own tenure - only contracts that ended between their
+     * recruitment date and their departure (the earlier of death or retirement) are counted - so late-joining or
+     * long-departed personnel are not credited for contracts they were not present for. The force-wide campaign
+     * reputation is tabulated over the full contract history. Both are written, so the result is correct whether
+     * reputation is tracked per character or at the campaign level. This is a permanent change.</p>
+     *
+     * @param campaign the campaign to update
+     *
+     * @return the force-wide reputation value applied
+     */
+    public static int applyRetroactiveContractReputation(Campaign campaign) {
+        for (Person person : campaign.getPlayerForce().getHumanResources().getPersonnel()) {
+            LocalDate departure = earliestDate(person.getDateOfDeath(), person.getRetirement());
+            person.setReputationDirect(tabulateReputationFromContracts(campaign,
+                  person.getRecruitment(),
+                  departure));
+        }
+
+        int forceReputation = tabulateReputationFromContracts(campaign, null, null);
+        campaign.getPlayerForce().setChaosCampaignReputation(forceReputation);
+
+        return forceReputation;
     }
 
     /**
