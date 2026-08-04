@@ -596,12 +596,14 @@ public class ChaosReputation {
 
         int delta = (int) -ceil(supportPointsLoot / PIRACY_PENALTY_PROFIT_DIVIDER);
 
-        if (gotCaught) {
-            if (campaign.getCampaignOptions().get(CampaignOption.CAMPAIGN_LEVEL_CHAOS_REPUTATION)) {
+        if (campaign.getCampaignOptions().get(CampaignOption.CAMPAIGN_LEVEL_CHAOS_REPUTATION)) {
+            if (gotCaught) {
                 campaign.getPlayerForce().changeChaosCampaignReputation(delta);
-            } else {
-                updatePersonnelForActOfPiracy(personnel, delta);
             }
+        } else {
+            // Always process personnel: the "Leaves Paper Trail" SPA records a criminal record even when the
+            // detachment was not caught, so the base delta is 0 for a clean getaway.
+            updatePersonnelForActOfPiracy(personnel, gotCaught ? delta : 0);
         }
 
         triggerPiracyDialog(campaign, roll, targetNumber, gotCaught, delta, booty);
@@ -731,15 +733,32 @@ public class ChaosReputation {
     }
 
     /**
-     * Applies a criminal-record change to every employed character (used when an act of piracy is discovered).
+     * Applies the per-character criminal-record change for an act of piracy.
      *
-     * @param personnel the personnel to penalize
-     * @param delta     the criminal-record change (typically negative)
+     * <p>Each employed character receives {@code baseDelta} (the negative penalty when the detachment was caught, or
+     * {@code 0} for a clean getaway), adjusted by their SPAs: "Leaves Paper Trail" always records one extra point of
+     * criminal record (even on a clean getaway), while "Leaves No Trail" reduces the criminal record gained by one,
+     * but never turns a penalty into a bonus.</p>
+     *
+     * @param personnel the personnel involved in the act of piracy
+     * @param baseDelta  the base criminal-record change (negative when caught, {@code 0} otherwise)
      */
-    private static void updatePersonnelForActOfPiracy(List<Person> personnel, int delta) {
+    private static void updatePersonnelForActOfPiracy(List<Person> personnel, int baseDelta) {
         for (Person person : personnel) {
-            if (person.isEmployed()) {
-                person.changeCriminalRecord(delta);
+            if (!person.isEmployed()) {
+                continue;
+            }
+
+            int criminalRecordDelta = baseDelta;
+            PersonnelOptions options = person.getOptions();
+            if (options.booleanOption(PersonnelOptions.LEAVES_PAPER_TRAIL)) {
+                criminalRecordDelta -= 1;
+            } else if (options.booleanOption(PersonnelOptions.LEAVES_NO_TRAIL)) {
+                criminalRecordDelta = min(criminalRecordDelta + 1, 0);
+            }
+
+            if (criminalRecordDelta != 0) {
+                person.changeCriminalRecord(criminalRecordDelta);
             }
         }
     }

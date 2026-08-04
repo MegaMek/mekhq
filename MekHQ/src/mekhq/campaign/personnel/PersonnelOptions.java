@@ -93,6 +93,8 @@ public class PersonnelOptions extends PilotOptions {
     public static final String FORGETS_TO_SEND_MESSAGES = "forgets_to_send_messages";
     public static final String BIG_PERSONALITY = "big_personality";
     public static final String UNRECORDED_PRESENCE = "unrecorded_presence";
+    public static final String LEAVES_PAPER_TRAIL = "leaves_paper_trail";
+    public static final String LEAVES_NO_TRAIL = "leaves_no_trail";
     public static final String FLAW_ANIMAL_ANTIPATHY = "flaw_animal_antipathy";
     public static final String ATOW_ANIMAL_EMPATHY = "atow_animal_empathy";
     public static final String ATOW_AMBIDEXTROUS = "atow_ambidextrous";
@@ -325,6 +327,8 @@ public class PersonnelOptions extends PilotOptions {
         addOption(l3a, FORGETS_TO_SEND_MESSAGES, false);
         addOption(l3a, BIG_PERSONALITY, false);
         addOption(l3a, UNRECORDED_PRESENCE, false);
+        addOption(l3a, LEAVES_PAPER_TRAIL, false);
+        addOption(l3a, LEAVES_NO_TRAIL, false);
         addOption(l3a, FLAW_ANIMAL_ANTIPATHY, false);
         addOption(l3a, ATOW_ANIMAL_EMPATHY, false);
         addOption(l3a, ATOW_AMBIDEXTROUS, false);
