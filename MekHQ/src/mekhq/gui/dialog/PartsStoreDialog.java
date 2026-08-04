@@ -268,7 +268,7 @@ public class PartsStoreDialog extends JDialog {
                         buyBulkDialog.setVisible(true);
                         quantity = buyBulkDialog.getValue();
 
-                        if (buyBulkDialog.wasCanceled()) {
+                        if (!buyBulkDialog.wasCanceled()) {
                             addPart(true, partProxy.getPart(), quantity);
                             partProxy.updateTargetAndInventories();
                             partsModel.fireTableCellUpdated(partsTable.convertRowIndexToModel(i),

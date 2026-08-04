@@ -7275,9 +7275,9 @@ public class Person implements ILocatable {
         int criminalRecordContribution = chaosCampaignCriminalRecord;
 
         if (options.booleanOption(SPOTLESS_RECORD)) {
-            criminalRecordContribution = max(0, criminalRecordContribution - 1);
-        } else if (options.booleanOption(RAP_SHEET)) {
             criminalRecordContribution++;
+        } else if (options.booleanOption(RAP_SHEET)) {
+            criminalRecordContribution = max(0, criminalRecordContribution--);
         }
 
 

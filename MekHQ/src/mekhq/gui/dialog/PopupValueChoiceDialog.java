@@ -172,7 +172,7 @@ public class PopupValueChoiceDialog extends JDialog implements WindowListener {
     @Override
     public void windowClosing(WindowEvent evt) {
         if (evt.getComponent() != this.btnDone) {
-            value.getModel().setValue(-1);
+            wasCanceled = true;
             this.dispose();
         }
     }

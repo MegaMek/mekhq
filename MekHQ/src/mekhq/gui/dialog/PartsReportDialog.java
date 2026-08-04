@@ -308,10 +308,12 @@ public class PartsReportDialog extends JDialog {
                 addBulkDialog.setVisible(true);
                 quantity = addBulkDialog.getValue();
                 IAcquisitionWork partToBuy = partInUse.getPartToBuy();
-                while (addBulkDialog.wasCanceled()) {
-                    campaign.getQuartermaster()
-                          .addPart((Part) partToBuy.getNewEquipment(), 0, false, getSelectedPlace().getWarehouse());
-                    --quantity;
+                if (!addBulkDialog.wasCanceled()) {
+                    while (quantity > 0) {
+                        campaign.getQuartermaster()
+                              .addPart((Part) partToBuy.getNewEquipment(), 0, false, getSelectedPlace().getWarehouse());
+                        --quantity;
+                    }
                 }
                 refreshOverviewSpecificPart(row, partInUse, partToBuy);
             }

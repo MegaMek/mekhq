@@ -1733,9 +1733,9 @@ public class PersonViewPanel extends JScrollablePanel {
             }
 
             if (options.booleanOption(SPOTLESS_RECORD)) {
-                criminalRecord = max(0, criminalRecord - 1);
-            } else if (options.booleanOption(RAP_SHEET)) {
                 criminalRecord++;
+            } else if (options.booleanOption(RAP_SHEET)) {
+                criminalRecord = max(0, criminalRecord--);
             }
 
             boolean applyPersonality = campaignOptions.get(CampaignOption.CHAOS_PERSONALITY_AFFECTS_REPUTATION) &&
