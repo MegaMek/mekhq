@@ -863,7 +863,7 @@ public class ChaosReputation {
 
             int criminalRecordDelta = baseDelta;
             PersonnelOptions options = person.getOptions();
-            if (options.booleanOption(PersonnelOptions.LEAVES_PAPER_TRAIL)) {
+            if (options.booleanOption(PersonnelOptions.LOOSE_LIPS)) {
                 criminalRecordDelta -= 1;
             } else if (options.booleanOption(PersonnelOptions.LEAVES_NO_TRAIL)) {
                 criminalRecordDelta = min(criminalRecordDelta + 1, 0);

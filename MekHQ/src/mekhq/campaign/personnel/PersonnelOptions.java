@@ -93,7 +93,7 @@ public class PersonnelOptions extends PilotOptions {
     public static final String FORGETS_TO_REPLY = "forgets_to_reply";
     public static final String BIG_PERSONALITY = "big_personality";
     public static final String REDACTED = "redacted";
-    public static final String LEAVES_PAPER_TRAIL = "leaves_paper_trail";
+    public static final String LOOSE_LIPS = "loose_lips";
     public static final String LEAVES_NO_TRAIL = "leaves_no_trail";
     public static final String BLAMELESS = "blameless";
     public static final String SCAPEGOAT = "scapegoat";
@@ -340,7 +340,7 @@ public class PersonnelOptions extends PilotOptions {
         addOption(l3a, FORGETS_TO_REPLY, false);
         addOption(l3a, BIG_PERSONALITY, false);
         addOption(l3a, REDACTED, false);
-        addOption(l3a, LEAVES_PAPER_TRAIL, false);
+        addOption(l3a, LOOSE_LIPS, false);
         addOption(l3a, LEAVES_NO_TRAIL, false);
         addOption(l3a, BLAMELESS, false);
         addOption(l3a, SCAPEGOAT, false);
