@@ -228,6 +228,7 @@ import mekhq.campaign.personnel.turnoverAndRetention.RetirementDefectionTracker;
 import mekhq.campaign.randomEvents.prisoners.PrisonerStatus;
 import mekhq.campaign.randomEvents.randomEventsSystem.RandomEventLibraries;
 import mekhq.campaign.reputation.camOpsReputation.ForceReputationController;
+import mekhq.campaign.reputation.chaosReputation.ChaosReputation;
 import mekhq.campaign.storyArc.StoryArc;
 import mekhq.campaign.unit.CargoStatistics;
 import mekhq.campaign.unit.CrewType;
@@ -1943,9 +1944,10 @@ public class Campaign implements ITechManager {
     }
 
     /**
-    * TODO: This won't work once we support multiple hangars. Method separated from getHangar() for future refactor
-    *
-     * @return all hangars across all locations associated with this campaign.     TODO: This won't work once we support multiple hangars. Method separated from getHangar() for future refactor
+     * TODO: This won't work once we support multiple hangars. Method separated from getHangar() for future refactor
+     *
+     * @return all hangars across all locations associated with this campaign.     TODO: This won't work once we support
+     *       multiple hangars. Method separated from getHangar() for future refactor
      *
      * @deprecated Use {@link PlayerForce#getHangar()} directly.
      */
@@ -7500,6 +7502,12 @@ public class Campaign implements ITechManager {
         boolean useChaosReputation = getCampaignOptions().get(CampaignOption.USE_CHAOS_REPUTATION);
 
         if (useChaosReputation) {
+            if (getCampaignOptions().get(CampaignOption.CAMPAIGN_LEVEL_CHAOS_REPUTATION)) {
+                // Campaign-level mode stores a pure base; the debt/manual/commander modifiers are applied live here.
+                return String.valueOf(ChaosReputation.getEffectiveCampaignLevelReputation(getPlayerForce(),
+                      getCampaignOptions(),
+                      getLocalDate()));
+            }
             return String.valueOf(getPlayerForce().getChaosCampaignReputation());
         } else {
             return String.valueOf(getPlayerForce().getReputationRating(false));

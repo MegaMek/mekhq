@@ -137,11 +137,21 @@ public class ChaosReputationReportDialog extends AbstractReportDialog {
 
         StringBuilder description = new StringBuilder("<html>");
 
+        // In campaign-level mode the stored value is a pure base; apply the live modifiers so the header matches the
+        // total shown in the breakdown below. In personnel mode the stored value is already the derived total.
+        int headerReputation = campaign.getCampaignOptions().get(CampaignOption.CAMPAIGN_LEVEL_CHAOS_REPUTATION)
+                                     ?
+                                     ChaosReputation.getEffectiveCampaignLevelReputation(playerForce,
+                                           campaign.getCampaignOptions(),
+                                           currentDate)
+                                     :
+                                     playerForce.getChaosCampaignReputation();
+
         // HEADER
         description.append(String.format("<div style='text-align: center;'><font size='%d'><b>%s:</b> %d</font></div>",
               titleFontSize,
               playerForce.getName(),
-              playerForce.getChaosCampaignReputation()));
+              headerReputation));
 
         appendChaosReputationSection(description,
               campaign,

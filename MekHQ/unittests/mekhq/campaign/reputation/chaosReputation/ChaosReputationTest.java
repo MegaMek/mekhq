@@ -322,6 +322,72 @@ class ChaosReputationTest {
     }
     // endregion applyCommanderDebtModifier
 
+    // region campaign-level effective reputation
+
+    /** Campaign-level options with the given manual modifier and cap; debt penalties do not stack. */
+    private static CampaignOptions campaignLevelOptions(int manualModifier, int cap) {
+        CampaignOptions options = mock(CampaignOptions.class);
+        when(options.get(CampaignOption.CAMPAIGN_LEVEL_CHAOS_REPUTATION)).thenReturn(true);
+        when(options.get(CampaignOption.CHAOS_DEBT_PENALTIES_STACK)).thenReturn(false);
+        when(options.get(CampaignOption.MANUAL_UNIT_RATING_MODIFIER)).thenReturn(manualModifier);
+        when(options.get(CampaignOption.CHAOS_REPUTATION_CAP)).thenReturn(cap);
+        return options;
+    }
+
+    /** A force storing the given (pure) base reputation, with the given outstanding loans and commander. */
+    private static PlayerForce campaignLevelForce(int storedBase, List<Loan> loans, Person commander) {
+        PlayerForce playerForce = mock(PlayerForce.class);
+        Finances finances = mock(Finances.class);
+        ForceHumanResources humanResources = mock(ForceHumanResources.class);
+
+        when(playerForce.getChaosCampaignReputation()).thenReturn(storedBase);
+        when(playerForce.isClanForce()).thenReturn(false);
+        when(playerForce.getFinances()).thenReturn(finances);
+        when(finances.getLoans()).thenReturn(loans);
+        when(playerForce.getHumanResources()).thenReturn(humanResources);
+        when(humanResources.getCommander(any(), anyBoolean(), any())).thenReturn(commander);
+        return playerForce;
+    }
+
+    @Test
+    void getEffectiveCampaignLevelReputation_appliesLiveModifiersToStoredBase() {
+        // Base 5, one fresh loan (debt -1), a Combat Sense commander (+1), manual +2 -> 5 - 1 + 1 + 2 = 7.
+        PlayerForce playerForce = campaignLevelForce(5,
+              List.of(loanAged(0)),
+              personWith(OptionsConstants.ATOW_COMBAT_SENSE));
+        CampaignOptions options = campaignLevelOptions(2, 0);
+
+        assertEquals(7, ChaosReputation.getEffectiveCampaignLevelReputation(playerForce, options, DATE));
+    }
+
+    @Test
+    void getEffectiveCampaignLevelReputation_neverMutatesStoredBase() {
+        PlayerForce playerForce = campaignLevelForce(5, List.of(loanAged(0)), null);
+        CampaignOptions options = campaignLevelOptions(0, 0);
+
+        ChaosReputation.getEffectiveCampaignLevelReputation(playerForce, options, DATE);
+
+        verify(playerForce, never()).setChaosCampaignReputation(anyInt());
+    }
+    // endregion campaign-level effective reputation
+
+    // region processChaosCampaignReputationChanges
+    @Test
+    void processChaosCampaignReputationChanges_campaignLevelDoesNotDriftTheStoredBase() {
+        // With one outstanding loan (debt -1), the buggy implementation stored base + (-1) back into the base field
+        // every day, so the value drifted by -1 per call. The stored base must never be rewritten in campaign-level
+        // mode - the debt modifier is applied live at display time instead.
+        PlayerForce playerForce = campaignLevelForce(5, List.of(loanAged(0)), null);
+        CampaignOptions options = campaignLevelOptions(0, 0);
+
+        for (int day = 0; day < 5; day++) {
+            ChaosReputation.processChaosCampaignReputationChanges(options, playerForce, DATE);
+        }
+
+        verify(playerForce, never()).setChaosCampaignReputation(anyInt());
+    }
+    // endregion processChaosCampaignReputationChanges
+
     // region processContractCompletion
     private static Campaign campaignLevelCampaign(int storedReputation, PlayerForce playerForce) {
         Campaign campaign = mock(Campaign.class);

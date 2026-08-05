@@ -93,6 +93,7 @@ import mekhq.NullEntityException;
 import mekhq.campaign.*;
 import mekhq.campaign.againstTheBot.AtBConfiguration;
 import mekhq.campaign.base.PlayerBase;
+import mekhq.campaign.campaignOptions.CampaignOption;
 import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.campaignOptions.CampaignOptionsUnmarshaller;
 import mekhq.campaign.enums.CampaignTransportType;
@@ -1590,6 +1591,43 @@ public record CampaignXmlParser(InputStream is, MekHQ app) {
      *
      * @return A value indicating whether a new custom unit file was added to disk.
      */
+    /**
+     * Keeps an existing campaign on its original CamOps reputation instead of silently switching it to Chaos
+     * Reputation.
+     *
+     * <p>{@link CampaignOption#USE_CHAOS_REPUTATION} defaults to {@code true} so that new campaigns start with Chaos
+     * Reputation. A campaign that predates the option has no {@code useChaosReputation} tag in its save, so a plain
+     * value read would silently return that default and flip the campaign over - resetting the force's reputation to
+     * the starting score and skipping the retroactive-initialization prompt (which never fires on load). When the tag
+     * is absent we therefore force the option off, preserving the campaign's existing reputation system. Saves that do
+     * carry the tag (new-format saves) keep whatever value they stored.</p>
+     *
+     * @param campaignOptionsNode the {@code <campaignOptions>} element from the save
+     * @param campaignOptions     the options just parsed from that element
+     */
+    static void preserveLegacyReputationForExistingCampaigns(Node campaignOptionsNode,
+          CampaignOptions campaignOptions) {
+        if (!hasChildElement(campaignOptionsNode, CampaignOption.USE_CHAOS_REPUTATION.xmlTag())) {
+            campaignOptions.set(CampaignOption.USE_CHAOS_REPUTATION, false);
+        }
+    }
+
+    /**
+     * @return {@code true} if {@code parent} has a direct child element whose node name equals {@code tagName}. Used to
+     *       distinguish "the save wrote this option" from "the option fell back to its default because the tag was
+     *       absent" - which a plain value read cannot tell apart.
+     */
+    private static boolean hasChildElement(Node parent, String tagName) {
+        NodeList children = parent.getChildNodes();
+        for (int i = 0; i < children.getLength(); i++) {
+            Node child = children.item(i);
+            if (child.getNodeType() == Node.ELEMENT_NODE && child.getNodeName().equals(tagName)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
     private static boolean processCustom(Campaign retVal, Node wn) {
         String sCustomsDir = "data" +
                                    File.separator +
@@ -2022,8 +2060,10 @@ public record CampaignXmlParser(InputStream is, MekHQ app) {
                 } else if (xn.equalsIgnoreCase("custom")) {
                     reloadUnitData |= processCustom(campaign, wn);
                 } else if (xn.equalsIgnoreCase("campaignOptions")) {
-                    campaign.setCampaignOptions(CampaignOptionsUnmarshaller.generateCampaignOptionsFromXml(wn,
-                          version));
+                    CampaignOptions campaignOptions = CampaignOptionsUnmarshaller.generateCampaignOptionsFromXml(wn,
+                          version);
+                    preserveLegacyReputationForExistingCampaigns(wn, campaignOptions);
+                    campaign.setCampaignOptions(campaignOptions);
                 } else if (xn.equalsIgnoreCase("gameOptions")) {
                     campaign.getGameOptions().fillFromXML(wn.getChildNodes());
                 } else if (xn.equalsIgnoreCase(PlanetarySystemCampaignXmlIO.XML_TAG)) {

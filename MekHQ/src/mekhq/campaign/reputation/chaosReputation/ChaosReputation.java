@@ -118,9 +118,10 @@ public class ChaosReputation {
     /**
      * Recalculates and stores the force's Chaos Reputation according to the active tracking mode.
      *
-     * <p>When {@link CampaignOption#CAMPAIGN_LEVEL_CHAOS_REPUTATION} is enabled the stored campaign-wide value is
-     * refreshed with the current debt penalty and manual modifier; otherwise the value is re-derived from the force's
-     * personnel. In both cases the configured debt-stacking, manual-modifier, and cap options are applied.</p>
+     * <p>When {@link CampaignOption#CAMPAIGN_LEVEL_CHAOS_REPUTATION} is enabled this is a no-op: the campaign-wide value
+     * is a pure base that only changes through events, and the debt, manual, and commander modifiers are applied live
+     * when it is displayed (see {@link #getEffectiveCampaignLevelReputation}). Otherwise the value is re-derived from
+     * the force's personnel, applying the configured debt-stacking, manual-modifier, and cap options.</p>
      *
      * @param campaignOptions the campaign options driving the calculation
      * @param playerForce     the force whose reputation is recalculated and stored
@@ -128,31 +129,30 @@ public class ChaosReputation {
      */
     public static void processChaosCampaignReputationChanges(CampaignOptions campaignOptions, PlayerForce playerForce,
           LocalDate today) {
+        if (campaignOptions.get(CampaignOption.CAMPAIGN_LEVEL_CHAOS_REPUTATION)) {
+            // The stored campaign-level value is a pure base that only changes through events (contract outcomes, acts
+            // of piracy, prisoner executions, random events). The dynamic debt penalty, manual modifier, and commander
+            // SPA modifiers are applied live wherever the value is displayed. Re-deriving and storing them here would
+            // fold those modifiers back into the base and compound them on every daily update.
+            return;
+        }
+
         boolean debtPenaltiesStack = campaignOptions.get(CampaignOption.CHAOS_DEBT_PENALTIES_STACK);
         int manualModifier = campaignOptions.get(CampaignOption.MANUAL_UNIT_RATING_MODIFIER);
         int cap = campaignOptions.get(CampaignOption.CHAOS_REPUTATION_CAP);
         Person commander = playerForce.getHumanResources().getCommander(campaignOptions, playerForce.isClanForce(),
               today);
 
-        if (campaignOptions.get(CampaignOption.CAMPAIGN_LEVEL_CHAOS_REPUTATION)) {
-            ChaosReputation.calculateCampaignLevelReputation(playerForce,
-                  today,
-                  debtPenaltiesStack,
-                  manualModifier,
-                  cap,
-                  commander);
-        } else {
-            boolean applyPersonality = campaignOptions.get(CampaignOption.CHAOS_PERSONALITY_AFFECTS_REPUTATION) &&
-                                             campaignOptions.get(CampaignOption.USE_RANDOM_PERSONALITIES);
-            ChaosReputation.calculatePersonnelLevelReputation(playerForce,
-                  today,
-                  debtPenaltiesStack,
-                  manualModifier,
-                  cap,
-                  campaignOptions.get(CampaignOption.USE_AGE_EFFECTS),
-                  commander,
-                  applyPersonality);
-        }
+        boolean applyPersonality = campaignOptions.get(CampaignOption.CHAOS_PERSONALITY_AFFECTS_REPUTATION) &&
+                                         campaignOptions.get(CampaignOption.USE_RANDOM_PERSONALITIES);
+        ChaosReputation.calculatePersonnelLevelReputation(playerForce,
+              today,
+              debtPenaltiesStack,
+              manualModifier,
+              cap,
+              campaignOptions.get(CampaignOption.USE_AGE_EFFECTS),
+              commander,
+              applyPersonality);
     }
 
     /**
@@ -250,27 +250,33 @@ public class ChaosReputation {
     }
 
     /**
-     * Refreshes the stored campaign-wide reputation by re-applying the current debt penalty and manual modifier to the
-     * stored base value, then storing the capped result.
+     * Computes the effective campaign-wide Chaos Reputation for display: the stored (pure) base value plus the current
+     * debt penalty, commander SPA modifiers, and manual modifier, limited by the configured cap.
      *
-     * @param playerForce        the force whose stored reputation is refreshed
-     * @param currentDate        the current date, used for loan-age calculations
-     * @param debtPenaltiesStack whether each loan contributes its own debt penalty
-     * @param manualModifier     the manual reputation modifier to add
-     * @param cap                the reputation cap ({@code 0} for none)
-     * @param commander          the campaign commander, whose SPAs may modify the debt penalty (may be {@code null})
+     * <p>This is a read-only calculation. Unlike the personnel-level path, the stored base is never overwritten here,
+     * so the dynamic modifiers are re-derived on every read rather than compounded into the stored value. It is the
+     * campaign-level counterpart to {@link #processReputation} and is the single source of truth for the value shown in
+     * the unit-rating text, the report header, and {@link #getCampaignLevelTooltip}.</p>
+     *
+     * @param playerForce     the force whose stored base reputation is read
+     * @param campaignOptions the campaign options driving the modifiers and cap
+     * @param currentDate     the current date, used for loan-age (debt) calculations
+     *
+     * @return the capped effective reputation
      */
-    private static void calculateCampaignLevelReputation(PlayerForce playerForce, LocalDate currentDate,
-          boolean debtPenaltiesStack, int manualModifier, int cap, Person commander) {
+    public static int getEffectiveCampaignLevelReputation(PlayerForce playerForce, CampaignOptions campaignOptions,
+          LocalDate currentDate) {
         int base = playerForce.getChaosCampaignReputation();
+        Person commander = playerForce.getHumanResources().getCommander(campaignOptions, playerForce.isClanForce(),
+              currentDate);
         int debtModifier = applyCommanderDebtModifier(getDebtModifier(playerForce.getFinances().getLoans(),
               currentDate,
-              debtPenaltiesStack), commander);
+              campaignOptions.get(CampaignOption.CHAOS_DEBT_PENALTIES_STACK)), commander);
         int otherModifiers = getOtherModifiers(commander);
+        int manualModifier = campaignOptions.get(CampaignOption.MANUAL_UNIT_RATING_MODIFIER);
+        int cap = campaignOptions.get(CampaignOption.CHAOS_REPUTATION_CAP);
 
-        int total = applyReputationCap(cap, base + debtModifier + otherModifiers + manualModifier);
-
-        playerForce.setChaosCampaignReputation(total);
+        return applyReputationCap(cap, base + debtModifier + otherModifiers + manualModifier);
     }
 
     /**
@@ -454,8 +460,7 @@ public class ChaosReputation {
               campaignOptions.get(CampaignOption.CHAOS_DEBT_PENALTIES_STACK)), commander);
         int otherModifiers = getOtherModifiers(commander);
         int manualModifier = campaignOptions.get(CampaignOption.MANUAL_UNIT_RATING_MODIFIER);
-        int cap = campaignOptions.get(CampaignOption.CHAOS_REPUTATION_CAP);
-        int total = applyReputationCap(cap, base + debtModifier + otherModifiers + manualModifier);
+        int total = getEffectiveCampaignLevelReputation(playerForce, campaignOptions, campaign.getLocalDate());
 
         return getFormattedTextAt(RESOURCE_BUNDLE, "campaignLevel.tooltip",
               Integer.toString(base),
