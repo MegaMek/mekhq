@@ -7280,6 +7280,13 @@ public class Person implements ILocatable {
             criminalRecordContribution = max(0, criminalRecordContribution--);
         }
 
+        int baseReputationContribution = chaosCampaignReputation;
+
+        if (options.booleanOption(GOOD_REPUTATION)) {
+            baseReputationContribution++;
+        } else if (options.booleanOption(BAD_REPUTATION)) {
+            baseReputationContribution--;
+        }
 
         int personalityContribution = PersonalityController.getPersonalityValue(applyPersonality,
               getAggression(),
@@ -7287,7 +7294,7 @@ public class Person implements ILocatable {
               getGreed(),
               getSocial());
 
-        return chaosCampaignReputation +
+        return baseReputationContribution +
                      criminalRecordContribution +
                      fameContribution +
                      connectionsContribution +

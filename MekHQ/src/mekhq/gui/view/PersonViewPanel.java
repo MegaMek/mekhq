@@ -43,10 +43,12 @@ import static megamek.common.options.PilotOptions.MD_ADVANTAGES;
 import static megamek.common.units.EntityWeightClass.WEIGHT_ULTRA_LIGHT;
 import static megamek.utilities.ImageUtilities.addTintToImageIcon;
 import static mekhq.campaign.personnel.Person.getLoyaltyName;
+import static mekhq.campaign.personnel.PersonnelOptions.BAD_REPUTATION;
 import static mekhq.campaign.personnel.PersonnelOptions.CERTIFIED_NOBODY;
 import static mekhq.campaign.personnel.PersonnelOptions.DONT_YOU_KNOW_WHO_I_AM;
 import static mekhq.campaign.personnel.PersonnelOptions.FORGETS_TO_REPLY;
 import static mekhq.campaign.personnel.PersonnelOptions.FRIENDS_IN_HIGH_PLACES;
+import static mekhq.campaign.personnel.PersonnelOptions.GOOD_REPUTATION;
 import static mekhq.campaign.personnel.PersonnelOptions.RAP_SHEET;
 import static mekhq.campaign.personnel.PersonnelOptions.SPOTLESS_RECORD;
 import static mekhq.campaign.personnel.enums.PersonnelStatus.ACTIVE;
@@ -1737,6 +1739,12 @@ public class PersonViewPanel extends JScrollablePanel {
                 criminalRecord++;
             } else if (options.booleanOption(RAP_SHEET)) {
                 criminalRecord = max(0, criminalRecord--);
+            }
+
+            if (options.booleanOption(GOOD_REPUTATION)) {
+                baseReputation++;
+            } else if (options.booleanOption(BAD_REPUTATION)) {
+                baseReputation--;
             }
 
             boolean applyPersonality = campaignOptions.get(CampaignOption.CHAOS_PERSONALITY_AFFECTS_REPUTATION) &&
