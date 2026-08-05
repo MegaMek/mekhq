@@ -186,21 +186,21 @@ class ChaosReputationTest {
 
     @Test
     void getExperienceLevel_aboveTheirWeightRaisesByOne() {
-        Person person = combatRolePerson(EXP_REGULAR, PersonnelOptions.ABOVE_THEIR_WEIGHT);
+        Person person = combatRolePerson(EXP_REGULAR, PersonnelOptions.LOOKS_GOOD_ON_PAPER);
         assertEquals(EXP_REGULAR + 1,
               ChaosReputation.getExperienceLevel(mock(CampaignOptions.class), false, DATE, person, true));
     }
 
     @Test
     void getExperienceLevel_looksGoodOnPaperLowersByOne() {
-        Person person = combatRolePerson(EXP_REGULAR, PersonnelOptions.LOOKS_GOOD_ON_PAPER);
+        Person person = combatRolePerson(EXP_REGULAR, PersonnelOptions.UNASSUMING);
         assertEquals(EXP_REGULAR - 1,
               ChaosReputation.getExperienceLevel(mock(CampaignOptions.class), false, DATE, person, true));
     }
 
     @Test
     void getExperienceLevel_aboveTheirWeightClampsAtLegendary() {
-        Person person = combatRolePerson(EXP_LEGENDARY, PersonnelOptions.ABOVE_THEIR_WEIGHT);
+        Person person = combatRolePerson(EXP_LEGENDARY, PersonnelOptions.LOOKS_GOOD_ON_PAPER);
         assertEquals(EXP_LEGENDARY,
               ChaosReputation.getExperienceLevel(mock(CampaignOptions.class), false, DATE, person, true));
     }
@@ -208,7 +208,7 @@ class ChaosReputationTest {
     @Test
     void getExperienceLevel_looksGoodOnPaperNeverDropsToNone() {
         // Ultra-green minus one must clamp to ultra-green, not EXP_NONE (which would drop the role from the tally).
-        Person person = combatRolePerson(EXP_ULTRA_GREEN, PersonnelOptions.LOOKS_GOOD_ON_PAPER);
+        Person person = combatRolePerson(EXP_ULTRA_GREEN, PersonnelOptions.UNASSUMING);
         assertEquals(EXP_ULTRA_GREEN,
               ChaosReputation.getExperienceLevel(mock(CampaignOptions.class), false, DATE, person, true));
     }
@@ -269,7 +269,7 @@ class ChaosReputationTest {
     void getAverageSkillLevel_unrecordedPresenceIsExcluded() {
         // The ELITE character is ignored, leaving only the REGULAR average.
         List<Person> personnel = List.of(combatPerson(true, EXP_REGULAR),
-              combatPerson(true, EXP_ELITE, PersonnelOptions.UNRECORDED_PRESENCE));
+              combatPerson(true, EXP_ELITE, PersonnelOptions.REDACTED));
 
         assertEquals(skillLevelFromExperienceLevel(EXP_REGULAR),
               ChaosReputation.getAverageSkillLevel(mock(CampaignOptions.class), false, DATE, personnel));
@@ -289,12 +289,12 @@ class ChaosReputationTest {
 
     @Test
     void getPersonnelReputationWeight_unrecordedPresenceCountsZero() {
-        assertEquals(0, ChaosReputation.getPersonnelReputationWeight(personWith(PersonnelOptions.UNRECORDED_PRESENCE)));
+        assertEquals(0, ChaosReputation.getPersonnelReputationWeight(personWith(PersonnelOptions.REDACTED)));
     }
 
     @Test
     void getPersonnelReputationWeight_unrecordedPresenceTakesPrecedence() {
-        Person person = personWith(PersonnelOptions.BIG_PERSONALITY, PersonnelOptions.UNRECORDED_PRESENCE);
+        Person person = personWith(PersonnelOptions.BIG_PERSONALITY, PersonnelOptions.REDACTED);
         assertEquals(0, ChaosReputation.getPersonnelReputationWeight(person));
     }
     // endregion getPersonnelReputationWeight

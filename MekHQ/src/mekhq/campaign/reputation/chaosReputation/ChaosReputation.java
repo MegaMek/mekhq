@@ -923,9 +923,9 @@ public class ChaosReputation {
         // "Above Their Weight" / "Looks Good on Paper" shift how experienced this character is counted as, clamped so
         // they are never dropped from the tally (EXP_NONE).
         PersonnelOptions options = person.getOptions();
-        if (options.booleanOption(PersonnelOptions.ABOVE_THEIR_WEIGHT)) {
+        if (options.booleanOption(PersonnelOptions.LOOKS_GOOD_ON_PAPER)) {
             experienceLevel = min(experienceLevel + 1, EXP_LEGENDARY);
-        } else if (options.booleanOption(PersonnelOptions.LOOKS_GOOD_ON_PAPER)) {
+        } else if (options.booleanOption(PersonnelOptions.UNASSUMING)) {
             experienceLevel = max(experienceLevel - 1, EXP_ULTRA_GREEN);
         }
 
@@ -945,7 +945,7 @@ public class ChaosReputation {
      */
     public static int getPersonnelReputationWeight(Person person) {
         PersonnelOptions options = person.getOptions();
-        if (options.booleanOption(PersonnelOptions.UNRECORDED_PRESENCE)) {
+        if (options.booleanOption(PersonnelOptions.REDACTED)) {
             return 0;
         }
         if (options.booleanOption(PersonnelOptions.BIG_PERSONALITY)) {

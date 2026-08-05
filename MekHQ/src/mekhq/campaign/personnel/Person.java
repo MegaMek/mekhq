@@ -7266,7 +7266,7 @@ public class Person implements ILocatable {
 
         int connectionsContribution = getAdjustedConnections(false);
 
-        if (options.booleanOption(FRIENDS_IN_HIGH_PLACES)) {
+        if (options.booleanOption(IMPORTANT_FRIENDS)) {
             connectionsContribution = (int) round(connectionsContribution * 1.25);
         } else if (options.booleanOption(FORGETS_TO_REPLY)) {
             connectionsContribution = (int) round(connectionsContribution * 0.75);
@@ -7274,9 +7274,9 @@ public class Person implements ILocatable {
 
         int criminalRecordContribution = chaosCampaignCriminalRecord;
 
-        if (options.booleanOption(SPOTLESS_RECORD)) {
+        if (options.booleanOption(BLAMELESS)) {
             criminalRecordContribution++;
-        } else if (options.booleanOption(RAP_SHEET)) {
+        } else if (options.booleanOption(SCAPEGOAT)) {
             criminalRecordContribution = max(0, criminalRecordContribution--);
         }
 
