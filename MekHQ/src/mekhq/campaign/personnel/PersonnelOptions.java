@@ -104,6 +104,8 @@ public class PersonnelOptions extends PilotOptions {
     public static final String SLIPPERY = "slippery";
     public static final String CONSPICUOUS = "conspicuous";
     public static final String LOOT_GOBLIN = "loot_goblin";
+    public static final String IMPRESSIVE_LEADER = "impressive_leader";
+    public static final String DISAPPOINTING_LEADER = "disappointing_leader";
     public static final String FLAW_ANIMAL_ANTIPATHY = "flaw_animal_antipathy";
     public static final String ATOW_ANIMAL_EMPATHY = "atow_animal_empathy";
     public static final String ATOW_AMBIDEXTROUS = "atow_ambidextrous";
@@ -347,6 +349,8 @@ public class PersonnelOptions extends PilotOptions {
         addOption(l3a, SLIPPERY, false);
         addOption(l3a, CONSPICUOUS, false);
         addOption(l3a, LOOT_GOBLIN, false);
+        addOption(l3a, IMPRESSIVE_LEADER, false);
+        addOption(l3a, DISAPPOINTING_LEADER, false);
         addOption(l3a, FLAW_ANIMAL_ANTIPATHY, false);
         addOption(l3a, ATOW_ANIMAL_EMPATHY, false);
         addOption(l3a, ATOW_AMBIDEXTROUS, false);

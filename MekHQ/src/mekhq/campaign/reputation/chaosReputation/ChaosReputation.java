@@ -232,6 +232,16 @@ public class ChaosReputation {
         if (hasCombatParalysis) {
             otherModifiers--;
         }
+
+        boolean isImpressiveLeader = options.booleanOption(PersonnelOptions.IMPRESSIVE_LEADER);
+        if (isImpressiveLeader) {
+            otherModifiers++;
+        }
+
+        boolean isDisappointingLeader = options.booleanOption(PersonnelOptions.DISAPPOINTING_LEADER);
+        if (isDisappointingLeader) {
+            otherModifiers--;
+        }
         return otherModifiers;
     }
 
@@ -440,7 +450,7 @@ public class ChaosReputation {
         int otherModifiers = getOtherModifiers(commander);
         int manualModifier = campaignOptions.get(CampaignOption.MANUAL_UNIT_RATING_MODIFIER);
         int cap = campaignOptions.get(CampaignOption.CHAOS_REPUTATION_CAP);
-        int total = applyReputationCap(cap, base + debtModifier + manualModifier);
+        int total = applyReputationCap(cap, base + debtModifier + otherModifiers + manualModifier);
 
         return getFormattedTextAt(RESOURCE_BUNDLE, "campaignLevel.tooltip",
               Integer.toString(base),
