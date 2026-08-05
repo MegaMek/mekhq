@@ -211,6 +211,11 @@ public abstract class MissingPart extends Part implements IAcquisitionWork {
             return;
         }
 
+        // Fabricating despite having a spare in stock is a legal choice, and reservePart() (which doesn't know about
+        // fabrication) may have reserved that spare for this task. Release it before overwriting the replacement
+        // reference, otherwise the stock part is left permanently reservedBy the tech and unusable.
+        cancelReservation();
+
         Part fabricated = getNewPart();
         fabricated.setBrandNew(true);
         fabricated.setQuality(unit.getQuality());
