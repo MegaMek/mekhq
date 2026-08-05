@@ -7268,7 +7268,7 @@ public class Person implements ILocatable {
 
         if (options.booleanOption(FRIENDS_IN_HIGH_PLACES)) {
             connectionsContribution = (int) round(connectionsContribution * 1.25);
-        } else if (options.booleanOption(FORGETS_TO_SEND_MESSAGES)) {
+        } else if (options.booleanOption(FORGETS_TO_REPLY)) {
             connectionsContribution = (int) round(connectionsContribution * 0.75);
         }
 

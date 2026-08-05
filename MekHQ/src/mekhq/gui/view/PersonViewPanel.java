@@ -45,7 +45,7 @@ import static megamek.utilities.ImageUtilities.addTintToImageIcon;
 import static mekhq.campaign.personnel.Person.getLoyaltyName;
 import static mekhq.campaign.personnel.PersonnelOptions.CERTIFIED_NOBODY;
 import static mekhq.campaign.personnel.PersonnelOptions.DONT_YOU_KNOW_WHO_I_AM;
-import static mekhq.campaign.personnel.PersonnelOptions.FORGETS_TO_SEND_MESSAGES;
+import static mekhq.campaign.personnel.PersonnelOptions.FORGETS_TO_REPLY;
 import static mekhq.campaign.personnel.PersonnelOptions.FRIENDS_IN_HIGH_PLACES;
 import static mekhq.campaign.personnel.PersonnelOptions.RAP_SHEET;
 import static mekhq.campaign.personnel.PersonnelOptions.SPOTLESS_RECORD;
@@ -1728,7 +1728,7 @@ public class PersonViewPanel extends JScrollablePanel {
             int adjustedConnections = person.getAdjustedConnections(false);
             if (options.booleanOption(FRIENDS_IN_HIGH_PLACES)) {
                 adjustedConnections = (int) round(adjustedConnections * 1.25);
-            } else if (options.booleanOption(FORGETS_TO_SEND_MESSAGES)) {
+            } else if (options.booleanOption(FORGETS_TO_REPLY)) {
                 adjustedConnections = (int) round(adjustedConnections * 0.75);
             }
 
