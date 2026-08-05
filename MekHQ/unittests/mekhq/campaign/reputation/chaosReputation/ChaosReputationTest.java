@@ -671,7 +671,7 @@ class ChaosReputationTest {
 
         ChaosReputation.applyStartingReputation(mock(CampaignOptions.class), false, DATE, civilian);
 
-        verify(civilian, never()).setReputationDirect(anyInt());
+        assertEquals(0, civilian.getReputationDirect());
     }
 
     @Test

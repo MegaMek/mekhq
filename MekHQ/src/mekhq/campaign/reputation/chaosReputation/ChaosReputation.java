@@ -42,6 +42,7 @@ import static megamek.common.compute.Compute.d6;
 import static megamek.common.options.OptionsConstants.ATOW_COMBAT_PARALYSIS;
 import static megamek.common.options.OptionsConstants.ATOW_COMBAT_SENSE;
 import static mekhq.campaign.personnel.skills.SkillType.EXP_ELITE;
+import static mekhq.campaign.personnel.skills.SkillType.EXP_GREEN;
 import static mekhq.campaign.personnel.skills.SkillType.EXP_HEROIC;
 import static mekhq.campaign.personnel.skills.SkillType.EXP_LEGENDARY;
 import static mekhq.campaign.personnel.skills.SkillType.EXP_NONE;
@@ -1014,7 +1015,8 @@ public class ChaosReputation {
 
     public static void applyStartingReputation(CampaignOptions campaignOptions, boolean isClanForce,
           LocalDate currentDate, Person person) {
-        if (person.isCivilian()) {
+        if (person.isCivilian() || person.isChild(currentDate, false)) {
+            person.setReputationDirect(0);
             return;
         }
 
@@ -1025,11 +1027,12 @@ public class ChaosReputation {
               true);
 
         int startingReputation = STARTING_REPUTATION_SCORE + switch (skillLevel) {
+            case EXP_NONE, EXP_ULTRA_GREEN, EXP_GREEN -> -1;
             case EXP_VETERAN -> 1;
             case EXP_ELITE -> 2;
             case EXP_HEROIC -> 3;
             case EXP_LEGENDARY -> 4;
-            default -> 0;
+            default -> 0; // EXP_REGULAR
         };
 
         person.setReputationDirect(startingReputation);
