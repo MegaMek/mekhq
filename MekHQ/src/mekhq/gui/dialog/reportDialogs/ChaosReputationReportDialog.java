@@ -93,6 +93,13 @@ public class ChaosReputationReportDialog extends AbstractReportDialog {
      */
     @Override
     protected JTextPane createTxtReport() {
+        // Recalculate and store the force reputation as the report opens, so the rating it explains reflects the
+        // current roster rather than a snapshot from the last daily update, contract completion, or enable.
+        Campaign reportCampaign = getCampaign();
+        ChaosReputation.processChaosCampaignReputationChanges(reportCampaign.getCampaignOptions(),
+              reportCampaign.getPlayerForce(),
+              reportCampaign.getLocalDate());
+
         final JTextPane txtReport = new JTextPane();
 
         txtReport.setContentType("text/html");
@@ -307,6 +314,7 @@ public class ChaosReputationReportDialog extends AbstractReportDialog {
                     currentDate,
                     campaignOptions.get(CampaignOption.CHAOS_DEBT_PENALTIES_STACK)),
               commander);
+        int otherModifiers = ChaosReputation.getOtherModifiers(commander);
         int manualModifier = campaignOptions.get(CampaignOption.MANUAL_UNIT_RATING_MODIFIER);
         int cap = campaignOptions.get(CampaignOption.CHAOS_REPUTATION_CAP);
         int total = ChaosReputation.applyReputationCap(cap, averageReputation + debtModifier + manualModifier);
@@ -318,6 +326,8 @@ public class ChaosReputationReportDialog extends AbstractReportDialog {
               Integer.toString(debtModifier)));
         description.append(summaryRow(getTextAt(RESOURCE_BUNDLE, "report.manualModifier"),
               Integer.toString(manualModifier)));
+        description.append(summaryRow(getTextAt(RESOURCE_BUNDLE, "report.otherModifiers"),
+              Integer.toString(otherModifiers)));
         description.append(summaryRow(getTextAt(RESOURCE_BUNDLE, "report.reputationTotal"),
               Integer.toString(total)));
         description.append("</table><br>");

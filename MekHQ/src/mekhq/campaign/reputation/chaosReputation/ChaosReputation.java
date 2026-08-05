@@ -39,6 +39,8 @@ import static java.lang.Math.max;
 import static java.lang.Math.min;
 import static java.lang.Math.round;
 import static megamek.common.compute.Compute.d6;
+import static megamek.common.options.OptionsConstants.ATOW_COMBAT_PARALYSIS;
+import static megamek.common.options.OptionsConstants.ATOW_COMBAT_SENSE;
 import static mekhq.campaign.personnel.skills.SkillType.EXP_ELITE;
 import static mekhq.campaign.personnel.skills.SkillType.EXP_HEROIC;
 import static mekhq.campaign.personnel.skills.SkillType.EXP_LEGENDARY;
@@ -213,8 +215,24 @@ public class ChaosReputation {
               applyPersonality);
 
         int debtModifier = applyCommanderDebtModifier(getDebtModifier(loans, currentDate, stackPenalties), commander);
+        int otherModifiers = getOtherModifiers(commander);
 
-        return applyReputationCap(cap, modeReputation + debtModifier + manualModifier);
+        return applyReputationCap(cap, modeReputation + debtModifier + otherModifiers + manualModifier);
+    }
+
+    public static int getOtherModifiers(Person commander) {
+        int otherModifiers = 0;
+        PersonnelOptions options = commander.getOptions();
+        boolean hasCombatSense = options.booleanOption(ATOW_COMBAT_SENSE);
+        if (hasCombatSense) {
+            otherModifiers++;
+        }
+
+        boolean hasCombatParalysis = options.booleanOption(ATOW_COMBAT_PARALYSIS);
+        if (hasCombatParalysis) {
+            otherModifiers--;
+        }
+        return otherModifiers;
     }
 
     /**
@@ -234,8 +252,9 @@ public class ChaosReputation {
         int debtModifier = applyCommanderDebtModifier(getDebtModifier(playerForce.getFinances().getLoans(),
               currentDate,
               debtPenaltiesStack), commander);
+        int otherModifiers = getOtherModifiers(commander);
 
-        int total = applyReputationCap(cap, base + debtModifier + manualModifier);
+        int total = applyReputationCap(cap, base + debtModifier + otherModifiers + manualModifier);
 
         playerForce.setChaosCampaignReputation(total);
     }
@@ -418,6 +437,7 @@ public class ChaosReputation {
         int debtModifier = applyCommanderDebtModifier(getDebtModifier(playerForce.getFinances().getLoans(),
               campaign.getLocalDate(),
               campaignOptions.get(CampaignOption.CHAOS_DEBT_PENALTIES_STACK)), commander);
+        int otherModifiers = getOtherModifiers(commander);
         int manualModifier = campaignOptions.get(CampaignOption.MANUAL_UNIT_RATING_MODIFIER);
         int cap = campaignOptions.get(CampaignOption.CHAOS_REPUTATION_CAP);
         int total = applyReputationCap(cap, base + debtModifier + manualModifier);
@@ -426,6 +446,7 @@ public class ChaosReputation {
               Integer.toString(base),
               Integer.toString(debtModifier),
               Integer.toString(manualModifier),
+              Integer.toString(otherModifiers),
               Integer.toString(total));
     }
 
