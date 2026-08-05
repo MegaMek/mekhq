@@ -46,9 +46,9 @@ import javax.swing.JSpinner;
 import jakarta.annotation.Nonnull;
 import jakarta.annotation.Nullable;
 import megamek.Version;
+import megamek.client.ui.settings.SettingsFormPanel;
 import mekhq.gui.campaignOptions.CampaignOptionFlag;
 import mekhq.gui.campaignOptions.components.CampaignOptionsCheckBox;
-import megamek.client.ui.settings.SettingsFormPanel;
 import mekhq.gui.campaignOptions.components.CampaignOptionsHeaderPanel;
 import mekhq.gui.campaignOptions.components.CampaignOptionsLabel;
 import mekhq.gui.campaignOptions.components.CampaignOptionsPagePanel;
@@ -197,8 +197,8 @@ class RepairPage {
 
     private @Nonnull JPanel createComponentDamagePanel() {
         final SettingsFormPanel panel = new SettingsFormPanel("ComponentDamagePanel",
-                LABEL_COLUMN_WIDTH,
-                CONTROL_COLUMN_WIDTH);
+              LABEL_COLUMN_WIDTH,
+              CONTROL_COLUMN_WIDTH);
         panel.addCheckBoxGrid(2,
               useAeroSystemHitsBox,
               useDamageMargin);
@@ -227,7 +227,7 @@ class RepairPage {
         useQuirksBox.setSelected(model.useQuirks);
         chkUseFabrication.setSelected(model.useFabrication);
         chkUseBalancedFabrication.setSelected(model.useBalancedFabrication);
-        chkMaintenanceFabrication.setSelected(model.MaintenanceFabrication);
+        chkMaintenanceFabrication.setSelected(model.maintenanceFabrication);
         useAeroSystemHitsBox.setSelected(model.useAeroSystemHits);
         useDamageMargin.setSelected(model.destroyByMargin);
         spnDamageMargin.setValue(model.destroyMargin);
@@ -253,7 +253,7 @@ class RepairPage {
         model.useQuirks = useQuirksBox.isSelected();
         model.useFabrication = chkUseFabrication.isSelected();
         model.useBalancedFabrication = chkUseBalancedFabrication.isSelected();
-        model.MaintenanceFabrication = chkMaintenanceFabrication.isSelected();
+        model.maintenanceFabrication = chkMaintenanceFabrication.isSelected();
         model.useAeroSystemHits = useAeroSystemHitsBox.isSelected();
         model.destroyByMargin = useDamageMargin.isSelected();
         model.destroyMargin = (int) spnDamageMargin.getValue();

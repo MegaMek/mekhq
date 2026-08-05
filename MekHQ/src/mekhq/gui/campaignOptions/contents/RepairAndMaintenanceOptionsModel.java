@@ -59,7 +59,7 @@ class RepairAndMaintenanceOptionsModel {
     boolean logMaintenance;
     boolean useFabrication;
     boolean useBalancedFabrication;
-    boolean MaintenanceFabrication;
+    boolean maintenanceFabrication;
 
     RepairAndMaintenanceOptionsModel(@Nonnull CampaignOptions options) {
         techsUseAdministration = options.isTechsUseAdministration();
@@ -84,7 +84,7 @@ class RepairAndMaintenanceOptionsModel {
         logMaintenance = options.isLogMaintenance();
         useFabrication = options.get(CampaignOption.USE_FABRICATION);
         useBalancedFabrication = options.get(CampaignOption.USE_BALANCED_FABRICATION);
-        MaintenanceFabrication = options.get(CampaignOption.FABRICATE_D_IN_MAINTENANCE_FACILITY);
+        maintenanceFabrication = options.get(CampaignOption.FABRICATE_D_IN_MAINTENANCE_FACILITY);
     }
 
     void applyTo(@Nonnull CampaignOptions options) {
@@ -110,6 +110,6 @@ class RepairAndMaintenanceOptionsModel {
         options.setLogMaintenance(logMaintenance);
         options.set(CampaignOption.USE_FABRICATION, useFabrication);
         options.set(CampaignOption.USE_BALANCED_FABRICATION, useBalancedFabrication);
-        options.set(CampaignOption.FABRICATE_D_IN_MAINTENANCE_FACILITY, MaintenanceFabrication);
+        options.set(CampaignOption.FABRICATE_D_IN_MAINTENANCE_FACILITY, maintenanceFabrication);
     }
 }
