@@ -44,10 +44,6 @@ import java.nio.file.Path;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
 
-/**
- * Verifies that saving a scenario template embeds the MegaMek Data legal notice (JSON has no comments) as a leading
- * {@code _license} block, and that the notice is ignored on read rather than leaking into the model.
- */
 class ScenarioTemplateLicenseTest {
 
     @Test
