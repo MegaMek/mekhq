@@ -63,6 +63,7 @@ import megamek.common.units.Entity;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.ForceHumanResources;
+import mekhq.campaign.campaignOptions.CampaignOption;
 import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.digitalGM.stratCon.StratConTrackState;
 import mekhq.campaign.events.NetworkChangedEvent;
@@ -412,22 +413,32 @@ public abstract class AbstractForce {
     /**
      * Calculates the average skill level of the personnel based on the specified parameters.
      *
-     * @param isUseChaosReputation a boolean flag indicating whether to use chaos reputation for skill level
-     *                             calculation
-     * @param campaignOptions      an instance of CampaignOptions containing options for the current campaign
-     * @param currentDate          the current date used in skill level computation
+     * @param campaignOptions an instance of CampaignOptions containing options for the current campaign
+     * @param currentDate     the current date used in skill level computation
      *
      * @return the average skill level as a SkillLevel object
      */
-    public SkillLevel getAverageSkillLevel(boolean isUseChaosReputation, CampaignOptions campaignOptions,
-          LocalDate currentDate) {
-        return isUseChaosReputation ?
+    public SkillLevel getAverageSkillLevel(CampaignOptions campaignOptions, LocalDate currentDate) {
+        return campaignOptions.get(CampaignOption.USE_CHAOS_REPUTATION) ?
                      ChaosReputation.getAverageSkillLevel(campaignOptions,
                            isClanForce(),
                            currentDate,
                            getHumanResources().getPersonnelFilteringOutDeparted()) :
                      reputation.getAverageSkillLevel();
     }
+
+    /**
+     * Calculates and returns the reputation rating based on the provided flag.
+     *
+     * @param isUseChaosReputation a boolean flag. If {@code true}, the method returns the chaosCampaignReputation. If
+     *                             {@code false}, it retrieves the reputation rating from the reputation object.
+     *
+     * @return the calculated reputation rating.
+     */
+    public int getReputationRating(boolean isUseChaosReputation) {
+        return isUseChaosReputation ? chaosCampaignReputation : reputation.getReputationRating();
+    }
+
 
     public FactionStandings getFactionStandings() {
         return factionStandings;

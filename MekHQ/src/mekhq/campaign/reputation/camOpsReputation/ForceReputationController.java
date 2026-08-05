@@ -131,6 +131,13 @@ public class ForceReputationController {
         return this.atbModifier;
     }
 
+    /**
+     * Retrieves the reputation of the force from the calculated data.
+     *
+     * <p><b>Usage Note:</b> generally you want to use {@link AbstractForce#getReputationRating(boolean)} </p>
+     *
+     * @return the average skill level as a SkillLevel object.
+     */
     public int getReputationRating() {
         return this.reputationRating;
     }

@@ -1944,7 +1944,7 @@ public class Campaign implements ITechManager {
 
     /**
      * @return all hangars across all locations associated with this campaign.
-     *                                                                                                                                                                                                 TODO: This won't work once we support multiple hangars. Method separated from getHangar() for future refactor
+     *                                                                                                                                                                                                             TODO: This won't work once we support multiple hangars. Method separated from getHangar() for future refactor
      *
      * @deprecated Use {@link PlayerForce#getHangar()} directly.
      */
@@ -7464,7 +7464,7 @@ public class Campaign implements ITechManager {
         if (useChaosReputation) {
             return String.valueOf(getPlayerForce().getChaosCampaignReputation());
         } else {
-            return String.valueOf(getPlayerForce().getReputation().getReputationRating());
+            return String.valueOf(getPlayerForce().getReputationRating(false));
         }
     }
 
@@ -7474,7 +7474,8 @@ public class Campaign implements ITechManager {
      * @return The unit rating modifier based on the campaign options.
      */
     public int getAtBUnitRatingMod() {
-        return getPlayerForce().getReputation().getAtbModifier();
+        boolean useChaosReputation = getCampaignOptions().get(CampaignOption.USE_CHAOS_REPUTATION);
+        return getPlayerForce().getAverageSkillLevel(campaignOptions, currentDay).ordinal();
     }
 
     /**

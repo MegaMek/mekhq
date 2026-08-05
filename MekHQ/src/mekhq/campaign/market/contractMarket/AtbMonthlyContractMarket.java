@@ -67,7 +67,6 @@ import mekhq.MHQConstants;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.JumpPath;
-import mekhq.campaign.campaignOptions.CampaignOption;
 import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.enums.DragoonRating;
 import mekhq.campaign.market.enums.ContractMarketMethod;
@@ -565,9 +564,7 @@ public class AtbMonthlyContractMarket extends AbstractContractMarket {
         final SkillLevel campaignSkillLevel = reputation == null ?
                                                     REGULAR :
                                                     campaign.getPlayerForce()
-                                                          .getAverageSkillLevel(campaign.getCampaignOptions()
-                                                                                      .get(CampaignOption.USE_CHAOS_REPUTATION),
-                                                                campaign.getCampaignOptions(),
+                                                          .getAverageSkillLevel(campaign.getCampaignOptions(),
                                                                 campaign.getLocalDate());
         final boolean useDynamicDifficulty = campaign.getCampaignOptions().isUseDynamicDifficulty();
         final boolean useBolsterContractSkill = campaign.getCampaignOptions().isUseBolsterContractSkill();
@@ -680,9 +677,7 @@ public class AtbMonthlyContractMarket extends AbstractContractMarket {
         contract.setSystemId(parent.getSystemId());
         final boolean useBolsterContractSkill = campaign.getCampaignOptions().isUseBolsterContractSkill();
         final SkillLevel campaignSkillLevel = campaign.getPlayerForce()
-                                                    .getAverageSkillLevel(campaign.getCampaignOptions()
-                                                                                .get(CampaignOption.USE_CHAOS_REPUTATION),
-                                                          campaign.getCampaignOptions(),
+                                                    .getAverageSkillLevel(campaign.getCampaignOptions(),
                                                           campaign.getLocalDate());
         setAllyRating(contract, campaign.getGameYear(), campaignSkillLevel, useBolsterContractSkill);
         setEnemyRating(contract, campaign.getGameYear(), campaignSkillLevel, useBolsterContractSkill);

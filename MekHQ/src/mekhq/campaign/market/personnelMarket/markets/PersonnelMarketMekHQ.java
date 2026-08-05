@@ -107,7 +107,9 @@ public class PersonnelMarketMekHQ extends NewPersonnelMarket {
         setAssociatedPersonnelMarketStyle(MEKHQ);
 
         setLowPopulationRecruitmentDivider(7500000);
-        setUnitReputationRecruitmentCutoff(-25);
+
+        boolean isUseChaosReputation = getCampaign().getCampaignOptions().get(CampaignOption.USE_CHAOS_REPUTATION);
+        setUnitReputationRecruitmentCutoff(isUseChaosReputation ? -3 : -25);
 
         PersonnelMarketLibraries personnelMarketLibraries = new PersonnelMarketLibraries();
         setClanMarketEntries(personnelMarketLibraries.getClanMarketMekHQ());
@@ -130,7 +132,8 @@ public class PersonnelMarketMekHQ extends NewPersonnelMarket {
         ArrayList<Faction> interestedFactions = new ArrayList<>();
 
         boolean filterOutLegalFactions = false;
-        if (getCampaign().getPlayerForce().getReputation().getReputationRating() <
+        boolean isUseChaosReputation = getCampaign().getCampaignOptions().get(CampaignOption.USE_CHAOS_REPUTATION);
+        if (getCampaign().getPlayerForce().getReputationRating(isUseChaosReputation) <
                   getUnitReputationRecruitmentCutoff()) {
             getLogger().debug(
                   "Only pirates & mercenaries will be considered for applicants, as the campaign's unit " +
@@ -248,9 +251,7 @@ public class PersonnelMarketMekHQ extends NewPersonnelMarket {
     @Override
     public void generateApplicants() {
         int averageSkillLevel = getCampaign().getPlayerForce()
-                                      .getAverageSkillLevel(getCampaign().getCampaignOptions()
-                                                                  .get(CampaignOption.USE_CHAOS_REPUTATION),
-                                            getCampaign().getCampaignOptions(),
+                                      .getAverageSkillLevel(getCampaign().getCampaignOptions(),
                                             getCampaign().getLocalDate())
                                       .getExperienceLevel();
 

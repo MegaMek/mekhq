@@ -64,7 +64,6 @@ import megamek.common.units.ProtoMek;
 import megamek.common.units.UnitType;
 import megamek.logging.MMLogger;
 import mekhq.campaign.Campaign;
-import mekhq.campaign.campaignOptions.CampaignOption;
 import mekhq.campaign.mission.AtBDynamicScenario;
 import mekhq.campaign.mission.BotForce;
 import mekhq.campaign.mission.Scenario;
@@ -183,10 +182,7 @@ public class ScenarioSetupForces<SCENARIO extends Scenario> extends SetupForces 
         game.addPlayer(player.getId(), player);
         var entities = setupPlayerForces(player);
         var playerSkill = campaign.getPlayerForce()
-                                .getAverageSkillLevel(campaign.getCampaignOptions()
-                                                            .get(CampaignOption.USE_CHAOS_REPUTATION),
-                                      campaign.getCampaignOptions(),
-                                      campaign.getLocalDate());
+                                .getAverageSkillLevel(campaign.getCampaignOptions(), campaign.getLocalDate());
         game.setPlayerSkillLevel(player.getId(), playerSkill);
         sendEntities(entities, game);
     }
