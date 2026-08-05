@@ -455,7 +455,10 @@ public class ChaosReputation {
             }
 
             // Is the person active and employed?
-            if (status.isActive() && person.isEmployed()) {
+            if (status.isActive() &&
+                      person.isEmployed() &&
+                      !person.isCivilian() &&
+                      !person.isChild(currentDate, false)) {
                 int weight = getPersonnelReputationWeight(person);
                 if (weight == 0) {
                     continue;
