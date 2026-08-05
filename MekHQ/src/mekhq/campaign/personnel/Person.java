@@ -113,6 +113,7 @@ import mekhq.campaign.AbstractLocation;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.ExtraData;
 import mekhq.campaign.LocalPersonnel;
+import mekhq.campaign.campaignOptions.CampaignOption;
 import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.events.persons.PersonChangedEvent;
 import mekhq.campaign.events.persons.PersonStatusChangedEvent;
@@ -2647,12 +2648,12 @@ public class Person implements ILocatable {
      * option for tracking total XP earnings is enabled, updates the total XP earnings as well.</p>
      *
      * @param campaign the {@link Campaign} instance providing the campaign options
-     * @param xp       the amount of XP to be awarded
+     * @param delta    the amount of XP to be awarded
      */
-    public void awardXP(final Campaign campaign, final int xp) {
-        this.xp += xp;
-        if (campaign.getCampaignOptions().isTrackTotalXPEarnings()) {
-            changeTotalXPEarnings(xp);
+    public void awardXP(final Campaign campaign, final int delta) {
+        this.xp = max(0, delta + xp);
+        if (campaign.getCampaignOptions().get(CampaignOption.TRACK_TOTAL_XP_EARNINGS)) {
+            changeTotalXPEarnings(delta);
         }
     }
 
@@ -7277,7 +7278,7 @@ public class Person implements ILocatable {
         if (options.booleanOption(BLAMELESS)) {
             criminalRecordContribution++;
         } else if (options.booleanOption(SCAPEGOAT)) {
-            criminalRecordContribution = max(0, criminalRecordContribution--);
+            criminalRecordContribution = min(0, criminalRecordContribution - 1);
         }
 
         int baseReputationContribution = chaosCampaignReputation;

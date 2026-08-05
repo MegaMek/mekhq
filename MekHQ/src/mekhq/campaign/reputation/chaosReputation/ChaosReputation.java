@@ -48,6 +48,7 @@ import static mekhq.campaign.personnel.skills.SkillType.EXP_LEGENDARY;
 import static mekhq.campaign.personnel.skills.SkillType.EXP_NONE;
 import static mekhq.campaign.personnel.skills.SkillType.EXP_ULTRA_GREEN;
 import static mekhq.campaign.personnel.skills.SkillType.EXP_VETERAN;
+import static mekhq.campaign.randomEvents.prisoners.PrisonerEventManager.MAX_CRIME_PENALTY;
 import static mekhq.campaign.universe.Faction.PIRATE_FACTION_CODE;
 import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
 import static mekhq.utilities.MHQInternationalization.getTextAt;
@@ -64,7 +65,6 @@ import java.util.List;
 
 import jakarta.annotation.Nullable;
 import megamek.common.enums.SkillLevel;
-import megamek.logging.MMLogger;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.ForceHumanResources;
 import mekhq.campaign.campaignOptions.CampaignOption;
@@ -95,7 +95,6 @@ import mekhq.gui.baseComponents.immersiveDialogs.ImmersiveDialogSimple;
  * computing the force's average experience level.</p>
  */
 public class ChaosReputation {
-    private static final MMLogger LOGGER = MMLogger.create(ChaosReputation.class);
     private static final String RESOURCE_BUNDLE = "mekhq.resources.ChaosReputation";
 
     public static final int STARTING_REPUTATION_SCORE = 1; // Hot Spots Draconis Reach pg25 1st printing
@@ -418,7 +417,8 @@ public class ChaosReputation {
         int adjustedCrimeRating = campaign.getPlayerForce().getAdjustedCrimeRating();
         int criminalRecordFromCrime = (int) floor(adjustedCrimeRating / CRIME_RATING_TO_CRIMINAL_RECORD_DIVIDER);
 
-        for (Person person : campaign.getPlayerForce().getHumanResources().getPersonnel()) {
+        Collection<Person> personnel = campaign.getPlayerForce().getHumanResources().getPersonnel();
+        for (Person person : personnel) {
             LocalDate departure = earliestDate(person.getDateOfDeath(), person.getRetirement());
             person.setReputationDirect(tabulateReputationFromContracts(campaign,
                   person.getRecruitment(),
@@ -509,12 +509,7 @@ public class ChaosReputation {
             }
         }
 
-        int averageReputation = (int) round(totalReputation / personCount);
-
-        LOGGER.info("Gathered all reputation from combat personnel in the force");
-        LOGGER.info("People: {}, Reputation: {}, Avg: {}", personCount, totalReputation, averageReputation);
-
-        return averageReputation;
+        return personnel.isEmpty() ? 0 : (int) round(totalReputation / personCount);
     }
 
     /**
@@ -624,8 +619,7 @@ public class ChaosReputation {
     public static void processContractCompletion(Campaign campaign, MissionStatus status, List<Person> personnel) {
         CampaignOptions campaignOptions = campaign.getCampaignOptions();
         boolean useChaosReputation = campaignOptions.get(CampaignOption.USE_CHAOS_REPUTATION);
-        boolean isCampaignLevelReputation = campaignOptions.get(CampaignOption.CAMPAIGN_LEVEL_CHAOS_REPUTATION);
-        if (!useChaosReputation && !isCampaignLevelReputation) {
+        if (!useChaosReputation) {
             return;
         }
 
@@ -640,6 +634,7 @@ public class ChaosReputation {
 
         PlayerForce playerForce = campaign.getPlayerForce();
         int base = playerForce.getChaosCampaignReputation();
+        boolean isCampaignLevelReputation = campaignOptions.get(CampaignOption.CAMPAIGN_LEVEL_CHAOS_REPUTATION);
         if (rewardsReputation) {
             if (isCampaignLevelReputation) {
                 playerForce.changeChaosCampaignReputation(CONTRACT_SUCCESS_DELTA);
@@ -707,8 +702,8 @@ public class ChaosReputation {
                 campaign.getPlayerForce().changeChaosCampaignReputation(delta);
             }
         } else {
-            // Always process personnel: the "Leaves Paper Trail" SPA records a criminal record even when the
-            // detachment was not caught, so the base delta is 0 for a clean getaway.
+            // Always process personnel: the "Loose Lips" SPA records a criminal record even when the detachment was
+            // not caught, so the base delta is 0 for a clean getaway.
             updatePersonnelForActOfPiracy(personnel, gotCaught ? delta : 0);
         }
 
@@ -800,6 +795,7 @@ public class ChaosReputation {
      * @return the scaled contract-loot support points
      */
     private static int determineContractLoot(int roll, int scale) {
+        // Hot Spots Draconis Reach, first printing, pg 126
         int base = switch (roll) {
             case 1 -> 0;
             case 2 -> 375;
@@ -830,6 +826,7 @@ public class ChaosReputation {
             }
         }
 
+        // Hot Spots Draconis Reach, first printing, pg 126
         int value = switch (runningTotal) {
             case 0 -> 0;
             case 1 -> 250;
@@ -1049,5 +1046,31 @@ public class ChaosReputation {
 
         int roll = -d6(1);
         person.setCriminalRecord(roll);
+    }
+
+    public static void changeCrimePenalty(Collection<Person> personnel, int delta) {
+        for (Person person : personnel) {
+            if (person.isEmployed()) {
+                if (delta != 0) {
+                    person.changeCriminalRecord(delta);
+                }
+            }
+        }
+    }
+
+    public static int getPrisonerExecutionPenalty(PlayerForce playerForce, int prisonerCount,
+          boolean crimeNoticed, boolean isUseCampaignReputationTracking) {
+        int penalty;
+        penalty = (int) -ceil(min(MAX_CRIME_PENALTY, prisonerCount) / 10.0);
+        if (crimeNoticed) {
+            if (isUseCampaignReputationTracking) {
+                playerForce.changeChaosCampaignReputation(penalty);
+            } else {
+                ChaosReputation.updatePersonnelCriminalRecord(
+                      playerForce.getHumanResources().getPersonnelFilteringOutDepartedAndAbsent(),
+                      penalty);
+            }
+        }
+        return penalty;
     }
 }

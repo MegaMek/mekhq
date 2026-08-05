@@ -470,18 +470,12 @@ public class PrisonerMissionEndEvent {
 
         CampaignOptions campaignOptions = campaign.getCampaignOptions();
         boolean isUseChaosReputation = campaignOptions.get(CampaignOption.USE_CHAOS_REPUTATION);
+        boolean isUseCampaignReputationTracking = campaignOptions.get(CampaignOption.CAMPAIGN_LEVEL_CHAOS_REPUTATION);
         if (isUseChaosReputation) {
-            penalty = -min(MAX_CRIME_PENALTY, prisoners.size()) / 10;
-            if (crimeNoticed) {
-                boolean isUsePersonnelReputation = campaignOptions.get(CampaignOption.CAMPAIGN_LEVEL_CHAOS_REPUTATION);
-                if (isUsePersonnelReputation) {
-                    campaign.getPlayerForce().changeChaosCampaignReputation(penalty);
-                } else {
-                    ChaosReputation.updatePersonnelCriminalRecord(
-                          campaign.getPlayerForce().getHumanResources().getPersonnelFilteringOutDepartedAndAbsent(),
-                          penalty);
-                }
-            }
+            penalty = ChaosReputation.getPrisonerExecutionPenalty(campaign.getPlayerForce(),
+                  prisoners.size(),
+                  crimeNoticed,
+                  isUseCampaignReputationTracking);
         } else {
             penalty = min(MAX_CRIME_PENALTY, prisoners.size() * 2);
             if (crimeNoticed) {

@@ -232,7 +232,7 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
     private static final String CMD_EDIT_KILL_LOG = "KILL_LOG";
     private static final String CMD_ADD_KILL = "ADD_KILL";
     private static final String CMD_SET_XP = "XP_SET";
-    private static final String CMD_ADD_XP = "XP_ADD";
+    private static final String CMD_CHANGE_XP = "CHANGE_XP";
     private static final String CMD_EDIT_BIOGRAPHY = "BIOGRAPHY";
     private static final String CMD_EDIT_PORTRAIT = "PORTRAIT";
     private static final String CMD_EDIT_HITS = "EDIT_HITS";
@@ -1469,7 +1469,7 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
                 }
                 break;
             }
-            case CMD_ADD_XP: {
+            case CMD_CHANGE_XP: {
                 PopupValueChoiceDialog popupValueChoiceDialog = new PopupValueChoiceDialog(getFrame(),
                       true,
                       resources.getString("xp.text"),
@@ -4368,7 +4368,7 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
             gmMenu.add(menuItem);
 
             menuItem = new JMenuItem(resources.getString("addXP.text"));
-            menuItem.setActionCommand(CMD_ADD_XP);
+            menuItem.setActionCommand(CMD_CHANGE_XP);
             menuItem.addActionListener(this);
             gmMenu.add(menuItem);
 

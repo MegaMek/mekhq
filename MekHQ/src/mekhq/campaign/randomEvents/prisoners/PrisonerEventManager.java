@@ -207,18 +207,12 @@ public class PrisonerEventManager {
         int penalty;
         CampaignOptions campaignOptions = campaign.getCampaignOptions();
         boolean isUseChaosReputation = campaignOptions.get(CampaignOption.USE_CHAOS_REPUTATION);
+        boolean isUseCampaignReputationTracking = campaignOptions.get(CampaignOption.CAMPAIGN_LEVEL_CHAOS_REPUTATION);
         if (isUseChaosReputation) {
-            penalty = -min(MAX_CRIME_PENALTY, victims) / 10;
-            if (crimeNoticed) {
-                boolean isUsePersonnelReputation = campaignOptions.get(CampaignOption.CAMPAIGN_LEVEL_CHAOS_REPUTATION);
-                if (isUsePersonnelReputation) {
-                    campaign.getPlayerForce().changeChaosCampaignReputation(penalty);
-                } else {
-                    ChaosReputation.updatePersonnelCriminalRecord(
-                          campaign.getPlayerForce().getHumanResources().getPersonnelFilteringOutDepartedAndAbsent(),
-                          penalty);
-                }
-            }
+            penalty = ChaosReputation.getPrisonerExecutionPenalty(campaign.getPlayerForce(),
+                  victims,
+                  crimeNoticed,
+                  isUseCampaignReputationTracking);
         } else {
             penalty = min(MAX_CRIME_PENALTY, victims * 2);
             if (crimeNoticed) {

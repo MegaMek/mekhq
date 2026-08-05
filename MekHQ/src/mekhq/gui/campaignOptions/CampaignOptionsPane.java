@@ -941,13 +941,14 @@ public class CampaignOptionsPane extends JPanel {
         boolean oldIsUseChaosReputation = oldOptions.useChaosReputation();
 
         boolean newIsTrackFactionStandings = newOptions.trackFactionStanding();
-        if (!isStartUp && newIsTrackFactionStandings && !oldIsTrackFactionStanding) { // Has tracking changed?
+        if (!isStartUp && (newIsTrackFactionStandings != oldIsTrackFactionStanding)) { // Has tracking changed?
             FactionStandingCampaignOptionsChangedConfirmationDialog dialog = new FactionStandingCampaignOptionsChangedConfirmationDialog(
                   campaign.getCampaignFactionIcon(),
                   campaign.getPlayerForce().getFaction(),
                   campaign.getLocalDate(),
                   campaign.getPlayerForce().getFactionStandings(),
                   campaign.getMissions(),
+                  newIsTrackFactionStandings,
                   campaign.getCampaignOptions().get(CampaignOption.REGARD_MULTIPLIER));
 
             List<String> reports = dialog.getReports();

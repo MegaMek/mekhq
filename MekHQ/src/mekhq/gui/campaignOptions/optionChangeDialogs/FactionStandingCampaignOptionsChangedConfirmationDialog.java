@@ -51,6 +51,7 @@ import java.awt.Insets;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.List;
 import javax.swing.Box;
 import javax.swing.BoxLayout;
@@ -92,6 +93,7 @@ public class FactionStandingCampaignOptionsChangedConfirmationDialog extends JDi
     private final LocalDate today;
     private final FactionStandings factionStandings;
     private final List<Mission> missions;
+    private final boolean isFactionStandingEnabled;
     private final double regardMultiplier;
 
     private final List<String> reports = new ArrayList<>();
@@ -102,23 +104,27 @@ public class FactionStandingCampaignOptionsChangedConfirmationDialog extends JDi
      * <p>This dialog displays a summary message and offers "Cancel" and "Confirm" buttons, allowing users to apply
      * or discard changes to faction standings as a result of campaign option modifications.</p>
      *
-     * @param campaignIcon     the icon representing the current campaign, shown in the dialog
-     * @param campaignFaction  the faction associated with the campaign, used when updating standings
-     * @param today            the current date used for date-specific updates or reporting
-     * @param factionStandings the object holding and managing all faction standings data
-     * @param missions         the set of missions relevant for recalculating standings on confirmation
-     * @param regardMultiplier the regard multiplier set in campaign options
+     * @param campaignIcon             the icon representing the current campaign, shown in the dialog
+     * @param campaignFaction          the faction associated with the campaign, used when updating standings
+     * @param today                    the current date used for date-specific updates or reporting
+     * @param factionStandings         the object holding and managing all faction standings data
+     * @param missions                 the set of missions relevant for recalculating standings on confirmation
+     * @param isFactionStandingEnabled {@code true} if faction standings are being enabled; {@code false} if being
+     *                                 disabled
+     * @param regardMultiplier         the regard multiplier set in campaign options
      *
      * @author Illiani
      * @since 0.50.07
      */
     public FactionStandingCampaignOptionsChangedConfirmationDialog(ImageIcon campaignIcon, Faction campaignFaction,
-          LocalDate today, FactionStandings factionStandings, Collection<Mission> missions, double regardMultiplier) {
+          LocalDate today, FactionStandings factionStandings, Collection<Mission> missions,
+          boolean isFactionStandingEnabled, double regardMultiplier) {
         this.campaignIcon = campaignIcon;
         this.campaignFaction = campaignFaction;
         this.today = today;
         this.factionStandings = factionStandings;
         this.missions = new ArrayList<>(missions);
+        this.isFactionStandingEnabled = isFactionStandingEnabled;
         this.regardMultiplier = regardMultiplier;
 
         populateDialog();
@@ -239,8 +245,9 @@ public class FactionStandingCampaignOptionsChangedConfirmationDialog extends JDi
         editorPane.setFocusable(false);
         editorPane.addHyperlinkListener(this::hyperlinkEventListenerActions);
 
+        String descriptionKeySuffix = isFactionStandingEnabled ? "enabled" : "disabled";
         String description = getFormattedTextAt(RESOURCE_BUNDLE,
-              "campaignOptionsChanged.description.enabled",
+              "campaignOptionsChanged.description." + descriptionKeySuffix,
               spanOpeningWithCustomColor(getWarningColor()),
               CLOSING_SPAN_TAG);
         String fontStyle = "font-family: Noto Sans;";
@@ -273,25 +280,29 @@ public class FactionStandingCampaignOptionsChangedConfirmationDialog extends JDi
 
         RoundedJButton btnConfirm = new RoundedJButton(getTextAt(RESOURCE_BUNDLE,
               "gmTools.confirmation.button.confirm"));
-        btnConfirm.addActionListener(evt -> confirmAction());
+        btnConfirm.addActionListener(evt -> {
+            if (isFactionStandingEnabled) {
+                reports.add(getTextAt(RESOURCE_BUNDLE, "gmTools.ZERO_ALL_REGARD.report"));
+                factionStandings.resetAllFactionStandings();
+                factionStandings.updateClimateRegard(campaignFaction, today, regardMultiplier, true);
+                reports.addAll(factionStandings.updateCampaignForPastMissions(missions,
+                      campaignIcon,
+                      campaignFaction,
+                      today,
+                      regardMultiplier));
+            } else {
+                reports.add(getTextAt(RESOURCE_BUNDLE, "gmTools.ZERO_ALL_REGARD.report"));
+                factionStandings.resetAllFactionStandings();
+                factionStandings.setClimateRegard(new HashMap<>());
+            }
+            dispose();
+        });
 
         pnlButtons.add(btnCancel);
-        pnlButtons.add(Box.createRigidArea(scaleForGUI(10, 0)));
+        pnlButtons.add(Box.createRigidArea(new Dimension(10, 0)));
         pnlButtons.add(btnConfirm);
 
         return pnlButtons;
-    }
-
-    private void confirmAction() {
-        reports.add(getTextAt(RESOURCE_BUNDLE, "gmTools.ZERO_ALL_REGARD.report"));
-        factionStandings.resetAllFactionStandings();
-        factionStandings.updateClimateRegard(campaignFaction, today, regardMultiplier, true);
-        reports.addAll(factionStandings.updateCampaignForPastMissions(missions,
-              campaignIcon,
-              campaignFaction,
-              today,
-              regardMultiplier));
-        dispose();
     }
 
     /**

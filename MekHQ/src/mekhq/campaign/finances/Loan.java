@@ -475,7 +475,6 @@ public class Loan {
      *
      * @return an approximate origination date, or {@code null} if {@link #getNextPayment()} is unknown
      */
-    @Deprecated(since = "0.51.01", forRemoval = true)
     private LocalDate approximateOriginationFromProgress() {
         if (getNextPayment() == null) {
             return null;
