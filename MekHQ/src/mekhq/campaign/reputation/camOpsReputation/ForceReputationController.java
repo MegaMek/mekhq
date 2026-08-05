@@ -118,8 +118,8 @@ public class ForceReputationController {
     /**
      * Retrieves the average skill level of the force from the calculated data.
      *
-     * <p><b>Usage Note:</b> generally you want to use
-     * {@link AbstractForce#getAverageSkillLevel(boolean, CampaignOptions, LocalDate)}</p>
+     * <p><b>Usage Note:</b> generally you want to
+     * use {@link AbstractForce#getAverageSkillLevel(CampaignOptions, LocalDate)}</p>
      *
      * @return the average skill level as a SkillLevel object.
      */
