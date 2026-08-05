@@ -400,7 +400,10 @@ public class HireBulkPersonnelDialog extends JDialog {
             // might have occurred via GM Mode or age restrictions.
             setVeterancyAwardEligibility(campaign, person);
 
-            boolean applyStartingReputation = campaignOptions.get(CampaignOption.CAMPAIGN_LEVEL_CHAOS_REPUTATION) &&
+            // Per-character starting reputation only matters under personnel tracking; campaign-level tracking uses a
+            // single stored value, so there is nothing to seed per character.
+            boolean applyStartingReputation = campaignOptions.get(CampaignOption.USE_CHAOS_REPUTATION) &&
+                                                    !campaignOptions.get(CampaignOption.CAMPAIGN_LEVEL_CHAOS_REPUTATION) &&
                                                     campaignOptions.get(CampaignOption.CHAOS_NEW_RECRUITS_HAVE_REPUTATION);
             if (applyStartingReputation) {
                 ChaosReputation.applyStartingReputation(campaignOptions,
