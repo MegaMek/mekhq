@@ -221,6 +221,10 @@ public class ChaosReputation {
     }
 
     public static int getOtherModifiers(Person commander) {
+        if (commander == null) {
+            return 0;
+        }
+
         int otherModifiers = 0;
         PersonnelOptions options = commander.getOptions();
         boolean hasCombatSense = options.booleanOption(ATOW_COMBAT_SENSE);
@@ -584,7 +588,7 @@ public class ChaosReputation {
             if (person.isEmployed()) {
                 int baseReputation = person.getReputationDirect();
                 int delta = getContractBreakDelta(baseReputation);
-                person.changeReputation(-delta);
+                person.changeReputation(delta);
             }
         }
     }

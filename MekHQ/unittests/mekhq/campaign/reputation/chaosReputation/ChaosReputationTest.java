@@ -37,8 +37,11 @@ import static mekhq.campaign.personnel.skills.SkillType.EXP_LEGENDARY;
 import static mekhq.campaign.personnel.skills.SkillType.EXP_NONE;
 import static mekhq.campaign.personnel.skills.SkillType.EXP_REGULAR;
 import static mekhq.campaign.personnel.skills.SkillType.EXP_ULTRA_GREEN;
+import static mekhq.campaign.personnel.skills.SkillType.EXP_VETERAN;
 import static mekhq.campaign.personnel.skills.SkillType.skillLevelFromExperienceLevel;
+import static mekhq.campaign.universe.Faction.PIRATE_FACTION_CODE;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyBoolean;
 import static org.mockito.ArgumentMatchers.anyInt;
@@ -54,6 +57,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+import megamek.common.options.OptionsConstants;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.ForceHumanResources;
 import mekhq.campaign.campaignOptions.CampaignOption;
@@ -68,8 +72,10 @@ import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.PersonnelOptions;
 import mekhq.campaign.personnel.enums.PersonnelRole;
 import mekhq.campaign.personnel.enums.PersonnelStatus;
+import mekhq.campaign.universe.Faction;
 import mekhq.gui.CampaignGUI;
 import org.junit.jupiter.api.Test;
+import org.mockito.ArgumentCaptor;
 
 /**
  * Unit tests for the deterministic logic in {@link ChaosReputation}: the reputation cap, debt penalty, per-role
@@ -552,4 +558,198 @@ class ChaosReputationTest {
         assertEquals(4, ChaosReputation.tabulateReputationFromContracts(campaign, null, null));
     }
     // endregion tabulateReputationFromContracts
+
+    // region getOtherModifiers
+    @Test
+    void getOtherModifiers_nullCommanderIsZero() {
+        assertEquals(0, ChaosReputation.getOtherModifiers(null));
+    }
+
+    @Test
+    void getOtherModifiers_commanderWithoutRelevantSpaIsZero() {
+        assertEquals(0, ChaosReputation.getOtherModifiers(personWith()));
+    }
+
+    @Test
+    void getOtherModifiers_impressiveLeaderAddsOne() {
+        assertEquals(1, ChaosReputation.getOtherModifiers(personWith(PersonnelOptions.IMPRESSIVE_LEADER)));
+    }
+
+    @Test
+    void getOtherModifiers_disappointingLeaderSubtractsOne() {
+        assertEquals(-1, ChaosReputation.getOtherModifiers(personWith(PersonnelOptions.DISAPPOINTING_LEADER)));
+    }
+
+    @Test
+    void getOtherModifiers_combatSenseAddsOne() {
+        assertEquals(1, ChaosReputation.getOtherModifiers(personWith(OptionsConstants.ATOW_COMBAT_SENSE)));
+    }
+
+    @Test
+    void getOtherModifiers_combatParalysisSubtractsOne() {
+        assertEquals(-1, ChaosReputation.getOtherModifiers(personWith(OptionsConstants.ATOW_COMBAT_PARALYSIS)));
+    }
+
+    @Test
+    void getOtherModifiers_opposingModifiersCancelOut() {
+        Person commander = personWith(OptionsConstants.ATOW_COMBAT_SENSE, PersonnelOptions.DISAPPOINTING_LEADER);
+        assertEquals(0, ChaosReputation.getOtherModifiers(commander));
+    }
+    // endregion getOtherModifiers
+
+    // region updatePersonnelCriminalRecord
+
+    /** An employed/unemployed character mock, usable in criminal-record and contract-break helpers. */
+    private static Person employablePerson(boolean employed) {
+        Person person = personWith();
+        when(person.isEmployed()).thenReturn(employed);
+        return person;
+    }
+
+    @Test
+    void updatePersonnelCriminalRecord_adjustsEmployedPersonnel() {
+        Person employed = employablePerson(true);
+
+        ChaosReputation.updatePersonnelCriminalRecord(List.of(employed), -2);
+
+        verify(employed).changeCriminalRecord(-2);
+    }
+
+    @Test
+    void updatePersonnelCriminalRecord_skipsUnemployedPersonnel() {
+        Person unemployed = employablePerson(false);
+
+        ChaosReputation.updatePersonnelCriminalRecord(List.of(unemployed), -2);
+
+        verify(unemployed, never()).changeCriminalRecord(anyInt());
+    }
+    // endregion updatePersonnelCriminalRecord
+
+    // region processContractCompletion (personnel-level breach)
+    @Test
+    void processContractCompletion_personnelLevelBreachPenalizesEachCharacter() {
+        // getReputationDirect() defaults to 0, so the break delta is -max(round(0 * 0.5), 3) = -3. The change must be
+        // negative: breaking a contract lowers reputation.
+        Person first = contractPerson();
+        Person second = contractPerson();
+        List<Person> personnel = List.of(first, second);
+        Campaign campaign = personnelLevelCampaign(personnel, false);
+
+        ChaosReputation.processContractCompletion(campaign, MissionStatus.BREACH, personnel);
+
+        verify(first).changeReputation(-3);
+        verify(second).changeReputation(-3);
+    }
+
+    @Test
+    void processContractCompletion_personnelLevelBreachHalvesHighReputation() {
+        // getReputationDirect() = 10, so the break delta is -max(round(10 * 0.5), 3) = -5.
+        Person person = contractPerson();
+        when(person.getReputationDirect()).thenReturn(10);
+        List<Person> personnel = List.of(person);
+        Campaign campaign = personnelLevelCampaign(personnel, false);
+
+        ChaosReputation.processContractCompletion(campaign, MissionStatus.BREACH, personnel);
+
+        verify(person).changeReputation(-5);
+    }
+    // endregion processContractCompletion (personnel-level breach)
+
+    // region applyStartingReputation
+
+    /** A character whose primary-role skill level is fixed, for starting-reputation tests. */
+    private static Person startingReputationPerson(boolean civilian, int skillLevel) {
+        Person person = mock(Person.class);
+        when(person.isCivilian()).thenReturn(civilian);
+        when(person.getExperienceLevel(any(), anyBoolean(), any(), eq(false), eq(true))).thenReturn(skillLevel);
+        return person;
+    }
+
+    @Test
+    void applyStartingReputation_civilianIsUnchanged() {
+        Person civilian = startingReputationPerson(true, EXP_REGULAR);
+
+        ChaosReputation.applyStartingReputation(mock(CampaignOptions.class), false, DATE, civilian);
+
+        verify(civilian, never()).setReputationDirect(anyInt());
+    }
+
+    @Test
+    void applyStartingReputation_regularGetsStartingScore() {
+        Person regular = startingReputationPerson(false, EXP_REGULAR);
+
+        ChaosReputation.applyStartingReputation(mock(CampaignOptions.class), false, DATE, regular);
+
+        verify(regular).setReputationDirect(ChaosReputation.STARTING_REPUTATION_SCORE);
+    }
+
+    @Test
+    void applyStartingReputation_veteranGetsBonus() {
+        Person veteran = startingReputationPerson(false, EXP_VETERAN);
+
+        ChaosReputation.applyStartingReputation(mock(CampaignOptions.class), false, DATE, veteran);
+
+        verify(veteran).setReputationDirect(ChaosReputation.STARTING_REPUTATION_SCORE + 1);
+    }
+
+    @Test
+    void applyStartingReputation_eliteGetsLargerBonus() {
+        Person elite = startingReputationPerson(false, EXP_ELITE);
+
+        ChaosReputation.applyStartingReputation(mock(CampaignOptions.class), false, DATE, elite);
+
+        verify(elite).setReputationDirect(ChaosReputation.STARTING_REPUTATION_SCORE + 2);
+    }
+    // endregion applyStartingReputation
+
+    // region applyStartingCriminalRecord
+    private static Person originFactionPerson(String factionCode, boolean child, boolean civilian) {
+        Faction faction = mock(Faction.class);
+        when(faction.getShortName()).thenReturn(factionCode);
+        Person person = mock(Person.class);
+        when(person.getOriginFaction()).thenReturn(faction);
+        when(person.isChild(any(), eq(false))).thenReturn(child);
+        when(person.isCivilian()).thenReturn(civilian);
+        return person;
+    }
+
+    @Test
+    void applyStartingCriminalRecord_nonPirateIsUnchanged() {
+        Person person = originFactionPerson("FS", false, false);
+
+        ChaosReputation.applyStartingCriminalRecord(DATE, person);
+
+        verify(person, never()).setCriminalRecord(anyInt());
+    }
+
+    @Test
+    void applyStartingCriminalRecord_pirateChildIsUnchanged() {
+        Person person = originFactionPerson(PIRATE_FACTION_CODE, true, false);
+
+        ChaosReputation.applyStartingCriminalRecord(DATE, person);
+
+        verify(person, never()).setCriminalRecord(anyInt());
+    }
+
+    @Test
+    void applyStartingCriminalRecord_pirateCivilianIsUnchanged() {
+        Person person = originFactionPerson(PIRATE_FACTION_CODE, false, true);
+
+        ChaosReputation.applyStartingCriminalRecord(DATE, person);
+
+        verify(person, never()).setCriminalRecord(anyInt());
+    }
+
+    @Test
+    void applyStartingCriminalRecord_pirateAdultGetsNegativeD6() {
+        Person person = originFactionPerson(PIRATE_FACTION_CODE, false, false);
+
+        ChaosReputation.applyStartingCriminalRecord(DATE, person);
+
+        ArgumentCaptor<Integer> captor = ArgumentCaptor.forClass(Integer.class);
+        verify(person).setCriminalRecord(captor.capture());
+        int record = captor.getValue();
+        assertTrue(record >= -6 && record <= -1, "criminal record should be a negated d6 result, was " + record);
+    }
+    // endregion applyStartingCriminalRecord
 }

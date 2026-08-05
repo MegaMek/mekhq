@@ -33,7 +33,6 @@
 package mekhq.campaign.chaosCampaign;
 
 import java.math.BigDecimal;
-import java.math.RoundingMode;
 
 import mekhq.campaign.finances.Money;
 
@@ -49,7 +48,6 @@ public class ChaosCampaignUtilities {
         BigDecimal reducedMoneyAmount = reducedMoney.getAmount();
 
         return reducedMoneyAmount
-                     .setScale(0, RoundingMode.HALF_UP)
                      .min(BigDecimal.valueOf(Integer.MAX_VALUE))
                      .max(BigDecimal.valueOf(Integer.MIN_VALUE))
                      .intValue();
