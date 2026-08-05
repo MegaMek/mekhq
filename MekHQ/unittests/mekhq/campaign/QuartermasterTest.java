@@ -276,6 +276,11 @@ public class QuartermasterTest {
         // ...then we should automatically buy a unit...
         Entity mockEntity = mock(Entity.class);
         int transitDays = 10;
+
+        Unit mockUnit = mock(Unit.class);
+        when(mockCampaign.addNewUnit(eq(mockEntity), eq(false), eq(transitDays), eq(PartQuality.QUALITY_D)))
+              .thenReturn(mockUnit);
+
         assertTrue(quartermaster.buyUnit(mockEntity, transitDays));
 
         // ...and the new unit should be added to the campaign.
@@ -332,6 +337,11 @@ public class QuartermasterTest {
         double cost = 1.0;
         doReturn(cost).when(mockEntity).getCost(anyBoolean());
 
+        Unit mockUnit = mock(Unit.class);
+        when(mockCampaign.addNewUnit(eq(mockEntity), eq(false), eq(0), eq(PartQuality.QUALITY_D)))
+              .thenReturn(mockUnit);
+
+
         // ...then we should be able to buy the unit...
         assertTrue(quartermaster.buyUnit(mockEntity, 0));
 
@@ -363,6 +373,10 @@ public class QuartermasterTest {
         Infantry mockEntity = mock(Infantry.class);
         double cost = 2.0;
         when(mockEntity.getAlternateCost()).thenReturn(cost);
+
+        Unit mockUnit = mock(Unit.class);
+        when(mockCampaign.addNewUnit(eq(mockEntity), eq(false), eq(0), eq(PartQuality.QUALITY_D)))
+              .thenReturn(mockUnit);
 
         // ...then we should be able to buy the infantry...
         assertTrue(quartermaster.buyUnit(mockEntity, 0));
@@ -401,6 +415,10 @@ public class QuartermasterTest {
         double cost = 1.0;
         doReturn(cost).when(mockEntity).getCost(anyBoolean());
 
+        Unit mockUnit = mock(Unit.class);
+        when(mockCampaign.addNewUnit(eq(mockEntity), eq(false), eq(0), eq(PartQuality.QUALITY_D)))
+              .thenReturn(mockUnit);
+
         // ...then we should be able to buy the unit...
         assertTrue(quartermaster.buyUnit(mockEntity, 0));
 
@@ -437,6 +455,10 @@ public class QuartermasterTest {
         when(mockEntity.isClan()).thenReturn(true);
         double cost = 1.0;
         when(mockEntity.getAlternateCost()).thenReturn(cost);
+
+        Unit mockUnit = mock(Unit.class);
+        when(mockCampaign.addNewUnit(eq(mockEntity), eq(false), eq(0), eq(PartQuality.QUALITY_D)))
+              .thenReturn(mockUnit);
 
         // ...then we should be able to buy the clan infantry...
         assertTrue(quartermaster.buyUnit(mockEntity, 0));
@@ -3079,8 +3101,8 @@ public class QuartermasterTest {
     }
 
     /**
-     * Regression test for GitHub #7414: removeAmmo should clean up 0-shot AmmoStorage entries
-     * rather than leaving them in the warehouse where they block future ammo lookups.
+     * Regression test for GitHub #7414: removeAmmo should clean up 0-shot AmmoStorage entries rather than leaving them
+     * in the warehouse where they block future ammo lookups.
      */
     @Test
     public void removeAmmoCleanUpZeroShotAmmoStorage() {

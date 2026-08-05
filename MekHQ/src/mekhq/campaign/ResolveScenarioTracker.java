@@ -74,6 +74,7 @@ import mekhq.campaign.finances.Money;
 import mekhq.campaign.finances.enums.TransactionType;
 import mekhq.campaign.force.Formation;
 import mekhq.campaign.log.ServiceLogger;
+import mekhq.campaign.log.UnitLogger;
 import mekhq.campaign.mission.AtBContract;
 import mekhq.campaign.mission.AtBScenario;
 import mekhq.campaign.mission.BotForce;
@@ -688,6 +689,8 @@ public class ResolveScenarioTracker {
                               getScenarioId(),
                               formationId,
                               unit.getEntity().getEntityType()));
+
+                        UnitLogger.scoredKill(unit, campaign.getLocalDate(), killed, person.getFullName());
                     }
                 }
             }
