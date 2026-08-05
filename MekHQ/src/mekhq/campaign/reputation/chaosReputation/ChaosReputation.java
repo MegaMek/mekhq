@@ -39,9 +39,13 @@ import static java.lang.Math.max;
 import static java.lang.Math.min;
 import static java.lang.Math.round;
 import static megamek.common.compute.Compute.d6;
+import static mekhq.campaign.personnel.skills.SkillType.EXP_ELITE;
+import static mekhq.campaign.personnel.skills.SkillType.EXP_HEROIC;
 import static mekhq.campaign.personnel.skills.SkillType.EXP_LEGENDARY;
 import static mekhq.campaign.personnel.skills.SkillType.EXP_NONE;
 import static mekhq.campaign.personnel.skills.SkillType.EXP_ULTRA_GREEN;
+import static mekhq.campaign.personnel.skills.SkillType.EXP_VETERAN;
+import static mekhq.campaign.universe.Faction.PIRATE_FACTION_CODE;
 import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
 import static mekhq.utilities.MHQInternationalization.getTextAt;
 import static mekhq.utilities.ReportingUtilities.CLOSING_SPAN_TAG;
@@ -968,5 +972,41 @@ public class ChaosReputation {
         meanExperienceLevel = clamp(meanExperienceLevel, EXP_NONE, EXP_LEGENDARY);
 
         return SkillType.skillLevelFromExperienceLevel(meanExperienceLevel);
+    }
+
+    public static void applyStartingReputation(CampaignOptions campaignOptions, boolean isClanForce,
+          LocalDate currentDate, Person person) {
+        if (person.isCivilian()) {
+            return;
+        }
+
+        int skillLevel = person.getExperienceLevel(campaignOptions,
+              isClanForce,
+              currentDate,
+              false,
+              true);
+
+        int startingReputation = STARTING_REPUTATION_SCORE + switch (skillLevel) {
+            case EXP_VETERAN -> 1;
+            case EXP_ELITE -> 2;
+            case EXP_HEROIC -> 3;
+            case EXP_LEGENDARY -> 4;
+            default -> 0;
+        };
+
+        person.setReputationDirect(startingReputation);
+    }
+
+    public static void applyStartingCriminalRecord(LocalDate currentDate, Person person) {
+        boolean isPirate = person.getOriginFaction().getShortName().equals(PIRATE_FACTION_CODE);
+        boolean isChild = person.isChild(currentDate, false);
+        boolean isCivilian = person.isCivilian();
+
+        if (!isPirate || isChild || isCivilian) {
+            return;
+        }
+
+        int roll = -d6(1);
+        person.setCriminalRecord(roll);
     }
 }

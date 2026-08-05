@@ -36,6 +36,7 @@ import static megamek.common.compute.Compute.d6;
 import static mekhq.campaign.personnel.generator.AbstractSkillGenerator.addSkill;
 import static mekhq.campaign.personnel.skills.SkillType.EXP_VETERAN;
 
+import java.time.LocalDate;
 import java.util.Collections;
 import java.util.Enumeration;
 import java.util.List;
@@ -43,7 +44,6 @@ import java.util.List;
 import megamek.common.enums.SkillLevel;
 import megamek.common.options.IOption;
 import mekhq.campaign.Campaign;
-import mekhq.campaign.ForceHumanResources;
 import mekhq.campaign.campaignOptions.CampaignOption;
 import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.personnel.enums.PersonnelRole;
@@ -52,6 +52,7 @@ import mekhq.campaign.personnel.generator.DefaultSpecialAbilityGenerator;
 import mekhq.campaign.personnel.skills.RandomSkillPreferences;
 import mekhq.campaign.personnel.skills.Skill;
 import mekhq.campaign.personnel.skills.SkillType;
+import mekhq.campaign.reputation.chaosReputation.ChaosReputation;
 
 /**
  * Utility class that provides methods for managing and modifying the skills, loyalty, and advantages of personnel in
@@ -179,7 +180,12 @@ public class PersonUtility {
         boolean applyStartingReputation = campaignOptions.get(CampaignOption.CAMPAIGN_LEVEL_CHAOS_REPUTATION) &&
                                                 campaignOptions.get(CampaignOption.CHAOS_NEW_RECRUITS_HAVE_REPUTATION);
         if (applyStartingReputation) {
-            ForceHumanResources.applyStartingReputation(campaign, person);
+            LocalDate currentDay = campaign.getLocalDate();
+            ChaosReputation.applyStartingReputation(campaignOptions,
+                  campaign.getPlayerForce().isClanForce(),
+                  currentDay,
+                  person);
+            ChaosReputation.applyStartingCriminalRecord(currentDay, person);
         }
 
         if (checkVeterancyEligibility) {

@@ -59,12 +59,12 @@ import megamek.common.icons.Portrait;
 import megamek.logging.MMLogger;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
-import mekhq.campaign.ForceHumanResources;
 import mekhq.campaign.campaignOptions.CampaignOption;
 import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.enums.PersonnelRole;
 import mekhq.campaign.personnel.enums.Profession;
+import mekhq.campaign.reputation.chaosReputation.ChaosReputation;
 import mekhq.gui.CampaignGUI;
 import mekhq.gui.displayWrappers.RankDisplay;
 
@@ -403,8 +403,13 @@ public class HireBulkPersonnelDialog extends JDialog {
             boolean applyStartingReputation = campaignOptions.get(CampaignOption.CAMPAIGN_LEVEL_CHAOS_REPUTATION) &&
                                                     campaignOptions.get(CampaignOption.CHAOS_NEW_RECRUITS_HAVE_REPUTATION);
             if (applyStartingReputation) {
-                ForceHumanResources.applyStartingReputation(campaign, person);
+                ChaosReputation.applyStartingReputation(campaignOptions,
+                      campaign.getPlayerForce().isClanForce(),
+                      today,
+                      person);
+                ChaosReputation.applyStartingCriminalRecord(today, person);
             }
+
 
             if (!campaign.getPlayerForce().getHumanResources().recruitPerson(campaign, person, isGmHire, true)) {
                 number = 0;
