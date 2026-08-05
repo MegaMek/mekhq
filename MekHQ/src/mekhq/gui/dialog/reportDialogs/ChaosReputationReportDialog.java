@@ -317,7 +317,8 @@ public class ChaosReputationReportDialog extends AbstractReportDialog {
         int otherModifiers = ChaosReputation.getOtherModifiers(commander);
         int manualModifier = campaignOptions.get(CampaignOption.MANUAL_UNIT_RATING_MODIFIER);
         int cap = campaignOptions.get(CampaignOption.CHAOS_REPUTATION_CAP);
-        int total = ChaosReputation.applyReputationCap(cap, averageReputation + debtModifier + manualModifier);
+        int total = ChaosReputation.applyReputationCap(cap,
+              averageReputation + debtModifier + otherModifiers + manualModifier);
 
         description.append("<table>");
         description.append(summaryRow(getTextAt(RESOURCE_BUNDLE, "report.averageReputation"),
