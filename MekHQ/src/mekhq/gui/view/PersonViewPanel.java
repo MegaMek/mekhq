@@ -1709,7 +1709,8 @@ public class PersonViewPanel extends JScrollablePanel {
             y++;
         }
 
-        if (campaignOptions.get(CampaignOption.USE_CHAOS_REPUTATION)) {
+        if (campaignOptions.get(CampaignOption.USE_CHAOS_REPUTATION) &&
+                  !campaignOptions.get(CampaignOption.CAMPAIGN_LEVEL_CHAOS_REPUTATION)) {
             int baseReputation = person.getReputationDirect();
             int criminalRecord = person.getCriminalRecord();
             boolean isClanForce = campaign.getPlayerForce().isClanForce();
