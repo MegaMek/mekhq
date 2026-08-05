@@ -4869,7 +4869,7 @@ public class Person implements ILocatable {
             case VEHICLE_GUNNER, VEHICLE_CREW, COMBAT_TECHNICIAN -> {
                 // Vehicle gunners need special handling to guesstimate what they should be. We base this on the unit
                 // they are currently assigned to.
-                Entity assignedEntity = person.getUnitFromEntity();
+                Entity assignedEntity = person.getEntityFromUnit();
                 if (assignedEntity != null) {
                     if (assignedEntity instanceof VTOL) {
                         newProfession = PersonnelRole.VEHICLE_CREW_VTOL;
@@ -6703,7 +6703,7 @@ public class Person implements ILocatable {
         return unit;
     }
 
-    public @Nullable Entity getUnitFromEntity() {
+    public @Nullable Entity getEntityFromUnit() {
         if (unit == null) {
             return null;
         }
@@ -6794,31 +6794,8 @@ public class Person implements ILocatable {
         }
     }
 
-    /**
-     * Returns the distinct base chassis names of every unit the person is currently assigned to: the unit they crew and
-     * every unit for which they are the directly-assigned tech. Used for daily chassis-familiarity accrual.
-     *
-     * @return the set of assigned base chassis names (possibly empty)
-     */
-    private Set<String> getAssignedChassis() {
-        Set<String> chassis = new HashSet<>();
-        Entity crewedEntity = getUnitFromEntity();
-        if (crewedEntity != null && crewedEntity.isChassisFamiliarityEligible()) {
-            chassis.add(crewedEntity.getChassis());
-        }
-
-        for (Unit techUnit : getTechUnits()) {
-            Entity techEntity = techUnit.getEntity();
-            if (techEntity != null && techEntity.isChassisFamiliarityEligible()) {
-                chassis.add(techEntity.getChassis());
-            }
-        }
-
-        return chassis;
-    }
-
     public int getChassisFamiliarityCombatBonus(FamiliarityMode mode, boolean isGunnery) {
-        Entity entity = getUnitFromEntity();
+        Entity entity = getEntityFromUnit();
         if (!mode.isEnabled() ||
                   entity == null ||
                   !entity.isChassisFamiliarityEligible()) {

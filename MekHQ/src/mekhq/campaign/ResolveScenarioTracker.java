@@ -45,7 +45,6 @@ import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
 import static mekhq.utilities.MHQInternationalization.getTextAt;
 import static mekhq.utilities.ReportingUtilities.CLOSING_SPAN_TAG;
 import static mekhq.utilities.ReportingUtilities.getAmazingColor;
-import static mekhq.utilities.ReportingUtilities.getWarningColor;
 import static mekhq.utilities.ReportingUtilities.spanOpeningWithCustomColor;
 
 import java.io.File;
@@ -2063,25 +2062,18 @@ public class ResolveScenarioTracker {
         boolean singleUnitAssignment = unitTech.getTechUnits().size() == 1;
         if (singleUnitAssignment) {
             awardFamiliarity(unitTech, chassis, cap, familiarityDice);
-        } else {
-            String report = getFormattedTextAt(RESOURCE_BUNDLE,
-                  "ResolveScenarioTracker.multiTechAssignment",
-                  unitTech.getHyperlinkedFullTitle(),
-                  spanOpeningWithCustomColor(getWarningColor()),
-                  CLOSING_SPAN_TAG);
-            campaign.addReport(DailyReportType.PERSONNEL, report);
         }
     }
 
     private void awardFamiliarity(Person crew, String chassis, int cap, int familiarityDice) {
         PersonnelOptions options = crew.getOptions();
-        boolean hasFreeLove = options.booleanOption(FAMILIARITY_IRON_BOND);
+        boolean hasIronBond = options.booleanOption(FAMILIARITY_IRON_BOND);
         boolean isEmotionallyUnavailable = options.booleanOption(FAMILIARITY_EMOTIONALLY_UNAVAILABLE);
 
         int currentFamiliarity = crew.getChassisFamiliarity(chassis);
 
         double multiplier = 1.0;
-        if (hasFreeLove) {
+        if (hasIronBond) {
             multiplier = 1.5;
         }
 

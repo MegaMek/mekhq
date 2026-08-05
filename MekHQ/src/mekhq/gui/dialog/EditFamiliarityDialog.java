@@ -115,7 +115,7 @@ public class EditFamiliarityDialog extends JDialog {
         comboAddChassis = new JComboBox<>(getCandidateChassis(campaign).toArray(new String[0]));
         comboAddChassis.setEditable(true);
         comboAddChassis.setSelectedItem("");
-        spnAddValue = new JSpinner(new SpinnerNumberModel(cap, 0, cap, 1));
+        spnAddValue = new JSpinner(new SpinnerNumberModel(0, 0, cap, 1));
         JButton btnAdd = new JButton(getTextAt(RESOURCE_BUNDLE, "EditFamiliarityDialog.add"));
         btnAdd.addActionListener(evt -> addChassisRow());
         addPanel.add(new JLabel(getTextAt(RESOURCE_BUNDLE, "EditFamiliarityDialog.addChassis")));
