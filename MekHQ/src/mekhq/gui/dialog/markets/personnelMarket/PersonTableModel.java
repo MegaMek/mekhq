@@ -94,6 +94,7 @@ public class PersonTableModel extends AbstractTableModel {
 
     private final Campaign campaign;
     private final List<Person> people;
+    private final List<ApplicantTableColumns> columns;
 
     /**
      * Creates a new {@code PersonTableModel} for the provided campaign and list of people.
@@ -107,6 +108,7 @@ public class PersonTableModel extends AbstractTableModel {
     public PersonTableModel(Campaign campaign, List<Person> people) {
         this.campaign = campaign;
         this.people = people;
+        this.columns = ApplicantTableColumns.getVisibleColumns(campaign.getCampaignOptions());
     }
 
     @Override
@@ -116,12 +118,12 @@ public class PersonTableModel extends AbstractTableModel {
 
     @Override
     public int getColumnCount() {
-        return ApplicantTableColumns.values().length;
+        return columns.size();
     }
 
     @Override
     public String getColumnName(int column) {
-        return ApplicantTableColumns.values()[column].getLabel();
+        return columns.get(column).getLabel();
     }
 
     @Override
@@ -151,7 +153,7 @@ public class PersonTableModel extends AbstractTableModel {
         }
 
         CampaignOptions campaignOptions = campaign.getCampaignOptions();
-        ApplicantTableColumns column = ApplicantTableColumns.values()[columnIndex];
+        ApplicantTableColumns column = columns.get(columnIndex);
         return switch (column) {
             case FULL_NAME -> {
                 String name = person.getFullName();
@@ -211,7 +213,7 @@ public class PersonTableModel extends AbstractTableModel {
      * @since 0.50.06
      */
     public Comparator<?> getComparator(int columnIndex) {
-        ApplicantTableColumns column = ApplicantTableColumns.values()[columnIndex];
+        ApplicantTableColumns column = columns.get(columnIndex);
         return switch (column) {
             case AGE, HIRING_COST -> new IntegerStringSorter();
             case POSITIVE_ABILITIES, NEGATIVE_ABILITIES, PERFORMANCE_EXAM, REPUTATION -> Comparator.naturalOrder();

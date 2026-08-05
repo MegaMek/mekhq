@@ -43,6 +43,7 @@ import java.util.stream.Collectors;
 
 import megamek.common.annotations.Nullable;
 import mekhq.MekHQ;
+import mekhq.campaign.campaignOptions.CampaignOption;
 import mekhq.campaign.campaignOptions.CampaignOptions;
 
 public enum PersonnelTabView {
@@ -106,8 +107,10 @@ public enum PersonnelTabView {
                 REASONING, CampaignOptions::isUseRandomPersonalities)),
     SERVICE_RECORD("PersonnelTabView.SERVICE_RECORD.text", "PersonnelTabView.SERVICE_RECORD.toolTipText",
           Set.of(RANK, FIRST_NAME, LAST_NAME, PERSONNEL_ROLE, COMMAND_STATUS, FOUNDER, RECRUITMENT_DATE,
-                RETIREMENT_DATE, SALARY, KILLS),
-          Map.of(RECRUITMENT_DATE, CampaignOptions::isUseTimeInService)),
+                RETIREMENT_DATE, SALARY, KILLS, REPUTATION),
+          Map.of(RECRUITMENT_DATE, CampaignOptions::isUseTimeInService,
+                REPUTATION, options -> options.get(CampaignOption.USE_CHAOS_REPUTATION) &&
+                                             !options.get(CampaignOption.CAMPAIGN_LEVEL_CHAOS_REPUTATION))),
     BIOGRAPHICAL("PersonnelTabView.BIOGRAPHICAL.text", "PersonnelTabView.BIOGRAPHICAL.toolTipText",
           Set.of(RANK, FIRST_NAME, LAST_NAME, AGE, DEATH_DATE, PERSONNEL_STATUS, BLOODNAME, ORIGIN),
           Map.of(ORIGIN, CampaignOptions::isShowOriginFaction,

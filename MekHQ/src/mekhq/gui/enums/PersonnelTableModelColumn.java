@@ -301,6 +301,18 @@ public enum PersonnelTableModelColumn implements MHQTableColumn {
                 campaign.getPlayerForce().isClanForce(),
                 campaign.getLocalDate()),
           Object::toString),
+    REPUTATION("Column.REPUTATION.title",
+          Comparators.INT_COMPARATOR,
+          (person, campaign) -> {
+              CampaignOptions campaignOptions = campaign.getCampaignOptions();
+              boolean applyPersonality = campaignOptions.get(CampaignOption.CHAOS_PERSONALITY_AFFECTS_REPUTATION) &&
+                                               campaignOptions.get(CampaignOption.USE_RANDOM_PERSONALITIES);
+              return person.getAdjustedReputation(campaignOptions.get(CampaignOption.USE_AGE_EFFECTS),
+                    campaign.getPlayerForce().isClanForce(),
+                    campaign.getLocalDate(),
+                    applyPersonality);
+          },
+          Object::toString),
     UNLUCKY("Column.UNLUCKY.title", Comparators.INT_COMPARATOR,
           Person::getUnlucky, Object::toString),
     BLOODMARK("Column.BLOODMARK.title", Comparators.INT_COMPARATOR,

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2025 The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2025-2026 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -33,6 +33,12 @@
 package mekhq.gui.dialog.markets.personnelMarket;
 
 import static mekhq.utilities.MHQInternationalization.getTextAt;
+
+import java.util.ArrayList;
+import java.util.List;
+
+import mekhq.campaign.campaignOptions.CampaignOption;
+import mekhq.campaign.campaignOptions.CampaignOptions;
 
 /**
  * Defines the columns for the applicant table in the Recruitment GUI.
@@ -116,5 +122,32 @@ public enum ApplicantTableColumns {
      */
     public String getLabel() {
         return getTextAt(RESOURCE_BUNDLE, name() + ".label");
+    }
+
+    /**
+     * Returns the ordered columns that should be shown for the current campaign configuration.
+     *
+     * <p>{@link #REPUTATION} is only included when Chaos Reputation is enabled and it is not tracked at the campaign
+     * level (in that mode individual characters do not carry a reputation value).</p>
+     *
+     * @param campaignOptions the campaign options driving column visibility
+     *
+     * @return the ordered list of columns to display
+     *
+     * @author Illiani
+     * @since 0.50.06
+     */
+    public static List<ApplicantTableColumns> getVisibleColumns(CampaignOptions campaignOptions) {
+        boolean showReputation = campaignOptions.get(CampaignOption.USE_CHAOS_REPUTATION) &&
+                                       !campaignOptions.get(CampaignOption.CAMPAIGN_LEVEL_CHAOS_REPUTATION);
+
+        List<ApplicantTableColumns> visibleColumns = new ArrayList<>();
+        for (ApplicantTableColumns column : values()) {
+            if (column == REPUTATION && !showReputation) {
+                continue;
+            }
+            visibleColumns.add(column);
+        }
+        return visibleColumns;
     }
 }
