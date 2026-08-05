@@ -61,6 +61,11 @@ public enum ApplicantTableColumns {
      */
     EXPERIENCE(2),
     /**
+     * The applicant's adjusted Chaos Campaign reputation. Only shown when Chaos Reputation is enabled and it is not
+     * tracked at the campaign level.
+     */
+    REPUTATION(3),
+    /**
      * The applicant's age
      */
     AGE(3),
