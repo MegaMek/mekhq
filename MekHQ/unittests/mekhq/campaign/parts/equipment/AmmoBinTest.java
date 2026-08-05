@@ -42,8 +42,11 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.RETURNS_DEEP_STUBS;
 import static org.mockito.Mockito.doAnswer;
+import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -57,19 +60,25 @@ import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.ParserConfigurationException;
 
 import megamek.Version;
+import megamek.common.enums.TechRating;
 import megamek.common.equipment.AmmoMounted;
 import megamek.common.equipment.AmmoType;
 import megamek.common.equipment.Mounted;
 import megamek.common.equipment.WeaponMounted;
 import megamek.common.equipment.WeaponType;
+import megamek.common.rolls.TargetRoll;
 import megamek.common.units.Entity;
 import megamek.common.units.ProtoMek;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.LocalWarehouse;
+import mekhq.campaign.campaignOptions.CampaignOption;
 import mekhq.campaign.campaignOptions.CampaignOptions;
+import mekhq.campaign.finances.Money;
 import mekhq.campaign.parts.AmmoStorage;
 import mekhq.campaign.parts.Part;
 import mekhq.campaign.parts.enums.PartRepairType;
+import mekhq.campaign.personnel.Person;
+import mekhq.campaign.personnel.PersonnelOptions;
 import mekhq.campaign.unit.Unit;
 import mekhq.campaign.work.IAcquisitionWork;
 import mekhq.utilities.MHQXMLUtility;
@@ -1580,6 +1589,128 @@ public class AmmoBinTest {
             AmmoBin ammoBin2 = new AmmoBin(0, ammo2, equipmentNum, shotsNeeded, false, false, mockCampaign);
 
             assertFalse(ammoBin1.isSamePartType(ammoBin2));
+        }
+    }
+
+    @Nested
+    class Fabrication {
+        private AmmoBin newBin(Campaign campaign, int shotsNeeded) {
+            AmmoType ammoType = getAmmoType("ISSRM6 Inferno Ammo");
+            return new AmmoBin(0, ammoType, -1, shotsNeeded, false, false, campaign);
+        }
+
+        @Test
+        public void fabricationMultipliesReloadTimeByTen() {
+            Campaign mockCampaign = mockCampaign();
+            AmmoBin ammoBin = newBin(mockCampaign, 10);
+
+            int normalTime = ammoBin.getActualTime();
+
+            ammoBin.setFabricating(true);
+
+            assertEquals(normalTime * 10, ammoBin.getActualTime());
+        }
+
+        @Test
+        public void routineReloadRemainsAutomaticSuccess() {
+            Campaign mockCampaign = mockCampaign();
+            AmmoBin ammoBin = newBin(mockCampaign, 10);
+
+            // A normal reload from stock loads automatically; only fabrication turns it into a genuine roll.
+            assertEquals(TargetRoll.AUTOMATIC_SUCCESS, ammoBin.getAllMods(null).getValue());
+        }
+
+        @Test
+        public void ammoFabricationCostScalesWithShotsNeeded() {
+            Campaign mockCampaign = mockCampaign();
+            CampaignOptions options = new CampaignOptions();
+            options.set(CampaignOption.PAY_FOR_PARTS, true);
+            options.set(CampaignOption.PAY_FOR_REPAIRS, false);
+            options.set(CampaignOption.USE_BALANCED_FABRICATION, true);
+            when(mockCampaign.getCampaignOptions()).thenReturn(options);
+
+            AmmoBin ammoBin = newBin(mockCampaign, 10);
+
+            // The cost basis is the value of the shots actually needed, times ten under the balanced profile.
+            Money expected = ammoBin.getValueNeeded().multipliedBy(10);
+            assertEquals(expected, ammoBin.getFabricationCost());
+        }
+
+        @Test
+        public void fabricationIsFreeWhenNotPayingForPartsOrRepairs() {
+            Campaign mockCampaign = mockCampaign();
+            CampaignOptions options = new CampaignOptions();
+            options.set(CampaignOption.PAY_FOR_PARTS, false);
+            options.set(CampaignOption.PAY_FOR_REPAIRS, false);
+            when(mockCampaign.getCampaignOptions()).thenReturn(options);
+
+            AmmoBin ammoBin = newBin(mockCampaign, 10);
+
+            assertTrue(ammoBin.getFabricationCost().isZero());
+        }
+
+        @Test
+        public void cancelFabricationClearsTheFabricationFlags() {
+            Campaign mockCampaign = mockCampaign();
+            AmmoBin ammoBin = newBin(mockCampaign, 10);
+            ammoBin.setFabricating(true);
+            ammoBin.setFabricateUntilSuccess(true);
+
+            ammoBin.cancelFabrication();
+
+            assertFalse(ammoBin.isFabricating());
+            assertFalse(ammoBin.isFabricateUntilSuccess());
+        }
+
+        /** Builds an ammo bin, installed on a field-workshop unit, whose Tech Rating is forced to the given value. */
+        private AmmoBin binAtFieldSiteWithTechRating(TechRating techRating) {
+            Campaign mockCampaign = mockCampaign();
+            when(mockCampaign.getCampaignOptions()).thenReturn(new CampaignOptions());
+            AmmoBin ammoBin = spy(newBin(mockCampaign, 10));
+            doReturn(techRating).when(ammoBin).getTechRating();
+
+            Unit unit = mock(Unit.class, RETURNS_DEEP_STUBS);
+            when(unit.getSite()).thenReturn(Unit.SITE_FIELD_WORKSHOP);
+            ammoBin.setUnit(unit);
+            return ammoBin;
+        }
+
+        private Person techWith(String... abilities) {
+            PersonnelOptions options = new PersonnelOptions();
+            for (String ability : abilities) {
+                options.getOption(ability).setValue(true);
+            }
+            Person tech = mock(Person.class);
+            when(tech.getOptions()).thenReturn(options);
+            return tech;
+        }
+
+        @Test
+        public void munitioneerLowersEffectiveTechRatingForAmmo() {
+            // Tech Rating D ammo cannot be fabricated in the field by a plain tech.
+            AmmoBin ammoBin = binAtFieldSiteWithTechRating(TechRating.D);
+
+            Person plainTech = techWith();
+            Person munitioneerTech = techWith(PersonnelOptions.TECH_MUNITIONEER);
+
+            assertFalse(ammoBin.canFabricate(plainTech).isBlank());
+            // Munitioneer treats the Tech Rating D ammo as C, so it becomes fabricable.
+            assertTrue(ammoBin.canFabricate(munitioneerTech).isBlank());
+        }
+
+        @Test
+        public void macGyverAndMunitioneerStackForAmmo() {
+            // Tech Rating E ammo needs a two-step reduction; neither ability alone is enough.
+            AmmoBin ammoBin = binAtFieldSiteWithTechRating(TechRating.E);
+
+            Person macGyverOnly = techWith(PersonnelOptions.TECH_MACGYVER);
+            Person munitioneerOnly = techWith(PersonnelOptions.TECH_MUNITIONEER);
+            Person both = techWith(PersonnelOptions.TECH_MACGYVER, PersonnelOptions.TECH_MUNITIONEER);
+
+            assertFalse(ammoBin.canFabricate(macGyverOnly).isBlank());
+            assertFalse(ammoBin.canFabricate(munitioneerOnly).isBlank());
+            // Stacked, they lower Tech Rating E to C, which is fabricable in the field.
+            assertTrue(ammoBin.canFabricate(both).isBlank());
         }
     }
 }

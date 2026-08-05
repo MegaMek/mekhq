@@ -51,6 +51,7 @@ import megamek.common.rolls.TargetRoll;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.campaignOptions.CampaignOption;
+import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.events.AcquisitionEvent;
 import mekhq.campaign.events.parts.PartChangedEvent;
 import mekhq.campaign.events.parts.PartModeChangedEvent;
@@ -65,6 +66,7 @@ import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.skills.SkillType;
 import mekhq.campaign.unit.Unit;
 import mekhq.campaign.work.IAcquisitionWork;
+import mekhq.campaign.work.IFabricatable;
 import mekhq.campaign.work.IPartWork;
 import mekhq.campaign.work.WorkTime;
 import mekhq.gui.CampaignGUI;
@@ -72,6 +74,7 @@ import mekhq.gui.ITechWorkPanel;
 import mekhq.gui.dialog.QuickStripDialog;
 import mekhq.gui.model.TaskTableModel;
 import mekhq.service.mrms.MRMSService;
+import mekhq.utilities.MHQInternationalization;
 
 public class TaskTableMouseAdapter extends JPopupMenuAdapter {
     //region Variable Declarations
@@ -184,29 +187,31 @@ public class TaskTableMouseAdapter extends JPopupMenuAdapter {
             }
             taskTable.repaint();
         } else if (command.startsWith("FABRICATE_")) {
-            if ((partWork instanceof MissingPart missingPart) && !missingPart.isBeingWorkedOn()) {
-                boolean wasFabricating = missingPart.isFabricating();
+            if ((partWork instanceof IFabricatable fabricatable) && !partWork.isBeingWorkedOn()) {
+                boolean wasFabricating = fabricatable.isFabricating();
                 switch (command) {
                     case "FABRICATE_OFF" -> {
-                        missingPart.setFabricating(false);
-                        missingPart.setFabricateUntilSuccess(false);
+                        fabricatable.setFabricating(false);
+                        fabricatable.setFabricateUntilSuccess(false);
                     }
                     case "FABRICATE_SINGLE" -> {
-                        missingPart.setFabricating(true);
-                        missingPart.setFabricateUntilSuccess(false);
+                        fabricatable.setFabricating(true);
+                        fabricatable.setFabricateUntilSuccess(false);
                     }
                     case "FABRICATE_UNTIL" -> {
-                        missingPart.setFabricating(true);
-                        missingPart.setFabricateUntilSuccess(true);
+                        fabricatable.setFabricating(true);
+                        fabricatable.setFabricateUntilSuccess(true);
                     }
                     default -> {}
                 }
                 // Turning fabrication on or off changes the total work time drastically (10x), so drop any partial
                 // progress. Switching only the retry mode leaves the time basis unchanged.
-                if (wasFabricating != missingPart.isFabricating()) {
-                    missingPart.resetTimeSpent();
+                if (wasFabricating != fabricatable.isFabricating()) {
+                    fabricatable.resetTimeSpent();
                 }
-                MekHQ.triggerEvent(new PartChangedEvent(missingPart));
+                if (partWork instanceof Part part) {
+                    MekHQ.triggerEvent(new PartChangedEvent(part));
+                }
                 taskTable.repaint();
             }
         }
@@ -479,20 +484,29 @@ public class TaskTableMouseAdapter extends JPopupMenuAdapter {
 
         // Eligibility (and the displayed cost) can depend on the tech
         Person fabricationTech = techWorkPanel.getSelectedTech();
-        if (gui.getCampaign().getCampaignOptions().get(CampaignOption.USE_FABRICATION)
-                  && (rows.length == 1) && (partWork instanceof MissingPart missingPart)) {
+        final CampaignOptions campaignOptions = gui.getCampaign().getCampaignOptions();
+        // Component fabrication and ammunition fabrication are governed by separate campaign options.
+
+        boolean fabricationEnabled = ((partWork instanceof MissingPart) &&
+                                            campaignOptions.get(CampaignOption.USE_FABRICATION)) ||
+                                           ((partWork instanceof AmmoBin ammoBin) &&
+                                                  !ammoBin.isSalvaging() &&
+                                                  campaignOptions.get(CampaignOption.USE_AMMO_FABRICATION));
+        if (fabricationEnabled && (rows.length == 1)) {
+            IFabricatable fabricatable = (IFabricatable) partWork;
             menu = new JMenu(getTextAt(RESOURCE_BUNDLE, "TaskTableMouseAdapter.FABRICATE"));
-            menu.setToolTipText(getFormattedTextAt(RESOURCE_BUNDLE, "TaskTableMouseAdapter.FABRICATE.tooltip",
-                  missingPart.getFabricationCost(fabricationTech).toAmountAndSymbolString()));
+            menu.setToolTipText(MHQInternationalization.getFormattedTextAt(RESOURCE_BUNDLE,
+                  "TaskTableMouseAdapter.FABRICATE.tooltip",
+                  fabricatable.getFabricationCost(fabricationTech).toAmountAndSymbolString()));
             menu.setEnabled(!isBeingWorked);
 
-            String canFabricate = missingPart.canFabricate(fabricationTech);
+            String canFabricate = fabricatable.canFabricate(fabricationTech);
             if (canFabricate.isBlank()) {
                 ButtonGroup fabricateGroup = new ButtonGroup();
 
                 JRadioButtonMenuItem offItem = new JRadioButtonMenuItem(
                       getTextAt(RESOURCE_BUNDLE, "TaskTableMouseAdapter.FABRICATE.off"));
-                offItem.setSelected(!missingPart.isFabricating());
+                offItem.setSelected(!fabricatable.isFabricating());
                 offItem.setActionCommand("FABRICATE_OFF");
                 offItem.addActionListener(this);
                 fabricateGroup.add(offItem);
@@ -500,7 +514,7 @@ public class TaskTableMouseAdapter extends JPopupMenuAdapter {
 
                 JRadioButtonMenuItem singleItem = new JRadioButtonMenuItem(
                       getTextAt(RESOURCE_BUNDLE, "TaskTableMouseAdapter.FABRICATE.single"));
-                singleItem.setSelected(missingPart.isFabricating() && !missingPart.isFabricateUntilSuccess());
+                singleItem.setSelected(fabricatable.isFabricating() && !fabricatable.isFabricateUntilSuccess());
                 singleItem.setActionCommand("FABRICATE_SINGLE");
                 singleItem.addActionListener(this);
                 fabricateGroup.add(singleItem);
@@ -508,7 +522,7 @@ public class TaskTableMouseAdapter extends JPopupMenuAdapter {
 
                 JRadioButtonMenuItem untilItem = new JRadioButtonMenuItem(
                       getTextAt(RESOURCE_BUNDLE, "TaskTableMouseAdapter.FABRICATE.untilSuccess"));
-                untilItem.setSelected(missingPart.isFabricating() && missingPart.isFabricateUntilSuccess());
+                untilItem.setSelected(fabricatable.isFabricating() && fabricatable.isFabricateUntilSuccess());
                 untilItem.setActionCommand("FABRICATE_UNTIL");
                 untilItem.addActionListener(this);
                 fabricateGroup.add(untilItem);

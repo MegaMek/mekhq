@@ -60,6 +60,7 @@ class RepairAndMaintenanceOptionsModel {
     boolean useFabrication;
     boolean useBalancedFabrication;
     boolean maintenanceFabrication;
+    boolean useAmmoFabrication;
 
     RepairAndMaintenanceOptionsModel(@Nonnull CampaignOptions options) {
         techsUseAdministration = options.isTechsUseAdministration();
@@ -85,6 +86,7 @@ class RepairAndMaintenanceOptionsModel {
         useFabrication = options.get(CampaignOption.USE_FABRICATION);
         useBalancedFabrication = options.get(CampaignOption.USE_BALANCED_FABRICATION);
         maintenanceFabrication = options.get(CampaignOption.FABRICATE_D_IN_MAINTENANCE_FACILITY);
+        useAmmoFabrication = options.get(CampaignOption.USE_AMMO_FABRICATION);
     }
 
     void applyTo(@Nonnull CampaignOptions options) {
@@ -111,5 +113,6 @@ class RepairAndMaintenanceOptionsModel {
         options.set(CampaignOption.USE_FABRICATION, useFabrication);
         options.set(CampaignOption.USE_BALANCED_FABRICATION, useBalancedFabrication);
         options.set(CampaignOption.FABRICATE_D_IN_MAINTENANCE_FACILITY, maintenanceFabrication);
+        options.set(CampaignOption.USE_AMMO_FABRICATION, useAmmoFabrication);
     }
 }

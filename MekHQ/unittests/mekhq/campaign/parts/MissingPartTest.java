@@ -535,6 +535,28 @@ public class MissingPartTest {
     }
 
     @Test
+    public void munitioneerDoesNotApplyToComponents() {
+        Campaign mockCampaign = mockCampaign();
+        when(mockCampaign.getCampaignOptions()).thenReturn(new CampaignOptions());
+        // Standard mek internal structure is Tech Rating D - not fabricable in the field by a plain tech.
+        MissingPart missingPart = new MissingMekLocation(Mek.LOC_LEFT_ARM, 20, EquipmentType.T_STRUCTURE_STANDARD,
+              false, false, false, mockCampaign);
+
+        Unit unit = mock(Unit.class, org.mockito.Mockito.RETURNS_DEEP_STUBS);
+        when(unit.getEntity().getWeight()).thenReturn(20.0);
+        when(unit.getSite()).thenReturn(Unit.SITE_FIELD_WORKSHOP);
+        missingPart.setUnit(unit);
+
+        Person munitioneerTech = mock(Person.class);
+        PersonnelOptions munitioneerOptions = new PersonnelOptions();
+        munitioneerOptions.getOption(PersonnelOptions.TECH_MUNITIONEER).setValue(true);
+        when(munitioneerTech.getOptions()).thenReturn(munitioneerOptions);
+
+        // Munitioneer is ammunition-only, so it does not help fabricate a (non-ammo) component.
+        assertFalse(missingPart.canFabricate(munitioneerTech).isBlank());
+    }
+
+    @Test
     public void maintenanceFacilityOptionAllowsTechRatingDFabrication() {
         Campaign mockCampaign = mockCampaign();
         CampaignOptions options = new CampaignOptions();

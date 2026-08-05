@@ -69,6 +69,7 @@ import mekhq.campaign.parts.enums.PartRepairType;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.unit.Unit;
 import mekhq.campaign.work.IAcquisitionWork;
+import mekhq.campaign.work.IFabricatable;
 import mekhq.utilities.MHQXMLUtility;
 import mekhq.utilities.ReportingUtilities;
 import org.w3c.dom.Node;
@@ -77,7 +78,7 @@ import org.w3c.dom.NodeList;
 /**
  * @author Jay Lawson (jaylawson39 at yahoo.com)
  */
-public class AmmoBin extends EquipmentPart implements IAcquisitionWork {
+public class AmmoBin extends EquipmentPart implements IAcquisitionWork, IFabricatable {
     private static final MMLogger LOGGER = MMLogger.create(AmmoBin.class);
 
     protected int shotsNeeded;
@@ -294,14 +295,63 @@ public class AmmoBin extends EquipmentPart implements IAcquisitionWork {
         loadBin();
     }
 
+    @Override
+    public String succeed() {
+        if (isFabricating() && !isSalvaging()) {
+            // The fabrication cost is charged per attempt before the manufactured shots are loaded.
+            chargeFabricationAttempt(campaign.getPlayerForce().getFinances());
+            fix();
+            return messageSurroundedBySpanWithColor(getPositiveColor(), " <b>fabricated</b>.");
+        }
+        return super.succeed();
+    }
+
+    @Override
+    public String fail(int rating) {
+        if (isFabricating() && !isSalvaging()) {
+            // A failed fabrication wastes the time and effort, but another attempt can be made at the same difficulty
+            // (Campaign Ops, p.202). The cost is still charged, per attempt.
+            chargeFabricationAttempt(campaign.getPlayerForce().getFinances());
+            timeSpent = 0;
+            shorthandedMod = 0;
+            return messageSurroundedBySpanWithColor(getNegativeColor(),
+                  "<b> fabrication failed - time and effort wasted</b>") + '.';
+        }
+        return super.fail(rating);
+    }
+
+    /**
+     * The fabrication cost of an ammo reload is based on the value of the shots actually needed (a partial reload costs
+     * proportionally less than a full ton), rather than the value of a whole new bin.
+     */
+    @Override
+    public Money getFabricationRepairBasis() {
+        return getValueNeeded();
+    }
+
+    @Override
+    public Money getFabricationPartBasis() {
+        return getValueNeeded();
+    }
+
+    /**
+     * Ammo bins fabricate ammunition, so the ammunition-only Munitioneer Special Ability applies to their fabrication
+     * eligibility (stacking with MacGyver).
+     */
+    @Override
+    public boolean isAmmunitionFabrication() {
+        return true;
+    }
+
     public void loadBin() {
         AmmoMounted mounted = (AmmoMounted) getMounted();
         if (mounted == null) {
             return;
         }
 
-        // Try to remove the ammo needed.
-        int shots = requisitionAmmo(getType(), getShotsNeeded());
+        // When fabricating, the shots are manufactured on the spot (paid for per attempt) rather than drawn from
+        // warehouse stock; otherwise pull as much of the necessary ammo as the warehouse can supply.
+        int shots = isFabricating() ? getShotsNeeded() : requisitionAmmo(getType(), getShotsNeeded());
         if (!ammoTypeChanged()) {
             // just a simple reload
             mounted.setShotsLeft(mounted.getBaseShotsLeft() + shots);
@@ -342,8 +392,7 @@ public class AmmoBin extends EquipmentPart implements IAcquisitionWork {
     }
 
     /**
-     * Requisitions ammo of a given type from the unit's local warehouse (or campaign warehouse as
-     * fallback).
+     * Requisitions ammo of a given type from the unit's local warehouse (or campaign warehouse as fallback).
      *
      * @param ammoType    The {@code AmmoType} being requisitioned.
      * @param shotsNeeded The number of shots needed.
@@ -411,8 +460,7 @@ public class AmmoBin extends EquipmentPart implements IAcquisitionWork {
     }
 
     /**
-     * Returns ammo unloaded from the bin to the unit's local warehouse (or campaign warehouse as
-     * fallback).
+     * Returns ammo unloaded from the bin to the unit's local warehouse (or campaign warehouse as fallback).
      *
      * @param ammoType      The {@code AmmoType} unloaded.
      * @param shotsUnloaded The number of shots of ammo unloaded.
@@ -449,6 +497,13 @@ public class AmmoBin extends EquipmentPart implements IAcquisitionWork {
     public TargetRoll getAllMods(Person tech) {
         if (isSalvaging()) {
             return super.getAllMods(tech);
+        }
+        // Fabricating ammunition is a genuine manufacturing task (with the standard +2 fabrication penalty), unlike a
+        // routine reload from stock which loads automatically.
+        if (isFabricating()) {
+            TargetRoll mods = super.getAllMods(tech);
+            addFabricationMods(mods, tech);
+            return mods;
         }
         return new TargetRoll(TargetRoll.AUTOMATIC_SUCCESS, "ammo loading");
     }
@@ -487,10 +542,11 @@ public class AmmoBin extends EquipmentPart implements IAcquisitionWork {
 
     @Override
     public int getActualTime() {
-        if (isOmniPodded()) {
-            return (int) Math.ceil(getBaseTime() * mode.timeMultiplier * 0.5);
-        }
-        return (int) Math.ceil(getBaseTime() * mode.timeMultiplier);
+        int time = isOmniPodded()
+                         ? (int) Math.ceil(getBaseTime() * mode.timeMultiplier * 0.5)
+                         : (int) Math.ceil(getBaseTime() * mode.timeMultiplier);
+        // Fabricating ammunition takes ten times as long as a routine reload.
+        return time * fabricationTimeMultiplier();
     }
 
     @Override
@@ -544,9 +600,18 @@ public class AmmoBin extends EquipmentPart implements IAcquisitionWork {
             return super.getDesc();
         }
 
+        // When set to fabricate, reflect that in the task heading (mirroring how a fabricated component reads),
+        // including the retry mode, so the player can see the mode at a glance.
+        String heading;
+        if (isFabricating()) {
+            heading = "Fabricate " + getName() + (isFabricateUntilSuccess() ? " (until success)" : "");
+        } else {
+            heading = "Reload " + getName();
+        }
+
         return "<html>" +
-                     "<b>Reload " +
-                     getName() +
+                     "<b>" +
+                     heading +
                      "</b><br/>" +
                      getDetails() +
                      "<br/>" +
@@ -608,13 +673,14 @@ public class AmmoBin extends EquipmentPart implements IAcquisitionWork {
 
     @Override
     public @Nullable String checkFixable() {
-        if (!isSalvaging() && (getAmountAvailable() == 0)) {
-            return "No ammo of this type is available";
-        } else if (null == unit) {
+        if (null == unit) {
             return "Ammo bins can only be loaded when installed on units";
-        } else {
-            return null;
         }
+        // Fabrication manufactures the shots for money, so it does not require any ammo in stock.
+        if (!isSalvaging() && !isFabricating() && (getAmountAvailable() == 0)) {
+            return "No ammo of this type is available";
+        }
+        return null;
     }
 
     public int getAmountAvailable() {
