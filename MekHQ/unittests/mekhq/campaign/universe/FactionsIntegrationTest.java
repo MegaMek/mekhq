@@ -34,7 +34,9 @@ package mekhq.campaign.universe;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.time.LocalDate;
@@ -42,6 +44,7 @@ import java.util.List;
 
 import megamek.common.universe.FactionTag;
 import megamek.common.universe.Factions2;
+import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.w3c.dom.DOMException;
@@ -56,6 +59,20 @@ public class FactionsIntegrationTest {
         // previously executed test class happened to load into the singleton.
         Factions2.setInstance(testFactions2);
         Factions.setInstance(Factions.loadDefault(true));
+    }
+
+    /**
+     * Clears the faction singletons this class published, so that a later test class in the same JVM does not silently
+     * inherit the small test faction set. Clearing rather than restoring a captured instance is deliberate: there is no
+     * way to read the singletons without creating them, so capturing in {@link #setUp()} would force the full
+     * production faction data to load just to have something to put back. A null instance simply means "not yet
+     * loaded", which is the state the next caller expects to handle.
+     */
+    @AfterAll
+    public static void tearDown() {
+        Factions.setInstance(null);
+        Factions2.setInstance(null);
+        testFactions2 = null;
     }
 
     @Test
@@ -112,8 +129,13 @@ public class FactionsIntegrationTest {
         Faction byCurrentKey = factions.getFaction("CC");
         Faction byRetiredAlias = factions.getFaction("CAPCON");
 
-        assertEquals(byCurrentKey.getShortName(), byRetiredAlias.getShortName(),
-              "A retired faction code kept as an alias must resolve to the surviving faction");
+        // Pin down the current key first. Comparing the two lookups alone would also pass if the test faction data
+        // failed to load and both calls returned the placeholder faction.
+        assertEquals("CC", byCurrentKey.getShortName(), "Test faction data did not load");
+        assertNotEquals(Faction.DEFAULT_CODE, byRetiredAlias.getShortName(),
+              "A retired faction code must not fall back to the placeholder faction");
+        assertSame(byCurrentKey, byRetiredAlias,
+              "A retired faction code kept as an alias must resolve to the surviving faction entry itself");
     }
 
     /**
