@@ -114,6 +114,9 @@ public final class TechChassisModifiers {
             return 0;
         }
         String currentKey = specialtyKey(family, weightClass);
+        if (currentKey == null) {
+            return 1;
+        }
         return specialist.stringValue().equalsIgnoreCase(currentKey) ? -1 : 1;
     }
 

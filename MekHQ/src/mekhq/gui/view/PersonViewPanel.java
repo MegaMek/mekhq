@@ -287,7 +287,10 @@ public class PersonViewPanel extends JScrollablePanel {
         int cap = familiarityMode.getFamiliarityCap();
         for (Map.Entry<String, Integer> entry : entries) {
             String chassis = entry.getKey();
-            int familiarity = entry.getValue();
+            // Clamp to the active mode's cap for display: a value stored under a higher-cap mode (e.g. 250 under Hard)
+            // survives a switch to a lower-cap mode until the next gain self-corrects it, and would otherwise overflow
+            // the meter bar. Bonuses saturate at the top level anyway, so clamping does not change the reported bonus.
+            int familiarity = Math.min(entry.getValue(), cap);
             int pilotingMaintenance = familiarityMode.getPilotingMaintenanceBonus(familiarity);
             int gunneryRepairs = familiarityMode.getGunneryRepairBonus(familiarity);
             String tooltip = getFormattedTextAt(RESOURCE_BUNDLE,
