@@ -52,6 +52,9 @@ public class FactionsIntegrationTest {
     @BeforeAll
     public static void setUp() {
         testFactions2 = new Factions2("testresources/data/universe/factions");
+        // The instance has to be published, otherwise these tests run against whichever faction data a
+        // previously executed test class happened to load into the singleton.
+        Factions2.setInstance(testFactions2);
         Factions.setInstance(Factions.loadDefault(true));
     }
 
@@ -94,5 +97,36 @@ public class FactionsIntegrationTest {
         assertEquals("Alshain", ghostBear.getStartingPlanet(LocalDate.of(3067, 1, 1)));
         assertTrue(ghostBear.is(FactionTag.CLAN));
         assertTrue(ghostBear.is(FactionTag.MAJOR));
+    }
+
+    /**
+     * A faction consolidation retires a faction code and keeps it on the surviving faction as an alias, so universe
+     * data and campaign saves still referring to the retired code must keep resolving. Regression coverage for the
+     * live case where {@code CEI} (retired into {@code CGS}) resolved to the placeholder faction instead, which made
+     * the faction diplomacy loader drop every Escorpion Imperio containment entry.
+     */
+    @Test
+    public void getFactionResolvesRetiredCodeThroughAlias() {
+        Factions factions = Factions.getInstance();
+
+        Faction byCurrentKey = factions.getFaction("CC");
+        Faction byRetiredAlias = factions.getFaction("CAPCON");
+
+        assertEquals(byCurrentKey.getShortName(), byRetiredAlias.getShortName(),
+              "A retired faction code kept as an alias must resolve to the surviving faction");
+    }
+
+    /**
+     * The alias fallback must not turn genuinely unknown codes into real factions - they still have to come back as
+     * the placeholder faction so callers can detect and report bad data.
+     */
+    @Test
+    public void getFactionReturnsPlaceholderForUnknownCode() {
+        Factions factions = Factions.getInstance();
+
+        Faction unknown = factions.getFaction("NOT_A_REAL_FACTION_CODE");
+
+        assertEquals(Faction.DEFAULT_CODE, unknown.getShortName(),
+              "An unrecognised faction code must resolve to the placeholder faction");
     }
 }
