@@ -70,7 +70,6 @@ import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.familiarity.FamiliarityMode;
 import mekhq.campaign.personnel.skills.Skill;
 import mekhq.campaign.personnel.skills.SkillModifierData;
-import mekhq.campaign.personnel.skills.TechChassisModifiers;
 import mekhq.campaign.universe.Atmosphere;
 import mekhq.campaign.universe.Planet;
 import mekhq.campaign.work.IPartWork;
@@ -445,14 +444,6 @@ public class Maintenance {
                 if (bonus != 0) {
                     target.addModifier(-bonus, "Chassis Familiarity");
                 }
-            }
-        }
-
-        // Tech weight-class Affinity/Antipathy/Specialist SPAs (maintenance is the piloting analog).
-        if (partUnit != null) {
-            int techSpaModifier = TechChassisModifiers.getMaintenanceModifier(tech, partUnit.getEntity());
-            if (techSpaModifier != 0) {
-                target.addModifier(techSpaModifier, "Chassis Specialization");
             }
         }
 

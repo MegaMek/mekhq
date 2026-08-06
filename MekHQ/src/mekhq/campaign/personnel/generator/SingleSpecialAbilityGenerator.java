@@ -175,21 +175,8 @@ public class SingleSpecialAbilityGenerator extends AbstractSpecialAbilityGenerat
                 displayName += " " + special;
                 break;
             }
-            case PersonnelOptions.UNIT_SPECIALIST:
-            case PersonnelOptions.TECH_UNIT_SPECIALIST: {
-                // Unit Specialist is a CHOICE ability; pick a specialty appropriate to the crewed unit (if any).
-                final String special = SpecialAbility.chooseUnitSpecialization(person);
-                person.getOptions().acquireAbility(PersonnelOptions.LVL3_ADVANTAGES, name, special);
-                displayName += " " + special;
-                break;
-            }
             default: {
-                // If a weight-class Affinity/Antipathy was rolled, re-point it at the crewed unit's weight class.
-                final String finalName = SpecialAbility.adjustWeightClassAbilityForUnit(person, name);
-                person.getOptions().acquireAbility(PersonnelOptions.LVL3_ADVANTAGES, finalName, true);
-                if (!finalName.equals(name)) {
-                    displayName = SpecialAbility.getDisplayName(finalName);
-                }
+                person.getOptions().acquireAbility(PersonnelOptions.LVL3_ADVANTAGES, name, true);
                 break;
             }
         }

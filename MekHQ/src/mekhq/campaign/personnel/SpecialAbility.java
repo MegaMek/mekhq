@@ -33,12 +33,6 @@
  */
 package mekhq.campaign.personnel;
 
-import static megamek.common.units.EntityWeightClass.WEIGHT_ASSAULT;
-import static megamek.common.units.EntityWeightClass.WEIGHT_HEAVY;
-import static megamek.common.units.EntityWeightClass.WEIGHT_LIGHT;
-import static megamek.common.units.EntityWeightClass.WEIGHT_MEDIUM;
-import static mekhq.campaign.personnel.PersonnelOptions.*;
-
 import java.io.FileInputStream;
 import java.io.InputStream;
 import java.io.PrintWriter;
@@ -49,20 +43,17 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
-import java.util.Set;
 import java.util.Vector;
 
 import megamek.Version;
 import megamek.codeUtilities.MathUtility;
 import megamek.common.TechConstants;
 import megamek.common.annotations.Nullable;
-import megamek.common.compute.Compute;
 import megamek.common.enums.Faction;
 import megamek.common.equipment.EquipmentType;
 import megamek.common.equipment.Mounted;
 import megamek.common.equipment.WeaponType;
 import megamek.common.options.IOption;
-import megamek.common.units.Entity;
 import megamek.common.util.weightedMaps.WeightedIntMap;
 import megamek.common.weapons.attacks.InfantryAttack;
 import megamek.common.weapons.autoCannons.ACWeapon;
@@ -97,29 +88,6 @@ public class SpecialAbility {
     private static final String PREREQ_MISC_CLAN_PILOT = "clanperson";
     private static String SPA_DIRECTORY = "data/universe/defaultspa.xml";
     private static String TEST_DIRECTORY = "testresources/data/universe/defaultspa_test.xml";
-
-    private enum WeightClassFamily {MEK, VEHICULAR, FLIGHT}
-
-    private enum WeightClassAbility {SPECIALIST, AFFINITY, ANTIPATHY}
-
-    /** All weight-class Affinity ability lookup names (positive-cost SPAs). */
-    private static final Set<String> WEIGHT_CLASS_AFFINITIES = Set.of(MEK_AFFINITY_LIGHT, MEK_AFFINITY_MEDIUM,
-          MEK_AFFINITY_HEAVY, MEK_AFFINITY_ASSAULT, VEHICULAR_AFFINITY_LIGHT, VEHICULAR_AFFINITY_MEDIUM,
-          VEHICULAR_AFFINITY_HEAVY, VEHICULAR_AFFINITY_ASSAULT, FLIGHT_AFFINITY_LIGHT, FLIGHT_AFFINITY_MEDIUM,
-          FLIGHT_AFFINITY_HEAVY);
-
-    /** All weight-class Antipathy ability lookup names (negative-cost Flaws). */
-    private static final Set<String> WEIGHT_CLASS_ANTIPATHIES = Set.of(MEK_ANTIPATHY_LIGHT, MEK_ANTIPATHY_MEDIUM,
-          MEK_ANTIPATHY_HEAVY, MEK_ANTIPATHY_ASSAULT, VEHICULAR_ANTIPATHY_LIGHT, VEHICULAR_ANTIPATHY_MEDIUM,
-          VEHICULAR_ANTIPATHY_HEAVY, VEHICULAR_ANTIPATHY_ASSAULT, FLIGHT_ANTIPATHY_LIGHT, FLIGHT_ANTIPATHY_MEDIUM,
-          FLIGHT_ANTIPATHY_HEAVY);
-
-    /** Every Unit Specialist choice value, used as the fallback pool when the person is not crewing a suitable unit. */
-    private static final List<String> ALL_SPECIALTIES = List.of(SPECIALIST_CHOICE_MEK_LIGHT,
-          SPECIALIST_CHOICE_MEK_MEDIUM, SPECIALIST_CHOICE_MEK_HEAVY, SPECIALIST_CHOICE_MEK_ASSAULT,
-          SPECIALIST_CHOICE_VEHICULAR_LIGHT, SPECIALIST_CHOICE_VEHICULAR_MEDIUM, SPECIALIST_CHOICE_VEHICULAR_HEAVY,
-          SPECIALIST_CHOICE_VEHICULAR_ASSAULT, SPECIALIST_CHOICE_FLIGHT_LIGHT, SPECIALIST_CHOICE_FLIGHT_MEDIUM,
-          SPECIALIST_CHOICE_FLIGHT_HEAVY);
 
     private static Map<String, SpecialAbility> specialAbilities = new HashMap<>();
     private static final Map<String, SpecialAbility> defaultSpecialAbilities = new HashMap<>();
@@ -623,192 +591,6 @@ public class SpecialAbility {
 
         return weapons.isEmpty() ? null : weapons.randomItem().getName();
     }
-
-    /**
-     * Chooses a Unit Specialist specialty (a {@code PersonnelOptions.SPECIALIST_CHOICE_*} value) appropriate for the
-     * unit the person is currently crewing, mirroring {@link #chooseWeaponSpecialization}. If they are not crewing a
-     * supported unit (a 'Mek, combat vehicle, or fighter), a random specialty is returned so a value is always
-     * produced.
-     *
-     * @param person the person the specialty is being generated for
-     *
-     * @return the chosen specialty choice value
-     */
-    public static String chooseUnitSpecialization(final Person person) {
-        String key = weightClassAbilityForCrewedUnit(person, WeightClassAbility.SPECIALIST);
-        return (key != null) ? key : ALL_SPECIALTIES.get(Compute.randomInt(ALL_SPECIALTIES.size()));
-    }
-
-    /**
-     * If {@code abilityName} is one of the weight-class Affinity/Antipathy SPAs, returns the variant of the same
-     * polarity appropriate for the unit the person is currently crewing; otherwise, or when they are not crewing a
-     * supported unit, returns {@code abilityName} unchanged. This lets a randomly rolled Affinity/Antipathy be
-     * re-pointed at the crewed unit's family and weight class.
-     *
-     * @param person      the person the ability is being generated for
-     * @param abilityName the lookup name of the randomly selected ability
-     *
-     * @return the unit-appropriate ability lookup name, or {@code abilityName} if no adjustment applies
-     */
-    public static String adjustWeightClassAbilityForUnit(final Person person, final String abilityName) {
-        final boolean antipathy = WEIGHT_CLASS_ANTIPATHIES.contains(abilityName);
-        if (!antipathy && !WEIGHT_CLASS_AFFINITIES.contains(abilityName)) {
-            return abilityName;
-        }
-        String appropriate = weightClassAbilityForCrewedUnit(person,
-              antipathy ? WeightClassAbility.ANTIPATHY : WeightClassAbility.AFFINITY);
-        if (appropriate == null) {
-            return abilityName;
-        }
-        // Keep the originally-rolled (already-eligible) ability if the unit-appropriate variant would conflict with an
-        // ability the person already holds (e.g. they already have the opposite Antipathy for that weight class).
-        SpecialAbility appropriateAbility = getAbility(appropriate);
-        if ((appropriateAbility != null) && !appropriateAbility.isEligible(person)) {
-            return abilityName;
-        }
-        return appropriate;
-    }
-
-    /**
-     * Resolves the weight-class ability lookup name (or specialty choice value) of the requested {@code kind} for the
-     * unit the person is currently crewing, or {@code null} if they are not crewing a supported 'Mek, combat vehicle,
-     * or fighter.
-     */
-    private static @Nullable String weightClassAbilityForCrewedUnit(final Person person,
-          final WeightClassAbility kind) {
-        if ((person.getUnit() == null) || (person.getUnit().getEntity() == null)) {
-            return null;
-        }
-        Entity entity = person.getUnit().getEntity();
-        WeightClassFamily family = crewedUnitFamily(entity);
-        if (family == null) {
-            return null;
-        }
-        int weightClass = entity.getWeightClass();
-        // Normalize to supported weight classes so these SPAs also work for ultra-light/super-heavy/etc.
-        if (weightClass < WEIGHT_LIGHT) {
-            weightClass = WEIGHT_LIGHT;
-        } else if ((family == WeightClassFamily.FLIGHT) && (weightClass > WEIGHT_HEAVY)) {
-            weightClass = WEIGHT_HEAVY;
-        } else if ((family != WeightClassFamily.FLIGHT) && (weightClass > WEIGHT_ASSAULT)) {
-            weightClass = WEIGHT_ASSAULT;
-        }
-        return switch (kind) {
-            // Specialist and Affinity reward the unit being crewed, so they match its exact type + weight class.
-            case SPECIALIST -> specialtyKey(family, weightClass);
-            case AFFINITY -> affinityName(family, weightClass);
-            // Antipathy is a penalty, so it targets the same family but a *different* weight class - a character is not
-            // saddled with a penalty for the very unit they are currently crewing.
-            case ANTIPATHY -> antipathyName(family, randomOtherWeightClass(family, weightClass));
-        };
-    }
-
-    /**
-     * Returns a random valid weight class for the family other than {@code currentWeightClass}. 'Mek and Vehicular
-     * families draw from Light/Medium/Heavy/Assault; Flight has no Assault class. If {@code currentWeightClass} is not
-     * one of the family's classes (e.g. a super-heavy or ultra-light unit), any of the family's classes may be
-     * returned.
-     */
-    private static int randomOtherWeightClass(final WeightClassFamily family, final int currentWeightClass) {
-        List<Integer> weightClasses = new ArrayList<>(List.of(WEIGHT_LIGHT, WEIGHT_MEDIUM, WEIGHT_HEAVY));
-        if (family != WeightClassFamily.FLIGHT) {
-            weightClasses.add(WEIGHT_ASSAULT);
-        }
-        weightClasses.removeIf(weightClass -> weightClass == currentWeightClass);
-        return weightClasses.get(Compute.randomInt(weightClasses.size()));
-    }
-
-    private static @Nullable WeightClassFamily crewedUnitFamily(final Entity entity) {
-        if (entity.isMek()) {
-            return WeightClassFamily.MEK;
-        }
-
-        if (entity.isFighter()) {
-            return WeightClassFamily.FLIGHT;
-        }
-
-        if (entity.isVehicle()) {
-            return WeightClassFamily.VEHICULAR;
-        }
-
-        return null;
-    }
-
-    private static @Nullable String specialtyKey(final WeightClassFamily family, final int weightClass) {
-        return switch (family) {
-            case MEK -> switch (weightClass) {
-                case WEIGHT_LIGHT -> SPECIALIST_CHOICE_MEK_LIGHT;
-                case WEIGHT_MEDIUM -> SPECIALIST_CHOICE_MEK_MEDIUM;
-                case WEIGHT_HEAVY -> SPECIALIST_CHOICE_MEK_HEAVY;
-                case WEIGHT_ASSAULT -> SPECIALIST_CHOICE_MEK_ASSAULT;
-                default -> null;
-            };
-            case VEHICULAR -> switch (weightClass) {
-                case WEIGHT_LIGHT -> SPECIALIST_CHOICE_VEHICULAR_LIGHT;
-                case WEIGHT_MEDIUM -> SPECIALIST_CHOICE_VEHICULAR_MEDIUM;
-                case WEIGHT_HEAVY -> SPECIALIST_CHOICE_VEHICULAR_HEAVY;
-                case WEIGHT_ASSAULT -> SPECIALIST_CHOICE_VEHICULAR_ASSAULT;
-                default -> null;
-            };
-            case FLIGHT -> switch (weightClass) {
-                case WEIGHT_LIGHT -> SPECIALIST_CHOICE_FLIGHT_LIGHT;
-                case WEIGHT_MEDIUM -> SPECIALIST_CHOICE_FLIGHT_MEDIUM;
-                case WEIGHT_HEAVY -> SPECIALIST_CHOICE_FLIGHT_HEAVY;
-                default -> null;
-            };
-        };
-    }
-
-    private static @Nullable String affinityName(final WeightClassFamily family, final int weightClass) {
-        return switch (family) {
-            case MEK -> switch (weightClass) {
-                case WEIGHT_LIGHT -> MEK_AFFINITY_LIGHT;
-                case WEIGHT_MEDIUM -> MEK_AFFINITY_MEDIUM;
-                case WEIGHT_HEAVY -> MEK_AFFINITY_HEAVY;
-                case WEIGHT_ASSAULT -> MEK_AFFINITY_ASSAULT;
-                default -> null;
-            };
-            case VEHICULAR -> switch (weightClass) {
-                case WEIGHT_LIGHT -> VEHICULAR_AFFINITY_LIGHT;
-                case WEIGHT_MEDIUM -> VEHICULAR_AFFINITY_MEDIUM;
-                case WEIGHT_HEAVY -> VEHICULAR_AFFINITY_HEAVY;
-                case WEIGHT_ASSAULT -> VEHICULAR_AFFINITY_ASSAULT;
-                default -> null;
-            };
-            case FLIGHT -> switch (weightClass) {
-                case WEIGHT_LIGHT -> FLIGHT_AFFINITY_LIGHT;
-                case WEIGHT_MEDIUM -> FLIGHT_AFFINITY_MEDIUM;
-                case WEIGHT_HEAVY -> FLIGHT_AFFINITY_HEAVY;
-                default -> null;
-            };
-        };
-    }
-
-    private static @Nullable String antipathyName(final WeightClassFamily family, final int weightClass) {
-        return switch (family) {
-            case MEK -> switch (weightClass) {
-                case WEIGHT_LIGHT -> MEK_ANTIPATHY_LIGHT;
-                case WEIGHT_MEDIUM -> MEK_ANTIPATHY_MEDIUM;
-                case WEIGHT_HEAVY -> MEK_ANTIPATHY_HEAVY;
-                case WEIGHT_ASSAULT -> MEK_ANTIPATHY_ASSAULT;
-                default -> null;
-            };
-            case VEHICULAR -> switch (weightClass) {
-                case WEIGHT_LIGHT -> VEHICULAR_ANTIPATHY_LIGHT;
-                case WEIGHT_MEDIUM -> VEHICULAR_ANTIPATHY_MEDIUM;
-                case WEIGHT_HEAVY -> VEHICULAR_ANTIPATHY_HEAVY;
-                case WEIGHT_ASSAULT -> VEHICULAR_ANTIPATHY_ASSAULT;
-                default -> null;
-            };
-            case FLIGHT -> switch (weightClass) {
-                case WEIGHT_LIGHT -> FLIGHT_ANTIPATHY_LIGHT;
-                case WEIGHT_MEDIUM -> FLIGHT_ANTIPATHY_MEDIUM;
-                case WEIGHT_HEAVY -> FLIGHT_ANTIPATHY_HEAVY;
-                default -> null;
-            };
-        };
-    }
-    // endregion Weight-class ability selection
 
     /**
      * This is a worker method to add any valid weaponry to the weighted map used to generate a random weapon

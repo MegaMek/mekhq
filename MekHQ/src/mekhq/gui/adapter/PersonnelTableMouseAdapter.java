@@ -5293,34 +5293,6 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
                       characterFlawMenu, utilityAbilityMenu,
                       characterOriginMenu);
             }
-        } else if (spaName.equals(PersonnelOptions.UNIT_SPECIALIST)
-                         || spaName.equals(PersonnelOptions.TECH_UNIT_SPECIALIST)) {
-            JMenu specialistMenu = new JMenu(spa.getDisplayName());
-            boolean isSpecialist = person.getOptions().booleanOption(spaName);
-            String currentChoice = isSpecialist ? person.getOptions().getOption(spaName).stringValue() : "";
-            for (String choice : spa.getChoiceValues()) {
-                if (choice.equalsIgnoreCase("none") || choice.equals(currentChoice)) {
-                    continue;
-                }
-                menuItem = new JMenuItem(String.format(resources.getString("abilityDesc.format"), choice, costDesc));
-                menuItem.setToolTipText(wordWrap(spa.getDescription() + "<br><br>" + spa.getAllPrereqDesc()));
-                menuItem.setActionCommand(makeCommand(CMD_ACQUIRE_CUSTOM_CHOICE,
-                      choice,
-                      String.valueOf(cost),
-                      spaName));
-                menuItem.addActionListener(this);
-                menuItem.setEnabled(available && isEligible);
-                specialistMenu.add(menuItem);
-            }
-            if (specialistMenu.getMenuComponentCount() > 0) {
-                placeInAppropriateSPASubMenu(spa,
-                      specialistMenu,
-                      combatAbilityMenu,
-                      maneuveringAbilityMenu,
-                      characterFlawMenu,
-                      utilityAbilityMenu,
-                      characterOriginMenu);
-            }
         } else if (Optional.ofNullable((person.getOptions().getOption(spaName))).isPresent() &&
                          (person.getOptions().getOption(spaName).getType() == IOption.CHOICE) &&
                          !(person.getOptions().getOption(spaName).booleanValue())) {

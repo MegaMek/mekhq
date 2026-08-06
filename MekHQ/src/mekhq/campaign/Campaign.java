@@ -226,7 +226,6 @@ import mekhq.campaign.personnel.skills.Skill;
 import mekhq.campaign.personnel.skills.SkillCheck;
 import mekhq.campaign.personnel.skills.SkillModifierData;
 import mekhq.campaign.personnel.skills.SkillType;
-import mekhq.campaign.personnel.skills.TechChassisModifiers;
 import mekhq.campaign.personnel.turnoverAndRetention.RetirementDefectionTracker;
 import mekhq.campaign.randomEvents.prisoners.PrisonerStatus;
 import mekhq.campaign.randomEvents.randomEventsSystem.RandomEventLibraries;
@@ -6516,13 +6515,6 @@ public class Campaign implements ITechManager {
                 if (bonus != 0) {
                     target.addModifier(-bonus, "Chassis Familiarity");
                 }
-            }
-        }
-
-        if (partWork.getUnit() != null) {
-            int techSpaModifier = TechChassisModifiers.getRepairModifier(tech, partWork.getUnit().getEntity());
-            if (techSpaModifier != 0) {
-                target.addModifier(techSpaModifier, "Chassis Specialization");
             }
         }
 
