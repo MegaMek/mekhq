@@ -273,7 +273,6 @@ public class UnitTableMouseAdapter extends JPopupMenuAdapter {
               logType);
         editUnitLogDialog.setVisible(true);
         MekHQ.triggerEvent(new UnitLogEvent(unit));
-        MekHQ.triggerEvent(new UnitChangedEvent(unit));
     }
 
     @Override
