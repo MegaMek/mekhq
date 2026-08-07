@@ -64,6 +64,8 @@ import static mekhq.campaign.universe.Faction.MERCENARY_FACTION_CODE;
 import static mekhq.campaign.universe.Faction.PIRATE_FACTION_CODE;
 import static mekhq.campaign.universe.Faction.TORTUGA_DOMINIONS_FACTION_CODE;
 import static mekhq.campaign.universe.Factions.getFactionLogo;
+import static mekhq.campaign.universe.WarriorsAlmanac.WarriorsAlmanacData.buildAlmanacPartsData;
+import static mekhq.campaign.universe.WarriorsAlmanac.WarriorsAlmanacData.buildAlmanacUnitsData;
 import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
 import static mekhq.utilities.MHQInternationalization.getTextAt;
 
@@ -236,6 +238,7 @@ import mekhq.campaign.unit.Unit;
 import mekhq.campaign.unit.UnitOrder;
 import mekhq.campaign.unit.enums.TransporterType;
 import mekhq.campaign.universe.*;
+import mekhq.campaign.universe.WarriorsAlmanac.WarriorsAlmanacData;
 import mekhq.campaign.universe.enums.HiringHallLevel;
 import mekhq.campaign.universe.enums.StartingLocationMode;
 import mekhq.campaign.universe.eras.Era;
@@ -366,6 +369,14 @@ public class Campaign implements ITechManager {
     // bugs being permanently locked into the campaign file.
     RandomEventLibraries randomEventLibraries;
     FactionStandingUltimatumsLibrary factionStandingUltimatumsLibrary;
+
+    private transient Map<Integer, WarriorsAlmanacData> partsAlmanacIS = buildAlmanacPartsData(partsStore, false);
+    private transient Map<Integer, WarriorsAlmanacData> partsAlmanacClan = buildAlmanacPartsData(partsStore, true);
+
+    private transient Map<Integer, WarriorsAlmanacData> unitsAlmanacIS = buildAlmanacUnitsData(TechBase.IS.toString());
+    private transient Map<Integer, WarriorsAlmanacData> unitsAlmanacClan = buildAlmanacUnitsData(TechBase.CLAN.toString());
+    private transient Map<Integer, WarriorsAlmanacData> unitsAlmanacMixed = buildAlmanacUnitsData(TechBase.ALL.toString());
+    private transient Map<Integer, WarriorsAlmanacData> unitsAlmanacUnknown = buildAlmanacUnitsData(TechBase.UNKNOWN.toString());
 
     /**
      * A constant that provides the ISO-8601 definition of week-based fields.
@@ -1945,7 +1956,7 @@ public class Campaign implements ITechManager {
 
     /**
      * @return all hangars across all locations associated with this campaign.
-     *                                                                                                                                                                   TODO: This won't work once we support multiple hangars. Method separated from getHangar() for future refactor
+     *                                                                                                                                                                                           TODO: This won't work once we support multiple hangars. Method separated from getHangar() for future refactor
      *
      * @deprecated Use {@link PlayerForce#getHangar()} directly.
      */
@@ -5348,6 +5359,55 @@ public class Campaign implements ITechManager {
 
     public FactionStandingUltimatumsLibrary getFactionStandingUltimatumsLibrary() {
         return factionStandingUltimatumsLibrary;
+    }
+
+
+    public Map<Integer, WarriorsAlmanacData> getPartsAlmanacIS() {
+        return partsAlmanacIS;
+    }
+
+    public void setPartsAlmanacIS(Map<Integer, WarriorsAlmanacData> partsAlmanacIS) {
+        this.partsAlmanacIS = partsAlmanacIS;
+    }
+
+    public Map<Integer, WarriorsAlmanacData> getPartsAlmanacClan() {
+        return partsAlmanacClan;
+    }
+
+    public void setPartsAlmanacClan(Map<Integer, WarriorsAlmanacData> partsAlmanacClan) {
+        this.partsAlmanacClan = partsAlmanacClan;
+    }
+
+    public Map<Integer, WarriorsAlmanacData> getUnitsAlmanacIS() {
+        return unitsAlmanacIS;
+    }
+
+    public void setUnitsAlmanacIS(Map<Integer, WarriorsAlmanacData> unitsAlmanacIS) {
+        this.unitsAlmanacIS = unitsAlmanacIS;
+    }
+
+    public Map<Integer, WarriorsAlmanacData> getUnitsAlmanacClan() {
+        return unitsAlmanacClan;
+    }
+
+    public void setUnitsAlmanacClan(Map<Integer, WarriorsAlmanacData> unitsAlmanacClan) {
+        this.unitsAlmanacClan = unitsAlmanacClan;
+    }
+
+    public Map<Integer, WarriorsAlmanacData> getUnitsAlmanacMixed() {
+        return unitsAlmanacMixed;
+    }
+
+    public void setUnitsAlmanacMixed(Map<Integer, WarriorsAlmanacData> unitsAlmanacMixed) {
+        this.unitsAlmanacMixed = unitsAlmanacMixed;
+    }
+
+    public Map<Integer, WarriorsAlmanacData> getUnitsAlmanacUnknown() {
+        return unitsAlmanacUnknown;
+    }
+
+    public void setUnitsAlmanacUnknown(Map<Integer, WarriorsAlmanacData> unitsAlmanacUnknown) {
+        this.unitsAlmanacUnknown = unitsAlmanacUnknown;
     }
 
     public void writeToXML(final PrintWriter writer, boolean isBugReportPrep) {

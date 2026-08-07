@@ -59,6 +59,7 @@ public record ReportHyperlinkListener(CampaignGUI campaignGUI) implements Hyperl
     public static final String CONTRACT_MARKET = "CONTRACT_MARKET";
     public static final String UNIT_MARKET = "UNIT_MARKET";
     public static final String PERSONNEL_ADVANCEMENT = "PERSONNEL_ADVANCEMENT";
+    public static final String WARRIORS_ALMANAC = "WARRIORS_ALMANAC";
     public static final String SCENARIO = "SCENARIO";
     public static final String MISSION = "MISSION";
     // endregion Variable Declarations
@@ -144,6 +145,13 @@ public record ReportHyperlinkListener(CampaignGUI campaignGUI) implements Hyperl
                     LOGGER.error("", e);
                 }
             } else if (evt.getDescription().startsWith(PERSON)) {
+                try {
+                    final UUID id = UUID.fromString(evt.getDescription().split(":")[1]);
+                    campaignGUI.focusOnPerson(id);
+                } catch (Exception e) {
+                    LOGGER.error("", e);
+                }
+            } else if (evt.getDescription().startsWith(WARRIORS_ALMANAC)) {
                 try {
                     final UUID id = UUID.fromString(evt.getDescription().split(":")[1]);
                     campaignGUI.focusOnPerson(id);
