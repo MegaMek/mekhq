@@ -249,6 +249,7 @@ import mekhq.campaign.universe.fameAndInfamy.FameAndInfamyController;
 import mekhq.campaign.universe.selectors.factionSelectors.AbstractFactionSelector;
 import mekhq.campaign.universe.selectors.planetSelectors.AbstractPlanetSelector;
 import mekhq.campaign.work.IAcquisitionWork;
+import mekhq.campaign.work.IFabricatable;
 import mekhq.campaign.work.IPartWork;
 import mekhq.gui.CampaignGUI;
 import mekhq.gui.baseComponents.immersiveDialogs.ImmersiveDialogSimple;
@@ -1945,7 +1946,7 @@ public class Campaign implements ITechManager {
 
     /**
      * @return all hangars across all locations associated with this campaign.
-     *                                                                                                                                                                   TODO: This won't work once we support multiple hangars. Method separated from getHangar() for future refactor
+     *                                                                                                                                                                               TODO: This won't work once we support multiple hangars. Method separated from getHangar() for future refactor
      *
      * @deprecated Use {@link PlayerForce#getHangar()} directly.
      */
@@ -4169,12 +4170,12 @@ public class Campaign implements ITechManager {
         partWork.cancelAssignment(true);
 
         if (!taskSucceeded
-                  && (partWork instanceof MissingPart missingPart)
-                  && missingPart.isFabricating()
-                  && missingPart.isFabricateUntilSuccess()
-                  && missingPart.canFabricate(tech).isBlank()
+                  && (partWork instanceof IFabricatable fabricatable)
+                  && fabricatable.isFabricating()
+                  && fabricatable.isFabricateUntilSuccess()
+                  && fabricatable.canFabricate(tech).isBlank()
                   && (tech.getSkillForWorkingOn(partWork) != null)) {
-            final Money nextCost = missingPart.getFabricationCost(tech);
+            final Money nextCost = fabricatable.getFabricationCost(tech);
             if (nextCost.isZero() || !playerForce.getFinances().getBalance().isLessThan(nextCost)) {
                 partWork.setTech(tech);
                 partWork.reservePart();
@@ -6426,23 +6427,21 @@ public class Campaign implements ITechManager {
             return new TargetRoll(TargetRoll.IMPOSSIBLE, "Task is impossible.");
         } else if (!partWork.needsFixing() && !partWork.isSalvaging()) {
             return new TargetRoll(TargetRoll.IMPOSSIBLE, "Task is not needed.");
-        } else if (partWork instanceof MissingPart missingPart) {
-            if (missingPart.isFabricating()) {
-                // A part flagged for fabrication that is no longer eligible (tech rating above C without a
-                // factory-grade facility) cannot be worked on.
-                String cannotFabricateReason = missingPart.canFabricate(tech);
-                if (!cannotFabricateReason.isBlank()) {
-                    return new TargetRoll(TargetRoll.IMPOSSIBLE,
-                          "This part cannot be fabricated here: " + cannotFabricateReason);
-                }
-                // Each fabrication attempt is paid up front
-                final Money fabricationCost = missingPart.getFabricationCost(tech);
-                if (!fabricationCost.isZero() && playerForce.getFinances().getBalance().isLessThan(fabricationCost)) {
-                    return new TargetRoll(TargetRoll.IMPOSSIBLE, "Cannot afford this fabrication attempt.");
-                }
-            } else if (missingPart.findReplacement(false) == null) {
-                return new TargetRoll(TargetRoll.IMPOSSIBLE, "Replacement part not available.");
+        } else if ((partWork instanceof IFabricatable fabricatable) && fabricatable.isFabricating()) {
+            // A task flagged for fabrication that is no longer eligible (tech rating above C without a
+            // factory-grade facility) cannot be worked on.
+            String cannotFabricateReason = fabricatable.canFabricate(tech);
+            if (!cannotFabricateReason.isBlank()) {
+                return new TargetRoll(TargetRoll.IMPOSSIBLE,
+                      "This cannot be fabricated here: " + cannotFabricateReason);
             }
+            // Each fabrication attempt is paid up front
+            final Money fabricationCost = fabricatable.getFabricationCost(tech);
+            if (!fabricationCost.isZero() && playerForce.getFinances().getBalance().isLessThan(fabricationCost)) {
+                return new TargetRoll(TargetRoll.IMPOSSIBLE, "Cannot afford this fabrication attempt.");
+            }
+        } else if ((partWork instanceof MissingPart missingPart) && (missingPart.findReplacement(false) == null)) {
+            return new TargetRoll(TargetRoll.IMPOSSIBLE, "Replacement part not available.");
         }
 
         final int techTime = isOvertimeAllowed() ?
