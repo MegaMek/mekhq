@@ -2344,7 +2344,11 @@ public class EducationController {
         }
 
         // Get the person's experience level and role (combat or non-combat)
-        final int experienceLevel = person.getExperienceLevel(campaign, false, true);
+        final int experienceLevel = person.getExperienceLevel(campaign.getCampaignOptions(),
+              campaign.getPlayerForce().isClanForce(),
+              campaign.getLocalDate(),
+              false,
+              true);
         final boolean isCombatRole = person.getPrimaryRole().isCombat();
         final boolean isDoctor = person.isDoctor();
 

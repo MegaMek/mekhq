@@ -448,7 +448,12 @@ public class RetirementDefectionTracker {
             // Desirability modifier
             if ((campaignOptions.isUseSkillModifiers()) &&
                       (person.getAge(campaign.getLocalDate()) < RETIREMENT_AGE)) {
-                targetNumber.addModifier(min(EXP_ELITE - 2, person.getExperienceLevel(campaign, false, true) - 2),
+                targetNumber.addModifier(min(EXP_ELITE - 2,
+                            person.getExperienceLevel(campaignOptions,
+                                  campaign.getPlayerForce().isClanForce(),
+                                  campaign.getLocalDate(),
+                                  false,
+                                  true) - 2),
                       resources.getString("desirability.text"));
             }
 

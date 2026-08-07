@@ -71,6 +71,7 @@ import mekhq.MHQConstants;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign.AdministratorSpecialization;
 import mekhq.campaign.campaignOptions.AcquisitionsType;
+import mekhq.campaign.campaignOptions.CampaignOption;
 import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.enums.DailyReportType;
 import mekhq.campaign.enums.DragoonRating;
@@ -106,6 +107,7 @@ import mekhq.campaign.personnel.skills.SkillModifierData;
 import mekhq.campaign.personnel.skills.SkillType;
 import mekhq.campaign.personnel.turnoverAndRetention.RetirementDefectionTracker;
 import mekhq.campaign.randomEvents.prisoners.PrisonerStatus;
+import mekhq.campaign.reputation.chaosReputation.ChaosReputation;
 import mekhq.campaign.unit.Unit;
 import mekhq.campaign.universe.Faction;
 import mekhq.campaign.universe.Factions;
@@ -1831,6 +1833,19 @@ public class ForceHumanResources {
 
         setVeterancyAwardEligibility(campaign, person);
 
+        // Per-character starting reputation only matters under personnel tracking; campaign-level tracking uses a
+        // single stored value, so there is nothing to seed per character.
+        boolean applyStartingReputation = campaignOptions.get(CampaignOption.USE_CHAOS_REPUTATION) &&
+                                                !campaignOptions.get(CampaignOption.CAMPAIGN_LEVEL_CHAOS_REPUTATION) &&
+                                                campaignOptions.get(CampaignOption.CHAOS_NEW_RECRUITS_HAVE_REPUTATION);
+        if (applyStartingReputation) {
+            ChaosReputation.applyStartingReputation(campaignOptions,
+                  campaign.getPlayerForce().isClanForce(),
+                  currentDay,
+                  person);
+            ChaosReputation.applyStartingCriminalRecord(currentDay, person);
+        }
+
         return person;
     }
 
@@ -2205,7 +2220,11 @@ public class ForceHumanResources {
                 child.getOptions().getOption(option.getName()).clearValue();
             }
 
-            int experienceLevel = child.getExperienceLevel(campaign, false);
+            int experienceLevel = child.getExperienceLevel(campaign.getCampaignOptions(),
+                  campaign.getPlayerForce().isClanForce(),
+                  campaign.getLocalDate(),
+                  false,
+                  false);
 
             if (experienceLevel <= 0) {
                 person.setLoyalty(d6(3) + 2);

@@ -43,6 +43,7 @@ import java.util.stream.Collectors;
 
 import megamek.common.annotations.Nullable;
 import mekhq.MekHQ;
+import mekhq.campaign.campaignOptions.CampaignOption;
 import mekhq.campaign.campaignOptions.CampaignOptions;
 
 public enum PersonnelTabView {
@@ -60,9 +61,12 @@ public enum PersonnelTabView {
     HEALTHCARE("PersonnelTabView.HEALTHCARE.text", "PersonnelTabView.HEALTHCARE.toolTipText",
           Set.of(RANK, FIRST_NAME, LAST_NAME, PERSONNEL_ROLE, INJURIES, TOUGHNESS, BODY, COVER_MEDICAL_EXPENSES,
                 DUE_DATE, MODIFICATION_COUNT),
-          Map.of(TOUGHNESS, CampaignOptions::isUseToughness,
-                MODIFICATION_COUNT, CampaignOptions::isUseAlternativeAdvancedMedical,
-                DUE_DATE, options -> options.isUseManualProcreation() || !options.getRandomProcreationMethod().isNone())),
+          Map.of(TOUGHNESS,
+                CampaignOptions::isUseToughness,
+                MODIFICATION_COUNT,
+                CampaignOptions::isUseAlternativeAdvancedMedical,
+                DUE_DATE,
+                options -> options.isUseManualProcreation() || !options.getRandomProcreationMethod().isNone())),
     GUNNERY_PILOT_SKILLS("PersonnelTabView.GUNNERY_PILOT_SKILLS.text",
           "PersonnelTabView.GUNNERY_PILOT_SKILLS.toolTipText",
           Set.of(RANK, FIRST_NAME, LAST_NAME, PERSONNEL_ROLE, MEK, GROUND_VEHICLE, NAVAL_VEHICLE, VTOL)),
@@ -80,7 +84,7 @@ public enum PersonnelTabView {
           "PersonnelTabView.ADMINISTRATIVE_SKILLS.toolTipText",
           Set.of(RANK, FIRST_NAME, LAST_NAME, PERSONNEL_ROLE, ADMINISTRATION, NEGOTIATION, TRAINING, APPRAISAL)),
     TRAITS("PersonnelTabView.TRAITS.text", "PersonnelTabView.TRAITS.toolTipText",
-          Set.of(RANK, FIRST_NAME, LAST_NAME, CONNECTIONS, WEALTH, EXTRA_INCOME, REPUTATION, UNLUCKY, BLOODMARK)),
+          Set.of(RANK, FIRST_NAME, LAST_NAME, CONNECTIONS, WEALTH, EXTRA_INCOME, FAME, UNLUCKY, BLOODMARK)),
     ATTRIBUTES("PersonnelTabView.ATTRIBUTES.text", "PersonnelTabView.ATTRIBUTES.toolTipText",
           Set.of(RANK, FIRST_NAME, LAST_NAME, STRENGTH, BODY, REFLEXES, DEXTERITY, INTELLIGENCE, WILLPOWER, CHARISMA,
                 EDGE),
@@ -103,8 +107,10 @@ public enum PersonnelTabView {
                 REASONING, CampaignOptions::isUseRandomPersonalities)),
     SERVICE_RECORD("PersonnelTabView.SERVICE_RECORD.text", "PersonnelTabView.SERVICE_RECORD.toolTipText",
           Set.of(RANK, FIRST_NAME, LAST_NAME, PERSONNEL_ROLE, COMMAND_STATUS, FOUNDER, RECRUITMENT_DATE,
-                RETIREMENT_DATE, SALARY, KILLS),
-          Map.of(RECRUITMENT_DATE, CampaignOptions::isUseTimeInService)),
+                RETIREMENT_DATE, SALARY, KILLS, REPUTATION),
+          Map.of(RECRUITMENT_DATE, CampaignOptions::isUseTimeInService,
+                REPUTATION, options -> options.get(CampaignOption.USE_CHAOS_REPUTATION) &&
+                                             !options.get(CampaignOption.CAMPAIGN_LEVEL_CHAOS_REPUTATION))),
     BIOGRAPHICAL("PersonnelTabView.BIOGRAPHICAL.text", "PersonnelTabView.BIOGRAPHICAL.toolTipText",
           Set.of(RANK, FIRST_NAME, LAST_NAME, AGE, DEATH_DATE, PERSONNEL_STATUS, BLOODNAME, ORIGIN),
           Map.of(ORIGIN, CampaignOptions::isShowOriginFaction,

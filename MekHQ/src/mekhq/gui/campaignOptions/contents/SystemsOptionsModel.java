@@ -33,11 +33,19 @@
 package mekhq.gui.campaignOptions.contents;
 
 import jakarta.annotation.Nonnull;
+import mekhq.campaign.campaignOptions.CampaignOption;
 import mekhq.campaign.campaignOptions.CampaignOptions;
 
 class SystemsOptionsModel {
     int manualUnitRatingModifier;
     boolean resetCriminalRecord;
+    boolean useChaosReputation;
+    boolean campaignLevelChaosReputation;
+    int chaosReputationCap;
+    boolean chaosDebtPenaltiesStack;
+    boolean chaosNoPartialSuccessReputation;
+    boolean chaosPersonalityAffectsReputation;
+    boolean chaosNewRecruitsHaveReputation;
     boolean requireSupportForceTransportation;
     boolean clampReputationPayMultiplier;
     boolean reduceReputationPerformanceModifier;
@@ -59,6 +67,13 @@ class SystemsOptionsModel {
     SystemsOptionsModel(@Nonnull CampaignOptions options) {
         manualUnitRatingModifier = options.getManualUnitRatingModifier();
         resetCriminalRecord = false;
+        useChaosReputation = options.get(CampaignOption.USE_CHAOS_REPUTATION);
+        campaignLevelChaosReputation = options.get(CampaignOption.CAMPAIGN_LEVEL_CHAOS_REPUTATION);
+        chaosReputationCap = options.get(CampaignOption.CHAOS_REPUTATION_CAP);
+        chaosDebtPenaltiesStack = options.get(CampaignOption.CHAOS_DEBT_PENALTIES_STACK);
+        chaosNoPartialSuccessReputation = options.get(CampaignOption.CHAOS_NO_PARTIAL_SUCCESS_REPUTATION);
+        chaosPersonalityAffectsReputation = options.get(CampaignOption.CHAOS_PERSONALITY_AFFECTS_REPUTATION);
+        chaosNewRecruitsHaveReputation = options.get(CampaignOption.CHAOS_NEW_RECRUITS_HAVE_REPUTATION);
         requireSupportForceTransportation = options.isRequireSupportForceTransportation();
         clampReputationPayMultiplier = options.isClampReputationPayMultiplier();
         reduceReputationPerformanceModifier = options.isReduceReputationPerformanceModifier();
@@ -80,6 +95,13 @@ class SystemsOptionsModel {
 
     void applyTo(@Nonnull CampaignOptions options) {
         options.setManualUnitRatingModifier(manualUnitRatingModifier);
+        options.set(CampaignOption.USE_CHAOS_REPUTATION, useChaosReputation);
+        options.set(CampaignOption.CAMPAIGN_LEVEL_CHAOS_REPUTATION, campaignLevelChaosReputation);
+        options.set(CampaignOption.CHAOS_REPUTATION_CAP, chaosReputationCap);
+        options.set(CampaignOption.CHAOS_DEBT_PENALTIES_STACK, chaosDebtPenaltiesStack);
+        options.set(CampaignOption.CHAOS_NO_PARTIAL_SUCCESS_REPUTATION, chaosNoPartialSuccessReputation);
+        options.set(CampaignOption.CHAOS_PERSONALITY_AFFECTS_REPUTATION, chaosPersonalityAffectsReputation);
+        options.set(CampaignOption.CHAOS_NEW_RECRUITS_HAVE_REPUTATION, chaosNewRecruitsHaveReputation);
         options.setRequireSupportForceTransportation(requireSupportForceTransportation);
         options.setClampReputationPayMultiplier(clampReputationPayMultiplier);
         options.setReduceReputationPerformanceModifier(reduceReputationPerformanceModifier);
