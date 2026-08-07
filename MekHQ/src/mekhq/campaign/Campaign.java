@@ -64,8 +64,6 @@ import static mekhq.campaign.universe.Faction.MERCENARY_FACTION_CODE;
 import static mekhq.campaign.universe.Faction.PIRATE_FACTION_CODE;
 import static mekhq.campaign.universe.Faction.TORTUGA_DOMINIONS_FACTION_CODE;
 import static mekhq.campaign.universe.Factions.getFactionLogo;
-import static mekhq.campaign.universe.WarriorsAlmanac.WarriorsAlmanacData.buildAlmanacPartsData;
-import static mekhq.campaign.universe.WarriorsAlmanac.WarriorsAlmanacData.buildAlmanacUnitsData;
 import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
 import static mekhq.utilities.MHQInternationalization.getTextAt;
 
@@ -370,13 +368,13 @@ public class Campaign implements ITechManager {
     RandomEventLibraries randomEventLibraries;
     FactionStandingUltimatumsLibrary factionStandingUltimatumsLibrary;
 
-    private transient Map<Integer, WarriorsAlmanacData> partsAlmanacIS = buildAlmanacPartsData(partsStore, false);
-    private transient Map<Integer, WarriorsAlmanacData> partsAlmanacClan = buildAlmanacPartsData(partsStore, true);
+    private Map<Integer, WarriorsAlmanacData> partsAlmanacIS;
+    private Map<Integer, WarriorsAlmanacData> partsAlmanacClan;
 
-    private transient Map<Integer, WarriorsAlmanacData> unitsAlmanacIS = buildAlmanacUnitsData(TechBase.IS.toString());
-    private transient Map<Integer, WarriorsAlmanacData> unitsAlmanacClan = buildAlmanacUnitsData(TechBase.CLAN.toString());
-    private transient Map<Integer, WarriorsAlmanacData> unitsAlmanacMixed = buildAlmanacUnitsData(TechBase.ALL.toString());
-    private transient Map<Integer, WarriorsAlmanacData> unitsAlmanacUnknown = buildAlmanacUnitsData(TechBase.UNKNOWN.toString());
+    private Map<Integer, WarriorsAlmanacData> unitsAlmanacIS;
+    private Map<Integer, WarriorsAlmanacData> unitsAlmanacClan;
+    private Map<Integer, WarriorsAlmanacData> unitsAlmanacMixed;
+    private Map<Integer, WarriorsAlmanacData> unitsAlmanacUnknown;
 
     /**
      * A constant that provides the ISO-8601 definition of week-based fields.
@@ -1956,7 +1954,7 @@ public class Campaign implements ITechManager {
 
     /**
      * @return all hangars across all locations associated with this campaign.
-     *                                                                                                                                                                                           TODO: This won't work once we support multiple hangars. Method separated from getHangar() for future refactor
+     *                                                                                                                                                                                                             TODO: This won't work once we support multiple hangars. Method separated from getHangar() for future refactor
      *
      * @deprecated Use {@link PlayerForce#getHangar()} directly.
      */

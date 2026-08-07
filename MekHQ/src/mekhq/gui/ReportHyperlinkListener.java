@@ -42,6 +42,7 @@ import megamek.codeUtilities.MathUtility;
 import megamek.logging.MMLogger;
 import mekhq.campaign.unit.Unit;
 import mekhq.gui.dialog.VocationalExperienceAwardDialog;
+import mekhq.gui.dialog.WarriorsAlmanacDialog;
 import mekhq.gui.dialog.reportDialogs.MaintenanceReportDialog;
 
 /**
@@ -152,12 +153,7 @@ public record ReportHyperlinkListener(CampaignGUI campaignGUI) implements Hyperl
                     LOGGER.error("", e);
                 }
             } else if (evt.getDescription().startsWith(WARRIORS_ALMANAC)) {
-                try {
-                    final UUID id = UUID.fromString(evt.getDescription().split(":")[1]);
-                    campaignGUI.focusOnPerson(id);
-                } catch (Exception e) {
-                    LOGGER.error("", e);
-                }
+                new WarriorsAlmanacDialog(campaignGUI.getCampaign());
             }
         }
     }

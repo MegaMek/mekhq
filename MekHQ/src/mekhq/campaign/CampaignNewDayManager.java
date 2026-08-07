@@ -202,6 +202,7 @@ import mekhq.gui.CommandCenterTab;
 import mekhq.gui.baseComponents.immersiveDialogs.ImmersiveDialogNotification;
 import mekhq.gui.baseComponents.immersiveDialogs.ImmersiveDialogSimple;
 import mekhq.gui.baseComponents.immersiveDialogs.ImmersiveDialogWidth;
+import mekhq.gui.dialog.WarriorsAlmanacDialog;
 import mekhq.service.mrms.MRMSService;
 import mekhq.utilities.ReportingUtilities;
 
@@ -503,6 +504,16 @@ public class CampaignNewDayManager {
         if (isNewYear) {
             // News is reloaded
             campaign.reloadNews();
+
+            // Warrior's Almanac
+            campaign.addReport(GENERAL, getFormattedTextAt(RESOURCE_BUNDLE, "warriorsAlmanac.text",
+                  spanOpeningWithCustomColor(ReportingUtilities.getPositiveColor()),
+                  today.getYear(),
+                  CLOSING_SPAN_TAG));
+
+            if (MekHQ.getMHQOptions().getShowWarriorsAlmanac()) {
+                new WarriorsAlmanacDialog(campaign);
+            }
 
             // Change Year Game Option
             campaign.getGameOptions().getOption(OptionsConstants.ALLOWED_YEAR).setValue(today.getYear());
