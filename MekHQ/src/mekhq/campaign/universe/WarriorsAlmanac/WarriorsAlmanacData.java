@@ -80,7 +80,7 @@ public record WarriorsAlmanacData(List<String> prototypeDate, List<String> produ
         final Map<Integer, WarriorsAlmanacData> unitTechDatesByYear = new HashMap<>();
 
         for (MekSummary summary : MekSummaryCache.getInstance().getAllMeks()) {
-            if (resolveTechBase(summary) != techBase) {
+            if (resolveTechBase(summary) == techBase) {
                 final String name = summary.getName();
                 unitTechDatesByYear.computeIfAbsent(summary.getPrototypeDate(), year -> new WarriorsAlmanacData())
                       .prototypeDate()
