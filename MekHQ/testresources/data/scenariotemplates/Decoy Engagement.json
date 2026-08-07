@@ -1,0 +1,154 @@
+# MegaMek Data (C) 2025-2026 by The MegaMek Team is licensed under CC BY-NC-SA 4.0.
+# To view a copy of this license, visit https: //creativecommons.org/licenses/by-nc-sa/4.0/
+#
+# NOTICE: The MegaMek organization is a non-profit group of volunteers
+# creating free software for the BattleTech community.
+#
+# MechWarrior, BattleMech, `Mech and AeroTech are registered trademarks
+# of The Topps Company, Inc. All Rights Reserved.
+#
+# Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
+# InMediaRes Productions, LLC.
+#
+# MechWarrior Copyright Microsoft Corporation. MegaMek Data was created under
+# Microsoft's "Game Content Usage Rules"
+# <https: //www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+# affiliated with Microsoft.
+
+{
+"name": "Decoy Engagement",
+"stratConScenarioType": "NONE",
+"shortBriefing": "Engage enemy, act as decoy.",
+"detailedBriefing": "Your mission is to serve as a decoy, drawing the attention of a large enemy force while our allies carry out critical objectives elsewhere in the sector. The enemy must believe you are the primary threat, forcing them to commit their forces fully to your position. Your task is to survive for the designated duration. Do not destroy the OpFor too quickly.",
+"isHostileFacility": false,
+"isAlliedFacility": false,
+"isSuitedForAmbushes": false,
+"isSuitedForBungledPatrols": false,
+"battlefieldControl": "VICTOR",
+"mapParameters": {
+"baseWidth": 0,
+"baseHeight": 0,
+"widthScalingIncrement": 5,
+"heightScalingIncrement": 5,
+"additionalMapSheetTall": 0,
+"additionalMapSheetWide": 0,
+"allowRotation": false,
+"useStandardAtBSizing": true,
+"mapLocation": "AllGroundTerrain",
+"allowedTerrainTypes": [
+"ColdHills",
+"Hills",
+"HotHillsDry",
+"HotHillsWet"
+]
+},
+"scenarioModifiers": [
+],
+"scenarioForces": {
+"Player": {
+"forceAlignment": 0,
+"generationMethod": 0,
+"forceMultiplier": 1.0,
+"deploymentZones": [
+2,
+4,
+6,
+8
+],
+"destinationZone": 5,
+"retreatThreshold": 50,
+"allowedUnitType": -2,
+"canReinforceLinked": false,
+"contributesToBV": true,
+"contributesToUnitCount": true,
+"forceName": "Player",
+"syncedForceName": null,
+"syncDeploymentType": "None",
+"syncRetreatThreshold": false,
+"arrivalTurn": 0,
+"maxWeightClass": 4,
+"minWeightClass": 0,
+"contributesToMapSize": true,
+"actualDeploymentZone": -1,
+"fixedUnitCount": 0,
+"generationOrder": 1,
+"allowAeroBombs": false,
+"startingAltitude": 0,
+"useArtillery": false,
+"deployOffBoard": false,
+"objectiveLinkedForces": [],
+"subjectToRandomRemoval": false,
+"fixedMul": null,
+"forceRoleStrings": [
+]
+},
+"OpFor": {
+"forceAlignment": 2,
+"generationMethod": 1,
+"forceMultiplier": 1.0,
+"deploymentZones": [],
+"destinationZone": 5,
+"retreatThreshold": 50,
+"allowedUnitType": -2,
+"canReinforceLinked": false,
+"contributesToBV": false,
+"contributesToUnitCount": false,
+"forceName": "OpFor",
+"syncedForceName": "Player",
+"syncDeploymentType": "OppositeEdge",
+"syncRetreatThreshold": false,
+"arrivalTurn": 0,
+"maxWeightClass": 4,
+"minWeightClass": 2,
+"contributesToMapSize": true,
+"actualDeploymentZone": -1,
+"fixedUnitCount": 0,
+"generationOrder": 5,
+"allowAeroBombs": false,
+"startingAltitude": 0,
+"useArtillery": false,
+"deployOffBoard": false,
+"objectiveLinkedForces": [
+],
+"subjectToRandomRemoval": true,
+"fixedMul": null,
+"forceRoleStrings": [
+"RECON",
+"RAIDER",
+"CAVALRY"
+]
+}
+},
+"scenarioObjectives": [
+{
+"objectiveCriterion": "Custom",
+"description": "Engage the following enemy forces for 12 turns. +1 SVP if succeeded, -1 SVP if failed. Do not destroy the OpFor too quickly.",
+"destinationEdge": "NONE",
+"percentage": 1,
+"fixedAmount": null,
+"timeLimitType": "Fixed",
+"timeLimitAtMost": false,
+"timeLimit": 12,
+"timeLimitScaleFactor": 2,
+"associatedForceNames": [
+"OpFor"
+],
+"associatedUnitIDs": [],
+"successEffects": [
+{
+"effectType": "ScenarioVictory",
+"effectScaling": "Fixed",
+"howMuch": 1
+}
+],
+"failureEffects": [
+{
+"effectType": "ScenarioDefeat",
+"effectScaling": "Fixed",
+"howMuch": 1
+}
+],
+"additionalDetails": []
+}
+]
+}

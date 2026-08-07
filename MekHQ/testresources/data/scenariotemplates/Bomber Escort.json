@@ -1,0 +1,177 @@
+# MegaMek Data (C) 2026 by The MegaMek Team is licensed under CC BY-NC-SA 4.0.
+# To view a copy of this license, visit https: //creativecommons.org/licenses/by-nc-sa/4.0/
+#
+# NOTICE: The MegaMek organization is a non-profit group of volunteers
+# creating free software for the BattleTech community.
+#
+# MechWarrior, BattleMech, `Mech and AeroTech are registered trademarks
+# of The Topps Company, Inc. All Rights Reserved.
+#
+# Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
+# InMediaRes Productions, LLC.
+#
+# MechWarrior Copyright Microsoft Corporation. MegaMek Data was created under
+# Microsoft's "Game Content Usage Rules"
+# <https: //www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+# affiliated with Microsoft.
+
+{
+"name": "Bomber Escort",
+"stratConScenarioType": "NONE",
+"shortBriefing": "Escort allied bombers through interceptors to their target.",
+"detailedBriefing": "Allied bombers are inbound to hit a priority target, and enemy interceptors are scrambling to knock them down before they can release. The bombers are loaded, sluggish, and cannot defend themselves—that is your job.",
+"isHostileFacility": false,
+"isAlliedFacility": false,
+"isSuitedForAmbushes": false,
+"isSuitedForBungledPatrols": false,
+"battlefieldControl": "VICTOR",
+"mapParameters": {
+"baseWidth": 50,
+"baseHeight": 50,
+"widthScalingIncrement": 5,
+"heightScalingIncrement": 5,
+"additionalMapSheetTall": 1,
+"additionalMapSheetWide": 0,
+"allowRotation": false,
+"useStandardAtBSizing": true,
+"mapLocation": "LowAtmosphere",
+"allowedTerrainTypes": []
+},
+"scenarioModifiers": [
+],
+"scenarioForces": {
+"Player": {
+"forceAlignment": 0,
+"generationMethod": 0,
+"forceMultiplier": 1.0,
+"deploymentZones": [],
+"destinationZone": 5,
+"retreatThreshold": 50,
+"allowedUnitType": 9,
+"canReinforceLinked": false,
+"contributesToBV": true,
+"contributesToUnitCount": true,
+"forceName": "Player",
+"syncedForceName": "Bombers",
+"syncDeploymentType": "SameEdge",
+"syncRetreatThreshold": false,
+"arrivalTurn": 0,
+"maxWeightClass": 4,
+"minWeightClass": 0,
+"contributesToMapSize": true,
+"actualDeploymentZone": -1,
+"fixedUnitCount": 0,
+"generationOrder": 1,
+"allowAeroBombs": false,
+"startingAltitude": 5,
+"useArtillery": false,
+"deployOffBoard": false,
+"objectiveLinkedForces": [
+],
+"subjectToRandomRemoval": false,
+"fixedMul": null,
+"forceRoleStrings": []
+},
+"OpFor": {
+"forceAlignment": 2,
+"generationMethod": 1,
+"forceMultiplier": 1.0,
+"deploymentZones": [],
+"destinationZone": 5,
+"retreatThreshold": 33,
+"allowedUnitType": -3,
+"canReinforceLinked": false,
+"contributesToBV": false,
+"contributesToUnitCount": false,
+"forceName": "OpFor",
+"syncedForceName": "Bombers",
+"syncDeploymentType": "OppositeEdge",
+"syncRetreatThreshold": false,
+"arrivalTurn": 0,
+"maxWeightClass": 4,
+"minWeightClass": 0,
+"contributesToMapSize": true,
+"actualDeploymentZone": -1,
+"fixedUnitCount": 0,
+"generationOrder": 5,
+"allowAeroBombs": false,
+"startingAltitude": 5,
+"useArtillery": false,
+"deployOffBoard": false,
+"objectiveLinkedForces": [
+],
+"subjectToRandomRemoval": true,
+"fixedMul": null,
+"forceRoleStrings": [
+"INTERCEPTOR"
+]
+},
+"Bombers": {
+"forceAlignment": 1,
+"generationMethod": 1,
+"forceMultiplier": 0.5,
+"deploymentZones": [
+11
+],
+"destinationZone": 6,
+"retreatThreshold": 0,
+"allowedUnitType": 9,
+"canReinforceLinked": false,
+"contributesToBV": true,
+"contributesToUnitCount": true,
+"forceName": "Bombers",
+"syncedForceName": null,
+"syncDeploymentType": "None",
+"syncRetreatThreshold": false,
+"arrivalTurn": 0,
+"maxWeightClass": 4,
+"minWeightClass": 0,
+"contributesToMapSize": true,
+"actualDeploymentZone": -1,
+"fixedUnitCount": 0,
+"generationOrder": 2,
+"allowAeroBombs": true,
+"startingAltitude": 5,
+"useArtillery": false,
+"deployOffBoard": false,
+"objectiveLinkedForces": [],
+"subjectToRandomRemoval": true,
+"fixedMul": null,
+"forceRoleStrings": [
+"BOMBER"
+]
+}
+},
+"scenarioObjectives": [
+{
+"objectiveCriterion": "Preserve",
+"description": "",
+"destinationEdge": "NONE",
+"percentage": 50,
+"fixedAmount": null,
+"timeLimitType": "None",
+"timeLimitAtMost": true,
+"timeLimit": null,
+"timeLimitScaleFactor": null,
+"associatedForceNames": [
+"Bombers"
+],
+"associatedUnitIDs": [],
+"successEffects": [
+{
+"effectType": "ScenarioVictory",
+"effectScaling": "Fixed",
+"howMuch": 1
+}
+],
+"failureEffects": [
+{
+"effectType": "ScenarioDefeat",
+"effectScaling": "Fixed",
+"howMuch": 1
+}
+],
+"additionalDetails": []
+}
+]
+}

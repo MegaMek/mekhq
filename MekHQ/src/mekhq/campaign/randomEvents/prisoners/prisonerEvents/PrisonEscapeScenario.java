@@ -236,7 +236,7 @@ public class PrisonEscapeScenario {
      */
     private void createEscapeeScenario(List<Unit> mobUnits) {
         final String DIRECTORY = "data" + separator + "scenariotemplates" + separator;
-        final String GENERIC = DIRECTORY + "Intercept the Escapees.xml";
+        final String GENERIC = DIRECTORY + "Intercept the Escapees.json";
 
         ScenarioTemplate template = ScenarioTemplate.Deserialize(GENERIC);
 
