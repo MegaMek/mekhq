@@ -1,0 +1,613 @@
+# MegaMek Data (C) 2025-2026 by The MegaMek Team is licensed under CC BY-NC-SA 4.0.
+# To view a copy of this license, visit https: //creativecommons.org/licenses/by-nc-sa/4.0/
+#
+# NOTICE: The MegaMek organization is a non-profit group of volunteers
+# creating free software for the BattleTech community.
+#
+# MechWarrior, BattleMech, `Mech and AeroTech are registered trademarks
+# of The Topps Company, Inc. All Rights Reserved.
+#
+# Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
+# InMediaRes Productions, LLC.
+#
+# MechWarrior Copyright Microsoft Corporation. MegaMek Data was created under
+# Microsoft's "Game Content Usage Rules"
+# <https: //www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+# affiliated with Microsoft.
+
+{
+"biomes": [ {
+"biomeCategory": "Terran",
+"allowedTemperatureLowerBound": 0,
+"allowedTemperatureUpperBound": 267,
+"allowedTerrainTypes": ["SnowField", "Glacier", "ArcticDesert", "ColdHills", "ColdMountain", "FrozenSea"]
+}, {
+"biomeCategory": "Terran",
+"allowedTemperatureLowerBound": 268,
+"allowedTemperatureUpperBound": 277,
+"allowedTerrainTypes": ["Tundra", "Steppe", "ColdForest", "Swamp", "ArcticDesert", "ColdHills", "ColdMountain", "ColdSea", "ColdUrban"]
+}, {
+"biomeCategory": "Terran",
+"allowedTemperatureLowerBound": 278,
+"allowedTemperatureUpperBound": 287,
+"allowedTerrainTypes": ["Badlands", "Plains", "Forest", "Swamp", "Desert", "Hills", "Mountain", "Sea", "Urban"]
+}, {
+"biomeCategory": "Terran",
+"allowedTemperatureLowerBound": 288,
+"allowedTemperatureUpperBound": 297,
+"allowedTerrainTypes": ["Badlands", "Plains", "Forest", "Swamp", "Desert", "Hills", "Mountain", "Sea", "Urban"]
+}, {
+"biomeCategory": "Terran",
+"allowedTemperatureLowerBound": 298,
+"allowedTemperatureUpperBound": 307,
+"allowedTerrainTypes": ["Badlands", "Savannah", "Forest", "HotForest", "Jungle", "Swamp", "Desert", "Hills", "Mountain", "HotHillsDry", "HotHillsWet", "Sea", "HotSea", "Urban", "HotUrban"]
+}, {
+"biomeCategory": "Terran",
+"allowedTemperatureLowerBound": 308,
+"allowedTemperatureUpperBound": 317,
+"allowedTerrainTypes": ["Badlands", "Savannah", "HotForest", "Jungle", "Swamp", "Desert", "Hills", "Mountain", "HotSea", "HotUrban", "HotHillsDry", "HotHillsWet", "HotMountainsDry", "HotMountainsWet"]
+}, {
+"biomeCategory": "Terran",
+"allowedTemperatureLowerBound": 318,
+"allowedTemperatureUpperBound": 90000,
+"allowedTerrainTypes": ["Badlands", "Savannah", "Jungle", "Desert", "HotSea", "HotHillsDry", "HotHillsWet", "HotMountainsDry", "HotMountainsWet"]
+}, {
+"biomeCategory": "TerranFacility",
+"allowedTemperatureLowerBound": 0,
+"allowedTemperatureUpperBound": 267,
+"allowedTerrainTypes": ["FrozenFacility"]
+}, {
+"biomeCategory": "TerranFacility",
+"allowedTemperatureLowerBound": 268,
+"allowedTemperatureUpperBound": 277,
+"allowedTerrainTypes": ["ColdFacility"]
+}, {
+"biomeCategory": "TerranFacility",
+"allowedTemperatureLowerBound": 278,
+"allowedTemperatureUpperBound": 297,
+"allowedTerrainTypes": ["TemperateFacility"]
+}, {
+"biomeCategory": "TerranFacility",
+"allowedTemperatureLowerBound": 298,
+"allowedTemperatureUpperBound": 90000,
+"allowedTerrainTypes": ["HotFacility"]
+}, {
+"biomeCategory": "Airless",
+"allowedTemperatureLowerBound": 0,
+"allowedTemperatureUpperBound": 90000,
+"allowedTerrainTypes": ["GrayLunar", "Mars", "Volcano" ]
+} ],
+"terrainTypes": [ {
+"name": "Sea",
+"image": null,
+"category": "OCEAN",
+"arable": false,
+"temperatureOffset": 0,
+"tilesetTheme": null
+}, {
+"name": "ColdSea",
+"image": null,
+"category": "OCEAN",
+"arable": false,
+"temperatureOffset": -8,
+"tilesetTheme": "snow"
+}, {
+"name": "HotSea",
+"image": null,
+"category": "OCEAN",
+"arable": false,
+"temperatureOffset": 8,
+"tilesetTheme": null
+}, {
+"name": "FrozenSea",
+"image": null,
+"category": "OCEAN",
+"arable": false,
+"temperatureOffset": -8,
+"tilesetTheme": "snow"
+}, {
+"name": "Mountain",
+"image": null,
+"category": "MOUNTAIN",
+"arable": false,
+"temperatureOffset": -6,
+"tilesetTheme": null
+}, {
+"name": "ColdMountain",
+"image": null,
+"category": "MOUNTAIN",
+"arable": false,
+"temperatureOffset": -14,
+"tilesetTheme": "snow"
+}, {
+"name": "HotMountainsWet",
+"image": null,
+"category": "MOUNTAIN",
+"arable": false,
+"temperatureOffset": 2,
+"tilesetTheme": null
+}, {
+"name": "HotMountainsDry",
+"image": null,
+"category": "MOUNTAIN",
+"arable": false,
+"temperatureOffset": 2,
+"tilesetTheme": "desert"
+}, {
+"name": "Urban",
+"image": null,
+"category": "URBAN",
+"arable": false,
+"temperatureOffset": 0,
+"tilesetTheme": null
+}, {
+"name": "ColdUrban",
+"image": null,
+"category": "URBAN",
+"arable": false,
+"temperatureOffset": -8,
+"tilesetTheme": "snow"
+}, {
+"name": "HotUrban",
+"image": null,
+"category": "URBAN",
+"arable": false,
+"temperatureOffset": 8,
+"tilesetTheme": null
+}, {
+"name": "Volcano",
+"image": null,
+"category": "VOLCANIC",
+"arable": false,
+"temperatureOffset": 25,
+"tilesetTheme": "volcano"
+}, {
+"name": "GrayLunar",
+"image": null,
+"category": "LUNAR",
+"arable": false,
+"temperatureOffset": 0,
+"tilesetTheme": "lunar"
+}, {
+"name": "Mars",
+"image": null,
+"category": "LUNAR",
+"arable": false,
+"temperatureOffset": 0,
+"tilesetTheme": "mars"
+}, {
+"name": "Forest",
+"image": null,
+"category": "VEGETATION",
+"arable": false,
+"temperatureOffset": 0,
+"tilesetTheme": null
+}, {
+"name": "ColdForest",
+"image": null,
+"category": "VEGETATION",
+"arable": false,
+"temperatureOffset": -8,
+"tilesetTheme": "snow"
+}, {
+"name": "HotForest",
+"image": null,
+"category": "VEGETATION",
+"arable": false,
+"temperatureOffset": 8,
+"tilesetTheme": "tropical"
+}, {
+"name": "Jungle",
+"image": null,
+"category": "VEGETATION",
+"arable": false,
+"temperatureOffset": 0,
+"tilesetTheme": "jungle"
+}, {
+"name": "Swamp",
+"image": null,
+"category": "VEGETATION",
+"arable": false,
+"temperatureOffset": 0,
+"tilesetTheme": "swamp"
+}, {
+"name": "Savannah",
+"image": null,
+"category": "VEGETATION",
+"arable": true,
+"temperatureOffset": 0,
+"tilesetTheme": null
+}, {
+"name": "Plains",
+"image": null,
+"category": "VEGETATION",
+"arable": true,
+"temperatureOffset": 0,
+"tilesetTheme": null
+}, {
+"name": "HotHillsWet",
+"image": null,
+"category": "HILLS",
+"arable": true,
+"temperatureOffset": 8,
+"tilesetTheme": null
+}, {
+"name": "Desert",
+"image": null,
+"category": "BARREN",
+"arable": false,
+"temperatureOffset": 8,
+"tilesetTheme": "desert"
+}, {
+"name": "Badlands",
+"image": null,
+"category": "BARREN",
+"arable": false,
+"temperatureOffset": 8,
+"tilesetTheme": "desert"
+}, {
+"name": "Steppe",
+"image": null,
+"category": "BARREN",
+"arable": true,
+"temperatureOffset": 0,
+"tilesetTheme": "desert"
+}, {
+"name": "ArcticDesert",
+"image": null,
+"category": "BARREN",
+"arable": false,
+"temperatureOffset": -8,
+"tilesetTheme": "snow"
+}, {
+"name": "Glacier",
+"image": null,
+"category": "BARREN",
+"arable": false,
+"temperatureOffset": -8,
+"tilesetTheme": "snow"
+}, {
+"name": "SnowField",
+"image": null,
+"category": "BARREN",
+"arable": false,
+"temperatureOffset": -8,
+"tilesetTheme": "snow"
+}, {
+"name": "Tundra",
+"image": null,
+"category": "BARREN",
+"arable": false,
+"temperatureOffset": -8,
+"tilesetTheme": "snow"
+}, {
+"name": "HotHillsDry",
+"image": null,
+"category": "HILLS",
+"arable": false,
+"temperatureOffset": 8,
+"tilesetTheme": "desert"
+}, {
+"name": "Hills",
+"image": null,
+"category": "HILLS",
+"arable": true,
+"temperatureOffset": 0,
+"tilesetTheme": null
+}, {
+"name": "ColdHills",
+"image": null,
+"category": "HILLS",
+"arable": false,
+"temperatureOffset": -8,
+"tilesetTheme": "snow"
+}, {
+"name": "Farmland",
+"image": null,
+"category": "AGRICULTURE",
+"arable": false,
+"temperatureOffset": 0,
+"tilesetTheme": null
+} ],
+"biomeMapTypes": {
+"LUNAR": {
+"mapTypes": ["StratconLunar"]
+},
+"SavannahFacility": {
+"mapTypes": ["BaseHotDesert", "RuralHomesteadsHotDesert", "PlainsOutpost"]
+},
+"ForestFacility": {
+"mapTypes": ["Town-wooded", "PlainsOutpost", "Woods-medium"]
+},
+"BadlandsFacility": {
+"mapTypes": ["BaseHotDesert", "RuralHomesteadsHotDesert", "Sandy-hills"]
+},
+"Swamp": {
+"mapTypes": ["Muddy-swamp", "Lake-marsh", "Lake-high", "Wooded-lake", "Swamp", "Wooded-swamp", "River-wetlands", "Lake-marsh - Jazz", "Muddy-swamp - Jazz", "River-wetlands - Jazz", "Swamp - Jazz", "Sea-MangroveCliffs", "Sea-SaltwaterMarsh"]
+},
+"SnowFieldFacility": {
+"mapTypes": ["SnowOutpost", "IceOutpost", "BaseCold", "RuralHomesteadsCold" ]
+},
+"ArcticDesertFacility": {
+"mapTypes": ["IceOutpost", "SnowOutpost", "BaseCold"]
+},
+"Hills": {
+"mapTypes": ["Hills", "Hills-craters", "Hills-pastoral", "Hills-Residential", "Hills-Residential2", "Hills-River", "Hills-RiverRoad", "Light-craters", "Wooded-hills", "Town-hills"]
+},
+"HotFacility": {
+"mapTypes": ["BaseHotDesert", "BaseHotJungle", "RuralHomesteadsHotDesert", "RuralHomesteadsHotJungle", "TownHotDesert", "TownHotJungle"]
+},
+"HotMountainsDry": {
+"mapTypes": ["MountainHotDesert", "Rocky-valley", "Cliffs", "Mountain-medium" ]
+},
+"HotForestFacility": {
+"mapTypes": ["BaseHotJungle", "RuralHomesteadsHotJungle", "TownHotJungle"]
+},
+"ColdUrban": {
+"mapTypes": ["ColdSeaCoastalFort", "CityCold", "TownCold", "RuralHomesteadsCold", "ColdSeaCoastalRoads"]
+},
+"Convoy": {
+"mapTypes": ["Convoy", "RuralHomesteadsCold", "RuralHomesteadsHotDesert", "RuralHomesteadsHotJungle", "BaseCold", "BaseHotDesert", "BaseHotJungle"]
+},
+"ColdForestFacility": {
+"mapTypes": ["BaseCold", "RuralHomesteadsCold", "Wooded-tundra", "TownCold" ]
+},
+"GrayLunarFacility": {
+"mapTypes": ["StratconLunar"]
+},
+"HotMountainsDryFacility": {
+"mapTypes": ["BaseHotDesert", "MountainHotDesert", "RuralHomesteadsHotDesert"]
+},
+"NEUTRAL": {
+"mapTypes": ["PlainsTown", "PlainsOutpost", "Town-generic", "Some-trees", "Town-ruin"]
+},
+"FrozenFacility": {
+"mapTypes": ["BaseCold", "IceOutpost", "IceHills", "SnowOutpost" ]
+},
+"HotMountainsWetFacility": {
+"mapTypes": ["BaseHotJungle", "MountainHotJungle", "RuralHomesteadsHotJungle"]
+},
+"Glacier": {
+"mapTypes": ["Icefield", "IceRiver", "IceOutpost", "IceJagged", "IceHills", "RockyIcefield", "SnowDunes"]
+},
+"HotHillsDry": {
+"mapTypes": ["HillsHotDesert", "Sandy-hills", "Sandy-valley", "Rocky-valley" ]
+},
+"Savannah": {
+"mapTypes": ["Savannah", "Some-trees", "Dust-bowl", "Sandy-hills", "Town-farming"]
+},
+"AGRICULTURE": {
+"mapTypes": ["Town-farming", "Hills-pastoral", "PlainsOutpost", "PlainsTown", "Some-trees"]
+},
+"TemperateFacility": {
+"mapTypes": ["PlainsOutpost", "Town-mining", "Town-farming", "Town-generic", "Town-wooded", "Sea-CoastalFort", "Fortress-City"]
+},
+"SwampFacility": {
+"mapTypes": ["Wooded-swamp", "Muddy-swamp", "PlainsOutpost"]
+},
+"Plains": {
+"mapTypes": ["PlainsLake", "PlainsOutpost", "PlainsTown", "Savannah", "Town-ruin", "Town-farming", "Dust-bowl", "River-huge"]
+},
+"HILLS": {
+"mapTypes": ["Hills", "Wooded-hills", "Hills-River", "Town-hills", "Hills-pastoral"]
+},
+"JungleFacility": {
+"mapTypes": ["BaseHotJungle", "RuralHomesteadsHotJungle", "TownHotJungle"]
+},
+"FarmlandFacility": {
+"mapTypes": ["Town-farming", "PlainsOutpost", "Hills-pastoral"]
+},
+"Badlands": {
+"mapTypes": ["Dust-bowl", "Light-craters", "Sandy-valley", "Rocky-valley", "Rubble-river"]
+},
+"FrozenSea": {
+"mapTypes": ["FrozenSea", "OpenOceanFrozen"]
+},
+"Sea": {
+"mapTypes": ["Sea-Deltas", "Sea-Fjord", "OpenOcean"]
+},
+"HotUrbanFacility": {
+"mapTypes": ["TownHotDesert", "TownHotJungle", "CityHotDesert"]
+},
+"Volcano": {
+"mapTypes": ["StratconVolcanic"]
+},
+"Jungle": {
+"mapTypes": ["Jungle", "TownHotJungle", "RuralHomesteadsHotJungle"]
+},
+"VEGETATION": {
+"mapTypes": ["Woods-medium", "Wooded-hills", "Woods-river", "Wooded-valley", "Some-trees"]
+},
+"ColdMountainFacility": {
+"mapTypes": ["BaseCold", "SnowOutpost", "Mountain-RuinedTrenches-snow", "Mountain-town-snow" ]
+},
+"VOLCANIC": {
+"mapTypes": ["StratconVolcanic"]
+},
+"HotMountainsWet": {
+"mapTypes": ["MountainHotJungle", "Mountain-river", "HillsHotJungle"]
+},
+"MOUNTAIN": {
+"mapTypes": ["Mountain-medium", "Mountain-high", "Cliffs", "Rubble-mountain", "Mountain-river"]
+},
+"HotSea": {
+"mapTypes": ["SeaHotDesert", "SeaHotJungle", "OpenOceanTropical"]
+},
+"DropZone": {
+"mapTypes": ["Savannah", "Dust-bowl", "Sandy-hills", "ArcticDesert", "ArcticDesert-Rough", "TundraRoad", "TundraRoadSnow", "TundraRiverGrass", "TundraRiverSnow" ]
+},
+"ColdFacility": {
+"mapTypes": ["BaseCold", "RuralHomesteadsCold", "SnowOutpost", "ColdSeaCoastalFort", "TownCold"]
+},
+"Urban": {
+"mapTypes": ["City-dense", "City-high", "Town-concrete", "Fortress-City", "Town-generic", "Town-ruin", "Seaport", "Town-mining", "Sea-CoastalRoads" ]
+},
+"HillsFacility": {
+"mapTypes": ["Town-hills", "Hills-Residential", "Hills-pastoral", "PlainsOutpost" ]
+},
+"Mars": {
+"mapTypes": ["StratconMars"]
+},
+"HotForest": {
+"mapTypes": ["ForestHot", "RuralHomesteadsHotJungle", "Jungle", "HillsHotJungle" ]
+},
+"Mountain": {
+"mapTypes": ["Mountain-lake", "Cliffs-lake", "Rubble-mountain", "Cliffs", "Mountain-medium", "Mountain-high", "Mountain-river", "Mountain-RuinedTrenches", "Mountain-TouristTown", "Mountain-town", "Heavy-craters", "Town-mountain", "Rocky-valley"]
+},
+"Steppe": {
+"mapTypes": ["Some-trees", "Dust-bowl", "TundraRiverGrass", "PlainsOutpost", "Town-farming"]
+},
+"ColdForest": {
+"mapTypes": ["ColdForest", "Some-trees-snow", "Wooded-lake-snow", "Woods-deep-snow", "Wooded-valley-snow", "Woods-river-snow", "Wooded-tundra", "RuralHomesteadsCold"]
+},
+"ColdHills": {
+"mapTypes": ["ColdHills", "Hills-craters-snow", "Hills-snow-tundra", "Hills-River-Snow", "Hills-RiverRoad-Snow", "Light-craters-snow", "Wooded-hills-snow"]
+},
+"HotUrban": {
+"mapTypes": ["CityHotDesert", "CityHotJungle", "TownHotJungle", "TownHotJungle", "RuralHomesteadsHotDesert"]
+},
+"HotHillsDryFacility": {
+"mapTypes": ["BaseHotDesert", "RuralHomesteadsHotDesert", "HillsHotDesert"]
+},
+"ArcticDesert": {
+"mapTypes": ["ArcticDesert", "ArcticDesert-Rough", "SnowDunes", "SnowCoast" ]
+},
+"VolcanoFacility": {
+"mapTypes": ["StratconVolcanic", "BaseHotDesert", "MountainHotDesert"]
+},
+"SteppeFacility": {
+"mapTypes": ["PlainsOutpost", "Town-farming", "Town-mining"]
+},
+"HotHillsWet": {
+"mapTypes": ["HillsHotJungle", "ForestHot", "RuralHomesteadsHotJungle"]
+},
+"MountainFacility": {
+"mapTypes": ["Mountain-town", "Town-mountain", "Mountain-RuinedTrenches", "Mountain-TouristTown" ]
+},
+"URBAN": {
+"mapTypes": ["City-dense", "City-high", "Town-concrete", "Fortress-City", "Town-generic"]
+},
+"ColdSea": {
+"mapTypes": ["ColdSeaDeltas", "ColdSeaFjords", "ColdSeaFjordsSteep", "OpenOceanCold" ]
+},
+"TundraFacility": {
+"mapTypes": ["SnowOutpost", "BaseCold", "RuralHomesteadsCold", "TundraTownSnow" ]
+},
+"UrbanFacility": {
+"mapTypes": ["Fortress-City", "Town-concrete", "Town-generic", "Town-ruin" ]
+},
+"ColdMountain": {
+"mapTypes": ["ColdMountain", "ColdMountain-Rough", "Mountain-lakes-snow", "Cliffs-lakes-snow", "Rubble-mountain-snow", "Cliffs-snow", "Mountain-medium-snow", "Mountain-high-snow", "Mountain-river-snow", "Mountain-RuinedTrenches-snow", "Mountain-TouristTown-snow", "Mountain-town-snow", "Heavy-craters-snow", "ColdMountain-Lone" ]
+},
+"DesertFacility": {
+"mapTypes": ["BaseHotDesert", "RuralHomesteadsHotDesert", "TownHotDesert"]
+},
+"GrayLunar": {
+"mapTypes": ["StratconLunar"]
+},
+"GlacierFacility": {
+"mapTypes": ["IceOutpost", "SnowOutpost", "BaseCold"]
+},
+"BARREN": {
+"mapTypes": ["Dust-bowl", "Rocky-valley", "Sandy-valley", "Sandy-hills", "Light-craters"]
+},
+"ColdUrbanFacility": {
+"mapTypes": ["TownCold", "CityCold", "BaseCold"]
+},
+"PlainsFacility": {
+"mapTypes": ["PlainsOutpost", "Town-farming", "Town-generic", "PlainsTown" ]
+},
+"SnowField": {
+"mapTypes": ["Snowfield", "SnowRiver", "SnowOutpost", "SnowCoast", "SnowDunes"]
+},
+"HotHillsWetFacility": {
+"mapTypes": ["BaseHotJungle", "RuralHomesteadsHotJungle", "HillsHotJungle"]
+},
+"Forest": {
+"mapTypes": ["Some-trees", "Wooded-lake", "Woods-medium", "Wooded-hills", "Woods-deep", "Wooded-valley", "Woods-river", "Wooded-swamp", "Town-wooded" ]
+},
+"MarsFacility": {
+"mapTypes": ["StratconMars"]
+},
+"Desert": {
+"mapTypes": ["Desert", "TownHotDesert", "RuralHomesteadsHotDesert", "Sandy-river", "Sandy-valley"]
+},
+"Tundra": {
+"mapTypes": ["TundraRiverGrass", "TundraRiverSnow", "TundraRoad", "TundraRoadSnow", "TundraTownSnow", "Wooded-tundra"]
+},
+"ColdHillsFacility": {
+"mapTypes": ["BaseCold", "RuralHomesteadsCold", "TownCold"]
+}
+},
+"biomeImages": {
+"HotMountainsWet": "data/images/stratcon/Stratcon_Mountains.png",
+"Farmland": "data/images/hexes/saxarba/field_0.png",
+"Factory": "data/images/stratcon/Stratcon_Factory.png",
+"Swamp": "data/images/stratcon/Stratcon_Swamp.png",
+"HotSea": "data/images/stratcon/Stratcon_Hot_Sea.png",
+"ColdFacility": "data/images/stratcon/Stratcon_Cold_Facility.png",
+"Mars": "data/images/stratcon/Stratcon_Mars.png",
+"Urban": "data/images/stratcon/Stratcon_Urban_Temperate.png",
+"HotForest": "data/images/stratcon/Stratcon_Jungle.png",
+"Mountain": "data/images/stratcon/Stratcon_Mountains.png",
+"Hills": "data/images/stratcon/Stratcon_Hills.png",
+"HotFacility": "data/images/stratcon/Stratcon_Hot_Facility.png",
+"Steppe": "data/images/stratcon/Stratcon_Steppe.png",
+"ColdForest": "data/images/stratcon/Stratcon_Cold_Forest.png",
+"HotMountainsDry": "data/images/stratcon/Stratcon_Hot_Mountain.png",
+"ColdHills": "data/images/stratcon/Stratcon_Cold_Hills.png",
+"HotUrban": "data/images/stratcon/Stratcon_Urban_Hot.png",
+"ColdUrban": "data/images/stratcon/Stratcon_Urban_Cold.png",
+"ForceHostile": "data/images/stratcon/SelectedHex/Stratcon_Force_Presence_Hostile_Red.png",
+"ArcticDesert": "data/images/stratcon/Stratcon_Arctic_Desert.png",
+"FrozenFacility": "data/images/stratcon/Stratcon_Frozen_Facility.png",
+"FogOfWar": "data/images/stratcon/Stratcon_Fog_of_War.png",
+"HotHillsWet": "data/images/stratcon/Stratcon_Hot_Hills_Wet.png",
+"Glacier": "data/images/stratcon/Stratcon_Glacier.png",
+"HotHillsDry": "data/images/stratcon/Stratcon_Hot_Hills_Dry.png",
+"Savannah": "data/images/stratcon/Stratcon_Savannah.png",
+"TemperateFacility": "data/images/stratcon/Stratcon_Temperate_Facility.png",
+"ColdSea": "data/images/stratcon/Stratcon_Cold_Sea.png",
+"ColdMountain": "data/images/stratcon/Stratcon_Cold_Mountain.png",
+"Plains": "data/images/stratcon/Stratcon_Plains.png",
+"City": "data/images/stratcon/Stratcon_Urban.png",
+"Badlands": "data/images/hexes/mars/mars_rough_3.gif",
+"FrozenSea": "data/images/stratcon/Stratcon_Frozen_Sea.png",
+"GrayLunar": "data/images/stratcon/Stratcon_Gray_Luna.png",
+"Sea": "data/images/stratcon/Stratcon_Sea.png",
+"Volcano": "data/images/stratcon/Stratcon_Volcanic.png",
+"ForceFriendly": "data/images/stratcon/SelectedHex/Stratcon_Force_Presence_Friendly_Green.png",
+"HexSelected": "data/images/stratcon/SelectedHex/Stratcon_Selected_Hex_White.png",
+"SnowField": "data/images/stratcon/Stratcon_Snowfield.png",
+"Jungle": "data/images/stratcon/Stratcon_Jungle.png",
+"Forest": "data/images/stratcon/Stratcon_Forest.png",
+"Desert": "data/images/stratcon/Stratcon_Desert.png",
+"Tundra": "data/images/stratcon/Stratcon_Tundra.png"
+},
+"facilityImages": {
+"FacilityAlliedTankBase": "data/images/stratcon/Bases/Stratcon_Base_Real_Allied.png",
+"FacilityHostileBaseOfOperations": "data/images/stratcon/Bases/Stratcon_Fortress_Real_Hostile.png",
+"FacilityAlliedArtilleryBase": "data/images/stratcon/Bases/Stratcon_Base_Real_Allied.png",
+"FacilityAlliedCommandCenter": "data/images/stratcon/Bases/Stratcon_Comms_Real_Allied.png",
+"FacilityHostileEarlyWarningSystem": "data/images/stratcon/Bases/Stratcon_Comms_Real_Hostile.png",
+"FacilityHostileDataCenter": "data/images/stratcon/Bases/Stratcon_Comms_Real_Hostile.png",
+"FacilityAlliedBaseOfOperations": "data/images/stratcon/Bases/Stratcon_Fortress_Real_Allied.png",
+"FacilityHostileDefault": "data/images/stratcon/Bases/Stratcon_Base_Real_Hostile.png",
+"FacilityHostileArtilleryBase": "data/images/stratcon/Bases/Stratcon_Base_Real_Hostile.png",
+"FacilityHostileOrbitalDefense": "data/images/stratcon/Bases/Stratcon_Comms_Real_Hostile.png",
+"FacilityAlliedSpacePort": "data/images/stratcon/Bases/Stratcon_Airbase_Real_Allied.png",
+"FacilityHostileTankBase": "data/images/stratcon/Bases/Stratcon_Base_Real_Hostile.png",
+"FacilityAlliedDataCenter": "data/images/stratcon/Bases/Stratcon_Comms_Real_Allied.png",
+"FacilityAlliedDefault": "data/images/stratcon/Bases/Stratcon_Base_Real_Allied.png",
+"FacilityAlliedEarlyWarningSystem": "data/images/stratcon/Bases/Stratcon_Comms_Real_Allied.png",
+"FacilityAlliedOrbitalDefense": "data/images/stratcon/Bases/Stratcon_Comms_Real_Allied.png",
+"FacilityHostileSpacePort": "data/images/stratcon/Bases/Stratcon_Airbase_Real_Hostile.png",
+"FacilityAlliedAirBase": "data/images/stratcon/Bases/Stratcon_Airbase_Real_Allied.png",
+"FacilityAlliedMekBase": "data/images/stratcon/Bases/Stratcon_Base_Real_Allied.png",
+"FacilityAlliedIndustrialFacility": "data/images/stratcon/Bases/Stratcon_Factory_Real_Allied.png",
+"FacilityHostileAirBase": "data/images/stratcon/Bases/Stratcon_Airbase_Real_Hostile.png",
+"FacilityHostileIndustrialFacility": "data/images/stratcon/Bases/Stratcon_Factory_Real_Hostile.png",
+"FacilityHostileMekBase": "data/images/stratcon/Bases/Stratcon_Base_Real_Hostile.png",
+"FacilityHostileCommandCenter": "data/images/stratcon/Bases/Stratcon_Comms_Real_Hostile.png"
+}
+}

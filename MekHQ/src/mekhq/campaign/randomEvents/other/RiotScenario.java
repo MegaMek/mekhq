@@ -207,7 +207,7 @@ public class RiotScenario {
      */
     private void createRiotScenario(AtBContract contract, List<Unit> mobUnits) {
         final String DIRECTORY = "data" + separator + "scenariotemplates" + separator;
-        final String SCENARIO_FILE = DIRECTORY + "Crowd Control.xml";
+        final String SCENARIO_FILE = DIRECTORY + "Crowd Control.json";
 
         ScenarioTemplate template = ScenarioTemplate.Deserialize(SCENARIO_FILE);
 
