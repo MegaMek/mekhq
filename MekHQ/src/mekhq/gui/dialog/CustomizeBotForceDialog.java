@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2024-2025 The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2024-2026 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -99,6 +99,7 @@ public class CustomizeBotForceDialog extends JDialog {
     private JLabel lblSelfPreservation;
     private JLabel lblAggression;
     private JLabel lblHerdMentality;
+    private JLabel lblPosture;
     private JLabel lblPilotingRisk;
     private JLabel lblForcedWithdrawal;
     private JLabel lblAutoFlee;
@@ -313,6 +314,7 @@ public class CustomizeBotForceDialog extends JDialog {
         lblSelfPreservation = new JLabel(Integer.toString(behavior.getSelfPreservationIndex()));
         lblAggression = new JLabel(Integer.toString(behavior.getHyperAggressionIndex()));
         lblHerdMentality = new JLabel(Integer.toString(behavior.getHerdMentalityIndex()));
+        lblPosture = new JLabel(behavior.getCombatPosture().toString());
         lblPilotingRisk = new JLabel(Integer.toString(behavior.getFallShameIndex()));
         lblForcedWithdrawal = new JLabel(getForcedWithdrawalDescription(behavior));
         lblAutoFlee = new JLabel(getAutoFleeDescription(behavior));
@@ -331,6 +333,10 @@ public class CustomizeBotForceDialog extends JDialog {
         gbcRight.gridy++;
         panBehavior.add(new JLabel(resourceMap.getString("lblHerdMentality.text")), gbcLeft);
         panBehavior.add(lblHerdMentality, gbcRight);
+        gbcLeft.gridy++;
+        gbcRight.gridy++;
+        panBehavior.add(new JLabel(resourceMap.getString("lblPosture.text")), gbcLeft);
+        panBehavior.add(lblPosture, gbcRight);
         gbcLeft.gridy++;
         gbcRight.gridy++;
         panBehavior.add(new JLabel(resourceMap.getString("lblPilotingRisk.text")), gbcLeft);
@@ -567,6 +573,7 @@ public class CustomizeBotForceDialog extends JDialog {
             lblSelfPreservation.setText(Integer.toString(behavior.getSelfPreservationIndex()));
             lblAggression.setText(Integer.toString(behavior.getHyperAggressionIndex()));
             lblHerdMentality.setText(Integer.toString(behavior.getHerdMentalityIndex()));
+            lblPosture.setText(behavior.getCombatPosture().toString());
             lblPilotingRisk.setText(Integer.toString(behavior.getFallShameIndex()));
             lblForcedWithdrawal.setText(getForcedWithdrawalDescription(behavior));
             lblAutoFlee.setText(getAutoFleeDescription(behavior));
