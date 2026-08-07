@@ -127,22 +127,6 @@ public class DataLoadingDialog extends AbstractMHQDialogBasic implements Propert
 
     private static final LocalDate DEFAULT_START_DATE = LocalDate.of(3151, 1, 1);
 
-    /**
-     * Groups, for a single year, the names of the technologies whose prototype, production, common, or extinction date
-     * falls on that year. Used to key one map by part name and another by unit name.
-     *
-     * @param prototypeDate  names whose {@code getPrototypeDate(clan)} is this year
-     * @param productionDate names whose {@code getProductionDate(clan)} is this year
-     * @param commonDate     names whose {@code getCommonDate(clan)} is this year
-     * @param extinctionDate names whose {@code getExtinctionDate(clan)} is this year
-     */
-    private record TechDateNames(List<String> prototypeDate, List<String> productionDate, List<String> commonDate,
-          List<String> extinctionDate) {
-        private TechDateNames() {
-            this(new ArrayList<>(), new ArrayList<>(), new ArrayList<>(), new ArrayList<>());
-        }
-    }
-
     // endregion Variable Declarations
 
     // region Constructors
