@@ -2313,7 +2313,7 @@ public class StratConRulesManager {
      *       described, or a default template if no special conditions are satisfied.
      */
     private static ScenarioTemplate getInterceptionScenarioTemplate(Formation formation, LocalHangar hangar) {
-        String templateString = "data/scenariotemplates/%sReinforcements Intercepted.xml";
+        String templateString = "data/scenariotemplates/%sReinforcements Intercepted.json";
 
         ScenarioTemplate scenarioTemplate = ScenarioTemplate.Deserialize(String.format(templateString, ""));
 

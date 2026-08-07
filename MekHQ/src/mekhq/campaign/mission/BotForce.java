@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2018-2025 The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2018-2026 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -169,6 +169,7 @@ public class BotForce implements IPlayerSettings {
         copy.getBehaviorSettings().setHyperAggressionIndex(this.getBehaviorSettings().getHyperAggressionIndex());
         copy.getBehaviorSettings().setSelfPreservationIndex(this.getBehaviorSettings().getSelfPreservationIndex());
         copy.getBehaviorSettings().setHerdMentalityIndex(this.getBehaviorSettings().getHerdMentalityIndex());
+        copy.getBehaviorSettings().setCombatPosture(this.getBehaviorSettings().getCombatPosture());
         // this bit of trickery seems to work to make a proper copy of the entity list
         copy.fixedEntityList = new ArrayList<>(this.getFixedEntityListDirect());
 
@@ -532,6 +533,7 @@ public class BotForce implements IPlayerSettings {
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "retreatEdge", behaviorSettings.getRetreatEdge().ordinal());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "herdMentalityIndex", behaviorSettings.getHerdMentalityIndex());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "braveryIndex", behaviorSettings.getBraveryIndex());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "combatPosture", behaviorSettings.getCombatPosture().name());
         MHQXMLUtility.writeSimpleXMLCloseTag(pw, --indent, "behaviorSettings");
         MHQXMLUtility.writeSimpleXMLCloseTag(pw, --indent, "botForce");
     }
@@ -611,6 +613,10 @@ public class BotForce implements IPlayerSettings {
                             behaviorSettings.setHerdMentalityIndex(Integer.parseInt(wn3.getTextContent()));
                         } else if (wn3.getNodeName().equalsIgnoreCase("braveryIndex")) {
                             behaviorSettings.setBraveryIndex(Integer.parseInt(wn3.getTextContent()));
+                        } else if (wn3.getNodeName().equalsIgnoreCase("combatPosture")) {
+                            // The string setter parses case-insensitively and falls back to AUTO,
+                            // so campaigns saved before this tag existed load unchanged.
+                            behaviorSettings.setCombatPosture(wn3.getTextContent());
                         }
                     }
                 }

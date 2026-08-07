@@ -33,6 +33,7 @@
  */
 package mekhq.campaign.parts.missing;
 
+import static mekhq.utilities.MHQInternationalization.getTextAt;
 import static mekhq.utilities.ReportingUtilities.CLOSING_SPAN_TAG;
 import static mekhq.utilities.ReportingUtilities.getNegativeColor;
 import static mekhq.utilities.ReportingUtilities.getWarningColor;
@@ -46,13 +47,20 @@ import megamek.common.annotations.Nullable;
 import megamek.common.enums.AvailabilityValue;
 import megamek.common.enums.Faction;
 import megamek.common.enums.TechBase;
+import megamek.common.enums.TechRating;
 import megamek.common.rolls.TargetRoll;
 import mekhq.campaign.Campaign;
+import mekhq.campaign.campaignOptions.CampaignOption;
+import mekhq.campaign.campaignOptions.CampaignOptions;
+import mekhq.campaign.finances.Finances;
 import mekhq.campaign.finances.Money;
+import mekhq.campaign.finances.enums.TransactionType;
 import mekhq.campaign.parts.Availability;
 import mekhq.campaign.parts.Part;
 import mekhq.campaign.parts.PartInventory;
 import mekhq.campaign.parts.equipment.MissingAmmoBin;
+import mekhq.campaign.personnel.Person;
+import mekhq.campaign.personnel.PersonnelOptions;
 import mekhq.campaign.personnel.skills.SkillType;
 import mekhq.campaign.unit.Unit;
 import mekhq.campaign.work.IAcquisitionWork;
@@ -65,6 +73,23 @@ import mekhq.utilities.ReportingUtilities;
  * @author Jay Lawson (jaylawson39 at yahoo.com)
  */
 public abstract class MissingPart extends Part implements IAcquisitionWork {
+    private static final String RESOURCE_BUNDLE = "mekhq.resources.Parts";
+
+    /** Fabrication takes ten times the normal replacement time and cost (Campaign Ops, p.202 rev 5th printing). */
+    private static final int FABRICATION_MULTIPLIER = 10;
+    /** A fabrication attempt receives an additional +2 to its target number. */
+    private static final int FABRICATION_MODIFIER = 2;
+    /** The Fabricator Special Ability reduces the fabrication target number by 2. */
+    private static final int FABRICATOR_ABILITY_MODIFIER = -2;
+    /** The Jury-Rigger Special Ability reduces all fabrication costs by 25% (i.e. to 75% of normal). */
+    private static final double JURY_RIGGER_COST_MULTIPLIER = 0.75;
+    /** The Wasteful flaw increases all fabrication (and repair) costs by 25% (i.e. to 125% of normal). */
+    private static final double WASTEFUL_COST_MULTIPLIER = 1.25;
+    /** Fraction of a part's undamaged value charged as the cost of a normal repair when 'Pay For Repairs' is enabled. */
+    private static final double REPAIR_COST_FRACTION = 0.2;
+    /** The purchase price of a fabricated part is half the sale price of a new component. */
+    private static final double FABRICATED_PART_PRICE_FRACTION = 0.5;
+
     public MissingPart(int tonnage, Campaign c) {
         super(tonnage, false, c);
     }
@@ -109,9 +134,12 @@ public abstract class MissingPart extends Part implements IAcquisitionWork {
     @Override
     public String getDesc() {
         StringBuilder toReturn = new StringBuilder();
-        toReturn.append("<html><b>Replace ").append(getName());
+        toReturn.append("<html><b>").append(isFabricating() ? "Fabricate " : "Replace ").append(getName());
         if (isUnitTonnageMatters()) {
             toReturn.append(" (").append(getUnitTonnage()).append(" ton)");
+        }
+        if (isFabricating() && isFabricateUntilSuccess()) {
+            toReturn.append(" (until success)");
         }
         toReturn.append(" - ")
               .append(messageSurroundedBySpanWithColor(SkillType.getExperienceLevelColor(getSkillMin()),
@@ -137,9 +165,18 @@ public abstract class MissingPart extends Part implements IAcquisitionWork {
 
     @Override
     public String succeed() {
+        boolean wasFabricating = isFabricating();
+        if (wasFabricating) {
+            // The fabrication cost is charged per attempt, whether it succeeds or fails.
+            chargeFabricationAttempt(campaign.getPlayerForce().getFinances());
+            // Supply the freshly fabricated component as this part's replacement so the normal fix() path below
+            // installs it - with the correct slot/location linkage handled by each part type's own fix() override -
+            // exactly as if it had been pulled from stock.
+            prepareFabricatedReplacement();
+        }
         fix();
         return messageSurroundedBySpanWithColor(ReportingUtilities.getPositiveColor(),
-              " <b>replaced</b>.");
+              wasFabricating ? " <b>fabricated</b>." : " <b>replaced</b>.");
     }
 
     @Override
@@ -160,6 +197,192 @@ public abstract class MissingPart extends Part implements IAcquisitionWork {
 
             actualReplacement.updateConditionFromPart();
         }
+    }
+
+    /**
+     * Creates a brand-new fabricated component and assigns it as this part's replacement, so the normal {@link #fix()}
+     * path for this specific part type installs it (with the correct slot/location linkage). The fabricated component's
+     * quality matches that of the unit it is installed in (individual per-part quality tracking from the margin of
+     * success is not modeled). The monetary cost of the attempt is charged separately, per attempt, by
+     * {@link #chargeFabricationAttempt(Finances)}.
+     */
+    private void prepareFabricatedReplacement() {
+        if (unit == null) {
+            return;
+        }
+
+        // Fabricating despite having a spare in stock is a legal choice, and reservePart() (which doesn't know about
+        // fabrication) may have reserved that spare for this task. Release it before overwriting the replacement
+        // reference, otherwise the stock part is left permanently reservedBy the tech and unusable.
+        cancelReservation();
+
+        Part fabricated = getNewPart();
+        fabricated.setBrandNew(true);
+        fabricated.setQuality(unit.getQuality());
+        setReplacementPart(fabricated);
+    }
+
+    /**
+     * Debits the cost of a single fabrication attempt (per attempt, regardless of success or failure).
+     */
+    private void chargeFabricationAttempt(Finances finances) {
+        Money cost = getFabricationCost();
+        if (!cost.isZero()) {
+            finances.debit(TransactionType.EQUIPMENT_PURCHASE,
+                  campaign.getLocalDate(),
+                  cost,
+                  "Fabrication of " + getName());
+        }
+    }
+
+    /**
+     * Determines whether this part may be fabricated from scratch by its assigned tech.
+     *
+     * @return an empty string if the part can be fabricated, otherwise an explanation of why it cannot
+     *
+     * @see #canFabricate(Person)
+     */
+    public String canFabricate() {
+        return canFabricate(getTech());
+    }
+
+    /**
+     * Determines whether this part may be fabricated from scratch by the given tech. Without factory-grade facilities,
+     * fabrication is limited to components with a base Tech Rating of A, B, or C (Campaign Ops, p.202 rev 5th
+     * printing); a factory-conditions site removes that restriction, and an optional rule additionally permits Tech
+     * Rating D at a maintenance facility. The MacGyver Special Ability, if the tech has it, treats the part's Tech
+     * Rating as one lower for this determination.
+     *
+     * @param tech the tech who would perform the fabrication, or {@code null} to judge eligibility without any tech
+     *             ability
+     *
+     * @return an empty string if the part can be fabricated, otherwise an explanation of why it cannot (and, for a Tech
+     *       Rating that is too high, what site would fix that)
+     */
+    public String canFabricate(final @Nullable Person tech) {
+        if (unit == null) {
+            return getTextAt(RESOURCE_BUNDLE, "MissingPart.noUnit");
+        }
+
+        // A factory-grade installation lifts the tech-rating restriction.
+        if (unit.getSite() >= Unit.SITE_FACTORY_CONDITIONS) {
+            return "";
+        }
+
+        TechRating rating = getTechRating();
+        if (rating == null) {
+            return getTextAt(RESOURCE_BUNDLE, "MissingPart.noTechRating");
+        }
+
+        int effectiveRating = rating.ordinal();
+        if ((tech != null) && tech.getOptions().booleanOption(PersonnelOptions.TECH_MACGYVER)) {
+            effectiveRating = Math.max(0, effectiveRating - 1);
+        }
+
+        // Base limit is Tech Rating C. An optional rule additionally permits Tech Rating D at a maintenance facility
+        // (or better).
+        boolean maintenanceFacilityAllowsD = campaign.getCampaignOptions()
+                                                   .get(CampaignOption.FABRICATE_D_IN_MAINTENANCE_FACILITY);
+        int maxRating = TechRating.C.ordinal();
+        if (maintenanceFacilityAllowsD && (unit.getSite() >= Unit.SITE_FACILITY_MAINTENANCE)) {
+            maxRating = TechRating.D.ordinal();
+        }
+
+        if (effectiveRating <= maxRating) {
+            return "";
+        }
+
+        // Tech Rating D can be unlocked at a maintenance facility when the optional rule is on; anything higher (or
+        // Tech Rating D without the optional rule) needs factory conditions.
+        if (maintenanceFacilityAllowsD && (effectiveRating == TechRating.D.ordinal())) {
+            return getTextAt(RESOURCE_BUNDLE, "MissingPart.complex.maintenance");
+        }
+
+        return getTextAt(RESOURCE_BUNDLE, "MissingPart.complex.factory");
+    }
+
+    /**
+     * Cancels an in-progress fabrication, reverting this task to a normal replacement. Clears the fabrication flag and
+     * unassigns any tech, resetting accumulated overtime and time spent (spent minutes are not refunded as money).
+     */
+    public void cancelFabrication() {
+        setFabricating(false);
+        setFabricateUntilSuccess(false);
+        cancelAssignment(true);
+    }
+
+    /**
+     * Computes the cost of a single fabrication attempt (charged per attempt, not only on success).
+     *
+     * <p>Both profiles charge ten times the normal repair/replacement cost (when the campaign pays for repairs). They
+     * differ only in the part-price component, charged when the campaign pays for parts:</p>
+     * <ul>
+     *     <li><b>Balanced fabrication</b> (default): ten times the new part's price.</li>
+     *     <li><b>Rules-accurate</b>: half the new part's price.</li>
+     * </ul>
+     *
+     * @return the money cost of one fabrication attempt for this part's assigned tech (can be {@link Money#zero()})
+     */
+    public Money getFabricationCost() {
+        return getFabricationCost(getTech());
+    }
+
+    /**
+     * Computes the cost of a single fabrication attempt performed by the given tech. Identical to
+     * {@link #getFabricationCost()} except that the Jury-Rigger Special Ability, if the tech has it, reduces the total
+     * by 25%, or the Wasteful flaw increases it by 25%.
+     *
+     * @param tech the tech who would perform the fabrication, or {@code null} to price it without any tech ability
+     *
+     * @return the money cost of one fabrication attempt (may be {@link Money#zero()})
+     */
+    public Money getFabricationCost(final @Nullable Person tech) {
+        final CampaignOptions options = campaign.getCampaignOptions();
+        final Part newPart = getNewPart();
+
+        Money cost = Money.zero();
+        if (options.get(CampaignOption.PAY_FOR_REPAIRS)) {
+            // Ten times the cost of a normal repair of this part.
+            cost = cost.plus(newPart.getUndamagedValue()
+                                   .multipliedBy(REPAIR_COST_FRACTION)
+                                   .multipliedBy(FABRICATION_MULTIPLIER));
+        }
+        if (options.get(CampaignOption.PAY_FOR_PARTS)) {
+            // Part price: ten times under the balanced profile, half under the rules-accurate profile.
+            double partFraction = options.get(CampaignOption.USE_BALANCED_FABRICATION)
+                                        ? FABRICATION_MULTIPLIER
+                                        : FABRICATED_PART_PRICE_FRACTION;
+            cost = cost.plus(newPart.getActualValue().multipliedBy(partFraction));
+        }
+
+        // The Jury-Rigger and Wasteful Special Abilities adjust all fabrication costs (they are mutually exclusive).
+        if (tech != null) {
+            if (tech.getOptions().booleanOption(PersonnelOptions.TECH_JURY_RIGGER)) {
+                cost = cost.multipliedBy(JURY_RIGGER_COST_MULTIPLIER);
+            } else if (tech.getOptions().booleanOption(PersonnelOptions.TECH_WASTEFUL)) {
+                cost = cost.multipliedBy(WASTEFUL_COST_MULTIPLIER);
+            }
+        }
+        return cost;
+    }
+
+    @Override
+    public int getActualTime() {
+        int time = super.getActualTime();
+        return isFabricating() ? time * FABRICATION_MULTIPLIER : time;
+    }
+
+    @Override
+    public TargetRoll getAllMods(final @Nullable Person tech) {
+        TargetRoll mods = super.getAllMods(tech);
+        if (isFabricating()) {
+            mods.addModifier(FABRICATION_MODIFIER, "fabricating");
+            // The Fabricator Special Ability offsets the fabrication penalty.
+            if ((tech != null) && tech.getOptions().booleanOption(PersonnelOptions.TECH_FABRICATOR)) {
+                mods.addModifier(FABRICATOR_ABILITY_MODIFIER, "Fabricator");
+            }
+        }
+        return mods;
     }
 
     @Override
@@ -283,6 +506,16 @@ public abstract class MissingPart extends Part implements IAcquisitionWork {
 
     @Override
     public String fail(int rating) {
+        if (isFabricating()) {
+            // A failed fabrication wastes the time and effort, but another attempt can be made at the same
+            // difficulty (Campaign Ops, p.202). The cost is still charged, per attempt.
+            chargeFabricationAttempt(campaign.getPlayerForce().getFinances());
+            timeSpent = 0;
+            shorthandedMod = 0;
+            return messageSurroundedBySpanWithColor(getNegativeColor(),
+                  "<b> fabrication failed - time and effort wasted</b>") + '.';
+        }
+
         skillMin = ++rating;
         timeSpent = 0;
         shorthandedMod = 0;

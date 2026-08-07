@@ -33,31 +33,38 @@
 package mekhq.campaign.mission.atb;
 
 import java.io.File;
-import java.io.FileInputStream;
 import java.util.Map;
-import javax.xml.transform.Source;
 
-import jakarta.xml.bind.JAXBContext;
-import jakarta.xml.bind.JAXBElement;
-import jakarta.xml.bind.Unmarshaller;
-import jakarta.xml.bind.annotation.XmlElement;
-import jakarta.xml.bind.annotation.XmlElementWrapper;
-import jakarta.xml.bind.annotation.XmlRootElement;
+import com.fasterxml.jackson.annotation.JsonAutoDetect;
+import com.fasterxml.jackson.annotation.PropertyAccessor;
+import com.fasterxml.jackson.core.JsonParser;
+import com.fasterxml.jackson.databind.DeserializationFeature;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import megamek.logging.MMLogger;
-import mekhq.utilities.MHQXMLUtility;
 
 /**
  * A manifest containing IDs and file names of scenario template definitions
  *
  * @author NickAragua
  */
-@XmlRootElement(name = "scenarioManifest")
 public class AtBScenarioManifest {
     private static final MMLogger logger = MMLogger.create(AtBScenarioManifest.class);
 
-    @XmlElementWrapper(name = "scenarioFileNames")
-    @XmlElement(name = "scenarioFileName")
+    private static final ObjectMapper MAPPER = buildMapper();
+
     public Map<Integer, String> scenarioFileNames;
+
+    private static ObjectMapper buildMapper() {
+        ObjectMapper mapper = new ObjectMapper();
+        // Use fields as the single source of truth, matching the shipped scenario template JSON files.
+        mapper.setVisibility(PropertyAccessor.ALL, JsonAutoDetect.Visibility.NONE);
+        mapper.setVisibility(PropertyAccessor.FIELD, JsonAutoDetect.Visibility.ANY);
+        // Tolerate fields absent from older files rather than failing the whole load.
+        mapper.disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES);
+        // Skip the leading '#' license-header comment lines that lead every saved file.
+        mapper.enable(JsonParser.Feature.ALLOW_YAML_COMMENTS);
+        return mapper;
+    }
 
     /**
      * Attempt to deserialize an instance of an AtBScenarioManifest from the passed-in file path
@@ -65,7 +72,6 @@ public class AtBScenarioManifest {
      * @return Possibly an instance of a ScenarioManifest
      */
     public static AtBScenarioManifest Deserialize(String fileName) {
-        AtBScenarioManifest resultingManifest = null;
         File inputFile = new File(fileName);
         if (!inputFile.exists()) {
             logger.warn("Specified file {} does not exist", fileName);
@@ -73,17 +79,10 @@ public class AtBScenarioManifest {
         }
 
         try {
-            JAXBContext context = JAXBContext.newInstance(AtBScenarioManifest.class);
-            Unmarshaller um = context.createUnmarshaller();
-            try (FileInputStream fileStream = new FileInputStream(inputFile)) {
-                Source inputSource = MHQXMLUtility.createSafeXmlSource(fileStream);
-                JAXBElement<AtBScenarioManifest> manifestElement = um.unmarshal(inputSource, AtBScenarioManifest.class);
-                resultingManifest = manifestElement.getValue();
-            }
+            return MAPPER.readValue(inputFile, AtBScenarioManifest.class);
         } catch (Exception e) {
             logger.error("Error Deserializing Scenario Manifest", e);
+            return null;
         }
-
-        return resultingManifest;
     }
 }

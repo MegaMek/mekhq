@@ -33,31 +33,44 @@
 package mekhq.campaign.digitalGM.stratCon.facility;
 
 import java.io.File;
-import java.io.FileInputStream;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.util.ArrayList;
 import java.util.List;
-import javax.xml.transform.Source;
 
-import jakarta.xml.bind.JAXBContext;
-import jakarta.xml.bind.JAXBElement;
-import jakarta.xml.bind.Unmarshaller;
-import jakarta.xml.bind.annotation.XmlElement;
-import jakarta.xml.bind.annotation.XmlElementWrapper;
-import jakarta.xml.bind.annotation.XmlRootElement;
+import com.fasterxml.jackson.annotation.JsonAutoDetect;
+import com.fasterxml.jackson.annotation.PropertyAccessor;
+import com.fasterxml.jackson.core.JsonParser;
+import com.fasterxml.jackson.databind.DeserializationFeature;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.SerializationFeature;
 import megamek.logging.MMLogger;
-import mekhq.utilities.MHQXMLUtility;
+import mekhq.utilities.MMDataLicenseHeader;
 
 /**
  * A manifest containing IDs and file names of StratCon facility definitions
  *
  * @author NickAragua
  */
-@XmlRootElement(name = "facilityManifest")
 public class StratConFacilityManifest {
     private static final MMLogger LOGGER = MMLogger.create(StratConFacilityManifest.class);
 
-    @XmlElementWrapper(name = "facilityFileNames")
-    @XmlElement(name = "facilityFileName")
-    public List<String> facilityFileNames;
+    private static final ObjectMapper MAPPER = buildMapper();
+
+    public List<String> facilityFileNames = new ArrayList<>();
+
+    private static ObjectMapper buildMapper() {
+        ObjectMapper mapper = new ObjectMapper();
+        // Use fields as the single source of truth, matching the shipped facility JSON files.
+        mapper.setVisibility(PropertyAccessor.ALL, JsonAutoDetect.Visibility.NONE);
+        mapper.setVisibility(PropertyAccessor.FIELD, JsonAutoDetect.Visibility.ANY);
+        mapper.enable(SerializationFeature.INDENT_OUTPUT);
+        // Tolerate fields absent from older files rather than failing the whole load.
+        mapper.disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES);
+        // Skip the leading '#' license-header comment lines that lead every saved file.
+        mapper.enable(JsonParser.Feature.ALLOW_YAML_COMMENTS);
+        return mapper;
+    }
 
     /**
      * Attempt to deserialize an instance of a StratConFacilityManifest from the passed-in file path
@@ -65,7 +78,6 @@ public class StratConFacilityManifest {
      * @return Possibly an instance of a StratConFacilityManifest
      */
     public static StratConFacilityManifest deserialize(String fileName) {
-        StratConFacilityManifest resultingManifest = null;
         File inputFile = new File(fileName);
         if (!inputFile.exists()) {
             LOGGER.warn("Specified file {} does not exist", fileName);
@@ -73,18 +85,29 @@ public class StratConFacilityManifest {
         }
 
         try {
-            JAXBContext context = JAXBContext.newInstance(StratConFacilityManifest.class);
-            Unmarshaller um = context.createUnmarshaller();
-            try (FileInputStream fileStream = new FileInputStream(inputFile)) {
-                Source inputSource = MHQXMLUtility.createSafeXmlSource(fileStream);
-                JAXBElement<StratConFacilityManifest> manifestElement = um.unmarshal(inputSource,
-                      StratConFacilityManifest.class);
-                resultingManifest = manifestElement.getValue();
-            }
+            return MAPPER.readValue(inputFile, StratConFacilityManifest.class);
         } catch (Exception e) {
             LOGGER.error("Error Deserializing Facility Manifest", e);
+            return null;
         }
+    }
 
-        return resultingManifest;
+    /**
+     * Writes this manifest to a JSON file, led by the MegaMek Data license header. The header carries the file's
+     * existing copyright year forward; {@code ALLOW_YAML_COMMENTS} skips it on read.
+     *
+     * @param outputFile the destination file
+     *
+     * @return {@code true} if the file was written, {@code false} if an error occurred (logged)
+     */
+    public boolean serialize(File outputFile) {
+        try {
+            String content = MMDataLicenseHeader.licenseHeader(outputFile) + '\n' + MAPPER.writeValueAsString(this);
+            Files.writeString(outputFile.toPath(), content, StandardCharsets.UTF_8);
+            return true;
+        } catch (Exception e) {
+            LOGGER.error("Error serializing facility manifest {}", outputFile.getPath(), e);
+            return false;
+        }
     }
 }
