@@ -81,7 +81,6 @@ public record WarriorsAlmanacData(List<String> prototypeDate, List<String> produ
 
         for (MekSummary summary : MekSummaryCache.getInstance().getAllMeks()) {
             if (Objects.equals(summary.getTechBase(), techBase)) {
-                // The tech dates are precomputed on the MekSummary, so there's no need to load the full Entity.
                 final String name = summary.getName();
                 unitTechDatesByYear.computeIfAbsent(summary.getPrototypeDate(), year -> new WarriorsAlmanacData())
                       .prototypeDate()

@@ -508,7 +508,7 @@ public class CampaignNewDayManager {
             // Warrior's Almanac
             campaign.addReport(GENERAL, getFormattedTextAt(RESOURCE_BUNDLE, "warriorsAlmanac.text",
                   spanOpeningWithCustomColor(ReportingUtilities.getPositiveColor()),
-                  today.getYear(),
+                  String.valueOf(today.getYear()),
                   CLOSING_SPAN_TAG));
 
             if (MekHQ.getMHQOptions().getShowWarriorsAlmanac()) {
