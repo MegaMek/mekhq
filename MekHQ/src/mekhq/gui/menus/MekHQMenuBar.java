@@ -507,6 +507,8 @@ public class MekHQMenuBar extends JMenuBar {
               evt -> new TransportReportDialog(getFrame(), new TransportReport(getCampaign())).setVisible(true)));
         menuReports.add(createMenuItem("miCargoReport.text", KeyEvent.VK_C,
               evt -> new CargoReportDialog(getFrame(), new CargoReport(getCampaign())).setVisible(true)));
+        menuReports.add(createMenuItem("miAlmanac.text", KeyEvent.VK_A,
+              evt -> new WarriorsAlmanacDialog(getCampaign())));
         return menuReports;
     }
 
