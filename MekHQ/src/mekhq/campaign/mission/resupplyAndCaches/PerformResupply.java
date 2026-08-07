@@ -521,10 +521,10 @@ public class PerformResupply {
     private static void processConvoyInterception(Resupply resupply, @Nullable Formation targetConvoy,
           @Nullable List<Part> convoyContents) {
         final String DIRECTORY = "data/scenariotemplates/";
-        final String GENERIC = DIRECTORY + "Emergency Convoy Defense.xml";
-        final String PLAYER_AEROSPACE_CONVOY = DIRECTORY + "Emergency Convoy Defense - Player - Low-Atmosphere.xml";
-        final String PLAYER_VTOL_CONVOY = DIRECTORY + "Emergency Convoy Defense - Player - VTOL.xml";
-        final String PLAYER_CONVOY = DIRECTORY + "Emergency Convoy Defense - Player.xml";
+        final String GENERIC = DIRECTORY + "Emergency Convoy Defense.json";
+        final String PLAYER_AEROSPACE_CONVOY = DIRECTORY + "Emergency Convoy Defense - Player - Low-Atmosphere.json";
+        final String PLAYER_VTOL_CONVOY = DIRECTORY + "Emergency Convoy Defense - Player - VTOL.json";
+        final String PLAYER_CONVOY = DIRECTORY + "Emergency Convoy Defense - Player.json";
 
         final Campaign campaign = resupply.getCampaign();
         final AtBContract contract = resupply.getContract();
