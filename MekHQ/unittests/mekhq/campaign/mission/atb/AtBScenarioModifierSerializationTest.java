@@ -46,8 +46,8 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
 
 /**
- * Serialization guards for {@link AtBScenarioModifier}: JSON is the write format (with the license header as leading
- * {@code #} comment lines) and legacy XML is still read for backward compatibility.
+ * Serialization guards for {@link AtBScenarioModifier}: JSON is the read/write format, with the license header as
+ * leading {@code #} comment lines.
  */
 class AtBScenarioModifierSerializationTest {
 

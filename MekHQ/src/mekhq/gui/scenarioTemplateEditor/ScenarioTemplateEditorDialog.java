@@ -268,7 +268,7 @@ public class ScenarioTemplateEditorDialog extends JDialog implements ActionListe
         }
 
         ScenarioForceTemplate forceTemplate = forceEditorPanel.buildForceTemplate();
-        ForceRosterEditor.CommitResult commitResult = ForceRosterEditor.commit(scenarioTemplate.getScenarioForces(),
+        ForceRosterEditor.CommitResult commitResult = ForceRosterEditor.commit(scenarioTemplate,
               editedForceId,
               forceTemplate);
         if (!commitResult.committed()) {

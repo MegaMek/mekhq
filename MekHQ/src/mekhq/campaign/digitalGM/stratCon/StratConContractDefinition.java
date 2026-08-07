@@ -393,9 +393,7 @@ public class StratConContractDefinition {
     }
 
     /**
-     * Attempt to deserialize an instance of a StratConContractDefinition from the passed-in file. JSON is the write
-     * format; XML is still read for legacy/user files. The format is detected by content (a leading '{' is JSON) rather
-     * than file extension, so a file is parsed correctly regardless of what it is named.
+     * Attempt to deserialize an instance of a StratConContractDefinition from the passed-in JSON file.
      *
      * @param inputFile The source file
      *

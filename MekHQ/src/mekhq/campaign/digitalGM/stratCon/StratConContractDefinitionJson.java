@@ -46,8 +46,8 @@ import com.fasterxml.jackson.databind.SerializationFeature;
 import mekhq.utilities.MMDataLicenseHeader;
 
 /**
- * JSON serialization for {@link StratConContractDefinition}. JSON is the write format for the shipped contract
- * definition files; XML (JAXB) is retained on the model for reading legacy/user files.
+ * JSON serialization for {@link StratConContractDefinition}. JSON is the read/write format for contract definition
+ * files; standalone {@code .xml} files are no longer read.
  *
  * <p>The mapper is configured for <strong>field-based</strong> access - it reads and writes the model's fields
  * directly, with getters/setters/creators disabled. This mirrors the state JAXB persists (which is field-backed) and

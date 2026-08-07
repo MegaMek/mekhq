@@ -46,10 +46,9 @@ import com.fasterxml.jackson.databind.SerializationFeature;
 import mekhq.utilities.MMDataLicenseHeader;
 
 /**
- * JSON serialization for {@link AtBScenarioModifier}. JSON is the write format for the shipped scenario modifier files;
- * XML (JAXB) is retained on the model for reading legacy/user files. Mirrors {@code ScenarioTemplateJson} and
- * {@code StratConContractDefinitionJson}: a field-based mapper, a leading {@code #} license header on write, and
- * {@code #}-comment skipping on read.
+ * JSON serialization for {@link AtBScenarioModifier}. JSON is the read/write format for scenario modifier files.
+ * Mirrors {@code ScenarioTemplateJson} and {@code StratConContractDefinitionJson}: a field-based mapper, a leading
+ * {@code #} license header on write, and {@code #}-comment skipping on read.
  */
 public final class AtBScenarioModifierJson {
 

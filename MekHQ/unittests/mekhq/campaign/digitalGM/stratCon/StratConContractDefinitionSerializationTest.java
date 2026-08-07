@@ -51,8 +51,8 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
 
 /**
- * Serialization guards for {@link StratConContractDefinition}: JSON is the write format (with the license notice as a
- * leading, read-ignored block) and legacy XML is still read for backward compatibility.
+ * Serialization guards for {@link StratConContractDefinition}: JSON is the read/write format, with the license notice
+ * as a leading, read-ignored {@code #} block.
  */
 class StratConContractDefinitionSerializationTest {
 

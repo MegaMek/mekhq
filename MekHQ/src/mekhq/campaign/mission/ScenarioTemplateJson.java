@@ -47,9 +47,9 @@ import com.fasterxml.jackson.databind.SerializationFeature;
 import mekhq.utilities.MMDataLicenseHeader;
 
 /**
- * JSON serialization for {@link ScenarioTemplate} and its object graph. JSON is the write format for standalone
- * scenario template files; XML (JAXB) is retained on the model for reading legacy/user files and for the template
- * fragment embedded in campaign saves.
+ * JSON serialization for {@link ScenarioTemplate} and its object graph. JSON is the read/write format for standalone
+ * scenario template files. The model keeps its JAXB (XML) annotations only for the template fragment embedded in
+ * campaign saves; standalone {@code .xml} template files are no longer read.
  *
  * <p>The mapper is configured for <strong>field-based</strong> access - it reads and writes the model's fields
  * directly, with getters/setters/creators disabled. This mirrors the state JAXB persists (which is field-backed) while

@@ -37,15 +37,18 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-import java.util.HashMap;
-import java.util.Map;
+import java.util.ArrayList;
+import java.util.List;
 
 import mekhq.campaign.mission.ScenarioForceTemplate;
+import mekhq.campaign.mission.ScenarioObjective;
+import mekhq.campaign.mission.ScenarioTemplate;
 import mekhq.gui.scenarioTemplateEditor.ForceRosterEditor.CommitResult;
 import org.junit.jupiter.api.Test;
 
 /**
- * Tests for {@link ForceRosterEditor}, covering the duplicate-ID and rename-orphan defects it closes.
+ * Tests for {@link ForceRosterEditor}, covering the duplicate-ID and rename defects it closes, including propagation
+ * of a rename through every template-owned reference to the force.
  */
 class ForceRosterEditorTest {
 
@@ -55,77 +58,143 @@ class ForceRosterEditorTest {
         return force;
     }
 
-    private static Map<String, ScenarioForceTemplate> rosterWith(ScenarioForceTemplate... forces) {
-        Map<String, ScenarioForceTemplate> roster = new HashMap<>();
+    private static ScenarioTemplate templateWith(ScenarioForceTemplate... forces) {
+        ScenarioTemplate template = new ScenarioTemplate();
         for (ScenarioForceTemplate force : forces) {
-            roster.put(force.getForceName(), force);
+            template.getScenarioForces().put(force.getForceName(), force);
         }
-        return roster;
+        return template;
     }
 
     @Test
     void addingNewForceStoresItUnderItsId() {
-        Map<String, ScenarioForceTemplate> roster = rosterWith();
+        ScenarioTemplate template = templateWith();
         ScenarioForceTemplate alpha = force("Alpha");
 
-        CommitResult result = ForceRosterEditor.commit(roster, null, alpha);
+        CommitResult result = ForceRosterEditor.commit(template, null, alpha);
 
         assertTrue(result.committed());
-        assertSame(alpha, roster.get("Alpha"));
-        assertEquals(1, roster.size());
+        assertSame(alpha, template.getScenarioForces().get("Alpha"));
+        assertEquals(1, template.getScenarioForces().size());
     }
 
     @Test
     void addingForceWithExistingIdIsRejectedAndDoesNotOverwrite() {
         ScenarioForceTemplate original = force("Alpha");
-        Map<String, ScenarioForceTemplate> roster = rosterWith(original);
+        ScenarioTemplate template = templateWith(original);
         ScenarioForceTemplate replacement = force("Alpha");
 
-        CommitResult result = ForceRosterEditor.commit(roster, null, replacement);
+        CommitResult result = ForceRosterEditor.commit(template, null, replacement);
 
         assertFalse(result.committed());
         assertTrue(result.errorMessage().contains("Alpha"));
-        assertSame(original, roster.get("Alpha"), "The existing force must not be overwritten");
-        assertEquals(1, roster.size());
+        assertSame(original, template.getScenarioForces().get("Alpha"), "The existing force must not be overwritten");
+        assertEquals(1, template.getScenarioForces().size());
     }
 
     @Test
     void editingInPlaceReplacesTheValueUnderTheSameId() {
-        Map<String, ScenarioForceTemplate> roster = rosterWith(force("Alpha"));
+        ScenarioTemplate template = templateWith(force("Alpha"));
         ScenarioForceTemplate edited = force("Alpha");
 
-        CommitResult result = ForceRosterEditor.commit(roster, "Alpha", edited);
+        CommitResult result = ForceRosterEditor.commit(template, "Alpha", edited);
 
         assertTrue(result.committed());
-        assertSame(edited, roster.get("Alpha"));
-        assertEquals(1, roster.size());
+        assertSame(edited, template.getScenarioForces().get("Alpha"));
+        assertEquals(1, template.getScenarioForces().size());
     }
 
     @Test
     void renamingToAFreeIdMovesTheEntryWithoutOrphaningTheOldKey() {
-        Map<String, ScenarioForceTemplate> roster = rosterWith(force("Alpha"));
+        ScenarioTemplate template = templateWith(force("Alpha"));
         ScenarioForceTemplate renamed = force("Bravo");
 
-        CommitResult result = ForceRosterEditor.commit(roster, "Alpha", renamed);
+        CommitResult result = ForceRosterEditor.commit(template, "Alpha", renamed);
 
         assertTrue(result.committed());
-        assertFalse(roster.containsKey("Alpha"), "The old ID must be removed on rename");
-        assertSame(renamed, roster.get("Bravo"));
-        assertEquals(1, roster.size());
+        assertFalse(template.getScenarioForces().containsKey("Alpha"), "The old ID must be removed on rename");
+        assertSame(renamed, template.getScenarioForces().get("Bravo"));
+        assertEquals(1, template.getScenarioForces().size());
     }
 
     @Test
     void renamingOntoADifferentExistingForceIsRejected() {
         ScenarioForceTemplate alpha = force("Alpha");
         ScenarioForceTemplate bravo = force("Bravo");
-        Map<String, ScenarioForceTemplate> roster = rosterWith(alpha, bravo);
+        ScenarioTemplate template = templateWith(alpha, bravo);
         ScenarioForceTemplate renamed = force("Bravo");
 
-        CommitResult result = ForceRosterEditor.commit(roster, "Alpha", renamed);
+        CommitResult result = ForceRosterEditor.commit(template, "Alpha", renamed);
 
         assertFalse(result.committed());
-        assertSame(alpha, roster.get("Alpha"), "The force being edited must be left untouched");
-        assertSame(bravo, roster.get("Bravo"), "The collision target must not be overwritten");
-        assertEquals(2, roster.size());
+        assertSame(alpha, template.getScenarioForces().get("Alpha"), "The force being edited must be left untouched");
+        assertSame(bravo, template.getScenarioForces().get("Bravo"), "The collision target must not be overwritten");
+        assertEquals(2, template.getScenarioForces().size());
+    }
+
+    @Test
+    void renamingUpdatesAnotherForcesSynchronizedDeploymentTarget() {
+        ScenarioForceTemplate alpha = force("Alpha");
+        ScenarioForceTemplate follower = force("Follower");
+        follower.setSyncedForceName("Alpha");
+        ScenarioTemplate template = templateWith(alpha, follower);
+        ScenarioForceTemplate renamed = force("Bravo");
+
+        CommitResult result = ForceRosterEditor.commit(template, "Alpha", renamed);
+
+        assertTrue(result.committed());
+        assertEquals("Bravo", follower.getSyncedForceName(),
+              "A synchronized-deployment target must follow the rename, not dangle on the old ID");
+    }
+
+    @Test
+    void renamingUpdatesAnotherForcesObjectiveLinks() {
+        ScenarioForceTemplate alpha = force("Alpha");
+        ScenarioForceTemplate linker = force("Linker");
+        linker.setObjectiveLinkedForces(new ArrayList<>(List.of("Alpha", "Charlie")));
+        ScenarioTemplate template = templateWith(alpha, linker);
+        ScenarioForceTemplate renamed = force("Bravo");
+
+        CommitResult result = ForceRosterEditor.commit(template, "Alpha", renamed);
+
+        assertTrue(result.committed());
+        assertEquals(List.of("Bravo", "Charlie"), linker.getObjectiveLinkedForces(),
+              "Objective-linked force IDs must follow the rename");
+    }
+
+    @Test
+    void renamingUpdatesObjectiveAssociatedForces() {
+        ScenarioForceTemplate alpha = force("Alpha");
+        ScenarioTemplate template = templateWith(alpha);
+        ScenarioObjective objective = new ScenarioObjective();
+        objective.addForce("Alpha");
+        objective.addForce("Charlie");
+        template.scenarioObjectives.add(objective);
+        ScenarioForceTemplate renamed = force("Bravo");
+
+        CommitResult result = ForceRosterEditor.commit(template, "Alpha", renamed);
+
+        assertTrue(result.committed());
+        assertFalse(objective.getAssociatedForceNames().contains("Alpha"),
+              "The objective must no longer reference the old force ID");
+        assertTrue(objective.getAssociatedForceNames().contains("Bravo"),
+              "The objective must reference the renamed force ID");
+        assertTrue(objective.getAssociatedForceNames().contains("Charlie"),
+              "Unrelated associated forces must be left intact");
+    }
+
+    @Test
+    void renamingUpdatesTheRenamedForcesOwnSelfReference() {
+        ScenarioForceTemplate alpha = force("Alpha");
+        ScenarioTemplate template = templateWith(alpha);
+        // The freshly built replacement carries a self-reference under the old ID.
+        ScenarioForceTemplate renamed = force("Bravo");
+        renamed.setSyncedForceName("Alpha");
+
+        CommitResult result = ForceRosterEditor.commit(template, "Alpha", renamed);
+
+        assertTrue(result.committed());
+        assertEquals("Bravo", renamed.getSyncedForceName(),
+              "A self-reference on the renamed force must be updated to its new ID");
     }
 }
