@@ -48,6 +48,7 @@ import static mekhq.campaign.unit.Unit.SITE_FIELD_WORKSHOP;
 import static mekhq.utilities.MHQInternationalization.getFormattedText;
 import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
 import static mekhq.utilities.MHQInternationalization.getText;
+import static mekhq.utilities.MHQInternationalization.getTextAt;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.MouseEvent;
@@ -102,6 +103,7 @@ import mekhq.campaign.Campaign;
 import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.events.RepairStatusChangedEvent;
 import mekhq.campaign.events.units.UnitChangedEvent;
+import mekhq.campaign.events.units.UnitLogEvent;
 import mekhq.campaign.finances.Money;
 import mekhq.campaign.finances.enums.TransactionType;
 import mekhq.campaign.mission.Scenario;
@@ -126,8 +128,10 @@ import mekhq.campaign.unit.actions.UnloadAmmoTypeAction;
 import mekhq.gui.CampaignGUI;
 import mekhq.gui.HangarTab;
 import mekhq.gui.baseComponents.immersiveDialogs.ImmersiveDialogSimple;
+import mekhq.gui.control.EditUnitLogControl.UnitLogType;
 import mekhq.gui.dialog.BombsDialog;
 import mekhq.gui.dialog.ChooseRefitDialog;
+import mekhq.gui.dialog.EditUnitLogDialog;
 import mekhq.gui.dialog.LargeCraftAmmoSwapDialog;
 import mekhq.gui.dialog.MarkdownEditorDialog;
 import mekhq.gui.dialog.MassMothballDialog;
@@ -174,6 +178,11 @@ public class UnitTableMouseAdapter extends JPopupMenuAdapter {
     public static final String COMMAND_CANCEL_MOTHBALL = "CANCEL_MOTHBALL";
     // Unit History Commands
     public static final String COMMAND_CHANGE_HISTORY = "CHANGE_HISTORY";
+    public static final String COMMAND_EDIT_UNIT_LOG = "EDIT_UNIT_LOG";
+    public static final String COMMAND_EDIT_KILL_LOG = "EDIT_KILL_LOG";
+    public static final String COMMAND_EDIT_CREW_LOG = "EDIT_CREW_LOG";
+    public static final String COMMAND_EDIT_DEPLOYMENT_LOG = "EDIT_DEPLOYMENT_LOG";
+    public static final String COMMAND_EDIT_REPAIR_LOG = "EDIT_REPAIR_LOG";
 
     public static final String COMMAND_HIRE_FULL = "HIRE_FULL";
     public static final String COMMAND_FILL_TEMP_CREW = "FILL_TEMP_CREW";
@@ -249,6 +258,21 @@ public class UnitTableMouseAdapter extends JPopupMenuAdapter {
                 }
             }
         }.connect(unitTable);
+    }
+
+    /**
+     * Opens the log editor for the given unit and log type, then fires a {@link UnitLogEvent}.
+     *
+     * @param unit    the unit whose log is being edited
+     * @param logType which of the unit's logs to edit
+     */
+    private void editUnitLog(Unit unit, UnitLogType logType) {
+        EditUnitLogDialog editUnitLogDialog = new EditUnitLogDialog(gui.getFrame(),
+              gui.getCampaign().getLocalDate(),
+              unit,
+              logType);
+        editUnitLogDialog.setVisible(true);
+        MekHQ.triggerEvent(new UnitLogEvent(unit));
     }
 
     @Override
@@ -606,6 +630,16 @@ public class UnitTableMouseAdapter extends JPopupMenuAdapter {
                 selectedUnit.setHistory(tad.getText());
                 MekHQ.triggerEvent(new UnitChangedEvent(selectedUnit));
             }
+        } else if (command.equals(COMMAND_EDIT_UNIT_LOG)) { // Single Unit only
+            editUnitLog(selectedUnit, UnitLogType.UNIT_LOG);
+        } else if (command.equals(COMMAND_EDIT_KILL_LOG)) { // Single Unit only
+            editUnitLog(selectedUnit, UnitLogType.KILL_LOG);
+        } else if (command.equals(COMMAND_EDIT_CREW_LOG)) { // Single Unit only
+            editUnitLog(selectedUnit, UnitLogType.CREW_LOG);
+        } else if (command.equals(COMMAND_EDIT_DEPLOYMENT_LOG)) { // Single Unit only
+            editUnitLog(selectedUnit, UnitLogType.DEPLOYMENT_LOG);
+        } else if (command.equals(COMMAND_EDIT_REPAIR_LOG)) { // Single Unit only
+            editUnitLog(selectedUnit, UnitLogType.REPAIR_LOG);
         } else if (command.equals(COMMAND_REMOVE_INDI_CAMO)) {
             for (final Unit unit : units) {
                 unit.getEntity().setCamouflage(new Camouflage());
@@ -1275,10 +1309,43 @@ public class UnitTableMouseAdapter extends JPopupMenuAdapter {
             }
 
             if (oneSelected) {
-                menuItem = new JMenuItem("Edit Unit History...");
+                JMenu unitHistoryMenu = new JMenu(getTextAt(RESOURCE_BUNDLE, "unitHistoryMenu.text"));
+
+                menuItem = new JMenuItem(getTextAt(RESOURCE_BUNDLE, "editUnitHistory.text"));
                 menuItem.setActionCommand(COMMAND_CHANGE_HISTORY);
                 menuItem.addActionListener(this);
-                popup.add(menuItem);
+                unitHistoryMenu.add(menuItem);
+
+                JMenu editLogsMenu = new JMenu(getTextAt(RESOURCE_BUNDLE, "editUnitLogsMenu.text"));
+
+                menuItem = new JMenuItem(getTextAt(RESOURCE_BUNDLE, "editUnitLog.text"));
+                menuItem.setActionCommand(COMMAND_EDIT_UNIT_LOG);
+                menuItem.addActionListener(this);
+                editLogsMenu.add(menuItem);
+
+                menuItem = new JMenuItem(getTextAt(RESOURCE_BUNDLE, "editUnitKillLog.text"));
+                menuItem.setActionCommand(COMMAND_EDIT_KILL_LOG);
+                menuItem.addActionListener(this);
+                editLogsMenu.add(menuItem);
+
+                menuItem = new JMenuItem(getTextAt(RESOURCE_BUNDLE, "editUnitCrewLog.text"));
+                menuItem.setActionCommand(COMMAND_EDIT_CREW_LOG);
+                menuItem.addActionListener(this);
+                editLogsMenu.add(menuItem);
+
+                menuItem = new JMenuItem(getTextAt(RESOURCE_BUNDLE, "editUnitDeploymentLog.text"));
+                menuItem.setActionCommand(COMMAND_EDIT_DEPLOYMENT_LOG);
+                menuItem.addActionListener(this);
+                editLogsMenu.add(menuItem);
+
+                menuItem = new JMenuItem(getTextAt(RESOURCE_BUNDLE, "editUnitRepairLog.text"));
+                menuItem.setActionCommand(COMMAND_EDIT_REPAIR_LOG);
+                menuItem.addActionListener(this);
+                editLogsMenu.add(menuItem);
+
+                unitHistoryMenu.add(editLogsMenu);
+
+                popup.add(unitHistoryMenu);
             }
 
             if (oneSelected) {

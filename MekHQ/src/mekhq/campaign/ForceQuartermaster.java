@@ -48,6 +48,7 @@ import mekhq.campaign.events.parts.PartArrivedEvent;
 import mekhq.campaign.events.parts.PartChangedEvent;
 import mekhq.campaign.finances.Money;
 import mekhq.campaign.finances.enums.TransactionType;
+import mekhq.campaign.log.UnitLogger;
 import mekhq.campaign.parts.AmmoStorage;
 import mekhq.campaign.parts.Armor;
 import mekhq.campaign.parts.InfantryAmmoStorage;
@@ -681,14 +682,16 @@ public record ForceQuartermaster(Campaign campaign) {
                       .debit(TransactionType.UNIT_PURCHASE, campaign().getLocalDate(),
                   cost, "Purchased " + en.getShortName())) {
 
-                campaign().addNewUnit(en, false, days, quality);
+                Unit unit = campaign().addNewUnit(en, false, days, quality);
+                UnitLogger.purchased(unit, campaign().getLocalDate());
 
                 return true;
             } else {
                 return false;
             }
         } else {
-            campaign().addNewUnit(en, false, days, quality);
+            Unit unit = campaign().addNewUnit(en, false, days, quality);
+            UnitLogger.purchased(unit, campaign().getLocalDate());
             return true;
         }
     }

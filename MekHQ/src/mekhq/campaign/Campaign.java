@@ -168,6 +168,7 @@ import mekhq.campaign.location.LocationUtils;
 import mekhq.campaign.log.HistoricalLogEntry;
 import mekhq.campaign.log.LogEntry;
 import mekhq.campaign.log.ServiceLogger;
+import mekhq.campaign.log.UnitLogger;
 import mekhq.campaign.market.ForceShoppingList;
 import mekhq.campaign.market.PartsStore;
 import mekhq.campaign.market.PersonnelMarket;
@@ -1816,6 +1817,12 @@ public class Campaign implements ITechManager {
         // we really just want the entity and the parts so let's just wrap that around a new unit.
         Unit unit = new Unit(testUnit.getEntity(), this);
         getPlayerForce().getHangar().addUnit(unit);
+
+        // record who the unit was salvaged from before we take ownership of it
+        final String formerOwner = (unit.getEntity().getOwner() != null) ? unit.getEntity().getOwner().getName() : null;
+        if ((formerOwner != null) && !formerOwner.isBlank()) {
+            UnitLogger.salvagedFrom(unit, getLocalDate(), formerOwner);
+        }
 
         // we decided we like the test unit so much we are going to keep it
         unit.getEntity().setOwner(player);
@@ -4116,6 +4123,12 @@ public class Campaign implements ITechManager {
         final boolean taskSucceeded = roll >= target.getValue();
         if (taskSucceeded) {
             report = report + partWork.succeed();
+            // log successful repairs (fixes and missing-part replacements) against the unit; salvage and ammo
+            // reloads are not repairs
+            Unit repairedUnit = partWork.getUnit();
+            if ((repairedUnit != null) && !partWork.isSalvaging() && !(partWork instanceof AmmoBin)) {
+                UnitLogger.repaired(repairedUnit, getLocalDate(), partWork.getPartName(), tech.getFullName());
+            }
             if (getCampaignOptions().isPayForRepairs() && action.equals(" fix ") && !(partWork instanceof Armor)) {
                 Money cost = partWork.getUndamagedValue().multipliedBy(0.2);
                 report += "<br>Repairs cost " + cost.toAmountAndSymbolString() + " worth of parts.";
