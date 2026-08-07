@@ -33,32 +33,39 @@
 package mekhq.campaign.mission.atb;
 
 import java.io.File;
-import java.io.FileInputStream;
 import java.util.ArrayList;
 import java.util.List;
-import javax.xml.transform.Source;
 
-import jakarta.xml.bind.JAXBContext;
-import jakarta.xml.bind.JAXBElement;
-import jakarta.xml.bind.Unmarshaller;
-import jakarta.xml.bind.annotation.XmlElement;
-import jakarta.xml.bind.annotation.XmlElementWrapper;
-import jakarta.xml.bind.annotation.XmlRootElement;
+import com.fasterxml.jackson.annotation.JsonAutoDetect;
+import com.fasterxml.jackson.annotation.PropertyAccessor;
+import com.fasterxml.jackson.core.JsonParser;
+import com.fasterxml.jackson.databind.DeserializationFeature;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import megamek.logging.MMLogger;
-import mekhq.utilities.MHQXMLUtility;
 
 /**
  * Class intended for local use that holds a manifest of scenario modifier definition file names.
  *
  * @author NickAragua
  */
-@XmlRootElement(name = "scenarioModifierManifest")
 class ScenarioModifierManifest {
     private static final MMLogger LOGGER = MMLogger.create(ScenarioModifierManifest.class);
 
-    @XmlElementWrapper(name = "modifiers")
-    @XmlElement(name = "modifier")
+    private static final ObjectMapper MAPPER = buildMapper();
+
     public List<String> fileNameList = new ArrayList<>();
+
+    private static ObjectMapper buildMapper() {
+        ObjectMapper mapper = new ObjectMapper();
+        // Use fields as the single source of truth, matching the shipped scenario modifier JSON files.
+        mapper.setVisibility(PropertyAccessor.ALL, JsonAutoDetect.Visibility.NONE);
+        mapper.setVisibility(PropertyAccessor.FIELD, JsonAutoDetect.Visibility.ANY);
+        // Tolerate fields absent from older files rather than failing the whole load.
+        mapper.disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES);
+        // Skip the leading '#' license-header comment lines (and any '#' notes marking disabled modifiers).
+        mapper.enable(JsonParser.Feature.ALLOW_YAML_COMMENTS);
+        return mapper;
+    }
 
     /**
      * Attempt to deserialize an instance of a scenario modifier list from the passed-in file
@@ -68,27 +75,17 @@ class ScenarioModifierManifest {
      * @return Possibly an instance of a scenario modifier list
      */
     public static ScenarioModifierManifest Deserialize(String fileName) {
-        ScenarioModifierManifest resultingList = null;
-
-        try {
-            JAXBContext context = JAXBContext.newInstance(ScenarioModifierManifest.class);
-            Unmarshaller um = context.createUnmarshaller();
-            File xmlFile = new File(fileName);
-            if (!xmlFile.exists()) {
-                LOGGER.warn("Specified file {} does not exist", fileName);
-                return null;
-            }
-
-            try (FileInputStream fileStream = new FileInputStream(xmlFile)) {
-                Source inputSource = MHQXMLUtility.createSafeXmlSource(fileStream);
-                JAXBElement<ScenarioModifierManifest> templateElement = um.unmarshal(inputSource,
-                      ScenarioModifierManifest.class);
-                resultingList = templateElement.getValue();
-            }
-        } catch (Exception ex) {
-            LOGGER.error("Error Deserializing Scenario Modifier List", ex);
+        File inputFile = new File(fileName);
+        if (!inputFile.exists()) {
+            LOGGER.warn("Specified file {} does not exist", fileName);
+            return null;
         }
 
-        return resultingList;
+        try {
+            return MAPPER.readValue(inputFile, ScenarioModifierManifest.class);
+        } catch (Exception ex) {
+            LOGGER.error("Error Deserializing Scenario Modifier List", ex);
+            return null;
+        }
     }
 }

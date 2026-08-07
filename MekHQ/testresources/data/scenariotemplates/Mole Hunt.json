@@ -1,0 +1,211 @@
+# MegaMek Data (C) 2026 by The MegaMek Team is licensed under CC BY-NC-SA 4.0.
+# To view a copy of this license, visit https: //creativecommons.org/licenses/by-nc-sa/4.0/
+#
+# NOTICE: The MegaMek organization is a non-profit group of volunteers
+# creating free software for the BattleTech community.
+#
+# MechWarrior, BattleMech, `Mech and AeroTech are registered trademarks
+# of The Topps Company, Inc. All Rights Reserved.
+#
+# Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
+# InMediaRes Productions, LLC.
+#
+# MechWarrior Copyright Microsoft Corporation. MegaMek Data was created under
+# Microsoft's "Game Content Usage Rules"
+# <https: //www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+# affiliated with Microsoft.
+
+{
+"name": "Mole Hunt",
+"stratConScenarioType": "NONE",
+"shortBriefing": "Cut through the bodyguard and eliminate the mole.",
+"detailedBriefing": "We have finally pinned down the mole who has been bleeding our operations dry. They are no soldier—just one person on foot—but they are ringed by a hardened bodyguard detail that will not let you anywhere near them without a fight.\n\nDo not get distracted trading fire with the escort; they are not the point. Break or scatter the guard just enough to get a clean line on the target, and put the mole down. Expect them to shelter behind their protectors and among the buildings, so you will have to dig them out.\n\nEliminate the mole. Nothing else in this engagement matters as much as that single kill.",
+"isHostileFacility": false,
+"isAlliedFacility": false,
+"isSuitedForAmbushes": false,
+"isSuitedForBungledPatrols": false,
+"battlefieldControl": "VICTOR",
+"mapParameters": {
+"baseWidth": 0,
+"baseHeight": 0,
+"widthScalingIncrement": 5,
+"heightScalingIncrement": 5,
+"additionalMapSheetTall": 0,
+"additionalMapSheetWide": 0,
+"allowRotation": false,
+"useStandardAtBSizing": true,
+"mapLocation": "SpecificGroundTerrain",
+"allowedTerrainTypes": [
+"Urban",
+"ColdUrban",
+"HotUrban"
+]
+},
+"scenarioModifiers": [
+],
+"scenarioForces": {
+"Bodyguard": {
+"forceAlignment": 2,
+"generationMethod": 1,
+"forceMultiplier": 1.0,
+"deploymentZones": [
+10
+],
+"destinationZone": 5,
+"retreatThreshold": 50,
+"allowedUnitType": -2,
+"canReinforceLinked": true,
+"contributesToBV": false,
+"contributesToUnitCount": false,
+"forceName": "Bodyguard",
+"syncedForceName": null,
+"syncDeploymentType": "None",
+"syncRetreatThreshold": false,
+"arrivalTurn": 0,
+"maxWeightClass": 4,
+"minWeightClass": 0,
+"contributesToMapSize": true,
+"actualDeploymentZone": -1,
+"fixedUnitCount": 0,
+"generationOrder": 5,
+"allowAeroBombs": false,
+"startingAltitude": 0,
+"useArtillery": false,
+"deployOffBoard": false,
+"objectiveLinkedForces": [
+"Mole"
+],
+"subjectToRandomRemoval": true,
+"fixedMul": null,
+"forceRoleStrings": [
+"SR_FIRE_SUPPORT",
+"CAVALRY"
+]
+},
+"Player": {
+"forceAlignment": 0,
+"generationMethod": 0,
+"forceMultiplier": 1.0,
+"deploymentZones": [
+6
+],
+"destinationZone": 2,
+"retreatThreshold": 50,
+"allowedUnitType": -2,
+"canReinforceLinked": true,
+"contributesToBV": true,
+"contributesToUnitCount": true,
+"forceName": "Player",
+"syncedForceName": null,
+"syncDeploymentType": "None",
+"syncRetreatThreshold": false,
+"arrivalTurn": 1,
+"maxWeightClass": 4,
+"minWeightClass": 0,
+"contributesToMapSize": true,
+"actualDeploymentZone": -1,
+"fixedUnitCount": 0,
+"generationOrder": 1,
+"allowAeroBombs": false,
+"startingAltitude": 0,
+"useArtillery": false,
+"deployOffBoard": false,
+"objectiveLinkedForces": [],
+"subjectToRandomRemoval": true,
+"fixedMul": null,
+"forceRoleStrings": [
+]
+},
+"Mole": {
+"forceAlignment": 2,
+"generationMethod": 1,
+"forceMultiplier": 1.0,
+"deploymentZones": [
+10
+],
+"destinationZone": 2,
+"retreatThreshold": 0,
+"allowedUnitType": 3,
+"canReinforceLinked": false,
+"contributesToBV": false,
+"contributesToUnitCount": false,
+"forceName": "Mole",
+"syncedForceName": null,
+"syncDeploymentType": "None",
+"syncRetreatThreshold": false,
+"arrivalTurn": 0,
+"maxWeightClass": 4,
+"minWeightClass": 0,
+"contributesToMapSize": true,
+"actualDeploymentZone": -1,
+"fixedUnitCount": 1,
+"generationOrder": 3,
+"allowAeroBombs": false,
+"startingAltitude": 0,
+"useArtillery": false,
+"deployOffBoard": false,
+"objectiveLinkedForces": [],
+"subjectToRandomRemoval": true,
+"fixedMul": null,
+"forceRoleStrings": [
+"CIVILIAN"
+]
+}
+},
+"scenarioObjectives": [
+{
+"objectiveCriterion": "Destroy",
+"description": "",
+"destinationEdge": "NONE",
+"percentage": 100,
+"fixedAmount": null,
+"timeLimitType": "None",
+"timeLimitAtMost": true,
+"timeLimit": null,
+"timeLimitScaleFactor": null,
+"associatedForceNames": [
+"Mole"
+],
+"associatedUnitIDs": [],
+"successEffects": [
+{
+"effectType": "ScenarioVictory",
+"effectScaling": "Fixed",
+"howMuch": 2
+}
+],
+"failureEffects": [
+{
+"effectType": "ScenarioDefeat",
+"effectScaling": "Fixed",
+"howMuch": 2
+}
+],
+"additionalDetails": []
+},
+{
+"objectiveCriterion": "ForceWithdraw",
+"description": "",
+"destinationEdge": "NONE",
+"percentage": 33,
+"fixedAmount": null,
+"timeLimitType": "None",
+"timeLimitAtMost": true,
+"timeLimit": null,
+"timeLimitScaleFactor": null,
+"associatedForceNames": [
+"Bodyguard"
+],
+"associatedUnitIDs": [],
+"successEffects": [
+{
+"effectType": "ScenarioVictory",
+"effectScaling": "Fixed",
+"howMuch": 1
+}
+],
+"failureEffects": [],
+"additionalDetails": []
+}
+]
+}

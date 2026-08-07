@@ -76,14 +76,14 @@ public final class StratConTestData {
             return;
         }
 
-        StratConBiomeManifest.loadForTest(fixture("StratConBiomeManifest.xml"));
+        StratConBiomeManifest.loadForTest(fixture("StratConBiomeManifest.json"));
         StratConHydrology.loadForTest(fixture("HydrologyProfiles.yaml"));
         StratConOrogeny.loadForTest(fixture("OrogenyProfiles.yaml"));
         StratConUrban.loadForTest(fixture("UrbanProfiles.yaml"));
         StratConSectorShape.loadForTest(fixture("SectorShapeProfiles.yaml"));
 
         // Facilities are a directory rather than a single file: the manifest names the files, which sit beside it.
-        StratConFacilityFactory.loadForTest(new File(FACILITY_DIRECTORY, "facilitymanifest.xml").getPath(),
+        StratConFacilityFactory.loadForTest(new File(FACILITY_DIRECTORY, "facilitymanifest.json").getPath(),
               FACILITY_DIRECTORY);
         assertFalse(StratConFacilityFactory.getHostileFacilities().isEmpty(),
               "No hostile facilities loaded from " + FACILITY_DIRECTORY +

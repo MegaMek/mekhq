@@ -102,9 +102,8 @@ public class StratConHydrology {
      * Test seam: loads the hydrology profiles from an explicit path and installs the result as the singleton.
      *
      * <p>Production resolves {@link MHQConstants#STRAT_CON_HYDROLOGY_PROFILES_PATH}, which lives under the
-     * {@code data}
-     * directory that is built when the application launches. That directory does not exist in the test environment, so
-     * tests point this at their own copy under {@code testresources} instead.</p>
+     * {@code data} directory that is built when the application launches. That directory does not exist in the test
+     * environment, so tests point this at their own copy under {@code testresources} instead.</p>
      *
      * @param path the file to load the hydrology profiles from
      */

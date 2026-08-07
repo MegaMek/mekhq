@@ -119,7 +119,7 @@ public class DataLoadingDialog extends AbstractMHQDialogBasic implements Propert
     private final boolean isInAppNewCampaign;
     private final Consumer<Campaign> completionHandler;
 
-    private final LocalDate DEFAULT_START_DATE = LocalDate.of(3051, 1, 1);
+    private static final LocalDate DEFAULT_START_DATE = LocalDate.of(3151, 1, 1);
 
     // endregion Variable Declarations
 

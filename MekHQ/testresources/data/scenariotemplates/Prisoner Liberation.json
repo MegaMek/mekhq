@@ -1,0 +1,215 @@
+# MegaMek Data (C) 2026 by The MegaMek Team is licensed under CC BY-NC-SA 4.0.
+# To view a copy of this license, visit https: //creativecommons.org/licenses/by-nc-sa/4.0/
+#
+# NOTICE: The MegaMek organization is a non-profit group of volunteers
+# creating free software for the BattleTech community.
+#
+# MechWarrior, BattleMech, `Mech and AeroTech are registered trademarks
+# of The Topps Company, Inc. All Rights Reserved.
+#
+# Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
+# InMediaRes Productions, LLC.
+#
+# MechWarrior Copyright Microsoft Corporation. MegaMek Data was created under
+# Microsoft's "Game Content Usage Rules"
+# <https: //www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+# affiliated with Microsoft.
+
+{
+"name": "Prisoner Liberation",
+"stratConScenarioType": "NONE",
+"shortBriefing": "Escort freed prisoners to friendly lines before the enemy recaptures them.",
+"detailedBriefing": "We have broken open a holding camp and freed our people, but they are not safe yet. They are lightly equipped, exhausted, and a long way from friendly lines—and the enemy is already moving to run them down and drag them back.\n\nThe freed prisoners will make for our lines on their own; your job is to cover them. Get between them and their pursuers, keep the enemy off their backs, and see enough of them safely off the field. They cannot fight and they cannot be replaced—every one lost is one back in enemy hands.\n\nGet the freed prisoners to safety and drive off the pursuit. Failing them will cost us dearly. The victor holds the field at the end of the engagement.",
+"isHostileFacility": false,
+"isAlliedFacility": false,
+"isSuitedForAmbushes": false,
+"isSuitedForBungledPatrols": false,
+"battlefieldControl": "VICTOR",
+"mapParameters": {
+"baseWidth": 0,
+"baseHeight": 0,
+"widthScalingIncrement": 5,
+"heightScalingIncrement": 5,
+"additionalMapSheetTall": 1,
+"additionalMapSheetWide": 0,
+"allowRotation": false,
+"useStandardAtBSizing": true,
+"mapLocation": "SpecificGroundTerrain",
+"allowedTerrainTypes": [
+"Forest",
+"ColdForest",
+"HotForest",
+"Jungle",
+"Swamp"
+]
+},
+"scenarioModifiers": [
+],
+"scenarioForces": {
+"Freed Prisoners": {
+"forceAlignment": 1,
+"generationMethod": 1,
+"forceMultiplier": 0.4,
+"deploymentZones": [
+10
+],
+"destinationZone": 6,
+"retreatThreshold": 0,
+"allowedUnitType": 3,
+"canReinforceLinked": false,
+"contributesToBV": false,
+"contributesToUnitCount": false,
+"forceName": "Freed Prisoners",
+"syncedForceName": null,
+"syncDeploymentType": "None",
+"syncRetreatThreshold": false,
+"arrivalTurn": 0,
+"maxWeightClass": 2,
+"minWeightClass": 0,
+"contributesToMapSize": true,
+"actualDeploymentZone": -1,
+"fixedUnitCount": 0,
+"generationOrder": 2,
+"allowAeroBombs": false,
+"startingAltitude": 0,
+"useArtillery": false,
+"deployOffBoard": false,
+"objectiveLinkedForces": [],
+"subjectToRandomRemoval": true,
+"fixedMul": null,
+"forceRoleStrings": [
+]
+},
+"Player": {
+"forceAlignment": 0,
+"generationMethod": 0,
+"forceMultiplier": 1.0,
+"deploymentZones": [
+6
+],
+"destinationZone": 2,
+"retreatThreshold": 50,
+"allowedUnitType": -2,
+"canReinforceLinked": true,
+"contributesToBV": true,
+"contributesToUnitCount": true,
+"forceName": "Player",
+"syncedForceName": null,
+"syncDeploymentType": "None",
+"syncRetreatThreshold": false,
+"arrivalTurn": 1,
+"maxWeightClass": 4,
+"minWeightClass": 0,
+"contributesToMapSize": true,
+"actualDeploymentZone": -1,
+"fixedUnitCount": 0,
+"generationOrder": 1,
+"allowAeroBombs": false,
+"startingAltitude": 0,
+"useArtillery": false,
+"deployOffBoard": false,
+"objectiveLinkedForces": [],
+"subjectToRandomRemoval": true,
+"fixedMul": null,
+"forceRoleStrings": [
+]
+},
+"OpFor": {
+"forceAlignment": 2,
+"generationMethod": 1,
+"forceMultiplier": 1.0,
+"deploymentZones": [],
+"destinationZone": 6,
+"retreatThreshold": 50,
+"allowedUnitType": -2,
+"canReinforceLinked": true,
+"contributesToBV": false,
+"contributesToUnitCount": false,
+"forceName": "OpFor",
+"syncedForceName": "Player",
+"syncDeploymentType": "OppositeEdge",
+"syncRetreatThreshold": false,
+"arrivalTurn": 0,
+"maxWeightClass": 4,
+"minWeightClass": 0,
+"contributesToMapSize": true,
+"actualDeploymentZone": -1,
+"fixedUnitCount": 0,
+"generationOrder": 5,
+"allowAeroBombs": false,
+"startingAltitude": 0,
+"useArtillery": false,
+"deployOffBoard": false,
+"objectiveLinkedForces": [
+],
+"subjectToRandomRemoval": true,
+"fixedMul": null,
+"forceRoleStrings": [
+"RAIDER",
+"CAVALRY"
+]
+}
+},
+"scenarioObjectives": [
+{
+"objectiveCriterion": "ReachMapEdge",
+"description": "",
+"destinationEdge": "SOUTH",
+"percentage": 50,
+"fixedAmount": null,
+"timeLimitType": "None",
+"timeLimitAtMost": false,
+"timeLimit": null,
+"timeLimitScaleFactor": 2,
+"associatedForceNames": [
+"Freed Prisoners"
+],
+"associatedUnitIDs": [],
+"successEffects": [
+{
+"effectType": "ScenarioVictory",
+"effectScaling": "Fixed",
+"howMuch": 2
+}
+],
+"failureEffects": [
+{
+"effectType": "ScenarioDefeat",
+"effectScaling": "Fixed",
+"howMuch": 2
+}
+],
+"additionalDetails": []
+},
+{
+"objectiveCriterion": "ForceWithdraw",
+"description": "",
+"destinationEdge": "NONE",
+"percentage": 33,
+"fixedAmount": null,
+"timeLimitType": "None",
+"timeLimitAtMost": true,
+"timeLimit": null,
+"timeLimitScaleFactor": null,
+"associatedForceNames": [
+"OpFor"
+],
+"associatedUnitIDs": [],
+"successEffects": [
+{
+"effectType": "ScenarioVictory",
+"effectScaling": "Fixed",
+"howMuch": 1
+}
+],
+"failureEffects": [
+{
+"effectType": "ScenarioDefeat",
+"effectScaling": "Fixed",
+"howMuch": 1
+}
+],
+"additionalDetails": []
+}
+]
+}
