@@ -1,8 +1,11 @@
 package mekhq.gui.dialog;
 
+import static mekhq.MHQConstants.BATTLE_OF_TUKAYYID;
+import static mekhq.MHQConstants.CLAN_INVASION_FIRST_WAVE_BEGINS;
 import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
 import static mekhq.utilities.MHQInternationalization.getTextAt;
 
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.EnumMap;
 import java.util.HashSet;
@@ -21,36 +24,22 @@ public class WarriorsAlmanacDialog {
 
     private record TechBaseColumn(String headerKey, @Nullable WarriorsAlmanacData data) {}
 
-    private String reportAsString;
     private boolean isEmpty = true;
 
-    public boolean isEmpty() {
-        return isEmpty;
-    }
-
     public WarriorsAlmanacDialog(final Campaign campaign) {
-        final int gameYear = campaign.getGameYear();
+        final LocalDate currentDate = campaign.getLocalDate();
+        final int gameYear = currentDate.getYear();
+
+        boolean isClanForce = campaign.getPlayerForce().getFaction().isClan();
+        boolean hideClanAndMixed = !currentDate.isAfter(BATTLE_OF_TUKAYYID) && !isClanForce;
+        boolean hideInnerSphereAndMixed = !currentDate.isAfter(CLAN_INVASION_FIRST_WAVE_BEGINS) && isClanForce;
 
         final StringBuilder report = new StringBuilder();
 
-        report.append(getFormattedTextAt(RESOURCE_BUNDLE, "WarriorsAlmanacDialog.title", gameYear));
+        report.append(getFormattedTextAt(RESOURCE_BUNDLE, "WarriorsAlmanacDialog.title", String.valueOf(gameYear)));
         report.append(getTextAt(RESOURCE_BUNDLE, "WarriorsAlmanacDialog.blurb"));
 
-        appendSection(report, "WarriorsAlmanacDialog.parts", List.of(
-              new TechBaseColumn("WarriorsAlmanacDialog.techBase.innerSphere",
-                    campaign.getPartsAlmanacIS().get(gameYear)),
-              new TechBaseColumn("WarriorsAlmanacDialog.techBase.clan",
-                    campaign.getPartsAlmanacClan().get(gameYear))));
-
-        appendSection(report, "WarriorsAlmanacDialog.units", List.of(
-              new TechBaseColumn("WarriorsAlmanacDialog.techBase.innerSphere",
-                    campaign.getUnitsAlmanacIS().get(gameYear)),
-              new TechBaseColumn("WarriorsAlmanacDialog.techBase.clan",
-                    campaign.getUnitsAlmanacClan().get(gameYear)),
-              new TechBaseColumn("WarriorsAlmanacDialog.techBase.mixed",
-                    campaign.getUnitsAlmanacMixed().get(gameYear)),
-              new TechBaseColumn("WarriorsAlmanacDialog.techBase.unknown",
-                    campaign.getUnitsAlmanacUnknown().get(gameYear))));
+        appendSections(campaign, hideClanAndMixed, report, gameYear, hideInnerSphereAndMixed);
 
         // Both sections were empty for this year, so there's nothing worth showing.
         if (isEmpty) {
@@ -60,9 +49,49 @@ public class WarriorsAlmanacDialog {
         new ImmersiveDialogNotification(campaign, report.toString(), true);
     }
 
+    private void appendSections(Campaign campaign, boolean hideClanAndMixed, StringBuilder report, int gameYear,
+          boolean hideInnerSphereAndMixed) {
+        if (hideClanAndMixed) {
+            appendSection(report, "WarriorsAlmanacDialog.parts", List.of(
+                  new TechBaseColumn("WarriorsAlmanacDialog.techBase.innerSphere",
+                        campaign.getPartsAlmanacIS().get(gameYear))));
+
+            appendSection(report, "WarriorsAlmanacDialog.units", List.of(
+                  new TechBaseColumn("WarriorsAlmanacDialog.techBase.innerSphere",
+                        campaign.getUnitsAlmanacIS().get(gameYear)),
+                  new TechBaseColumn("WarriorsAlmanacDialog.techBase.unknown",
+                        campaign.getUnitsAlmanacUnknown().get(gameYear))));
+        } else if (hideInnerSphereAndMixed) {
+            appendSection(report, "WarriorsAlmanacDialog.parts", List.of(
+                  new TechBaseColumn("WarriorsAlmanacDialog.techBase.clan",
+                        campaign.getPartsAlmanacClan().get(gameYear))));
+
+            appendSection(report, "WarriorsAlmanacDialog.units", List.of(
+                  new TechBaseColumn("WarriorsAlmanacDialog.techBase.clan",
+                        campaign.getUnitsAlmanacClan().get(gameYear)),
+                  new TechBaseColumn("WarriorsAlmanacDialog.techBase.unknown",
+                        campaign.getUnitsAlmanacUnknown().get(gameYear))));
+        } else {
+            appendSection(report, "WarriorsAlmanacDialog.parts", List.of(
+                  new TechBaseColumn("WarriorsAlmanacDialog.techBase.innerSphere",
+                        campaign.getPartsAlmanacIS().get(gameYear)),
+                  new TechBaseColumn("WarriorsAlmanacDialog.techBase.clan",
+                        campaign.getPartsAlmanacClan().get(gameYear))));
+
+            appendSection(report, "WarriorsAlmanacDialog.units", List.of(
+                  new TechBaseColumn("WarriorsAlmanacDialog.techBase.innerSphere",
+                        campaign.getUnitsAlmanacIS().get(gameYear)),
+                  new TechBaseColumn("WarriorsAlmanacDialog.techBase.clan",
+                        campaign.getUnitsAlmanacClan().get(gameYear)),
+                  new TechBaseColumn("WarriorsAlmanacDialog.techBase.mixed",
+                        campaign.getUnitsAlmanacMixed().get(gameYear)),
+                  new TechBaseColumn("WarriorsAlmanacDialog.techBase.unknown",
+                        campaign.getUnitsAlmanacUnknown().get(gameYear))));
+        }
+    }
+
     private void appendSection(final StringBuilder report, final String sectionHeaderKey,
           final List<TechBaseColumn> columns) {
-        // Resolve each column's names into a single phase up front, honoring the phase priority.
         final List<Map<AlmanacTechAdvancementPhase, List<String>>> groupedByColumn = new ArrayList<>();
         for (TechBaseColumn column : columns) {
             groupedByColumn.add(groupNamesByPhase(column.data()));
