@@ -76,6 +76,7 @@ class MHQDisplayPage extends MHQOptionsPage {
     private SettingsCheckBox chkCompanyGeneratorStartup;
     private SettingsCheckBox chkShowCompanyGenerator;
     private SettingsCheckBox chkShowUnitPicturesOnTOE;
+    private SettingsCheckBox chkShowWarriorsAlmanac;
 
     // Display - Interstellar Map
       private SettingsCheckBox chkInterstellarMapShowJumpRadius;
@@ -166,13 +167,15 @@ class MHQDisplayPage extends MHQOptionsPage {
               getMetadata(null, CampaignOptionFlag.UNIMPLEMENTED));
         chkShowCompanyGenerator = checkBox("chkShowCompanyGenerator", model.showCompanyGenerator);
         chkShowUnitPicturesOnTOE = checkBox("chkShowUnitPicturesOnTOE", model.showUnitPicturesOnTOE);
+        chkShowWarriorsAlmanac = checkBox("chkShowWarriorsAlmanac", model.showWarriorsAlmanac);
         panel.addCheckBoxGrid(2,
               chkHideUnitFluff,
               chkUseAlternateStratConFogOfWar,
               chkHistoricalDailyLog,
               chkCompanyGeneratorStartup,
               chkShowCompanyGenerator,
-              chkShowUnitPicturesOnTOE);
+              chkShowUnitPicturesOnTOE,
+              chkShowWarriorsAlmanac);
 
         return panel;
     }
@@ -358,6 +361,7 @@ class MHQDisplayPage extends MHQOptionsPage {
         model.companyGeneratorStartup = chkCompanyGeneratorStartup.isSelected();
         model.showCompanyGenerator = chkShowCompanyGenerator.isSelected();
         model.showUnitPicturesOnTOE = chkShowUnitPicturesOnTOE.isSelected();
+        model.showWarriorsAlmanac = chkShowWarriorsAlmanac.isSelected();
 
         model.interstellarMapShowJumpRadius = chkInterstellarMapShowJumpRadius.isSelected();
         model.interstellarMapShowJumpRadiusMinimumZoom =

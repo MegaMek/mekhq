@@ -34,6 +34,8 @@ package mekhq.gui.dialog;
 
 import static java.util.Arrays.sort;
 import static mekhq.campaign.enums.DailyReportType.POLITICS;
+import static mekhq.campaign.universe.WarriorsAlmanac.WarriorsAlmanacData.buildAlmanacPartsData;
+import static mekhq.campaign.universe.WarriorsAlmanac.WarriorsAlmanacData.buildAlmanacUnitsData;
 import static mekhq.gui.campaignOptions.CampaignOptionsDialog.CampaignOptionsDialogMode.STARTUP;
 import static mekhq.gui.campaignOptions.CampaignOptionsDialog.CampaignOptionsDialogMode.STARTUP_ABRIDGED;
 import static mekhq.utilities.EntityUtilities.isUnsupportedEntity;
@@ -49,6 +51,7 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.CancellationException;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutionException;
@@ -66,6 +69,7 @@ import megamek.client.generator.RandomNameGenerator;
 import megamek.client.ui.util.UIUtil;
 import megamek.client.ui.widget.RawImagePanel;
 import megamek.common.annotations.Nullable;
+import megamek.common.enums.TechBase;
 import megamek.common.loaders.MekSummaryCache;
 import megamek.common.options.OptionsConstants;
 import megamek.common.units.Entity;
@@ -83,6 +87,7 @@ import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.events.OptionsChangedEvent;
 import mekhq.campaign.finances.CurrencyManager;
 import mekhq.campaign.finances.financialInstitutions.FinancialInstitutions;
+import mekhq.campaign.market.PartsStore;
 import mekhq.campaign.market.enums.ContractMarketMethod;
 import mekhq.campaign.mission.atb.AtBScenarioModifier;
 import mekhq.campaign.personnel.Bloodname;
@@ -98,6 +103,7 @@ import mekhq.campaign.personnel.skills.SkillType;
 import mekhq.campaign.unit.Unit;
 import mekhq.campaign.universe.Factions;
 import mekhq.campaign.universe.Systems;
+import mekhq.campaign.universe.WarriorsAlmanac.WarriorsAlmanacData;
 import mekhq.campaign.universe.eras.Eras;
 import mekhq.campaign.universe.factionHints.WarAndPeaceProcessor;
 import mekhq.campaign.universe.factionStanding.FactionStandings;
@@ -190,7 +196,7 @@ public class DataLoadingDialog extends AbstractMHQDialogBasic implements Propert
     }
 
     private JProgressBar createProgressBar() {
-        setProgressBar(new JProgressBar(0, 7));
+        setProgressBar(new JProgressBar(0, 8));
         getProgressBar().setString(resources.getString("loadingBaseData.text"));
         getProgressBar().setValue(0);
         getProgressBar().setStringPainted(true);
@@ -243,6 +249,9 @@ public class DataLoadingDialog extends AbstractMHQDialogBasic implements Propert
                 progressBar.setString(resources.getString((getCampaignFile() == null) ?
                                                                 "applyingNewCampaign.text" :
                                                                 "applyingLoadedCampaign.text"));
+                break;
+            case 8:
+                progressBar.setString(resources.getString("performingFinalSteps.text"));
                 break;
             default:
                 progressBar.setString(resources.getString("Error.text"));
@@ -423,15 +432,15 @@ public class DataLoadingDialog extends AbstractMHQDialogBasic implements Propert
 
                 // Setup Personnel Modules
                 final AbstractMarriage marriage = campaignOptions
-                                           .getRandomMarriageMethod()
+                                                        .getRandomMarriageMethod()
                                                         .getMethod(campaignOptions);
                 campaign.getPlayerForce().getHumanResources().setMarriage(marriage);
                 final AbstractDivorce divorce = campaignOptions
-                                          .getRandomDivorceMethod()
+                                                      .getRandomDivorceMethod()
                                                       .getMethod(campaignOptions);
                 campaign.getPlayerForce().getHumanResources().setDivorce(divorce);
                 final AbstractProcreation procreation = campaignOptions
-                                              .getRandomProcreationMethod()
+                                                              .getRandomProcreationMethod()
                                                               .getMethod(campaignOptions);
                 campaign.getPlayerForce().getHumanResources().setProcreation(procreation);
 
@@ -500,9 +509,28 @@ public class DataLoadingDialog extends AbstractMHQDialogBasic implements Propert
                 // endregion Progress 7
             }
 
+            // region progress 8
+            setProgress(8);
+
+            PartsStore partsStore = campaign.getPartsStore();
+            Map<Integer, WarriorsAlmanacData> partsAlmanacInnerSphere = buildAlmanacPartsData(partsStore, false);
+            campaign.setPartsAlmanacIS(partsAlmanacInnerSphere);
+            Map<Integer, WarriorsAlmanacData> partsAlmanacClan = buildAlmanacPartsData(partsStore, true);
+            campaign.setPartsAlmanacClan(partsAlmanacClan);
+
+            Map<Integer, WarriorsAlmanacData> unitsAlmanacIS = buildAlmanacUnitsData(TechBase.IS);
+            campaign.setUnitsAlmanacIS(unitsAlmanacIS);
+            Map<Integer, WarriorsAlmanacData> unitsAlmanacClan = buildAlmanacUnitsData(TechBase.CLAN);
+            campaign.setUnitsAlmanacClan(unitsAlmanacClan);
+            Map<Integer, WarriorsAlmanacData> unitsAlmanacMixed = buildAlmanacUnitsData(TechBase.ALL);
+            campaign.setUnitsAlmanacMixed(unitsAlmanacMixed);
+            Map<Integer, WarriorsAlmanacData> unitsAlmanacUnknown = buildAlmanacUnitsData(TechBase.UNKNOWN);
+            campaign.setUnitsAlmanacUnknown(unitsAlmanacUnknown);
+
             if (isNewCampaign) {
                 new WarAndPeaceProcessor(campaign, true);
             }
+            // endregion Progress 8
 
             return campaign;
         }
@@ -535,8 +563,8 @@ public class DataLoadingDialog extends AbstractMHQDialogBasic implements Propert
          * Builds and shows the modal Campaign Options dialog for a brand-new campaign, then reports whether the user
          * canceled it.
          *
-         * <p>Must run on the Event Dispatch Thread (it is invoked through {@link SwingUtilities#invokeAndWait} from the
-         * worker thread) because it constructs the dialog's entire Swing component tree.</p>
+         * <p>Must run on the Event Dispatch Thread (it is invoked through {@link SwingUtilities#invokeAndWait} from
+         * the worker thread) because it constructs the dialog's entire Swing component tree.</p>
          *
          * @param campaign the new campaign being configured
          * @param preset   the preset to seed the dialog with, or {@code null}

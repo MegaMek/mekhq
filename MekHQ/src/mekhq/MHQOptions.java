@@ -120,6 +120,14 @@ public final class MHQOptions extends SuiteOptions {
         userPreferences.node(MHQConstants.DISPLAY_NODE).putBoolean(MHQConstants.SHOW_UNIT_PICTURES_ON_TOE, value);
     }
 
+    public boolean getShowWarriorsAlmanac() {
+        return userPreferences.node(MHQConstants.DISPLAY_NODE).getBoolean(MHQConstants.SHOW_WARRIORS_ALMANAC, true);
+    }
+
+    public void setShowWarriorsAlmanac(final boolean value) {
+        userPreferences.node(MHQConstants.DISPLAY_NODE).putBoolean(MHQConstants.SHOW_WARRIORS_ALMANAC, value);
+    }
+
     // region Command Center Tab
     @Deprecated(since = "0.50.07", forRemoval = true)
     public boolean getCommandCenterUseUnitMarket() {

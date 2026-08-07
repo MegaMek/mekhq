@@ -111,6 +111,7 @@ class MHQOptionsModel {
     boolean companyGeneratorStartup;
     boolean showCompanyGenerator;
     boolean showUnitPicturesOnTOE;
+    boolean showWarriorsAlmanac;
     // endregion Display - General
 
     // region Display - Interstellar Map
@@ -210,6 +211,7 @@ class MHQOptionsModel {
         companyGeneratorStartup = options.getCompanyGeneratorStartup();
         showCompanyGenerator = options.getShowCompanyGenerator();
         showUnitPicturesOnTOE = options.getShowUnitPicturesOnTOE();
+        showWarriorsAlmanac = options.getShowWarriorsAlmanac();
 
         // Display - Interstellar Map
         interstellarMapShowJumpRadius = options.getInterstellarMapShowJumpRadius();
@@ -381,6 +383,7 @@ class MHQOptionsModel {
         options.setCompanyGeneratorStartup(companyGeneratorStartup);
         options.setShowCompanyGenerator(showCompanyGenerator);
         options.setShowUnitPicturesOnTOE(showUnitPicturesOnTOE);
+        options.setShowWarriorsAlmanac(showWarriorsAlmanac);
 
         // Display - Interstellar Map
         options.setInterstellarMapShowJumpRadius(interstellarMapShowJumpRadius);
