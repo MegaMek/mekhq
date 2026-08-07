@@ -36,8 +36,8 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 
+import megamek.common.enums.TechBase;
 import megamek.common.loaders.MekSummary;
 import megamek.common.loaders.MekSummaryCache;
 import mekhq.campaign.market.PartsStore;
@@ -76,11 +76,11 @@ public record WarriorsAlmanacData(List<String> prototypeDate, List<String> produ
         return partTechDatesByYear;
     }
 
-    public static Map<Integer, WarriorsAlmanacData> buildAlmanacUnitsData(String techBase) {
+    public static Map<Integer, WarriorsAlmanacData> buildAlmanacUnitsData(TechBase techBase) {
         final Map<Integer, WarriorsAlmanacData> unitTechDatesByYear = new HashMap<>();
 
         for (MekSummary summary : MekSummaryCache.getInstance().getAllMeks()) {
-            if (Objects.equals(summary.getTechBase(), techBase)) {
+            if (resolveTechBase(summary) != techBase) {
                 final String name = summary.getName();
                 unitTechDatesByYear.computeIfAbsent(summary.getPrototypeDate(), year -> new WarriorsAlmanacData())
                       .prototypeDate()
@@ -98,5 +98,12 @@ public record WarriorsAlmanacData(List<String> prototypeDate, List<String> produ
         }
 
         return unitTechDatesByYear;
+    }
+
+    private static TechBase resolveTechBase(MekSummary summary) {
+        if (summary.isMixedTech()) {
+            return TechBase.ALL;
+        }
+        return summary.isClan() ? TechBase.CLAN : TechBase.IS;
     }
 }

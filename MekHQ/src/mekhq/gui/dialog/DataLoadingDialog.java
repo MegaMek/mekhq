@@ -518,13 +518,13 @@ public class DataLoadingDialog extends AbstractMHQDialogBasic implements Propert
             Map<Integer, WarriorsAlmanacData> partsAlmanacClan = buildAlmanacPartsData(partsStore, true);
             campaign.setPartsAlmanacClan(partsAlmanacClan);
 
-            Map<Integer, WarriorsAlmanacData> unitsAlmanacIS = buildAlmanacUnitsData(TechBase.IS.toString());
+            Map<Integer, WarriorsAlmanacData> unitsAlmanacIS = buildAlmanacUnitsData(TechBase.IS);
             campaign.setUnitsAlmanacIS(unitsAlmanacIS);
-            Map<Integer, WarriorsAlmanacData> unitsAlmanacClan = buildAlmanacUnitsData(TechBase.CLAN.toString());
+            Map<Integer, WarriorsAlmanacData> unitsAlmanacClan = buildAlmanacUnitsData(TechBase.CLAN);
             campaign.setUnitsAlmanacClan(unitsAlmanacClan);
-            Map<Integer, WarriorsAlmanacData> unitsAlmanacMixed = buildAlmanacUnitsData(TechBase.ALL.toString());
+            Map<Integer, WarriorsAlmanacData> unitsAlmanacMixed = buildAlmanacUnitsData(TechBase.ALL);
             campaign.setUnitsAlmanacMixed(unitsAlmanacMixed);
-            Map<Integer, WarriorsAlmanacData> unitsAlmanacUnknown = buildAlmanacUnitsData(TechBase.UNKNOWN.toString());
+            Map<Integer, WarriorsAlmanacData> unitsAlmanacUnknown = buildAlmanacUnitsData(TechBase.UNKNOWN);
             campaign.setUnitsAlmanacUnknown(unitsAlmanacUnknown);
 
             if (isNewCampaign) {
