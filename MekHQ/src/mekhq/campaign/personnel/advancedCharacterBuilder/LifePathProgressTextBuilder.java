@@ -1,0 +1,271 @@
+/*
+ * Copyright (C) 2025 The MegaMek Team. All Rights Reserved.
+ *
+ * This file is part of MekHQ.
+ *
+ * MekHQ is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License (GPL),
+ * version 3 or (at your option) any later version,
+ * as published by the Free Software Foundation.
+ *
+ * MekHQ is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty
+ * of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+ * See the GNU General Public License for more details.
+ *
+ * A copy of the GPL should have been included with this project;
+ * if not, see <https://www.gnu.org/licenses/>.
+ *
+ * NOTICE: The MegaMek organization is a non-profit group of volunteers
+ * creating free software for the BattleTech community.
+ *
+ * MechWarrior, BattleMech, `Mech and AeroTech are registered trademarks
+ * of The Topps Company, Inc. All Rights Reserved.
+ *
+ * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
+ * InMediaRes Productions, LLC.
+ *
+ * MechWarrior Copyright Microsoft Corporation. MekHQ was created under
+ * Microsoft's "Game Content Usage Rules"
+ * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+ * affiliated with Microsoft.
+ */
+package mekhq.campaign.personnel.advancedCharacterBuilder;
+
+import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
+import static mekhq.utilities.MHQInternationalization.getTextAt;
+
+import java.util.List;
+import java.util.Set;
+
+import mekhq.gui.dialog.advancedCharacterBuilder.lifePathBuilder.LifePathTab;
+import mekhq.gui.dialog.advancedCharacterBuilder.lifePathBuilder.LifePathTabBasicInformation;
+
+public class LifePathProgressTextBuilder {
+    private static final String RESOURCE_BUNDLE = "mekhq.resources.LifePathBuilderDialog";
+
+    public static String getProgressText(LifePathTabBasicInformation basicInfoTab, LifePathTab requirementsTab,
+          LifePathTab exclusionsTab, LifePathTab fixedXPTab, LifePathTab flexibleXPTab) {
+        StringBuilder newProgressText = new StringBuilder();
+
+        int calculatedCost = LifePathXPCostCalculator.calculateXPCost(basicInfoTab.getDiscount(),
+              fixedXPTab.getAttributes(),
+              fixedXPTab.getFlexibleAttribute(),
+              fixedXPTab.getEdge(),
+              fixedXPTab.getTraits(),
+              fixedXPTab.getSkills(),
+              fixedXPTab.getMetaSkills(),
+              fixedXPTab.getNaturalAptitudes(),
+              fixedXPTab.getNaturalAptitudesMetaSkills(),
+              fixedXPTab.getAbilities(),
+              flexibleXPTab.getTabCount(),
+              flexibleXPTab.getPickCount(),
+              flexibleXPTab.getAttributes(),
+              flexibleXPTab.getFlexibleAttribute(),
+              flexibleXPTab.getEdge(),
+              flexibleXPTab.getTraits(),
+              flexibleXPTab.getSkills(),
+              flexibleXPTab.getMetaSkills(),
+              flexibleXPTab.getNaturalAptitudes(),
+              flexibleXPTab.getNaturalAptitudesMetaSkills(),
+              flexibleXPTab.getAbilities());
+
+        String newBasicText = getNewBasicText(basicInfoTab, calculatedCost);
+        newProgressText.append(newBasicText);
+
+        String newFixedXPText = getFixedXPText(fixedXPTab);
+        newProgressText.append(newFixedXPText);
+
+        String newFlexibleXPText = getFlexibleXPText(flexibleXPTab);
+        newProgressText.append(newFlexibleXPText);
+
+        String newRequirementsText = getNewRequirementsText(requirementsTab);
+        newProgressText.append(newRequirementsText);
+
+        String newExclusionsText = getNewExclusionsText(exclusionsTab);
+        newProgressText.append(newExclusionsText);
+
+        return newProgressText.toString();
+    }
+
+    private static String getNewBasicText(LifePathTabBasicInformation basicInfoTab, int calculatedCost) {
+        StringBuilder newText = new StringBuilder();
+
+        String name = basicInfoTab.getName();
+        newText.append("<h1 style='text-align:center; margin:0'>").append(name).append("</h1>");
+
+        String flavorText = basicInfoTab.getFlavorText();
+        if (!flavorText.isBlank()) {
+            newText.append("<i>").append(flavorText).append("</i><br>");
+        }
+
+        int age = basicInfoTab.getAge();
+        if (!flavorText.isBlank()) {
+            newText.append("<br>");
+        }
+        newText.append(getFormattedTextAt(RESOURCE_BUNDLE, "LifePathBuilderDialog.tab.progress.basic.age", age));
+
+        newText.append("<h2>");
+        newText.append(getFormattedTextAt(RESOURCE_BUNDLE,
+              "LifePathBuilderDialog.tab.progress.basic.cost",
+              calculatedCost));
+        newText.append("</h2>");
+
+        Set<ATOWLifeStage> lifeStages = basicInfoTab.getLifeStages();
+        StringBuilder lifeStageText = new StringBuilder();
+        lifeStageText.append(getTextAt(RESOURCE_BUNDLE, "LifePathBuilderDialog.tab.progress.basic.stages"));
+
+        List<ATOWLifeStage> orderedLifeStages = lifeStages.stream()
+                                                      .sorted(ATOWLifeStage::compareTo)
+                                                      .toList();
+
+        for (int i = 0; i < orderedLifeStages.size(); i++) {
+            ATOWLifeStage lifeStage = orderedLifeStages.get(i);
+            if (i == 0) {
+                lifeStageText.append(lifeStage.getDisplayName());
+            } else {
+                lifeStageText.append(", ").append(lifeStage.getDisplayName());
+            }
+        }
+        newText.append(lifeStageText);
+
+        Set<LifePathCategory> categories = basicInfoTab.getCategories();
+        StringBuilder categoriesText = new StringBuilder();
+        categoriesText.append(getTextAt(RESOURCE_BUNDLE, "LifePathBuilderDialog.tab.progress.basic.categories"));
+
+        List<LifePathCategory> orderedCategories = categories.stream()
+                                                         .sorted(LifePathCategory::compareTo)
+                                                         .toList();
+
+        for (int i = 0; i < orderedCategories.size(); i++) {
+            LifePathCategory category = orderedCategories.get(i);
+            if (i == 0) {
+                categoriesText.append(category.getDisplayName());
+            } else {
+                categoriesText.append(", ").append(category.getDisplayName());
+            }
+        }
+        newText.append("<br>").append(categoriesText);
+
+        return newText.toString();
+    }
+
+    private static String getNewRequirementsText(LifePathTab lifePathTab) {
+        StringBuilder newText = new StringBuilder();
+
+        List<String> progress = lifePathTab.buildProgressText();
+        if (isEmpty(progress)) {
+            return "";
+        }
+
+        String title = getTextAt(RESOURCE_BUNDLE, "LifePathBuilderDialog.requirements.tab.title");
+        newText.append("<h2 style='text-align:center; margin:0;'>").append(title).append(
+              "</h2>");
+
+        for (int i = 0; i < progress.size(); i++) {
+            String group = progress.get(i);
+            if (group.isBlank()) {
+                continue;
+            }
+
+            if (i != 0) {
+                newText.append("<br>");
+            }
+
+            newText.append("&#9654; ");
+            newText.append(group);
+        }
+
+        return newText.toString();
+    }
+
+    private static boolean isEmpty(List<String> progress) {
+        for (String group : progress) {
+            if (!group.isBlank()) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    private static String getNewExclusionsText(LifePathTab lifePathTab) {
+        StringBuilder newText = new StringBuilder();
+
+        List<String> progress = lifePathTab.buildProgressText();
+        if (isEmpty(progress)) {
+            return "";
+        }
+
+        String title = getTextAt(RESOURCE_BUNDLE, "LifePathBuilderDialog.exclusions.tab.title");
+        newText.append("<h2 style='text-align:center; margin:0;'>").append(title).append(
+              "</h2>");
+
+        for (int i = 0; i < progress.size(); i++) {
+            if (i != 0) {
+                newText.append(", ");
+            }
+
+            newText.append(progress.get(i));
+        }
+
+        return newText.toString();
+    }
+
+    private static String getFixedXPText(LifePathTab lifePathTab) {
+        StringBuilder newText = new StringBuilder();
+
+        List<String> progress = lifePathTab.buildProgressText();
+        if (isEmpty(progress)) {
+            return "";
+        }
+
+        String title = getTextAt(RESOURCE_BUNDLE, "LifePathBuilderDialog.fixed_xp.tab.title");
+        newText.append("<h2 style='text-align:center; margin:0;'>").append(title).append(
+              "</h2>");
+
+        for (int i = 0; i < progress.size(); i++) {
+            if (i != 0) {
+                newText.append(", ");
+            }
+
+            newText.append(progress.get(i));
+        }
+
+        return newText.toString();
+    }
+
+    private static String getFlexibleXPText(LifePathTab lifePathTab) {
+        StringBuilder newText = new StringBuilder();
+
+        List<String> progress = lifePathTab.buildProgressText();
+        if (isEmpty(progress)) {
+            return "";
+        }
+
+        String title = getTextAt(RESOURCE_BUNDLE, "LifePathBuilderDialog.flexible_xp.tab.title");
+        newText.append("<h2 style='text-align:center; margin:0;'>").append(title).append(
+              "</h2>");
+
+        newText.append("<b>");
+        newText.append(getTextAt(RESOURCE_BUNDLE, "LifePathBuilderDialog.flexible_xp.button.pickCount.label"));
+        newText.append(":</b> ");
+        newText.append(lifePathTab.getPickCount());
+        newText.append("<br>");
+
+        for (int i = 0; i < progress.size(); i++) {
+            String group = progress.get(i);
+            if (group.isBlank()) {
+                continue;
+            }
+
+            if (i != 0) {
+                newText.append("<br>");
+            }
+
+            newText.append("&#9654; ");
+            newText.append(group);
+        }
+
+        return newText.toString();
+    }
+}
