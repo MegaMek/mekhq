@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2018-2025 The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2018-2026 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -33,18 +33,11 @@
 package mekhq.campaign.mission.atb;
 
 import java.io.File;
-import java.io.FileInputStream;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import javax.xml.namespace.QName;
-import javax.xml.transform.Source;
 
-import jakarta.xml.bind.JAXBContext;
-import jakarta.xml.bind.JAXBElement;
-import jakarta.xml.bind.Marshaller;
-import jakarta.xml.bind.Unmarshaller;
 import jakarta.xml.bind.annotation.XmlElement;
 import jakarta.xml.bind.annotation.XmlElementWrapper;
 import jakarta.xml.bind.annotation.XmlRootElement;
@@ -58,7 +51,6 @@ import mekhq.campaign.mission.ScenarioForceTemplate;
 import mekhq.campaign.mission.ScenarioForceTemplate.ForceAlignment;
 import mekhq.campaign.mission.ScenarioMapParameters.MapLocation;
 import mekhq.campaign.mission.ScenarioObjective;
-import mekhq.utilities.MHQXMLUtility;
 
 /**
  * Data structure representing a scenario modifier for dynamic AtB scenarios
@@ -69,14 +61,14 @@ import mekhq.utilities.MHQXMLUtility;
 public class AtBScenarioModifier implements Cloneable {
     private static final MMLogger LOGGER = MMLogger.create(AtBScenarioModifier.class);
 
-    private static final String MODIFIER_DIRECTORY = "./data/scenariomodifiers/modifiermanifest.xml";
+    private static final String MODIFIER_DIRECTORY = "./data/scenariomodifiers/modifiermanifest.json";
     private static final String MODIFIER_DIRECTORY_WILDCARD = "./data/scenariomodifiers/%s";
 
     private static final String MODIFIER_TEST_DIRECTORY = "testresources/data/scenariomodifiers" +
-                                                                "/modifiermanifest_test.xml";
+                                                                "/modifiermanifest_test.json";
     private static final String MODIFIER_TEST_DIRECTORY_WILDCARD = "testresources/data/scenariomodifiers/%s";
 
-    private static final String MODIFIER_USER_DIRECTORY = "./data/scenariomodifiers/usermodifiermanifest.xml";
+    private static final String MODIFIER_USER_DIRECTORY = "./data/scenariomodifiers/usermodifiermanifest.json";
 
     /**
      * Possible values for when a scenario modifier may occur: before or after primary force generation.
@@ -99,6 +91,9 @@ public class AtBScenarioModifier implements Cloneable {
     private Integer ammoExpenditureIntensity = null;
     private Integer unitRemovalCount = null;
     private List<MapLocation> allowedMapLocations = null;
+    // When non-empty, the modifier only applies to scenarios whose assigned terrain is in this list. Used to target a
+    // SpecificGroundTerrain modifier at particular terrain types (e.g. only Desert). Null/empty means no restriction.
+    private List<String> allowedTerrainTypes = null;
     private Boolean useAmbushLogic = null;
     private Boolean switchSides = null;
     private Integer numExtraEvents = null;
@@ -340,45 +335,53 @@ public class AtBScenarioModifier implements Cloneable {
      * @return Possibly an instance of a scenario modifier list
      */
     public static AtBScenarioModifier Deserialize(String fileName) {
-        AtBScenarioModifier resultingModifier = null;
-
-        try {
-            JAXBContext context = JAXBContext.newInstance(AtBScenarioModifier.class);
-            Unmarshaller um = context.createUnmarshaller();
-            File xmlFile = new File(fileName);
-            if (!xmlFile.exists()) {
-                LOGGER.warn("Specified file {} does not exist", fileName);
-                return null;
-            }
-
-            try (FileInputStream fileStream = new FileInputStream(xmlFile)) {
-                Source inputSource = MHQXMLUtility.createSafeXmlSource(fileStream);
-                JAXBElement<AtBScenarioModifier> modifierElement = um.unmarshal(inputSource, AtBScenarioModifier.class);
-                resultingModifier = modifierElement.getValue();
-            }
-        } catch (Exception ex) {
-            LOGGER.error("Error Deserializing Scenario Modifier: {}", fileName, ex);
+        File inputFile = new File(fileName);
+        if (!inputFile.exists()) {
+            LOGGER.warn("Specified file {} does not exist", fileName);
+            return null;
         }
 
-        return resultingModifier;
+        try {
+            return AtBScenarioModifierJson.fromFile(inputFile);
+        } catch (Exception ex) {
+            LOGGER.error("Error Deserializing Scenario Modifier: {}", fileName, ex);
+            return null;
+        }
     }
 
     /**
-     * Serialize this instance of a scenario template to a File Please pass in a non-null file.
+     * Serialize this scenario modifier to a JSON File. Please pass in a non-null file.
      *
      * @param outputFile The destination file.
      */
     public void Serialize(File outputFile) {
         try {
-            JAXBContext context = JAXBContext.newInstance(AtBScenarioModifier.class);
-            JAXBElement<AtBScenarioModifier> templateElement = new JAXBElement<>(new QName("AtBScenarioModifier"),
-                  AtBScenarioModifier.class, this);
-            Marshaller m = context.createMarshaller();
-            m.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, true);
-            m.marshal(templateElement, outputFile);
+            AtBScenarioModifierJson.toFile(this, outputFile);
         } catch (Exception ex) {
             LOGGER.error("", ex);
         }
+    }
+
+    /**
+     * @return {@code true} if this modifier may apply to the scenario's assigned terrain. Terrain targeting is only
+     *       honored when the modifier is scoped to {@link MapLocation#SpecificGroundTerrain}; otherwise, or when no
+     *       terrain restriction is set ({@link #allowedTerrainTypes} null or empty), the modifier always applies. When
+     *       a restriction is in effect, the scenario's assigned terrain type must be one of the allowed types (so a
+     *       terrain-restricted modifier is skipped on a non-matching or terrain-less scenario, such as a space
+     *       battle).
+     */
+    boolean appliesToScenarioTerrain(AtBDynamicScenario scenario) {
+        // terrain targeting only applies to modifiers scoped to SpecificGroundTerrain
+        if ((allowedMapLocations == null) || !allowedMapLocations.contains(MapLocation.SpecificGroundTerrain)) {
+            return true;
+        }
+        if ((allowedTerrainTypes == null) || allowedTerrainTypes.isEmpty()) {
+            return true;
+        }
+        String terrainType = scenario.getTerrainType();
+        // a terrain-restricted modifier never applies to a terrain-less scenario (e.g. a space battle); the explicit
+        // null guard also avoids contains(null) throwing on an immutable allowedTerrainTypes list
+        return (terrainType != null) && allowedTerrainTypes.contains(terrainType);
     }
 
     /**
@@ -388,6 +391,10 @@ public class AtBScenarioModifier implements Cloneable {
      */
     public void processModifier(AtBDynamicScenario scenario, Campaign campaign, EventTiming eventTiming) {
         if (eventTiming == getEventTiming()) {
+            if (!appliesToScenarioTerrain(scenario)) {
+                return;
+            }
+
             if ((getAdditionalBriefingText() != null) && !getAdditionalBriefingText().isBlank()) {
                 AtBScenarioModifierApplicator.appendScenarioBriefingText(scenario,
                       getAdditionalBriefingText());
@@ -465,6 +472,7 @@ public class AtBScenarioModifier implements Cloneable {
         copy.additionalBriefingText = additionalBriefingText;
         copy.allowedMapLocations = allowedMapLocations == null ? new ArrayList<>()
                                          : new ArrayList<>(allowedMapLocations);
+        copy.allowedTerrainTypes = allowedTerrainTypes == null ? null : new ArrayList<>(allowedTerrainTypes);
         copy.ammoExpenditureIntensity = ammoExpenditureIntensity;
         copy.battleDamageIntensity = battleDamageIntensity;
         copy.benefitsPlayer = benefitsPlayer;
@@ -505,7 +513,6 @@ public class AtBScenarioModifier implements Cloneable {
         return benefitsPlayer;
     }
 
-    @Deprecated(since = "0.51.0", forRemoval = true)
     public void setBenefitsPlayer(Boolean benefitsPlayer) {
         this.benefitsPlayer = benefitsPlayer;
     }
@@ -514,7 +521,6 @@ public class AtBScenarioModifier implements Cloneable {
         return blockFurtherEvents;
     }
 
-    @Deprecated(since = "0.51.0", forRemoval = true)
     public void setBlockFurtherEvents(Boolean blockFurtherEvents) {
         this.blockFurtherEvents = blockFurtherEvents;
     }
@@ -523,7 +529,6 @@ public class AtBScenarioModifier implements Cloneable {
         return eventTiming;
     }
 
-    @Deprecated(since = "0.51.0", forRemoval = true)
     public void setEventTiming(EventTiming eventTiming) {
         this.eventTiming = eventTiming;
     }
@@ -541,7 +546,6 @@ public class AtBScenarioModifier implements Cloneable {
         return skillAdjustment;
     }
 
-    @Deprecated(since = "0.51.0", forRemoval = true)
     public void setSkillAdjustment(Integer skillAdjustment) {
         this.skillAdjustment = skillAdjustment;
     }
@@ -550,7 +554,6 @@ public class AtBScenarioModifier implements Cloneable {
         return qualityAdjustment;
     }
 
-    @Deprecated(since = "0.51.0", forRemoval = true)
     public void setQualityAdjustment(Integer qualityAdjustment) {
         this.qualityAdjustment = qualityAdjustment;
     }
@@ -559,7 +562,6 @@ public class AtBScenarioModifier implements Cloneable {
         return eventRecipient;
     }
 
-    @Deprecated(since = "0.51.0", forRemoval = true)
     public void setEventRecipient(ForceAlignment eventRecipient) {
         this.eventRecipient = eventRecipient;
     }
@@ -568,7 +570,6 @@ public class AtBScenarioModifier implements Cloneable {
         return battleDamageIntensity;
     }
 
-    @Deprecated(since = "0.51.0", forRemoval = true)
     public void setBattleDamageIntensity(Integer battleDamageIntensity) {
         this.battleDamageIntensity = battleDamageIntensity;
     }
@@ -577,7 +578,6 @@ public class AtBScenarioModifier implements Cloneable {
         return ammoExpenditureIntensity;
     }
 
-    @Deprecated(since = "0.51.0", forRemoval = true)
     public void setAmmoExpenditureIntensity(Integer ammoExpenditureIntensity) {
         this.ammoExpenditureIntensity = ammoExpenditureIntensity;
     }
@@ -586,7 +586,6 @@ public class AtBScenarioModifier implements Cloneable {
         return unitRemovalCount;
     }
 
-    @Deprecated(since = "0.51.0", forRemoval = true)
     public void setUnitRemovalCount(Integer unitRemovalCount) {
         this.unitRemovalCount = unitRemovalCount;
     }
@@ -597,16 +596,26 @@ public class AtBScenarioModifier implements Cloneable {
         return allowedMapLocations;
     }
 
-    @Deprecated(since = "0.51.0", forRemoval = true)
     public void setAllowedMapLocations(List<MapLocation> allowedMapLocations) {
         this.allowedMapLocations = allowedMapLocations;
+    }
+
+    /**
+     * @return the terrain types this modifier is restricted to, or {@code null}/empty for no terrain restriction. When
+     *       set, the modifier only applies to a scenario whose assigned terrain type is in this list.
+     */
+    public List<String> getAllowedTerrainTypes() {
+        return allowedTerrainTypes;
+    }
+
+    public void setAllowedTerrainTypes(List<String> allowedTerrainTypes) {
+        this.allowedTerrainTypes = allowedTerrainTypes;
     }
 
     public Boolean getUseAmbushLogic() {
         return useAmbushLogic;
     }
 
-    @Deprecated(since = "0.51.0", forRemoval = true)
     public void setUseAmbushLogic(Boolean useAmbushLogic) {
         this.useAmbushLogic = useAmbushLogic;
     }
@@ -615,7 +624,6 @@ public class AtBScenarioModifier implements Cloneable {
         return switchSides;
     }
 
-    @Deprecated(since = "0.51.0", forRemoval = true)
     public void setSwitchSides(Boolean switchSides) {
         this.switchSides = switchSides;
     }
@@ -630,7 +638,6 @@ public class AtBScenarioModifier implements Cloneable {
         return numExtraEvents;
     }
 
-    @Deprecated(since = "0.51.0", forRemoval = true)
     public void setNumExtraEvents(Integer numExtraEvents) {
         this.numExtraEvents = numExtraEvents;
     }
@@ -639,7 +646,6 @@ public class AtBScenarioModifier implements Cloneable {
         return bvBudgetAdditiveMultiplier;
     }
 
-    @Deprecated(since = "0.51.0", forRemoval = true)
     public void setBVBudgetAdditiveMultiplier(Double bvBudgetAdditiveMultiplier) {
         this.bvBudgetAdditiveMultiplier = bvBudgetAdditiveMultiplier;
     }
@@ -648,7 +654,6 @@ public class AtBScenarioModifier implements Cloneable {
         return reinforcementDelayReduction;
     }
 
-    @Deprecated(since = "0.51.0", forRemoval = true)
     public void setReinforcementDelayReduction(Integer reinforcementDelayReduction) {
         this.reinforcementDelayReduction = reinforcementDelayReduction;
     }

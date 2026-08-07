@@ -33,7 +33,6 @@
 package mekhq.campaign.mission;
 
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -41,7 +40,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 import javax.xml.namespace.QName;
-import javax.xml.transform.Source;
 
 import jakarta.xml.bind.JAXBContext;
 import jakarta.xml.bind.JAXBElement;
@@ -57,7 +55,6 @@ import mekhq.campaign.mission.ScenarioForceTemplate.ForceAlignment;
 import mekhq.campaign.mission.ScenarioForceTemplate.ForceGenerationMethod;
 import mekhq.campaign.mission.ScenarioMapParameters.MapLocation;
 import mekhq.campaign.mission.enums.ScenarioType;
-import mekhq.utilities.MHQXMLUtility;
 import org.w3c.dom.Node;
 
 /**
@@ -154,7 +151,6 @@ public class ScenarioTemplate implements Cloneable {
         return (this.stratConScenarioType != null) ? this.stratConScenarioType : ScenarioType.NONE;
     }
 
-    @Deprecated(since = "0.51.0", forRemoval = true)
     public void setStratConScenarioType(String scenarioType) {
         try {
             this.stratConScenarioType = ScenarioType.valueOf(scenarioType.trim().toUpperCase());
@@ -280,20 +276,17 @@ public class ScenarioTemplate implements Cloneable {
     }
 
     /**
-     * Serialize this instance of a scenario template to a File Please pass in a non-null file.
+     * Serialize this instance of a scenario template to a File as JSON. JSON is the write format for standalone
+     * scenario template files; the XML paths ({@link #Serialize(PrintWriter)} and the {@code Node} deserializer) are
+     * retained for the template fragment embedded in campaign saves. Please pass in a non-null file.
      *
      * @param outputFile The destination file.
      */
     public void Serialize(File outputFile) {
         try {
-            JAXBContext context = JAXBContext.newInstance(ScenarioTemplate.class);
-            JAXBElement<ScenarioTemplate> templateElement = new JAXBElement<>(new QName(ROOT_XML_ELEMENT_NAME),
-                  ScenarioTemplate.class, this);
-            Marshaller m = context.createMarshaller();
-            m.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, true);
-            m.marshal(templateElement, outputFile);
+            ScenarioTemplateJson.toFile(this, outputFile);
         } catch (Exception e) {
-            LOGGER.error("", e);
+            LOGGER.error("Error serializing scenario template to JSON", e);
         }
     }
 
@@ -341,21 +334,12 @@ public class ScenarioTemplate implements Cloneable {
      * @return Possibly an instance of a ScenarioTemplate
      */
     public static ScenarioTemplate Deserialize(File inputFile) {
-        ScenarioTemplate resultingTemplate = null;
-
         try {
-            JAXBContext context = JAXBContext.newInstance(ScenarioTemplate.class);
-            Unmarshaller um = context.createUnmarshaller();
-            try (FileInputStream fileStream = new FileInputStream(inputFile)) {
-                Source inputSource = MHQXMLUtility.createSafeXmlSource(fileStream);
-                JAXBElement<ScenarioTemplate> templateElement = um.unmarshal(inputSource, ScenarioTemplate.class);
-                resultingTemplate = templateElement.getValue();
-            }
+            return ScenarioTemplateJson.fromFile(inputFile);
         } catch (Exception e) {
             LOGGER.error("Error Deserializing Scenario Template", e);
+            return null;
         }
-
-        return resultingTemplate;
     }
 
     /**

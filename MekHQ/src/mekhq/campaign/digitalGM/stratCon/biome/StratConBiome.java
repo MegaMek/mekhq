@@ -50,4 +50,13 @@ public class StratConBiome {
     public int allowedTemperatureUpperBound;
 
     public List<String> allowedTerrainTypes;
+
+    @Override
+    public String toString() {
+        return String.format("%s [%d-%dK] %s",
+              biomeCategory,
+              allowedTemperatureLowerBound,
+              allowedTemperatureUpperBound,
+              (allowedTerrainTypes == null) ? List.of() : allowedTerrainTypes);
+    }
 }

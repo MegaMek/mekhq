@@ -174,7 +174,7 @@ public final class StratConOceanPlacer {
                 direction = (Compute.randomInt(2) == 0) ?
                                   ((direction + 1) % StratConHexGeometry.HEX_DIRECTIONS) :
                                   ((direction + StratConHexGeometry.HEX_DIRECTIONS - 1) %
-                                   StratConHexGeometry.HEX_DIRECTIONS);
+                                         StratConHexGeometry.HEX_DIRECTIONS);
             }
 
             StratConCoords next = current.translate(direction);
