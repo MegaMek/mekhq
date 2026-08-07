@@ -512,7 +512,7 @@ public class CampaignNewDayManager {
                   CLOSING_SPAN_TAG));
 
             if (MekHQ.getMHQOptions().getShowWarriorsAlmanac()) {
-                new WarriorsAlmanacDialog(campaign);
+                new WarriorsAlmanacDialog(campaign, true);
             }
 
             // Change Year Game Option

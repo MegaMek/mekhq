@@ -26,7 +26,7 @@ public class WarriorsAlmanacDialog {
 
     private boolean isEmpty = true;
 
-    public WarriorsAlmanacDialog(final Campaign campaign) {
+    public WarriorsAlmanacDialog(final Campaign campaign, final boolean isAutomaticDisplay) {
         final LocalDate currentDate = campaign.getLocalDate();
         final int gameYear = currentDate.getYear();
 
@@ -41,9 +41,12 @@ public class WarriorsAlmanacDialog {
 
         appendSections(campaign, hideClanAndMixed, report, gameYear, hideInnerSphereAndMixed);
 
-        // Both sections were empty for this year, so there's nothing worth showing.
         if (isEmpty) {
-            return;
+            report.append(getTextAt(RESOURCE_BUNDLE, "WarriorsAlmanacDialog.nothing"));
+
+            if (isAutomaticDisplay) {
+                return;
+            }
         }
 
         new ImmersiveDialogNotification(campaign, report.toString(), true);

@@ -153,7 +153,7 @@ public record ReportHyperlinkListener(CampaignGUI campaignGUI) implements Hyperl
                     LOGGER.error("", e);
                 }
             } else if (evt.getDescription().startsWith(WARRIORS_ALMANAC)) {
-                new WarriorsAlmanacDialog(campaignGUI.getCampaign());
+                new WarriorsAlmanacDialog(campaignGUI.getCampaign(), false);
             }
         }
     }
