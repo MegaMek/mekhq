@@ -35,6 +35,7 @@ package mekhq.campaign.work;
 import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
 import static mekhq.utilities.MHQInternationalization.getTextAt;
 
+import jakarta.annotation.Nonnull;
 import megamek.common.annotations.Nullable;
 import megamek.common.enums.TechRating;
 import megamek.common.rolls.TargetRoll;
@@ -83,12 +84,15 @@ public interface IFabricatable extends IPartWork {
     // region Accessors supplied by the implementing Part
     Campaign getCampaign();
 
+    @Override
     @Nullable
     Person getTech();
 
+    @Override
     @Nullable
     Unit getUnit();
 
+    @Nonnull
     TechRating getTechRating();
 
     String getName();
@@ -207,9 +211,6 @@ public interface IFabricatable extends IPartWork {
         }
 
         TechRating rating = getTechRating();
-        if (rating == null) {
-            return getTextAt(RESOURCE_BUNDLE, "MissingPart.noTechRating");
-        }
 
         int effectiveRating = rating.ordinal();
         if (tech != null) {
