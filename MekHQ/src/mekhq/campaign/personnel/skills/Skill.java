@@ -1,6 +1,6 @@
 /*
  * Copyright (c) 2009 Jay Lawson (jaylawson39 at yahoo.com). All rights reserved.
- * Copyright (C) 2013-2025 The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2013-2026 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -311,9 +311,9 @@ public class Skill {
     }
 
     /**
-     * As {@link #getSPAModifiers(PersonnelOptions, int)}, but also adds the combat Chassis Familiarity bonus the
-     * caller has already computed for this skill's role (piloting or gunnery); it applies only to combat
-     * piloting/gunnery skills and may be negative (Hard mode). Pass {@code 0} for no bonus.
+     * As {@link #getSPAModifiers(PersonnelOptions, int)}, but also adds the combat Chassis Familiarity bonus the caller
+     * has already computed for this skill's role (piloting or gunnery); it applies only to combat piloting/gunnery
+     * skills and may be negative (Hard mode). Pass {@code 0} for no bonus.
      *
      * @param characterOptions the character's options and special traits
      * @param reputation       the character's reputation
