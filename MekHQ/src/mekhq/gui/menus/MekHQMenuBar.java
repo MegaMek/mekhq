@@ -112,6 +112,9 @@ import mekhq.campaign.universe.Systems;
 import mekhq.gui.CampaignGUI;
 import mekhq.gui.FileDialogs;
 import mekhq.gui.campaignOptions.CampaignOptionsDialog;
+import mekhq.gui.developerTools.ContractDefinitionEditorDialog;
+import mekhq.gui.developerTools.ScenarioModifierEditorDialog;
+import mekhq.gui.developerTools.StratConFacilityEditorDialog;
 import mekhq.gui.dialog.*;
 import mekhq.gui.dialog.advancedCharacterBuilder.lifePathBuilder.LifePathBuilderDialog;
 import mekhq.gui.dialog.reportDialogs.CargoReportDialog;
@@ -120,6 +123,7 @@ import mekhq.gui.dialog.reportDialogs.PersonnelReportDialog;
 import mekhq.gui.dialog.reportDialogs.ReputationReportDialog;
 import mekhq.gui.dialog.reportDialogs.TransportReportDialog;
 import mekhq.gui.enums.MHQTabType;
+import mekhq.gui.scenarioTemplateEditor.ScenarioTemplateEditorDialog;
 import mekhq.io.FileType;
 import mekhq.utilities.MHQInternationalization;
 import mekhq.utilities.MHQXMLUtility;
@@ -167,6 +171,7 @@ public class MekHQMenuBar extends JMenuBar {
         add(initReportsMenu());
         add(initViewMenu());
         add(initManageCampaignMenu());
+        add(initDeveloperToolsMenu());
         add(initHelpMenu());
     }
 
@@ -559,10 +564,6 @@ public class MekHQMenuBar extends JMenuBar {
         });
         menuManage.add(miBloodnames);
 
-        JMenuItem miScenarioEditor = createMenuItem("miScenarioEditor.text", KeyEvent.VK_S,
-              evt -> new ScenarioTemplateEditorDialog(getFrame()).setVisible(true));
-        menuManage.add(miScenarioEditor);
-
         miCompanyGenerator = createMenuItem("miCompanyGenerator.text", KeyEvent.VK_C,
               evt -> new CompanyGenerationDialog(getFrame(), getCampaign()).setVisible(true));
         miCompanyGenerator.setVisible(MekHQ.getMHQOptions().getShowCompanyGenerator());
@@ -593,6 +594,34 @@ public class MekHQMenuBar extends JMenuBar {
               evt -> new LifePathBuilderDialog(getCampaign(), getFrame()));
         menuRoleplay.add(miLifePathBuilder);
         menuManage.add(menuRoleplay);
+    }
+
+    /**
+     * Builds the "Developer Tools" menu, which groups the data-file editors: the scenario template editor and the new
+     * scenario modifier and contract definition editors.
+     */
+    private JMenu initDeveloperToolsMenu() {
+        JMenu menuDeveloperTools = new JMenu(getTextAt("menuDeveloperTools.text"));
+        menuDeveloperTools.setMnemonic(KeyEvent.VK_D);
+        menuDeveloperTools.setName("developerToolsMenu");
+
+        JMenuItem miScenarioEditor = createMenuItem("miScenarioEditor.text", KeyEvent.VK_S,
+              evt -> new ScenarioTemplateEditorDialog(getFrame()).setVisible(true));
+        menuDeveloperTools.add(miScenarioEditor);
+
+        JMenuItem miScenarioModifierEditor = createMenuItem("miScenarioModifierEditor.text", KeyEvent.VK_M,
+              evt -> new ScenarioModifierEditorDialog(getFrame()).setVisible(true));
+        menuDeveloperTools.add(miScenarioModifierEditor);
+
+        JMenuItem miContractDefinitionEditor = createMenuItem("miContractDefinitionEditor.text", KeyEvent.VK_C,
+              evt -> new ContractDefinitionEditorDialog(getFrame()).setVisible(true));
+        menuDeveloperTools.add(miContractDefinitionEditor);
+
+        JMenuItem miFacilityEditor = createMenuItem("miFacilityEditor.text", KeyEvent.VK_F,
+              evt -> new StratConFacilityEditorDialog(getFrame()).setVisible(true));
+        menuDeveloperTools.add(miFacilityEditor);
+
+        return menuDeveloperTools;
     }
 
     /**

@@ -671,9 +671,28 @@ public class AtBDynamicScenario extends AtBScenario {
         super.clearAllFormationsAndPersonnel(campaign);
     }
 
+    /**
+     * Derives the "who controls the battlefield" line shown in the scenario briefing directly from the template's
+     * {@link ScenarioTemplate.BattlefieldControlType}, so template authors no longer have to state it by hand in the
+     * briefing text. {@code UNDEFINED} (or a missing template) yields an empty string, matching the prior behavior of
+     * showing nothing.
+     */
     @Override
     public String getBattlefieldControlDescription() {
-        return "";
+        ScenarioTemplate template = getTemplate();
+        ScenarioTemplate.BattlefieldControlType battlefieldControl = (template != null) ?
+                                                                           template.getBattlefieldControl() :
+                                                                           ScenarioTemplate.BattlefieldControlType.UNDEFINED;
+        if (battlefieldControl == null) {
+            battlefieldControl = ScenarioTemplate.BattlefieldControlType.UNDEFINED;
+        }
+
+        return switch (battlefieldControl) {
+            case VICTOR -> getResourceBundle().getString("battleDetails.common.winnerControlsBattlefield");
+            case PLAYER -> getResourceBundle().getString("battleDetails.common.playerControlsBattlefield");
+            case ENEMY -> getResourceBundle().getString("battleDetails.common.enemyControlsBattlefield");
+            case UNDEFINED -> "";
+        };
     }
 
     /**

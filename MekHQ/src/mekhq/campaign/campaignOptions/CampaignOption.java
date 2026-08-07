@@ -97,6 +97,12 @@ public final class CampaignOption<T> {
           of(Boolean.class, false, "logMaintenance");
     public static final CampaignOption<Integer> DEFAULT_MAINTENANCE_TIME =
           of(Integer.class, 4, "defaultMaintenanceTime");
+    public static final CampaignOption<Boolean> USE_FABRICATION =
+          of(Boolean.class, false, "useFabrication");
+    public static final CampaignOption<Boolean> USE_BALANCED_FABRICATION =
+          of(Boolean.class, true, "useBalancedFabrication");
+    public static final CampaignOption<Boolean> FABRICATE_D_IN_MAINTENANCE_FACILITY =
+          of(Boolean.class, false, "maintenanceFabrication");
     // endregion Repair and Maintenance
 
     // region Migrated Options (generated storage-only migration)
