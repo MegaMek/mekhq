@@ -59,6 +59,7 @@ import java.util.Vector;
 
 import megamek.common.compute.Compute;
 import mekhq.campaign.Campaign;
+import mekhq.campaign.campaignOptions.CampaignOption;
 import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.force.Formation;
 import mekhq.campaign.force.PlayerForce;
@@ -997,6 +998,10 @@ public class PrisonerEventManagerTest {
         private Campaign newCampaign() {
             Campaign campaign = mockCampaign();
             when(campaign.getLocalDate()).thenReturn(TODAY);
+            // Chaos Reputation disabled so the CamOps crime-rating path is exercised.
+            CampaignOptions campaignOptions = new CampaignOptions();
+            campaignOptions.set(CampaignOption.USE_CHAOS_REPUTATION, false);
+            when(campaign.getCampaignOptions()).thenReturn(campaignOptions);
             return campaign;
         }
 
@@ -1046,7 +1051,7 @@ public class PrisonerEventManagerTest {
             }
 
             verify(playerForce).changeCrimeRating(-(victims * 2));
-            verify(playerForce).setDateOfLastCrime(TODAY);
+            verify(playerForce).setCampOpsDateOfLastCrime(TODAY);
         }
 
         @Test

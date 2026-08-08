@@ -37,6 +37,7 @@ import static java.lang.Math.abs;
 import static java.lang.Math.clamp;
 import static java.lang.Math.floor;
 import static java.lang.Math.max;
+import static java.lang.Math.min;
 import static java.lang.Math.round;
 import static megamek.codeUtilities.StringUtility.isNullOrBlank;
 import static megamek.common.compute.Compute.d6;
@@ -59,7 +60,7 @@ import static mekhq.campaign.personnel.enums.BloodGroup.getRandomBloodGroup;
 import static mekhq.campaign.personnel.medical.BodyLocation.GENERIC;
 import static mekhq.campaign.personnel.medical.BodyLocation.INTERNAL;
 import static mekhq.campaign.personnel.medical.advancedMedicalAlternate.AdvancedMedicalAlternate.getAllActiveInjuryEffects;
-import static mekhq.campaign.personnel.skills.Aging.getReputationAgeModifier;
+import static mekhq.campaign.personnel.skills.Aging.getFameAgeModifier;
 import static mekhq.campaign.personnel.skills.Attributes.MAXIMUM_ATTRIBUTE_SCORE;
 import static mekhq.campaign.personnel.skills.Attributes.MINIMUM_EDGE_SCORE;
 import static mekhq.campaign.personnel.skills.InfantryGunnerySkills.INFANTRY_GUNNERY_SKILLS;
@@ -67,6 +68,7 @@ import static mekhq.campaign.personnel.skills.SkillModifierData.IGNORE_AGE;
 import static mekhq.campaign.personnel.skills.SkillType.*;
 import static mekhq.campaign.randomEvents.personalities.PersonalityController.generateReasoning;
 import static mekhq.campaign.randomEvents.personalities.PersonalityController.getTraitIndex;
+import static mekhq.campaign.reputation.chaosReputation.ChaosReputation.STARTING_REPUTATION_SCORE;
 import static mekhq.utilities.MHQInternationalization.getFormattedText;
 import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
 import static mekhq.utilities.ReportingUtilities.CLOSING_SPAN_TAG;
@@ -111,6 +113,7 @@ import mekhq.campaign.AbstractLocation;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.ExtraData;
 import mekhq.campaign.LocalPersonnel;
+import mekhq.campaign.campaignOptions.CampaignOption;
 import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.events.persons.PersonChangedEvent;
 import mekhq.campaign.events.persons.PersonStatusChangedEvent;
@@ -201,7 +204,7 @@ public class Person implements ILocatable {
     public static final int MINIMUM_PROPERTY = 0;
     public static final int MAXIMUM_PROPERTY = 10;
 
-    public static final String REPUTATION_LABEL = "REPUTATION";
+    public static final String REPUTATION_LABEL = "FAME";
     public static final int MINIMUM_REPUTATION = -5;
     public static final int MAXIMUM_REPUTATION = 5;
 
@@ -306,6 +309,8 @@ public class Person implements ILocatable {
     private PersonnelOptions options;
     private boolean hasGainedVeterancySPA;
     private int toughness;
+    private int chaosCampaignReputation;
+    private int chaosCampaignCriminalRecord;
     private Attributes atowAttributes;
 
     // If new Traits are added, make sure to also add them to LifePathDataTraitLookup
@@ -313,7 +318,7 @@ public class Person implements ILocatable {
     private int wealth;
     private ExtraIncome extraIncome;
     private boolean hasPerformedExtremeExpenditure;
-    private int reputation;
+    private int fame;
     private int unlucky;
     private int bloodmark;
     private List<LocalDate> bloodhuntSchedule;
@@ -582,12 +587,14 @@ public class Person implements ILocatable {
         hits = 0;
         hitsPrior = 0;
         toughness = 0;
+        chaosCampaignReputation = STARTING_REPUTATION_SCORE;
+        chaosCampaignCriminalRecord = 0;
         hasGainedVeterancySPA = false;
         connections = 0;
         wealth = 0;
         extraIncome = ExtraIncome.ZERO;
         hasPerformedExtremeExpenditure = false;
-        reputation = 0;
+        fame = 0;
         unlucky = 0;
         bloodmark = 0;
         bloodhuntSchedule = new ArrayList<>();
@@ -2654,12 +2661,12 @@ public class Person implements ILocatable {
      * option for tracking total XP earnings is enabled, updates the total XP earnings as well.</p>
      *
      * @param campaign the {@link Campaign} instance providing the campaign options
-     * @param xp       the amount of XP to be awarded
+     * @param delta    the amount of XP to be awarded
      */
-    public void awardXP(final Campaign campaign, final int xp) {
-        this.xp += xp;
-        if (campaign.getCampaignOptions().isTrackTotalXPEarnings()) {
-            changeTotalXPEarnings(xp);
+    public void awardXP(final Campaign campaign, final int delta) {
+        this.xp = max(0, delta + xp);
+        if (campaign.getCampaignOptions().get(CampaignOption.TRACK_TOTAL_XP_EARNINGS)) {
+            changeTotalXPEarnings(delta);
         }
     }
 
@@ -2707,7 +2714,11 @@ public class Person implements ILocatable {
         }
 
         // Is the character a veteran in their primary profession?
-        int experienceLevel = getExperienceLevel(campaign, false, true);
+        int experienceLevel = getExperienceLevel(campaignOptions,
+              campaign.getPlayerForce().isClanForce(),
+              campaign.getLocalDate(),
+              false,
+              true);
         if (experienceLevel < EXP_VETERAN) {
             return;
         }
@@ -3592,6 +3603,14 @@ public class Person implements ILocatable {
                 MHQXMLUtility.writeSimpleXMLTag(pw, indent, "toughness", toughness);
             }
 
+            if (chaosCampaignReputation != STARTING_REPUTATION_SCORE) {
+                MHQXMLUtility.writeSimpleXMLTag(pw, indent, "chaosCampaignReputation", chaosCampaignReputation);
+            }
+
+            if (chaosCampaignCriminalRecord != 0) {
+                MHQXMLUtility.writeSimpleXMLTag(pw, indent, "chaosCampaignCriminalRecord", chaosCampaignCriminalRecord);
+            }
+
             if (hasGainedVeterancySPA) {
                 MHQXMLUtility.writeSimpleXMLTag(pw, indent, "hasGainedVeterancySPA", hasGainedVeterancySPA);
             }
@@ -3612,8 +3631,8 @@ public class Person implements ILocatable {
                 MHQXMLUtility.writeSimpleXMLTag(pw, indent, "hasPerformedExtremeExpenditure", true);
             }
 
-            if (reputation != 0) {
-                MHQXMLUtility.writeSimpleXMLTag(pw, indent, "reputation", reputation);
+            if (fame != 0) {
+                MHQXMLUtility.writeSimpleXMLTag(pw, indent, "fame", fame);
             }
 
             if (unlucky != 0) {
@@ -4177,6 +4196,11 @@ public class Person implements ILocatable {
                     implants = wn2.getTextContent();
                 } else if (nodeName.equalsIgnoreCase("toughness")) {
                     person.toughness = MathUtility.parseInt(wn2.getTextContent().trim());
+                } else if (nodeName.equalsIgnoreCase("chaosCampaignReputation")) {
+                    person.chaosCampaignReputation = MathUtility.parseInt(wn2.getTextContent().trim(),
+                          STARTING_REPUTATION_SCORE);
+                } else if (nodeName.equalsIgnoreCase("chaosCampaignCriminalRecord")) {
+                    person.chaosCampaignCriminalRecord = MathUtility.parseInt(wn2.getTextContent().trim());
                 } else if (nodeName.equalsIgnoreCase("hasGainedVeterancySPA")) {
                     person.hasGainedVeterancySPA = Boolean.parseBoolean(wn2.getTextContent().trim());
                 } else if (nodeName.equalsIgnoreCase("connections")) {
@@ -4188,7 +4212,10 @@ public class Person implements ILocatable {
                 } else if (nodeName.equalsIgnoreCase("hasPerformedExtremeExpenditure")) {
                     person.hasPerformedExtremeExpenditure = Boolean.parseBoolean(wn2.getTextContent().trim());
                 } else if (nodeName.equalsIgnoreCase("reputation")) {
-                    person.reputation = MathUtility.parseInt(wn2.getTextContent().trim());
+                    // <51.01 compatibility handler
+                    person.fame = MathUtility.parseInt(wn2.getTextContent().trim());
+                } else if (nodeName.equalsIgnoreCase("fame")) {
+                    person.fame = MathUtility.parseInt(wn2.getTextContent().trim());
                 } else if (nodeName.equalsIgnoreCase("unlucky")) {
                     person.unlucky = MathUtility.parseInt(wn2.getTextContent().trim());
                 } else if (nodeName.equalsIgnoreCase("bloodmark")) {
@@ -5390,8 +5417,8 @@ public class Person implements ILocatable {
     /**
      * Returns the {@link SkillLevel} for this person's primary or secondary role.
      *
-     * <p>Delegates to {@link #getExperienceLevel(Campaign, boolean, boolean)} and maps the result to the
-     * corresponding {@link SkillLevel} constant.</p>
+     * <p>Delegates to {@link #getSkillLevel(CampaignOptions, boolean, LocalDate, boolean, boolean)} after unpacking
+     * the required values from the {@link Campaign}.</p>
      *
      * @param campaign             the campaign context
      * @param secondary            {@code true} to evaluate the secondary role; {@code false} for the primary role
@@ -5401,7 +5428,11 @@ public class Person implements ILocatable {
      */
     public SkillLevel getSkillLevel(final Campaign campaign, final boolean secondary,
           final boolean excludeInjuryEffects) {
-        return Skills.SKILL_LEVELS[getExperienceLevel(campaign, secondary, excludeInjuryEffects) + 1];
+        return getSkillLevel(campaign.getCampaignOptions(),
+              campaign.getPlayerForce().isClanForce(),
+              campaign.getLocalDate(),
+              secondary,
+              excludeInjuryEffects);
     }
 
     /**
@@ -5428,12 +5459,8 @@ public class Person implements ILocatable {
               excludeInjuryEffects) + 1];
     }
 
-    public int getExperienceLevel(final Campaign campaign, final boolean secondary) {
-        return getExperienceLevel(campaign, secondary, false);
-    }
-
     /**
-     * Determines the experience level of a person in their current profession within the context of a campaign.
+     * Determines the experience level of a person in their current profession.
      *
      * <p>The calculation varies depending on the person's role and campaign options:</p>
      * <ul>
@@ -5455,25 +5482,11 @@ public class Person implements ILocatable {
      *     </li>
      * </ul>
      *
-     * @param campaign             the campaign context, providing options and relevant configuration
-     * @param secondary            if {@code true}, evaluates the person's secondary role; if {@code false}, evaluates
-     *                             the primary role
-     * @param excludeInjuryEffects if {@code true} injury effect modifiers will be excluded from calculations
-     *
-     * @return the calculated experience level for the relevant role, or {@link SkillType#EXP_NONE} if not qualified
-     */
-    public int getExperienceLevel(final Campaign campaign, final boolean secondary, boolean excludeInjuryEffects) {
-        return getExperienceLevel(campaign.getCampaignOptions(), campaign.isClanCampaign(),
-              campaign.getLocalDate(), secondary, excludeInjuryEffects);
-    }
-
-    /**
-     * Determines the experience level of a person in their current profession.
-     *
      * @param campaignOptions      the campaign options providing configuration
      * @param isClanCampaign       whether this is a Clan campaign
      * @param today                the current in-game date
-     * @param secondary            if {@code true}, evaluates the person's secondary role
+     * @param secondary            if {@code true}, evaluates the person's secondary role; if {@code false}, evaluates
+     *                             the primary role
      * @param excludeInjuryEffects if {@code true} injury effect modifiers will be excluded from calculations
      *
      * @return the calculated experience level for the relevant role, or {@link SkillType#EXP_NONE} if not qualified
@@ -5827,7 +5840,7 @@ public class Person implements ILocatable {
      * campaign context, and the current date. If the skill is not found, {@code 0} is returned.</p>
      *
      * @param skillName         the name of the skill to retrieve
-     * @param isUseAgingEffects {@code true} to include aging effects in reputation adjustment, {@code false} otherwise
+     * @param isUseAgingEffects {@code true} to include aging effects in fame adjustment, {@code false} otherwise
      * @param isClanCampaign    {@code true} if the context is a Clan campaign, {@code false} otherwise
      * @param today             the current date used for age-related calculations
      *
@@ -6297,7 +6310,7 @@ public class Person implements ILocatable {
             return 0;
         }
 
-        setEdge(Math.min(previousEdge + amount, effectiveMaximum));
+        setEdge(min(previousEdge + amount, effectiveMaximum));
         return getEdge() - previousEdge;
     }
 
@@ -7251,6 +7264,82 @@ public class Person implements ILocatable {
         this.toughness = toughness;
     }
 
+    public int getAdjustedReputation(boolean isUseAgingEffects, boolean isClanCampaign, LocalDate currentDate) {
+        return getAdjustedReputation(isUseAgingEffects, isClanCampaign, currentDate, false);
+    }
+
+    public int getAdjustedReputation(boolean isUseAgingEffects, boolean isClanCampaign, LocalDate currentDate,
+          boolean applyPersonality) {
+        int fameContribution = getAdjustedFame(isUseAgingEffects, isClanCampaign, currentDate);
+
+        if (options.booleanOption(DONT_YOU_KNOW_WHO_I_AM)) {
+            fameContribution = (int) round(fameContribution * 1.25);
+        } else if (options.booleanOption(CERTIFIED_NOBODY)) {
+            fameContribution = (int) round(fameContribution * 0.75);
+        }
+
+        int connectionsContribution = getAdjustedConnections(false);
+
+        if (options.booleanOption(IMPORTANT_FRIENDS)) {
+            connectionsContribution = (int) round(connectionsContribution * 1.25);
+        } else if (options.booleanOption(FORGETS_TO_REPLY)) {
+            connectionsContribution = (int) round(connectionsContribution * 0.75);
+        }
+
+        int criminalRecordContribution = chaosCampaignCriminalRecord;
+
+        if (options.booleanOption(BLAMELESS)) {
+            criminalRecordContribution++;
+        } else if (options.booleanOption(SCAPEGOAT)) {
+            criminalRecordContribution = min(0, criminalRecordContribution - 1);
+        }
+
+        int baseReputationContribution = chaosCampaignReputation;
+
+        if (options.booleanOption(GOOD_REPUTATION)) {
+            baseReputationContribution++;
+        } else if (options.booleanOption(BAD_REPUTATION)) {
+            baseReputationContribution--;
+        }
+
+        int personalityContribution = PersonalityController.getPersonalityValue(applyPersonality,
+              getAggression(),
+              getAmbition(),
+              getGreed(),
+              getSocial());
+
+        return baseReputationContribution +
+                     criminalRecordContribution +
+                     fameContribution +
+                     connectionsContribution +
+                     personalityContribution;
+    }
+
+    /** Generally you will want to call {@link #getAdjustedReputation(boolean, boolean, LocalDate)} instead */
+    public int getReputationDirect() {
+        return chaosCampaignReputation;
+    }
+
+    public void setReputationDirect(int chaosCampaignReputation) {
+        this.chaosCampaignReputation = chaosCampaignReputation;
+    }
+
+    public void changeReputation(int delta) {
+        chaosCampaignReputation += delta;
+    }
+
+    public int getCriminalRecord() {
+        return chaosCampaignCriminalRecord;
+    }
+
+    public void setCriminalRecord(int chaosCampaignCriminalRecord) {
+        this.chaosCampaignCriminalRecord = chaosCampaignCriminalRecord;
+    }
+
+    public void changeCriminalRecord(int delta) {
+        this.chaosCampaignCriminalRecord = min(0, chaosCampaignCriminalRecord + delta);
+    }
+
     public boolean getHasGainedVeterancySPA() {
         return hasGainedVeterancySPA;
     }
@@ -7426,79 +7515,78 @@ public class Person implements ILocatable {
     }
 
     /**
-     * Retrieves the raw reputation value of the character.
+     * Retrieves the raw fame value of the character.
      *
-     * <p>This method returns the unadjusted reputation value associated with the character.</p>
+     * <p>This method returns the unadjusted fame value associated with the character.</p>
      *
      * <p><b>Usage:</b> If aging effects are enabled, you likely want to use
-     * {@link #getAdjustedReputation(boolean, boolean, LocalDate, int)}  instead.</p>
+     * {@link #getAdjustedFame(boolean, boolean, LocalDate)}   instead.</p>
      *
-     * @return The raw reputation value.
+     * @return The raw fame value.
      */
-    public int getReputation() {
-        return reputation;
+    public int getFame() {
+        return fame;
     }
 
     /**
-     * Calculates the adjusted reputation value for the character based on aging effects, the current campaign type,
-     * date, and rank.
+     * Calculates the adjusted fame value for the character based on aging effects, the current campaign type, date, and
+     * rank.
      *
-     * <p>This method computes the character's reputation by applying age-based modifiers, which depend on factors such
+     * <p>This method computes the character's fame by applying age-based modifiers, which depend on factors such
      * as whether aging effects are enabled, whether the campaign is clan-specific, the character's bloodname status,
-     * and their rank in the clan hierarchy. If aging effects are disabled, the reputation remains unchanged.</p>
+     * and their rank in the clan hierarchy. If aging effects are disabled, the fame remains unchanged.</p>
      *
-     * <p><b>Usage:</b> If aging effects are disabled, the result will be equivalent to the base reputation value
-     * provided by {@link #getReputation()}.</p>
+     * <p><b>Usage:</b> If aging effects are disabled, the result will be equivalent to the base fame value
+     * provided by {@link #getFame()}.</p>
      *
-     * @param isUseAgingEffects Indicates whether aging effects should be applied to the reputation calculation.
+     * @param isUseAgingEffects Indicates whether aging effects should be applied to the fame calculation.
      * @param isClanCampaign    Indicates whether the current campaign is specific to a clan.
      * @param today             The current date used to calculate the character's age.
-     * @param rankNumeric       The rank index of the character, which can adjust the reputation modifier in clan-based
-     *                          campaigns.
      *
-     * @return The adjusted reputation value, accounting for factors like age, clan campaign status, bloodname
-     *       possession, and rank. If aging effects are disabled, the base reputation value is returned.
+     * @return The adjusted fame value, accounting for factors like age, clan campaign status, bloodname possession, and
+     *       rank. If aging effects are disabled, the base fame value is returned.
      */
-    public int getAdjustedReputation(boolean isUseAgingEffects, boolean isClanCampaign, LocalDate today,
-          int rankNumeric) {
-        final int PATHOLOGIC_RACISM_REPUTATION_PENALTY = -2;
+    public int getAdjustedFame(boolean isUseAgingEffects, boolean isClanCampaign, LocalDate today) {
+        final int PATHOLOGIC_RACISM_FAME_PENALTY = -2;
 
+        // The age-based modifier is only applied when aging effects are enabled, so avoid the age lookup entirely
+        // otherwise (today may be unavailable when aging is disabled).
         int modifiers = isUseAgingEffects ?
-                              getReputationAgeModifier(getAge(today),
+                              getFameAgeModifier(getAge(today),
                                     isClanCampaign,
                                     !isNullOrBlank(bloodname),
-                                    rankNumeric) :
+                                    getRankNumeric()) :
                               0;
 
         boolean hasRacism = options.booleanOption(COMPULSION_RACISM);
         modifiers -= hasRacism ? 1 : 0;
 
         boolean hasPathologicRacism = options.booleanOption(COMPULSION_PATHOLOGIC_RACISM);
-        modifiers += hasPathologicRacism ? PATHOLOGIC_RACISM_REPUTATION_PENALTY : 0;
+        modifiers += hasPathologicRacism ? PATHOLOGIC_RACISM_FAME_PENALTY : 0;
 
         boolean hasXenophobia = options.booleanOption(COMPULSION_XENOPHOBIA);
         modifiers -= hasXenophobia ? 1 : 0;
 
         modifiers += getDarkSecretModifier(true);
 
-        return clamp(reputation + modifiers, MINIMUM_REPUTATION, MAXIMUM_REPUTATION);
+        return clamp(fame + modifiers, MINIMUM_FAME, MAXIMUM_FAME);
     }
 
-    public void setReputation(final int reputation) {
-        this.reputation = clamp(reputation, MINIMUM_REPUTATION, MAXIMUM_REPUTATION);
+    public void setFame(final int fame) {
+        this.fame = clamp(fame, MINIMUM_FAME, MAXIMUM_FAME);
     }
 
     /**
-     * Adjusts the person's reputation by the specified amount.
+     * Adjusts the person's fame by the specified amount.
      *
-     * <p>The change in reputation can be positive or negative, depending on the provided delta value.</p>
+     * <p>The change in fame can be positive or negative, depending on the provided delta value.</p>
      *
-     * @param delta The amount by which to adjust the reputation. A positive value increases the reputation, while a
-     *              negative value decreases it.
+     * @param delta The amount by which to adjust the fame. A positive value increases the fame, while a negative value
+     *              decreases it.
      */
-    public void changeReputation(final int delta) {
-        int newValue = reputation + delta;
-        reputation = clamp(newValue, MINIMUM_REPUTATION, MAXIMUM_REPUTATION);
+    public void changeFame(final int delta) {
+        int newValue = fame + delta;
+        fame = clamp(newValue, MINIMUM_FAME, MAXIMUM_FAME);
     }
 
     public int getUnlucky() {
@@ -8227,7 +8315,12 @@ public class Person implements ILocatable {
         if (isFounder()) {
             shares++;
         }
-        shares += max(-1, getExperienceLevel(campaign, false, true) - 2);
+        shares += max(-1,
+              getExperienceLevel(campaign.getCampaignOptions(),
+                    campaign.getPlayerForce().isClanForce(),
+                    campaign.getLocalDate(),
+                    false,
+                    true) - 2);
 
         if (getRank().isOfficer()) {
             final Profession profession = Profession.getProfessionFromPersonnelRole(getPrimaryRole());
@@ -8271,7 +8364,11 @@ public class Person implements ILocatable {
         // MekWarriors and aero pilots are worth more than the other types of scrubs
         return (getPrimaryRole().isMekWarriorGrouping() || getPrimaryRole().isAerospacePilot() ?
                       MEKWARRIOR_AERO_RANSOM_VALUES :
-                      OTHER_RANSOM_VALUES).get(getExperienceLevel(campaign, false, true));
+                      OTHER_RANSOM_VALUES).get(getExperienceLevel(campaign.getCampaignOptions(),
+              campaign.getPlayerForce().isClanForce(),
+              campaign.getLocalDate(),
+              false,
+              true));
     }
 
     @Override
@@ -9320,11 +9417,9 @@ public class Person implements ILocatable {
      * Calculates the modifier associated with a character's Dark Secret.
      *
      * <p>If the dark secret is not revealed and the character does not have a dark secret, the modifier is 0.
-     * Otherwise, returns a value based on enabled options and the type of modifier requested (reputation or
-     * other).</p>
+     * Otherwise, returns a value based on enabled options and the type of modifier requested (fame or other).</p>
      *
-     * @param isReputation {@code true} to retrieve the Reputation modifier; {@code false} to retrieve the Connections
-     *                     modifier.
+     * @param isFame {@code true} to retrieve the Fame modifier; {@code false} to retrieve the Connections modifier.
      *
      * @return the appropriate Dark Secret modifier, or 0 if no relevant option is enabled or the secret is not
      *       present/revealed.
@@ -9332,7 +9427,7 @@ public class Person implements ILocatable {
      * @author Illiani
      * @since 0.50.07
      */
-    public int getDarkSecretModifier(final boolean isReputation) {
+    public int getDarkSecretModifier(final boolean isFame) {
         // Only apply modifiers if the character has a dark secret AND it is revealed; otherwise, return 0
         if (!darkSecretRevealed || !hasDarkSecret()) {
             return 0;
@@ -9341,7 +9436,7 @@ public class Person implements ILocatable {
         // If the dark secret is revealed, calculate the appropriate modifier
         for (Map.Entry<String, int[]> entry : DARK_SECRET_MODIFIERS.entrySet()) {
             if (options.booleanOption(entry.getKey())) {
-                return isReputation ? entry.getValue()[0] : entry.getValue()[1];
+                return isFame ? entry.getValue()[0] : entry.getValue()[1];
             }
         }
 
@@ -9497,23 +9592,23 @@ public class Person implements ILocatable {
     }
 
     /**
-     * Gets skill modifier data for this person without reputation adjustments.
+     * Gets skill modifier data for this person without fame adjustments.
      *
      * <p>This is a convenience method that returns skill modifier data with:</p>
      * <ul>
      *   <li>Personnel options (character traits and abilities)</li>
      *   <li>Attributes (physical and mental stats)</li>
      *   <li>Active injury effects (considering ambidextrous trait)</li>
-     *   <li>Adjusted reputation set to 0 (no reputation modifier)</li>
+     *   <li>Adjusted fame set to 0 (no fame modifier)</li>
      *   <li>Illiteracy status</li>
      * </ul>
      *
-     * <p>Use {@link #getSkillModifierData(boolean, boolean, LocalDate)} if reputation adjustments based on age,
+     * <p>Use {@link #getSkillModifierData(boolean, boolean, LocalDate)} if fame adjustments based on age,
      * campaign type, and rank are needed.</p>
      *
      * @param excludeInjuryEffects {@code true} to ignore all skill modifiers from injury effects.
      *
-     * @return a {@link SkillModifierData} object with reputation set to 0
+     * @return a {@link SkillModifierData} object with fame set to 0
      *
      * @author Illiani
      * @since 0.50.10
@@ -9554,12 +9649,12 @@ public class Person implements ILocatable {
      *   <li>Personnel options (character traits and abilities)</li>
      *   <li>Attributes (physical and mental stats)</li>
      *   <li>Active injury effects (considering ambidextrous trait)</li>
-     *   <li>Adjusted reputation (affected by age, campaign type, and rank)</li>
+     *   <li>Adjusted fame (affected by age, campaign type, and rank)</li>
      *   <li>Illiteracy status</li>
      * </ul>
      *
-     * @param isUseAgingEffects    whether aging effects should be applied to reputation
-     * @param isClanCampaign       whether this is a Clan campaign (affects reputation calculation)
+     * @param isUseAgingEffects    whether aging effects should be applied to fame
+     * @param isClanCampaign       whether this is a Clan campaign (affects fame calculation)
      * @param today                the current campaign date (used for age-based calculations)
      * @param excludeInjuryEffects {@code true} to ignore all skill modifiers from injury effects.
      *
@@ -9570,7 +9665,7 @@ public class Person implements ILocatable {
      */
     public SkillModifierData getSkillModifierData(boolean isUseAgingEffects, boolean isClanCampaign, LocalDate today,
           boolean excludeInjuryEffects) {
-        int adjustedReputation = getAdjustedReputation(isUseAgingEffects, isClanCampaign, today, rank);
+        int adjustedFame = getAdjustedFame(isUseAgingEffects, isClanCampaign, today);
 
         boolean isAmbidextrous = options.booleanOption(PersonnelOptions.ATOW_AMBIDEXTROUS);
         List<InjuryEffect> injuryEffects = excludeInjuryEffects ?
@@ -9580,7 +9675,7 @@ public class Person implements ILocatable {
 
         return new SkillModifierData(options,
               atowAttributes,
-              adjustedReputation,
+              adjustedFame,
               injuryEffects,
               ageForAttributeModifiers);
     }

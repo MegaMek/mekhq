@@ -74,6 +74,7 @@ import mekhq.campaign.CampaignLocationManager;
 import mekhq.campaign.CurrentLocation;
 import mekhq.campaign.FixedLocation;
 import mekhq.campaign.LocalWarehouse;
+import mekhq.campaign.campaignOptions.CampaignOption;
 import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.enums.DailyReportType;
 import mekhq.campaign.events.persons.PersonStatusChangedEvent;
@@ -117,7 +118,7 @@ public class PersonTest {
         initAwards();
 
         CampaignOptions mockCampaignOpts = mock(CampaignOptions.class);
-        when(mockCampaignOpts.isTrackTotalXPEarnings()).thenReturn(false);
+        when(mockCampaignOpts.get(CampaignOption.TRACK_TOTAL_XP_EARNINGS)).thenReturn(false);
         when(mockCampaignOpts.getAwardBonusStyle()).thenReturn(AwardBonus.BOTH);
 
         Campaign mockCampaign = mockCampaign();
@@ -155,7 +156,7 @@ public class PersonTest {
         initAwards();
 
         CampaignOptions mockCampaignOpts = mock(CampaignOptions.class);
-        when(mockCampaignOpts.isTrackTotalXPEarnings()).thenReturn(false);
+        when(mockCampaignOpts.get(CampaignOption.TRACK_TOTAL_XP_EARNINGS)).thenReturn(false);
         when(mockCampaignOpts.getAwardBonusStyle()).thenReturn(AwardBonus.BOTH);
 
         Campaign mockCampaign = mockCampaign();

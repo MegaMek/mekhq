@@ -1,0 +1,359 @@
+/*
+ * Copyright (C) 2026 The MegaMek Team. All Rights Reserved.
+ *
+ * This file is part of MekHQ.
+ *
+ * MekHQ is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License (GPL),
+ * version 3 or (at your option) any later version,
+ * as published by the Free Software Foundation.
+ *
+ * MekHQ is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty
+ * of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+ * See the GNU General Public License for more details.
+ *
+ * A copy of the GPL should have been included with this project;
+ * if not, see <https://www.gnu.org/licenses/>.
+ *
+ * NOTICE: The MegaMek organization is a non-profit group of volunteers
+ * creating free software for the BattleTech community.
+ *
+ * MechWarrior, BattleMech, `Mech and AeroTech are registered trademarks
+ * of The Topps Company, Inc. All Rights Reserved.
+ *
+ * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
+ * InMediaRes Productions, LLC.
+ *
+ * MechWarrior Copyright Microsoft Corporation. MekHQ was created under
+ * Microsoft's "Game Content Usage Rules"
+ * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+ * affiliated with Microsoft.
+ */
+package mekhq.gui.dialog.reportDialogs;
+
+import static java.lang.Math.clamp;
+import static java.lang.Math.round;
+import static mekhq.campaign.personnel.skills.SkillType.EXP_LEGENDARY;
+import static mekhq.campaign.personnel.skills.SkillType.EXP_NONE;
+import static mekhq.utilities.MHQInternationalization.getTextAt;
+
+import java.time.LocalDate;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.Map;
+import java.util.TreeMap;
+import javax.swing.JFrame;
+import javax.swing.JTextPane;
+
+import megamek.client.ui.util.UIUtil;
+import megamek.common.enums.SkillLevel;
+import mekhq.campaign.Campaign;
+import mekhq.campaign.campaignOptions.CampaignOption;
+import mekhq.campaign.campaignOptions.CampaignOptions;
+import mekhq.campaign.force.PlayerForce;
+import mekhq.campaign.personnel.Person;
+import mekhq.campaign.personnel.enums.PersonnelStatus;
+import mekhq.campaign.personnel.skills.SkillType;
+import mekhq.campaign.reputation.chaosReputation.ChaosReputation;
+
+/**
+ * Displays a report explaining how the force's Chaos Campaign Reputation was determined, including the average
+ * experience calculation and the per-character reputation breakdown. This is the Chaos Campaign counterpart to
+ * {@link ReputationReportDialog}, which reports on the Campaign Operations reputation system.
+ */
+public class ChaosReputationReportDialog extends AbstractReportDialog {
+    private static final String RESOURCE_BUNDLE = "mekhq.resources.ChaosReputation";
+
+    private final Campaign campaign;
+
+    /**
+     * Creates and displays the Chaos Reputation report dialog for the given campaign.
+     *
+     * @param frame    the parent frame the dialog is anchored to
+     * @param campaign the campaign whose Chaos Reputation is reported on
+     */
+    public ChaosReputationReportDialog(final JFrame frame, final Campaign campaign) {
+        super(frame, "ChaosReputationReportDialog", "ChaosReputationReportDialog.title");
+        this.campaign = campaign;
+        initialize();
+    }
+
+    /**
+     * @return the campaign this dialog reports on
+     */
+    public Campaign getCampaign() {
+        return campaign;
+    }
+
+    /**
+     * Builds the report's text pane, populated with the HTML produced by {@link #getReportText(Campaign)}.
+     *
+     * @return a non-editable, HTML {@link JTextPane} containing the report
+     */
+    @Override
+    protected JTextPane createTxtReport() {
+        // Recalculate and store the force reputation as the report opens, so the rating it explains reflects the
+        // current roster rather than a snapshot from the last daily update, contract completion, or enable.
+        Campaign reportCampaign = getCampaign();
+        ChaosReputation.processChaosCampaignReputationChanges(reportCampaign.getCampaignOptions(),
+              reportCampaign.getPlayerForce(),
+              reportCampaign.getLocalDate());
+
+        final JTextPane txtReport = new JTextPane();
+
+        txtReport.setContentType("text/html");
+
+        txtReport.setText(getReportText(getCampaign()));
+
+        txtReport.setName("txtReport");
+        txtReport.setEditable(false);
+        txtReport.setCaretPosition(0);
+        return txtReport;
+    }
+    //endregion Getters
+
+    /**
+     * Builds an HTML report explaining how the force's Chaos Campaign Reputation was determined.
+     *
+     * <p>The report is split into two sections. The first shows how the force's average experience was calculated,
+     * tallying how many combat roles sit at each experience level, the running total, and the resulting mean skill
+     * level. The second shows how the Chaos Reputation was determined, tallying how many personnel share each adjusted
+     * reputation value, then combining the personnel average with the debt penalty to reach the final total.</p>
+     *
+     * @param campaign the campaign whose player force is reported on
+     *
+     * @return an HTML string suitable for display in a {@link javax.swing.JTextPane}
+     */
+    public static String getReportText(Campaign campaign) {
+        int titleFontSize = UIUtil.scaleForGUI(7);
+        int subtitleFontSize = UIUtil.scaleForGUI(5);
+
+        PlayerForce playerForce = campaign.getPlayerForce();
+        Collection<Person> personnel = playerForce.allPersonnel();
+        LocalDate currentDate = campaign.getLocalDate();
+        boolean isUseAgeEffects = campaign.getCampaignOptions().get(CampaignOption.USE_AGE_EFFECTS);
+        boolean isClanForce = playerForce.isClanForce();
+
+        StringBuilder description = new StringBuilder("<html>");
+
+        // In campaign-level mode the stored value is a pure base; apply the live modifiers so the header matches the
+        // total shown in the breakdown below. In personnel mode the stored value is already the derived total.
+        int headerReputation = campaign.getCampaignOptions().get(CampaignOption.CAMPAIGN_LEVEL_CHAOS_REPUTATION)
+                                     ?
+                                     ChaosReputation.getEffectiveCampaignLevelReputation(playerForce,
+                                           campaign.getCampaignOptions(),
+                                           currentDate)
+                                     :
+                                     playerForce.getChaosCampaignReputation();
+
+        // HEADER
+        description.append(String.format("<div style='text-align: center;'><font size='%d'><b>%s:</b> %d</font></div>",
+              titleFontSize,
+              playerForce.getName(),
+              headerReputation));
+
+        appendChaosReputationSection(description,
+              campaign,
+              personnel,
+              currentDate,
+              isUseAgeEffects,
+              isClanForce,
+              subtitleFontSize);
+
+        appendAverageExperienceSection(description, campaign, personnel, subtitleFontSize);
+
+        description.append("</html>");
+        return description.toString();
+    }
+
+    /**
+     * Appends the "Average Experience" section to the report.
+     *
+     * <p>Tallies how many combat roles (primary and secondary) sit at each experience level across the active,
+     * employed personnel, then appends a distribution table followed by summary rows for the total experience points,
+     * the number of roles counted, and the resulting mean skill level.</p>
+     *
+     * @param description      the buffer the section HTML is appended to
+     * @param campaign         the campaign whose personnel are examined
+     * @param personnel        the personnel to consider
+     * @param subtitleFontSize the GUI-scaled font size for the section subtitle
+     */
+    private static void appendAverageExperienceSection(StringBuilder description, Campaign campaign,
+          Collection<Person> personnel, int subtitleFontSize) {
+        description.append(String.format("<b><font size='%d'>%s</font></b><br>",
+              subtitleFontSize,
+              getTextAt(RESOURCE_BUNDLE, "report.averageExperience")));
+
+        // Tally how many combat roles sit at each experience level, rather than listing every person, so the report
+        // stays compact for large campaigns.
+        Map<Integer, Integer> experienceCounts = new TreeMap<>(Collections.reverseOrder());
+        double roleCount = 0;
+        int totalExperienceLevel = 0;
+        final CampaignOptions campaignOptions = campaign.getCampaignOptions();
+        final boolean isClanForce = campaign.getPlayerForce().isClanForce();
+        final LocalDate currentDate = campaign.getLocalDate();
+        for (Person person : personnel) {
+            PersonnelStatus status = person.getStatus();
+            if (status.isDepartedUnit() || !status.isActive() || !person.isEmployed()) {
+                continue;
+            }
+
+            int weight = ChaosReputation.getPersonnelReputationWeight(person);
+            if (weight == 0) {
+                continue;
+            }
+
+            int primaryExperienceLevel = ChaosReputation.getExperienceLevel(campaignOptions,
+                  isClanForce,
+                  currentDate,
+                  person,
+                  true);
+            int secondaryExperienceLevel = ChaosReputation.getExperienceLevel(campaignOptions,
+                  isClanForce,
+                  currentDate,
+                  person,
+                  false);
+
+            if (primaryExperienceLevel != EXP_NONE) {
+                roleCount += weight;
+                totalExperienceLevel += primaryExperienceLevel * weight;
+                experienceCounts.merge(primaryExperienceLevel, weight, Integer::sum);
+            }
+            if (secondaryExperienceLevel != EXP_NONE) {
+                roleCount += weight;
+                totalExperienceLevel += secondaryExperienceLevel * weight;
+                experienceCounts.merge(secondaryExperienceLevel, weight, Integer::sum);
+            }
+        }
+
+        description.append("<table>");
+        description.append(String.format("<tr><th align='left'>%s</th><th>%s</th></tr>",
+              getTextAt(RESOURCE_BUNDLE, "report.experienceLevel"),
+              getTextAt(RESOURCE_BUNDLE, "report.personnel")));
+        for (Map.Entry<Integer, Integer> entry : experienceCounts.entrySet()) {
+            description.append(String.format("<tr><td>%s</td> <td align='center'>%d</td></tr>",
+                  SkillType.getExperienceLevelName(entry.getKey()),
+                  entry.getValue()));
+        }
+        description.append("</table>");
+
+        int meanExperienceLevel = roleCount == 0 ? EXP_NONE : (int) round(totalExperienceLevel / roleCount);
+        meanExperienceLevel = clamp(meanExperienceLevel, EXP_NONE, EXP_LEGENDARY);
+        SkillLevel averageSkillLevel = SkillType.skillLevelFromExperienceLevel(meanExperienceLevel);
+
+        description.append("<table>");
+        description.append(summaryRow(getTextAt(RESOURCE_BUNDLE, "report.totalExperience"),
+              Integer.toString(totalExperienceLevel)));
+        description.append(summaryRow(getTextAt(RESOURCE_BUNDLE, "report.rolesCounted"),
+              Integer.toString((int) roleCount)));
+        description.append(summaryRow(getTextAt(RESOURCE_BUNDLE, "report.averageSkillLevel"),
+              averageSkillLevel.toString()));
+        description.append("</table><br>");
+    }
+
+    /**
+     * Appends the "Chaos Reputation" section to the report.
+     *
+     * <p>Tallies how many active, employed personnel share each adjusted reputation value and appends a distribution
+     * table, followed by summary rows for the personnel average, the debt penalty, the manual modifier, and the final
+     * (cap-limited) total.</p>
+     *
+     * @param description      the buffer the section HTML is appended to
+     * @param campaign         the campaign whose options and finances drive the totals
+     * @param personnel        the personnel to consider
+     * @param currentDate      the date used for age effects and loan-age calculations
+     * @param isUseAgeEffects  whether age effects apply to adjusted reputation
+     * @param isClanForce      whether the force is a Clan force
+     * @param subtitleFontSize the GUI-scaled font size for the section subtitle
+     */
+    private static void appendChaosReputationSection(StringBuilder description, Campaign campaign,
+          Collection<Person> personnel, LocalDate currentDate, boolean isUseAgeEffects, boolean isClanForce,
+          int subtitleFontSize) {
+        description.append(String.format("<b><font size='%d'>%s</font></b><br>",
+              subtitleFontSize,
+              getTextAt(RESOURCE_BUNDLE, "report.chaosReputation")));
+
+        // Tally how many personnel share each adjusted reputation value, rather than listing every person, so the
+        // report stays compact for large campaigns.
+        Map<Integer, Integer> reputationCounts = new TreeMap<>(Collections.reverseOrder());
+        boolean applyPersonality =
+              campaign.getCampaignOptions().get(CampaignOption.CHAOS_PERSONALITY_AFFECTS_REPUTATION) &&
+                    campaign.getCampaignOptions().get(CampaignOption.USE_RANDOM_PERSONALITIES);
+        double personCount = 0;
+        int totalReputation = 0;
+        for (Person person : personnel) {
+            PersonnelStatus status = person.getStatus();
+            if (status.isDepartedUnit() || !status.isActive() || !person.isEmployed()) {
+                continue;
+            }
+
+            int weight = ChaosReputation.getPersonnelReputationWeight(person);
+            if (weight == 0) {
+                continue;
+            }
+
+            personCount += weight;
+            int adjustedReputation = person.getAdjustedReputation(isUseAgeEffects,
+                  isClanForce,
+                  currentDate,
+                  applyPersonality);
+            totalReputation += adjustedReputation * weight;
+            reputationCounts.merge(adjustedReputation, weight, Integer::sum);
+        }
+
+        description.append("<table>");
+        description.append(String.format("<tr><th align='left'>%s</th><th>%s</th></tr>",
+              getTextAt(RESOURCE_BUNDLE, "report.reputationValue"),
+              getTextAt(RESOURCE_BUNDLE, "report.personnel")));
+        for (Map.Entry<Integer, Integer> entry : reputationCounts.entrySet()) {
+            description.append(String.format("<tr><td align='center'>%d</td> <td align='center'>%d</td></tr>",
+                  entry.getKey(),
+                  entry.getValue()));
+        }
+        description.append("</table>");
+
+        CampaignOptions campaignOptions = campaign.getCampaignOptions();
+        int averageReputation = personCount == 0 ? 0 : (int) round(totalReputation / personCount);
+        PlayerForce playerForce = campaign.getPlayerForce();
+        Person commander = playerForce.getHumanResources().getCommander(campaignOptions,
+              playerForce.isClanForce(),
+              currentDate);
+        int debtModifier = ChaosReputation.applyCommanderDebtModifier(
+              ChaosReputation.getDebtModifier(playerForce.getFinances().getLoans(),
+                    currentDate,
+                    campaignOptions.get(CampaignOption.CHAOS_DEBT_PENALTIES_STACK)),
+              commander);
+        int otherModifiers = ChaosReputation.getOtherModifiers(commander);
+        int manualModifier = campaignOptions.get(CampaignOption.MANUAL_UNIT_RATING_MODIFIER);
+        int cap = campaignOptions.get(CampaignOption.CHAOS_REPUTATION_CAP);
+        int total = ChaosReputation.applyReputationCap(cap,
+              averageReputation + debtModifier + otherModifiers + manualModifier);
+
+        description.append("<table>");
+        description.append(summaryRow(getTextAt(RESOURCE_BUNDLE, "report.averageReputation"),
+              Integer.toString(averageReputation)));
+        description.append(summaryRow(getTextAt(RESOURCE_BUNDLE, "report.debtPenalty"),
+              Integer.toString(debtModifier)));
+        description.append(summaryRow(getTextAt(RESOURCE_BUNDLE, "report.manualModifier"),
+              Integer.toString(manualModifier)));
+        description.append(summaryRow(getTextAt(RESOURCE_BUNDLE, "report.otherModifiers"),
+              Integer.toString(otherModifiers)));
+        description.append(summaryRow(getTextAt(RESOURCE_BUNDLE, "report.reputationTotal"),
+              Integer.toString(total)));
+        description.append("</table><br>");
+    }
+
+    /**
+     * Formats a single indented "label: value" summary row as an HTML table row.
+     *
+     * @param label the row label
+     * @param value the row value
+     *
+     * @return the HTML {@code <tr>} for the summary row
+     */
+    private static String summaryRow(String label, String value) {
+        String indent = "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;";
+        return String.format("<tr><td>%s<b>%s:</b></td> <td>%s</td></tr>", indent, label, value);
+    }
+}

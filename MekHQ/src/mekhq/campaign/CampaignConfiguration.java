@@ -59,6 +59,7 @@ import mekhq.campaign.personnel.procreation.AbstractProcreation;
 import mekhq.campaign.personnel.ranks.RankSystem;
 import mekhq.campaign.personnel.turnoverAndRetention.RetirementDefectionTracker;
 import mekhq.campaign.randomEvents.randomEventsSystem.RandomEventLibraries;
+import mekhq.campaign.reputation.camOpsReputation.ForceReputationController;
 import mekhq.campaign.universe.Faction;
 import mekhq.campaign.universe.Systems;
 import mekhq.campaign.universe.factionStanding.FactionStandingUltimatumsLibrary;
@@ -109,7 +110,7 @@ public class CampaignConfiguration {
     private Map<UUID, LifePath> lifePathLibrary;
     private RetirementDefectionTracker retirementDefectionTracker;
 
-    private mekhq.campaign.camOpsReputation.ForceReputationController reputation;
+    private ForceReputationController reputation;
     private FactionStandings factionStandings;
     private BehaviorSettings autoResolveBehaviorSettings;
 
@@ -161,7 +162,7 @@ public class CampaignConfiguration {
           Faction faction,
           megamek.common.enums.Faction techFaction,
           CurrencyManager currencyManager,
-            mekhq.campaign.camOpsReputation.ForceReputationController reputationController,
+          ForceReputationController reputationController,
           FactionStandings factionStandings,
           RankSystem rankSystem,
           Formation formation,
@@ -260,7 +261,7 @@ public class CampaignConfiguration {
           CurrencyManager currencyManager,
           Systems systemsInstance,
           CurrentLocation startLocation,
-            mekhq.campaign.camOpsReputation.ForceReputationController reputationController,
+          ForceReputationController reputationController,
           FactionStandings factionStandings,
           RankSystem rankSystem,
           Formation formation,
@@ -372,7 +373,7 @@ public class CampaignConfiguration {
         return this.location;
     }
 
-    public mekhq.campaign.camOpsReputation.ForceReputationController getReputationController() {
+    public ForceReputationController getReputationController() {
         return this.reputation;
     }
 
@@ -535,7 +536,7 @@ public class CampaignConfiguration {
         this.retirementDefectionTracker = retirementDefectionTracker;
     }
 
-    public void setReputation(mekhq.campaign.camOpsReputation.ForceReputationController reputation) {
+    public void setReputation(ForceReputationController reputation) {
         this.reputation = reputation;
     }
 
