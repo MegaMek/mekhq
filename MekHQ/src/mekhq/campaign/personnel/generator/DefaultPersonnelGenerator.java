@@ -126,7 +126,11 @@ public class DefaultPersonnelGenerator extends AbstractPersonnelGenerator {
             }
             // regenerate expLvl to factor in skill additions (as this can modify character experience level beyond
             // the requested level)
-            expLvl = person.getExperienceLevel(campaign, false);
+            expLvl = person.getExperienceLevel(campaign.getCampaignOptions(),
+                  campaign.getPlayerForce().isClanForce(),
+                  campaign.getLocalDate(),
+                  false,
+                  false);
         }
 
         // set SPAs

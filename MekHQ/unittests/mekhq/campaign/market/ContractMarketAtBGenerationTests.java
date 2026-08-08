@@ -64,6 +64,7 @@ import mekhq.campaign.finances.Money;
 import mekhq.campaign.force.Formation;
 import mekhq.campaign.market.contractMarket.AtbMonthlyContractMarket;
 import mekhq.campaign.mission.AtBContract;
+import mekhq.campaign.reputation.camOpsReputation.ForceReputationController;
 import mekhq.campaign.universe.Faction;
 import mekhq.campaign.universe.Factions;
 import mekhq.campaign.universe.PlanetarySystem;
@@ -102,7 +103,7 @@ public class ContractMarketAtBGenerationTests {
         when(campaign.getLocalDate()).thenReturn(LocalDate.ofYearDay(gameYear, 1));
         when(campaign.getGameYear()).thenReturn(gameYear);
 
-        mekhq.campaign.camOpsReputation.ForceReputationController camOpsReputation = mock(mekhq.campaign.camOpsReputation.ForceReputationController.class);
+        ForceReputationController camOpsReputation = mock(ForceReputationController.class);
         when(camOpsReputation.getReputationFactor()).thenReturn(0.0);
         when(campaign.getPlayerForce().getReputation()).thenReturn(camOpsReputation);
 
@@ -206,7 +207,7 @@ public class ContractMarketAtBGenerationTests {
         when(campaign.getLocalDate()).thenReturn(LocalDate.ofYearDay(gameYear, 1));
         when(campaign.getGameYear()).thenReturn(gameYear);
 
-        mekhq.campaign.camOpsReputation.ForceReputationController camOpsReputation = mock(mekhq.campaign.camOpsReputation.ForceReputationController.class);
+        ForceReputationController camOpsReputation = mock(ForceReputationController.class);
         when(camOpsReputation.getReputationFactor()).thenReturn(0.0);
         when(campaign.getPlayerForce().getReputation()).thenReturn(camOpsReputation);
 
@@ -313,7 +314,7 @@ public class ContractMarketAtBGenerationTests {
         when(campaign.getLocalDate()).thenReturn(LocalDate.ofYearDay(gameYear, 1));
         when(campaign.getGameYear()).thenReturn(gameYear);
 
-        mekhq.campaign.camOpsReputation.ForceReputationController camOpsReputation = mock(mekhq.campaign.camOpsReputation.ForceReputationController.class);
+        ForceReputationController camOpsReputation = mock(ForceReputationController.class);
         when(camOpsReputation.getReputationFactor()).thenReturn(0.0);
         when(campaign.getPlayerForce().getReputation()).thenReturn(camOpsReputation);
 
@@ -420,7 +421,7 @@ public class ContractMarketAtBGenerationTests {
         when(campaign.getLocalDate()).thenReturn(LocalDate.ofYearDay(gameYear, 1));
         when(campaign.getGameYear()).thenReturn(gameYear);
 
-        mekhq.campaign.camOpsReputation.ForceReputationController camOpsReputation = mock(mekhq.campaign.camOpsReputation.ForceReputationController.class);
+        ForceReputationController camOpsReputation = mock(ForceReputationController.class);
         when(camOpsReputation.getReputationFactor()).thenReturn(0.0);
         when(campaign.getPlayerForce().getReputation()).thenReturn(camOpsReputation);
 
@@ -536,7 +537,7 @@ public class ContractMarketAtBGenerationTests {
         when(campaign.getLocalDate()).thenReturn(LocalDate.ofYearDay(gameYear, 1));
         when(campaign.getGameYear()).thenReturn(gameYear);
 
-        mekhq.campaign.camOpsReputation.ForceReputationController camOpsReputation = mock(mekhq.campaign.camOpsReputation.ForceReputationController.class);
+        ForceReputationController camOpsReputation = mock(ForceReputationController.class);
         when(camOpsReputation.getReputationFactor()).thenReturn(0.0);
         when(campaign.getPlayerForce().getReputation()).thenReturn(camOpsReputation);
 
@@ -647,7 +648,7 @@ public class ContractMarketAtBGenerationTests {
         when(campaign.getLocalDate()).thenReturn(LocalDate.ofYearDay(gameYear, 1));
         when(campaign.getGameYear()).thenReturn(gameYear);
 
-        mekhq.campaign.camOpsReputation.ForceReputationController camOpsReputation = mock(mekhq.campaign.camOpsReputation.ForceReputationController.class);
+        ForceReputationController camOpsReputation = mock(ForceReputationController.class);
         when(camOpsReputation.getReputationFactor()).thenReturn(0.0);
         when(campaign.getPlayerForce().getReputation()).thenReturn(camOpsReputation);
 
@@ -684,7 +685,7 @@ public class ContractMarketAtBGenerationTests {
         when(campaign.getLocalDate()).thenReturn(LocalDate.ofYearDay(gameYear, 1));
         when(campaign.getGameYear()).thenReturn(gameYear);
 
-        mekhq.campaign.camOpsReputation.ForceReputationController camOpsReputation = mock(mekhq.campaign.camOpsReputation.ForceReputationController.class);
+        ForceReputationController camOpsReputation = mock(ForceReputationController.class);
         when(camOpsReputation.getReputationFactor()).thenReturn(0.0);
         when(campaign.getPlayerForce().getReputation()).thenReturn(camOpsReputation);
 
@@ -791,7 +792,7 @@ public class ContractMarketAtBGenerationTests {
         when(campaign.getLocalDate()).thenReturn(LocalDate.ofYearDay(gameYear, 1));
         when(campaign.getGameYear()).thenReturn(gameYear);
 
-        mekhq.campaign.camOpsReputation.ForceReputationController camOpsReputation = mock(mekhq.campaign.camOpsReputation.ForceReputationController.class);
+        ForceReputationController camOpsReputation = mock(ForceReputationController.class);
         when(camOpsReputation.getReputationFactor()).thenReturn(0.0);
         when(campaign.getPlayerForce().getReputation()).thenReturn(camOpsReputation);
 
@@ -890,7 +891,7 @@ public class ContractMarketAtBGenerationTests {
         when(campaign.getLocalDate()).thenReturn(LocalDate.ofYearDay(gameYear, 1));
         when(campaign.getGameYear()).thenReturn(gameYear);
 
-        mekhq.campaign.camOpsReputation.ForceReputationController camOpsReputation = mock(mekhq.campaign.camOpsReputation.ForceReputationController.class);
+        ForceReputationController camOpsReputation = mock(ForceReputationController.class);
         when(camOpsReputation.getReputationFactor()).thenReturn(0.0);
         when(campaign.getPlayerForce().getReputation()).thenReturn(camOpsReputation);
 
@@ -997,7 +998,7 @@ public class ContractMarketAtBGenerationTests {
         when(campaign.getLocalDate()).thenReturn(LocalDate.ofYearDay(gameYear, 1));
         when(campaign.getGameYear()).thenReturn(gameYear);
 
-        mekhq.campaign.camOpsReputation.ForceReputationController camOpsReputation = mock(mekhq.campaign.camOpsReputation.ForceReputationController.class);
+        ForceReputationController camOpsReputation = mock(ForceReputationController.class);
         when(camOpsReputation.getReputationFactor()).thenReturn(0.0);
         when(campaign.getPlayerForce().getReputation()).thenReturn(camOpsReputation);
 
@@ -1100,7 +1101,7 @@ public class ContractMarketAtBGenerationTests {
         when(campaign.getLocalDate()).thenReturn(LocalDate.ofYearDay(gameYear, 1));
         when(campaign.getGameYear()).thenReturn(gameYear);
 
-        mekhq.campaign.camOpsReputation.ForceReputationController camOpsReputation = mock(mekhq.campaign.camOpsReputation.ForceReputationController.class);
+        ForceReputationController camOpsReputation = mock(ForceReputationController.class);
         when(camOpsReputation.getReputationFactor()).thenReturn(0.0);
         when(campaign.getPlayerForce().getReputation()).thenReturn(camOpsReputation);
 
@@ -1207,7 +1208,7 @@ public class ContractMarketAtBGenerationTests {
         when(campaign.getLocalDate()).thenReturn(LocalDate.ofYearDay(gameYear, 1));
         when(campaign.getGameYear()).thenReturn(gameYear);
 
-        mekhq.campaign.camOpsReputation.ForceReputationController camOpsReputation = mock(mekhq.campaign.camOpsReputation.ForceReputationController.class);
+        ForceReputationController camOpsReputation = mock(ForceReputationController.class);
         when(camOpsReputation.getReputationFactor()).thenReturn(0.0);
         when(campaign.getPlayerForce().getReputation()).thenReturn(camOpsReputation);
 
@@ -1314,7 +1315,7 @@ public class ContractMarketAtBGenerationTests {
         when(campaign.getLocalDate()).thenReturn(LocalDate.ofYearDay(gameYear, 1));
         when(campaign.getGameYear()).thenReturn(gameYear);
 
-        mekhq.campaign.camOpsReputation.ForceReputationController camOpsReputation = mock(mekhq.campaign.camOpsReputation.ForceReputationController.class);
+        ForceReputationController camOpsReputation = mock(ForceReputationController.class);
         when(camOpsReputation.getReputationFactor()).thenReturn(0.0);
         when(campaign.getPlayerForce().getReputation()).thenReturn(camOpsReputation);
 
@@ -1421,7 +1422,7 @@ public class ContractMarketAtBGenerationTests {
         when(campaign.getLocalDate()).thenReturn(LocalDate.ofYearDay(gameYear, 1));
         when(campaign.getGameYear()).thenReturn(gameYear);
 
-        mekhq.campaign.camOpsReputation.ForceReputationController camOpsReputation = mock(mekhq.campaign.camOpsReputation.ForceReputationController.class);
+        ForceReputationController camOpsReputation = mock(ForceReputationController.class);
         when(camOpsReputation.getReputationFactor()).thenReturn(0.0);
         when(campaign.getPlayerForce().getReputation()).thenReturn(camOpsReputation);
 
@@ -1527,7 +1528,7 @@ public class ContractMarketAtBGenerationTests {
         when(campaign.getLocalDate()).thenReturn(LocalDate.ofYearDay(gameYear, 1));
         when(campaign.getGameYear()).thenReturn(gameYear);
 
-        mekhq.campaign.camOpsReputation.ForceReputationController camOpsReputation = mock(mekhq.campaign.camOpsReputation.ForceReputationController.class);
+        ForceReputationController camOpsReputation = mock(ForceReputationController.class);
         when(camOpsReputation.getReputationFactor()).thenReturn(0.0);
         when(campaign.getPlayerForce().getReputation()).thenReturn(camOpsReputation);
 
@@ -1635,7 +1636,7 @@ public class ContractMarketAtBGenerationTests {
         when(campaign.getLocalDate()).thenReturn(LocalDate.ofYearDay(gameYear, 1));
         when(campaign.getGameYear()).thenReturn(gameYear);
 
-        mekhq.campaign.camOpsReputation.ForceReputationController camOpsReputation = mock(mekhq.campaign.camOpsReputation.ForceReputationController.class);
+        ForceReputationController camOpsReputation = mock(ForceReputationController.class);
         when(camOpsReputation.getReputationFactor()).thenReturn(0.0);
         when(campaign.getPlayerForce().getReputation()).thenReturn(camOpsReputation);
 
@@ -1742,7 +1743,7 @@ public class ContractMarketAtBGenerationTests {
         when(campaign.getLocalDate()).thenReturn(LocalDate.ofYearDay(gameYear, 1));
         when(campaign.getGameYear()).thenReturn(gameYear);
 
-        mekhq.campaign.camOpsReputation.ForceReputationController camOpsReputation = mock(mekhq.campaign.camOpsReputation.ForceReputationController.class);
+        ForceReputationController camOpsReputation = mock(ForceReputationController.class);
         when(camOpsReputation.getReputationFactor()).thenReturn(0.0);
         when(campaign.getPlayerForce().getReputation()).thenReturn(camOpsReputation);
 
@@ -1850,7 +1851,7 @@ public class ContractMarketAtBGenerationTests {
         when(campaign.getLocalDate()).thenReturn(LocalDate.ofYearDay(gameYear, 1));
         when(campaign.getGameYear()).thenReturn(gameYear);
 
-        mekhq.campaign.camOpsReputation.ForceReputationController camOpsReputation = mock(mekhq.campaign.camOpsReputation.ForceReputationController.class);
+        ForceReputationController camOpsReputation = mock(ForceReputationController.class);
         when(camOpsReputation.getReputationFactor()).thenReturn(0.0);
         when(campaign.getPlayerForce().getReputation()).thenReturn(camOpsReputation);
 

@@ -108,7 +108,7 @@ public class PartsTableMouseAdapter extends JPopupMenuAdapter {
             if (null != selectedPart) {
                 PopupValueChoiceDialog popupValueChoiceDialog = getPopupValueChoiceDialog(selectedPart,
                       "Sell How Many ");
-                if (popupValueChoiceDialog.getValue() < 0) {
+                if (popupValueChoiceDialog.wasCanceled()) {
                     return;
                 }
                 int q = popupValueChoiceDialog.getValue();
@@ -146,7 +146,7 @@ public class PartsTableMouseAdapter extends JPopupMenuAdapter {
         } else if (command.equalsIgnoreCase("REMOVE_N")) {
             if (null != selectedPart) {
                 PopupValueChoiceDialog dialog = getPopupValueChoiceDialog(selectedPart, "Remove How Many ");
-                if (dialog.getValue() < 0) {
+                if (dialog.wasCanceled()) {
                     return;
                 }
                 int quantity = dialog.getValue();
@@ -154,18 +154,18 @@ public class PartsTableMouseAdapter extends JPopupMenuAdapter {
             }
         } else if (command.equalsIgnoreCase("ADD_N")) {
             if (null != selectedPart) {
-                PopupValueChoiceDialog dialog = new PopupValueChoiceDialog(gui.getFrame(),
+                PopupValueChoiceDialog addQuantityDialog = new PopupValueChoiceDialog(gui.getFrame(),
                       true,
                       "Add How Many " + selectedPart.getName() + "s?",
                       0,
                       0,
                       9999999);
-                dialog.setVisible(true);
-                if (dialog.getValue() < 0) {
+                addQuantityDialog.setVisible(true);
+                if (addQuantityDialog.wasCanceled()) {
                     return;
                 }
 
-                int quantity = dialog.getValue();
+                int quantity = addQuantityDialog.getValue();
                 Part clonedPart = selectedPart.clone();
 
                 if (selectedPart instanceof AmmoStorage) {
@@ -241,7 +241,7 @@ public class PartsTableMouseAdapter extends JPopupMenuAdapter {
                       1,
                       n);
                 popupValueChoiceDialog.setVisible(true);
-                if (popupValueChoiceDialog.getValue() < 0) {
+                if (popupValueChoiceDialog.wasCanceled()) {
                     return;
                 }
                 int q = popupValueChoiceDialog.getValue();
@@ -264,7 +264,7 @@ public class PartsTableMouseAdapter extends JPopupMenuAdapter {
                       1,
                       1);
                 popupValueChoiceDialog.setVisible(true);
-                if (popupValueChoiceDialog.getValue() < 1) {
+                if (popupValueChoiceDialog.wasCanceled()) {
                     return;
                 }
                 int q = popupValueChoiceDialog.getValue();

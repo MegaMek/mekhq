@@ -236,6 +236,10 @@ public class OptimizeInfirmaryAssignments {
      * @return the experience level of the doctor
      */
     private int getDoctorExperienceLevel(Person doctor) {
-        return doctor.getExperienceLevel(campaign, doctor.getSecondaryRole().isDoctor());
+        return doctor.getExperienceLevel(campaign.getCampaignOptions(),
+              campaign.getPlayerForce().isClanForce(),
+              campaign.getLocalDate(),
+              doctor.getSecondaryRole().isDoctor(),
+              false);
     }
 }
