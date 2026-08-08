@@ -56,6 +56,7 @@ import static mekhq.campaign.log.LogEntryType.PERFORMANCE;
 import static mekhq.campaign.personnel.PersonnelOptions.*;
 import static mekhq.campaign.personnel.education.EducationController.getAcademy;
 import static mekhq.campaign.personnel.enums.BloodGroup.getRandomBloodGroup;
+import static mekhq.campaign.personnel.familiarity.Familiarity.FAMILIARITY_THREE_HUNDRED;
 import static mekhq.campaign.personnel.medical.BodyLocation.GENERIC;
 import static mekhq.campaign.personnel.medical.BodyLocation.INTERNAL;
 import static mekhq.campaign.personnel.medical.advancedMedicalAlternate.AdvancedMedicalAlternate.getAllActiveInjuryEffects;
@@ -134,6 +135,7 @@ import mekhq.campaign.personnel.education.Academy;
 import mekhq.campaign.personnel.enums.*;
 import mekhq.campaign.personnel.enums.education.EducationLevel;
 import mekhq.campaign.personnel.enums.education.EducationStage;
+import mekhq.campaign.personnel.familiarity.Familiarity;
 import mekhq.campaign.personnel.familyTree.Genealogy;
 import mekhq.campaign.personnel.generator.DefaultPersonnelGenerator;
 import mekhq.campaign.personnel.generator.SingleSpecialAbilityGenerator;
@@ -383,6 +385,10 @@ public class Person implements ILocatable {
     private double trainingForceEducationTime;
     // endregion Education
 
+    // region Chassis Familiarity
+    private Map<String, Integer> chassisFamiliarity;
+    // endregion Chassis Familiarity
+
     // region Personality
     private Aggression aggression;
     private int aggressionDescriptionIndex;
@@ -592,6 +598,7 @@ public class Person implements ILocatable {
         skills = new Skills();
         options = new PersonnelOptions();
         techUnits = new ArrayList<>();
+        chassisFamiliarity = new HashMap<>();
         personnelLog = new ArrayList<>();
         medicalLog = new ArrayList<>();
         patientLog = new ArrayList<>();
@@ -3752,6 +3759,17 @@ public class Person implements ILocatable {
                 MHQXMLUtility.writeSimpleXMLCloseTag(pw, --indent, "canonDiseaseInoculations");
             }
 
+            if (!chassisFamiliarity.isEmpty()) {
+                MHQXMLUtility.writeSimpleXMLOpenTag(pw, indent++, "chassisFamiliarity");
+                for (Map.Entry<String, Integer> entry : chassisFamiliarity.entrySet()) {
+                    MHQXMLUtility.writeSimpleXMLOpenTag(pw, indent++, "familiarity");
+                    MHQXMLUtility.writeSimpleXMLTag(pw, indent, "chassis", entry.getKey());
+                    MHQXMLUtility.writeSimpleXMLTag(pw, indent, "value", entry.getValue());
+                    MHQXMLUtility.writeSimpleXMLCloseTag(pw, --indent, "familiarity");
+                }
+                MHQXMLUtility.writeSimpleXMLCloseTag(pw, --indent, "chassisFamiliarity");
+            }
+
             if (originalUnitWeight != EntityWeightClass.WEIGHT_ULTRA_LIGHT) {
                 MHQXMLUtility.writeSimpleXMLTag(pw, indent, "originalUnitWeight", originalUnitWeight);
             }
@@ -4452,6 +4470,29 @@ public class Person implements ILocatable {
                         }
                         person.canonDiseaseInoculations.add(wn3.getTextContent());
                     }
+                } else if (nodeName.equalsIgnoreCase("chassisFamiliarity")) {
+                    NodeList nl2 = wn2.getChildNodes();
+                    for (int y = 0; y < nl2.getLength(); y++) {
+                        Node wn3 = nl2.item(y);
+                        if ((wn3.getNodeType() != Node.ELEMENT_NODE)
+                                  || !wn3.getNodeName().equalsIgnoreCase("familiarity")) {
+                            continue;
+                        }
+                        String chassis = null;
+                        int value = 0;
+                        NodeList nl3 = wn3.getChildNodes();
+                        for (int z = 0; z < nl3.getLength(); z++) {
+                            Node wn4 = nl3.item(z);
+                            if (wn4.getNodeName().equalsIgnoreCase("chassis")) {
+                                chassis = wn4.getTextContent().trim();
+                            } else if (wn4.getNodeName().equalsIgnoreCase("value")) {
+                                value = MathUtility.parseInt(wn4.getTextContent().trim());
+                            }
+                        }
+                        if ((chassis != null) && !chassis.isBlank() && (value > 0)) {
+                            person.chassisFamiliarity.put(chassis, Math.min(value, FAMILIARITY_THREE_HUNDRED));
+                        }
+                    }
                 } else if (nodeName.equalsIgnoreCase("originalUnitWeight")) {
                     person.originalUnitWeight = MathUtility.parseInt(wn2.getTextContent().trim());
                 } else if (nodeName.equalsIgnoreCase("originalUnitTech")) {
@@ -4828,7 +4869,7 @@ public class Person implements ILocatable {
             case VEHICLE_GUNNER, VEHICLE_CREW, COMBAT_TECHNICIAN -> {
                 // Vehicle gunners need special handling to guesstimate what they should be. We base this on the unit
                 // they are currently assigned to.
-                Entity assignedEntity = person.getEntity();
+                Entity assignedEntity = person.getEntityFromUnit();
                 if (assignedEntity != null) {
                     if (assignedEntity instanceof VTOL) {
                         newProfession = PersonnelRole.VEHICLE_CREW_VTOL;
@@ -6662,7 +6703,7 @@ public class Person implements ILocatable {
         return unit;
     }
 
-    public @Nullable Entity getEntity() {
+    public @Nullable Entity getEntityFromUnit() {
         if (unit == null) {
             return null;
         }
@@ -6693,6 +6734,92 @@ public class Person implements ILocatable {
     public List<Unit> getTechUnits() {
         return Collections.unmodifiableList(techUnits);
     }
+
+    // region Chassis Familiarity
+
+    /**
+     * @return an unmodifiable view of this character's accrued familiarity, keyed by (base) chassis name
+     */
+    public Map<String, Integer> getChassisFamiliarity() {
+        return Collections.unmodifiableMap(chassisFamiliarity);
+    }
+
+    /**
+     * @param chassis the base chassis name (e.g. {@code "Hunchback"})
+     *
+     * @return the character's current familiarity with that chassis (0 if none)
+     */
+    public int getChassisFamiliarity(final String chassis) {
+        return chassisFamiliarity.getOrDefault(chassis, 0);
+    }
+
+    /**
+     * Adds (or, with a negative amount, subtracts) familiarity for the given chassis, clamping the result to the range
+     * {@code 0..cap}. Blank chassis names and no-op amounts are ignored. The cap is supplied by the caller from the
+     * active {@link Familiarity}.
+     *
+     * @param chassis the base chassis name
+     * @param amount  the amount of familiarity to add
+     * @param cap     the maximum familiarity permitted under the active mode
+     */
+    public void addChassisFamiliarity(final String chassis, final int amount, final int cap) {
+        if ((chassis == null) || chassis.isBlank() || (amount == 0)) {
+            return;
+        }
+        int updated = Math.clamp(getChassisFamiliarity(chassis) + amount, 0, cap);
+        if (updated == 0) {
+            chassisFamiliarity.remove(chassis);
+        } else {
+            chassisFamiliarity.put(chassis, updated);
+        }
+    }
+
+    /**
+     * Sets the character's familiarity with the given chassis to an absolute value, clamped to
+     * {@code 0..}{@link Familiarity#FAMILIARITY_THREE_HUNDRED}; a value of 0 removes the entry. Intended for GM
+     * editing.
+     *
+     * @param chassis the base chassis name
+     * @param value   the familiarity value to set
+     */
+    public void setChassisFamiliarity(final String chassis, final int value) {
+        if ((chassis == null) || chassis.isBlank()) {
+            return;
+        }
+        int clamped = Math.clamp(value, 0, FAMILIARITY_THREE_HUNDRED);
+        if (clamped == 0) {
+            chassisFamiliarity.remove(chassis);
+        } else {
+            chassisFamiliarity.put(chassis, clamped);
+        }
+    }
+
+    public int getChassisFamiliarityCombatBonus(Familiarity mode, boolean isGunnery) {
+        Entity entity = getEntityFromUnit();
+        if (!mode.isEnabled() ||
+                  entity == null ||
+                  !entity.isChassisFamiliarityEligible()) {
+            return 0;
+        }
+
+        String chassis = entity.getChassis();
+        int familiarity = getChassisFamiliarity(chassis);
+        return isGunnery ? mode.getGunneryRepairBonus(familiarity) : mode.getPilotingMaintenanceBonus(familiarity);
+    }
+
+    public int getChassisFamiliarityTechBonus(Familiarity mode, @Nullable Entity entity, boolean isRepair) {
+        if (!mode.isEnabled() ||
+                  entity == null ||
+                  !entity.isChassisFamiliarityEligible()) {
+            return 0;
+        }
+
+        String chassis = entity.getChassis();
+        int familiarity = getChassisFamiliarity(chassis);
+        return isRepair ? mode.getGunneryRepairBonus(familiarity) : mode.getPilotingMaintenanceBonus(familiarity);
+    }
+
+    // endregion Chassis Familiarity
 
     public void removeAllTechJobs(final Campaign campaign) {
         campaign.getPlayerForce().getHangar().forEachUnit(u -> {

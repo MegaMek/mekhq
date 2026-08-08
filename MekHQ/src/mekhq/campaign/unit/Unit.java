@@ -107,6 +107,7 @@ import mekhq.MHQStaticDirectoryManager;
 import mekhq.MekHQ;
 import mekhq.Utilities;
 import mekhq.campaign.Campaign;
+import mekhq.campaign.campaignOptions.CampaignOption;
 import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.enums.CampaignTransportType;
 import mekhq.campaign.events.persons.PersonCrewAssignmentEvent;
@@ -149,6 +150,7 @@ import mekhq.campaign.parts.protomeks.ProtoMekSensor;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.PersonnelOptions;
 import mekhq.campaign.personnel.enums.PersonnelRole;
+import mekhq.campaign.personnel.familiarity.Familiarity;
 import mekhq.campaign.personnel.skills.InfantryGunnerySkills;
 import mekhq.campaign.personnel.skills.Skill;
 import mekhq.campaign.personnel.skills.SkillModifierData;
@@ -5303,6 +5305,9 @@ public class Unit implements ITechnology, ILocatable {
         boolean entityIsConventionalInfantry = entity.isConventionalInfantry();
         boolean isTank = entity instanceof Tank; // Includes Wet Naval and VTOLs
 
+        Familiarity familiarity = getCampaign().getCampaignOptions()
+                                        .get(CampaignOption.CHASSIS_FAMILIARITY_MODE);
+
         // For certain entities both drivers and gunners contribute to gunnery & piloting
         List<Person> relevantCrew = getCompositeCrew(isTank || entityIsConventionalInfantry, true);
         for (Person person : relevantCrew) {
@@ -5311,10 +5316,12 @@ public class Unit implements ITechnology, ILocatable {
             }
 
             SkillModifierData skillModifierData = person.getSkillModifierData();
+            int familiarityBonusPiloting = person.getChassisFamiliarityCombatBonus(familiarity, false);
+            int familiarityBonusGunnery = person.getChassisFamiliarityCombatBonus(familiarity, true);
 
             if (person.hasSkill(driveType)) {
                 sumPiloting += person.getSkill(driveType)
-                                     .getFinalSkillValue(skillModifierData, entity.getWeightClass());
+                                     .getFinalSkillValue(skillModifierData, familiarityBonusPiloting);
                 nDrivers++;
             } else if (entity instanceof Infantry) {
                 // For infantry, we need to assign an 8 if they have no anti-mek skill
@@ -5323,7 +5330,8 @@ public class Unit implements ITechnology, ILocatable {
             }
 
             if (entity instanceof Tank && Compute.getFullCrewSize(entity) == 1 && person.hasSkill(gunType)) {
-                sumGunnery += person.getSkill(gunType).getFinalSkillValue(skillModifierData, entity.getWeightClass());
+                sumGunnery += person.getSkill(gunType)
+                                    .getFinalSkillValue(skillModifierData, familiarityBonusGunnery);
                 nGunners++;
             }
             if (getCampaign().getCampaignOptions().isUseAdvancedMedical()) {
@@ -5339,6 +5347,7 @@ public class Unit implements ITechnology, ILocatable {
             }
 
             SkillModifierData skillModifierData = person.getSkillModifierData();
+            int familiarityBonusGunnery = person.getChassisFamiliarityCombatBonus(familiarity, true);
 
             String tempGunType = gunType;
             if (entityIsConventionalInfantry) {
@@ -5350,12 +5359,14 @@ public class Unit implements ITechnology, ILocatable {
 
             if (person.hasSkill(tempGunType)) {
                 sumGunnery += person.getSkill(tempGunType)
-                                    .getFinalSkillValue(skillModifierData, entity.getWeightClass());
+                                    .getFinalSkillValue(skillModifierData, familiarityBonusGunnery);
                 nGunners++;
             }
             if (person.hasSkill(SkillType.S_ARTILLERY) &&
-                      person.getSkill(SkillType.S_ARTILLERY).getFinalSkillValue(skillModifierData) < artillery) {
-                artillery = person.getSkill(SkillType.S_ARTILLERY).getFinalSkillValue(skillModifierData);
+                      person.getSkill(SkillType.S_ARTILLERY)
+                            .getFinalSkillValue(skillModifierData, familiarityBonusGunnery) < artillery) {
+                artillery = person.getSkill(SkillType.S_ARTILLERY)
+                                  .getFinalSkillValue(skillModifierData, familiarityBonusGunnery);
             }
             if (getCampaign().getCampaignOptions().isUseAdvancedMedical()) {
                 sumGunnery += person.getInjuryModifiers(false);
@@ -5389,10 +5400,13 @@ public class Unit implements ITechnology, ILocatable {
 
         if (isOnlyCommandersMatter && getCommander() != null) {
             SkillModifierData skillModifierData = getCommander().getSkillModifierData();
+            int familiarityBonusPiloting = getCommander().getChassisFamiliarityCombatBonus(familiarity, false);
+            int familiarityBonusGunnery = getCommander().getChassisFamiliarityCombatBonus(familiarity, true);
 
             Skill drivingSkill = getCommander().getSkill(driveType);
-            piloting = drivingSkill == null ? 13
-                             : drivingSkill.getFinalSkillValue(skillModifierData, entity.getWeightClass());
+            piloting = drivingSkill == null ?
+                             13 :
+                             drivingSkill.getFinalSkillValue(skillModifierData, familiarityBonusPiloting);
             if (entity instanceof Infantry && drivingSkill == null) {
                 piloting = 8;
             }
@@ -5406,8 +5420,15 @@ public class Unit implements ITechnology, ILocatable {
             }
 
             Skill gunnerySkill = getCommander().getSkill(tempGunType);
-            gunnery = gunnerySkill == null ? 13
-                            : gunnerySkill.getFinalSkillValue(skillModifierData, entity.getWeightClass());
+            gunnery = gunnerySkill == null ?
+                            13 :
+                            gunnerySkill.getFinalSkillValue(skillModifierData, familiarityBonusGunnery);
+
+
+            if (getCommander().hasSkill(SkillType.S_ARTILLERY)) {
+                artillery = getCommander().getSkill(SkillType.S_ARTILLERY)
+                                  .getFinalSkillValue(skillModifierData, familiarityBonusGunnery);
+            }
         }
 
         if (entity instanceof Infantry) {
@@ -5621,6 +5642,10 @@ public class Unit implements ITechnology, ILocatable {
         }
 
         SkillModifierData skillModifierData = pilot.getSkillModifierData();
+        Familiarity familiarity = getCampaign().getCampaignOptions()
+                                        .get(CampaignOption.CHASSIS_FAMILIARITY_MODE);
+        int familiarityBonusPiloting = pilot.getChassisFamiliarityCombatBonus(familiarity, false);
+        int familiarityBonusGunnery = pilot.getChassisFamiliarityCombatBonus(familiarity, true);
 
         int pilotingMek = 13;
         int gunneryMek = 13;
@@ -5629,19 +5654,24 @@ public class Unit implements ITechnology, ILocatable {
         int artillery = 13;
 
         if (pilot.hasSkill(SkillType.S_PILOT_MEK)) {
-            pilotingMek = pilot.getSkill(SkillType.S_PILOT_MEK).getFinalSkillValue(skillModifierData);
+            pilotingMek = pilot.getSkill(SkillType.S_PILOT_MEK)
+                                .getFinalSkillValue(skillModifierData, familiarityBonusPiloting);
         }
         if (pilot.hasSkill(SkillType.S_GUN_MEK)) {
-            gunneryMek = pilot.getSkill(SkillType.S_GUN_MEK).getFinalSkillValue(skillModifierData);
+            gunneryMek = pilot.getSkill(SkillType.S_GUN_MEK)
+                               .getFinalSkillValue(skillModifierData, familiarityBonusGunnery);
         }
         if (pilot.hasSkill(SkillType.S_PILOT_AERO)) {
-            pilotingAero = pilot.getSkill(SkillType.S_PILOT_AERO).getFinalSkillValue(skillModifierData);
+            pilotingAero = pilot.getSkill(SkillType.S_PILOT_AERO)
+                                 .getFinalSkillValue(skillModifierData, familiarityBonusPiloting);
         }
         if (pilot.hasSkill(SkillType.S_GUN_AERO)) {
-            gunneryAero = pilot.getSkill(SkillType.S_GUN_AERO).getFinalSkillValue(skillModifierData);
+            gunneryAero = pilot.getSkill(SkillType.S_GUN_AERO)
+                                .getFinalSkillValue(skillModifierData, familiarityBonusGunnery);
         }
         if (pilot.hasSkill(SkillType.S_ARTILLERY)) {
-            artillery = pilot.getSkill(SkillType.S_ARTILLERY).getFinalSkillValue(skillModifierData);
+            artillery = pilot.getSkill(SkillType.S_ARTILLERY)
+                              .getFinalSkillValue(skillModifierData, familiarityBonusGunnery);
         }
 
         if (getCampaign().getCampaignOptions().isUseAdvancedMedical()) {
@@ -5667,6 +5697,11 @@ public class Unit implements ITechnology, ILocatable {
     private void assignToCrewSlot(Person person, int slot, String gunType, String driveType) {
         SkillModifierData skillModifierData = person.getSkillModifierData();
 
+        Familiarity familiarity = getCampaign().getCampaignOptions()
+                                        .get(CampaignOption.CHASSIS_FAMILIARITY_MODE);
+        int familiarityBonusPiloting = person.getChassisFamiliarityCombatBonus(familiarity, false);
+        int familiarityBonusGunnery = person.getChassisFamiliarityCombatBonus(familiarity, true);
+
         entity.getCrew().setName(person.getFullTitle(), slot);
         entity.getCrew().setNickname(person.getCallsign(), slot);
         entity.getCrew().setGender(person.getGender(), slot);
@@ -5677,17 +5712,21 @@ public class Unit implements ITechnology, ILocatable {
         int artillery = 7;
         int piloting = 8;
         if (person.hasSkill(gunType)) {
-            gunnery = person.getSkill(gunType).getFinalSkillValue(skillModifierData, entity.getWeightClass());
+            gunnery = person.getSkill(gunType)
+                            .getFinalSkillValue(skillModifierData, familiarityBonusGunnery);
         }
         if (getCampaign().getCampaignOptions().isUseAdvancedMedical()) {
             gunnery += person.getInjuryModifiers(false);
         }
         if (person.hasSkill(driveType)) {
-            piloting = person.getSkill(driveType).getFinalSkillValue(skillModifierData, entity.getWeightClass());
+            piloting = person.getSkill(driveType)
+                             .getFinalSkillValue(skillModifierData, familiarityBonusPiloting);
         }
         if (person.hasSkill(SkillType.S_ARTILLERY) &&
-                  person.getSkill(SkillType.S_ARTILLERY).getFinalSkillValue(skillModifierData) < artillery) {
-            artillery = person.getSkill(SkillType.S_ARTILLERY).getFinalSkillValue(skillModifierData);
+                  person.getSkill(SkillType.S_ARTILLERY)
+                        .getFinalSkillValue(skillModifierData, familiarityBonusGunnery) < artillery) {
+            artillery = person.getSkill(SkillType.S_ARTILLERY)
+                              .getFinalSkillValue(skillModifierData, familiarityBonusGunnery);
         }
         entity.getCrew().setPiloting(Math.clamp(piloting, 0, 8), slot);
         entity.getCrew().setGunnery(Math.clamp(gunnery, 0, 8), slot);

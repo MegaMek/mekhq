@@ -56,15 +56,18 @@ import java.util.stream.Collectors;
 
 import megamek.common.options.OptionsConstants;
 import megamek.common.rolls.TargetRoll;
+import megamek.common.units.Entity;
 import megamek.logging.MMLogger;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
+import mekhq.campaign.campaignOptions.CampaignOption;
 import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.finances.enums.TransactionType;
 import mekhq.campaign.location.LocationUtils;
 import mekhq.campaign.parts.Part;
 import mekhq.campaign.parts.enums.PartQuality;
 import mekhq.campaign.personnel.Person;
+import mekhq.campaign.personnel.familiarity.Familiarity;
 import mekhq.campaign.personnel.skills.Skill;
 import mekhq.campaign.personnel.skills.SkillModifierData;
 import mekhq.campaign.universe.Atmosphere;
@@ -432,11 +435,23 @@ public class Maintenance {
 
         target.append(partWork.getAllModsForMaintenance());
 
+        Familiarity familiarity = campaignOptions.get(CampaignOption.CHASSIS_FAMILIARITY_MODE);
+        Unit partUnit = partWork.getUnit();
+        if (familiarity.isEnabled() && tech != null && partUnit != null) {
+            Entity partEntity = partUnit.getEntity();
+            if (partEntity != null) {
+                int bonus = tech.getChassisFamiliarityTechBonus(familiarity, partEntity, false);
+                if (bonus != 0) {
+                    target.addModifier(-bonus, "Chassis Familiarity");
+                }
+            }
+        }
+
         if (campaignOptions.isUseEraMods()) {
             target.addModifier(campaign.getFaction().getEraMod(campaign.getGameYear()), "era");
         }
 
-        if (partWork.getUnit().getSite() < SITE_FACILITY_BASIC) {
+        if (partUnit != null && partUnit.getSite() < SITE_FACILITY_BASIC) {
             if (campaign.getPlayerForce().getForceDetachment().getCurrentLocation().isOnPlanet() &&
                       campaignOptions.isUsePlanetaryModifiers()) {
                 Planet planet = campaign.getPlayerForce().getForceDetachment().getCurrentLocation().getPlanet();
@@ -480,7 +495,7 @@ public class Maintenance {
             }
         }
 
-        if (null != partWork.getUnit() && null != tech) {
+        if (tech != null && partUnit != null) {
             // the AsTech issue is crazy, because you can actually be better off
             // not maintaining
             // than going it short-handed, but that is just the way it is.
@@ -488,8 +503,8 @@ public class Maintenance {
             // short AsTechs
             // for part of the cycle.
             final int helpMod;
-            if (partWork.getUnit().isSelfCrewed()) {
-                helpMod = campaign.getShorthandedModForCrews(partWork.getUnit().getEntity().getCrew());
+            if (partUnit.isSelfCrewed()) {
+                helpMod = campaign.getShorthandedModForCrews(partUnit.getEntity().getCrew());
             } else {
                 helpMod = campaign.getShorthandedMod(asTechsUsed, false);
             }
@@ -500,8 +515,8 @@ public class Maintenance {
 
             // like repairs, per CamOps page 208 extra time gives a
             // reduction to the TN based on x2, x3, x4
-            if (partWork.getUnit().getMaintenanceMultiplier() > 1) {
-                target.addModifier(-(partWork.getUnit().getMaintenanceMultiplier() - 1), "extra time");
+            if (partUnit.getMaintenanceMultiplier() > 1) {
+                target.addModifier(-(partUnit.getMaintenanceMultiplier() - 1), "extra time");
             }
         }
 

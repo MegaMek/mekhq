@@ -63,6 +63,7 @@ import megamek.common.units.Entity;
 import megamek.common.units.UnitType;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.CurrentLocation;
+import mekhq.campaign.campaignOptions.CampaignOption;
 import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.digitalGM.stratCon.StratConContractDefinition.StrategicObjectiveType;
 import mekhq.campaign.digitalGM.stratCon.facility.StratConFacility;
@@ -79,6 +80,7 @@ import mekhq.campaign.mission.enums.CombatRole;
 import mekhq.campaign.mission.enums.ScenarioType;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.PersonnelOptions;
+import mekhq.campaign.personnel.familiarity.Familiarity;
 import mekhq.campaign.personnel.skills.ScoutingSkills;
 import mekhq.campaign.personnel.skills.Skill;
 import mekhq.campaign.personnel.skills.SkillCheck;
@@ -312,6 +314,7 @@ class StratConRulesManagerTest {
         Campaign campaign = MHQTestUtilities.mockCampaign();
         CampaignOptions options = mock(CampaignOptions.class);
         when(campaign.getCampaignOptions()).thenReturn(options);
+        when(options.get(CampaignOption.CHASSIS_FAMILIARITY_MODE)).thenReturn(Familiarity.DISABLED);
 
         AtBContract contract = mock(AtBContract.class);
         StratConTrackState track = mock(StratConTrackState.class);
@@ -359,6 +362,7 @@ class StratConRulesManagerTest {
         Campaign campaign = MHQTestUtilities.mockCampaign();
         CampaignOptions options = mock(CampaignOptions.class);
         when(campaign.getCampaignOptions()).thenReturn(options);
+        when(options.get(CampaignOption.CHASSIS_FAMILIARITY_MODE)).thenReturn(Familiarity.DISABLED);
 
         AtBContract contract = mock(AtBContract.class);
         StratConTrackState track = mock(StratConTrackState.class);
@@ -411,6 +415,7 @@ class StratConRulesManagerTest {
         Campaign campaign = MHQTestUtilities.mockCampaign();
         CampaignOptions options = mock(CampaignOptions.class);
         when(campaign.getCampaignOptions()).thenReturn(options);
+        when(options.get(CampaignOption.CHASSIS_FAMILIARITY_MODE)).thenReturn(Familiarity.DISABLED);
 
         AtBContract contract = mock(AtBContract.class);
         StratConTrackState track = mock(StratConTrackState.class);
@@ -715,6 +720,7 @@ class StratConRulesManagerTest {
         Campaign campaign = MHQTestUtilities.mockCampaign();
         CampaignOptions options = mock(CampaignOptions.class);
         when(campaign.getCampaignOptions()).thenReturn(options);
+        when(options.get(CampaignOption.CHASSIS_FAMILIARITY_MODE)).thenReturn(Familiarity.DISABLED);
 
         AtBContract contract = mock(AtBContract.class);
         StratConTrackState track = mock(StratConTrackState.class);

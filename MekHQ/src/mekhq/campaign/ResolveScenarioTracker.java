@@ -68,6 +68,7 @@ import megamek.logging.MMLogger;
 import mekhq.MHQConstants;
 import mekhq.MekHQ;
 import mekhq.Utilities;
+import mekhq.campaign.campaignOptions.CampaignOption;
 import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.events.persons.PersonBattleFinishedEvent;
 import mekhq.campaign.finances.Money;
@@ -87,6 +88,8 @@ import mekhq.campaign.parts.Part;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.enums.PersonnelRole;
 import mekhq.campaign.personnel.enums.PersonnelStatus;
+import mekhq.campaign.personnel.familiarity.Familiarity;
+import mekhq.campaign.personnel.familiarity.FamiliarityGainType;
 import mekhq.campaign.personnel.medical.InjurySPAUtility;
 import mekhq.campaign.personnel.turnoverAndRetention.Fatigue;
 import mekhq.campaign.randomEvents.prisoners.CapturePrisoners;
@@ -1843,6 +1846,12 @@ public class ResolveScenarioTracker {
             }
         }
 
+        Familiarity familiarity = campaignOptions.get(CampaignOption.CHASSIS_FAMILIARITY_MODE);
+        int familiarityDice = campaignOptions.get(CampaignOption.CHASSIS_FAMILIARITY_SPEED);
+        if (familiarity.isEnabled()) {
+            processFamiliarity(familiarityDice, familiarity);
+        }
+
         // Process payouts for killed temp crew (blob crew)
         if (!killedTempCrew.isEmpty()) {
             processTempCrewDeathPayouts();
@@ -2017,6 +2026,18 @@ public class ResolveScenarioTracker {
         campaign.refreshNetworks();
         scenario.setDate(campaign.getLocalDate());
         client = null;
+    }
+
+    private void processFamiliarity(int familiaritySpeed, Familiarity familiarity) {
+        // Techs gaining familiarity even if the unit is undamaged is intentional. I opted not to have techs gain
+        // familiarity when repairing or maintaining directly because otherwise tech familiarity gain would skyrocket
+        // - Illiani Aug/1/26
+        int cap = familiarity.getFamiliarityCap();
+        if (familiaritySpeed > 0) {
+            for (Unit unit : units) {
+                Familiarity.assignFamiliarity(campaign, unit, cap, familiaritySpeed, FamiliarityGainType.D6);
+            }
+        }
     }
 
     @Deprecated(since = "0.51.0", forRemoval = true)

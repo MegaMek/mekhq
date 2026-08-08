@@ -33,12 +33,12 @@
 package mekhq.gui.campaignOptions.contents;
 
 import static megamek.client.ui.WrapLayout.wordWrap;
+import static mekhq.campaign.personnel.skills.Attributes.MAXIMUM_ATTRIBUTE_SCORE;
 import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.LEGACY_RULE_BEFORE_METADATA;
 import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.MILESTONE_BEFORE_METADATA;
 import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.createTipPanelUpdater;
 import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.getImageDirectory;
 import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.getMetadata;
-import static mekhq.campaign.personnel.skills.Attributes.MAXIMUM_ATTRIBUTE_SCORE;
 
 import java.awt.Component;
 import javax.swing.DefaultListCellRenderer;
@@ -55,6 +55,7 @@ import megamek.client.ui.comboBoxes.MMComboBox;
 import megamek.client.ui.settings.SettingsFormPanel;
 import mekhq.campaign.campaignOptions.CampaignOption;
 import mekhq.campaign.personnel.enums.EdgeRefreshPeriod;
+import mekhq.campaign.personnel.familiarity.Familiarity;
 import mekhq.gui.campaignOptions.CampaignOptionFlag;
 import mekhq.gui.campaignOptions.components.CampaignOptionsCheckBox;
 import mekhq.gui.campaignOptions.components.CampaignOptionsHeaderPanel;
@@ -114,6 +115,11 @@ class PersonnelGeneralPage {
     private JCheckBox chkUseBlobVesselGunner;
     private JCheckBox chkUseBlobVesselCrew;
 
+    private JLabel lblChassisFamiliarityMode;
+    private MMComboBox<Familiarity> comboChassisFamiliarityMode;
+    private JLabel lblchassisFamiliaritySpeed;
+    private JSpinner spnchassisFamiliaritySpeed;
+
     private boolean created;
 
     /**
@@ -135,6 +141,7 @@ class PersonnelGeneralPage {
         JPanel pnlPersonnelCleanup = createPersonnelCleanUpPanel();
         JPanel pnlAdministrators = createAdministratorsPanel();
         JPanel pnlBlobCrew = createBlobCrewPanel();
+        JPanel familiarityPanel = createChassisFamiliarityPanel();
         JPanel panel = CampaignOptionsPagePanel.builder("PersonnelGeneralPage", "PersonnelGeneralPage", imageAddress)
                              .header(generalHeader)
                              .quote("personnelGeneralPage")
@@ -153,10 +160,50 @@ class PersonnelGeneralPage {
                                    "lblBlobCrewPanel.summary",
                                    pnlBlobCrew,
                                    getMetadata(new Version(0, 50, 12)))
+                             .section("lblChassisFamiliarityPanel.text",
+                                   "lblChassisFamiliarityPanel.summary",
+                                   familiarityPanel,
+                                   getMetadata(new Version(0, 51, 1),
+                                         CampaignOptionFlag.CUSTOM_SYSTEM,
+                                         CampaignOptionFlag.DOCUMENTED))
                              .build();
 
         created = true;
         readFromModel(model);
+
+        return panel;
+    }
+
+    private JPanel createChassisFamiliarityPanel() {
+        lblChassisFamiliarityMode = new CampaignOptionsLabel("ChassisFamiliarityMode",
+              getMetadata(new Version(0, 51, 1), CampaignOptionFlag.CUSTOM_SYSTEM, CampaignOptionFlag.DOCUMENTED));
+        lblChassisFamiliarityMode.addMouseListener(createTipPanelUpdater("ChassisFamiliarityMode"));
+        comboChassisFamiliarityMode = new MMComboBox<>("comboChassisFamiliarityMode", Familiarity.values());
+        comboChassisFamiliarityMode.setRenderer(new DefaultListCellRenderer() {
+            @Override
+            public Component getListCellRendererComponent(final JList<?> list, final Object value, final int index,
+                  final boolean isSelected, final boolean cellHasFocus) {
+                super.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);
+                if (value instanceof Familiarity) {
+                    list.setToolTipText(wordWrap(((Familiarity) value).getTooltip()));
+                }
+                return this;
+            }
+        });
+        comboChassisFamiliarityMode.addMouseListener(createTipPanelUpdater("ChassisFamiliarityMode"));
+
+        lblchassisFamiliaritySpeed = new CampaignOptionsLabel("chassisFamiliaritySpeed",
+              getMetadata(new Version(0, 51, 1), CampaignOptionFlag.CUSTOM_SYSTEM, CampaignOptionFlag.RECOMMENDED));
+        lblchassisFamiliaritySpeed.addMouseListener(createTipPanelUpdater("chassisFamiliaritySpeed"));
+        spnchassisFamiliaritySpeed = new CampaignOptionsSpinner("chassisFamiliaritySpeed",
+              1, 0, 20, 1);
+        spnchassisFamiliaritySpeed.addMouseListener(createTipPanelUpdater("chassisFamiliaritySpeed"));
+
+        final SettingsFormPanel panel = new SettingsFormPanel("ChassisFamiliarityPanel",
+              LABEL_COLUMN_WIDTH,
+              CONTROL_COLUMN_WIDTH);
+        panel.addRow(lblChassisFamiliarityMode, comboChassisFamiliarityMode);
+        panel.addRow(lblchassisFamiliaritySpeed, spnchassisFamiliaritySpeed);
 
         return panel;
     }
@@ -408,6 +455,8 @@ class PersonnelGeneralPage {
         chkUseBlobVesselPilot.setSelected(model.useBlobVesselPilot);
         chkUseBlobVesselGunner.setSelected(model.useBlobVesselGunner);
         chkUseBlobVesselCrew.setSelected(model.useBlobVesselCrew);
+        comboChassisFamiliarityMode.setSelectedItem(model.chassisFamiliarity);
+        spnchassisFamiliaritySpeed.setValue(model.chassisFamiliaritySpeed);
     }
 
     /**
@@ -452,5 +501,7 @@ class PersonnelGeneralPage {
         model.useBlobVesselPilot = chkUseBlobVesselPilot.isSelected();
         model.useBlobVesselGunner = chkUseBlobVesselGunner.isSelected();
         model.useBlobVesselCrew = chkUseBlobVesselCrew.isSelected();
+        model.chassisFamiliarity = comboChassisFamiliarityMode.getSelectedItem();
+        model.chassisFamiliaritySpeed = (int) spnchassisFamiliaritySpeed.getValue();
     }
 }
