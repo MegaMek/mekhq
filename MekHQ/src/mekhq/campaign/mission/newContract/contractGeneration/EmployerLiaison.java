@@ -46,7 +46,6 @@ import mekhq.campaign.Campaign;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.enums.PersonnelRole;
 import mekhq.campaign.personnel.ranks.AutoAssignRankForCompanyGenerator;
-import mekhq.campaign.universe.Faction;
 
 public class EmployerLiaison {
     private final static PersonnelRole PIRATE_LIAISON_ROLE = BROKER;
@@ -62,19 +61,20 @@ public class EmployerLiaison {
 
     private EmployerLiaison() {}
 
-    public static Person generateLiaison(Campaign campaign, ContractSearchType searchType, Faction employerFaction) {
-        PersonnelRole role = getLiaisonRole(searchType, employerFaction);
+    public static Person generateLiaison(Campaign campaign, ContractSearchType searchType, boolean employerIsClan,
+          String employerCode) {
+        PersonnelRole role = getLiaisonRole(searchType, employerIsClan);
 
-        Person negotiator = campaign.newPerson(role, employerFaction.getShortName(), Gender.RANDOMIZE);
+        Person negotiator = campaign.getPlayerForce()
+                                  .getHumanResources()
+                                  .newPerson(campaign, role, employerCode, Gender.RANDOMIZE);
 
         assignRank(negotiator);
 
         return negotiator;
     }
 
-    private static PersonnelRole getLiaisonRole(ContractSearchType searchType, Faction employerFaction) {
-        boolean employerIsClan = employerFaction.isClan();
-
+    private static PersonnelRole getLiaisonRole(ContractSearchType searchType, boolean employerIsClan) {
         return switch (searchType) {
             case PIRATE -> PIRATE_LIAISON_ROLE;
             case MERCENARY -> employerIsClan ? MERCENARY_LIAISON_CLAN : MERCENARY_LIAISON_NORMAL;
