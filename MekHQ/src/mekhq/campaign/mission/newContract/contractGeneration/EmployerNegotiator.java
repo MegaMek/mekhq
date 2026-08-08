@@ -106,9 +106,11 @@ public class EmployerNegotiator {
           Faction employerFaction, HiringHallLevel hiringHallLevel) {
         PersonnelRole role = getNegotiatorRole(hiringHallLevel, searchType, employerFaction);
 
-        Person negotiator = campaign.newPerson(role, employerFaction.getShortName(), Gender.RANDOMIZE);
+        Person negotiator = campaign.getPlayerForce()
+                                  .getHumanResources()
+                                  .newPerson(campaign, role, employerFaction.getShortName(), Gender.RANDOMIZE);
 
-        adjustExperienceLevel(campaign, negotiator, role);
+        adjustExperienceLevel(campaign, negotiator, role, employerFaction.isClan());
         adjustCharisma(negotiator);
         adjustNegotiation(negotiator);
         giveSPA(campaign, negotiator);
@@ -147,8 +149,14 @@ public class EmployerNegotiator {
         return MERCENARY_NEGOTIATOR_NORMAL;
     }
 
-    private static void adjustExperienceLevel(Campaign campaign, Person negotiator, PersonnelRole role) {
-        int experienceLevel = negotiator.getExperienceLevel(campaign, false);
+    private static void adjustExperienceLevel(Campaign campaign, Person negotiator, PersonnelRole role,
+          boolean isClanForce) {
+        int experienceLevel = negotiator.getExperienceLevel(campaign.getCampaignOptions(),
+              isClanForce,
+              campaign.getLocalDate(),
+              false,
+              false);
+
         if (experienceLevel <= SkillLevel.VETERAN.getExperienceLevel()) {
             PersonUtility.overrideSkills(campaign, negotiator, role, SkillLevel.VETERAN, true);
         }
