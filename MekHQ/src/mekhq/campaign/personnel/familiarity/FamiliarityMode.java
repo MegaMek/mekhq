@@ -52,7 +52,13 @@ public enum FamiliarityMode {
           new FamiliarityLevel(-1, -1),
           new FamiliarityLevel(0, 0),
           new FamiliarityLevel(1, 0),
-          new FamiliarityLevel(1, 1));
+          new FamiliarityLevel(1, 1)),
+    ROLEPLAY("ROLEPLAY",
+          300,
+          new FamiliarityLevel(0, 0),
+          new FamiliarityLevel(0, 0),
+          new FamiliarityLevel(0, 0),
+          new FamiliarityLevel(0, 0));
 
     private final static String RESOURCE_BUNDLE = "mekhq.resources.FamiliarityMode";
 
