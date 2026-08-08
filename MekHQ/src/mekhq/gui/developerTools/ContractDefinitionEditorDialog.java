@@ -49,7 +49,7 @@ import megamek.codeUtilities.MathUtility;
 import megamek.common.ui.FastJScrollPane;
 import mekhq.campaign.digitalGM.stratCon.StratConContractDefinition;
 import mekhq.campaign.digitalGM.stratCon.StratConContractDefinition.ObjectiveParameters;
-import mekhq.campaign.mission.enums.AtBContractType;
+import mekhq.campaign.mission.enums.ContractObjectiveType;
 import mekhq.gui.FileDialogs;
 
 /**
@@ -247,9 +247,9 @@ public class ContractDefinitionEditorDialog extends JDialog {
 
     /**
      * Registers the current definition's file name in the {@code ContractDefinitionManifest.json} that sits alongside
-     * it, so the game will use it. The manifest maps each {@link AtBContractType} to a file name, so the user is asked
-     * which contract type this file should serve; the chosen mapping is then written (overwriting any prior mapping for
-     * that type, after confirmation).
+     * it, so the game will use it. The manifest maps each {@link ContractObjectiveType} to a file name, so the user is
+     * asked which contract type this file should serve; the chosen mapping is then written (overwriting any prior
+     * mapping for that type, after confirmation).
      */
     private void addToManifest() {
         if (currentFile == null) {
@@ -259,15 +259,15 @@ public class ContractDefinitionEditorDialog extends JDialog {
         String fileName = currentFile.getName();
         File manifestFile = new File(currentFile.getParentFile(), CONTRACT_MANIFEST_FILE_NAME);
 
-        AtBContractType type = (AtBContractType) JOptionPane.showInputDialog(this,
+        ContractObjectiveType type = (ContractObjectiveType) JOptionPane.showInputDialog(this,
               getTextAt(RESOURCE_BUNDLE, "contractEditor.manifest.pickType.message"),
               getTextAt(RESOURCE_BUNDLE, "contractEditor.manifest.title"),
-              JOptionPane.QUESTION_MESSAGE, null, AtBContractType.values(), AtBContractType.GARRISON_DUTY);
+              JOptionPane.QUESTION_MESSAGE, null, ContractObjectiveType.values(), ContractObjectiveType.GARRISON_DUTY);
         if (type == null) {
             return;
         }
 
-        Map<AtBContractType, String> mapping = StratConContractDefinition.readManifestMapping(manifestFile);
+        Map<ContractObjectiveType, String> mapping = StratConContractDefinition.readManifestMapping(manifestFile);
 
         if (fileName.equals(mapping.get(type))) {
             showManifestResult("contractEditor.manifest.alreadyPresent.message", fileName, type,
@@ -299,7 +299,7 @@ public class ContractDefinitionEditorDialog extends JDialog {
         }
     }
 
-    private void showManifestResult(String messageKey, String fileName, AtBContractType type, int messageType) {
+    private void showManifestResult(String messageKey, String fileName, ContractObjectiveType type, int messageType) {
         JOptionPane.showMessageDialog(this,
               getFormattedTextAt(RESOURCE_BUNDLE, messageKey, fileName, type.toString()),
               getTextAt(RESOURCE_BUNDLE, "contractEditor.manifest.title"), messageType);

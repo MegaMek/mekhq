@@ -45,8 +45,8 @@ import mekhq.campaign.JumpPath;
 import mekhq.campaign.digitalGM.stratCon.StratConCampaignState;
 import mekhq.campaign.finances.Money;
 import mekhq.campaign.mission.Scenario;
-import mekhq.campaign.mission.enums.AtBContractType;
 import mekhq.campaign.mission.enums.AtBMoraleLevel;
+import mekhq.campaign.mission.enums.ContractObjectiveType;
 import mekhq.campaign.mission.enums.MissionStatus;
 import mekhq.campaign.mission.newContract.contractData.ContractFinanceData;
 import mekhq.campaign.mission.newContract.contractData.ContractObjectiveData;
@@ -391,11 +391,11 @@ public abstract class AbstractContract {
         return contractFinanceData.getTotalPay(contractLengthInMonths);
     }
 
-    public AtBContractType getObjectiveType() {
+    public ContractObjectiveType getObjectiveType() {
         return objectiveData.opposingObjectiveType();
     }
 
-    public AtBContractType getOpposingObjectiveType() {
+    public ContractObjectiveType getOpposingObjectiveType() {
         return objectiveData.opposingObjectiveType();
     }
 

@@ -58,8 +58,8 @@ import mekhq.campaign.enums.DragoonRating;
 import mekhq.campaign.market.enums.ContractMarketMethod;
 import mekhq.campaign.mission.AtBContract;
 import mekhq.campaign.mission.Contract;
-import mekhq.campaign.mission.enums.AtBContractType;
 import mekhq.campaign.mission.enums.ContractCommandRights;
+import mekhq.campaign.mission.enums.ContractObjectiveType;
 import mekhq.campaign.mission.utilities.ContractUtilities;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.PersonnelOptions;
@@ -450,7 +450,7 @@ public class CamOpsContractMarket extends AbstractContractMarket {
         return tags;
     }
 
-    private AtBContractType determineMission(Campaign campaign, Faction employer, int ratingMod) {
+    private ContractObjectiveType determineMission(Campaign campaign, Faction employer, int ratingMod) {
         if (campaign.getFaction().isPirate()) {
             return MissionSelector.getPirateMission(Compute.d6(2), 0);
         }

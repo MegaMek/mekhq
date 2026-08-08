@@ -47,7 +47,7 @@ import mekhq.campaign.mission.newContract.contractGeneration.ChaosObjectiveType;
 import mekhq.campaign.mission.newContract.contractGeneration.targetFinder.EnemySelectionProfile;
 import mekhq.campaign.mission.newContract.contractGeneration.targetFinder.MissionLocationProfile;
 
-public enum AtBContractType {
+public enum ContractObjectiveType {
     // NEVER SORT THESE ENUM ENTRIES. IT WILL BREAK ATB CONTRACT GENERATION.
     GARRISON_DUTY("AtBContractType.GARRISON_DUTY.text", "AtBContractType.GARRISON_DUTY.toolTipText",
           ChaosObjectiveType.GARRISON,
@@ -161,7 +161,7 @@ public enum AtBContractType {
     // endregion Variable Declarations
 
     // region Constructors
-    AtBContractType(final String name, final String toolTipText, final ChaosObjectiveType chaosObjectiveType,
+    ContractObjectiveType(final String name, final String toolTipText, final ChaosObjectiveType chaosObjectiveType,
           final double operationsTempoMultiplier, final EnemySelectionProfile enemySelectionProfile,
           final MissionLocationProfile missionLocationProfile) {
         final ResourceBundle resources = ResourceBundle.getBundle("mekhq.resources.Mission",
@@ -665,7 +665,7 @@ public enum AtBContractType {
      *
      * @return the saved AtBContractType
      */
-    public static AtBContractType parseFromString(final String text) {
+    public static ContractObjectiveType parseFromString(final String text) {
         try {
             return valueOf(text);
         } catch (Exception ignored) {
@@ -719,7 +719,7 @@ public enum AtBContractType {
 
         }
 
-        MMLogger.create(AtBContractType.class)
+        MMLogger.create(ContractObjectiveType.class)
               .error("Failed to parse text {} into an AtBContractType, returning GARRISON_DUTY.", text);
 
         return GARRISON_DUTY;

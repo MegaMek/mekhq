@@ -38,11 +38,11 @@ import static megamek.client.ui.util.PlayerColour.RED;
 import static megamek.common.enums.SkillLevel.REGULAR;
 import static megamek.common.enums.SkillLevel.parseFromString;
 import static mekhq.campaign.mission.RandomFactionCamouflage.pickRandomCamouflage;
-import static mekhq.campaign.mission.enums.AtBContractType.UNDEFINED;
 import static mekhq.campaign.mission.enums.AtBMoraleLevel.MAXIMUM_MORALE_LEVEL;
 import static mekhq.campaign.mission.enums.AtBMoraleLevel.MINIMUM_MORALE_LEVEL;
 import static mekhq.campaign.mission.enums.AtBMoraleLevel.STALEMATE;
 import static mekhq.campaign.mission.enums.ContractCommandRights.INDEPENDENT;
+import static mekhq.campaign.mission.enums.ContractObjectiveType.UNDEFINED;
 import static mekhq.campaign.personnel.ranks.Rank.RO_MIN;
 import static mekhq.campaign.personnel.skills.SkillType.EXP_REGULAR;
 import static mekhq.campaign.universe.Faction.INDEPENDENT_FACTION_CODE;
@@ -74,9 +74,9 @@ import mekhq.campaign.digitalGM.stratCon.SupportPointNegotiation;
 import mekhq.campaign.enums.DragoonRating;
 import mekhq.campaign.finances.Accountant;
 import mekhq.campaign.finances.Money;
-import mekhq.campaign.mission.enums.AtBContractType;
 import mekhq.campaign.mission.enums.AtBMoraleLevel;
 import mekhq.campaign.mission.enums.ContractCommandRights;
+import mekhq.campaign.mission.enums.ContractObjectiveType;
 import mekhq.campaign.mission.enums.MissionStatus;
 import mekhq.campaign.personnel.Bloodname;
 import mekhq.campaign.personnel.Person;
@@ -113,7 +113,7 @@ public abstract class AbstractMissionTransition {
     private StratConCampaignState stratConCampaignState;
     private MissionStatus status = MissionStatus.ACTIVE;
     private String contractTypeName = getText("AbstractMission.contractTypeName.default");
-    private AtBContractType contractType = UNDEFINED;
+    private ContractObjectiveType contractType = UNDEFINED;
     private String description;
 
     private String systemId;
@@ -666,16 +666,16 @@ public abstract class AbstractMissionTransition {
         this.contractTypeName = contractTypeName;
     }
 
-    public AtBContractType getContractType() {
+    public ContractObjectiveType getContractType() {
         return contractType;
     }
 
-    public void setContractTypeAndName(final AtBContractType contractType) {
+    public void setContractTypeAndName(final ContractObjectiveType contractType) {
         this.contractType = contractType;
         setContractTypeName(contractType.toString());
     }
 
-    public void setContractType(final AtBContractType contractType) {
+    public void setContractType(final ContractObjectiveType contractType) {
         this.contractType = contractType;
     }
 
@@ -1699,7 +1699,7 @@ public abstract class AbstractMissionTransition {
                 } else if (nodeName.equalsIgnoreCase("enemyMercenaryEmployerCode")) {
                     setEnemyMercenaryEmployerCode(value);
                 } else if (nodeName.equalsIgnoreCase("contractType")) {
-                    setContractType(AtBContractType.parseFromString(value.trim()));
+                    setContractType(ContractObjectiveType.parseFromString(value.trim()));
                 } else if (nodeName.equalsIgnoreCase("allySkill")) {
                     setAllySkill(parseFromString(value.trim()));
                 } else if (nodeName.equalsIgnoreCase("allyQuality")) {

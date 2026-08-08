@@ -40,7 +40,7 @@ import static org.mockito.Mockito.when;
 
 import mekhq.campaign.Campaign;
 import mekhq.campaign.mission.AtBContract;
-import mekhq.campaign.mission.enums.AtBContractType;
+import mekhq.campaign.mission.enums.ContractObjectiveType;
 import mekhq.campaign.mission.newContract.contractGeneration.targetFinder.EnemySelectionProfile;
 import mekhq.campaign.universe.Faction;
 import mekhq.campaign.universe.RandomFactionGenerator;
@@ -71,7 +71,7 @@ class AbstractContractMarketEnemySelectionTest {
         RandomFactionGenerator.setInstance(rfg);
 
         AtBContract contract = mock(AtBContract.class);
-        when(contract.getContractType()).thenReturn(AtBContractType.GUERRILLA_WARFARE);
+        when(contract.getContractType()).thenReturn(ContractObjectiveType.GUERRILLA_WARFARE);
         when(contract.getEmployerCode()).thenReturn("EMPLOYER");
         Campaign campaign = mock(Campaign.class);
 

@@ -32,7 +32,8 @@
  */
 package mekhq.campaign.mission.newContract.contractData;
 
-import mekhq.campaign.mission.enums.AtBContractType;
+import mekhq.campaign.mission.enums.ContractObjectiveType;
 
-public record ContractObjectiveData(AtBContractType playerObjectiveType, AtBContractType opposingObjectiveType) {
+public record ContractObjectiveData(
+      ContractObjectiveType playerObjectiveType, ContractObjectiveType opposingObjectiveType) {
 }

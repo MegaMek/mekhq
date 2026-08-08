@@ -71,8 +71,8 @@ import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.enums.DragoonRating;
 import mekhq.campaign.market.enums.ContractMarketMethod;
 import mekhq.campaign.mission.AtBContract;
-import mekhq.campaign.mission.enums.AtBContractType;
 import mekhq.campaign.mission.enums.ContractCommandRights;
+import mekhq.campaign.mission.enums.ContractObjectiveType;
 import mekhq.campaign.mission.utilities.ContractUtilities;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.PersonnelOptions;
@@ -513,9 +513,9 @@ public class AtbMonthlyContractMarket extends AbstractContractMarket {
                                Factions.getInstance().getFaction(contract.getEnemyCode()),
                                campaign.getLocalDate())) {
             if (contract.getContractType().isPlanetaryAssault()) {
-                contract.setContractTypeAndName(AtBContractType.GARRISON_DUTY);
+                contract.setContractTypeAndName(ContractObjectiveType.GARRISON_DUTY);
             } else if (contract.getContractType().isReliefDuty()) {
-                contract.setContractTypeAndName(AtBContractType.SECURITY_DUTY);
+                contract.setContractTypeAndName(ContractObjectiveType.SECURITY_DUTY);
             }
         }
         setAttacker(contract);
@@ -635,7 +635,7 @@ public class AtbMonthlyContractMarket extends AbstractContractMarket {
                                            contract.getContractType().getEnemySelectionProfile());
         contract.setEnemyCode(enemyFaction.getShortName());
         if (contract.getContractType().isGarrisonDuty() && contract.getEnemy().isRebel()) {
-            contract.setContractTypeAndName(AtBContractType.RIOT_DUTY);
+            contract.setContractTypeAndName(ContractObjectiveType.RIOT_DUTY);
         }
 
         contract.setParentContract(parent);
@@ -788,13 +788,13 @@ public class AtbMonthlyContractMarket extends AbstractContractMarket {
         followup.updateEmployer(contract.getEmployerCode(), campaign.getGameYear());
         switch (contract.getContractType()) {
             case DIVERSIONARY_RAID:
-                followup.setContractTypeAndName(AtBContractType.OBJECTIVE_RAID);
+                followup.setContractTypeAndName(ContractObjectiveType.OBJECTIVE_RAID);
                 break;
             case RECON_RAID:
-                followup.setContractTypeAndName(AtBContractType.PLANETARY_ASSAULT);
+                followup.setContractTypeAndName(ContractObjectiveType.PLANETARY_ASSAULT);
                 break;
             case RIOT_DUTY:
-                followup.setContractTypeAndName(AtBContractType.GARRISON_DUTY);
+                followup.setContractTypeAndName(ContractObjectiveType.GARRISON_DUTY);
                 break;
             default:
                 break;
@@ -895,7 +895,7 @@ public class AtbMonthlyContractMarket extends AbstractContractMarket {
 
     @Override
     public void checkForFollowup(Campaign campaign, AtBContract contract) {
-        AtBContractType type = contract.getContractType();
+        ContractObjectiveType type = contract.getContractType();
         if (type.isDiversionaryRaid() || type.isReconRaid() || type.isRiotDuty()) {
             int roll = d6();
             if (roll == 6) {

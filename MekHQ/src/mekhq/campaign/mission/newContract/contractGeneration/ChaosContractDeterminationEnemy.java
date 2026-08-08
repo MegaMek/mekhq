@@ -41,7 +41,7 @@ import java.time.LocalDate;
 import megamek.common.icons.Camouflage;
 import megamek.logging.MMLogger;
 import mekhq.campaign.location.ILocation;
-import mekhq.campaign.mission.enums.AtBContractType;
+import mekhq.campaign.mission.enums.ContractObjectiveType;
 import mekhq.campaign.mission.newContract.contractData.EnemyData;
 import mekhq.campaign.mission.newContract.contractGeneration.targetFinder.EnemySelectionProfile;
 import mekhq.campaign.universe.Faction;
@@ -60,7 +60,7 @@ public class ChaosContractDeterminationEnemy {
     private ChaosContractDeterminationEnemy() {}
 
     static EnemyData generateEnemyFactionForObjective(ILocation currentLocation, LocalDate currentDate,
-          Faction employerFaction, AtBContractType objectiveType) {
+          Faction employerFaction, ContractObjectiveType objectiveType) {
         RandomFactionGenerator randomFactionGenerator = RandomFactionGenerator.getInstance();
 
         EnemySelectionProfile enemySelectionProfile = objectiveType.getEnemySelectionProfile();

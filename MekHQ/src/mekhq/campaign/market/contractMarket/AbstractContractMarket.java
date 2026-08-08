@@ -64,9 +64,9 @@ import mekhq.campaign.market.enums.ContractMarketMethod;
 import mekhq.campaign.mission.AtBContract;
 import mekhq.campaign.mission.Contract;
 import mekhq.campaign.mission.Mission;
-import mekhq.campaign.mission.enums.AtBContractType;
 import mekhq.campaign.mission.enums.CombatRole;
 import mekhq.campaign.mission.enums.ContractCommandRights;
+import mekhq.campaign.mission.enums.ContractObjectiveType;
 import mekhq.campaign.mission.newContract.contractGeneration.targetFinder.EnemySelectionProfile;
 import mekhq.campaign.mission.newContract.contractGeneration.targetFinder.MissionLocationProfile;
 import mekhq.campaign.mission.utilities.ContractUtilities;
@@ -802,7 +802,7 @@ public abstract class AbstractContractMarket {
      *
      * @return the calculated modifier for the contract type.
      */
-    private int calculateContractTypeModifiers(AtBContractType contractType, boolean isAttacker) {
+    private int calculateContractTypeModifiers(ContractObjectiveType contractType, boolean isAttacker) {
         int mod = 0;
 
         if (contractType.isGuerrillaType() || contractType.isCadreDuty()) {
