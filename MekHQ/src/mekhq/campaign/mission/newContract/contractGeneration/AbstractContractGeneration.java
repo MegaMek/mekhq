@@ -150,7 +150,6 @@ public class AbstractContractGeneration {
      * side's faction, role, and the era &mdash; to {@link ChaosEmployerForceRating}. When the campaign has opted into
      * dynamic difficulty, the ratings are additionally scaled toward the player's own skill.</p>
      *
-     * @param campaign        the active campaign, for player skill and options
      * @param campaignOptions the campaign options
      * @param currentDate     the current date, for era context and reading the target world's data
      * @param targetPlanet    the target planet
