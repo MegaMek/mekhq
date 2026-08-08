@@ -43,7 +43,6 @@ import megamek.common.enums.SkillLevel;
 import megamek.logging.MMLogger;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.JumpPath;
-import mekhq.campaign.camOpsReputation.ForceReputationController;
 import mekhq.campaign.campaignOptions.CampaignOption;
 import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.location.ILocation;
@@ -53,6 +52,7 @@ import mekhq.campaign.mission.newContract.contractData.ContractScheduleData;
 import mekhq.campaign.mission.newContract.contractData.EmployerData;
 import mekhq.campaign.mission.newContract.contractData.EnemyData;
 import mekhq.campaign.mission.newContract.contractData.SystemsTargetData;
+import mekhq.campaign.reputation.camOpsReputation.ForceReputationController;
 import mekhq.campaign.universe.Planet;
 import mekhq.campaign.universe.PlanetarySystem;
 import mekhq.campaign.universe.Systems;
@@ -192,8 +192,7 @@ public class NormalContractGeneration extends AbstractContractGeneration {
     }
 
     private static SkillLevel campaignAverageSkill(Campaign campaign) {
-        // TODO replace with new reputation system
-        ForceReputationController reputation = campaign.getReputation();
+        ForceReputationController reputation = campaign.getPlayerForce().getReputation();
         return (reputation == null) ? SkillLevel.REGULAR : reputation.getAverageSkillLevel();
     }
 
