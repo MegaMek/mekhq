@@ -30,7 +30,7 @@
  * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
  * affiliated with Microsoft.
  */
-package mekhq.campaign.camOpsReputation;
+package mekhq.campaign.reputation.camOpsReputation;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -52,7 +52,7 @@ public class CrimeRating {
     protected static Map<String, Integer> calculateCrimeRating(Campaign campaign) {
         Map<String, Integer> crimeRating = new HashMap<>();
 
-        crimeRating.put("piracy", campaign.getPlayerForce().getCrimePirateModifier());
+        crimeRating.put("piracy", campaign.getPlayerForce().getCampOpsCrimePirateModifier());
         crimeRating.put("other", campaign.getPlayerForce().getRawCrimeRating());
 
         int adjustedCrimeRating = campaign.getPlayerForce().getAdjustedCrimeRating();

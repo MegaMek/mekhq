@@ -57,6 +57,7 @@ import javax.swing.table.TableRowSorter;
 
 import megamek.client.ui.util.ClickableLabel;
 import megamek.client.ui.util.UIUtil;
+import megamek.common.enums.SkillLevel;
 import megamek.common.event.Subscribe;
 import megamek.common.ui.EnhancedTabbedPane;
 import megamek.common.ui.FastJScrollPane;
@@ -64,6 +65,7 @@ import megamek.utilities.ImageUtilities;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.CampaignSummary;
+import mekhq.campaign.campaignOptions.CampaignOption;
 import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.dailyReportLog.DailyReportLog;
 import mekhq.campaign.enums.DailyReportType;
@@ -90,6 +92,7 @@ import mekhq.campaign.report.CargoReport;
 import mekhq.campaign.report.HangarReport;
 import mekhq.campaign.report.PersonnelReport;
 import mekhq.campaign.report.TransportReport;
+import mekhq.campaign.reputation.chaosReputation.ChaosReputation;
 import mekhq.campaign.work.IAcquisitionWork;
 import mekhq.gui.adapter.ProcurementTableMouseAdapter;
 import mekhq.gui.baseComponents.roundedComponents.RoundedJButton;
@@ -100,6 +103,7 @@ import mekhq.gui.dialog.PartsReportDialog;
 import mekhq.gui.dialog.ShoppingListPriorityDialog;
 import mekhq.gui.dialog.factionStanding.FactionStandingReport;
 import mekhq.gui.dialog.reportDialogs.CargoReportDialog;
+import mekhq.gui.dialog.reportDialogs.ChaosReputationReportDialog;
 import mekhq.gui.dialog.reportDialogs.HangarReportDialog;
 import mekhq.gui.dialog.reportDialogs.PersonnelReportDialog;
 import mekhq.gui.dialog.reportDialogs.ReputationReportDialog;
@@ -320,9 +324,17 @@ public final class CommandCenterTab extends CampaignGuiTab {
         gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
         gridBagConstraints.insets = new Insets(5, 5, 1, 5);
         panInfo.add(lblRatingHead, gridBagConstraints);
-        lblRating = new ClickableLabel(
-              evt -> new ReputationReportDialog(getCampaignGui().getFrame(),
-                    getCampaign()).setVisible(true));
+        lblRating = new ClickableLabel(evt -> {
+            if (getCampaignOptions().get(CampaignOption.USE_CHAOS_REPUTATION)) {
+                if (getCampaignOptions().get(CampaignOption.CAMPAIGN_LEVEL_CHAOS_REPUTATION)) {
+                    // Campaign-level tracking surfaces its breakdown via the rating tooltip, not a report dialog.
+                    return;
+                }
+                new ChaosReputationReportDialog(getCampaignGui().getFrame(), getCampaign()).setVisible(true);
+            } else {
+                new ReputationReportDialog(getCampaignGui().getFrame(), getCampaign()).setVisible(true);
+            }
+        });
         lblRating.setHyperlinkMode(true);
         lblRatingHead.setLabelFor(lblRating);
         gridBagConstraints.gridx = 1;
@@ -881,15 +893,21 @@ public final class CommandCenterTab extends CampaignGuiTab {
             panInfo.repaint();
         }
 
+        boolean isUseChaosReputation = getCampaignOptions().get(CampaignOption.USE_CHAOS_REPUTATION);
+        SkillLevel averageSkillLevel = campaign.getPlayerForce()
+                                             .getAverageSkillLevel(getCampaignOptions(), campaign.getLocalDate());
         String experienceString = "<html><b>" +
-                                        SkillType.getColoredExperienceLevelName(campaign.getPlayerForce()
-                                                                                      .getReputation()
-                                                                                      .getAverageSkillLevel()) +
+                                        SkillType.getColoredExperienceLevelName(averageSkillLevel) +
                                         "</b></html>";
         lblExperience.setText(experienceString);
 
         campaignSummary.updateInformation();
         lblRating.setText(campaign.getUnitRatingText());
+        if (isUseChaosReputation && campaignOptions.get(CampaignOption.CAMPAIGN_LEVEL_CHAOS_REPUTATION)) {
+            lblRating.setToolTipText(ChaosReputation.getCampaignLevelTooltip(campaign));
+        } else {
+            lblRating.setToolTipText(null);
+        }
         lblPersonnel.setText(campaignSummary.getPersonnelReport());
         lblMissionSuccess.setText(campaignSummary.getMissionSuccessReport());
         lblComposition.setText(campaignSummary.getForceCompositionReport());
@@ -946,7 +964,8 @@ public final class CommandCenterTab extends CampaignGuiTab {
                                                                            .getFontColorWarningHexColor() +
                                                                      "'>" +
                                                                      ChronoUnit.DAYS.between(getCampaign().getLocalDate(),
-                                                                           scenario.getDate())) + " days</font></html>");
+                                                                           scenario.getDate())) +
+                                                       " days</font></html>");
                             }
                         }
                     }

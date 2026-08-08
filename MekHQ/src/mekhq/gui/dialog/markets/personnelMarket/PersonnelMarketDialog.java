@@ -71,6 +71,7 @@ import megamek.client.ui.preferences.PreferencesNode;
 import megamek.logging.MMLogger;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
+import mekhq.campaign.campaignOptions.CampaignOption;
 import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.finances.Money;
 import mekhq.campaign.market.personnelMarket.markets.NewPersonnelMarket;
@@ -673,7 +674,8 @@ public class PersonnelMarketDialog extends JDialog {
         String closingBrace = CLOSING_SPAN_TAG;
 
         if (noAvailabilityMessage.isBlank()) {
-            if (campaign.getPlayerForce().getReputation().getReputationRating() <
+            if (campaign.getPlayerForce()
+                      .getReputationRating(campaignOptions.get(CampaignOption.USE_CHAOS_REPUTATION)) <
                       market.getUnitReputationRecruitmentCutoff()) {
                 color = MekHQ.getMHQOptions().getFontColorWarningHexColor();
 

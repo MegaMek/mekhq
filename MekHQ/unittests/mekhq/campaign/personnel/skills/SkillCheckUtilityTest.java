@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2025 The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2025-2026 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -275,7 +275,7 @@ class SkillCheckUtilityTest {
             when(mockPerson.getSkill("MISSING_NAME")).thenReturn(skill);
             when(mockPerson.getATOWAttributes()).thenReturn(characterAttributes);
             when(mockPerson.getOptions()).thenReturn(new PersonnelOptions());
-            when(mockPerson.getReputation()).thenReturn(0);
+            when(mockPerson.getFame()).thenReturn(0);
             when(mockPerson.getSkillModifierData(anyBoolean(), anyBoolean(), any(LocalDate.class))).thenReturn(
                   skillModifierData);
 
@@ -323,7 +323,7 @@ class SkillCheckUtilityTest {
         when(mockPerson.getSkill("MISSING_NAME")).thenReturn(skill);
         when(mockPerson.getATOWAttributes()).thenReturn(characterAttributes);
         when(mockPerson.getOptions()).thenReturn(new PersonnelOptions());
-        when(mockPerson.getReputation()).thenReturn(0);
+        when(mockPerson.getFame()).thenReturn(0);
         when(mockPerson.getSkillModifierData(anyBoolean(), anyBoolean(), any(LocalDate.class))).thenReturn(
               skillModifierData);
 
@@ -364,7 +364,7 @@ class SkillCheckUtilityTest {
             when(mockPerson.getSkill("MISSING_NAME")).thenReturn(skill);
             when(mockPerson.getATOWAttributes()).thenReturn(characterAttributes);
             when(mockPerson.getOptions()).thenReturn(new PersonnelOptions());
-            when(mockPerson.getReputation()).thenReturn(0);
+            when(mockPerson.getFame()).thenReturn(0);
             when(mockPerson.getSkillModifierData(anyBoolean(), anyBoolean(), any(LocalDate.class))).thenReturn(
                   skillModifierData);
 

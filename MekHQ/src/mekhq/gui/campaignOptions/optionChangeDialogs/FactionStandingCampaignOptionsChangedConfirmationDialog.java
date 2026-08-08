@@ -104,7 +104,6 @@ public class FactionStandingCampaignOptionsChangedConfirmationDialog extends JDi
      * <p>This dialog displays a summary message and offers "Cancel" and "Confirm" buttons, allowing users to apply
      * or discard changes to faction standings as a result of campaign option modifications.</p>
      *
-     * @param parent                   the parent {@link JDialog} for modality and positioning
      * @param campaignIcon             the icon representing the current campaign, shown in the dialog
      * @param campaignFaction          the faction associated with the campaign, used when updating standings
      * @param today                    the current date used for date-specific updates or reporting
@@ -117,8 +116,7 @@ public class FactionStandingCampaignOptionsChangedConfirmationDialog extends JDi
      * @author Illiani
      * @since 0.50.07
      */
-    public FactionStandingCampaignOptionsChangedConfirmationDialog(JDialog parent, ImageIcon campaignIcon,
-          Faction campaignFaction,
+    public FactionStandingCampaignOptionsChangedConfirmationDialog(ImageIcon campaignIcon, Faction campaignFaction,
           LocalDate today, FactionStandings factionStandings, Collection<Mission> missions,
           boolean isFactionStandingEnabled, double regardMultiplier) {
         this.campaignIcon = campaignIcon;
@@ -130,7 +128,7 @@ public class FactionStandingCampaignOptionsChangedConfirmationDialog extends JDi
         this.regardMultiplier = regardMultiplier;
 
         populateDialog();
-        initializeDialog(parent);
+        initializeDialog();
     }
 
     /**
@@ -149,17 +147,15 @@ public class FactionStandingCampaignOptionsChangedConfirmationDialog extends JDi
      * Initializes the dialog window with standard properties, such as modality, title, size, close operation, and
      * visibility.
      *
-     * @param parent the parent dialog for positioning and modality
-     *
      * @author Illiani
      * @since 0.50.07
      */
-    void initializeDialog(JDialog parent) {
+    void initializeDialog() {
         setTitle(getTextAt(RESOURCE_BUNDLE, "factionStandingReport.title"));
         setDefaultCloseOperation(DISPOSE_ON_CLOSE);
         setResizable(false);
         pack();
-        setLocationRelativeTo(parent);
+        setLocationRelativeTo(null);
         setModal(true);
         setAlwaysOnTop(true);
         setVisible(true);

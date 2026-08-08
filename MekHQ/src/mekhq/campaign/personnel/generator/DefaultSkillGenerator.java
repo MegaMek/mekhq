@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2019-2025 The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2019-2026 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -317,7 +317,7 @@ public class DefaultSkillGenerator extends AbstractSkillGenerator {
         }
 
         person.setConnections(Math.clamp(performTraitRoll(), MINIMUM_CONNECTIONS, MAXIMUM_CONNECTIONS));
-        person.setReputation(Math.clamp(performTraitRoll(), MINIMUM_REPUTATION, MAXIMUM_REPUTATION));
+        person.setFame(Math.clamp(performTraitRoll(), MINIMUM_FAME, MAXIMUM_FAME));
         person.setWealth(Math.clamp(performTraitRoll(), MINIMUM_WEALTH, MAXIMUM_WEALTH));
         person.setExtraIncomeFromTraitLevel(Math.clamp(performTraitRoll(), MINIMUM_EXTRA_INCOME, MAXIMUM_EXTRA_INCOME));
 

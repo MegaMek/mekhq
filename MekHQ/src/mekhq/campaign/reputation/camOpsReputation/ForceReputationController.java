@@ -30,17 +30,17 @@
  * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
  * affiliated with Microsoft.
  */
-package mekhq.campaign.camOpsReputation;
+package mekhq.campaign.reputation.camOpsReputation;
 
-import static mekhq.campaign.camOpsReputation.AverageExperienceRating.getAverageExperienceModifier;
-import static mekhq.campaign.camOpsReputation.AverageExperienceRating.getSkillLevel;
-import static mekhq.campaign.camOpsReputation.CombatRecordRating.calculateCombatRecordRating;
-import static mekhq.campaign.camOpsReputation.CommandRating.calculateCommanderRating;
-import static mekhq.campaign.camOpsReputation.CrimeRating.calculateCrimeRating;
-import static mekhq.campaign.camOpsReputation.FinancialRating.calculateFinancialRating;
-import static mekhq.campaign.camOpsReputation.OtherModifiers.calculateOtherModifiers;
-import static mekhq.campaign.camOpsReputation.SupportRating.calculateSupportRating;
-import static mekhq.campaign.camOpsReputation.TransportationRating.calculateTransportationRating;
+import static mekhq.campaign.reputation.camOpsReputation.AverageExperienceRating.getAverageExperienceModifier;
+import static mekhq.campaign.reputation.camOpsReputation.AverageExperienceRating.getSkillLevel;
+import static mekhq.campaign.reputation.camOpsReputation.CombatRecordRating.calculateCombatRecordRating;
+import static mekhq.campaign.reputation.camOpsReputation.CommandRating.calculateCommanderRating;
+import static mekhq.campaign.reputation.camOpsReputation.CrimeRating.calculateCrimeRating;
+import static mekhq.campaign.reputation.camOpsReputation.FinancialRating.calculateFinancialRating;
+import static mekhq.campaign.reputation.camOpsReputation.OtherModifiers.calculateOtherModifiers;
+import static mekhq.campaign.reputation.camOpsReputation.SupportRating.calculateSupportRating;
+import static mekhq.campaign.reputation.camOpsReputation.TransportationRating.calculateTransportationRating;
 
 import java.io.PrintWriter;
 import java.time.LocalDate;
@@ -58,6 +58,8 @@ import megamek.common.enums.SkillLevel;
 import megamek.logging.MMLogger;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
+import mekhq.campaign.campaignOptions.CampaignOptions;
+import mekhq.campaign.force.AbstractForce;
 import mekhq.campaign.personnel.Person;
 import mekhq.utilities.MHQXMLUtility;
 import org.w3c.dom.Node;
@@ -112,6 +114,15 @@ public class ForceReputationController {
     private int reputationRating = 0;
 
     // region Getters and Setters
+
+    /**
+     * Retrieves the average skill level of the force from the calculated data.
+     *
+     * <p><b>Usage Note:</b> generally you want to
+     * use {@link AbstractForce#getAverageSkillLevel(CampaignOptions, LocalDate)}</p>
+     *
+     * @return the average skill level as a SkillLevel object.
+     */
     public SkillLevel getAverageSkillLevel() {
         return this.averageSkillLevel;
     }
@@ -120,6 +131,13 @@ public class ForceReputationController {
         return this.atbModifier;
     }
 
+    /**
+     * Retrieves the reputation of the force from the calculated data.
+     *
+     * <p><b>Usage Note:</b> generally you want to use {@link AbstractForce#getReputationRating(boolean)} </p>
+     *
+     * @return the average skill level as a SkillLevel object.
+     */
     public int getReputationRating() {
         return this.reputationRating;
     }
@@ -183,7 +201,7 @@ public class ForceReputationController {
         // step seven: calculate crime rating
         crimeRatingMap = calculateCrimeRating(campaign);
         crimeRating = crimeRatingMap.get("total");
-        dateOfLastCrime = campaign.getPlayerForce().getDateOfLastCrime();
+        dateOfLastCrime = campaign.getPlayerForce().getCampOpsDateOfLastCrime();
 
         // step eight: calculate other modifiers
         otherModifiersMap = calculateOtherModifiers(campaign);

@@ -124,6 +124,20 @@ public final class CampaignOption<T> {
           of(Boolean.class, false, "reduceReputationPerformanceModifier");
     public static final CampaignOption<Boolean> REPUTATION_PERFORMANCE_MODIFIER_CUT_OFF =
           of(Boolean.class, false, "reputationPerformanceModifierCutOff");
+    public static final CampaignOption<Boolean> USE_CHAOS_REPUTATION =
+          of(Boolean.class, true, "useChaosReputation");
+    public static final CampaignOption<Boolean> CAMPAIGN_LEVEL_CHAOS_REPUTATION =
+          of(Boolean.class, false, "campaignLevelChaosReputation");
+    public static final CampaignOption<Integer> CHAOS_REPUTATION_CAP =
+          of(Integer.class, 0, "chaosReputationCap");
+    public static final CampaignOption<Boolean> CHAOS_DEBT_PENALTIES_STACK =
+          of(Boolean.class, false, "chaosDebtPenaltiesStack");
+    public static final CampaignOption<Boolean> CHAOS_NO_PARTIAL_SUCCESS_REPUTATION =
+          of(Boolean.class, true, "chaosNoPartialSuccessReputation");
+    public static final CampaignOption<Boolean> CHAOS_PERSONALITY_AFFECTS_REPUTATION =
+          of(Boolean.class, false, "chaosPersonalityAffectsReputation");
+    public static final CampaignOption<Boolean> CHAOS_NEW_RECRUITS_HAVE_REPUTATION =
+          of(Boolean.class, false, "chaosNewRecruitsHaveReputation");
     public static final CampaignOption<Boolean> USE_ERA_MODS =
           of(Boolean.class, false, "useEraMods");
     public static final CampaignOption<Boolean> ASSIGNED_TECH_FIRST =
