@@ -32,6 +32,7 @@
  */
 package mekhq.campaign.io;
 
+import static megamek.codeUtilities.MathUtility.parseInt;
 import static mekhq.campaign.enums.DailyReportType.GENERAL;
 import static mekhq.campaign.force.CombatTeam.recalculateCombatTeams;
 import static mekhq.campaign.force.Formation.FORMATION_NONE;
@@ -39,6 +40,7 @@ import static mekhq.campaign.market.personnelMarket.markets.NewPersonnelMarket.g
 import static mekhq.campaign.personnel.education.EducationController.getAcademy;
 import static mekhq.campaign.personnel.enums.PersonnelStatus.statusValidator;
 import static mekhq.campaign.personnel.skills.SkillDeprecationTool.DEPRECATED_SKILLS;
+import static mekhq.campaign.reputation.chaosReputation.ChaosReputation.STARTING_REPUTATION_SCORE;
 import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
 import static mekhq.utilities.ReportingUtilities.CLOSING_SPAN_TAG;
 import static mekhq.utilities.ReportingUtilities.getNegativeColor;
@@ -68,7 +70,6 @@ import megamek.client.bot.princess.BehaviorSettingsFactory;
 import megamek.client.generator.RandomGenderGenerator;
 import megamek.client.generator.RandomNameGenerator;
 import megamek.client.ui.util.PlayerColour;
-import megamek.codeUtilities.MathUtility;
 import megamek.common.annotations.Nullable;
 import megamek.common.enums.Gender;
 import megamek.common.enums.TechBase;
@@ -92,7 +93,7 @@ import mekhq.NullEntityException;
 import mekhq.campaign.*;
 import mekhq.campaign.againstTheBot.AtBConfiguration;
 import mekhq.campaign.base.PlayerBase;
-import mekhq.campaign.camOpsReputation.ForceReputationController;
+import mekhq.campaign.campaignOptions.CampaignOption;
 import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.campaignOptions.CampaignOptionsUnmarshaller;
 import mekhq.campaign.enums.CampaignTransportType;
@@ -100,6 +101,7 @@ import mekhq.campaign.finances.Finances;
 import mekhq.campaign.force.CombatTeam;
 import mekhq.campaign.force.Detachment;
 import mekhq.campaign.force.Formation;
+import mekhq.campaign.force.PlayerForce;
 import mekhq.campaign.icons.StandardFormationIcon;
 import mekhq.campaign.icons.UnitIcon;
 import mekhq.campaign.location.AcademyCampusLocation;
@@ -148,6 +150,7 @@ import mekhq.campaign.personnel.skills.SkillDeprecationTool;
 import mekhq.campaign.personnel.skills.SkillType;
 import mekhq.campaign.personnel.skills.enums.SkillAttribute;
 import mekhq.campaign.personnel.turnoverAndRetention.RetirementDefectionTracker;
+import mekhq.campaign.reputation.camOpsReputation.ForceReputationController;
 import mekhq.campaign.storyArc.StoryArc;
 import mekhq.campaign.unit.Unit;
 import mekhq.campaign.unit.cleanup.EquipmentUnscrambler;
@@ -187,6 +190,7 @@ public record CampaignXmlParser(InputStream is, MekHQ app) {
         NodeList childNodes = parentNode.getChildNodes();
 
         // Okay, lets iterate through the children, eh?
+        PlayerForce playerForce = campaign.getPlayerForce();
         for (int x = 0; x < childNodes.getLength(); x++) {
             Node childNode = childNodes.item(x);
             int nodeType = childNode.getNodeType();
@@ -202,7 +206,7 @@ public record CampaignXmlParser(InputStream is, MekHQ app) {
                     campaign.setLocalDate(MHQXMLUtility.parseDate(childNode.getTextContent().trim()));
                 } else if (nodeName.equalsIgnoreCase(Camouflage.XML_TAG)) {
                     final Camouflage camouflage = Camouflage.parseFromXML(childNode);
-                    campaign.getPlayerForce().setCamouflage(camouflage);
+                    playerForce.setCamouflage(camouflage);
                 } else if (nodeName.equalsIgnoreCase("camoCategory")) {
                     String val = childNode.getTextContent().trim();
 
@@ -217,10 +221,10 @@ public record CampaignXmlParser(InputStream is, MekHQ app) {
                     }
                 } else if (nodeName.equalsIgnoreCase("colour")) {
                     final PlayerColour colour = PlayerColour.parseFromString(childNode.getTextContent().trim());
-                    campaign.getPlayerForce().setColour(colour);
+                    playerForce.setColour(colour);
                 } else if (nodeName.equalsIgnoreCase(UnitIcon.XML_TAG)) {
                     final StandardFormationIcon unitIcon = UnitIcon.parseFromXML(childNode);
-                    campaign.getPlayerForce().setUnitIcon(unitIcon);
+                    playerForce.setUnitIcon(unitIcon);
                 } else if (nodeName.equalsIgnoreCase("nameGen")) {
                     // First, get all the child nodes;
                     NodeList nl2 = childNode.getChildNodes();
@@ -232,7 +236,7 @@ public record CampaignXmlParser(InputStream is, MekHQ app) {
                         if (wn2.getNodeName().equalsIgnoreCase("faction")) {
                             RandomNameGenerator.getInstance().setChosenFaction(wn2.getTextContent().trim());
                         } else if (wn2.getNodeName().equalsIgnoreCase("percentFemale")) {
-                            RandomGenderGenerator.setPercentFemale(MathUtility.parseInt(wn2.getTextContent().trim(),
+                            RandomGenderGenerator.setPercentFemale(parseInt(wn2.getTextContent().trim(),
                                   50));
                         }
                     }
@@ -240,34 +244,37 @@ public record CampaignXmlParser(InputStream is, MekHQ app) {
                     campaign.getDailyReportLog().readFromXML(childNode);
                 } else if (nodeName.equalsIgnoreCase("faction")) {
                     Faction faction = Factions.getInstance().getFaction(childNode.getTextContent());
-                    campaign.getPlayerForce().setFaction(faction);
+                    playerForce.setFaction(faction);
                 } else if (nodeName.equalsIgnoreCase("retainerEmployerCode")) {
-                    campaign.getPlayerForce().setRetainerEmployerCode(childNode.getTextContent());
+                    playerForce.setRetainerEmployerCode(childNode.getTextContent());
                 } else if (nodeName.equalsIgnoreCase("retainerStartDate")) {
-                    campaign.getPlayerForce().setRetainerStartDate(LocalDate.parse(childNode.getTextContent()));
+                    playerForce.setRetainerStartDate(LocalDate.parse(childNode.getTextContent()));
                 } else if (nodeName.equalsIgnoreCase("crimeRating")) {
-                    int crimeRating = MathUtility.parseInt(childNode.getTextContent());
-                    campaign.getPlayerForce().setCrimeRating(crimeRating);
+                    int crimeRating = parseInt(childNode.getTextContent());
+                    playerForce.setCamOpsCrimeRating(crimeRating);
                 } else if (nodeName.equalsIgnoreCase("initiativeBonus")) {
-                    int bonus = MathUtility.parseInt(childNode.getTextContent());
-                    campaign.getPlayerForce().setInitiativeBonus(bonus);
+                    int bonus = parseInt(childNode.getTextContent());
+                    playerForce.setInitiativeBonus(bonus);
                 } else if (nodeName.equalsIgnoreCase("initiativeMaxBonus")) {
-                    int bonus = MathUtility.parseInt(childNode.getTextContent(), 1);
-                    campaign.getPlayerForce().setInitiativeMaxBonus(bonus);
+                    int bonus = parseInt(childNode.getTextContent(), 1);
+                    playerForce.setInitiativeMaxBonus(bonus);
                 } else if (nodeName.equalsIgnoreCase("crimePirateModifier")) {
-                    int crimePirateModifier = MathUtility.parseInt(childNode.getTextContent());
-                    campaign.getPlayerForce().setCrimePirateModifier(crimePirateModifier);
+                    int crimePirateModifier = parseInt(childNode.getTextContent());
+                    playerForce.setCampOpsCrimePirateModifier(crimePirateModifier);
                 } else if (nodeName.equalsIgnoreCase("dateOfLastCrime")) {
-                    campaign.getPlayerForce().setDateOfLastCrime(LocalDate.parse(childNode.getTextContent()));
+                    playerForce.setCampOpsDateOfLastCrime(LocalDate.parse(childNode.getTextContent()));
                 } else if (nodeName.equalsIgnoreCase("reputation")) {
                     ForceReputationController reputation = new ForceReputationController().generateInstanceFromXML(
                           childNode);
-                    campaign.getPlayerForce().setReputation(reputation);
+                    playerForce.setReputation(reputation);
+                } else if (nodeName.equalsIgnoreCase("chaosCampaignReputation")) {
+                    playerForce.setChaosCampaignReputation(parseInt(childNode.getTextContent(),
+                          STARTING_REPUTATION_SCORE));
                 } else if (nodeName.equalsIgnoreCase("newPersonnelMarket")) {
                     campaign.setNewPersonnelMarket(generatePersonnelMarketDataFromXML(campaign, childNode, version));
                 } else if (nodeName.equalsIgnoreCase("factionStandings")) {
                     FactionStandings factionStandings = FactionStandings.generateInstanceFromXML(childNode);
-                    campaign.getPlayerForce().setFactionStandings(factionStandings);
+                    playerForce.setFactionStandings(factionStandings);
                 } else if (nodeName.equalsIgnoreCase("rankSystem")) {
                     if (!childNode.hasChildNodes()) { // we need there to be child nodes to parse from
                         continue;
@@ -277,7 +284,7 @@ public record CampaignXmlParser(InputStream is, MekHQ app) {
                     // If the system is valid (either not campaign or validates), set it. Otherwise,
                     // keep the default
                     if (!rankSystem.getType().isCampaign() || new RankValidator().validate(rankSystem, true)) {
-                        campaign.getPlayerForce().setRankSystemDirect(rankSystem);
+                        playerForce.setRankSystemDirect(rankSystem);
                     }
                 } else if (nodeName.equalsIgnoreCase("gmMode")) {
                     campaign.setGMMode(Boolean.parseBoolean(childNode.getTextContent().trim()));
@@ -287,9 +294,9 @@ public record CampaignXmlParser(InputStream is, MekHQ app) {
                     String val = childNode.getTextContent().trim();
 
                     if (val.equals("null")) {
-                        campaign.getPlayerForce().setName(null);
+                        playerForce.setName(null);
                     } else {
-                        campaign.getPlayerForce().setName(val);
+                        playerForce.setName(val);
                     }
                 } else if (nodeName.equalsIgnoreCase("campaignStartDate")) {
                     String campaignStartDate = childNode.getTextContent().trim();
@@ -302,17 +309,17 @@ public record CampaignXmlParser(InputStream is, MekHQ app) {
                 } else if (nodeName.equalsIgnoreCase("overtime")) {
                     campaign.setOvertime(Boolean.parseBoolean(childNode.getTextContent().trim()));
                 } else if (nodeName.equalsIgnoreCase("astechPool")) {
-                    int size = MathUtility.parseInt(childNode.getTextContent().trim());
-                    campaign.getPlayerForce().getHumanResources().setAsTechPool(size);
+                    int size = parseInt(childNode.getTextContent().trim());
+                    playerForce.getHumanResources().setAsTechPool(size);
                 } else if (nodeName.equalsIgnoreCase("astechPoolMinutes")) {
-                    int minutes = MathUtility.parseInt(childNode.getTextContent().trim());
-                    campaign.getPlayerForce().getHumanResources().setAsTechPoolMinutes(minutes);
+                    int minutes = parseInt(childNode.getTextContent().trim());
+                    playerForce.getHumanResources().setAsTechPoolMinutes(minutes);
                 } else if (nodeName.equalsIgnoreCase("astechPoolOvertime")) {
-                    int overtime = MathUtility.parseInt(childNode.getTextContent().trim());
-                    campaign.getPlayerForce().getHumanResources().setAsTechPoolOvertime(overtime);
+                    int overtime = parseInt(childNode.getTextContent().trim());
+                    playerForce.getHumanResources().setAsTechPoolOvertime(overtime);
                 } else if (nodeName.equalsIgnoreCase("medicPool")) {
-                    int size = MathUtility.parseInt(childNode.getTextContent().trim());
-                    campaign.getPlayerForce().getHumanResources().setMedicPool(size);
+                    int size = parseInt(childNode.getTextContent().trim());
+                    playerForce.getHumanResources().setMedicPool(size);
                 } else if (nodeName.equalsIgnoreCase("tempCrewPools")) {
                     NodeList tempCrewNodes = childNode.getChildNodes();
                     for (int i = 0; i < tempCrewNodes.getLength(); i++) {
@@ -329,14 +336,14 @@ public record CampaignXmlParser(InputStream is, MekHQ app) {
                                 if (dataNodeName.equalsIgnoreCase("role")) {
                                     roleStr = dataNode.getTextContent().trim();
                                 } else if (dataNodeName.equalsIgnoreCase("size")) {
-                                    size = MathUtility.parseInt(dataNode.getTextContent().trim());
+                                    size = parseInt(dataNode.getTextContent().trim());
                                 }
                             }
 
                             if (roleStr != null) {
                                 try {
                                     PersonnelRole role = PersonnelRole.valueOf(roleStr);
-                                    campaign.getPlayerForce().getHumanResources().setTempCrewPool(campaign, role, size);
+                                    playerForce.getHumanResources().setTempCrewPool(campaign, role, size);
                                 } catch (IllegalArgumentException e) {
                                     LOGGER.warn("Unknown PersonnelRole: {}", roleStr);
                                 }
@@ -344,14 +351,14 @@ public record CampaignXmlParser(InputStream is, MekHQ app) {
                         }
                     }
                 } else if (nodeName.equalsIgnoreCase("fieldKitchenWithinCapacity")) {
-                    campaign.getPlayerForce()
+                    playerForce
                           .setFieldKitchenWithinCapacity(Boolean.parseBoolean(childNode.getTextContent().trim()));
                 } else if (nodeName.equalsIgnoreCase("mashTheatreCapacity")) {
-                    int mashTheatreCapacity = MathUtility.parseInt(childNode.getTextContent().trim());
-                    campaign.getPlayerForce().setMashTheatreCapacity(mashTheatreCapacity);
+                    int mashTheatreCapacity = parseInt(childNode.getTextContent().trim());
+                    playerForce.setMashTheatreCapacity(mashTheatreCapacity);
                 } else if (nodeName.equalsIgnoreCase("repairBaysRented")) {
-                    int repairBaysRented = MathUtility.parseInt(childNode.getTextContent().trim());
-                    campaign.getPlayerForce().setRepairBaysRented(repairBaysRented);
+                    int repairBaysRented = parseInt(childNode.getTextContent().trim());
+                    playerForce.setRepairBaysRented(repairBaysRented);
                 } else if (nodeName.equalsIgnoreCase("id")) {
                     campaign.setId(UUID.fromString(childNode.getTextContent().trim()));
                 }
@@ -1584,6 +1591,43 @@ public record CampaignXmlParser(InputStream is, MekHQ app) {
      *
      * @return A value indicating whether a new custom unit file was added to disk.
      */
+    /**
+     * Keeps an existing campaign on its original CamOps reputation instead of silently switching it to Chaos
+     * Reputation.
+     *
+     * <p>{@link CampaignOption#USE_CHAOS_REPUTATION} defaults to {@code true} so that new campaigns start with Chaos
+     * Reputation. A campaign that predates the option has no {@code useChaosReputation} tag in its save, so a plain
+     * value read would silently return that default and flip the campaign over - resetting the force's reputation to
+     * the starting score and skipping the retroactive-initialization prompt (which never fires on load). When the tag
+     * is absent we therefore force the option off, preserving the campaign's existing reputation system. Saves that do
+     * carry the tag (new-format saves) keep whatever value they stored.</p>
+     *
+     * @param campaignOptionsNode the {@code <campaignOptions>} element from the save
+     * @param campaignOptions     the options just parsed from that element
+     */
+    static void preserveLegacyReputationForExistingCampaigns(Node campaignOptionsNode,
+          CampaignOptions campaignOptions) {
+        if (!hasChildElement(campaignOptionsNode, CampaignOption.USE_CHAOS_REPUTATION.xmlTag())) {
+            campaignOptions.set(CampaignOption.USE_CHAOS_REPUTATION, false);
+        }
+    }
+
+    /**
+     * @return {@code true} if {@code parent} has a direct child element whose node name equals {@code tagName}. Used to
+     *       distinguish "the save wrote this option" from "the option fell back to its default because the tag was
+     *       absent" - which a plain value read cannot tell apart.
+     */
+    private static boolean hasChildElement(Node parent, String tagName) {
+        NodeList children = parent.getChildNodes();
+        for (int i = 0; i < children.getLength(); i++) {
+            Node child = children.item(i);
+            if (child.getNodeType() == Node.ELEMENT_NODE && child.getNodeName().equals(tagName)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
     private static boolean processCustom(Campaign retVal, Node wn) {
         String sCustomsDir = "data" +
                                    File.separator +
@@ -2016,8 +2060,10 @@ public record CampaignXmlParser(InputStream is, MekHQ app) {
                 } else if (xn.equalsIgnoreCase("custom")) {
                     reloadUnitData |= processCustom(campaign, wn);
                 } else if (xn.equalsIgnoreCase("campaignOptions")) {
-                    campaign.setCampaignOptions(CampaignOptionsUnmarshaller.generateCampaignOptionsFromXml(wn,
-                          version));
+                    CampaignOptions campaignOptions = CampaignOptionsUnmarshaller.generateCampaignOptionsFromXml(wn,
+                          version);
+                    preserveLegacyReputationForExistingCampaigns(wn, campaignOptions);
+                    campaign.setCampaignOptions(campaignOptions);
                 } else if (xn.equalsIgnoreCase("gameOptions")) {
                     campaign.getGameOptions().fillFromXML(wn.getChildNodes());
                 } else if (xn.equalsIgnoreCase(PlanetarySystemCampaignXmlIO.XML_TAG)) {
@@ -2185,7 +2231,7 @@ public record CampaignXmlParser(InputStream is, MekHQ app) {
                 } else if (nodeName.equalsIgnoreCase("partsInUse")) {
                     processPartsInUse(campaign, workingNode, version);
                 } else if (nodeName.equalsIgnoreCase("temporaryPrisonerCapacity")) {
-                    int temporaryPrisonerCapacity = MathUtility.parseInt(workingNode.getTextContent().trim());
+                    int temporaryPrisonerCapacity = parseInt(workingNode.getTextContent().trim());
                     campaign.getPlayerForce().setTemporaryPrisonerCapacity(temporaryPrisonerCapacity);
                 } else if (nodeName.equalsIgnoreCase("processProcurement")) {
                     campaign.setProcessProcurement(Boolean.parseBoolean(workingNode.getTextContent().trim()));
@@ -2547,8 +2593,6 @@ public record CampaignXmlParser(InputStream is, MekHQ app) {
         campaign.getPlayerForce().setWarehouse(warehouse);
 
         LOGGER.info("[Campaign Load] Warehouse cleaned up in {}ms", System.currentTimeMillis() - timestamp);
-
-        campaign.setUnitRating(null);
 
         // this is used to handle characters from pre-50.01 campaigns
         campaign.getPlayerForce()

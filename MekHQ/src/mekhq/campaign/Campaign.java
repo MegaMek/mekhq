@@ -59,6 +59,7 @@ import static mekhq.campaign.personnel.skills.SkillType.S_TECH_MECHANIC;
 import static mekhq.campaign.personnel.skills.SkillType.getType;
 import static mekhq.campaign.personnel.turnoverAndRetention.RetirementDefectionTracker.Payout.isBreakingContract;
 import static mekhq.campaign.randomEvents.other.GrayMonday.isGrayMonday;
+import static mekhq.campaign.reputation.chaosReputation.ChaosReputation.STARTING_REPUTATION_SCORE;
 import static mekhq.campaign.unit.Unit.TECH_WORK_DAY;
 import static mekhq.campaign.universe.Faction.MERCENARY_FACTION_CODE;
 import static mekhq.campaign.universe.Faction.PIRATE_FACTION_CODE;
@@ -128,9 +129,8 @@ import mekhq.Utilities;
 import mekhq.campaign.ForceQuartermaster.PartAcquisitionResult;
 import mekhq.campaign.againstTheBot.AtBConfiguration;
 import mekhq.campaign.base.PlayerBase;
-import mekhq.campaign.camOpsReputation.ForceReputationController;
-import mekhq.campaign.camOpsReputation.IUnitRating;
 import mekhq.campaign.campaignOptions.AcquisitionsType;
+import mekhq.campaign.campaignOptions.CampaignOption;
 import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.campaignOptions.CampaignOptionsMarshaller;
 import mekhq.campaign.dailyReportLog.DailyReportLog;
@@ -227,6 +227,8 @@ import mekhq.campaign.personnel.skills.SkillType;
 import mekhq.campaign.personnel.turnoverAndRetention.RetirementDefectionTracker;
 import mekhq.campaign.randomEvents.prisoners.PrisonerStatus;
 import mekhq.campaign.randomEvents.randomEventsSystem.RandomEventLibraries;
+import mekhq.campaign.reputation.camOpsReputation.ForceReputationController;
+import mekhq.campaign.reputation.chaosReputation.ChaosReputation;
 import mekhq.campaign.storyArc.StoryArc;
 import mekhq.campaign.unit.CargoStatistics;
 import mekhq.campaign.unit.CrewType;
@@ -351,8 +353,6 @@ public class Campaign implements ITechManager {
 
     private AtBConfiguration atbConfig; // AtB
     private IUnitGenerator unitGenerator; // deprecated
-    @Deprecated(since = "0.50.10", forRemoval = true)
-    private IUnitRating unitRating; // deprecated
     private CampaignSummary campaignSummary;
     // TODO (campaign split): the transporter maps hold a Campaign back-reference. Remove that coupling so they
     //   can move onto the force (AbstractForce/PlayerForce) alongside the other owned state.
@@ -470,7 +470,7 @@ public class Campaign implements ITechManager {
         // The player force owns faction identity, finances, reputation, and the hangar/warehouse/personnel. It is the
         // IPlace anchored into the location tree, so it must exist before we set the campaign's location.
         playerForce = new PlayerForce(faction, techFaction, rankSystem, finances, reputationController,
-              factionStandings, campaignOpts);
+              STARTING_REPUTATION_SCORE, factionStandings, campaignOpts);
         playerForce.setName(name);
 
         setLocation(startLocation);
@@ -1945,8 +1945,10 @@ public class Campaign implements ITechManager {
     }
 
     /**
-     * @return all hangars across all locations associated with this campaign.
-     *                                                                                                                                                                               TODO: This won't work once we support multiple hangars. Method separated from getHangar() for future refactor
+     * TODO: This won't work once we support multiple hangars. Method separated from getHangar() for future refactor
+     *
+     * @return all hangars across all locations associated with this campaign.     TODO: This won't work once we support
+     *       multiple hangars. Method separated from getHangar() for future refactor
      *
      * @deprecated Use {@link PlayerForce#getHangar()} directly.
      */
@@ -4099,7 +4101,11 @@ public class Campaign implements ITechManager {
                       (!getCampaignOptions().isDestroyByMargin()
                              // if a legendary, primary tech and destroy by margin is NOT on
                              &&
-                             ((tech.getExperienceLevel(this, false, true) == SkillType.EXP_LEGENDARY) ||
+                             ((tech.getExperienceLevel(getCampaignOptions(),
+                                   getPlayerForce().isClanForce(),
+                                   getLocalDate(),
+                                   false,
+                                   true) == SkillType.EXP_LEGENDARY) ||
                                     tech.getPrimaryRole().isVesselCrew())) // For vessel crews
                             && (roll < target.getValue())) {
                 tech.spendEdge();
@@ -4842,8 +4848,9 @@ public class Campaign implements ITechManager {
      * @author Illiani
      * @since 0.50.05
      */
+    @Deprecated(since = "0.51.01")
     public boolean isClanCampaign() {
-        return getFaction().isClan();
+        return getPlayerForce().isClanForce();
     }
 
     /**
@@ -4933,11 +4940,11 @@ public class Campaign implements ITechManager {
     }
 
     /**
-     * @deprecated Use {@link PlayerForce#setCrimeRating(int)} directly.
+     * @deprecated Use {@link PlayerForce#setCamOpsCrimeRating(int)} directly.
      */
     @Deprecated(since = "0.51.01", forRemoval = true)
     public void setCrimeRating(int crimeRating) {
-        getPlayerForce().setCrimeRating(crimeRating);
+        getPlayerForce().setCamOpsCrimeRating(crimeRating);
     }
 
     /**
@@ -4954,19 +4961,19 @@ public class Campaign implements ITechManager {
     }
 
     /**
-     * @deprecated Use {@link PlayerForce#getCrimePirateModifier()} directly.
+     * @deprecated Use {@link PlayerForce#getCampOpsCrimePirateModifier()} directly.
      */
     @Deprecated(since = "0.51.01", forRemoval = true)
     public int getCrimePirateModifier() {
-        return getPlayerForce().getCrimePirateModifier();
+        return getPlayerForce().getCampOpsCrimePirateModifier();
     }
 
     /**
-     * @deprecated Use {@link PlayerForce#setCrimePirateModifier(int)} directly.
+     * @deprecated Use {@link PlayerForce#setCampOpsCrimePirateModifier(int)} directly.
      */
     @Deprecated(since = "0.51.01", forRemoval = true)
     public void setCrimePirateModifier(int crimePirateModifier) {
-        getPlayerForce().setCrimePirateModifier(crimePirateModifier);
+        getPlayerForce().setCampOpsCrimePirateModifier(crimePirateModifier);
     }
 
     /**
@@ -4995,19 +5002,19 @@ public class Campaign implements ITechManager {
     }
 
     /**
-     * @deprecated Use {@link PlayerForce#getDateOfLastCrime()} directly.
+     * @deprecated Use {@link PlayerForce#getCampOpsDateOfLastCrime()} directly.
      */
     @Deprecated(since = "0.51.01", forRemoval = true)
     public @Nullable LocalDate getDateOfLastCrime() {
-        return getPlayerForce().getDateOfLastCrime();
+        return getPlayerForce().getCampOpsDateOfLastCrime();
     }
 
     /**
-     * @deprecated Use {@link PlayerForce#setDateOfLastCrime(LocalDate)} directly.
+     * @deprecated Use {@link PlayerForce#setCampOpsDateOfLastCrime(LocalDate)} directly.
      */
     @Deprecated(since = "0.51.01", forRemoval = true)
     public void setDateOfLastCrime(LocalDate dateOfLastCrime) {
-        getPlayerForce().setDateOfLastCrime(dateOfLastCrime);
+        getPlayerForce().setCampOpsDateOfLastCrime(dateOfLastCrime);
     }
 
     /**
@@ -5380,15 +5387,20 @@ public class Campaign implements ITechManager {
         }
         MHQXMLUtility.writeSimpleXMLTag(writer, indent, "crimeRating", getPlayerForce().getRawCrimeRating());
         MHQXMLUtility.writeSimpleXMLTag(writer, indent, "crimePirateModifier",
-              getPlayerForce().getCrimePirateModifier());
+              getPlayerForce().getCampOpsCrimePirateModifier());
 
-        if (getPlayerForce().getDateOfLastCrime() != null) {
-            MHQXMLUtility.writeSimpleXMLTag(writer, indent, "dateOfLastCrime", getPlayerForce().getDateOfLastCrime());
+        if (getPlayerForce().getCampOpsDateOfLastCrime() != null) {
+            MHQXMLUtility.writeSimpleXMLTag(writer,
+                  indent,
+                  "dateOfLastCrime",
+                  getPlayerForce().getCampOpsDateOfLastCrime());
         }
 
         MHQXMLUtility.writeSimpleXMLOpenTag(writer, indent++, "reputation");
         getPlayerForce().getReputation().writeReputationToXML(writer, indent);
         MHQXMLUtility.writeSimpleXMLCloseTag(writer, --indent, "reputation");
+        MHQXMLUtility.writeSimpleXMLTag(writer, indent, "chaosCampaignReputation",
+              getPlayerForce().getChaosCampaignReputation());
         if (getPlayerForce().getHumanResources().getNewPersonnelMarket() != null) {
             MHQXMLUtility.writeSimpleXMLOpenTag(writer, indent++, "newPersonnelMarket");
             getPlayerForce().getHumanResources().getNewPersonnelMarket().writePersonnelMarketDataToXML(writer, indent);
@@ -7486,7 +7498,19 @@ public class Campaign implements ITechManager {
      * @return The text representation of the unit rating
      */
     public String getUnitRatingText() {
-        return String.valueOf(getPlayerForce().getReputation().getReputationRating());
+        boolean useChaosReputation = getCampaignOptions().get(CampaignOption.USE_CHAOS_REPUTATION);
+
+        if (useChaosReputation) {
+            if (getCampaignOptions().get(CampaignOption.CAMPAIGN_LEVEL_CHAOS_REPUTATION)) {
+                // Campaign-level mode stores a pure base; the debt/manual/commander modifiers are applied live here.
+                return String.valueOf(ChaosReputation.getEffectiveCampaignLevelReputation(getPlayerForce(),
+                      getCampaignOptions(),
+                      getLocalDate()));
+            }
+            return String.valueOf(getPlayerForce().getChaosCampaignReputation());
+        } else {
+            return String.valueOf(getPlayerForce().getReputationRating(false));
+        }
     }
 
     /**
@@ -7495,7 +7519,7 @@ public class Campaign implements ITechManager {
      * @return The unit rating modifier based on the campaign options.
      */
     public int getAtBUnitRatingMod() {
-        return getPlayerForce().getReputation().getAtbModifier();
+        return getPlayerForce().getAverageSkillLevel(campaignOptions, currentDay).ordinal();
     }
 
     /**
@@ -8328,22 +8352,6 @@ public class Campaign implements ITechManager {
                      .anyMatch(s -> (s.getDate() != null) &&
                                           !(s instanceof AtBScenario) &&
                                           !getLocalDate().isBefore(s.getDate()));
-    }
-
-    /**
-     * Sets the type of rating method used.
-     */
-    public void setUnitRating(IUnitRating rating) {
-        unitRating = rating;
-    }
-
-    /**
-     * Returns the type of rating method as selected in the Campaign Options dialog. Lazy-loaded for performance.
-     * Default is CampaignOpsReputation
-     */
-    @Deprecated(since = "0.50.10", forRemoval = true)
-    public IUnitRating getUnitRating() {
-        return unitRating;
     }
 
     @Override

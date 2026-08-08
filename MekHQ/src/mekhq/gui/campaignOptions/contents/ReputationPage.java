@@ -50,10 +50,10 @@ import javax.swing.JSpinner;
 import jakarta.annotation.Nonnull;
 import jakarta.annotation.Nullable;
 import megamek.Version;
+import megamek.client.ui.settings.SettingsFormPanel;
 import mekhq.gui.campaignOptions.CampaignOptionFlag;
 import mekhq.gui.campaignOptions.CampaignOptionsMetadata;
 import mekhq.gui.campaignOptions.components.CampaignOptionsCheckBox;
-import megamek.client.ui.settings.SettingsFormPanel;
 import mekhq.gui.campaignOptions.components.CampaignOptionsHeaderPanel;
 import mekhq.gui.campaignOptions.components.CampaignOptionsLabel;
 import mekhq.gui.campaignOptions.components.CampaignOptionsPagePanel;
@@ -64,11 +64,11 @@ import mekhq.gui.campaignOptions.components.CampaignOptionsSpinner;
  * the widgets for reputation configuration - the manual unit rating modifier, the criminal-record reset button, and the
  * reputation "sanity" toggles - and synchronises them with a shared {@link SystemsOptionsModel}.
  *
- * <p>This view is a sub-component of {@link SystemsPages}: the model snapshot and the overall load/apply lifecycle still
- * live on {@code SystemsPages}, while this class is responsible only for constructing the Reputation panel and copying
- * reputation values to and from the model. Unlike the other leaf pages it keeps a reference to the current model so the
- * reset-criminal-record button can flag a pending reset and refresh its own display; the actual criminal-record reset
- * is performed by {@code SystemsPages} during apply. The page is built lazily; until
+ * <p>This view is a sub-component of {@link SystemsPages}: the model snapshot and the overall load/apply lifecycle
+ * still live on {@code SystemsPages}, while this class is responsible only for constructing the Reputation panel and
+ * copying reputation values to and from the model. Unlike the other leaf pages it keeps a reference to the current
+ * model so the reset-criminal-record button can flag a pending reset and refresh its own display; the actual
+ * criminal-record reset is performed by {@code SystemsPages} during apply. The page is built lazily; until
  * {@link #createPanel(SystemsOptionsModel)} is called, {@link #readFromModel(SystemsOptionsModel)} and
  * {@link #writeToModel(SystemsOptionsModel)} are no-ops.</p>
  */
@@ -82,6 +82,13 @@ class ReputationPage {
     private JButton btnResetCriminalRecord;
 
     private JSpinner manualUnitRatingModifier;
+    private JCheckBox chkUseChaosReputation;
+    private JCheckBox chkCampaignLevelChaosReputation;
+    private JSpinner chaosReputationCap;
+    private JCheckBox chkChaosDebtPenaltiesStack;
+    private JCheckBox chkChaosNoPartialSuccessReputation;
+    private JCheckBox chkChaosPersonalityAffectsReputation;
+    private JCheckBox chkChaosNewRecruitsHaveReputation;
     private JCheckBox chkRequireSupportForceTransportation;
     private JCheckBox chkClampReputationPayMultiplier;
     private JCheckBox chkReduceReputationPerformanceModifier;
@@ -97,7 +104,8 @@ class ReputationPage {
      *
      * @return a {@link JPanel} component representing the entire Reputation page UI
      */
-    @Nonnull JPanel createPanel(@Nullable SystemsOptionsModel model) {
+    @Nonnull
+    JPanel createPanel(@Nullable SystemsOptionsModel model) {
         this.model = model;
 
         // Header
@@ -106,19 +114,23 @@ class ReputationPage {
 
         // Contents
         JPanel pnlReputationGeneralOptions = createReputationGeneralPanel();
+        JPanel pnlChaosReputationOptions = createChaosReputationPanel();
         JPanel pnlReputationSanityOptions = createReputationSanityPanel();
 
         // Layout the Panel
         final JPanel panel = CampaignOptionsPagePanel.builder("ReputationPage", "ReputationPage", imageAddress)
-                .header(reputationHeader)
-                .quote("reputationPage")
-                .section("lblReputationGeneralOptionsPanel.text",
-                        "lblReputationGeneralOptionsPanel.summary",
-                        pnlReputationGeneralOptions)
-                .section("lblReputationSanityOptionsPanel.text",
-                        "lblReputationSanityOptionsPanel.summary",
-                        pnlReputationSanityOptions)
-                .build();
+                                   .header(reputationHeader)
+                                   .quote("reputationPage")
+                                   .section("lblReputationGeneralOptionsPanel.text",
+                                         "lblReputationGeneralOptionsPanel.summary",
+                                         pnlReputationGeneralOptions)
+                                   .section("lblChaosReputationOptionsPanel.text",
+                                         "lblChaosReputationOptionsPanel.summary",
+                                         pnlChaosReputationOptions)
+                                   .section("lblReputationSanityOptionsPanel.text",
+                                         "lblReputationSanityOptionsPanel.summary",
+                                         pnlReputationSanityOptions)
+                                   .build();
 
         created = true;
         readFromModel(model);
@@ -134,23 +146,69 @@ class ReputationPage {
      */
     private @Nonnull JPanel createReputationGeneralPanel() {
         // Contents
+        chkUseChaosReputation = new CampaignOptionsCheckBox("UseChaosReputation", getMetadata(new Version(0, 51, 1)));
+        chkUseChaosReputation.addMouseListener(createTipPanelUpdater("UseChaosReputation"));
+
         JLabel lblManualUnitRatingModifier = new CampaignOptionsLabel("ManualUnitRatingModifier");
         lblManualUnitRatingModifier.addMouseListener(createTipPanelUpdater("ManualUnitRatingModifier"));
         manualUnitRatingModifier = new CampaignOptionsSpinner("ManualUnitRatingModifier", 0, -1000, 1000, 1);
-        manualUnitRatingModifier
-                .addMouseListener(createTipPanelUpdater("ManualUnitRatingModifier"));
-
-        JLabel lblResetCriminalRecord = new CampaignOptionsLabel("ResetCriminalRecord",
-                getResetCriminalRecordMetadata());
-        lblResetCriminalRecord.addMouseListener(createTipPanelUpdater("ResetCriminalRecord"));
-        btnResetCriminalRecord = createResetCriminalRecordButton();
+        manualUnitRatingModifier.addMouseListener(createTipPanelUpdater("ManualUnitRatingModifier"));
 
         // Layout the Panel
         final SettingsFormPanel panel = new SettingsFormPanel("ReputationGeneralOptionsPanel",
-                FORM_LABEL_COLUMN_WIDTH,
-                FORM_CONTROL_COLUMN_WIDTH);
+              FORM_LABEL_COLUMN_WIDTH,
+              FORM_CONTROL_COLUMN_WIDTH);
+        panel.addCheckBox(chkUseChaosReputation);
         panel.addRow(lblManualUnitRatingModifier, manualUnitRatingModifier);
-        panel.addRow(lblResetCriminalRecord, createLeftAlignedButtonPanel(btnResetCriminalRecord));
+
+        return panel;
+    }
+
+    /**
+     * Creates and lays out the Chaos Reputation options panel, holding the settings specific to the Chaos Campaign
+     * reputation system (other than the master toggle in the general panel).
+     *
+     * @return a {@link JPanel} containing the Chaos Reputation controls
+     */
+    private @Nonnull JPanel createChaosReputationPanel() {
+        // Contents
+        chkCampaignLevelChaosReputation = new CampaignOptionsCheckBox("CampaignLevelChaosReputation",
+              getMetadata(new Version(0, 51, 1)));
+        chkCampaignLevelChaosReputation.addMouseListener(createTipPanelUpdater("CampaignLevelChaosReputation"));
+
+        chkChaosDebtPenaltiesStack = new CampaignOptionsCheckBox("ChaosDebtPenaltiesStack",
+              getMetadata(new Version(0, 51, 1)));
+        chkChaosDebtPenaltiesStack.addMouseListener(createTipPanelUpdater("ChaosDebtPenaltiesStack"));
+
+        chkChaosNoPartialSuccessReputation = new CampaignOptionsCheckBox("ChaosNoPartialSuccessReputation",
+              getMetadata(new Version(0, 51, 1)));
+        chkChaosNoPartialSuccessReputation.addMouseListener(createTipPanelUpdater("ChaosNoPartialSuccessReputation"));
+
+        chkChaosPersonalityAffectsReputation = new CampaignOptionsCheckBox("ChaosPersonalityAffectsReputation",
+              getMetadata(new Version(0, 51, 1)));
+        chkChaosPersonalityAffectsReputation.addMouseListener(createTipPanelUpdater("ChaosPersonalityAffectsReputation"));
+
+        chkChaosNewRecruitsHaveReputation = new CampaignOptionsCheckBox("ChaosNewRecruitsHaveReputation",
+              getMetadata(new Version(0, 51, 1)));
+        chkChaosNewRecruitsHaveReputation.addMouseListener(createTipPanelUpdater("ChaosNewRecruitsHaveReputation"));
+
+        JLabel lblChaosReputationCap = new CampaignOptionsLabel("ChaosReputationCap",
+              getMetadata(new Version(0, 51, 1)));
+        lblChaosReputationCap.addMouseListener(createTipPanelUpdater("ChaosReputationCap"));
+        chaosReputationCap = new CampaignOptionsSpinner("ChaosReputationCap", 0, 0, 1000, 1);
+        chaosReputationCap.addMouseListener(createTipPanelUpdater("ChaosReputationCap"));
+
+        // Layout the Panel
+        final SettingsFormPanel panel = new SettingsFormPanel("ChaosReputationOptionsPanel",
+              FORM_LABEL_COLUMN_WIDTH,
+              FORM_CONTROL_COLUMN_WIDTH);
+        panel.addRow(lblChaosReputationCap, chaosReputationCap);
+        panel.addCheckBoxGrid(CHECKBOX_GRID_COLUMNS,
+              chkCampaignLevelChaosReputation,
+              chkChaosDebtPenaltiesStack,
+              chkChaosNoPartialSuccessReputation,
+              chkChaosPersonalityAffectsReputation,
+              chkChaosNewRecruitsHaveReputation);
 
         return panel;
     }
@@ -185,34 +243,42 @@ class ReputationPage {
      */
     private @Nonnull JPanel createReputationSanityPanel() {
         // Contents
+        JLabel lblResetCriminalRecord = new CampaignOptionsLabel("ResetCriminalRecord",
+              getResetCriminalRecordMetadata());
+        lblResetCriminalRecord.addMouseListener(createTipPanelUpdater("ResetCriminalRecord"));
+        btnResetCriminalRecord = createResetCriminalRecordButton();
+
         chkRequireSupportForceTransportation = new CampaignOptionsCheckBox("RequireSupportForceTransportation",
-                getMetadata(new Version(0, 51, 0)));
+              getMetadata(new Version(0, 51, 0)));
         chkRequireSupportForceTransportation.addMouseListener(createTipPanelUpdater("RequireSupportForceTransportation"));
 
         chkClampReputationPayMultiplier = new CampaignOptionsCheckBox("ClampReputationPayMultiplier",
-                getMetadata(LEGACY_RULE_BEFORE_METADATA, CampaignOptionFlag.IMPORTANT,
-                        CampaignOptionFlag.RECOMMENDED));
+              getMetadata(LEGACY_RULE_BEFORE_METADATA, CampaignOptionFlag.IMPORTANT,
+                    CampaignOptionFlag.RECOMMENDED));
         chkClampReputationPayMultiplier.addMouseListener(createTipPanelUpdater("ClampReputationPayMultiplier"));
 
         chkReduceReputationPerformanceModifier = new CampaignOptionsCheckBox("ReduceReputationPerformanceModifier",
-                getMetadata(LEGACY_RULE_BEFORE_METADATA, CampaignOptionFlag.IMPORTANT,
-                        CampaignOptionFlag.RECOMMENDED));
-        chkReduceReputationPerformanceModifier.addMouseListener(createTipPanelUpdater("ReduceReputationPerformanceModifier"));
+              getMetadata(LEGACY_RULE_BEFORE_METADATA, CampaignOptionFlag.IMPORTANT,
+                    CampaignOptionFlag.RECOMMENDED));
+        chkReduceReputationPerformanceModifier.addMouseListener(createTipPanelUpdater(
+              "ReduceReputationPerformanceModifier"));
 
         chkReputationPerformanceModifierCutOff = new CampaignOptionsCheckBox("ReputationPerformanceModifierCutOff",
-                getMetadata(LEGACY_RULE_BEFORE_METADATA, CampaignOptionFlag.IMPORTANT,
-                        CampaignOptionFlag.RECOMMENDED));
-        chkReputationPerformanceModifierCutOff.addMouseListener(createTipPanelUpdater("ReputationPerformanceModifierCutOff"));
+              getMetadata(LEGACY_RULE_BEFORE_METADATA, CampaignOptionFlag.IMPORTANT,
+                    CampaignOptionFlag.RECOMMENDED));
+        chkReputationPerformanceModifierCutOff.addMouseListener(createTipPanelUpdater(
+              "ReputationPerformanceModifierCutOff"));
 
         // Layout the Panel
         final SettingsFormPanel panel = new SettingsFormPanel("ReputationSanityOptionsPanel",
-                FORM_LABEL_COLUMN_WIDTH,
-                FORM_CONTROL_COLUMN_WIDTH);
+              FORM_LABEL_COLUMN_WIDTH,
+              FORM_CONTROL_COLUMN_WIDTH);
+        panel.addRow(lblResetCriminalRecord, createLeftAlignedButtonPanel(btnResetCriminalRecord));
         panel.addCheckBoxGrid(CHECKBOX_GRID_COLUMNS,
-                chkClampReputationPayMultiplier,
-                chkRequireSupportForceTransportation,
-                chkReduceReputationPerformanceModifier,
-                chkReputationPerformanceModifierCutOff);
+              chkClampReputationPayMultiplier,
+              chkRequireSupportForceTransportation,
+              chkReduceReputationPerformanceModifier,
+              chkReputationPerformanceModifierCutOff);
 
         return panel;
     }
@@ -233,7 +299,7 @@ class ReputationPage {
 
         boolean isResetPending = model != null && model.resetCriminalRecord;
         String resourceKey = isResetPending ? "btnResetCriminalRecord.pending.text" :
-                "btnResetCriminalRecord.text";
+                                   "btnResetCriminalRecord.text";
         btnResetCriminalRecord.setText(getTextAt(getCampaignOptionsResourceBundle(), resourceKey));
         btnResetCriminalRecord.setEnabled(!isResetPending);
     }
@@ -251,6 +317,13 @@ class ReputationPage {
         }
 
         manualUnitRatingModifier.setValue(model.manualUnitRatingModifier);
+        chkUseChaosReputation.setSelected(model.useChaosReputation);
+        chkCampaignLevelChaosReputation.setSelected(model.campaignLevelChaosReputation);
+        chkChaosDebtPenaltiesStack.setSelected(model.chaosDebtPenaltiesStack);
+        chkChaosNoPartialSuccessReputation.setSelected(model.chaosNoPartialSuccessReputation);
+        chkChaosPersonalityAffectsReputation.setSelected(model.chaosPersonalityAffectsReputation);
+        chkChaosNewRecruitsHaveReputation.setSelected(model.chaosNewRecruitsHaveReputation);
+        chaosReputationCap.setValue(model.chaosReputationCap);
         updateResetCriminalRecordButtonFromModel();
         chkRequireSupportForceTransportation.setSelected(model.requireSupportForceTransportation);
         chkClampReputationPayMultiplier.setSelected(model.clampReputationPayMultiplier);
@@ -270,6 +343,13 @@ class ReputationPage {
         }
 
         model.manualUnitRatingModifier = (int) manualUnitRatingModifier.getValue();
+        model.useChaosReputation = chkUseChaosReputation.isSelected();
+        model.campaignLevelChaosReputation = chkCampaignLevelChaosReputation.isSelected();
+        model.chaosDebtPenaltiesStack = chkChaosDebtPenaltiesStack.isSelected();
+        model.chaosNoPartialSuccessReputation = chkChaosNoPartialSuccessReputation.isSelected();
+        model.chaosPersonalityAffectsReputation = chkChaosPersonalityAffectsReputation.isSelected();
+        model.chaosNewRecruitsHaveReputation = chkChaosNewRecruitsHaveReputation.isSelected();
+        model.chaosReputationCap = (int) chaosReputationCap.getValue();
         model.requireSupportForceTransportation = chkRequireSupportForceTransportation.isSelected();
         model.clampReputationPayMultiplier = chkClampReputationPayMultiplier.isSelected();
         model.reduceReputationPerformanceModifier = chkReduceReputationPerformanceModifier.isSelected();
