@@ -40,9 +40,16 @@ import static mekhq.utilities.ReportingUtilities.CLOSING_SPAN_TAG;
 import static mekhq.utilities.ReportingUtilities.getAmazingColor;
 import static mekhq.utilities.ReportingUtilities.spanOpeningWithCustomColor;
 
+import java.util.List;
+
 import megamek.common.units.Entity;
 import mekhq.campaign.Campaign;
+import mekhq.campaign.LocalHangar;
+import mekhq.campaign.campaignOptions.CampaignOption;
+import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.enums.DailyReportType;
+import mekhq.campaign.force.CombatTeam;
+import mekhq.campaign.force.Formation;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.PersonnelOptions;
 import mekhq.campaign.unit.Unit;
@@ -180,8 +187,37 @@ public enum Familiarity {
         return label;
     }
 
+    public static void assignFamiliarityToCombatTeam(Campaign campaign, CombatTeam combatTeam,
+          FamiliarityGainType gainType) {
+        CampaignOptions campaignOptions = campaign.getCampaignOptions();
+        Familiarity mode = campaignOptions.get(CampaignOption.CHASSIS_FAMILIARITY_MODE);
+        if (!mode.isEnabled()) {
+            return;
+        }
+
+        Formation formation = combatTeam.getFormation(campaign);
+        if (formation == null) {
+            return;
+        }
+
+        int familiaritySpeed = campaignOptions.get(CampaignOption.CHASSIS_FAMILIARITY_SPEED);
+        int familiarityCap = mode.getFamiliarityCap();
+
+        LocalHangar hangar = campaign.getPlayerForce().getHangar();
+        List<Unit> units = formation.getUnitsAsUnits(hangar);
+        for (Unit unit : units) {
+            assignFamiliarity(campaign, unit, familiarityCap, familiaritySpeed, gainType);
+        }
+    }
+
     public static void assignFamiliarity(Campaign campaign, Unit unit, int cap, int speed,
           FamiliarityGainType gainType) {
+        CampaignOptions campaignOptions = campaign.getCampaignOptions();
+        Familiarity mode = campaignOptions.get(CampaignOption.CHASSIS_FAMILIARITY_MODE);
+        if (!mode.isEnabled()) {
+            return;
+        }
+
         Entity unitEntity = unit.getEntity();
         if (unitEntity == null || !unitEntity.isChassisFamiliarityEligible()) {
             return;

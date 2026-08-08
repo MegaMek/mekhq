@@ -121,6 +121,8 @@ import mekhq.campaign.mission.enums.ScenarioStatus;
 import mekhq.campaign.mission.enums.ScenarioType;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.PersonnelOptions;
+import mekhq.campaign.personnel.familiarity.Familiarity;
+import mekhq.campaign.personnel.familiarity.FamiliarityGainType;
 import mekhq.campaign.personnel.skills.ActionCheckResult;
 import mekhq.campaign.personnel.skills.ScoutingSkills;
 import mekhq.campaign.personnel.skills.Skill;
@@ -1710,11 +1712,15 @@ public class StratConRulesManager {
         // we want to ensure we only increase Fatigue once
         boolean hasFatigueIncreased = false;
 
-        // Determine scan range (this is the furthest a hex can be revealed)
         int scanRangeIncrease = track.getScanRangeIncrease();
         CombatTeam combatTeam = campaign.getPlayerForce().getCombatTeamsAsMap(campaign).get(forceID);
-        if (combatTeam != null && combatTeam.getRole().isPatrol()) {
-            scanRangeIncrease++;
+        if (combatTeam != null) {
+            boolean isPatrol = combatTeam.getRole().isPatrol();
+            if (isPatrol) {
+                scanRangeIncrease++; // Determine scan range (this is the furthest a hex can be revealed)
+            }
+
+            Familiarity.assignFamiliarityToCombatTeam(campaign, combatTeam, FamiliarityGainType.D3);
         }
 
         // Process starting point
