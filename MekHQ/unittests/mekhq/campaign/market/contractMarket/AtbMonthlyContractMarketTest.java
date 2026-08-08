@@ -57,6 +57,7 @@ import java.util.Optional;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.JumpPath;
 import mekhq.campaign.LocalHangar;
+import mekhq.campaign.campaignOptions.CampaignOption;
 import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.enums.DragoonRating;
 import mekhq.campaign.finances.Accountant;
@@ -66,6 +67,7 @@ import mekhq.campaign.mission.AtBContract;
 import mekhq.campaign.mission.enums.AtBContractType;
 import mekhq.campaign.mission.newContract.contractGeneration.targetFinder.EnemySelectionProfile;
 import mekhq.campaign.mission.utilities.ContractUtilities;
+import mekhq.campaign.reputation.camOpsReputation.ForceReputationController;
 import mekhq.campaign.universe.Faction;
 import mekhq.campaign.universe.Factions;
 import mekhq.campaign.universe.PlanetarySystem;
@@ -147,10 +149,10 @@ class AtbMonthlyContractMarketTest {
         private void setupCampaign() {
             CampaignOptions campaignOptions = mock(CampaignOptions.class);
             when(campaignOptions.getContractMaxSalvagePercentage()).thenReturn(100);
+            when(campaignOptions.get(CampaignOption.USE_CHAOS_REPUTATION)).thenReturn(false);
 
-            mekhq.campaign.camOpsReputation.ForceReputationController reputation = mock(mekhq.campaign.camOpsReputation.ForceReputationController.class);
+            ForceReputationController reputation = mock(ForceReputationController.class);
             when(reputation.getReputationFactor()).thenReturn(1.0);
-            when(reputation.getAverageSkillLevel()).thenReturn(REGULAR);
 
             Accountant accountant = mock(Accountant.class);
             when(accountant.getContractBase()).thenReturn(Money.of(1));
@@ -166,6 +168,7 @@ class AtbMonthlyContractMarketTest {
             when(campaign.getGameYear()).thenReturn(GAME_YEAR);
             when(campaign.getCampaignOptions()).thenReturn(campaignOptions);
             when(campaign.getPlayerForce().getReputation()).thenReturn(reputation);
+            when(campaign.getPlayerForce().getAverageSkillLevel(any(), any())).thenReturn(REGULAR);
             when(campaign.getAccountant()).thenReturn(accountant);
             when(campaign.getPlayerForce().getHangar()).thenReturn(hangar);
             when(campaign.getCurrentSystem()).thenReturn(currentSystem);

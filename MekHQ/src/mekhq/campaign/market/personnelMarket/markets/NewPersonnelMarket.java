@@ -1124,7 +1124,11 @@ public class NewPersonnelMarket {
                 continue;
             }
 
-            int experienceLevel = applicant.getExperienceLevel(campaign, false);
+            int experienceLevel = applicant.getExperienceLevel(campaign.getCampaignOptions(),
+                  campaign.getPlayerForce().isClanForce(),
+                  campaign.getLocalDate(),
+                  false,
+                  false);
             for (int i = 0; i < expLevels.length; i++) {
                 if (experienceLevel == expLevels[i]) {
                     applicantCounts[i]++;

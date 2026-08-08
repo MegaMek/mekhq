@@ -112,7 +112,6 @@ import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.LocalHangar;
 import mekhq.campaign.againstTheBot.AtBConfiguration;
-import mekhq.campaign.camOpsReputation.IUnitRating;
 import mekhq.campaign.campaignOptions.BoardScalingType;
 import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.digitalGM.stratCon.StratConCampaignState;
@@ -2365,7 +2364,6 @@ public class AtBDynamicScenarioFactory {
      * @param transports    list of potential transports
      * @param factionCode   Faction code for generating infantry
      * @param skill         {@link SkillLevel} target skill for crews of generated units
-     * @param quality       {@link IUnitRating} Base quality for selection of infantry
      * @param requiredRoles Lists of required roles for generated units
      * @param allowInfantry false if conventional infantry shouldn't be generated
      * @param campaign      current campaign

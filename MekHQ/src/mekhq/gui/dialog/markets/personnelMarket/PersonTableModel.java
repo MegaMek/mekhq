@@ -35,6 +35,7 @@ package mekhq.gui.dialog.markets.personnelMarket;
 import static mekhq.campaign.personnel.enums.GenderDescriptors.MALE_FEMALE_OTHER;
 import static mekhq.campaign.personnel.skills.SkillType.getColoredExperienceLevelName;
 
+import java.time.LocalDate;
 import java.util.Comparator;
 import java.util.Enumeration;
 import java.util.List;
@@ -46,6 +47,8 @@ import megamek.common.options.IOption;
 import megamek.common.util.sorter.NaturalOrderComparator;
 import megamek.logging.MMLogger;
 import mekhq.campaign.Campaign;
+import mekhq.campaign.campaignOptions.CampaignOption;
+import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.finances.Money;
 import mekhq.campaign.market.personnelMarket.markets.NewPersonnelMarket;
 import mekhq.campaign.personnel.Person;
@@ -91,6 +94,7 @@ public class PersonTableModel extends AbstractTableModel {
 
     private final Campaign campaign;
     private final List<Person> people;
+    private final List<ApplicantTableColumns> columns;
 
     /**
      * Creates a new {@code PersonTableModel} for the provided campaign and list of people.
@@ -104,6 +108,7 @@ public class PersonTableModel extends AbstractTableModel {
     public PersonTableModel(Campaign campaign, List<Person> people) {
         this.campaign = campaign;
         this.people = people;
+        this.columns = ApplicantTableColumns.getVisibleColumns(campaign.getCampaignOptions());
     }
 
     @Override
@@ -113,12 +118,12 @@ public class PersonTableModel extends AbstractTableModel {
 
     @Override
     public int getColumnCount() {
-        return ApplicantTableColumns.values().length;
+        return columns.size();
     }
 
     @Override
     public String getColumnName(int column) {
-        return ApplicantTableColumns.values()[column].getLabel();
+        return columns.get(column).getLabel();
     }
 
     @Override
@@ -147,7 +152,8 @@ public class PersonTableModel extends AbstractTableModel {
             }
         }
 
-        ApplicantTableColumns column = ApplicantTableColumns.values()[columnIndex];
+        CampaignOptions campaignOptions = campaign.getCampaignOptions();
+        ApplicantTableColumns column = columns.get(columnIndex);
         return switch (column) {
             case FULL_NAME -> {
                 String name = person.getFullName();
@@ -167,8 +173,22 @@ public class PersonTableModel extends AbstractTableModel {
                 }
             }
             case EXPERIENCE -> {
-                int experienceLevel = person.getExperienceLevel(campaign, false, true);
+                int experienceLevel = person.getExperienceLevel(campaignOptions,
+                      campaign.getPlayerForce().isClanForce(),
+                      campaign.getLocalDate(),
+                      false,
+                      true);
                 yield "<html>" + getColoredExperienceLevelName(experienceLevel) + "</html>";
+            }
+            case REPUTATION -> {
+                boolean useAgeEffects = campaignOptions.get(CampaignOption.USE_AGE_EFFECTS);
+                boolean isClanForce = campaign.getPlayerForce().isClanForce();
+                LocalDate currentDate = campaign.getLocalDate();
+                boolean isUseRandomPersonalities = campaignOptions.get(CampaignOption.USE_RANDOM_PERSONALITIES);
+                boolean isUsePersonalityReputation = campaignOptions.get(CampaignOption.CHAOS_PERSONALITY_AFFECTS_REPUTATION);
+                boolean isUsePersonality = isUseRandomPersonalities && isUsePersonalityReputation;
+
+                yield person.getAdjustedReputation(useAgeEffects, isClanForce, currentDate, isUsePersonality);
             }
             case AGE -> Integer.toString(person.getAge(campaign.getLocalDate()));
             case GENDER -> MALE_FEMALE_OTHER.getDescriptorCapitalized(person.getGender());
@@ -193,10 +213,10 @@ public class PersonTableModel extends AbstractTableModel {
      * @since 0.50.06
      */
     public Comparator<?> getComparator(int columnIndex) {
-        ApplicantTableColumns column = ApplicantTableColumns.values()[columnIndex];
+        ApplicantTableColumns column = columns.get(columnIndex);
         return switch (column) {
             case AGE, HIRING_COST -> new IntegerStringSorter();
-            case POSITIVE_ABILITIES, NEGATIVE_ABILITIES, PERFORMANCE_EXAM -> Comparator.naturalOrder();
+            case POSITIVE_ABILITIES, NEGATIVE_ABILITIES, PERFORMANCE_EXAM, REPUTATION -> Comparator.naturalOrder();
             case EXPERIENCE -> new LevelSorter();
             default -> new NaturalOrderComparator();
         };

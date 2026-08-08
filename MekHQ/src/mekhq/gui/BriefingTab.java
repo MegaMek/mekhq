@@ -89,6 +89,7 @@ import mekhq.campaign.Campaign;
 import mekhq.campaign.CampaignNewDayManager;
 import mekhq.campaign.LocalHangar;
 import mekhq.campaign.autoResolve.AutoResolveMethod;
+import mekhq.campaign.campaignOptions.CampaignOption;
 import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.digitalGM.stratCon.StratConCampaignState;
 import mekhq.campaign.digitalGM.stratCon.StratConScenario;
@@ -119,6 +120,7 @@ import mekhq.campaign.personnel.autoAwards.AutoAwardsController;
 import mekhq.campaign.personnel.enums.PersonnelRole;
 import mekhq.campaign.personnel.skills.SkillType;
 import mekhq.campaign.randomEvents.prisoners.PrisonerMissionEndEvent;
+import mekhq.campaign.reputation.chaosReputation.ChaosReputation;
 import mekhq.campaign.unit.Unit;
 import mekhq.campaign.universe.Faction;
 import mekhq.campaign.universe.Factions;
@@ -852,6 +854,23 @@ public final class BriefingTab extends CampaignGuiTab {
 
         getCampaign().completeMission(mission, status);
         MekHQ.triggerEvent(new MissionCompletedEvent(mission));
+
+        if (campaignOptions.get(CampaignOption.USE_CHAOS_REPUTATION)) {
+            List<Person> personnel = getCampaign().getPlayerForce()
+                                           .getHumanResources()
+                                           .getPersonnelFilteringOutDepartedAndAbsent();
+            ChaosReputation.processContractCompletion(getCampaign(), status, personnel);
+
+            if (mission instanceof AtBContract contract &&
+                      Objects.equals(contract.getEmployerCode(), PIRATE_FACTION_CODE)) {
+                ChaosReputation.resolveActOfPiracy(getCampaign(),
+                      personnel,
+                      contract.getRequiredCombatTeams(),
+                      contract.getScenarios(),
+                      status.isOverallSuccess(),
+                      contract.getName());
+            }
+        }
 
         // apply mission xp
         int xpAward = getMissionXpAward(cmd.getStatus(), mission);
