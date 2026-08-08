@@ -204,9 +204,9 @@ public class Person implements ILocatable {
     public static final int MINIMUM_PROPERTY = 0;
     public static final int MAXIMUM_PROPERTY = 10;
 
-    public static final String REPUTATION_LABEL = "FAME";
-    public static final int MINIMUM_REPUTATION = -5;
-    public static final int MAXIMUM_REPUTATION = 5;
+    public static final String FAME_LABEL = "FAME";
+    public static final int MINIMUM_FAME = -5;
+    public static final int MAXIMUM_FAME = 5;
 
     public static final String TITLE_LABEL = "TITLE";
     public static final int MINIMUM_TITLE = 0;

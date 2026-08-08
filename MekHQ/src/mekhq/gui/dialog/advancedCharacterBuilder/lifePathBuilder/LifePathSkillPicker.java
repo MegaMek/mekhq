@@ -310,7 +310,6 @@ class LifePathSkillPicker extends JDialog {
         for (int i = 0; i < skills.size(); i++) {
             SkillType type = skills.get(i);
             String label = type.getName();
-            label = label.replace(SkillType.RP_ONLY_TAG, "");
 
             int minimumSkillLevel = switch (tabType) {
                 case REQUIREMENTS, EXCLUSIONS -> 0;

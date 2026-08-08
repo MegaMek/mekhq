@@ -237,8 +237,8 @@ class LifePathTraitPicker extends JDialog {
                             traitMaximumValue = MAXIMUM_PROPERTY;
                         }
                         case REPUTATION -> {
-                            traitMinimumValue = MINIMUM_REPUTATION;
-                            traitMaximumValue = MAXIMUM_REPUTATION;
+                            traitMinimumValue = MINIMUM_FAME;
+                            traitMaximumValue = MAXIMUM_FAME;
                         }
                         case TITLE -> {
                             traitMinimumValue = MINIMUM_TITLE;

@@ -247,7 +247,7 @@ class LifePathAttributePicker extends JDialog {
         int keyValue = getDefaultAttributeValue(tabType, false);
 
         for (SkillAttribute attribute : SkillAttribute.values()) {
-            if (attribute == SkillAttribute.NONE) {
+            if (attribute == SkillAttribute.NO_ATTRIBUTE) {
                 continue;
             }
 

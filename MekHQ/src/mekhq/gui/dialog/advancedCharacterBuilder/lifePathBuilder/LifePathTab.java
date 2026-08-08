@@ -74,7 +74,6 @@ import mekhq.campaign.personnel.advancedCharacterBuilder.LifePath;
 import mekhq.campaign.personnel.advancedCharacterBuilder.LifePathBuilderTabType;
 import mekhq.campaign.personnel.advancedCharacterBuilder.LifePathCategory;
 import mekhq.campaign.personnel.advancedCharacterBuilder.LifePathEntryDataTraitLookup;
-import mekhq.campaign.personnel.skills.SkillType;
 import mekhq.campaign.personnel.skills.enums.SkillAttribute;
 import mekhq.campaign.personnel.skills.enums.SkillSubType;
 import mekhq.campaign.universe.Faction;
@@ -1119,7 +1118,7 @@ public class LifePathTab {
             int length = workingNaturalAptitudes.size();
             for (Map.Entry<String, Integer> entry : workingNaturalAptitudes.entrySet()) {
                 String label = getFormattedTextAt(RESOURCE_BUNDLE, "LifePathBuilderDialog.naturalAptitude.label",
-                      entry.getKey().replace(SkillType.RP_ONLY_TAG, ""));
+                      entry.getKey());
                 int value = entry.getValue();
 
                 individualProgressText.append(label);
@@ -1163,7 +1162,7 @@ public class LifePathTab {
             int counter = 0;
             int length = workingSkills.size();
             for (Map.Entry<String, Integer> entry : workingSkills.entrySet()) {
-                String label = entry.getKey().replace(SkillType.RP_ONLY_TAG, "");
+                String label = entry.getKey();
                 int value = entry.getValue();
 
                 individualProgressText.append(label);
