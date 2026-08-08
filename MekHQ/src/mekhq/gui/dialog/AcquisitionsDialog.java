@@ -515,15 +515,15 @@ public class AcquisitionsDialog extends JDialog {
             btnOrderInBulk.setName("btnOrderInBulk");
             btnOrderInBulk.addActionListener(ev -> {
                 int quantity = 1;
-                PopupValueChoiceDialog pcd = new PopupValueChoiceDialog(campaignGUI.getFrame(),
+                PopupValueChoiceDialog orderCountDialog = new PopupValueChoiceDialog(campaignGUI.getFrame(),
                       true,
                       "How Many " + part.getName() + '?',
                       quantity,
                       1,
                       CampaignGUI.MAX_QUANTITY_SPINNER);
-                pcd.setVisible(true);
-                quantity = pcd.getValue();
-                if (quantity > 0) {
+                orderCountDialog.setVisible(true);
+                quantity = orderCountDialog.getValue();
+                if (!orderCountDialog.wasCanceled()) {
                     campaignGUI.getCampaign().getPlayerForce().getShoppingList()
                           .addShoppingItem(part.getAcquisitionWork(), quantity, campaignGUI.getCampaign());
                     refresh();
