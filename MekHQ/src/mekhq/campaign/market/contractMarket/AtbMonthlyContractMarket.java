@@ -559,7 +559,7 @@ public class AtbMonthlyContractMarket extends AbstractContractMarket {
             return generateAtBContract(campaign, employer, unitRatingMod, retries - 1);
         }
 
-        final ForceReputationController reputation = campaign.getPlayerForce().getReputation();
+        final ForceReputationController reputation = campaign.getPlayerForce().getCamOpsReputation();
         final SkillLevel campaignSkillLevel = reputation == null ?
                                                     REGULAR :
                                                     campaign.getPlayerForce()
@@ -855,7 +855,7 @@ public class AtbMonthlyContractMarket extends AbstractContractMarket {
         }
 
         // Reputation multiplier
-        double reputationFactor = campaign.getPlayerForce().getReputation().getReputationFactor();
+        double reputationFactor = campaign.getPlayerForce().getCamOpsReputation().getReputationFactor();
 
         if (campaignOptions.isClampReputationPayMultiplier()) {
             reputationFactor = Math.clamp(reputationFactor, 0.5, 2.0);

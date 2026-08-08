@@ -167,7 +167,7 @@ class AtbMonthlyContractMarketTest {
             when(campaign.getLocalDate()).thenReturn(TODAY);
             when(campaign.getGameYear()).thenReturn(GAME_YEAR);
             when(campaign.getCampaignOptions()).thenReturn(campaignOptions);
-            when(campaign.getPlayerForce().getReputation()).thenReturn(reputation);
+            when(campaign.getPlayerForce().getCamOpsReputation()).thenReturn(reputation);
             when(campaign.getPlayerForce().getAverageSkillLevel(any(), any())).thenReturn(REGULAR);
             when(campaign.getAccountant()).thenReturn(accountant);
             when(campaign.getPlayerForce().getHangar()).thenReturn(hangar);

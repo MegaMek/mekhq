@@ -36,15 +36,19 @@ import static java.lang.Math.ceil;
 
 import java.time.LocalDate;
 import java.util.Collection;
+import java.util.List;
 
 import jakarta.annotation.Nonnull;
 import jakarta.annotation.Nullable;
 import megamek.common.enums.SkillLevel;
 import megamek.logging.MMLogger;
+import mekhq.campaign.AbstractLocation;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.JumpPath;
 import mekhq.campaign.campaignOptions.CampaignOption;
 import mekhq.campaign.campaignOptions.CampaignOptions;
+import mekhq.campaign.force.Detachment;
+import mekhq.campaign.force.PlayerForce;
 import mekhq.campaign.location.ILocation;
 import mekhq.campaign.mission.newContract.ChaosContract;
 import mekhq.campaign.mission.newContract.contractData.ContractObjectiveData;
@@ -52,7 +56,8 @@ import mekhq.campaign.mission.newContract.contractData.ContractScheduleData;
 import mekhq.campaign.mission.newContract.contractData.EmployerData;
 import mekhq.campaign.mission.newContract.contractData.EnemyData;
 import mekhq.campaign.mission.newContract.contractData.SystemsTargetData;
-import mekhq.campaign.reputation.camOpsReputation.ForceReputationController;
+import mekhq.campaign.personnel.Person;
+import mekhq.campaign.reputation.chaosReputation.ChaosReputation;
 import mekhq.campaign.universe.Planet;
 import mekhq.campaign.universe.PlanetarySystem;
 import mekhq.campaign.universe.Systems;
@@ -63,12 +68,12 @@ public class NormalContractGeneration extends AbstractContractGeneration {
     private static final MMLogger LOGGER = MMLogger.create(NormalContractGeneration.class);
 
     public static @Nullable ChaosContract createChaosContract(Campaign campaign, CampaignOptions campaignOptions,
-          LocalDate currentDate, ILocation currentLocation, int contractGenerationModifier,
-          ContractSearchType searchType, FactionStandings factionStandings,
-          boolean overridingCommandCircuitRequirements, boolean isGM) {
+          LocalDate currentDate, Detachment detachment, int contractGenerationModifier, ContractSearchType searchType,
+          FactionStandings factionStandings, boolean overridingCommandCircuitRequirements, boolean isGM) {
         final ChaosContract contract = new ChaosContract();
 
         // Step 1: Employer
+        AbstractLocation currentLocation = detachment.getCurrentLocation();
         EmployerData employerData = pickEmployer(campaign, currentDate, currentLocation, searchType, contract);
         if (employerData == null) {
             return null;
@@ -93,11 +98,13 @@ public class NormalContractGeneration extends AbstractContractGeneration {
         }
 
         // Step 5: Force Ratings (skill and equipment of both sides)
+        PlayerForce playerForce = campaign.getPlayerForce();
         PlanetarySystem targetSystem = Systems.getInstance().getSystemById(systemsTargetData.systemId());
         Planet targetPlanet = targetSystem.getPlanetById(systemsTargetData.planetId());
-        setForceRatings(campaign,
+        setForceRatings(playerForce,
               campaignOptions,
               currentDate,
+              detachment,
               targetPlanet,
               employerData,
               enemyData,
@@ -152,11 +159,12 @@ public class NormalContractGeneration extends AbstractContractGeneration {
      * @param objectiveData   the contract's objectives, for the player objective's strategic scope
      * @param contract        the contract being built
      */
-    private static void setForceRatings(Campaign campaign, CampaignOptions campaignOptions, LocalDate currentDate,
-          Planet targetPlanet, EmployerData employerData, EnemyData enemyData,
+    private static void setForceRatings(PlayerForce playerForce, CampaignOptions campaignOptions, LocalDate currentDate,
+          Detachment detachment, Planet targetPlanet, EmployerData employerData, EnemyData enemyData,
           ContractObjectiveData objectiveData, ChaosContract contract) {
-        int planetStrategicValue = (targetPlanet == null) ? 0
-                                         : ChaosPlanetStrategicValue.calculate(targetPlanet, currentDate);
+        int planetStrategicValue = (targetPlanet == null) ?
+                                         0 :
+                                         ChaosPlanetStrategicValue.calculate(targetPlanet, currentDate);
 
         ChaosObjectiveType objectiveType = objectiveData.playerObjectiveType().getChaosObjectiveType();
         ContractImportance importance = ContractImportance.from(employerData.type(), objectiveType,
@@ -165,19 +173,57 @@ public class NormalContractGeneration extends AbstractContractGeneration {
         boolean isPlayerAttacker = isPlayerAttacker(objectiveType);
         int year = currentDate.getYear();
         boolean scaleToPlayer = campaignOptions.get(CampaignOption.USE_DYNAMIC_DIFFICULTY);
-        SkillLevel averageSkill = campaignAverageSkill(campaign);
 
-        ChaosEmployerForceRating.ForceRating employerRating = ChaosEmployerForceRating.determine(
-              employerData.getFaction(), isPlayerAttacker, true, year, importance, scaleToPlayer, averageSkill);
+        boolean isClanForce = playerForce.isClanForce();
+        SkillLevel playerAverageSkill = getAverageSkill(playerForce,
+              isClanForce,
+              campaignOptions,
+              currentDate,
+              detachment);
+
+        ChaosEmployerForceRating.ForceRating employerRating = ChaosEmployerForceRating.determine(employerData.getFaction(),
+              isPlayerAttacker,
+              true,
+              year,
+              importance,
+              scaleToPlayer,
+              playerAverageSkill);
+
         ChaosEmployerForceRating.ForceRating enemyRating = ChaosEmployerForceRating.determine(enemyData.getFaction(),
-              !isPlayerAttacker, false, year, importance, scaleToPlayer, averageSkill);
+              !isPlayerAttacker,
+              false,
+              year,
+              importance,
+              scaleToPlayer,
+              playerAverageSkill);
 
-        EmployerData updatedEmployerData = new EmployerData(employerData, employerRating.forceSkill(),
+        EmployerData updatedEmployerData = new EmployerData(employerData,
+              employerRating.forceSkill(),
               employerRating.equipmentRating());
         contract.setEmployerData(updatedEmployerData);
 
         EnemyData updatedEnemyData = new EnemyData(enemyData, enemyRating.forceSkill(), enemyRating.equipmentRating());
         contract.setEnemyData(updatedEnemyData);
+    }
+
+    private static SkillLevel getAverageSkill(PlayerForce playerForce, boolean isClanForce,
+          CampaignOptions campaignOptions, LocalDate currentDate, Detachment detachment) {
+        SkillLevel averageSkill;
+        boolean isUseChaosReputation = campaignOptions.get(CampaignOption.USE_CHAOS_REPUTATION);
+
+        if (isUseChaosReputation) {
+            List<Person> personnel = detachment.getPersonnel().values().stream()
+                                           .filter(person -> !person.getStatus().isDepartedUnit())
+                                           .toList();
+            averageSkill = ChaosReputation.getAverageSkillLevel(campaignOptions,
+                  isClanForce,
+                  currentDate,
+                  personnel);
+        } else {
+            averageSkill = playerForce.getCamOpsReputation().getAverageSkillLevel();
+        }
+
+        return averageSkill;
     }
 
     /**
@@ -189,11 +235,6 @@ public class NormalContractGeneration extends AbstractContractGeneration {
             case GARRISON, CADRE_DUTY -> false;
             default -> true;
         };
-    }
-
-    private static SkillLevel campaignAverageSkill(Campaign campaign) {
-        ForceReputationController reputation = campaign.getPlayerForce().getReputation();
-        return (reputation == null) ? SkillLevel.REGULAR : reputation.getAverageSkillLevel();
     }
 
     private static void setContractTerms(ChaosObjectiveType objectiveType, ChaosEmployerType employerType,
@@ -276,8 +317,8 @@ public class NormalContractGeneration extends AbstractContractGeneration {
         return objectiveData;
     }
 
-    private static @Nullable EmployerData pickEmployer(Campaign campaign,
-          LocalDate currentDate, ILocation currentLocation, ContractSearchType searchType, ChaosContract contract) {
+    private static @Nullable EmployerData pickEmployer(Campaign campaign, LocalDate currentDate,
+          ILocation currentLocation, ContractSearchType searchType, ChaosContract contract) {
         EmployerData employerData = ChaosContractEmployerDetermination.getEmployerGenerationData(currentDate,
               currentLocation,
               campaign,

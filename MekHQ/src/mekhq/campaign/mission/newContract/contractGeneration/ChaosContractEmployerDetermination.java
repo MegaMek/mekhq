@@ -63,7 +63,6 @@ public class ChaosContractEmployerDetermination {
     private static final int COMSTAR_EMPLOYER_CHANCE = 100;
     private static final int WORD_OF_BLAKE_EMPLOYER_CHANCE = 40;
 
-    // TODO remove campaign
     public static @Nullable EmployerData getEmployerGenerationData(LocalDate currentDate, ILocation currentLocation,
           Campaign campaign, ContractSearchType searchType) {
         ChaosEmployerType type = determineEmployerType();
@@ -87,7 +86,10 @@ public class ChaosContractEmployerDetermination {
         HiringHallLevel hiringHall = currentPlanet.getHiringHallLevel(currentDate);
 
         Person negotiator = EmployerNegotiator.generateNegotiator(campaign, searchType, employer, hiringHall);
-        Person liaison = EmployerLiaison.generateLiaison(campaign, searchType, employer);
+        Person liaison = EmployerLiaison.generateLiaison(campaign,
+              searchType,
+              employer.isClan(),
+              employer.getShortName());
 
         Camouflage camouflage = pickRandomCamouflage(currentYear, factionCode);
 
