@@ -41,7 +41,7 @@ import java.util.Set;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.EnumSource;
 
-class NormalContractGenerationTest {
+class AbstractContractGenerationTest {
 
     /** The objectives on which the player holds ground rather than takes it. */
     private static final Set<ChaosObjectiveType> DEFENSIVE_OBJECTIVES =
@@ -52,10 +52,10 @@ class NormalContractGenerationTest {
     void isPlayerAttackerIsFalseOnlyForDefensiveObjectives(final ChaosObjectiveType objectiveType) {
         boolean expectedAttacker = !DEFENSIVE_OBJECTIVES.contains(objectiveType);
         if (expectedAttacker) {
-            assertTrue(NormalContractGeneration.isPlayerAttacker(objectiveType),
+            assertTrue(AbstractContractGeneration.isPlayerAttacker(objectiveType),
                   objectiveType + " is an offensive objective and should make the player the attacker");
         } else {
-            assertFalse(NormalContractGeneration.isPlayerAttacker(objectiveType),
+            assertFalse(AbstractContractGeneration.isPlayerAttacker(objectiveType),
                   objectiveType + " is a defensive objective and should not make the player the attacker");
         }
     }
