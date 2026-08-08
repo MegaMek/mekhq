@@ -39,10 +39,10 @@ import static megamek.common.enums.SkillLevel.REGULAR;
 import static megamek.common.enums.SkillLevel.parseFromString;
 import static mekhq.campaign.mission.RandomFactionCamouflage.pickRandomCamouflage;
 import static mekhq.campaign.mission.enums.AtBContractType.UNDEFINED;
-import static mekhq.campaign.mission.enums.AtBMoraleLevel.MAXIMUM_MORALE_LEVEL;
-import static mekhq.campaign.mission.enums.AtBMoraleLevel.MINIMUM_MORALE_LEVEL;
-import static mekhq.campaign.mission.enums.AtBMoraleLevel.STALEMATE;
 import static mekhq.campaign.mission.enums.ContractCommandRights.INDEPENDENT;
+import static mekhq.campaign.mission.enums.ContractMoraleLevel.MAXIMUM_MORALE_LEVEL;
+import static mekhq.campaign.mission.enums.ContractMoraleLevel.MINIMUM_MORALE_LEVEL;
+import static mekhq.campaign.mission.enums.ContractMoraleLevel.STALEMATE;
 import static mekhq.campaign.personnel.ranks.Rank.RO_MIN;
 import static mekhq.campaign.personnel.skills.SkillType.EXP_REGULAR;
 import static mekhq.campaign.universe.Faction.INDEPENDENT_FACTION_CODE;
@@ -75,8 +75,8 @@ import mekhq.campaign.enums.DragoonRating;
 import mekhq.campaign.finances.Accountant;
 import mekhq.campaign.finances.Money;
 import mekhq.campaign.mission.enums.AtBContractType;
-import mekhq.campaign.mission.enums.AtBMoraleLevel;
 import mekhq.campaign.mission.enums.ContractCommandRights;
+import mekhq.campaign.mission.enums.ContractMoraleLevel;
 import mekhq.campaign.mission.enums.MissionStatus;
 import mekhq.campaign.personnel.Bloodname;
 import mekhq.campaign.personnel.Person;
@@ -194,7 +194,7 @@ public abstract class AbstractMissionTransition {
     private int contractNegotiationSupportRoll;
     private int contractNegotiationTransportRoll;
 
-    private AtBMoraleLevel moraleLevel = STALEMATE;
+    private ContractMoraleLevel moraleLevel = STALEMATE;
     private LocalDate routEndDate;
     private Money routedPayout = null;
 
@@ -1366,21 +1366,21 @@ public abstract class AbstractMissionTransition {
         this.routEndDate = routEnd;
     }
 
-    public AtBMoraleLevel getMoraleLevel() {
+    public ContractMoraleLevel getMoraleLevel() {
         return moraleLevel;
     }
 
-    public void setMoraleLevel(AtBMoraleLevel moraleLevel) {
+    public void setMoraleLevel(ContractMoraleLevel moraleLevel) {
         this.moraleLevel = moraleLevel;
     }
 
     /**
-     * Adjusts the current {@link AtBMoraleLevel} by the specified delta and returns the resulting morale level.
+     * Adjusts the current {@link ContractMoraleLevel} by the specified delta and returns the resulting morale level.
      *
      * <p>The method computes a new integer morale value by adding the given {@code delta} to the unit's current
      * morale level, then clamps the result to the valid range defined by {@code MINIMUM_MORALE_LEVEL} and
      * {@code MAXIMUM_MORALE_LEVEL}. It then attempts to resolve the resulting value to a corresponding
-     * {@link AtBMoraleLevel}.</p>
+     * {@link ContractMoraleLevel}.</p>
      *
      * <p>If the resolved morale level is valid (i.e., non-{@code null}), the unit's internal morale state is updated.
      * If no valid enum constant exists for the computed level, the method leaves the current morale unchanged and
@@ -1390,17 +1390,17 @@ public abstract class AbstractMissionTransition {
      *
      * @param delta the amount to adjust the current morale level by; may be positive or negative
      *
-     * @return the new {@link AtBMoraleLevel} after applying the delta; if no corresponding morale level exists for the
-     *       computed value, the current morale level is returned unchanged
+     * @return the new {@link ContractMoraleLevel} after applying the delta; if no corresponding morale level exists for
+     *       the computed value, the current morale level is returned unchanged
      *
      * @author Illiani
      * @since 0.50.10
      */
-    public AtBMoraleLevel changeMoraleLevel(final int delta) {
+    public ContractMoraleLevel changeMoraleLevel(final int delta) {
         int currentLevel = getMoraleLevel().getLevel();
         int newLevel = Math.clamp(currentLevel + delta, MINIMUM_MORALE_LEVEL, MAXIMUM_MORALE_LEVEL);
 
-        AtBMoraleLevel newMoraleLevel = AtBMoraleLevel.parseFromLevel(newLevel);
+        ContractMoraleLevel newMoraleLevel = ContractMoraleLevel.parseFromLevel(newLevel);
         if (newMoraleLevel != null) {
             setMoraleLevel(newMoraleLevel);
         }
@@ -1733,7 +1733,7 @@ public abstract class AbstractMissionTransition {
                 } else if (nodeName.equalsIgnoreCase("requiredCombatElements")) {
                     setRequiredCombatElements(Integer.parseInt(value));
                 } else if (nodeName.equalsIgnoreCase("moraleLevel")) {
-                    setMoraleLevel(AtBMoraleLevel.parseFromString(value.trim()));
+                    setMoraleLevel(ContractMoraleLevel.parseFromString(value.trim()));
                 } else if (nodeName.equalsIgnoreCase("routEnd")) {
                     setRoutEndDate(MHQXMLUtility.parseDate(value.trim()));
                 } else if (nodeName.equalsIgnoreCase("routedPayout")) {

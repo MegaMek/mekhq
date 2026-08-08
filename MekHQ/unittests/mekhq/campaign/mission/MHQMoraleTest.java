@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2025 The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2025-2026 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -37,13 +37,13 @@ import static mekhq.campaign.mission.MHQMorale.RALLYING_TARGET_NUMBER;
 import static mekhq.campaign.mission.MHQMorale.WAVERING_TARGET_NUMBER;
 import static mekhq.campaign.mission.MHQMorale.getMoraleOutcome;
 import static mekhq.campaign.mission.MHQMorale.getReliabilityModifier;
-import static mekhq.campaign.mission.enums.AtBMoraleLevel.ADVANCING;
-import static mekhq.campaign.mission.enums.AtBMoraleLevel.CRITICAL;
-import static mekhq.campaign.mission.enums.AtBMoraleLevel.DOMINATING;
-import static mekhq.campaign.mission.enums.AtBMoraleLevel.OVERWHELMING;
-import static mekhq.campaign.mission.enums.AtBMoraleLevel.ROUTED;
-import static mekhq.campaign.mission.enums.AtBMoraleLevel.STALEMATE;
-import static mekhq.campaign.mission.enums.AtBMoraleLevel.WEAKENED;
+import static mekhq.campaign.mission.enums.ContractMoraleLevel.ADVANCING;
+import static mekhq.campaign.mission.enums.ContractMoraleLevel.CRITICAL;
+import static mekhq.campaign.mission.enums.ContractMoraleLevel.DOMINATING;
+import static mekhq.campaign.mission.enums.ContractMoraleLevel.OVERWHELMING;
+import static mekhq.campaign.mission.enums.ContractMoraleLevel.ROUTED;
+import static mekhq.campaign.mission.enums.ContractMoraleLevel.STALEMATE;
+import static mekhq.campaign.mission.enums.ContractMoraleLevel.WEAKENED;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
@@ -57,7 +57,7 @@ import java.util.List;
 import java.util.stream.Stream;
 
 import megamek.common.enums.SkillLevel;
-import mekhq.campaign.mission.enums.AtBMoraleLevel;
+import mekhq.campaign.mission.enums.ContractMoraleLevel;
 import mekhq.campaign.mission.enums.ScenarioStatus;
 import mekhq.campaign.universe.Faction;
 import org.junit.jupiter.api.Test;
@@ -343,7 +343,7 @@ class MHQMoraleTest {
 
     @ParameterizedTest
     @MethodSource("moraleRallyingCases")
-    void testGetMoraleOutcome_rallying(AtBMoraleLevel startLevel, AtBMoraleLevel expectedLevel) {
+    void testGetMoraleOutcome_rallying(ContractMoraleLevel startLevel, ContractMoraleLevel expectedLevel) {
         AtBContract mockContract = mock(AtBContract.class);
         when(mockContract.getMoraleLevel()).thenReturn(startLevel);
 
@@ -372,7 +372,7 @@ class MHQMoraleTest {
 
     @ParameterizedTest
     @MethodSource("moraleWaveringCases")
-    void testGetMoraleOutcome_wavering(AtBMoraleLevel startLevel, AtBMoraleLevel expectedLevel) {
+    void testGetMoraleOutcome_wavering(ContractMoraleLevel startLevel, ContractMoraleLevel expectedLevel) {
         AtBContract mockContract = mock(AtBContract.class);
         when(mockContract.getMoraleLevel()).thenReturn(startLevel);
 
@@ -401,7 +401,7 @@ class MHQMoraleTest {
 
     @ParameterizedTest
     @MethodSource("moraleNoChangeCases")
-    void testGetMoraleOutcome_noChange(AtBMoraleLevel startLevel, AtBMoraleLevel expectedLevel) {
+    void testGetMoraleOutcome_noChange(ContractMoraleLevel startLevel, ContractMoraleLevel expectedLevel) {
         AtBContract mockContract = mock(AtBContract.class);
         when(mockContract.getMoraleLevel()).thenReturn(startLevel);
 
