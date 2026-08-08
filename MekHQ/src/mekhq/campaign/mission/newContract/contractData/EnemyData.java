@@ -51,6 +51,8 @@ public record EnemyData(String factionCode,
       PlayerColour color,
       boolean batchallAccepted
 ) {
+    private static final boolean DEFAULT_BATCHALL_ACCEPTED = true;
+
     public EnemyData(String factionCode, @Nullable String sponsorFactionCode, String displayName,
           Camouflage camouflage) {
         this(factionCode,
@@ -60,7 +62,7 @@ public record EnemyData(String factionCode,
               DragoonRating.DRAGOON_C.getRating(),
               camouflage,
               RED,
-              true);
+              DEFAULT_BATCHALL_ACCEPTED);
     }
 
     public EnemyData(EnemyData existingData, SkillLevel forceSkill, int equipmentRating) {

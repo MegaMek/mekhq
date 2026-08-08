@@ -36,4 +36,11 @@ import mekhq.campaign.finances.Money;
 
 public record ContractFinanceData(Money transport, Money monthlyPay
 ) {
+    public Money getTotalMonthlyPay(int lengthInMonths) {
+        return monthlyPay.multipliedBy(lengthInMonths);
+    }
+
+    public Money getTotalPay(int lengthInMonths) {
+        return getTotalMonthlyPay(lengthInMonths).plus(transport);
+    }
 }

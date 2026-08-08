@@ -32,13 +32,21 @@
  */
 package mekhq.campaign.mission.newContract;
 
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
+import jakarta.annotation.Nullable;
+import megamek.client.ui.util.PlayerColour;
+import megamek.common.enums.SkillLevel;
+import megamek.common.icons.Camouflage;
 import mekhq.campaign.JumpPath;
 import mekhq.campaign.digitalGM.stratCon.StratConCampaignState;
+import mekhq.campaign.finances.Money;
 import mekhq.campaign.mission.Scenario;
+import mekhq.campaign.mission.enums.AtBContractType;
+import mekhq.campaign.mission.enums.AtBMoraleLevel;
 import mekhq.campaign.mission.enums.MissionStatus;
 import mekhq.campaign.mission.newContract.contractData.ContractFinanceData;
 import mekhq.campaign.mission.newContract.contractData.ContractObjectiveData;
@@ -48,7 +56,12 @@ import mekhq.campaign.mission.newContract.contractData.EnemyData;
 import mekhq.campaign.mission.newContract.contractData.MoraleData;
 import mekhq.campaign.mission.newContract.contractData.RentedFacilitiesData;
 import mekhq.campaign.mission.newContract.contractData.SystemsTargetData;
+import mekhq.campaign.mission.newContract.contractGeneration.ChaosEmployerType;
 import mekhq.campaign.mission.newContract.contractGeneration.ContractTermsData;
+import mekhq.campaign.personnel.Person;
+import mekhq.campaign.universe.Faction;
+import mekhq.campaign.universe.Planet;
+import mekhq.campaign.universe.PlanetarySystem;
 
 public abstract class AbstractContract {
     private UUID contractId;
@@ -229,5 +242,165 @@ public abstract class AbstractContract {
 
     public void setCachedContractDifficulty(int cachedContractDifficulty) {
         this.cachedContractDifficulty = cachedContractDifficulty;
+    }
+
+    public ChaosEmployerType getEmployerType() {
+        return employerData.type();
+    }
+
+    public String getEmployerFactionCode() {
+        return employerData.factionCode();
+    }
+
+    public Faction getEmployerFaction() {
+        return employerData.getFaction();
+    }
+
+    public String getEmployerDisplayName() {
+        return employerData.displayName();
+    }
+
+    public Person getEmployerNegotiator() {
+        return employerData.negotiator();
+    }
+
+    public Person getEmployerLiaison() {
+        return employerData.liaison();
+    }
+
+    public SkillLevel getEmployerForceSkill() {
+        return employerData.forceSkill();
+    }
+
+    public int getEmployerEquipmentRating() {
+        return employerData.equipmentRating();
+    }
+
+    public Camouflage getEmployerCamouflage() {
+        return employerData.camouflage();
+    }
+
+    /** You almost always need {@link #getEmployerCamouflage()} */
+    public PlayerColour getEmployerColor() {
+        return employerData.color();
+    }
+
+    public String getEnemyFactionCode() {
+        return enemyData.factionCode();
+    }
+
+    public Faction getEnemyFaction() {
+        return enemyData.getFaction();
+    }
+
+    public String getEnemyDisplayName() {
+        return enemyData.displayName();
+    }
+
+    public SkillLevel getEnemyForceSkill() {
+        return enemyData.forceSkill();
+    }
+
+    public int getEnemyEquipmentRating() {
+        return enemyData.equipmentRating();
+    }
+
+    public Camouflage getEnemyCamouflage() {
+        return enemyData.camouflage();
+    }
+
+    /** You almost always need {@link #getEnemyCamouflage()} */
+    public PlayerColour getEnemyColour() {
+        return enemyData.color();
+    }
+
+    public boolean isBatchallAccepted() {
+        return enemyData.batchallAccepted();
+    }
+
+    public AtBMoraleLevel getEnemyMoraleLevel() {
+        return moraleData.moraleLevel();
+    }
+
+    public @Nullable LocalDate getRoutEndDate() {
+        return moraleData.routEndDate();
+    }
+
+    public Money getRoutPayout() {
+        return moraleData.routedPayout();
+    }
+
+    public int getRentedHospitalBeds() {
+        return rentedFacilitiesData.hospitalBeds();
+    }
+
+    public int getRentedKitchens() {
+        return rentedFacilitiesData.kitchens();
+    }
+
+    public int getRentedHoldingCells() {
+        return rentedFacilitiesData.holdingCells();
+    }
+
+    public String getTargetSystemId() {
+        return systemsTargetData.systemId();
+    }
+
+    public @Nullable PlanetarySystem getTargetSystem() {
+        return systemsTargetData.getSystem();
+    }
+
+    public String getTargetSystemName(LocalDate currentDate) {
+        return systemsTargetData.getSystemName(currentDate);
+    }
+
+    public @Nullable String getTargetPlanetId() {
+        return systemsTargetData.planetId();
+    }
+
+    public Planet getTargetPlanet() {
+        return systemsTargetData.getPlanet();
+    }
+
+    public @Nullable String getTargetPlanetName(LocalDate currentDate) {
+        return systemsTargetData.getPlanetName(currentDate);
+    }
+
+    public Money getTransportPayment() {
+        return contractFinanceData.transport();
+    }
+
+    public Money getMonthlyPay() {
+        return contractFinanceData.monthlyPay();
+    }
+
+    public Money getTotalMonthlyPay() {
+        int contractLengthInMonths = scheduleData.lengthInMonths();
+        return contractFinanceData.getTotalMonthlyPay(contractLengthInMonths);
+    }
+
+    public Money getTotalPay() {
+        int contractLengthInMonths = scheduleData.lengthInMonths();
+        return contractFinanceData.getTotalPay(contractLengthInMonths);
+    }
+
+    public AtBContractType getObjectiveType() {
+        return objectiveData.opposingObjectiveType();
+    }
+
+    public AtBContractType getOpposingObjectiveType() {
+        return objectiveData.opposingObjectiveType();
+    }
+
+    public LocalDate getStartDate() {
+        return scheduleData.startDate();
+    }
+
+    public LocalDate getEndDate() {
+        return scheduleData.endDate();
+    }
+
+    public int getContractLengthInMonths() {
+        return scheduleData.lengthInMonths();
     }
 }

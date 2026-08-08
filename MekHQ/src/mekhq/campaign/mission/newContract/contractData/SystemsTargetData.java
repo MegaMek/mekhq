@@ -32,5 +32,30 @@
  */
 package mekhq.campaign.mission.newContract.contractData;
 
+import java.time.LocalDate;
+
+import jakarta.annotation.Nullable;
+import mekhq.campaign.universe.Planet;
+import mekhq.campaign.universe.PlanetarySystem;
+import mekhq.campaign.universe.Systems;
+
 public record SystemsTargetData(String systemId, String planetId) {
+    public @Nullable PlanetarySystem getSystem() {
+        return Systems.getInstance().getSystemById(systemId);
+    }
+
+    public String getSystemName(LocalDate currentDate) {
+        PlanetarySystem planetarySystem = getSystem();
+        return planetarySystem == null ? "-" : planetarySystem.getName(currentDate);
+    }
+
+    public @Nullable Planet getPlanet() {
+        PlanetarySystem planetarySystem = getSystem();
+        return planetarySystem == null ? null : getSystem().getPlanetById(planetId);
+    }
+
+    public String getPlanetName(LocalDate currentDate) {
+        Planet planet = getPlanet();
+        return planet == null ? "-" : planet.getName(currentDate);
+    }
 }
