@@ -32,10 +32,24 @@
  */
 package mekhq.campaign.personnel.familiarity;
 
+import static mekhq.campaign.personnel.PersonnelOptions.FAMILIARITY_EMOTIONALLY_UNAVAILABLE;
+import static mekhq.campaign.personnel.PersonnelOptions.FAMILIARITY_IRON_BOND;
+import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
 import static mekhq.utilities.MHQInternationalization.getTextAt;
+import static mekhq.utilities.ReportingUtilities.CLOSING_SPAN_TAG;
+import static mekhq.utilities.ReportingUtilities.getAmazingColor;
+import static mekhq.utilities.ReportingUtilities.spanOpeningWithCustomColor;
 
-public enum FamiliarityMode {
+import megamek.common.units.Entity;
+import mekhq.campaign.Campaign;
+import mekhq.campaign.enums.DailyReportType;
+import mekhq.campaign.personnel.Person;
+import mekhq.campaign.personnel.PersonnelOptions;
+import mekhq.campaign.unit.Unit;
+
+public enum Familiarity {
     DISABLED("DISABLED",
+          0,
           0,
           new FamiliarityLevel(0, 0),
           new FamiliarityLevel(0, 0),
@@ -43,18 +57,21 @@ public enum FamiliarityMode {
           new FamiliarityLevel(0, 0)),
     NORMAL("NORMAL",
           200,
+          100,
           new FamiliarityLevel(0, 0),
           new FamiliarityLevel(1, 0),
           new FamiliarityLevel(1, 1),
           new FamiliarityLevel(1, 1)),
     HARD("HARD",
           300,
+          100,
           new FamiliarityLevel(-1, -1),
           new FamiliarityLevel(0, 0),
           new FamiliarityLevel(1, 0),
           new FamiliarityLevel(1, 1)),
     ROLEPLAY("ROLEPLAY",
           300,
+          100,
           new FamiliarityLevel(0, 0),
           new FamiliarityLevel(0, 0),
           new FamiliarityLevel(0, 0),
@@ -69,6 +86,7 @@ public enum FamiliarityMode {
 
     private final String lookUpName;
     private final int familiarityCap;
+    private final int trainingCap;
     private final String label;
     private final String tooltip;
     private final FamiliarityLevel zero;
@@ -76,10 +94,11 @@ public enum FamiliarityMode {
     private final FamiliarityLevel twoHundred;
     private final FamiliarityLevel threeHundred;
 
-    FamiliarityMode(final String lookUpName, final int familiarityCap, final FamiliarityLevel zero,
+    Familiarity(final String lookUpName, final int familiarityCap, final int trainingCap, final FamiliarityLevel zero,
           final FamiliarityLevel oneHundred, final FamiliarityLevel twoHundred, final FamiliarityLevel threeHundred) {
         this.lookUpName = lookUpName;
         this.familiarityCap = familiarityCap;
+        this.trainingCap = trainingCap;
         this.label = getLabel(lookUpName);
         this.tooltip = getTooltip(lookUpName);
         this.zero = zero;
@@ -102,6 +121,10 @@ public enum FamiliarityMode {
 
     public int getFamiliarityCap() {
         return familiarityCap;
+    }
+
+    public int getTrainingCap() {
+        return trainingCap;
     }
 
     public String getLabel() {
@@ -155,5 +178,64 @@ public enum FamiliarityMode {
     @Override
     public String toString() {
         return label;
+    }
+
+    public static void assignFamiliarity(Campaign campaign, Unit unit, int cap, int speed,
+          FamiliarityGainType gainType) {
+        Entity unitEntity = unit.getEntity();
+        if (unitEntity == null || !unitEntity.isChassisFamiliarityEligible()) {
+            return;
+        }
+
+        int familiarityGain = gainType.rollFamiliarity(speed);
+
+        String chassis = unitEntity.getChassis();
+        for (Person crew : unit.getCrew()) {
+            addFamiliarity(campaign, crew, chassis, cap, familiarityGain);
+        }
+
+        Person unitTech = unit.getTech();
+        if (unitTech != null) {
+            gateMultipleTechAssignments(campaign, unitTech, chassis, cap, familiarityGain);
+        }
+    }
+
+    private static void gateMultipleTechAssignments(Campaign campaign, Person unitTech, String chassis, int cap,
+          int familiarityGain) {
+        boolean singleUnitAssignment = unitTech.getTechUnits().size() == 1;
+        if (singleUnitAssignment) {
+            addFamiliarity(campaign, unitTech, chassis, cap, familiarityGain);
+        }
+    }
+
+    private static void addFamiliarity(Campaign campaign, Person crew, String chassis, int cap, int familiarityGain) {
+        PersonnelOptions options = crew.getOptions();
+        boolean hasIronBond = options.booleanOption(FAMILIARITY_IRON_BOND);
+        boolean isEmotionallyUnavailable = options.booleanOption(FAMILIARITY_EMOTIONALLY_UNAVAILABLE);
+
+        int currentFamiliarity = crew.getChassisFamiliarity(chassis);
+
+        double multiplier = 1.0;
+        if (hasIronBond) {
+            multiplier = 1.5;
+        }
+
+        if (isEmotionallyUnavailable && currentFamiliarity == 0) {
+            multiplier = 0.0;
+        }
+
+        familiarityGain = (int) Math.round(familiarityGain * multiplier);
+
+        boolean alreadyCapped = currentFamiliarity == cap;
+        crew.addChassisFamiliarity(chassis, familiarityGain, cap);
+        boolean nowCapped = crew.getChassisFamiliarity(chassis) == cap;
+
+        if (!alreadyCapped && nowCapped) {
+            String report = getFormattedTextAt(RESOURCE_BUNDLE, "ResolveScenarioTracker.cappedFamiliarity",
+                  crew.getHyperlinkedFullTitle(), spanOpeningWithCustomColor(getAmazingColor()),
+                  CLOSING_SPAN_TAG,
+                  chassis);
+            campaign.addReport(DailyReportType.PERSONNEL, report);
+        }
     }
 }

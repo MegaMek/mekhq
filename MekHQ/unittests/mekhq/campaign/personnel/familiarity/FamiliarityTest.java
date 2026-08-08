@@ -41,24 +41,23 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
 
 /**
- * Boundary coverage for {@link FamiliarityMode}. The private {@code getFamiliarityLevel} bucketing is exercised through
- * the public {@link FamiliarityMode#getPilotingMaintenanceBonus(int)} /
- * {@link FamiliarityMode#getGunneryRepairBonus(int)} accessors, since a bucket-boundary off-by-one is exactly the class
- * of bug this suite guards against.
+ * Boundary coverage for {@link Familiarity}. The private {@code getFamiliarityLevel} bucketing is exercised through the
+ * public {@link Familiarity#getPilotingMaintenanceBonus(int)} / {@link Familiarity#getGunneryRepairBonus(int)}
+ * accessors, since a bucket-boundary off-by-one is exactly the class of bug this suite guards against.
  */
-class FamiliarityModeTest {
+class FamiliarityTest {
     @Test
     void testCaps() {
-        assertEquals(0, FamiliarityMode.DISABLED.getFamiliarityCap());
-        assertEquals(200, FamiliarityMode.NORMAL.getFamiliarityCap());
-        assertEquals(300, FamiliarityMode.HARD.getFamiliarityCap());
+        assertEquals(0, Familiarity.DISABLED.getFamiliarityCap());
+        assertEquals(200, Familiarity.NORMAL.getFamiliarityCap());
+        assertEquals(300, Familiarity.HARD.getFamiliarityCap());
     }
 
     @Test
     void testIsEnabled() {
-        assertFalse(FamiliarityMode.DISABLED.isEnabled());
-        assertTrue(FamiliarityMode.NORMAL.isEnabled());
-        assertTrue(FamiliarityMode.HARD.isEnabled());
+        assertFalse(Familiarity.DISABLED.isEnabled());
+        assertTrue(Familiarity.NORMAL.isEnabled());
+        assertTrue(Familiarity.HARD.isEnabled());
     }
 
     /**
@@ -67,8 +66,8 @@ class FamiliarityModeTest {
     @ParameterizedTest
     @CsvSource({ "-50", "0", "99", "100", "199", "200", "299", "300", "500" })
     void testDisabledAlwaysZero(int familiarity) {
-        assertEquals(0, FamiliarityMode.DISABLED.getPilotingMaintenanceBonus(familiarity));
-        assertEquals(0, FamiliarityMode.DISABLED.getGunneryRepairBonus(familiarity));
+        assertEquals(0, Familiarity.DISABLED.getPilotingMaintenanceBonus(familiarity));
+        assertEquals(0, Familiarity.DISABLED.getGunneryRepairBonus(familiarity));
     }
 
     /**
@@ -87,9 +86,9 @@ class FamiliarityModeTest {
           "300, 1, 1",
           "999, 1, 1" })
     void testNormalBonuses(int familiarity, int expectedPiloting, int expectedGunnery) {
-        assertEquals(expectedPiloting, FamiliarityMode.NORMAL.getPilotingMaintenanceBonus(familiarity),
+        assertEquals(expectedPiloting, Familiarity.NORMAL.getPilotingMaintenanceBonus(familiarity),
               "piloting/maintenance at familiarity " + familiarity);
-        assertEquals(expectedGunnery, FamiliarityMode.NORMAL.getGunneryRepairBonus(familiarity),
+        assertEquals(expectedGunnery, Familiarity.NORMAL.getGunneryRepairBonus(familiarity),
               "gunnery/repair at familiarity " + familiarity);
     }
 
@@ -110,9 +109,9 @@ class FamiliarityModeTest {
           "300,  1,  1",
           "400,  1,  1" })
     void testHardBonuses(int familiarity, int expectedPiloting, int expectedGunnery) {
-        assertEquals(expectedPiloting, FamiliarityMode.HARD.getPilotingMaintenanceBonus(familiarity),
+        assertEquals(expectedPiloting, Familiarity.HARD.getPilotingMaintenanceBonus(familiarity),
               "piloting/maintenance at familiarity " + familiarity);
-        assertEquals(expectedGunnery, FamiliarityMode.HARD.getGunneryRepairBonus(familiarity),
+        assertEquals(expectedGunnery, Familiarity.HARD.getGunneryRepairBonus(familiarity),
               "gunnery/repair at familiarity " + familiarity);
     }
 }

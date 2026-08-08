@@ -56,7 +56,7 @@ import static mekhq.campaign.log.LogEntryType.PERFORMANCE;
 import static mekhq.campaign.personnel.PersonnelOptions.*;
 import static mekhq.campaign.personnel.education.EducationController.getAcademy;
 import static mekhq.campaign.personnel.enums.BloodGroup.getRandomBloodGroup;
-import static mekhq.campaign.personnel.familiarity.FamiliarityMode.FAMILIARITY_THREE_HUNDRED;
+import static mekhq.campaign.personnel.familiarity.Familiarity.FAMILIARITY_THREE_HUNDRED;
 import static mekhq.campaign.personnel.medical.BodyLocation.GENERIC;
 import static mekhq.campaign.personnel.medical.BodyLocation.INTERNAL;
 import static mekhq.campaign.personnel.medical.advancedMedicalAlternate.AdvancedMedicalAlternate.getAllActiveInjuryEffects;
@@ -135,7 +135,7 @@ import mekhq.campaign.personnel.education.Academy;
 import mekhq.campaign.personnel.enums.*;
 import mekhq.campaign.personnel.enums.education.EducationLevel;
 import mekhq.campaign.personnel.enums.education.EducationStage;
-import mekhq.campaign.personnel.familiarity.FamiliarityMode;
+import mekhq.campaign.personnel.familiarity.Familiarity;
 import mekhq.campaign.personnel.familyTree.Genealogy;
 import mekhq.campaign.personnel.generator.DefaultPersonnelGenerator;
 import mekhq.campaign.personnel.generator.SingleSpecialAbilityGenerator;
@@ -6756,7 +6756,7 @@ public class Person implements ILocatable {
     /**
      * Adds (or, with a negative amount, subtracts) familiarity for the given chassis, clamping the result to the range
      * {@code 0..cap}. Blank chassis names and no-op amounts are ignored. The cap is supplied by the caller from the
-     * active {@link FamiliarityMode}.
+     * active {@link Familiarity}.
      *
      * @param chassis the base chassis name
      * @param amount  the amount of familiarity to add
@@ -6776,7 +6776,7 @@ public class Person implements ILocatable {
 
     /**
      * Sets the character's familiarity with the given chassis to an absolute value, clamped to
-     * {@code 0..}{@link FamiliarityMode#FAMILIARITY_THREE_HUNDRED}; a value of 0 removes the entry. Intended for GM
+     * {@code 0..}{@link Familiarity#FAMILIARITY_THREE_HUNDRED}; a value of 0 removes the entry. Intended for GM
      * editing.
      *
      * @param chassis the base chassis name
@@ -6794,7 +6794,7 @@ public class Person implements ILocatable {
         }
     }
 
-    public int getChassisFamiliarityCombatBonus(FamiliarityMode mode, boolean isGunnery) {
+    public int getChassisFamiliarityCombatBonus(Familiarity mode, boolean isGunnery) {
         Entity entity = getEntityFromUnit();
         if (!mode.isEnabled() ||
                   entity == null ||
@@ -6807,7 +6807,7 @@ public class Person implements ILocatable {
         return isGunnery ? mode.getGunneryRepairBonus(familiarity) : mode.getPilotingMaintenanceBonus(familiarity);
     }
 
-    public int getChassisFamiliarityTechBonus(FamiliarityMode mode, @Nullable Entity entity, boolean isRepair) {
+    public int getChassisFamiliarityTechBonus(Familiarity mode, @Nullable Entity entity, boolean isRepair) {
         if (!mode.isEnabled() ||
                   entity == null ||
                   !entity.isChassisFamiliarityEligible()) {

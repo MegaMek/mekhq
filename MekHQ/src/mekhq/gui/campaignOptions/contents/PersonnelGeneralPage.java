@@ -55,7 +55,7 @@ import megamek.client.ui.comboBoxes.MMComboBox;
 import megamek.client.ui.settings.SettingsFormPanel;
 import mekhq.campaign.campaignOptions.CampaignOption;
 import mekhq.campaign.personnel.enums.EdgeRefreshPeriod;
-import mekhq.campaign.personnel.familiarity.FamiliarityMode;
+import mekhq.campaign.personnel.familiarity.Familiarity;
 import mekhq.gui.campaignOptions.CampaignOptionFlag;
 import mekhq.gui.campaignOptions.components.CampaignOptionsCheckBox;
 import mekhq.gui.campaignOptions.components.CampaignOptionsHeaderPanel;
@@ -116,9 +116,9 @@ class PersonnelGeneralPage {
     private JCheckBox chkUseBlobVesselCrew;
 
     private JLabel lblChassisFamiliarityMode;
-    private MMComboBox<FamiliarityMode> comboChassisFamiliarityMode;
-    private JLabel lblChassisFamiliarityDice;
-    private JSpinner spnChassisFamiliarityDice;
+    private MMComboBox<Familiarity> comboChassisFamiliarityMode;
+    private JLabel lblchassisFamiliaritySpeed;
+    private JSpinner spnchassisFamiliaritySpeed;
 
     private boolean created;
 
@@ -178,32 +178,32 @@ class PersonnelGeneralPage {
         lblChassisFamiliarityMode = new CampaignOptionsLabel("ChassisFamiliarityMode",
               getMetadata(new Version(0, 51, 1), CampaignOptionFlag.CUSTOM_SYSTEM, CampaignOptionFlag.DOCUMENTED));
         lblChassisFamiliarityMode.addMouseListener(createTipPanelUpdater("ChassisFamiliarityMode"));
-        comboChassisFamiliarityMode = new MMComboBox<>("comboChassisFamiliarityMode", FamiliarityMode.values());
+        comboChassisFamiliarityMode = new MMComboBox<>("comboChassisFamiliarityMode", Familiarity.values());
         comboChassisFamiliarityMode.setRenderer(new DefaultListCellRenderer() {
             @Override
             public Component getListCellRendererComponent(final JList<?> list, final Object value, final int index,
                   final boolean isSelected, final boolean cellHasFocus) {
                 super.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);
-                if (value instanceof FamiliarityMode) {
-                    list.setToolTipText(wordWrap(((FamiliarityMode) value).getTooltip()));
+                if (value instanceof Familiarity) {
+                    list.setToolTipText(wordWrap(((Familiarity) value).getTooltip()));
                 }
                 return this;
             }
         });
         comboChassisFamiliarityMode.addMouseListener(createTipPanelUpdater("ChassisFamiliarityMode"));
 
-        lblChassisFamiliarityDice = new CampaignOptionsLabel("ChassisFamiliarityDice",
+        lblchassisFamiliaritySpeed = new CampaignOptionsLabel("chassisFamiliaritySpeed",
               getMetadata(new Version(0, 51, 1), CampaignOptionFlag.CUSTOM_SYSTEM, CampaignOptionFlag.RECOMMENDED));
-        lblChassisFamiliarityDice.addMouseListener(createTipPanelUpdater("ChassisFamiliarityDice"));
-        spnChassisFamiliarityDice = new CampaignOptionsSpinner("ChassisFamiliarityDice",
+        lblchassisFamiliaritySpeed.addMouseListener(createTipPanelUpdater("chassisFamiliaritySpeed"));
+        spnchassisFamiliaritySpeed = new CampaignOptionsSpinner("chassisFamiliaritySpeed",
               1, 0, 20, 1);
-        spnChassisFamiliarityDice.addMouseListener(createTipPanelUpdater("ChassisFamiliarityDice"));
+        spnchassisFamiliaritySpeed.addMouseListener(createTipPanelUpdater("chassisFamiliaritySpeed"));
 
         final SettingsFormPanel panel = new SettingsFormPanel("ChassisFamiliarityPanel",
               LABEL_COLUMN_WIDTH,
               CONTROL_COLUMN_WIDTH);
         panel.addRow(lblChassisFamiliarityMode, comboChassisFamiliarityMode);
-        panel.addRow(lblChassisFamiliarityDice, spnChassisFamiliarityDice);
+        panel.addRow(lblchassisFamiliaritySpeed, spnchassisFamiliaritySpeed);
 
         return panel;
     }
@@ -455,8 +455,8 @@ class PersonnelGeneralPage {
         chkUseBlobVesselPilot.setSelected(model.useBlobVesselPilot);
         chkUseBlobVesselGunner.setSelected(model.useBlobVesselGunner);
         chkUseBlobVesselCrew.setSelected(model.useBlobVesselCrew);
-        comboChassisFamiliarityMode.setSelectedItem(model.chassisFamiliarityMode);
-        spnChassisFamiliarityDice.setValue(model.chassisFamiliarityDice);
+        comboChassisFamiliarityMode.setSelectedItem(model.chassisFamiliarity);
+        spnchassisFamiliaritySpeed.setValue(model.chassisFamiliaritySpeed);
     }
 
     /**
@@ -501,7 +501,7 @@ class PersonnelGeneralPage {
         model.useBlobVesselPilot = chkUseBlobVesselPilot.isSelected();
         model.useBlobVesselGunner = chkUseBlobVesselGunner.isSelected();
         model.useBlobVesselCrew = chkUseBlobVesselCrew.isSelected();
-        model.chassisFamiliarityMode = comboChassisFamiliarityMode.getSelectedItem();
-        model.chassisFamiliarityDice = (int) spnChassisFamiliarityDice.getValue();
+        model.chassisFamiliarity = comboChassisFamiliarityMode.getSelectedItem();
+        model.chassisFamiliaritySpeed = (int) spnchassisFamiliaritySpeed.getValue();
     }
 }

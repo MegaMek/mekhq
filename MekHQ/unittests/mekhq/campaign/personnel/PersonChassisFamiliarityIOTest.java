@@ -32,7 +32,7 @@
  */
 package mekhq.campaign.personnel;
 
-import static mekhq.campaign.personnel.familiarity.FamiliarityMode.FAMILIARITY_THREE_HUNDRED;
+import static mekhq.campaign.personnel.familiarity.Familiarity.FAMILIARITY_THREE_HUNDRED;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;

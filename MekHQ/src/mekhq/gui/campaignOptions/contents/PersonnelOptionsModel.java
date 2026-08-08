@@ -41,7 +41,7 @@ import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.personnel.enums.AwardBonus;
 import mekhq.campaign.personnel.enums.EdgeRefreshPeriod;
 import mekhq.campaign.personnel.enums.TimeInDisplayFormat;
-import mekhq.campaign.personnel.familiarity.FamiliarityMode;
+import mekhq.campaign.personnel.familiarity.Familiarity;
 import mekhq.campaign.randomEvents.prisoners.PrisonerCaptureStyle;
 
 class PersonnelOptionsModel {
@@ -137,8 +137,8 @@ class PersonnelOptionsModel {
     boolean useRandomDependentRemoval;
     int dependentProfessionDieSize;
     int civilianProfessionDieSize;
-    FamiliarityMode chassisFamiliarityMode;
-    int chassisFamiliarityDice;
+    Familiarity chassisFamiliarity;
+    int chassisFamiliaritySpeed;
 
     PersonnelOptionsModel(@Nonnull CampaignOptions options) {
         useTactics = options.isUseTactics();
@@ -233,8 +233,8 @@ class PersonnelOptionsModel {
         useRandomDependentRemoval = options.isUseRandomDependentRemoval();
         dependentProfessionDieSize = options.getDependentProfessionDieSize();
         civilianProfessionDieSize = options.getCivilianProfessionDieSize();
-        chassisFamiliarityMode = options.get(CampaignOption.CHASSIS_FAMILIARITY_MODE);
-        chassisFamiliarityDice = options.get(CampaignOption.CHASSIS_FAMILIARITY_SCENARIO_DICE);
+        chassisFamiliarity = options.get(CampaignOption.CHASSIS_FAMILIARITY_MODE);
+        chassisFamiliaritySpeed = options.get(CampaignOption.CHASSIS_FAMILIARITY_SPEED);
     }
 
     void applyTo(@Nonnull Campaign campaign, @Nonnull CampaignOptions options) {
@@ -333,7 +333,7 @@ class PersonnelOptionsModel {
         options.setUseRandomDependentRemoval(useRandomDependentRemoval);
         options.setDependentProfessionDieSize(dependentProfessionDieSize);
         options.setCivilianProfessionDieSize(civilianProfessionDieSize);
-        options.set(CampaignOption.CHASSIS_FAMILIARITY_MODE, chassisFamiliarityMode);
-        options.set(CampaignOption.CHASSIS_FAMILIARITY_SCENARIO_DICE, chassisFamiliarityDice);
+        options.set(CampaignOption.CHASSIS_FAMILIARITY_MODE, chassisFamiliarity);
+        options.set(CampaignOption.CHASSIS_FAMILIARITY_SPEED, chassisFamiliaritySpeed);
     }
 }

@@ -67,7 +67,7 @@ import mekhq.campaign.location.LocationUtils;
 import mekhq.campaign.parts.Part;
 import mekhq.campaign.parts.enums.PartQuality;
 import mekhq.campaign.personnel.Person;
-import mekhq.campaign.personnel.familiarity.FamiliarityMode;
+import mekhq.campaign.personnel.familiarity.Familiarity;
 import mekhq.campaign.personnel.skills.Skill;
 import mekhq.campaign.personnel.skills.SkillModifierData;
 import mekhq.campaign.universe.Atmosphere;
@@ -435,12 +435,12 @@ public class Maintenance {
 
         target.append(partWork.getAllModsForMaintenance());
 
-        FamiliarityMode familiarityMode = campaignOptions.get(CampaignOption.CHASSIS_FAMILIARITY_MODE);
+        Familiarity familiarity = campaignOptions.get(CampaignOption.CHASSIS_FAMILIARITY_MODE);
         Unit partUnit = partWork.getUnit();
-        if (familiarityMode.isEnabled() && tech != null && partUnit != null) {
+        if (familiarity.isEnabled() && tech != null && partUnit != null) {
             Entity partEntity = partUnit.getEntity();
             if (partEntity != null) {
-                int bonus = tech.getChassisFamiliarityTechBonus(familiarityMode, partEntity, false);
+                int bonus = tech.getChassisFamiliarityTechBonus(familiarity, partEntity, false);
                 if (bonus != 0) {
                     target.addModifier(-bonus, "Chassis Familiarity");
                 }

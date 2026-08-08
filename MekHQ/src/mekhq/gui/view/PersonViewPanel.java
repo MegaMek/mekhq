@@ -122,7 +122,7 @@ import mekhq.campaign.personnel.enums.PersonnelRole;
 import mekhq.campaign.personnel.enums.PersonnelStatus;
 import mekhq.campaign.personnel.enums.education.EducationLevel;
 import mekhq.campaign.personnel.enums.education.EducationStage;
-import mekhq.campaign.personnel.familiarity.FamiliarityMode;
+import mekhq.campaign.personnel.familiarity.Familiarity;
 import mekhq.campaign.personnel.familyTree.FormerSpouse;
 import mekhq.campaign.personnel.medical.advancedMedicalAlternate.InjuryEffect;
 import mekhq.campaign.personnel.medical.advancedMedicalAlternate.InjurySubType;
@@ -283,7 +283,7 @@ public class PersonViewPanel extends JScrollablePanel {
                            .reversed()
                            .thenComparing(Map.Entry::getKey));
 
-        FamiliarityMode familiarityMode = campaignOptions.get(CampaignOption.CHASSIS_FAMILIARITY_MODE);
+        Familiarity familiarityMode = campaignOptions.get(CampaignOption.CHASSIS_FAMILIARITY_MODE);
         int cap = familiarityMode.getFamiliarityCap();
         for (Map.Entry<String, Integer> entry : entries) {
             String chassis = entry.getKey();

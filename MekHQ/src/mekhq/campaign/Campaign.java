@@ -212,7 +212,7 @@ import mekhq.campaign.personnel.divorce.AbstractDivorce;
 import mekhq.campaign.personnel.enums.PersonnelRole;
 import mekhq.campaign.personnel.enums.PersonnelStatus;
 import mekhq.campaign.personnel.enums.SplittingSurnameStyle;
-import mekhq.campaign.personnel.familiarity.FamiliarityMode;
+import mekhq.campaign.personnel.familiarity.Familiarity;
 import mekhq.campaign.personnel.generator.AbstractPersonnelGenerator;
 import mekhq.campaign.personnel.marriage.AbstractMarriage;
 import mekhq.campaign.personnel.procreation.AbstractProcreation;
@@ -1947,7 +1947,7 @@ public class Campaign implements ITechManager {
 
     /**
      * @return all hangars across all locations associated with this campaign.
-     *                                                                                                                                                                   TODO: This won't work once we support multiple hangars. Method separated from getHangar() for future refactor
+     *                                                                                                                                                                         TODO: This won't work once we support multiple hangars. Method separated from getHangar() for future refactor
      *
      * @return all hangars across all locations associated with this campaign.
      *
@@ -6505,13 +6505,13 @@ public class Campaign implements ITechManager {
             target.addModifier(getFaction().getEraMod(getGameYear()), "era");
         }
 
-        FamiliarityMode familiarityMode = getCampaignOptions().get(CampaignOption.CHASSIS_FAMILIARITY_MODE);
+        Familiarity familiarity = getCampaignOptions().get(CampaignOption.CHASSIS_FAMILIARITY_MODE);
         Unit partUnit = partWork.getUnit();
-        if (familiarityMode.isEnabled() && partUnit != null) {
+        if (familiarity.isEnabled() && partUnit != null) {
             Entity partEntity = partUnit.getEntity();
 
             if (partEntity != null) {
-                int bonus = tech.getChassisFamiliarityTechBonus(familiarityMode, partEntity, true);
+                int bonus = tech.getChassisFamiliarityTechBonus(familiarity, partEntity, true);
                 if (bonus != 0) {
                     target.addModifier(-bonus, "Chassis Familiarity");
                 }

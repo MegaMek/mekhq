@@ -38,14 +38,9 @@ import static mekhq.campaign.enums.DailyReportType.FINANCES;
 import static mekhq.campaign.enums.DailyReportType.TECHNICAL;
 import static mekhq.campaign.mission.Scenario.T_SPACE;
 import static mekhq.campaign.parts.enums.PartQuality.QUALITY_D;
-import static mekhq.campaign.personnel.PersonnelOptions.FAMILIARITY_EMOTIONALLY_UNAVAILABLE;
-import static mekhq.campaign.personnel.PersonnelOptions.FAMILIARITY_IRON_BOND;
 import static mekhq.campaign.randomEvents.prisoners.NonCombatPrisoners.getCivilianCaptives;
 import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
 import static mekhq.utilities.MHQInternationalization.getTextAt;
-import static mekhq.utilities.ReportingUtilities.CLOSING_SPAN_TAG;
-import static mekhq.utilities.ReportingUtilities.getAmazingColor;
-import static mekhq.utilities.ReportingUtilities.spanOpeningWithCustomColor;
 
 import java.io.File;
 import java.util.*;
@@ -75,7 +70,6 @@ import mekhq.MekHQ;
 import mekhq.Utilities;
 import mekhq.campaign.campaignOptions.CampaignOption;
 import mekhq.campaign.campaignOptions.CampaignOptions;
-import mekhq.campaign.enums.DailyReportType;
 import mekhq.campaign.events.persons.PersonBattleFinishedEvent;
 import mekhq.campaign.finances.Money;
 import mekhq.campaign.finances.enums.TransactionType;
@@ -92,10 +86,10 @@ import mekhq.campaign.mission.camOpsSalvage.CamOpsSalvageUtilities;
 import mekhq.campaign.mission.enums.ScenarioStatus;
 import mekhq.campaign.parts.Part;
 import mekhq.campaign.personnel.Person;
-import mekhq.campaign.personnel.PersonnelOptions;
 import mekhq.campaign.personnel.enums.PersonnelRole;
 import mekhq.campaign.personnel.enums.PersonnelStatus;
-import mekhq.campaign.personnel.familiarity.FamiliarityMode;
+import mekhq.campaign.personnel.familiarity.Familiarity;
+import mekhq.campaign.personnel.familiarity.FamiliarityGainType;
 import mekhq.campaign.personnel.medical.InjurySPAUtility;
 import mekhq.campaign.personnel.turnoverAndRetention.Fatigue;
 import mekhq.campaign.randomEvents.prisoners.CapturePrisoners;
@@ -1852,9 +1846,10 @@ public class ResolveScenarioTracker {
             }
         }
 
-        FamiliarityMode familiarityMode = campaignOptions.get(CampaignOption.CHASSIS_FAMILIARITY_MODE);
-        if (familiarityMode.isEnabled()) {
-            processFamiliarity(campaignOptions, familiarityMode);
+        Familiarity familiarity = campaignOptions.get(CampaignOption.CHASSIS_FAMILIARITY_MODE);
+        int familiarityDice = campaignOptions.get(CampaignOption.CHASSIS_FAMILIARITY_SPEED);
+        if (familiarity.isEnabled()) {
+            processFamiliarity(familiarityDice, familiarity);
         }
 
         // Process payouts for killed temp crew (blob crew)
@@ -2033,65 +2028,15 @@ public class ResolveScenarioTracker {
         client = null;
     }
 
-    private void processFamiliarity(CampaignOptions campaignOptions, FamiliarityMode familiarityMode) {
+    private void processFamiliarity(int familiaritySpeed, Familiarity familiarity) {
         // Techs gaining familiarity even if the unit is undamaged is intentional. I opted not to have techs gain
         // familiarity when repairing or maintaining directly because otherwise tech familiarity gain would skyrocket
         // - Illiani Aug/1/26
-        int familiarityDice = campaignOptions.get(CampaignOption.CHASSIS_FAMILIARITY_SCENARIO_DICE);
-        int cap = familiarityMode.getFamiliarityCap();
-        if (familiarityDice > 0) {
+        int cap = familiarity.getFamiliarityCap();
+        if (familiaritySpeed > 0) {
             for (Unit unit : units) {
-                Entity unitEntity = unit.getEntity();
-                if (unitEntity == null || !unitEntity.isChassisFamiliarityEligible()) {
-                    continue;
-                }
-                String chassis = unitEntity.getChassis();
-                for (Person crew : unit.getCrew()) {
-                    awardFamiliarity(crew, chassis, cap, familiarityDice);
-                }
-
-                Person unitTech = unit.getTech();
-                if (unitTech != null) {
-                    awardTechFamiliarity(unitTech, chassis, cap, familiarityDice);
-                }
+                Familiarity.assignFamiliarity(campaign, unit, cap, familiaritySpeed, FamiliarityGainType.D6);
             }
-        }
-    }
-
-    private void awardTechFamiliarity(Person unitTech, String chassis, int cap, int familiarityDice) {
-        boolean singleUnitAssignment = unitTech.getTechUnits().size() == 1;
-        if (singleUnitAssignment) {
-            awardFamiliarity(unitTech, chassis, cap, familiarityDice);
-        }
-    }
-
-    private void awardFamiliarity(Person crew, String chassis, int cap, int familiarityDice) {
-        PersonnelOptions options = crew.getOptions();
-        boolean hasIronBond = options.booleanOption(FAMILIARITY_IRON_BOND);
-        boolean isEmotionallyUnavailable = options.booleanOption(FAMILIARITY_EMOTIONALLY_UNAVAILABLE);
-
-        int currentFamiliarity = crew.getChassisFamiliarity(chassis);
-
-        double multiplier = 1.0;
-        if (hasIronBond) {
-            multiplier = 1.5;
-        }
-
-        if (isEmotionallyUnavailable && currentFamiliarity == 0) {
-            multiplier = 0.0;
-        }
-
-        boolean alreadyCapped = currentFamiliarity == cap;
-        int familiarity = (int) Math.round(Compute.d6(familiarityDice) * multiplier);
-        crew.addChassisFamiliarity(chassis, familiarity, cap);
-        boolean nowCapped = crew.getChassisFamiliarity(chassis) == cap;
-
-        if (!alreadyCapped && nowCapped) {
-            String report = getFormattedTextAt(RESOURCE_BUNDLE, "ResolveScenarioTracker.cappedFamiliarity",
-                  crew.getHyperlinkedFullTitle(), spanOpeningWithCustomColor(getAmazingColor()),
-                  CLOSING_SPAN_TAG,
-                  chassis);
-            campaign.addReport(DailyReportType.PERSONNEL, report);
         }
     }
 

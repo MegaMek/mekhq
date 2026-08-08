@@ -62,6 +62,7 @@ import java.util.Vector;
 import megamek.codeUtilities.StringUtility;
 import megamek.logging.MMLogger;
 import mekhq.campaign.Campaign;
+import mekhq.campaign.campaignOptions.CampaignOption;
 import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.digitalGM.stratCon.StratConCampaignState;
 import mekhq.campaign.force.CombatTeam;
@@ -71,6 +72,8 @@ import mekhq.campaign.mission.AtBContract;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.PersonnelOptions;
 import mekhq.campaign.personnel.enums.PersonnelRole;
+import mekhq.campaign.personnel.familiarity.Familiarity;
+import mekhq.campaign.personnel.familiarity.FamiliarityGainType;
 import mekhq.campaign.personnel.skills.ActionCheckResult;
 import mekhq.campaign.personnel.skills.InfantryGunnerySkills;
 import mekhq.campaign.personnel.skills.ScoutingSkills;
@@ -246,6 +249,17 @@ public class TrainingCombatTeams {
         int fatigueRate = campaignOptions.getFatigueRate();
         double xpCostMultiplier = campaignOptions.getXpCostMultiplier();
 
+        Familiarity familiarityMode = campaignOptions.get(CampaignOption.CHASSIS_FAMILIARITY_MODE);
+        if (familiarityMode.isEnabled()) {
+            int familiaritySpeed = campaignOptions.get(CampaignOption.CHASSIS_FAMILIARITY_SPEED);
+
+            Familiarity.assignFamiliarity(campaign,
+                  commander.getUnit(),
+                  familiarityMode.getFamiliarityCap(),
+                  familiaritySpeed,
+                  FamiliarityGainType.SINGLE);
+        }
+
         List<Person> educatorCrew = commander.getUnit().getActiveCrew();
         for (UUID unitId : formation.getUnits()) {
             Unit unit = campaign.getUnit(unitId);
@@ -387,7 +401,20 @@ public class TrainingCombatTeams {
         int baseCostToImprove = getBaseCostToImprove(trainee, xpCostMultiplier, useReasoningXPChanges,
               skillName, targetSkillLevel);
 
-        int finalXPProgress = getFinalXPProgress(actionCheckResult, targetSkill);
+        int trainingMarginOfSuccess = actionCheckResult.getMarginOfSuccess();
+        int finalXPProgress = getFinalXPProgress(trainingMarginOfSuccess, targetSkill);
+
+        CampaignOptions campaignOptions = campaign.getCampaignOptions();
+        Familiarity familiarityMode = campaignOptions.get(CampaignOption.CHASSIS_FAMILIARITY_MODE);
+        if (familiarityMode.isEnabled()) {
+            int familiaritySpeed = campaignOptions.get(CampaignOption.CHASSIS_FAMILIARITY_SPEED);
+            improveFamiliarityForTrainees(campaign,
+                  educator,
+                  trainee,
+                  familiaritySpeed,
+                  trainingMarginOfSuccess,
+                  familiarityMode);
+        }
 
         boolean wasTrainingCompleted = isWasTrainingCompleted(baseCostToImprove, finalXPProgress);
 
@@ -397,6 +424,26 @@ public class TrainingCombatTeams {
         } else {
             return "";
         }
+    }
+
+    private static void improveFamiliarityForTrainees(Campaign campaign, Person educator, Person trainee,
+          int familiaritySpeed, int trainingMarginOfSuccess, Familiarity familiarityMode) {
+        int familiarityProgressOwnChassisSpeed = familiaritySpeed * trainingMarginOfSuccess;
+
+        int familiarityCap = familiarityMode.getTrainingCap();
+        Familiarity.assignFamiliarity(campaign,
+              trainee.getUnit(),
+              familiarityCap,
+              familiarityProgressOwnChassisSpeed,
+              FamiliarityGainType.SINGLE);
+
+        int familiarityEducatorChassisSpeed = (int) round(familiarityProgressOwnChassisSpeed * 0.5);
+        int trainerFamiliarityCap = (int) round(familiarityCap * 0.5);
+        Familiarity.assignFamiliarity(campaign,
+              educator.getUnit(),
+              trainerFamiliarityCap,
+              familiarityEducatorChassisSpeed,
+              FamiliarityGainType.SINGLE);
     }
 
     /**
@@ -482,17 +529,16 @@ public class TrainingCombatTeams {
      * <p>Progress is at minimum 1 XP, scaled by the margin of success. Returns the skill's total accumulated XP
      * progress after applying this session's gain.</p>
      *
-     * @param actionCheckResult the training skill check result, used to scale XP gain
-     * @param targetSkill       the {@link Skill} receiving the XP progress; its progress is mutated in-place
+     * @param trainingMarginOfSuccess the training skill check result, used to scale XP gain
+     * @param targetSkill             the {@link Skill} receiving the XP progress; its progress is mutated in-place
      *
      * @return the skill's total accumulated XP progress after this session's contribution is applied
      *
      * @author Illiani
      * @since 0.51.01
      */
-    public static int getFinalXPProgress(ActionCheckResult actionCheckResult, Skill targetSkill) {
-        int actualXPProgress = Math.clamp(XP_RATE_BASE_LINE * actionCheckResult.getMarginOfSuccess(),
-              XP_RATE_BASE_LINE, XP_GAIN_MAX);
+    public static int getFinalXPProgress(int trainingMarginOfSuccess, Skill targetSkill) {
+        int actualXPProgress = Math.clamp(XP_RATE_BASE_LINE * trainingMarginOfSuccess, XP_RATE_BASE_LINE, XP_GAIN_MAX);
         targetSkill.changeXpProgress(actualXPProgress);
 
         return targetSkill.getXpProgress();
