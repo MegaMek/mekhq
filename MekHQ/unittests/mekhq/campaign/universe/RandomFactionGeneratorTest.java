@@ -56,9 +56,8 @@ import java.util.Set;
 import megamek.common.compute.Compute;
 import megamek.common.util.weightedMaps.WeightedIntMap;
 import mekhq.campaign.location.ILocation;
-import mekhq.campaign.mission.mission.contractGeneration.GlobalEmployerTableValue;
-import mekhq.campaign.mission.newContract.EnemySelectionProfile;
-import mekhq.campaign.mission.newContract.MissionLocationProfile;
+import mekhq.campaign.mission.newContract.contractGeneration.targetFinder.EnemySelectionProfile;
+import mekhq.campaign.mission.newContract.contractGeneration.targetFinder.MissionLocationProfile;
 import mekhq.campaign.universe.PlanetarySystem.PlanetaryRating;
 import mekhq.campaign.universe.PlanetarySystem.PlanetarySophistication;
 import mekhq.campaign.universe.enums.HPGRating;
@@ -642,7 +641,7 @@ public class RandomFactionGeneratorTest {
         RandomFactionGenerator rfg = createIsolatedRfg(peripheryFaction);
         ILocation location = createTestLocation(peripheryFaction);
 
-        Faction chosen = rfg.getRandomEmployerFaction(location, TEST_DATE, null, false);
+        Faction chosen = rfg.getRandomEmployerFaction(location, TEST_DATE, false);
 
         assertNotNull(chosen, "Employer faction should not be null");
         assertEquals(peripheryFaction.getShortName(), chosen.getShortName());
@@ -654,7 +653,7 @@ public class RandomFactionGeneratorTest {
         ILocation location = mock(ILocation.class);
         when(location.getCurrentSystem()).thenReturn(null);
 
-        assertNull(rfg.getRandomEmployerFaction(location, TEST_DATE, null, false));
+        assertNull(rfg.getRandomEmployerFaction(location, TEST_DATE, false));
     }
 
     @Test
@@ -662,7 +661,7 @@ public class RandomFactionGeneratorTest {
         RandomFactionGenerator rfg = createIsolatedRfg(clanFaction);
         ILocation location = createTestLocation(clanFaction);
 
-        assertNull(rfg.getRandomEmployerFaction(location, TEST_DATE, null, true),
+        assertNull(rfg.getRandomEmployerFaction(location, TEST_DATE, true),
               "A Clan-controlled area with no eligible contained faction should have no employer");
     }
 
@@ -673,7 +672,7 @@ public class RandomFactionGeneratorTest {
         RandomFactionGenerator rfg = createIsolatedRfg(isFaction);
         ILocation location = createTestLocation(isFaction);
 
-        assertNull(rfg.getRandomEmployerFaction(location, TEST_DATE, null, false),
+        assertNull(rfg.getRandomEmployerFaction(location, TEST_DATE, false),
               "Extinct controlling faction should not be chosen, nor unlock its contained faction");
     }
 
@@ -684,7 +683,7 @@ public class RandomFactionGeneratorTest {
 
         boolean innerSeen = false;
         for (int i = 0; i < 500; i++) {
-            Faction chosen = rfg.getRandomEmployerFaction(location, TEST_DATE, null, false);
+            Faction chosen = rfg.getRandomEmployerFaction(location, TEST_DATE, false);
             assertNotNull(chosen, "Employer faction should not be null");
             if (innerISFaction.getShortName().equals(chosen.getShortName())) {
                 innerSeen = true;
@@ -706,7 +705,7 @@ public class RandomFactionGeneratorTest {
         ILocation location = createTestLocation(isFaction);
 
         for (int i = 0; i < 500; i++) {
-            Faction chosen = rfg.getRandomEmployerFaction(location, TEST_DATE, null, true);
+            Faction chosen = rfg.getRandomEmployerFaction(location, TEST_DATE, true);
             assertNotNull(chosen, "Employer faction should not be null");
             assertNotEquals(innerISFaction.getShortName(), chosen.getShortName(),
                   "Clan contained faction must never be chosen as an employer");
@@ -736,29 +735,6 @@ public class RandomFactionGeneratorTest {
     }
 
     /**
-     * Regression test: {@link RandomFactionGenerator#getRandomEmployerFaction} must filter candidates by the requested
-     * {@link GlobalEmployerTableValue} power tier, excluding any faction (controlling or contained) whose tier doesn't
-     * match.
-     */
-    @Test
-    public void testRandomEmployerFactionFiltersByEmployerType() {
-        when(isFaction.isMinorPower()).thenReturn(true);
-        RandomFactionGenerator rfg = createTestRFG();
-        ILocation location = createTestLocation(isFaction);
-
-        for (int i = 0; i < 500; i++) {
-            Faction chosen = rfg.getRandomEmployerFaction(location,
-                  TEST_DATE,
-                  GlobalEmployerTableValue.MINOR_POWER,
-                  false);
-            assertNotNull(chosen, "Employer faction should not be null");
-            assertEquals(isFaction.getShortName(), chosen.getShortName(),
-                  "Only factions matching the requested employer power tier should be returned, including excluding "
-                        + "an otherwise-eligible contained faction whose own tier doesn't match");
-        }
-    }
-
-    /**
      * Regression test: {@code isMercenaryCampaign} must exclude any faction that doesn't use mercenaries, not just
      * Clans (see {@link #testRandomEmployerFactionExcludesClanController} for the Clan-specific case).
      */
@@ -768,7 +744,7 @@ public class RandomFactionGeneratorTest {
         RandomFactionGenerator rfg = createIsolatedRfg(peripheryFaction);
         ILocation location = createTestLocation(peripheryFaction);
 
-        assertNull(rfg.getRandomEmployerFaction(location, TEST_DATE, null, true),
+        assertNull(rfg.getRandomEmployerFaction(location, TEST_DATE, true),
               "A non-Clan faction that doesn't use mercenaries should still be excluded during a mercenary campaign");
     }
 
@@ -1021,8 +997,8 @@ public class RandomFactionGeneratorTest {
     /**
      * AT_WAR (and by extension OCCUPYING_POWER, which shares the same belligerent search): an aggregate-faction
      * employer can be matched against itself with no war record, since
-     * {@code RandomFactionGenerator#findEnemiesAtWarWith(Faction, LocalDate)} carries the
-     * same self-conflict exception as {@link RandomFactionGenerator#buildEnemyMap}.
+     * {@code RandomFactionGenerator#findEnemiesAtWarWith(Faction, LocalDate)} carries the same self-conflict exception
+     * as {@link RandomFactionGenerator#buildEnemyMap}.
      */
     @Test
     public void testGetRandomEnemyProfileAtWarAllowsMercenaryEmployerToFightItselfWithoutAWarRecord() {

@@ -223,7 +223,7 @@ public class CompanyGenerationDialog extends AbstractMHQValidationButtonDialog {
         PlayerForce playerForce = campaign.getPlayerForce();
         ForceReputationController reputationController = new ForceReputationController();
         reputationController.initializeReputation(campaign);
-        playerForce.setReputation(reputationController);
+        playerForce.setCamOpsReputation(reputationController);
 
         ChaosReputation.processChaosCampaignReputationChanges(campaign.getCampaignOptions(),
               campaign.getPlayerForce(),

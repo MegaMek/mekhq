@@ -62,8 +62,8 @@ import mekhq.campaign.force.Formation;
 import mekhq.campaign.force.FormationLevel;
 import mekhq.campaign.force.FormationType;
 import mekhq.campaign.mission.AtBContract.AtBContractRef;
-import mekhq.campaign.mission.enums.AtBContractType;
 import mekhq.campaign.mission.enums.CombatRole;
+import mekhq.campaign.mission.enums.ContractObjectiveType;
 import mekhq.campaign.mission.utilities.ContractUtilities;
 import mekhq.campaign.personnel.backgrounds.RandomCompanyNameGenerator;
 import mekhq.campaign.unit.Unit;
@@ -213,8 +213,8 @@ public class AtBContractTest {
 
     @Test
     public void setContractTypeUpdatesParentMissionType() {
-        contract.setContractTypeAndName(AtBContractType.CADRE_DUTY);
-        assertEquals(AtBContractType.CADRE_DUTY, contract.getContractType());
+        contract.setContractTypeAndName(ContractObjectiveType.CADRE_DUTY);
+        assertEquals(ContractObjectiveType.CADRE_DUTY, contract.getContractType());
         assertEquals("Cadre Duty", contract.getContractTypeName());
     }
 

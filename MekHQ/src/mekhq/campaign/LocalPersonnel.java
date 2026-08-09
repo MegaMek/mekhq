@@ -50,8 +50,8 @@ import org.w3c.dom.NodeList;
  * Roster of {@link Person}s, keyed by UUID.
  *
  * <p>Extends {@link LinkedHashMap} so all standard map operations work on existing call sites.
- * Adds {@link #writeToXML} and {@link #loadFromXML} to own the canonical save/load loop for
- * the {@code <personnel>} XML block.</p>
+ * Adds {@link #writeToXML} and {@link #loadFromXML} to own the canonical save/load loop for the {@code <personnel>} XML
+ * block.</p>
  */
 public class LocalPersonnel extends LinkedHashMap<UUID, Person> implements ILocation {
     private static final MMLogger logger = MMLogger.create(LocalPersonnel.class);
@@ -77,8 +77,8 @@ public class LocalPersonnel extends LinkedHashMap<UUID, Person> implements ILoca
     }
 
     /**
-     * Parses a {@code <personnel>} XML node and imports each {@code <person>} child into {@code campaign}
-     * via {@link Campaign#importPerson(Person)}.
+     * Parses a {@code <personnel>} XML node and imports each {@code <person>} child into {@code campaign} via
+     * {@link Campaign#importPerson(Person)}.
      *
      * <p>Compatibility post-processing (edge conversion, academy validation) is left to the caller.</p>
      */

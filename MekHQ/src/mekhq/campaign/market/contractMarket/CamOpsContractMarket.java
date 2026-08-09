@@ -35,7 +35,7 @@ package mekhq.campaign.market.contractMarket;
 import static megamek.common.compute.Compute.d6;
 import static megamek.common.enums.SkillLevel.GREEN;
 import static megamek.common.enums.SkillLevel.REGULAR;
-import static mekhq.campaign.mission.newContract.ClanHomeworldsExclusion.violatesHomeworldsExclusion;
+import static mekhq.campaign.mission.newContract.contractGeneration.targetFinder.ClanHomeworldsExclusion.violatesHomeworldsExclusion;
 import static mekhq.campaign.personnel.PersonnelOptions.ADMIN_NETWORKER;
 import static mekhq.campaign.personnel.skills.SkillType.S_NEGOTIATION;
 import static mekhq.campaign.randomEvents.other.GrayMonday.isGrayMonday;
@@ -58,8 +58,8 @@ import mekhq.campaign.enums.DragoonRating;
 import mekhq.campaign.market.enums.ContractMarketMethod;
 import mekhq.campaign.mission.AtBContract;
 import mekhq.campaign.mission.Contract;
-import mekhq.campaign.mission.enums.AtBContractType;
 import mekhq.campaign.mission.enums.ContractCommandRights;
+import mekhq.campaign.mission.enums.ContractObjectiveType;
 import mekhq.campaign.mission.utilities.ContractUtilities;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.PersonnelOptions;
@@ -86,7 +86,7 @@ public class CamOpsContractMarket extends AbstractContractMarket {
     public AtBContract addAtBContract(Campaign campaign) {
         HiringHallModifiers hiringHallModifiers = getHiringHallModifiers(campaign);
         ForceReputationController reputation = campaign.getPlayerForce()
-                                                     .getReputation();
+                                                     .getCamOpsReputation();
         Optional<AtBContract> c = generateContract(campaign, reputation, hiringHallModifiers);
         if (c.isPresent()) {
             AtBContract atbContract = c.get();
@@ -119,7 +119,7 @@ public class CamOpsContractMarket extends AbstractContractMarket {
         //}
         // TODO: CamOpsMarket: allow players to choose negotiators and send them out, removing them
         // from other tasks they're doing. For now just use the highest negotiation skill on the force.
-        int ratingMod = campaign.getPlayerForce().getReputation().getReputationModifier();
+        int ratingMod = campaign.getPlayerForce().getCamOpsReputation().getReputationModifier();
         HiringHallModifiers hiringHallModifiers = getHiringHallModifiers(campaign);
         int negotiationSkill = findNegotiationSkill(campaign);
 
@@ -159,7 +159,7 @@ public class CamOpsContractMarket extends AbstractContractMarket {
 
     @Override
     public double calculatePaymentMultiplier(Campaign campaign, AtBContract contract) {
-        double reputationFactor = campaign.getPlayerForce().getReputation().getReputationFactor();
+        double reputationFactor = campaign.getPlayerForce().getCamOpsReputation().getReputationFactor();
         ContractTerms terms = getContractTerms(campaign, contract);
         return terms.getEmploymentMultiplier() * terms.getOperationsTempoMultiplier() * reputationFactor;
     }
@@ -176,7 +176,7 @@ public class CamOpsContractMarket extends AbstractContractMarket {
             return;
         }
         int negotiationSkill = findNegotiationSkill(campaign);
-        int ratingMod = campaign.getPlayerForce().getReputation().getReputationModifier();
+        int ratingMod = campaign.getPlayerForce().getCamOpsReputation().getReputationModifier();
 
         if (campaign.getCampaignOptions().isUseFactionStandingNegotiationSafe()) {
             FactionStandings standings = campaign.getPlayerForce().getFactionStandings();
@@ -450,7 +450,7 @@ public class CamOpsContractMarket extends AbstractContractMarket {
         return tags;
     }
 
-    private AtBContractType determineMission(Campaign campaign, Faction employer, int ratingMod) {
+    private ContractObjectiveType determineMission(Campaign campaign, Faction employer, int ratingMod) {
         if (campaign.getFaction().isPirate()) {
             return MissionSelector.getPirateMission(Compute.d6(2), 0);
         }
@@ -472,7 +472,7 @@ public class CamOpsContractMarket extends AbstractContractMarket {
     private ContractTerms getContractTerms(Campaign campaign, AtBContract contract) {
         return new ContractTerms(contract.getContractType(),
               contract.getEmployerFaction(),
-              campaign.getPlayerForce().getReputation().getReputationFactor(),
+              campaign.getPlayerForce().getCamOpsReputation().getReputationFactor(),
               campaign.getLocalDate());
     }
 

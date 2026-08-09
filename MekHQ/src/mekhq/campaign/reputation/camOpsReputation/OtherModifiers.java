@@ -41,7 +41,7 @@ import java.util.stream.Collectors;
 import megamek.logging.MMLogger;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.mission.AtBContract;
-import mekhq.campaign.mission.enums.AtBContractType;
+import mekhq.campaign.mission.enums.ContractObjectiveType;
 
 public class OtherModifiers {
     private static final MMLogger LOGGER = MMLogger.create(OtherModifiers.class);
@@ -134,7 +134,7 @@ public class OtherModifiers {
      * @return true if the contract is suitable, false otherwise.
      */
     private static boolean isSuitableContract(AtBContract contract) {
-        AtBContractType contractType = contract.getContractType();
+        ContractObjectiveType contractType = contract.getContractType();
 
         return (!contractType.isGarrisonType() && !contractType.isCadreDuty());
     }

@@ -422,8 +422,8 @@ public final class MHQConstants extends SuiteConstants {
     public static final LocalDate FORTRESS_REPUBLIC_START = LocalDate.of(3135, Month.NOVEMBER, 1);
     public static final LocalDate FORTRESS_REPUBLIC_END = LocalDate.of(3149, Month.JANUARY, 1);
     public static final LocalDate FORTRESS_REPUBLIC_TERRA_ONLY_END = LocalDate.of(3151, Month.JANUARY, 1);
-    public static final LocalDate OPERATION_BULLDOG_START = LocalDate.of(3059, Month.MAY, 20);
-    public static final LocalDate OPERATION_BULLDOG_END = LocalDate.of(3059, Month.AUGUST, 13);
+    public static final LocalDate IS_INVASION_OF_HUNTRESS_START = LocalDate.of(3060, Month.FEBRUARY, 19);
+    public static final LocalDate IS_INVASION_OF_HUNTRESS_END = LocalDate.of(3060, Month.APRIL, 9);
     /**
      * The invasion of Luthien kicks off the Jihad
      */
