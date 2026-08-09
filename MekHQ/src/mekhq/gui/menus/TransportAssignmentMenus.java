@@ -47,15 +47,16 @@ import javax.swing.JOptionPane;
 import javax.swing.JPopupMenu;
 
 import megamek.client.ui.dialogs.lobby.TrainOrderDialog;
+import megamek.client.ui.util.MenuScroller;
 import megamek.common.equipment.TankTrailerHitch;
 import megamek.common.units.Entity;
+import mekhq.MHQConstants;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.enums.CampaignTransportType;
 import mekhq.campaign.events.units.UnitChangedEvent;
 import mekhq.campaign.unit.Unit;
 import mekhq.campaign.unit.enums.TransporterType;
-import mekhq.gui.utilities.JMenuHelpers;
 import mekhq.utilities.MHQInternationalization;
 
 /**
@@ -91,12 +92,28 @@ public final class TransportAssignmentMenus {
                 case TACTICAL_TRANSPORT -> new AssignForceToTacticalTransportMenu(campaign, unitSet);
                 case TOW_TRANSPORT -> new AssignForceToTowTransportMenu(campaign, unitSet);
             };
-            JMenuHelpers.addMenuIfNonEmpty(popup, assignMenu);
+            addMenuIfNonEmpty(popup, assignMenu);
             addUnassignSelfMenuItem(popup, campaign, units, campaignTransportType);
             addUnassignTransportedMenuItem(popup, campaign, units, campaignTransportType);
         }
         addConnectTrainMenuItem(frame, popup, campaign, units);
         addDisconnectTrainMenuItem(popup, campaign, units);
+    }
+
+    /**
+     * Adds the child menu to the popup only when it has entries, with a scroller once it grows
+     * past the standard threshold. Replaces the deprecated
+     * {@code JMenuHelpers.addMenuIfNonEmpty}; the popups handed in by the TO&amp;E and Hangar
+     * adapters are plain {@link JPopupMenu}s, so the {@code JScrollablePopupMenu} replacement
+     * does not apply here.
+     */
+    private static void addMenuIfNonEmpty(JPopupMenu popup, JMenu childMenu) {
+        if (childMenu.getItemCount() > 0) {
+            popup.add(childMenu);
+            if (childMenu.getItemCount() > MHQConstants.BASE_SCROLLER_THRESHOLD) {
+                MenuScroller.setScrollerFor(childMenu, MHQConstants.BASE_SCROLLER_THRESHOLD);
+            }
+        }
     }
 
     /**
