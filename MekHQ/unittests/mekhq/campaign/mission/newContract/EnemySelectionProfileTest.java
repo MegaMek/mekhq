@@ -34,7 +34,7 @@ package mekhq.campaign.mission.newContract;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-import mekhq.campaign.mission.enums.AtBContractType;
+import mekhq.campaign.mission.enums.ContractObjectiveType;
 import mekhq.campaign.mission.newContract.contractGeneration.targetFinder.EnemySelectionProfile;
 import org.junit.jupiter.api.Test;
 
@@ -48,68 +48,68 @@ class EnemySelectionProfileTest {
     @Test
     void pirateHuntingMapsToPirates() {
         assertEquals(EnemySelectionProfile.PIRATES,
-              AtBContractType.PIRATE_HUNTING.getEnemySelectionProfile());
+              ContractObjectiveType.PIRATE_HUNTING.getEnemySelectionProfile());
     }
 
     @Test
     void riotDutyMapsToRebels() {
         assertEquals(EnemySelectionProfile.REBELS,
-              AtBContractType.RIOT_DUTY.getEnemySelectionProfile());
+              ContractObjectiveType.RIOT_DUTY.getEnemySelectionProfile());
     }
 
     @Test
     void cadreDutyMapsToRaiders() {
         assertEquals(EnemySelectionProfile.RAIDERS,
-              AtBContractType.CADRE_DUTY.getEnemySelectionProfile());
+              ContractObjectiveType.CADRE_DUTY.getEnemySelectionProfile());
     }
 
     @Test
     void openWarfareTypesMapToAtWar() {
         assertEquals(EnemySelectionProfile.AT_WAR,
-              AtBContractType.PLANETARY_ASSAULT.getEnemySelectionProfile());
+              ContractObjectiveType.PLANETARY_ASSAULT.getEnemySelectionProfile());
         assertEquals(EnemySelectionProfile.AT_WAR,
-              AtBContractType.RELIEF_DUTY.getEnemySelectionProfile());
+              ContractObjectiveType.RELIEF_DUTY.getEnemySelectionProfile());
     }
 
     @Test
     void guerrillaWarfareMapsToOccupyingPower() {
         assertEquals(EnemySelectionProfile.OCCUPYING_POWER,
-              AtBContractType.GUERRILLA_WARFARE.getEnemySelectionProfile());
+              ContractObjectiveType.GUERRILLA_WARFARE.getEnemySelectionProfile());
     }
 
     @Test
     void covertTypesMapToCovert() {
         assertEquals(EnemySelectionProfile.COVERT,
-              AtBContractType.ESPIONAGE.getEnemySelectionProfile());
+              ContractObjectiveType.ESPIONAGE.getEnemySelectionProfile());
         assertEquals(EnemySelectionProfile.COVERT,
-              AtBContractType.SABOTAGE.getEnemySelectionProfile());
+              ContractObjectiveType.SABOTAGE.getEnemySelectionProfile());
         assertEquals(EnemySelectionProfile.COVERT,
-              AtBContractType.TERRORISM.getEnemySelectionProfile());
+              ContractObjectiveType.TERRORISM.getEnemySelectionProfile());
         assertEquals(EnemySelectionProfile.COVERT,
-              AtBContractType.ASSASSINATION.getEnemySelectionProfile());
+              ContractObjectiveType.ASSASSINATION.getEnemySelectionProfile());
     }
 
     @Test
     void remainingTypesMapToDefault() {
         assertEquals(EnemySelectionProfile.DEFAULT,
-              AtBContractType.GARRISON_DUTY.getEnemySelectionProfile());
+              ContractObjectiveType.GARRISON_DUTY.getEnemySelectionProfile());
         assertEquals(EnemySelectionProfile.DEFAULT,
-              AtBContractType.SECURITY_DUTY.getEnemySelectionProfile());
+              ContractObjectiveType.SECURITY_DUTY.getEnemySelectionProfile());
         assertEquals(EnemySelectionProfile.DEFAULT,
-              AtBContractType.RETAINER.getEnemySelectionProfile());
+              ContractObjectiveType.RETAINER.getEnemySelectionProfile());
         assertEquals(EnemySelectionProfile.DEFAULT,
-              AtBContractType.DIVERSIONARY_RAID.getEnemySelectionProfile());
+              ContractObjectiveType.DIVERSIONARY_RAID.getEnemySelectionProfile());
         assertEquals(EnemySelectionProfile.DEFAULT,
-              AtBContractType.OBJECTIVE_RAID.getEnemySelectionProfile());
+              ContractObjectiveType.OBJECTIVE_RAID.getEnemySelectionProfile());
         assertEquals(EnemySelectionProfile.DEFAULT,
-              AtBContractType.RECON_RAID.getEnemySelectionProfile());
+              ContractObjectiveType.RECON_RAID.getEnemySelectionProfile());
         assertEquals(EnemySelectionProfile.DEFAULT,
-              AtBContractType.EXTRACTION_RAID.getEnemySelectionProfile());
+              ContractObjectiveType.EXTRACTION_RAID.getEnemySelectionProfile());
         assertEquals(EnemySelectionProfile.DEFAULT,
-              AtBContractType.OBSERVATION_RAID.getEnemySelectionProfile());
+              ContractObjectiveType.OBSERVATION_RAID.getEnemySelectionProfile());
         assertEquals(EnemySelectionProfile.DEFAULT,
-              AtBContractType.MOLE_HUNTING.getEnemySelectionProfile());
+              ContractObjectiveType.MOLE_HUNTING.getEnemySelectionProfile());
         assertEquals(EnemySelectionProfile.DEFAULT,
-              AtBContractType.UNDEFINED.getEnemySelectionProfile());
+              ContractObjectiveType.UNDEFINED.getEnemySelectionProfile());
     }
 }

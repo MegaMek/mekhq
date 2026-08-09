@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2025 The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2025-2026 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -34,7 +34,7 @@ package mekhq.campaign.market.contractMarket;
 
 import static megamek.common.compute.Compute.d6;
 
-import mekhq.campaign.mission.enums.AtBContractType;
+import mekhq.campaign.mission.enums.ContractObjectiveType;
 import mekhq.campaign.universe.Faction;
 
 /**
@@ -65,7 +65,7 @@ public class ContractTypePicker {
      * @author Illiani
      * @since 0.50.10
      */
-    public static AtBContractType findMissionType(Faction employer, int commanderModifier) {
+    public static ContractObjectiveType findMissionType(Faction employer, int commanderModifier) {
         // I took some liberties here with what faction rolls on what table, as the options were fairly limited. The
         // below gives a much better variance among the factions.
         if (employer.isClan()) {
@@ -128,20 +128,20 @@ public class ContractTypePicker {
      * @author Illiani
      * @since 0.50.10
      */
-    private static AtBContractType clanTable(int modifier) {
+    private static ContractObjectiveType clanTable(int modifier) {
         int roll = getRoll(modifier);
         while (roll < 4 || roll > 11) {
             roll = getRoll(modifier);
         }
 
         return switch (roll) {
-            case 4 -> AtBContractType.PIRATE_HUNTING;
-            case 5 -> AtBContractType.PLANETARY_ASSAULT;
-            case 6, 7 -> AtBContractType.OBJECTIVE_RAID;
-            case 8 -> AtBContractType.EXTRACTION_RAID;
-            case 9 -> AtBContractType.RECON_RAID;
-            case 10 -> AtBContractType.GARRISON_DUTY;
-            case 11 -> AtBContractType.CADRE_DUTY;
+            case 4 -> ContractObjectiveType.PIRATE_HUNTING;
+            case 5 -> ContractObjectiveType.PLANETARY_ASSAULT;
+            case 6, 7 -> ContractObjectiveType.OBJECTIVE_RAID;
+            case 8 -> ContractObjectiveType.EXTRACTION_RAID;
+            case 9 -> ContractObjectiveType.RECON_RAID;
+            case 10 -> ContractObjectiveType.GARRISON_DUTY;
+            case 11 -> ContractObjectiveType.CADRE_DUTY;
             default -> throw new IllegalStateException("Unexpected value: " + roll);
         };
     }
@@ -159,18 +159,18 @@ public class ContractTypePicker {
      * @author Illiani
      * @since 0.50.10
      */
-    private static AtBContractType innerSphereTable(int modifier) {
+    private static ContractObjectiveType innerSphereTable(int modifier) {
         int roll = getRoll(modifier);
         return switch (roll) {
             case 2 -> covertTable(modifier);
             case 3, 12 -> specialTable(modifier);
-            case 4 -> AtBContractType.PIRATE_HUNTING;
-            case 5 -> AtBContractType.PLANETARY_ASSAULT;
-            case 6, 7 -> AtBContractType.OBJECTIVE_RAID;
-            case 8 -> AtBContractType.EXTRACTION_RAID;
-            case 9 -> AtBContractType.RECON_RAID;
-            case 10 -> AtBContractType.GARRISON_DUTY;
-            case 11 -> AtBContractType.CADRE_DUTY;
+            case 4 -> ContractObjectiveType.PIRATE_HUNTING;
+            case 5 -> ContractObjectiveType.PLANETARY_ASSAULT;
+            case 6, 7 -> ContractObjectiveType.OBJECTIVE_RAID;
+            case 8 -> ContractObjectiveType.EXTRACTION_RAID;
+            case 9 -> ContractObjectiveType.RECON_RAID;
+            case 10 -> ContractObjectiveType.GARRISON_DUTY;
+            case 11 -> ContractObjectiveType.CADRE_DUTY;
             default -> throw new IllegalStateException("Unexpected value: " + roll);
         };
     }
@@ -188,18 +188,18 @@ public class ContractTypePicker {
      * @author Illiani
      * @since 0.50.10
      */
-    private static AtBContractType independentTable(int modifier) {
+    private static ContractObjectiveType independentTable(int modifier) {
         int roll = getRoll(modifier);
         return switch (roll) {
             case 2 -> covertTable(modifier);
             case 3, 12 -> specialTable(modifier);
-            case 4 -> AtBContractType.PLANETARY_ASSAULT;
-            case 5, 9 -> AtBContractType.OBJECTIVE_RAID;
-            case 6 -> AtBContractType.EXTRACTION_RAID;
-            case 7 -> AtBContractType.PIRATE_HUNTING;
-            case 8 -> AtBContractType.SECURITY_DUTY;
-            case 10 -> AtBContractType.GARRISON_DUTY;
-            case 11 -> AtBContractType.CADRE_DUTY;
+            case 4 -> ContractObjectiveType.PLANETARY_ASSAULT;
+            case 5, 9 -> ContractObjectiveType.OBJECTIVE_RAID;
+            case 6 -> ContractObjectiveType.EXTRACTION_RAID;
+            case 7 -> ContractObjectiveType.PIRATE_HUNTING;
+            case 8 -> ContractObjectiveType.SECURITY_DUTY;
+            case 10 -> ContractObjectiveType.GARRISON_DUTY;
+            case 11 -> ContractObjectiveType.CADRE_DUTY;
             default -> throw new IllegalStateException("Unexpected value: " + roll);
         };
     }
@@ -217,18 +217,18 @@ public class ContractTypePicker {
      * @author Illiani
      * @since 0.50.10
      */
-    private static AtBContractType corporationTable(int modifier) {
+    private static ContractObjectiveType corporationTable(int modifier) {
         int roll = getRoll(modifier);
         return switch (roll) {
             case 2 -> covertTable(modifier);
-            case 3, 4 -> AtBContractType.GUERRILLA_WARFARE;
-            case 5, 8 -> AtBContractType.RECON_RAID;
-            case 6 -> AtBContractType.EXTRACTION_RAID;
-            case 7 -> AtBContractType.RETAINER;
-            case 9 -> AtBContractType.RELIEF_DUTY;
-            case 10 -> AtBContractType.DIVERSIONARY_RAID;
-            case 11 -> AtBContractType.RIOT_DUTY;
-            case 12 -> AtBContractType.CADRE_DUTY;
+            case 3, 4 -> ContractObjectiveType.GUERRILLA_WARFARE;
+            case 5, 8 -> ContractObjectiveType.RECON_RAID;
+            case 6 -> ContractObjectiveType.EXTRACTION_RAID;
+            case 7 -> ContractObjectiveType.RETAINER;
+            case 9 -> ContractObjectiveType.RELIEF_DUTY;
+            case 10 -> ContractObjectiveType.DIVERSIONARY_RAID;
+            case 11 -> ContractObjectiveType.RIOT_DUTY;
+            case 12 -> ContractObjectiveType.CADRE_DUTY;
             default -> throw new IllegalStateException("Unexpected value: " + roll);
         };
     }
@@ -245,11 +245,11 @@ public class ContractTypePicker {
      * @author Illiani
      * @since 0.50.10
      */
-    private static AtBContractType pirateTable(int modifier) {
+    private static ContractObjectiveType pirateTable(int modifier) {
         int roll = getRoll(modifier);
         return switch (roll) {
-            case 2, 3, 4, 5 -> AtBContractType.RECON_RAID;
-            case 6, 7, 8, 9, 10, 11, 12 -> AtBContractType.OBJECTIVE_RAID;
+            case 2, 3, 4, 5 -> ContractObjectiveType.RECON_RAID;
+            case 6, 7, 8, 9, 10, 11, 12 -> ContractObjectiveType.OBJECTIVE_RAID;
             default -> throw new IllegalStateException("Unexpected value: " + roll);
         };
     }
@@ -267,19 +267,19 @@ public class ContractTypePicker {
      * @author Illiani
      * @since 0.50.10
      */
-    private static AtBContractType covertTable(int modifier) {
+    private static ContractObjectiveType covertTable(int modifier) {
         int roll = getRoll(modifier);
         return switch (roll) {
-            case 2 -> AtBContractType.TERRORISM;
-            case 3, 4 -> AtBContractType.ASSASSINATION;
-            case 5 -> AtBContractType.ESPIONAGE;
-            case 6 -> AtBContractType.SABOTAGE;
-            case 7 -> AtBContractType.GUERRILLA_WARFARE;
-            case 8 -> AtBContractType.RECON_RAID;
-            case 9 -> AtBContractType.DIVERSIONARY_RAID;
-            case 10 -> AtBContractType.OBSERVATION_RAID;
-            case 11 -> AtBContractType.MOLE_HUNTING;
-            case 12 -> AtBContractType.SECURITY_DUTY;
+            case 2 -> ContractObjectiveType.TERRORISM;
+            case 3, 4 -> ContractObjectiveType.ASSASSINATION;
+            case 5 -> ContractObjectiveType.ESPIONAGE;
+            case 6 -> ContractObjectiveType.SABOTAGE;
+            case 7 -> ContractObjectiveType.GUERRILLA_WARFARE;
+            case 8 -> ContractObjectiveType.RECON_RAID;
+            case 9 -> ContractObjectiveType.DIVERSIONARY_RAID;
+            case 10 -> ContractObjectiveType.OBSERVATION_RAID;
+            case 11 -> ContractObjectiveType.MOLE_HUNTING;
+            case 12 -> ContractObjectiveType.SECURITY_DUTY;
             default -> throw new IllegalStateException("Unexpected value: " + roll);
         };
     }
@@ -297,18 +297,18 @@ public class ContractTypePicker {
      * @author Illiani
      * @since 0.50.10
      */
-    private static AtBContractType specialTable(int modifier) {
+    private static ContractObjectiveType specialTable(int modifier) {
         int roll = getRoll(modifier);
         return switch (roll) {
             case 2 -> covertTable(modifier);
-            case 3, 4 -> AtBContractType.GUERRILLA_WARFARE;
-            case 5, 8 -> AtBContractType.RECON_RAID;
-            case 6 -> AtBContractType.EXTRACTION_RAID;
-            case 7 -> AtBContractType.RETAINER;
-            case 9 -> AtBContractType.RELIEF_DUTY;
-            case 10 -> AtBContractType.DIVERSIONARY_RAID;
-            case 11 -> AtBContractType.RIOT_DUTY;
-            case 12 -> AtBContractType.CADRE_DUTY;
+            case 3, 4 -> ContractObjectiveType.GUERRILLA_WARFARE;
+            case 5, 8 -> ContractObjectiveType.RECON_RAID;
+            case 6 -> ContractObjectiveType.EXTRACTION_RAID;
+            case 7 -> ContractObjectiveType.RETAINER;
+            case 9 -> ContractObjectiveType.RELIEF_DUTY;
+            case 10 -> ContractObjectiveType.DIVERSIONARY_RAID;
+            case 11 -> ContractObjectiveType.RIOT_DUTY;
+            case 12 -> ContractObjectiveType.CADRE_DUTY;
             default -> throw new IllegalStateException("Unexpected value: " + roll);
         };
     }

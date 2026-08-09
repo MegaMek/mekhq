@@ -64,7 +64,7 @@ import mekhq.campaign.finances.Accountant;
 import mekhq.campaign.finances.Money;
 import mekhq.campaign.force.CombatTeam;
 import mekhq.campaign.mission.AtBContract;
-import mekhq.campaign.mission.enums.AtBContractType;
+import mekhq.campaign.mission.enums.ContractObjectiveType;
 import mekhq.campaign.mission.newContract.contractGeneration.targetFinder.EnemySelectionProfile;
 import mekhq.campaign.mission.utilities.ContractUtilities;
 import mekhq.campaign.reputation.camOpsReputation.ForceReputationController;
@@ -97,7 +97,7 @@ class AtbMonthlyContractMarketTest {
               MockedStatic<ContractUtilities> contractUtilities = mockStatic(ContractUtilities.class);
               MockedStatic<CombatTeam> combatTeam = mockStatic(CombatTeam.class)) {
             contractTypePicker.when(() -> ContractTypePicker.findMissionType(context.employerFaction, 0))
-                  .thenReturn(AtBContractType.GARRISON_DUTY);
+                  .thenReturn(ContractObjectiveType.GARRISON_DUTY);
             contractUtilities.when(ContractUtilities::calculateVarianceFactor).thenReturn(1.0);
             contractUtilities.when(() -> ContractUtilities.calculateBaseNumberOfRequiredLances(context.campaign,
                         false,

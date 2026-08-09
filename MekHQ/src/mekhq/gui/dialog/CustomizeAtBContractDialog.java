@@ -58,7 +58,7 @@ import megamek.logging.MMLogger;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.mission.AtBContract;
-import mekhq.campaign.mission.enums.AtBContractType;
+import mekhq.campaign.mission.enums.ContractObjectiveType;
 import mekhq.campaign.mission.enums.ContractMoraleLevel;
 import mekhq.campaign.universe.Factions;
 import mekhq.campaign.universe.PlanetarySystem;
@@ -89,7 +89,7 @@ public class CustomizeAtBContractDialog extends JDialog {
     protected FactionComboBox cbEnemy;
     protected JCheckBox chkShowAllFactions;
 
-    protected MMComboBox<AtBContractType> comboContractType;
+    protected MMComboBox<ContractObjectiveType> comboContractType;
     protected MarkdownEditorPanel txtDesc;
     protected JSuggestField suggestPlanet;
     protected MMComboBox<SkillLevel> comboAllySkill;
@@ -169,14 +169,14 @@ public class CustomizeAtBContractDialog extends JDialog {
         JLabel lblEnemy = new JLabel();
         chkShowAllFactions = new JCheckBox();
 
-        comboContractType = new MMComboBox<>("comboContractType", AtBContractType.values());
+        comboContractType = new MMComboBox<>("comboContractType", ContractObjectiveType.values());
         comboContractType.setRenderer(new DefaultListCellRenderer() {
             @Override
             public Component getListCellRendererComponent(final JList<?> list, final Object value, final int index,
                   final boolean isSelected, final boolean cellHasFocus) {
                 super.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);
-                if (value instanceof AtBContractType) {
-                    list.setToolTipText(((AtBContractType) value).getToolTipText());
+                if (value instanceof ContractObjectiveType) {
+                    list.setToolTipText(((ContractObjectiveType) value).getToolTipText());
                 }
                 return this;
             }

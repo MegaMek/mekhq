@@ -48,7 +48,7 @@ import java.util.List;
 
 import megamek.codeUtilities.ObjectUtility;
 import megamek.logging.MMLogger;
-import mekhq.campaign.mission.enums.AtBContractType;
+import mekhq.campaign.mission.enums.ContractObjectiveType;
 
 public enum ChaosObjectiveType {
     EXPEDITION(3, 0, 1, 0, 0, 2, -1, true,
@@ -136,9 +136,9 @@ public enum ChaosObjectiveType {
         }
     }
 
-    public AtBContractType getCamOpsObjectiveType() {
-        List<AtBContractType> candidates = new ArrayList<>();
-        for (AtBContractType type : AtBContractType.values()) {
+    public ContractObjectiveType getCamOpsObjectiveType() {
+        List<ContractObjectiveType> candidates = new ArrayList<>();
+        for (ContractObjectiveType type : ContractObjectiveType.values()) {
             if (type.getChaosObjectiveType() == this) {
                 candidates.add(type);
             }
