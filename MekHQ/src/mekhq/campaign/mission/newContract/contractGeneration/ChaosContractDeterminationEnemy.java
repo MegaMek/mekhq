@@ -39,7 +39,6 @@ import static mekhq.campaign.universe.Faction.MERCENARY_FACTION_CODE;
 import java.time.LocalDate;
 
 import megamek.common.icons.Camouflage;
-import megamek.logging.MMLogger;
 import mekhq.campaign.location.ILocation;
 import mekhq.campaign.mission.enums.ContractObjectiveType;
 import mekhq.campaign.mission.newContract.contractData.EnemyData;
@@ -53,8 +52,6 @@ import mekhq.campaign.universe.RandomFactionGenerator;
  * instantiable.
  */
 public class ChaosContractDeterminationEnemy {
-    private static final MMLogger LOGGER = MMLogger.create(ChaosContractDeterminationEnemy.class);
-
     private static final int MERCENARY_ENEMY_CHANCE = 20;
 
     private ChaosContractDeterminationEnemy() {}
@@ -69,14 +66,14 @@ public class ChaosContractDeterminationEnemy {
         String factionCode = enemyFaction.getShortName();
 
         String sponsorFactionCode = null;
-        boolean hasEmployedMercenaries = hasEmployedMercenaries(employerFaction, currentDate);
+        boolean hasEmployedMercenaries = hasEmployedMercenaries(enemyFaction, currentDate);
         if (hasEmployedMercenaries) {
             sponsorFactionCode = factionCode;
             factionCode = MERCENARY_FACTION_CODE;
         }
 
         int currentYear = currentDate.getYear();
-        String displayName = employerFaction.getFullName(currentYear);
+        String displayName = enemyFaction.getFullName(currentYear);
 
         Camouflage camouflage = pickRandomCamouflage(currentYear, factionCode);
 
@@ -87,9 +84,7 @@ public class ChaosContractDeterminationEnemy {
         boolean allowsMercenaries = employerFaction.isUsesMercenaries(currentDate.getYear());
         if (allowsMercenaries) {
             int roll = randomInt(MERCENARY_ENEMY_CHANCE);
-            if (roll == 0) {
-                return true;
-            }
+            return roll == 0;
         }
 
         return false;
