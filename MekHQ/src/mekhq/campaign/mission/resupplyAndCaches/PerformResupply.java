@@ -37,9 +37,9 @@ import static mekhq.campaign.digitalGM.stratCon.StratConContractInitializer.getU
 import static mekhq.campaign.digitalGM.stratCon.StratConRulesManager.generateExternalScenario;
 import static mekhq.campaign.enums.DailyReportType.ACQUISITIONS;
 import static mekhq.campaign.enums.DailyReportType.BATTLE;
-import static mekhq.campaign.mission.enums.AtBMoraleLevel.CRITICAL;
-import static mekhq.campaign.mission.enums.AtBMoraleLevel.DOMINATING;
-import static mekhq.campaign.mission.enums.AtBMoraleLevel.STALEMATE;
+import static mekhq.campaign.mission.enums.ContractMoraleLevel.CRITICAL;
+import static mekhq.campaign.mission.enums.ContractMoraleLevel.DOMINATING;
+import static mekhq.campaign.mission.enums.ContractMoraleLevel.STALEMATE;
 import static mekhq.campaign.mission.resupplyAndCaches.GenerateResupplyContents.DropType.DROP_TYPE_AMMO;
 import static mekhq.campaign.mission.resupplyAndCaches.GenerateResupplyContents.DropType.DROP_TYPE_ARMOR;
 import static mekhq.campaign.mission.resupplyAndCaches.GenerateResupplyContents.DropType.DROP_TYPE_PARTS;
@@ -81,7 +81,7 @@ import mekhq.campaign.mission.AtBContract;
 import mekhq.campaign.mission.AtBDynamicScenario;
 import mekhq.campaign.mission.Loot;
 import mekhq.campaign.mission.ScenarioTemplate;
-import mekhq.campaign.mission.enums.AtBMoraleLevel;
+import mekhq.campaign.mission.enums.ContractMoraleLevel;
 import mekhq.campaign.mission.resupplyAndCaches.Resupply.ResupplyType;
 import mekhq.campaign.parts.Armor;
 import mekhq.campaign.parts.Part;
@@ -369,7 +369,7 @@ public class PerformResupply {
         final AtBContract contract = resupply.getContract();
 
         // First, we need to identify whether the convoy has been intercepted.
-        AtBMoraleLevel morale = contract.getMoraleLevel();
+        ContractMoraleLevel morale = contract.getMoraleLevel();
 
         // There isn't any chance of an interception if the enemy is Routed, so early-exit
         if (morale.isRouted()) {
@@ -456,7 +456,7 @@ public class PerformResupply {
             final String STATUS_FORWARD = "statusUpdate";
             final String STATUS_AFTERWARD = ".text";
 
-            AtBMoraleLevel morale = contract.getMoraleLevel();
+            ContractMoraleLevel morale = contract.getMoraleLevel();
             String commanderAddress = campaign.getCommanderAddress();
 
             String eventText;

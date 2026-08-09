@@ -75,7 +75,7 @@ import mekhq.campaign.mission.Scenario;
 import mekhq.campaign.mission.ScenarioForceTemplate.ForceAlignment;
 import mekhq.campaign.mission.ScenarioTemplate;
 import mekhq.campaign.mission.atb.AtBScenarioModifier;
-import mekhq.campaign.mission.enums.AtBMoraleLevel;
+import mekhq.campaign.mission.enums.ContractMoraleLevel;
 import mekhq.campaign.universe.Faction;
 import mekhq.campaign.universe.PlanetarySystem;
 import mekhq.campaign.universe.enums.Alphabet;
@@ -331,7 +331,7 @@ public class StratConContractInitializer {
 
         // Determine starting morale
         if (contract.getContractType().isGarrisonDuty() || contract.getContractType().isRetainer()) {
-            contract.setMoraleLevel(AtBMoraleLevel.ROUTED);
+            contract.setMoraleLevel(ContractMoraleLevel.ROUTED);
 
             LocalDate startDate = contract.getStartDate();
             startDate = startDate == null ? campaign.getLocalDate() : startDate;
@@ -341,13 +341,13 @@ public class StratConContractInitializer {
             contract.checkMorale(campaign, campaign.getLocalDate());
 
             if (contract.getMoraleLevel().isRouted()) {
-                contract.setMoraleLevel(AtBMoraleLevel.CRITICAL);
+                contract.setMoraleLevel(ContractMoraleLevel.CRITICAL);
             }
 
             if (contract.getContractType().isReliefDuty()) {
                 int currentMoraleLevel = min(6, contract.getMoraleLevel().ordinal() + 1);
 
-                contract.setMoraleLevel(AtBMoraleLevel.parseFromString(String.valueOf(currentMoraleLevel)));
+                contract.setMoraleLevel(ContractMoraleLevel.parseFromString(String.valueOf(currentMoraleLevel)));
             }
         }
 
