@@ -39,17 +39,17 @@ import megamek.logging.MMLogger;
 import mekhq.MekHQ;
 
 /**
- * The AtBMoraleLevel enum represents the different enemy morale conditions used by AtB systems.
+ * The ContractMoraleLevel enum represents the different enemy morale conditions used by AtB systems.
  */
 public enum ContractMoraleLevel {
     // region Enum Declarations
-    ROUTED(-3, 7, "AtBMoraleLevel.ROUTED.text", "AtBMoraleLevel.ROUTED.toolTipText"),
-    CRITICAL(-2, 6, "AtBMoraleLevel.CRITICAL.text", "AtBMoraleLevel.CRITICAL.toolTipText"),
-    WEAKENED(-1, 5, "AtBMoraleLevel.WEAKENED.text", "AtBMoraleLevel.WEAKENED.toolTipText"),
-    STALEMATE(0, 4, "AtBMoraleLevel.STALEMATE.text", "AtBMoraleLevel.STALEMATE.toolTipText"),
-    ADVANCING(1, 3, "AtBMoraleLevel.ADVANCING.text", "AtBMoraleLevel.ADVANCING.toolTipText"),
-    DOMINATING(2, 2, "AtBMoraleLevel.DOMINATING.text", "AtBMoraleLevel.DOMINATING.toolTipText"),
-    OVERWHELMING(3, 1, "AtBMoraleLevel.OVERWHELMING.text", "AtBMoraleLevel.OVERWHELMING.toolTipText");
+    ROUTED(-3, 7, "ContractMoraleLevel.ROUTED.text", "ContractMoraleLevel.ROUTED.toolTipText"),
+    CRITICAL(-2, 6, "ContractMoraleLevel.CRITICAL.text", "ContractMoraleLevel.CRITICAL.toolTipText"),
+    WEAKENED(-1, 5, "ContractMoraleLevel.WEAKENED.text", "ContractMoraleLevel.WEAKENED.toolTipText"),
+    STALEMATE(0, 4, "ContractMoraleLevel.STALEMATE.text", "ContractMoraleLevel.STALEMATE.toolTipText"),
+    ADVANCING(1, 3, "ContractMoraleLevel.ADVANCING.text", "ContractMoraleLevel.ADVANCING.toolTipText"),
+    DOMINATING(2, 2, "ContractMoraleLevel.DOMINATING.text", "ContractMoraleLevel.DOMINATING.toolTipText"),
+    OVERWHELMING(3, 1, "ContractMoraleLevel.OVERWHELMING.text", "ContractMoraleLevel.OVERWHELMING.toolTipText");
 
     public final static int MINIMUM_MORALE_LEVEL = ROUTED.getLevel();
     public final static int MAXIMUM_MORALE_LEVEL = OVERWHELMING.getLevel();
@@ -231,7 +231,7 @@ public enum ContractMoraleLevel {
         }
 
         MMLogger.create(ContractMoraleLevel.class)
-              .error("Unable to parse {} into an AtBMoraleLevel. Returning STALEMATE.", moraleLevel);
+              .error("Unable to parse {} into an ContractMoraleLevel. Returning STALEMATE.", moraleLevel);
         return STALEMATE;
     }
     // endregion File I/O
