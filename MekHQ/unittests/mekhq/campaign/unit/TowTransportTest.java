@@ -64,7 +64,6 @@ import java.util.Vector;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 
-import megamek.Version;
 import megamek.common.equipment.EquipmentType;
 import megamek.common.equipment.TankTrailerHitch;
 import megamek.common.equipment.Transporter;
@@ -77,6 +76,8 @@ import mekhq.gui.menus.TransportAssignmentMenus;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.w3c.dom.Document;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
 
 /**
  * Tests for TOW_TRANSPORT campaign assignments: train building, capacity math, the unassign
@@ -236,11 +237,11 @@ public class TowTransportTest {
         return stringWriter.toString();
     }
 
-    private Unit loadUnitFromXml(String unitXml, Campaign campaign) throws Exception {
+    private NodeList findNodes(String unitXml, String tagName) throws Exception {
         DocumentBuilder documentBuilder = DocumentBuilderFactory.newInstance().newDocumentBuilder();
         Document document = documentBuilder.parse(new ByteArrayInputStream(
               unitXml.getBytes(StandardCharsets.UTF_8)));
-        return Unit.generateInstanceFromXML(document.getDocumentElement(), new Version(), campaign);
+        return document.getDocumentElement().getElementsByTagName(tagName);
     }
 
     @Test
@@ -257,9 +258,12 @@ public class TowTransportTest {
         trailer.setTransportAssignment(TOW_TRANSPORT,
               new TransportAssignment(tractor, TransporterType.TANK_TRAILER_HITCH));
 
-        Unit loadedTrailer = loadUnitFromXml(writeUnitToXml(trailer), campaign);
+        // Write, then parse the written node the way the campaign loader does
+        NodeList assignmentNodes = findNodes(writeUnitToXml(trailer), "transportAssignment");
+        assertEquals(1, assignmentNodes.getLength());
+        Unit loadedTrailer = new Unit();
+        Unit.parseTransportAssignmentNode(assignmentNodes.item(0), loadedTrailer);
 
-        assertNotNull(loadedTrailer);
         assertTrue(loadedTrailer.hasTransportAssignment(TOW_TRANSPORT));
         assertEquals(tractorId, loadedTrailer.getTransportAssignment(TOW_TRANSPORT).getTransport().getId());
         assertEquals(TransporterType.TANK_TRAILER_HITCH,
@@ -281,9 +285,11 @@ public class TowTransportTest {
         when(trailer.getId()).thenReturn(trailerId);
         tractor.addTransportedUnit(TOW_TRANSPORT, trailer);
 
-        Unit loadedTractor = loadUnitFromXml(writeUnitToXml(tractor), campaign);
+        NodeList transportedNodes = findNodes(writeUnitToXml(tractor), "transportedUnit");
+        assertEquals(1, transportedNodes.getLength());
+        Unit loadedTractor = new Unit();
+        Unit.parseTransportedUnitNode(transportedNodes.item(0), loadedTractor);
 
-        assertNotNull(loadedTractor);
         assertTrue(loadedTractor.hasTransportedUnits(TOW_TRANSPORT));
         assertEquals(1, loadedTractor.getTransportedUnits(TOW_TRANSPORT).size());
         assertEquals(trailerId, loadedTractor.getTransportedUnits(TOW_TRANSPORT).iterator().next().getId());
@@ -305,12 +311,20 @@ public class TowTransportTest {
         unit.setTransportAssignment(CampaignTransportType.TACTICAL_TRANSPORT,
               new TransportAssignment(transport, TransporterType.MEK_BAY));
 
-        // Rewrite the tactical entries to the pre-attribute legacy format a pre-50.07 save has
-        String unitXml = writeUnitToXml(unit)
-                               .replace(" campaignTransportType=\"TACTICAL_TRANSPORT\"", "");
-        Unit loadedUnit = loadUnitFromXml(unitXml, campaign);
+        // The writer still emits the pre-attribute legacy tactical entry alongside the new-format
+        // one, so pick the attribute-less node - the exact shape a pre-50.07 save contains
+        NodeList assignmentNodes = findNodes(writeUnitToXml(unit), "transportAssignment");
+        Node legacyNode = null;
+        for (int nodeIndex = 0; nodeIndex < assignmentNodes.getLength(); nodeIndex++) {
+            if (assignmentNodes.item(nodeIndex).getAttributes().getNamedItem("campaignTransportType") == null) {
+                legacyNode = assignmentNodes.item(nodeIndex);
+            }
+        }
+        assertNotNull(legacyNode, "expected a legacy attribute-less tactical entry in the written XML");
 
-        assertNotNull(loadedUnit);
+        Unit loadedUnit = new Unit();
+        Unit.parseTransportAssignmentNode(legacyNode, loadedUnit);
+
         assertTrue(loadedUnit.hasTacticalTransportAssignment());
         assertEquals(transportId, loadedUnit.getTacticalTransportAssignment().getTransport().getId());
         assertFalse(loadedUnit.hasTransportAssignment(TOW_TRANSPORT));

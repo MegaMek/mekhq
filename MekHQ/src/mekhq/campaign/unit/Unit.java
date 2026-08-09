@@ -3040,43 +3040,9 @@ public class Unit implements ITechnology, ILocatable {
                     retVal.setSuperHeavyVehicleCapacity(Double.parseDouble(wn2.getTextContent()));
                     needsBayInitialization = false;
                 } else if (wn2.getNodeName().equalsIgnoreCase("transportAssignment")) {
-                    NamedNodeMap attributes = wn2.getAttributes();
-                    CampaignTransportType campaignTransportType;
-                    if (attributes.getNamedItem("campaignTransportType") != null) {
-                        campaignTransportType = CampaignTransportType.valueOf(attributes.getNamedItem(
-                              "campaignTransportType").getTextContent());
-                    } else {
-                        // Tactical transports were added before the campaignTransportType attribute
-                        // was. Assume it's a tactical transport.
-                        campaignTransportType = CampaignTransportType.TACTICAL_TRANSPORT;
-                    }
-                    UUID id = UUID.fromString(attributes.getNamedItem("id").getTextContent());
-
-                    if (attributes.getNamedItem("transportedLocation") != null) {
-                        int transportedLocationHash = Integer.parseInt(attributes.getNamedItem("transportedLocation")
-                                                                             .getTextContent());
-                        retVal.setTransportAssignment(campaignTransportType,
-                              new TransportAssignment(new UnitRef(id), transportedLocationHash));
-                    } else if (attributes.getNamedItem("transporterType") != null) {
-                        try {
-                            TransporterType transporterType = TransporterType.valueOf((attributes.getNamedItem(
-                                  "transporterType").getTextContent()));
-                            retVal.setTransportAssignment(campaignTransportType,
-                                  new TransportAssignment(new UnitRef(id), transporterType));
-                        } catch (IllegalArgumentException e) {
-                            LOGGER.error(e, "Could not find transporter type.");
-                            retVal.setTransportAssignment(campaignTransportType,
-                                  new TransportAssignment(new UnitRef(id)));
-                        }
-                    } else {
-                        retVal.setTransportAssignment(campaignTransportType, new TransportAssignment(new UnitRef(id)));
-                    }
+                    parseTransportAssignmentNode(wn2, retVal);
                 } else if (wn2.getNodeName().equalsIgnoreCase("transportedUnit")) {
-                    NamedNodeMap attributes = wn2.getAttributes();
-                    CampaignTransportType campaignTransportType = CampaignTransportType.valueOf(attributes.getNamedItem(
-                          "campaignTransportType").getTextContent());
-                    retVal.addTransportedUnit(campaignTransportType,
-                          new UnitRef(UUID.fromString(attributes.getNamedItem("id").getTextContent())));
+                    parseTransportedUnitNode(wn2, retVal);
                 } else if (wn2.getNodeName().equalsIgnoreCase("formationId") ||
                                  wn2.getNodeName().equalsIgnoreCase("forceId")) {
                     retVal.formationId = Integer.parseInt(wn2.getTextContent());
@@ -3123,6 +3089,59 @@ public class Unit implements ITechnology, ILocatable {
         }
 
         return retVal;
+    }
+
+    /**
+     * Parses a {@code <transportAssignment>} save-file node onto the given unit. Entries carry a
+     * {@code campaignTransportType} attribute; entries without one predate that attribute and only
+     * ever meant a tactical transport, so they load as TACTICAL. Package-visible so the routing is
+     * unit-testable without loading a full entity.
+     */
+    static void parseTransportAssignmentNode(Node transportNode, Unit retVal) {
+        NamedNodeMap attributes = transportNode.getAttributes();
+        CampaignTransportType campaignTransportType;
+        if (attributes.getNamedItem("campaignTransportType") != null) {
+            campaignTransportType = CampaignTransportType.valueOf(attributes.getNamedItem(
+                  "campaignTransportType").getTextContent());
+        } else {
+            // Tactical transports were added before the campaignTransportType attribute
+            // was. Assume it's a tactical transport.
+            campaignTransportType = CampaignTransportType.TACTICAL_TRANSPORT;
+        }
+        UUID id = UUID.fromString(attributes.getNamedItem("id").getTextContent());
+
+        if (attributes.getNamedItem("transportedLocation") != null) {
+            int transportedLocationHash = Integer.parseInt(attributes.getNamedItem("transportedLocation")
+                                                                 .getTextContent());
+            retVal.setTransportAssignment(campaignTransportType,
+                  new TransportAssignment(new UnitRef(id), transportedLocationHash));
+        } else if (attributes.getNamedItem("transporterType") != null) {
+            try {
+                TransporterType transporterType = TransporterType.valueOf((attributes.getNamedItem(
+                      "transporterType").getTextContent()));
+                retVal.setTransportAssignment(campaignTransportType,
+                      new TransportAssignment(new UnitRef(id), transporterType));
+            } catch (IllegalArgumentException e) {
+                LOGGER.error(e, "Could not find transporter type.");
+                retVal.setTransportAssignment(campaignTransportType,
+                      new TransportAssignment(new UnitRef(id)));
+            }
+        } else {
+            retVal.setTransportAssignment(campaignTransportType, new TransportAssignment(new UnitRef(id)));
+        }
+    }
+
+    /**
+     * Parses a {@code <transportedUnit>} save-file node onto the given unit, routing it to the
+     * summary matching its {@code campaignTransportType} attribute. Package-visible so the routing
+     * is unit-testable without loading a full entity.
+     */
+    static void parseTransportedUnitNode(Node transportedNode, Unit retVal) {
+        NamedNodeMap attributes = transportedNode.getAttributes();
+        CampaignTransportType campaignTransportType = CampaignTransportType.valueOf(attributes.getNamedItem(
+              "campaignTransportType").getTextContent());
+        retVal.addTransportedUnit(campaignTransportType,
+              new UnitRef(UUID.fromString(attributes.getNamedItem("id").getTextContent())));
     }
 
     /**
