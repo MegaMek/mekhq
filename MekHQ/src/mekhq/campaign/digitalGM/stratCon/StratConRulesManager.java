@@ -60,7 +60,7 @@ import static mekhq.campaign.mission.ScenarioMapParameters.MapLocation.AllGround
 import static mekhq.campaign.mission.ScenarioMapParameters.MapLocation.LowAtmosphere;
 import static mekhq.campaign.mission.ScenarioMapParameters.MapLocation.Space;
 import static mekhq.campaign.mission.ScenarioMapParameters.MapLocation.SpecificGroundTerrain;
-import static mekhq.campaign.mission.enums.AtBMoraleLevel.STALEMATE;
+import static mekhq.campaign.mission.enums.ContractMoraleLevel.STALEMATE;
 import static mekhq.campaign.personnel.PersonnelOptions.ADMIN_COORDINATOR;
 import static mekhq.campaign.personnel.PersonnelOptions.EDGE_RECON_FAIL;
 import static mekhq.campaign.personnel.skills.SkillType.S_ADMIN;
@@ -114,9 +114,9 @@ import mekhq.campaign.mission.ScenarioForceTemplate.ForceGenerationMethod;
 import mekhq.campaign.mission.ScenarioMapParameters.MapLocation;
 import mekhq.campaign.mission.ScenarioTemplate;
 import mekhq.campaign.mission.atb.AtBScenarioModifier;
-import mekhq.campaign.mission.enums.AtBMoraleLevel;
 import mekhq.campaign.mission.enums.CombatRole;
 import mekhq.campaign.mission.enums.ContractCommandRights;
+import mekhq.campaign.mission.enums.ContractMoraleLevel;
 import mekhq.campaign.mission.enums.ScenarioStatus;
 import mekhq.campaign.mission.enums.ScenarioType;
 import mekhq.campaign.personnel.Person;
@@ -847,18 +847,18 @@ public class StratConRulesManager {
      *   <li>If the scenario is already marked as a "special" scenario type (via {@link ScenarioType#isSpecial()}),
      *       the method returns immediately without making any changes. Special scenarios cannot be crisis scenarios.</li>
      *   <li>Otherwise, a random roll is performed using a die size determined by the current morale level
-     *       (via {@link AtBMoraleLevel#getCrisisDieSize()}).</li>
+     *       (via {@link ContractMoraleLevel#getCrisisDieSize()}).</li>
      *   <li>If the roll results in {@code 0} (the minimum value), the scenario is marked as a crisis scenario.</li>
      *   <li>If the roll results in any other value, the scenario is not marked as a crisis.</li>
      * </ul>
-     *  @param morale          The {@link AtBMoraleLevel} representing the current morale state, which determines the
+     *  @param morale          The {@link ContractMoraleLevel} representing the current morale state, which determines the
      *                        size of the die used for the crisis check.
      *
      * @param backingScenario   The {@link AtBDynamicScenario} being evaluated. This scenario will be marked as a crisis
      *                          if the conditions are met.
      * @param isCombatChallenge {@code true} if the scenario is barred from being a Crisis
      */
-    private static void determineIfCrisisScenario(AtBMoraleLevel morale, AtBDynamicScenario backingScenario,
+    private static void determineIfCrisisScenario(ContractMoraleLevel morale, AtBDynamicScenario backingScenario,
           boolean isCombatChallenge) {
         ScenarioType scenarioType = backingScenario.getStratConScenarioType();
         boolean isSpecial = scenarioType.isSpecial();
@@ -3668,15 +3668,15 @@ public class StratConRulesManager {
      *
      * <p>The calculation follows these rules:</p>
      * <ul>
-     *   <li>If the contract's morale level is {@link AtBMoraleLevel#ROUTED}, the method immediately returns {@code
+     *   <li>If the contract's morale level is {@link ContractMoraleLevel#ROUTED}, the method immediately returns {@code
      *   -1}, indicating that no scenarios can occur.</li>
      *   <li>If {@code isReinforcements} is {@code true}, a morale-based modifier is applied:
      *       <ul>
-     *         <li>{@link AtBMoraleLevel#CRITICAL}: -10 penalty</li>
-     *         <li>{@link AtBMoraleLevel#WEAKENED}: -5 penalty</li>
-     *         <li>{@link AtBMoraleLevel#ADVANCING}: +5 bonus</li>
-     *         <li>{@link AtBMoraleLevel#DOMINATING}: +20 bonus</li>
-     *         <li>{@link AtBMoraleLevel#OVERWHELMING}: +50 bonus</li>
+     *         <li>{@link ContractMoraleLevel#CRITICAL}: -10 penalty</li>
+     *         <li>{@link ContractMoraleLevel#WEAKENED}: -5 penalty</li>
+     *         <li>{@link ContractMoraleLevel#ADVANCING}: +5 bonus</li>
+     *         <li>{@link ContractMoraleLevel#DOMINATING}: +20 bonus</li>
+     *         <li>{@link ContractMoraleLevel#OVERWHELMING}: +50 bonus</li>
      *         <li>All other morale levels: no modifier</li>
      *       </ul>
      *   </li>
@@ -3697,8 +3697,8 @@ public class StratConRulesManager {
      *                         the calculation.
      *
      * @return The calculated scenario odds value. Returns {@code -1} if the contract's morale level is
-     *       {@link AtBMoraleLevel#ROUTED}, indicating no scenarios should occur. Otherwise, returns the sum of the base
-     *       scenario odds, morale modifier (if applicable), and data center modifier.
+     *       {@link ContractMoraleLevel#ROUTED}, indicating no scenarios should occur. Otherwise, returns the sum of the
+     *       base scenario odds, morale modifier (if applicable), and data center modifier.
      */
     public static int calculateScenarioOdds(StratConTrackState track, AtBContract contract, boolean isReinforcements) {
         if (contract.getMoraleLevel().isRouted()) {

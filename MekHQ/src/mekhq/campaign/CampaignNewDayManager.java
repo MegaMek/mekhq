@@ -137,7 +137,7 @@ import mekhq.campaign.mission.Contract;
 import mekhq.campaign.mission.Mission;
 import mekhq.campaign.mission.Scenario;
 import mekhq.campaign.mission.atb.AtBScenarioFactory;
-import mekhq.campaign.mission.enums.AtBMoraleLevel;
+import mekhq.campaign.mission.enums.ContractMoraleLevel;
 import mekhq.campaign.mission.enums.ScenarioStatus;
 import mekhq.campaign.mission.enums.ScenarioType;
 import mekhq.campaign.mission.rentals.ContractRentalType;
@@ -1224,10 +1224,10 @@ public class CampaignNewDayManager {
              * First of the month; roll Morale.
              */
             for (AtBContract contract : campaign.getActiveAtBContracts()) {
-                AtBMoraleLevel oldMorale = contract.getMoraleLevel();
+                ContractMoraleLevel oldMorale = contract.getMoraleLevel();
 
                 contract.checkMorale(campaign, today);
-                AtBMoraleLevel newMorale = contract.getMoraleLevel();
+                ContractMoraleLevel newMorale = contract.getMoraleLevel();
 
                 String report = "";
                 if (contract.isPeaceful()) {

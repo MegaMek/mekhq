@@ -52,10 +52,10 @@ import static mekhq.campaign.force.FormationLevel.BATTALION;
 import static mekhq.campaign.force.FormationLevel.COMPANY;
 import static mekhq.campaign.mission.ContractDifficulty.calculateContractDifficulty;
 import static mekhq.campaign.mission.RandomFactionCamouflage.pickRandomCamouflage;
-import static mekhq.campaign.mission.enums.AtBMoraleLevel.ADVANCING;
-import static mekhq.campaign.mission.enums.AtBMoraleLevel.DOMINATING;
-import static mekhq.campaign.mission.enums.AtBMoraleLevel.OVERWHELMING;
-import static mekhq.campaign.mission.enums.AtBMoraleLevel.STALEMATE;
+import static mekhq.campaign.mission.enums.ContractMoraleLevel.ADVANCING;
+import static mekhq.campaign.mission.enums.ContractMoraleLevel.DOMINATING;
+import static mekhq.campaign.mission.enums.ContractMoraleLevel.OVERWHELMING;
+import static mekhq.campaign.mission.enums.ContractMoraleLevel.STALEMATE;
 import static mekhq.campaign.randomEvents.prisoners.PrisonerStatus.FREE;
 import static mekhq.campaign.universe.Faction.PIRATE_FACTION_CODE;
 import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
@@ -82,9 +82,9 @@ import mekhq.campaign.events.missions.MissionChangedEvent;
 import mekhq.campaign.finances.Money;
 import mekhq.campaign.market.enums.UnitMarketType;
 import mekhq.campaign.mission.atb.AtBScenarioFactory;
-import mekhq.campaign.mission.enums.AtBMoraleLevel;
-import mekhq.campaign.mission.enums.ContractCommandRights;
 import mekhq.campaign.mission.enums.ContractObjectiveType;
+import mekhq.campaign.mission.enums.ContractMoraleLevel;
+import mekhq.campaign.mission.enums.ContractCommandRights;
 import mekhq.campaign.mission.utilities.ContractUtilities;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.backgrounds.BackgroundsController;
@@ -207,7 +207,7 @@ public class AtBContract extends Contract {
                 // We use variable morale levels to spike morale up to a value above Stalemate. This works with the
                 // regenerated Scenario Odds to create very high intensity spikes in otherwise low-key Garrison-type
                 // contracts.
-                AtBMoraleLevel newMoraleLevel = switch (roll) {
+                ContractMoraleLevel newMoraleLevel = switch (roll) {
                     case 2, 3, 4, 5 -> ADVANCING;
                     case 6, 7 -> DOMINATING;
                     case 8 -> OVERWHELMING;
@@ -807,7 +807,7 @@ public class AtBContract extends Contract {
         }
 
         moraleOrdinal = min(moraleOrdinal + roll, OVERWHELMING.ordinal());
-        setMoraleLevel(AtBMoraleLevel.values()[moraleOrdinal]);
+        setMoraleLevel(ContractMoraleLevel.values()[moraleOrdinal]);
 
         campaign.addReport(GENERAL, getMoraleLevel().getToolTipText());
 
