@@ -143,7 +143,7 @@ class ClanHomeworldsExclusionTest {
         PlanetarySystem stranaMechty = mockStranaMechty();
         // The current date is before Operation Bulldog starts, but travel time pushes the actual arrival date into
         // the window - the rule is keyed on arrival date, not the date the contract was generated.
-        Campaign campaign = mockCampaign(MHQConstants.OPERATION_BULLDOG_START.minusDays(10));
+        Campaign campaign = mockCampaign(MHQConstants.IS_INVASION_OF_HUNTRESS_START.minusDays(10));
         AbstractMissionTransition contract = mockContract(mockFaction(false), 200, stranaMechty, 15);
 
         assertFalse(violatesHomeworldsExclusion(contract, campaign),
