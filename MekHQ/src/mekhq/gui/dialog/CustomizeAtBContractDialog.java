@@ -229,7 +229,7 @@ public class CustomizeAtBContractDialog extends JDialog {
         JLabel lblBasePay = new JLabel();
 
         comboEnemyMorale = new MMComboBox<>("comboEnemyMorale", ContractMoraleLevel.values());
-        comboContractType.setRenderer(new DefaultListCellRenderer() {
+        comboEnemyMorale.setRenderer(new DefaultListCellRenderer() {
             @Override
             public Component getListCellRendererComponent(final JList<?> list, final Object value, final int index,
                   final boolean isSelected, final boolean cellHasFocus) {
