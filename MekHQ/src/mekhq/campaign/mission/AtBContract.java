@@ -82,9 +82,9 @@ import mekhq.campaign.events.missions.MissionChangedEvent;
 import mekhq.campaign.finances.Money;
 import mekhq.campaign.market.enums.UnitMarketType;
 import mekhq.campaign.mission.atb.AtBScenarioFactory;
-import mekhq.campaign.mission.enums.AtBContractType;
 import mekhq.campaign.mission.enums.AtBMoraleLevel;
 import mekhq.campaign.mission.enums.ContractCommandRights;
+import mekhq.campaign.mission.enums.ContractObjectiveType;
 import mekhq.campaign.mission.utilities.ContractUtilities;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.backgrounds.BackgroundsController;
@@ -150,7 +150,7 @@ public class AtBContract extends Contract {
         setContractDifficulty(Integer.MIN_VALUE);
 
         parentContract = null;
-        setContractTypeAndName(AtBContractType.GARRISON_DUTY);
+        setContractTypeAndName(ContractObjectiveType.GARRISON_DUTY);
 
         extensionLength = 0;
 
@@ -182,7 +182,7 @@ public class AtBContract extends Contract {
     }
 
     public void calculateLength(final boolean variable) {
-        setLengthInMonths(getContractType().calculateLength(variable));
+        setLengthInMonths(getContractType().getChaosObjectiveType().calculateLength(variable));
     }
 
     /**
@@ -407,7 +407,7 @@ public class AtBContract extends Contract {
     public int getRepairLocation() {
         int repairLocation = Unit.SITE_FACILITY_BASIC;
 
-        AtBContractType contractType = getContractType();
+        ContractObjectiveType contractType = getContractType();
 
         if (contractType.isGuerrillaType()) {
             repairLocation = Unit.SITE_IMPROVISED;
@@ -1020,7 +1020,7 @@ public class AtBContract extends Contract {
         setSigningBonusAmount(contract.getSigningBonusAmount());
 
         /* Guess at AtBContract values */
-        AtBContractType contractType = getAtBContractType(contract);
+        ContractObjectiveType contractType = getContractObjectiveType(contract);
         setContractTypeAndName(contractType);
 
         Faction f = Factions.getInstance()
@@ -1059,9 +1059,9 @@ public class AtBContract extends Contract {
         }
     }
 
-    private static AtBContractType getAtBContractType(Contract contract) {
-        AtBContractType contractType = null;
-        for (final AtBContractType type : AtBContractType.values()) {
+    private static ContractObjectiveType getContractObjectiveType(Contract contract) {
+        ContractObjectiveType contractType = null;
+        for (final ContractObjectiveType type : ContractObjectiveType.values()) {
             if (type.toString().equalsIgnoreCase(contract.getContractTypeName())) {
                 contractType = type;
                 break;
@@ -1070,11 +1070,11 @@ public class AtBContract extends Contract {
         /* Make a rough guess */
         if (contractType == null) {
             if (contract.getLengthInMonths() <= 3) {
-                contractType = AtBContractType.OBJECTIVE_RAID;
+                contractType = ContractObjectiveType.OBJECTIVE_RAID;
             } else if (contract.getLengthInMonths() < 12) {
-                contractType = AtBContractType.GARRISON_DUTY;
+                contractType = ContractObjectiveType.GARRISON_DUTY;
             } else {
-                contractType = AtBContractType.PLANETARY_ASSAULT;
+                contractType = ContractObjectiveType.PLANETARY_ASSAULT;
             }
         }
         return contractType;

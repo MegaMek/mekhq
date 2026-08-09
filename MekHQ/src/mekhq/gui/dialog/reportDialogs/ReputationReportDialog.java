@@ -61,7 +61,7 @@ public class ReputationReportDialog extends AbstractReportDialog {
 
         txtReport.setContentType("text/html");
 
-        txtReport.setText(String.format(getCampaign().getPlayerForce().getReputation().getReportText(campaign)));
+        txtReport.setText(String.format(getCampaign().getPlayerForce().getCamOpsReputation().getReportText(campaign)));
 
         txtReport.setName("txtReport");
         txtReport.setEditable(false);

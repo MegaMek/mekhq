@@ -46,7 +46,7 @@ import java.util.List;
 import megamek.common.units.Entity;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.mission.AtBContract;
-import mekhq.campaign.mission.enums.AtBContractType;
+import mekhq.campaign.mission.enums.ContractObjectiveType;
 
 /**
  * Utility class for generating pity contracts when a campaign does not have enough successful completed contracts.
@@ -189,7 +189,7 @@ public class PityContracts {
      * @since 0.51.0
      */
     private static void overrideContractTermsForPityContracts(AtBContract contract) {
-        contract.setContractTypeAndName(AtBContractType.PIRATE_HUNTING);
+        contract.setContractTypeAndName(ContractObjectiveType.PIRATE_HUNTING);
 
         int salvageRoll = d6(1) * 10;
         contract.setSalvagePercent(salvageRoll);

@@ -30,7 +30,7 @@
  * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
  * affiliated with Microsoft.
  */
-package mekhq.campaign.mission.newContract.targetFinder;
+package mekhq.campaign.mission.newContract.contractGeneration.targetFinder;
 
 import static mekhq.campaign.universe.Faction.BANDIT_CASTE_FACTION_CODE;
 import static mekhq.campaign.universe.Faction.MERCENARY_FACTION_CODE;
@@ -46,7 +46,6 @@ import java.util.Set;
 
 import megamek.common.annotations.Nullable;
 import mekhq.campaign.location.ILocation;
-import mekhq.campaign.mission.newContract.MissionLocationProfile;
 import mekhq.campaign.universe.Faction;
 import mekhq.campaign.universe.FactionBorderTracker;
 import mekhq.campaign.universe.FactionBorders;
@@ -67,6 +66,13 @@ public class MissionTargetFinder {
     private final PirateMissionTargetFinder pirateFinder;
     private final ComStarMissionTargetFinder comStarFinder;
 
+    /**
+     * Creates a mission-target finder backed by the given border tracker and faction hints, wiring up the specialized
+     * pirate and ComStar finders.
+     *
+     * @param borderTracker the tracker providing faction border regions
+     * @param factionHints  the faction relationship hints used to evaluate diplomatic stance
+     */
     public MissionTargetFinder(FactionBorderTracker borderTracker, FactionHints factionHints) {
         this.borderTracker = borderTracker;
         this.factionHints = factionHints;
@@ -224,7 +230,7 @@ public class MissionTargetFinder {
     public List<PlanetarySystem> findRearAreaTargets(Faction attacker, Faction defender, ILocation location,
           double radius, LocalDate date) {
         Set<PlanetarySystem> interior = new HashSet<>(findAllDefenderTargets(defender, location, radius, date));
-        interior.removeAll(borderTracker.getBorderSystems(attacker, defender, location, radius));
+        borderTracker.getBorderSystems(attacker, defender, location, radius).forEach(interior::remove);
         return new ArrayList<>(interior);
     }
 
@@ -259,7 +265,7 @@ public class MissionTargetFinder {
 
     /**
      * Finds targets for a guerrilla campaign behind enemy lines. Preferred tier: defender-held systems in range that
-     * the attacker held {@value MissionLocationProfile#OCCUPIED_TERRITORY_LOOKBACK_YEARS} years ago &mdash; recently
+     * the attacker held {@value MissionLocationProfile#OCCUPIED_TERRITORY_LOOK_BACK_YEARS} years ago &mdash; recently
      * conquered worlds whose population plausibly still sympathizes with the attacker. Second tier: any defender system
      * in range away from the shared border, since a guerrilla campaign on the contested front is just the regular war.
      * Empty only when the defender holds nothing in range beyond the border itself.
@@ -271,7 +277,7 @@ public class MissionTargetFinder {
             return defenderSystems;
         }
 
-        LocalDate beforeConquest = date.minusYears(MissionLocationProfile.OCCUPIED_TERRITORY_LOOKBACK_YEARS);
+        LocalDate beforeConquest = date.minusYears(MissionLocationProfile.OCCUPIED_TERRITORY_LOOK_BACK_YEARS);
         List<PlanetarySystem> recentlyConquered = new ArrayList<>();
         for (PlanetarySystem system : defenderSystems) {
             if (system.getFactionSet(beforeConquest).contains(attacker)) {
@@ -283,7 +289,7 @@ public class MissionTargetFinder {
         }
 
         Set<PlanetarySystem> deepSystems = new HashSet<>(defenderSystems);
-        deepSystems.removeAll(borderTracker.getBorderSystems(attacker, defender, location, radius));
+        borderTracker.getBorderSystems(attacker, defender, location, radius).forEach(deepSystems::remove);
         return new ArrayList<>(deepSystems);
     }
 

@@ -88,12 +88,30 @@ public class CurrentLocation extends AbstractMobileLocation {
 
     @Override
     public boolean isAtJumpPoint() {
-        return transitTime >= currentSystem.getTimeToJumpPoint(1.0);
+        return transitTime >= destinationTransitTime();
     }
 
     @Override
     public double getPercentageTransit() {
-        return 1 - transitTime / currentSystem.getTimeToJumpPoint(1.0);
+        return 1 - transitTime / destinationTransitTime();
+    }
+
+    /**
+     * The in-system transit time, in days, from the jump point to the ship's actual destination within the current
+     * system.
+     *
+     * <p>By default this is the transit to the system's primary world. Once the ship is on the final leg of a jump
+     * path (its last remaining system) and that path names a {@link JumpPath#getTargetPlanet() target planet}, it is
+     * instead the transit to that planet &mdash; so a journey to an outer or inner world takes correspondingly longer
+     * or shorter, and "arrival" means reaching that planet rather than the primary world.</p>
+     *
+     * @return the effective in-system transit time to the current destination
+     */
+    private double destinationTransitTime() {
+        if ((jumpPath != null) && (jumpPath.size() == 1) && (jumpPath.getTargetPlanet() != null)) {
+            return jumpPath.getTargetPlanet().getTimeToJumpPoint(1.0);
+        }
+        return currentSystem.getTimeToJumpPoint(1.0);
     }
 
     @Override
@@ -233,7 +251,9 @@ public class CurrentLocation extends AbstractMobileLocation {
                 // reduce remaining hours by usedRechargeTime or usedTransitTime, whichever is
                 // greater
                 hours -= Math.max(usedRechargeTime, usedTransitTime);
-                transitTime = currentSystem.getTimeToJumpPoint(1.0);
+                // On arriving at the final system this is the transit to the path's target planet (if any); at an
+                // intermediate system it is the primary-world transit, as before.
+                transitTime = destinationTransitTime();
                 rechargeTime = 0;
                 // if there are hours remaining, then begin recharging jump drive
                 usedRechargeTime = Math.min(hours, neededRechargeTime - rechargeTime);
