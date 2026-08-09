@@ -67,7 +67,7 @@ import mekhq.campaign.market.contractMarket.AbstractContractMarket;
 import mekhq.campaign.market.contractMarket.ContractAutomation;
 import mekhq.campaign.mission.AtBContract;
 import mekhq.campaign.mission.Contract;
-import mekhq.campaign.mission.enums.AtBContractType;
+import mekhq.campaign.mission.enums.ContractObjectiveType;
 import mekhq.campaign.mission.rentals.FacilityRentals;
 import mekhq.campaign.universe.Faction;
 import mekhq.campaign.universe.Factions;
@@ -674,7 +674,7 @@ public class ContractMarketDialog extends JDialog {
         String outOfCharacterResourceKey = null;
 
 
-        AtBContractType contractType = ((AtBContract) selectedContract).getContractType();
+        ContractObjectiveType contractType = ((AtBContract) selectedContract).getContractType();
         if (contractType.isGarrisonDuty() || contractType.isRetainer()) {
             inCharacterResourceKey = "messageChallengeGarrison.inCharacter";
             outOfCharacterResourceKey = "messageChallengeGarrison.outOfCharacter";

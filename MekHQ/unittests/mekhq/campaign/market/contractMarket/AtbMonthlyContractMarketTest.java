@@ -64,8 +64,8 @@ import mekhq.campaign.finances.Accountant;
 import mekhq.campaign.finances.Money;
 import mekhq.campaign.force.CombatTeam;
 import mekhq.campaign.mission.AtBContract;
-import mekhq.campaign.mission.enums.AtBContractType;
-import mekhq.campaign.mission.newContract.EnemySelectionProfile;
+import mekhq.campaign.mission.enums.ContractObjectiveType;
+import mekhq.campaign.mission.newContract.contractGeneration.targetFinder.EnemySelectionProfile;
 import mekhq.campaign.mission.utilities.ContractUtilities;
 import mekhq.campaign.reputation.camOpsReputation.ForceReputationController;
 import mekhq.campaign.universe.Faction;
@@ -97,7 +97,7 @@ class AtbMonthlyContractMarketTest {
               MockedStatic<ContractUtilities> contractUtilities = mockStatic(ContractUtilities.class);
               MockedStatic<CombatTeam> combatTeam = mockStatic(CombatTeam.class)) {
             contractTypePicker.when(() -> ContractTypePicker.findMissionType(context.employerFaction, 0))
-                  .thenReturn(AtBContractType.GARRISON_DUTY);
+                  .thenReturn(ContractObjectiveType.GARRISON_DUTY);
             contractUtilities.when(ContractUtilities::calculateVarianceFactor).thenReturn(1.0);
             contractUtilities.when(() -> ContractUtilities.calculateBaseNumberOfRequiredLances(context.campaign,
                         false,
@@ -167,7 +167,7 @@ class AtbMonthlyContractMarketTest {
             when(campaign.getLocalDate()).thenReturn(TODAY);
             when(campaign.getGameYear()).thenReturn(GAME_YEAR);
             when(campaign.getCampaignOptions()).thenReturn(campaignOptions);
-            when(campaign.getPlayerForce().getReputation()).thenReturn(reputation);
+            when(campaign.getPlayerForce().getCamOpsReputation()).thenReturn(reputation);
             when(campaign.getPlayerForce().getAverageSkillLevel(any(), any())).thenReturn(REGULAR);
             when(campaign.getAccountant()).thenReturn(accountant);
             when(campaign.getPlayerForce().getHangar()).thenReturn(hangar);

@@ -32,7 +32,9 @@
  */
 package mekhq.campaign.mission.newContract;
 
-import static mekhq.campaign.mission.newContract.ClanHomeworldsExclusion.violatesHomeworldsExclusion;
+import static mekhq.MHQConstants.IS_INVASION_OF_HUNTRESS_END;
+import static mekhq.MHQConstants.IS_INVASION_OF_HUNTRESS_START;
+import static mekhq.campaign.mission.newContract.contractGeneration.targetFinder.ClanHomeworldsExclusion.violatesHomeworldsExclusion;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
@@ -41,7 +43,6 @@ import static org.mockito.Mockito.when;
 
 import java.time.LocalDate;
 
-import mekhq.MHQConstants;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.market.contractMarket.AbstractContractMarket;
 import mekhq.campaign.market.contractMarket.AtbMonthlyContractMarket;
@@ -54,8 +55,8 @@ import org.junit.jupiter.api.Test;
 
 class ClanHomeworldsExclusionTest {
 
-    private static final LocalDate OUTSIDE_BULLDOG = LocalDate.of(3049, 12, 1);
-    private static final LocalDate INSIDE_BULLDOG = LocalDate.of(3059, 6, 1);
+    private static final LocalDate OUTSIDE_SERPENT = IS_INVASION_OF_HUNTRESS_END.plusDays(1);
+    private static final LocalDate INSIDE_SERPENT = IS_INVASION_OF_HUNTRESS_START.plusDays(1);
 
     private final AbstractContractMarket contractMarket = new AtbMonthlyContractMarket();
 
@@ -97,31 +98,31 @@ class ClanHomeworldsExclusionTest {
     }
 
     @Test
-    void nonClanAttackerWithinRadiusOutsideBulldogViolates() {
+    void nonClanAttackerWithinRadiusOutsideSerpentViolates() {
         PlanetarySystem stranaMechty = mockStranaMechty();
-        Campaign campaign = mockCampaign(OUTSIDE_BULLDOG);
+        Campaign campaign = mockCampaign(OUTSIDE_SERPENT);
         AbstractMissionTransition contract = mockContract(mockFaction(false), 200, stranaMechty, 0);
 
         assertTrue(violatesHomeworldsExclusion(contract, campaign),
-              "A non-Clan faction striking within the exclusion radius outside Operation Bulldog should violate "
+              "A non-Clan faction striking within the exclusion radius outside Operation Serpent should violate "
                     + "the restriction");
     }
 
     @Test
-    void nonClanAttackerWithinRadiusDuringBulldogIsAllowed() {
+    void nonClanAttackerWithinRadiusDuringSerpentIsAllowed() {
         PlanetarySystem stranaMechty = mockStranaMechty();
-        Campaign campaign = mockCampaign(INSIDE_BULLDOG);
+        Campaign campaign = mockCampaign(INSIDE_SERPENT);
         AbstractMissionTransition contract = mockContract(mockFaction(false), 200, stranaMechty, 0);
 
         assertFalse(violatesHomeworldsExclusion(contract, campaign),
-              "Operation Bulldog is the one historical window where non-Clan forces legitimately operated within "
+              "Operation Serpent is the one historical window where non-Clan forces legitimately operated within "
                     + "the exclusion radius");
     }
 
     @Test
-    void clanAttackerWithinRadiusOutsideBulldogIsAllowed() {
+    void clanAttackerWithinRadiusOutsideSerpentIsAllowed() {
         PlanetarySystem stranaMechty = mockStranaMechty();
-        Campaign campaign = mockCampaign(OUTSIDE_BULLDOG);
+        Campaign campaign = mockCampaign(OUTSIDE_SERPENT);
         AbstractMissionTransition contract = mockContract(mockFaction(true), 200, stranaMechty, 0);
 
         assertFalse(violatesHomeworldsExclusion(contract, campaign),
@@ -129,9 +130,9 @@ class ClanHomeworldsExclusionTest {
     }
 
     @Test
-    void nonClanAttackerOutsideRadiusOutsideBulldogIsAllowed() {
+    void nonClanAttackerOutsideRadiusOutsideSerpentIsAllowed() {
         PlanetarySystem stranaMechty = mockStranaMechty();
-        Campaign campaign = mockCampaign(OUTSIDE_BULLDOG);
+        Campaign campaign = mockCampaign(OUTSIDE_SERPENT);
         AbstractMissionTransition contract = mockContract(mockFaction(false), 451, stranaMechty, 0);
 
         assertFalse(violatesHomeworldsExclusion(contract, campaign),
@@ -139,11 +140,11 @@ class ClanHomeworldsExclusionTest {
     }
 
     @Test
-    void travelTimeThatPushesArrivalIntoBulldogWindowIsAllowed() {
+    void travelTimeThatPushesArrivalIntoSerpentWindowIsAllowed() {
         PlanetarySystem stranaMechty = mockStranaMechty();
-        // The current date is before Operation Bulldog starts, but travel time pushes the actual arrival date into
+        // The current date is before Operation Serpent starts, but travel time pushes the actual arrival date into
         // the window - the rule is keyed on arrival date, not the date the contract was generated.
-        Campaign campaign = mockCampaign(MHQConstants.OPERATION_BULLDOG_START.minusDays(10));
+        Campaign campaign = mockCampaign(IS_INVASION_OF_HUNTRESS_START.minusDays(10));
         AbstractMissionTransition contract = mockContract(mockFaction(false), 200, stranaMechty, 15);
 
         assertFalse(violatesHomeworldsExclusion(contract, campaign),

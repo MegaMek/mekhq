@@ -390,14 +390,20 @@ public abstract class AbstractForce {
         finances.debit(type, date, quantity, description);
     }
 
-    public ForceReputationController getReputation() {
+    /**
+     * Generally you want to use {@link #getReputationRating(boolean)} instead, as that is campaign options aware.
+     */
+    public ForceReputationController getCamOpsReputation() {
         return reputation;
     }
 
-    public void setReputation(ForceReputationController reputation) {
+    public void setCamOpsReputation(ForceReputationController reputation) {
         this.reputation = reputation;
     }
 
+    /**
+     * Generally you want to use {@link #getReputationRating(boolean)} instead, as that is campaign options aware.
+     */
     public int getChaosCampaignReputation() {
         return chaosCampaignReputation;
     }
