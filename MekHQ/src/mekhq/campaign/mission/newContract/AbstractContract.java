@@ -66,9 +66,9 @@ import mekhq.campaign.universe.PlanetarySystem;
 /**
  * This is the base template for all ChaosContract subclasses.
  *
- * <p></p>Note for reviewer: this is intended to be a pure data class, with no logic. The class that preceded it
- * ended up getting incredibly bloated with logic that ballooned the class into an unmanageable size. Please keep this
- * class, and its inheritors, as thin as possible. - Illiani, Aug/8/2026/p>
+ * <p>Note for reviewers: this is intended to be a pure data class, with no logic. The class that preceded it ended up
+ * getting incredibly bloated with logic that ballooned the class into an unmanageable size. Please keep this class, and
+ * its inheritors, as thin as possible.</p>
  */
 public abstract class AbstractContract {
     private UUID contractId;
