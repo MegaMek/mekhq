@@ -6487,12 +6487,10 @@ public class Unit implements ITechnology, ILocatable {
         // We don't want to clear transport assignments, but we do want to remove the
         // transport from the list of potential transports, if it's transport.
         if (campaign != null) {
-            if (!getTransportCapabilities(SHIP_TRANSPORT).isEmpty()) {
-                getCampaign().removeCampaignTransporter(SHIP_TRANSPORT, this);
-            }
-
-            if (!getTransportCapabilities(CampaignTransportType.TACTICAL_TRANSPORT).isEmpty()) {
-                getCampaign().removeCampaignTransporter(CampaignTransportType.TACTICAL_TRANSPORT, this);
+            for (CampaignTransportType campaignTransportType : CampaignTransportType.values()) {
+                if (!getTransportCapabilities(campaignTransportType).isEmpty()) {
+                    getCampaign().removeCampaignTransporter(campaignTransportType, this);
+                }
             }
         }
     }
@@ -6571,16 +6569,10 @@ public class Unit implements ITechnology, ILocatable {
         // If this unit is a transport, let's add it to the campaign's
         // transporter map.
         if (campaign != null) {
-            if (!getTransportCapabilities(SHIP_TRANSPORT).isEmpty()) {
-                getCampaign().addCampaignTransport(SHIP_TRANSPORT, this);
-            }
-
-            if (!getTransportCapabilities(CampaignTransportType.TACTICAL_TRANSPORT).isEmpty()) {
-                getCampaign().addCampaignTransport(CampaignTransportType.TACTICAL_TRANSPORT, this);
-            }
-
-            if (!getTransportCapabilities(CampaignTransportType.TOW_TRANSPORT).isEmpty()) {
-                getCampaign().addCampaignTransport(CampaignTransportType.TOW_TRANSPORT, this);
+            for (CampaignTransportType campaignTransportType : CampaignTransportType.values()) {
+                if (!getTransportCapabilities(campaignTransportType).isEmpty()) {
+                    getCampaign().addCampaignTransport(campaignTransportType, this);
+                }
             }
         }
     }

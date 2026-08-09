@@ -541,37 +541,67 @@ public class AtBGameThread extends GameThread {
 
                 // Prompt the player to tow stuff (lowest priority)
                 if (potentialTransports.hasTransports(TOW_TRANSPORT)) {
-                    for (UUID transportId : potentialTransports.getTransports(TOW_TRANSPORT)) {
-                        boolean towUnits = false;
+                    Set<UUID> towTransportIds = potentialTransports.getTransports(TOW_TRANSPORT);
+                    for (UUID transportId : towTransportIds) {
                         Unit transport = campaign.getUnit(transportId);
-
-                        if (transport.hasTransportedUnits(TOW_TRANSPORT)) {
-                            towUnits = (JOptionPane.YES_OPTION ==
-                                              JOptionPane.showConfirmDialog(null,
-                                                    MHQInternationalization.getFormattedTextAt(
-                                                          "mekhq.resources.AssignForceToTransport",
-                                                          "AtBGameThread.loadTransportDialog.TOW_TRANSPORT.text",
-                                                          transport.getName()),
-                                                    MHQInternationalization.getFormattedTextAt(
-                                                          "mekhq.resources.AssignForceToTransport",
-                                                          "AtBGameThread.loadTransportDialog.TOW_TRANSPORT.title"),
-                                                    JOptionPane.YES_NO_OPTION));
+                        if ((transport == null) || (transport.getEntity() == null)) {
+                            continue;
                         }
+
+                        // A train is built once, headed by its lead tractor. Skip units that are
+                        // towed by another transport deployed in this scenario - they are middle
+                        // trailers and get hitched as part of the lead tractor's train.
+                        if (transport.hasTransportAssignment(TOW_TRANSPORT) &&
+                                  towTransportIds.contains(transport.getTransportAssignment(TOW_TRANSPORT)
+                                                                 .getTransport()
+                                                                 .getId())) {
+                            continue;
+                        }
+
+                        // Walk the train front to back. Each unit in the map only lists the trailer
+                        // directly behind it, so follow the links hop by hop, stopping at any gap.
+                        List<Integer> orderedTrailerIds = new ArrayList<>();
+                        Set<UUID> visitedUnits = new HashSet<>();
+                        visitedUnits.add(transportId);
+                        UUID currentUnitId = transportId;
+                        while (true) {
+                            List<UUID> towedUnitIds = potentialTransports.getTransportedUnits(TOW_TRANSPORT,
+                                  currentUnitId);
+                            if ((towedUnitIds == null) || towedUnitIds.isEmpty()) {
+                                break;
+                            }
+                            Unit towedUnit = campaign.getUnit(towedUnitIds.getFirst());
+                            if ((towedUnit == null) ||
+                                      (towedUnit.getEntity() == null) ||
+                                      !visitedUnits.add(towedUnit.getId())) {
+                                break;
+                            }
+                            orderedTrailerIds.add(towedUnit.getEntity().getId());
+                            currentUnitId = towedUnit.getId();
+                        }
+
+                        if (orderedTrailerIds.isEmpty()) {
+                            continue;
+                        }
+
+                        boolean towUnits = (JOptionPane.YES_OPTION ==
+                                                  JOptionPane.showConfirmDialog(null,
+                                                        MHQInternationalization.getFormattedTextAt(
+                                                              "mekhq.resources.AssignForceToTransport",
+                                                              "AtBGameThread.loadTransportDialog.TOW_TRANSPORT.text",
+                                                              transport.getName()),
+                                                        MHQInternationalization.getFormattedTextAt(
+                                                              "mekhq.resources.AssignForceToTransport",
+                                                              "AtBGameThread.loadTransportDialog.TOW_TRANSPORT.title"),
+                                                        JOptionPane.YES_NO_OPTION));
 
                         // Now, send the tow commands
                         if (towUnits) {
-                            // Convert the list of Unit UUIDs to MM EntityIds
-                            Unit towedUnit = campaign.getUnit(potentialTransports.getTransportedUnits(TOW_TRANSPORT,
-                                  transportId).getFirst());
-                            if (towedUnit != null && towedUnit.getEntity() != null) {
-                                // And now tow the units.
-                                Utilities.towPlayerTrailers(transport.getEntity().getId(),
-                                      towedUnit.getEntity().getId(),
-                                      client,
-                                      towUnits,
-                                      alreadyResetTransport.contains(transportId));
-                                alreadyResetTransport.add(transportId);
-                            }
+                            Utilities.towPlayerTrailers(transport.getEntity().getId(),
+                                  orderedTrailerIds,
+                                  client,
+                                  alreadyResetTransport.contains(transportId));
+                            alreadyResetTransport.add(transportId);
                         }
                     }
                 }
