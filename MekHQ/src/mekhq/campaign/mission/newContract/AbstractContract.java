@@ -47,7 +47,7 @@ import mekhq.campaign.JumpPath;
 import mekhq.campaign.digitalGM.stratCon.StratConCampaignState;
 import mekhq.campaign.finances.Money;
 import mekhq.campaign.mission.Scenario;
-import mekhq.campaign.mission.enums.AtBMoraleLevel;
+import mekhq.campaign.mission.enums.ContractMoraleLevel;
 import mekhq.campaign.mission.enums.ContractObjectiveType;
 import mekhq.campaign.mission.enums.MissionStatus;
 import mekhq.campaign.mission.newContract.contractData.ContractFinanceData;
@@ -328,7 +328,7 @@ public abstract class AbstractContract {
         return enemyData.batchallAccepted();
     }
 
-    public AtBMoraleLevel getEnemyMoraleLevel() {
+    public ContractMoraleLevel getEnemyMoraleLevel() {
         return moraleData.moraleLevel();
     }
 

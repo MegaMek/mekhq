@@ -58,8 +58,8 @@ import megamek.logging.MMLogger;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.mission.AtBContract;
-import mekhq.campaign.mission.enums.AtBMoraleLevel;
 import mekhq.campaign.mission.enums.ContractObjectiveType;
+import mekhq.campaign.mission.enums.ContractMoraleLevel;
 import mekhq.campaign.universe.Factions;
 import mekhq.campaign.universe.PlanetarySystem;
 import mekhq.campaign.universe.RandomFactionGenerator;
@@ -99,7 +99,7 @@ public class CustomizeAtBContractDialog extends JDialog {
     protected JSpinner spnRequiredCombatTeams;
     protected JSpinner spnRequiredCombatElements;
     protected JMoneyTextField txtBasePay;
-    protected MMComboBox<AtBMoraleLevel> comboEnemyMorale;
+    protected MMComboBox<ContractMoraleLevel> comboEnemyMorale;
     protected JSpinner spnContractScoreArbitraryModifier;
     protected JTextField txtAllyBotName;
     protected JTextField txtEnemyBotName;
@@ -228,14 +228,14 @@ public class CustomizeAtBContractDialog extends JDialog {
         txtBasePay.setMoney(contract.getBaseAmount());
         JLabel lblBasePay = new JLabel();
 
-        comboEnemyMorale = new MMComboBox<>("comboEnemyMorale", AtBMoraleLevel.values());
-        comboContractType.setRenderer(new DefaultListCellRenderer() {
+        comboEnemyMorale = new MMComboBox<>("comboEnemyMorale", ContractMoraleLevel.values());
+        comboEnemyMorale.setRenderer(new DefaultListCellRenderer() {
             @Override
             public Component getListCellRendererComponent(final JList<?> list, final Object value, final int index,
                   final boolean isSelected, final boolean cellHasFocus) {
                 super.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);
-                if (value instanceof AtBMoraleLevel) {
-                    list.setToolTipText(wordWrap(((AtBMoraleLevel) value).getToolTipText()));
+                if (value instanceof ContractMoraleLevel) {
+                    list.setToolTipText(wordWrap(((ContractMoraleLevel) value).getToolTipText()));
                 }
                 return this;
             }

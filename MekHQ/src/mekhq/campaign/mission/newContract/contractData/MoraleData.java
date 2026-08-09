@@ -36,12 +36,12 @@ import java.time.LocalDate;
 
 import jakarta.annotation.Nullable;
 import mekhq.campaign.finances.Money;
-import mekhq.campaign.mission.enums.AtBMoraleLevel;
+import mekhq.campaign.mission.enums.ContractMoraleLevel;
 
-public record MoraleData(AtBMoraleLevel moraleLevel,
+public record MoraleData(ContractMoraleLevel moraleLevel,
       @Nullable LocalDate routEndDate,
       Money routedPayout) {
-    public MoraleData(AtBMoraleLevel moraleLevel) {
+    public MoraleData(ContractMoraleLevel moraleLevel) {
         this(moraleLevel, null, Money.zero());
     }
 }
