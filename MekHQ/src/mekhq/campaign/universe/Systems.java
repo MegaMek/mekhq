@@ -385,8 +385,8 @@ public class Systems {
                     // connector-ness from the zip's own name; the per-entry check below still catches the
                     // case where a connector entry lives inside a zip that sits elsewhere.
                     boolean zipIsConnector = isConnectorDir
-                                                   ||
-                                                   isConnectorPath(zipFile.getName().replaceFirst("(?i)\\.zip$", ""));
+                                                   || isConnectorPath(zipFile.getName()
+                                                                            .replaceFirst("(?i)\\.zip$", ""));
                     try (ZipFile zip = new ZipFile(zipFile.getPath())) {
                         Enumeration<? extends ZipEntry> entries = zip.entries();
                         while (entries.hasMoreElements()) {

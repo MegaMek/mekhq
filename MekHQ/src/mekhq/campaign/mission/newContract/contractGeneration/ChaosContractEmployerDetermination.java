@@ -129,6 +129,13 @@ public class ChaosContractEmployerDetermination {
 
     private static @Nullable Faction determineEmployerFaction(ChaosEmployerType employerType,
           LocalDate currentDate, ILocation currentLocation, boolean isMercenarySearch) {
+        if (isMercenarySearch) {
+            Faction specialEmployer = checkForSpecialEmployer(currentDate.getYear());
+            if (specialEmployer != null) {
+                return specialEmployer;
+            }
+        }
+
         if (employerType.isCurrentSystemEmployer()) {
             Faction employerFaction = getCurrentSystemEmployer(currentDate, currentLocation);
             if (employerFaction != null) {return employerFaction;}

@@ -153,7 +153,7 @@ public final class ChaosPlanetSelector {
         return switch (preference) {
             case HIGH_VALUE -> 1 + strategicValue;
             case LOW_VALUE -> 1 + (ChaosPlanetStrategicValue.MAX_STRATEGIC_VALUE - strategicValue);
-            case NEUTRAL -> 1;
+            default -> throw new IllegalStateException("Unexpected value: " + preference);
         };
     }
 
