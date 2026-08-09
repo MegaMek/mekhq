@@ -52,7 +52,7 @@ import jakarta.xml.bind.annotation.XmlElementWrapper;
 import jakarta.xml.bind.annotation.XmlRootElement;
 import megamek.logging.MMLogger;
 import mekhq.MHQConstants;
-import mekhq.campaign.mission.enums.AtBContractType;
+import mekhq.campaign.mission.enums.ContractObjectiveType;
 import mekhq.utilities.MMDataLicenseHeader;
 
 /**
@@ -65,7 +65,7 @@ public class StratConContractDefinition {
     private static final MMLogger LOGGER = MMLogger.create(StratConContractDefinition.class);
 
     private static ContractDefinitionManifest definitionManifest;
-    private static final Map<AtBContractType, StratConContractDefinition> loadedDefinitions = new HashMap<>();
+    private static final Map<ContractObjectiveType, StratConContractDefinition> loadedDefinitions = new HashMap<>();
 
     private static ContractDefinitionManifest getContractDefinitionManifest() {
         if (definitionManifest == null) {
@@ -83,12 +83,12 @@ public class StratConContractDefinition {
     }
 
     /**
-     * Returns the StratCon contract definition for the given {@link AtBContractType}
+     * Returns the StratCon contract definition for the given {@link ContractObjectiveType}
      */
-    public static StratConContractDefinition getContractDefinition(final AtBContractType atbContractType) {
-        if (!loadedDefinitions.containsKey(atbContractType)) {
+    public static StratConContractDefinition getContractDefinition(final ContractObjectiveType contractObjectiveType) {
+        if (!loadedDefinitions.containsKey(contractObjectiveType)) {
             String filePath = Paths.get(MHQConstants.STRAT_CON_CONTRACT_PATH,
-                  getContractDefinitionManifest().definitionFileNames.get(atbContractType)).toString();
+                  getContractDefinitionManifest().definitionFileNames.get(contractObjectiveType)).toString();
             StratConContractDefinition def = Deserialize(new File(filePath));
 
             if (def == null) {
@@ -96,10 +96,10 @@ public class StratConContractDefinition {
                 return null;
             }
 
-            loadedDefinitions.put(atbContractType, def);
+            loadedDefinitions.put(contractObjectiveType, def);
         }
 
-        return loadedDefinitions.get(atbContractType);
+        return loadedDefinitions.get(contractObjectiveType);
     }
 
     /**
@@ -415,7 +415,7 @@ public class StratConContractDefinition {
      *
      * @return the mapping, or an empty map if the file is absent or unreadable
      */
-    public static Map<AtBContractType, String> readManifestMapping(File manifestFile) {
+    public static Map<ContractObjectiveType, String> readManifestMapping(File manifestFile) {
         ContractDefinitionManifest manifest = ContractDefinitionManifest.Deserialize(manifestFile.getPath());
         if ((manifest == null) || (manifest.definitionFileNames == null)) {
             return new HashMap<>();
@@ -424,14 +424,15 @@ public class StratConContractDefinition {
     }
 
     /**
-     * Writes a contract definition manifest file mapping each {@link AtBContractType} to its definition file name.
+     * Writes a contract definition manifest file mapping each {@link ContractObjectiveType} to its definition file
+     * name.
      *
      * @param manifestFile the destination file
      * @param mapping      the contract-type-to-file-name mapping to write
      *
      * @return {@code true} if the file was written, {@code false} on error (logged)
      */
-    public static boolean writeManifestMapping(File manifestFile, Map<AtBContractType, String> mapping) {
+    public static boolean writeManifestMapping(File manifestFile, Map<ContractObjectiveType, String> mapping) {
         ContractDefinitionManifest manifest = new ContractDefinitionManifest();
         manifest.definitionFileNames = mapping;
         return manifest.serialize(manifestFile);
@@ -445,7 +446,7 @@ public class StratConContractDefinition {
     private static class ContractDefinitionManifest {
         private static final ObjectMapper MAPPER = buildMapper();
 
-        public Map<AtBContractType, String> definitionFileNames;
+        public Map<ContractObjectiveType, String> definitionFileNames;
 
         private static ObjectMapper buildMapper() {
             ObjectMapper mapper = new ObjectMapper();

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2024-2025 The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2024-2026 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -33,7 +33,7 @@
 package mekhq.campaign.market.contractMarket;
 
 import megamek.common.compute.Compute;
-import mekhq.campaign.mission.enums.AtBContractType;
+import mekhq.campaign.mission.enums.ContractObjectiveType;
 
 /**
  * Utility class that implements the mission tables as described in CamOps (4th printing).
@@ -47,9 +47,9 @@ public class MissionSelector {
      * @param margin The margin of success from a Negotiation check
      * @param isClan Whether the player unit is a Clan faction
      *
-     * @return The AtBContractType representing the type of mission for the contract
+     * @return The ContractObjectiveType representing the type of mission for the contract
      */
-    public static AtBContractType getInnerSphereClanMission(int roll, int margin, boolean isClan) {
+    public static ContractObjectiveType getInnerSphereClanMission(int roll, int margin, boolean isClan) {
         if (isClan) {
             int result = roll + margin;
             if (result < 4 || result > 11) {
@@ -60,13 +60,13 @@ public class MissionSelector {
         return switch (Math.clamp(roll + margin, 2, 12)) {
             case 2 -> getCovertMission(Compute.d6(2), margin);
             case 3, 12 -> getSpecialMission(Compute.d6(2), margin);
-            case 4 -> AtBContractType.PIRATE_HUNTING;
-            case 5 -> AtBContractType.PLANETARY_ASSAULT;
-            case 6, 7 -> AtBContractType.OBJECTIVE_RAID;
-            case 8 -> AtBContractType.EXTRACTION_RAID;
-            case 9 -> AtBContractType.RECON_RAID;
-            case 10 -> AtBContractType.GARRISON_DUTY;
-            default -> AtBContractType.CADRE_DUTY;
+            case 4 -> ContractObjectiveType.PIRATE_HUNTING;
+            case 5 -> ContractObjectiveType.PLANETARY_ASSAULT;
+            case 6, 7 -> ContractObjectiveType.OBJECTIVE_RAID;
+            case 8 -> ContractObjectiveType.EXTRACTION_RAID;
+            case 9 -> ContractObjectiveType.RECON_RAID;
+            case 10 -> ContractObjectiveType.GARRISON_DUTY;
+            default -> ContractObjectiveType.CADRE_DUTY;
         };
     }
 
@@ -78,9 +78,9 @@ public class MissionSelector {
      * @param margin The margin of success from a Negotiation check
      * @param isClan Whether the player unit is a Clan faction
      *
-     * @return The AtBContractType representing the type of mission for the contract
+     * @return The ContractObjectiveType representing the type of mission for the contract
      */
-    public static AtBContractType getIndependentMission(int roll, int margin, boolean isClan) {
+    public static ContractObjectiveType getIndependentMission(int roll, int margin, boolean isClan) {
         if (isClan) {
             int result = roll + margin;
             if (result < 4 || result > 11) {
@@ -91,13 +91,13 @@ public class MissionSelector {
         return switch (Math.clamp(roll + margin, 2, 12)) {
             case 2 -> getCovertMission(Compute.d6(2), margin);
             case 3, 12 -> getSpecialMission(Compute.d6(2), margin);
-            case 4 -> AtBContractType.PLANETARY_ASSAULT;
-            case 5, 9 -> AtBContractType.OBJECTIVE_RAID;
-            case 6 -> AtBContractType.EXTRACTION_RAID;
-            case 7 -> AtBContractType.PIRATE_HUNTING;
-            case 8 -> AtBContractType.SECURITY_DUTY;
-            case 10 -> AtBContractType.GARRISON_DUTY;
-            default -> AtBContractType.CADRE_DUTY;
+            case 4 -> ContractObjectiveType.PLANETARY_ASSAULT;
+            case 5, 9 -> ContractObjectiveType.OBJECTIVE_RAID;
+            case 6 -> ContractObjectiveType.EXTRACTION_RAID;
+            case 7 -> ContractObjectiveType.PIRATE_HUNTING;
+            case 8 -> ContractObjectiveType.SECURITY_DUTY;
+            case 10 -> ContractObjectiveType.GARRISON_DUTY;
+            default -> ContractObjectiveType.CADRE_DUTY;
         };
     }
 
@@ -109,9 +109,9 @@ public class MissionSelector {
      * @param margin The margin of success from a Negotiation check
      * @param isClan Whether the player unit is a Clan faction
      *
-     * @return The AtBContractType representing the type of mission for the contract
+     * @return The ContractObjectiveType representing the type of mission for the contract
      */
-    public static AtBContractType getCorporationMission(int roll, int margin, boolean isClan) {
+    public static ContractObjectiveType getCorporationMission(int roll, int margin, boolean isClan) {
         if (isClan) {
             int result = roll + margin;
             if (result < 5 || result > 11) {
@@ -122,13 +122,13 @@ public class MissionSelector {
         return switch (Math.clamp(roll + margin, 2, 12)) {
             case 2, 3 -> getCovertMission(Compute.d6(2), margin);
             case 4, 12 -> getSpecialMission(Compute.d6(2), margin);
-            case 5, 8 -> AtBContractType.OBJECTIVE_RAID;
-            case 6 -> AtBContractType.EXTRACTION_RAID;
-            case 7 -> AtBContractType.RECON_RAID;
-            case 9 -> AtBContractType.SECURITY_DUTY;
-            case 10 -> AtBContractType.GARRISON_DUTY;
+            case 5, 8 -> ContractObjectiveType.OBJECTIVE_RAID;
+            case 6 -> ContractObjectiveType.EXTRACTION_RAID;
+            case 7 -> ContractObjectiveType.RECON_RAID;
+            case 9 -> ContractObjectiveType.SECURITY_DUTY;
+            case 10 -> ContractObjectiveType.GARRISON_DUTY;
             // TODO: determine which is the higher paying between cadre/garrison and return that
-            default -> AtBContractType.CADRE_DUTY;
+            default -> ContractObjectiveType.CADRE_DUTY;
         };
     }
 
@@ -138,38 +138,38 @@ public class MissionSelector {
      * @param roll   The result of a 2d6 roll
      * @param margin The margin of success from a Negotiation check
      *
-     * @return The AtBContractType representing the type of mission for the contract
+     * @return The ContractObjectiveType representing the type of mission for the contract
      */
-    public static AtBContractType getPirateMission(int roll, int margin) {
+    public static ContractObjectiveType getPirateMission(int roll, int margin) {
         roll += margin;
         if (roll < 6) {
-            return AtBContractType.RECON_RAID;
+            return ContractObjectiveType.RECON_RAID;
         } else {
-            return AtBContractType.OBJECTIVE_RAID;
+            return ContractObjectiveType.OBJECTIVE_RAID;
         }
     }
 
-    private static AtBContractType getSpecialMission(int roll, int margin) {
+    private static ContractObjectiveType getSpecialMission(int roll, int margin) {
         return switch (Math.clamp(roll + margin, 2, 12)) {
             case 2 -> getCovertMission(Compute.d6(2), margin);
             // TODO: figure out how to offer planetary assault followup contracts
-            case 3, 4 -> AtBContractType.GUERRILLA_WARFARE;
+            case 3, 4 -> ContractObjectiveType.GUERRILLA_WARFARE;
             // TODO: figure out how to offer planetary assault followup contracts
-            case 5, 8 -> AtBContractType.RECON_RAID;
-            case 6 -> AtBContractType.EXTRACTION_RAID;
+            case 5, 8 -> ContractObjectiveType.RECON_RAID;
+            case 6 -> ContractObjectiveType.EXTRACTION_RAID;
             // TODO: change this to RETAINER if/when that is implemented
-            case 7 -> AtBContractType.GARRISON_DUTY;
-            case 9 -> AtBContractType.RELIEF_DUTY;
+            case 7 -> ContractObjectiveType.GARRISON_DUTY;
+            case 9 -> ContractObjectiveType.RELIEF_DUTY;
             // TODO: figure out how to offer planetary assault followup contracts
-            case 10 -> AtBContractType.DIVERSIONARY_RAID;
+            case 10 -> ContractObjectiveType.DIVERSIONARY_RAID;
             // TODO: determine which is the higher paying between riot/garrison and return that
-            case 11 -> AtBContractType.RIOT_DUTY;
+            case 11 -> ContractObjectiveType.RIOT_DUTY;
             // TODO: determine which is the higher paying between cadre/garrison and return that
-            default -> AtBContractType.CADRE_DUTY;
+            default -> ContractObjectiveType.CADRE_DUTY;
         };
     }
 
-    private static AtBContractType getCovertMission(int roll, int margin) {
+    private static ContractObjectiveType getCovertMission(int roll, int margin) {
         // TODO: most of the covert mission types are not implemented in MekHQ at the time of writing,
         //  so just use the special missions table for now.
         return getSpecialMission(Compute.d6(2), margin);

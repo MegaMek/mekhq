@@ -34,7 +34,7 @@ package mekhq.campaign.mission.newContract.contractGeneration;
 
 import jakarta.annotation.Nullable;
 import mekhq.campaign.location.ILocation;
-import mekhq.campaign.mission.enums.AtBContractType;
+import mekhq.campaign.mission.enums.ContractObjectiveType;
 import mekhq.campaign.mission.newContract.contractGeneration.targetFinder.MissionLocationProfile;
 import mekhq.campaign.universe.RandomFactionGenerator;
 
@@ -57,7 +57,8 @@ public class ChaosContractDeterminationLocation {
      *
      * @return the target system id, or {@code null} if no valid target could be found
      */
-    public static @Nullable String determineContractLocation(AtBContractType objectiveType, boolean isPlayerAttacker,
+    public static @Nullable String determineContractLocation(ContractObjectiveType objectiveType,
+          boolean isPlayerAttacker,
           String employerFactionCode, String enemyFactionCode, ILocation currentLocation) {
         MissionLocationProfile missionLocationProfile = objectiveType.getMissionLocationProfile();
 

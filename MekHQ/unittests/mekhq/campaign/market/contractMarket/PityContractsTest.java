@@ -48,22 +48,22 @@ import java.util.List;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.mission.AtBContract;
-import mekhq.campaign.mission.enums.AtBContractType;
+import mekhq.campaign.mission.enums.ContractObjectiveType;
 import mekhq.campaign.universe.PlanetarySystem;
 import org.junit.jupiter.api.Test;
 import org.mockito.InOrder;
 
 /**
- * Tests {@link PityContracts#createPityContract}, in particular that overwriting a freshly-generated contract's
- * enemy (and, for non-pirate campaigns, its type) correctly triggers a re-resolution of the attacker/defender roles
- * and the target system, rather than leaving them stale from whatever the contract's original (pre-override) enemy
- * happened to be.
+ * Tests {@link PityContracts#createPityContract}, in particular that overwriting a freshly-generated contract's enemy
+ * (and, for non-pirate campaigns, its type) correctly triggers a re-resolution of the attacker/defender roles and the
+ * target system, rather than leaving them stale from whatever the contract's original (pre-override) enemy happened to
+ * be.
  */
 class PityContractsTest {
 
     private static AtBContract mockContract() {
         AtBContract contract = mock(AtBContract.class);
-        when(contract.getContractType()).thenReturn(AtBContractType.PIRATE_HUNTING);
+        when(contract.getContractType()).thenReturn(ContractObjectiveType.PIRATE_HUNTING);
         when(contract.getStartDate()).thenReturn(LocalDate.of(3025, 1, 1));
         when(contract.getEmployerName()).thenReturn("Some Employer");
         PlanetarySystem system = mock(PlanetarySystem.class);
@@ -103,8 +103,8 @@ class PityContractsTest {
 
     /**
      * Regression test: if no valid location can be found for the pity contract's actual enemy, the half-configured
-     * contract (already added to the market by {@code addAtBContract}) must be removed rather than left in the
-     * market with a mismatched or missing target system.
+     * contract (already added to the market by {@code addAtBContract}) must be removed rather than left in the market
+     * with a mismatched or missing target system.
      */
     @Test
     void createPityContractRemovesContractWhenNoLocationFound() throws Exception {
