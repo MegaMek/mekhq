@@ -56,9 +56,9 @@ import megamek.common.equipment.EquipmentType;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.digitalGM.stratCon.StratConCampaignState;
 import mekhq.campaign.finances.Money;
-import mekhq.campaign.mission.enums.AtBMoraleLevel;
-import mekhq.campaign.mission.enums.ContractCommandRights;
 import mekhq.campaign.mission.enums.ContractObjectiveType;
+import mekhq.campaign.mission.enums.ContractMoraleLevel;
+import mekhq.campaign.mission.enums.ContractCommandRights;
 import mekhq.campaign.mission.enums.MissionStatus;
 import mekhq.campaign.mission.enums.ScenarioStatus;
 import mekhq.campaign.personnel.Person;
@@ -373,7 +373,7 @@ public class AbstractMissionTransitionIOTest {
 
         contract.setRequiredCombatTeams(2);
         contract.setRequiredCombatElements(8);
-        contract.setMoraleLevel(AtBMoraleLevel.ADVANCING);
+        contract.setMoraleLevel(ContractMoraleLevel.ADVANCING);
         contract.setPartsAvailabilityLevel(4);
         contract.setSharesPercent(45);
         contract.setBatchallAccepted(false);

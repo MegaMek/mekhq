@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2021-2025 The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2021-2026 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -39,17 +39,17 @@ import megamek.logging.MMLogger;
 import mekhq.MekHQ;
 
 /**
- * The AtBMoraleLevel enum represents the different enemy morale conditions used by AtB systems.
+ * The ContractMoraleLevel enum represents the different enemy morale conditions used by AtB systems.
  */
-public enum AtBMoraleLevel {
+public enum ContractMoraleLevel {
     // region Enum Declarations
-    ROUTED(-3, 7, "AtBMoraleLevel.ROUTED.text", "AtBMoraleLevel.ROUTED.toolTipText"),
-    CRITICAL(-2, 6, "AtBMoraleLevel.CRITICAL.text", "AtBMoraleLevel.CRITICAL.toolTipText"),
-    WEAKENED(-1, 5, "AtBMoraleLevel.WEAKENED.text", "AtBMoraleLevel.WEAKENED.toolTipText"),
-    STALEMATE(0, 4, "AtBMoraleLevel.STALEMATE.text", "AtBMoraleLevel.STALEMATE.toolTipText"),
-    ADVANCING(1, 3, "AtBMoraleLevel.ADVANCING.text", "AtBMoraleLevel.ADVANCING.toolTipText"),
-    DOMINATING(2, 2, "AtBMoraleLevel.DOMINATING.text", "AtBMoraleLevel.DOMINATING.toolTipText"),
-    OVERWHELMING(3, 1, "AtBMoraleLevel.OVERWHELMING.text", "AtBMoraleLevel.OVERWHELMING.toolTipText");
+    ROUTED(-3, 7, "ContractMoraleLevel.ROUTED.text", "ContractMoraleLevel.ROUTED.toolTipText"),
+    CRITICAL(-2, 6, "ContractMoraleLevel.CRITICAL.text", "ContractMoraleLevel.CRITICAL.toolTipText"),
+    WEAKENED(-1, 5, "ContractMoraleLevel.WEAKENED.text", "ContractMoraleLevel.WEAKENED.toolTipText"),
+    STALEMATE(0, 4, "ContractMoraleLevel.STALEMATE.text", "ContractMoraleLevel.STALEMATE.toolTipText"),
+    ADVANCING(1, 3, "ContractMoraleLevel.ADVANCING.text", "ContractMoraleLevel.ADVANCING.toolTipText"),
+    DOMINATING(2, 2, "ContractMoraleLevel.DOMINATING.text", "ContractMoraleLevel.DOMINATING.toolTipText"),
+    OVERWHELMING(3, 1, "ContractMoraleLevel.OVERWHELMING.text", "ContractMoraleLevel.OVERWHELMING.toolTipText");
 
     public final static int MINIMUM_MORALE_LEVEL = ROUTED.getLevel();
     public final static int MAXIMUM_MORALE_LEVEL = OVERWHELMING.getLevel();
@@ -63,7 +63,7 @@ public enum AtBMoraleLevel {
     // endregion Variable Declarations
 
     /**
-     * Initializes a new {@link AtBMoraleLevel} object with the specified name and tooltip text.
+     * Initializes a new {@link ContractMoraleLevel} object with the specified name and tooltip text.
      *
      * @param level         the severity of the morale level
      * @param crisisDieSize the number of sides on the die rolled to determine if a scenario is classified as a
@@ -72,7 +72,7 @@ public enum AtBMoraleLevel {
      * @param toolTipText   the resource key for the tooltip text of the Morale Level
      */
     // region Constructors
-    AtBMoraleLevel(final int level, final int crisisDieSize, final String name, final String toolTipText) {
+    ContractMoraleLevel(final int level, final int crisisDieSize, final String name, final String toolTipText) {
         final ResourceBundle resources = ResourceBundle.getBundle("mekhq.resources.Mission",
               MekHQ.getMHQOptions().getLocale());
         this.level = level;
@@ -168,24 +168,24 @@ public enum AtBMoraleLevel {
     // endregion Boolean Comparison Methods
 
     /**
-     * Returns the {@link AtBMoraleLevel} that corresponds to the specified integer level.
+     * Returns the {@link ContractMoraleLevel} that corresponds to the specified integer level.
      *
-     * <p>This method iterates over all defined {@link AtBMoraleLevel} values and returns the one whose
+     * <p>This method iterates over all defined {@link ContractMoraleLevel} values and returns the one whose
      * {@link #getLevel()} value matches the provided {@code level}. If no matching morale level exists, {@code null} is
      * returned.</p>
      *
      * @param level the integer morale level to parse
      *
-     * @return the matching {@link AtBMoraleLevel}, or {@code null} if no defined morale level corresponds to the given
-     *       value
+     * @return the matching {@link ContractMoraleLevel}, or {@code null} if no defined morale level corresponds to the
+     *       given value
      *
      * @author Illiani
      * @since 0.50.10
      */
-    public static @Nullable AtBMoraleLevel parseFromLevel(final int level) {
-        for (AtBMoraleLevel atBMoraleLevel : AtBMoraleLevel.values()) {
-            if (atBMoraleLevel.getLevel() == level) {
-                return atBMoraleLevel;
+    public static @Nullable ContractMoraleLevel parseFromLevel(final int level) {
+        for (ContractMoraleLevel moraleLevel : ContractMoraleLevel.values()) {
+            if (moraleLevel.getLevel() == level) {
+                return moraleLevel;
             }
         }
 
@@ -193,16 +193,16 @@ public enum AtBMoraleLevel {
     }
 
     /**
-     * Parses a string representation of a morale level and returns the corresponding {@link AtBMoraleLevel} enum
+     * Parses a string representation of a morale level and returns the corresponding {@link ContractMoraleLevel} enum
      * value.
      *
      * @param moraleLevel the string representation of a morale level
      *
-     * @return the {@link AtBMoraleLevel} enum value corresponding to the given morale level string, or
+     * @return the {@link ContractMoraleLevel} enum value corresponding to the given morale level string, or
      *       {@code STALEMATE} if the string cannot be parsed
      */
     // region File I/O
-    public static AtBMoraleLevel parseFromString(final String moraleLevel) {
+    public static ContractMoraleLevel parseFromString(final String moraleLevel) {
         try {
             return valueOf(moraleLevel);
         } catch (Exception ignored) {
@@ -230,8 +230,8 @@ public enum AtBMoraleLevel {
         } catch (Exception ignored) {
         }
 
-        MMLogger.create(AtBMoraleLevel.class)
-              .error("Unable to parse {} into an AtBMoraleLevel. Returning STALEMATE.", moraleLevel);
+        MMLogger.create(ContractMoraleLevel.class)
+              .error("Unable to parse {} into an ContractMoraleLevel. Returning STALEMATE.", moraleLevel);
         return STALEMATE;
     }
     // endregion File I/O

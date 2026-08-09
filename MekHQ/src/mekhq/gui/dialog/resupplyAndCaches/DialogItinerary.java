@@ -67,7 +67,7 @@ import megamek.client.ui.util.UIUtil;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.Campaign.AdministratorSpecialization;
 import mekhq.campaign.mission.AtBContract;
-import mekhq.campaign.mission.enums.AtBMoraleLevel;
+import mekhq.campaign.mission.enums.ContractMoraleLevel;
 import mekhq.campaign.mission.resupplyAndCaches.Resupply;
 import mekhq.campaign.mission.resupplyAndCaches.Resupply.ResupplyType;
 import mekhq.campaign.parts.Part;
@@ -359,7 +359,7 @@ public class DialogItinerary {
         return switch (resupplyType) {
             case RESUPPLY_NORMAL -> {
                 AtBContract contract = resupply.getContract();
-                AtBMoraleLevel morale = contract.getMoraleLevel();
+                ContractMoraleLevel morale = contract.getMoraleLevel();
 
                 yield getFormattedTextAt(RESOURCE_BUNDLE,
                       morale.toString().toLowerCase() + "Supplies" + randomInt(20) + ".text",

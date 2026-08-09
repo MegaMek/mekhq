@@ -71,7 +71,7 @@ import mekhq.campaign.digitalGM.stratCon.StratConCampaignState;
 import mekhq.campaign.events.persons.PersonChangedEvent;
 import mekhq.campaign.force.Formation;
 import mekhq.campaign.mission.AtBContract;
-import mekhq.campaign.mission.enums.AtBMoraleLevel;
+import mekhq.campaign.mission.enums.ContractMoraleLevel;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.enums.PersonnelRole;
 import mekhq.campaign.personnel.enums.PersonnelStatus;
@@ -1073,7 +1073,7 @@ public class RandomEventEffectsManager {
         List<AtBContract> potentialTargets = new ArrayList<>();
 
         for (AtBContract contract : campaign.getActiveAtBContracts()) {
-            AtBMoraleLevel currentMorale = contract.getMoraleLevel();
+            ContractMoraleLevel currentMorale = contract.getMoraleLevel();
 
             if (!currentMorale.isOverwhelming()) {
                 potentialTargets.add(contract);
@@ -1087,7 +1087,7 @@ public class RandomEventEffectsManager {
         AtBContract target = getRandomItem(potentialTargets);
 
         int moraleOrdinal = target.getMoraleLevel().ordinal();
-        target.setMoraleLevel(AtBMoraleLevel.values()[moraleOrdinal + 1]);
+        target.setMoraleLevel(ContractMoraleLevel.values()[moraleOrdinal + 1]);
 
         String colorOpen = spanOpeningWithCustomColor(ReportingUtilities.getNegativeColor());
 
