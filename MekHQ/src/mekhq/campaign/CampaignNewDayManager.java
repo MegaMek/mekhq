@@ -1379,7 +1379,7 @@ public class CampaignNewDayManager {
         }
 
         if (today.getDayOfWeek().equals(DayOfWeek.MONDAY)) {
-            campaign.getPlayerForce().getReputation().initializeReputation(campaign);
+            campaign.getPlayerForce().getCamOpsReputation().initializeReputation(campaign);
         }
     }
 

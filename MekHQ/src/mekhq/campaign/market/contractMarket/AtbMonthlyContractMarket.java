@@ -42,7 +42,7 @@ import static mekhq.campaign.enums.DailyReportType.GENERAL;
 import static mekhq.campaign.enums.DailyReportType.PERSONNEL;
 import static mekhq.campaign.enums.DailyReportType.SKILL_CHECKS;
 import static mekhq.campaign.mission.ContractDifficulty.calculateContractDifficulty;
-import static mekhq.campaign.mission.newContract.ClanHomeworldsExclusion.violatesHomeworldsExclusion;
+import static mekhq.campaign.mission.newContract.contractGeneration.targetFinder.ClanHomeworldsExclusion.violatesHomeworldsExclusion;
 import static mekhq.campaign.personnel.PersonnelOptions.ADMIN_NETWORKER;
 import static mekhq.campaign.personnel.PersonnelOptions.EDGE_COMMANDER_NEGOTIATION;
 import static mekhq.campaign.personnel.skills.SkillType.S_NEGOTIATION;
@@ -311,7 +311,7 @@ public class AtbMonthlyContractMarket extends AbstractContractMarket {
                 while ((retries > 0) && (contract == null)) {
                     Faction employer =
                           RandomFactionGenerator.getInstance().getRandomEmployerFaction(campaign.getCurrentLocation(),
-                                campaign.getLocalDate(), null, isMercenaryCampaign);
+                                campaign.getLocalDate(), isMercenaryCampaign);
                     if (employer == null) {
                         retries--;
                         continue;
@@ -481,7 +481,6 @@ public class AtbMonthlyContractMarket extends AbstractContractMarket {
                 Faction rerolledEmployer = RandomFactionGenerator.getInstance()
                                                  .getRandomEmployerFaction(campaign.getCurrentLocation(),
                                                        campaign.getLocalDate(),
-                                                       null,
                                                        true);
                 employer = rerolledEmployer == null ? null : rerolledEmployer.getShortName();
                 if ((employer != null) && !Factions.getInstance().getFaction(employer).isMercenary()) {
@@ -560,7 +559,7 @@ public class AtbMonthlyContractMarket extends AbstractContractMarket {
             return generateAtBContract(campaign, employer, unitRatingMod, retries - 1);
         }
 
-        final ForceReputationController reputation = campaign.getPlayerForce().getReputation();
+        final ForceReputationController reputation = campaign.getPlayerForce().getCamOpsReputation();
         final SkillLevel campaignSkillLevel = reputation == null ?
                                                     REGULAR :
                                                     campaign.getPlayerForce()
@@ -856,7 +855,7 @@ public class AtbMonthlyContractMarket extends AbstractContractMarket {
         }
 
         // Reputation multiplier
-        double reputationFactor = campaign.getPlayerForce().getReputation().getReputationFactor();
+        double reputationFactor = campaign.getPlayerForce().getCamOpsReputation().getReputationFactor();
 
         if (campaignOptions.isClampReputationPayMultiplier()) {
             reputationFactor = Math.clamp(reputationFactor, 0.5, 2.0);

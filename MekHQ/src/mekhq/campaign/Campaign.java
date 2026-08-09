@@ -5017,19 +5017,19 @@ public class Campaign implements ITechManager {
     }
 
     /**
-     * @deprecated Use {@link PlayerForce#getReputation()} directly.
+     * @deprecated Use {@link PlayerForce#getCamOpsReputation()} directly.
      */
     @Deprecated(since = "0.51.01", forRemoval = true)
     public ForceReputationController getReputation() {
-        return getPlayerForce().getReputation();
+        return getPlayerForce().getCamOpsReputation();
     }
 
     /**
-     * @deprecated Use {@link PlayerForce#setReputation(ForceReputationController)} directly.
+     * @deprecated Use {@link PlayerForce#setCamOpsReputation(ForceReputationController)} directly.
      */
     @Deprecated(since = "0.51.01", forRemoval = true)
     public void setReputation(ForceReputationController reputation) {
-        getPlayerForce().setReputation(reputation);
+        getPlayerForce().setCamOpsReputation(reputation);
     }
 
     /**
@@ -5396,7 +5396,7 @@ public class Campaign implements ITechManager {
         }
 
         MHQXMLUtility.writeSimpleXMLOpenTag(writer, indent++, "reputation");
-        getPlayerForce().getReputation().writeReputationToXML(writer, indent);
+        getPlayerForce().getCamOpsReputation().writeReputationToXML(writer, indent);
         MHQXMLUtility.writeSimpleXMLCloseTag(writer, --indent, "reputation");
         MHQXMLUtility.writeSimpleXMLTag(writer, indent, "chaosCampaignReputation",
               getPlayerForce().getChaosCampaignReputation());

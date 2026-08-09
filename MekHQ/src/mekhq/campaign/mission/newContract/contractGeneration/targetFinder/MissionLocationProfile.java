@@ -30,14 +30,13 @@
  * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
  * affiliated with Microsoft.
  */
-package mekhq.campaign.mission.newContract;
+package mekhq.campaign.mission.newContract.contractGeneration.targetFinder;
 
 import java.time.LocalDate;
 import java.util.Collections;
 import java.util.List;
 
 import mekhq.campaign.location.ILocation;
-import mekhq.campaign.mission.newContract.targetFinder.MissionTargetFinder;
 import mekhq.campaign.universe.Faction;
 import mekhq.campaign.universe.PlanetarySystem;
 
@@ -164,7 +163,7 @@ public enum MissionLocationProfile {
      * location tier and {@link EnemySelectionProfile#OCCUPYING_POWER}'s enemy preference, so that when guerrilla
      * contracts pick an occupying enemy, the location tier's flipped-world search agrees on what "recent" means.
      */
-    public static final int OCCUPIED_TERRITORY_LOOKBACK_YEARS = 10;
+    public static final int OCCUPIED_TERRITORY_LOOK_BACK_YEARS = 10;
 
     /**
      * @return {@code true} if the final pick from this profile's candidate list should be weighted by how valuable

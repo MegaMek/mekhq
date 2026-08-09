@@ -41,7 +41,7 @@ import static org.mockito.Mockito.when;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.mission.AtBContract;
 import mekhq.campaign.mission.enums.AtBContractType;
-import mekhq.campaign.mission.newContract.EnemySelectionProfile;
+import mekhq.campaign.mission.newContract.contractGeneration.targetFinder.EnemySelectionProfile;
 import mekhq.campaign.universe.Faction;
 import mekhq.campaign.universe.RandomFactionGenerator;
 import org.junit.jupiter.api.AfterEach;

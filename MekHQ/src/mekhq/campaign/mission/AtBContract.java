@@ -182,7 +182,7 @@ public class AtBContract extends Contract {
     }
 
     public void calculateLength(final boolean variable) {
-        setLengthInMonths(getContractType().calculateLength(variable));
+        setLengthInMonths(getContractType().getChaosObjectiveType().calculateLength(variable));
     }
 
     /**

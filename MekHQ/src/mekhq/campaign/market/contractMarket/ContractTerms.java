@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2024-2025 The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2024-2026 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -53,7 +53,7 @@ public class ContractTerms {
 
     public ContractTerms(AtBContractType mission, Faction employer, double reputationFactor, LocalDate date) {
         operationsTempoMultiplier = mission.getOperationsTempoMultiplier();
-        baseLength = mission.getConstantLength();
+        baseLength = mission.getChaosObjectiveType().getMonthsLength();
         addMissionTypeModifiers(mission);
         addEmployerModifiers(employer, date);
         addUnitReputationModifiers(reputationFactor);
