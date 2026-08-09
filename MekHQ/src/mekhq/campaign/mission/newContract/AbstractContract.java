@@ -41,6 +41,8 @@ import jakarta.annotation.Nullable;
 import megamek.client.ui.util.PlayerColour;
 import megamek.common.enums.SkillLevel;
 import megamek.common.icons.Camouflage;
+import mekhq.campaign.Campaign;
+import mekhq.campaign.CurrentLocation;
 import mekhq.campaign.JumpPath;
 import mekhq.campaign.digitalGM.stratCon.StratConCampaignState;
 import mekhq.campaign.finances.Money;
@@ -235,7 +237,8 @@ public abstract class AbstractContract {
         this.trackCount = trackCount;
     }
 
-    public JumpPath getCachedJumpPath() {
+    /** Generally you want to use {@link ContractUtilities#getJumpPath(Campaign, AbstractContract, CurrentLocation)} */
+    public @Nullable JumpPath getCachedJumpPathDirect() {
         return cachedJumpPath;
     }
 
@@ -361,11 +364,11 @@ public abstract class AbstractContract {
         return systemsTargetData.getSystemName(currentDate);
     }
 
-    public @Nullable String getTargetPlanetId() {
+    public String getTargetPlanetId() {
         return systemsTargetData.planetId();
     }
 
-    public Planet getTargetPlanet() {
+    public @Nullable Planet getTargetPlanet() {
         return systemsTargetData.getPlanet();
     }
 

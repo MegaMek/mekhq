@@ -230,7 +230,7 @@ public class MissionTargetFinder {
     public List<PlanetarySystem> findRearAreaTargets(Faction attacker, Faction defender, ILocation location,
           double radius, LocalDate date) {
         Set<PlanetarySystem> interior = new HashSet<>(findAllDefenderTargets(defender, location, radius, date));
-        interior.removeAll(borderTracker.getBorderSystems(attacker, defender, location, radius));
+        borderTracker.getBorderSystems(attacker, defender, location, radius).forEach(interior::remove);
         return new ArrayList<>(interior);
     }
 
@@ -289,7 +289,7 @@ public class MissionTargetFinder {
         }
 
         Set<PlanetarySystem> deepSystems = new HashSet<>(defenderSystems);
-        deepSystems.removeAll(borderTracker.getBorderSystems(attacker, defender, location, radius));
+        borderTracker.getBorderSystems(attacker, defender, location, radius).forEach(deepSystems::remove);
         return new ArrayList<>(deepSystems);
     }
 

@@ -398,6 +398,7 @@ public class FactionStandingUtilities {
      * @param overridingCommandCircuitRequirements {@code true} if command circuit requirements are overridden
      * @param isGM                                 {@code true} if GM mode is enabled
      * @param factionStandings                     player faction standing data
+     * @param employerCode                         employer faction code
      *
      * @return {@code true} if command circuit access should be used; {@code false} otherwise
      *

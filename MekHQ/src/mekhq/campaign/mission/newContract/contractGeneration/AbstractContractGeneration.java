@@ -100,7 +100,7 @@ public class AbstractContractGeneration {
         // Step 5: Force Ratings (skill and equipment of both sides)
         PlayerForce playerForce = campaign.getPlayerForce();
         PlanetarySystem targetSystem = Systems.getInstance().getSystemById(systemsTargetData.systemId());
-        Planet targetPlanet = targetSystem.getPlanetById(systemsTargetData.planetId());
+        Planet targetPlanet = targetSystem == null ? null : targetSystem.getPlanetById(systemsTargetData.planetId());
         setForceRatings(playerForce,
               campaignOptions,
               currentDate,
@@ -169,7 +169,7 @@ public class AbstractContractGeneration {
         ContractImportance importance = ContractImportance.from(employerData.type(), objectiveType,
               planetStrategicValue);
 
-        boolean isPlayerAttacker = isPlayerAttacker(objectiveType);
+        boolean isPlayerAttacker = objectiveType.isAttacker();
         int year = currentDate.getYear();
         boolean scaleToPlayer = campaignOptions.get(CampaignOption.USE_DYNAMIC_DIFFICULTY);
 
@@ -223,17 +223,6 @@ public class AbstractContractGeneration {
         }
 
         return averageSkill;
-    }
-
-    /**
-     * A player fielding a garrison or training cadre is holding ground rather than taking it; every other objective is
-     * an offensive one.
-     */
-    static boolean isPlayerAttacker(ChaosObjectiveType objectiveType) {
-        return switch (objectiveType) {
-            case GARRISON, CADRE_DUTY -> false;
-            default -> true;
-        };
     }
 
     private static void setContractTerms(ChaosObjectiveType objectiveType, ChaosEmployerType employerType,
