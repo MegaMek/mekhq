@@ -395,7 +395,7 @@ public abstract class AbstractContract {
     }
 
     public ContractObjectiveType getObjectiveType() {
-        return objectiveData.opposingObjectiveType();
+        return objectiveData.playerObjectiveType();
     }
 
     public ContractObjectiveType getOpposingObjectiveType() {

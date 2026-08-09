@@ -1020,7 +1020,7 @@ public class AtBContract extends Contract {
         setSigningBonusAmount(contract.getSigningBonusAmount());
 
         /* Guess at AtBContract values */
-        ContractObjectiveType contractType = getAtBContractType(contract);
+        ContractObjectiveType contractType = getContractObjectiveType(contract);
         setContractTypeAndName(contractType);
 
         Faction f = Factions.getInstance()
@@ -1059,7 +1059,7 @@ public class AtBContract extends Contract {
         }
     }
 
-    private static ContractObjectiveType getAtBContractType(Contract contract) {
+    private static ContractObjectiveType getContractObjectiveType(Contract contract) {
         ContractObjectiveType contractType = null;
         for (final ContractObjectiveType type : ContractObjectiveType.values()) {
             if (type.toString().equalsIgnoreCase(contract.getContractTypeName())) {

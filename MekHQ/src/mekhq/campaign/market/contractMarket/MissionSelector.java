@@ -47,7 +47,7 @@ public class MissionSelector {
      * @param margin The margin of success from a Negotiation check
      * @param isClan Whether the player unit is a Clan faction
      *
-     * @return The AtBContractType representing the type of mission for the contract
+     * @return The ContractObjectiveType representing the type of mission for the contract
      */
     public static ContractObjectiveType getInnerSphereClanMission(int roll, int margin, boolean isClan) {
         if (isClan) {
@@ -78,7 +78,7 @@ public class MissionSelector {
      * @param margin The margin of success from a Negotiation check
      * @param isClan Whether the player unit is a Clan faction
      *
-     * @return The AtBContractType representing the type of mission for the contract
+     * @return The ContractObjectiveType representing the type of mission for the contract
      */
     public static ContractObjectiveType getIndependentMission(int roll, int margin, boolean isClan) {
         if (isClan) {
@@ -109,7 +109,7 @@ public class MissionSelector {
      * @param margin The margin of success from a Negotiation check
      * @param isClan Whether the player unit is a Clan faction
      *
-     * @return The AtBContractType representing the type of mission for the contract
+     * @return The ContractObjectiveType representing the type of mission for the contract
      */
     public static ContractObjectiveType getCorporationMission(int roll, int margin, boolean isClan) {
         if (isClan) {
@@ -138,7 +138,7 @@ public class MissionSelector {
      * @param roll   The result of a 2d6 roll
      * @param margin The margin of success from a Negotiation check
      *
-     * @return The AtBContractType representing the type of mission for the contract
+     * @return The ContractObjectiveType representing the type of mission for the contract
      */
     public static ContractObjectiveType getPirateMission(int roll, int margin) {
         roll += margin;
