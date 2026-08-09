@@ -266,7 +266,7 @@ public record CampaignXmlParser(InputStream is, MekHQ app) {
                 } else if (nodeName.equalsIgnoreCase("reputation")) {
                     ForceReputationController reputation = new ForceReputationController().generateInstanceFromXML(
                           childNode);
-                    playerForce.setReputation(reputation);
+                    playerForce.setCamOpsReputation(reputation);
                 } else if (nodeName.equalsIgnoreCase("chaosCampaignReputation")) {
                     playerForce.setChaosCampaignReputation(parseInt(childNode.getTextContent(),
                           STARTING_REPUTATION_SCORE));

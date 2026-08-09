@@ -364,7 +364,7 @@ public class AtBMonthlyUnitMarket extends AbstractUnitMarket {
           final int priceModifier) {
         if (faction == null) {
             faction = RandomFactionGenerator.getInstance().getRandomEmployerFaction(campaign.getCurrentLocation(),
-                  campaign.getLocalDate(), null, campaign.isMercenaryCampaign());
+                  campaign.getLocalDate(), campaign.isMercenaryCampaign());
         }
 
         if (faction == null) {

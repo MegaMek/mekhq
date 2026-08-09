@@ -402,7 +402,7 @@ public class DataLoadingDialog extends AbstractMHQDialogBasic implements Propert
                 // initialize reputation
                 ForceReputationController reputationController = new ForceReputationController();
                 reputationController.initializeReputation(campaign);
-                campaign.getPlayerForce().setReputation(reputationController);
+                campaign.getPlayerForce().setCamOpsReputation(reputationController);
 
                 // initialize starting faction standings
                 CampaignOptions campaignOptions = campaign.getCampaignOptions();

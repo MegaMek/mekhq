@@ -105,7 +105,7 @@ public class ContractMarketAtBGenerationTests {
 
         ForceReputationController camOpsReputation = mock(ForceReputationController.class);
         when(camOpsReputation.getReputationFactor()).thenReturn(0.0);
-        when(campaign.getPlayerForce().getReputation()).thenReturn(camOpsReputation);
+        when(campaign.getPlayerForce().getCamOpsReputation()).thenReturn(camOpsReputation);
 
         Faction campaignFaction = mock(Faction.class);
         when(campaignFaction.isMercenary()).thenReturn(true);
@@ -209,7 +209,7 @@ public class ContractMarketAtBGenerationTests {
 
         ForceReputationController camOpsReputation = mock(ForceReputationController.class);
         when(camOpsReputation.getReputationFactor()).thenReturn(0.0);
-        when(campaign.getPlayerForce().getReputation()).thenReturn(camOpsReputation);
+        when(campaign.getPlayerForce().getCamOpsReputation()).thenReturn(camOpsReputation);
 
         Faction campaignFaction = mock(Faction.class);
         when(campaignFaction.isMercenary()).thenReturn(true);
@@ -316,7 +316,7 @@ public class ContractMarketAtBGenerationTests {
 
         ForceReputationController camOpsReputation = mock(ForceReputationController.class);
         when(camOpsReputation.getReputationFactor()).thenReturn(0.0);
-        when(campaign.getPlayerForce().getReputation()).thenReturn(camOpsReputation);
+        when(campaign.getPlayerForce().getCamOpsReputation()).thenReturn(camOpsReputation);
 
         Faction campaignFaction = mock(Faction.class);
         when(campaignFaction.isMercenary()).thenReturn(true);
@@ -423,7 +423,7 @@ public class ContractMarketAtBGenerationTests {
 
         ForceReputationController camOpsReputation = mock(ForceReputationController.class);
         when(camOpsReputation.getReputationFactor()).thenReturn(0.0);
-        when(campaign.getPlayerForce().getReputation()).thenReturn(camOpsReputation);
+        when(campaign.getPlayerForce().getCamOpsReputation()).thenReturn(camOpsReputation);
 
         Faction campaignFaction = mock(Faction.class);
         when(campaignFaction.isMercenary()).thenReturn(true);
@@ -539,7 +539,7 @@ public class ContractMarketAtBGenerationTests {
 
         ForceReputationController camOpsReputation = mock(ForceReputationController.class);
         when(camOpsReputation.getReputationFactor()).thenReturn(0.0);
-        when(campaign.getPlayerForce().getReputation()).thenReturn(camOpsReputation);
+        when(campaign.getPlayerForce().getCamOpsReputation()).thenReturn(camOpsReputation);
 
         Faction campaignFaction = mock(Faction.class);
         when(campaignFaction.isMercenary()).thenReturn(true);
@@ -650,7 +650,7 @@ public class ContractMarketAtBGenerationTests {
 
         ForceReputationController camOpsReputation = mock(ForceReputationController.class);
         when(camOpsReputation.getReputationFactor()).thenReturn(0.0);
-        when(campaign.getPlayerForce().getReputation()).thenReturn(camOpsReputation);
+        when(campaign.getPlayerForce().getCamOpsReputation()).thenReturn(camOpsReputation);
 
         Faction campaignFaction = mock(Faction.class);
         when(campaignFaction.isMercenary()).thenReturn(true);
@@ -687,7 +687,7 @@ public class ContractMarketAtBGenerationTests {
 
         ForceReputationController camOpsReputation = mock(ForceReputationController.class);
         when(camOpsReputation.getReputationFactor()).thenReturn(0.0);
-        when(campaign.getPlayerForce().getReputation()).thenReturn(camOpsReputation);
+        when(campaign.getPlayerForce().getCamOpsReputation()).thenReturn(camOpsReputation);
 
         Faction campaignFaction = mock(Faction.class);
         when(campaignFaction.isMercenary()).thenReturn(true);
@@ -794,7 +794,7 @@ public class ContractMarketAtBGenerationTests {
 
         ForceReputationController camOpsReputation = mock(ForceReputationController.class);
         when(camOpsReputation.getReputationFactor()).thenReturn(0.0);
-        when(campaign.getPlayerForce().getReputation()).thenReturn(camOpsReputation);
+        when(campaign.getPlayerForce().getCamOpsReputation()).thenReturn(camOpsReputation);
 
         Faction campaignFaction = mock(Faction.class);
         when(campaignFaction.isMercenary()).thenReturn(true);
@@ -893,7 +893,7 @@ public class ContractMarketAtBGenerationTests {
 
         ForceReputationController camOpsReputation = mock(ForceReputationController.class);
         when(camOpsReputation.getReputationFactor()).thenReturn(0.0);
-        when(campaign.getPlayerForce().getReputation()).thenReturn(camOpsReputation);
+        when(campaign.getPlayerForce().getCamOpsReputation()).thenReturn(camOpsReputation);
 
         Faction campaignFaction = mock(Faction.class);
         when(campaignFaction.isMercenary()).thenReturn(true);
@@ -1000,7 +1000,7 @@ public class ContractMarketAtBGenerationTests {
 
         ForceReputationController camOpsReputation = mock(ForceReputationController.class);
         when(camOpsReputation.getReputationFactor()).thenReturn(0.0);
-        when(campaign.getPlayerForce().getReputation()).thenReturn(camOpsReputation);
+        when(campaign.getPlayerForce().getCamOpsReputation()).thenReturn(camOpsReputation);
 
         Faction campaignFaction = mock(Faction.class);
         when(campaignFaction.isMercenary()).thenReturn(true);
@@ -1103,7 +1103,7 @@ public class ContractMarketAtBGenerationTests {
 
         ForceReputationController camOpsReputation = mock(ForceReputationController.class);
         when(camOpsReputation.getReputationFactor()).thenReturn(0.0);
-        when(campaign.getPlayerForce().getReputation()).thenReturn(camOpsReputation);
+        when(campaign.getPlayerForce().getCamOpsReputation()).thenReturn(camOpsReputation);
 
         Faction campaignFaction = mock(Faction.class);
         when(campaignFaction.isMercenary()).thenReturn(true);
@@ -1210,7 +1210,7 @@ public class ContractMarketAtBGenerationTests {
 
         ForceReputationController camOpsReputation = mock(ForceReputationController.class);
         when(camOpsReputation.getReputationFactor()).thenReturn(0.0);
-        when(campaign.getPlayerForce().getReputation()).thenReturn(camOpsReputation);
+        when(campaign.getPlayerForce().getCamOpsReputation()).thenReturn(camOpsReputation);
 
         Faction campaignFaction = mock(Faction.class);
         when(campaignFaction.isMercenary()).thenReturn(true);
@@ -1317,7 +1317,7 @@ public class ContractMarketAtBGenerationTests {
 
         ForceReputationController camOpsReputation = mock(ForceReputationController.class);
         when(camOpsReputation.getReputationFactor()).thenReturn(0.0);
-        when(campaign.getPlayerForce().getReputation()).thenReturn(camOpsReputation);
+        when(campaign.getPlayerForce().getCamOpsReputation()).thenReturn(camOpsReputation);
 
         Faction campaignFaction = mock(Faction.class);
         when(campaignFaction.isMercenary()).thenReturn(true);
@@ -1424,7 +1424,7 @@ public class ContractMarketAtBGenerationTests {
 
         ForceReputationController camOpsReputation = mock(ForceReputationController.class);
         when(camOpsReputation.getReputationFactor()).thenReturn(0.0);
-        when(campaign.getPlayerForce().getReputation()).thenReturn(camOpsReputation);
+        when(campaign.getPlayerForce().getCamOpsReputation()).thenReturn(camOpsReputation);
 
         Faction campaignFaction = mock(Faction.class);
         when(campaignFaction.isMercenary()).thenReturn(true);
@@ -1530,7 +1530,7 @@ public class ContractMarketAtBGenerationTests {
 
         ForceReputationController camOpsReputation = mock(ForceReputationController.class);
         when(camOpsReputation.getReputationFactor()).thenReturn(0.0);
-        when(campaign.getPlayerForce().getReputation()).thenReturn(camOpsReputation);
+        when(campaign.getPlayerForce().getCamOpsReputation()).thenReturn(camOpsReputation);
 
         Faction campaignFaction = mock(Faction.class);
         when(campaignFaction.isMercenary()).thenReturn(false);
@@ -1638,7 +1638,7 @@ public class ContractMarketAtBGenerationTests {
 
         ForceReputationController camOpsReputation = mock(ForceReputationController.class);
         when(camOpsReputation.getReputationFactor()).thenReturn(0.0);
-        when(campaign.getPlayerForce().getReputation()).thenReturn(camOpsReputation);
+        when(campaign.getPlayerForce().getCamOpsReputation()).thenReturn(camOpsReputation);
 
         Faction campaignFaction = mock(Faction.class);
         when(campaignFaction.isMercenary()).thenReturn(false);
@@ -1745,7 +1745,7 @@ public class ContractMarketAtBGenerationTests {
 
         ForceReputationController camOpsReputation = mock(ForceReputationController.class);
         when(camOpsReputation.getReputationFactor()).thenReturn(0.0);
-        when(campaign.getPlayerForce().getReputation()).thenReturn(camOpsReputation);
+        when(campaign.getPlayerForce().getCamOpsReputation()).thenReturn(camOpsReputation);
 
         Faction campaignFaction = mock(Faction.class);
         when(campaignFaction.isMercenary()).thenReturn(false);
@@ -1853,7 +1853,7 @@ public class ContractMarketAtBGenerationTests {
 
         ForceReputationController camOpsReputation = mock(ForceReputationController.class);
         when(camOpsReputation.getReputationFactor()).thenReturn(0.0);
-        when(campaign.getPlayerForce().getReputation()).thenReturn(camOpsReputation);
+        when(campaign.getPlayerForce().getCamOpsReputation()).thenReturn(camOpsReputation);
 
         Faction campaignFaction = mock(Faction.class);
         when(campaignFaction.isMercenary()).thenReturn(false);

@@ -171,7 +171,7 @@ class ScenarioSetupForcesTest {
         campaign.getPlayerForce().setName("Test Player");
         var reputationController = mock(ForceReputationController.class);
         when(reputationController.getAverageSkillLevel()).thenReturn(SkillLevel.REGULAR);
-        campaign.getPlayerForce().setReputation(reputationController);
+        campaign.getPlayerForce().setCamOpsReputation(reputationController);
         Formation formation = new Formation("Heroes");
         Formation superFormation = campaign.getPlayerForce().getFormation(0);
         campaign.getPlayerForce().addFormation(formation, superFormation, campaign);

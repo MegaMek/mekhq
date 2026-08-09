@@ -46,7 +46,7 @@ import java.util.Map;
 
 import mekhq.campaign.digitalGM.stratCon.StratConContractDefinition.ObjectiveParameters;
 import mekhq.campaign.digitalGM.stratCon.StratConContractDefinition.StrategicObjectiveType;
-import mekhq.campaign.mission.enums.AtBContractType;
+import mekhq.campaign.mission.enums.ContractObjectiveType;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
 
@@ -99,9 +99,9 @@ class StratConContractDefinitionSerializationTest {
 
     @Test
     void manifestMappingRoundTripsAndCarriesLicense(@TempDir Path tempDir) throws IOException {
-        Map<AtBContractType, String> mapping = new EnumMap<>(AtBContractType.class);
-        mapping.put(AtBContractType.GARRISON_DUTY, "GarrisonDuty.json");
-        mapping.put(AtBContractType.OBJECTIVE_RAID, "ObjectiveRaid.json");
+        Map<ContractObjectiveType, String> mapping = new EnumMap<>(ContractObjectiveType.class);
+        mapping.put(ContractObjectiveType.GARRISON_DUTY, "GarrisonDuty.json");
+        mapping.put(ContractObjectiveType.OBJECTIVE_RAID, "ObjectiveRaid.json");
 
         File out = tempDir.resolve("ContractDefinitionManifest.json").toFile();
         assertTrue(StratConContractDefinition.writeManifestMapping(out, mapping));
@@ -109,33 +109,33 @@ class StratConContractDefinitionSerializationTest {
         String content = Files.readString(out.toPath());
         assertTrue(content.startsWith("# MegaMek Data (C)"), "manifest should begin with the '#' license header");
 
-        Map<AtBContractType, String> reloaded = StratConContractDefinition.readManifestMapping(out);
+        Map<ContractObjectiveType, String> reloaded = StratConContractDefinition.readManifestMapping(out);
         assertEquals(2, reloaded.size());
-        assertEquals("GarrisonDuty.json", reloaded.get(AtBContractType.GARRISON_DUTY));
-        assertEquals("ObjectiveRaid.json", reloaded.get(AtBContractType.OBJECTIVE_RAID));
+        assertEquals("GarrisonDuty.json", reloaded.get(ContractObjectiveType.GARRISON_DUTY));
+        assertEquals("ObjectiveRaid.json", reloaded.get(ContractObjectiveType.OBJECTIVE_RAID));
     }
 
     @Test
     void manifestMappingOverwritesExistingTypeMapping(@TempDir Path tempDir) {
-        Map<AtBContractType, String> mapping = new EnumMap<>(AtBContractType.class);
-        mapping.put(AtBContractType.GARRISON_DUTY, "GarrisonDuty.json");
+        Map<ContractObjectiveType, String> mapping = new EnumMap<>(ContractObjectiveType.class);
+        mapping.put(ContractObjectiveType.GARRISON_DUTY, "GarrisonDuty.json");
         File out = tempDir.resolve("ContractDefinitionManifest.json").toFile();
         assertTrue(StratConContractDefinition.writeManifestMapping(out, mapping));
 
         // re-mapping the same contract type replaces the file name rather than adding a duplicate
-        Map<AtBContractType, String> updated = StratConContractDefinition.readManifestMapping(out);
-        updated.put(AtBContractType.GARRISON_DUTY, "CustomGarrison.json");
+        Map<ContractObjectiveType, String> updated = StratConContractDefinition.readManifestMapping(out);
+        updated.put(ContractObjectiveType.GARRISON_DUTY, "CustomGarrison.json");
         assertTrue(StratConContractDefinition.writeManifestMapping(out, updated));
 
-        Map<AtBContractType, String> reloaded = StratConContractDefinition.readManifestMapping(out);
+        Map<ContractObjectiveType, String> reloaded = StratConContractDefinition.readManifestMapping(out);
         assertEquals(1, reloaded.size());
-        assertEquals("CustomGarrison.json", reloaded.get(AtBContractType.GARRISON_DUTY));
+        assertEquals("CustomGarrison.json", reloaded.get(ContractObjectiveType.GARRISON_DUTY));
     }
 
     @Test
     void readManifestMappingReturnsEmptyForMissingFile(@TempDir Path tempDir) {
         // a checkout without a user manifest must yield an empty (never null) map so registration can start fresh
-        Map<AtBContractType, String> mapping =
+        Map<ContractObjectiveType, String> mapping =
               StratConContractDefinition.readManifestMapping(tempDir.resolve("absent.json").toFile());
         assertNotNull(mapping);
         assertTrue(mapping.isEmpty());

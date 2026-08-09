@@ -235,7 +235,7 @@ public class ResolverTest {
         var reputationController = mock(ForceReputationController.class);
         when(reputationController.getAverageSkillLevel()).thenReturn(SkillLevel.REGULAR);
 
-        campaign.getPlayerForce().setReputation(reputationController);
+        campaign.getPlayerForce().setCamOpsReputation(reputationController);
         var force = new Formation("Heroes");
 
         Formation superFormation = campaign.getPlayerForce().getFormation(0);
