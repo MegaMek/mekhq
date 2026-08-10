@@ -859,7 +859,7 @@ public class CampaignGUI extends JPanel {
             }
         } else {
             if (true) {
-                new ChaosContractMarketDialogTest();
+                new ChaosContractMarketDialogTest(getCampaign());
             } else {
                 ContractMarketDialog contractMarketDialog = new ContractMarketDialog(getFrame(), getCampaign());
                 contractMarketDialog.setVisible(true);
