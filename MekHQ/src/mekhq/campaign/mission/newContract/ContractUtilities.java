@@ -38,8 +38,8 @@ import java.time.LocalDate;
 import java.util.Objects;
 
 import jakarta.annotation.Nullable;
+import mekhq.campaign.AbstractLocation;
 import mekhq.campaign.Campaign;
-import mekhq.campaign.CurrentLocation;
 import mekhq.campaign.JumpPath;
 import mekhq.campaign.universe.Planet;
 import mekhq.campaign.universe.PlanetarySystem;
@@ -48,7 +48,7 @@ import mekhq.campaign.universe.factionStanding.FactionStandings;
 
 public class ContractUtilities {
     public static int getTravelDays(Campaign campaign, AbstractContract abstractContract,
-          CurrentLocation currentLocation,
+          AbstractLocation currentLocation,
           boolean isGM, boolean isOverridingCommandCircuitRequirements, FactionStandings factionStandings,
           String employerFactionCode) {
         boolean isUseCommandCircuit = FactionStandingUtilities.isUseCommandCircuit(
@@ -69,7 +69,7 @@ public class ContractUtilities {
     }
 
     public static @Nullable JumpPath getJumpPath(Campaign campaign, AbstractContract abstractContract,
-          CurrentLocation currentLocation) {
+          AbstractLocation currentLocation) {
         // if we don't have a cached jump path, or if the jump path's starting/ending point no longer match the
         // campaign's current location or contract's destination
         JumpPath cachedJumpPath = abstractContract.getCachedJumpPathDirect();
