@@ -93,6 +93,9 @@ import mekhq.campaign.universe.factionStanding.FactionStandings;
 public class PersonnelMarketMekHQ extends NewPersonnelMarket {
     public static final int ALTERNATE_ADVANCED_MEDICAL_RECRUITMENT_MULTIPLIER = 2;
 
+    private static final int DEFAULT_UNIT_REPUTATION_RECRUITMENT_CUTOFF = -25;
+    private static final int CHAOS_UNIT_REPUTATION_RECRUITMENT_CUTOFF = -3;
+
     /**
      * Constructs a personnel market using the MekHQ classic ruleset.
      *
@@ -108,12 +111,35 @@ public class PersonnelMarketMekHQ extends NewPersonnelMarket {
 
         setLowPopulationRecruitmentDivider(7500000);
 
-        boolean isUseChaosReputation = getCampaign().getCampaignOptions().get(CampaignOption.USE_CHAOS_REPUTATION);
-        setUnitReputationRecruitmentCutoff(isUseChaosReputation ? -3 : -25);
+        // The campaign reference isn't available yet at construction time, so we default the cutoff here and refine it
+        // in setCampaign(...) once the campaign has been attached.
+        setUnitReputationRecruitmentCutoff(DEFAULT_UNIT_REPUTATION_RECRUITMENT_CUTOFF);
 
         PersonnelMarketLibraries personnelMarketLibraries = new PersonnelMarketLibraries();
         setClanMarketEntries(personnelMarketLibraries.getClanMarketMekHQ());
         setInnerSphereMarketEntries(personnelMarketLibraries.getInnerSphereMarketMekHQ());
+    }
+
+    /**
+     * {@inheritDoc}
+     *
+     * <p>Once the campaign has been attached, the unit reputation recruitment cutoff is refined based on the
+     * {@link CampaignOption#USE_CHAOS_REPUTATION} campaign option. This can't be done in the constructor because the
+     * campaign reference isn't available at that point.</p>
+     *
+     * @author Illiani
+     * @since 0.50.07
+     */
+    @Override
+    public void setCampaign(Campaign campaign) {
+        super.setCampaign(campaign);
+
+        if (campaign != null) {
+            boolean isUseChaosReputation = campaign.getCampaignOptions().get(CampaignOption.USE_CHAOS_REPUTATION);
+            setUnitReputationRecruitmentCutoff(isUseChaosReputation ?
+                                                     CHAOS_UNIT_REPUTATION_RECRUITMENT_CUTOFF :
+                                                     DEFAULT_UNIT_REPUTATION_RECRUITMENT_CUTOFF);
+        }
     }
 
 
