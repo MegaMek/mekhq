@@ -36,8 +36,10 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.mockStatic;
 import static org.mockito.Mockito.when;
 
+import javax.swing.DefaultComboBoxModel;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -47,8 +49,11 @@ import java.util.TreeMap;
 
 import megamek.common.universe.Faction2;
 import megamek.common.universe.HonorRating;
+import mekhq.campaign.personnel.Person;
 import mekhq.gui.displayWrappers.FactionDisplay;
+import mekhq.gui.utilities.OriginFactionPickerHelper;
 import org.junit.jupiter.api.Test;
+import org.mockito.MockedStatic;
 
 /**
  * Verifies that subordinate formations - the individual regiments declared inside a command's file - are recognised as
@@ -95,6 +100,29 @@ class FactionSubunitTest {
         Faction legacyFaction = new Faction("FS", "Federated Suns");
 
         assertFalse(legacyFaction.isSubunit());
+    }
+
+    @Test
+    void anExistingSubunitOriginIsKeptSoEditingDoesNotLoseIt() {
+        // buildModel documents that a person's current origin is always offered, so that editing a
+        // character whose origin would otherwise be filtered out does not silently drop it. The
+        // subunit exclusion has to respect that, or hand-edited data loses the assignment.
+        Faction subunitOrigin = factionFrom("FS.DaviBrig.Heav", "Davion Heavy Guards", true);
+        Person person = mock(Person.class);
+        when(person.getOriginFaction()).thenReturn(subunitOrigin);
+        when(person.getDateOfBirth()).thenReturn(LocalDate.of(3000, 1, 1));
+
+        try (MockedStatic<Factions> factionsStatic = mockStatic(Factions.class)) {
+            Factions factions = mock(Factions.class);
+            when(factions.getFactions()).thenReturn(List.of(subunitOrigin));
+            factionsStatic.when(Factions::getInstance).thenReturn(factions);
+
+            DefaultComboBoxModel<Faction> model =
+                  OriginFactionPickerHelper.buildModel(person, 3025, null, true);
+
+            assertEquals(1, model.getSize(), "The person's existing origin must still be offered");
+            assertEquals(subunitOrigin, model.getElementAt(0));
+        }
     }
 
     @Test
