@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2025 The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2025-2026 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -145,6 +145,9 @@ public class AssignForceToTowTransportMenu extends AssignForceToTransportMenu {
                     campaign.updateTransportInTransports(TOW_TRANSPORT, towingEnt);
                     MekHQ.triggerEvent(new UnitChangedEvent(towingEnt));
                 }
+
+                // A trailer hitched from the Hangar tab follows its tractor into the TO&E
+                TransportAssignmentMenus.addTrailerToTractorFormation(campaign, transport, unit);
             }
             MekHQ.triggerEvent(new UnitChangedEvent(unit));
 

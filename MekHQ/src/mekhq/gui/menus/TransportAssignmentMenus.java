@@ -55,6 +55,7 @@ import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.enums.CampaignTransportType;
 import mekhq.campaign.events.units.UnitChangedEvent;
+import mekhq.campaign.force.Formation;
 import mekhq.campaign.unit.Unit;
 import mekhq.campaign.unit.enums.TransporterType;
 import mekhq.utilities.MHQInternationalization;
@@ -305,9 +306,27 @@ public final class TransportAssignmentMenus {
         campaign.updateTransportInTransports(TOW_TRANSPORT, head);
         MekHQ.triggerEvent(new UnitChangedEvent(head));
         for (Unit trailer : orderedTrailers) {
+            addTrailerToTractorFormation(campaign, head, trailer);
             MekHQ.triggerEvent(new UnitChangedEvent(trailer));
         }
         return true;
+    }
+
+    /**
+     * Puts a newly hitched trailer into the tractor's TO&amp;E formation so the train stays
+     * together on the org chart. Only fires when the tractor is in a formation and the trailer is
+     * not in one: a trailer the player already placed somewhere in the TO&amp;E is left where it
+     * is.
+     *
+     * @param campaign current campaign
+     * @param tractor  unit heading the train the trailer was hitched into
+     * @param trailer  trailer that was just hitched
+     */
+    static void addTrailerToTractorFormation(Campaign campaign, Unit tractor, Unit trailer) {
+        if ((tractor.getFormationId() != Formation.FORMATION_NONE)
+                  && (trailer.getFormationId() == Formation.FORMATION_NONE)) {
+            campaign.getPlayerForce().addUnitToFormation(trailer, tractor.getFormationId(), campaign);
+        }
     }
 
     /**

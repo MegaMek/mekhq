@@ -41,7 +41,9 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyInt;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
@@ -200,6 +202,38 @@ public class TowTransportTest {
         assertNull(firstTrailer.getTransportAssignment(TOW_TRANSPORT));
         assertNull(secondTrailer.getTransportAssignment(TOW_TRANSPORT));
         assertFalse(tractor.hasTransportedUnits(TOW_TRANSPORT));
+    }
+
+    @Test
+    public void connectTrainAddsFormationlessTrailersToTractorFormation() {
+        Campaign campaign = mockCampaign();
+        Unit tractor = buildTowUnit(campaign, 50.0, false);
+        when(tractor.getEntity().canTow(anyInt())).thenReturn(true);
+        tractor.setFormationId(7);
+        Unit freeTrailer = buildTowUnit(campaign, 10.0, true);
+        Unit placedTrailer = buildTowUnit(campaign, 20.0, true);
+        placedTrailer.setFormationId(3);
+
+        assertTrue(TransportAssignmentMenus.connectTrain(campaign, tractor,
+              List.of(freeTrailer, placedTrailer)));
+
+        // The formation-less trailer follows the tractor into its formation; the trailer the
+        // player already placed in the TO&E stays where it is
+        verify(campaign.getPlayerForce()).addUnitToFormation(freeTrailer, 7, campaign);
+        verify(campaign.getPlayerForce(), never()).addUnitToFormation(eq(placedTrailer), anyInt(), eq(campaign));
+    }
+
+    @Test
+    public void connectTrainLeavesFormationsAloneWhenTractorHasNone() {
+        Campaign campaign = mockCampaign();
+        Unit tractor = buildTowUnit(campaign, 50.0, false);
+        when(tractor.getEntity().canTow(anyInt())).thenReturn(true);
+        Unit trailer = buildTowUnit(campaign, 10.0, true);
+
+        assertTrue(TransportAssignmentMenus.connectTrain(campaign, tractor, List.of(trailer)));
+
+        verify(campaign.getPlayerForce(), never()).addUnitToFormation(any(Unit.class), anyInt(),
+              any(Campaign.class));
     }
 
     @Test
