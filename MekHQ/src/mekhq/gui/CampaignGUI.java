@@ -123,6 +123,7 @@ import mekhq.gui.baseComponents.roundedComponents.RoundedLineBorder;
 import mekhq.gui.baseComponents.roundedComponents.RoundedMMToggleButton;
 import mekhq.gui.dialog.*;
 import mekhq.gui.dialog.glossary.GlossaryDialog;
+import mekhq.gui.dialog.markets.contractMarket.ChaosContractMarketDialogTest;
 import mekhq.gui.enums.MHQTabType;
 import mekhq.gui.menus.MekHQMenuBar;
 import mekhq.gui.model.LocationFilterItem;
@@ -857,8 +858,12 @@ public class CampaignGUI extends JPanel {
                 customizeMissionDialog.setVisible(true);
             }
         } else {
-            ContractMarketDialog contractMarketDialog = new ContractMarketDialog(getFrame(), getCampaign());
-            contractMarketDialog.setVisible(true);
+            if (true) {
+                new ChaosContractMarketDialogTest();
+            } else {
+                ContractMarketDialog contractMarketDialog = new ContractMarketDialog(getFrame(), getCampaign());
+                contractMarketDialog.setVisible(true);
+            }
         }
     }
 
@@ -1230,7 +1235,8 @@ public class CampaignGUI extends JPanel {
             logger.warn("Cannot export person if no one is selected! Ignoring.");
             return;
         }
-        Person selectedPerson = pt.getPersonnelTableModel().getPerson(pt.getPersonnelTable().convertRowIndexToModel(row));
+        Person selectedPerson = pt.getPersonnelTableModel()
+                                      .getPerson(pt.getPersonnelTable().convertRowIndexToModel(row));
         int[] rows = pt.getPersonnelTable().getSelectedRows();
         Person[] people = Arrays.stream(rows)
                                 .mapToObj(j -> pt.getPersonnelTableModel()
