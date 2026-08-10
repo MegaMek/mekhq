@@ -102,9 +102,12 @@ public final class OriginFactionPickerHelper {
      */
     public static DefaultComboBoxModel<Faction> buildModel(Person person, int currentYear,
           LocalDate endDate, boolean showAllFactions) {
+        // Subordinate formations declared inside another command's file are left out: a person's origin is a faction
+        // or a command, never an individual regiment of one.
         List<Faction> orderedFactions = Factions.getInstance()
                                               .getFactions()
                                               .stream()
+                                              .filter(faction -> !faction.isSubunit())
                                               .sorted((a, b) -> a.getFullName(currentYear)
                                                                       .compareToIgnoreCase(b.getFullName(currentYear)))
                                               .toList();
