@@ -47,6 +47,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
+import megamek.common.annotations.Nullable;
 import megamek.common.enums.Gender;
 import megamek.common.loaders.EntityLoadingException;
 import megamek.common.loaders.MekFileParser;
@@ -303,15 +304,34 @@ public class FactionAccoladeEvent {
                 speaker.setSecondaryRole(PersonnelRole.MILITARY_PROMOTER);
             } else if (isLetterFromHeadOfState) {
                 FactionLeaderData leaderData = accoladingFaction.getLeaderForYear(campaign.getGameYear());
-                if (leaderData != null) {
-                    String name = leaderData.getFullTitle(true);
-                    speaker.setGivenName(name);
-                    speaker.setSurname("");
-                    speaker.setGender(leaderData.gender());
-                }
+                applyLeaderIdentity(speaker, leaderData);
             }
         }
         return speaker;
+    }
+
+    /**
+     * Gives the speaker the name and gender of the faction leader who signed the letter.
+     *
+     * <p>The leader's gender is only applied when one is recorded. Command files carry commanding officers whose
+     * sourcebooks never state a gender, so {@link FactionLeaderData#gender()} can be {@code null}; the speaker was
+     * already created with a generated gender, and that is kept rather than cleared.</p>
+     *
+     * @param speaker    the person who will deliver the letter
+     * @param leaderData the leader in power in the current year, or {@code null} if the faction records none
+     */
+    static void applyLeaderIdentity(final Person speaker, final @Nullable FactionLeaderData leaderData) {
+        if (leaderData == null) {
+            return;
+        }
+
+        speaker.setGivenName(leaderData.getFullTitle(true));
+        speaker.setSurname("");
+
+        Gender leaderGender = leaderData.gender();
+        if (leaderGender != null) {
+            speaker.setGender(leaderGender);
+        }
     }
 
     /**
