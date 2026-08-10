@@ -128,7 +128,7 @@ public class PersonnelMarketMekHQ extends NewPersonnelMarket {
      * campaign reference isn't available at that point.</p>
      *
      * @author Illiani
-     * @since 0.50.07
+     * @since 0.51.01
      */
     @Override
     public void setCampaign(Campaign campaign) {
