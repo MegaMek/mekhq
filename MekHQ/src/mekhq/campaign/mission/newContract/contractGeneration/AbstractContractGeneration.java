@@ -96,9 +96,12 @@ public class AbstractContractGeneration {
 
         // Step 2: Type
         ContractObjectiveData objectiveData = pickObjective(contractGenerationModifier, contract);
+        boolean isDefensiveObjective = !objectiveData.playerObjectiveType().getChaosObjectiveType().isAttacker();
 
         // Step 3: Enemy
         EnemyData enemyData = pickEnemy(currentDate, currentLocation, employerData, objectiveData, contract);
+
+        // Step 4: Update Employer for Type
 
         // Step 4: Location
         SystemsTargetData systemsTargetData = pickTargetLocation(currentLocation,
@@ -106,7 +109,9 @@ public class AbstractContractGeneration {
               objectiveData,
               employerData,
               enemyData,
-              contract);
+              contract,
+              isDefensiveObjective,
+              employerData.type().isCurrentSystemEmployer());
         if (systemsTargetData == null) {
             // No valid target planet means nowhere to situate the contract.
             return null;
@@ -347,12 +352,17 @@ public class AbstractContractGeneration {
 
     private static @Nullable SystemsTargetData pickTargetLocation(ILocation currentLocation, LocalDate currentDate,
           ContractObjectiveData objectiveData, EmployerData employerData, EnemyData enemyData,
-          ChaosContract contract) {
-        String targetSystemId = ChaosContractDeterminationLocation.determineContractLocation(objectiveData.playerObjectiveType(),
-              true,
-              employerData.factionCode(),
-              enemyData.factionCode(),
-              currentLocation);
+          ChaosContract contract, boolean isDefensiveObjective, boolean currentSystemEmployer) {
+        boolean shouldAlwaysPickCurrentSystem = isDefensiveObjective && currentSystemEmployer;
+        String currentSystemId = currentLocation.getCurrentSystem().getId();
+
+        String targetSystemId = shouldAlwaysPickCurrentSystem ?
+                                      currentSystemId :
+                                      ChaosContractDeterminationLocation.determineContractLocation(objectiveData.playerObjectiveType(),
+                                            true,
+                                            employerData.factionCode(),
+                                            enemyData.factionCode(),
+                                            currentLocation);
         PlanetarySystem targetSystem = Systems.getInstance().getSystemById(targetSystemId);
         if (targetSystem == null) {
             LOGGER.warn("Target system {} could not be resolved. Contract generation failed.", targetSystemId);
