@@ -34,7 +34,7 @@ package mekhq.campaign.mission.newContract.contractData;
 
 import mekhq.campaign.finances.Money;
 
-public record ContractFinanceData(Money transport, Money monthlyPay
+public record ContractFinanceData(Money transport, Money monthlyPay, Money combatPay
 ) {
     public Money getTotalMonthlyPay(int lengthInMonths) {
         return monthlyPay.multipliedBy(lengthInMonths);

@@ -33,10 +33,12 @@
 package mekhq.campaign.mission.newContract.contractGeneration;
 
 import static java.lang.Math.ceil;
+import static java.lang.Math.round;
 
 import java.time.LocalDate;
 import java.util.Collection;
 import java.util.List;
+import java.util.UUID;
 
 import jakarta.annotation.Nonnull;
 import jakarta.annotation.Nullable;
@@ -47,14 +49,22 @@ import mekhq.campaign.Campaign;
 import mekhq.campaign.JumpPath;
 import mekhq.campaign.campaignOptions.CampaignOption;
 import mekhq.campaign.campaignOptions.CampaignOptions;
+import mekhq.campaign.chaosCampaign.ChaosCampaignUtilities;
+import mekhq.campaign.digitalGM.stratCon.StratConCampaignState;
+import mekhq.campaign.finances.Money;
 import mekhq.campaign.force.Detachment;
 import mekhq.campaign.force.PlayerForce;
 import mekhq.campaign.location.ILocation;
+import mekhq.campaign.mission.enums.ContractMoraleLevel;
+import mekhq.campaign.mission.newContract.AbstractContract;
 import mekhq.campaign.mission.newContract.ChaosContract;
+import mekhq.campaign.mission.newContract.contractData.ContractFinanceData;
 import mekhq.campaign.mission.newContract.contractData.ContractObjectiveData;
 import mekhq.campaign.mission.newContract.contractData.ContractScheduleData;
 import mekhq.campaign.mission.newContract.contractData.EmployerData;
 import mekhq.campaign.mission.newContract.contractData.EnemyData;
+import mekhq.campaign.mission.newContract.contractData.MoraleData;
+import mekhq.campaign.mission.newContract.contractData.RentedFacilitiesData;
 import mekhq.campaign.mission.newContract.contractData.SystemsTargetData;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.reputation.chaosReputation.ChaosReputation;
@@ -67,7 +77,12 @@ import mekhq.campaign.universe.factionStanding.FactionStandings;
 public class AbstractContractGeneration {
     private static final MMLogger LOGGER = MMLogger.create(AbstractContractGeneration.class);
 
-    public static @Nullable ChaosContract createChaosContract(Campaign campaign, CampaignOptions campaignOptions,
+    public final static int DEFAULT_MONTHLY_PAY_MULTIPLIER = 500;
+    public final static int DEFAULT_COMBAT_PAY_MULTIPLIER = 500;
+    public final static int DEFAULT_TRANSPORT_COST_MULTIPLIER = 300;
+    public final static int HIRING_HALL_RETURN_MULTIPLIER = 2;
+
+    public static @Nullable AbstractContract createContract(Campaign campaign, CampaignOptions campaignOptions,
           LocalDate currentDate, Detachment detachment, int contractGenerationModifier, ContractSearchType searchType,
           FactionStandings factionStandings, boolean overridingCommandCircuitRequirements, boolean isGM) {
         final ChaosContract contract = new ChaosContract();
@@ -132,8 +147,70 @@ public class AbstractContractGeneration {
         // Step 8: Track Count & Intensity
         setTrackCount(objectiveType, contract);
 
-        // Step 9: Return the Contract
+        // Step 9: Final Tasks
+        performFinalTasks(currentDate, contract, currentLocation);
+
+        // Step 10: Return the Contract
         return contract;
+    }
+
+    private static void performFinalTasks(LocalDate currentDate, ChaosContract contract,
+          AbstractLocation currentLocation) {
+        // Basic Information
+        UUID contractId = UUID.randomUUID();
+        contract.setContractId(contractId);
+        contract.setMissionStatus(null);
+
+        // Contract Details
+        String contractName = contract.getStartDate().toString() +
+                                    " - " +
+                                    contract.getObjectiveType().name() +
+                                    ": " +
+                                    contract.getEmployerDisplayName() +
+                                    " vs. " +
+                                    contract.getEnemyDisplayName();
+        contract.setContractName(contractName);
+
+        String description = "Placeholder description";
+        contract.setDescription(description);
+
+        // Morale
+        MoraleData moraleData = new MoraleData(ContractMoraleLevel.STALEMATE);
+        contract.setMoraleData(moraleData);
+
+        // Rented Facilities
+        RentedFacilitiesData rentedFacilitiesData = new RentedFacilitiesData(0, 0, 0);
+        contract.setRentedFacilitiesData(rentedFacilitiesData);
+
+        // StratCon
+        StratConCampaignState stratConCampaignState = new StratConCampaignState();
+        contract.setStratConCampaignState(stratConCampaignState);
+
+        // Pay
+        determineContractPay(currentDate, contract, currentLocation);
+    }
+
+    private static void determineContractPay(LocalDate currentDate, ChaosContract contract,
+          AbstractLocation currentLocation) {
+        int monthlyPayInSupportPoints = DEFAULT_MONTHLY_PAY_MULTIPLIER * contract.getScale();
+        monthlyPayInSupportPoints = (int) round(monthlyPayInSupportPoints * contract.getBasePayMultiplier());
+        Money monthlyPay = ChaosCampaignUtilities.getMoneyFromChaosSupportPoints(monthlyPayInSupportPoints);
+
+        int combatPayInSupportPoints = DEFAULT_COMBAT_PAY_MULTIPLIER * contract.getScale();
+        combatPayInSupportPoints = (int) round(combatPayInSupportPoints * contract.getBasePayMultiplier());
+        Money combatPay = ChaosCampaignUtilities.getMoneyFromChaosSupportPoints(combatPayInSupportPoints);
+
+        int transportCostInSupportPoints = DEFAULT_TRANSPORT_COST_MULTIPLIER * contract.getScale();
+        boolean isAtHiringHall = currentLocation.getCurrentSystem().isHiringHall(currentDate);
+        if (isAtHiringHall) {
+            transportCostInSupportPoints *= HIRING_HALL_RETURN_MULTIPLIER;
+        }
+
+        transportCostInSupportPoints = (int) round(transportCostInSupportPoints * contract.getTransportMultiplier());
+        Money transportPay = ChaosCampaignUtilities.getMoneyFromChaosSupportPoints(transportCostInSupportPoints);
+
+        ContractFinanceData contractFinanceData = new ContractFinanceData(transportPay, monthlyPay, combatPay);
+        contract.setContractFinanceData(contractFinanceData);
     }
 
     private static void setTrackCount(ChaosObjectiveType objectiveType, ChaosContract contract) {
