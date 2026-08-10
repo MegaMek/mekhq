@@ -604,7 +604,7 @@ public final class BriefingTab extends CampaignGuiTab {
         MMComboBox<ScenarioQueueFilter> comboBox = new MMComboBox<>(name, filters);
         styleCompactComponent(comboBox);
         comboBox.setMaximumRowCount(filters.length);
-        comboBox.addActionListener(ev -> refreshScenarioTableData(false));
+        comboBox.addActionListener(ev -> refreshScenarioTableData());
         return comboBox;
     }
 
@@ -2702,23 +2702,11 @@ public final class BriefingTab extends CampaignGuiTab {
     }
 
     public void refreshScenarioTableData() {
-        refreshScenarioTableData(true);
-    }
-
-    private void refreshScenarioTableData(boolean preserveResolvedSelection) {
         int scenarioSelection = getSelectedScenarioId(scenarioTable, scenarioModel);
         ScenarioQueueFilter selectedFilter = getSelectedScenarioFilter(scenarioFilter,
               ScenarioQueueFilter.ALL);
         final Mission mission = comboMission.getSelectedItem();
         List<Scenario> visibleScenarios = (mission == null) ? new ArrayList<>() : mission.getVisibleScenarios();
-        if (preserveResolvedSelection && (scenarioSelection >= 0) &&
-                  (selectedFilter != ScenarioQueueFilter.ALL) &&
-                  (selectedFilter != ScenarioQueueFilter.ALL_RESOLVED) &&
-                  (selectedFilter != ScenarioQueueFilter.CURRENT_MONTH) &&
-                  isResolvedScenario(visibleScenarios, scenarioSelection)) {
-            scenarioFilter.setSelectedItem(ScenarioQueueFilter.ALL_RESOLVED);
-            return;
-        }
 
         List<Scenario> filteredScenarios = new ArrayList<>();
 
@@ -2744,15 +2732,6 @@ public final class BriefingTab extends CampaignGuiTab {
 
         scenarioTable.setFillsViewportHeight(true);
         refreshScenarioView();
-    }
-
-    private boolean isResolvedScenario(List<Scenario> scenarios, int scenarioId) {
-        for (Scenario scenario : scenarios) {
-            if ((scenario.getId() == scenarioId) && !scenario.getStatus().isCurrent()) {
-                return true;
-            }
-        }
-        return false;
     }
 
     /**
