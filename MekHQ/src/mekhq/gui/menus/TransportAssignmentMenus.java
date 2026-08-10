@@ -148,6 +148,24 @@ public final class TransportAssignmentMenus {
      * @param anyMember any unit of the train to dissolve
      */
     public static void disconnectTrain(Campaign campaign, Unit anyMember) {
+        List<Unit> members = trainMembers(anyMember);
+        List<Unit> towedMembers = new ArrayList<>(members.subList(1, members.size()));
+
+        if (!towedMembers.isEmpty()) {
+            unassignFromTransport(campaign, TOW_TRANSPORT, towedMembers);
+        }
+    }
+
+    /**
+     * Lists the whole tow train the given unit belongs to, lead tractor first, then each trailer in
+     * hitch order. A unit that is in no train is returned on its own. Both walks stop as soon as a
+     * unit repeats, so a campaign that somehow ended up with a looped hitch cannot spin here.
+     *
+     * @param anyMember any unit of the train - tractor, middle trailer, or tail
+     *
+     * @return train members in order, lead tractor first; never empty
+     */
+    public static List<Unit> trainMembers(Unit anyMember) {
         // Walk forward to the tractor heading the train
         Unit head = anyMember;
         Set<Unit> seenGoingForward = new HashSet<>();
@@ -161,7 +179,8 @@ public final class TransportAssignmentMenus {
         }
 
         // Collect every towed unit behind the head; each unit only lists the one directly behind it
-        List<Unit> towedMembers = new ArrayList<>();
+        List<Unit> members = new ArrayList<>();
+        members.add(head);
         Set<Unit> seenGoingBack = new HashSet<>();
         seenGoingBack.add(head);
         Unit current = head;
@@ -170,13 +189,25 @@ public final class TransportAssignmentMenus {
             if ((unitBehind == null) || !seenGoingBack.add(unitBehind)) {
                 break;
             }
-            towedMembers.add(unitBehind);
+            members.add(unitBehind);
             current = unitBehind;
         }
 
-        if (!towedMembers.isEmpty()) {
-            unassignFromTransport(campaign, TOW_TRANSPORT, towedMembers);
-        }
+        return members;
+    }
+
+    /**
+     * True when the unit is already part of the train the given transport belongs to. Hitching a
+     * unit into its own train leaves it towing itself, and every walk along that train then runs
+     * forever, so these pairings are never offered and never applied.
+     *
+     * @param transport tractor the unit would be hitched into the train of
+     * @param unit      unit being hitched
+     *
+     * @return true when the two are already in the same train
+     */
+    public static boolean isInSameTrain(Unit transport, Unit unit) {
+        return trainMembers(transport).contains(unit);
     }
 
     /**
@@ -305,27 +336,32 @@ public final class TransportAssignmentMenus {
 
         campaign.updateTransportInTransports(TOW_TRANSPORT, head);
         MekHQ.triggerEvent(new UnitChangedEvent(head));
+        moveTrainIntoTractorFormation(campaign, head);
         for (Unit trailer : orderedTrailers) {
-            addTrailerToTractorFormation(campaign, head, trailer);
             MekHQ.triggerEvent(new UnitChangedEvent(trailer));
         }
         return true;
     }
 
     /**
-     * Puts a newly hitched trailer into the tractor's TO&amp;E formation so the train stays
-     * together on the org chart. Only fires when the tractor is in a formation and the trailer is
-     * not in one: a trailer the player already placed somewhere in the TO&amp;E is left where it
-     * is.
+     * Moves every trailer of the tractor's train into the tractor's TO&amp;E formation so the whole
+     * train sits together on the org chart. A trailer that was in another formation is moved out of
+     * it. Nothing happens when the tractor is in no formation, since there is nothing to move the
+     * trailers into.
      *
      * @param campaign current campaign
-     * @param tractor  unit heading the train the trailer was hitched into
-     * @param trailer  trailer that was just hitched
+     * @param tractor  unit the trailers were hitched onto
      */
-    static void addTrailerToTractorFormation(Campaign campaign, Unit tractor, Unit trailer) {
-        if ((tractor.getFormationId() != Formation.FORMATION_NONE)
-                  && (trailer.getFormationId() == Formation.FORMATION_NONE)) {
-            campaign.getPlayerForce().addUnitToFormation(trailer, tractor.getFormationId(), campaign);
+    static void moveTrainIntoTractorFormation(Campaign campaign, Unit tractor) {
+        int formationId = tractor.getFormationId();
+        if (formationId == Formation.FORMATION_NONE) {
+            return;
+        }
+
+        for (Unit member : trainMembers(tractor)) {
+            if (member.getFormationId() != formationId) {
+                campaign.getPlayerForce().addUnitToFormation(member, formationId, campaign);
+            }
         }
     }
 

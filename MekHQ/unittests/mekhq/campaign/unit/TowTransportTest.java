@@ -40,6 +40,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertTimeoutPreemptively;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyInt;
@@ -58,6 +59,7 @@ import java.io.ByteArrayInputStream;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.nio.charset.StandardCharsets;
+import java.time.Duration;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
@@ -205,7 +207,7 @@ public class TowTransportTest {
     }
 
     @Test
-    public void connectTrainAddsFormationlessTrailersToTractorFormation() {
+    public void connectTrainMovesEveryTrailerIntoTheTractorFormation() {
         Campaign campaign = mockCampaign();
         Unit tractor = buildTowUnit(campaign, 50.0, false);
         when(tractor.getEntity().canTow(anyInt())).thenReturn(true);
@@ -217,10 +219,12 @@ public class TowTransportTest {
         assertTrue(TransportAssignmentMenus.connectTrain(campaign, tractor,
               List.of(freeTrailer, placedTrailer)));
 
-        // The formation-less trailer follows the tractor into its formation; the trailer the
-        // player already placed in the TO&E stays where it is
+        // Both trailers follow the tractor, including the one that was in another formation
         verify(campaign.getPlayerForce()).addUnitToFormation(freeTrailer, 7, campaign);
-        verify(campaign.getPlayerForce(), never()).addUnitToFormation(eq(placedTrailer), anyInt(), eq(campaign));
+        verify(campaign.getPlayerForce()).addUnitToFormation(placedTrailer, 7, campaign);
+
+        // The tractor is already there and is not re-added
+        verify(campaign.getPlayerForce(), never()).addUnitToFormation(eq(tractor), anyInt(), eq(campaign));
     }
 
     @Test
@@ -234,6 +238,55 @@ public class TowTransportTest {
 
         verify(campaign.getPlayerForce(), never()).addUnitToFormation(any(Unit.class), anyInt(),
               any(Campaign.class));
+    }
+
+    @Test
+    public void trainMembersListsTheWholeTrainFromAnyMember() {
+        Campaign campaign = mockCampaign();
+        Unit tractor = buildTowUnit(campaign, 50.0, false);
+        Unit firstTrailer = buildTowUnit(campaign, 10.0, true);
+        Unit secondTrailer = buildTowUnit(campaign, 20.0, true);
+        tractor.towTrailer(firstTrailer, null, TransporterType.TANK_TRAILER_HITCH);
+        firstTrailer.towTrailer(secondTrailer, null, TransporterType.TANK_TRAILER_HITCH);
+
+        List<Unit> wholeTrain = List.of(tractor, firstTrailer, secondTrailer);
+        assertEquals(wholeTrain, TransportAssignmentMenus.trainMembers(tractor));
+        assertEquals(wholeTrain, TransportAssignmentMenus.trainMembers(firstTrailer));
+        assertEquals(wholeTrain, TransportAssignmentMenus.trainMembers(secondTrailer));
+
+        // A unit hitched to nothing is a train of one
+        Unit looseTrailer = buildTowUnit(campaign, 15.0, true);
+        assertEquals(List.of(looseTrailer), TransportAssignmentMenus.trainMembers(looseTrailer));
+    }
+
+    @Test
+    public void unitAlreadyInTheTrainIsNotAValidTowTarget() {
+        Campaign campaign = mockCampaign();
+        Unit tractor = buildTowUnit(campaign, 50.0, false);
+        Unit firstTrailer = buildTowUnit(campaign, 10.0, true);
+        Unit looseTrailer = buildTowUnit(campaign, 15.0, true);
+        tractor.towTrailer(firstTrailer, null, TransporterType.TANK_TRAILER_HITCH);
+
+        // Hitching a trailer into its own train puts it at the end of that train, which is itself
+        assertTrue(TransportAssignmentMenus.isInSameTrain(tractor, firstTrailer));
+        assertTrue(TransportAssignmentMenus.isInSameTrain(firstTrailer, tractor));
+
+        // A trailer outside the train is still a valid target
+        assertFalse(TransportAssignmentMenus.isInSameTrain(tractor, looseTrailer));
+    }
+
+    @Test
+    public void loopedHitchDoesNotHangTheTrainWalks() {
+        Campaign campaign = mockCampaign();
+        Unit trailer = buildTowUnit(campaign, 10.0, true);
+
+        // A trailer towing itself - what a click on a stale menu could build. Every walk along the
+        // train has to stop instead of following the loop forever.
+        assertTimeoutPreemptively(Duration.ofSeconds(10), () -> {
+            trailer.towTrailer(trailer, null, TransporterType.TANK_TRAILER_HITCH);
+            assertEquals(List.of(trailer), TransportAssignmentMenus.trainMembers(trailer));
+            TransportAssignmentMenus.disconnectTrain(campaign, trailer);
+        });
     }
 
     @Test

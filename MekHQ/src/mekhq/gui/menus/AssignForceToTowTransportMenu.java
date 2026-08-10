@@ -98,6 +98,36 @@ public class AssignForceToTowTransportMenu extends AssignForceToTransportMenu {
     }
 
     /**
+     * Drops tractors whose train a selected unit is already part of. A trailer cannot be hitched
+     * into its own train: the hitch goes onto the last unit of the train, which would be the
+     * trailer itself, leaving it towing itself. This is also why the menu disappears for a trailer
+     * once it is hitched to the only tractor that could pull it.
+     *
+     * @param transports tractors the selection would otherwise be offered
+     * @param units      units being assigned a tractor
+     *
+     * @return tractors that can still take these units
+     */
+    @Override
+    protected Set<Unit> filterTransports(final Set<Unit> transports, final Set<Unit> units) {
+        Set<Unit> availableTransports = new HashSet<>();
+        for (Unit transport : transports) {
+            boolean alreadyInTrain = false;
+            for (Unit unit : units) {
+                if (TransportAssignmentMenus.isInSameTrain(transport, unit)) {
+                    alreadyInTrain = true;
+                    break;
+                }
+            }
+            if (!alreadyInTrain) {
+                availableTransports.add(transport);
+            }
+        }
+
+        return availableTransports;
+    }
+
+    /**
      * Assign a unit to a Tow Transport.
      *
      * @param evt             ActionEvent from the selection happening
@@ -109,6 +139,18 @@ public class AssignForceToTowTransportMenu extends AssignForceToTransportMenu {
     protected void transportMenuAction(ActionEvent evt, TransporterType transporterType, Unit transport,
           Set<Unit> units) {
         for (Unit unit : units) {
+            // A unit already in this train would be hitched to itself, which loops every later
+            // walk along the train. The menu filters these out; a menu built before an earlier
+            // click in the same selection can still get here.
+            if (TransportAssignmentMenus.isInSameTrain(transport, unit)) {
+                JOptionPane.showMessageDialog(null, MHQInternationalization.getFormattedTextAt(
+                      "mekhq.resources.AssignForceToTransport",
+                      "AssignForceToTransportMenu.warningUnitAlreadyInTrain.text",
+                      unit.getName(),
+                      transport.getName()), "Warning", JOptionPane.WARNING_MESSAGE);
+                return;
+            }
+
             if (!transport.getEntity().canTow(unit.getEntity().getId())) {
                 JOptionPane.showMessageDialog(null, MHQInternationalization.getFormattedTextAt(
                       "mekhq.resources.AssignForceToTransport",
@@ -125,8 +167,14 @@ public class AssignForceToTowTransportMenu extends AssignForceToTransportMenu {
 
             // This unit is actually going be towed by the unit at the end of the train - let's find it.
             // We shouldn't actually set towingEnt to null unless "hasTransportedUnits" is lying
+            Set<Unit> walkedTrain = new HashSet<>();
+            walkedTrain.add(towingEnt);
             while (towingEnt != null && towingEnt.hasTransportedUnits(TOW_TRANSPORT)) {
                 towingEnt = towingEnt.getTransportedUnits(TOW_TRANSPORT).stream().findAny().orElse(null);
+                if ((towingEnt != null) && !walkedTrain.add(towingEnt)) {
+                    // A looped hitch would keep this walk going forever
+                    break;
+                }
             }
 
             // Intentionally letting this throw an NPE if towingEnt is null, it
@@ -147,7 +195,7 @@ public class AssignForceToTowTransportMenu extends AssignForceToTransportMenu {
                 }
 
                 // A trailer hitched from the Hangar tab follows its tractor into the TO&E
-                TransportAssignmentMenus.addTrailerToTractorFormation(campaign, transport, unit);
+                TransportAssignmentMenus.moveTrainIntoTractorFormation(campaign, transport);
             }
             MekHQ.triggerEvent(new UnitChangedEvent(unit));
 

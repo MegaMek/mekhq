@@ -128,6 +128,12 @@ public class TowTransportedUnitsSummary extends AbstractTransportedUnitsSummary 
             otherTrailers.add(towingUnit);
             while (towingUnit != null && towingUnit.hasTransportedUnits(TOW_TRANSPORT)) {
                 towingUnit = towingUnit.getTransportedUnits(TOW_TRANSPORT).iterator().next();
+                if (otherTrailers.contains(towingUnit)) {
+                    // A looped hitch would keep adding the same trailers forever
+                    LOGGER.error("Unit {} ('{}') is towed twice in the same train",
+                          towingUnit.getId(), towingUnit.getName());
+                    break;
+                }
                 otherTrailers.add(towingUnit);
             }
         }
@@ -273,7 +279,17 @@ public class TowTransportedUnitsSummary extends AbstractTransportedUnitsSummary 
             if (tank.isTrailer()) {
                 if (transport.hasTransportAssignment(TOW_TRANSPORT)) {
                     tractor = transport.getTransportAssignment(TOW_TRANSPORT).getTransport();
+
+                    // A hitch that loops back on itself would keep this walk going forever and
+                    // freeze whatever thread asked, so stop and report the broken train instead
+                    Set<Unit> unitsWalked = new HashSet<>();
+                    unitsWalked.add(transport);
                     while (tractor.hasTransportAssignment(TOW_TRANSPORT)) {
+                        if (!unitsWalked.add(tractor)) {
+                            LOGGER.error("Unit {} ('{}') is in a tow train that loops back on itself",
+                                  tractor.getId(), tractor.getName());
+                            break;
+                        }
                         tractor = tractor.getTransportAssignment(TOW_TRANSPORT).getTransport();
                     }
                 } else {

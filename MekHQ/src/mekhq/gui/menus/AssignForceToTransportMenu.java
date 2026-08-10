@@ -134,6 +134,7 @@ public abstract class AssignForceToTransportMenu extends JScrollableMenu {
                   transporterType,
                   requiredTransportCapacity);
             transports.removeIf(transport -> transport.getFormationId() == Formation.FORMATION_NONE);
+            transports = filterTransports(transports, units);
 
             if (!transports.isEmpty()) {
                 JScrollableMenu transporterTypeMenu = new JScrollableMenu(transporterType.toString(),
@@ -169,6 +170,19 @@ public abstract class AssignForceToTransportMenu extends JScrollableMenu {
             transportMenus.add(transportMenu);
         }
         return transportMenus;
+    }
+
+    /**
+     * Drops transports that must not be offered for this selection, after the capacity and
+     * formation filtering the base menu already does. The default keeps every transport.
+     *
+     * @param transports transports the selection would otherwise be offered
+     * @param units      units being assigned a transport
+     *
+     * @return the transports still worth showing
+     */
+    protected Set<Unit> filterTransports(final Set<Unit> transports, final Set<Unit> units) {
+        return transports;
     }
 
     /**
