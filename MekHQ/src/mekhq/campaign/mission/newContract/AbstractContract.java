@@ -47,9 +47,11 @@ import mekhq.campaign.JumpPath;
 import mekhq.campaign.digitalGM.stratCon.StratConCampaignState;
 import mekhq.campaign.finances.Money;
 import mekhq.campaign.mission.Scenario;
+import mekhq.campaign.mission.enums.ContractCommandRights;
 import mekhq.campaign.mission.enums.ContractMoraleLevel;
 import mekhq.campaign.mission.enums.ContractObjectiveType;
 import mekhq.campaign.mission.enums.MissionStatus;
+import mekhq.campaign.mission.newContract.contractData.ChaosContractStepsTable;
 import mekhq.campaign.mission.newContract.contractData.ContractFinanceData;
 import mekhq.campaign.mission.newContract.contractData.ContractObjectiveData;
 import mekhq.campaign.mission.newContract.contractData.ContractScheduleData;
@@ -412,5 +414,53 @@ public abstract class AbstractContract {
 
     public int getContractLengthInMonths() {
         return scheduleData.lengthInMonths();
+    }
+
+    public ChaosContractStepsTable getCommandRightsStep() {
+        return contractTerms.commandRights();
+    }
+
+    public ContractCommandRights getContractCommandRights() {
+        return getCommandRightsStep().getContractCommandRights();
+    }
+
+    public ChaosContractStepsTable getBasePayRateStep() {
+        return contractTerms.payRate();
+    }
+
+    public double getBasePayMultiplier() {
+        return getBasePayRateStep().getBasePayMultiplier();
+    }
+
+    public ChaosContractStepsTable getSupportStep() {
+        return contractTerms.support();
+    }
+
+    public double getSupportMultiplier() {
+        return getSupportStep().getStraightSupportMultiplier();
+    }
+
+    public double getBattlefieldLossMultiplier() {
+        return getSupportStep().getBattlefieldLossMultiplier();
+    }
+
+    public ChaosContractStepsTable getTransportStep() {
+        return contractTerms.transport();
+    }
+
+    public double getTransportMultiplier() {
+        return getTransportStep().getTransportMultiplier();
+    }
+
+    public ChaosContractStepsTable getSalvageRightsStep() {
+        return contractTerms.salvageRights();
+    }
+
+    public double getSalvageRightsMultiplier() {
+        return getSalvageRightsStep().getSalvageMultiplier();
+    }
+
+    public boolean isExchangeSalvage() {
+        return getSalvageRightsStep().isExchangeSalvage();
     }
 }
