@@ -52,7 +52,7 @@ import mekhq.campaign.universe.RandomFactionGenerator;
  * instantiable.
  */
 public class ChaosContractDeterminationEnemy {
-    private static final int MERCENARY_ENEMY_CHANCE = 20;
+    private static final int MERCENARY_ENEMY_CHANCE = 10;
 
     private ChaosContractDeterminationEnemy() {}
 
