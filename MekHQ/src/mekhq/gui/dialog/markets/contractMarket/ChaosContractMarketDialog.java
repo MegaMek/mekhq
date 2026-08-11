@@ -16,21 +16,24 @@ import javax.swing.JPanel;
 import javax.swing.JSpinner;
 import javax.swing.SpinnerNumberModel;
 
+import mekhq.campaign.AbstractLocation;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.ForceHumanResources;
 import mekhq.campaign.campaignOptions.CampaignOptions;
+import mekhq.campaign.finances.Money;
 import mekhq.campaign.force.Detachment;
 import mekhq.campaign.force.PlayerForce;
 import mekhq.campaign.mission.newContract.AbstractContract;
 import mekhq.campaign.mission.newContract.contractData.ChaosContractStepsTable;
 import mekhq.campaign.mission.newContract.contractGeneration.ContractSearchType;
 import mekhq.campaign.mission.newContract.contractGeneration.ContractTermsData;
+import mekhq.campaign.mission.newContract.contractGeneration.targetFinder.ChaosContractPayDetermination;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.universe.factionStanding.FactionStandings;
 import mekhq.gui.baseComponents.immersiveDialogs.ImmersiveDialogCore;
 import mekhq.gui.baseComponents.immersiveDialogs.ImmersiveDialogNotification;
 
-public class ChaosContractMarketDialogTest {
+public class ChaosContractMarketDialog {
     private JLabel lblBreakdown;
     private final JLabel lblPayRateNegotiations = new JLabel("Pay Rate Negotiations: ");
     private final JSpinner spnPayRateNegotiations = new JSpinner();
@@ -43,7 +46,7 @@ public class ChaosContractMarketDialogTest {
     private final JLabel lblCommandRightsNegotiations = new JLabel("Command Rights Negotiations: ");
     private final JSpinner spnCommandRightsNegotiations = new JSpinner();
 
-    public ChaosContractMarketDialogTest(Campaign campaign) {
+    public ChaosContractMarketDialog(Campaign campaign) {
         CampaignOptions campaignOptions = campaign.getCampaignOptions();
         LocalDate currentDate = campaign.getLocalDate();
         PlayerForce playerForce = campaign.getPlayerForce();
@@ -72,7 +75,7 @@ public class ChaosContractMarketDialogTest {
                       null,
                       null,
                       false,
-                      getSpinnerPanel(contract),
+                      getSpinnerPanel(campaign, currentDate, detachment.getCurrentLocation(), contract),
                       null,
                       true);
                 if (dialog.getDialogChoice() == 1) {
@@ -82,7 +85,8 @@ public class ChaosContractMarketDialogTest {
         }
     }
 
-    private JPanel getSpinnerPanel(AbstractContract contract) {
+    private JPanel getSpinnerPanel(Campaign campaign, LocalDate currentDate, AbstractLocation currentLocation,
+          AbstractContract contract) {
         final int PADDING = scaleForGUI(10);
 
         lblBreakdown = new JLabel(buildTextFromContract(contract));
@@ -98,6 +102,9 @@ public class ChaosContractMarketDialogTest {
             ContractTermsData existingTermsData = contract.getContractTerms();
             ContractTermsData updatedTermsData = new ContractTermsData(existingTermsData, step, null, null, null, null);
             contract.setContractTerms(updatedTermsData);
+
+            Money newMoney = ChaosContractPayDetermination.getMonthlyPay(contract);
+            contract.updateMonthlyPay(newMoney);
 
             lblBreakdown.setText(buildTextFromContract(contract));
         });
@@ -128,6 +135,10 @@ public class ChaosContractMarketDialogTest {
             ContractTermsData existingTermsData = contract.getContractTerms();
             ContractTermsData updatedTermsData = new ContractTermsData(existingTermsData, null, null, step, null, null);
             contract.setContractTerms(updatedTermsData);
+
+            Money newMoney = ChaosContractPayDetermination.getTransportPay(campaign, currentDate, contract,
+                  currentLocation);
+            contract.updateTransportPay(newMoney);
 
             lblBreakdown.setText(buildTextFromContract(contract));
         });

@@ -123,7 +123,7 @@ import mekhq.gui.baseComponents.roundedComponents.RoundedLineBorder;
 import mekhq.gui.baseComponents.roundedComponents.RoundedMMToggleButton;
 import mekhq.gui.dialog.*;
 import mekhq.gui.dialog.glossary.GlossaryDialog;
-import mekhq.gui.dialog.markets.contractMarket.ChaosContractMarketDialogTest;
+import mekhq.gui.dialog.markets.contractMarket.ChaosContractMarketDialog;
 import mekhq.gui.enums.MHQTabType;
 import mekhq.gui.menus.MekHQMenuBar;
 import mekhq.gui.model.LocationFilterItem;
@@ -859,7 +859,7 @@ public class CampaignGUI extends JPanel {
             }
         } else {
             if (true) {
-                new ChaosContractMarketDialogTest(getCampaign());
+                new ChaosContractMarketDialog(getCampaign());
             } else {
                 ContractMarketDialog contractMarketDialog = new ContractMarketDialog(getFrame(), getCampaign());
                 contractMarketDialog.setVisible(true);

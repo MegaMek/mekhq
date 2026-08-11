@@ -33,7 +33,6 @@
 package mekhq.campaign.mission.newContract.contractGeneration;
 
 import static java.lang.Math.ceil;
-import static java.lang.Math.round;
 
 import java.time.LocalDate;
 import java.util.Collection;
@@ -47,18 +46,16 @@ import megamek.logging.MMLogger;
 import mekhq.campaign.AbstractLocation;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.JumpPath;
+import mekhq.campaign.LocalHangar;
 import mekhq.campaign.campaignOptions.CampaignOption;
 import mekhq.campaign.campaignOptions.CampaignOptions;
-import mekhq.campaign.chaosCampaign.ChaosCampaignUtilities;
 import mekhq.campaign.digitalGM.stratCon.StratConCampaignState;
-import mekhq.campaign.finances.Money;
 import mekhq.campaign.force.Detachment;
 import mekhq.campaign.force.PlayerForce;
 import mekhq.campaign.location.ILocation;
 import mekhq.campaign.mission.enums.ContractMoraleLevel;
 import mekhq.campaign.mission.newContract.AbstractContract;
 import mekhq.campaign.mission.newContract.ChaosContract;
-import mekhq.campaign.mission.newContract.contractData.ContractFinanceData;
 import mekhq.campaign.mission.newContract.contractData.ContractObjectiveData;
 import mekhq.campaign.mission.newContract.contractData.ContractScheduleData;
 import mekhq.campaign.mission.newContract.contractData.EmployerData;
@@ -66,6 +63,7 @@ import mekhq.campaign.mission.newContract.contractData.EnemyData;
 import mekhq.campaign.mission.newContract.contractData.MoraleData;
 import mekhq.campaign.mission.newContract.contractData.RentedFacilitiesData;
 import mekhq.campaign.mission.newContract.contractData.SystemsTargetData;
+import mekhq.campaign.mission.newContract.contractGeneration.targetFinder.ChaosContractPayDetermination;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.reputation.chaosReputation.ChaosReputation;
 import mekhq.campaign.universe.Planet;
@@ -76,11 +74,6 @@ import mekhq.campaign.universe.factionStanding.FactionStandings;
 
 public class AbstractContractGeneration {
     private static final MMLogger LOGGER = MMLogger.create(AbstractContractGeneration.class);
-
-    public final static int DEFAULT_MONTHLY_PAY_MULTIPLIER = 500;
-    public final static int DEFAULT_COMBAT_PAY_MULTIPLIER = 500;
-    public final static int DEFAULT_TRANSPORT_COST_MULTIPLIER = 300;
-    public final static int HIRING_HALL_RETURN_MULTIPLIER = 2;
 
     public static @Nullable AbstractContract createContract(Campaign campaign, CampaignOptions campaignOptions,
           LocalDate currentDate, Detachment detachment, int contractGenerationModifier, ContractSearchType searchType,
@@ -96,7 +89,11 @@ public class AbstractContractGeneration {
 
         // Step 2: Type
         ContractObjectiveData objectiveData = pickObjective(contractGenerationModifier, contract);
+        ChaosObjectiveType chaosObjectiveType = objectiveData.playerObjectiveType().getChaosObjectiveType();
         boolean isDefensiveObjective = !objectiveData.playerObjectiveType().getChaosObjectiveType().isAttacker();
+
+        // Step 3: Scale & Intensity
+        setTrackCount(campaign.getPlayerForce(), detachment.getHangar(), chaosObjectiveType, contract);
 
         // Step 3: Enemy (situated against the employer's territorial anchor faction, so a landless flavor employer -
         // rebels, a mercenary command, a corporation - still yields a sensible nearby belligerent)
@@ -132,7 +129,7 @@ public class AbstractContractGeneration {
 
         // Step 6: Length
         boolean useVariableContractLength = campaignOptions.get(CampaignOption.VARIABLE_CONTRACT_LENGTH);
-        ChaosObjectiveType objectiveType = determineSchedule(campaign,
+        determineSchedule(campaign,
               useVariableContractLength,
               currentDate,
               currentLocation.getCurrentSystem(),
@@ -142,23 +139,20 @@ public class AbstractContractGeneration {
               isGM,
               targetSystem,
               employerData.factionCode(),
-              objectiveData.playerObjectiveType().getChaosObjectiveType(),
+              chaosObjectiveType,
               contract);
 
         // Step 7: Initial Terms
-        setContractTerms(objectiveType, employerData.type(), contract);
-
-        // Step 8: Track Count & Intensity
-        setTrackCount(objectiveType, contract);
+        setContractTerms(chaosObjectiveType, employerData.type(), contract);
 
         // Step 9: Final Tasks
-        performFinalTasks(currentDate, contract, currentLocation);
+        performFinalTasks(campaign, currentDate, contract, currentLocation);
 
         // Step 10: Return the Contract
         return contract;
     }
 
-    private static void performFinalTasks(LocalDate currentDate, ChaosContract contract,
+    private static void performFinalTasks(Campaign campaign, LocalDate currentDate, ChaosContract contract,
           AbstractLocation currentLocation) {
         // Basic Information
         UUID contractId = UUID.randomUUID();
@@ -191,33 +185,17 @@ public class AbstractContractGeneration {
         contract.setStratConCampaignState(stratConCampaignState);
 
         // Pay
-        determineContractPay(currentDate, contract, currentLocation);
+        ChaosContractPayDetermination.determineContractPayForChaosContract(campaign, currentDate, contract,
+              currentLocation);
     }
 
-    private static void determineContractPay(LocalDate currentDate, ChaosContract contract,
-          AbstractLocation currentLocation) {
-        int monthlyPayInSupportPoints = DEFAULT_MONTHLY_PAY_MULTIPLIER * contract.getScale();
-        monthlyPayInSupportPoints = (int) round(monthlyPayInSupportPoints * contract.getBasePayMultiplier());
-        Money monthlyPay = ChaosCampaignUtilities.getMoneyFromChaosSupportPoints(monthlyPayInSupportPoints);
+    private static void setTrackCount(PlayerForce playerForce, LocalHangar detachmentHangar,
+          ChaosObjectiveType objectiveType, ChaosContract contract) {
+        int scale = ChaosContractDeterminationScale.generateScaleForDetachment(playerForce,
+              detachmentHangar,
+              contract.getObjectiveType().isCadreDuty());
+        contract.setScale(scale);
 
-        int combatPayInSupportPoints = DEFAULT_COMBAT_PAY_MULTIPLIER * contract.getScale();
-        combatPayInSupportPoints = (int) round(combatPayInSupportPoints * contract.getBasePayMultiplier());
-        Money combatPay = ChaosCampaignUtilities.getMoneyFromChaosSupportPoints(combatPayInSupportPoints);
-
-        int transportCostInSupportPoints = DEFAULT_TRANSPORT_COST_MULTIPLIER * contract.getScale();
-        boolean isAtHiringHall = currentLocation.getCurrentSystem().isHiringHall(currentDate);
-        if (isAtHiringHall) {
-            transportCostInSupportPoints *= HIRING_HALL_RETURN_MULTIPLIER;
-        }
-
-        transportCostInSupportPoints = (int) round(transportCostInSupportPoints * contract.getTransportMultiplier());
-        Money transportPay = ChaosCampaignUtilities.getMoneyFromChaosSupportPoints(transportCostInSupportPoints);
-
-        ContractFinanceData contractFinanceData = new ContractFinanceData(transportPay, monthlyPay, combatPay);
-        contract.setContractFinanceData(contractFinanceData);
-    }
-
-    private static void setTrackCount(ChaosObjectiveType objectiveType, ChaosContract contract) {
         int trackCount = ChaosContractDetermineIntensity.determineTrackCount(objectiveType);
         contract.setTrackCount(trackCount);
     }
@@ -313,9 +291,8 @@ public class AbstractContractGeneration {
         contract.setContractTerms(initialContractTerms);
     }
 
-    private static @Nonnull ChaosObjectiveType determineSchedule(Campaign campaign, boolean useVariableContractLength,
-          LocalDate currentDate, PlanetarySystem currentSystem, Planet targetPlanet,
-          FactionStandings factionStandings,
+    private static void determineSchedule(Campaign campaign, boolean useVariableContractLength, LocalDate currentDate,
+          PlanetarySystem currentSystem, Planet targetPlanet, FactionStandings factionStandings,
           boolean overridingCommandCircuitRequirements, boolean isGM, PlanetarySystem targetSystem,
           String employerFactionCode, ChaosObjectiveType objectiveType, ChaosContract contract) {
         // Jump Path, terminating at the specific target planet so both the journey time below and the actual travel
@@ -337,8 +314,6 @@ public class AbstractContractGeneration {
 
         ContractScheduleData contractScheduleData = new ContractScheduleData(startDate, endDate, monthsLength);
         contract.setScheduleData(contractScheduleData);
-
-        return objectiveType;
     }
 
     private static @Nonnull EnemyData pickEnemy(LocalDate currentDate, ILocation currentLocation,

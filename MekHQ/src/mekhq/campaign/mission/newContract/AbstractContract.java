@@ -175,6 +175,18 @@ public abstract class AbstractContract {
         this.contractFinanceData = contractFinanceData;
     }
 
+    public void updateMonthlyPay(Money newMoney) {
+        contractFinanceData = new ContractFinanceData(contractFinanceData, null, newMoney, null);
+    }
+
+    public void updateTransportPay(Money newMoney) {
+        contractFinanceData = new ContractFinanceData(contractFinanceData, newMoney, null, null);
+    }
+
+    public void updateCombatPay(Money newMoney) {
+        contractFinanceData = new ContractFinanceData(contractFinanceData, null, null, newMoney);
+    }
+
     public MissionStatus getMissionStatus() {
         return missionStatus;
     }
