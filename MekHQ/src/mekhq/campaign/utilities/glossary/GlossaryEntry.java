@@ -86,6 +86,7 @@ public enum GlossaryEntry {
     EDGE("EDGE", new Version("0.50.06")),
     EDUCATION("EDUCATION", new Version("0.50.06")),
     EMPTY_SYSTEMS("EMPTY_SYSTEMS", new Version("0.50.06")),
+    ESSENTIAL_SCENARIOS("ESSENTIAL_SCENARIOS", new Version("0.51.01")),
     EXPERIENCE_COSTS("EXPERIENCE_COSTS", new Version("0.50.06")),
     EXPERIENCE_RATING("EXPERIENCE_RATING", new Version("0.50.06")),
     EXTRA_INCOME("EXTRA_INCOME", new Version("0.50.10")),
