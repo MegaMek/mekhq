@@ -334,6 +334,19 @@ public class CampaignPreset {
     // endregion Getters/Setters
 
     /**
+     * Returns the directory where user-created campaign presets should be saved. If a custom user directory is
+     * configured, presets are stored beneath it; otherwise the legacy MekHQ user-data directory is used.
+     *
+     * @return the writable campaign preset directory
+     */
+    public static File getUserCampaignPresetDirectory() {
+        final File configuredDirectory = getConfiguredUserCampaignPresetDirectory();
+        return configuredDirectory == null
+              ? new File(MHQConstants.USER_CAMPAIGN_PRESET_DIRECTORY)
+              : configuredDirectory;
+    }
+
+    /**
      * Retrieves a combined list of all campaign presets from the default directory, the old user data directory, and
      * the modern (user-defined) user data directory. The campaign presets are sourced, merged, and sorted in natural
      * order before being returned.
@@ -358,9 +371,10 @@ public class CampaignPreset {
         presets.addAll(loadCampaignPresetsFromDirectory(new File(MHQConstants.USER_CAMPAIGN_PRESET_DIRECTORY)));
 
         // Modern user data directory
-        String userDirectory = PreferenceManager.getClientPreferences().getUserDir();
-        File presetUserDirectory = new File(userDirectory + '/' + CAMPAIGN_PRESET_DIRECTORY);
-        presets.addAll(loadCampaignPresetsFromDirectory(presetUserDirectory));
+        final File configuredDirectory = getConfiguredUserCampaignPresetDirectory();
+        if (configuredDirectory != null) {
+            presets.addAll(loadCampaignPresetsFromDirectory(configuredDirectory));
+        }
 
         final NaturalOrderComparator naturalOrderComparator = new NaturalOrderComparator();
 
@@ -388,15 +402,21 @@ public class CampaignPreset {
         presets.addAll(loadCampaignPresetsMetadataFromDirectory(new File(MHQConstants.USER_CAMPAIGN_PRESET_DIRECTORY)));
 
         // Modern user data directory
-        String userDirectory = PreferenceManager.getClientPreferences().getUserDir();
-        File presetUserDirectory = new File(userDirectory + '/' + CAMPAIGN_PRESET_DIRECTORY);
-        presets.addAll(loadCampaignPresetsMetadataFromDirectory(presetUserDirectory));
+        final File configuredDirectory = getConfiguredUserCampaignPresetDirectory();
+        if (configuredDirectory != null) {
+            presets.addAll(loadCampaignPresetsMetadataFromDirectory(configuredDirectory));
+        }
 
         final NaturalOrderComparator naturalOrderComparator = new NaturalOrderComparator();
 
         presets.sort((p0, p1) -> naturalOrderComparator.compare(p0.toString(), p1.toString()));
 
         return presets;
+    }
+
+    private static @Nullable File getConfiguredUserCampaignPresetDirectory() {
+        final String userDirectory = PreferenceManager.getClientPreferences().getUserDir();
+        return userDirectory.isBlank() ? null : new File(userDirectory, CAMPAIGN_PRESET_DIRECTORY);
     }
 
     // region File I/O

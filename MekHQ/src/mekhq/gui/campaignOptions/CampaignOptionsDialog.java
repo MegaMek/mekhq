@@ -62,7 +62,6 @@ import megamek.client.ui.settings.SettingsIconLegend;
 import megamek.client.ui.util.UIUtil;
 import megamek.logging.MMLogger;
 import mekhq.CampaignPreset;
-import mekhq.MHQConstants;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.campaignOptions.CampaignOptions;
@@ -318,7 +317,7 @@ public class CampaignOptionsDialog extends AbstractButtonDialog {
      * @return the file the preset should be written to
      */
     private File resolveUserPresetFile(final CampaignPreset preset) {
-        final File presetDirectory = new File(MHQConstants.USER_CAMPAIGN_PRESET_DIRECTORY);
+        final File presetDirectory = CampaignPreset.getUserCampaignPresetDirectory();
         if (!presetDirectory.exists() && !presetDirectory.mkdirs()) {
             LOGGER.error("Failed to create campaign preset directory: {}", presetDirectory);
         }
