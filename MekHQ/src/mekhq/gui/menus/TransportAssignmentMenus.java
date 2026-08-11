@@ -442,10 +442,35 @@ public final class TransportAssignmentMenus {
     public static void unassignTransportedUnits(Campaign campaign, CampaignTransportType campaignTransportType,
           Collection<Unit> transports) {
         for (Unit transport : transports) {
-            if (transport.hasTransportedUnits(campaignTransportType)) {
-                unassignFromTransport(campaign, campaignTransportType,
-                      new ArrayList<>(transport.getTransportedUnits(campaignTransportType)));
+            if (!transport.hasTransportedUnits(campaignTransportType)) {
+                continue;
             }
+            // A tow train is a linked list, so a tractor only lists the trailer directly behind it.
+            // Releasing that one alone would leave the rest of the train hitched to it and floating
+            // loose, so the whole run of trailers behind the unit comes off together.
+            Collection<Unit> unitsToRelease = campaignTransportType.isTowTransport() ?
+                                                    trailersBehind(transport) :
+                                                    new ArrayList<>(transport.getTransportedUnits(
+                                                          campaignTransportType));
+            unassignFromTransport(campaign, campaignTransportType, unitsToRelease);
         }
+    }
+
+    /**
+     * Lists every trailer behind the given unit in its tow train, front to back. A tractor returns
+     * its whole train; a middle trailer returns only what it is pulling, leaving its own hitch to
+     * the unit in front alone.
+     *
+     * @param unit any member of a tow train
+     *
+     * @return the trailers behind it in hitch order, empty when it is pulling nothing
+     */
+    public static List<Unit> trailersBehind(Unit unit) {
+        List<Unit> members = trainMembers(unit);
+        int position = members.indexOf(unit);
+        if (position < 0) {
+            return new ArrayList<>();
+        }
+        return new ArrayList<>(members.subList(position + 1, members.size()));
     }
 }

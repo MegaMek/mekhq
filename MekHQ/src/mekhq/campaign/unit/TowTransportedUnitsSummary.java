@@ -201,7 +201,10 @@ public class TowTransportedUnitsSummary extends AbstractTransportedUnitsSummary 
         if (towedUnit.getTransportAssignment(TOW_TRANSPORT) != null) {
             oldTractor = towedUnit.getTransportAssignment(TOW_TRANSPORT).getTransport();
             if (oldTractor != null && !oldTractor.equals(transport)) {
-                oldTractor.unloadFromTransport(TOW_TRANSPORT);
+                // Release the trailer from the unit that was pulling it. Unloading the old tractor
+                // itself instead would leave it still listing this trailer as towed, a hitch that
+                // no longer exists on the trailer's side.
+                towedUnit.unloadFromTransport(TOW_TRANSPORT);
             }
         }
         if (transportedLocation != null) {
@@ -257,8 +260,10 @@ public class TowTransportedUnitsSummary extends AbstractTransportedUnitsSummary 
 
         if (transportedUnit.getEntity() != null && transport.getEntity() != null) {
             Unit tractor = getTractor();
+            // Recalculate even when the train is now empty: a tractor that just gave up its last
+            // trailer has its full towing capacity back, and stopping here would leave it stuck at
+            // the reduced figure the campaign transporter map offers the assign menus.
             if (tractor != null &&
-                      tractor.hasTransportedUnits(TOW_TRANSPORT) &&
                       tractor.getEntity() != null &&
                       tractor.getEntity() instanceof Tank tank) {
                 TowTransportedUnitsSummary tractorTransportedUnitsSummary = (TowTransportedUnitsSummary) tractor.getTransportedUnitsSummary(

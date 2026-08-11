@@ -452,4 +452,98 @@ public class TowTransportTest {
         verify(campaign, never()).addCampaignTransport(SHIP_TRANSPORT, tractor);
         verify(campaign, never()).addCampaignTransport(TACTICAL_TRANSPORT, tractor);
     }
+
+    @Test
+    public void unassignTowedUnitsReleasesEveryTrailerInTheTrain() {
+        Campaign campaign = mockCampaign();
+        Unit tractor = buildTowUnit(campaign, 50.0, false);
+        Unit firstTrailer = buildTowUnit(campaign, 10.0, true);
+        Unit secondTrailer = buildTowUnit(campaign, 20.0, true);
+        tractor.towTrailer(firstTrailer, null, TransporterType.TANK_TRAILER_HITCH);
+        firstTrailer.towTrailer(secondTrailer, null, TransporterType.TANK_TRAILER_HITCH);
+
+        TransportAssignmentMenus.unassignTransportedUnits(campaign, TOW_TRANSPORT, List.of(tractor));
+
+        // Every trailer comes off, not just the one hitched directly to the tractor
+        assertNull(firstTrailer.getTransportAssignment(TOW_TRANSPORT));
+        assertNull(secondTrailer.getTransportAssignment(TOW_TRANSPORT));
+        assertFalse(tractor.hasTransportedUnits(TOW_TRANSPORT));
+        assertFalse(firstTrailer.hasTransportedUnits(TOW_TRANSPORT));
+    }
+
+    @Test
+    public void unassignTowedUnitsOnAMiddleTrailerKeepsItsOwnHitch() {
+        Campaign campaign = mockCampaign();
+        Unit tractor = buildTowUnit(campaign, 50.0, false);
+        Unit firstTrailer = buildTowUnit(campaign, 10.0, true);
+        Unit secondTrailer = buildTowUnit(campaign, 20.0, true);
+        tractor.towTrailer(firstTrailer, null, TransporterType.TANK_TRAILER_HITCH);
+        firstTrailer.towTrailer(secondTrailer, null, TransporterType.TANK_TRAILER_HITCH);
+
+        TransportAssignmentMenus.unassignTransportedUnits(campaign, TOW_TRANSPORT, List.of(firstTrailer));
+
+        // Only what the middle trailer was pulling comes off; it stays hitched to the tractor
+        assertNull(secondTrailer.getTransportAssignment(TOW_TRANSPORT));
+        assertEquals(tractor, firstTrailer.getTransportAssignment(TOW_TRANSPORT).getTransport());
+        assertEquals(40.0, tractor.getCurrentTransportCapacity(TOW_TRANSPORT, TransporterType.TANK_TRAILER_HITCH));
+    }
+
+    @Test
+    public void trailersBehindListsTheHitchPointForTheMenuTooltip() {
+        Campaign campaign = mockCampaign();
+        Unit tractor = buildTowUnit(campaign, 50.0, false);
+        Unit firstTrailer = buildTowUnit(campaign, 10.0, true);
+        Unit secondTrailer = buildTowUnit(campaign, 20.0, true);
+        tractor.towTrailer(firstTrailer, null, TransporterType.TANK_TRAILER_HITCH);
+        firstTrailer.towTrailer(secondTrailer, null, TransporterType.TANK_TRAILER_HITCH);
+
+        // The tooltip shows what a tractor is already pulling, in hitch order
+        assertEquals(List.of(firstTrailer, secondTrailer), TransportAssignmentMenus.trailersBehind(tractor));
+        assertEquals(List.of(secondTrailer), TransportAssignmentMenus.trailersBehind(firstTrailer));
+        assertEquals(List.of(), TransportAssignmentMenus.trailersBehind(secondTrailer));
+
+        // A free tractor is pulling nothing
+        assertEquals(List.of(), TransportAssignmentMenus.trailersBehind(buildTowUnit(campaign, 50.0, false)));
+    }
+
+    @Test
+    public void movingATrailerToAnotherTractorLeavesNoPhantomHitch() {
+        Campaign campaign = mockCampaign();
+        Unit firstTractor = buildTowUnit(campaign, 50.0, false);
+        Unit secondTractor = buildTowUnit(campaign, 50.0, false);
+        Unit trailer = buildTowUnit(campaign, 10.0, true);
+        firstTractor.towTrailer(trailer, null, TransporterType.TANK_TRAILER_HITCH);
+
+        // Re-hitching the trailer onto a different tractor has to clear the old hitch
+        secondTractor.towTrailer(trailer, null, TransporterType.TANK_TRAILER_HITCH);
+
+        assertEquals(secondTractor, trailer.getTransportAssignment(TOW_TRANSPORT).getTransport());
+        assertFalse(firstTractor.hasTransportedUnits(TOW_TRANSPORT));
+        assertTrue(secondTractor.getTransportedUnits(TOW_TRANSPORT).contains(trailer));
+        assertEquals(50.0, firstTractor.getCurrentTransportCapacity(TOW_TRANSPORT,
+              TransporterType.TANK_TRAILER_HITCH));
+        assertEquals(40.0, secondTractor.getCurrentTransportCapacity(TOW_TRANSPORT,
+              TransporterType.TANK_TRAILER_HITCH));
+    }
+
+    @Test
+    public void tractorCanTowAgainAfterUnassigningItsTowedUnits() {
+        Campaign campaign = mockCampaign();
+        Unit tractor = buildTowUnit(campaign, 50.0, false);
+        Unit trailer = buildTowUnit(campaign, 10.0, true);
+        tractor.towTrailer(trailer, null, TransporterType.TANK_TRAILER_HITCH);
+        assertEquals(40.0, tractor.getCurrentTransportCapacity(TOW_TRANSPORT, TransporterType.TANK_TRAILER_HITCH));
+
+        TransportAssignmentMenus.unassignTransportedUnits(campaign, TOW_TRANSPORT, List.of(tractor));
+
+        // The freed tractor is back to its full towing capacity, so the menus offer it again
+        assertEquals(50.0, tractor.getCurrentTransportCapacity(TOW_TRANSPORT, TransporterType.TANK_TRAILER_HITCH));
+        assertFalse(TransportAssignmentMenus.isInSameTrain(tractor, trailer));
+
+        // And the same trailer can be hitched straight back on
+        tractor.towTrailer(trailer, null, TransporterType.TANK_TRAILER_HITCH);
+        assertEquals(tractor, trailer.getTransportAssignment(TOW_TRANSPORT).getTransport());
+        assertTrue(tractor.getTransportedUnits(TOW_TRANSPORT).contains(trailer));
+        assertEquals(40.0, tractor.getCurrentTransportCapacity(TOW_TRANSPORT, TransporterType.TANK_TRAILER_HITCH));
+    }
 }
