@@ -79,20 +79,20 @@ class MHQDisplayPage extends MHQOptionsPage {
     private SettingsCheckBox chkShowWarriorsAlmanac;
 
     // Display - Interstellar Map
-      private SettingsCheckBox chkInterstellarMapShowJumpRadius;
-      private SettingsSpinner spinnerInterstellarMapShowJumpRadiusMinimumZoom;
+    private SettingsCheckBox chkInterstellarMapShowJumpRadius;
+    private SettingsSpinner spinnerInterstellarMapShowJumpRadiusMinimumZoom;
     private ColourSelectorButton btnInterstellarMapJumpRadiusColour;
-      private SettingsCheckBox chkInterstellarMapShowPlanetaryAcquisitionRadius;
-      private SettingsSpinner spinnerInterstellarMapShowPlanetaryAcquisitionRadiusMinimumZoom;
+    private SettingsCheckBox chkInterstellarMapShowPlanetaryAcquisitionRadius;
+    private SettingsSpinner spinnerInterstellarMapShowPlanetaryAcquisitionRadiusMinimumZoom;
     private ColourSelectorButton btnInterstellarMapPlanetaryAcquisitionRadiusColour;
-      private SettingsCheckBox chkInterstellarMapShowContractSearchRadius;
+    private SettingsCheckBox chkInterstellarMapShowContractSearchRadius;
     private ColourSelectorButton btnInterstellarMapContractSearchRadiusColour;
 
     // Display - Personnel List
     private JComboBox<PersonnelFilterStyle> comboPersonnelFilterStyle;
-      private SettingsCheckBox chkPersonnelFilterOnPrimaryRole;
-      private SettingsCheckBox chkUnifiedDailyReport;
-      private SettingsCheckBox chkEnableDailyReportAggregateTab;
+    private SettingsCheckBox chkPersonnelFilterOnPrimaryRole;
+    private SettingsCheckBox chkUnifiedDailyReport;
+    private SettingsCheckBox chkEnableDailyReportAggregateTab;
 
     MHQDisplayPage(MHQOptionsModel model) {
         super(model);
@@ -122,16 +122,16 @@ class MHQDisplayPage extends MHQOptionsPage {
     }
 
     private JPanel createDisplayGeneralSection() {
-      SettingsFormPanel panel = new SettingsFormPanel("MHQDisplayGeneralContent", FORM_LABEL_WIDTH,
+        SettingsFormPanel panel = new SettingsFormPanel("MHQDisplayGeneralContent", FORM_LABEL_WIDTH,
               FORM_CONTROL_WIDTH);
 
         fieldDisplayDateFormat = new JTextField(model.displayDateFormat, 14);
         fieldDisplayDateFormat.setName("txtlabelDisplayDateFormat");
-      panel.addRow(new SettingsLabel(TEXT_PROVIDER, "labelDisplayDateFormat"),
+        panel.addRow(new SettingsLabel(TEXT_PROVIDER, "labelDisplayDateFormat"),
               dateFormatControl(fieldDisplayDateFormat));
         fieldLongDisplayDateFormat = new JTextField(model.longDisplayDateFormat, 14);
         fieldLongDisplayDateFormat.setName("txtlabelLongDisplayDateFormat");
-      panel.addRow(new SettingsLabel(TEXT_PROVIDER, "labelLongDisplayDateFormat"),
+        panel.addRow(new SettingsLabel(TEXT_PROVIDER, "labelLongDisplayDateFormat"),
               dateFormatControl(fieldLongDisplayDateFormat));
 
         String guiScaleText = Messages.getString("CommonSettingsDialog.guiScale");
@@ -167,7 +167,8 @@ class MHQDisplayPage extends MHQOptionsPage {
               getMetadata(null, CampaignOptionFlag.UNIMPLEMENTED));
         chkShowCompanyGenerator = checkBox("chkShowCompanyGenerator", model.showCompanyGenerator);
         chkShowUnitPicturesOnTOE = checkBox("chkShowUnitPicturesOnTOE", model.showUnitPicturesOnTOE);
-        chkShowWarriorsAlmanac = checkBox("chkShowWarriorsAlmanac", model.showWarriorsAlmanac);
+        chkShowWarriorsAlmanac = checkBox("chkShowWarriorsAlmanac", model.showWarriorsAlmanac,
+              getMetadata(new Version(0, 51, 1)));
         panel.addCheckBoxGrid(2,
               chkHideUnitFluff,
               chkUseAlternateStratConFogOfWar,
@@ -234,7 +235,7 @@ class MHQDisplayPage extends MHQOptionsPage {
     }
 
     private JPanel createDisplayInterstellarSection() {
-      SettingsFormPanel panel = new SettingsFormPanel("MHQDisplayInterstellarContent", FORM_LABEL_WIDTH,
+        SettingsFormPanel panel = new SettingsFormPanel("MHQDisplayInterstellarContent", FORM_LABEL_WIDTH,
               FORM_CONTROL_WIDTH);
 
         chkInterstellarMapShowJumpRadius =
@@ -251,9 +252,9 @@ class MHQDisplayPage extends MHQOptionsPage {
 
         chkInterstellarMapShowPlanetaryAcquisitionRadius = checkBox(
               "chkInterstellarMapShowPlanetaryAcquisitionRadius", model.interstellarMapShowPlanetaryAcquisitionRadius);
-      SettingsLabel acquisitionZoomLabel = new SettingsLabel(TEXT_PROVIDER,
+        SettingsLabel acquisitionZoomLabel = new SettingsLabel(TEXT_PROVIDER,
               "lblInterstellarMapShowPlanetaryAcquisitionRadiusMinimumZoom");
-      spinnerInterstellarMapShowPlanetaryAcquisitionRadiusMinimumZoom = new SettingsSpinner(TEXT_PROVIDER,
+        spinnerInterstellarMapShowPlanetaryAcquisitionRadiusMinimumZoom = new SettingsSpinner(TEXT_PROVIDER,
               "lblInterstellarMapShowPlanetaryAcquisitionRadiusMinimumZoom", 2d, 0d, 10d, 0.5);
         spinnerInterstellarMapShowPlanetaryAcquisitionRadiusMinimumZoom.setValue(
               model.interstellarMapShowPlanetaryAcquisitionRadiusMinimumZoom);
@@ -333,7 +334,7 @@ class MHQDisplayPage extends MHQOptionsPage {
         chkEnableDailyReportAggregateTab = checkBox("chkEnableDailyReportAggregateTab", model.aggregateDailyReport,
               getMetadata(null, CampaignOptionFlag.IMPORTANT));
 
-      SettingsFormPanel panel = new SettingsFormPanel("MHQDisplayPersonnelContent", FORM_LABEL_WIDTH,
+        SettingsFormPanel panel = new SettingsFormPanel("MHQDisplayPersonnelContent", FORM_LABEL_WIDTH,
               FORM_CONTROL_WIDTH);
         panel.addRow(filterStyleLabel, comboPersonnelFilterStyle);
         panel.addCheckBoxGrid(2, chkPersonnelFilterOnPrimaryRole, chkUnifiedDailyReport,
