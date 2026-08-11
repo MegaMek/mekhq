@@ -2011,6 +2011,8 @@ public class PlanetarySystemEditorDialog extends AbstractMHQDialogBasic {
                      .filter(Objects::nonNull)
                      .filter(faction -> blankToNull(faction.getShortName()) != null)
                      .filter(faction -> !faction.isAggregate())
+                     // A planet is owned by a faction or a command, never by an individual regiment of one.
+                     .filter(faction -> !faction.isSubunit())
                      .map(faction -> new FactionChoice(faction.getShortName(), factionDisplayName(faction, year),
                            faction.getStartYear(), faction.getEndYear()))
                      .sorted(Comparator.comparing(choice -> choice.displayName().toLowerCase(Locale.ROOT)))
