@@ -47,28 +47,30 @@ public class ChaosContractMarketDialogTest {
     }
 
     private String buildTextFromContract(AbstractContract contract) {
-        StringBuilder sb = new StringBuilder("<html>");
-        sb.append("contractId: " + contract.getContractId()).append("<br>");
-        sb.append("contractName:" + contract.getContractName()).append("<br>");
-        sb.append("description:" + contract.getDescription()).append("<br>");
-        sb.append("employerData:" + contract.getEmployerData()).append("<br>");
-        sb.append("enemyData:" + contract.getEnemyData()).append("<br>");
-        sb.append("contractTerms:" + contract.getContractTerms()).append("<br>");
-        sb.append("objectiveData:" + contract.getObjectiveData()).append("<br>");
-        sb.append("contractFinanceData:" + contract.getContractFinanceData()).append("<br>");
-        sb.append("missionStatus:" + contract.getMissionStatus()).append("<br>");
-        sb.append("scheduleData:" + contract.getScheduleData()).append("<br>");
-        sb.append("systemsTargetData:" + contract.getSystemsTargetData()).append("<br>");
-        sb.append("rentedFacilitiesData:" + contract.getRentedFacilitiesData()).append("<br>");
-        sb.append("moraleData:" + contract.getMoraleData()).append("<br>");
-        sb.append("stratConCampaignState:" + contract.getStratConCampaignState()).append("<br>");
-        sb.append("scale:" + contract.getScale()).append("<br>");
-        sb.append("trackCount:" + contract.getTrackCount()).append("<br>");
-        sb.append("scenarios:" + contract.getScenarios()).append("<br>");
-        sb.append("cachedJumpPath:" + contract.getCachedJumpPathDirect()).append("<br>");
-        sb.append("cachedContractDifficulty:" + contract.getCachedContractDifficulty()).append("<br>");
-        sb.append("</html>");
+        StringBuilder contractReport = new StringBuilder("<html>");
+        contractReport.append("contractId: ").append(contract.getContractId()).append("<br>");
+        contractReport.append("contractName:").append(contract.getContractName()).append("<br>");
+        contractReport.append("description:").append(contract.getDescription()).append("<br>");
+        contractReport.append("employerData:").append(contract.getEmployerData()).append("<br>");
+        contractReport.append("enemyData:").append(contract.getEnemyData()).append("<br>");
+        contractReport.append("contractTerms:").append(contract.getContractTerms()).append("<br>");
+        contractReport.append("objectiveData:").append(contract.getObjectiveData()).append("<br>");
+        contractReport.append("contractFinanceData:").append(contract.getContractFinanceData()).append("<br>");
+        contractReport.append("missionStatus:").append(contract.getMissionStatus()).append("<br>");
+        contractReport.append("scheduleData:").append(contract.getScheduleData()).append("<br>");
+        contractReport.append("systemsTargetData:").append(contract.getSystemsTargetData()).append("<br>");
+        contractReport.append("rentedFacilitiesData:").append(contract.getRentedFacilitiesData()).append("<br>");
+        contractReport.append("moraleData:").append(contract.getMoraleData()).append("<br>");
+        contractReport.append("stratConCampaignState:").append(contract.getStratConCampaignState()).append("<br>");
+        contractReport.append("scale:").append(contract.getScale()).append("<br>");
+        contractReport.append("trackCount:").append(contract.getTrackCount()).append("<br>");
+        contractReport.append("scenarios:").append(contract.getScenarios()).append("<br>");
+        contractReport.append("cachedJumpPath:").append(contract.getCachedJumpPathDirect()).append("<br>");
+        contractReport.append("cachedContractDifficulty:")
+              .append(contract.getCachedContractDifficulty())
+              .append("<br>");
+        contractReport.append("</html>");
 
-        return sb.toString().replace(",", "<br>");
+        return contractReport.toString().replace(",", "<br>");
     }
 }
