@@ -98,10 +98,9 @@ public class AbstractContractGeneration {
         ContractObjectiveData objectiveData = pickObjective(contractGenerationModifier, contract);
         boolean isDefensiveObjective = !objectiveData.playerObjectiveType().getChaosObjectiveType().isAttacker();
 
-        // Step 3: Enemy
+        // Step 3: Enemy (situated against the employer's territorial anchor faction, so a landless flavor employer -
+        // rebels, a mercenary command, a corporation - still yields a sensible nearby belligerent)
         EnemyData enemyData = pickEnemy(currentDate, currentLocation, employerData, objectiveData, contract);
-
-        // Step 4: Update Employer for Type
 
         // Step 4: Location
         SystemsTargetData systemsTargetData = pickTargetLocation(currentLocation,
@@ -344,8 +343,16 @@ public class AbstractContractGeneration {
 
     private static @Nonnull EnemyData pickEnemy(LocalDate currentDate, ILocation currentLocation,
           EmployerData employerData, ContractObjectiveData objectiveData, ChaosContract contract) {
-        EnemyData enemyData = ChaosContractDeterminationEnemy.generateEnemyFactionForObjective(currentLocation,
-              currentDate, employerData.getFaction(), objectiveData.playerObjectiveType());
+        EnemyData enemyData;
+        if (employerData.type() == ChaosEmployerType.CIVILIAN_ORGANIZATION_REBELS) {
+            // A rebellion is fought against the rebels' own ruling power, not a randomly drawn belligerent, so the
+            // enemy is fixed to the employer's territorial anchor (the local government the rebels rise against).
+            enemyData = ChaosContractDeterminationEnemy.generateEnemyForFaction(employerData.getAnchorFaction(),
+                  currentDate);
+        } else {
+            enemyData = ChaosContractDeterminationEnemy.generateEnemyFactionForObjective(currentLocation,
+                  currentDate, employerData.getAnchorFaction(), objectiveData.playerObjectiveType());
+        }
         contract.setEnemyData(enemyData);
         return enemyData;
     }
@@ -353,14 +360,17 @@ public class AbstractContractGeneration {
     private static @Nullable SystemsTargetData pickTargetLocation(ILocation currentLocation, LocalDate currentDate,
           ContractObjectiveData objectiveData, EmployerData employerData, EnemyData enemyData,
           ChaosContract contract, boolean isDefensiveObjective, boolean currentSystemEmployer) {
-        boolean shouldAlwaysPickCurrentSystem = isDefensiveObjective && currentSystemEmployer;
+        // A rebellion happens where the rebels are - here, against the local ruling power - so it is always situated in
+        // the current system rather than drawn from the employer/enemy border.
+        boolean isRebellion = employerData.type() == ChaosEmployerType.CIVILIAN_ORGANIZATION_REBELS;
+        boolean shouldAlwaysPickCurrentSystem = (isDefensiveObjective && currentSystemEmployer) || isRebellion;
         String currentSystemId = currentLocation.getCurrentSystem().getId();
 
         String targetSystemId = shouldAlwaysPickCurrentSystem ?
                                       currentSystemId :
                                       ChaosContractDeterminationLocation.determineContractLocation(objectiveData.playerObjectiveType(),
                                             true,
-                                            employerData.factionCode(),
+                                            employerData.anchorFactionCode(),
                                             enemyData.factionCode(),
                                             currentLocation);
         PlanetarySystem targetSystem = Systems.getInstance().getSystemById(targetSystemId);

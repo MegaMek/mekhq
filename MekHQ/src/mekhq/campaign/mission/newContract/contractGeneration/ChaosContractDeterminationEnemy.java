@@ -63,6 +63,22 @@ public class ChaosContractDeterminationEnemy {
         EnemySelectionProfile enemySelectionProfile = objectiveType.getEnemySelectionProfile();
         Faction enemyFaction = randomFactionGenerator.getRandomEnemy(currentLocation, currentDate, employerFaction,
               enemySelectionProfile);
+
+        return generateEnemyForFaction(enemyFaction, currentDate);
+    }
+
+    /**
+     * Wraps a pre-determined enemy faction into {@link EnemyData}, applying the same mercenary-sponsor substitution and
+     * camouflage/display resolution as {@link #generateEnemyFactionForObjective}. Used when the enemy is fixed by
+     * context rather than drawn from the objective's enemy pool &mdash; for example a rebellion, where the enemy is the
+     * ruling power the rebels are fighting rather than a randomly selected belligerent.
+     *
+     * @param enemyFaction the faction that will oppose the player
+     * @param currentDate  the date used for mercenary eligibility, display name, and camouflage
+     *
+     * @return the enemy data for the given faction
+     */
+    static EnemyData generateEnemyForFaction(Faction enemyFaction, LocalDate currentDate) {
         String factionCode = enemyFaction.getShortName();
 
         String sponsorFactionCode = null;

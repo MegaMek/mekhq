@@ -34,6 +34,7 @@ package mekhq.campaign.mission.newContract.contractData;
 
 import static megamek.client.ui.util.PlayerColour.BLUE;
 
+import jakarta.annotation.Nullable;
 import megamek.client.ui.util.PlayerColour;
 import megamek.common.enums.SkillLevel;
 import megamek.common.icons.Camouflage;
@@ -43,8 +44,22 @@ import mekhq.campaign.personnel.Person;
 import mekhq.campaign.universe.Faction;
 import mekhq.campaign.universe.Factions;
 
+/**
+ * @param factionCode        the employer's <em>flavor</em> faction &mdash; who is paying the unit and whose theme
+ *                           matches the {@link ChaosEmployerType}. Used for display, negotiator/liaison, and
+ *                           camouflage. May be a landless faction (rebels, a mercenary command, a corporation).
+ * @param anchorFactionCode  the employer's <em>territorial anchor</em> faction &mdash; a faction that actually holds
+ *                           ground near the player, used to situate the enemy and target system. Equal to
+ *                           {@code factionCode} when the flavor faction is itself a nearby territorial owner.
+ * @param sponsorFactionCode the covert <em>patron</em> bankrolling the employer, or {@code null} when the employer acts
+ *                           on its own account. Currently only rebels can be sponsored, by a ComStar/Word of Blake
+ *                           patron backing their uprising &mdash; the mirror of an enemy fielding sponsored
+ *                           mercenaries.
+ */
 public record EmployerData(ChaosEmployerType type,
       String factionCode,
+      String anchorFactionCode,
+      @Nullable String sponsorFactionCode,
       String displayName,
       Person negotiator,
       Person liaison,
@@ -53,10 +68,13 @@ public record EmployerData(ChaosEmployerType type,
       Camouflage camouflage,
       PlayerColour color
 ) {
-    public EmployerData(ChaosEmployerType type, String factionCode, String displayName, Person negotiator,
-          Person liaison, Camouflage camouflage) {
+    public EmployerData(ChaosEmployerType type, String factionCode, String anchorFactionCode,
+          @Nullable String sponsorFactionCode, String displayName, Person negotiator, Person liaison,
+          Camouflage camouflage) {
         this(type,
               factionCode,
+              anchorFactionCode,
+              sponsorFactionCode,
               displayName,
               negotiator,
               liaison,
@@ -69,6 +87,8 @@ public record EmployerData(ChaosEmployerType type,
     public EmployerData(EmployerData existingData, SkillLevel forceSkill, int equipmentRating) {
         this(existingData.type,
               existingData.factionCode,
+              existingData.anchorFactionCode,
+              existingData.sponsorFactionCode,
               existingData.displayName,
               existingData.negotiator,
               existingData.liaison,
@@ -79,7 +99,26 @@ public record EmployerData(ChaosEmployerType type,
         );
     }
 
+    /**
+     * @return the flavor faction &mdash; who is paying the unit (see {@link #factionCode()})
+     */
     public Faction getFaction() {
         return Factions.getInstance().getFaction(factionCode);
+    }
+
+    /**
+     * @return the territorial anchor faction used to situate the enemy and target system (see
+     *       {@link #anchorFactionCode()})
+     */
+    public Faction getAnchorFaction() {
+        return Factions.getInstance().getFaction(anchorFactionCode);
+    }
+
+    /**
+     * @return the covert patron bankrolling the employer, or {@code null} if the employer has none (see
+     *       {@link #sponsorFactionCode()})
+     */
+    public @Nullable Faction getSponsorFaction() {
+        return sponsorFactionCode == null ? null : Factions.getInstance().getFaction(sponsorFactionCode);
     }
 }

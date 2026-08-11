@@ -32,7 +32,11 @@
  */
 package mekhq.campaign.mission.newContract.contractGeneration;
 
+import static java.lang.Math.max;
+import static java.lang.Math.round;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.util.EnumMap;
 import java.util.Map;
@@ -76,5 +80,52 @@ class ChaosObjectiveTypeTest {
     void everyObjectiveHasAnExpectedForceCommitmentValue() {
         assertEquals(ChaosObjectiveType.values().length, EXPECTED_FORCE_COMMITMENT.size(),
               "Every ChaosObjectiveType must have an expected force-commitment value in this test's table");
+    }
+
+    // --- contract length ---
+
+    @ParameterizedTest
+    @EnumSource(ChaosObjectiveType.class)
+    void fixedLengthEqualsTheDeclaredMonthsLength(final ChaosObjectiveType objectiveType) {
+        assertEquals(objectiveType.getMonthsLength(), objectiveType.calculateLength(false),
+              "with variable length disabled the contract runs for exactly the declared duration");
+    }
+
+    @ParameterizedTest
+    @EnumSource(ChaosObjectiveType.class)
+    void variableLengthStaysWithinTheDocumentedBand(final ChaosObjectiveType objectiveType) {
+        // Mirrors calculateVariableLength: base of 75% plus 0..(variance-1) months of jitter at 50%, floored at 1.
+        int months = objectiveType.getMonthsLength();
+        int base = (int) round(months * 0.75);
+        int variance = (int) round(months * 0.5);
+        int lowerBound = max(1, base);
+        int upperBound = (variance > 0) ? base + variance - 1 : months;
+
+        for (int iteration = 0; iteration < 500; iteration++) {
+            int length = objectiveType.calculateLength(true);
+            assertTrue(length >= lowerBound && length <= upperBound,
+                  objectiveType + " variable length " + length + " fell outside [" + lowerBound + ", " + upperBound
+                        + "]");
+        }
+    }
+
+    // --- special rules ---
+
+    @Test
+    void usesSpecialRuleReflectsMembership() {
+        assertTrue(ChaosObjectiveType.PIRATE_HUNT.usesSpecialRule(
+                    ChaosObjectiveSpecialRules.END_CONTRACT_AFTER_TWO_CONSECUTIVE_TRACKS),
+              "pirate hunts end after two consecutive quiet tracks");
+        assertFalse(ChaosObjectiveType.PIRATE_HUNT.usesSpecialRule(ChaosObjectiveSpecialRules.USE_PIRATE_LOOTING),
+              "a pirate hunt does not itself loot");
+        assertTrue(ChaosObjectiveType.PIRATE_RAID.usesSpecialRule(ChaosObjectiveSpecialRules.USE_PIRATE_LOOTING),
+              "a pirate raid loots");
+    }
+
+    @Test
+    void objectiveWithoutSpecialRulesHasNone() {
+        assertTrue(ChaosObjectiveType.EXPEDITION.getSpecialRules().isEmpty(),
+              "an expedition carries no special rules");
+        assertFalse(ChaosObjectiveType.EXPEDITION.usesSpecialRule(ChaosObjectiveSpecialRules.SIMULATED_DAMAGE));
     }
 }

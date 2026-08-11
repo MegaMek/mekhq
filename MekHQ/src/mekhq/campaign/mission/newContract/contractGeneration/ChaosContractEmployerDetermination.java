@@ -36,11 +36,15 @@ import static megamek.common.compute.Compute.d6;
 import static megamek.common.compute.Compute.randomInt;
 import static mekhq.campaign.mission.RandomFactionCamouflage.pickRandomCamouflage;
 import static mekhq.campaign.universe.Faction.COMSTAR_FACTION_CODE;
+import static mekhq.campaign.universe.Faction.MERCENARY_FACTION_CODE;
+import static mekhq.campaign.universe.Faction.REBEL_FACTION_CODE;
 import static mekhq.campaign.universe.Faction.WORD_OF_BLAKE_FACTION_CODE;
 
 import java.time.LocalDate;
 import java.util.Collections;
 import java.util.List;
+import java.util.function.Predicate;
+import java.util.function.Supplier;
 
 import jakarta.annotation.Nullable;
 import megamek.common.icons.Camouflage;
@@ -68,14 +72,19 @@ public class ChaosContractEmployerDetermination {
         ChaosEmployerType type = determineEmployerType();
 
         boolean isMercenarySearch = searchType == ContractSearchType.MERCENARY;
-        Faction employer = determineEmployerFaction(type, currentDate, currentLocation, isMercenarySearch);
-        if (employer == null) {
+        EmployerFactions employerFactions = determineEmployerFactions(type, currentDate, currentLocation,
+              isMercenarySearch);
+        if (employerFactions == null) {
             LOGGER.info("Failed to select an employer for current location. Contract generation failed");
             return null;
         }
 
+        Faction employer = employerFactions.flavor();
         int currentYear = currentDate.getYear();
         String factionCode = employer.getShortName();
+        String anchorFactionCode = employerFactions.anchor().getShortName();
+        Faction sponsor = employerFactions.sponsor();
+        String sponsorFactionCode = sponsor == null ? null : sponsor.getShortName();
         String displayName = employer.getFullName(currentYear);
 
         Planet currentPlanet = currentLocation.getPlanet();
@@ -95,6 +104,8 @@ public class ChaosContractEmployerDetermination {
 
         return new EmployerData(type,
               factionCode,
+              anchorFactionCode,
+              sponsorFactionCode,
               displayName,
               negotiator,
               liaison,
@@ -127,22 +138,152 @@ public class ChaosContractEmployerDetermination {
         };
     }
 
-    private static @Nullable Faction determineEmployerFaction(ChaosEmployerType employerType,
+    /**
+     * The factions describing an employer: the {@code flavor} faction the player is contracted with (matching the
+     * {@link ChaosEmployerType} theme), the {@code anchor} faction whose territory near the player the contract's
+     * conflict is situated in, and an optional covert {@code sponsor} bankrolling the employer. Flavor and anchor are
+     * equal for territorial employer types and differ when the flavor faction is landless (rebels, a mercenary command,
+     * a corporation, a stateless noble). The sponsor is {@code null} unless a patron is backing the employer.
+     */
+    record EmployerFactions(@NonNull Faction flavor, @NonNull Faction anchor, @Nullable Faction sponsor) {}
+
+    /**
+     * Resolves the flavor (paying) faction, the territorial anchor faction, and any covert sponsor for the given
+     * employer type.
+     *
+     * <p>The flavor faction is chosen to match the {@link ChaosEmployerType} theme (a corporation for a corporation, a
+     * mercenary command for a subcontract, and so on), which may be a faction with no territory of its own. The anchor
+     * faction is always a faction that holds ground near the player, so the downstream enemy and target-system
+     * selection have real geography to work with even when the flavor faction is landless.</p>
+     *
+     * <p>On a mercenary search a ComStar/Word of Blake patron may step in. For rebels it does so covertly, bankrolling
+     * the uprising while the rebels remain the visible employer (mirroring an enemy fielding sponsored mercenaries);
+     * for every other type it openly takes over as the employer, as before.</p>
+     *
+     * @return the flavor/anchor/sponsor factions, or {@code null} if no eligible employer could be found for the
+     *       location
+     */
+    static @Nullable EmployerFactions determineEmployerFactions(ChaosEmployerType employerType,
           LocalDate currentDate, ILocation currentLocation, boolean isMercenarySearch) {
-        if (isMercenarySearch) {
-            Faction specialEmployer = checkForSpecialEmployer(currentDate.getYear());
-            if (specialEmployer != null) {
-                return specialEmployer;
+        if (employerType == ChaosEmployerType.CIVILIAN_ORGANIZATION_REBELS) {
+            Faction rebels = resolveFlavorFaction(employerType, currentDate, currentLocation, isMercenarySearch);
+            if (rebels == null) {
+                return null;
             }
+            Faction anchor = resolveAnchorFaction(employerType, currentDate, currentLocation, isMercenarySearch,
+                  rebels);
+            // A Blakist/ComStar patron does not replace the rebels as employer; it secretly funds them.
+            Faction sponsor = isMercenarySearch ? checkForSpecialEmployer(currentDate.getYear()) : null;
+            return new EmployerFactions(rebels, anchor, sponsor);
         }
 
-        if (employerType.isCurrentSystemEmployer()) {
-            Faction employerFaction = getCurrentSystemEmployer(currentDate, currentLocation);
-            if (employerFaction != null) {return employerFaction;}
+        Faction flavor;
+        if (isMercenarySearch && (flavor = checkForSpecialEmployer(currentDate.getYear())) != null) {
+            // ComStar/Word of Blake overrides keep their flavor but anchor on a regional owner: in most eras they hold
+            // little or no territory, so the conflict still needs a landed power to sit inside.
+            Faction anchor = pickRegionalOwner(currentDate, currentLocation, isMercenarySearch, flavor);
+            return new EmployerFactions(flavor, anchor, null);
         }
 
+        flavor = resolveFlavorFaction(employerType, currentDate, currentLocation, isMercenarySearch);
+        if (flavor == null) {
+            return null;
+        }
+
+        Faction anchor = resolveAnchorFaction(employerType, currentDate, currentLocation, isMercenarySearch, flavor);
+        return new EmployerFactions(flavor, anchor, null);
+    }
+
+    /**
+     * Selects the flavor faction &mdash; who is paying the unit &mdash; matching the employer type's theme.
+     */
+    private static @Nullable Faction resolveFlavorFaction(ChaosEmployerType employerType, LocalDate currentDate,
+          ILocation currentLocation, boolean isMercenarySearch) {
+        Factions factions = Factions.getInstance();
+        return switch (employerType) {
+            // Owner of the world/system the player is standing on, falling back to any regional owner off-world.
+            case LOCAL_SYSTEM_OWNER, LOCAL_PLANETARY_GOVERNMENT, CIVILIAN_ORGANIZATION_MILITIA ->
+                  firstNonNull(getCurrentSystemEmployer(currentDate, currentLocation),
+                        () -> pickRegionalOwner(currentDate, currentLocation, isMercenarySearch, null));
+            // Any landed government with a presence near the player.
+            case ANY_SYSTEM_OWNER, ANY_PLANETARY_GOVERNMENT ->
+                  pickRegionalOwner(currentDate, currentLocation, isMercenarySearch, null);
+            // A noble house, a corporation, or a corporate business: prefer one operating near the player, otherwise
+            // draw any active faction of that kind, and finally fall back to a regional owner so generation never fails
+            // just because no themed faction is in range.
+            case NOBLE -> firstNonNull(pickThemedFaction(currentDate, currentLocation, isMercenarySearch,
+                        Faction::isNoble),
+                  () -> pickRegionalOwner(currentDate, currentLocation, isMercenarySearch, null));
+            case CORPORATION, CIVILIAN_ORGANIZATION_BUSINESS ->
+                  firstNonNull(pickThemedFaction(currentDate, currentLocation, isMercenarySearch,
+                              Faction::isCorporation),
+                        () -> pickRegionalOwner(currentDate, currentLocation, isMercenarySearch, null));
+            case CIVILIAN_ORGANIZATION_REBELS -> factions.getFaction(REBEL_FACTION_CODE);
+            case MERCENARY_SUBCONTRACT -> factions.getFaction(MERCENARY_FACTION_CODE);
+        };
+    }
+
+    /**
+     * Selects the territorial anchor faction for the given type. Territorial employer types anchor on the flavor
+     * faction itself; landless or stateless flavor types anchor on a nearby landed power whose war the contract sits
+     * inside. Rebels are special: they fight their own local government, so the anchor is the current system's owner.
+     */
+    private static Faction resolveAnchorFaction(ChaosEmployerType employerType, LocalDate currentDate,
+          ILocation currentLocation, boolean isMercenarySearch, Faction flavor) {
+        return switch (employerType) {
+            case LOCAL_SYSTEM_OWNER, LOCAL_PLANETARY_GOVERNMENT, CIVILIAN_ORGANIZATION_MILITIA,
+                 ANY_SYSTEM_OWNER, ANY_PLANETARY_GOVERNMENT -> flavor;
+            case CIVILIAN_ORGANIZATION_REBELS -> firstNonNull(getCurrentSystemEmployer(currentDate, currentLocation),
+                  () -> pickRegionalOwner(currentDate, currentLocation, isMercenarySearch, flavor));
+            case NOBLE, CORPORATION, CIVILIAN_ORGANIZATION_BUSINESS, MERCENARY_SUBCONTRACT ->
+                  pickRegionalOwner(currentDate, currentLocation, isMercenarySearch, flavor);
+        };
+    }
+
+    /**
+     * Picks a landed government faction with a presence near the player, falling back to any regional employer and
+     * finally to {@code fallback} so a territorial anchor is always available.
+     */
+    private static Faction pickRegionalOwner(LocalDate currentDate, ILocation currentLocation,
+          boolean isMercenarySearch, @Nullable Faction fallback) {
         RandomFactionGenerator generator = RandomFactionGenerator.getInstance();
-        return generator.getRandomEmployerFaction(currentLocation, currentDate, isMercenarySearch);
+        Faction owner = generator.getRandomEmployerFaction(currentLocation, currentDate, isMercenarySearch,
+              Faction::isGovernment);
+        if (owner == null) {
+            owner = generator.getRandomEmployerFaction(currentLocation, currentDate, isMercenarySearch);
+        }
+        return owner != null ? owner : fallback;
+    }
+
+    /**
+     * Picks a faction matching {@code predicate}, preferring one with a regional presence near the player and otherwise
+     * drawing from all active factions of that kind. Returns {@code null} if no such faction exists at all.
+     */
+    private static @Nullable Faction pickThemedFaction(LocalDate currentDate, ILocation currentLocation,
+          boolean isMercenarySearch, Predicate<Faction> predicate) {
+        Faction regional = RandomFactionGenerator.getInstance()
+                                 .getRandomEmployerFaction(currentLocation, currentDate, isMercenarySearch, predicate);
+        if (regional != null) {
+            return regional;
+        }
+
+        List<Faction> candidates = Factions.getInstance()
+                                         .getActiveFactions(currentDate)
+                                         .stream()
+                                         .filter(predicate)
+                                         .toList();
+        if (candidates.isEmpty()) {
+            return null;
+        }
+        return candidates.get(randomInt(candidates.size()));
+    }
+
+    /**
+     * Returns {@code first} if it is non-null, otherwise the value produced by {@code fallback}. The fallback is a
+     * supplier so its (potentially expensive) regional lookup is only performed when the primary faction is missing.
+     */
+    private static @Nullable Faction firstNonNull(@Nullable Faction first, Supplier<Faction> fallback) {
+        return first != null ? first : fallback.get();
     }
 
     private static @Nullable Faction getCurrentSystemEmployer(LocalDate currentDate, ILocation currentLocation) {
