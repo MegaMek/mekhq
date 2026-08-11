@@ -32,28 +32,35 @@
  */
 package mekhq.campaign.universe.WarriorsAlmanac;
 
-import java.util.List;
-import java.util.function.Function;
+import static mekhq.utilities.MHQInternationalization.getTextAt;
 
+/**
+ * The development phases tracked by the Warrior's Almanac, in the order they occur in a technology's lifecycle.
+ *
+ * <p>Each phase carries a resource key for its localized, plain-text label, used as the value of the "Development"
+ * column in the almanac's per-type tables.</p>
+ *
+ * @author Illiani
+ * @since 0.50.07
+ */
 public enum AlmanacTechAdvancementPhase {
-    EXTINCT("WarriorsAlmanacDialog.extinct", WarriorsAlmanacData::extinctionDate),
-    COMMON("WarriorsAlmanacDialog.common", WarriorsAlmanacData::commonDate),
-    PRODUCTION("WarriorsAlmanacDialog.production", WarriorsAlmanacData::productionDate),
-    PROTOTYPE("WarriorsAlmanacDialog.prototype", WarriorsAlmanacData::prototypeDate);
+    PROTOTYPE("WarriorsAlmanacDialog.development.prototype"),
+    PRODUCTION("WarriorsAlmanacDialog.development.production"),
+    COMMON("WarriorsAlmanacDialog.development.common"),
+    EXTINCT("WarriorsAlmanacDialog.development.extinct");
 
-    private final String headerKey;
-    private final Function<WarriorsAlmanacData, List<String>> names;
+    private static final String RESOURCE_BUNDLE = "mekhq.resources.WarriorsAlmanacDialog";
 
-    AlmanacTechAdvancementPhase(String headerKey, Function<WarriorsAlmanacData, List<String>> names) {
-        this.headerKey = headerKey;
-        this.names = names;
+    private final String labelKey;
+
+    AlmanacTechAdvancementPhase(String labelKey) {
+        this.labelKey = labelKey;
     }
 
-    public String getHeaderKey() {
-        return headerKey;
-    }
-
-    public Function<WarriorsAlmanacData, List<String>> getNames() {
-        return names;
+    /**
+     * @return the localized, plain-text label for this phase
+     */
+    public String getLabel() {
+        return getTextAt(RESOURCE_BUNDLE, labelKey);
     }
 }

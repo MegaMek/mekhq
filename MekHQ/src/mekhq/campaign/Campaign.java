@@ -238,7 +238,7 @@ import mekhq.campaign.unit.Unit;
 import mekhq.campaign.unit.UnitOrder;
 import mekhq.campaign.unit.enums.TransporterType;
 import mekhq.campaign.universe.*;
-import mekhq.campaign.universe.WarriorsAlmanac.WarriorsAlmanacData;
+import mekhq.campaign.universe.WarriorsAlmanac.WarriorsAlmanacEntry;
 import mekhq.campaign.universe.enums.HiringHallLevel;
 import mekhq.campaign.universe.enums.StartingLocationMode;
 import mekhq.campaign.universe.eras.Era;
@@ -368,13 +368,8 @@ public class Campaign implements ITechManager {
     RandomEventLibraries randomEventLibraries;
     FactionStandingUltimatumsLibrary factionStandingUltimatumsLibrary;
 
-    private Map<Integer, WarriorsAlmanacData> partsAlmanacIS;
-    private Map<Integer, WarriorsAlmanacData> partsAlmanacClan;
-
-    private Map<Integer, WarriorsAlmanacData> unitsAlmanacIS;
-    private Map<Integer, WarriorsAlmanacData> unitsAlmanacClan;
-    private Map<Integer, WarriorsAlmanacData> unitsAlmanacMixed;
-    private Map<Integer, WarriorsAlmanacData> unitsAlmanacUnknown;
+    private Map<Integer, List<WarriorsAlmanacEntry>> partsAlmanac;
+    private Map<Integer, List<WarriorsAlmanacEntry>> unitsAlmanac;
 
     /**
      * A constant that provides the ISO-8601 definition of week-based fields.
@@ -5367,52 +5362,20 @@ public class Campaign implements ITechManager {
     }
 
 
-    public Map<Integer, WarriorsAlmanacData> getPartsAlmanacIS() {
-        return partsAlmanacIS;
+    public Map<Integer, List<WarriorsAlmanacEntry>> getPartsAlmanac() {
+        return partsAlmanac;
     }
 
-    public void setPartsAlmanacIS(Map<Integer, WarriorsAlmanacData> partsAlmanacIS) {
-        this.partsAlmanacIS = partsAlmanacIS;
+    public void setPartsAlmanac(Map<Integer, List<WarriorsAlmanacEntry>> partsAlmanac) {
+        this.partsAlmanac = partsAlmanac;
     }
 
-    public Map<Integer, WarriorsAlmanacData> getPartsAlmanacClan() {
-        return partsAlmanacClan;
+    public Map<Integer, List<WarriorsAlmanacEntry>> getUnitsAlmanac() {
+        return unitsAlmanac;
     }
 
-    public void setPartsAlmanacClan(Map<Integer, WarriorsAlmanacData> partsAlmanacClan) {
-        this.partsAlmanacClan = partsAlmanacClan;
-    }
-
-    public Map<Integer, WarriorsAlmanacData> getUnitsAlmanacIS() {
-        return unitsAlmanacIS;
-    }
-
-    public void setUnitsAlmanacIS(Map<Integer, WarriorsAlmanacData> unitsAlmanacIS) {
-        this.unitsAlmanacIS = unitsAlmanacIS;
-    }
-
-    public Map<Integer, WarriorsAlmanacData> getUnitsAlmanacClan() {
-        return unitsAlmanacClan;
-    }
-
-    public void setUnitsAlmanacClan(Map<Integer, WarriorsAlmanacData> unitsAlmanacClan) {
-        this.unitsAlmanacClan = unitsAlmanacClan;
-    }
-
-    public Map<Integer, WarriorsAlmanacData> getUnitsAlmanacMixed() {
-        return unitsAlmanacMixed;
-    }
-
-    public void setUnitsAlmanacMixed(Map<Integer, WarriorsAlmanacData> unitsAlmanacMixed) {
-        this.unitsAlmanacMixed = unitsAlmanacMixed;
-    }
-
-    public Map<Integer, WarriorsAlmanacData> getUnitsAlmanacUnknown() {
-        return unitsAlmanacUnknown;
-    }
-
-    public void setUnitsAlmanacUnknown(Map<Integer, WarriorsAlmanacData> unitsAlmanacUnknown) {
-        this.unitsAlmanacUnknown = unitsAlmanacUnknown;
+    public void setUnitsAlmanac(Map<Integer, List<WarriorsAlmanacEntry>> unitsAlmanac) {
+        this.unitsAlmanac = unitsAlmanac;
     }
 
     public void writeToXML(final PrintWriter writer, boolean isBugReportPrep) {

@@ -34,8 +34,8 @@ package mekhq.gui.dialog;
 
 import static java.util.Arrays.sort;
 import static mekhq.campaign.enums.DailyReportType.POLITICS;
-import static mekhq.campaign.universe.WarriorsAlmanac.WarriorsAlmanacData.buildAlmanacPartsData;
-import static mekhq.campaign.universe.WarriorsAlmanac.WarriorsAlmanacData.buildAlmanacUnitsData;
+import static mekhq.campaign.universe.WarriorsAlmanac.WarriorsAlmanacEntry.buildAlmanacPartsData;
+import static mekhq.campaign.universe.WarriorsAlmanac.WarriorsAlmanacEntry.buildAlmanacUnitsData;
 import static mekhq.gui.campaignOptions.CampaignOptionsDialog.CampaignOptionsDialogMode.STARTUP;
 import static mekhq.gui.campaignOptions.CampaignOptionsDialog.CampaignOptionsDialogMode.STARTUP_ABRIDGED;
 import static mekhq.utilities.EntityUtilities.isUnsupportedEntity;
@@ -51,7 +51,6 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
-import java.util.Map;
 import java.util.concurrent.CancellationException;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutionException;
@@ -69,7 +68,6 @@ import megamek.client.generator.RandomNameGenerator;
 import megamek.client.ui.util.UIUtil;
 import megamek.client.ui.widget.RawImagePanel;
 import megamek.common.annotations.Nullable;
-import megamek.common.enums.TechBase;
 import megamek.common.loaders.MekSummaryCache;
 import megamek.common.options.OptionsConstants;
 import megamek.common.units.Entity;
@@ -103,7 +101,6 @@ import mekhq.campaign.reputation.camOpsReputation.ForceReputationController;
 import mekhq.campaign.unit.Unit;
 import mekhq.campaign.universe.Factions;
 import mekhq.campaign.universe.Systems;
-import mekhq.campaign.universe.WarriorsAlmanac.WarriorsAlmanacData;
 import mekhq.campaign.universe.eras.Eras;
 import mekhq.campaign.universe.factionHints.WarAndPeaceProcessor;
 import mekhq.campaign.universe.factionStanding.FactionStandings;
@@ -513,19 +510,10 @@ public class DataLoadingDialog extends AbstractMHQDialogBasic implements Propert
             setProgress(8);
 
             PartsStore partsStore = campaign.getPartsStore();
-            Map<Integer, WarriorsAlmanacData> partsAlmanacInnerSphere = buildAlmanacPartsData(partsStore, false);
-            campaign.setPartsAlmanacIS(partsAlmanacInnerSphere);
-            Map<Integer, WarriorsAlmanacData> partsAlmanacClan = buildAlmanacPartsData(partsStore, true);
-            campaign.setPartsAlmanacClan(partsAlmanacClan);
-
-            Map<Integer, WarriorsAlmanacData> unitsAlmanacIS = buildAlmanacUnitsData(TechBase.IS);
-            campaign.setUnitsAlmanacIS(unitsAlmanacIS);
-            Map<Integer, WarriorsAlmanacData> unitsAlmanacClan = buildAlmanacUnitsData(TechBase.CLAN);
-            campaign.setUnitsAlmanacClan(unitsAlmanacClan);
-            Map<Integer, WarriorsAlmanacData> unitsAlmanacMixed = buildAlmanacUnitsData(TechBase.ALL);
-            campaign.setUnitsAlmanacMixed(unitsAlmanacMixed);
-            Map<Integer, WarriorsAlmanacData> unitsAlmanacUnknown = buildAlmanacUnitsData(TechBase.UNKNOWN);
-            campaign.setUnitsAlmanacUnknown(unitsAlmanacUnknown);
+            // Parts carry separate Inner Sphere and Clan tech dates; use the player force's perspective.
+            boolean isClanForce = campaign.getPlayerForce().isClanForce();
+            campaign.setPartsAlmanac(buildAlmanacPartsData(partsStore, isClanForce));
+            campaign.setUnitsAlmanac(buildAlmanacUnitsData());
 
             if (isNewCampaign) {
                 new WarAndPeaceProcessor(campaign, true);
