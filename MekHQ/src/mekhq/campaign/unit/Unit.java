@@ -74,6 +74,7 @@ import javax.swing.UIManager;
 import jakarta.annotation.Nonnull;
 import megamek.Version;
 import megamek.client.ui.tileset.EntityImage;
+import megamek.codeUtilities.MathUtility;
 import megamek.common.CriticalSlot;
 import megamek.common.SimpleTechLevel;
 import megamek.common.TechConstants;
@@ -3040,43 +3041,9 @@ public class Unit implements ITechnology, ILocatable {
                     retVal.setSuperHeavyVehicleCapacity(Double.parseDouble(wn2.getTextContent()));
                     needsBayInitialization = false;
                 } else if (wn2.getNodeName().equalsIgnoreCase("transportAssignment")) {
-                    NamedNodeMap attributes = wn2.getAttributes();
-                    CampaignTransportType campaignTransportType;
-                    if (attributes.getNamedItem("campaignTransportType") != null) {
-                        campaignTransportType = CampaignTransportType.valueOf(attributes.getNamedItem(
-                              "campaignTransportType").getTextContent());
-                    } else {
-                        // Tactical transports were added before the campaignTransportType attribute
-                        // was. Assume it's a tactical transport.
-                        campaignTransportType = CampaignTransportType.TACTICAL_TRANSPORT;
-                    }
-                    UUID id = UUID.fromString(attributes.getNamedItem("id").getTextContent());
-
-                    if (attributes.getNamedItem("transportedLocation") != null) {
-                        int transportedLocationHash = Integer.parseInt(attributes.getNamedItem("transportedLocation")
-                                                                             .getTextContent());
-                        retVal.setTransportAssignment(campaignTransportType,
-                              new TransportAssignment(new UnitRef(id), transportedLocationHash));
-                    } else if (attributes.getNamedItem("transporterType") != null) {
-                        try {
-                            TransporterType transporterType = TransporterType.valueOf((attributes.getNamedItem(
-                                  "transporterType").getTextContent()));
-                            retVal.setTransportAssignment(campaignTransportType,
-                                  new TransportAssignment(new UnitRef(id), transporterType));
-                        } catch (IllegalArgumentException e) {
-                            LOGGER.error(e, "Could not find transporter type.");
-                            retVal.setTransportAssignment(campaignTransportType,
-                                  new TransportAssignment(new UnitRef(id)));
-                        }
-                    } else {
-                        retVal.setTransportAssignment(campaignTransportType, new TransportAssignment(new UnitRef(id)));
-                    }
+                    parseTransportAssignmentNode(wn2, retVal);
                 } else if (wn2.getNodeName().equalsIgnoreCase("transportedUnit")) {
-                    NamedNodeMap attributes = wn2.getAttributes();
-                    CampaignTransportType campaignTransportType = CampaignTransportType.valueOf(attributes.getNamedItem(
-                          "campaignTransportType").getTextContent());
-                    retVal.addTransportedUnit(campaignTransportType,
-                          new UnitRef(UUID.fromString(attributes.getNamedItem("id").getTextContent())));
+                    parseTransportedUnitNode(wn2, retVal);
                 } else if (wn2.getNodeName().equalsIgnoreCase("formationId") ||
                                  wn2.getNodeName().equalsIgnoreCase("forceId")) {
                     retVal.formationId = Integer.parseInt(wn2.getTextContent());
@@ -3123,6 +3090,69 @@ public class Unit implements ITechnology, ILocatable {
         }
 
         return retVal;
+    }
+
+    // Attribute names on the <transportAssignment> and <transportedUnit> save-file nodes. The id is
+    // the transport's UUID on an assignment node and the transported unit's UUID on a transported
+    // node; the other three only ever appear on an assignment node.
+    private static final String TRANSPORT_ATTRIBUTE_ID = "id";
+    private static final String TRANSPORT_ATTRIBUTE_TYPE = "campaignTransportType";
+    private static final String TRANSPORT_ATTRIBUTE_LOCATION = "transportedLocation";
+    private static final String TRANSPORT_ATTRIBUTE_TRANSPORTER_TYPE = "transporterType";
+
+    /**
+     * Parses a {@code <transportAssignment>} save-file node onto the given unit. Entries carry a
+     * {@code campaignTransportType} attribute; entries without one predate that attribute and only
+     * ever meant a tactical transport, so they load as TACTICAL. Package-visible so the routing is
+     * unit-testable without loading a full entity.
+     */
+    static void parseTransportAssignmentNode(Node transportNode, Unit retVal) {
+        NamedNodeMap attributes = transportNode.getAttributes();
+        CampaignTransportType campaignTransportType;
+        if (attributes.getNamedItem(TRANSPORT_ATTRIBUTE_TYPE) != null) {
+            campaignTransportType = CampaignTransportType.valueOf(attributes.getNamedItem(
+                  TRANSPORT_ATTRIBUTE_TYPE).getTextContent());
+        } else {
+            // Tactical transports were added before the campaignTransportType attribute
+            // was. Assume it's a tactical transport.
+            campaignTransportType = CampaignTransportType.TACTICAL_TRANSPORT;
+        }
+        UUID id = UUID.fromString(attributes.getNamedItem(TRANSPORT_ATTRIBUTE_ID).getTextContent());
+
+        if (attributes.getNamedItem(TRANSPORT_ATTRIBUTE_LOCATION) != null) {
+            // A hash that does not parse, or does not match any of the transport's bays, leaves the
+            // assignment without a location - the same state as an entry that never carried one.
+            int transportedLocationHash = MathUtility.parseInt(attributes.getNamedItem(TRANSPORT_ATTRIBUTE_LOCATION)
+                                                                     .getTextContent(), 0);
+            retVal.setTransportAssignment(campaignTransportType,
+                  new TransportAssignment(new UnitRef(id), transportedLocationHash));
+        } else if (attributes.getNamedItem(TRANSPORT_ATTRIBUTE_TRANSPORTER_TYPE) != null) {
+            try {
+                TransporterType transporterType = TransporterType.valueOf((attributes.getNamedItem(
+                      TRANSPORT_ATTRIBUTE_TRANSPORTER_TYPE).getTextContent()));
+                retVal.setTransportAssignment(campaignTransportType,
+                      new TransportAssignment(new UnitRef(id), transporterType));
+            } catch (IllegalArgumentException e) {
+                LOGGER.error(e, "Could not find transporter type.");
+                retVal.setTransportAssignment(campaignTransportType,
+                      new TransportAssignment(new UnitRef(id)));
+            }
+        } else {
+            retVal.setTransportAssignment(campaignTransportType, new TransportAssignment(new UnitRef(id)));
+        }
+    }
+
+    /**
+     * Parses a {@code <transportedUnit>} save-file node onto the given unit, routing it to the
+     * summary matching its {@code campaignTransportType} attribute. Package-visible so the routing
+     * is unit-testable without loading a full entity.
+     */
+    static void parseTransportedUnitNode(Node transportedNode, Unit retVal) {
+        NamedNodeMap attributes = transportedNode.getAttributes();
+        CampaignTransportType campaignTransportType = CampaignTransportType.valueOf(attributes.getNamedItem(
+              TRANSPORT_ATTRIBUTE_TYPE).getTextContent());
+        retVal.addTransportedUnit(campaignTransportType,
+              new UnitRef(UUID.fromString(attributes.getNamedItem(TRANSPORT_ATTRIBUTE_ID).getTextContent())));
     }
 
     /**
@@ -6487,12 +6517,10 @@ public class Unit implements ITechnology, ILocatable {
         // We don't want to clear transport assignments, but we do want to remove the
         // transport from the list of potential transports, if it's transport.
         if (campaign != null) {
-            if (!getTransportCapabilities(SHIP_TRANSPORT).isEmpty()) {
-                getCampaign().removeCampaignTransporter(SHIP_TRANSPORT, this);
-            }
-
-            if (!getTransportCapabilities(CampaignTransportType.TACTICAL_TRANSPORT).isEmpty()) {
-                getCampaign().removeCampaignTransporter(CampaignTransportType.TACTICAL_TRANSPORT, this);
+            for (CampaignTransportType campaignTransportType : CampaignTransportType.values()) {
+                if (!getTransportCapabilities(campaignTransportType).isEmpty()) {
+                    getCampaign().removeCampaignTransporter(campaignTransportType, this);
+                }
             }
         }
     }
@@ -6571,16 +6599,10 @@ public class Unit implements ITechnology, ILocatable {
         // If this unit is a transport, let's add it to the campaign's
         // transporter map.
         if (campaign != null) {
-            if (!getTransportCapabilities(SHIP_TRANSPORT).isEmpty()) {
-                getCampaign().addCampaignTransport(SHIP_TRANSPORT, this);
-            }
-
-            if (!getTransportCapabilities(CampaignTransportType.TACTICAL_TRANSPORT).isEmpty()) {
-                getCampaign().addCampaignTransport(CampaignTransportType.TACTICAL_TRANSPORT, this);
-            }
-
-            if (!getTransportCapabilities(CampaignTransportType.TOW_TRANSPORT).isEmpty()) {
-                getCampaign().addCampaignTransport(CampaignTransportType.TOW_TRANSPORT, this);
+            for (CampaignTransportType campaignTransportType : CampaignTransportType.values()) {
+                if (!getTransportCapabilities(campaignTransportType).isEmpty()) {
+                    getCampaign().addCampaignTransport(campaignTransportType, this);
+                }
             }
         }
     }

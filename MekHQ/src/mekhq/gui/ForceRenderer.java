@@ -41,11 +41,14 @@ import javax.swing.JTree;
 import javax.swing.tree.DefaultTreeCellRenderer;
 
 import megamek.client.ui.Messages;
+import megamek.client.ui.util.UIUtil;
+import megamek.common.annotations.Nullable;
 import megamek.common.equipment.GunEmplacement;
 import megamek.common.units.Entity;
 import megamek.logging.MMLogger;
 import mekhq.MekHQ;
 import mekhq.campaign.enums.CampaignTransportType;
+import mekhq.campaign.unit.ITransportAssignment;
 import mekhq.campaign.force.Formation;
 import mekhq.campaign.force.FormationType;
 import mekhq.campaign.personnel.Person;
@@ -54,6 +57,18 @@ import mekhq.utilities.ReportingUtilities;
 
 public class ForceRenderer extends DefaultTreeCellRenderer {
     private static final MMLogger LOGGER = MMLogger.create(ForceRenderer.class);
+
+    /**
+     * Corner of the branch drawn before a carried or towed unit, matching the MegaMek lobby's
+     * display of trains and loaded units. Escaped to keep the source plain ASCII.
+     */
+    private static final String BRANCH_CORNER = "\u2514";
+
+    /** One length of branch. Repeated once per level, so a deeper load reads as a longer arm. */
+    private static final String BRANCH_ARM = "\u2500";
+
+    /** Stops a malformed transport chain from spinning while counting how deep a unit sits. */
+    private static final int MAX_CARRIER_DEPTH = 16;
 
     // region Constructors
     public ForceRenderer() {
@@ -145,12 +160,10 @@ public class ForceRenderer extends DefaultTreeCellRenderer {
                 transport.append("<br>Transported (Ship) by: ")
                       .append(unit.getTransportShipAssignment().getTransportShip().getName());
             }
-            String tacticalTransport = "";
             if (unit.hasTacticalTransportAssignment()) {
                 transport.append("<br>Transported (Tactical) by: ")
                       .append(unit.getTacticalTransportAssignment().getTransport().getName());
             }
-            String towTransport = "";
             if (unit.hasTransportAssignment(CampaignTransportType.TOW_TRANSPORT)) {
                 transport.append("<br>Towed by: ")
                       .append(unit.getTransportAssignment(CampaignTransportType.TOW_TRANSPORT)
@@ -158,7 +171,7 @@ public class ForceRenderer extends DefaultTreeCellRenderer {
                                     .getName());
             }
 
-            String text = name + ", " + unitName + c3network + transport + tacticalTransport + towTransport;
+            String text = carriedBranch(unit) + name + ", " + unitName + c3network + transport;
 
             mekhq.campaign.Campaign campaign = unit.getCampaign();
             int id = unit.getFormationId();
@@ -195,6 +208,57 @@ public class ForceRenderer extends DefaultTreeCellRenderer {
         setIcon(getIcon(value));
 
         return this;
+    }
+
+    /**
+     * Returns the gray branch drawn in front of a unit that rides on another - carried in a bay or
+     * towed behind a tractor - indented and lengthened by how deeply it sits, matching the MegaMek
+     * lobby's train display. The second trailer of a train is drawn further in than the first, so a
+     * train reads as a tree rather than a flat run of identical rows. Empty when the unit rides on
+     * nothing.
+     */
+    private static String carriedBranch(Unit unit) {
+        int depth = carriedDepth(unit);
+        if (depth <= 0) {
+            return "";
+        }
+
+        return UIUtil.fontHTML(UIUtil.uiGray())
+                     + "&nbsp;".repeat(depth) + BRANCH_CORNER + BRANCH_ARM.repeat(depth) + "&nbsp;</font>";
+    }
+
+    /**
+     * How many transports sit above this unit in the campaign's transport assignments: 1 for a
+     * trailer hitched to a tractor, 2 for the second trailer in that train or for a trailer whose
+     * tractor rides a transport itself.
+     */
+    private static int carriedDepth(Unit unit) {
+        int depth = 0;
+        Unit current = unit;
+
+        while ((current != null) && (depth < MAX_CARRIER_DEPTH)) {
+            Unit carrier = carrierOf(current);
+
+            if ((carrier == null) || carrier.equals(current)) {
+                break;
+            }
+            depth++;
+            current = carrier;
+        }
+
+        return depth;
+    }
+
+    /** The unit this one rides on - transport bay, tactical carrier, or tow hitch - or {@code null} when none. */
+    private static @Nullable Unit carrierOf(Unit unit) {
+        for (CampaignTransportType campaignTransportType : CampaignTransportType.values()) {
+            ITransportAssignment assignment = unit.getTransportAssignment(campaignTransportType);
+            if ((assignment != null) && (assignment.getTransport() != null)) {
+                return assignment.getTransport();
+            }
+        }
+
+        return null;
     }
 
     private static String getFormattedForceName(Formation formation) {
