@@ -1,48 +1,233 @@
 package mekhq.gui.dialog.markets.contractMarket;
 
+import static megamek.client.ui.util.UIUtil.scaleForGUI;
+import static mekhq.campaign.mission.newContract.contractData.ChaosContractStepsTable.CHAOS_CONTRACT_MAXIMUM_STEP_VALUE;
+import static mekhq.campaign.mission.newContract.contractData.ChaosContractStepsTable.CHAOS_CONTRACT_MINIMUM_STEP_VALUE;
 import static mekhq.campaign.mission.newContract.contractGeneration.AbstractContractGeneration.createContract;
 
+import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
+import java.awt.Insets;
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.List;
+import javax.swing.JLabel;
+import javax.swing.JPanel;
+import javax.swing.JSpinner;
+import javax.swing.SpinnerNumberModel;
 
 import mekhq.campaign.Campaign;
+import mekhq.campaign.ForceHumanResources;
 import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.force.Detachment;
+import mekhq.campaign.force.PlayerForce;
 import mekhq.campaign.mission.newContract.AbstractContract;
+import mekhq.campaign.mission.newContract.contractData.ChaosContractStepsTable;
 import mekhq.campaign.mission.newContract.contractGeneration.ContractSearchType;
+import mekhq.campaign.mission.newContract.contractGeneration.ContractTermsData;
+import mekhq.campaign.personnel.Person;
 import mekhq.campaign.universe.factionStanding.FactionStandings;
-import mekhq.gui.baseComponents.immersiveDialogs.ImmersiveDialogSimple;
+import mekhq.gui.baseComponents.immersiveDialogs.ImmersiveDialogCore;
+import mekhq.gui.baseComponents.immersiveDialogs.ImmersiveDialogNotification;
 
 public class ChaosContractMarketDialogTest {
+    private JLabel lblBreakdown;
+    private final JLabel lblPayRateNegotiations = new JLabel("Pay Rate Negotiations: ");
+    private final JSpinner spnPayRateNegotiations = new JSpinner();
+    private final JLabel lblSupportNegotiations = new JLabel("Support Negotiations: ");
+    private final JSpinner spnSupportNegotiations = new JSpinner();
+    private final JLabel lblTransportNegotiations = new JLabel("Transport Negotiations: ");
+    private final JSpinner spnTransportNegotiations = new JSpinner();
+    private final JLabel lblSalvageRightsNegotiations = new JLabel("Salvage Rights Negotiations: ");
+    private final JSpinner spnSalvageRightsNegotiations = new JSpinner();
+    private final JLabel lblCommandRightsNegotiations = new JLabel("Command Rights Negotiations: ");
+    private final JSpinner spnCommandRightsNegotiations = new JSpinner();
+
     public ChaosContractMarketDialogTest(Campaign campaign) {
         CampaignOptions campaignOptions = campaign.getCampaignOptions();
         LocalDate currentDate = campaign.getLocalDate();
-        Detachment detachment = campaign.getPlayerForce().getForceDetachment();
-        FactionStandings factionStandings = campaign.getPlayerForce().getFactionStandings();
+        PlayerForce playerForce = campaign.getPlayerForce();
+        Detachment detachment = playerForce.getForceDetachment();
+        FactionStandings factionStandings = playerForce.getFactionStandings();
+        boolean isClanForce = playerForce.isClanForce();
         while (true) {
-            ImmersiveDialogSimple dialog = new ImmersiveDialogSimple(campaign,
-                  null,
-                  getContractText(campaign, campaignOptions, currentDate, detachment, factionStandings),
-                  List.of("NEW", "EXIT"),
-                  null);
-            if (dialog.getDialogChoice() == 1) {
-                break;
+            AbstractContract contract = createContract(campaign,
+                  campaignOptions,
+                  currentDate,
+                  detachment,
+                  0,
+                  ContractSearchType.MERCENARY,
+                  factionStandings,
+                  false,
+                  false);
+
+            if (contract == null) {
+                new ImmersiveDialogNotification(null, "ERROR", true);
+            } else {
+                ImmersiveDialogCore dialog = new ImmersiveDialogCore(campaign,
+                      getSeniorAdminPerson(playerForce.getHumanResources(), campaignOptions, isClanForce, currentDate),
+                      contract.getEmployerNegotiator(),
+                      "",
+                      getButtons(),
+                      null,
+                      null,
+                      false,
+                      getSpinnerPanel(contract),
+                      null,
+                      true);
+                if (dialog.getDialogChoice() == 1) {
+                    break;
+                }
             }
         }
     }
 
-    private String getContractText(Campaign campaign, CampaignOptions campaignOptions, LocalDate currentDate,
-          Detachment detachment, FactionStandings factionStandings) {
-        AbstractContract contract = createContract(campaign,
-              campaignOptions,
-              currentDate,
-              detachment,
-              0,
-              ContractSearchType.MERCENARY,
-              factionStandings,
-              false,
-              false);
+    private JPanel getSpinnerPanel(AbstractContract contract) {
+        final int PADDING = scaleForGUI(10);
 
+        lblBreakdown = new JLabel(buildTextFromContract(contract));
+
+        int currentValuePayRate = contract.getBasePayRateStep().stepValue();
+        spnPayRateNegotiations.setModel(new SpinnerNumberModel(currentValuePayRate,
+              CHAOS_CONTRACT_MINIMUM_STEP_VALUE,
+              CHAOS_CONTRACT_MAXIMUM_STEP_VALUE,
+              1));
+        spnPayRateNegotiations.addChangeListener(e -> {
+            int newStepValue = (int) spnPayRateNegotiations.getValue();
+            ChaosContractStepsTable step = ChaosContractStepsTable.fromStepValue(newStepValue);
+            ContractTermsData existingTermsData = contract.getContractTerms();
+            ContractTermsData updatedTermsData = new ContractTermsData(existingTermsData, step, null, null, null, null);
+            contract.setContractTerms(updatedTermsData);
+
+            lblBreakdown.setText(buildTextFromContract(contract));
+        });
+
+        int currentValueSupport = contract.getSupportStep().stepValue();
+        spnSupportNegotiations.setModel(new SpinnerNumberModel(currentValueSupport,
+              CHAOS_CONTRACT_MINIMUM_STEP_VALUE,
+              CHAOS_CONTRACT_MAXIMUM_STEP_VALUE,
+              1));
+        spnSupportNegotiations.addChangeListener(e -> {
+            int newStepValue = (int) spnSupportNegotiations.getValue();
+            ChaosContractStepsTable step = ChaosContractStepsTable.fromStepValue(newStepValue);
+            ContractTermsData existingTermsData = contract.getContractTerms();
+            ContractTermsData updatedTermsData = new ContractTermsData(existingTermsData, null, step, null, null, null);
+            contract.setContractTerms(updatedTermsData);
+
+            lblBreakdown.setText(buildTextFromContract(contract));
+        });
+
+        int currentValueTransport = contract.getTransportStep().stepValue();
+        spnTransportNegotiations.setModel(new SpinnerNumberModel(currentValueTransport,
+              CHAOS_CONTRACT_MINIMUM_STEP_VALUE,
+              CHAOS_CONTRACT_MAXIMUM_STEP_VALUE,
+              1));
+        spnTransportNegotiations.addChangeListener(e -> {
+            int newStepValue = (int) spnTransportNegotiations.getValue();
+            ChaosContractStepsTable step = ChaosContractStepsTable.fromStepValue(newStepValue);
+            ContractTermsData existingTermsData = contract.getContractTerms();
+            ContractTermsData updatedTermsData = new ContractTermsData(existingTermsData, null, null, step, null, null);
+            contract.setContractTerms(updatedTermsData);
+
+            lblBreakdown.setText(buildTextFromContract(contract));
+        });
+
+        int currentValueSalvageRights = contract.getSalvageRightsStep().stepValue();
+        spnSalvageRightsNegotiations.setModel(new SpinnerNumberModel(currentValueSalvageRights,
+              CHAOS_CONTRACT_MINIMUM_STEP_VALUE,
+              CHAOS_CONTRACT_MAXIMUM_STEP_VALUE,
+              1));
+        spnSalvageRightsNegotiations.addChangeListener(e -> {
+            int newStepValue = (int) spnSalvageRightsNegotiations.getValue();
+            ChaosContractStepsTable step = ChaosContractStepsTable.fromStepValue(newStepValue);
+            ContractTermsData existingTermsData = contract.getContractTerms();
+            ContractTermsData updatedTermsData = new ContractTermsData(existingTermsData, null, null, null, step, null);
+            contract.setContractTerms(updatedTermsData);
+
+            lblBreakdown.setText(buildTextFromContract(contract));
+        });
+
+        int currentValueCommandRights = contract.getCommandRightsStep().stepValue();
+        spnCommandRightsNegotiations.setModel(new SpinnerNumberModel(currentValueCommandRights,
+              CHAOS_CONTRACT_MINIMUM_STEP_VALUE,
+              CHAOS_CONTRACT_MAXIMUM_STEP_VALUE,
+              1));
+        spnCommandRightsNegotiations.addChangeListener(e -> {
+            int newStepValue = (int) spnCommandRightsNegotiations.getValue();
+            ChaosContractStepsTable step = ChaosContractStepsTable.fromStepValue(newStepValue);
+            ContractTermsData existingTermsData = contract.getContractTerms();
+            ContractTermsData updatedTermsData = new ContractTermsData(existingTermsData, null, null, null, null, step);
+            contract.setContractTerms(updatedTermsData);
+
+            lblBreakdown.setText(buildTextFromContract(contract));
+        });
+
+        JPanel panel = new JPanel(new GridBagLayout());
+        GridBagConstraints layout = new GridBagConstraints();
+
+        layout.gridx = 0;
+        layout.gridy = 0;
+        layout.gridwidth = 2; // The label takes up two spaces horizontally
+        layout.anchor = GridBagConstraints.WEST;
+        layout.insets = new Insets(PADDING, 0, PADDING, 0);
+        panel.add(lblBreakdown, layout);
+
+        layout.gridwidth = 1;
+        layout.gridy = 1;
+        panel.add(lblPayRateNegotiations, layout);
+
+        layout.gridx = 1;
+        panel.add(spnPayRateNegotiations, layout);
+
+        layout.gridx = 0;
+        layout.gridy = 2;
+        panel.add(lblSupportNegotiations, layout);
+
+        layout.gridx = 1;
+        panel.add(spnSupportNegotiations, layout);
+
+        layout.gridx = 0;
+        layout.gridy = 3;
+        panel.add(lblTransportNegotiations, layout);
+
+        layout.gridx = 1;
+        panel.add(spnTransportNegotiations, layout);
+
+        layout.gridx = 0;
+        layout.gridy = 4;
+        panel.add(lblSalvageRightsNegotiations, layout);
+
+        layout.gridx = 1;
+        panel.add(spnSalvageRightsNegotiations, layout);
+
+        layout.gridx = 0;
+        layout.gridy = 5;
+        panel.add(lblCommandRightsNegotiations, layout);
+
+        layout.gridx = 1;
+        panel.add(spnCommandRightsNegotiations, layout);
+
+        return panel;
+    }
+
+    private List<ImmersiveDialogCore.ButtonLabelTooltipPair> getButtons() {
+        List<ImmersiveDialogCore.ButtonLabelTooltipPair> buttons = new ArrayList<>();
+
+        buttons.add(new ImmersiveDialogCore.ButtonLabelTooltipPair("REGENERATE", null));
+        buttons.add(new ImmersiveDialogCore.ButtonLabelTooltipPair("LEAVE", null));
+
+        return buttons;
+    }
+
+    private static Person getSeniorAdminPerson(ForceHumanResources humanResources, CampaignOptions campaignOptions,
+          boolean isClanForce, LocalDate currentDate) {
+        return humanResources.getSeniorAdminPerson(Campaign.AdministratorSpecialization.COMMAND,
+              campaignOptions,
+              isClanForce,
+              currentDate);
+    }
+
+    private String getContractText(AbstractContract contract) {
         return contract == null ? "WHOOPSIE DOODLES" : buildTextFromContract(contract);
     }
 

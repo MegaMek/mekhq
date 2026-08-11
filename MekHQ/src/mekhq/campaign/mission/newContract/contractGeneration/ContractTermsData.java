@@ -32,12 +32,25 @@
  */
 package mekhq.campaign.mission.newContract.contractGeneration;
 
+import jakarta.annotation.Nullable;
 import mekhq.campaign.mission.newContract.contractData.ChaosContractStepsTable;
 
-public record ContractTermsData(ChaosContractStepsTable payRate,
+public record ContractTermsData(
+      ChaosContractStepsTable payRate,
       ChaosContractStepsTable support,
       ChaosContractStepsTable transport,
       ChaosContractStepsTable salvageRights,
       ChaosContractStepsTable commandRights
 ) {
+    public ContractTermsData(ContractTermsData existingTerms, @Nullable ChaosContractStepsTable newPayRate,
+          @Nullable ChaosContractStepsTable newSupport, @Nullable ChaosContractStepsTable newTransport,
+          @Nullable ChaosContractStepsTable newSalvageRights, @Nullable ChaosContractStepsTable newCommandRights) {
+        this(
+              newPayRate != null ? newPayRate : existingTerms.payRate,
+              newSupport != null ? newSupport : existingTerms.support,
+              newTransport != null ? newTransport : existingTerms.transport,
+              newSalvageRights != null ? newSalvageRights : existingTerms.salvageRights,
+              newCommandRights != null ? newCommandRights : existingTerms.commandRights
+        );
+    }
 }

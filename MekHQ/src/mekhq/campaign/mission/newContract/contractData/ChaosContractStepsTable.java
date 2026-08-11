@@ -57,8 +57,8 @@ public enum ChaosContractStepsTable {
     STEP_SIXTEEN(16, 1.9, ContractCommandRights.INDEPENDENT, 1.0, false, 1.0, 1.0, 1.0),
     STEP_SEVENTEEN(17, 2.0, ContractCommandRights.INDEPENDENT, 1.0, false, 1.0, 1.0, 1.0);
 
-    private final static int MINIMUM_STEP_VALUE = 1;
-    private final static int MAXIMUM_STEP_VALUE = 17;
+    public final static int CHAOS_CONTRACT_MINIMUM_STEP_VALUE = 1;
+    public final static int CHAOS_CONTRACT_MAXIMUM_STEP_VALUE = 17;
 
     private final int stepValue;
     private final double basePayMultiplier;
@@ -89,7 +89,7 @@ public enum ChaosContractStepsTable {
 
     public @Nullable ChaosContractStepsTable influenceStep(final int delta) {
         int newStepValue = this.stepValue + delta;
-        newStepValue = clamp(newStepValue, MINIMUM_STEP_VALUE, MAXIMUM_STEP_VALUE);
+        newStepValue = clamp(newStepValue, CHAOS_CONTRACT_MINIMUM_STEP_VALUE, CHAOS_CONTRACT_MAXIMUM_STEP_VALUE);
 
         for (ChaosContractStepsTable step : ChaosContractStepsTable.values()) {
             if (step.stepValue == newStepValue) {
@@ -98,6 +98,16 @@ public enum ChaosContractStepsTable {
         }
 
         return null;
+    }
+
+    public static ChaosContractStepsTable fromStepValue(final int stepValue) {
+        for (ChaosContractStepsTable step : ChaosContractStepsTable.values()) {
+            if (step.stepValue == stepValue) {
+                return step;
+            }
+        }
+
+        throw new IllegalArgumentException("No step value " + stepValue);
     }
 
     public double getBasePayMultiplier() {
