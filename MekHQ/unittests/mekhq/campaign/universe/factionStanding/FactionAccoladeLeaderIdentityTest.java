@@ -73,7 +73,11 @@ class FactionAccoladeLeaderIdentityTest {
         FactionAccoladeEvent.applyLeaderIdentity(speaker, leaderWithGender(null));
 
         verify(speaker, never()).setGender(any());
+        // The full title goes into the given name, so the generated surname must still be cleared.
+        // Otherwise the letter is signed by "Colonel Natasha Kerensky" followed by a surname that
+        // was never theirs.
         verify(speaker).setGivenName("Colonel Natasha Kerensky");
+        verify(speaker).setSurname("");
     }
 
     @Test
