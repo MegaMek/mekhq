@@ -41,7 +41,7 @@ import java.util.List;
 import java.util.Set;
 import javax.swing.JOptionPane;
 
-import megamek.common.annotations.Nullable;
+import jakarta.annotation.Nullable;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.enums.CampaignTransportType;
@@ -114,21 +114,30 @@ public class AssignForceToTowTransportMenu extends AssignForceToTransportMenu {
      */
     @Override
     protected Set<Unit> filterTransports(final Set<Unit> transports, final Set<Unit> units) {
+        // Walk each selected unit's train once and collect everything in it. Testing each
+        // tractor against each unit instead would re-walk the same trains for every tractor
+        // offered.
+        Set<Unit> unitsAndTheirTrains = new HashSet<>();
+        for (Unit unit : units) {
+            unitsAndTheirTrains.addAll(TransportAssignmentMenus.trainMembers(unit));
+        }
+
         Set<Unit> availableTransports = new HashSet<>();
         for (Unit transport : transports) {
-            boolean alreadyInTrain = false;
-            for (Unit unit : units) {
-                if (TransportAssignmentMenus.isInSameTrain(transport, unit)) {
-                    alreadyInTrain = true;
-                    break;
-                }
-            }
-            if (!alreadyInTrain) {
+            if (!unitsAndTheirTrains.contains(transport)) {
                 availableTransports.add(transport);
             }
         }
 
         return availableTransports;
+    }
+
+    /**
+     * Title for the warning dialogs raised by the assign action.
+     */
+    private static String warningTitle() {
+        return MHQInternationalization.getTextAt(RESOURCE_BUNDLE,
+              "AssignForceToTransportMenu.warning.title");
     }
 
     /**
@@ -178,20 +187,18 @@ public class AssignForceToTowTransportMenu extends AssignForceToTransportMenu {
             // walk along the train. The menu filters these out; a menu built before an earlier
             // click in the same selection can still get here.
             if (TransportAssignmentMenus.isInSameTrain(transport, unit)) {
-                JOptionPane.showMessageDialog(null, MHQInternationalization.getFormattedTextAt(
-                      "mekhq.resources.AssignForceToTransport",
+                JOptionPane.showMessageDialog(null, MHQInternationalization.getFormattedTextAt(RESOURCE_BUNDLE,
                       "AssignForceToTransportMenu.warningUnitAlreadyInTrain.text",
                       unit.getName(),
-                      transport.getName()), "Warning", JOptionPane.WARNING_MESSAGE);
+                      transport.getName()), warningTitle(), JOptionPane.WARNING_MESSAGE);
                 return;
             }
 
             if (!transport.getEntity().canTow(unit.getEntity().getId())) {
-                JOptionPane.showMessageDialog(null, MHQInternationalization.getFormattedTextAt(
-                      "mekhq.resources.AssignForceToTransport",
+                JOptionPane.showMessageDialog(null, MHQInternationalization.getFormattedTextAt(RESOURCE_BUNDLE,
                       "AssignForceToTransportMenu.warningCouldNotLoadUnit.text",
                       unit.getName(),
-                      transport.getName()), "Warning", JOptionPane.WARNING_MESSAGE);
+                      transport.getName()), warningTitle(), JOptionPane.WARNING_MESSAGE);
                 return;
             }
 

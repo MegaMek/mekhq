@@ -46,9 +46,11 @@ import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
 import javax.swing.JPopupMenu;
 
+import jakarta.annotation.Nullable;
 import megamek.client.ui.dialogs.lobby.TrainOrderDialog;
 import megamek.client.ui.util.MenuScroller;
 import megamek.common.equipment.TankTrailerHitch;
+import megamek.common.equipment.Transporter;
 import megamek.common.units.Entity;
 import mekhq.MHQConstants;
 import mekhq.MekHQ;
@@ -124,10 +126,13 @@ public final class TransportAssignmentMenus {
      * everything.
      */
     private static void addDisconnectTrainMenuItem(JPopupMenu popup, Campaign campaign, List<Unit> units) {
-        if (anyDeployed(units) ||
-                  !units.stream().allMatch(unit -> unit.hasTransportAssignment(TOW_TRANSPORT) ||
-                                                         unit.hasTransportedUnits(TOW_TRANSPORT))) {
+        if (anyDeployed(units)) {
             return;
+        }
+        for (Unit unit : units) {
+            if (!unit.hasTransportAssignment(TOW_TRANSPORT) && !unit.hasTransportedUnits(TOW_TRANSPORT)) {
+                return;
+            }
         }
         JMenuItem menuItem = new JMenuItem(MHQInternationalization.getTextAt(RESOURCE_BUNDLE,
               "TransportAssignmentMenus.disconnectTrain.text"));
@@ -158,42 +163,45 @@ public final class TransportAssignmentMenus {
 
     /**
      * Lists the whole tow train the given unit belongs to, lead tractor first, then each trailer in
-     * hitch order. A unit that is in no train is returned on its own. Both walks stop as soon as a
-     * unit repeats, so a campaign that somehow ended up with a looped hitch cannot spin here.
+     * hitch order. A unit that is in no train is returned on its own.
+     *
+     * <p>A train is a singly-linked list - each unit records only the unit directly behind it - so
+     * listing it from a member in the middle means finding the lead tractor first and then reading
+     * back down from there. Callers that only need what is behind a unit should use
+     * {@link #trailersBehind(Unit)}, which skips the walk to the head.</p>
      *
      * @param anyMember any unit of the train - tractor, middle trailer, or tail
      *
      * @return train members in order, lead tractor first; never empty
      */
     public static List<Unit> trainMembers(Unit anyMember) {
-        // Walk forward to the tractor heading the train
+        Unit head = trainHead(anyMember);
+        List<Unit> members = new ArrayList<>();
+        members.add(head);
+        members.addAll(trailersBehind(head));
+        return members;
+    }
+
+    /**
+     * Walks forward from any train member to the tractor heading it. Stops if a unit repeats, so a
+     * campaign that somehow ended up with a looped hitch cannot spin here.
+     *
+     * @param anyMember any unit of the train
+     *
+     * @return the lead tractor, or the unit itself when it is hitched to nothing
+     */
+    private static Unit trainHead(Unit anyMember) {
         Unit head = anyMember;
-        Set<Unit> seenGoingForward = new HashSet<>();
-        seenGoingForward.add(head);
+        Set<Unit> unitsWalked = new HashSet<>();
+        unitsWalked.add(head);
         while (head.hasTransportAssignment(TOW_TRANSPORT)) {
             Unit unitInFront = head.getTransportAssignment(TOW_TRANSPORT).getTransport();
-            if ((unitInFront == null) || !seenGoingForward.add(unitInFront)) {
+            if ((unitInFront == null) || !unitsWalked.add(unitInFront)) {
                 break;
             }
             head = unitInFront;
         }
-
-        // Collect every towed unit behind the head; each unit only lists the one directly behind it
-        List<Unit> members = new ArrayList<>();
-        members.add(head);
-        Set<Unit> seenGoingBack = new HashSet<>();
-        seenGoingBack.add(head);
-        Unit current = head;
-        while (current.hasTransportedUnits(TOW_TRANSPORT)) {
-            Unit unitBehind = current.getTransportedUnits(TOW_TRANSPORT).iterator().next();
-            if ((unitBehind == null) || !seenGoingBack.add(unitBehind)) {
-                break;
-            }
-            members.add(unitBehind);
-            current = unitBehind;
-        }
-
-        return members;
+        return head;
     }
 
     /**
@@ -220,12 +228,33 @@ public final class TransportAssignmentMenus {
             return;
         }
 
-        Unit head = null;
         List<Unit> trailers = new ArrayList<>();
+        Unit head = parseConnectableTrain(units, trailers);
+        if (head == null) {
+            return;
+        }
+
+        JMenuItem menuItem = new JMenuItem(MHQInternationalization.getTextAt(RESOURCE_BUNDLE,
+              "TransportAssignmentMenus.connectTrain.text"));
+        menuItem.addActionListener(evt -> connectTrainAction(frame, campaign, head, trailers));
+        popup.add(menuItem);
+    }
+
+    /**
+     * Reads a multi-selection the way the lobby's Connect Train does: exactly one free tractor plus
+     * one or more free trailers, nothing else. Anything else in the selection makes it unusable.
+     *
+     * @param units    selected units
+     * @param trailers filled with the free trailers found, in selection order
+     *
+     * @return the one free tractor to head the train, or null when the selection is not one
+     */
+    private static @Nullable Unit parseConnectableTrain(List<Unit> units, List<Unit> trailers) {
+        Unit head = null;
         for (Unit unit : units) {
             Entity entity = unit.getEntity();
             if ((entity == null) || !unit.isAvailable() || unit.hasTransportAssignment(TOW_TRANSPORT)) {
-                return;
+                return null;
             }
             if (entity.isTrailer()) {
                 trailers.add(unit);
@@ -233,23 +262,15 @@ public final class TransportAssignmentMenus {
                 if ((head != null) || unit.hasTransportedUnits(TOW_TRANSPORT)) {
                     // The train is built from one unattached tractor; two heads or a tractor
                     // already towing means the selection is not a connectable train.
-                    return;
+                    return null;
                 }
                 head = unit;
             } else {
                 // Selection contains a unit that is neither a tractor nor a trailer
-                return;
+                return null;
             }
         }
-        if ((head == null) || trailers.isEmpty()) {
-            return;
-        }
-
-        Unit trainHead = head;
-        JMenuItem menuItem = new JMenuItem(MHQInternationalization.getTextAt(RESOURCE_BUNDLE,
-              "TransportAssignmentMenus.connectTrain.text"));
-        menuItem.addActionListener(evt -> connectTrainAction(frame, campaign, trainHead, trailers));
-        popup.add(menuItem);
+        return trailers.isEmpty() ? null : head;
     }
 
     private static void connectTrainAction(JFrame frame, Campaign campaign, Unit head, List<Unit> trailers) {
@@ -317,10 +338,7 @@ public final class TransportAssignmentMenus {
 
             // Every trailer except the last one is an attach point and needs a hitch of its own
             boolean isLastTrailer = trailerIndex == (orderedTrailers.size() - 1);
-            if (!isLastTrailer &&
-                      trailerEntity.getTransports()
-                            .stream()
-                            .noneMatch(transporter -> transporter instanceof TankTrailerHitch)) {
+            if (!isLastTrailer && !hasTrailerHitch(trailerEntity)) {
                 return false;
             }
         }
@@ -341,6 +359,22 @@ public final class TransportAssignmentMenus {
             MekHQ.triggerEvent(new UnitChangedEvent(trailer));
         }
         return true;
+    }
+
+    /**
+     * True when the entity carries a trailer hitch, so another trailer can attach behind it.
+     *
+     * @param entity entity being checked as an attach point
+     *
+     * @return true when it has at least one hitch
+     */
+    private static boolean hasTrailerHitch(Entity entity) {
+        for (Transporter transporter : entity.getTransports()) {
+            if (transporter instanceof TankTrailerHitch) {
+                return true;
+            }
+        }
+        return false;
     }
 
     /**
@@ -371,12 +405,16 @@ public final class TransportAssignmentMenus {
      */
     private static void addUnassignSelfMenuItem(JPopupMenu popup, Campaign campaign, List<Unit> units,
           CampaignTransportType campaignTransportType) {
-        if (anyDeployed(units) ||
-                  !units.stream().allMatch(unit -> unit.hasTransportAssignment(campaignTransportType))) {
+        if (anyDeployed(units)) {
             return;
         }
-        JMenuItem menuItem = new JMenuItem(MHQInternationalization.getTextAt(RESOURCE_BUNDLE,
-              "TOEMouseAdapter.unassign." + campaignTransportType.name() + ".text"));
+        for (Unit unit : units) {
+            if (!unit.hasTransportAssignment(campaignTransportType)) {
+                return;
+            }
+        }
+        String menuTextKey = "TOEMouseAdapter.unassign." + campaignTransportType.name() + ".text";
+        JMenuItem menuItem = new JMenuItem(MHQInternationalization.getTextAt(RESOURCE_BUNDLE, menuTextKey));
         menuItem.addActionListener(evt -> unassignFromTransport(campaign, campaignTransportType, units));
         popup.add(menuItem);
     }
@@ -387,12 +425,16 @@ public final class TransportAssignmentMenus {
      */
     private static void addUnassignTransportedMenuItem(JPopupMenu popup, Campaign campaign, List<Unit> units,
           CampaignTransportType campaignTransportType) {
-        if (anyDeployed(units) ||
-                  !units.stream().allMatch(unit -> unit.hasTransportedUnits(campaignTransportType))) {
+        if (anyDeployed(units)) {
             return;
         }
-        JMenuItem menuItem = new JMenuItem(MHQInternationalization.getTextAt(RESOURCE_BUNDLE,
-              "TOEMouseAdapter.unassignFrom." + campaignTransportType.name() + ".text"));
+        for (Unit unit : units) {
+            if (!unit.hasTransportedUnits(campaignTransportType)) {
+                return;
+            }
+        }
+        String menuTextKey = "TOEMouseAdapter.unassignFrom." + campaignTransportType.name() + ".text";
+        JMenuItem menuItem = new JMenuItem(MHQInternationalization.getTextAt(RESOURCE_BUNDLE, menuTextKey));
         menuItem.addActionListener(evt -> unassignTransportedUnits(campaign, campaignTransportType, units));
         popup.add(menuItem);
     }
@@ -417,18 +459,26 @@ public final class TransportAssignmentMenus {
     public static void unassignFromTransport(Campaign campaign, CampaignTransportType campaignTransportType,
           Collection<Unit> units) {
         Set<Unit> transportsToUpdate = new HashSet<>();
+        Set<Unit> changedUnits = new HashSet<>();
         for (Unit transportedUnit : units) {
             Unit oldTransport = transportedUnit.unloadFromTransport(campaignTransportType);
             if (oldTransport != null) {
                 transportsToUpdate.add(oldTransport);
             }
-            MekHQ.triggerEvent(new UnitChangedEvent(transportedUnit));
+            changedUnits.add(transportedUnit);
         }
 
         for (Unit transportToUpdate : transportsToUpdate) {
             transportToUpdate.initializeTransportSpace(campaignTransportType);
             campaign.updateTransportInTransports(campaignTransportType, transportToUpdate);
-            MekHQ.triggerEvent(new UnitChangedEvent(transportToUpdate));
+            changedUnits.add(transportToUpdate);
+        }
+
+        // Both sides of every broken hitch really did change, but releasing a whole train puts the
+        // same middle trailer in both sets - it is a released unit and the next one's old transport.
+        // Collecting first means each unit refreshes once instead of twice.
+        for (Unit changedUnit : changedUnits) {
+            MekHQ.triggerEvent(new UnitChangedEvent(changedUnit));
         }
     }
 
@@ -466,11 +516,21 @@ public final class TransportAssignmentMenus {
      * @return the trailers behind it in hitch order, empty when it is pulling nothing
      */
     public static List<Unit> trailersBehind(Unit unit) {
-        List<Unit> members = trainMembers(unit);
-        int position = members.indexOf(unit);
-        if (position < 0) {
-            return new ArrayList<>();
+        List<Unit> trailers = new ArrayList<>();
+        Set<Unit> unitsWalked = new HashSet<>();
+        unitsWalked.add(unit);
+
+        Unit current = unit;
+        while (current.hasTransportedUnits(TOW_TRANSPORT)) {
+            Unit unitBehind = current.getTransportedUnits(TOW_TRANSPORT).iterator().next();
+            if ((unitBehind == null) || !unitsWalked.add(unitBehind)) {
+                // A looped hitch would keep this walk going forever
+                break;
+            }
+            trailers.add(unitBehind);
+            current = unitBehind;
         }
-        return new ArrayList<>(members.subList(position + 1, members.size()));
+
+        return trailers;
     }
 }

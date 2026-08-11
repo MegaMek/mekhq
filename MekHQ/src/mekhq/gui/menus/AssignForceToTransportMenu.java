@@ -38,7 +38,7 @@ import java.util.HashSet;
 import java.util.Set;
 import javax.swing.JMenuItem;
 
-import megamek.common.annotations.Nullable;
+import jakarta.annotation.Nullable;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.enums.CampaignTransportType;

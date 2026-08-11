@@ -74,6 +74,7 @@ import javax.swing.UIManager;
 import jakarta.annotation.Nonnull;
 import megamek.Version;
 import megamek.client.ui.tileset.EntityImage;
+import megamek.codeUtilities.MathUtility;
 import megamek.common.CriticalSlot;
 import megamek.common.SimpleTechLevel;
 import megamek.common.TechConstants;
@@ -3091,6 +3092,14 @@ public class Unit implements ITechnology, ILocatable {
         return retVal;
     }
 
+    // Attribute names on the <transportAssignment> and <transportedUnit> save-file nodes. The id is
+    // the transport's UUID on an assignment node and the transported unit's UUID on a transported
+    // node; the other three only ever appear on an assignment node.
+    private static final String TRANSPORT_ATTRIBUTE_ID = "id";
+    private static final String TRANSPORT_ATTRIBUTE_TYPE = "campaignTransportType";
+    private static final String TRANSPORT_ATTRIBUTE_LOCATION = "transportedLocation";
+    private static final String TRANSPORT_ATTRIBUTE_TRANSPORTER_TYPE = "transporterType";
+
     /**
      * Parses a {@code <transportAssignment>} save-file node onto the given unit. Entries carry a
      * {@code campaignTransportType} attribute; entries without one predate that attribute and only
@@ -3100,25 +3109,27 @@ public class Unit implements ITechnology, ILocatable {
     static void parseTransportAssignmentNode(Node transportNode, Unit retVal) {
         NamedNodeMap attributes = transportNode.getAttributes();
         CampaignTransportType campaignTransportType;
-        if (attributes.getNamedItem("campaignTransportType") != null) {
+        if (attributes.getNamedItem(TRANSPORT_ATTRIBUTE_TYPE) != null) {
             campaignTransportType = CampaignTransportType.valueOf(attributes.getNamedItem(
-                  "campaignTransportType").getTextContent());
+                  TRANSPORT_ATTRIBUTE_TYPE).getTextContent());
         } else {
             // Tactical transports were added before the campaignTransportType attribute
             // was. Assume it's a tactical transport.
             campaignTransportType = CampaignTransportType.TACTICAL_TRANSPORT;
         }
-        UUID id = UUID.fromString(attributes.getNamedItem("id").getTextContent());
+        UUID id = UUID.fromString(attributes.getNamedItem(TRANSPORT_ATTRIBUTE_ID).getTextContent());
 
-        if (attributes.getNamedItem("transportedLocation") != null) {
-            int transportedLocationHash = Integer.parseInt(attributes.getNamedItem("transportedLocation")
-                                                                 .getTextContent());
+        if (attributes.getNamedItem(TRANSPORT_ATTRIBUTE_LOCATION) != null) {
+            // A hash that does not parse, or does not match any of the transport's bays, leaves the
+            // assignment without a location - the same state as an entry that never carried one.
+            int transportedLocationHash = MathUtility.parseInt(attributes.getNamedItem(TRANSPORT_ATTRIBUTE_LOCATION)
+                                                                     .getTextContent(), 0);
             retVal.setTransportAssignment(campaignTransportType,
                   new TransportAssignment(new UnitRef(id), transportedLocationHash));
-        } else if (attributes.getNamedItem("transporterType") != null) {
+        } else if (attributes.getNamedItem(TRANSPORT_ATTRIBUTE_TRANSPORTER_TYPE) != null) {
             try {
                 TransporterType transporterType = TransporterType.valueOf((attributes.getNamedItem(
-                      "transporterType").getTextContent()));
+                      TRANSPORT_ATTRIBUTE_TRANSPORTER_TYPE).getTextContent()));
                 retVal.setTransportAssignment(campaignTransportType,
                       new TransportAssignment(new UnitRef(id), transporterType));
             } catch (IllegalArgumentException e) {
@@ -3139,9 +3150,9 @@ public class Unit implements ITechnology, ILocatable {
     static void parseTransportedUnitNode(Node transportedNode, Unit retVal) {
         NamedNodeMap attributes = transportedNode.getAttributes();
         CampaignTransportType campaignTransportType = CampaignTransportType.valueOf(attributes.getNamedItem(
-              "campaignTransportType").getTextContent());
+              TRANSPORT_ATTRIBUTE_TYPE).getTextContent());
         retVal.addTransportedUnit(campaignTransportType,
-              new UnitRef(UUID.fromString(attributes.getNamedItem("id").getTextContent())));
+              new UnitRef(UUID.fromString(attributes.getNamedItem(TRANSPORT_ATTRIBUTE_ID).getTextContent())));
     }
 
     /**
