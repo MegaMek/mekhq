@@ -37,9 +37,11 @@ import static mekhq.campaign.enums.CampaignTransportType.TOW_TRANSPORT;
 
 import java.awt.event.ActionEvent;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 import javax.swing.JOptionPane;
 
+import megamek.common.annotations.Nullable;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.enums.CampaignTransportType;
@@ -57,6 +59,8 @@ import mekhq.utilities.MHQInternationalization;
  * @see mekhq.campaign.unit.TransportAssignment
  */
 public class AssignForceToTowTransportMenu extends AssignForceToTransportMenu {
+
+    private static final String RESOURCE_BUNDLE = "mekhq.resources.AssignForceToTransport";
 
     /**
      * Constructor for a new tow transport Menu
@@ -125,6 +129,37 @@ public class AssignForceToTowTransportMenu extends AssignForceToTransportMenu {
         }
 
         return availableTransports;
+    }
+
+    /**
+     * Adds the tractor's current train to the tooltip, so the hitch point is visible before the
+     * click: a trailer goes on the back of whatever this tractor is already pulling, not onto the
+     * tractor itself.
+     *
+     * @param transport tractor being offered
+     *
+     * @return tooltip naming the tractor's formation and the train it heads
+     */
+    @Override
+    protected @Nullable String transportMenuTooltip(Unit transport) {
+        String formationPath = formationFullName(transport);
+        if (formationPath == null) {
+            return null;
+        }
+
+        List<Unit> trailers = TransportAssignmentMenus.trailersBehind(transport);
+        if (trailers.isEmpty()) {
+            return MHQInternationalization.getFormattedTextAt(RESOURCE_BUNDLE,
+                  "AssignForceToTransportMenu.towTooltipEmpty.text", formationPath);
+        }
+
+        StringBuilder trainDescription = new StringBuilder(transport.getName());
+        for (Unit trailer : trailers) {
+            trainDescription.append(" -> ").append(trailer.getName());
+        }
+        return MHQInternationalization.getFormattedTextAt(RESOURCE_BUNDLE,
+              "AssignForceToTransportMenu.towTooltipTrain.text", formationPath,
+              trailers.size(), trainDescription.toString());
     }
 
     /**

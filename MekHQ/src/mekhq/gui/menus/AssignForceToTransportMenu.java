@@ -38,6 +38,7 @@ import java.util.HashSet;
 import java.util.Set;
 import javax.swing.JMenuItem;
 
+import megamek.common.annotations.Nullable;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.enums.CampaignTransportType;
@@ -161,15 +162,60 @@ public abstract class AssignForceToTransportMenu extends JScrollableMenu {
         for (Unit transport : transports) {
             JMenuItem transportMenu = new JMenuItem(transport.getId().toString());
 
-            // {Transport Name} | Space Remaining: {Current Transport Capacity}
+            // {Transport Name} [{Formation}] | Space Remaining: {Current Transport Capacity}
             transportMenu.setText(MHQInternationalization.getFormattedTextAt("mekhq.resources.AssignForceToTransport",
                   "AssignForceToTransportMenu.transportSpaceRemaining.text",
-                  transport.getName(), transport.getCurrentTransportCapacity(campaignTransportType, transporterType)));
+                  transport.getName(), formationName(transport),
+                  transport.getCurrentTransportCapacity(campaignTransportType, transporterType)));
+            transportMenu.setToolTipText(transportMenuTooltip(transport));
 
             transportMenu.addActionListener(evt -> transportMenuAction(evt, transporterType, transport, units));
             transportMenus.add(transportMenu);
         }
         return transportMenus;
+    }
+
+    /**
+     * Name of the TO&amp;E formation the transport sits in, for the menu label. Transports outside
+     * the TO&amp;E are dropped before the menu is built, so there is normally a formation to name.
+     *
+     * @param transport transport being offered
+     *
+     * @return the formation's own name, or an empty string when it has none
+     */
+    String formationName(Unit transport) {
+        Formation formation = campaign.getPlayerForce().getFormation(transport.getFormationId());
+        return (formation == null) ? "" : formation.getName();
+    }
+
+    /**
+     * Full TO&amp;E path of the formation the transport sits in, leaf first, for tooltips.
+     *
+     * @param transport transport being offered
+     *
+     * @return the formation path, or null when the transport is in no formation
+     */
+    protected @Nullable String formationFullName(Unit transport) {
+        Formation formation = campaign.getPlayerForce().getFormation(transport.getFormationId());
+        return (formation == null) ? null : formation.getFullName();
+    }
+
+    /**
+     * Tooltip for a transport's menu item, naming where it sits in the TO&amp;E so the whole chain
+     * of formations is visible without leaving the menu. Subclasses build their own when there is
+     * more worth showing for their transport type.
+     *
+     * @param transport transport being offered
+     *
+     * @return tooltip text, or null when the transport has no formation to describe
+     */
+    protected @Nullable String transportMenuTooltip(Unit transport) {
+        String formationPath = formationFullName(transport);
+        if (formationPath == null) {
+            return null;
+        }
+        return MHQInternationalization.getFormattedTextAt("mekhq.resources.AssignForceToTransport",
+              "AssignForceToTransportMenu.transportTooltip.text", formationPath);
     }
 
     /**
