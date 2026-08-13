@@ -81,6 +81,7 @@ import org.w3c.dom.NodeList;
  * Abstract base class for various Contract Market types in AtB/StratCon. Responsible for generation and initialization
  * of AtBContracts.
  */
+@Deprecated(since = "0.51.01", forRemoval = true)
 public abstract class AbstractContractMarket {
     public static final int CLAUSE_COMMAND = 0;
     public static final int CLAUSE_SALVAGE = 1;

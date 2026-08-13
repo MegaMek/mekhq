@@ -47,6 +47,7 @@ import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
 import java.util.Stack;
 import java.util.UUID;
@@ -132,7 +133,8 @@ public class KillAwards {
 
                 if (awardScope.equalsIgnoreCase("mission")) {
                     List<Kill> killCredits = campaign.getKillsFor(person).stream()
-                                                   .filter(kill -> kill.getMissionId() == mission.getId())
+                                                   .filter(kill -> Objects.equals(kill.getMissionId(),
+                                                         mission.getId()))
                                                    .toList();
 
                     // -1 corresponds to 'individual', so we only care about the pilot's personal

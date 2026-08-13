@@ -1336,6 +1336,18 @@ public class Campaign implements ITechManager {
         MekHQ.triggerEvent(new MissionNewEvent(m));
     }
 
+    public ContractHistoryData getContractHistoryData() {
+        return contractHistory;
+    }
+
+    public LinkedHashMap<UUID, AbstractContract> getContractHistoryAsMap() {
+        return contractHistory.contractHistory();
+    }
+
+    public @jakarta.annotation.Nullable AbstractContract getContract(UUID contractId) {
+        return contractHistory.get(contractId);
+    }
+
     /**
      * @param id the mission's id
      *

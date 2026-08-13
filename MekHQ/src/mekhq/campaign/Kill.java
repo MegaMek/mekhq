@@ -37,6 +37,7 @@ import java.io.PrintWriter;
 import java.time.LocalDate;
 import java.util.UUID;
 
+import jakarta.annotation.Nullable;
 import megamek.Version;
 import megamek.logging.MMLogger;
 import mekhq.utilities.MHQXMLUtility;
@@ -53,7 +54,7 @@ public class Kill {
     private LocalDate date;
     private String killed;
     private String killer;
-    private int missionId = 0;
+    private UUID missionId;
     private int scenarioId = 0;
     private int forceId = 0;
     private long unitType = 0;
@@ -63,7 +64,7 @@ public class Kill {
     public Kill() {
     }
 
-    public Kill(UUID id, String kill, String killer, LocalDate d, int missionId, int scenarioId, int forceId,
+    public Kill(UUID id, String kill, String killer, LocalDate d, UUID missionId, int scenarioId, int forceId,
           long unitType) {
         pilotId = id;
         this.killed = kill;
@@ -107,11 +108,11 @@ public class Kill {
         killer = s;
     }
 
-    public int getMissionId() {
+    public @Nullable UUID getMissionId() {
         return missionId;
     }
 
-    public void setMissionId(int id) {
+    public void setMissionId(@Nullable UUID id) {
         missionId = id;
     }
 
@@ -172,7 +173,7 @@ public class Kill {
                 } else if (wn2.getNodeName().equalsIgnoreCase("date")) {
                     retVal.date = MHQXMLUtility.parseDate(wn2.getTextContent().trim());
                 } else if (wn2.getNodeName().equalsIgnoreCase("missionId")) {
-                    retVal.missionId = Integer.parseInt(wn2.getTextContent());
+                    retVal.missionId = UUID.fromString(wn2.getTextContent());
                 } else if (wn2.getNodeName().equalsIgnoreCase("scenarioId")) {
                     retVal.scenarioId = Integer.parseInt(wn2.getTextContent());
                 } else if (wn2.getNodeName().equalsIgnoreCase("unitType")) {

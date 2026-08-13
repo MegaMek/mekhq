@@ -34,15 +34,7 @@ package mekhq.campaign.personnel.autoAwards;
 
 import java.awt.Dialog.ModalityType;
 import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.ResourceBundle;
-import java.util.UUID;
+import java.util.*;
 import java.util.stream.Collectors;
 import javax.swing.JOptionPane;
 
@@ -935,7 +927,8 @@ public class AutoAwardsController {
         Map<Integer, List<Kill>> missionKillData = personnel.stream()
                                                          .flatMap(person -> campaign.getKillsFor(person).stream())
                                                          .filter(kill -> mission != null &&
-                                                                               (kill.getMissionId() == mission.getId()))
+                                                                               (Objects.equals(kill.getMissionId(),
+                                                                                     mission.getId())))
                                                          .collect(Collectors.groupingBy(Kill::getForceId));
 
         // process the award data, checking for award eligibility
