@@ -34,6 +34,7 @@ package mekhq;
 
 import static megamek.SuiteConstants.LAST_MILESTONE;
 import static mekhq.MHQConstants.CAMPAIGN_PRESET_DIRECTORY;
+import static mekhq.utilities.MHQInternationalization.getTextAt;
 
 import java.io.BufferedOutputStream;
 import java.io.File;
@@ -52,7 +53,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
-import java.util.ResourceBundle;
 import java.util.stream.Collectors;
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
@@ -108,6 +108,7 @@ public class CampaignPreset {
      */
     private static final Version LAST_COMPATIBLE_VERSION = LAST_MILESTONE;
 
+    private static final String RESOURCE_BUNDLE = "mekhq.resources.Campaign";
     private static final MMLogger LOGGER = MMLogger.create(CampaignPreset.class);
 
     /**
@@ -444,11 +445,9 @@ public class CampaignPreset {
         } catch (Exception ex) {
             LOGGER.error("writeToFile() Exception", ex);
             if (frame != null) {
-                final ResourceBundle resources = ResourceBundle.getBundle("mekhq.resources.Campaign",
-                      MekHQ.getMHQOptions().getLocale());
                 JOptionPane.showMessageDialog(frame,
-                      resources.getString("CampaignPresetSaveFailure.text"),
-                      resources.getString("CampaignPresetSaveFailure.title"),
+                      getTextAt(RESOURCE_BUNDLE, "CampaignPresetSaveFailure.text"),
+                      getTextAt(RESOURCE_BUNDLE, "CampaignPresetSaveFailure.title"),
                       JOptionPane.ERROR_MESSAGE);
             }
             return false;
