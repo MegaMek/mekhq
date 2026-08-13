@@ -151,7 +151,8 @@ class MedicalPage {
               "UseAlternativeAdvancedMedicalFewerPermanentInjuries"));
 
         lblAlternativeAdvancedMedicalHealingTimeMultiplier = new CampaignOptionsLabel(
-              "AlternativeAdvancedMedicalHealingTimeMultiplier");
+              "AlternativeAdvancedMedicalHealingTimeMultiplier",
+              getMetadata(new Version(0, 51, 1), CampaignOptionFlag.IMPORTANT));
         lblAlternativeAdvancedMedicalHealingTimeMultiplier.addMouseListener(createTipPanelUpdater(
               "AlternativeAdvancedMedicalHealingTimeMultiplier"));
         spnAlternativeAdvancedMedicalHealingTimeMultiplier = new CampaignOptionsSpinner(
@@ -159,8 +160,7 @@ class MedicalPage {
               1.0,
               0.01,
               10,
-              0.01,
-              getMetadata(new Version(0, 51, 1), CampaignOptionFlag.IMPORTANT));
+              0.01);
         spnAlternativeAdvancedMedicalHealingTimeMultiplier.addMouseListener(createTipPanelUpdater(
               "AlternativeAdvancedMedicalHealingTimeMultiplier"));
 
