@@ -82,9 +82,9 @@ import mekhq.campaign.events.missions.MissionChangedEvent;
 import mekhq.campaign.finances.Money;
 import mekhq.campaign.market.enums.UnitMarketType;
 import mekhq.campaign.mission.atb.AtBScenarioFactory;
-import mekhq.campaign.mission.enums.ContractObjectiveType;
-import mekhq.campaign.mission.enums.ContractMoraleLevel;
 import mekhq.campaign.mission.enums.ContractCommandRights;
+import mekhq.campaign.mission.enums.ContractMoraleLevel;
+import mekhq.campaign.mission.enums.ContractObjectiveType;
 import mekhq.campaign.mission.utilities.ContractUtilities;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.backgrounds.BackgroundsController;
@@ -109,7 +109,7 @@ import org.w3c.dom.NodeList;
  *
  * @author Neoancient
  */
-@Deprecated(since = "0.51.01", forRemoval = false)
+@Deprecated(since = "0.51.01", forRemoval = true)
 public class AtBContract extends Contract {
     private static final MMLogger logger = MMLogger.create(AtBContract.class);
 

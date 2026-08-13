@@ -57,7 +57,7 @@ import mekhq.campaign.Campaign;
 import mekhq.campaign.Kill;
 import mekhq.campaign.force.Formation;
 import mekhq.campaign.force.FormationLevel;
-import mekhq.campaign.mission.Mission;
+import mekhq.campaign.mission.newContract.AbstractContract;
 import mekhq.campaign.personnel.Award;
 
 public class KillAwards {
@@ -72,7 +72,8 @@ public class KillAwards {
      * @param awards   the awards to be processed (should only include awards where item == Kill)
      * @param killData the pre-processed list of kills mapped to Force ID
      */
-    public static Map<Integer, List<Object>> KillAwardProcessor(Campaign campaign, Mission mission, UUID person,
+    public static Map<Integer, List<Object>> KillAwardProcessor(Campaign campaign, AbstractContract mission,
+          UUID person,
           List<Award> awards, Map<Integer, List<Kill>> killData) {
         List<Award> individualAwards = new ArrayList<>();
 
@@ -134,7 +135,7 @@ public class KillAwards {
                 if (awardScope.equalsIgnoreCase("mission")) {
                     List<Kill> killCredits = campaign.getKillsFor(person).stream()
                                                    .filter(kill -> Objects.equals(kill.getMissionId(),
-                                                         mission.getId()))
+                                                         mission.getContractId()))
                                                    .toList();
 
                     // -1 corresponds to 'individual', so we only care about the pilot's personal

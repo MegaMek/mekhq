@@ -44,8 +44,7 @@ import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.Kill;
 import mekhq.campaign.mission.AtBContract;
-import mekhq.campaign.mission.Contract;
-import mekhq.campaign.mission.Mission;
+import mekhq.campaign.mission.newContract.AbstractContract;
 import mekhq.campaign.personnel.Award;
 import mekhq.campaign.personnel.AwardsFactory;
 import mekhq.campaign.personnel.Person;
@@ -53,7 +52,7 @@ import mekhq.gui.dialog.AutoAwardsDialog;
 
 public class AutoAwardsController {
     private Campaign campaign;
-    private Mission mission;
+    private AbstractContract mission;
 
     final private List<Award> contractAwards = new ArrayList<>();
     final private List<Award> factionHunterAwards = new ArrayList<>();
@@ -140,7 +139,7 @@ public class AutoAwardsController {
      * @param missionWasSuccessful true if the Mission was a complete Success, otherwise false
      * @param POWPersonnel         a list of persons that have been a prisoner of war in the current mission
      */
-    public void PostMissionController(Campaign campaign, Mission mission, Boolean missionWasSuccessful,
+    public void PostMissionController(Campaign campaign, AbstractContract mission, Boolean missionWasSuccessful,
           @Nullable List<Person> POWPersonnel) {
         logger.info("autoAwards (Mission Conclusion) has started");
 
@@ -685,7 +684,7 @@ public class AutoAwardsController {
         Map<Integer, List<Object>> processedData;
         int allAwardDataKey = 0;
 
-        if ((!contractAwards.isEmpty()) && (mission instanceof Contract)) {
+        if (!contractAwards.isEmpty()) {
             processedData = ContractAwardsManager(personnel);
 
             // if processedData == null, nobody was eligible for this type of award, so they should be skipped
@@ -695,9 +694,7 @@ public class AutoAwardsController {
             }
         }
 
-        if ((!factionHunterAwards.isEmpty()) &&
-                  (campaign.getCampaignOptions().isUseStratCon()) &&
-                  (mission instanceof AtBContract)) {
+        if (!factionHunterAwards.isEmpty() && campaign.getCampaignOptions().isUseStratCon()) {
             processedData = FactionHunterAwardsManager(personnel);
 
             if (processedData != null) {
@@ -761,7 +758,7 @@ public class AutoAwardsController {
             }
         }
 
-        if ((!theatreOfWarAwards.isEmpty()) && (mission instanceof Contract)) {
+        if (!theatreOfWarAwards.isEmpty()) {
             processedData = TheatreOfWarAwardsManager(personnel);
 
             if (processedData != null) {
@@ -928,7 +925,7 @@ public class AutoAwardsController {
                                                          .flatMap(person -> campaign.getKillsFor(person).stream())
                                                          .filter(kill -> mission != null &&
                                                                                (Objects.equals(kill.getMissionId(),
-                                                                                     mission.getId())))
+                                                                                     mission.getContractId())))
                                                          .collect(Collectors.groupingBy(Kill::getForceId));
 
         // process the award data, checking for award eligibility
