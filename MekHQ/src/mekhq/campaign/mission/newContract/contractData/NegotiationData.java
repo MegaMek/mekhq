@@ -35,6 +35,7 @@ package mekhq.campaign.mission.newContract.contractData;
 import java.util.List;
 
 import mekhq.campaign.mission.newContract.contractGeneration.ContractTermsData;
+import mekhq.campaign.mission.newContract.contractGeneration.negotiationsAndNPCs.TermFunding;
 
 /**
  * A record of how a contract's terms were negotiated, stored on the contract so the negotiation table can be reopened

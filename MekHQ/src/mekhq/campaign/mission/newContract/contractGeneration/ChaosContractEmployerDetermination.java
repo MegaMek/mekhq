@@ -52,6 +52,8 @@ import megamek.logging.MMLogger;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.location.ILocation;
 import mekhq.campaign.mission.newContract.contractData.EmployerData;
+import mekhq.campaign.mission.newContract.contractGeneration.negotiationsAndNPCs.EmployerLiaison;
+import mekhq.campaign.mission.newContract.contractGeneration.negotiationsAndNPCs.EmployerNegotiator;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.universe.Faction;
 import mekhq.campaign.universe.Factions;

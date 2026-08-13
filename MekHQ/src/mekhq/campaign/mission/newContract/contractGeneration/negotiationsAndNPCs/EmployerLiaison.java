@@ -30,7 +30,7 @@
  * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
  * affiliated with Microsoft.
  */
-package mekhq.campaign.mission.newContract.contractGeneration;
+package mekhq.campaign.mission.newContract.contractGeneration.negotiationsAndNPCs;
 
 import static mekhq.campaign.personnel.enums.PersonnelRole.ADMINISTRATOR_COMMAND;
 import static mekhq.campaign.personnel.enums.PersonnelRole.BROKER;
@@ -43,6 +43,7 @@ import java.util.List;
 
 import megamek.common.enums.Gender;
 import mekhq.campaign.Campaign;
+import mekhq.campaign.mission.newContract.contractGeneration.ContractSearchType;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.enums.PersonnelRole;
 import mekhq.campaign.personnel.ranks.AutoAssignRankForCompanyGenerator;

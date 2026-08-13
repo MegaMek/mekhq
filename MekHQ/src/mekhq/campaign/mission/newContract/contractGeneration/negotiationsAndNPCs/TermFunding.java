@@ -30,7 +30,7 @@
  * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
  * affiliated with Microsoft.
  */
-package mekhq.campaign.mission.newContract.contractData;
+package mekhq.campaign.mission.newContract.contractGeneration.negotiationsAndNPCs;
 
 /**
  * How a single raised negotiation step was paid for, recorded per step so a raise can be refunded to the correct budget
