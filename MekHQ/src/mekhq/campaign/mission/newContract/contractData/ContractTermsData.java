@@ -30,10 +30,9 @@
  * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
  * affiliated with Microsoft.
  */
-package mekhq.campaign.mission.newContract.contractGeneration;
+package mekhq.campaign.mission.newContract.contractData;
 
 import jakarta.annotation.Nullable;
-import mekhq.campaign.mission.newContract.contractData.ChaosContractStepsTable;
 
 public record ContractTermsData(
       ChaosContractStepsTable payRate,

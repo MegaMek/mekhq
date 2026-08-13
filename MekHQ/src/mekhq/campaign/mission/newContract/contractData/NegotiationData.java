@@ -34,7 +34,6 @@ package mekhq.campaign.mission.newContract.contractData;
 
 import java.util.List;
 
-import mekhq.campaign.mission.newContract.contractGeneration.ContractTermsData;
 import mekhq.campaign.mission.newContract.contractGeneration.negotiationsAndNPCs.TermFunding;
 
 /**

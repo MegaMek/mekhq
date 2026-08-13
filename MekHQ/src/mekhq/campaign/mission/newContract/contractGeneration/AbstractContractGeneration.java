@@ -60,6 +60,7 @@ import mekhq.campaign.mission.newContract.AbstractContract;
 import mekhq.campaign.mission.newContract.ChaosContract;
 import mekhq.campaign.mission.newContract.contractData.ContractObjectiveData;
 import mekhq.campaign.mission.newContract.contractData.ContractScheduleData;
+import mekhq.campaign.mission.newContract.contractData.ContractTermsData;
 import mekhq.campaign.mission.newContract.contractData.EmployerData;
 import mekhq.campaign.mission.newContract.contractData.EnemyData;
 import mekhq.campaign.mission.newContract.contractData.MoraleData;
