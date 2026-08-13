@@ -119,6 +119,7 @@ import mekhq.campaign.mission.enums.ContractCommandRights;
 import mekhq.campaign.mission.enums.ContractMoraleLevel;
 import mekhq.campaign.mission.enums.ScenarioStatus;
 import mekhq.campaign.mission.enums.ScenarioType;
+import mekhq.campaign.mission.newContract.AbstractContract;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.PersonnelOptions;
 import mekhq.campaign.personnel.skills.ActionCheckResult;
@@ -271,7 +272,7 @@ public class StratConRulesManager {
      * @param scenarioCount The number of scenarios to generate.
      */
     public static void generateDailyScenariosForTrack(Campaign campaign, StratConCampaignState campaignState,
-          AtBContract contract, int scenarioCount) {
+          AbstractContract contract, int scenarioCount) {
         CampaignOptions campaignOptions = campaign.getCampaignOptions();
 
         // get this list just so we have it available
@@ -291,7 +292,7 @@ public class StratConRulesManager {
 
             final int deploymentDelay = track.getDeploymentTime();
             final LocalDate scenarioTargetDate = campaign.getLocalDate().plusDays(deploymentDelay);
-            final LocalDate contractEnd = campaignState.getContract().getEndingDate();
+            final LocalDate contractEnd = campaignState.getContract().getEndDate();
 
             if (!scenarioTargetDate.isBefore(contractEnd)) {
                 LOGGER.info("Skipping scenario because it is on or after the contract end date.");

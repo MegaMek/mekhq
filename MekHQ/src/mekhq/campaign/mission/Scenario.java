@@ -648,11 +648,11 @@ public class Scenario implements IPlayerSettings {
         this.id = i;
     }
 
-    public UUID getMissionId() {
+    public @Nullable UUID getMissionId() {
         return missionId;
     }
 
-    public void setMissionId(UUID i) {
+    public void setMissionId(@Nullable UUID i) {
         this.missionId = i;
     }
 

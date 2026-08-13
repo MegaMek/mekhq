@@ -293,7 +293,7 @@ public final class ChaosContractMarketAvailability {
             offers.clear();
             final int count = offerCount(rolls, type);
             for (final AbstractContract contract : generateOffers(campaign, count, false, type)) {
-                offers.put(contract.getContractId(), contract);
+                offers.put(contract.getId(), contract);
             }
             totalOffers += count;
         }

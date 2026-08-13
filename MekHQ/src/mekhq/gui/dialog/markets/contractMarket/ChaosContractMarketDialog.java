@@ -431,7 +431,7 @@ public class ChaosContractMarketDialog extends JDialog implements ContractMarket
 
         Map<UUID, AbstractContract> marketOffers = contractMarket.getContracts(searchType);
         for (AbstractContract contract : generated) {
-            marketOffers.put(contract.getContractId(), contract);
+            marketOffers.put(contract.getId(), contract);
         }
         contracts.clear();
         contracts.addAll(marketOffers.values());

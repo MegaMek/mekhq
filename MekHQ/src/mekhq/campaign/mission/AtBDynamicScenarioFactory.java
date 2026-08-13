@@ -135,6 +135,7 @@ import mekhq.campaign.mission.ScenarioObjective.TimeLimitType;
 import mekhq.campaign.mission.atb.AtBScenarioModifier;
 import mekhq.campaign.mission.atb.AtBScenarioModifier.EventTiming;
 import mekhq.campaign.mission.enums.CombatRole;
+import mekhq.campaign.mission.newContract.AbstractContract;
 import mekhq.campaign.personnel.Bloodname;
 import mekhq.campaign.personnel.SpecialAbility;
 import mekhq.campaign.personnel.enums.Phenotype;
@@ -180,7 +181,8 @@ public class AtBDynamicScenarioFactory {
      *
      * @return A new Scenario object with the provided settings
      */
-    public static AtBDynamicScenario initializeScenarioFromTemplate(ScenarioTemplate template, AtBContract contract,
+    public static AtBDynamicScenario initializeScenarioFromTemplate(ScenarioTemplate template,
+          AbstractContract contract,
           Campaign campaign) {
         AtBDynamicScenario scenario = new AtBDynamicScenario();
 
@@ -188,8 +190,8 @@ public class AtBDynamicScenarioFactory {
         scenario.setStratConScenarioType(template.getStratConScenarioType());
         scenario.setDesc(template.detailedBriefing);
         scenario.setTemplate(template);
-        scenario.setEffectiveOpForSkill(contract.getEnemySkill());
-        scenario.setEffectiveOpForQuality(contract.getEnemyQuality());
+        scenario.setEffectiveOpForSkill(contract.getEnemyForceSkill());
+        scenario.setEffectiveOpForQuality(contract.getEnemyEquipmentRating());
         scenario.setMissionId(contract.getId());
 
         // apply any fixed modifiers
@@ -255,7 +257,7 @@ public class AtBDynamicScenarioFactory {
      * @param contract Contract in which the scenario is occurring
      * @param campaign Current campaign.
      */
-    public static void finalizeScenario(AtBDynamicScenario scenario, AtBContract contract, Campaign campaign) {
+    public static void finalizeScenario(AtBDynamicScenario scenario, AbstractContract contract, Campaign campaign) {
         // if scenario already had bots, then we need to reset the briefing to remove
         // text related to old scenario modifiers
         if (scenario.getNumBots() > 0) {
@@ -5185,13 +5187,14 @@ public class AtBDynamicScenarioFactory {
      *
      * @return Faction code.
      */
-    public static String getPlanetOwnerFaction(AtBContract contract, LocalDate currentDate) {
+    public static String getPlanetOwnerFaction(AbstractContract contract, LocalDate currentDate) {
         String factionCode = "MERC";
 
         // planet owner is the first of the factions that owns the current planet.
         // if there's no such thing, then mercenaries.
-        List<String> planetFactions = contract.getSystem().getFactions(currentDate);
-        if (planetFactions != null && !planetFactions.isEmpty()) {
+        Planet targetPlanet = contract.getTargetPlanet();
+        List<String> planetFactions = targetPlanet == null ? new ArrayList<>() : targetPlanet.getFactions(currentDate);
+        if (!planetFactions.isEmpty()) {
             factionCode = planetFactions.getFirst();
             Faction ownerFaction = Factions.getInstance().getFaction(factionCode);
 
@@ -5212,14 +5215,15 @@ public class AtBDynamicScenarioFactory {
      *
      * @return ForceAlignment.
      */
-    public static ForceAlignment getPlanetOwnerAlignment(AtBContract contract, String factionCode,
+    public static ForceAlignment getPlanetOwnerAlignment(AbstractContract contract, String factionCode,
           LocalDate currentDate) {
         // if the faction is one of the planet owners, see if it's either the employer
         // or op for. If it's not, third-party.
-        if (contract.getSystem().getFactions(currentDate).contains(factionCode)) {
-            if (factionCode.equals(contract.getEmployerCode())) {
+        Planet targetPlanet = contract.getTargetPlanet();
+        if (targetPlanet != null && targetPlanet.getFactions(currentDate).contains(factionCode)) {
+            if (factionCode.equals(contract.getEmployerFactionCode())) {
                 return ForceAlignment.Allied;
-            } else if (factionCode.equals(contract.getEnemyCode())) {
+            } else if (factionCode.equals(contract.getEnemyFactionCode())) {
                 return ForceAlignment.Opposing;
             }
         }

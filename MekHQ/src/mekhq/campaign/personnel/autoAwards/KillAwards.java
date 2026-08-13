@@ -135,7 +135,7 @@ public class KillAwards {
                 if (awardScope.equalsIgnoreCase("mission")) {
                     List<Kill> killCredits = campaign.getKillsFor(person).stream()
                                                    .filter(kill -> Objects.equals(kill.getMissionId(),
-                                                         mission.getContractId()))
+                                                         mission.getId()))
                                                    .toList();
 
                     // -1 corresponds to 'individual', so we only care about the pilot's personal

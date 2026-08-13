@@ -1349,6 +1349,15 @@ public class Campaign implements ITechManager {
     }
 
     /**
+     * @return missions sorted with active missions from oldest to newest, followed by completed missions from newest to
+     *       oldest; active missions without a start date use the campaign date, while completed missions without one
+     *       sort last
+     */
+    public List<AbstractContract> getSortedMissions() {
+        return contractHistory.getSortedMissions();
+    }
+
+    /**
      * @param id the mission's id
      *
      * @return the mission in question
@@ -1362,27 +1371,6 @@ public class Campaign implements ITechManager {
      */
     public Collection<Mission> getMissions() {
         return missions.values();
-    }
-
-    /**
-     * @return missions sorted with active missions from oldest to newest, followed by completed missions from newest to
-     *       oldest; active missions without a start date use the campaign date, while completed missions without one
-     *       sort last
-     */
-    public List<Mission> getSortedMissions() {
-        List<Mission> sortedMissions = new ArrayList<>(getMissions());
-        sortedMissions.sort(Comparator.comparing((Mission mission) -> mission.getStatus().isCompleted())
-                                  .thenComparingLong(this::getMissionSortKey));
-        return sortedMissions;
-    }
-
-    private long getMissionSortKey(Mission mission) {
-        LocalDate startDate = mission.getStartDate();
-        if (startDate == null) {
-            return mission.getStatus().isCompleted() ? Long.MAX_VALUE : getLocalDate().toEpochDay();
-        }
-        long startDay = startDate.toEpochDay();
-        return mission.getStatus().isCompleted() ? -startDay : startDay;
     }
 
     public List<Mission> getActiveMissions(final boolean excludeEndDateCheck) {
@@ -1576,8 +1564,8 @@ public class Campaign implements ITechManager {
     /**
      * Adds scenario to existing mission, generating a report.
      */
-    public void addScenario(Scenario s, Mission m) {
-        addScenario(s, m, false);
+    public void addScenario(Scenario scenario, AbstractContract mission) {
+        addScenario(scenario, mission, false);
     }
 
     /**
@@ -4644,7 +4632,7 @@ public class Campaign implements ITechManager {
         MekHQ.triggerEvent(new ScenarioRemovedEvent(scenario));
     }
 
-    public void removeMission(final Mission mission) {
+    public void removeMission(final AbstractContract mission) {
         // Loop through scenarios here! We need to remove them as well.
         for (Scenario scenario : mission.getScenarios()) {
             scenario.clearAllFormationsAndPersonnel(this);
@@ -4652,7 +4640,7 @@ public class Campaign implements ITechManager {
         }
         mission.clearScenarios();
 
-        missions.remove(mission.getId());
+        contractHistory.remove(mission.getId());
 
         // https://github.com/MegaMek/mekhq/pull/7761
         // there's a bug preventing clearAllFormationsAndPersonnel from removing all scenario links,

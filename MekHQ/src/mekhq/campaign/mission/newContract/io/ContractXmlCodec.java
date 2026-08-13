@@ -30,7 +30,7 @@
  * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
  * affiliated with Microsoft.
  */
-package mekhq.campaign.mission.newContract;
+package mekhq.campaign.mission.newContract.io;
 
 import java.io.PrintWriter;
 import java.time.LocalDate;
@@ -55,6 +55,10 @@ import mekhq.campaign.mission.Scenario;
 import mekhq.campaign.mission.enums.ContractMoraleLevel;
 import mekhq.campaign.mission.enums.ContractObjectiveType;
 import mekhq.campaign.mission.enums.MissionStatus;
+import mekhq.campaign.mission.newContract.AbstractContract;
+import mekhq.campaign.mission.newContract.ChaosActOfPiracy;
+import mekhq.campaign.mission.newContract.ChaosContract;
+import mekhq.campaign.mission.newContract.ChaosGameWorlds;
 import mekhq.campaign.mission.newContract.contractData.*;
 import mekhq.campaign.mission.newContract.contractGeneration.ChaosEmployerType;
 import mekhq.campaign.mission.newContract.contractGeneration.negotiationsAndNPCs.TermFunding;
@@ -104,15 +108,15 @@ public final class ContractXmlCodec {
         MHQXMLUtility.writeSimpleXMLOpenTag(printWriter, indent++, CONTRACT_TAG, TYPE_ATTRIBUTE,
               contract.getClass().getName());
 
-        if (contract.getContractId() != null) {
-            MHQXMLUtility.writeSimpleXMLTag(printWriter, indent, "contractId", contract.getContractId());
+        if (contract.getId() != null) {
+            MHQXMLUtility.writeSimpleXMLTag(printWriter, indent, "contractId", contract.getId());
         }
         writeStringIfPresent(printWriter, indent, "contractName", contract.getContractName());
         writeStringIfPresent(printWriter, indent, "description", contract.getDescription());
         MHQXMLUtility.writeSimpleXMLTag(printWriter, indent, "scale", contract.getScale());
         MHQXMLUtility.writeSimpleXMLTag(printWriter, indent, "trackCount", contract.getTrackCount());
-        if (contract.getMissionStatus() != null) {
-            MHQXMLUtility.writeSimpleXMLTag(printWriter, indent, "missionStatus", contract.getMissionStatus().name());
+        if (contract.getStatus() != null) {
+            MHQXMLUtility.writeSimpleXMLTag(printWriter, indent, "missionStatus", contract.getStatus().name());
         }
         // The player's chosen negotiator is a roster member, so persist only their id and re-resolve on load.
         if (contract.getPlayerNegotiator() != null) {

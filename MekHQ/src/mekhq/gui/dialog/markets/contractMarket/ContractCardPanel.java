@@ -298,7 +298,7 @@ public class ContractCardPanel extends JPanel {
         gbc.weightx = 1.0;
         row.add(chip(getFormattedTextAt(RESOURCE_BUNDLE,
               "card.contractMarket.months",
-              contract.getContractLengthInMonths())), gbc);
+              contract.getLengthInMonths())), gbc);
 
         return row;
     }

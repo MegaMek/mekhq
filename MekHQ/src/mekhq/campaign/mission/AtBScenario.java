@@ -91,6 +91,7 @@ import mekhq.campaign.mission.ScenarioForceTemplate.ForceAlignment;
 import mekhq.campaign.mission.ScenarioObjective.ObjectiveCriterion;
 import mekhq.campaign.mission.atb.IAtBScenario;
 import mekhq.campaign.mission.enums.CombatRole;
+import mekhq.campaign.mission.newContract.AbstractContract;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.skills.Skill;
 import mekhq.campaign.personnel.skills.SkillModifierData;
@@ -2158,8 +2159,8 @@ public abstract class AtBScenario extends Scenario implements IAtBScenario {
         return retVal.toString();
     }
 
-    public AtBContract getContract(Campaign c) {
-        return (AtBContract) c.getMission(getMissionId());
+    public AbstractContract getContract(Campaign campaign) {
+        return campaign.getContract(getMissionId());
     }
 
     /**
@@ -2352,7 +2353,7 @@ public abstract class AtBScenario extends Scenario implements IAtBScenario {
      * @return the matching {@link StratConScenario} if found, or {@code null} if no match is found or any required data
      *       is missing
      */
-    public @Nullable StratConScenario getStratconScenario(AtBContract contract, AtBScenario atBScenario) {
+    public @Nullable StratConScenario getStratconScenario(AbstractContract contract, AtBScenario atBScenario) {
         if (contract == null || atBScenario == null) {
             return null;
         }

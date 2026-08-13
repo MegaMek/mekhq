@@ -372,7 +372,7 @@ public class ContractDossierPanel extends JPanel {
               "+" + estimate.guaranteedIncome().toAmountAndSymbolString(), positiveColor(), false);
         addProfitRow(panel, getFormattedTextAt(RESOURCE_BUNDLE,
                     "dossier.contractMarket.profit.expenses",
-                    contract.getContractLengthInMonths(),
+                    contract.getLengthInMonths(),
                     estimate.transitDays()),
               "-" + estimate.operatingCosts().toAmountAndSymbolString(), dangerColor(), false);
         addProfitRow(panel, getTextAt(RESOURCE_BUNDLE, "dossier.contractMarket.profit.net"),
@@ -468,7 +468,7 @@ public class ContractDossierPanel extends JPanel {
         JLabel travel = new JLabel(getFormattedTextAt(RESOURCE_BUNDLE,
               "dossier.contractMarket.footer.travel",
               destination,
-              contract.getContractLengthInMonths()));
+              contract.getLengthInMonths()));
         travel.setForeground(mutedColor());
         footer.add(travel, BorderLayout.WEST);
 

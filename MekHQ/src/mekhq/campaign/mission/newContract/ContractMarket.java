@@ -43,6 +43,7 @@ import megamek.logging.MMLogger;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.force.PlayerForce;
 import mekhq.campaign.mission.newContract.contractGeneration.ContractSearchType;
+import mekhq.campaign.mission.newContract.io.ContractXmlCodec;
 import mekhq.utilities.MHQXMLUtility;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
@@ -51,7 +52,7 @@ import org.w3c.dom.NodeList;
  * The contract market owned by a {@link PlayerForce}: the pool of currently available {@link AbstractContract} offers,
  * split into one map per {@link ContractSearchType}.
  *
- * <p>Each map is keyed by {@link AbstractContract#getContractId()} and iterated in insertion order. The four maps are:
+ * <p>Each map is keyed by {@link AbstractContract#getId()} and iterated in insertion order. The four maps are:
  * mercenary work ({@link ContractSearchType#MERCENARY}), acts of piracy ({@link ContractSearchType#PIRATE}), government
  * orders ({@link ContractSearchType#GOVERNMENT}), and tournament bouts ({@link ContractSearchType#TOURNAMENT}). The
  * market UI shows exactly one of these at a time, chosen by the player's selected search type.</p>
@@ -123,13 +124,13 @@ public class ContractMarket {
     }
 
     /**
-     * Adds (or replaces) an offer under the given search type, keyed by its {@link AbstractContract#getContractId()}.
+     * Adds (or replaces) an offer under the given search type, keyed by its {@link AbstractContract#getId()}.
      *
      * @param searchType the search type the offer belongs to
      * @param contract   the offer to store
      */
     public void addContract(final ContractSearchType searchType, final AbstractContract contract) {
-        getContracts(searchType).put(contract.getContractId(), contract);
+        getContracts(searchType).put(contract.getId(), contract);
     }
 
     /**
@@ -139,7 +140,7 @@ public class ContractMarket {
      * @param contract   the offer to remove
      */
     public void removeContract(final ContractSearchType searchType, final AbstractContract contract) {
-        getContracts(searchType).remove(contract.getContractId());
+        getContracts(searchType).remove(contract.getId());
     }
 
     /**
@@ -221,8 +222,8 @@ public class ContractMarket {
                     continue;
                 }
                 final AbstractContract contract = ContractXmlCodec.readContract(contractNode, campaign, version);
-                if ((contract != null) && (contract.getContractId() != null)) {
-                    offers.put(contract.getContractId(), contract);
+                if ((contract != null) && (contract.getId() != null)) {
+                    offers.put(contract.getId(), contract);
                 }
             }
         }

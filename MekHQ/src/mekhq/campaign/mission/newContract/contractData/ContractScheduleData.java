@@ -33,9 +33,27 @@
 package mekhq.campaign.mission.newContract.contractData;
 
 import java.time.LocalDate;
+import java.time.temporal.ChronoUnit;
+
+import jakarta.annotation.Nullable;
 
 public record ContractScheduleData(LocalDate startDate,
       LocalDate endDate,
       int lengthInMonths
 ) {
+    public ContractScheduleData(ContractScheduleData existingData, @Nullable LocalDate newStartDate,
+          @Nullable LocalDate newEndDate) {
+        this(newStartDate == null ? existingData.startDate : newStartDate,
+              newEndDate == null ? existingData.endDate : newEndDate,
+              // This is ugly but is necessary so that it can be included in the constructor
+              (int) ChronoUnit.MONTHS.between(
+                    (newStartDate == null ? existingData.startDate : newStartDate),
+                    (newEndDate == null ? existingData.endDate : newEndDate)
+              )
+        );
+    }
+
+    public boolean isActiveOn(LocalDate date) {
+        return !date.isBefore(startDate) && !date.isAfter(endDate);
+    }
 }

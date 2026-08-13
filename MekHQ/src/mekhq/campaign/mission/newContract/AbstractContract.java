@@ -37,6 +37,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
+import jakarta.annotation.Nonnull;
 import jakarta.annotation.Nullable;
 import megamek.client.ui.util.PlayerColour;
 import megamek.common.enums.SkillLevel;
@@ -46,6 +47,7 @@ import mekhq.campaign.CurrentLocation;
 import mekhq.campaign.JumpPath;
 import mekhq.campaign.digitalGM.stratCon.StratConCampaignState;
 import mekhq.campaign.finances.Money;
+import mekhq.campaign.mission.AtBScenario;
 import mekhq.campaign.mission.Scenario;
 import mekhq.campaign.mission.enums.ContractCommandRights;
 import mekhq.campaign.mission.enums.ContractMoraleLevel;
@@ -53,6 +55,7 @@ import mekhq.campaign.mission.enums.ContractObjectiveType;
 import mekhq.campaign.mission.enums.MissionStatus;
 import mekhq.campaign.mission.newContract.contractData.*;
 import mekhq.campaign.mission.newContract.contractGeneration.ChaosEmployerType;
+import mekhq.campaign.mission.newContract.utilities.ContractGeneralUtilities;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.universe.Faction;
 import mekhq.campaign.universe.Planet;
@@ -104,7 +107,69 @@ public abstract class AbstractContract {
         return scenarios;
     }
 
-    public UUID getContractId() {
+    /**
+     * Don't use this method directly as it will not add an id to the added scenario. Use Campaign#AddScenario instead
+     *
+     * @param scenario the scenario to add this mission
+     */
+    public void addScenario(final Scenario scenario) {
+        scenario.setMissionId(getId());
+        getScenarios().add(scenario);
+    }
+
+    public List<Scenario> getVisibleScenarios() {
+        List<Scenario> filteredScenarios = new ArrayList<>();
+
+        for (Scenario scenario : getScenarios()) {
+            if (!scenario.isCloaked()) {
+                filteredScenarios.add(scenario);
+            }
+        }
+
+        return filteredScenarios;
+    }
+
+    public List<Scenario> getCurrentScenarios() {
+        List<Scenario> filteredScenarios = new ArrayList<>();
+
+        for (Scenario scenario : getScenarios()) {
+            if (scenario.getStatus().isCurrent()) {
+                filteredScenarios.add(scenario);
+            }
+        }
+
+        return filteredScenarios;
+    }
+
+    public List<Scenario> getCompletedScenarios() {
+        List<Scenario> filteredScenarios = new ArrayList<>();
+
+        for (Scenario scenario : getScenarios()) {
+            if (!scenario.getStatus().isCurrent()) {
+                filteredScenarios.add(scenario);
+            }
+        }
+
+        return filteredScenarios;
+    }
+
+    public List<AtBScenario> getCurrentAtBScenarios() {
+        List<AtBScenario> filteredScenarios = new ArrayList<>();
+
+        for (Scenario scenario : getScenarios()) {
+            if (scenario instanceof AtBScenario atBScenario && atBScenario.getStatus().isCurrent()) {
+                filteredScenarios.add(atBScenario);
+            }
+        }
+
+        return filteredScenarios;
+    }
+
+    public void clearScenarios() {
+        scenarios.clear();
+    }
+
+    public UUID getId() {
         return contractId;
     }
 
@@ -180,7 +245,7 @@ public abstract class AbstractContract {
         contractFinanceData = new ContractFinanceData(contractFinanceData, null, null, newMoney);
     }
 
-    public MissionStatus getMissionStatus() {
+    public MissionStatus getStatus() {
         return missionStatus;
     }
 
@@ -194,6 +259,14 @@ public abstract class AbstractContract {
 
     public void setScheduleData(ContractScheduleData scheduleData) {
         this.scheduleData = scheduleData;
+    }
+
+    public void updateScheduleData(@Nullable LocalDate newStartDate, @Nullable LocalDate newEndDate) {
+        setScheduleData(new ContractScheduleData(scheduleData, newStartDate, newEndDate));
+    }
+
+    public boolean isActiveOn(LocalDate date) {
+        return scheduleData.isActiveOn(date);
     }
 
     public SystemsTargetData getSystemsTargetData() {
@@ -218,6 +291,19 @@ public abstract class AbstractContract {
 
     public void setMoraleData(MoraleData moraleData) {
         this.moraleData = moraleData;
+    }
+
+    public void updateMoraleData(ContractMoraleLevel newMoraleLevel) {
+        setMoraleData(new MoraleData(newMoraleLevel, null, Money.zero()));
+    }
+
+    public void updateMoraleData(ContractMoraleLevel newMoraleLevel, @Nullable LocalDate newRoutEndDate) {
+        setMoraleData(new MoraleData(newMoraleLevel, newRoutEndDate, Money.zero()));
+    }
+
+    public void updateMoraleData(ContractMoraleLevel newMoraleLevel, @Nullable LocalDate newRoutEndDate,
+          @Nonnull Money newRoutPayout) {
+        setMoraleData(new MoraleData(newMoraleLevel, newRoutEndDate, newRoutPayout));
     }
 
     public @Nullable NegotiationData getNegotiationData() {
@@ -260,7 +346,10 @@ public abstract class AbstractContract {
         this.trackCount = trackCount;
     }
 
-    /** Generally you want to use {@link ContractUtilities#getJumpPath(Campaign, AbstractContract, CurrentLocation)} */
+    /**
+     * Generally you want to use
+     * {@link ContractGeneralUtilities#getJumpPath(Campaign, AbstractContract, CurrentLocation)}
+     */
     public @Nullable JumpPath getCachedJumpPathDirect() {
         return cachedJumpPath;
     }
@@ -433,7 +522,7 @@ public abstract class AbstractContract {
         return scheduleData.endDate();
     }
 
-    public int getContractLengthInMonths() {
+    public int getLengthInMonths() {
         return scheduleData.lengthInMonths();
     }
 
@@ -483,6 +572,10 @@ public abstract class AbstractContract {
 
     public boolean isExchangeSalvage() {
         return getSalvageRightsStep().isExchangeSalvage();
+    }
+
+    public boolean canSalvage() {
+        return getSalvageRightsMultiplier() > 0;
     }
 
     public boolean isPlayerAttacker() {

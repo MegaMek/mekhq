@@ -65,7 +65,7 @@ import mekhq.campaign.Campaign;
 import mekhq.campaign.location.ILocation;
 import mekhq.campaign.mission.AtBContract;
 import mekhq.campaign.mission.Contract;
-import mekhq.campaign.mission.Mission;
+import mekhq.campaign.mission.newContract.AbstractContract;
 import mekhq.campaign.universe.Planet;
 import mekhq.campaign.universe.PlanetarySystem;
 import mekhq.gui.CampaignGUI;
@@ -82,7 +82,7 @@ import mekhq.utilities.ReportingUtilities;
 public class MissionViewPanel extends JScrollablePanel {
     private static final String RESOURCE_BUNDLE = "mekhq.resources.ContractViewPanel";
 
-    private final Mission mission;
+    private final AbstractContract mission;
     protected CampaignGUI gui;
 
     protected JPanel pnlStats;
@@ -114,9 +114,9 @@ public class MissionViewPanel extends JScrollablePanel {
     private JLabel txtSalvageValueEmployer;
     private JLabel txtDeploymentCoverage;
 
-    public MissionViewPanel(Mission m, CampaignGUI gui) {
+    public MissionViewPanel(AbstractContract mission, CampaignGUI gui) {
         super();
-        this.mission = m;
+        this.mission = mission;
         this.gui = gui;
         initComponents();
     }
@@ -705,7 +705,10 @@ public class MissionViewPanel extends JScrollablePanel {
             JLabel txtSalvagePct = new JLabel();
             txtSalvagePct.setName("txtSalvagePct");
             if (contract.isSalvageExchange()) {
-                txtSalvagePct.setText(getTextAt(RESOURCE_BUNDLE, "exchange") + " (" + contract.getSalvagePercent() + "%)");
+                txtSalvagePct.setText(getTextAt(RESOURCE_BUNDLE, "exchange") +
+                                            " (" +
+                                            contract.getSalvagePercent() +
+                                            "%)");
             } else {
                 txtSalvagePct.setText(getTextAt(RESOURCE_BUNDLE, "none"));
             }
@@ -730,7 +733,8 @@ public class MissionViewPanel extends JScrollablePanel {
             addStatRow(lblCargoRequirement, txtCargoRequirement, y++);
 
             if (contract.isActiveOn(campaign.getLocalDate())) {
-                String deploymentCoverageTooltip = wordWrap(getTextAt(RESOURCE_BUNDLE, "txtDeploymentCoverage.tooltip"));
+                String deploymentCoverageTooltip = wordWrap(getTextAt(RESOURCE_BUNDLE,
+                      "txtDeploymentCoverage.tooltip"));
                 lblDeploymentCoverage.setName("lblDeploymentCoverage");
                 lblDeploymentCoverage.setText(getTextAt(RESOURCE_BUNDLE, "lblDeploymentCoverage.text"));
                 lblDeploymentCoverage.setToolTipText(deploymentCoverageTooltip);

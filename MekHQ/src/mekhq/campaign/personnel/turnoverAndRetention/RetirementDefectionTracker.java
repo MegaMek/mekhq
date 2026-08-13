@@ -33,7 +33,6 @@
  */
 package mekhq.campaign.personnel.turnoverAndRetention;
 
-import static java.lang.Math.max;
 import static java.lang.Math.min;
 import static java.lang.Math.round;
 import static mekhq.campaign.personnel.Person.getLoyaltyName;
@@ -59,8 +58,8 @@ import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.finances.Money;
 import mekhq.campaign.mission.AtBContract;
 import mekhq.campaign.mission.Contract;
-import mekhq.campaign.mission.Mission;
 import mekhq.campaign.mission.enums.ContractObjectiveType;
+import mekhq.campaign.mission.newContract.AbstractContract;
 import mekhq.campaign.personnel.Injury;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.PersonnelOptions;
@@ -94,8 +93,8 @@ public class RetirementDefectionTracker {
      * and determining payouts, but before the retirees have been paid,
      * we store those results to avoid making the rolls again.
      */
-    final private Set<Integer> rollRequired;
-    final private Map<Integer, HashSet<UUID>> unresolvedPersonnel;
+    final private Set<UUID> rollRequired;
+    final private Map<UUID, HashSet<UUID>> unresolvedPersonnel;
     final private Map<UUID, Payout> payouts;
     private LocalDate lastRetirementRoll;
 
@@ -389,7 +388,7 @@ public class RetirementDefectionTracker {
      *
      * @return A map with person ids as key and calculated target roll as value.
      */
-    public Map<UUID, TargetRoll> getTargetNumbers(final @Nullable Mission mission, final Campaign campaign) {
+    public Map<UUID, TargetRoll> getTargetNumbers(final @Nullable AbstractContract mission, final Campaign campaign) {
         final Map<UUID, TargetRoll> targets = new HashMap<>();
 
         if (null != mission) {
@@ -495,40 +494,6 @@ public class RetirementDefectionTracker {
             if (campaignOptions.isUseManagementSkill()) {
                 int modifier = getManagementSkillPenalty(person, campaign);
                 targetNumber.addModifier(modifier, resources.getString("managementSkill.text"));
-            }
-
-            // Shares Modifiers
-            if (campaignOptions.isUseShareSystem()) {
-                // If this retirement roll is not being made at the end of a contract (e.g. >12
-                // months since last roll),
-                // the share percentage should still apply.
-                // In the case of multiple active contracts, pick the one with the best
-                // percentage.
-
-                AtBContract contract;
-
-                try {
-                    contract = (AtBContract) mission;
-                } catch (Exception e) {
-                    contract = null;
-                }
-
-                if (contract == null) {
-                    List<AtBContract> atbContracts = campaign.getActiveAtBContracts();
-
-                    if (!atbContracts.isEmpty()) {
-                        for (AtBContract atbContract : atbContracts) {
-                            if ((contract == null) || (contract.getSharesPercent() > atbContract.getSharesPercent())) {
-                                contract = atbContract;
-                            }
-                        }
-                    }
-                }
-
-                if (contract != null) {
-                    targetNumber.addModifier(-max(0, ((contract.getSharesPercent() / 10) - 2)),
-                          resources.getString("shares.text"));
-                }
             }
 
             // Unit Rating modifier
@@ -875,7 +840,7 @@ public class RetirementDefectionTracker {
      * @param shareValue The value of each share in the unit; if not using the share system, this is zero.
      * @param campaign   the current campaign
      */
-    public void rollRetirement(final @Nullable Mission mission, final Map<UUID, TargetRoll> targets,
+    public void rollRetirement(final @Nullable AbstractContract mission, final Map<UUID, TargetRoll> targets,
           final Money shareValue, final Campaign campaign) {
         if ((mission != null) && !unresolvedPersonnel.containsKey(mission.getId())) {
             unresolvedPersonnel.put(mission.getId(), new HashSet<>());
@@ -959,7 +924,7 @@ public class RetirementDefectionTracker {
      * @return True if the person was successfully removed from the campaign, false otherwise.
      */
     public boolean removeFromCampaign(Person person, boolean killed, boolean sacked, Campaign campaign,
-          Mission contract) {
+          AbstractContract contract) {
         if (!person.getPrisonerStatus().isFree()) {
             return false;
         }
@@ -992,7 +957,7 @@ public class RetirementDefectionTracker {
     public void removePerson(Person person) {
         payouts.remove(person.getId());
 
-        for (int contractID : unresolvedPersonnel.keySet()) {
+        for (UUID contractID : unresolvedPersonnel.keySet()) {
             unresolvedPersonnel.get(contractID).remove(person.getId());
         }
     }
@@ -1005,14 +970,14 @@ public class RetirementDefectionTracker {
             return campaign.getPlayerForce().getHumanResources().getPerson(personID) == null;
         });
 
-        for (int contractID : unresolvedPersonnel.keySet()) {
+        for (UUID contractID : unresolvedPersonnel.keySet()) {
             unresolvedPersonnel.get(contractID).removeIf(personID -> {
                 return campaign.getPlayerForce().getHumanResources().getPerson(personID) == null;
             });
         }
     }
 
-    public boolean isOutstanding(int id) {
+    public boolean isOutstanding(UUID id) {
         return unresolvedPersonnel.containsKey(id);
     }
 
@@ -1025,17 +990,7 @@ public class RetirementDefectionTracker {
         payouts.clear();
     }
 
-    public void resolveContract(final @Nullable Mission mission) {
-        if (mission == null) {
-            unresolvedPersonnel.keySet().forEach(this::resolveContract);
-            unresolvedPersonnel.clear();
-        } else {
-            resolveContract(mission.getId());
-            unresolvedPersonnel.remove(mission.getId());
-        }
-    }
-
-    private void resolveContract(int contractId) {
+    private void resolveContract(UUID contractId) {
         if (null != unresolvedPersonnel.get(contractId)) {
             for (UUID pid : unresolvedPersonnel.get(contractId)) {
                 payouts.remove(pid);
@@ -1048,7 +1003,7 @@ public class RetirementDefectionTracker {
         return getRetirees(null);
     }
 
-    public Set<UUID> getRetirees(final @Nullable Mission mission) {
+    public Set<UUID> getRetirees(final @Nullable AbstractContract mission) {
         return (mission == null) ? payouts.keySet() : unresolvedPersonnel.get(mission.getId());
     }
 
@@ -1224,13 +1179,13 @@ public class RetirementDefectionTracker {
         MHQXMLUtility.writeSimpleXMLOpenTag(pw, indent++, "retirementDefectionTracker");
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "rollRequired", createCsv(rollRequired));
         MHQXMLUtility.writeSimpleXMLOpenTag(pw, indent++, "unresolvedPersonnel");
-        for (Integer i : unresolvedPersonnel.keySet()) {
+        for (UUID id : unresolvedPersonnel.keySet()) {
             MHQXMLUtility.writeSimpleXMLAttributedTag(pw,
                   indent,
                   "contract",
                   "id",
-                  i,
-                  createCsv(unresolvedPersonnel.get(i)));
+                  id,
+                  createCsv(unresolvedPersonnel.get(id)));
         }
         MHQXMLUtility.writeSimpleXMLCloseTag(pw, --indent, "unresolvedPersonnel");
 
@@ -1272,7 +1227,7 @@ public class RetirementDefectionTracker {
                     if (!wn2.getTextContent().isBlank()) {
                         String[] ids = wn2.getTextContent().split(",");
                         for (String id : ids) {
-                            retVal.rollRequired.add(Integer.parseInt(id));
+                            retVal.rollRequired.add(UUID.fromString(id));
                         }
                     }
                 } else if (wn2.getNodeName().equalsIgnoreCase("unresolvedPersonnel")) {
@@ -1283,7 +1238,7 @@ public class RetirementDefectionTracker {
                             continue;
                         }
                         if (wn3.getNodeName().equalsIgnoreCase("contract")) {
-                            int id = Integer.parseInt(wn3.getAttributes().getNamedItem("id").getTextContent());
+                            UUID id = UUID.fromString(wn3.getAttributes().getNamedItem("id").getTextContent());
                             String[] ids = wn3.getTextContent().split(",");
                             HashSet<UUID> pids = Arrays.stream(ids)
                                                        .map(UUID::fromString)

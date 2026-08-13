@@ -119,10 +119,9 @@ public class ChaosReputation {
      * Recalculates and stores the force's Chaos Reputation according to the active tracking mode.
      *
      * <p>When {@link CampaignOption#CAMPAIGN_LEVEL_CHAOS_REPUTATION} is enabled this is a no-op: the campaign-wide
-     * value
-     * is a pure base that only changes through events, and the debt, manual, and commander modifiers are applied live
-     * when it is displayed (see {@link #getEffectiveCampaignLevelReputation}). Otherwise the value is re-derived from
-     * the force's personnel, applying the configured debt-stacking, manual-modifier, and cap options.</p>
+     * value is a pure base that only changes through events, and the debt, manual, and commander modifiers are applied
+     * live when it is displayed (see {@link #getEffectiveCampaignLevelReputation}). Otherwise the value is re-derived
+     * from the force's personnel, applying the configured debt-stacking, manual-modifier, and cap options.</p>
      *
      * @param campaignOptions the campaign options driving the calculation
      * @param playerForce     the force whose reputation is recalculated and stored
@@ -352,7 +351,7 @@ public class ChaosReputation {
                 continue;
             }
 
-            MissionStatus status = mission.getMissionStatus();
+            MissionStatus status = mission.getStatus();
             if (status.isSuccess()) {
                 reputation += CONTRACT_SUCCESS_DELTA;
             } else if (status.isPartialSuccess() && !noPartialSuccessReputation) {

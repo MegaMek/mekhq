@@ -30,7 +30,7 @@
  * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
  * affiliated with Microsoft.
  */
-package mekhq.campaign.mission.newContract;
+package mekhq.campaign.mission.newContract.utilities;
 
 import static java.lang.Math.ceil;
 
@@ -41,12 +41,13 @@ import jakarta.annotation.Nullable;
 import mekhq.campaign.AbstractLocation;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.JumpPath;
+import mekhq.campaign.mission.newContract.AbstractContract;
 import mekhq.campaign.universe.Planet;
 import mekhq.campaign.universe.PlanetarySystem;
 import mekhq.campaign.universe.factionStanding.FactionStandingUtilities;
 import mekhq.campaign.universe.factionStanding.FactionStandings;
 
-public class ContractUtilities {
+public class ContractGeneralUtilities {
     public static int getTravelDays(Campaign campaign, AbstractContract abstractContract,
           AbstractLocation currentLocation, boolean isOverridingCommandCircuitRequirements,
           FactionStandings factionStandings, String employerFactionCode) {

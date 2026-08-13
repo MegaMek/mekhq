@@ -47,7 +47,7 @@ import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.finances.Finances;
 import mekhq.campaign.mission.newContract.AbstractContract;
 import mekhq.campaign.mission.newContract.ContractMarket;
-import mekhq.campaign.mission.newContract.ContractXmlCodec;
+import mekhq.campaign.mission.newContract.io.ContractXmlCodec;
 import mekhq.campaign.personnel.ranks.RankSystem;
 import mekhq.campaign.reputation.camOpsReputation.ForceReputationController;
 import mekhq.campaign.universe.Faction;
@@ -71,7 +71,7 @@ public class PlayerForce extends AbstractForce implements SingleDetachmentForce 
 
     private final Detachment forceDetachment = new Detachment();
 
-    /** The force's contracts, keyed by {@link AbstractContract#getContractId()} and iterated in insertion order. */
+    /** The force's contracts, keyed by {@link AbstractContract#getId()} and iterated in insertion order. */
     private final Map<UUID, AbstractContract> contractHistory = new LinkedHashMap<>();
 
     /** The force's contract market: the currently available offers, split by {@code ContractSearchType}. */
@@ -135,12 +135,12 @@ public class PlayerForce extends AbstractForce implements SingleDetachmentForce 
     }
 
     /**
-     * Adds (or replaces) a contract, keyed by its own {@link AbstractContract#getContractId()}.
+     * Adds (or replaces) a contract, keyed by its own {@link AbstractContract#getId()}.
      *
      * @param contract the contract to store
      */
     public void addContract(final AbstractContract contract) {
-        contractHistory.put(contract.getContractId(), contract);
+        contractHistory.put(contract.getId(), contract);
     }
 
     /**
@@ -179,8 +179,8 @@ public class PlayerForce extends AbstractForce implements SingleDetachmentForce 
                 continue;
             }
             final AbstractContract contract = ContractXmlCodec.readContract(child, campaign, version);
-            if ((contract != null) && (contract.getContractId() != null)) {
-                contractHistory.put(contract.getContractId(), contract);
+            if ((contract != null) && (contract.getId() != null)) {
+                contractHistory.put(contract.getId(), contract);
             }
         }
     }

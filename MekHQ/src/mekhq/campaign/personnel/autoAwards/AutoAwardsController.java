@@ -925,7 +925,7 @@ public class AutoAwardsController {
                                                          .flatMap(person -> campaign.getKillsFor(person).stream())
                                                          .filter(kill -> mission != null &&
                                                                                (Objects.equals(kill.getMissionId(),
-                                                                                     mission.getContractId())))
+                                                                                     mission.getId())))
                                                          .collect(Collectors.groupingBy(Kill::getForceId));
 
         // process the award data, checking for award eligibility

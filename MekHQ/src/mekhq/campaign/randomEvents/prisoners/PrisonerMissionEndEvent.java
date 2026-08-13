@@ -54,9 +54,7 @@ import mekhq.campaign.Campaign;
 import mekhq.campaign.campaignOptions.CampaignOption;
 import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.finances.Money;
-import mekhq.campaign.mission.Contract;
-import mekhq.campaign.mission.Mission;
-import mekhq.campaign.mission.Scenario;
+import mekhq.campaign.mission.newContract.AbstractContract;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.enums.PersonnelStatus;
 import mekhq.campaign.reputation.chaosReputation.ChaosReputation;
@@ -76,7 +74,7 @@ public class PrisonerMissionEndEvent {
     private static final String RESOURCE_BUNDLE = "mekhq.resources.PrisonerEvents";
 
     private final Campaign campaign;
-    private final Mission mission;
+    private final AbstractContract mission;
     private boolean isSuccess;
     private boolean isAllied;
 
@@ -92,7 +90,7 @@ public class PrisonerMissionEndEvent {
      * @param campaign The current campaign instance, providing context and data about prisoners and finances.
      * @param mission  The current mission related to this event.
      */
-    public PrisonerMissionEndEvent(Campaign campaign, Mission mission) {
+    public PrisonerMissionEndEvent(Campaign campaign, AbstractContract mission) {
         this.campaign = campaign;
         this.mission = mission;
     }
@@ -267,28 +265,7 @@ public class PrisonerMissionEndEvent {
      *       found.
      */
     private LocalDate getContractOrMissionStartDate() {
-        LocalDate startDate = null;
-        if (mission instanceof Contract) {
-            startDate = ((Contract) mission).getStartDate();
-        } else {
-            for (Scenario scenario : mission.getCompletedScenarios()) {
-                LocalDate scenarioDate = scenario.getDate();
-
-                if (startDate == null) {
-                    startDate = scenarioDate;
-                    continue;
-                }
-
-                if (scenarioDate.isBefore(startDate)) {
-                    startDate = scenarioDate;
-                }
-            }
-        }
-
-        if (startDate == null) {
-            return null;
-        }
-
+        LocalDate startDate = mission.getStartDate();
         return startDate.minusDays(1);
     }
 
