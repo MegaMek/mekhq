@@ -161,7 +161,7 @@ public class MekHQUnitSelectorDialog extends AbstractUnitSelectorDialog {
         buttonShowBV = new JButton();
 
         if (addToCampaign) {
-            //This branch is for purchases and adding to the hanger directly.
+            //This branch is for purchases and adding to the hangar directly.
             buttonBuy.setText(Messages.getString("MekSelectorDialog.Buy", TARGET_UNKNOWN));
             buttonBuy.setName("buttonBuy");
             buttonBuy.addActionListener(evt -> buyUnit());
@@ -179,7 +179,7 @@ public class MekHQUnitSelectorDialog extends AbstractUnitSelectorDialog {
             buttonClose.setName("buttonClose");
             buttonClose.addActionListener(this);
         } else {
-            // This branch is for adding units where they will not be going to the hanger.
+            // This branch is for adding units where they will not be going to the hangar.
             buttonSelect.setText(Messages.getString("MekSelectorDialog.Add"));
             buttonSelect.setName("buttonAdd");
             buttonSelect.addActionListener(evt -> select(false));
