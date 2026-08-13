@@ -48,7 +48,7 @@ public class ChaosContractDeterminationScale {
     static int generateScaleForDetachment(PlayerForce playerForce, LocalHangar hangar, boolean isCadreDuty) {
         int validBattleValue = 0;
 
-        for (Unit unit : hanger.getUnits()) {
+        for (Unit unit : hangar.getUnits()) {
             int formationId = unit.getFormationId();
             Formation formation = playerForce.getFormation(formationId);
             if (formation != null) {
