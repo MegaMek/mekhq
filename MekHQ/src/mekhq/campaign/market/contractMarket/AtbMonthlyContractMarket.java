@@ -42,7 +42,6 @@ import static mekhq.campaign.enums.DailyReportType.GENERAL;
 import static mekhq.campaign.enums.DailyReportType.PERSONNEL;
 import static mekhq.campaign.enums.DailyReportType.SKILL_CHECKS;
 import static mekhq.campaign.mission.ContractDifficulty.calculateContractDifficulty;
-import static mekhq.campaign.mission.newContract.contractGeneration.targetFinder.ClanHomeworldsExclusion.violatesHomeworldsExclusion;
 import static mekhq.campaign.personnel.PersonnelOptions.ADMIN_NETWORKER;
 import static mekhq.campaign.personnel.PersonnelOptions.EDGE_COMMANDER_NEGOTIATION;
 import static mekhq.campaign.personnel.skills.SkillType.S_NEGOTIATION;
@@ -96,6 +95,7 @@ import mekhq.campaign.universe.factionStanding.FactionStandings;
  *
  * @author Neoancient
  */
+@Deprecated(since = "0.51.01", forRemoval = true)
 public class AtbMonthlyContractMarket extends AbstractContractMarket {
     private static final String RESOURCE_BUNDLE = "mekhq.resources.AtbMonthlyContractMarket";
     private static final MMLogger logger = MMLogger.create(AtbMonthlyContractMarket.class);
@@ -552,12 +552,12 @@ public class AtbMonthlyContractMarket extends AbstractContractMarket {
             return generateAtBContract(campaign, employer, unitRatingMod, retries - 1);
         }
 
-        if (violatesHomeworldsExclusion(contract, campaign)) {
-            logger.warn(
-                  "Contract location {} is within the Clan Homeworlds exclusion zone outside Operation Bulldog; "
-                        + "retrying.", contract.getSystem().getName(campaign.getLocalDate()));
-            return generateAtBContract(campaign, employer, unitRatingMod, retries - 1);
-        }
+        //        if (violatesHomeworldsExclusion(contract, campaign)) {
+        //            logger.warn(
+        //                  "Contract location {} is within the Clan Homeworlds exclusion zone outside Operation Bulldog; "
+        //                        + "retrying.", contract.getSystem().getName(campaign.getLocalDate()));
+        //            return generateAtBContract(campaign, employer, unitRatingMod, retries - 1);
+        //        }
 
         final ForceReputationController reputation = campaign.getPlayerForce().getCamOpsReputation();
         final SkillLevel campaignSkillLevel = reputation == null ?

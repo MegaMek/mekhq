@@ -46,6 +46,7 @@ import megamek.logging.MMLogger;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.mission.AtBContract;
 import mekhq.campaign.mission.Mission;
+import mekhq.campaign.mission.newContract.AbstractContract;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.PronounData;
 import mekhq.campaign.personnel.enums.PersonnelRole;
@@ -357,7 +358,7 @@ public class FactionStandingUtilities {
      */
     public static boolean isUseCommandCircuit(boolean overridingCommandCircuitRequirements, boolean isGM,
           boolean useFactionStandingCommandCircuit, FactionStandings factionStandings,
-          List<AtBContract> activeContracts) {
+          List<AbstractContract> activeContracts) {
         boolean useCommandCircuit = overridingCommandCircuitRequirements && isGM;
 
         if (useCommandCircuit) {
@@ -370,8 +371,8 @@ public class FactionStandingUtilities {
 
         double highestRegard = FactionStandingLevel.STANDING_LEVEL_0.getMinimumRegard();
         if (useFactionStandingCommandCircuit) {
-            for (AtBContract contract : activeContracts) {
-                double currentRegard = factionStandings.getRegardForFaction(contract.getEmployerCode(), true);
+            for (AbstractContract contract : activeContracts) {
+                double currentRegard = factionStandings.getRegardForFaction(contract.getEmployerFactionCode(), true);
                 if (currentRegard > highestRegard) {
                     highestRegard = currentRegard;
                 }

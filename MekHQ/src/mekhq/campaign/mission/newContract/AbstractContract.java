@@ -484,4 +484,8 @@ public abstract class AbstractContract {
     public boolean isExchangeSalvage() {
         return getSalvageRightsStep().isExchangeSalvage();
     }
+
+    public boolean isPlayerAttacker() {
+        return getObjectiveType().getChaosObjectiveType().isAttacker();
+    }
 }

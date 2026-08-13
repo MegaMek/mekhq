@@ -35,7 +35,6 @@ package mekhq.campaign.market.contractMarket;
 import static megamek.common.compute.Compute.d6;
 import static megamek.common.enums.SkillLevel.GREEN;
 import static megamek.common.enums.SkillLevel.REGULAR;
-import static mekhq.campaign.mission.newContract.contractGeneration.targetFinder.ClanHomeworldsExclusion.violatesHomeworldsExclusion;
 import static mekhq.campaign.personnel.PersonnelOptions.ADMIN_NETWORKER;
 import static mekhq.campaign.personnel.skills.SkillType.S_NEGOTIATION;
 import static mekhq.campaign.randomEvents.other.GrayMonday.isGrayMonday;
@@ -73,6 +72,7 @@ import mekhq.campaign.universe.factionStanding.FactionStandings;
 /**
  * Contract Market as described in Campaign Operations, 4th printing.
  */
+@Deprecated(since = "0.51.01", forRemoval = true)
 public class CamOpsContractMarket extends AbstractContractMarket {
     private static final MMLogger logger = MMLogger.create(CamOpsContractMarket.class);
     private static final int BASE_NEGOTIATION_TARGET = 8;
@@ -288,9 +288,9 @@ public class CamOpsContractMarket extends AbstractContractMarket {
         } catch (NoContractLocationFoundException ex) {
             return Optional.empty();
         }
-        if (violatesHomeworldsExclusion(contract, campaign)) {
-            return Optional.empty();
-        }
+        //        if (violatesHomeworldsExclusion(contract, campaign)) {
+        //            return Optional.empty();
+        //        }
         // Step 4: Populate some information about enemies and allies
         final SkillLevel campaignSkillLevel = campaign.getPlayerForce()
                                                     .getAverageSkillLevel(campaign.getCampaignOptions(),

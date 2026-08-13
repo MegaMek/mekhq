@@ -175,7 +175,6 @@ import mekhq.campaign.market.RequestedStockLevels;
 import mekhq.campaign.market.contractMarket.AbstractContractMarket;
 import mekhq.campaign.market.personnelMarket.markets.NewPersonnelMarket;
 import mekhq.campaign.market.unitMarket.AbstractUnitMarket;
-import mekhq.campaign.mission.AbstractMissionTransition;
 import mekhq.campaign.mission.AtBContract;
 import mekhq.campaign.mission.AtBDynamicScenario;
 import mekhq.campaign.mission.AtBScenario;
@@ -185,6 +184,8 @@ import mekhq.campaign.mission.Scenario;
 import mekhq.campaign.mission.TransportCostCalculations;
 import mekhq.campaign.mission.enums.CombatRole;
 import mekhq.campaign.mission.enums.MissionStatus;
+import mekhq.campaign.mission.newContract.AbstractContract;
+import mekhq.campaign.mission.newContract.contractData.ContractHistoryData;
 import mekhq.campaign.mission.rentals.ContractRentalType;
 import mekhq.campaign.mission.rentals.FacilityRentals;
 import mekhq.campaign.parts.Armor;
@@ -295,6 +296,7 @@ public class Campaign implements ITechManager {
     CampaignTransporterMap tacticalTransporters = new CampaignTransporterMap(this,
           CampaignTransportType.TACTICAL_TRANSPORT);
     CampaignTransporterMap towTransporters = new CampaignTransporterMap(this, CampaignTransportType.TOW_TRANSPORT);
+    private final ContractHistoryData contractHistory = new ContractHistoryData();
     private final TreeMap<Integer, Mission> missions = new TreeMap<>();
     private final TreeMap<Integer, Scenario> scenarios = new TreeMap<>();
     private final Map<UUID, List<Kill>> kills = new HashMap<>();
@@ -733,15 +735,11 @@ public class Campaign implements ITechManager {
         getPlayerForce().setIsOverridingCommandCircuitRequirements(isOverridingCommandCircuitRequirements);
     }
 
-    public boolean isUseCommandCircuitForContract(AbstractMissionTransition abstractMission) {
-        if (abstractMission instanceof AtBContract atBContract) {
-            return FactionStandingUtilities.isUseCommandCircuit(
-                  getPlayerForce().isOverridingCommandCircuitRequirements(), gmMode,
-                  campaignOptions.isUseFactionStandingCommandCircuitSafe(),
-                  getPlayerForce().getFactionStandings(), List.of(atBContract));
-        } else {
-            return false;
-        }
+    public boolean isUseCommandCircuitForContract(AbstractContract abstractContract) {
+        return FactionStandingUtilities.isUseCommandCircuit(
+              getPlayerForce().isOverridingCommandCircuitRequirements(), gmMode,
+              campaignOptions.isUseFactionStandingCommandCircuitSafe(),
+              getPlayerForce().getFactionStandings(), List.of(abstractContract));
     }
 
     public boolean isUseCommandCircuit() {
@@ -1381,8 +1379,8 @@ public class Campaign implements ITechManager {
                      .collect(Collectors.toList());
     }
 
-    public List<Mission> getCompletedMissions() {
-        return getMissions().stream().filter(m -> m.getStatus().isCompleted()).collect(Collectors.toList());
+    public List<AbstractContract> getCompletedMissions() {
+        return contractHistory.getCompleted();
     }
 
     /**

@@ -48,9 +48,9 @@ import mekhq.campaign.universe.factionStanding.FactionStandings;
 
 public class ContractUtilities {
     public static int getTravelDays(Campaign campaign, AbstractContract abstractContract,
-          AbstractLocation currentLocation,
-          boolean isGM, boolean isOverridingCommandCircuitRequirements, FactionStandings factionStandings,
-          String employerFactionCode) {
+          AbstractLocation currentLocation, boolean isOverridingCommandCircuitRequirements,
+          FactionStandings factionStandings, String employerFactionCode) {
+        boolean isGM = campaign.isGM();
         boolean isUseCommandCircuit = FactionStandingUtilities.isUseCommandCircuit(
               isOverridingCommandCircuitRequirements,
               isGM,

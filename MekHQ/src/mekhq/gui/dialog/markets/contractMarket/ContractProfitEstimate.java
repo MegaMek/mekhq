@@ -77,7 +77,6 @@ public record ContractProfitEstimate(int transitDays, Money guaranteedIncome, Mo
         int transitDays = ContractUtilities.getTravelDays(campaign,
               contract,
               detachment.getCurrentLocation(),
-              campaign.isGM(),
               false,
               factionStandings,
               contract.getEmployerFactionCode());

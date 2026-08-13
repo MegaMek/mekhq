@@ -56,9 +56,9 @@ import megamek.common.equipment.EquipmentType;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.digitalGM.stratCon.StratConCampaignState;
 import mekhq.campaign.finances.Money;
-import mekhq.campaign.mission.enums.ContractObjectiveType;
-import mekhq.campaign.mission.enums.ContractMoraleLevel;
 import mekhq.campaign.mission.enums.ContractCommandRights;
+import mekhq.campaign.mission.enums.ContractMoraleLevel;
+import mekhq.campaign.mission.enums.ContractObjectiveType;
 import mekhq.campaign.mission.enums.MissionStatus;
 import mekhq.campaign.mission.enums.ScenarioStatus;
 import mekhq.campaign.personnel.Person;
@@ -96,6 +96,7 @@ import testUtilities.MHQTestUtilities;
  * plain {@link Mission}, a {@link Contract}, and a fully-populated {@link AtBContract} (scenarios, StratCon state and
  * NPCs included).</p>
  */
+@Deprecated(since = "0.51.01", forRemoval = true)
 public class AbstractMissionTransitionIOTest {
     private static final Path MISSIONS_DIR = Path.of("testresources", "data", "missions");
 

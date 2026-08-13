@@ -38,11 +38,11 @@ import static megamek.client.ui.util.PlayerColour.RED;
 import static megamek.common.enums.SkillLevel.REGULAR;
 import static megamek.common.enums.SkillLevel.parseFromString;
 import static mekhq.campaign.mission.RandomFactionCamouflage.pickRandomCamouflage;
-import static mekhq.campaign.mission.enums.ContractObjectiveType.UNDEFINED;
 import static mekhq.campaign.mission.enums.ContractCommandRights.INDEPENDENT;
 import static mekhq.campaign.mission.enums.ContractMoraleLevel.MAXIMUM_MORALE_LEVEL;
 import static mekhq.campaign.mission.enums.ContractMoraleLevel.MINIMUM_MORALE_LEVEL;
 import static mekhq.campaign.mission.enums.ContractMoraleLevel.STALEMATE;
+import static mekhq.campaign.mission.enums.ContractObjectiveType.UNDEFINED;
 import static mekhq.campaign.personnel.ranks.Rank.RO_MIN;
 import static mekhq.campaign.personnel.skills.SkillType.EXP_REGULAR;
 import static mekhq.campaign.universe.Faction.INDEPENDENT_FACTION_CODE;
@@ -74,9 +74,9 @@ import mekhq.campaign.digitalGM.stratCon.SupportPointNegotiation;
 import mekhq.campaign.enums.DragoonRating;
 import mekhq.campaign.finances.Accountant;
 import mekhq.campaign.finances.Money;
-import mekhq.campaign.mission.enums.ContractObjectiveType;
-import mekhq.campaign.mission.enums.ContractMoraleLevel;
 import mekhq.campaign.mission.enums.ContractCommandRights;
+import mekhq.campaign.mission.enums.ContractMoraleLevel;
+import mekhq.campaign.mission.enums.ContractObjectiveType;
 import mekhq.campaign.mission.enums.MissionStatus;
 import mekhq.campaign.personnel.Bloodname;
 import mekhq.campaign.personnel.Person;
@@ -103,7 +103,7 @@ import org.w3c.dom.NodeList;
  * modern classes. It is effectively deprecated on day of birth as it is not intended to outlive the old Mission,
  * Contract, or AtBContract classes.
  */
-@Deprecated(since = "0.51.01", forRemoval = false)
+@Deprecated(since = "0.51.01", forRemoval = true)
 public abstract class AbstractMissionTransition {
     private static final MMLogger LOGGER = MMLogger.create(AbstractMissionTransition.class);
     private static final String RESOURCE_BUNDLE = "mekhq.resources.AbstractMission";

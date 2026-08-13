@@ -72,6 +72,7 @@ import mekhq.gui.CampaignGUI;
  *
  * @author Neoancient
  */
+@Deprecated(since = "0.51.01", forRemoval = true)
 public class ContractSummaryPanel extends JPanel {
     //region Variable Declarations
     private final Campaign campaign;
