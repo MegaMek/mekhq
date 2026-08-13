@@ -52,22 +52,37 @@ public record ContractHistoryData(LinkedHashMap<UUID, AbstractContract> contract
         return completedContracts;
     }
 
+    public List<AbstractContract> getActive() {
+        List<AbstractContract> activeContracts = new ArrayList<>();
+
+        for (AbstractContract contract : contractHistory.values()) {
+            if (contract.getStatus().isActive()) {
+                if (!activeContracts.contains(contract)) {
+                    activeContracts.add(contract);
+                }
+            }
+        }
+
+        return activeContracts;
+    }
+
     /**
      * @return missions sorted with active missions from oldest to newest, followed by completed missions from newest to
      *       oldest; active missions without a start date use the campaign date, while completed missions without one
      *       sort last
      */
-    public List<AbstractContract> getSortedMissions() {
+    public List<AbstractContract> getSortedMissions(LocalDate currentDate) {
         List<AbstractContract> sortedMissions = new ArrayList<>(contractHistory.values());
         sortedMissions.sort(Comparator.comparing((AbstractContract mission) -> mission.getStatus().isCompleted())
-                                  .thenComparingLong(this::getMissionSortKey));
+                                  .thenComparingLong((AbstractContract mission) -> this.getMissionSortKey(mission,
+                                        currentDate)));
         return sortedMissions;
     }
 
-    private long getMissionSortKey(AbstractContract mission) {
+    private long getMissionSortKey(AbstractContract mission, LocalDate currentDate) {
         LocalDate startDate = mission.getStartDate();
         if (startDate == null) {
-            return mission.getStatus().isCompleted() ? Long.MAX_VALUE : getLocalDate().toEpochDay();
+            return mission.getStatus().isCompleted() ? Long.MAX_VALUE : currentDate.toEpochDay();
         }
         long startDay = startDate.toEpochDay();
         return mission.getStatus().isCompleted() ? -startDay : startDay;

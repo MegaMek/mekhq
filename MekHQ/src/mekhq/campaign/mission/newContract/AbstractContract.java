@@ -80,6 +80,9 @@ public abstract class AbstractContract {
     private ContractObjectiveData objectiveData;
     private ContractFinanceData contractFinanceData;
 
+    private Money salvagedByUnitValue = Money.zero();
+    private Money salvagedByEmployerValue = Money.zero();
+
     private MissionStatus missionStatus;
     private ContractScheduleData scheduleData;
     private SystemsTargetData systemsTargetData;
@@ -580,5 +583,29 @@ public abstract class AbstractContract {
 
     public boolean isPlayerAttacker() {
         return getObjectiveType().getChaosObjectiveType().isAttacker();
+    }
+
+    public Money getSalvagedByEmployerValue() {
+        return salvagedByEmployerValue;
+    }
+
+    public void setSalvagedByEmployerValue(Money salvagedByEmployerValue) {
+        this.salvagedByEmployerValue = salvagedByEmployerValue;
+    }
+
+    public void changeSalvagedByEmployerValue(Money delta) {
+        salvagedByEmployerValue.plus(delta);
+    }
+
+    public Money getSalvagedByUnitValue() {
+        return salvagedByUnitValue;
+    }
+
+    public void setSalvagedByUnitValue(Money salvagedByUnitValue) {
+        this.salvagedByUnitValue = salvagedByUnitValue;
+    }
+
+    public void changeSalvagedByUnitValue(Money delta) {
+        salvagedByUnitValue.plus(delta);
     }
 }

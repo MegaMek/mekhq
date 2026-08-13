@@ -76,9 +76,9 @@ import mekhq.campaign.finances.Money;
 import mekhq.campaign.finances.enums.TransactionType;
 import mekhq.campaign.force.Formation;
 import mekhq.campaign.mission.AtBContract;
-import mekhq.campaign.mission.Contract;
-import mekhq.campaign.mission.Mission;
 import mekhq.campaign.mission.Scenario;
+import mekhq.campaign.mission.newContract.AbstractContract;
+import mekhq.campaign.mission.newContract.utilities.ContractRepairLocation;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.PersonnelOptions;
 import mekhq.campaign.personnel.enums.PersonnelStatus;
@@ -200,7 +200,7 @@ public class CamOpsSalvageUtilities {
      * </ul>
      *
      * @param campaign        The current {@link Campaign} to add salvage to.
-     * @param mission         The {@link Mission} associated with the salvage.
+     * @param mission         The {@link AbstractContract} associated with the salvage.
      * @param scenario        The {@link Scenario} that generated the salvage.
      * @param keptSalvage     The list of units claimed by the player.
      * @param soldSalvage     The list of units that were sold instead of claimed.
@@ -209,15 +209,11 @@ public class CamOpsSalvageUtilities {
      * @author Illiani
      * @since 0.50.10
      */
-    public static void resolveSalvage(Campaign campaign, Mission mission, Scenario scenario,
+    public static void resolveSalvage(Campaign campaign, AbstractContract mission, Scenario scenario,
           List<TestUnit> keptSalvage, List<TestUnit> soldSalvage, List<TestUnit> employerSalvage) {
-        int deliveryTime = 0;
-        if (mission instanceof AtBContract atbContract) {
-            deliveryTime = getDeploymentTime(scenario.getId(), atbContract);
-        }
+        int deliveryTime = getDeploymentTime(scenario.getId(), mission);
 
         // now let's take care of salvage
-        boolean isContract = mission instanceof Contract;
         for (TestUnit salvageUnit : keptSalvage) {
             ResolveScenarioTracker.UnitStatus salvageStatus = new ResolveScenarioTracker.UnitStatus(salvageUnit);
             if (salvageUnit.getEntity() instanceof Aero) {
@@ -226,16 +222,10 @@ public class CamOpsSalvageUtilities {
 
             campaign.clearGameData(salvageUnit.getEntity());
             campaign.addTestUnit(salvageUnit, deliveryTime);
-            if (mission instanceof AtBContract atbContract) {
-                salvageUnit.setSite(atbContract.getRepairLocation());
-            } else {
-                salvageUnit.setSite(mission.getRepairLocation());
-            }
+            salvageUnit.setSite(ContractRepairLocation.getRepairLocation(mission.getObjectiveType()));
 
             // if this is a contract, add to the salvaged value
-            if (isContract) {
-                ((Contract) mission).addSalvageByUnit(salvageUnit.getSellValue());
-            }
+            mission.changeSalvagedByUnitValue(salvageUnit.getSellValue());
         }
 
         // And any ransomed salvaged units
@@ -256,9 +246,7 @@ public class CamOpsSalvageUtilities {
                       unitRansoms.toAmountString(), scenario.getHyperlinkedName()));
 
                 // if this is a contract, add to the salvaged value
-                if (isContract) {
-                    ((Contract) mission).addSalvageByUnit(unitRansoms);
-                }
+                mission.changeSalvagedByUnitValue(unitRansoms);
             }
         }
 
@@ -267,30 +255,27 @@ public class CamOpsSalvageUtilities {
             employerTakeHome = employerTakeHome.plus(salvageUnit.getSellValue());
         }
 
-        if (isContract) {
-            if (((Contract) mission).isSalvageExchange()) {
-                int playerPercent = ((Contract) mission).getSalvagePercent();
+        if (mission.isExchangeSalvage()) {
+            double playerPercent = mission.getSalvageRightsMultiplier();
+            Money playerTakeHome = employerTakeHome.multipliedBy(playerPercent);
+            employerTakeHome = employerTakeHome.minus(playerTakeHome);
+            mission.changeSalvagedByUnitValue(playerTakeHome);
 
-                Money playerTakeHome = employerTakeHome.multipliedBy(playerPercent).dividedBy(100);
-                employerTakeHome = employerTakeHome.minus(playerTakeHome);
-                ((Contract) mission).addSalvageByUnit(playerTakeHome);
-
-                if (playerTakeHome.isPositive()) {
-                    campaign.getPlayerForce().getFinances()
-                          .credit(TransactionType.SALVAGE_EXCHANGE,
-                                campaign.getLocalDate(),
-                                playerTakeHome,
-                                getFormattedTextAt(RESOURCE_BUNDLE,
-                                      "CamOpsSalvageUtilities.exchange",
-                                      scenario.getName()));
-                    campaign.addReport(FINANCES,
-                          getFormattedTextAt(RESOURCE_BUNDLE, "CamOpsSalvageUtilities.exchange.report",
-                                playerTakeHome.toAmountString(), scenario.getHyperlinkedName()));
-                }
+            if (playerTakeHome.isPositive()) {
+                campaign.getPlayerForce().getFinances()
+                      .credit(TransactionType.SALVAGE_EXCHANGE,
+                            campaign.getLocalDate(),
+                            playerTakeHome,
+                            getFormattedTextAt(RESOURCE_BUNDLE,
+                                  "CamOpsSalvageUtilities.exchange",
+                                  scenario.getName()));
+                campaign.addReport(FINANCES,
+                      getFormattedTextAt(RESOURCE_BUNDLE, "CamOpsSalvageUtilities.exchange.report",
+                            playerTakeHome.toAmountString(), scenario.getHyperlinkedName()));
             }
-
-            ((Contract) mission).addSalvageByEmployer(employerTakeHome);
         }
+
+        mission.changeSalvagedByEmployerValue(employerTakeHome);
     }
 
     /**
@@ -308,8 +293,8 @@ public class CamOpsSalvageUtilities {
      * @author Illiani
      * @since 0.50.10
      */
-    private static int getDeploymentTime(int scenarioId, AtBContract atbContract) {
-        StratConCampaignState campaignState = atbContract.getStratConCampaignState();
+    private static int getDeploymentTime(int scenarioId, AbstractContract contract) {
+        StratConCampaignState campaignState = contract.getStratConCampaignState();
         if (campaignState != null) {
             for (StratConTrackState track : campaignState.getTracks()) {
                 if (track.getBackingScenariosMap().get(scenarioId) != null) {
@@ -538,13 +523,9 @@ public class CamOpsSalvageUtilities {
      * @since 0.50.10
      */
     public static void deploySalvageTeams(Campaign campaign, Scenario scenario) {
-        final Mission mission = campaign.getMission(scenario.getMissionId());
+        final AbstractContract mission = campaign.getContract(scenario.getMissionId());
 
-        if (!(mission instanceof AtBContract contract)) {
-            return;
-        }
-
-        final StratConCampaignState state = contract.getStratConCampaignState();
+        final StratConCampaignState state = mission.getStratConCampaignState();
         if (state == null) {
             return;
         }

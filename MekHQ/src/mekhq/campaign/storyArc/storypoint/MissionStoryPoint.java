@@ -43,6 +43,7 @@ import megamek.logging.MMLogger;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.mission.Mission;
 import mekhq.campaign.mission.enums.MissionStatus;
+import mekhq.campaign.mission.newContract.AbstractContract;
 import mekhq.campaign.storyArc.StoryPoint;
 import mekhq.utilities.MHQXMLUtility;
 import org.w3c.dom.Node;
@@ -68,7 +69,7 @@ public class MissionStoryPoint extends StoryPoint {
     private static final MMLogger LOGGER = MMLogger.create(MissionStoryPoint.class);
 
     /* A mission object to track the mission */
-    private Mission mission;
+    private AbstractContract mission;
 
     /**
      * A double that tracks what percent of scenarios must be successful for successful mission. This may not be
@@ -130,7 +131,7 @@ public class MissionStoryPoint extends StoryPoint {
         super.complete();
     }
 
-    public Mission getMission() {
+    public AbstractContract getMission() {
         return mission;
     }
 

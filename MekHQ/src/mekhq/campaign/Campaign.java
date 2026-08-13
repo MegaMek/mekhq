@@ -297,7 +297,7 @@ public class Campaign implements ITechManager {
           CampaignTransportType.TACTICAL_TRANSPORT);
     CampaignTransporterMap towTransporters = new CampaignTransporterMap(this, CampaignTransportType.TOW_TRANSPORT);
     private final ContractHistoryData contractHistory = new ContractHistoryData();
-    private final TreeMap<Integer, Mission> missions = new TreeMap<>();
+    private final TreeMap<Integer, AbstractContract> missions = new TreeMap<>();
     private final TreeMap<Integer, Scenario> scenarios = new TreeMap<>();
     private final Map<UUID, List<Kill>> kills = new HashMap<>();
 
@@ -1324,16 +1324,11 @@ public class Campaign implements ITechManager {
      *
      * @param mission Mission to import into the campaign.
      */
-    public void importMission(final Mission mission) {
+    public void importMission(final AbstractContract mission) {
         mission.getScenarios().forEach(this::importScenario);
-        addMissionWithoutId(mission);
+        missions.put(mission.getId(), mission);
+        MekHQ.triggerEvent(new MissionNewEvent(mission));
         StratConContractInitializer.restoreTransientStratconInformation(mission, this);
-    }
-
-    private void addMissionWithoutId(Mission m) {
-        lastMissionId = max(lastMissionId, m.getId());
-        missions.put(m.getId(), m);
-        MekHQ.triggerEvent(new MissionNewEvent(m));
     }
 
     public ContractHistoryData getContractHistoryData() {
