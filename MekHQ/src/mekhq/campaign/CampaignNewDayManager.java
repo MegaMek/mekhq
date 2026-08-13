@@ -140,6 +140,7 @@ import mekhq.campaign.mission.atb.AtBScenarioFactory;
 import mekhq.campaign.mission.enums.ContractMoraleLevel;
 import mekhq.campaign.mission.enums.ScenarioStatus;
 import mekhq.campaign.mission.enums.ScenarioType;
+import mekhq.campaign.mission.newContract.contractGeneration.ChaosContractMarketAvailability;
 import mekhq.campaign.mission.rentals.ContractRentalType;
 import mekhq.campaign.mission.rentals.FacilityRentals;
 import mekhq.campaign.mission.resupplyAndCaches.Resupply;
@@ -565,6 +566,11 @@ public class CampaignNewDayManager {
         // TODO : AbstractContractMarket : Uncomment
         // getContractMarket().processNewDay(campaign);
         campaign.getUnitMarket().processNewDay(campaign);
+
+        // Roll this month's Chaos contract-market offers (and post the roll to the daily report).
+        if (isFirstOfMonth && updatedLocation.isOnPlanet()) {
+            ChaosContractMarketAvailability.processNewMonth(campaign);
+        }
 
         // campaign needs to be after both personnel and markets
         if (campaignOptions.isAllowMonthlyConnections() && isFirstOfMonth) {

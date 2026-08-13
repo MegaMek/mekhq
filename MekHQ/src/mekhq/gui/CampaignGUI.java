@@ -858,7 +858,7 @@ public class CampaignGUI extends JPanel {
                 customizeMissionDialog.setVisible(true);
             }
         } else {
-            if (false) {
+            if (true) {
                 // TODO: Swap the generating constructor for a persistent contract-market backend once one exists.
                 new ChaosContractMarketDialog(getCampaign());
             } else {

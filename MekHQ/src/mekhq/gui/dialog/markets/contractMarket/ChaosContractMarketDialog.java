@@ -58,15 +58,11 @@ import megamek.common.ui.FastJScrollPane;
 import megamek.logging.MMLogger;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
-import mekhq.campaign.campaignOptions.CampaignOptions;
-import mekhq.campaign.force.Detachment;
-import mekhq.campaign.force.PlayerForce;
 import mekhq.campaign.mission.newContract.AbstractContract;
 import mekhq.campaign.mission.newContract.ContractMarket;
-import mekhq.campaign.mission.newContract.contractGeneration.AbstractContractGeneration;
+import mekhq.campaign.mission.newContract.contractGeneration.ChaosContractMarketAvailability;
 import mekhq.campaign.mission.newContract.contractGeneration.ContractSearchType;
 import mekhq.campaign.universe.Faction;
-import mekhq.campaign.universe.factionStanding.FactionStandings;
 import mekhq.gui.baseComponents.roundedComponents.RoundedJButton;
 import mekhq.gui.baseComponents.roundedComponents.RoundedLineBorder;
 
@@ -85,7 +81,6 @@ public class ChaosContractMarketDialog extends JDialog implements ContractMarket
     private static final Dimension MINIMUM_SIZE = scaleForGUI(760, 620);
     private static final Dimension DEFAULT_SIZE = scaleForGUI(880, 900);
 
-    private static final int INITIAL_OFFERS = 3;
     private static final int GENERATED_OFFERS_PER_BATCH = 1;
 
     private final transient Campaign campaign;
@@ -242,31 +237,25 @@ public class ChaosContractMarketDialog extends JDialog implements ContractMarket
     }
 
     /**
-     * Mirrors the active search type's {@link ContractMarket} map into the visible {@link #contracts} list, seeding
-     * that map with a fresh batch of offers the first time a type is viewed. Each of the four maps therefore populates
-     * lazily and then persists on the {@link PlayerForce}; switching away and back shows the same offers rather than
-     * rerolling them. Types whose generation is not yet implemented simply stay empty.
+     * Mirrors the active search type's {@link ContractMarket} map into the visible {@link #contracts} list. The market
+     * is populated by the monthly refresh ({@link ChaosContractMarketAvailability#processNewMonth(Campaign)}), so the
+     * dialog only displays whatever offers are currently available - an empty board is a valid state.
      *
      * @author Illiani
      * @since 0.51.01
      */
     private void loadOffersForSearchType() {
-        Map<UUID, AbstractContract> marketOffers = contractMarket.getContracts(searchType);
-        if (marketOffers.isEmpty()) {
-            for (AbstractContract contract : generateOffers(campaign, INITIAL_OFFERS, false, searchType)) {
-                marketOffers.put(contract.getContractId(), contract);
-            }
-        }
         contracts.clear();
-        contracts.addAll(marketOffers.values());
+        contracts.addAll(contractMarket.getContracts(searchType).values());
     }
 
     private String countMessage() {
-        return switch (contracts.size()) {
-            case 0 -> getTextAt(RESOURCE_BUNDLE, "header.contractMarket.count.none");
-            case 1 -> getTextAt(RESOURCE_BUNDLE, "header.contractMarket.count.one");
-            default -> getFormattedTextAt(RESOURCE_BUNDLE, "header.contractMarket.count.many", contracts.size());
-        };
+        int contractCount = contracts.size();
+        if (contractCount == 0) {
+            return getTextAt(RESOURCE_BUNDLE, "header.contractMarket.count.none");
+        }
+
+        return getFormattedTextAt(RESOURCE_BUNDLE, "header.contractMarket.count", contractCount);
     }
 
     /**
@@ -457,7 +446,7 @@ public class ChaosContractMarketDialog extends JDialog implements ContractMarket
      * @since 0.51.01
      */
     private List<AbstractContract> generateOfferBatch() {
-        return generateOffers(campaign, GENERATED_OFFERS_PER_BATCH, true, searchType);
+        return ChaosContractMarketAvailability.generateOffers(campaign, GENERATED_OFFERS_PER_BATCH, true, searchType);
     }
 
     /**
@@ -492,44 +481,6 @@ public class ChaosContractMarketDialog extends JDialog implements ContractMarket
             return List.of(ContractSearchType.MERCENARY, ContractSearchType.PIRATE, ContractSearchType.TOURNAMENT);
         }
         return List.of(ContractSearchType.GOVERNMENT, ContractSearchType.TOURNAMENT);
-    }
-
-    /**
-     * Rolls {@code count} contracts from {@link AbstractContractGeneration}, keeping whichever come back valid (a
-     * {@code null} roll - no contract could be placed - is skipped, so the returned list may be shorter or empty).
-     *
-     * @param campaign the active campaign
-     * @param count    how many contracts to attempt to generate
-     * @param isGM     whether to generate in GM mode, bypassing command-circuit and placement gating
-     *
-     * @author Illiani
-     * @since 0.51.01
-     */
-    private static List<AbstractContract> generateOffers(Campaign campaign, int count, boolean isGM,
-          ContractSearchType searchType) {
-        CampaignOptions campaignOptions = campaign.getCampaignOptions();
-        LocalDate currentDate = campaign.getLocalDate();
-        PlayerForce playerForce = campaign.getPlayerForce();
-        Detachment detachment = playerForce.getForceDetachment();
-        FactionStandings factionStandings = playerForce.getFactionStandings();
-        boolean isOverridingCommandCircuitRequirements = playerForce.isOverridingCommandCircuitRequirements();
-
-        List<AbstractContract> generated = new ArrayList<>();
-        for (int i = 0; i < count; i++) {
-            AbstractContract contract = AbstractContractGeneration.createContract(campaign,
-                  campaignOptions,
-                  currentDate,
-                  detachment,
-                  0,
-                  searchType,
-                  factionStandings,
-                  isOverridingCommandCircuitRequirements,
-                  isGM);
-            if (contract != null) {
-                generated.add(contract);
-            }
-        }
-        return generated;
     }
 
     /**
