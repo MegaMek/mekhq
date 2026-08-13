@@ -860,7 +860,7 @@ public final class BriefingTab extends CampaignGuiTab {
                       mission.getScale(),
                       mission.getScenarios(),
                       status.isOverallSuccess(),
-                      mission.getContractName());
+                      mission.getName());
             }
         }
 
@@ -1033,7 +1033,7 @@ public final class BriefingTab extends CampaignGuiTab {
         // end to ensure there isn't any risk of us accidentally killing the data when it's still required.
         mission.setStratConCampaignState(null);
 
-        final List<AbstractContract> missions = getCampaign().getSortedMissions();
+        final List<AbstractContract> missions = getCampaign().getSortedContracts();
         comboMission.setSelectedItem(missions.isEmpty() ? null : missions.getFirst());
     }
 
@@ -1135,7 +1135,7 @@ public final class BriefingTab extends CampaignGuiTab {
         }
 
         getCampaign().removeMission(mission);
-        final List<AbstractContract> missions = getCampaign().getSortedMissions();
+        final List<AbstractContract> missions = getCampaign().getSortedContracts();
         comboMission.setSelectedItem(missions.isEmpty() ? null : missions.getFirst());
         MekHQ.triggerEvent(new MissionRemovedEvent(mission));
     }
@@ -2485,7 +2485,7 @@ public final class BriefingTab extends CampaignGuiTab {
 
     public void refreshMissions() {
         comboMission.removeAllItems();
-        final List<AbstractContract> missions = getCampaign().getSortedMissions();
+        final List<AbstractContract> missions = getCampaign().getSortedContracts();
         for (final AbstractContract mission : missions) {
             comboMission.addItem(mission);
         }

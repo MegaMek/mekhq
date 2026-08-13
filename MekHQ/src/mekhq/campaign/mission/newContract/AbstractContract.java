@@ -33,6 +33,7 @@
 package mekhq.campaign.mission.newContract;
 
 import java.time.LocalDate;
+import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
@@ -180,12 +181,28 @@ public abstract class AbstractContract {
         this.contractId = contractId;
     }
 
-    public String getContractName() {
+    public String getName() {
         return contractName;
     }
 
     public void setContractName(String contractName) {
         this.contractName = contractName;
+    }
+
+    /**
+     * Returns the name of this object as an HTML hyperlink.
+     *
+     * <p>The hyperlink is formatted with a "MISSION:" protocol prefix followed by the object's ID. This allows UI
+     * components that support HTML to render the name as a clickable link, which can be used to navigate to or focus on
+     * this specific object when clicked.</p>
+     *
+     * @return An HTML formatted string containing the object's name as a hyperlink with its ID
+     *
+     * @author Illiani
+     * @since 0.50.05
+     */
+    public String getHyperlinkedName() {
+        return String.format("<a href='MISSION:%s'>%s</a>", getId(), getName());
     }
 
     public String getDescription() {
@@ -252,7 +269,7 @@ public abstract class AbstractContract {
         return missionStatus;
     }
 
-    public void setMissionStatus(MissionStatus missionStatus) {
+    public void setStatus(MissionStatus missionStatus) {
         this.missionStatus = missionStatus;
     }
 
@@ -607,5 +624,9 @@ public abstract class AbstractContract {
 
     public void changeSalvagedByUnitValue(Money delta) {
         salvagedByUnitValue.plus(delta);
+    }
+
+    public long getMonthsLeft(LocalDate localDate) {
+        return ChronoUnit.MONTHS.between(localDate, getEndDate());
     }
 }

@@ -539,7 +539,7 @@ public class CampaignExportWizard extends JDialog {
         }
 
         if (chkExportCompletedContracts.isSelected()) {
-            for (AbstractContract mission : sourceCampaign.getCompletedMissions()) {
+            for (AbstractContract mission : sourceCampaign.getCompletedContracts()) {
                 destinationCampaign.importMission(mission);
             }
         }

@@ -165,7 +165,7 @@ public class AbstractContractGeneration {
         // Basic Information
         UUID contractId = UUID.randomUUID();
         contract.setContractId(contractId);
-        contract.setMissionStatus(null);
+        contract.setStatus(null);
 
         // Contract Details
         String contractName = getFormattedTextAt(RESOURCE_BUNDLES,

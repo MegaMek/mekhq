@@ -7,6 +7,8 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.UUID;
 
+import mekhq.MekHQ;
+import mekhq.campaign.events.missions.MissionNewEvent;
 import mekhq.campaign.mission.newContract.AbstractContract;
 
 public record ContractHistoryData(LinkedHashMap<UUID, AbstractContract> contractHistory) {
@@ -20,6 +22,8 @@ public record ContractHistoryData(LinkedHashMap<UUID, AbstractContract> contract
 
     public void add(AbstractContract contract) {
         contractHistory.put(contract.getId(), contract);
+
+        MekHQ.triggerEvent(new MissionNewEvent(contract));
     }
 
     public void remove(UUID contractId) {
@@ -52,12 +56,42 @@ public record ContractHistoryData(LinkedHashMap<UUID, AbstractContract> contract
         return completedContracts;
     }
 
-    public List<AbstractContract> getActive() {
+    public List<AbstractContract> getActiveIncludingNotYetStarted() {
         List<AbstractContract> activeContracts = new ArrayList<>();
 
         for (AbstractContract contract : contractHistory.values()) {
             if (contract.getStatus().isActive()) {
                 if (!activeContracts.contains(contract)) {
+                    activeContracts.add(contract);
+                }
+            }
+        }
+
+        return activeContracts;
+    }
+
+    public List<AbstractContract> getActiveAndStarted(LocalDate currentDate) {
+        List<AbstractContract> activeContracts = new ArrayList<>();
+
+        for (AbstractContract contract : contractHistory.values()) {
+            if (contract.getStatus().isActive() && !activeContracts.contains(contract)) {
+                LocalDate startDate = contract.getStartDate();
+                if (!startDate.isBefore(currentDate)) {
+                    activeContracts.add(contract);
+                }
+            }
+        }
+
+        return activeContracts;
+    }
+
+    public List<AbstractContract> getActiveAndNotYetStarted(LocalDate currentDate) {
+        List<AbstractContract> activeContracts = new ArrayList<>();
+
+        for (AbstractContract contract : contractHistory.values()) {
+            if (contract.getStatus().isActive() && !activeContracts.contains(contract)) {
+                LocalDate startDate = contract.getStartDate();
+                if (startDate.isBefore(currentDate)) {
                     activeContracts.add(contract);
                 }
             }

@@ -358,7 +358,7 @@ public class ChaosContractMarketDialog extends JDialog implements ContractMarket
     @Override
     public void accept(AbstractContract contract) {
         LOGGER.info("Contract accepted from market: {} (pending campaign-commit pipeline)",
-              contract.getContractName());
+              contract.getName());
         this.acceptedContract = contract;
         dispose();
     }
@@ -397,7 +397,7 @@ public class ChaosContractMarketDialog extends JDialog implements ContractMarket
      */
     @Override
     public void edit(AbstractContract contract) {
-        LOGGER.info("GM edit requested for contract: {} (pending contract editor).", contract.getContractName());
+        LOGGER.info("GM edit requested for contract: {} (pending contract editor).", contract.getName());
     }
 
     /**

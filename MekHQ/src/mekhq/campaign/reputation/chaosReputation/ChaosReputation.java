@@ -342,7 +342,7 @@ public class ChaosReputation {
         boolean noPartialSuccessReputation =
               campaign.getCampaignOptions().get(CampaignOption.CHAOS_NO_PARTIAL_SUCCESS_REPUTATION);
 
-        List<AbstractContract> completedMissions = new ArrayList<>(campaign.getCompletedMissions());
+        List<AbstractContract> completedMissions = new ArrayList<>(campaign.getCompletedContracts());
         completedMissions.sort(Comparator.comparing(AbstractContract::getEndDate,
               Comparator.nullsFirst(Comparator.naturalOrder())));
 

@@ -552,7 +552,7 @@ class ChaosReputationTest {
         CampaignOptions options = mock(CampaignOptions.class);
         when(campaign.getCampaignOptions()).thenReturn(options);
         when(options.get(CampaignOption.CHAOS_NO_PARTIAL_SUCCESS_REPUTATION)).thenReturn(noPartialReputation);
-        when(campaign.getCompletedMissions()).thenReturn(missions);
+        when(campaign.getCompletedContracts()).thenReturn(missions);
         return campaign;
     }
 

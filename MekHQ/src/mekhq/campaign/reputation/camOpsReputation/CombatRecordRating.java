@@ -81,7 +81,7 @@ public class CombatRecordRating {
         boolean usePerformanceCutOff = campaign.getCampaignOptions().isReputationPerformanceModifierCutOff();
         LocalDate cutOffDate = campaign.getLocalDate().minusYears(REPUTATION_PERFORMANCE_CUT_OFF_YEARS);
         Map<MissionStatus, Long> missionCountsByStatus = new HashMap<>();
-        for (AbstractContract mission : campaign.getCompletedMissions()) {
+        for (AbstractContract mission : campaign.getCompletedContracts()) {
             if (mission.getStatus() == MissionStatus.ACTIVE) {
                 continue;
             }

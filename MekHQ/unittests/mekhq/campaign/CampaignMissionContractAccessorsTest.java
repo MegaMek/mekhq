@@ -34,7 +34,6 @@ package mekhq.campaign;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.time.LocalDate;
@@ -242,7 +241,7 @@ class CampaignMissionContractAccessorsTest {
         sortingCampaign.addMission(newerCompleted);
 
         assertEquals(List.of(olderActive, newerActive, newerCompleted, olderCompleted),
-              sortingCampaign.getSortedMissions());
+              sortingCampaign.getSortedContracts());
     }
 
     @Test
@@ -270,7 +269,7 @@ class CampaignMissionContractAccessorsTest {
         sortingCampaign.addMission(undatedActive);
 
         assertEquals(List.of(currentActive, undatedActive, futureActive,
-              datedCompleted, olderCompleted, undatedCompleted),
-              sortingCampaign.getSortedMissions());
+                    datedCompleted, olderCompleted, undatedCompleted),
+              sortingCampaign.getSortedContracts());
     }
 }

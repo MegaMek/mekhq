@@ -251,7 +251,7 @@ public class ContractNegotiationDialog extends JDialog {
                                            +
                                            escape(getFormattedTextAt(RESOURCE_BUNDLE,
                                                  "negotiate.contractMarket.subtitle",
-                                                 contract.getContractName(),
+                                                 contract.getName(),
                                                  contract.getEmployerDisplayName(),
                                                  scale)) +
                                            "</span></html>");
@@ -651,7 +651,7 @@ public class ContractNegotiationDialog extends JDialog {
               originalStep[Clause.SALVAGE.ordinal()], originalStep[Clause.COMMAND.ordinal()],
               reputationUsed, swapsUsed, sacrificeBank, fundingByClause));
 
-        LOGGER.info("Negotiated terms confirmed for contract: {}", contract.getContractName());
+        LOGGER.info("Negotiated terms confirmed for contract: {}", contract.getName());
         confirmed = true;
         dispose();
     }

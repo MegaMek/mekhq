@@ -118,7 +118,7 @@ public class ContractDossierPanel extends JPanel {
                                         "</span><br>"
                                         +
                                         "<b style='font-size:larger'>" +
-                                        escape(contract.getContractName()) +
+                                        escape(contract.getName()) +
                                         "</b></html>");
         title.setForeground(onAccent);
         header.add(title, BorderLayout.WEST);
