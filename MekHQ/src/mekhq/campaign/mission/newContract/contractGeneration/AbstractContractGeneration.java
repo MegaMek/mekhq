@@ -33,6 +33,8 @@
 package mekhq.campaign.mission.newContract.contractGeneration;
 
 import static java.lang.Math.ceil;
+import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
+import static mekhq.utilities.MHQInternationalization.getTextAt;
 
 import java.time.LocalDate;
 import java.util.Collection;
@@ -74,6 +76,7 @@ import mekhq.campaign.universe.factionStanding.FactionStandings;
 
 public class AbstractContractGeneration {
     private static final MMLogger LOGGER = MMLogger.create(AbstractContractGeneration.class);
+    private static final String RESOURCE_BUNDLES = "mekhq.resources.AbstractMission";
 
     public static @Nullable AbstractContract createContract(Campaign campaign, CampaignOptions campaignOptions,
           LocalDate currentDate, Detachment detachment, int contractGenerationModifier, ContractSearchType searchType,
@@ -164,16 +167,15 @@ public class AbstractContractGeneration {
         contract.setMissionStatus(null);
 
         // Contract Details
-        String contractName = contract.getStartDate().toString() +
-                                    " - " +
-                                    contract.getObjectiveType().name() +
-                                    ": " +
-                                    contract.getEmployerDisplayName() +
-                                    " vs. " +
-                                    contract.getEnemyDisplayName();
+        String contractName = getFormattedTextAt(RESOURCE_BUNDLES,
+              "AbstractContractGeneration.contractName",
+              contract.getStartDate(),
+              contract.getObjectiveType().toString(),
+              contract.getEmployerDisplayName(),
+              contract.getEnemyDisplayName());
         contract.setContractName(contractName);
 
-        String description = "Placeholder description";
+        String description = getTextAt(RESOURCE_BUNDLES, "AbstractContractGeneration.description.placeholder");
         contract.setDescription(description);
 
         // Morale

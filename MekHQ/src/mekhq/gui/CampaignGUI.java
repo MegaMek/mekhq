@@ -859,6 +859,7 @@ public class CampaignGUI extends JPanel {
             }
         } else {
             if (true) {
+                // TODO: Swap the generating constructor for a persistent contract-market backend once one exists.
                 new ChaosContractMarketDialog(getCampaign());
             } else {
                 ContractMarketDialog contractMarketDialog = new ContractMarketDialog(getFrame(), getCampaign());
