@@ -42,6 +42,7 @@ import static mekhq.utilities.ReportingUtilities.messageSurroundedBySpanWithColo
 import java.awt.BorderLayout;
 import java.awt.Component;
 import java.awt.Dimension;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
@@ -64,6 +65,7 @@ import megamek.common.util.sorter.NaturalOrderComparator;
 import megamek.logging.MMLogger;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
+import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.force.Formation;
 import mekhq.campaign.force.FormationType;
 import mekhq.campaign.mission.ScenarioTemplate;
@@ -361,8 +363,11 @@ public class SalvageFormationPicker extends JDialog {
         boolean isTechSecondary1 = tech1.getSecondaryRole().isTechSecondary();
         boolean isTechSecondary2 = tech2.getSecondaryRole().isTechSecondary();
 
-        int expLevel1 = tech1.getExperienceLevel(model.campaign, isTechSecondary1, true);
-        int expLevel2 = tech2.getExperienceLevel(model.campaign, isTechSecondary2, true);
+        CampaignOptions campaignOptions = model.campaign.getCampaignOptions();
+        boolean isClanCampaign = model.campaign.getPlayerForce().isClanForce();
+        LocalDate today = model.campaign.getLocalDate();
+        int expLevel1 = tech1.getExperienceLevel(campaignOptions, isClanCampaign, today, isTechSecondary1, true);
+        int expLevel2 = tech2.getExperienceLevel(campaignOptions, isClanCampaign, today, isTechSecondary2, true);
 
         int expCompare = Integer.compare(expLevel2, expLevel1); // Reversed (highest -> lowest, more experienced first)
         if (expCompare != 0) {return expCompare;}

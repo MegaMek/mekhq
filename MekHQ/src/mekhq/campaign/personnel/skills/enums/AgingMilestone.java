@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2025 The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2025-2026 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -50,11 +50,11 @@ public enum AgingMilestone {
 
     private static final String RESOURCE_BUNDLE = "mekhq.resources.AgingMilestone";
 
-    public static final int CLAN_REPUTATION_MULTIPLIER = 150;
+    public static final int CLAN_FAME_MULTIPLIER = 150;
     public static final int STAR_CAPTAIN_RANK_INDEX = 34;
-    public static final int STAR_CAPTAIN_REPUTATION_MULTIPLIER = 1;
+    public static final int STAR_CAPTAIN_FAME_MULTIPLIER = 1;
     public static final int STAR_COLONEL_RANK_INDEX = 38;
-    public static final int STAR_COLONEL_REPUTATION_MULTIPLIER = 2;
+    public static final int STAR_COLONEL_FAME_MULTIPLIER = 2;
 
     // Attributes
     private final int milestone;
@@ -66,7 +66,7 @@ public enum AgingMilestone {
     private final int intelligence;
     private final int willpower;
     private final int charisma;
-    private final int reputation;
+    private final int fame;
     private final boolean slowLearner;
     private final boolean glassJaw;
     // Cumulative values
@@ -109,7 +109,7 @@ public enum AgingMilestone {
 
     // Constructor
     AgingMilestone(int milestone, int maximumAge, int strength, int body, int dexterity, int reflexes, int intelligence,
-          int willpower, int charisma, int reputation, boolean slowLearner, boolean glassJaw) {
+          int willpower, int charisma, int fame, boolean slowLearner, boolean glassJaw) {
         this.milestone = milestone;
         this.maximumAge = maximumAge;
         this.strength = strength;
@@ -119,7 +119,7 @@ public enum AgingMilestone {
         this.intelligence = intelligence;
         this.willpower = willpower;
         this.charisma = charisma;
-        this.reputation = reputation;
+        this.fame = fame;
         this.slowLearner = slowLearner;
         this.glassJaw = glassJaw;
     }
@@ -182,8 +182,8 @@ public enum AgingMilestone {
         };
     }
 
-    public int getReputation() {
-        return reputation;
+    public int getFame() {
+        return fame;
     }
 
     public boolean isSlowLearner() {

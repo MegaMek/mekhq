@@ -32,8 +32,8 @@
  */
 package mekhq.campaign.randomEvents.randomEventsSystem;
 
-import static mekhq.campaign.mission.enums.AtBMoraleLevel.OVERWHELMING;
-import static mekhq.campaign.mission.enums.AtBMoraleLevel.STALEMATE;
+import static mekhq.campaign.mission.enums.ContractMoraleLevel.OVERWHELMING;
+import static mekhq.campaign.mission.enums.ContractMoraleLevel.STALEMATE;
 import static mekhq.campaign.personnel.PersonnelOptions.ATOW_POISON_RESISTANCE;
 import static mekhq.campaign.personnel.enums.PersonnelRole.ADMINISTRATOR_LOGISTICS;
 import static mekhq.campaign.personnel.enums.PersonnelRole.DEPENDENT;

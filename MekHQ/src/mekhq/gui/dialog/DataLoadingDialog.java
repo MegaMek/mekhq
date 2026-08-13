@@ -78,7 +78,6 @@ import mekhq.NullEntityException;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.Campaign.AdministratorSpecialization;
 import mekhq.campaign.CampaignFactory;
-import mekhq.campaign.camOpsReputation.ForceReputationController;
 import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.events.OptionsChangedEvent;
 import mekhq.campaign.finances.CurrencyManager;
@@ -95,6 +94,7 @@ import mekhq.campaign.personnel.medical.advancedMedical.InjuryTypes;
 import mekhq.campaign.personnel.procreation.AbstractProcreation;
 import mekhq.campaign.personnel.ranks.Ranks;
 import mekhq.campaign.personnel.skills.SkillType;
+import mekhq.campaign.reputation.camOpsReputation.ForceReputationController;
 import mekhq.campaign.unit.Unit;
 import mekhq.campaign.universe.Factions;
 import mekhq.campaign.universe.Systems;
@@ -402,7 +402,7 @@ public class DataLoadingDialog extends AbstractMHQDialogBasic implements Propert
                 // initialize reputation
                 ForceReputationController reputationController = new ForceReputationController();
                 reputationController.initializeReputation(campaign);
-                campaign.getPlayerForce().setReputation(reputationController);
+                campaign.getPlayerForce().setCamOpsReputation(reputationController);
 
                 // initialize starting faction standings
                 CampaignOptions campaignOptions = campaign.getCampaignOptions();
@@ -423,15 +423,15 @@ public class DataLoadingDialog extends AbstractMHQDialogBasic implements Propert
 
                 // Setup Personnel Modules
                 final AbstractMarriage marriage = campaignOptions
-                                           .getRandomMarriageMethod()
+                                                        .getRandomMarriageMethod()
                                                         .getMethod(campaignOptions);
                 campaign.getPlayerForce().getHumanResources().setMarriage(marriage);
                 final AbstractDivorce divorce = campaignOptions
-                                          .getRandomDivorceMethod()
+                                                      .getRandomDivorceMethod()
                                                       .getMethod(campaignOptions);
                 campaign.getPlayerForce().getHumanResources().setDivorce(divorce);
                 final AbstractProcreation procreation = campaignOptions
-                                              .getRandomProcreationMethod()
+                                                              .getRandomProcreationMethod()
                                                               .getMethod(campaignOptions);
                 campaign.getPlayerForce().getHumanResources().setProcreation(procreation);
 
@@ -535,8 +535,8 @@ public class DataLoadingDialog extends AbstractMHQDialogBasic implements Propert
          * Builds and shows the modal Campaign Options dialog for a brand-new campaign, then reports whether the user
          * canceled it.
          *
-         * <p>Must run on the Event Dispatch Thread (it is invoked through {@link SwingUtilities#invokeAndWait} from the
-         * worker thread) because it constructs the dialog's entire Swing component tree.</p>
+         * <p>Must run on the Event Dispatch Thread (it is invoked through {@link SwingUtilities#invokeAndWait} from
+         * the worker thread) because it constructs the dialog's entire Swing component tree.</p>
          *
          * @param campaign the new campaign being configured
          * @param preset   the preset to seed the dialog with, or {@code null}

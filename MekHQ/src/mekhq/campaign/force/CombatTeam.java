@@ -64,8 +64,8 @@ import mekhq.campaign.events.OrganizationChangedEvent;
 import mekhq.campaign.mission.AtBContract;
 import mekhq.campaign.mission.AtBScenario;
 import mekhq.campaign.mission.atb.AtBScenarioFactory;
-import mekhq.campaign.mission.enums.AtBMoraleLevel;
 import mekhq.campaign.mission.enums.CombatRole;
+import mekhq.campaign.mission.enums.ContractMoraleLevel;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.unit.Unit;
 import mekhq.campaign.universe.Faction;
@@ -435,7 +435,7 @@ public class CombatTeam {
         // thresholds are coded from charts with 1-100 range, so we add 1 to mod to
         // adjust 0-based random int
         int battleTypeMod = 1 +
-                                  (AtBMoraleLevel.STALEMATE.ordinal() -
+                                  (ContractMoraleLevel.STALEMATE.ordinal() -
                                          getContract(campaign).getMoraleLevel().ordinal()) * 5;
         battleTypeMod += getContract(campaign).getBattleTypeMod();
 

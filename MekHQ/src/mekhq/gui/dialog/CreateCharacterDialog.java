@@ -733,7 +733,7 @@ public class CreateCharacterDialog extends JDialog implements DialogOptionListen
         lblReputation.setText(resourceMap.getString("lblReputation.text"));
         lblReputation.setName("lblReputation");
 
-        textReputation.setText(Integer.toString(person.getReputation()));
+        textReputation.setText(Integer.toString(person.getFame()));
         textReputation.setName("textReputation");
 
         gridBagConstraints = new GridBagConstraints();
@@ -1727,8 +1727,8 @@ public class CreateCharacterDialog extends JDialog implements DialogOptionListen
         newValue = MathUtility.parseInt(textWealth.getText(), person.getWealth());
         person.setWealth(Math.clamp(newValue, MINIMUM_WEALTH, MAXIMUM_WEALTH));
 
-        newValue = MathUtility.parseInt(textReputation.getText(), person.getReputation());
-        person.setReputation(Math.clamp(newValue, MINIMUM_REPUTATION, MAXIMUM_REPUTATION));
+        newValue = MathUtility.parseInt(textReputation.getText(), person.getFame());
+        person.setFame(Math.clamp(newValue, MINIMUM_FAME, MAXIMUM_FAME));
 
         newValue = MathUtility.parseInt(textUnlucky.getText(), person.getUnlucky());
         person.setUnlucky(Math.clamp(newValue, MINIMUM_UNLUCKY, MAXIMUM_UNLUCKY));

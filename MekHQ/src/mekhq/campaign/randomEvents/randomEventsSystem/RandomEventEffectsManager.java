@@ -65,12 +65,13 @@ import megamek.logging.MMLogger;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.RandomOriginOptions;
+import mekhq.campaign.campaignOptions.CampaignOption;
 import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.digitalGM.stratCon.StratConCampaignState;
 import mekhq.campaign.events.persons.PersonChangedEvent;
 import mekhq.campaign.force.Formation;
 import mekhq.campaign.mission.AtBContract;
-import mekhq.campaign.mission.enums.AtBMoraleLevel;
+import mekhq.campaign.mission.enums.ContractMoraleLevel;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.enums.PersonnelRole;
 import mekhq.campaign.personnel.enums.PersonnelStatus;
@@ -79,6 +80,7 @@ import mekhq.campaign.personnel.skills.Skill;
 import mekhq.campaign.personnel.skills.SkillType;
 import mekhq.campaign.personnel.turnoverAndRetention.Fatigue;
 import mekhq.campaign.randomEvents.prisoners.PrisonerStatus;
+import mekhq.campaign.reputation.chaosReputation.ChaosReputation;
 import mekhq.campaign.unit.Unit;
 import mekhq.campaign.universe.Faction;
 import mekhq.campaign.universe.selectors.factionSelectors.AbstractFactionSelector;
@@ -1071,7 +1073,7 @@ public class RandomEventEffectsManager {
         List<AtBContract> potentialTargets = new ArrayList<>();
 
         for (AtBContract contract : campaign.getActiveAtBContracts()) {
-            AtBMoraleLevel currentMorale = contract.getMoraleLevel();
+            ContractMoraleLevel currentMorale = contract.getMoraleLevel();
 
             if (!currentMorale.isOverwhelming()) {
                 potentialTargets.add(contract);
@@ -1085,7 +1087,7 @@ public class RandomEventEffectsManager {
         AtBContract target = getRandomItem(potentialTargets);
 
         int moraleOrdinal = target.getMoraleLevel().ordinal();
-        target.setMoraleLevel(AtBMoraleLevel.values()[moraleOrdinal + 1]);
+        target.setMoraleLevel(ContractMoraleLevel.values()[moraleOrdinal + 1]);
 
         String colorOpen = spanOpeningWithCustomColor(ReportingUtilities.getNegativeColor());
 
@@ -1217,15 +1219,29 @@ public class RandomEventEffectsManager {
     private String eventEffectUniqueAbandonedToDie(RandomEventResult result) {
         int magnitude = result.magnitude();
 
+        CampaignOptions campaignOptions = campaign.getCampaignOptions();
+        boolean isUseChaosReputation = campaignOptions.get(CampaignOption.USE_CHAOS_REPUTATION);
+        boolean isUseCampaignReputationTracking = campaignOptions.get(CampaignOption.CAMPAIGN_LEVEL_CHAOS_REPUTATION);
+
         int crimeChange = 0;
         if (magnitude > 0) {
-            crimeChange = d6(magnitude);
+            crimeChange = isUseChaosReputation ? -1 : d6(magnitude);
         }
 
-        if (crimeChange > 0) {
-            LocalDate dateOfLastCrime = campaign.getLocalDate();
-            campaign.getPlayerForce().setDateOfLastCrime(dateOfLastCrime);
-            campaign.getPlayerForce().changeCrimeRating(crimeChange);
+        if (crimeChange != 0) {
+            if (isUseChaosReputation) {
+                if (isUseCampaignReputationTracking) {
+                    campaign.getPlayerForce().setChaosCampaignReputation(crimeChange);
+                } else {
+                    ChaosReputation.changeCrimePenalty(campaign.getPlayerForce()
+                                                             .getHumanResources()
+                                                             .getPersonnelFilteringOutDeparted(), crimeChange);
+                }
+            } else {
+                LocalDate dateOfLastCrime = campaign.getLocalDate();
+                campaign.getPlayerForce().setCampOpsDateOfLastCrime(dateOfLastCrime);
+                campaign.getPlayerForce().changeCrimeRating(crimeChange);
+            }
         }
 
         int prisonerCount = d6();
@@ -1263,11 +1279,14 @@ public class RandomEventEffectsManager {
         String haveOrHas = getFormattedTextAt(RESOURCE_BUNDLE,
               prisonerCount != 1 ? "pluralizer.have" : "pluralizer.has");
 
-        String crimeReport = getFormattedTextAt(RESOURCE_BUNDLE,
-              "ABANDONED_TO_DIE.report.crime",
-              colorOpen,
-              CLOSING_SPAN_TAG,
-              crimeChange);
+        String crimeReport = "";
+        if (!campaign.getCampaignOptions().get(CampaignOption.USE_CHAOS_REPUTATION)) {
+            crimeReport = getFormattedTextAt(RESOURCE_BUNDLE,
+                  "ABANDONED_TO_DIE.report.crime",
+                  colorOpen,
+                  CLOSING_SPAN_TAG,
+                  crimeChange);
+        }
 
         return getFormattedTextAt(RESOURCE_BUNDLE,
               "ABANDONED_TO_DIE.report.prisoners",

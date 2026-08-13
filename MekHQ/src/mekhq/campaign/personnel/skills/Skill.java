@@ -975,8 +975,9 @@ public class Skill {
      * @return the corresponding {@link SkillLevel} for the evaluated experience level
      */
     public SkillLevel getSkillLevel(SkillModifierData skillModifierData) {
-        // Returns the SkillLevel Enum value equivalent to the Experience Level Magic Number
-        return Skills.SKILL_LEVELS[getExperienceLevel(skillModifierData) + 1];
+        int experienceLevel = getExperienceLevel(skillModifierData);
+
+        return SkillType.skillLevelFromExperienceLevel(experienceLevel);
     }
 
     /**

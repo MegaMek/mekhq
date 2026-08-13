@@ -56,8 +56,8 @@ import megamek.common.equipment.EquipmentType;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.digitalGM.stratCon.StratConCampaignState;
 import mekhq.campaign.finances.Money;
-import mekhq.campaign.mission.enums.AtBContractType;
-import mekhq.campaign.mission.enums.AtBMoraleLevel;
+import mekhq.campaign.mission.enums.ContractObjectiveType;
+import mekhq.campaign.mission.enums.ContractMoraleLevel;
 import mekhq.campaign.mission.enums.ContractCommandRights;
 import mekhq.campaign.mission.enums.MissionStatus;
 import mekhq.campaign.mission.enums.ScenarioStatus;
@@ -236,7 +236,7 @@ public class AbstractMissionTransitionIOTest {
         // AtB faction / force data.
         assertEquals("FWL", contract.getEmployerCode());
         assertEquals("CP", contract.getEnemyCode());
-        assertEquals(AtBContractType.OBJECTIVE_RAID, contract.getContractType());
+        assertEquals(ContractObjectiveType.OBJECTIVE_RAID, contract.getContractType());
         assertEquals("Objective Raid", contract.getContractTypeName());
         assertEquals(SkillLevel.ELITE, contract.getAllySkill());
         assertEquals(SkillLevel.REGULAR, contract.getEnemySkill());
@@ -326,7 +326,7 @@ public class AbstractMissionTransitionIOTest {
         contract.setSystemId("Terra");
         contract.setStatus(MissionStatus.SUCCESS);
         contract.setDescription("a description");
-        contract.setContractTypeAndName(AtBContractType.PIRATE_HUNTING);
+        contract.setContractTypeAndName(ContractObjectiveType.PIRATE_HUNTING);
 
         contract.setLengthInMonths(9);
         contract.setStartDate(LocalDate.of(3055, 3, 4));
@@ -373,7 +373,7 @@ public class AbstractMissionTransitionIOTest {
 
         contract.setRequiredCombatTeams(2);
         contract.setRequiredCombatElements(8);
-        contract.setMoraleLevel(AtBMoraleLevel.ADVANCING);
+        contract.setMoraleLevel(ContractMoraleLevel.ADVANCING);
         contract.setPartsAvailabilityLevel(4);
         contract.setSharesPercent(45);
         contract.setBatchallAccepted(false);

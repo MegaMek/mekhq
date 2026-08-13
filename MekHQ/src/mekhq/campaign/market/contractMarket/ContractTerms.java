@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2024-2025 The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2024-2026 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -34,8 +34,8 @@ package mekhq.campaign.market.contractMarket;
 
 import java.time.LocalDate;
 
-import mekhq.campaign.mission.enums.AtBContractType;
 import mekhq.campaign.mission.enums.ContractCommandRights;
+import mekhq.campaign.mission.enums.ContractObjectiveType;
 import mekhq.campaign.universe.Faction;
 
 /**
@@ -51,9 +51,9 @@ public class ContractTerms {
     private int supportModifier;
     private int transportModifier;
 
-    public ContractTerms(AtBContractType mission, Faction employer, double reputationFactor, LocalDate date) {
+    public ContractTerms(ContractObjectiveType mission, Faction employer, double reputationFactor, LocalDate date) {
         operationsTempoMultiplier = mission.getOperationsTempoMultiplier();
-        baseLength = mission.getConstantLength();
+        baseLength = mission.getChaosObjectiveType().getMonthsLength();
         addMissionTypeModifiers(mission);
         addEmployerModifiers(employer, date);
         addUnitReputationModifiers(reputationFactor);
@@ -201,7 +201,7 @@ public class ContractTerms {
         };
     }
 
-    private void addMissionTypeModifiers(AtBContractType mission) {
+    private void addMissionTypeModifiers(ContractObjectiveType mission) {
         switch (mission) {
             case CADRE_DUTY -> supportModifier += 1;
             case DIVERSIONARY_RAID -> {

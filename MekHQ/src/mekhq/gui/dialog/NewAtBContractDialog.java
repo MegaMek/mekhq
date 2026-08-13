@@ -62,7 +62,7 @@ import mekhq.campaign.digitalGM.stratCon.StratConContractInitializer;
 import mekhq.campaign.finances.enums.TransactionType;
 import mekhq.campaign.market.contractMarket.AbstractContractMarket;
 import mekhq.campaign.mission.AtBContract;
-import mekhq.campaign.mission.enums.AtBContractType;
+import mekhq.campaign.mission.enums.ContractObjectiveType;
 import mekhq.campaign.mission.utilities.ContractUtilities;
 import mekhq.campaign.universe.Factions;
 import mekhq.campaign.universe.PlanetarySystem;
@@ -86,7 +86,7 @@ public class NewAtBContractDialog extends NewContractDialog {
     protected JCheckBox chkShowAllFactions;
     protected JComboBox<String> cbPlanets;
     protected JCheckBox chkShowAllPlanets;
-    protected MMComboBox<AtBContractType> comboContractType;
+    protected MMComboBox<ContractObjectiveType> comboContractType;
     protected MMComboBox<SkillLevel> comboAllySkill;
     protected JComboBox<String> cbAllyQuality;
     protected MMComboBox<SkillLevel> comboEnemySkill;
@@ -306,15 +306,15 @@ public class NewAtBContractDialog extends NewContractDialog {
         gbc.insets = new Insets(5, 5, 5, 5);
         descPanel.add(lblType, gbc);
 
-        comboContractType = new MMComboBox<>("comboContractType", AtBContractType.values());
+        comboContractType = new MMComboBox<>("comboContractType", ContractObjectiveType.values());
         comboContractType.setSelectedItem(contract.getContractType());
         comboContractType.setRenderer(new DefaultListCellRenderer() {
             @Override
             public Component getListCellRendererComponent(final JList<?> list, final Object value, final int index,
                   final boolean isSelected, final boolean cellHasFocus) {
                 super.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);
-                if (value instanceof AtBContractType) {
-                    list.setToolTipText(((AtBContractType) value).getToolTipText());
+                if (value instanceof ContractObjectiveType) {
+                    list.setToolTipText(((ContractObjectiveType) value).getToolTipText());
                 }
                 return this;
             }

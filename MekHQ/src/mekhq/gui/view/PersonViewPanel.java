@@ -35,12 +35,22 @@ package mekhq.gui.view;
 import static java.awt.Color.BLACK;
 import static java.awt.Color.RED;
 import static java.lang.Math.ceil;
+import static java.lang.Math.max;
+import static java.lang.Math.round;
 import static megamek.client.ui.WrapLayout.wordWrap;
 import static megamek.common.options.PilotOptions.LVL3_ADVANTAGES;
 import static megamek.common.options.PilotOptions.MD_ADVANTAGES;
 import static megamek.common.units.EntityWeightClass.WEIGHT_ULTRA_LIGHT;
 import static megamek.utilities.ImageUtilities.addTintToImageIcon;
 import static mekhq.campaign.personnel.Person.getLoyaltyName;
+import static mekhq.campaign.personnel.PersonnelOptions.BAD_REPUTATION;
+import static mekhq.campaign.personnel.PersonnelOptions.BLAMELESS;
+import static mekhq.campaign.personnel.PersonnelOptions.CERTIFIED_NOBODY;
+import static mekhq.campaign.personnel.PersonnelOptions.DONT_YOU_KNOW_WHO_I_AM;
+import static mekhq.campaign.personnel.PersonnelOptions.FORGETS_TO_REPLY;
+import static mekhq.campaign.personnel.PersonnelOptions.GOOD_REPUTATION;
+import static mekhq.campaign.personnel.PersonnelOptions.IMPORTANT_FRIENDS;
+import static mekhq.campaign.personnel.PersonnelOptions.SCAPEGOAT;
 import static mekhq.campaign.personnel.enums.PersonnelStatus.ACTIVE;
 import static mekhq.campaign.personnel.skills.Skill.getIndividualAttributeModifier;
 import static mekhq.campaign.personnel.skills.Skill.getTotalAttributeModifier;
@@ -102,6 +112,7 @@ import mekhq.MHQStaticDirectoryManager;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.Kill;
+import mekhq.campaign.campaignOptions.CampaignOption;
 import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.finances.Money;
 import mekhq.campaign.log.LogEntry;
@@ -1224,6 +1235,8 @@ public class PersonViewPanel extends JScrollablePanel {
         JPanel pnlInfo = new JPanel(new GridBagLayout());
         pnlInfo.setBorder(RoundedLineBorder.createRoundedLineBorder(person.getFullTitle()));
         JLabel lblBounty = new JLabel();
+        JLabel lblChaosReputation1 = new JLabel();
+        JLabel lblChaosReputation2 = new JLabel();
         JLabel lblType = new JLabel();
         JLabel lblUnitNotResponsibleForSalary = new JLabel();
         JLabel lblStatus1 = new JLabel();
@@ -1343,7 +1356,9 @@ public class PersonViewPanel extends JScrollablePanel {
             String factionName = person.getOriginFaction().getFullName(campaign.getGameYear());
             if (person.getOriginPlanet() != null) {
                 String planetName = person.getOriginPlanet().getName(today);
-                lblOrigin2.setText(String.format("<html><a href='#'>%s</a> (%s)</html>", planetName, factionName));
+                lblOrigin2.setText(String.format("<html><nobr><a href='#'>%s</a> (%s)</nobr></html>",
+                      planetName,
+                      factionName));
                 lblOrigin2.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
                 lblOrigin2.addMouseListener(new MouseAdapter() {
                     @Override
@@ -1693,6 +1708,90 @@ public class PersonViewPanel extends JScrollablePanel {
             gridBagConstraints.fill = GridBagConstraints.NONE;
             gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
             pnlInfo.add(lblTimeInRank2, gridBagConstraints);
+            y++;
+        }
+
+        if (campaignOptions.get(CampaignOption.USE_CHAOS_REPUTATION) &&
+                  !campaignOptions.get(CampaignOption.CAMPAIGN_LEVEL_CHAOS_REPUTATION)) {
+            int baseReputation = person.getReputationDirect();
+            int criminalRecord = person.getCriminalRecord();
+            boolean isClanForce = campaign.getPlayerForce().isClanForce();
+            boolean isUseAgeEffects = campaignOptions.get(CampaignOption.USE_AGE_EFFECTS);
+            int adjustedFame = person.getAdjustedFame(isUseAgeEffects,
+                  isClanForce,
+                  today);
+
+            PersonnelOptions options = person.getOptions();
+            if (options.booleanOption(DONT_YOU_KNOW_WHO_I_AM)) {
+                adjustedFame = (int) round(adjustedFame * 1.25);
+            } else if (options.booleanOption(CERTIFIED_NOBODY)) {
+                adjustedFame = (int) round(adjustedFame * 0.75);
+            }
+
+            int adjustedConnections = person.getAdjustedConnections(false);
+            if (options.booleanOption(IMPORTANT_FRIENDS)) {
+                adjustedConnections = (int) round(adjustedConnections * 1.25);
+            } else if (options.booleanOption(FORGETS_TO_REPLY)) {
+                adjustedConnections = (int) round(adjustedConnections * 0.75);
+            }
+
+            if (options.booleanOption(BLAMELESS)) {
+                criminalRecord++;
+            } else if (options.booleanOption(SCAPEGOAT)) {
+                criminalRecord = max(0, criminalRecord--);
+            }
+
+            if (options.booleanOption(GOOD_REPUTATION)) {
+                baseReputation++;
+            } else if (options.booleanOption(BAD_REPUTATION)) {
+                baseReputation--;
+            }
+
+            boolean applyPersonality = campaignOptions.get(CampaignOption.CHAOS_PERSONALITY_AFFECTS_REPUTATION) &&
+                                             campaignOptions.get(CampaignOption.USE_RANDOM_PERSONALITIES);
+            int personality = PersonalityController.getPersonalityValue(applyPersonality,
+                  person.getAggression(),
+                  person.getAmbition(),
+                  person.getGreed(),
+                  person.getSocial());
+
+            int adjustedReputation =
+                  baseReputation + criminalRecord + adjustedFame + adjustedConnections + personality;
+            String chaosReputationTooltip = wordWrap(String.format(resourceMap.getString("lblChaosReputation.tooltip"),
+                  baseReputation,
+                  criminalRecord,
+                  adjustedFame,
+                  adjustedConnections,
+                  personality,
+                  adjustedReputation));
+
+            lblChaosReputation1.setName("lblChaosReputation1");
+            lblChaosReputation1.setText(resourceMap.getString("lblChaosReputation.text"));
+            lblChaosReputation1.setToolTipText(chaosReputationTooltip);
+            gridBagConstraints = new GridBagConstraints();
+            gridBagConstraints.gridwidth = 1;
+            gridBagConstraints.gridx = 0;
+            gridBagConstraints.gridy = y;
+            gridBagConstraints.fill = GridBagConstraints.NONE;
+            gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
+            pnlInfo.add(lblChaosReputation1, gridBagConstraints);
+
+            lblChaosReputation2.setName("lblChaosReputation2");
+            lblChaosReputation2.setText(String.format("<html><nobr>%s%s</nobr></html>",
+                  adjustedReputation,
+                  getTraitAdjustmentIcon(baseReputation, adjustedReputation)));
+            lblChaosReputation2.setToolTipText(chaosReputationTooltip);
+            lblChaosReputation1.setLabelFor(lblChaosReputation2);
+            gridBagConstraints = new GridBagConstraints();
+            gridBagConstraints.gridx = 1;
+            gridBagConstraints.gridy = y;
+            gridBagConstraints.gridwidth = 3;
+            gridBagConstraints.weightx = 1.0;
+            gridBagConstraints.insets = new Insets(0, 10, 0, 0);
+            gridBagConstraints.fill = GridBagConstraints.NONE;
+            gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
+            pnlInfo.add(lblChaosReputation2, gridBagConstraints);
+            y++;
         }
 
         return pnlInfo;
@@ -2105,10 +2204,9 @@ public class PersonViewPanel extends JScrollablePanel {
 
         Attributes attributes = person.getATOWAttributes();
         PersonnelOptions options = person.getOptions();
-        int adjustedReputation = person.getAdjustedReputation(campaignOptions.isUseAgeEffects(),
-              campaign.isClanCampaign(),
-              campaign.getLocalDate(),
-              person.getRankNumeric());
+        int adjustedReputation = person.getAdjustedFame(campaignOptions.get(CampaignOption.USE_AGE_EFFECTS),
+              campaign.getPlayerForce().isClanForce(),
+              campaign.getLocalDate());
 
         boolean adminsHaveNegotiation = campaignOptions.isAdminsHaveNegotiation();
         boolean doctorsUseAdmin = campaignOptions.isDoctorsUseAdministration();
@@ -2601,22 +2699,21 @@ public class PersonViewPanel extends JScrollablePanel {
             lblExtraIncome.setToolTipText(wordWrap(resourceMap.getString("lblExtraIncome.tooltip")));
         }
 
-        JLabel lblReputation = null;
-        int baseReputation = person.getReputation();
-        int adjustedReputation = person.getAdjustedReputation(campaignOptions.isUseAgeEffects(),
+        JLabel lblFame = null;
+        int baseFame = person.getFame();
+        int adjustedFame = person.getAdjustedFame(campaignOptions.get(CampaignOption.USE_AGE_EFFECTS),
               campaign.isClanCampaign(),
-              campaign.getLocalDate(),
-              person.getRankNumeric());
-        if (baseReputation != 0 || adjustedReputation != 0) {
-            String adjustment = getTraitAdjustmentIcon(baseReputation, adjustedReputation);
-            String reputationLabel = String.format(resourceMap.getString("format.traitValue"),
-                  resourceMap.getString("lblReputation.text"),
-                  adjustedReputation,
+              campaign.getLocalDate());
+        if (baseFame != 0 || adjustedFame != 0) {
+            String adjustment = getTraitAdjustmentIcon(baseFame, adjustedFame);
+            String fameLabel = String.format(resourceMap.getString("format.traitValue"),
+                  resourceMap.getString("lblFame.text"),
+                  adjustedFame,
                   adjustment);
-            lblReputation = new JLabel(reputationLabel);
-            lblReputation.setToolTipText(wordWrap(String.format(resourceMap.getString("lblReputation.tooltip"),
-                  baseReputation,
-                  adjustedReputation)));
+            lblFame = new JLabel(fameLabel);
+            lblFame.setToolTipText(wordWrap(String.format(resourceMap.getString("lblFame.tooltip"),
+                  baseFame,
+                  adjustedFame)));
         }
 
         JLabel lblToughness = null;
@@ -2748,8 +2845,8 @@ public class PersonViewPanel extends JScrollablePanel {
         if (lblExtraIncome != null) {
             components.add(lblExtraIncome);
         }
-        if (lblReputation != null) {
-            components.add(lblReputation);
+        if (lblFame != null) {
+            components.add(lblFame);
         }
         if (lblToughness != null) {
             components.add(lblToughness);

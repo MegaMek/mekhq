@@ -58,6 +58,7 @@ import java.util.List;
 
 import megamek.common.compute.Compute;
 import mekhq.campaign.Campaign;
+import mekhq.campaign.campaignOptions.CampaignOption;
 import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.finances.Money;
 import mekhq.campaign.finances.enums.TransactionType;
@@ -87,7 +88,7 @@ class PrisonerMissionEndEventTest {
         when(campaignFaction.getShortName()).thenReturn("MERC");
 
         LocalDate today = LocalDate.of(3151, 1, 1);
-        when(mockCampaign.getPlayerForce().getDateOfLastCrime()).thenReturn(null);
+        when(mockCampaign.getPlayerForce().getCampOpsDateOfLastCrime()).thenReturn(null);
 
         AtBContract contract = new AtBContract("TEST");
         contract.setStartDate(today.minusYears(1));
@@ -114,7 +115,7 @@ class PrisonerMissionEndEventTest {
         when(campaignFaction.getShortName()).thenReturn("MERC");
 
         LocalDate today = LocalDate.of(3151, 1, 1);
-        when(mockCampaign.getPlayerForce().getDateOfLastCrime()).thenReturn(today);
+        when(mockCampaign.getPlayerForce().getCampOpsDateOfLastCrime()).thenReturn(today);
 
         AtBContract contract = new AtBContract("TEST");
         contract.setStartDate(today.minusYears(1));
@@ -142,7 +143,7 @@ class PrisonerMissionEndEventTest {
         when(campaignFaction.getShortName()).thenReturn("MERC");
 
         LocalDate today = LocalDate.of(3151, 1, 1);
-        when(mockCampaign.getPlayerForce().getDateOfLastCrime()).thenReturn(today);
+        when(mockCampaign.getPlayerForce().getCampOpsDateOfLastCrime()).thenReturn(today);
 
         AtBContract contract = new AtBContract("TEST");
         contract.setStartDate(today.minusYears(1));
@@ -285,6 +286,9 @@ class PrisonerMissionEndEventTest {
     void testExecutePrisoners_crimeNoticed_appliesNegativePenaltyAndRecordsDate() {
         // Setup
         Campaign mockCampaign = mockCampaign();
+        CampaignOptions campaignOptions = new CampaignOptions();
+        campaignOptions.set(CampaignOption.USE_CHAOS_REPUTATION, false);
+        when(mockCampaign.getCampaignOptions()).thenReturn(campaignOptions);
         LocalDate today = LocalDate.of(3151, 1, 1);
         when(mockCampaign.getLocalDate()).thenReturn(today);
         AtBContract contract = new AtBContract("TEST");
@@ -300,13 +304,16 @@ class PrisonerMissionEndEventTest {
 
         // Assert — penalty = min(MAX_CRIME_PENALTY, 3 * 2) = 6
         verify(mockCampaign.getPlayerForce()).changeCrimeRating(-6);
-        verify(mockCampaign.getPlayerForce()).setDateOfLastCrime(today);
+        verify(mockCampaign.getPlayerForce()).setCampOpsDateOfLastCrime(today);
     }
 
     @Test
     void testExecutePrisoners_crimeNoticed_penaltyCappedAtMaximum() {
         // Setup
         Campaign mockCampaign = mockCampaign();
+        CampaignOptions campaignOptions = new CampaignOptions();
+        campaignOptions.set(CampaignOption.USE_CHAOS_REPUTATION, false);
+        when(mockCampaign.getCampaignOptions()).thenReturn(campaignOptions);
         when(mockCampaign.getLocalDate()).thenReturn(LocalDate.of(3151, 1, 1));
         AtBContract contract = new AtBContract("TEST");
         PrisonerMissionEndEvent endEvent = new PrisonerMissionEndEvent(mockCampaign, contract);
@@ -330,6 +337,9 @@ class PrisonerMissionEndEventTest {
     void testExecutePrisoners_crimeUnnoticed_doesNotChangeCrimeRating() {
         // Setup
         Campaign mockCampaign = mockCampaign();
+        CampaignOptions campaignOptions = new CampaignOptions();
+        campaignOptions.set(CampaignOption.USE_CHAOS_REPUTATION, false);
+        when(mockCampaign.getCampaignOptions()).thenReturn(campaignOptions);
         when(mockCampaign.getLocalDate()).thenReturn(LocalDate.of(3151, 1, 1));
         AtBContract contract = new AtBContract("TEST");
         PrisonerMissionEndEvent endEvent = new PrisonerMissionEndEvent(mockCampaign, contract);

@@ -59,10 +59,12 @@ import megamek.common.icons.Portrait;
 import megamek.logging.MMLogger;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
+import mekhq.campaign.campaignOptions.CampaignOption;
 import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.enums.PersonnelRole;
 import mekhq.campaign.personnel.enums.Profession;
+import mekhq.campaign.reputation.chaosReputation.ChaosReputation;
 import mekhq.gui.CampaignGUI;
 import mekhq.gui.displayWrappers.RankDisplay;
 
@@ -397,6 +399,20 @@ public class HireBulkPersonnelDialog extends JDialog {
             // We need to override Veterancy eligibility to factor in any fixed experience level generation that
             // might have occurred via GM Mode or age restrictions.
             setVeterancyAwardEligibility(campaign, person);
+
+            // Per-character starting reputation only matters under personnel tracking; campaign-level tracking uses a
+            // single stored value, so there is nothing to seed per character.
+            boolean applyStartingReputation = campaignOptions.get(CampaignOption.USE_CHAOS_REPUTATION) &&
+                                                    !campaignOptions.get(CampaignOption.CAMPAIGN_LEVEL_CHAOS_REPUTATION) &&
+                                                    campaignOptions.get(CampaignOption.CHAOS_NEW_RECRUITS_HAVE_REPUTATION);
+            if (applyStartingReputation) {
+                ChaosReputation.applyStartingReputation(campaignOptions,
+                      campaign.getPlayerForce().isClanForce(),
+                      today,
+                      person);
+                ChaosReputation.applyStartingCriminalRecord(today, person);
+            }
+
 
             if (!campaign.getPlayerForce().getHumanResources().recruitPerson(campaign, person, isGmHire, true)) {
                 number = 0;

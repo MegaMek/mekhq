@@ -811,7 +811,7 @@ public class CustomizePersonDialog extends JDialog implements DialogOptionListen
         lblReputation.setText(resourceMap.getString("lblReputation.text"));
         lblReputation.setName("lblReputation");
 
-        textReputation.setText(Integer.toString(person.getReputation()));
+        textReputation.setText(Integer.toString(person.getFame()));
         textReputation.setName("textReputation");
 
         gridBagConstraints = new GridBagConstraints();
@@ -1907,9 +1907,9 @@ public class CustomizePersonDialog extends JDialog implements DialogOptionListen
         newValue = MathUtility.parseInt(textWealth.getText(), currentValue);
         person.setWealth(Math.clamp(newValue, MINIMUM_WEALTH, MAXIMUM_WEALTH));
 
-        currentValue = person.getReputation();
+        currentValue = person.getFame();
         newValue = MathUtility.parseInt(textReputation.getText(), currentValue);
-        person.setReputation(Math.clamp(newValue, MINIMUM_REPUTATION, MAXIMUM_REPUTATION));
+        person.setFame(Math.clamp(newValue, MINIMUM_FAME, MAXIMUM_FAME));
 
         currentValue = person.getUnlucky();
         newValue = MathUtility.parseInt(textUnlucky.getText(), currentValue);

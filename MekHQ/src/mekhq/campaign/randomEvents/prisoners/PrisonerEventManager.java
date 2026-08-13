@@ -60,16 +60,18 @@ import megamek.common.compute.Compute;
 import megamek.common.units.Entity;
 import megamek.logging.MMLogger;
 import mekhq.campaign.Campaign;
+import mekhq.campaign.campaignOptions.CampaignOption;
 import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.force.Formation;
 import mekhq.campaign.mission.AtBContract;
-import mekhq.campaign.mission.enums.AtBMoraleLevel;
+import mekhq.campaign.mission.enums.ContractMoraleLevel;
 import mekhq.campaign.mission.rentals.ContractRentalType;
 import mekhq.campaign.mission.rentals.FacilityRentals;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.randomEvents.prisoners.prisonerEvents.PrisonEscapeScenario;
 import mekhq.campaign.randomEvents.randomEventsSystem.RandomEventData;
 import mekhq.campaign.randomEvents.randomEventsSystem.RandomEventEffectsManager;
+import mekhq.campaign.reputation.chaosReputation.ChaosReputation;
 import mekhq.campaign.unit.Unit;
 import mekhq.campaign.universe.factionStanding.FactionStandings;
 import mekhq.gui.dialog.PrisonerIntelBreachDialog;
@@ -202,12 +204,23 @@ public class PrisonerEventManager {
         int crimeNoticeRoll = Compute.randomInt(100);
         boolean crimeNoticed = crimeNoticeRoll < victims;
 
-        int penalty = min(MAX_CRIME_PENALTY, victims * 2);
-        if (crimeNoticed) {
-            int change = -penalty;
-            campaign.getPlayerForce().changeCrimeRating(change);
-            LocalDate dateOfLastCrime = campaign.getLocalDate();
-            campaign.getPlayerForce().setDateOfLastCrime(dateOfLastCrime);
+        int penalty;
+        CampaignOptions campaignOptions = campaign.getCampaignOptions();
+        boolean isUseChaosReputation = campaignOptions.get(CampaignOption.USE_CHAOS_REPUTATION);
+        boolean isUseCampaignReputationTracking = campaignOptions.get(CampaignOption.CAMPAIGN_LEVEL_CHAOS_REPUTATION);
+        if (isUseChaosReputation) {
+            penalty = ChaosReputation.getPrisonerExecutionPenalty(campaign.getPlayerForce(),
+                  victims,
+                  crimeNoticed,
+                  isUseCampaignReputationTracking);
+        } else {
+            penalty = min(MAX_CRIME_PENALTY, victims * 2);
+            if (crimeNoticed) {
+                int change = -penalty;
+                campaign.getPlayerForce().changeCrimeRating(change);
+                LocalDate dateOfLastCrime = campaign.getLocalDate();
+                campaign.getPlayerForce().setCampOpsDateOfLastCrime(dateOfLastCrime);
+            }
         }
 
         // Build the report
@@ -441,14 +454,14 @@ public class PrisonerEventManager {
                             prisonerCapacity += isMekHQCaptureStyle ?
                                                       PRISONER_CAPACITY_BATTLE_ARMOR :
                                                       PRISONER_CAPACITY_BATTLE_ARMOR *
-                                                      PRISONER_CAPACITY_CAM_OPS_MULTIPLIER;
+                                                            PRISONER_CAPACITY_CAM_OPS_MULTIPLIER;
                         }
                     }
 
                     prisonerCapacity += unit.getTotalTempCrew() * (isMekHQCaptureStyle ?
                                                                          PRISONER_CAPACITY_BATTLE_ARMOR :
                                                                          PRISONER_CAPACITY_BATTLE_ARMOR *
-                                                                         PRISONER_CAPACITY_CAM_OPS_MULTIPLIER);
+                                                                               PRISONER_CAPACITY_CAM_OPS_MULTIPLIER);
 
                     continue;
                 }
@@ -459,14 +472,14 @@ public class PrisonerEventManager {
                             prisonerCapacity += isMekHQCaptureStyle ?
                                                       PRISONER_CAPACITY_CONVENTIONAL_INFANTRY :
                                                       PRISONER_CAPACITY_CONVENTIONAL_INFANTRY *
-                                                      PRISONER_CAPACITY_CAM_OPS_MULTIPLIER;
+                                                            PRISONER_CAPACITY_CAM_OPS_MULTIPLIER;
                         }
                     }
 
                     prisonerCapacity += unit.getTotalTempCrew() * (isMekHQCaptureStyle ?
                                                                          PRISONER_CAPACITY_CONVENTIONAL_INFANTRY :
                                                                          PRISONER_CAPACITY_CONVENTIONAL_INFANTRY *
-                                                                         PRISONER_CAPACITY_CAM_OPS_MULTIPLIER);
+                                                                               PRISONER_CAPACITY_CAM_OPS_MULTIPLIER);
 
                     continue;
                 }
@@ -502,7 +515,8 @@ public class PrisonerEventManager {
      *
      * <p>If at least one breach occurs, the selected contract’s morale level is improved by the number of breaches,
      * and a corresponding {@link PrisonerIntelBreachDialog} is displayed to the user. Contracts at
-     * {@link AtBMoraleLevel#OVERWHELMING} or {@link AtBMoraleLevel#ROUTED} morale are excluded from selection.</p>
+     * {@link ContractMoraleLevel#OVERWHELMING} or {@link ContractMoraleLevel#ROUTED} morale are excluded from
+     * selection.</p>
      *
      * @param campaign           the {@link Campaign} context in which the event occurs
      * @param freedPrisonerCount the total number of prisoners freed by the player
@@ -528,8 +542,8 @@ public class PrisonerEventManager {
 
         if (hadIntelBreach) {
             AtBContract relevantContract = ObjectUtility.getRandomItem(activeContracts);
-            AtBMoraleLevel oldMorale = relevantContract.getMoraleLevel();
-            AtBMoraleLevel newMorale = relevantContract.changeMoraleLevel(1);
+            ContractMoraleLevel oldMorale = relevantContract.getMoraleLevel();
+            ContractMoraleLevel newMorale = relevantContract.changeMoraleLevel(1);
 
             new PrisonerIntelBreachDialog(campaign, relevantContract, oldMorale, newMorale);
         }

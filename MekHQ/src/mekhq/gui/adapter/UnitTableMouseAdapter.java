@@ -57,6 +57,7 @@ import java.io.FileOutputStream;
 import java.io.OutputStream;
 import java.io.PrintStream;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 import java.util.ResourceBundle;
@@ -144,6 +145,7 @@ import mekhq.gui.menus.AssignUnitToForceMenu;
 import mekhq.gui.menus.AssignUnitToPersonMenu;
 import mekhq.gui.menus.ExportUnitSpriteMenu;
 import mekhq.gui.menus.LocationMenu;
+import mekhq.gui.menus.TransportAssignmentMenus;
 import mekhq.gui.model.UnitTableModel;
 import mekhq.gui.utilities.JMenuHelpers;
 import mekhq.gui.utilities.StaticChecks;
@@ -1367,6 +1369,10 @@ public class UnitTableMouseAdapter extends JPopupMenuAdapter {
 
                 popup.add(new ExportUnitSpriteMenu(gui.getFrame(), gui.getCampaign(), unit));
             }
+
+            // transport assignment (ship / tactical / tow), same actions as the TO&E tab
+            TransportAssignmentMenus.addTransportMenus(gui.getFrame(), popup, gui.getCampaign(),
+                  Arrays.asList(units));
 
             // sell unit
             if (!allDeployed && gui.getCampaign().getCampaignOptions().isSellUnits()) {

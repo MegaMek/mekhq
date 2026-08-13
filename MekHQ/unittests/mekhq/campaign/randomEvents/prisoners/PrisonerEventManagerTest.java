@@ -36,7 +36,7 @@ import static java.lang.Math.max;
 import static java.lang.Math.min;
 import static java.lang.Math.round;
 import static mekhq.campaign.force.FormationType.SECURITY;
-import static mekhq.campaign.mission.enums.AtBMoraleLevel.STALEMATE;
+import static mekhq.campaign.mission.enums.ContractMoraleLevel.STALEMATE;
 import static mekhq.campaign.randomEvents.prisoners.PrisonerEventManager.*;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
@@ -59,11 +59,12 @@ import java.util.Vector;
 
 import megamek.common.compute.Compute;
 import mekhq.campaign.Campaign;
+import mekhq.campaign.campaignOptions.CampaignOption;
 import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.force.Formation;
 import mekhq.campaign.force.PlayerForce;
 import mekhq.campaign.mission.AtBContract;
-import mekhq.campaign.mission.enums.AtBMoraleLevel;
+import mekhq.campaign.mission.enums.ContractMoraleLevel;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.unit.Unit;
 import mekhq.campaign.universe.Faction;
@@ -997,6 +998,10 @@ public class PrisonerEventManagerTest {
         private Campaign newCampaign() {
             Campaign campaign = mockCampaign();
             when(campaign.getLocalDate()).thenReturn(TODAY);
+            // Chaos Reputation disabled so the CamOps crime-rating path is exercised.
+            CampaignOptions campaignOptions = new CampaignOptions();
+            campaignOptions.set(CampaignOption.USE_CHAOS_REPUTATION, false);
+            when(campaign.getCampaignOptions()).thenReturn(campaignOptions);
             return campaign;
         }
 
@@ -1046,7 +1051,7 @@ public class PrisonerEventManagerTest {
             }
 
             verify(playerForce).changeCrimeRating(-(victims * 2));
-            verify(playerForce).setDateOfLastCrime(TODAY);
+            verify(playerForce).setCampOpsDateOfLastCrime(TODAY);
         }
 
         @Test
@@ -1101,7 +1106,7 @@ public class PrisonerEventManagerTest {
             return mockCampaign;
         }
 
-        private AtBContract contractWithMorale(AtBMoraleLevel morale) {
+        private AtBContract contractWithMorale(ContractMoraleLevel morale) {
             AtBContract contract = new AtBContract("TEST");
             contract.setMoraleLevel(morale);
             return contract;
@@ -1119,13 +1124,13 @@ public class PrisonerEventManagerTest {
         @Test
         void allContractsOverwhelmingOrRouted_filteredOut_noBreach() {
             Campaign campaign = campaignWithCaptureStyle(PrisonerCaptureStyle.MEKHQ);
-            AtBContract contract = contractWithMorale(AtBMoraleLevel.OVERWHELMING);
+            AtBContract contract = contractWithMorale(ContractMoraleLevel.OVERWHELMING);
             when(campaign.getActiveAtBContracts()).thenReturn(new ArrayList<>(List.of(contract)));
 
             PrisonerEventManager.checkForIntelBreachEvent(campaign, 5);
 
             // The only candidate contract is filtered out, so no breach can occur and morale is unchanged.
-            assertEquals(AtBMoraleLevel.OVERWHELMING, contract.getMoraleLevel());
+            assertEquals(ContractMoraleLevel.OVERWHELMING, contract.getMoraleLevel());
         }
 
         @Test

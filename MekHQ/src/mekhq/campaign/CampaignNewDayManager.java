@@ -109,6 +109,7 @@ import megamek.logging.MMLogger;
 import mekhq.MHQOptions;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign.AdministratorSpecialization;
+import mekhq.campaign.campaignOptions.CampaignOption;
 import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.digitalGM.stratCon.StratConCampaignState;
 import mekhq.campaign.digitalGM.stratCon.StratConCoords;
@@ -136,7 +137,7 @@ import mekhq.campaign.mission.Contract;
 import mekhq.campaign.mission.Mission;
 import mekhq.campaign.mission.Scenario;
 import mekhq.campaign.mission.atb.AtBScenarioFactory;
-import mekhq.campaign.mission.enums.AtBMoraleLevel;
+import mekhq.campaign.mission.enums.ContractMoraleLevel;
 import mekhq.campaign.mission.enums.ScenarioStatus;
 import mekhq.campaign.mission.enums.ScenarioType;
 import mekhq.campaign.mission.rentals.ContractRentalType;
@@ -184,6 +185,7 @@ import mekhq.campaign.randomEvents.other.RiotScenario;
 import mekhq.campaign.randomEvents.other.VoiceOfKerensky;
 import mekhq.campaign.randomEvents.prisoners.PrisonerEventManager;
 import mekhq.campaign.randomEvents.prisoners.RecoverMIAPersonnel;
+import mekhq.campaign.reputation.chaosReputation.ChaosReputation;
 import mekhq.campaign.unit.Maintenance;
 import mekhq.campaign.unit.Unit;
 import mekhq.campaign.universe.Faction;
@@ -581,7 +583,11 @@ public class CampaignNewDayManager {
             processNewDayATB();
         }
 
-        processReputationChanges();
+        if (campaignOptions.get(CampaignOption.USE_CHAOS_REPUTATION)) {
+            ChaosReputation.processChaosCampaignReputationChanges(campaignOptions, campaign.getPlayerForce(), today);
+        } else {
+            processCamOpsReputationChanges();
+        }
 
         if (campaignOptions.isUseEducationModule()) {
             processEducationNewDay();
@@ -1207,10 +1213,10 @@ public class CampaignNewDayManager {
              * First of the month; roll Morale.
              */
             for (AtBContract contract : campaign.getActiveAtBContracts()) {
-                AtBMoraleLevel oldMorale = contract.getMoraleLevel();
+                ContractMoraleLevel oldMorale = contract.getMoraleLevel();
 
                 contract.checkMorale(campaign, today);
-                AtBMoraleLevel newMorale = contract.getMoraleLevel();
+                ContractMoraleLevel newMorale = contract.getMoraleLevel();
 
                 String report = "";
                 if (contract.isPeaceful()) {
@@ -1343,14 +1349,14 @@ public class CampaignNewDayManager {
     /**
      * Processes reputation changes based on various conditions.
      */
-    private void processReputationChanges() {
+    private void processCamOpsReputationChanges() {
         if (faction.isPirate()) {
-            campaign.getPlayerForce().setDateOfLastCrime(today);
-            campaign.getPlayerForce().setCrimePirateModifier(-100);
+            campaign.getPlayerForce().setCampOpsDateOfLastCrime(today);
+            campaign.getPlayerForce().setCampOpsCrimePirateModifier(-100);
         }
 
-        LocalDate dateOfLastCrime = campaign.getPlayerForce().getDateOfLastCrime();
-        int crimePirateModifier = campaign.getPlayerForce().getCrimePirateModifier();
+        LocalDate dateOfLastCrime = campaign.getPlayerForce().getCampOpsDateOfLastCrime();
+        int crimePirateModifier = campaign.getPlayerForce().getCampOpsCrimePirateModifier();
 
         if (today.getDayOfMonth() == 1) {
             if (dateOfLastCrime != null) {
@@ -1373,7 +1379,7 @@ public class CampaignNewDayManager {
         }
 
         if (today.getDayOfWeek().equals(DayOfWeek.MONDAY)) {
-            campaign.getPlayerForce().getReputation().initializeReputation(campaign);
+            campaign.getPlayerForce().getCamOpsReputation().initializeReputation(campaign);
         }
     }
 
@@ -2029,7 +2035,11 @@ public class CampaignNewDayManager {
         int score = 0;
 
         if (person.getPrimaryRole().isSupport(true)) {
-            int dice = person.getExperienceLevel(campaign, false);
+            int dice = person.getExperienceLevel(campaign.getCampaignOptions(),
+                  campaign.getPlayerForce().isClanForce(),
+                  campaign.getLocalDate(),
+                  false,
+                  false);
 
             if (dice > 0) {
                 score = d6(dice);
@@ -2039,7 +2049,11 @@ public class CampaignNewDayManager {
         }
 
         if (person.getSecondaryRole().isSupport(true)) {
-            int dice = person.getExperienceLevel(campaign, true);
+            int dice = person.getExperienceLevel(campaign.getCampaignOptions(),
+                  campaign.getPlayerForce().isClanForce(),
+                  campaign.getLocalDate(),
+                  true,
+                  false);
 
             if (dice > 0) {
                 score += d6(dice);

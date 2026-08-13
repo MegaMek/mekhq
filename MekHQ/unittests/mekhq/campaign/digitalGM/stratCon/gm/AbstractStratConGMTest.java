@@ -59,7 +59,7 @@ import mekhq.campaign.digitalGM.stratCon.StratConScenario;
 import mekhq.campaign.digitalGM.stratCon.StratConTrackState;
 import mekhq.campaign.events.NewDayEvent;
 import mekhq.campaign.mission.AtBContract;
-import mekhq.campaign.mission.enums.AtBMoraleLevel;
+import mekhq.campaign.mission.enums.ContractMoraleLevel;
 import org.junit.jupiter.api.Test;
 
 /**
@@ -137,7 +137,7 @@ class AbstractStratConGMTest {
         return scenario;
     }
 
-    private static AtBContract contractWith(StratConCampaignState campaignState, AtBMoraleLevel morale) {
+    private static AtBContract contractWith(StratConCampaignState campaignState, ContractMoraleLevel morale) {
         AtBContract contract = mock(AtBContract.class);
         when(contract.getStratConCampaignState()).thenReturn(campaignState);
         when(contract.getMoraleLevel()).thenReturn(morale);
@@ -167,7 +167,7 @@ class AbstractStratConGMTest {
         StratConTrackState track1 = trackWith();
         StratConTrackState track2 = trackWith();
         StratConCampaignState campaignState = campaignStateWith(List.of(track1, track2), new ArrayList<>());
-        AtBContract contract = contractWith(campaignState, AtBMoraleLevel.STALEMATE);
+        AtBContract contract = contractWith(campaignState, ContractMoraleLevel.STALEMATE);
         TestGM gm = new TestGM(false);
 
         gm.handleNewDay(newDay(MONDAY, contract));
@@ -189,7 +189,7 @@ class AbstractStratConGMTest {
         StratConTrackState track1 = trackWith();
         StratConTrackState track2 = trackWith();
         StratConCampaignState campaignState = campaignStateWith(List.of(track1, track2), new ArrayList<>());
-        AtBContract contract = contractWith(campaignState, AtBMoraleLevel.STALEMATE);
+        AtBContract contract = contractWith(campaignState, ContractMoraleLevel.STALEMATE);
         TestGM gm = new TestGM(true);
 
         gm.handleNewDay(newDay(MONDAY, contract));
@@ -203,7 +203,7 @@ class AbstractStratConGMTest {
     void nonMondayDoesNotGenerateWeeklyDates() {
         StratConTrackState track = trackWith();
         StratConCampaignState campaignState = campaignStateWith(List.of(track), new ArrayList<>());
-        AtBContract contract = contractWith(campaignState, AtBMoraleLevel.STALEMATE);
+        AtBContract contract = contractWith(campaignState, ContractMoraleLevel.STALEMATE);
         TestGM gm = new TestGM(false);
 
         gm.handleNewDay(newDay(TUESDAY, contract));
@@ -216,7 +216,7 @@ class AbstractStratConGMTest {
         StratConTrackState track1 = trackWith();
         StratConTrackState track2 = trackWith();
         StratConCampaignState campaignState = campaignStateWith(List.of(track1, track2), new ArrayList<>());
-        AtBContract contract = contractWith(campaignState, AtBMoraleLevel.STALEMATE);
+        AtBContract contract = contractWith(campaignState, ContractMoraleLevel.STALEMATE);
         TestGM gm = new TestGM(false);
 
         gm.handleNewDay(newDay(TUESDAY, contract));
@@ -234,7 +234,7 @@ class AbstractStratConGMTest {
         StratConScenario future = scenario(TUESDAY.plusDays(5), false);
         StratConTrackState track = trackWith(expired, expiredButCommitted, future);
         StratConCampaignState campaignState = campaignStateWith(List.of(track), new ArrayList<>());
-        AtBContract contract = contractWith(campaignState, AtBMoraleLevel.STALEMATE);
+        AtBContract contract = contractWith(campaignState, ContractMoraleLevel.STALEMATE);
         TestGM gm = new TestGM(false);
 
         gm.handleNewDay(newDay(TUESDAY, contract));
@@ -250,7 +250,7 @@ class AbstractStratConGMTest {
         // today scheduled twice -> scenarioCount == 2
         StratConCampaignState campaignState = campaignStateWith(List.of(track),
               new ArrayList<>(List.of(TUESDAY, TUESDAY)));
-        AtBContract contract = contractWith(campaignState, AtBMoraleLevel.STALEMATE);
+        AtBContract contract = contractWith(campaignState, ContractMoraleLevel.STALEMATE);
         TestGM gm = new TestGM(false);
 
         gm.handleNewDay(newDay(TUESDAY, contract));
@@ -263,7 +263,7 @@ class AbstractStratConGMTest {
         StratConTrackState track = trackWith();
         StratConCampaignState campaignState = campaignStateWith(List.of(track),
               new ArrayList<>(List.of(TUESDAY)));
-        AtBContract contract = contractWith(campaignState, AtBMoraleLevel.ROUTED);
+        AtBContract contract = contractWith(campaignState, ContractMoraleLevel.ROUTED);
         TestGM gm = new TestGM(false);
 
         gm.handleNewDay(newDay(TUESDAY, contract));
@@ -276,7 +276,7 @@ class AbstractStratConGMTest {
 
     @Test
     void contractWithoutCampaignStateIsSkipped() {
-        AtBContract contract = contractWith(null, AtBMoraleLevel.STALEMATE);
+        AtBContract contract = contractWith(null, ContractMoraleLevel.STALEMATE);
         TestGM gm = new TestGM(false);
 
         gm.handleNewDay(newDay(MONDAY, contract));
