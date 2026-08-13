@@ -39,6 +39,7 @@ import java.io.BufferedOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
+import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
@@ -420,9 +421,9 @@ public class CampaignPreset {
     }
 
     // region File I/O
-    public void writeToFile(final JFrame frame, @Nullable File file) {
+    public boolean writeToFile(final @Nullable JFrame frame, @Nullable File file) {
         if (file == null) {
-            return;
+            return false;
         }
 
         String path = file.getPath();
@@ -436,14 +437,21 @@ public class CampaignPreset {
               OutputStreamWriter osw = new OutputStreamWriter(bos, StandardCharsets.UTF_8);
               PrintWriter pw = new PrintWriter(osw)) {
             writeToXML(pw, 0);
+            if (pw.checkError()) {
+                throw new IOException("Failed to write campaign preset to " + file);
+            }
+            return true;
         } catch (Exception ex) {
             LOGGER.error("writeToFile() Exception", ex);
-            final ResourceBundle resources = ResourceBundle.getBundle("mekhq.resources.Campaign",
-                  MekHQ.getMHQOptions().getLocale());
-            JOptionPane.showMessageDialog(frame,
-                  resources.getString("CampaignPresetSaveFailure.text"),
-                  resources.getString("CampaignPresetSaveFailure.title"),
-                  JOptionPane.ERROR_MESSAGE);
+            if (frame != null) {
+                final ResourceBundle resources = ResourceBundle.getBundle("mekhq.resources.Campaign",
+                      MekHQ.getMHQOptions().getLocale());
+                JOptionPane.showMessageDialog(frame,
+                      resources.getString("CampaignPresetSaveFailure.text"),
+                      resources.getString("CampaignPresetSaveFailure.title"),
+                      JOptionPane.ERROR_MESSAGE);
+            }
+            return false;
         }
     }
 

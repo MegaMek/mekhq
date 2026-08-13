@@ -33,6 +33,7 @@
 package mekhq;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.io.IOException;
@@ -94,5 +95,23 @@ class CampaignPresetTest {
         assertTrue(CampaignPreset.getCampaignPresetsMetadata()
                          .stream()
                          .anyMatch(preset -> presetFile.toFile().equals(preset.getPresetFile())));
+    }
+
+    @Test
+    void writeToFileReportsFailureForInvalidDestination(final @TempDir Path temporaryDirectory) throws IOException {
+        final Path parentFile = temporaryDirectory.resolve("not-a-directory");
+        Files.writeString(parentFile, "blocking file", StandardCharsets.UTF_8);
+        final Path presetFile = parentFile.resolve("Campaign Preset.xml");
+
+        assertFalse(new CampaignPreset().writeToFile(null, presetFile.toFile()));
+        assertFalse(Files.exists(presetFile));
+    }
+
+    @Test
+    void writeToFileReportsSuccess(final @TempDir Path temporaryDirectory) {
+        final Path presetFile = temporaryDirectory.resolve("Campaign Preset.xml");
+
+        assertTrue(new CampaignPreset().writeToFile(null, presetFile.toFile()));
+        assertTrue(Files.isRegularFile(presetFile));
     }
 }

@@ -301,7 +301,9 @@ public class CampaignOptionsDialog extends AbstractButtonDialog {
             }
 
             campaignOptionsPane.applyCampaignOptionsToCampaign(preset, mode, true);
-            preset.writeToFile(getFrame(), presetFile);
+            if (!preset.writeToFile(getFrame(), presetFile)) {
+                return;
+            }
             showSavePresetSuccessDialog(preset, presetFile.getParentFile(), presetFile);
             return;
         }
