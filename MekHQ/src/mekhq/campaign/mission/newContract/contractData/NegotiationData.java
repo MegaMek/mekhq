@@ -46,7 +46,7 @@ import mekhq.campaign.mission.newContract.contractGeneration.negotiationsAndNPCs
  * enforce the per-term cap and reputation/swap limits across sessions.</p>
  *
  * <p>The {@code funding} lists are in canonical clause order - pay, support, transport, salvage, command - matching
- * {@link ContractTermsData; each inner list holds one {@link TermFunding} entry per step that clause was raised.</p>
+ * {@link ContractTermsData}; each inner list holds one {@link TermFunding} entry per step that clause was raised.</p>
  *
  * @author Illiani
  * @since 0.51.01

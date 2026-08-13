@@ -45,10 +45,10 @@ import mekhq.campaign.unit.Unit;
 public class ChaosContractDeterminationScale {
     private final static double BATTLE_VALUE_PER_SCALE = 4_500.0; // Draconis Reach first printing pg 36
 
-    static int generateScaleForDetachment(PlayerForce playerForce, LocalHangar hanger, boolean isCadreDuty) {
+    static int generateScaleForDetachment(PlayerForce playerForce, LocalHangar hangar, boolean isCadreDuty) {
         int validBattleValue = 0;
 
-        for (Unit unit : hanger.getUnits()) {
+        for (Unit unit : hangar.getUnits()) {
             int formationId = unit.getFormationId();
             Formation formation = playerForce.getFormation(formationId);
             if (formation != null) {

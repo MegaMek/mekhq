@@ -44,6 +44,7 @@ import java.util.stream.Collectors;
 import jakarta.annotation.Nullable;
 import megamek.Version;
 import megamek.client.ui.util.PlayerColour;
+import megamek.codeUtilities.MathUtility;
 import megamek.common.enums.SkillLevel;
 import megamek.common.icons.Camouflage;
 import megamek.logging.MMLogger;
@@ -805,7 +806,7 @@ public final class ContractXmlCodec {
     }
 
     private static int parseInt(final Node node) {
-        return Integer.parseInt(text(node));
+        return MathUtility.parseInt(text(node));
     }
     // endregion Read
 }
