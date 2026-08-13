@@ -148,7 +148,11 @@ public class AbstractContractGeneration {
         // Step 9: Final Tasks
         performFinalTasks(campaign, currentDate, contract, currentLocation);
 
-        // Step 10: Return the Contract
+        // Step 10: Difficulty estimate (cached; enemy force and skill are finalized by this point)
+        contract.setCachedContractDifficulty(
+              ChaosContractDeterminationDifficulty.calculateContractDifficulty(campaign, contract));
+
+        // Step 11: Return the Contract
         return contract;
     }
 

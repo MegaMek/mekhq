@@ -1,272 +1,622 @@
+/*
+ * Copyright (C) 2026 The MegaMek Team. All Rights Reserved.
+ *
+ * This file is part of MekHQ.
+ *
+ * MekHQ is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License (GPL),
+ * version 3 or (at your option) any later version,
+ * as published by the Free Software Foundation.
+ *
+ * MekHQ is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty
+ * of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+ * See the GNU General Public License for more details.
+ *
+ * A copy of the GPL should have been included with this project;
+ * if not, see <https://www.gnu.org/licenses/>.
+ *
+ * NOTICE: The MegaMek organization is a non-profit group of volunteers
+ * creating free software for the BattleTech community.
+ *
+ * MechWarrior, BattleMech, `Mech and AeroTech are registered trademarks
+ * of The Topps Company, Inc. All Rights Reserved.
+ *
+ * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
+ * InMediaRes Productions, LLC.
+ *
+ * MechWarrior Copyright Microsoft Corporation. MekHQ was created under
+ * Microsoft's "Game Content Usage Rules"
+ * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+ * affiliated with Microsoft.
+ */
 package mekhq.gui.dialog.markets.contractMarket;
 
 import static megamek.client.ui.util.UIUtil.scaleForGUI;
-import static mekhq.campaign.mission.newContract.contractData.ChaosContractStepsTable.CHAOS_CONTRACT_MAXIMUM_STEP_VALUE;
-import static mekhq.campaign.mission.newContract.contractData.ChaosContractStepsTable.CHAOS_CONTRACT_MINIMUM_STEP_VALUE;
-import static mekhq.campaign.mission.newContract.contractGeneration.AbstractContractGeneration.createContract;
+import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
+import static mekhq.utilities.MHQInternationalization.getTextAt;
 
+import java.awt.BorderLayout;
+import java.awt.Component;
+import java.awt.Dimension;
+import java.awt.FlowLayout;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
-import java.awt.Insets;
+import java.awt.LayoutManager;
+import java.awt.Rectangle;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
-import javax.swing.JLabel;
-import javax.swing.JPanel;
-import javax.swing.JSpinner;
-import javax.swing.SpinnerNumberModel;
+import javax.swing.*;
 
-import mekhq.campaign.AbstractLocation;
+import megamek.client.ui.comboBoxes.MMComboBox;
+import megamek.client.ui.preferences.JWindowPreference;
+import megamek.client.ui.preferences.PreferencesNode;
+import megamek.common.ui.FastJScrollPane;
+import megamek.logging.MMLogger;
+import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
-import mekhq.campaign.ForceHumanResources;
 import mekhq.campaign.campaignOptions.CampaignOptions;
-import mekhq.campaign.finances.Money;
 import mekhq.campaign.force.Detachment;
 import mekhq.campaign.force.PlayerForce;
 import mekhq.campaign.mission.newContract.AbstractContract;
-import mekhq.campaign.mission.newContract.contractData.ChaosContractStepsTable;
+import mekhq.campaign.mission.newContract.contractGeneration.AbstractContractGeneration;
 import mekhq.campaign.mission.newContract.contractGeneration.ContractSearchType;
-import mekhq.campaign.mission.newContract.contractGeneration.ContractTermsData;
-import mekhq.campaign.mission.newContract.contractGeneration.targetFinder.ChaosContractPayDetermination;
-import mekhq.campaign.personnel.Person;
+import mekhq.campaign.universe.Faction;
 import mekhq.campaign.universe.factionStanding.FactionStandings;
-import mekhq.gui.baseComponents.immersiveDialogs.ImmersiveDialogCore;
-import mekhq.gui.baseComponents.immersiveDialogs.ImmersiveDialogNotification;
+import mekhq.gui.baseComponents.roundedComponents.RoundedJButton;
+import mekhq.gui.baseComponents.roundedComponents.RoundedLineBorder;
 
-public class ChaosContractMarketDialog {
-    private JLabel lblBreakdown;
-    private final JLabel lblPayRateNegotiations = new JLabel("Pay Rate Negotiations: ");
-    private final JSpinner spnPayRateNegotiations = new JSpinner();
-    private final JLabel lblSupportNegotiations = new JLabel("Support Negotiations: ");
-    private final JSpinner spnSupportNegotiations = new JSpinner();
-    private final JLabel lblTransportNegotiations = new JLabel("Transport Negotiations: ");
-    private final JSpinner spnTransportNegotiations = new JSpinner();
-    private final JLabel lblSalvageRightsNegotiations = new JLabel("Salvage Rights Negotiations: ");
-    private final JSpinner spnSalvageRightsNegotiations = new JSpinner();
-    private final JLabel lblCommandRightsNegotiations = new JLabel("Command Rights Negotiations: ");
-    private final JSpinner spnCommandRightsNegotiations = new JSpinner();
+/**
+ * The Chaos contract market: a "job board" of 0-3 available {@link AbstractContract} offers that expands into a full
+ * briefing dossier for whichever offer the player selects.
+ *
+ * @author Illiani
+ * @since 0.51.01
+ */
+public class ChaosContractMarketDialog extends JDialog implements ContractMarketActions {
+    private static final MMLogger LOGGER = MMLogger.create(ChaosContractMarketDialog.class);
+    private static final String RESOURCE_BUNDLE = "mekhq.resources.ChaosContractMarketDialog";
 
+    private final int PADDING = scaleForGUI(5);
+    private static final Dimension MINIMUM_SIZE = scaleForGUI(760, 620);
+    private static final Dimension DEFAULT_SIZE = scaleForGUI(880, 900);
+
+    private static final int INITIAL_OFFERS = 3;
+    private static final int GENERATED_OFFERS_PER_BATCH = 1;
+
+    private final transient Campaign campaign;
+    private final JFrame parent;
+    private final LocalDate currentDate;
+    private final transient List<AbstractContract> contracts;
+    private transient ContractSearchType searchType;
+
+    private final transient List<ContractCardPanel> cards = new ArrayList<>();
+    private JPanel content;
+    private JPanel dossierContainer;
+    private transient AbstractContract acceptedContract;
+
+    /**
+     * Constructs and shows the contract market, generating its initial offers with {@link AbstractContractGeneration}.
+     *
+     * <p>This is the convenience entry point used until a persistent contract-market backend exists: it rolls up to
+     * {@link #INITIAL_OFFERS} offers on the spot and hands them to the list constructor.</p>
+     *
+     * @param campaign the active campaign
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
     public ChaosContractMarketDialog(Campaign campaign) {
+        this(campaign, generateOffers(campaign, INITIAL_OFFERS, false, defaultSearchType(campaign)));
+    }
+
+    /**
+     * Constructs and shows the contract market for the supplied offers.
+     *
+     * @param campaign  the active campaign
+     * @param contracts the offers to display; may be empty (0 offers is a valid, expected state)
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    public ChaosContractMarketDialog(Campaign campaign, List<AbstractContract> contracts) {
+        super(campaign.getGUI().getFrame(), true);
+        this.campaign = campaign;
+        this.parent = campaign.getGUI().getFrame();
+        this.currentDate = campaign.getLocalDate();
+        this.contracts = new ArrayList<>(contracts);
+        this.searchType = defaultSearchType(campaign);
+
+        initializeComponents();
+    }
+
+    /**
+     * Returns the offer the player accepted, or {@code null} if they closed the market without accepting one.
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    public AbstractContract getAcceptedContract() {
+        return acceptedContract;
+    }
+
+    private void initializeComponents() {
+        setTitle(getTextAt(RESOURCE_BUNDLE, "title.contractMarket"));
+
+        content = new JPanel(new BorderLayout());
+        content.setBorder(BorderFactory.createEmptyBorder(PADDING, PADDING, PADDING, PADDING));
+        rebuildContent();
+
+        getContentPane().add(content);
+
+        setMinimumSize(MINIMUM_SIZE);
+        pack();
+        setSize(DEFAULT_SIZE); // Default opening size; saved preferences (below) override it on later opens
+        setLocationRelativeTo(parent);
+        setPreferences(this); // Must be before setVisible
+        setVisible(true); // Should always be last
+    }
+
+    private JPanel buildHeader() {
+        JPanel header = new JPanel(new GridBagLayout());
+        header.setBorder(BorderFactory.createEmptyBorder(PADDING, PADDING, PADDING, PADDING));
+
+        GridBagConstraints gbc = new GridBagConstraints();
+        gbc.gridx = 0;
+        gbc.gridy = 0;
+        gbc.anchor = GridBagConstraints.WEST;
+        gbc.weightx = 1.0;
+        gbc.fill = GridBagConstraints.HORIZONTAL;
+
+        JLabel title = new JLabel(getTextAt(RESOURCE_BUNDLE, "title.contractMarket"));
+        title.setFont(title.getFont().deriveFont(title.getFont().getSize2D() + 4f));
+        header.add(title, gbc);
+
+        gbc.gridy = 1;
+        JLabel subtitle = new JLabel(getFormattedTextAt(RESOURCE_BUNDLE,
+              "header.contractMarket.location",
+              campaign.getCurrentSystem().getName(currentDate),
+              currentDate));
+        header.add(subtitle, gbc);
+
+        JPanel right = new JPanel();
+        right.setLayout(new BoxLayout(right, BoxLayout.Y_AXIS));
+        JLabel count = new JLabel(countMessage());
+        count.setAlignmentX(Component.RIGHT_ALIGNMENT);
+        right.add(count);
+        JPanel searchTypeControl = buildSearchTypeControl();
+        searchTypeControl.setAlignmentX(Component.RIGHT_ALIGNMENT);
+        right.add(searchTypeControl);
+
+        gbc.gridx = 1;
+        gbc.gridy = 0;
+        gbc.gridheight = 2;
+        gbc.weightx = 0.0;
+        gbc.anchor = GridBagConstraints.EAST;
+        gbc.fill = GridBagConstraints.NONE;
+        header.add(right, gbc);
+
+        return header;
+    }
+
+    private JPanel buildSearchTypeControl() {
+        JPanel panel = new JPanel(new FlowLayout(FlowLayout.RIGHT, PADDING, 0));
+        panel.add(new JLabel(getTextAt(RESOURCE_BUNDLE, "header.contractMarket.searchType")));
+
+        List<ContractSearchType> allowed = allowedSearchTypes(campaign);
+        MMComboBox<ContractSearchType> combo = new MMComboBox<>("contractSearchType");
+        combo.setModel(new DefaultComboBoxModel<>(allowed.toArray(new ContractSearchType[0])));
+        combo.setSelectedItem(searchType);
+        combo.setRenderer(new DefaultListCellRenderer() {
+            @Override
+            public Component getListCellRendererComponent(JList<?> list, Object value, int index, boolean isSelected,
+                  boolean cellHasFocus) {
+                super.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);
+                if (value instanceof ContractSearchType type) {
+                    setText(searchTypeLabel(type));
+                }
+                return this;
+            }
+        });
+        combo.setEnabled(allowed.size() > 1);
+        combo.addActionListener(e -> {
+            ContractSearchType selected = combo.getSelectedItem();
+            if (selected != null && selected != searchType) {
+                changeSearchType(selected);
+            }
+        });
+        panel.add(combo);
+        return panel;
+    }
+
+    private static String searchTypeLabel(ContractSearchType type) {
+        return getTextAt(RESOURCE_BUNDLE, "searchType.contractMarket." + type.name());
+    }
+
+    /**
+     * Switches the search type and regenerates the board so the visible offers match the newly chosen type. Pirate and
+     * government types currently produce no offers, so the board falls to its empty state until their generation
+     * lands.
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    private void changeSearchType(ContractSearchType newType) {
+        searchType = newType;
+        contracts.clear();
+        contracts.addAll(generateOffers(campaign, INITIAL_OFFERS, false, searchType));
+        rebuildContent();
+    }
+
+    private String countMessage() {
+        return switch (contracts.size()) {
+            case 0 -> getTextAt(RESOURCE_BUNDLE, "header.contractMarket.count.none");
+            case 1 -> getTextAt(RESOURCE_BUNDLE, "header.contractMarket.count.one");
+            default -> getFormattedTextAt(RESOURCE_BUNDLE, "header.contractMarket.count.many", contracts.size());
+        };
+    }
+
+    /**
+     * Rebuilds the whole content area (header, board or empty state, and button bar) so the dialog reflects the current
+     * set of offers after one is deleted or all are cleared.
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    private void rebuildContent() {
+        content.removeAll();
+        content.add(buildHeader(), BorderLayout.NORTH);
+        content.add(contracts.isEmpty() ? buildEmptyState() : buildBoard(), BorderLayout.CENTER);
+        content.add(buildButtonBar(), BorderLayout.SOUTH);
+        content.revalidate();
+        content.repaint();
+    }
+
+    private JPanel buildBoard() {
+        cards.clear();
+        JPanel board = new JPanel(new BorderLayout(0, PADDING));
+
+        // The cards stay on a single row (a plain FlowLayout keeps its one-row preferred width), and the
+        // FastJScrollPane scrolls horizontally when they overflow the window width rather than wrapping to a new row.
+        JPanel cardRow = new JPanel(new FlowLayout(FlowLayout.LEFT, PADDING, PADDING));
+        for (AbstractContract contract : contracts) {
+            ContractCardPanel card = new ContractCardPanel(contract, currentDate, this::selectContract);
+            cards.add(card);
+            cardRow.add(card);
+        }
+        equalizeCardHeights();
+
+        FastJScrollPane cardScroll = new FastJScrollPane(cardRow,
+              ScrollPaneConstants.VERTICAL_SCROLLBAR_NEVER,
+              ScrollPaneConstants.HORIZONTAL_SCROLLBAR_AS_NEEDED);
+        cardScroll.setBorder(null);
+        cardScroll.getHorizontalScrollBar().setUnitIncrement(scaleForGUI(16));
+        int cardRowHeight = cards.getFirst().getPreferredSize().height + 2 * PADDING
+                                  + cardScroll.getHorizontalScrollBar().getPreferredSize().height;
+        cardScroll.setPreferredSize(new Dimension(scaleForGUI(1), cardRowHeight));
+        board.add(cardScroll, BorderLayout.NORTH);
+
+        // A width-tracking view lets the dossier shrink with the dialog: without it, the viewport keeps the panel at
+        // its wider preferred width when the window is made smaller, so the content never reflows narrower.
+        dossierContainer = new WidthTrackingPanel(new BorderLayout());
+        FastJScrollPane dossierScroll = new FastJScrollPane(dossierContainer,
+              ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED,
+              ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
+        dossierScroll.setBorder(null);
+        dossierScroll.getVerticalScrollBar().setUnitIncrement(scaleForGUI(16));
+        board.add(dossierScroll, BorderLayout.CENTER);
+
+        // Open on the first offer so the player never faces an empty detail pane.
+        selectContract(contracts.getFirst());
+
+        return board;
+    }
+
+    /**
+     * Sets every card to the tallest card's height so a row of cards with differing name lengths lines up evenly.
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    private void equalizeCardHeights() {
+        int maxHeight = 0;
+        for (ContractCardPanel card : cards) {
+            maxHeight = Math.max(maxHeight, card.getPreferredSize().height);
+        }
+        for (ContractCardPanel card : cards) {
+            card.setForcedHeight(maxHeight);
+        }
+    }
+
+
+    private void selectContract(AbstractContract contract) {
+        for (ContractCardPanel card : cards) {
+            card.setSelected(card.getContract() == contract);
+        }
+
+        dossierContainer.removeAll();
+        dossierContainer.add(new ContractDossierPanel(campaign, contract, currentDate, this),
+              BorderLayout.NORTH);
+        dossierContainer.revalidate();
+        dossierContainer.repaint();
+    }
+
+    /**
+     * Records the accepted offer and closes the market.
+     *
+     * <p>TODO: Wire this into the campaign once a commit-to-active-mission pipeline exists for
+     * {@link AbstractContract}. At present {@link AbstractContract} is a pure data class with no path to becoming an
+     * active mission, so this intentionally only captures the player's choice (retrievable via
+     * {@link #getAcceptedContract()}) and disposes the dialog. The caller is responsible for committing the returned
+     * contract.</p>
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    @Override
+    public void accept(AbstractContract contract) {
+        LOGGER.info("Contract accepted from market: {} (pending campaign-commit pipeline)",
+              contract.getContractName());
+        this.acceptedContract = contract;
+        dispose();
+    }
+
+    /**
+     * Opens the negotiation table for the offer. If the player confirms changes, the contract's terms, pay, and rented
+     * facilities are updated in place, so the dossier is rebuilt to reflect them.
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    @Override
+    public void negotiate(AbstractContract contract) {
+        ContractNegotiationDialog negotiation = new ContractNegotiationDialog(campaign, contract);
+        if (negotiation.wasConfirmed()) {
+            selectContract(contract);
+        }
+    }
+
+    /**
+     * Removes a single offer from the board and refreshes the dialog.
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    @Override
+    public void delete(AbstractContract contract) {
+        contracts.remove(contract);
+        rebuildContent();
+    }
+
+    /**
+     * TODO: Open the GM contract editor once one exists for {@link AbstractContract}. For now this only records the
+     * intent.
+     */
+    @Override
+    public void edit(AbstractContract contract) {
+        LOGGER.info("GM edit requested for contract: {} (pending contract editor).", contract.getContractName());
+    }
+
+    /**
+     * Clears every offer from the board and refreshes the dialog to the empty state.
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    private void deleteAllContracts() {
+        contracts.clear();
+        rebuildContent();
+    }
+
+    /**
+     * Generates a fresh batch of offers and adds them to the board.
+     *
+     * <p>This is a GM tool, so it uses the same generator the market will eventually call, in GM mode, and simply
+     * appends whatever valid contracts come back (a batch can legitimately be smaller than requested, or empty, if the
+     * generator cannot place a contract). The first newly generated offer is selected so the result is visible.</p>
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    private void generateNewContracts() {
+        List<AbstractContract> generated = generateOfferBatch();
+        if (generated.isEmpty()) {
+            LOGGER.info("Generate-new produced no valid contracts.");
+            return;
+        }
+
+        contracts.addAll(generated);
+        rebuildContent();
+        selectContract(generated.getFirst());
+    }
+
+    /**
+     * Rolls up to {@link #GENERATED_OFFERS_PER_BATCH} contracts for the GM "Generate new" action.
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    private List<AbstractContract> generateOfferBatch() {
+        return generateOffers(campaign, GENERATED_OFFERS_PER_BATCH, true, searchType);
+    }
+
+    /**
+     * The search type a campaign defaults to: mercenary or pirate bands default to their own type, and every other
+     * (government) campaign can only look for government contracts.
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    private static ContractSearchType defaultSearchType(Campaign campaign) {
+        Faction faction = campaign.getPlayerForce().getFaction();
+        if (faction.isPirate()) {
+            return ContractSearchType.PIRATE;
+        }
+        if (faction.isMercenary()) {
+            return ContractSearchType.MERCENARY;
+        }
+        return ContractSearchType.GOVERNMENT;
+    }
+
+    /**
+     * The search types a campaign may choose between. Mercenary and pirate bands may look for either mercenary or
+     * pirate work; government campaigns are limited to government contracts.
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    private static List<ContractSearchType> allowedSearchTypes(Campaign campaign) {
+        Faction faction = campaign.getPlayerForce().getFaction();
+        if (faction.isMercenary() || faction.isPirate()) {
+            return List.of(ContractSearchType.MERCENARY, ContractSearchType.PIRATE);
+        }
+        return List.of(ContractSearchType.GOVERNMENT);
+    }
+
+    /**
+     * Rolls {@code count} contracts from {@link AbstractContractGeneration}, keeping whichever come back valid (a
+     * {@code null} roll - no contract could be placed - is skipped, so the returned list may be shorter or empty).
+     *
+     * @param campaign the active campaign
+     * @param count    how many contracts to attempt to generate
+     * @param isGM     whether to generate in GM mode, bypassing command-circuit and placement gating
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    private static List<AbstractContract> generateOffers(Campaign campaign, int count, boolean isGM,
+          ContractSearchType searchType) {
         CampaignOptions campaignOptions = campaign.getCampaignOptions();
         LocalDate currentDate = campaign.getLocalDate();
         PlayerForce playerForce = campaign.getPlayerForce();
         Detachment detachment = playerForce.getForceDetachment();
         FactionStandings factionStandings = playerForce.getFactionStandings();
-        boolean isClanForce = playerForce.isClanForce();
-        while (true) {
-            AbstractContract contract = createContract(campaign,
+
+        List<AbstractContract> generated = new ArrayList<>();
+        for (int i = 0; i < count; i++) {
+            AbstractContract contract = AbstractContractGeneration.createContract(campaign,
                   campaignOptions,
                   currentDate,
                   detachment,
                   0,
-                  ContractSearchType.MERCENARY,
+                  searchType,
                   factionStandings,
                   false,
-                  false);
-
-            if (contract == null) {
-                new ImmersiveDialogNotification(null, "ERROR", true);
-            } else {
-                ImmersiveDialogCore dialog = new ImmersiveDialogCore(campaign,
-                      getSeniorAdminPerson(playerForce.getHumanResources(), campaignOptions, isClanForce, currentDate),
-                      contract.getEmployerNegotiator(),
-                      "",
-                      getButtons(),
-                      null,
-                      null,
-                      false,
-                      getSpinnerPanel(campaign, currentDate, detachment.getCurrentLocation(), contract),
-                      null,
-                      true);
-                if (dialog.getDialogChoice() == 1) {
-                    break;
-                }
+                  isGM);
+            if (contract != null) {
+                generated.add(contract);
             }
         }
+        return generated;
     }
 
-    private JPanel getSpinnerPanel(Campaign campaign, LocalDate currentDate, AbstractLocation currentLocation,
-          AbstractContract contract) {
-        final int PADDING = scaleForGUI(10);
+    /**
+     * TODO: Open a GM contract-creation flow and add the result to the board once one exists. For now this only records
+     * the intent.
+     */
+    private void createNewContract() {
+        LOGGER.info("GM create-new requested (pending contract-creation flow).");
+    }
 
-        lblBreakdown = new JLabel(buildTextFromContract(contract));
+    private JPanel buildEmptyState() {
+        JPanel panel = new JPanel();
+        panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
+        panel.setBorder(BorderFactory.createEmptyBorder(scaleForGUI(48), PADDING, scaleForGUI(48), PADDING));
 
-        int currentValuePayRate = contract.getBasePayRateStep().stepValue();
-        spnPayRateNegotiations.setModel(new SpinnerNumberModel(currentValuePayRate,
-              CHAOS_CONTRACT_MINIMUM_STEP_VALUE,
-              CHAOS_CONTRACT_MAXIMUM_STEP_VALUE,
-              1));
-        spnPayRateNegotiations.addChangeListener(e -> {
-            int newStepValue = (int) spnPayRateNegotiations.getValue();
-            ChaosContractStepsTable step = ChaosContractStepsTable.fromStepValue(newStepValue);
-            ContractTermsData existingTermsData = contract.getContractTerms();
-            ContractTermsData updatedTermsData = new ContractTermsData(existingTermsData, step, null, null, null, null);
-            contract.setContractTerms(updatedTermsData);
+        JLabel title = new JLabel(getTextAt(RESOURCE_BUNDLE, "empty.contractMarket.title"), SwingConstants.CENTER);
+        title.setAlignmentX(JLabel.CENTER_ALIGNMENT);
+        title.setFont(title.getFont().deriveFont(title.getFont().getSize2D() + 2f));
 
-            Money newMoney = ChaosContractPayDetermination.getMonthlyPay(contract);
-            contract.updateMonthlyPay(newMoney);
+        JLabel body = new JLabel("<html><body style='width:" +
+                                       scaleForGUI(360)
+                                       +
+                                       "px; text-align:center'>" +
+                                       getTextAt(RESOURCE_BUNDLE, "empty.contractMarket.body") +
+                                       "</body></html>",
+              SwingConstants.CENTER);
+        body.setAlignmentX(JLabel.CENTER_ALIGNMENT);
 
-            lblBreakdown.setText(buildTextFromContract(contract));
-        });
-
-        int currentValueSupport = contract.getSupportStep().stepValue();
-        spnSupportNegotiations.setModel(new SpinnerNumberModel(currentValueSupport,
-              CHAOS_CONTRACT_MINIMUM_STEP_VALUE,
-              CHAOS_CONTRACT_MAXIMUM_STEP_VALUE,
-              1));
-        spnSupportNegotiations.addChangeListener(e -> {
-            int newStepValue = (int) spnSupportNegotiations.getValue();
-            ChaosContractStepsTable step = ChaosContractStepsTable.fromStepValue(newStepValue);
-            ContractTermsData existingTermsData = contract.getContractTerms();
-            ContractTermsData updatedTermsData = new ContractTermsData(existingTermsData, null, step, null, null, null);
-            contract.setContractTerms(updatedTermsData);
-
-            lblBreakdown.setText(buildTextFromContract(contract));
-        });
-
-        int currentValueTransport = contract.getTransportStep().stepValue();
-        spnTransportNegotiations.setModel(new SpinnerNumberModel(currentValueTransport,
-              CHAOS_CONTRACT_MINIMUM_STEP_VALUE,
-              CHAOS_CONTRACT_MAXIMUM_STEP_VALUE,
-              1));
-        spnTransportNegotiations.addChangeListener(e -> {
-            int newStepValue = (int) spnTransportNegotiations.getValue();
-            ChaosContractStepsTable step = ChaosContractStepsTable.fromStepValue(newStepValue);
-            ContractTermsData existingTermsData = contract.getContractTerms();
-            ContractTermsData updatedTermsData = new ContractTermsData(existingTermsData, null, null, step, null, null);
-            contract.setContractTerms(updatedTermsData);
-
-            Money newMoney = ChaosContractPayDetermination.getTransportPay(campaign, currentDate, contract,
-                  currentLocation);
-            contract.updateTransportPay(newMoney);
-
-            lblBreakdown.setText(buildTextFromContract(contract));
-        });
-
-        int currentValueSalvageRights = contract.getSalvageRightsStep().stepValue();
-        spnSalvageRightsNegotiations.setModel(new SpinnerNumberModel(currentValueSalvageRights,
-              CHAOS_CONTRACT_MINIMUM_STEP_VALUE,
-              CHAOS_CONTRACT_MAXIMUM_STEP_VALUE,
-              1));
-        spnSalvageRightsNegotiations.addChangeListener(e -> {
-            int newStepValue = (int) spnSalvageRightsNegotiations.getValue();
-            ChaosContractStepsTable step = ChaosContractStepsTable.fromStepValue(newStepValue);
-            ContractTermsData existingTermsData = contract.getContractTerms();
-            ContractTermsData updatedTermsData = new ContractTermsData(existingTermsData, null, null, null, step, null);
-            contract.setContractTerms(updatedTermsData);
-
-            lblBreakdown.setText(buildTextFromContract(contract));
-        });
-
-        int currentValueCommandRights = contract.getCommandRightsStep().stepValue();
-        spnCommandRightsNegotiations.setModel(new SpinnerNumberModel(currentValueCommandRights,
-              CHAOS_CONTRACT_MINIMUM_STEP_VALUE,
-              CHAOS_CONTRACT_MAXIMUM_STEP_VALUE,
-              1));
-        spnCommandRightsNegotiations.addChangeListener(e -> {
-            int newStepValue = (int) spnCommandRightsNegotiations.getValue();
-            ChaosContractStepsTable step = ChaosContractStepsTable.fromStepValue(newStepValue);
-            ContractTermsData existingTermsData = contract.getContractTerms();
-            ContractTermsData updatedTermsData = new ContractTermsData(existingTermsData, null, null, null, null, step);
-            contract.setContractTerms(updatedTermsData);
-
-            lblBreakdown.setText(buildTextFromContract(contract));
-        });
-
-        JPanel panel = new JPanel(new GridBagLayout());
-        GridBagConstraints layout = new GridBagConstraints();
-
-        layout.gridx = 0;
-        layout.gridy = 0;
-        layout.gridwidth = 2; // The label takes up two spaces horizontally
-        layout.anchor = GridBagConstraints.WEST;
-        layout.insets = new Insets(PADDING, 0, PADDING, 0);
-        panel.add(lblBreakdown, layout);
-
-        layout.gridwidth = 1;
-        layout.gridy = 1;
-        panel.add(lblPayRateNegotiations, layout);
-
-        layout.gridx = 1;
-        panel.add(spnPayRateNegotiations, layout);
-
-        layout.gridx = 0;
-        layout.gridy = 2;
-        panel.add(lblSupportNegotiations, layout);
-
-        layout.gridx = 1;
-        panel.add(spnSupportNegotiations, layout);
-
-        layout.gridx = 0;
-        layout.gridy = 3;
-        panel.add(lblTransportNegotiations, layout);
-
-        layout.gridx = 1;
-        panel.add(spnTransportNegotiations, layout);
-
-        layout.gridx = 0;
-        layout.gridy = 4;
-        panel.add(lblSalvageRightsNegotiations, layout);
-
-        layout.gridx = 1;
-        panel.add(spnSalvageRightsNegotiations, layout);
-
-        layout.gridx = 0;
-        layout.gridy = 5;
-        panel.add(lblCommandRightsNegotiations, layout);
-
-        layout.gridx = 1;
-        panel.add(spnCommandRightsNegotiations, layout);
-
+        panel.add(title);
+        panel.add(javax.swing.Box.createVerticalStrut(PADDING));
+        panel.add(body);
         return panel;
     }
 
-    private List<ImmersiveDialogCore.ButtonLabelTooltipPair> getButtons() {
-        List<ImmersiveDialogCore.ButtonLabelTooltipPair> buttons = new ArrayList<>();
+    private JPanel buildButtonBar() {
+        boolean isGM = campaign.isGM();
 
-        buttons.add(new ImmersiveDialogCore.ButtonLabelTooltipPair("REGENERATE", null));
-        buttons.add(new ImmersiveDialogCore.ButtonLabelTooltipPair("LEAVE", null));
+        JPanel bar = new JPanel(new FlowLayout(FlowLayout.CENTER, PADDING, PADDING));
+        bar.setBorder(RoundedLineBorder.createRoundedLineBorder());
 
-        return buttons;
+        RoundedJButton close = new RoundedJButton(getTextAt(RESOURCE_BUNDLE, "button.contractMarket.close"));
+        close.addActionListener(e -> dispose());
+        bar.add(close);
+
+        RoundedJButton deleteAll = new RoundedJButton(getTextAt(RESOURCE_BUNDLE, "button.contractMarket.deleteAll"));
+        deleteAll.addActionListener(e -> deleteAllContracts());
+        deleteAll.setEnabled(!contracts.isEmpty());
+        bar.add(deleteAll);
+
+        RoundedJButton generateNew = new RoundedJButton(getTextAt(RESOURCE_BUNDLE,
+              "button.contractMarket.generateNew"));
+        generateNew.addActionListener(e -> generateNewContracts());
+        generateNew.setEnabled(isGM);
+        bar.add(generateNew);
+
+        RoundedJButton createNew = new RoundedJButton(getTextAt(RESOURCE_BUNDLE, "button.contractMarket.createNew"));
+        createNew.addActionListener(e -> createNewContract());
+        createNew.setEnabled(isGM);
+        bar.add(createNew);
+
+        return bar;
     }
 
-    private static Person getSeniorAdminPerson(ForceHumanResources humanResources, CampaignOptions campaignOptions,
-          boolean isClanForce, LocalDate currentDate) {
-        return humanResources.getSeniorAdminPerson(Campaign.AdministratorSpecialization.COMMAND,
-              campaignOptions,
-              isClanForce,
-              currentDate);
+    /**
+     * A scroll-pane view that is forced to the viewport's width but keeps its own (taller) height. This lets the
+     * dossier reflow narrower when the dialog shrinks while still scrolling vertically when its content is tall.
+     */
+    private static class WidthTrackingPanel extends JPanel implements Scrollable {
+        WidthTrackingPanel(LayoutManager layout) {
+            super(layout);
+        }
+
+        @Override
+        public Dimension getPreferredScrollableViewportSize() {
+            return getPreferredSize();
+        }
+
+        @Override
+        public int getScrollableUnitIncrement(Rectangle visibleRect, int orientation, int direction) {
+            return scaleForGUI(16);
+        }
+
+        @Override
+        public int getScrollableBlockIncrement(Rectangle visibleRect, int orientation, int direction) {
+            return visibleRect.height;
+        }
+
+        @Override
+        public boolean getScrollableTracksViewportWidth() {
+            return true;
+        }
+
+        @Override
+        public boolean getScrollableTracksViewportHeight() {
+            return false;
+        }
     }
 
-    private String getContractText(AbstractContract contract) {
-        return contract == null ? "WHOOPSIE DOODLES" : buildTextFromContract(contract);
-    }
-
-    private String buildTextFromContract(AbstractContract contract) {
-        StringBuilder contractReport = new StringBuilder("<html>");
-        contractReport.append("contractId: ").append(contract.getContractId()).append("<br>");
-        contractReport.append("contractName:").append(contract.getContractName()).append("<br>");
-        contractReport.append("description:").append(contract.getDescription()).append("<br>");
-        contractReport.append("employerData:").append(contract.getEmployerData()).append("<br>");
-        contractReport.append("enemyData:").append(contract.getEnemyData()).append("<br>");
-        contractReport.append("contractTerms:").append(contract.getContractTerms()).append("<br>");
-        contractReport.append("objectiveData:").append(contract.getObjectiveData()).append("<br>");
-        contractReport.append("contractFinanceData:").append(contract.getContractFinanceData()).append("<br>");
-        contractReport.append("missionStatus:").append(contract.getMissionStatus()).append("<br>");
-        contractReport.append("scheduleData:").append(contract.getScheduleData()).append("<br>");
-        contractReport.append("systemsTargetData:").append(contract.getSystemsTargetData()).append("<br>");
-        contractReport.append("rentedFacilitiesData:").append(contract.getRentedFacilitiesData()).append("<br>");
-        contractReport.append("moraleData:").append(contract.getMoraleData()).append("<br>");
-        contractReport.append("stratConCampaignState:").append(contract.getStratConCampaignState()).append("<br>");
-        contractReport.append("scale:").append(contract.getScale()).append("<br>");
-        contractReport.append("trackCount:").append(contract.getTrackCount()).append("<br>");
-        contractReport.append("scenarios:").append(contract.getScenarios()).append("<br>");
-        contractReport.append("cachedJumpPath:").append(contract.getCachedJumpPathDirect()).append("<br>");
-        contractReport.append("cachedContractDifficulty:")
-              .append(contract.getCachedContractDifficulty())
-              .append("<br>");
-        contractReport.append("</html>");
-
-        return contractReport.toString().replace(",", "<br>");
+    /**
+     * This override forces the preferences for this class to be tracked in MekHQ instead of MegaMek.
+     */
+    private void setPreferences(JDialog dialog) {
+        try {
+            PreferencesNode preferences = MekHQ.getMHQPreferences().forClass(ChaosContractMarketDialog.class);
+            dialog.setName("ChaosContractMarketDialog");
+            preferences.manage(new JWindowPreference(dialog));
+        } catch (Exception ex) {
+            LOGGER.error("Failed to set user preferences", ex);
+        }
     }
 }

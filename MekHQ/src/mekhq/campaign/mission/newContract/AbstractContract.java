@@ -51,15 +51,7 @@ import mekhq.campaign.mission.enums.ContractCommandRights;
 import mekhq.campaign.mission.enums.ContractMoraleLevel;
 import mekhq.campaign.mission.enums.ContractObjectiveType;
 import mekhq.campaign.mission.enums.MissionStatus;
-import mekhq.campaign.mission.newContract.contractData.ChaosContractStepsTable;
-import mekhq.campaign.mission.newContract.contractData.ContractFinanceData;
-import mekhq.campaign.mission.newContract.contractData.ContractObjectiveData;
-import mekhq.campaign.mission.newContract.contractData.ContractScheduleData;
-import mekhq.campaign.mission.newContract.contractData.EmployerData;
-import mekhq.campaign.mission.newContract.contractData.EnemyData;
-import mekhq.campaign.mission.newContract.contractData.MoraleData;
-import mekhq.campaign.mission.newContract.contractData.RentedFacilitiesData;
-import mekhq.campaign.mission.newContract.contractData.SystemsTargetData;
+import mekhq.campaign.mission.newContract.contractData.*;
 import mekhq.campaign.mission.newContract.contractGeneration.ChaosEmployerType;
 import mekhq.campaign.mission.newContract.contractGeneration.ContractTermsData;
 import mekhq.campaign.personnel.Person;
@@ -92,6 +84,8 @@ public abstract class AbstractContract {
 
     private RentedFacilitiesData rentedFacilitiesData;
     private MoraleData moraleData;
+    private NegotiationData negotiationData;
+    private Person playerNegotiator;
 
     private StratConCampaignState stratConCampaignState;
     private int scale;
@@ -225,6 +219,22 @@ public abstract class AbstractContract {
 
     public void setMoraleData(MoraleData moraleData) {
         this.moraleData = moraleData;
+    }
+
+    public @Nullable NegotiationData getNegotiationData() {
+        return negotiationData;
+    }
+
+    public void setNegotiationData(NegotiationData negotiationData) {
+        this.negotiationData = negotiationData;
+    }
+
+    public @Nullable Person getPlayerNegotiator() {
+        return playerNegotiator;
+    }
+
+    public void setPlayerNegotiator(Person playerNegotiator) {
+        this.playerNegotiator = playerNegotiator;
     }
 
     public StratConCampaignState getStratConCampaignState() {
