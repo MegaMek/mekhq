@@ -492,6 +492,7 @@ public class ChaosContractMarketDialog extends JDialog implements ContractMarket
         PlayerForce playerForce = campaign.getPlayerForce();
         Detachment detachment = playerForce.getForceDetachment();
         FactionStandings factionStandings = playerForce.getFactionStandings();
+        boolean isOverridingCommandCircuitRequirements = playerForce.isOverridingCommandCircuitRequirements();
 
         List<AbstractContract> generated = new ArrayList<>();
         for (int i = 0; i < count; i++) {
@@ -502,7 +503,7 @@ public class ChaosContractMarketDialog extends JDialog implements ContractMarket
                   0,
                   searchType,
                   factionStandings,
-                  false,
+                  isOverridingCommandCircuitRequirements,
                   isGM);
             if (contract != null) {
                 generated.add(contract);
