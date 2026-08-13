@@ -115,6 +115,7 @@ import mekhq.campaign.market.contractMarket.AtbMonthlyContractMarket;
 import mekhq.campaign.mission.AtBContract;
 import mekhq.campaign.mission.Mission;
 import mekhq.campaign.mission.Scenario;
+import mekhq.campaign.mission.newContract.ContractMarket;
 import mekhq.campaign.parts.AmmoStorage;
 import mekhq.campaign.parts.EnginePart;
 import mekhq.campaign.parts.Part;
@@ -258,6 +259,10 @@ public record CampaignXmlParser(InputStream is, MekHQ app) {
                 } else if (nodeName.equalsIgnoreCase("initiativeMaxBonus")) {
                     int bonus = parseInt(childNode.getTextContent(), 1);
                     playerForce.setInitiativeMaxBonus(bonus);
+                } else if (nodeName.equalsIgnoreCase(PlayerForce.CONTRACTS_TAG)) {
+                    playerForce.loadContractsFromXML(childNode, campaign, version);
+                } else if (nodeName.equalsIgnoreCase(ContractMarket.MARKET_TAG)) {
+                    playerForce.getContractMarket().loadFromXML(childNode, campaign, version);
                 } else if (nodeName.equalsIgnoreCase("crimePirateModifier")) {
                     int crimePirateModifier = parseInt(childNode.getTextContent());
                     playerForce.setCampOpsCrimePirateModifier(crimePirateModifier);

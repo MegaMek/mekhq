@@ -78,7 +78,9 @@ public class EmployerLiaison {
     private static PersonnelRole getLiaisonRole(ContractSearchType searchType, boolean employerIsClan) {
         return switch (searchType) {
             case PIRATE -> PIRATE_LIAISON_ROLE;
-            case MERCENARY -> employerIsClan ? MERCENARY_LIAISON_CLAN : MERCENARY_LIAISON_NORMAL;
+            // TOURNAMENT contacts (arena games organizers) reuse the mercenary-hall broker role until dedicated
+            // tournament generation lands.
+            case MERCENARY, TOURNAMENT -> employerIsClan ? MERCENARY_LIAISON_CLAN : MERCENARY_LIAISON_NORMAL;
             case GOVERNMENT -> employerIsClan ? GOVERNMENT_LIAISON_CLAN : GOVERNMENT_LIAISON_NORMAL;
         };
     }

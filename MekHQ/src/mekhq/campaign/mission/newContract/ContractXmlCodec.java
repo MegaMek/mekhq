@@ -83,7 +83,7 @@ import org.w3c.dom.NodeList;
 public final class ContractXmlCodec {
     private static final MMLogger LOGGER = MMLogger.create(ContractXmlCodec.class);
 
-    static final String CONTRACT_TAG = "contract";
+    public static final String CONTRACT_TAG = "contract";
     private static final String TYPE_ATTRIBUTE = "type";
 
     private ContractXmlCodec() {}
@@ -447,265 +447,310 @@ public final class ContractXmlCodec {
         }
     }
 
-    private static EmployerData parseEmployerData(final Node wn, final Campaign campaign, final Version version) {
-        ChaosEmployerType type = null;
-        String factionCode = null;
-        String anchorFactionCode = null;
-        String sponsorFactionCode = null;
-        String displayName = null;
-        SkillLevel forceSkill = SkillLevel.REGULAR;
-        int equipmentRating = 0;
-        Camouflage camouflage = new Camouflage();
-        PlayerColour color = PlayerColour.BLUE;
-        Person negotiator = null;
-        Person liaison = null;
+    /**
+     * Binds one child element of a data record's node onto a mutable builder. Every binder shares this signature so the
+     * few that need the campaign/version (nested personnel) sit in the same map-lookup table as the pure-value ones.
+     */
+    @FunctionalInterface
+    private interface FieldBinder<B> {
+        void bind(B builder, Node node, Campaign campaign, Version version);
+    }
 
-        final NodeList children = wn.getChildNodes();
+    /**
+     * Map-lookup dispatch shared by every data-record parser: each element child of {@code parent} is routed to its
+     * handler in {@code binders} by tag name and applied to {@code builder} - the same algorithm the top-level
+     * {@link #READERS} table uses. Unknown tags and handlers that throw are logged and skipped so one bad field never
+     * aborts the record.
+     */
+    private static <B> B readFields(final Node parent, final B builder, final Map<String, FieldBinder<B>> binders,
+          final Campaign campaign, final Version version, final String context) {
+        final NodeList children = parent.getChildNodes();
         for (int i = 0; i < children.getLength(); i++) {
             final Node child = children.item(i);
             if (child.getNodeType() != Node.ELEMENT_NODE) {
                 continue;
             }
-            switch (child.getNodeName()) {
-                case "type" -> type = ChaosEmployerType.valueOf(text(child));
-                case "factionCode" -> factionCode = text(child);
-                case "anchorFactionCode" -> anchorFactionCode = text(child);
-                case "sponsorFactionCode" -> sponsorFactionCode = text(child);
-                case "displayName" -> displayName = text(child);
-                case "forceSkill" -> forceSkill = SkillLevel.valueOf(text(child));
-                case "equipmentRating" -> equipmentRating = parseInt(child);
-                case "color" -> color = PlayerColour.valueOf(text(child));
-                case Camouflage.XML_TAG -> camouflage = Camouflage.parseFromXML(child);
-                case "negotiator" -> negotiator = parseWrappedPerson(child, campaign, version);
-                case "liaison" -> liaison = parseWrappedPerson(child, campaign, version);
-                default -> LOGGER.warn("Unexpected employerData element ignored: {}", child.getNodeName());
+            final FieldBinder<B> binder = binders.get(child.getNodeName());
+            if (binder == null) {
+                LOGGER.warn("Unexpected {} element ignored: {}", context, child.getNodeName());
+                continue;
+            }
+            try {
+                binder.bind(builder, child, campaign, version);
+            } catch (Exception ex) {
+                LOGGER.error(ex, "Error parsing {} element: {}", context, child.getNodeName());
             }
         }
-
-        return new EmployerData(type, factionCode, anchorFactionCode, sponsorFactionCode, displayName, negotiator,
-              liaison, forceSkill, equipmentRating, camouflage, color);
+        return builder;
     }
 
-    private static EnemyData parseEnemyData(final Node wn) {
-        String factionCode = null;
-        String sponsorFactionCode = null;
-        String displayName = null;
+    private static final class EmployerDataBuilder {
+        ChaosEmployerType type;
+        String factionCode;
+        String anchorFactionCode;
+        String sponsorFactionCode;
+        String displayName;
         SkillLevel forceSkill = SkillLevel.REGULAR;
-        int equipmentRating = 0;
+        int equipmentRating;
+        Camouflage camouflage = new Camouflage();
+        PlayerColour color = PlayerColour.BLUE;
+        Person negotiator;
+        Person liaison;
+    }
+
+    private static final Map<String, FieldBinder<EmployerDataBuilder>> EMPLOYER_BINDERS = createEmployerBinders();
+
+    private static Map<String, FieldBinder<EmployerDataBuilder>> createEmployerBinders() {
+        final Map<String, FieldBinder<EmployerDataBuilder>> binders = new HashMap<>();
+        binders.put("type", (b, n, c, v) -> b.type = ChaosEmployerType.valueOf(text(n)));
+        binders.put("factionCode", (b, n, c, v) -> b.factionCode = text(n));
+        binders.put("anchorFactionCode", (b, n, c, v) -> b.anchorFactionCode = text(n));
+        binders.put("sponsorFactionCode", (b, n, c, v) -> b.sponsorFactionCode = text(n));
+        binders.put("displayName", (b, n, c, v) -> b.displayName = text(n));
+        binders.put("forceSkill", (b, n, c, v) -> b.forceSkill = SkillLevel.valueOf(text(n)));
+        binders.put("equipmentRating", (b, n, c, v) -> b.equipmentRating = parseInt(n));
+        binders.put("color", (b, n, c, v) -> b.color = PlayerColour.valueOf(text(n)));
+        binders.put(Camouflage.XML_TAG, (b, n, c, v) -> b.camouflage = Camouflage.parseFromXML(n));
+        binders.put("negotiator", (b, n, c, v) -> b.negotiator = parseWrappedPerson(n, c, v));
+        binders.put("liaison", (b, n, c, v) -> b.liaison = parseWrappedPerson(n, c, v));
+        return binders;
+    }
+
+    private static EmployerData parseEmployerData(final Node wn, final Campaign campaign, final Version version) {
+        final EmployerDataBuilder builder = readFields(wn, new EmployerDataBuilder(), EMPLOYER_BINDERS, campaign,
+              version, "employerData");
+        return new EmployerData(builder.type, builder.factionCode, builder.anchorFactionCode,
+              builder.sponsorFactionCode, builder.displayName, builder.negotiator, builder.liaison, builder.forceSkill,
+              builder.equipmentRating, builder.camouflage, builder.color);
+    }
+
+    private static final class EnemyDataBuilder {
+        String factionCode;
+        String sponsorFactionCode;
+        String displayName;
+        SkillLevel forceSkill = SkillLevel.REGULAR;
+        int equipmentRating;
         Camouflage camouflage = new Camouflage();
         PlayerColour color = PlayerColour.RED;
         boolean batchallAccepted = true;
+    }
 
-        final NodeList children = wn.getChildNodes();
-        for (int i = 0; i < children.getLength(); i++) {
-            final Node child = children.item(i);
-            if (child.getNodeType() != Node.ELEMENT_NODE) {
-                continue;
-            }
-            switch (child.getNodeName()) {
-                case "factionCode" -> factionCode = text(child);
-                case "sponsorFactionCode" -> sponsorFactionCode = text(child);
-                case "displayName" -> displayName = text(child);
-                case "forceSkill" -> forceSkill = SkillLevel.valueOf(text(child));
-                case "equipmentRating" -> equipmentRating = parseInt(child);
-                case "color" -> color = PlayerColour.valueOf(text(child));
-                case "batchallAccepted" -> batchallAccepted = Boolean.parseBoolean(text(child));
-                case Camouflage.XML_TAG -> camouflage = Camouflage.parseFromXML(child);
-                default -> LOGGER.warn("Unexpected enemyData element ignored: {}", child.getNodeName());
-            }
-        }
+    private static final Map<String, FieldBinder<EnemyDataBuilder>> ENEMY_BINDERS = createEnemyBinders();
 
-        return new EnemyData(factionCode, sponsorFactionCode, displayName, forceSkill, equipmentRating, camouflage,
-              color, batchallAccepted);
+    private static Map<String, FieldBinder<EnemyDataBuilder>> createEnemyBinders() {
+        final Map<String, FieldBinder<EnemyDataBuilder>> binders = new HashMap<>();
+        binders.put("factionCode", (b, n, c, v) -> b.factionCode = text(n));
+        binders.put("sponsorFactionCode", (b, n, c, v) -> b.sponsorFactionCode = text(n));
+        binders.put("displayName", (b, n, c, v) -> b.displayName = text(n));
+        binders.put("forceSkill", (b, n, c, v) -> b.forceSkill = SkillLevel.valueOf(text(n)));
+        binders.put("equipmentRating", (b, n, c, v) -> b.equipmentRating = parseInt(n));
+        binders.put("color", (b, n, c, v) -> b.color = PlayerColour.valueOf(text(n)));
+        binders.put("batchallAccepted", (b, n, c, v) -> b.batchallAccepted = Boolean.parseBoolean(text(n)));
+        binders.put(Camouflage.XML_TAG, (b, n, c, v) -> b.camouflage = Camouflage.parseFromXML(n));
+        return binders;
+    }
+
+    private static EnemyData parseEnemyData(final Node wn) {
+        final EnemyDataBuilder builder = readFields(wn, new EnemyDataBuilder(), ENEMY_BINDERS, null, null, "enemyData");
+        return new EnemyData(builder.factionCode, builder.sponsorFactionCode, builder.displayName, builder.forceSkill,
+              builder.equipmentRating, builder.camouflage, builder.color, builder.batchallAccepted);
+    }
+
+    private static final class ContractTermsBuilder {
+        ChaosContractStepsTable payRate;
+        ChaosContractStepsTable support;
+        ChaosContractStepsTable transport;
+        ChaosContractStepsTable salvageRights;
+        ChaosContractStepsTable commandRights;
+    }
+
+    private static final Map<String, FieldBinder<ContractTermsBuilder>> CONTRACT_TERMS_BINDERS =
+          createContractTermsBinders();
+
+    private static Map<String, FieldBinder<ContractTermsBuilder>> createContractTermsBinders() {
+        final Map<String, FieldBinder<ContractTermsBuilder>> binders = new HashMap<>();
+        binders.put("payRate", (b, n, c, v) -> b.payRate = ChaosContractStepsTable.valueOf(text(n)));
+        binders.put("support", (b, n, c, v) -> b.support = ChaosContractStepsTable.valueOf(text(n)));
+        binders.put("transport", (b, n, c, v) -> b.transport = ChaosContractStepsTable.valueOf(text(n)));
+        binders.put("salvageRights", (b, n, c, v) -> b.salvageRights = ChaosContractStepsTable.valueOf(text(n)));
+        binders.put("commandRights", (b, n, c, v) -> b.commandRights = ChaosContractStepsTable.valueOf(text(n)));
+        return binders;
     }
 
     private static ContractTermsData parseContractTerms(final Node wn) {
-        ChaosContractStepsTable payRate = null;
-        ChaosContractStepsTable support = null;
-        ChaosContractStepsTable transport = null;
-        ChaosContractStepsTable salvageRights = null;
-        ChaosContractStepsTable commandRights = null;
+        final ContractTermsBuilder builder = readFields(wn, new ContractTermsBuilder(), CONTRACT_TERMS_BINDERS, null,
+              null, "contractTerms");
+        return new ContractTermsData(builder.payRate, builder.support, builder.transport, builder.salvageRights,
+              builder.commandRights);
+    }
 
-        final NodeList children = wn.getChildNodes();
-        for (int i = 0; i < children.getLength(); i++) {
-            final Node child = children.item(i);
-            if (child.getNodeType() != Node.ELEMENT_NODE) {
-                continue;
-            }
-            switch (child.getNodeName()) {
-                case "payRate" -> payRate = ChaosContractStepsTable.valueOf(text(child));
-                case "support" -> support = ChaosContractStepsTable.valueOf(text(child));
-                case "transport" -> transport = ChaosContractStepsTable.valueOf(text(child));
-                case "salvageRights" -> salvageRights = ChaosContractStepsTable.valueOf(text(child));
-                case "commandRights" -> commandRights = ChaosContractStepsTable.valueOf(text(child));
-                default -> LOGGER.warn("Unexpected contractTerms element ignored: {}", child.getNodeName());
-            }
-        }
+    private static final class ObjectiveDataBuilder {
+        ContractObjectiveType playerObjectiveType;
+        ContractObjectiveType opposingObjectiveType;
+    }
 
-        return new ContractTermsData(payRate, support, transport, salvageRights, commandRights);
+    private static final Map<String, FieldBinder<ObjectiveDataBuilder>> OBJECTIVE_BINDERS = createObjectiveBinders();
+
+    private static Map<String, FieldBinder<ObjectiveDataBuilder>> createObjectiveBinders() {
+        final Map<String, FieldBinder<ObjectiveDataBuilder>> binders = new HashMap<>();
+        binders.put("playerObjectiveType",
+              (b, n, c, v) -> b.playerObjectiveType = ContractObjectiveType.valueOf(text(n)));
+        binders.put("opposingObjectiveType",
+              (b, n, c, v) -> b.opposingObjectiveType = ContractObjectiveType.valueOf(text(n)));
+        return binders;
     }
 
     private static ContractObjectiveData parseObjectiveData(final Node wn) {
-        ContractObjectiveType playerObjectiveType = null;
-        ContractObjectiveType opposingObjectiveType = null;
-
-        final NodeList children = wn.getChildNodes();
-        for (int i = 0; i < children.getLength(); i++) {
-            final Node child = children.item(i);
-            if (child.getNodeType() != Node.ELEMENT_NODE) {
-                continue;
-            }
-            switch (child.getNodeName()) {
-                case "playerObjectiveType" -> playerObjectiveType = ContractObjectiveType.valueOf(text(child));
-                case "opposingObjectiveType" -> opposingObjectiveType = ContractObjectiveType.valueOf(text(child));
-                default -> LOGGER.warn("Unexpected objectiveData element ignored: {}", child.getNodeName());
-            }
-        }
-
-        return new ContractObjectiveData(playerObjectiveType, opposingObjectiveType);
+        final ObjectiveDataBuilder builder = readFields(wn, new ObjectiveDataBuilder(), OBJECTIVE_BINDERS, null, null,
+              "objectiveData");
+        return new ContractObjectiveData(builder.playerObjectiveType, builder.opposingObjectiveType);
     }
 
-    private static ContractFinanceData parseFinanceData(final Node wn) {
+    private static final class FinanceDataBuilder {
         Money transport = Money.zero();
         Money monthlyPay = Money.zero();
         Money combatPay = Money.zero();
+    }
 
-        final NodeList children = wn.getChildNodes();
-        for (int i = 0; i < children.getLength(); i++) {
-            final Node child = children.item(i);
-            if (child.getNodeType() != Node.ELEMENT_NODE) {
-                continue;
-            }
-            switch (child.getNodeName()) {
-                case "transport" -> transport = Money.fromXmlString(text(child));
-                case "monthlyPay" -> monthlyPay = Money.fromXmlString(text(child));
-                case "combatPay" -> combatPay = Money.fromXmlString(text(child));
-                default -> LOGGER.warn("Unexpected contractFinanceData element ignored: {}", child.getNodeName());
-            }
-        }
+    private static final Map<String, FieldBinder<FinanceDataBuilder>> FINANCE_BINDERS = createFinanceBinders();
 
-        return new ContractFinanceData(transport, monthlyPay, combatPay);
+    private static Map<String, FieldBinder<FinanceDataBuilder>> createFinanceBinders() {
+        final Map<String, FieldBinder<FinanceDataBuilder>> binders = new HashMap<>();
+        binders.put("transport", (b, n, c, v) -> b.transport = Money.fromXmlString(text(n)));
+        binders.put("monthlyPay", (b, n, c, v) -> b.monthlyPay = Money.fromXmlString(text(n)));
+        binders.put("combatPay", (b, n, c, v) -> b.combatPay = Money.fromXmlString(text(n)));
+        return binders;
+    }
+
+    private static ContractFinanceData parseFinanceData(final Node wn) {
+        final FinanceDataBuilder builder = readFields(wn, new FinanceDataBuilder(), FINANCE_BINDERS, null, null,
+              "contractFinanceData");
+        return new ContractFinanceData(builder.transport, builder.monthlyPay, builder.combatPay);
+    }
+
+    private static final class ScheduleDataBuilder {
+        LocalDate startDate;
+        LocalDate endDate;
+        int lengthInMonths;
+    }
+
+    private static final Map<String, FieldBinder<ScheduleDataBuilder>> SCHEDULE_BINDERS = createScheduleBinders();
+
+    private static Map<String, FieldBinder<ScheduleDataBuilder>> createScheduleBinders() {
+        final Map<String, FieldBinder<ScheduleDataBuilder>> binders = new HashMap<>();
+        binders.put("startDate", (b, n, c, v) -> b.startDate = MHQXMLUtility.parseDate(text(n)));
+        binders.put("endDate", (b, n, c, v) -> b.endDate = MHQXMLUtility.parseDate(text(n)));
+        binders.put("lengthInMonths", (b, n, c, v) -> b.lengthInMonths = parseInt(n));
+        return binders;
     }
 
     private static ContractScheduleData parseScheduleData(final Node wn) {
-        LocalDate startDate = null;
-        LocalDate endDate = null;
-        int lengthInMonths = 0;
+        final ScheduleDataBuilder builder = readFields(wn, new ScheduleDataBuilder(), SCHEDULE_BINDERS, null, null,
+              "scheduleData");
+        return new ContractScheduleData(builder.startDate, builder.endDate, builder.lengthInMonths);
+    }
 
-        final NodeList children = wn.getChildNodes();
-        for (int i = 0; i < children.getLength(); i++) {
-            final Node child = children.item(i);
-            if (child.getNodeType() != Node.ELEMENT_NODE) {
-                continue;
-            }
-            switch (child.getNodeName()) {
-                case "startDate" -> startDate = MHQXMLUtility.parseDate(text(child));
-                case "endDate" -> endDate = MHQXMLUtility.parseDate(text(child));
-                case "lengthInMonths" -> lengthInMonths = parseInt(child);
-                default -> LOGGER.warn("Unexpected scheduleData element ignored: {}", child.getNodeName());
-            }
-        }
+    private static final class SystemsTargetBuilder {
+        String systemId;
+        String planetId;
+    }
 
-        return new ContractScheduleData(startDate, endDate, lengthInMonths);
+    private static final Map<String, FieldBinder<SystemsTargetBuilder>> SYSTEMS_TARGET_BINDERS =
+          createSystemsTargetBinders();
+
+    private static Map<String, FieldBinder<SystemsTargetBuilder>> createSystemsTargetBinders() {
+        final Map<String, FieldBinder<SystemsTargetBuilder>> binders = new HashMap<>();
+        binders.put("systemId", (b, n, c, v) -> b.systemId = text(n));
+        binders.put("planetId", (b, n, c, v) -> b.planetId = text(n));
+        return binders;
     }
 
     private static SystemsTargetData parseSystemsTargetData(final Node wn) {
-        String systemId = null;
-        String planetId = null;
+        final SystemsTargetBuilder builder = readFields(wn, new SystemsTargetBuilder(), SYSTEMS_TARGET_BINDERS, null,
+              null, "systemsTargetData");
+        return new SystemsTargetData(builder.systemId, builder.planetId);
+    }
 
-        final NodeList children = wn.getChildNodes();
-        for (int i = 0; i < children.getLength(); i++) {
-            final Node child = children.item(i);
-            if (child.getNodeType() != Node.ELEMENT_NODE) {
-                continue;
-            }
-            switch (child.getNodeName()) {
-                case "systemId" -> systemId = text(child);
-                case "planetId" -> planetId = text(child);
-                default -> LOGGER.warn("Unexpected systemsTargetData element ignored: {}", child.getNodeName());
-            }
-        }
+    private static final class RentedFacilitiesBuilder {
+        int hospitalBeds;
+        int kitchens;
+        int holdingCells;
+    }
 
-        return new SystemsTargetData(systemId, planetId);
+    private static final Map<String, FieldBinder<RentedFacilitiesBuilder>> RENTED_FACILITIES_BINDERS =
+          createRentedFacilitiesBinders();
+
+    private static Map<String, FieldBinder<RentedFacilitiesBuilder>> createRentedFacilitiesBinders() {
+        final Map<String, FieldBinder<RentedFacilitiesBuilder>> binders = new HashMap<>();
+        binders.put("hospitalBeds", (b, n, c, v) -> b.hospitalBeds = parseInt(n));
+        binders.put("kitchens", (b, n, c, v) -> b.kitchens = parseInt(n));
+        binders.put("holdingCells", (b, n, c, v) -> b.holdingCells = parseInt(n));
+        return binders;
     }
 
     private static RentedFacilitiesData parseRentedFacilitiesData(final Node wn) {
-        int hospitalBeds = 0;
-        int kitchens = 0;
-        int holdingCells = 0;
+        final RentedFacilitiesBuilder builder = readFields(wn, new RentedFacilitiesBuilder(),
+              RENTED_FACILITIES_BINDERS, null, null, "rentedFacilitiesData");
+        return new RentedFacilitiesData(builder.hospitalBeds, builder.kitchens, builder.holdingCells);
+    }
 
-        final NodeList children = wn.getChildNodes();
-        for (int i = 0; i < children.getLength(); i++) {
-            final Node child = children.item(i);
-            if (child.getNodeType() != Node.ELEMENT_NODE) {
-                continue;
-            }
-            switch (child.getNodeName()) {
-                case "hospitalBeds" -> hospitalBeds = parseInt(child);
-                case "kitchens" -> kitchens = parseInt(child);
-                case "holdingCells" -> holdingCells = parseInt(child);
-                default -> LOGGER.warn("Unexpected rentedFacilitiesData element ignored: {}", child.getNodeName());
-            }
-        }
+    private static final class MoraleDataBuilder {
+        ContractMoraleLevel moraleLevel;
+        LocalDate routEndDate;
+        Money routedPayout = Money.zero();
+    }
 
-        return new RentedFacilitiesData(hospitalBeds, kitchens, holdingCells);
+    private static final Map<String, FieldBinder<MoraleDataBuilder>> MORALE_BINDERS = createMoraleBinders();
+
+    private static Map<String, FieldBinder<MoraleDataBuilder>> createMoraleBinders() {
+        final Map<String, FieldBinder<MoraleDataBuilder>> binders = new HashMap<>();
+        binders.put("moraleLevel", (b, n, c, v) -> b.moraleLevel = ContractMoraleLevel.valueOf(text(n)));
+        binders.put("routEndDate", (b, n, c, v) -> b.routEndDate = MHQXMLUtility.parseDate(text(n)));
+        binders.put("routedPayout", (b, n, c, v) -> b.routedPayout = Money.fromXmlString(text(n)));
+        return binders;
     }
 
     private static MoraleData parseMoraleData(final Node wn) {
-        ContractMoraleLevel moraleLevel = null;
-        LocalDate routEndDate = null;
-        Money routedPayout = Money.zero();
+        final MoraleDataBuilder builder = readFields(wn, new MoraleDataBuilder(), MORALE_BINDERS, null, null,
+              "moraleData");
+        return new MoraleData(builder.moraleLevel, builder.routEndDate, builder.routedPayout);
+    }
 
-        final NodeList children = wn.getChildNodes();
-        for (int i = 0; i < children.getLength(); i++) {
-            final Node child = children.item(i);
-            if (child.getNodeType() != Node.ELEMENT_NODE) {
-                continue;
-            }
-            switch (child.getNodeName()) {
-                case "moraleLevel" -> moraleLevel = ContractMoraleLevel.valueOf(text(child));
-                case "routEndDate" -> routEndDate = MHQXMLUtility.parseDate(text(child));
-                case "routedPayout" -> routedPayout = Money.fromXmlString(text(child));
-                default -> LOGGER.warn("Unexpected moraleData element ignored: {}", child.getNodeName());
-            }
-        }
+    private static final class NegotiationDataBuilder {
+        int originalPayStep;
+        int originalSupportStep;
+        int originalTransportStep;
+        int originalSalvageStep;
+        int originalCommandStep;
+        int reputationUsed;
+        int swapsUsed;
+        int sacrificeBank;
+        List<List<TermFunding>> funding = new ArrayList<>();
+    }
 
-        return new MoraleData(moraleLevel, routEndDate, routedPayout);
+    private static final Map<String, FieldBinder<NegotiationDataBuilder>> NEGOTIATION_BINDERS =
+          createNegotiationBinders();
+
+    private static Map<String, FieldBinder<NegotiationDataBuilder>> createNegotiationBinders() {
+        final Map<String, FieldBinder<NegotiationDataBuilder>> binders = new HashMap<>();
+        binders.put("originalPayStep", (b, n, c, v) -> b.originalPayStep = parseInt(n));
+        binders.put("originalSupportStep", (b, n, c, v) -> b.originalSupportStep = parseInt(n));
+        binders.put("originalTransportStep", (b, n, c, v) -> b.originalTransportStep = parseInt(n));
+        binders.put("originalSalvageStep", (b, n, c, v) -> b.originalSalvageStep = parseInt(n));
+        binders.put("originalCommandStep", (b, n, c, v) -> b.originalCommandStep = parseInt(n));
+        binders.put("reputationUsed", (b, n, c, v) -> b.reputationUsed = parseInt(n));
+        binders.put("swapsUsed", (b, n, c, v) -> b.swapsUsed = parseInt(n));
+        binders.put("sacrificeBank", (b, n, c, v) -> b.sacrificeBank = parseInt(n));
+        binders.put("funding", (b, n, c, v) -> b.funding = parseFunding(n));
+        return binders;
     }
 
     private static NegotiationData parseNegotiationData(final Node wn) {
-        int originalPayStep = 0;
-        int originalSupportStep = 0;
-        int originalTransportStep = 0;
-        int originalSalvageStep = 0;
-        int originalCommandStep = 0;
-        int reputationUsed = 0;
-        int swapsUsed = 0;
-        int sacrificeBank = 0;
-        final List<List<TermFunding>> funding = new ArrayList<>();
-
-        final NodeList children = wn.getChildNodes();
-        for (int i = 0; i < children.getLength(); i++) {
-            final Node child = children.item(i);
-            if (child.getNodeType() != Node.ELEMENT_NODE) {
-                continue;
-            }
-            switch (child.getNodeName()) {
-                case "originalPayStep" -> originalPayStep = parseInt(child);
-                case "originalSupportStep" -> originalSupportStep = parseInt(child);
-                case "originalTransportStep" -> originalTransportStep = parseInt(child);
-                case "originalSalvageStep" -> originalSalvageStep = parseInt(child);
-                case "originalCommandStep" -> originalCommandStep = parseInt(child);
-                case "reputationUsed" -> reputationUsed = parseInt(child);
-                case "swapsUsed" -> swapsUsed = parseInt(child);
-                case "sacrificeBank" -> sacrificeBank = parseInt(child);
-                case "funding" -> funding.addAll(parseFunding(child));
-                default -> LOGGER.warn("Unexpected negotiationData element ignored: {}", child.getNodeName());
-            }
-        }
-
-        return new NegotiationData(originalPayStep, originalSupportStep, originalTransportStep, originalSalvageStep,
-              originalCommandStep, reputationUsed, swapsUsed, sacrificeBank, funding);
+        final NegotiationDataBuilder builder = readFields(wn, new NegotiationDataBuilder(), NEGOTIATION_BINDERS, null,
+              null, "negotiationData");
+        return new NegotiationData(builder.originalPayStep, builder.originalSupportStep, builder.originalTransportStep,
+              builder.originalSalvageStep, builder.originalCommandStep, builder.reputationUsed, builder.swapsUsed,
+              builder.sacrificeBank, builder.funding);
     }
 
     private static List<List<TermFunding>> parseFunding(final Node wn) {

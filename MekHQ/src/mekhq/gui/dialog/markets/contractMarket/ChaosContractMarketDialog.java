@@ -47,6 +47,8 @@ import java.awt.Rectangle;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+import java.util.UUID;
 import javax.swing.*;
 
 import megamek.client.ui.comboBoxes.MMComboBox;
@@ -60,6 +62,7 @@ import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.force.Detachment;
 import mekhq.campaign.force.PlayerForce;
 import mekhq.campaign.mission.newContract.AbstractContract;
+import mekhq.campaign.mission.newContract.ContractMarket;
 import mekhq.campaign.mission.newContract.contractGeneration.AbstractContractGeneration;
 import mekhq.campaign.mission.newContract.contractGeneration.ContractSearchType;
 import mekhq.campaign.universe.Faction;
@@ -88,6 +91,7 @@ public class ChaosContractMarketDialog extends JDialog implements ContractMarket
     private final transient Campaign campaign;
     private final JFrame parent;
     private final LocalDate currentDate;
+    private final transient ContractMarket contractMarket;
     private final transient List<AbstractContract> contracts;
     private transient ContractSearchType searchType;
 
@@ -97,10 +101,10 @@ public class ChaosContractMarketDialog extends JDialog implements ContractMarket
     private transient AbstractContract acceptedContract;
 
     /**
-     * Constructs and shows the contract market, generating its initial offers with {@link AbstractContractGeneration}.
+     * Constructs and shows the contract market backed by the player force's {@link ContractMarket}.
      *
-     * <p>This is the convenience entry point used until a persistent contract-market backend exists: it rolls up to
-     * {@link #INITIAL_OFFERS} offers on the spot and hands them to the list constructor.</p>
+     * <p>The board shows the offers stored under the campaign's default {@link ContractSearchType}; switching type in
+     * the header swaps to that type's map (see {@link #loadOffersForSearchType()}).</p>
      *
      * @param campaign the active campaign
      *
@@ -108,25 +112,14 @@ public class ChaosContractMarketDialog extends JDialog implements ContractMarket
      * @since 0.51.01
      */
     public ChaosContractMarketDialog(Campaign campaign) {
-        this(campaign, generateOffers(campaign, INITIAL_OFFERS, false, defaultSearchType(campaign)));
-    }
-
-    /**
-     * Constructs and shows the contract market for the supplied offers.
-     *
-     * @param campaign  the active campaign
-     * @param contracts the offers to display; may be empty (0 offers is a valid, expected state)
-     *
-     * @author Illiani
-     * @since 0.51.01
-     */
-    public ChaosContractMarketDialog(Campaign campaign, List<AbstractContract> contracts) {
         super(campaign.getGUI().getFrame(), true);
         this.campaign = campaign;
         this.parent = campaign.getGUI().getFrame();
         this.currentDate = campaign.getLocalDate();
-        this.contracts = new ArrayList<>(contracts);
+        this.contractMarket = campaign.getPlayerForce().getContractMarket();
         this.searchType = defaultSearchType(campaign);
+        this.contracts = new ArrayList<>();
+        loadOffersForSearchType();
 
         initializeComponents();
     }
@@ -235,18 +228,37 @@ public class ChaosContractMarketDialog extends JDialog implements ContractMarket
     }
 
     /**
-     * Switches the search type and regenerates the board so the visible offers match the newly chosen type. Pirate and
-     * government types currently produce no offers, so the board falls to its empty state until their generation
-     * lands.
+     * Switches the search type and shows that type's offers from the {@link ContractMarket}. Types whose generation is
+     * not yet implemented (pirate, government, tournament) have empty maps, so the board falls to its empty state until
+     * their generation lands.
      *
      * @author Illiani
      * @since 0.51.01
      */
     private void changeSearchType(ContractSearchType newType) {
         searchType = newType;
-        contracts.clear();
-        contracts.addAll(generateOffers(campaign, INITIAL_OFFERS, false, searchType));
+        loadOffersForSearchType();
         rebuildContent();
+    }
+
+    /**
+     * Mirrors the active search type's {@link ContractMarket} map into the visible {@link #contracts} list, seeding
+     * that map with a fresh batch of offers the first time a type is viewed. Each of the four maps therefore populates
+     * lazily and then persists on the {@link PlayerForce}; switching away and back shows the same offers rather than
+     * rerolling them. Types whose generation is not yet implemented simply stay empty.
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    private void loadOffersForSearchType() {
+        Map<UUID, AbstractContract> marketOffers = contractMarket.getContracts(searchType);
+        if (marketOffers.isEmpty()) {
+            for (AbstractContract contract : generateOffers(campaign, INITIAL_OFFERS, false, searchType)) {
+                marketOffers.put(contract.getContractId(), contract);
+            }
+        }
+        contracts.clear();
+        contracts.addAll(marketOffers.values());
     }
 
     private String countMessage() {
@@ -385,6 +397,7 @@ public class ChaosContractMarketDialog extends JDialog implements ContractMarket
      */
     @Override
     public void delete(AbstractContract contract) {
+        contractMarket.removeContract(searchType, contract);
         contracts.remove(contract);
         rebuildContent();
     }
@@ -405,6 +418,7 @@ public class ChaosContractMarketDialog extends JDialog implements ContractMarket
      * @since 0.51.01
      */
     private void deleteAllContracts() {
+        contractMarket.getContracts(searchType).clear();
         contracts.clear();
         rebuildContent();
     }
@@ -426,7 +440,12 @@ public class ChaosContractMarketDialog extends JDialog implements ContractMarket
             return;
         }
 
-        contracts.addAll(generated);
+        Map<UUID, AbstractContract> marketOffers = contractMarket.getContracts(searchType);
+        for (AbstractContract contract : generated) {
+            marketOffers.put(contract.getContractId(), contract);
+        }
+        contracts.clear();
+        contracts.addAll(marketOffers.values());
         rebuildContent();
         selectContract(generated.getFirst());
     }
@@ -461,7 +480,8 @@ public class ChaosContractMarketDialog extends JDialog implements ContractMarket
 
     /**
      * The search types a campaign may choose between. Mercenary and pirate bands may look for either mercenary or
-     * pirate work; government campaigns are limited to government contracts.
+     * pirate work; government campaigns are limited to government contracts. Tournament circuits are open to every
+     * campaign.
      *
      * @author Illiani
      * @since 0.51.01
@@ -469,9 +489,9 @@ public class ChaosContractMarketDialog extends JDialog implements ContractMarket
     private static List<ContractSearchType> allowedSearchTypes(Campaign campaign) {
         Faction faction = campaign.getPlayerForce().getFaction();
         if (faction.isMercenary() || faction.isPirate()) {
-            return List.of(ContractSearchType.MERCENARY, ContractSearchType.PIRATE);
+            return List.of(ContractSearchType.MERCENARY, ContractSearchType.PIRATE, ContractSearchType.TOURNAMENT);
         }
-        return List.of(ContractSearchType.GOVERNMENT);
+        return List.of(ContractSearchType.GOVERNMENT, ContractSearchType.TOURNAMENT);
     }
 
     /**
