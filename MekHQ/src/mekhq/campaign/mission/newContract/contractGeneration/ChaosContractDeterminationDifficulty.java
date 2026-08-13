@@ -61,7 +61,7 @@ import mekhq.campaign.universe.Factions;
  * producing values from {@code 1} (easiest) to {@code 10} (hardest).</p>
  *
  * @author Illiani
- * @since 0.50.08
+ * @since 0.51.01
  */
 public class ChaosContractDeterminationDifficulty {
     /** Generic BV is used so this scale matches the one AtB contracts are rated on. */
@@ -78,7 +78,7 @@ public class ChaosContractDeterminationDifficulty {
      *       cannot be estimated
      *
      * @author Illiani
-     * @since 0.50.08
+     * @since 0.51.01
      */
     public static int calculateContractDifficulty(Campaign campaign, AbstractContract contract) {
         String enemyCode = contract.getEnemyFactionCode();
@@ -112,7 +112,7 @@ public class ChaosContractDeterminationDifficulty {
      * skill level higher than their nominal rating.
      *
      * @author Illiani
-     * @since 0.50.08
+     * @since 0.51.01
      */
     static SkillLevel modifySkillLevelBasedOnFaction(String factionCode, SkillLevel skillLevel) {
         if (Objects.equals(factionCode, "SOC")) {
@@ -130,7 +130,7 @@ public class ChaosContractDeterminationDifficulty {
      * Estimates the average combat power of the player's participating combat units.
      *
      * @author Illiani
-     * @since 0.50.08
+     * @since 0.51.01
      */
     static double estimatePlayerPower(List<Entity> units) {
         if (units.isEmpty()) {
@@ -152,7 +152,7 @@ public class ChaosContractDeterminationDifficulty {
      * Returns the skill BV multiplier for the given skill level.
      *
      * @author Illiani
-     * @since 0.50.08
+     * @since 0.51.01
      */
     private static double getSkillMultiplier(SkillLevel skillLevel) {
         return switch (skillLevel) {
@@ -171,7 +171,7 @@ public class ChaosContractDeterminationDifficulty {
      * Estimates the average combat power of non-salvage 'Meks available to a faction at a given quality level.
      *
      * @author Illiani
-     * @since 0.50.08
+     * @since 0.51.01
      */
     static double estimateMekStrength(int gameYear, String factionCode, int quality) {
         final double ERROR = 0;
@@ -230,7 +230,7 @@ public class ChaosContractDeterminationDifficulty {
      * Computes an average (generic) battle value.
      *
      * @author Illiani
-     * @since 0.50.08
+     * @since 0.51.01
      */
     private static double averageBattleValue(int totalBV, int totalGBV, int divisor) {
         if (divisor == 0) {

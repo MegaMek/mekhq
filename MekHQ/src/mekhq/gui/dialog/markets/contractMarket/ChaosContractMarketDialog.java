@@ -538,7 +538,7 @@ public class ChaosContractMarketDialog extends JDialog implements ContractMarket
         body.setAlignmentX(JLabel.CENTER_ALIGNMENT);
 
         panel.add(title);
-        panel.add(javax.swing.Box.createVerticalStrut(PADDING));
+        panel.add(Box.createVerticalStrut(PADDING));
         panel.add(body);
         return panel;
     }

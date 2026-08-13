@@ -358,9 +358,10 @@ public final class ContractXmlCodec {
         readers.put("missionStatus",
               (contract, node, campaign, version) -> contract.setMissionStatus(MissionStatus.parseFromString(text(node))));
         readers.put("playerNegotiatorId",
-              (contract, node, campaign, version) -> contract.setPlayerNegotiator(campaign.getPerson(UUID.fromString(
-                    text(
-                          node)))));
+              (contract, node, campaign, version) -> contract.setPlayerNegotiator(campaign.getPlayerForce()
+                                                                                        .getHumanResources()
+                                                                                        .getPerson(UUID.fromString(text(
+                                                                                              node)))));
 
         readers.put("employerData",
               (contract, node, campaign, version) -> contract.setEmployerData(parseEmployerData(node,
