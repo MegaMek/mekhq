@@ -53,6 +53,7 @@ import megamek.client.bot.princess.PrincessException;
 import megamek.client.ui.comboBoxes.MMComboBox;
 import megamek.client.ui.dialogs.buttonDialogs.BotConfigDialog;
 import megamek.client.ui.dialogs.iconChooser.CamoChooserDialog;
+import megamek.client.ui.util.MULVersionValidator;
 import megamek.common.Player;
 import megamek.common.enums.SkillLevel;
 import megamek.common.icons.Camouflage;
@@ -602,6 +603,9 @@ public class CustomizeBotForceDialog extends JDialog {
                 parser = new MULParser(units.get(), campaign.getGameOptions());
             } catch (Exception ex) {
                 LOGGER.error("Could not parse BotForce entities", ex);
+                return;
+            }
+            if (!MULVersionValidator.isCorrectVersion(frame, parser)) {
                 return;
             }
             fixedEntities = Collections.list(parser.getEntities().elements());
