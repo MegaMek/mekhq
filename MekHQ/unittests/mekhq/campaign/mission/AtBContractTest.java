@@ -43,6 +43,7 @@ import static org.mockito.Mockito.anyBoolean;
 import static org.mockito.Mockito.anyInt;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.eq;
+import static org.mockito.Mockito.inOrder;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.same;
 import static org.mockito.Mockito.times;
@@ -89,6 +90,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
+import org.mockito.InOrder;
 
 public class AtBContractTest {
     private AtBContract contract;
@@ -135,7 +137,9 @@ public class AtBContractTest {
         contract.createEmployerLiaison(campaign);
 
         assertSame(liaison, contract.getEmployerLiaison());
-        verify(liaison).setRankSystem(any(RankValidator.class), same(employerRankSystem));
+        InOrder rankAssignmentOrder = inOrder(liaison);
+        rankAssignmentOrder.verify(liaison).setRankSystem(any(RankValidator.class), same(employerRankSystem));
+        rankAssignmentOrder.verify(liaison).setRank(RO_MIN);
     }
 
     @Test
