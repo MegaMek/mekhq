@@ -199,6 +199,15 @@ public abstract class AbstractContract {
     }
 
     /**
+     * @return the contract's name, so UI components that render a contract directly (such as the Briefing Room's
+     *       current-mission selector) show it by name rather than by object identity
+     */
+    @Override
+    public String toString() {
+        return getName();
+    }
+
+    /**
      * Returns the name of this object as an HTML hyperlink.
      *
      * <p>The hyperlink is formatted with a "MISSION:" protocol prefix followed by the object's ID. This allows UI
@@ -405,11 +414,11 @@ public abstract class AbstractContract {
         this.playerNegotiator = playerNegotiator;
     }
 
-    public StratConCampaignState getStratConCampaignState() {
+    public @Nullable StratConCampaignState getStratConCampaignState() {
         return stratConCampaignState;
     }
 
-    public void setStratConCampaignState(StratConCampaignState stratConCampaignState) {
+    public void setStratConCampaignState(@Nullable StratConCampaignState stratConCampaignState) {
         this.stratConCampaignState = stratConCampaignState;
     }
 
@@ -721,7 +730,15 @@ public abstract class AbstractContract {
         setScheduleData(new ContractScheduleData(scheduleData, localDate, localDate.plusMonths(getLengthInMonths())));
     }
 
+    /**
+     * @return the contract's available support points, or 0 when it has no StratCon campaign state (the player opted
+     *       out of StratCon for this contract, or it came from a save that never had one)
+     */
     public int getCurrentSupportPoints() {
+        if (stratConCampaignState == null) {
+            return 0;
+        }
+
         return stratConCampaignState.getSupportPoints();
     }
 

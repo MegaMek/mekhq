@@ -96,6 +96,14 @@ public class RetirementDefectionTracker {
     final private Map<UUID, Payout> payouts;
     private LocalDate lastRetirementRoll;
 
+    /**
+     * Contract references loaded from a pre-UUID save, held until the campaign loader can map their legacy integer
+     * mission ids onto the converted contracts' {@link UUID}s (see {@link #relinkLegacyMissionIds(Map)}). Empty for
+     * modern saves.
+     */
+    final private transient Set<Integer> legacyRollRequired = new HashSet<>();
+    final private transient Map<Integer, HashSet<UUID>> legacyUnresolvedPersonnel = new HashMap<>();
+
     private static Person asfCommander;
     private static Integer asfCommanderModifier;
     private static Person vehicleCrewCommander;
@@ -1202,6 +1210,69 @@ public class RetirementDefectionTracker {
         MHQXMLUtility.writeSimpleXMLCloseTag(pw, --indent, "retirementDefectionTracker");
     }
 
+    /**
+     * Parses a contract reference, returning {@code null} when the value is not a {@link UUID} (i.e. a legacy integer
+     * mission id from a pre-UUID save) rather than throwing.
+     */
+    private static @Nullable UUID parseMissionId(final String text) {
+        if ((text == null) || text.isBlank()) {
+            return null;
+        }
+
+        try {
+            return UUID.fromString(text.trim());
+        } catch (IllegalArgumentException ex) {
+            return null;
+        }
+    }
+
+    /** Parses a legacy integer mission id, or {@code null} when the value is not an integer. */
+    private static @Nullable Integer parseLegacyMissionId(final String text) {
+        if ((text == null) || text.isBlank()) {
+            return null;
+        }
+
+        try {
+            return Integer.valueOf(text.trim());
+        } catch (NumberFormatException ex) {
+            return null;
+        }
+    }
+
+    /**
+     * Re-hooks contract references loaded from a pre-UUID save onto the contracts those legacy missions were converted
+     * into. Called by the campaign loader once every mission has been read, so it does not matter whether the tracker
+     * or the missions were parsed first. References whose mission was not converted are discarded (the tracker's own
+     * orphan-record cleanup would drop them anyway).
+     *
+     * @param legacyMissionIdMap legacy integer mission id to converted contract {@link UUID}
+     *
+     * @return the number of references successfully re-hooked
+     */
+    public int relinkLegacyMissionIds(final Map<Integer, UUID> legacyMissionIdMap) {
+        int relinked = 0;
+
+        for (final Integer legacyId : legacyRollRequired) {
+            final UUID missionId = legacyMissionIdMap.get(legacyId);
+            if (missionId != null) {
+                rollRequired.add(missionId);
+                relinked++;
+            }
+        }
+        legacyRollRequired.clear();
+
+        for (final Map.Entry<Integer, HashSet<UUID>> entry : legacyUnresolvedPersonnel.entrySet()) {
+            final UUID missionId = legacyMissionIdMap.get(entry.getKey());
+            if (missionId != null) {
+                unresolvedPersonnel.put(missionId, entry.getValue());
+                relinked++;
+            }
+        }
+        legacyUnresolvedPersonnel.clear();
+
+        return relinked;
+    }
+
     public static RetirementDefectionTracker generateInstanceFromXML(Node wn, Campaign c) {
         RetirementDefectionTracker retVal = null;
 
@@ -1225,7 +1296,17 @@ public class RetirementDefectionTracker {
                     if (!wn2.getTextContent().isBlank()) {
                         String[] ids = wn2.getTextContent().split(",");
                         for (String id : ids) {
-                            retVal.rollRequired.add(UUID.fromString(id));
+                            // Pre-UUID saves stored a legacy integer mission id here; hold it for re-hooking rather
+                            // than throwing (which would abort the rest of the tracker's parse).
+                            UUID missionId = parseMissionId(id);
+                            if (missionId != null) {
+                                retVal.rollRequired.add(missionId);
+                            } else {
+                                Integer legacyId = parseLegacyMissionId(id);
+                                if (legacyId != null) {
+                                    retVal.legacyRollRequired.add(legacyId);
+                                }
+                            }
                         }
                     }
                 } else if (wn2.getNodeName().equalsIgnoreCase("unresolvedPersonnel")) {
@@ -1236,12 +1317,21 @@ public class RetirementDefectionTracker {
                             continue;
                         }
                         if (wn3.getNodeName().equalsIgnoreCase("contract")) {
-                            UUID id = UUID.fromString(wn3.getAttributes().getNamedItem("id").getTextContent());
+                            String rawId = wn3.getAttributes().getNamedItem("id").getTextContent();
                             String[] ids = wn3.getTextContent().split(",");
                             HashSet<UUID> pids = Arrays.stream(ids)
                                                        .map(UUID::fromString)
                                                        .collect(Collectors.toCollection(HashSet::new));
-                            retVal.unresolvedPersonnel.put(id, pids);
+
+                            UUID id = parseMissionId(rawId);
+                            if (id != null) {
+                                retVal.unresolvedPersonnel.put(id, pids);
+                            } else {
+                                Integer legacyId = parseLegacyMissionId(rawId);
+                                if (legacyId != null) {
+                                    retVal.legacyUnresolvedPersonnel.put(legacyId, pids);
+                                }
+                            }
                         }
                     }
                 } else if (wn2.getNodeName().equalsIgnoreCase("payouts")) {

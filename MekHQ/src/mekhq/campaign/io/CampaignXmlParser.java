@@ -1619,13 +1619,16 @@ public record CampaignXmlParser(InputStream is, MekHQ app) {
      * Runs once the whole save is parsed, so it does not matter whether the referencing nodes or the missions were read
      * first. A reference whose old mission was not converted (e.g. its mission node was missing) is left unlinked.
      */
-    private static void relinkLegacyMissions(final Map<Integer, UUID> legacyMissionIdMap,
+    private static void relinkLegacyMissions(final Campaign campaign, final Map<Integer, UUID> legacyMissionIdMap,
           final List<LegacyMissionRelink> pendingMissionRelinks) {
-        if (pendingMissionRelinks.isEmpty()) {
-            return;
-        }
+        // The turnover tracker holds its own legacy contract references (pending rolls and unresolved personnel), which
+        // it stashed during its parse; resolve those too. It is absent from saves that never had one.
+        final RetirementDefectionTracker turnoverTracker = campaign.getPlayerForce()
+                                                                 .getHumanResources()
+                                                                 .getRetirementDefectionTracker();
+        int relinked = (turnoverTracker == null) ? 0 : turnoverTracker.relinkLegacyMissionIds(legacyMissionIdMap);
+        int total = relinked;
 
-        int relinked = 0;
         for (final LegacyMissionRelink link : pendingMissionRelinks) {
             final UUID newMissionId = legacyMissionIdMap.get(link.legacyMissionId());
             if (newMissionId != null) {
@@ -1633,10 +1636,12 @@ public record CampaignXmlParser(InputStream is, MekHQ app) {
                 relinked++;
             }
         }
+        total += pendingMissionRelinks.size();
 
-        final int unmatched = pendingMissionRelinks.size() - relinked;
-        LOGGER.info("Re-hooked {} of {} legacy mission reference(s) to their converted contracts ({} had no match).",
-              relinked, pendingMissionRelinks.size(), unmatched);
+        if (total > 0) {
+            LOGGER.info("Re-hooked {} of {} legacy mission reference(s) to their converted contracts ({} had no match).",
+                  relinked, total, total - relinked);
+        }
     }
 
     /**
@@ -2720,7 +2725,7 @@ public record CampaignXmlParser(InputStream is, MekHQ app) {
 
         migrateLegacyEducationTravel(campaign);
         reconnectPersonsToTravelLocations(campaign);
-        relinkLegacyMissions(legacyMissionIdMap, pendingMissionRelinks);
+        relinkLegacyMissions(campaign, legacyMissionIdMap, pendingMissionRelinks);
         LOGGER.info("Load of campaign file complete!");
 
         return campaign;
