@@ -103,6 +103,8 @@ public abstract class AbstractContract {
     private int requiredCombatElements;
     private int requiredVictoryPoints;
     private int trackCount; // TODO future proofing
+    /** A "pity" contract: an easy top-up offer, surfaced in the market as a Proving Ground. */
+    private boolean provingGround;
 
     private final List<Scenario> scenarios = new ArrayList<>();
 
@@ -433,6 +435,15 @@ public abstract class AbstractContract {
 
     public void setTrackCount(int trackCount) {
         this.trackCount = trackCount;
+    }
+
+    /** @return {@code true} if this is a pity ("Proving Ground") contract - an easy top-up offer for a struggling force */
+    public boolean isProvingGround() {
+        return provingGround;
+    }
+
+    public void setProvingGround(boolean provingGround) {
+        this.provingGround = provingGround;
     }
 
     public int getRequiredVictoryPoints() {

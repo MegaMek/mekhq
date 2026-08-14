@@ -55,6 +55,7 @@ import mekhq.campaign.force.Detachment;
 import mekhq.campaign.force.PlayerForce;
 import mekhq.campaign.mission.newContract.AbstractContract;
 import mekhq.campaign.mission.newContract.ContractMarket;
+import mekhq.campaign.mission.newContract.utilities.PityContracts;
 import mekhq.campaign.universe.Faction;
 import mekhq.campaign.universe.enums.HiringHallLevel;
 import mekhq.campaign.universe.factionStanding.FactionStandings;
@@ -298,6 +299,10 @@ public final class ChaosContractMarketAvailability {
             totalOffers += count;
         }
 
+        // Top the market up with easy "Proving Ground" offers if the force has not yet earned enough successful
+        // contracts. These are additional to the rolled offers above and are not counted in the summary report.
+        PityContracts.generatePityContracts(campaign);
+
         campaign.addReport(DailyReportType.GENERAL, buildSummaryReport(rolls, totalOffers));
         campaign.addReport(DailyReportType.SKILL_CHECKS, buildRollBreakdownReport(campaign, rolls));
     }
@@ -406,6 +411,32 @@ public final class ChaosContractMarketAvailability {
      */
     public static List<AbstractContract> generateOffers(final Campaign campaign, final int count, final boolean isGM,
           final ContractSearchType searchType) {
+        final List<AbstractContract> generated = new ArrayList<>();
+        for (int i = 0; i < count; i++) {
+            final AbstractContract contract = generateOne(campaign, searchType, isGM, false);
+            if (contract != null) {
+                generated.add(contract);
+            }
+        }
+        return generated;
+    }
+
+    /**
+     * Generates a single "Proving Ground" (pity) offer for the given search type: an ordinary offer that generation
+     * deliberately makes easy (a veteran ally against a green enemy) and flags as a
+     * {@link AbstractContract#isProvingGround() Proving Ground}. Used by {@code PityContracts} to top up a struggling
+     * force's market.
+     *
+     * @return the generated offer, or {@code null} if generation could not place one
+     */
+    public static @jakarta.annotation.Nullable AbstractContract generateProvingGroundOffer(final Campaign campaign,
+          final ContractSearchType searchType) {
+        return generateOne(campaign, searchType, false, true);
+    }
+
+    /** Assembles the generation context from the campaign and produces one contract (or {@code null}). */
+    private static @jakarta.annotation.Nullable AbstractContract generateOne(final Campaign campaign,
+          final ContractSearchType searchType, final boolean isGM, final boolean provingGround) {
         final CampaignOptions campaignOptions = campaign.getCampaignOptions();
         final LocalDate currentDate = campaign.getLocalDate();
         final PlayerForce playerForce = campaign.getPlayerForce();
@@ -413,21 +444,15 @@ public final class ChaosContractMarketAvailability {
         final FactionStandings factionStandings = playerForce.getFactionStandings();
         final boolean isOverridingCommandCircuitRequirements = playerForce.isOverridingCommandCircuitRequirements();
 
-        final List<AbstractContract> generated = new ArrayList<>();
-        for (int i = 0; i < count; i++) {
-            final AbstractContract contract = AbstractContractGeneration.createContract(campaign,
-                  campaignOptions,
-                  currentDate,
-                  detachment,
-                  0,
-                  searchType,
-                  factionStandings,
-                  isOverridingCommandCircuitRequirements,
-                  isGM);
-            if (contract != null) {
-                generated.add(contract);
-            }
-        }
-        return generated;
+        return AbstractContractGeneration.createContract(campaign,
+              campaignOptions,
+              currentDate,
+              detachment,
+              0,
+              searchType,
+              factionStandings,
+              isOverridingCommandCircuitRequirements,
+              isGM,
+              provingGround);
     }
 }

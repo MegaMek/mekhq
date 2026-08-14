@@ -81,8 +81,10 @@ public class AbstractContractGeneration {
 
     public static @Nullable AbstractContract createContract(Campaign campaign, CampaignOptions campaignOptions,
           LocalDate currentDate, Detachment detachment, int contractGenerationModifier, ContractSearchType searchType,
-          FactionStandings factionStandings, boolean overridingCommandCircuitRequirements, boolean isGM) {
+          FactionStandings factionStandings, boolean overridingCommandCircuitRequirements, boolean isGM,
+          boolean provingGround) {
         final ChaosContract contract = new ChaosContract();
+        contract.setProvingGround(provingGround);
 
         // Step 1: Employer
         AbstractLocation currentLocation = detachment.getCurrentLocation();
@@ -129,7 +131,8 @@ public class AbstractContractGeneration {
               employerData,
               enemyData,
               objectiveData,
-              contract);
+              contract,
+              provingGround);
 
         // Step 6: Length
         boolean useVariableContractLength = campaignOptions.get(CampaignOption.VARIABLE_CONTRACT_LENGTH);
@@ -235,7 +238,7 @@ public class AbstractContractGeneration {
      */
     private static void setForceRatings(PlayerForce playerForce, CampaignOptions campaignOptions, LocalDate currentDate,
           Detachment detachment, Planet targetPlanet, EmployerData employerData, EnemyData enemyData,
-          ContractObjectiveData objectiveData, ChaosContract contract) {
+          ContractObjectiveData objectiveData, ChaosContract contract, boolean provingGround) {
         int planetStrategicValue = (targetPlanet == null) ?
                                          0 :
                                          ChaosPlanetStrategicValue.calculate(targetPlanet, currentDate);
@@ -271,12 +274,17 @@ public class AbstractContractGeneration {
               scaleToPlayer,
               playerAverageSkill);
 
+        // Proving Ground (pity) contracts are deliberately easy: a veteran ally against a green enemy. The rest of the
+        // rating - equipment, factions, everything else - is left as generated.
+        SkillLevel employerSkill = provingGround ? SkillLevel.VETERAN : employerRating.forceSkill();
+        SkillLevel enemySkill = provingGround ? SkillLevel.GREEN : enemyRating.forceSkill();
+
         EmployerData updatedEmployerData = new EmployerData(employerData,
-              employerRating.forceSkill(),
+              employerSkill,
               employerRating.equipmentRating());
         contract.setEmployerData(updatedEmployerData);
 
-        EnemyData updatedEnemyData = new EnemyData(enemyData, enemyRating.forceSkill(), enemyRating.equipmentRating());
+        EnemyData updatedEnemyData = new EnemyData(enemyData, enemySkill, enemyRating.equipmentRating());
         contract.setEnemyData(updatedEnemyData);
     }
 

@@ -41,9 +41,9 @@ import java.util.UUID;
 import megamek.Version;
 import megamek.logging.MMLogger;
 import mekhq.campaign.Campaign;
-import mekhq.campaign.mission.Mission;
 import mekhq.campaign.mission.enums.MissionStatus;
 import mekhq.campaign.mission.newContract.AbstractContract;
+import mekhq.campaign.mission.newContract.io.ContractXmlCodec;
 import mekhq.campaign.storyArc.StoryPoint;
 import mekhq.utilities.MHQXMLUtility;
 import org.w3c.dom.Node;
@@ -162,7 +162,7 @@ public class MissionStoryPoint extends StoryPoint {
             if (mission.getId() != null) {
                 MHQXMLUtility.writeSimpleXMLTag(pw1, indent, "missionId", mission.getId());
             } else {
-                mission.writeToXML(getCampaign(), pw1, indent);
+                ContractXmlCodec.writeContract(pw1, indent, mission, getCampaign());
             }
         }
         writeToXmlEnd(pw1, --indent);
@@ -182,8 +182,8 @@ public class MissionStoryPoint extends StoryPoint {
                     if (null != c) {
                         mission = c.getContract(missionId);
                     }
-                } else if (wn2.getNodeName().equalsIgnoreCase("mission")) {
-                    mission = Mission.generateInstanceFromXML(wn2, c, version);
+                } else if (wn2.getNodeName().equalsIgnoreCase(ContractXmlCodec.CONTRACT_TAG)) {
+                    mission = ContractXmlCodec.readContract(wn2, c, version);
                 } else if (wn2.getNodeName().equalsIgnoreCase("scenarioStoryPointId")) {
                     scenarioStoryPointIds.add(UUID.fromString(wn2.getTextContent().trim()));
                 } else if (wn2.getNodeName().equalsIgnoreCase("percentWin")) {

@@ -62,6 +62,7 @@ import mekhq.campaign.mission.newContract.AbstractContract;
 import mekhq.campaign.mission.newContract.ContractMarket;
 import mekhq.campaign.mission.newContract.contractGeneration.ChaosContractMarketAvailability;
 import mekhq.campaign.mission.newContract.contractGeneration.ContractSearchType;
+import mekhq.campaign.mission.newContract.utilities.ContractAcceptance;
 import mekhq.campaign.universe.Faction;
 import mekhq.gui.baseComponents.roundedComponents.RoundedJButton;
 import mekhq.gui.baseComponents.roundedComponents.RoundedLineBorder;
@@ -105,6 +106,9 @@ public class ChaosContractMarketDialog extends JDialog implements ContractMarket
           "checkbox.contractMarket.mothball.tooltip");
     private final JCheckBox travelToSystemCheckbox = buildOptionCheckbox("checkbox.contractMarket.travel",
           "checkbox.contractMarket.travel.tooltip");
+    /** Only shown (and only meaningful) when the campaign uses StratCon; unticked leaves the contract without one. */
+    private final JCheckBox useStratConCheckbox = buildOptionCheckbox("checkbox.contractMarket.stratcon",
+          "checkbox.contractMarket.stratcon.tooltip");
 
     /**
      * Constructs and shows the contract market backed by the player force's {@link ContractMarket}.
@@ -355,21 +359,26 @@ public class ChaosContractMarketDialog extends JDialog implements ContractMarket
     }
 
     /**
-     * Records the accepted offer and closes the market.
-     *
-     * <p>TODO: Wire this into the campaign once a commit-to-active-mission pipeline exists for
-     * {@link AbstractContract}. At present {@link AbstractContract} is a pure data class with no path to becoming an
-     * active mission, so this intentionally only captures the player's choice (retrievable via
-     * {@link #getAcceptedContract()}) and disposes the dialog. The caller is responsible for committing the returned
-     * contract.</p>
+     * Commits the offer to the campaign via {@link ContractAcceptance}, honoring the player's on-departure and StratCon
+     * checkbox choices. If the player cancels at the confirmation nag the market stays open; otherwise the accepted
+     * offer is recorded and the dialog closes.
      *
      * @author Illiani
      * @since 0.51.01
      */
     @Override
     public void accept(AbstractContract contract) {
-        LOGGER.info("Contract accepted from market: {} (pending campaign-commit pipeline)",
-              contract.getName());
+        boolean accepted = ContractAcceptance.accept(campaign,
+              contract,
+              searchType,
+              isUseStratConSelected(),
+              isMothballOnDepartureSelected(),
+              isTravelToSystemSelected());
+        if (!accepted) {
+            return;
+        }
+
+        LOGGER.info("Contract accepted from market: {}", contract.getName());
         this.acceptedContract = contract;
         dispose();
     }
@@ -403,12 +412,18 @@ public class ChaosContractMarketDialog extends JDialog implements ContractMarket
     }
 
     /**
-     * TODO: Open the GM contract editor once one exists for {@link AbstractContract}. For now this only records the
-     * intent.
+     * Opens the GM editor for the offer. If the GM confirms changes, the contract is updated in place, so the dossier is
+     * rebuilt to reflect them.
+     *
+     * @author Illiani
+     * @since 0.51.01
      */
     @Override
     public void edit(AbstractContract contract) {
-        LOGGER.info("GM edit requested for contract: {} (pending contract editor).", contract.getName());
+        ContractEditorDialog editor = new ContractEditorDialog(campaign, contract);
+        if (editor.wasConfirmed()) {
+            selectContract(contract);
+        }
     }
 
     /**
@@ -495,11 +510,27 @@ public class ChaosContractMarketDialog extends JDialog implements ContractMarket
     }
 
     /**
-     * TODO: Open a GM contract-creation flow and add the result to the board once one exists. For now this only records
-     * the intent.
+     * Opens the GM editor on a fresh, fully-defaulted contract. If the GM confirms, the new offer is added to the
+     * current search type's market and shown on the board.
+     *
+     * @author Illiani
+     * @since 0.51.01
      */
     private void createNewContract() {
-        LOGGER.info("GM create-new requested (pending contract-creation flow).");
+        AbstractContract contract = NewContractFactory.createBlank(campaign);
+        ContractEditorDialog editor = new ContractEditorDialog(campaign, contract, searchType);
+        if (!editor.wasConfirmed()) {
+            return;
+        }
+
+        ContractSearchType bucket = editor.getSelectedSearchType();
+        contractMarket.addContract(bucket, contract);
+
+        // Switch the board to the bucket the GM chose so the new offer is visible.
+        searchType = bucket;
+        loadOffersForSearchType();
+        rebuildContent();
+        selectContract(contract);
     }
 
     private JPanel buildEmptyState() {
@@ -559,6 +590,17 @@ public class ChaosContractMarketDialog extends JDialog implements ContractMarket
         return travelToSystemCheckbox.isSelected();
     }
 
+    /**
+     * @return {@code true} if the accepted contract should use StratCon (only meaningful when the campaign uses
+     *       StratCon; when {@code false} the contract keeps a {@code null} StratCon campaign state)
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    public boolean isUseStratConSelected() {
+        return useStratConCheckbox.isSelected();
+    }
+
     private JPanel buildButtonBar() {
         boolean isGM = campaign.isGM();
 
@@ -567,6 +609,10 @@ public class ChaosContractMarketDialog extends JDialog implements ContractMarket
 
         bar.add(mothballOnDepartureCheckbox);
         bar.add(travelToSystemCheckbox);
+        // The StratCon opt-out is only relevant when the campaign is running StratCon at all.
+        if (campaign.getCampaignOptions().isUseStratCon()) {
+            bar.add(useStratConCheckbox);
+        }
 
         RoundedJButton close = new RoundedJButton(getTextAt(RESOURCE_BUNDLE, "button.contractMarket.close"));
         close.addActionListener(e -> dispose());

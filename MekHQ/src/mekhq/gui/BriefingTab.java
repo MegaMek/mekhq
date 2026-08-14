@@ -135,16 +135,13 @@ import mekhq.gui.adapter.ScenarioTableMouseAdapter;
 import mekhq.gui.baseComponents.immersiveDialogs.ImmersiveDialogNotification;
 import mekhq.gui.baseComponents.immersiveDialogs.ImmersiveDialogSimple;
 import mekhq.gui.dialog.CompleteMissionDialog;
-import mekhq.gui.dialog.CustomizeMissionDialog;
 import mekhq.gui.dialog.CustomizeScenarioDialog;
-import mekhq.gui.dialog.MissionTypeDialog;
-import mekhq.gui.dialog.NewAtBContractDialog;
-import mekhq.gui.dialog.NewContractDialog;
 import mekhq.gui.dialog.RetirementDefectionDialog;
 import mekhq.gui.dialog.camOpsSalvage.SalvageFormationPicker;
 import mekhq.gui.dialog.camOpsSalvage.SalvageTechPicker;
 import mekhq.gui.dialog.factionStanding.manualMissionDialogs.ManualMissionDialog;
 import mekhq.gui.dialog.factionStanding.manualMissionDialogs.SimulateMissionDialog;
+import mekhq.gui.dialog.markets.contractMarket.ContractEditorDialog;
 import mekhq.gui.enums.MHQTabType;
 import mekhq.gui.model.ScenarioTableModel;
 import mekhq.gui.panels.TutorialHyperlinkPanel;
@@ -282,11 +279,6 @@ public final class BriefingTab extends CampaignGuiTab {
         gridBagConstraints.weighty = 0.0;
         panMission.add(panMissionButtons, gridBagConstraints);
 
-        JButton btnAddMission = new JButton(getTextAt(RESOURCE_BUNDLE, "btnAddMission.text"));
-        btnAddMission.setToolTipText(getTextAt(RESOURCE_BUNDLE, "btnAddMission.toolTipText"));
-        btnAddMission.addActionListener(ev -> addMission());
-        panMissionButtons.add(btnAddMission);
-
         btnAddScenario = new JButton(getTextAt(RESOURCE_BUNDLE, "btnAddScenario.text"));
         btnAddScenario.setToolTipText(getTextAt(RESOURCE_BUNDLE, "btnAddScenario.toolTipText"));
         btnAddScenario.addActionListener(ev -> addScenario());
@@ -313,8 +305,7 @@ public final class BriefingTab extends CampaignGuiTab {
         btnGMGenerateScenarios.setName("btnGMGenerateScenarios");
         btnGMGenerateScenarios.addActionListener(ev -> gmGenerateScenarios());
         panMissionButtons.add(btnGMGenerateScenarios);
-        styleSecondaryButtons(btnAddMission,
-              btnAddScenario,
+        styleSecondaryButtons(btnAddScenario,
               btnEditMission,
               btnCompleteMission,
               btnGMGenerateScenarios);
@@ -777,29 +768,13 @@ public final class BriefingTab extends CampaignGuiTab {
               tab -> MaplessStratCon.deployWithoutMap(tab.getStratconPanel(), getCampaign(), scenario));
     }
 
-    private void addMission() {
-        MissionTypeDialog mtd = new MissionTypeDialog(getFrame(), true);
-        mtd.setVisible(true);
-        if (mtd.isContract()) {
-            NewContractDialog ncd = getCampaignOptions().isUseStratCon() ?
-                                          new NewAtBContractDialog(getFrame(), true, getCampaign()) :
-                                          new NewContractDialog(getFrame(), true, getCampaign());
-            ncd.setVisible(true);
-            comboMission.setSelectedItem(ncd.getContract());
-        }
-        if (mtd.isMission()) {
-            CustomizeMissionDialog cmd = new CustomizeMissionDialog(getFrame(), true, null, getCampaign());
-            cmd.setVisible(true);
-            comboMission.setSelectedItem(cmd.getMission());
-        }
-    }
-
     private void editMission() {
-        // TODO update to include new edit contract dialog
         final AbstractContract mission = comboMission.getSelectedItem();
         if (mission == null) {
             return;
         }
+
+        new ContractEditorDialog(getCampaign(), mission);
 
         MekHQ.triggerEvent(new MissionChangedEvent(mission));
     }

@@ -192,6 +192,80 @@ public class ContractAutomation {
     }
 
     /**
+     * Non-interactive counterpart to {@link #contractStartPrompt(Campaign, AbstractContract)}: runs the contract-start
+     * automation directly from pre-made choices instead of prompting the player, because the market dialog has already
+     * captured those choices as checkboxes.
+     *
+     * <p>Regardless of the transit choice the contract is dated to <b>start on the day the force should arrive</b> at
+     * the target system (today plus the computed travel time; today if already there). When {@code mothball} is set,
+     * eligible units are GM-mothballed first. When {@code travel} is set and a jump path exists, the jump is plotted
+     * and the journey is charged; if it is not set, the player is left to make the trip themselves but the contract
+     * still starts on the projected arrival day.</p>
+     *
+     * @param campaign the current campaign
+     * @param contract the contract being started
+     * @param mothball {@code true} to GM-mothball eligible units before departure
+     * @param travel   {@code true} to plot and charge the jump to the target system now
+     */
+    public static void performContractStart(Campaign campaign, AbstractContract contract, boolean mothball,
+          boolean travel) {
+        PlayerForce playerForce = campaign.getPlayerForce();
+        AbstractLocation currentLocation = playerForce.getForceDetachment().getCurrentLocation();
+
+        if (mothball) {
+            List<UUID> automatedMothballUnits = performAutomatedMothballing(campaign);
+            playerForce.setAutomatedMothballUnits(automatedMothballUnits);
+        }
+
+        // Work out the journey. If we are already in the target system there is no jump and travel time is zero.
+        boolean alreadyAtTarget = Objects.equals(campaign.getCurrentLocation().getCurrentSystem(),
+              contract.getTargetSystem());
+        JumpPath jumpPath = alreadyAtTarget ? null : ContractUtilities.getJumpPath(campaign, contract, currentLocation);
+        int travelDays = (jumpPath == null) ? 0
+                               : ContractUtilities.getTravelDays(campaign, contract, currentLocation,
+              playerForce.isOverridingCommandCircuitRequirements(),
+              playerForce.getFactionStandings());
+
+        // The contract starts on the day the force should arrive, whether or not transit is automated here.
+        contract.setStartAndEndDate(campaign.getLocalDate().plusDays(travelDays));
+
+        if (!travel || (jumpPath == null)) {
+            return;
+        }
+
+        if (!JumpBlockers.areAllUnitsJumpCapable(campaign)) {
+            return;
+        }
+
+        jumpPath.setTargetPlanet(contract.getTargetPlanet());
+        campaign.getCurrentLocation().setJumpPath(jumpPath);
+        campaign.getUnits().forEach(unit -> unit.setSite(Unit.SITE_FACILITY_BASIC));
+
+        Detachment detachment = playerForce.getForceDetachment();
+        TransportCostCalculations costCalculations = new TransportCostCalculations(detachment.getHangar().getUnits(),
+              playerForce.getWarehouse().getSpareParts(),
+              detachment.getPersonnel().values(),
+              EXP_REGULAR);
+        Money cost = costCalculations.calculateJumpCostForEntireJourney(travelDays, jumpPath.getJumps());
+
+        String targetSystem = contract.getTargetSystemName(campaign.getLocalDate());
+        // performJumpTransaction returns an empty string when the charge succeeded.
+        String jumpReport = TransportCostCalculations.performJumpTransaction(playerForce.getFinances(),
+              jumpPath,
+              campaign.getLocalDate(),
+              cost,
+              campaign.getCurrentSystem());
+        if (jumpReport.isBlank()) {
+            campaign.addReport(GENERAL, getFormattedTextAt(RESOURCE_BUNDLE, "transitDescription.report",
+                  targetSystem, travelDays));
+        } else {
+            campaign.addReport(GENERAL, jumpReport);
+        }
+
+        campaign.getGUI().refreshAllTabs();
+    }
+
+    /**
      * This method identifies all non-mothballed units within a campaign that are currently assigned to a
      * {@link Formation}. Those units are then GM Mothballed.
      *

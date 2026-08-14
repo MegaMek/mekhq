@@ -41,7 +41,6 @@ import static megamek.common.units.UnitType.AEROSPACE_FIGHTER;
 import static megamek.common.units.UnitType.MEK;
 import static megamek.common.units.UnitType.TANK;
 import static mekhq.MHQConstants.BATTLE_OF_TUKAYYID;
-import static mekhq.campaign.digitalGM.stratCon.StratConContractDefinition.getContractDefinition;
 import static mekhq.campaign.enums.DailyReportType.GENERAL;
 import static mekhq.campaign.force.CombatTeam.getStandardFormationSize;
 import static mekhq.campaign.force.FormationLevel.BATTALION;
@@ -59,14 +58,10 @@ import java.time.LocalDate;
 
 import megamek.Version;
 import megamek.logging.MMLogger;
-import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.digitalGM.stratCon.StratConCampaignState;
-import mekhq.campaign.digitalGM.stratCon.StratConContractDefinition;
-import mekhq.campaign.digitalGM.stratCon.StratConContractInitializer;
 import mekhq.campaign.enums.DragoonRating;
-import mekhq.campaign.events.missions.MissionChangedEvent;
 import mekhq.campaign.finances.Money;
 import mekhq.campaign.market.enums.UnitMarketType;
 import mekhq.campaign.mission.atb.AtBScenarioFactory;
@@ -443,11 +438,11 @@ public class AtBContract extends Contract {
                       specialEventScenarioDate);
 
                 if (atBScenario != null) {
-                    campaign.addScenario(atBScenario, this);
+                    //                    campaign.addScenario(atBScenario, this);
 
-                    if (campaign.getCampaignOptions().isUsePlanetaryConditions()) {
-                        atBScenario.setPlanetaryConditions(this, campaign);
-                    }
+                    //                    if (campaign.getCampaignOptions().isUsePlanetaryConditions()) {
+                    //                        atBScenario.setPlanetaryConditions(this, campaign);
+                    //                    }
 
                     atBScenario.setForces(campaign);
                 }
@@ -509,7 +504,6 @@ public class AtBContract extends Contract {
 
         campaign.addReport(GENERAL, getMoraleLevel().getToolTipText());
 
-        MekHQ.triggerEvent(new MissionChangedEvent(this));
         return true;
     }
 
@@ -600,11 +594,6 @@ public class AtBContract extends Contract {
             }
         }
 
-        // Wire up the StratCon campaign state to this contract now that we have a typed reference.
-        if (getStratConCampaignState() != null) {
-            getStratConCampaignState().setContract(this);
-        }
-
         // Create NPCs if they were not present in the save (e.g. older saves, or first load after feature addition).
         if (getEmployerLiaison() == null) {
             createEmployerLiaison(campaign);
@@ -661,21 +650,6 @@ public class AtBContract extends Contract {
 
     public int getBattleTypeMod() {
         return battleTypeMod + nextWeekBattleTypeMod;
-    }
-
-    @Override
-    public void acceptContract(Campaign campaign) {
-        if (campaign.getCampaignOptions().isUseStratCon()) {
-            StratConContractDefinition stratconContractDefinition = getContractDefinition(getObjectiveType());
-            if (stratconContractDefinition != null) {
-                StratConContractInitializer.initializeCampaignState(this, campaign, stratconContractDefinition);
-            }
-        }
-
-        // Announce that the contract is now fully initialized (its StratCon state, if any, now exists). addMission
-        // already fired MissionNewEvent earlier, but that happens before this initialization, so listeners such as the
-        // StratCon tab need this second signal to pick the contract up immediately rather than only after the next day.
-        MekHQ.triggerEvent(new MissionChangedEvent(this));
     }
 
     public AtBContract(Contract contract, Campaign campaign) {
@@ -800,7 +774,7 @@ public class AtBContract extends Contract {
      */
     protected static class AtBContractRef extends AtBContract {
         public AtBContractRef(int id) {
-            setId(id);
+            //            setId(id);
         }
     }
 }

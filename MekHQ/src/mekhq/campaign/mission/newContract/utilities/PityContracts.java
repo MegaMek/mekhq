@@ -33,45 +33,38 @@
 package mekhq.campaign.mission.newContract.utilities;
 
 import static java.lang.Math.max;
-import static megamek.common.compute.Compute.d6;
-import static megamek.common.enums.SkillLevel.GREEN;
-import static megamek.common.enums.SkillLevel.VETERAN;
-import static mekhq.campaign.mission.Contract.OH_NONE;
-import static mekhq.campaign.mission.ContractDifficulty.calculateContractDifficulty;
-import static mekhq.campaign.universe.Faction.BANDIT_CASTE_FACTION_CODE;
-import static mekhq.campaign.universe.Faction.PIRATE_FACTION_CODE;
 
-import java.util.List;
-
-import megamek.common.units.Entity;
 import mekhq.campaign.Campaign;
-import mekhq.campaign.mission.AtBContract;
-import mekhq.campaign.mission.enums.ContractObjectiveType;
 import mekhq.campaign.mission.newContract.AbstractContract;
+import mekhq.campaign.mission.newContract.ContractMarket;
+import mekhq.campaign.mission.newContract.contractGeneration.ChaosContractMarketAvailability;
+import mekhq.campaign.mission.newContract.contractGeneration.ContractSearchType;
+import mekhq.campaign.universe.Faction;
 
 /**
  * Utility class for generating pity contracts when a campaign does not have enough successful completed contracts.
  *
- * <p>Pity contracts are intended to ensure that a campaign has access to a minimum number of easy contract
- * opportunities by creating additional contracts when the campaign has fewer than the requested number of pity
- * contracts.</p>
- *
- * <p>This system is intended to smooth out early game progression.</p>
+ * <p>Pity contracts guarantee a struggling force a minimum number of easy opportunities: whenever the campaign has
+ * fewer successful completed contracts than the configured pity count, the shortfall is topped up with easy offers (a
+ * veteran ally against a green enemy). These offers are flagged as {@link AbstractContract#isProvingGround() Proving
+ * Grounds} and surfaced in the market, smoothing out early-game progression.</p>
  *
  * @author Illiani
  * @since 0.51.0
  */
 public class PityContracts {
+    private PityContracts() {}
+
     /**
-     * Generates pity contracts for the supplied campaign.
+     * Tops up the contract market with pity ("Proving Ground") offers for the supplied campaign.
      *
-     * <p>The number of generated contracts is based on the number of successful completed contracts already present
-     * in the campaign. If the campaign already has at least a number of successful completed contracts in excess of the
-     * pity contract count, no pity contracts are generated.</p>
+     * <p>The shortfall is the configured pity count less the number of successful completed contracts already earned;
+     * that many easy offers are generated and added to the market. When the force already has at least the pity count in
+     * successful contracts, nothing is added.</p>
      *
      * @param campaign the campaign for which pity contracts are generated
      *
-     * @return the number of pity contracts requested for generation
+     * @return the number of pity contracts added to the market
      *
      * @author Illiani
      * @since 0.51.0
@@ -80,18 +73,22 @@ public class PityContracts {
         int successfulContractCount = getSuccessfulContractCount(campaign);
         int targetPityContractCount = campaign.getCampaignOptions().getPityContracts();
 
-        int contractCount = targetPityContractCount - successfulContractCount;
-        contractCount = max(0, contractCount);
+        int contractCount = max(0, targetPityContractCount - successfulContractCount);
 
+        ContractMarket contractMarket = campaign.getPlayerForce().getContractMarket();
+        ContractSearchType bucket = pityBucket(campaign);
         for (int i = 0; i < contractCount; i++) {
-            createPityContract(campaign, contractMarket);
+            AbstractContract contract = ChaosContractMarketAvailability.generateProvingGroundOffer(campaign, bucket);
+            if (contract != null) {
+                contractMarket.addContract(bucket, contract);
+            }
         }
 
         return contractCount;
     }
 
     /**
-     * Counts the number of completed contracts in the supplied campaign that have a successful mission status.
+     * Counts the completed contracts in the supplied campaign that ended in success.
      *
      * @param campaign the campaign whose completed contracts are inspected
      *
@@ -102,7 +99,7 @@ public class PityContracts {
      */
     private static int getSuccessfulContractCount(Campaign campaign) {
         int successfulContractCount = 0;
-        for (AtBContract contract : campaign.getCompletedAtBContracts()) {
+        for (AbstractContract contract : campaign.getCompletedContracts()) {
             if (contract.getStatus().isSuccess()) {
                 successfulContractCount++;
             }
@@ -111,96 +108,20 @@ public class PityContracts {
     }
 
     /**
-     * Creates and initializes a single pity contract using the supplied contract market.
-     *
-     * @param campaign       the campaign receiving the pity contract
-     * @param contractMarket the contract market used to create the contract
+     * The market bucket pity contracts are placed in, matching where the campaign's faction actually looks for work:
+     * pirate bands browse acts of piracy, mercenaries browse mercenary work, everyone else browses government orders.
      *
      * @author Illiani
      * @since 0.51.0
      */
-    static void createPityContract(Campaign campaign, AbstractContractMarket contractMarket) {
-        AbstractContract contract = contractMarket.addAtBContract(campaign);
-        if (contract == null) {
-            return;
+    private static ContractSearchType pityBucket(Campaign campaign) {
+        Faction faction = campaign.getFaction();
+        if (faction.isPirate()) {
+            return ContractSearchType.PIRATE;
         }
-
-        contract.setAllySkill(VETERAN);
-        contract.setEnemySkill(GREEN);
-
-        updateEnemyFaction(campaign, contract);
-
-        if (!campaign.isPirateCampaign()) { // Pirate campaigns have fixed contractual terms
-            overrideContractTermsForPityContracts(contract);
+        if (faction.isMercenary()) {
+            return ContractSearchType.MERCENARY;
         }
-
-        // The enemy (and possibly the contract type) were just overwritten, so the attacker/defender roles and the
-        // target system - both resolved by addAtBContract() against the *original* enemy/type - are now stale and
-        // need to be redone against the pity contract's actual enemy.
-        contractMarket.setAttacker(contract);
-        try {
-            contractMarket.setSystemId(contract, campaign);
-        } catch (AbstractContractMarket.NoContractLocationFoundException ex) {
-            contractMarket.removeContract(contract);
-            return;
-        }
-
-        // We need to rebuild the difficulty estimate as otherwise it will still be reporting for the contract's
-        // original enemy
-        boolean isUseGenericBattleValue = campaign.getCampaignOptions().isUseGenericBattleValue();
-        List<Entity> combatUnits = campaign.getAllCombatEntities();
-        int difficulty = calculateContractDifficulty(contract, campaign.getGameYear(),
-              isUseGenericBattleValue,
-              combatUnits);
-        contract.setContractDifficulty(difficulty);
-
-        contract.setName(AtbMonthlyContractMarket.generateDefaultName(contract.getEmployerName(), contract,
-              campaign));
-    }
-
-    /**
-     * Sets the enemy faction for a pity contract and refreshes the contract enemy data.
-     *
-     * <p>Clan campaigns use the bandit caste faction code, while non-Clan campaigns use the pirate faction code.</p>
-     *
-     * @param campaign the campaign used to determine the appropriate enemy faction
-     * @param contract the contract whose enemy faction is updated
-     *
-     * @author Illiani
-     * @since 0.51.0
-     */
-    static void updateEnemyFaction(Campaign campaign, AbstractContract contract) {
-        String enemyCode = campaign.isClanCampaign() ? BANDIT_CASTE_FACTION_CODE : PIRATE_FACTION_CODE;
-
-        contract.setEnemyCode(enemyCode);
-        MHQMorale.updateEnemy(campaign, campaign.getLocalDate(), enemyCode);
-    }
-
-    /**
-     * Overrides generated contract terms with pity contract-specific values.
-     *
-     * <p>The resulting contract is configured as a pirate hunting contract with randomly generated salvage, support,
-     * battle loss compensation, and transport compensation values.</p>
-     *
-     * @param contract the contract whose terms are overridden
-     *
-     * @author Illiani
-     * @since 0.51.0
-     */
-    private static void overrideContractTermsForPityContracts(AtBContract contract) {
-        contract.setContractTypeAndName(ContractObjectiveType.PIRATE_HUNTING);
-
-        int salvageRoll = d6(1) * 10;
-        contract.setSalvagePercent(salvageRoll);
-
-        int supportRoll = d6(1) * 10;
-        contract.setStraightSupport(supportRoll);
-        contract.setOverheadCompensation(OH_NONE);
-
-        int battleLossRoll = d6(1) * 10;
-        contract.setBattleLossCompensation(battleLossRoll);
-
-        int transportRoll = (4 + d6(1)) * 10;
-        contract.setTransportCompensation(transportRoll);
+        return ContractSearchType.GOVERNMENT;
     }
 }
