@@ -443,7 +443,7 @@ public abstract class AbstractMissionTransition {
                                  .getHumanResources()
                                  .newPerson(campaign, PersonnelRole.MILITARY_LIAISON, factionCode, Gender.RANDOMIZE));
 
-    AutomaticRankAssigner.assignRankSystemFromFaction(getEmployerLiaison(), RO_MIN);
+        AutomaticRankAssigner.assignRankSystemFromFaction(getEmployerLiaison(), RO_MIN);
     }
 
     public int getAllyQuality() {
