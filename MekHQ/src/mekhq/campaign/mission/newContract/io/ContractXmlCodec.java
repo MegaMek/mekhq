@@ -125,7 +125,7 @@ public final class ContractXmlCodec {
         }
 
         writeEmployerData(printWriter, indent, contract.getEmployerData(), campaign);
-        writeEnemyData(printWriter, indent, contract.getEnemyData());
+        writeEnemyData(printWriter, indent, contract.getEnemyData(), campaign);
         writeContractTerms(printWriter, indent, contract.getContractTerms());
         writeObjectiveData(printWriter, indent, contract.getObjectiveData());
         writeFinanceData(printWriter, indent, contract.getContractFinanceData());
@@ -167,7 +167,8 @@ public final class ContractXmlCodec {
         MHQXMLUtility.writeSimpleXMLCloseTag(pw, --indent, "employerData");
     }
 
-    private static void writeEnemyData(final PrintWriter pw, int indent, final @Nullable EnemyData data) {
+    private static void writeEnemyData(final PrintWriter pw, int indent, final @Nullable EnemyData data,
+          final Campaign campaign) {
         if (data == null) {
             return;
         }
@@ -182,6 +183,7 @@ public final class ContractXmlCodec {
         if (data.camouflage() != null) {
             data.camouflage().writeToXML(pw, indent);
         }
+        writeWrappedPerson(pw, indent, "opposingCommander", data.opposingCommander(), campaign);
         MHQXMLUtility.writeSimpleXMLCloseTag(pw, --indent, "enemyData");
     }
 
@@ -372,7 +374,8 @@ public final class ContractXmlCodec {
               (contract, node, campaign, version) -> contract.setEmployerData(parseEmployerData(node,
                     campaign,
                     version)));
-        readers.put("enemyData", (contract, node, campaign, version) -> contract.setEnemyData(parseEnemyData(node)));
+        readers.put("enemyData",
+              (contract, node, campaign, version) -> contract.setEnemyData(parseEnemyData(node)));
         readers.put("contractTerms",
               (contract, node, campaign, version) -> contract.setContractTerms(parseContractTerms(node)));
         readers.put("objectiveData",
@@ -535,6 +538,7 @@ public final class ContractXmlCodec {
         String displayName;
         SkillLevel forceSkill = SkillLevel.REGULAR;
         int equipmentRating;
+        Person opposingCommander;
         Camouflage camouflage = new Camouflage();
         PlayerColour color = PlayerColour.RED;
         boolean batchallAccepted = true;
@@ -557,8 +561,15 @@ public final class ContractXmlCodec {
 
     private static EnemyData parseEnemyData(final Node wn) {
         final EnemyDataBuilder builder = readFields(wn, new EnemyDataBuilder(), ENEMY_BINDERS, null, null, "enemyData");
-        return new EnemyData(builder.factionCode, builder.sponsorFactionCode, builder.displayName, builder.forceSkill,
-              builder.equipmentRating, builder.camouflage, builder.color, builder.batchallAccepted);
+        return new EnemyData(builder.factionCode,
+              builder.sponsorFactionCode,
+              builder.displayName,
+              builder.forceSkill,
+              builder.equipmentRating,
+              builder.opposingCommander,
+              builder.camouflage,
+              builder.color,
+              builder.batchallAccepted);
     }
 
     private static final class ContractTermsBuilder {
