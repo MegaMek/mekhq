@@ -2338,7 +2338,7 @@ public abstract class AtBScenario extends Scenario implements IAtBScenario {
 
     /**
      * Retrieves the {@link StratConScenario} associated with the given {@link AtBScenario} for the specified
-     * {@link AtBContract}.
+     * {@link AbstractContract}.
      *
      * <p>This method attempts to locate a {@link StratConScenario} that matches the provided
      * {@link AtBScenario} within the tracks of the {@link StratConCampaignState} associated with the provided contract.
@@ -2350,7 +2350,7 @@ public abstract class AtBScenario extends Scenario implements IAtBScenario {
      * instances. If a {@link StratConScenario} has a non-null {@link AtBDynamicScenario} that matches the provided
      * {@link AtBScenario}, the method returns that {@link StratConScenario}.
      *
-     * @param contract    the {@link AtBContract} from which to retrieve the {@link StratConCampaignState} and
+     * @param contract    the {@link AbstractContract} from which to retrieve the {@link StratConCampaignState} and
      *                    associated tracks
      * @param atBScenario the {@link AtBScenario} to match against the backing scenarios of the {@link StratConScenario}
      *                    instances

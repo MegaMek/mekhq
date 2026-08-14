@@ -441,8 +441,8 @@ public class AtBDynamicScenarioFactory {
      * </p>
      *
      * @param scenario           The {@link AtBDynamicScenario} for which the forces are being generated.
-     * @param contract           The {@link AtBContract} providing context about the campaign and planetary parameters
-     *                           for force generation, including faction and alignment.
+     * @param contract           The {@link AbstractContract} providing context about the campaign and planetary
+     *                           parameters for force generation, including faction and alignment.
      * @param campaign           The active {@link Campaign} to which the forces will be added.
      * @param effectiveBV        The effective Battle Value (BV) of allied and player units prior to force generation.
      * @param effectiveUnitCount The effective count of allied and player units prior to force generation.
@@ -1351,7 +1351,7 @@ public class AtBDynamicScenarioFactory {
     /**
      * Retrieves the {@link StratConTrackState} associated with the given {@link AtBDynamicScenario}.
      * <p>
-     * This method iterates over all {@link StratConTrackState} instances in the provided {@link AtBContract}'s
+     * This method iterates over all {@link StratConTrackState} instances in the provided {@link AbstractContract}'s
      * {@link StratConCampaignState} to find the track that contains a {@link StratConScenario} corresponding to the
      * specified {@link AtBDynamicScenario}. If a match is found, the track is returned; otherwise, {@code null} is
      * returned.

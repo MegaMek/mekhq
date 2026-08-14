@@ -106,7 +106,6 @@ import mekhq.campaign.events.scenarios.ScenarioResolvedEvent;
 import mekhq.campaign.force.CombatTeam;
 import mekhq.campaign.force.Formation;
 import mekhq.campaign.market.personnelMarket.markets.NewPersonnelMarket;
-import mekhq.campaign.mission.AtBContract;
 import mekhq.campaign.mission.AtBDynamicScenario;
 import mekhq.campaign.mission.AtBDynamicScenarioFactory;
 import mekhq.campaign.mission.AtBScenario;
@@ -2093,7 +2092,7 @@ public final class BriefingTab extends CampaignGuiTab {
      * <p><b>Note:</b> Significantly overhauled during the 51.0 dev cycle.</p>
      *
      * @param scenario the {@link AtBScenario} whose bot forces will be configured
-     * @param contract the {@link AtBContract} providing employer and planet-owner context
+     * @param contract the {@link AbstractContract} providing employer and planet-owner context
      * @param today    the current campaign date, used to resolve the planet owner's faction and alignment
      */
     private void configureBotAI(AtBScenario scenario, AbstractContract contract, LocalDate today) {

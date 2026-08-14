@@ -77,7 +77,6 @@ import mekhq.campaign.digitalGM.stratCon.StratConCoords;
 import mekhq.campaign.digitalGM.stratCon.StratConScenario;
 import mekhq.campaign.digitalGM.stratCon.StratConTrackState;
 import mekhq.campaign.force.Formation;
-import mekhq.campaign.mission.AtBContract;
 import mekhq.campaign.mission.AtBDynamicScenario;
 import mekhq.campaign.mission.Loot;
 import mekhq.campaign.mission.ScenarioTemplate;
@@ -114,8 +113,8 @@ public class PerformResupply {
      *
      * <p>This method provides a simplified entry point to the resupply workflow, using a default value
      * of 1 for the supply drop count. It delegates to the overloaded method
-     * {@link #performResupply(Resupply, AtBContract, int)} for the main execution of the resupply process, encompassing
-     * supply generation, convoy interaction, and delivery confirmation.</p>
+     * {@link #performResupply(Resupply, AbstractContract, int)} for the main execution of the resupply process,
+     * encompassing supply generation, convoy interaction, and delivery confirmation.</p>
      *
      * <p>This entry point is typically used when the exact number of supply drops is not specified or
      * defaults to a single drop per invocation.</p>

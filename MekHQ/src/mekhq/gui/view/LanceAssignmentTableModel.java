@@ -39,7 +39,6 @@ import javax.swing.SwingConstants;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.force.CombatTeam;
 import mekhq.campaign.force.Formation;
-import mekhq.campaign.mission.AtBContract;
 import mekhq.campaign.mission.enums.CombatRole;
 import mekhq.campaign.mission.newContract.AbstractContract;
 import mekhq.gui.model.DataTableModel;
@@ -85,7 +84,7 @@ class LanceAssignmentTableModel extends DataTableModel<CombatTeam> {
     public Class<?> getColumnClass(int c) {
         return switch (c) {
             case COL_FORCE -> Formation.class;
-            case COL_CONTRACT -> AtBContract.class;
+            case COL_CONTRACT -> AbstractContract.class;
             case COL_ROLE -> CombatRole.class;
             default -> String.class;
         };

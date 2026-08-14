@@ -51,7 +51,6 @@ import mekhq.campaign.Campaign;
 import mekhq.campaign.JumpPath;
 import mekhq.campaign.events.units.UnitChangedEvent;
 import mekhq.campaign.force.Formation;
-import mekhq.campaign.mission.AtBContract;
 import mekhq.campaign.mission.TransportCostCalculations;
 import mekhq.campaign.mission.newContract.AbstractContract;
 import mekhq.campaign.personnel.Person;
@@ -98,12 +97,10 @@ public class ContractAutomation {
 
         // Mothballing
         String inCharacterMessage = getFormattedTextAt(RESOURCE_BUNDLE, "mothballDescription.text", commanderAddress);
-        if (contract instanceof AtBContract atBContract) {
-            String employerCode = atBContract.getEmployerCode();
-            if (employerCode.equals(PIRATE_FACTION_CODE)) {
-                inCharacterMessage = getFormattedTextAt(RESOURCE_BUNDLE, "mothballDescription.text.PIR",
-                      commanderAddress);
-            }
+        String employerCode = contract.getEmployerFactionCode();
+        if (employerCode.equals(PIRATE_FACTION_CODE)) {
+            inCharacterMessage = getFormattedTextAt(RESOURCE_BUNDLE, "mothballDescription.text.PIR",
+                  commanderAddress);
         }
 
         String outOfCharacterMessage = getFormattedTextAt(RESOURCE_BUNDLE, "mothballDescription.addendum");

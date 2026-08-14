@@ -102,7 +102,6 @@ import mekhq.campaign.events.StratConDeploymentEvent;
 import mekhq.campaign.events.scenarios.ScenarioChangedEvent;
 import mekhq.campaign.force.CombatTeam;
 import mekhq.campaign.force.Formation;
-import mekhq.campaign.mission.AtBContract;
 import mekhq.campaign.mission.AtBDynamicScenario;
 import mekhq.campaign.mission.AtBDynamicScenarioFactory;
 import mekhq.campaign.mission.AtBScenario;
@@ -391,9 +390,9 @@ public class StratConRulesManager {
      * track or scenario template.</p>
      *
      * <p>This method delegates to the more advanced
-     * {@link #generateExternalScenario(Campaign, AtBContract, StratConTrackState, StratConCoords, ScenarioTemplate,
-     * boolean, boolean, boolean, Integer)} method with default parameters, selecting a random track and scenario
-     * configurations automatically.</p>
+     * {@link #generateExternalScenario(Campaign, AbstractContract, StratConTrackState, StratConCoords,
+     * ScenarioTemplate, boolean, boolean, boolean, Integer)} method with default parameters, selecting a random track
+     * and scenario configurations automatically.</p>
      *
      * <p><b>Note:</b> When using this method scenarios cannot spawn on top of player forces or facilities.</p>
      *
@@ -438,7 +437,7 @@ public class StratConRulesManager {
      * generation will fail, returning {@code null}.</p>
      *
      * @param campaign                  The current {@link Campaign} under which the scenario is generated.
-     * @param contract                  The {@link AtBContract} associated with the scenario.
+     * @param contract                  The {@link AbstractContract} associated with the scenario.
      * @param track                     The specific {@link StratConTrackState} where the scenario should be placed, or
      *                                  {@code null} to allow selection of a random track.
      * @param scenarioCoords            The target {@link StratConCoords} for placing the scenario, or {@code null} to
@@ -605,7 +604,7 @@ public class StratConRulesManager {
      * Fetches a random {@link StratConTrackState} from the {@link StratConCampaignState}. If no tracks are present, it
      * logs an error message and returns {@code null}.
      *
-     * @param contract The {@link AtBContract} from which the track state will be fetched.
+     * @param contract The {@link AbstractContract} from which the track state will be fetched.
      *
      * @return The randomly chosen {@link StratConTrackState}, or {@code null} if no tracks are available.
      */
@@ -2564,7 +2563,7 @@ public class StratConRulesManager {
      * </ul>
      *
      * @param campaign          the {@link Campaign} managing the gameplay state
-     * @param contract          the {@link AtBContract} governing the StratCon campaign
+     * @param contract          the {@link AbstractContract} governing the StratCon campaign
      * @param track             the {@link StratConTrackState} to which the scenario belongs
      * @param forceID           the ID of the force for which the scenario is generated, or
      *                          {@link Formation#FORMATION_NONE} if none
@@ -3039,7 +3038,7 @@ public class StratConRulesManager {
      *
      * @param campaign               The {@link Campaign} containing data regarding contracts, combat teams, and their
      *                               statuses.
-     * @param contract               The {@link AtBContract} contract for which combat teams are evaluated based on
+     * @param contract               The {@link AbstractContract} contract for which combat teams are evaluated based on
      *                               their eligibility.
      * @param bypassRoleRestrictions A boolean flag to indicate whether restrictions based on combat roles should be
      *                               ignored. If {@code true}, all combat teams assigned to the contract are considered
@@ -3608,8 +3607,8 @@ public class StratConRulesManager {
      *
      * @param track            The {@link StratConTrackState} containing the base scenario odds and data center modifier
      *                         information.
-     * @param contract         The {@link AtBContract} containing the morale level information that affects scenario
-     *                         odds.
+     * @param contract         The {@link AbstractContract} containing the morale level information that affects
+     *                         scenario odds.
      * @param isReinforcements A flag indicating whether this calculation is for reinforcement scenarios. When
      *                         {@code true}, morale modifiers are applied; when {@code false}, morale has no effect on
      *                         the calculation.

@@ -56,7 +56,6 @@ import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.force.CombatTeam;
 import mekhq.campaign.force.Formation;
-import mekhq.campaign.mission.AtBContract;
 import mekhq.campaign.mission.enums.CombatRole;
 import mekhq.campaign.mission.newContract.AbstractContract;
 import mekhq.gui.model.DataTableModel;
@@ -109,7 +108,7 @@ public class LanceAssignmentView extends JPanel {
             @Override
             public Component getListCellRendererComponent(JList<?> list, Object value, int index, boolean isSelected,
                   boolean cellHasFocus) {
-                return new JLabel((null == value) ? "None" : ((AtBContract) value).getName());
+                return new JLabel((null == value) ? "None" : ((AbstractContract) value).getName());
             }
         });
 
@@ -180,7 +179,7 @@ public class LanceAssignmentView extends JPanel {
                             if (null == value) {
                                 setText("None");
                             } else {
-                                setText(((AtBContract) value).getName());
+                                setText(((AbstractContract) value).getName());
                             }
                             break;
                         default:
@@ -213,8 +212,8 @@ public class LanceAssignmentView extends JPanel {
         lanceAssignmentSorter.setComparator(LanceAssignmentTableModel.COL_FORCE, forceComparator);
         lanceAssignmentSorter.setComparator(LanceAssignmentTableModel.COL_CONTRACT,
               (firstContract, secondContract) -> naturalOrderComparator.compare(
-                    (firstContract == null) ? "" : ((AtBContract) firstContract).getName(),
-                    (secondContract == null) ? "" : ((AtBContract) secondContract).getName()));
+                    (firstContract == null) ? "" : ((AbstractContract) firstContract).getName(),
+                    (secondContract == null) ? "" : ((AbstractContract) secondContract).getName()));
         lanceAssignmentSorter.setComparator(LanceAssignmentTableModel.COL_ROLE,
               (firstRole, secondRole) -> naturalOrderComparator.compare(firstRole.toString(),
                     secondRole.toString()));

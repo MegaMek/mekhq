@@ -42,7 +42,6 @@ import megamek.common.annotations.Nullable;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.finances.Finances;
 import mekhq.campaign.finances.Money;
-import mekhq.campaign.mission.AtBContract;
 import mekhq.campaign.mission.newContract.AbstractContract;
 import mekhq.campaign.mission.newContract.contractData.ChaosContractStepsTable;
 import mekhq.campaign.mission.newContract.contractData.ContractFinanceData;
@@ -183,7 +182,7 @@ public class GrayMonday {
      * origin faction is set accordingly.
      * </p>
      *
-     * @param contract the {@link AtBContract} whose employer faction is used to create the speaker
+     * @param contract the {@link AbstractContract} whose employer faction is used to create the speaker
      *
      * @return a {@link Person} representing the employer, with appropriate faction and origin set
      *

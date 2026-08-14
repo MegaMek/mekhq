@@ -55,7 +55,6 @@ import mekhq.campaign.Campaign;
 import mekhq.campaign.enums.CampaignTransportType;
 import mekhq.campaign.events.DeploymentChangedEvent;
 import mekhq.campaign.force.Formation;
-import mekhq.campaign.mission.AtBContract;
 import mekhq.campaign.mission.AtBDynamicScenario;
 import mekhq.campaign.mission.Scenario;
 import mekhq.campaign.mission.ScenarioForceTemplate;
@@ -379,7 +378,7 @@ public class StratConScenario implements IStratConDisplayable {
     }
 
     /**
-     * Retrieves the {@link AtBContract} associated with the backing scenario.
+     * Retrieves the {@link AbstractContract} associated with the backing scenario.
      *
      * <p>If the backing scenario is null, this method will return {@code null}. Otherwise, it
      * retrieves the associated contract through the provided campaign instance.

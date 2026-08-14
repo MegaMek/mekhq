@@ -40,7 +40,6 @@ import static mekhq.utilities.MHQInternationalization.getTextAt;
 import java.util.List;
 
 import mekhq.campaign.Campaign;
-import mekhq.campaign.mission.AtBContract;
 import mekhq.campaign.mission.newContract.AbstractContract;
 import mekhq.campaign.mission.resupplyAndCaches.ResupplyUtilities;
 import mekhq.campaign.personnel.Person;
@@ -82,7 +81,7 @@ public class FactionStandingGreeting {
      * Constructs and immediately displays a Faction Standing greeting dialog based on the provided campaign and
      * contract.
      *
-     * <p>If the contract is an instance of {@link AtBContract}, the dialog is customized using employer liaison,
+     * <p>If the contract is an instance of {@link AbstractContract}, the dialog is customized using employer liaison,
      * contract type, command rights, and resupply information. If the contract is not an AtBContract,
      * {@link #FactionStandingGreeting(Campaign)} is called instead to display a default greeting.</p>
      *

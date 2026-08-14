@@ -75,7 +75,6 @@ import mekhq.campaign.events.persons.PersonChangedEvent;
 import mekhq.campaign.finances.Money;
 import mekhq.campaign.finances.enums.TransactionType;
 import mekhq.campaign.force.Formation;
-import mekhq.campaign.mission.AtBContract;
 import mekhq.campaign.mission.Scenario;
 import mekhq.campaign.mission.newContract.AbstractContract;
 import mekhq.campaign.mission.newContract.utilities.ContractRepairLocation;
@@ -514,7 +513,7 @@ public class CamOpsSalvageUtilities {
      *
      * <p>This method identifies the {@link StratConTrackState} and {@link StratConCoords} that correspond to the
      * given {@link Scenario}, and assigns each salvage-capable {@link Formation} participating in the scenario to that
-     * location. If the scenario is not part of an {@link AtBContract}, or if the contract has no active strategic
+     * location. If the scenario is not part of an {@link AbstractContract}, or if the contract has no active strategic
      * campaign state, the method exits without making changes.</p>
      *
      * @param campaign the active {@link Campaign} containing forces and missions

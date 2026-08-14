@@ -63,7 +63,6 @@ import mekhq.campaign.Campaign;
 import mekhq.campaign.campaignOptions.CampaignOption;
 import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.force.Formation;
-import mekhq.campaign.mission.AtBContract;
 import mekhq.campaign.mission.enums.ContractMoraleLevel;
 import mekhq.campaign.mission.newContract.AbstractContract;
 import mekhq.campaign.mission.rentals.ContractRentalType;
@@ -507,7 +506,7 @@ public class PrisonerEventManager {
 
     /**
      * Evaluates whether freeing prisoners during a scenario triggers one or more Intel Breach events, and applies the
-     * resulting morale penalties to a relevant active {@link AtBContract}.
+     * resulting morale penalties to a relevant active {@link AbstractContract}.
      *
      * <p>The chance of an Intel Breach scales with the number of prisoners freed. The method divides the freed
      * prisoners into groups of up to 50 and performs one breach roll per group. Each roll compares a uniform random

@@ -38,7 +38,6 @@ import static mekhq.utilities.ReportingUtilities.getNegativeColor;
 import static mekhq.utilities.ReportingUtilities.spanOpeningWithCustomColor;
 
 import mekhq.campaign.Campaign;
-import mekhq.campaign.mission.AtBContract;
 import mekhq.campaign.mission.enums.ContractMoraleLevel;
 import mekhq.campaign.mission.newContract.AbstractContract;
 import mekhq.gui.baseComponents.immersiveDialogs.ImmersiveDialogNotification;
@@ -58,7 +57,7 @@ public class PrisonerIntelBreachDialog {
      * Displays the Intel Breach notification for the given contract.
      *
      * @param campaign  the current campaign instance
-     * @param contract  the {@link AtBContract} whose morale was affected by the breach
+     * @param contract  the {@link AbstractContract} whose morale was affected by the breach
      * @param oldMorale the contract's morale level before the breach
      * @param newMorale the contract's morale level after the breach
      *

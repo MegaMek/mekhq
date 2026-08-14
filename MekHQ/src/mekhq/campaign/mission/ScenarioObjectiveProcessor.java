@@ -56,6 +56,7 @@ import mekhq.campaign.force.Formation;
 import mekhq.campaign.mission.ObjectiveEffect.EffectScalingType;
 import mekhq.campaign.mission.ObjectiveEffect.ObjectiveEffectType;
 import mekhq.campaign.mission.enums.ScenarioStatus;
+import mekhq.campaign.mission.newContract.AbstractContract;
 import mekhq.campaign.mission.resupplyAndCaches.Resupply;
 import org.apache.logging.log4j.LogManager;
 
@@ -411,7 +412,7 @@ public class ScenarioObjectiveProcessor {
      *
      * <p>When run in dry-run mode, the method simply returns a description of the effect without
      * applying any changes to the campaign or contract. In active mode, the effect is applied to
-     * the appropriate {@link Campaign}, {@link AtBContract}, or scenario entities.</p>
+     * the appropriate {@link Campaign}, {@link AbstractContract}, or scenario entities.</p>
      *
      * @param campaign    the {@link Campaign} instance being updated.
      * @param effect      the {@link ObjectiveEffect} defining the effect type and its further details.

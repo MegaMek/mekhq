@@ -48,7 +48,6 @@ import megamek.common.util.weightedMaps.WeightedIntMap;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.ResolveScenarioTracker;
 import mekhq.campaign.campaignOptions.CampaignOptions;
-import mekhq.campaign.mission.AtBContract;
 import mekhq.campaign.mission.newContract.AbstractContract;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.PersonUtility;
@@ -112,14 +111,14 @@ public class NonCombatPrisoners {
      *
      * <p>The number of captives in each category is determined by die rolls. Each generated {@link Person} has their
      * skills overridden according to the current {@link CampaignOptions} and a target {@link SkillLevel}: for
-     * {@link AtBContract} missions the enemy skill is used, otherwise {@link SkillLevel#REGULAR} is assumed.</p>
+     * {@link AbstractContract} missions the enemy skill is used, otherwise {@link SkillLevel#REGULAR} is assumed.</p>
      *
      * <p>All returned {@link ResolveScenarioTracker.OppositionPersonnelStatus} entries are flagged as captured and
      * keyed by the captive's {@link Person#getId() ID}.</p>
      *
      * @param campaign the campaign used to generate new personnel and read campaign options
-     * @param mission  the mission that produced these prisoners; may be an {@link AtBContract} to derive the target
-     *                 skill level
+     * @param mission  the mission that produced these prisoners; may be an {@link AbstractContract} to derive the
+     *                 target skill level
      *
      * @return a {@link Hashtable} mapping each captive's {@link UUID} to their corresponding opposition personnel
      *       status
