@@ -58,8 +58,9 @@ import mekhq.campaign.enums.CampaignTransportType;
 import mekhq.campaign.finances.Money;
 import mekhq.campaign.finances.enums.TransactionType;
 import mekhq.campaign.force.Formation;
-import mekhq.campaign.mission.Contract;
 import mekhq.campaign.mission.newContract.AbstractContract;
+import mekhq.campaign.mission.newContract.ContractMarket;
+import mekhq.campaign.mission.newContract.contractGeneration.ContractSearchType;
 import mekhq.campaign.parts.AmmoStorage;
 import mekhq.campaign.parts.Armor;
 import mekhq.campaign.parts.Part;
@@ -533,8 +534,12 @@ public class CampaignExportWizard extends JDialog {
         }
 
         if (chkExportContractOffers.isSelected()) {
-            for (Contract contract : sourceCampaign.getContractMarket().getContracts()) {
-                destinationCampaign.getContractMarket().getContracts().add(contract);
+            final ContractMarket sourceMarket = sourceCampaign.getPlayerForce().getContractMarket();
+            final ContractMarket destinationMarket = destinationCampaign.getPlayerForce().getContractMarket();
+            for (final ContractSearchType searchType : ContractSearchType.values()) {
+                for (final AbstractContract contract : sourceMarket.getContracts(searchType).values()) {
+                    destinationMarket.addContract(searchType, contract);
+                }
             }
         }
 

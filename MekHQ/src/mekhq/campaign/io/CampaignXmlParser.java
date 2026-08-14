@@ -110,8 +110,6 @@ import mekhq.campaign.location.LocationNode;
 import mekhq.campaign.market.ForceShoppingList;
 import mekhq.campaign.market.PersonnelMarket;
 import mekhq.campaign.market.RequestedStockLevels;
-import mekhq.campaign.mission.AtBContract;
-import mekhq.campaign.mission.Mission;
 import mekhq.campaign.mission.Scenario;
 import mekhq.campaign.mission.newContract.ContractMarket;
 import mekhq.campaign.parts.AmmoStorage;
@@ -1727,42 +1725,6 @@ public record CampaignXmlParser(InputStream is, MekHQ app) {
         }
     }
 
-    private static void processMissionNodes(Campaign retVal, Node wn, Version version) {
-        LOGGER.info("Loading Mission Nodes from XML...");
-
-        NodeList wList = wn.getChildNodes();
-
-        // Okay, lets iterate through the children, eh?
-        for (int x = 0; x < wList.getLength(); x++) {
-            Node wn2 = wList.item(x);
-
-            // If it's not an element node, we ignore it.
-            if (wn2.getNodeType() != Node.ELEMENT_NODE) {
-                continue;
-            }
-
-            if (!wn2.getNodeName().equalsIgnoreCase("mission")) {
-                // Error condition of sorts!
-                // Errr, what should we do here?
-                LOGGER.warn("Unknown node type not loaded in Mission nodes: {}", wn2.getNodeName());
-                continue;
-            }
-
-            Mission m = Mission.generateInstanceFromXML(wn2, retVal, version);
-
-            if (m != null) {
-                retVal.importMission(m);
-            }
-        }
-
-        // Restore references on AtBContracts
-        for (AtBContract contract : retVal.getAtBContracts()) {
-            contract.restore(retVal);
-        }
-
-        LOGGER.info("Load Mission Nodes Complete!");
-    }
-
     private static @Nullable String checkUnits(final Node wn) {
         LOGGER.info("Checking for missing entities...");
 
@@ -2113,7 +2075,6 @@ public record CampaignXmlParser(InputStream is, MekHQ app) {
         }
 
         boolean foundPersonnelMarket = false;
-        boolean foundContractMarket = false;
         boolean foundUnitMarket = false;
 
         // Saves made in 0.51.00 do not have a <location> but will have a <locations> with a single item.
@@ -2160,7 +2121,10 @@ public record CampaignXmlParser(InputStream is, MekHQ app) {
                 } else if (nodeName.equalsIgnoreCase("units")) {
                     processUnitNodes(campaign, workingNode, version);
                 } else if (nodeName.equalsIgnoreCase("missions")) {
-                    processMissionNodes(campaign, workingNode, version);
+                    // Legacy pre-AbstractContract saves stored missions here. That format cannot be converted to the
+                    // current contract model (loaded from the <info> node via PlayerForce.loadContractsFromXML), so
+                    // these are skipped.
+                    LOGGER.warn("Ignoring legacy <missions> node; pre-migration contracts are no longer loaded.");
                 } else if (nodeName.equalsIgnoreCase("forces")) {
                     processForces(campaign, workingNode, version);
                 } else if (nodeName.equalsIgnoreCase("formations")) {
@@ -2200,12 +2164,6 @@ public record CampaignXmlParser(InputStream is, MekHQ app) {
                           version);
                     campaign.getPlayerForce().getHumanResources().setPersonnelMarket(personnelMarket);
                     foundPersonnelMarket = true;
-                } else if (nodeName.equalsIgnoreCase("contractMarket")) {
-                    // CAW: implicit DEPENDS-ON to the <missions> node
-                    campaign.setContractMarket(AbstractContractMarket.generateInstanceFromXML(workingNode,
-                          campaign,
-                          version));
-                    foundContractMarket = true;
                 } else if (nodeName.equalsIgnoreCase("unitMarket")) {
                     // Windchild: implicit DEPENDS ON to the <campaignOptions> nodes
                     campaign.setUnitMarket(campaign.getCampaignOptions().getUnitMarketMethod().getUnitMarket());
@@ -2515,10 +2473,6 @@ public record CampaignXmlParser(InputStream is, MekHQ app) {
         if (!foundPersonnelMarket) {
             final PersonnelMarket personnelMarket = new PersonnelMarket(campaign);
             campaign.getPlayerForce().getHumanResources().setPersonnelMarket(personnelMarket);
-        }
-
-        if (!foundContractMarket) {
-            campaign.setContractMarket(new AtbMonthlyContractMarket());
         }
 
         if (!foundUnitMarket) {

@@ -77,8 +77,6 @@ public class PityContracts {
      * @since 0.51.0
      */
     public static int generatePityContracts(Campaign campaign) {
-        AbstractContractMarket contractMarket = campaign.getContractMarket();
-
         int successfulContractCount = getSuccessfulContractCount(campaign);
         int targetPityContractCount = campaign.getCampaignOptions().getPityContracts();
 
@@ -86,7 +84,7 @@ public class PityContracts {
         contractCount = max(0, contractCount);
 
         for (int i = 0; i < contractCount; i++) {
-            PityContracts.createPityContract(campaign, contractMarket);
+            createPityContract(campaign, contractMarket);
         }
 
         return contractCount;
