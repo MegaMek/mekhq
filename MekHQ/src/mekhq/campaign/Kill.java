@@ -195,12 +195,13 @@ public class Kill {
      * Parses a kill's mission id for backward compatibility.
      *
      * <p>Missions are now identified by {@link UUID}. Saves written before that change stored the mission id as a
-     * plain integer, which does not map to any current mission - so a non-UUID (legacy) value is treated as "no
-     * mission" and yields {@code null} rather than throwing and aborting the rest of the kill's parse.</p>
+     * plain integer, which is not a valid {@link UUID}. Rather than throwing (and aborting the rest of the kill's
+     * parse), a non-UUID value yields {@code null} here; the campaign loader detects that and re-hooks the kill to the
+     * contract the legacy mission was converted into, so no linkage is lost.</p>
      *
      * @param text the raw {@code missionId} element text
      *
-     * @return the parsed {@link UUID}, or {@code null} for a blank or legacy integer value
+     * @return the parsed {@link UUID}, or {@code null} for a blank or legacy integer value (to be re-hooked on load)
      */
     private static @Nullable UUID parseMissionId(final String text) {
         if ((text == null) || text.isBlank()) {
@@ -210,8 +211,8 @@ public class Kill {
         try {
             return UUID.fromString(text.trim());
         } catch (IllegalArgumentException ex) {
-            logger.info("Dropping legacy integer kill mission id '{}'; missions are now identified by UUID.",
-                  text.trim());
+            // Legacy integer id; the loader re-hooks it to the converted contract. Not logged here to avoid per-kill
+            // noise - the loader reports a single re-hook summary instead.
             return null;
         }
     }
