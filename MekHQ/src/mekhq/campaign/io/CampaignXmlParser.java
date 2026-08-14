@@ -111,7 +111,9 @@ import mekhq.campaign.market.ForceShoppingList;
 import mekhq.campaign.market.PersonnelMarket;
 import mekhq.campaign.market.RequestedStockLevels;
 import mekhq.campaign.mission.Scenario;
+import mekhq.campaign.mission.newContract.AbstractContract;
 import mekhq.campaign.mission.newContract.ContractMarket;
+import mekhq.campaign.mission.newContract.io.LegacyContractConverter;
 import mekhq.campaign.parts.AmmoStorage;
 import mekhq.campaign.parts.EnginePart;
 import mekhq.campaign.parts.Part;
@@ -1725,6 +1727,34 @@ public record CampaignXmlParser(InputStream is, MekHQ app) {
         }
     }
 
+    /**
+     * Loads a legacy {@code <missions>} node from a pre-migration save. Each {@code <mission>} child is converted to a
+     * new {@link AbstractContract} via {@link LegacyContractConverter} and imported into the campaign, so old saves
+     * keep their contracts once the legacy mission classes are removed.
+     */
+    private static void processLegacyMissionNodes(final Campaign campaign, final Node missionsNode,
+          final Version version) {
+        LOGGER.info("Converting legacy mission nodes to contracts...");
+
+        final NodeList missionNodes = missionsNode.getChildNodes();
+        for (int i = 0; i < missionNodes.getLength(); i++) {
+            final Node missionNode = missionNodes.item(i);
+            if ((missionNode.getNodeType() != Node.ELEMENT_NODE)
+                      || !missionNode.getNodeName().equalsIgnoreCase("mission")) {
+                continue;
+            }
+
+            try {
+                final AbstractContract contract = LegacyContractConverter.convert(missionNode, campaign, version);
+                campaign.importMission(contract);
+            } catch (Exception ex) {
+                LOGGER.error(ex, "Failed to convert a legacy mission node; it was skipped.");
+            }
+        }
+
+        LOGGER.info("Legacy mission conversion complete.");
+    }
+
     private static @Nullable String checkUnits(final Node wn) {
         LOGGER.info("Checking for missing entities...");
 
@@ -2121,10 +2151,7 @@ public record CampaignXmlParser(InputStream is, MekHQ app) {
                 } else if (nodeName.equalsIgnoreCase("units")) {
                     processUnitNodes(campaign, workingNode, version);
                 } else if (nodeName.equalsIgnoreCase("missions")) {
-                    // Legacy pre-AbstractContract saves stored missions here. That format cannot be converted to the
-                    // current contract model (loaded from the <info> node via PlayerForce.loadContractsFromXML), so
-                    // these are skipped.
-                    LOGGER.warn("Ignoring legacy <missions> node; pre-migration contracts are no longer loaded.");
+                    processLegacyMissionNodes(campaign, workingNode, version);
                 } else if (nodeName.equalsIgnoreCase("forces")) {
                     processForces(campaign, workingNode, version);
                 } else if (nodeName.equalsIgnoreCase("formations")) {
