@@ -46,13 +46,14 @@ import java.util.UUID;
 import megamek.common.units.Entity;
 import megamek.logging.MMLogger;
 import mekhq.MekHQ;
+import mekhq.campaign.AbstractLocation;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.JumpPath;
 import mekhq.campaign.events.units.UnitChangedEvent;
 import mekhq.campaign.force.Formation;
 import mekhq.campaign.mission.AtBContract;
-import mekhq.campaign.mission.Contract;
 import mekhq.campaign.mission.TransportCostCalculations;
+import mekhq.campaign.mission.newContract.AbstractContract;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.unit.Unit;
 import mekhq.campaign.unit.actions.ActivateUnitAction;
@@ -79,9 +80,9 @@ public class ContractAutomation {
      * @param campaign The current campaign.
      * @param contract Selected contract.
      */
-    public static void contractStartPrompt(Campaign campaign, Contract contract) {
+    public static void contractStartPrompt(Campaign campaign, AbstractContract contract) {
         // If we're already in the right system, there is no need to automate these actions
-        if (Objects.equals(campaign.getCurrentLocation().getCurrentSystem(), contract.getSystem())) {
+        if (Objects.equals(campaign.getCurrentLocation().getCurrentSystem(), contract.getTargetSystem())) {
             return;
         }
 
@@ -122,9 +123,14 @@ public class ContractAutomation {
         }
 
         // Transit
-        String targetSystem = contract.getSystemName(campaign.getLocalDate());
-        JumpPath jumpPath = contract.getJumpPath(campaign);
-        int travelDays = contract.getTravelDays(campaign);
+        String targetSystem = contract.getTargetSystemName(campaign.getLocalDate());
+        AbstractLocation currentLocation = campaign.getPlayerForce().getForceDetachment().getCurrentLocation();
+        JumpPath jumpPath = ContractUtilities.getJumpPath(campaign,
+              contract,
+              currentLocation);
+        int travelDays = ContractUtilities.getTravelDays(campaign, contract, currentLocation,
+              campaign.getPlayerForce().isOverridingCommandCircuitRequirements(),
+              campaign.getPlayerForce().getFactionStandings());
 
         boolean isUseTwoWayPay = campaign.getCampaignOptions().isUseTwoWayPay();
         String totalCost = contract.getTotalTransportationFees(campaign)

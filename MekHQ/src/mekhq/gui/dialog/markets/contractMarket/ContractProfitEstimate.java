@@ -78,8 +78,7 @@ public record ContractProfitEstimate(int transitDays, Money guaranteedIncome, Mo
               contract,
               detachment.getCurrentLocation(),
               false,
-              factionStandings,
-              contract.getEmployerFactionCode());
+              factionStandings);
 
         int months = contract.getLengthInMonths();
         Money guaranteedIncome = contract.getTotalMonthlyPay().plus(contract.getTransportPayment());

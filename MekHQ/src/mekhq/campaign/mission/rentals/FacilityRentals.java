@@ -33,7 +33,6 @@
 package mekhq.campaign.mission.rentals;
 
 import static java.lang.Math.max;
-import static mekhq.MHQConstants.CONFIRMATION_CONTRACT_RENTAL;
 import static mekhq.campaign.enums.DailyReportType.FINANCES;
 import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
 import static mekhq.utilities.MHQInternationalization.getTextAt;
@@ -57,13 +56,10 @@ import mekhq.campaign.events.RepairStatusChangedEvent;
 import mekhq.campaign.finances.Finances;
 import mekhq.campaign.finances.Money;
 import mekhq.campaign.finances.enums.TransactionType;
-import mekhq.campaign.mission.Contract;
 import mekhq.campaign.mission.newContract.AbstractContract;
 import mekhq.campaign.mission.newContract.utilities.ContractRepairLocation;
 import mekhq.campaign.unit.Unit;
-import mekhq.gui.baseComponents.immersiveDialogs.ImmersiveDialogConfirmation;
 import mekhq.gui.dialog.BayRentalDialog;
-import mekhq.gui.dialog.ContractStartRentalDialog;
 
 /**
  * Handles rental opportunities and transactions for various campaign facilities such as repair bays, hospital beds,
@@ -112,35 +108,6 @@ public class FacilityRentals {
             };
         }
         return rentedFacilities;
-    }
-
-    public static void offerContractRentalOpportunity(Campaign campaign, Contract contract) {
-        CampaignOptions campaignOptions = campaign.getCampaignOptions();
-        int hospitalCost = campaignOptions.getRentedFacilitiesCostHospitalBeds();
-        int kitchenCost = campaignOptions.getRentedFacilitiesCostKitchens();
-        int holdingCellCost = campaignOptions.getRentedFacilitiesCostHoldingCells();
-
-        // If all rentals are disabled, we're just going to back out entirely
-        if ((hospitalCost + kitchenCost + holdingCellCost) == 0) {
-            return;
-        }
-
-        boolean wasConfirmedOverall = false;
-        while (!wasConfirmedOverall) {
-            new ContractStartRentalDialog(campaign, contract, hospitalCost, kitchenCost, holdingCellCost);
-
-            if (!MekHQ.getMHQOptions().getNagDialogIgnore(CONFIRMATION_CONTRACT_RENTAL)) {
-                ImmersiveDialogConfirmation confirmation = new ImmersiveDialogConfirmation(campaign,
-                      CONFIRMATION_CONTRACT_RENTAL);
-                wasConfirmedOverall = confirmation.wasConfirmed();
-            } else {
-                wasConfirmedOverall = true;
-            }
-        }
-
-        contract.setHospitalBedsRented(ContractStartRentalDialog.getHospitalSpinnerValue());
-        contract.setKitchensRented(ContractStartRentalDialog.getKitchensSpinnerValue());
-        contract.setHoldingCellsRented(ContractStartRentalDialog.getSecuritySpinnerValue());
     }
 
     /**

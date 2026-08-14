@@ -85,7 +85,6 @@ import mekhq.campaign.digitalGM.stratCon.StratConRulesManager;
 import mekhq.campaign.finances.Money;
 import mekhq.campaign.finances.enums.TransactionType;
 import mekhq.campaign.mission.AtBScenario;
-import mekhq.campaign.mission.Contract;
 import mekhq.campaign.mission.Loot;
 import mekhq.campaign.mission.ScenarioObjective;
 import mekhq.campaign.mission.ScenarioObjectiveProcessor;
@@ -1858,7 +1857,7 @@ public class ResolveScenarioWizardDialog extends JDialog {
             }
         }
 
-        currentSalvagePct = Contract.calculateSalvagePercentage(salvageUnit, salvageEmployer);
+        currentSalvagePct = SalvageUtilities.calculateSalvagePercentage(salvageUnit, salvageEmployer);
 
         for (int i = 0; i < salvageBoxes.size(); i++) {
             // Skip the escaping units

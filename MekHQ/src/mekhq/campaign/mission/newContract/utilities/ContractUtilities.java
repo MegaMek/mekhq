@@ -53,13 +53,13 @@ import mekhq.campaign.universe.factionStanding.FactionStandings;
 public class ContractUtilities {
     public static int getTravelDays(Campaign campaign, AbstractContract abstractContract,
           AbstractLocation currentLocation, boolean isOverridingCommandCircuitRequirements,
-          FactionStandings factionStandings, String employerFactionCode) {
+          FactionStandings factionStandings) {
         boolean isGM = campaign.isGM();
         boolean isUseCommandCircuit = FactionStandingUtilities.isUseCommandCircuit(
               isOverridingCommandCircuitRequirements,
               isGM,
               factionStandings,
-              employerFactionCode);
+              abstractContract.getEmployerFactionCode());
 
         JumpPath jumpPath = getJumpPath(campaign, abstractContract, currentLocation);
 

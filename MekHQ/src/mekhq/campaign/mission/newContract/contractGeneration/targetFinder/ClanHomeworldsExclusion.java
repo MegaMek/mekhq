@@ -98,8 +98,7 @@ public class ClanHomeworldsExclusion {
               contract,
               currentLocation,
               playerForce.isOverridingCommandCircuitRequirements(),
-              playerForce.getFactionStandings(),
-              allyFaction.getShortName());
+              playerForce.getFactionStandings());
 
         LocalDate arrivalDate = campaign.getLocalDate().plusDays(travelDays);
         boolean isDuringTaskForceSergent = arrivalDate.isBefore(MHQConstants.IS_INVASION_OF_HUNTRESS_START) ||
