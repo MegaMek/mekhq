@@ -51,21 +51,21 @@ import mekhq.campaign.unit.Unit;
 import mekhq.campaign.universe.Faction;
 
 /**
- * Utility class responsible for automatically assigning ranks to the crew of a given {@link Unit} based on faction
- * rules, unit type, and individual experience levels.
+ * Utility class responsible for automatically assigning ranks to personnel. It can apply a faction's rank system and
+ * select a valid rank for an individual, or assign missing ranks across a {@link Unit}'s crew.
  *
- * <p>Rank assignment follows a hierarchy: the unit commander receives the highest
+ * <p>When assigning a unit's crew, rank assignment follows a hierarchy: the unit commander receives the highest
  * rank index, squad leaders (if applicable) receive an intermediate rank, and remaining crew members are assigned the
  * next available rank below the leaders. Clan and ComStar/Word of Blake factions use simplified, flat rank assignments
  * rather than the standard graduated system.</p>
  *
- * <p>Only personnel who do not already hold a rank are affected; existing ranks
+ * <p>Only crew members who do not already hold a rank are affected; existing ranks
  * are always preserved.</p>
  *
  * @author Illiani
  * @since 0.51.0
  */
-public final class AutoAssignRankForCompanyGenerator {
+public final class AutomaticRankAssigner {
     private static final String NO_RANK = "None";
     private static final String MISSING_RANK = "-";
 
@@ -317,6 +317,6 @@ public final class AutoAssignRankForCompanyGenerator {
         }
         person.setRankSystem(rankValidator, rankSystem);
 
-        AutoAssignRankForCompanyGenerator.assignAscendingRank(person, rankLevel);
+        AutomaticRankAssigner.assignAscendingRank(person, rankLevel);
     }
 }
