@@ -73,9 +73,11 @@ import org.w3c.dom.NodeList;
  * into a new {@link AbstractContract}, so old saves keep a record of their contracts once the legacy classes are
  * removed.
  *
- * <p>Old-format contracts cannot run under the new system, so each converted contract is <b>closed out on load</b>:
- * force-completed as a {@link MissionStatus#SUCCESS complete success}, any explicitly-outstanding payout (the legacy
- * routed payout) settled to the player, and the player advised. The conversion is otherwise best-effort and lossy -
+ * <p>Old-format contracts cannot run under the new system, so a converted contract that was <b>still active</b> is
+ * closed out on load: force-completed as a {@link MissionStatus#SUCCESS complete success}, any explicitly-outstanding
+ * payout (the legacy routed payout) settled to the player, and the player advised. A contract that had already
+ * concluded keeps the outcome it finished with, and is converted silently. The conversion is otherwise best-effort and
+ * lossy -
  * fields with a clean equivalent are carried over, and fields that are normally never {@code null} in the new model
  * (faction codes, display names, target system, and the NPC personnel) are filled with placeholders so the resulting
  * contract is always well-formed. The negotiable terms have no step-table equivalent and are set to a neutral step, and
@@ -111,6 +113,7 @@ public final class LegacyContractConverter {
         String name = "";
         String description = "";
         String systemId = null;
+        MissionStatus status = MissionStatus.ACTIVE;
 
         LocalDate startDate = null;
         LocalDate endDate = null;
@@ -163,6 +166,7 @@ public final class LegacyContractConverter {
                     case "name" -> name = value;
                     case "desc" -> description = value;
                     case "systemId" -> systemId = value;
+                    case "status" -> status = MissionStatus.parseFromString(value);
                     case "startDate" -> startDate = MHQXMLUtility.parseDate(value);
                     case "endDate" -> endDate = MHQXMLUtility.parseDate(value);
                     case "nMonths" -> lengthInMonths = MathUtility.parseInt(value);
@@ -222,8 +226,10 @@ public final class LegacyContractConverter {
         contract.setContractId(UUID.randomUUID());
         contract.setContractName(name);
         contract.setDescription(description);
-        // Old-format contracts cannot run in the new system: close each one out as a complete success.
-        contract.setStatus(MissionStatus.SUCCESS);
+        // Old-format contracts cannot run in the new system, so an active one is closed out as a complete success.
+        // A contract that had already concluded keeps the outcome it finished with - there is nothing to close out.
+        final boolean wasActive = status.isActive();
+        contract.setStatus(wasActive ? MissionStatus.SUCCESS : status);
         contract.setScale(Math.max(1, scale));
         contract.setRequiredCombatElements(requiredCombatElements);
         contract.setCachedContractDifficulty(difficulty);
@@ -249,7 +255,11 @@ public final class LegacyContractConverter {
             contract.getStratConCampaignState().setContract(contract);
         }
 
-        settle(campaign, contract, routedPayout);
+        // Only a contract that was still running needs settling and an advisory; one that had already concluded was
+        // settled when it ended.
+        if (wasActive) {
+            settle(campaign, contract, routedPayout);
+        }
         return contract;
     }
 
