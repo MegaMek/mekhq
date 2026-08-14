@@ -215,7 +215,7 @@ import mekhq.campaign.personnel.enums.SplittingSurnameStyle;
 import mekhq.campaign.personnel.generator.AbstractPersonnelGenerator;
 import mekhq.campaign.personnel.marriage.AbstractMarriage;
 import mekhq.campaign.personnel.procreation.AbstractProcreation;
-import mekhq.campaign.personnel.ranks.AutoAssignRankForCompanyGenerator;
+import mekhq.campaign.personnel.ranks.AutomaticRankAssigner;
 import mekhq.campaign.personnel.ranks.RankSystem;
 import mekhq.campaign.personnel.skills.ActionCheckResult;
 import mekhq.campaign.personnel.skills.Appraisal;
@@ -4416,7 +4416,7 @@ public class Campaign implements ITechManager {
             final String factionCode = chosenFaction.getShortName();
             Person speaker = getPlayerForce().getHumanResources().newPerson(this, role, factionCode, Gender.RANDOMIZE);
 
-            AutoAssignRankForCompanyGenerator.assignRankSystemFromFaction(speaker, RO_MIN);
+            AutomaticRankAssigner.assignRankSystemFromFaction(speaker, RO_MIN);
 
             new FactionJudgmentDialog(this, speaker, getPlayerForce().getHumanResources()
                                                            .getCommander(getCampaignOptions(),
