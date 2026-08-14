@@ -1558,7 +1558,8 @@ public record CampaignXmlParser(InputStream is, MekHQ app) {
         LOGGER.info("Load Special Ability Nodes Complete!");
     }
 
-    private static void processKillNodes(Campaign retVal, Node wn, Version version) {
+    private static void processKillNodes(Campaign retVal, Node wn, Version version,
+          List<LegacyKillMissionLink> pendingKillRelinks) {
         LOGGER.info("Loading Kill Nodes from XML...");
 
         NodeList wList = wn.getChildNodes();
@@ -1580,10 +1581,38 @@ public record CampaignXmlParser(InputStream is, MekHQ app) {
             Kill kill = Kill.generateInstanceFromXML(wn2, version);
             if (kill != null) {
                 retVal.importKill(kill);
+
+                // Missions are now UUID-keyed; a kill that came in with a legacy integer mission id has had it dropped
+                // by its own parse. Capture that raw legacy id here so it can be re-hooked to the converted contract
+                // once every mission has been read (kills may appear before missions in the save).
+                if (kill.getMissionId() == null) {
+                    Integer legacyMissionId = intChildValue(wn2, "missionId");
+                    if (legacyMissionId != null) {
+                        pendingKillRelinks.add(new LegacyKillMissionLink(kill, legacyMissionId));
+                    }
+                }
             }
         }
 
         LOGGER.info("Load Kill Nodes Complete!");
+    }
+
+    /** A kill loaded with a legacy integer mission id, pending re-hook to the converted contract's {@link UUID}. */
+    private record LegacyKillMissionLink(Kill kill, int legacyMissionId) {}
+
+    /**
+     * Re-hooks kills that referenced a mission by its legacy integer id to the converted contract's new {@link UUID}.
+     * Runs once the whole save is parsed, so it does not matter whether kills or missions were read first. A kill whose
+     * old mission was not converted (e.g. its mission node was missing) is left unlinked.
+     */
+    private static void relinkLegacyKills(final Map<Integer, UUID> legacyMissionIdMap,
+          final List<LegacyKillMissionLink> pendingKillRelinks) {
+        for (final LegacyKillMissionLink link : pendingKillRelinks) {
+            final UUID newMissionId = legacyMissionIdMap.get(link.legacyMissionId());
+            if (newMissionId != null) {
+                link.kill().setMissionId(newMissionId);
+            }
+        }
     }
 
     /**
@@ -1731,9 +1760,13 @@ public record CampaignXmlParser(InputStream is, MekHQ app) {
      * Loads a legacy {@code <missions>} node from a pre-migration save. Each {@code <mission>} child is converted to a
      * new {@link AbstractContract} via {@link LegacyContractConverter} and imported into the campaign, so old saves
      * keep their contracts once the legacy mission classes are removed.
+     *
+     * <p>The legacy integer mission id is recorded against the new contract's {@link UUID} in
+     * {@code legacyMissionIdMap} so kills (and anything else that referenced a mission by its old integer id) can be
+     * re-hooked to the converted contract once the whole save is parsed.</p>
      */
     private static void processLegacyMissionNodes(final Campaign campaign, final Node missionsNode,
-          final Version version) {
+          final Version version, final Map<Integer, UUID> legacyMissionIdMap) {
         LOGGER.info("Converting legacy mission nodes to contracts...");
 
         final NodeList missionNodes = missionsNode.getChildNodes();
@@ -1745,14 +1778,37 @@ public record CampaignXmlParser(InputStream is, MekHQ app) {
             }
 
             try {
+                final Integer legacyId = intChildValue(missionNode, "id");
                 final AbstractContract contract = LegacyContractConverter.convert(missionNode, campaign, version);
                 campaign.importMission(contract);
+                if (legacyId != null) {
+                    legacyMissionIdMap.put(legacyId, contract.getId());
+                }
             } catch (Exception ex) {
                 LOGGER.error(ex, "Failed to convert a legacy mission node; it was skipped.");
             }
         }
 
         LOGGER.info("Legacy mission conversion complete.");
+    }
+
+    /**
+     * Returns the integer value of a named direct child element of {@code parent}, or {@code null} when the child is
+     * absent or its text is not an integer (e.g. a modern {@link UUID}).
+     */
+    private static @Nullable Integer intChildValue(final Node parent, final String childTag) {
+        final NodeList children = parent.getChildNodes();
+        for (int i = 0; i < children.getLength(); i++) {
+            final Node child = children.item(i);
+            if ((child.getNodeType() == Node.ELEMENT_NODE) && child.getNodeName().equalsIgnoreCase(childTag)) {
+                try {
+                    return Integer.valueOf(child.getTextContent().trim());
+                } catch (NumberFormatException ex) {
+                    return null;
+                }
+            }
+        }
+        return null;
     }
 
     private static @Nullable String checkUnits(final Node wn) {
@@ -1994,6 +2050,11 @@ public record CampaignXmlParser(InputStream is, MekHQ app) {
         Campaign campaign = CampaignFactory.createCampaign();
         campaign.setGUI(app.getCampaigngui());
 
+        // Legacy-save compatibility: maps a converted contract's old integer mission id to its new UUID, and collects
+        // the kills that referenced a mission by that old id, so they can be re-hooked once everything is parsed.
+        final Map<Integer, UUID> legacyMissionIdMap = new HashMap<>();
+        final List<LegacyKillMissionLink> pendingKillRelinks = new ArrayList<>();
+
         Document xmlDoc;
 
         try {
@@ -2151,7 +2212,7 @@ public record CampaignXmlParser(InputStream is, MekHQ app) {
                 } else if (nodeName.equalsIgnoreCase("units")) {
                     processUnitNodes(campaign, workingNode, version);
                 } else if (nodeName.equalsIgnoreCase("missions")) {
-                    processLegacyMissionNodes(campaign, workingNode, version);
+                    processLegacyMissionNodes(campaign, workingNode, version, legacyMissionIdMap);
                 } else if (nodeName.equalsIgnoreCase("forces")) {
                     processForces(campaign, workingNode, version);
                 } else if (nodeName.equalsIgnoreCase("formations")) {
@@ -2181,7 +2242,7 @@ public record CampaignXmlParser(InputStream is, MekHQ app) {
                 } else if (nodeName.equalsIgnoreCase("storyArc")) {
                     processStoryArcNodes(campaign, workingNode, version);
                 } else if (nodeName.equalsIgnoreCase("kills")) {
-                    processKillNodes(campaign, workingNode, version);
+                    processKillNodes(campaign, workingNode, version, pendingKillRelinks);
                 } else if (nodeName.equalsIgnoreCase("shoppingList")) {
                     ForceShoppingList sl = ForceShoppingList.generateInstanceFromXML(workingNode, campaign, version);
                     campaign.getPlayerForce().setShoppingList(sl);
@@ -2634,6 +2695,7 @@ public record CampaignXmlParser(InputStream is, MekHQ app) {
 
         migrateLegacyEducationTravel(campaign);
         reconnectPersonsToTravelLocations(campaign);
+        relinkLegacyKills(legacyMissionIdMap, pendingKillRelinks);
         LOGGER.info("Load of campaign file complete!");
 
         return campaign;

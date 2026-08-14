@@ -173,7 +173,7 @@ public class Kill {
                 } else if (wn2.getNodeName().equalsIgnoreCase("date")) {
                     retVal.date = MHQXMLUtility.parseDate(wn2.getTextContent().trim());
                 } else if (wn2.getNodeName().equalsIgnoreCase("missionId")) {
-                    retVal.missionId = UUID.fromString(wn2.getTextContent());
+                    retVal.missionId = parseMissionId(wn2.getTextContent());
                 } else if (wn2.getNodeName().equalsIgnoreCase("scenarioId")) {
                     retVal.scenarioId = Integer.parseInt(wn2.getTextContent());
                 } else if (wn2.getNodeName().equalsIgnoreCase("unitType")) {
@@ -189,6 +189,31 @@ public class Kill {
             logger.error("", ex);
         }
         return retVal;
+    }
+
+    /**
+     * Parses a kill's mission id for backward compatibility.
+     *
+     * <p>Missions are now identified by {@link UUID}. Saves written before that change stored the mission id as a
+     * plain integer, which does not map to any current mission - so a non-UUID (legacy) value is treated as "no
+     * mission" and yields {@code null} rather than throwing and aborting the rest of the kill's parse.</p>
+     *
+     * @param text the raw {@code missionId} element text
+     *
+     * @return the parsed {@link UUID}, or {@code null} for a blank or legacy integer value
+     */
+    private static @Nullable UUID parseMissionId(final String text) {
+        if ((text == null) || text.isBlank()) {
+            return null;
+        }
+
+        try {
+            return UUID.fromString(text.trim());
+        } catch (IllegalArgumentException ex) {
+            logger.info("Dropping legacy integer kill mission id '{}'; missions are now identified by UUID.",
+                  text.trim());
+            return null;
+        }
     }
 
     public void writeToXML(final PrintWriter pw, int indent) {
