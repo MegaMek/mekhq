@@ -99,9 +99,9 @@ public class MHQMorale {
     private static final MMLogger LOGGER = MMLogger.create(MHQMorale.class);
     private static final String RESOURCE_BUNDLE = "mekhq.resources.MHQMorale";
 
-    static final int RALLYING_TARGET_NUMBER = 6;
-    static final int NO_CHANGE_TARGET_NUMBER = 7;
-    static final int WAVERING_TARGET_NUMBER = 8;
+    public static final int RALLYING_TARGET_NUMBER = 6;
+    public static final int NO_CHANGE_TARGET_NUMBER = 7;
+    public static final int WAVERING_TARGET_NUMBER = 8;
 
     /**
      * Returns the localized title used for the morale check report UI.
@@ -258,7 +258,7 @@ public class MHQMorale {
      * @author Illiani
      * @since 0.50.10
      */
-    static MoraleOutcome getMoraleOutcome(AbstractContract contract, int roll) {
+    public static MoraleOutcome getMoraleOutcome(AbstractContract contract, int roll) {
         ContractMoraleLevel currentMoraleLevel = contract.getMoraleLevel();
         ContractMoraleLevel updatedMoraleLevel = currentMoraleLevel;
         MoraleOutcome moraleOutcome;
@@ -412,7 +412,7 @@ public class MHQMorale {
      * @author Illiani
      * @since 0.50.10
      */
-    static int getReliabilityModifier(int adjustedSkillLevel) {
+    public static int getReliabilityModifier(int adjustedSkillLevel) {
         int reliabilityModifier = 0;
 
         if (adjustedSkillLevel <= GREEN.getAdjustedValue()) {
