@@ -1607,12 +1607,22 @@ public record CampaignXmlParser(InputStream is, MekHQ app) {
      */
     private static void relinkLegacyKills(final Map<Integer, UUID> legacyMissionIdMap,
           final List<LegacyKillMissionLink> pendingKillRelinks) {
+        if (pendingKillRelinks.isEmpty()) {
+            return;
+        }
+
+        int relinked = 0;
         for (final LegacyKillMissionLink link : pendingKillRelinks) {
             final UUID newMissionId = legacyMissionIdMap.get(link.legacyMissionId());
             if (newMissionId != null) {
                 link.kill().setMissionId(newMissionId);
+                relinked++;
             }
         }
+
+        final int unmatched = pendingKillRelinks.size() - relinked;
+        LOGGER.info("Re-hooked {} of {} legacy kill(s) to their converted contracts ({} had no matching mission).",
+              relinked, pendingKillRelinks.size(), unmatched);
     }
 
     /**

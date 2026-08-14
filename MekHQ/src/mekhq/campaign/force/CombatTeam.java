@@ -91,7 +91,7 @@ public class CombatTeam {
 
     private int formationId;
     private UUID missionId;
-    private CombatRole role;
+    private CombatRole role = CombatRole.RESERVE;
     private UUID commanderId;
 
     /**

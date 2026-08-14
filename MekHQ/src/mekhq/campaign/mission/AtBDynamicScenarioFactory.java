@@ -3614,8 +3614,7 @@ public class AtBDynamicScenarioFactory {
         List<CombatRole> validRoles = List.of(FRONTLINE, MANEUVER, CADRE, PATROL);
         for (CombatTeam combatTeam : campaign.getPlayerForce().getCombatTeamsAsList(campaign)) {
             CombatRole role = combatTeam.getRole();
-            // A combat team may have no role; validRoles is a null-hostile List.of, so guard before contains().
-            if ((role == null) || !validRoles.contains(role)) {
+            if (!validRoles.contains(role)) {
                 continue;
             }
 
@@ -3690,8 +3689,7 @@ public class AtBDynamicScenarioFactory {
         LocalHangar localHangar = playerForce.getHangar();
         for (CombatTeam combatTeam : playerForce.getCombatTeamsAsList(campaign)) {
             CombatRole role = combatTeam.getRole();
-            // A combat team may have no role; validRoles is a null-hostile List.of, so guard before contains().
-            if ((role == null) || !validRoles.contains(role)) {
+            if (!validRoles.contains(role)) {
                 continue;
             }
 
