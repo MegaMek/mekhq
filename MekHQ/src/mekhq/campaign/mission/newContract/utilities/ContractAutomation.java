@@ -34,6 +34,7 @@ package mekhq.campaign.mission.newContract.utilities;
 
 import static mekhq.campaign.enums.DailyReportType.GENERAL;
 import static mekhq.campaign.enums.DailyReportType.TECHNICAL;
+import static mekhq.campaign.personnel.skills.SkillType.EXP_REGULAR;
 import static mekhq.campaign.universe.Faction.PIRATE_FACTION_CODE;
 import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
 import static mekhq.utilities.MHQInternationalization.getTextAt;
@@ -50,7 +51,10 @@ import mekhq.campaign.AbstractLocation;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.JumpPath;
 import mekhq.campaign.events.units.UnitChangedEvent;
+import mekhq.campaign.finances.Money;
+import mekhq.campaign.force.Detachment;
 import mekhq.campaign.force.Formation;
+import mekhq.campaign.force.PlayerForce;
 import mekhq.campaign.mission.TransportCostCalculations;
 import mekhq.campaign.mission.newContract.AbstractContract;
 import mekhq.campaign.personnel.Person;
@@ -125,20 +129,30 @@ public class ContractAutomation {
         JumpPath jumpPath = ContractUtilities.getJumpPath(campaign,
               contract,
               currentLocation);
+
+        if (jumpPath == null) {
+            return;
+        }
+
+        PlayerForce playerForce = campaign.getPlayerForce();
+        jumpPath.setTargetPlanet(contract.getTargetPlanet());
         int travelDays = ContractUtilities.getTravelDays(campaign, contract, currentLocation,
-              campaign.getPlayerForce().isOverridingCommandCircuitRequirements(),
-              campaign.getPlayerForce().getFactionStandings());
+              playerForce.isOverridingCommandCircuitRequirements(),
+              playerForce.getFactionStandings());
 
+        Detachment detachment = playerForce.getForceDetachment();
         boolean isUseTwoWayPay = campaign.getCampaignOptions().isUseTwoWayPay();
-        String totalCost = contract.getTotalTransportationFees(campaign)
-                                 .dividedBy(isUseTwoWayPay ? 2 : 1)
-                                 .toAmountString();
+        TransportCostCalculations costCalculations = new TransportCostCalculations(detachment.getHangar().getUnits(),
+              playerForce.getWarehouse().getSpareParts(),
+              detachment.getPersonnel().values(),
+              EXP_REGULAR);
 
+        Money cost = costCalculations.calculateJumpCostForEntireJourney(travelDays, jumpPath.getJumps());
         inCharacterMessage = getFormattedTextAt(RESOURCE_BUNDLE,
               "transitDescription.text",
               targetSystem,
               travelDays,
-              totalCost);
+              cost.toAmountString());
 
         ImmersiveDialogSimple transitDialog = new ImmersiveDialogSimple(campaign,
               speaker,
@@ -163,7 +177,7 @@ public class ContractAutomation {
             String jumpReport = TransportCostCalculations.performJumpTransaction(campaign.getPlayerForce()
                                                                                        .getFinances(), jumpPath,
                   campaign.getLocalDate(),
-                  contract.getTotalTransportationFees(campaign).dividedBy(useTwoWayPay ? 2 : 1),
+                  cost,
                   campaign.getCurrentSystem());
 
             if (jumpReport.isBlank()) {

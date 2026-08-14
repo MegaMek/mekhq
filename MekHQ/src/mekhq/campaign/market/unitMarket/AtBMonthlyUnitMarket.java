@@ -183,7 +183,7 @@ public class AtBMonthlyUnitMarket extends AbstractUnitMarket {
             }
 
             // Unwanted Salvage Market
-            faction = contract.getEnemy();
+            faction = contract.getEnemyFaction();
 
             addOffers(campaign, getMarketItemCount(campaign, RARE, totalModifier),
                   UnitMarketType.EMPLOYER, UnitType.MEK, faction, DragoonRating.DRAGOON_F.getRating(), 2);

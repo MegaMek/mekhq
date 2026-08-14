@@ -96,6 +96,17 @@ public class ChaosContractMarketDialog extends JDialog implements ContractMarket
     private transient AbstractContract acceptedContract;
 
     /**
+     * On-departure automation options the player toggles before accepting an offer. They are fields (not rebuilt with
+     * the button bar) so their state persists across {@link #rebuildContent()} calls; read them via
+     * {@link #isMothballOnDepartureSelected()} and {@link #isTravelToSystemSelected()} when committing the accepted
+     * contract.
+     */
+    private final JCheckBox mothballOnDepartureCheckbox = buildOptionCheckbox("checkbox.contractMarket.mothball",
+          "checkbox.contractMarket.mothball.tooltip");
+    private final JCheckBox travelToSystemCheckbox = buildOptionCheckbox("checkbox.contractMarket.travel",
+          "checkbox.contractMarket.travel.tooltip");
+
+    /**
      * Constructs and shows the contract market backed by the player force's {@link ContractMarket}.
      *
      * <p>The board shows the offers stored under the campaign's default {@link ContractSearchType}; switching type in
@@ -515,11 +526,47 @@ public class ChaosContractMarketDialog extends JDialog implements ContractMarket
         return panel;
     }
 
+    /**
+     * Builds a persistent, initially-selected automation checkbox from its label and tooltip resource keys.
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    private static JCheckBox buildOptionCheckbox(String labelKey, String tooltipKey) {
+        JCheckBox checkbox = new JCheckBox(getTextAt(RESOURCE_BUNDLE, labelKey), true);
+        checkbox.setToolTipText(getTextAt(RESOURCE_BUNDLE, tooltipKey));
+        return checkbox;
+    }
+
+    /**
+     * @return {@code true} if the player wants eligible units mothballed on departure when the accepted contract begins
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    public boolean isMothballOnDepartureSelected() {
+        return mothballOnDepartureCheckbox.isSelected();
+    }
+
+    /**
+     * @return {@code true} if the player wants to automatically travel to the contract's system when the accepted
+     *       contract begins
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    public boolean isTravelToSystemSelected() {
+        return travelToSystemCheckbox.isSelected();
+    }
+
     private JPanel buildButtonBar() {
         boolean isGM = campaign.isGM();
 
         JPanel bar = new JPanel(new FlowLayout(FlowLayout.CENTER, PADDING, PADDING));
         bar.setBorder(RoundedLineBorder.createRoundedLineBorder());
+
+        bar.add(mothballOnDepartureCheckbox);
+        bar.add(travelToSystemCheckbox);
 
         RoundedJButton close = new RoundedJButton(getTextAt(RESOURCE_BUNDLE, "button.contractMarket.close"));
         close.addActionListener(e -> dispose());

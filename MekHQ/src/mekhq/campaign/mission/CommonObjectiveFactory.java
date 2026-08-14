@@ -173,7 +173,7 @@ public class CommonObjectiveFactory {
      * @param contract Contract to examine for enemy force name.
      */
     public static ScenarioObjective getDestroyEnemies(AbstractContract contract, int OperationalVP, int percentage) {
-        return getDestroyEnemies(contract.getEnemyBotName(), OperationalVP, percentage);
+        return getDestroyEnemies(contract.getEnemyDisplayName(), OperationalVP, percentage);
     }
 
     /**
@@ -188,7 +188,7 @@ public class CommonObjectiveFactory {
         destroyHostiles.setObjectiveCriterion(ObjectiveCriterion.PreventReachMapEdge);
         destroyHostiles.setPercentage(percentage);
         destroyHostiles.setDestinationEdge(direction);
-        destroyHostiles.addForce(contract.getEnemyBotName());
+        destroyHostiles.addForce(contract.getEnemyDisplayName());
 
         return getScenarioObjective(OperationalVP, destroyHostiles);
     }
