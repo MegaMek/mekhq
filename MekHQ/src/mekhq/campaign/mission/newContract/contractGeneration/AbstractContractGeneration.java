@@ -34,7 +34,6 @@ package mekhq.campaign.mission.newContract.contractGeneration;
 
 import static java.lang.Math.ceil;
 import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
-import static mekhq.utilities.MHQInternationalization.getTextAt;
 
 import java.time.LocalDate;
 import java.util.Collection;
@@ -178,9 +177,6 @@ public class AbstractContractGeneration {
               contract.getEmployerDisplayName(),
               contract.getEnemyDisplayName());
         contract.setContractName(contractName);
-
-        String description = getTextAt(RESOURCE_BUNDLES, "AbstractContractGeneration.description.placeholder");
-        contract.setDescription(description);
 
         // Morale
         MHQMorale.performMoraleCheck(currentDate, contract, 0, 0, 0, 0);

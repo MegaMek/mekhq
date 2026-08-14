@@ -47,6 +47,7 @@ import java.awt.*;
 import java.time.LocalDate;
 import javax.swing.*;
 
+import jakarta.annotation.Nullable;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.mission.newContract.AbstractContract;
@@ -58,6 +59,7 @@ import mekhq.gui.baseComponents.roundedComponents.RoundedJButton;
 import mekhq.gui.baseComponents.roundedComponents.RoundedLineBorder;
 import mekhq.gui.utilities.MarkdownRenderer;
 import mekhq.gui.view.PlanetViewPanel;
+import org.apache.commons.lang3.StringUtils;
 
 /**
  * The full "briefing dossier" for a single selected {@link AbstractContract}.
@@ -326,9 +328,9 @@ public class ContractDossierPanel extends JPanel {
      * @author Illiani
      * @since 0.51.01
      */
-    private JPanel buildBriefing() {
+    private @Nullable JPanel buildBriefing() {
         String description = contract.getDescription();
-        if ((description == null) || description.isBlank()) {
+        if (StringUtils.isBlank(description)) {
             return null;
         }
 

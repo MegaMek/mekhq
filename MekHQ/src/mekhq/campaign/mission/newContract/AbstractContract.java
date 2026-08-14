@@ -94,7 +94,11 @@ public abstract class AbstractContract {
     private SystemsTargetData systemsTargetData;
 
     private RentedFacilitiesData rentedFacilitiesData;
-    private MoraleData moraleData;
+    /**
+     * Seeded with neutral morale so a freshly-constructed contract is always well-formed: generation performs its first
+     * morale check (which reads the current level as its baseline) before any morale data is assigned.
+     */
+    private MoraleData moraleData = new MoraleData(ContractMoraleLevel.STALEMATE);
     private NegotiationData negotiationData;
     private Person playerNegotiator;
 
@@ -223,7 +227,7 @@ public abstract class AbstractContract {
         return String.format("<a href='MISSION:%s'>%s</a>", getId(), getName());
     }
 
-    public String getDescription() {
+    public @Nonnull String getDescription() {
         return description;
     }
 

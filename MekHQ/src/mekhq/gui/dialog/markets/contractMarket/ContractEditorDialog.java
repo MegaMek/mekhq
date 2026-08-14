@@ -265,7 +265,10 @@ public class ContractEditorDialog extends JDialog {
         JPanel content = new JPanel(new BorderLayout());
         content.setBorder(BorderFactory.createEmptyBorder(PADDING, PADDING, PADDING, PADDING));
 
-        JScrollPane bodyScroll = new JScrollPane(buildBody(),
+        JPanel bodyWrapper = new ChaosContractMarketDialog.WidthTrackingPanel(new BorderLayout());
+        bodyWrapper.add(buildBody(), BorderLayout.NORTH);
+
+        JScrollPane bodyScroll = new JScrollPane(bodyWrapper,
               ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED,
               ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
         bodyScroll.setBorder(null);

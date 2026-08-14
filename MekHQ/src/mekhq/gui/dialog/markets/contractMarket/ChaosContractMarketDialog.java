@@ -412,8 +412,8 @@ public class ChaosContractMarketDialog extends JDialog implements ContractMarket
     }
 
     /**
-     * Opens the GM editor for the offer. If the GM confirms changes, the contract is updated in place, so the dossier is
-     * rebuilt to reflect them.
+     * Opens the GM editor for the offer. If the GM confirms changes, the contract is updated in place, so the dossier
+     * is rebuilt to reflect them.
      *
      * @author Illiani
      * @since 0.51.01
@@ -641,7 +641,7 @@ public class ChaosContractMarketDialog extends JDialog implements ContractMarket
      * A scroll-pane view that is forced to the viewport's width but keeps its own (taller) height. This lets the
      * dossier reflow narrower when the dialog shrinks while still scrolling vertically when its content is tall.
      */
-    private static class WidthTrackingPanel extends JPanel implements Scrollable {
+    static class WidthTrackingPanel extends JPanel implements Scrollable {
         WidthTrackingPanel(LayoutManager layout) {
             super(layout);
         }

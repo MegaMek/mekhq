@@ -73,6 +73,7 @@ import mekhq.gui.CampaignGUI;
 import mekhq.gui.baseComponents.JScrollablePanel;
 import mekhq.gui.utilities.BriefingStyle;
 import mekhq.gui.utilities.MarkdownRenderer;
+import org.apache.commons.lang3.StringUtils;
 
 /**
  * A custom panel that gets filled in with goodies from a scenario object
@@ -557,7 +558,7 @@ public class MissionViewPanel extends JScrollablePanel {
     }
 
     private void addDescriptionPane(String description, int gridY, double weighty) {
-        if ((description == null) || description.isBlank()) {
+        if (StringUtils.isBlank(description)) {
             return;
         }
 
