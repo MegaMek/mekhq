@@ -63,7 +63,7 @@ import mekhq.campaign.parts.Part;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.autoAwards.AutoAwardsController;
 import mekhq.campaign.personnel.enums.PersonnelRole;
-import mekhq.campaign.personnel.ranks.AutoAssignRankForCompanyGenerator;
+import mekhq.campaign.personnel.ranks.AutomaticRankAssigner;
 import mekhq.campaign.reputation.camOpsReputation.ForceReputationController;
 import mekhq.campaign.reputation.chaosReputation.ChaosReputation;
 import mekhq.campaign.unit.Unit;
@@ -185,7 +185,7 @@ public class CompanyGenerationDialog extends AbstractMHQValidationButtonDialog {
         Person speaker = campaign.getPlayerForce()
                                .getHumanResources()
                                .newPerson(campaign, role, campaignFactionCode, Gender.RANDOMIZE);
-        AutoAssignRankForCompanyGenerator.assignRankSystemFromFaction(speaker, RO_MIN);
+        AutomaticRankAssigner.assignRankSystemFromFaction(speaker, RO_MIN);
         new FactionJudgmentDialog(campaign, speaker, campaign.getPlayerForce().getHumanResources()
                                                            .getCommander(campaign.getCampaignOptions(),
                                                                  campaign.isClanCampaign(),
