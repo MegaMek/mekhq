@@ -121,10 +121,10 @@ import mekhq.campaign.location.ILocatable;
 import mekhq.campaign.location.LocationNode;
 import mekhq.campaign.location.LocationUtils;
 import mekhq.campaign.log.AssignmentLogger;
-import mekhq.campaign.mission.AtBContract;
-import mekhq.campaign.mission.Mission;
 import mekhq.campaign.mission.Scenario;
 import mekhq.campaign.mission.camOpsSalvage.CamOpsSalvageUtilities;
+import mekhq.campaign.mission.enums.ContractObjectiveType;
+import mekhq.campaign.mission.newContract.AbstractContract;
 import mekhq.campaign.parts.*;
 import mekhq.campaign.parts.enums.PartQuality;
 import mekhq.campaign.parts.equipment.*;
@@ -3102,9 +3102,9 @@ public class Unit implements ITechnology, ILocatable {
 
     /**
      * Parses a {@code <transportAssignment>} save-file node onto the given unit. Entries carry a
-     * {@code campaignTransportType} attribute; entries without one predate that attribute and only
-     * ever meant a tactical transport, so they load as TACTICAL. Package-visible so the routing is
-     * unit-testable without loading a full entity.
+     * {@code campaignTransportType} attribute; entries without one predate that attribute and only ever meant a
+     * tactical transport, so they load as TACTICAL. Package-visible so the routing is unit-testable without loading a
+     * full entity.
      */
     static void parseTransportAssignmentNode(Node transportNode, Unit retVal) {
         NamedNodeMap attributes = transportNode.getAttributes();
@@ -3143,9 +3143,9 @@ public class Unit implements ITechnology, ILocatable {
     }
 
     /**
-     * Parses a {@code <transportedUnit>} save-file node onto the given unit, routing it to the
-     * summary matching its {@code campaignTransportType} attribute. Package-visible so the routing
-     * is unit-testable without loading a full entity.
+     * Parses a {@code <transportedUnit>} save-file node onto the given unit, routing it to the summary matching its
+     * {@code campaignTransportType} attribute. Package-visible so the routing is unit-testable without loading a full
+     * entity.
      */
     static void parseTransportedUnitNode(Node transportedNode, Unit retVal) {
         NamedNodeMap attributes = transportedNode.getAttributes();
@@ -7038,14 +7038,13 @@ public class Unit implements ITechnology, ILocatable {
     }
 
     public void incrementDaysSinceMaintenance(Campaign campaign, boolean maintained, int asTechs) {
-        List<Mission> activeMissions = campaign.getActiveMissions(false);
+        List<AbstractContract> activeMissions = campaign.getActiveContracts();
         double timeIncrease = 0.25;
 
-        for (Mission mission : activeMissions) {
-            if (mission instanceof AtBContract atBContract) {
-                if (atBContract.getContractType().isGarrisonDuty() || atBContract.getContractType().isRetainer()) {
-                    continue;
-                }
+        for (AbstractContract mission : activeMissions) {
+            ContractObjectiveType objectiveType = mission.getObjectiveType();
+            if (objectiveType.isGarrisonDuty() || objectiveType.isRetainer()) {
+                continue;
             }
 
             timeIncrease = 1;

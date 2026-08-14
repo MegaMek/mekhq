@@ -30,9 +30,12 @@
  * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
  * affiliated with Microsoft.
  */
-package mekhq.campaign.mission;
+package mekhq.campaign.mission.newContract.utilities;
 
 import java.util.List;
+
+import mekhq.campaign.mission.Scenario;
+import mekhq.campaign.mission.newContract.AbstractContract;
 
 /**
  * Utility class for calculating contract performance scores based on scenario outcomes.
@@ -57,6 +60,26 @@ public class ContractScore {
     private static final int REFUSED_ENGAGEMENT = -3;
 
     /**
+     * Calculates the overall contract score based on scenario outcomes and modifiers.
+     *
+     * <p>For StratCon campaigns, this returns the current victory points from the campaign state.</p>
+     *
+     * <p>For standard contracts, this aggregates scores from all completed scenarios and applies any arbitrary
+     * modifiers that have been set for this contract.</p>
+     *
+     * @param isUseMaplessMode {@code true} if mapless mode is enabled in StratCon
+     *
+     * @return the total contract score, including victory points or scenario scores plus modifiers
+     */
+    public static int getContractScore(boolean isUseMaplessMode, AbstractContract contract) {
+        if (!isUseMaplessMode && contract.getStratConCampaignState() != null) {
+            return contract.getStratConCampaignState().getVictoryPoints();
+        }
+
+        return getContractScore(contract.getCompletedScenarios());
+    }
+
+    /**
      * Calculates the overall contract score based on the outcomes of all completed scenarios.
      *
      * <p>This method iterates through all provided scenarios and aggregates their individual scores based on their
@@ -71,7 +94,7 @@ public class ContractScore {
      * @author Illiani
      * @since 0.50.10
      */
-    public static int getContractScore(List<Scenario> scenarios) {
+    private static int getContractScore(List<Scenario> scenarios) {
         int contractScore = 0;
         for (Scenario scenario : scenarios) {
             if (scenario.getStatus().isCurrent()) {

@@ -81,10 +81,11 @@ import mekhq.campaign.digitalGM.stratCon.StratConTrackState;
 import mekhq.campaign.digitalGM.stratCon.gm.StratConGMs;
 import mekhq.campaign.enums.CampaignTransportType;
 import mekhq.campaign.force.Formation;
-import mekhq.campaign.mission.AtBContract;
 import mekhq.campaign.mission.AtBDynamicScenario;
 import mekhq.campaign.mission.ScenarioForceTemplate;
 import mekhq.campaign.mission.ScenarioTemplate;
+import mekhq.campaign.mission.newContract.AbstractContract;
+import mekhq.campaign.mission.newContract.contractData.EnemyData;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.unit.Unit;
 import mekhq.campaign.universe.Faction;
@@ -863,8 +864,8 @@ public class StratConScenarioWizard extends JDialog {
               baseTargetNumber);
         int availableSupportPoints = currentCampaignState.getSupportPoints();
 
-        AtBContract contract = currentScenario.getBackingContract(campaign);
-        Faction enemy = contract.getEnemy();
+        AbstractContract contract = currentScenario.getBackingContract(campaign);
+        Faction enemy = contract.getEnemyFaction();
         boolean isClanEnemy = enemy.isClan();
         boolean isBatchallAccepted = contract.isBatchallAccepted();
 
@@ -916,7 +917,7 @@ public class StratConScenarioWizard extends JDialog {
                                                  0
                                                  :
                                                  (dialog.getSupportPoints() * SUPPORT_POINTS_MODIFIER) /
-                                                 selectedForceCount;
+                                                       selectedForceCount;
                 int finalTargetNumber = targetNumber.getValue() + supportPointModifier;
 
                 btnCommitClicked(finalTargetNumber, false, true);
@@ -1090,14 +1091,14 @@ public class StratConScenarioWizard extends JDialog {
      * <p>This method marks the Batchall as not accepted in the contract and, if the campaign is configured to track
      * faction standing, adjusts regard accordingly and adds all relevant standing reports to the campaign log.</p>
      *
-     * @param contract  the active {@link AtBContract} for which the Batchall was breached
+     * @param contract  the active {@link AbstractContract} for which the Batchall was breached
      * @param enemyCode the code representing the enemy faction involved in the breach
      *
      * @author Illiani
      * @since 0.50.07
      */
-    private void processBatchallBreach(AtBContract contract, String enemyCode) {
-        contract.setBatchallAccepted(false);
+    private void processBatchallBreach(AbstractContract contract, String enemyCode) {
+        contract.setEnemyData(new EnemyData(contract.getEnemyData(), false));
 
         CampaignOptions campaignOptions = campaign.getCampaignOptions();
         if (campaignOptions.isTrackFactionStanding()) {

@@ -60,7 +60,7 @@ import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.location.ILocation;
 import mekhq.campaign.location.IPlace;
 import mekhq.campaign.location.LocationNode;
-import mekhq.campaign.mission.Contract;
+import mekhq.campaign.mission.newContract.AbstractContract;
 import mekhq.campaign.personnel.Injury;
 import mekhq.campaign.personnel.InjuryType;
 import mekhq.campaign.personnel.Person;
@@ -228,7 +228,7 @@ public abstract class AbstractLocation implements IPlace {
               campaign.isGM(),
               campaignOptions.isUseFactionStandingCommandCircuitSafe(),
               campaign.getPlayerForce().getFactionStandings(),
-              campaign.getFutureAtBContracts());
+              campaign.getFutureContracts());
     }
 
     public void checkForDiseaseOrBioweaponOutbreaks(Campaign campaign, LocalDate today) {
@@ -277,8 +277,8 @@ public abstract class AbstractLocation implements IPlace {
      * @param campaign The {@link Campaign} instance.
      */
     public void testForEarlyArrival(Campaign campaign) {
-        for (Contract contract : campaign.getFutureContracts()) {
-            if (Objects.equals(currentSystem, contract.getSystem())) {
+        for (AbstractContract contract : campaign.getFutureContracts()) {
+            if (Objects.equals(getPlanet(), contract.getTargetPlanet())) {
                 int daysTillStart = campaign.getLocalDate().until(contract.getStartDate()).getDays();
 
                 String inCharacterMessage = getFormattedTextAt(RESOURCE_BUNDLE,

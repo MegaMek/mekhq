@@ -80,7 +80,7 @@ class OutstandingScenariosNagLogicTest {
         when(campaign.getCampaignOptions()).thenReturn(campaignOptions);
         when(campaignOptions.isUseStratCon()).thenReturn(false);
 
-        when(campaign.getActiveAtBContracts(true)).thenReturn(List.of(contract));
+        when(campaign.getActiveContracts(true)).thenReturn(List.of(contract));
         when(campaign.getLocalDate()).thenReturn(today);
         when(contract.getCurrentAtBScenarios()).thenReturn(List.of(scenario1, scenario2));
     }

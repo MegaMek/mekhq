@@ -99,7 +99,7 @@ public record ReportHyperlinkListener(CampaignGUI campaignGUI) implements Hyperl
                 }
             } else if (evt.getDescription().startsWith(MISSION)) {
                 try {
-                    final int id = MathUtility.parseInt(evt.getDescription().split(":")[1]);
+                    final UUID id = UUID.fromString(evt.getDescription().split(":")[1]);
                     campaignGUI.focusOnMission(id);
                 } catch (Exception e) {
                     LOGGER.error("", e);

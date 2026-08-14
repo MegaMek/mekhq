@@ -45,8 +45,6 @@ import mekhq.campaign.finances.Finances;
 import mekhq.campaign.force.Formation;
 import mekhq.campaign.market.PartsStore;
 import mekhq.campaign.market.PersonnelMarket;
-import mekhq.campaign.market.contractMarket.AbstractContractMarket;
-import mekhq.campaign.market.contractMarket.AtbMonthlyContractMarket;
 import mekhq.campaign.market.personnelMarket.markets.NewPersonnelMarket;
 import mekhq.campaign.market.unitMarket.AbstractUnitMarket;
 import mekhq.campaign.personnel.death.RandomDeath;
@@ -95,7 +93,6 @@ public class CampaignConfiguration {
     @Deprecated(since = "0.50.06")
     private PersonnelMarket personnelMarket;
 
-    private AbstractContractMarket contractMarket;
     private AbstractUnitMarket unitMarket;
 
     private AbstractDivorce divorce;
@@ -168,7 +165,6 @@ public class CampaignConfiguration {
           AutosaveService autosave,
           BehaviorSettings behaviorSettings,
           PersonnelMarket persMarket,
-          AtbMonthlyContractMarket atbMonthlyContractMarket,
           AbstractUnitMarket unitMarket,
           AbstractDivorce divorce,
           AbstractMarriage marriage,
@@ -191,7 +187,6 @@ public class CampaignConfiguration {
         this.autosaveService = autosave;
         this.autoResolveBehaviorSettings = behaviorSettings;
         this.personnelMarket = persMarket;
-        this.contractMarket = atbMonthlyContractMarket;
         this.unitMarket = unitMarket;
         this.divorce = divorce;
         this.marriage = marriage;
@@ -264,7 +259,6 @@ public class CampaignConfiguration {
           AutosaveService autosave,
           BehaviorSettings behaviorSettings,
           PersonnelMarket persMarket,
-          AtbMonthlyContractMarket atbMonthlyContractMarket,
           AbstractUnitMarket unitMarket,
           AbstractDivorce divorce,
           AbstractMarriage marriage,
@@ -296,7 +290,6 @@ public class CampaignConfiguration {
         this.autosaveService = autosave;
         this.autoResolveBehaviorSettings = behaviorSettings;
         this.personnelMarket = persMarket;
-        this.contractMarket = atbMonthlyContractMarket;
         this.unitMarket = unitMarket;
         this.divorce = divorce;
         this.marriage = marriage;
@@ -407,10 +400,6 @@ public class CampaignConfiguration {
         return this.personnelMarket;
     }
 
-    public AbstractContractMarket getAtBMonthlyContractMarket() {
-        return this.contractMarket;
-    }
-
     public AbstractUnitMarket getUnitMarket() {
         return this.unitMarket;
     }
@@ -482,10 +471,6 @@ public class CampaignConfiguration {
 
     public void setCampaignOptions(CampaignOptions campaignOptions) {
         this.campaignOptions = campaignOptions;
-    }
-
-    public void setContractMarket(AbstractContractMarket contractMarket) {
-        this.contractMarket = contractMarket;
     }
 
     public void setUnitMarket(AbstractUnitMarket unitMarket) {

@@ -82,7 +82,6 @@ import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.events.OptionsChangedEvent;
 import mekhq.campaign.finances.CurrencyManager;
 import mekhq.campaign.finances.financialInstitutions.FinancialInstitutions;
-import mekhq.campaign.market.enums.ContractMarketMethod;
 import mekhq.campaign.mission.atb.AtBScenarioModifier;
 import mekhq.campaign.personnel.Bloodname;
 import mekhq.campaign.personnel.SpecialAbility;
@@ -438,13 +437,7 @@ public class DataLoadingDialog extends AbstractMHQDialogBasic implements Propert
                 // Setup Markets
                 campaign.getPlayerForce().getHumanResources().refreshApplicants(campaign, true);
                 showRarePersonnelDialog(campaign, true);
-                ContractMarketMethod contractMarketMethod = campaignOptions.getContractMarketMethod();
-                campaign.setContractMarket(contractMarketMethod.getContractMarket());
 
-                // AtBMonthly initial contract generation is handled using AtB initialization
-                if (!contractMarketMethod.isNone() && !contractMarketMethod.isAtBMonthly()) {
-                    campaign.getContractMarket().generateContractOffers(campaign, true);
-                }
                 if (!campaignOptions.getUnitMarketMethod().isNone()) {
                     campaign.setUnitMarket(campaignOptions.getUnitMarketMethod().getUnitMarket());
                     campaign.getUnitMarket().generateUnitOffers(campaign);

@@ -43,7 +43,6 @@ import megamek.logging.MMLogger;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.Kill;
-import mekhq.campaign.mission.AtBContract;
 import mekhq.campaign.mission.newContract.AbstractContract;
 import mekhq.campaign.personnel.Award;
 import mekhq.campaign.personnel.AwardsFactory;
@@ -314,7 +313,7 @@ public class AutoAwardsController {
         LocalDate today = campaign.getLocalDate();
 
         // Get the list of completed contracts from the campaign object.
-        List<AtBContract> completedContracts = campaign.getCompletedAtBContracts();
+        List<AbstractContract> completedContracts = campaign.getCompletedContracts();
 
         // If there are no completed contracts, return the current date.
         if (completedContracts.isEmpty()) {
@@ -327,11 +326,11 @@ public class AutoAwardsController {
         return getLastContractEndingDate(completedContracts);
     }
 
-    private static LocalDate getLastContractEndingDate(List<AtBContract> completedContracts) {
+    private static LocalDate getLastContractEndingDate(List<AbstractContract> completedContracts) {
         LocalDate lastContractEndingDate = null;
 
         // Loop through each contract in the list of completed contracts.
-        for (AtBContract contract : completedContracts) {
+        for (AbstractContract contract : completedContracts) {
             // Get the ending date of the current contract.
             LocalDate endingDate = contract.getEndingDate();
 

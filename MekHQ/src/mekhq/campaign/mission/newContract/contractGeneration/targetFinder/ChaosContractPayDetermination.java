@@ -43,7 +43,7 @@ import mekhq.campaign.chaosCampaign.ChaosCampaignUtilities;
 import mekhq.campaign.finances.Money;
 import mekhq.campaign.mission.newContract.AbstractContract;
 import mekhq.campaign.mission.newContract.contractData.ContractFinanceData;
-import mekhq.campaign.mission.newContract.utilities.ContractGeneralUtilities;
+import mekhq.campaign.mission.newContract.utilities.ContractUtilities;
 import mekhq.campaign.universe.PlanetarySystem;
 import org.jspecify.annotations.NonNull;
 
@@ -68,7 +68,7 @@ public class ChaosContractPayDetermination {
           AbstractLocation currentLocation) {
         PlanetarySystem currentSystem = currentLocation.getCurrentSystem();
 
-        JumpPath cachedJumpPath = ContractGeneralUtilities.getJumpPath(campaign, contract, currentLocation);
+        JumpPath cachedJumpPath = ContractUtilities.getJumpPath(campaign, contract, currentLocation);
         int jumpCount = cachedJumpPath == null ? 0 : cachedJumpPath.getJumps();
 
         if (jumpCount == 0) {

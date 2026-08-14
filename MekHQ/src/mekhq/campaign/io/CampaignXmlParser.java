@@ -110,8 +110,6 @@ import mekhq.campaign.location.LocationNode;
 import mekhq.campaign.market.ForceShoppingList;
 import mekhq.campaign.market.PersonnelMarket;
 import mekhq.campaign.market.RequestedStockLevels;
-import mekhq.campaign.market.contractMarket.AbstractContractMarket;
-import mekhq.campaign.market.contractMarket.AtbMonthlyContractMarket;
 import mekhq.campaign.mission.AtBContract;
 import mekhq.campaign.mission.Mission;
 import mekhq.campaign.mission.Scenario;

@@ -33,7 +33,7 @@
  */
 package mekhq.gui.dialog;
 
-import static mekhq.campaign.market.contractMarket.ContractAutomation.contractStartPrompt;
+import static mekhq.campaign.mission.newContract.utilities.ContractAutomation.contractStartPrompt;
 import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
 import static mekhq.utilities.MHQInternationalization.getTextAt;
 
@@ -60,7 +60,6 @@ import mekhq.campaign.Campaign;
 import mekhq.campaign.digitalGM.stratCon.StratConContractDefinition;
 import mekhq.campaign.digitalGM.stratCon.StratConContractInitializer;
 import mekhq.campaign.finances.enums.TransactionType;
-import mekhq.campaign.market.contractMarket.AbstractContractMarket;
 import mekhq.campaign.mission.AtBContract;
 import mekhq.campaign.mission.enums.ContractObjectiveType;
 import mekhq.campaign.mission.utilities.ContractUtilities;
@@ -307,7 +306,7 @@ public class NewAtBContractDialog extends NewContractDialog {
         descPanel.add(lblType, gbc);
 
         comboContractType = new MMComboBox<>("comboContractType", ContractObjectiveType.values());
-        comboContractType.setSelectedItem(contract.getContractType());
+        comboContractType.setSelectedItem(contract.getObjectiveType());
         comboContractType.setRenderer(new DefaultListCellRenderer() {
             @Override
             public Component getListCellRendererComponent(final JList<?> list, final Object value, final int index,
@@ -501,7 +500,7 @@ public class NewAtBContractDialog extends NewContractDialog {
             return;
         }
         AtBContract contract = (AtBContract) this.contract;
-        boolean isGarrisonType = contract.getContractType().isGarrisonType();
+        boolean isGarrisonType = contract.getObjectiveType().isGarrisonType();
         HashSet<String> systems = new HashSet<>();
         if (!isGarrisonType ||
                   Factions.getInstance().getFaction(getCurrentEnemyCode()).isRebelOrPirate()) {
@@ -512,7 +511,7 @@ public class NewAtBContractDialog extends NewContractDialog {
             }
         }
 
-        if ((isGarrisonType || contract.getContractType().isReliefDuty()) &&
+        if ((isGarrisonType || contract.getObjectiveType().isReliefDuty()) &&
                   !contract.getEnemy().isRebel()) {
             for (PlanetarySystem p : RandomFactionGenerator.getInstance()
                                            .getMissionTargetList(getCurrentEnemyCode(), getCurrentEmployerCode(),
@@ -609,7 +608,7 @@ public class NewAtBContractDialog extends NewContractDialog {
         contract.setEnemyBotName(contract.generateEnemyName(campaign.getGameYear()));
         contract.setSharesPercent((Integer) spnShares.getValue());
 
-        contract.setPartsAvailabilityLevel(contract.getContractType().calculatePartsAvailabilityLevel());
+        contract.setPartsAvailabilityLevel(contract.getObjectiveType().calculatePartsAvailabilityLevel());
 
         contract.createEmployerLiaison(campaign);
         if (contract.getEnemy().isClan()) {
@@ -634,7 +633,7 @@ public class NewAtBContractDialog extends NewContractDialog {
         if (campaign.getCampaignOptions().isUseStratCon()) {
             StratConContractInitializer.initializeCampaignState(contract,
                   campaign,
-                  Objects.requireNonNull(StratConContractDefinition.getContractDefinition(contract.getContractType())));
+                  Objects.requireNonNull(StratConContractDefinition.getContractDefinition(contract.getObjectiveType())));
         }
 
         setVisible(false);

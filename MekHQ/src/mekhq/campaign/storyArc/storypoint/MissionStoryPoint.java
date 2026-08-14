@@ -159,7 +159,7 @@ public class MissionStoryPoint extends StoryPoint {
             // if the mission has a valid id, then just save this because the mission is
             // saved
             // and loaded elsewhere, so we need to link it
-            if (mission.getId() > 0) {
+            if (mission.getId() != null) {
                 MHQXMLUtility.writeSimpleXMLTag(pw1, indent, "missionId", mission.getId());
             } else {
                 mission.writeToXML(getCampaign(), pw1, indent);
@@ -178,9 +178,9 @@ public class MissionStoryPoint extends StoryPoint {
 
             try {
                 if (wn2.getNodeName().equalsIgnoreCase("missionId")) {
-                    int missionId = Integer.parseInt(wn2.getTextContent().trim());
+                    UUID missionId = UUID.fromString(wn2.getTextContent().trim());
                     if (null != c) {
-                        mission = c.getMission(missionId);
+                        mission = c.getContract(missionId);
                     }
                 } else if (wn2.getNodeName().equalsIgnoreCase("mission")) {
                     mission = Mission.generateInstanceFromXML(wn2, c, version);

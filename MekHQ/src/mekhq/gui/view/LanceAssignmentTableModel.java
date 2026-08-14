@@ -41,6 +41,7 @@ import mekhq.campaign.force.CombatTeam;
 import mekhq.campaign.force.Formation;
 import mekhq.campaign.mission.AtBContract;
 import mekhq.campaign.mission.enums.CombatRole;
+import mekhq.campaign.mission.newContract.AbstractContract;
 import mekhq.gui.model.DataTableModel;
 
 class LanceAssignmentTableModel extends DataTableModel<CombatTeam> {
@@ -112,7 +113,7 @@ class LanceAssignmentTableModel extends DataTableModel<CombatTeam> {
                 yield campaign.getPlayerForce().getFormation(id);
             }
             case COL_WEIGHT_CLASS -> WEIGHT_CODES[data.get(row).getWeightClass(campaign)];
-            case COL_CONTRACT -> campaign.getMission(data.get(row).getMissionId());
+            case COL_CONTRACT -> campaign.getContract(data.get(row).getMissionId());
             case COL_ROLE -> data.get(row).getRole();
             default -> "?";
         };
@@ -121,7 +122,7 @@ class LanceAssignmentTableModel extends DataTableModel<CombatTeam> {
     @Override
     public void setValueAt(Object value, int row, int col) {
         if (col == COL_CONTRACT) {
-            data.get(row).setContract((AtBContract) value);
+            data.get(row).setContract((AbstractContract) value);
         } else if (col == COL_ROLE) {
             if (value instanceof CombatRole) {
                 data.get(row).setRole((CombatRole) value);

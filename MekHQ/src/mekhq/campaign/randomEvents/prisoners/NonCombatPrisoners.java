@@ -49,7 +49,7 @@ import mekhq.campaign.Campaign;
 import mekhq.campaign.ResolveScenarioTracker;
 import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.mission.AtBContract;
-import mekhq.campaign.mission.Mission;
+import mekhq.campaign.mission.newContract.AbstractContract;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.PersonUtility;
 import mekhq.campaign.personnel.enums.PersonnelRole;
@@ -128,14 +128,11 @@ public class NonCombatPrisoners {
      * @since 0.50.10
      */
     public static Hashtable<UUID, ResolveScenarioTracker.OppositionPersonnelStatus> getCivilianCaptives(
-          Campaign campaign, Mission mission) {
+          Campaign campaign, AbstractContract mission) {
         CampaignOptions campaignOptions = campaign.getCampaignOptions();
         boolean isUseAdvancedMedical = campaignOptions.isUseAdvancedMedical();
 
-        SkillLevel targetSkillLevel = SkillLevel.REGULAR;
-        if (mission instanceof AtBContract contract) {
-            targetSkillLevel = contract.getEnemySkill();
-        }
+        SkillLevel targetSkillLevel = mission.getEnemyForceSkill();
 
         int supportCount = d6(3); // Support Personnel
         int soldierCount = d6(5); // Guards

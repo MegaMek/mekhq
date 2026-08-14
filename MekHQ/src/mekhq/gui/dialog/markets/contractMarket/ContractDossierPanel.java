@@ -272,7 +272,7 @@ public class ContractDossierPanel extends JPanel {
         JPanel terms = section(getTextAt(RESOURCE_BUNDLE, "dossier.contractMarket.section.terms"));
         addDetailRow(terms,
               "dossier.contractMarket.terms.command",
-              contract.getContractCommandRights().toString(),
+              contract.getCommandRights().toString(),
               null);
         addDetailRow(terms, "dossier.contractMarket.terms.salvage", salvage(contract), null);
         addDetailRow(terms, "dossier.contractMarket.terms.support", support(contract), null);
@@ -283,7 +283,7 @@ public class ContractDossierPanel extends JPanel {
         addDetailRow(intel, "dossier.contractMarket.intel.alliedCommand", alliedCommand(contract), null);
         addDetailRow(intel, "dossier.contractMarket.intel.opposition", contract.getEnemyDisplayName(), null);
         addDetailRow(intel, "dossier.contractMarket.intel.threat", threat(contract), null);
-        addDetailRow(intel, "dossier.contractMarket.intel.morale", contract.getEnemyMoraleLevel().toString(), null);
+        addDetailRow(intel, "dossier.contractMarket.intel.morale", contract.getMoraleLevel().toString(), null);
         int difficulty = assessmentDifficulty(contract);
         Color assessmentColor = difficulty >= 8 ? dangerColor() : (difficulty <= 2 ? positiveColor() : null);
         addDetailRow(intel, "dossier.contractMarket.intel.assessment", assessmentLabel(contract), assessmentColor);
@@ -340,7 +340,7 @@ public class ContractDossierPanel extends JPanel {
         metrics.add(metricTile("dossier.contractMarket.metric.total",
               contract.getTotalPay().toAmountAndSymbolString()));
         metrics.add(metricTile("dossier.contractMarket.metric.monthly",
-              contract.getMonthlyPay().toAmountAndSymbolString()));
+              contract.getMonthlyPayOut().toAmountAndSymbolString()));
         metrics.add(metricTile("dossier.contractMarket.metric.transport",
               contract.getTransportPayment().toAmountAndSymbolString()));
         metrics.add(metricTile("dossier.contractMarket.metric.combat",

@@ -169,8 +169,8 @@ public class StratConCampaignState {
         this.victoryPoints = victoryPoints;
     }
 
-    public void updateVictoryPoints(int increment) {
-        victoryPoints += increment;
+    public void changeVictoryPoints(int delta) {
+        victoryPoints += delta;
     }
 
     public String getBriefingText() {

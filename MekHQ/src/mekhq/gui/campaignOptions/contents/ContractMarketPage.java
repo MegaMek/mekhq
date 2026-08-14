@@ -57,11 +57,11 @@ import jakarta.annotation.Nonnull;
 import jakarta.annotation.Nullable;
 import megamek.Version;
 import megamek.client.ui.comboBoxes.MMComboBox;
+import megamek.client.ui.settings.SettingsFormPanel;
 import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.market.enums.ContractMarketMethod;
 import mekhq.gui.campaignOptions.CampaignOptionFlag;
 import mekhq.gui.campaignOptions.components.CampaignOptionsCheckBox;
-import megamek.client.ui.settings.SettingsFormPanel;
 import mekhq.gui.campaignOptions.components.CampaignOptionsHeaderPanel;
 import mekhq.gui.campaignOptions.components.CampaignOptionsLabel;
 import mekhq.gui.campaignOptions.components.CampaignOptionsPagePanel;
@@ -74,7 +74,8 @@ import mekhq.gui.campaignOptions.components.CampaignOptionsStandardPanel;
  * toggles, and the equipment/personnel contract-pay subsections - and synchronises them with a shared
  * {@link MarketsOptionsModel}.
  *
- * <p>This view is a sub-component of {@link MarketsPages}: the model snapshot and the overall load/apply lifecycle still
+ * <p>This view is a sub-component of {@link MarketsPages}: the model snapshot and the overall load/apply lifecycle
+ * still
  * live on {@code MarketsPages}, while this class is responsible only for constructing the Contract Market panel and
  * copying contract market values to and from the model. The page is built lazily; until
  * {@link #createPanel(MarketsOptionsModel)} is called, {@link #readFromModel(MarketsOptionsModel)} and
@@ -146,7 +147,8 @@ class ContractMarketPage {
      *
      * @return A {@link JPanel} for the Contract Market configuration page.
      */
-    @Nonnull JPanel createPanel(@Nullable MarketsOptionsModel model) {
+    @Nonnull
+    JPanel createPanel(@Nullable MarketsOptionsModel model) {
         // Header
         String imageAddress = getImageDirectory() + "logo_federated_suns.png";
         contractMarketHeader = new CampaignOptionsHeaderPanel("ContractMarketPage", imageAddress);
@@ -155,16 +157,16 @@ class ContractMarketPage {
         pnlContractPay = createContractPayPanel();
 
         final JPanel panel = CampaignOptionsPagePanel.builder("ContractMarketPage", "ContractMarketPage",
-                imageAddress)
-                .header(contractMarketHeader)
-                .quote("contractMarketPage")
-                .section("lblContractMarketGeneralOptionsPanel.text",
-                        "lblContractMarketGeneralOptionsPanel.summary",
-                        pnlContractMarketGeneralOptions)
-                .section("lblContractPayPanel.text",
-                        "lblContractPayPanel.summary",
-                        pnlContractPay)
-                .build();
+                    imageAddress)
+                                   .header(contractMarketHeader)
+                                   .quote("contractMarketPage")
+                                   .section("lblContractMarketGeneralOptionsPanel.text",
+                                         "lblContractMarketGeneralOptionsPanel.summary",
+                                         pnlContractMarketGeneralOptions)
+                                   .section("lblContractPayPanel.text",
+                                         "lblContractPayPanel.summary",
+                                         pnlContractPay)
+                                   .build();
 
         created = true;
         readFromModel(model);
@@ -182,47 +184,46 @@ class ContractMarketPage {
         // Contents
         lblContractMarketMethod = new CampaignOptionsLabel("ContractMarketMethod");
         lblContractMarketMethod
-                .addMouseListener(createTipPanelUpdater("ContractMarketMethod"));
+              .addMouseListener(createTipPanelUpdater("ContractMarketMethod"));
         comboContractMarketMethod = new MMComboBox<>("comboContractMarketMethod");
         DefaultComboBoxModel<ContractMarketMethod> model = new DefaultComboBoxModel<>(
-                ContractMarketMethod.values());
-        model.removeElement(ContractMarketMethod.CAM_OPS);
+              ContractMarketMethod.values());
         comboContractMarketMethod.setModel(model);
         comboContractMarketMethod
-                .addMouseListener(createTipPanelUpdater("ContractMarketMethod"));
+              .addMouseListener(createTipPanelUpdater("ContractMarketMethod"));
 
         lblContractSearchRadius = new CampaignOptionsLabel("ContractSearchRadius");
         lblContractSearchRadius
-                .addMouseListener(createTipPanelUpdater("ContractSearchRadius"));
+              .addMouseListener(createTipPanelUpdater("ContractSearchRadius"));
         spnContractSearchRadius = new CampaignOptionsSpinner("ContractSearchRadius", 300, 1, 2500, 100);
         spnContractSearchRadius
-                .addMouseListener(createTipPanelUpdater("ContractSearchRadius"));
+              .addMouseListener(createTipPanelUpdater("ContractSearchRadius"));
 
         chkVariableContractLength = new CampaignOptionsCheckBox("VariableContractLength");
         chkVariableContractLength.addMouseListener(createTipPanelUpdater("VariableContractLength"));
 
         chkUseTwoWayPay = new CampaignOptionsCheckBox("UseTwoWayPay",
-                getMetadata(MILESTONE_BEFORE_METADATA));
+              getMetadata(MILESTONE_BEFORE_METADATA));
         chkUseTwoWayPay.addMouseListener(createTipPanelUpdater("UseTwoWayPay"));
 
         chkUseCamOpsSalvage = new CampaignOptionsCheckBox("UseCamOpsSalvage",
-                getMetadata(MILESTONE_BEFORE_METADATA));
+              getMetadata(MILESTONE_BEFORE_METADATA));
         chkUseCamOpsSalvage.addMouseListener(createTipPanelUpdater("UseCamOpsSalvage"));
 
         chkUseRiskySalvage = new CampaignOptionsCheckBox("UseRiskySalvage",
-                getMetadata(MILESTONE_BEFORE_METADATA, CampaignOptionFlag.CUSTOM_SYSTEM));
+              getMetadata(MILESTONE_BEFORE_METADATA, CampaignOptionFlag.CUSTOM_SYSTEM));
         chkUseRiskySalvage.addMouseListener(createTipPanelUpdater("UseRiskySalvage"));
 
         chkEnableSalvageFlagByDefault = new CampaignOptionsCheckBox("EnableSalvageFlagByDefault",
-                getMetadata(MILESTONE_BEFORE_METADATA));
+              getMetadata(MILESTONE_BEFORE_METADATA));
         chkEnableSalvageFlagByDefault.addMouseListener(createTipPanelUpdater("EnableSalvageFlagByDefault"));
 
         chkUseDynamicDifficulty = new CampaignOptionsCheckBox("UseDynamicDifficulty");
         chkUseDynamicDifficulty
-                .addMouseListener(createTipPanelUpdater("UseDynamicDifficulty"));
+              .addMouseListener(createTipPanelUpdater("UseDynamicDifficulty"));
 
         chkUseBolsterContractSkill = new CampaignOptionsCheckBox("UseBolsterContractSkill",
-                getMetadata(MILESTONE_BEFORE_METADATA, CampaignOptionFlag.CUSTOM_SYSTEM));
+              getMetadata(MILESTONE_BEFORE_METADATA, CampaignOptionFlag.CUSTOM_SYSTEM));
         chkUseBolsterContractSkill.addMouseListener(createTipPanelUpdater("UseBolsterContractSkill"));
 
         chkContractMarketReportRefresh = new CampaignOptionsCheckBox("ContractMarketReportRefresh");
@@ -231,7 +232,7 @@ class ContractMarketPage {
         lblContractMaxSalvagePercentage = new CampaignOptionsLabel("ContractMaxSalvagePercentage");
         lblContractMaxSalvagePercentage.addMouseListener(createTipPanelUpdater("ContractMaxSalvagePercentage"));
         spnContractMaxSalvagePercentage = new CampaignOptionsSpinner("ContractMaxSalvagePercentage", 100, 0, 100,
-                10);
+              10);
         spnContractMaxSalvagePercentage.addMouseListener(createTipPanelUpdater("ContractMaxSalvagePercentage"));
 
         lblDropShipBonusPercentage = new CampaignOptionsLabel("DropShipBonusPercentage");
@@ -250,19 +251,19 @@ class ContractMarketPage {
         // two-column checkbox grid. addRow and addCheckBoxGrid both use the same two underlying grid columns, so they
         // line up cleanly within a single form panel.
         final SettingsFormPanel panel = new SettingsFormPanel("ContractMarketGeneralOptionsPanel",
-                LABEL_COLUMN_WIDTH,
-                CONTROL_COLUMN_WIDTH);
+              LABEL_COLUMN_WIDTH,
+              CONTROL_COLUMN_WIDTH);
         panel.addRow(lblContractMarketMethod, comboContractMarketMethod);
         panel.addRow(lblContractSearchRadius, spnContractSearchRadius);
         panel.addCheckBoxGrid(CHECKBOX_GRID_COLUMNS,
-                chkVariableContractLength,
-                chkUseTwoWayPay,
-                chkUseCamOpsSalvage,
-                chkUseRiskySalvage,
-                chkEnableSalvageFlagByDefault,
-                chkUseDynamicDifficulty,
-                chkUseBolsterContractSkill,
-                chkContractMarketReportRefresh);
+              chkVariableContractLength,
+              chkUseTwoWayPay,
+              chkUseCamOpsSalvage,
+              chkUseRiskySalvage,
+              chkEnableSalvageFlagByDefault,
+              chkUseDynamicDifficulty,
+              chkUseBolsterContractSkill,
+              chkContractMarketReportRefresh);
         panel.addRow(lblContractMaxSalvagePercentage, spnContractMaxSalvagePercentage);
         panel.addRow(lblDropShipBonusPercentage, spnDropShipBonusPercentage);
         panel.addRow(lblPityContracts, spnPityContracts);
@@ -281,15 +282,15 @@ class ContractMarketPage {
     private @Nonnull JPanel createContractPayPanel() {
         // Contents
         btnContractEquipment = new JRadioButton(getTextAt(getCampaignOptionsResourceBundle(),
-                "lblContractEquipment.text"));
+              "lblContractEquipment.text"));
         btnContractEquipment.setToolTipText(getTextAt(getCampaignOptionsResourceBundle(),
-                "lblContractEquipment.tooltip"));
+              "lblContractEquipment.tooltip"));
         btnContractEquipment.addMouseListener(createTipPanelUpdater("ContractEquipment"));
 
         btnContractPersonnel = new JRadioButton(getTextAt(getCampaignOptionsResourceBundle(),
-                "lblContractPersonnel.text"));
+              "lblContractPersonnel.text"));
         btnContractPersonnel.setToolTipText(getTextAt(getCampaignOptionsResourceBundle(),
-                "lblContractPersonnel.tooltip"));
+              "lblContractPersonnel.tooltip"));
         btnContractPersonnel.addMouseListener(createTipPanelUpdater("ContractPersonnel"));
 
         ButtonGroup contractGroup = new ButtonGroup();
@@ -297,11 +298,11 @@ class ContractMarketPage {
         contractGroup.add(btnContractPersonnel);
 
         chkUseAlternatePaymentMode = new CampaignOptionsCheckBox("UseAlternatePaymentMode",
-                getMetadata(MILESTONE_BEFORE_METADATA, CampaignOptionFlag.CUSTOM_SYSTEM));
+              getMetadata(MILESTONE_BEFORE_METADATA, CampaignOptionFlag.CUSTOM_SYSTEM));
         chkUseAlternatePaymentMode.addMouseListener(createTipPanelUpdater("UseAlternatePaymentMode"));
 
         chkUseDiminishingContractPay = new CampaignOptionsCheckBox("UseDiminishingContractPay",
-                getMetadata(MILESTONE_BEFORE_METADATA, CampaignOptionFlag.CUSTOM_SYSTEM));
+              getMetadata(MILESTONE_BEFORE_METADATA, CampaignOptionFlag.CUSTOM_SYSTEM));
         chkUseDiminishingContractPay.addMouseListener(createTipPanelUpdater("UseDiminishingContractPay"));
 
         chkEquipContractSaleValue = new CampaignOptionsCheckBox("EquipContractSaleValue");
@@ -310,37 +311,37 @@ class ContractMarketPage {
         lblEquipPercent = new CampaignOptionsLabel("EquipPercent");
         lblEquipPercent.addMouseListener(createTipPanelUpdater("EquipPercent"));
         spnEquipPercent = new CampaignOptionsSpinner("EquipPercent",
-                0.1,
-                0,
-                CampaignOptions.MAXIMUM_COMBAT_EQUIPMENT_PERCENT,
-                0.1);
+              0.1,
+              0,
+              CampaignOptions.MAXIMUM_COMBAT_EQUIPMENT_PERCENT,
+              0.1);
         spnEquipPercent.addMouseListener(createTipPanelUpdater("EquipPercent"));
 
         lblDropShipPercent = new CampaignOptionsLabel("DropShipPercent");
         lblDropShipPercent.addMouseListener(createTipPanelUpdater("DropShipPercent"));
         spnDropShipPercent = new CampaignOptionsSpinner("DropShipPercent",
-                0.1,
-                0,
-                CampaignOptions.MAXIMUM_COMBAT_EQUIPMENT_PERCENT,
-                0.1);
+              0.1,
+              0,
+              CampaignOptions.MAXIMUM_COMBAT_EQUIPMENT_PERCENT,
+              0.1);
         spnDropShipPercent.addMouseListener(createTipPanelUpdater("DropShipPercent"));
 
         lblJumpShipPercent = new CampaignOptionsLabel("JumpShipPercent");
         lblJumpShipPercent.addMouseListener(createTipPanelUpdater("JumpShipPercent"));
         spnJumpShipPercent = new CampaignOptionsSpinner("JumpShipPercent",
-                0.1,
-                0,
-                CampaignOptions.MAXIMUM_COMBAT_EQUIPMENT_PERCENT,
-                0.1);
+              0.1,
+              0,
+              CampaignOptions.MAXIMUM_COMBAT_EQUIPMENT_PERCENT,
+              0.1);
         spnJumpShipPercent.addMouseListener(createTipPanelUpdater("JumpShipPercent"));
 
         lblWarShipPercent = new CampaignOptionsLabel("WarShipPercent");
         lblWarShipPercent.addMouseListener(createTipPanelUpdater("WarShipPercent"));
         spnWarShipPercent = new CampaignOptionsSpinner("WarShipPercent",
-                0.1,
-                0,
-                CampaignOptions.MAXIMUM_COMBAT_EQUIPMENT_PERCENT,
-                0.1);
+              0.1,
+              0,
+              CampaignOptions.MAXIMUM_COMBAT_EQUIPMENT_PERCENT,
+              0.1);
         spnWarShipPercent.addMouseListener(createTipPanelUpdater("WarShipPercent"));
 
         chkBLCSaleValue = new CampaignOptionsCheckBox("BLCSaleValue");
@@ -354,13 +355,13 @@ class ContractMarketPage {
 
         // Layout the Panel
         final SettingsFormPanel equipmentValuePanel = new SettingsFormPanel(
-                "ContractPayPanelValuePercent",
-                CONTRACT_PAY_LABEL_COLUMN_WIDTH,
-                CONTROL_COLUMN_WIDTH);
+              "ContractPayPanelValuePercent",
+              CONTRACT_PAY_LABEL_COLUMN_WIDTH,
+              CONTROL_COLUMN_WIDTH);
         equipmentValuePanel.addCheckBoxGrid(CHECKBOX_GRID_COLUMNS,
-                chkEquipContractSaleValue,
-                chkUseAlternatePaymentMode,
-                chkUseDiminishingContractPay);
+              chkEquipContractSaleValue,
+              chkUseAlternatePaymentMode,
+              chkUseDiminishingContractPay);
         equipmentValuePanel.addRow(lblEquipPercent, spnEquipPercent);
         equipmentValuePanel.addRow(lblDropShipPercent, spnDropShipPercent);
         equipmentValuePanel.addRow(lblJumpShipPercent, spnJumpShipPercent);
@@ -368,13 +369,13 @@ class ContractMarketPage {
         pnlContractPayEquipmentOptions = equipmentValuePanel;
 
         final SettingsFormPanel personnelPayPanel = new SettingsFormPanel(
-                "ContractPayPersonnelPanel",
-                CONTRACT_PAY_LABEL_COLUMN_WIDTH,
-                CONTROL_COLUMN_WIDTH);
+              "ContractPayPersonnelPanel",
+              CONTRACT_PAY_LABEL_COLUMN_WIDTH,
+              CONTROL_COLUMN_WIDTH);
         personnelPayPanel.addCheckBoxGrid(CHECKBOX_GRID_COLUMNS,
-                chkBLCSaleValue,
-                chkUseInfantryDoesNotCount,
-                chkOverageRepaymentInFinalPayment);
+              chkBLCSaleValue,
+              chkUseInfantryDoesNotCount,
+              chkOverageRepaymentInFinalPayment);
         pnlContractPayPersonnelOptions = personnelPayPanel;
 
         btnContractEquipment.addActionListener(event -> updateContractPayEnabledState());
@@ -389,25 +390,25 @@ class ContractMarketPage {
         layout.gridx = 0;
         layout.gridy = 0;
         panel.add(createContractPaySubsection("ContractPayEquipmentSubsection",
-                btnContractEquipment,
-                equipmentValuePanel), layout);
+              btnContractEquipment,
+              equipmentValuePanel), layout);
 
         layout.gridy++;
         panel.add(createContractPaySubsection("ContractPayPersonnelSubsection",
-                btnContractPersonnel,
-                personnelPayPanel), layout);
+              btnContractPersonnel,
+              personnelPayPanel), layout);
 
         return panel;
     }
 
     /**
-     * Wraps a contract-pay radio button together with the options it controls inside a single bordered card. The
-     * radio button acts as the card's header and the supplied options panel is indented beneath it so it is visually
-     * clear which settings belong to which payment basis.
+     * Wraps a contract-pay radio button together with the options it controls inside a single bordered card. The radio
+     * button acts as the card's header and the supplied options panel is indented beneath it so it is visually clear
+     * which settings belong to which payment basis.
      *
-     * @param name         the internal panel name
-     * @param radioButton  the radio button that selects this payment basis
-     * @param options      the options that apply when this payment basis is selected
+     * @param name        the internal panel name
+     * @param radioButton the radio button that selects this payment basis
+     * @param options     the options that apply when this payment basis is selected
      *
      * @return the assembled subsection card
      */

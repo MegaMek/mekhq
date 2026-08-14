@@ -138,7 +138,7 @@ public class PostScenarioDialogHandler {
           Scenario currentScenario) {
         if (!campaign.getPlayerForce().getHumanResources().getRetirementDefectionTracker().getRetirees().isEmpty()) {
             RetirementDefectionDialog rdd = new RetirementDefectionDialog(campaignGUI,
-                  campaign.getMission(currentScenario.getMissionId()), false);
+                  campaign.getContract(currentScenario.getMissionId()), false);
 
             if (!rdd.wasAborted()) {
                 campaign.applyRetirement(rdd.totalPayout(), rdd.getUnitAssignments());

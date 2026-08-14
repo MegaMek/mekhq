@@ -740,7 +740,7 @@ public class ContractNegotiationDialog extends JDialog {
               originalStep[Clause.PAY.ordinal()]).getBasePayMultiplier();
         double proposedMultiplier = ChaosContractStepsTable.fromStepValue(
               currentStep[Clause.PAY.ordinal()]).getBasePayMultiplier();
-        Money baseMonthly = contract.getMonthlyPay();
+        Money baseMonthly = contract.getMonthlyPayOut();
         Money projectedMonthly = originalMultiplier == 0 ? baseMonthly
                                        : baseMonthly.multipliedBy(proposedMultiplier / originalMultiplier);
 

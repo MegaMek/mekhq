@@ -120,7 +120,7 @@ public class JumpPathViewPanel extends JScrollablePanel {
                                                                  .isOverridingCommandCircuitRequirements(),
                     campaign.isGM(),
                     campaign.getCampaignOptions().isUseFactionStandingCommandCircuitSafe(),
-                    campaign.getPlayerForce().getFactionStandings(), campaign.getFutureAtBContracts());
+                    campaign.getPlayerForce().getFactionStandings(), campaign.getFutureContracts());
 
         for (PlanetarySystem system : path.getSystems()) {
             lblPlanet =
@@ -252,7 +252,7 @@ public class JumpPathViewPanel extends JScrollablePanel {
         boolean isUseCommandCircuit = FactionStandingUtilities.isUseCommandCircuit(campaign.getPlayerForce()
                                                                                          .isOverridingCommandCircuitRequirements(),
               campaign.isGM(), campaign.getCampaignOptions().isUseFactionStandingCommandCircuitSafe(),
-              campaign.getPlayerForce().getFactionStandings(), campaign.getFutureAtBContracts());
+              campaign.getPlayerForce().getFactionStandings(), campaign.getFutureContracts());
 
         txtRechargeTime.setName("lblRechargeTime2");
         txtRechargeTime.setText("<html>" +

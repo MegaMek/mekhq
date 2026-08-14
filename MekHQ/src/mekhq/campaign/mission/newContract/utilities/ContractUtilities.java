@@ -33,6 +33,7 @@
 package mekhq.campaign.mission.newContract.utilities;
 
 import static java.lang.Math.ceil;
+import static java.lang.Math.max;
 
 import java.time.LocalDate;
 import java.util.Objects;
@@ -41,13 +42,15 @@ import jakarta.annotation.Nullable;
 import mekhq.campaign.AbstractLocation;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.JumpPath;
+import mekhq.campaign.force.CombatTeam;
+import mekhq.campaign.mission.enums.CombatRole;
 import mekhq.campaign.mission.newContract.AbstractContract;
 import mekhq.campaign.universe.Planet;
 import mekhq.campaign.universe.PlanetarySystem;
 import mekhq.campaign.universe.factionStanding.FactionStandingUtilities;
 import mekhq.campaign.universe.factionStanding.FactionStandings;
 
-public class ContractGeneralUtilities {
+public class ContractUtilities {
     public static int getTravelDays(Campaign campaign, AbstractContract abstractContract,
           AbstractLocation currentLocation, boolean isOverridingCommandCircuitRequirements,
           FactionStandings factionStandings, String employerFactionCode) {
@@ -103,5 +106,47 @@ public class ContractGeneralUtilities {
         abstractContract.setCachedJumpPath(jumpPath);
 
         return jumpPath;
+    }
+
+    /**
+     * @param contract an active AtBContract
+     *
+     * @return the current deployment deficit for the contract
+     */
+    public static int getDeploymentDeficit(Campaign campaign, AbstractContract contract) {
+        LocalDate currentDate = campaign.getLocalDate();
+        if (!contract.isActiveOn(currentDate) || contract.getStartDate().isEqual(currentDate)) {
+            // Do not check for deficits if the contract has not started, or
+            // it is the first day of the contract, as players won't have
+            // had time to assign forces to the contract yet
+            return 0;
+        }
+
+        int total = -contract.getRequiredCombatElements();
+        int role = -max(1, contract.getRequiredCombatElements() / 2);
+
+        final CombatRole requiredLanceRole = contract.getObjectiveType().getRequiredCombatRole();
+        for (CombatTeam combatTeam : campaign.getPlayerForce().getCombatTeamsMap().values()) {
+            CombatRole combatRole = combatTeam.getRole();
+
+            if (!combatRole.isReserve() && !combatRole.isAuxiliary()) {
+                if (Objects.equals(combatTeam.getMissionId(), contract.getId())) {
+                    if (!combatRole.isTraining()) {
+                        if (!combatRole.isCadre() || contract.getObjectiveType().isCadreDuty()) {
+                            total += combatTeam.getSize(campaign);
+                        }
+                    }
+                }
+
+                if (combatRole == requiredLanceRole) {
+                    role += combatTeam.getSize(campaign);
+                }
+            }
+        }
+
+        if (total >= 0 && role >= 0) {
+            return 0;
+        }
+        return Math.abs(Math.min(total, role));
     }
 }

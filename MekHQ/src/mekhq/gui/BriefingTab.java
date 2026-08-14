@@ -889,7 +889,7 @@ public final class BriefingTab extends CampaignGuiTab {
         List<Person> POWPersonnel = getCampaign().getPlayerForce().getHumanResources().getFriendlyPrisoners();
 
         // We only resolve prisoners if there are no active Missions
-        if (getCampaign().getActiveMissions(false).isEmpty()) {
+        if (getCampaign().getActiveContracts().isEmpty()) {
             if (!getCampaign().getPlayerForce().getHumanResources().getFriendlyPrisoners().isEmpty()) {
                 prisoners.handlePrisoners(wasOverallSuccess, true);
             }
@@ -1592,7 +1592,7 @@ public final class BriefingTab extends CampaignGuiTab {
         List<SalvageFormationData> salvageFormationOptions = new ArrayList<>();
 
         // Collect eligible salvage forces (We want salvage forces first)
-        List<AtBContract> activeContracts = getCampaign().getActiveAtBContracts();
+        List<AbstractContract> activeContracts = getCampaign().getActiveContracts();
         LocalHangar hangar = campaign.getPlayerForce().getHangar();
         List<Formation> eligibleSalvageFormations = new ArrayList<>();
         for (Formation formation : getCampaign().getPlayerForce().getAllFormations()) {

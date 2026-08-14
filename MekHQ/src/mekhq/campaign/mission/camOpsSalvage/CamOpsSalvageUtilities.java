@@ -255,7 +255,7 @@ public class CamOpsSalvageUtilities {
             employerTakeHome = employerTakeHome.plus(salvageUnit.getSellValue());
         }
 
-        if (mission.isExchangeSalvage()) {
+        if (mission.isSalvageExchange()) {
             double playerPercent = mission.getSalvageRightsMultiplier();
             Money playerTakeHome = employerTakeHome.multipliedBy(playerPercent);
             employerTakeHome = employerTakeHome.minus(playerTakeHome);

@@ -33,10 +33,8 @@
  */
 package mekhq.campaign.mission;
 
-import static java.lang.Math.ceil;
 import static java.lang.Math.max;
 import static java.lang.Math.min;
-import static java.lang.Math.round;
 import static megamek.common.compute.Compute.d6;
 import static megamek.common.compute.Compute.randomInt;
 import static megamek.common.units.UnitType.AEROSPACE_FIGHTER;
@@ -44,31 +42,22 @@ import static megamek.common.units.UnitType.MEK;
 import static megamek.common.units.UnitType.TANK;
 import static mekhq.MHQConstants.BATTLE_OF_TUKAYYID;
 import static mekhq.campaign.digitalGM.stratCon.StratConContractDefinition.getContractDefinition;
-import static mekhq.campaign.digitalGM.stratCon.StratConRulesManager.INDEPENDENT_COMMAND_RIGHTS_REQUIRED_VICTORY_POINTS;
 import static mekhq.campaign.enums.DailyReportType.GENERAL;
-import static mekhq.campaign.enums.DailyReportType.POLITICS;
 import static mekhq.campaign.force.CombatTeam.getStandardFormationSize;
 import static mekhq.campaign.force.FormationLevel.BATTALION;
 import static mekhq.campaign.force.FormationLevel.COMPANY;
 import static mekhq.campaign.mission.ContractDifficulty.calculateContractDifficulty;
 import static mekhq.campaign.mission.RandomFactionCamouflage.pickRandomCamouflage;
-import static mekhq.campaign.mission.enums.ContractMoraleLevel.ADVANCING;
-import static mekhq.campaign.mission.enums.ContractMoraleLevel.DOMINATING;
 import static mekhq.campaign.mission.enums.ContractMoraleLevel.OVERWHELMING;
-import static mekhq.campaign.mission.enums.ContractMoraleLevel.STALEMATE;
 import static mekhq.campaign.randomEvents.prisoners.PrisonerStatus.FREE;
 import static mekhq.campaign.universe.Faction.PIRATE_FACTION_CODE;
-import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
-import static mekhq.utilities.MHQInternationalization.getTextAt;
 
 import java.io.PrintWriter;
 import java.text.ParseException;
 import java.time.DayOfWeek;
 import java.time.LocalDate;
-import java.util.List;
 
 import megamek.Version;
-import megamek.common.annotations.Nullable;
 import megamek.logging.MMLogger;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
@@ -76,29 +65,20 @@ import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.digitalGM.stratCon.StratConCampaignState;
 import mekhq.campaign.digitalGM.stratCon.StratConContractDefinition;
 import mekhq.campaign.digitalGM.stratCon.StratConContractInitializer;
-import mekhq.campaign.digitalGM.stratCon.StratConTrackState;
 import mekhq.campaign.enums.DragoonRating;
 import mekhq.campaign.events.missions.MissionChangedEvent;
 import mekhq.campaign.finances.Money;
 import mekhq.campaign.market.enums.UnitMarketType;
 import mekhq.campaign.mission.atb.AtBScenarioFactory;
-import mekhq.campaign.mission.enums.ContractCommandRights;
 import mekhq.campaign.mission.enums.ContractMoraleLevel;
 import mekhq.campaign.mission.enums.ContractObjectiveType;
 import mekhq.campaign.mission.utilities.ContractUtilities;
 import mekhq.campaign.personnel.Person;
-import mekhq.campaign.personnel.backgrounds.BackgroundsController;
 import mekhq.campaign.randomEvents.other.MercenaryAuction;
 import mekhq.campaign.randomEvents.other.RoninOffer;
 import mekhq.campaign.universe.Faction;
 import mekhq.campaign.universe.Factions;
 import mekhq.campaign.universe.RandomFactionGenerator;
-import mekhq.campaign.universe.factionStanding.FactionStandingUtilities;
-import mekhq.campaign.universe.factionStanding.FactionStandings;
-import mekhq.campaign.universe.factionStanding.PerformBatchall;
-import mekhq.gui.baseComponents.immersiveDialogs.ImmersiveDialogNotification;
-import mekhq.gui.baseComponents.immersiveDialogs.ImmersiveDialogSimple;
-import mekhq.gui.view.MoraleBar;
 import mekhq.utilities.MHQXMLUtility;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
@@ -181,232 +161,7 @@ public class AtBContract extends Contract {
     }
 
     public void calculateLength(final boolean variable) {
-        setLengthInMonths(getContractType().getChaosObjectiveType().calculateLength(variable));
-    }
-
-    /**
-     * Checks and updates the morale which depends on various conditions such as the rout end date, skill levels,
-     * victories, defeats, etc. This method also updates the enemy status based on the morale level.
-     *
-     * @param today The current date in the context.
-     */
-    public void checkMorale(Campaign campaign, LocalDate today) {
-        // If there is a rout end date, and it's past today, update morale and enemy state accordingly
-        if (getRoutEndDate() != null) {
-            // Check whether any current rout continues beyond its expected date. This is only applicable for
-            // Garrison Type contracts. For all other types we reinforce immediately
-            boolean routContinue = getContractType().isGarrisonType() && randomInt(4) == 0;
-            if (routContinue) {
-                return;
-            }
-
-            if (today.isAfter(getRoutEndDate())) {
-                int roll = randomInt(8);
-
-                // We use variable morale levels to spike morale up to a value above Stalemate. This works with the
-                // regenerated Scenario Odds to create very high intensity spikes in otherwise low-key Garrison-type
-                // contracts.
-                ContractMoraleLevel newMoraleLevel = switch (roll) {
-                    case 2, 3, 4, 5 -> ADVANCING;
-                    case 6, 7 -> DOMINATING;
-                    case 8 -> OVERWHELMING;
-                    default -> STALEMATE; // 0-1
-                };
-
-                // If we have a StratCon enabled contract, regenerate Scenario Odds
-                if (getStratConCampaignState() != null) {
-                    StratConContractDefinition contractDefinition = getContractDefinition(getContractType());
-
-                    if (contractDefinition != null) {
-                        for (StratConTrackState trackState : getStratConCampaignState().getTracks()) {
-                            int scenarioOdds = StratConContractInitializer.getScenarioOdds(contractDefinition);
-
-                            trackState.setScenarioOdds(scenarioOdds);
-                        }
-                    }
-                }
-
-                setMoraleLevel(newMoraleLevel);
-                setRoutEndDate(null);
-
-                String key = "routEnded.reinforcements";
-                if (getContractType().isGarrisonDuty() || getContractType().isRetainer()) {
-                    updateEnemy(campaign, today); // mix it up a little
-                    key = "routEnded.aNewChallenger";
-                }
-
-                new ImmersiveDialogSimple(campaign,
-                      getEmployerLiaison(),
-                      null,
-                      getFormattedTextAt(RESOURCE_BUNDLE,
-                            key,
-                            campaign.getCommanderAddress(),
-                            FactionStandingUtilities.getFactionName(getEnemy(), today.getYear())),
-                      null,
-                      null,
-                      null,
-                      false);
-            }
-
-            return;
-        }
-
-        CampaignOptions campaignOptions = campaign.getCampaignOptions();
-        String moraleReport = MHQMorale.performMoraleCheck(today, this,
-              campaignOptions.getMoraleDecisiveVictoryEffect(), campaignOptions.getMoraleVictoryEffect(),
-              campaignOptions.getMoraleDecisiveDefeatEffect(), campaignOptions.getMoraleDefeatEffect());
-        String flavorText = MHQMorale.getFormattedTitle()
-                                  + "<h2 style='text-align:center;'>" + getName() + "</h2>"
-                                  + MoraleBar.getMoraleDisplay(this).tooltip();
-        new ImmersiveDialogNotification(campaign, flavorText, moraleReport, MoraleBar.createDialogPanel(this),
-              true);
-
-        MHQMorale.routedMoraleUpdate(campaign, this);
-
-        // Reset external morale modifier
-        moraleMod = 0;
-    }
-
-    private void updateEnemy(Campaign campaign, LocalDate today) {
-        updateEnemy(campaign, today, null);
-    }
-
-    /**
-     * Updates the enemy faction and enemy bot name for this contract.
-     *
-     * @param campaign  The current campaign.
-     * @param today     The current LocalDate object.
-     * @param enemyCode {@code Nullable} the code for the new faction, if {@code null} an appropriate random faction
-     *                  will be used
-     */
-    public void updateEnemy(Campaign campaign, LocalDate today, @Nullable String enemyCode) {
-        if (enemyCode == null) {
-            Faction employer = getEmployerFaction();
-            // Re-rolled with the same contract-type enemy preference the market uses, so e.g. a riot duty that
-            // "mixes it up" still ends up against rebels rather than a random neighboring power.
-            enemyCode = RandomFactionGenerator.getInstance()
-                              .getRandomEnemy(campaign.getCurrentLocation(), today, employer,
-                                    getContractType().getEnemySelectionProfile())
-                              .getShortName();
-        }
-        setEnemyCode(enemyCode);
-
-        Faction enemyFaction = Factions.getInstance().getFaction(enemyCode);
-        setEnemyBotName(enemyFaction.getFullName(today.getYear()));
-        setEnemyName(""); // wipe the old enemy name
-        generateEnemyName(today.getYear()); // we use this to update enemyName
-        if (enemyFaction.isClan()) {
-            createClanOpponent(campaign);
-        }
-
-        // We have a check in getEnemyName that prevents rolling over mercenary names, so we add this extra step to
-        // force a mercenary name re-roll, in the event one Mercenary faction is replaced with another.
-        if (Factions.getInstance().getFaction(enemyCode).isMercenary()) {
-            setEnemyBotName(BackgroundsController.randomMercenaryCompanyNameGenerator(null));
-        }
-
-        setAllyCamouflage(pickRandomCamouflage(today.getYear(), getEmployerCode()));
-        setEnemyCamouflage(pickRandomCamouflage(today.getYear(), enemyCode));
-
-        // Update the Batchall information
-        setBatchallAccepted(true);
-        if (campaign.getCampaignOptions().isUseGenericBattleValue() && enemyFaction.performsBatchalls()) {
-            boolean tracksStanding = campaign.getCampaignOptions().isTrackFactionStanding();
-            FactionStandings factionStandings = campaign.getPlayerForce().getFactionStandings();
-
-            boolean allowBatchalls = true;
-            if (campaign.getCampaignOptions().isUseFactionStandingBatchallRestrictionsSafe()) {
-                double regard = factionStandings.getRegardForFaction(enemyFaction.getShortName(), true);
-                allowBatchalls = FactionStandingUtilities.isBatchallAllowed(regard);
-            }
-
-            double regardMultiplier = campaign.getCampaignOptions().getRegardMultiplier();
-            String campaignFactionCode = campaign.getFaction().getShortName();
-            if (enemyFaction.performsBatchalls() && allowBatchalls) {
-                PerformBatchall batchallDialog = new PerformBatchall(campaign, getClanOpponent(), enemyCode);
-
-                setBatchallAccepted(batchallDialog.isBatchallAccepted());
-
-                if (!isBatchallAccepted() && tracksStanding) {
-                    List<String> reports = factionStandings.processRefusedBatchall(campaignFactionCode, enemyCode,
-                          today.getYear(), regardMultiplier);
-
-                    for (String report : reports) {
-                        campaign.addReport(GENERAL, report);
-                    }
-                }
-            }
-
-            if (tracksStanding) {
-                // Whenever we dynamically change the enemy faction, we update standing accordingly
-                String report = factionStandings.processContractAccept(campaignFactionCode, enemyFaction, today,
-                      regardMultiplier, getLengthInMonths());
-                if (report != null) {
-                    campaign.addReport(POLITICS, report);
-                }
-            }
-        }
-
-        // Check for emergency clause (this can trigger multiple times if the enemy faction keeps changing to a Clan
-        // faction. This can be seen as the employer getting increasingly desperate and wanting to keep the player on
-        // side.
-        checkForSpecialClanSalvageClause(campaign, today, enemyFaction);
-    }
-
-    /**
-     * Checks for and applies a special emergency salvage clause when fighting Clan forces prior to or during the Battle
-     * of Tukayyid.
-     *
-     * <p>If the employer is non-Clan and the enemy is Clan, and the current date is on or before the Battle of
-     * Tukayyid, the salvage percentage is increased by 25% (up to a minimum of 100%) and salvage exchange is enabled.
-     * An immersive dialog is displayed to inform the player of the contract adjustment.</p>
-     *
-     * @param campaign     The current campaign instance.
-     * @param today        The current game date to check against the Tukayyid threshold.
-     * @param enemyFaction The faction being fought in the current contract or mission.
-     *
-     * @author Illiani
-     * @since 0.50.11
-     */
-    private void checkForSpecialClanSalvageClause(Campaign campaign, LocalDate today, Faction enemyFaction) {
-        if (!getEmployerFaction().isClan() && enemyFaction.isClan()) {
-            if (!today.isAfter(BATTLE_OF_TUKAYYID)) {
-                int oldSalvagePercent = getSalvagePercent();
-                int newSalvagePercent = (int) max(100, round(oldSalvagePercent * 1.25));
-
-                boolean isAlreadyMax = oldSalvagePercent >= 100;
-
-                setSalvageExchange(true);
-                setSalvagePercent(newSalvagePercent);
-
-                String message = getTextAt(RESOURCE_BUNDLE, "emergencySalvageClause.message");
-                if (!isAlreadyMax) {
-                    message += getFormattedTextAt(RESOURCE_BUNDLE, "emergencySalvageClause.addendum",
-                          oldSalvagePercent, newSalvagePercent);
-                }
-                new ImmersiveDialogSimple(campaign, getEmployerLiaison(), null, message, null, null, null, false);
-            }
-        }
-    }
-
-    /**
-     * Calculates the overall contract score based on scenario outcomes and modifiers.
-     *
-     * <p>For StratCon campaigns, this returns the current victory points from the campaign state.</p>
-     *
-     * <p>For standard contracts, this aggregates scores from all completed scenarios and applies any arbitrary
-     * modifiers that have been set for this contract.</p>
-     *
-     * @param isUseMaplessMode {@code true} if mapless mode is enabled in StratCon
-     *
-     * @return the total contract score, including victory points or scenario scores plus modifiers
-     */
-    public int getContractScore(boolean isUseMaplessMode) {
-        if (!isUseMaplessMode && getStratConCampaignState() != null) {
-            return getStratConCampaignState().getVictoryPoints();
-        }
-
-        return ContractScore.getContractScore(getCompletedScenarios()) + contractScoreArbitraryModifier;
+        setLengthInMonths(getObjectiveType().getChaosObjectiveType().calculateLength(variable));
     }
 
 
@@ -539,7 +294,7 @@ public class AtBContract extends Contract {
             }
 
             String text;
-            switch (getContractType().generateEventType(campaign)) {
+            switch (getObjectiveType().generateEventType(campaign)) {
                 case BONUS_ROLL:
                     campaign.addReport(GENERAL, "<b>Special Event:</b> ");
                     doBonusRoll(campaign, false);
@@ -547,7 +302,7 @@ public class AtBContract extends Contract {
                 case SPECIAL_SCENARIO:
                     campaign.addReport(GENERAL, "<b>Special Event:</b> Special scenario this month");
                     specialEventScenarioDate = getRandomDayOfMonth(campaign.getLocalDate());
-                    specialEventScenarioType = getContractType().generateSpecialScenarioType(campaign);
+                    specialEventScenarioType = getObjectiveType().generateSpecialScenarioType(campaign);
                     break;
                 case CIVIL_DISTURBANCE:
                     campaign.addReport(GENERAL,
@@ -666,7 +421,7 @@ public class AtBContract extends Contract {
                 case BIG_BATTLE:
                     campaign.addReport(GENERAL, "<b>Special Event:</b> Big battle this month");
                     specialEventScenarioDate = getRandomDayOfMonth(campaign.getLocalDate());
-                    specialEventScenarioType = getContractType().generateBigBattleType();
+                    specialEventScenarioType = getObjectiveType().generateBigBattleType();
                     break;
             }
         }
@@ -709,7 +464,7 @@ public class AtBContract extends Contract {
     }
 
     public boolean contractExtended(final Campaign campaign) {
-        if (getContractType().isPirateHunting() || getContractType().isRiotDuty()) {
+        if (getObjectiveType().isPirateHunting() || getObjectiveType().isRiotDuty()) {
             return false;
         }
 
@@ -865,24 +620,24 @@ public class AtBContract extends Contract {
      * @param c The Campaign which holds this contract.
      */
     public void restore(Campaign c) {
-        if (parentContract != null) {
-            Mission m = c.getMission(parentContract.getId());
-            if (m != null) {
-                if (m instanceof AtBContract) {
-                    setParentContract((AtBContract) m);
-                } else {
-                    logger.warn("Parent Contract reference #{} is not an AtBContract for contract {}",
-                          parentContract.getId(),
-                          getName());
-                    setParentContract(null);
-                }
-            } else {
-                logger.warn("Parent Contract #{} reference was not found for contract {}",
-                      parentContract.getId(),
-                      getName());
-                setParentContract(null);
-            }
-        }
+        //        if (parentContract != null) {
+        //            Mission m = c.getMission(parentContract.getId());
+        //            if (m != null) {
+        //                if (m instanceof AtBContract) {
+        //                    setParentContract((AtBContract) m);
+        //                } else {
+        //                    logger.warn("Parent Contract reference #{} is not an AtBContract for contract {}",
+        //                          parentContract.getId(),
+        //                          getName());
+        //                    setParentContract(null);
+        //                }
+        //            } else {
+        //                logger.warn("Parent Contract #{} reference was not found for contract {}",
+        //                      parentContract.getId(),
+        //                      getName());
+        //                setParentContract(null);
+        //            }
+        //        }
     }
 
     @Override
@@ -911,7 +666,7 @@ public class AtBContract extends Contract {
     @Override
     public void acceptContract(Campaign campaign) {
         if (campaign.getCampaignOptions().isUseStratCon()) {
-            StratConContractDefinition stratconContractDefinition = getContractDefinition(getContractType());
+            StratConContractDefinition stratconContractDefinition = getContractDefinition(getObjectiveType());
             if (stratconContractDefinition != null) {
                 StratConContractInitializer.initializeCampaignState(this, campaign, stratconContractDefinition);
             }
@@ -974,10 +729,10 @@ public class AtBContract extends Contract {
             setEmployerCode(f.getShortName());
         }
 
-        if (getContractType().isPirateHunting()) {
+        if (getObjectiveType().isPirateHunting()) {
             Faction employer = getEmployerFaction();
             setEnemyCode(employer.isClan() ? "BAN" : PIRATE_FACTION_CODE);
-        } else if (getContractType().isRiotDuty()) {
+        } else if (getObjectiveType().isRiotDuty()) {
             setEnemyCode("REB");
         }
 
@@ -985,7 +740,7 @@ public class AtBContract extends Contract {
               contractType.isCadreDuty(), true, 1.0));
         setRequiredCombatElements(ContractUtilities.calculateBaseNumberOfUnitsRequiredInCombatTeams(campaign));
 
-        setPartsAvailabilityLevel(getContractType().calculatePartsAvailabilityLevel());
+        setPartsAvailabilityLevel(getObjectiveType().calculatePartsAvailabilityLevel());
 
         int currentYear = campaign.getGameYear();
         setAllyBotName(getEmployerName(currentYear));
@@ -1047,49 +802,5 @@ public class AtBContract extends Contract {
         public AtBContractRef(int id) {
             setId(id);
         }
-    }
-
-    /**
-     * Calculates the number of required Victory Points (VP) needed to achieve overall success for this StratCon
-     * contract.
-     *
-     * <p>The final result estimates the expected number of Turning Points the player must win for overall contract
-     * success. If the player loses a handful of Turning Points, they should still be able to win the contract by being
-     * proactive in the Area of Operations.</p>
-     *
-     * @return the required number of Victory Points, rounded up to the nearest integer
-     *
-     * @author Illiani
-     * @since 0.50.10
-     */
-    public int getRequiredVictoryPoints() {
-        if (getStratConCampaignState() == null) {
-            return 0;
-        }
-
-        if (getCommandRights().isIndependent()) {
-            return INDEPENDENT_COMMAND_RIGHTS_REQUIRED_VICTORY_POINTS;
-        }
-
-        double baseRequirement = getRequiredCombatTeams();
-
-        int duration = getLengthInMonths();
-        if (getContractType().isGarrisonType()) {
-            duration = (int) ceil(duration * 0.75); // We assume around 25% of the contract will be peaceful
-        }
-
-        double trackCount = 0;
-        int totalScenarioOdds = 0;
-        for (StratConTrackState trackState : getStratConCampaignState().getTracks()) {
-            trackCount++;
-            totalScenarioOdds += trackState.getScenarioOdds();
-        }
-
-        double meanScenarioOdds = totalScenarioOdds / trackCount;
-        double scenarioOdds = meanScenarioOdds / 100.0;
-        double turningPointChance = (getCommandRights() == ContractCommandRights.INTEGRATED ? 1.0 : 0.33);
-
-        // This result gives us the average number of Turning Points expected for the contract
-        return (int) ceil(baseRequirement * duration * scenarioOdds * turningPointChance);
     }
 }

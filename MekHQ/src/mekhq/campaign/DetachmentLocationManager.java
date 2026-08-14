@@ -33,7 +33,7 @@
 
 package mekhq.campaign;
 
-import static mekhq.campaign.market.contractMarket.ContractAutomation.performAutomatedActivation;
+import static mekhq.campaign.mission.newContract.utilities.ContractAutomation.performAutomatedActivation;
 
 import java.io.PrintWriter;
 import java.util.ArrayList;
@@ -139,8 +139,8 @@ public class DetachmentLocationManager {
     }
 
     /**
-     * Writes the {@code <location>} block for the detachment's current location and the
-     * {@code <locationNodeChildren>} block for the detachment's direct children in the location tree.
+     * Writes the {@code <location>} block for the detachment's current location and the {@code <locationNodeChildren>}
+     * block for the detachment's direct children in the location tree.
      */
     public void writeToXML(PrintWriter pw, int indent) {
         AbstractLocation currentLocation = locationNode.getNearestAbstractLocation();

@@ -146,8 +146,6 @@ import mekhq.campaign.universe.Faction;
 import mekhq.campaign.universe.Factions;
 import mekhq.campaign.universe.IUnitGenerator;
 import mekhq.campaign.universe.Planet;
-import mekhq.campaign.universe.PlanetarySystem;
-import mekhq.campaign.universe.Systems;
 import mekhq.campaign.universe.UnitGeneratorParameters;
 import mekhq.utilities.EntityUtilities;
 
@@ -319,7 +317,7 @@ public class AtBDynamicScenarioFactory {
      *
      * @return How many "lances" or other individual units were generated?
      */
-    private static int generateForces(AtBDynamicScenario scenario, AtBContract contract, Campaign campaign) {
+    private static int generateForces(AtBDynamicScenario scenario, AbstractContract contract, Campaign campaign) {
         LOGGER.info("GENERATING FORCES FOR: {}", scenario.getName().toUpperCase());
         int generatedLanceCount = 0;
         List<ScenarioForceTemplate> forceTemplates = scenario.getTemplate().getAllScenarioForces();
@@ -383,7 +381,7 @@ public class AtBDynamicScenarioFactory {
     /**
      * "Meaty" function that generates a force for the given scenario using the fixed MUL
      */
-    public static int generateFixedForce(AtBDynamicScenario scenario, AtBContract contract, Campaign campaign,
+    public static int generateFixedForce(AtBDynamicScenario scenario, AbstractContract contract, Campaign campaign,
           ScenarioForceTemplate forceTemplate) {
         File mulFile = new File(MHQConstants.STRAT_CON_MUL_FILES_DIRECTORY + forceTemplate.getFixedMul());
         if (!mulFile.exists()) {
@@ -457,7 +455,7 @@ public class AtBDynamicScenarioFactory {
      *
      * @return The number of "lances" or other unit groups successfully generated.
      */
-    public static int generateForce(AtBDynamicScenario scenario, AtBContract contract, Campaign campaign,
+    public static int generateForce(AtBDynamicScenario scenario, AbstractContract contract, Campaign campaign,
           int effectiveBV, int effectiveUnitCount, int weightClass, ScenarioForceTemplate forceTemplate,
           boolean isScenarioModifier) {
         // don't generate forces flagged as player-supplied
@@ -485,12 +483,12 @@ public class AtBDynamicScenarioFactory {
         switch (forceAlignment) {
             case Allied:
             case Player:
-                factionCode = contract.getEmployerCode();
-                skill = contract.getAllySkill();
-                quality = contract.getAllyQuality();
+                factionCode = contract.getEmployerFactionCode();
+                skill = contract.getEmployerForceSkill();
+                quality = contract.getEmployerEquipmentRating();
                 break;
             case Opposing:
-                factionCode = contract.getEnemyCode();
+                factionCode = contract.getEnemyFactionCode();
 
                 // We only want the difficulty multipliers applying to enemy forces
                 double difficultyMultiplier = getDifficultyMultiplier(campaign);
@@ -613,8 +611,7 @@ public class AtBDynamicScenarioFactory {
                 isLowPressure = true;
                 allowsTanks = false;
             } else {
-                mekhq.campaign.universe.Atmosphere specific_atmosphere = contract.getSystem()
-                                                                               .getPrimaryPlanet()
+                mekhq.campaign.universe.Atmosphere specific_atmosphere = contract.getTargetPlanet()
                                                                                .getAtmosphere(currentDate);
 
                 switch (specific_atmosphere) {
@@ -854,10 +851,10 @@ public class AtBDynamicScenarioFactory {
                 // Use the raw quality values rather than the diluted 'effective' rating
                 switch (forceAlignment) {
                     case Allied:
-                        ownerBaseQuality = contract.getAllyQuality();
+                        ownerBaseQuality = contract.getEmployerEquipmentRating();
                         break;
                     case Opposing:
-                        ownerBaseQuality = contract.getEnemyQuality();
+                        ownerBaseQuality = contract.getEnemyEquipmentRating();
                         break;
                     case Third:
                         // Slight hack, assume "Unidentified Hostiles" are pirates with variable
@@ -1361,13 +1358,14 @@ public class AtBDynamicScenarioFactory {
      * </p>
      *
      * @param scenario the {@link AtBDynamicScenario} whose associated track is to be identified.
-     * @param contract the {@link AtBContract} containing the {@link StratConCampaignState} with all available tracks.
+     * @param contract the {@link AbstractContract} containing the {@link StratConCampaignState} with all available
+     *                 tracks.
      *
      * @return the {@link StratConTrackState} that contains the {@link StratConScenario} backed by the specified
      *       {@link AtBDynamicScenario}, or {@code null} if no matching track is found.
      */
     private static @Nullable StratConTrackState getStratconTrackState(AtBDynamicScenario scenario,
-          AtBContract contract) {
+          AbstractContract contract) {
         List<StratConTrackState> tracks = contract.getStratConCampaignState().getTracks();
         StratConTrackState scenarioHomeTrack = null;
 
@@ -1586,7 +1584,7 @@ public class AtBDynamicScenarioFactory {
             ScenarioForceTemplate forceTemplate = scenario.getBotForceTemplates().get(botForce);
 
             if ((forceTemplate != null) && forceTemplate.isAlliedPlayerForce()) {
-                final Camouflage camouflage = scenario.getContract(campaign).getAllyCamouflage();
+                final Camouflage camouflage = scenario.getContract(campaign).getEmployerCamouflage();
                 for (Entity en : botForce.getFullEntityList(campaign)) {
                     scenario.getAlliesPlayer().add(en);
                     scenario.getBotUnitTemplates().put(UUID.fromString(en.getExternalIdAsString()), forceTemplate);
@@ -1913,19 +1911,19 @@ public class AtBDynamicScenarioFactory {
      * @param mission  The active mission for the scenario
      * @param campaign The current campaign
      */
-    private static void setPlanetaryConditions(AtBDynamicScenario scenario, AtBContract mission, Campaign campaign) {
+    private static void setPlanetaryConditions(AtBDynamicScenario scenario, AbstractContract mission,
+          Campaign campaign) {
         if (scenario.getBoardType() == T_SPACE) {
             return;
         }
 
         if (null != mission) {
-            PlanetarySystem pSystem = Systems.getInstance().getSystemById(mission.getSystemId());
-            Planet p = pSystem.getPrimaryPlanet();
-            if (null != p) {
-                Atmosphere atmosphere = ObjectUtility.nonNull(p.getPressure(campaign.getLocalDate()),
+            Planet planet = mission.getTargetPlanet();
+            if (null != planet) {
+                Atmosphere atmosphere = ObjectUtility.nonNull(planet.getPressure(campaign.getLocalDate()),
                       scenario.getAtmosphere());
-                float gravity = ObjectUtility.nonNull(p.getGravity(), scenario.getGravity()).floatValue();
-                int temperature = ObjectUtility.nonNull(p.getTemperature(campaign.getLocalDate()),
+                float gravity = ObjectUtility.nonNull(planet.getGravity(), scenario.getGravity()).floatValue();
+                int temperature = ObjectUtility.nonNull(planet.getTemperature(campaign.getLocalDate()),
                       scenario.getTemperature());
 
                 scenario.setAtmosphere(atmosphere);
@@ -4321,16 +4319,16 @@ public class AtBDynamicScenarioFactory {
      * @param contract       The contract from which to set parameters
      */
     private static void setBotForceParameters(BotForce generatedForce, ScenarioForceTemplate forceTemplate,
-          ForceAlignment forceAlignment, AtBContract contract) {
+          ForceAlignment forceAlignment, AbstractContract contract) {
         if (forceAlignment == ForceAlignment.Allied) {
             generatedForce.setName(java.lang.String.format("%s %s",
-                  contract.getAllyBotName(),
+                  contract.getEmployerDisplayName(),
                   forceTemplate.getForceName()));
-            generatedForce.setColour(contract.getAllyColour());
-            generatedForce.setCamouflage(contract.getAllyCamouflage().clone());
+            generatedForce.setColour(contract.getEmployerColor());
+            generatedForce.setCamouflage(contract.getEmployerCamouflage().clone());
         } else if (forceAlignment == ForceAlignment.Opposing) {
             generatedForce.setName(java.lang.String.format("%s %s",
-                  contract.getEnemyBotName(),
+                  contract.getEnemyDisplayName(),
                   forceTemplate.getForceName()));
             generatedForce.setColour(contract.getEnemyColour());
             generatedForce.setCamouflage(contract.getEnemyCamouflage().clone());
@@ -4579,7 +4577,7 @@ public class AtBDynamicScenarioFactory {
         ArrayList<Integer> primaryForceIDs = new ArrayList<>();
 
         if (campaign.getCampaignOptions().isUseStratCon()) {
-            AtBContract contract = scenario.getContract(campaign);
+            AbstractContract contract = scenario.getContract(campaign);
             StratConCampaignState campaignState = contract.getStratConCampaignState();
 
             for (StratConTrackState track : campaignState.getTracks()) {
@@ -5255,14 +5253,14 @@ public class AtBDynamicScenarioFactory {
      * Highly paranoid function that will check if the given faction is one of the owners of the contract's location at
      * the current date.
      */
-    private static boolean isPlanetOwner(AtBContract contract, LocalDate currentDate, String factionCode) {
+    private static boolean isPlanetOwner(AbstractContract contract, LocalDate currentDate, String factionCode) {
         if ((contract == null) ||
-                  (contract.getSystem() == null) ||
-                  (contract.getSystem().getFactions(currentDate) == null)) {
+                  (contract.getTargetPlanet() == null) ||
+                  (contract.getTargetPlanet().getFactions(currentDate) == null)) {
             return false;
         }
 
-        return contract.getSystem().getFactions(currentDate).contains(factionCode);
+        return contract.getTargetPlanet().getFactions(currentDate).contains(factionCode);
     }
 
     /**

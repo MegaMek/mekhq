@@ -30,7 +30,7 @@
  * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
  * affiliated with Microsoft.
  */
-package mekhq.campaign.market.contractMarket;
+package mekhq.campaign.finances;
 
 import static megamek.common.units.EntityWeightClass.WEIGHT_ASSAULT;
 import static megamek.common.units.EntityWeightClass.WEIGHT_HEAVY;
@@ -51,7 +51,6 @@ import megamek.common.units.Infantry;
 import megamek.common.units.LandAirMek;
 import megamek.logging.MMLogger;
 import mekhq.campaign.LocalHangar;
-import mekhq.campaign.finances.Money;
 import mekhq.campaign.force.CombatTeam;
 import mekhq.campaign.force.Formation;
 import mekhq.campaign.force.FormationLevel;
@@ -169,7 +168,7 @@ public enum AlternatePaymentModelValues {
      * {@link #adjustValuesForDiminishingReturns(Faction, List)}. Otherwise, the method returns the straight sum.</p>
      *
      * @param campaignFaction           the current campaign faction (used to determine the diminishing-returns cutoff)
-     * @param allFormations                 the forces to evaluate
+     * @param allFormations             the forces to evaluate
      * @param hangar                    the campaign hangar used for resolving units within forces
      * @param useDiminishingContractPay whether diminishing returns should be applied (only when relevant)
      * @param excludeInfantry           if {@code true}, infantry and battle armor entities contribute
@@ -186,9 +185,9 @@ public enum AlternatePaymentModelValues {
      * @since 0.50.11
      */
     public static Money getForceValue(Faction campaignFaction, List<Formation> allFormations,
-            mekhq.campaign.LocalHangar hangar,
-                                      boolean useDiminishingContractPay, boolean excludeInfantry, double combatUnitContractPercent,
-                                      double dropShipContractPercent, double warShipContractPercent, double jumpShipContractPercent) {
+          mekhq.campaign.LocalHangar hangar,
+          boolean useDiminishingContractPay, boolean excludeInfantry, double combatUnitContractPercent,
+          double dropShipContractPercent, double warShipContractPercent, double jumpShipContractPercent) {
         final double combatMultiplier = combatUnitContractPercent / 100.0;
         final double dropShipMultiplier = dropShipContractPercent / 100.0;
         final double warShipMultiplier = warShipContractPercent / 100.0;

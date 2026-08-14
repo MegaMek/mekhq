@@ -32,11 +32,6 @@
  */
 package mekhq.campaign.mission;
 
-import static mekhq.campaign.mission.MHQMorale.NO_CHANGE_TARGET_NUMBER;
-import static mekhq.campaign.mission.MHQMorale.RALLYING_TARGET_NUMBER;
-import static mekhq.campaign.mission.MHQMorale.WAVERING_TARGET_NUMBER;
-import static mekhq.campaign.mission.MHQMorale.getMoraleOutcome;
-import static mekhq.campaign.mission.MHQMorale.getReliabilityModifier;
 import static mekhq.campaign.mission.enums.ContractMoraleLevel.ADVANCING;
 import static mekhq.campaign.mission.enums.ContractMoraleLevel.CRITICAL;
 import static mekhq.campaign.mission.enums.ContractMoraleLevel.DOMINATING;
@@ -44,6 +39,11 @@ import static mekhq.campaign.mission.enums.ContractMoraleLevel.OVERWHELMING;
 import static mekhq.campaign.mission.enums.ContractMoraleLevel.ROUTED;
 import static mekhq.campaign.mission.enums.ContractMoraleLevel.STALEMATE;
 import static mekhq.campaign.mission.enums.ContractMoraleLevel.WEAKENED;
+import static mekhq.campaign.mission.newContract.utilities.MHQMorale.NO_CHANGE_TARGET_NUMBER;
+import static mekhq.campaign.mission.newContract.utilities.MHQMorale.RALLYING_TARGET_NUMBER;
+import static mekhq.campaign.mission.newContract.utilities.MHQMorale.WAVERING_TARGET_NUMBER;
+import static mekhq.campaign.mission.newContract.utilities.MHQMorale.getMoraleOutcome;
+import static mekhq.campaign.mission.newContract.utilities.MHQMorale.getReliabilityModifier;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
@@ -59,6 +59,7 @@ import java.util.stream.Stream;
 import megamek.common.enums.SkillLevel;
 import mekhq.campaign.mission.enums.ContractMoraleLevel;
 import mekhq.campaign.mission.enums.ScenarioStatus;
+import mekhq.campaign.mission.newContract.utilities.MHQMorale;
 import mekhq.campaign.universe.Faction;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;

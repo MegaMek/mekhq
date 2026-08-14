@@ -610,7 +610,7 @@ public class CampaignExportWizard extends JDialog {
             for (Kill kill : sourceCampaign.getKillsFor(person.getId())) {
                 // we don't preserve IDs to avoid conflicts with the destination campaign
                 kill.setScenarioId(0);
-                kill.setMissionId(0);
+                kill.setMissionId(null);
 
                 destinationCampaign.importKill(kill);
             }

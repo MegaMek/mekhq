@@ -152,6 +152,10 @@ public class ContractMarket {
         return getContracts(searchType).isEmpty();
     }
 
+    public void clear(final ContractSearchType searchType) {
+        getContracts(searchType).clear();
+    }
+
     // region File I/O
 
     /**

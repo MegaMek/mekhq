@@ -87,7 +87,7 @@ public class CombatRecordRating {
             }
 
             if (usePerformanceCutOff) {
-                if (mission.getEndDate().isBefore(cutOffDate)) {
+                if (mission.getEndingDate().isBefore(cutOffDate)) {
                     continue;
                 }
             }

@@ -60,6 +60,7 @@ import mekhq.campaign.mission.AtBDynamicScenario;
 import mekhq.campaign.mission.Scenario;
 import mekhq.campaign.mission.ScenarioForceTemplate;
 import mekhq.campaign.mission.ScenarioTemplate;
+import mekhq.campaign.mission.newContract.AbstractContract;
 import mekhq.campaign.unit.ITransportAssignment;
 import mekhq.campaign.unit.Unit;
 import mekhq.utilities.ReportingUtilities;
@@ -388,7 +389,7 @@ public class StratConScenario implements IStratConDisplayable {
      * @return The {@code AtBContract} associated with the current backing scenario, or {@code null} if no backing
      *       scenario exists.
      */
-    public @Nullable AtBContract getBackingContract(Campaign campaign) {
+    public @Nullable AbstractContract getBackingContract(Campaign campaign) {
         if (backingScenario == null) {
             return null;
         }
@@ -546,7 +547,7 @@ public class StratConScenario implements IStratConDisplayable {
                 return null;
             }
 
-            AtBContract contract = backingScenario.getContract(campaign);
+            AbstractContract contract = backingScenario.getContract(campaign);
 
             campaignState = contract.getStratConCampaignState();
 
@@ -611,7 +612,7 @@ public class StratConScenario implements IStratConDisplayable {
         Scenario backingScenario = campaign.getScenario(backingScenarioId);
 
         if (backingScenarioId != -1 && backingScenario instanceof AtBDynamicScenario) {
-            AtBContract contract = ((AtBDynamicScenario) backingScenario).getContract(campaign);
+            AbstractContract contract = ((AtBDynamicScenario) backingScenario).getContract(campaign);
             if (contract == null) {
                 return;
             }

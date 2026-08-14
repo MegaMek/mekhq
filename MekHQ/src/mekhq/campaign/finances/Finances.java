@@ -64,8 +64,7 @@ import mekhq.campaign.events.loans.LoanDefaultedEvent;
 import mekhq.campaign.events.transactions.TransactionCreditEvent;
 import mekhq.campaign.events.transactions.TransactionDebitEvent;
 import mekhq.campaign.finances.enums.TransactionType;
-import mekhq.campaign.mission.AtBContract;
-import mekhq.campaign.mission.Contract;
+import mekhq.campaign.mission.newContract.AbstractContract;
 import mekhq.campaign.personnel.Person;
 import mekhq.io.FileType;
 import mekhq.utilities.MHQXMLUtility;
@@ -372,7 +371,7 @@ public class Finances {
 
         // Handle contract payments
         if (isNewMonth) {
-            for (Contract contract : campaign.getActiveContracts()) {
+            for (AbstractContract contract : campaign.getActiveContracts()) {
                 credit(TransactionType.CONTRACT_PAYMENT,
                       today,
                       contract.getMonthlyPayOut(),
@@ -380,8 +379,6 @@ public class Finances {
                 campaign.addReport(FINANCES, String.format(resourceMap.getString("ContractPaymentCredit.text"),
                       contract.getMonthlyPayOut().toAmountAndSymbolString(),
                       contract.getHyperlinkedName()));
-
-                payoutShares(campaign, contract, today);
             }
         }
 
@@ -588,58 +585,6 @@ public class Finances {
                                 .round();
 
         debit(TransactionType.TAXES, campaign.getLocalDate(), taxAmount, resourceMap.getString("Taxes.finances"));
-    }
-
-    private void payoutShares(Campaign campaign, Contract contract, LocalDate date) {
-        if (campaign.getCampaignOptions().isUseStratCon() &&
-                  campaign.getCampaignOptions().isUseShareSystem() &&
-                  (contract instanceof AtBContract)) {
-            Money shares = contract.getMonthlyPayOut().multipliedBy(contract.getSharesPercent()).dividedBy(100);
-            if (shares.isGreaterThan(Money.zero())) {
-                if (debit(TransactionType.SALARIES,
-                      date,
-                      shares,
-                      String.format(resourceMap.getString("ContractSharePayment.text"), contract.getName()))) {
-                    campaign.addReport(FINANCES, resourceMap.getString("DistributedShares.text"),
-                          shares.toAmountAndSymbolString());
-
-                    payOutSharesToPersonnel(campaign, shares);
-                } else {
-                    /*
-                     * This should not happen, as the shares payment should be less than the
-                     * contract payment that has just been made.
-                     */
-                    campaign.addReport(FINANCES, messageSurroundedBySpanWithColor(getNegativeColor(),
-                          String.format(resourceMap.getString("InsufficientFunds.text"), resourceMap.getString(
-                                "Shares.text"))));
-                    LOGGER.error("Attempted to payout share amount larger than the payment of the contract");
-                }
-            }
-        }
-    }
-
-    /**
-     * Shares calculate the amount debited without iterating through all the personnel, so it's not more efficient to
-     * provide that information to debit. Pay out shares manually for now.
-     *
-     * @param campaign where to pull personnel from
-     * @param shares   total value of the shares to pay out
-     */
-    public void payOutSharesToPersonnel(Campaign campaign, Money shares) {
-        if (campaign.getCampaignOptions().isTrackTotalEarnings()) {
-            boolean sharesForAll = campaign.getCampaignOptions().isSharesForAll();
-
-            int numberOfShares = campaign.getPlayerForce().getHumanResources().getActivePersonnel(false, true)
-                                       .stream()
-                                       .mapToInt(person -> person.getNumShares(campaign, sharesForAll))
-                                       .sum();
-
-            Money singleShare = shares.dividedBy(numberOfShares);
-
-            for (Person person : campaign.getPlayerForce().getHumanResources().getActivePersonnel(false, true)) {
-                person.payPersonShares(campaign, singleShare, sharesForAll);
-            }
-        }
     }
 
     public Money checkOverdueLoanPayments(Campaign campaign) {

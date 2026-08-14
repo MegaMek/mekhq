@@ -188,7 +188,7 @@ public class Contract extends Mission {
                                                                      .isOverridingCommandCircuitRequirements(),
                         campaign.isGM(),
                         campaign.getCampaignOptions().isUseFactionStandingCommandCircuitSafe(),
-                        campaign.getPlayerForce().getFactionStandings(), campaign.getFutureAtBContracts());
+                        campaign.getPlayerForce().getFactionStandings(), campaign.getFutureContracts());
 
             int days = (int) ceil(getJumpPath(campaign).getTotalTime(campaign.getLocalDate(),
                   campaign.getPlayerForce().getForceDetachment().getCurrentLocation().getTransitTime(),

@@ -65,6 +65,7 @@ import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.force.Formation;
 import mekhq.campaign.mission.AtBContract;
 import mekhq.campaign.mission.enums.ContractMoraleLevel;
+import mekhq.campaign.mission.newContract.AbstractContract;
 import mekhq.campaign.mission.rentals.ContractRentalType;
 import mekhq.campaign.mission.rentals.FacilityRentals;
 import mekhq.campaign.personnel.Person;
@@ -160,7 +161,7 @@ public class PrisonerEventManager {
             return;
         }
 
-        if (campaign.getActiveMissions(false).isEmpty()) {
+        if (campaign.getActiveContracts().isEmpty()) {
             return;
         }
 
@@ -388,7 +389,7 @@ public class PrisonerEventManager {
 
         if (!escapees.isEmpty() && campaign.hasActiveAtBContract()) {
             if (randomInt(100) < escapees.size()) {
-                List<AtBContract> contracts = campaign.getActiveAtBContracts();
+                List<AbstractContract> contracts = campaign.getActiveContracts();
                 Collections.shuffle(contracts);
 
                 new PrisonEscapeScenario(campaign, contracts.getFirst(), escapees);
@@ -529,7 +530,7 @@ public class PrisonerEventManager {
             return;
         }
 
-        List<AtBContract> activeContracts = campaign.getActiveAtBContracts();
+        List<AbstractContract> activeContracts = campaign.getActiveContracts();
         activeContracts.removeIf(contract -> contract.getMoraleLevel().isOverwhelming() ||
                                                    contract.getMoraleLevel().isRouted());
         if (activeContracts.isEmpty()) {
@@ -541,9 +542,9 @@ public class PrisonerEventManager {
         boolean hadIntelBreach = freedPrisonerCount > 0 && Compute.randomInt(baseChance) < freedPrisonerCount;
 
         if (hadIntelBreach) {
-            AtBContract relevantContract = ObjectUtility.getRandomItem(activeContracts);
+            AbstractContract relevantContract = ObjectUtility.getRandomItem(activeContracts);
             ContractMoraleLevel oldMorale = relevantContract.getMoraleLevel();
-            ContractMoraleLevel newMorale = relevantContract.changeMoraleLevel(1);
+            ContractMoraleLevel newMorale = relevantContract.changeMorale(1);
 
             new PrisonerIntelBreachDialog(campaign, relevantContract, oldMorale, newMorale);
         }

@@ -343,11 +343,11 @@ public class ChaosReputation {
               campaign.getCampaignOptions().get(CampaignOption.CHAOS_NO_PARTIAL_SUCCESS_REPUTATION);
 
         List<AbstractContract> completedMissions = new ArrayList<>(campaign.getCompletedContracts());
-        completedMissions.sort(Comparator.comparing(AbstractContract::getEndDate,
+        completedMissions.sort(Comparator.comparing(AbstractContract::getEndingDate,
               Comparator.nullsFirst(Comparator.naturalOrder())));
 
         for (AbstractContract mission : completedMissions) {
-            if (!isWithinWindow(mission.getEndDate(), windowStart, windowEnd)) {
+            if (!isWithinWindow(mission.getEndingDate(), windowStart, windowEnd)) {
                 continue;
             }
 

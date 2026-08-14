@@ -155,7 +155,7 @@ class AbstractStratConGMTest {
     private static NewDayEvent newDay(LocalDate today, AtBContract contract) {
         Campaign campaign = mock(Campaign.class);
         when(campaign.getLocalDate()).thenReturn(today);
-        when(campaign.getActiveAtBContracts()).thenReturn(List.of(contract));
+        when(campaign.getActiveContracts()).thenReturn(List.of(contract));
 
         NewDayEvent event = mock(NewDayEvent.class);
         when(event.getCampaign()).thenReturn(campaign);

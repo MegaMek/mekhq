@@ -30,7 +30,7 @@
  * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
  * affiliated with Microsoft.
  */
-package mekhq.campaign.market.contractMarket;
+package mekhq.campaign.mission.newContract.utilities;
 
 import static mekhq.campaign.enums.DailyReportType.GENERAL;
 import static mekhq.campaign.enums.DailyReportType.TECHNICAL;
@@ -175,8 +175,8 @@ public class ContractAutomation {
     }
 
     /**
-     * This method identifies all non-mothballed units within a campaign that are currently assigned to a {@link Formation}.
-     * Those units are then GM Mothballed.
+     * This method identifies all non-mothballed units within a campaign that are currently assigned to a
+     * {@link Formation}. Those units are then GM Mothballed.
      *
      * @param campaign The current campaign.
      *

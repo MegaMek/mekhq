@@ -461,7 +461,7 @@ public class ImmersiveDialogCore extends JDialog {
             campaignGUI.focusOnPerson(id);
         } else if (commandKey.equalsIgnoreCase(MISSION_COMMAND_STRING)) {
             try {
-                final int targetId = MathUtility.parseInt(entryKey, -1);
+                final UUID targetId = UUID.fromString(entryKey);
                 campaignGUI.focusOnMission(targetId);
             } catch (Exception e) {
                 LOGGER.error("Failed to parse mission ID: {}", entryKey, e);

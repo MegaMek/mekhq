@@ -40,6 +40,7 @@ import static mekhq.utilities.ReportingUtilities.spanOpeningWithCustomColor;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.mission.AtBContract;
 import mekhq.campaign.mission.enums.ContractMoraleLevel;
+import mekhq.campaign.mission.newContract.AbstractContract;
 import mekhq.gui.baseComponents.immersiveDialogs.ImmersiveDialogNotification;
 
 /**
@@ -64,7 +65,7 @@ public class PrisonerIntelBreachDialog {
      * @author Illiani
      * @since 0.51.01
      */
-    public PrisonerIntelBreachDialog(Campaign campaign, AtBContract contract, ContractMoraleLevel oldMorale,
+    public PrisonerIntelBreachDialog(Campaign campaign, AbstractContract contract, ContractMoraleLevel oldMorale,
           ContractMoraleLevel newMorale) {
         String centerMessage = getFormattedTextAt(RESOURCE_BUNDLE, "intelBreach.ic",
               spanOpeningWithCustomColor(getNegativeColor()), CLOSING_SPAN_TAG);

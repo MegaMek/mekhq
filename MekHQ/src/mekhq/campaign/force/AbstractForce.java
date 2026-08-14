@@ -74,8 +74,8 @@ import mekhq.campaign.finances.enums.TransactionType;
 import mekhq.campaign.icons.StandardFormationIcon;
 import mekhq.campaign.icons.UnitIcon;
 import mekhq.campaign.market.ForceShoppingList;
-import mekhq.campaign.mission.AtBContract;
 import mekhq.campaign.mission.Scenario;
+import mekhq.campaign.mission.newContract.AbstractContract;
 import mekhq.campaign.mission.rentals.ContractRentalType;
 import mekhq.campaign.mission.rentals.FacilityRentals;
 import mekhq.campaign.parts.enums.PartQuality;
@@ -905,7 +905,7 @@ public abstract class AbstractForce {
         }
 
         // clear out StratCon formation assignments
-        for (AtBContract contract : campaign.getActiveAtBContracts()) {
+        for (AbstractContract contract : campaign.getActiveContracts()) {
             if (contract.getStratConCampaignState() != null) {
                 for (StratConTrackState track : contract.getStratConCampaignState().getTracks()) {
                     track.unassignFormation(formationId);

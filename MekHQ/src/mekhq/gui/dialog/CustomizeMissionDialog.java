@@ -60,6 +60,7 @@ import mekhq.gui.utilities.MarkdownEditorPanel;
 /**
  * @author Taharqa
  */
+@Deprecated(since = "0.51.01", forRemoval = true)
 public class CustomizeMissionDialog extends JDialog {
     private static final MMLogger LOGGER = MMLogger.create(CustomizeMissionDialog.class);
 

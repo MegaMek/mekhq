@@ -176,7 +176,7 @@ class CampaignMissionContractAccessorsTest {
 
     @Test
     void getActiveAtBContractsReturnsOnlyActiveAtBContracts() {
-        List<AtBContract> activeAtB = campaign.getActiveAtBContracts();
+        List<AtBContract> activeAtB = campaign.getActiveContracts();
 
         assertEquals(1, activeAtB.size(), "Only the active AtB contract should be returned");
         assertTrue(activeAtB.contains(activeAtBContract));
@@ -206,12 +206,12 @@ class CampaignMissionContractAccessorsTest {
 
     @Test
     void getFutureAtBContractsReturnsOnlyFutureStartAtBContracts() {
-        List<AtBContract> futureAtB = campaign.getFutureAtBContracts();
+        List<AtBContract> futureAtB = campaign.getFutureContracts();
 
         assertEquals(1, futureAtB.size(), "Only the future-start AtB contract should be returned");
         assertTrue(futureAtB.contains(futureAtBContract));
         assertFalse(futureAtB.contains(futureContract), "the plain future contract is not an AtB contract");
-        assertTrue(campaign.hasFutureAtBContract(), "hasFutureAtBContract must report true when a future AtB exists");
+        assertTrue(campaign.hasFutureContract(), "hasFutureAtBContract must report true when a future AtB exists");
     }
 
     @Test

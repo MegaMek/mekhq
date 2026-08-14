@@ -58,7 +58,6 @@ import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.finances.enums.TransactionType;
 import mekhq.campaign.mission.Contract;
-import mekhq.campaign.mission.Mission;
 import mekhq.campaign.mission.enums.ContractCommandRights;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.skills.SkillType;
@@ -66,11 +65,12 @@ import mekhq.campaign.universe.PlanetarySystem;
 import mekhq.campaign.universe.Systems;
 import mekhq.gui.utilities.JSuggestField;
 import mekhq.gui.utilities.MarkdownEditorPanel;
-import mekhq.gui.view.ContractPaymentBreakdown;
+
 
 /**
  * @author Taharqa
  */
+@Deprecated(since = "0.51.01", forRemoval = true)
 public class NewContractDialog extends JDialog {
     private static final MMLogger LOGGER = MMLogger.create(NewContractDialog.class);
 
@@ -100,8 +100,6 @@ public class NewContractDialog extends JDialog {
     protected JSpinner spnSignBonus;
     protected JSpinner spnAdvance;
     protected JCheckBox checkMRBC;
-
-    private ContractPaymentBreakdown contractPaymentBreakdown;
 
     /** Creates new form NewTeamDialog */
     public NewContractDialog(JFrame parent, boolean modal, Campaign c) {
@@ -370,8 +368,6 @@ public class NewContractDialog extends JDialog {
     }
 
     protected void initPaymentBreakdownPanel(JPanel totalsPanel) {
-        contractPaymentBreakdown = new ContractPaymentBreakdown(totalsPanel, contract, campaign);
-        contractPaymentBreakdown.display(0, 1);
     }
 
     protected void initContractPanel(ResourceBundle resourceMap, JPanel contractPanel) {
@@ -689,15 +685,15 @@ public class NewContractDialog extends JDialog {
         }
 
         String chosenName = txtName.getText();
-        for (Mission m : campaign.getMissions()) {
-            if (m.getName().equals(chosenName)) {
-                JOptionPane.showMessageDialog(frame,
-                      "There is already a mission with the name " + chosenName,
-                      "Duplicate Mission Name",
-                      JOptionPane.ERROR_MESSAGE);
-                return;
-            }
-        }
+        //        for (Mission m : campaign.getMissions()) {
+        //            if (m.getName().equals(chosenName)) {
+        //                JOptionPane.showMessageDialog(frame,
+        //                      "There is already a mission with the name " + chosenName,
+        //                      "Duplicate Mission Name",
+        //                      JOptionPane.ERROR_MESSAGE);
+        //                return;
+        //            }
+        //        }
 
         contract.setName(txtName.getText());
         // contract.setPlanetName(suggestPlanet.getText());

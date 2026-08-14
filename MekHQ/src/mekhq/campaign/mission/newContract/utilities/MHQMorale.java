@@ -30,13 +30,22 @@
  * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
  * affiliated with Microsoft.
  */
-package mekhq.campaign.mission;
+package mekhq.campaign.mission.newContract.utilities;
 
 import static java.lang.Math.max;
 import static megamek.common.compute.Compute.d6;
+import static megamek.common.compute.Compute.randomInt;
 import static megamek.common.enums.SkillLevel.ELITE;
 import static megamek.common.enums.SkillLevel.GREEN;
 import static megamek.common.enums.SkillLevel.LEGENDARY;
+import static mekhq.MHQConstants.BATTLE_OF_TUKAYYID;
+import static mekhq.campaign.digitalGM.stratCon.StratConContractDefinition.getContractDefinition;
+import static mekhq.campaign.enums.DailyReportType.GENERAL;
+import static mekhq.campaign.enums.DailyReportType.POLITICS;
+import static mekhq.campaign.mission.enums.ContractMoraleLevel.ADVANCING;
+import static mekhq.campaign.mission.enums.ContractMoraleLevel.DOMINATING;
+import static mekhq.campaign.mission.enums.ContractMoraleLevel.OVERWHELMING;
+import static mekhq.campaign.mission.enums.ContractMoraleLevel.STALEMATE;
 import static mekhq.campaign.randomEvents.prisoners.PrisonerEventManager.DEFAULT_TEMPORARY_CAPACITY;
 import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
 import static mekhq.utilities.MHQInternationalization.getTextAt;
@@ -48,17 +57,34 @@ import static mekhq.utilities.ReportingUtilities.getWarningColor;
 import static mekhq.utilities.ReportingUtilities.spanOpeningWithCustomColor;
 
 import java.time.LocalDate;
+import java.util.List;
 
+import megamek.common.annotations.Nullable;
 import megamek.common.rolls.TargetRoll;
 import megamek.logging.MMLogger;
 import mekhq.campaign.Campaign;
+import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.digitalGM.stratCon.StratConCampaignState;
+import mekhq.campaign.digitalGM.stratCon.StratConContractDefinition;
+import mekhq.campaign.digitalGM.stratCon.StratConContractInitializer;
+import mekhq.campaign.digitalGM.stratCon.StratConTrackState;
+import mekhq.campaign.mission.Scenario;
 import mekhq.campaign.mission.enums.ContractMoraleLevel;
 import mekhq.campaign.mission.enums.ScenarioStatus;
+import mekhq.campaign.mission.newContract.AbstractContract;
+import mekhq.campaign.mission.newContract.contractData.ChaosContractStepsTable;
+import mekhq.campaign.mission.newContract.contractData.ContractTermsData;
+import mekhq.campaign.mission.newContract.contractData.EnemyData;
+import mekhq.campaign.mission.newContract.contractGeneration.ChaosContractDeterminationEnemy;
 import mekhq.campaign.randomEvents.prisoners.PrisonerEventManager;
 import mekhq.campaign.randomEvents.prisoners.PrisonerMissionEndEvent;
 import mekhq.campaign.universe.Faction;
+import mekhq.campaign.universe.factionStanding.FactionStandingUtilities;
+import mekhq.campaign.universe.factionStanding.FactionStandings;
+import mekhq.campaign.universe.factionStanding.PerformBatchall;
 import mekhq.gui.baseComponents.immersiveDialogs.ImmersiveDialogNotification;
+import mekhq.gui.baseComponents.immersiveDialogs.ImmersiveDialogSimple;
+import mekhq.gui.view.MoraleBar;
 
 /**
  * Handles contract morale checks and morale/report calculation for campaign missions.
@@ -136,13 +162,13 @@ public class MHQMorale {
      * @author Illiani
      * @since 0.50.10
      */
-    public static String performMoraleCheck(final LocalDate today, final AtBContract contract,
+    public static String performMoraleCheck(final LocalDate today, final AbstractContract contract,
           final int decisiveVictoryModifier, final int victoryModifier, final int decisiveDefeatModifier,
           final int defeatModifier) {
         final TargetRoll targetNumber = new TargetRoll();
 
         // Add modifiers to the target number
-        int reliability = getReliability(contract.getEnemySkill().getAdjustedValue(), contract.getEnemy());
+        int reliability = getReliability(contract.getEnemyForceSkill().getAdjustedValue(), contract.getEnemyFaction());
         targetNumber.addModifier(reliability, getTextAt(RESOURCE_BUNDLE, "MHQMorale.modifier.reliability"));
 
         int performanceModifier = getPerformanceModifier(today, contract, decisiveVictoryModifier, victoryModifier,
@@ -232,7 +258,7 @@ public class MHQMorale {
      * @author Illiani
      * @since 0.50.10
      */
-    static MoraleOutcome getMoraleOutcome(AtBContract contract, int roll) {
+    static MoraleOutcome getMoraleOutcome(AbstractContract contract, int roll) {
         ContractMoraleLevel currentMoraleLevel = contract.getMoraleLevel();
         ContractMoraleLevel updatedMoraleLevel = currentMoraleLevel;
         MoraleOutcome moraleOutcome;
@@ -264,7 +290,7 @@ public class MHQMorale {
 
         // Only update if the morale level actually changed
         if (updatedMoraleLevel != currentMoraleLevel) {
-            contract.setMoraleLevel(updatedMoraleLevel);
+            contract.changeMorale(updatedMoraleLevel);
         }
 
         return moraleOutcome;
@@ -416,7 +442,7 @@ public class MHQMorale {
      * @author Illiani
      * @since 0.50.10
      */
-    static int getPerformanceModifier(LocalDate today, AtBContract contract, int decisiveVictoryModifier,
+    static int getPerformanceModifier(LocalDate today, AbstractContract contract, int decisiveVictoryModifier,
           int victoryModifier, int decisiveDefeatModifier, int defeatModifier) {
         int victories = 0;
         int defeats = 0;
@@ -511,7 +537,7 @@ public class MHQMorale {
      * </ul>
      *
      * <p>After applying the morale outcome, if the contract's morale level is routed,
-     * {@link #routedMoraleUpdate(Campaign, AtBContract)} is invoked to handle follow-up effects such as early
+     * {@link #routedMoraleUpdate(Campaign, AbstractContract)} is invoked to handle follow-up effects such as early
      * contract end or prisoner handling.</p>
      *
      * @param campaign       the active campaign containing contract and prisoner state
@@ -521,7 +547,7 @@ public class MHQMorale {
      * @author Illiani
      * @since 0.50.10
      */
-    public static void processCombatChallengeResults(Campaign campaign, AtBContract contract,
+    public static void processCombatChallengeResults(Campaign campaign, AbstractContract contract,
           ScenarioStatus scenarioStatus) {
         int forcedRoll = NO_CHANGE_TARGET_NUMBER;
 
@@ -568,8 +594,8 @@ public class MHQMorale {
      *     </li>
      * </ul>
      *
-     * <p>This method should be called only after {@link AtBContract#getMoraleLevel()} has been updated to a routed
-     * state, and it assumes that the supplied {@link Campaign} and {@link AtBContract} are consistent with that
+     * <p>This method should be called only after {@link AbstractContract#getMoraleLevel()} has been updated to a routed
+     * state, and it assumes that the supplied {@link Campaign} and {@link AbstractContract} are consistent with that
      * state.</p>
      *
      * @param campaign the campaign providing time, contract, and prisoner state
@@ -578,7 +604,7 @@ public class MHQMorale {
      * @author Illiani
      * @since 0.50.10
      */
-    public static void routedMoraleUpdate(Campaign campaign, AtBContract contract) {
+    public static void routedMoraleUpdate(Campaign campaign, AbstractContract contract) {
         if (contract.getMoraleLevel().isRouted()) {
             LocalDate today = campaign.getLocalDate();
             StratConCampaignState campaignState = contract.getStratConCampaignState();
@@ -586,8 +612,8 @@ public class MHQMorale {
 
             // Additional morale updates if morale level is set to 'Routed' and the contract type is either a garrison
             // type or doesn't allow early contract completion
-            if (!canEarlyFinish || contract.getContractType().isGarrisonType()) {
-                contract.setRoutEndDate(today.plusMonths(max(1, d6() - 3)).minusDays(1));
+            if (!canEarlyFinish || contract.getObjectiveType().isGarrisonType()) {
+                contract.changeMorale(today.plusMonths(max(1, d6() - 3)).minusDays(1));
 
                 PrisonerMissionEndEvent prisoners = new PrisonerMissionEndEvent(campaign, contract);
                 if (!campaign.getPlayerForce().getHumanResources().getFriendlyPrisoners().isEmpty()) {
@@ -602,9 +628,197 @@ public class MHQMorale {
             } else {
                 new ImmersiveDialogNotification(campaign, getFormattedTextAt(RESOURCE_BUNDLE,
                       "stratCon.earlyContractEnd.objectives", contract.getName()), true);
-                int remainingMonths = contract.getMonthsLeft(campaign.getLocalDate().plusDays(1));
-                contract.setRoutedPayout(contract.getMonthlyPayOut().multipliedBy(remainingMonths));
-                contract.setEndingDate(today.plusDays(1));
+                int remainingMonths = (int) contract.getMonthsLeft(campaign.getLocalDate().plusDays(1));
+                contract.changeMorale(today.plusDays(1), contract.getMonthlyPayOut().multipliedBy(remainingMonths));
+            }
+        }
+    }
+
+    /**
+     * Checks and updates the morale which depends on various conditions such as the rout end date, skill levels,
+     * victories, defeats, etc. This method also updates the enemy status based on the morale level.
+     */
+    public static void checkMorale(Campaign campaign, AbstractContract contract) {
+        LocalDate today = campaign.getLocalDate();
+        // If there is a rout end date, and it's past today, update morale and enemy state accordingly
+        if (contract.getRoutEndDate() != null) {
+            // Check whether any current rout continues beyond its expected date. This is only applicable for
+            // Garrison Type contracts. For all other types we reinforce immediately
+            boolean routContinue = contract.getObjectiveType().isGarrisonType() && randomInt(4) == 0;
+            if (routContinue) {
+                return;
+            }
+
+            if (today.isAfter(contract.getRoutEndDate())) {
+                int roll = randomInt(8);
+
+                // We use variable morale levels to spike morale up to a value above Stalemate. This works with the
+                // regenerated Scenario Odds to create very high intensity spikes in otherwise low-key Garrison-type
+                // contracts.
+                ContractMoraleLevel newMoraleLevel = switch (roll) {
+                    case 2, 3, 4, 5 -> ADVANCING;
+                    case 6, 7 -> DOMINATING;
+                    case 8 -> OVERWHELMING;
+                    default -> STALEMATE; // 0-1
+                };
+
+                // If we have a StratCon enabled contract, regenerate Scenario Odds
+                if (contract.getStratConCampaignState() != null) {
+                    StratConContractDefinition contractDefinition = getContractDefinition(contract.getObjectiveType());
+
+                    if (contractDefinition != null) {
+                        for (StratConTrackState trackState : contract.getStratConCampaignState().getTracks()) {
+                            int scenarioOdds = StratConContractInitializer.getScenarioOdds(contractDefinition);
+
+                            trackState.setScenarioOdds(scenarioOdds);
+                        }
+                    }
+                }
+
+                contract.changeMorale(newMoraleLevel, null);
+
+                String key = "routEnded.reinforcements";
+                if (contract.getObjectiveType().isGarrisonDuty() || contract.getObjectiveType().isRetainer()) {
+                    updateEnemy(campaign, today, contract); // mix it up a little
+                    key = "routEnded.aNewChallenger";
+                }
+
+                new ImmersiveDialogSimple(campaign,
+                      contract.getEmployerLiaison(),
+                      null,
+                      getFormattedTextAt(RESOURCE_BUNDLE,
+                            key,
+                            campaign.getCommanderAddress(),
+                            FactionStandingUtilities.getFactionName(contract.getEnemyFaction(), today.getYear())),
+                      null,
+                      null,
+                      null,
+                      false);
+            }
+
+            return;
+        }
+
+        CampaignOptions campaignOptions = campaign.getCampaignOptions();
+        String moraleReport = MHQMorale.performMoraleCheck(today, contract,
+              campaignOptions.getMoraleDecisiveVictoryEffect(), campaignOptions.getMoraleVictoryEffect(),
+              campaignOptions.getMoraleDecisiveDefeatEffect(), campaignOptions.getMoraleDefeatEffect());
+        String flavorText = MHQMorale.getFormattedTitle()
+                                  + "<h2 style='text-align:center;'>" + contract.getName() + "</h2>"
+                                  + MoraleBar.getMoraleDisplay(contract).tooltip();
+        new ImmersiveDialogNotification(campaign, flavorText, moraleReport, MoraleBar.createDialogPanel(contract),
+              true);
+
+        MHQMorale.routedMoraleUpdate(campaign, contract);
+    }
+
+    public static void updateEnemy(Campaign campaign, LocalDate today, AbstractContract contract) {
+        updateEnemy(campaign, today, null, contract);
+    }
+
+    /**
+     * Updates the enemy faction and enemy bot name for this contract.
+     *
+     * @param campaign  The current campaign.
+     * @param today     The current LocalDate object.
+     * @param enemyCode {@code Nullable} the code for the new faction, if {@code null} an appropriate random faction
+     *                  will be used
+     */
+    public static void updateEnemy(Campaign campaign, LocalDate today, @Nullable String enemyCode,
+          AbstractContract contract) {
+        EnemyData newEnemyData = ChaosContractDeterminationEnemy.generateEnemyFactionForObjective(campaign,
+              campaign.getPlayerForce().getForceDetachment().getCurrentLocation(),
+              campaign.getLocalDate(),
+              contract.getEmployerFaction(),
+              contract.getObjectiveType()
+        );
+
+        // Update the Batchall information
+        Faction newEnemyFaction = contract.getEnemyFaction();
+        if (campaign.getCampaignOptions().isUseGenericBattleValue() && newEnemyFaction.performsBatchalls()) {
+            boolean tracksStanding = campaign.getCampaignOptions().isTrackFactionStanding();
+            FactionStandings factionStandings = campaign.getPlayerForce().getFactionStandings();
+
+            boolean acceptedBatchall = true;
+            boolean allowBatchalls = true;
+            if (campaign.getCampaignOptions().isUseFactionStandingBatchallRestrictionsSafe()) {
+                double regard = factionStandings.getRegardForFaction(newEnemyFaction.getShortName(), true);
+                allowBatchalls = FactionStandingUtilities.isBatchallAllowed(regard);
+            }
+
+            double regardMultiplier = campaign.getCampaignOptions().getRegardMultiplier();
+            String campaignFactionCode = campaign.getPlayerForce().getFaction().getShortName();
+            if (newEnemyFaction.performsBatchalls() && allowBatchalls) {
+                PerformBatchall batchallDialog = new PerformBatchall(campaign,
+                      contract.getEnemyData().opposingCommander(),
+                      enemyCode);
+
+                acceptedBatchall = batchallDialog.isBatchallAccepted();
+
+                if (!acceptedBatchall && tracksStanding) {
+                    List<String> reports = factionStandings.processRefusedBatchall(campaignFactionCode, enemyCode,
+                          today.getYear(), regardMultiplier);
+
+                    for (String report : reports) {
+                        campaign.addReport(GENERAL, report);
+                    }
+                }
+                newEnemyData = new EnemyData(newEnemyData, acceptedBatchall);
+            }
+
+            contract.setEnemyData(newEnemyData);
+
+            if (tracksStanding) {
+                // Whenever we dynamically change the enemy faction, we update standing accordingly
+                String report = factionStandings.processContractAccept(campaignFactionCode, newEnemyFaction, today,
+                      regardMultiplier, contract.getLengthInMonths());
+                if (report != null) {
+                    campaign.addReport(POLITICS, report);
+                }
+            }
+        }
+
+        // Check for emergency clause (this can trigger multiple times if the enemy faction keeps changing to a Clan
+        // faction. This can be seen as the employer getting increasingly desperate and wanting to keep the player on
+        // side.
+        checkForSpecialClanSalvageClause(campaign, today, newEnemyFaction, contract);
+    }
+
+    /**
+     * Checks for and applies a special emergency salvage clause when fighting Clan forces prior to or during the Battle
+     * of Tukayyid.
+     *
+     * <p>If the employer is non-Clan and the enemy is Clan, and the current date is on or before the Battle of
+     * Tukayyid, the salvage percentage is increased by 25% (up to a minimum of 100%) and salvage exchange is enabled.
+     * An immersive dialog is displayed to inform the player of the contract adjustment.</p>
+     *
+     * @param campaign     The current campaign instance.
+     * @param today        The current game date to check against the Tukayyid threshold.
+     * @param enemyFaction The faction being fought in the current contract or mission.
+     *
+     * @author Illiani
+     * @since 0.50.11
+     */
+    private static void checkForSpecialClanSalvageClause(Campaign campaign, LocalDate today, Faction enemyFaction,
+          AbstractContract contract) {
+        if (!contract.getEmployerFaction().isClan() && enemyFaction.isClan()) {
+            if (!today.isAfter(BATTLE_OF_TUKAYYID)) {
+                contract.setContractTerms(new ContractTermsData(contract.getContractTerms(),
+                      null,
+                      null,
+                      null,
+                      ChaosContractStepsTable.STEP_FIVE,
+                      null));
+
+                String message = getTextAt(RESOURCE_BUNDLE, "emergencySalvageClause.message");
+                new ImmersiveDialogSimple(campaign,
+                      contract.getEmployerLiaison(),
+                      null,
+                      message,
+                      null,
+                      null,
+                      null,
+                      false);
             }
         }
     }

@@ -55,7 +55,6 @@ import mekhq.campaign.digitalGM.stratCon.StratConCampaignState;
 import mekhq.campaign.force.Detachment;
 import mekhq.campaign.force.PlayerForce;
 import mekhq.campaign.location.ILocation;
-import mekhq.campaign.mission.enums.ContractMoraleLevel;
 import mekhq.campaign.mission.newContract.AbstractContract;
 import mekhq.campaign.mission.newContract.ChaosContract;
 import mekhq.campaign.mission.newContract.contractData.ContractObjectiveData;
@@ -63,10 +62,11 @@ import mekhq.campaign.mission.newContract.contractData.ContractScheduleData;
 import mekhq.campaign.mission.newContract.contractData.ContractTermsData;
 import mekhq.campaign.mission.newContract.contractData.EmployerData;
 import mekhq.campaign.mission.newContract.contractData.EnemyData;
-import mekhq.campaign.mission.newContract.contractData.MoraleData;
 import mekhq.campaign.mission.newContract.contractData.RentedFacilitiesData;
 import mekhq.campaign.mission.newContract.contractData.SystemsTargetData;
 import mekhq.campaign.mission.newContract.contractGeneration.targetFinder.ChaosContractPayDetermination;
+import mekhq.campaign.mission.newContract.utilities.MHQMorale;
+import mekhq.campaign.mission.utilities.ContractUtilities;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.reputation.chaosReputation.ChaosReputation;
 import mekhq.campaign.universe.Planet;
@@ -97,11 +97,11 @@ public class AbstractContractGeneration {
         boolean isDefensiveObjective = !objectiveData.playerObjectiveType().getChaosObjectiveType().isAttacker();
 
         // Step 3: Scale & Intensity
-        setTrackCount(campaign.getPlayerForce(), detachment.getHangar(), chaosObjectiveType, contract);
+        setAncillaryValues(campaign, detachment.getHangar(), chaosObjectiveType, contract);
 
         // Step 3: Enemy (situated against the employer's territorial anchor faction, so a landless flavor employer -
         // rebels, a mercenary command, a corporation - still yields a sensible nearby belligerent)
-        EnemyData enemyData = pickEnemy(currentDate, currentLocation, employerData, objectiveData, contract);
+        EnemyData enemyData = pickEnemy(campaign, currentDate, currentLocation, employerData, objectiveData, contract);
 
         // Step 4: Location
         SystemsTargetData systemsTargetData = pickTargetLocation(currentLocation,
@@ -180,8 +180,7 @@ public class AbstractContractGeneration {
         contract.setDescription(description);
 
         // Morale
-        MoraleData moraleData = new MoraleData(ContractMoraleLevel.STALEMATE);
-        contract.setMoraleData(moraleData);
+        MHQMorale.performMoraleCheck(currentDate, contract, 0, 0, 0, 0);
 
         // Rented Facilities
         RentedFacilitiesData rentedFacilitiesData = new RentedFacilitiesData(0, 0, 0);
@@ -196,15 +195,25 @@ public class AbstractContractGeneration {
               currentLocation);
     }
 
-    private static void setTrackCount(PlayerForce playerForce, LocalHangar detachmentHangar,
+    private static void setAncillaryValues(Campaign campaign, LocalHangar detachmentHangar,
           ChaosObjectiveType objectiveType, ChaosContract contract) {
+        PlayerForce playerForce = campaign.getPlayerForce();
         int scale = ChaosContractDeterminationScale.generateScaleForDetachment(playerForce,
               detachmentHangar,
               contract.getObjectiveType().isCadreDuty());
         contract.setScale(scale);
 
+        double varianceFactor = ContractUtilities.calculateVarianceFactor();
+        int requiredCombatElements = RequiredCombatElements.calculateRequiredCombatElements(campaign,
+              false,
+              varianceFactor);
+        contract.setRequiredCombatElements(requiredCombatElements);
+
         int trackCount = ChaosContractDetermineIntensity.determineTrackCount(objectiveType);
         contract.setTrackCount(trackCount);
+
+        int requiredVictoryPoints = ChaosContractDeterminationRequiredVictoryPoints.getRequiredVictoryPoints(contract);
+        contract.setRequiredVictoryPoints(requiredVictoryPoints);
     }
 
     /**
@@ -323,17 +332,21 @@ public class AbstractContractGeneration {
         contract.setScheduleData(contractScheduleData);
     }
 
-    private static @Nonnull EnemyData pickEnemy(LocalDate currentDate, ILocation currentLocation,
+    private static @Nonnull EnemyData pickEnemy(Campaign campaign, LocalDate currentDate, ILocation currentLocation,
           EmployerData employerData, ContractObjectiveData objectiveData, ChaosContract contract) {
         EnemyData enemyData;
         if (employerData.type() == ChaosEmployerType.CIVILIAN_ORGANIZATION_REBELS) {
             // A rebellion is fought against the rebels' own ruling power, not a randomly drawn belligerent, so the
             // enemy is fixed to the employer's territorial anchor (the local government the rebels rise against).
-            enemyData = ChaosContractDeterminationEnemy.generateEnemyForFaction(employerData.getAnchorFaction(),
+            enemyData = ChaosContractDeterminationEnemy.generateEnemyForFaction(campaign,
+                  employerData.getAnchorFaction(),
                   currentDate);
         } else {
-            enemyData = ChaosContractDeterminationEnemy.generateEnemyFactionForObjective(currentLocation,
-                  currentDate, employerData.getAnchorFaction(), objectiveData.playerObjectiveType());
+            enemyData = ChaosContractDeterminationEnemy.generateEnemyFactionForObjective(campaign,
+                  currentLocation,
+                  currentDate,
+                  employerData.getAnchorFaction(),
+                  objectiveData.playerObjectiveType());
         }
         contract.setEnemyData(enemyData);
         return enemyData;

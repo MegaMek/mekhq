@@ -779,7 +779,7 @@ public class CampaignGUI extends JPanel {
      * @author Illiani
      * @since 0.50.05
      */
-    public void focusOnMission(int targetId) {
+    public void focusOnMission(UUID targetId) {
         getBriefingRoomTab().focusOnMission(targetId);
         tabMain.setSelectedIndex(getTabIndexByName(resourceMap.getString("panBriefing.TabConstraints.tabTitle")));
     }
@@ -858,13 +858,7 @@ public class CampaignGUI extends JPanel {
                 customizeMissionDialog.setVisible(true);
             }
         } else {
-            if (true) {
-                // TODO: Swap the generating constructor for a persistent contract-market backend once one exists.
-                new ChaosContractMarketDialog(getCampaign());
-            } else {
-                ContractMarketDialog contractMarketDialog = new ContractMarketDialog(getFrame(), getCampaign());
-                contractMarketDialog.setVisible(true);
-            }
+            new ChaosContractMarketDialog(getCampaign());
         }
     }
 
@@ -1680,7 +1674,7 @@ public class CampaignGUI extends JPanel {
         if (getCampaign().getCampaignOptions().getAcquisitionType() == AcquisitionsType.ANY_TECH) {
             lblPartsAvailabilityRating.setText("");
         } else {
-            int partsAvailability = getCampaign().findAtBPartsAvailabilityLevel();
+            int partsAvailability = getCampaign().findPartsAvailabilityLevel();
             lblPartsAvailabilityRating.setText(statusBarLabel("statusBar.lblPartsAvailabilityRating.text",
                   partsAvailability));
         }

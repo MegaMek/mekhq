@@ -43,6 +43,11 @@ import mekhq.campaign.Campaign;
 import mekhq.campaign.finances.Finances;
 import mekhq.campaign.finances.Money;
 import mekhq.campaign.mission.AtBContract;
+import mekhq.campaign.mission.newContract.AbstractContract;
+import mekhq.campaign.mission.newContract.contractData.ChaosContractStepsTable;
+import mekhq.campaign.mission.newContract.contractData.ContractFinanceData;
+import mekhq.campaign.mission.newContract.contractData.ContractTermsData;
+import mekhq.campaign.mission.newContract.contractGeneration.ContractSearchType;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.universe.Factions;
 import mekhq.gui.baseComponents.immersiveDialogs.ImmersiveDialogSimple;
@@ -88,21 +93,27 @@ public class GrayMonday {
             }
 
             if (isEmployerBegging) {
-                for (AtBContract contract : campaign.getAtBContracts()) {
+                for (AbstractContract contract : campaign.getActiveContracts()) {
                     LocalDate startDate = contract.getStartDate();
                     if (!startDate.isBefore(today)) {
-                        contract.setBaseAmount(Money.of(0));
-                        contract.setOverheadCompensation(0);
-                        contract.setBattleLossCompensation(0);
-                        contract.setStraightSupport(0);
-                        contract.setTransportCompensation(0);
-                        contract.calculateContract(campaign);
+                        ContractFinanceData newFinances = new ContractFinanceData(Money.zero(),
+                              Money.zero(),
+                              Money.zero());
+                        contract.setContractFinanceData(newFinances);
 
-                        contract.setSalvagePercent(100);
+                        ContractTermsData newTerms = new ContractTermsData(contract.getContractTerms(),
+                              null,
+                              null,
+                              null,
+                              ChaosContractStepsTable.STEP_SEVENTEEN,
+                              null);
+                        contract.setContractTerms(newTerms);
                     }
                 }
 
-                campaign.getContractMarket().getContracts().clear();
+                campaign.getPlayerForce().getContractMarket().clear(ContractSearchType.MERCENARY);
+                campaign.getPlayerForce().getContractMarket().clear(ContractSearchType.GOVERNMENT);
+                campaign.getPlayerForce().getContractMarket().clear(ContractSearchType.TOURNAMENT);
 
                 getFormattedTextAt(RESOURCE_BUNDLE, "employer.report");
             }
@@ -118,7 +129,7 @@ public class GrayMonday {
         Person speaker = null;
 
         if (isEmployerBegging) {
-            for (AtBContract contract : campaign.getAtBContracts()) {
+            for (AbstractContract contract : campaign.getActiveContracts()) {
                 LocalDate startDate = contract.getStartDate();
                 if (!startDate.isBefore(today)) {
                     speaker = getEmployerSpeaker(contract);
@@ -179,14 +190,9 @@ public class GrayMonday {
      * @author Illiani
      * @since 0.50.06
      */
-    private Person getEmployerSpeaker(AtBContract contract) {
+    private Person getEmployerSpeaker(AbstractContract contract) {
         String employer = contract.getEmployerFaction().getShortName();
-        Person speaker = campaign.getPlayerForce()
-                               .getHumanResources()
-                               .newPerson(campaign,
-                                     mekhq.campaign.personnel.enums.PersonnelRole.ADMINISTRATOR_COMMAND,
-                                     employer,
-                                     megamek.common.enums.Gender.RANDOMIZE);
+        Person speaker = contract.getEmployerLiaison();
         speaker.setOriginFaction(Factions.getInstance().getFaction(employer));
 
         return speaker;

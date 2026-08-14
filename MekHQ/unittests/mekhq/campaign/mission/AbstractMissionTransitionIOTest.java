@@ -237,14 +237,14 @@ public class AbstractMissionTransitionIOTest {
         // AtB faction / force data.
         assertEquals("FWL", contract.getEmployerCode());
         assertEquals("CP", contract.getEnemyCode());
-        assertEquals(ContractObjectiveType.OBJECTIVE_RAID, contract.getContractType());
+        assertEquals(ContractObjectiveType.OBJECTIVE_RAID, contract.getObjectiveType());
         assertEquals("Objective Raid", contract.getContractTypeName());
         assertEquals(SkillLevel.ELITE, contract.getAllySkill());
         assertEquals(SkillLevel.REGULAR, contract.getEnemySkill());
         assertEquals(2, contract.getAllyQuality());
         assertEquals(0, contract.getEnemyQuality());
         assertEquals(5, contract.getContractDifficulty());
-        assertEquals(1, contract.getRequiredCombatTeams());
+        assertEquals(1, contract.getScale());
         assertEquals(1, contract.getRequiredCombatElements());
         assertEquals(1, contract.getPartsAvailabilityLevel());
         assertEquals(0, contract.getSharesPercent());
@@ -393,7 +393,7 @@ public class AbstractMissionTransitionIOTest {
         assertCoreFieldsEqual(contract, reloaded);
 
         // Fields not covered by assertCoreFieldsEqual.
-        assertEquals(contract.getContractType(), reloaded.getContractType(), "contractType");
+        assertEquals(contract.getObjectiveType(), reloaded.getObjectiveType(), "contractType");
         assertEquals(contract.getEnemyMercenaryEmployerCode(), reloaded.getEnemyMercenaryEmployerCode(),
               "enemyMercenaryEmployerCode");
         assertEquals(contract.getAllyQuality(), reloaded.getAllyQuality(), "allyQuality");
@@ -405,7 +405,7 @@ public class AbstractMissionTransitionIOTest {
         assertEquals(contract.getHospitalBedsRented(), reloaded.getHospitalBedsRented(), "hospitalBedsRented");
         assertEquals(contract.getKitchensRented(), reloaded.getKitchensRented(), "kitchensRented");
         assertEquals(contract.getHoldingCellsRented(), reloaded.getHoldingCellsRented(), "holdingCellsRented");
-        assertEquals(contract.getRequiredCombatTeams(), reloaded.getRequiredCombatTeams(), "requiredCombatTeams");
+        assertEquals(contract.getScale(), reloaded.getScale(), "requiredCombatTeams");
         assertEquals(contract.getRequiredCombatElements(), reloaded.getRequiredCombatElements(),
               "requiredCombatElements");
         assertEquals(contract.getContractNegotiationCommandRoll(), reloaded.getContractNegotiationCommandRoll(),
@@ -595,7 +595,7 @@ public class AbstractMissionTransitionIOTest {
         assertEquals(expected.isPaidMRBCFee(), actual.isPaidMRBCFee(), "paidMRBCFee");
         assertEquals(expected.getEmployerCode(), actual.getEmployerCode(), "employerCode");
         assertEquals(expected.getEnemyCode(), actual.getEnemyCode(), "enemyCode");
-        assertEquals(expected.getContractType(), actual.getContractType(), "contractType");
+        assertEquals(expected.getObjectiveType(), actual.getObjectiveType(), "contractType");
         assertEquals(expected.getAllySkill(), actual.getAllySkill(), "allySkill");
         assertEquals(expected.getEnemySkill(), actual.getEnemySkill(), "enemySkill");
         assertEquals(expected.getContractDifficulty(), actual.getContractDifficulty(), "contractDifficulty");

@@ -92,7 +92,7 @@ public class UnresolvedStratConContactsNagLogicTest {
         when(campaign.getCampaignOptions()).thenReturn(campaignOptions);
         when(campaignOptions.isUseStratCon()).thenReturn(true);
 
-        when(campaign.getActiveAtBContracts()).thenReturn(List.of(contract));
+        when(campaign.getActiveContracts()).thenReturn(List.of(contract));
         when(contract.getStratConCampaignState()).thenReturn(stratconCampaignState);
         when(stratconCampaignState.getTracks()).thenReturn(List.of(track));
 

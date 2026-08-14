@@ -78,15 +78,15 @@ public class ContractEmergencyExtension {
             return false;
         }
 
-        LocalDate newEndDate = contract.getEndDate().plusMonths(extension);
+        LocalDate newEndDate = contract.getEndingDate().plusMonths(extension);
         contract.updateScheduleData(null, newEndDate);
 
         // We spike morale to create a jump in contract difficulty - essentially the reason why the employer is using
         // the emergency clause.
-        int moraleOrdinal = contract.getEnemyMoraleLevel().ordinal();
+        int moraleOrdinal = contract.getMoraleLevel().ordinal();
         roll = d6(2) / 2;
         moraleOrdinal = min(moraleOrdinal + roll, OVERWHELMING.ordinal());
-        contract.updateMoraleData(ContractMoraleLevel.values()[moraleOrdinal]);
+        contract.changeMorale(ContractMoraleLevel.values()[moraleOrdinal]);
 
         MekHQ.triggerEvent(new MissionChangedEvent(contract));
 
@@ -103,7 +103,7 @@ public class ContractEmergencyExtension {
 
         String outOfCharacter = getFormattedTextAt(RESOURCE_BUNDLE,
               "ContractEmergencyExtension.ooc",
-              contract.getEndDate());
+              contract.getEndingDate());
 
         new ImmersiveDialogSimple(campaign,
               contract.getEmployerLiaison(),

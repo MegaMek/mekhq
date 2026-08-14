@@ -68,12 +68,12 @@ public class StratConSetupForces extends ScenarioSetupForces<AtBScenario> {
 
     @Override
     protected SkillLevel getEnemySkillLevel() {
-        return getScenario().getContract(campaign).getEnemySkill();
+        return getScenario().getContract(campaign).getEnemyForceSkill();
     }
 
     @Override
     protected SkillLevel getAlliedSkillLevel() {
-        return getScenario().getContract(campaign).getAllySkill();
+        return getScenario().getContract(campaign).getEmployerForceSkill();
     }
 
     /**

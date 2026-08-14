@@ -56,8 +56,6 @@ import megamek.logging.MMLogger;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.finances.Money;
-import mekhq.campaign.mission.AtBContract;
-import mekhq.campaign.mission.Contract;
 import mekhq.campaign.mission.enums.ContractObjectiveType;
 import mekhq.campaign.mission.newContract.AbstractContract;
 import mekhq.campaign.personnel.Injury;
@@ -162,14 +160,14 @@ public class RetirementDefectionTracker {
               ContractObjectiveType.SECURITY_DUTY,
               ContractObjectiveType.RIOT_DUTY);
 
-        List<Contract> activeContracts = campaign.getActiveContracts();
+        List<AbstractContract> activeContracts = campaign.getActiveContracts();
 
         if (!activeContracts.isEmpty()) {
             if (campaign.getCampaignOptions().isUseStratCon()) {
-                Optional<Contract> defensiveContract = activeContracts.stream()
-                                                             .filter(contract -> contract instanceof AtBContract)
-                                                             .filter(atBContract -> !defensiveContracts.contains(((AtBContract) atBContract).getContractType()))
-                                                             .findFirst();
+                Optional<AbstractContract> defensiveContract = activeContracts.stream()
+                                                                     .filter(mission -> !defensiveContracts.contains(
+                                                                           mission.getObjectiveType()))
+                                                                     .findFirst();
 
                 return defensiveContract.isPresent();
             } else {

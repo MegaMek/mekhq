@@ -30,7 +30,7 @@
  * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
  * affiliated with Microsoft.
  */
-package mekhq.campaign.market.contractMarket;
+package mekhq.campaign.mission.newContract.utilities;
 
 import static java.lang.Math.max;
 import static megamek.common.compute.Compute.d6;
@@ -47,6 +47,7 @@ import megamek.common.units.Entity;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.mission.AtBContract;
 import mekhq.campaign.mission.enums.ContractObjectiveType;
+import mekhq.campaign.mission.newContract.AbstractContract;
 
 /**
  * Utility class for generating pity contracts when a campaign does not have enough successful completed contracts.
@@ -121,7 +122,7 @@ public class PityContracts {
      * @since 0.51.0
      */
     static void createPityContract(Campaign campaign, AbstractContractMarket contractMarket) {
-        AtBContract contract = contractMarket.addAtBContract(campaign);
+        AbstractContract contract = contractMarket.addAtBContract(campaign);
         if (contract == null) {
             return;
         }
@@ -170,11 +171,11 @@ public class PityContracts {
      * @author Illiani
      * @since 0.51.0
      */
-    static void updateEnemyFaction(Campaign campaign, AtBContract contract) {
+    static void updateEnemyFaction(Campaign campaign, AbstractContract contract) {
         String enemyCode = campaign.isClanCampaign() ? BANDIT_CASTE_FACTION_CODE : PIRATE_FACTION_CODE;
 
         contract.setEnemyCode(enemyCode);
-        contract.updateEnemy(campaign, campaign.getLocalDate(), enemyCode);
+        MHQMorale.updateEnemy(campaign, campaign.getLocalDate(), enemyCode);
     }
 
     /**
