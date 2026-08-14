@@ -45,7 +45,7 @@ import megamek.common.enums.Gender;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.enums.PersonnelRole;
-import mekhq.campaign.personnel.ranks.AutoAssignRankForCompanyGenerator;
+import mekhq.campaign.personnel.ranks.AutomaticRankAssigner;
 
 public class EmployerLiaison {
     private final static PersonnelRole PIRATE_LIAISON_ROLE = BROKER;
@@ -88,6 +88,6 @@ public class EmployerLiaison {
             return;
         }
 
-        AutoAssignRankForCompanyGenerator.assignRankSystemFromFaction(negotiator, RO_MIN);
+        AutomaticRankAssigner.assignRankSystemFromFaction(negotiator, RO_MIN);
     }
 }
