@@ -304,7 +304,7 @@ class ProcreationPage {
                 getMetadata(MILESTONE_BEFORE_METADATA, CampaignOptionFlag.IMPORTANT));
         lblNoInterestInRelationshipsDiceSize.addMouseListener(createTipPanelUpdater("NoInterestInRelationshipsDiceSize"));
         spnNoInterestInRelationshipsDiceSize = new CampaignOptionsSpinner("NoInterestInRelationshipsDiceSize",
-                10, 1, 100000, 1);
+                10, 0, 100000, 1);
         spnNoInterestInRelationshipsDiceSize.addMouseListener(createTipPanelUpdater("NoInterestInRelationshipsDiceSize"));
 
         lblPrefersSameSexDiceSize = new CampaignOptionsLabel("PrefersSameSexDiceSize",
