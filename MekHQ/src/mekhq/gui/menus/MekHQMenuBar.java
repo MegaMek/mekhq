@@ -66,6 +66,7 @@ import megamek.client.ui.dialogs.UnitLoadingDialog;
 import megamek.client.ui.dialogs.buttonDialogs.CommonSettingsDialog;
 import megamek.client.ui.dialogs.buttonDialogs.GameOptionsDialog;
 import megamek.client.ui.dialogs.unitSelectorDialogs.AbstractUnitSelectorDialog;
+import megamek.client.ui.util.MULVersionValidator;
 import megamek.common.event.Subscribe;
 import megamek.common.loaders.MULParser;
 import megamek.common.loaders.MekSummaryCache;
@@ -718,7 +719,11 @@ public class MekHQMenuBar extends JMenuBar {
 
         if (unitFile != null) {
             try {
-                for (Entity entity : new MULParser(unitFile, getCampaign().getGameOptions()).getEntities()) {
+                final MULParser parser = new MULParser(unitFile, getCampaign().getGameOptions());
+                if (!MULVersionValidator.isCorrectVersion(getFrame(), parser)) {
+                    return;
+                }
+                for (Entity entity : parser.getEntities()) {
                     getCampaign().addNewUnit(entity, allowNewPilots, 0, quality);
                 }
             } catch (Exception e) {
