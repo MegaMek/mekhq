@@ -150,6 +150,10 @@ public class CombatTeam {
         return missionId;
     }
 
+    public void setMissionId(@jakarta.annotation.Nullable UUID missionId) {
+        this.missionId = missionId;
+    }
+
     public AbstractContract getContract(Campaign campaign) {
         return campaign.getContract(missionId);
     }
@@ -445,7 +449,7 @@ public class CombatTeam {
                     // If this breaks, we need it to break loudly so we immediately notice
                     retVal.formationId = Integer.parseInt(wn2.getTextContent());
                 } else if (wn2.getNodeName().equalsIgnoreCase("missionId")) {
-                    retVal.missionId = UUID.fromString(wn2.getTextContent());
+                    retVal.missionId = parseMissionId(wn2.getTextContent());
                 } else if (wn2.getNodeName().equalsIgnoreCase("role")) {
                     retVal.setRole(CombatRole.parseFromString(wn2.getTextContent().trim()));
                 } else if (wn2.getNodeName().equalsIgnoreCase("commanderId")) {
@@ -456,6 +460,30 @@ public class CombatTeam {
             LOGGER.error("", ex);
         }
         return retVal;
+    }
+
+    /**
+     * Parses a combat team's mission id for backward compatibility.
+     *
+     * <p>Missions are now identified by {@link UUID}. Saves written before that change stored the mission id as a
+     * plain integer, which is not a valid {@link UUID}. Returning {@code null} for such a value (rather than throwing)
+     * keeps the rest of the combat team's parse - including its role - intact; the campaign loader re-hooks the team to
+     * the contract the legacy mission was converted into, so the assignment is not lost.</p>
+     *
+     * @param text the raw {@code missionId} element text
+     *
+     * @return the parsed {@link UUID}, or {@code null} for a blank or legacy integer value (to be re-hooked on load)
+     */
+    private static @jakarta.annotation.Nullable UUID parseMissionId(final String text) {
+        if ((text == null) || text.isBlank()) {
+            return null;
+        }
+
+        try {
+            return UUID.fromString(text.trim());
+        } catch (IllegalArgumentException ex) {
+            return null;
+        }
     }
 
     private double getEffectivePoints(Campaign campaign) {
