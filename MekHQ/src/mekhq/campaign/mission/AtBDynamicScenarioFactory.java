@@ -1366,6 +1366,10 @@ public class AtBDynamicScenarioFactory {
      */
     private static @Nullable StratConTrackState getStratconTrackState(AtBDynamicScenario scenario,
           AbstractContract contract) {
+        if (contract.getStratConCampaignState() == null) {
+            return null; // The contract is not running StratCon, so it has no tracks.
+        }
+
         List<StratConTrackState> tracks = contract.getStratConCampaignState().getTracks();
         StratConTrackState scenarioHomeTrack = null;
 

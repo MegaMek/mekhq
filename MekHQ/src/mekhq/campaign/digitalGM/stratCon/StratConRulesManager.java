@@ -609,6 +609,10 @@ public class StratConRulesManager {
      * @return The randomly chosen {@link StratConTrackState}, or {@code null} if no tracks are available.
      */
     public static @Nullable StratConTrackState getRandomTrack(AbstractContract contract) {
+        if (contract.getStratConCampaignState() == null) {
+            return null; // The contract is not running StratCon, so it has no tracks.
+        }
+
         List<StratConTrackState> tracks = contract.getStratConCampaignState().getTracks();
         Random rand = new Random();
 
@@ -743,8 +747,11 @@ public class StratConRulesManager {
                 }
             }
             case INDEPENDENT -> {
-                if (contract.getStratConCampaignState().getVictoryPoints() <
-                          INDEPENDENT_COMMAND_RIGHTS_REQUIRED_VICTORY_POINTS) {
+                // Victory points only exist on a StratCon campaign state; treat a non-StratCon contract as having
+                // none, so it still qualifies as a turning point.
+                StratConCampaignState campaignState = contract.getStratConCampaignState();
+                int victoryPoints = (campaignState == null) ? 0 : campaignState.getVictoryPoints();
+                if (victoryPoints < INDEPENDENT_COMMAND_RIGHTS_REQUIRED_VICTORY_POINTS) {
                     scenario.setTurningPoint(true);
                 }
             }
@@ -3525,6 +3532,8 @@ public class StratConRulesManager {
         // if the force is deployed elsewhere, it cannot be deployed as reinforcements
         if (campaign.getActiveContracts()
                   .stream()
+                  // Not every active contract runs StratCon (the player can opt out per contract), so skip those.
+                  .filter(contract -> contract.getStratConCampaignState() != null)
                   .flatMap(contract -> contract.getStratConCampaignState().getTracks().stream())
                   .anyMatch(track -> !Objects.equals(track, trackState) &&
                                            track.getAssignedForceCoords().containsKey(forceID))) {

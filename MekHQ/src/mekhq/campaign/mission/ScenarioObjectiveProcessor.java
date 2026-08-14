@@ -439,7 +439,9 @@ public class ScenarioObjectiveProcessor {
                 break;
             case ContractScoreUpdate:
                 // if atb contract, update contract score by how many units met criterion * scaling
-                if (tracker.getMission() != null) {
+                // Victory points live on the StratCon campaign state, which a contract only has when it is running
+                // StratCon; mirror the SupportPointUpdate case below and skip otherwise.
+                if ((tracker.getMission() != null) && (tracker.getMission().getStratConCampaignState() != null)) {
                     int effectMultiplier = effect.effectScaling == EffectScalingType.Fixed ? 1 : scaleFactor;
                     int scoreEffect = effect.howMuch * effectMultiplier;
 
