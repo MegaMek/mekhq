@@ -48,7 +48,6 @@ import mekhq.campaign.events.parts.PartArrivedEvent;
 import mekhq.campaign.events.parts.PartChangedEvent;
 import mekhq.campaign.finances.Money;
 import mekhq.campaign.finances.enums.TransactionType;
-import mekhq.campaign.log.UnitLogger;
 import mekhq.campaign.parts.AmmoStorage;
 import mekhq.campaign.parts.Armor;
 import mekhq.campaign.parts.InfantryAmmoStorage;
@@ -60,6 +59,7 @@ import mekhq.campaign.parts.equipment.AmmoBin;
 import mekhq.campaign.parts.missing.MissingPart;
 import mekhq.campaign.unit.TestUnit;
 import mekhq.campaign.unit.Unit;
+import mekhq.campaign.unit.UnitAcquisitionType;
 
 /**
  * Manages machines and material for a campaign.
@@ -682,16 +682,14 @@ public record ForceQuartermaster(Campaign campaign) {
                       .debit(TransactionType.UNIT_PURCHASE, campaign().getLocalDate(),
                   cost, "Purchased " + en.getShortName())) {
 
-                Unit unit = campaign().addNewUnit(en, false, days, quality);
-                UnitLogger.purchased(unit, campaign().getLocalDate());
+                campaign().addNewUnit(en, false, days, quality, UnitAcquisitionType.PURCHASED);
 
                 return true;
             } else {
                 return false;
             }
         } else {
-            Unit unit = campaign().addNewUnit(en, false, days, quality);
-            UnitLogger.purchased(unit, campaign().getLocalDate());
+            campaign().addNewUnit(en, false, days, quality, UnitAcquisitionType.PURCHASED);
             return true;
         }
     }

@@ -6299,15 +6299,30 @@ public class Unit implements ITechnology, ILocatable {
         tech = person;
         person.addTechUnit(this);
         AssignmentLogger.assignedTo(person, getCampaign().getLocalDate(), getName());
-        UnitLogger.assignedCrew(this, getCampaign().getLocalDate(), person.getFullName());
+        UnitLogger.assignedTech(this, getCampaign().getLocalDate(), person.getFullName());
         MekHQ.triggerEvent(new PersonTechAssignmentEvent(person, this));
     }
 
     public void removeTech() {
+        removeTech(true);
+    }
+
+    /**
+     * Removes this unit's assigned technician, if it has one.
+     *
+     * @param log whether to record the removal in the technician's own assignment log. Pass {@code false} where the
+     *            caller records the person's side of the move itself, such as {@link #remove(Person, boolean)}, so that
+     *            the removal is not logged twice. The unit's own crew log records the removal either way.
+     */
+    public void removeTech(final boolean log) {
         if (tech != null) {
             Person originalTech = tech;
             tech.removeTechUnit(this);
             tech = null;
+            UnitLogger.removedTech(this, getCampaign().getLocalDate(), originalTech.getFullName());
+            if (log) {
+                AssignmentLogger.removedFrom(originalTech, getCampaign().getLocalDate(), getName());
+            }
             MekHQ.triggerEvent(new PersonTechAssignmentEvent(originalTech, null));
         }
     }
@@ -6386,7 +6401,8 @@ public class Unit implements ITechnology, ILocatable {
 
         ensurePersonIsRegistered(person);
         if (person.equals(tech)) {
-            removeTech();
+            // the trailing 'log' block below records this person's side of the removal, so do not log it twice
+            removeTech(false);
         }
 
         boolean wasCrew = false;
@@ -6415,6 +6431,9 @@ public class Unit implements ITechnology, ILocatable {
 
         if (wasCrew) {
             resetPilotAndEntity();
+            // the departure is part of the unit's service history whether or not the person's own logs record it, as
+            // a transfer still leaves this unit without that crew member
+            UnitLogger.removedCrew(this, getCampaign().getLocalDate(), person.getFullName());
             MekHQ.triggerEvent(new PersonCrewAssignmentEvent(campaign, person, this));
         }
 
@@ -6475,13 +6494,8 @@ public class Unit implements ITechnology, ILocatable {
     }
 
     public void setScenarioId(int i) {
-        // log a deployment when the unit is newly committed to a real scenario
-        if ((i != Scenario.S_DEFAULT_ID) && (i != scenarioId) && (campaign != null)) {
-            Scenario scenario = campaign.getScenario(i);
-            if (scenario != null) {
-                UnitLogger.deployed(this, campaign.getLocalDate(), scenario.getName());
-            }
-        }
+        // Note: assigning a unit to a scenario is only a plan, and can be undone before the scenario is played, so no
+        // deployment is logged here. ResolveScenarioTracker logs the deployment once the scenario is actually resolved.
         this.scenarioId = i;
     }
 

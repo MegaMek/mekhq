@@ -69,6 +69,7 @@ import mekhq.campaign.parts.Part;
 import mekhq.campaign.parts.enums.PartQuality;
 import mekhq.campaign.parts.equipment.AmmoBin;
 import mekhq.campaign.unit.Unit;
+import mekhq.campaign.unit.UnitAcquisitionType;
 import mekhq.utilities.MHQXMLUtility;
 import mekhq.utilities.ReportingUtilities;
 import org.w3c.dom.Node;
@@ -291,7 +292,11 @@ public class Loot {
                       Unit.getRandomUnitQuality(qualityAndModifier.get("modifier")).toNumeric());
             }
 
-            campaign.addNewUnit(entity, false, 0, PartQuality.fromNumeric(qualityAndModifier.get("quality")));
+            campaign.addNewUnit(entity,
+                  false,
+                  0,
+                  PartQuality.fromNumeric(qualityAndModifier.get("quality")),
+                  UnitAcquisitionType.LOOT);
 
             LOGGER.debug("Looting units complete");
         }

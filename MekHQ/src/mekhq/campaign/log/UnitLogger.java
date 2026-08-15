@@ -37,7 +37,9 @@ import static mekhq.utilities.MHQInternationalization.getTextAt;
 
 import java.time.LocalDate;
 
+import megamek.common.annotations.Nullable;
 import mekhq.campaign.unit.Unit;
+import mekhq.campaign.unit.UnitAcquisitionType;
 
 /**
  * This class is responsible for controlling the logging of Unit Log Entries.
@@ -68,13 +70,17 @@ public class UnitLogger {
     }
 
     /**
-     * Records that the unit was purchased on the given date. Added to the unit log.
+     * Records how the unit entered the campaign. Added to the unit log.
      *
-     * @param unit the unit being logged
-     * @param date the date the unit was purchased
+     * <p>This is called for every unit added to the campaign, so that each unit's history opens with the form and
+     * date of its acquisition.</p>
+     *
+     * @param unit            the unit being logged
+     * @param date            the date the unit was acquired
+     * @param acquisitionType the means by which the unit was acquired
      */
-    public static void purchased(Unit unit, LocalDate date) {
-        unit.addUnitLogEntry(new UnitLogEntry(date, getTextAt(RESOURCE_BUNDLE, "unitPurchased.text")));
+    public static void acquired(Unit unit, LocalDate date, UnitAcquisitionType acquisitionType) {
+        unit.addUnitLogEntry(new UnitLogEntry(date, getTextAt(RESOURCE_BUNDLE, acquisitionType.getResourceKey())));
     }
 
     /**
@@ -91,15 +97,24 @@ public class UnitLogger {
     }
 
     /**
-     * Records a kill scored by the unit through its pilot. Added to the kill log.
+     * Records a kill scored by the unit. Added to the kill log.
      *
-     * @param unit       the unit being logged
-     * @param date       the date of the kill
-     * @param killed     the name of what was killed
-     * @param personName the name of the crew member credited with the kill
+     * <p>Exactly one entry is recorded per kill, regardless of how many crew members the unit has. Where the unit has
+     * a commander at the time of the kill they are named, but a unit crewed only by temporary crew still records the
+     * kill.</p>
+     *
+     * @param unit          the unit being logged
+     * @param date          the date of the kill
+     * @param killed        the name of what was killed
+     * @param commanderName the name of the unit's commander, or {@code null} if the unit has no named commander
      */
-    public static void scoredKill(Unit unit, LocalDate date, String killed, String personName) {
-        String message = getFormattedTextAt(RESOURCE_BUNDLE, "unitScoredKill.text", killed, personName);
+    public static void scoredKill(Unit unit, LocalDate date, String killed, @Nullable String commanderName) {
+        String message = (commanderName == null) ?
+                               getFormattedTextAt(RESOURCE_BUNDLE, "unitScoredKill.text", killed) :
+                               getFormattedTextAt(RESOURCE_BUNDLE,
+                                     "unitScoredKillCommandedBy.text",
+                                     killed,
+                                     commanderName);
         unit.addKillLogEntry(new UnitLogEntry(date, message));
     }
 
@@ -112,6 +127,45 @@ public class UnitLogger {
      */
     public static void assignedCrew(Unit unit, LocalDate date, String personName) {
         String message = getFormattedTextAt(RESOURCE_BUNDLE, "unitAssignedCrew.text", personName);
+        unit.addCrewLogEntry(new UnitLogEntry(date, message));
+    }
+
+    /**
+     * Records that a crew member left the unit. Added to the crew log.
+     *
+     * @param unit       the unit being logged
+     * @param date       the date the crew member was removed
+     * @param personName the name of the crew member
+     */
+    public static void removedCrew(Unit unit, LocalDate date, String personName) {
+        String message = getFormattedTextAt(RESOURCE_BUNDLE, "unitRemovedCrew.text", personName);
+        unit.addCrewLogEntry(new UnitLogEntry(date, message));
+    }
+
+    /**
+     * Records that a technician took over maintenance of the unit. Added to the crew log.
+     *
+     * <p>Technicians are not crew, so they are recorded under their own message rather than as an assignment to a
+     * crew position.</p>
+     *
+     * @param unit       the unit being logged
+     * @param date       the date the technician was assigned
+     * @param personName the name of the technician
+     */
+    public static void assignedTech(Unit unit, LocalDate date, String personName) {
+        String message = getFormattedTextAt(RESOURCE_BUNDLE, "unitAssignedTech.text", personName);
+        unit.addCrewLogEntry(new UnitLogEntry(date, message));
+    }
+
+    /**
+     * Records that a technician stopped maintaining the unit. Added to the crew log.
+     *
+     * @param unit       the unit being logged
+     * @param date       the date the technician was removed
+     * @param personName the name of the technician
+     */
+    public static void removedTech(Unit unit, LocalDate date, String personName) {
+        String message = getFormattedTextAt(RESOURCE_BUNDLE, "unitRemovedTech.text", personName);
         unit.addCrewLogEntry(new UnitLogEntry(date, message));
     }
 
