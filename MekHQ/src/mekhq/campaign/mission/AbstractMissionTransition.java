@@ -83,7 +83,7 @@ import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.backgrounds.BackgroundsController;
 import mekhq.campaign.personnel.enums.PersonnelRole;
 import mekhq.campaign.personnel.enums.Phenotype;
-import mekhq.campaign.personnel.ranks.AutoAssignRankForCompanyGenerator;
+import mekhq.campaign.personnel.ranks.AutomaticRankAssigner;
 import mekhq.campaign.personnel.ranks.RankSystem;
 import mekhq.campaign.personnel.ranks.RankValidator;
 import mekhq.campaign.personnel.ranks.Ranks;
@@ -443,7 +443,7 @@ public abstract class AbstractMissionTransition {
                                  .getHumanResources()
                                  .newPerson(campaign, PersonnelRole.MILITARY_LIAISON, factionCode, Gender.RANDOMIZE));
 
-        AutoAssignRankForCompanyGenerator.assignAscendingRank(getEmployerLiaison(), RO_MIN);
+        AutomaticRankAssigner.assignRankSystemFromFaction(getEmployerLiaison(), RO_MIN);
     }
 
     public int getAllyQuality() {
@@ -627,7 +627,7 @@ public abstract class AbstractMissionTransition {
             getClanOpponent().setBloodname(bloodname.getName());
         }
 
-        AutoAssignRankForCompanyGenerator.assignAscendingRank(getClanOpponent(), RO_MIN);
+        AutomaticRankAssigner.assignAscendingRank(getClanOpponent(), RO_MIN);
 
         final RankSystem rankSystem = Ranks.getRankSystemFromCode("CLAN");
 
@@ -639,7 +639,7 @@ public abstract class AbstractMissionTransition {
         getClanOpponent().setRankSystem(rankValidator, rankSystem);
 
         int targetClanRank = 38;
-        AutoAssignRankForCompanyGenerator.assignAscendingRank(getClanOpponent(), targetClanRank);
+        AutomaticRankAssigner.assignAscendingRank(getClanOpponent(), targetClanRank);
     }
 
     public boolean isBatchallAccepted() {
