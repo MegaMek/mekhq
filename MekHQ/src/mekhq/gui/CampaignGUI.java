@@ -779,7 +779,7 @@ public class CampaignGUI extends JPanel {
      * @author Illiani
      * @since 0.50.05
      */
-    public void focusOnMission(int targetId) {
+    public void focusOnMission(UUID targetId) {
         getBriefingRoomTab().focusOnMission(targetId);
         tabMain.setSelectedIndex(getTabIndexByName(resourceMap.getString("panBriefing.TabConstraints.tabTitle")));
     }
@@ -847,38 +847,7 @@ public class CampaignGUI extends JPanel {
     }
 
     public void showContractMarket() {
-        CampaignOptions campaignOptions = getCampaign().getCampaignOptions();
-
-        if (campaignOptions.getContractMarketMethod().isNone()) {
-            MissionTypeDialog missionTypeDialog = getMissionTypeDialog(campaignOptions);
-
-            if (missionTypeDialog.isMission()) {
-                CustomizeMissionDialog customizeMissionDialog =
-                      new CustomizeMissionDialog(getFrame(), true, null, getCampaign());
-                customizeMissionDialog.setVisible(true);
-            }
-        } else {
-            if (false) {
-                // TODO: Swap the generating constructor for a persistent contract-market backend once one exists.
-                new ChaosContractMarketDialog(getCampaign());
-            } else {
-                ContractMarketDialog contractMarketDialog = new ContractMarketDialog(getFrame(), getCampaign());
-                contractMarketDialog.setVisible(true);
-            }
-        }
-    }
-
-    private MissionTypeDialog getMissionTypeDialog(CampaignOptions campaignOptions) {
-        MissionTypeDialog missionTypeDialog = new MissionTypeDialog(getFrame(), true);
-        missionTypeDialog.setVisible(true);
-
-        if (missionTypeDialog.isContract()) {
-            NewContractDialog newContractDialog = campaignOptions.isUseStratCon() ?
-                                                        new NewAtBContractDialog(getFrame(), true, getCampaign()) :
-                                                        new NewContractDialog(getFrame(), true, getCampaign());
-            newContractDialog.setVisible(true);
-        }
-        return missionTypeDialog;
+        new ChaosContractMarketDialog(getCampaign());
     }
 
     public void showUnitMarket() {
@@ -1680,7 +1649,7 @@ public class CampaignGUI extends JPanel {
         if (getCampaign().getCampaignOptions().getAcquisitionType() == AcquisitionsType.ANY_TECH) {
             lblPartsAvailabilityRating.setText("");
         } else {
-            int partsAvailability = getCampaign().findAtBPartsAvailabilityLevel();
+            int partsAvailability = getCampaign().findPartsAvailabilityLevel();
             lblPartsAvailabilityRating.setText(statusBarLabel("statusBar.lblPartsAvailabilityRating.text",
                   partsAvailability));
         }

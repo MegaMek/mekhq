@@ -39,6 +39,7 @@ import megamek.client.ui.util.PlayerColour;
 import megamek.common.enums.SkillLevel;
 import megamek.common.icons.Camouflage;
 import mekhq.campaign.enums.DragoonRating;
+import mekhq.campaign.personnel.Person;
 import mekhq.campaign.universe.Faction;
 import mekhq.campaign.universe.Factions;
 
@@ -47,6 +48,7 @@ public record EnemyData(String factionCode,
       String displayName,
       SkillLevel forceSkill,
       int equipmentRating,
+      Person opposingCommander,
       Camouflage camouflage,
       PlayerColour color,
       boolean batchallAccepted
@@ -54,12 +56,13 @@ public record EnemyData(String factionCode,
     private static final boolean DEFAULT_BATCHALL_ACCEPTED = true;
 
     public EnemyData(String factionCode, @Nullable String sponsorFactionCode, String displayName,
-          Camouflage camouflage) {
+          Person opposingCommander, Camouflage camouflage) {
         this(factionCode,
               sponsorFactionCode,
               displayName,
               SkillLevel.REGULAR,
               DragoonRating.DRAGOON_C.getRating(),
+              opposingCommander,
               camouflage,
               RED,
               DEFAULT_BATCHALL_ACCEPTED);
@@ -71,6 +74,7 @@ public record EnemyData(String factionCode,
               existingData.displayName,
               forceSkill,
               equipmentRating,
+              existingData.opposingCommander,
               existingData.camouflage,
               existingData.color,
               existingData.batchallAccepted
@@ -83,6 +87,7 @@ public record EnemyData(String factionCode,
               existingData.displayName,
               existingData.forceSkill,
               existingData.equipmentRating,
+              existingData.opposingCommander,
               existingData.camouflage,
               existingData.color,
               batchallAccepted

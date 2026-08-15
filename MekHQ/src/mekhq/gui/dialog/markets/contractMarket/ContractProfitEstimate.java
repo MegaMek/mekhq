@@ -37,7 +37,7 @@ import mekhq.campaign.finances.Money;
 import mekhq.campaign.force.Detachment;
 import mekhq.campaign.force.PlayerForce;
 import mekhq.campaign.mission.newContract.AbstractContract;
-import mekhq.campaign.mission.newContract.ContractUtilities;
+import mekhq.campaign.mission.newContract.utilities.ContractUtilities;
 import mekhq.campaign.universe.factionStanding.FactionStandings;
 
 /**
@@ -77,12 +77,10 @@ public record ContractProfitEstimate(int transitDays, Money guaranteedIncome, Mo
         int transitDays = ContractUtilities.getTravelDays(campaign,
               contract,
               detachment.getCurrentLocation(),
-              campaign.isGM(),
               false,
-              factionStandings,
-              contract.getEmployerFactionCode());
+              factionStandings);
 
-        int months = contract.getContractLengthInMonths();
+        int months = contract.getLengthInMonths();
         Money guaranteedIncome = contract.getTotalMonthlyPay().plus(contract.getTransportPayment());
 
         Money peacetimeMonthly = campaign.getAccountant().getPeacetimeCost();

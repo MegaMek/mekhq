@@ -105,7 +105,7 @@ public class Scenario implements IPlayerSettings {
     private final List<Integer> salvageFormations;
     private final List<UUID> salvageTechs;
     private int id = S_DEFAULT_ID;
-    private int missionId;
+    private UUID missionId;
     private FormationStub stub;
     private boolean cloaked;
 
@@ -648,11 +648,11 @@ public class Scenario implements IPlayerSettings {
         this.id = i;
     }
 
-    public int getMissionId() {
+    public @Nullable UUID getMissionId() {
         return missionId;
     }
 
-    public void setMissionId(int i) {
+    public void setMissionId(@Nullable UUID i) {
         this.missionId = i;
     }
 
@@ -1015,10 +1015,10 @@ public class Scenario implements IPlayerSettings {
      *
      * <p>This readiness check intentionally excludes any date-based restriction. In the base {@link Scenario}
      * implementation {@link #canStartScenario(Campaign)} simply delegates to this method, but subclasses such as
-     * {@link AtBScenario} may override {@code canStartScenario} to additionally require that the scenario be launched on
-     * its scheduled date. Because {@code canPrepareScenario} never applies such a restriction, it is suitable for gating
-     * preparation actions (adjusting the deployment, exporting or printing the assigned force) that players should be
-     * able to perform ahead of the scenario's date.</p>
+     * {@link AtBScenario} may override {@code canStartScenario} to additionally require that the scenario be launched
+     * on its scheduled date. Because {@code canPrepareScenario} never applies such a restriction, it is suitable for
+     * gating preparation actions (adjusting the deployment, exporting or printing the assigned force) that players
+     * should be able to perform ahead of the scenario's date.</p>
      *
      * @param c the campaign this scenario belongs to
      *

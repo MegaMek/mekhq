@@ -57,8 +57,8 @@ import megamek.common.units.Infantry;
 import megamek.common.units.UnitType;
 import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.force.Formation;
-import mekhq.campaign.mission.Mission;
 import mekhq.campaign.mission.enums.MissionStatus;
+import mekhq.campaign.mission.newContract.AbstractContract;
 import mekhq.campaign.mission.rentals.ContractRentalType;
 import mekhq.campaign.mission.rentals.FacilityRentals;
 import mekhq.campaign.personnel.Person;
@@ -189,8 +189,8 @@ public class CampaignSummary {
 
         // missions
         countMissionByStatus = new int[MissionStatus.values().length];
-        for (Mission m : campaign.getMissions()) {
-            countMissionByStatus[m.getStatus().ordinal()]++;
+        for (AbstractContract contract : campaign.getContractHistoryAsMap().values()) {
+            countMissionByStatus[contract.getStatus().ordinal()]++;
         }
 
         completedMissions = 0;

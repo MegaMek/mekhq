@@ -598,7 +598,7 @@ class RandomEventEffectsManagerTest {
         AtBContract contract = new AtBContract("Test");
         StratConCampaignState state = new StratConCampaignState(contract);
         contract.setStratConCampaignState(state);
-        when(mockCampaign.getActiveAtBContracts()).thenReturn(List.of(contract));
+        when(mockCampaign.getActiveContracts()).thenReturn(List.of(contract));
 
         runEffect(SUPPORT_POINT, List.of(PRISONERS), 5);
 
@@ -615,7 +615,7 @@ class RandomEventEffectsManagerTest {
     @Test
     void testEffectSupportPoint_noActiveContracts_emptyReport() {
         when(mockCampaignOptions.isUseStratCon()).thenReturn(true);
-        when(mockCampaign.getActiveAtBContracts()).thenReturn(List.of());
+        when(mockCampaign.getActiveContracts()).thenReturn(List.of());
 
         assertTrue(runEffect(SUPPORT_POINT, List.of(PRISONERS), 5).getMechanicalEffectsReport().isBlank());
     }
@@ -628,7 +628,7 @@ class RandomEventEffectsManagerTest {
     void testEffectUniqueBartering_stalemateMorale_moraleBumped() {
         AtBContract contract = new AtBContract("Test");
         contract.setMoraleLevel(STALEMATE);
-        when(mockCampaign.getActiveAtBContracts()).thenReturn(List.of(contract));
+        when(mockCampaign.getActiveContracts()).thenReturn(List.of(contract));
 
         runEffectForType("BARTERING", List.of(PRISONERS), 1);
 
@@ -640,7 +640,7 @@ class RandomEventEffectsManagerTest {
     void testEffectUniqueBartering_overwhelmingMorale_noChange() {
         AtBContract contract = new AtBContract("Test");
         contract.setMoraleLevel(OVERWHELMING);
-        when(mockCampaign.getActiveAtBContracts()).thenReturn(List.of(contract));
+        when(mockCampaign.getActiveContracts()).thenReturn(List.of(contract));
 
         RandomEventEffectsManager manager = runEffectForType("BARTERING", List.of(PRISONERS), 1);
 
@@ -651,7 +651,7 @@ class RandomEventEffectsManagerTest {
 
     @Test
     void testEffectUniqueBartering_noContracts_emptyReport() {
-        when(mockCampaign.getActiveAtBContracts()).thenReturn(List.of());
+        when(mockCampaign.getActiveContracts()).thenReturn(List.of());
 
         assertTrue(runEffectForType("BARTERING", List.of(PRISONERS), 1)
                          .getMechanicalEffectsReport().isBlank());
@@ -700,7 +700,7 @@ class RandomEventEffectsManagerTest {
         AtBContract contract = mock(AtBContract.class);
         Faction employerFaction = new Faction("employerFaction", "employerFaction");
         when(contract.getEmployerFaction()).thenReturn(employerFaction);
-        when(mockCampaign.getActiveAtBContracts()).thenReturn(List.of(contract));
+        when(mockCampaign.getActiveContracts()).thenReturn(List.of(contract));
 
         Person prisoner = makePrisoner();
         Faction originalFaction = new Faction("prisonerFaction", "prisonerFaction");
@@ -716,7 +716,7 @@ class RandomEventEffectsManagerTest {
 
     @Test
     void testEffectUniqueUndercover_noContracts_noChange() {
-        when(mockCampaign.getActiveAtBContracts()).thenReturn(List.of());
+        when(mockCampaign.getActiveContracts()).thenReturn(List.of());
 
         Person prisoner = makePrisoner();
         Faction originalFaction = new Faction();

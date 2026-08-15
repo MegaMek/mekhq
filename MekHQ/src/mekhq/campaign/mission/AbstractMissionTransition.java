@@ -38,11 +38,11 @@ import static megamek.client.ui.util.PlayerColour.RED;
 import static megamek.common.enums.SkillLevel.REGULAR;
 import static megamek.common.enums.SkillLevel.parseFromString;
 import static mekhq.campaign.mission.RandomFactionCamouflage.pickRandomCamouflage;
-import static mekhq.campaign.mission.enums.ContractObjectiveType.UNDEFINED;
 import static mekhq.campaign.mission.enums.ContractCommandRights.INDEPENDENT;
 import static mekhq.campaign.mission.enums.ContractMoraleLevel.MAXIMUM_MORALE_LEVEL;
 import static mekhq.campaign.mission.enums.ContractMoraleLevel.MINIMUM_MORALE_LEVEL;
 import static mekhq.campaign.mission.enums.ContractMoraleLevel.STALEMATE;
+import static mekhq.campaign.mission.enums.ContractObjectiveType.UNDEFINED;
 import static mekhq.campaign.personnel.ranks.Rank.RO_MIN;
 import static mekhq.campaign.personnel.skills.SkillType.EXP_REGULAR;
 import static mekhq.campaign.universe.Faction.INDEPENDENT_FACTION_CODE;
@@ -57,6 +57,7 @@ import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 import jakarta.annotation.Nonnull;
@@ -74,9 +75,9 @@ import mekhq.campaign.digitalGM.stratCon.SupportPointNegotiation;
 import mekhq.campaign.enums.DragoonRating;
 import mekhq.campaign.finances.Accountant;
 import mekhq.campaign.finances.Money;
-import mekhq.campaign.mission.enums.ContractObjectiveType;
-import mekhq.campaign.mission.enums.ContractMoraleLevel;
 import mekhq.campaign.mission.enums.ContractCommandRights;
+import mekhq.campaign.mission.enums.ContractMoraleLevel;
+import mekhq.campaign.mission.enums.ContractObjectiveType;
 import mekhq.campaign.mission.enums.MissionStatus;
 import mekhq.campaign.personnel.Bloodname;
 import mekhq.campaign.personnel.Person;
@@ -103,13 +104,13 @@ import org.w3c.dom.NodeList;
  * modern classes. It is effectively deprecated on day of birth as it is not intended to outlive the old Mission,
  * Contract, or AtBContract classes.
  */
-@Deprecated(since = "0.51.01", forRemoval = false)
+@Deprecated(since = "0.51.01", forRemoval = true)
 public abstract class AbstractMissionTransition {
     private static final MMLogger LOGGER = MMLogger.create(AbstractMissionTransition.class);
     private static final String RESOURCE_BUNDLE = "mekhq.resources.AbstractMission";
 
     private String name;
-    private int id = -1;
+    private UUID id = null;
     private StratConCampaignState stratConCampaignState;
     private MissionStatus status = MissionStatus.ACTIVE;
     private String contractTypeName = getText("AbstractMission.contractTypeName.default");
@@ -332,7 +333,7 @@ public abstract class AbstractMissionTransition {
                                                                      .isOverridingCommandCircuitRequirements(),
                         campaign.isGM(),
                         campaign.getCampaignOptions().isUseFactionStandingCommandCircuitSafe(),
-                        campaign.getPlayerForce().getFactionStandings(), campaign.getFutureAtBContracts());
+                        campaign.getPlayerForce().getFactionStandings(), campaign.getFutureContracts());
 
             JumpPath jumpPath = getJumpPath(campaign);
             if (jumpPath == null) {
@@ -666,7 +667,7 @@ public abstract class AbstractMissionTransition {
         this.contractTypeName = contractTypeName;
     }
 
-    public ContractObjectiveType getContractType() {
+    public ContractObjectiveType getObjectiveType() {
         return contractType;
     }
 
@@ -778,11 +779,11 @@ public abstract class AbstractMissionTransition {
         scenarios.clear();
     }
 
-    public int getId() {
+    public @Nullable UUID getId() {
         return id;
     }
 
-    public void setId(int id) {
+    public void setId(@Nullable UUID id) {
         this.id = id;
     }
 
@@ -1236,10 +1237,9 @@ public abstract class AbstractMissionTransition {
 
         TransportCostCalculations transportCostCalculations = campaign.getTransportCostCalculation(EXP_REGULAR);
         boolean useTwoWayPay = campaign.getCampaignOptions().isUseTwoWayPay();
-        boolean isUseCommandCircuits = campaign.isUseCommandCircuitForContract(this);
         int duration = (int) ceil(jumpPath.getTotalTime(campaign.getLocalDate(),
               campaign.getPlayerForce().getForceDetachment().getCurrentLocation().getTransitTime(),
-              isUseCommandCircuits));
+              false));
         Money transportCost = transportCostCalculations.calculateJumpCostForEntireJourney(duration,
               jumpPath.getJumps());
 
@@ -1334,7 +1334,7 @@ public abstract class AbstractMissionTransition {
         this.requiredCombatElements = requiredCombatElements;
     }
 
-    public int getRequiredCombatTeams() {
+    public int getScale() {
         return requiredCombatTeams;
     }
 
@@ -1409,7 +1409,7 @@ public abstract class AbstractMissionTransition {
     }
 
     public boolean isPeaceful() {
-        return getContractType().isGarrisonType() && getMoraleLevel().isRouted();
+        return getObjectiveType().isGarrisonType() && getMoraleLevel().isRouted();
     }
 
     public @Nullable Money getRoutedPayout() {
@@ -1505,7 +1505,7 @@ public abstract class AbstractMissionTransition {
                   "enemyMercenaryEmployerCode",
                   getEnemyMercenaryEmployerCode());
         }
-        MHQXMLUtility.writeSimpleXMLTag(printWriter, indent, "contractType", getContractType().name());
+        MHQXMLUtility.writeSimpleXMLTag(printWriter, indent, "contractType", getObjectiveType().name());
         MHQXMLUtility.writeSimpleXMLTag(printWriter, indent, "allySkill", getAllySkill().name());
         MHQXMLUtility.writeSimpleXMLTag(printWriter, indent, "allyQuality", getAllyQuality());
         MHQXMLUtility.writeSimpleXMLTag(printWriter, indent, "enemySkill", getEnemySkill().name());
@@ -1535,7 +1535,7 @@ public abstract class AbstractMissionTransition {
         MHQXMLUtility.writeSimpleXMLTag(printWriter, indent, "enemyColour", getEnemyColour().name());
 
         // combat requirements and state
-        MHQXMLUtility.writeSimpleXMLTag(printWriter, indent, "requiredCombatTeams", getRequiredCombatTeams());
+        MHQXMLUtility.writeSimpleXMLTag(printWriter, indent, "requiredCombatTeams", getScale());
         MHQXMLUtility.writeSimpleXMLTag(printWriter, indent, "requiredCombatElements", getRequiredCombatElements());
         MHQXMLUtility.writeSimpleXMLTag(printWriter, indent, "moraleLevel", getMoraleLevel().name());
         if (getRoutEndDate() != null) {
@@ -1609,7 +1609,7 @@ public abstract class AbstractMissionTransition {
                 } else if (nodeName.equalsIgnoreCase("status")) {
                     setStatus(MissionStatus.parseFromString(value.trim()));
                 } else if (nodeName.equalsIgnoreCase("id")) {
-                    setId(Integer.parseInt(value));
+                    setId(UUID.fromString(value));
                 } else if (nodeName.equalsIgnoreCase("desc")) {
                     setDescription(value);
                 } else if (nodeName.equalsIgnoreCase("type")) {

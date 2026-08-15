@@ -46,39 +46,13 @@ import megamek.codeUtilities.ObjectUtility;
 import megamek.logging.MMLogger;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.force.CombatTeam;
-import mekhq.campaign.mission.AtBContract;
 import mekhq.campaign.mission.AtBScenario;
-import mekhq.campaign.mission.atb.scenario.*;
+import mekhq.campaign.mission.newContract.AbstractContract;
 
 public class AtBScenarioFactory {
     private static final MMLogger logger = MMLogger.create(AtBScenarioFactory.class);
 
     private static final Map<Integer, List<Class<IAtBScenario>>> scenarioMap = new HashMap<>();
-
-    static {
-        registerScenario(new AceDuelBuiltInScenario());
-        registerScenario(new AlliedTraitorsBuiltInScenario());
-        registerScenario(new AllyRescueBuiltInScenario());
-        registerScenario(new AmbushBuiltInScenario());
-        registerScenario(new BaseAttackBuiltInScenario());
-        registerScenario(new BreakthroughBuiltInScenario());
-        registerScenario(new ChaseBuiltInScenario());
-        registerScenario(new CivilianHelpBuiltInScenario());
-        registerScenario(new CivilianRiotBuiltInScenario());
-        registerScenario(new ConvoyAttackBuiltInScenario());
-        registerScenario(new ConvoyRescueBuiltInScenario());
-        registerScenario(new ExtractionBuiltInScenario());
-        registerScenario(new HideAndSeekBuiltInScenario());
-        registerScenario(new HoldTheLineBuiltInScenario());
-        registerScenario(new OfficerDuelBuiltInScenario());
-        registerScenario(new PirateFreeForAllBuiltInScenario());
-        registerScenario(new PrisonBreakBuiltInScenario());
-        registerScenario(new ProbeBuiltInScenario());
-        registerScenario(new ReconRaidBuiltInScenario());
-        registerScenario(new StandUpBuiltInScenario());
-        registerScenario(new StarLeagueCache1BuiltInScenario());
-        registerScenario(new StarLeagueCache2BuiltInScenario());
-    }
 
     private AtBScenarioFactory() {
 
@@ -159,7 +133,7 @@ public class AtBScenarioFactory {
         boolean hasBaseAttackAttacker;
 
         // We only need to process active AtB contracts that haven't hit their end date
-        for (final AtBContract contract : campaign.getActiveAtBContracts()) {
+        for (final AbstractContract contract : campaign.getActiveContracts()) {
             // region Value Initialization
             scenarios = new ArrayList<>();
             dontGenerateForces = new ArrayList<>();
@@ -211,7 +185,7 @@ public class AtBScenarioFactory {
                               !combatTeam.isEligible(campaign) ||
                               (combatTeam.getMissionId() != contract.getId())
                               ||
-                              !combatTeam.getContract(campaign).isActiveOn(campaign.getLocalDate(), true)) {
+                              !combatTeam.getContract(campaign).isActiveOn(campaign.getLocalDate())) {
                         continue;
                     }
 
@@ -300,7 +274,7 @@ public class AtBScenarioFactory {
                             } else {
                                 // edge case: combatTeam assigned to another mission gets assigned the scenario,
                                 // we need to remove any scenario they are assigned to already
-                                campaign.getMission(combatTeam.getMissionId()).getScenarios()
+                                campaign.getContract(combatTeam.getMissionId()).getScenarios()
                                       .removeIf(scenario -> (scenario instanceof AtBScenario)
                                                                   &&
                                                                   (((AtBScenario) scenario).getCombatTeamId() !=

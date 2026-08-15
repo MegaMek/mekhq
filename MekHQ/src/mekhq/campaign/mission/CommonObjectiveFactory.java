@@ -46,6 +46,7 @@ import mekhq.campaign.force.Formation;
 import mekhq.campaign.mission.ObjectiveEffect.EffectScalingType;
 import mekhq.campaign.mission.ObjectiveEffect.ObjectiveEffectType;
 import mekhq.campaign.mission.ScenarioObjective.ObjectiveCriterion;
+import mekhq.campaign.mission.newContract.AbstractContract;
 
 /**
  * This class contains code for the creation of some common objectives for an AtB scenario
@@ -61,7 +62,7 @@ public class CommonObjectiveFactory {
      * and integrated units, giving a -1 contract score penalty for each one that gets totaled. Does not include
      * dropships.
      */
-    public static ScenarioObjective getKeepAttachedGroundUnitsAlive(AtBContract contract, AtBScenario scenario) {
+    public static ScenarioObjective getKeepAttachedGroundUnitsAlive(AbstractContract contract, AtBScenario scenario) {
         ScenarioObjective keepAttachedUnitsAlive = new ScenarioObjective();
         keepAttachedUnitsAlive.setDescription(resourceMap.getString("commonObjectives.preserveEmployerUnits.text"));
         keepAttachedUnitsAlive.setObjectiveCriterion(ObjectiveCriterion.Preserve);
@@ -107,7 +108,7 @@ public class CommonObjectiveFactory {
      * Generates a "keep at least X% of all units" objective from the primary player force, as well as any attached
      * allies, alive
      */
-    public static ScenarioObjective getKeepFriendliesAlive(Campaign campaign, AtBContract contract,
+    public static ScenarioObjective getKeepFriendliesAlive(Campaign campaign, AbstractContract contract,
           AtBScenario scenario, int OperationalVP, int number,
           boolean fixedAmount) {
         ScenarioObjective keepFriendliesAlive = new ScenarioObjective();
@@ -171,14 +172,15 @@ public class CommonObjectiveFactory {
      *
      * @param contract Contract to examine for enemy force name.
      */
-    public static ScenarioObjective getDestroyEnemies(AtBContract contract, int OperationalVP, int percentage) {
-        return getDestroyEnemies(contract.getEnemyBotName(), OperationalVP, percentage);
+    public static ScenarioObjective getDestroyEnemies(AbstractContract contract, int OperationalVP, int percentage) {
+        return getDestroyEnemies(contract.getEnemyDisplayName(), OperationalVP, percentage);
     }
 
     /**
      * Generates a "prevent x% of all units from reaching given edge" objective from the primary opposing force
      */
-    public static ScenarioObjective getPreventEnemyBreakthrough(AtBContract contract, int OperationalVP, int percentage,
+    public static ScenarioObjective getPreventEnemyBreakthrough(AbstractContract contract, int OperationalVP,
+          int percentage,
           OffBoardDirection direction) {
         ScenarioObjective destroyHostiles = new ScenarioObjective();
         destroyHostiles.setDescription(
@@ -186,7 +188,7 @@ public class CommonObjectiveFactory {
         destroyHostiles.setObjectiveCriterion(ObjectiveCriterion.PreventReachMapEdge);
         destroyHostiles.setPercentage(percentage);
         destroyHostiles.setDestinationEdge(direction);
-        destroyHostiles.addForce(contract.getEnemyBotName());
+        destroyHostiles.addForce(contract.getEnemyDisplayName());
 
         return getScenarioObjective(OperationalVP, destroyHostiles);
     }
@@ -194,7 +196,7 @@ public class CommonObjectiveFactory {
     /**
      * Generates a "reach X edge with x% of all allied + player units" objective
      */
-    public static ScenarioObjective getBreakthrough(AtBContract contract, AtBScenario scenario, Campaign campaign,
+    public static ScenarioObjective getBreakthrough(AbstractContract contract, AtBScenario scenario, Campaign campaign,
           int OperationalVP,
           int percentage, OffBoardDirection direction) {
         ScenarioObjective breakthrough = new ScenarioObjective();
@@ -252,14 +254,14 @@ public class CommonObjectiveFactory {
      * Worker function that adds all employer units in the given scenario (as specified in the contract) to the given
      * objective, except DropShips.
      */
-    private static void addEmployerUnitsToObjective(AtBScenario scenario, AtBContract contract,
+    private static void addEmployerUnitsToObjective(AtBScenario scenario, AbstractContract contract,
           ScenarioObjective objective) {
         for (int botForceID = 0; botForceID < scenario.getNumBots(); botForceID++) {
             // kind of hack-ish:
             // if there's an allied bot that shares employer name, then add it to the survival objective
             // we know there's only one of those, so break out of the loop when we see it
-            if (scenario.getBotForce(botForceID).getName().equals(contract.getAllyBotName())) {
-                objective.addForce(contract.getAllyBotName());
+            if (scenario.getBotForce(botForceID).getName().equals(contract.getEmployerDisplayName())) {
+                objective.addForce(contract.getEmployerDisplayName());
                 break;
             }
         }

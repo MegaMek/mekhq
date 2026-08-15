@@ -99,7 +99,7 @@ public class ShortDeploymentNagLogicTest {
         when(campaign.getCurrentLocation().isOnPlanet()).thenReturn(true);
         when(campaign.getLocalDate()).thenReturn(sunday);
 
-        when(campaign.getActiveAtBContracts()).thenReturn(new ArrayList<>());
+        when(campaign.getActiveContracts()).thenReturn(new ArrayList<>());
 
         assertFalse(hasDeploymentShortfall(campaign));
     }
@@ -109,7 +109,7 @@ public class ShortDeploymentNagLogicTest {
         when(campaign.getCurrentLocation().isOnPlanet()).thenReturn(true);
         when(campaign.getLocalDate()).thenReturn(sunday);
 
-        when(campaign.getActiveAtBContracts()).thenReturn(List.of(contract));
+        when(campaign.getActiveContracts()).thenReturn(List.of(contract));
         when(campaign.getDeploymentDeficit(contract)).thenReturn(0);
 
         assertFalse(hasDeploymentShortfall(campaign));
@@ -120,7 +120,7 @@ public class ShortDeploymentNagLogicTest {
         when(campaign.getCurrentLocation().isOnPlanet()).thenReturn(true);
         when(campaign.getLocalDate()).thenReturn(sunday);
 
-        when(campaign.getActiveAtBContracts()).thenReturn(List.of(contract));
+        when(campaign.getActiveContracts()).thenReturn(List.of(contract));
         when(campaign.getDeploymentDeficit(contract)).thenReturn(-3);
 
         assertFalse(hasDeploymentShortfall(campaign));
@@ -131,7 +131,7 @@ public class ShortDeploymentNagLogicTest {
         when(campaign.getCurrentLocation().isOnPlanet()).thenReturn(true);
         when(campaign.getLocalDate()).thenReturn(sunday);
 
-        when(campaign.getActiveAtBContracts()).thenReturn(List.of(contract));
+        when(campaign.getActiveContracts()).thenReturn(List.of(contract));
         when(campaign.getDeploymentDeficit(contract)).thenReturn(1);
 
         assertTrue(hasDeploymentShortfall(campaign));

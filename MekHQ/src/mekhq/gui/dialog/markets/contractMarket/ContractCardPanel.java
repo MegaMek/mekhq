@@ -154,7 +154,7 @@ public class ContractCardPanel extends JPanel {
     }
 
     private void applyTitleText() {
-        String name = wrapInner(escape(contract.getContractName().replace('_', ' ')), NAME_MAX_CHARS);
+        String name = wrapInner(escape(contract.getName().replace('_', ' ')), NAME_MAX_CHARS);
         String subtitle = wrapInner(escape(contract.getEmployerDisplayName()) + " &middot; "
                                           + escape(contract.getObjectiveType().toString()), SUBTITLE_MAX_CHARS);
         titlesLabel.setText("<html><b>" + name + "</b><br>"
@@ -298,7 +298,7 @@ public class ContractCardPanel extends JPanel {
         gbc.weightx = 1.0;
         row.add(chip(getFormattedTextAt(RESOURCE_BUNDLE,
               "card.contractMarket.months",
-              contract.getContractLengthInMonths())), gbc);
+              contract.getLengthInMonths())), gbc);
 
         return row;
     }

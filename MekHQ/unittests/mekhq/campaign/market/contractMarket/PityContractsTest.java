@@ -35,7 +35,6 @@ package mekhq.campaign.market.contractMarket;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.RETURNS_DEEP_STUBS;
-import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.inOrder;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
@@ -49,6 +48,7 @@ import mekhq.campaign.Campaign;
 import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.mission.AtBContract;
 import mekhq.campaign.mission.enums.ContractObjectiveType;
+import mekhq.campaign.mission.newContract.utilities.PityContracts;
 import mekhq.campaign.universe.PlanetarySystem;
 import org.junit.jupiter.api.Test;
 import org.mockito.InOrder;
@@ -63,7 +63,7 @@ class PityContractsTest {
 
     private static AtBContract mockContract() {
         AtBContract contract = mock(AtBContract.class);
-        when(contract.getContractType()).thenReturn(ContractObjectiveType.PIRATE_HUNTING);
+        when(contract.getObjectiveType()).thenReturn(ContractObjectiveType.PIRATE_HUNTING);
         when(contract.getStartDate()).thenReturn(LocalDate.of(3025, 1, 1));
         when(contract.getEmployerName()).thenReturn("Some Employer");
         PlanetarySystem system = mock(PlanetarySystem.class);

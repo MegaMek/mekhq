@@ -58,10 +58,10 @@ import mekhq.campaign.digitalGM.stratCon.StratConCampaignState;
 import mekhq.campaign.digitalGM.stratCon.StratConCoords;
 import mekhq.campaign.digitalGM.stratCon.StratConScenario;
 import mekhq.campaign.digitalGM.stratCon.StratConTrackState;
-import mekhq.campaign.mission.AtBContract;
 import mekhq.campaign.mission.AtBScenario;
 import mekhq.campaign.mission.BotForce;
 import mekhq.campaign.mission.ScenarioTemplate;
+import mekhq.campaign.mission.newContract.AbstractContract;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.unit.Unit;
 import mekhq.campaign.universe.Faction;
@@ -101,10 +101,10 @@ public class RiotScenario {
      * @author Illiani
      * @since 0.50.10
      */
-    public RiotScenario(Campaign campaign, AtBContract contract) {
+    public RiotScenario(Campaign campaign, AbstractContract contract) {
         this.campaign = campaign;
 
-        List<Unit> allMobs = findMobsForRiots(contract.getEnemy());
+        List<Unit> allMobs = findMobsForRiots(contract.getEnemyFaction());
         createRiotScenario(contract, allMobs);
     }
 
@@ -205,7 +205,7 @@ public class RiotScenario {
      * @author Illiani
      * @since 0.50.10
      */
-    private void createRiotScenario(AtBContract contract, List<Unit> mobUnits) {
+    private void createRiotScenario(AbstractContract contract, List<Unit> mobUnits) {
         final String DIRECTORY = "data" + separator + "scenariotemplates" + separator;
         final String SCENARIO_FILE = DIRECTORY + "Crowd Control.json";
 

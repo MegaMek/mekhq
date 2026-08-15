@@ -98,24 +98,22 @@ public class PersonnelTableModelColumnTest {
         // check overrides and a few columns of different types
         for (final PersonnelTableModelColumn personnelTableModelColumn : columns) {
             switch (personnelTableModelColumn) {
-                case RANK, SKILL_LEVEL ->
-                    assertEquals(SwingConstants.LEFT, personnelTableModelColumn.getAlignment());
+                case RANK, SKILL_LEVEL -> assertEquals(SwingConstants.LEFT, personnelTableModelColumn.getAlignment());
                 case SALARY, MAX_TECH_MINUTES ->
-                    assertEquals(SwingConstants.RIGHT, personnelTableModelColumn.getAlignment());
+                      assertEquals(SwingConstants.RIGHT, personnelTableModelColumn.getAlignment());
                 case FIRST_NAME -> // String
-                    assertEquals(SwingConstants.LEFT, personnelTableModelColumn.getAlignment());
+                      assertEquals(SwingConstants.LEFT, personnelTableModelColumn.getAlignment());
                 case AGE -> // Int
-                    assertEquals(SwingConstants.CENTER, personnelTableModelColumn.getAlignment());
+                      assertEquals(SwingConstants.CENTER, personnelTableModelColumn.getAlignment());
                 case VTOL -> // SkillPair
-                    assertEquals(SwingConstants.CENTER, personnelTableModelColumn.getAlignment());
+                      assertEquals(SwingConstants.CENTER, personnelTableModelColumn.getAlignment());
                 case HIGHEST_EDUCATION -> // field
-                    assertEquals(SwingConstants.CENTER, personnelTableModelColumn.getAlignment());
+                      assertEquals(SwingConstants.CENTER, personnelTableModelColumn.getAlignment());
                 case AGGRESSION -> // PersonalityTrait
-                    assertEquals(SwingConstants.CENTER, personnelTableModelColumn.getAlignment());
+                      assertEquals(SwingConstants.CENTER, personnelTableModelColumn.getAlignment());
                 case REFLEXES -> // SkillAttribute
-                    assertEquals(SwingConstants.CENTER, personnelTableModelColumn.getAlignment());
-                default ->
-                    assertTrue(SwingConstants.RIGHT != personnelTableModelColumn.getAlignment());
+                      assertEquals(SwingConstants.CENTER, personnelTableModelColumn.getAlignment());
+                default -> assertTrue(SwingConstants.RIGHT != personnelTableModelColumn.getAlignment());
             }
         }
     }
@@ -187,7 +185,7 @@ public class PersonnelTableModelColumnTest {
             when(campaign.getPlayerForce().isOverridingCommandCircuitRequirements()).thenReturn(false);
             when(campaign.isGM()).thenReturn(false);
             when(opts.isUseFactionStandingCommandCircuitSafe()).thenReturn(false);
-            when(campaign.getFutureAtBContracts()).thenReturn(List.of());
+            when(campaign.getFutureContracts()).thenReturn(List.of());
             return campaign;
         }
 
@@ -253,7 +251,8 @@ public class PersonnelTableModelColumnTest {
 
             @Test
             void destination_allDashWhenNotTraveling() {
-                assertEquals("-", PersonnelTableModelColumn.DESTINATION_SYSTEM_AND_PLANET.getCellValue(campaign, person));
+                assertEquals("-",
+                      PersonnelTableModelColumn.DESTINATION_SYSTEM_AND_PLANET.getCellValue(campaign, person));
                 assertEquals("-", PersonnelTableModelColumn.DESTINATION_NAME.getCellValue(campaign, person));
             }
         }
@@ -292,7 +291,8 @@ public class PersonnelTableModelColumnTest {
 
             @Test
             void destination_allDashWhenNotTraveling() {
-                assertEquals("-", PersonnelTableModelColumn.DESTINATION_SYSTEM_AND_PLANET.getCellValue(campaign, person));
+                assertEquals("-",
+                      PersonnelTableModelColumn.DESTINATION_SYSTEM_AND_PLANET.getCellValue(campaign, person));
                 assertEquals("-", PersonnelTableModelColumn.DESTINATION_NAME.getCellValue(campaign, person));
             }
         }
@@ -330,8 +330,9 @@ public class PersonnelTableModelColumnTest {
                 cl.setJumpPath(new JumpPath(new ArrayList<>(List.of(originSys, academySys))));
                 Person person = buildTravelingPerson(cl);
 
-                assertEquals("New Avalon", PersonnelTableModelColumn.DESTINATION_SYSTEM_AND_PLANET.getCellValue(campaign,
-                      person));
+                assertEquals("New Avalon",
+                      PersonnelTableModelColumn.DESTINATION_SYSTEM_AND_PLANET.getCellValue(campaign,
+                            person));
             }
 
             @Test
@@ -341,8 +342,9 @@ public class PersonnelTableModelColumnTest {
                 cl.setJumpPath(new JumpPath(new ArrayList<>(List.of(originSys, academySys))));
                 Person person = buildTravelingPerson(cl);
 
-                assertEquals("New Avalon", PersonnelTableModelColumn.DESTINATION_SYSTEM_AND_PLANET.getCellValue(campaign,
-                      person));
+                assertEquals("New Avalon",
+                      PersonnelTableModelColumn.DESTINATION_SYSTEM_AND_PLANET.getCellValue(campaign,
+                            person));
             }
 
             @Test
@@ -402,7 +404,8 @@ public class PersonnelTableModelColumnTest {
 
             @Test
             void destination_allDashWhenNotTraveling() {
-                assertEquals("-", PersonnelTableModelColumn.DESTINATION_SYSTEM_AND_PLANET.getCellValue(campaign, person));
+                assertEquals("-",
+                      PersonnelTableModelColumn.DESTINATION_SYSTEM_AND_PLANET.getCellValue(campaign, person));
                 assertEquals("-", PersonnelTableModelColumn.DESTINATION_NAME.getCellValue(campaign, person));
             }
         }

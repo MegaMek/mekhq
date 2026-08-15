@@ -44,13 +44,10 @@ import java.util.UUID;
 import megamek.common.annotations.Nullable;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
-import mekhq.campaign.mission.AtBContract;
-import mekhq.campaign.mission.Contract;
-import mekhq.campaign.mission.Mission;
+import mekhq.campaign.mission.newContract.AbstractContract;
 import mekhq.campaign.personnel.Award;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.universe.Faction;
-import mekhq.campaign.universe.Factions;
 import mekhq.campaign.universe.PlanetarySystem;
 import mekhq.campaign.universe.RandomFactionGenerator;
 
@@ -73,7 +70,7 @@ public class MiscAwards {
      *
      * @return a map of eligible awards grouped by their respective IDs
      */
-    public static Map<Integer, List<Object>> MiscAwardsProcessor(Campaign campaign, @Nullable Mission mission,
+    public static Map<Integer, List<Object>> MiscAwardsProcessor(Campaign campaign, @Nullable AbstractContract mission,
           UUID person, List<Award> awards, Boolean missionWasSuccessful, boolean isCivilianHelp,
           @Nullable Integer killCount, @Nullable Integer injuryCount, @Nullable UUID supportPersonOfTheYear,
           @Nullable List<Person> POWPersonnel) {
@@ -162,15 +159,16 @@ public class MiscAwards {
      * @param person   the person to check award eligibility for
      * @param isYesWar true if this is a Yes War Award
      */
-    private static boolean HouseWorldWar(Campaign campaign, @Nullable Mission mission, Award award, UUID person,
+    private static boolean HouseWorldWar(Campaign campaign, @Nullable AbstractContract mission, Award award,
+          UUID person,
           boolean isYesWar) {
         if (award.canBeAwarded(campaign.getPerson(person))) {
             if (mission != null) {
-                if (mission instanceof AtBContract) {
-                    PlanetarySystem system = campaign.getSystemById(mission.getSystemId());
-                    LocalDate date = campaign.getLocalDate();
-                    Faction enemyFaction = ((AtBContract) mission).getEnemy();
+                PlanetarySystem system = mission.getTargetSystem();
+                LocalDate date = campaign.getLocalDate();
+                Faction enemyFaction = mission.getEnemyFaction();
 
+                if (system != null) {
                     for (Faction faction : system.getFactionSet(campaign.getLocalDate())) {
                         if (faction.isISMajorOrSuperPower()) {
                             boolean isAtWar = RandomFactionGenerator.getInstance().getFactionHints()
@@ -199,11 +197,11 @@ public class MiscAwards {
      *
      * @return true if the person is eligible for the award, false otherwise
      */
-    private static boolean Periphery(Campaign campaign, @Nullable Mission mission, Award award, UUID person) {
+    private static boolean Periphery(Campaign campaign, @Nullable AbstractContract mission, Award award, UUID person) {
         if (award.canBeAwarded(campaign.getPerson(person))) {
             if (mission != null) {
                 try {
-                    PlanetarySystem system = campaign.getSystemById(mission.getSystemId());
+                    PlanetarySystem system = mission.getTargetSystem();
 
                     return system.getFactionSet(campaign.getLocalDate()).stream().anyMatch(Faction::isPeriphery);
                 } catch (Exception e) {
@@ -246,21 +244,18 @@ public class MiscAwards {
      *
      * @return true if the person is eligible for the award, false otherwise
      */
-    private static boolean CeremonialDuty(Campaign campaign, Award award, UUID person, @Nullable Mission mission) {
+    private static boolean CeremonialDuty(Campaign campaign, Award award, UUID person,
+          @Nullable AbstractContract mission) {
         if (award.canBeAwarded(campaign.getPerson(person))) {
             if (mission != null) {
-                if (mission instanceof Contract) {
-                    PlanetarySystem capitalSystem = Factions.getInstance()
-                                                          .getFactionFromFullNameAndYear(((Contract) mission).getEmployerName(),
-                                                                campaign.getGameYear())
-                                                          .getStartingPlanet(campaign, campaign.getLocalDate());
-                    try {
-                        if (campaign.getCurrentSystem().equals(capitalSystem)) {
-                            return true;
-                        }
-                    } catch (Exception e) {
-                        return false;
+                PlanetarySystem capitalSystem = mission.getEmployerFaction()
+                                                      .getStartingPlanet(campaign, campaign.getLocalDate());
+                try {
+                    if (campaign.getCurrentSystem().equals(capitalSystem)) {
+                        return true;
                     }
+                } catch (Exception e) {
+                    return false;
                 }
             }
         }

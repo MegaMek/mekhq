@@ -56,6 +56,7 @@ import mekhq.campaign.force.Formation;
 import mekhq.campaign.mission.ObjectiveEffect.EffectScalingType;
 import mekhq.campaign.mission.ObjectiveEffect.ObjectiveEffectType;
 import mekhq.campaign.mission.enums.ScenarioStatus;
+import mekhq.campaign.mission.newContract.AbstractContract;
 import mekhq.campaign.mission.resupplyAndCaches.Resupply;
 import org.apache.logging.log4j.LogManager;
 
@@ -411,7 +412,7 @@ public class ScenarioObjectiveProcessor {
      *
      * <p>When run in dry-run mode, the method simply returns a description of the effect without
      * applying any changes to the campaign or contract. In active mode, the effect is applied to
-     * the appropriate {@link Campaign}, {@link AtBContract}, or scenario entities.</p>
+     * the appropriate {@link Campaign}, {@link AbstractContract}, or scenario entities.</p>
      *
      * @param campaign    the {@link Campaign} instance being updated.
      * @param effect      the {@link ObjectiveEffect} defining the effect type and its further details.
@@ -438,34 +439,35 @@ public class ScenarioObjectiveProcessor {
                 break;
             case ContractScoreUpdate:
                 // if atb contract, update contract score by how many units met criterion * scaling
-                if (tracker.getMission() instanceof AtBContract contract) {
+                // Victory points live on the StratCon campaign state, which a contract only has when it is running
+                // StratCon; mirror the SupportPointUpdate case below and skip otherwise.
+                if ((tracker.getMission() != null) && (tracker.getMission().getStratConCampaignState() != null)) {
                     int effectMultiplier = effect.effectScaling == EffectScalingType.Fixed ? 1 : scaleFactor;
                     int scoreEffect = effect.howMuch * effectMultiplier;
 
                     if (dryRun) {
                         return String.format("%d Contract Score/Campaign Victory Points", scoreEffect);
                     } else {
-                        contract.setContractScoreArbitraryModifier(contract.getContractScoreArbitraryModifier() +
-                                                                         scoreEffect);
+                        tracker.getMission().getStratConCampaignState().changeVictoryPoints(scoreEffect);
                     }
                 }
                 break;
             case SupportPointUpdate:
-                if (tracker.getMission() instanceof AtBContract contract) {
-                    if (contract.getStratConCampaignState() != null) {
+                if (tracker.getMission() != null) {
+                    if (tracker.getMission().getStratConCampaignState() != null) {
                         int effectMultiplier = effect.effectScaling == EffectScalingType.Fixed ? 1 : scaleFactor;
                         int numSupportPoints = effect.howMuch * effectMultiplier;
                         if (dryRun) {
                             return String.format("%d support points will be added", numSupportPoints);
                         } else {
-                            contract.getStratConCampaignState().changeSupportPoints(numSupportPoints);
+                            tracker.getMission().getStratConCampaignState().changeSupportPoints(numSupportPoints);
                         }
                     }
                 }
                 break;
             case SupplyCache:
-                if (tracker.getMission() instanceof AtBContract contract) {
-                    Resupply resupply = new Resupply(campaign, contract, RESUPPLY_LOOT);
+                if (tracker.getMission() != null) {
+                    Resupply resupply = new Resupply(campaign, tracker.getMission(), RESUPPLY_LOOT);
 
                     // This scaling means users will need to have at least 10 qualifying units before they get a Resupply.
                     double effectMultiplier = effect.effectScaling == EffectScalingType.Fixed ? 1 : (scaleFactor * 0.2);
@@ -474,7 +476,7 @@ public class ScenarioObjectiveProcessor {
                     if (dryRun) {
                         return String.format("A size %d supply cache will be added", size);
                     } else {
-                        performResupply(resupply, contract, size);
+                        performResupply(resupply, tracker.getMission(), size);
                     }
                 }
                 break;
@@ -499,57 +501,51 @@ public class ScenarioObjectiveProcessor {
                 }
                 break;
             case AtBBonus:
-                if (tracker.getMission() instanceof AtBContract contract) {
+                if (tracker.getMission() != null) {
                     int effectMultiplier = effect.effectScaling == EffectScalingType.Fixed ? 1 : scaleFactor;
                     int numBonuses = effect.howMuch * effectMultiplier;
                     if (dryRun) {
                         return String.format("%d AtB bonus rolls", numBonuses);
                     } else {
-                        int dropSize = 0;
-                        for (int x = 0; x < numBonuses; x++) {
-                            dropSize += contract.doBonusRoll(tracker.getCampaign(), true)
-                                              ? 1 : 0;
-                        }
-
-                        if (dropSize > 0) {
+                        if (numBonuses > 0) {
                             LogManager.getLogger().info("ScenarioObjectiveProcessor.java");
                             campaign.addReport(GENERAL, "Bonus: Captured Supplies");
-                            Resupply resupply = new Resupply(campaign, contract, RESUPPLY_LOOT);
-                            performResupply(resupply, contract, dropSize);
+                            Resupply resupply = new Resupply(campaign, tracker.getMission(), RESUPPLY_LOOT);
+                            performResupply(resupply, tracker.getMission(), numBonuses);
                         }
                     }
                 }
             case FacilityRemains:
-                if ((tracker.getMission() instanceof AtBContract) && (tracker.getScenario() instanceof AtBScenario)) {
+                if ((tracker.getMission() != null) && (tracker.getScenario() instanceof AtBScenario)) {
                     if (dryRun) {
                         return "This facility will not be captured.";
                     } else {
                         StratConRulesManager.updateFacilityForScenario((AtBScenario) tracker.getScenario(),
-                              (AtBContract) tracker.getMission(),
+                              tracker.getMission(),
                               false,
                               false);
                     }
                 }
                 break;
             case FacilityRemoved:
-                if ((tracker.getMission() instanceof AtBContract) && (tracker.getScenario() instanceof AtBScenario)) {
+                if ((tracker.getMission() != null) && (tracker.getScenario() instanceof AtBScenario)) {
                     if (dryRun) {
                         return "This facility will be destroyed.";
                     } else {
                         StratConRulesManager.updateFacilityForScenario((AtBScenario) tracker.getScenario(),
-                              (AtBContract) tracker.getMission(),
+                              tracker.getMission(),
                               true,
                               false);
                     }
                 }
                 break;
             case FacilityCaptured:
-                if (tracker.getMission() instanceof AtBContract) {
+                if (tracker.getMission() != null) {
                     if (dryRun) {
                         return "Allied forces will control this facility.";
                     } else {
                         StratConRulesManager.updateFacilityForScenario((AtBScenario) tracker.getScenario(),
-                              (AtBContract) tracker.getMission(),
+                              tracker.getMission(),
                               false,
                               true);
                     }

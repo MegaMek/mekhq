@@ -64,7 +64,6 @@ import mekhq.campaign.LocalHangar;
 import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.force.Formation;
 import mekhq.campaign.force.FormationType;
-import mekhq.campaign.market.contractMarket.AlternatePaymentModelValues;
 import mekhq.campaign.mission.AtBContract;
 import mekhq.campaign.mission.enums.CombatRole;
 import mekhq.campaign.parts.Part;
@@ -852,7 +851,7 @@ public class AccountantTest {
         AtBContract contract = mock(AtBContract.class);
         when(contract.getSystem()).thenReturn(mockSystem);
         when(contract.getEmployerCode()).thenReturn("EMPLOYER");
-        when(mockCampaign.getActiveAtBContracts()).thenReturn(List.of(contract));
+        when(mockCampaign.getActiveContracts()).thenReturn(List.of(contract));
 
         FactionStandings factionStandings = mock(FactionStandings.class);
         when(factionStandings.getRegardForFaction("EMPLOYER", true)).thenReturn(20.0);
@@ -894,7 +893,7 @@ public class AccountantTest {
 
         // No active contracts in the current system, so the barrack multiplier falls back to the
         // highest regard among the system's local factions.
-        when(mockCampaign.getActiveAtBContracts()).thenReturn(List.of());
+        when(mockCampaign.getActiveContracts()).thenReturn(List.of());
 
         Faction localFaction = mock(Faction.class);
         when(localFaction.getShortName()).thenReturn("LOCAL");
@@ -1223,8 +1222,8 @@ public class AccountantTest {
 
     /**
      * tests
-     * {@link Accountant#getPeacetimeOperatingCosts(java.util.Collection, LocalHangar, CampaignOptions, boolean, LocalDate,
-     * int, int, java.util.Map, boolean)}
+     * {@link Accountant#getPeacetimeOperatingCosts(java.util.Collection, LocalHangar, CampaignOptions, boolean,
+     * LocalDate, int, int, java.util.Map, boolean)}
      */
     @Nested
     class TestGetPeacetimeOperatingCosts {
@@ -1409,9 +1408,9 @@ public class AccountantTest {
      * These tests confirm that, for a campaign where every hangar unit is assigned somewhere in the TO&E and every
      * salary-eligible person crews one of those units (i.e. the common case today), routing
      * {@link Accountant#getPeacetimeCost(boolean)} through the new formation-based
-     * {@link Accountant#getPeacetimeOperatingCosts(java.util.Collection, LocalHangar, CampaignOptions, boolean, LocalDate,
-     * int, int, java.util.Map, boolean)} produces the exact same total that the old whole-campaign calculation used to
-     * produce.
+     * {@link Accountant#getPeacetimeOperatingCosts(java.util.Collection, LocalHangar, CampaignOptions, boolean,
+     * LocalDate, int, int, java.util.Map, boolean)} produces the exact same total that the old whole-campaign
+     * calculation used to produce.
      */
     @Nested
     class TestPeacetimeCostMatchesLegacyBehavior {
@@ -1836,8 +1835,8 @@ public class AccountantTest {
 
     /**
      * tests
-     * {@link Accountant#getForceValue(java.util.Collection, LocalHangar, Faction, CampaignOptions, boolean, boolean, double,
-     * double, double, boolean)}
+     * {@link Accountant#getForceValue(java.util.Collection, LocalHangar, Faction, CampaignOptions, boolean, boolean,
+     * double, double, double, boolean)}
      */
     @Nested
     class TestGetForceValueStatic {

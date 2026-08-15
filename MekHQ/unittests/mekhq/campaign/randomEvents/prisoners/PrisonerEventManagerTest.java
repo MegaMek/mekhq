@@ -1118,14 +1118,14 @@ public class PrisonerEventManagerTest {
 
             PrisonerEventManager.checkForIntelBreachEvent(campaign, 5);
 
-            verify(campaign, never()).getActiveAtBContracts();
+            verify(campaign, never()).getActiveContracts();
         }
 
         @Test
         void allContractsOverwhelmingOrRouted_filteredOut_noBreach() {
             Campaign campaign = campaignWithCaptureStyle(PrisonerCaptureStyle.MEKHQ);
             AtBContract contract = contractWithMorale(ContractMoraleLevel.OVERWHELMING);
-            when(campaign.getActiveAtBContracts()).thenReturn(new ArrayList<>(List.of(contract)));
+            when(campaign.getActiveContracts()).thenReturn(new ArrayList<>(List.of(contract)));
 
             PrisonerEventManager.checkForIntelBreachEvent(campaign, 5);
 
@@ -1137,7 +1137,7 @@ public class PrisonerEventManagerTest {
         void zeroFreedPrisoners_noBreach() {
             Campaign campaign = campaignWithCaptureStyle(PrisonerCaptureStyle.MEKHQ);
             AtBContract contract = contractWithMorale(STALEMATE);
-            when(campaign.getActiveAtBContracts()).thenReturn(new ArrayList<>(List.of(contract)));
+            when(campaign.getActiveContracts()).thenReturn(new ArrayList<>(List.of(contract)));
 
             PrisonerEventManager.checkForIntelBreachEvent(campaign, 0);
 
@@ -1148,7 +1148,7 @@ public class PrisonerEventManagerTest {
         void breachRollAtOrAboveFreedCount_noBreach() {
             Campaign campaign = campaignWithCaptureStyle(PrisonerCaptureStyle.MEKHQ);
             AtBContract contract = contractWithMorale(STALEMATE);
-            when(campaign.getActiveAtBContracts()).thenReturn(new ArrayList<>(List.of(contract)));
+            when(campaign.getActiveContracts()).thenReturn(new ArrayList<>(List.of(contract)));
 
             try (MockedStatic<Compute> compute = mockStatic(Compute.class)) {
                 // A roll that is not less than the freed count (freed = 1, roll = 40) means no breach.

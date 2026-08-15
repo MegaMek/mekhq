@@ -70,6 +70,7 @@ import org.junit.jupiter.params.provider.CsvSource;
  *
  * @author Claude (test author for PR #9417 review)
  */
+@Deprecated(since = "0.51.01", forRemoval = true)
 class AbstractMissionTransitionBehaviorTest {
     private static final String UNKNOWN_SYSTEM_ID = "NoSuchSystem_ZZZ";
 

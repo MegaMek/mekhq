@@ -64,6 +64,7 @@ import testUtilities.MHQTestUtilities;
  *
  * @author Claude (test author for PR #9417 review)
  */
+@Deprecated(since = "0.51.01", forRemoval = true)
 class MissionFlatteningLatentBugTest {
 
     @BeforeAll

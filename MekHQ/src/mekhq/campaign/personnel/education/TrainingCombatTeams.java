@@ -67,7 +67,7 @@ import mekhq.campaign.digitalGM.stratCon.StratConCampaignState;
 import mekhq.campaign.force.CombatTeam;
 import mekhq.campaign.force.Formation;
 import mekhq.campaign.log.PerformanceLogger;
-import mekhq.campaign.mission.AtBContract;
+import mekhq.campaign.mission.newContract.AbstractContract;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.PersonnelOptions;
 import mekhq.campaign.personnel.enums.PersonnelRole;
@@ -141,8 +141,8 @@ public class TrainingCombatTeams {
                 continue;
             }
 
-            AtBContract contract = combatTeam.getContract(campaign);
-            if (contract == null || !contract.isActiveOn(today, false)) {
+            AbstractContract contract = combatTeam.getContract(campaign);
+            if (contract == null || !contract.isActiveOn(today)) {
                 continue;
             }
 

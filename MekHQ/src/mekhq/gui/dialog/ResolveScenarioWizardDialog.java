@@ -33,6 +33,7 @@
  */
 package mekhq.gui.dialog;
 
+import static java.lang.Math.round;
 import static megamek.client.ui.util.UIUtil.scaleForGUI;
 import static mekhq.MHQConstants.CONFIRMATION_RESOLVE_SCENARIO;
 import static mekhq.campaign.enums.DailyReportType.FINANCES;
@@ -84,12 +85,12 @@ import mekhq.campaign.digitalGM.stratCon.StratConRulesManager;
 import mekhq.campaign.finances.Money;
 import mekhq.campaign.finances.enums.TransactionType;
 import mekhq.campaign.mission.AtBScenario;
-import mekhq.campaign.mission.Contract;
 import mekhq.campaign.mission.Loot;
-import mekhq.campaign.mission.MHQMorale;
 import mekhq.campaign.mission.ScenarioObjective;
 import mekhq.campaign.mission.ScenarioObjectiveProcessor;
 import mekhq.campaign.mission.enums.ScenarioStatus;
+import mekhq.campaign.mission.newContract.utilities.MHQMorale;
+import mekhq.campaign.mission.newContract.utilities.SalvageUtilities;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.randomEvents.prisoners.PrisonerCaptureStyle;
 import mekhq.campaign.unit.TestUnit;
@@ -217,12 +218,12 @@ public class ResolveScenarioWizardDialog extends JDialog {
         loots = tracker.getPotentialLoot();
         salvageableUnites = new ArrayList<>();
         isUseCamOpsSalvage = campaign.getCampaignOptions().isUseCamOpsSalvage();
-        if (tracker.getMission() instanceof Contract contract) {
-            salvageEmployer = contract.getSalvagedByEmployer();
-            salvageUnit = contract.getSalvagedByUnit();
-            maxSalvagePct = contract.getSalvagePercent();
+        if (tracker.getMission() != null) {
+            salvageEmployer = tracker.getMission().getSalvagedByEmployerValue();
+            salvageUnit = tracker.getMission().getSalvagedByUnitValue();
+            maxSalvagePct = (int) round(tracker.getMission().getSalvageRightsMultiplier() * 100);
 
-            currentSalvagePct = Contract.calculateSalvagePercentage(salvageUnit, salvageEmployer);
+            currentSalvagePct = SalvageUtilities.calculateSalvagePercentage(salvageUnit, salvageEmployer);
         }
 
         initComponents();
@@ -605,7 +606,7 @@ public class ResolveScenarioWizardDialog extends JDialog {
         int gridx = 0;
         int gridY = 0;
         GridBagConstraints gridBagConstraints;
-        if ((tracker.getMission() instanceof Contract) && !tracker.usesSalvageExchange()) {
+        if (tracker.getMission() != null && !tracker.usesSalvageExchange()) {
             gridBagConstraints = new GridBagConstraints();
             gridBagConstraints.gridwidth = 1;
             gridBagConstraints.anchor = GridBagConstraints.WEST;
@@ -1722,8 +1723,8 @@ public class ResolveScenarioWizardDialog extends JDialog {
                 case PILOT_PANEL -> !tracker.getPeopleStatus().isEmpty();
                 case PRISONER_PANEL -> !tracker.getOppositionPersonnel().isEmpty();
                 case SALVAGE_PANEL -> !tracker.getPotentialSalvage().isEmpty() &&
-                                            (!(tracker.getMission() instanceof Contract) ||
-                                                   ((Contract) tracker.getMission()).canSalvage());
+                                            tracker.getMission() != null &&
+                                            tracker.getMission().canSalvage();
                 case KILLS_PANEL -> !tracker.getKillCredits().isEmpty();
                 case REWARD_PANEL -> !loots.isEmpty();
                 case PREVIEW_PANEL -> true;
@@ -1837,11 +1838,11 @@ public class ResolveScenarioWizardDialog extends JDialog {
             }
         }
 
-        if (!(tracker.getMission() instanceof Contract) || tracker.usesSalvageExchange()) {
+        if (tracker.getMission() == null || tracker.usesSalvageExchange()) {
             return;
         }
-        salvageEmployer = ((Contract) tracker.getMission()).getSalvagedByEmployer();
-        salvageUnit = ((Contract) tracker.getMission()).getSalvagedByUnit();
+        salvageEmployer = tracker.getMission().getSalvagedByEmployerValue();
+        salvageUnit = tracker.getMission().getSalvagedByUnitValue();
         for (int i = 0; i < salvageBoxes.size(); i++) {
             // Skip the escaping units
             if (escapeBoxes.get(i).isSelected()) {
@@ -1856,7 +1857,7 @@ public class ResolveScenarioWizardDialog extends JDialog {
             }
         }
 
-        currentSalvagePct = Contract.calculateSalvagePercentage(salvageUnit, salvageEmployer);
+        currentSalvagePct = SalvageUtilities.calculateSalvagePercentage(salvageUnit, salvageEmployer);
 
         for (int i = 0; i < salvageBoxes.size(); i++) {
             // Skip the escaping units

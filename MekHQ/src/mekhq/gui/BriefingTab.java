@@ -37,7 +37,6 @@ import static mekhq.campaign.ForceHumanResources.isUsingLegacyPersonnelMarket;
 import static mekhq.campaign.digitalGM.stratCon.StratConRulesManager.generateDailyScenariosForTrack;
 import static mekhq.campaign.digitalGM.stratCon.StratConRulesManager.isForceDeployedToStratCon;
 import static mekhq.campaign.enums.DailyReportType.PERSONNEL;
-import static mekhq.campaign.enums.DailyReportType.POLITICS;
 import static mekhq.campaign.force.Formation.NO_ASSIGNED_SCENARIO;
 import static mekhq.campaign.mission.AtBDynamicScenarioFactory.getPlanetOwnerAlignment;
 import static mekhq.campaign.mission.AtBDynamicScenarioFactory.getPlanetOwnerFaction;
@@ -47,7 +46,6 @@ import static mekhq.campaign.mission.enums.ScenarioStatus.DRAW;
 import static mekhq.campaign.randomEvents.prisoners.PrisonerEventManager.DEFAULT_TEMPORARY_CAPACITY;
 import static mekhq.campaign.universe.Faction.MERCENARY_FACTION_CODE;
 import static mekhq.campaign.universe.Faction.PIRATE_FACTION_CODE;
-import static mekhq.gui.dialog.factionStanding.manualMissionDialogs.SimulateMissionDialog.handleFactionRegardUpdates;
 import static mekhq.utilities.MHQInternationalization.getText;
 import static mekhq.utilities.MHQInternationalization.getTextAt;
 
@@ -74,7 +72,6 @@ import megamek.client.ui.comboBoxes.MMComboBox;
 import megamek.codeUtilities.ObjectUtility;
 import megamek.common.annotations.Nullable;
 import megamek.common.containers.MunitionTree;
-import megamek.common.enums.Gender;
 import megamek.common.event.Subscribe;
 import megamek.common.game.Game;
 import megamek.common.options.OptionsConstants;
@@ -109,12 +106,21 @@ import mekhq.campaign.events.scenarios.ScenarioResolvedEvent;
 import mekhq.campaign.force.CombatTeam;
 import mekhq.campaign.force.Formation;
 import mekhq.campaign.market.personnelMarket.markets.NewPersonnelMarket;
-import mekhq.campaign.mission.*;
+import mekhq.campaign.mission.AtBDynamicScenario;
+import mekhq.campaign.mission.AtBDynamicScenarioFactory;
+import mekhq.campaign.mission.AtBScenario;
+import mekhq.campaign.mission.BotForce;
+import mekhq.campaign.mission.Scenario;
+import mekhq.campaign.mission.ScenarioForceTemplate;
+import mekhq.campaign.mission.ScenarioObjective;
+import mekhq.campaign.mission.ScenarioTemplate;
 import mekhq.campaign.mission.camOpsSalvage.CamOpsSalvageUtilities;
 import mekhq.campaign.mission.camOpsSalvage.SalvageFormationData;
 import mekhq.campaign.mission.camOpsSalvage.SalvageTechData;
 import mekhq.campaign.mission.enums.CombatRole;
 import mekhq.campaign.mission.enums.MissionStatus;
+import mekhq.campaign.mission.newContract.AbstractContract;
+import mekhq.campaign.mission.newContract.utilities.ContractEmergencyExtension;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.autoAwards.AutoAwardsController;
 import mekhq.campaign.personnel.enums.PersonnelRole;
@@ -129,17 +135,13 @@ import mekhq.gui.adapter.ScenarioTableMouseAdapter;
 import mekhq.gui.baseComponents.immersiveDialogs.ImmersiveDialogNotification;
 import mekhq.gui.baseComponents.immersiveDialogs.ImmersiveDialogSimple;
 import mekhq.gui.dialog.CompleteMissionDialog;
-import mekhq.gui.dialog.CustomizeAtBContractDialog;
-import mekhq.gui.dialog.CustomizeMissionDialog;
 import mekhq.gui.dialog.CustomizeScenarioDialog;
-import mekhq.gui.dialog.MissionTypeDialog;
-import mekhq.gui.dialog.NewAtBContractDialog;
-import mekhq.gui.dialog.NewContractDialog;
 import mekhq.gui.dialog.RetirementDefectionDialog;
 import mekhq.gui.dialog.camOpsSalvage.SalvageFormationPicker;
 import mekhq.gui.dialog.camOpsSalvage.SalvageTechPicker;
 import mekhq.gui.dialog.factionStanding.manualMissionDialogs.ManualMissionDialog;
 import mekhq.gui.dialog.factionStanding.manualMissionDialogs.SimulateMissionDialog;
+import mekhq.gui.dialog.markets.contractMarket.ContractEditorDialog;
 import mekhq.gui.enums.MHQTabType;
 import mekhq.gui.model.ScenarioTableModel;
 import mekhq.gui.panels.TutorialHyperlinkPanel;
@@ -171,7 +173,7 @@ public final class BriefingTab extends CampaignGuiTab {
     private LanceAssignmentView panLanceAssignment;
     private JTabbedPane scenarioWorkTabs;
     private JTable scenarioTable;
-    private MMComboBox<Mission> comboMission;
+    private MMComboBox<AbstractContract> comboMission;
     private MMComboBox<ScenarioQueueFilter> scenarioFilter;
     private JScrollPane scrollMissionView;
     private JScrollPane scrollScenarioView;
@@ -277,11 +279,6 @@ public final class BriefingTab extends CampaignGuiTab {
         gridBagConstraints.weighty = 0.0;
         panMission.add(panMissionButtons, gridBagConstraints);
 
-        JButton btnAddMission = new JButton(getTextAt(RESOURCE_BUNDLE, "btnAddMission.text"));
-        btnAddMission.setToolTipText(getTextAt(RESOURCE_BUNDLE, "btnAddMission.toolTipText"));
-        btnAddMission.addActionListener(ev -> addMission());
-        panMissionButtons.add(btnAddMission);
-
         btnAddScenario = new JButton(getTextAt(RESOURCE_BUNDLE, "btnAddScenario.text"));
         btnAddScenario.setToolTipText(getTextAt(RESOURCE_BUNDLE, "btnAddScenario.toolTipText"));
         btnAddScenario.addActionListener(ev -> addScenario());
@@ -308,8 +305,7 @@ public final class BriefingTab extends CampaignGuiTab {
         btnGMGenerateScenarios.setName("btnGMGenerateScenarios");
         btnGMGenerateScenarios.addActionListener(ev -> gmGenerateScenarios());
         panMissionButtons.add(btnGMGenerateScenarios);
-        styleSecondaryButtons(btnAddMission,
-              btnAddScenario,
+        styleSecondaryButtons(btnAddScenario,
               btnEditMission,
               btnCompleteMission,
               btnGMGenerateScenarios);
@@ -758,10 +754,8 @@ public final class BriefingTab extends CampaignGuiTab {
     }
 
     private boolean isStratConScenario(Scenario scenario) {
-        Mission mission = getCampaign().getMission(scenario.getMissionId());
-        return (scenario instanceof AtBDynamicScenario) &&
-                     (mission instanceof AtBContract contract) &&
-                     (contract.getStratConCampaignState() != null);
+        AbstractContract mission = getCampaign().getContract(scenario.getMissionId());
+        return mission.getStratConCampaignState() != null;
     }
 
     private void deploySelectedScenario() {
@@ -774,46 +768,19 @@ public final class BriefingTab extends CampaignGuiTab {
               tab -> MaplessStratCon.deployWithoutMap(tab.getStratconPanel(), getCampaign(), scenario));
     }
 
-    private void addMission() {
-        MissionTypeDialog mtd = new MissionTypeDialog(getFrame(), true);
-        mtd.setVisible(true);
-        if (mtd.isContract()) {
-            NewContractDialog ncd = getCampaignOptions().isUseStratCon() ?
-                                          new NewAtBContractDialog(getFrame(), true, getCampaign()) :
-                                          new NewContractDialog(getFrame(), true, getCampaign());
-            ncd.setVisible(true);
-            comboMission.setSelectedItem(ncd.getContract());
-        }
-        if (mtd.isMission()) {
-            CustomizeMissionDialog cmd = new CustomizeMissionDialog(getFrame(), true, null, getCampaign());
-            cmd.setVisible(true);
-            comboMission.setSelectedItem(cmd.getMission());
-        }
-    }
-
     private void editMission() {
-        final Mission mission = comboMission.getSelectedItem();
+        final AbstractContract mission = comboMission.getSelectedItem();
         if (mission == null) {
             return;
         }
 
-        if (getCampaignOptions().isUseStratCon() && (mission instanceof AtBContract)) {
-            CustomizeAtBContractDialog cmd = new CustomizeAtBContractDialog(getFrame(),
-                  true,
-                  (AtBContract) mission,
-                  getCampaign());
-            cmd.setVisible(true);
-            comboMission.setSelectedItem(cmd.getAtBContract());
-        } else {
-            CustomizeMissionDialog cmd = new CustomizeMissionDialog(getFrame(), true, mission, getCampaign());
-            cmd.setVisible(true);
-            comboMission.setSelectedItem(cmd.getMission());
-        }
+        new ContractEditorDialog(getCampaign(), mission);
+
         MekHQ.triggerEvent(new MissionChangedEvent(mission));
     }
 
     private void completeMission() {
-        final Mission mission = comboMission.getSelectedItem();
+        final AbstractContract mission = comboMission.getSelectedItem();
 
         if (mission == null) {
             return;
@@ -840,8 +807,8 @@ public final class BriefingTab extends CampaignGuiTab {
             return;
         }
 
-        if (campaignOptions.isUseStratCon() && (mission instanceof AtBContract)) {
-            if (((AtBContract) mission).contractExtended(getCampaign())) {
+        if (campaignOptions.isUseStratCon()) { // TODO make contract extension a campaign option
+            if (ContractEmergencyExtension.contractExtended(getCampaign(), mission)) {
                 return;
             }
         }
@@ -861,14 +828,13 @@ public final class BriefingTab extends CampaignGuiTab {
                                            .getPersonnelFilteringOutDepartedAndAbsent();
             ChaosReputation.processContractCompletion(getCampaign(), status, personnel);
 
-            if (mission instanceof AtBContract contract &&
-                      Objects.equals(contract.getEmployerCode(), PIRATE_FACTION_CODE)) {
+            if (mission.getEmployerFactionCode() == PIRATE_FACTION_CODE) {
                 ChaosReputation.resolveActOfPiracy(getCampaign(),
                       personnel,
-                      contract.getRequiredCombatTeams(),
-                      contract.getScenarios(),
+                      mission.getScale(),
+                      mission.getScenarios(),
                       status.isOverallSuccess(),
-                      contract.getName());
+                      mission.getName());
             }
         }
 
@@ -897,7 +863,7 @@ public final class BriefingTab extends CampaignGuiTab {
         List<Person> POWPersonnel = getCampaign().getPlayerForce().getHumanResources().getFriendlyPrisoners();
 
         // We only resolve prisoners if there are no active Missions
-        if (getCampaign().getActiveMissions(false).isEmpty()) {
+        if (getCampaign().getActiveContracts().isEmpty()) {
             if (!getCampaign().getPlayerForce().getHumanResources().getFriendlyPrisoners().isEmpty()) {
                 prisoners.handlePrisoners(wasOverallSuccess, true);
             }
@@ -958,10 +924,6 @@ public final class BriefingTab extends CampaignGuiTab {
             }
         }
 
-        if (campaignOptions.isUseStratCon() && (mission instanceof AtBContract)) {
-            getCampaign().getContractMarket().checkForFollowup(getCampaign(), (AtBContract) mission);
-        }
-
         // prompt autoAwards ceremony
         if (campaignOptions.isEnableAutoAwards()) {
             AutoAwardsController autoAwardsController = new AutoAwardsController();
@@ -981,27 +943,9 @@ public final class BriefingTab extends CampaignGuiTab {
 
             double regardMultiplier = campaignOptions.getRegardMultiplier();
 
-            if (mission instanceof AtBContract contract) {
-                Faction employer = contract.getEmployerFaction();
-                reports = factionStandings.processContractCompletion(getCampaign().getFaction(), employer, today,
-                      status, regardMultiplier, contract.getLengthInMonths());
-            } else {
-                SimulateMissionDialog dialog = getSimulateMissionDialog(mission, status);
-
-                Faction employerChoice = dialog.getEmployerChoice();
-                Faction enemyChoice = dialog.getEnemyChoice();
-                MissionStatus statusChoice = dialog.getStatusChoice();
-                int durationChoice = dialog.getDurationChoice();
-
-                reports.addAll(handleFactionRegardUpdates(getCampaign().getFaction(), employerChoice, enemyChoice,
-                      statusChoice, today, factionStandings, regardMultiplier, durationChoice));
-            }
-
-            for (String report : reports) {
-                if (report != null && !report.isBlank()) {
-                    getCampaign().addReport(POLITICS, report);
-                }
-            }
+            Faction employer = mission.getEmployerFaction();
+            reports = factionStandings.processContractCompletion(getCampaign().getFaction(), employer, today,
+                  status, regardMultiplier, mission.getLengthInMonths());
         }
 
         // Refresh personnel market if it was previously disabled
@@ -1012,7 +956,7 @@ public final class BriefingTab extends CampaignGuiTab {
         }
 
         // Undeploy forces & units
-        boolean isCadreDuty = mission instanceof AtBContract && ((AtBContract) mission).getContractType().isCadreDuty();
+        boolean isCadreDuty = mission.getObjectiveType().isCadreDuty();
         boolean hadCadreForces = false;
         for (Formation formation : getCampaign().getPlayerForce().getAllFormations()) {
             if (isCadreDuty && formation.getCombatRoleInMemory().isCadre()) {
@@ -1053,21 +997,17 @@ public final class BriefingTab extends CampaignGuiTab {
             scenario.setStatus(DRAW);
         }
 
-        if (mission instanceof AtBContract contract) {
-            if (contract.getEmployerCode().equals(PIRATE_FACTION_CODE)) {
-                // CamOps 'other crimes' value
-                Campaign campaign = getCampaign();
-                campaign.getPlayerForce().changeCrimePirateModifier(10);
-            }
+        if (mission.getEmployerFactionCode().equals(PIRATE_FACTION_CODE)) {
+            // CamOps 'other crimes' value
+            Campaign campaign = getCampaign();
+            campaign.getPlayerForce().changeCrimePirateModifier(10);
         }
 
         // Clear out any old StratCon campaign data (it's not going to be used, moving forward). We do this near the
         // end to ensure there isn't any risk of us accidentally killing the data when it's still required.
-        if (mission instanceof AtBContract contract) {
-            contract.setStratConCampaignState(null);
-        }
+        mission.setStratConCampaignState(null);
 
-        final List<Mission> missions = getCampaign().getSortedMissions();
+        final List<AbstractContract> missions = getCampaign().getSortedContracts();
         comboMission.setSelectedItem(missions.isEmpty() ? null : missions.getFirst());
     }
 
@@ -1092,10 +1032,8 @@ public final class BriefingTab extends CampaignGuiTab {
      * @author Illiani
      * @since 0.50.07
      */
-    private SimulateMissionDialog getSimulateMissionDialog(Mission mission, MissionStatus status) {
-        LocalDate startDate = mission instanceof Contract
-                                    ? ((Contract) mission).getStartDate()
-                                    : null;
+    private SimulateMissionDialog getSimulateMissionDialog(AbstractContract mission, MissionStatus status) {
+        LocalDate startDate = mission.getStartDate();
         LocalDate today = getCampaign().getLocalDate();
         if (startDate == null) {
             startDate = today;
@@ -1127,15 +1065,13 @@ public final class BriefingTab extends CampaignGuiTab {
      *
      * @return The XP award for completing the mission.
      */
-    private int getMissionXpAward(MissionStatus missionStatus, Mission mission) {
+    private int getMissionXpAward(MissionStatus missionStatus, AbstractContract mission) {
         return switch (missionStatus) {
             case FAILED, BREACH -> getCampaignOptions().getMissionXpFail();
             case SUCCESS, PARTIAL -> {
-                if ((getCampaignOptions().isUseStratCon()) &&
-                          (mission instanceof AtBContract)) {
-                    StratConCampaignState stratConCampaignState = ((AtBContract) mission).getStratConCampaignState();
-
-                    if (stratConCampaignState == null || stratConCampaignState.getVictoryPoints() < 3) {
+                StratConCampaignState stratConCampaignState = mission.getStratConCampaignState();
+                if (stratConCampaignState != null) {
+                    if (stratConCampaignState.getVictoryPoints() < 3) {
                         yield getCampaignOptions().getMissionXpSuccess();
                     } else {
                         yield getCampaignOptions().getMissionXpOutstandingSuccess();
@@ -1149,7 +1085,7 @@ public final class BriefingTab extends CampaignGuiTab {
     }
 
     private void deleteMission() {
-        final Mission mission = comboMission.getSelectedItem();
+        final AbstractContract mission = comboMission.getSelectedItem();
         if (mission == null) {
             logger.error("Cannot remove null mission");
             return;
@@ -1173,7 +1109,7 @@ public final class BriefingTab extends CampaignGuiTab {
         }
 
         getCampaign().removeMission(mission);
-        final List<Mission> missions = getCampaign().getSortedMissions();
+        final List<AbstractContract> missions = getCampaign().getSortedContracts();
         comboMission.setSelectedItem(missions.isEmpty() ? null : missions.getFirst());
         MekHQ.triggerEvent(new MissionRemovedEvent(mission));
     }
@@ -1195,13 +1131,11 @@ public final class BriefingTab extends CampaignGuiTab {
             return;
         }
 
-        if (comboMission.getSelectedItem() instanceof AtBContract contract) {
-            StratConCampaignState campaignState = contract.getStratConCampaignState();
-            if (campaignState != null) {
-                generateDailyScenariosForTrack(getCampaign(), campaignState, contract, 1);
-                this.refreshAll(); // We need to refresh otherwise the scenario won't show up in the GUI
-                return;
-            }
+        StratConCampaignState campaignState = comboMission.getSelectedItem().getStratConCampaignState();
+        if (campaignState != null) {
+            generateDailyScenariosForTrack(getCampaign(), campaignState, comboMission.getSelectedItem(), 1);
+            this.refreshAll(); // We need to refresh otherwise the scenario won't show up in the GUI
+            return;
         }
 
         JOptionPane.showMessageDialog(this,
@@ -1211,7 +1145,7 @@ public final class BriefingTab extends CampaignGuiTab {
     }
 
     private void addScenario() {
-        final Mission mission = comboMission.getSelectedItem();
+        final AbstractContract mission = comboMission.getSelectedItem();
         if (mission == null) {
             return;
         }
@@ -1237,7 +1171,7 @@ public final class BriefingTab extends CampaignGuiTab {
 
             // This handles StratCon undeployment
             if (scenario instanceof AtBScenario) {
-                AtBContract contract = ((AtBScenario) scenario).getContract(getCampaign());
+                AbstractContract contract = ((AtBScenario) scenario).getContract(getCampaign());
                 StratConScenario stratConScenario = ((AtBScenario) scenario).getStratconScenario(contract,
                       (AtBScenario) scenario);
 
@@ -1389,12 +1323,11 @@ public final class BriefingTab extends CampaignGuiTab {
      * @author Illiani
      * @since 0.50.10
      */
-    private boolean isHasSalvageOpportunity(int missionId) {
+    private boolean isHasSalvageOpportunity(UUID missionId) {
         boolean hasSalvageOpportunity = true;
-        Mission mission = getCampaign().getMission(missionId);
-        if (mission instanceof Contract contract) {
-            hasSalvageOpportunity = contract.canSalvage();
-        }
+        AbstractContract mission = getCampaign().getContract(missionId);
+        hasSalvageOpportunity = mission.canSalvage();
+
         return hasSalvageOpportunity;
     }
 
@@ -1633,7 +1566,7 @@ public final class BriefingTab extends CampaignGuiTab {
         List<SalvageFormationData> salvageFormationOptions = new ArrayList<>();
 
         // Collect eligible salvage forces (We want salvage forces first)
-        List<AtBContract> activeContracts = getCampaign().getActiveAtBContracts();
+        List<AbstractContract> activeContracts = getCampaign().getActiveContracts();
         LocalHangar hangar = campaign.getPlayerForce().getHangar();
         List<Formation> eligibleSalvageFormations = new ArrayList<>();
         for (Formation formation : getCampaign().getPlayerForce().getAllFormations()) {
@@ -1754,24 +1687,15 @@ public final class BriefingTab extends CampaignGuiTab {
 
         description = briefingBody.toString();
 
-        Mission mission = null;
-        if (scenario.getMissionId() != -1) {
-            mission = getCampaign().getMission(scenario.getMissionId());
+        AbstractContract mission = null;
+        if (scenario.getMissionId() != null) {
+            mission = getCampaign().getContract(scenario.getMissionId());
         }
         if (mission == null) {
             mission = comboMission.getSelectedItem();
         }
 
-        Person speaker;
-        if (mission instanceof AtBContract contract) {
-            speaker = contract.getEmployerLiaison();
-        } else {
-            // If we're not working with an AtBContract we have to generate the liaison each time
-            Campaign campaign = getCampaign();
-            speaker = campaign.getPlayerForce()
-                            .getHumanResources()
-                            .newPerson(campaign, PersonnelRole.ADMINISTRATOR_COMMAND, "MERC", Gender.RANDOMIZE);
-        }
+        Person speaker = mission.getEmployerLiaison();
 
         List<Person> forceCommanders = new ArrayList<>();
         for (Formation formation : getCampaign().getPlayerForce().getAllFormations()) {
@@ -2108,7 +2032,7 @@ public final class BriefingTab extends CampaignGuiTab {
                 autoconfigureBotMunitions(atBScenario, chosen);
             }
 
-            AtBContract contract = atBScenario.getContract(getCampaign());
+            AbstractContract contract = atBScenario.getContract(getCampaign());
             configureBotAI(atBScenario, contract, getCampaign().getLocalDate());
         }
 
@@ -2143,10 +2067,10 @@ public final class BriefingTab extends CampaignGuiTab {
      * <p><b>Note:</b> Significantly overhauled during the 51.0 dev cycle.</p>
      *
      * @param scenario the {@link AtBScenario} whose bot forces will be configured
-     * @param contract the {@link AtBContract} providing employer and planet-owner context
+     * @param contract the {@link AbstractContract} providing employer and planet-owner context
      * @param today    the current campaign date, used to resolve the planet owner's faction and alignment
      */
-    private void configureBotAI(AtBScenario scenario, AtBContract contract, LocalDate today) {
+    private void configureBotAI(AtBScenario scenario, AbstractContract contract, LocalDate today) {
         Faction enemyFaction = getEnemyFactionFromScenario(scenario);
         Faction employerFaction = getAlliedFactionFromScenario(scenario);
 
@@ -2189,7 +2113,7 @@ public final class BriefingTab extends CampaignGuiTab {
      * @author Illiani
      * @since 0.51.0
      */
-    private boolean resolvePlanetOwnerIsPirate(AtBContract contract, LocalDate today,
+    private boolean resolvePlanetOwnerIsPirate(AbstractContract contract, LocalDate today,
           boolean isEmployerPirate, boolean isEnemyPirate) {
         String factionCode = getPlanetOwnerFaction(contract, today);
         ScenarioForceTemplate.ForceAlignment alignment = getPlanetOwnerAlignment(contract, factionCode, today);
@@ -2205,22 +2129,20 @@ public final class BriefingTab extends CampaignGuiTab {
      * @return the enemy faction
      */
     private Faction getEnemyFactionFromScenario(Scenario scenario) {
-        Mission mission = null;
-        if (scenario.getMissionId() != -1) {
-            mission = getCampaign().getMission(scenario.getMissionId());
+        AbstractContract mission = null;
+        if (scenario.getMissionId() != null) {
+            mission = getCampaign().getContract(scenario.getMissionId());
         }
         if (mission == null) {
             mission = comboMission.getSelectedItem();
         }
         String opForFactionCode = "IS";
         Faction enemy;
-        if (mission instanceof AtBContract atBContract) {
-            enemy = atBContract.getEnemy();
-            if (enemy != null) {
-                return atBContract.getEnemy();
-            }
-            opForFactionCode = atBContract.getEnemyCode().isBlank() ? opForFactionCode : atBContract.getEnemyCode();
+        enemy = mission.getEnemyFaction();
+        if (enemy != null) {
+            return mission.getEnemyFaction();
         }
+        opForFactionCode = mission.getEnemyFactionCode().isBlank() ? opForFactionCode : mission.getEnemyFactionCode();
         enemy = Factions.getInstance().getFaction(opForFactionCode);
         return enemy;
     }
@@ -2233,23 +2155,20 @@ public final class BriefingTab extends CampaignGuiTab {
      * @return the employer faction
      */
     private Faction getAlliedFactionFromScenario(Scenario scenario) {
-        Mission mission = null;
-        if (scenario.getMissionId() != -1) {
-            mission = getCampaign().getMission(scenario.getMissionId());
+        AbstractContract mission = null;
+        if (scenario.getMissionId() != null) {
+            mission = getCampaign().getContract(scenario.getMissionId());
         }
         if (mission == null) {
             mission = comboMission.getSelectedItem();
         }
         String allyFactionCode = MERCENARY_FACTION_CODE;
-        Faction employerFaction;
-        if (mission instanceof AtBContract atBContract) {
-            employerFaction = atBContract.getEmployerFaction();
-            if (employerFaction != null) {
-                return employerFaction;
-            }
-            String employerCode = atBContract.getEmployerCode();
-            allyFactionCode = employerCode.isBlank() ? allyFactionCode : employerCode;
+        Faction employerFaction = mission.getEmployerFaction();
+        if (employerFaction != null) {
+            return employerFaction;
         }
+        String employerCode = mission.getEmployerFactionCode();
+        allyFactionCode = employerCode.isBlank() ? allyFactionCode : employerCode;
         employerFaction = Factions.getInstance().getFaction(allyFactionCode);
         return employerFaction;
     }
@@ -2274,15 +2193,13 @@ public final class BriefingTab extends CampaignGuiTab {
         int allowedYear = cGame.getOptions().intOption(OptionsConstants.ALLOWED_YEAR);
 
         // This had better be an AtB contract...
-        final Mission mission = comboMission.getSelectedItem();
-        if (mission instanceof AtBContract atbContract) {
-            opForFactionCode = (atbContract.getEnemyCode().isBlank()) ? opForFactionCode : atbContract.getEnemyCode();
-            opForQuality = atbContract.getEnemyQuality();
-            allyFactionCodes.add(atbContract.getEmployerCode());
-            allyFaction = atbContract.getEmployerName(allowedYear);
-        } else {
-            allyFactionCodes.add(allyFaction);
-        }
+        final AbstractContract mission = comboMission.getSelectedItem();
+
+        opForFactionCode = (mission.getEnemyFactionCode().isBlank()) ? opForFactionCode : mission.getEnemyFactionCode();
+        opForQuality = mission.getEnemyEquipmentRating();
+        allyFactionCodes.add(mission.getEmployerFactionCode());
+        allyFaction = mission.getEmployerDisplayName();
+
         Faction opforFaction = Factions.getInstance().getFaction(opForFactionCode);
         opForFactionCodes.add(opForFactionCode);
         boolean isPirate = opforFaction.isRebelOrPirate();
@@ -2462,14 +2379,13 @@ public final class BriefingTab extends CampaignGuiTab {
             logger.error("", ex);
         }
 
-        final Mission mission = comboMission.getSelectedItem();
-        if ((mission instanceof AtBContract) &&
-                  (scenario instanceof AtBScenario) &&
+        final AbstractContract mission = comboMission.getSelectedItem();
+        if ((scenario instanceof AtBScenario) &&
                   !((AtBScenario) scenario).getAlliesPlayer().isEmpty()) {
             // Export allies
             chosen.clear();
             chosen.addAll(((AtBScenario) scenario).getAlliesPlayer());
-            file = determineMULFilePath(scenario, ((AtBContract) mission).getEmployerName());
+            file = determineMULFilePath(scenario, mission.getEmployerDisplayName());
 
             int genericBattleValue = calculateGenericBattleValue(chosen);
 
@@ -2543,8 +2459,8 @@ public final class BriefingTab extends CampaignGuiTab {
 
     public void refreshMissions() {
         comboMission.removeAllItems();
-        final List<Mission> missions = getCampaign().getSortedMissions();
-        for (final Mission mission : missions) {
+        final List<AbstractContract> missions = getCampaign().getSortedContracts();
+        for (final AbstractContract mission : missions) {
             comboMission.addItem(mission);
         }
 
@@ -2675,7 +2591,7 @@ public final class BriefingTab extends CampaignGuiTab {
     }
 
     public void changeMission() {
-        final Mission mission = comboMission.getSelectedItem();
+        final AbstractContract mission = comboMission.getSelectedItem();
         if (mission == null) {
             scrollMissionView.setViewportView(null);
             missionViewPanel = null;
@@ -2705,7 +2621,7 @@ public final class BriefingTab extends CampaignGuiTab {
         int scenarioSelection = getSelectedScenarioId(scenarioTable, scenarioModel);
         ScenarioQueueFilter selectedFilter = getSelectedScenarioFilter(scenarioFilter,
               ScenarioQueueFilter.ALL);
-        final Mission mission = comboMission.getSelectedItem();
+        final AbstractContract mission = comboMission.getSelectedItem();
         List<Scenario> visibleScenarios = (mission == null) ? new ArrayList<>() : mission.getVisibleScenarios();
 
         List<Scenario> filteredScenarios = new ArrayList<>();
@@ -2756,11 +2672,11 @@ public final class BriefingTab extends CampaignGuiTab {
      * @since 0.50.05
      */
     public void focusOnScenario(int targetId) {
-        Mission targetMission = null;
+        AbstractContract targetMission = null;
         Scenario targetScenario = null;
 
         // First find the mission and scenario
-        for (Mission mission : getCampaign().getMissions()) {
+        for (AbstractContract mission : getCampaign().getContractHistoryAsMap().values()) {
             for (Scenario scenario : mission.getScenarios()) {
                 if (scenario.getId() == targetId) {
                     targetMission = mission;
@@ -2818,8 +2734,8 @@ public final class BriefingTab extends CampaignGuiTab {
      * @author Illiani
      * @since 0.50.05
      */
-    public void focusOnMission(int targetId) {
-        Mission mission = getCampaign().getMission(targetId);
+    public void focusOnMission(UUID targetId) {
+        AbstractContract mission = getCampaign().getContract(targetId);
 
         if (mission == null) {
             return;
@@ -2846,7 +2762,7 @@ public final class BriefingTab extends CampaignGuiTab {
 
     @Subscribe
     public void handle(ScenarioChangedEvent evt) {
-        final Mission mission = comboMission.getSelectedItem();
+        final AbstractContract mission = comboMission.getSelectedItem();
         if ((evt.getScenario() != null) &&
                   (evt.getScenario().getMissionId() == (mission == null ? -1 : mission.getId()))) {
             scenarioTable.repaint();
@@ -2908,7 +2824,7 @@ public final class BriefingTab extends CampaignGuiTab {
 
     @Subscribe
     public void handle(MissionChangedEvent evt) {
-        final Mission mission = comboMission.getSelectedItem();
+        final AbstractContract mission = comboMission.getSelectedItem();
         if ((mission != null) && (evt.getMission().getId() == mission.getId())) {
             changeMission();
         }

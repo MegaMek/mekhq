@@ -47,6 +47,8 @@ import java.awt.Rectangle;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+import java.util.UUID;
 import javax.swing.*;
 
 import megamek.client.ui.comboBoxes.MMComboBox;
@@ -56,14 +58,12 @@ import megamek.common.ui.FastJScrollPane;
 import megamek.logging.MMLogger;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
-import mekhq.campaign.campaignOptions.CampaignOptions;
-import mekhq.campaign.force.Detachment;
-import mekhq.campaign.force.PlayerForce;
 import mekhq.campaign.mission.newContract.AbstractContract;
-import mekhq.campaign.mission.newContract.contractGeneration.AbstractContractGeneration;
+import mekhq.campaign.mission.newContract.ContractMarket;
+import mekhq.campaign.mission.newContract.contractGeneration.ChaosContractMarketAvailability;
 import mekhq.campaign.mission.newContract.contractGeneration.ContractSearchType;
+import mekhq.campaign.mission.newContract.utilities.ContractAcceptance;
 import mekhq.campaign.universe.Faction;
-import mekhq.campaign.universe.factionStanding.FactionStandings;
 import mekhq.gui.baseComponents.roundedComponents.RoundedJButton;
 import mekhq.gui.baseComponents.roundedComponents.RoundedLineBorder;
 
@@ -82,12 +82,12 @@ public class ChaosContractMarketDialog extends JDialog implements ContractMarket
     private static final Dimension MINIMUM_SIZE = scaleForGUI(760, 620);
     private static final Dimension DEFAULT_SIZE = scaleForGUI(880, 900);
 
-    private static final int INITIAL_OFFERS = 3;
     private static final int GENERATED_OFFERS_PER_BATCH = 1;
 
     private final transient Campaign campaign;
     private final JFrame parent;
     private final LocalDate currentDate;
+    private final transient ContractMarket contractMarket;
     private final transient List<AbstractContract> contracts;
     private transient ContractSearchType searchType;
 
@@ -97,10 +97,24 @@ public class ChaosContractMarketDialog extends JDialog implements ContractMarket
     private transient AbstractContract acceptedContract;
 
     /**
-     * Constructs and shows the contract market, generating its initial offers with {@link AbstractContractGeneration}.
+     * On-departure automation options the player toggles before accepting an offer. They are fields (not rebuilt with
+     * the button bar) so their state persists across {@link #rebuildContent()} calls; read them via
+     * {@link #isMothballOnDepartureSelected()} and {@link #isTravelToSystemSelected()} when committing the accepted
+     * contract.
+     */
+    private final JCheckBox mothballOnDepartureCheckbox = buildOptionCheckbox("checkbox.contractMarket.mothball",
+          "checkbox.contractMarket.mothball.tooltip");
+    private final JCheckBox travelToSystemCheckbox = buildOptionCheckbox("checkbox.contractMarket.travel",
+          "checkbox.contractMarket.travel.tooltip");
+    /** Only shown (and only meaningful) when the campaign uses StratCon; unticked leaves the contract without one. */
+    private final JCheckBox useStratConCheckbox = buildOptionCheckbox("checkbox.contractMarket.stratcon",
+          "checkbox.contractMarket.stratcon.tooltip");
+
+    /**
+     * Constructs and shows the contract market backed by the player force's {@link ContractMarket}.
      *
-     * <p>This is the convenience entry point used until a persistent contract-market backend exists: it rolls up to
-     * {@link #INITIAL_OFFERS} offers on the spot and hands them to the list constructor.</p>
+     * <p>The board shows the offers stored under the campaign's default {@link ContractSearchType}; switching type in
+     * the header swaps to that type's map (see {@link #loadOffersForSearchType()}).</p>
      *
      * @param campaign the active campaign
      *
@@ -108,25 +122,14 @@ public class ChaosContractMarketDialog extends JDialog implements ContractMarket
      * @since 0.51.01
      */
     public ChaosContractMarketDialog(Campaign campaign) {
-        this(campaign, generateOffers(campaign, INITIAL_OFFERS, false, defaultSearchType(campaign)));
-    }
-
-    /**
-     * Constructs and shows the contract market for the supplied offers.
-     *
-     * @param campaign  the active campaign
-     * @param contracts the offers to display; may be empty (0 offers is a valid, expected state)
-     *
-     * @author Illiani
-     * @since 0.51.01
-     */
-    public ChaosContractMarketDialog(Campaign campaign, List<AbstractContract> contracts) {
         super(campaign.getGUI().getFrame(), true);
         this.campaign = campaign;
         this.parent = campaign.getGUI().getFrame();
         this.currentDate = campaign.getLocalDate();
-        this.contracts = new ArrayList<>(contracts);
+        this.contractMarket = campaign.getPlayerForce().getContractMarket();
         this.searchType = defaultSearchType(campaign);
+        this.contracts = new ArrayList<>();
+        loadOffersForSearchType();
 
         initializeComponents();
     }
@@ -235,26 +238,39 @@ public class ChaosContractMarketDialog extends JDialog implements ContractMarket
     }
 
     /**
-     * Switches the search type and regenerates the board so the visible offers match the newly chosen type. Pirate and
-     * government types currently produce no offers, so the board falls to its empty state until their generation
-     * lands.
+     * Switches the search type and shows that type's offers from the {@link ContractMarket}. Types whose generation is
+     * not yet implemented (pirate, government, tournament) have empty maps, so the board falls to its empty state until
+     * their generation lands.
      *
      * @author Illiani
      * @since 0.51.01
      */
     private void changeSearchType(ContractSearchType newType) {
         searchType = newType;
-        contracts.clear();
-        contracts.addAll(generateOffers(campaign, INITIAL_OFFERS, false, searchType));
+        loadOffersForSearchType();
         rebuildContent();
     }
 
+    /**
+     * Mirrors the active search type's {@link ContractMarket} map into the visible {@link #contracts} list. The market
+     * is populated by the monthly refresh ({@link ChaosContractMarketAvailability#processNewMonth(Campaign)}), so the
+     * dialog only displays whatever offers are currently available - an empty board is a valid state.
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    private void loadOffersForSearchType() {
+        contracts.clear();
+        contracts.addAll(contractMarket.getContracts(searchType).values());
+    }
+
     private String countMessage() {
-        return switch (contracts.size()) {
-            case 0 -> getTextAt(RESOURCE_BUNDLE, "header.contractMarket.count.none");
-            case 1 -> getTextAt(RESOURCE_BUNDLE, "header.contractMarket.count.one");
-            default -> getFormattedTextAt(RESOURCE_BUNDLE, "header.contractMarket.count.many", contracts.size());
-        };
+        int contractCount = contracts.size();
+        if (contractCount == 0) {
+            return getTextAt(RESOURCE_BUNDLE, "header.contractMarket.count.none");
+        }
+
+        return getFormattedTextAt(RESOURCE_BUNDLE, "header.contractMarket.count", contractCount);
     }
 
     /**
@@ -343,21 +359,26 @@ public class ChaosContractMarketDialog extends JDialog implements ContractMarket
     }
 
     /**
-     * Records the accepted offer and closes the market.
-     *
-     * <p>TODO: Wire this into the campaign once a commit-to-active-mission pipeline exists for
-     * {@link AbstractContract}. At present {@link AbstractContract} is a pure data class with no path to becoming an
-     * active mission, so this intentionally only captures the player's choice (retrievable via
-     * {@link #getAcceptedContract()}) and disposes the dialog. The caller is responsible for committing the returned
-     * contract.</p>
+     * Commits the offer to the campaign via {@link ContractAcceptance}, honoring the player's on-departure and StratCon
+     * checkbox choices. If the player cancels at the confirmation nag the market stays open; otherwise the accepted
+     * offer is recorded and the dialog closes.
      *
      * @author Illiani
      * @since 0.51.01
      */
     @Override
     public void accept(AbstractContract contract) {
-        LOGGER.info("Contract accepted from market: {} (pending campaign-commit pipeline)",
-              contract.getContractName());
+        boolean accepted = ContractAcceptance.accept(campaign,
+              contract,
+              searchType,
+              isUseStratConSelected(),
+              isMothballOnDepartureSelected(),
+              isTravelToSystemSelected());
+        if (!accepted) {
+            return;
+        }
+
+        LOGGER.info("Contract accepted from market: {}", contract.getName());
         this.acceptedContract = contract;
         dispose();
     }
@@ -385,17 +406,24 @@ public class ChaosContractMarketDialog extends JDialog implements ContractMarket
      */
     @Override
     public void delete(AbstractContract contract) {
+        contractMarket.removeContract(searchType, contract);
         contracts.remove(contract);
         rebuildContent();
     }
 
     /**
-     * TODO: Open the GM contract editor once one exists for {@link AbstractContract}. For now this only records the
-     * intent.
+     * Opens the GM editor for the offer. If the GM confirms changes, the contract is updated in place, so the dossier
+     * is rebuilt to reflect them.
+     *
+     * @author Illiani
+     * @since 0.51.01
      */
     @Override
     public void edit(AbstractContract contract) {
-        LOGGER.info("GM edit requested for contract: {} (pending contract editor).", contract.getContractName());
+        ContractEditorDialog editor = new ContractEditorDialog(campaign, contract);
+        if (editor.wasConfirmed()) {
+            selectContract(contract);
+        }
     }
 
     /**
@@ -405,6 +433,7 @@ public class ChaosContractMarketDialog extends JDialog implements ContractMarket
      * @since 0.51.01
      */
     private void deleteAllContracts() {
+        contractMarket.getContracts(searchType).clear();
         contracts.clear();
         rebuildContent();
     }
@@ -426,7 +455,12 @@ public class ChaosContractMarketDialog extends JDialog implements ContractMarket
             return;
         }
 
-        contracts.addAll(generated);
+        Map<UUID, AbstractContract> marketOffers = contractMarket.getContracts(searchType);
+        for (AbstractContract contract : generated) {
+            marketOffers.put(contract.getId(), contract);
+        }
+        contracts.clear();
+        contracts.addAll(marketOffers.values());
         rebuildContent();
         selectContract(generated.getFirst());
     }
@@ -438,7 +472,7 @@ public class ChaosContractMarketDialog extends JDialog implements ContractMarket
      * @since 0.51.01
      */
     private List<AbstractContract> generateOfferBatch() {
-        return generateOffers(campaign, GENERATED_OFFERS_PER_BATCH, true, searchType);
+        return ChaosContractMarketAvailability.generateOffers(campaign, GENERATED_OFFERS_PER_BATCH, true, searchType);
     }
 
     /**
@@ -461,7 +495,8 @@ public class ChaosContractMarketDialog extends JDialog implements ContractMarket
 
     /**
      * The search types a campaign may choose between. Mercenary and pirate bands may look for either mercenary or
-     * pirate work; government campaigns are limited to government contracts.
+     * pirate work; government campaigns are limited to government contracts. Tournament circuits are open to every
+     * campaign.
      *
      * @author Illiani
      * @since 0.51.01
@@ -469,55 +504,33 @@ public class ChaosContractMarketDialog extends JDialog implements ContractMarket
     private static List<ContractSearchType> allowedSearchTypes(Campaign campaign) {
         Faction faction = campaign.getPlayerForce().getFaction();
         if (faction.isMercenary() || faction.isPirate()) {
-            return List.of(ContractSearchType.MERCENARY, ContractSearchType.PIRATE);
+            return List.of(ContractSearchType.MERCENARY, ContractSearchType.PIRATE, ContractSearchType.TOURNAMENT);
         }
-        return List.of(ContractSearchType.GOVERNMENT);
+        return List.of(ContractSearchType.GOVERNMENT, ContractSearchType.TOURNAMENT);
     }
 
     /**
-     * Rolls {@code count} contracts from {@link AbstractContractGeneration}, keeping whichever come back valid (a
-     * {@code null} roll - no contract could be placed - is skipped, so the returned list may be shorter or empty).
-     *
-     * @param campaign the active campaign
-     * @param count    how many contracts to attempt to generate
-     * @param isGM     whether to generate in GM mode, bypassing command-circuit and placement gating
+     * Opens the GM editor on a fresh, fully-defaulted contract. If the GM confirms, the new offer is added to the
+     * current search type's market and shown on the board.
      *
      * @author Illiani
      * @since 0.51.01
      */
-    private static List<AbstractContract> generateOffers(Campaign campaign, int count, boolean isGM,
-          ContractSearchType searchType) {
-        CampaignOptions campaignOptions = campaign.getCampaignOptions();
-        LocalDate currentDate = campaign.getLocalDate();
-        PlayerForce playerForce = campaign.getPlayerForce();
-        Detachment detachment = playerForce.getForceDetachment();
-        FactionStandings factionStandings = playerForce.getFactionStandings();
-        boolean isOverridingCommandCircuitRequirements = playerForce.isOverridingCommandCircuitRequirements();
-
-        List<AbstractContract> generated = new ArrayList<>();
-        for (int i = 0; i < count; i++) {
-            AbstractContract contract = AbstractContractGeneration.createContract(campaign,
-                  campaignOptions,
-                  currentDate,
-                  detachment,
-                  0,
-                  searchType,
-                  factionStandings,
-                  isOverridingCommandCircuitRequirements,
-                  isGM);
-            if (contract != null) {
-                generated.add(contract);
-            }
-        }
-        return generated;
-    }
-
-    /**
-     * TODO: Open a GM contract-creation flow and add the result to the board once one exists. For now this only records
-     * the intent.
-     */
     private void createNewContract() {
-        LOGGER.info("GM create-new requested (pending contract-creation flow).");
+        AbstractContract contract = NewContractFactory.createBlank(campaign);
+        ContractEditorDialog editor = new ContractEditorDialog(campaign, contract, searchType);
+        if (!editor.wasConfirmed()) {
+            return;
+        }
+
+        ContractSearchType bucket = editor.getSelectedSearchType();
+        contractMarket.addContract(bucket, contract);
+
+        // Switch the board to the bucket the GM chose so the new offer is visible.
+        searchType = bucket;
+        loadOffersForSearchType();
+        rebuildContent();
+        selectContract(contract);
     }
 
     private JPanel buildEmptyState() {
@@ -544,11 +557,62 @@ public class ChaosContractMarketDialog extends JDialog implements ContractMarket
         return panel;
     }
 
+    /**
+     * Builds a persistent, initially-selected automation checkbox from its label and tooltip resource keys.
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    private static JCheckBox buildOptionCheckbox(String labelKey, String tooltipKey) {
+        JCheckBox checkbox = new JCheckBox(getTextAt(RESOURCE_BUNDLE, labelKey), true);
+        checkbox.setToolTipText(getTextAt(RESOURCE_BUNDLE, tooltipKey));
+        return checkbox;
+    }
+
+    /**
+     * @return {@code true} if the player wants eligible units mothballed on departure when the accepted contract begins
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    public boolean isMothballOnDepartureSelected() {
+        return mothballOnDepartureCheckbox.isSelected();
+    }
+
+    /**
+     * @return {@code true} if the player wants to automatically travel to the contract's system when the accepted
+     *       contract begins
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    public boolean isTravelToSystemSelected() {
+        return travelToSystemCheckbox.isSelected();
+    }
+
+    /**
+     * @return {@code true} if the accepted contract should use StratCon (only meaningful when the campaign uses
+     *       StratCon; when {@code false} the contract keeps a {@code null} StratCon campaign state)
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    public boolean isUseStratConSelected() {
+        return useStratConCheckbox.isSelected();
+    }
+
     private JPanel buildButtonBar() {
         boolean isGM = campaign.isGM();
 
         JPanel bar = new JPanel(new FlowLayout(FlowLayout.CENTER, PADDING, PADDING));
         bar.setBorder(RoundedLineBorder.createRoundedLineBorder());
+
+        bar.add(mothballOnDepartureCheckbox);
+        bar.add(travelToSystemCheckbox);
+        // The StratCon opt-out is only relevant when the campaign is running StratCon at all.
+        if (campaign.getCampaignOptions().isUseStratCon()) {
+            bar.add(useStratConCheckbox);
+        }
 
         RoundedJButton close = new RoundedJButton(getTextAt(RESOURCE_BUNDLE, "button.contractMarket.close"));
         close.addActionListener(e -> dispose());
@@ -577,7 +641,7 @@ public class ChaosContractMarketDialog extends JDialog implements ContractMarket
      * A scroll-pane view that is forced to the viewport's width but keeps its own (taller) height. This lets the
      * dossier reflow narrower when the dialog shrinks while still scrolling vertically when its content is tall.
      */
-    private static class WidthTrackingPanel extends JPanel implements Scrollable {
+    static class WidthTrackingPanel extends JPanel implements Scrollable {
         WidthTrackingPanel(LayoutManager layout) {
             super(layout);
         }

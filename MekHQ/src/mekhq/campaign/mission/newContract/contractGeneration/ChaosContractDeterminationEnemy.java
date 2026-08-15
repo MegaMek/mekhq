@@ -39,10 +39,13 @@ import static mekhq.campaign.universe.Faction.MERCENARY_FACTION_CODE;
 import java.time.LocalDate;
 
 import megamek.common.icons.Camouflage;
+import mekhq.campaign.Campaign;
 import mekhq.campaign.location.ILocation;
 import mekhq.campaign.mission.enums.ContractObjectiveType;
 import mekhq.campaign.mission.newContract.contractData.EnemyData;
+import mekhq.campaign.mission.newContract.contractGeneration.negotiationsAndNPCs.OpposingCommander;
 import mekhq.campaign.mission.newContract.contractGeneration.targetFinder.EnemySelectionProfile;
+import mekhq.campaign.personnel.Person;
 import mekhq.campaign.universe.Faction;
 import mekhq.campaign.universe.RandomFactionGenerator;
 
@@ -56,15 +59,15 @@ public class ChaosContractDeterminationEnemy {
 
     private ChaosContractDeterminationEnemy() {}
 
-    static EnemyData generateEnemyFactionForObjective(ILocation currentLocation, LocalDate currentDate,
-          Faction employerFaction, ContractObjectiveType objectiveType) {
+    public static EnemyData generateEnemyFactionForObjective(Campaign campaign, ILocation currentLocation,
+          LocalDate currentDate, Faction employerFaction, ContractObjectiveType objectiveType) {
         RandomFactionGenerator randomFactionGenerator = RandomFactionGenerator.getInstance();
 
         EnemySelectionProfile enemySelectionProfile = objectiveType.getEnemySelectionProfile();
         Faction enemyFaction = randomFactionGenerator.getRandomEnemy(currentLocation, currentDate, employerFaction,
               enemySelectionProfile);
 
-        return generateEnemyForFaction(enemyFaction, currentDate);
+        return generateEnemyForFaction(campaign, enemyFaction, currentDate);
     }
 
     /**
@@ -78,7 +81,7 @@ public class ChaosContractDeterminationEnemy {
      *
      * @return the enemy data for the given faction
      */
-    static EnemyData generateEnemyForFaction(Faction enemyFaction, LocalDate currentDate) {
+    static EnemyData generateEnemyForFaction(Campaign campaign, Faction enemyFaction, LocalDate currentDate) {
         String factionCode = enemyFaction.getShortName();
 
         String sponsorFactionCode = null;
@@ -92,8 +95,9 @@ public class ChaosContractDeterminationEnemy {
         String displayName = enemyFaction.getFullName(currentYear);
 
         Camouflage camouflage = pickRandomCamouflage(currentYear, factionCode);
+        Person opposingCommander = OpposingCommander.generateOpposingCommander(campaign, enemyFaction);
 
-        return new EnemyData(factionCode, sponsorFactionCode, displayName, camouflage);
+        return new EnemyData(factionCode, sponsorFactionCode, displayName, opposingCommander, camouflage);
     }
 
     private static boolean hasEmployedMercenaries(Faction employerFaction, LocalDate currentDate) {

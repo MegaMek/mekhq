@@ -59,6 +59,7 @@ import mekhq.campaign.force.Formation;
 import mekhq.campaign.mission.ScenarioForceTemplate.ForceAlignment;
 import mekhq.campaign.mission.ScenarioForceTemplate.ForceGenerationMethod;
 import mekhq.campaign.mission.atb.AtBScenarioModifier;
+import mekhq.campaign.mission.newContract.AbstractContract;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.skills.SkillModifierData;
 import mekhq.campaign.personnel.skills.SkillType;
@@ -713,7 +714,7 @@ public class AtBDynamicScenario extends AtBScenario {
      *       parameter isAllied.
      */
     public int getTeamTotalBattleValue(Campaign campaign, boolean isAllied) {
-        AtBContract contract = getContract(campaign);
+        AbstractContract contract = getContract(campaign);
         int totalBattleValue = 0;
 
         for (BotForce botForce : getBotForces()) {

@@ -42,8 +42,8 @@ import mekhq.campaign.JumpPath;
 import mekhq.campaign.chaosCampaign.ChaosCampaignUtilities;
 import mekhq.campaign.finances.Money;
 import mekhq.campaign.mission.newContract.AbstractContract;
-import mekhq.campaign.mission.newContract.ContractUtilities;
 import mekhq.campaign.mission.newContract.contractData.ContractFinanceData;
+import mekhq.campaign.mission.newContract.utilities.ContractUtilities;
 import mekhq.campaign.universe.PlanetarySystem;
 import org.jspecify.annotations.NonNull;
 

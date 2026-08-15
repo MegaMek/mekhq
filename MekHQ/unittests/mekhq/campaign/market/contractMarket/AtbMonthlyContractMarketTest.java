@@ -172,7 +172,7 @@ class AtbMonthlyContractMarketTest {
             when(campaign.getAccountant()).thenReturn(accountant);
             when(campaign.getPlayerForce().getHangar()).thenReturn(hangar);
             when(campaign.getCurrentSystem()).thenReturn(currentSystem);
-            when(campaign.getFutureAtBContracts()).thenReturn(List.of());
+            when(campaign.getFutureContracts()).thenReturn(List.of());
         }
 
         private void setupFactions() {

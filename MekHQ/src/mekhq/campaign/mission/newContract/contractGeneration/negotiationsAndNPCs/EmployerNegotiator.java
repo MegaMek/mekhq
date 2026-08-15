@@ -132,7 +132,9 @@ public class EmployerNegotiator {
 
         return switch (campaignType) {
             case PIRATE -> PIRATE_NEGOTIATOR_ROLE;
-            case MERCENARY -> getMercenaryNegotiatorType(hiringHallLevel, employerIsClan);
+            // TOURNAMENT contacts (arena games organizers) reuse the mercenary-hall broker role until dedicated
+            // tournament generation lands.
+            case MERCENARY, TOURNAMENT -> getMercenaryNegotiatorType(hiringHallLevel, employerIsClan);
             case GOVERNMENT -> employerIsClan ? GOVERNMENT_NEGOTIATOR_CLAN : GOVERNMENT_NEGOTIATOR_NORMAL;
         };
     }

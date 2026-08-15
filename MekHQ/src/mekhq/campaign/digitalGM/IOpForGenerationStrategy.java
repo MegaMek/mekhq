@@ -34,8 +34,8 @@ package mekhq.campaign.digitalGM;
 
 import mekhq.campaign.Campaign;
 import mekhq.campaign.digitalGM.stratCon.gm.AbstractStratConGM;
-import mekhq.campaign.mission.AtBContract;
 import mekhq.campaign.mission.AtBDynamicScenario;
+import mekhq.campaign.mission.newContract.AbstractContract;
 
 /**
  * Strategy for generating the opposing force (OpFor) of a scenario &mdash; <i>what you fight</i>, as opposed to
@@ -60,5 +60,5 @@ public interface IOpForGenerationStrategy {
      * @param contract        the contract the scenario belongs to
      * @param campaign        the active campaign
      */
-    void generateOpFor(AtBDynamicScenario backingScenario, AtBContract contract, Campaign campaign);
+    void generateOpFor(AtBDynamicScenario backingScenario, AbstractContract contract, Campaign campaign);
 }

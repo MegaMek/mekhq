@@ -947,7 +947,7 @@ public class CampaignOptionsPane extends JPanel {
                   campaign.getPlayerForce().getFaction(),
                   campaign.getLocalDate(),
                   campaign.getPlayerForce().getFactionStandings(),
-                  campaign.getMissions(),
+                  campaign.getContractHistoryAsMap().values(),
                   newIsTrackFactionStandings,
                   campaign.getCampaignOptions().get(CampaignOption.REGARD_MULTIPLIER));
 

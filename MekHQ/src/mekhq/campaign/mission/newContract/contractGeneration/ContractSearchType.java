@@ -42,5 +42,7 @@ public enum ContractSearchType {
     /** A pirate band, which selects a victim faction rather than a conventional employer. */
     PIRATE,
     /** A government faction (any campaign faction that is neither mercenary nor pirate). */
-    GOVERNMENT
+    GOVERNMENT,
+    /** An arena tournament circuit (e.g. the Solaris VII games), whose bouts are drawn from a dedicated pool. */
+    TOURNAMENT
 }

@@ -58,8 +58,8 @@ import megamek.logging.MMLogger;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.mission.AtBContract;
-import mekhq.campaign.mission.enums.ContractObjectiveType;
 import mekhq.campaign.mission.enums.ContractMoraleLevel;
+import mekhq.campaign.mission.enums.ContractObjectiveType;
 import mekhq.campaign.universe.Factions;
 import mekhq.campaign.universe.PlanetarySystem;
 import mekhq.campaign.universe.RandomFactionGenerator;
@@ -210,7 +210,7 @@ public class CustomizeAtBContractDialog extends JDialog {
         JLabel lblRequiredCombatTeams = new JLabel();
         JLabel lblRequiredElements = new JLabel();
 
-        int requiredCombatTeams = contract.getRequiredCombatTeams() > 0 ? contract.getRequiredCombatTeams() : 1;
+        int requiredCombatTeams = contract.getScale() > 0 ? contract.getScale() : 1;
         spnRequiredCombatTeams = new JSpinner(new SpinnerNumberModel(requiredCombatTeams, 1, null, 1));
 
         int requiredElements = contract.getRequiredCombatElements() > 0 ? contract.getRequiredCombatElements() : 1;
@@ -332,7 +332,7 @@ public class CustomizeAtBContractDialog extends JDialog {
         gbc.insets = new Insets(5, 5, 5, 5);
         leftPanel.add(lblType, gbc);
 
-        comboContractType.setSelectedItem(contract.getContractType());
+        comboContractType.setSelectedItem(contract.getObjectiveType());
         gbc.gridx = 1;
         gbc.gridy = y++;
         gbc.gridwidth = 2;

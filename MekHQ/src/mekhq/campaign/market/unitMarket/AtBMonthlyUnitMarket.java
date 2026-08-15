@@ -64,7 +64,7 @@ import mekhq.campaign.enums.DragoonRating;
 import mekhq.campaign.market.enums.UnitMarketMethod;
 import mekhq.campaign.market.enums.UnitMarketRarity;
 import mekhq.campaign.market.enums.UnitMarketType;
-import mekhq.campaign.mission.AtBContract;
+import mekhq.campaign.mission.newContract.AbstractContract;
 import mekhq.campaign.universe.Faction;
 import mekhq.campaign.universe.Factions;
 import mekhq.campaign.universe.IUnitGenerator;
@@ -105,8 +105,8 @@ public class AtBMonthlyUnitMarket extends AbstractUnitMarket {
      */
     @Override
     public void generateUnitOffers(final Campaign campaign) {
-        final List<AtBContract> contracts = campaign.getActiveAtBContracts();
-        final AtBContract contract = contracts.isEmpty() ? null : contracts.getFirst();
+        final List<AbstractContract> contracts = campaign.getActiveContracts();
+        final AbstractContract contract = contracts.isEmpty() ? null : contracts.getFirst();
 
         Faction faction = campaign.getFaction();
         int rarityModifier = campaign.getCampaignOptions().getUnitMarketRarityModifier();
@@ -149,7 +149,7 @@ public class AtBMonthlyUnitMarket extends AbstractUnitMarket {
             int standingsModifier = 0;
             if (campaign.getCampaignOptions().isUseFactionStandingUnitMarketSafe()) {
                 FactionStandings factionStandings = campaign.getPlayerForce().getFactionStandings();
-                double regard = factionStandings.getRegardForFaction(contract.getEmployerCode(), true);
+                double regard = factionStandings.getRegardForFaction(contract.getEmployerFactionCode(), true);
                 standingsModifier = FactionStandingUtilities.getUnitMarketRarityModifier(regard);
             }
 
@@ -183,7 +183,7 @@ public class AtBMonthlyUnitMarket extends AbstractUnitMarket {
             }
 
             // Unwanted Salvage Market
-            faction = contract.getEnemy();
+            faction = contract.getEnemyFaction();
 
             addOffers(campaign, getMarketItemCount(campaign, RARE, totalModifier),
                   UnitMarketType.EMPLOYER, UnitType.MEK, faction, DragoonRating.DRAGOON_F.getRating(), 2);

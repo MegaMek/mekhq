@@ -155,7 +155,7 @@ public final class ContractMarketFormatting {
      * @since 0.51.01
      */
     public static String salvage(AbstractContract contract) {
-        if (contract.isExchangeSalvage()) {
+        if (contract.isSalvageExchange()) {
             return getTextAt(RESOURCE_BUNDLE, "value.contractMarket.salvage.exchange");
         }
         return getFormattedTextAt(RESOURCE_BUNDLE,

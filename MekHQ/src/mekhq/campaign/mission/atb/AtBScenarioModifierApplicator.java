@@ -149,9 +149,9 @@ public class AtBScenarioModifierApplicator {
             String factionCode;
 
             if (eventRecipient == ForceAlignment.Allied) {
-                factionCode = scenario.getContract(campaign).getEmployerCode();
+                factionCode = scenario.getContract(campaign).getEmployerFactionCode();
             } else {
-                factionCode = scenario.getContract(campaign).getEnemyCode();
+                factionCode = scenario.getContract(campaign).getEnemyFactionCode();
             }
 
             Faction faction = Factions.getInstance().getFaction(factionCode);
@@ -237,7 +237,7 @@ public class AtBScenarioModifierApplicator {
         final AbstractSkillGenerator abstractSkillGenerator = new ModifiedConstantSkillGenerator();
         abstractSkillGenerator.setLevel(adjustedSkill);
 
-        if (Factions.getInstance().getFaction(scenario.getContract(campaign).getEnemyCode()).isClan()) {
+        if (Factions.getInstance().getFaction(scenario.getContract(campaign).getEnemyFactionCode()).isClan()) {
             abstractSkillGenerator.setType(SkillGeneratorType.CLAN);
         }
 
@@ -266,7 +266,7 @@ public class AtBScenarioModifierApplicator {
             return;
         }
 
-        int currentQuality = scenario.getContract(c).getEnemyQuality();
+        int currentQuality = scenario.getContract(c).getEnemyEquipmentRating();
 
         currentQuality += qualityAdjustment;
         currentQuality = Math.min(DragoonRating.DRAGOON_ASTAR.getRating(), currentQuality);

@@ -32,7 +32,7 @@
  */
 package mekhq.campaign.force;
 
-import static mekhq.campaign.market.contractMarket.ContractAutomation.performAutomatedActivation;
+import static mekhq.campaign.mission.newContract.utilities.ContractAutomation.performAutomatedActivation;
 
 import java.util.Objects;
 

@@ -40,8 +40,7 @@ import static mekhq.utilities.MHQInternationalization.getTextAt;
 import java.util.List;
 
 import mekhq.campaign.Campaign;
-import mekhq.campaign.mission.AtBContract;
-import mekhq.campaign.mission.Contract;
+import mekhq.campaign.mission.newContract.AbstractContract;
 import mekhq.campaign.mission.resupplyAndCaches.ResupplyUtilities;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.ranks.Rank;
@@ -82,7 +81,7 @@ public class FactionStandingGreeting {
      * Constructs and immediately displays a Faction Standing greeting dialog based on the provided campaign and
      * contract.
      *
-     * <p>If the contract is an instance of {@link AtBContract}, the dialog is customized using employer liaison,
+     * <p>If the contract is an instance of {@link AbstractContract}, the dialog is customized using employer liaison,
      * contract type, command rights, and resupply information. If the contract is not an AtBContract,
      * {@link #FactionStandingGreeting(Campaign)} is called instead to display a default greeting.</p>
      *
@@ -92,19 +91,14 @@ public class FactionStandingGreeting {
      * @author Illiani
      * @since 0.50.07
      */
-    public FactionStandingGreeting(Campaign campaign, Contract contract) {
-        if (!(contract instanceof AtBContract atBContract)) {
-            new FactionStandingGreeting(campaign);
+    public FactionStandingGreeting(Campaign campaign, AbstractContract contract) {
+        if (contract.getEmployerFactionCode().equals(PIRATE_FACTION_CODE)) {
             return;
         }
 
-        if (atBContract.getEmployerCode().equals(PIRATE_FACTION_CODE)) {
-            return;
-        }
-
-        final Person contractRepresentative = atBContract.getEmployerLiaison();
-        final boolean isGuerrillaWarfare = atBContract.getContractType().isGuerrillaType();
-        final boolean isIndependent = atBContract.getCommandRights().isIndependent();
+        final Person contractRepresentative = contract.getEmployerLiaison();
+        final boolean isGuerrillaWarfare = contract.getObjectiveType().isGuerrillaType();
+        final boolean isIndependent = contract.getCommandRights().isIndependent();
         final FactionStandingLevel factionStandingLevel = getFactionStandingsLevel(campaign.getPlayerForce()
                                                                                          .getFactionStandings(),
               contractRepresentative);
@@ -113,7 +107,7 @@ public class FactionStandingGreeting {
         int cargoAvailable = 0;
         final boolean isUseStratCon = campaign.getCampaignOptions().isUseStratCon();
         if (isUseStratCon) {
-            cargoRequirements = ResupplyUtilities.estimateCargoRequirements(campaign, atBContract);
+            cargoRequirements = ResupplyUtilities.estimateCargoRequirements(campaign, contract);
             cargoAvailable = ResupplyUtilities.estimateAvailablePlayerCargo(campaign);
         }
 
@@ -132,7 +126,8 @@ public class FactionStandingGreeting {
     }
 
     /**
-     * Constructs and immediately displays a Faction Standing greeting dialog in the absence of an {@link AtBContract}.
+     * Constructs and immediately displays a Faction Standing greeting dialog in the absence of an
+     * {@link AbstractContract}.
      *
      * <p>This form provides a simplified greeting dialog, using a generated employer liaison and default context
      * such as a neutral or non-contract scenario. No resupply or contract-specific information is included in the

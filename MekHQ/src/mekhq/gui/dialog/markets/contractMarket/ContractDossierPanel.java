@@ -47,6 +47,7 @@ import java.awt.*;
 import java.time.LocalDate;
 import javax.swing.*;
 
+import jakarta.annotation.Nullable;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.mission.newContract.AbstractContract;
@@ -56,7 +57,9 @@ import mekhq.campaign.universe.Planet;
 import mekhq.campaign.universe.PlanetarySystem;
 import mekhq.gui.baseComponents.roundedComponents.RoundedJButton;
 import mekhq.gui.baseComponents.roundedComponents.RoundedLineBorder;
+import mekhq.gui.utilities.MarkdownRenderer;
 import mekhq.gui.view.PlanetViewPanel;
+import org.apache.commons.lang3.StringUtils;
 
 /**
  * The full "briefing dossier" for a single selected {@link AbstractContract}.
@@ -118,25 +121,46 @@ public class ContractDossierPanel extends JPanel {
                                         "</span><br>"
                                         +
                                         "<b style='font-size:larger'>" +
-                                        escape(contract.getContractName()) +
+                                        escape(contract.getName()) +
                                         "</b></html>");
         title.setForeground(onAccent);
         header.add(title, BorderLayout.WEST);
 
+        JPanel badges = new JPanel();
+        badges.setLayout(new BoxLayout(badges, BoxLayout.Y_AXIS));
+        badges.setOpaque(false);
+
         Faction enemyFaction = contract.getEnemyFaction();
-        if (enemyFaction != null && enemyFaction.isClan()) {
-            JLabel batchall = new JLabel(getTextAt(RESOURCE_BUNDLE, "dossier.contractMarket.batchall"));
-            batchall.setForeground(onAccent);
-            batchall.setBorder(BorderFactory.createCompoundBorder(
-                  new RoundedLineBorder(onAccent, scaleForGUI(1), scaleForGUI(16)),
-                  BorderFactory.createEmptyBorder(scaleForGUI(2), scaleForGUI(8), scaleForGUI(2), scaleForGUI(8))));
+        boolean hasBatchall = (enemyFaction != null) && enemyFaction.isClan();
+        if (hasBatchall) {
+            badges.add(headerBadge(getTextAt(RESOURCE_BUNDLE, "dossier.contractMarket.batchall"), onAccent));
+        }
+        if (contract.isProvingGround()) {
+            if (hasBatchall) {
+                badges.add(Box.createVerticalStrut(scaleForGUI(4)));
+            }
+            badges.add(headerBadge(getTextAt(RESOURCE_BUNDLE, "dossier.contractMarket.provingGround"), onAccent));
+        }
+
+        if (badges.getComponentCount() > 0) {
             JPanel badgeWrapper = new JPanel(new BorderLayout());
             badgeWrapper.setOpaque(false);
-            badgeWrapper.add(batchall, BorderLayout.NORTH);
+            badgeWrapper.add(badges, BorderLayout.NORTH);
             header.add(badgeWrapper, BorderLayout.EAST);
         }
 
         return header;
+    }
+
+    /** A small pill-shaped header badge (e.g. Batchall, Proving Ground) drawn in the accent-contrasting colour. */
+    private JLabel headerBadge(String text, Color onAccent) {
+        JLabel badge = new JLabel(text);
+        badge.setForeground(onAccent);
+        badge.setAlignmentX(Component.RIGHT_ALIGNMENT);
+        badge.setBorder(BorderFactory.createCompoundBorder(
+              new RoundedLineBorder(onAccent, scaleForGUI(1), scaleForGUI(16)),
+              BorderFactory.createEmptyBorder(scaleForGUI(2), scaleForGUI(8), scaleForGUI(2), scaleForGUI(8))));
+        return badge;
     }
 
     private JPanel buildBody(ContractMarketActions actions) {
@@ -167,6 +191,11 @@ public class ContractDossierPanel extends JPanel {
         JPanel details = new JPanel();
         details.setLayout(new BoxLayout(details, BoxLayout.Y_AXIS));
         details.setBorder(BorderFactory.createEmptyBorder(pad, pad, pad, pad));
+        JPanel briefing = buildBriefing();
+        if (briefing != null) {
+            details.add(briefing);
+            details.add(Box.createVerticalStrut(pad));
+        }
         details.add(buildColumns());
         details.add(Box.createVerticalStrut(pad));
         details.add(buildMetrics());
@@ -272,7 +301,7 @@ public class ContractDossierPanel extends JPanel {
         JPanel terms = section(getTextAt(RESOURCE_BUNDLE, "dossier.contractMarket.section.terms"));
         addDetailRow(terms,
               "dossier.contractMarket.terms.command",
-              contract.getContractCommandRights().toString(),
+              contract.getCommandRights().toString(),
               null);
         addDetailRow(terms, "dossier.contractMarket.terms.salvage", salvage(contract), null);
         addDetailRow(terms, "dossier.contractMarket.terms.support", support(contract), null);
@@ -283,13 +312,48 @@ public class ContractDossierPanel extends JPanel {
         addDetailRow(intel, "dossier.contractMarket.intel.alliedCommand", alliedCommand(contract), null);
         addDetailRow(intel, "dossier.contractMarket.intel.opposition", contract.getEnemyDisplayName(), null);
         addDetailRow(intel, "dossier.contractMarket.intel.threat", threat(contract), null);
-        addDetailRow(intel, "dossier.contractMarket.intel.morale", contract.getEnemyMoraleLevel().toString(), null);
+        addDetailRow(intel, "dossier.contractMarket.intel.morale", contract.getMoraleLevel().toString(), null);
         int difficulty = assessmentDifficulty(contract);
         Color assessmentColor = difficulty >= 8 ? dangerColor() : (difficulty <= 2 ? positiveColor() : null);
         addDetailRow(intel, "dossier.contractMarket.intel.assessment", assessmentLabel(contract), assessmentColor);
         columns.add(intel);
 
         return columns;
+    }
+
+    /**
+     * Builds the briefing card holding the contract's (Markdown-rendered) description, or {@code null} when the
+     * contract has no description so no empty card is shown.
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    private @Nullable JPanel buildBriefing() {
+        String description = contract.getDescription();
+        if (StringUtils.isBlank(description)) {
+            return null;
+        }
+
+        final int pad = scaleForGUI(10);
+        JPanel panel = new JPanel(new BorderLayout());
+        panel.setBorder(BorderFactory.createCompoundBorder(RoundedLineBorder.createSubtleRoundedLineBorder(),
+              BorderFactory.createEmptyBorder(pad, pad, pad, pad)));
+
+        JLabel title = new JLabel(getTextAt(RESOURCE_BUNDLE, "dossier.contractMarket.section.briefing").toUpperCase());
+        title.setFont(title.getFont().deriveFont(title.getFont().getSize2D() - 2f));
+        title.setForeground(mutedColor());
+        panel.add(title, BorderLayout.NORTH);
+
+        JTextPane descriptionPane = new JTextPane();
+        descriptionPane.setEditable(false);
+        descriptionPane.setFocusable(false);
+        descriptionPane.setOpaque(false);
+        descriptionPane.setContentType("text/html");
+        descriptionPane.setText(MarkdownRenderer.getRenderedHtml(description));
+        descriptionPane.setBorder(BorderFactory.createEmptyBorder(scaleForGUI(6), 0, 0, 0));
+        panel.add(descriptionPane, BorderLayout.CENTER);
+
+        return panel;
     }
 
     private JPanel section(String heading) {
@@ -340,7 +404,7 @@ public class ContractDossierPanel extends JPanel {
         metrics.add(metricTile("dossier.contractMarket.metric.total",
               contract.getTotalPay().toAmountAndSymbolString()));
         metrics.add(metricTile("dossier.contractMarket.metric.monthly",
-              contract.getMonthlyPay().toAmountAndSymbolString()));
+              contract.getMonthlyPayOut().toAmountAndSymbolString()));
         metrics.add(metricTile("dossier.contractMarket.metric.transport",
               contract.getTransportPayment().toAmountAndSymbolString()));
         metrics.add(metricTile("dossier.contractMarket.metric.combat",
@@ -372,7 +436,7 @@ public class ContractDossierPanel extends JPanel {
               "+" + estimate.guaranteedIncome().toAmountAndSymbolString(), positiveColor(), false);
         addProfitRow(panel, getFormattedTextAt(RESOURCE_BUNDLE,
                     "dossier.contractMarket.profit.expenses",
-                    contract.getContractLengthInMonths(),
+                    contract.getLengthInMonths(),
                     estimate.transitDays()),
               "-" + estimate.operatingCosts().toAmountAndSymbolString(), dangerColor(), false);
         addProfitRow(panel, getTextAt(RESOURCE_BUNDLE, "dossier.contractMarket.profit.net"),
@@ -468,7 +532,7 @@ public class ContractDossierPanel extends JPanel {
         JLabel travel = new JLabel(getFormattedTextAt(RESOURCE_BUNDLE,
               "dossier.contractMarket.footer.travel",
               destination,
-              contract.getContractLengthInMonths()));
+              contract.getLengthInMonths()));
         travel.setForeground(mutedColor());
         footer.add(travel, BorderLayout.WEST);
 

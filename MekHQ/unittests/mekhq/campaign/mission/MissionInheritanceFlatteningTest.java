@@ -54,6 +54,7 @@ import org.apache.logging.log4j.LogManager;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
+@Deprecated(since = "0.51.01", forRemoval = true)
 class MissionInheritanceFlatteningTest {
 
     @BeforeAll

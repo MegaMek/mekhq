@@ -71,7 +71,7 @@ class AbstractContractMarketEnemySelectionTest {
         RandomFactionGenerator.setInstance(rfg);
 
         AtBContract contract = mock(AtBContract.class);
-        when(contract.getContractType()).thenReturn(ContractObjectiveType.GUERRILLA_WARFARE);
+        when(contract.getObjectiveType()).thenReturn(ContractObjectiveType.GUERRILLA_WARFARE);
         when(contract.getEmployerCode()).thenReturn("EMPLOYER");
         Campaign campaign = mock(Campaign.class);
 

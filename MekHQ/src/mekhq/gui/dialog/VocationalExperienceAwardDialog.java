@@ -38,7 +38,7 @@ import java.util.List;
 
 import mekhq.campaign.Campaign;
 import mekhq.campaign.campaignOptions.CampaignOptions;
-import mekhq.campaign.mission.AtBContract;
+import mekhq.campaign.mission.newContract.AbstractContract;
 import mekhq.campaign.personnel.Person;
 import mekhq.gui.baseComponents.immersiveDialogs.ImmersiveDialogSimple;
 
@@ -147,8 +147,8 @@ public class VocationalExperienceAwardDialog extends ImmersiveDialogSimple {
 
         if (campaign.hasActiveContract()) {
             if (campaignOptions.isUseStratCon()) {
-                for (AtBContract contract : campaign.getActiveAtBContracts()) {
-                    if (!contract.getContractType().isGarrisonType()) {
+                for (AbstractContract contract : campaign.getActiveContracts()) {
+                    if (!contract.getObjectiveType().isGarrisonType()) {
                         advancement *= 2;
                         break;
                     }

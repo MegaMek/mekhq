@@ -91,6 +91,7 @@ import mekhq.campaign.mission.ScenarioForceTemplate.ForceAlignment;
 import mekhq.campaign.mission.ScenarioObjective.ObjectiveCriterion;
 import mekhq.campaign.mission.atb.IAtBScenario;
 import mekhq.campaign.mission.enums.CombatRole;
+import mekhq.campaign.mission.newContract.AbstractContract;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.skills.Skill;
 import mekhq.campaign.personnel.skills.SkillModifierData;
@@ -99,8 +100,6 @@ import mekhq.campaign.unit.Unit;
 import mekhq.campaign.universe.Faction;
 import mekhq.campaign.universe.Factions;
 import mekhq.campaign.universe.Planet;
-import mekhq.campaign.universe.PlanetarySystem;
-import mekhq.campaign.universe.Systems;
 import mekhq.utilities.EntityUtilities;
 import mekhq.utilities.MHQXMLUtility;
 import org.w3c.dom.Element;
@@ -348,8 +347,9 @@ public abstract class AtBScenario extends Scenario implements IAtBScenario {
     private void initBattle(Campaign campaign) {
         setTerrain();
         CampaignOptions campaignOptions = campaign.getCampaignOptions();
-        if (campaignOptions.isUsePlanetaryConditions() && null != campaign.getMission(getMissionId())) {
-            setPlanetaryConditions(campaign.getMission(getMissionId()), campaign);
+        AbstractContract contract = campaign.getContract(getMissionId());
+        if (campaignOptions.isUsePlanetaryConditions() && null != contract) {
+            setPlanetaryConditions(contract.getTargetPlanet(), campaign.getLocalDate());
         }
         if (campaignOptions.isUseLightConditions()) {
             setLightConditions();
@@ -458,15 +458,10 @@ public abstract class AtBScenario extends Scenario implements IAtBScenario {
         setEMI(emi);
     }
 
-    public void setPlanetaryConditions(Mission mission, Campaign campaign) {
-        if (null != mission) {
-            PlanetarySystem planetarySystem = Systems.getInstance().getSystemById(mission.getSystemId());
-            // assume primary planet for now
-            Planet p = planetarySystem.getPrimaryPlanet();
-            if (null != p) {
-                setAtmosphere(ObjectUtility.nonNull(p.getPressure(campaign.getLocalDate()), getAtmosphere()));
-                setGravity(ObjectUtility.nonNull(p.getGravity(), getGravity()).floatValue());
-            }
+    public void setPlanetaryConditions(Planet planet, LocalDate date) {
+        if (null != planet) {
+            setAtmosphere(ObjectUtility.nonNull(planet.getPressure(date), getAtmosphere()));
+            setGravity(ObjectUtility.nonNull(planet.getGravity(), getGravity()).floatValue());
         }
     }
 
@@ -753,7 +748,7 @@ public abstract class AtBScenario extends Scenario implements IAtBScenario {
         }
         int numAttachedPlayer = 0;
         int numAttachedBot = 0;
-        if (getContract(campaign).getContractType().isCadreDuty()) {
+        if (getContract(campaign).getObjectiveType().isCadreDuty()) {
             numAttachedPlayer = 3;
         } else {
             if (campaign.getFaction().isMercenary()) {
@@ -785,11 +780,11 @@ public abstract class AtBScenario extends Scenario implements IAtBScenario {
          * The entities in the attachedAllies list will be added to the player's forces
          * in MM and don't require a separate BotForce
          */
-        final Camouflage camouflage = getContract(campaign).getAllyCamouflage();
+        final Camouflage camouflage = getContract(campaign).getEmployerCamouflage();
         for (int i = 0; i < numAttachedPlayer; i++) {
-            Entity en = getEntity(getContract(campaign).getEmployerCode(),
-                  getContract(campaign).getAllySkill(),
-                  getContract(campaign).getAllyQuality(),
+            Entity en = getEntity(getContract(campaign).getEmployerFactionCode(),
+                  getContract(campaign).getEmployerForceSkill(),
+                  getContract(campaign).getEmployerEquipmentRating(),
                   UnitType.MEK,
                   attachedUnitWeight,
                   campaign);
@@ -809,9 +804,9 @@ public abstract class AtBScenario extends Scenario implements IAtBScenario {
         /* The allyBot list will be passed to the BotForce constructor */
         ArrayList<Entity> allyEntities = new ArrayList<>();
         for (int i = 0; i < numAttachedBot; i++) {
-            Entity en = getEntity(getContract(campaign).getEmployerCode(),
-                  getContract(campaign).getAllySkill(),
-                  getContract(campaign).getAllyQuality(),
+            Entity en = getEntity(getContract(campaign).getEmployerFactionCode(),
+                  getContract(campaign).getEmployerForceSkill(),
+                  getContract(campaign).getEmployerEquipmentRating(),
                   UnitType.MEK,
                   attachedUnitWeight,
                   campaign);
@@ -835,18 +830,18 @@ public abstract class AtBScenario extends Scenario implements IAtBScenario {
             ArrayList<Entity> reinforcements = new ArrayList<>();
             if (roll == 6) {
                 addLance(reinforcements,
-                      getContract(campaign).getEnemyCode(),
-                      getContract(campaign).getEnemySkill(),
-                      getContract(campaign).getEnemyQuality(),
+                      getContract(campaign).getEnemyFactionCode(),
+                      getContract(campaign).getEnemyForceSkill(),
+                      getContract(campaign).getEnemyEquipmentRating(),
                       EntityWeightClass.WEIGHT_MEDIUM,
                       EntityWeightClass.WEIGHT_ASSAULT,
                       campaign,
                       8);
             } else {
                 addLance(reinforcements,
-                      getContract(campaign).getEnemyCode(),
-                      getContract(campaign).getEnemySkill(),
-                      getContract(campaign).getEnemyQuality(),
+                      getContract(campaign).getEnemyFactionCode(),
+                      getContract(campaign).getEnemyForceSkill(),
+                      getContract(campaign).getEnemyEquipmentRating(),
                       EntityWeightClass.WEIGHT_LIGHT,
                       EntityWeightClass.WEIGHT_ASSAULT,
                       campaign,
@@ -863,9 +858,9 @@ public abstract class AtBScenario extends Scenario implements IAtBScenario {
 
             reinforcements.addAll(AtBDynamicScenarioFactory.fillTransports(this,
                   reinforcements,
-                  getContract(campaign).getEnemyCode(),
-                  getContract(campaign).getEnemySkill(),
-                  getContract(campaign).getEnemyQuality(),
+                  getContract(campaign).getEnemyFactionCode(),
+                  getContract(campaign).getEnemyForceSkill(),
+                  getContract(campaign).getEnemyEquipmentRating(),
                   null,
                   true,
                   campaign));
@@ -896,12 +891,12 @@ public abstract class AtBScenario extends Scenario implements IAtBScenario {
                 }
                 for (int i = 0; i < Compute.d6() - 3; i++) {
                     addLance(enemyEntities,
-                          getContract(campaign).getEnemyCode(),
-                          getContract(campaign).getEnemySkill(),
-                          getContract(campaign).getEnemyQuality(),
+                          getContract(campaign).getEnemyFactionCode(),
+                          getContract(campaign).getEnemyForceSkill(),
+                          getContract(campaign).getEnemyEquipmentRating(),
                           AtBStaticWeightGenerator.getRandomWeight(campaign,
                                 UnitType.MEK,
-                                getContract(campaign).getEnemy()),
+                                getContract(campaign).getEnemyFaction()),
                           EntityWeightClass.WEIGHT_ASSAULT,
                           campaign);
                 }
@@ -1162,7 +1157,7 @@ public abstract class AtBScenario extends Scenario implements IAtBScenario {
      */
     protected void addEnemyForce(List<Entity> list, int weightClass, int maxWeight, int rollMod, int weightMod,
           Campaign campaign) {
-        String org = AtBConfiguration.getParentFactionType(getContract(campaign).getEnemy());
+        String org = AtBConfiguration.getParentFactionType(getContract(campaign).getEnemyFaction());
 
         String lances = campaign.getAtBConfig().selectBotLances(org, weightClass, rollMod / 20f);
         if (lances == null) {
@@ -1179,9 +1174,9 @@ public abstract class AtBScenario extends Scenario implements IAtBScenario {
 
         list.addAll(AtBDynamicScenarioFactory.fillTransports(this,
               list,
-              getContract(campaign).getEnemyCode(),
-              getContract(campaign).getEnemySkill(),
-              getContract(campaign).getEnemyQuality(),
+              getContract(campaign).getEnemyFactionCode(),
+              getContract(campaign).getEnemyForceSkill(),
+              getContract(campaign).getEnemyEquipmentRating(),
               null,
               true,
               campaign));
@@ -1203,9 +1198,9 @@ public abstract class AtBScenario extends Scenario implements IAtBScenario {
             weight = EntityWeightClass.WEIGHT_ASSAULT;
         }
         addLance(list,
-              getContract(campaign).getEnemyCode(),
-              getContract(campaign).getEnemySkill(),
-              getContract(campaign).getEnemyQuality(),
+              getContract(campaign).getEnemyFactionCode(),
+              getContract(campaign).getEnemyForceSkill(),
+              getContract(campaign).getEnemyEquipmentRating(),
               weight,
               maxWeight,
               campaign);
@@ -1585,11 +1580,13 @@ public abstract class AtBScenario extends Scenario implements IAtBScenario {
             return;
         }
 
-        AtBContract contract = getContract(campaign);
+        AbstractContract contract = getContract(campaign);
 
-        boolean opForOwnsPlanet = contract.getSystem()
-                                        .getFactions(campaign.getLocalDate())
-                                        .contains(contract.getEnemyCode());
+        Planet targetPlanet = contract.getTargetPlanet();
+        boolean opForOwnsPlanet = targetPlanet != null &&
+                                        contract.getTargetPlanet()
+                                              .getFactions(campaign.getLocalDate())
+                                              .contains(contract.getEnemyFactionCode());
 
         boolean spawnConventional = opForOwnsPlanet &&
                                           Compute.d6() >=
@@ -1608,9 +1605,9 @@ public abstract class AtBScenario extends Scenario implements IAtBScenario {
             for (int unitCount = 0;
                   unitCount <= campaign.getCampaignOptions().getSkillLevel().getAdjustedValue();
                   unitCount++) {
-                aero = getEntity(contract.getEnemyCode(),
-                      contract.getEnemySkill(),
-                      contract.getEnemyQuality(),
+                aero = getEntity(contract.getEmployerFactionCode(),
+                      contract.getEnemyForceSkill(),
+                      contract.getEnemyEquipmentRating(),
                       UnitType.CONV_FIGHTER,
                       EntityWeightClass.WEIGHT_LIGHT,
                       campaign);
@@ -1625,9 +1622,9 @@ public abstract class AtBScenario extends Scenario implements IAtBScenario {
                 // compute weight class
                 int weightClass = randomAeroWeights[Compute.d6() - 1];
 
-                aero = getEntity(contract.getEnemyCode(),
-                      contract.getEnemySkill(),
-                      contract.getEnemyQuality(),
+                aero = getEntity(contract.getEmployerFactionCode(),
+                      contract.getEnemyForceSkill(),
+                      contract.getEnemyEquipmentRating(),
                       UnitType.AEROSPACE_FIGHTER,
                       weightClass,
                       campaign);
@@ -1655,9 +1652,9 @@ public abstract class AtBScenario extends Scenario implements IAtBScenario {
             tlg.populateAeroBombs(aircraft,
                   campaign.getGameYear(),
                   !isAeroMap,
-                  contract.getEnemyQuality(),
-                  contract.getEnemy().isPirate(),
-                  contract.getEnemy().getShortName());
+                  contract.getEnemyEquipmentRating(),
+                  contract.getEnemyFaction().isPirate(),
+                  contract.getEnemyFactionCode());
 
             BotForce bf = getEnemyBotForce(getContract(campaign), enemyHome, enemyHome, aircraft);
             bf.setName(bf.getName() + " (Air Support)");
@@ -1683,11 +1680,13 @@ public abstract class AtBScenario extends Scenario implements IAtBScenario {
             return;
         }
 
-        AtBContract contract = getContract(campaign);
+        AbstractContract contract = getContract(campaign);
 
-        boolean opForOwnsPlanet = contract.getSystem()
-                                        .getFactions(campaign.getLocalDate())
-                                        .contains(contract.getEnemyCode());
+        Planet targetPlanet = contract.getTargetPlanet();
+        boolean opForOwnsPlanet = targetPlanet != null &&
+                                        contract.getTargetPlanet()
+                                              .getFactions(campaign.getLocalDate())
+                                              .contains(contract.getEnemyFactionCode());
         boolean spawnTurrets = opForOwnsPlanet &&
                                      Compute.d6() >=
                                            MHQConstants.MAXIMUM_D6_VALUE -
@@ -1715,19 +1714,19 @@ public abstract class AtBScenario extends Scenario implements IAtBScenario {
             // of extra units
             addTurrets(scrubs,
                   campaign.getCampaignOptions().getSkillLevel().getAdjustedValue() + 1,
-                  contract.getEnemySkill(),
-                  contract.getEnemyQuality(),
+                  contract.getEnemyForceSkill(),
+                  contract.getEnemyEquipmentRating(),
                   campaign,
-                  contract.getEnemy());
+                  contract.getEnemyFaction());
         }
 
         if (spawnConventionalInfantry && isInfantryAppropriateTerrain) {
             for (int unitCount = 0;
                   unitCount <= campaign.getCampaignOptions().getSkillLevel().getAdjustedValue();
                   unitCount++) {
-                Entity infantry = getEntity(contract.getEnemyCode(),
-                      contract.getEnemySkill(),
-                      contract.getEnemyQuality(),
+                Entity infantry = getEntity(contract.getEmployerFactionCode(),
+                      contract.getEnemyForceSkill(),
+                      contract.getEnemyEquipmentRating(),
                       UnitType.INFANTRY,
                       EntityWeightClass.WEIGHT_LIGHT,
                       campaign);
@@ -1743,9 +1742,9 @@ public abstract class AtBScenario extends Scenario implements IAtBScenario {
                   unitCount++) {
                 // some factions don't have access to battle armor, so they get conventional
                 // infantry instead
-                Entity generatedUnit = getEntity(contract.getEnemyCode(),
-                      contract.getEnemySkill(),
-                      contract.getEnemyQuality(),
+                Entity generatedUnit = getEntity(contract.getEmployerFactionCode(),
+                      contract.getEnemyForceSkill(),
+                      contract.getEnemyEquipmentRating(),
                       UnitType.BATTLE_ARMOR,
                       EntityWeightClass.WEIGHT_LIGHT,
                       campaign);
@@ -1753,9 +1752,9 @@ public abstract class AtBScenario extends Scenario implements IAtBScenario {
                 if (generatedUnit != null) {
                     scrubs.add(generatedUnit);
                 } else {
-                    Entity infantry = getEntity(contract.getEnemyCode(),
-                          contract.getEnemySkill(),
-                          contract.getEnemyQuality(),
+                    Entity infantry = getEntity(contract.getEmployerFactionCode(),
+                          contract.getEnemyForceSkill(),
+                          contract.getEnemyEquipmentRating(),
                           UnitType.INFANTRY,
                           EntityWeightClass.WEIGHT_LIGHT,
                           campaign);
@@ -1793,9 +1792,9 @@ public abstract class AtBScenario extends Scenario implements IAtBScenario {
      *
      */
     protected void addDropship(Campaign campaign) {
-        Entity dropship = AtBDynamicScenarioFactory.getEntity(getContract(campaign).getEmployerCode(),
-              getContract(campaign).getAllySkill(),
-              getContract(campaign).getAllyQuality(),
+        Entity dropship = AtBDynamicScenarioFactory.getEntity(getContract(campaign).getEmployerFactionCode(),
+              getContract(campaign).getEmployerForceSkill(),
+              getContract(campaign).getEmployerEquipmentRating(),
               UnitType.DROPSHIP,
               AtBDynamicScenarioFactory.UNIT_WEIGHT_UNSPECIFIED,
               campaign);
@@ -1823,28 +1822,28 @@ public abstract class AtBScenario extends Scenario implements IAtBScenario {
     }
 
     /* Convenience methods for frequently-used arguments */
-    protected BotForce getAllyBotForce(AtBContract c, int start, int home, List<Entity> entities) {
-        return new BotForce(c.getAllyBotName(),
+    protected BotForce getAllyBotForce(AbstractContract contract, int start, int home, List<Entity> entities) {
+        return new BotForce(contract.getEmployerDisplayName(),
               1,
               start,
               home,
               entities,
-              c.getAllyCamouflage().clone(),
-              c.getAllyColour());
+              contract.getEmployerCamouflage().clone(),
+              contract.getEmployerColor());
     }
 
-    protected BotForce getEnemyBotForce(AtBContract c, int start, List<Entity> entities) {
-        return getEnemyBotForce(c, start, start, entities);
+    protected BotForce getEnemyBotForce(AbstractContract contract, int start, List<Entity> entities) {
+        return getEnemyBotForce(contract, start, start, entities);
     }
 
-    protected BotForce getEnemyBotForce(AtBContract c, int start, int home, List<Entity> entities) {
-        return new BotForce(c.getEnemyBotName(),
+    protected BotForce getEnemyBotForce(AbstractContract contract, int start, int home, List<Entity> entities) {
+        return new BotForce(contract.getEnemyDisplayName(),
               2,
               start,
               home,
               entities,
-              c.getEnemyCamouflage().clone(),
-              c.getEnemyColour());
+              contract.getEnemyCamouflage().clone(),
+              contract.getEnemyColour());
     }
 
     @Override
@@ -1861,7 +1860,7 @@ public abstract class AtBScenario extends Scenario implements IAtBScenario {
         }
     }
 
-    protected void setObjectives(Campaign c, AtBContract contract) {
+    protected void setObjectives(Campaign c, AbstractContract contract) {
         getScenarioObjectives().clear();
     }
 
@@ -2165,8 +2164,8 @@ public abstract class AtBScenario extends Scenario implements IAtBScenario {
         return retVal.toString();
     }
 
-    public AtBContract getContract(Campaign c) {
-        return (AtBContract) c.getMission(getMissionId());
+    public AbstractContract getContract(Campaign campaign) {
+        return campaign.getContract(getMissionId());
     }
 
     /**
@@ -2339,7 +2338,7 @@ public abstract class AtBScenario extends Scenario implements IAtBScenario {
 
     /**
      * Retrieves the {@link StratConScenario} associated with the given {@link AtBScenario} for the specified
-     * {@link AtBContract}.
+     * {@link AbstractContract}.
      *
      * <p>This method attempts to locate a {@link StratConScenario} that matches the provided
      * {@link AtBScenario} within the tracks of the {@link StratConCampaignState} associated with the provided contract.
@@ -2351,7 +2350,7 @@ public abstract class AtBScenario extends Scenario implements IAtBScenario {
      * instances. If a {@link StratConScenario} has a non-null {@link AtBDynamicScenario} that matches the provided
      * {@link AtBScenario}, the method returns that {@link StratConScenario}.
      *
-     * @param contract    the {@link AtBContract} from which to retrieve the {@link StratConCampaignState} and
+     * @param contract    the {@link AbstractContract} from which to retrieve the {@link StratConCampaignState} and
      *                    associated tracks
      * @param atBScenario the {@link AtBScenario} to match against the backing scenarios of the {@link StratConScenario}
      *                    instances
@@ -2359,7 +2358,7 @@ public abstract class AtBScenario extends Scenario implements IAtBScenario {
      * @return the matching {@link StratConScenario} if found, or {@code null} if no match is found or any required data
      *       is missing
      */
-    public @Nullable StratConScenario getStratconScenario(AtBContract contract, AtBScenario atBScenario) {
+    public @Nullable StratConScenario getStratconScenario(AbstractContract contract, AtBScenario atBScenario) {
         if (contract == null || atBScenario == null) {
             return null;
         }

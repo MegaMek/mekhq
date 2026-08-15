@@ -64,6 +64,7 @@ import mekhq.campaign.enums.DragoonRating;
 import mekhq.campaign.finances.Money;
 import mekhq.campaign.finances.enums.TransactionType;
 import mekhq.campaign.mission.enums.ScenarioType;
+import mekhq.campaign.mission.newContract.AbstractContract;
 import mekhq.campaign.parts.Armor;
 import mekhq.campaign.parts.Part;
 import mekhq.campaign.parts.enums.PartQuality;
@@ -281,7 +282,7 @@ public class Loot {
 
         // This only needs to be done once, so we do it outside the 'loot units' loop
         // for efficiency
-        HashMap<String, Integer> qualityAndModifier = getQualityAndModifier(campaign.getMission(scenario.getMissionId()));
+        HashMap<String, Integer> qualityAndModifier = getQualityAndModifier(campaign.getContract(scenario.getMissionId()));
 
         for (Entity entity : units) {
             LOGGER.debug("Looting unit: {}", entity.getDisplayName());
@@ -309,41 +310,38 @@ public class Loot {
      * @throws IllegalStateException if the contract is an instance of AtBContract and the enemy quality is not
      *                               recognized
      */
-    private static HashMap<String, Integer> getQualityAndModifier(Mission contract) {
+    private static HashMap<String, Integer> getQualityAndModifier(AbstractContract contract) {
         HashMap<String, Integer> qualityAndModifier = new HashMap<>();
 
-        if (contract instanceof AtBContract) {
-            DragoonRating dragoonRating = DragoonRating.fromRating(((AtBContract) contract).getEnemyQuality());
-            switch (dragoonRating) {
-                case DRAGOON_F:
-                    qualityAndModifier.put("quality", PartQuality.QUALITY_A.toNumeric());
-                    qualityAndModifier.put("modifier", -2);
-                    break;
-                case DRAGOON_D:
-                    qualityAndModifier.put("quality", PartQuality.QUALITY_B.toNumeric());
-                    qualityAndModifier.put("modifier", -1);
-                    break;
-                case DRAGOON_C:
-                case DRAGOON_B:
-                    qualityAndModifier.put("quality", PartQuality.QUALITY_C.toNumeric());
-                    qualityAndModifier.put("modifier", 0);
-                    break;
-                case DRAGOON_A:
-                    qualityAndModifier.put("quality", PartQuality.QUALITY_D.toNumeric());
-                    qualityAndModifier.put("modifier", 1);
-                    break;
-                case DRAGOON_ASTAR:
-                    qualityAndModifier.put("quality", PartQuality.QUALITY_F.toNumeric());
-                    qualityAndModifier.put("modifier", 2);
-                    break;
-                default:
-                    throw new IllegalStateException(
-                          "Unexpected value in mekhq/campaign/mission/Loot.java/getQualityAndModifier: " +
-                                ((AtBContract) contract).getEnemyQuality());
-            }
-        } else {
-            qualityAndModifier.put("quality", PartQuality.QUALITY_D.toNumeric());
-            qualityAndModifier.put("modifier", 0);
+        DragoonRating dragoonRating = contract == null ?
+                                            DragoonRating.DRAGOON_C :
+                                            DragoonRating.fromRating(contract.getEnemyEquipmentRating());
+        switch (dragoonRating) {
+            case DRAGOON_F:
+                qualityAndModifier.put("quality", PartQuality.QUALITY_A.toNumeric());
+                qualityAndModifier.put("modifier", -2);
+                break;
+            case DRAGOON_D:
+                qualityAndModifier.put("quality", PartQuality.QUALITY_B.toNumeric());
+                qualityAndModifier.put("modifier", -1);
+                break;
+            case DRAGOON_C:
+            case DRAGOON_B:
+                qualityAndModifier.put("quality", PartQuality.QUALITY_C.toNumeric());
+                qualityAndModifier.put("modifier", 0);
+                break;
+            case DRAGOON_A:
+                qualityAndModifier.put("quality", PartQuality.QUALITY_D.toNumeric());
+                qualityAndModifier.put("modifier", 1);
+                break;
+            case DRAGOON_ASTAR:
+                qualityAndModifier.put("quality", PartQuality.QUALITY_F.toNumeric());
+                qualityAndModifier.put("modifier", 2);
+                break;
+            default:
+                throw new IllegalStateException(
+                      "Unexpected value in mekhq/campaign/mission/Loot.java/getQualityAndModifier: " +
+                            contract.getEnemyEquipmentRating());
         }
 
         return qualityAndModifier;

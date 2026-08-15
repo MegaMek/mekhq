@@ -76,7 +76,8 @@ import mekhq.campaign.events.StratConDeploymentEvent;
 import mekhq.campaign.events.missions.MissionChangedEvent;
 import mekhq.campaign.events.missions.MissionCompletedEvent;
 import mekhq.campaign.events.missions.MissionRemovedEvent;
-import mekhq.campaign.mission.AtBContract;
+import mekhq.campaign.mission.newContract.AbstractContract;
+import mekhq.campaign.mission.newContract.utilities.ContractScore;
 import mekhq.campaign.universe.PlanetarySystem;
 import mekhq.gui.baseComponents.roundedComponents.RoundedJButton;
 import mekhq.gui.baseComponents.roundedComponents.RoundedLineBorder;
@@ -120,7 +121,7 @@ public class StratConTab extends CampaignGuiTab {
     private JScrollPane expandedObjectivePanel;
     private boolean objectivesCollapsed = false;
 
-    private AtBContract currentContract;
+    private AbstractContract currentContract;
     private StratConTrackState currentSectorTrack;
 
     private boolean adjustingSelectors = false;
@@ -590,7 +591,7 @@ public class StratConTab extends CampaignGuiTab {
         victoryPointsPanel.setVisible(true);
 
         boolean maplessMode = getCampaignGui().getCampaign().getCampaignOptions().isUseStratConMaplessMode();
-        int currentScore = currentContract.getContractScore(maplessMode);
+        int currentScore = ContractScore.getContractScore(maplessMode, currentContract);
         int requiredScore = currentContract.getRequiredVictoryPoints();
 
         if (requiredScore > 0) {
@@ -860,8 +861,8 @@ public class StratConTab extends CampaignGuiTab {
 
         Campaign campaign = getCampaignGui().getCampaign();
         PlanetarySystem currentSystem = campaign.getCurrentSystem();
-        for (AtBContract contract : campaign.getActiveAtBContracts(false)) {
-            if (!currentSystem.equals(contract.getSystem())) {
+        for (AbstractContract contract : campaign.getActiveContracts(false)) {
+            if (!currentSystem.equals(contract.getTargetPlanet())) {
                 continue;
             }
             if (contract.getStratConCampaignState() == null) {
@@ -904,7 +905,7 @@ public class StratConTab extends CampaignGuiTab {
      * Rebuilds the sector tabs for the given contract, one tab per track. Preserves the currently displayed sector when
      * it still exists, otherwise selects the first sector.
      */
-    private void repopulateSectorTabs(AtBContract contract) {
+    private void repopulateSectorTabs(AbstractContract contract) {
         StratConTrackState previousTrack = currentSectorTrack;
 
         adjustingSelectors = true;
@@ -1058,7 +1059,7 @@ public class StratConTab extends CampaignGuiTab {
     /**
      * Data structure backing an entry in the contract selection dropdown.
      */
-    private record ContractItem(AtBContract contract) {
+    private record ContractItem(AbstractContract contract) {
         @Override
         @Nonnull
         public String toString() {

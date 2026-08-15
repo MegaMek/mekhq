@@ -60,7 +60,6 @@ import mekhq.campaign.io.CampaignXmlParseException;
 import mekhq.campaign.io.CampaignXmlParser;
 import mekhq.campaign.market.PartsStore;
 import mekhq.campaign.market.PersonnelMarket;
-import mekhq.campaign.market.contractMarket.AtbMonthlyContractMarket;
 import mekhq.campaign.market.personnelMarket.markets.NewPersonnelMarket;
 import mekhq.campaign.market.unitMarket.DisabledUnitMarket;
 import mekhq.campaign.personnel.death.RandomDeath;
@@ -194,7 +193,6 @@ public class CampaignFactory {
         // Set up markets
         // TODO: Replace PersonnelMarket due to deprecation
         PersonnelMarket personnelMarket = new PersonnelMarket();
-        AtbMonthlyContractMarket atbMonthlyContractMarket = new AtbMonthlyContractMarket();
         DisabledUnitMarket disabledUnitMarket = new DisabledUnitMarket();
 
         // Set up Randomizers based on campaignOptions
@@ -224,12 +222,27 @@ public class CampaignFactory {
         }
 
         try {
-            campaignConfig = new CampaignConfiguration(name, date, options,
-                  faction, techFaction, currencyManager, reputationController,
-                  factionStandings, rankSystem, formation, finances, randomEvents, ultimatums,
-                  retirementDefectionTracker, autosave, behaviorSettings,
-                  personnelMarket, atbMonthlyContractMarket, disabledUnitMarket,
-                  disabledRandomDivorce, disabledRandomMarriage, disabledRandomProcreation);
+            campaignConfig = new CampaignConfiguration(name,
+                  date,
+                  options,
+                  faction,
+                  techFaction,
+                  currencyManager,
+                  reputationController,
+                  factionStandings,
+                  rankSystem,
+                  formation,
+                  finances,
+                  randomEvents,
+                  ultimatums,
+                  retirementDefectionTracker,
+                  autosave,
+                  behaviorSettings,
+                  personnelMarket,
+                  disabledUnitMarket,
+                  disabledRandomDivorce,
+                  disabledRandomMarriage,
+                  disabledRandomProcreation);
         } catch (Exception e) {
             LOGGER.error("Unable to create campaign.", e);
         }

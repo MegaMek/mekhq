@@ -36,8 +36,8 @@ import static java.lang.Math.ceil;
 import static megamek.client.ui.WrapLayout.wordWrap;
 import static mekhq.MHQConstants.CONFIRMATION_BEGIN_TRANSIT;
 import static mekhq.campaign.enums.DailyReportType.GENERAL;
-import static mekhq.campaign.market.contractMarket.ContractAutomation.outOfContractMothballAutomation;
 import static mekhq.campaign.market.personnelMarket.enums.PersonnelMarketStyle.MEKHQ;
+import static mekhq.campaign.mission.newContract.utilities.ContractAutomation.outOfContractMothballAutomation;
 import static mekhq.campaign.personnel.skills.SkillType.EXP_REGULAR;
 import static mekhq.campaign.randomEvents.prisoners.RecoverMIAPersonnel.abandonMissingPersonnel;
 

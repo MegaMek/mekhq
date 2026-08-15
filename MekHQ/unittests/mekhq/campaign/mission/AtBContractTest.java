@@ -249,7 +249,7 @@ public class AtBContractTest {
     @Test
     public void setContractTypeUpdatesParentMissionType() {
         contract.setContractTypeAndName(ContractObjectiveType.CADRE_DUTY);
-        assertEquals(ContractObjectiveType.CADRE_DUTY, contract.getContractType());
+        assertEquals(ContractObjectiveType.CADRE_DUTY, contract.getObjectiveType());
         assertEquals("Cadre Duty", contract.getContractTypeName());
     }
 

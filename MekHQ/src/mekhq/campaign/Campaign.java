@@ -172,19 +172,16 @@ import mekhq.campaign.market.ForceShoppingList;
 import mekhq.campaign.market.PartsStore;
 import mekhq.campaign.market.PersonnelMarket;
 import mekhq.campaign.market.RequestedStockLevels;
-import mekhq.campaign.market.contractMarket.AbstractContractMarket;
 import mekhq.campaign.market.personnelMarket.markets.NewPersonnelMarket;
 import mekhq.campaign.market.unitMarket.AbstractUnitMarket;
-import mekhq.campaign.mission.AbstractMissionTransition;
-import mekhq.campaign.mission.AtBContract;
 import mekhq.campaign.mission.AtBDynamicScenario;
 import mekhq.campaign.mission.AtBScenario;
-import mekhq.campaign.mission.Contract;
 import mekhq.campaign.mission.Mission;
 import mekhq.campaign.mission.Scenario;
 import mekhq.campaign.mission.TransportCostCalculations;
-import mekhq.campaign.mission.enums.CombatRole;
 import mekhq.campaign.mission.enums.MissionStatus;
+import mekhq.campaign.mission.newContract.AbstractContract;
+import mekhq.campaign.mission.newContract.contractData.ContractHistoryData;
 import mekhq.campaign.mission.rentals.ContractRentalType;
 import mekhq.campaign.mission.rentals.FacilityRentals;
 import mekhq.campaign.parts.Armor;
@@ -295,6 +292,7 @@ public class Campaign implements ITechManager {
     CampaignTransporterMap tacticalTransporters = new CampaignTransporterMap(this,
           CampaignTransportType.TACTICAL_TRANSPORT);
     CampaignTransporterMap towTransporters = new CampaignTransporterMap(this, CampaignTransportType.TOW_TRANSPORT);
+    private final ContractHistoryData contractHistory = new ContractHistoryData();
     private final TreeMap<Integer, Mission> missions = new TreeMap<>();
     private final TreeMap<Integer, Scenario> scenarios = new TreeMap<>();
     private final Map<UUID, List<Kill>> kills = new HashMap<>();
@@ -344,7 +342,6 @@ public class Campaign implements ITechManager {
     private RandomSkillPreferences randomSkillPreferences = new RandomSkillPreferences();
     private CampaignGUI gui;
 
-    private AbstractContractMarket contractMarket;
     private AbstractUnitMarket unitMarket;
 
     private RandomDeath randomDeath;
@@ -431,7 +428,6 @@ public class Campaign implements ITechManager {
               campConf.getAutosave(),
               campConf.getBehaviorSettings(),
               campConf.getPersonnelMarket(),
-              campConf.getAtBMonthlyContractMarket(),
               campConf.getUnitMarket(),
               campConf.getDivorce(),
               campConf.getMarriage(),
@@ -449,7 +445,7 @@ public class Campaign implements ITechManager {
           RandomEventLibraries randomEvents, FactionStandingUltimatumsLibrary ultimatums,
           RetirementDefectionTracker retDefTracker, IAutosaveService autosave,
           BehaviorSettings behaviorSettings,
-          PersonnelMarket persMarket, AbstractContractMarket atbMonthlyContractMarket,
+          PersonnelMarket persMarket,
           AbstractUnitMarket unitMarket,
           AbstractDivorce divorce, AbstractMarriage marriage,
           AbstractProcreation procreation) {
@@ -493,7 +489,6 @@ public class Campaign implements ITechManager {
         getPlayerForce().setFaction(faction);
         getPlayerForce().setRankSystemDirect(rankSystem);
         getPlayerForce().getHumanResources().setPersonnelMarket(persMarket);
-        setContractMarket(atbMonthlyContractMarket);
         setUnitMarket(unitMarket);
         getPlayerForce().getHumanResources().setDivorce(divorce);
         getPlayerForce().getHumanResources().setMarriage(marriage);
@@ -733,22 +728,18 @@ public class Campaign implements ITechManager {
         getPlayerForce().setIsOverridingCommandCircuitRequirements(isOverridingCommandCircuitRequirements);
     }
 
-    public boolean isUseCommandCircuitForContract(AbstractMissionTransition abstractMission) {
-        if (abstractMission instanceof AtBContract atBContract) {
-            return FactionStandingUtilities.isUseCommandCircuit(
-                  getPlayerForce().isOverridingCommandCircuitRequirements(), gmMode,
-                  campaignOptions.isUseFactionStandingCommandCircuitSafe(),
-                  getPlayerForce().getFactionStandings(), List.of(atBContract));
-        } else {
-            return false;
-        }
+    public boolean isUseCommandCircuitForContract(AbstractContract abstractContract) {
+        return FactionStandingUtilities.isUseCommandCircuit(
+              getPlayerForce().isOverridingCommandCircuitRequirements(), gmMode,
+              campaignOptions.isUseFactionStandingCommandCircuitSafe(),
+              getPlayerForce().getFactionStandings(), List.of(abstractContract));
     }
 
     public boolean isUseCommandCircuit() {
         return FactionStandingUtilities.isUseCommandCircuit(
               getPlayerForce().isOverridingCommandCircuitRequirements(), isGM(),
               getCampaignOptions().isUseFactionStandingCommandCircuitSafe(),
-              getPlayerForce().getFactionStandings(), getFutureAtBContracts());
+              getPlayerForce().getFactionStandings(), getFutureContracts());
     }
 
     /**
@@ -906,14 +897,6 @@ public class Campaign implements ITechManager {
     @Deprecated(since = "0.51.01", forRemoval = true)
     public void setPersonnelMarket(final PersonnelMarket personnelMarket) {
         getPlayerForce().getHumanResources().setPersonnelMarket(personnelMarket);
-    }
-
-    public AbstractContractMarket getContractMarket() {
-        return contractMarket;
-    }
-
-    public void setContractMarket(final AbstractContractMarket contractMarket) {
-        this.contractMarket = contractMarket;
     }
 
     public AbstractUnitMarket getUnitMarket() {
@@ -1313,45 +1296,33 @@ public class Campaign implements ITechManager {
      *
      * @param mission The mission to be added
      */
-    public void addMission(Mission mission) {
-        int missionID = lastMissionId + 1;
-        mission.setId(missionID);
-        missions.put(missionID, mission);
-        lastMissionId = missionID;
+    public void addMission(AbstractContract mission) {
+        contractHistory.contractHistory().put(mission.getId(), mission);
         MekHQ.triggerEvent(new MissionNewEvent(mission));
     }
 
     /**
-     * Imports a {@link Mission} into a campaign.
+     * Imports a {@link AbstractContract} into a campaign.
      *
      * @param mission Mission to import into the campaign.
      */
-    public void importMission(final Mission mission) {
+    public void importMission(final AbstractContract mission) {
         mission.getScenarios().forEach(this::importScenario);
-        addMissionWithoutId(mission);
+        contractHistory.contractHistory().put(mission.getId(), mission);
+        MekHQ.triggerEvent(new MissionNewEvent(mission));
         StratConContractInitializer.restoreTransientStratconInformation(mission, this);
     }
 
-    private void addMissionWithoutId(Mission m) {
-        lastMissionId = max(lastMissionId, m.getId());
-        missions.put(m.getId(), m);
-        MekHQ.triggerEvent(new MissionNewEvent(m));
+    public ContractHistoryData getContractHistoryData() {
+        return contractHistory;
     }
 
-    /**
-     * @param id the mission's id
-     *
-     * @return the mission in question
-     */
-    public @Nullable Mission getMission(int id) {
-        return missions.get(id);
+    public LinkedHashMap<UUID, AbstractContract> getContractHistoryAsMap() {
+        return contractHistory.contractHistory();
     }
 
-    /**
-     * @return an <code>Collection</code> of missions in the campaign
-     */
-    public Collection<Mission> getMissions() {
-        return missions.values();
+    public @jakarta.annotation.Nullable AbstractContract getContract(UUID contractId) {
+        return contractHistory.get(contractId);
     }
 
     /**
@@ -1359,30 +1330,17 @@ public class Campaign implements ITechManager {
      *       oldest; active missions without a start date use the campaign date, while completed missions without one
      *       sort last
      */
-    public List<Mission> getSortedMissions() {
-        List<Mission> sortedMissions = new ArrayList<>(getMissions());
-        sortedMissions.sort(Comparator.comparing((Mission mission) -> mission.getStatus().isCompleted())
-                                  .thenComparingLong(this::getMissionSortKey));
-        return sortedMissions;
+    public List<AbstractContract> getSortedContracts() {
+        return contractHistory.getSortedMissions(currentDay);
     }
 
-    private long getMissionSortKey(Mission mission) {
-        LocalDate startDate = mission.getStartDate();
-        if (startDate == null) {
-            return mission.getStatus().isCompleted() ? Long.MAX_VALUE : getLocalDate().toEpochDay();
-        }
-        long startDay = startDate.toEpochDay();
-        return mission.getStatus().isCompleted() ? -startDay : startDay;
+    @Deprecated(since = "0.51.01", forRemoval = true)
+    public List<AbstractContract> getActiveMissions() {
+        return contractHistory.getActiveIncludingNotYetStarted();
     }
 
-    public List<Mission> getActiveMissions(final boolean excludeEndDateCheck) {
-        return getMissions().stream()
-                     .filter(m -> m.isActiveOn(getLocalDate(), excludeEndDateCheck))
-                     .collect(Collectors.toList());
-    }
-
-    public List<Mission> getCompletedMissions() {
-        return getMissions().stream().filter(m -> m.getStatus().isCompleted()).collect(Collectors.toList());
+    public List<AbstractContract> getCompletedContracts() {
+        return contractHistory.getCompleted();
     }
 
     /**
@@ -1392,72 +1350,36 @@ public class Campaign implements ITechManager {
      * set to {@code false}. It fetches all contracts from the list of missions and filters them for those that are
      * currently active on the current local date.</p>
      *
-     * @return A list of {@link Contract} objects that are currently active.
+     * @return A list of {@link AbstractContract} objects that are currently active.
      */
-    public List<Contract> getActiveContracts() {
+    public List<AbstractContract> getActiveContracts() {
         return getActiveContracts(false);
     }
 
     /**
      * Retrieves a list of active contracts, with an option to include future contracts.
      *
-     * <p>This method iterates through all missions and checks if they are instances of {@link Contract}.
-     * If so, it filters them based on their active status, as determined by the
-     * {@link Contract#isActiveOn(LocalDate, boolean)} method.</p>
-     *
      * @param includeFutureContracts If {@code true}, contracts that are scheduled to start in the future will also be
      *                               included in the final result. If {@code false}, only contracts active on the
      *                               current local date are included.
      *
-     * @return A list of {@link Contract} objects that match the active criteria.
+     * @return A list of {@link AbstractContract} objects that match the active criteria.
      */
-    public List<Contract> getActiveContracts(boolean includeFutureContracts) {
-        List<Contract> activeContracts = new ArrayList<>();
-
-        for (Mission mission : getMissions()) {
-            // Skip if the mission is not a Contract
-            if (!(mission instanceof Contract contract)) {
-                continue;
-            }
-
-            if (contract.isActiveOn(getLocalDate(), includeFutureContracts)) {
-                activeContracts.add(contract);
-            }
-        }
-
-        return activeContracts;
+    public List<AbstractContract> getActiveContracts(boolean includeFutureContracts) {
+        return includeFutureContracts ? contractHistory.getActiveIncludingNotYetStarted() :
+                     contractHistory.getActiveAndStarted(currentDay);
     }
 
     /**
      * Retrieves a list of future contracts.
      *
-     * <p>This method fetches all missions and checks if they are instances of {@link Contract}. It filters the
+     * <p>This method fetches all missions and checks if they are instances of {@link AbstractContract}. It filters the
      * contracts where the start date is after the current day.</p>
      *
-     * @return A list of {@link Contract} objects whose start dates are in the future.
+     * @return A list of {@link AbstractContract} objects whose start dates are in the future.
      */
-    public List<Contract> getFutureContracts() {
-        List<Contract> activeContracts = new ArrayList<>();
-
-        for (Mission mission : getMissions()) {
-            // Skip if the mission is not a Contract
-            if (!(mission instanceof Contract contract)) {
-                continue;
-            }
-
-            if (contract.getStartDate().isAfter(currentDay)) {
-                activeContracts.add(contract);
-            }
-        }
-
-        return activeContracts;
-    }
-
-    public List<AtBContract> getAtBContracts() {
-        return getMissions().stream()
-                     .filter(c -> c instanceof AtBContract)
-                     .map(c -> (AtBContract) c)
-                     .collect(Collectors.toList());
+    public List<AbstractContract> getFutureContracts() {
+        return contractHistory.getActiveAndNotYetStarted(currentDay);
     }
 
     /**
@@ -1471,15 +1393,15 @@ public class Campaign implements ITechManager {
      * @return {@code true} if there is any currently active AtB contract, or if {@code includeFutureContracts} is
      *       {@code true} and there are future contracts starting after the current date. Otherwise, {@code false}.
      *
-     * @see #hasFutureAtBContract()
+     * @see #hasFutureContract()
      */
     public boolean hasActiveAtBContract(boolean includeFutureContracts) {
-        if (!getActiveAtBContracts().isEmpty()) {
+        if (!getActiveContracts().isEmpty()) {
             return true;
         }
 
         if (includeFutureContracts) {
-            return hasFutureAtBContract();
+            return hasFutureContract();
         }
 
         return false;
@@ -1497,53 +1419,8 @@ public class Campaign implements ITechManager {
         return hasActiveAtBContract(false);
     }
 
-    /**
-     * Determines whether there are any future AtB (Against the Bot) contracts. A future contract is defined as a
-     * contract that has been accepted but has a start date later than the current day.
-     *
-     * @return true if there is at least one future AtB contract (accepted but starting after the current date).
-     *       Otherwise, false.
-     */
-    public boolean hasFutureAtBContract() {
-        List<AtBContract> contracts = getAtBContracts();
-
-        for (AtBContract contract : contracts) {
-            // This catches any contracts that have been accepted, but haven't yet started
-            if (contract.getStartDate().isAfter(currentDay)) {
-                return true;
-            }
-        }
-
-        return false;
-    }
-
-    /**
-     * Retrieves a list of {@link AtBContract} objects that have a start date after the current day.
-     *
-     * @return a list of future AtBContract objects whose start date is after the current day
-     */
-    public List<AtBContract> getFutureAtBContracts() {
-        return getAtBContracts().stream()
-                     .filter(c -> c.getStartDate().isAfter(currentDay))
-                     .collect(Collectors.toList());
-    }
-
-    public List<AtBContract> getActiveAtBContracts() {
-        return getActiveAtBContracts(false);
-    }
-
-    public List<AtBContract> getActiveAtBContracts(boolean excludeEndDateCheck) {
-        return getMissions().stream()
-                     .filter(c -> (c instanceof AtBContract) && c.isActiveOn(getLocalDate(), excludeEndDateCheck))
-                     .map(c -> (AtBContract) c)
-                     .collect(Collectors.toList());
-    }
-
-    public List<AtBContract> getCompletedAtBContracts() {
-        return getMissions().stream()
-                     .filter(c -> (c instanceof AtBContract) && c.getStatus().isCompleted())
-                     .map(c -> (AtBContract) c)
-                     .collect(Collectors.toList());
+    public boolean hasFutureContract() {
+        return !getFutureContracts().isEmpty();
     }
 
     /**
@@ -1558,16 +1435,15 @@ public class Campaign implements ITechManager {
      * hasActiveContract based on that check. This value should not be set elsewhere
      */
     public void setHasActiveContract() {
-        hasActiveContract = getMissions().stream()
-                                  .anyMatch(c -> (c instanceof Contract) && c.isActiveOn(getLocalDate()));
+        hasActiveContract = getActiveContracts().size() > 0;
     }
     // endregion Missions/Contracts
 
     /**
      * Adds scenario to existing mission, generating a report.
      */
-    public void addScenario(Scenario s, Mission m) {
-        addScenario(s, m, false);
+    public void addScenario(Scenario scenario, AbstractContract mission) {
+        addScenario(scenario, mission, false);
     }
 
     /**
@@ -1580,24 +1456,24 @@ public class Campaign implements ITechManager {
      * <code>createScenariosForNewWeek</code> to
      * ensure that scenarios are generated properly.
      *
-     * @param s              - the Scenario to add
-     * @param m              - the mission to add the new scenario to
+     * @param scenario       - the Scenario to add
+     * @param mission        - the mission to add the new scenario to
      * @param suppressReport - whether to suppress the campaign report
      */
-    public void addScenario(Scenario s, Mission m, boolean suppressReport) {
-        final boolean newScenario = s.getId() == Scenario.S_DEFAULT_ID;
-        final int id = newScenario ? ++lastScenarioId : s.getId();
-        s.setId(id);
-        m.addScenario(s);
-        scenarios.put(id, s);
+    public void addScenario(Scenario scenario, AbstractContract mission, boolean suppressReport) {
+        final boolean newScenario = scenario.getId() == Scenario.S_DEFAULT_ID;
+        final int id = newScenario ? ++lastScenarioId : scenario.getId();
+        scenario.setId(id);
+        mission.addScenario(scenario);
+        scenarios.put(id, scenario);
 
         if (newScenario && !suppressReport) {
             addReport(BATTLE, MessageFormat.format(resources.getString("newAtBScenario.format"),
-                  s.getHyperlinkedName(),
-                  MekHQ.getMHQOptions().getDisplayFormattedDate(s.getDate())));
+                  scenario.getHyperlinkedName(),
+                  MekHQ.getMHQOptions().getDisplayFormattedDate(scenario.getDate())));
         }
 
-        MekHQ.triggerEvent(new ScenarioNewEvent(s));
+        MekHQ.triggerEvent(new ScenarioNewEvent(scenario));
     }
 
     public Scenario getScenario(int id) {
@@ -1683,7 +1559,7 @@ public class Campaign implements ITechManager {
     }
 
     public boolean isOnContractAndPlanetside() {
-        boolean isOnContract = !getActiveMissions(false).isEmpty();
+        boolean isOnContract = !getActiveContracts().isEmpty();
         boolean isPlanetside = getPlayerForce().getForceDetachment().isOnPlanet();
         return isPlanetside && isOnContract;
     }
@@ -4244,49 +4120,6 @@ public class Campaign implements ITechManager {
     }
 
     /**
-     * TODO : I should be part of AtBContract, not Campaign
-     *
-     * @param contract an active AtBContract
-     *
-     * @return the current deployment deficit for the contract
-     */
-    public int getDeploymentDeficit(AtBContract contract) {
-        if (!contract.isActiveOn(getLocalDate()) || contract.getStartDate().isEqual(getLocalDate())) {
-            // Do not check for deficits if the contract has not started, or
-            // it is the first day of the contract, as players won't have
-            // had time to assign forces to the contract yet
-            return 0;
-        }
-
-        int total = -contract.getRequiredCombatElements();
-        int role = -max(1, contract.getRequiredCombatElements() / 2);
-
-        final CombatRole requiredLanceRole = contract.getContractType().getRequiredCombatRole();
-        for (CombatTeam combatTeam : playerForce.getCombatTeamsMap().values()) {
-            CombatRole combatRole = combatTeam.getRole();
-
-            if (!combatRole.isReserve() && !combatRole.isAuxiliary()) {
-                if ((combatTeam.getMissionId() == contract.getId())) {
-                    if (!combatRole.isTraining()) {
-                        if (!combatRole.isCadre() || contract.getContractType().isCadreDuty()) {
-                            total += combatTeam.getSize(this);
-                        }
-                    }
-                }
-
-                if (combatRole == requiredLanceRole) {
-                    role += combatTeam.getSize(this);
-                }
-            }
-        }
-
-        if (total >= 0 && role >= 0) {
-            return 0;
-        }
-        return Math.abs(Math.min(total, role));
-    }
-
-    /**
      * Advances the campaign by one day, processing all daily events and updates.
      *
      * <p>This method delegates to {@link CampaignNewDayManager} to handle all new day processing,
@@ -4325,7 +4158,7 @@ public class Campaign implements ITechManager {
      * @since 0.50.10
      */
     public Money getTotalRentFeesExcludingBays() {
-        List<Contract> activeContracts = getActiveContracts();
+        List<AbstractContract> activeContracts = getActiveContracts();
         int hospitalRentalCost = campaignOptions.getRentedFacilitiesCostHospitalBeds();
         Money hospitalRentalFee = FacilityRentals.calculateContractRentalCost(hospitalRentalCost, activeContracts,
               ContractRentalType.HOSPITAL_BEDS);
@@ -4612,16 +4445,14 @@ public class Campaign implements ITechManager {
 
     public void removeScenario(final Scenario scenario) {
         scenario.clearAllFormationsAndPersonnel(this);
-        final Mission mission = getMission(scenario.getMissionId());
+        final AbstractContract mission = getContract(scenario.getMissionId());
         if (mission != null) {
             mission.getScenarios().remove(scenario);
 
             // run through the StratCon campaign state where applicable and remove the
             // "parent" scenario as well
-            if ((mission instanceof AtBContract) &&
-                      (((AtBContract) mission).getStratConCampaignState() != null) &&
-                      (scenario instanceof AtBDynamicScenario)) {
-                ((AtBContract) mission).getStratConCampaignState().removeStratConScenario(scenario.getId());
+            if (mission.getStratConCampaignState() != null && scenario instanceof AtBDynamicScenario) {
+                mission.getStratConCampaignState().removeStratConScenario(scenario.getId());
             }
         }
         scenarios.remove(scenario.getId());
@@ -4634,7 +4465,7 @@ public class Campaign implements ITechManager {
         MekHQ.triggerEvent(new ScenarioRemovedEvent(scenario));
     }
 
-    public void removeMission(final Mission mission) {
+    public void removeMission(final AbstractContract mission) {
         // Loop through scenarios here! We need to remove them as well.
         for (Scenario scenario : mission.getScenarios()) {
             scenario.clearAllFormationsAndPersonnel(this);
@@ -4642,7 +4473,7 @@ public class Campaign implements ITechManager {
         }
         mission.clearScenarios();
 
-        missions.remove(mission.getId());
+        contractHistory.remove(mission.getId());
 
         // https://github.com/MegaMek/mekhq/pull/7761
         // there's a bug preventing clearAllFormationsAndPersonnel from removing all scenario links,
@@ -5429,6 +5260,8 @@ public class Campaign implements ITechManager {
         MHQXMLUtility.writeSimpleXMLTag(writer, indent, "colour", getPlayerForce().getColour().name());
         getPlayerForce().getUnitIcon().writeToXML(writer, indent);
         MHQXMLUtility.writeSimpleXMLTag(writer, indent, "lastFormationId", playerForce.getLastFormationId());
+        getPlayerForce().writeContractsToXML(writer, indent, this);
+        getPlayerForce().getContractMarket().writeToXML(writer, indent, this);
         MHQXMLUtility.writeSimpleXMLTag(writer, indent, "lastMissionId", lastMissionId);
         MHQXMLUtility.writeSimpleXMLTag(writer, indent, "lastScenarioId", lastScenarioId);
         MHQXMLUtility.writeSimpleXMLTag(writer, indent, "initiativeBonus", getPlayerForce().getInitiativeBonus());
@@ -5470,12 +5303,6 @@ public class Campaign implements ITechManager {
         getPlayerForce().getHangar().writeToXML(writer, indent, "units"); // Units
 
         getPlayerForce().getHumanResources().writeToXML(writer, indent, this);
-
-        MHQXMLUtility.writeSimpleXMLOpenTag(writer, indent++, "missions");
-        for (final Mission mission : getMissions()) {
-            mission.writeToXML(this, writer, indent);
-        }
-        MHQXMLUtility.writeSimpleXMLCloseTag(writer, --indent, "missions");
 
         // the formations structure is hierarchical, but that should be handled
         // internally from with writeToXML function for Formation
@@ -5540,7 +5367,6 @@ public class Campaign implements ITechManager {
         if (getCampaignOptions().isUseStratCon()) {
             // TODO : AbstractContractMarket : Remove next two lines
             // CAW: implicit DEPENDS-ON to the <missions> node, do not move this above it
-            contractMarket.writeToXML(this, writer, indent);
 
             if (!playerForce.getCombatTeamsMap().isEmpty()) {
                 MHQXMLUtility.writeSimpleXMLOpenTag(writer, indent++, "combatTeams");
@@ -5873,7 +5699,7 @@ public class Campaign implements ITechManager {
             return new JumpPath();
         }
 
-        List<AtBContract> activeAtBContracts = getActiveAtBContracts();
+        List<AbstractContract> activeAtBContracts = getActiveContracts();
 
         FactionHints factionHints = FactionHints.getInstance();
         if (!skipAccessCheck && campaignOptions.isUseFactionStandingOutlawedSafe()) {
@@ -5932,7 +5758,7 @@ public class Campaign implements ITechManager {
                   FactionStandingUtilities.isUseCommandCircuit(getPlayerForce().isOverridingCommandCircuitRequirements(),
                         gmMode,
                         campaignOptions.isUseFactionStandingCommandCircuitSafe(),
-                        getPlayerForce().getFactionStandings(), getFutureAtBContracts());
+                        getPlayerForce().getFactionStandings(), getFutureContracts());
 
             // Get current node's information
             double currentG = scoreG.get(current) + currentSystem.getRechargeTime(getLocalDate(), isUseCommandCircuits);
@@ -6725,7 +6551,7 @@ public class Campaign implements ITechManager {
 
         List<TargetRollModifier> modifiers = new ArrayList<>(acquisition.getAllAcquisitionMods().getModifiers());
         if (getCampaignOptions().isUseStratCon() && getCampaignOptions().isRestrictPartsByMission()) {
-            int contractAvailability = findAtBPartsAvailabilityLevel();
+            int contractAvailability = findPartsAvailabilityLevel();
             if (contractAvailability != 0) {
                 modifiers.add(new TargetRollModifier(contractAvailability,
                       getTextAt(ACTION_CHECK_BUNDLE, "acquisition.modifier.contractPartAvailability")));
@@ -6738,10 +6564,10 @@ public class Campaign implements ITechManager {
         return person.checkSkill(skillType.getName(), this).withExternalModifiers(modifiers);
     }
 
-    public int findAtBPartsAvailabilityLevel() {
+    public int findPartsAvailabilityLevel() {
         Integer availabilityModifier = null;
-        for (AtBContract contract : getActiveAtBContracts()) {
-            int contractAvailability = contract.getPartsAvailabilityLevel();
+        for (AbstractContract contract : getActiveContracts()) {
+            int contractAvailability = contract.getObjectiveType().calculatePartsAvailabilityLevel();
 
             if (availabilityModifier == null || contractAvailability < availabilityModifier) {
                 availabilityModifier = contractAvailability;
@@ -7795,86 +7621,45 @@ public class Campaign implements ITechManager {
         });
     }
 
-    public void completeMission(@Nullable Mission mission, MissionStatus status) {
+    public void completeMission(@Nullable AbstractContract mission, MissionStatus status) {
         if (mission == null) {
             return;
         }
         mission.setStatus(status);
-        if (mission instanceof Contract contract) {
-            Money remainingMoney = Money.zero();
-            // check for money in escrow According to FMM(r) pg 179, both failure and breach lead to no further
-            // payment even though this seems foolish
-            if (contract.getStatus().isSuccess()) {
-                remainingMoney = contract.getMonthlyPayOut().multipliedBy(contract.getMonthsLeft(getLocalDate()));
+        Money remainingMoney = Money.zero();
+        // check for money in escrow According to FMM(r) pg 179, both failure and breach lead to no further
+        // payment even though this seems foolish
+        if (mission.getStatus().isSuccess()) {
+            remainingMoney = mission.getMonthlyPayOut().multipliedBy(mission.getMonthsLeft(getLocalDate()));
 
-                if (contract instanceof AtBContract) {
-                    Money routedPayout = ((AtBContract) contract).getRoutedPayout();
+            Money routedPayout = mission.getRoutPayout();
 
-                    remainingMoney = routedPayout == null ? remainingMoney : routedPayout;
-                }
-            }
+            remainingMoney = routedPayout == null ? remainingMoney : routedPayout;
+        }
 
-            // If overage repayment is enabled, we first need to check if the salvage
-            // percent is
-            // under 100. 100 means you cannot have an overage.
-            // Then, we check if the salvage percent is less than the percent salvaged by
-            // the
-            // unit in question. If it is, then they owe the assigner some cash
-            if (getCampaignOptions().isOverageRepaymentInFinalPayment() && (contract.getSalvagePercent() < 100.0)) {
-                final double salvagePercent = contract.getSalvagePercent() / 100.0;
-                final Money maxSalvage = contract.getSalvagedByEmployer()
-                                               .multipliedBy(salvagePercent / (1 - salvagePercent));
-                if (contract.getSalvagedByUnit().isGreaterThan(maxSalvage)) {
-                    final Money amountToRepay = contract.getSalvagedByUnit().minus(maxSalvage);
-                    remainingMoney = remainingMoney.minus(amountToRepay);
-                    contract.subtractSalvageByUnit(amountToRepay);
-                }
-            }
+        if (remainingMoney.isPositive()) {
+            getPlayerForce().getFinances().credit(TransactionType.CONTRACT_PAYMENT,
+                  getLocalDate(),
+                  remainingMoney,
+                  "Remaining payment for " + mission.getName());
+            addReport(FINANCES, "Your account has been credited for " +
+                                      remainingMoney.toAmountAndSymbolString() +
+                                      " for the remaining payout from contract " +
+                                      mission.getHyperlinkedName());
+        } else if (remainingMoney.isNegative()) {
+            getPlayerForce().getFinances().credit(TransactionType.CONTRACT_PAYMENT,
+                  getLocalDate(),
+                  remainingMoney,
+                  "Repaying payment overages for " + mission.getName());
+            addReport(FINANCES, "Your account has been debited for " +
+                                      remainingMoney.absolute().toAmountAndSymbolString() +
+                                      " to repay payment overages occurred during the contract " +
+                                      mission.getHyperlinkedName());
+        }
 
-            if (getCampaignOptions().isUseShareSystem()) {
-                ResourceBundle financeResources = ResourceBundle.getBundle("mekhq.resources.Finances",
-                      MekHQ.getMHQOptions().getLocale());
-
-                if (remainingMoney.isGreaterThan(Money.zero())) {
-                    Money shares = remainingMoney.multipliedBy(contract.getSharesPercent()).dividedBy(100);
-                    remainingMoney = remainingMoney.minus(shares);
-
-                    if (getPlayerForce().getFinances().debit(TransactionType.SALARIES,
-                          getLocalDate(),
-                          shares,
-                          String.format(financeResources.getString("ContractSharePayment.text"), contract.getName()))) {
-                        addReport(FINANCES, financeResources.getString("DistributedShares.text"),
-                              shares.toAmountAndSymbolString());
-
-                        getPlayerForce().getFinances().payOutSharesToPersonnel(this, shares);
-                    }
-                }
-            }
-
-            if (remainingMoney.isPositive()) {
-                getPlayerForce().getFinances().credit(TransactionType.CONTRACT_PAYMENT,
-                      getLocalDate(),
-                      remainingMoney,
-                      "Remaining payment for " + contract.getName());
-                addReport(FINANCES, "Your account has been credited for " +
-                                          remainingMoney.toAmountAndSymbolString() +
-                                          " for the remaining payout from contract " +
-                                          contract.getHyperlinkedName());
-            } else if (remainingMoney.isNegative()) {
-                getPlayerForce().getFinances().credit(TransactionType.CONTRACT_PAYMENT,
-                      getLocalDate(),
-                      remainingMoney,
-                      "Repaying payment overages for " + contract.getName());
-                addReport(FINANCES, "Your account has been debited for " +
-                                          remainingMoney.absolute().toAmountAndSymbolString() +
-                                          " to repay payment overages occurred during the contract " +
-                                          contract.getHyperlinkedName());
-            }
-
-            // This relies on the mission being a Contract, and AtB to be on
-            if (getCampaignOptions().isUseStratCon()) {
-                setHasActiveContract();
-            }
+        // This relies on the mission being a Contract, and AtB to be on
+        if (getCampaignOptions().isUseStratCon()) {
+            setHasActiveContract();
         }
     }
 
@@ -8190,16 +7975,6 @@ public class Campaign implements ITechManager {
     public void initAtB(boolean newCampaign) {
         if (!newCampaign) {
             /*
-             * Switch all contracts to AtBContract's
-             */
-            for (Entry<Integer, Mission> me : missions.entrySet()) {
-                Mission m = me.getValue();
-                if (m instanceof Contract && !(m instanceof AtBContract)) {
-                    me.setValue(new AtBContract((Contract) m, this));
-                }
-            }
-
-            /*
              * Go through all the personnel records and assume the earliest date is the date
              * the unit was founded.
              */
@@ -8261,8 +8036,6 @@ public class Campaign implements ITechManager {
 
         setAtBConfig(AtBConfiguration.loadFromXml());
         RandomFactionGenerator.getInstance().startup(this);
-
-        getContractMarket().generateContractOffers(this, newCampaign); // TODO : AbstractContractMarket : Remove
     }
 
     /**
@@ -8348,7 +8121,7 @@ public class Campaign implements ITechManager {
      * @return {@code true} if there are scenarios due, {@code false} otherwise
      */
     public boolean checkScenariosDue() {
-        return getActiveMissions(true).stream()
+        return getActiveContracts(true).stream()
                      .flatMap(m -> m.getCurrentScenarios().stream())
                      .anyMatch(s -> (s.getDate() != null) &&
                                           !(s instanceof AtBScenario) &&

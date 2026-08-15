@@ -50,6 +50,7 @@ import megamek.common.enums.SkillLevel;
 import megamek.common.units.Entity;
 import mekhq.campaign.universe.Factions;
 
+@Deprecated(since = "0.51.01", forRemoval = true)
 public class ContractDifficulty {
     /**
      * Calculates a difficulty rating for a mission by comparing the estimated combat strength of the opposing force
