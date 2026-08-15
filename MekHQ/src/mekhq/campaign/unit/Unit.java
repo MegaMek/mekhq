@@ -121,6 +121,9 @@ import mekhq.campaign.location.ILocatable;
 import mekhq.campaign.location.LocationNode;
 import mekhq.campaign.location.LocationUtils;
 import mekhq.campaign.log.AssignmentLogger;
+import mekhq.campaign.log.LogEntry;
+import mekhq.campaign.log.LogEntryFactory;
+import mekhq.campaign.log.UnitLogger;
 import mekhq.campaign.mission.AtBContract;
 import mekhq.campaign.mission.Mission;
 import mekhq.campaign.mission.Scenario;
@@ -245,6 +248,11 @@ public class Unit implements ITechnology, ILocatable {
     private Person engineer;
 
     private String history;
+    private List<LogEntry> unitLog;
+    private List<LogEntry> killLog;
+    private List<LogEntry> crewLog;
+    private List<LogEntry> deploymentLog;
+    private List<LogEntry> repairLog;
 
     // for delivery
     protected int daysToArrival;
@@ -270,6 +278,11 @@ public class Unit implements ITechnology, ILocatable {
         formationId = Formation.FORMATION_NONE;
         scenarioId = Scenario.S_DEFAULT_ID;
         this.history = "";
+        this.unitLog = new ArrayList<>();
+        this.killLog = new ArrayList<>();
+        this.crewLog = new ArrayList<>();
+        this.deploymentLog = new ArrayList<>();
+        this.repairLog = new ArrayList<>();
         this.lastMaintenanceReport = "";
         this.fluffName = "";
         this.maintenanceMultiplier = 4;
@@ -803,6 +816,131 @@ public class Unit implements ITechnology, ILocatable {
 
     public void setHistory(String s) {
         this.history = s;
+    }
+
+    /**
+     * Returns this unit's general log, sorted by date. The general log keeps tabs on ownership events: who originally
+     * owned it (if salvaged), when it was purchased, and refits.
+     *
+     * @return the unit's general log entries, sorted by date
+     */
+    public List<LogEntry> getUnitLog() {
+        unitLog.sort(Comparator.comparing(LogEntry::getDate));
+        return unitLog;
+    }
+
+    /**
+     * Adds a new entry to this unit's general log.
+     *
+     * @param entry the log entry to add
+     */
+    public void addUnitLogEntry(final LogEntry entry) {
+        unitLog.add(entry);
+    }
+
+    /**
+     * Returns this unit's kill log, sorted by date. The kill log records the kills scored by the unit through its
+     * pilot.
+     *
+     * @return the unit's kill log entries, sorted by date
+     */
+    public List<LogEntry> getKillLog() {
+        killLog.sort(Comparator.comparing(LogEntry::getDate));
+        return killLog;
+    }
+
+    /**
+     * Adds a new entry to this unit's kill log.
+     *
+     * @param entry the log entry to add
+     */
+    public void addKillLogEntry(final LogEntry entry) {
+        killLog.add(entry);
+    }
+
+    /**
+     * Returns this unit's crew log, sorted by date. The crew log records who has crewed the unit.
+     *
+     * @return the unit's crew log entries, sorted by date
+     */
+    public List<LogEntry> getCrewLog() {
+        crewLog.sort(Comparator.comparing(LogEntry::getDate));
+        return crewLog;
+    }
+
+    /**
+     * Adds a new entry to this unit's crew log.
+     *
+     * @param entry the log entry to add
+     */
+    public void addCrewLogEntry(final LogEntry entry) {
+        crewLog.add(entry);
+    }
+
+    /**
+     * Returns this unit's deployment log, sorted by date. The deployment log records deployments to scenarios.
+     *
+     * @return the unit's deployment log entries, sorted by date
+     */
+    public List<LogEntry> getDeploymentLog() {
+        deploymentLog.sort(Comparator.comparing(LogEntry::getDate));
+        return deploymentLog;
+    }
+
+    /**
+     * Adds a new entry to this unit's deployment log.
+     *
+     * @param entry the log entry to add
+     */
+    public void addDeploymentLogEntry(final LogEntry entry) {
+        deploymentLog.add(entry);
+    }
+
+    /**
+     * Returns this unit's repair log, sorted by date. The repair log records repairs conducted on the unit.
+     *
+     * @return the unit's repair log entries, sorted by date
+     */
+    public List<LogEntry> getRepairLog() {
+        repairLog.sort(Comparator.comparing(LogEntry::getDate));
+        return repairLog;
+    }
+
+    /**
+     * Adds a new entry to this unit's repair log.
+     *
+     * @param entry the log entry to add
+     */
+    public void addRepairLogEntry(final LogEntry entry) {
+        repairLog.add(entry);
+    }
+
+    /**
+     * Loads log entries from a log node (e.g. {@code <unitLog>}) into the provided list.
+     *
+     * @param logNode the XML node containing {@code <logEntry>} children
+     * @param target  the list to populate with the parsed entries
+     * @param logName the name of the log, used for error reporting
+     */
+    private static void loadLogEntriesFromXML(Node logNode, List<LogEntry> target, String logName) {
+        NodeList nl = logNode.getChildNodes();
+        for (int y = 0; y < nl.getLength(); y++) {
+            Node wn = nl.item(y);
+            // If it's not an element node, we ignore it.
+            if (wn.getNodeType() != Node.ELEMENT_NODE) {
+                continue;
+            }
+
+            if (!wn.getNodeName().equalsIgnoreCase("logEntry")) {
+                LOGGER.error("({}) Unknown node type not loaded in unit logEntry nodes: {}", logName, wn.getNodeName());
+                continue;
+            }
+
+            final LogEntry logEntry = LogEntryFactory.getInstance().generateInstanceFromXML(wn);
+            if (logEntry != null) {
+                target.add(logEntry);
+            }
+        }
     }
 
     public static boolean isFunctional(Entity en) {
@@ -2892,6 +3030,46 @@ public class Unit implements ITechnology, ILocatable {
             MHQXMLUtility.writeSimpleXMLTag(pw, indent, "history", history);
         }
 
+        if (!unitLog.isEmpty()) {
+            MHQXMLUtility.writeSimpleXMLOpenTag(pw, indent++, "unitLog");
+            for (LogEntry entry : unitLog) {
+                entry.writeToXML(pw, indent);
+            }
+            MHQXMLUtility.writeSimpleXMLCloseTag(pw, --indent, "unitLog");
+        }
+
+        if (!killLog.isEmpty()) {
+            MHQXMLUtility.writeSimpleXMLOpenTag(pw, indent++, "killLog");
+            for (LogEntry entry : killLog) {
+                entry.writeToXML(pw, indent);
+            }
+            MHQXMLUtility.writeSimpleXMLCloseTag(pw, --indent, "killLog");
+        }
+
+        if (!crewLog.isEmpty()) {
+            MHQXMLUtility.writeSimpleXMLOpenTag(pw, indent++, "crewLog");
+            for (LogEntry entry : crewLog) {
+                entry.writeToXML(pw, indent);
+            }
+            MHQXMLUtility.writeSimpleXMLCloseTag(pw, --indent, "crewLog");
+        }
+
+        if (!deploymentLog.isEmpty()) {
+            MHQXMLUtility.writeSimpleXMLOpenTag(pw, indent++, "deploymentLog");
+            for (LogEntry entry : deploymentLog) {
+                entry.writeToXML(pw, indent);
+            }
+            MHQXMLUtility.writeSimpleXMLCloseTag(pw, --indent, "deploymentLog");
+        }
+
+        if (!repairLog.isEmpty()) {
+            MHQXMLUtility.writeSimpleXMLOpenTag(pw, indent++, "repairLog");
+            for (LogEntry entry : repairLog) {
+                entry.writeToXML(pw, indent);
+            }
+            MHQXMLUtility.writeSimpleXMLCloseTag(pw, --indent, "repairLog");
+        }
+
         if (refit != null) {
             refit.writeToXML(pw, indent);
         }
@@ -3059,6 +3237,16 @@ public class Unit implements ITechnology, ILocatable {
                     retVal.refit = Refit.generateInstanceFromXML(wn2, version, campaign, retVal);
                 } else if (wn2.getNodeName().equalsIgnoreCase("history")) {
                     retVal.history = wn2.getTextContent();
+                } else if (wn2.getNodeName().equalsIgnoreCase("unitLog")) {
+                    loadLogEntriesFromXML(wn2, retVal.unitLog, "unitLog");
+                } else if (wn2.getNodeName().equalsIgnoreCase("killLog")) {
+                    loadLogEntriesFromXML(wn2, retVal.killLog, "killLog");
+                } else if (wn2.getNodeName().equalsIgnoreCase("crewLog")) {
+                    loadLogEntriesFromXML(wn2, retVal.crewLog, "crewLog");
+                } else if (wn2.getNodeName().equalsIgnoreCase("deploymentLog")) {
+                    loadLogEntriesFromXML(wn2, retVal.deploymentLog, "deploymentLog");
+                } else if (wn2.getNodeName().equalsIgnoreCase("repairLog")) {
+                    loadLogEntriesFromXML(wn2, retVal.repairLog, "repairLog");
                 } else if (wn2.getNodeName().equalsIgnoreCase("fluffName")) {
                     retVal.fluffName = wn2.getTextContent();
                 } else if (wn2.getNodeName().equalsIgnoreCase("lastMaintenanceReport")) {
@@ -5993,6 +6181,7 @@ public class Unit implements ITechnology, ILocatable {
         } else {
             AssignmentLogger.assignedTo(person, getCampaign().getLocalDate(), getName());
         }
+        UnitLogger.assignedCrew(this, getCampaign().getLocalDate(), person.getFullName());
         MekHQ.triggerEvent(new PersonCrewAssignmentEvent(campaign, person, this));
     }
 
@@ -6016,6 +6205,7 @@ public class Unit implements ITechnology, ILocatable {
         } else {
             AssignmentLogger.assignedTo(person, getCampaign().getLocalDate(), getName());
         }
+        UnitLogger.assignedCrew(this, getCampaign().getLocalDate(), person.getFullName());
         MekHQ.triggerEvent(new PersonCrewAssignmentEvent(campaign, person, this));
     }
 
@@ -6039,6 +6229,7 @@ public class Unit implements ITechnology, ILocatable {
         } else {
             AssignmentLogger.assignedTo(person, getCampaign().getLocalDate(), getName());
         }
+        UnitLogger.assignedCrew(this, getCampaign().getLocalDate(), person.getFullName());
         MekHQ.triggerEvent(new PersonCrewAssignmentEvent(campaign, person, this));
     }
 
@@ -6062,6 +6253,7 @@ public class Unit implements ITechnology, ILocatable {
         } else {
             AssignmentLogger.assignedTo(person, getCampaign().getLocalDate(), getName());
         }
+        UnitLogger.assignedCrew(this, getCampaign().getLocalDate(), person.getFullName());
         MekHQ.triggerEvent(new PersonCrewAssignmentEvent(campaign, person, this));
     }
 
@@ -6089,6 +6281,7 @@ public class Unit implements ITechnology, ILocatable {
         } else {
             AssignmentLogger.assignedTo(person, getCampaign().getLocalDate(), getName());
         }
+        UnitLogger.assignedCrew(this, getCampaign().getLocalDate(), person.getFullName());
         MekHQ.triggerEvent(new PersonCrewAssignmentEvent(campaign, person, this));
     }
 
@@ -6106,14 +6299,30 @@ public class Unit implements ITechnology, ILocatable {
         tech = person;
         person.addTechUnit(this);
         AssignmentLogger.assignedTo(person, getCampaign().getLocalDate(), getName());
+        UnitLogger.assignedTech(this, getCampaign().getLocalDate(), person.getFullName());
         MekHQ.triggerEvent(new PersonTechAssignmentEvent(person, this));
     }
 
     public void removeTech() {
+        removeTech(true);
+    }
+
+    /**
+     * Removes this unit's assigned technician, if it has one.
+     *
+     * @param log whether to record the removal in the technician's own assignment log. Pass {@code false} where the
+     *            caller records the person's side of the move itself, such as {@link #remove(Person, boolean)}, so that
+     *            the removal is not logged twice. The unit's own crew log records the removal either way.
+     */
+    public void removeTech(final boolean log) {
         if (tech != null) {
             Person originalTech = tech;
             tech.removeTechUnit(this);
             tech = null;
+            UnitLogger.removedTech(this, getCampaign().getLocalDate(), originalTech.getFullName());
+            if (log) {
+                AssignmentLogger.removedFrom(originalTech, getCampaign().getLocalDate(), getName());
+            }
             MekHQ.triggerEvent(new PersonTechAssignmentEvent(originalTech, null));
         }
     }
@@ -6177,6 +6386,7 @@ public class Unit implements ITechnology, ILocatable {
                   getCampaign().getLocalDate(),
                   campaign1.getPlayerForce().getFormationFor(this));
         }
+        UnitLogger.assignedCrew(this, getCampaign().getLocalDate(), person.getFullName());
         MekHQ.triggerEvent(new PersonCrewAssignmentEvent(campaign, person, this));
     }
 
@@ -6191,7 +6401,8 @@ public class Unit implements ITechnology, ILocatable {
 
         ensurePersonIsRegistered(person);
         if (person.equals(tech)) {
-            removeTech();
+            // the trailing 'log' block below records this person's side of the removal, so do not log it twice
+            removeTech(false);
         }
 
         boolean wasCrew = false;
@@ -6220,6 +6431,9 @@ public class Unit implements ITechnology, ILocatable {
 
         if (wasCrew) {
             resetPilotAndEntity();
+            // the departure is part of the unit's service history whether or not the person's own logs record it, as
+            // a transfer still leaves this unit without that crew member
+            UnitLogger.removedCrew(this, getCampaign().getLocalDate(), person.getFullName());
             MekHQ.triggerEvent(new PersonCrewAssignmentEvent(campaign, person, this));
         }
 
@@ -6280,6 +6494,8 @@ public class Unit implements ITechnology, ILocatable {
     }
 
     public void setScenarioId(int i) {
+        // Note: assigning a unit to a scenario is only a plan, and can be undone before the scenario is played, so no
+        // deployment is logged here. ResolveScenarioTracker logs the deployment once the scenario is actually resolved.
         this.scenarioId = i;
     }
 

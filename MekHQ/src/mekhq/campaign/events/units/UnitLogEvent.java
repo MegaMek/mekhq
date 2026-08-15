@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2018-2026 The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2026 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -30,17 +30,15 @@
  * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
  * affiliated with Microsoft.
  */
-package mekhq.campaign.log;
+package mekhq.campaign.events.units;
 
-public enum LogEntryType {
-    ASSIGNMENT,
-    AWARD,
-    CUSTOM,
-    HISTORICAL, //Used for historical daily log
-    MEDICAL,
-    PATIENT,
-    PERFORMANCE,
-    PERSONAL,
-    SERVICE,
-    UNIT
+import mekhq.campaign.unit.Unit;
+
+/**
+ * Triggered when a unit's log is changed.
+ */
+public class UnitLogEvent extends UnitEvent {
+    public UnitLogEvent(Unit unit) {
+        super(unit);
+    }
 }
