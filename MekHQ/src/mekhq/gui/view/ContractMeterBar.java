@@ -49,6 +49,7 @@ import javax.swing.UIManager;
 import jakarta.annotation.Nonnull;
 import jakarta.annotation.Nullable;
 import megamek.client.ui.util.UIUtil;
+import mekhq.campaign.digitalGM.stratCon.StratConCampaignState;
 import mekhq.gui.baseComponents.GradientMarkerBar;
 import mekhq.gui.baseComponents.GradientMarkerBar.Marker;
 import mekhq.gui.baseComponents.GradientMarkerBar.MarkerStyle;
@@ -73,15 +74,46 @@ import mekhq.gui.baseComponents.GradientMarkerBar.MarkerStyle;
  * </p>
  *
  * <p>
- * Instances are created through the {@link #victoryPoints(int, int, boolean)}, {@link #supportPoints(int, int)},
- * {@link #salvage(int, int)}, and {@link #timeline(LocalDate, LocalDate, LocalDate, String, String, String)} factory
- * methods, which supply the appropriate title, tooltip, and styling for each metric.
+ * Instances are created through the {@link #victoryPoints(int, int, StratConCampaignState)},
+ * {@link #supportPoints(int, int)}, {@link #salvage(int, int)}, and
+ * {@link #timeline(LocalDate, LocalDate, LocalDate, String, String, String)} factory methods, which supply the
+ * appropriate title, tooltip, and styling for each metric.
  * </p>
  *
  * @author The MegaMek Team
  */
 public class ContractMeterBar extends JPanel {
     private static final String RESOURCE_BUNDLE = "mekhq.resources.ContractViewPanel";
+
+    /**
+     * Presentation state for full-term contracts, contracts with outstanding objective requirements, and contracts
+     * whose objective requirements are satisfied. A missing campaign state maps conservatively to outstanding
+     * requirements; {@link StratConCampaignState#canEndContractEarly()} treats completed and failed objectives as
+     * resolved.
+     */
+    private enum EarlyVictoryStatus {
+        FULL_TERM,
+        OBJECTIVE_REQUIREMENTS_OUTSTANDING,
+        OBJECTIVE_REQUIREMENTS_SATISFIED;
+
+        /**
+         * Determines the presentation state from a contract's StratCon campaign state.
+         *
+         * @param campaignState the contract's StratCon campaign state, or {@code null} when unavailable
+         *
+         * @return the corresponding presentation state
+         */
+        private static @Nonnull EarlyVictoryStatus from(final @Nullable StratConCampaignState campaignState) {
+            if (campaignState == null) {
+                return OBJECTIVE_REQUIREMENTS_OUTSTANDING;
+            }
+            if (!campaignState.allowEarlyVictory()) {
+                return FULL_TERM;
+            }
+            return campaignState.canEndContractEarly() ? OBJECTIVE_REQUIREMENTS_SATISFIED
+                  : OBJECTIVE_REQUIREMENTS_OUTSTANDING;
+        }
+    }
 
     /** Deep red for a low or negative score; shared with {@link MoraleBar}'s palette for visual consistency. */
     private static final Color DEEP_RED = new Color(0xA8, 0x12, 0x12);
@@ -159,24 +191,42 @@ public class ContractMeterBar extends JPanel {
     }
 
     /**
-     * Creates a gauge of a contract's accumulated victory points against the score required to declare victory.
+     * Creates a gauge of a contract's accumulated victory points against its Victory Point target. Its title and
+     * tooltip distinguish full-term contracts, outstanding objective requirements, and secured early victory.
      *
      * @param currentScore  the contract's current accumulated victory points (may be negative)
-     * @param requiredScore the victory points required to declare victory; should be positive (callers should fall back
-     *                      to a plain-text display when the requirement is not a positive number)
-     * @param canEndEarly   {@code true} if reaching {@code requiredScore} lets the player declare victory early;
-     *                      {@code false} if the contract must run its full term, in which case the title carries a
-     *                      concise "full term" cue
+     * @param requiredScore the victory points required to declare victory; should be positive (callers should fall
+     *                      back to a plain-text display when the requirement is not a positive number)
+     * @param campaignState the contract's StratCon state; a missing state is treated conservatively as having
+     *                      outstanding objective requirements, rather than claiming either full term or secured early
+     *                      victory
      *
      * @return the configured gauge
      */
     public static @Nonnull ContractMeterBar victoryPoints(final int currentScore, final int requiredScore,
-          final boolean canEndEarly) {
-        final String tooltip = getFormattedTextAt(RESOURCE_BUNDLE,
-              canEndEarly ? "contractScoreBar.tooltip.canEndEarly" : "contractScoreBar.tooltip.cannotEndEarly",
-              currentScore, requiredScore);
-        final String titleKey = canEndEarly ? "contractScoreBar.title.text"
-                                      : "contractScoreBar.title.cannotEndEarly.text";
+          final @Nullable StratConCampaignState campaignState) {
+        final EarlyVictoryStatus earlyVictoryStatus = EarlyVictoryStatus.from(campaignState);
+        final boolean targetReached = currentScore >= requiredScore;
+        final String titleKey = switch (earlyVictoryStatus) {
+            case FULL_TERM -> targetReached ? "contractScoreBar.title.targetReached.fullTerm.text"
+                  : "contractScoreBar.title.fullTerm.text";
+            case OBJECTIVE_REQUIREMENTS_OUTSTANDING -> targetReached ?
+                  "contractScoreBar.title.targetReached.objectivesOutstanding.text" :
+                  "contractScoreBar.title.text";
+            case OBJECTIVE_REQUIREMENTS_SATISFIED -> targetReached ?
+                  "contractScoreBar.title.earlyVictorySecured.text" : "contractScoreBar.title.text";
+        };
+        final String tooltipKey = switch (earlyVictoryStatus) {
+            case FULL_TERM -> targetReached ? "contractScoreBar.tooltip.targetReached.fullTerm"
+                  : "contractScoreBar.tooltip.fullTerm";
+            case OBJECTIVE_REQUIREMENTS_OUTSTANDING -> targetReached ?
+                  "contractScoreBar.tooltip.targetReached.objectivesOutstanding" :
+                  "contractScoreBar.tooltip.objectivesOutstanding";
+            case OBJECTIVE_REQUIREMENTS_SATISFIED -> targetReached ?
+                  "contractScoreBar.tooltip.earlyVictorySecured" :
+                  "contractScoreBar.tooltip.objectiveRequirementsSatisfied";
+        };
+        final String tooltip = getFormattedTextAt(RESOURCE_BUNDLE, tooltipKey, currentScore, requiredScore);
         return valueMeter(getTextAt(RESOURCE_BUNDLE, titleKey), currentScore, requiredScore, tooltip);
     }
 
