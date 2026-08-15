@@ -39,7 +39,7 @@ import mekhq.campaign.Campaign;
 import mekhq.campaign.personnel.Bloodname;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.enums.Phenotype;
-import mekhq.campaign.personnel.ranks.AutoAssignRankForCompanyGenerator;
+import mekhq.campaign.personnel.ranks.AutomaticRankAssigner;
 import mekhq.campaign.universe.Faction;
 
 /**
@@ -90,7 +90,7 @@ public class OpposingCommander {
 
         // assignRankSystemFromFaction resolves the commander's origin faction's own rank system, so the resulting rank
         // is faction-appropriate for Clans, ComStar, and Inner Sphere powers alike.
-        AutoAssignRankForCompanyGenerator.assignRankSystemFromFaction(commander, COMMANDER_RANK);
+        AutomaticRankAssigner.assignRankSystemFromFaction(commander, COMMANDER_RANK);
 
         return commander;
     }
