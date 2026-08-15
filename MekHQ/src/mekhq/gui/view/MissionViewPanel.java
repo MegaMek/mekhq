@@ -249,9 +249,8 @@ public class MissionViewPanel extends JScrollablePanel {
                   mission);
             int neededScore = mission.getRequiredVictoryPoints();
             if (neededScore > 0) {
-                final boolean canEndEarly = (mission.getStratConCampaignState() == null) ||
-                                                  mission.getStratConCampaignState().allowEarlyVictory();
-                addGaugeRow(ContractMeterBar.victoryPoints(currentScore, neededScore, canEndEarly), y++);
+                addGaugeRow(ContractMeterBar.victoryPoints(currentScore, neededScore,
+                      mission.getStratConCampaignState()), y++);
             } else {
                 lblScore.setName("lblScore");
                 lblScore.setText(getTextAt(RESOURCE_BUNDLE, "lblScore.text"));

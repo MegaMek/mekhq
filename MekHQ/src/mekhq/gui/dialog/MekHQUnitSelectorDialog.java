@@ -67,6 +67,7 @@ import megamek.common.units.UnitType;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.parts.enums.PartQuality;
+import mekhq.campaign.unit.UnitAcquisitionType;
 import mekhq.campaign.unit.UnitOrder;
 import mekhq.campaign.unit.UnitTechProgression;
 import mekhq.utilities.MHQInternationalization;
@@ -250,7 +251,7 @@ public class MekHQUnitSelectorDialog extends AbstractUnitSelectorDialog {
             quality = UnitOrder.getRandomUnitQuality(0);
         }
 
-        campaign.addNewUnit(selectedUnit.getEntity(), false, 0, quality);
+        campaign.addNewUnit(selectedUnit.getEntity(), false, 0, quality, UnitAcquisitionType.GM_ADDED);
     }
 
     /**
