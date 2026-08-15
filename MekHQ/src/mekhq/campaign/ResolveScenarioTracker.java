@@ -75,6 +75,7 @@ import mekhq.campaign.finances.Money;
 import mekhq.campaign.finances.enums.TransactionType;
 import mekhq.campaign.force.Formation;
 import mekhq.campaign.log.ServiceLogger;
+import mekhq.campaign.log.UnitLogger;
 import mekhq.campaign.mission.AtBScenario;
 import mekhq.campaign.mission.BotForce;
 import mekhq.campaign.mission.Loot;

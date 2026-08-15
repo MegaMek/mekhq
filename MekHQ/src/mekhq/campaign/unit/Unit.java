@@ -124,8 +124,6 @@ import mekhq.campaign.log.AssignmentLogger;
 import mekhq.campaign.log.LogEntry;
 import mekhq.campaign.log.LogEntryFactory;
 import mekhq.campaign.log.UnitLogger;
-import mekhq.campaign.mission.AtBContract;
-import mekhq.campaign.mission.Mission;
 import mekhq.campaign.mission.Scenario;
 import mekhq.campaign.mission.camOpsSalvage.CamOpsSalvageUtilities;
 import mekhq.campaign.mission.enums.ContractObjectiveType;
