@@ -84,6 +84,7 @@ import mekhq.campaign.personnel.Clan;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.enums.Phenotype;
 import mekhq.campaign.unit.Unit;
+import mekhq.campaign.unit.UnitAcquisitionType;
 import mekhq.campaign.universe.Factions;
 import mekhq.gui.CampaignGUI;
 import mekhq.gui.baseComponents.AbstractMHQDialogBasic;
@@ -1512,7 +1513,8 @@ public class GMToolsDialog extends AbstractMHQDialogBasic {
                 quality = PartQuality.QUALITY_D;
             }
 
-            final Unit unit = getGUI().getCampaign().addNewUnit(getLastRolledUnit(), false, 0, quality);
+            final Unit unit = getGUI().getCampaign()
+                                    .addNewUnit(getLastRolledUnit(), false, 0, quality, UnitAcquisitionType.GM_ADDED);
 
             if ((getPerson() != null) && (getPerson().getUnit() == null)) {
                 unit.addPilotOrSoldier(getPerson());

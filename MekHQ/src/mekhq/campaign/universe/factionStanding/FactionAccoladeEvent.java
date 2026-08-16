@@ -63,9 +63,12 @@ import mekhq.campaign.finances.Money;
 import mekhq.campaign.finances.enums.TransactionType;
 import mekhq.campaign.force.CombatTeam;
 import mekhq.campaign.force.FormationLevel;
+import mekhq.campaign.parts.enums.PartQuality;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.enums.PersonnelRole;
 import mekhq.campaign.personnel.ranks.AutomaticRankAssigner;
+import mekhq.campaign.unit.UnitAcquisitionType;
+import mekhq.campaign.unit.UnitOrder;
 import mekhq.campaign.universe.Faction;
 import mekhq.campaign.universe.Factions;
 import mekhq.campaign.universe.IUnitGenerator;
@@ -225,7 +228,8 @@ public class FactionAccoladeEvent {
 
             List<Entity> generatedEntities = generateUnits();
             for (Entity entity : generatedEntities) {
-                campaign.addNewUnit(entity, false, 0);
+                PartQuality quality = UnitOrder.getRandomUnitQuality(2);
+                campaign.addNewUnit(entity, false, 0, quality, UnitAcquisitionType.GIFT);
             }
             return;
         }

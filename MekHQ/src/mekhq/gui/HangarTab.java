@@ -77,6 +77,7 @@ import mekhq.campaign.events.parts.PartWorkEvent;
 import mekhq.campaign.events.persons.PersonChangedEvent;
 import mekhq.campaign.events.scenarios.ScenarioResolvedEvent;
 import mekhq.campaign.events.units.UnitChangedEvent;
+import mekhq.campaign.events.units.UnitLogEvent;
 import mekhq.campaign.events.units.UnitNewEvent;
 import mekhq.campaign.events.units.UnitRemovedEvent;
 import mekhq.campaign.unit.Unit;
@@ -800,6 +801,11 @@ public final class HangarTab extends CampaignGuiTab {
     @Subscribe
     public void handle(UnitChangedEvent ev) {
         filterUnitScheduler.schedule();
+    }
+
+    @Subscribe
+    public void handle(UnitLogEvent ev) {
+        refreshUnitView();
     }
 
     @Subscribe
