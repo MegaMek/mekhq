@@ -33,8 +33,10 @@
 package mekhq.gui.campaignOptions;
 
 import megamek.Version;
+import megamek.client.ui.settings.SettingsBadge;
 import megamek.common.annotations.Nullable;
 
+import java.awt.Color;
 import java.util.Collections;
 import java.util.EnumSet;
 import java.util.MissingResourceException;
@@ -162,5 +164,17 @@ public record CampaignOptionsMetadata(
         }
         return String.format(" <font face=\"Material Symbols Rounded\" color=\"%s\">%s</font>",
               badge.getColor(), badge.getSymbol());
+    }
+
+    /**
+     * @return the resolved generic settings badge for this option's version, or {@code null} when it is not recent
+     */
+    @Nullable SettingsBadge getAddedSinceSettingsBadge() {
+        AddedSinceBadge badge = getBadgeType();
+        if (badge == null) {
+            return null;
+        }
+        String description = getTextAt(AddedSinceBadge.RESOURCE_BUNDLE, "legend." + badge.key);
+        return new SettingsBadge(badge.getSymbol().codePointAt(0), Color.decode(badge.getColor()), description);
     }
 }

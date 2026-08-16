@@ -181,7 +181,8 @@ public class ScenarioSetupForces<SCENARIO extends Scenario> extends SetupForces 
         var player = getCleanPlayer();
         game.addPlayer(player.getId(), player);
         var entities = setupPlayerForces(player);
-        var playerSkill = campaign.getPlayerForce().getReputation().getAverageSkillLevel();
+        var playerSkill = campaign.getPlayerForce()
+                                .getAverageSkillLevel(campaign.getCampaignOptions(), campaign.getLocalDate());
         game.setPlayerSkillLevel(player.getId(), playerSkill);
         sendEntities(entities, game);
     }

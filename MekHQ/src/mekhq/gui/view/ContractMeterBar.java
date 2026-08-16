@@ -49,6 +49,7 @@ import javax.swing.UIManager;
 import jakarta.annotation.Nonnull;
 import jakarta.annotation.Nullable;
 import megamek.client.ui.util.UIUtil;
+import mekhq.campaign.digitalGM.stratCon.StratConCampaignState;
 import mekhq.gui.baseComponents.GradientMarkerBar;
 import mekhq.gui.baseComponents.GradientMarkerBar.Marker;
 import mekhq.gui.baseComponents.GradientMarkerBar.MarkerStyle;
@@ -73,15 +74,46 @@ import mekhq.gui.baseComponents.GradientMarkerBar.MarkerStyle;
  * </p>
  *
  * <p>
- * Instances are created through the {@link #victoryPoints(int, int, boolean)}, {@link #supportPoints(int, int)},
- * {@link #salvage(int, int)}, and {@link #timeline(LocalDate, LocalDate, LocalDate, String, String, String)} factory
- * methods, which supply the appropriate title, tooltip, and styling for each metric.
+ * Instances are created through the {@link #victoryPoints(int, int, StratConCampaignState)},
+ * {@link #supportPoints(int, int)}, {@link #salvage(int, int)}, and
+ * {@link #timeline(LocalDate, LocalDate, LocalDate, String, String, String)} factory methods, which supply the
+ * appropriate title, tooltip, and styling for each metric.
  * </p>
  *
  * @author The MegaMek Team
  */
 public class ContractMeterBar extends JPanel {
     private static final String RESOURCE_BUNDLE = "mekhq.resources.ContractViewPanel";
+
+    /**
+     * Presentation state for full-term contracts, contracts with outstanding objective requirements, and contracts
+     * whose objective requirements are satisfied. A missing campaign state maps conservatively to outstanding
+     * requirements; {@link StratConCampaignState#canEndContractEarly()} treats completed and failed objectives as
+     * resolved.
+     */
+    private enum EarlyVictoryStatus {
+        FULL_TERM,
+        OBJECTIVE_REQUIREMENTS_OUTSTANDING,
+        OBJECTIVE_REQUIREMENTS_SATISFIED;
+
+        /**
+         * Determines the presentation state from a contract's StratCon campaign state.
+         *
+         * @param campaignState the contract's StratCon campaign state, or {@code null} when unavailable
+         *
+         * @return the corresponding presentation state
+         */
+        private static @Nonnull EarlyVictoryStatus from(final @Nullable StratConCampaignState campaignState) {
+            if (campaignState == null) {
+                return OBJECTIVE_REQUIREMENTS_OUTSTANDING;
+            }
+            if (!campaignState.allowEarlyVictory()) {
+                return FULL_TERM;
+            }
+            return campaignState.canEndContractEarly() ? OBJECTIVE_REQUIREMENTS_SATISFIED
+                  : OBJECTIVE_REQUIREMENTS_OUTSTANDING;
+        }
+    }
 
     /** Deep red for a low or negative score; shared with {@link MoraleBar}'s palette for visual consistency. */
     private static final Color DEEP_RED = new Color(0xA8, 0x12, 0x12);
@@ -159,24 +191,42 @@ public class ContractMeterBar extends JPanel {
     }
 
     /**
-     * Creates a gauge of a contract's accumulated victory points against the score required to declare victory.
+     * Creates a gauge of a contract's accumulated victory points against its Victory Point target. Its title and
+     * tooltip distinguish full-term contracts, outstanding objective requirements, and secured early victory.
      *
      * @param currentScore  the contract's current accumulated victory points (may be negative)
      * @param requiredScore the victory points required to declare victory; should be positive (callers should fall
      *                      back to a plain-text display when the requirement is not a positive number)
-     * @param canEndEarly   {@code true} if reaching {@code requiredScore} lets the player declare victory early;
-     *                      {@code false} if the contract must run its full term, in which case the title carries a
-     *                      concise "full term" cue
+     * @param campaignState the contract's StratCon state; a missing state is treated conservatively as having
+     *                      outstanding objective requirements, rather than claiming either full term or secured early
+     *                      victory
      *
      * @return the configured gauge
      */
     public static @Nonnull ContractMeterBar victoryPoints(final int currentScore, final int requiredScore,
-          final boolean canEndEarly) {
-        final String tooltip = getFormattedTextAt(RESOURCE_BUNDLE,
-              canEndEarly ? "contractScoreBar.tooltip.canEndEarly" : "contractScoreBar.tooltip.cannotEndEarly",
-              currentScore, requiredScore);
-        final String titleKey = canEndEarly ? "contractScoreBar.title.text"
-              : "contractScoreBar.title.cannotEndEarly.text";
+          final @Nullable StratConCampaignState campaignState) {
+        final EarlyVictoryStatus earlyVictoryStatus = EarlyVictoryStatus.from(campaignState);
+        final boolean targetReached = currentScore >= requiredScore;
+        final String titleKey = switch (earlyVictoryStatus) {
+            case FULL_TERM -> targetReached ? "contractScoreBar.title.targetReached.fullTerm.text"
+                  : "contractScoreBar.title.fullTerm.text";
+            case OBJECTIVE_REQUIREMENTS_OUTSTANDING -> targetReached ?
+                  "contractScoreBar.title.targetReached.objectivesOutstanding.text" :
+                  "contractScoreBar.title.text";
+            case OBJECTIVE_REQUIREMENTS_SATISFIED -> targetReached ?
+                  "contractScoreBar.title.earlyVictorySecured.text" : "contractScoreBar.title.text";
+        };
+        final String tooltipKey = switch (earlyVictoryStatus) {
+            case FULL_TERM -> targetReached ? "contractScoreBar.tooltip.targetReached.fullTerm"
+                  : "contractScoreBar.tooltip.fullTerm";
+            case OBJECTIVE_REQUIREMENTS_OUTSTANDING -> targetReached ?
+                  "contractScoreBar.tooltip.targetReached.objectivesOutstanding" :
+                  "contractScoreBar.tooltip.objectivesOutstanding";
+            case OBJECTIVE_REQUIREMENTS_SATISFIED -> targetReached ?
+                  "contractScoreBar.tooltip.earlyVictorySecured" :
+                  "contractScoreBar.tooltip.objectiveRequirementsSatisfied";
+        };
+        final String tooltip = getFormattedTextAt(RESOURCE_BUNDLE, tooltipKey, currentScore, requiredScore);
         return valueMeter(getTextAt(RESOURCE_BUNDLE, titleKey), currentScore, requiredScore, tooltip);
     }
 
@@ -213,16 +263,57 @@ public class ContractMeterBar extends JPanel {
     }
 
     /**
-     * Creates a neutral progress gauge of how far the current date has advanced between a contract's start and end.
-     * Unlike the value meters, the track is a single neutral color: time has no good or bad direction, so a red-to-green
-     * gradient would imply a judgement that does not exist. The start and end are unlabeled ticks (the dates are carried
-     * in the title), and the current date is the bold accent marker.
+     * Creates a threat gauge running from 0% (calm) to 100% (hostile). Unlike the value meters, the gradient is
+     * reversed - green on the left, red on the right - because a higher value here is worse, not better.
      *
-     * @param startDate   the contract start date (left end of the track)
-     * @param endDate     the contract end date (right end of the track)
-     * @param currentDate the current date, drawn as the bold accent marker
-     * @param startLabel  the formatted start date, shown in the title
-     * @param endLabel    the formatted end date, shown in the title
+     * @param percent the threat percentage (clamped to 0..100)
+     *
+     * @return the configured gauge
+     */
+    public static @Nonnull ContractMeterBar threatLevel(final int percent) {
+        final int clamped = Math.clamp(percent, 0, 100);
+        final Color markerColor = markerColor();
+        final List<Marker> markers = new ArrayList<>(3);
+        markers.add(new Marker(100, "100", markerColor, MarkerStyle.TICK, false));
+        markers.add(new Marker(0, "0", markerColor, MarkerStyle.TICK, false));
+        markers.add(new Marker(clamped, clamped + "%", CURRENT_MARKER_COLOR, MarkerStyle.SOLID, true, true));
+        final String tooltip = getFormattedTextAt(RESOURCE_BUNDLE, "contractThreatBar.tooltip", clamped);
+        return new ContractMeterBar(getTextAt(RESOURCE_BUNDLE, "contractThreatBar.title.text"), 0, 100,
+              new Color[] { GREEN, GOLD, DEEP_RED }, GREEN.darker(), DEEP_RED.darker(), markers, tooltip);
+    }
+
+    /**
+     * Creates a deployment-time gauge running from 0 to 10, where a longer deployment is worse, so the gradient is
+     * reversed (green on the left, red on the right). The marker is positioned within the 0..10 track but labelled with
+     * the actual day count.
+     *
+     * @param days the deployment length in days
+     *
+     * @return the configured gauge
+     */
+    public static @Nonnull ContractMeterBar deploymentTime(final int days) {
+        final int position = Math.clamp(days, 0, 10);
+        final Color markerColor = markerColor();
+        final List<Marker> markers = new ArrayList<>(3);
+        markers.add(new Marker(10, "10", markerColor, MarkerStyle.TICK, false));
+        markers.add(new Marker(0, "0", markerColor, MarkerStyle.TICK, false));
+        markers.add(new Marker(position, Integer.toString(days), CURRENT_MARKER_COLOR, MarkerStyle.SOLID, true, true));
+        final String tooltip = getFormattedTextAt(RESOURCE_BUNDLE, "contractDeploymentBar.tooltip", days);
+        return new ContractMeterBar(getTextAt(RESOURCE_BUNDLE, "contractDeploymentBar.title.text"), 0, 10,
+              new Color[] { GREEN, GOLD, DEEP_RED }, GREEN.darker(), DEEP_RED.darker(), markers, tooltip);
+    }
+
+    /**
+     * Creates a neutral progress gauge of how far the current date has advanced between a contract's start and end.
+     * Unlike the value meters, the track is a single neutral color: time has no good or bad direction, so a
+     * red-to-green gradient would imply a judgement that does not exist. The start and end are unlabeled ticks (the
+     * dates are carried in the title), and the current date is the bold accent marker.
+     *
+     * @param startDate    the contract start date (left end of the track)
+     * @param endDate      the contract end date (right end of the track)
+     * @param currentDate  the current date, drawn as the bold accent marker
+     * @param startLabel   the formatted start date, shown in the title
+     * @param endLabel     the formatted end date, shown in the title
      * @param currentLabel the formatted current date, shown beneath the current-date marker
      *
      * @return the configured gauge
@@ -238,10 +329,30 @@ public class ContractMeterBar extends JPanel {
         // The track itself runs from start to end (the dates are carried in the title), so the only marker is the bold
         // "today" marker that slides along it; no separate start or end ticks are drawn.
         markers.add(new Marker(current, currentLabel, CURRENT_MARKER_COLOR, MarkerStyle.SOLID, true, true));
-        final String title = getFormattedTextAt(RESOURCE_BUNDLE, "contractTimelineBar.title.text", startLabel,
-              endLabel, daysLeft);
-        final String tooltip = getFormattedTextAt(RESOURCE_BUNDLE, "contractTimelineBar.tooltip", startLabel, endLabel,
-              currentLabel);
+        // An overrun contract reads "0 days left" like one ending today, which is the state a player most needs
+        // telling about, so it gets its own title and tooltip.
+        final boolean expired = currentDate.isAfter(endDate);
+        final String title = expired ?
+                                   getFormattedTextAt(RESOURCE_BUNDLE,
+                                         "contractTimelineBar.title.expired.text",
+                                         startLabel,
+                                         endLabel) :
+                                   getFormattedTextAt(RESOURCE_BUNDLE,
+                                         "contractTimelineBar.title.text",
+                                         startLabel,
+                                         endLabel,
+                                         daysLeft);
+        final String tooltip = expired ?
+                                     getFormattedTextAt(RESOURCE_BUNDLE,
+                                           "contractTimelineBar.expired.tooltip",
+                                           startLabel,
+                                           endLabel,
+                                           currentLabel) :
+                                     getFormattedTextAt(RESOURCE_BUNDLE,
+                                           "contractTimelineBar.tooltip",
+                                           startLabel,
+                                           endLabel,
+                                           currentLabel);
         return new ContractMeterBar(title, start, end, new Color[] { NEUTRAL_TRACK }, null, null, markers, tooltip);
     }
 

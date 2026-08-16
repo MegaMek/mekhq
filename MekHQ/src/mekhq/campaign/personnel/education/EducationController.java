@@ -75,6 +75,7 @@ import mekhq.campaign.CurrentLocation;
 import mekhq.campaign.JumpPath;
 import mekhq.campaign.LocalPersonnel;
 import mekhq.campaign.base.PlayerBase;
+import mekhq.campaign.campaignOptions.CampaignOption;
 import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.events.persons.PersonChangedEvent;
 import mekhq.campaign.finances.Money;
@@ -2343,12 +2344,17 @@ public class EducationController {
         }
 
         // Get the person's experience level and role (combat or non-combat)
-        final int experienceLevel = person.getExperienceLevel(campaign, false, true);
+        final int experienceLevel = person.getExperienceLevel(campaign.getCampaignOptions(),
+              campaign.getPlayerForce().isClanForce(),
+              campaign.getLocalDate(),
+              false,
+              true);
         final boolean isCombatRole = person.getPrimaryRole().isCombat();
+        final boolean isDoctor = person.isDoctor();
 
         // We base passRate on US averages
         int passRate = 60 - (Reasoning.values().length / 2);
-        final int reasoningModifier = campaign.getCampaignOptions().isUseRandomPersonalities() ?
+        final int reasoningModifier = campaign.getCampaignOptions().get(CampaignOption.USE_RANDOM_PERSONALITIES) ?
                                             person.getReasoning().getReasoningScore() :
                                             Reasoning.values().length / 2;
         passRate += reasoningModifier;
@@ -2360,8 +2366,10 @@ public class EducationController {
             // Determine education levels for combat roles
             educationLevel = getCombatEducationLevel(experienceLevel, flunked, passRate);
         } else {
+            // Calculate effective experience level (boost for doctors)
+            final int effectiveExperienceLevel = isDoctor ? experienceLevel + EXP_VETERAN : experienceLevel;
             // Determine education levels for non-combat roles
-            educationLevel = getNonCombatEducationLevel(experienceLevel, flunked, passRate);
+            educationLevel = getNonCombatEducationLevel(effectiveExperienceLevel, flunked, passRate);
         }
 
         // Assign the determined education level

@@ -1,0 +1,231 @@
+# MegaMek Data (C) 2025-2026 by The MegaMek Team is licensed under CC BY-NC-SA 4.0.
+# To view a copy of this license, visit https: //creativecommons.org/licenses/by-nc-sa/4.0/
+#
+# NOTICE: The MegaMek organization is a non-profit group of volunteers
+# creating free software for the BattleTech community.
+#
+# MechWarrior, BattleMech, `Mech and AeroTech are registered trademarks
+# of The Topps Company, Inc. All Rights Reserved.
+#
+# Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
+# InMediaRes Productions, LLC.
+#
+# MechWarrior Copyright Microsoft Corporation. MegaMek Data was created under
+# Microsoft's "Game Content Usage Rules"
+# <https: //www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+# affiliated with Microsoft.
+
+{
+"name": "Isolated DropShip Defense",
+"stratConScenarioType": "NONE",
+"shortBriefing": "Defend isolated DropShip from interception.",
+"detailedBriefing": "An allied DropShip has been isolated behind enemy lines, and hostile forces are closing in fast. Your mission is to defend the DropShip until it can lift off or, if necessary, destroy at least 33% of the enemy forces to break their assault. If the DropShip fails to escape and the enemy remains intact, our strategic situation will be severely compromised.\n\nExpect a relentless assault from multiple directions, with enemy units prioritizing disabling the DropShip before it can launch. They may attempt to immobilize it, breach its hull, or delay its departure long enough for reinforcements to arrive. You must hold the line, intercept high-threat targets, and keep the DropShip secure until it achieves liftoff. If the situation demands it, eliminating a third of the enemy force will force them to retreat, buying the DropShip a chance to escape.\n\nThe enemy will control the field at the end of the engagement, meaning no salvage or recovery will be possible. This is a battle of survival—ensure the DropShip gets out or cripple the enemy so thoroughly that they can no longer threaten it.",
+"isHostileFacility": false,
+"isAlliedFacility": false,
+"isSuitedForAmbushes": true,
+"isSuitedForBungledPatrols": true,
+"battlefieldControl": "ENEMY",
+"mapParameters": {
+"baseWidth": 0,
+"baseHeight": 0,
+"widthScalingIncrement": 10,
+"heightScalingIncrement": 10,
+"additionalMapSheetTall": 1,
+"additionalMapSheetWide": 0,
+"allowRotation": false,
+"useStandardAtBSizing": true,
+"mapLocation": "SpecificGroundTerrain",
+"allowedTerrainTypes": [
+"DropZone"
+]
+},
+"scenarioModifiers": [
+],
+"scenarioForces": {
+"Player": {
+"forceAlignment": 0,
+"generationMethod": 0,
+"forceMultiplier": 1.0,
+"deploymentZones": [
+6
+],
+"destinationZone": 5,
+"retreatThreshold": 50,
+"allowedUnitType": -2,
+"canReinforceLinked": true,
+"contributesToBV": true,
+"contributesToUnitCount": true,
+"forceName": "Player",
+"syncedForceName": null,
+"syncDeploymentType": "None",
+"syncRetreatThreshold": false,
+"arrivalTurn": 1,
+"maxWeightClass": 4,
+"minWeightClass": 0,
+"contributesToMapSize": true,
+"actualDeploymentZone": -1,
+"fixedUnitCount": 0,
+"generationOrder": 1,
+"allowAeroBombs": false,
+"startingAltitude": 0,
+"useArtillery": false,
+"deployOffBoard": false,
+"objectiveLinkedForces": [],
+"subjectToRandomRemoval": true,
+"fixedMul": null,
+"forceRoleStrings": [
+]
+},
+"OpFor": {
+"forceAlignment": 2,
+"generationMethod": 1,
+"forceMultiplier": 1.0,
+"deploymentZones": [],
+"destinationZone": 5,
+"retreatThreshold": 50,
+"allowedUnitType": -2,
+"canReinforceLinked": true,
+"contributesToBV": false,
+"contributesToUnitCount": false,
+"forceName": "OpFor",
+"syncedForceName": "Player",
+"syncDeploymentType": "OppositeArc",
+"syncRetreatThreshold": false,
+"arrivalTurn": 1,
+"maxWeightClass": 4,
+"minWeightClass": 0,
+"contributesToMapSize": true,
+"actualDeploymentZone": -1,
+"fixedUnitCount": 0,
+"generationOrder": 5,
+"allowAeroBombs": false,
+"startingAltitude": 0,
+"useArtillery": false,
+"deployOffBoard": false,
+"objectiveLinkedForces": [
+],
+"subjectToRandomRemoval": true,
+"fixedMul": null,
+"forceRoleStrings": [
+"ARTILLERY",
+"FIRE_SUPPORT",
+"FIRE_SUPPORT",
+"FIRE_SUPPORT",
+"FIRE_SUPPORT",
+"FIRE_SUPPORT",
+"FIRE_SUPPORT",
+"SR_FIRE_SUPPORT",
+"SR_FIRE_SUPPORT",
+"SR_FIRE_SUPPORT",
+"SR_FIRE_SUPPORT",
+"SR_FIRE_SUPPORT",
+"SR_FIRE_SUPPORT"
+]
+},
+"DropShip": {
+"forceAlignment": 1,
+"generationMethod": 4,
+"forceMultiplier": 1.0,
+"deploymentZones": [
+10
+],
+"destinationZone": 5,
+"retreatThreshold": 50,
+"allowedUnitType": 11,
+"canReinforceLinked": false,
+"contributesToBV": false,
+"contributesToUnitCount": false,
+"forceName": "DropShip",
+"syncedForceName": null,
+"syncDeploymentType": "None",
+"syncRetreatThreshold": false,
+"arrivalTurn": 0,
+"maxWeightClass": 4,
+"minWeightClass": 0,
+"contributesToMapSize": true,
+"actualDeploymentZone": -1,
+"fixedUnitCount": 1,
+"generationOrder": 3,
+"allowAeroBombs": false,
+"startingAltitude": 0,
+"useArtillery": false,
+"deployOffBoard": false,
+"objectiveLinkedForces": [],
+"subjectToRandomRemoval": true,
+"fixedMul": null,
+"forceRoleStrings": [
+"MEK_CARRIER",
+"MEK_CARRIER",
+"ASF_CARRIER",
+"VEE_CARRIER",
+"INFANTRY_CARRIER",
+"TROOP_CARRIER",
+"CIVILIAN"
+]
+}
+},
+"scenarioObjectives": [
+{
+"objectiveCriterion": "Preserve",
+"description": "",
+"destinationEdge": "NONE",
+"percentage": 100,
+"fixedAmount": null,
+"timeLimitType": "ScaledToPrimaryUnitCount",
+"timeLimitAtMost": false,
+"timeLimit": null,
+"timeLimitScaleFactor": 2,
+"associatedForceNames": [
+"DropShip"
+],
+"associatedUnitIDs": [],
+"successEffects": [
+{
+"effectType": "ScenarioVictory",
+"effectScaling": "Fixed",
+"howMuch": 2
+}
+],
+"failureEffects": [
+{
+"effectType": "ScenarioDefeat",
+"effectScaling": "Fixed",
+"howMuch": 1
+}
+],
+"additionalDetails": [
+"If the DropShip cannot be deployed regenerate the map within MegaMek."
+]
+},
+{
+"objectiveCriterion": "ForceWithdraw",
+"description": "",
+"destinationEdge": "NONE",
+"percentage": 33,
+"fixedAmount": null,
+"timeLimitType": "None",
+"timeLimitAtMost": true,
+"timeLimit": null,
+"timeLimitScaleFactor": null,
+"associatedForceNames": [
+"OpFor"
+],
+"associatedUnitIDs": [],
+"successEffects": [
+{
+"effectType": "ScenarioVictory",
+"effectScaling": "Fixed",
+"howMuch": 1
+}
+],
+"failureEffects": [
+{
+"effectType": "ScenarioDefeat",
+"effectScaling": "Fixed",
+"howMuch": 1
+}
+],
+"additionalDetails": []
+}
+]
+}

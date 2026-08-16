@@ -96,6 +96,43 @@ public class PartTest {
     }
 
     @Test
+    public void cancelAssignmentWithoutResetKeepsSpentMinutes() {
+        // Mirrors the "Cancel Task" action: unassign the tech but do not refund the minutes already spent.
+        Person mockTech = mock(Person.class);
+
+        Part part = new MekSensor();
+        part.setTech(mockTech);
+        part.setShorthandedMod(2);
+        part.addTimeSpent(90);
+
+        assertTrue(part.isBeingWorkedOn());
+
+        part.cancelAssignment(false);
+
+        assertNull(part.getTech());
+        assertFalse(part.isBeingWorkedOn());
+        assertEquals(0, part.getShorthandedMod());
+        // Spent minutes are preserved (no refund).
+        assertEquals(90, part.getTimeSpent());
+    }
+
+    @Test
+    public void cancelAssignmentWithResetClearsSpentMinutes() {
+        Person mockTech = mock(Person.class);
+
+        Part part = new MekSensor();
+        part.setTech(mockTech);
+        part.addTimeSpent(90);
+
+        part.cancelAssignment(true);
+
+        assertNull(part.getTech());
+        assertFalse(part.isBeingWorkedOn());
+        // With resetTime, spent minutes are refunded.
+        assertEquals(0, part.getTimeSpent());
+    }
+
+    @Test
     public void isReservedForRefitNotSpare() {
         Unit mockUnit = mock(Unit.class);
         when(mockUnit.getId()).thenReturn(UUID.randomUUID());

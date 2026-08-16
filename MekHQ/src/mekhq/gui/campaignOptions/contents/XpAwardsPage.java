@@ -45,11 +45,11 @@ import javax.swing.JSpinner;
 import jakarta.annotation.Nonnull;
 import jakarta.annotation.Nullable;
 import mekhq.gui.campaignOptions.CampaignOptionFlag;
-import mekhq.gui.campaignOptions.components.CampaignOptionsFormPanel;
+import megamek.client.ui.settings.SettingsFormPanel;
 import mekhq.gui.campaignOptions.components.CampaignOptionsHeaderPanel;
 import mekhq.gui.campaignOptions.components.CampaignOptionsLabel;
 import mekhq.gui.campaignOptions.components.CampaignOptionsPagePanel;
-import mekhq.gui.campaignOptions.components.CampaignOptionsPairedFieldGridPanel;
+import megamek.client.ui.settings.SettingsPairedFieldGridPanel;
 import mekhq.gui.campaignOptions.components.CampaignOptionsSpinner;
 
 /**
@@ -64,18 +64,17 @@ import mekhq.gui.campaignOptions.components.CampaignOptionsSpinner;
  * and {@link #writeToModel(AwardsAndRandomizationOptionsModel)} are no-ops.</p>
  */
 class XpAwardsPage {
-    private static final int LABEL_COLUMN_WIDTH = CampaignOptionsFormPanel.DEFAULT_LABEL_WIDTH;
-    private static final int CONTROL_COLUMN_WIDTH = CampaignOptionsFormPanel.DEFAULT_CONTROL_WIDTH;
+    private static final int LABEL_COLUMN_WIDTH = SettingsFormPanel.DEFAULT_LABEL_WIDTH;
+    private static final int CONTROL_COLUMN_WIDTH = SettingsFormPanel.DEFAULT_CONTROL_WIDTH;
     private static final int ADVANCEMENT_LABEL_CONTROL_GAP = 12;
     private static final int ADVANCEMENT_GRID_CONTROL_COLUMN_WIDTH = 100;
     // First pair column = label column + the form's label/control gap, so a
     // two-column grid's column 3 lines up with
     // the control column of the 2-column form sections on the same page (e.g. XP
     // Award Options sits above the XP-award
-    // grids). The following pair is narrower so the whole grid still stays within
-    // the shared page-width floor
-    // (measured: 312 + 303 -> 640px section, exactly the floor; column 3 lands at
-    // x=312, matching the 2-column control).
+        // grids). The following pair keeps the grid's 640px natural section width within
+        // the shared page-width floor; column 3 lands at x=312, matching the 2-column
+        // control.
     private static final int ADVANCEMENT_GRID_FIRST_PAIR_COLUMN_WIDTH = LABEL_COLUMN_WIDTH
             + ADVANCEMENT_LABEL_CONTROL_GAP;
     private static final int ADVANCEMENT_GRID_FOLLOWING_PAIR_COLUMN_WIDTH = 303;
@@ -184,7 +183,7 @@ class XpAwardsPage {
         spnXpCostMultiplier = new CampaignOptionsSpinner("XpCostMultiplier", 1, 0, 5, 0.05);
         spnXpCostMultiplier.addMouseListener(createTipPanelUpdater("XpCostMultiplier"));
 
-        final CampaignOptionsFormPanel panel = new CampaignOptionsFormPanel("XpAwardOptionsPanel",
+        final SettingsFormPanel panel = new SettingsFormPanel("XpAwardOptionsPanel",
                 LABEL_COLUMN_WIDTH,
                 CONTROL_COLUMN_WIDTH);
         panel.addRow(lblXpCostMultiplier, spnXpCostMultiplier);
@@ -192,9 +191,9 @@ class XpAwardsPage {
         return panel;
     }
 
-    private @Nonnull CampaignOptionsPairedFieldGridPanel createAdvancementPairedGrid(String name, JComponent[] labels,
+    private @Nonnull SettingsPairedFieldGridPanel createAdvancementPairedGrid(String name, JComponent[] labels,
             JComponent[] controls) {
-        final CampaignOptionsPairedFieldGridPanel panel = new CampaignOptionsPairedFieldGridPanel(name,
+        final SettingsPairedFieldGridPanel panel = new SettingsPairedFieldGridPanel(name,
                 ADVANCEMENT_GRID_FIRST_PAIR_COLUMN_WIDTH,
                 ADVANCEMENT_GRID_FOLLOWING_PAIR_COLUMN_WIDTH,
                 ADVANCEMENT_GRID_CONTROL_COLUMN_WIDTH,
@@ -241,7 +240,7 @@ class XpAwardsPage {
         JComponent[] labels = { lblTaskXP, lblNTasksXP, lblSuccessXP, lblMistakeXP };
         JComponent[] controls = { spnTaskXP, spnNTasksXP, spnSuccessXP, spnMistakeXP };
 
-        final CampaignOptionsFormPanel panel = new CampaignOptionsFormPanel("TasksPanel",
+        final SettingsFormPanel panel = new SettingsFormPanel("TasksPanel",
                 LABEL_COLUMN_WIDTH,
                 CONTROL_COLUMN_WIDTH);
         for (int index = 0; index < labels.length; index++) {

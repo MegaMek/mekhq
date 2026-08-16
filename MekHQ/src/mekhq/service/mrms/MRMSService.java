@@ -1251,8 +1251,16 @@ public class MRMSService {
                 continue;
             }
 
-            if ((partWork instanceof MissingPart) && !((MissingPart) partWork).isReplacementAvailable()) {
-                continue;
+            if (partWork instanceof MissingPart missingPart) {
+                // A part the player has queued for fabrication is being built from scratch on purpose; MRMS must
+                // leave it alone rather than replace it from warehouse stock and undo that choice.
+                if (missingPart.isFabricating()) {
+                    continue;
+                }
+
+                if (!missingPart.isReplacementAvailable()) {
+                    continue;
+                }
             }
 
             if (mrmsOptionsByType != null) {

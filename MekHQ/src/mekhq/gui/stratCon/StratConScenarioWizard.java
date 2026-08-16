@@ -33,23 +33,23 @@
 package mekhq.gui.stratCon;
 
 import static mekhq.MHQConstants.CONFIRMATION_STRATCON_BATCHALL_BREACH;
+import static mekhq.campaign.digitalGM.stratCon.StratConRulesManager.BASE_LEADERSHIP_BUDGET;
+import static mekhq.campaign.digitalGM.stratCon.StratConRulesManager.ReinforcementEligibilityType;
+import static mekhq.campaign.digitalGM.stratCon.StratConRulesManager.ReinforcementResultsType;
+import static mekhq.campaign.digitalGM.stratCon.StratConRulesManager.ReinforcementResultsType.DELAYED;
+import static mekhq.campaign.digitalGM.stratCon.StratConRulesManager.ReinforcementResultsType.FAILED;
+import static mekhq.campaign.digitalGM.stratCon.StratConRulesManager.ReinforcementResultsType.INSTANT;
+import static mekhq.campaign.digitalGM.stratCon.StratConRulesManager.calculateReinforcementTargetNumber;
+import static mekhq.campaign.digitalGM.stratCon.StratConRulesManager.commanderLanceHasDefensiveAssignment;
+import static mekhq.campaign.digitalGM.stratCon.StratConRulesManager.getEligibleLeadershipUnits;
+import static mekhq.campaign.digitalGM.stratCon.StratConRulesManager.getReinforcementType;
+import static mekhq.campaign.digitalGM.stratCon.StratConRulesManager.processReinforcementDeployment;
+import static mekhq.campaign.digitalGM.stratCon.StratConScenario.ScenarioState.PRIMARY_FORCES_COMMITTED;
+import static mekhq.campaign.digitalGM.stratCon.StratConScenario.ScenarioState.REINFORCEMENTS_COMMITTED;
 import static mekhq.campaign.enums.DailyReportType.POLITICS;
 import static mekhq.campaign.mission.AtBDynamicScenarioFactory.scaleObjectiveTimeLimits;
 import static mekhq.campaign.mission.AtBDynamicScenarioFactory.translateTemplateObjectives;
 import static mekhq.campaign.personnel.skills.SkillType.S_LEADER;
-import static mekhq.campaign.stratCon.StratConRulesManager.BASE_LEADERSHIP_BUDGET;
-import static mekhq.campaign.stratCon.StratConRulesManager.ReinforcementEligibilityType;
-import static mekhq.campaign.stratCon.StratConRulesManager.ReinforcementResultsType;
-import static mekhq.campaign.stratCon.StratConRulesManager.ReinforcementResultsType.DELAYED;
-import static mekhq.campaign.stratCon.StratConRulesManager.ReinforcementResultsType.FAILED;
-import static mekhq.campaign.stratCon.StratConRulesManager.ReinforcementResultsType.INSTANT;
-import static mekhq.campaign.stratCon.StratConRulesManager.calculateReinforcementTargetNumber;
-import static mekhq.campaign.stratCon.StratConRulesManager.commanderLanceHasDefensiveAssignment;
-import static mekhq.campaign.stratCon.StratConRulesManager.getEligibleLeadershipUnits;
-import static mekhq.campaign.stratCon.StratConRulesManager.getReinforcementType;
-import static mekhq.campaign.stratCon.StratConRulesManager.processReinforcementDeployment;
-import static mekhq.campaign.stratCon.StratConScenario.ScenarioState.PRIMARY_FORCES_COMMITTED;
-import static mekhq.campaign.stratCon.StratConScenario.ScenarioState.REINFORCEMENTS_COMMITTED;
 import static mekhq.campaign.utilities.CampaignTransportUtilities.getLeadershipDropdownVectorPair;
 import static mekhq.utilities.MHQInternationalization.getTextAt;
 
@@ -74,6 +74,11 @@ import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.Campaign.AdministratorSpecialization;
 import mekhq.campaign.campaignOptions.CampaignOptions;
+import mekhq.campaign.digitalGM.stratCon.StratConCampaignState;
+import mekhq.campaign.digitalGM.stratCon.StratConRulesManager;
+import mekhq.campaign.digitalGM.stratCon.StratConScenario;
+import mekhq.campaign.digitalGM.stratCon.StratConTrackState;
+import mekhq.campaign.digitalGM.stratCon.gm.StratConGMs;
 import mekhq.campaign.enums.CampaignTransportType;
 import mekhq.campaign.force.Formation;
 import mekhq.campaign.mission.AtBContract;
@@ -81,10 +86,6 @@ import mekhq.campaign.mission.AtBDynamicScenario;
 import mekhq.campaign.mission.ScenarioForceTemplate;
 import mekhq.campaign.mission.ScenarioTemplate;
 import mekhq.campaign.personnel.Person;
-import mekhq.campaign.stratCon.StratConCampaignState;
-import mekhq.campaign.stratCon.StratConRulesManager;
-import mekhq.campaign.stratCon.StratConScenario;
-import mekhq.campaign.stratCon.StratConTrackState;
 import mekhq.campaign.unit.Unit;
 import mekhq.campaign.universe.Faction;
 import mekhq.campaign.universe.factionStanding.FactionStandings;
@@ -950,6 +951,8 @@ public class StratConScenarioWizard extends JDialog {
      */
     private void btnCommitClicked(@Nullable Integer reinforcementTargetNumber, boolean isGMReinforcement,
           boolean isInstantlyDeployed) {
+        CampaignOptions campaignOptions = campaign.getCampaignOptions();
+
         if (parent != null) {
             parent.setCommitForces(true);
         }
@@ -1017,7 +1020,7 @@ public class StratConScenarioWizard extends JDialog {
 
         // every force that's been deployed to this scenario gets assigned to the track
         for (int forceID : currentScenario.getAssignedForces()) {
-            StratConRulesManager.processForceDeployment(currentScenario.getCoords(),
+            StratConGMs.forceDeployment(campaignOptions).processForceDeployment(currentScenario.getCoords(),
                   forceID,
                   campaign,
                   currentTrackState,

@@ -60,7 +60,7 @@ import mekhq.campaign.finances.Money;
 import mekhq.campaign.mission.AtBContract;
 import mekhq.campaign.mission.Contract;
 import mekhq.campaign.mission.Mission;
-import mekhq.campaign.mission.enums.AtBContractType;
+import mekhq.campaign.mission.enums.ContractObjectiveType;
 import mekhq.campaign.personnel.Injury;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.PersonnelOptions;
@@ -158,10 +158,10 @@ public class RetirementDefectionTracker {
      *       an active contract, false otherwise
      */
     private boolean isHostileTerritory(Campaign campaign) {
-        List<AtBContractType> defensiveContracts = Arrays.asList(AtBContractType.GARRISON_DUTY,
-              AtBContractType.CADRE_DUTY,
-              AtBContractType.SECURITY_DUTY,
-              AtBContractType.RIOT_DUTY);
+        List<ContractObjectiveType> defensiveContracts = Arrays.asList(ContractObjectiveType.GARRISON_DUTY,
+              ContractObjectiveType.CADRE_DUTY,
+              ContractObjectiveType.SECURITY_DUTY,
+              ContractObjectiveType.RIOT_DUTY);
 
         List<Contract> activeContracts = campaign.getActiveContracts();
 
@@ -448,7 +448,12 @@ public class RetirementDefectionTracker {
             // Desirability modifier
             if ((campaignOptions.isUseSkillModifiers()) &&
                       (person.getAge(campaign.getLocalDate()) < RETIREMENT_AGE)) {
-                targetNumber.addModifier(min(EXP_ELITE - 2, person.getExperienceLevel(campaign, false, true) - 2),
+                targetNumber.addModifier(min(EXP_ELITE - 2,
+                            person.getExperienceLevel(campaignOptions,
+                                  campaign.getPlayerForce().isClanForce(),
+                                  campaign.getLocalDate(),
+                                  false,
+                                  true) - 2),
                       resources.getString("desirability.text"));
             }
 

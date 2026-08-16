@@ -32,15 +32,20 @@
  */
 package mekhq.campaign.mission;
 
+import static mekhq.campaign.personnel.ranks.Rank.RO_MIN;
 import static mekhq.campaign.universe.Faction.MERCENARY_FACTION_CODE;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertSame;
+import static org.mockito.Mockito.any;
 import static org.mockito.Mockito.anyBoolean;
 import static org.mockito.Mockito.anyInt;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.eq;
+import static org.mockito.Mockito.inOrder;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.same;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -52,6 +57,7 @@ import java.util.Vector;
 import java.util.stream.Stream;
 
 import megamek.client.generator.RandomCallsignGenerator;
+import megamek.common.enums.Gender;
 import megamek.common.equipment.EquipmentType;
 import megamek.common.units.Entity;
 import megamek.common.units.UnitType;
@@ -62,10 +68,15 @@ import mekhq.campaign.force.Formation;
 import mekhq.campaign.force.FormationLevel;
 import mekhq.campaign.force.FormationType;
 import mekhq.campaign.mission.AtBContract.AtBContractRef;
-import mekhq.campaign.mission.enums.AtBContractType;
 import mekhq.campaign.mission.enums.CombatRole;
+import mekhq.campaign.mission.enums.ContractObjectiveType;
 import mekhq.campaign.mission.utilities.ContractUtilities;
+import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.backgrounds.RandomCompanyNameGenerator;
+import mekhq.campaign.personnel.enums.PersonnelRole;
+import mekhq.campaign.personnel.ranks.Ranks;
+import mekhq.campaign.personnel.ranks.RankSystem;
+import mekhq.campaign.personnel.ranks.RankValidator;
 import mekhq.campaign.unit.Unit;
 import mekhq.campaign.universe.Faction;
 import mekhq.campaign.universe.Factions;
@@ -79,6 +90,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
+import org.mockito.InOrder;
 
 public class AtBContractTest {
     private AtBContract contract;
@@ -88,6 +100,7 @@ public class AtBContractTest {
     @BeforeAll
     public static void initSingletons() {
         EquipmentType.initializeTypes();
+        Ranks.initializeRankSystems();
         // TODO: fix this in the production code
         RandomCallsignGenerator.getInstance(true); // Required in this code path to generate a random merc company name
         RandomCompanyNameGenerator.getInstance(); // Required in this code path to generate a random merc company name
@@ -105,6 +118,28 @@ public class AtBContractTest {
         options = mock(CampaignOptions.class);
         when(campaign.getCampaignOptions()).thenReturn(options);
         contract = new AtBContract();
+    }
+
+    @Test
+    void createEmployerLiaisonAssignsEmployerFactionRankSystem() {
+        String employerCode = "FS";
+        Faction employerFaction = Factions.getInstance().getFaction(employerCode);
+        RankSystem employerRankSystem = employerFaction.getRankSystem();
+        Person liaison = mock(Person.class);
+        contract.setEmployerCode(employerCode);
+        when(liaison.getOriginFaction()).thenReturn(employerFaction);
+        when(liaison.getRankName()).thenReturn("Captain");
+        when(campaign.getPlayerForce()
+                   .getHumanResources()
+                   .newPerson(campaign, PersonnelRole.MILITARY_LIAISON, employerCode, Gender.RANDOMIZE))
+              .thenReturn(liaison);
+
+        contract.createEmployerLiaison(campaign);
+
+        assertSame(liaison, contract.getEmployerLiaison());
+        InOrder rankAssignmentOrder = inOrder(liaison);
+        rankAssignmentOrder.verify(liaison).setRankSystem(any(RankValidator.class), same(employerRankSystem));
+        rankAssignmentOrder.verify(liaison).setRank(RO_MIN);
     }
 
     @Test
@@ -213,8 +248,8 @@ public class AtBContractTest {
 
     @Test
     public void setContractTypeUpdatesParentMissionType() {
-        contract.setContractTypeAndName(AtBContractType.CADRE_DUTY);
-        assertEquals(AtBContractType.CADRE_DUTY, contract.getContractType());
+        contract.setContractTypeAndName(ContractObjectiveType.CADRE_DUTY);
+        assertEquals(ContractObjectiveType.CADRE_DUTY, contract.getContractType());
         assertEquals("Cadre Duty", contract.getContractTypeName());
     }
 

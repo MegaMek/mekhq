@@ -230,7 +230,7 @@ public class CapturePrisoners {
             return;
         }
 
-        Faction campaignFaction = campaign.getFaction();
+        Faction campaignFaction = campaign.getPlayerForce().getFaction();
         processPrisoner(prisoner, campaignFaction, prisonerCaptureStyle.isMekHQ(), true);
 
         // Have they been removed via Bondsref or Seppuku?
@@ -422,7 +422,7 @@ public class CapturePrisoners {
 
         if (potentialDefector.isClanPersonnel()) {
             if (isNPC) {
-                Faction campaignFaction = campaign.getFaction();
+                Faction campaignFaction = campaign.getPlayerForce().getFaction();
                 if (campaignFaction.isPirate() || campaignFaction.isMercenary()) {
                     adjustedDefectionChance *= CLAN_DEZGRA_MULTIPLIER;
                 }
@@ -538,7 +538,8 @@ public class CapturePrisoners {
 
         // 'Recruit' prisoner
         PrisonerStatus prisonerStatus = prisoner.getPrisonerStatus();
-        campaign.recruitPerson(prisoner, prisonerStatus, false, true, true);
+        campaign.getPlayerForce().getHumanResources().recruitPerson(campaign, prisoner, prisonerStatus, false, true,
+              true);
 
         if (prisonerStatus.isPrisonerDefector()) {
             campaign.addReport(PERSONNEL,

@@ -36,8 +36,10 @@ import jakarta.annotation.Nonnull;
 import megamek.common.enums.SkillLevel;
 import mekhq.campaign.autoResolve.AutoResolveMethod;
 import mekhq.campaign.campaignOptions.BoardScalingType;
+import mekhq.campaign.campaignOptions.CampaignOption;
 import mekhq.campaign.campaignOptions.CampaignOptions;
-import mekhq.campaign.stratCon.StratConPlayType;
+import mekhq.campaign.digitalGM.stratCon.gm.StratConPlayType;
+import mekhq.campaign.digitalGM.stratCon.sectorGeneration.StratConSectorCountMethod;
 
 class RulesetsOptionsModel {
     SkillLevel skillLevel;
@@ -81,6 +83,9 @@ class RulesetsOptionsModel {
     boolean noSeedForces;
     boolean useGenericBattleValue;
     boolean useVerboseBidding;
+    StratConSectorCountMethod stratConSectorCountMethod;
+    boolean useStratConAlternateSectorTerrain;
+    double stratConSectorSizeMultiplier;
 
     RulesetsOptionsModel(@Nonnull CampaignOptions options) {
         skillLevel = options.getSkillLevel();
@@ -124,6 +129,9 @@ class RulesetsOptionsModel {
         noSeedForces = options.isNoSeedForces();
         useGenericBattleValue = options.isUseGenericBattleValue();
         useVerboseBidding = options.isUseVerboseBidding();
+        stratConSectorCountMethod = options.get(CampaignOption.STRAT_CON_SECTOR_COUNT_METHOD);
+        useStratConAlternateSectorTerrain = options.get(CampaignOption.USE_STRAT_CON_ALTERNATE_SECTOR_TERRAIN);
+        stratConSectorSizeMultiplier = options.get(CampaignOption.STRAT_CON_SECTOR_SIZE_MULTIPLIER);
     }
 
     void applyTo(@Nonnull CampaignOptions options) {
@@ -168,5 +176,8 @@ class RulesetsOptionsModel {
         options.setNoSeedForces(noSeedForces);
         options.setUseGenericBattleValue(useGenericBattleValue);
         options.setUseVerboseBidding(useVerboseBidding);
+        options.set(CampaignOption.STRAT_CON_SECTOR_COUNT_METHOD, stratConSectorCountMethod);
+        options.set(CampaignOption.USE_STRAT_CON_ALTERNATE_SECTOR_TERRAIN, useStratConAlternateSectorTerrain);
+        options.set(CampaignOption.STRAT_CON_SECTOR_SIZE_MULTIPLIER, stratConSectorSizeMultiplier);
     }
 }

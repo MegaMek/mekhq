@@ -69,6 +69,7 @@ import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.enums.PersonnelRole;
 import mekhq.campaign.personnel.ranks.Ranks;
 import mekhq.campaign.personnel.skills.SkillType;
+import mekhq.campaign.reputation.camOpsReputation.ForceReputationController;
 import mekhq.campaign.unit.Unit;
 import mekhq.campaign.universe.Systems;
 import org.junit.jupiter.api.BeforeAll;
@@ -79,9 +80,9 @@ import org.mockito.MockitoAnnotations;
 import testUtilities.MHQTestUtilities;
 
 /**
- * Tests for {@link ScenarioSetupForces}, specifically verifying that player entities
- * are correctly added to the simulation regardless of their forceString state.
- * Regression tests for <a href="https://github.com/MegaMek/mekhq/issues/8385">#8385</a>.
+ * Tests for {@link ScenarioSetupForces}, specifically verifying that player entities are correctly added to the
+ * simulation regardless of their forceString state. Regression tests for <a
+ * href="https://github.com/MegaMek/mekhq/issues/8385">#8385</a>.
  */
 class ScenarioSetupForcesTest {
 
@@ -104,10 +105,10 @@ class ScenarioSetupForcesTest {
     }
 
     /**
-     * Entities whose forceString starts with an empty root force name (e.g. "|1||Company|29||...")
-     * must still produce player formations in the simulation. This is the primary regression
-     * case for #8385 — the campaign root force has no name, causing Forces.verifyForceName to
-     * reject the top-level force, which silently dropped all player entities.
+     * Entities whose forceString starts with an empty root force name (e.g. "|1||Company|29||...") must still produce
+     * player formations in the simulation. This is the primary regression case for #8385 — the campaign root force has
+     * no name, causing Forces.verifyForceName to reject the top-level force, which silently dropped all player
+     * entities.
      */
     @Test
     void testEntitiesWithEmptyRootForceNameProduceFormations() {
@@ -116,8 +117,8 @@ class ScenarioSetupForcesTest {
     }
 
     /**
-     * Entities with a completely blank forceString (no formation assignment) must still
-     * be added to the simulation with a default force.
+     * Entities with a completely blank forceString (no formation assignment) must still be added to the simulation with
+     * a default force.
      */
     @Test
     void testEntitiesWithBlankForceStringProduceFormations() {
@@ -140,8 +141,8 @@ class ScenarioSetupForcesTest {
               "Player should have at least one formation in the simulation");
 
         var botFormations = context.getActiveFormations().stream()
-              .filter(f -> f.getOwnerId() != 0)
-              .toList();
+                                  .filter(f -> f.getOwnerId() != 0)
+                                  .toList();
         assertFalse(botFormations.isEmpty(),
               "Bot should have at least one formation in the simulation");
 
@@ -168,9 +169,9 @@ class ScenarioSetupForcesTest {
     private Campaign createCampaign() {
         var campaign = MHQTestUtilities.getTestCampaign();
         campaign.getPlayerForce().setName("Test Player");
-        var reputationController = mock(mekhq.campaign.camOpsReputation.ForceReputationController.class);
+        var reputationController = mock(ForceReputationController.class);
         when(reputationController.getAverageSkillLevel()).thenReturn(SkillLevel.REGULAR);
-        campaign.getPlayerForce().setReputation(reputationController);
+        campaign.getPlayerForce().setCamOpsReputation(reputationController);
         Formation formation = new Formation("Heroes");
         Formation superFormation = campaign.getPlayerForce().getFormation(0);
         campaign.getPlayerForce().addFormation(formation, superFormation, campaign);

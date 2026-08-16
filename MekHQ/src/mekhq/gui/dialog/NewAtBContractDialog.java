@@ -57,13 +57,13 @@ import megamek.common.enums.SkillLevel;
 import megamek.logging.MMLogger;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
+import mekhq.campaign.digitalGM.stratCon.StratConContractDefinition;
+import mekhq.campaign.digitalGM.stratCon.StratConContractInitializer;
 import mekhq.campaign.finances.enums.TransactionType;
 import mekhq.campaign.market.contractMarket.AbstractContractMarket;
 import mekhq.campaign.mission.AtBContract;
-import mekhq.campaign.mission.enums.AtBContractType;
+import mekhq.campaign.mission.enums.ContractObjectiveType;
 import mekhq.campaign.mission.utilities.ContractUtilities;
-import mekhq.campaign.stratCon.StratConContractDefinition;
-import mekhq.campaign.stratCon.StratConContractInitializer;
 import mekhq.campaign.universe.Factions;
 import mekhq.campaign.universe.PlanetarySystem;
 import mekhq.campaign.universe.RandomFactionGenerator;
@@ -86,7 +86,7 @@ public class NewAtBContractDialog extends NewContractDialog {
     protected JCheckBox chkShowAllFactions;
     protected JComboBox<String> cbPlanets;
     protected JCheckBox chkShowAllPlanets;
-    protected MMComboBox<AtBContractType> comboContractType;
+    protected MMComboBox<ContractObjectiveType> comboContractType;
     protected MMComboBox<SkillLevel> comboAllySkill;
     protected JComboBox<String> cbAllyQuality;
     protected MMComboBox<SkillLevel> comboEnemySkill;
@@ -306,15 +306,15 @@ public class NewAtBContractDialog extends NewContractDialog {
         gbc.insets = new Insets(5, 5, 5, 5);
         descPanel.add(lblType, gbc);
 
-        comboContractType = new MMComboBox<>("comboContractType", AtBContractType.values());
+        comboContractType = new MMComboBox<>("comboContractType", ContractObjectiveType.values());
         comboContractType.setSelectedItem(contract.getContractType());
         comboContractType.setRenderer(new DefaultListCellRenderer() {
             @Override
             public Component getListCellRendererComponent(final JList<?> list, final Object value, final int index,
                   final boolean isSelected, final boolean cellHasFocus) {
                 super.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);
-                if (value instanceof AtBContractType) {
-                    list.setToolTipText(((AtBContractType) value).getToolTipText());
+                if (value instanceof ContractObjectiveType) {
+                    list.setToolTipText(((ContractObjectiveType) value).getToolTipText());
                 }
                 return this;
             }
@@ -501,19 +501,22 @@ public class NewAtBContractDialog extends NewContractDialog {
             return;
         }
         AtBContract contract = (AtBContract) this.contract;
+        boolean isGarrisonType = contract.getContractType().isGarrisonType();
         HashSet<String> systems = new HashSet<>();
-        if (!contract.getContractType().isGarrisonType() ||
+        if (!isGarrisonType ||
                   Factions.getInstance().getFaction(getCurrentEnemyCode()).isRebelOrPirate()) {
             for (PlanetarySystem p : RandomFactionGenerator.getInstance()
-                                           .getMissionTargetList(getCurrentEmployerCode(), getCurrentEnemyCode())) {
+                                           .getMissionTargetList(getCurrentEmployerCode(), getCurrentEnemyCode(),
+                                                 campaign.getCurrentLocation())) {
                 systems.add(p.getName(campaign.getLocalDate()));
             }
         }
 
-        if ((contract.getContractType().isGarrisonType() || contract.getContractType().isReliefDuty()) &&
+        if ((isGarrisonType || contract.getContractType().isReliefDuty()) &&
                   !contract.getEnemy().isRebel()) {
             for (PlanetarySystem p : RandomFactionGenerator.getInstance()
-                                           .getMissionTargetList(getCurrentEnemyCode(), getCurrentEmployerCode())) {
+                                           .getMissionTargetList(getCurrentEnemyCode(), getCurrentEmployerCode(),
+                                                 campaign.getCurrentLocation())) {
                 systems.add(p.getName(campaign.getLocalDate()));
             }
         }

@@ -489,20 +489,28 @@ public class Planet {
         /**
          * Gets the current {@link PlanetaryEvent} for the time.
          *
+         * <p>{@code planetaryEvent} is a single shared, mutable accumulator: fast-forwarding merges every event up to
+         * {@code now} into it via {@link PlanetaryEvent#copyDataFrom}, and nothing ever unmerges them.
+         * {@code lastUpdated} must therefore track the date this accumulator actually reflects (the most recent
+         * {@code now} resolved, not just the date passed to the original {@link #initialize}), or a later
+         * out-of-order query (e.g., a caller checking a future date) would fast-forward the accumulator past a
+         * subsequent, earlier-dated query without tripping the "went back in time" reset below, silently returning
+         * already-future state for a query that asked about the present or past.</p>
+         *
          * @param now The current time.
          *
          * @return The up-to-date {@link PlanetaryEvent} as of {@code now}.
          */
         public PlanetaryEvent getCurrentEvent(LocalDate now) {
             if ((lastUpdated == null) || lastUpdated.isAfter(now)) {
-                // initialize ourselves if we're fresh or if we
-                // went back in time (which breaks how the event stream works)
+                // initialize ourselves if we're fresh or if we went back in time (which breaks how the event stream
+                // works)
                 initialize(now);
             }
+            lastUpdated = now;
 
-            // if we have no more events for this planet,
-            // or if our current date is before the next date
-            // return our cached event
+            // if we have no more events for this planet, or if our current date is before the next date, return our
+            // cached event
             if ((nextEvent == null) || now.isBefore(nextEvent.getKey())) {
                 return planetaryEvent;
             }

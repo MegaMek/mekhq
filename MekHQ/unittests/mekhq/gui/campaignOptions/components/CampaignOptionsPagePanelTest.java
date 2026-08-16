@@ -35,9 +35,17 @@ package mekhq.gui.campaignOptions.components;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.getCampaignOptionsResourceBundle;
+import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
 
+import java.awt.Component;
+import java.awt.Container;
+import java.util.ArrayList;
+import java.util.List;
 import javax.swing.JLabel;
 
+import megamek.client.ui.settings.CollapsibleSectionPanel;
+import megamek.client.ui.settings.SettingsTextProvider;
 import org.junit.jupiter.api.Test;
 
 /**
@@ -71,5 +79,53 @@ class CampaignOptionsPagePanelTest {
                 .build();
 
         assertEquals("", page.getSectionSearchText());
+    }
+
+    @Test
+    void expandSectionsMatchingRevealsOnlyMatchingCollapsedSection() {
+        CampaignOptionsPagePanel page = CampaignOptionsPagePanel.builder("Test", "Test", "")
+                .sectionsExpandedByDefault(false)
+                .literalSection("Alpha Section", "alpha summary", new JLabel())
+                .literalSection("Beta Section", "beta summary", new JLabel())
+                .build();
+        List<CollapsibleSectionPanel> sections = findSections(page);
+
+        boolean matched = page.expandSectionsMatching(text -> text.contains("Beta Section"));
+
+        assertTrue(matched);
+        assertEquals(2, sections.size());
+        assertFalse(sections.get(0).isExpanded());
+        assertTrue(sections.get(1).isExpanded());
+    }
+
+    @Test
+    void campaignProviderUsesExplicitBundleFormatting() {
+        String resourceBundle = getCampaignOptionsResourceBundle();
+        SettingsTextProvider provider = CampaignOptionsComponentSupport.textProvider(resourceBundle);
+
+        assertEquals(getFormattedTextAt(resourceBundle, "savePresetOverwrite.text", "Test"),
+              provider.getFormattedText("savePresetOverwrite.text", "Test"));
+    }
+
+    @Test
+    void campaignHeaderPreservesUnformattedApostrophes() {
+        CampaignOptionsHeaderPanel header = new CampaignOptionsHeaderPanel(
+              "UseCommanderLeadershipOnly", "", false, 80, true, getCampaignOptionsResourceBundle());
+        JLabel title = (JLabel) header.getComponent(0);
+
+        assertTrue(title.getText().contains("Commander's"), title.getText());
+    }
+
+    private static List<CollapsibleSectionPanel> findSections(Container root) {
+        List<CollapsibleSectionPanel> sections = new ArrayList<>();
+        for (Component child : root.getComponents()) {
+            if (child instanceof CollapsibleSectionPanel section) {
+                sections.add(section);
+            }
+            if (child instanceof Container container) {
+                sections.addAll(findSections(container));
+            }
+        }
+        return sections;
     }
 }

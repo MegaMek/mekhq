@@ -37,6 +37,10 @@ import static java.lang.Math.floor;
 import static java.lang.Math.max;
 import static java.lang.Math.min;
 import static megamek.common.options.OptionsConstants.UNOFFICIAL_SENSOR_GEEK;
+import static megamek.common.units.EntityWeightClass.WEIGHT_ASSAULT;
+import static megamek.common.units.EntityWeightClass.WEIGHT_HEAVY;
+import static megamek.common.units.EntityWeightClass.WEIGHT_LIGHT;
+import static megamek.common.units.EntityWeightClass.WEIGHT_MEDIUM;
 import static mekhq.campaign.personnel.PersonnelOptions.*;
 import static mekhq.campaign.personnel.skills.SkillModifierData.IGNORE_AGE;
 import static mekhq.campaign.personnel.skills.SkillType.*;
@@ -55,6 +59,7 @@ import megamek.codeUtilities.MathUtility;
 import megamek.common.annotations.Nullable;
 import megamek.common.compute.Compute;
 import megamek.common.enums.SkillLevel;
+import megamek.common.options.IOption;
 import megamek.common.rolls.TargetRoll;
 import megamek.logging.MMLogger;
 import mekhq.campaign.personnel.Person;
@@ -99,6 +104,14 @@ import org.w3c.dom.NodeList;
 public class Skill {
     public static int COUNT_UP_MAX_VALUE = 10;
     public static int COUNT_DOWN_MIN_VALUE = 0;
+
+    /**
+     * Sentinel weight class passed to {@link #getSPAModifiers(PersonnelOptions, int, int)} (and the weight-class-aware
+     * {@link #getFinalSkillValue(SkillModifierData, int)}) when the skill is being evaluated outside of any specific
+     * unit. In that case the unit-specific 'Mek/Vehicular/Flight Affinity, Antipathy, and Specialist modifiers do not
+     * apply.
+     */
+    public static final int NO_UNIT_WEIGHT_CLASS = -1;
 
     private static final String RESOURCE_BUNDLE = "mekhq.resources.Skill";
     private static final MMLogger logger = MMLogger.create(Skill.class);
@@ -273,7 +286,22 @@ public class Skill {
      * @return the calculated final skill value, after applying all modifiers and bounds
      */
     public int getFinalSkillValue(SkillModifierData skillModifierData) {
-        int modifiers = getModifiers(skillModifierData);
+        return getFinalSkillValue(skillModifierData, NO_UNIT_WEIGHT_CLASS);
+    }
+
+    /**
+     * As {@link #getFinalSkillValue(SkillModifierData)}, but also applies the unit-specific 'Mek/Vehicular/Flight
+     * Affinity, Antipathy, and Specialist modifiers for a unit of the given weight class. Pass
+     * {@link #NO_UNIT_WEIGHT_CLASS} to skip those (e.g. when the value is not being computed for a specific unit).
+     *
+     * @param skillModifierData the modifiers that affect this skill
+     * @param unitWeightClass   the {@link megamek.common.units.EntityWeightClass} of the unit being crewed, or
+     *                          {@link #NO_UNIT_WEIGHT_CLASS}
+     *
+     * @return the calculated final skill value, after applying all modifiers and bounds
+     */
+    public int getFinalSkillValue(SkillModifierData skillModifierData, int unitWeightClass) {
+        int modifiers = getModifiers(skillModifierData, unitWeightClass);
 
         if (isCountUp()) {
             return min(COUNT_UP_MAX_VALUE, getSkillValue() + modifiers);
@@ -293,6 +321,23 @@ public class Skill {
      * @return The calculated skill modifier for the current skill type.
      */
     public int getSPAModifiers(PersonnelOptions characterOptions, int reputation) {
+        return getSPAModifiers(characterOptions, reputation, NO_UNIT_WEIGHT_CLASS);
+    }
+
+    /**
+     * As {@link #getSPAModifiers(PersonnelOptions, int)}, but also applies the unit-specific modifiers that depend on
+     * the weight class of the unit being crewed: 'Mek/Vehicular/Flight Affinity and Antipathy (piloting skills only)
+     * and Unit Specialist (both gunnery and piloting). The unit family is inferred from this skill's type. Pass
+     * {@link #NO_UNIT_WEIGHT_CLASS} to skip these (no unit context).
+     *
+     * @param characterOptions the character's options and special traits
+     * @param reputation       the character's reputation
+     * @param unitWeightClass  the {@link megamek.common.units.EntityWeightClass} of the unit being crewed, or
+     *                         {@link #NO_UNIT_WEIGHT_CLASS}
+     *
+     * @return the calculated skill modifier for the current skill type
+     */
+    public int getSPAModifiers(PersonnelOptions characterOptions, int reputation, int unitWeightClass) {
         int modifier = 0;
 
         if (characterOptions == null) {
@@ -534,7 +579,154 @@ public class Skill {
             }
         }
 
+        // 'Mek / Vehicular / Flight Affinity & Antipathy (piloting only) and Unit Specialist (gunnery and piloting).
+        // The unit family is inferred from this skill's type; the weight class is that of the unit being crewed.
+        modifier += getUnitFamilyModifiers(characterOptions, name, unitWeightClass);
+
         return modifier;
+    }
+
+    /**
+     * Unit family for the weight-class Affinity/Antipathy/Specialist SPAs, inferred from a skill's type name.
+     */
+    private enum SpecialistFamily {MEK, VEHICULAR, FLIGHT}
+
+    /**
+     * Computes the weight-class Affinity, Antipathy, and Unit Specialist modifiers for a single combat piloting or
+     * gunnery skill. Returns {@code 0} outside a unit context or for skills that are not tied to a specialist family.
+     *
+     * <p>Positive is better (consistent with the rest of {@code getSPAModifiers}): Affinity and a matching Specialist
+     * yield {@code +1}; Antipathy and a non-matching Specialist yield {@code -1}. Affinity/Antipathy apply to piloting
+     * skills only; the Specialist applies to both gunnery and piloting.</p>
+     */
+    private static int getUnitFamilyModifiers(PersonnelOptions characterOptions, String skillName,
+          int unitWeightClass) {
+        if (unitWeightClass == NO_UNIT_WEIGHT_CLASS) {
+            return 0;
+        }
+        SpecialistFamily family = familyForSkill(skillName);
+        if (family == null) {
+            return 0;
+        }
+
+        int modifier = 0;
+
+        // Unit Specialist: +1 while crewing the chosen family/weight class, -1 otherwise.
+        IOption specialist = characterOptions.getOption(UNIT_SPECIALIST);
+        if ((specialist != null) && specialist.booleanValue()) {
+            String currentKey = specialtyKey(family, unitWeightClass);
+            modifier += specialist.stringValue().equalsIgnoreCase(currentKey) ? 1 : -1;
+        }
+
+        // Affinity / Antipathy: piloting skills only.
+        if (isPilotingSkill(skillName)) {
+            String affinity = affinityOption(family, unitWeightClass);
+            if ((affinity != null) && characterOptions.booleanOption(affinity)) {
+                modifier += 1;
+            }
+            String antipathy = antipathyOption(family, unitWeightClass);
+            if ((antipathy != null) && characterOptions.booleanOption(antipathy)) {
+                modifier -= 1;
+            }
+        }
+
+        return modifier;
+    }
+
+    private static SpecialistFamily familyForSkill(String skillName) {
+        return switch (skillName) {
+            case S_PILOT_MEK, S_GUN_MEK -> SpecialistFamily.MEK;
+            case S_PILOT_GVEE, S_PILOT_NVEE, S_PILOT_VTOL, S_GUN_VEE -> SpecialistFamily.VEHICULAR;
+            case S_PILOT_AERO, S_PILOT_JET, S_GUN_AERO, S_GUN_JET -> SpecialistFamily.FLIGHT;
+            default -> null;
+        };
+    }
+
+    private static boolean isPilotingSkill(String skillName) {
+        return switch (skillName) {
+            case S_PILOT_MEK, S_PILOT_GVEE, S_PILOT_NVEE, S_PILOT_VTOL, S_PILOT_AERO, S_PILOT_JET -> true;
+            default -> false;
+        };
+    }
+
+    /**
+     * The Unit Specialist choice value for a family + weight class (matching
+     * {@code PersonnelOptions.SPECIALIST_CHOICE_*} and the defaultspa.xml {@code <choiceValues>}), or {@code null} if
+     * that combination is not a valid specialty.
+     */
+    private static String specialtyKey(SpecialistFamily family, int weightClass) {
+        return switch (family) {
+            case MEK -> switch (weightClass) {
+                case WEIGHT_LIGHT -> SPECIALIST_CHOICE_MEK_LIGHT;
+                case WEIGHT_MEDIUM -> SPECIALIST_CHOICE_MEK_MEDIUM;
+                case WEIGHT_HEAVY -> SPECIALIST_CHOICE_MEK_HEAVY;
+                case WEIGHT_ASSAULT -> SPECIALIST_CHOICE_MEK_ASSAULT;
+                default -> null;
+            };
+            case VEHICULAR -> switch (weightClass) {
+                case WEIGHT_LIGHT -> SPECIALIST_CHOICE_VEHICULAR_LIGHT;
+                case WEIGHT_MEDIUM -> SPECIALIST_CHOICE_VEHICULAR_MEDIUM;
+                case WEIGHT_HEAVY -> SPECIALIST_CHOICE_VEHICULAR_HEAVY;
+                case WEIGHT_ASSAULT -> SPECIALIST_CHOICE_VEHICULAR_ASSAULT;
+                default -> null;
+            };
+            case FLIGHT -> switch (weightClass) {
+                case WEIGHT_LIGHT -> SPECIALIST_CHOICE_FLIGHT_LIGHT;
+                case WEIGHT_MEDIUM -> SPECIALIST_CHOICE_FLIGHT_MEDIUM;
+                case WEIGHT_HEAVY -> SPECIALIST_CHOICE_FLIGHT_HEAVY;
+                default -> null;
+            };
+        };
+    }
+
+    private static String affinityOption(SpecialistFamily family, int weightClass) {
+        return switch (family) {
+            case MEK -> switch (weightClass) {
+                case WEIGHT_LIGHT -> MEK_AFFINITY_LIGHT;
+                case WEIGHT_MEDIUM -> MEK_AFFINITY_MEDIUM;
+                case WEIGHT_HEAVY -> MEK_AFFINITY_HEAVY;
+                case WEIGHT_ASSAULT -> MEK_AFFINITY_ASSAULT;
+                default -> null;
+            };
+            case VEHICULAR -> switch (weightClass) {
+                case WEIGHT_LIGHT -> VEHICULAR_AFFINITY_LIGHT;
+                case WEIGHT_MEDIUM -> VEHICULAR_AFFINITY_MEDIUM;
+                case WEIGHT_HEAVY -> VEHICULAR_AFFINITY_HEAVY;
+                case WEIGHT_ASSAULT -> VEHICULAR_AFFINITY_ASSAULT;
+                default -> null;
+            };
+            case FLIGHT -> switch (weightClass) {
+                case WEIGHT_LIGHT -> FLIGHT_AFFINITY_LIGHT;
+                case WEIGHT_MEDIUM -> FLIGHT_AFFINITY_MEDIUM;
+                case WEIGHT_HEAVY -> FLIGHT_AFFINITY_HEAVY;
+                default -> null;
+            };
+        };
+    }
+
+    private static String antipathyOption(SpecialistFamily family, int weightClass) {
+        return switch (family) {
+            case MEK -> switch (weightClass) {
+                case WEIGHT_LIGHT -> MEK_ANTIPATHY_LIGHT;
+                case WEIGHT_MEDIUM -> MEK_ANTIPATHY_MEDIUM;
+                case WEIGHT_HEAVY -> MEK_ANTIPATHY_HEAVY;
+                case WEIGHT_ASSAULT -> MEK_ANTIPATHY_ASSAULT;
+                default -> null;
+            };
+            case VEHICULAR -> switch (weightClass) {
+                case WEIGHT_LIGHT -> VEHICULAR_ANTIPATHY_LIGHT;
+                case WEIGHT_MEDIUM -> VEHICULAR_ANTIPATHY_MEDIUM;
+                case WEIGHT_HEAVY -> VEHICULAR_ANTIPATHY_HEAVY;
+                case WEIGHT_ASSAULT -> VEHICULAR_ANTIPATHY_ASSAULT;
+                default -> null;
+            };
+            case FLIGHT -> switch (weightClass) {
+                case WEIGHT_LIGHT -> FLIGHT_ANTIPATHY_LIGHT;
+                case WEIGHT_MEDIUM -> FLIGHT_ANTIPATHY_MEDIUM;
+                case WEIGHT_HEAVY -> FLIGHT_ANTIPATHY_HEAVY;
+                default -> null;
+            };
+        };
     }
 
 
@@ -696,8 +888,12 @@ public class Skill {
      * @since 0.50.07
      */
     private int getModifiers(SkillModifierData skillModifierData) {
+        return getModifiers(skillModifierData, NO_UNIT_WEIGHT_CLASS);
+    }
+
+    private int getModifiers(SkillModifierData skillModifierData, int unitWeightClass) {
         int spaModifiers = getSPAModifiers(skillModifierData.characterOptions(),
-              skillModifierData.adjustedReputation());
+              skillModifierData.adjustedReputation(), unitWeightClass);
         int attributeModifiers = getTotalAttributeModifier(new TargetRoll(), skillModifierData.attributes(), type,
               skillModifierData.injuryEffects(), skillModifierData.characterOptions(), skillModifierData.age());
         int totalInjuryModifier = getTotalInjuryModifier(skillModifierData, type);
@@ -779,8 +975,9 @@ public class Skill {
      * @return the corresponding {@link SkillLevel} for the evaluated experience level
      */
     public SkillLevel getSkillLevel(SkillModifierData skillModifierData) {
-        // Returns the SkillLevel Enum value equivalent to the Experience Level Magic Number
-        return Skills.SKILL_LEVELS[getExperienceLevel(skillModifierData) + 1];
+        int experienceLevel = getExperienceLevel(skillModifierData);
+
+        return SkillType.skillLevelFromExperienceLevel(experienceLevel);
     }
 
     /**

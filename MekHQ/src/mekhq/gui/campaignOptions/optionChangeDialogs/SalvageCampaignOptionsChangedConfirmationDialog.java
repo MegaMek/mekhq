@@ -66,7 +66,7 @@ import megamek.common.loaders.MekSummaryCache;
 import megamek.logging.MMLogger;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.parts.enums.PartQuality;
-import mekhq.campaign.personnel.ranks.AutoAssignRankForCompanyGenerator;
+import mekhq.campaign.personnel.ranks.AutomaticRankAssigner;
 import mekhq.campaign.unit.Unit;
 import mekhq.campaign.unit.UnitOrder;
 import mekhq.campaign.universe.Faction;
@@ -222,7 +222,7 @@ public class SalvageCampaignOptionsChangedConfirmationDialog extends JDialog {
                 Unit unit = campaign.addNewUnit(mekSummary.loadEntity(), true, 0, quality);
                 if (unit != null) {
                     if (isAutomaticallyAssignRanks) {
-                        AutoAssignRankForCompanyGenerator.assignRanks(campaign, unit, faction);
+                        AutomaticRankAssigner.assignRanks(campaign, unit, faction);
                     }
                     units.add(unit);
                 }

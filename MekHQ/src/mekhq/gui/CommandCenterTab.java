@@ -57,6 +57,7 @@ import javax.swing.table.TableRowSorter;
 
 import megamek.client.ui.util.ClickableLabel;
 import megamek.client.ui.util.UIUtil;
+import megamek.common.enums.SkillLevel;
 import megamek.common.event.Subscribe;
 import megamek.common.ui.EnhancedTabbedPane;
 import megamek.common.ui.FastJScrollPane;
@@ -64,7 +65,9 @@ import megamek.utilities.ImageUtilities;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.CampaignSummary;
+import mekhq.campaign.campaignOptions.CampaignOption;
 import mekhq.campaign.campaignOptions.CampaignOptions;
+import mekhq.campaign.dailyReportLog.DailyReportLog;
 import mekhq.campaign.enums.DailyReportType;
 import mekhq.campaign.events.AcquisitionEvent;
 import mekhq.campaign.events.NewDayEvent;
@@ -89,6 +92,7 @@ import mekhq.campaign.report.CargoReport;
 import mekhq.campaign.report.HangarReport;
 import mekhq.campaign.report.PersonnelReport;
 import mekhq.campaign.report.TransportReport;
+import mekhq.campaign.reputation.chaosReputation.ChaosReputation;
 import mekhq.campaign.work.IAcquisitionWork;
 import mekhq.gui.adapter.ProcurementTableMouseAdapter;
 import mekhq.gui.baseComponents.roundedComponents.RoundedJButton;
@@ -99,6 +103,7 @@ import mekhq.gui.dialog.PartsReportDialog;
 import mekhq.gui.dialog.ShoppingListPriorityDialog;
 import mekhq.gui.dialog.factionStanding.FactionStandingReport;
 import mekhq.gui.dialog.reportDialogs.CargoReportDialog;
+import mekhq.gui.dialog.reportDialogs.ChaosReputationReportDialog;
 import mekhq.gui.dialog.reportDialogs.HangarReportDialog;
 import mekhq.gui.dialog.reportDialogs.PersonnelReportDialog;
 import mekhq.gui.dialog.reportDialogs.ReputationReportDialog;
@@ -319,9 +324,17 @@ public final class CommandCenterTab extends CampaignGuiTab {
         gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
         gridBagConstraints.insets = new Insets(5, 5, 1, 5);
         panInfo.add(lblRatingHead, gridBagConstraints);
-        lblRating = new ClickableLabel(
-              evt -> new ReputationReportDialog(getCampaignGui().getFrame(),
-                    getCampaign()).setVisible(true));
+        lblRating = new ClickableLabel(evt -> {
+            if (getCampaignOptions().get(CampaignOption.USE_CHAOS_REPUTATION)) {
+                if (getCampaignOptions().get(CampaignOption.CAMPAIGN_LEVEL_CHAOS_REPUTATION)) {
+                    // Campaign-level tracking surfaces its breakdown via the rating tooltip, not a report dialog.
+                    return;
+                }
+                new ChaosReputationReportDialog(getCampaignGui().getFrame(), getCampaign()).setVisible(true);
+            } else {
+                new ReputationReportDialog(getCampaignGui().getFrame(), getCampaign()).setVisible(true);
+            }
+        });
         lblRating.setHyperlinkMode(true);
         lblRatingHead.setLabelFor(lblRating);
         gridBagConstraints.gridx = 1;
@@ -880,15 +893,21 @@ public final class CommandCenterTab extends CampaignGuiTab {
             panInfo.repaint();
         }
 
+        boolean isUseChaosReputation = getCampaignOptions().get(CampaignOption.USE_CHAOS_REPUTATION);
+        SkillLevel averageSkillLevel = campaign.getPlayerForce()
+                                             .getAverageSkillLevel(getCampaignOptions(), campaign.getLocalDate());
         String experienceString = "<html><b>" +
-                                        SkillType.getColoredExperienceLevelName(campaign.getPlayerForce()
-                                                                                      .getReputation()
-                                                                                      .getAverageSkillLevel()) +
+                                        SkillType.getColoredExperienceLevelName(averageSkillLevel) +
                                         "</b></html>";
         lblExperience.setText(experienceString);
 
         campaignSummary.updateInformation();
         lblRating.setText(campaign.getUnitRatingText());
+        if (isUseChaosReputation && campaignOptions.get(CampaignOption.CAMPAIGN_LEVEL_CHAOS_REPUTATION)) {
+            lblRating.setToolTipText(ChaosReputation.getCampaignLevelTooltip(campaign));
+        } else {
+            lblRating.setToolTipText(null);
+        }
         lblPersonnel.setText(campaignSummary.getPersonnelReport());
         lblMissionSuccess.setText(campaignSummary.getMissionSuccessReport());
         lblComposition.setText(campaignSummary.getForceCompositionReport());
@@ -945,7 +964,8 @@ public final class CommandCenterTab extends CampaignGuiTab {
                                                                            .getFontColorWarningHexColor() +
                                                                      "'>" +
                                                                      ChronoUnit.DAYS.between(getCampaign().getLocalDate(),
-                                                                           scenario.getDate())) + " days</font></html>");
+                                                                           scenario.getDate())) +
+                                                       " days</font></html>");
                             }
                         }
                     }
@@ -1016,88 +1036,80 @@ public final class CommandCenterTab extends CampaignGuiTab {
      * Initialize a new daily log report
      */
     private void initLog() {
-        String generalReport = getCampaign().getCurrentReportHTML();
-        pnlGeneralLog.refreshLog(generalReport, GENERAL);
-        getCampaign().fetchAndClearNewReports();
+        DailyReportLog reportLog = getCampaign().getDailyReportLog();
 
-        String skillReport = getCampaign().getSkillReportHTML();
-        pnlSkillLog.refreshLog(skillReport, SKILL_CHECKS);
-        getCampaign().fetchAndClearNewSkillReports();
+        pnlGeneralLog.refreshLog(reportLog.getHtml(GENERAL), GENERAL);
+        reportLog.fetchAndClearNew(GENERAL);
 
-        String battleReport = getCampaign().getBattleReportHTML();
-        pnlBattleLog.refreshLog(battleReport, BATTLE);
-        getCampaign().fetchAndClearNewBattleReports();
+        pnlSkillLog.refreshLog(reportLog.getHtml(SKILL_CHECKS), SKILL_CHECKS);
+        reportLog.fetchAndClearNew(SKILL_CHECKS);
 
-        String politicsReport = getCampaign().getPoliticsReportHTML();
-        pnlPoliticsLog.refreshLog(politicsReport, POLITICS);
-        getCampaign().fetchAndClearNewPoliticsReports();
+        pnlBattleLog.refreshLog(reportLog.getHtml(BATTLE), BATTLE);
+        reportLog.fetchAndClearNew(BATTLE);
 
-        String personnelReport = getCampaign().getPersonnelReportHTML();
-        pnlPersonnelLog.refreshLog(personnelReport, PERSONNEL);
-        getCampaign().fetchAndClearNewPersonnelReports();
+        pnlPoliticsLog.refreshLog(reportLog.getHtml(POLITICS), POLITICS);
+        reportLog.fetchAndClearNew(POLITICS);
 
-        String medicalReport = getCampaign().getMedicalReportHTML();
-        pnlMedicalLog.refreshLog(medicalReport, MEDICAL);
-        getCampaign().fetchAndClearNewMedicalReports();
+        pnlPersonnelLog.refreshLog(reportLog.getHtml(PERSONNEL), PERSONNEL);
+        reportLog.fetchAndClearNew(PERSONNEL);
 
-        String financesReport = getCampaign().getFinancesReportHTML();
-        pnlFinancesLog.refreshLog(financesReport, FINANCES);
-        getCampaign().fetchAndClearNewFinancesReports();
+        pnlMedicalLog.refreshLog(reportLog.getHtml(MEDICAL), MEDICAL);
+        reportLog.fetchAndClearNew(MEDICAL);
 
-        String acquisitionsReport = getCampaign().getAcquisitionsReportHTML();
-        pnlAcquisitionsLog.refreshLog(acquisitionsReport, ACQUISITIONS);
-        getCampaign().fetchAndClearNewAcquisitionsReports();
+        pnlFinancesLog.refreshLog(reportLog.getHtml(FINANCES), FINANCES);
+        reportLog.fetchAndClearNew(FINANCES);
 
-        String technicalReport = getCampaign().getTechnicalReportHTML();
-        pnlTechnicalLog.refreshLog(technicalReport, TECHNICAL);
-        getCampaign().fetchAndClearNewTechnicalReports();
+        pnlAcquisitionsLog.refreshLog(reportLog.getHtml(ACQUISITIONS), ACQUISITIONS);
+        reportLog.fetchAndClearNew(ACQUISITIONS);
 
-        String aggregateReport = getCampaign().getAggregateReportHTML();
-        pnlAggregateLog.refreshLog(aggregateReport, AGGREGATE);
-        getCampaign().fetchAndClearNewAggregateReports();
+        pnlTechnicalLog.refreshLog(reportLog.getHtml(TECHNICAL), TECHNICAL);
+        reportLog.fetchAndClearNew(TECHNICAL);
+
+        pnlAggregateLog.refreshLog(reportLog.getHtml(AGGREGATE), AGGREGATE);
+        reportLog.fetchAndClearNew(AGGREGATE);
     }
 
     /**
      * append new reports to the daily log report
      */
     synchronized private void refreshGeneralLog() {
-        pnlGeneralLog.appendLog(getCampaign().fetchAndClearNewReports(), GENERAL);
+        pnlGeneralLog.appendLog(getCampaign().getDailyReportLog().fetchAndClearNew(GENERAL), GENERAL);
     }
 
     synchronized private void refreshSkillLog() {
-        pnlSkillLog.appendLog(getCampaign().fetchAndClearNewSkillReports(), SKILL_CHECKS);
+        pnlSkillLog.appendLog(getCampaign().getDailyReportLog().fetchAndClearNew(SKILL_CHECKS), SKILL_CHECKS);
     }
 
     synchronized private void refreshBattleLog() {
-        pnlBattleLog.appendLog(getCampaign().fetchAndClearNewBattleReports(), BATTLE);
+        pnlBattleLog.appendLog(getCampaign().getDailyReportLog().fetchAndClearNew(BATTLE), BATTLE);
     }
 
     synchronized private void refreshPoliticsLog() {
-        pnlPoliticsLog.appendLog(getCampaign().fetchAndClearNewPoliticsReports(), POLITICS);
+        pnlPoliticsLog.appendLog(getCampaign().getDailyReportLog().fetchAndClearNew(POLITICS), POLITICS);
     }
 
     synchronized private void refreshPersonnelLog() {
-        pnlPersonnelLog.appendLog(getCampaign().fetchAndClearNewPersonnelReports(), PERSONNEL);
+        pnlPersonnelLog.appendLog(getCampaign().getDailyReportLog().fetchAndClearNew(PERSONNEL), PERSONNEL);
     }
 
     synchronized private void refreshMedicalLog() {
-        pnlMedicalLog.appendLog(getCampaign().fetchAndClearNewMedicalReports(), MEDICAL);
+        pnlMedicalLog.appendLog(getCampaign().getDailyReportLog().fetchAndClearNew(MEDICAL), MEDICAL);
     }
 
     synchronized private void refreshFinancesLog() {
-        pnlFinancesLog.appendLog(getCampaign().fetchAndClearNewFinancesReports(), FINANCES);
+        pnlFinancesLog.appendLog(getCampaign().getDailyReportLog().fetchAndClearNew(FINANCES), FINANCES);
     }
 
     synchronized private void refreshAcquisitionsLog() {
-        pnlAcquisitionsLog.appendLog(getCampaign().fetchAndClearNewAcquisitionsReports(), ACQUISITIONS);
+        pnlAcquisitionsLog.appendLog(getCampaign().getDailyReportLog().fetchAndClearNew(ACQUISITIONS), ACQUISITIONS);
     }
 
     synchronized private void refreshTechnicalLog() {
-        pnlTechnicalLog.appendLog(getCampaign().fetchAndClearNewTechnicalReports(), TECHNICAL);
+        pnlTechnicalLog.appendLog(getCampaign().getDailyReportLog().fetchAndClearNew(TECHNICAL), TECHNICAL);
     }
 
     synchronized private void refreshAggregateLog() {
-        pnlAggregateLog.appendLog(getCampaign().fetchAndClearNewAggregateReports(), AGGREGATE);
+        pnlAggregateLog.appendLog(getCampaign().getDailyReportLog().fetchAndClearNew(AGGREGATE), AGGREGATE);
     }
 
     private final ActionScheduler procurementListScheduler = new ActionScheduler(this::refreshProcurementList);

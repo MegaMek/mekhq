@@ -56,13 +56,16 @@ import javax.swing.JOptionPane;
 
 import megamek.client.ui.util.PlayerColour;
 import megamek.common.annotations.Nullable;
+import megamek.common.enums.SkillLevel;
 import megamek.common.game.Game;
 import megamek.common.icons.Camouflage;
 import megamek.common.units.Entity;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.ForceHumanResources;
-import mekhq.campaign.camOpsReputation.ForceReputationController;
+import mekhq.campaign.campaignOptions.CampaignOption;
+import mekhq.campaign.campaignOptions.CampaignOptions;
+import mekhq.campaign.digitalGM.stratCon.StratConTrackState;
 import mekhq.campaign.events.NetworkChangedEvent;
 import mekhq.campaign.events.OrganizationChangedEvent;
 import mekhq.campaign.finances.Finances;
@@ -80,7 +83,8 @@ import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.medical.MASHCapacity;
 import mekhq.campaign.personnel.ranks.RankSystem;
 import mekhq.campaign.personnel.ranks.RankValidator;
-import mekhq.campaign.stratCon.StratConTrackState;
+import mekhq.campaign.reputation.camOpsReputation.ForceReputationController;
+import mekhq.campaign.reputation.chaosReputation.ChaosReputation;
 import mekhq.campaign.unit.Unit;
 import mekhq.campaign.unit.UnitTechProgression;
 import mekhq.campaign.universe.Faction;
@@ -92,9 +96,9 @@ import mekhq.campaign.universe.factionStanding.FactionStandings;
  *
  * <p>The located resources (hangar, warehouse, personnel, location) are <em>not</em> owned by the force — they belong
  * to its {@link Detachment}(s). A force is not itself a location node; {@link #getDetachments()} is the
- * detachment-count-agnostic way to reach them, and the aggregate helpers ({@link #allUnits()},
- * {@link #allPersonnel()}) project across every detachment. Convenience accessors that assume a single detachment live
- * on {@link SingleDetachmentForce}; force-internal operations that still assume one go through
+ * detachment-count-agnostic way to reach them, and the aggregate helpers ({@link #allUnits()}, {@link #allPersonnel()})
+ * project across every detachment. Convenience accessors that assume a single detachment live on
+ * {@link SingleDetachmentForce}; force-internal operations that still assume one go through
  * {@link #requireSingleDetachment()}.</p>
  *
  * <p>A force holds <em>no</em> reference back to its {@link mekhq.campaign.Campaign}. Campaign-level concerns — the
@@ -121,11 +125,12 @@ public abstract class AbstractForce {
     private Finances finances;
 
     // Reputation / standing / crime / initiative
+    private int chaosCampaignReputation;
     private ForceReputationController reputation;
+    private int camOpsCrimeRating = 0;
+    private int campOpsCrimePirateModifier = 0;
+    private LocalDate campOpsDateOfLastCrime = null;
     private FactionStandings factionStandings;
-    private int crimeRating = 0;
-    private int crimePirateModifier = 0;
-    private LocalDate dateOfLastCrime = null;
     private int initiativeBonus = 0;
     private int initiativeMaxBonus = 1;
 
@@ -149,12 +154,14 @@ public abstract class AbstractForce {
     private Hashtable<Integer, CombatTeam> combatTeams = new Hashtable<>();
 
     protected AbstractForce(ForceOptions forceOptions, megamek.common.enums.Faction techFaction, RankSystem rankSystem,
-          Finances finances, ForceReputationController reputation, FactionStandings factionStandings) {
+          Finances finances, ForceReputationController reputation, int chaosCampaignReputation,
+          FactionStandings factionStandings) {
         this.forceOptions = forceOptions;
         this.techFaction = techFaction;
         this.rankSystem = rankSystem;
         this.finances = finances;
         this.reputation = reputation;
+        this.chaosCampaignReputation = chaosCampaignReputation;
         this.factionStandings = factionStandings;
     }
 
@@ -230,6 +237,15 @@ public abstract class AbstractForce {
 
     public void setFactionDirect(final Faction faction) {
         forceOptions.setFaction(faction);
+    }
+
+    /**
+     * Determines whether the current force is a clan campaign.
+     *
+     * @return {@code true} if the force belongs to a clan faction, {@code false} otherwise.
+     */
+    public boolean isClanForce() {
+        return getFaction().isClan();
     }
 
     public megamek.common.enums.Faction getTechFaction() {
@@ -374,13 +390,61 @@ public abstract class AbstractForce {
         finances.debit(type, date, quantity, description);
     }
 
-    public ForceReputationController getReputation() {
+    /**
+     * Generally you want to use {@link #getReputationRating(boolean)} instead, as that is campaign options aware.
+     */
+    public ForceReputationController getCamOpsReputation() {
         return reputation;
     }
 
-    public void setReputation(ForceReputationController reputation) {
+    public void setCamOpsReputation(ForceReputationController reputation) {
         this.reputation = reputation;
     }
+
+    /**
+     * Generally you want to use {@link #getReputationRating(boolean)} instead, as that is campaign options aware.
+     */
+    public int getChaosCampaignReputation() {
+        return chaosCampaignReputation;
+    }
+
+    public void setChaosCampaignReputation(int chaosCampaignReputation) {
+        this.chaosCampaignReputation = chaosCampaignReputation;
+    }
+
+    public void changeChaosCampaignReputation(int delta) {
+        this.chaosCampaignReputation = chaosCampaignReputation + delta;
+    }
+
+    /**
+     * Calculates the average skill level of the personnel based on the specified parameters.
+     *
+     * @param campaignOptions an instance of CampaignOptions containing options for the current campaign
+     * @param currentDate     the current date used in skill level computation
+     *
+     * @return the average skill level as a SkillLevel object
+     */
+    public SkillLevel getAverageSkillLevel(CampaignOptions campaignOptions, LocalDate currentDate) {
+        return campaignOptions.get(CampaignOption.USE_CHAOS_REPUTATION) ?
+                     ChaosReputation.getAverageSkillLevel(campaignOptions,
+                           isClanForce(),
+                           currentDate,
+                           getHumanResources().getPersonnelFilteringOutDeparted()) :
+                     reputation.getAverageSkillLevel();
+    }
+
+    /**
+     * Calculates and returns the reputation rating based on the provided flag.
+     *
+     * @param isUseChaosReputation a boolean flag. If {@code true}, the method returns the chaosCampaignReputation. If
+     *                             {@code false}, it retrieves the reputation rating from the reputation object.
+     *
+     * @return the calculated reputation rating.
+     */
+    public int getReputationRating(boolean isUseChaosReputation) {
+        return isUseChaosReputation ? chaosCampaignReputation : reputation.getReputationRating();
+    }
+
 
     public FactionStandings getFactionStandings() {
         return factionStandings;
@@ -391,39 +455,39 @@ public abstract class AbstractForce {
     }
 
     public int getRawCrimeRating() {
-        return crimeRating;
+        return camOpsCrimeRating;
     }
 
-    public void setCrimeRating(int crimeRating) {
-        this.crimeRating = crimeRating;
+    public void setCamOpsCrimeRating(int camOpsCrimeRating) {
+        this.camOpsCrimeRating = camOpsCrimeRating;
     }
 
     public void changeCrimeRating(int change) {
-        this.crimeRating = Math.min(0, crimeRating + change);
+        this.camOpsCrimeRating = Math.min(0, camOpsCrimeRating + change);
     }
 
-    public int getCrimePirateModifier() {
-        return crimePirateModifier;
+    public int getCampOpsCrimePirateModifier() {
+        return campOpsCrimePirateModifier;
     }
 
-    public void setCrimePirateModifier(int crimePirateModifier) {
-        this.crimePirateModifier = crimePirateModifier;
+    public void setCampOpsCrimePirateModifier(int campOpsCrimePirateModifier) {
+        this.campOpsCrimePirateModifier = campOpsCrimePirateModifier;
     }
 
     public void changeCrimePirateModifier(int change) {
-        this.crimePirateModifier = Math.min(0, crimePirateModifier + change);
+        this.campOpsCrimePirateModifier = Math.min(0, campOpsCrimePirateModifier + change);
     }
 
     public int getAdjustedCrimeRating() {
-        return crimeRating + crimePirateModifier;
+        return camOpsCrimeRating + campOpsCrimePirateModifier;
     }
 
-    public @Nullable LocalDate getDateOfLastCrime() {
-        return dateOfLastCrime;
+    public @Nullable LocalDate getCampOpsDateOfLastCrime() {
+        return campOpsDateOfLastCrime;
     }
 
-    public void setDateOfLastCrime(LocalDate dateOfLastCrime) {
-        this.dateOfLastCrime = dateOfLastCrime;
+    public void setCampOpsDateOfLastCrime(LocalDate campOpsDateOfLastCrime) {
+        this.campOpsDateOfLastCrime = campOpsDateOfLastCrime;
     }
 
     public int getInitiativeBonus() {
@@ -656,8 +720,8 @@ public abstract class AbstractForce {
         return combatTeams;
     }
 
-    public ArrayList<CombatTeam> getCombatTeamsAsList(Campaign campaign) {
-        ArrayList<CombatTeam> combatTeamsList = new ArrayList<>();
+    public List<CombatTeam> getCombatTeamsAsList(Campaign campaign) {
+        List<CombatTeam> combatTeamsList = new ArrayList<>();
         for (CombatTeam combatTeam : getCombatTeamsAsMap(campaign).values()) {
             if (formationIds.containsKey(combatTeam.getFormationId())) {
                 combatTeamsList.add(combatTeam);
@@ -689,8 +753,8 @@ public abstract class AbstractForce {
      * Moves {@code formation} to sit directly under {@code superFormation} in the TOE, detaching it from its current
      * parent and inheriting the target's scenario assignment. Formation-type standardization is then applied per the
      * moved formation's {@link FormationType} (parents may be standardized, children may inherit), and formation levels
-     * are repopulated across the TOE. No-ops if {@code formation} is {@code null} or equals {@code superFormation}.
-     * The {@link Campaign} is supplied as a parameter for the scenario and TOE updates this drives.
+     * are repopulated across the TOE. No-ops if {@code formation} is {@code null} or equals {@code superFormation}. The
+     * {@link Campaign} is supplied as a parameter for the scenario and TOE updates this drives.
      */
     public void moveFormation(Formation formation, Formation superFormation, Campaign campaign) {
         // Can't move a null formation under a subformation and can't move a formation under itself.
@@ -809,10 +873,9 @@ public abstract class AbstractForce {
     }
 
     /**
-     * Removes {@code formation} from the TOE: unassigns its units (clearing their scenario if it was deployed),
-     * removes it from any scenario it was deployed to and from its parent formation, and clears any StratCon track
-     * assignments. The {@link Campaign} is supplied as a parameter for the scenario, contract, and combat-team updates
-     * this drives.
+     * Removes {@code formation} from the TOE: unassigns its units (clearing their scenario if it was deployed), removes
+     * it from any scenario it was deployed to and from its parent formation, and clears any StratCon track assignments.
+     * The {@link Campaign} is supplied as a parameter for the scenario, contract, and combat-team updates this drives.
      */
     public void removeFormation(Formation formation, Campaign campaign) {
         int formationId = formation.getId();

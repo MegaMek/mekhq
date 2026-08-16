@@ -58,7 +58,6 @@ public final class MHQConstants extends SuiteConstants {
     public static final int FACTION_GENERATOR_BORDER_RANGE_NEAR_PERIPHERY = 90;
     public static final int FACTION_GENERATOR_BORDER_RANGE_DEEP_PERIPHERY = 210; // a bit more than this distance
     // between HL and NC
-    public static final LocalDate FORTRESS_REPUBLIC = LocalDate.of(3135, Month.NOVEMBER, 1);
     // endregion Faction Generation Constants
 
     // region GUI Constants
@@ -147,6 +146,7 @@ public final class MHQConstants extends SuiteConstants {
     public static final String AWAY_FROM_MAIN_FORCE_FOREGROUND = "awayFromMainForceForeground";
     public static final String AWAY_FROM_MAIN_FORCE_BACKGROUND = "awayFromMainForceBackground";
     public static final String STRAT_CON_HEX_COORD_FOREGROUND = "stratconHexCoordForeground";
+    public static final String USE_ALTERNATE_STRAT_CON_FOG_OF_WAR = "useAlternateStratConFogOfWar";
     public static final String FONT_COLOR_NEGATIVE = "fontColorNegative";
     public static final String FONT_COLOR_AMAZING = "fontColorAmazing";
     public static final String FONT_COLOR_POSITIVE = "fontColorPositive";
@@ -203,6 +203,8 @@ public final class MHQConstants extends SuiteConstants {
     public static final String NEW_DAY_OPTIMIZE_MEDICAL_ASSIGNMENTS = "NewDayOptimizeMedicalAssignments";
     public static final String NEW_DAY_AUTOMATE_MAINTENANCE_ASSIGNMENTS = "NewDayAutomateMaintenanceAssignments";
     public static final String NEW_DAY_QUICK_TRAIN = "NewDayQuickTrain";
+    public static final String NEW_DAY_QUICK_TRAIN_IGNORE_TRAINING_FORMATIONS =
+          "NewDayQuickTrainIgnoreTrainingFormations";
     public static final String NEW_DAY_QUICK_TRAIN_TARGET = "QuickTrainTarget";
     public static final String NEW_DAY_ARTILLERY = "NewDayArtillery";
     public static final String NEW_DAY_SCOUTING = "NewDayScouting";
@@ -344,30 +346,35 @@ public final class MHQConstants extends SuiteConstants {
     public static final String LOGS_PATH = "logs";
 
     // region StratCon
-    public static final String STRAT_CON_REQUIRED_HOSTILE_FACILITY_MODS = "./data/scenariomodifiers/requiredHostileFacilityModifiers.xml";
-    public static final String STRAT_CON_HOSTILE_FACILITY_MODS = "./data/scenariomodifiers/hostileFacilityModifiers.xml";
-    public static final String STRAT_CON_ALLIED_FACILITY_MODS = "./data/scenariomodifiers/alliedFacilityModifiers.xml";
-    public static final String STRAT_CON_GROUND_MODS = "./data/scenariomodifiers/groundBattleModifiers.xml";
-    public static final String STRAT_CON_AIR_MODS = "./data/scenariomodifiers/airBattleModifiers.xml";
-    public static final String STRAT_CON_PRIMARY_PLAYER_FORCE_MODS = "./data/scenariomodifiers/primaryPlayerForceModifiers.xml";
-    public static final String STRAT_CON_SCENARIO_MANIFEST = "./data/scenariotemplates/ScenarioManifest.xml";
-    public static final String STRAT_CON_USER_SCENARIO_MANIFEST = "./data/scenariotemplates/UserScenarioManifest.xml";
+    public static final String STRAT_CON_REQUIRED_HOSTILE_FACILITY_MODS = "./data/scenariomodifiers/requiredHostileFacilityModifiers.json";
+    public static final String STRAT_CON_HOSTILE_FACILITY_MODS = "./data/scenariomodifiers/hostileFacilityModifiers.json";
+    public static final String STRAT_CON_ALLIED_FACILITY_MODS = "./data/scenariomodifiers/alliedFacilityModifiers.json";
+    public static final String STRAT_CON_GROUND_MODS = "./data/scenariomodifiers/groundBattleModifiers.json";
+    public static final String STRAT_CON_AIR_MODS = "./data/scenariomodifiers/airBattleModifiers.json";
+    public static final String STRAT_CON_PRIMARY_PLAYER_FORCE_MODS = "./data/scenariomodifiers/primaryPlayerForceModifiers.json";
+    public static final String STRAT_CON_SCENARIO_MANIFEST = "./data/scenariotemplates/ScenarioManifest.json";
+    public static final String STRAT_CON_USER_SCENARIO_MANIFEST = "./data/scenariotemplates/UserScenarioManifest.json";
     public static final String STRAT_CON_SCENARIO_TEMPLATE_PATH = "./data/scenariotemplates/";
-    public static final String STRAT_CON_FACILITY_MANIFEST = "./data/stratconfacilities/facilitymanifest.xml";
-    public static final String STRAT_CON_USER_FACILITY_MANIFEST = "./data/stratconfacilities/userfacilitymanifest.xml";
+    public static final String STRAT_CON_FACILITY_MANIFEST = "./data/stratconfacilities/facilitymanifest.json";
+    public static final String STRAT_CON_USER_FACILITY_MANIFEST = "./data/stratconfacilities/userfacilitymanifest.json";
     public static final String STRAT_CON_FACILITY_PATH = "./data/stratconfacilities/";
-    public static final String STRAT_CON_CONTRACT_MANIFEST = "./data/stratconcontractdefinitions/ContractDefinitionManifest.xml";
-    public static final String STRAT_CON_USER_CONTRACT_MANIFEST = "./data/stratconcontractdefinitions/UserContractDefinitionManifest.xml";
+    public static final String STRAT_CON_CONTRACT_MANIFEST = "./data/stratconcontractdefinitions/ContractDefinitionManifest.json";
+    public static final String STRAT_CON_USER_CONTRACT_MANIFEST = "./data/stratconcontractdefinitions/UserContractDefinitionManifest.json";
     public static final String STRAT_CON_CONTRACT_PATH = "./data/stratconcontractdefinitions/";
 
-    public static final String STRAT_CON_BIOME_MANIFEST_PATH = "./data/stratconbiomedefinitions/StratConBiomeManifest.xml";
+    public static final String STRAT_CON_BIOME_MANIFEST_PATH = "./data/stratconbiomedefinitions/StratConBiomeManifest.json";
+    public static final String STRAT_CON_HYDROLOGY_PROFILES_PATH = "./data/stratconbiomedefinitions/HydrologyProfiles.yaml";
+    public static final String STRAT_CON_OROGENY_PROFILES_PATH = "./data/stratconbiomedefinitions/OrogenyProfiles.yaml";
+    public static final String STRAT_CON_URBAN_PROFILES_PATH = "./data/stratconbiomedefinitions/UrbanProfiles.yaml";
+    public static final String STRAT_CON_SECTOR_SHAPE_PROFILES_PATH =
+          "./data/stratconbiomedefinitions/SectorShapeProfiles.yaml";
     public static final String TERRAIN_CONDITIONS_ODDS_MANIFEST_PATH = "./data/terrainconditionsodds/TerrainConditionsOddsManifest.xml";
-    public static final String HOSTILE_FACILITY_SCENARIO = "Hostile Facility.xml";
-    public static final String ALLIED_FACILITY_SCENARIO = "Base Defense.xml";
-    public static final String SCENARIO_MODIFIER_HOUSE_CO_GROUND = "HouseOfficerGround.xml";
-    public static final String SCENARIO_MODIFIER_HOUSE_CO_AIR = "HouseOfficerAir.xml";
-    public static final String SCENARIO_MODIFIER_TRAINEES_AIR = "AlliedTraineesAir.xml";
-    public static final String SCENARIO_MODIFIER_TRAINEES_GROUND = "AlliedTraineesGround.xml";
+    public static final String HOSTILE_FACILITY_SCENARIO = "Hostile Facility.json";
+    public static final String ALLIED_FACILITY_SCENARIO = "Base Defense.json";
+    public static final String SCENARIO_MODIFIER_HOUSE_CO_GROUND = "HouseOfficerGround.json";
+    public static final String SCENARIO_MODIFIER_HOUSE_CO_AIR = "HouseOfficerAir.json";
+    public static final String SCENARIO_MODIFIER_TRAINEES_AIR = "AlliedTraineesAir.json";
+    public static final String SCENARIO_MODIFIER_TRAINEES_GROUND = "AlliedTraineesGround.json";
     // endregion StratCon
 
     // region StoryArcs
@@ -407,6 +414,11 @@ public final class MHQConstants extends SuiteConstants {
     public static final LocalDate BATTLE_OF_TUKAYYID = LocalDate.of(3052, 5, 21);
     public static final LocalDate COMSTAR_SCHISM = LocalDate.of(3052, 9, 21);
     public static final LocalDate OPERATION_SCOUR_ENDS = LocalDate.of(3078, 1, 1);
+    public static final LocalDate FORTRESS_REPUBLIC_START = LocalDate.of(3135, Month.NOVEMBER, 1);
+    public static final LocalDate FORTRESS_REPUBLIC_END = LocalDate.of(3149, Month.JANUARY, 1);
+    public static final LocalDate FORTRESS_REPUBLIC_TERRA_ONLY_END = LocalDate.of(3151, Month.JANUARY, 1);
+    public static final LocalDate IS_INVASION_OF_HUNTRESS_START = LocalDate.of(3060, Month.FEBRUARY, 19);
+    public static final LocalDate IS_INVASION_OF_HUNTRESS_END = LocalDate.of(3060, Month.APRIL, 9);
     /**
      * The invasion of Luthien kicks off the Jihad
      */

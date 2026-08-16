@@ -48,7 +48,7 @@ import jakarta.annotation.Nullable;
 import megamek.client.ui.comboBoxes.MMComboBox;
 import mekhq.campaign.personnel.enums.RandomDivorceMethod;
 import mekhq.gui.campaignOptions.components.CampaignOptionsCheckBox;
-import mekhq.gui.campaignOptions.components.CampaignOptionsFormPanel;
+import megamek.client.ui.settings.SettingsFormPanel;
 import mekhq.gui.campaignOptions.components.CampaignOptionsHeaderPanel;
 import mekhq.gui.campaignOptions.components.CampaignOptionsLabel;
 import mekhq.gui.campaignOptions.components.CampaignOptionsPagePanel;
@@ -67,8 +67,8 @@ import mekhq.gui.campaignOptions.components.CampaignOptionsSpinner;
  * {@link #writeToModel(RelationshipsOptionsModel)} are no-ops.</p>
  */
 class DivorcePage {
-    private static final int LABEL_COLUMN_WIDTH = CampaignOptionsFormPanel.DEFAULT_LABEL_WIDTH;
-    private static final int CONTROL_COLUMN_WIDTH = CampaignOptionsFormPanel.DEFAULT_CONTROL_WIDTH;
+    private static final int LABEL_COLUMN_WIDTH = SettingsFormPanel.DEFAULT_LABEL_WIDTH;
+    private static final int CONTROL_COLUMN_WIDTH = SettingsFormPanel.DEFAULT_CONTROL_WIDTH;
 
     private CampaignOptionsHeaderPanel divorceHeader;
     private JCheckBox chkUseManualDivorce;
@@ -129,7 +129,7 @@ class DivorcePage {
         chkUsePrisonerDivorce.addMouseListener(createTipPanelUpdater("UsePrisonerDivorce"));
 
         // Layout the Panel
-        final CampaignOptionsFormPanel panel = new CampaignOptionsFormPanel("DivorceGeneralOptionsPanel",
+        final SettingsFormPanel panel = new SettingsFormPanel("DivorceGeneralOptionsPanel",
                 LABEL_COLUMN_WIDTH,
                 CONTROL_COLUMN_WIDTH);
         panel.addCheckBoxGrid(2,
@@ -183,7 +183,7 @@ class DivorcePage {
         spnRandomDivorceDiceSize.addMouseListener(createTipPanelUpdater("RandomDivorceDiceSize"));
 
         // Layout the Panel
-        final CampaignOptionsFormPanel panel = new CampaignOptionsFormPanel("RandomDivorcePanel",
+        final SettingsFormPanel panel = new SettingsFormPanel("RandomDivorcePanel",
                 LABEL_COLUMN_WIDTH,
                 CONTROL_COLUMN_WIDTH);
         panel.addRow(lblRandomDivorceMethod, comboRandomDivorceMethod);

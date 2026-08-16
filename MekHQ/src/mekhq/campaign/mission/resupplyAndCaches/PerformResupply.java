@@ -33,11 +33,13 @@
 package mekhq.campaign.mission.resupplyAndCaches;
 
 import static megamek.common.compute.Compute.randomInt;
+import static mekhq.campaign.digitalGM.stratCon.StratConContractInitializer.getUnoccupiedCoords;
+import static mekhq.campaign.digitalGM.stratCon.StratConRulesManager.generateExternalScenario;
 import static mekhq.campaign.enums.DailyReportType.ACQUISITIONS;
 import static mekhq.campaign.enums.DailyReportType.BATTLE;
-import static mekhq.campaign.mission.enums.AtBMoraleLevel.CRITICAL;
-import static mekhq.campaign.mission.enums.AtBMoraleLevel.DOMINATING;
-import static mekhq.campaign.mission.enums.AtBMoraleLevel.STALEMATE;
+import static mekhq.campaign.mission.enums.ContractMoraleLevel.CRITICAL;
+import static mekhq.campaign.mission.enums.ContractMoraleLevel.DOMINATING;
+import static mekhq.campaign.mission.enums.ContractMoraleLevel.STALEMATE;
 import static mekhq.campaign.mission.resupplyAndCaches.GenerateResupplyContents.DropType.DROP_TYPE_AMMO;
 import static mekhq.campaign.mission.resupplyAndCaches.GenerateResupplyContents.DropType.DROP_TYPE_ARMOR;
 import static mekhq.campaign.mission.resupplyAndCaches.GenerateResupplyContents.DropType.DROP_TYPE_PARTS;
@@ -47,8 +49,6 @@ import static mekhq.campaign.mission.resupplyAndCaches.Resupply.RESUPPLY_AMMO_TO
 import static mekhq.campaign.mission.resupplyAndCaches.Resupply.RESUPPLY_ARMOR_TONNAGE;
 import static mekhq.campaign.mission.resupplyAndCaches.Resupply.ResupplyType.RESUPPLY_CONTRACT_END;
 import static mekhq.campaign.mission.resupplyAndCaches.Resupply.ResupplyType.RESUPPLY_LOOT;
-import static mekhq.campaign.stratCon.StratConContractInitializer.getUnoccupiedCoords;
-import static mekhq.campaign.stratCon.StratConRulesManager.generateExternalScenario;
 import static mekhq.campaign.universe.Faction.PIRATE_FACTION_CODE;
 import static mekhq.gui.dialog.ResupplyConvoyChoice.ConvoyResponseType.CANCEL;
 import static mekhq.gui.dialog.ResupplyConvoyChoice.ConvoyResponseType.PLAYER;
@@ -72,22 +72,22 @@ import megamek.common.enums.Gender;
 import megamek.common.units.Entity;
 import megamek.logging.MMLogger;
 import mekhq.campaign.Campaign;
+import mekhq.campaign.digitalGM.stratCon.StratConCampaignState;
+import mekhq.campaign.digitalGM.stratCon.StratConCoords;
+import mekhq.campaign.digitalGM.stratCon.StratConScenario;
+import mekhq.campaign.digitalGM.stratCon.StratConTrackState;
 import mekhq.campaign.force.Formation;
 import mekhq.campaign.mission.AtBContract;
 import mekhq.campaign.mission.AtBDynamicScenario;
 import mekhq.campaign.mission.Loot;
 import mekhq.campaign.mission.ScenarioTemplate;
-import mekhq.campaign.mission.enums.AtBMoraleLevel;
+import mekhq.campaign.mission.enums.ContractMoraleLevel;
 import mekhq.campaign.mission.resupplyAndCaches.Resupply.ResupplyType;
 import mekhq.campaign.parts.Armor;
 import mekhq.campaign.parts.Part;
 import mekhq.campaign.parts.equipment.AmmoBin;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.enums.PersonnelRole;
-import mekhq.campaign.stratCon.StratConCampaignState;
-import mekhq.campaign.stratCon.StratConCoords;
-import mekhq.campaign.stratCon.StratConScenario;
-import mekhq.campaign.stratCon.StratConTrackState;
 import mekhq.gui.baseComponents.immersiveDialogs.ImmersiveDialogSimple;
 import mekhq.gui.dialog.ResupplyConvoyChoice;
 import mekhq.gui.dialog.resupplyAndCaches.DialogResupplyFocus;
@@ -369,7 +369,7 @@ public class PerformResupply {
         final AtBContract contract = resupply.getContract();
 
         // First, we need to identify whether the convoy has been intercepted.
-        AtBMoraleLevel morale = contract.getMoraleLevel();
+        ContractMoraleLevel morale = contract.getMoraleLevel();
 
         // There isn't any chance of an interception if the enemy is Routed, so early-exit
         if (morale.isRouted()) {
@@ -456,7 +456,7 @@ public class PerformResupply {
             final String STATUS_FORWARD = "statusUpdate";
             final String STATUS_AFTERWARD = ".text";
 
-            AtBMoraleLevel morale = contract.getMoraleLevel();
+            ContractMoraleLevel morale = contract.getMoraleLevel();
             String commanderAddress = campaign.getCommanderAddress();
 
             String eventText;
@@ -521,10 +521,10 @@ public class PerformResupply {
     private static void processConvoyInterception(Resupply resupply, @Nullable Formation targetConvoy,
           @Nullable List<Part> convoyContents) {
         final String DIRECTORY = "data/scenariotemplates/";
-        final String GENERIC = DIRECTORY + "Emergency Convoy Defense.xml";
-        final String PLAYER_AEROSPACE_CONVOY = DIRECTORY + "Emergency Convoy Defense - Player - Low-Atmosphere.xml";
-        final String PLAYER_VTOL_CONVOY = DIRECTORY + "Emergency Convoy Defense - Player - VTOL.xml";
-        final String PLAYER_CONVOY = DIRECTORY + "Emergency Convoy Defense - Player.xml";
+        final String GENERIC = DIRECTORY + "Emergency Convoy Defense.json";
+        final String PLAYER_AEROSPACE_CONVOY = DIRECTORY + "Emergency Convoy Defense - Player - Low-Atmosphere.json";
+        final String PLAYER_VTOL_CONVOY = DIRECTORY + "Emergency Convoy Defense - Player - VTOL.json";
+        final String PLAYER_CONVOY = DIRECTORY + "Emergency Convoy Defense - Player.json";
 
         final Campaign campaign = resupply.getCampaign();
         final AtBContract contract = resupply.getContract();

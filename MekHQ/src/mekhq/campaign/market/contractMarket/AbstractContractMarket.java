@@ -42,20 +42,18 @@ import static megamek.common.enums.SkillLevel.HEROIC;
 import static megamek.common.enums.SkillLevel.REGULAR;
 import static megamek.common.enums.SkillLevel.VETERAN;
 import static mekhq.campaign.enums.DailyReportType.GENERAL;
+import static mekhq.campaign.mission.newContract.contractGeneration.targetFinder.LandlessEmployerExclusion.shouldRejectDefensiveObjectives;
 import static mekhq.campaign.universe.Faction.MERCENARY_FACTION_CODE;
 import static mekhq.campaign.universe.Faction.PIRATE_FACTION_CODE;
 
 import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
-import java.util.Set;
 
 import megamek.Version;
-import megamek.codeUtilities.ObjectUtility;
 import megamek.common.enums.SkillLevel;
 import megamek.logging.MMLogger;
 import mekhq.campaign.Campaign;
@@ -66,9 +64,11 @@ import mekhq.campaign.market.enums.ContractMarketMethod;
 import mekhq.campaign.mission.AtBContract;
 import mekhq.campaign.mission.Contract;
 import mekhq.campaign.mission.Mission;
-import mekhq.campaign.mission.enums.AtBContractType;
 import mekhq.campaign.mission.enums.CombatRole;
 import mekhq.campaign.mission.enums.ContractCommandRights;
+import mekhq.campaign.mission.enums.ContractObjectiveType;
+import mekhq.campaign.mission.newContract.contractGeneration.targetFinder.EnemySelectionProfile;
+import mekhq.campaign.mission.newContract.contractGeneration.targetFinder.MissionLocationProfile;
 import mekhq.campaign.mission.utilities.ContractUtilities;
 import mekhq.campaign.universe.Faction;
 import mekhq.campaign.universe.Factions;
@@ -205,7 +205,9 @@ public abstract class AbstractContractMarket {
                           clauseMods.get(contract.getId()).mods[clause],
                           campaign.getCampaignOptions().getContractMaxSalvagePercentage());
 
-                    contract.clanTechSalvageOverride();
+                    if (campaign.getCampaignOptions().isLimitClanTech()) {
+                        contract.clanTechSalvageOverride();
+                    }
                 }
                 case CLAUSE_TRANSPORT -> rollTransportClause(contract, clauseMods.get(contract.getId()).mods[clause]);
                 case CLAUSE_SUPPORT -> rollSupportClause(contract, clauseMods.get(contract.getId()).mods[clause]);
@@ -536,32 +538,30 @@ public abstract class AbstractContractMarket {
         }
     }
 
-    protected void setEnemyCode(AtBContract contract) {
-        if (contract.getContractType().isPirateHunting()) {
-            Faction employer = contract.getEmployerFaction();
-            contract.setEnemyCode(employer.isClan() ? "BAN" : PIRATE_FACTION_CODE);
-        } else if (contract.getContractType().isRiotDuty()) {
-            contract.setEnemyCode("REB");
-        } else if (contract.getEmployerCode().equals(PIRATE_FACTION_CODE)) {
-            RandomFactionGenerator factionGenerator = RandomFactionGenerator.getInstance();
-            Set<String> localFactions = new HashSet<>(factionGenerator.getCurrentFactions());
-            String enemyCode = ObjectUtility.getRandomItem(localFactions);
-            contract.setEnemyCode(enemyCode);
-        } else {
-            String enemyFactionCode = RandomFactionGenerator.getInstance()
-                                            .getEnemy(contract.getEmployerCode(),
-                                                  contract.getContractType().isGarrisonType());
-            Faction enemyFaction = Factions.getInstance().getFaction(enemyFactionCode);
+    /**
+     * Selects and sets the contract's enemy faction, using an enemy-selection preference derived from the contract's
+     * type (see {@link EnemySelectionProfile}): pirate hunting and riot duty resolve to their baked-in enemies as
+     * before, while the other profiles shape which factions the weighted pool prefers.
+     *
+     * @param contract the contract to select an enemy for; its type and employer must already be set
+     * @param campaign the active campaign
+     */
+    protected void setEnemyCode(AtBContract contract, Campaign campaign) {
+        EnemySelectionProfile profile = contract.getContractType().getEnemySelectionProfile();
+        Faction enemyFaction = RandomFactionGenerator.getInstance()
+                                     .getRandomEnemy(campaign.getCurrentLocation(), campaign.getLocalDate(),
+                                           contract.getEmployerFaction(), profile);
 
-            // If the OpFor isn't Clan, there is a 1-in-5 chance they've hired mercenaries to do their dirty work. So
-            // the original enemy faction is set as the mercenary's employer, while the enemy faction is set to
-            // Mercenaries.
-            if (!enemyFaction.isClan() && !enemyFaction.isAggregate() && randomInt(5) == 0) {
-                contract.setEnemyMercenaryEmployerCode(enemyFactionCode);
-                contract.setEnemyCode(MERCENARY_FACTION_CODE);
-            } else {
-                contract.setEnemyCode(enemyFactionCode);
-            }
+        // If the OpFor isn't Clan (or an aggregate like pirates and rebels), there is a 1-in-5 chance they've hired
+        // mercenaries to do their dirty work. So the original enemy faction is set as the mercenary's employer,
+        // while the enemy faction is set to Mercenaries. A pirate employer's grudges are its own, so its enemies are
+        // never substituted.
+        boolean isPirateEmployer = contract.getEmployerCode().equals(PIRATE_FACTION_CODE);
+        if (!isPirateEmployer && !enemyFaction.isClan() && !enemyFaction.isAggregate() && randomInt(5) == 0) {
+            contract.setEnemyMercenaryEmployerCode(enemyFaction.getShortName());
+            contract.setEnemyCode(MERCENARY_FACTION_CODE);
+        } else {
+            contract.setEnemyCode(enemyFaction.getShortName());
         }
     }
 
@@ -572,21 +572,42 @@ public abstract class AbstractContractMarket {
         contract.setPlayerAttacker(isAttacker);
     }
 
-    protected void setSystemId(AtBContract contract) throws NoContractLocationFoundException {
+    /**
+     * Resolves and sets the contract's target system, searching the defender's side of the conflict with a location
+     * preference derived from the contract's type (see {@link MissionLocationProfile}). Must be called after any enemy
+     * or contract-type overrides (e.g. pity contracts), since both the attacker/defender roles and the profile are read
+     * from the contract's current state.
+     *
+     * @param contract the contract to resolve a target system for
+     * @param campaign the active campaign
+     *
+     * @throws NoContractLocationFoundException if no valid target system could be found, or the player would be
+     *                                          defending for an employer that controls no planets to defend
+     */
+    protected void setSystemId(AtBContract contract, Campaign campaign) throws NoContractLocationFoundException {
+        if (shouldRejectDefensiveObjectives(contract.getEmployerFaction(),
+              contract.isPlayerAttacker(),
+              campaign.getLocalDate())) {
+            throw new NoContractLocationFoundException("Defensive contract for landless employer");
+        }
+
+        MissionLocationProfile profile = contract.getContractType().getMissionLocationProfile();
         if (contract.isPlayerAttacker()) {
             contract.setSystemId(RandomFactionGenerator.getInstance()
-                                       .getMissionTarget(contract.getEmployerCode(), contract.getEnemyCode()));
+                                       .getMissionTarget(contract.getEmployerCode(), contract.getEnemyCode(),
+                                             campaign.getCurrentLocation(), profile));
         } else {
             contract.setSystemId(RandomFactionGenerator.getInstance()
-                                       .getMissionTarget(contract.getEnemyCode(), contract.getEmployerCode()));
+                                       .getMissionTarget(contract.getEnemyCode(), contract.getEmployerCode(),
+                                             campaign.getCurrentLocation(), profile));
         }
         if (contract.getSystem() == null) {
-            String errorMsg = "Could not find contract location for " +
-                                    contract.getEmployerCode() +
-                                    " vs. " +
-                                    contract.getEnemyCode();
-            logger.warn(errorMsg);
-            throw new NoContractLocationFoundException(errorMsg);
+            String errorMessage = "Could not find contract location for " +
+                                        contract.getEmployerCode() +
+                                        " vs. " +
+                                        contract.getEnemyCode();
+            logger.warn(errorMessage);
+            throw new NoContractLocationFoundException(errorMessage);
         }
     }
 
@@ -781,7 +802,7 @@ public abstract class AbstractContractMarket {
      *
      * @return the calculated modifier for the contract type.
      */
-    private int calculateContractTypeModifiers(AtBContractType contractType, boolean isAttacker) {
+    private int calculateContractTypeModifiers(ContractObjectiveType contractType, boolean isAttacker) {
         int mod = 0;
 
         if (contractType.isGuerrillaType() || contractType.isCadreDuty()) {

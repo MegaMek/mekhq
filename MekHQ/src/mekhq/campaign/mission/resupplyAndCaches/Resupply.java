@@ -53,6 +53,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 
+import megamek.common.equipment.MiscType;
 import megamek.common.units.Entity;
 import megamek.common.units.Mek;
 import mekhq.campaign.Campaign;
@@ -642,8 +643,11 @@ public class Resupply {
      * @return {@code true} if the part is in the exclusion list, {@code false} otherwise.
      */
     private boolean checkExclusionList(Part part) {
-        if (part instanceof EquipmentPart equipmentPart) {
-            return equipmentPart.getType().hasFlag(F_SPONSON_TURRET);
+        // F_SPONSON_TURRET is a MiscType flag, so only check it when the underlying type is actually a
+        // MiscType. This correctly excludes EquipmentParts backed by other types (AmmoType, WeaponType, etc.).
+        if (part instanceof EquipmentPart equipmentPart &&
+                  equipmentPart.getType() instanceof MiscType miscType) {
+            return miscType.hasFlag(F_SPONSON_TURRET);
         }
         return false;
     }

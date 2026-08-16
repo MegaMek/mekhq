@@ -38,6 +38,7 @@ import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.MILESTONE_BEFOR
 import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.createTipPanelUpdater;
 import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.getImageDirectory;
 import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.getMetadata;
+import static mekhq.campaign.personnel.skills.Attributes.MAXIMUM_ATTRIBUTE_SCORE;
 
 import java.awt.Component;
 import javax.swing.DefaultListCellRenderer;
@@ -51,10 +52,11 @@ import jakarta.annotation.Nonnull;
 import jakarta.annotation.Nullable;
 import megamek.Version;
 import megamek.client.ui.comboBoxes.MMComboBox;
+import megamek.client.ui.settings.SettingsFormPanel;
+import mekhq.campaign.campaignOptions.CampaignOption;
 import mekhq.campaign.personnel.enums.EdgeRefreshPeriod;
 import mekhq.gui.campaignOptions.CampaignOptionFlag;
 import mekhq.gui.campaignOptions.components.CampaignOptionsCheckBox;
-import mekhq.gui.campaignOptions.components.CampaignOptionsFormPanel;
 import mekhq.gui.campaignOptions.components.CampaignOptionsHeaderPanel;
 import mekhq.gui.campaignOptions.components.CampaignOptionsLabel;
 import mekhq.gui.campaignOptions.components.CampaignOptionsPagePanel;
@@ -73,8 +75,8 @@ import mekhq.gui.campaignOptions.components.CampaignOptionsSpinner;
  * no-ops.</p>
  */
 class PersonnelGeneralPage {
-    private static final int LABEL_COLUMN_WIDTH = CampaignOptionsFormPanel.DEFAULT_LABEL_WIDTH;
-    private static final int CONTROL_COLUMN_WIDTH = CampaignOptionsFormPanel.DEFAULT_CONTROL_WIDTH;
+    private static final int LABEL_COLUMN_WIDTH = SettingsFormPanel.DEFAULT_LABEL_WIDTH;
+    private static final int CONTROL_COLUMN_WIDTH = SettingsFormPanel.DEFAULT_CONTROL_WIDTH;
 
     private CampaignOptionsHeaderPanel generalHeader;
     private JCheckBox chkUseTactics;
@@ -88,9 +90,10 @@ class PersonnelGeneralPage {
     private JCheckBox chkOnlyCommandersMatterInfantry;
     private JCheckBox chkOnlyCommandersMatterBattleArmor;
     private JCheckBox chkUseEdge;
-    private JLabel lblEdgeRefreshPeriod;
+    private JCheckBox chkUseTwistOfFateSurvival;
+    private JCheckBox chkUseFoundersHavePlotArmor;
+    private JSpinner spnMaximumEdge;
     private MMComboBox<EdgeRefreshPeriod> comboEdgeRefreshPeriod;
-    private JLabel lblEdgeRefreshCost;
     private JSpinner spnEdgeRefreshCost;
     private JCheckBox chkUseImplants;
     private JCheckBox chkUseAlternativeQualityAveraging;
@@ -120,7 +123,8 @@ class PersonnelGeneralPage {
      *
      * @return a {@link JPanel} representing the General Page
      */
-    @Nonnull JPanel createPanel(@Nullable PersonnelOptionsModel model) {
+    @Nonnull
+    JPanel createPanel(@Nullable PersonnelOptionsModel model) {
         // Header
         String imageAddress = getImageDirectory() + "logo_clan_wolverine.png";
         generalHeader = new CampaignOptionsHeaderPanel("PersonnelGeneralPage", imageAddress);
@@ -132,24 +136,24 @@ class PersonnelGeneralPage {
         JPanel pnlAdministrators = createAdministratorsPanel();
         JPanel pnlBlobCrew = createBlobCrewPanel();
         JPanel panel = CampaignOptionsPagePanel.builder("PersonnelGeneralPage", "PersonnelGeneralPage", imageAddress)
-                .header(generalHeader)
-                .quote("personnelGeneralPage")
-                .section("lblPersonnelGeneralPage.text",
-                        "lblPersonnelGeneralPage.summary",
-                        pnlPersonnelGeneralOptions)
-                .section("lblPersonnelCleanUpPanel.text",
-                        "lblPersonnelCleanUpPanel.summary",
-                        pnlPersonnelCleanup,
-                        getMetadata(LEGACY_RULE_BEFORE_METADATA, CampaignOptionFlag.CUSTOM_SYSTEM))
-                .section("lblAdministratorsPanel.text",
-                        "lblAdministratorsPanel.summary",
-                        pnlAdministrators,
-                        getMetadata(LEGACY_RULE_BEFORE_METADATA, CampaignOptionFlag.CUSTOM_SYSTEM))
-                .section("lblBlobCrewPanel.text",
-                        "lblBlobCrewPanel.summary",
-                        pnlBlobCrew,
-                        getMetadata(new Version(0, 50, 12)))
-                .build();
+                             .header(generalHeader)
+                             .quote("personnelGeneralPage")
+                             .section("lblPersonnelGeneralPage.text",
+                                   "lblPersonnelGeneralPage.summary",
+                                   pnlPersonnelGeneralOptions)
+                             .section("lblPersonnelCleanUpPanel.text",
+                                   "lblPersonnelCleanUpPanel.summary",
+                                   pnlPersonnelCleanup,
+                                   getMetadata(LEGACY_RULE_BEFORE_METADATA, CampaignOptionFlag.CUSTOM_SYSTEM))
+                             .section("lblAdministratorsPanel.text",
+                                   "lblAdministratorsPanel.summary",
+                                   pnlAdministrators,
+                                   getMetadata(LEGACY_RULE_BEFORE_METADATA, CampaignOptionFlag.CUSTOM_SYSTEM))
+                             .section("lblBlobCrewPanel.text",
+                                   "lblBlobCrewPanel.summary",
+                                   pnlBlobCrew,
+                                   getMetadata(new Version(0, 50, 12)))
+                             .build();
 
         created = true;
         readFromModel(model);
@@ -165,37 +169,49 @@ class PersonnelGeneralPage {
     private @Nonnull JPanel createGeneralOptionsPanel() {
         // Contents
         chkUseTactics = new CampaignOptionsCheckBox("UseTactics",
-                getMetadata(LEGACY_RULE_BEFORE_METADATA, CampaignOptionFlag.IMPORTANT));
+              getMetadata(LEGACY_RULE_BEFORE_METADATA, CampaignOptionFlag.IMPORTANT));
         chkUseTactics.addMouseListener(createTipPanelUpdater("UseTactics"));
         chkUseInitiativeBonus = new CampaignOptionsCheckBox("UseInitiativeBonus",
-                getMetadata(LEGACY_RULE_BEFORE_METADATA, CampaignOptionFlag.IMPORTANT));
+              getMetadata(LEGACY_RULE_BEFORE_METADATA, CampaignOptionFlag.IMPORTANT));
         chkUseInitiativeBonus.addMouseListener(createTipPanelUpdater("UseInitiativeBonus"));
         chkUseSensibleTactics = new CampaignOptionsCheckBox("UseSensibleTactics",
               getMetadata(new Version(0, 51, 1), CampaignOptionFlag.IMPORTANT, CampaignOptionFlag.CUSTOM_SYSTEM));
         chkUseSensibleTactics.addMouseListener(createTipPanelUpdater("UseSensibleTactics"));
         chkUseToughness = new CampaignOptionsCheckBox("UseToughness",
-                getMetadata(LEGACY_RULE_BEFORE_METADATA, CampaignOptionFlag.CUSTOM_SYSTEM));
+              getMetadata(LEGACY_RULE_BEFORE_METADATA, CampaignOptionFlag.CUSTOM_SYSTEM));
         chkUseToughness.addMouseListener(createTipPanelUpdater("UseToughness"));
         chkUseRandomToughness = new CampaignOptionsCheckBox("UseRandomToughness",
-                getMetadata(LEGACY_RULE_BEFORE_METADATA, CampaignOptionFlag.CUSTOM_SYSTEM));
+              getMetadata(LEGACY_RULE_BEFORE_METADATA, CampaignOptionFlag.CUSTOM_SYSTEM));
         chkUseRandomToughness.addMouseListener(createTipPanelUpdater("UseRandomToughness"));
         chkUseArtillery = new CampaignOptionsCheckBox("UseArtillery");
         chkUseArtillery.addMouseListener(createTipPanelUpdater("UseArtillery"));
         chkUseAbilities = new CampaignOptionsCheckBox("UseAbilities");
         chkUseAbilities.addMouseListener(createTipPanelUpdater("UseAbilities"));
         chkOnlyCommandersMatterVehicles = new CampaignOptionsCheckBox("OnlyCommandersMatterVehicles",
-                getMetadata(MILESTONE_BEFORE_METADATA));
+              getMetadata(MILESTONE_BEFORE_METADATA));
         chkOnlyCommandersMatterVehicles.addMouseListener(createTipPanelUpdater("OnlyCommandersMatterVehicles"));
         chkOnlyCommandersMatterInfantry = new CampaignOptionsCheckBox("OnlyCommandersMatterInfantry",
-                getMetadata(MILESTONE_BEFORE_METADATA));
+              getMetadata(MILESTONE_BEFORE_METADATA));
         chkOnlyCommandersMatterInfantry.addMouseListener(createTipPanelUpdater("OnlyCommandersMatterInfantry"));
         chkOnlyCommandersMatterBattleArmor = new CampaignOptionsCheckBox("OnlyCommandersMatterBattleArmor",
-                getMetadata(MILESTONE_BEFORE_METADATA));
+              getMetadata(MILESTONE_BEFORE_METADATA));
         chkOnlyCommandersMatterBattleArmor.addMouseListener(createTipPanelUpdater("OnlyCommandersMatterBattleArmor"));
         chkUseEdge = new CampaignOptionsCheckBox("UseEdge");
         chkUseEdge.addMouseListener(createTipPanelUpdater("UseEdge"));
+        chkUseTwistOfFateSurvival = new CampaignOptionsCheckBox("UseTwistOfFateSurvival",
+              getMetadata(new Version(0, 51, 1)));
+        chkUseTwistOfFateSurvival.addMouseListener(createTipPanelUpdater("UseTwistOfFateSurvival"));
+        chkUseFoundersHavePlotArmor = new CampaignOptionsCheckBox("UseFoundersHavePlotArmor",
+              getMetadata(new Version(0, 51, 1)));
+        chkUseFoundersHavePlotArmor.addMouseListener(createTipPanelUpdater("UseFoundersHavePlotArmor"));
 
-        lblEdgeRefreshPeriod = new CampaignOptionsLabel("EdgeRefreshPeriod", getMetadata(new Version(0, 51, 0)));
+        JLabel lblMaximumEdge = new CampaignOptionsLabel("MaximumEdge", getMetadata(new Version(0, 51, 1)));
+        lblMaximumEdge.addMouseListener(createTipPanelUpdater("MaximumEdge"));
+        spnMaximumEdge = new CampaignOptionsSpinner("MaximumEdge",
+              CampaignOption.MAXIMUM_EDGE.defaultValue(), 0, MAXIMUM_ATTRIBUTE_SCORE, 1);
+        spnMaximumEdge.addMouseListener(createTipPanelUpdater("MaximumEdge"));
+
+        JLabel lblEdgeRefreshPeriod = new CampaignOptionsLabel("EdgeRefreshPeriod", getMetadata(new Version(0, 51, 0)));
         lblEdgeRefreshPeriod.addMouseListener(createTipPanelUpdater("EdgeRefreshPeriod"));
         comboEdgeRefreshPeriod.setRenderer(new DefaultListCellRenderer() {
             @Override
@@ -210,34 +226,37 @@ class PersonnelGeneralPage {
         });
         comboEdgeRefreshPeriod.addMouseListener(createTipPanelUpdater("EdgeRefreshPeriod"));
 
-        lblEdgeRefreshCost = new CampaignOptionsLabel("EdgeRefreshCost", getMetadata(new Version(0, 51, 0)));
+        JLabel lblEdgeRefreshCost = new CampaignOptionsLabel("EdgeRefreshCost", getMetadata(new Version(0, 51, 0)));
         lblEdgeRefreshCost.addMouseListener(createTipPanelUpdater("EdgeRefreshCost"));
         spnEdgeRefreshCost = new CampaignOptionsSpinner("EdgeRefreshCost", 20, 0, 100, 1);
         spnEdgeRefreshCost.addMouseListener(createTipPanelUpdater("EdgeRefreshCost"));
         chkUseImplants = new CampaignOptionsCheckBox("UseImplants");
         chkUseImplants.addMouseListener(createTipPanelUpdater("UseImplants"));
         chkUseAlternativeQualityAveraging = new CampaignOptionsCheckBox("UseAlternativeQualityAveraging",
-                getMetadata(LEGACY_RULE_BEFORE_METADATA, CampaignOptionFlag.CUSTOM_SYSTEM));
+              getMetadata(LEGACY_RULE_BEFORE_METADATA, CampaignOptionFlag.CUSTOM_SYSTEM));
         chkUseAlternativeQualityAveraging.addMouseListener(createTipPanelUpdater("UseAlternativeQualityAveraging"));
 
         // Layout the Panel
-        final CampaignOptionsFormPanel panel = new CampaignOptionsFormPanel("PersonnelGeneralPage",
-                LABEL_COLUMN_WIDTH,
-                CONTROL_COLUMN_WIDTH);
+        final SettingsFormPanel panel = new SettingsFormPanel("PersonnelGeneralPage",
+              LABEL_COLUMN_WIDTH,
+              CONTROL_COLUMN_WIDTH);
         panel.addCheckBoxGrid(2,
-                chkUseTactics,
-                chkUseInitiativeBonus,
-                chkUseSensibleTactics,
-                chkUseToughness,
-                chkUseRandomToughness,
-                chkUseArtillery,
-                chkUseAbilities,
-                chkOnlyCommandersMatterVehicles,
-                chkOnlyCommandersMatterInfantry,
-                chkOnlyCommandersMatterBattleArmor,
-                chkUseEdge,
-                chkUseImplants,
-                chkUseAlternativeQualityAveraging);
+              chkUseTactics,
+              chkUseInitiativeBonus,
+              chkUseSensibleTactics,
+              chkUseToughness,
+              chkUseRandomToughness,
+              chkUseArtillery,
+              chkUseAbilities,
+              chkOnlyCommandersMatterVehicles,
+              chkOnlyCommandersMatterInfantry,
+              chkOnlyCommandersMatterBattleArmor,
+              chkUseEdge,
+              chkUseTwistOfFateSurvival,
+              chkUseFoundersHavePlotArmor,
+              chkUseImplants,
+              chkUseAlternativeQualityAveraging);
+        panel.addRow(lblMaximumEdge, spnMaximumEdge);
         panel.addRow(lblEdgeRefreshCost, spnEdgeRefreshCost);
         panel.addRow(lblEdgeRefreshPeriod, comboEdgeRefreshPeriod);
 
@@ -255,19 +274,19 @@ class PersonnelGeneralPage {
         chkUsePersonnelRemoval.addMouseListener(createTipPanelUpdater("UsePersonnelRemoval"));
         chkUseRemovalExemptCemetery = new CampaignOptionsCheckBox("UseRemovalExemptCemetery");
         chkUseRemovalExemptCemetery
-                .addMouseListener(createTipPanelUpdater("UseRemovalExemptCemetery"));
+              .addMouseListener(createTipPanelUpdater("UseRemovalExemptCemetery"));
         chkUseRemovalExemptRetirees = new CampaignOptionsCheckBox("UseRemovalExemptRetirees");
         chkUseRemovalExemptRetirees
-                .addMouseListener(createTipPanelUpdater("UseRemovalExemptRetirees"));
+              .addMouseListener(createTipPanelUpdater("UseRemovalExemptRetirees"));
 
         // Layout the Panel
-        final CampaignOptionsFormPanel panel = new CampaignOptionsFormPanel("PersonnelCleanUpPanel",
-                LABEL_COLUMN_WIDTH,
-                CONTROL_COLUMN_WIDTH);
+        final SettingsFormPanel panel = new SettingsFormPanel("PersonnelCleanUpPanel",
+              LABEL_COLUMN_WIDTH,
+              CONTROL_COLUMN_WIDTH);
         panel.addCheckBoxGrid(2,
-                chkUsePersonnelRemoval,
-                chkUseRemovalExemptCemetery,
-                chkUseRemovalExemptRetirees);
+              chkUsePersonnelRemoval,
+              chkUseRemovalExemptCemetery,
+              chkUseRemovalExemptRetirees);
 
         return panel;
     }
@@ -282,16 +301,17 @@ class PersonnelGeneralPage {
         chkAdminsHaveNegotiation = new CampaignOptionsCheckBox("AdminsHaveNegotiation");
         chkAdminsHaveNegotiation.addMouseListener(createTipPanelUpdater("AdminsHaveNegotiation"));
         chkAdminExperienceLevelIncludeNegotiation = new CampaignOptionsCheckBox(
-                "AdminExperienceLevelIncludeNegotiation");
-        chkAdminExperienceLevelIncludeNegotiation.addMouseListener(createTipPanelUpdater("AdminExperienceLevelIncludeNegotiation"));
+              "AdminExperienceLevelIncludeNegotiation");
+        chkAdminExperienceLevelIncludeNegotiation.addMouseListener(createTipPanelUpdater(
+              "AdminExperienceLevelIncludeNegotiation"));
 
         // Layout the Panel
-        final CampaignOptionsFormPanel panel = new CampaignOptionsFormPanel("AdministratorsPanel",
-                LABEL_COLUMN_WIDTH,
-                CONTROL_COLUMN_WIDTH);
+        final SettingsFormPanel panel = new SettingsFormPanel("AdministratorsPanel",
+              LABEL_COLUMN_WIDTH,
+              CONTROL_COLUMN_WIDTH);
         panel.addCheckBoxGrid(2,
-                chkAdminsHaveNegotiation,
-                chkAdminExperienceLevelIncludeNegotiation);
+              chkAdminsHaveNegotiation,
+              chkAdminExperienceLevelIncludeNegotiation);
 
         return panel;
     }
@@ -306,42 +326,42 @@ class PersonnelGeneralPage {
         chkUseBlobInfantry = new CampaignOptionsCheckBox("UseBlobInfantry", getMetadata(new Version(0, 50, 12)));
         chkUseBlobInfantry.addMouseListener(createTipPanelUpdater("UseBlobInfantry"));
         chkUseBlobBattleArmor = new CampaignOptionsCheckBox("UseBlobBattleArmor",
-                getMetadata(new Version(0, 50, 12)));
+              getMetadata(new Version(0, 50, 12)));
         chkUseBlobBattleArmor.addMouseListener(createTipPanelUpdater("UseBlobBattleArmor"));
         chkUseBlobVehicleCrewGround = new CampaignOptionsCheckBox("UseBlobVehicleCrewGround",
-                getMetadata(new Version(0, 50, 12)));
+              getMetadata(new Version(0, 50, 12)));
         chkUseBlobVehicleCrewGround
-                .addMouseListener(createTipPanelUpdater("UseBlobVehicleCrewGround"));
+              .addMouseListener(createTipPanelUpdater("UseBlobVehicleCrewGround"));
         chkUseBlobVehicleCrewVTOL = new CampaignOptionsCheckBox("UseBlobVehicleCrewVTOL",
-                getMetadata(new Version(0, 50, 12)));
+              getMetadata(new Version(0, 50, 12)));
         chkUseBlobVehicleCrewVTOL.addMouseListener(createTipPanelUpdater("UseBlobVehicleCrewVTOL"));
         chkUseBlobVehicleCrewNaval = new CampaignOptionsCheckBox("UseBlobVehicleCrewNaval",
-                getMetadata(new Version(0, 50, 12)));
+              getMetadata(new Version(0, 50, 12)));
         chkUseBlobVehicleCrewNaval
-                .addMouseListener(createTipPanelUpdater("UseBlobVehicleCrewNaval"));
+              .addMouseListener(createTipPanelUpdater("UseBlobVehicleCrewNaval"));
         chkUseBlobVesselPilot = new CampaignOptionsCheckBox("UseBlobVesselPilot",
-                getMetadata(new Version(0, 50, 12)));
+              getMetadata(new Version(0, 50, 12)));
         chkUseBlobVesselPilot.addMouseListener(createTipPanelUpdater("UseBlobVesselPilot"));
         chkUseBlobVesselGunner = new CampaignOptionsCheckBox("UseBlobVesselGunner",
-                getMetadata(new Version(0, 50, 12)));
+              getMetadata(new Version(0, 50, 12)));
         chkUseBlobVesselGunner.addMouseListener(createTipPanelUpdater("UseBlobVesselGunner"));
         chkUseBlobVesselCrew = new CampaignOptionsCheckBox("UseBlobVesselCrew",
-                getMetadata(new Version(0, 50, 12)));
+              getMetadata(new Version(0, 50, 12)));
         chkUseBlobVesselCrew.addMouseListener(createTipPanelUpdater("UseBlobVesselCrew"));
 
         // Layout the Panel
-        final CampaignOptionsFormPanel panel = new CampaignOptionsFormPanel("BlobCrewPanel",
-                LABEL_COLUMN_WIDTH,
-                CONTROL_COLUMN_WIDTH);
+        final SettingsFormPanel panel = new SettingsFormPanel("BlobCrewPanel",
+              LABEL_COLUMN_WIDTH,
+              CONTROL_COLUMN_WIDTH);
         panel.addCheckBoxGrid(2,
-                chkUseBlobInfantry,
-                chkUseBlobBattleArmor,
-                chkUseBlobVehicleCrewGround,
-                chkUseBlobVehicleCrewVTOL,
-                chkUseBlobVehicleCrewNaval,
-                chkUseBlobVesselPilot,
-                chkUseBlobVesselGunner,
-                chkUseBlobVesselCrew);
+              chkUseBlobInfantry,
+              chkUseBlobBattleArmor,
+              chkUseBlobVehicleCrewGround,
+              chkUseBlobVehicleCrewVTOL,
+              chkUseBlobVehicleCrewNaval,
+              chkUseBlobVesselPilot,
+              chkUseBlobVesselGunner,
+              chkUseBlobVesselCrew);
 
         return panel;
     }
@@ -368,6 +388,9 @@ class PersonnelGeneralPage {
         chkOnlyCommandersMatterInfantry.setSelected(model.onlyCommandersMatterInfantry);
         chkOnlyCommandersMatterBattleArmor.setSelected(model.onlyCommandersMatterBattleArmor);
         chkUseEdge.setSelected(model.useEdge);
+        spnMaximumEdge.setValue(model.maximumEdge);
+        chkUseTwistOfFateSurvival.setSelected(model.useTwistOfFateSurvival);
+        chkUseFoundersHavePlotArmor.setSelected(model.useFoundersHavePlotArmor);
         comboEdgeRefreshPeriod.setSelectedItem(model.edgeRefreshPeriod);
         spnEdgeRefreshCost.setValue(model.edgeRefreshCost);
         chkUseImplants.setSelected(model.useImplants);
@@ -409,6 +432,9 @@ class PersonnelGeneralPage {
         model.onlyCommandersMatterInfantry = chkOnlyCommandersMatterInfantry.isSelected();
         model.onlyCommandersMatterBattleArmor = chkOnlyCommandersMatterBattleArmor.isSelected();
         model.useEdge = chkUseEdge.isSelected();
+        model.maximumEdge = (int) spnMaximumEdge.getValue();
+        model.useTwistOfFateSurvival = chkUseTwistOfFateSurvival.isSelected();
+        model.useFoundersHavePlotArmor = chkUseFoundersHavePlotArmor.isSelected();
         model.edgeRefreshPeriod = comboEdgeRefreshPeriod.getSelectedItem();
         model.edgeRefreshCost = (int) spnEdgeRefreshCost.getValue();
         model.useImplants = chkUseImplants.isSelected();

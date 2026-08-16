@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2019-2025 The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2019-2026 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -52,6 +52,7 @@ import java.util.List;
 import megamek.common.compute.Compute;
 import mekhq.Utilities;
 import mekhq.campaign.Campaign;
+import mekhq.campaign.campaignOptions.CampaignOption;
 import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.enums.PersonnelRole;
@@ -223,8 +224,10 @@ public class DefaultSkillGenerator extends AbstractSkillGenerator {
      * @param person the {@link Person} whose attributes will be generated and assigned
      */
     @Override
-    public void generateAttributes(Person person, boolean isUseEdge) {
+    public void generateAttributes(Person person, CampaignOptions campaignOptions) {
         RandomSkillPreferences skillPreferences = getSkillPreferences();
+        boolean isUseEdge = campaignOptions.get(CampaignOption.USE_EDGE);
+        int maximumEdge = campaignOptions.get(CampaignOption.MAXIMUM_EDGE);
 
         // Reset Attribute Scores to default
         for (SkillAttribute attribute : SkillAttribute.values()) {
@@ -252,24 +255,28 @@ public class DefaultSkillGenerator extends AbstractSkillGenerator {
             if (attribute.isNoAttribute()) {
                 continue;
             }
+            boolean isEdge = attribute == SkillAttribute.EDGE;
+            if (isEdge && !isUseEdge) {
+                continue;
+            }
 
             // Profession && Phenotype adjustments
             int baseAttributeScore = profession.getAttributeModifier(attribute);
             int attributeModifier = phenotype.getAttributeModifier(attribute);
-            person.setAttributeScore(attribute, baseAttributeScore + attributeModifier);
+            int generatedScore = baseAttributeScore + attributeModifier;
+            person.setAttributeScore(attribute,
+                  isEdge ? Math.min(generatedScore, maximumEdge) : generatedScore);
 
             // Attribute randomization
             if (randomizeAttributes) {
-                boolean isEdge = attribute == SkillAttribute.EDGE;
-                int delta;
-                if (isEdge && isUseEdge) {
-                    delta = d6(2) == 12 ? 1 : 0;
-                } else {
-                    delta = performTraitRoll();
-                }
+                int delta = isEdge ? (d6(2) == 12 ? 1 : 0) : performTraitRoll();
 
                 if (delta != 0) {
-                    person.changeAttributeScore(attribute, delta);
+                    if (isEdge && delta > 0) {
+                        person.gainEdge(delta, maximumEdge);
+                    } else {
+                        person.changeAttributeScore(attribute, delta);
+                    }
                 }
             }
         }
@@ -310,7 +317,7 @@ public class DefaultSkillGenerator extends AbstractSkillGenerator {
         }
 
         person.setConnections(Math.clamp(performTraitRoll(), MINIMUM_CONNECTIONS, MAXIMUM_CONNECTIONS));
-        person.setReputation(Math.clamp(performTraitRoll(), MINIMUM_REPUTATION, MAXIMUM_REPUTATION));
+        person.setFame(Math.clamp(performTraitRoll(), MINIMUM_FAME, MAXIMUM_FAME));
         person.setWealth(Math.clamp(performTraitRoll(), MINIMUM_WEALTH, MAXIMUM_WEALTH));
         person.setExtraIncomeFromTraitLevel(Math.clamp(performTraitRoll(), MINIMUM_EXTRA_INCOME, MAXIMUM_EXTRA_INCOME));
 

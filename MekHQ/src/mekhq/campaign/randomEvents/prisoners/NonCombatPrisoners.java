@@ -130,12 +130,7 @@ public class NonCombatPrisoners {
     public static Hashtable<UUID, ResolveScenarioTracker.OppositionPersonnelStatus> getCivilianCaptives(
           Campaign campaign, Mission mission) {
         CampaignOptions campaignOptions = campaign.getCampaignOptions();
-        boolean adminsHaveNegotiation = campaignOptions.isAdminsHaveNegotiation();
-        boolean doctorsHaveAdministration = campaignOptions.isDoctorsUseAdministration();
-        boolean techsHaveAdministration = campaignOptions.isTechsUseAdministration();
-        boolean isUseArtillery = campaignOptions.isUseArtillery();
         boolean isUseAdvancedMedical = campaignOptions.isUseAdvancedMedical();
-        boolean isUseExtraRandom = campaign.getRandomSkillPreferences().randomizeSkill();
 
         SkillLevel targetSkillLevel = SkillLevel.REGULAR;
         if (mission instanceof AtBContract contract) {

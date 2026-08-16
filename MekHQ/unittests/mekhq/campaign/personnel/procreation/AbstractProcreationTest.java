@@ -142,7 +142,7 @@ public class AbstractProcreationTest {
     public void testDetermineFather() {
         when(mockProcreation.determineFather(any(), any())).thenCallRealMethod();
         Faction campaignFaction = mock(Faction.class);
-        when(mockCampaign.getFaction()).thenReturn(campaignFaction);
+        when(mockCampaign.getPlayerForce().getFaction()).thenReturn(campaignFaction);
         when(campaignFaction.getShortName()).thenReturn("MERC");
 
         final Person mother = new Person(mockCampaign);
@@ -706,7 +706,7 @@ public class AbstractProcreationTest {
         doCallRealMethod().when(mockProcreation).addPregnancy(any(), any(), any(), eq(false));
         doCallRealMethod().when(mockProcreation).addPregnancy(any(), any(), any(), anyInt(), eq(false));
         Faction campaignFaction = mock(Faction.class);
-        when(mockCampaign.getFaction()).thenReturn(campaignFaction);
+        when(mockCampaign.getPlayerForce().getFaction()).thenReturn(campaignFaction);
         when(campaignFaction.getShortName()).thenReturn("MERC");
 
         final Person mother = new Person(mockCampaign);
@@ -751,7 +751,7 @@ public class AbstractProcreationTest {
     public void testRemovePregnancy() {
         doCallRealMethod().when(mockProcreation).removePregnancy(any());
         Faction campaignFaction = mock(Faction.class);
-        when(mockCampaign.getFaction()).thenReturn(campaignFaction);
+        when(mockCampaign.getPlayerForce().getFaction()).thenReturn(campaignFaction);
         when(campaignFaction.getShortName()).thenReturn("MERC");
 
         final Person mother = new Person(mockCampaign);
@@ -862,7 +862,7 @@ public class AbstractProcreationTest {
     public void testRandomlyProcreates() {
         doCallRealMethod().when(mockProcreation).randomlyProcreates(any(), any());
         Faction campaignFaction = mock(Faction.class);
-        when(mockCampaign.getFaction()).thenReturn(campaignFaction);
+        when(mockCampaign.getPlayerForce().getFaction()).thenReturn(campaignFaction);
         when(campaignFaction.getShortName()).thenReturn("MERC");
 
         final Person person = new Person(mockCampaign);

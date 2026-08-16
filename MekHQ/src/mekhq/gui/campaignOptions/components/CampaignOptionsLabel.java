@@ -32,127 +32,36 @@
  */
 package mekhq.gui.campaignOptions.components;
 
-import static megamek.client.ui.WrapLayout.wordWrap;
-import static megamek.client.ui.util.FlatLafStyleBuilder.setFontScaling;
-import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.getCampaignOptionsResourceBundle;
-import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.processWrapSize;
-import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
-import static mekhq.utilities.MHQInternationalization.getTextAt;
+import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.settingsBadges;
+import static mekhq.gui.campaignOptions.components.CampaignOptionsComponentSupport.campaignTextProvider;
+import static mekhq.gui.campaignOptions.components.CampaignOptionsComponentSupport.textProvider;
 
-import javax.swing.JLabel;
-
-import megamek.common.annotations.Nullable;
+import jakarta.annotation.Nullable;
+import megamek.client.ui.settings.SettingsLabel;
 import mekhq.gui.campaignOptions.CampaignOptionsMetadata;
-import mekhq.gui.campaignOptions.CampaignOptionsUtilities;
 
-/**
- * A specialized {@link JLabel} component designed for use in campaign options dialogs.
- * <p>
- * The label's text and tooltip are dynamically loaded from a resource bundle based on the provided name. Tooltip text
- * can also be configured for word wrapping, and an option exists to create the label without a tooltip.
- */
-public class CampaignOptionsLabel extends JLabel {
-    /**
-     * Constructs a {@link CampaignOptionsLabel} with the specified name.
-     * <p>
-     * The label's text is retrieved using the resource key {@code "lbl" + name + ".text"}. The tooltip is retrieved
-     * using the resource key {@code "lbl" + name + ".tooltip"}. If the keys do not exist in the resource bundle, an
-     * exception will be thrown.
-     * <p>
-     * A tooltip is included by default, and a default line wrapping size is used for the tooltip text.
-     *
-     * @param name the base name of the label, used to construct resource bundle keys
-     */
+/** Campaign-specific resource-key and metadata adapter over {@link SettingsLabel}. */
+public class CampaignOptionsLabel extends SettingsLabel {
     public CampaignOptionsLabel(String name) {
         this(name, null, false, null);
     }
 
-    /**
-     * Constructs a {@link CampaignOptionsLabel} with the specified name, optional custom tooltip wrap size, and
-     * optional tooltip exclusion.
-     * <p>
-     * The label's text is retrieved using the resource key {@code "lbl" + name + ".text"}. If {@code noTooltip} is
-     * {@code false}, the tooltip is retrieved using the resource key {@code "lbl" + name + ".tooltip"} and word-wrapped
-     * based on the provided {@code customWrapSize}, defaulting to 100 characters if {@code customWrapSize} is
-     * {@code null}. If {@code noTooltip} is {@code true}, no tooltip is set for the label.
-     * <p>
-     * If the resource keys do not exist in the resource bundle, an exception will be thrown.
-     *
-     * @param name           the base name of the label, used to construct resource bundle keys
-     * @param customWrapSize the maximum number of characters per line in the tooltip, or {@code null} to use the
-     *                       default value of 100
-     * @param noTooltip      if {@code true}, the label is created without a tooltip
-     */
     public CampaignOptionsLabel(String name, @Nullable Integer customWrapSize, boolean noTooltip) {
         this(name, customWrapSize, noTooltip, null);
     }
 
-    /**
-     * Constructs a {@link CampaignOptionsLabel} with the specified name and metadata.
-     * <p>
-     * The metadata is used to display version badges and special flag symbols alongside the label text.
-     *
-     * @param name     the base name of the label, used to construct resource bundle keys
-     * @param metadata version and flag metadata for displaying badges, or {@code null} for no badges
-     */
     public CampaignOptionsLabel(String name, @Nullable CampaignOptionsMetadata metadata) {
         this(name, null, false, metadata);
     }
 
-    /**
-     * Constructs a {@link CampaignOptionsLabel} with the specified name, optional custom tooltip wrap size, optional
-     * tooltip exclusion, and metadata.
-     * <p>
-     * The label's text is retrieved using the resource key {@code "lbl" + name + ".text"}. If {@code noTooltip} is
-     * {@code false}, the tooltip is retrieved using the resource key {@code "lbl" + name + ".tooltip"} and word-wrapped
-     * based on the provided {@code customWrapSize}, defaulting to 100 characters if {@code customWrapSize} is
-     * {@code null}. If {@code noTooltip} is {@code true}, no tooltip is set for the label.
-     * <p>
-     * The metadata is used to display version badges and special flag symbols alongside the label text.
-     * <p>
-     * If the resource keys do not exist in the resource bundle, an exception will be thrown.
-     *
-     * @param name           the base name of the label, used to construct resource bundle keys
-     * @param customWrapSize the maximum number of characters per line in the tooltip, or {@code null} to use the
-     *                       default value of 100
-     * @param noTooltip      if {@code true}, the label is created without a tooltip
-     * @param metadata       version and flag metadata for displaying badges, or {@code null} for no badges
-     */
     public CampaignOptionsLabel(String name, @Nullable Integer customWrapSize, boolean noTooltip,
-                                @Nullable CampaignOptionsMetadata metadata) {
-        // Set the label's text using HTML formatting for better rendering
-        super(String.format("<html>%s</html>", buildLabelText(name, metadata)));
-
-        // Configure the tooltip if not excluded
-        if (!noTooltip) {
-            setToolTipText(wordWrap(getTextAt(getCampaignOptionsResourceBundle(), "lbl" + name + ".tooltip"),
-                  processWrapSize(customWrapSize)));
-        }
-
-        // Set the internal name of the label
+          @Nullable CampaignOptionsMetadata metadata) {
+        super(campaignTextProvider(), "lbl" + name, customWrapSize, noTooltip, settingsBadges(metadata));
         setName("lbl" + name);
-
-        // Apply font scaling
-        setFontScaling(this, false, 1);
     }
 
-    /**
-     * Builds the label text with badges either inserted at %s placeholders or appended to the end.
-     *
-     * @param name     the base name of the label
-     * @param metadata version and flag metadata for displaying badges, or {@code null} for no badges
-     * @return the formatted label text with badges
-     */
-    private static String buildLabelText(String name, @Nullable CampaignOptionsMetadata metadata) {
-        String baseText = getTextAt(getCampaignOptionsResourceBundle(), "lbl" + name + ".text");
-
-        // If the text contains {0}, use getFormattedTextAt to insert badges at the placeholder location
-        if (baseText.contains("{0}")) {
-            return getFormattedTextAt(getCampaignOptionsResourceBundle(), "lbl" + name + ".text",
-                  CampaignOptionsUtilities.formatBadges(metadata));
-        } else {
-            // Otherwise, append badges to the end (legacy behavior)
-            return baseText + CampaignOptionsUtilities.formatBadges(metadata);
-        }
+    public CampaignOptionsLabel(String resourceBundleName, String name) {
+        super(textProvider(resourceBundleName), name);
+        setName("lbl" + name);
     }
 }

@@ -67,6 +67,7 @@ import megamek.common.rolls.TargetRoll;
 import megamek.common.ui.FastJScrollPane;
 import megamek.logging.MMLogger;
 import mekhq.MekHQ;
+import mekhq.campaign.digitalGM.stratCon.StratConRulesManager;
 import mekhq.campaign.events.AcquisitionEvent;
 import mekhq.campaign.events.AsTechPoolChangedEvent;
 import mekhq.campaign.events.DeploymentChangedEvent;
@@ -87,7 +88,6 @@ import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.skills.Skill;
 import mekhq.campaign.personnel.skills.SkillModifierData;
 import mekhq.campaign.personnel.skills.SkillType;
-import mekhq.campaign.stratCon.StratConRulesManager;
 import mekhq.campaign.unit.Unit;
 import mekhq.campaign.work.IPartWork;
 import mekhq.gui.adapter.ServicedUnitsTableMouseAdapter;
@@ -425,7 +425,7 @@ public final class RepairTab extends CampaignGuiTab implements ITechWorkPanel {
         sortKeys = new ArrayList<>();
         sortKeys.add(new RowSorter.SortKey(0, SortOrder.ASCENDING));
         taskSorter.setSortKeys(sortKeys);
-        TaskTableMouseAdapter.connect(getCampaignGui(), taskTable, taskModel);
+        TaskTableMouseAdapter.connect(getCampaignGui(), taskTable, taskModel, this);
         JScrollPane scrollTaskTable = new FastJScrollPane(taskTable);
         scrollTaskTable.setMinimumSize(new Dimension(200, 200));
         scrollTaskTable.setPreferredSize(new Dimension(300, 300));
@@ -798,8 +798,12 @@ public final class RepairTab extends CampaignGuiTab implements ITechWorkPanel {
                 TechTableModel techModel = entry.getModel();
                 Person tech = techModel.getTechAt(entry.getIdentifier());
                 // Tech must be at the same location as the unit being repaired
-                ILocation repairTarget = (unit != null) ? unit
-                      : (part instanceof Part partWithUnit && partWithUnit.getUnit() != null) ? partWithUnit.getUnit() : (ILocation) part;
+                ILocation repairTarget = (unit != null) ?
+                                               unit
+                                               :
+                                               (part instanceof Part partWithUnit && partWithUnit.getUnit() != null) ?
+                                                     partWithUnit.getUnit() :
+                                               (ILocation) part;
                 if (!LocationUtils.areSameEffectiveLocation(tech, repairTarget)) {
                     return false;
                 }

@@ -106,6 +106,10 @@ import mekhq.campaign.CampaignController;
 import mekhq.campaign.ResolveScenarioTracker;
 import mekhq.campaign.autoResolve.MekHQSetupForces;
 import mekhq.campaign.autoResolve.StratConSetupForces;
+import mekhq.campaign.digitalGM.IDigitalGM;
+import mekhq.campaign.digitalGM.stratCon.gm.MaplessStratConGM;
+import mekhq.campaign.digitalGM.stratCon.gm.SinglesStratConGM;
+import mekhq.campaign.digitalGM.stratCon.gm.StratConDigitalGM;
 import mekhq.campaign.handler.PostScenarioDialogHandler;
 import mekhq.campaign.handler.XPHandler;
 import mekhq.campaign.mission.AtBDynamicScenario;
@@ -114,7 +118,6 @@ import mekhq.campaign.mission.Scenario;
 import mekhq.campaign.mission.ScenarioTemplate;
 import mekhq.campaign.mission.ScenarioTemplate.BattlefieldControlType;
 import mekhq.campaign.personnel.Person;
-import mekhq.campaign.stratCon.StratConRulesManager;
 import mekhq.campaign.unit.Unit;
 import mekhq.gui.CampaignGUI;
 import mekhq.gui.baseComponents.immersiveDialogs.ImmersiveDialogSimple;
@@ -367,9 +370,9 @@ public class MekHQ implements GameListener {
     }
 
     /**
-     * Disposes all CampaignGUI components and deactivates the current campaign. Since event bus registration is
-     * linked to UI lifecycle, it also unregisters them from the event bus. Manually unsubscribes non-UI components.
-     * Logs remaining event bus listeners for debug purposes.
+     * Disposes all CampaignGUI components and deactivates the current campaign. Since event bus registration is linked
+     * to UI lifecycle, it also unregisters them from the event bus. Manually unsubscribes non-UI components. Logs
+     * remaining event bus listeners for debug purposes.
      */
     private void deactivateCampaign() {
         if (campaignGUI != null) {
@@ -958,9 +961,13 @@ public class MekHQ implements GameListener {
     private void initEventHandlers() {
         EVENT_BUS.register(new XPHandler());
 
-        StratConRulesManager srm = new StratConRulesManager();
-        srm.startup();
-        EVENT_BUS.register(srm);
+        // Register every digital GM. All receive the new-day event, but only the one matching the campaign's StratCon
+        // play type acts (see DigitalGM#isEnabled); the play types are mutually exclusive, so at most one runs per day.
+        for (IDigitalGM IDigitalGM : List.of(new StratConDigitalGM(),
+              new MaplessStratConGM(),
+              new SinglesStratConGM())) {
+            IDigitalGM.startup();
+        }
     }
 
     private static void setLookAndFeel(String themeName) {

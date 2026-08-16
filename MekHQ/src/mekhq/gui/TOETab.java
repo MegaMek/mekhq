@@ -53,6 +53,7 @@ import megamek.common.event.Subscribe;
 import megamek.common.ui.FastJScrollPane;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
+import mekhq.campaign.digitalGM.stratCon.gm.MaplessStratCon;
 import mekhq.campaign.events.DeploymentChangedEvent;
 import mekhq.campaign.events.NetworkChangedEvent;
 import mekhq.campaign.events.OrganizationChangedEvent;
@@ -67,7 +68,6 @@ import mekhq.campaign.mission.AtBDynamicScenario;
 import mekhq.campaign.mission.Mission;
 import mekhq.campaign.mission.Scenario;
 import mekhq.campaign.personnel.Person;
-import mekhq.campaign.stratCon.MaplessStratCon;
 import mekhq.campaign.unit.Unit;
 import mekhq.gui.adapter.TOEMouseAdapter;
 import mekhq.gui.baseComponents.roundedComponents.RoundedJButton;
@@ -348,7 +348,7 @@ public final class TOETab extends CampaignGuiTab {
             // to not select the unit in the TO&E.
         } else if (node instanceof Formation) {
             final JScrollPane scrollForce = new FastJScrollPane(new ForceViewPanel((Formation) node, getCampaign(),
-                this::selectUnitFromForceView, this::selectFormationFromForceView));
+                  this::selectUnitFromForceView, this::selectFormationFromForceView));
             scrollForce.setBorder(null);
             panForceView.add(scrollForce, BorderLayout.CENTER);
             panForceView.setBorder(null);

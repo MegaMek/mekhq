@@ -41,18 +41,21 @@ import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.argThat;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.atLeast;
 import static org.mockito.Mockito.atLeastOnce;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.mockStatic;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static testUtilities.MHQTestUtilities.mockCampaign;
 
 import java.lang.reflect.Field;
+import java.lang.reflect.Method;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -71,6 +74,7 @@ import mekhq.campaign.CampaignLocationManager;
 import mekhq.campaign.CurrentLocation;
 import mekhq.campaign.FixedLocation;
 import mekhq.campaign.LocalWarehouse;
+import mekhq.campaign.campaignOptions.CampaignOption;
 import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.enums.DailyReportType;
 import mekhq.campaign.events.persons.PersonStatusChangedEvent;
@@ -83,8 +87,11 @@ import mekhq.campaign.personnel.enums.AwardBonus;
 import mekhq.campaign.personnel.enums.PersonnelStatus;
 import mekhq.campaign.personnel.enums.education.EducationLevel;
 import mekhq.campaign.personnel.enums.education.EducationStage;
+import mekhq.campaign.personnel.medical.BodyLocation;
+import mekhq.campaign.personnel.medical.advancedMedical.InjuryTypes;
 import mekhq.campaign.personnel.skills.SkillCheck;
 import mekhq.campaign.personnel.skills.SkillType;
+import mekhq.campaign.personnel.skills.enums.SkillAttribute;
 import mekhq.campaign.randomEvents.personalities.Aggression;
 import mekhq.campaign.randomEvents.personalities.Ambition;
 import mekhq.campaign.randomEvents.personalities.Greed;
@@ -111,7 +118,7 @@ public class PersonTest {
         initAwards();
 
         CampaignOptions mockCampaignOpts = mock(CampaignOptions.class);
-        when(mockCampaignOpts.isTrackTotalXPEarnings()).thenReturn(false);
+        when(mockCampaignOpts.get(CampaignOption.TRACK_TOTAL_XP_EARNINGS)).thenReturn(false);
         when(mockCampaignOpts.getAwardBonusStyle()).thenReturn(AwardBonus.BOTH);
 
         Campaign mockCampaign = mockCampaign();
@@ -149,7 +156,7 @@ public class PersonTest {
         initAwards();
 
         CampaignOptions mockCampaignOpts = mock(CampaignOptions.class);
-        when(mockCampaignOpts.isTrackTotalXPEarnings()).thenReturn(false);
+        when(mockCampaignOpts.get(CampaignOption.TRACK_TOTAL_XP_EARNINGS)).thenReturn(false);
         when(mockCampaignOpts.getAwardBonusStyle()).thenReturn(AwardBonus.BOTH);
 
         Campaign mockCampaign = mockCampaign();
@@ -376,7 +383,7 @@ public class PersonTest {
 
         Campaign mockCampaign = mockCampaign();
         when(mockCampaign.getLocalDate()).thenReturn(LocalDate.now());
-        when(mockCampaign.getName()).thenReturn("Campaign");
+        when(mockCampaign.getPlayerForce().getName()).thenReturn("Campaign");
         when(mockCampaign.getCampaignOptions()).thenReturn(mockCampaignOpts);
 
         // Add a unit to the person
@@ -400,7 +407,7 @@ public class PersonTest {
 
         Campaign mockCampaign = mockCampaign();
         when(mockCampaign.getLocalDate()).thenReturn(LocalDate.now());
-        when(mockCampaign.getName()).thenReturn("Campaign");
+        when(mockCampaign.getPlayerForce().getName()).thenReturn("Campaign");
         when(mockCampaign.getCampaignOptions()).thenReturn(mockCampaignOpts);
 
         // Add a unit to the person
@@ -424,7 +431,7 @@ public class PersonTest {
 
         Campaign mockCampaign = mockCampaign();
         when(mockCampaign.getLocalDate()).thenReturn(LocalDate.now());
-        when(mockCampaign.getName()).thenReturn("Campaign");
+        when(mockCampaign.getPlayerForce().getName()).thenReturn("Campaign");
         when(mockCampaign.getCampaignOptions()).thenReturn(mockCampaignOpts);
 
         // Add a unit to the person
@@ -448,7 +455,7 @@ public class PersonTest {
 
         Campaign mockCampaign = mockCampaign();
         when(mockCampaign.getLocalDate()).thenReturn(LocalDate.now());
-        when(mockCampaign.getName()).thenReturn("Campaign");
+        when(mockCampaign.getPlayerForce().getName()).thenReturn("Campaign");
         when(mockCampaign.getCampaignOptions()).thenReturn(mockCampaignOpts);
 
         // Add a unit to the person
@@ -476,7 +483,7 @@ public class PersonTest {
     void testGambleWealth_rollLosesWealth() {
         Campaign mockCampaign = mockCampaign();
         Faction mockFaction = mock(Faction.class);
-        when(mockCampaign.getFaction()).thenReturn(mockFaction);
+        when(mockCampaign.getPlayerForce().getFaction()).thenReturn(mockFaction);
         when(mockFaction.getShortName()).thenReturn("MERC");
 
         Person gambler = new Person(mockCampaign);
@@ -498,7 +505,7 @@ public class PersonTest {
     void testGambleWealth_rollGainsWealth() {
         Campaign mockCampaign = mockCampaign();
         Faction mockFaction = mock(Faction.class);
-        when(mockCampaign.getFaction()).thenReturn(mockFaction);
+        when(mockCampaign.getPlayerForce().getFaction()).thenReturn(mockFaction);
         when(mockFaction.getShortName()).thenReturn("MERC");
 
         Person gambler = new Person(mockCampaign);
@@ -520,7 +527,7 @@ public class PersonTest {
     void testGambleWealth_noWealthChange() {
         Campaign mockCampaign = mockCampaign();
         Faction mockFaction = mock(Faction.class);
-        when(mockCampaign.getFaction()).thenReturn(mockFaction);
+        when(mockCampaign.getPlayerForce().getFaction()).thenReturn(mockFaction);
         when(mockFaction.getShortName()).thenReturn("MERC");
 
         Person gambler = new Person(mockCampaign);
@@ -542,7 +549,7 @@ public class PersonTest {
     void testGambleWealth_noWealthChange_wealthTooHighForGain() {
         Campaign mockCampaign = mockCampaign();
         Faction mockFaction = mock(Faction.class);
-        when(mockCampaign.getFaction()).thenReturn(mockFaction);
+        when(mockCampaign.getPlayerForce().getFaction()).thenReturn(mockFaction);
         when(mockFaction.getShortName()).thenReturn("MERC");
 
         Person gambler = new Person(mockCampaign);
@@ -564,7 +571,7 @@ public class PersonTest {
     void testGambleWealth_noWealthChange_wealthTooLowForLoss() {
         Campaign mockCampaign = mockCampaign();
         Faction mockFaction = mock(Faction.class);
-        when(mockCampaign.getFaction()).thenReturn(mockFaction);
+        when(mockCampaign.getPlayerForce().getFaction()).thenReturn(mockFaction);
         when(mockFaction.getShortName()).thenReturn("MERC");
 
         Person gambler = new Person(mockCampaign);
@@ -587,7 +594,7 @@ public class PersonTest {
     void testProcessDiscontinuationSyndrome_noAddiction() {
         Campaign mockCampaign = mockCampaign();
         Faction mockFaction = mock(Faction.class);
-        when(mockCampaign.getFaction()).thenReturn(mockFaction);
+        when(mockCampaign.getPlayerForce().getFaction()).thenReturn(mockFaction);
         when(mockFaction.getShortName()).thenReturn("MERC");
 
         Person person = new Person(mockCampaign);
@@ -602,7 +609,7 @@ public class PersonTest {
     void testProcessDiscontinuationSyndrome_passedWillpowerCheck() {
         Campaign mockCampaign = mockCampaign();
         Faction mockFaction = mock(Faction.class);
-        when(mockCampaign.getFaction()).thenReturn(mockFaction);
+        when(mockCampaign.getPlayerForce().getFaction()).thenReturn(mockFaction);
         when(mockFaction.getShortName()).thenReturn("MERC");
 
         Person person = new Person(mockCampaign);
@@ -619,7 +626,7 @@ public class PersonTest {
         Faction mockFaction = mock(Faction.class);
         LocalDate currentDate = LocalDate.of(3151, 1, 1);
         CampaignOptions mockCampaignOptions = mock(CampaignOptions.class);
-        when(mockCampaign.getFaction()).thenReturn(mockFaction);
+        when(mockCampaign.getPlayerForce().getFaction()).thenReturn(mockFaction);
         when(mockFaction.getShortName()).thenReturn("MERC");
         when(mockCampaign.getLocalDate()).thenReturn(currentDate);
         when(mockCampaign.getCampaignOptions()).thenReturn(mockCampaignOptions);
@@ -638,7 +645,7 @@ public class PersonTest {
         Faction mockFaction = mock(Faction.class);
         LocalDate currentDate = LocalDate.of(3151, 1, 1);
         CampaignOptions mockCampaignOptions = mock(CampaignOptions.class);
-        when(mockCampaign.getFaction()).thenReturn(mockFaction);
+        when(mockCampaign.getPlayerForce().getFaction()).thenReturn(mockFaction);
         when(mockFaction.getShortName()).thenReturn("MERC");
         when(mockCampaign.getLocalDate()).thenReturn(currentDate);
         when(mockCampaign.getCampaignOptions()).thenReturn(mockCampaignOptions);
@@ -655,7 +662,7 @@ public class PersonTest {
     void testProcessDiscontinuationSyndrome_noFatigue_noAdvancedMedical() {
         Campaign mockCampaign = mockCampaign();
         Faction mockFaction = mock(Faction.class);
-        when(mockCampaign.getFaction()).thenReturn(mockFaction);
+        when(mockCampaign.getPlayerForce().getFaction()).thenReturn(mockFaction);
         when(mockFaction.getShortName()).thenReturn("MERC");
 
         Person person = new Person(mockCampaign);
@@ -672,7 +679,7 @@ public class PersonTest {
         Faction mockFaction = mock(Faction.class);
         LocalDate currentDate = LocalDate.of(3151, 1, 1);
         CampaignOptions mockCampaignOptions = mock(CampaignOptions.class);
-        when(mockCampaign.getFaction()).thenReturn(mockFaction);
+        when(mockCampaign.getPlayerForce().getFaction()).thenReturn(mockFaction);
         when(mockFaction.getShortName()).thenReturn("MERC");
         when(mockCampaign.getLocalDate()).thenReturn(currentDate);
         when(mockCampaign.getCampaignOptions()).thenReturn(mockCampaignOptions);
@@ -693,7 +700,7 @@ public class PersonTest {
         mekhq.campaign.LocalHangar mockHangar = mock(mekhq.campaign.LocalHangar.class);
         LocalWarehouse mockWarehouse = mock(LocalWarehouse.class);
         CampaignOptions mockCampaignOptions = mock(CampaignOptions.class);
-        when(mockCampaign.getFaction()).thenReturn(mockFaction);
+        when(mockCampaign.getPlayerForce().getFaction()).thenReturn(mockFaction);
         when(mockFaction.getShortName()).thenReturn("MERC");
         when(mockCampaign.getLocalDate()).thenReturn(currentDate);
         when(mockCampaign.getPlayerForce().getHangar()).thenReturn(mockHangar);
@@ -719,7 +726,7 @@ public class PersonTest {
         mekhq.campaign.LocalHangar mockHangar = mock(mekhq.campaign.LocalHangar.class);
         LocalWarehouse mockWarehouse = mock(LocalWarehouse.class);
         CampaignOptions mockCampaignOptions = mock(CampaignOptions.class);
-        when(mockCampaign.getFaction()).thenReturn(mockFaction);
+        when(mockCampaign.getPlayerForce().getFaction()).thenReturn(mockFaction);
         when(mockFaction.getShortName()).thenReturn("MERC");
         when(mockCampaign.getLocalDate()).thenReturn(currentDate);
         when(mockCampaign.getPlayerForce().getHangar()).thenReturn(mockHangar);
@@ -743,7 +750,7 @@ public class PersonTest {
     void testProcessCripplingFlashbacks_noFlashbacks() {
         Campaign mockCampaign = mockCampaign();
         Faction mockFaction = mock(Faction.class);
-        when(mockCampaign.getFaction()).thenReturn(mockFaction);
+        when(mockCampaign.getPlayerForce().getFaction()).thenReturn(mockFaction);
         when(mockFaction.getShortName()).thenReturn("MERC");
 
         Person person = new Person(mockCampaign);
@@ -757,7 +764,7 @@ public class PersonTest {
     void testProcessCripplingFlashbacks_passedWillpowerCheck() {
         Campaign mockCampaign = mockCampaign();
         Faction mockFaction = mock(Faction.class);
-        when(mockCampaign.getFaction()).thenReturn(mockFaction);
+        when(mockCampaign.getPlayerForce().getFaction()).thenReturn(mockFaction);
         when(mockFaction.getShortName()).thenReturn("MERC");
 
         Person person = new Person(mockCampaign);
@@ -771,7 +778,7 @@ public class PersonTest {
     void testProcessCripplingFlashbacks_noAdvancedMedical() {
         Campaign mockCampaign = mockCampaign();
         Faction mockFaction = mock(Faction.class);
-        when(mockCampaign.getFaction()).thenReturn(mockFaction);
+        when(mockCampaign.getPlayerForce().getFaction()).thenReturn(mockFaction);
         when(mockFaction.getShortName()).thenReturn("MERC");
 
         Person person = new Person(mockCampaign);
@@ -787,7 +794,7 @@ public class PersonTest {
         Faction mockFaction = mock(Faction.class);
         LocalDate currentDate = LocalDate.of(3151, 1, 1);
         CampaignOptions mockCampaignOptions = mock(CampaignOptions.class);
-        when(mockCampaign.getFaction()).thenReturn(mockFaction);
+        when(mockCampaign.getPlayerForce().getFaction()).thenReturn(mockFaction);
         when(mockFaction.getShortName()).thenReturn("MERC");
         when(mockCampaign.getLocalDate()).thenReturn(currentDate);
         when(mockCampaign.getCampaignOptions()).thenReturn(mockCampaignOptions);
@@ -807,7 +814,7 @@ public class PersonTest {
         mekhq.campaign.LocalHangar mockHangar = mock(mekhq.campaign.LocalHangar.class);
         LocalWarehouse mockWarehouse = mock(LocalWarehouse.class);
         CampaignOptions mockCampaignOptions = mock(CampaignOptions.class);
-        when(mockCampaign.getFaction()).thenReturn(mockFaction);
+        when(mockCampaign.getPlayerForce().getFaction()).thenReturn(mockFaction);
         when(mockFaction.getShortName()).thenReturn("MERC");
         when(mockCampaign.getLocalDate()).thenReturn(currentDate);
         when(mockCampaign.getPlayerForce().getHangar()).thenReturn(mockHangar);
@@ -832,7 +839,7 @@ public class PersonTest {
         mekhq.campaign.LocalHangar mockHangar = mock(mekhq.campaign.LocalHangar.class);
         LocalWarehouse mockWarehouse = mock(LocalWarehouse.class);
         CampaignOptions mockCampaignOptions = mock(CampaignOptions.class);
-        when(mockCampaign.getFaction()).thenReturn(mockFaction);
+        when(mockCampaign.getPlayerForce().getFaction()).thenReturn(mockFaction);
         when(mockFaction.getShortName()).thenReturn("MERC");
         when(mockCampaign.getLocalDate()).thenReturn(currentDate);
         when(mockCampaign.getPlayerForce().getHangar()).thenReturn(mockHangar);
@@ -946,7 +953,7 @@ public class PersonTest {
         Faction originalMockFaction = mock(Faction.class);
         Faction storedMockFaction = mock(Faction.class);
 
-        when(mockCampaign.getFaction()).thenReturn(originalMockFaction);
+        when(mockCampaign.getPlayerForce().getFaction()).thenReturn(originalMockFaction);
         when(originalMockFaction.getShortName()).thenReturn("MERC");
         when(storedMockFaction.getShortName()).thenReturn("DC");
 
@@ -992,7 +999,7 @@ public class PersonTest {
         Campaign mockCampaign = mockCampaign();
         Faction mockFaction = mock(Faction.class);
 
-        when(mockCampaign.getFaction()).thenReturn(mockFaction);
+        when(mockCampaign.getPlayerForce().getFaction()).thenReturn(mockFaction);
         when(mockFaction.getShortName()).thenReturn("MERC");
 
         Person person = new Person(mockCampaign);
@@ -1007,7 +1014,7 @@ public class PersonTest {
         Campaign mockCampaign = mockCampaign();
         Faction mockFaction = mock(Faction.class);
 
-        when(mockCampaign.getFaction()).thenReturn(mockFaction);
+        when(mockCampaign.getPlayerForce().getFaction()).thenReturn(mockFaction);
         when(mockFaction.getShortName()).thenReturn("MERC");
 
         Person person = new Person(mockCampaign);
@@ -1024,7 +1031,7 @@ public class PersonTest {
         LocalDate currentDate = LocalDate.of(3151, 1, 1);
         CampaignOptions mockCampaignOptions = mock(CampaignOptions.class);
 
-        when(mockCampaign.getFaction()).thenReturn(mockFaction);
+        when(mockCampaign.getPlayerForce().getFaction()).thenReturn(mockFaction);
         when(mockFaction.getShortName()).thenReturn("MERC");
         when(mockCampaign.getLocalDate()).thenReturn(currentDate);
         when(mockCampaign.getCampaignOptions()).thenReturn(mockCampaignOptions);
@@ -1043,7 +1050,7 @@ public class PersonTest {
         LocalDate currentDate = LocalDate.of(3151, 1, 1);
         CampaignOptions mockCampaignOptions = mock(CampaignOptions.class);
 
-        when(mockCampaign.getFaction()).thenReturn(mockFaction);
+        when(mockCampaign.getPlayerForce().getFaction()).thenReturn(mockFaction);
         when(mockFaction.getShortName()).thenReturn("MERC");
         when(mockCampaign.getLocalDate()).thenReturn(currentDate);
         when(mockCampaign.getCampaignOptions()).thenReturn(mockCampaignOptions);
@@ -1064,7 +1071,7 @@ public class PersonTest {
         LocalWarehouse mockWarehouse = mock(LocalWarehouse.class);
         CampaignOptions mockCampaignOptions = mock(CampaignOptions.class);
 
-        when(mockCampaign.getFaction()).thenReturn(mockFaction);
+        when(mockCampaign.getPlayerForce().getFaction()).thenReturn(mockFaction);
         when(mockFaction.getShortName()).thenReturn("MERC");
         when(mockCampaign.getLocalDate()).thenReturn(currentDate);
         when(mockCampaign.getPlayerForce().getHangar()).thenReturn(mockHangar);
@@ -1090,7 +1097,7 @@ public class PersonTest {
         LocalWarehouse mockWarehouse = mock(LocalWarehouse.class);
         CampaignOptions mockCampaignOptions = mock(CampaignOptions.class);
 
-        when(mockCampaign.getFaction()).thenReturn(mockFaction);
+        when(mockCampaign.getPlayerForce().getFaction()).thenReturn(mockFaction);
         when(mockFaction.getShortName()).thenReturn("MERC");
         when(mockCampaign.getLocalDate()).thenReturn(currentDate);
         when(mockCampaign.getPlayerForce().getHangar()).thenReturn(mockHangar);
@@ -1113,7 +1120,7 @@ public class PersonTest {
     void testProcessChildlikeRegression_noRegression() {
         Campaign mockCampaign = mockCampaign();
         Faction mockFaction = mock(Faction.class);
-        when(mockCampaign.getFaction()).thenReturn(mockFaction);
+        when(mockCampaign.getPlayerForce().getFaction()).thenReturn(mockFaction);
         when(mockFaction.getShortName()).thenReturn("MERC");
 
         Person person = new Person(mockCampaign);
@@ -1127,7 +1134,7 @@ public class PersonTest {
     void testProcessChildlikeRegression_passedWillpowerCheck() {
         Campaign mockCampaign = mockCampaign();
         Faction mockFaction = mock(Faction.class);
-        when(mockCampaign.getFaction()).thenReturn(mockFaction);
+        when(mockCampaign.getPlayerForce().getFaction()).thenReturn(mockFaction);
         when(mockFaction.getShortName()).thenReturn("MERC");
 
         Person person = new Person(mockCampaign);
@@ -1141,7 +1148,7 @@ public class PersonTest {
     void testProcessChildlikeRegression_noAdvancedMedical() {
         Campaign mockCampaign = mockCampaign();
         Faction mockFaction = mock(Faction.class);
-        when(mockCampaign.getFaction()).thenReturn(mockFaction);
+        when(mockCampaign.getPlayerForce().getFaction()).thenReturn(mockFaction);
         when(mockFaction.getShortName()).thenReturn("MERC");
 
         Person person = new Person(mockCampaign);
@@ -1157,7 +1164,7 @@ public class PersonTest {
         Faction mockFaction = mock(Faction.class);
         LocalDate currentDate = LocalDate.of(3151, 1, 1);
         CampaignOptions mockCampaignOptions = mock(CampaignOptions.class);
-        when(mockCampaign.getFaction()).thenReturn(mockFaction);
+        when(mockCampaign.getPlayerForce().getFaction()).thenReturn(mockFaction);
         when(mockFaction.getShortName()).thenReturn("MERC");
         when(mockCampaign.getLocalDate()).thenReturn(currentDate);
         when(mockCampaign.getCampaignOptions()).thenReturn(mockCampaignOptions);
@@ -1177,7 +1184,7 @@ public class PersonTest {
         mekhq.campaign.LocalHangar mockHangar = mock(mekhq.campaign.LocalHangar.class);
         LocalWarehouse mockWarehouse = mock(LocalWarehouse.class);
         CampaignOptions mockCampaignOptions = mock(CampaignOptions.class);
-        when(mockCampaign.getFaction()).thenReturn(mockFaction);
+        when(mockCampaign.getPlayerForce().getFaction()).thenReturn(mockFaction);
         when(mockFaction.getShortName()).thenReturn("MERC");
         when(mockCampaign.getLocalDate()).thenReturn(currentDate);
         when(mockCampaign.getPlayerForce().getHangar()).thenReturn(mockHangar);
@@ -1202,7 +1209,7 @@ public class PersonTest {
         mekhq.campaign.LocalHangar mockHangar = mock(mekhq.campaign.LocalHangar.class);
         LocalWarehouse mockWarehouse = mock(LocalWarehouse.class);
         CampaignOptions mockCampaignOptions = mock(CampaignOptions.class);
-        when(mockCampaign.getFaction()).thenReturn(mockFaction);
+        when(mockCampaign.getPlayerForce().getFaction()).thenReturn(mockFaction);
         when(mockFaction.getShortName()).thenReturn("MERC");
         when(mockCampaign.getLocalDate()).thenReturn(currentDate);
         when(mockCampaign.getPlayerForce().getHangar()).thenReturn(mockHangar);
@@ -1225,7 +1232,7 @@ public class PersonTest {
     void testProcessCatatonia_noCatatonia() {
         Campaign mockCampaign = mockCampaign();
         Faction mockFaction = mock(Faction.class);
-        when(mockCampaign.getFaction()).thenReturn(mockFaction);
+        when(mockCampaign.getPlayerForce().getFaction()).thenReturn(mockFaction);
         when(mockFaction.getShortName()).thenReturn("MERC");
 
         Person person = new Person(mockCampaign);
@@ -1239,7 +1246,7 @@ public class PersonTest {
     void testProcessCatatonia_passedWillpowerCheck() {
         Campaign mockCampaign = mockCampaign();
         Faction mockFaction = mock(Faction.class);
-        when(mockCampaign.getFaction()).thenReturn(mockFaction);
+        when(mockCampaign.getPlayerForce().getFaction()).thenReturn(mockFaction);
         when(mockFaction.getShortName()).thenReturn("MERC");
 
         Person person = new Person(mockCampaign);
@@ -1253,7 +1260,7 @@ public class PersonTest {
     void testProcessCatatonia_noAdvancedMedical() {
         Campaign mockCampaign = mockCampaign();
         Faction mockFaction = mock(Faction.class);
-        when(mockCampaign.getFaction()).thenReturn(mockFaction);
+        when(mockCampaign.getPlayerForce().getFaction()).thenReturn(mockFaction);
         when(mockFaction.getShortName()).thenReturn("MERC");
 
         Person person = new Person(mockCampaign);
@@ -1269,7 +1276,7 @@ public class PersonTest {
         Faction mockFaction = mock(Faction.class);
         LocalDate currentDate = LocalDate.of(3151, 1, 1);
         CampaignOptions mockCampaignOptions = mock(CampaignOptions.class);
-        when(mockCampaign.getFaction()).thenReturn(mockFaction);
+        when(mockCampaign.getPlayerForce().getFaction()).thenReturn(mockFaction);
         when(mockFaction.getShortName()).thenReturn("MERC");
         when(mockCampaign.getLocalDate()).thenReturn(currentDate);
         when(mockCampaign.getCampaignOptions()).thenReturn(mockCampaignOptions);
@@ -1289,7 +1296,7 @@ public class PersonTest {
         mekhq.campaign.LocalHangar mockHangar = mock(mekhq.campaign.LocalHangar.class);
         LocalWarehouse mockWarehouse = mock(LocalWarehouse.class);
         CampaignOptions mockCampaignOptions = mock(CampaignOptions.class);
-        when(mockCampaign.getFaction()).thenReturn(mockFaction);
+        when(mockCampaign.getPlayerForce().getFaction()).thenReturn(mockFaction);
         when(mockFaction.getShortName()).thenReturn("MERC");
         when(mockCampaign.getLocalDate()).thenReturn(currentDate);
         when(mockCampaign.getPlayerForce().getHangar()).thenReturn(mockHangar);
@@ -1314,7 +1321,7 @@ public class PersonTest {
         mekhq.campaign.LocalHangar mockHangar = mock(mekhq.campaign.LocalHangar.class);
         LocalWarehouse mockWarehouse = mock(LocalWarehouse.class);
         CampaignOptions mockCampaignOptions = mock(CampaignOptions.class);
-        when(mockCampaign.getFaction()).thenReturn(mockFaction);
+        when(mockCampaign.getPlayerForce().getFaction()).thenReturn(mockFaction);
         when(mockFaction.getShortName()).thenReturn("MERC");
         when(mockCampaign.getLocalDate()).thenReturn(currentDate);
         when(mockCampaign.getPlayerForce().getHangar()).thenReturn(mockHangar);
@@ -1337,7 +1344,7 @@ public class PersonTest {
     void returnsHitsWhenNoInjuries() throws Exception {
         Campaign mockCampaign = mockCampaign();
         Faction mockFaction = mock(Faction.class);
-        when(mockCampaign.getFaction()).thenReturn(mockFaction);
+        when(mockCampaign.getPlayerForce().getFaction()).thenReturn(mockFaction);
         when(mockFaction.getShortName()).thenReturn("MERC");
 
         Person person = new Person(mockCampaign);
@@ -1351,7 +1358,7 @@ public class PersonTest {
     void ignoresPermanentInjuries() throws Exception {
         Campaign mockCampaign = mockCampaign();
         Faction mockFaction = mock(Faction.class);
-        when(mockCampaign.getFaction()).thenReturn(mockFaction);
+        when(mockCampaign.getPlayerForce().getFaction()).thenReturn(mockFaction);
         when(mockFaction.getShortName()).thenReturn("MERC");
 
         Person person = new Person(mockCampaign);
@@ -1375,7 +1382,7 @@ public class PersonTest {
     void sumsOnlyNonPermanentInjuryHitsPlusBaseHits() throws Exception {
         Campaign mockCampaign = mockCampaign();
         Faction mockFaction = mock(Faction.class);
-        when(mockCampaign.getFaction()).thenReturn(mockFaction);
+        when(mockCampaign.getPlayerForce().getFaction()).thenReturn(mockFaction);
         when(mockFaction.getShortName()).thenReturn("MERC");
 
         Person person = new Person(mockCampaign);
@@ -1403,7 +1410,7 @@ public class PersonTest {
     void countsNonPermanentInjuriesEvenWhenHitsIsZero() throws Exception {
         Campaign mockCampaign = mockCampaign();
         Faction mockFaction = mock(Faction.class);
-        when(mockCampaign.getFaction()).thenReturn(mockFaction);
+        when(mockCampaign.getPlayerForce().getFaction()).thenReturn(mockFaction);
         when(mockFaction.getShortName()).thenReturn("MERC");
 
         Person person = new Person(mockCampaign);
@@ -1428,7 +1435,7 @@ public class PersonTest {
         when(mockCampaign.getPlayerForce().getWarehouse()).thenReturn(new LocalWarehouse());
 
         Faction mockFaction = mock(Faction.class);
-        when(mockCampaign.getFaction()).thenReturn(mockFaction);
+        when(mockCampaign.getPlayerForce().getFaction()).thenReturn(mockFaction);
         when(mockFaction.getShortName()).thenReturn("MERC");
 
         Person secondInCommand = new Person(mockCampaign);
@@ -1477,7 +1484,7 @@ public class PersonTest {
         when(mockCampaign.getPlayerForce().getWarehouse()).thenReturn(new LocalWarehouse());
 
         Faction mockFaction = mock(Faction.class);
-        when(mockCampaign.getFaction()).thenReturn(mockFaction);
+        when(mockCampaign.getPlayerForce().getFaction()).thenReturn(mockFaction);
         when(mockFaction.getShortName()).thenReturn("MERC");
 
         Person person = new Person(mockCampaign);
@@ -1648,7 +1655,7 @@ public class PersonTest {
             @Test
             void anyAcademy_setsEducationTimeFromAcademyDuration() {
                 Academy academy = buildAcademy(true, false);
-                when(campaign.getName()).thenReturn("TestCampaign");
+                when(campaign.getPlayerForce().getName()).thenReturn("TestCampaign");
 
                 EducationController.enrollPerson(campaign, person, academy, null, "MERC", 0);
 
@@ -1658,7 +1665,7 @@ public class PersonTest {
             @Test
             void anyAcademy_setsFactionOnPerson() {
                 Academy academy = buildAcademy(true, false);
-                when(campaign.getName()).thenReturn("TestCampaign");
+                when(campaign.getPlayerForce().getName()).thenReturn("TestCampaign");
 
                 EducationController.enrollPerson(campaign, person, academy, null, "DC", 0);
 
@@ -1668,7 +1675,7 @@ public class PersonTest {
             @Test
             void anyAcademy_setsCourseIndexOnPerson() {
                 Academy academy = buildAcademy(true, false);
-                when(campaign.getName()).thenReturn("TestCampaign");
+                when(campaign.getPlayerForce().getName()).thenReturn("TestCampaign");
 
                 EducationController.enrollPerson(campaign, person, academy, null, "MERC", 0);
 
@@ -1678,7 +1685,7 @@ public class PersonTest {
             @Test
             void anyAcademy_daysOfTravelResetToZero() {
                 Academy academy = buildAcademy(true, false);
-                when(campaign.getName()).thenReturn("TestCampaign");
+                when(campaign.getPlayerForce().getName()).thenReturn("TestCampaign");
                 person.setEduDaysOfTravel(5);
 
                 EducationController.enrollPerson(campaign, person, academy, null, "MERC", 0);
@@ -1791,7 +1798,7 @@ public class PersonTest {
             Campaign campaign = mockCampaign();
             mekhq.campaign.universe.Faction faction = mock(mekhq.campaign.universe.Faction.class);
             when(faction.getShortName()).thenReturn("MERC");
-            when(campaign.getFaction()).thenReturn(faction);
+            when(campaign.getPlayerForce().getFaction()).thenReturn(faction);
             when(campaign.getLocalDate()).thenReturn(LocalDate.of(3025, 1, 1));
             when(campaign.getVersion()).thenReturn(new Version(0, 51, 1));
 
@@ -1977,7 +1984,7 @@ public class PersonTest {
             }
         }
 
-        /** smoke tests, actual test coverage is in {@link mekhq.campaign.personnel.skills.SkillCheckTest} */
+        /** smoke tests, actual test coverage is in {@code SkillCheckTest} */
         @Nested
         class CheckSkill {
 
@@ -2016,6 +2023,178 @@ public class PersonTest {
                 verify(campaign).isClanCampaign();
                 verify(campaign).getLocalDate();
             }
+        }
+    }
+
+    @Nested
+    class EdgeGain {
+        @Test
+        void gainEdgeStopsAtConfiguredMaximum() {
+            Person person = new Person("GivenName", "Surname", null, "MERC");
+            person.setEdge(2);
+
+            int gained = person.gainEdge(3, 3);
+
+            assertEquals(1, gained);
+            assertEquals(3, person.getEdge());
+            assertFalse(person.canGainEdge(3));
+        }
+
+        @Test
+        void gainEdgeDoesNotReduceGmAssignedEdgeAboveMaximum() {
+            Person person = new Person("GivenName", "Surname", null, "MERC");
+            person.setEdge(4);
+
+            int gained = person.gainEdge(1, 3);
+
+            assertEquals(0, gained);
+            assertEquals(4, person.getEdge());
+        }
+
+        @Test
+        void zeroMaximumPreventsEdgeGain() {
+            Person person = new Person("GivenName", "Surname", null, "MERC");
+
+            int gained = person.gainEdge(1, 0);
+
+            assertEquals(0, gained);
+            assertEquals(0, person.getEdge());
+        }
+
+        @Test
+        void configuredMaximumCannotExceedAttributeCap() {
+            Person person = new Person("GivenName", "Surname", null, "MERC");
+            int attributeCap = person.getAttributeCap(SkillAttribute.EDGE);
+            person.setEdge(attributeCap - 1);
+
+            int gained = person.gainEdge(5, attributeCap + 10);
+
+            assertEquals(1, gained);
+            assertEquals(attributeCap, person.getEdge());
+        }
+
+        @Test
+        void setEdgeAllowsGmAssignmentAboveConfiguredMaximum() {
+            Person person = new Person("GivenName", "Surname", null, "MERC");
+            person.gainEdge(3, 3);
+
+            person.setEdge(4);
+
+            assertEquals(4, person.getEdge());
+            assertEquals(0, person.getCurrentEdge());
+        }
+    }
+
+    /**
+     * Tests for {@code Person#attemptToCheatDeath(Campaign)} (the "Twist of Fate Survival" ability). The method is
+     * private, so it is exercised here via reflection.
+     */
+    @Nested
+    class AttemptToCheatDeath {
+        private static final int DEATH = 6;
+
+        /** Invokes the private {@code attemptToCheatDeath(Campaign)} method reflectively. */
+        private boolean invokeAttemptToCheatDeath(Person person, Campaign campaign) throws Exception {
+            Method method = Person.class.getDeclaredMethod("attemptToCheatDeath", Campaign.class);
+            method.setAccessible(true);
+            return (boolean) method.invoke(person, campaign);
+        }
+
+        private Campaign mockCampaignWith(CampaignOptions options) {
+            Campaign campaign = mockCampaign();
+            when(campaign.getCampaignOptions()).thenReturn(options);
+            when(campaign.getLocalDate()).thenReturn(LocalDate.of(3151, 1, 1));
+            return campaign;
+        }
+
+        @Test
+        void returnsFalseWhenTwistOfFateDisabled() throws Exception {
+            Person person = new Person("GivenName", "Surname", null, "MERC");
+            person.setAttributeScore(SkillAttribute.EDGE, 3);
+
+            CampaignOptions options = mock(CampaignOptions.class);
+            when(options.isUseTwistOfFateSurvival()).thenReturn(false);
+            Campaign campaign = mockCampaignWith(options);
+
+            assertFalse(invokeAttemptToCheatDeath(person, campaign));
+            // Edge must not be consumed when the ability is disabled.
+            assertEquals(3, person.getAttributeScore(SkillAttribute.EDGE));
+            verify(campaign, never()).addReport(any(), anyString());
+        }
+
+        @Test
+        void returnsFalseWhenNoPermanentEdge() throws Exception {
+            Person person = new Person("GivenName", "Surname", null, "MERC");
+            // Fresh personnel default to an Edge score of 0.
+            assertEquals(0, person.getAttributeScore(SkillAttribute.EDGE));
+
+            CampaignOptions options = mock(CampaignOptions.class);
+            when(options.isUseTwistOfFateSurvival()).thenReturn(true);
+            Campaign campaign = mockCampaignWith(options);
+
+            assertFalse(invokeAttemptToCheatDeath(person, campaign));
+            assertEquals(0, person.getAttributeScore(SkillAttribute.EDGE));
+            verify(campaign, never()).addReport(any(), anyString());
+        }
+
+        @Test
+        void survivesAndConsumesEdgeWhenNoLethalDamage() throws Exception {
+            Person person = new Person("GivenName", "Surname", null, "MERC");
+            person.setAttributeScore(SkillAttribute.EDGE, 3);
+
+            CampaignOptions options = mock(CampaignOptions.class);
+            when(options.isUseTwistOfFateSurvival()).thenReturn(true);
+            when(options.isUseAdvancedMedical()).thenReturn(false);
+            Campaign campaign = mockCampaignWith(options);
+
+            assertTrue(invokeAttemptToCheatDeath(person, campaign));
+            // A single point of permanent Edge is spent to cheat death.
+            assertEquals(2, person.getAttributeScore(SkillAttribute.EDGE));
+            // No lethal damage, so nothing is healed.
+            assertEquals(0, person.getHits());
+            // The escaped-death report is posted.
+            verify(campaign).addReport(any(), anyString());
+        }
+
+        @Test
+        void survivesAndHealsExcessHits() throws Exception {
+            Person person = new Person("GivenName", "Surname", null, "MERC");
+            person.setAttributeScore(SkillAttribute.EDGE, 3);
+            person.setHits(DEATH + 2); // lethal hit total
+
+            CampaignOptions options = mock(CampaignOptions.class);
+            when(options.isUseTwistOfFateSurvival()).thenReturn(true);
+            when(options.isUseAdvancedMedical()).thenReturn(false);
+            Campaign campaign = mockCampaignWith(options);
+
+            assertTrue(invokeAttemptToCheatDeath(person, campaign));
+            assertEquals(2, person.getAttributeScore(SkillAttribute.EDGE));
+            // Hits are healed down to just below the lethal threshold.
+            assertEquals(DEATH - 1, person.getHits());
+            // Both the excess-hits heal report and the escaped-death report are posted.
+            verify(campaign, atLeast(2)).addReport(any(), anyString());
+        }
+
+        @Test
+        void survivesAndHealsExcessInjuries() throws Exception {
+            Person person = new Person("GivenName", "Surname", null, "MERC");
+            person.setAttributeScore(SkillAttribute.EDGE, 3);
+            person.addInjury(new Injury(1, "Test concussion 1", BodyLocation.HEAD, InjuryTypes.CONCUSSION, 2,
+                  LocalDate.of(3151, 1, 1), false));
+            person.addInjury(new Injury(1, "Test concussion 2", BodyLocation.HEAD, InjuryTypes.CONCUSSION, 2,
+                  LocalDate.of(3151, 1, 1), false));
+            person.addInjury(new Injury(1, "Test concussion 3", BodyLocation.HEAD, InjuryTypes.CONCUSSION, 2,
+                  LocalDate.of(3151, 1, 1), false));
+
+            CampaignOptions options = mock(CampaignOptions.class);
+            when(options.isUseTwistOfFateSurvival()).thenReturn(true);
+            when(options.isUseAdvancedMedical()).thenReturn(true);
+            Campaign campaign = mockCampaignWith(options);
+
+            assertTrue(invokeAttemptToCheatDeath(person, campaign));
+            assertEquals(2, person.getAttributeScore(SkillAttribute.EDGE));
+            assertTrue(person.getNonPermanentInjurySeverity() < DEATH);
+            verify(campaign, atLeast(2)).addReport(any(), anyString());
         }
     }
 

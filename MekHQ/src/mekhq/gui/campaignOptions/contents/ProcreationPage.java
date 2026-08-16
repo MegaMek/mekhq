@@ -52,7 +52,7 @@ import mekhq.campaign.personnel.enums.BabySurnameStyle;
 import mekhq.campaign.personnel.enums.RandomProcreationMethod;
 import mekhq.gui.campaignOptions.CampaignOptionFlag;
 import mekhq.gui.campaignOptions.components.CampaignOptionsCheckBox;
-import mekhq.gui.campaignOptions.components.CampaignOptionsFormPanel;
+import megamek.client.ui.settings.SettingsFormPanel;
 import mekhq.gui.campaignOptions.components.CampaignOptionsHeaderPanel;
 import mekhq.gui.campaignOptions.components.CampaignOptionsLabel;
 import mekhq.gui.campaignOptions.components.CampaignOptionsPagePanel;
@@ -71,8 +71,8 @@ import mekhq.gui.campaignOptions.components.CampaignOptionsSpinner;
  * {@link #writeToModel(RelationshipsOptionsModel)} are no-ops.</p>
  */
 class ProcreationPage {
-    private static final int LABEL_COLUMN_WIDTH = CampaignOptionsFormPanel.DEFAULT_LABEL_WIDTH;
-    private static final int CONTROL_COLUMN_WIDTH = CampaignOptionsFormPanel.DEFAULT_CONTROL_WIDTH;
+    private static final int LABEL_COLUMN_WIDTH = SettingsFormPanel.DEFAULT_LABEL_WIDTH;
+    private static final int CONTROL_COLUMN_WIDTH = SettingsFormPanel.DEFAULT_CONTROL_WIDTH;
 
     private JCheckBox chkUseManualProcreation;
     private JCheckBox chkUseClanPersonnelProcreation;
@@ -211,7 +211,7 @@ class ProcreationPage {
         chkLogProcreation.addMouseListener(createTipPanelUpdater("LogProcreation"));
 
         // Layout the Panel
-        final CampaignOptionsFormPanel panel = new CampaignOptionsFormPanel("ProcreationGeneralOptionsPanel",
+        final SettingsFormPanel panel = new SettingsFormPanel("ProcreationGeneralOptionsPanel",
                 LABEL_COLUMN_WIDTH,
                 CONTROL_COLUMN_WIDTH);
         panel.addCheckBoxGrid(2,
@@ -284,7 +284,7 @@ class ProcreationPage {
         spnRandomProcreationRelationshiplessDiceSize.addMouseListener(createTipPanelUpdater("RandomProcreationRelationshiplessDiceSize"));
 
         // Layout the Panel
-        final CampaignOptionsFormPanel panel = new CampaignOptionsFormPanel("RandomProcreationPanel",
+        final SettingsFormPanel panel = new SettingsFormPanel("RandomProcreationPanel",
                 LABEL_COLUMN_WIDTH,
                 CONTROL_COLUMN_WIDTH);
         panel.addRow(lblRandomProcreationMethod, comboRandomProcreationMethod);
@@ -304,7 +304,7 @@ class ProcreationPage {
                 getMetadata(MILESTONE_BEFORE_METADATA, CampaignOptionFlag.IMPORTANT));
         lblNoInterestInRelationshipsDiceSize.addMouseListener(createTipPanelUpdater("NoInterestInRelationshipsDiceSize"));
         spnNoInterestInRelationshipsDiceSize = new CampaignOptionsSpinner("NoInterestInRelationshipsDiceSize",
-                10, 1, 100000, 1);
+                10, 0, 100000, 1);
         spnNoInterestInRelationshipsDiceSize.addMouseListener(createTipPanelUpdater("NoInterestInRelationshipsDiceSize"));
 
         lblPrefersSameSexDiceSize = new CampaignOptionsLabel("PrefersSameSexDiceSize",
@@ -322,7 +322,7 @@ class ProcreationPage {
         spnPrefersBothSexesDiceSize.addMouseListener(createTipPanelUpdater("PrefersBothSexesDiceSize"));
 
         // Layout the Panel
-        final CampaignOptionsFormPanel panel = new CampaignOptionsFormPanel("RandomSexualityPanel",
+        final SettingsFormPanel panel = new SettingsFormPanel("RandomSexualityPanel",
                 LABEL_COLUMN_WIDTH,
                 CONTROL_COLUMN_WIDTH);
         panel.addRow(lblNoInterestInRelationshipsDiceSize, spnNoInterestInRelationshipsDiceSize);

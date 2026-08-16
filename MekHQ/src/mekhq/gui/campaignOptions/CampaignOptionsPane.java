@@ -67,17 +67,20 @@ import javax.swing.BorderFactory;
 import javax.swing.JComponent;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
-import javax.swing.JSplitPane;
 import javax.swing.KeyStroke;
-import javax.swing.SwingUtilities;
 
 import jakarta.annotation.Nonnull;
 import jakarta.annotation.Nullable;
+import megamek.client.ui.settings.SettingsContentHost;
+import megamek.client.ui.settings.SettingsNavigationText;
+import megamek.client.ui.settings.SettingsPane;
+import megamek.client.ui.settings.SettingsRoute;
 import megamek.client.ui.util.UIUtil;
 import mekhq.CampaignPreset;
 import mekhq.MekHQ;
 import mekhq.campaign.AbstractLocation;
 import mekhq.campaign.Campaign;
+import mekhq.campaign.campaignOptions.CampaignOption;
 import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.campaignOptions.CampaignOptionsFreebieTracker;
 import mekhq.campaign.events.OptionsChangedEvent;
@@ -87,6 +90,7 @@ import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.enums.PersonnelRoleSubType;
 import mekhq.campaign.personnel.skills.RandomSkillPreferences;
 import mekhq.campaign.personnel.skills.SkillType;
+import mekhq.campaign.reputation.chaosReputation.ChaosReputation;
 import mekhq.campaign.universe.Faction;
 import mekhq.campaign.universe.Planet;
 import mekhq.gui.CampaignGUI;
@@ -97,10 +101,9 @@ import mekhq.gui.campaignOptions.optionChangeDialogs.*;
 
 /**
  * {@code CampaignOptionsPane} is the central panel of the Campaign Options dialog. It presents every campaign setting
- * through a searchable navigation tree on the left (a {@link CampaignOptionsNavigationPanel}) paired with a scrollable
- * content host on the right (a {@link CampaignOptionsContentHost}) inside a {@link javax.swing.JSplitPane}.
+ * through the shared MegaMek settings framework.
  *
- * <p>The pane registers a flat set of {@link CampaignOptionsRoute}s - each describing a navigable destination and its
+ * <p>The pane registers a flat set of {@link SettingsRoute}s - each describing a navigable destination and its
  * hierarchical path - and maps each one to a page factory. Pages are built lazily the first time they are shown (or
  * when the navigation search index is warmed) and then cached. The per-area builders
  * ({@link mekhq.gui.campaignOptions.contents.GeneralPage GeneralPage},
@@ -150,14 +153,9 @@ public class CampaignOptionsPane extends JPanel {
     private final Campaign campaign;
     private final CampaignOptions campaignOptions;
     private final CampaignOptionsDialogMode mode;
-    private final List<CampaignOptionsRoute> navigationTargets = new ArrayList<>();
+    private final List<SettingsRoute> navigationTargets = new ArrayList<>();
     private final Map<String, Supplier<Component>> directPageFactories = new HashMap<>();
-    private final Map<String, Component> directPageCache = new HashMap<>();
-    private boolean searchIndexInitialized = false;
-
-    private CampaignOptionsContentHost activeContentHost;
-    private CampaignOptionsNavigationPanel navigationPanel;
-    private boolean isSyncingNavigationSelection;
+    private SettingsPane settingsPane;
 
     private GeneralPage generalPage;
     private PersonnelPages personnelPages;
@@ -183,8 +181,7 @@ public class CampaignOptionsPane extends JPanel {
      *
      * @param frame    the parent {@link JFrame} for this pane
      * @param campaign the {@link Campaign} object representing the current campaign
-     * @param mode     the {@link CampaignOptionsDialogMode} for configuring the
-     *                 pane's behavior
+     * @param mode     the {@link CampaignOptionsDialogMode} for configuring the pane's behavior
      */
     public CampaignOptionsPane(final JFrame frame, @Nonnull final Campaign campaign, CampaignOptionsDialogMode mode) {
         super(new BorderLayout());
@@ -204,58 +201,49 @@ public class CampaignOptionsPane extends JPanel {
     protected void initialize() {
         JPanel generalPage = createGeneralPage(mode);
         registerRoutes(generalPage);
-        CampaignOptionsRoute initialRoute = navigationTargets.get(0);
-
-        // Bottom margin is 0: the footer's button panel already adds top padding, so a bottom margin here would
-        // stack with it and make the gap above the footer buttons look larger than the gap below them.
-        setBorder(BorderFactory.createEmptyBorder(CONTENT_MARGIN, CONTENT_MARGIN, 0, CONTENT_MARGIN));
-        CampaignOptionsContentHost contentHost = createContentHost(generalPage, initialRoute);
 
         // Abridged startup (preset "Apply") shows only the General page, so skip the navigation tree and its search
         // entirely and let the content fill the dialog.
         if (mode == STARTUP_ABRIDGED) {
+            int margin = CONTENT_MARGIN;
+            setBorder(BorderFactory.createEmptyBorder(margin, margin, 0, margin));
+            SettingsContentHost contentHost = new SettingsContentHost(generalPage,
+                  getTextAt(getCampaignOptionsResourceBundle(), "campaignOptionsHelp.title"), true);
             add(contentHost, BorderLayout.CENTER);
             return;
         }
 
-        JSplitPane splitPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT,
-                createNavigationPanel(),
-                contentHost);
-        splitPane.setName("campaignOptionsSplitPane");
-        splitPane.setResizeWeight(0.0);
-        splitPane.setDividerLocation(UIUtil.scaleForGUI(CampaignOptionsNavigationPanel.NAVIGATION_WIDTH));
-        add(splitPane, BorderLayout.CENTER);
-        navigationPanel.selectRoute(navigationTargets.get(0));
+        settingsPane = new SettingsPane(navigationTargets, directPageFactories, createNavigationText(),
+              getTextAt(getCampaignOptionsResourceBundle(), "campaignOptionsHelp.title"));
+        add(settingsPane, BorderLayout.CENTER);
         registerSearchShortcut();
     }
 
     /**
-     * Registers a window-level Ctrl/Cmd+F shortcut that moves focus to the navigation search field, regardless of
-     * which control inside the dialog currently has focus.
+     * Registers a window-level Ctrl/Cmd+F shortcut that moves focus to the navigation search field, regardless of which
+     * control inside the dialog currently has focus.
      */
     private void registerSearchShortcut() {
         KeyStroke findKeyStroke = KeyStroke.getKeyStroke(KeyEvent.VK_F,
-                Toolkit.getDefaultToolkit().getMenuShortcutKeyMaskEx());
+              Toolkit.getDefaultToolkit().getMenuShortcutKeyMaskEx());
         getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(findKeyStroke, "focusCampaignOptionsSearch");
         getActionMap().put("focusCampaignOptionsSearch", new AbstractAction() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                navigationPanel.focusSearchField();
+                settingsPane.focusSearchField();
             }
         });
     }
 
-    private CampaignOptionsNavigationPanel createNavigationPanel() {
-        navigationPanel = new CampaignOptionsNavigationPanel(navigationTargets, this::selectedNavigationTarget);
-        navigationPanel.setSearchIndexInitializer(this::ensureSearchIndexBuilt);
-        return navigationPanel;
-    }
-
-    private CampaignOptionsContentHost createContentHost(Component initialContent, CampaignOptionsRoute initialRoute) {
-        activeContentHost = new CampaignOptionsContentHost(initialContent,
-                getQuoteResourceName(initialRoute),
-                initialRoute.shouldShowHelpPanel());
-        return activeContentHost;
+    private SettingsNavigationText createNavigationText() {
+        String resourceBundle = getCampaignOptionsResourceBundle();
+        return new SettingsNavigationText(
+              getTextAt(resourceBundle, "txtCampaignOptionsFilter.text"),
+              getTextAt(resourceBundle, "txtCampaignOptionsFilter.tooltip"),
+              getTextAt(resourceBundle, "campaignOptionsFilter.noMatches"),
+              getTextAt(resourceBundle, "campaignOptionsFilter.matches"),
+              getTextAt(resourceBundle, "btnExpandAll.text"),
+              getTextAt(resourceBundle, "btnCollapseAll.text"));
     }
 
     private void registerRoutes(JPanel generalPage) {
@@ -271,300 +259,132 @@ public class CampaignOptionsPane extends JPanel {
         registerParentRoute("human-resources", "humanResourcesCategory");
         registerParentRoute("human-resources.personnel", "humanResourcesCategory", "personnelCategory");
         registerDirectRoute("human-resources.personnel.general", this::createPersonnelGeneralPage,
-                "humanResourcesCategory", "personnelCategory", "personnelGeneralPage");
+              "humanResourcesCategory", "personnelCategory", "personnelGeneralPage");
         registerDirectRoute("human-resources.personnel.awards", this::createPersonnelAwardsPage,
-                "humanResourcesCategory", "personnelCategory", "awardsPage");
+              "humanResourcesCategory", "personnelCategory", "awardsPage");
         registerDirectRoute("human-resources.personnel.medical", this::createPersonnelMedicalPage,
-                "humanResourcesCategory", "personnelCategory", "medicalPage");
+              "humanResourcesCategory", "personnelCategory", "medicalPage");
         registerDirectRoute("human-resources.personnel.information", this::createPersonnelInformationPage,
-                "humanResourcesCategory", "personnelCategory", "personnelInformationPage");
+              "humanResourcesCategory", "personnelCategory", "personnelInformationPage");
         registerDirectRoute("human-resources.personnel.prisoners-and-civilians",
-                this::createPersonnelPrisonersAndDependentsPage,
-                "humanResourcesCategory", "personnelCategory", "prisonersAndDependentsPage");
+              this::createPersonnelPrisonersAndDependentsPage,
+              "humanResourcesCategory", "personnelCategory", "prisonersAndDependentsPage");
         registerParentRoute("human-resources.biography", "humanResourcesCategory", "biographyCategory");
         registerDirectRoute("human-resources.biography.general", this::createBiographyGeneralPage,
-                "humanResourcesCategory", "biographyCategory", "biographyGeneralPage");
+              "humanResourcesCategory", "biographyCategory", "biographyGeneralPage");
         registerDirectRoute("human-resources.biography.backgrounds", this::createBiographyBackgroundsPage,
-                "humanResourcesCategory", "biographyCategory", "backgroundsPage");
+              "humanResourcesCategory", "biographyCategory", "backgroundsPage");
         registerDirectRoute("human-resources.biography.death", this::createBiographyDeathPage,
-                "humanResourcesCategory", "biographyCategory", "deathPage");
+              "humanResourcesCategory", "biographyCategory", "deathPage");
         registerDirectRoute("human-resources.biography.education", this::createBiographyEducationPage,
-                "humanResourcesCategory", "biographyCategory", "educationPage");
+              "humanResourcesCategory", "biographyCategory", "educationPage");
         registerDirectRoute("human-resources.biography.name-and-portraits",
-                this::createBiographyNameAndPortraitGenerationPage,
-                "humanResourcesCategory", "biographyCategory", "nameAndPortraitGenerationPage");
+              this::createBiographyNameAndPortraitGenerationPage,
+              "humanResourcesCategory", "biographyCategory", "nameAndPortraitGenerationPage");
         registerDirectRoute("human-resources.biography.rank", this::createBiographyRankPage,
-                "humanResourcesCategory", "biographyCategory", "rankPage");
+              "humanResourcesCategory", "biographyCategory", "rankPage");
         registerParentRoute("human-resources.relationships", "humanResourcesCategory", "relationshipsCategory");
         registerDirectRoute("human-resources.relationships.marriage", this::createRelationshipMarriagePage,
-                "humanResourcesCategory", "relationshipsCategory", "marriagePage");
+              "humanResourcesCategory", "relationshipsCategory", "marriagePage");
         registerDirectRoute("human-resources.relationships.divorce", this::createRelationshipDivorcePage,
-                "humanResourcesCategory", "relationshipsCategory", "divorcePage");
+              "humanResourcesCategory", "relationshipsCategory", "divorcePage");
         registerDirectRoute("human-resources.relationships.procreation", this::createRelationshipProcreationPage,
-                "humanResourcesCategory", "relationshipsCategory", "procreationPage");
+              "humanResourcesCategory", "relationshipsCategory", "procreationPage");
         registerParentRoute("human-resources.salaries", "humanResourcesCategory", "salariesCategory");
         registerDirectRoute("human-resources.salaries.combat", this::createCombatSalariesPage,
-                "humanResourcesCategory", "salariesCategory", "0combatSalariesPage");
+              "humanResourcesCategory", "salariesCategory", "0combatSalariesPage");
         registerDirectRoute("human-resources.salaries.support", this::createSupportSalariesPage,
-                "humanResourcesCategory", "salariesCategory", "1supportSalariesPage");
+              "humanResourcesCategory", "salariesCategory", "1supportSalariesPage");
         registerDirectRoute("human-resources.salaries.civilian", this::createCivilianSalariesPage,
-                "humanResourcesCategory", "salariesCategory", "2civilianSalariesPage");
+              "humanResourcesCategory", "salariesCategory", "2civilianSalariesPage");
         registerParentRoute("human-resources.turnover-and-retention", "humanResourcesCategory",
-                "turnoverAndRetentionCategory");
+              "turnoverAndRetentionCategory");
         registerDirectRoute("human-resources.turnover-and-retention.turnover",
-                this::createTurnoverAndRetentionTurnoverPage,
-                "humanResourcesCategory", "turnoverAndRetentionCategory", "turnoverPage");
+              this::createTurnoverAndRetentionTurnoverPage,
+              "humanResourcesCategory", "turnoverAndRetentionCategory", "turnoverPage");
         registerDirectRoute("human-resources.turnover-and-retention.fatigue",
-                this::createTurnoverAndRetentionFatiguePage,
-                "humanResourcesCategory", "turnoverAndRetentionCategory", "fatiguePage");
+              this::createTurnoverAndRetentionFatiguePage,
+              "humanResourcesCategory", "turnoverAndRetentionCategory", "fatiguePage");
 
         registerParentRoute("advancement", "advancementCategory");
         registerParentRoute("advancement.awards-and-randomization", "advancementCategory",
-                "awardsAndRandomizationCategory");
+              "awardsAndRandomizationCategory");
         registerDirectRoute("advancement.awards-and-randomization.randomization",
-                this::createAdvancementRandomizationPage,
-                "advancementCategory", "awardsAndRandomizationCategory", "0randomizationPage");
+              this::createAdvancementRandomizationPage,
+              "advancementCategory", "awardsAndRandomizationCategory", "0randomizationPage");
         registerDirectRoute("advancement.awards-and-randomization.xp-awards", this::createAdvancementXpAwardsPage,
-                "advancementCategory", "awardsAndRandomizationCategory", "1xpAwardsPage");
+              "advancementCategory", "awardsAndRandomizationCategory", "1xpAwardsPage");
         registerDirectRoute("advancement.awards-and-randomization.recruitment-bonuses",
-                this::createAdvancementRecruitmentBonusesPage,
-                CampaignOptionsRouteOptions.withoutHelpPanel(),
-                "advancementCategory", "awardsAndRandomizationCategory", "2recruitmentBonusesPage");
+              this::createAdvancementRecruitmentBonusesPage,
+              CampaignOptionsRouteOptions.withoutHelpPanel(),
+              "advancementCategory", "awardsAndRandomizationCategory", "2recruitmentBonusesPage");
         registerParentRoute("advancement.skills", "advancementCategory", "skillsCategory");
         registerDirectRoute("advancement.skills.attributes-and-traits",
-                this::createAdvancementAttributesAndTraitsPage,
-                "advancementCategory", "skillsCategory", "attributesAndTraitsPage");
+              this::createAdvancementAttributesAndTraitsPage,
+              "advancementCategory", "skillsCategory", "attributesAndTraitsPage");
         registerDirectRoute("advancement.skills.gunnery", this::createAdvancementGunnerySkillsPage,
-                "advancementCategory", "skillsCategory", "0gunnerySkillsPage");
+              "advancementCategory", "skillsCategory", "0gunnerySkillsPage");
         registerDirectRoute("advancement.skills.piloting", this::createAdvancementPilotingSkillsPage,
-                "advancementCategory", "skillsCategory", "1pilotingSkillsPage");
+              "advancementCategory", "skillsCategory", "1pilotingSkillsPage");
         registerDirectRoute("advancement.skills.support", this::createAdvancementSupportSkillsPage,
-                "advancementCategory", "skillsCategory", "2supportSkillsPage");
+              "advancementCategory", "skillsCategory", "2supportSkillsPage");
         registerDirectRoute("advancement.skills.utility", this::createAdvancementUtilitySkillsPage,
-                "advancementCategory", "skillsCategory", "3utilitySkillsPage");
+              "advancementCategory", "skillsCategory", "3utilitySkillsPage");
         registerDirectRoute("advancement.skills.roleplay", this::createAdvancementRoleplaySkillsPage,
-                "advancementCategory", "skillsCategory", "4roleplaySkillsPage");
+              "advancementCategory", "skillsCategory", "4roleplaySkillsPage");
         registerParentRoute("advancement.abilities", "advancementCategory", "abilityCategory");
         registerDirectRoute("advancement.abilities.combat", this::createAdvancementCombatAbilitiesPage,
-                "advancementCategory", "abilityCategory", "0combatAbilitiesPage");
+              "advancementCategory", "abilityCategory", "0combatAbilitiesPage");
         registerDirectRoute("advancement.abilities.maneuvering", this::createAdvancementManeuveringAbilitiesPage,
-                "advancementCategory", "abilityCategory", "1maneuveringAbilitiesPage");
+              "advancementCategory", "abilityCategory", "1maneuveringAbilitiesPage");
         registerDirectRoute("advancement.abilities.utility", this::createAdvancementUtilityAbilitiesPage,
-                "advancementCategory", "abilityCategory", "2utilityAbilitiesPage");
+              "advancementCategory", "abilityCategory", "2utilityAbilitiesPage");
         registerDirectRoute("advancement.abilities.character-flaws", this::createAdvancementCharacterFlawsPage,
-                "advancementCategory", "abilityCategory", "3characterFlawsPage");
+              "advancementCategory", "abilityCategory", "3characterFlawsPage");
         registerDirectRoute("advancement.abilities.character-creation-only",
-                this::createAdvancementCharacterCreationOnlyPage,
-                "advancementCategory", "abilityCategory", "4characterCreationOnlyPage");
+              this::createAdvancementCharacterCreationOnlyPage,
+              "advancementCategory", "abilityCategory", "4characterCreationOnlyPage");
 
         registerParentRoute("logistics", "logisticsAndMaintenanceCategory");
         registerParentRoute("logistics.repairs-and-maintenance", "logisticsAndMaintenanceCategory",
-                "repairsAndMaintenanceCategory");
+              "repairsAndMaintenanceCategory");
         registerDirectRoute("logistics.repairs-and-maintenance.repairs", this::createLogisticsRepairsPage,
-                "logisticsAndMaintenanceCategory", "repairsAndMaintenanceCategory", "repairPage");
+              "logisticsAndMaintenanceCategory", "repairsAndMaintenanceCategory", "repairPage");
         registerDirectRoute("logistics.repairs-and-maintenance.maintenance", this::createLogisticsMaintenancePage,
-                "logisticsAndMaintenanceCategory", "repairsAndMaintenanceCategory", "maintenancePage");
+              "logisticsAndMaintenanceCategory", "repairsAndMaintenanceCategory", "maintenancePage");
         registerParentRoute("logistics.supplies-and-acquisition", "logisticsAndMaintenanceCategory",
-                "suppliesAndAcquisitionCategory");
+              "suppliesAndAcquisitionCategory");
         registerDirectRoute("logistics.supplies-and-acquisition.acquisition", this::createLogisticsAcquisitionPage,
-                "logisticsAndMaintenanceCategory", "suppliesAndAcquisitionCategory", "acquisitionPage");
+              "logisticsAndMaintenanceCategory", "suppliesAndAcquisitionCategory", "acquisitionPage");
         registerDirectRoute("logistics.supplies-and-acquisition.planetary-acquisition",
-                this::createLogisticsPlanetaryAcquisitionPage,
-                "logisticsAndMaintenanceCategory", "suppliesAndAcquisitionCategory",
-                "planetaryAcquisitionPage");
+              this::createLogisticsPlanetaryAcquisitionPage,
+              "logisticsAndMaintenanceCategory", "suppliesAndAcquisitionCategory",
+              "planetaryAcquisitionPage");
         registerDirectRoute("logistics.supplies-and-acquisition.tech-limits", this::createLogisticsTechLimitsPage,
-                "logisticsAndMaintenanceCategory", "suppliesAndAcquisitionCategory", "techLimitsPage");
+              "logisticsAndMaintenanceCategory", "suppliesAndAcquisitionCategory", "techLimitsPage");
 
         registerParentRoute("operations", "strategicOperationsCategory");
         registerParentRoute("operations.finances", "strategicOperationsCategory", "financesCategory");
         registerDirectRoute("operations.finances.general", this::createOperationsFinancesGeneralPage,
-                "strategicOperationsCategory", "financesCategory", "financesGeneralPage");
+              "strategicOperationsCategory", "financesCategory", "financesGeneralPage");
         registerDirectRoute("operations.finances.price-multipliers", this::createOperationsPriceMultipliersPage,
-                "strategicOperationsCategory", "financesCategory", "priceMultipliersPage");
+              "strategicOperationsCategory", "financesCategory", "priceMultipliersPage");
         registerParentRoute("operations.markets", "strategicOperationsCategory", "marketsCategory");
         registerDirectRoute("operations.markets.personnel", this::createOperationsPersonnelMarketPage,
-                "strategicOperationsCategory", "marketsCategory", "personnelMarketPage");
+              "strategicOperationsCategory", "marketsCategory", "personnelMarketPage");
         registerDirectRoute("operations.markets.units", this::createOperationsUnitMarketPage,
-                "strategicOperationsCategory", "marketsCategory", "unitMarketPage");
+              "strategicOperationsCategory", "marketsCategory", "unitMarketPage");
         registerDirectRoute("operations.markets.contracts", this::createOperationsContractMarketPage,
-                "strategicOperationsCategory", "marketsCategory", "contractMarketPage");
+              "strategicOperationsCategory", "marketsCategory", "contractMarketPage");
         registerParentRoute("operations.systems", "strategicOperationsCategory", "systemsCategory");
         registerDirectRoute("operations.systems.reputation", this::createOperationsReputationPage,
-                "strategicOperationsCategory", "systemsCategory", "reputationPage");
+              "strategicOperationsCategory", "systemsCategory", "reputationPage");
         registerDirectRoute("operations.systems.faction-standing", this::createOperationsFactionStandingPage,
-                "strategicOperationsCategory", "systemsCategory", "factionStandingPage");
+              "strategicOperationsCategory", "systemsCategory", "factionStandingPage");
         registerParentRoute("operations.rulesets", "strategicOperationsCategory", "rulesetsCategory");
         registerDirectRoute("operations.rulesets.stratcon", this::createOperationsStratConPage,
-                "strategicOperationsCategory", "rulesetsCategory", "stratConGeneralPage");
+              "strategicOperationsCategory", "rulesetsCategory", "stratConGeneralPage");
 
-    }
-
-    private void selectedNavigationTarget(CampaignOptionsRoute route) {
-        isSyncingNavigationSelection = true;
-        try {
-            selectRoute(route);
-            resetContentScrollPosition();
-        } finally {
-            isSyncingNavigationSelection = false;
-        }
-    }
-
-    private void resetContentScrollPosition() {
-        if (activeContentHost != null) {
-            activeContentHost.resetScrollPosition();
-        }
-    }
-
-    private void selectRoute(CampaignOptionsRoute route) {
-        // Category (parent) routes now have a landing page of their own, so they normally resolve to themselves;
-        // getDefaultDirectRoute only falls back to a child page for a route with no page at all. We intentionally do
-        // NOT move the tree highlight here: re-selecting a child would trap keyboard navigation, because pressing Up
-        // onto a group row would immediately bounce the selection back down to its first child. Leaving the highlight
-        // where the user put it lets Up/Down move one row at a time in both directions.
-        CampaignOptionsRoute effectiveRoute = getDefaultDirectRoute(route);
-        showDirectRoute(effectiveRoute);
-    }
-
-    private boolean showDirectRoute(CampaignOptionsRoute route) {
-        Component directPage = getDirectPage(route.getId());
-        if (directPage == null) {
-            return false;
-        }
-
-        activeContentHost.setContent(directPage, getQuoteResourceName(route), route.shouldShowHelpPanel());
-        expandSectionsForActiveFilter(directPage);
-        return true;
-    }
-
-    /**
-     * When a page is opened while a navigation search is active, expands the section(s) whose title or summary match
-     * the search so the result the user clicked is revealed, instead of the page opening fully collapsed. When the
-     * search matched the page as a whole (its title or an internal name such as "stratcon" for the renamed "Digital
-     * GMs" page) rather than any single section, every section is expanded so the page is still revealed.
-     *
-     * @param directPage the page component just shown
-     */
-    private void expandSectionsForActiveFilter(Component directPage) {
-        if (navigationPanel == null) {
-            return;
-        }
-
-        String activeFilter = navigationPanel.getActiveFilter();
-        if (activeFilter.isBlank()) {
-            return;
-        }
-
-        CampaignOptionsPagePanel pagePanel = CampaignOptionsContentHost.findPagePanel(directPage);
-        if (pagePanel == null) {
-            return;
-        }
-
-        String[] tokens = activeFilter.split("\\s+");
-        boolean expandedMatchingSection = pagePanel.expandSectionsMatching(
-              sectionText -> sectionMatchesAllTokens(sectionText, tokens));
-        if (!expandedMatchingSection) {
-            pagePanel.expandAllSections();
-        }
-    }
-
-    private static boolean sectionMatchesAllTokens(String rawSectionText, String[] normalizedTokens) {
-        String normalizedSectionText = CampaignOptionsRoute.normalizeSearchText(rawSectionText);
-        for (String token : normalizedTokens) {
-            if (!token.isBlank() && !normalizedSectionText.contains(token)) {
-                return false;
-            }
-        }
-        return true;
-    }
-
-    private String getQuoteResourceName(CampaignOptionsRoute route) {
-        List<String> titleResourceNames = route.getTitleResourceNames();
-        return titleResourceNames.get(titleResourceNames.size() - 1);
-    }
-
-    private Component getDirectPage(String routeId) {
-        Component directPage = directPageCache.get(routeId);
-        if (directPage != null) {
-            return directPage;
-        }
-
-        Supplier<Component> directPageFactory = directPageFactories.get(routeId);
-        if (directPageFactory == null) {
-            return null;
-        }
-
-        directPage = directPageFactory.get();
-        directPageCache.putIfAbsent(routeId, directPage);
-        Component cachedPage = directPageCache.get(routeId);
-        harvestSectionSearchText(routeId, cachedPage);
-        return cachedPage;
-    }
-
-    /**
-     * Copies the resolved section titles and summaries of a freshly built page into its matching route so the
-     * navigation filter can match section headings. This is a no-op when the page has no sections or has already been
-     * harvested.
-     *
-     * @param routeId the id of the route that owns the page
-     * @param page    the built page content
-     */
-    private void harvestSectionSearchText(String routeId, Component page) {
-        if (!(page instanceof CampaignOptionsPagePanel pagePanel)) {
-            return;
-        }
-
-        String sectionSearchText = pagePanel.getSectionSearchText();
-        if (sectionSearchText.isBlank()) {
-            return;
-        }
-
-        for (CampaignOptionsRoute navigationTarget : navigationTargets) {
-            if (navigationTarget.getId().equals(routeId)) {
-                navigationTarget.setSectionSearchText(sectionSearchText);
-                return;
-            }
-        }
-    }
-
-    /**
-     * Builds every direct page once, on demand, so section titles and summaries become searchable across all pages
-     * rather than only the pages the user has already visited. Pages are built progressively, one per Swing event, to
-     * keep the dialog responsive, and the built pages are cached so later navigation is instant. Runs at most once.
-     */
-    void ensureSearchIndexBuilt() {
-        if (searchIndexInitialized) {
-            return;
-        }
-        searchIndexInitialized = true;
-        buildSearchIndexStep(new ArrayList<>(directPageFactories.keySet()), 0);
-    }
-
-    private void buildSearchIndexStep(List<String> routeIds, int index) {
-        if (index >= routeIds.size()) {
-            if (navigationPanel != null) {
-                navigationPanel.refreshFilter();
-            }
-            return;
-        }
-
-        getDirectPage(routeIds.get(index));
-        SwingUtilities.invokeLater(() -> buildSearchIndexStep(routeIds, index + 1));
-    }
-
-    private CampaignOptionsRoute getDefaultDirectRoute(CampaignOptionsRoute route) {
-        if (directPageFactories.containsKey(route.getId())) {
-            return route;
-        }
-
-        String routePrefix = route.getId() + ".";
-        for (CampaignOptionsRoute navigationTarget : navigationTargets) {
-            if (navigationTarget.getId().startsWith(routePrefix)
-                    && directPageFactories.containsKey(navigationTarget.getId())) {
-                return navigationTarget;
-            }
-        }
-
-        return route;
     }
 
     private void ensureCategoryLoaded(String topLevelResourceName) {
@@ -635,13 +455,13 @@ public class CampaignOptionsPane extends JPanel {
         // Details box via withoutHelpPanel().
         List<String> landingResourceNames = List.of(titleResourceNames);
         registerDirectRoute(id, () -> createCategoryLandingPage(landingResourceNames),
-                CampaignOptionsRouteOptions.withoutHelpPanel(), titleResourceNames);
+              CampaignOptionsRouteOptions.withoutHelpPanel(), titleResourceNames);
     }
 
     /**
      * Builds the landing page shown when a category (non-leaf) node is selected in the navigation tree. It mirrors the
-     * standard page shell - logo, quote, and an explainer paragraph - but holds no options and hides the Option
-     * Details box. The header title ({@code lbl<category>.text}), quote ({@code <category>.border}), and explainer
+     * standard page shell - logo, quote, and an explainer paragraph - but holds no options and hides the Option Details
+     * box. The header title ({@code lbl<category>.text}), quote ({@code <category>.border}), and explainer
      * ({@code <category>.intro}) are authored per category in the campaign options resource bundle.
      *
      * @param titleResourceNames the route's title resource names; the last element identifies the category
@@ -653,11 +473,11 @@ public class CampaignOptionsPane extends JPanel {
         String logoFile = CATEGORY_LANDING_LOGOS.getOrDefault(categoryKey, DEFAULT_CATEGORY_LANDING_LOGO);
         String logoPath = CampaignOptionsUtilities.getImageDirectory() + logoFile;
         return CampaignOptionsPagePanel.builder(categoryKey + "Landing", categoryKey, logoPath)
-                .intro(categoryKey)
-                .quote(categoryKey)
-                .showDetailsPanel(false)
-                .standardContentWidth()
-                .build();
+                     .intro(categoryKey)
+                     .quote(categoryKey)
+                     .showDetailsPanel(false)
+                     .standardContentWidth()
+                     .build();
     }
 
     private void registerDirectRoute(String id, Supplier<Component> pageFactory, String... titleResourceNames) {
@@ -665,7 +485,7 @@ public class CampaignOptionsPane extends JPanel {
     }
 
     private void registerDirectRoute(String id, Supplier<Component> pageFactory,
-            CampaignOptionsRouteOptions routeOptions, String... titleResourceNames) {
+          CampaignOptionsRouteOptions routeOptions, String... titleResourceNames) {
         registerRoute(CampaignOptionsRouteDescriptor.direct(id, pageFactory, routeOptions, titleResourceNames));
     }
 
@@ -679,9 +499,8 @@ public class CampaignOptionsPane extends JPanel {
             directPageFactories.put(descriptor.getId(), descriptor.getPageFactory());
         }
 
-        navigationTargets
-                .add(new CampaignOptionsRoute(descriptor.getId(), path, descriptor.getTitleResourceNames(),
-                        descriptor.shouldShowHelpPanel()));
+        navigationTargets.add(new SettingsRoute(descriptor.getId(), path, descriptor.getTitleResourceNames(),
+              descriptor.getTitleResourceNames(), descriptor.shouldShowHelpPanel()));
     }
 
     private static class CampaignOptionsRouteOptions {
@@ -714,7 +533,7 @@ public class CampaignOptionsPane extends JPanel {
         private final CampaignOptionsRouteOptions routeOptions;
 
         private CampaignOptionsRouteDescriptor(String id, @Nullable Supplier<Component> pageFactory,
-                CampaignOptionsRouteOptions routeOptions, String... titleResourceNames) {
+              CampaignOptionsRouteOptions routeOptions, String... titleResourceNames) {
             this.id = id;
             this.pageFactory = pageFactory;
             this.routeOptions = routeOptions;
@@ -722,7 +541,7 @@ public class CampaignOptionsPane extends JPanel {
         }
 
         private static CampaignOptionsRouteDescriptor direct(String id, Supplier<Component> pageFactory,
-                CampaignOptionsRouteOptions routeOptions, String... titleResourceNames) {
+              CampaignOptionsRouteOptions routeOptions, String... titleResourceNames) {
             return new CampaignOptionsRouteDescriptor(id, pageFactory, routeOptions, titleResourceNames);
         }
 
@@ -744,8 +563,7 @@ public class CampaignOptionsPane extends JPanel {
     }
 
     /**
-     * Creates the panel for general campaign options. Loads settings for general
-     * preferences and initializes it with
+     * Creates the panel for general campaign options. Loads settings for general preferences and initializes it with
      * current campaign options.
      *
      * @param mode the state in which the dialog was triggered.
@@ -991,19 +809,16 @@ public class CampaignOptionsPane extends JPanel {
     }
 
     /**
-     * Applies the currently configured campaign options to the active
-     * {@link Campaign}. This method processes all pages
-     * in the dialog, applying the options to the campaign in logical order (e.g.,
-     * "General" first, followed by other
+     * Applies the currently configured campaign options to the active {@link Campaign}. This method processes all pages
+     * in the dialog, applying the options to the campaign in logical order (e.g., "General" first, followed by other
      * categories).
      *
-     * @param preset       an optional {@link CampaignPreset} used to override
-     *                     campaign options
+     * @param preset       an optional {@link CampaignPreset} used to override campaign options
      * @param mode         the mode in which the application process was triggered
      * @param isSaveAction determines if this action is saving options to a preset
      */
     public void applyCampaignOptionsToCampaign(@Nullable CampaignPreset preset, CampaignOptionsDialogMode mode,
-            boolean isSaveAction) {
+          boolean isSaveAction) {
         boolean isStartUp = mode == STARTUP || mode == STARTUP_ABRIDGED;
 
         if (preset != null || isSaveAction) {
@@ -1021,7 +836,7 @@ public class CampaignOptionsPane extends JPanel {
         }
 
         CampaignOptionsFreebieTracker oldCampaignOptions = new CampaignOptionsFreebieTracker(
-                campaign.getCampaignOptions());
+              campaign.getCampaignOptions());
 
         // Options get applied in the order they are defined in the UI
         generalPage.applyCampaignOptionsToCampaign(isStartUp, isSaveAction);
@@ -1072,54 +887,43 @@ public class CampaignOptionsPane extends JPanel {
         }
 
         CampaignOptionsFreebieTracker newCampaignOptions = new CampaignOptionsFreebieTracker(
-                campaign.getCampaignOptions());
+              campaign.getCampaignOptions());
         triggerUpgradeFreebies(campaign, oldCampaignOptions, newCampaignOptions, isStartUp);
     }
 
     /**
-     * Compares a previously-recorded {@link CampaignOptionsFreebieTracker} snapshot
-     * against a new snapshot and triggers
+     * Compares a previously-recorded {@link CampaignOptionsFreebieTracker} snapshot against a new snapshot and triggers
      * any one-time handlers required when critical campaign options are enabled.
      *
      * <p>
-     * This method is intended to be called immediately after applying campaign
-     * option changes (or when
-     * loading/upgrading a campaign) so the campaign can react to newly-enabled
-     * systems. Reactions may include prompting
-     * the player with confirmation dialogs, adjusting campaign state, or granting
-     * "freebies" to keep the save
+     * This method is intended to be called immediately after applying campaign option changes (or when
+     * loading/upgrading a campaign) so the campaign can react to newly-enabled systems. Reactions may include prompting
+     * the player with confirmation dialogs, adjusting campaign state, or granting "freebies" to keep the save
      * consistent and fair when major rulesets are turned on mid-campaign.
      * </p>
      *
      * <p>
-     * Only transitions from {@code false -> true} are acted upon (that is, newly
-     * enabled features). Disabling
-     * options typically does not require compensation and is therefore ignored
-     * here.
+     * Only transitions from {@code false -> true} are acted upon (that is, newly enabled features). Disabling options
+     * typically does not require compensation and is therefore ignored here.
      * </p>
      *
      * <p>
-     * When {@code isStartUp} is {@code true}, interactive prompts are suppressed;
-     * the method may still perform
-     * required non-interactive adjustments depending on implementation.
+     * When {@code isStartUp} is {@code true}, interactive prompts are suppressed; the method may still perform required
+     * non-interactive adjustments depending on implementation.
      * </p>
      *
-     * @param campaign   the campaign whose state may be adjusted and/or to which
-     *                   reports may be added
-     * @param oldOptions snapshot of the option state before the change (or
-     *                   previously acknowledged state)
-     * @param newOptions snapshot of the option state after the change (current
-     *                   effective state)
-     * @param isStartUp  whether this invocation is happening during
-     *                   startup/load/upgrade rather than an in-session
+     * @param campaign   the campaign whose state may be adjusted and/or to which reports may be added
+     * @param oldOptions snapshot of the option state before the change (or previously acknowledged state)
+     * @param newOptions snapshot of the option state after the change (current effective state)
+     * @param isStartUp  whether this invocation is happening during startup/load/upgrade rather than an in-session
      *                   options change
      *
      * @author Illiani
      * @since 0.50.11
      */
     public static void triggerUpgradeFreebies(@Nonnull Campaign campaign, CampaignOptionsFreebieTracker oldOptions,
-            CampaignOptionsFreebieTracker newOptions,
-            boolean isStartUp) {
+          CampaignOptionsFreebieTracker newOptions,
+          boolean isStartUp) {
         // Store old values for use if we want to trigger certain dialogs
         boolean oldAwardVeterancySPAs = oldOptions.awardVeterancySPAs();
         boolean oldIsTrackFactionStanding = oldOptions.trackFactionStanding();
@@ -1134,18 +938,18 @@ public class CampaignOptionsPane extends JPanel {
         boolean oldIsUseDiseases = oldIsUseAltAdvancedMedical && oldOptions.useDiseases();
         boolean oldUseNormalizedContractPayModel = oldOptions.useNormalizedContractPayModel();
         boolean oldIsDiminishReturnsContractPay = oldOptions.useDiminishingContractPay();
+        boolean oldIsUseChaosReputation = oldOptions.useChaosReputation();
 
         boolean newIsTrackFactionStandings = newOptions.trackFactionStanding();
-        if (!isStartUp && newIsTrackFactionStandings && !oldIsTrackFactionStanding) { // Has tracking changed?
+        if (!isStartUp && (newIsTrackFactionStandings != oldIsTrackFactionStanding)) { // Has tracking changed?
             FactionStandingCampaignOptionsChangedConfirmationDialog dialog = new FactionStandingCampaignOptionsChangedConfirmationDialog(
-                    null,
-                    campaign.getCampaignFactionIcon(),
-                    campaign.getFaction(),
-                    campaign.getLocalDate(),
+                  campaign.getCampaignFactionIcon(),
+                  campaign.getPlayerForce().getFaction(),
+                  campaign.getLocalDate(),
                   campaign.getPlayerForce().getFactionStandings(),
-                    campaign.getMissions(),
-                    newIsTrackFactionStandings,
-                    campaign.getCampaignOptions().getRegardMultiplier());
+                  campaign.getMissions(),
+                  newIsTrackFactionStandings,
+                  campaign.getCampaignOptions().get(CampaignOption.REGARD_MULTIPLIER));
 
             List<String> reports = dialog.getReports();
             for (String report : reports) {
@@ -1214,6 +1018,16 @@ public class CampaignOptionsPane extends JPanel {
         if (!isStartUp && newIsDiminishReturnsContractPay && !oldIsDiminishReturnsContractPay) {
             new DiminishingReturnsCampaignOptionsChangedConfirmationDialog(campaign);
         }
+
+        boolean newIsUseChaosReputation = newOptions.useChaosReputation();
+        if (!isStartUp && newIsUseChaosReputation && !oldIsUseChaosReputation) { // Has tracking changed?
+            new ChaosReputationCampaignOptionsChangedConfirmationDialog(campaign);
+            // Recalculate immediately so the reputation is current, rather than stale until the next monthly update.
+            ChaosReputation.processChaosCampaignReputationChanges(campaign.getCampaignOptions(),
+                  campaign.getPlayerForce(),
+                  campaign.getLocalDate());
+            MekHQ.triggerEvent(new OptionsChangedEvent(campaign));
+        }
     }
 
     /**
@@ -1260,24 +1074,24 @@ public class CampaignOptionsPane extends JPanel {
             }
 
             inoculate(
-                    person,
-                    origin,
-                    origin.getId(),
-                    origin.getParentSystem().getId(),
-                    currentDay,
-                    curesBySystem);
+                  person,
+                  origin,
+                  origin.getId(),
+                  origin.getParentSystem().getId(),
+                  currentDay,
+                  curesBySystem);
         }
     }
 
     private static void inoculate(Person person, Planet planet, String planetId, String systemId, LocalDate today,
-            Map<String, Set<InjuryType>> curesBySystem) {
+          Map<String, Set<InjuryType>> curesBySystem) {
         if (!person.hasPlanetaryInoculation(planetId)) {
             person.addPlanetaryInoculation(planetId);
             MedicalLogger.inoculation(person, today, planet.getName(today));
         }
 
         final Set<InjuryType> activeCures = curesBySystem.computeIfAbsent(systemId,
-                id -> getAllSystemSpecificDiseasesWithCures(id, today, true));
+              id -> getAllSystemSpecificDiseasesWithCures(id, today, true));
 
         for (InjuryType injuryType : activeCures) {
             if (!person.hasCanonDiseaseInoculation(injuryType.getKey())) {
@@ -1288,16 +1102,12 @@ public class CampaignOptionsPane extends JPanel {
     }
 
     /**
-     * Applies the values from a {@link CampaignPreset} to all pages in the dialog.
-     * This propagates preset-specific
-     * configuration to all associated components and sub-pages, including
-     * campaign-related properties such as dates,
+     * Applies the values from a {@link CampaignPreset} to all pages in the dialog. This propagates preset-specific
+     * configuration to all associated components and sub-pages, including campaign-related properties such as dates,
      * factions, and skills.
      *
-     * @param campaignPreset the {@link CampaignPreset} containing the preset
-     *                       options to apply
-     * @param isStartup      {@code true} if the preset is being loaded during new
-     *                       campaign startup
+     * @param campaignPreset the {@link CampaignPreset} containing the preset options to apply
+     * @param isStartup      {@code true} if the preset is being loaded during new campaign startup
      */
     public void applyPreset(@Nullable CampaignPreset campaignPreset, boolean isStartup) {
         if (campaignPreset == null) {
@@ -1319,16 +1129,16 @@ public class CampaignOptionsPane extends JPanel {
         // Human Resources
         personnelPages.loadValuesFromCampaignOptions(presetCampaignOptions, campaign.getVersion());
         biographyPages.loadValuesFromCampaignOptions(presetCampaignOptions,
-                presetCampaignOptions.getRandomOriginOptions(),
-                campaignPreset.getRankSystem());
+              presetCampaignOptions.getRandomOriginOptions(),
+              campaignPreset.getRankSystem());
         relationshipsPages.loadValuesFromCampaignOptions(presetCampaignOptions);
         turnoverAndRetentionPages.loadValuesFromCampaignOptions(presetCampaignOptions);
 
         // Advancement
         awardsAndRandomizationPages.loadValuesFromCampaignOptions(presetCampaignOptions,
-                campaignPreset.getRandomSkillPreferences());
+              campaignPreset.getRandomSkillPreferences());
         attributesAndTraitsPage.loadValuesFromCampaignOptions(presetCampaignOptions,
-                campaignPreset.getRandomSkillPreferences());
+              campaignPreset.getRandomSkillPreferences());
         skillsPages.loadValuesFromCampaignOptions(presetCampaignOptions, campaignPreset.getSkills());
         // The ability page is a special case, so handled differently to other pages
         abilitiesPages.buildAllAbilityInfo(campaignPreset.getSpecialAbilities());

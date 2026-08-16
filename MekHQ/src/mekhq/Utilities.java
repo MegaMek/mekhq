@@ -309,7 +309,12 @@ public class Utilities {
 
             LocalDate today = campaign.getLocalDate();
 
-            if (!campaignIsClan && modelIsClan && today.isBefore(BATTLE_OF_TUKAYYID)) {
+            boolean isLimitClanTech = campaign.getCampaignOptions().isLimitClanTech();
+            boolean isBeforeTukayyid = !today.isAfter(BATTLE_OF_TUKAYYID);
+            if (!campaignIsClan &&
+                      modelIsClan &&
+                      isLimitClanTech &&
+                      isBeforeTukayyid) {
                 continue;
             }
 
@@ -1285,8 +1290,7 @@ public class Utilities {
      * @param table the table to save to csv
      * @param file  the file to save to
      *
-     * @return a report summarizing how many rows were written if the operation succeeded
-     *         or an error report otherwise
+     * @return a report summarizing how many rows were written if the operation succeeded or an error report otherwise
      */
     public static String exportTableToCSV(JTable table, File file) {
         TableModel model = table.getModel();
@@ -1647,51 +1651,47 @@ public class Utilities {
     }
 
     /**
-     * Handles towing a player's trailers by their tractors once a megamek scenario has actually started.
+     * Handles towing a player's trailers by their tractors once a megamek scenario has actually started. The whole
+     * train is built in one server request, which validates every link and rolls back if any trailer cannot be
+     * hitched.
      *
-     * @param tractorId      - The MM id of the tractor entity we want to tow with
-     * @param trailerId      - Entity id for the unit we want to tow
-     * @param client         - the player's Client instance
-     * @param isAlreadyReset - transports loaded via "Ship" will have been reset once, don't do it again here
+     * @param tractorId         - The MM id of the tractor entity heading the train
+     * @param orderedTrailerIds - Entity ids of the trailers, in hitch order from front to back
+     * @param client            - the player's Client instance
+     * @param isAlreadyReset    - transports loaded via "Ship" will have been reset once, don't do it again here
      *
      * @see mekhq.campaign.enums.CampaignTransportType#TOW_TRANSPORT
      * @see ITransportAssignment
      */
-    public static void towPlayerTrailers(int tractorId, int trailerId, Client client, boolean towTrailers,
+    public static void towPlayerTrailers(int tractorId, List<Integer> orderedTrailerIds, Client client,
           boolean isAlreadyReset) {
-        Set<Entity> alreadyTransportedEntities = new HashSet<>();
-        if (!towTrailers) {
-            return;
-        }
         Entity tractor = client.getEntity(tractorId);
-        Entity trailer = client.getEntity(trailerId);
 
-        if (tractor == null || trailer == null) {
+        if ((tractor == null) || orderedTrailerIds.isEmpty()) {
             return;
         }
 
         // Reset transporter status, as unit might still
         // retain updates from when the Unit
         // was assigned to the tractor on the TO&E tab
+        Set<Entity> alreadyTransportedEntities = new HashSet<>();
         if (isAlreadyReset) {
             alreadyTransportedEntities.addAll(tractor.getLoadedUnits());
         }
         tractor.resetTransporter();
 
-
         //Restore the normal transported entities
         for (Entity alreadyTransportedEntity : alreadyTransportedEntities) {
             tractor.load(alreadyTransportedEntity, alreadyTransportedEntity.getTargetBay());
         }
+
         //Towed units should deploy on their tractor's turn
-        if (tractor.canTow(trailerId)) {
-            sendTowEntity(client, trailerId, tractorId);
-        }
+        sendBuildTrain(client, tractorId, orderedTrailerIds);
     }
 
-    private static void sendTowEntity(Client client, int trailerId, int tractorId) {
-        client.sendTowEntity(trailerId, tractorId);
-        // Add a wait to make sure that we don't start processing client.sendTowEntity
+    private static void sendBuildTrain(Client client, int tractorId, List<Integer> orderedTrailerIds) {
+        client.sendBuildTrain(tractorId, orderedTrailerIds);
+        // Add a wait to make sure that we don't start processing client.sendBuildTrain
         // out of order
         try {
             Thread.sleep(500);

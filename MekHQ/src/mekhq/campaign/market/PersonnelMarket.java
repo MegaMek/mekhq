@@ -209,7 +209,11 @@ public class PersonnelMarket {
 
             // Add details about the first personnel's experience, primary role, and name
             Person person = personnel.getFirst();
-            int experienceLevel = person.getExperienceLevel(campaign, false);
+            int experienceLevel = person.getExperienceLevel(campaign.getCampaignOptions(),
+                  campaign.getPlayerForce().isClanForce(),
+                  campaign.getLocalDate(),
+                  false,
+                  false);
             String expLevel = SkillType.getExperienceLevelName(experienceLevel);
 
             if (expLevel.equals("Elite") || expLevel.equals("Ultra-Green")) {

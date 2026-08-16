@@ -461,7 +461,7 @@ public class AbstractMarriageTest {
     public void testMarry() {
         doCallRealMethod().when(mockMarriage).marry(any(), any(), any(), any(), any(), anyBoolean());
         Faction campaignFaction = mock(Faction.class);
-        when(mockCampaign.getFaction()).thenReturn(campaignFaction);
+        when(mockCampaign.getPlayerForce().getFaction()).thenReturn(campaignFaction);
         when(campaignFaction.getShortName()).thenReturn("MERC");
 
         when(mockCampaign.getPlayerForce().getRankSystem()).thenReturn(mock(RankSystem.class));

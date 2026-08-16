@@ -34,6 +34,8 @@ package mekhq.gui;
 
 import static megamek.client.ratgenerator.ForceDescriptor.RATING_5;
 import static mekhq.campaign.ForceHumanResources.isUsingLegacyPersonnelMarket;
+import static mekhq.campaign.digitalGM.stratCon.StratConRulesManager.generateDailyScenariosForTrack;
+import static mekhq.campaign.digitalGM.stratCon.StratConRulesManager.isForceDeployedToStratCon;
 import static mekhq.campaign.enums.DailyReportType.PERSONNEL;
 import static mekhq.campaign.enums.DailyReportType.POLITICS;
 import static mekhq.campaign.force.Formation.NO_ASSIGNED_SCENARIO;
@@ -43,8 +45,6 @@ import static mekhq.campaign.mission.enums.MissionStatus.PARTIAL;
 import static mekhq.campaign.mission.enums.MissionStatus.SUCCESS;
 import static mekhq.campaign.mission.enums.ScenarioStatus.DRAW;
 import static mekhq.campaign.randomEvents.prisoners.PrisonerEventManager.DEFAULT_TEMPORARY_CAPACITY;
-import static mekhq.campaign.stratCon.StratConRulesManager.generateDailyScenariosForTrack;
-import static mekhq.campaign.stratCon.StratConRulesManager.isForceDeployedToStratCon;
 import static mekhq.campaign.universe.Faction.MERCENARY_FACTION_CODE;
 import static mekhq.campaign.universe.Faction.PIRATE_FACTION_CODE;
 import static mekhq.gui.dialog.factionStanding.manualMissionDialogs.SimulateMissionDialog.handleFactionRegardUpdates;
@@ -89,7 +89,11 @@ import mekhq.campaign.Campaign;
 import mekhq.campaign.CampaignNewDayManager;
 import mekhq.campaign.LocalHangar;
 import mekhq.campaign.autoResolve.AutoResolveMethod;
+import mekhq.campaign.campaignOptions.CampaignOption;
 import mekhq.campaign.campaignOptions.CampaignOptions;
+import mekhq.campaign.digitalGM.stratCon.StratConCampaignState;
+import mekhq.campaign.digitalGM.stratCon.StratConScenario;
+import mekhq.campaign.digitalGM.stratCon.gm.MaplessStratCon;
 import mekhq.campaign.events.DeploymentChangedEvent;
 import mekhq.campaign.events.GMModeEvent;
 import mekhq.campaign.events.OptionsChangedEvent;
@@ -116,9 +120,7 @@ import mekhq.campaign.personnel.autoAwards.AutoAwardsController;
 import mekhq.campaign.personnel.enums.PersonnelRole;
 import mekhq.campaign.personnel.skills.SkillType;
 import mekhq.campaign.randomEvents.prisoners.PrisonerMissionEndEvent;
-import mekhq.campaign.stratCon.MaplessStratCon;
-import mekhq.campaign.stratCon.StratConCampaignState;
-import mekhq.campaign.stratCon.StratConScenario;
+import mekhq.campaign.reputation.chaosReputation.ChaosReputation;
 import mekhq.campaign.unit.Unit;
 import mekhq.campaign.universe.Faction;
 import mekhq.campaign.universe.Factions;
@@ -602,7 +604,7 @@ public final class BriefingTab extends CampaignGuiTab {
         MMComboBox<ScenarioQueueFilter> comboBox = new MMComboBox<>(name, filters);
         styleCompactComponent(comboBox);
         comboBox.setMaximumRowCount(filters.length);
-        comboBox.addActionListener(ev -> refreshScenarioTableData(false));
+        comboBox.addActionListener(ev -> refreshScenarioTableData());
         return comboBox;
     }
 
@@ -852,6 +854,23 @@ public final class BriefingTab extends CampaignGuiTab {
 
         getCampaign().completeMission(mission, status);
         MekHQ.triggerEvent(new MissionCompletedEvent(mission));
+
+        if (campaignOptions.get(CampaignOption.USE_CHAOS_REPUTATION)) {
+            List<Person> personnel = getCampaign().getPlayerForce()
+                                           .getHumanResources()
+                                           .getPersonnelFilteringOutDepartedAndAbsent();
+            ChaosReputation.processContractCompletion(getCampaign(), status, personnel);
+
+            if (mission instanceof AtBContract contract &&
+                      Objects.equals(contract.getEmployerCode(), PIRATE_FACTION_CODE)) {
+                ChaosReputation.resolveActOfPiracy(getCampaign(),
+                      personnel,
+                      contract.getRequiredCombatTeams(),
+                      contract.getScenarios(),
+                      status.isOverallSuccess(),
+                      contract.getName());
+            }
+        }
 
         // apply mission xp
         int xpAward = getMissionXpAward(cmd.getStatus(), mission);
@@ -1710,6 +1729,30 @@ public final class BriefingTab extends CampaignGuiTab {
         if (description.isBlank()) {
             return true;
         }
+
+        // Compose the briefing body: detailed briefing, then who controls the field, then the objectives, each
+        // separated by a horizontal divider.
+        StringBuilder briefingBody = new StringBuilder(description);
+
+        if (scenario instanceof AtBScenario atBScenario) {
+            String battlefieldControl = atBScenario.getBattlefieldControlDescription();
+            if ((battlefieldControl != null) && !battlefieldControl.isBlank()) {
+                briefingBody.append("<hr>").append(battlefieldControl);
+            }
+        }
+
+        List<ScenarioObjective> objectives = scenario.getScenarioObjectives();
+        if ((objectives != null) && !objectives.isEmpty()) {
+            briefingBody.append("<hr><b>")
+                  .append(getTextAt(RESOURCE_BUNDLE, "dialogScenarioAcceptance.objectives.header"))
+                  .append("</b><ul>");
+            for (ScenarioObjective objective : objectives) {
+                briefingBody.append("<li>").append(objective.getDescription()).append("</li>");
+            }
+            briefingBody.append("</ul>");
+        }
+
+        description = briefingBody.toString();
 
         Mission mission = null;
         if (scenario.getMissionId() != -1) {
@@ -2659,23 +2702,11 @@ public final class BriefingTab extends CampaignGuiTab {
     }
 
     public void refreshScenarioTableData() {
-        refreshScenarioTableData(true);
-    }
-
-    private void refreshScenarioTableData(boolean preserveResolvedSelection) {
         int scenarioSelection = getSelectedScenarioId(scenarioTable, scenarioModel);
         ScenarioQueueFilter selectedFilter = getSelectedScenarioFilter(scenarioFilter,
               ScenarioQueueFilter.ALL);
         final Mission mission = comboMission.getSelectedItem();
         List<Scenario> visibleScenarios = (mission == null) ? new ArrayList<>() : mission.getVisibleScenarios();
-        if (preserveResolvedSelection && (scenarioSelection >= 0) &&
-                  (selectedFilter != ScenarioQueueFilter.ALL) &&
-                  (selectedFilter != ScenarioQueueFilter.ALL_RESOLVED) &&
-                  (selectedFilter != ScenarioQueueFilter.CURRENT_MONTH) &&
-                  isResolvedScenario(visibleScenarios, scenarioSelection)) {
-            scenarioFilter.setSelectedItem(ScenarioQueueFilter.ALL_RESOLVED);
-            return;
-        }
 
         List<Scenario> filteredScenarios = new ArrayList<>();
 
@@ -2701,15 +2732,6 @@ public final class BriefingTab extends CampaignGuiTab {
 
         scenarioTable.setFillsViewportHeight(true);
         refreshScenarioView();
-    }
-
-    private boolean isResolvedScenario(List<Scenario> scenarios, int scenarioId) {
-        for (Scenario scenario : scenarios) {
-            if ((scenario.getId() == scenarioId) && !scenario.getStatus().isCurrent()) {
-                return true;
-            }
-        }
-        return false;
     }
 
     /**

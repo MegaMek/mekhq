@@ -34,13 +34,13 @@ package mekhq.campaign.randomEvents.other;
 
 import static java.io.File.separator;
 import static megamek.common.compute.Compute.d6;
+import static mekhq.campaign.digitalGM.stratCon.StratConContractInitializer.getUnoccupiedCoords;
+import static mekhq.campaign.digitalGM.stratCon.StratConRulesManager.generateExternalScenario;
 import static mekhq.campaign.mission.AtBDynamicScenarioFactory.createEntityWithCrew;
-import static mekhq.campaign.randomEvents.prisoners.MobType.HUGE;
-import static mekhq.campaign.randomEvents.prisoners.MobType.LARGE;
-import static mekhq.campaign.randomEvents.prisoners.MobType.MEDIUM;
-import static mekhq.campaign.randomEvents.prisoners.MobType.SMALL;
-import static mekhq.campaign.stratCon.StratConContractInitializer.getUnoccupiedCoords;
-import static mekhq.campaign.stratCon.StratConRulesManager.generateExternalScenario;
+import static mekhq.campaign.randomEvents.prisoners.prisonerEvents.MobType.HUGE;
+import static mekhq.campaign.randomEvents.prisoners.prisonerEvents.MobType.LARGE;
+import static mekhq.campaign.randomEvents.prisoners.prisonerEvents.MobType.MEDIUM;
+import static mekhq.campaign.randomEvents.prisoners.prisonerEvents.MobType.SMALL;
 import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
 
 import java.util.ArrayList;
@@ -54,15 +54,15 @@ import megamek.common.loaders.MekSummaryCache;
 import megamek.common.units.Entity;
 import megamek.logging.MMLogger;
 import mekhq.campaign.Campaign;
+import mekhq.campaign.digitalGM.stratCon.StratConCampaignState;
+import mekhq.campaign.digitalGM.stratCon.StratConCoords;
+import mekhq.campaign.digitalGM.stratCon.StratConScenario;
+import mekhq.campaign.digitalGM.stratCon.StratConTrackState;
 import mekhq.campaign.mission.AtBContract;
 import mekhq.campaign.mission.AtBScenario;
 import mekhq.campaign.mission.BotForce;
 import mekhq.campaign.mission.ScenarioTemplate;
 import mekhq.campaign.personnel.Person;
-import mekhq.campaign.stratCon.StratConCampaignState;
-import mekhq.campaign.stratCon.StratConCoords;
-import mekhq.campaign.stratCon.StratConScenario;
-import mekhq.campaign.stratCon.StratConTrackState;
 import mekhq.campaign.unit.Unit;
 import mekhq.campaign.universe.Faction;
 import mekhq.gui.baseComponents.immersiveDialogs.ImmersiveDialogSimple;
@@ -207,7 +207,7 @@ public class RiotScenario {
      */
     private void createRiotScenario(AtBContract contract, List<Unit> mobUnits) {
         final String DIRECTORY = "data" + separator + "scenariotemplates" + separator;
-        final String SCENARIO_FILE = DIRECTORY + "Crowd Control.xml";
+        final String SCENARIO_FILE = DIRECTORY + "Crowd Control.json";
 
         ScenarioTemplate template = ScenarioTemplate.Deserialize(SCENARIO_FILE);
 
@@ -267,7 +267,7 @@ public class RiotScenario {
         if (campaign.isClanCampaign()) {
             key = "RiotScenario.report.clan";
         } else {
-            if (campaign.getFaction().isComStarOrWoB()) {
+            if (campaign.getPlayerForce().getFaction().isComStarOrWoB()) {
                 key = "RiotScenario.report.cs";
             } else if (campaign.isMercenaryCampaign()) {
                 key = "RiotScenario.report.merc";

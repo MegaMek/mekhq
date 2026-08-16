@@ -34,6 +34,7 @@ package mekhq.campaign.universe;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.mock;
@@ -44,6 +45,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 
+import mekhq.campaign.location.ILocation;
 import mekhq.campaign.universe.FactionBorderTracker.RegionHex;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentMatchers;
@@ -67,7 +69,7 @@ public class FactionBorderTrackerTest {
 
         return new FactionBorderTracker() {
             @Override
-            protected Collection<PlanetarySystem> getSystemList() {
+            public Collection<PlanetarySystem> getSystemList() {
                 return systems;
             }
         };
@@ -88,7 +90,26 @@ public class FactionBorderTrackerTest {
         String id = String.format("%f, %f", x, y);
         when(system.getId()).thenReturn(id);
         when(system.getFactionSet(ArgumentMatchers.any())).thenReturn(Collections.singleton(owner));
+        // Real Euclidean distance based on the stubbed coordinates, so radius-based filtering (used by the
+        // getBorders/getBorderSystems overloads that take an ILocation) behaves like production instead of
+        // Mockito's unstubbed 0.0 default.
+        when(system.getDistanceTo(ArgumentMatchers.any(PlanetarySystem.class))).thenAnswer(invocation -> {
+            PlanetarySystem other = invocation.getArgument(0);
+            return Math.hypot(x - other.getX(), y - other.getY());
+        });
         return system;
+    }
+
+    /**
+     * Builds a mock {@link ILocation} whose current system sits at the given coordinates. The owning faction is
+     * irrelevant here since the location's system is only ever used as the origin point for distance checks, never
+     * returned as part of a scanned region.
+     */
+    private ILocation createLocationAt(final double x, final double y) {
+        PlanetarySystem system = createSystem(x, y, factionUs);
+        ILocation location = mock(ILocation.class);
+        when(location.getCurrentSystem()).thenReturn(system);
+        return location;
     }
 
     @Test
@@ -134,6 +155,112 @@ public class FactionBorderTrackerTest {
         assertEquals(0, border.size());
     }
 
+    /**
+     * Regression test: {@link FactionBorderTracker#getBorders(Faction, ILocation, double)} computes a fresh result
+     * around an arbitrary location, entirely independent of the tracker's persistently cached region &mdash; even when
+     * that cached region is centered somewhere else (or empty) at the time of the call.
+     */
+    @Test
+    public void testGetBordersByLocationIgnoresCachedRegion() {
+        FactionBorderTracker tracker = buildTestTracker();
+        tracker.setDefaultBorderSize(1, 1, 1);
+        // Push the tracker's cached region far away and tight, so the cached view has no presence for either faction.
+        tracker.setRegionRadius(1);
+        tracker.setRegionCenter(50, 0);
+        assertNull(tracker.getBorders(factionUs), "Sanity check: cached region should have no presence for factionUs");
+        assertNull(tracker.getBorders(factionThem),
+              "Sanity check: cached region should have no presence for factionThem");
+
+        ILocation location = createLocationAt(0, 0);
+
+        FactionBorders usBorders = tracker.getBorders(factionUs, location, 1);
+        FactionBorders themBorders = tracker.getBorders(factionThem, location, 1);
+
+        assertNotNull(usBorders, "factionUs controls a system at the search origin");
+        assertEquals(1, usBorders.getSystems().size());
+        assertNotNull(themBorders, "factionThem controls systems within radius 1 of the search origin");
+        assertEquals(2, themBorders.getSystems().size());
+        // The cached region itself must remain untouched by the location-based query.
+        assertNull(tracker.getBorders(factionUs));
+        assertNull(tracker.getBorders(factionThem));
+    }
+
+    /**
+     * Regression test: when no system of the requested faction falls within the given radius of the location, the
+     * result is {@code null} rather than an empty, non-null {@link FactionBorders}.
+     */
+    @Test
+    public void testGetBordersByLocationReturnsNullWhenFactionHasNoPresenceInRange() {
+        FactionBorderTracker tracker = buildTestTracker();
+        ILocation location = createLocationAt(0, 0);
+
+        assertNull(tracker.getBorders(factionThem, location, 0.5),
+              "No factionThem system is within 0.5 ly of the origin");
+    }
+
+    /**
+     * Regression test: a location with no current system (e.g. a force in deep transit) yields {@code null}/an empty
+     * result rather than throwing, for both the faction-borders and the two-faction proximity overloads.
+     */
+    @Test
+    public void testGetBordersByLocationReturnsNullWhenLocationHasNoCurrentSystem() {
+        FactionBorderTracker tracker = buildTestTracker();
+        ILocation location = mock(ILocation.class);
+        when(location.getCurrentSystem()).thenReturn(null);
+
+        assertNull(tracker.getBorders(factionUs, location, 10));
+        assertNull(tracker.getBorders(factionUs, location));
+        assertTrue(tracker.getBorderSystems(factionUs, factionThem, location, 10).isEmpty());
+    }
+
+    /**
+     * Regression test: {@link FactionBorderTracker#getBorders(Faction, ILocation)} (no explicit radius) uses the
+     * tracker's configured {@link FactionBorderTracker#getRadius()} as the search radius, including the "negative
+     * radius means the whole map" convention.
+     */
+    @Test
+    public void testGetBordersByLocationDefaultOverloadUsesTrackerRadius() {
+        FactionBorderTracker tracker = buildTestTracker();
+        tracker.setDefaultBorderSize(1, 1, 1);
+        ILocation location = createLocationAt(0, 0);
+
+        tracker.setRegionRadius(1);
+        FactionBorders themNarrow = tracker.getBorders(factionThem, location);
+        assertNotNull(themNarrow);
+        assertEquals(2, themNarrow.getSystems().size(),
+              "getBorders(Faction, ILocation) should use the tracker's configured radius as the search radius");
+
+        tracker.setRegionRadius(-1);
+        FactionBorders themAll = tracker.getBorders(factionThem, location);
+        assertNotNull(themAll);
+        assertEquals(12, themAll.getSystems().size(),
+              "A negative tracker radius should include every system in the location-based search too");
+    }
+
+    /**
+     * Regression test: {@link FactionBorderTracker#getBorderSystems(Faction, Faction, ILocation, double)} matches the
+     * cached, region-based {@link FactionBorderTracker#getBorderSystems(Faction, Faction)} result when the location and
+     * radius describe the same area, while remaining independent of the tracker's cached region.
+     */
+    @Test
+    public void testGetBorderSystemsByLocationMatchesRegionBasedResult() {
+        FactionBorderTracker tracker = buildTestTracker();
+        tracker.setDefaultBorderSize(1, 1, 1);
+        // Push the cached region far away; the location-based call below must not depend on it.
+        tracker.setRegionRadius(1);
+        tracker.setRegionCenter(50, 0);
+
+        ILocation location = createLocationAt(0, 0);
+
+        List<PlanetarySystem> border = tracker.getBorderSystems(factionUs, factionThem, location, 1);
+
+        assertEquals(2, border.size());
+        for (PlanetarySystem p : border) {
+            assertEquals(1, Math.abs(p.getX()), RegionPerimeter.EPSILON);
+            assertEquals(0, p.getY(), RegionPerimeter.EPSILON);
+        }
+    }
+
     @Test
     public void testDefaultBorderSize() {
         Faction is = createFaction("is", false, false);
@@ -155,6 +282,35 @@ public class FactionBorderTrackerTest {
         tracker.setBorderSize(is, 30);
 
         assertEquals(30, tracker.getBorderSize(is), RegionPerimeter.EPSILON);
+    }
+
+    /**
+     * Regression test: {@link FactionBorderTracker#systemsNear(PlanetarySystem, double)} caches each distinct
+     * (origin, radius) query on its own. A change in either the origin or the radius must yield that query's own
+     * correct result rather than serving a stale result keyed on a prior call's origin or radius.
+     */
+    @Test
+    public void testSystemsNearRecomputesWhenOriginOrRadiusChanges() {
+        FactionBorderTracker tracker = buildTestTracker();
+        PlanetarySystem origin = createSystem(0, 0, factionUs);
+        PlanetarySystem farOrigin = createSystem(50, 0, factionUs);
+
+        assertEquals(3,
+              tracker.systemsNear(origin, 1).size(),
+              "Sanity check: radius 1 around the origin should include factionUs and the two adjacent factionThem systems");
+
+        // Same origin, narrower radius: must key on its own radius, not reuse the radius-1 cache entry.
+        assertEquals(1, tracker.systemsNear(origin, 0.5).size(),
+              "A narrower radius on the same origin should produce its own result, not reuse the wider cached result");
+
+        // Same radius as the first call, but a different origin far from every system: must key on its own origin,
+        // not reuse the origin-(0,0) cache entry.
+        assertEquals(0, tracker.systemsNear(farOrigin, 1).size(),
+              "A different origin should produce its own result, not reuse the previous origin's cached result");
+
+        // Back to the original (origin, radius) pair: should still produce the correct, non-stale result.
+        assertEquals(3, tracker.systemsNear(origin, 1).size(),
+              "Returning to a previously-queried (origin, radius) pair should still produce the correct result");
     }
 
     @Test

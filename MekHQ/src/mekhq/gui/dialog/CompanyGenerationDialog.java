@@ -56,13 +56,16 @@ import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.events.OrganizationChangedEvent;
+import mekhq.campaign.force.PlayerForce;
 import mekhq.campaign.parts.AmmoStorage;
 import mekhq.campaign.parts.Armor;
 import mekhq.campaign.parts.Part;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.autoAwards.AutoAwardsController;
 import mekhq.campaign.personnel.enums.PersonnelRole;
-import mekhq.campaign.personnel.ranks.AutoAssignRankForCompanyGenerator;
+import mekhq.campaign.personnel.ranks.AutomaticRankAssigner;
+import mekhq.campaign.reputation.camOpsReputation.ForceReputationController;
+import mekhq.campaign.reputation.chaosReputation.ChaosReputation;
 import mekhq.campaign.unit.Unit;
 import mekhq.campaign.universe.Faction;
 import mekhq.campaign.universe.companyGeneration.CompanyGenerationOptions;
@@ -182,7 +185,7 @@ public class CompanyGenerationDialog extends AbstractMHQValidationButtonDialog {
         Person speaker = campaign.getPlayerForce()
                                .getHumanResources()
                                .newPerson(campaign, role, campaignFactionCode, Gender.RANDOMIZE);
-        AutoAssignRankForCompanyGenerator.assignRankSystemFromFaction(speaker, RO_MIN);
+        AutomaticRankAssigner.assignRankSystemFromFaction(speaker, RO_MIN);
         new FactionJudgmentDialog(campaign, speaker, campaign.getPlayerForce().getHumanResources()
                                                            .getCommander(campaign.getCampaignOptions(),
                                                                  campaign.isClanCampaign(),
@@ -217,9 +220,14 @@ public class CompanyGenerationDialog extends AbstractMHQValidationButtonDialog {
             autoAwardsController.ManualController(campaign, false);
         }
 
-        mekhq.campaign.camOpsReputation.ForceReputationController reputationController = new mekhq.campaign.camOpsReputation.ForceReputationController();
+        PlayerForce playerForce = campaign.getPlayerForce();
+        ForceReputationController reputationController = new ForceReputationController();
         reputationController.initializeReputation(campaign);
-        campaign.getPlayerForce().setReputation(reputationController);
+        playerForce.setCamOpsReputation(reputationController);
+
+        ChaosReputation.processChaosCampaignReputationChanges(campaign.getCampaignOptions(),
+              campaign.getPlayerForce(),
+              campaign.getLocalDate());
 
         processBonusUnitsBasedOnCampaignOptions(trackers, options);
     }
@@ -227,7 +235,10 @@ public class CompanyGenerationDialog extends AbstractMHQValidationButtonDialog {
     private void processBonusUnitsBasedOnCampaignOptions(List<CompanyGenerationPersonTracker> trackers,
           CompanyGenerationOptions options) {
         CampaignOptions campaignOptions = campaign.getCampaignOptions();
-        if (campaignOptions.isUseAlternativeAdvancedMedical()) {
+        boolean isUseAltAdvancedMedical = campaignOptions.isUseAlternativeAdvancedMedical();
+        double altAdvancedMedicalHealingTimeMultiplier = campaignOptions.getAlternativeAdvancedMedicalHealingTimeMultiplier();
+        boolean isUseHardAltAdvancedMedical = altAdvancedMedicalHealingTimeMultiplier >= 2.0;
+        if (isUseAltAdvancedMedical && isUseHardAltAdvancedMedical) {
             int combatants = 0;
             for (CompanyGenerationPersonTracker tracker : trackers) {
                 if (tracker.getPersonType().isCombat()) {

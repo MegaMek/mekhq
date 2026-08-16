@@ -44,7 +44,7 @@ import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
 import megamek.common.units.Entity;
 import megamek.logging.MMLogger;
 import mekhq.campaign.Campaign;
-import mekhq.campaign.stratCon.StratConCampaignState;
+import mekhq.campaign.digitalGM.stratCon.StratConCampaignState;
 import mekhq.gui.baseComponents.immersiveDialogs.ImmersiveDialogSimple;
 import mekhq.gui.dialog.MercenaryAuctionDialog;
 

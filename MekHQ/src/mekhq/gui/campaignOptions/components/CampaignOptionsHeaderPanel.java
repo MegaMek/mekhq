@@ -33,123 +33,53 @@
 package mekhq.gui.campaignOptions.components;
 
 import static java.awt.Color.BLACK;
-import static megamek.client.ui.util.FlatLafStyleBuilder.setFontScaling;
 import static megamek.utilities.ImageUtilities.addTintToImageIcon;
 import static megamek.utilities.ImageUtilities.scaleImageIcon;
 import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.getCampaignOptionsResourceBundle;
-import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
 import static mekhq.utilities.MHQInternationalization.getTextAt;
 
-import java.awt.GridBagConstraints;
 import java.util.HashMap;
 import java.util.Map;
+import javax.swing.Icon;
 import javax.swing.ImageIcon;
-import javax.swing.JLabel;
-import javax.swing.JPanel;
-import javax.swing.SwingConstants;
 
 import jakarta.annotation.Nonnull;
-import megamek.client.ui.util.UIUtil;
+import megamek.client.ui.settings.SettingsHeaderPanel;
 
-/**
- * A specialized {@link JPanel} designed for headers in the campaign options dialog.
- * <p>
- * This panel includes a header label, an image, and optionally a body label for additional text. The text for the
- * labels is dynamically loaded from a resource bundle based on the provided name. The image is scaled to fit the
- * layout, and font scaling is applied to the labels to ensure consistent appearance.
- */
-public class CampaignOptionsHeaderPanel extends JPanel {
+/** Campaign-specific image and resource-key adapter over {@link SettingsHeaderPanel}. */
+public class CampaignOptionsHeaderPanel extends SettingsHeaderPanel {
     private static final int DEFAULT_IMAGE_SIZE = 80;
     private static final int DEFAULT_BODY_TEXT_WIDTH = 750;
+    private static final Map<String, Icon> HEADER_IMAGE_CACHE = new HashMap<>();
 
-    // Header images are reused across every page build; cache the loaded/scaled/tinted icon by (address, size, tint)
-    // so we don't reload from disk and re-tint each time. Accessed only on the EDT, so a plain HashMap is safe.
-    private static final Map<String, ImageIcon> HEADER_IMAGE_CACHE = new HashMap<>();
-
-    /**
-     * Constructs a {@code CampaignOptionsHeaderPanel} that displays a header label and an image.
-     *
-     * <p>The panel is named {@code "pnl" + name + "HeaderPanel"}. The header label's text is fetched from a resource
-     * bundle using {@code "lbl" + name + ".text"}. The image is loaded from the specified file path and scaled
-     * appropriately.</p>
-     *
-     * @param name         a unique identifier used to fetch resource bundle entries and to form the panel's name
-     * @param imageAddress the path to the image file displayed in the panel
-     */
     public CampaignOptionsHeaderPanel(@Nonnull String name, @Nonnull String imageAddress) {
         this(name, imageAddress, false, DEFAULT_IMAGE_SIZE, true);
     }
 
-    /**
-     * Constructs a {@code CampaignOptionsHeaderPanel} with a custom image size.
-     *
-     * @param name            a unique identifier used for resource bundle lookups and to form the panel's name
-     * @param imageAddress    the path to the image file to display at the top of the panel
-     * @param includeBodyText if true, includes a body label beneath the image with descriptive text
-     * @param imageSize       the target width or height for the header image
-     */
-    public CampaignOptionsHeaderPanel(@Nonnull String name, @Nonnull String imageAddress, boolean includeBodyText, int imageSize) {
+    public CampaignOptionsHeaderPanel(@Nonnull String name, @Nonnull String imageAddress, boolean includeBodyText,
+          int imageSize) {
         this(name, imageAddress, includeBodyText, imageSize, true);
     }
 
-    /**
-     * Constructs a {@code CampaignOptionsHeaderPanel} with custom image sizing and tint behavior.
-     *
-     * @param name            a unique identifier used for resource bundle lookups and to form the panel's name
-     * @param imageAddress    the path to the image file to display at the top of the panel
-     * @param includeBodyText if true, includes a body label beneath the image with descriptive text
-     * @param imageSize       the target width or height for the header image
-     * @param tintImage       if true, tints the image black to match the standard options header style
-     */
-    public CampaignOptionsHeaderPanel(@Nonnull String name, @Nonnull String imageAddress, boolean includeBodyText, int imageSize,
-          boolean tintImage) {
-        // Build the header image once per (address, size, tint) and reuse it; see HEADER_IMAGE_CACHE.
-        ImageIcon imageIcon = HEADER_IMAGE_CACHE.computeIfAbsent(imageAddress + '|' + imageSize + '|' + tintImage,
-              key -> {
-                  ImageIcon icon = scaleImageIcon(new ImageIcon(imageAddress), imageSize, true);
-                  return tintImage ? addTintToImageIcon(icon.getImage(), BLACK) : icon;
-              });
+    public CampaignOptionsHeaderPanel(@Nonnull String name, @Nonnull String imageAddress, boolean includeBodyText,
+          int imageSize, boolean tintImage) {
+        this(name, imageAddress, includeBodyText, imageSize, tintImage, getCampaignOptionsResourceBundle());
+    }
 
-        // Create a JLabel to display the image in the panel
-        JLabel lblImage = new JLabel(imageIcon);
+    public CampaignOptionsHeaderPanel(@Nonnull String name, @Nonnull String imageAddress, boolean includeBodyText,
+          int imageSize, boolean tintImage, @Nonnull String resourceBundleName) {
+        super(name,
+              getTextAt(resourceBundleName, "lbl" + name + ".text"),
+              headerIcon(imageAddress, imageSize, tintImage),
+              includeBodyText ? getTextAt(resourceBundleName, "lbl" + name + "Body.text") : null,
+              DEFAULT_BODY_TEXT_WIDTH);
+    }
 
-        // Create the header label with text from the resource bundle
-        final JLabel lblHeader = new JLabel("<html>" +
-                                                  getFormattedTextAt(getCampaignOptionsResourceBundle(),
-                                                        "lbl" + name + ".text") +
-                                                  "</html>",
-              SwingConstants.CENTER);
-        lblHeader.setName("lbl" + name);
-        setFontScaling(lblHeader, true, 2);
-
-        // Optionally create a body label with additional text if includeBodyText is true
-        JLabel lblBody = new JLabel();
-        if (includeBodyText) {
-            lblBody = new JLabel(String.format("<html><div style='width: %s'>%s</div></html>",
-                  UIUtil.scaleForGUI(DEFAULT_BODY_TEXT_WIDTH),
-                  getTextAt(getCampaignOptionsResourceBundle(), "lbl" + name + "Body.text")),
-                  SwingConstants.CENTER);
-            lblBody.setName("lbl" + name + "Body");
-            setFontScaling(lblBody, false, 1);
-        }
-
-        // Initialize the panel's layout using a GridBagLayout
-        setName("pnl" + name + "HeaderPanel");
-        final GridBagConstraints layout = new CampaignOptionsGridBagConstraints(this);
-
-        // Configure and add components to the panel
-        layout.gridwidth = 5;
-        layout.gridx = 0;
-        layout.gridy = 0;
-        this.add(lblHeader, layout);
-
-        layout.gridy++;
-        this.add(lblImage, layout);
-
-        if (includeBodyText) {
-            layout.gridy++;
-            layout.gridwidth = 1;
-            this.add(lblBody, layout);
-        }
+    private static Icon headerIcon(String imageAddress, int imageSize, boolean tintImage) {
+        String cacheKey = imageAddress + '|' + imageSize + '|' + tintImage;
+        return HEADER_IMAGE_CACHE.computeIfAbsent(cacheKey, ignored -> {
+            ImageIcon icon = scaleImageIcon(new ImageIcon(imageAddress), imageSize, true);
+            return tintImage ? addTintToImageIcon(icon.getImage(), BLACK) : icon;
+        });
     }
 }

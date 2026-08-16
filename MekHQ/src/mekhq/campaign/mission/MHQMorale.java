@@ -52,11 +52,11 @@ import java.time.LocalDate;
 import megamek.common.rolls.TargetRoll;
 import megamek.logging.MMLogger;
 import mekhq.campaign.Campaign;
-import mekhq.campaign.mission.enums.AtBMoraleLevel;
+import mekhq.campaign.digitalGM.stratCon.StratConCampaignState;
+import mekhq.campaign.mission.enums.ContractMoraleLevel;
 import mekhq.campaign.mission.enums.ScenarioStatus;
 import mekhq.campaign.randomEvents.prisoners.PrisonerEventManager;
 import mekhq.campaign.randomEvents.prisoners.PrisonerMissionEndEvent;
-import mekhq.campaign.stratCon.StratConCampaignState;
 import mekhq.campaign.universe.Faction;
 import mekhq.gui.baseComponents.immersiveDialogs.ImmersiveDialogNotification;
 
@@ -233,29 +233,29 @@ public class MHQMorale {
      * @since 0.50.10
      */
     static MoraleOutcome getMoraleOutcome(AtBContract contract, int roll) {
-        AtBMoraleLevel currentMoraleLevel = contract.getMoraleLevel();
-        AtBMoraleLevel updatedMoraleLevel = currentMoraleLevel;
+        ContractMoraleLevel currentMoraleLevel = contract.getMoraleLevel();
+        ContractMoraleLevel updatedMoraleLevel = currentMoraleLevel;
         MoraleOutcome moraleOutcome;
 
         if (roll <= RALLYING_TARGET_NUMBER) {
             moraleOutcome = MoraleOutcome.RALLYING;
             updatedMoraleLevel = switch (currentMoraleLevel) {
-                case ROUTED -> AtBMoraleLevel.CRITICAL;
-                case CRITICAL -> AtBMoraleLevel.WEAKENED;
-                case WEAKENED -> AtBMoraleLevel.STALEMATE;
-                case STALEMATE -> AtBMoraleLevel.ADVANCING;
-                case ADVANCING -> AtBMoraleLevel.DOMINATING;
-                case DOMINATING, OVERWHELMING -> AtBMoraleLevel.OVERWHELMING;
+                case ROUTED -> ContractMoraleLevel.CRITICAL;
+                case CRITICAL -> ContractMoraleLevel.WEAKENED;
+                case WEAKENED -> ContractMoraleLevel.STALEMATE;
+                case STALEMATE -> ContractMoraleLevel.ADVANCING;
+                case ADVANCING -> ContractMoraleLevel.DOMINATING;
+                case DOMINATING, OVERWHELMING -> ContractMoraleLevel.OVERWHELMING;
             };
         } else if (roll >= WAVERING_TARGET_NUMBER) {
             moraleOutcome = MoraleOutcome.WAVERING;
             updatedMoraleLevel = switch (currentMoraleLevel) {
-                case ROUTED, CRITICAL -> AtBMoraleLevel.ROUTED;
-                case WEAKENED -> AtBMoraleLevel.CRITICAL;
-                case STALEMATE -> AtBMoraleLevel.WEAKENED;
-                case ADVANCING -> AtBMoraleLevel.STALEMATE;
-                case DOMINATING -> AtBMoraleLevel.ADVANCING;
-                case OVERWHELMING -> AtBMoraleLevel.DOMINATING;
+                case ROUTED, CRITICAL -> ContractMoraleLevel.ROUTED;
+                case WEAKENED -> ContractMoraleLevel.CRITICAL;
+                case STALEMATE -> ContractMoraleLevel.WEAKENED;
+                case ADVANCING -> ContractMoraleLevel.STALEMATE;
+                case DOMINATING -> ContractMoraleLevel.ADVANCING;
+                case OVERWHELMING -> ContractMoraleLevel.DOMINATING;
             };
         } else {
             moraleOutcome = MoraleOutcome.UNCHANGED;

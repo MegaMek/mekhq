@@ -739,6 +739,7 @@ public class ImmersiveDialogCore extends JDialog {
         // First pass: Create buttons and determine the largest size
         for (ButtonLabelTooltipPair buttonStrings : buttons) {
             JButton button = null;
+            ResponseButtonMotion responseMotion = buttonStrings.responseMotion();
 
             if (isVerticalLayout) {
                 StringBuilder buttonLabel = new StringBuilder("<html>");
@@ -757,19 +758,19 @@ public class ImmersiveDialogCore extends JDialog {
                     buttonLabel.append(label);
                 }
 
-                button = new TransmissionResponseButton(buttonLabel.toString());
+                button = new TransmissionResponseButton(buttonLabel.toString(), responseMotion);
             } else {
                 String label = buttonStrings.btnLabel();
                 String tooltip = buttonStrings.btnTooltip();
                 if (label != null) {
                     String text = String.format("<html><div style='text-align:center;'>%s</div></html>", label);
-                    button = new TransmissionResponseButton(text);
+                    button = new TransmissionResponseButton(text, responseMotion);
 
                     if (tooltip != null) {
                         button.setToolTipText(wordWrap(tooltip));
                     }
                 } else if (tooltip != null) {
-                    button = new TransmissionResponseButton(tooltip);
+                    button = new TransmissionResponseButton(tooltip, responseMotion);
                 }
             }
 
@@ -1040,7 +1041,7 @@ public class ImmersiveDialogCore extends JDialog {
      * Represents a label-tooltip pair for constructing UI buttons. Each button displays a label and optionally provides
      * a tooltip when hovered.
      */
-    public record ButtonLabelTooltipPair(String btnLabel, String btnTooltip) {
+    public record ButtonLabelTooltipPair(String btnLabel, String btnTooltip, ResponseButtonMotion responseMotion) {
         /**
          * Constructs a ButtonLabelTooltipPair with the given label and tooltip.
          *
@@ -1050,11 +1051,29 @@ public class ImmersiveDialogCore extends JDialog {
          * @throws IllegalArgumentException if both {@code btnLabel} and {@code btnTooltip} are {@code null}.
          */
         public ButtonLabelTooltipPair(String btnLabel, @Nullable String btnTooltip) {
+            this(btnLabel, btnTooltip, ResponseButtonMotion.TRANSMISSION_SCAN);
+        }
+
+        /**
+         * Constructs a ButtonLabelTooltipPair with the given label, tooltip, and response motion.
+         *
+         * @param btnLabel      The label for the button. Can be {@code null} when a tooltip is supplied.
+         * @param btnTooltip    The tooltip for the button. Can be {@code null} when a label is supplied.
+         * @param responseMotion The visual motion used by the button. Must not be {@code null}.
+         *
+         * @throws IllegalArgumentException if both text values or the response motion are {@code null}.
+         */
+        public ButtonLabelTooltipPair(String btnLabel, @Nullable String btnTooltip,
+              ResponseButtonMotion responseMotion) {
             if (btnLabel == null && btnTooltip == null) {
                 throw new IllegalArgumentException("btnLabel and btnTooltip cannot be null at the same time.");
             }
+            if (responseMotion == null) {
+                throw new IllegalArgumentException("responseMotion cannot be null.");
+            }
             this.btnLabel = btnLabel;
             this.btnTooltip = btnTooltip;
+            this.responseMotion = responseMotion;
         }
 
         /**

@@ -51,12 +51,12 @@ import megamek.common.units.Entity;
 import mekhq.MHQConstants;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.ResolveScenarioTracker;
+import mekhq.campaign.digitalGM.stratCon.StratConRulesManager;
 import mekhq.campaign.force.Formation;
 import mekhq.campaign.mission.ObjectiveEffect.EffectScalingType;
 import mekhq.campaign.mission.ObjectiveEffect.ObjectiveEffectType;
 import mekhq.campaign.mission.enums.ScenarioStatus;
 import mekhq.campaign.mission.resupplyAndCaches.Resupply;
-import mekhq.campaign.stratCon.StratConRulesManager;
 import org.apache.logging.log4j.LogManager;
 
 /**

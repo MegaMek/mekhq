@@ -48,11 +48,11 @@ import javax.swing.SpinnerNumberModel;
 import jakarta.annotation.Nonnull;
 import jakarta.annotation.Nullable;
 import mekhq.campaign.parts.enums.PartQuality;
-import mekhq.gui.campaignOptions.components.CampaignOptionsFormPanel;
+import megamek.client.ui.settings.SettingsFormPanel;
 import mekhq.gui.campaignOptions.components.CampaignOptionsHeaderPanel;
 import mekhq.gui.campaignOptions.components.CampaignOptionsLabel;
 import mekhq.gui.campaignOptions.components.CampaignOptionsPagePanel;
-import mekhq.gui.campaignOptions.components.CampaignOptionsPairedFieldGridPanel;
+import megamek.client.ui.settings.SettingsPairedFieldGridPanel;
 import mekhq.gui.campaignOptions.components.CampaignOptionsSpinner;
 
 /**
@@ -68,16 +68,15 @@ import mekhq.gui.campaignOptions.components.CampaignOptionsSpinner;
  * {@link #writeToModel(FinancesOptionsModel)} are no-ops.</p>
  */
 class PriceMultipliersPage {
-    private static final int LABEL_COLUMN_WIDTH = CampaignOptionsFormPanel.DEFAULT_LABEL_WIDTH;
+    private static final int LABEL_COLUMN_WIDTH = SettingsFormPanel.DEFAULT_LABEL_WIDTH;
     private static final int LABEL_CONTROL_GAP = 12;
     // Paired (4-column) grid widths for the Price Multipliers sections. The first
     // pair column is the label column plus
     // the form's label/control gap, so a two-column grid's column 3 sits where the
     // control column of 2-column form
-    // sections does. The following pair is sized so the two-column grid's content
-    // lands on the shared page-width floor
-    // (measured: 312 + 303 -> 640px section). The control width keeps the spinners
-    // uniform.
+        // sections does. The following pair keeps the two-column grid's natural content
+        // within the shared page-width floor (measured: 312 + 303 -> 640px section).
+        // The control width keeps the spinners uniform.
     private static final int GRID_FIRST_PAIR_COLUMN_WIDTH = LABEL_COLUMN_WIDTH + LABEL_CONTROL_GAP;
     private static final int GRID_FOLLOWING_PAIR_COLUMN_WIDTH = 303;
     private static final int GRID_CONTROL_COLUMN_WIDTH = 100;
@@ -328,9 +327,9 @@ class PriceMultipliersPage {
      *
      * @return the assembled paired-field grid panel
      */
-    private @Nonnull CampaignOptionsPairedFieldGridPanel createPriceMultiplierGridPanel(String name, JComponent[] labels,
+    private @Nonnull SettingsPairedFieldGridPanel createPriceMultiplierGridPanel(String name, JComponent[] labels,
             JComponent[] controls) {
-        final CampaignOptionsPairedFieldGridPanel panel = new CampaignOptionsPairedFieldGridPanel(name,
+        final SettingsPairedFieldGridPanel panel = new SettingsPairedFieldGridPanel(name,
                 GRID_FIRST_PAIR_COLUMN_WIDTH,
                 GRID_FOLLOWING_PAIR_COLUMN_WIDTH,
                 GRID_CONTROL_COLUMN_WIDTH,

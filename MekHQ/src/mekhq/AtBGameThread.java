@@ -67,7 +67,9 @@ import megamek.common.units.IAero;
 import megamek.common.units.Infantry;
 import megamek.common.units.UnitType;
 import megamek.logging.MMLogger;
+import mekhq.campaign.digitalGM.stratCon.gm.StratConGMs;
 import mekhq.campaign.enums.CampaignTransportType;
+import mekhq.campaign.Campaign;
 import mekhq.campaign.force.CombatTeam;
 import mekhq.campaign.force.Formation;
 import mekhq.campaign.mission.AtBContract;
@@ -90,6 +92,8 @@ import mekhq.utilities.ScenarioUtils;
 @Deprecated(since = "0.51.0", forRemoval = true)
 public class AtBGameThread extends GameThread {
     private static final MMLogger LOGGER = MMLogger.create(AtBGameThread.class);
+
+    private static final String TRANSPORT_RESOURCE_BUNDLE = "mekhq.resources.AssignForceToTransport";
 
     private final AtBScenario scenario;
     private final BehaviorSettings autoResolveBehaviorSettings;
@@ -177,6 +181,19 @@ public class AtBGameThread extends GameThread {
                 }
 
                 MapSettings mapSettings = ScenarioUtils.getMapSettings(scenario);
+                // StratCon: tune the generated board so it reflects the sector hex being fought on (roads, water,
+                // terrain emphasis, cities), via the active GM's map-generation strategy. Fixed maps are used exactly
+                // as authored, so they are skipped here rather than relying on the generator knobs being ignored
+                // downstream.
+                //
+                // getHasTrack() is what limits this to StratCon. Two things would otherwise pull every AtB scenario in:
+                // AtBScenario.setTerrain() gives each one a random terrainType drawn from the biome map pools, and
+                // StratConGMs falls back to the default StratCon GM even with StratCon switched off - so a plain AtB
+                // board would be handed terrain emphasis and a forced theme chosen from a terrain it never fought on.
+                if (!scenario.isUsingFixedMap() && scenario.getHasTrack()) {
+                    StratConGMs.mapGeneration(app.getCampaign().getCampaignOptions())
+                          .tuneMapSettings(mapSettings, scenario);
+                }
                 client.sendMapSettings(mapSettings);
                 Thread.sleep(MekHQ.getMHQOptions().getStartGameDelay());
 
@@ -527,37 +544,45 @@ public class AtBGameThread extends GameThread {
 
                 // Prompt the player to tow stuff (lowest priority)
                 if (potentialTransports.hasTransports(TOW_TRANSPORT)) {
-                    for (UUID transportId : potentialTransports.getTransports(TOW_TRANSPORT)) {
-                        boolean towUnits = false;
+                    Set<UUID> towTransportIds = potentialTransports.getTransports(TOW_TRANSPORT);
+                    for (UUID transportId : towTransportIds) {
                         Unit transport = campaign.getUnit(transportId);
-
-                        if (transport.hasTransportedUnits(TOW_TRANSPORT)) {
-                            towUnits = (JOptionPane.YES_OPTION ==
-                                              JOptionPane.showConfirmDialog(null,
-                                                    MHQInternationalization.getFormattedTextAt(
-                                                          "mekhq.resources.AssignForceToTransport",
-                                                          "AtBGameThread.loadTransportDialog.TOW_TRANSPORT.text",
-                                                          transport.getName()),
-                                                    MHQInternationalization.getFormattedTextAt(
-                                                          "mekhq.resources.AssignForceToTransport",
-                                                          "AtBGameThread.loadTransportDialog.TOW_TRANSPORT.title"),
-                                                    JOptionPane.YES_NO_OPTION));
+                        if ((transport == null) || (transport.getEntity() == null)) {
+                            continue;
                         }
+
+                        // A train is built once, headed by its lead tractor. Skip units that are
+                        // towed by another transport deployed in this scenario - they are middle
+                        // trailers and get hitched as part of the lead tractor's train.
+                        if (transport.hasTransportAssignment(TOW_TRANSPORT) &&
+                                  towTransportIds.contains(transport.getTransportAssignment(TOW_TRANSPORT)
+                                                                 .getTransport()
+                                                                 .getId())) {
+                            continue;
+                        }
+
+                        List<Integer> orderedTrailerIds = orderedTrainTrailerIds(campaign,
+                              potentialTransports, transportId);
+
+                        if (orderedTrailerIds.isEmpty()) {
+                            continue;
+                        }
+
+                        String towPrompt = MHQInternationalization.getFormattedTextAt(TRANSPORT_RESOURCE_BUNDLE,
+                              "AtBGameThread.loadTransportDialog.TOW_TRANSPORT.text", transport.getName());
+                        String towTitle = MHQInternationalization.getTextAt(TRANSPORT_RESOURCE_BUNDLE,
+                              "AtBGameThread.loadTransportDialog.TOW_TRANSPORT.title");
+                        boolean towUnits = (JOptionPane.YES_OPTION ==
+                                                  JOptionPane.showConfirmDialog(null, towPrompt, towTitle,
+                                                        JOptionPane.YES_NO_OPTION));
 
                         // Now, send the tow commands
                         if (towUnits) {
-                            // Convert the list of Unit UUIDs to MM EntityIds
-                            Unit towedUnit = campaign.getUnit(potentialTransports.getTransportedUnits(TOW_TRANSPORT,
-                                  transportId).getFirst());
-                            if (towedUnit != null && towedUnit.getEntity() != null) {
-                                // And now tow the units.
-                                Utilities.towPlayerTrailers(transport.getEntity().getId(),
-                                      towedUnit.getEntity().getId(),
-                                      client,
-                                      towUnits,
-                                      alreadyResetTransport.contains(transportId));
-                                alreadyResetTransport.add(transportId);
-                            }
+                            Utilities.towPlayerTrailers(transport.getEntity().getId(),
+                                  orderedTrailerIds,
+                                  client,
+                                  alreadyResetTransport.contains(transportId));
+                            alreadyResetTransport.add(transportId);
                         }
                     }
                 }
@@ -625,6 +650,57 @@ public class AtBGameThread extends GameThread {
             }
         }
         return useDropship;
+    }
+
+    /**
+     * Lists the entity ids of every trailer behind the given lead tractor, in hitch order, ready to
+     * hand to a single {@code sendBuildTrain}. A tow train is stored as a linked list - each unit
+     * records only the trailer directly behind it - so the train is read by following those links
+     * hop by hop.
+     *
+     * <p>The walk stops at the first gap (a unit missing from the campaign or with no entity) and at
+     * the first unit it has already seen. That second guard is what bounds the loop: every pass adds
+     * a new id to {@code visitedUnits} or ends the loop, so a save file with a hitch that loops back
+     * on itself returns the trailers it managed to read instead of spinning.</p>
+     *
+     * @param campaign            current campaign
+     * @param potentialTransports transports deployed in this scenario
+     * @param leadTractorId       unit id of the tractor heading the train
+     *
+     * @return trailer entity ids front to back, empty when the tractor is pulling nothing
+     */
+    static List<Integer> orderedTrainTrailerIds(Campaign campaign, PotentialTransportsMap potentialTransports,
+          UUID leadTractorId) {
+        List<Integer> orderedTrailerIds = new ArrayList<>();
+        Set<UUID> visitedUnits = new HashSet<>();
+        visitedUnits.add(leadTractorId);
+
+        for (Unit towedUnit = nextTrailer(campaign, potentialTransports, leadTractorId);
+              (towedUnit != null) && visitedUnits.add(towedUnit.getId());
+              towedUnit = nextTrailer(campaign, potentialTransports, towedUnit.getId())) {
+            orderedTrailerIds.add(towedUnit.getEntity().getId());
+        }
+
+        return orderedTrailerIds;
+    }
+
+    /**
+     * The one trailer hitched directly behind the given unit in this scenario.
+     *
+     * @param campaign            current campaign
+     * @param potentialTransports transports deployed in this scenario
+     * @param unitId              unit whose hitch is being read
+     *
+     * @return the trailer behind it, or null when there is none or it cannot be deployed
+     */
+    private static @Nullable Unit nextTrailer(Campaign campaign, PotentialTransportsMap potentialTransports,
+          UUID unitId) {
+        List<UUID> towedUnitIds = potentialTransports.getTransportedUnits(TOW_TRANSPORT, unitId);
+        if ((towedUnitIds == null) || towedUnitIds.isEmpty()) {
+            return null;
+        }
+        Unit towedUnit = campaign.getUnit(towedUnitIds.getFirst());
+        return ((towedUnit == null) || (towedUnit.getEntity() == null)) ? null : towedUnit;
     }
 
     private BotClient setupPlayerBotForAutoResolve(Player player) throws InterruptedException, PrincessException {

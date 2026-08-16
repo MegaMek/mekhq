@@ -38,6 +38,7 @@ import java.awt.Color;
 import java.awt.GradientPaint;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
+import java.awt.RenderingHints;
 import java.awt.event.FocusAdapter;
 import java.awt.event.FocusEvent;
 import java.awt.event.MouseAdapter;
@@ -46,74 +47,120 @@ import java.awt.geom.RoundRectangle2D;
 import javax.swing.JButton;
 import javax.swing.Timer;
 
-/** Response button with a restrained transmission scan on hover or keyboard focus. */
+/** Response button with selectable transmission motion on hover or keyboard focus. */
 final class TransmissionResponseButton extends JButton {
     private static final int FRAME_DELAY = 16;
     static final long SCAN_NANOS_PER_PIXEL = 14_000_000L;
+    static final long FRAME_TRANSITION_DURATION_NANOS = 200_000_000L;
     private static final double FADE_START_PROGRESS = 0.80;
     private static final int TRAIL_ALPHA = 52;
     private static final int LINE_ALPHA = 112;
     private static final int TRAIL_WIDTH = 48;
+    private static final int CORNER_LENGTH = 12;
+    private static final int FRAME_THICKNESS = 2;
 
-    private final Timer scanTimer;
+    private final ResponseButtonMotion responseMotion;
+    private final Timer animationTimer;
 
     private long scanStartNanos;
     private double scanProgress = 1.0;
     private boolean scanActive;
     private boolean scanForward = true;
     private boolean repeatScan;
+    private long frameTransitionStartNanos;
+    private long frameTransitionDurationNanos;
+    private double frameTransitionStartProgress;
+    private double frameTargetProgress;
+    private double frameProgress;
+    private boolean frameTransitionActive;
+    private boolean pointerActive;
+    private boolean keyboardFocusActive;
 
     TransmissionResponseButton(String text) {
+        this(text, ResponseButtonMotion.TRANSMISSION_SCAN);
+    }
+
+    TransmissionResponseButton(String text, ResponseButtonMotion responseMotion) {
         super(text);
+        if (responseMotion == null) {
+            throw new IllegalArgumentException("responseMotion cannot be null");
+        }
+        this.responseMotion = responseMotion;
         setRolloverEnabled(true);
 
-        scanTimer = new Timer(FRAME_DELAY, event -> advanceScan());
-        scanTimer.setCoalesce(true);
+        animationTimer = new Timer(FRAME_DELAY, event -> advanceAnimation());
+        animationTimer.setCoalesce(true);
+        animationTimer.setRepeats(!usesFrameMotion());
 
         addMouseListener(new MouseAdapter() {
             @Override
             public void mouseEntered(MouseEvent event) {
-                startScan(true, System.nanoTime());
+                if (usesFrameMotion()) {
+                    pointerActive = true;
+                    updateFrameTarget(System.nanoTime());
+                } else {
+                    startScan(true, System.nanoTime());
+                }
             }
 
             @Override
             public void mouseExited(MouseEvent event) {
-                completeScan();
+                if (usesFrameMotion()) {
+                    pointerActive = false;
+                    updateFrameTarget(System.nanoTime());
+                } else {
+                    completeScan();
+                }
             }
         });
         addFocusListener(new FocusAdapter() {
             @Override
             public void focusGained(FocusEvent event) {
-                if (isKeyboardTraversal(event)) {
+                if (usesFrameMotion()) {
+                    keyboardFocusActive = true;
+                    updateFrameTarget(System.nanoTime());
+                } else if (isKeyboardTraversal(event)) {
                     startScan(false, System.nanoTime());
                 }
             }
 
             @Override
             public void focusLost(FocusEvent event) {
-                if (!getModel().isRollover()) {
+                if (usesFrameMotion()) {
+                    keyboardFocusActive = false;
+                    updateFrameTarget(System.nanoTime());
+                } else if (!getModel().isRollover()) {
                     completeScan();
                 }
             }
         });
+        getModel().addChangeListener(event -> {
+            if (usesFrameMotion()) {
+                updateFrameTarget(System.nanoTime());
+            }
+        });
         addPropertyChangeListener("enabled", event -> {
             if (!isEnabled()) {
-                completeScan();
+                resetAnimation();
+            } else if (usesFrameMotion()) {
+                updateFrameForeground();
             }
         });
     }
 
     @Override
     public void removeNotify() {
-        scanTimer.stop();
-        scanActive = false;
-        scanProgress = 1.0;
-        repeatScan = false;
+        resetAnimation();
         super.removeNotify();
     }
 
     @Override
     protected void paintComponent(Graphics graphics) {
+        if (usesFrameMotion()) {
+            paintFrameButton(graphics);
+            return;
+        }
+
         super.paintComponent(graphics);
         if (!scanActive || !isEnabled()) {
             return;
@@ -159,7 +206,7 @@ final class TransmissionResponseButton extends JButton {
     }
 
     void startScan(boolean repeat, long startNanos) {
-        if (!isEnabled()) {
+        if (usesFrameMotion() || !isEnabled()) {
             return;
         }
         if (scanActive) {
@@ -172,12 +219,12 @@ final class TransmissionResponseButton extends JButton {
         repeatScan = repeat;
         scanProgress = 0;
         scanStartNanos = startNanos;
-        scanTimer.start();
+        animationTimer.start();
         repaint();
     }
 
     void completeScan() {
-        scanTimer.stop();
+        animationTimer.stop();
         scanActive = false;
         scanForward = true;
         repeatScan = false;
@@ -233,6 +280,214 @@ final class TransmissionResponseButton extends JButton {
     int getScanTravelDistance() {
         int inset = Math.max(1, scaleForGUI(2));
         return Math.max(1, getWidth() - inset * 2 - 1);
+    }
+
+    ResponseButtonMotion getResponseMotion() {
+        return responseMotion;
+    }
+
+    boolean usesFrameMotion() {
+        return responseMotion != ResponseButtonMotion.TRANSMISSION_SCAN;
+    }
+
+    void applyFrameStyle() {
+        setOpaque(false);
+        setContentAreaFilled(false);
+        setBorderPainted(false);
+        setFocusPainted(false);
+        updateFrameForeground();
+    }
+
+    void setFrameActive(boolean active, long nowNanos) {
+        if (!usesFrameMotion() || !isEnabled()) {
+            return;
+        }
+
+        if (frameTransitionActive) {
+            advanceFrameTransition(nowNanos);
+        }
+
+        double targetProgress = active ? 1.0 : 0.0;
+        if (targetProgress == frameTargetProgress && frameTransitionActive) {
+            return;
+        }
+        if (targetProgress == frameProgress) {
+            frameTargetProgress = targetProgress;
+            frameTransitionActive = false;
+            animationTimer.stop();
+            return;
+        }
+
+        frameTransitionStartProgress = frameProgress;
+        frameTargetProgress = targetProgress;
+        frameTransitionStartNanos = nowNanos;
+        frameTransitionDurationNanos = Math.max(1,
+              Math.round(FRAME_TRANSITION_DURATION_NANOS * Math.abs(frameTargetProgress - frameProgress)));
+        frameTransitionActive = true;
+        animationTimer.restart();
+        repaint();
+    }
+
+    void advanceFrameTransition(long nowNanos) {
+        if (!frameTransitionActive) {
+            return;
+        }
+
+        long elapsedNanos = Math.max(0, nowNanos - frameTransitionStartNanos);
+        double linearProgress = Math.min(1.0, (double) elapsedNanos / frameTransitionDurationNanos);
+        double easedProgress = linearProgress * linearProgress * (3.0 - 2.0 * linearProgress);
+        frameProgress = frameTransitionStartProgress +
+                              (frameTargetProgress - frameTransitionStartProgress) * easedProgress;
+        updateFrameForeground();
+
+        if (linearProgress >= 1.0) {
+            frameProgress = frameTargetProgress;
+            frameTransitionActive = false;
+            animationTimer.stop();
+        }
+        repaint();
+    }
+
+    double getFrameProgress() {
+        return frameProgress;
+    }
+
+    boolean isFrameTransitionRunning() {
+        return frameTransitionActive;
+    }
+
+    boolean isAnimationTimerRunning() {
+        return animationTimer.isRunning();
+    }
+
+    boolean isAnimationTimerRepeating() {
+        return animationTimer.isRepeats();
+    }
+
+    private void advanceAnimation() {
+        if (usesFrameMotion()) {
+            advanceFrameTransition(System.nanoTime());
+            if (frameTransitionActive) {
+                animationTimer.restart();
+            }
+        } else {
+            advanceScan();
+        }
+    }
+
+    private void updateFrameTarget(long nowNanos) {
+        boolean interactionActive = pointerActive || keyboardFocusActive || getModel().isPressed();
+        setFrameActive(interactionActive, nowNanos);
+    }
+
+    private void resetAnimation() {
+        animationTimer.stop();
+        if (usesFrameMotion()) {
+            frameTransitionActive = false;
+            frameTransitionStartProgress = 0.0;
+            frameTargetProgress = 0.0;
+            frameProgress = 0.0;
+            pointerActive = false;
+            keyboardFocusActive = false;
+            updateFrameForeground();
+            repaint();
+        } else {
+            scanActive = false;
+            scanForward = true;
+            repeatScan = false;
+            scanProgress = 1.0;
+            repaint();
+        }
+    }
+
+    private void paintFrameButton(Graphics graphics) {
+        ImmersiveDialogStyle.ResponseButtonColors colors =
+              ImmersiveDialogStyle.getResponseButtonColors(responseMotion);
+        ImmersiveDialogStyle.ResponseButtonStateColors stateColors;
+        double paintProgress;
+        if (!isEnabled()) {
+            stateColors = colors.disabled();
+            paintProgress = 0.0;
+        } else if (getModel().isPressed()) {
+            stateColors = colors.pressed();
+            paintProgress = frameProgress;
+        } else {
+            stateColors = blend(colors.idle(), colors.active(), frameProgress);
+            paintProgress = frameProgress;
+        }
+
+        Graphics2D backgroundGraphics = (Graphics2D) graphics.create();
+        backgroundGraphics.setColor(stateColors.background());
+        backgroundGraphics.fillRect(0, 0, getWidth(), getHeight());
+        backgroundGraphics.dispose();
+
+        super.paintComponent(graphics);
+
+        Graphics2D frameGraphics = (Graphics2D) graphics.create();
+        frameGraphics.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_OFF);
+        frameGraphics.setColor(stateColors.frame());
+        paintCornerFrame(frameGraphics, paintProgress);
+        frameGraphics.dispose();
+    }
+
+    private void paintCornerFrame(Graphics2D graphics, double progress) {
+        int width = getWidth();
+        int height = getHeight();
+        if (width <= 0 || height <= 0) {
+            return;
+        }
+
+        int thickness = Math.min(Math.max(1, scaleForGUI(FRAME_THICKNESS)), Math.min(width, height));
+        int halfWidth = (width + 1) / 2;
+        int halfHeight = (height + 1) / 2;
+        int horizontalCorner = Math.min(scaleForGUI(CORNER_LENGTH), halfWidth);
+        int verticalCorner = Math.min(scaleForGUI(CORNER_LENGTH), halfHeight);
+        int horizontalLength = horizontalCorner +
+                                     (int) Math.round((halfWidth - horizontalCorner) * progress);
+        int verticalLength = verticalCorner +
+                                   (int) Math.round((halfHeight - verticalCorner) * progress);
+
+        graphics.fillRect(0, 0, horizontalLength, thickness);
+        graphics.fillRect(width - horizontalLength, 0, horizontalLength, thickness);
+        graphics.fillRect(0, height - thickness, horizontalLength, thickness);
+        graphics.fillRect(width - horizontalLength, height - thickness, horizontalLength, thickness);
+        graphics.fillRect(0, 0, thickness, verticalLength);
+        graphics.fillRect(width - thickness, 0, thickness, verticalLength);
+        graphics.fillRect(0, height - verticalLength, thickness, verticalLength);
+        graphics.fillRect(width - thickness, height - verticalLength, thickness, verticalLength);
+    }
+
+    private void updateFrameForeground() {
+        if (!usesFrameMotion()) {
+            return;
+        }
+
+        ImmersiveDialogStyle.ResponseButtonColors colors =
+              ImmersiveDialogStyle.getResponseButtonColors(responseMotion);
+        Color foreground = isEnabled()
+                                 ? blend(colors.idle(), colors.active(), frameProgress).foreground()
+                                 : colors.disabled().foreground();
+        if (!foreground.equals(super.getForeground())) {
+            super.setForeground(foreground);
+        }
+    }
+
+    private static ImmersiveDialogStyle.ResponseButtonStateColors blend(
+          ImmersiveDialogStyle.ResponseButtonStateColors idle,
+          ImmersiveDialogStyle.ResponseButtonStateColors active, double progress) {
+        return new ImmersiveDialogStyle.ResponseButtonStateColors(
+              blend(idle.background(), active.background(), progress),
+              blend(idle.foreground(), active.foreground(), progress),
+              blend(idle.frame(), active.frame(), progress));
+    }
+
+    private static Color blend(Color firstColor, Color secondColor, double progress) {
+        double firstWeight = 1.0 - progress;
+        int red = (int) Math.round(firstColor.getRed() * firstWeight + secondColor.getRed() * progress);
+        int green = (int) Math.round(firstColor.getGreen() * firstWeight + secondColor.getGreen() * progress);
+        int blue = (int) Math.round(firstColor.getBlue() * firstWeight + secondColor.getBlue() * progress);
+        int alpha = (int) Math.round(firstColor.getAlpha() * firstWeight + secondColor.getAlpha() * progress);
+        return new Color(red, green, blue, alpha);
     }
 
     private double scanOpacity() {

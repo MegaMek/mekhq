@@ -39,6 +39,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyBoolean;
 import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
@@ -56,14 +57,17 @@ import java.util.Optional;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.JumpPath;
 import mekhq.campaign.LocalHangar;
+import mekhq.campaign.campaignOptions.CampaignOption;
 import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.enums.DragoonRating;
 import mekhq.campaign.finances.Accountant;
 import mekhq.campaign.finances.Money;
 import mekhq.campaign.force.CombatTeam;
 import mekhq.campaign.mission.AtBContract;
-import mekhq.campaign.mission.enums.AtBContractType;
+import mekhq.campaign.mission.enums.ContractObjectiveType;
+import mekhq.campaign.mission.newContract.contractGeneration.targetFinder.EnemySelectionProfile;
 import mekhq.campaign.mission.utilities.ContractUtilities;
+import mekhq.campaign.reputation.camOpsReputation.ForceReputationController;
 import mekhq.campaign.universe.Faction;
 import mekhq.campaign.universe.Factions;
 import mekhq.campaign.universe.PlanetarySystem;
@@ -93,7 +97,7 @@ class AtbMonthlyContractMarketTest {
               MockedStatic<ContractUtilities> contractUtilities = mockStatic(ContractUtilities.class);
               MockedStatic<CombatTeam> combatTeam = mockStatic(CombatTeam.class)) {
             contractTypePicker.when(() -> ContractTypePicker.findMissionType(context.employerFaction, 0))
-                  .thenReturn(AtBContractType.GARRISON_DUTY);
+                  .thenReturn(ContractObjectiveType.GARRISON_DUTY);
             contractUtilities.when(ContractUtilities::calculateVarianceFactor).thenReturn(1.0);
             contractUtilities.when(() -> ContractUtilities.calculateBaseNumberOfRequiredLances(context.campaign,
                         false,
@@ -145,10 +149,10 @@ class AtbMonthlyContractMarketTest {
         private void setupCampaign() {
             CampaignOptions campaignOptions = mock(CampaignOptions.class);
             when(campaignOptions.getContractMaxSalvagePercentage()).thenReturn(100);
+            when(campaignOptions.get(CampaignOption.USE_CHAOS_REPUTATION)).thenReturn(false);
 
-            mekhq.campaign.camOpsReputation.ForceReputationController reputation = mock(mekhq.campaign.camOpsReputation.ForceReputationController.class);
+            ForceReputationController reputation = mock(ForceReputationController.class);
             when(reputation.getReputationFactor()).thenReturn(1.0);
-            when(reputation.getAverageSkillLevel()).thenReturn(REGULAR);
 
             Accountant accountant = mock(Accountant.class);
             when(accountant.getContractBase()).thenReturn(Money.of(1));
@@ -163,7 +167,8 @@ class AtbMonthlyContractMarketTest {
             when(campaign.getLocalDate()).thenReturn(TODAY);
             when(campaign.getGameYear()).thenReturn(GAME_YEAR);
             when(campaign.getCampaignOptions()).thenReturn(campaignOptions);
-            when(campaign.getPlayerForce().getReputation()).thenReturn(reputation);
+            when(campaign.getPlayerForce().getCamOpsReputation()).thenReturn(reputation);
+            when(campaign.getPlayerForce().getAverageSkillLevel(any(), any())).thenReturn(REGULAR);
             when(campaign.getAccountant()).thenReturn(accountant);
             when(campaign.getPlayerForce().getHangar()).thenReturn(hangar);
             when(campaign.getCurrentSystem()).thenReturn(currentSystem);
@@ -210,8 +215,11 @@ class AtbMonthlyContractMarketTest {
 
             RandomFactionGenerator randomFactionGenerator = mock(RandomFactionGenerator.class);
             when(randomFactionGenerator.getFactionHints()).thenReturn(factionHints);
-            when(randomFactionGenerator.getEnemy(EMPLOYER_CODE, true)).thenReturn(ENEMY_CODE);
-            when(randomFactionGenerator.getMissionTarget(anyString(), anyString()))
+            when(randomFactionGenerator.hasAnyTerritory(eq(employerFaction), any(LocalDate.class)))
+                  .thenReturn(true);
+            when(randomFactionGenerator.getRandomEnemy(any(), any(), eq(employerFaction),
+                  any(EnemySelectionProfile.class))).thenReturn(enemyFaction);
+            when(randomFactionGenerator.getMissionTarget(anyString(), anyString(), any(), any()))
                   .thenReturn(UNREACHABLE_TARGET_ID)
                   .thenReturn(REACHABLE_TARGET_ID);
             RandomFactionGenerator.setInstance(randomFactionGenerator);

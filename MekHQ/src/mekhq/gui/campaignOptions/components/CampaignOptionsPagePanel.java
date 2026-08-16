@@ -32,128 +32,46 @@
  */
 package mekhq.gui.campaignOptions.components;
 
-import static megamek.client.ui.util.FlatLafStyleBuilder.setFontScaling;
-import static megamek.client.ui.util.FontHandler.symbolIcon;
-import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.campaignOptionsPanelWidth;
-import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.formatBadges;
+import static java.awt.Color.BLACK;
+import static megamek.utilities.ImageUtilities.addTintToImageIcon;
+import static megamek.utilities.ImageUtilities.scaleImageIcon;
 import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.getCampaignOptionsResourceBundle;
-import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.setSmallSizeVariant;
-import static mekhq.utilities.MHQInternationalization.getTextAt;
+import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.settingsBadges;
 
 import java.awt.BorderLayout;
+import java.awt.Component;
 import java.awt.Dimension;
-import java.awt.FlowLayout;
-import java.awt.GridBagConstraints;
-import java.awt.GridBagLayout;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.ResourceBundle;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.function.Predicate;
-import javax.swing.BorderFactory;
-import javax.swing.JButton;
+import javax.swing.Icon;
+import javax.swing.ImageIcon;
 import javax.swing.JComponent;
-import javax.swing.JEditorPane;
 import javax.swing.JPanel;
 
-import megamek.client.ui.util.UIUtil;
 import jakarta.annotation.Nonnull;
 import jakarta.annotation.Nullable;
-import mekhq.gui.baseComponents.MHQCollapsiblePanel;
+import megamek.client.ui.settings.SettingsPagePanel;
+import megamek.client.ui.settings.SettingsTextProvider;
 import mekhq.gui.campaignOptions.CampaignOptionsMetadata;
 
 /**
- * Standard page shell for Campaign Options screens, assembled through its
- * fluent {@link Builder}.
- *
- * <p>
- * A page stacks, from top to bottom: a {@link CampaignOptionsHeaderPanel}
- * header, an optional intro paragraph, a
- * stack of collapsible {@link MHQCollapsiblePanel} sections (with shared
- * expand/collapse-all controls), and an optional
- * quote footer. Arbitrary components can also be interleaved with the sections.
- * Every sectioned page is floored to a
- * shared width ({@link #uniformSectionStackWidth()}) so the dialog's pages
- * render at a consistent width, while pages
- * whose content is naturally wider keep their size up to the page-width cap.
- * </p>
- *
- * <p>
- * Section titles and summaries are concatenated into
- * {@link #getSectionSearchText()} so the navigation filter can
- * match on a section heading, not only the page title.
- * </p>
+ * MekHQ compatibility adapter for the shared {@link SettingsPagePanel}. It retains the existing Campaign Options
+ * builder conventions while delegating page layout, collapsible sections, details policy, and section search to
+ * MegaMek.
  */
 public class CampaignOptionsPagePanel extends JPanel {
-    private static final int INTRO_HORIZONTAL_PADDING = UIUtil.scaleForGUI(24);
-    private static final int QUOTE_TOP_PADDING = UIUtil.scaleForGUI(12);
-    private static final int QUOTE_BOTTOM_PADDING = UIUtil.scaleForGUI(8);
-    private static final int QUOTE_HORIZONTAL_PADDING = UIUtil.scaleForGUI(24);
     private static final int DEFAULT_HEADER_IMAGE_SIZE = 80;
-    private static int uniformSectionStackWidth() {
-        // Shared minimum width every sectioned page is floored to, so form pages render at a consistent width across
-        // the dialog instead of each page shrinking to its own widest section. Comfortably covers a two-column form
-        // section (label column plus a long right-column control or checkbox) and stays well under the page width cap,
-        // so wider table pages and the 950 cap are unaffected. Resolved on each call (not cached in a static final) so
-        // the pages reflow when the GUI scale changes at runtime.
-        return UIUtil.scaleForGUI(640);
-    }
+    private static final Map<String, Icon> HEADER_IMAGE_CACHE = new HashMap<>();
 
-    private final JPanel pageBody;
-    private final boolean showDetailsPanel;
-    private final String sectionSearchText;
-    private final List<SearchableSection> searchableSections;
+    private final SettingsPagePanel delegate;
 
     private CampaignOptionsPagePanel(Builder builder) {
-        super(null);
-        setName("pnl" + builder.name + "Page");
-        showDetailsPanel = builder.showDetailsPanel;
-
-        pageBody = new JPanel(new BorderLayout());
-        pageBody.setName("pnl" + builder.name + "PageBody");
-        pageBody.setOpaque(false);
-
-        // Render items preserve the order in which sections and raw components were added to the builder, so callers
-        // can place arbitrary components above, between, or below the collapsible sections.
-        List<Object> renderItems = new ArrayList<>();
-        List<MHQCollapsiblePanel> sections = new ArrayList<>();
-        List<SearchableSection> searchableSectionList = new ArrayList<>();
-        StringBuilder searchTextBuilder = new StringBuilder();
-        for (Object bodyItem : builder.bodyItems) {
-            if (bodyItem instanceof Section section) {
-                MHQCollapsiblePanel sectionPanel = createSection(section, builder.sectionsExpandedByDefault);
-                sections.add(sectionPanel);
-                renderItems.add(sectionPanel);
-
-                StringBuilder sectionTextBuilder = new StringBuilder();
-                appendSectionSearchText(sectionTextBuilder, section);
-                String sectionText = sectionTextBuilder.toString().trim();
-                searchableSectionList.add(new SearchableSection(sectionPanel, sectionText));
-                if (!sectionText.isEmpty()) {
-                    searchTextBuilder.append(' ').append(sectionText);
-                }
-            } else if (bodyItem instanceof JComponent component) {
-                renderItems.add(component);
-            }
-        }
-        searchableSections = List.copyOf(searchableSectionList);
-        sectionSearchText = searchTextBuilder.toString().trim();
-        JPanel sectionControls = createSectionControls(sections);
-        int sectionStackWidth = getPreferredSectionStackWidth(sections, sectionControls);
-        if (sectionStackWidth == 0 && builder.standardContentWidth) {
-            // A section-less page (such as a category landing page) would otherwise collapse its intro and quote to
-            // the header width; floor it to the shared page width so it matches the dialog's sectioned pages.
-            sectionStackWidth = uniformSectionStackWidth();
-        }
-
-        JPanel contentPanel = createContentPanel(builder, renderItems, sections, sectionControls, sectionStackWidth);
-        pageBody.add(contentPanel, BorderLayout.CENTER);
-        int quoteWidth = sectionStackWidth > 0 ? sectionStackWidth : contentPanel.getPreferredSize().width;
-        JComponent quotePanel = createQuotePanel(builder.quoteResourceName, quoteWidth);
-        if (quotePanel != null) {
-            pageBody.add(quotePanel, BorderLayout.SOUTH);
-        }
-
-        add(pageBody);
+        super(new BorderLayout());
+        delegate = builder.buildDelegate();
+        setName(delegate.getName());
+        setOpaque(false);
+        add(delegate, BorderLayout.CENTER);
     }
 
     public static @Nonnull Builder builder(@Nonnull String name, @Nonnull String headerResourceName,
@@ -162,370 +80,48 @@ public class CampaignOptionsPagePanel extends JPanel {
     }
 
     public boolean shouldShowDetailsPanel() {
-        return showDetailsPanel;
+        return delegate.shouldShowDetailsPanel();
     }
 
-    /**
-     * Returns the concatenated, resolved title and summary text of every collapsible section on this page. This is used
-     * by the navigation filter so a search can match a section title or summary, not only the page (page) title.
-     *
-     * @return the section search text, or an empty string if the page has no sections
-     */
     public @Nonnull String getSectionSearchText() {
-        return sectionSearchText;
+        return delegate.getSectionSearchText();
     }
 
-    /**
-     * Expands every collapsible section whose title or summary text satisfies the given matcher and collapses the
-     * rest, so a page opened from a navigation search result reveals the matching section instead of opening fully
-     * collapsed. If no section matches (for example, when only the page title matched the search), the page is left
-     * untouched.
-     *
-     * @param sectionTextMatcher tests a section's raw (un-normalized) title and summary text
-     *
-     * @return {@code true} if at least one section matched and the section states were updated
-     */
     public boolean expandSectionsMatching(@Nonnull Predicate<String> sectionTextMatcher) {
-        if (searchableSections.isEmpty()) {
-            return false;
-        }
-
-        boolean[] matches = new boolean[searchableSections.size()];
-        boolean anyMatch = false;
-        for (int index = 0; index < searchableSections.size(); index++) {
-            matches[index] = sectionTextMatcher.test(searchableSections.get(index).searchText());
-            anyMatch |= matches[index];
-        }
-
-        if (!anyMatch) {
-            return false;
-        }
-
-        for (int index = 0; index < searchableSections.size(); index++) {
-            searchableSections.get(index).panel().setExpanded(matches[index]);
-        }
-        return true;
+        return delegate.expandSectionsMatching(sectionTextMatcher);
     }
 
-    /**
-     * Expands every collapsible section on this page. Used as a fallback when a page is opened from a navigation search
-     * whose term matched the page as a whole (such as an internal page name) rather than any single section heading, so
-     * the page is revealed instead of opening fully collapsed.
-     */
     public void expandAllSections() {
-        for (SearchableSection section : searchableSections) {
-            section.panel().setExpanded(true);
-        }
-    }
-
-    /** Pairs a collapsible section with its resolved title and summary text for search-driven expansion. */
-    private record SearchableSection(MHQCollapsiblePanel panel, String searchText) {
-    }
-
-    private static void appendSectionSearchText(StringBuilder builder, Section section) {
-        appendResolvedText(builder, section.titleKey(), section.literal());
-        appendResolvedText(builder, section.summaryKey(), section.literal());
-    }
-
-    private static void appendResolvedText(StringBuilder builder, @Nullable String key, boolean literal) {
-        if (key == null) {
-            return;
-        }
-        String text = literal ? key : getTextAt(getCampaignOptionsResourceBundle(), key);
-        if (text != null && !text.isBlank()) {
-            builder.append(' ').append(text);
-        }
+        delegate.expandAllSections();
     }
 
     @Override
     public @Nonnull Dimension getPreferredSize() {
-        Dimension preferredSize = pageBody.getPreferredSize();
-        return new Dimension(Math.min(preferredSize.width, campaignOptionsPanelWidth()), preferredSize.height);
+        return delegate.getPreferredSize();
     }
 
     @Override
     public @Nonnull Dimension getMinimumSize() {
-        return new Dimension(0, pageBody.getMinimumSize().height);
+        return delegate.getMinimumSize();
     }
 
-    @Override
-    public void doLayout() {
-        Dimension preferredSize = pageBody.getPreferredSize();
-        // Give the page body its full content width, even when that exceeds the viewport. Squeezing the inner
-        // GridBagLayout below its content width makes the section stack collapse to its zero minimum width and the
-        // header text wrap vertically, which wipes the whole page. Letting any overflow clip on the right keeps the
-        // header on one line and the sections visible, which is a far better failure mode than a blank page.
-        int contentWidth = preferredSize.width;
-        int x = Math.max(0, (getWidth() - contentWidth) / 2);
-        pageBody.setBounds(x, 0, contentWidth, preferredSize.height);
-    }
-
-    private JPanel createContentPanel(Builder builder, List<Object> renderItems, List<MHQCollapsiblePanel> sections,
-          JPanel sectionControls, int sectionStackWidth) {
-        CampaignOptionsHeaderPanel header = builder.headerPanel != null ? builder.headerPanel
-              : new CampaignOptionsHeaderPanel(builder.headerResourceName,
-                    builder.imageAddress,
-                    builder.includeHeaderBodyText,
-                    builder.headerImageSize,
-                    builder.tintHeaderImage);
-
-        JPanel panel = new CampaignOptionsStandardPanel(builder.name);
-        GridBagConstraints layout = new CampaignOptionsGridBagConstraints(panel);
-        layout.fill = GridBagConstraints.NONE;
-
-        layout.gridwidth = 1;
-        layout.gridx = 0;
-        layout.gridy = 0;
-        layout.weightx = 0.0;
-        layout.anchor = GridBagConstraints.CENTER;
-        panel.add(header, layout);
-
-        if (builder.introComponent != null || builder.introResourceName != null) {
-            layout.gridy++;
-            int introWidth = sectionStackWidth > 0 ? sectionStackWidth : header.getPreferredSize().width;
-            panel.add(createIntroPanel(builder, introWidth), layout);
-        }
-
-        if (!renderItems.isEmpty()) {
-            layout.gridy++;
-            layout.anchor = GridBagConstraints.NORTHWEST;
-            panel.add(createSectionStackPanel(renderItems, sections, sectionControls, sectionStackWidth), layout);
-        }
-
-        return panel;
-    }
-
-    private JPanel createSectionStackPanel(List<Object> renderItems, List<MHQCollapsiblePanel> sections,
-          JPanel sectionControls, int stackWidth) {
-        JPanel stackPanel = new JPanel(new GridBagLayout()) {
-            @Override
-            public Dimension getPreferredSize() {
-                Dimension preferredSize = super.getPreferredSize();
-                return new Dimension(Math.max(preferredSize.width, stackWidth), preferredSize.height);
-            }
-
-            @Override
-            public Dimension getMinimumSize() {
-                return new Dimension(0, super.getMinimumSize().height);
-            }
-        };
-        stackPanel.setOpaque(false);
-
-        GridBagConstraints layout = new GridBagConstraints();
-        layout.gridx = 0;
-        layout.gridy = -1;
-        layout.weightx = 1.0;
-        layout.fill = GridBagConstraints.HORIZONTAL;
-
-        boolean controlsAdded = false;
-        for (Object renderItem : renderItems) {
-            // The expand/collapse-all controls belong with the sections, so insert them immediately before the first
-            // section. Components placed before any section therefore render above the controls (a top action area),
-            // while components between sections stay inline.
-            if (renderItem instanceof MHQCollapsiblePanel section) {
-                if (!controlsAdded && !sections.isEmpty()) {
-                    layout.gridy++;
-                    layout.anchor = GridBagConstraints.EAST;
-                    stackPanel.add(sectionControls, layout);
-                    controlsAdded = true;
-                }
-                layout.gridy++;
-                layout.anchor = GridBagConstraints.NORTHWEST;
-                stackPanel.add(section, layout);
-            } else if (renderItem instanceof JComponent component) {
-                layout.gridy++;
-                layout.anchor = GridBagConstraints.NORTHWEST;
-                stackPanel.add(component, layout);
-            }
-        }
-
-        return stackPanel;
-    }
-
-    private JPanel createIntroPanel(Builder builder, int textWidth) {
-        int introHorizontalPadding = getIntroHorizontalPadding(textWidth);
-        JPanel introPanel;
-        if (builder.introComponent != null) {
-            introPanel = new JPanel(new BorderLayout());
-            introPanel.setName(builder.name + "Intro");
-            introPanel.setOpaque(false);
-            introPanel.add(builder.introComponent, BorderLayout.CENTER);
-        } else {
-            introPanel = new CampaignOptionsIntroPanel(builder.name + "Intro",
-                getTextAt(getCampaignOptionsResourceBundle(), builder.introResourceName + ".intro"),
-                textWidth - (introHorizontalPadding * 2));
-        }
-        introPanel.setBorder(BorderFactory.createEmptyBorder(0,
-            introHorizontalPadding,
-            0,
-            introHorizontalPadding));
-        return introPanel;
-    }
-
-    private int getIntroHorizontalPadding(int introWidth) {
-        return Math.min(INTRO_HORIZONTAL_PADDING, Math.max(0, (introWidth - 1) / 2));
-    }
-
-    private MHQCollapsiblePanel createSection(Section sectionDefinition, boolean expandedByDefault) {
-        MHQCollapsiblePanel section = new MHQCollapsiblePanel(getSectionTitle(sectionDefinition),
-              sectionDefinition.content);
-        section.setSummary(getSectionSummary(sectionDefinition));
-        section.setExpanded(expandedByDefault);
-
-        // When the content exposes a header control (e.g. an enable toggle), mount it in the section header and mirror
-        // its enabled state onto the title so the section can be read and toggled without expanding it.
-        if (sectionDefinition.content instanceof SectionHeaderControlProvider provider) {
-            section.setTrailingComponent(provider.getSectionHeaderControl());
-            section.setTitleMuted(!provider.isSectionEnabled());
-            provider.setSectionStateListener(() -> section.setTitleMuted(!provider.isSectionEnabled()));
-        }
-
-        return section;
-    }
-
-    private String getSectionTitle(Section sectionDefinition) {
-        String title = sectionDefinition.literal ? sectionDefinition.titleKey
-              : getTextAt(getCampaignOptionsResourceBundle(), sectionDefinition.titleKey);
-        String badges = formatBadges(sectionDefinition.metadata);
-        if (badges.isBlank()) {
-            return title;
-        }
-        // <nobr> keeps the title (which becomes HTML once badges are present) on a single line. Without it an HTML
-        // label only reserves the width of its longest word, so the title would wrap whenever the section content is
-        // narrow, making the header width appear tied to the content width.
-        return "<html><nobr>" + title + badges + "</nobr></html>";
-    }
-
-    private String getSectionSummary(Section sectionDefinition) {
-        if (sectionDefinition.summaryKey == null) {
-            return "";
-        }
-        return sectionDefinition.literal ? sectionDefinition.summaryKey
-              : getTextAt(getCampaignOptionsResourceBundle(), sectionDefinition.summaryKey);
-    }
-
-    private int getPreferredSectionWidth(List<MHQCollapsiblePanel> sections) {
-        int preferredWidth = 0;
-        for (MHQCollapsiblePanel section : sections) {
-            preferredWidth = Math.max(preferredWidth, section.getPreferredSize().width);
-        }
-        return preferredWidth;
-    }
-
-    private int getPreferredSectionStackWidth(List<MHQCollapsiblePanel> sections, JPanel sectionControls) {
-        if (sections.isEmpty()) {
-            return 0;
-        }
-
-        int contentWidth = Math.max(getPreferredSectionWidth(sections), sectionControls.getPreferredSize().width);
-        // Floor every sectioned page to a shared width so form pages render at a
-        // consistent width across the dialog
-        // instead of each page shrinking to its own widest section. Pages whose content
-        // is naturally wider than the
-        // floor (e.g. table-based pages) keep their larger width; this only grows
-        // narrower pages up to the floor, so it
-        // never clips. Tune uniformSectionStackWidth() to adjust the shared width.
-        return Math.max(contentWidth, uniformSectionStackWidth());
-    }
-
-    private JPanel createSectionControls(List<MHQCollapsiblePanel> sections) {
-        // Material Symbols code points (https://fonts.google.com/icons): unfold_more / unfold_less. Collapse is sized
-        // a touch larger so its tighter glyph reads the same as the expand glyph.
-        JButton expandAllButton = createSectionActionButton("btnExpandAll.text", 0xE5D7, 0);
-        expandAllButton.addActionListener(event -> setExpanded(true, sections));
-        JButton collapseAllButton = createSectionActionButton("btnCollapseAll.text", 0xE5D6, UIUtil.scaleForGUI(2));
-        collapseAllButton.addActionListener(event -> setExpanded(false, sections));
-
-        JPanel controls = new JPanel(new FlowLayout(FlowLayout.RIGHT, 5, 0));
-        controls.setOpaque(false);
-        controls.add(expandAllButton);
-        controls.add(collapseAllButton);
-
-        return controls;
-    }
-
-    private JButton createSectionActionButton(String resourceKey, int iconCodePoint, int iconSizeBoost) {
-        JButton button = new JButton(getTextAt(getCampaignOptionsResourceBundle(), resourceKey));
-        setSmallSizeVariant(button);
-        button.setIcon(symbolIcon(iconCodePoint, button.getFont().getSize() + iconSizeBoost,
-              button.getForeground()));
-        return button;
-    }
-
-    private void setExpanded(boolean expanded, List<MHQCollapsiblePanel> sections) {
-        for (MHQCollapsiblePanel section : sections) {
-            section.setExpanded(expanded);
-        }
-    }
-
-    private @Nullable JComponent createQuotePanel(@Nullable String quoteResourceName, int contentWidth) {
-        if (quoteResourceName == null || !ResourceBundle.getBundle(getCampaignOptionsResourceBundle())
-                                           .containsKey(quoteResourceName + ".border")) {
-            return null;
-        }
-
-        int quotePanelWidth = Math.max(1, Math.min(contentWidth, campaignOptionsPanelWidth()));
-        int quoteHorizontalPadding = getQuoteHorizontalPadding(quotePanelWidth);
-        int quoteTextWidth = quotePanelWidth - (quoteHorizontalPadding * 2);
-        JPanel quotePanel = new JPanel(new GridBagLayout());
-        quotePanel.setName("pnl" + quoteResourceName + "QuotePanel");
-        quotePanel.setOpaque(false);
-        quotePanel.setBorder(BorderFactory.createEmptyBorder(QUOTE_TOP_PADDING,
-              quoteHorizontalPadding,
-              QUOTE_BOTTOM_PADDING,
-              quoteHorizontalPadding));
-
-        JEditorPane quote = new JEditorPane("text/html",
-              formatQuoteText(getTextAt(getCampaignOptionsResourceBundle(), quoteResourceName + ".border")));
-        quote.setName("txt" + quoteResourceName + "Quote");
-        quote.setEditable(false);
-        quote.setFocusable(false);
-        quote.setOpaque(false);
-        quote.setBorder(BorderFactory.createEmptyBorder());
-        quote.putClientProperty("JEditorPane.honorDisplayProperties", Boolean.TRUE);
-        setFontScaling(quote, false, 1);
-
-        Dimension quoteSize = getWrappedQuoteSize(quote, quoteTextWidth);
-        quote.setPreferredSize(quoteSize);
-        quote.setMinimumSize(quoteSize);
-
-        GridBagConstraints quoteConstraints = new GridBagConstraints();
-        quoteConstraints.gridx = GridBagConstraints.RELATIVE;
-        quoteConstraints.gridy = GridBagConstraints.RELATIVE;
-        quotePanel.add(quote, quoteConstraints);
-
-        return quotePanel;
-    }
-
-    private int getQuoteHorizontalPadding(int quotePanelWidth) {
-        return Math.min(QUOTE_HORIZONTAL_PADDING, Math.max(0, (quotePanelWidth - 1) / 2));
-    }
-
-    private Dimension getWrappedQuoteSize(JEditorPane quote, int quoteWidth) {
-        quote.setSize(quoteWidth, Short.MAX_VALUE);
-        Dimension preferredSize = quote.getPreferredSize();
-        return new Dimension(quoteWidth, preferredSize.height);
-    }
-
-    private String formatQuoteText(String text) {
-        return "<html><body style='margin: 0; padding: 0; text-align: center;'>" + text + "</body></html>";
-    }
-
+    /** Source-compatible adapter for existing Campaign Options page declarations. */
     public static class Builder {
         private final String name;
         private final String headerResourceName;
         private final String imageAddress;
-        private final List<Object> bodyItems = new ArrayList<>();
+        private String resourceBundleName = getCampaignOptionsResourceBundle();
         private CampaignOptionsHeaderPanel headerPanel;
-        private String quoteResourceName;
-        private String introResourceName;
-        private JComponent introComponent;
         private boolean includeHeaderBodyText;
         private int headerImageSize = DEFAULT_HEADER_IMAGE_SIZE;
         private boolean tintHeaderImage = true;
+        private String introResourceName;
+        private JComponent introComponent;
+        private String quoteResourceName;
         private boolean sectionsExpandedByDefault;
         private boolean showDetailsPanel = true;
         private boolean standardContentWidth;
+        private final java.util.List<BodyItem> bodyItems = new java.util.ArrayList<>();
 
         private Builder(String name, String headerResourceName, String imageAddress) {
             this.name = name;
@@ -538,109 +134,141 @@ public class CampaignOptionsPagePanel extends JPanel {
             return this;
         }
 
-        public Builder headerImageSize(int headerImageSize) {
-            this.headerImageSize = headerImageSize;
+        public Builder headerImageSize(int imageSize) {
+            headerImageSize = imageSize;
             return this;
         }
 
-        public Builder tintHeaderImage(boolean tintHeaderImage) {
-            this.tintHeaderImage = tintHeaderImage;
+        public Builder tintHeaderImage(boolean tint) {
+            tintHeaderImage = tint;
             return this;
         }
 
-        public Builder header(CampaignOptionsHeaderPanel headerPanel) {
-            this.headerPanel = headerPanel;
+        public Builder header(CampaignOptionsHeaderPanel header) {
+            headerPanel = header;
             return this;
         }
 
-        /**
-         * Sets the explainer paragraph shown under the header, resolved from the {@code <name>.intro} resource key.
-         * Mirrors {@link #quote(String)}, which resolves {@code <name>.border}.
-         */
-        public Builder intro(String introResourceName) {
-            this.introResourceName = introResourceName;
+        public Builder resourceBundle(String bundleName) {
+            resourceBundleName = bundleName;
             return this;
         }
 
-        /**
-         * Places the given component in the centered intro area below the header, used instead of {@link
-         * #intro(String)} when the intro needs real Swing controls (such as an icon legend) rather than HTML text.
-         */
-        public Builder introComponent(JComponent introComponent) {
-            this.introComponent = introComponent;
+        public Builder intro(String resourceName) {
+            introResourceName = resourceName;
+            introComponent = null;
             return this;
         }
 
-        /**
-         * Sets the centered quote shown at the foot of the page, resolved from the {@code <name>.border} resource key.
-         * Mirrors {@link #intro(String)}, which resolves {@code <name>.intro}.
-         */
-        public Builder quote(String quoteResourceName) {
-            this.quoteResourceName = quoteResourceName;
+        public Builder introComponent(JComponent component) {
+            introComponent = component;
+            introResourceName = null;
             return this;
         }
 
-        public Builder showDetailsPanel(boolean showDetailsPanel) {
-            this.showDetailsPanel = showDetailsPanel;
+        public Builder quote(String resourceName) {
+            quoteResourceName = resourceName;
             return this;
         }
 
-        /**
-         * Floors a section-less page (such as a category landing page) to the standard page content width, so its
-         * intro and quote render at the same width as the dialog's sectioned pages instead of collapsing to the
-         * header width.
-         */
+        public Builder showDetailsPanel(boolean show) {
+            showDetailsPanel = show;
+            return this;
+        }
+
         public Builder standardContentWidth() {
-            this.standardContentWidth = true;
+            standardContentWidth = true;
             return this;
         }
 
-        public Builder sectionsExpandedByDefault(boolean sectionsExpandedByDefault) {
-            this.sectionsExpandedByDefault = sectionsExpandedByDefault;
+        public Builder sectionsExpandedByDefault(boolean expanded) {
+            sectionsExpandedByDefault = expanded;
             return this;
         }
 
-        public Builder section(String titleKey, String summaryKey, JComponent content) {
+        public Builder section(String titleKey, @Nullable String summaryKey, JComponent content) {
             return section(titleKey, summaryKey, content, null);
         }
 
-        public Builder section(String titleKey, String summaryKey, JComponent content,
+        public Builder section(String titleKey, @Nullable String summaryKey, JComponent content,
               @Nullable CampaignOptionsMetadata metadata) {
-            bodyItems.add(new Section(titleKey, summaryKey, content, metadata, false));
+            bodyItems.add(new SectionItem(titleKey, summaryKey, content, metadata, false));
             return this;
         }
 
-        /**
-         * Adds a collapsible section whose title and summary are used verbatim rather than being resolved through the
-         * campaign options resource bundle. Use this for sections whose titles are only known at runtime (for example,
-         * one section per special ability).
-         *
-         * @param title   the literal section title
-         * @param summary the literal summary shown when the section is collapsed, or {@code null} for none
-         * @param content the section body
-         */
         public Builder literalSection(String title, @Nullable String summary, JComponent content) {
-            bodyItems.add(new Section(title, summary, content, null, true));
+            bodyItems.add(new SectionItem(title, summary, content, null, true));
             return this;
         }
 
-        /**
-         * Adds an arbitrary component to the page body. The component is rendered in the order it was added relative to
-         * sections, so it can sit above, between, or below them.
-         *
-         * @param component the component to add
-         */
         public Builder component(JComponent component) {
-            bodyItems.add(component);
+            bodyItems.add(new ComponentItem(component));
             return this;
         }
 
         public CampaignOptionsPagePanel build() {
             return new CampaignOptionsPagePanel(this);
         }
+
+        private SettingsPagePanel buildDelegate() {
+            SettingsTextProvider textProvider = CampaignOptionsComponentSupport.textProvider(resourceBundleName);
+            SettingsPagePanel.Builder builder = SettingsPagePanel.builder(name, textProvider,
+                  "lbl" + headerResourceName + ".text", headerPanel == null ? headerIcon() : null)
+                  .showDetailsPanel(showDetailsPanel)
+                  .sectionsExpandedByDefault(sectionsExpandedByDefault);
+            if (headerPanel != null) {
+                builder.header(headerPanel);
+            }
+            if (includeHeaderBodyText) {
+                builder.headerBody("lbl" + headerResourceName + "Body.text");
+            }
+            if (introComponent != null) {
+                builder.introComponent(introComponent);
+            } else if (introResourceName != null) {
+                builder.intro(introResourceName + ".intro");
+            }
+            if (quoteResourceName != null) {
+                builder.quote(quoteResourceName + ".border");
+            }
+            if (standardContentWidth) {
+                builder.standardContentWidth();
+            }
+            for (BodyItem bodyItem : bodyItems) {
+                bodyItem.apply(builder);
+            }
+            return builder.build();
+        }
+
+        private Icon headerIcon() {
+            String cacheKey = imageAddress + '|' + headerImageSize + '|' + tintHeaderImage;
+            return HEADER_IMAGE_CACHE.computeIfAbsent(cacheKey, ignored -> {
+                ImageIcon icon = scaleImageIcon(new ImageIcon(imageAddress), headerImageSize, true);
+                return tintHeaderImage ? addTintToImageIcon(icon.getImage(), BLACK) : icon;
+            });
+        }
     }
 
-    private record Section(String titleKey, String summaryKey, JComponent content,
-                           @Nullable CampaignOptionsMetadata metadata, boolean literal) {
+    private sealed interface BodyItem permits SectionItem, ComponentItem {
+        void apply(SettingsPagePanel.Builder builder);
     }
+
+    private record SectionItem(String title, @Nullable String summary, JComponent content,
+                               @Nullable CampaignOptionsMetadata metadata, boolean literal) implements BodyItem {
+        @Override
+        public void apply(SettingsPagePanel.Builder builder) {
+            if (literal) {
+                builder.literalSection(title, summary, content);
+            } else {
+                builder.section(title, summary, content, settingsBadges(metadata));
+            }
+        }
+    }
+
+    private record ComponentItem(JComponent component) implements BodyItem {
+        @Override
+        public void apply(SettingsPagePanel.Builder builder) {
+            builder.component(component);
+        }
+    }
+
 }

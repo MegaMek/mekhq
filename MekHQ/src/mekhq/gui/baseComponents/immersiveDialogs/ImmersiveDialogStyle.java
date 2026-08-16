@@ -68,6 +68,14 @@ final class ImmersiveDialogStyle {
     private static final Color LIGHT_THEME_SIGNAL = new Color(23, 112, 112);
     private static final Color DARK_THEME_INFORMATION = new Color(235, 177, 76);
     private static final Color LIGHT_THEME_INFORMATION = new Color(150, 92, 16);
+    private static final Color MEKBAY_IDLE_BACKGROUND = new Color(40, 40, 40, 128);
+    private static final Color MEKBAY_ACTIVE_BACKGROUND = new Color(61, 61, 61);
+    private static final Color MEKBAY_PRESSED_BACKGROUND = new Color(74, 74, 74);
+    private static final Color MEKBAY_IDLE_TEXT = new Color(187, 187, 187);
+    private static final Color MEKBAY_IDLE_FRAME = new Color(102, 102, 102);
+    private static final Color MEKBAY_DISABLED_BACKGROUND = new Color(40, 40, 40, 80);
+    private static final Color MEKBAY_DISABLED_TEXT = new Color(119, 119, 119);
+    private static final Color MEKBAY_DISABLED_FRAME = new Color(85, 85, 85);
     private static final int FRAME_PADDING = scaleForGUI(10);
     private static final int SECTION_GAP = scaleForGUI(6);
     private static final int CORNER_CUT = scaleForGUI(11);
@@ -154,6 +162,11 @@ final class ImmersiveDialogStyle {
     }
 
     static void applyResponseButtonStyle(JButton button) {
+        if (button instanceof TransmissionResponseButton responseButton && responseButton.usesFrameMotion()) {
+            responseButton.applyFrameStyle();
+            return;
+        }
+
         Color signalColor = getSignalColor();
         button.setFocusable(true);
         button.setFocusPainted(true);
@@ -197,6 +210,38 @@ final class ImmersiveDialogStyle {
     static Color getInformationColor() {
         return isDarkTheme() ? DARK_THEME_INFORMATION : LIGHT_THEME_INFORMATION;
     }
+
+        static ResponseButtonColors getResponseButtonColors(ResponseButtonMotion motion) {
+          return switch (motion) {
+            case MEKBAY_REFERENCE -> new ResponseButtonColors(
+                new ResponseButtonStateColors(MEKBAY_IDLE_BACKGROUND, MEKBAY_IDLE_TEXT, MEKBAY_IDLE_FRAME),
+                new ResponseButtonStateColors(MEKBAY_ACTIVE_BACKGROUND, Color.WHITE, Color.WHITE),
+                new ResponseButtonStateColors(MEKBAY_PRESSED_BACKGROUND, Color.WHITE, Color.WHITE),
+                new ResponseButtonStateColors(MEKBAY_DISABLED_BACKGROUND,
+                    MEKBAY_DISABLED_TEXT,
+                    MEKBAY_DISABLED_FRAME));
+            case MEKHQ_SIGNAL -> {
+                Color panelColor = getPanelColor();
+                Color surfaceColor = getSurfaceColor();
+                Color signalColor = getSignalColor();
+                Color labelColor = getLabelColor();
+                yield new ResponseButtonColors(
+                    new ResponseButtonStateColors(withAlpha(surfaceColor, 190),
+                        mix(labelColor, signalColor, 0.18f),
+                        getSubtleSignalColor()),
+                    new ResponseButtonStateColors(mix(surfaceColor, signalColor, 0.16f),
+                        signalColor,
+                        signalColor),
+                    new ResponseButtonStateColors(mix(surfaceColor, signalColor, 0.27f),
+                        signalColor,
+                        signalColor),
+                    new ResponseButtonStateColors(withAlpha(surfaceColor, 120),
+                        mix(panelColor, labelColor, 0.36f),
+                        mix(panelColor, signalColor, 0.20f)));
+            }
+            case TRANSMISSION_SCAN -> throw new IllegalArgumentException("Transmission scan does not use frame colors");
+          };
+        }
 
     private static JLabel createTechnicalLabel(String text, Color color, float sizeAdjustment) {
         JLabel label = new JLabel(text);
@@ -247,6 +292,13 @@ final class ImmersiveDialogStyle {
 
     private static Color withAlpha(Color color, int alpha) {
         return new Color(color.getRed(), color.getGreen(), color.getBlue(), alpha);
+    }
+
+    record ResponseButtonStateColors(Color background, Color foreground, Color frame) {
+    }
+
+    record ResponseButtonColors(ResponseButtonStateColors idle, ResponseButtonStateColors active,
+          ResponseButtonStateColors pressed, ResponseButtonStateColors disabled) {
     }
 
     private static Path2D createAngularFrame(float left, float top, float right, float bottom) {

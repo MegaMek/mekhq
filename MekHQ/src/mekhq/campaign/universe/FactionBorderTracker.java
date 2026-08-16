@@ -50,6 +50,7 @@ import megamek.common.event.Subscribe;
 import megamek.logging.MMLogger;
 import mekhq.campaign.events.LocationChangedEvent;
 import mekhq.campaign.events.NewDayEvent;
+import mekhq.campaign.location.ILocation;
 
 /**
  * Checks all planets within a given region of space and can report which factions control one or more planets in the
@@ -87,6 +88,8 @@ public class FactionBorderTracker {
     private final ExecutorService executor = Executors.newSingleThreadExecutor();
     private volatile boolean invalid = true;
     private volatile boolean cancelTask = false;
+
+    private final Map<SystemsNearKey, List<PlanetarySystem>> systemsNearCache = new HashMap<>();
 
     /**
      * Constructs a FactionBorderTracker with the default region of a 1000 ly radius around Terra.
@@ -213,6 +216,32 @@ public class FactionBorderTracker {
     }
 
     /**
+     * Retrieves a {@code Set} of all factions that control at least one planet within {@code radius} light years of
+     * {@code location}'s current system, computed fresh rather than from this tracker's persistently cached region. See
+     * {@link #getBorders(Faction, ILocation, double)} for why this exists.
+     *
+     * @param location the location to center the search on
+     * @param radius   the search radius in light years from {@code location}'s current system; a negative radius
+     *                 includes every system returned by {@link #getSystemList()}
+     *
+     * @return a {@code Set} of the factions present near {@code location}, or an empty set if {@code location} has no
+     *       current system
+     */
+    public Set<Faction> getFactionsInRegion(ILocation location, double radius) {
+        PlanetarySystem origin = location.getCurrentSystem();
+        if (origin == null) {
+            return Collections.emptySet();
+        }
+
+        LocalDate when = currentDate();
+        Set<Faction> factions = new HashSet<>();
+        for (PlanetarySystem system : systemsNear(origin, radius)) {
+            factions.addAll(system.getFactionSet(when));
+        }
+        return factions;
+    }
+
+    /**
      * Retrieves a FactionBorders object for the given faction.
      * <p>
      * If the borders are being recalculated, this method may block until the calculation is complete. If the change
@@ -303,6 +332,142 @@ public class FactionBorderTracker {
     }
 
     /**
+     * Computes {@link FactionBorders} for the given faction restricted to systems within {@code radius} light years of
+     * {@code location}'s current system. Unlike {@link #getBorders(Faction)}, this is computed fresh on every call and
+     * never blocks or touches this tracker's cached region &mdash; useful for campaigns with multiple simultaneous
+     * locations (e.g. one per active force), where no single point can stand in for a "current location."
+     *
+     * @param faction  the faction to calculate borders for
+     * @param location the location to center the search on
+     * @param radius   the search radius in light years from {@code location}'s current system; a negative radius
+     *                 includes every system returned by {@link #getSystemList()}
+     *
+     * @return a {@link FactionBorders} instance for the faction restricted to systems near {@code location}, or
+     *       {@code null} if {@code location} has no current system or the faction controls nothing in range
+     */
+    public @Nullable FactionBorders getBorders(Faction faction, ILocation location, double radius) {
+        PlanetarySystem origin = location.getCurrentSystem();
+        if (origin == null) {
+            return null;
+        }
+
+        FactionBorders result = new FactionBorders(faction, currentDate(), systemsNear(origin, radius));
+        return result.getSystems().isEmpty() ? null : result;
+    }
+
+    /**
+     * Equivalent to {@link #getBorders(Faction, ILocation, double)} using this tracker's configured
+     * {@link #getRadius()} as the search radius.
+     *
+     * @param faction  the faction to calculate borders for
+     * @param location the location to center the search on
+     *
+     * @return a {@link FactionBorders} instance for the faction restricted to systems near {@code location}, or
+     *       {@code null} if {@code location} has no current system or the faction controls nothing in range
+     */
+    public @Nullable FactionBorders getBorders(Faction faction, ILocation location) {
+        return getBorders(faction, location, getRadius());
+    }
+
+    /**
+     * Equivalent to {@link #getBorderSystems(Faction, Faction)}, but computed fresh around an arbitrary location within
+     * {@code radius} light years, rather than this tracker's persistently cached, single-centered region. See
+     * {@link #getBorders(Faction, ILocation, double)} for why this exists.
+     *
+     * @param self     the faction whose planets are used to test proximity
+     * @param other    the faction whose planets are added to the returned list if they are within a certain distance
+     * @param location the location to center the search on
+     * @param radius   the search radius in light years from {@code location}'s current system; a negative radius
+     *                 includes every system returned by {@link #getSystemList()}
+     *
+     * @return a list of all planets near {@code location} that are controlled by {@code other} and considered to be
+     *       within the border region, or an empty list if {@code location} has no current system
+     */
+    public List<PlanetarySystem> getBorderSystems(Faction self, Faction other, ILocation location, double radius) {
+        return getBorderSystems(self, other, location, radius, Math.max(getBorderSize(self), getBorderSize(other)));
+    }
+
+    /**
+     * Equivalent to {@link #getBorderSystems(Faction, Faction, ILocation, double)}, but with an explicitly supplied
+     * border size instead of the standard per-faction sizes &mdash; e.g. for raids that reach deeper past the front
+     * line than a conventional border does.
+     *
+     * @param self       the faction whose planets are used to test proximity
+     * @param other      the faction whose planets are added to the returned list if they are within a certain distance
+     * @param location   the location to center the search on
+     * @param radius     the search radius in light years from {@code location}'s current system; a negative radius
+     *                   includes every system returned by {@link #getSystemList()}
+     * @param borderSize the distance in light years from one of {@code self}'s systems within which one of
+     *                   {@code other}'s systems counts as a border system
+     *
+     * @return a list of all planets near {@code location} that are controlled by {@code other} and considered to be
+     *       within the border region, or an empty list if {@code location} has no current system
+     */
+    public List<PlanetarySystem> getBorderSystems(Faction self, Faction other, ILocation location, double radius,
+          double borderSize) {
+        PlanetarySystem origin = location.getCurrentSystem();
+        if (origin == null) {
+            return Collections.emptyList();
+        }
+
+        List<PlanetarySystem> nearby = systemsNear(origin, radius);
+        LocalDate when = currentDate();
+        FactionBorders selfBorders = new FactionBorders(self, when, nearby);
+        FactionBorders otherBorders = new FactionBorders(other, when, nearby);
+        return selfBorders.getBorderSystems(otherBorders, borderSize);
+    }
+
+    /**
+     * Checks whether the given faction controls at least one system anywhere in {@link #getSystemList()}, stopping at
+     * the first match. An uncached linear scan, intended for rare candidates (e.g. a war partner with no presence in
+     * the cached region) rather than as a routine per-faction query.
+     *
+     * @param faction the faction to check
+     * @param date    the date to check faction control against
+     *
+     * @return {@code true} if the faction controls at least one known system on the given date
+     */
+    public boolean controlsAnySystem(Faction faction, LocalDate date) {
+        for (PlanetarySystem system : getSystemList()) {
+            if (system.getFactionSet(date).contains(faction)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    /**
+     * @return the systems from {@link #getSystemList()} within {@code radius} light years of {@code origin}; a negative
+     *       radius returns every system
+     *       <p>Callers routinely repeat the exact same (origin, radius) query several times in quick succession
+     *       (e.g. several
+     *       {@link #getBorders(Faction, ILocation, double)}/{@link #getBorderSystems(Faction, Faction, ILocation,
+     *       double)} calls within one {@code MissionTargetFinder.find()}, or {@code RandomFactionGenerator} selecting
+     *       an employer then an enemy for the same location) &mdash; since the result depends only on the (stable,
+     *       session-lifetime) system list's geometry and never on campaign date, each distinct (origin, radius) result
+     *       is cached to skip re-scanning the whole system list each time.</p>
+     */
+    public synchronized List<PlanetarySystem> systemsNear(PlanetarySystem origin, double radius) {
+        return systemsNearCache.computeIfAbsent(new SystemsNearKey(origin, radius), key -> {
+            List<PlanetarySystem> nearby = new ArrayList<>();
+            for (PlanetarySystem system : getSystemList()) {
+                if ((radius < 0) || (system.getDistanceTo(origin) <= radius)) {
+                    nearby.add(system);
+                }
+            }
+            return nearby;
+        });
+    }
+
+    /**
+     * @return the tracker's current campaign date, kept up to date by {@link #setDate(LocalDate)} independently of the
+     *       background recalculation thread
+     */
+    private synchronized LocalDate currentDate() {
+        return now;
+    }
+
+    /**
      * Sets the distance threshold for blocking recalculations. If the size or position of the bounding hex is changed
      * by more than this distance, methods that access calculated border data will block until the calculation is
      * complete. Any distance less than this is considered close enough that the previous data is accurate enough.
@@ -387,11 +552,15 @@ public class FactionBorderTracker {
      *
      * @see #setDefaultBorderSize(double, double, double)
      */
-    public void setBorderSize(Faction faction, double borderSize) {
-        if (borderSize >= 0) {
-            factionBorderSize.put(faction, borderSize);
-        } else {
-            factionBorderSize.remove(faction);
+    public synchronized void setBorderSize(Faction faction, double borderSize) {
+        Double previous = (borderSize >= 0)
+                                ? factionBorderSize.put(faction, borderSize)
+                                : factionBorderSize.remove(faction);
+        double effectivePrevious = (previous != null) ? previous : getDefaultBorderSize(faction);
+        double effectiveNew = (borderSize >= 0) ? borderSize : getDefaultBorderSize(faction);
+        if (Math.abs(effectivePrevious - effectiveNew) > RegionPerimeter.EPSILON) {
+            invalid = true;
+            recalculate();
         }
     }
 
@@ -403,10 +572,17 @@ public class FactionBorderTracker {
      * @param periphery Default border size for Periphery factions
      * @param clan      Default border size for Clan factions
      */
-    public void setDefaultBorderSize(double is, double periphery, double clan) {
+    public synchronized void setDefaultBorderSize(double is, double periphery, double clan) {
+        boolean changed = (Math.abs(isBorderSize - is) > RegionPerimeter.EPSILON)
+                                || (Math.abs(peripheryBorderSize - periphery) > RegionPerimeter.EPSILON)
+                                || (Math.abs(clanBorderSize - clan) > RegionPerimeter.EPSILON);
         isBorderSize = is;
         peripheryBorderSize = periphery;
         clanBorderSize = clan;
+        if (changed) {
+            invalid = true;
+            recalculate();
+        }
     }
 
     /**
@@ -422,7 +598,7 @@ public class FactionBorderTracker {
      *
      * @return A collection of all available planets.
      */
-    protected Collection<PlanetarySystem> getSystemList() {
+    public Collection<PlanetarySystem> getSystemList() {
         return Systems.getInstance().getSystems().values();
     }
 
@@ -526,6 +702,16 @@ public class FactionBorderTracker {
             recalculate();
         }
     }
+
+    /**
+     * Cache key for {@link #systemsNear(PlanetarySystem, double)}: a specific (origin, radius) query. Results depend
+     * only on the (stable, session-lifetime) system list's geometry and never on campaign date, so a cached entry stays
+     * valid for the tracker's lifetime.
+     *
+     * @param origin the system the search is centered on
+     * @param radius the search radius in light years; a negative radius matches every system
+     */
+    private record SystemsNearKey(PlanetarySystem origin, double radius) {}
 
     /**
      * Class for the region bounding hex.

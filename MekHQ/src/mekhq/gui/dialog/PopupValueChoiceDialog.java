@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2013-2025 The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2013-2026 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -59,7 +59,12 @@ public class PopupValueChoiceDialog extends JDialog implements WindowListener {
     // Variable Declarations
     private JButton btnDone;
     private JSpinner value;
+    private boolean wasCanceled = false;
     private final SpinnerNumberModel model;
+
+    public boolean wasCanceled() {
+        return wasCanceled;
+    }
 
     /**
      * This was originally set up as a text entry dialog, but there is really no reason to use it instead of the pre-fab
@@ -126,12 +131,12 @@ public class PopupValueChoiceDialog extends JDialog implements WindowListener {
     }
 
     private void btnDoneActionPerformed(ActionEvent evt) {
-        this.setVisible(false);
+        this.dispose();
     }
 
     private void btnCancelActionPerformed(ActionEvent evt) {
-        value.getModel().setValue(-1);
-        this.setVisible(false);
+        this.wasCanceled = true;
+        dispose();
     }
 
     /**
@@ -167,8 +172,8 @@ public class PopupValueChoiceDialog extends JDialog implements WindowListener {
     @Override
     public void windowClosing(WindowEvent evt) {
         if (evt.getComponent() != this.btnDone) {
-            value.getModel().setValue(-1);
-            this.setVisible(false);
+            wasCanceled = true;
+            this.dispose();
         }
     }
 
