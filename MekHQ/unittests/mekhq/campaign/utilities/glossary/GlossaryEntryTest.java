@@ -35,15 +35,22 @@ package mekhq.campaign.utilities.glossary;
 import static mekhq.utilities.MHQInternationalization.isResourceKeyValid;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertSame;
 
 import java.util.List;
 import java.util.Objects;
+import java.util.Locale;
 
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.EnumSource;
 
 class GlossaryEntryTest {
+    private static final java.util.regex.Pattern HTML_TAG_PATTERN = java.util.regex.Pattern.compile("</?[a-zA-Z][^>]*>");
+    
+
     @ParameterizedTest
     @EnumSource(GlossaryEntry.class)
     void testAllEntriesHaveValidTitle(GlossaryEntry entry) {
@@ -84,5 +91,35 @@ class GlossaryEntryTest {
                                           .toList();
 
         assertEquals(lookUpNames.size(), uniqueTitles.size(), "Titles are not unique.");
+    }
+
+    @ParameterizedTest
+    @EnumSource(GlossaryEntry.class)
+    void testGetSearchableTextReturnsNonEmptyLowercaseText(GlossaryEntry entry) {
+        String searchableText = entry.getSearchableText();
+
+        assertNotNull(searchableText, "Searchable text for " + entry.name() + " was null.");
+        assertTrue(!searchableText.isBlank(), "Searchable text for " + entry.name() + " was blank.");
+        assertEquals(searchableText, searchableText.toLowerCase(Locale.ROOT),
+            "Searchable text for " + entry.name() + " was not fully lower-cased.");
+    }
+
+    @ParameterizedTest
+    @EnumSource(GlossaryEntry.class)
+    void testGetSearchableTextStripsHtmlTags(GlossaryEntry entry) {
+        String searchableText = entry.getSearchableText();
+
+        assertFalse(HTML_TAG_PATTERN.matcher(searchableText).find(),
+            "Searchable text for " + entry.name() + " still contains an HTML tag: " + searchableText);
+    }
+
+    @ParameterizedTest
+    @EnumSource(GlossaryEntry.class)
+    void testGetSearchableTextIsCachedBetweenCalls(GlossaryEntry entry) {
+        String first = entry.getSearchableText();
+        String second = entry.getSearchableText();
+
+        assertSame(first, second,
+            "getSearchableText() for " + entry.name() + " did not return a cached instance.");
     }
 }

@@ -35,6 +35,7 @@ package mekhq.campaign.utilities.glossary;
 import static mekhq.utilities.MHQInternationalization.isResourceKeyValid;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assertions.fail;
 
@@ -109,6 +110,39 @@ class DocumentationEntryTest {
             assertTrue(pdf.getNumberOfPages() > 0, "PDF has no pages: " + fileAddress);
         } catch (IOException e) {
             fail("File '" + fileAddress + "' could not be opened as a PDF. Exception: " + e.getMessage());
+        }
+    }
+
+    @ParameterizedTest
+    @EnumSource(DocumentationEntry.class)
+    void testGetSearchableTextReturnsNonEmptyLowercaseText(DocumentationEntry entry) {
+        String searchableText = entry.getSearchableText();
+
+        assertNotNull(searchableText, "Searchable text for " + entry.name() + " was null.");
+        assertTrue(!searchableText.isBlank(), "Searchable text for " + entry.name() + " was blank.");
+        assertEquals(searchableText, searchableText.toLowerCase(java.util.Locale.ROOT),
+            "Searchable text for " + entry.name() + " was not fully lower-cased.");
+    }
+
+    @ParameterizedTest
+    @EnumSource(DocumentationEntry.class)
+    void testGetSearchableTextIsCachedBetweenCalls(DocumentationEntry entry) {
+        String first = entry.getSearchableText();
+        String second = entry.getSearchableText();
+
+        // computeIfAbsent should only extract once; subsequent calls return the same cached instance
+        // rather than re-parsing the PDF.
+        assertSame(first, second, "getSearchableText() for " + entry.name() + " did not return a cached instance.");
+    }
+
+    @Test
+    void testPreloadSearchableTextPopulatesEveryEntry() {
+        DocumentationEntry.preloadSearchableText();
+
+        for (DocumentationEntry entry : DocumentationEntry.values()) {
+            String searchableText = entry.getSearchableText();
+            assertNotNull(searchableText, "Preload left null searchable text for " + entry.name());
+            assertTrue(!searchableText.isBlank(), "Preload left blank searchable text for " + entry.name());
         }
     }
 }
