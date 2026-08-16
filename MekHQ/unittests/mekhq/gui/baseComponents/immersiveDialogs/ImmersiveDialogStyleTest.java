@@ -32,8 +32,10 @@
  */
 package mekhq.gui.baseComponents.immersiveDialogs;
 
+import static megamek.client.ui.util.UIUtil.scaleForGUI;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
@@ -45,10 +47,10 @@ import java.awt.Graphics2D;
 import java.awt.Insets;
 import java.awt.image.BufferedImage;
 import java.util.Map;
-import javax.swing.BorderFactory;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JComponent;
+import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JSpinner;
 import javax.swing.SwingUtilities;
@@ -98,6 +100,19 @@ class ImmersiveDialogStyleTest {
     }
 
     @Test
+    void responseSectionHeaderKeepsTitleAndRuleWithoutStatus() throws Exception {
+        SwingUtilities.invokeAndWait(() -> {
+            JPanel header = ImmersiveDialogStyle.createSectionHeader("RESPONSE", Color.CYAN);
+            java.awt.BorderLayout layout = (java.awt.BorderLayout) header.getLayout();
+
+            assertEquals("RESPONSE",
+                  ((JLabel) layout.getLayoutComponent(java.awt.BorderLayout.WEST)).getText());
+            assertNotNull(layout.getLayoutComponent(java.awt.BorderLayout.CENTER));
+            assertNull(layout.getLayoutComponent(java.awt.BorderLayout.EAST));
+        });
+    }
+
+    @Test
     void centralSectionsUseUniformSpacing() throws Exception {
         SwingUtilities.invokeAndWait(() -> {
             Insets insets = ImmersiveDialogStyle.createSectionSpacingBorder().getBorderInsets(new JPanel());
@@ -110,15 +125,26 @@ class ImmersiveDialogStyleTest {
     }
 
     @Test
-    void framedPanelLeavesCutCornersTransparent() throws Exception {
+    void angularSurfaceKeepsExpectedPaddingFillAndOutline() throws Exception {
         SwingUtilities.invokeAndWait(() -> {
-            JPanel panel = ImmersiveDialogStyle.createFramedPanel();
-            panel.setBorder(BorderFactory.createEmptyBorder());
-            panel.setSize(100, 60);
+            JPanel panel = ImmersiveDialogStyle.createAngularSurfacePanel();
+            int width = scaleForGUI(140);
+            int height = scaleForGUI(60);
+            panel.setSize(width, height);
 
-            BufferedImage image = render(panel, 100, 60);
-            assertEquals(0, new Color(image.getRGB(99, 0), true).getAlpha());
-            assertTrue(new Color(image.getRGB(50, 30), true).getAlpha() > 0);
+            Insets insets = panel.getBorder().getBorderInsets(panel);
+            assertEquals(scaleForGUI(10) + scaleForGUI(1), insets.top);
+            assertEquals(insets.top, insets.left);
+            assertEquals(insets.top, insets.bottom);
+            assertEquals(insets.top, insets.right);
+
+            BufferedImage image = render(panel, width, height);
+            int formerAccentPixel = image.getRGB(scaleForGUI(20), 0);
+            int regularOutlinePixel = image.getRGB(scaleForGUI(100), 0);
+            assertEquals(0, new Color(image.getRGB(width - 1, 0), true).getAlpha());
+            assertTrue(new Color(image.getRGB(width / 2, height / 2), true).getAlpha() > 0);
+            assertNotEquals(image.getRGB(width / 2, height / 2), regularOutlinePixel);
+            assertEquals(regularOutlinePixel, formerAccentPixel);
         });
     }
 
@@ -139,6 +165,37 @@ class ImmersiveDialogStyleTest {
             assertNotNull(styleMap.get("hoverBackground"));
             assertNotNull(styleMap.get("pressedBackground"));
         });
+    }
+
+    @Test
+    void frameResponseButtonsRemainFocusable() throws Exception {
+        SwingUtilities.invokeAndWait(() -> {
+            TransmissionResponseButton button =
+                  new TransmissionResponseButton("Respond", ResponseButtonMotion.MEKHQ_SIGNAL);
+            button.setFocusable(false);
+
+            ImmersiveDialogStyle.applyResponseButtonStyle(button);
+
+            assertTrue(button.isFocusable());
+        });
+    }
+
+    @Test
+    void commanderSourceUsesCommandLabel() {
+        assertEquals("ImmersiveDialog.source.command",
+              ImmersiveDialogCore.resolveSourceLabelResourceKey(true, true));
+    }
+
+    @Test
+    void internalSourceUsesUnitChannelLabel() {
+        assertEquals("ImmersiveDialog.source.unitChannel",
+              ImmersiveDialogCore.resolveSourceLabelResourceKey(false, true));
+    }
+
+    @Test
+    void externalSourceUsesFieldContactLabel() {
+        assertEquals("ImmersiveDialog.source.fieldContact",
+              ImmersiveDialogCore.resolveSourceLabelResourceKey(false, false));
     }
 
     @Test

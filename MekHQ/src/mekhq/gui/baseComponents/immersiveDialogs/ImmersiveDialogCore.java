@@ -122,6 +122,7 @@ public class ImmersiveDialogCore extends JDialog {
     private final Person leftSpeaker;
     private final Person rightSpeaker;
     private final TransmissionSignalQuality signalQuality;
+    private final ResponseActivationController responseActivationController;
 
     private JSpinner spinner;
     private int spinnerValue;
@@ -143,6 +144,8 @@ public class ImmersiveDialogCore extends JDialog {
      *
      * @return An integer representing the index of the button selected by the user. If the dialog is closed without
      *       selection, this will return the {@code defaultChoiceIndex} defined during construction.
+    *       Response activation stores this choice and any supplemental control values before the brief transmission
+    *       confirmation; a modal constructor returns after that confirmation closes the dialog.
      */
     public int getDialogChoice() {
         return dialogChoice;
@@ -261,7 +264,8 @@ public class ImmersiveDialogCore extends JDialog {
         this.campaign = campaign;
         this.leftSpeaker = leftSpeaker;
         this.rightSpeaker = rightSpeaker;
-          this.signalQuality = signalQuality;
+        this.signalQuality = signalQuality;
+                    responseActivationController = new ResponseActivationController(this::dispose);
 
         CENTER_WIDTH = (centerWidth != null) ? centerWidth : CENTER_WIDTH;
 
@@ -298,7 +302,7 @@ public class ImmersiveDialogCore extends JDialog {
         // Left box for speaker details
         if (leftSpeaker != null) {
             JPanel pnlLeftSpeaker = ImmersiveDialogStyle.createSourcePanel(
-                  getText("ImmersiveDialog.source.left"),
+                  getSourceLabel(leftSpeaker),
                   buildLeftSpeakerPanel(leftSpeaker, campaign));
 
             // Add pnlLeftSpeaker to mainPanel
@@ -322,7 +326,7 @@ public class ImmersiveDialogCore extends JDialog {
         // Right box for speaker details
         if (rightSpeaker != null) {
             JPanel pnlRightSpeaker = ImmersiveDialogStyle.createSourcePanel(
-                  getText("ImmersiveDialog.source.right"),
+                  getSourceLabel(rightSpeaker),
                   buildRightSpeakerPanel(rightSpeaker, campaign));
 
             // Add pnlRightSpeaker to mainPanel
@@ -360,11 +364,45 @@ public class ImmersiveDialogCore extends JDialog {
         setVisible(true);
     }
 
+    @Override
+    public void dispose() {
+        if (responseActivationController != null) {
+            responseActivationController.cancel();
+        }
+        super.dispose();
+    }
+
+    @Override
+    public void removeNotify() {
+        if (responseActivationController != null) {
+            responseActivationController.cancel();
+        }
+        super.removeNotify();
+    }
+
     /**
      * Sets the title of the dialog window using localized text.
      */
     protected void setTitle() {
         setTitle(MHQConstants.PROJECT_NAME);
+    }
+
+    private String getSourceLabel(Person speaker) {
+        boolean isPlayerForcePersonnel = campaign.getPlayerForce()
+                                                   .getHumanResources()
+                                                   .getPersonnel()
+                                                   .contains(speaker);
+        return getText(resolveSourceLabelResourceKey(speaker.isCommander(), isPlayerForcePersonnel));
+    }
+
+    static String resolveSourceLabelResourceKey(boolean isCommander, boolean isPlayerForcePersonnel) {
+        if (isCommander) {
+            return "ImmersiveDialog.source.command";
+        }
+        if (isPlayerForcePersonnel) {
+            return "ImmersiveDialog.source.unitChannel";
+        }
+        return "ImmersiveDialog.source.fieldContact";
     }
 
     private boolean configureWindowsFullWindowContent() {
@@ -415,7 +453,7 @@ public class ImmersiveDialogCore extends JDialog {
      */
     private JPanel createCenterBox(String centerMessage, List<ButtonLabelTooltipPair> buttons, boolean isVerticalLayout,
           @Nullable JPanel supplementalPanel, @Nullable ImageIcon imageIcon) {
-                JPanel centerPanel = ImmersiveDialogStyle.createFramedPanel();
+                JPanel centerPanel = ImmersiveDialogStyle.createAngularSurfacePanel();
 
         // Buttons panel
         JPanel buttonPanel = populateButtonPanel(buttons, isVerticalLayout);
@@ -733,12 +771,12 @@ public class ImmersiveDialogCore extends JDialog {
         gbc.fill = isVerticalLayout ? GridBagConstraints.HORIZONTAL : GridBagConstraints.NONE;
         gbc.weightx = isVerticalLayout ? 1 : 0;
 
-        List<JButton> buttonList = new ArrayList<>();
+        List<TransmissionResponseButton> buttonList = new ArrayList<>();
         Dimension largestSize = scaleForGUI(0, 0);
 
         // First pass: Create buttons and determine the largest size
         for (ButtonLabelTooltipPair buttonStrings : buttons) {
-            JButton button = null;
+            TransmissionResponseButton button = null;
             ResponseButtonMotion responseMotion = buttonStrings.responseMotion();
 
             if (isVerticalLayout) {
@@ -786,20 +824,15 @@ public class ImmersiveDialogCore extends JDialog {
                 button.setHorizontalTextPosition(SwingConstants.LEFT);
             }
 
-            // Add action listener
-            button.addActionListener(evt -> {
-                setDialogChoice(buttons.indexOf(buttonStrings));
-
-                if (spinner != null) {
-                    setSpinnerValue((int) spinner.getValue());
-                }
-
-                if (comboBox != null) {
-                    setComboBoxChoiceIndex(comboBox.getSelectedIndex());
-                }
-
-                dispose();
-            });
+            TransmissionResponseButton responseButton = button;
+            int responseIndex = buttons.indexOf(buttonStrings);
+            button.addActionListener(evt -> responseActivationController.activate(
+                  responseButton,
+                  buttonList,
+                  () -> captureResponseState(responseIndex),
+                                    getText("ImmersiveDialog.response.transmitting.text"),
+                                    getText("ImmersiveDialog.response.transmitting.compact"),
+                                    getText("ImmersiveDialog.response.transmitting.accessible")));
 
             // Update largest size
             Dimension preferredSize = button.getPreferredSize();
@@ -814,12 +847,12 @@ public class ImmersiveDialogCore extends JDialog {
         }
 
         // Second pass: Set all buttons to the largest size
-        for (JButton button : buttonList) {
+        for (TransmissionResponseButton button : buttonList) {
             button.setPreferredSize(largestSize);
         }
 
         // Final pass: Add buttons to the panel
-        for (JButton button : buttonList) {
+        for (TransmissionResponseButton button : buttonList) {
             buttonPanel.add(button, gbc);
 
             if (isVerticalLayout) {
@@ -839,6 +872,18 @@ public class ImmersiveDialogCore extends JDialog {
         containerPanel.add(buttonPanel, BorderLayout.CENTER);
 
         return containerPanel;
+    }
+
+    private void captureResponseState(int responseIndex) {
+        setDialogChoice(responseIndex);
+
+        if (spinner != null) {
+            setSpinnerValue((int) spinner.getValue());
+        }
+
+        if (comboBox != null) {
+            setComboBoxChoiceIndex(comboBox.getSelectedIndex());
+        }
     }
 
     /**
@@ -1037,6 +1082,90 @@ public class ImmersiveDialogCore extends JDialog {
         return new ImageIcon(baseImage.getScaledInstance(targetWidth, height, Image.SCALE_SMOOTH));
     }
 
+    static final class ResponseActivationController {
+        static final int TRANSMISSION_CONFIRMATION_DELAY_MS = 500;
+
+        private final Runnable dialogDisposer;
+        private Timer confirmationTimer;
+        private TransmissionResponseButton selectedButton;
+        private boolean responseActivated;
+        private boolean completionPending;
+        private boolean transmissionFeedbackVisible;
+
+          ResponseActivationController(Runnable dialogDisposer) {
+            this.dialogDisposer = dialogDisposer;
+        }
+
+        boolean activate(TransmissionResponseButton selectedButton,
+              List<TransmissionResponseButton> responseButtons, Runnable captureResponse,
+              String confirmationText, String compactConfirmationText, String accessibleFeedbackText) {
+            if (responseActivated) {
+                return false;
+            }
+
+            responseActivated = true;
+            captureResponse.run();
+            for (TransmissionResponseButton responseButton : responseButtons) {
+                if (responseButton != selectedButton) {
+                    responseButton.setEnabled(false);
+                }
+            }
+            this.selectedButton = selectedButton;
+            selectedButton.lockTransmissionConfirmation(
+                confirmationText, compactConfirmationText, accessibleFeedbackText);
+            transmissionFeedbackVisible = true;
+
+            completionPending = true;
+            confirmationTimer = new Timer(TRANSMISSION_CONFIRMATION_DELAY_MS,
+                  event -> completeTransmission());
+            confirmationTimer.setRepeats(false);
+            confirmationTimer.start();
+            return true;
+        }
+
+        void completeTransmission() {
+            if (!completionPending) {
+                return;
+            }
+
+            completionPending = false;
+            stopTimer();
+            clearTransmissionFeedback();
+            dialogDisposer.run();
+        }
+
+        void cancel() {
+            completionPending = false;
+            stopTimer();
+            clearTransmissionFeedback();
+        }
+
+        boolean isConfirmationTimerRunning() {
+            return confirmationTimer != null && confirmationTimer.isRunning();
+        }
+
+        boolean isConfirmationTimerRepeating() {
+            return confirmationTimer != null && confirmationTimer.isRepeats();
+        }
+
+        private void stopTimer() {
+            if (confirmationTimer != null) {
+                confirmationTimer.stop();
+                confirmationTimer = null;
+            }
+        }
+
+        private void clearTransmissionFeedback() {
+            if (!transmissionFeedbackVisible) {
+                return;
+            }
+
+            transmissionFeedbackVisible = false;
+            selectedButton.clearTransmissionConfirmation();
+            selectedButton = null;
+        }
+    }
+
     /**
      * Represents a label-tooltip pair for constructing UI buttons. Each button displays a label and optionally provides
      * a tooltip when hovered.
@@ -1051,7 +1180,7 @@ public class ImmersiveDialogCore extends JDialog {
          * @throws IllegalArgumentException if both {@code btnLabel} and {@code btnTooltip} are {@code null}.
          */
         public ButtonLabelTooltipPair(String btnLabel, @Nullable String btnTooltip) {
-            this(btnLabel, btnTooltip, ResponseButtonMotion.TRANSMISSION_SCAN);
+            this(btnLabel, btnTooltip, ResponseButtonMotion.MEKHQ_SIGNAL);
         }
 
         /**

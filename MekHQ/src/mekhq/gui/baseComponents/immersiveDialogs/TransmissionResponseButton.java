@@ -35,9 +35,11 @@ package mekhq.gui.baseComponents.immersiveDialogs;
 import static megamek.client.ui.util.UIUtil.scaleForGUI;
 
 import java.awt.Color;
+import java.awt.FontMetrics;
 import java.awt.GradientPaint;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
+import java.awt.Insets;
 import java.awt.RenderingHints;
 import java.awt.event.FocusAdapter;
 import java.awt.event.FocusEvent;
@@ -51,7 +53,7 @@ import javax.swing.Timer;
 final class TransmissionResponseButton extends JButton {
     private static final int FRAME_DELAY = 16;
     static final long SCAN_NANOS_PER_PIXEL = 14_000_000L;
-    static final long FRAME_TRANSITION_DURATION_NANOS = 200_000_000L;
+    static final long FRAME_TRANSITION_DURATION_NANOS = 320_000_000L;
     private static final double FADE_START_PROGRESS = 0.80;
     private static final int TRAIL_ALPHA = 52;
     private static final int LINE_ALPHA = 112;
@@ -74,10 +76,14 @@ final class TransmissionResponseButton extends JButton {
     private double frameProgress;
     private boolean frameTransitionActive;
     private boolean pointerActive;
-    private boolean keyboardFocusActive;
+    private boolean focusActive;
+    private boolean transmissionConfirmationVisible;
+    private String transmissionConfirmationText;
+    private String compactTransmissionConfirmationText;
+    private String accessibleNameBeforeTransmission;
 
     TransmissionResponseButton(String text) {
-        this(text, ResponseButtonMotion.TRANSMISSION_SCAN);
+        this(text, ResponseButtonMotion.MEKHQ_SIGNAL);
     }
 
     TransmissionResponseButton(String text, ResponseButtonMotion responseMotion) {
@@ -117,8 +123,9 @@ final class TransmissionResponseButton extends JButton {
             @Override
             public void focusGained(FocusEvent event) {
                 if (usesFrameMotion()) {
-                    keyboardFocusActive = true;
-                    updateFrameTarget(System.nanoTime());
+                    focusActive = true;
+                    updateFrameForeground();
+                    repaint();
                 } else if (isKeyboardTraversal(event)) {
                     startScan(false, System.nanoTime());
                 }
@@ -127,8 +134,9 @@ final class TransmissionResponseButton extends JButton {
             @Override
             public void focusLost(FocusEvent event) {
                 if (usesFrameMotion()) {
-                    keyboardFocusActive = false;
-                    updateFrameTarget(System.nanoTime());
+                    focusActive = false;
+                    updateFrameForeground();
+                    repaint();
                 } else if (!getModel().isRollover()) {
                     completeScan();
                 }
@@ -137,6 +145,8 @@ final class TransmissionResponseButton extends JButton {
         getModel().addChangeListener(event -> {
             if (usesFrameMotion()) {
                 updateFrameTarget(System.nanoTime());
+                updateFrameForeground();
+                repaint();
             }
         });
         addPropertyChangeListener("enabled", event -> {
@@ -150,12 +160,18 @@ final class TransmissionResponseButton extends JButton {
 
     @Override
     public void removeNotify() {
+        clearTransmissionConfirmation();
         resetAnimation();
         super.removeNotify();
     }
 
     @Override
     protected void paintComponent(Graphics graphics) {
+        if (transmissionConfirmationVisible) {
+            paintTransmissionConfirmation(graphics);
+            return;
+        }
+
         if (usesFrameMotion()) {
             paintFrameButton(graphics);
             return;
@@ -206,7 +222,7 @@ final class TransmissionResponseButton extends JButton {
     }
 
     void startScan(boolean repeat, long startNanos) {
-        if (usesFrameMotion() || !isEnabled()) {
+        if (usesFrameMotion() || !isEnabled() || transmissionConfirmationVisible) {
             return;
         }
         if (scanActive) {
@@ -291,6 +307,7 @@ final class TransmissionResponseButton extends JButton {
     }
 
     void applyFrameStyle() {
+        setFocusable(true);
         setOpaque(false);
         setContentAreaFilled(false);
         setBorderPainted(false);
@@ -299,7 +316,7 @@ final class TransmissionResponseButton extends JButton {
     }
 
     void setFrameActive(boolean active, long nowNanos) {
-        if (!usesFrameMotion() || !isEnabled()) {
+        if (!usesFrameMotion() || !isEnabled() || transmissionConfirmationVisible) {
             return;
         }
 
@@ -364,6 +381,49 @@ final class TransmissionResponseButton extends JButton {
         return animationTimer.isRepeats();
     }
 
+    boolean lockTransmissionConfirmation(String confirmationText, String compactConfirmationText,
+          String accessibleFeedbackText) {
+        if (transmissionConfirmationVisible) {
+            return false;
+        }
+        if (confirmationText == null || compactConfirmationText == null || accessibleFeedbackText == null) {
+            throw new IllegalArgumentException("transmission confirmation text cannot be null");
+        }
+
+        transmissionConfirmationVisible = true;
+        transmissionConfirmationText = confirmationText;
+        compactTransmissionConfirmationText = compactConfirmationText;
+        accessibleNameBeforeTransmission = getAccessibleContext().getAccessibleName();
+        animationTimer.stop();
+        if (usesFrameMotion()) {
+            frameTransitionActive = false;
+            frameTransitionStartProgress = 1.0;
+            frameTargetProgress = 1.0;
+            frameProgress = 1.0;
+        } else {
+            scanActive = false;
+            scanForward = true;
+            repeatScan = false;
+            scanProgress = 1.0;
+        }
+        getAccessibleContext().setAccessibleName(accessibleFeedbackText);
+        updateFrameForeground();
+        repaint();
+        return true;
+    }
+
+    boolean isTransmissionConfirmationVisible() {
+        return transmissionConfirmationVisible;
+    }
+
+    String getTransmissionConfirmationOverlayText(FontMetrics fontMetrics) {
+        Insets insets = getInsets();
+        int availableWidth = Math.max(0, getWidth() - insets.left - insets.right);
+        return fontMetrics.stringWidth(transmissionConfirmationText) <= availableWidth
+                     ? transmissionConfirmationText
+                     : compactTransmissionConfirmationText;
+    }
+
     private void advanceAnimation() {
         if (usesFrameMotion()) {
             advanceFrameTransition(System.nanoTime());
@@ -376,8 +436,10 @@ final class TransmissionResponseButton extends JButton {
     }
 
     private void updateFrameTarget(long nowNanos) {
-        boolean interactionActive = pointerActive || keyboardFocusActive || getModel().isPressed();
-        setFrameActive(interactionActive, nowNanos);
+        if (transmissionConfirmationVisible) {
+            return;
+        }
+        setFrameActive(pointerActive, nowNanos);
     }
 
     private void resetAnimation() {
@@ -388,7 +450,7 @@ final class TransmissionResponseButton extends JButton {
             frameTargetProgress = 0.0;
             frameProgress = 0.0;
             pointerActive = false;
-            keyboardFocusActive = false;
+            focusActive = false;
             updateFrameForeground();
             repaint();
         } else {
@@ -410,9 +472,13 @@ final class TransmissionResponseButton extends JButton {
             paintProgress = 0.0;
         } else if (getModel().isPressed()) {
             stateColors = colors.pressed();
-            paintProgress = frameProgress;
+            paintProgress = 1.0;
         } else {
             stateColors = blend(colors.idle(), colors.active(), frameProgress);
+            if (focusActive || isDefaultButton()) {
+                stateColors = new ImmersiveDialogStyle.ResponseButtonStateColors(
+                      stateColors.background(), stateColors.foreground(), colors.active().frame());
+            }
             paintProgress = frameProgress;
         }
 
@@ -427,6 +493,41 @@ final class TransmissionResponseButton extends JButton {
         frameGraphics.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_OFF);
         frameGraphics.setColor(stateColors.frame());
         paintCornerFrame(frameGraphics, paintProgress);
+        frameGraphics.dispose();
+    }
+
+    private void paintTransmissionConfirmation(Graphics graphics) {
+        ImmersiveDialogStyle.ResponseButtonStateColors pressedColors =
+              ImmersiveDialogStyle.getTransmissionConfirmationColors(responseMotion);
+
+        Graphics2D backgroundGraphics = (Graphics2D) graphics.create();
+        backgroundGraphics.setColor(pressedColors.background());
+        backgroundGraphics.fillRect(0, 0, getWidth(), getHeight());
+        backgroundGraphics.dispose();
+
+        Insets insets = getInsets();
+        int innerWidth = Math.max(0, getWidth() - insets.left - insets.right);
+        int innerHeight = Math.max(0, getHeight() - insets.top - insets.bottom);
+        if (innerWidth > 0 && innerHeight > 0) {
+            Graphics2D textGraphics = (Graphics2D) graphics.create();
+            textGraphics.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING,
+                  RenderingHints.VALUE_TEXT_ANTIALIAS_ON);
+            textGraphics.setColor(pressedColors.foreground());
+            textGraphics.setFont(getFont());
+            textGraphics.clipRect(insets.left, insets.top, innerWidth, innerHeight);
+            FontMetrics fontMetrics = textGraphics.getFontMetrics();
+            String overlayText = getTransmissionConfirmationOverlayText(fontMetrics);
+            int textX = insets.left + Math.max(0, (innerWidth - fontMetrics.stringWidth(overlayText)) / 2);
+            int textY = insets.top + Math.max(0, (innerHeight - fontMetrics.getHeight()) / 2)
+                              + fontMetrics.getAscent();
+            textGraphics.drawString(overlayText, textX, textY);
+            textGraphics.dispose();
+        }
+
+        Graphics2D frameGraphics = (Graphics2D) graphics.create();
+        frameGraphics.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_OFF);
+        frameGraphics.setColor(pressedColors.frame());
+        paintCornerFrame(frameGraphics, 1.0);
         frameGraphics.dispose();
     }
 
@@ -464,12 +565,40 @@ final class TransmissionResponseButton extends JButton {
 
         ImmersiveDialogStyle.ResponseButtonColors colors =
               ImmersiveDialogStyle.getResponseButtonColors(responseMotion);
-        Color foreground = isEnabled()
-                                 ? blend(colors.idle(), colors.active(), frameProgress).foreground()
-                                 : colors.disabled().foreground();
+        Color foreground;
+        if (transmissionConfirmationVisible) {
+            foreground = colors.pressed().foreground();
+        } else if (getModel().isPressed()) {
+            foreground = colors.pressed().foreground();
+        } else {
+            foreground = isEnabled()
+                               ? blend(colors.idle(), colors.active(), frameProgress).foreground()
+                               : colors.disabled().foreground();
+        }
         if (!foreground.equals(super.getForeground())) {
             super.setForeground(foreground);
         }
+    }
+
+    void clearTransmissionConfirmation() {
+        if (!transmissionConfirmationVisible) {
+            return;
+        }
+
+        transmissionConfirmationVisible = false;
+        transmissionConfirmationText = null;
+        compactTransmissionConfirmationText = null;
+        getAccessibleContext().setAccessibleName(accessibleNameBeforeTransmission);
+        accessibleNameBeforeTransmission = null;
+        if (usesFrameMotion()) {
+            frameTransitionActive = false;
+            frameTransitionStartProgress = pointerActive ? 1.0 : 0.0;
+            frameTargetProgress = frameTransitionStartProgress;
+            frameProgress = frameTransitionStartProgress;
+            animationTimer.stop();
+        }
+        updateFrameForeground();
+        repaint();
     }
 
     private static ImmersiveDialogStyle.ResponseButtonStateColors blend(

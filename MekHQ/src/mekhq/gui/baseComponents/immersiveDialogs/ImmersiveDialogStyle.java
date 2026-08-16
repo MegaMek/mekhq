@@ -120,10 +120,10 @@ final class ImmersiveDialogStyle {
         return panel;
     }
 
-    static JPanel createFramedPanel() {
-        JPanel panel = new AngularTransmissionPanel();
+    static JPanel createAngularSurfacePanel() {
+        JPanel panel = new AngularSurfacePanel();
         panel.setLayout(new BorderLayout());
-        panel.setBorder(BorderFactory.createCompoundBorder(new AngularTransmissionBorder(),
+          panel.setBorder(BorderFactory.createCompoundBorder(new AngularTransmissionBorder(),
               BorderFactory.createEmptyBorder(FRAME_PADDING, FRAME_PADDING, FRAME_PADDING, FRAME_PADDING)));
         return panel;
     }
@@ -243,6 +243,18 @@ final class ImmersiveDialogStyle {
           };
         }
 
+    static ResponseButtonStateColors getTransmissionConfirmationColors(ResponseButtonMotion motion) {
+        if (motion != ResponseButtonMotion.TRANSMISSION_SCAN) {
+            return getResponseButtonColors(motion).pressed();
+        }
+
+        Color signalColor = getSignalColor();
+        return new ResponseButtonStateColors(
+              mix(getSurfaceColor(), signalColor, isDarkTheme() ? 0.16f : 0.10f),
+              signalColor,
+              signalColor);
+    }
+
     private static JLabel createTechnicalLabel(String text, Color color, float sizeAdjustment) {
         JLabel label = new JLabel(text);
         Font baseFont = label.getFont();
@@ -330,8 +342,8 @@ final class ImmersiveDialogStyle {
         }
     }
 
-    private static final class AngularTransmissionPanel extends JPanel {
-        private AngularTransmissionPanel() {
+    private static final class AngularSurfacePanel extends JPanel {
+        private AngularSurfacePanel() {
             setOpaque(false);
         }
 
@@ -427,11 +439,8 @@ final class ImmersiveDialogStyle {
             float bottom = yPosition + height - 1.5f;
             Path2D frame = createAngularFrame(left, top, right, bottom);
             graphics2D.draw(frame);
-
-            graphics2D.setColor(getSignalColor());
-            graphics2D.drawLine(Math.round(left + CORNER_CUT), Math.round(top),
-                  Math.round(left + CORNER_CUT + scaleForGUI(42)), Math.round(top));
             graphics2D.dispose();
         }
     }
+
 }
