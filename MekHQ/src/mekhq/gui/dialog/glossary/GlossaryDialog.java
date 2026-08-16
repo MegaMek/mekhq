@@ -42,6 +42,10 @@ import java.awt.Frame;
 import java.util.List;
 import javax.swing.*;
 import javax.swing.event.HyperlinkEvent;
+import java.util.ArrayList;
+import java.util.Locale;
+import javax.swing.event.DocumentEvent;
+import javax.swing.event.DocumentListener;
 
 import megamek.client.ui.preferences.JWindowPreference;
 import megamek.client.ui.preferences.PreferencesNode;
@@ -110,6 +114,13 @@ public class GlossaryDialog extends JDialog {
     final static List<String> documentationEntries = DocumentationEntry.getLookUpNamesSortedByTitle();
     private int minimumWidth = 0;
 
+    private static final int SEARCH_DEBOUNCE_MS = 150;
+
+    private JTextPane txtGlossary;
+    private JTextPane txtDocumentation;
+    private JTextField txtSearch;
+    private Timer searchDebounceTimer;
+
     /**
      * Creates and displays a new glossary and documentation dialog. Automatically sizes and positions the dialog based
      * on UI scaling.
@@ -170,7 +181,21 @@ public class GlossaryDialog extends JDialog {
         contentDocsPanel.add(aboutWrapper);
         contentDocsPanel.add(contentsWrapper);
         contentDocsPanel.add(documentationWrapper);
-        return contentDocsPanel;
+
+        JPanel outerPanel = new JPanel(new BorderLayout());
+        outerPanel.add(buildSearchPanel(), BorderLayout.NORTH);
+        outerPanel.add(contentDocsPanel, BorderLayout.CENTER);
+
+        // Warm the PDF text cache off the EDT so full-text search feels instant once the user types.
+        new SwingWorker<Void, Void>() {
+            @Override
+            protected Void doInBackground() {
+                DocumentationEntry.preloadSearchableText();
+                return null;
+            }
+        }.execute();
+
+        return outerPanel;
     }
 
     /**
@@ -260,34 +285,23 @@ public class GlossaryDialog extends JDialog {
      * @since 0.50.07
      */
     private FastJScrollPane buildGlossaryPane() {
-        StringBuilder formatedGlossaryText = new StringBuilder();
-        formatedGlossaryText.append(getTextAt(RESOURCE_BUNDLE, "GlossaryDialog.contentsPane.title"));
-
-        String lastFirstLetter = "";
-        for (String entry : glossaryEntries) {
-            GlossaryEntry glossaryEntry = GlossaryEntry.getGlossaryEntryFromLookUpName(entry);
-            String title = glossaryEntry != null ? glossaryEntry.getTitleWithVersionUpdateIcon() : "-";
-
-            if (!lastFirstLetter.equals(title.substring(0, 1))) {
-                lastFirstLetter = title.substring(0, 1);
-                formatedGlossaryText.append("<h2>")
-                      .append(lastFirstLetter)
-                      .append("</h2>");
-            }
-
-            formatedGlossaryText.append("<a href='GLOSSARY:")
-                  .append(entry)
-                  .append("'>")
-                  .append(title)
-                  .append("</a><br>");
-        }
-
-        JTextPane txtGlossary = createGlossaryDialogTextPane(formatedGlossaryText);
+        txtGlossary = createGlossaryDialogTextPane(new StringBuilder());
+        refreshGlossaryList("");
 
         FastJScrollPane scrollGlossary = new FastJScrollPane(txtGlossary);
         scrollGlossary.setBorder(RoundedLineBorder.createRoundedLineBorder());
 
         return scrollGlossary;
+    }
+
+    private FastJScrollPane buildDocumentationPane() {
+        txtDocumentation = createGlossaryDialogTextPane(new StringBuilder());
+        refreshDocumentationList("");
+
+        FastJScrollPane scrollDocumentation = new FastJScrollPane(txtDocumentation);
+        scrollDocumentation.setBorder(RoundedLineBorder.createRoundedLineBorder());
+
+        return scrollDocumentation;
     }
 
     /**
@@ -301,60 +315,214 @@ public class GlossaryDialog extends JDialog {
      * @since 0.50.07
      */
     private JTextPane createGlossaryDialogTextPane(StringBuilder formatedGlossaryText) {
-        JTextPane txtGlossary = new JTextPane();
-        txtGlossary.setContentType("text/html");
-        txtGlossary.setText(formatedGlossaryText.toString());
-        txtGlossary.setEditable(false);
-        txtGlossary.setBorder(null);
-        txtGlossary.setBorder(BorderFactory.createEmptyBorder(PADDING, PADDING, PADDING, PADDING));
-        txtGlossary.setCaretPosition(0);
-        txtGlossary.addHyperlinkListener(e -> {
+        JTextPane pane = new JTextPane();
+        pane.setContentType("text/html");
+        pane.setText(formatedGlossaryText.toString());
+        pane.setEditable(false);
+        pane.setBorder(null);
+        pane.setBorder(BorderFactory.createEmptyBorder(PADDING, PADDING, PADDING, PADDING));
+        pane.setCaretPosition(0);
+        pane.addHyperlinkListener(e -> {
             if (e.getEventType() == HyperlinkEvent.EventType.ACTIVATED) {
                 dispose();
                 handleGlossaryHyperlinkClick(this, e);
             }
         });
 
-        return txtGlossary;
+        return pane;
     }
 
     /**
-     * Builds the scrollable documentation section, each entry as a clickable link.
-     *
-     * @return a {@link FastJScrollPane} containing the documentation links
-     *
-     * @author Illiani
-     * @since 0.50.07
+     * Builds the single search field shared by both the glossary and documentation columns. Typing
+     * filters both lists together.
      */
-    private FastJScrollPane buildDocumentationPane() {
+    private JPanel buildSearchPanel() {
+        JLabel lblSearch = new JLabel(getTextAt(RESOURCE_BUNDLE, "GlossaryDialog.search.label"));
+        lblSearch.setBorder(BorderFactory.createEmptyBorder(0, 0, 0, PADDING));
+
+        txtSearch = new JTextField();
+        txtSearch.setToolTipText(getTextAt(RESOURCE_BUNDLE, "GlossaryDialog.search.tooltip"));
+        txtSearch.setBorder(BorderFactory.createCompoundBorder(RoundedLineBorder.createRoundedLineBorder(),
+            BorderFactory.createEmptyBorder(4, 8, 4, 8)));
+        txtSearch.setColumns(20);
+        txtSearch.setMaximumSize(txtSearch.getPreferredSize());
+
+        searchDebounceTimer = new Timer(SEARCH_DEBOUNCE_MS, e -> {
+            String query = txtSearch.getText();
+            refreshGlossaryList(query);
+            refreshDocumentationList(query);
+        });
+        searchDebounceTimer.setRepeats(false);
+
+        txtSearch.getDocument().addDocumentListener(new DocumentListener() {
+            @Override
+            public void insertUpdate(DocumentEvent e) {
+                searchDebounceTimer.restart();
+            }
+
+            @Override
+            public void removeUpdate(DocumentEvent e) {
+                searchDebounceTimer.restart();
+            }
+
+            @Override
+            public void changedUpdate(DocumentEvent e) {
+                searchDebounceTimer.restart();
+            }
+        });
+
+        JPanel searchPanel = new JPanel(new FlowLayout(FlowLayout.CENTER, 0, 0));
+        searchPanel.setBorder(BorderFactory.createEmptyBorder(0, PADDING, PADDING, PADDING));
+        searchPanel.add(lblSearch);
+        searchPanel.add(txtSearch);
+        return searchPanel;
+    }
+
+    /**
+     * Refreshes the display of the glossary list based on the search string.
+     * 
+     * @param query the raw text from the search field
+     *
+     */
+    private void refreshGlossaryList(String query) {
+        List<String> searchTerms = parseSearchTerms(query);
+
+        StringBuilder formatedGlossaryText = new StringBuilder();
+        formatedGlossaryText.append(getTextAt(RESOURCE_BUNDLE, "GlossaryDialog.contentsPane.title"));
+
+        boolean hasMatch = false;
+        String lastFirstLetter = "";
+        for (String entryKey : glossaryEntries) {
+            GlossaryEntry glossaryEntry = GlossaryEntry.getGlossaryEntryFromLookUpName(entryKey);
+            if (glossaryEntry == null) {
+                continue;
+            }
+
+            if (!matchesGlossarySearch(glossaryEntry, searchTerms)) {
+                continue;
+            }
+
+            hasMatch = true;
+
+            String title = glossaryEntry.getTitleWithVersionUpdateIcon();
+            String firstLetter = title.substring(0, 1);
+            if (!lastFirstLetter.equals(firstLetter)) {
+                lastFirstLetter = firstLetter;
+                formatedGlossaryText.append("<h2>").append(lastFirstLetter).append("</h2>");
+            }
+
+            formatedGlossaryText.append("<a href='GLOSSARY:")
+                .append(entryKey)
+                .append("'>")
+                .append(title)
+                .append("</a><br>");
+        }
+
+        if (!hasMatch) {
+            formatedGlossaryText.append("<i>")
+                .append(getTextAt(RESOURCE_BUNDLE, "GlossaryDialog.search.noResults"))
+                .append("</i>");
+        }
+
+        txtGlossary.setText(formatedGlossaryText.toString());
+        txtGlossary.setCaretPosition(0);
+    }
+    
+
+    /**
+     * Refreshes the documentation list, filtering by the given search query.
+     *
+     * @param query the raw text from the search field
+     *
+     */
+    private void refreshDocumentationList(String query) {
+        List<String> searchTerms = parseSearchTerms(query);
+
         StringBuilder formatedDocumentationText = new StringBuilder();
         formatedDocumentationText.append(getTextAt(RESOURCE_BUNDLE, "GlossaryDialog.documentationPane.title"));
 
+        boolean hasMatch = false;
         String lastFirstLetter = "";
-        for (String entry : documentationEntries) {
-            DocumentationEntry documentationEntry = DocumentationEntry.getDocumentationEntryFromLookUpName(entry);
-            String title = documentationEntry != null ? documentationEntry.getTitleWithVersionUpdateIcon() : "-";
+        for (String entryKey : documentationEntries) {
+            DocumentationEntry documentationEntry = DocumentationEntry.getDocumentationEntryFromLookUpName(entryKey);
+            if (documentationEntry == null) {
+                continue;
+            }
 
-            if (!lastFirstLetter.equals(title.substring(0, 1))) {
-                lastFirstLetter = title.substring(0, 1);
-                formatedDocumentationText.append("<h2>")
-                      .append(lastFirstLetter)
-                      .append("</h2>");
+            if (!matchesSearch(documentationEntry, documentationEntry.getTitle(), searchTerms)) {
+                continue;
+            }
+
+            hasMatch = true;
+
+            String title = documentationEntry.getTitleWithVersionUpdateIcon();
+            String firstLetter = title.substring(0, 1);
+            if (!lastFirstLetter.equals(firstLetter)) {
+                lastFirstLetter = firstLetter;
+                formatedDocumentationText.append("<h2>").append(lastFirstLetter).append("</h2>");
             }
 
             formatedDocumentationText.append("<a href='DOCUMENTATION:")
-                  .append(entry)
-                  .append("'>")
-                  .append(title)
-                  .append("</a><br>");
+                .append(entryKey)
+                .append("'>")
+                .append(title)
+                .append("</a><br>");
         }
 
-        JTextPane txtDocumentation = createGlossaryDialogTextPane(formatedDocumentationText);
+        if (!hasMatch) {
+            formatedDocumentationText.append("<i>")
+                .append(getTextAt(RESOURCE_BUNDLE, "GlossaryDialog.search.noResults"))
+                .append("</i>");
+        }
 
-        FastJScrollPane scrollDocumentation = new FastJScrollPane(txtDocumentation);
-        scrollDocumentation.setBorder(RoundedLineBorder.createRoundedLineBorder());
+        txtDocumentation.setText(formatedDocumentationText.toString());
+        txtDocumentation.setCaretPosition(0);
+    }
 
-        return scrollDocumentation;
+    private static List<String> parseSearchTerms(String query) {
+        if (query == null || query.isBlank()) {
+            return List.of();
+        }
+
+        List<String> terms = new ArrayList<>();
+        for (String term : query.toLowerCase(Locale.ROOT).split("\\s+")) {
+            if (!term.isBlank()) {
+                terms.add(term);
+            }
+        }
+        return terms;
+    }
+
+    private static boolean matchesSearch(DocumentationEntry entry, String title, List<String> searchTerms) {
+        if (searchTerms.isEmpty()) {
+            return true;
+        }
+
+        String lowerTitle = title.toLowerCase(Locale.ROOT);
+        String content = entry.getSearchableText();
+
+        for (String term : searchTerms) {
+            if (!lowerTitle.contains(term) && !content.contains(term)) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    private static boolean matchesGlossarySearch(GlossaryEntry entry, List<String> searchTerms) {
+        if (searchTerms.isEmpty()) {
+            return true;
+        }
+
+        String lowerTitle = entry.getTitle().toLowerCase(Locale.ROOT);
+        String content = entry.getSearchableText();
+
+        for (String term : searchTerms) {
+            if (!lowerTitle.contains(term) && !content.contains(term)) {
+                return false;
+            }
+        }
+        return true;
     }
 
     /**

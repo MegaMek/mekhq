@@ -34,6 +34,18 @@ package mekhq.campaign.utilities.glossary;
 
 import static mekhq.utilities.MHQInternationalization.getTextAt;
 
+import java.io.File;
+import java.io.IOException;
+import java.util.Locale;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
+
+import org.apache.pdfbox.pdmodel.PDDocument;
+import org.apache.pdfbox.text.PDFTextStripper;
+import org.apache.pdfbox.Loader;
+
+import megamek.logging.MMLogger;
+
 import java.util.Arrays;
 import java.util.Comparator;
 import java.util.List;
@@ -80,6 +92,14 @@ public enum DocumentationEntry {
     UNIT_MARKETS("UNIT_MARKETS", "GlossaryDocs/Unit Markets", new Version("0.50.06"));
 
     private static final String RESOURCE_BUNDLE = "mekhq.resources.DocumentationEntry";
+
+    private static final MMLogger LOGGER = MMLogger.create(DocumentationEntry.class);
+
+    /**
+     * Cache of extracted PDF text per entry, lower-cased, used for full-text search. Populated lazily,
+     * or eagerly via {@link #preloadSearchableText()}.
+     */
+    private static final Map<DocumentationEntry, String> SEARCHABLE_TEXT_CACHE = new ConcurrentHashMap<>();
 
     private final String DIRECTORY = "docs/";
     private final String FILE_EXTENSION = ".pdf";
@@ -157,6 +177,41 @@ public enum DocumentationEntry {
      */
     public String getFileAddress() {
         return DIRECTORY + fileAddress + FILE_EXTENSION;
+    }
+
+    /**
+     * Returns the extracted, lower-cased plain-text content of this entry's PDF, for use in search
+     * filtering. Extraction happens once per entry and is cached for the lifetime of the application.
+     *
+     * @return the lower-cased extracted PDF text, or an empty string if it could not be read
+     */
+    public String getSearchableText() {
+        return SEARCHABLE_TEXT_CACHE.computeIfAbsent(this, DocumentationEntry::extractTextFromPdf);
+    }
+
+    private static String extractTextFromPdf(DocumentationEntry entry) {
+        File file = new File(entry.getFileAddress());
+        if (!file.exists()) {
+            return "";
+        }
+
+        try (PDDocument document = Loader.loadPDF(file)) {
+            PDFTextStripper stripper = new PDFTextStripper();
+            return stripper.getText(document).toLowerCase(Locale.ROOT);
+        } catch (IOException ex) {
+            LOGGER.warn("Failed to extract searchable text from {}: {}", entry.getFileAddress(), ex.getMessage());
+            return "";
+        }
+    }
+
+    /**
+     * Warms the searchable-text cache for every entry. Meant to be called off the EDT (e.g. from a
+     * {@link javax.swing.SwingWorker}) since PDF text extraction can take a moment.
+     */
+    public static void preloadSearchableText() {
+        for (DocumentationEntry entry : values()) {
+            entry.getSearchableText();
+        }
     }
 
     /**

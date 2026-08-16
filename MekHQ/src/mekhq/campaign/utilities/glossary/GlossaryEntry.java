@@ -35,6 +35,9 @@ package mekhq.campaign.utilities.glossary;
 import static mekhq.utilities.MHQInternationalization.getTextAt;
 
 import java.util.List;
+import java.util.EnumMap;
+import java.util.Locale;
+import java.util.Map;
 
 import megamek.Version;
 import megamek.common.annotations.Nullable;
@@ -183,6 +186,11 @@ public enum GlossaryEntry {
 
     private static final String RESOURCE_BUNDLE = "mekhq.resources.GlossaryEntry";
 
+    /**
+     * Cache of plain-text, lower-cased definitions (HTML stripped) per entry, used for search filtering.
+     */
+    private static final Map<GlossaryEntry, String> SEARCHABLE_TEXT_CACHE = new EnumMap<>(GlossaryEntry.class);
+
     private final String lookUpName;
     private final Version versionAddedOrLastUpdated;
 
@@ -265,6 +273,27 @@ public enum GlossaryEntry {
      */
     public String getDefinition() {
         return getTextAt(RESOURCE_BUNDLE, lookUpName + ".definition");
+    }
+
+    /**
+     * Returns this entry's definition as plain, lower-cased text with HTML markup stripped, for use in
+     * search filtering. Computed once and cached.
+     *
+     * @return the lower-cased, HTML-stripped definition text
+     *
+     */
+    public String getSearchableText() {
+        return SEARCHABLE_TEXT_CACHE.computeIfAbsent(this, entry -> stripHtml(entry.getDefinition()));
+    }
+
+    private static String stripHtml(String html) {
+        if (html == null || html.isBlank()) {
+            return "";
+        }
+        return html.replaceAll("<[^>]*>", " ")
+                    .replaceAll("\\s+", " ")
+                    .trim()
+                    .toLowerCase(Locale.ROOT);
     }
 
     /**
