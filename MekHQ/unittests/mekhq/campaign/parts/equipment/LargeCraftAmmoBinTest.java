@@ -66,7 +66,9 @@ import megamek.common.equipment.WeaponMounted;
 import megamek.common.units.Entity;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.LocalWarehouse;
+import mekhq.campaign.campaignOptions.CampaignOption;
 import mekhq.campaign.campaignOptions.CampaignOptions;
+import mekhq.campaign.finances.Money;
 import mekhq.campaign.parts.AmmoStorage;
 import mekhq.campaign.parts.Part;
 import mekhq.campaign.unit.Unit;
@@ -1630,6 +1632,67 @@ public class LargeCraftAmmoBinTest {
 
         // ... and have more ammo available in the warehouse
         assertEquals(shotsOnHand - ammoType.getShots(), quartermaster.getAmmoAvailable(ammoType));
+    }
+
+    /**
+     * A work action on a bay handles a single ton, so a fabrication attempt is priced for a single ton no matter how
+     * much of the bay is empty. It must not scale with the bay's capacity the way
+     * {@link LargeCraftAmmoBin#getValueNeeded()} does.
+     */
+    @Test
+    public void fabricationPricesASingleTonRegardlessOfHowEmptyTheBayIs() {
+        Campaign mockCampaign = mockCampaign();
+        CampaignOptions options = new CampaignOptions();
+        options.set(CampaignOption.PAY_FOR_PARTS, true);
+        options.set(CampaignOption.PAY_FOR_REPAIRS, false);
+        options.set(CampaignOption.USE_BALANCED_FABRICATION, true);
+        when(mockCampaign.getCampaignOptions()).thenReturn(options);
+
+        AmmoType ammoType = getAmmoType("ISLRM20 Ammo");
+        int capacity = 10;
+
+        // Under the balanced profile the part price is ten times the value of what is manufactured - one ton.
+        Money oneTonAttempt = Money.of(ammoType.getRawCost()).multipliedBy(10);
+
+        // A ten ton bay missing a single ton is charged for that one ton ...
+        LargeCraftAmmoBin missingOneTon = new LargeCraftAmmoBin(0, ammoType, 42, ammoType.getShots(), capacity,
+              mockCampaign);
+        missingOneTon.setFabricating(true);
+        assertEquals(oneTonAttempt, missingOneTon.getFabricationCost());
+
+        // ... and so is the same bay standing completely empty, since it still only loads a ton per attempt.
+        LargeCraftAmmoBin missingEverything = new LargeCraftAmmoBin(0, ammoType, 42, ammoType.getShots() * capacity,
+              capacity, mockCampaign);
+        missingEverything.setFabricating(true);
+        assertEquals(oneTonAttempt, missingEverything.getFabricationCost());
+
+        // The capacity-scaled reload value would have charged far more for that same one-ton attempt.
+        assertTrue(oneTonAttempt.isLessThan(missingEverything.getValueNeeded()));
+    }
+
+    /** The one-ton basis is the ammunition's own per-ton price, so a costlier munition costs more to fabricate. */
+    @Test
+    public void fabricationPricesTheBaysOwnMunition() {
+        Campaign mockCampaign = mockCampaign();
+        CampaignOptions options = new CampaignOptions();
+        options.set(CampaignOption.PAY_FOR_PARTS, true);
+        options.set(CampaignOption.PAY_FOR_REPAIRS, false);
+        options.set(CampaignOption.USE_BALANCED_FABRICATION, true);
+        when(mockCampaign.getCampaignOptions()).thenReturn(options);
+
+        AmmoType standardAmmo = getAmmoType("ISLRM20 Ammo");
+        AmmoType artemisAmmo = getAmmoType("ISLRM20 Artemis-capable Ammo");
+
+        LargeCraftAmmoBin standardBin = new LargeCraftAmmoBin(0, standardAmmo, 42, standardAmmo.getShots(), 10,
+              mockCampaign);
+        standardBin.setFabricating(true);
+        LargeCraftAmmoBin artemisBin = new LargeCraftAmmoBin(0, artemisAmmo, 42, artemisAmmo.getShots(), 10,
+              mockCampaign);
+        artemisBin.setFabricating(true);
+
+        assertEquals(Money.of(standardAmmo.getRawCost()).multipliedBy(10), standardBin.getFabricationCost());
+        assertEquals(Money.of(artemisAmmo.getRawCost()).multipliedBy(10), artemisBin.getFabricationCost());
+        assertTrue(standardBin.getFabricationCost().isLessThan(artemisBin.getFabricationCost()));
     }
 
     /**
