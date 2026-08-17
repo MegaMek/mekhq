@@ -47,7 +47,7 @@ import javax.swing.ImageIcon;
 import javax.swing.JComponent;
 import javax.swing.Timer;
 
-import jakarta.annotation.Nullable;
+import megamek.common.annotations.Nullable;
 
 /**
  * Displays an image as a live video transmission with restrained analog interference.
@@ -130,7 +130,7 @@ final class TransmissionImagePanel extends JComponent {
 
         if (glitchFramesRemaining > 0) {
             glitchFramesRemaining--;
-          } else if (ThreadLocalRandom.current().nextInt(signalQuality.glitchInterval) == 0) {
+                } else if (ThreadLocalRandom.current().nextInt(signalQuality.glitchInterval) == 0) {
             int height = getHeight();
             glitchFramesRemaining = ThreadLocalRandom.current().nextInt(signalQuality.glitchFrameMinimum,
                 signalQuality.glitchFrameMaximum);

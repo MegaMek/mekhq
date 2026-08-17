@@ -8933,6 +8933,15 @@ public class Campaign implements ITechManager {
     }
 
     /**
+     * Returns the HPG network supplied by this campaign's systems data for the current campaign date.
+     *
+     * @return the campaign's current dated HPG links
+     */
+    public Collection<HPGLink> getHPGNetwork() {
+        return systemsInstance.getHPGNetwork(currentDay);
+    }
+
+    /**
      * Now that systemsInstance is injectable and non-final, we may wish to update it on the fly.
      *
      * @return systemsInstance Systems instance used when instantiating this Campaign instance.

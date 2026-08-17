@@ -47,7 +47,6 @@ import java.awt.Graphics2D;
 import java.awt.Insets;
 import java.awt.image.BufferedImage;
 import java.util.Map;
-import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JComponent;
 import javax.swing.JLabel;
@@ -149,29 +148,9 @@ class ImmersiveDialogStyleTest {
     }
 
     @Test
-    void responseButtonsUseSignalInteractionStyleAndRemainFocusable() throws Exception {
-        SwingUtilities.invokeAndWait(() -> {
-            JButton button = new JButton("Respond");
-            button.setFocusable(false);
-
-            ImmersiveDialogStyle.applyResponseButtonStyle(button);
-
-            assertTrue(button.isFocusable());
-            assertTrue(button.isFocusPainted());
-            Map<?, ?> styleMap = getStyleMap(button);
-            assertEquals(ImmersiveDialogStyle.getSignalColor(), styleMap.get("focusedBorderColor"));
-            assertEquals(ImmersiveDialogStyle.getSignalColor(), styleMap.get("pressedBorderColor"));
-            assertNotNull(styleMap.get("hoverBorderColor"));
-            assertNotNull(styleMap.get("hoverBackground"));
-            assertNotNull(styleMap.get("pressedBackground"));
-        });
-    }
-
-    @Test
     void frameResponseButtonsRemainFocusable() throws Exception {
         SwingUtilities.invokeAndWait(() -> {
-            TransmissionResponseButton button =
-                  new TransmissionResponseButton("Respond", ResponseButtonMotion.MEKHQ_SIGNAL);
+            TransmissionResponseButton button = new TransmissionResponseButton("Respond");
             button.setFocusable(false);
 
             ImmersiveDialogStyle.applyResponseButtonStyle(button);

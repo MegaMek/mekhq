@@ -36,7 +36,6 @@ import static megamek.client.ui.util.UIUtil.scaleForGUI;
 
 import java.awt.Color;
 import java.awt.FontMetrics;
-import java.awt.GradientPaint;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Insets;
@@ -45,30 +44,20 @@ import java.awt.event.FocusAdapter;
 import java.awt.event.FocusEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
-import java.awt.geom.RoundRectangle2D;
 import javax.swing.JButton;
 import javax.swing.Timer;
 
-/** Response button with selectable transmission motion on hover or keyboard focus. */
+/** Response button with a signal frame that expands on hover. */
 final class TransmissionResponseButton extends JButton {
     private static final int FRAME_DELAY = 16;
-    static final long SCAN_NANOS_PER_PIXEL = 14_000_000L;
     static final long FRAME_TRANSITION_DURATION_NANOS = 320_000_000L;
-    private static final double FADE_START_PROGRESS = 0.80;
-    private static final int TRAIL_ALPHA = 52;
-    private static final int LINE_ALPHA = 112;
-    private static final int TRAIL_WIDTH = 48;
     private static final int CORNER_LENGTH = 12;
     private static final int FRAME_THICKNESS = 2;
+    private static final int CONTENT_VERTICAL_MARGIN = 8;
+    private static final int CONTENT_HORIZONTAL_MARGIN = 16;
 
-    private final ResponseButtonMotion responseMotion;
     private final Timer animationTimer;
 
-    private long scanStartNanos;
-    private double scanProgress = 1.0;
-    private boolean scanActive;
-    private boolean scanForward = true;
-    private boolean repeatScan;
     private long frameTransitionStartNanos;
     private long frameTransitionDurationNanos;
     private double frameTransitionStartProgress;
@@ -83,76 +72,52 @@ final class TransmissionResponseButton extends JButton {
     private String accessibleNameBeforeTransmission;
 
     TransmissionResponseButton(String text) {
-        this(text, ResponseButtonMotion.MEKHQ_SIGNAL);
-    }
-
-    TransmissionResponseButton(String text, ResponseButtonMotion responseMotion) {
         super(text);
-        if (responseMotion == null) {
-            throw new IllegalArgumentException("responseMotion cannot be null");
-        }
-        this.responseMotion = responseMotion;
+        setMargin(new Insets(scaleForGUI(CONTENT_VERTICAL_MARGIN), scaleForGUI(CONTENT_HORIZONTAL_MARGIN),
+              scaleForGUI(CONTENT_VERTICAL_MARGIN), scaleForGUI(CONTENT_HORIZONTAL_MARGIN)));
         setRolloverEnabled(true);
 
         animationTimer = new Timer(FRAME_DELAY, event -> advanceAnimation());
         animationTimer.setCoalesce(true);
-        animationTimer.setRepeats(!usesFrameMotion());
+        animationTimer.setRepeats(false);
 
         addMouseListener(new MouseAdapter() {
             @Override
             public void mouseEntered(MouseEvent event) {
-                if (usesFrameMotion()) {
-                    pointerActive = true;
-                    updateFrameTarget(System.nanoTime());
-                } else {
-                    startScan(true, System.nanoTime());
-                }
+                pointerActive = true;
+                updateFrameTarget(System.nanoTime());
             }
 
             @Override
             public void mouseExited(MouseEvent event) {
-                if (usesFrameMotion()) {
-                    pointerActive = false;
-                    updateFrameTarget(System.nanoTime());
-                } else {
-                    completeScan();
-                }
+                pointerActive = false;
+                updateFrameTarget(System.nanoTime());
             }
         });
         addFocusListener(new FocusAdapter() {
             @Override
             public void focusGained(FocusEvent event) {
-                if (usesFrameMotion()) {
-                    focusActive = true;
-                    updateFrameForeground();
-                    repaint();
-                } else if (isKeyboardTraversal(event)) {
-                    startScan(false, System.nanoTime());
-                }
+                focusActive = true;
+                updateFrameForeground();
+                repaint();
             }
 
             @Override
             public void focusLost(FocusEvent event) {
-                if (usesFrameMotion()) {
-                    focusActive = false;
-                    updateFrameForeground();
-                    repaint();
-                } else if (!getModel().isRollover()) {
-                    completeScan();
-                }
-            }
-        });
-        getModel().addChangeListener(event -> {
-            if (usesFrameMotion()) {
-                updateFrameTarget(System.nanoTime());
+                focusActive = false;
                 updateFrameForeground();
                 repaint();
             }
         });
+        getModel().addChangeListener(event -> {
+            updateFrameTarget(System.nanoTime());
+            updateFrameForeground();
+            repaint();
+        });
         addPropertyChangeListener("enabled", event -> {
             if (!isEnabled()) {
                 resetAnimation();
-            } else if (usesFrameMotion()) {
+            } else {
                 updateFrameForeground();
             }
         });
@@ -171,139 +136,7 @@ final class TransmissionResponseButton extends JButton {
             paintTransmissionConfirmation(graphics);
             return;
         }
-
-        if (usesFrameMotion()) {
-            paintFrameButton(graphics);
-            return;
-        }
-
-        super.paintComponent(graphics);
-        if (!scanActive || !isEnabled()) {
-            return;
-        }
-
-        int inset = Math.max(1, scaleForGUI(2));
-        int innerWidth = getWidth() - inset * 2;
-        int innerHeight = getHeight() - inset * 2;
-        if ((innerWidth <= 0) || (innerHeight <= 0)) {
-            return;
-        }
-
-        int scanX = inset + (int) Math.round((innerWidth - 1) * scanProgress);
-        int trailSpace = scanForward
-                       ? scanX - inset
-                       : inset + innerWidth - 1 - scanX;
-        int trailWidth = Math.min(scaleForGUI(TRAIL_WIDTH), Math.max(0, trailSpace));
-        double opacity = scanOpacity();
-        Color signalColor = ImmersiveDialogStyle.getSignalColor();
-
-        Graphics2D graphics2D = (Graphics2D) graphics.create();
-        int arc = scaleForGUI(6);
-        graphics2D.clip(new RoundRectangle2D.Float(inset, inset, innerWidth, innerHeight, arc, arc));
-
-        if (trailWidth > 0) {
-            int trailStart = scanForward ? scanX - trailWidth : scanX;
-            Color transparentSignal = withAlpha(signalColor, 0);
-            Color trailSignal = withAlpha(signalColor, (int) Math.round(TRAIL_ALPHA * opacity));
-            graphics2D.setPaint(scanForward
-                                      ? new GradientPaint(trailStart, 0, transparentSignal, scanX, 0, trailSignal)
-                                      : new GradientPaint(scanX, 0, trailSignal,
-                                            scanX + trailWidth, 0, transparentSignal));
-            graphics2D.fillRect(trailStart, inset, trailWidth, innerHeight);
-        }
-
-        graphics2D.setColor(withAlpha(signalColor, (int) Math.round(LINE_ALPHA * opacity)));
-        graphics2D.fillRect(scanX, inset, Math.max(1, scaleForGUI(1)), innerHeight);
-        graphics2D.dispose();
-    }
-
-    void startScan() {
-        startScan(false, System.nanoTime());
-    }
-
-    void startScan(boolean repeat, long startNanos) {
-        if (usesFrameMotion() || !isEnabled() || transmissionConfirmationVisible) {
-            return;
-        }
-        if (scanActive) {
-            repeatScan |= repeat;
-            return;
-        }
-
-        scanActive = true;
-        scanForward = true;
-        repeatScan = repeat;
-        scanProgress = 0;
-        scanStartNanos = startNanos;
-        animationTimer.start();
-        repaint();
-    }
-
-    void completeScan() {
-        animationTimer.stop();
-        scanActive = false;
-        scanForward = true;
-        repeatScan = false;
-        scanProgress = 1.0;
-        repaint();
-    }
-
-    boolean isScanRunning() {
-        return scanActive;
-    }
-
-    boolean isScanMovingForward() {
-        return scanForward;
-    }
-
-    double getScanProgress() {
-        return scanProgress;
-    }
-
-    private void advanceScan() {
-        advanceScan(System.nanoTime());
-    }
-
-    void advanceScan(long nowNanos) {
-        long elapsedNanos = Math.max(0, nowNanos - scanStartNanos);
-        long passDurationNanos = getScanPassDurationNanos();
-        if (!repeatScan) {
-            scanForward = true;
-            scanProgress = Math.min(1.0, (double) elapsedNanos / passDurationNanos);
-            if (scanProgress >= 1.0) {
-                completeScan();
-            } else {
-                repaint();
-            }
-            return;
-        }
-
-        long passIndex = elapsedNanos / passDurationNanos;
-        double passProgress = (double) (elapsedNanos % passDurationNanos) / passDurationNanos;
-        scanForward = (passIndex % 2) == 0;
-        scanProgress = scanForward ? passProgress : 1.0 - passProgress;
-        if (!getModel().isRollover()) {
-            completeScan();
-        } else {
-            repaint();
-        }
-    }
-
-    long getScanPassDurationNanos() {
-        return Math.max(1, getScanTravelDistance()) * SCAN_NANOS_PER_PIXEL;
-    }
-
-    int getScanTravelDistance() {
-        int inset = Math.max(1, scaleForGUI(2));
-        return Math.max(1, getWidth() - inset * 2 - 1);
-    }
-
-    ResponseButtonMotion getResponseMotion() {
-        return responseMotion;
-    }
-
-    boolean usesFrameMotion() {
-        return responseMotion != ResponseButtonMotion.TRANSMISSION_SCAN;
+        paintFrameButton(graphics);
     }
 
     void applyFrameStyle() {
@@ -316,7 +149,7 @@ final class TransmissionResponseButton extends JButton {
     }
 
     void setFrameActive(boolean active, long nowNanos) {
-        if (!usesFrameMotion() || !isEnabled() || transmissionConfirmationVisible) {
+        if (!isEnabled() || transmissionConfirmationVisible) {
             return;
         }
 
@@ -332,6 +165,7 @@ final class TransmissionResponseButton extends JButton {
             frameTargetProgress = targetProgress;
             frameTransitionActive = false;
             animationTimer.stop();
+            updateFrameForeground();
             return;
         }
 
@@ -341,6 +175,7 @@ final class TransmissionResponseButton extends JButton {
         frameTransitionDurationNanos = Math.max(1,
               Math.round(FRAME_TRANSITION_DURATION_NANOS * Math.abs(frameTargetProgress - frameProgress)));
         frameTransitionActive = true;
+        updateFrameForeground();
         animationTimer.restart();
         repaint();
     }
@@ -355,7 +190,6 @@ final class TransmissionResponseButton extends JButton {
         double easedProgress = linearProgress * linearProgress * (3.0 - 2.0 * linearProgress);
         frameProgress = frameTransitionStartProgress +
                               (frameTargetProgress - frameTransitionStartProgress) * easedProgress;
-        updateFrameForeground();
 
         if (linearProgress >= 1.0) {
             frameProgress = frameTargetProgress;
@@ -395,17 +229,10 @@ final class TransmissionResponseButton extends JButton {
         compactTransmissionConfirmationText = compactConfirmationText;
         accessibleNameBeforeTransmission = getAccessibleContext().getAccessibleName();
         animationTimer.stop();
-        if (usesFrameMotion()) {
-            frameTransitionActive = false;
-            frameTransitionStartProgress = 1.0;
-            frameTargetProgress = 1.0;
-            frameProgress = 1.0;
-        } else {
-            scanActive = false;
-            scanForward = true;
-            repeatScan = false;
-            scanProgress = 1.0;
-        }
+        frameTransitionActive = false;
+        frameTransitionStartProgress = 1.0;
+        frameTargetProgress = 1.0;
+        frameProgress = 1.0;
         getAccessibleContext().setAccessibleName(accessibleFeedbackText);
         updateFrameForeground();
         repaint();
@@ -425,13 +252,9 @@ final class TransmissionResponseButton extends JButton {
     }
 
     private void advanceAnimation() {
-        if (usesFrameMotion()) {
-            advanceFrameTransition(System.nanoTime());
-            if (frameTransitionActive) {
-                animationTimer.restart();
-            }
-        } else {
-            advanceScan();
+        advanceFrameTransition(System.nanoTime());
+        if (frameTransitionActive) {
+            animationTimer.restart();
         }
     }
 
@@ -444,27 +267,18 @@ final class TransmissionResponseButton extends JButton {
 
     private void resetAnimation() {
         animationTimer.stop();
-        if (usesFrameMotion()) {
-            frameTransitionActive = false;
-            frameTransitionStartProgress = 0.0;
-            frameTargetProgress = 0.0;
-            frameProgress = 0.0;
-            pointerActive = false;
-            focusActive = false;
-            updateFrameForeground();
-            repaint();
-        } else {
-            scanActive = false;
-            scanForward = true;
-            repeatScan = false;
-            scanProgress = 1.0;
-            repaint();
-        }
+        frameTransitionActive = false;
+        frameTransitionStartProgress = 0.0;
+        frameTargetProgress = 0.0;
+        frameProgress = 0.0;
+        pointerActive = false;
+        focusActive = false;
+        updateFrameForeground();
+        repaint();
     }
 
     private void paintFrameButton(Graphics graphics) {
-        ImmersiveDialogStyle.ResponseButtonColors colors =
-              ImmersiveDialogStyle.getResponseButtonColors(responseMotion);
+        ImmersiveDialogStyle.ResponseButtonColors colors = ImmersiveDialogStyle.getResponseButtonColors();
         ImmersiveDialogStyle.ResponseButtonStateColors stateColors;
         double paintProgress;
         if (!isEnabled()) {
@@ -498,7 +312,7 @@ final class TransmissionResponseButton extends JButton {
 
     private void paintTransmissionConfirmation(Graphics graphics) {
         ImmersiveDialogStyle.ResponseButtonStateColors pressedColors =
-              ImmersiveDialogStyle.getTransmissionConfirmationColors(responseMotion);
+              ImmersiveDialogStyle.getTransmissionConfirmationColors();
 
         Graphics2D backgroundGraphics = (Graphics2D) graphics.create();
         backgroundGraphics.setColor(pressedColors.background());
@@ -559,21 +373,16 @@ final class TransmissionResponseButton extends JButton {
     }
 
     private void updateFrameForeground() {
-        if (!usesFrameMotion()) {
-            return;
-        }
-
-        ImmersiveDialogStyle.ResponseButtonColors colors =
-              ImmersiveDialogStyle.getResponseButtonColors(responseMotion);
+        ImmersiveDialogStyle.ResponseButtonColors colors = ImmersiveDialogStyle.getResponseButtonColors();
         Color foreground;
         if (transmissionConfirmationVisible) {
             foreground = colors.pressed().foreground();
         } else if (getModel().isPressed()) {
             foreground = colors.pressed().foreground();
         } else {
-            foreground = isEnabled()
-                               ? blend(colors.idle(), colors.active(), frameProgress).foreground()
-                               : colors.disabled().foreground();
+            foreground = isEnabled() && frameTargetProgress > 0.0
+                               ? colors.active().foreground()
+                               : isEnabled() ? colors.idle().foreground() : colors.disabled().foreground();
         }
         if (!foreground.equals(super.getForeground())) {
             super.setForeground(foreground);
@@ -590,13 +399,11 @@ final class TransmissionResponseButton extends JButton {
         compactTransmissionConfirmationText = null;
         getAccessibleContext().setAccessibleName(accessibleNameBeforeTransmission);
         accessibleNameBeforeTransmission = null;
-        if (usesFrameMotion()) {
-            frameTransitionActive = false;
-            frameTransitionStartProgress = pointerActive ? 1.0 : 0.0;
-            frameTargetProgress = frameTransitionStartProgress;
-            frameProgress = frameTransitionStartProgress;
-            animationTimer.stop();
-        }
+        frameTransitionActive = false;
+        frameTransitionStartProgress = pointerActive ? 1.0 : 0.0;
+        frameTargetProgress = frameTransitionStartProgress;
+        frameProgress = frameTransitionStartProgress;
+        animationTimer.stop();
         updateFrameForeground();
         repaint();
     }
@@ -619,24 +426,4 @@ final class TransmissionResponseButton extends JButton {
         return new Color(red, green, blue, alpha);
     }
 
-    private double scanOpacity() {
-        if (repeatScan) {
-            return 1.0;
-        }
-        if (scanProgress <= FADE_START_PROGRESS) {
-            return 1.0;
-        }
-        return 1.0 - (scanProgress - FADE_START_PROGRESS) / (1.0 - FADE_START_PROGRESS);
-    }
-
-    private static boolean isKeyboardTraversal(FocusEvent event) {
-        return switch (event.getCause()) {
-            case TRAVERSAL_FORWARD, TRAVERSAL_BACKWARD, TRAVERSAL_UP, TRAVERSAL_DOWN -> true;
-            default -> false;
-        };
-    }
-
-    private static Color withAlpha(Color color, int alpha) {
-        return new Color(color.getRed(), color.getGreen(), color.getBlue(), alpha);
-    }
 }

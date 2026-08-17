@@ -32,10 +32,12 @@
  */
 package mekhq.gui.baseComponents.immersiveDialogs;
 
+import static megamek.client.ui.util.UIUtil.scaleForGUI;
 import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
+import static org.junit.jupiter.api.Assertions.assertNotSame;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.awt.Dimension;
@@ -49,6 +51,7 @@ import java.awt.event.MouseListener;
 import java.awt.image.BufferedImage;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
+import javax.swing.JPanel;
 import javax.swing.JRootPane;
 import javax.swing.SwingUtilities;
 
@@ -57,107 +60,16 @@ import org.junit.jupiter.api.Test;
 class TransmissionResponseButtonTest {
     private static final int WIDTH = 180;
     private static final int HEIGHT = 44;
+    private static final int HORIZONTAL_LAYOUT_ALLOWANCE = 4;
+    private static final int VERTICAL_LAYOUT_ALLOWANCE = 2;
     private static final String CONFIRMATION_TEXT = "TRANSMITTING";
     private static final String COMPACT_CONFIRMATION_TEXT = "TX...";
     private static final String ACCESSIBLE_CONFIRMATION_TEXT = "Transmitting response";
 
     @Test
-    void scanOverlayAppearsDuringAnimationAndClearsOnCompletion() throws Exception {
-        SwingUtilities.invokeAndWait(() -> {
-            TransmissionResponseButton button = createButton();
-            int[] idlePixels = renderPixels(button);
-
-            button.startScan();
-            int[] scanningPixels = renderPixels(button);
-            assertTrue(button.isScanRunning());
-            assertFalse(java.util.Arrays.equals(idlePixels, scanningPixels));
-
-            button.completeScan();
-            assertFalse(button.isScanRunning());
-            assertArrayEquals(idlePixels, renderPixels(button));
-        });
-    }
-
-    @Test
-    void disabledButtonDoesNotStartScan() throws Exception {
-        SwingUtilities.invokeAndWait(() -> {
-            TransmissionResponseButton button = createButton();
-            button.setEnabled(false);
-
-            button.startScan();
-
-            assertFalse(button.isScanRunning());
-        });
-    }
-
-    @Test
-    void hoverAndKeyboardTraversalStartScanButWindowActivationDoesNot() throws Exception {
-        SwingUtilities.invokeAndWait(() -> {
-            TransmissionResponseButton button = createButton();
-
-            MouseEvent mouseEntered = new MouseEvent(button,
-                  MouseEvent.MOUSE_ENTERED,
-                  System.currentTimeMillis(),
-                  0,
-                  2,
-                  2,
-                  0,
-                  false);
-            for (MouseListener listener : button.getMouseListeners()) {
-                listener.mouseEntered(mouseEntered);
-            }
-            assertTrue(button.isScanRunning());
-
-            button.completeScan();
-            button.getModel().setRollover(true);
-            button.startScan(true, 0);
-            button.advanceScan(button.getScanPassDurationNanos() * 3 / 2);
-            assertTrue(button.isScanRunning());
-            assertFalse(button.isScanMovingForward());
-            assertEquals(0.5, button.getScanProgress(), 0.001);
-
-            MouseEvent mouseExited = new MouseEvent(button,
-                  MouseEvent.MOUSE_EXITED,
-                  System.currentTimeMillis(),
-                  0,
-                  WIDTH + 1,
-                  HEIGHT + 1,
-                  0,
-                  false);
-            for (MouseListener listener : button.getMouseListeners()) {
-                listener.mouseExited(mouseExited);
-            }
-            assertFalse(button.isScanRunning());
-
-            fireFocusGained(button, FocusEvent.Cause.ACTIVATION);
-            assertFalse(button.isScanRunning());
-
-            fireFocusGained(button, FocusEvent.Cause.TRAVERSAL_FORWARD);
-            assertTrue(button.isScanRunning());
-            button.advanceScan(Long.MAX_VALUE);
-            assertFalse(button.isScanRunning());
-        });
-    }
-
-    @Test
-    void scanUsesTheSamePixelVelocityForDifferentButtonWidths() throws Exception {
-        SwingUtilities.invokeAndWait(() -> {
-            TransmissionResponseButton shortButton = createButton();
-            TransmissionResponseButton longButton = createButton();
-            longButton.setSize(WIDTH * 2, HEIGHT);
-
-            assertEquals(TransmissionResponseButton.SCAN_NANOS_PER_PIXEL,
-                  shortButton.getScanPassDurationNanos() / shortButton.getScanTravelDistance());
-            assertEquals(TransmissionResponseButton.SCAN_NANOS_PER_PIXEL,
-                  longButton.getScanPassDurationNanos() / longButton.getScanTravelDistance());
-            assertTrue(longButton.getScanPassDurationNanos() > shortButton.getScanPassDurationNanos());
-        });
-    }
-
-    @Test
     void framePaintsIdlePartialAndFullStates() throws Exception {
         SwingUtilities.invokeAndWait(() -> {
-            TransmissionResponseButton button = createFrameButton(ResponseButtonMotion.MEKBAY_REFERENCE);
+            TransmissionResponseButton button = createButton();
             int[] idlePixels = renderPixels(button);
 
             button.setFrameActive(true, 0);
@@ -179,8 +91,8 @@ class TransmissionResponseButtonTest {
     @Test
     void frameDurationIsFixedIndependentOfButtonWidth() throws Exception {
         SwingUtilities.invokeAndWait(() -> {
-            TransmissionResponseButton shortButton = createFrameButton(ResponseButtonMotion.MEKBAY_REFERENCE);
-            TransmissionResponseButton longButton = createFrameButton(ResponseButtonMotion.MEKBAY_REFERENCE);
+            TransmissionResponseButton shortButton = createButton();
+            TransmissionResponseButton longButton = createButton();
             longButton.setSize(WIDTH * 2, HEIGHT);
 
             shortButton.setFrameActive(true, 0);
@@ -198,7 +110,7 @@ class TransmissionResponseButtonTest {
     @Test
     void frameReversesFromCurrentProgress() throws Exception {
         SwingUtilities.invokeAndWait(() -> {
-            TransmissionResponseButton button = createFrameButton(ResponseButtonMotion.MEKBAY_REFERENCE);
+            TransmissionResponseButton button = createButton();
             long halfDuration = TransmissionResponseButton.FRAME_TRANSITION_DURATION_NANOS / 2;
 
             button.setFrameActive(true, 0);
@@ -220,7 +132,7 @@ class TransmissionResponseButtonTest {
     @Test
     void focusedDefaultFrameUsesBrightCornersWhileHoverStillAnimates() throws Exception {
         SwingUtilities.invokeAndWait(() -> {
-            TransmissionResponseButton button = createFrameButton(ResponseButtonMotion.MEKHQ_SIGNAL);
+            TransmissionResponseButton button = createButton();
             int[] idlePixels = renderPixels(button);
 
             JRootPane rootPane = new JRootPane();
@@ -260,7 +172,7 @@ class TransmissionResponseButtonTest {
     @Test
     void modelPressForcesFullFrameAndReleaseRestoresInteractionState() throws Exception {
         SwingUtilities.invokeAndWait(() -> {
-            TransmissionResponseButton button = createFrameButton(ResponseButtonMotion.MEKHQ_SIGNAL);
+            TransmissionResponseButton button = createButton();
             fireFocusGained(button, FocusEvent.Cause.TRAVERSAL_FORWARD);
             int[] focusedPixels = renderPixels(button);
 
@@ -289,7 +201,7 @@ class TransmissionResponseButtonTest {
     @Test
     void disabledAndRemovedFrameButtonStopsCleanly() throws Exception {
         SwingUtilities.invokeAndWait(() -> {
-            TransmissionResponseButton button = createFrameButton(ResponseButtonMotion.MEKBAY_REFERENCE);
+            TransmissionResponseButton button = createButton();
             button.setFrameActive(true, 0);
             button.advanceFrameTransition(TransmissionResponseButton.FRAME_TRANSITION_DURATION_NANOS / 4);
 
@@ -309,27 +221,7 @@ class TransmissionResponseButtonTest {
     }
 
     @Test
-    void frameStylesUseDistinctNeutralAndSignalColors() throws Exception {
-        SwingUtilities.invokeAndWait(() -> {
-            TransmissionResponseButton mekBayButton = createFrameButton(ResponseButtonMotion.MEKBAY_REFERENCE);
-            TransmissionResponseButton mekHQButton = createFrameButton(ResponseButtonMotion.MEKHQ_SIGNAL);
-
-            int[] mekBayIdlePixels = renderPixels(mekBayButton);
-            int[] mekHQIdlePixels = renderPixels(mekHQButton);
-            assertNotEquals(pixelAt(mekBayIdlePixels, 0, 0), pixelAt(mekHQIdlePixels, 0, 0));
-
-            mekBayButton.setFrameActive(true, 0);
-            mekHQButton.setFrameActive(true, 0);
-            mekBayButton.advanceFrameTransition(TransmissionResponseButton.FRAME_TRANSITION_DURATION_NANOS);
-            mekHQButton.advanceFrameTransition(TransmissionResponseButton.FRAME_TRANSITION_DURATION_NANOS);
-
-            assertNotEquals(pixelAt(renderPixels(mekBayButton), 0, 0),
-                  pixelAt(renderPixels(mekHQButton), 0, 0));
-        });
-    }
-
-    @Test
-    void defaultConstructionUsesMekHQSignalAndActionsRemainImmediate() throws Exception {
+    void defaultConstructionPreservesButtonMetadataAndActionsRemainImmediate() throws Exception {
         SwingUtilities.invokeAndWait(() -> {
             ImmersiveDialogCore.ButtonLabelTooltipPair pair =
                   new ImmersiveDialogCore.ButtonLabelTooltipPair("Respond", null);
@@ -339,16 +231,157 @@ class TransmissionResponseButtonTest {
 
             button.doClick(0);
 
-            assertEquals(ResponseButtonMotion.MEKHQ_SIGNAL, pair.responseMotion());
-            assertEquals(ResponseButtonMotion.MEKHQ_SIGNAL, button.getResponseMotion());
+            assertEquals("Respond", pair.btnLabel());
+            assertEquals(null, pair.btnTooltip());
             assertEquals(1, actionCount.get());
+        });
+    }
+
+    @Test
+    void horizontalLabelsPreservePlainAndExplicitHtmlText() throws Exception {
+        SwingUtilities.invokeAndWait(() -> {
+            String plainText = ImmersiveDialogCore.resolveHorizontalButtonText("Request Support", "Tooltip");
+            TransmissionResponseButton plainButton = createStyledFrameButton(plainText);
+            TransmissionResponseButton comparisonButton = createStyledFrameButton("Respond");
+
+            assertEquals("Request Support", plainText);
+            assertEquals(plainText, plainButton.getText());
+            assertFalse(plainButton.getText().startsWith("<html"));
+            assertEquals(comparisonButton.getPreferredSize().height, plainButton.getPreferredSize().height);
+
+            String htmlText = "<html><b>Request</b><br>Support</html>";
+            String resolvedHtmlText = ImmersiveDialogCore.resolveHorizontalButtonText(htmlText, null);
+            TransmissionResponseButton htmlButton = createStyledFrameButton(resolvedHtmlText);
+
+            assertEquals(htmlText, resolvedHtmlText);
+            assertEquals(htmlText, htmlButton.getText());
+        });
+    }
+
+    @Test
+    void uniformButtonSizingUsesWideGlyphContentAndIndependentDimensions() throws Exception {
+        SwingUtilities.invokeAndWait(() -> {
+            TransmissionResponseButton wideButton = createStyledFrameButton("WWW Request Support");
+            TransmissionResponseButton tallButton = createStyledFrameButton("<html>Confirm<br>Assignment</html>");
+            Dimension naturalWideSize = wideButton.getPreferredSize();
+            Dimension naturalTallSize = tallButton.getPreferredSize();
+            Dimension wideContentRequirement = calculatePlainTextRequirement(wideButton);
+            Dimension expectedSize = new Dimension(
+                  Math.max(Math.max(naturalWideSize.width, wideContentRequirement.width), naturalTallSize.width),
+                  Math.max(Math.max(naturalWideSize.height, wideContentRequirement.height), naturalTallSize.height));
+
+            assertTrue(wideContentRequirement.width > naturalTallSize.width);
+
+            ImmersiveDialogCore.applyUniformButtonSizes(List.of(wideButton, tallButton));
+
+            assertEquals(expectedSize, wideButton.getPreferredSize());
+            assertEquals(expectedSize, wideButton.getMinimumSize());
+            assertEquals(expectedSize, tallButton.getPreferredSize());
+            assertEquals(expectedSize, tallButton.getMinimumSize());
+            assertNotSame(wideButton.getPreferredSize(), wideButton.getMinimumSize());
+            assertNotSame(wideButton.getPreferredSize(), tallButton.getPreferredSize());
+            assertNotSame(wideButton.getMinimumSize(), tallButton.getMinimumSize());
+            assertTrue(wideButton.getPreferredSize().width >= wideContentRequirement.width);
+            assertTrue(wideButton.getMinimumSize().width >= wideContentRequirement.width);
+
+            wideButton.getPreferredSize().width++;
+            assertEquals(expectedSize, wideButton.getMinimumSize());
+            assertEquals(expectedSize, tallButton.getPreferredSize());
+        });
+    }
+
+    @Test
+    void horizontalResponseButtonsStayUniformAndWrapOnlyWhenWidthRequiresIt() throws Exception {
+        SwingUtilities.invokeAndWait(() -> {
+            List<String> labels = List.of(
+                  "Advance", "Hold Position", "Withdraw", "Request Support", "Abort Operation");
+            List<TransmissionResponseButton> buttons = labels.stream()
+                .map(label -> createStyledFrameButton(
+                    ImmersiveDialogCore.resolveHorizontalButtonText(label, null)))
+                .toList();
+            List<Dimension> contentRequirements = buttons.stream()
+                .map(TransmissionResponseButtonTest::calculatePlainTextRequirement)
+                .toList();
+
+            ImmersiveDialogCore.applyUniformButtonSizes(buttons);
+
+            Dimension uniformSize = new Dimension(buttons.get(0).getPreferredSize());
+            for (TransmissionResponseButton button : buttons) {
+                assertEquals(uniformSize, button.getPreferredSize());
+                assertEquals(uniformSize, button.getMinimumSize());
+                for (Dimension contentRequirement : contentRequirements) {
+                    assertTrue(button.getPreferredSize().width >= contentRequirement.width);
+                    assertTrue(button.getPreferredSize().height >= contentRequirement.height);
+                    assertTrue(button.getMinimumSize().width >= contentRequirement.width);
+                    assertTrue(button.getMinimumSize().height >= contentRequirement.height);
+                }
+            }
+
+            TransmissionResponseButton requestSupportButton = buttons.get(3);
+            assertEquals("Request Support", requestSupportButton.getText());
+            assertFalse(requestSupportButton.getText().startsWith("<html"));
+            FontMetrics fontMetrics = requestSupportButton.getFontMetrics(requestSupportButton.getFont());
+            Insets insets = requestSupportButton.getInsets();
+            int exactTextAndInsetsWidth = fontMetrics.stringWidth(requestSupportButton.getText())
+                + insets.left
+                + insets.right;
+            assertTrue(requestSupportButton.getPreferredSize().width > exactTextAndInsetsWidth);
+            assertTrue(requestSupportButton.getMinimumSize().width > exactTextAndInsetsWidth);
+
+            JPanel buttonPanel = ImmersiveDialogCore.createResponseButtonPanel(false, scaleForGUI(5));
+            buttons.forEach(buttonPanel::add);
+            Dimension oneRowSize = buttonPanel.getPreferredSize();
+            buttonPanel.setSize(oneRowSize);
+            buttonPanel.doLayout();
+
+            assertTrue(areInSingleRow(buttons));
+            assertLaidOutAtUniformSize(buttons, uniformSize);
+
+            int constrainedWidth = oneRowSize.width - uniformSize.width;
+            buttonPanel.setSize(constrainedWidth, oneRowSize.height);
+            Dimension wrappedSize = buttonPanel.getPreferredSize();
+            buttonPanel.setSize(constrainedWidth, wrappedSize.height);
+            buttonPanel.doLayout();
+
+            assertFalse(areInSingleRow(buttons));
+            assertTrue(wrappedSize.height > oneRowSize.height);
+            assertLaidOutAtUniformSize(buttons, uniformSize);
+        });
+    }
+
+    @Test
+    void frameAnimationAndConfirmationPreserveDimensionsWithoutForegroundChurn() throws Exception {
+        SwingUtilities.invokeAndWait(() -> {
+            TransmissionResponseButton button = createButton();
+            ImmersiveDialogCore.applyUniformButtonSizes(List.of(button));
+            Dimension preferredSize = new Dimension(button.getPreferredSize());
+            Dimension minimumSize = new Dimension(button.getMinimumSize());
+            Dimension currentSize = new Dimension(button.getSize());
+            AtomicInteger foregroundChanges = new AtomicInteger();
+            button.addPropertyChangeListener("foreground", event -> foregroundChanges.incrementAndGet());
+
+            button.setFrameActive(true, 0);
+            int changesAfterHover = foregroundChanges.get();
+            assertTrue(changesAfterHover <= 1);
+
+            button.advanceFrameTransition(TransmissionResponseButton.FRAME_TRANSITION_DURATION_NANOS / 2);
+            assertButtonDimensions(button, preferredSize, minimumSize, currentSize);
+            assertEquals(changesAfterHover, foregroundChanges.get());
+
+            button.advanceFrameTransition(TransmissionResponseButton.FRAME_TRANSITION_DURATION_NANOS);
+            assertButtonDimensions(button, preferredSize, minimumSize, currentSize);
+            assertEquals(changesAfterHover, foregroundChanges.get());
+
+            button.lockTransmissionConfirmation(
+                  CONFIRMATION_TEXT, COMPACT_CONFIRMATION_TEXT, ACCESSIBLE_CONFIRMATION_TEXT);
+            assertButtonDimensions(button, preferredSize, minimumSize, currentSize);
         });
     }
 
     @Test
     void transmissionConfirmationPreservesTextAndSizeAndCleansUpOnRemoval() throws Exception {
         SwingUtilities.invokeAndWait(() -> {
-            TransmissionResponseButton button = createFrameButton(ResponseButtonMotion.MEKHQ_SIGNAL);
+            TransmissionResponseButton button = createButton();
             button.getAccessibleContext().setAccessibleName("Original response");
             String originalText = button.getText();
             Dimension originalPreferredSize = button.getPreferredSize();
@@ -378,15 +411,6 @@ class TransmissionResponseButtonTest {
             assertNotEquals(pixelAt(transmittingPixels, 0, HEIGHT / 2),
                 pixelAt(transmittingPixels, 3, HEIGHT / 2));
 
-            TransmissionResponseButton scanButton = createButton();
-            assertTrue(scanButton.lockTransmissionConfirmation(
-                CONFIRMATION_TEXT, COMPACT_CONFIRMATION_TEXT, ACCESSIBLE_CONFIRMATION_TEXT));
-            scanButton.startScan();
-            assertFalse(scanButton.isScanRunning());
-            int[] scanConfirmationPixels = renderPixels(scanButton);
-            assertNotEquals(pixelAt(scanConfirmationPixels, WIDTH / 2, 0),
-                pixelAt(scanConfirmationPixels, WIDTH / 2, 3));
-
             fireFocusLost(button);
             assertEquals(1.0, button.getFrameProgress(), 0.001);
 
@@ -405,7 +429,7 @@ class TransmissionResponseButtonTest {
     @Test
     void confirmationUsesCompactTextOnlyWhenFullTextDoesNotFit() throws Exception {
         SwingUtilities.invokeAndWait(() -> {
-            TransmissionResponseButton button = createFrameButton(ResponseButtonMotion.MEKHQ_SIGNAL);
+            TransmissionResponseButton button = createButton();
             FontMetrics fontMetrics = button.getFontMetrics(button.getFont());
             Insets insets = button.getInsets();
             int frameWidth = insets.left + insets.right;
@@ -427,8 +451,8 @@ class TransmissionResponseButtonTest {
     @Test
     void responseActivationCapturesImmediatelyAndRejectsDuplicates() throws Exception {
         SwingUtilities.invokeAndWait(() -> {
-            TransmissionResponseButton selectedButton = createFrameButton(ResponseButtonMotion.MEKHQ_SIGNAL);
-            TransmissionResponseButton alternateButton = createFrameButton(ResponseButtonMotion.MEKHQ_SIGNAL);
+            TransmissionResponseButton selectedButton = createButton();
+            TransmissionResponseButton alternateButton = createButton();
             AtomicInteger captureCount = new AtomicInteger();
             AtomicInteger disposeCount = new AtomicInteger();
             boolean[] capturedBeforeVisualChanges = new boolean[1];
@@ -458,7 +482,7 @@ class TransmissionResponseButtonTest {
             assertNotEquals(pixelAt(selectedPixels, 0, HEIGHT / 2), pixelAt(selectedPixels, 3, HEIGHT / 2));
             assertTrue(controller.isConfirmationTimerRunning());
             assertFalse(controller.isConfirmationTimerRepeating());
-            assertEquals(500,
+            assertEquals(350,
                   ImmersiveDialogCore.ResponseActivationController.TRANSMISSION_CONFIRMATION_DELAY_MS);
 
             assertFalse(controller.activate(selectedButton,
@@ -479,7 +503,7 @@ class TransmissionResponseButtonTest {
     @Test
     void responseActivationTimerCancelsWithoutDisposal() throws Exception {
         SwingUtilities.invokeAndWait(() -> {
-            TransmissionResponseButton button = createFrameButton(ResponseButtonMotion.MEKHQ_SIGNAL);
+            TransmissionResponseButton button = createButton();
             AtomicInteger disposeCount = new AtomicInteger();
             button.getAccessibleContext().setAccessibleName("Original response");
             ImmersiveDialogCore.ResponseActivationController controller =
@@ -500,18 +524,49 @@ class TransmissionResponseButtonTest {
     }
 
     private static TransmissionResponseButton createButton() {
-        TransmissionResponseButton button =
-              new TransmissionResponseButton("Respond", ResponseButtonMotion.TRANSMISSION_SCAN);
+        TransmissionResponseButton button = new TransmissionResponseButton("Respond");
         ImmersiveDialogStyle.applyResponseButtonStyle(button);
         button.setSize(WIDTH, HEIGHT);
         return button;
     }
 
-    private static TransmissionResponseButton createFrameButton(ResponseButtonMotion motion) {
-        TransmissionResponseButton button = new TransmissionResponseButton("Respond", motion);
+    private static TransmissionResponseButton createStyledFrameButton(String text) {
+        TransmissionResponseButton button = new TransmissionResponseButton(text);
         ImmersiveDialogStyle.applyResponseButtonStyle(button);
-        button.setSize(WIDTH, HEIGHT);
         return button;
+    }
+
+    private static Dimension calculatePlainTextRequirement(TransmissionResponseButton button) {
+        FontMetrics fontMetrics = button.getFontMetrics(button.getFont());
+        Insets insets = button.getInsets();
+        int horizontalAllowance = scaleForGUI(HORIZONTAL_LAYOUT_ALLOWANCE);
+        int verticalAllowance = scaleForGUI(VERTICAL_LAYOUT_ALLOWANCE);
+        return new Dimension(
+              fontMetrics.stringWidth(button.getText()) + insets.left + insets.right + horizontalAllowance * 2,
+              fontMetrics.getHeight() + insets.top + insets.bottom + verticalAllowance * 2);
+    }
+
+    private static void assertButtonDimensions(TransmissionResponseButton button, Dimension preferredSize,
+          Dimension minimumSize, Dimension currentSize) {
+        assertEquals(preferredSize, button.getPreferredSize());
+        assertEquals(minimumSize, button.getMinimumSize());
+        assertEquals(currentSize, button.getSize());
+    }
+
+    private static void assertLaidOutAtUniformSize(List<TransmissionResponseButton> buttons, Dimension uniformSize) {
+        for (TransmissionResponseButton button : buttons) {
+            assertEquals(uniformSize, button.getSize());
+        }
+    }
+
+    private static boolean areInSingleRow(List<TransmissionResponseButton> buttons) {
+        int firstY = buttons.get(0).getY();
+        for (TransmissionResponseButton button : buttons) {
+            if (button.getY() != firstY) {
+                return false;
+            }
+        }
+        return true;
     }
 
     private static int[] renderPixels(TransmissionResponseButton button) {

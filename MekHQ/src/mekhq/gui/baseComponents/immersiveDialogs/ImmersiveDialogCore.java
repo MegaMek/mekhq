@@ -49,6 +49,8 @@ import static mekhq.utilities.MHQInternationalization.getText;
 import java.awt.BorderLayout;
 import java.awt.Component;
 import java.awt.Dimension;
+import java.awt.FlowLayout;
+import java.awt.FontMetrics;
 import java.awt.GraphicsConfiguration;
 import java.awt.GraphicsDevice;
 import java.awt.GraphicsEnvironment;
@@ -64,11 +66,13 @@ import java.awt.Window;
 import java.awt.image.ImageObserver;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.UUID;
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
 import javax.swing.event.HyperlinkEvent;
 import javax.swing.event.HyperlinkEvent.EventType;
+import javax.swing.plaf.basic.BasicHTML;
 
 import megamek.client.ui.comboBoxes.MMComboBox;
 import megamek.codeUtilities.MathUtility;
@@ -89,6 +93,7 @@ import mekhq.gui.CampaignGUI;
 import mekhq.gui.baseComponents.JScrollablePanel;
 import mekhq.gui.dialog.glossary.GlossaryDocumentationEntryDialog;
 import mekhq.gui.dialog.glossary.GlossaryEntryDialog;
+import mekhq.gui.utilities.WrapLayout;
 
 /**
  * An immersive dialog used in MekHQ to display interactions between speakers, messages, and actions. The dialog
@@ -101,6 +106,8 @@ import mekhq.gui.dialog.glossary.GlossaryEntryDialog;
  * allowing for dynamic configurations based on the input parameters.</p>
  */
 public class ImmersiveDialogCore extends JDialog {
+    private static final int RESPONSE_BUTTON_HORIZONTAL_LAYOUT_ALLOWANCE = 4;
+    private static final int RESPONSE_BUTTON_VERTICAL_LAYOUT_ALLOWANCE = 2;
     private static final String FLATLAF_CLASS_PREFIX = "com.formdev.flatlaf.";
     private static final String FLATLAF_WINDOW_DECORATIONS_PROPERTY = "flatlaf.useWindowDecorations";
     private static final String USE_WINDOW_DECORATIONS_PROPERTY = "JRootPane.useWindowDecorations";
@@ -237,7 +244,7 @@ public class ImmersiveDialogCore extends JDialog {
           String centerMessage, List<ButtonLabelTooltipPair> buttons, @Nullable String outOfCharacterMessage,
           @Nullable Integer centerWidth, boolean isVerticalLayout, @Nullable JPanel supplementalPanel,
           @Nullable ImageIcon imageIcon, boolean isModal) {
-          this(campaign,
+        this(campaign,
               leftSpeaker,
               rightSpeaker,
               centerMessage,
@@ -247,25 +254,29 @@ public class ImmersiveDialogCore extends JDialog {
               isVerticalLayout,
               supplementalPanel,
               imageIcon,
-              TransmissionSignalQuality.REMOTE,
+              TransmissionSignalQualityResolver.resolve(campaign, leftSpeaker, rightSpeaker),
               isModal);
-        }
+    }
 
-        /**
-         * Constructs an immersive dialog using the specified video transmission quality.
-         *
-         * @param signalQuality visual fidelity applied to speaker portraits
-         */
-        public ImmersiveDialogCore(Campaign campaign, @Nullable Person leftSpeaker, @Nullable Person rightSpeaker,
-            String centerMessage, List<ButtonLabelTooltipPair> buttons, @Nullable String outOfCharacterMessage,
-            @Nullable Integer centerWidth, boolean isVerticalLayout, @Nullable JPanel supplementalPanel,
-            @Nullable ImageIcon imageIcon, TransmissionSignalQuality signalQuality, boolean isModal) {
+    /**
+     * Constructs an immersive dialog using an explicit video transmission quality override.
+     *
+     * <p>The remaining parameters inherit the contracts documented by the adjacent constructor.</p>
+     *
+     * @param signalQuality non-null visual fidelity override applied to speaker portraits
+     *
+     * @throws NullPointerException if {@code signalQuality} is {@code null}
+     */
+    public ImmersiveDialogCore(Campaign campaign, @Nullable Person leftSpeaker, @Nullable Person rightSpeaker,
+          String centerMessage, List<ButtonLabelTooltipPair> buttons, @Nullable String outOfCharacterMessage,
+          @Nullable Integer centerWidth, boolean isVerticalLayout, @Nullable JPanel supplementalPanel,
+          @Nullable ImageIcon imageIcon, TransmissionSignalQuality signalQuality, boolean isModal) {
         // Initialize
         this.campaign = campaign;
         this.leftSpeaker = leftSpeaker;
         this.rightSpeaker = rightSpeaker;
-        this.signalQuality = signalQuality;
-                    responseActivationController = new ResponseActivationController(this::dispose);
+        this.signalQuality = Objects.requireNonNull(signalQuality, "signalQuality");
+        responseActivationController = new ResponseActivationController(this::dispose);
 
         CENTER_WIDTH = (centerWidth != null) ? centerWidth : CENTER_WIDTH;
 
@@ -291,9 +302,9 @@ public class ImmersiveDialogCore extends JDialog {
 
         // Main Panel to hold all boxes
         JPanel mainPanel = new JPanel(new GridBagLayout());
-          mainPanel.setOpaque(false);
+        mainPanel.setOpaque(false);
         GridBagConstraints constraints = new GridBagConstraints();
-          constraints.insets = new Insets(0, PADDING, 0, PADDING);
+        constraints.insets = new Insets(0, PADDING, 0, PADDING);
         constraints.fill = GridBagConstraints.BOTH;
         constraints.weighty = 1;
 
@@ -453,7 +464,7 @@ public class ImmersiveDialogCore extends JDialog {
      */
     private JPanel createCenterBox(String centerMessage, List<ButtonLabelTooltipPair> buttons, boolean isVerticalLayout,
           @Nullable JPanel supplementalPanel, @Nullable ImageIcon imageIcon) {
-                JPanel centerPanel = ImmersiveDialogStyle.createAngularSurfacePanel();
+          JPanel centerPanel = ImmersiveDialogStyle.createAngularSurfacePanel();
 
         // Buttons panel
         JPanel buttonPanel = populateButtonPanel(buttons, isVerticalLayout);
@@ -591,7 +602,7 @@ public class ImmersiveDialogCore extends JDialog {
 
         // Use inline CSS to set font family, size, and other style properties
         String fontStyle = "font-family: Noto Sans;";
-                editorPane.setText(String.format("<html><div style='width: %dpx; %s'>%s</div></html>",
+        editorPane.setText(String.format("<html><div style='width: %dpx; %s'>%s</div></html>",
               max(buttonPanel.getPreferredSize().width, CENTER_WIDTH),
               fontStyle,
               centerMessage));
@@ -760,9 +771,7 @@ public class ImmersiveDialogCore extends JDialog {
         containerPanel.setOpaque(false);
 
         // Create button panel
-        JPanel buttonPanel = new JPanel();
-        buttonPanel.setLayout(new GridBagLayout());
-        buttonPanel.setOpaque(false);
+        JPanel buttonPanel = createResponseButtonPanel(isVerticalLayout, padding);
         GridBagConstraints gbc = new GridBagConstraints();
         gbc.gridx = 0;
         gbc.gridy = 0;
@@ -772,12 +781,10 @@ public class ImmersiveDialogCore extends JDialog {
         gbc.weightx = isVerticalLayout ? 1 : 0;
 
         List<TransmissionResponseButton> buttonList = new ArrayList<>();
-        Dimension largestSize = scaleForGUI(0, 0);
 
         // First pass: Create buttons and determine the largest size
         for (ButtonLabelTooltipPair buttonStrings : buttons) {
             TransmissionResponseButton button = null;
-            ResponseButtonMotion responseMotion = buttonStrings.responseMotion();
 
             if (isVerticalLayout) {
                 StringBuilder buttonLabel = new StringBuilder("<html>");
@@ -796,19 +803,17 @@ public class ImmersiveDialogCore extends JDialog {
                     buttonLabel.append(label);
                 }
 
-                button = new TransmissionResponseButton(buttonLabel.toString(), responseMotion);
+                button = new TransmissionResponseButton(buttonLabel.toString());
             } else {
                 String label = buttonStrings.btnLabel();
                 String tooltip = buttonStrings.btnTooltip();
-                if (label != null) {
-                    String text = String.format("<html><div style='text-align:center;'>%s</div></html>", label);
-                    button = new TransmissionResponseButton(text, responseMotion);
+                String text = resolveHorizontalButtonText(label, tooltip);
+                if (text != null) {
+                    button = new TransmissionResponseButton(text);
 
-                    if (tooltip != null) {
+                    if (label != null && tooltip != null) {
                         button.setToolTipText(wordWrap(tooltip));
                     }
-                } else if (tooltip != null) {
-                    button = new TransmissionResponseButton(tooltip, responseMotion);
                 }
             }
 
@@ -830,41 +835,23 @@ public class ImmersiveDialogCore extends JDialog {
                   responseButton,
                   buttonList,
                   () -> captureResponseState(responseIndex),
-                                    getText("ImmersiveDialog.response.transmitting.text"),
-                                    getText("ImmersiveDialog.response.transmitting.compact"),
-                                    getText("ImmersiveDialog.response.transmitting.accessible")));
-
-            // Update largest size
-            Dimension preferredSize = button.getPreferredSize();
-            if (preferredSize.width > largestSize.width) {
-                largestSize.width = preferredSize.width;
-            }
-            if (preferredSize.height > largestSize.height) {
-                largestSize.height = preferredSize.height;
-            }
+                getText("ImmersiveDialog.response.transmitting.text"),
+                getText("ImmersiveDialog.response.transmitting.compact"),
+                getText("ImmersiveDialog.response.transmitting.accessible")));
 
             buttonList.add(button);
         }
 
-        // Second pass: Set all buttons to the largest size
-        for (TransmissionResponseButton button : buttonList) {
-            button.setPreferredSize(largestSize);
-        }
+        applyUniformButtonSizes(buttonList);
 
         // Final pass: Add buttons to the panel
         for (TransmissionResponseButton button : buttonList) {
-            buttonPanel.add(button, gbc);
-
             if (isVerticalLayout) {
+                buttonPanel.add(button, gbc);
                 // If we're using a vertical layout, we just want the buttons stacked
                 gbc.gridy++;
             } else {
-                // Horizontal layout with wrapping after every 3 buttons
-                gbc.gridx++;
-                if (gbc.gridx % 3 == 0) { // Move to a new row after every third button
-                    gbc.gridx = 0;
-                    gbc.gridy++;
-                }
+                buttonPanel.add(button);
             }
         }
 
@@ -872,6 +859,64 @@ public class ImmersiveDialogCore extends JDialog {
         containerPanel.add(buttonPanel, BorderLayout.CENTER);
 
         return containerPanel;
+    }
+
+    static JPanel createResponseButtonPanel(boolean isVerticalLayout, int padding) {
+        JPanel buttonPanel = new JPanel(isVerticalLayout
+                                              ? new GridBagLayout()
+                                              : new WrapLayout(FlowLayout.CENTER, padding, padding));
+        buttonPanel.setOpaque(false);
+        return buttonPanel;
+    }
+
+    static String resolveHorizontalButtonText(String label, String tooltip) {
+        return label != null ? label : tooltip;
+    }
+
+    static void applyUniformButtonSizes(List<? extends JButton> buttons) {
+        int largestWidth = 0;
+        int largestHeight = 0;
+        for (JButton button : buttons) {
+            if (button == null) {
+                throw new IllegalArgumentException("buttons cannot contain null");
+            }
+            Dimension requiredSize = calculateRequiredButtonSize(button);
+            largestWidth = max(largestWidth, requiredSize.width);
+            largestHeight = max(largestHeight, requiredSize.height);
+        }
+
+        Dimension largestSize = new Dimension(largestWidth, largestHeight);
+        for (JButton button : buttons) {
+            if (button == null) {
+                throw new IllegalArgumentException("buttons cannot contain null");
+            }
+            button.setMinimumSize(new Dimension(largestSize));
+            button.setPreferredSize(new Dimension(largestSize));
+        }
+    }
+
+    private static Dimension calculateRequiredButtonSize(JButton button) {
+        Dimension uiPreferredSize = button.getPreferredSize();
+        String text = button.getText();
+        if (BasicHTML.isHTMLString(text)) {
+            return new Dimension(uiPreferredSize);
+        }
+
+        FontMetrics fontMetrics = button.getFontMetrics(button.getFont());
+        Insets insets = button.getInsets();
+        int contentWidth = text == null ? 0 : fontMetrics.stringWidth(text);
+        int contentHeight = fontMetrics.getHeight();
+        Icon icon = button.getIcon();
+        if (icon != null) {
+            contentWidth += icon.getIconWidth() + button.getIconTextGap();
+            contentHeight = max(contentHeight, icon.getIconHeight());
+        }
+
+        int horizontalAllowance = scaleForGUI(RESPONSE_BUTTON_HORIZONTAL_LAYOUT_ALLOWANCE);
+        int verticalAllowance = scaleForGUI(RESPONSE_BUTTON_VERTICAL_LAYOUT_ALLOWANCE);
+        int requiredWidth = contentWidth + insets.left + insets.right + horizontalAllowance * 2;
+        int requiredHeight = contentHeight + insets.top + insets.bottom + verticalAllowance * 2;
+        return new Dimension(max(uiPreferredSize.width, requiredWidth), max(uiPreferredSize.height, requiredHeight));
     }
 
     private void captureResponseState(int responseIndex) {
@@ -1083,7 +1128,7 @@ public class ImmersiveDialogCore extends JDialog {
     }
 
     static final class ResponseActivationController {
-        static final int TRANSMISSION_CONFIRMATION_DELAY_MS = 500;
+        static final int TRANSMISSION_CONFIRMATION_DELAY_MS = 350;
 
         private final Runnable dialogDisposer;
         private Timer confirmationTimer;
@@ -1170,7 +1215,7 @@ public class ImmersiveDialogCore extends JDialog {
      * Represents a label-tooltip pair for constructing UI buttons. Each button displays a label and optionally provides
      * a tooltip when hovered.
      */
-    public record ButtonLabelTooltipPair(String btnLabel, String btnTooltip, ResponseButtonMotion responseMotion) {
+    public record ButtonLabelTooltipPair(String btnLabel, @Nullable String btnTooltip) {
         /**
          * Constructs a ButtonLabelTooltipPair with the given label and tooltip.
          *
@@ -1179,30 +1224,10 @@ public class ImmersiveDialogCore extends JDialog {
          *
          * @throws IllegalArgumentException if both {@code btnLabel} and {@code btnTooltip} are {@code null}.
          */
-        public ButtonLabelTooltipPair(String btnLabel, @Nullable String btnTooltip) {
-            this(btnLabel, btnTooltip, ResponseButtonMotion.MEKHQ_SIGNAL);
-        }
-
-        /**
-         * Constructs a ButtonLabelTooltipPair with the given label, tooltip, and response motion.
-         *
-         * @param btnLabel      The label for the button. Can be {@code null} when a tooltip is supplied.
-         * @param btnTooltip    The tooltip for the button. Can be {@code null} when a label is supplied.
-         * @param responseMotion The visual motion used by the button. Must not be {@code null}.
-         *
-         * @throws IllegalArgumentException if both text values or the response motion are {@code null}.
-         */
-        public ButtonLabelTooltipPair(String btnLabel, @Nullable String btnTooltip,
-              ResponseButtonMotion responseMotion) {
+        public ButtonLabelTooltipPair {
             if (btnLabel == null && btnTooltip == null) {
                 throw new IllegalArgumentException("btnLabel and btnTooltip cannot be null at the same time.");
             }
-            if (responseMotion == null) {
-                throw new IllegalArgumentException("responseMotion cannot be null.");
-            }
-            this.btnLabel = btnLabel;
-            this.btnTooltip = btnTooltip;
-            this.responseMotion = responseMotion;
         }
 
         /**
