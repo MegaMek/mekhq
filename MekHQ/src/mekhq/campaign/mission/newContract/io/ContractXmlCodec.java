@@ -378,7 +378,7 @@ public final class ContractXmlCodec {
                     campaign,
                     version)));
         readers.put("enemyData",
-              (contract, node, campaign, version) -> contract.setEnemyData(parseEnemyData(node)));
+              (contract, node, campaign, version) -> contract.setEnemyData(parseEnemyData(node, campaign, version)));
         readers.put("contractTerms",
               (contract, node, campaign, version) -> contract.setContractTerms(parseContractTerms(node)));
         readers.put("objectiveData",
@@ -559,11 +559,13 @@ public final class ContractXmlCodec {
         binders.put("color", (b, n, c, v) -> b.color = PlayerColour.valueOf(text(n)));
         binders.put("batchallAccepted", (b, n, c, v) -> b.batchallAccepted = Boolean.parseBoolean(text(n)));
         binders.put(Camouflage.XML_TAG, (b, n, c, v) -> b.camouflage = Camouflage.parseFromXML(n));
+        binders.put("opposingCommander", (b, n, c, v) -> b.opposingCommander = parseWrappedPerson(n, c, v));
         return binders;
     }
 
-    private static EnemyData parseEnemyData(final Node wn) {
-        final EnemyDataBuilder builder = readFields(wn, new EnemyDataBuilder(), ENEMY_BINDERS, null, null, "enemyData");
+    private static EnemyData parseEnemyData(final Node wn, final Campaign campaign, final Version version) {
+        final EnemyDataBuilder builder = readFields(wn, new EnemyDataBuilder(), ENEMY_BINDERS, campaign, version,
+              "enemyData");
         return new EnemyData(builder.factionCode,
               builder.sponsorFactionCode,
               builder.displayName,
