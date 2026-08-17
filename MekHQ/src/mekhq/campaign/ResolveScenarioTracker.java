@@ -74,6 +74,7 @@ import mekhq.campaign.finances.Money;
 import mekhq.campaign.finances.enums.TransactionType;
 import mekhq.campaign.force.Formation;
 import mekhq.campaign.log.ServiceLogger;
+import mekhq.campaign.log.UnitLogger;
 import mekhq.campaign.mission.AtBContract;
 import mekhq.campaign.mission.AtBScenario;
 import mekhq.campaign.mission.BotForce;
@@ -670,6 +671,15 @@ public class ResolveScenarioTracker {
                               unit.getId().toString());
                         continue;
                     }
+
+                    // one unit history entry per kill, regardless of how many named crew the unit has - a unit run
+                    // entirely by temporary crew still scored the kill
+                    Person commander = unit.getCommander();
+                    UnitLogger.scoredKill(unit,
+                          campaign.getLocalDate(),
+                          killed,
+                          (commander == null) ? null : commander.getFullName());
+
                     for (Person person : unit.getActiveCrew()) {
                         PersonStatus status = peopleStatus.get(person.getId());
 
@@ -1904,6 +1914,11 @@ public class ResolveScenarioTracker {
                 continue;
             }
             Entity en = unitStatus.getEntity();
+
+            // the unit took part in the scenario, so this is the point at which the deployment becomes history. It is
+            // deliberately not logged when the unit is assigned to the scenario, as that assignment can be undone.
+            UnitLogger.deployed(unit, campaign.getLocalDate(), scenario.getName());
+
             Money unitValue = unit.getBuyCost();
             if (campaignOptions.isBLCSaleValue()) {
                 unitValue = unit.getSellValue();

@@ -40,6 +40,7 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.lang.reflect.Field;
+import javax.swing.SpinnerNumberModel;
 
 import megamek.client.ui.settings.SettingsBadge;
 import megamek.common.preference.PreferenceManager;
@@ -86,6 +87,19 @@ class CampaignOptionsVisualRegressionTest {
                     + "primary role changes.",
               getTextAt(getCampaignOptionsResourceBundle(), "lblAssignPortraitOnRoleChange.tooltip"));
     }
+
+        @Test
+        void noInterestInRelationshipsChanceCanReachZero() throws ReflectiveOperationException {
+          ProcreationPage page = new ProcreationPage();
+          page.createPanel(null);
+
+          CampaignOptionsSpinner spinner = getField(page,
+              "spnNoInterestInRelationshipsDiceSize",
+              CampaignOptionsSpinner.class);
+          spinner.setValue(1);
+
+          assertEquals(0, ((SpinnerNumberModel) spinner.getModel()).getPreviousValue());
+        }
 
     private static <T> T getField(Object target, String fieldName, Class<T> fieldType)
           throws ReflectiveOperationException {

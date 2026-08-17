@@ -50,7 +50,7 @@ import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.PersonUtility;
 import mekhq.campaign.personnel.enums.PersonnelRole;
 import mekhq.campaign.personnel.generator.SingleSpecialAbilityGenerator;
-import mekhq.campaign.personnel.ranks.AutoAssignRankForCompanyGenerator;
+import mekhq.campaign.personnel.ranks.AutomaticRankAssigner;
 import mekhq.campaign.personnel.skills.Skill;
 import mekhq.campaign.personnel.skills.enums.SkillAttribute;
 import mekhq.campaign.universe.Faction;
@@ -189,6 +189,6 @@ public class EmployerNegotiator {
             return;
         }
 
-        AutoAssignRankForCompanyGenerator.assignRankSystemFromFaction(negotiator, RO_MIN);
+        AutomaticRankAssigner.assignRankSystemFromFaction(negotiator, RO_MIN);
     }
 }

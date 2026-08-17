@@ -67,6 +67,7 @@ import mekhq.campaign.finances.Money;
 import mekhq.campaign.finances.enums.TransactionType;
 import mekhq.campaign.market.enums.UnitMarketType;
 import mekhq.campaign.market.unitMarket.UnitMarketOffer;
+import mekhq.campaign.unit.UnitAcquisitionType;
 import mekhq.gui.baseComponents.AbstractMHQSplitPane;
 import mekhq.gui.model.UnitMarketTableModel;
 import mekhq.gui.sorter.FormattedNumberSorter;
@@ -545,7 +546,8 @@ public class UnitMarketPane extends AbstractMHQSplitPane {
             getCampaign().addNewUnit(offer.getEntity(),
                   false,
                   transitDuration,
-                  UnitMarketType.getQuality(campaign, offer.getMarketType()));
+                  UnitMarketType.getQuality(campaign, offer.getMarketType()),
+                  UnitAcquisitionType.PURCHASED);
 
             if (!instantDelivery) {
                 getCampaign().addReport(ACQUISITIONS, "<font color='" +

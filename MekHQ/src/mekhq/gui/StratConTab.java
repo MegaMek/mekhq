@@ -594,8 +594,7 @@ public class StratConTab extends CampaignGuiTab {
         int requiredScore = currentContract.getRequiredVictoryPoints();
 
         if (requiredScore > 0) {
-            boolean canEndEarly = (campaignState == null) || campaignState.allowEarlyVictory();
-            victoryPointsPanel.add(ContractMeterBar.victoryPoints(currentScore, requiredScore, canEndEarly),
+            victoryPointsPanel.add(ContractMeterBar.victoryPoints(currentScore, requiredScore, campaignState),
                   BorderLayout.CENTER);
         } else {
             // No positive target to chart (e.g., a contract with a zero requirement); show the figures as text instead,

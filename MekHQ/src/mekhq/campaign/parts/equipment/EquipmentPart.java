@@ -612,7 +612,8 @@ public class EquipmentPart extends Part {
         return (type instanceof MiscType) &&
                      (type.hasFlag(MiscType.F_TARGETING_COMPUTER) ||
                             type.hasFlag(MiscType.F_CLUB) ||
-                            type.hasFlag(MiscType.F_TALON));
+                            type.hasFlag(MiscType.F_TALON) ||
+                            type.hasFlag(MiscType.F_SHIELD));
     }
 
     public static double getStartingTonnage(EquipmentType type) {

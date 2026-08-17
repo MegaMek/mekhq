@@ -296,20 +296,6 @@ public final class CampaignOption<T> {
           of(Boolean.class, false, "personnelLogAbilityGain");
     public static final CampaignOption<Boolean> PERSONNEL_LOG_EDGE_GAIN =
           of(Boolean.class, false, "personnelLogEdgeGain");
-    public static final CampaignOption<Boolean> DISPLAY_PERSONNEL_LOG =
-          of(Boolean.class, false, "displayPersonnelLog");
-    public static final CampaignOption<Boolean> DISPLAY_SCENARIO_LOG =
-          of(Boolean.class, false, "displayScenarioLog");
-    public static final CampaignOption<Boolean> DISPLAY_KILL_RECORD =
-          of(Boolean.class, false, "displayKillRecord");
-    public static final CampaignOption<Boolean> DISPLAY_MEDICAL_RECORD =
-          of(Boolean.class, false, "displayMedicalRecord");
-    public static final CampaignOption<Boolean> DISPLAY_PATIENT_RECORD =
-          of(Boolean.class, false, "displayPatientRecord");
-    public static final CampaignOption<Boolean> DISPLAY_ASSIGNMENT_RECORD =
-          of(Boolean.class, false, "displayAssignmentRecord");
-    public static final CampaignOption<Boolean> DISPLAY_PERFORMANCE_RECORD =
-          of(Boolean.class, false, "displayPerformanceRecord");
     public static final CampaignOption<Boolean> AWARD_VETERANCY_SP_AS =
           of(Boolean.class, false, "awardVeterancySPAs");
     public static final CampaignOption<Boolean> AWARD_RELEVANT_VETERANCY_SP_AS =

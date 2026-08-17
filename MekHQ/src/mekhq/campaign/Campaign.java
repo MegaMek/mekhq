@@ -168,6 +168,7 @@ import mekhq.campaign.location.LocationUtils;
 import mekhq.campaign.log.HistoricalLogEntry;
 import mekhq.campaign.log.LogEntry;
 import mekhq.campaign.log.ServiceLogger;
+import mekhq.campaign.log.UnitLogger;
 import mekhq.campaign.market.ForceShoppingList;
 import mekhq.campaign.market.PartsStore;
 import mekhq.campaign.market.PersonnelMarket;
@@ -214,7 +215,7 @@ import mekhq.campaign.personnel.enums.SplittingSurnameStyle;
 import mekhq.campaign.personnel.generator.AbstractPersonnelGenerator;
 import mekhq.campaign.personnel.marriage.AbstractMarriage;
 import mekhq.campaign.personnel.procreation.AbstractProcreation;
-import mekhq.campaign.personnel.ranks.AutoAssignRankForCompanyGenerator;
+import mekhq.campaign.personnel.ranks.AutomaticRankAssigner;
 import mekhq.campaign.personnel.ranks.RankSystem;
 import mekhq.campaign.personnel.skills.ActionCheckResult;
 import mekhq.campaign.personnel.skills.Appraisal;
@@ -235,6 +236,7 @@ import mekhq.campaign.unit.CrewType;
 import mekhq.campaign.unit.HangarStatistics;
 import mekhq.campaign.unit.TestUnit;
 import mekhq.campaign.unit.Unit;
+import mekhq.campaign.unit.UnitAcquisitionType;
 import mekhq.campaign.unit.UnitOrder;
 import mekhq.campaign.unit.enums.TransporterType;
 import mekhq.campaign.universe.*;
@@ -1818,6 +1820,14 @@ public class Campaign implements ITechManager {
         Unit unit = new Unit(testUnit.getEntity(), this);
         getPlayerForce().getHangar().addUnit(unit);
 
+        // record who the unit was salvaged from before we take ownership of it
+        final String formerOwner = (unit.getEntity().getOwner() != null) ? unit.getEntity().getOwner().getName() : null;
+        if ((formerOwner != null) && !formerOwner.isBlank()) {
+            UnitLogger.salvagedFrom(unit, getLocalDate(), formerOwner);
+        } else {
+            UnitLogger.acquired(unit, getLocalDate(), UnitAcquisitionType.SALVAGED);
+        }
+
         // we decided we like the test unit so much we are going to keep it
         unit.getEntity().setOwner(player);
         unit.getEntity().setGame(game);
@@ -1862,7 +1872,7 @@ public class Campaign implements ITechManager {
     }
 
     /**
-     * Add a new unit to the campaign and set its quality.
+     * Add a new unit to the campaign and set its quality, without recording a specific form of acquisition.
      *
      * @param en             An <code>Entity</code> object that the new unit will be wrapped around
      * @param allowNewPilots A boolean indicating whether to add new pilots for the unit
@@ -1874,6 +1884,27 @@ public class Campaign implements ITechManager {
      * @throws IllegalArgumentException If the quality is not within the valid range (0-5)
      */
     public Unit addNewUnit(Entity en, boolean allowNewPilots, int days, PartQuality quality) {
+        return addNewUnit(en, allowNewPilots, days, quality, UnitAcquisitionType.ACQUIRED);
+    }
+
+    /**
+     * Add a new unit to the campaign and set its quality.
+     *
+     * <p>The acquisition is recorded in the new unit's log, so every unit added through this method carries the form
+     * and date by which it entered the campaign.</p>
+     *
+     * @param en              An <code>Entity</code> object that the new unit will be wrapped around
+     * @param allowNewPilots  A boolean indicating whether to add new pilots for the unit
+     * @param days            The number of days for the new unit to arrive
+     * @param quality         The quality of the new unit (0-5)
+     * @param acquisitionType The means by which the campaign acquired the unit
+     *
+     * @return The newly added unit
+     *
+     * @throws IllegalArgumentException If the quality is not within the valid range (0-5)
+     */
+    public Unit addNewUnit(Entity en, boolean allowNewPilots, int days, PartQuality quality,
+          UnitAcquisitionType acquisitionType) {
         Unit unit = new Unit(en, this);
         if (!unit.isSelfCrewed()) {
             unit.setMaintenanceMultiplier(getCampaignOptions().getDefaultMaintenanceTime());
@@ -1926,6 +1957,8 @@ public class Campaign implements ITechManager {
                 }
             }
         }
+
+        UnitLogger.acquired(unit, getLocalDate(), acquisitionType);
 
         checkDuplicateNamesDuringAdd(en);
         addReport(ACQUISITIONS, unit.getHyperlinkedName() + " has been added to the unit roster.");
@@ -4122,7 +4155,18 @@ public class Campaign implements ITechManager {
 
         final boolean taskSucceeded = roll >= target.getValue();
         if (taskSucceeded) {
+            // capture the repair target before succeeding: replacing a MissingPart removes the placeholder from the
+            // unit, which clears its unit reference and its part name along with it
+            final Unit repairedUnit = partWork.getUnit();
+            final String repairedPartName = partWork.getPartName();
+            final boolean isRepair = !partWork.isSalvaging() && !(partWork instanceof AmmoBin);
+
             report = report + partWork.succeed();
+            // log successful repairs (fixes and missing-part replacements) against the unit; salvage and ammo
+            // reloads are not repairs
+            if ((repairedUnit != null) && isRepair) {
+                UnitLogger.repaired(repairedUnit, getLocalDate(), repairedPartName, tech.getFullName());
+            }
             if (getCampaignOptions().isPayForRepairs() && action.equals(" fix ") && !(partWork instanceof Armor)) {
                 Money cost = partWork.getUndamagedValue().multipliedBy(0.2);
                 report += "<br>Repairs cost " + cost.toAmountAndSymbolString() + " worth of parts.";
@@ -4404,7 +4448,7 @@ public class Campaign implements ITechManager {
             final String factionCode = chosenFaction.getShortName();
             Person speaker = getPlayerForce().getHumanResources().newPerson(this, role, factionCode, Gender.RANDOMIZE);
 
-            AutoAssignRankForCompanyGenerator.assignRankSystemFromFaction(speaker, RO_MIN);
+            AutomaticRankAssigner.assignRankSystemFromFaction(speaker, RO_MIN);
 
             new FactionJudgmentDialog(this, speaker, getPlayerForce().getHumanResources()
                                                            .getCommander(getCampaignOptions(),
