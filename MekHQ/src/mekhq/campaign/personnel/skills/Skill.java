@@ -42,6 +42,8 @@ import static mekhq.campaign.personnel.skills.SkillModifierData.IGNORE_AGE;
 import static mekhq.campaign.personnel.skills.SkillType.*;
 import static mekhq.campaign.personnel.skills.enums.SkillAttribute.CHARISMA;
 import static mekhq.campaign.personnel.skills.enums.SkillAttribute.INTELLIGENCE;
+import static mekhq.campaign.personnel.skills.enums.SkillSubType.COMBAT_GUNNERY;
+import static mekhq.campaign.personnel.skills.enums.SkillSubType.COMBAT_PILOTING;
 import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
 import static mekhq.utilities.MHQInternationalization.getTextAt;
 
@@ -565,8 +567,10 @@ public class Skill {
 
         // Chassis Familiarity (combat): the caller supplies the bonus already computed for this skill's role (piloting
         // or gunnery) from the crew member's familiarity and the active FamiliarityMode; it may be negative (Hard
-        // mode). It applies only to combat piloting/gunnery skills (those tied to a specialist family).
-        if ((familiarityBonus != 0) && (familyForSkill(name) != null)) {
+        // mode). It applies to every skill a unit is driven or fought with - which is exactly the combat
+        // piloting/gunnery subtypes, covering Anti-Mek and Gunnery/ProtoMek alongside Piloting/Mek, the infantry
+        // gunnery skills alongside Small Arms, and Artillery. Support and roleplay skills never receive it.
+        if ((familiarityBonus != 0) && isCombatPilotingOrGunnery()) {
             modifier += familiarityBonus;
         }
 
@@ -574,18 +578,11 @@ public class Skill {
     }
 
     /**
-     * Unit family inferred from a combat piloting/gunnery skill's type name; used to gate the combat Chassis
-     * Familiarity bonus to piloting/gunnery skills. Returns {@code null} for non-combat skills.
+     * @return {@code true} if this skill is one a unit is piloted or shot with, and so is eligible for the combat
+     *       Chassis Familiarity bonus
      */
-    private enum SpecialistFamily {MEK, VEHICULAR, FLIGHT}
-
-    private static SpecialistFamily familyForSkill(String skillName) {
-        return switch (skillName) {
-            case S_PILOT_MEK, S_GUN_MEK -> SpecialistFamily.MEK;
-            case S_PILOT_GVEE, S_PILOT_NVEE, S_PILOT_VTOL, S_GUN_VEE -> SpecialistFamily.VEHICULAR;
-            case S_PILOT_AERO, S_PILOT_JET, S_GUN_AERO, S_GUN_JET -> SpecialistFamily.FLIGHT;
-            default -> null;
-        };
+    private boolean isCombatPilotingOrGunnery() {
+        return type.isSubTypeOf(COMBAT_PILOTING) || type.isSubTypeOf(COMBAT_GUNNERY);
     }
 
 
