@@ -3031,26 +3031,6 @@ public class Campaign implements ITechManager {
      * determined using the {@link Person#outRanksUsingSkillTiebreaker} method when there are multiple eligible
      * administrators for the specified role.
      *
-     * <p>
-     * The method evaluates both the primary and secondary roles of each administrator against the provided
-     * {@link AdministratorSpecialization} type.
-     * </p>
-     *
-     * <p>
-     * The valid types of administrative roles are represented by the {@link AdministratorSpecialization} enum:
-     * </p>
-     * <ul>
-     * <li>{@link AdministratorSpecialization#COMMAND} - Command Administrator</li>
-     * <li>{@link AdministratorSpecialization#LOGISTICS} - Logistics
-     * Administrator</li>
-     * <li>{@link AdministratorSpecialization#TRANSPORT} - Transport
-     * Administrator</li>
-     * <li>{@link AdministratorSpecialization#HR} - HR Administrator</li>
-     * </ul>
-     *
-     * @param type the {@link AdministratorSpecialization} representing the administrative role to check for. Passing a
-     *             {@code null} type will result in an {@link IllegalStateException}.
-     *
      * @return the most senior {@link Person} with the specified administrative role, or {@code null} if no eligible
      *       administrator is found.
      *

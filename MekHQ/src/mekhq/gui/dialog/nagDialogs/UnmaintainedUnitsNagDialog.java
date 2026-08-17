@@ -81,7 +81,6 @@ public class UnmaintainedUnitsNagDialog extends ImmersiveDialogNag {
      * employed to determine the speaker based on senior administrators.</p>
      *
      * @param campaign       The {@link Campaign} instance providing access to personnel and administrator data.
-     * @param specialization The {@link AdministratorSpecialization} used as a criterion for selecting the speaker.
      *
      * @return The {@link Person} designated as the speaker, prioritizing technical specialists, then senior
      *       administrators with "HR" or "COMMAND" specializations. Returns {@code null} if no suitable speaker can be

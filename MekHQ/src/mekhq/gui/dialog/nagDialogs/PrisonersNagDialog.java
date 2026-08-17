@@ -60,8 +60,6 @@ public class PrisonersNagDialog extends ImmersiveDialogNag {
      * between candidates. If no qualified force commander is found, it falls back to a default speaker mechanism.</p>
      *
      * @param campaign       The {@link Campaign} instance providing access to force and personnel data.
-     * @param specialization The {@link AdministratorSpecialization} used as an optional criterion for selecting the
-     *                       speaker (maybe {@code null}).
      *
      * @return The {@link Person} designated as the speaker, favoring commanders from "SECURITY" forces, or a fallback
      *       speaker if no suitable individual is found. Returns {@code null} only if the fallback mechanism cannot
