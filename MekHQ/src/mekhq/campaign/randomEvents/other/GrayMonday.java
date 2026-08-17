@@ -32,7 +32,6 @@
  */
 package mekhq.campaign.randomEvents.other;
 
-import static mekhq.campaign.Campaign.AdministratorSpecialization.COMMAND;
 import static mekhq.campaign.finances.enums.TransactionType.STARTING_CAPITAL;
 import static mekhq.campaign.personnel.enums.PersonnelRole.ADMINISTRATOR;
 import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
@@ -160,8 +159,7 @@ public class GrayMonday {
      */
     private @Nullable Person getSpeaker() {
         return campaign.getPlayerForce().getHumanResources()
-                     .getSeniorAdminPerson(COMMAND,
-                           campaign.getCampaignOptions(),
+                     .getSeniorAdminPerson(campaign.getCampaignOptions(),
                            campaign.isClanCampaign(),
                            campaign.getLocalDate());
     }

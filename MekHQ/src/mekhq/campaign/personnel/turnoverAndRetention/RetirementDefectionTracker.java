@@ -230,8 +230,7 @@ public class RetirementDefectionTracker {
         int combinedSkillValues = 0;
 
         for (Person person : campaign.getPlayerForce().getHumanResources().getActivePersonnel(false, false)) {
-            boolean isAdmin = person.getPrimaryRole().isAdministratorHR() ||
-                                    person.getSecondaryRole().isAdministratorHR();
+            boolean isAdmin = person.isAdministrator();
             if (!isAdmin) {
                 continue;
             }

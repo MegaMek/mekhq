@@ -257,11 +257,7 @@ public class SupportPointNegotiation {
     private static List<Person> getSortedAdminTransportPersonnel(Campaign campaign) {
         List<Person> adminTransport = new ArrayList<>();
         for (Person person : campaign.getPlayerForce().getHumanResources().getAdmins()) {
-            if (person.getPrimaryRole().isAdministratorTransport() ||
-                      person.getSecondaryRole().isAdministratorTransport()) {
-                // Each character gets to roll three times, so we add them to the list three times.
-                adminTransport.add(person);
-                adminTransport.add(person);
+            if (person.isAdministrator()) {
                 adminTransport.add(person);
             }
         }

@@ -91,9 +91,6 @@ public class QuickTrain {
     public static void processQuickTraining(List<Person> targetPersonnel, int targetLevel,
           Campaign campaign, QuickTrainOptions options, boolean isContinuousTraining) {
         CampaignOptions campaignOptions = campaign.getCampaignOptions();
-        // Should we train Negotiation for Admins?
-        boolean isAdminsHaveNegotiation = campaignOptions.isAdminsHaveNegotiation();
-
         // Should we train Administration for Techs and Doctors?
         boolean isDoctorsUseAdministration = campaignOptions.isDoctorsUseAdministration();
         boolean isTechsUseAdministration = campaignOptions.isTechsUseAdministration();
@@ -144,10 +141,20 @@ public class QuickTrain {
 
             SkillModifierData skillModifierData = person.getSkillModifierData(isUseAgingEffects, isClanCampaign,
                   today, true);
-            processSkills(person, isAdminsHaveNegotiation, isDoctorsUseAdministration, isTechsUseAdministration,
-                  isLevelArtillery, isUseSmallArmsOnly, isLevelScoutingSkills, isLevelEscapeSkills,
-                  isUseAppraisal, procurementPersonnel, isLevelLeadership, isLevelTraining, isLevelOtherCommandSkills,
-                  targetSkills, skillModifierData);
+            processSkills(person,
+                  isDoctorsUseAdministration,
+                  isTechsUseAdministration,
+                  isLevelArtillery,
+                  isUseSmallArmsOnly,
+                  isLevelScoutingSkills,
+                  isLevelEscapeSkills,
+                  isUseAppraisal,
+                  procurementPersonnel,
+                  isLevelLeadership,
+                  isLevelTraining,
+                  isLevelOtherCommandSkills,
+                  targetSkills,
+                  skillModifierData);
 
             if (targetSkills.isEmpty()) {
                 continue;
@@ -286,8 +293,6 @@ public class QuickTrain {
      * <p>The {@code targetSkills} list is modified in place; skills may be added, removed, and finally reordered.
      *
      * @param person                     the person whose skills and roles are being evaluated
-     * @param isAdminsHaveNegotiation    {@code true} if administrators should use negotiation instead of administration
-     *                                   for their profession-based skill picks
      * @param isDoctorsUseAdministration {@code true} if doctors should use administration instead of medical-specific
      *                                   skills for their profession-based picks
      * @param isTechsUseAdministration   {@code true} if technicians should use administration instead of
@@ -312,20 +317,29 @@ public class QuickTrain {
      * @author Illiani
      * @since 0.50.10
      */
-    private static void processSkills(Person person, boolean isAdminsHaveNegotiation,
-          boolean isDoctorsUseAdministration, boolean isTechsUseAdministration, boolean isLevelArtillery,
-          boolean isUseSmallArmsOnly, boolean isLevelScoutingSkills, boolean isLevelEscapeSkills,
-          boolean isUseAppraisal, ProcurementPersonnelPick procurementPersonnel, boolean isLevelLeadership,
-          boolean isLevelTraining, boolean isLevelOtherCommandSkills, List<String> targetSkills,
-          SkillModifierData skillModifierData) {
+    private static void processSkills(Person person, boolean isDoctorsUseAdministration,
+          boolean isTechsUseAdministration, boolean isLevelArtillery, boolean isUseSmallArmsOnly,
+          boolean isLevelScoutingSkills, boolean isLevelEscapeSkills, boolean isUseAppraisal,
+          ProcurementPersonnelPick procurementPersonnel, boolean isLevelLeadership, boolean isLevelTraining,
+          boolean isLevelOtherCommandSkills, List<String> targetSkills, SkillModifierData skillModifierData) {
         Skills personSkills = person.getSkills();
 
-        fetchSkillsForProfession(isAdminsHaveNegotiation, isDoctorsUseAdministration,
-              isTechsUseAdministration, isLevelArtillery, isUseSmallArmsOnly, person, targetSkills,
-              person.getPrimaryRole(), skillModifierData);
-        fetchSkillsForProfession(isAdminsHaveNegotiation, isDoctorsUseAdministration,
-              isTechsUseAdministration, isLevelArtillery, isUseSmallArmsOnly, person, targetSkills,
-              person.getSecondaryRole(), skillModifierData);
+        fetchSkillsForProfession(isDoctorsUseAdministration,
+              isTechsUseAdministration,
+              isLevelArtillery,
+              isUseSmallArmsOnly,
+              person,
+              targetSkills,
+              person.getPrimaryRole(),
+              skillModifierData);
+        fetchSkillsForProfession(isDoctorsUseAdministration,
+              isTechsUseAdministration,
+              isLevelArtillery,
+              isUseSmallArmsOnly,
+              person,
+              targetSkills,
+              person.getSecondaryRole(),
+              skillModifierData);
 
         if (!personSkills.hasSkill(SkillType.S_ARTILLERY)) {
             targetSkills.remove(SkillType.S_ARTILLERY);
@@ -427,7 +441,6 @@ public class QuickTrain {
      * Identifies and adds to the target skills list all relevant trainable skills for a given profession of a person,
      * observing special rules for vehicle crews and soldiers.
      *
-     * @param isAdminsHaveNegotiation    campaign option: admins substitute negotiation
      * @param isDoctorsUseAdministration campaign option: doctors substitute administration
      * @param isTechsUseAdministration   campaign option: techs substitute administration
      * @param isUseArtillery             campaign option: include artillery skills
@@ -439,9 +452,9 @@ public class QuickTrain {
      * @author Illiani
      * @since 0.50.10
      */
-    private static void fetchSkillsForProfession(boolean isAdminsHaveNegotiation, boolean isDoctorsUseAdministration,
-          boolean isTechsUseAdministration, boolean isUseArtillery, boolean isUseSmallArmsOnly, Person person,
-          List<String> targetSkills, PersonnelRole profession, SkillModifierData skillModifierData) {
+    private static void fetchSkillsForProfession(boolean isDoctorsUseAdministration, boolean isTechsUseAdministration,
+          boolean isUseArtillery, boolean isUseSmallArmsOnly, Person person, List<String> targetSkills,
+          PersonnelRole profession, SkillModifierData skillModifierData) {
         if (profession.isNone() || profession.isDependent()) {
             return;
         }
@@ -456,14 +469,18 @@ public class QuickTrain {
             }
 
             if (highestSkillName == null) {
-                targetSkills.addAll(PersonnelRole.SOLDIER.getSkillsForProfession(isAdminsHaveNegotiation,
-                      isDoctorsUseAdministration, isTechsUseAdministration, isUseArtillery, false));
+                targetSkills.addAll(PersonnelRole.SOLDIER.getSkillsForProfession(isDoctorsUseAdministration,
+                      isTechsUseAdministration,
+                      isUseArtillery,
+                      false));
             } else {
                 targetSkills.add(highestSkillName);
             }
         } else {
-            targetSkills.addAll(profession.getSkillsForProfession(isAdminsHaveNegotiation,
-                  isDoctorsUseAdministration, isTechsUseAdministration, isUseArtillery, false));
+            targetSkills.addAll(profession.getSkillsForProfession(isDoctorsUseAdministration,
+                  isTechsUseAdministration,
+                  isUseArtillery,
+                  false));
         }
     }
 

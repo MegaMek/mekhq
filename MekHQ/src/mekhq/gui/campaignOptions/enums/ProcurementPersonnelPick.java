@@ -135,8 +135,7 @@ public enum ProcurementPersonnelPick {
                 }
             }
             case LOGISTICS -> {
-                if (!person.getPrimaryRole().isAdministratorLogistics() &&
-                          !person.getSecondaryRole().isAdministratorLogistics()) {
+                if (!person.isAdministrator()) {
                     return true;
                 }
             }

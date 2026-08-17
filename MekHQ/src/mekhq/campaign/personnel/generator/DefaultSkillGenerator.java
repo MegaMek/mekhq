@@ -125,9 +125,9 @@ public class DefaultSkillGenerator extends AbstractSkillGenerator {
             generateArtillerySkill(person, bonus);
         }
 
-        // roll Negotiation skill
-        if (campaignOptions.isAdminsHaveNegotiation() && (primaryRole.isAdministrator())) {
-            addSkill(person, SkillType.S_NEGOTIATION, expLvl, skillPreferences.randomizeSkill(), 0, mod);
+        // roll Appraisal skill
+        if (primaryRole.isAdministrator()) {
+            addSkill(person, SkillType.S_APPRAISAL, expLvl, skillPreferences.randomizeSkill(), 0, mod);
         }
 
         // roll Administration skill

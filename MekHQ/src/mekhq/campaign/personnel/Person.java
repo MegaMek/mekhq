@@ -5660,13 +5660,11 @@ public class Person implements ILocatable {
         final PersonnelRole profession = secondary ? getSecondaryRole() : getPrimaryRole();
 
         final CampaignOptions campaignOptions = campaign.getCampaignOptions();
-        final boolean isAdminsHaveNegotiation = campaignOptions.isAdminsHaveNegotiation();
         final boolean isDoctorsUseAdministration = campaignOptions.isDoctorsUseAdministration();
         final boolean isTechsUseAdministration = campaignOptions.isTechsUseAdministration();
         final boolean isUseArtillery = campaignOptions.isUseArtillery();
 
-        return profession.getSkillsForProfession(isAdminsHaveNegotiation,
-              isDoctorsUseAdministration,
+        return profession.getSkillsForProfession(isDoctorsUseAdministration,
               isTechsUseAdministration,
               isUseArtillery);
     }

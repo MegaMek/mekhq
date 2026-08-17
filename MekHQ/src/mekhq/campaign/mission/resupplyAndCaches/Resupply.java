@@ -844,8 +844,7 @@ public class Resupply {
             negotiator = null;
 
             for (Person admin : campaign.getPlayerForce().getHumanResources().getAdmins()) {
-                if (admin.getPrimaryRole().isAdministratorLogistics() ||
-                          admin.getSecondaryRole().isAdministratorLogistics()) {
+                if (admin.isAdministrator()) {
                     if (negotiator == null || (admin.outRanksUsingSkillTiebreaker(campaign, negotiator))) {
                         negotiator = admin;
                     }

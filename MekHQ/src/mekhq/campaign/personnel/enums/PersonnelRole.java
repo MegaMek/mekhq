@@ -718,12 +718,9 @@ public enum PersonnelRole {
                 }
             }
             case MEDIC -> List.of(SkillType.S_MEDTECH);
-            case ADMINISTRATOR_COMMAND, ADMINISTRATOR_LOGISTICS, ADMINISTRATOR_TRANSPORT, ADMINISTRATOR_HR -> {
-                if (isAdminsHaveNegotiation) {
-                    yield List.of(SkillType.S_ADMIN, SkillType.S_NEGOTIATION);
-                } else {
-                    yield List.of(SkillType.S_ADMIN);
-                }
+            case ADMINISTRATOR, ADMINISTRATOR_COMMAND, ADMINISTRATOR_LOGISTICS, ADMINISTRATOR_TRANSPORT,
+                 ADMINISTRATOR_HR -> {
+                yield List.of(SkillType.S_ADMIN, SkillType.S_APPRAISAL);
             }
             case DEPENDENT, NONE -> List.of();
             case MISCELLANEOUS_JOB -> List.of(SkillType.S_CAREER_ANY);
@@ -1154,34 +1151,6 @@ public enum PersonnelRole {
     }
 
     /**
-     * @return {@code true} if the personnel has the Admin/Command role, {@code false} otherwise.
-     */
-    public boolean isAdministratorCommand() {
-        return this == ADMINISTRATOR_COMMAND;
-    }
-
-    /**
-     * @return {@code true} if the personnel has the Admin/Logistics role, {@code false} otherwise.
-     */
-    public boolean isAdministratorLogistics() {
-        return this == ADMINISTRATOR_LOGISTICS;
-    }
-
-    /**
-     * @return {@code true} if the personnel has the Admin/Transport role, {@code false} otherwise.
-     */
-    public boolean isAdministratorTransport() {
-        return this == ADMINISTRATOR_TRANSPORT;
-    }
-
-    /**
-     * @return {@code true} if the personnel has the Admin/HR role, {@code false} otherwise.
-     */
-    public boolean isAdministratorHR() {
-        return this == ADMINISTRATOR_HR;
-    }
-
-    /**
      * @return {@code true} if the personnel has the Dependent role, {@code false} otherwise.
      */
     public boolean isDependent() {
@@ -1336,10 +1305,7 @@ public enum PersonnelRole {
      * @return {@code true} if the character is assigned to an Administrative role, {@code false} otherwise.
      */
     public boolean isAdministrator() {
-        return isAdministratorCommand() ||
-                     isAdministratorLogistics() ||
-                     isAdministratorTransport() ||
-                     isAdministratorHR();
+        return this == ADMINISTRATOR;
     }
 
     /**

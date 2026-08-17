@@ -377,19 +377,6 @@ public class Campaign implements ITechManager {
      */
     public static final WeekFields WEEK_FIELDS = WeekFields.ISO;
 
-    /**
-     * Represents the different types of administrative specializations. Each specialization corresponds to a distinct
-     * administrative role within the organization.
-     *
-     * <p>
-     * These specializations are used to determine administrative roles and responsibilities, such as by identifying the
-     * most senior administrator for a given role.
-     * </p>
-     */
-    public enum AdministratorSpecialization {
-        COMMAND, LOGISTICS, TRANSPORT, HR
-    }
-
     @Deprecated(since = "0.51.0")
     private final transient ResourceBundle resources = ResourceBundle.getBundle("mekhq.resources.Campaign",
           MekHQ.getMHQOptions().getLocale());
