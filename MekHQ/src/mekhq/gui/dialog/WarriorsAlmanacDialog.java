@@ -59,12 +59,13 @@ import javax.swing.table.TableColumn;
 import megamek.common.enums.TechBase;
 import megamek.common.ui.EnhancedTabbedPane;
 import mekhq.campaign.Campaign;
-import mekhq.campaign.universe.WarriorsAlmanac.WarriorsAlmanacEntry;
+import mekhq.campaign.universe.warriorsAlmanac.AlmanacTechAdvancementPhase;
+import mekhq.campaign.universe.warriorsAlmanac.WarriorsAlmanacEntry;
 import mekhq.gui.baseComponents.immersiveDialogs.ImmersiveDialogNotification;
 
 /**
  * Displays the Warrior's Almanac: the parts and units whose development reached a new phase (prototype, production,
- * common, or extinct) in the current campaign year.
+ * common, extinct, or reintroduced) in the current campaign year.
  *
  * <p>The almanac is presented as a nested set of tabs. The outer tabs separate Parts from Units; within each, an
  * inner tab per category (Warehouse part category / unit type) holds a sortable table of that year's developments.
@@ -87,13 +88,16 @@ public class WarriorsAlmanacDialog {
     private static final int DEFAULT_HEIGHT = scaleForGUI(600);
     private static final int MINIMUM_HEIGHT = scaleForGUI(400);
 
+    /** Identifies a table row, so entries that would render identically can be collapsed into one. */
+    private record RowKey(String name, TechBase techBase, AlmanacTechAdvancementPhase phase) {}
+
     public WarriorsAlmanacDialog(final Campaign campaign, final boolean isAutomaticDisplay) {
         final LocalDate currentDate = campaign.getLocalDate();
         final int gameYear = currentDate.getYear();
 
         final boolean isClanForce = campaign.getPlayerForce().isClanForce();
-        final boolean hideClanAndMixed = !currentDate.isAfter(BATTLE_OF_TUKAYYID) && !isClanForce;
-        final boolean hideInnerSphereAndMixed = !currentDate.isAfter(CLAN_INVASION_FIRST_WAVE_BEGINS) && isClanForce;
+        final boolean hideClanAndMixed = currentDate.isBefore(BATTLE_OF_TUKAYYID) && !isClanForce;
+        final boolean hideInnerSphereAndMixed = currentDate.isBefore(CLAN_INVASION_FIRST_WAVE_BEGINS) && isClanForce;
 
         final List<WarriorsAlmanacEntry> partsEntries = gatherEntries(campaign.getPartsAlmanac(), gameYear,
               hideClanAndMixed, hideInnerSphereAndMixed, true);
@@ -249,9 +253,9 @@ public class WarriorsAlmanacDialog {
         };
         // The parts store holds many identically named parts (e.g. armor of differing tonnages); collapse rows that
         // would be indistinguishable in the table.
-        final Set<String> seen = new HashSet<>();
+        final Set<RowKey> seen = new HashSet<>();
         for (WarriorsAlmanacEntry entry : entries) {
-            if (seen.add(entry.name() + ' ' + entry.techBase() + ' ' + entry.phase())) {
+            if (seen.add(new RowKey(entry.name(), entry.techBase(), entry.phase()))) {
                 model.addRow(new Object[] { entry.name(), techBaseLabel(entry.techBase(), isParts),
                                             entry.phase().getLabel() });
             }

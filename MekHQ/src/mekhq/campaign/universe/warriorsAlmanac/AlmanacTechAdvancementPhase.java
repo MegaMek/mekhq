@@ -30,7 +30,7 @@
  * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
  * affiliated with Microsoft.
  */
-package mekhq.campaign.universe.WarriorsAlmanac;
+package mekhq.campaign.universe.warriorsAlmanac;
 
 import static mekhq.utilities.MHQInternationalization.getTextAt;
 
@@ -47,7 +47,8 @@ public enum AlmanacTechAdvancementPhase {
     PROTOTYPE("WarriorsAlmanacDialog.development.prototype"),
     PRODUCTION("WarriorsAlmanacDialog.development.production"),
     COMMON("WarriorsAlmanacDialog.development.common"),
-    EXTINCT("WarriorsAlmanacDialog.development.extinct");
+    EXTINCT("WarriorsAlmanacDialog.development.extinct"),
+    REINTRODUCED("WarriorsAlmanacDialog.development.reintroduced");
 
     private static final String RESOURCE_BUNDLE = "mekhq.resources.WarriorsAlmanacDialog";
 

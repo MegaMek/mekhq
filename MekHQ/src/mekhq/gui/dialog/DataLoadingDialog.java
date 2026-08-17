@@ -34,8 +34,8 @@ package mekhq.gui.dialog;
 
 import static java.util.Arrays.sort;
 import static mekhq.campaign.enums.DailyReportType.POLITICS;
-import static mekhq.campaign.universe.WarriorsAlmanac.WarriorsAlmanacEntry.buildAlmanacPartsData;
-import static mekhq.campaign.universe.WarriorsAlmanac.WarriorsAlmanacEntry.buildAlmanacUnitsData;
+import static mekhq.campaign.universe.warriorsAlmanac.WarriorsAlmanacEntry.buildAlmanacPartsData;
+import static mekhq.campaign.universe.warriorsAlmanac.WarriorsAlmanacEntry.buildAlmanacUnitsData;
 import static mekhq.gui.campaignOptions.CampaignOptionsDialog.CampaignOptionsDialogMode.STARTUP;
 import static mekhq.gui.campaignOptions.CampaignOptionsDialog.CampaignOptionsDialogMode.STARTUP_ABRIDGED;
 import static mekhq.utilities.EntityUtilities.isUnsupportedEntity;

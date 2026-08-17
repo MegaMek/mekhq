@@ -30,7 +30,7 @@
  * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
  * affiliated with Microsoft.
  */
-package mekhq.campaign.universe.WarriorsAlmanac;
+package mekhq.campaign.universe.warriorsAlmanac;
 
 import static mekhq.utilities.MHQInternationalization.getTextAt;
 import static mekhq.utilities.MHQInternationalization.isResourceKeyValid;
@@ -41,7 +41,6 @@ import java.util.List;
 import java.util.Map;
 
 import megamek.common.enums.TechBase;
-import megamek.common.interfaces.ITechnology;
 import megamek.common.loaders.MekSummary;
 import megamek.common.loaders.MekSummaryCache;
 import megamek.common.units.UnitType;
@@ -50,7 +49,7 @@ import mekhq.campaign.parts.Part;
 
 /**
  * A single Warrior's Almanac development event: one part or unit reaching a particular
- * {@link AlmanacTechAdvancementPhase} (prototype, production, common, or extinct) in a given year.
+ * {@link AlmanacTechAdvancementPhase} (prototype, production, common, extinct, or reintroduced) in a given year.
  *
  * <p>Entries are grouped by the year the event occurred (see {@link #buildAlmanacPartsData} and
  * {@link #buildAlmanacUnitsData}), then presented per-category (Warehouse part category / unit type) in the
@@ -107,6 +106,8 @@ public record WarriorsAlmanacEntry(String name, TechBase techBase, int categoryO
                   AlmanacTechAdvancementPhase.COMMON);
             addEntry(byYear, part.getExtinctionDate(isClan), name, techBase, order, label, intro,
                   AlmanacTechAdvancementPhase.EXTINCT);
+            addEntry(byYear, part.getReintroductionDate(isClan), name, techBase, order, label, intro,
+                  AlmanacTechAdvancementPhase.REINTRODUCED);
         }
 
         return byYear;
@@ -140,6 +141,8 @@ public record WarriorsAlmanacEntry(String name, TechBase techBase, int categoryO
                   AlmanacTechAdvancementPhase.COMMON);
             addEntry(byYear, summary.getExtinctionDate(), name, techBase, order, label, intro,
                   AlmanacTechAdvancementPhase.EXTINCT);
+            addEntry(byYear, summary.getReintroductionDate(), name, techBase, order, label, intro,
+                  AlmanacTechAdvancementPhase.REINTRODUCED);
         }
 
         return byYear;
@@ -148,7 +151,10 @@ public record WarriorsAlmanacEntry(String name, TechBase techBase, int categoryO
     private static void addEntry(Map<Integer, List<WarriorsAlmanacEntry>> byYear, int year, String name,
           TechBase techBase, int categoryOrder, String categoryLabel, String categoryIntro,
           AlmanacTechAdvancementPhase phase) {
-        if (year == ITechnology.DATE_NONE) {
+        // DATE_NONE marks an event that never happened. A units.cache written before MekSummary carried a
+        // reintroduction date deserializes that field as 0 rather than DATE_NONE, so reject every non-positive year
+        // until the cache is rebuilt.
+        if (year <= 0) {
             return;
         }
         byYear.computeIfAbsent(year, ignored -> new ArrayList<>())
