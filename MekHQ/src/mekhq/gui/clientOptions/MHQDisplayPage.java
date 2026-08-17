@@ -77,21 +77,35 @@ class MHQDisplayPage extends MHQOptionsPage {
     private SettingsCheckBox chkShowCompanyGenerator;
     private SettingsCheckBox chkShowUnitPicturesOnTOE;
 
+    // Display - Record Logs (start expanded)
+    private SettingsCheckBox chkDisplayPersonnelLog;
+    private SettingsCheckBox chkDisplayScenarioLog;
+    private SettingsCheckBox chkDisplayKillRecord;
+    private SettingsCheckBox chkDisplayMedicalRecord;
+    private SettingsCheckBox chkDisplayPatientRecord;
+    private SettingsCheckBox chkDisplayAssignmentRecord;
+    private SettingsCheckBox chkDisplayPerformanceRecord;
+    private SettingsCheckBox chkDisplayUnitLog;
+    private SettingsCheckBox chkDisplayUnitKillLog;
+    private SettingsCheckBox chkDisplayUnitCrewLog;
+    private SettingsCheckBox chkDisplayUnitDeploymentLog;
+    private SettingsCheckBox chkDisplayUnitRepairLog;
+
     // Display - Interstellar Map
-      private SettingsCheckBox chkInterstellarMapShowJumpRadius;
-      private SettingsSpinner spinnerInterstellarMapShowJumpRadiusMinimumZoom;
+    private SettingsCheckBox chkInterstellarMapShowJumpRadius;
+    private SettingsSpinner spinnerInterstellarMapShowJumpRadiusMinimumZoom;
     private ColourSelectorButton btnInterstellarMapJumpRadiusColour;
-      private SettingsCheckBox chkInterstellarMapShowPlanetaryAcquisitionRadius;
-      private SettingsSpinner spinnerInterstellarMapShowPlanetaryAcquisitionRadiusMinimumZoom;
+    private SettingsCheckBox chkInterstellarMapShowPlanetaryAcquisitionRadius;
+    private SettingsSpinner spinnerInterstellarMapShowPlanetaryAcquisitionRadiusMinimumZoom;
     private ColourSelectorButton btnInterstellarMapPlanetaryAcquisitionRadiusColour;
-      private SettingsCheckBox chkInterstellarMapShowContractSearchRadius;
+    private SettingsCheckBox chkInterstellarMapShowContractSearchRadius;
     private ColourSelectorButton btnInterstellarMapContractSearchRadiusColour;
 
     // Display - Personnel List
     private JComboBox<PersonnelFilterStyle> comboPersonnelFilterStyle;
-      private SettingsCheckBox chkPersonnelFilterOnPrimaryRole;
-      private SettingsCheckBox chkUnifiedDailyReport;
-      private SettingsCheckBox chkEnableDailyReportAggregateTab;
+    private SettingsCheckBox chkPersonnelFilterOnPrimaryRole;
+    private SettingsCheckBox chkUnifiedDailyReport;
+    private SettingsCheckBox chkEnableDailyReportAggregateTab;
 
     MHQDisplayPage(MHQOptionsModel model) {
         super(model);
@@ -102,11 +116,13 @@ class MHQDisplayPage extends MHQOptionsPage {
         JComponent generalContent = createDisplayGeneralSection();
         JComponent interstellarContent = createDisplayInterstellarSection();
         JComponent personnelContent = createDisplayPersonnelSection();
+        JComponent recordLogsContent = createDisplayRecordLogsSection();
         // Register each section body's tips before the page is built; |= always evaluates its right side, so no
         // section's registration is skipped.
         boolean hasTooltips = registerDetailsTips(generalContent);
         hasTooltips |= registerDetailsTips(interstellarContent);
         hasTooltips |= registerDetailsTips(personnelContent);
+        hasTooltips |= registerDetailsTips(recordLogsContent);
         Component page = pageBuilder("MHQDisplayPage", hasTooltips)
                                .section("lblMHQDisplayGeneralSection.text", "lblMHQDisplayGeneralSection.summary",
                                      generalContent)
@@ -115,22 +131,25 @@ class MHQDisplayPage extends MHQOptionsPage {
                                      interstellarContent)
                                .section("lblMHQDisplayPersonnelSection.text", "lblMHQDisplayPersonnelSection.summary",
                                      personnelContent)
+                               .section("lblMHQDisplayRecordLogsSection.text",
+                                     "lblMHQDisplayRecordLogsSection.summary",
+                                     recordLogsContent)
                                .build();
         created = true;
         return page;
     }
 
     private JPanel createDisplayGeneralSection() {
-      SettingsFormPanel panel = new SettingsFormPanel("MHQDisplayGeneralContent", FORM_LABEL_WIDTH,
+        SettingsFormPanel panel = new SettingsFormPanel("MHQDisplayGeneralContent", FORM_LABEL_WIDTH,
               FORM_CONTROL_WIDTH);
 
         fieldDisplayDateFormat = new JTextField(model.displayDateFormat, 14);
         fieldDisplayDateFormat.setName("txtlabelDisplayDateFormat");
-      panel.addRow(new SettingsLabel(TEXT_PROVIDER, "labelDisplayDateFormat"),
+        panel.addRow(new SettingsLabel(TEXT_PROVIDER, "labelDisplayDateFormat"),
               dateFormatControl(fieldDisplayDateFormat));
         fieldLongDisplayDateFormat = new JTextField(model.longDisplayDateFormat, 14);
         fieldLongDisplayDateFormat.setName("txtlabelLongDisplayDateFormat");
-      panel.addRow(new SettingsLabel(TEXT_PROVIDER, "labelLongDisplayDateFormat"),
+        panel.addRow(new SettingsLabel(TEXT_PROVIDER, "labelLongDisplayDateFormat"),
               dateFormatControl(fieldLongDisplayDateFormat));
 
         String guiScaleText = Messages.getString("CommonSettingsDialog.guiScale");
@@ -173,6 +192,51 @@ class MHQDisplayPage extends MHQOptionsPage {
               chkCompanyGeneratorStartup,
               chkShowCompanyGenerator,
               chkShowUnitPicturesOnTOE);
+
+        return panel;
+    }
+
+    private JPanel createDisplayRecordLogsSection() {
+        chkDisplayPersonnelLog = checkBox("optionDisplayPersonnelLog",
+              model.displayPersonnelLog, getMetadata(new Version(0, 51, 1)));
+        chkDisplayScenarioLog = checkBox("optionDisplayScenarioLog",
+              model.displayScenarioLog, getMetadata(new Version(0, 51, 1)));
+        chkDisplayKillRecord = checkBox("optionDisplayKillRecord",
+              model.displayKillRecord, getMetadata(new Version(0, 51, 1)));
+        chkDisplayMedicalRecord = checkBox("optionDisplayMedicalRecord",
+              model.displayMedicalRecord, getMetadata(new Version(0, 51, 1)));
+        chkDisplayPatientRecord = checkBox("optionDisplayPatientRecord",
+              model.displayPatientRecord, getMetadata(new Version(0, 51, 1)));
+        chkDisplayAssignmentRecord = checkBox("optionDisplayAssignmentRecord",
+              model.displayAssignmentRecord, getMetadata(new Version(0, 51, 1)));
+        chkDisplayPerformanceRecord = checkBox("optionDisplayPerformanceRecord",
+              model.displayPerformanceRecord, getMetadata(new Version(0, 51, 1)));
+        chkDisplayUnitLog = checkBox("optionDisplayUnitLog",
+              model.displayUnitLog, getMetadata(new Version(0, 51, 1)));
+        chkDisplayUnitKillLog = checkBox("optionDisplayUnitKillLog",
+              model.displayUnitKillLog, getMetadata(new Version(0, 51, 1)));
+        chkDisplayUnitCrewLog = checkBox("optionDisplayUnitCrewLog",
+              model.displayUnitCrewLog, getMetadata(new Version(0, 51, 1)));
+        chkDisplayUnitDeploymentLog = checkBox("optionDisplayUnitDeploymentLog",
+              model.displayUnitDeploymentLog, getMetadata(new Version(0, 51, 1)));
+        chkDisplayUnitRepairLog = checkBox("optionDisplayUnitRepairLog",
+              model.displayUnitRepairLog, getMetadata(new Version(0, 51, 1)));
+
+        SettingsFormPanel panel = new SettingsFormPanel("MHQDisplayRecordLogsContent", FORM_LABEL_WIDTH,
+              FORM_CONTROL_WIDTH);
+        panel.addCheckBoxGrid(2,
+              chkDisplayPersonnelLog,
+              chkDisplayScenarioLog,
+              chkDisplayKillRecord,
+              chkDisplayMedicalRecord,
+              chkDisplayPatientRecord,
+              chkDisplayAssignmentRecord,
+              chkDisplayPerformanceRecord,
+              chkDisplayUnitLog,
+              chkDisplayUnitKillLog,
+              chkDisplayUnitCrewLog,
+              chkDisplayUnitDeploymentLog,
+              chkDisplayUnitRepairLog);
 
         return panel;
     }
@@ -231,7 +295,7 @@ class MHQDisplayPage extends MHQOptionsPage {
     }
 
     private JPanel createDisplayInterstellarSection() {
-      SettingsFormPanel panel = new SettingsFormPanel("MHQDisplayInterstellarContent", FORM_LABEL_WIDTH,
+        SettingsFormPanel panel = new SettingsFormPanel("MHQDisplayInterstellarContent", FORM_LABEL_WIDTH,
               FORM_CONTROL_WIDTH);
 
         chkInterstellarMapShowJumpRadius =
@@ -248,9 +312,9 @@ class MHQDisplayPage extends MHQOptionsPage {
 
         chkInterstellarMapShowPlanetaryAcquisitionRadius = checkBox(
               "chkInterstellarMapShowPlanetaryAcquisitionRadius", model.interstellarMapShowPlanetaryAcquisitionRadius);
-      SettingsLabel acquisitionZoomLabel = new SettingsLabel(TEXT_PROVIDER,
+        SettingsLabel acquisitionZoomLabel = new SettingsLabel(TEXT_PROVIDER,
               "lblInterstellarMapShowPlanetaryAcquisitionRadiusMinimumZoom");
-      spinnerInterstellarMapShowPlanetaryAcquisitionRadiusMinimumZoom = new SettingsSpinner(TEXT_PROVIDER,
+        spinnerInterstellarMapShowPlanetaryAcquisitionRadiusMinimumZoom = new SettingsSpinner(TEXT_PROVIDER,
               "lblInterstellarMapShowPlanetaryAcquisitionRadiusMinimumZoom", 2d, 0d, 10d, 0.5);
         spinnerInterstellarMapShowPlanetaryAcquisitionRadiusMinimumZoom.setValue(
               model.interstellarMapShowPlanetaryAcquisitionRadiusMinimumZoom);
@@ -330,7 +394,7 @@ class MHQDisplayPage extends MHQOptionsPage {
         chkEnableDailyReportAggregateTab = checkBox("chkEnableDailyReportAggregateTab", model.aggregateDailyReport,
               getMetadata(null, CampaignOptionFlag.IMPORTANT));
 
-      SettingsFormPanel panel = new SettingsFormPanel("MHQDisplayPersonnelContent", FORM_LABEL_WIDTH,
+        SettingsFormPanel panel = new SettingsFormPanel("MHQDisplayPersonnelContent", FORM_LABEL_WIDTH,
               FORM_CONTROL_WIDTH);
         panel.addRow(filterStyleLabel, comboPersonnelFilterStyle);
         panel.addCheckBoxGrid(2, chkPersonnelFilterOnPrimaryRole, chkUnifiedDailyReport,
@@ -358,6 +422,19 @@ class MHQDisplayPage extends MHQOptionsPage {
         model.companyGeneratorStartup = chkCompanyGeneratorStartup.isSelected();
         model.showCompanyGenerator = chkShowCompanyGenerator.isSelected();
         model.showUnitPicturesOnTOE = chkShowUnitPicturesOnTOE.isSelected();
+
+        model.displayPersonnelLog = chkDisplayPersonnelLog.isSelected();
+        model.displayScenarioLog = chkDisplayScenarioLog.isSelected();
+        model.displayKillRecord = chkDisplayKillRecord.isSelected();
+        model.displayMedicalRecord = chkDisplayMedicalRecord.isSelected();
+        model.displayPatientRecord = chkDisplayPatientRecord.isSelected();
+        model.displayAssignmentRecord = chkDisplayAssignmentRecord.isSelected();
+        model.displayPerformanceRecord = chkDisplayPerformanceRecord.isSelected();
+        model.displayUnitLog = chkDisplayUnitLog.isSelected();
+        model.displayUnitKillLog = chkDisplayUnitKillLog.isSelected();
+        model.displayUnitCrewLog = chkDisplayUnitCrewLog.isSelected();
+        model.displayUnitDeploymentLog = chkDisplayUnitDeploymentLog.isSelected();
+        model.displayUnitRepairLog = chkDisplayUnitRepairLog.isSelected();
 
         model.interstellarMapShowJumpRadius = chkInterstellarMapShowJumpRadius.isSelected();
         model.interstellarMapShowJumpRadiusMinimumZoom =
