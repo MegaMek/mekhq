@@ -829,7 +829,7 @@ public class Resupply {
     /**
      * Calculates the negotiation skill level by selecting the most qualified negotiator in the current campaign. If the
      * contract type is classified as guerrilla warfare, the flagged commander is prioritized. Otherwise,
-     * Admin/Logistics personnel are evaluated.
+     * Admin personnel are evaluated.
      */
     private void calculateNegotiationSkill() {
         Person negotiator;
