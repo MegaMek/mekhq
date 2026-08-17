@@ -6767,19 +6767,29 @@ public class Person implements ILocatable {
     }
 
     /**
-     * Adds (or, with a negative amount, subtracts) familiarity for the given chassis, clamping the result to the range
-     * {@code 0..cap}. Blank chassis names and no-op amounts are ignored. The cap is supplied by the caller from the
-     * active {@link Familiarity}.
+     * Adds (or, with a negative amount, subtracts) familiarity for the given chassis. Blank chassis names and no-op
+     * amounts are ignored. The cap is supplied by the caller from the active {@link Familiarity}, and different callers
+     * pass different caps for the same character (training, for instance, caps a trainee at
+     * {@link Familiarity#getTrainingCap()} and an educator at half that). A cap therefore limits what a gain can
+     * <i>reach</i>; it never reduces familiarity the character has already earned. A positive amount consequently
+     * leaves an above-cap value untouched rather than pulling it down to the cap, while a negative amount always
+     * applies and bottoms out at 0.
      *
      * @param chassis the base chassis name
      * @param amount  the amount of familiarity to add
-     * @param cap     the maximum familiarity permitted under the active mode
+     * @param cap     the maximum familiarity a gain may raise this character to under the calling context
      */
     public void addChassisFamiliarity(final String chassis, final int amount, final int cap) {
         if ((chassis == null) || chassis.isBlank() || (amount == 0)) {
             return;
         }
-        int updated = Math.clamp(getChassisFamiliarity(chassis) + amount, 0, cap);
+        int current = getChassisFamiliarity(chassis);
+        int updated;
+        if (amount > 0) {
+            updated = (current >= cap) ? current : Math.min(current + amount, cap);
+        } else {
+            updated = Math.max(current + amount, 0);
+        }
         if (updated == 0) {
             chassisFamiliarity.remove(chassis);
         } else {
