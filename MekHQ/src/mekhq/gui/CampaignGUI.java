@@ -1861,7 +1861,7 @@ public class CampaignGUI extends JPanel {
     public void handlePersonUpdate(PersonEvent personEvent) {
         // only bother recalculating AtB parts availability if a logistics admin has been changed
         // refreshPartsAvailability cuts out early with a "use AtB" check so it's not necessary here
-        if (personEvent.getPerson().hasRole(PersonnelRole.ADMINISTRATOR_LOGISTICS)) {
+        if (personEvent.getPerson().hasRole(PersonnelRole.ADMINISTRATOR)) {
             refreshPartsAvailability();
         }
     }
