@@ -426,12 +426,28 @@ public class TrainingCombatTeams {
         }
     }
 
-    private static void improveFamiliarityForTrainees(Campaign campaign, Person educator, Person trainee,
+    /**
+     * Awards this session's training familiarity to a single trainee: the full gain for their own chassis, and half of
+     * it for the educator's chassis at half the cap.
+     *
+     * <p>Both grants are person-scoped. The caller already runs once per trainee, so awarding the whole crew of either
+     * unit would multiply the session's grants by the crew size and would push the educator's crew - rather than the
+     * trainee - up the cross-chassis track.</p>
+     *
+     * @param campaign                the current {@link Campaign} context
+     * @param educator                the {@link Person} teaching this session; only their unit's chassis is used
+     * @param trainee                 the {@link Person} being taught, and the only person awarded here
+     * @param familiaritySpeed        the campaign's configured familiarity speed
+     * @param trainingMarginOfSuccess the margin of success of the educator's training check
+     * @param familiarityMode         the active {@link Familiarity} mode, supplying the training cap
+     */
+    static void improveFamiliarityForTrainees(Campaign campaign, Person educator, Person trainee,
           int familiaritySpeed, int trainingMarginOfSuccess, Familiarity familiarityMode) {
         int familiarityProgressOwnChassisSpeed = familiaritySpeed * trainingMarginOfSuccess;
 
         int familiarityCap = familiarityMode.getTrainingCap();
-        Familiarity.assignFamiliarity(campaign,
+        Familiarity.assignFamiliarityToPerson(campaign,
+              trainee,
               trainee.getUnit(),
               familiarityCap,
               familiarityProgressOwnChassisSpeed,
@@ -439,7 +455,8 @@ public class TrainingCombatTeams {
 
         int familiarityEducatorChassisSpeed = (int) round(familiarityProgressOwnChassisSpeed * 0.5);
         int trainerFamiliarityCap = (int) round(familiarityCap * 0.5);
-        Familiarity.assignFamiliarity(campaign,
+        Familiarity.assignFamiliarityToPerson(campaign,
+              trainee,
               educator.getUnit(),
               trainerFamiliarityCap,
               familiarityEducatorChassisSpeed,

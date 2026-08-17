@@ -42,6 +42,7 @@ import static mekhq.utilities.ReportingUtilities.spanOpeningWithCustomColor;
 
 import java.util.List;
 
+import megamek.common.annotations.Nullable;
 import megamek.common.units.Entity;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.LocalHangar;
@@ -234,6 +235,40 @@ public enum Familiarity {
         if (unitTech != null) {
             gateMultipleTechAssignments(campaign, unitTech, chassis, cap, familiarityGain);
         }
+    }
+
+    /**
+     * Awards familiarity with the chassis of {@code chassisSource} to one named person, and to nobody else.
+     *
+     * <p>Unlike {@link #assignFamiliarity(Campaign, Unit, int, int, FamiliarityGainType)}, this does not spread the
+     * grant across the unit's crew or its assigned tech, and the person need not be aboard the unit at all. It is the
+     * right entry point wherever the caller has already decided <i>which</i> character is being rewarded - for example
+     * training, where the trainee earns familiarity with their own chassis and, separately, with the educator's
+     * chassis.</p>
+     *
+     * <p>Does nothing if familiarity is disabled, if either argument is {@code null}, or if the unit's entity is not
+     * {@link Entity#isChassisFamiliarityEligible() eligible} for familiarity.</p>
+     *
+     * @param campaign      the current campaign
+     * @param person        the single character to award
+     * @param chassisSource the unit whose chassis the familiarity is earned with
+     * @param cap           the maximum familiarity this grant may raise the character to
+     * @param speed         the base familiarity gain, before {@code gainType} and per-character trait modifiers
+     * @param gainType      how {@code speed} is converted into the awarded amount
+     */
+    public static void assignFamiliarityToPerson(Campaign campaign, @Nullable Person person,
+          @Nullable Unit chassisSource, int cap, int speed, FamiliarityGainType gainType) {
+        Familiarity mode = campaign.getCampaignOptions().get(CampaignOption.CHASSIS_FAMILIARITY_MODE);
+        if (!mode.isEnabled() || (person == null) || (chassisSource == null)) {
+            return;
+        }
+
+        Entity unitEntity = chassisSource.getEntity();
+        if (unitEntity == null || !unitEntity.isChassisFamiliarityEligible()) {
+            return;
+        }
+
+        addFamiliarity(campaign, person, unitEntity.getChassis(), cap, gainType.rollFamiliarity(speed));
     }
 
     private static void gateMultipleTechAssignments(Campaign campaign, Person unitTech, String chassis, int cap,
