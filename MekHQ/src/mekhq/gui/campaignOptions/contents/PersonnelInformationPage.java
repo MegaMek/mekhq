@@ -33,7 +33,6 @@
 package mekhq.gui.campaignOptions.contents;
 
 import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.LEGACY_RULE_BEFORE_METADATA;
-import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.MILESTONE_BEFORE_METADATA;
 import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.createTipPanelUpdater;
 import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.getImageDirectory;
 import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.getMetadata;
@@ -45,10 +44,10 @@ import javax.swing.JPanel;
 import jakarta.annotation.Nonnull;
 import jakarta.annotation.Nullable;
 import megamek.client.ui.comboBoxes.MMComboBox;
+import megamek.client.ui.settings.SettingsFormPanel;
 import mekhq.campaign.personnel.enums.TimeInDisplayFormat;
 import mekhq.gui.campaignOptions.CampaignOptionFlag;
 import mekhq.gui.campaignOptions.components.CampaignOptionsCheckBox;
-import megamek.client.ui.settings.SettingsFormPanel;
 import mekhq.gui.campaignOptions.components.CampaignOptionsHeaderPanel;
 import mekhq.gui.campaignOptions.components.CampaignOptionsLabel;
 import mekhq.gui.campaignOptions.components.CampaignOptionsPagePanel;
@@ -85,13 +84,6 @@ class PersonnelInformationPage {
     private JCheckBox chkPersonnelLogSkillGain;
     private JCheckBox chkPersonnelLogAbilityGain;
     private JCheckBox chkPersonnelLogEdgeGain;
-    private JCheckBox chkDisplayPersonnelLog;
-    private JCheckBox chkDisplayScenarioLog;
-    private JCheckBox chkDisplayKillRecord;
-    private JCheckBox chkDisplayMedicalRecord;
-    private JCheckBox chkDisplayPatientRecord;
-    private JCheckBox chkDisplayAssignmentRecord;
-    private JCheckBox chkDisplayPerformanceRecord;
 
     private boolean created;
 
@@ -103,16 +95,17 @@ class PersonnelInformationPage {
      *
      * @return a {@link JPanel} representing the Personnel Information Page
      */
-    @Nonnull JPanel createPanel(@Nullable PersonnelOptionsModel model) {
+    @Nonnull
+    JPanel createPanel(@Nullable PersonnelOptionsModel model) {
         // Header
         String imageAddress = getImageDirectory() + "logo_rasalhague_dominion.png";
         personnelInformationHeader = new CampaignOptionsHeaderPanel("PersonnelInformation", imageAddress);
 
         // Contents
         comboTimeInServiceDisplayFormat = new MMComboBox<>("comboTimeInServiceDisplayFormat",
-                TimeInDisplayFormat.values());
+              TimeInDisplayFormat.values());
         comboTimeInRankDisplayFormat = new MMComboBox<>("comboTimeInRankDisplayFormat",
-                TimeInDisplayFormat.values());
+              TimeInDisplayFormat.values());
 
         chkUseTimeInService = new CampaignOptionsCheckBox("UseTimeInService");
         chkUseTimeInService.addMouseListener(createTipPanelUpdater("UseTimeInService"));
@@ -124,38 +117,38 @@ class PersonnelInformationPage {
         lblTimeInRankDisplayFormat.addMouseListener(createTipPanelUpdater("TimeInRankDisplayFormat"));
         chkTrackTotalEarnings = new CampaignOptionsCheckBox("TrackTotalEarnings");
         chkTrackTotalEarnings
-                .addMouseListener(createTipPanelUpdater("TrackTotalEarnings"));
+              .addMouseListener(createTipPanelUpdater("TrackTotalEarnings"));
         chkTrackTotalXPEarnings = new CampaignOptionsCheckBox("TrackTotalXPEarnings");
         chkTrackTotalXPEarnings.addMouseListener(createTipPanelUpdater("TrackTotalXPEarnings"));
         chkShowOriginFaction = new CampaignOptionsCheckBox("ShowOriginFaction");
         chkShowOriginFaction
-                .addMouseListener(createTipPanelUpdater("ShowOriginFaction"));
+              .addMouseListener(createTipPanelUpdater("ShowOriginFaction"));
 
         JPanel pnlPersonnelLogs = createPersonnelLogsPanel();
 
         // Layout the Panel
         final SettingsFormPanel personnelInformationPanel = new SettingsFormPanel(
-                "PersonnelInformation",
-                LABEL_COLUMN_WIDTH,
-                CONTROL_COLUMN_WIDTH);
+              "PersonnelInformation",
+              LABEL_COLUMN_WIDTH,
+              CONTROL_COLUMN_WIDTH);
         personnelInformationPanel.addCheckBoxGrid(2,
-                chkUseTimeInService,
-                chkUseTimeInRank);
+              chkUseTimeInService,
+              chkUseTimeInRank);
         personnelInformationPanel.addRow(lblTimeInServiceDisplayFormat, comboTimeInServiceDisplayFormat);
         personnelInformationPanel.addRow(lblTimeInRankDisplayFormat, comboTimeInRankDisplayFormat);
         personnelInformationPanel.addCheckBoxGrid(2,
-                chkTrackTotalEarnings,
-                chkTrackTotalXPEarnings,
-                chkShowOriginFaction);
+              chkTrackTotalEarnings,
+              chkTrackTotalXPEarnings,
+              chkShowOriginFaction);
         JPanel panel = CampaignOptionsPagePanel.builder("PersonnelInformation", "PersonnelInformation", imageAddress)
-                .header(personnelInformationHeader)
-                .quote("personnelInformationPage")
-                .section("lblPersonnelInformation.text",
-                        "lblPersonnelInformation.summary",
-                        personnelInformationPanel,
-                        getMetadata(LEGACY_RULE_BEFORE_METADATA, CampaignOptionFlag.CUSTOM_SYSTEM))
-                .section("lblPersonnelLogsPanel.text", "lblPersonnelLogsPanel.summary", pnlPersonnelLogs)
-                .build();
+                             .header(personnelInformationHeader)
+                             .quote("personnelInformationPage")
+                             .section("lblPersonnelInformation.text",
+                                   "lblPersonnelInformation.summary",
+                                   personnelInformationPanel,
+                                   getMetadata(LEGACY_RULE_BEFORE_METADATA, CampaignOptionFlag.CUSTOM_SYSTEM))
+                             .section("lblPersonnelLogsPanel.text", "lblPersonnelLogsPanel.summary", pnlPersonnelLogs)
+                             .build();
 
         created = true;
         readFromModel(model);
@@ -171,7 +164,7 @@ class PersonnelInformationPage {
     private @Nonnull JPanel createPersonnelLogsPanel() {
         // Contents
         chkUseTransfers = new CampaignOptionsCheckBox("UseTransfers",
-                getMetadata(LEGACY_RULE_BEFORE_METADATA, CampaignOptionFlag.RECOMMENDED));
+              getMetadata(LEGACY_RULE_BEFORE_METADATA, CampaignOptionFlag.RECOMMENDED));
         chkUseTransfers.addMouseListener(createTipPanelUpdater("UseTransfers"));
         chkUseExtendedTOEForceName = new CampaignOptionsCheckBox("UseExtendedTOEForceName");
         chkUseExtendedTOEForceName.addMouseListener(createTipPanelUpdater("UseExtendedTOEForceName"));
@@ -181,41 +174,17 @@ class PersonnelInformationPage {
         chkPersonnelLogAbilityGain.addMouseListener(createTipPanelUpdater("PersonnelLogAbilityGain"));
         chkPersonnelLogEdgeGain = new CampaignOptionsCheckBox("PersonnelLogEdgeGain");
         chkPersonnelLogEdgeGain.addMouseListener(createTipPanelUpdater("PersonnelLogEdgeGain"));
-        chkDisplayPersonnelLog = new CampaignOptionsCheckBox("DisplayPersonnelLog");
-        chkDisplayPersonnelLog.addMouseListener(createTipPanelUpdater("DisplayPersonnelLog"));
-        chkDisplayScenarioLog = new CampaignOptionsCheckBox("DisplayScenarioLog");
-        chkDisplayScenarioLog
-                .addMouseListener(createTipPanelUpdater("DisplayScenarioLog"));
-        chkDisplayKillRecord = new CampaignOptionsCheckBox("DisplayKillRecord");
-        chkDisplayKillRecord
-                .addMouseListener(createTipPanelUpdater("DisplayKillRecord"));
-        chkDisplayMedicalRecord = new CampaignOptionsCheckBox("DisplayMedicalRecord");
-        chkDisplayMedicalRecord.addMouseListener(createTipPanelUpdater("DisplayMedicalRecord"));
-        chkDisplayPatientRecord = new CampaignOptionsCheckBox("DisplayPatientRecord",
-                getMetadata(MILESTONE_BEFORE_METADATA));
-        chkDisplayPatientRecord.addMouseListener(createTipPanelUpdater("DisplayPatientRecord"));
-        chkDisplayAssignmentRecord = new CampaignOptionsCheckBox("DisplayAssignmentRecord");
-        chkDisplayAssignmentRecord.addMouseListener(createTipPanelUpdater("DisplayAssignmentRecord"));
-        chkDisplayPerformanceRecord = new CampaignOptionsCheckBox("DisplayPerformanceRecord");
-        chkDisplayPerformanceRecord.addMouseListener(createTipPanelUpdater("DisplayPerformanceRecord"));
 
         // Layout the Panel
         final SettingsFormPanel panel = new SettingsFormPanel("PersonnelLogsPanel",
-                LABEL_COLUMN_WIDTH,
-                CONTROL_COLUMN_WIDTH);
+              LABEL_COLUMN_WIDTH,
+              CONTROL_COLUMN_WIDTH);
         panel.addCheckBoxGrid(2,
-                chkUseTransfers,
-                chkUseExtendedTOEForceName,
-                chkPersonnelLogSkillGain,
-                chkPersonnelLogAbilityGain,
-                chkPersonnelLogEdgeGain,
-                chkDisplayPersonnelLog,
-                chkDisplayScenarioLog,
-                chkDisplayKillRecord,
-                chkDisplayMedicalRecord,
-                chkDisplayPatientRecord,
-                chkDisplayAssignmentRecord,
-                chkDisplayPerformanceRecord);
+              chkUseTransfers,
+              chkUseExtendedTOEForceName,
+              chkPersonnelLogSkillGain,
+              chkPersonnelLogAbilityGain,
+              chkPersonnelLogEdgeGain);
 
         return panel;
     }
@@ -236,13 +205,6 @@ class PersonnelInformationPage {
         chkPersonnelLogSkillGain.setSelected(model.personnelLogSkillGain);
         chkPersonnelLogAbilityGain.setSelected(model.personnelLogAbilityGain);
         chkPersonnelLogEdgeGain.setSelected(model.personnelLogEdgeGain);
-        chkDisplayPersonnelLog.setSelected(model.displayPersonnelLog);
-        chkDisplayScenarioLog.setSelected(model.displayScenarioLog);
-        chkDisplayKillRecord.setSelected(model.displayKillRecord);
-        chkDisplayMedicalRecord.setSelected(model.displayMedicalRecord);
-        chkDisplayPatientRecord.setSelected(model.displayPatientRecord);
-        chkDisplayAssignmentRecord.setSelected(model.displayAssignmentRecord);
-        chkDisplayPerformanceRecord.setSelected(model.displayPerformanceRecord);
         chkUseTimeInService.setSelected(model.useTimeInService);
         comboTimeInServiceDisplayFormat.setSelectedItem(model.timeInServiceDisplayFormat);
         chkUseTimeInRank.setSelected(model.useTimeInRank);
@@ -268,13 +230,6 @@ class PersonnelInformationPage {
         model.personnelLogSkillGain = chkPersonnelLogSkillGain.isSelected();
         model.personnelLogAbilityGain = chkPersonnelLogAbilityGain.isSelected();
         model.personnelLogEdgeGain = chkPersonnelLogEdgeGain.isSelected();
-        model.displayPersonnelLog = chkDisplayPersonnelLog.isSelected();
-        model.displayScenarioLog = chkDisplayScenarioLog.isSelected();
-        model.displayKillRecord = chkDisplayKillRecord.isSelected();
-        model.displayMedicalRecord = chkDisplayMedicalRecord.isSelected();
-        model.displayPatientRecord = chkDisplayPatientRecord.isSelected();
-        model.displayAssignmentRecord = chkDisplayAssignmentRecord.isSelected();
-        model.displayPerformanceRecord = chkDisplayPerformanceRecord.isSelected();
         model.useTimeInService = chkUseTimeInService.isSelected();
         model.timeInServiceDisplayFormat = comboTimeInServiceDisplayFormat.getSelectedItem();
         model.useTimeInRank = chkUseTimeInRank.isSelected();

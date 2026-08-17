@@ -114,6 +114,21 @@ class MHQOptionsModel {
     boolean showWarriorsAlmanac;
     // endregion Display - General
 
+    // region Display - Record Logs
+    boolean displayPersonnelLog;
+    boolean displayScenarioLog;
+    boolean displayKillRecord;
+    boolean displayMedicalRecord;
+    boolean displayPatientRecord;
+    boolean displayAssignmentRecord;
+    boolean displayPerformanceRecord;
+    boolean displayUnitLog;
+    boolean displayUnitKillLog;
+    boolean displayUnitCrewLog;
+    boolean displayUnitDeploymentLog;
+    boolean displayUnitRepairLog;
+    // endregion Display - Record Logs
+
     // region Display - Interstellar Map
     boolean interstellarMapShowJumpRadius;
     double interstellarMapShowJumpRadiusMinimumZoom;
@@ -212,6 +227,20 @@ class MHQOptionsModel {
         showCompanyGenerator = options.getShowCompanyGenerator();
         showUnitPicturesOnTOE = options.getShowUnitPicturesOnTOE();
         showWarriorsAlmanac = options.getShowWarriorsAlmanac();
+
+        // Display - Record Logs
+        displayPersonnelLog = options.getDisplayPersonnelLog();
+        displayScenarioLog = options.getDisplayScenarioLog();
+        displayKillRecord = options.getDisplayKillRecord();
+        displayMedicalRecord = options.getDisplayMedicalRecord();
+        displayPatientRecord = options.getDisplayPatientRecord();
+        displayAssignmentRecord = options.getDisplayAssignmentRecord();
+        displayPerformanceRecord = options.getDisplayPerformanceRecord();
+        displayUnitLog = options.getDisplayUnitLog();
+        displayUnitKillLog = options.getDisplayUnitKillLog();
+        displayUnitCrewLog = options.getDisplayUnitCrewLog();
+        displayUnitDeploymentLog = options.getDisplayUnitDeploymentLog();
+        displayUnitRepairLog = options.getDisplayUnitRepairLog();
 
         // Display - Interstellar Map
         interstellarMapShowJumpRadius = options.getInterstellarMapShowJumpRadius();
@@ -384,6 +413,19 @@ class MHQOptionsModel {
         options.setShowCompanyGenerator(showCompanyGenerator);
         options.setShowUnitPicturesOnTOE(showUnitPicturesOnTOE);
         options.setShowWarriorsAlmanac(showWarriorsAlmanac);
+
+        options.setDisplayPersonnelLog(displayPersonnelLog);
+        options.setDisplayScenarioLog(displayScenarioLog);
+        options.setDisplayKillRecord(displayKillRecord);
+        options.setDisplayMedicalRecord(displayMedicalRecord);
+        options.setDisplayPatientRecord(displayPatientRecord);
+        options.setDisplayAssignmentRecord(displayAssignmentRecord);
+        options.setDisplayPerformanceRecord(displayPerformanceRecord);
+        options.setDisplayUnitLog(displayUnitLog);
+        options.setDisplayUnitKillLog(displayUnitKillLog);
+        options.setDisplayUnitCrewLog(displayUnitCrewLog);
+        options.setDisplayUnitDeploymentLog(displayUnitDeploymentLog);
+        options.setDisplayUnitRepairLog(displayUnitRepairLog);
 
         // Display - Interstellar Map
         options.setInterstellarMapShowJumpRadius(interstellarMapShowJumpRadius);
