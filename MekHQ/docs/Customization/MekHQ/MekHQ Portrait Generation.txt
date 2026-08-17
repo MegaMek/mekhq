@@ -31,7 +31,7 @@ will never be assigned one of the Combat pictures unless every Male MekWarrior-s
 
 Subfolders count. As of 0.51.01 a folder search matches that folder AND everything nested underneath it. This has two
 consequences worth knowing:
-- /Male/Admin covers /Male/Admin/Command, /Male/Admin/HR, and so on. You do not have to flatten these.
+- A folder can be organised into subfolders however you like. /Male/Admin covers /Male/Admin/Veterans, and so on.
 - The final /<Gender> step therefore covers every portrait filed anywhere under that gender. In practice a character
   will nearly always end up with something rather than the default silhouette.
 Pictures sitting loose in the top-level portraits folder (such as default.gif) are outside every gendered folder and
@@ -103,7 +103,7 @@ Role Group Folders:
 These are a fallback for when the role folder above is missing or exhausted. Only the roles listed here have one.
 Administrators:                 /Admin           Administrator
 Vehicle Crews:                  /Vehicle Crew    Vehicle Crew/Ground, Vehicle Crew/Naval, Vehicle Crew/VTOL
-Vessel Crewmembers:             /Vessel Crew     Vessel Crewmember only
+Vessel Crewmembers:             /Vessel Crew     Vessel Pilot, Vessel Gunner, Vessel Crewmember, Hyperspace Navigator
 Techs:                          /Tech            MekTech, Mechanic, AeroTek, Battle Armor Tech
 Medical Staff:                  /Medical         Doctor, Medic
 
@@ -112,9 +112,10 @@ Two traps here:
   NOT fall back to it; they go straight from their own role folder to /Combat.
 - Astechs have no group folder. They go from /Astech straight to /Support.
 
-This step predates the current portrait folders and is kept mainly so that existing collections keep working. The
-stock portraits still rely on it: they ship under /Admin/{Command,HR,Logistical,Transport} and
-/Vehicle Crew/{Generic,Ground,Naval,VTOL} rather than under a per-role folder.
+This step predates the current portrait folders and is kept so that collections sorted by role family keep working. The
+stock portraits are all filed under their own role folder, so nothing shipped depends on it. The one you are most
+likely to have is /<Gender>/Admin, which is where administrator portraits shipped before 0.51.01; it still works, and
+still feeds every administrator.
 
 
 General Grouping Folders:
@@ -131,12 +132,19 @@ The four administrator roles were merged into a single Administrator role. Admin
 Admin/Transport and Admin/HR no longer exist as assignable roles, and all administrators now read from
 /<Gender>/Administrator, falling back to /<Gender>/Admin.
 
-Existing collections keep working without any changes: because a folder search now includes its subfolders, the four
-old /Admin/Command, /Admin/HR, /Admin/Logistical and /Admin/Transport folders are all picked up by the /Admin fallback.
-If you would rather sort them yourself, move their contents up into /<Gender>/Admin or into /<Gender>/Administrator.
+The stock portraits moved to match. The four /<Gender>/Admin/{Command,HR,Logistical,Transport} folders are gone and
+their portraits now sit in /<Gender>/Administrator.
 
-Note that a character loaded from an older save keeps the old role only until the save is opened; MekHQ converts them
-to Administrator on load.
+Existing campaigns are migrated for you and need no attention:
+- Characters keep the portrait they already had. Loading a campaign repoints any portrait that referenced one of the
+  four old sub-folders at /<Gender>/Administrator, and the new path is written back out the next time the campaign is
+  saved. The picture itself is unchanged.
+- A character keeps the old administrator role only until the save is opened; MekHQ converts them to Administrator on
+  load.
+
+Your own portraits are not touched. If you had built your own /<Gender>/Admin folder, it keeps its name, keeps its
+contents, and keeps feeding administrators through the role group fallback. Only the four folder names that shipped
+with MekHQ are repointed, so sorting your own portraits into an /Admin folder still works exactly as before.
 
 
 Post-0.50.10 Compatibility:
