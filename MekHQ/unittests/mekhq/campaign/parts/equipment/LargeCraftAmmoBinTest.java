@@ -1696,6 +1696,47 @@ public class LargeCraftAmmoBinTest {
     }
 
     /**
+     * Refit completion refills large craft bays by setting them empty and calling {@link LargeCraftAmmoBin#loadBin()}
+     * directly, with no fabrication charge. A bay flagged for fabrication must load from stock on that path rather than
+     * manufacturing its ammunition for free.
+     */
+    @Test
+    public void refitStyleLoadingOfAFabricationFlaggedBayNeverManufactures() {
+        Campaign mockCampaign = mockCampaign();
+        when(mockCampaign.getCampaignOptions()).thenReturn(new CampaignOptions());
+        LocalWarehouse warehouse = new LocalWarehouse();
+        when(mockCampaign.getPlayerForce().getWarehouse()).thenReturn(warehouse);
+        mekhq.campaign.ForceQuartermaster quartermaster = new mekhq.campaign.ForceQuartermaster(mockCampaign);
+        when(mockCampaign.getQuartermaster()).thenReturn(quartermaster);
+
+        AmmoType ammoType = getAmmoType("ISLRM20 Ammo");
+
+        int capacity = 4;
+        int equipmentNum = 42;
+        LargeCraftAmmoBin ammoBin = new LargeCraftAmmoBin(0, ammoType, equipmentNum, 0, capacity, mockCampaign);
+
+        // ... place the ammo bin on a unit ...
+        Unit mockUnit = mock(Unit.class);
+        Entity mockEntity = mock(Entity.class);
+        when(mockUnit.getEntity()).thenReturn(mockEntity);
+        AmmoMounted mockMounted = mock(AmmoMounted.class);
+        when(mockMounted.getType()).thenReturn(ammoType);
+        when(mockMounted.getBaseShotsLeft()).thenReturn(0);
+        when(mockEntity.getEquipment(eq(equipmentNum))).thenReturn((Mounted) mockMounted);
+        ammoBin.setUnit(mockUnit);
+
+        ammoBin.setFabricating(true);
+
+        // This is what Refit does on completion: treat the bay as empty and load it back up.
+        ammoBin.setShotsNeeded(ammoBin.getFullShots());
+        ammoBin.loadBin();
+
+        // The warehouse was empty, so nothing was manufactured and nothing was loaded.
+        assertEquals(ammoBin.getFullShots(), ammoBin.getShotsNeeded());
+        verify(mockMounted, times(1)).setShotsLeft(eq(0));
+    }
+
+    /**
      * A bay is loaded one ton at a time, and fabrication manufactures that ton for money instead of requisitioning it,
      * so a successful attempt must load a ton even with an empty warehouse.
      */

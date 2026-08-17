@@ -243,10 +243,10 @@ public class LargeCraftAmmoBin extends AmmoBin {
     public void loadBinSingleTon() {
         Mounted<?> mounted = getMounted();
         if (mounted != null) {
-            // When fabricating, the ton of shots is manufactured on the spot (paid for per attempt) rather than drawn
+            // Inside a paid-for fabrication attempt the ton of shots is manufactured on the spot rather than drawn
             // from warehouse stock.
             int shots = getSingleTonShots();
-            shots = isFabricating() ? shots : requisitionAmmo(getType(), shots);
+            shots = isManufacturing() ? shots : requisitionAmmo(getType(), shots);
 
             mounted.setShotsLeft(mounted.getBaseShotsLeft() + shots);
 

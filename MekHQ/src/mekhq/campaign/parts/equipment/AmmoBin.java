@@ -84,6 +84,15 @@ public class AmmoBin extends EquipmentPart implements IAcquisitionWork, IFabrica
     protected int shotsNeeded;
     protected boolean oneShot;
 
+    /**
+     * Set only for the duration of a paid-for fabrication attempt (see {@link #succeed()}), which charges for the shots
+     * and manufactures them as a single atomic operation. Every other route into {@link #loadBin()} - refit completion,
+     * a GM fix, topping off a partner bin - loads from warehouse stock whether or not this bin is flagged for
+     * fabrication, so that nothing can be manufactured without being charged for. Deliberately transient: it is never
+     * persisted and never survives a clone.
+     */
+    private transient boolean manufacturing;
+
     public AmmoBin() {
         this(0, null, -1, 0, false, false, null);
     }
@@ -298,12 +307,30 @@ public class AmmoBin extends EquipmentPart implements IAcquisitionWork, IFabrica
     @Override
     public String succeed() {
         if (isFabricating() && !isSalvaging()) {
-            // The fabrication cost is charged per attempt before the manufactured shots are loaded.
+            // The fabrication cost is charged per attempt before the manufactured shots are loaded. Charging and
+            // manufacturing are one operation: the load only manufactures while this flag is held.
             chargeFabricationAttempt(campaign.getPlayerForce().getFinances());
-            fix();
+            manufacturing = true;
+            try {
+                fix();
+            } finally {
+                manufacturing = false;
+            }
             return messageSurroundedBySpanWithColor(getPositiveColor(), " <b>fabricated</b>.");
         }
         return super.succeed();
+    }
+
+    /**
+     * Whether this bin is currently manufacturing the shots it loads, rather than drawing them from warehouse stock.
+     * This is true only inside the paid-for fabrication attempt in {@link #succeed()}; being flagged for fabrication
+     * with {@link #isFabricating()} is not on its own enough, so that a bin loaded from anywhere else (refit
+     * completion, a GM fix) can never manufacture ammunition without paying for it.
+     *
+     * @return {@code true} if the shots loaded right now are being manufactured
+     */
+    protected boolean isManufacturing() {
+        return manufacturing;
     }
 
     @Override
@@ -391,9 +418,9 @@ public class AmmoBin extends EquipmentPart implements IAcquisitionWork, IFabrica
             return;
         }
 
-        // When fabricating, the shots are manufactured on the spot (paid for per attempt) rather than drawn from
+        // Inside a paid-for fabrication attempt the shots are manufactured on the spot rather than drawn from
         // warehouse stock; otherwise pull as much of the necessary ammo as the warehouse can supply.
-        int shots = isFabricating() ? getShotsNeeded() : requisitionAmmo(getType(), getShotsNeeded());
+        int shots = isManufacturing() ? getShotsNeeded() : requisitionAmmo(getType(), getShotsNeeded());
         if (!ammoTypeChanged()) {
             // just a simple reload
             mounted.setShotsLeft(mounted.getBaseShotsLeft() + shots);

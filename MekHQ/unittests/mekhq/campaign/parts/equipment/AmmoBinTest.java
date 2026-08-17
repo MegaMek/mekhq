@@ -1793,6 +1793,42 @@ public class AmmoBinTest {
             }
         }
 
+        /**
+         * Regression test: refit completion loads bins by calling {@link AmmoBin#loadBin()} directly, without going
+         * through {@link AmmoBin#succeed()} and its charge. A bin that happens to be flagged for fabrication must
+         * therefore load from stock on that path - manufacturing there would fill it for free.
+         */
+        @Test
+        public void loadingAFabricationFlaggedBinDirectlyNeverManufactures() {
+            AmmoType ammoType = getAmmoType("ISSRM6 Ammo");
+
+            Finances finances = new Finances();
+            finances.credit(TransactionType.MISCELLANEOUS, LocalDate.of(3151, 1, 1), Money.of(100_000_000),
+                  "Test funds");
+            Campaign mockCampaign = fabricationCampaign(finances);
+            Money startingBalance = finances.getBalance();
+
+            // An empty bin, flagged for fabrication, being loaded the way a refit loads it ...
+            AmmoBin ammoBin = binOnAUnit(mockCampaign, ammoType, ammoType.getShots());
+            ammoBin.setFabricating(true);
+
+            // ... with an empty warehouse, loads nothing at all ...
+            ammoBin.loadBin();
+
+            assertEquals(ammoType.getShots(), ammoBin.getShotsNeeded());
+            assertEquals(startingBalance, finances.getBalance());
+
+            // ... and with some stock on hand, loads exactly what the warehouse could supply, free of charge.
+            int shotsInStock = ammoType.getShots() / 3;
+            mockCampaign.getQuartermaster().addAmmo(ammoType, shotsInStock);
+
+            ammoBin.loadBin();
+
+            assertEquals(ammoType.getShots() - shotsInStock, ammoBin.getShotsNeeded());
+            assertEquals(0, mockCampaign.getQuartermaster().getAmmoAvailable(ammoType));
+            assertEquals(startingBalance, finances.getBalance());
+        }
+
         /** A campaign that pays for parts, with a real warehouse, quartermaster and finances. */
         private Campaign fabricationCampaign(Finances finances) {
             Campaign mockCampaign = mockCampaign();
@@ -1821,8 +1857,13 @@ public class AmmoBinTest {
 
         /** A bin installed on a unit and full of the given munition. */
         private AmmoBin fullBinOnAUnit(Campaign campaign, AmmoType ammoType) {
+            return binOnAUnit(campaign, ammoType, 0);
+        }
+
+        /** A bin installed on a unit, needing the given number of shots of the given munition. */
+        private AmmoBin binOnAUnit(Campaign campaign, AmmoType ammoType, int shotsNeeded) {
             int equipmentNum = 42;
-            AmmoBin ammoBin = new AmmoBin(0, ammoType, equipmentNum, 0, false, false, campaign);
+            AmmoBin ammoBin = new AmmoBin(0, ammoType, equipmentNum, shotsNeeded, false, false, campaign);
 
             Unit mockUnit = mock(Unit.class);
             Entity mockEntity = mock(Entity.class);
@@ -1830,7 +1871,7 @@ public class AmmoBinTest {
 
             AmmoMounted mockMounted = mock(AmmoMounted.class);
             when(mockMounted.getType()).thenReturn(ammoType);
-            when(mockMounted.getBaseShotsLeft()).thenReturn(ammoType.getShots());
+            when(mockMounted.getBaseShotsLeft()).thenReturn(ammoType.getShots() - shotsNeeded);
             doAnswer(invocation -> {
                 AmmoType newAmmoType = invocation.getArgument(0);
                 when(mockMounted.getType()).thenReturn(newAmmoType);

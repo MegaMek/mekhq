@@ -159,9 +159,9 @@ public class BattleArmorAmmoBin extends AmmoBin {
             // Calculate the actual shots needed
             int shotsPerTrooper = shotsNeeded / getNumTroopers();
             int shotsToReload;
-            if (isFabricating()) {
-                // The shots are manufactured on the spot (paid for per attempt) rather than drawn from warehouse
-                // stock, so the whole squad can be reloaded regardless of what is in the warehouse.
+            if (isManufacturing()) {
+                // Inside a paid-for fabrication attempt the shots are manufactured on the spot rather than drawn from
+                // warehouse stock, so the whole squad can be reloaded regardless of what is in the warehouse.
                 shotsToReload = shotsPerTrooper;
                 shotsNeeded -= shotsToReload * getNumTroopers();
             } else {
