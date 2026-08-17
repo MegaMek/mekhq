@@ -393,7 +393,7 @@ class PersonnelFilterTest {
     @Test
     void testIsAdministrator() {
         for (final PersonnelFilter personnelFilter : filters) {
-            if (personnelFilter == PersonnelFilter.ADMINISTRATOR) {
+            if (personnelFilter == PersonnelFilter.ADMINISTRATOR_GLOBAL) {
                 assertTrue(personnelFilter.isAdministrator());
             } else {
                 assertFalse(personnelFilter.isAdministrator());

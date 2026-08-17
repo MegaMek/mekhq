@@ -1476,8 +1476,7 @@ public class Person implements ILocatable {
             case AERO_TEK -> hasSkill(S_TECH_AERO);
             case BA_TECH -> hasSkill(S_TECH_BA);
             case DOCTOR -> hasSkill(S_SURGERY);
-            case ADMINISTRATOR_COMMAND, ADMINISTRATOR_LOGISTICS, ADMINISTRATOR_TRANSPORT, ADMINISTRATOR_HR ->
-                  hasSkill(S_ADMIN);
+            case ADMINISTRATOR -> hasSkill(S_ADMIN) && hasSkill(S_APPRAISAL);
             case ADULT_ENTERTAINER -> {
                 // A character under the age of 18 should never have access to this profession
                 if (isChild(today, true)) {
@@ -5482,7 +5481,6 @@ public class Person implements ILocatable {
           final LocalDate today, final boolean secondary, boolean excludeInjuryEffects) {
         final PersonnelRole role = secondary ? getSecondaryRole() : getPrimaryRole();
 
-        final boolean doAdminCountNegotiation = campaignOptions.isAdminExperienceLevelIncludeNegotiation();
         final boolean isUseArtillery = campaignOptions.isUseArtillery();
         final boolean isAlternativeQualityAveraging = campaignOptions.isAlternativeQualityAveraging();
         final boolean isUseAgingEffects = campaignOptions.isUseAgeEffects();
@@ -5539,23 +5537,18 @@ public class Person implements ILocatable {
 
                 yield highestExperienceLevel;
             }
-            case ADMINISTRATOR_COMMAND, ADMINISTRATOR_LOGISTICS, ADMINISTRATOR_TRANSPORT, ADMINISTRATOR_HR -> {
+            case ADMINISTRATOR -> {
                 int adminLevel = getSkillLevelOrNegative(S_ADMIN, skillModifierData);
                 adminLevel = adminLevel == -1 ? 0 : adminLevel;
 
-                int negotiationLevel = getSkillLevelOrNegative(S_NEGOTIATION, skillModifierData);
-                negotiationLevel = negotiationLevel == -1 ? 0 : negotiationLevel;
+                int appraisalLevel = getSkillLevelOrNegative(S_APPRAISAL, skillModifierData);
+                appraisalLevel = appraisalLevel == -1 ? 0 : appraisalLevel;
 
                 int levelSum;
                 int divisor;
 
-                if (doAdminCountNegotiation) {
-                    levelSum = adminLevel + negotiationLevel;
+                levelSum = adminLevel + appraisalLevel;
                     divisor = 2;
-                } else {
-                    levelSum = adminLevel;
-                    divisor = 1;
-                }
 
                 if (levelSum == -divisor) {
                     yield EXP_NONE;

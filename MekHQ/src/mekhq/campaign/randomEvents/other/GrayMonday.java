@@ -34,11 +34,13 @@ package mekhq.campaign.randomEvents.other;
 
 import static mekhq.campaign.Campaign.AdministratorSpecialization.COMMAND;
 import static mekhq.campaign.finances.enums.TransactionType.STARTING_CAPITAL;
+import static mekhq.campaign.personnel.enums.PersonnelRole.ADMINISTRATOR;
 import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
 
 import java.time.LocalDate;
 
 import megamek.common.annotations.Nullable;
+import megamek.common.enums.Gender;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.finances.Finances;
 import mekhq.campaign.finances.Money;
@@ -184,9 +186,9 @@ public class GrayMonday {
         Person speaker = campaign.getPlayerForce()
                                .getHumanResources()
                                .newPerson(campaign,
-                                     mekhq.campaign.personnel.enums.PersonnelRole.ADMINISTRATOR_COMMAND,
+                                     ADMINISTRATOR,
                                      employer,
-                                     megamek.common.enums.Gender.RANDOMIZE);
+                                     Gender.RANDOMIZE);
         speaker.setOriginFaction(Factions.getInstance().getFaction(employer));
 
         return speaker;

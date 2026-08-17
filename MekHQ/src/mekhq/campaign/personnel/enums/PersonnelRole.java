@@ -75,9 +75,14 @@ public enum PersonnelRole {
     ASTECH(PersonnelRoleSubType.SUPPORT, KeyEvent.VK_UNDEFINED, 4, 4, 5, 3, 5, 5, 4),
     DOCTOR(PersonnelRoleSubType.SUPPORT, KeyEvent.VK_D, 3, 4, 5, 4, 5, 5, 4),
     MEDIC(PersonnelRoleSubType.SUPPORT, KeyEvent.VK_UNDEFINED, 3, 4, 5, 4, 5, 5, 4),
+    ADMINISTRATOR(PersonnelRoleSubType.SUPPORT, KeyEvent.VK_UNDEFINED, 3, 4, 4, 4, 5, 5, 5),
+    @Deprecated(since = "0.51.01", forRemoval = true)
     ADMINISTRATOR_COMMAND(PersonnelRoleSubType.SUPPORT, KeyEvent.VK_UNDEFINED, 3, 4, 4, 4, 5, 5, 5),
+    @Deprecated(since = "0.51.01", forRemoval = true)
     ADMINISTRATOR_LOGISTICS(PersonnelRoleSubType.SUPPORT, KeyEvent.VK_L, 3, 4, 4, 4, 5, 5, 5),
+    @Deprecated(since = "0.51.01", forRemoval = true)
     ADMINISTRATOR_TRANSPORT(PersonnelRoleSubType.SUPPORT, KeyEvent.VK_R, 3, 4, 4, 4, 5, 5, 5),
+    @Deprecated(since = "0.51.01", forRemoval = true)
     ADMINISTRATOR_HR(PersonnelRoleSubType.SUPPORT, KeyEvent.VK_H, 3, 4, 4, 4, 5, 5, 5),
 
     // If we're generating a character without a Profession, we're just going to leave them with middle of the road
@@ -364,8 +369,8 @@ public enum PersonnelRole {
 
     public static final List<PersonnelRole> VEHICLE_CREW_EXTENDED_ROLES = List.of(MEK_TECH, AERO_TEK, MECHANIC,
           BA_TECH, ASTECH, DOCTOR, MEDIC, COMMS_OPERATOR, TECH_COMMUNICATIONS, SENSOR_TECHNICIAN, SOLDIER,
-          ADMINISTRATOR_COMMAND, ADMINISTRATOR_TRANSPORT, ADMINISTRATOR_LOGISTICS, ADMINISTRATOR_HR, CHEF,
-          VEHICLE_CREW_GROUND, VEHICLE_CREW_NAVAL, VEHICLE_CREW_VTOL);
+          ADMINISTRATOR, ADMINISTRATOR_COMMAND, ADMINISTRATOR_TRANSPORT, ADMINISTRATOR_LOGISTICS, ADMINISTRATOR_HR,
+          CHEF, VEHICLE_CREW_GROUND, VEHICLE_CREW_NAVAL, VEHICLE_CREW_VTOL);
 
     private final PersonnelRoleSubType subType;
     private final boolean hasClanName;
@@ -577,7 +582,7 @@ public enum PersonnelRole {
      * @see #getSkillsForProfession(boolean, boolean, boolean, boolean)
      */
     public List<String> getSkillsForProfession() {
-        return getSkillsForProfession(false, false, false, false, false);
+        return getSkillsForProfession(false, false, false, false);
     }
 
     /**
@@ -591,17 +596,15 @@ public enum PersonnelRole {
      * <p>This method is typically used during personnel creation or skill assignment to ensure each role receives a
      * fitting skill set based on campaign rules and user preferences.</p>
      *
-     * @param isAdminsHaveNegotiation    if {@code true}, includes Negotiation skill for administrators
      * @param isDoctorsUseAdministration if {@code true}, includes Administration skill for medical roles
      * @param isTechsUseAdministration   if {@code true}, includes Administration skill for technical roles
      * @param isUseArtillery             if {@code true}, includes Artillery skills where applicable
      *
      * @return a list of skill names representing the profession-appropriate skills
      */
-    public List<String> getSkillsForProfession(boolean isAdminsHaveNegotiation, boolean isDoctorsUseAdministration,
-          boolean isTechsUseAdministration, boolean isUseArtillery) {
-        return getSkillsForProfession(isAdminsHaveNegotiation, isDoctorsUseAdministration, isTechsUseAdministration,
-              isUseArtillery, false);
+    public List<String> getSkillsForProfession(boolean isDoctorsUseAdministration, boolean isTechsUseAdministration,
+          boolean isUseArtillery) {
+        return getSkillsForProfession(isDoctorsUseAdministration, isTechsUseAdministration, isUseArtillery, false);
     }
 
 
@@ -616,7 +619,6 @@ public enum PersonnelRole {
      * <p>This method is typically used during personnel creation or skill assignment to ensure each role receives a
      * fitting skill set based on campaign rules and user preferences.</p>
      *
-     * @param isAdminsHaveNegotiation    if {@code true}, includes Negotiation skill for administrators
      * @param isDoctorsUseAdministration if {@code true}, includes Administration skill for medical roles
      * @param isTechsUseAdministration   if {@code true}, includes Administration skill for technical roles
      * @param isUseArtillery             if {@code true}, includes Artillery skills where applicable
@@ -625,8 +627,8 @@ public enum PersonnelRole {
      *
      * @return a list of skill names representing the profession-appropriate skills
      */
-    public List<String> getSkillsForProfession(boolean isAdminsHaveNegotiation, boolean isDoctorsUseAdministration,
-          boolean isTechsUseAdministration, boolean isUseArtillery, boolean includeExpandedSkills) {
+    public List<String> getSkillsForProfession(boolean isDoctorsUseAdministration, boolean isTechsUseAdministration,
+          boolean isUseArtillery, boolean includeExpandedSkills) {
         List<String> skills = switch (this) {
             case MEKWARRIOR -> {
                 if (isUseArtillery) {

@@ -187,6 +187,7 @@ public class CampaignOptions {
         setRoleBaseSalary(PersonnelRole.ASTECH, 400);
         setRoleBaseSalary(PersonnelRole.DOCTOR, 1500);
         setRoleBaseSalary(PersonnelRole.MEDIC, 400);
+        setRoleBaseSalary(PersonnelRole.ADMINISTRATOR, 500);
         setRoleBaseSalary(PersonnelRole.ADMINISTRATOR_COMMAND, 500);
         setRoleBaseSalary(PersonnelRole.ADMINISTRATOR_LOGISTICS, 500);
         setRoleBaseSalary(PersonnelRole.ADMINISTRATOR_TRANSPORT, 500);
@@ -1553,46 +1554,6 @@ public class CampaignOptions {
     @Deprecated(since = "0.51.01", forRemoval = true)
     public void setShowOriginFaction(final boolean showOriginFaction) {
         set(CampaignOption.SHOW_ORIGIN_FACTION, showOriginFaction);
-    }
-
-    /**
-     * @deprecated Use
-     *       {@link CampaignOptions#get(CampaignOption) CampaignOptions.get(CampaignOption.ADMINS_HAVE_NEGOTIATION)}
-     */
-    @Deprecated(since = "0.51.01", forRemoval = true)
-    public boolean isAdminsHaveNegotiation() {
-        return get(CampaignOption.ADMINS_HAVE_NEGOTIATION);
-    }
-
-    /**
-     * @deprecated Use
-     *       {@link CampaignOptions#set(CampaignOption, Object)
-     *       CampaignOptions.set(CampaignOption.ADMINS_HAVE_NEGOTIATION, value)}
-     */
-    @Deprecated(since = "0.51.01", forRemoval = true)
-    public void setAdminsHaveNegotiation(final boolean useAdminsHaveNegotiation) {
-        set(CampaignOption.ADMINS_HAVE_NEGOTIATION, useAdminsHaveNegotiation);
-    }
-
-    /**
-     * @deprecated Use
-     *       {@link CampaignOptions#get(CampaignOption)
-     *       CampaignOptions.get(CampaignOption.ADMIN_EXPERIENCE_LEVEL_INCLUDE_NEGOTIATION)}
-     */
-    @Deprecated(since = "0.51.01", forRemoval = true)
-    public boolean isAdminExperienceLevelIncludeNegotiation() {
-        return get(CampaignOption.ADMIN_EXPERIENCE_LEVEL_INCLUDE_NEGOTIATION);
-    }
-
-    /**
-     * @deprecated Use
-     *       {@link CampaignOptions#set(CampaignOption, Object)
-     *       CampaignOptions.set(CampaignOption.ADMIN_EXPERIENCE_LEVEL_INCLUDE_NEGOTIATION, value)}
-     */
-    @Deprecated(since = "0.51.01", forRemoval = true)
-    public void setAdminExperienceLevelIncludeNegotiation(final boolean useAdminExperienceLevelIncludeNegotiation) {
-        set(CampaignOption.ADMIN_EXPERIENCE_LEVEL_INCLUDE_NEGOTIATION,
-              useAdminExperienceLevelIncludeNegotiation);
     }
 
     // endregion Expanded Personnel Information

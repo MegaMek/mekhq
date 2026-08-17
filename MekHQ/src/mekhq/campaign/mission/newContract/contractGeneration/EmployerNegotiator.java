@@ -32,7 +32,7 @@
  */
 package mekhq.campaign.mission.newContract.contractGeneration;
 
-import static mekhq.campaign.personnel.enums.PersonnelRole.ADMINISTRATOR_COMMAND;
+import static mekhq.campaign.personnel.enums.PersonnelRole.ADMINISTRATOR;
 import static mekhq.campaign.personnel.enums.PersonnelRole.BROKER;
 import static mekhq.campaign.personnel.enums.PersonnelRole.LAWYER;
 import static mekhq.campaign.personnel.enums.PersonnelRole.MEKWARRIOR;
@@ -77,7 +77,7 @@ public class EmployerNegotiator {
     private final static int MINIMUM_NEGOTIATION = 4;
 
     private final static PersonnelRole PIRATE_NEGOTIATOR_ROLE = BROKER;
-    private final static PersonnelRole GOVERNMENT_NEGOTIATOR_NORMAL = ADMINISTRATOR_COMMAND;
+    private final static PersonnelRole GOVERNMENT_NEGOTIATOR_NORMAL = ADMINISTRATOR;
     private final static PersonnelRole GOVERNMENT_NEGOTIATOR_CLAN = MEKWARRIOR;
     private final static PersonnelRole MERCENARY_NEGOTIATOR_NORMAL = LAWYER;
     private final static PersonnelRole MERCENARY_NEGOTIATOR_CLAN = MERCHANT;

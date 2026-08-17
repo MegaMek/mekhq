@@ -66,7 +66,7 @@ class PersonnelOptionsModel {
     boolean useRemovalExemptCemetery;
     boolean useRemovalExemptRetirees;
     boolean adminsHaveNegotiation;
-    boolean adminExperienceLevelIncludeNegotiation;
+    boolean adminExperienceLevelIncludeAppraisal;
     boolean useBlobInfantry;
     boolean useBlobBattleArmor;
     boolean useBlobVehicleCrewGround;
@@ -153,7 +153,7 @@ class PersonnelOptionsModel {
         useRemovalExemptCemetery = options.isUseRemovalExemptCemetery();
         useRemovalExemptRetirees = options.isUseRemovalExemptRetirees();
         adminsHaveNegotiation = options.isAdminsHaveNegotiation();
-        adminExperienceLevelIncludeNegotiation = options.isAdminExperienceLevelIncludeNegotiation();
+        adminExperienceLevelIncludeAppraisal = options.isAdminExperienceLevelIncludeNegotiation();
         useBlobInfantry = options.isUseBlobInfantry();
         useBlobBattleArmor = options.isUseBlobBattleArmor();
         useBlobVehicleCrewGround = options.isUseBlobVehicleCrewGround();
@@ -241,7 +241,7 @@ class PersonnelOptionsModel {
         options.setUseRemovalExemptCemetery(useRemovalExemptCemetery);
         options.setUseRemovalExemptRetirees(useRemovalExemptRetirees);
         options.setAdminsHaveNegotiation(adminsHaveNegotiation);
-        options.setAdminExperienceLevelIncludeNegotiation(adminExperienceLevelIncludeNegotiation);
+        options.setAdminExperienceLevelIncludeNegotiation(adminExperienceLevelIncludeAppraisal);
         options.setUseBlobInfantry(useBlobInfantry);
         options.setUseBlobBattleArmor(useBlobBattleArmor);
         options.setUseBlobVehicleCrewGround(useBlobVehicleCrewGround);

@@ -1770,7 +1770,7 @@ public final class BriefingTab extends CampaignGuiTab {
             Campaign campaign = getCampaign();
             speaker = campaign.getPlayerForce()
                             .getHumanResources()
-                            .newPerson(campaign, PersonnelRole.ADMINISTRATOR_COMMAND, "MERC", Gender.RANDOMIZE);
+                            .newPerson(campaign, PersonnelRole.ADMINISTRATOR, "MERC", Gender.RANDOMIZE);
         }
 
         List<Person> forceCommanders = new ArrayList<>();

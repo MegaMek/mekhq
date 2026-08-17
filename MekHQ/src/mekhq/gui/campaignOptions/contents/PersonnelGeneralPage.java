@@ -33,12 +33,12 @@
 package mekhq.gui.campaignOptions.contents;
 
 import static megamek.client.ui.WrapLayout.wordWrap;
+import static mekhq.campaign.personnel.skills.Attributes.MAXIMUM_ATTRIBUTE_SCORE;
 import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.LEGACY_RULE_BEFORE_METADATA;
 import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.MILESTONE_BEFORE_METADATA;
 import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.createTipPanelUpdater;
 import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.getImageDirectory;
 import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.getMetadata;
-import static mekhq.campaign.personnel.skills.Attributes.MAXIMUM_ATTRIBUTE_SCORE;
 
 import java.awt.Component;
 import javax.swing.DefaultListCellRenderer;
@@ -301,9 +301,9 @@ class PersonnelGeneralPage {
         chkAdminsHaveNegotiation = new CampaignOptionsCheckBox("AdminsHaveNegotiation");
         chkAdminsHaveNegotiation.addMouseListener(createTipPanelUpdater("AdminsHaveNegotiation"));
         chkAdminExperienceLevelIncludeNegotiation = new CampaignOptionsCheckBox(
-              "AdminExperienceLevelIncludeNegotiation");
+              "AdminExperienceLevelIncludeAppraisal");
         chkAdminExperienceLevelIncludeNegotiation.addMouseListener(createTipPanelUpdater(
-              "AdminExperienceLevelIncludeNegotiation"));
+              "AdminExperienceLevelIncludeAppraisal"));
 
         // Layout the Panel
         final SettingsFormPanel panel = new SettingsFormPanel("AdministratorsPanel",
@@ -399,7 +399,7 @@ class PersonnelGeneralPage {
         chkUseRemovalExemptCemetery.setSelected(model.useRemovalExemptCemetery);
         chkUseRemovalExemptRetirees.setSelected(model.useRemovalExemptRetirees);
         chkAdminsHaveNegotiation.setSelected(model.adminsHaveNegotiation);
-        chkAdminExperienceLevelIncludeNegotiation.setSelected(model.adminExperienceLevelIncludeNegotiation);
+        chkAdminExperienceLevelIncludeNegotiation.setSelected(model.adminExperienceLevelIncludeAppraisal);
         chkUseBlobInfantry.setSelected(model.useBlobInfantry);
         chkUseBlobBattleArmor.setSelected(model.useBlobBattleArmor);
         chkUseBlobVehicleCrewGround.setSelected(model.useBlobVehicleCrewGround);
@@ -443,7 +443,7 @@ class PersonnelGeneralPage {
         model.useRemovalExemptCemetery = chkUseRemovalExemptCemetery.isSelected();
         model.useRemovalExemptRetirees = chkUseRemovalExemptRetirees.isSelected();
         model.adminsHaveNegotiation = chkAdminsHaveNegotiation.isSelected();
-        model.adminExperienceLevelIncludeNegotiation = chkAdminExperienceLevelIncludeNegotiation.isSelected();
+        model.adminExperienceLevelIncludeAppraisal = chkAdminExperienceLevelIncludeNegotiation.isSelected();
         model.useBlobInfantry = chkUseBlobInfantry.isSelected();
         model.useBlobBattleArmor = chkUseBlobBattleArmor.isSelected();
         model.useBlobVehicleCrewGround = chkUseBlobVehicleCrewGround.isSelected();
