@@ -40,6 +40,7 @@ import java.util.HashMap;
 import java.util.Hashtable;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Random;
 
 import megamek.codeUtilities.ObjectUtility;
@@ -183,7 +184,7 @@ public class AtBScenarioFactory {
                               (combatTeam.getContract(campaign) == null)
                               ||
                               !combatTeam.isEligible(campaign) ||
-                              (combatTeam.getMissionId() != contract.getId())
+                              !Objects.equals(combatTeam.getMissionId(), contract.getId())
                               ||
                               !combatTeam.getContract(campaign).isActiveOn(campaign.getLocalDate())) {
                         continue;
@@ -232,7 +233,7 @@ public class AtBScenarioFactory {
                      */
                     List<CombatTeam> lList = new ArrayList<>();
                     for (CombatTeam combatTeam : combatTeamsTable.values()) {
-                        if ((combatTeam.getMissionId() == contract.getId())
+                        if (Objects.equals(combatTeam.getMissionId(), contract.getId())
                                   && combatTeam.getRole().isFrontline() && combatTeam.isEligible(campaign)) {
                             lList.add(combatTeam);
                         }
@@ -240,7 +241,8 @@ public class AtBScenarioFactory {
 
                     if (lList.isEmpty()) {
                         for (CombatTeam combatTeam : combatTeamsTable.values()) {
-                            if ((combatTeam.getMissionId() == contract.getId()) && combatTeam.isEligible(campaign)) {
+                            if (Objects.equals(combatTeam.getMissionId(), contract.getId()) &&
+                                      combatTeam.isEligible(campaign)) {
                                 lList.add(combatTeam);
                             }
                         }
@@ -259,7 +261,7 @@ public class AtBScenarioFactory {
                         AtBScenario atbScenario = AtBScenarioFactory.createScenario(campaign, combatTeam,
                               AtBScenario.BASE_ATTACK, false, CombatTeam.getBattleDate(campaign.getLocalDate()));
                         if (atbScenario != null) {
-                            if ((combatTeam.getMissionId() == atbScenario.getMissionId())
+                            if (Objects.equals(combatTeam.getMissionId(), atbScenario.getMissionId())
                                       || (combatTeam.getMissionId() == CombatTeam.NO_MISSION)) {
                                 for (int i = 0; i < scenarios.size(); i++) {
                                     if ((scenarios.get(i).getCombatTeamId() != NO_COMBAT_TEAM)

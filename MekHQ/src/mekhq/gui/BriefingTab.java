@@ -969,7 +969,7 @@ public final class BriefingTab extends CampaignGuiTab {
                 Scenario scenario = getCampaign().getScenario(scenarioAssignment);
 
                 // This shouldn't be necessary, but now is as good a time as any to check for null scenarios
-                if (scenario == null || scenario.getMissionId() == mission.getId()) {
+                if (scenario == null || Objects.equals(scenario.getMissionId(), mission.getId())) {
                     formation.setScenarioId(NO_ASSIGNED_SCENARIO, getCampaign());
                 }
             }
@@ -986,7 +986,7 @@ public final class BriefingTab extends CampaignGuiTab {
                 Scenario scenario = getCampaign().getScenario(scenarioAssignment);
 
                 // This shouldn't be necessary, but now is as good a time as any to check for null scenarios
-                if (scenario == null || scenario.getMissionId() == mission.getId()) {
+                if (scenario == null || Objects.equals(scenario.getMissionId(), mission.getId())) {
                     unit.setScenarioId(NO_ASSIGNED_SCENARIO);
                 }
             }
@@ -2764,7 +2764,8 @@ public final class BriefingTab extends CampaignGuiTab {
     public void handle(ScenarioChangedEvent evt) {
         final AbstractContract mission = comboMission.getSelectedItem();
         if ((evt.getScenario() != null) &&
-                  (evt.getScenario().getMissionId() == (mission == null ? -1 : mission.getId()))) {
+                  (mission != null) &&
+                  Objects.equals(evt.getScenario().getMissionId(), mission.getId())) {
             scenarioTable.repaint();
             if (evt.getScenario().getId() == selectedScenario) {
                 scenarioViewScheduler.schedule();

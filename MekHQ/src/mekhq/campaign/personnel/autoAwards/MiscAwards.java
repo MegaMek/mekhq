@@ -276,7 +276,7 @@ public class MiscAwards {
     private static boolean prisonerOfWar(Campaign campaign, Award award, UUID person,
           @Nullable List<Person> POWPersonnel) {
         if (award.canBeAwarded(campaign.getPerson(person))) {
-            return POWPersonnel.stream().anyMatch(p -> p.getId() == person);
+            return POWPersonnel.stream().anyMatch(p -> person.equals(p.getId()));
         }
 
         return false;
