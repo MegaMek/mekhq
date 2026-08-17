@@ -4913,14 +4913,14 @@ public class Person implements ILocatable {
         }
 
         Skill negotiationSkill = person.getSkill(S_NEGOTIATION);
+        Skill administrationSkill = person.getSkill(S_ADMIN);
         Skill appraisalSkill = person.getSkill(S_APPRAISAL);
 
-        int currentNegotiationSkill = negotiationSkill.getLevel();
-        int currentAppraisalSkill = appraisalSkill == null ? -1 : currentNegotiationSkill;
+        int newSkillLevel = negotiationSkill == null ? administrationSkill.getLevel() : negotiationSkill.getLevel();
 
-        if (currentAppraisalSkill < currentNegotiationSkill) {
+        if (appraisalSkill == null || appraisalSkill.getLevel() < newSkillLevel) {
             int bonus = appraisalSkill != null ? appraisalSkill.getBonus() : 0;
-            person.addSkill(S_APPRAISAL, currentNegotiationSkill, bonus);
+            person.addSkill(S_APPRAISAL, newSkillLevel, bonus);
         }
 
         if (isPrimary) {

@@ -68,7 +68,7 @@ import org.mockito.ArgumentMatchers;
 import org.mockito.MockedStatic;
 
 class NewPersonnelMarketTest {
-    static PersonnelMarketEntry marketEntryAdminHR = entry(ADMINISTRATOR, 1, 1);
+    static PersonnelMarketEntry marketEntryAdmin = entry(ADMINISTRATOR, 1, 1);
     static PersonnelMarketEntry marketEntryDoctor = entry(DOCTOR, 2, 2);
     static PersonnelMarketEntry marketEntryMekWarrior = entry(MEKWARRIOR, 3, 3);
 
@@ -108,7 +108,7 @@ class NewPersonnelMarketTest {
               MEKWARRIOR,
               marketEntryMekWarrior,
               ADMINISTRATOR,
-              marketEntryAdminHR);
+              marketEntryAdmin);
         List<PersonnelRole> expectedOrder = List.of(ADMINISTRATOR, DOCTOR, MEKWARRIOR);
 
         List<PersonnelMarketEntry> sortedList = personnelMarket.getMarketEntriesAsList(marketEntries);
@@ -286,11 +286,11 @@ class NewPersonnelMarketTest {
     }
 
     @ParameterizedTest
-    @CsvSource(value = { "0, ADMINISTRATOR_HR", "1, DOCTOR", "2, DOCTOR", "3, MEKWARRIOR", "4, MEKWARRIOR",
+    @CsvSource(value = { "0, ADMINISTRATOR", "1, DOCTOR", "2, DOCTOR", "3, MEKWARRIOR", "4, MEKWARRIOR",
                          "5, MEKWARRIOR" })
     void testPickEntry_multiplePositiveEntriesEachPickable(int randomValue, String expectedEntryKey) {
         // Setup
-        List<PersonnelMarketEntry> entries = List.of(marketEntryAdminHR, marketEntryDoctor, marketEntryMekWarrior);
+        List<PersonnelMarketEntry> entries = List.of(marketEntryAdmin, marketEntryDoctor, marketEntryMekWarrior);
         NewPersonnelMarket market = new NewPersonnelMarket();
 
         // Act

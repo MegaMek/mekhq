@@ -515,8 +515,7 @@ public class HumanResourcesTest {
 
     /**
      * Tests for
-     * {@link ForceHumanResources#getSeniorAdminPerson(Collection, AdministratorSpecialization, CampaignOptions, boolean,
-     * LocalDate)}
+     * {@link ForceHumanResources#getSeniorAdminPerson(Collection, CampaignOptions, boolean, LocalDate)}
      */
     @Nested
     class GetSeniorAdminPerson {
@@ -537,15 +536,8 @@ public class HumanResourcesTest {
         @Test
         void singleCommandAdminIsReturned() {
             // Arrange
-            PersonnelRole commandRole = mock(PersonnelRole.class);
-            when(commandRole.isAdministrator()).thenReturn(true);
-
-            PersonnelRole none = mock(PersonnelRole.class);
-            when(none.isAdministrator()).thenReturn(false);
-
             Person admin = mock(Person.class);
-            when(admin.getPrimaryRole()).thenReturn(commandRole);
-            when(admin.getSecondaryRole()).thenReturn(none);
+            when(admin.isAdministrator()).thenReturn(true);
 
             // Act
             Person result = ForceHumanResources.getSeniorAdminPerson(List.of(admin),
@@ -558,20 +550,12 @@ public class HumanResourcesTest {
         @Test
         void higherRankingAdminWins() {
             // Arrange
-            PersonnelRole hrRole = mock(PersonnelRole.class);
-            when(hrRole.isAdministrator()).thenReturn(true);
-
-            PersonnelRole none = mock(PersonnelRole.class);
-            when(none.isAdministrator()).thenReturn(false);
-
             Person junior = mock(Person.class);
-            when(junior.getPrimaryRole()).thenReturn(hrRole);
-            when(junior.getSecondaryRole()).thenReturn(none);
+            when(junior.isAdministrator()).thenReturn(true);
             when(junior.outRanksUsingSkillTiebreaker(any(), anyBoolean(), any(), any())).thenReturn(false);
 
             Person senior = mock(Person.class);
-            when(senior.getPrimaryRole()).thenReturn(hrRole);
-            when(senior.getSecondaryRole()).thenReturn(none);
+            when(senior.isAdministrator()).thenReturn(true);
             when(senior.outRanksUsingSkillTiebreaker(any(), anyBoolean(), any(), any())).thenReturn(true);
 
             // Act
@@ -583,21 +567,13 @@ public class HumanResourcesTest {
         }
 
         @Test
-        void nonMatchingSpecializationIsExcluded() {
-            // Arrange — person is logistics admin, we ask for command admin
-            PersonnelRole logisticsRole = mock(PersonnelRole.class);
-            when(logisticsRole.isAdministrator()).thenReturn(false);
-            when(logisticsRole.isAdministrator()).thenReturn(true);
-
-            PersonnelRole none = mock(PersonnelRole.class);
-            when(none.isAdministrator()).thenReturn(false);
-
-            Person logisticsAdmin = mock(Person.class);
-            when(logisticsAdmin.getPrimaryRole()).thenReturn(logisticsRole);
-            when(logisticsAdmin.getSecondaryRole()).thenReturn(none);
+        void nonAdministratorIsExcluded() {
+            // Arrange
+            Person nonAdministrator = mock(Person.class);
+            when(nonAdministrator.isAdministrator()).thenReturn(false);
 
             // Act
-            Person result = ForceHumanResources.getSeniorAdminPerson(List.of(logisticsAdmin),
+            Person result = ForceHumanResources.getSeniorAdminPerson(List.of(nonAdministrator),
                   campaignOptions, false, today);
 
             // Assert
