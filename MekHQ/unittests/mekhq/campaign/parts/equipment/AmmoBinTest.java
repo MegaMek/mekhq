@@ -36,6 +36,7 @@ import static mekhq.campaign.parts.AmmoUtilities.getAmmoType;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertInstanceOf;
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -56,6 +57,7 @@ import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.StringWriter;
+import java.time.LocalDate;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.ParserConfigurationException;
 
@@ -73,7 +75,9 @@ import mekhq.campaign.Campaign;
 import mekhq.campaign.LocalWarehouse;
 import mekhq.campaign.campaignOptions.CampaignOption;
 import mekhq.campaign.campaignOptions.CampaignOptions;
+import mekhq.campaign.finances.Finances;
 import mekhq.campaign.finances.Money;
+import mekhq.campaign.finances.enums.TransactionType;
 import mekhq.campaign.parts.AmmoStorage;
 import mekhq.campaign.parts.Part;
 import mekhq.campaign.parts.enums.PartRepairType;
@@ -1711,6 +1715,137 @@ public class AmmoBinTest {
             assertFalse(ammoBin.canFabricate(munitioneerOnly).isBlank());
             // Stacked, they lower Tech Rating E to C, which is fabricable in the field.
             assertTrue(ammoBin.canFabricate(both).isBlank());
+        }
+
+        /**
+         * A full bin whose munition type has been changed still reports zero raw shots needed, but reloading it
+         * manufactures an entire bin of the new munition. The attempt must therefore be priced as a full bin of the new
+         * munition rather than as nothing at all.
+         */
+        @Test
+        public void fabricatingAMunitionSwapOnAFullBinIsPricedAsAFullBinOfTheNewMunition() {
+            AmmoType ammoType = getAmmoType("ISSRM6 Ammo");
+            AmmoType otherAmmoType = getAmmoType("ISSRM6 Inferno Ammo");
+
+            Campaign mockCampaign = fabricationCampaign(new Finances());
+            AmmoBin ammoBin = fullBinOnAUnit(mockCampaign, ammoType);
+            ammoBin.setFabricating(true);
+
+            // A full bin needs no shots, so it costs nothing to fabricate ...
+            assertTrue(ammoBin.getFabricationCost().isZero());
+
+            // ... but once the munition type is swapped, a whole bin of the new munition gets manufactured.
+            ammoBin.changeMunition(otherAmmoType);
+
+            AmmoBin newMunitionBin = fabricatingBin(mockCampaign, otherAmmoType, otherAmmoType.getShots());
+            AmmoBin oldMunitionBin = fabricatingBin(mockCampaign, ammoType, ammoType.getShots());
+
+            assertFalse(ammoBin.getFabricationCost().isZero());
+            assertEquals(newMunitionBin.getFabricationCost(), ammoBin.getFabricationCost());
+            // The munition being manufactured is priced, not the one still sitting in the bin.
+            assertNotEquals(oldMunitionBin.getFabricationCost(), ammoBin.getFabricationCost());
+        }
+
+        /**
+         * Regression test: alternating a full bin between two munition types used to be free, because the cost was
+         * derived from the raw shots-needed count (zero on a full bin) while the reload manufactured a full bin. Each
+         * swap dumped the old rounds into the warehouse, so the loop generated unlimited free ammunition.
+         */
+        @Test
+        public void repeatedlySwappingMunitionsWhileFabricatingIsChargedEveryTime() {
+            AmmoType ammoType = getAmmoType("ISSRM6 Ammo");
+            AmmoType otherAmmoType = getAmmoType("ISSRM6 Inferno Ammo");
+
+            Finances finances = new Finances();
+            finances.credit(TransactionType.MISCELLANEOUS, LocalDate.of(3151, 1, 1), Money.of(100_000_000),
+                  "Test funds");
+            Campaign mockCampaign = fabricationCampaign(finances);
+
+            AmmoBin ammoBin = fullBinOnAUnit(mockCampaign, ammoType);
+            ammoBin.setFabricating(true);
+
+            AmmoType loaded = ammoType;
+            for (int swap = 0; swap < 4; swap++) {
+                AmmoType manufactured = (loaded == ammoType) ? otherAmmoType : ammoType;
+                ammoBin.changeMunition(manufactured);
+
+                Money costOfAttempt = ammoBin.getFabricationCost();
+                Money balanceBefore = finances.getBalance();
+                int stockOfManufacturedTypeBefore = mockCampaign.getQuartermaster().getAmmoAvailable(manufactured);
+                int stockOfDisplacedTypeBefore = mockCampaign.getQuartermaster().getAmmoAvailable(loaded);
+
+                assertFalse(costOfAttempt.isZero(), "Fabricating a bin of ammunition must never be free");
+
+                ammoBin.succeed();
+
+                // Every attempt is paid for ...
+                assertEquals(balanceBefore.minus(costOfAttempt), finances.getBalance());
+                // ... the bin ends up full of the new munition ...
+                assertEquals(0, ammoBin.getShotsNeeded());
+                // ... manufactured rather than drawn from stock ...
+                assertEquals(stockOfManufacturedTypeBefore,
+                      mockCampaign.getQuartermaster().getAmmoAvailable(manufactured));
+                // ... and the rounds it displaced were returned to the warehouse (paid for, not conjured).
+                assertEquals(stockOfDisplacedTypeBefore + loaded.getShots(),
+                      mockCampaign.getQuartermaster().getAmmoAvailable(loaded));
+
+                loaded = manufactured;
+            }
+        }
+
+        /** A campaign that pays for parts, with a real warehouse, quartermaster and finances. */
+        private Campaign fabricationCampaign(Finances finances) {
+            Campaign mockCampaign = mockCampaign();
+
+            CampaignOptions options = new CampaignOptions();
+            options.set(CampaignOption.PAY_FOR_PARTS, true);
+            options.set(CampaignOption.PAY_FOR_REPAIRS, false);
+            options.set(CampaignOption.USE_BALANCED_FABRICATION, true);
+            when(mockCampaign.getCampaignOptions()).thenReturn(options);
+            when(mockCampaign.getLocalDate()).thenReturn(LocalDate.of(3151, 1, 1));
+
+            LocalWarehouse warehouse = new LocalWarehouse();
+            when(mockCampaign.getPlayerForce().getWarehouse()).thenReturn(warehouse);
+            when(mockCampaign.getPlayerForce().getFinances()).thenReturn(finances);
+            when(mockCampaign.getQuartermaster()).thenReturn(new mekhq.campaign.ForceQuartermaster(mockCampaign));
+
+            return mockCampaign;
+        }
+
+        /** An off-unit bin of the given munition, set to fabricate, needing the given number of shots. */
+        private AmmoBin fabricatingBin(Campaign campaign, AmmoType ammoType, int shotsNeeded) {
+            AmmoBin ammoBin = new AmmoBin(0, ammoType, -1, shotsNeeded, false, false, campaign);
+            ammoBin.setFabricating(true);
+            return ammoBin;
+        }
+
+        /** A bin installed on a unit and full of the given munition. */
+        private AmmoBin fullBinOnAUnit(Campaign campaign, AmmoType ammoType) {
+            int equipmentNum = 42;
+            AmmoBin ammoBin = new AmmoBin(0, ammoType, equipmentNum, 0, false, false, campaign);
+
+            Unit mockUnit = mock(Unit.class);
+            Entity mockEntity = mock(Entity.class);
+            when(mockUnit.getEntity()).thenReturn(mockEntity);
+
+            AmmoMounted mockMounted = mock(AmmoMounted.class);
+            when(mockMounted.getType()).thenReturn(ammoType);
+            when(mockMounted.getBaseShotsLeft()).thenReturn(ammoType.getShots());
+            doAnswer(invocation -> {
+                AmmoType newAmmoType = invocation.getArgument(0);
+                when(mockMounted.getType()).thenReturn(newAmmoType);
+                return null;
+            }).when(mockMounted).changeAmmoType(any());
+            doAnswer(invocation -> {
+                int shotsLeft = invocation.getArgument(0);
+                when(mockMounted.getBaseShotsLeft()).thenReturn(shotsLeft);
+                return null;
+            }).when(mockMounted).setShotsLeft(anyInt());
+
+            when(mockEntity.getEquipment(eq(equipmentNum))).thenReturn((Mounted) mockMounted);
+            ammoBin.setUnit(mockUnit);
+
+            return ammoBin;
         }
     }
 }

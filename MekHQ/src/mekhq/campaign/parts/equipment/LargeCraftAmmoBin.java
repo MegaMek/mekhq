@@ -243,12 +243,30 @@ public class LargeCraftAmmoBin extends AmmoBin {
     public void loadBinSingleTon() {
         Mounted<?> mounted = getMounted();
         if (mounted != null) {
-            int shots = requisitionAmmo(getType(), Math.min(shotsNeeded, getType().getShots()));
+            // When fabricating, the ton of shots is manufactured on the spot (paid for per attempt) rather than drawn
+            // from warehouse stock.
+            int shots = getSingleTonShots();
+            shots = isFabricating() ? shots : requisitionAmmo(getType(), shots);
 
             mounted.setShotsLeft(mounted.getBaseShotsLeft() + shots);
 
             shotsNeeded -= shots;
         }
+    }
+
+    /**
+     * @return the number of shots a single load (one ton of ammunition) installs, never negative
+     */
+    private int getSingleTonShots() {
+        return Math.clamp(shotsNeeded, 0, getType().getShots());
+    }
+
+    /**
+     * A bay is worked on one ton at a time, so a fabrication attempt manufactures at most a single ton of shots.
+     */
+    @Override
+    protected int getFabricationShots() {
+        return getSingleTonShots();
     }
 
     /**

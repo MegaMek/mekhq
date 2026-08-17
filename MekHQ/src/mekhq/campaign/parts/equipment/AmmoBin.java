@@ -321,17 +321,59 @@ public class AmmoBin extends EquipmentPart implements IAcquisitionWork, IFabrica
     }
 
     /**
-     * The fabrication cost of an ammo reload is based on the value of the shots actually needed (a partial reload costs
-     * proportionally less than a full ton), rather than the value of a whole new bin.
+     * The fabrication cost of an ammo reload is based on the value of the shots the attempt actually manufactures (a
+     * partial reload costs proportionally less than a full ton), rather than the value of a whole new bin.
      */
     @Override
     public Money getFabricationRepairBasis() {
-        return getValueNeeded();
+        return getFabricationValue();
     }
 
     @Override
     public Money getFabricationPartBasis() {
-        return getValueNeeded();
+        return getFabricationValue();
+    }
+
+    /**
+     * The number of shots a single fabrication attempt manufactures. This must match what the load performed by
+     * {@link #fix()} actually installs, since the attempt is priced from it: a reload that fills the bin from empty
+     * manufactures a full bin, and so does a munition swap on an otherwise full bin (the old rounds are unloaded back
+     * to the warehouse and an entire bin of the new munition is manufactured to replace them).
+     *
+     * @return the number of shots one fabrication attempt manufactures, never negative
+     */
+    protected int getFabricationShots() {
+        return Math.max(0, getShotsNeeded());
+    }
+
+    /**
+     * The per-ton price of the ammunition a fabrication attempt manufactures. Unlike {@link #getPricePerTon()}, which
+     * deliberately prices whatever is presently in the bin, fabrication always manufactures {@link #getType()} - the
+     * munition the reload is about to install.
+     *
+     * @return the price of one ton of the munition being manufactured
+     */
+    protected Money getFabricationPricePerTon() {
+        return Money.of(getType().getRawCost());
+    }
+
+    /**
+     * The value of the ammunition a single fabrication attempt manufactures, used as the basis for both components of
+     * the fabrication cost. This deliberately prices the exact type and quantity the load operation will install rather
+     * than reusing {@link #getValueNeeded()}, which is based on the raw shots-needed count and on the munition already
+     * in the bin.
+     *
+     * @return the value of the shots one fabrication attempt manufactures, or {@link Money#zero()} if it manufactures
+     *       nothing
+     */
+    protected Money getFabricationValue() {
+        int shots = getFabricationShots();
+        int shotsPerTon = getShotsPerTon();
+        if ((shotsPerTon <= 0) || (shots <= 0)) {
+            return Money.zero();
+        }
+
+        return adjustCostsForCampaignOptions(getFabricationPricePerTon().multipliedBy(shots).dividedBy(shotsPerTon));
     }
 
     /**
