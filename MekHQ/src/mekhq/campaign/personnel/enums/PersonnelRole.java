@@ -77,13 +77,13 @@ public enum PersonnelRole {
     MEDIC(PersonnelRoleSubType.SUPPORT, KeyEvent.VK_UNDEFINED, 3, 4, 5, 4, 5, 5, 4),
     ADMINISTRATOR(PersonnelRoleSubType.SUPPORT, KeyEvent.VK_UNDEFINED, 3, 4, 4, 4, 5, 5, 5),
     @Deprecated(since = "0.51.01", forRemoval = true)
-    ADMINISTRATOR_COMMAND(PersonnelRoleSubType.SUPPORT, KeyEvent.VK_UNDEFINED, 3, 4, 4, 4, 5, 5, 5),
+    ADMINISTRATOR_COMMAND(true),
     @Deprecated(since = "0.51.01", forRemoval = true)
-    ADMINISTRATOR_LOGISTICS(PersonnelRoleSubType.SUPPORT, KeyEvent.VK_L, 3, 4, 4, 4, 5, 5, 5),
+    ADMINISTRATOR_LOGISTICS(true),
     @Deprecated(since = "0.51.01", forRemoval = true)
-    ADMINISTRATOR_TRANSPORT(PersonnelRoleSubType.SUPPORT, KeyEvent.VK_R, 3, 4, 4, 4, 5, 5, 5),
+    ADMINISTRATOR_TRANSPORT(true),
     @Deprecated(since = "0.51.01", forRemoval = true)
-    ADMINISTRATOR_HR(PersonnelRoleSubType.SUPPORT, KeyEvent.VK_H, 3, 4, 4, 4, 5, 5, 5),
+    ADMINISTRATOR_HR(true),
 
     // If we're generating a character without a Profession, we're just going to leave them with middle of the road
     // Attribute scores (4 in everything)
