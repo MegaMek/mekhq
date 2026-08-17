@@ -50,6 +50,7 @@ import static org.mockito.Mockito.mockConstruction;
 import static org.mockito.Mockito.mockStatic;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.spy;
+import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -81,6 +82,7 @@ import mekhq.campaign.mission.enums.ScenarioType;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.PersonnelOptions;
 import mekhq.campaign.personnel.familiarity.Familiarity;
+import mekhq.campaign.personnel.familiarity.FamiliarityGainType;
 import mekhq.campaign.personnel.skills.ScoutingSkills;
 import mekhq.campaign.personnel.skills.Skill;
 import mekhq.campaign.personnel.skills.SkillCheck;
@@ -547,6 +549,119 @@ class StratConRulesManagerTest {
             scenarioFactory.verify(() -> StratConScenarioFactory.getRandomScenario(anyInt(), eq(true), anyBoolean()),
                   never());
             assertTrue(dialogBungledArgs.isEmpty());
+        }
+    }
+
+    /**
+     * Bundles the mocks a patrol-familiarity test needs.
+     */
+    private record FamiliarityFixture(Campaign campaign, AtBContract contract, StratConTrackState track,
+          StratConCoords coords, int forceID) {}
+
+    /**
+     * Builds the mock infrastructure for a deployment onto a hex that already holds an ordinary scenario, so that both
+     * {@link StratConRulesManager#deployForceToCoords} and {@link StratConRulesManager#assignForceToScenario} run to
+     * completion without generating a scenario of their own.
+     *
+     * @param isPatrol whether the deploying force is on a patrol role
+     */
+    private FamiliarityFixture buildFamiliarityFixture(boolean isPatrol) {
+        Campaign campaign = MHQTestUtilities.mockCampaign();
+        CampaignOptions options = mock(CampaignOptions.class);
+        when(campaign.getCampaignOptions()).thenReturn(options);
+        when(options.get(CampaignOption.CHASSIS_FAMILIARITY_MODE)).thenReturn(Familiarity.NORMAL);
+
+        AtBContract contract = mock(AtBContract.class);
+        StratConTrackState track = mock(StratConTrackState.class);
+        StratConCoords coords = new StratConCoords(2, 3);
+        int forceID = 1;
+
+        StratConScenario scenario = mock(StratConScenario.class);
+        AtBDynamicScenario backingScenario = mock(AtBDynamicScenario.class);
+        when(backingScenario.getStratConScenarioType()).thenReturn(ScenarioType.NONE);
+        when(backingScenario.isFinalized()).thenReturn(true);
+        when(backingScenario.isCloaked()).thenReturn(false);
+        when(backingScenario.getForceIDs()).thenReturn(new ArrayList<>());
+        when(scenario.getBackingScenario()).thenReturn(backingScenario);
+        when(scenario.getPrimaryForceIDs()).thenReturn(new ArrayList<>());
+        when(scenario.getPlayerTemplateForceIDs()).thenReturn(new ArrayList<>());
+        when(track.getScenario(coords)).thenReturn(scenario);
+
+        CombatTeam combatTeam = mock(CombatTeam.class);
+        CombatRole combatRole = mock(CombatRole.class);
+        when(combatRole.isPatrol()).thenReturn(isPatrol);
+        when(combatRole.isTraining()).thenReturn(false);
+        when(combatTeam.getRole()).thenReturn(combatRole);
+        var combatTeamsMap = new Hashtable<Integer, CombatTeam>();
+        combatTeamsMap.put(forceID, combatTeam);
+        when(campaign.getPlayerForce().getCombatTeamsAsMap(campaign)).thenReturn(combatTeamsMap);
+
+        setupProcessForceDeploymentMocks(campaign, options, track, forceID);
+
+        return new FamiliarityFixture(campaign, contract, track, coords, forceID);
+    }
+
+    /**
+     * A patrol deployment earns the patrol familiarity award, and earns it exactly once for the deployment.
+     */
+    @Test
+    void deployForceToCoords_patrolForce_awardsPatrolFamiliarityOnce() {
+        FamiliarityFixture fixture = buildFamiliarityFixture(true);
+
+        try (MockedStatic<Familiarity> familiarity = mockStatic(Familiarity.class)) {
+            StratConRulesManager.deployForceToCoords(fixture.coords(), fixture.forceID(), fixture.campaign(),
+                  fixture.contract(), fixture.track(), false);
+
+            familiarity.verify(() -> Familiarity.assignFamiliarityToCombatTeam(eq(fixture.campaign()), any(),
+                  eq(FamiliarityGainType.D3)), times(1));
+        }
+    }
+
+    /**
+     * The award is Patrol-only: every other combat role deploys without earning it.
+     */
+    @Test
+    void deployForceToCoords_nonPatrolForce_awardsNoFamiliarity() {
+        FamiliarityFixture fixture = buildFamiliarityFixture(false);
+
+        try (MockedStatic<Familiarity> familiarity = mockStatic(Familiarity.class)) {
+            StratConRulesManager.deployForceToCoords(fixture.coords(), fixture.forceID(), fixture.campaign(),
+                  fixture.contract(), fixture.track(), false);
+
+            familiarity.verify(() -> Familiarity.assignFamiliarityToCombatTeam(any(), any(), any()), never());
+        }
+    }
+
+    /**
+     * Assigning a force to an existing scenario is not a patrol sweep, so it earns nothing here - the scenario grants
+     * its own award at resolution. This holds even for a force on a patrol role.
+     */
+    @Test
+    void assignForceToScenario_patrolForce_awardsNoFamiliarity() {
+        FamiliarityFixture fixture = buildFamiliarityFixture(true);
+
+        try (MockedStatic<Familiarity> familiarity = mockStatic(Familiarity.class)) {
+            StratConRulesManager.assignForceToScenario(fixture.coords(), fixture.forceID(), fixture.campaign(),
+                  fixture.contract(), fixture.track(), false);
+
+            familiarity.verify(() -> Familiarity.assignFamiliarityToCombatTeam(any(), any(), any()), never());
+        }
+    }
+
+    /**
+     * The award hangs off the deployment decision, not off the hex-revealing pass. Every route that commits a force to
+     * a scenario re-runs {@code processForceDeployment}, so an award made there would land more than once per
+     * deployment.
+     */
+    @Test
+    void processForceDeployment_patrolForce_awardsNoFamiliarity() {
+        FamiliarityFixture fixture = buildFamiliarityFixture(true);
+
+        try (MockedStatic<Familiarity> familiarity = mockStatic(Familiarity.class)) {
+            StratConRulesManager.processForceDeployment(fixture.coords(), fixture.forceID(), fixture.campaign(),
+                  fixture.track(), false);
+
+            familiarity.verify(() -> Familiarity.assignFamiliarityToCombatTeam(any(), any(), any()), never());
         }
     }
 

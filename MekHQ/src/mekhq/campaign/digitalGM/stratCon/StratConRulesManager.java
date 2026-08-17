@@ -1289,6 +1289,14 @@ public class StratConRulesManager {
         boolean isPatrol = combatRole.isPatrol();
         boolean isTraining = combatRole.isTraining();
 
+        // A patrol spends its deployment riding the sector, so the patrolling force earns a little familiarity with
+        // their own chassis. No other role earns it. The award sits here rather than in processForceDeployment: that
+        // runs again whenever a force is committed to a scenario - both from the branches below and from
+        // assignForceToScenario - and a scenario grants its own, larger award at resolution.
+        if (isPatrol) {
+            Familiarity.assignFamiliarityToCombatTeam(campaign, combatTeam, FamiliarityGainType.D3);
+        }
+
         // A force that deploys into an unexplored hex is walking in blind. If that deployment trips a scenario, the
         // force is caught off-guard: the scenario is pinned to the deployed hex (bypassing the patrol adjacent-shift)
         // and counts as an ambush - or a bungled patrol, if the force was on patrol. This must be captured *before*
@@ -1719,8 +1727,6 @@ public class StratConRulesManager {
             if (isPatrol) {
                 scanRangeIncrease++; // Determine scan range (this is the furthest a hex can be revealed)
             }
-
-            Familiarity.assignFamiliarityToCombatTeam(campaign, combatTeam, FamiliarityGainType.D3);
         }
 
         // Process starting point
