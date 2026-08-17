@@ -2409,7 +2409,7 @@ public record CampaignXmlParser(InputStream is, MekHQ app) {
             }
 
             // <51.01 compatibility handler
-            if (Person.updateSkillsForAdminProfessions(today, person, person.getPrimaryRole(), true) ||
+            if (Person.updateSkillsForAdminProfessions(today, person, person.getPrimaryRole(), true) |
                       Person.updateSkillsForAdminProfessions(today, person, person.getSecondaryRole(), false)) {
                 String report = getFormattedTextAt(RESOURCE_BUNDLE, "adminProfessionSkillChange",
                       spanOpeningWithCustomColor(getWarningColor()),

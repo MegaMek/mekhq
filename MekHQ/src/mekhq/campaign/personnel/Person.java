@@ -4916,7 +4916,9 @@ public class Person implements ILocatable {
         Skill administrationSkill = person.getSkill(S_ADMIN);
         Skill appraisalSkill = person.getSkill(S_APPRAISAL);
 
-        int newSkillLevel = negotiationSkill == null ? administrationSkill.getLevel() : negotiationSkill.getLevel();
+        int newSkillLevel = negotiationSkill != null ?
+                                  negotiationSkill.getLevel() :
+                                  (administrationSkill == null ? 1 : administrationSkill.getLevel());
 
         if (appraisalSkill == null || appraisalSkill.getLevel() < newSkillLevel) {
             int bonus = appraisalSkill != null ? appraisalSkill.getBonus() : 0;
@@ -5579,10 +5581,9 @@ public class Person implements ILocatable {
                 appraisalLevel = appraisalLevel == -1 ? 0 : appraisalLevel;
 
                 int levelSum;
-                int divisor;
+                int divisor = 2;
 
                 levelSum = adminLevel + appraisalLevel;
-                    divisor = 2;
 
                 if (levelSum == -divisor) {
                     yield EXP_NONE;

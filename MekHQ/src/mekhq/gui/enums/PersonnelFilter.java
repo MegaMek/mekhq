@@ -90,7 +90,8 @@ public enum PersonnelFilter {
           "PersonnelFilter.ADMINISTRATOR.toolTipText",
           true,
           false),
-    ADMINISTRATOR_SINGLE("PersonnelFilter.ADMINISTRATOR.text", "PersonnelFilter.ADMINISTRATOR.toolTipText", true, true),
+    ADMINISTRATOR_SINGLE("PersonnelFilter.ADMINISTRATOR.text", "PersonnelFilter.ADMINISTRATOR.toolTipText", false,
+          true),
     DEPENDENT("PersonnelFilter.DEPENDENT.text", "PersonnelFilter.DEPENDENT.toolTipText"),
     CAMP_FOLLOWER("PersonnelFilter.CAMP_FOLLOWER.text", "PersonnelFilter.CAMP_FOLLOWER.toolTipText"),
     // endregion Standard Personnel Filters

@@ -100,7 +100,7 @@ public class NonCombatPrisoners {
                     Map.entry(ASTECH, 108), // 6 per tech 'pick'
                     Map.entry(DOCTOR, 1),
                     Map.entry(MEDIC, 4), // 4 per doctor
-                    Map.entry(ADMINISTRATOR, 1)
+                    Map.entry(ADMINISTRATOR, 10)
               );
 
         WeightedIntMap<PersonnelRole> weightSortedMap = new WeightedIntMap<>();
