@@ -130,7 +130,7 @@ final class TransmissionImagePanel extends JComponent {
 
         if (glitchFramesRemaining > 0) {
             glitchFramesRemaining--;
-                } else if (ThreadLocalRandom.current().nextInt(signalQuality.glitchInterval) == 0) {
+        } else if (ThreadLocalRandom.current().nextInt(signalQuality.glitchInterval) == 0) {
             int height = getHeight();
             glitchFramesRemaining = ThreadLocalRandom.current().nextInt(signalQuality.glitchFrameMinimum,
                 signalQuality.glitchFrameMaximum);

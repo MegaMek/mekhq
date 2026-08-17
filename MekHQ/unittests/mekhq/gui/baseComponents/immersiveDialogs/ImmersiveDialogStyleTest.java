@@ -34,10 +34,13 @@ package mekhq.gui.baseComponents.immersiveDialogs;
 
 import static megamek.client.ui.util.UIUtil.scaleForGUI;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 import java.awt.Color;
 import java.awt.Component;
@@ -46,6 +49,7 @@ import java.awt.FlowLayout;
 import java.awt.Graphics2D;
 import java.awt.Insets;
 import java.awt.image.BufferedImage;
+import java.util.List;
 import java.util.Map;
 import javax.swing.JComboBox;
 import javax.swing.JComponent;
@@ -54,6 +58,10 @@ import javax.swing.JPanel;
 import javax.swing.JSpinner;
 import javax.swing.SwingUtilities;
 
+import mekhq.campaign.Campaign;
+import mekhq.campaign.ForceHumanResources;
+import mekhq.campaign.force.PlayerForce;
+import mekhq.campaign.personnel.Person;
 import org.junit.jupiter.api.Test;
 
 class ImmersiveDialogStyleTest {
@@ -160,9 +168,11 @@ class ImmersiveDialogStyleTest {
     }
 
     @Test
-    void commanderSourceUsesCommandLabel() {
+    void commanderSourceUsesCommandLabelRegardlessOfRosterMembership() {
         assertEquals("ImmersiveDialog.source.command",
               ImmersiveDialogCore.resolveSourceLabelResourceKey(true, true));
+        assertEquals("ImmersiveDialog.source.command",
+              ImmersiveDialogCore.resolveSourceLabelResourceKey(true, false));
     }
 
     @Test
@@ -175,6 +185,64 @@ class ImmersiveDialogStyleTest {
     void externalSourceUsesFieldContactLabel() {
         assertEquals("ImmersiveDialog.source.fieldContact",
               ImmersiveDialogCore.resolveSourceLabelResourceKey(false, false));
+    }
+
+    @Test
+    void nullCampaignIsNotPlayerForcePersonnel() {
+        assertFalse(ImmersiveDialogCore.isPlayerForcePersonnel(null, mock(Person.class)));
+    }
+
+    @Test
+    void nullPlayerForceIsNotPlayerForcePersonnel() {
+        Campaign campaign = mock(Campaign.class);
+
+        assertFalse(ImmersiveDialogCore.isPlayerForcePersonnel(campaign, mock(Person.class)));
+    }
+
+    @Test
+    void nullHumanResourcesIsNotPlayerForcePersonnel() {
+        Campaign campaign = mock(Campaign.class);
+        PlayerForce playerForce = mock(PlayerForce.class);
+        when(campaign.getPlayerForce()).thenReturn(playerForce);
+
+        assertFalse(ImmersiveDialogCore.isPlayerForcePersonnel(campaign, mock(Person.class)));
+    }
+
+    @Test
+    void nullPersonnelIsNotPlayerForcePersonnel() {
+        Campaign campaign = mock(Campaign.class);
+        PlayerForce playerForce = mock(PlayerForce.class);
+        ForceHumanResources humanResources = mock(ForceHumanResources.class);
+        when(campaign.getPlayerForce()).thenReturn(playerForce);
+        when(playerForce.getHumanResources()).thenReturn(humanResources);
+        when(humanResources.getPersonnel()).thenReturn(null);
+
+        assertFalse(ImmersiveDialogCore.isPlayerForcePersonnel(campaign, mock(Person.class)));
+    }
+
+    @Test
+    void rosterMemberIsPlayerForcePersonnel() {
+        Campaign campaign = mock(Campaign.class);
+        PlayerForce playerForce = mock(PlayerForce.class);
+        ForceHumanResources humanResources = mock(ForceHumanResources.class);
+        Person speaker = mock(Person.class);
+        when(campaign.getPlayerForce()).thenReturn(playerForce);
+        when(playerForce.getHumanResources()).thenReturn(humanResources);
+        when(humanResources.getPersonnel()).thenReturn(List.of(speaker));
+
+        assertTrue(ImmersiveDialogCore.isPlayerForcePersonnel(campaign, speaker));
+    }
+
+    @Test
+    void nonRosterSpeakerIsNotPlayerForcePersonnel() {
+        Campaign campaign = mock(Campaign.class);
+        PlayerForce playerForce = mock(PlayerForce.class);
+        ForceHumanResources humanResources = mock(ForceHumanResources.class);
+        when(campaign.getPlayerForce()).thenReturn(playerForce);
+        when(playerForce.getHumanResources()).thenReturn(humanResources);
+        when(humanResources.getPersonnel()).thenReturn(List.of());
+
+        assertFalse(ImmersiveDialogCore.isPlayerForcePersonnel(campaign, mock(Person.class)));
     }
 
     @Test

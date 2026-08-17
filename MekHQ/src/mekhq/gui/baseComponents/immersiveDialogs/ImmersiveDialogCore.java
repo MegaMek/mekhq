@@ -65,6 +65,7 @@ import java.awt.Toolkit;
 import java.awt.Window;
 import java.awt.image.ImageObserver;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 import java.util.Objects;
 import java.util.UUID;
@@ -82,7 +83,9 @@ import megamek.common.ui.FastJScrollPane;
 import megamek.logging.MMLogger;
 import mekhq.MHQConstants;
 import mekhq.campaign.Campaign;
+import mekhq.campaign.ForceHumanResources;
 import mekhq.campaign.force.Formation;
+import mekhq.campaign.force.PlayerForce;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.enums.PersonnelRole;
 import mekhq.campaign.unit.Unit;
@@ -399,11 +402,27 @@ public class ImmersiveDialogCore extends JDialog {
     }
 
     private String getSourceLabel(Person speaker) {
-        boolean isPlayerForcePersonnel = campaign.getPlayerForce()
-                                                   .getHumanResources()
-                                                   .getPersonnel()
-                                                   .contains(speaker);
-        return getText(resolveSourceLabelResourceKey(speaker.isCommander(), isPlayerForcePersonnel));
+        return getText(resolveSourceLabelResourceKey(
+              speaker.isCommander(), isPlayerForcePersonnel(campaign, speaker)));
+    }
+
+    static boolean isPlayerForcePersonnel(@Nullable Campaign campaign, Person speaker) {
+        if (campaign == null) {
+            return false;
+        }
+
+        PlayerForce playerForce = campaign.getPlayerForce();
+        if (playerForce == null) {
+            return false;
+        }
+
+        ForceHumanResources humanResources = playerForce.getHumanResources();
+        if (humanResources == null) {
+            return false;
+        }
+
+        Collection<Person> personnel = humanResources.getPersonnel();
+        return personnel != null && personnel.contains(speaker);
     }
 
     static String resolveSourceLabelResourceKey(boolean isCommander, boolean isPlayerForcePersonnel) {

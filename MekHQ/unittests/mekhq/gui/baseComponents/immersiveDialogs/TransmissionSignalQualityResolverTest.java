@@ -73,7 +73,7 @@ class TransmissionSignalQualityResolverTest {
         when(playerForce.getHumanResources()).thenReturn(humanResources);
         when(humanResources.getPersonnel()).thenReturn(List.of());
         when(campaign.getLocalDate()).thenReturn(DATE);
-                        when(campaign.getHPGNetwork()).thenReturn(List.of());
+        when(campaign.getHPGNetwork()).thenReturn(List.of());
     }
 
     @Test
@@ -251,14 +251,14 @@ class TransmissionSignalQualityResolverTest {
     }
 
     @Test
-            void campaignProvidesNetwork() {
+    void campaignProvidesNetwork() {
         PlanetarySystem speakerSystem = systemWithRating(HPGRating.A);
         Person speaker = rosterSpeakerAt(speakerSystem);
         network(new HPGLink(campaignSystem, speakerSystem, HPGRating.A));
 
         assertEquals(TransmissionSignalQuality.REMOTE,
               TransmissionSignalQualityResolver.resolve(campaign, speaker, null));
-                        verify(campaign).getHPGNetwork();
+        verify(campaign).getHPGNetwork();
     }
 
     private Person rosterSpeakerAt(PlanetarySystem system) {
@@ -280,6 +280,6 @@ class TransmissionSignalQualityResolverTest {
     }
 
     private void network(HPGLink... links) {
-      when(campaign.getHPGNetwork()).thenReturn(List.of(links));
+        when(campaign.getHPGNetwork()).thenReturn(List.of(links));
     }
 }
