@@ -73,7 +73,7 @@ public class SingleDropNagDialog extends ImmersiveDialogNag {
      *            to configure and display this nag dialog
      */
     public SingleDropNagDialog(final Campaign campaign) {
-        super(campaign, null, NAG_SINGLE_DROP_SET_UP, "SingleDropNagDialog");
+        super(campaign, NAG_SINGLE_DROP_SET_UP, "SingleDropNagDialog");
     }
 
     public static boolean checkNag(List<AtBContract> activeContracts, boolean isSunday,

@@ -250,15 +250,13 @@ public class BirthAnnouncement {
      */
     private @Nullable Person getFallbackSpeaker(Campaign campaign) {
         Person speaker = campaign.getPlayerForce().getHumanResources()
-                               .getSeniorAdminPerson(Campaign.AdministratorSpecialization.HR,
-                                     campaign.getCampaignOptions(),
+                               .getSeniorAdminPerson(campaign.getCampaignOptions(),
                                      campaign.isClanCampaign(),
                                      campaign.getLocalDate());
 
         if (speaker == null) {
             speaker = campaign.getPlayerForce().getHumanResources()
-                            .getSeniorAdminPerson(Campaign.AdministratorSpecialization.COMMAND,
-                                  campaign.getCampaignOptions(),
+                            .getSeniorAdminPerson(campaign.getCampaignOptions(),
                                   campaign.isClanCampaign(),
                                   campaign.getLocalDate());
         } else {

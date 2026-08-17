@@ -136,15 +136,13 @@ public record CommandersDayAnnouncement(Campaign campaign) {
      */
     private @Nullable Person getSpeaker() {
         Person speaker = campaign.getPlayerForce().getHumanResources()
-                               .getSeniorAdminPerson(mekhq.campaign.Campaign.AdministratorSpecialization.HR,
-                                     campaign.getCampaignOptions(),
+                               .getSeniorAdminPerson(campaign.getCampaignOptions(),
                                      campaign.isClanCampaign(),
                                      campaign.getLocalDate());
 
         if (speaker == null) {
             speaker = campaign.getPlayerForce().getHumanResources()
-                            .getSeniorAdminPerson(mekhq.campaign.Campaign.AdministratorSpecialization.COMMAND,
-                                  campaign.getCampaignOptions(),
+                            .getSeniorAdminPerson(campaign.getCampaignOptions(),
                                   campaign.isClanCampaign(),
                                   campaign.getLocalDate());
         } else {

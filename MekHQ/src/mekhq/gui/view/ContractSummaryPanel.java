@@ -116,22 +116,19 @@ public class ContractSummaryPanel extends JPanel {
                 tranRerolls = 1;
             } else {
                 commandNegotiator = campaign.getPlayerForce().getHumanResources()
-                                          .getSeniorAdminPerson(Campaign.AdministratorSpecialization.COMMAND,
-                                                campaign.getCampaignOptions(),
+                                          .getSeniorAdminPerson(campaign.getCampaignOptions(),
                                                 campaign.isClanCampaign(),
                                                 campaign.getLocalDate());
                 cmdRerolls = (commandNegotiator == null ||
                                     commandNegotiator.getSkill(SkillType.S_NEGOTIATION) == null) ? 0 : 1;
                 logisticsNegotiator = campaign.getPlayerForce().getHumanResources()
-                                            .getSeniorAdminPerson(Campaign.AdministratorSpecialization.LOGISTICS,
-                                                  campaign.getCampaignOptions(),
+                                            .getSeniorAdminPerson(campaign.getCampaignOptions(),
                                                   campaign.isClanCampaign(),
                                                   campaign.getLocalDate());
                 logRerolls = (logisticsNegotiator == null ||
                                     logisticsNegotiator.getSkill(SkillType.S_NEGOTIATION) == null) ? 0 : 1;
                 transportNegotiator = campaign.getPlayerForce().getHumanResources()
-                                            .getSeniorAdminPerson(Campaign.AdministratorSpecialization.TRANSPORT,
-                                                  campaign.getCampaignOptions(),
+                                            .getSeniorAdminPerson(campaign.getCampaignOptions(),
                                                   campaign.isClanCampaign(),
                                                   campaign.getLocalDate());
                 tranRerolls = (transportNegotiator == null ||

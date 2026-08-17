@@ -63,7 +63,7 @@ public class OutstandingScenariosNagDialog extends ImmersiveDialogNag {
      *                 settings required for constructing the dialog.
      */
     public OutstandingScenariosNagDialog(final Campaign campaign) {
-        super(campaign, null, NAG_OUTSTANDING_SCENARIOS, "OutstandingScenariosNagDialog");
+        super(campaign, NAG_OUTSTANDING_SCENARIOS, "OutstandingScenariosNagDialog");
     }
 
     @Override

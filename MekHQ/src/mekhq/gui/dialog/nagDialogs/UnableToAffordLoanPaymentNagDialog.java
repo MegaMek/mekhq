@@ -33,7 +33,7 @@
 package mekhq.gui.dialog.nagDialogs;
 
 import static mekhq.MHQConstants.NAG_UNABLE_TO_AFFORD_LOAN_PAYMENT;
-import static mekhq.campaign.Campaign.AdministratorSpecialization.LOGISTICS;
+
 import static mekhq.gui.dialog.nagDialogs.nagLogic.UnableToAffordLoanPaymentNag.getTotalPaymentsDue;
 import static mekhq.gui.dialog.nagDialogs.nagLogic.UnableToAffordLoanPaymentNag.unableToAffordLoans;
 import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
@@ -70,7 +70,7 @@ public class UnableToAffordLoanPaymentNagDialog extends ImmersiveDialogNag {
      *                 required for constructing the nag dialog.
      */
     public UnableToAffordLoanPaymentNagDialog(final Campaign campaign) {
-        super(campaign, LOGISTICS, NAG_UNABLE_TO_AFFORD_LOAN_PAYMENT, "UnableToAffordLoanPaymentNagDialog");
+        super(campaign, NAG_UNABLE_TO_AFFORD_LOAN_PAYMENT, "UnableToAffordLoanPaymentNagDialog");
     }
 
     @Override

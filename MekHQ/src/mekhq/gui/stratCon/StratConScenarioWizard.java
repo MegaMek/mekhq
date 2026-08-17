@@ -72,7 +72,7 @@ import megamek.common.ui.FastJScrollPane;
 import megamek.logging.MMLogger;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
-import mekhq.campaign.Campaign.AdministratorSpecialization;
+
 import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.digitalGM.stratCon.StratConCampaignState;
 import mekhq.campaign.digitalGM.stratCon.StratConRulesManager;
@@ -853,8 +853,7 @@ public class StratConScenarioWizard extends JDialog {
         }
 
         Person commandLiaison = campaign.getPlayerForce().getHumanResources()
-                                      .getSeniorAdminPerson(AdministratorSpecialization.COMMAND,
-                                            campaign.getCampaignOptions(),
+                                      .getSeniorAdminPerson(campaign.getCampaignOptions(),
                                             campaign.isClanCampaign(),
                                             campaign.getLocalDate());
         int baseTargetNumber = campaign.getCampaignOptions().getReinforcementBaseTargetNumber();
@@ -1056,8 +1055,7 @@ public class StratConScenarioWizard extends JDialog {
         boolean backedOutOfBatchall = false;
 
         Person speaker = campaign.getPlayerForce().getHumanResources()
-                               .getSeniorAdminPerson(AdministratorSpecialization.COMMAND,
-                                     campaign.getCampaignOptions(),
+                               .getSeniorAdminPerson(campaign.getCampaignOptions(),
                                      campaign.isClanCampaign(),
                                      campaign.getLocalDate());
         String inCharacterMessage = String.format(resources.getString("batchallBreach.ic"),

@@ -102,9 +102,6 @@ class PersonnelGeneralPage {
     private JCheckBox chkUseRemovalExemptCemetery;
     private JCheckBox chkUseRemovalExemptRetirees;
 
-    private JCheckBox chkAdminsHaveNegotiation;
-    private JCheckBox chkAdminExperienceLevelIncludeNegotiation;
-
     private JCheckBox chkUseBlobInfantry;
     private JCheckBox chkUseBlobBattleArmor;
     private JCheckBox chkUseBlobVehicleCrewGround;
@@ -133,7 +130,6 @@ class PersonnelGeneralPage {
         comboEdgeRefreshPeriod = new MMComboBox<>("comboEdgeRefreshPeriod", EdgeRefreshPeriod.values());
         JPanel pnlPersonnelGeneralOptions = createGeneralOptionsPanel();
         JPanel pnlPersonnelCleanup = createPersonnelCleanUpPanel();
-        JPanel pnlAdministrators = createAdministratorsPanel();
         JPanel pnlBlobCrew = createBlobCrewPanel();
         JPanel panel = CampaignOptionsPagePanel.builder("PersonnelGeneralPage", "PersonnelGeneralPage", imageAddress)
                              .header(generalHeader)
@@ -144,10 +140,6 @@ class PersonnelGeneralPage {
                              .section("lblPersonnelCleanUpPanel.text",
                                    "lblPersonnelCleanUpPanel.summary",
                                    pnlPersonnelCleanup,
-                                   getMetadata(LEGACY_RULE_BEFORE_METADATA, CampaignOptionFlag.CUSTOM_SYSTEM))
-                             .section("lblAdministratorsPanel.text",
-                                   "lblAdministratorsPanel.summary",
-                                   pnlAdministrators,
                                    getMetadata(LEGACY_RULE_BEFORE_METADATA, CampaignOptionFlag.CUSTOM_SYSTEM))
                              .section("lblBlobCrewPanel.text",
                                    "lblBlobCrewPanel.summary",
@@ -292,31 +284,6 @@ class PersonnelGeneralPage {
     }
 
     /**
-     * Creates the panel for administrative settings in the General Page.
-     *
-     * @return a {@link JPanel} containing settings related to administrators, such as negotiation options
-     */
-    private @Nonnull JPanel createAdministratorsPanel() {
-        // Contents
-        chkAdminsHaveNegotiation = new CampaignOptionsCheckBox("AdminsHaveNegotiation");
-        chkAdminsHaveNegotiation.addMouseListener(createTipPanelUpdater("AdminsHaveNegotiation"));
-        chkAdminExperienceLevelIncludeNegotiation = new CampaignOptionsCheckBox(
-              "AdminExperienceLevelIncludeAppraisal");
-        chkAdminExperienceLevelIncludeNegotiation.addMouseListener(createTipPanelUpdater(
-              "AdminExperienceLevelIncludeAppraisal"));
-
-        // Layout the Panel
-        final SettingsFormPanel panel = new SettingsFormPanel("AdministratorsPanel",
-              LABEL_COLUMN_WIDTH,
-              CONTROL_COLUMN_WIDTH);
-        panel.addCheckBoxGrid(2,
-              chkAdminsHaveNegotiation,
-              chkAdminExperienceLevelIncludeNegotiation);
-
-        return panel;
-    }
-
-    /**
      * Creates the panel for blob crew settings in the General Page.
      *
      * @return a {@link JPanel} containing settings related to blob crews (temporary personnel pools)
@@ -398,8 +365,6 @@ class PersonnelGeneralPage {
         chkUsePersonnelRemoval.setSelected(model.usePersonnelRemoval);
         chkUseRemovalExemptCemetery.setSelected(model.useRemovalExemptCemetery);
         chkUseRemovalExemptRetirees.setSelected(model.useRemovalExemptRetirees);
-        chkAdminsHaveNegotiation.setSelected(model.adminsHaveNegotiation);
-        chkAdminExperienceLevelIncludeNegotiation.setSelected(model.adminExperienceLevelIncludeAppraisal);
         chkUseBlobInfantry.setSelected(model.useBlobInfantry);
         chkUseBlobBattleArmor.setSelected(model.useBlobBattleArmor);
         chkUseBlobVehicleCrewGround.setSelected(model.useBlobVehicleCrewGround);
@@ -442,8 +407,6 @@ class PersonnelGeneralPage {
         model.usePersonnelRemoval = chkUsePersonnelRemoval.isSelected();
         model.useRemovalExemptCemetery = chkUseRemovalExemptCemetery.isSelected();
         model.useRemovalExemptRetirees = chkUseRemovalExemptRetirees.isSelected();
-        model.adminsHaveNegotiation = chkAdminsHaveNegotiation.isSelected();
-        model.adminExperienceLevelIncludeAppraisal = chkAdminExperienceLevelIncludeNegotiation.isSelected();
         model.useBlobInfantry = chkUseBlobInfantry.isSelected();
         model.useBlobBattleArmor = chkUseBlobBattleArmor.isSelected();
         model.useBlobVehicleCrewGround = chkUseBlobVehicleCrewGround.isSelected();

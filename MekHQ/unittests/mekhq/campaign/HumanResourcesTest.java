@@ -59,7 +59,7 @@ import megamek.Version;
 import megamek.common.enums.SkillLevel;
 import megamek.common.equipment.EquipmentType;
 import megamek.common.units.Entity;
-import mekhq.campaign.Campaign.AdministratorSpecialization;
+
 import mekhq.campaign.campaignOptions.AcquisitionsType;
 import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.personnel.Person;

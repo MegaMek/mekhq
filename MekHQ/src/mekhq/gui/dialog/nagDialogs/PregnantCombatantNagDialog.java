@@ -33,7 +33,7 @@
 package mekhq.gui.dialog.nagDialogs;
 
 import static mekhq.MHQConstants.NAG_PREGNANT_COMBATANT;
-import static mekhq.campaign.Campaign.AdministratorSpecialization.HR;
+
 import static mekhq.gui.dialog.nagDialogs.nagLogic.PregnantCombatantNagLogic.hasActivePregnantCombatant;
 
 import java.util.List;
@@ -64,7 +64,7 @@ public class PregnantCombatantNagDialog extends ImmersiveDialogNag {
      *                 settings required for constructing the dialog.
      */
     public PregnantCombatantNagDialog(final Campaign campaign) {
-        super(campaign, HR, NAG_PREGNANT_COMBATANT, "PregnantCombatantNagDialog");
+        super(campaign, NAG_PREGNANT_COMBATANT, "PregnantCombatantNagDialog");
     }
 
     /**

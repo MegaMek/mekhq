@@ -98,8 +98,7 @@ public class ContractStartRentalDialog extends ImmersiveDialogCore {
           int holdingCellCost) {
         super(campaign,
               campaign.getPlayerForce().getHumanResources()
-                    .getSeniorAdminPerson(mekhq.campaign.Campaign.AdministratorSpecialization.LOGISTICS,
-                          campaign.getCampaignOptions(),
+                    .getSeniorAdminPerson(campaign.getCampaignOptions(),
                           campaign.isClanCampaign(),
                           campaign.getLocalDate()),
               null,

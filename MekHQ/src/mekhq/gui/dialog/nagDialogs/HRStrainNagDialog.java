@@ -33,7 +33,7 @@
 package mekhq.gui.dialog.nagDialogs;
 
 import static mekhq.MHQConstants.NAG_HR_STRAIN;
-import static mekhq.campaign.Campaign.AdministratorSpecialization.HR;
+
 import static mekhq.gui.dialog.nagDialogs.nagLogic.HRStrainNagLogic.hasHRStrain;
 
 import mekhq.MekHQ;
@@ -62,7 +62,7 @@ public class HRStrainNagDialog extends ImmersiveDialogNag {
      *                 settings required for dialog construction.
      */
     public HRStrainNagDialog(final Campaign campaign) {
-        super(campaign, HR, NAG_HR_STRAIN, "HRStrainNagDialog");
+        super(campaign, NAG_HR_STRAIN, "HRStrainNagDialog");
     }
 
     /**

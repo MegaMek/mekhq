@@ -108,7 +108,7 @@ import megamek.common.options.OptionsConstants;
 import megamek.logging.MMLogger;
 import mekhq.MHQOptions;
 import mekhq.MekHQ;
-import mekhq.campaign.Campaign.AdministratorSpecialization;
+
 import mekhq.campaign.campaignOptions.CampaignOption;
 import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.digitalGM.stratCon.StratConCampaignState;
@@ -276,8 +276,7 @@ public class CampaignNewDayManager {
 
         ImmersiveDialogSimple dialog = new ImmersiveDialogSimple(campaign,
               campaign.getPlayerForce().getHumanResources()
-                    .getSeniorAdminPerson(AdministratorSpecialization.HR,
-                          campaign.getCampaignOptions(),
+                    .getSeniorAdminPerson(campaign.getCampaignOptions(),
                           campaign.isClanCampaign(),
                           campaign.getLocalDate()),
               null,

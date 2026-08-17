@@ -171,8 +171,7 @@ public class AtbMonthlyContractMarket extends AbstractContractMarket {
             PityContracts.generatePityContracts(campaign);
 
             Person negotiator = campaign.getPlayerForce().getHumanResources()
-                                      .getSeniorAdminPerson(mekhq.campaign.Campaign.AdministratorSpecialization.COMMAND,
-                                            campaign.getCampaignOptions(),
+                                      .getSeniorAdminPerson(campaign.getCampaignOptions(),
                                             campaign.isClanCampaign(),
                                             campaign.getLocalDate());
             int negotiatorModifier = 0;
@@ -948,18 +947,15 @@ public class AtbMonthlyContractMarket extends AbstractContractMarket {
          * skills are equal.
          */
         Person adminCommand = campaign.getPlayerForce().getHumanResources()
-                                    .getSeniorAdminPerson(mekhq.campaign.Campaign.AdministratorSpecialization.COMMAND,
-                                          campaign.getCampaignOptions(),
+                                    .getSeniorAdminPerson(campaign.getCampaignOptions(),
                                           campaign.isClanCampaign(),
                                           campaign.getLocalDate());
         Person adminTransport = campaign.getPlayerForce().getHumanResources()
-                                      .getSeniorAdminPerson(mekhq.campaign.Campaign.AdministratorSpecialization.TRANSPORT,
-                                            campaign.getCampaignOptions(),
+                                      .getSeniorAdminPerson(campaign.getCampaignOptions(),
                                             campaign.isClanCampaign(),
                                             campaign.getLocalDate());
         Person adminLogistics = campaign.getPlayerForce().getHumanResources()
-                                      .getSeniorAdminPerson(mekhq.campaign.Campaign.AdministratorSpecialization.LOGISTICS,
-                                            campaign.getCampaignOptions(),
+                                      .getSeniorAdminPerson(campaign.getCampaignOptions(),
                                             campaign.isClanCampaign(),
                                             campaign.getLocalDate());
 

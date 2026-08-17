@@ -90,8 +90,7 @@ public class ContractAutomation {
         final List<String> buttonLabels = List.of(getTextAt(RESOURCE_BUNDLE, "generalConfirm.text"),
               getTextAt(RESOURCE_BUNDLE, "generalDecline.text"));
         final Person speaker = campaign.getPlayerForce().getHumanResources()
-                                     .getSeniorAdminPerson(mekhq.campaign.Campaign.AdministratorSpecialization.TRANSPORT,
-                                           campaign.getCampaignOptions(),
+                                     .getSeniorAdminPerson(campaign.getCampaignOptions(),
                                            campaign.isClanCampaign(),
                                            campaign.getLocalDate());
 
@@ -263,8 +262,7 @@ public class ContractAutomation {
               getTextAt(RESOURCE_BUNDLE, "generalDecline.text"));
 
         final Person speaker = campaign.getPlayerForce().getHumanResources()
-                                     .getSeniorAdminPerson(mekhq.campaign.Campaign.AdministratorSpecialization.TRANSPORT,
-                                           campaign.getCampaignOptions(),
+                                     .getSeniorAdminPerson(campaign.getCampaignOptions(),
                                            campaign.isClanCampaign(),
                                            campaign.getLocalDate());
 

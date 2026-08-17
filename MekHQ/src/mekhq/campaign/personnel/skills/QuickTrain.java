@@ -373,8 +373,7 @@ public class QuickTrain {
                     }
                 }
                 case LOGISTICS -> {
-                    boolean isLogisticsCharacter = person.getPrimaryRole().isAdministratorLogistics() ||
-                                                         person.getSecondaryRole().isAdministratorLogistics();
+                    boolean isLogisticsCharacter = person.isAdministrator();
                     if (isLogisticsCharacter && shouldAddSkill(personSkills, S_APPRAISAL, targetSkills)) {
                         targetSkills.add(S_APPRAISAL);
                     }

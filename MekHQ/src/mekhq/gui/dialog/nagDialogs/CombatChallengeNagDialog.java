@@ -42,15 +42,14 @@ import mekhq.gui.baseComponents.immersiveDialogs.ImmersiveDialogNag;
 
 public class CombatChallengeNagDialog extends ImmersiveDialogNag {
     public CombatChallengeNagDialog(final Campaign campaign) {
-        super(campaign, Campaign.AdministratorSpecialization.COMMAND, NAG_COMBAT_CHALLENGE, "CombatChallengeNagDialog");
+        super(campaign, NAG_COMBAT_CHALLENGE, "CombatChallengeNagDialog");
     }
 
     @Override
     protected ImmersiveDialogCore constructDialog(Campaign campaign,
-          Campaign.AdministratorSpecialization specialization,
           String messageKey) {
         return new ImmersiveDialogCore(campaign,
-              getSpeaker(campaign, specialization),
+              getSpeaker(campaign),
               null,
               getInCharacterMessage(campaign, messageKey, campaign.getCommanderAddress()),
               createButtons(),

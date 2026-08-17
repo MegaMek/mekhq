@@ -3079,9 +3079,9 @@ public class Campaign implements ITechManager {
      *       LocalDate)} directly.
      */
     @Deprecated(since = "0.51.01", forRemoval = true)
-    public @Nullable Person getSeniorAdminPerson(AdministratorSpecialization type) {
+    public @Nullable Person getSeniorAdminPerson() {
         return getPlayerForce().getHumanResources()
-                     .getSeniorAdminPerson(type, getCampaignOptions(), isClanCampaign(), getLocalDate());
+                     .getSeniorAdminPerson(getCampaignOptions(), isClanCampaign(), getLocalDate());
     }
 
     /**
@@ -5894,8 +5894,7 @@ public class Campaign implements ITechManager {
         if (!skipEmptySystemCheck && getPlayerForce().isAvoidingEmptySystems()
                   && end.getPopulation(currentDay) == 0) {
             new ImmersiveDialogSimple(this, getPlayerForce().getHumanResources()
-                                                  .getSeniorAdminPerson(AdministratorSpecialization.TRANSPORT,
-                                                        getCampaignOptions(),
+                                                  .getSeniorAdminPerson(getCampaignOptions(),
                                                         isClanCampaign(),
                                                         getLocalDate()), null,
                   String.format(resources.getString("unableToEnterSystem.abandoned.ic"), getCommanderAddress()),
@@ -5913,8 +5912,7 @@ public class Campaign implements ITechManager {
                   start, end, currentDay, activeAtBContracts, factionHints);
             if (!canAccessSystem) {
                 new ImmersiveDialogSimple(this, getPlayerForce().getHumanResources()
-                                                      .getSeniorAdminPerson(AdministratorSpecialization.TRANSPORT,
-                                                            getCampaignOptions(),
+                                                      .getSeniorAdminPerson(getCampaignOptions(),
                                                             isClanCampaign(),
                                                             getLocalDate()), null,
                       String.format(resources.getString("unableToEnterSystem.outlawed.ic"), getCommanderAddress()),
@@ -6391,8 +6389,7 @@ public class Campaign implements ITechManager {
         }
 
         Person negotiator = getPlayerForce().getHumanResources()
-                                  .getSeniorAdminPerson(AdministratorSpecialization.TRANSPORT,
-                                        getCampaignOptions(),
+                                  .getSeniorAdminPerson(getCampaignOptions(),
                                         isClanCampaign(),
                                         getLocalDate());
         if (negotiator != null) {

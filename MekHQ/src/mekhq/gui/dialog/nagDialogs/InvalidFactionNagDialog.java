@@ -64,7 +64,7 @@ public class InvalidFactionNagDialog extends ImmersiveDialogNag {
      *                 settings required for constructing the dialog.
      */
     public InvalidFactionNagDialog(final Campaign campaign) {
-        super(campaign, null, NAG_INVALID_FACTION, "InvalidFactionNagDialog");
+        super(campaign, NAG_INVALID_FACTION, "InvalidFactionNagDialog");
     }
 
     /**

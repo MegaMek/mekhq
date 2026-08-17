@@ -1916,8 +1916,7 @@ public class CampaignGUI extends JPanel {
 
             new ImmersiveDialogSimple(campaign,
                   campaign.getPlayerForce().getHumanResources()
-                        .getSeniorAdminPerson(Campaign.AdministratorSpecialization.LOGISTICS,
-                              campaign.getCampaignOptions(),
+                        .getSeniorAdminPerson(campaign.getCampaignOptions(),
                               campaign.isClanCampaign(),
                               campaign.getLocalDate()),
                   null,
@@ -1962,8 +1961,7 @@ public class CampaignGUI extends JPanel {
 
             new ImmersiveDialogSimple(campaign,
                   campaign.getPlayerForce().getHumanResources()
-                        .getSeniorAdminPerson(Campaign.AdministratorSpecialization.COMMAND,
-                              campaign.getCampaignOptions(),
+                        .getSeniorAdminPerson(campaign.getCampaignOptions(),
                               campaign.isClanCampaign(),
                               campaign.getLocalDate()),
                   null,

@@ -60,7 +60,7 @@ public class DeploymentShortfallNagDialog extends ImmersiveDialogNag {
      *                 settings required for dialog construction.
      */
     public DeploymentShortfallNagDialog(final Campaign campaign) {
-        super(campaign, null, NAG_SHORT_DEPLOYMENT, "DeploymentShortfallNagDialog");
+        super(campaign, NAG_SHORT_DEPLOYMENT, "DeploymentShortfallNagDialog");
     }
 
     /**

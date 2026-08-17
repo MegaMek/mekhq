@@ -150,7 +150,6 @@ class PersonnelOptionsModel {
         usePersonnelRemoval = options.isUsePersonnelRemoval();
         useRemovalExemptCemetery = options.isUseRemovalExemptCemetery();
         useRemovalExemptRetirees = options.isUseRemovalExemptRetirees();
-        adminExperienceLevelIncludeAppraisal = options.isAdminExperienceLevelIncludeNegotiation();
         useBlobInfantry = options.isUseBlobInfantry();
         useBlobBattleArmor = options.isUseBlobBattleArmor();
         useBlobVehicleCrewGround = options.isUseBlobVehicleCrewGround();

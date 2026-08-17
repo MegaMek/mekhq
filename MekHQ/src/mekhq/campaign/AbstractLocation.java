@@ -287,8 +287,7 @@ public abstract class AbstractLocation implements IPlace {
                       daysTillStart);
 
                 new ImmersiveDialogSimple(campaign, campaign.getPlayerForce().getHumanResources()
-                                                          .getSeniorAdminPerson(Campaign.AdministratorSpecialization.TRANSPORT,
-                                                                campaign.getCampaignOptions(),
+                                                          .getSeniorAdminPerson(campaign.getCampaignOptions(),
                                                                 campaign.isClanCampaign(),
                                                                 campaign.getLocalDate()), null,
                       inCharacterMessage, null,

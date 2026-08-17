@@ -76,7 +76,7 @@ import mekhq.MHQStaticDirectoryManager;
 import mekhq.MekHQ;
 import mekhq.NullEntityException;
 import mekhq.campaign.Campaign;
-import mekhq.campaign.Campaign.AdministratorSpecialization;
+
 import mekhq.campaign.CampaignFactory;
 import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.events.OptionsChangedEvent;
@@ -586,7 +586,7 @@ public class DataLoadingDialog extends AbstractMHQDialogBasic implements Propert
             }
 
             ImmersiveDialogSimple dialog = new ImmersiveDialogSimple(campaign,
-                  campaign.getSeniorAdminPerson(AdministratorSpecialization.HR),
+                  campaign.getSeniorAdminPerson(),
                   null,
                   campaign.getResources().getString("personnelMarket.rareProfession.inCharacter"),
                   buttons,

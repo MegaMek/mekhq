@@ -124,8 +124,7 @@ public class CamOpsContractMarket extends AbstractContractMarket {
         int negotiationSkill = findNegotiationSkill(campaign);
 
         Person negotiator = campaign.getPlayerForce().getHumanResources()
-                                  .getSeniorAdminPerson(Campaign.AdministratorSpecialization.COMMAND,
-                                        campaign.getCampaignOptions(),
+                                  .getSeniorAdminPerson(campaign.getCampaignOptions(),
                                         campaign.isClanCampaign(),
                                         campaign.getLocalDate());
         int negotiatorModifier = 0;
