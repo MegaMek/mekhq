@@ -528,7 +528,7 @@ public class HumanResourcesTest {
 
             // Act
             Person result = ForceHumanResources.getSeniorAdminPerson(people,
-                  AdministratorSpecialization.COMMAND, campaignOptions, false, today);
+                  campaignOptions, false, today);
 
             // Assert
             assertNull(result);
@@ -538,10 +538,10 @@ public class HumanResourcesTest {
         void singleCommandAdminIsReturned() {
             // Arrange
             PersonnelRole commandRole = mock(PersonnelRole.class);
-            when(commandRole.isAdministratorCommand()).thenReturn(true);
+            when(commandRole.isAdministrator()).thenReturn(true);
 
             PersonnelRole none = mock(PersonnelRole.class);
-            when(none.isAdministratorCommand()).thenReturn(false);
+            when(none.isAdministrator()).thenReturn(false);
 
             Person admin = mock(Person.class);
             when(admin.getPrimaryRole()).thenReturn(commandRole);
@@ -549,7 +549,7 @@ public class HumanResourcesTest {
 
             // Act
             Person result = ForceHumanResources.getSeniorAdminPerson(List.of(admin),
-                  AdministratorSpecialization.COMMAND, campaignOptions, false, today);
+                  campaignOptions, false, today);
 
             // Assert
             assertEquals(admin, result);
@@ -559,10 +559,10 @@ public class HumanResourcesTest {
         void higherRankingAdminWins() {
             // Arrange
             PersonnelRole hrRole = mock(PersonnelRole.class);
-            when(hrRole.isAdministratorHR()).thenReturn(true);
+            when(hrRole.isAdministrator()).thenReturn(true);
 
             PersonnelRole none = mock(PersonnelRole.class);
-            when(none.isAdministratorHR()).thenReturn(false);
+            when(none.isAdministrator()).thenReturn(false);
 
             Person junior = mock(Person.class);
             when(junior.getPrimaryRole()).thenReturn(hrRole);
@@ -576,7 +576,7 @@ public class HumanResourcesTest {
 
             // Act
             Person result = ForceHumanResources.getSeniorAdminPerson(List.of(junior, senior),
-                  AdministratorSpecialization.HR, campaignOptions, false, today);
+                  campaignOptions, false, today);
 
             // Assert
             assertEquals(senior, result);
@@ -586,11 +586,11 @@ public class HumanResourcesTest {
         void nonMatchingSpecializationIsExcluded() {
             // Arrange — person is logistics admin, we ask for command admin
             PersonnelRole logisticsRole = mock(PersonnelRole.class);
-            when(logisticsRole.isAdministratorCommand()).thenReturn(false);
-            when(logisticsRole.isAdministratorLogistics()).thenReturn(true);
+            when(logisticsRole.isAdministrator()).thenReturn(false);
+            when(logisticsRole.isAdministrator()).thenReturn(true);
 
             PersonnelRole none = mock(PersonnelRole.class);
-            when(none.isAdministratorCommand()).thenReturn(false);
+            when(none.isAdministrator()).thenReturn(false);
 
             Person logisticsAdmin = mock(Person.class);
             when(logisticsAdmin.getPrimaryRole()).thenReturn(logisticsRole);
@@ -598,7 +598,7 @@ public class HumanResourcesTest {
 
             // Act
             Person result = ForceHumanResources.getSeniorAdminPerson(List.of(logisticsAdmin),
-                  AdministratorSpecialization.COMMAND, campaignOptions, false, today);
+                  campaignOptions, false, today);
 
             // Assert
             assertNull(result);

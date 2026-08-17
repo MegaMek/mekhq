@@ -325,51 +325,6 @@ class PersonnelRoleTest {
             }
         }
     }
-
-    @Test
-    void testIsAdministratorCommand() {
-        for (final PersonnelRole personnelRole : roles) {
-            if (personnelRole == PersonnelRole.ADMINISTRATOR_COMMAND) {
-                assertTrue(personnelRole.isAdministratorCommand());
-            } else {
-                assertFalse(personnelRole.isAdministratorCommand());
-            }
-        }
-    }
-
-    @Test
-    void testIsAdministratorLogistics() {
-        for (final PersonnelRole personnelRole : roles) {
-            if (personnelRole == PersonnelRole.ADMINISTRATOR_LOGISTICS) {
-                assertTrue(personnelRole.isAdministratorLogistics());
-            } else {
-                assertFalse(personnelRole.isAdministratorLogistics());
-            }
-        }
-    }
-
-    @Test
-    void testIsAdministratorTransport() {
-        for (final PersonnelRole personnelRole : roles) {
-            if (personnelRole == PersonnelRole.ADMINISTRATOR_TRANSPORT) {
-                assertTrue(personnelRole.isAdministratorTransport());
-            } else {
-                assertFalse(personnelRole.isAdministratorTransport());
-            }
-        }
-    }
-
-    @Test
-    void testIsAdministratorHR() {
-        for (final PersonnelRole personnelRole : roles) {
-            if (personnelRole == PersonnelRole.ADMINISTRATOR_HR) {
-                assertTrue(personnelRole.isAdministratorHR());
-            } else {
-                assertFalse(personnelRole.isAdministratorHR());
-            }
-        }
-    }
-
     @Test
     void testIsDependent() {
         for (final PersonnelRole personnelRole : roles) {
