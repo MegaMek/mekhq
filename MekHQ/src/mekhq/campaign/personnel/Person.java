@@ -1618,7 +1618,7 @@ public class Person implements ILocatable {
                     ServiceLogger.returnedFromLeave(this, campaign.getLocalDate());
                 } else if (getStatus().isStudent()) {
                     campaign.addReport(PERSONNEL, String.format(resources.getString("returnedFromEducation.report"),
-                          getHyperlinkedFullTitle()));
+                          getHyperlinkedFullTitle(), getEduAcademyName(), getEduAcademyNameInSet(), getEduAcademyFaction()));
                     ServiceLogger.returnedFromEducation(this, campaign.getLocalDate());
                 } else if (getStatus().isMissing()) {
                     campaign.addReport(PERSONNEL, String.format(resources.getString("returnedFromMissing.report"),

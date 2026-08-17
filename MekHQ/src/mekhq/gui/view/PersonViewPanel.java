@@ -328,13 +328,13 @@ public class PersonViewPanel extends JScrollablePanel {
             pnlKillsHeader.setName("killsHeader");
             pnlKillsHeader.setBorder(RoundedLineBorder.createRoundedLineBorder(getTextAt(RESOURCE_BUNDLE,
                   "pnlKillsHeader.title")));
-            pnlKillsHeader.setVisible(!campaignOptions.isDisplayKillRecord());
+            pnlKillsHeader.setVisible(!MekHQ.getMHQOptions().getDisplayKillRecord());
 
             JPanel pnlKills = fillKillRecord();
 
             pnlKills.setName("txtKills");
             pnlKills.setBorder(RoundedLineBorder.createRoundedLineBorder(getTextAt(RESOURCE_BUNDLE, "pnlKills.title")));
-            pnlKills.setVisible(campaignOptions.isDisplayKillRecord());
+            pnlKills.setVisible(MekHQ.getMHQOptions().getDisplayKillRecord());
 
             pnlKillsHeader.addMouseListener(getSwitchListener(pnlKillsHeader, pnlKills));
             pnlKills.addMouseListener(getSwitchListener(pnlKills, pnlKillsHeader));
@@ -358,14 +358,14 @@ public class PersonViewPanel extends JScrollablePanel {
             pnlScenariosLogHeader.setName("scenarioLogHeader");
             pnlScenariosLogHeader.setBorder(RoundedLineBorder.createRoundedLineBorder(getTextAt(RESOURCE_BUNDLE,
                   "scenarioLogHeader.title")));
-            pnlScenariosLogHeader.setVisible(!campaignOptions.isDisplayScenarioLog());
+            pnlScenariosLogHeader.setVisible(!MekHQ.getMHQOptions().getDisplayScenarioLog());
 
             JPanel pnlScenariosLog = fillScenarioLog();
 
             pnlScenariosLog.setName("scenarioLog");
             pnlScenariosLog.setBorder(RoundedLineBorder.createRoundedLineBorder(getTextAt(RESOURCE_BUNDLE,
                   "scenarioLog.title")));
-            pnlScenariosLog.setVisible(campaignOptions.isDisplayScenarioLog());
+            pnlScenariosLog.setVisible(MekHQ.getMHQOptions().getDisplayScenarioLog());
 
             pnlScenariosLogHeader.addMouseListener(getSwitchListener(pnlScenariosLogHeader, pnlScenariosLog));
             pnlScenariosLog.addMouseListener(getSwitchListener(pnlScenariosLog, pnlScenariosLogHeader));
@@ -389,13 +389,13 @@ public class PersonViewPanel extends JScrollablePanel {
             pnlPersonalLogHeader.setName("pnlLogHeader");
             pnlPersonalLogHeader.setBorder(RoundedLineBorder.createRoundedLineBorder(getTextAt(RESOURCE_BUNDLE,
                   "pnlLogHeader.title")));
-            pnlPersonalLogHeader.setVisible(!campaignOptions.isDisplayPersonnelLog());
+            pnlPersonalLogHeader.setVisible(!MekHQ.getMHQOptions().getDisplayPersonnelLog());
 
             JPanel pnlPersonalLog = fillPersonalLog();
             pnlPersonalLog.setName("pnlLog");
             pnlPersonalLog.setBorder(RoundedLineBorder.createRoundedLineBorder(getTextAt(RESOURCE_BUNDLE,
                   "pnlLog.title")));
-            pnlPersonalLog.setVisible(campaignOptions.isDisplayPersonnelLog());
+            pnlPersonalLog.setVisible(MekHQ.getMHQOptions().getDisplayPersonnelLog());
 
             pnlPersonalLogHeader.addMouseListener(getSwitchListener(pnlPersonalLogHeader, pnlPersonalLog));
             pnlPersonalLog.addMouseListener(getSwitchListener(pnlPersonalLog, pnlPersonalLogHeader));
@@ -419,13 +419,13 @@ public class PersonViewPanel extends JScrollablePanel {
             pnlPerformanceLogHeader.setName("pnlPerformanceLogHeader");
             pnlPerformanceLogHeader.setBorder(RoundedLineBorder.createRoundedLineBorder(getTextAt(RESOURCE_BUNDLE,
                   "pnlPerformanceLogHeader.title")));
-            pnlPerformanceLogHeader.setVisible(!campaignOptions.isDisplayPerformanceRecord());
+            pnlPerformanceLogHeader.setVisible(!MekHQ.getMHQOptions().getDisplayPerformanceRecord());
 
             JPanel pnlPerformanceLog = fillPerformanceLog();
             pnlPerformanceLog.setName("pnlPerformanceLog");
             pnlPerformanceLog.setBorder(RoundedLineBorder.createRoundedLineBorder(getTextAt(RESOURCE_BUNDLE,
                   "pnlPerformanceLog.title")));
-            pnlPerformanceLog.setVisible(campaignOptions.isDisplayPerformanceRecord());
+            pnlPerformanceLog.setVisible(MekHQ.getMHQOptions().getDisplayPerformanceRecord());
 
             pnlPerformanceLogHeader.addMouseListener(getSwitchListener(pnlPerformanceLogHeader, pnlPerformanceLog));
             pnlPerformanceLog.addMouseListener(getSwitchListener(pnlPerformanceLog, pnlPerformanceLogHeader));
@@ -449,13 +449,13 @@ public class PersonViewPanel extends JScrollablePanel {
             pnlMedicalLogHeader.setName("pnlMedicalLogHeader");
             pnlMedicalLogHeader.setBorder(RoundedLineBorder.createRoundedLineBorder(getTextAt(RESOURCE_BUNDLE,
                   "pnlMedicalLogHeader.title")));
-            pnlMedicalLogHeader.setVisible(!campaignOptions.isDisplayMedicalRecord());
+            pnlMedicalLogHeader.setVisible(!MekHQ.getMHQOptions().getDisplayMedicalRecord());
 
             JPanel pnlMedicalLog = fillMedicalLog();
             pnlMedicalLog.setName("pnlMedicalLog");
             pnlMedicalLog.setBorder(RoundedLineBorder.createRoundedLineBorder(getTextAt(RESOURCE_BUNDLE,
                   "pnlMedicalLog.title")));
-            pnlMedicalLog.setVisible(campaignOptions.isDisplayMedicalRecord());
+            pnlMedicalLog.setVisible(MekHQ.getMHQOptions().getDisplayMedicalRecord());
 
             pnlMedicalLogHeader.addMouseListener(getSwitchListener(pnlMedicalLogHeader, pnlMedicalLog));
             pnlMedicalLog.addMouseListener(getSwitchListener(pnlMedicalLog, pnlMedicalLogHeader));
@@ -479,13 +479,13 @@ public class PersonViewPanel extends JScrollablePanel {
             pnlPatientLogHeader.setName("pnlPatientLogHeader");
             pnlPatientLogHeader.setBorder(RoundedLineBorder.createRoundedLineBorder(getTextAt(RESOURCE_BUNDLE,
                   "pnlPatientLogHeader.title")));
-            pnlPatientLogHeader.setVisible(!campaignOptions.isDisplayPatientRecord());
+            pnlPatientLogHeader.setVisible(!MekHQ.getMHQOptions().getDisplayPatientRecord());
 
             JPanel pnlPatientLog = fillPatientLog();
             pnlPatientLog.setName("pnlPatientLog");
             pnlPatientLog.setBorder(RoundedLineBorder.createRoundedLineBorder(getTextAt(RESOURCE_BUNDLE,
                   "pnlPatientLog.title")));
-            pnlPatientLog.setVisible(campaignOptions.isDisplayPatientRecord());
+            pnlPatientLog.setVisible(MekHQ.getMHQOptions().getDisplayPatientRecord());
 
             pnlPatientLogHeader.addMouseListener(getSwitchListener(pnlPatientLogHeader, pnlPatientLog));
             pnlPatientLog.addMouseListener(getSwitchListener(pnlPatientLog, pnlPatientLogHeader));
@@ -509,14 +509,14 @@ public class PersonViewPanel extends JScrollablePanel {
             pnlAssignmentsLogHeader.setName("assignmentLogHeader");
             pnlAssignmentsLogHeader.setBorder(RoundedLineBorder.createRoundedLineBorder(getTextAt(RESOURCE_BUNDLE,
                   "assignmentLogHeader.title")));
-            pnlAssignmentsLogHeader.setVisible(!campaignOptions.isDisplayAssignmentRecord());
+            pnlAssignmentsLogHeader.setVisible(!MekHQ.getMHQOptions().getDisplayAssignmentRecord());
 
             JPanel pnlAssignmentsLog = fillAssignmentLog();
 
             pnlAssignmentsLog.setName("assignmentLog");
             pnlAssignmentsLog.setBorder(RoundedLineBorder.createRoundedLineBorder(getTextAt(RESOURCE_BUNDLE,
                   "assignmentLog.title")));
-            pnlAssignmentsLog.setVisible(campaignOptions.isDisplayAssignmentRecord());
+            pnlAssignmentsLog.setVisible(MekHQ.getMHQOptions().getDisplayAssignmentRecord());
 
             pnlAssignmentsLogHeader.addMouseListener(getSwitchListener(pnlAssignmentsLogHeader, pnlAssignmentsLog));
             pnlAssignmentsLog.addMouseListener(getSwitchListener(pnlAssignmentsLog, pnlAssignmentsLogHeader));

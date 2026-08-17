@@ -68,7 +68,7 @@ import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.enums.PersonnelRole;
 import mekhq.campaign.personnel.enums.PersonnelStatus;
 import mekhq.campaign.personnel.medical.advancedMedical.InjuryUtil;
-import mekhq.campaign.personnel.ranks.AutoAssignRankForCompanyGenerator;
+import mekhq.campaign.personnel.ranks.AutomaticRankAssigner;
 import mekhq.campaign.universe.Faction;
 import mekhq.gui.baseComponents.immersiveDialogs.ImmersiveDialogSimple;
 import mekhq.gui.baseComponents.immersiveDialogs.ImmersiveDialogWidth;
@@ -178,7 +178,7 @@ public class FactionCensureEvent {
                     Person speaker = campaign.getPlayerForce()
                                            .getHumanResources()
                                            .newPerson(campaign, role, factionCode, Gender.RANDOMIZE);
-                    AutoAssignRankForCompanyGenerator.assignRankSystemFromFaction(speaker, RO_MIN);
+                    AutomaticRankAssigner.assignRankSystemFromFaction(speaker, RO_MIN);
 
                     ImmersiveDialogWidth dialogWidth;
                     if (censureAction.equals(FINE) || censureAction.equals(FORMAL_WARNING)) {
