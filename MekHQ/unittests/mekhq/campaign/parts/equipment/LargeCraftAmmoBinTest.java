@@ -1631,4 +1631,54 @@ public class LargeCraftAmmoBinTest {
         // ... and have more ammo available in the warehouse
         assertEquals(shotsOnHand - ammoType.getShots(), quartermaster.getAmmoAvailable(ammoType));
     }
+
+    /**
+     * A bay is loaded one ton at a time, and fabrication manufactures that ton for money instead of requisitioning it,
+     * so a successful attempt must load a ton even with an empty warehouse.
+     */
+    @Test
+    public void fabricationLoadsASingleTonFromAnEmptyWarehouse() {
+        Campaign mockCampaign = mockCampaign();
+        when(mockCampaign.getCampaignOptions()).thenReturn(new CampaignOptions());
+        LocalWarehouse warehouse = new LocalWarehouse();
+        when(mockCampaign.getPlayerForce().getWarehouse()).thenReturn(warehouse);
+        mekhq.campaign.ForceQuartermaster quartermaster = new mekhq.campaign.ForceQuartermaster(mockCampaign);
+        when(mockCampaign.getQuartermaster()).thenReturn(quartermaster);
+
+        AmmoType ammoType = getAmmoType("ISLRM20 Ammo");
+
+        // Create an empty Ammo Bin with room for several tons ...
+        int capacity = 4;
+        int shotsNeeded = ammoType.getShots() * capacity;
+        int equipmentNum = 42;
+        LargeCraftAmmoBin ammoBin = new LargeCraftAmmoBin(0,
+              ammoType,
+              equipmentNum,
+              shotsNeeded,
+              capacity,
+              mockCampaign);
+
+        // ... place the ammo bin on a unit ...
+        Unit mockUnit = mock(Unit.class);
+        Entity mockEntity = mock(Entity.class);
+        when(mockUnit.getEntity()).thenReturn(mockEntity);
+        AmmoMounted mockMounted = mock(AmmoMounted.class);
+        when(mockMounted.getType()).thenReturn(ammoType);
+        when(mockMounted.getBaseShotsLeft()).thenReturn(0);
+        when(mockEntity.getEquipment(eq(equipmentNum))).thenReturn((Mounted) mockMounted);
+        ammoBin.setUnit(mockUnit);
+
+        ammoBin.setFabricating(true);
+
+        // The warehouse is empty, but the attempt can still be worked on ...
+        assertNull(ammoBin.checkFixable());
+        ammoBin.succeed();
+
+        // ... and it loads a full ton of manufactured shots ...
+        assertEquals(shotsNeeded - ammoType.getShots(), ammoBin.getShotsNeeded());
+        verify(mockMounted, times(1)).setShotsLeft(eq(ammoType.getShots()));
+
+        // ... without drawing anything from stock.
+        assertEquals(0, quartermaster.getAmmoAvailable(ammoType));
+    }
 }

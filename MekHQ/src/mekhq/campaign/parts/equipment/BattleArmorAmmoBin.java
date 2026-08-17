@@ -158,11 +158,19 @@ public class BattleArmorAmmoBin extends AmmoBin {
 
             // Calculate the actual shots needed
             int shotsPerTrooper = shotsNeeded / getNumTroopers();
-            int shotsToReload = Math.min(shotsPerTrooper,
-                  (int) Math.floor((double) getAmountAvailable() / getNumTroopers()));
-            for (int shotsPerSuitLoaded = 0; shotsPerSuitLoaded < shotsToReload; shotsPerSuitLoaded++) {
-                int shots = requisitionAmmo(getType(), getNumTroopers());
-                shotsNeeded -= shots;
+            int shotsToReload;
+            if (isFabricating()) {
+                // The shots are manufactured on the spot (paid for per attempt) rather than drawn from warehouse
+                // stock, so the whole squad can be reloaded regardless of what is in the warehouse.
+                shotsToReload = shotsPerTrooper;
+                shotsNeeded -= shotsToReload * getNumTroopers();
+            } else {
+                shotsToReload = Math.min(shotsPerTrooper,
+                      (int) Math.floor((double) getAmountAvailable() / getNumTroopers()));
+                for (int shotsPerSuitLoaded = 0; shotsPerSuitLoaded < shotsToReload; shotsPerSuitLoaded++) {
+                    int shots = requisitionAmmo(getType(), getNumTroopers());
+                    shotsNeeded -= shots;
+                }
             }
 
             if (!ammoTypeChanged()) {
@@ -193,10 +201,26 @@ public class BattleArmorAmmoBin extends AmmoBin {
         returnAmmo(curType, shots);
     }
 
+    /**
+     * A squad is reloaded a shot at a time across every trooper, so the number of shots manufactured by a fabrication
+     * attempt is the per-trooper need multiplied back out over the squad.
+     */
+    @Override
+    protected int getFabricationShots() {
+        int troopers = getNumTroopers();
+        if ((troopers <= 0) || (shotsNeeded <= 0)) {
+            return 0;
+        }
+
+        return (shotsNeeded / troopers) * troopers;
+    }
+
     @Override
     public @Nullable String checkFixable() {
+        // Fabrication manufactures the shots rather than drawing them from stock, so a stock level too small to
+        // reload the whole squad does not stand in its way.
         int amountAvailable = getAmountAvailable();
-        if ((amountAvailable > 0) && (amountAvailable < getNumTroopers())) {
+        if (!isFabricating() && (amountAvailable > 0) && (amountAvailable < getNumTroopers())) {
             return "Cannot do a partial reload of Battle Armor ammo less than the number of troopers";
         }
         return super.checkFixable();
