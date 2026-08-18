@@ -342,7 +342,7 @@ public class Campaign implements ITechManager {
 
     private final List<String> customs;
 
-    private CampaignOptions campaignOptions;
+    private static CampaignOptions campaignOptions;
     private RandomSkillPreferences randomSkillPreferences = new RandomSkillPreferences();
     private CampaignGUI gui;
 
@@ -463,7 +463,7 @@ public class Campaign implements ITechManager {
         this.player = player;
         this.game.addPlayer(0, this.player);
         currentDay = date;
-        campaignOptions = campaignOpts;
+        setCampaignOptions(campaignOpts);
         this.gameOptions = gameOptions;
         game.setOptions(gameOptions);
         this.systemsInstance = systemsInstance;
@@ -5251,22 +5251,43 @@ public class Campaign implements ITechManager {
 
     }
 
-    public CampaignOptions getCampaignOptions() {
+    public static CampaignOptions campaignOptions() {
+        if (campaignOptions == null) {
+            throw new IllegalStateException(
+                  "CampaignOptions accessed before it was set; a Campaign must be initialized first.");
+        }
         return campaignOptions;
     }
 
+    public CampaignOptions getCampaignOptions() {
+        return Campaign.campaignOptions();
+    }
+
     public void setCampaignOptions(CampaignOptions options) {
-        // Check if blob crew was disabled for each role
-        boolean infantryWasEnabled = campaignOptions.isUseBlobInfantry();
-        boolean baWasEnabled = campaignOptions.isUseBlobBattleArmor();
-        boolean vehicleGroundWasEnabled = campaignOptions.isUseBlobVehicleCrewGround();
-        boolean vehicleVTOLWasEnabled = campaignOptions.isUseBlobVehicleCrewVTOL();
-        boolean vehicleNavalWasEnabled = campaignOptions.isUseBlobVehicleCrewNaval();
-        boolean vesselPilotWasEnabled = campaignOptions.isUseBlobVesselPilot();
-        boolean vesselGunnerWasEnabled = campaignOptions.isUseBlobVesselGunner();
-        boolean vesselCrewWasEnabled = campaignOptions.isUseBlobVesselCrew();
+        // campaignOptions is a static/global reference shared by every Campaign, so log an actual swap.
+        final CampaignOptions previousOptions = campaignOptions;
+        if ((previousOptions != null) && (previousOptions != options)) {
+            LOGGER.debug("Replacing the static/global CampaignOptions. Old: {}, New: {}", previousOptions, options);
+        }
+
+        // Check if blob crew was disabled for each role (only meaningful once options already exist)
+        boolean infantryWasEnabled = (previousOptions != null) && previousOptions.isUseBlobInfantry();
+        boolean baWasEnabled = (previousOptions != null) && previousOptions.isUseBlobBattleArmor();
+        boolean vehicleGroundWasEnabled = (previousOptions != null) && previousOptions.isUseBlobVehicleCrewGround();
+        boolean vehicleVTOLWasEnabled = (previousOptions != null) && previousOptions.isUseBlobVehicleCrewVTOL();
+        boolean vehicleNavalWasEnabled = (previousOptions != null) && previousOptions.isUseBlobVehicleCrewNaval();
+        boolean vesselPilotWasEnabled = (previousOptions != null) && previousOptions.isUseBlobVesselPilot();
+        boolean vesselGunnerWasEnabled = (previousOptions != null) && previousOptions.isUseBlobVesselGunner();
+        boolean vesselCrewWasEnabled = (previousOptions != null) && previousOptions.isUseBlobVesselCrew();
 
         campaignOptions = options;
+
+        // During initial construction the player force does not exist yet; its ForceOptions pass-through and blob
+        // crew are wired up separately in that case.
+        if (playerForce == null) {
+            return;
+        }
+
         // Keep the player force's ForceOptions pass-through pointed at the current campaign options.
         playerForce.getForceOptions().setCampaignOptions(options);
 
