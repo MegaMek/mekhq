@@ -115,6 +115,7 @@ import mekhq.campaign.personnel.skills.SkillType;
 import mekhq.campaign.unit.Unit;
 import mekhq.campaign.universe.Faction;
 import mekhq.campaign.universe.NewsItem;
+import mekhq.campaign.universe.PlanetarySystem;
 import mekhq.campaign.utilities.AutomatedTechAssignments;
 import mekhq.gui.baseComponents.ScalingWidthConstrainedPanel;
 import mekhq.gui.baseComponents.immersiveDialogs.ImmersiveDialogSimple;
@@ -782,6 +783,21 @@ public class CampaignGUI extends JPanel {
     public void focusOnMission(UUID targetId) {
         getBriefingRoomTab().focusOnMission(targetId);
         tabMain.setSelectedIndex(getTabIndexByName(resourceMap.getString("panBriefing.TabConstraints.tabTitle")));
+    }
+
+    /**
+     * Shows the given system on the interstellar map and brings the navigation tab forward.
+     *
+     * @param system the system to focus on; ignored when {@code null}, as an unresolvable link should do nothing rather
+     *               than switch tabs
+     */
+    public void focusOnSystem(final @Nullable PlanetarySystem system) {
+        if (system == null) {
+            return;
+        }
+
+        getNavigationTab().showSystem(system);
+        tabMain.setSelectedComponent(getNavigationTab());
     }
 
     public void focusOnUnitInRepairBay(UUID id) {

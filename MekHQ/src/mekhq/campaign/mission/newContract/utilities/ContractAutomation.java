@@ -61,6 +61,7 @@ import mekhq.campaign.personnel.Person;
 import mekhq.campaign.unit.Unit;
 import mekhq.campaign.unit.actions.ActivateUnitAction;
 import mekhq.campaign.unit.actions.MothballUnitAction;
+import mekhq.campaign.universe.PlanetarySystem;
 import mekhq.campaign.utilities.JumpBlockers;
 import mekhq.gui.baseComponents.immersiveDialogs.ImmersiveDialogSimple;
 
@@ -124,7 +125,11 @@ public class ContractAutomation {
         }
 
         // Transit
-        String targetSystem = contract.getTargetSystemName(campaign.getLocalDate());
+        // Hyperlinked so the player can jump straight to the destination on the interstellar map.
+        PlanetarySystem targetPlanetarySystem = contract.getTargetSystem();
+        String targetSystem = (targetPlanetarySystem == null) ?
+                                    contract.getTargetSystemName(campaign.getLocalDate()) :
+                                    targetPlanetarySystem.getHyperlinkedName(campaign.getLocalDate());
         AbstractLocation currentLocation = campaign.getPlayerForce().getForceDetachment().getCurrentLocation();
         JumpPath jumpPath = ContractUtilities.getJumpPath(campaign,
               contract,
@@ -248,7 +253,11 @@ public class ContractAutomation {
               EXP_REGULAR);
         Money cost = costCalculations.calculateJumpCostForEntireJourney(travelDays, jumpPath.getJumps());
 
-        String targetSystem = contract.getTargetSystemName(campaign.getLocalDate());
+        // Hyperlinked so the player can jump straight to the destination on the interstellar map.
+        PlanetarySystem targetPlanetarySystem = contract.getTargetSystem();
+        String targetSystem = (targetPlanetarySystem == null) ?
+                                    contract.getTargetSystemName(campaign.getLocalDate()) :
+                                    targetPlanetarySystem.getHyperlinkedName(campaign.getLocalDate());
         // performJumpTransaction returns an empty string when the charge succeeded.
         String jumpReport = TransportCostCalculations.performJumpTransaction(playerForce.getFinances(),
               jumpPath,
