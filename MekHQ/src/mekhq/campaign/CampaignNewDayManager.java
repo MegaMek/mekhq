@@ -2184,22 +2184,25 @@ public class CampaignNewDayManager {
              * the contract start. In that case, shift the starting and ending dates before making any battle rolls.
              */
             if (!ContractUtilities.hasArrivedAtContractLocation(updatedLocation, contract)) {
-                // The whole remaining journey, not just the in-system leg: getTransitTime() covers only the burn to
-                // or from the current system's jump point, so using it while jumps remain dates the contract a few
-                // days out no matter how far away the target actually is.
-                int remainingJourneyDays = ContractUtilities.getTravelDays(campaign,
-                      contract,
-                      updatedLocation,
-                      campaign.getPlayerForce().isOverridingCommandCircuitRequirements(),
-                      campaign.getPlayerForce().getFactionStandings());
-                contract.setStartAndEndDate(today.plusDays(remainingJourneyDays));
-                campaign.addReport(GENERAL, "The start and end dates of " +
-                                                  contract.getHyperlinkedName() +
-                                                  " have been shifted to reflect the current ETA.");
+                // Only push the dates back once the start has actually slipped past us. Re-dating every day would
+                // make the contract recede: the estimate does not shrink while the fleet sits recharging at a jump
+                // point, so "today + remaining journey" moves a day further out for each day spent recharging.
+                LocalDate startDate = contract.getStartDate();
+                if ((startDate != null) && !today.isBefore(startDate)) {
+                    int remainingJourneyDays = ContractUtilities.getTravelDays(campaign,
+                          contract,
+                          updatedLocation,
+                          campaign.getPlayerForce().isOverridingCommandCircuitRequirements(),
+                          campaign.getPlayerForce().getFactionStandings());
+                    contract.setStartAndEndDate(today.plusDays(remainingJourneyDays));
+                    campaign.addReport(GENERAL, "The start and end dates of " +
+                                                      contract.getHyperlinkedName() +
+                                                      " have been shifted to reflect the current ETA.");
 
-                if (campaignOptions.isUseStratCon() && contract.getMoraleLevel().isRouted()) {
-                    LocalDate newRoutEndDate = contract.getStartDate().plusMonths(max(1, d6() - 3)).minusDays(1);
-                    contract.changeMorale(newRoutEndDate);
+                    if (campaignOptions.isUseStratCon() && contract.getMoraleLevel().isRouted()) {
+                        LocalDate newRoutEndDate = contract.getStartDate().plusMonths(max(1, d6() - 3)).minusDays(1);
+                        contract.changeMorale(newRoutEndDate);
+                    }
                 }
 
                 continue;
