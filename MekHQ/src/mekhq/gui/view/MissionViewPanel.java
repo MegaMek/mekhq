@@ -64,6 +64,7 @@ import mekhq.MekHQ;
 import mekhq.campaign.AbstractLocation;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.campaignOptions.CampaignOption;
+import mekhq.campaign.enums.DragoonRating;
 import mekhq.campaign.location.ILocation;
 import mekhq.campaign.mission.newContract.AbstractContract;
 import mekhq.campaign.mission.newContract.utilities.ContractScore;
@@ -178,7 +179,6 @@ public class MissionViewPanel extends JScrollablePanel {
         Campaign campaign = gui.getCampaign();
 
         // TODO : Switch me to use IUnitRating
-        String[] ratingNames = { "F", "D", "C", "B", "A" };
         lblLocation = new JLabel();
         txtLocation = new JLabel();
         /* AtB Contract Parameters */
@@ -306,13 +306,15 @@ public class MissionViewPanel extends JScrollablePanel {
         txtAllyRating.setName("txtAllyRating");
         txtAllyRating.setText(mission.getEmployerForceSkill() +
                                     "/" +
-                                    ratingNames[mission.getEmployerEquipmentRating()]);
+                                    DragoonRating.fromRating(mission.getEmployerEquipmentRating()).getLabel());
         addStatRow(lblAllyRating, txtAllyRating, y++);
 
         lblEnemyRating.setName("lblEnemyRating");
         lblEnemyRating.setText(getTextAt(RESOURCE_BUNDLE, "lblEnemyRating.text"));
         txtEnemyRating.setName("txtEnemyRating");
-        txtEnemyRating.setText(mission.getEnemyForceSkill() + "/" + ratingNames[mission.getEnemyEquipmentRating()]);
+        txtEnemyRating.setText(mission.getEnemyForceSkill() +
+                                     "/" +
+                                     DragoonRating.fromRating(mission.getEnemyEquipmentRating()).getLabel());
         addStatRow(lblEnemyRating, txtEnemyRating, y++);
 
         if (campaign.getCampaignOptions().get(CampaignOption.USE_SHARE_SYSTEM)) {
