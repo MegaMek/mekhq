@@ -1650,16 +1650,6 @@ public class ContractEditorDialog extends JDialog {
             applyIcon(portraitButton, new Portrait()); // placeholder; portrait stays null until the GM picks one
             givenNameField.setToolTipText(getTextAt(RESOURCE_BUNDLE, "create.contractMarket.npc.tooltip"));
             surnameField.setToolTipText(getTextAt(RESOURCE_BUNDLE, "create.contractMarket.npc.tooltip"));
-            ranks.setRenderer(new DefaultListCellRenderer() {
-                @Override
-                public Component getListCellRendererComponent(JList<?> list, Object value, int index,
-                      boolean isSelected, boolean cellHasFocus) {
-                    super.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);
-                    setText(value instanceof RankDisplay rank ? rank.toString()
-                                  : getTextAt(RESOURCE_BUNDLE, "create.contractMarket.rank.generated"));
-                    return this;
-                }
-            });
             refreshRanks(null);
             portraitButton.addActionListener(e -> {
                 PortraitChooserDialog chooser = new PortraitChooserDialog(campaign.getGUI().getFrame(),
