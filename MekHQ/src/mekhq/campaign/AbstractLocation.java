@@ -47,7 +47,6 @@ import static mekhq.utilities.MHQInternationalization.getTextAt;
 import java.io.PrintWriter;
 import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
-import java.util.Objects;
 import java.util.Set;
 
 import jakarta.annotation.Nonnull;
@@ -62,6 +61,7 @@ import mekhq.campaign.location.ILocation;
 import mekhq.campaign.location.IPlace;
 import mekhq.campaign.location.LocationNode;
 import mekhq.campaign.mission.newContract.AbstractContract;
+import mekhq.campaign.mission.newContract.utilities.ContractUtilities;
 import mekhq.campaign.personnel.Injury;
 import mekhq.campaign.personnel.InjuryType;
 import mekhq.campaign.personnel.Person;
@@ -86,6 +86,14 @@ public abstract class AbstractLocation implements IPlace {
     @XmlElement(name = "currentSystemId")
     @XmlJavaTypeAdapter(PlanetarySystemAdapter.class)
     protected PlanetarySystem currentSystem;
+
+    /**
+     * The world within {@link #currentSystem} the force is actually at, or {@code null} when that is not known - in
+     * transit between systems, or a save written before locations tracked this. {@link #getPlanet()} falls back to the
+     * system's primary world in that case, which is what every location reported before planets were tracked.
+     */
+    @XmlTransient
+    protected Planet currentPlanet;
 
     @XmlTransient
     protected LocationNode locationNode;
@@ -147,12 +155,29 @@ public abstract class AbstractLocation implements IPlace {
     }
 
     /**
-     * @return the current planet location. This is currently the primary planet of the system, but in the future this
-     *       will not be the case.
+     * @return the world the force is at: the specific planet when one is known, otherwise the system's primary world
      */
     @Override
     public Planet getPlanet() {
-        return getCurrentSystem().getPrimaryPlanet();
+        return (currentPlanet != null) ? currentPlanet : getCurrentSystem().getPrimaryPlanet();
+    }
+
+    /**
+     * @return the world the force is at, or {@code null} when it is not known. Unlike {@link #getPlanet()} this does
+     *       not fall back to the system's primary world, so callers can tell "at the primary world" apart from "world
+     *       not tracked" - a save predating planet tracking knows only the system.
+     */
+    public @Nullable Planet getCurrentPlanetDirect() {
+        return currentPlanet;
+    }
+
+    /**
+     * Records which world within the current system the force is at.
+     *
+     * @param currentPlanet the world, or {@code null} when it is not known (in transit, or at a jump point)
+     */
+    public void setCurrentPlanet(final @Nullable Planet currentPlanet) {
+        this.currentPlanet = currentPlanet;
     }
 
     @Override
@@ -279,7 +304,7 @@ public abstract class AbstractLocation implements IPlace {
      */
     public void testForEarlyArrival(Campaign campaign) {
         for (AbstractContract contract : campaign.getFutureContracts()) {
-            if (Objects.equals(getPlanet(), contract.getTargetPlanet())) {
+            if (ContractUtilities.hasArrivedAtContractLocation(this, contract)) {
                 // DAYS.between, not Period.getDays() - the latter yields only the day component, so a start two
                 // months out would report the leftover days rather than the whole wait.
                 long daysTillStart = ChronoUnit.DAYS.between(campaign.getLocalDate(), contract.getStartDate());

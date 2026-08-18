@@ -51,6 +51,30 @@ import mekhq.campaign.universe.factionStanding.FactionStandingUtilities;
 import mekhq.campaign.universe.factionStanding.FactionStandings;
 
 public class ContractUtilities {
+    /**
+     * Whether a force at {@code location} has arrived at where {@code contract} is fought.
+     *
+     * <p>Arrival is judged on the system first, since that is what the location model has always tracked, and then on
+     * the world - but only when both worlds are known. A location from a save predating planet tracking knows only its
+     * system, and {@link AbstractLocation#getPlanet()} would report the system's primary world; comparing that against
+     * a contract targeting some other world would say "not arrived" forever.</p>
+     *
+     * @param location the force's location
+     * @param contract the contract whose target is being tested against
+     *
+     * @return {@code true} when the force is in the contract's target system, out of transit, and - where known - at
+     *       its target world
+     */
+    public static boolean hasArrivedAtContractLocation(AbstractLocation location, AbstractContract contract) {
+        if (!Objects.equals(location.getCurrentSystem(), contract.getTargetSystem()) || !location.isOnPlanet()) {
+            return false;
+        }
+
+        Planet knownPlanet = location.getCurrentPlanetDirect();
+        Planet targetPlanet = contract.getTargetPlanet();
+        return (knownPlanet == null) || (targetPlanet == null) || Objects.equals(knownPlanet, targetPlanet);
+    }
+
     public static int getTravelDays(Campaign campaign, AbstractContract abstractContract,
           AbstractLocation currentLocation, boolean isOverridingCommandCircuitRequirements,
           FactionStandings factionStandings) {

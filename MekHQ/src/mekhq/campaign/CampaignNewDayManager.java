@@ -33,7 +33,6 @@
  */
 package mekhq.campaign;
 
-import static java.lang.Math.ceil;
 import static java.lang.Math.max;
 import static java.lang.Math.round;
 import static megamek.common.compute.Compute.d6;
@@ -2184,9 +2183,16 @@ public class CampaignNewDayManager {
              * Situations like a delayed start or running out of funds during transit can delay arrival until after
              * the contract start. In that case, shift the starting and ending dates before making any battle rolls.
              */
-            if (!updatedLocation.getPlanet().getId().equals(contract.getTargetPlanetId())) {
-                // transitTime is measured in days, so we round up to the next whole day
-                contract.setStartAndEndDate(today.plusDays((int) ceil(updatedLocation.getTransitTime())));
+            if (!ContractUtilities.hasArrivedAtContractLocation(updatedLocation, contract)) {
+                // The whole remaining journey, not just the in-system leg: getTransitTime() covers only the burn to
+                // or from the current system's jump point, so using it while jumps remain dates the contract a few
+                // days out no matter how far away the target actually is.
+                int remainingJourneyDays = ContractUtilities.getTravelDays(campaign,
+                      contract,
+                      updatedLocation,
+                      campaign.getPlayerForce().isOverridingCommandCircuitRequirements(),
+                      campaign.getPlayerForce().getFactionStandings());
+                contract.setStartAndEndDate(today.plusDays(remainingJourneyDays));
                 campaign.addReport(GENERAL, "The start and end dates of " +
                                                   contract.getHyperlinkedName() +
                                                   " have been shifted to reflect the current ETA.");
