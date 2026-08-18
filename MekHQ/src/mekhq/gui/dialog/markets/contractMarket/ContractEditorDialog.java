@@ -67,6 +67,7 @@ import mekhq.campaign.mission.enums.ContractObjectiveType;
 import mekhq.campaign.mission.enums.MissionStatus;
 import mekhq.campaign.mission.newContract.AbstractContract;
 import mekhq.campaign.mission.newContract.contractData.*;
+import mekhq.campaign.mission.newContract.contractGeneration.AbstractContractGeneration;
 import mekhq.campaign.mission.newContract.contractGeneration.ChaosEmployerType;
 import mekhq.campaign.mission.newContract.contractGeneration.ContractSearchType;
 import mekhq.campaign.mission.newContract.contractGeneration.negotiationsAndNPCs.EmployerLiaison;
@@ -127,9 +128,13 @@ public class ContractEditorDialog extends JDialog {
 
     // Parameters
     private JSpinner scaleSpinner;
+    private JCheckBox scaleAutomatic;
     private JSpinner trackCountSpinner;
+    private JCheckBox trackCountAutomatic;
     private JSpinner combatElementsSpinner;
+    private JCheckBox combatElementsAutomatic;
     private JSpinner victoryPointsSpinner;
+    private JCheckBox victoryPointsAutomatic;
 
     // Schedule
     private JTextField startDateField;
@@ -323,6 +328,7 @@ public class ContractEditorDialog extends JDialog {
     /** Lays each category out on its own tab, so the GM steps through them rather than scrolling one long column. */
     private EnhancedTabbedPane buildTabs() {
         EnhancedTabbedPane tabs = new EnhancedTabbedPane(false, false);
+        tabs.setTabPlacement(JTabbedPane.LEFT);
 
         addTab(tabs, "edit.contractMarket.section.identity", buildIdentityCard());
         addTab(tabs, "edit.contractMarket.section.parameters", buildParametersCard());
@@ -418,16 +424,23 @@ public class ContractEditorDialog extends JDialog {
         JPanel rows = rowsPanel();
 
         scaleSpinner = intSpinner(contract.getScale(), 1);
-        rows.add(formRow("edit.contractMarket.field.scale", scaleSpinner));
+        scaleAutomatic = automaticToggle(scaleSpinner);
+        rows.add(formRow("edit.contractMarket.field.scale", withAutomatic(scaleSpinner, scaleAutomatic)));
 
         trackCountSpinner = intSpinner(contract.getTrackCount(), 0);
-        rows.add(formRow("edit.contractMarket.field.trackCount", trackCountSpinner));
+        trackCountAutomatic = automaticToggle(trackCountSpinner);
+        rows.add(formRow("edit.contractMarket.field.trackCount",
+              withAutomatic(trackCountSpinner, trackCountAutomatic)));
 
         combatElementsSpinner = intSpinner(contract.getRequiredCombatElements(), 0);
-        rows.add(formRow("edit.contractMarket.field.combatElements", combatElementsSpinner));
+        combatElementsAutomatic = automaticToggle(combatElementsSpinner);
+        rows.add(formRow("edit.contractMarket.field.combatElements",
+              withAutomatic(combatElementsSpinner, combatElementsAutomatic)));
 
         victoryPointsSpinner = intSpinner(contract.getRequiredVictoryPoints(), 0);
-        rows.add(formRow("edit.contractMarket.field.victoryPoints", victoryPointsSpinner));
+        victoryPointsAutomatic = automaticToggle(victoryPointsSpinner);
+        rows.add(formRow("edit.contractMarket.field.victoryPoints",
+              withAutomatic(victoryPointsSpinner, victoryPointsAutomatic)));
 
         return card(rows);
     }
@@ -722,11 +735,35 @@ public class ContractEditorDialog extends JDialog {
             contract.setStatus(statusValue(statusCombo));
         }
 
-        // Parameters
-        contract.setScale(intValue(scaleSpinner));
-        contract.setTrackCount(intValue(trackCountSpinner));
-        contract.setRequiredCombatElements(intValue(combatElementsSpinner));
-        contract.setRequiredVictoryPoints(intValue(victoryPointsSpinner));
+        // Parameters. The "Automatic" checkboxes exist only in create mode (see automaticToggle): a ticked box
+        // (re)determines the value with the same rules the contract generator uses (AbstractContractGeneration),
+        // while an unticked box writes the GM's manual spinner value. Scale is resolved before the required victory
+        // points, which are derived from it. When editing an existing contract there are no checkboxes - the GM's
+        // spinner values are written directly, with no regeneration.
+        if (createMode) {
+            contract.setScale(scaleAutomatic.isSelected()
+                                    ? AbstractContractGeneration.determineScale(campaign.getPlayerForce(),
+                  campaign.getPlayerForce().getForceDetachment().getHangar(), contract)
+                                    : intValue(scaleSpinner));
+            contract.setRequiredCombatElements(combatElementsAutomatic.isSelected()
+                                                     ?
+                                                     AbstractContractGeneration.determineRequiredCombatElements(campaign)
+                                                     :
+                                                     intValue(combatElementsSpinner));
+            contract.setTrackCount(trackCountAutomatic.isSelected()
+                                         ? AbstractContractGeneration.determineTrackCount(contract)
+                                         : intValue(trackCountSpinner));
+            contract.setRequiredVictoryPoints(victoryPointsAutomatic.isSelected()
+                                                    ?
+                                                    AbstractContractGeneration.determineRequiredVictoryPoints(contract)
+                                                    :
+                                                    intValue(victoryPointsSpinner));
+        } else {
+            contract.setScale(intValue(scaleSpinner));
+            contract.setRequiredCombatElements(intValue(combatElementsSpinner));
+            contract.setTrackCount(intValue(trackCountSpinner));
+            contract.setRequiredVictoryPoints(intValue(victoryPointsSpinner));
+        }
 
         // Schedule. lengthInMonths is derived from the dates everywhere else in the model, so go through the copy
         // constructor and let it recompute rather than saving a spinner value that can contradict them.
@@ -869,6 +906,38 @@ public class ContractEditorDialog extends JDialog {
 
     private static JSpinner intSpinner(int value, int minimum) {
         return new JSpinner(new SpinnerNumberModel(max(value, minimum), minimum, Integer.MAX_VALUE, 1));
+    }
+
+    /**
+     * Builds the "Automatic" checkbox that governs a parameter spinner, or {@code null} when the dialog is editing an
+     * existing contract rather than creating one. The checkbox (re)generates the value with the contract-generation
+     * rules, which for some fields carry random variance - appropriate for a brand-new offer, but not for a GM tuning
+     * an accepted contract's values by hand - so it is only offered in create mode. When present it is ticked by
+     * default, which disables the spinner; unticking it hands control back to the GM.
+     */
+    private @Nullable JCheckBox automaticToggle(JSpinner spinner) {
+        if (!createMode) {
+            return null;
+        }
+        JCheckBox automatic = new JCheckBox(getTextAt(RESOURCE_BUNDLE, "edit.contractMarket.field.automatic"), true);
+        automatic.setToolTipText(getTextAt(RESOURCE_BUNDLE, "edit.contractMarket.field.automatic.tooltip"));
+        spinner.setEnabled(false); // ticked by default, so the spinner starts disabled
+        automatic.addActionListener(e -> spinner.setEnabled(!automatic.isSelected()));
+        return automatic;
+    }
+
+    /**
+     * Lays a parameter spinner beside its "Automatic" checkbox as a single field for {@link #formRow}. With no checkbox
+     * (edit mode) the spinner is the field on its own.
+     */
+    private JComponent withAutomatic(JSpinner spinner, @Nullable JCheckBox automatic) {
+        if (automatic == null) {
+            return spinner;
+        }
+        JPanel panel = new JPanel(new BorderLayout(scaleForGUI(8), 0));
+        panel.add(spinner, BorderLayout.CENTER);
+        panel.add(automatic, BorderLayout.EAST);
+        return panel;
     }
 
     private static JSpinner moneySpinner(Money money) {

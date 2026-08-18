@@ -98,7 +98,7 @@ public class AbstractContractGeneration {
         boolean isDefensiveObjective = !objectiveData.playerObjectiveType().getChaosObjectiveType().isAttacker();
 
         // Step 3: Scale & Intensity
-        setAncillaryValues(campaign, detachment.getHangar(), chaosObjectiveType, contract);
+        setAncillaryValues(campaign, detachment.getHangar(), contract);
 
         // Step 3: Enemy (situated against the employer's territorial anchor faction, so a landless flavor employer -
         // rebels, a mercenary command, a corporation - still yields a sensible nearby belligerent)
@@ -194,25 +194,57 @@ public class AbstractContractGeneration {
               currentLocation);
     }
 
-    private static void setAncillaryValues(Campaign campaign, LocalHangar detachmentHangar,
-          ChaosObjectiveType objectiveType, ChaosContract contract) {
-        PlayerForce playerForce = campaign.getPlayerForce();
-        int scale = ChaosContractDeterminationScale.generateScaleForDetachment(playerForce,
-              detachmentHangar,
+    private static void setAncillaryValues(Campaign campaign, LocalHangar detachmentHangar, ChaosContract contract) {
+        // Scale must be set before the required victory points, which are derived from it.
+        contract.setScale(determineScale(campaign.getPlayerForce(), detachmentHangar, contract));
+        contract.setRequiredCombatElements(determineRequiredCombatElements(campaign));
+        contract.setTrackCount(determineTrackCount(contract));
+        contract.setRequiredVictoryPoints(determineRequiredVictoryPoints(contract));
+    }
+
+    /**
+     * Determines a contract's scale from the units the player force commits to it. Exposed as public so the GM contract
+     * editor's "Automatic" scale option follows exactly the same rule generation uses.
+     *
+     * @param playerForce      the player force whose committed units set the scale
+     * @param detachmentHangar the hangar whose units are weighed
+     * @param contract         the contract being sized (its objective decides whether cadre units count)
+     *
+     * @return the automatically determined scale
+     */
+    public static int determineScale(PlayerForce playerForce, LocalHangar detachmentHangar, AbstractContract contract) {
+        return ChaosContractDeterminationScale.generateScaleForDetachment(playerForce, detachmentHangar,
               contract.getObjectiveType().isCadreDuty());
-        contract.setScale(scale);
+    }
 
-        double varianceFactor = ContractUtilities.calculateVarianceFactor();
-        int requiredCombatElements = RequiredCombatElements.calculateRequiredCombatElements(campaign,
-              false,
-              varianceFactor);
-        contract.setRequiredCombatElements(requiredCombatElements);
+    /**
+     * Determines a contract's required combat elements the way generation does. Note this includes a random variance
+     * factor, so repeated calls will not agree.
+     *
+     * @return the automatically determined required combat elements
+     */
+    public static int determineRequiredCombatElements(Campaign campaign) {
+        return RequiredCombatElements.calculateRequiredCombatElements(campaign, false,
+              ContractUtilities.calculateVarianceFactor());
+    }
 
-        int trackCount = ChaosContractDetermineIntensity.determineTrackCount(objectiveType);
-        contract.setTrackCount(trackCount);
+    /**
+     * Determines a contract's StratCon track count from its objective, the way generation does.
+     *
+     * @return the automatically determined track count
+     */
+    public static int determineTrackCount(AbstractContract contract) {
+        return ChaosContractDetermineIntensity.determineTrackCount(contract.getObjectiveType().getChaosObjectiveType());
+    }
 
-        int requiredVictoryPoints = ChaosContractDeterminationRequiredVictoryPoints.getRequiredVictoryPoints(contract);
-        contract.setRequiredVictoryPoints(requiredVictoryPoints);
+    /**
+     * Determines a contract's required victory points from its current state (scale, command rights, schedule, and
+     * StratCon tracks), the way generation does. Determine the scale first if it too is being regenerated.
+     *
+     * @return the automatically determined required victory points
+     */
+    public static int determineRequiredVictoryPoints(AbstractContract contract) {
+        return ChaosContractDeterminationRequiredVictoryPoints.getRequiredVictoryPoints(contract);
     }
 
     /**

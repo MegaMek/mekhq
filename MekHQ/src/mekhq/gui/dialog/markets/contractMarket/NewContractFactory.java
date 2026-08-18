@@ -44,7 +44,6 @@ import mekhq.campaign.Campaign;
 import mekhq.campaign.finances.Money;
 import mekhq.campaign.mission.enums.ContractMoraleLevel;
 import mekhq.campaign.mission.enums.ContractObjectiveType;
-import mekhq.campaign.mission.enums.MissionStatus;
 import mekhq.campaign.mission.newContract.AbstractContract;
 import mekhq.campaign.mission.newContract.ChaosContract;
 import mekhq.campaign.mission.newContract.contractData.*;
@@ -98,7 +97,9 @@ public final class NewContractFactory {
         contract.setContractId(UUID.randomUUID());
         contract.setContractName(getTextAt(RESOURCE_BUNDLE, "create.contractMarket.defaultName"));
         contract.setDescription("");
-        contract.setStatus(MissionStatus.ACTIVE);
+        // A freshly created offer has not been accepted, so it carries no status - matching a generated market offer
+        // (AbstractContractGeneration#performFinalTasks). The editor only exposes status once a contract is accepted.
+        contract.setStatus(null);
         contract.setScale(1);
         contract.setTrackCount(0);
         contract.setRequiredCombatElements(0);
