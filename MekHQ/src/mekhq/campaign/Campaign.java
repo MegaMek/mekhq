@@ -698,7 +698,7 @@ public class Campaign implements ITechManager {
         this.campaignStartDate = campaignStartDate;
     }
 
-    public PlanetarySystem getCurrentSystem() {
+    public @Nullable PlanetarySystem getCurrentSystem() {
         AbstractLocation location = getPlayerForce().getForceDetachment().getCurrentLocation();
         return location != null ? location.getCurrentSystem() : null;
     }

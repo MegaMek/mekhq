@@ -65,6 +65,7 @@ import mekhq.campaign.mission.newContract.contractGeneration.ChaosContractMarket
 import mekhq.campaign.mission.newContract.contractGeneration.ContractSearchType;
 import mekhq.campaign.mission.newContract.utilities.ContractAcceptance;
 import mekhq.campaign.universe.Faction;
+import mekhq.campaign.universe.PlanetarySystem;
 import mekhq.gui.baseComponents.roundedComponents.RoundedJButton;
 import mekhq.gui.baseComponents.roundedComponents.RoundedLineBorder;
 
@@ -178,9 +179,15 @@ public class ChaosContractMarketDialog extends JDialog implements ContractMarket
         header.add(title, gbc);
 
         gbc.gridy = 1;
+        // getCurrentSystem() is null when the player force has no known location (e.g. in transit), so fall back to a
+        // placeholder rather than dereferencing it.
+        final PlanetarySystem currentSystem = campaign.getCurrentSystem();
+        final String locationName = currentSystem != null
+                                          ? currentSystem.getName(currentDate)
+                                          : getTextAt(RESOURCE_BUNDLE, "header.contractMarket.location.unknown");
         JLabel subtitle = new JLabel(getFormattedTextAt(RESOURCE_BUNDLE,
               "header.contractMarket.location",
-              campaign.getCurrentSystem().getName(currentDate),
+              locationName,
               currentDate));
         header.add(subtitle, gbc);
 

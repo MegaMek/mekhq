@@ -33,6 +33,7 @@
  */
 package mekhq.campaign.personnel.turnoverAndRetention;
 
+import static java.lang.Math.max;
 import static java.lang.Math.min;
 import static java.lang.Math.round;
 import static mekhq.campaign.personnel.Person.getLoyaltyName;
@@ -54,6 +55,7 @@ import megamek.common.options.IOption;
 import megamek.common.rolls.TargetRoll;
 import megamek.logging.MMLogger;
 import mekhq.campaign.Campaign;
+import mekhq.campaign.campaignOptions.CampaignOption;
 import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.finances.Money;
 import mekhq.campaign.mission.enums.ContractObjectiveType;
@@ -523,6 +525,14 @@ public class RetirementDefectionTracker {
                     targetNumber.addModifier(1, resources.getString("missionFailure.text"));
                 } else if (mission.getStatus().isBreach()) {
                     targetNumber.addModifier(2, resources.getString("missionBreach.text"));
+                }
+            }
+
+            // Shares modifier: a share-heavy contract gives the crew a larger stake, suppressing turnover.
+            if ((mission != null) && campaignOptions.get(CampaignOption.USE_SHARE_SYSTEM)) {
+                int sharesModifier = max(0, (mission.getSharesPercent() / 10) - 2);
+                if (sharesModifier > 0) {
+                    targetNumber.addModifier(-sharesModifier, resources.getString("shares.text"));
                 }
             }
 
