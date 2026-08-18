@@ -113,6 +113,7 @@ public final class LegacyContractConverter {
         String name = "";
         String description = "";
         String systemId = null;
+        String legacySystemName = "";
         MissionStatus status = MissionStatus.ACTIVE;
 
         LocalDate startDate = null;
@@ -173,7 +174,10 @@ public final class LegacyContractConverter {
                 switch (tag) {
                     case "name" -> name = value;
                     case "desc" -> description = value;
-                    case "systemId" -> systemId = value;
+                    // "planetId" is what the oldest saves called the system id; "planetName" holds the system's
+                    // name when the save has no id at all - the two are written as alternatives, never together.
+                    case "systemId", "planetId" -> systemId = value;
+                    case "planetName" -> legacySystemName = value;
                     case "status" -> status = MissionStatus.parseFromString(value);
                     case "startDate" -> startDate = MHQXMLUtility.parseDate(value);
                     case "endDate" -> endDate = MHQXMLUtility.parseDate(value);
@@ -225,7 +229,7 @@ public final class LegacyContractConverter {
         enemyCode = codeOrPlaceholder(enemyCode, PIRATE_FACTION_CODE);
         employerName = nameOrPlaceholder(employerName, employerCode, year);
         enemyName = nameOrPlaceholder(enemyName, enemyCode, year);
-        systemId = systemIdOrPlaceholder(systemId, campaign);
+        systemId = systemIdOrPlaceholder(systemId, legacySystemName, campaign);
         if (name.isBlank()) {
             name = getFormattedTextAt(RESOURCE_BUNDLE, "legacyContract.defaultName", employerName);
         }
@@ -377,22 +381,39 @@ public final class LegacyContractConverter {
     }
 
     /**
-     * Resolves the system a legacy contract was fought in, standing the campaign's current system in for a missing
-     * one.
+     * Resolves the system a legacy contract was fought in, in the same order the legacy loader used: an explicit id
+     * first, then the recorded system name, and finally the campaign's current system as a stand-in.
      *
-     * <p>Returns {@code null} when the save records no system and the campaign has no current system either - during a
-     * load the force's location may not be restored yet. {@link SystemsTargetData} treats a missing system id as
-     * unknown rather than invalid, so a defunct contract simply displays no system.</p>
+     * <p>A save that predates system ids records its location as a name instead, so that name is resolved here rather
+     * than discarded - otherwise such a contract would adopt whatever system the campaign happens to be sitting in.</p>
      *
-     * @param systemId the system id read from the legacy save, if any
-     * @param campaign the campaign whose current system stands in for a missing id
+     * <p>Returns {@code null} when none of the three yields a system: an unrecognized name (the universe data may no
+     * longer carry it) and no current system, which during a load is possible because the force's location may not be
+     * restored yet. {@link SystemsTargetData} treats a missing system id as unknown rather than invalid, so a defunct
+     * contract simply displays no system.</p>
+     *
+     * @param systemId         the system id read from the legacy save, if any
+     * @param legacySystemName the system's name, recorded by saves written before system ids existed
+     * @param campaign         the campaign used to resolve the name, and whose current system stands in as a last
+     *                         resort
      *
      * @return the resolved system id, or {@code null} when none can be determined
      */
-    private static @Nullable String systemIdOrPlaceholder(final @Nullable String systemId, final Campaign campaign) {
+    private static @Nullable String systemIdOrPlaceholder(final @Nullable String systemId,
+          final String legacySystemName, final Campaign campaign) {
         if ((systemId != null) && !systemId.isBlank()) {
             return systemId;
         }
+
+        if (!legacySystemName.isBlank()) {
+            final PlanetarySystem namedSystem = campaign.getSystemByName(legacySystemName);
+            if (namedSystem != null) {
+                return namedSystem.getId();
+            }
+            LOGGER.warn("A legacy contract names an unknown system ({}); falling back to the current system.",
+                  legacySystemName);
+        }
+
         final PlanetarySystem currentSystem = campaign.getCurrentSystem();
         return currentSystem == null ? systemId : currentSystem.getId();
     }
