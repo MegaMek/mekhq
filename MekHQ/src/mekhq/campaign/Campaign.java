@@ -252,6 +252,7 @@ import mekhq.campaign.universe.factionStanding.FactionStandings;
 import mekhq.campaign.universe.fameAndInfamy.FameAndInfamyController;
 import mekhq.campaign.universe.selectors.factionSelectors.AbstractFactionSelector;
 import mekhq.campaign.universe.selectors.planetSelectors.AbstractPlanetSelector;
+import mekhq.campaign.universe.warriorsAlmanac.WarriorsAlmanacEntry;
 import mekhq.campaign.work.IAcquisitionWork;
 import mekhq.campaign.work.IPartWork;
 import mekhq.gui.CampaignGUI;
@@ -368,6 +369,9 @@ public class Campaign implements ITechManager {
     // bugs being permanently locked into the campaign file.
     RandomEventLibraries randomEventLibraries;
     FactionStandingUltimatumsLibrary factionStandingUltimatumsLibrary;
+
+    private Map<Integer, List<WarriorsAlmanacEntry>> partsAlmanac;
+    private Map<Integer, List<WarriorsAlmanacEntry>> unitsAlmanac;
 
     /**
      * A constant that provides the ISO-8601 definition of week-based fields.
@@ -5399,6 +5403,23 @@ public class Campaign implements ITechManager {
 
     public FactionStandingUltimatumsLibrary getFactionStandingUltimatumsLibrary() {
         return factionStandingUltimatumsLibrary;
+    }
+
+
+    public Map<Integer, List<WarriorsAlmanacEntry>> getPartsAlmanac() {
+        return partsAlmanac;
+    }
+
+    public void setPartsAlmanac(Map<Integer, List<WarriorsAlmanacEntry>> partsAlmanac) {
+        this.partsAlmanac = partsAlmanac;
+    }
+
+    public Map<Integer, List<WarriorsAlmanacEntry>> getUnitsAlmanac() {
+        return unitsAlmanac;
+    }
+
+    public void setUnitsAlmanac(Map<Integer, List<WarriorsAlmanacEntry>> unitsAlmanac) {
+        this.unitsAlmanac = unitsAlmanac;
     }
 
     public void writeToXML(final PrintWriter writer, boolean isBugReportPrep) {

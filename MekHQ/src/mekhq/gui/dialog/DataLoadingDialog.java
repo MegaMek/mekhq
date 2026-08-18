@@ -34,6 +34,8 @@ package mekhq.gui.dialog;
 
 import static java.util.Arrays.sort;
 import static mekhq.campaign.enums.DailyReportType.POLITICS;
+import static mekhq.campaign.universe.warriorsAlmanac.WarriorsAlmanacEntry.buildAlmanacPartsData;
+import static mekhq.campaign.universe.warriorsAlmanac.WarriorsAlmanacEntry.buildAlmanacUnitsData;
 import static mekhq.gui.campaignOptions.CampaignOptionsDialog.CampaignOptionsDialogMode.STARTUP;
 import static mekhq.gui.campaignOptions.CampaignOptionsDialog.CampaignOptionsDialogMode.STARTUP_ABRIDGED;
 import static mekhq.utilities.EntityUtilities.isUnsupportedEntity;
@@ -82,6 +84,7 @@ import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.events.OptionsChangedEvent;
 import mekhq.campaign.finances.CurrencyManager;
 import mekhq.campaign.finances.financialInstitutions.FinancialInstitutions;
+import mekhq.campaign.market.PartsStore;
 import mekhq.campaign.market.enums.ContractMarketMethod;
 import mekhq.campaign.mission.atb.AtBScenarioModifier;
 import mekhq.campaign.personnel.Bloodname;
@@ -190,7 +193,7 @@ public class DataLoadingDialog extends AbstractMHQDialogBasic implements Propert
     }
 
     private JProgressBar createProgressBar() {
-        setProgressBar(new JProgressBar(0, 7));
+        setProgressBar(new JProgressBar(0, 8));
         getProgressBar().setString(resources.getString("loadingBaseData.text"));
         getProgressBar().setValue(0);
         getProgressBar().setStringPainted(true);
@@ -243,6 +246,9 @@ public class DataLoadingDialog extends AbstractMHQDialogBasic implements Propert
                 progressBar.setString(resources.getString((getCampaignFile() == null) ?
                                                                 "applyingNewCampaign.text" :
                                                                 "applyingLoadedCampaign.text"));
+                break;
+            case 8:
+                progressBar.setString(resources.getString("performingFinalSteps.text"));
                 break;
             default:
                 progressBar.setString(resources.getString("Error.text"));
@@ -500,9 +506,19 @@ public class DataLoadingDialog extends AbstractMHQDialogBasic implements Propert
                 // endregion Progress 7
             }
 
+            // region progress 8
+            setProgress(8);
+
+            PartsStore partsStore = campaign.getPartsStore();
+            // Parts carry separate Inner Sphere and Clan tech dates; use the player force's perspective.
+            boolean isClanForce = campaign.getPlayerForce().isClanForce();
+            campaign.setPartsAlmanac(buildAlmanacPartsData(partsStore, isClanForce));
+            campaign.setUnitsAlmanac(buildAlmanacUnitsData());
+
             if (isNewCampaign) {
                 new WarAndPeaceProcessor(campaign, true);
             }
+            // endregion Progress 8
 
             return campaign;
         }
