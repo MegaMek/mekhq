@@ -295,16 +295,36 @@ public final class LegacyContractConverter {
         }
     }
 
-    /** Creates a lightweight placeholder NPC of the given faction, or {@code null} if one cannot be made. */
-    private static @Nullable Person placeholderPerson(final Campaign campaign, final String factionCode) {
+    /**
+     * Creates a lightweight placeholder NPC of the given faction.
+     *
+     * <p>These fill the new model's NPC slots (the employer's negotiator and liaison, and the opposing commander),
+     * which the legacy format has no equivalent for. Generation can fail on an unrecognized legacy faction code, so a
+     * bare {@link Person} is used as a last resort rather than returning {@code null}: those slots are not nullable,
+     * and an unnamed placeholder on a defunct contract is better than aborting the conversion and losing the
+     * contract.</p>
+     *
+     * @param campaign    the campaign the placeholder belongs to
+     * @param factionCode the faction the placeholder should originate from
+     *
+     * @return a placeholder NPC, never {@code null}
+     */
+    private static Person placeholderPerson(final Campaign campaign, final String factionCode) {
         try {
-            return campaign.getPlayerForce()
-                         .getHumanResources()
-                         .newPerson(campaign, PersonnelRole.MEKWARRIOR, factionCode, Gender.RANDOMIZE);
+            final Person person = campaign.getPlayerForce()
+                                        .getHumanResources()
+                                        .newPerson(campaign, PersonnelRole.MEKWARRIOR, factionCode, Gender.RANDOMIZE);
+            if (person != null) {
+                return person;
+            }
+            LOGGER.warn("Placeholder personnel generation returned null for faction {}; using an unnamed placeholder.",
+                  factionCode);
         } catch (Exception ex) {
-            LOGGER.error(ex, "Failed to create placeholder personnel for a legacy contract");
-            return null;
+            LOGGER.error(ex, "Failed to create placeholder personnel for a legacy contract; using an unnamed"
+                                   + " placeholder.");
         }
+        // Falls back to the player's own faction, which is always valid - the legacy code may be what failed above.
+        return new Person(campaign);
     }
 
     private static String codeOrPlaceholder(final String code, final String placeholder) {
