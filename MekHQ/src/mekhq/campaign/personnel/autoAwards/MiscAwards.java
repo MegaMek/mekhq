@@ -41,6 +41,7 @@ import java.util.Map;
 import java.util.ResourceBundle;
 import java.util.UUID;
 
+import megamek.codeUtilities.MathUtility;
 import megamek.common.annotations.Nullable;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
@@ -228,7 +229,7 @@ public class MiscAwards {
           @Nullable Integer injuryCount) {
         if (award.canBeAwarded(campaign.getPerson(person))) {
             if ((killCount != null) && (injuryCount != null)) {
-                return (killCount >= Integer.parseInt(award.getSize())) && (injuryCount >= award.getQty());
+                return (killCount >= MathUtility.parseInt(award.getSize())) && (injuryCount >= award.getQty());
             }
         }
         return false;

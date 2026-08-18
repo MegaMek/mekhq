@@ -101,18 +101,19 @@ public class ContractScore {
                 continue;
             }
 
-            switch (scenario.getStatus()) {
-                case DECISIVE_VICTORY -> contractScore += DECISIVE_VICTORY;
-                case VICTORY -> contractScore += VICTORY;
-                case MARGINAL_VICTORY -> contractScore += MARGINAL_VICTORY;
-                case PYRRHIC_VICTORY -> contractScore += PYRRHIC_VICTORY;
-                case DRAW -> contractScore += DRAW;
-                case MARGINAL_DEFEAT -> contractScore += MARGINAL_DEFEAT;
-                case DEFEAT -> contractScore += DEFEAT;
-                case DECISIVE_DEFEAT -> contractScore += DECISIVE_DEFEAT;
-                case FLEET_IN_BEING -> contractScore += FLEET_IN_BEING;
-                case REFUSED_ENGAGEMENT -> contractScore += REFUSED_ENGAGEMENT;
-            }
+            contractScore += switch (scenario.getStatus()) {
+                case DECISIVE_VICTORY -> DECISIVE_VICTORY;
+                case VICTORY -> VICTORY;
+                case MARGINAL_VICTORY -> MARGINAL_VICTORY;
+                case PYRRHIC_VICTORY -> PYRRHIC_VICTORY;
+                case DRAW -> DRAW;
+                case MARGINAL_DEFEAT -> MARGINAL_DEFEAT;
+                case DEFEAT -> DEFEAT;
+                case DECISIVE_DEFEAT -> DECISIVE_DEFEAT;
+                case FLEET_IN_BEING -> FLEET_IN_BEING;
+                case REFUSED_ENGAGEMENT -> REFUSED_ENGAGEMENT;
+                case CURRENT -> 0;
+            };
         }
 
         return contractScore;

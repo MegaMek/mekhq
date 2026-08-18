@@ -38,6 +38,7 @@ import java.util.Map;
 import java.util.UUID;
 import java.util.stream.IntStream;
 
+import megamek.codeUtilities.MathUtility;
 import megamek.logging.MMLogger;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.mission.newContract.AbstractContract;
@@ -149,8 +150,8 @@ public class TheatreOfWarAwards {
 
         try {
             return IntStream.rangeClosed(0, contractLength).map(year -> contractStartYear + year)
-                         .anyMatch(checkYear -> (checkYear >= Integer.parseInt(wartime.getFirst()))
-                                                      && (checkYear <= Integer.parseInt(wartime.get(1))));
+                         .anyMatch(checkYear -> (checkYear >= MathUtility.parseInt(wartime.getFirst()))
+                                                      && (checkYear <= MathUtility.parseInt(wartime.get(1))));
         } catch (Exception e) {
             LOGGER.error("Failed to parse isDuringWartime. Returning false.");
             return false;
