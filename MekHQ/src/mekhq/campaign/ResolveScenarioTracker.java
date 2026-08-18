@@ -645,10 +645,9 @@ public class ResolveScenarioTracker {
 
     private List<Person> shuffleCrew(List<Person> source) {
         List<Person> sortedList = new ArrayList<>();
-        Random generator = new Random();
 
         while (!source.isEmpty()) {
-            int position = generator.nextInt(source.size());
+            int position = Compute.randomInt(source.size());
             sortedList.add(source.get(position));
             source.remove(position);
         }

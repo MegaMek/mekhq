@@ -614,14 +614,13 @@ public class StratConRulesManager {
         }
 
         List<StratConTrackState> tracks = contract.getStratConCampaignState().getTracks();
-        Random rand = new Random();
 
-        if (!tracks.isEmpty()) {
-            return tracks.get(rand.nextInt(tracks.size()));
-        } else {
+        if (tracks.isEmpty()) {
             LOGGER.error("No tracks available. Unable to fetch random track");
             return null;
         }
+
+        return getRandomItem(tracks);
     }
 
     /**

@@ -37,9 +37,9 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.List;
-import java.util.Random;
 import java.util.stream.Stream;
 
+import megamek.codeUtilities.ObjectUtility;
 import megamek.common.icons.Camouflage;
 import megamek.logging.MMLogger;
 import mekhq.campaign.universe.Factions;
@@ -77,7 +77,7 @@ public class RandomFactionCamouflage {
 
         // Select a random file to set camouflage, if there are files available
         if ((null != allPaths) && (!allPaths.isEmpty())) {
-            Path randomPath = allPaths.get(new Random().nextInt(allPaths.size()));
+            Path randomPath = ObjectUtility.getRandomItem(allPaths);
 
             String fileName = randomPath.getFileName().toString();
             String fileCategory = randomPath.getParent()
