@@ -988,11 +988,15 @@ public class RetirementDefectionTracker {
     }
 
     /**
-     * Called by when all payouts have been resolved for the contract. If the contract is null, the dialog has been
-     * invoked without a specific contract and all outstanding payouts have been resolved.
+     * Clears every outstanding payout, for all contracts at once. Called when the turnover dialog was opened without a
+     * specific contract, so settling it settles everything.
+     *
+     * <p>Each contract is resolved individually before the map is emptied, so the roll-required flags go with it -
+     * {@link #resolveContract(UUID)} keys off a contract id and so cannot stand in for "all of them".</p>
      */
     public void resolveAllContracts() {
-        resolveContract(null);
+        unresolvedPersonnel.keySet().forEach(this::resolveContract);
+        unresolvedPersonnel.clear();
         payouts.clear();
     }
 
