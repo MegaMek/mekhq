@@ -525,15 +525,31 @@ public class ContractDossierPanel extends JPanel {
     private JPanel buildFooter(ContractMarketActions actions) {
         JPanel footer = new JPanel(new BorderLayout());
 
-        String destination = contract.getTargetPlanetName(currentDate);
-        if (destination == null) {
-            destination = contract.getTargetSystemName(currentDate);
+        // Render the destination as the system's report hyperlink so clicking it focuses the interstellar map.
+        PlanetarySystem targetSystem = contract.getTargetSystem();
+        String destination;
+        if (targetSystem != null) {
+            destination = targetSystem.getHyperlinkedName(currentDate);
+        } else {
+            destination = contract.getTargetPlanetName(currentDate);
+            if (destination == null) {
+                destination = contract.getTargetSystemName(currentDate);
+            }
         }
-        JLabel travel = new JLabel(getFormattedTextAt(RESOURCE_BUNDLE,
+        String travelText = getFormattedTextAt(RESOURCE_BUNDLE,
               "dossier.contractMarket.footer.travel",
               destination,
-              contract.getLengthInMonths()));
+              contract.getLengthInMonths());
+
+        JEditorPane travel = new JEditorPane("text/html",
+              "<html><body style='margin:0'>" + travelText + "</body></html>");
+        travel.setEditable(false);
+        travel.setOpaque(false);
+        travel.setBorder(null);
+        travel.putClientProperty(JEditorPane.HONOR_DISPLAY_PROPERTIES, Boolean.TRUE);
+        travel.setFont(new JLabel().getFont());
         travel.setForeground(mutedColor());
+        travel.addHyperlinkListener(campaign.getGUI().getReportHLL());
         footer.add(travel, BorderLayout.WEST);
 
         JPanel buttons = new JPanel(new FlowLayout(FlowLayout.RIGHT, scaleForGUI(6), 0));

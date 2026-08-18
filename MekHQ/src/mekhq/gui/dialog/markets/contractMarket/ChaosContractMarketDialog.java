@@ -604,36 +604,41 @@ public class ChaosContractMarketDialog extends JDialog implements ContractMarket
     private JPanel buildButtonBar() {
         boolean isGM = campaign.isGM();
 
-        JPanel bar = new JPanel(new FlowLayout(FlowLayout.CENTER, PADDING, PADDING));
-        bar.setBorder(RoundedLineBorder.createRoundedLineBorder());
-
-        bar.add(mothballOnDepartureCheckbox);
-        bar.add(travelToSystemCheckbox);
+        // Options on one row, actions on the row beneath, so the bar does not run off the dialog's width.
+        JPanel optionRow = new JPanel(new FlowLayout(FlowLayout.CENTER, PADDING, PADDING));
+        optionRow.add(mothballOnDepartureCheckbox);
+        optionRow.add(travelToSystemCheckbox);
         // The StratCon opt-out is only relevant when the campaign is running StratCon at all.
         if (campaign.getCampaignOptions().isUseStratCon()) {
-            bar.add(useStratConCheckbox);
+            optionRow.add(useStratConCheckbox);
         }
+
+        JPanel actionRow = new JPanel(new FlowLayout(FlowLayout.CENTER, PADDING, PADDING));
 
         RoundedJButton close = new RoundedJButton(getTextAt(RESOURCE_BUNDLE, "button.contractMarket.close"));
         close.addActionListener(e -> dispose());
-        bar.add(close);
+        actionRow.add(close);
 
         RoundedJButton deleteAll = new RoundedJButton(getTextAt(RESOURCE_BUNDLE, "button.contractMarket.deleteAll"));
         deleteAll.addActionListener(e -> deleteAllContracts());
         deleteAll.setEnabled(!contracts.isEmpty());
-        bar.add(deleteAll);
+        actionRow.add(deleteAll);
 
         RoundedJButton generateNew = new RoundedJButton(getTextAt(RESOURCE_BUNDLE,
               "button.contractMarket.generateNew"));
         generateNew.addActionListener(e -> generateNewContracts());
         generateNew.setEnabled(isGM);
-        bar.add(generateNew);
+        actionRow.add(generateNew);
 
         RoundedJButton createNew = new RoundedJButton(getTextAt(RESOURCE_BUNDLE, "button.contractMarket.createNew"));
         createNew.addActionListener(e -> createNewContract());
         createNew.setEnabled(isGM);
-        bar.add(createNew);
+        actionRow.add(createNew);
 
+        JPanel bar = new JPanel(new BorderLayout());
+        bar.setBorder(RoundedLineBorder.createRoundedLineBorder());
+        bar.add(optionRow, BorderLayout.NORTH);
+        bar.add(actionRow, BorderLayout.SOUTH);
         return bar;
     }
 

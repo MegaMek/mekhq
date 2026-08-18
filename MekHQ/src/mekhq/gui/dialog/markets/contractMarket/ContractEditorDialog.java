@@ -36,6 +36,7 @@ import static java.lang.Math.max;
 import static megamek.client.ui.util.UIUtil.scaleForGUI;
 import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
 import static mekhq.utilities.MHQInternationalization.getTextAt;
+import static mekhq.utilities.MHQInternationalization.isResourceKeyValid;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
@@ -887,18 +888,39 @@ public class ContractEditorDialog extends JDialog {
     // endregion Cards
 
     private JPanel buildFooter() {
-        JPanel footer = new JPanel(new FlowLayout(FlowLayout.RIGHT, PADDING, 0));
+        JPanel footer = new JPanel(new BorderLayout());
         footer.setBorder(BorderFactory.createEmptyBorder(PADDING, PADDING, 0, PADDING));
 
+        // Instructions sit on the left, apart from the Cancel/Save actions on the right.
+        JPanel left = new JPanel(new FlowLayout(FlowLayout.LEFT, PADDING, 0));
+        RoundedJButton instructions = new RoundedJButton(
+              getTextAt(RESOURCE_BUNDLE, "button.contractMarket.edit.instructions"));
+        instructions.addActionListener(e -> showInstructions());
+        left.add(instructions);
+        footer.add(left, BorderLayout.WEST);
+
+        JPanel right = new JPanel(new FlowLayout(FlowLayout.RIGHT, PADDING, 0));
         RoundedJButton cancel = new RoundedJButton(getTextAt(RESOURCE_BUNDLE, "button.contractMarket.edit.cancel"));
         cancel.addActionListener(e -> dispose());
-        footer.add(cancel);
+        right.add(cancel);
 
         RoundedJButton save = new RoundedJButton(getTextAt(RESOURCE_BUNDLE, "button.contractMarket.edit.save"));
         save.addActionListener(e -> saveAction());
-        footer.add(save);
+        right.add(save);
+        footer.add(right, BorderLayout.EAST);
 
         return footer;
+    }
+
+    /** Opens a modal, scrollable overview of the dialog and what each tab controls. */
+    private void showInstructions() {
+        JEditorPane pane = new JEditorPane("text/html", getTextAt(RESOURCE_BUNDLE, "instructions.contractMarket.body"));
+        pane.setEditable(false);
+        pane.setCaretPosition(0);
+        JScrollPane scroll = new JScrollPane(pane);
+        scroll.setPreferredSize(new Dimension(scaleForGUI(580), scaleForGUI(520)));
+        JOptionPane.showMessageDialog(this, scroll,
+              getTextAt(RESOURCE_BUNDLE, "instructions.contractMarket.title"), JOptionPane.INFORMATION_MESSAGE);
     }
 
     /**
@@ -1114,6 +1136,12 @@ public class ContractEditorDialog extends JDialog {
         row.setBorder(BorderFactory.createEmptyBorder(scaleForGUI(4), 0, scaleForGUI(4), 0));
 
         JLabel label = new JLabel(getTextAt(RESOURCE_BUNDLE, labelKey));
+        // Explain the field on its label (leaving field-specific tooltips - term effects, date pickers, the automatic
+        // checkboxes - untouched). Only set one when a "<labelKey>.tooltip" string actually exists.
+        String tooltip = getTextAt(RESOURCE_BUNDLE, labelKey + ".tooltip");
+        if (isResourceKeyValid(tooltip)) {
+            label.setToolTipText(tooltip);
+        }
         label.setPreferredSize(new Dimension(scaleForGUI(LABEL_WIDTH), label.getPreferredSize().height));
         label.setVerticalAlignment(JLabel.TOP);
         row.add(label, BorderLayout.WEST);
