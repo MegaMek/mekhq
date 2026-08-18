@@ -77,14 +77,17 @@ public class PityContracts {
 
         ContractMarket contractMarket = campaign.getPlayerForce().getContractMarket();
         ContractSearchType bucket = pityBucket(campaign);
+        int addedCount = 0;
         for (int i = 0; i < contractCount; i++) {
             AbstractContract contract = ChaosContractMarketAvailability.generateProvingGroundOffer(campaign, bucket);
+            // Generation is best-effort and may fail to place an offer, so count only what actually landed.
             if (contract != null) {
                 contractMarket.addContract(bucket, contract);
+                addedCount++;
             }
         }
 
-        return contractCount;
+        return addedCount;
     }
 
     /**
