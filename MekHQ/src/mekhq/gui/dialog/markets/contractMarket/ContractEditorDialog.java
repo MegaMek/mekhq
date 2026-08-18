@@ -44,6 +44,7 @@ import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.time.LocalDate;
 import java.util.AbstractMap;
+import java.util.Arrays;
 import javax.swing.*;
 
 import jakarta.annotation.Nullable;
@@ -56,6 +57,7 @@ import megamek.common.enums.SkillLevel;
 import megamek.common.icons.AbstractIcon;
 import megamek.common.icons.Camouflage;
 import megamek.common.icons.Portrait;
+import megamek.common.ui.EnhancedTabbedPane;
 import megamek.logging.MMLogger;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
@@ -105,7 +107,6 @@ public class ContractEditorDialog extends JDialog {
     private static final int MONEY_STEP = 1000;
     private static final int LABEL_WIDTH = 170;
     private static final int ICON_SIZE = 48;
-    private static final float MUTED_BLEND = 0.45f;
     /** Profession used to label ranks in the create-mode NPC pickers; the numeric rank is what actually applies. */
     private static final Profession DEFAULT_PROFESSION = Profession.MEKWARRIOR;
 
@@ -122,6 +123,7 @@ public class ContractEditorDialog extends JDialog {
     private JTextField nameField;
     private JTextArea descriptionArea;
     private JComboBox<MissionStatus> statusCombo;
+    private boolean statusEditable;
 
     // Parameters
     private JSpinner scaleSpinner;
@@ -266,22 +268,14 @@ public class ContractEditorDialog extends JDialog {
         JPanel content = new JPanel(new BorderLayout());
         content.setBorder(BorderFactory.createEmptyBorder(PADDING, PADDING, PADDING, PADDING));
 
-        JPanel bodyWrapper = new ChaosContractMarketDialog.WidthTrackingPanel(new BorderLayout());
-        bodyWrapper.add(buildBody(), BorderLayout.NORTH);
-
-        JScrollPane bodyScroll = new JScrollPane(bodyWrapper,
-              ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED,
-              ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
-        bodyScroll.setBorder(null);
-        bodyScroll.getVerticalScrollBar().setUnitIncrement(scaleForGUI(16));
-        content.add(bodyScroll, BorderLayout.CENTER);
+        content.add(buildTabs(), BorderLayout.CENTER);
         content.add(buildFooter(), BorderLayout.SOUTH);
 
         root.add(content, BorderLayout.CENTER);
         getContentPane().add(root);
 
         pack();
-        setSize(scaleForGUI(640, 780)); // Default opening size; saved preferences (below) override it on later opens
+        setSize(scaleForGUI(640, 560)); // Default opening size; saved preferences (below) override it on later opens
         setLocationRelativeTo(getParent());
         setPreferences(); // Must be before setVisible
         setVisible(true);
@@ -326,30 +320,42 @@ public class ContractEditorDialog extends JDialog {
         return header;
     }
 
-    private JPanel buildBody() {
-        JPanel body = new JPanel();
-        body.setLayout(new BoxLayout(body, BoxLayout.Y_AXIS));
+    /** Lays each category out on its own tab, so the GM steps through them rather than scrolling one long column. */
+    private EnhancedTabbedPane buildTabs() {
+        EnhancedTabbedPane tabs = new EnhancedTabbedPane(false, false);
 
-        addCard(body, buildIdentityCard());
-        addCard(body, buildParametersCard());
-        addCard(body, buildScheduleCard());
-        addCard(body, buildTargetCard());
-        addCard(body, buildEmployerCard());
-        addCard(body, buildEnemyCard());
-        addCard(body, buildTermsCard());
-        addCard(body, buildObjectivesCard());
-        addCard(body, buildFinanceCard());
-        addCard(body, buildFacilitiesCard());
-        addCard(body, buildMoraleCard());
-        buildPersonnelCards(body);
+        addTab(tabs, "edit.contractMarket.section.identity", buildIdentityCard());
+        addTab(tabs, "edit.contractMarket.section.parameters", buildParametersCard());
+        addTab(tabs, "edit.contractMarket.section.schedule", buildScheduleCard());
+        addTab(tabs, "edit.contractMarket.section.target", buildTargetCard());
+        addTab(tabs, "edit.contractMarket.section.employer", buildEmployerCard());
+        addTab(tabs, "edit.contractMarket.section.enemy", buildEnemyCard());
+        addTab(tabs, "edit.contractMarket.section.terms", buildTermsCard());
+        addTab(tabs, "edit.contractMarket.section.objectives", buildObjectivesCard());
+        addTab(tabs, "edit.contractMarket.section.finance", buildFinanceCard());
+        addTab(tabs, "edit.contractMarket.section.facilities", buildFacilitiesCard());
+        addTab(tabs, "edit.contractMarket.section.morale", buildMoraleCard());
+        buildPersonnelTabs(tabs);
 
-        return body;
+        return tabs;
     }
 
-    private void addCard(JPanel body, JPanel card) {
-        card.setAlignmentX(Component.LEFT_ALIGNMENT);
-        body.add(card);
-        body.add(Box.createVerticalStrut(PADDING));
+    /**
+     * Adds one category to the pane as a tab titled by its section key, with the content top-anchored and vertically
+     * scrollable so a tall category never gets clipped.
+     */
+    private void addTab(EnhancedTabbedPane tabs, String sectionKey, JPanel content) {
+        JPanel wrapper = new JPanel(new BorderLayout());
+        wrapper.setBorder(BorderFactory.createEmptyBorder(PADDING, PADDING, PADDING, PADDING));
+        wrapper.add(content, BorderLayout.NORTH);
+
+        JScrollPane scroll = new JScrollPane(wrapper,
+              ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED,
+              ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
+        scroll.setBorder(null);
+        scroll.getVerticalScrollBar().setUnitIncrement(scaleForGUI(16));
+
+        tabs.addTab(getTextAt(RESOURCE_BUNDLE, sectionKey), scroll);
     }
 
     // region Cards
@@ -384,10 +390,28 @@ public class ContractEditorDialog extends JDialog {
         descriptionScroll.setPreferredSize(new Dimension(scaleForGUI(260), scaleForGUI(90)));
         rows.add(formRow("edit.contractMarket.field.description", descriptionScroll));
 
-        statusCombo = enumCombo(MissionStatus.values(), contract.getStatus());
+        // A market offer has no status, and an accepted-but-active contract is finalized through the normal completion
+        // flow, so status is only hand-editable once the contract has actually concluded. Even then it may only move
+        // between concluded outcomes - a concluded contract can never be turned back to ACTIVE - so the enabled picker
+        // offers the completed statuses alone. When not editable the field is disabled (showing the current value),
+        // never hidden.
+        MissionStatus status = contract.getStatus();
+        statusEditable = status != null && status.isCompleted();
+        MissionStatus[] statusOptions = statusEditable
+                                              ?
+                                              Arrays.stream(MissionStatus.values())
+                                                    .filter(MissionStatus::isCompleted)
+                                                    .toArray(MissionStatus[]::new)
+                                              :
+                                              MissionStatus.values();
+        statusCombo = enumCombo(statusOptions, status);
+        statusCombo.setEnabled(statusEditable);
+        if (!statusEditable) {
+            statusCombo.setToolTipText(getTextAt(RESOURCE_BUNDLE, "edit.contractMarket.field.status.disabled.tooltip"));
+        }
         rows.add(formRow("edit.contractMarket.field.status", statusCombo));
 
-        return card("edit.contractMarket.section.identity", rows);
+        return card(rows);
     }
 
     private JPanel buildParametersCard() {
@@ -405,7 +429,7 @@ public class ContractEditorDialog extends JDialog {
         victoryPointsSpinner = intSpinner(contract.getRequiredVictoryPoints(), 0);
         rows.add(formRow("edit.contractMarket.field.victoryPoints", victoryPointsSpinner));
 
-        return card("edit.contractMarket.section.parameters", rows);
+        return card(rows);
     }
 
     private JPanel buildScheduleCard() {
@@ -424,7 +448,7 @@ public class ContractEditorDialog extends JDialog {
         lengthSpinner.setToolTipText(getTextAt(RESOURCE_BUNDLE, "edit.contractMarket.field.length.tooltip"));
         rows.add(formRow("edit.contractMarket.field.length", lengthSpinner));
 
-        return card("edit.contractMarket.section.schedule", rows);
+        return card(rows);
     }
 
     private JPanel buildTargetCard() {
@@ -454,7 +478,7 @@ public class ContractEditorDialog extends JDialog {
         repopulatePlanets(targetSystem, contract.getTargetPlanetId());
         rows.add(formRow("edit.contractMarket.field.planetId", planetCombo));
 
-        return card("edit.contractMarket.section.target", rows);
+        return card(rows);
     }
 
     private JPanel buildEmployerCard() {
@@ -489,7 +513,7 @@ public class ContractEditorDialog extends JDialog {
         employerCamoButton = camoButton(() -> employerCamouflage, camo -> employerCamouflage = camo);
         rows.add(formRow("edit.contractMarket.field.camouflage", employerCamoButton));
 
-        return card("edit.contractMarket.section.employer", rows);
+        return card(rows);
     }
 
     private JPanel buildEnemyCard() {
@@ -522,7 +546,7 @@ public class ContractEditorDialog extends JDialog {
         enemyCamoButton = camoButton(() -> enemyCamouflage, camo -> enemyCamouflage = camo);
         rows.add(formRow("edit.contractMarket.field.camouflage", enemyCamoButton));
 
-        return card("edit.contractMarket.section.enemy", rows);
+        return card(rows);
     }
 
     private JPanel buildTermsCard() {
@@ -543,7 +567,7 @@ public class ContractEditorDialog extends JDialog {
         commandCombo = stepsCombo(contract.getCommandRightsStep());
         rows.add(formRow("edit.contractMarket.field.command", commandCombo));
 
-        return card("edit.contractMarket.section.terms", rows);
+        return card(rows);
     }
 
     private JPanel buildObjectivesCard() {
@@ -555,7 +579,7 @@ public class ContractEditorDialog extends JDialog {
         opposingObjectiveCombo = objectiveCombo(contract.getOpposingObjectiveType());
         rows.add(formRow("edit.contractMarket.field.opposingObjective", opposingObjectiveCombo));
 
-        return card("edit.contractMarket.section.objectives", rows);
+        return card(rows);
     }
 
     private JPanel buildFinanceCard() {
@@ -579,7 +603,7 @@ public class ContractEditorDialog extends JDialog {
         combatPaySpinner = moneySpinner(combatPay);
         rows.add(formRow("edit.contractMarket.field.combatPay", combatPaySpinner));
 
-        return card("edit.contractMarket.section.finance", rows);
+        return card(rows);
     }
 
     private JPanel buildFacilitiesCard() {
@@ -594,7 +618,7 @@ public class ContractEditorDialog extends JDialog {
         holdingCellsSpinner = intSpinner(contract.getRentedHoldingCells(), 0);
         rows.add(formRow("edit.contractMarket.field.holdingCells", holdingCellsSpinner));
 
-        return card("edit.contractMarket.section.facilities", rows);
+        return card(rows);
     }
 
     private JPanel buildMoraleCard() {
@@ -609,14 +633,14 @@ public class ContractEditorDialog extends JDialog {
         routedPayoutSpinner = moneySpinner(contract.getRoutPayout());
         rows.add(formRow("edit.contractMarket.field.routedPayout", routedPayoutSpinner));
 
-        return card("edit.contractMarket.section.morale", rows);
+        return card(rows);
     }
 
     /**
      * Adds an editor card for each generated NPC that exists on the contract. Contracts missing an NPC (for example an
      * opposing commander that has not been generated) simply contribute no card.
      */
-    private void buildPersonnelCards(JPanel body) {
+    private void buildPersonnelTabs(EnhancedTabbedPane tabs) {
         // Create mode: the NPCs do not exist yet, so show override cards whose name/portrait are layered onto the NPCs
         // generated when the dialog is confirmed.
         if (createMode) {
@@ -637,9 +661,9 @@ public class ContractEditorDialog extends JDialog {
             employerFactionCombo.addActionListener(e -> refreshEmployerRanks.run());
             enemyFactionCombo.addActionListener(e -> refreshEnemyRanks.run());
 
-            addCard(body, negotiatorOverride.buildCard("edit.contractMarket.section.negotiator"));
-            addCard(body, liaisonOverride.buildCard("edit.contractMarket.section.liaison"));
-            addCard(body, commanderOverride.buildCard("edit.contractMarket.section.commander"));
+            addTab(tabs, "edit.contractMarket.section.negotiator", negotiatorOverride.buildCard());
+            addTab(tabs, "edit.contractMarket.section.liaison", liaisonOverride.buildCard());
+            addTab(tabs, "edit.contractMarket.section.commander", commanderOverride.buildCard());
             return;
         }
 
@@ -651,13 +675,13 @@ public class ContractEditorDialog extends JDialog {
         commanderEditor = npcEditor(enemy == null ? null : enemy.opposingCommander());
 
         if (negotiatorEditor != null) {
-            addCard(body, negotiatorEditor.buildCard("edit.contractMarket.section.negotiator"));
+            addTab(tabs, "edit.contractMarket.section.negotiator", negotiatorEditor.buildCard());
         }
         if (liaisonEditor != null) {
-            addCard(body, liaisonEditor.buildCard("edit.contractMarket.section.liaison"));
+            addTab(tabs, "edit.contractMarket.section.liaison", liaisonEditor.buildCard());
         }
         if (commanderEditor != null) {
-            addCard(body, commanderEditor.buildCard("edit.contractMarket.section.commander"));
+            addTab(tabs, "edit.contractMarket.section.commander", commanderEditor.buildCard());
         }
     }
 
@@ -692,7 +716,11 @@ public class ContractEditorDialog extends JDialog {
             contract.setContractName(name);
         }
         contract.setDescription(descriptionArea.getText());
-        contract.setStatus(statusValue(statusCombo));
+        // Only write status back when the field was editable; otherwise leave the contract's status as-is (an offer's
+        // absent status, or an active contract's ACTIVE) rather than stamping the combo's fallback onto it.
+        if (statusEditable) {
+            contract.setStatus(statusValue(statusCombo));
+        }
 
         // Parameters
         contract.setScale(intValue(scaleSpinner));
@@ -818,18 +846,11 @@ public class ContractEditorDialog extends JDialog {
         return rows;
     }
 
-    /** Wraps a rows panel in a subtly-bordered card headed by its (upper-cased) section title. */
-    private JPanel card(String sectionKey, JPanel rows) {
+    /** Wraps a rows panel in a subtly-bordered card; the enclosing tab supplies the section title. */
+    private JPanel card(JPanel rows) {
         JPanel card = new JPanel(new BorderLayout());
         card.setBorder(BorderFactory.createCompoundBorder(RoundedLineBorder.createSubtleRoundedLineBorder(),
               BorderFactory.createEmptyBorder(PADDING, PADDING, PADDING, PADDING)));
-
-        JLabel section = new JLabel(getTextAt(RESOURCE_BUNDLE, sectionKey).toUpperCase());
-        section.setFont(section.getFont().deriveFont(section.getFont().getSize2D() - 2f));
-        section.setForeground(muted());
-        card.add(section, BorderLayout.NORTH);
-
-        rows.setBorder(BorderFactory.createEmptyBorder(PADDING, 0, 0, 0));
         card.add(rows, BorderLayout.CENTER);
         return card;
     }
@@ -1079,23 +1100,6 @@ public class ContractEditorDialog extends JDialog {
 
     // endregion Value helpers
 
-    /** A theme-aware muted foreground, matching the market's section labels (a blend of text into background). */
-    private static Color muted() {
-        Color foreground = UIManager.getColor("Label.foreground");
-        Color background = UIManager.getColor("Panel.background");
-        if (foreground == null || background == null) {
-            return Color.GRAY;
-        }
-        return blend(foreground, background, MUTED_BLEND);
-    }
-
-    private static Color blend(Color foreground, Color background, float backgroundWeight) {
-        float fw = 1f - backgroundWeight;
-        return new Color(Math.round(foreground.getRed() * fw + background.getRed() * backgroundWeight),
-              Math.round(foreground.getGreen() * fw + background.getGreen() * backgroundWeight),
-              Math.round(foreground.getBlue() * fw + background.getBlue() * backgroundWeight));
-    }
-
     private static Color contrastingText(Color background) {
         double luminance = (0.299 * background.getRed() + 0.587 * background.getGreen()
                                   + 0.114 * background.getBlue()) / 255.0;
@@ -1138,13 +1142,13 @@ public class ContractEditorDialog extends JDialog {
             });
         }
 
-        private JPanel buildCard(String titleKey) {
+        private JPanel buildCard() {
             JPanel rows = rowsPanel();
             rows.add(formRow("edit.contractMarket.field.givenName", givenNameField));
             rows.add(formRow("edit.contractMarket.field.surname", surnameField));
             rows.add(formRow("edit.contractMarket.field.rank", ranks));
             rows.add(formRow("edit.contractMarket.field.portrait", portraitButton));
-            return card(titleKey, rows);
+            return card(rows);
         }
 
         private void apply() {
@@ -1212,13 +1216,13 @@ public class ContractEditorDialog extends JDialog {
             ranks.setSelectedIndex(0);
         }
 
-        private JPanel buildCard(String titleKey) {
+        private JPanel buildCard() {
             JPanel rows = rowsPanel();
             rows.add(formRow("edit.contractMarket.field.givenName", givenNameField));
             rows.add(formRow("edit.contractMarket.field.surname", surnameField));
             rows.add(formRow("edit.contractMarket.field.rank", ranks));
             rows.add(formRow("edit.contractMarket.field.portrait", portraitButton));
-            return card(titleKey, rows);
+            return card(rows);
         }
 
         /** Applies whichever overrides the GM supplied to the freshly-generated NPC, leaving blank fields alone. */
