@@ -299,8 +299,6 @@ public final class ChaosContractMarketAvailability {
         final Map<ContractSearchType, OfferRoll> rolls = rollMonthlyOffers(campaign);
         final ContractMarket market = campaign.getPlayerForce().getContractMarket();
 
-        final Map<ContractSearchType, Integer> generatedCounts = new EnumMap<>(ContractSearchType.class);
-        int totalOffers = 0;
         for (final ContractSearchType type : ContractSearchType.values()) {
             final Map<UUID, AbstractContract> offers = market.getContracts(type);
             offers.clear();
@@ -308,16 +306,22 @@ public final class ChaosContractMarketAvailability {
             for (final AbstractContract contract : generateOffers(campaign, count, false, type)) {
                 offers.put(contract.getId(), contract);
             }
-            // What landed, not what was rolled - generation is best-effort and may place fewer than asked.
-            generatedCounts.put(type, offers.size());
-            totalOffers += offers.size();
         }
 
         // Top the market up with easy "Proving Ground" offers if the force has not yet earned enough successful
-        // contracts. These are additional to the rolled offers above and are not counted in the summary report.
+        // contracts. These land in one of the reported buckets and are counted alongside the rolled offers.
         PityContracts.generatePityContracts(campaign);
 
-        campaign.addReport(DailyReportType.GENERAL, buildSummaryReport(generatedCounts, totalOffers));
+        // Count what actually landed in the market per type
+        final Map<ContractSearchType, Integer> generatedCounts = new EnumMap<>(ContractSearchType.class);
+        int marketOffers = 0;
+        for (final ContractSearchType type : ContractSearchType.values()) {
+            final int count = market.getContracts(type).size();
+            generatedCounts.put(type, count);
+            marketOffers += count;
+        }
+
+        campaign.addReport(DailyReportType.GENERAL, buildSummaryReport(generatedCounts, marketOffers));
         campaign.addReport(DailyReportType.SKILL_CHECKS, buildRollBreakdownReport(campaign, rolls));
     }
 
