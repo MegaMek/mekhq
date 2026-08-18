@@ -799,7 +799,9 @@ public class ContractNegotiationDialog extends JDialog {
         return switch (clause) {
             case COMMAND -> step.getContractCommandRights().toString();
             case PAY -> percent(step.getBasePayMultiplier());
-            case SUPPORT -> percent(step.getStraightSupportMultiplier());
+            case SUPPORT -> getFormattedTextAt(RESOURCE_BUNDLE, "negotiate.contractMarket.value.support",
+                  (int) Math.round(step.getStraightSupportMultiplier() * 100),
+                  (int) Math.round(step.getBattlefieldLossMultiplier() * 100));
             case TRANSPORT -> percent(step.getTransportMultiplier());
             case SALVAGE -> step.isExchangeSalvage()
                                   ? getTextAt(RESOURCE_BUNDLE, "value.contractMarket.salvage.exchange")
