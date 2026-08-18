@@ -77,7 +77,7 @@ import mekhq.campaign.universe.PlanetarySystem;
 public abstract class AbstractContract {
     private UUID contractId;
     private String contractName;
-    private String description;
+    private @Nonnull String description = "";
 
     private EmployerData employerData;
     private EnemyData enemyData;
@@ -86,8 +86,8 @@ public abstract class AbstractContract {
     private ContractObjectiveData objectiveData;
     private ContractFinanceData contractFinanceData;
 
-    private Money salvagedByUnitValue = Money.zero();
-    private Money salvagedByEmployerValue = Money.zero();
+    private @Nonnull Money salvagedByUnitValue = Money.zero();
+    private @Nonnull Money salvagedByEmployerValue = Money.zero();
 
     private MissionStatus missionStatus;
     private ContractScheduleData scheduleData;
@@ -98,7 +98,7 @@ public abstract class AbstractContract {
      * Seeded with neutral morale so a freshly-constructed contract is always well-formed: generation performs its first
      * morale check (which reads the current level as its baseline) before any morale data is assigned.
      */
-    private MoraleData moraleData = new MoraleData(ContractMoraleLevel.STALEMATE);
+    private @Nonnull MoraleData moraleData = new MoraleData(ContractMoraleLevel.STALEMATE);
     private NegotiationData negotiationData;
     private Person playerNegotiator;
     /**
@@ -129,7 +129,7 @@ public abstract class AbstractContract {
     private transient JumpPath cachedJumpPath;
     private transient int cachedContractDifficulty;
 
-    public List<Scenario> getScenarios() {
+    public @Nonnull List<Scenario> getScenarios() {
         return scenarios;
     }
 
@@ -336,11 +336,11 @@ public abstract class AbstractContract {
         this.rentedFacilitiesData = rentedFacilitiesData;
     }
 
-    public MoraleData getMoraleData() {
+    public @Nonnull MoraleData getMoraleData() {
         return moraleData;
     }
 
-    public void setMoraleData(MoraleData moraleData) {
+    public void setMoraleData(@Nonnull MoraleData moraleData) {
         this.moraleData = moraleData;
     }
 
@@ -733,11 +733,11 @@ public abstract class AbstractContract {
         return getObjectiveType().getChaosObjectiveType().isAttacker();
     }
 
-    public Money getSalvagedByEmployerValue() {
+    public @Nonnull Money getSalvagedByEmployerValue() {
         return salvagedByEmployerValue;
     }
 
-    public void setSalvagedByEmployerValue(Money salvagedByEmployerValue) {
+    public void setSalvagedByEmployerValue(@Nonnull Money salvagedByEmployerValue) {
         this.salvagedByEmployerValue = salvagedByEmployerValue;
     }
 
@@ -745,11 +745,11 @@ public abstract class AbstractContract {
         salvagedByEmployerValue = salvagedByEmployerValue.plus(delta);
     }
 
-    public Money getSalvagedByUnitValue() {
+    public @Nonnull Money getSalvagedByUnitValue() {
         return salvagedByUnitValue;
     }
 
-    public void setSalvagedByUnitValue(Money salvagedByUnitValue) {
+    public void setSalvagedByUnitValue(@Nonnull Money salvagedByUnitValue) {
         this.salvagedByUnitValue = salvagedByUnitValue;
     }
 
