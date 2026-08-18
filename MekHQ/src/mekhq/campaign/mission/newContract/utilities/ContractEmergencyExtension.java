@@ -90,12 +90,13 @@ public class ContractEmergencyExtension {
 
         MekHQ.triggerEvent(new MissionChangedEvent(contract));
 
-        triggerDialog(campaign, contract, extension);
+        triggerDialog(campaign, contract, extension, warName);
 
         return true;
     }
 
-    private static void triggerDialog(Campaign campaign, AbstractContract contract, int extension) {
+    private static void triggerDialog(Campaign campaign, AbstractContract contract, int extension,
+          String warName) {
         String inCharacter = getFormattedTextAt(RESOURCE_BUNDLE,
               "ContractEmergencyExtension.ic",
               campaign.getCommanderAddress(),
@@ -103,7 +104,7 @@ public class ContractEmergencyExtension {
 
         String outOfCharacter = getFormattedTextAt(RESOURCE_BUNDLE,
               "ContractEmergencyExtension.ooc",
-              contract.getEndingDate());
+              warName);
 
         new ImmersiveDialogSimple(campaign,
               contract.getEmployerLiaison(),
