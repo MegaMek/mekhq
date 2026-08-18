@@ -36,8 +36,10 @@ import static mekhq.campaign.universe.Faction.MERCENARY_FACTION_CODE;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertSame;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.Mockito.RETURNS_DEEP_STUBS;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.mockStatic;
 import static org.mockito.Mockito.when;
@@ -46,6 +48,7 @@ import java.time.LocalDate;
 
 import megamek.common.compute.Compute;
 import megamek.common.icons.Camouflage;
+import mekhq.campaign.Campaign;
 import mekhq.campaign.mission.RandomFactionCamouflage;
 import mekhq.campaign.mission.newContract.contractData.EnemyData;
 import mekhq.campaign.universe.Faction;
@@ -53,14 +56,25 @@ import org.junit.jupiter.api.Test;
 import org.mockito.MockedStatic;
 
 /**
- * Exercises {@link ChaosContractDeterminationEnemy#generateEnemyForFaction(Faction, LocalDate)} &mdash; the method that
- * wraps a fixed enemy faction into {@link EnemyData}, including the mercenary-sponsor substitution used when the enemy
- * fields hired guns. Camouflage lookups are stubbed so no universe fixtures are required.
+ * Exercises {@link ChaosContractDeterminationEnemy#generateEnemyForFaction(Campaign, Faction, LocalDate)} &mdash; the
+ * method that wraps a fixed enemy faction into {@link EnemyData}, including the mercenary-sponsor substitution used
+ * when the enemy fields hired guns. Camouflage lookups are stubbed so no universe fixtures are required.
  */
 class ChaosContractDeterminationEnemyTest {
 
     private static final int YEAR = 3050;
     private static final LocalDate DATE = LocalDate.of(YEAR, 1, 1);
+
+    /**
+     * A campaign whose personnel generator yields no one, so {@code generateOpposingCommander} short-circuits to
+     * {@code null}. The commander is orthogonal to the faction-code and camouflage resolution under test here.
+     */
+    private static Campaign campaignWithoutPersonnel() {
+        Campaign campaign = mock(Campaign.class, RETURNS_DEEP_STUBS);
+        when(campaign.getPlayerForce().getHumanResources().newPerson(any(), any(), anyString(), any()))
+              .thenReturn(null);
+        return campaign;
+    }
 
     private static Faction enemyFaction(boolean usesMercenaries) {
         Faction faction = mock(Faction.class);
@@ -78,7 +92,9 @@ class ChaosContractDeterminationEnemyTest {
             camo.when(() -> RandomFactionCamouflage.pickRandomCamouflage(anyInt(), anyString()))
                   .thenReturn(camouflage);
 
-            EnemyData enemy = ChaosContractDeterminationEnemy.generateEnemyForFaction(enemyFaction(false), DATE);
+            EnemyData enemy = ChaosContractDeterminationEnemy.generateEnemyForFaction(campaignWithoutPersonnel(),
+                  enemyFaction(false),
+                  DATE);
 
             assertEquals("DC", enemy.factionCode());
             assertNull(enemy.sponsorFactionCode(), "an enemy fighting its own war has no sponsor");
@@ -98,7 +114,9 @@ class ChaosContractDeterminationEnemyTest {
             // MERCENARY_ENEMY_CHANCE roll of 0 means mercenaries were hired.
             compute.when(() -> Compute.randomInt(anyInt())).thenReturn(0);
 
-            EnemyData enemy = ChaosContractDeterminationEnemy.generateEnemyForFaction(enemyFaction(true), DATE);
+            EnemyData enemy = ChaosContractDeterminationEnemy.generateEnemyForFaction(campaignWithoutPersonnel(),
+                  enemyFaction(true),
+                  DATE);
 
             assertEquals(MERCENARY_FACTION_CODE, enemy.factionCode(), "the visible combatant is the mercenaries");
             assertEquals("DC", enemy.sponsorFactionCode(), "the real faction is recorded as the hidden sponsor");
@@ -116,7 +134,9 @@ class ChaosContractDeterminationEnemyTest {
             // Any non-zero roll means no mercenaries were hired this time.
             compute.when(() -> Compute.randomInt(anyInt())).thenReturn(1);
 
-            EnemyData enemy = ChaosContractDeterminationEnemy.generateEnemyForFaction(enemyFaction(true), DATE);
+            EnemyData enemy = ChaosContractDeterminationEnemy.generateEnemyForFaction(campaignWithoutPersonnel(),
+                  enemyFaction(true),
+                  DATE);
 
             assertEquals("DC", enemy.factionCode());
             assertNull(enemy.sponsorFactionCode());

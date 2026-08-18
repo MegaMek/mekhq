@@ -38,27 +38,45 @@ import static mekhq.campaign.mission.newContract.contractGeneration.targetFinder
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyBoolean;
+import static org.mockito.ArgumentMatchers.anyDouble;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 import java.time.LocalDate;
 
 import mekhq.campaign.Campaign;
-import mekhq.campaign.market.contractMarket.AbstractContractMarket;
-import mekhq.campaign.market.contractMarket.AtbMonthlyContractMarket;
-import mekhq.campaign.mission.AbstractMissionTransition;
+import mekhq.campaign.CurrentLocation;
+import mekhq.campaign.JumpPath;
+import mekhq.campaign.force.PlayerForce;
+import mekhq.campaign.mission.enums.ContractObjectiveType;
 import mekhq.campaign.universe.Faction;
 import mekhq.campaign.universe.PlanetarySystem;
 import mekhq.campaign.universe.Systems;
+import mekhq.campaign.universe.factionStanding.FactionStandings;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 
+/**
+ * Exercises the Clan Homeworlds exclusion zone: no Inner Sphere force may campaign within 450 light years of Strana
+ * Mechty except during Task Force Serpent, and even then only against the Smoke Jaguars.
+ *
+ * <p>Strana Mechty is stubbed into the {@link Systems} singleton and the jump path is mocked, so no universe or map
+ * fixtures are needed.</p>
+ */
 class ClanHomeworldsExclusionTest {
-
     private static final LocalDate OUTSIDE_SERPENT = IS_INVASION_OF_HUNTRESS_END.plusDays(1);
     private static final LocalDate INSIDE_SERPENT = IS_INVASION_OF_HUNTRESS_START.plusDays(1);
 
-    private final AbstractContractMarket contractMarket = new AtbMonthlyContractMarket();
+    /** Comfortably inside the 450 light year exclusion radius. */
+    private static final double INSIDE_RADIUS = 200;
+    /** Comfortably outside the 450 light year exclusion radius. */
+    private static final double OUTSIDE_RADIUS = 451;
+
+    private static final String SMOKE_JAGUAR = "CSJ";
+    private static final String DRACONIS_COMBINE = "DC";
+    private static final String WOLF = "CW";
 
     @AfterEach
     void tearDown() {
@@ -73,82 +91,191 @@ class ClanHomeworldsExclusionTest {
         return stranaMechty;
     }
 
-    private static Faction mockFaction(boolean isClan) {
+    private static Faction mockFaction(boolean isClan, String shortName) {
         Faction faction = mock(Faction.class);
         when(faction.isClan()).thenReturn(isClan);
+        when(faction.getShortName()).thenReturn(shortName);
         return faction;
     }
 
-    private static AbstractMissionTransition mockContract(Faction attackerFaction, double distanceToStranaMechty,
-          PlanetarySystem stranaMechty, int travelDays) {
-        AbstractMissionTransition contract = mock(AbstractMissionTransition.class);
-        when(contract.isPlayerAttacker()).thenReturn(true);
-        when(contract.getEmployerFaction()).thenReturn(attackerFaction);
+    /**
+     * A contract whose employer holds {@code employerObjective} and whose enemy holds {@code enemyObjective}, targeting
+     * a system {@code distanceToStranaMechty} light years from the Clan capital.
+     */
+    private static AbstractContract mockContract(Faction employerFaction, ContractObjectiveType employerObjective,
+          Faction enemyFaction, ContractObjectiveType enemyObjective, double distanceToStranaMechty,
+          PlanetarySystem stranaMechty) {
+        AbstractContract contract = mock(AbstractContract.class);
+        when(contract.getEmployerFaction()).thenReturn(employerFaction);
+        when(contract.getObjectiveType()).thenReturn(employerObjective);
+        when(contract.getEnemyFaction()).thenReturn(enemyFaction);
+        when(contract.getOpposingObjectiveType()).thenReturn(enemyObjective);
+
         PlanetarySystem targetSystem = mock(PlanetarySystem.class);
         when(targetSystem.getDistanceTo(stranaMechty)).thenReturn(distanceToStranaMechty);
-        when(contract.getSystem()).thenReturn(targetSystem);
-        when(contract.getTravelDays(any())).thenReturn(travelDays);
+        when(contract.getTargetSystem()).thenReturn(targetSystem);
         return contract;
     }
 
-    private static Campaign mockCampaign(LocalDate currentDate) {
+    /**
+     * A campaign sitting at {@code currentDate} whose only jump path to anywhere takes {@code travelDays}. The
+     * exclusion is keyed on the arrival date, so travel time has to be controllable.
+     */
+    private static Campaign mockCampaign(LocalDate currentDate, int travelDays) {
         Campaign campaign = mock(Campaign.class);
         when(campaign.getLocalDate()).thenReturn(currentDate);
+
+        PlayerForce playerForce = mock(PlayerForce.class);
+        when(playerForce.isOverridingCommandCircuitRequirements()).thenReturn(false);
+        when(playerForce.getFactionStandings()).thenReturn(mock(FactionStandings.class));
+        when(campaign.getPlayerForce()).thenReturn(playerForce);
+
+        JumpPath jumpPath = mock(JumpPath.class);
+        when(jumpPath.getTotalTime(any(), anyDouble(), anyBoolean())).thenReturn((double) travelDays);
+        when(campaign.calculateJumpPath(any(), any())).thenReturn(jumpPath);
         return campaign;
     }
 
-    @Test
-    void nonClanAttackerWithinRadiusOutsideSerpentViolates() {
-        PlanetarySystem stranaMechty = mockStranaMechty();
-        Campaign campaign = mockCampaign(OUTSIDE_SERPENT);
-        AbstractMissionTransition contract = mockContract(mockFaction(false), 200, stranaMechty, 0);
+    private static CurrentLocation mockLocation() {
+        CurrentLocation location = mock(CurrentLocation.class);
+        when(location.getCurrentSystem()).thenReturn(mock(PlanetarySystem.class));
+        return location;
+    }
 
-        assertTrue(violatesHomeworldsExclusion(contract, campaign),
-              "A non-Clan faction striking within the exclusion radius outside Operation Serpent should violate "
+    /** An Inner Sphere invader striking a Clan defender - the arrangement the exclusion zone exists to police. */
+    private static AbstractContract innerSphereInvasionOf(Faction defender, double distance,
+          PlanetarySystem stranaMechty) {
+        return mockContract(mockFaction(false, DRACONIS_COMBINE),
+              ContractObjectiveType.PLANETARY_ASSAULT,
+              defender,
+              ContractObjectiveType.GARRISON_DUTY,
+              distance,
+              stranaMechty);
+    }
+
+    @Test
+    void innerSphereAttackerWithinRadiusOutsideSerpentViolates() {
+        PlanetarySystem stranaMechty = mockStranaMechty();
+        AbstractContract contract = innerSphereInvasionOf(mockFaction(true, SMOKE_JAGUAR),
+              INSIDE_RADIUS,
+              stranaMechty);
+
+        assertTrue(violatesHomeworldsExclusion(contract, mockCampaign(OUTSIDE_SERPENT, 0), mockLocation()),
+              "An Inner Sphere force striking within the exclusion radius outside Task Force Serpent should violate "
                     + "the restriction");
     }
 
     @Test
-    void nonClanAttackerWithinRadiusDuringSerpentIsAllowed() {
+    void innerSphereAttackerAgainstSmokeJaguarDuringSerpentIsAllowed() {
         PlanetarySystem stranaMechty = mockStranaMechty();
-        Campaign campaign = mockCampaign(INSIDE_SERPENT);
-        AbstractMissionTransition contract = mockContract(mockFaction(false), 200, stranaMechty, 0);
+        AbstractContract contract = innerSphereInvasionOf(mockFaction(true, SMOKE_JAGUAR),
+              INSIDE_RADIUS,
+              stranaMechty);
 
-        assertFalse(violatesHomeworldsExclusion(contract, campaign),
-              "Operation Serpent is the one historical window where non-Clan forces legitimately operated within "
-                    + "the exclusion radius");
+        assertFalse(violatesHomeworldsExclusion(contract, mockCampaign(INSIDE_SERPENT, 0), mockLocation()),
+              "Task Force Serpent is the one historical window where Inner Sphere forces legitimately operated "
+                    + "within the exclusion radius");
     }
 
     @Test
-    void clanAttackerWithinRadiusOutsideSerpentIsAllowed() {
+    void innerSphereAttackerAgainstAnotherClanDuringSerpentStillViolates() {
         PlanetarySystem stranaMechty = mockStranaMechty();
-        Campaign campaign = mockCampaign(OUTSIDE_SERPENT);
-        AbstractMissionTransition contract = mockContract(mockFaction(true), 200, stranaMechty, 0);
+        AbstractContract contract = innerSphereInvasionOf(mockFaction(true, WOLF), INSIDE_RADIUS, stranaMechty);
 
-        assertFalse(violatesHomeworldsExclusion(contract, campaign),
+        assertTrue(violatesHomeworldsExclusion(contract, mockCampaign(INSIDE_SERPENT, 0), mockLocation()),
+              "Task Force Serpent was mounted against the Smoke Jaguars specifically; it does not license attacks "
+                    + "on other Clans");
+    }
+
+    @Test
+    void clanOnClanFightWithinRadiusIsAllowed() {
+        PlanetarySystem stranaMechty = mockStranaMechty();
+        AbstractContract contract = mockContract(mockFaction(true, WOLF),
+              ContractObjectiveType.PLANETARY_ASSAULT,
+              mockFaction(true, SMOKE_JAGUAR),
+              ContractObjectiveType.GARRISON_DUTY,
+              INSIDE_RADIUS,
+              stranaMechty);
+
+        assertFalse(violatesHomeworldsExclusion(contract, mockCampaign(OUTSIDE_SERPENT, 0), mockLocation()),
               "Clan factions are native to the Homeworlds and are never restricted by this rule");
     }
 
     @Test
-    void nonClanAttackerOutsideRadiusOutsideSerpentIsAllowed() {
+    void innerSphereDefenderAgainstClanAttackerWithinRadiusIsAllowed() {
         PlanetarySystem stranaMechty = mockStranaMechty();
-        Campaign campaign = mockCampaign(OUTSIDE_SERPENT);
-        AbstractMissionTransition contract = mockContract(mockFaction(false), 451, stranaMechty, 0);
+        AbstractContract contract = mockContract(mockFaction(false, DRACONIS_COMBINE),
+              ContractObjectiveType.GARRISON_DUTY,
+              mockFaction(true, SMOKE_JAGUAR),
+              ContractObjectiveType.PLANETARY_ASSAULT,
+              INSIDE_RADIUS,
+              stranaMechty);
 
-        assertFalse(violatesHomeworldsExclusion(contract, campaign),
+        assertFalse(violatesHomeworldsExclusion(contract, mockCampaign(OUTSIDE_SERPENT, 0), mockLocation()),
+              "The rule polices Inner Sphere forces reaching into the Homeworlds, not Clans attacking a garrison "
+                    + "there");
+    }
+
+    @Test
+    void innerSphereAttackerOutsideRadiusIsAllowed() {
+        PlanetarySystem stranaMechty = mockStranaMechty();
+        AbstractContract contract = innerSphereInvasionOf(mockFaction(true, SMOKE_JAGUAR),
+              OUTSIDE_RADIUS,
+              stranaMechty);
+
+        assertFalse(violatesHomeworldsExclusion(contract, mockCampaign(OUTSIDE_SERPENT, 0), mockLocation()),
               "A target outside the exclusion radius is never restricted by this rule");
+    }
+
+    @Test
+    void contractWithoutATargetSystemIsAllowed() {
+        PlanetarySystem stranaMechty = mockStranaMechty();
+        AbstractContract contract = innerSphereInvasionOf(mockFaction(true, SMOKE_JAGUAR),
+              INSIDE_RADIUS,
+              stranaMechty);
+        when(contract.getTargetSystem()).thenReturn(null);
+
+        assertFalse(violatesHomeworldsExclusion(contract, mockCampaign(OUTSIDE_SERPENT, 0), mockLocation()),
+              "A contract with no target yet cannot be measured against the exclusion radius");
+    }
+
+    @Test
+    void unknownStranaMechtyIsAllowed() {
+        Systems systems = mock(Systems.class);
+        when(systems.getSystemById(anyString())).thenReturn(null);
+        Systems.setInstance(systems);
+
+        AbstractContract contract = innerSphereInvasionOf(mockFaction(true, SMOKE_JAGUAR), INSIDE_RADIUS, null);
+
+        assertFalse(violatesHomeworldsExclusion(contract, mockCampaign(OUTSIDE_SERPENT, 0), mockLocation()),
+              "Without Strana Mechty in the loaded universe there is no center to measure the exclusion zone from");
     }
 
     @Test
     void travelTimeThatPushesArrivalIntoSerpentWindowIsAllowed() {
         PlanetarySystem stranaMechty = mockStranaMechty();
-        // The current date is before Operation Serpent starts, but travel time pushes the actual arrival date into
+        AbstractContract contract = innerSphereInvasionOf(mockFaction(true, SMOKE_JAGUAR),
+              INSIDE_RADIUS,
+              stranaMechty);
+        // The current date is before Task Force Serpent starts, but travel time pushes the actual arrival date into
         // the window - the rule is keyed on arrival date, not the date the contract was generated.
-        Campaign campaign = mockCampaign(IS_INVASION_OF_HUNTRESS_START.minusDays(10));
-        AbstractMissionTransition contract = mockContract(mockFaction(false), 200, stranaMechty, 15);
+        Campaign campaign = mockCampaign(IS_INVASION_OF_HUNTRESS_START.minusDays(10), 15);
 
-        assertFalse(violatesHomeworldsExclusion(contract, campaign),
+        assertFalse(violatesHomeworldsExclusion(contract, campaign, mockLocation()),
               "The restriction is keyed on the arrival date (current date plus travel time), not the date the "
                     + "contract was generated");
+    }
+
+    @Test
+    void travelTimeThatPushesArrivalPastSerpentWindowViolates() {
+        PlanetarySystem stranaMechty = mockStranaMechty();
+        AbstractContract contract = innerSphereInvasionOf(mockFaction(true, SMOKE_JAGUAR),
+              INSIDE_RADIUS,
+              stranaMechty);
+        // Departing inside the window is not enough: by the time the force arrives, Serpent is over.
+        Campaign campaign = mockCampaign(IS_INVASION_OF_HUNTRESS_END.minusDays(5), 30);
+
+        assertTrue(violatesHomeworldsExclusion(contract, campaign, mockLocation()),
+              "Departing during Task Force Serpent does not license an arrival after it has ended");
     }
 }

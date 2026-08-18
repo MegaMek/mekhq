@@ -63,8 +63,9 @@ public class ClanHomeworldsExclusion {
      * @param currentLocation the detachment's current location, used to compute the arrival date (current date plus
      *                        travel time)
      *
-     * @return {@code true} if the contract's attacking faction is non-Clan, its target is within the exclusion radius,
-     *       and the attacker would arrive there outside the Operation Bulldog window
+     * @return {@code true} if exactly one side is a non-Clan attacker, the target is within the exclusion radius, and
+     *       the force would arrive there outside the Task Force Serpent window - or inside that window but against an
+     *       enemy other than the Smoke Jaguars it was mounted against
      */
     public static boolean violatesHomeworldsExclusion(AbstractContract contract, Campaign campaign,
           CurrentLocation currentLocation) {
@@ -85,11 +86,9 @@ public class ClanHomeworldsExclusion {
 
         PlanetarySystem stranaMechty = Systems.getInstance().getSystemById(STRANA_MECHTY_SYSTEM_ID);
         PlanetarySystem targetSystem = contract.getTargetSystem();
-        if (stranaMechty == null || targetSystem == null ||
-                  (contract.getTargetSystem().getDistanceTo(stranaMechty) > HOMEWORLDS_EXCLUSION_RADIUS)) {
-            return false;
-        }
-        if (targetSystem.getDistanceTo(stranaMechty) > HOMEWORLDS_EXCLUSION_RADIUS) {
+        if (stranaMechty == null ||
+                  targetSystem == null ||
+                  (targetSystem.getDistanceTo(stranaMechty) > HOMEWORLDS_EXCLUSION_RADIUS)) {
             return false;
         }
 
@@ -101,14 +100,14 @@ public class ClanHomeworldsExclusion {
               playerForce.getFactionStandings());
 
         LocalDate arrivalDate = campaign.getLocalDate().plusDays(travelDays);
-        boolean isDuringTaskForceSergent = arrivalDate.isBefore(MHQConstants.IS_INVASION_OF_HUNTRESS_START) ||
-                                                 arrivalDate.isAfter(MHQConstants.IS_INVASION_OF_HUNTRESS_END);
-
+        boolean arrivesDuringTaskForceSerpent = !arrivalDate.isBefore(MHQConstants.IS_INVASION_OF_HUNTRESS_START) &&
+                                                      !arrivalDate.isAfter(MHQConstants.IS_INVASION_OF_HUNTRESS_END);
 
         String clanSmokeJaguarCode = "CSJ";
         boolean containsSmokeJaguar = allyFaction.getShortName().equals(clanSmokeJaguarCode) ||
                                             enemyFaction.getShortName().equals(clanSmokeJaguarCode);
 
-        return !isDuringTaskForceSergent || !containsSmokeJaguar;
+        // Task Force Serpent is the sole exception, and only against the Smoke Jaguars it was mounted to destroy.
+        return !arrivesDuringTaskForceSerpent || !containsSmokeJaguar;
     }
 }

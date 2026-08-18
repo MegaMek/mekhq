@@ -69,7 +69,6 @@ import mekhq.campaign.digitalGM.stratCon.facility.StratConFacility;
 import mekhq.campaign.digitalGM.stratCon.facility.StratConFacilityFactory;
 import mekhq.campaign.force.CombatTeam;
 import mekhq.campaign.force.Formation;
-import mekhq.campaign.mission.AtBContract;
 import mekhq.campaign.mission.AtBDynamicScenario;
 import mekhq.campaign.mission.AtBDynamicScenarioFactory;
 import mekhq.campaign.mission.ScenarioForceTemplate;
@@ -77,6 +76,7 @@ import mekhq.campaign.mission.ScenarioMapParameters.MapLocation;
 import mekhq.campaign.mission.ScenarioTemplate;
 import mekhq.campaign.mission.enums.CombatRole;
 import mekhq.campaign.mission.enums.ScenarioType;
+import mekhq.campaign.mission.newContract.AbstractContract;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.PersonnelOptions;
 import mekhq.campaign.personnel.skills.ScoutingSkills;
@@ -103,11 +103,11 @@ import testUtilities.MHQTestUtilities;
  */
 class StratConRulesManagerTest {
 
-    private static void initializeObjectiveScenarios(Campaign campaign, AtBContract contract,
+    private static void initializeObjectiveScenarios(Campaign campaign, AbstractContract contract,
           StratConTrackState track, List<String> objectiveScenarios) throws Exception {
         Method method = StratConContractInitializer.class.getDeclaredMethod("initializeObjectiveScenarios",
               Campaign.class,
-              AtBContract.class,
+              AbstractContract.class,
               StratConTrackState.class,
               int.class,
               List.class,
@@ -154,7 +154,7 @@ class StratConRulesManagerTest {
     @Test
     void initializeObjectiveScenarios_skipsMissingTemplateWithoutAddingObjective() throws Exception {
         Campaign campaign = MHQTestUtilities.mockCampaign();
-        AtBContract contract = mock(AtBContract.class);
+        AbstractContract contract = mock(AbstractContract.class);
         StratConTrackState track = new StratConTrackState();
         track.setWidth(1);
         track.setHeight(1);
@@ -168,7 +168,7 @@ class StratConRulesManagerTest {
     @Test
     void initializeObjectiveScenarios_doesNotAddObjectiveWhenScenarioGenerationFails() throws Exception {
         Campaign campaign = MHQTestUtilities.mockCampaign();
-        AtBContract contract = mock(AtBContract.class);
+        AbstractContract contract = mock(AbstractContract.class);
         StratConTrackState track = new StratConTrackState();
         track.setWidth(1);
         track.setHeight(1);
@@ -185,7 +185,7 @@ class StratConRulesManagerTest {
             when(template.isHostileFacility()).thenReturn(true);
             facilityFactory.when(StratConFacilityFactory::getRandomHostileFacility).thenReturn(facility);
             rulesManager.when(() -> StratConRulesManager.generateScenario(any(Campaign.class),
-                        any(AtBContract.class),
+                        any(AbstractContract.class),
                         any(StratConTrackState.class),
                         any(),
                         any(StratConCoords.class),
@@ -231,7 +231,7 @@ class StratConRulesManagerTest {
     @Test
     void setupScenario_existingFacilitySkipsGenerationWhenFacilityTemplateMissing() {
         Campaign campaign = MHQTestUtilities.mockCampaign();
-        AtBContract contract = mock(AtBContract.class);
+        AbstractContract contract = mock(AbstractContract.class);
         StratConTrackState track = new StratConTrackState();
         StratConCoords coords = new StratConCoords(2, 6);
 
@@ -255,7 +255,7 @@ class StratConRulesManagerTest {
 
             assertNull(scenario);
             rulesManager.verify(() -> StratConRulesManager.generateScenario(any(Campaign.class),
-                  any(AtBContract.class),
+                  any(AbstractContract.class),
                   any(StratConTrackState.class),
                   any(),
                   any(StratConCoords.class),
@@ -313,7 +313,7 @@ class StratConRulesManagerTest {
         CampaignOptions options = mock(CampaignOptions.class);
         when(campaign.getCampaignOptions()).thenReturn(options);
 
-        AtBContract contract = mock(AtBContract.class);
+        AbstractContract contract = mock(AbstractContract.class);
         StratConTrackState track = mock(StratConTrackState.class);
         StratConCoords coords = new StratConCoords(2, 3);
         int forceID = 1;
@@ -360,7 +360,7 @@ class StratConRulesManagerTest {
         CampaignOptions options = mock(CampaignOptions.class);
         when(campaign.getCampaignOptions()).thenReturn(options);
 
-        AtBContract contract = mock(AtBContract.class);
+        AbstractContract contract = mock(AbstractContract.class);
         StratConTrackState track = mock(StratConTrackState.class);
         StratConCoords coords = new StratConCoords(2, 3);
         int forceID = 1;
@@ -398,7 +398,7 @@ class StratConRulesManagerTest {
     /**
      * Bundles the mocks a {@link StratConRulesManager#deployForceToCoords} ambush test needs.
      */
-    private record AmbushFixture(Campaign campaign, AtBContract contract, StratConTrackState track,
+    private record AmbushFixture(Campaign campaign, AbstractContract contract, StratConTrackState track,
           StratConCoords coords, int forceID) {}
 
     /**
@@ -412,7 +412,7 @@ class StratConRulesManagerTest {
         CampaignOptions options = mock(CampaignOptions.class);
         when(campaign.getCampaignOptions()).thenReturn(options);
 
-        AtBContract contract = mock(AtBContract.class);
+        AbstractContract contract = mock(AbstractContract.class);
         StratConTrackState track = mock(StratConTrackState.class);
         StratConCoords coords = new StratConCoords(2, 3);
         int forceID = 1;
@@ -548,7 +548,7 @@ class StratConRulesManagerTest {
     /**
      * Bundles the mocks a {@link StratConRulesManager#generateDailyScenariosForTrack} ambush test needs.
      */
-    private record DailyAmbushFixture(Campaign campaign, StratConCampaignState campaignState, AtBContract contract,
+    private record DailyAmbushFixture(Campaign campaign, StratConCampaignState campaignState, AbstractContract contract,
           StratConTrackState track, StratConCoords coords, Set<Integer> assignedForceIDs, int forceID) {}
 
     /**
@@ -565,7 +565,7 @@ class StratConRulesManagerTest {
         when(campaign.getCampaignOptions()).thenReturn(options);
         when(campaign.getLocalDate()).thenReturn(LocalDate.of(3025, 1, 15));
 
-        AtBContract contract = mock(AtBContract.class);
+        AbstractContract contract = mock(AbstractContract.class);
         when(contract.getEndingDate()).thenReturn(LocalDate.of(3025, 2, 1));
 
         StratConCampaignState campaignState = mock(StratConCampaignState.class);
@@ -716,7 +716,7 @@ class StratConRulesManagerTest {
         CampaignOptions options = mock(CampaignOptions.class);
         when(campaign.getCampaignOptions()).thenReturn(options);
 
-        AtBContract contract = mock(AtBContract.class);
+        AbstractContract contract = mock(AbstractContract.class);
         StratConTrackState track = mock(StratConTrackState.class);
         StratConCoords coords = new StratConCoords(2, 3);
         int forceID = 1;
@@ -766,7 +766,7 @@ class StratConRulesManagerTest {
         when(campaign.getCampaignOptions()).thenReturn(options);
         when(options.isUseStratConMaplessMode()).thenReturn(false);
 
-        AtBContract contract = mock(AtBContract.class);
+        AbstractContract contract = mock(AbstractContract.class);
         StratConTrackState track = mock(StratConTrackState.class);
         StratConCoords coords = new StratConCoords(2, 3);
 
@@ -808,7 +808,7 @@ class StratConRulesManagerTest {
         when(campaign.getCampaignOptions()).thenReturn(options);
         when(options.isUseStratConMaplessMode()).thenReturn(false);
 
-        AtBContract contract = mock(AtBContract.class);
+        AbstractContract contract = mock(AbstractContract.class);
         StratConTrackState track = mock(StratConTrackState.class);
         StratConCoords coords = new StratConCoords(2, 3);
 

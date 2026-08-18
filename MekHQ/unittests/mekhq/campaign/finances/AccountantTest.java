@@ -64,8 +64,8 @@ import mekhq.campaign.LocalHangar;
 import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.force.Formation;
 import mekhq.campaign.force.FormationType;
-import mekhq.campaign.mission.AtBContract;
 import mekhq.campaign.mission.enums.CombatRole;
+import mekhq.campaign.mission.newContract.AbstractContract;
 import mekhq.campaign.parts.Part;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.enums.PersonnelRole;
@@ -848,9 +848,9 @@ public class AccountantTest {
 
         // A contract active in the current system takes precedence over local factions when
         // determining whose regard sets the barrack cost multiplier.
-        AtBContract contract = mock(AtBContract.class);
-        when(contract.getSystem()).thenReturn(mockSystem);
-        when(contract.getEmployerCode()).thenReturn("EMPLOYER");
+        AbstractContract contract = mock(AbstractContract.class);
+        when(contract.getTargetSystem()).thenReturn(mockSystem);
+        when(contract.getEmployerFactionCode()).thenReturn("EMPLOYER");
         when(mockCampaign.getActiveContracts()).thenReturn(List.of(contract));
 
         FactionStandings factionStandings = mock(FactionStandings.class);

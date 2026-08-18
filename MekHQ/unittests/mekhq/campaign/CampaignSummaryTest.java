@@ -67,7 +67,7 @@ class CampaignSummaryTest {
         when(campaign.getPlayerForce().getHumanResources().getActivePersonnel(false, false)).thenReturn(List.of());
         when(campaign.getPlayerForce().getHangar()).thenReturn(hangar);
         when(hangar.getUnits()).thenReturn(List.of());
-        when(campaign.getMissions()).thenReturn(List.of());
+        when(campaign.getActiveContracts()).thenReturn(List.of());
         when(campaign.getCargoStatistics()).thenReturn(cargoStatistics);
 
         return campaign;

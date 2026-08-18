@@ -67,7 +67,8 @@ import mekhq.campaign.LocalHangar;
 import mekhq.campaign.LocalWarehouse;
 import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.digitalGM.stratCon.StratConCampaignState;
-import mekhq.campaign.mission.AtBContract;
+import mekhq.campaign.mission.newContract.AbstractContract;
+import mekhq.campaign.mission.newContract.ChaosContract;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.skills.SkillType;
 import mekhq.campaign.randomEvents.prisoners.PrisonerStatus;
@@ -595,7 +596,7 @@ class RandomEventEffectsManagerTest {
     void testEffectSupportPoint_stratConEnabled_pointsIncreased() {
         when(mockCampaignOptions.isUseStratCon()).thenReturn(true);
 
-        AtBContract contract = new AtBContract("Test");
+        AbstractContract contract = new ChaosContract();
         StratConCampaignState state = new StratConCampaignState(contract);
         contract.setStratConCampaignState(state);
         when(mockCampaign.getActiveContracts()).thenReturn(List.of(contract));
@@ -626,8 +627,8 @@ class RandomEventEffectsManagerTest {
 
     @Test
     void testEffectUniqueBartering_stalemateMorale_moraleBumped() {
-        AtBContract contract = new AtBContract("Test");
-        contract.setMoraleLevel(STALEMATE);
+        AbstractContract contract = new ChaosContract();
+        contract.changeMorale(STALEMATE);
         when(mockCampaign.getActiveContracts()).thenReturn(List.of(contract));
 
         runEffectForType("BARTERING", List.of(PRISONERS), 1);
@@ -638,8 +639,8 @@ class RandomEventEffectsManagerTest {
 
     @Test
     void testEffectUniqueBartering_overwhelmingMorale_noChange() {
-        AtBContract contract = new AtBContract("Test");
-        contract.setMoraleLevel(OVERWHELMING);
+        AbstractContract contract = new ChaosContract();
+        contract.changeMorale(OVERWHELMING);
         when(mockCampaign.getActiveContracts()).thenReturn(List.of(contract));
 
         RandomEventEffectsManager manager = runEffectForType("BARTERING", List.of(PRISONERS), 1);
@@ -697,7 +698,7 @@ class RandomEventEffectsManagerTest {
 
     @Test
     void testEffectUniqueUndercover_prisonerFactionChanged() {
-        AtBContract contract = mock(AtBContract.class);
+        AbstractContract contract = mock(AbstractContract.class);
         Faction employerFaction = new Faction("employerFaction", "employerFaction");
         when(contract.getEmployerFaction()).thenReturn(employerFaction);
         when(mockCampaign.getActiveContracts()).thenReturn(List.of(contract));

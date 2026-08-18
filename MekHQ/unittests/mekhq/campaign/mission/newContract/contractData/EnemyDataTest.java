@@ -39,6 +39,7 @@ import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import megamek.common.enums.SkillLevel;
+import megamek.common.icons.Camouflage;
 import mekhq.campaign.enums.DragoonRating;
 import org.junit.jupiter.api.Test;
 
@@ -49,8 +50,10 @@ import org.junit.jupiter.api.Test;
  */
 class EnemyDataTest {
 
+    private static final Camouflage CAMOUFLAGE = new Camouflage(Camouflage.COLOUR_CAMOUFLAGE, "Red");
+
     private static EnemyData sampleEnemy(String sponsorFactionCode) {
-        return new EnemyData("DC", sponsorFactionCode, "Draconis Combine", null);
+        return new EnemyData("DC", sponsorFactionCode, "Draconis Combine", null, CAMOUFLAGE);
     }
 
     @Test
@@ -62,6 +65,8 @@ class EnemyDataTest {
         assertEquals("Draconis Combine", enemy.displayName());
         assertEquals(SkillLevel.REGULAR, enemy.forceSkill(), "default force skill");
         assertEquals(DragoonRating.DRAGOON_C.getRating(), enemy.equipmentRating(), "default equipment rating");
+        assertNull(enemy.opposingCommander(), "no opposing commander was supplied");
+        assertEquals(CAMOUFLAGE, enemy.camouflage(), "camouflage is passed straight through");
         assertEquals(RED, enemy.color(), "enemy forces default to the opposing colour");
         assertTrue(enemy.batchallAccepted(), "batchall is accepted by default");
     }
@@ -84,6 +89,7 @@ class EnemyDataTest {
         assertEquals(original.factionCode(), updated.factionCode());
         assertEquals(original.sponsorFactionCode(), updated.sponsorFactionCode());
         assertEquals(original.displayName(), updated.displayName());
+        assertEquals(original.opposingCommander(), updated.opposingCommander());
         assertEquals(original.camouflage(), updated.camouflage());
         assertEquals(original.color(), updated.color());
         assertEquals(original.batchallAccepted(), updated.batchallAccepted());
@@ -102,6 +108,7 @@ class EnemyDataTest {
         assertEquals(original.displayName(), updated.displayName());
         assertEquals(original.forceSkill(), updated.forceSkill());
         assertEquals(original.equipmentRating(), updated.equipmentRating());
+        assertEquals(original.opposingCommander(), updated.opposingCommander());
         assertEquals(original.camouflage(), updated.camouflage());
         assertEquals(original.color(), updated.color());
     }

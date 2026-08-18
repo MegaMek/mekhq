@@ -50,7 +50,7 @@ import mekhq.campaign.digitalGM.stratCon.StratConCoords;
 import mekhq.campaign.digitalGM.stratCon.StratConScenario;
 import mekhq.campaign.digitalGM.stratCon.StratConScenario.ScenarioState;
 import mekhq.campaign.digitalGM.stratCon.StratConTrackState;
-import mekhq.campaign.mission.AtBContract;
+import mekhq.campaign.mission.newContract.AbstractContract;
 import mekhq.gui.dialog.nagDialogs.UnresolvedStratConContactsNagDialog;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -60,7 +60,7 @@ import org.junit.jupiter.api.Test;
  * scenarios related to the {@code nagUnresolvedContacts} method
  */
 public class UnresolvedStratConContactsNagLogicTest {
-    private AtBContract contract;
+    private AbstractContract contract;
     private LocalDate today;
     private StratConScenario stratConScenario1, stratConScenario2;
 
@@ -73,7 +73,7 @@ public class UnresolvedStratConContactsNagLogicTest {
         Campaign campaign = mockCampaign();
         CampaignOptions campaignOptions = mock(CampaignOptions.class);
         today = LocalDate.of(3025, 1, 1);
-        contract = mock(AtBContract.class);
+        contract = mock(AbstractContract.class);
         StratConCampaignState stratconCampaignState = mock(StratConCampaignState.class);
         StratConTrackState track = mock(StratConTrackState.class);
 

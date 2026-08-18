@@ -63,8 +63,9 @@ import mekhq.campaign.campaignOptions.CampaignOption;
 import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.force.Formation;
 import mekhq.campaign.force.PlayerForce;
-import mekhq.campaign.mission.AtBContract;
 import mekhq.campaign.mission.enums.ContractMoraleLevel;
+import mekhq.campaign.mission.newContract.AbstractContract;
+import mekhq.campaign.mission.newContract.ChaosContract;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.unit.Unit;
 import mekhq.campaign.universe.Faction;
@@ -218,8 +219,8 @@ public class PrisonerEventManagerTest {
         LocalDate today = LocalDate.of(3151, 1, 3);
         when(mockCampaign.getLocalDate()).thenReturn(today);
 
-        AtBContract contract = new AtBContract("TEST");
-        contract.setMoraleLevel(STALEMATE);
+        AbstractContract contract = new ChaosContract();
+        contract.changeMorale(STALEMATE);
         when(mockCampaign.hasActiveContract()).thenReturn(true);
         when(mockCampaign.getActiveContracts()).thenReturn(List.of(contract));
 
@@ -1106,9 +1107,9 @@ public class PrisonerEventManagerTest {
             return mockCampaign;
         }
 
-        private AtBContract contractWithMorale(ContractMoraleLevel morale) {
-            AtBContract contract = new AtBContract("TEST");
-            contract.setMoraleLevel(morale);
+        private AbstractContract contractWithMorale(ContractMoraleLevel morale) {
+            AbstractContract contract = new ChaosContract();
+            contract.changeMorale(morale);
             return contract;
         }
 
@@ -1124,7 +1125,7 @@ public class PrisonerEventManagerTest {
         @Test
         void allContractsOverwhelmingOrRouted_filteredOut_noBreach() {
             Campaign campaign = campaignWithCaptureStyle(PrisonerCaptureStyle.MEKHQ);
-            AtBContract contract = contractWithMorale(ContractMoraleLevel.OVERWHELMING);
+            AbstractContract contract = contractWithMorale(ContractMoraleLevel.OVERWHELMING);
             when(campaign.getActiveContracts()).thenReturn(new ArrayList<>(List.of(contract)));
 
             PrisonerEventManager.checkForIntelBreachEvent(campaign, 5);
@@ -1136,7 +1137,7 @@ public class PrisonerEventManagerTest {
         @Test
         void zeroFreedPrisoners_noBreach() {
             Campaign campaign = campaignWithCaptureStyle(PrisonerCaptureStyle.MEKHQ);
-            AtBContract contract = contractWithMorale(STALEMATE);
+            AbstractContract contract = contractWithMorale(STALEMATE);
             when(campaign.getActiveContracts()).thenReturn(new ArrayList<>(List.of(contract)));
 
             PrisonerEventManager.checkForIntelBreachEvent(campaign, 0);
@@ -1147,7 +1148,7 @@ public class PrisonerEventManagerTest {
         @Test
         void breachRollAtOrAboveFreedCount_noBreach() {
             Campaign campaign = campaignWithCaptureStyle(PrisonerCaptureStyle.MEKHQ);
-            AtBContract contract = contractWithMorale(STALEMATE);
+            AbstractContract contract = contractWithMorale(STALEMATE);
             when(campaign.getActiveContracts()).thenReturn(new ArrayList<>(List.of(contract)));
 
             try (MockedStatic<Compute> compute = mockStatic(Compute.class)) {

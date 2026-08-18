@@ -30,7 +30,7 @@
  * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
  * affiliated with Microsoft.
  */
-package mekhq.campaign.market.contractMarket;
+package mekhq.campaign.finances;
 
 import static megamek.common.units.EntityWeightClass.WEIGHT_ASSAULT;
 import static megamek.common.units.EntityWeightClass.WEIGHT_HEAVY;
@@ -59,8 +59,6 @@ import megamek.common.units.Entity;
 import megamek.common.units.EntityMovementMode;
 import megamek.common.units.Infantry;
 import megamek.common.units.LandAirMek;
-import mekhq.campaign.finances.AlternatePaymentModelValues;
-import mekhq.campaign.finances.Money;
 import mekhq.campaign.force.CombatTeam;
 import mekhq.campaign.force.Formation;
 import mekhq.campaign.unit.Unit;

@@ -41,6 +41,7 @@ import static mekhq.campaign.personnel.ranks.Rank.RO_MIN;
 
 import java.util.List;
 
+import jakarta.annotation.Nullable;
 import megamek.common.enums.Gender;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.mission.newContract.contractGeneration.ContractSearchType;
@@ -62,8 +63,8 @@ public class EmployerLiaison {
 
     private EmployerLiaison() {}
 
-    public static Person generateLiaison(Campaign campaign, ContractSearchType searchType, boolean employerIsClan,
-          String employerCode) {
+    public static @Nullable Person generateLiaison(Campaign campaign, ContractSearchType searchType,
+          boolean employerIsClan, String employerCode) {
         PersonnelRole role = getLiaisonRole(searchType, employerIsClan);
 
         Person negotiator = campaign.getPlayerForce()
@@ -85,7 +86,13 @@ public class EmployerLiaison {
         };
     }
 
-    private static void assignRank(Person negotiator) {
+    private static void assignRank(@Nullable Person negotiator) {
+        // Personnel generation can fail on an unrecognized faction code, the same way it can for the opposing
+        // commander; there is simply no one to rank in that case.
+        if (negotiator == null) {
+            return;
+        }
+
         final PersonnelRole primaryRole = negotiator.getPrimaryRole();
         if (UNRANKED_ROLES.contains(primaryRole)) {
             return;

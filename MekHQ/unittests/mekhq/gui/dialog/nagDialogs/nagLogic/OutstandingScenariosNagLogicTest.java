@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2024-2025 The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2024-2026 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -46,8 +46,8 @@ import java.util.ResourceBundle;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.campaignOptions.CampaignOptions;
-import mekhq.campaign.mission.AtBContract;
 import mekhq.campaign.mission.AtBScenario;
+import mekhq.campaign.mission.newContract.AbstractContract;
 import mekhq.gui.dialog.nagDialogs.OutstandingScenariosNagDialog;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -72,7 +72,7 @@ class OutstandingScenariosNagLogicTest {
     void init() {
         campaign = mockCampaign();
         CampaignOptions campaignOptions = mock(CampaignOptions.class);
-        AtBContract contract = mock(AtBContract.class);
+        AbstractContract contract = mock(AbstractContract.class);
         scenario1 = mock(AtBScenario.class);
         scenario2 = mock(AtBScenario.class);
         today = LocalDate.of(3025, 1, 1);

@@ -62,7 +62,9 @@ import mekhq.campaign.campaignOptions.CampaignOption;
 import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.finances.Money;
 import mekhq.campaign.finances.enums.TransactionType;
-import mekhq.campaign.mission.AtBContract;
+import mekhq.campaign.mission.newContract.AbstractContract;
+import mekhq.campaign.mission.newContract.ChaosContract;
+import mekhq.campaign.mission.newContract.contractData.ContractScheduleData;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.skills.SkillType;
 import mekhq.campaign.universe.Faction;
@@ -78,6 +80,19 @@ import org.mockito.MockedStatic;
  * used to isolate dependencies and ensure the test logic is independent of external factors.</p>
  */
 class PrisonerMissionEndEventTest {
+    /**
+     * A minimal contract carrying nothing but a schedule. {@link PrisonerMissionEndEvent} only reads the contract's
+     * start date, so a bare {@link ChaosContract} with a schedule is enough - but the schedule itself must be present,
+     * since an unset one is not something a loaded or generated contract ever has.
+     *
+     * @param startDate the day the contract began, or {@code null} for a contract with no settled start
+     */
+    private static AbstractContract contractStartingOn(LocalDate startDate) {
+        AbstractContract contract = new ChaosContract();
+        contract.setScheduleData(new ContractScheduleData(startDate, null, 0));
+        return contract;
+    }
+
     @Test
     void testDetermineGoodEventChance_NoCrime() {
         // Setup
@@ -90,8 +105,7 @@ class PrisonerMissionEndEventTest {
         LocalDate today = LocalDate.of(3151, 1, 1);
         when(mockCampaign.getPlayerForce().getCampOpsDateOfLastCrime()).thenReturn(null);
 
-        AtBContract contract = new AtBContract("TEST");
-        contract.setStartDate(today.minusYears(1));
+        AbstractContract contract = contractStartingOn(today.minusYears(1));
 
         // Act
         PrisonerMissionEndEvent endEvent = new PrisonerMissionEndEvent(mockCampaign, contract);
@@ -117,8 +131,7 @@ class PrisonerMissionEndEventTest {
         LocalDate today = LocalDate.of(3151, 1, 1);
         when(mockCampaign.getPlayerForce().getCampOpsDateOfLastCrime()).thenReturn(today);
 
-        AtBContract contract = new AtBContract("TEST");
-        contract.setStartDate(today.minusYears(1));
+        AbstractContract contract = contractStartingOn(today.minusYears(1));
 
         // Act
         PrisonerMissionEndEvent endEvent = new PrisonerMissionEndEvent(mockCampaign, contract);
@@ -145,8 +158,7 @@ class PrisonerMissionEndEventTest {
         LocalDate today = LocalDate.of(3151, 1, 1);
         when(mockCampaign.getPlayerForce().getCampOpsDateOfLastCrime()).thenReturn(today);
 
-        AtBContract contract = new AtBContract("TEST");
-        contract.setStartDate(today.minusYears(1));
+        AbstractContract contract = contractStartingOn(today.minusYears(1));
 
         // Act
         PrisonerMissionEndEvent endEvent = new PrisonerMissionEndEvent(mockCampaign, contract);
@@ -172,7 +184,7 @@ class PrisonerMissionEndEventTest {
         when(mockCampaignOptions.isAlternativeQualityAveraging()).thenReturn(false);
         when(mockCampaign.getCampaignOptions()).thenReturn(mockCampaignOptions);
 
-        AtBContract contract = new AtBContract("TEST");
+        AbstractContract contract = contractStartingOn(null);
 
         SkillType.initializeTypes();
 
@@ -205,7 +217,7 @@ class PrisonerMissionEndEventTest {
         when(mockCampaignOptions.isAlternativeQualityAveraging()).thenReturn(false);
         when(mockCampaign.getCampaignOptions()).thenReturn(mockCampaignOptions);
 
-        AtBContract contract = new AtBContract("TEST");
+        AbstractContract contract = contractStartingOn(null);
 
         SkillType.initializeTypes();
 
@@ -232,7 +244,7 @@ class PrisonerMissionEndEventTest {
         // Setup
         Campaign mockCampaign = mockCampaign();
         LocalDate today = LocalDate.of(3151, 1, 1);
-        AtBContract contract = new AtBContract("TEST");
+        AbstractContract contract = contractStartingOn(null);
         PrisonerMissionEndEvent endEvent = new PrisonerMissionEndEvent(mockCampaign, contract);
         Money ransom = Money.of(1000);
 
@@ -251,7 +263,7 @@ class PrisonerMissionEndEventTest {
         // Setup
         Campaign mockCampaign = mockCampaign();
         LocalDate today = LocalDate.of(3151, 1, 1);
-        AtBContract contract = new AtBContract("TEST");
+        AbstractContract contract = contractStartingOn(null);
         PrisonerMissionEndEvent endEvent = new PrisonerMissionEndEvent(mockCampaign, contract);
         Money ransom = Money.of(1000);
 
@@ -269,7 +281,7 @@ class PrisonerMissionEndEventTest {
     void testRemoveAllPrisoners_removesEachPrisoner() {
         // Setup
         Campaign mockCampaign = mockCampaign();
-        AtBContract contract = new AtBContract("TEST");
+        AbstractContract contract = contractStartingOn(null);
         PrisonerMissionEndEvent endEvent = new PrisonerMissionEndEvent(mockCampaign, contract);
         Person first = mock(Person.class);
         Person second = mock(Person.class);
@@ -291,7 +303,7 @@ class PrisonerMissionEndEventTest {
         when(mockCampaign.getCampaignOptions()).thenReturn(campaignOptions);
         LocalDate today = LocalDate.of(3151, 1, 1);
         when(mockCampaign.getLocalDate()).thenReturn(today);
-        AtBContract contract = new AtBContract("TEST");
+        AbstractContract contract = contractStartingOn(null);
         PrisonerMissionEndEvent endEvent = new PrisonerMissionEndEvent(mockCampaign, contract);
         List<Person> prisoners = List.of(mock(Person.class), mock(Person.class), mock(Person.class));
 
@@ -315,7 +327,7 @@ class PrisonerMissionEndEventTest {
         campaignOptions.set(CampaignOption.USE_CHAOS_REPUTATION, false);
         when(mockCampaign.getCampaignOptions()).thenReturn(campaignOptions);
         when(mockCampaign.getLocalDate()).thenReturn(LocalDate.of(3151, 1, 1));
-        AtBContract contract = new AtBContract("TEST");
+        AbstractContract contract = contractStartingOn(null);
         PrisonerMissionEndEvent endEvent = new PrisonerMissionEndEvent(mockCampaign, contract);
         List<Person> prisoners = new ArrayList<>();
         for (int i = 0; i < 100; i++) { // 100 * 2 = 200, which exceeds MAX_CRIME_PENALTY
@@ -341,7 +353,7 @@ class PrisonerMissionEndEventTest {
         campaignOptions.set(CampaignOption.USE_CHAOS_REPUTATION, false);
         when(mockCampaign.getCampaignOptions()).thenReturn(campaignOptions);
         when(mockCampaign.getLocalDate()).thenReturn(LocalDate.of(3151, 1, 1));
-        AtBContract contract = new AtBContract("TEST");
+        AbstractContract contract = contractStartingOn(null);
         PrisonerMissionEndEvent endEvent = new PrisonerMissionEndEvent(mockCampaign, contract);
         List<Person> prisoners = List.of(mock(Person.class), mock(Person.class), mock(Person.class));
 

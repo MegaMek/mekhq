@@ -30,7 +30,7 @@
  * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
  * affiliated with Microsoft.
  */
-package mekhq.campaign.mission;
+package mekhq.campaign.mission.newContract.utilities;
 
 import static mekhq.campaign.mission.enums.ContractMoraleLevel.ADVANCING;
 import static mekhq.campaign.mission.enums.ContractMoraleLevel.CRITICAL;
@@ -39,11 +39,6 @@ import static mekhq.campaign.mission.enums.ContractMoraleLevel.OVERWHELMING;
 import static mekhq.campaign.mission.enums.ContractMoraleLevel.ROUTED;
 import static mekhq.campaign.mission.enums.ContractMoraleLevel.STALEMATE;
 import static mekhq.campaign.mission.enums.ContractMoraleLevel.WEAKENED;
-import static mekhq.campaign.mission.newContract.utilities.MHQMorale.NO_CHANGE_TARGET_NUMBER;
-import static mekhq.campaign.mission.newContract.utilities.MHQMorale.RALLYING_TARGET_NUMBER;
-import static mekhq.campaign.mission.newContract.utilities.MHQMorale.WAVERING_TARGET_NUMBER;
-import static mekhq.campaign.mission.newContract.utilities.MHQMorale.getMoraleOutcome;
-import static mekhq.campaign.mission.newContract.utilities.MHQMorale.getReliabilityModifier;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
@@ -57,9 +52,10 @@ import java.util.List;
 import java.util.stream.Stream;
 
 import megamek.common.enums.SkillLevel;
+import mekhq.campaign.mission.Scenario;
 import mekhq.campaign.mission.enums.ContractMoraleLevel;
 import mekhq.campaign.mission.enums.ScenarioStatus;
-import mekhq.campaign.mission.newContract.utilities.MHQMorale;
+import mekhq.campaign.mission.newContract.AbstractContract;
 import mekhq.campaign.universe.Faction;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -84,7 +80,7 @@ class MHQMoraleTest {
         when(mockFaction.isPirate()).thenReturn(false);
 
         int actualReliability = MHQMorale.getReliability(adjustedSkillLevel, mockFaction);
-        int expectedReliability = getReliabilityModifier(adjustedSkillLevel);
+        int expectedReliability = MHQMorale.getReliabilityModifier(adjustedSkillLevel);
 
         assertEquals(expectedReliability, actualReliability,
               String.format("Expected %d but got %d",
@@ -105,7 +101,7 @@ class MHQMoraleTest {
         int actualReliability = MHQMorale.getReliability(adjustedSkillLevel, mockFaction);
 
         int adjustedQuality = Math.min(SkillLevel.LEGENDARY.getAdjustedValue(), adjustedSkillLevel + 1);
-        int expectedReliability = getReliabilityModifier(adjustedQuality);
+        int expectedReliability = MHQMorale.getReliabilityModifier(adjustedQuality);
         expectedReliability--;
 
         assertEquals(expectedReliability, actualReliability,
@@ -126,7 +122,7 @@ class MHQMoraleTest {
 
         int actualReliability = MHQMorale.getReliability(adjustedSkillLevel, mockFaction);
 
-        int expectedReliability = getReliabilityModifier(adjustedSkillLevel);
+        int expectedReliability = MHQMorale.getReliabilityModifier(adjustedSkillLevel);
         expectedReliability++;
 
         assertEquals(expectedReliability, actualReliability,
@@ -147,7 +143,7 @@ class MHQMoraleTest {
 
         int actualReliability = MHQMorale.getReliability(adjustedSkillLevel, mockFaction);
 
-        int expectedReliability = getReliabilityModifier(adjustedSkillLevel);
+        int expectedReliability = MHQMorale.getReliabilityModifier(adjustedSkillLevel);
         expectedReliability++;
 
         assertEquals(expectedReliability, actualReliability,
@@ -168,7 +164,7 @@ class MHQMoraleTest {
 
         int actualReliability = MHQMorale.getReliability(adjustedSkillLevel, mockFaction);
 
-        int expectedReliability = getReliabilityModifier(adjustedSkillLevel);
+        int expectedReliability = MHQMorale.getReliabilityModifier(adjustedSkillLevel);
         expectedReliability++;
 
         assertEquals(expectedReliability, actualReliability,
@@ -189,7 +185,7 @@ class MHQMoraleTest {
 
         int actualReliability = MHQMorale.getReliability(adjustedSkillLevel, mockFaction);
 
-        int expectedReliability = getReliabilityModifier(adjustedSkillLevel);
+        int expectedReliability = MHQMorale.getReliabilityModifier(adjustedSkillLevel);
         expectedReliability++;
 
         assertEquals(expectedReliability, actualReliability,
@@ -215,7 +211,7 @@ class MHQMoraleTest {
     @MethodSource("performanceModifierTestCases")
     void testPerformanceModifier(int expectedModifier, int daysToSubtract, int decisiveVictories, int victories,
           int pyrrhicVictories, int decisiveDefeats, int defeats, int fleetInBeing, int refusedEngagements) {
-        AtBContract mockContract = mock(AtBContract.class);
+        AbstractContract mockContract = mock(AbstractContract.class);
         List<Scenario> scenarioList = buildScenarioArray(daysToSubtract, decisiveVictories, victories,
               pyrrhicVictories, decisiveDefeats, defeats, fleetInBeing, refusedEngagements);
         when(mockContract.getScenarios()).thenReturn(scenarioList);
@@ -244,7 +240,7 @@ class MHQMoraleTest {
 
     @Test
     void testPerformanceModifier_decisiveVictoryAllDefeatsExpired() {
-        AtBContract mockContract = mock(AtBContract.class);
+        AbstractContract mockContract = mock(AbstractContract.class);
         List<Scenario> scenarioList = buildScenarioArray(7, 0, 1, 0, 0, 0, 0, 0);
         scenarioList.addAll(buildScenarioArray(357, 0, 1, 0, 0, 2, 0, 0));
         when(mockContract.getScenarios()).thenReturn(scenarioList);
@@ -260,7 +256,7 @@ class MHQMoraleTest {
 
     @Test
     void testPerformanceModifier_scenariosWithNullDateAreIgnored() {
-        AtBContract mockContract = mock(AtBContract.class);
+        AbstractContract mockContract = mock(AbstractContract.class);
         List<Scenario> scenarioList = new ArrayList<>();
 
         // Scenario with null date – should be ignored
@@ -345,17 +341,17 @@ class MHQMoraleTest {
     @ParameterizedTest
     @MethodSource("moraleRallyingCases")
     void testGetMoraleOutcome_rallying(ContractMoraleLevel startLevel, ContractMoraleLevel expectedLevel) {
-        AtBContract mockContract = mock(AtBContract.class);
+        AbstractContract mockContract = mock(AbstractContract.class);
         when(mockContract.getMoraleLevel()).thenReturn(startLevel);
 
-        MHQMorale.MoraleOutcome outcome = getMoraleOutcome(mockContract, RALLYING_TARGET_NUMBER);
+        MHQMorale.MoraleOutcome outcome = MHQMorale.getMoraleOutcome(mockContract, MHQMorale.RALLYING_TARGET_NUMBER);
 
         assertEquals(MHQMorale.MoraleOutcome.RALLYING, outcome);
 
         if (expectedLevel != startLevel) {
-            verify(mockContract).setMoraleLevel(expectedLevel);
+            verify(mockContract).changeMorale(expectedLevel);
         } else {
-            verify(mockContract, never()).setMoraleLevel(any());
+            verify(mockContract, never()).changeMorale(any(ContractMoraleLevel.class));
         }
     }
 
@@ -374,17 +370,17 @@ class MHQMoraleTest {
     @ParameterizedTest
     @MethodSource("moraleWaveringCases")
     void testGetMoraleOutcome_wavering(ContractMoraleLevel startLevel, ContractMoraleLevel expectedLevel) {
-        AtBContract mockContract = mock(AtBContract.class);
+        AbstractContract mockContract = mock(AbstractContract.class);
         when(mockContract.getMoraleLevel()).thenReturn(startLevel);
 
-        MHQMorale.MoraleOutcome outcome = getMoraleOutcome(mockContract, WAVERING_TARGET_NUMBER);
+        MHQMorale.MoraleOutcome outcome = MHQMorale.getMoraleOutcome(mockContract, MHQMorale.WAVERING_TARGET_NUMBER);
 
         assertEquals(MHQMorale.MoraleOutcome.WAVERING, outcome);
 
         if (expectedLevel != startLevel) {
-            verify(mockContract).setMoraleLevel(expectedLevel);
+            verify(mockContract).changeMorale(expectedLevel);
         } else {
-            verify(mockContract, never()).setMoraleLevel(any());
+            verify(mockContract, never()).changeMorale(any(ContractMoraleLevel.class));
         }
     }
 
@@ -403,17 +399,17 @@ class MHQMoraleTest {
     @ParameterizedTest
     @MethodSource("moraleNoChangeCases")
     void testGetMoraleOutcome_noChange(ContractMoraleLevel startLevel, ContractMoraleLevel expectedLevel) {
-        AtBContract mockContract = mock(AtBContract.class);
+        AbstractContract mockContract = mock(AbstractContract.class);
         when(mockContract.getMoraleLevel()).thenReturn(startLevel);
 
-        MHQMorale.MoraleOutcome outcome = getMoraleOutcome(mockContract, NO_CHANGE_TARGET_NUMBER);
+        MHQMorale.MoraleOutcome outcome = MHQMorale.getMoraleOutcome(mockContract, MHQMorale.NO_CHANGE_TARGET_NUMBER);
 
         assertEquals(MHQMorale.MoraleOutcome.UNCHANGED, outcome);
 
         if (expectedLevel != startLevel) {
-            verify(mockContract).setMoraleLevel(expectedLevel);
+            verify(mockContract).changeMorale(expectedLevel);
         } else {
-            verify(mockContract, never()).setMoraleLevel(any());
+            verify(mockContract, never()).changeMorale(any(ContractMoraleLevel.class));
         }
     }
 

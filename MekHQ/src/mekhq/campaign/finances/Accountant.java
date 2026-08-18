@@ -43,6 +43,7 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.UUID;
 
 import megamek.common.equipment.Engine;
@@ -524,7 +525,7 @@ public record Accountant(Campaign campaign) {
 
         // Consider contracts in the current system
         for (AbstractContract contract : activeContracts) {
-            if (contract.getTargetPlanet().equals(currentSystem)) {
+            if (Objects.equals(contract.getTargetSystem(), currentSystem)) {
                 double currentRegard = factionStandings.getRegardForFaction(contract.getEmployerFactionCode(), true);
                 if (currentRegard > maxRegard) {
                     maxRegard = currentRegard;
