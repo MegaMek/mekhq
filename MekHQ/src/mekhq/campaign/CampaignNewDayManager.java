@@ -133,7 +133,6 @@ import mekhq.campaign.market.PartsInUseManager;
 import mekhq.campaign.mission.AtBDynamicScenario;
 import mekhq.campaign.mission.AtBScenario;
 import mekhq.campaign.mission.Scenario;
-import mekhq.campaign.mission.atb.AtBScenarioFactory;
 import mekhq.campaign.mission.enums.ContractMoraleLevel;
 import mekhq.campaign.mission.enums.ScenarioStatus;
 import mekhq.campaign.mission.enums.ScenarioType;
@@ -2248,13 +2247,8 @@ public class CampaignNewDayManager {
             }
         }
 
-        // Third, on Mondays we generate new scenarios for the week
-        if (today.getDayOfWeek() == DayOfWeek.MONDAY) {
-            // StratCon's scenario generation is handled in StratConRulesManager, not here. Though we can't just
-            // filter StratCon campaigns out of this call, because StratCon does do some processing in this method,
-            // just not related to scenario generation.
-            AtBScenarioFactory.createScenariosForNewWeek(campaign);
-        }
+        // Legacy AtB scenario generation used to run here on Mondays. It was retired with the per-type AtBScenario
+        // classes; StratCon generates its own scenarios in StratConRulesManager.
 
         // Fourth, we look at deployments for pre-existing and new scenarios
         for (AbstractContract contract : contracts) {

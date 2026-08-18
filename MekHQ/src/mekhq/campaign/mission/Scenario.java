@@ -66,8 +66,6 @@ import mekhq.campaign.Campaign;
 import mekhq.campaign.events.DeploymentChangedEvent;
 import mekhq.campaign.force.Formation;
 import mekhq.campaign.force.FormationStub;
-import mekhq.campaign.mission.atb.AtBScenarioFactory;
-import mekhq.campaign.mission.atb.IAtBScenario;
 import mekhq.campaign.mission.enums.ScenarioStatus;
 import mekhq.campaign.mission.enums.ScenarioType;
 import mekhq.campaign.unit.Unit;
@@ -1167,34 +1165,12 @@ public class Scenario implements IPlayerSettings {
         try {
             // Instantiate the correct child class, and call its parsing function.
             if (className.equals(AtBScenario.class.getName())) {
-                // Backwards compatibility when AtBScenarios were all part of the same class
-                // Find the battle type and then load it through the AtBScenarioFactory
-
-                NodeList nl = wn.getChildNodes();
-                int battleType = -1;
-
-                for (int x = 0; x < nl.getLength(); x++) {
-                    Node wn2 = nl.item(x);
-
-                    if (wn2.getNodeName().equalsIgnoreCase("battleType")) {
-                        battleType = Integer.parseInt(wn2.getTextContent());
-                        break;
-                    }
-                }
-
-                if (battleType == -1) {
-                    LOGGER.error("Unable to load an old AtBScenario because we could not determine the battle type");
-                    return null;
-                }
-
-                List<Class<IAtBScenario>> scenarioClassList = AtBScenarioFactory.getScenarios(battleType);
-
-                if ((null == scenarioClassList) || scenarioClassList.isEmpty()) {
-                    LOGGER.error("Unable to load an old AtBScenario of battle type {}", battleType);
-                    return null;
-                }
-
-                retVal = (Scenario) scenarioClassList.getFirst().getDeclaredConstructor().newInstance();
+                // Saves written when AtBScenarios were all one class store the subtype in a <battleType> tag. The
+                // per-type scenario classes those resolved to were retired with legacy AtB scenario generation, so
+                // there is nothing left to instantiate - the scenario is dropped rather than half-loaded. StratCon
+                // scenarios are unaffected: they persist their own concrete class name.
+                LOGGER.info("Skipping a legacy AtB scenario: this scenario type is no longer supported.");
+                return null;
             } else {
                 retVal = (Scenario) Class.forName(className).getDeclaredConstructor().newInstance();
             }

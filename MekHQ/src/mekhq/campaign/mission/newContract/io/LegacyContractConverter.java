@@ -312,15 +312,24 @@ public final class LegacyContractConverter {
     private static void convertScenarios(final Node scenariosNode, final Campaign campaign, final Version version,
           final ChaosContract contract) {
         final NodeList children = scenariosNode.getChildNodes();
+        int skipped = 0;
         for (int i = 0; i < children.getLength(); i++) {
             final Node child = children.item(i);
             if (child.getNodeType() != Node.ELEMENT_NODE || !"scenario".equalsIgnoreCase(child.getNodeName())) {
                 continue;
             }
             final Scenario scenario = Scenario.generateInstanceFromXML(child, campaign, version);
-            if (scenario != null) {
-                contract.getScenarios().add(scenario);
+            if (scenario == null) {
+                // Expected for legacy AtB scenarios, whose per-type classes were retired along with legacy AtB
+                // scenario generation. The contract itself still converts; it just arrives without them.
+                skipped++;
+                continue;
             }
+            contract.getScenarios().add(scenario);
+        }
+
+        if (skipped > 0) {
+            LOGGER.info("Dropped {} scenario(s) of a legacy contract that can no longer be loaded.", skipped);
         }
     }
 

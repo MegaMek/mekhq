@@ -1451,10 +1451,7 @@ public class Campaign implements ITechManager {
      * scenario. It then adds the scenario to the scenarioId hash.
      * <p>
      * Scenarios with previously set ids can be sent to this mission, allowing one to remove and then re-add scenarios
-     * if needed. This functionality is used in the
-     * <code>AtBScenarioFactory</code> class in method
-     * <code>createScenariosForNewWeek</code> to
-     * ensure that scenarios are generated properly.
+     * if needed.
      *
      * @param scenario       - the Scenario to add
      * @param mission        - the mission to add the new scenario to
