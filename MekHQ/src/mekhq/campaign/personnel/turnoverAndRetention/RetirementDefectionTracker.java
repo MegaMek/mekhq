@@ -1247,9 +1247,10 @@ public class RetirementDefectionTracker {
      *
      * @param legacyMissionIdMap legacy integer mission id to converted contract {@link UUID}
      *
-     * @return the number of references successfully re-hooked
+     * @return how many references were held and how many of them were re-hooked
      */
-    public int relinkLegacyMissionIds(final Map<Integer, UUID> legacyMissionIdMap) {
+    public LegacyRelinkResult relinkLegacyMissionIds(final Map<Integer, UUID> legacyMissionIdMap) {
+        final int attempted = legacyRollRequired.size() + legacyUnresolvedPersonnel.size();
         int relinked = 0;
 
         for (final Integer legacyId : legacyRollRequired) {
@@ -1270,8 +1271,19 @@ public class RetirementDefectionTracker {
         }
         legacyUnresolvedPersonnel.clear();
 
-        return relinked;
+        return new LegacyRelinkResult(attempted, relinked);
     }
+
+    /**
+     * The outcome of a {@link #relinkLegacyMissionIds(Map)} pass.
+     *
+     * <p>Both counts are reported because they differ whenever a legacy reference has no converted contract to hook
+     * onto; a caller that logs only the successes cannot tell how many were dropped.</p>
+     *
+     * @param attempted the number of legacy references the tracker held
+     * @param relinked  how many of them resolved to a converted contract
+     */
+    public record LegacyRelinkResult(int attempted, int relinked) {}
 
     public static RetirementDefectionTracker generateInstanceFromXML(Node wn, Campaign c) {
         RetirementDefectionTracker retVal = null;

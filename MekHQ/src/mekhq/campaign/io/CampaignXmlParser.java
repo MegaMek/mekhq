@@ -151,6 +151,7 @@ import mekhq.campaign.personnel.skills.SkillDeprecationTool;
 import mekhq.campaign.personnel.skills.SkillType;
 import mekhq.campaign.personnel.skills.enums.SkillAttribute;
 import mekhq.campaign.personnel.turnoverAndRetention.RetirementDefectionTracker;
+import mekhq.campaign.personnel.turnoverAndRetention.RetirementDefectionTracker.LegacyRelinkResult;
 import mekhq.campaign.reputation.camOpsReputation.ForceReputationController;
 import mekhq.campaign.storyArc.StoryArc;
 import mekhq.campaign.unit.Unit;
@@ -1627,8 +1628,12 @@ public record CampaignXmlParser(InputStream is, MekHQ app) {
         final RetirementDefectionTracker turnoverTracker = campaign.getPlayerForce()
                                                                  .getHumanResources()
                                                                  .getRetirementDefectionTracker();
-        int relinked = (turnoverTracker == null) ? 0 : turnoverTracker.relinkLegacyMissionIds(legacyMissionIdMap);
-        int total = relinked;
+        final LegacyRelinkResult trackerResult = (turnoverTracker == null) ?
+                                                       new LegacyRelinkResult(0, 0) :
+                                                       turnoverTracker.relinkLegacyMissionIds(legacyMissionIdMap);
+
+        int relinked = trackerResult.relinked();
+        int total = trackerResult.attempted();
 
         for (final LegacyMissionRelink link : pendingMissionRelinks) {
             final UUID newMissionId = legacyMissionIdMap.get(link.legacyMissionId());
