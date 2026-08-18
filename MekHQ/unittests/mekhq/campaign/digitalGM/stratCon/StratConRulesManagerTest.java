@@ -555,7 +555,7 @@ class StratConRulesManagerTest {
     /**
      * Bundles the mocks a patrol-familiarity test needs.
      */
-    private record FamiliarityFixture(Campaign campaign, AtBContract contract, StratConTrackState track,
+    private record FamiliarityFixture(Campaign campaign, AbstractContract contract, StratConTrackState track,
           StratConCoords coords, int forceID) {}
 
     /**
@@ -571,7 +571,7 @@ class StratConRulesManagerTest {
         when(campaign.getCampaignOptions()).thenReturn(options);
         when(options.get(CampaignOption.CHASSIS_FAMILIARITY_MODE)).thenReturn(Familiarity.NORMAL);
 
-        AtBContract contract = mock(AtBContract.class);
+        AbstractContract contract = mock(AbstractContract.class);
         StratConTrackState track = mock(StratConTrackState.class);
         StratConCoords coords = new StratConCoords(2, 3);
         int forceID = 1;
