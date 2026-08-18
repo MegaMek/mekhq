@@ -103,6 +103,8 @@ public final class CampaignOption<T> {
           of(Boolean.class, true, "useBalancedFabrication");
     public static final CampaignOption<Boolean> FABRICATE_D_IN_MAINTENANCE_FACILITY =
           of(Boolean.class, false, "maintenanceFabrication");
+    public static final CampaignOption<Boolean> USE_AMMO_FABRICATION =
+          of(Boolean.class, false, "useAmmoFabrication");
     // endregion Repair and Maintenance
 
     // region Migrated Options (generated storage-only migration)

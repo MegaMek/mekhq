@@ -46,6 +46,7 @@ import java.io.PrintStream;
 import java.io.PrintWriter;
 import java.util.*;
 
+import jakarta.annotation.Nonnull;
 import megamek.Version;
 import megamek.common.CriticalSlot;
 import megamek.common.TechAdvancement;
@@ -1436,12 +1437,12 @@ public class Refit extends Part implements IAcquisitionWork {
         }
 
         return (Armor) getWarehouse().findSparePart(part -> part instanceof Armor &&
-                                                                                ((Armor) part).getType() ==
-                                                                                      newArmorSupplies.getType() &&
-                                                                                part.isClanTechBase() ==
-                                                                                      newArmorSupplies.isClanTechBase() &&
-                                                                                !part.isReservedForRefit() &&
-                                                                                part.isPresent());
+                                                                  ((Armor) part).getType() ==
+                                                                        newArmorSupplies.getType() &&
+                                                                  part.isClanTechBase() ==
+                                                                        newArmorSupplies.isClanTechBase() &&
+                                                                  !part.isReservedForRefit() &&
+                                                                  part.isPresent());
     }
 
     /**
@@ -3025,7 +3026,7 @@ public class Refit extends Part implements IAcquisitionWork {
      * @return 0
      */
     @Override
-    public TechRating getTechRating() {
+    public @Nonnull TechRating getTechRating() {
         return TechRating.A; // Was 0 pre-conversion to ENUM, so this is the same
     }
 
