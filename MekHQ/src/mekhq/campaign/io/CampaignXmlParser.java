@@ -114,6 +114,7 @@ import mekhq.campaign.market.RequestedStockLevels;
 import mekhq.campaign.mission.Scenario;
 import mekhq.campaign.mission.newContract.AbstractContract;
 import mekhq.campaign.mission.newContract.ContractMarket;
+import mekhq.campaign.mission.newContract.contractGeneration.ContractSearchType;
 import mekhq.campaign.mission.newContract.io.LegacyContractConverter;
 import mekhq.campaign.parts.AmmoStorage;
 import mekhq.campaign.parts.EnginePart;
@@ -1645,6 +1646,46 @@ public record CampaignXmlParser(InputStream is, MekHQ app) {
     }
 
     /**
+     * Resolves the player's chosen negotiator on every contract read from the save.
+     *
+     * <p>Contracts live inside {@code <info>}, which is parsed before the personnel roster is populated, so the codec
+     * can only stash the negotiator's id while reading. This runs once the whole save is parsed and turns those ids
+     * back into roster members. An id with no matching person (e.g. the negotiator was deleted) is left unresolved,
+     * which the contract already tolerates - its negotiator is nullable.</p>
+     */
+    private static void resolvePlayerNegotiators(final Campaign campaign) {
+        final PlayerForce playerForce = campaign.getPlayerForce();
+        final ContractMarket contractMarket = playerForce.getContractMarket();
+
+        final List<AbstractContract> contracts = new ArrayList<>(playerForce.getContractHistory().values());
+        for (final ContractSearchType searchType : ContractSearchType.values()) {
+            contracts.addAll(contractMarket.getContracts(searchType).values());
+        }
+
+        int resolved = 0;
+        int total = 0;
+        for (final AbstractContract contract : contracts) {
+            final UUID negotiatorId = contract.getPendingPlayerNegotiatorId();
+            if (negotiatorId == null) {
+                continue;
+            }
+            total++;
+
+            final Person negotiator = playerForce.getHumanResources().getPerson(negotiatorId);
+            if (negotiator != null) {
+                contract.setPlayerNegotiator(negotiator);
+                resolved++;
+            }
+            contract.setPendingPlayerNegotiatorId(null);
+        }
+
+        if (total > 0) {
+            LOGGER.info("Resolved {} of {} contract negotiator(s) to roster members ({} had no match).",
+                  resolved, total, total - resolved);
+        }
+    }
+
+    /**
      * Processes a custom unit in a campaign.
      *
      * @param retVal The {@see Campaign} being parsed.
@@ -2726,6 +2767,7 @@ public record CampaignXmlParser(InputStream is, MekHQ app) {
         migrateLegacyEducationTravel(campaign);
         reconnectPersonsToTravelLocations(campaign);
         relinkLegacyMissions(campaign, legacyMissionIdMap, pendingMissionRelinks);
+        resolvePlayerNegotiators(campaign);
         LOGGER.info("Load of campaign file complete!");
 
         return campaign;

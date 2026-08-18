@@ -101,6 +101,15 @@ public abstract class AbstractContract {
     private MoraleData moraleData = new MoraleData(ContractMoraleLevel.STALEMATE);
     private NegotiationData negotiationData;
     private Person playerNegotiator;
+    /**
+     * The id of {@link #playerNegotiator} as read from a save, held until it can be resolved.
+     *
+     * <p>Contracts are written inside {@code <info>}, which the loader parses before the personnel roster exists, so
+     * the negotiator cannot be looked up while the contract itself is being read. The codec stashes the raw id here and
+     * the loader resolves it in a post-load pass once the whole save has been read. Never serialized - the negotiator
+     * is written from {@link #playerNegotiator}.</p>
+     */
+    private transient UUID pendingPlayerNegotiatorId;
 
     private StratConCampaignState stratConCampaignState;
     private int scale;
@@ -416,6 +425,23 @@ public abstract class AbstractContract {
 
     public void setPlayerNegotiator(Person playerNegotiator) {
         this.playerNegotiator = playerNegotiator;
+    }
+
+    /**
+     * @return the unresolved negotiator id stashed during a save load, or {@code null} when there is nothing pending
+     */
+    public @Nullable UUID getPendingPlayerNegotiatorId() {
+        return pendingPlayerNegotiatorId;
+    }
+
+    /**
+     * Stashes the negotiator id read from a save so the loader can resolve it once the roster is populated. Cleared by
+     * that pass; not for general use.
+     *
+     * @param pendingPlayerNegotiatorId the id to resolve later, or {@code null} to clear
+     */
+    public void setPendingPlayerNegotiatorId(final @Nullable UUID pendingPlayerNegotiatorId) {
+        this.pendingPlayerNegotiatorId = pendingPlayerNegotiatorId;
     }
 
     public @Nullable StratConCampaignState getStratConCampaignState() {

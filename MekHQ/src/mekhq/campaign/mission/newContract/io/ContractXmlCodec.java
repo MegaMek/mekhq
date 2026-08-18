@@ -367,11 +367,10 @@ public final class ContractXmlCodec {
               (contract, node, campaign, version) -> contract.setProvingGround(Boolean.parseBoolean(text(node))));
         readers.put("missionStatus",
               (contract, node, campaign, version) -> contract.setStatus(MissionStatus.parseFromString(text(node))));
+        // The roster is not loaded yet when contracts are read, so stash the id; the loader resolves it post-load.
         readers.put("playerNegotiatorId",
-              (contract, node, campaign, version) -> contract.setPlayerNegotiator(campaign.getPlayerForce()
-                                                                                        .getHumanResources()
-                                                                                        .getPerson(UUID.fromString(text(
-                                                                                              node)))));
+              (contract, node, campaign, version) -> contract.setPendingPlayerNegotiatorId(UUID.fromString(text(
+                    node))));
 
         readers.put("employerData",
               (contract, node, campaign, version) -> contract.setEmployerData(parseEmployerData(node,
