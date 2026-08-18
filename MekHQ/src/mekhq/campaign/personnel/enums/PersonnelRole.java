@@ -719,9 +719,7 @@ public enum PersonnelRole {
             }
             case MEDIC -> List.of(SkillType.S_MEDTECH);
             case ADMINISTRATOR, ADMINISTRATOR_COMMAND, ADMINISTRATOR_LOGISTICS, ADMINISTRATOR_TRANSPORT,
-                 ADMINISTRATOR_HR -> {
-                yield List.of(SkillType.S_ADMIN, SkillType.S_APPRAISAL);
-            }
+                 ADMINISTRATOR_HR -> List.of(SkillType.S_ADMIN, SkillType.S_NEGOTIATION);
             case DEPENDENT, NONE -> List.of();
             case MISCELLANEOUS_JOB -> List.of(SkillType.S_CAREER_ANY);
             case ADULT_ENTERTAINER -> List.of(SkillType.S_ART_OTHER, SkillType.S_ACTING);
