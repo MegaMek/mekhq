@@ -182,6 +182,7 @@ import mekhq.campaign.mission.TransportCostCalculations;
 import mekhq.campaign.mission.enums.MissionStatus;
 import mekhq.campaign.mission.newContract.AbstractContract;
 import mekhq.campaign.mission.newContract.contractData.ContractHistoryData;
+import mekhq.campaign.mission.newContract.utilities.ContractSettlement;
 import mekhq.campaign.mission.rentals.ContractRentalType;
 import mekhq.campaign.mission.rentals.FacilityRentals;
 import mekhq.campaign.parts.Armor;
@@ -7711,6 +7712,8 @@ public class Campaign implements ITechManager {
                                       remainingMoney.toAmountAndSymbolString() +
                                       " for the remaining payout from contract " +
                                       mission.getHyperlinkedName());
+            // Shareholders take their cut of the final payout, mirroring the monthly share payout.
+            ContractSettlement.settleShares(this, mission, remainingMoney);
         } else if (remainingMoney.isNegative()) {
             getPlayerForce().getFinances().credit(TransactionType.CONTRACT_PAYMENT,
                   getLocalDate(),
@@ -7721,6 +7724,9 @@ public class Campaign implements ITechManager {
                                       " to repay payment overages occurred during the contract " +
                                       mission.getHyperlinkedName());
         }
+
+        // Reconcile salvage: if the player kept more than their salvage rights allowed, repay the employer the excess.
+        ContractSettlement.settleSalvage(this, mission);
 
         // This relies on the mission being a Contract, and AtB to be on
         if (getCampaignOptions().isUseStratCon()) {
