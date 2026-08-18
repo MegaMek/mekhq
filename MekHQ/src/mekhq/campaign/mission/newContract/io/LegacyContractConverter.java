@@ -151,6 +151,11 @@ public final class LegacyContractConverter {
         LocalDate routEndDate = null;
         Money routedPayout = Money.zero();
 
+        // The legacy format stores these two NPCs in full; the new model's third NPC (the employer's negotiator) has
+        // no legacy equivalent and is always a placeholder.
+        Person legacyLiaison = null;
+        Person legacyOpposingCommander = null;
+
         final ChaosContract contract = new ChaosContract();
 
         final NodeList children = missionNode.getChildNodes();
@@ -196,6 +201,8 @@ public final class LegacyContractConverter {
                     case "moraleLevel" -> moraleLevel = ContractMoraleLevel.valueOf(value);
                     case "routEnd" -> routEndDate = MHQXMLUtility.parseDate(value);
                     case "routedPayout" -> routedPayout = Money.fromXmlString(value);
+                    case "employerLiaison" -> legacyLiaison = legacyPerson(child, campaign, version);
+                    case "clanOpponent" -> legacyOpposingCommander = legacyPerson(child, campaign, version);
                     case "scenarios" -> convertScenarios(child, campaign, version, contract);
                     default -> {
                         if (StratConCampaignState.ROOT_XML_ELEMENT_NAME.equals(tag)) {
@@ -219,9 +226,13 @@ public final class LegacyContractConverter {
             name = getFormattedTextAt(RESOURCE_BUNDLE, "legacyContract.defaultName", employerName);
         }
 
+        // Keep the NPCs the save actually recorded; only invent one where the legacy format had none. A liaison is
+        // absent unless the contract had one, and a clan opponent only exists for Clan enemies.
         final Person negotiator = placeholderPerson(campaign, employerCode);
-        final Person liaison = placeholderPerson(campaign, employerCode);
-        final Person opposingCommander = placeholderPerson(campaign, enemyCode);
+        final Person liaison = (legacyLiaison != null) ? legacyLiaison : placeholderPerson(campaign, employerCode);
+        final Person opposingCommander = (legacyOpposingCommander != null) ?
+                                               legacyOpposingCommander :
+                                               placeholderPerson(campaign, enemyCode);
 
         contract.setContractId(UUID.randomUUID());
         contract.setContractName(name);
@@ -292,6 +303,28 @@ public final class LegacyContractConverter {
             if (scenario != null) {
                 contract.getScenarios().add(scenario);
             }
+        }
+    }
+
+    /**
+     * Reads an NPC the legacy format stored inline under its own wrapper tag.
+     *
+     * <p>Legacy saves write the person's fields directly into the wrapper (there is no nested {@code <person>}
+     * element), so the wrapper node itself is what gets parsed.</p>
+     *
+     * @param personNode the wrapper element holding the person's fields
+     * @param campaign   the campaign the person belongs to
+     * @param version    the save file version
+     *
+     * @return the parsed NPC, or {@code null} if it could not be read
+     */
+    private static @Nullable Person legacyPerson(final Node personNode, final Campaign campaign,
+          final Version version) {
+        try {
+            return Person.generateInstanceFromXML(personNode, campaign, version);
+        } catch (Exception ex) {
+            LOGGER.error(ex, "Failed to read a legacy contract's NPC; a placeholder will stand in.");
+            return null;
         }
     }
 
