@@ -49,6 +49,7 @@ import java.awt.event.MouseEvent;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import javax.swing.JComboBox;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
@@ -861,7 +862,9 @@ public class StratConTab extends CampaignGuiTab {
         Campaign campaign = getCampaignGui().getCampaign();
         PlanetarySystem currentSystem = campaign.getCurrentSystem();
         for (AbstractContract contract : campaign.getActiveContracts(false)) {
-            if (!currentSystem.equals(contract.getTargetPlanet())) {
+            // The contract's location is a system, not a planet within one - comparing against getTargetPlanet()
+            // can never match, since PlanetarySystem.equals requires the same class.
+            if (!Objects.equals(currentSystem, contract.getTargetSystem())) {
                 continue;
             }
             if (contract.getStratConCampaignState() == null) {

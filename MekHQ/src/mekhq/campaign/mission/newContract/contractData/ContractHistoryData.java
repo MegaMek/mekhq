@@ -70,13 +70,19 @@ public record ContractHistoryData(LinkedHashMap<UUID, AbstractContract> contract
         return activeContracts;
     }
 
+    /**
+     * @param currentDate the date to test against
+     *
+     * @return the contracts running on {@code currentDate}, that is, those whose status is active and whose schedule
+     *       covers the date inclusive of both its start and end - a contract counts from the day it starts through the
+     *       day it ends
+     */
     public List<AbstractContract> getActiveAndStarted(LocalDate currentDate) {
         List<AbstractContract> activeContracts = new ArrayList<>();
 
         for (AbstractContract contract : contractHistory.values()) {
             if (contract.getStatus().isActive() && !activeContracts.contains(contract)) {
-                LocalDate startDate = contract.getStartDate();
-                if (!startDate.isBefore(currentDate)) {
+                if (contract.isActiveOn(currentDate)) {
                     activeContracts.add(contract);
                 }
             }
@@ -85,13 +91,19 @@ public record ContractHistoryData(LinkedHashMap<UUID, AbstractContract> contract
         return activeContracts;
     }
 
+    /**
+     * @param currentDate the date to test against
+     *
+     * @return the accepted contracts that have not begun yet, that is, those whose status is active and whose start
+     *       date is strictly after {@code currentDate} - a contract starting today has started, so it is excluded
+     */
     public List<AbstractContract> getActiveAndNotYetStarted(LocalDate currentDate) {
         List<AbstractContract> activeContracts = new ArrayList<>();
 
         for (AbstractContract contract : contractHistory.values()) {
             if (contract.getStatus().isActive() && !activeContracts.contains(contract)) {
                 LocalDate startDate = contract.getStartDate();
-                if (startDate.isBefore(currentDate)) {
+                if (startDate.isAfter(currentDate)) {
                     activeContracts.add(contract);
                 }
             }

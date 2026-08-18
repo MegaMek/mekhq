@@ -46,6 +46,7 @@ import static mekhq.utilities.MHQInternationalization.getTextAt;
 
 import java.io.PrintWriter;
 import java.time.LocalDate;
+import java.time.temporal.ChronoUnit;
 import java.util.Objects;
 import java.util.Set;
 
@@ -279,7 +280,9 @@ public abstract class AbstractLocation implements IPlace {
     public void testForEarlyArrival(Campaign campaign) {
         for (AbstractContract contract : campaign.getFutureContracts()) {
             if (Objects.equals(getPlanet(), contract.getTargetPlanet())) {
-                int daysTillStart = campaign.getLocalDate().until(contract.getStartDate()).getDays();
+                // DAYS.between, not Period.getDays() - the latter yields only the day component, so a start two
+                // months out would report the leftover days rather than the whole wait.
+                long daysTillStart = ChronoUnit.DAYS.between(campaign.getLocalDate(), contract.getStartDate());
 
                 String inCharacterMessage = getFormattedTextAt(RESOURCE_BUNDLE,
                       "contract.arrivedEarly.ic." + randomInt(10),
