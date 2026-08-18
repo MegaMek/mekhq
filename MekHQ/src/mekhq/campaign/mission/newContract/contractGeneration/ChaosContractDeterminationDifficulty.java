@@ -68,6 +68,9 @@ public class ChaosContractDeterminationDifficulty {
     /** Generic BV is used so this scale matches the one AtB contracts are rated on. */
     private static final boolean USE_GENERIC_BV = true;
     public static final int UNKNOWN_DIFFICULTY = -99;
+    /** The 1-10 band the rating is reported on; the skulls in the contract market render the same scale. */
+    public static final int MINIMUM_DIFFICULTY = 1;
+    public static final int MAXIMUM_DIFFICULTY = 10;
 
     /**
      * Calculates the difficulty rating for a contract.
@@ -105,13 +108,19 @@ public class ChaosContractDeterminationDifficulty {
 
         double playerPower = estimatePlayerPower(campaign.getAllCombatEntities());
 
+        // The rating is a ratio, so with no fielded combat units there is no denominator to scale against. Say so
+        // outright: fighting anything with nothing is as hard as the scale goes.
+        if (playerPower == 0) {
+            return MAXIMUM_DIFFICULTY;
+        }
+
         double difference = enemyPower - playerPower;
-        double percentDifference = (playerPower != 0 ? difference / playerPower : difference) * 100;
+        double percentDifference = (difference / playerPower) * 100;
 
         int difficulty = (int) round(Math.abs(percentDifference) / 20);
         difficulty = (percentDifference < 0) ? 5 - difficulty : 5 + difficulty;
 
-        return Math.clamp(difficulty, 1, 10);
+        return Math.clamp(difficulty, MINIMUM_DIFFICULTY, MAXIMUM_DIFFICULTY);
     }
 
     /**
