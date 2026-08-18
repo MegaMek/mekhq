@@ -190,7 +190,12 @@ public class CampaignSummary {
         // missions
         countMissionByStatus = new int[MissionStatus.values().length];
         for (AbstractContract contract : campaign.getContractHistoryAsMap().values()) {
-            countMissionByStatus[contract.getStatus().ordinal()]++;
+            // No status-based accessor covers "every status including active", so the raw map is right here - but it
+            // is unfiltered, so a contract without a status has to be skipped rather than indexed on.
+            MissionStatus status = contract.getStatus();
+            if (status != null) {
+                countMissionByStatus[status.ordinal()]++;
+            }
         }
 
         completedMissions = 0;

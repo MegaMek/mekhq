@@ -45,6 +45,7 @@ import megamek.Version;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.finances.Finances;
+import mekhq.campaign.mission.enums.MissionStatus;
 import mekhq.campaign.mission.newContract.AbstractContract;
 import mekhq.campaign.mission.newContract.ContractMarket;
 import mekhq.campaign.mission.newContract.io.ContractXmlCodec;
@@ -180,6 +181,11 @@ public class PlayerForce extends AbstractForce implements SingleDetachmentForce 
             }
             final AbstractContract contract = ContractXmlCodec.readContract(child, campaign, version);
             if ((contract != null) && (contract.getId() != null)) {
+                // A contract in the history was accepted, so it has a status. Saves written before acceptance set one
+                // carry none; treat those as active rather than letting them drop out of every status filter.
+                if (contract.getStatus() == null) {
+                    contract.setStatus(MissionStatus.ACTIVE);
+                }
                 contractHistory.put(contract.getId(), contract);
             }
         }

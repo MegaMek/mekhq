@@ -42,6 +42,7 @@ import mekhq.campaign.enums.DailyReportType;
 import mekhq.campaign.events.missions.MissionChangedEvent;
 import mekhq.campaign.finances.Money;
 import mekhq.campaign.finances.enums.TransactionType;
+import mekhq.campaign.mission.enums.MissionStatus;
 import mekhq.campaign.mission.newContract.AbstractContract;
 import mekhq.campaign.mission.newContract.contractGeneration.ContractSearchType;
 import mekhq.gui.baseComponents.immersiveDialogs.ImmersiveDialogConfirmation;
@@ -93,6 +94,9 @@ public final class ContractAcceptance {
         // Take the offer off the market and register it as a mission. addMission must come before StratCon setup so the
         // contract has its mission id when the tracks are seeded.
         campaign.getPlayerForce().getContractMarket().removeContract(bucket, contract);
+        // A market offer carries no status; accepting it is what makes it a running mission. Set this before
+        // addMission, since every contractHistory filter keys off the status.
+        contract.setStatus(MissionStatus.ACTIVE);
         campaign.addMission(contract);
 
         // Seed StratCon, unless the campaign is not using it or the player opted this contract out. When opted out the

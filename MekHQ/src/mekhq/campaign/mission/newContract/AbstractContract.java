@@ -302,7 +302,11 @@ public abstract class AbstractContract {
         contractFinanceData = new ContractFinanceData(contractFinanceData, null, null, newMoney);
     }
 
-    public MissionStatus getStatus() {
+    /**
+     * @return this contract's status, or {@code null} for a market offer that has not been accepted - an offer is not a
+     *       mission yet, and {@link ContractXmlCodec} persists the absent status as such
+     */
+    public @Nullable MissionStatus getStatus() {
         return missionStatus;
     }
 

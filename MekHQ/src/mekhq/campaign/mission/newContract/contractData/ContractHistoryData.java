@@ -46,7 +46,7 @@ public record ContractHistoryData(LinkedHashMap<UUID, AbstractContract> contract
         List<AbstractContract> completedContracts = new ArrayList<>();
 
         for (AbstractContract contract : contractHistory.values()) {
-            if (!contract.getStatus().isActive()) {
+            if (hasStatus(contract) && !contract.getStatus().isActive()) {
                 if (!completedContracts.contains(contract)) {
                     completedContracts.add(contract);
                 }
@@ -60,7 +60,7 @@ public record ContractHistoryData(LinkedHashMap<UUID, AbstractContract> contract
         List<AbstractContract> activeContracts = new ArrayList<>();
 
         for (AbstractContract contract : contractHistory.values()) {
-            if (contract.getStatus().isActive()) {
+            if (isActive(contract)) {
                 if (!activeContracts.contains(contract)) {
                     activeContracts.add(contract);
                 }
@@ -81,7 +81,7 @@ public record ContractHistoryData(LinkedHashMap<UUID, AbstractContract> contract
         List<AbstractContract> activeContracts = new ArrayList<>();
 
         for (AbstractContract contract : contractHistory.values()) {
-            if (contract.getStatus().isActive() && !activeContracts.contains(contract)) {
+            if (isActive(contract) && !activeContracts.contains(contract)) {
                 if (contract.isActiveOn(currentDate)) {
                     activeContracts.add(contract);
                 }
@@ -102,7 +102,7 @@ public record ContractHistoryData(LinkedHashMap<UUID, AbstractContract> contract
         List<AbstractContract> activeContracts = new ArrayList<>();
 
         for (AbstractContract contract : contractHistory.values()) {
-            if (contract.getStatus().isActive() && !activeContracts.contains(contract)) {
+            if (isActive(contract) && !activeContracts.contains(contract)) {
                 LocalDate startDate = contract.getStartDate();
                 if ((startDate != null) && startDate.isAfter(currentDate)) {
                     activeContracts.add(contract);
@@ -120,7 +120,7 @@ public record ContractHistoryData(LinkedHashMap<UUID, AbstractContract> contract
      */
     public List<AbstractContract> getSortedMissions(LocalDate currentDate) {
         List<AbstractContract> sortedMissions = new ArrayList<>(contractHistory.values());
-        sortedMissions.sort(Comparator.comparing((AbstractContract mission) -> mission.getStatus().isCompleted())
+        sortedMissions.sort(Comparator.comparing(ContractHistoryData::isCompleted)
                                   .thenComparingLong((AbstractContract mission) -> this.getMissionSortKey(mission,
                                         currentDate)));
         return sortedMissions;
@@ -129,9 +129,26 @@ public record ContractHistoryData(LinkedHashMap<UUID, AbstractContract> contract
     private long getMissionSortKey(AbstractContract mission, LocalDate currentDate) {
         LocalDate startDate = mission.getStartDate();
         if (startDate == null) {
-            return mission.getStatus().isCompleted() ? Long.MAX_VALUE : currentDate.toEpochDay();
+            return isCompleted(mission) ? Long.MAX_VALUE : currentDate.toEpochDay();
         }
         long startDay = startDate.toEpochDay();
-        return mission.getStatus().isCompleted() ? -startDay : startDay;
+        return isCompleted(mission) ? -startDay : startDay;
+    }
+
+    /**
+     * A contract only has a status once it has been accepted; an un-accepted market offer has none. These treat a
+     * missing status as neither active nor completed, so an offer that somehow reaches this collection is skipped
+     * rather than throwing.
+     */
+    private static boolean hasStatus(AbstractContract contract) {
+        return contract.getStatus() != null;
+    }
+
+    private static boolean isActive(AbstractContract contract) {
+        return hasStatus(contract) && contract.getStatus().isActive();
+    }
+
+    private static boolean isCompleted(AbstractContract contract) {
+        return hasStatus(contract) && contract.getStatus().isCompleted();
     }
 }

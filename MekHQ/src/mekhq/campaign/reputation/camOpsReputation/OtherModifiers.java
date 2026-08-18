@@ -116,10 +116,8 @@ public class OtherModifiers {
      * @return A List of suitable AtBContracts.
      */
     private static List<AbstractContract> getSuitableContracts(Campaign campaign) {
-        // Filter mission of type AtBContract and with completed status, check if it's
-        // suitable
-        return campaign.getContractHistoryAsMap().values().stream()
-                     .filter(c -> c.getStatus().isCompleted())
+        // getCompletedContracts covers exactly the non-active statuses and skips any contract without one
+        return campaign.getCompletedContracts().stream()
                      .filter(OtherModifiers::isSuitableContract)
                      .toList();
     }
