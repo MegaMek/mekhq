@@ -37,8 +37,11 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertInstanceOf;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -472,6 +475,47 @@ public class BattleArmorAmmoBinTest {
 
             // ... and the correct amount of ammo is left
             assertEquals(ammoType.getShots() * SQUAD_SIZE * 9, quartermaster.getAmmoAvailable(ammoType));
+        }
+
+        /**
+         * Fabrication manufactures the squad's ammunition for money, so it must load the bin even though the warehouse
+         * is empty - the stock-limited reload path would otherwise charge the attempt and load nothing.
+         */
+        @Test
+        public void fabricationLoadsTheWholeSquadFromAnEmptyWarehouse() {
+            // ARRANGE
+            when(mockCampaign.getCampaignOptions()).thenReturn(new CampaignOptions());
+
+            int shotsNeeded = ammoType.getShots() * SQUAD_SIZE;
+            BattleArmorAmmoBin ammoBin = new BattleArmorAmmoBin(0,
+                  ammoType,
+                  equipmentNum,
+                  shotsNeeded,
+                  false,
+                  mockCampaign);
+
+            ammoBin.setUnit(mockUnit);
+            when(mockMounted.getBaseShotsLeft()).thenReturn(0);
+            doAnswer(invocation -> {
+                int shotsLeft = invocation.getArgument(0);
+                when(mockMounted.getBaseShotsLeft()).thenReturn(shotsLeft);
+                return null;
+            }).when(mockMounted).setShotsLeft(anyInt());
+
+            ammoBin.setFabricating(true);
+
+            // ACT
+            // The warehouse is empty, but a fabrication attempt can still be worked on ...
+            assertNull(ammoBin.checkFixable());
+            ammoBin.succeed();
+
+            // ASSERT
+            // ... and it actually loads every trooper ...
+            assertEquals(0, ammoBin.getShotsNeeded());
+            assertEquals(ammoType.getShots(), mockMounted.getBaseShotsLeft());
+
+            // ... without drawing anything from stock.
+            assertEquals(0, quartermaster.getAmmoAvailable(ammoType));
         }
     }
 }

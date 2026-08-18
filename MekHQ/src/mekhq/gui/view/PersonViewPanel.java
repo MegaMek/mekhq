@@ -83,6 +83,7 @@ import java.awt.event.MouseListener;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.List;
@@ -131,6 +132,7 @@ import mekhq.campaign.personnel.enums.PersonnelRole;
 import mekhq.campaign.personnel.enums.PersonnelStatus;
 import mekhq.campaign.personnel.enums.education.EducationLevel;
 import mekhq.campaign.personnel.enums.education.EducationStage;
+import mekhq.campaign.personnel.familiarity.Familiarity;
 import mekhq.campaign.personnel.familyTree.FormerSpouse;
 import mekhq.campaign.personnel.medical.advancedMedicalAlternate.InjuryEffect;
 import mekhq.campaign.personnel.medical.advancedMedicalAlternate.InjurySubType;
@@ -253,6 +255,13 @@ public class PersonViewPanel extends JScrollablePanel {
         initializeLogs(pnlPersonnelRecordTab);
         tabbedPane.addTab(getTextAt(RESOURCE_BUNDLE, "pnlPersonnelRecordTab.title"), pnlPersonnelRecordTab);
 
+        if (campaignOptions.get(CampaignOption.CHASSIS_FAMILIARITY_MODE).isEnabled()) {
+            JPanel pnlFamiliarityTab = new JPanel();
+            pnlFamiliarityTab.setLayout(new GridBagLayout());
+            initializeFamiliarity(pnlFamiliarityTab);
+            tabbedPane.addTab(getTextAt(RESOURCE_BUNDLE, "pnlFamiliarityTab.title"), pnlFamiliarityTab);
+        }
+
         // use glue to fill up the remaining space so everything is aligned to the top
         gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 0;
@@ -262,6 +271,52 @@ public class PersonViewPanel extends JScrollablePanel {
         gridBagConstraints.fill = GridBagConstraints.BOTH;
         gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
         add(Box.createGlue(), gridBagConstraints);
+    }
+
+    private void initializeFamiliarity(JPanel pnlFamiliarityTab) {
+        GridBagConstraints gridBagConstraints = new GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 0;
+        gridBagConstraints.weightx = 1.0;
+        gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
+        gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
+        gridBagConstraints.insets = new Insets(5, 5, 5, 5);
+
+        Map<String, Integer> familiarityMap = person.getChassisFamiliarity();
+        if (familiarityMap.isEmpty()) {
+            pnlFamiliarityTab.add(new JLabel(getTextAt(RESOURCE_BUNDLE, "pnlFamiliarityTab.none")), gridBagConstraints);
+            return;
+        }
+
+        List<Map.Entry<String, Integer>> entries = new ArrayList<>(familiarityMap.entrySet());
+        entries.sort(Comparator.<Map.Entry<String, Integer>>comparingInt(Map.Entry::getValue)
+                           .reversed()
+                           .thenComparing(Map.Entry::getKey));
+
+        Familiarity familiarityMode = campaignOptions.get(CampaignOption.CHASSIS_FAMILIARITY_MODE);
+        int cap = familiarityMode.getFamiliarityCap();
+        for (Map.Entry<String, Integer> entry : entries) {
+            String chassis = entry.getKey();
+            // Clamp to the active mode's cap for display: a value stored under a higher-cap mode (e.g. 250 under Hard)
+            // survives a switch to a lower-cap mode until the next gain self-corrects it, and would otherwise overflow
+            // the meter bar. Bonuses saturate at the top level anyway, so clamping does not change the reported bonus.
+            int familiarity = Math.min(entry.getValue(), cap);
+            int pilotingMaintenance = familiarityMode.getPilotingMaintenanceBonus(familiarity);
+            int gunneryRepairs = familiarityMode.getGunneryRepairBonus(familiarity);
+            String tooltip = getFormattedTextAt(RESOURCE_BUNDLE,
+                  "pnlFamiliarityTab.tooltip",
+                  chassis,
+                  familiarity,
+                  cap,
+                  pilotingMaintenance,
+                  gunneryRepairs);
+            pnlFamiliarityTab.add(ContractMeterBar.valueBar(chassis, familiarity, cap, tooltip), gridBagConstraints);
+            gridBagConstraints.gridy++;
+        }
+
+        gridBagConstraints.weighty = 1.0;
+        gridBagConstraints.fill = GridBagConstraints.BOTH;
+        pnlFamiliarityTab.add(Box.createGlue(), gridBagConstraints);
     }
 
     private void initializeLogs(JPanel pnlPersonnelRecordTab) {

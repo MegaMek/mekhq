@@ -160,7 +160,7 @@ class TrainingCombatTeamsTest {
     @Test
     void test_GetFinalXPProgress_ZeroMarginOfSuccess() {
         int marginOfSuccess = 0;
-        TrainingCombatTeams.getFinalXPProgress(new ActionCheckResult(null, marginOfSuccess, false, ""), gunneryMek);
+        TrainingCombatTeams.getFinalXPProgress(marginOfSuccess, gunneryMek);
 
         int expectedProgress = XP_RATE_BASE_LINE;
         int actualXPProgress = gunneryMek.getXpProgress();
@@ -171,7 +171,7 @@ class TrainingCombatTeamsTest {
     @Test
     void test_GetFinalXPProgress_NonZeroMarginOfSuccess() {
         int marginOfSuccess = 2;
-        TrainingCombatTeams.getFinalXPProgress(new ActionCheckResult(null, marginOfSuccess, false, ""), gunneryMek);
+        TrainingCombatTeams.getFinalXPProgress(marginOfSuccess, gunneryMek);
 
         int expectedProgress = XP_RATE_BASE_LINE * marginOfSuccess;
         int actualXPProgress = gunneryMek.getXpProgress();
@@ -239,10 +239,10 @@ class TrainingCombatTeamsTest {
     }
 
     @ParameterizedTest
-    @CsvSource({"0, 1", "2, 2", "4, 4", "-2, 1", "-8, 1", "100000, 6"})
+    @CsvSource({ "0, 1", "2, 2", "4, 4", "-2, 1", "-8, 1", "100000, 6" })
     void test_GetFinalXPProgress_(int marginOfSuccess, int xp) {
         Skill skill = mock(Skill.class);
-        TrainingCombatTeams.getFinalXPProgress(new ActionCheckResult(null, marginOfSuccess, false, ""), skill);
+        TrainingCombatTeams.getFinalXPProgress(marginOfSuccess, skill);
         verify(skill).changeXpProgress(xp);
     }
 }
