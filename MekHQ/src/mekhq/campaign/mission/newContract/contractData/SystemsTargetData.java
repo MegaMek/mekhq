@@ -39,7 +39,17 @@ import mekhq.campaign.universe.Planet;
 import mekhq.campaign.universe.PlanetarySystem;
 import mekhq.campaign.universe.Systems;
 
-public record SystemsTargetData(String systemId, String planetId) {
+/**
+ * Where a contract is fought, as ids into the universe data.
+ *
+ * <p>Both ids are optional. A contract need not name a planet within its system, and a converted legacy contract may
+ * not name a system at all when the save records none and the campaign has no current system to stand in for it. Every
+ * accessor here copes: an unknown or absent id yields {@code null}, and the display accessors render {@code "-"}.</p>
+ *
+ * @param systemId the id of the target system, or {@code null} when none is known
+ * @param planetId the id of the target planet within that system, or {@code null} when the contract names no planet
+ */
+public record SystemsTargetData(@Nullable String systemId, @Nullable String planetId) {
     public @Nullable PlanetarySystem getSystem() {
         return Systems.getInstance().getSystemById(systemId);
     }
@@ -51,7 +61,7 @@ public record SystemsTargetData(String systemId, String planetId) {
 
     public @Nullable Planet getPlanet() {
         PlanetarySystem planetarySystem = getSystem();
-        return planetarySystem == null ? null : getSystem().getPlanetById(planetId);
+        return planetarySystem == null ? null : planetarySystem.getPlanetById(planetId);
     }
 
     public String getPlanetName(LocalDate currentDate) {

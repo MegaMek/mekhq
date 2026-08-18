@@ -339,6 +339,19 @@ public final class LegacyContractConverter {
         return faction == null ? factionCode : faction.getFullName(year);
     }
 
+    /**
+     * Resolves the system a legacy contract was fought in, standing the campaign's current system in for a missing
+     * one.
+     *
+     * <p>Returns {@code null} when the save records no system and the campaign has no current system either - during a
+     * load the force's location may not be restored yet. {@link SystemsTargetData} treats a missing system id as
+     * unknown rather than invalid, so a defunct contract simply displays no system.</p>
+     *
+     * @param systemId the system id read from the legacy save, if any
+     * @param campaign the campaign whose current system stands in for a missing id
+     *
+     * @return the resolved system id, or {@code null} when none can be determined
+     */
     private static @Nullable String systemIdOrPlaceholder(final @Nullable String systemId, final Campaign campaign) {
         if ((systemId != null) && !systemId.isBlank()) {
             return systemId;

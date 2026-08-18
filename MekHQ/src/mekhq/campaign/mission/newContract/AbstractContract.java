@@ -606,7 +606,10 @@ public abstract class AbstractContract {
         return rentedFacilitiesData.holdingCells();
     }
 
-    public String getTargetSystemId() {
+    /**
+     * @return the id of the system this contract is fought in, or {@code null} when none is known
+     */
+    public @Nullable String getTargetSystemId() {
         return systemsTargetData.systemId();
     }
 
