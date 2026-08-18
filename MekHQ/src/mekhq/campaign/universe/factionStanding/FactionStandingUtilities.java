@@ -51,6 +51,7 @@ import mekhq.campaign.personnel.enums.PersonnelRole;
 import mekhq.campaign.universe.Faction;
 import mekhq.campaign.universe.PlanetarySystem;
 import mekhq.campaign.universe.factionHints.FactionHints;
+import org.jspecify.annotations.NonNull;
 
 
 public class FactionStandingUtilities {
@@ -599,21 +600,48 @@ public class FactionStandingUtilities {
      * @since 0.50.07
      */
     public static String getFactionName(Faction faction, int gameYear) {
+        return getFactionName(faction, gameYear, true);
+    }
+
+    /**
+     * Returns the formatted full name of a {@link Faction} for the specified game year.
+     *
+     * <p>If the faction's name starts with the localized "clan" prefix, the method returns the full name as-is.
+     * Otherwise, the localized "the" article is prefixed to the base name. This helps ensure proper grammatical usage
+     * for varying factions based on localization and faction naming conventions.</p>
+     *
+     * @param faction    the {@link Faction} whose name should be formatted
+     * @param gameYear   the year for which the faction's full name is relevant
+     * @param capitalize If {@code true}, the first letter of the faction name will be capitalized, but only if the
+     *                   first word is {@code "the"}.
+     *
+     * @return the formatted faction name, including the appropriate localized prefix if necessary
+     *
+     * @author Illiani
+     * @since 0.50.07
+     */
+    public static String getFactionName(Faction faction, int gameYear, boolean capitalize) {
         if (faction == null) {
             return getTextAt(RESOURCE_BUNDLE, "FactionStandingUtilities.faction");
         }
 
+        String baseName = faction.getFullName(gameYear);
+        return addNamePrefix(baseName, capitalize);
+    }
+
+    public static @NonNull String addNamePrefix(String baseName, boolean capitalize) {
         final String CLAN = getTextAt(RESOURCE_BUNDLE, "FactionStandingUtilities.clan");
+        final String COMSTAR = getTextAt(RESOURCE_BUNDLE, "FactionStandingUtilities.comStar");
         final String THE = getTextAt(RESOURCE_BUNDLE, "FactionStandingUtilities.the");
 
-        String baseName = faction.getFullName(gameYear);
-        if (baseName.startsWith(CLAN)) {
+        String lowerCaseBaseName = baseName.toLowerCase();
+        if (lowerCaseBaseName.startsWith(CLAN) || lowerCaseBaseName.startsWith(COMSTAR)) {
             return baseName;
         }
 
         // Add additional conditionals here as necessary.
-
-        return THE + ' ' + baseName;
+        String prefix = capitalize ? THE : THE.toLowerCase();
+        return prefix + ' ' + baseName;
     }
 
     /**

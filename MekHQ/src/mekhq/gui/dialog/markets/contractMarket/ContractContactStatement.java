@@ -81,12 +81,15 @@ public final class ContractContactStatement {
         String faction = factionKey(contract);
         String band = standingBand(campaign, contract);
         String objective = objectiveKey(contract);
-        String employerName = contract.getEmployerDisplayName();
+        String baseName = contract.getEmployerDisplayName();
+
+        String nameCapitalized = FactionStandingUtilities.addNamePrefix(baseName, true);
+        String nameLowercase = FactionStandingUtilities.addNamePrefix(baseName, false);
 
         String greeting = getFormattedTextAt(RESOURCE_BUNDLE,
-              "greeting.contractMarket." + faction + "." + band, employerName);
+              "greeting.contractMarket." + faction + "." + band, nameCapitalized, nameLowercase);
         String ask = getFormattedTextAt(RESOURCE_BUNDLE,
-              "ask.contractMarket." + objective + "." + band, employerName);
+              "ask.contractMarket." + objective + "." + band, nameCapitalized, nameLowercase);
 
         return greeting + " " + ask;
     }
