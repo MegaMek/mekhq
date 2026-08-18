@@ -7703,6 +7703,15 @@ public class Campaign implements ITechManager {
             remainingMoney = routedPayout == null ? remainingMoney : routedPayout;
         }
 
+        // Shareholders take their cut of the contract's gross final payout, mirroring the monthly share payout.
+        final Money grossPayout = remainingMoney;
+
+        // With OverageRepaymentInFinalPayment enabled, salvage the player kept beyond their rights is repaid as part of
+        // the final payment, which can push it into a debit (the negative branch below).
+        if (getCampaignOptions().isOverageRepaymentInFinalPayment()) {
+            remainingMoney = remainingMoney.minus(ContractSettlement.salvageOverage(mission));
+        }
+
         if (remainingMoney.isPositive()) {
             getPlayerForce().getFinances().credit(TransactionType.CONTRACT_PAYMENT,
                   getLocalDate(),
@@ -7712,21 +7721,18 @@ public class Campaign implements ITechManager {
                                       remainingMoney.toAmountAndSymbolString() +
                                       " for the remaining payout from contract " +
                                       mission.getHyperlinkedName());
-            // Shareholders take their cut of the final payout, mirroring the monthly share payout.
-            ContractSettlement.settleShares(this, mission, remainingMoney);
         } else if (remainingMoney.isNegative()) {
             getPlayerForce().getFinances().credit(TransactionType.CONTRACT_PAYMENT,
                   getLocalDate(),
                   remainingMoney,
-                  "Repaying payment overages for " + mission.getName());
+                  "Repaying salvage overages for " + mission.getName());
             addReport(FINANCES, "Your account has been debited for " +
                                       remainingMoney.absolute().toAmountAndSymbolString() +
-                                      " to repay payment overages occurred during the contract " +
+                                      " to repay salvage taken beyond your rights on the contract " +
                                       mission.getHyperlinkedName());
         }
 
-        // Reconcile salvage: if the player kept more than their salvage rights allowed, repay the employer the excess.
-        ContractSettlement.settleSalvage(this, mission);
+        ContractSettlement.settleShares(this, mission, grossPayout);
 
         // This relies on the mission being a Contract, and AtB to be on
         if (getCampaignOptions().isUseStratCon()) {

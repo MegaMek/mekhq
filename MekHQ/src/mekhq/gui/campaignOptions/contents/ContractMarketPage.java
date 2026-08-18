@@ -107,9 +107,6 @@ class ContractMarketPage {
     private JCheckBox chkEnableSalvageFlagByDefault;
     private JCheckBox chkUseDynamicDifficulty;
     private JCheckBox chkUseBolsterContractSkill;
-    private JCheckBox chkContractMarketReportRefresh;
-    private JLabel lblContractMaxSalvagePercentage;
-    private JSpinner spnContractMaxSalvagePercentage;
     private JLabel lblDropShipBonusPercentage;
     private JSpinner spnDropShipBonusPercentage;
     private JLabel lblPityContracts;
@@ -226,15 +223,6 @@ class ContractMarketPage {
               getMetadata(MILESTONE_BEFORE_METADATA, CampaignOptionFlag.CUSTOM_SYSTEM));
         chkUseBolsterContractSkill.addMouseListener(createTipPanelUpdater("UseBolsterContractSkill"));
 
-        chkContractMarketReportRefresh = new CampaignOptionsCheckBox("ContractMarketReportRefresh");
-        chkContractMarketReportRefresh.addMouseListener(createTipPanelUpdater("ContractMarketReportRefresh"));
-
-        lblContractMaxSalvagePercentage = new CampaignOptionsLabel("ContractMaxSalvagePercentage");
-        lblContractMaxSalvagePercentage.addMouseListener(createTipPanelUpdater("ContractMaxSalvagePercentage"));
-        spnContractMaxSalvagePercentage = new CampaignOptionsSpinner("ContractMaxSalvagePercentage", 100, 0, 100,
-              10);
-        spnContractMaxSalvagePercentage.addMouseListener(createTipPanelUpdater("ContractMaxSalvagePercentage"));
-
         lblDropShipBonusPercentage = new CampaignOptionsLabel("DropShipBonusPercentage");
         lblDropShipBonusPercentage.addMouseListener(createTipPanelUpdater("DropShipBonusPercentage"));
         spnDropShipBonusPercentage = new CampaignOptionsSpinner("DropShipBonusPercentage", 0, 0, 20, 5);
@@ -262,9 +250,7 @@ class ContractMarketPage {
               chkUseRiskySalvage,
               chkEnableSalvageFlagByDefault,
               chkUseDynamicDifficulty,
-              chkUseBolsterContractSkill,
-              chkContractMarketReportRefresh);
-        panel.addRow(lblContractMaxSalvagePercentage, spnContractMaxSalvagePercentage);
+              chkUseBolsterContractSkill);
         panel.addRow(lblDropShipBonusPercentage, spnDropShipBonusPercentage);
         panel.addRow(lblPityContracts, spnPityContracts);
 
@@ -482,8 +468,6 @@ class ContractMarketPage {
         chkEnableSalvageFlagByDefault.setSelected(model.enableSalvageFlagByDefault);
         chkUseDynamicDifficulty.setSelected(model.useDynamicDifficulty);
         chkUseBolsterContractSkill.setSelected(model.useBolsterContractSkill);
-        chkContractMarketReportRefresh.setSelected(model.contractMarketReportRefresh);
-        spnContractMaxSalvagePercentage.setValue(model.contractMaxSalvagePercentage);
         spnDropShipBonusPercentage.setValue(model.dropShipBonusPercentage);
         spnPityContracts.setValue(model.pityContracts);
         if (model.equipmentContractBase) {
@@ -524,8 +508,6 @@ class ContractMarketPage {
         model.enableSalvageFlagByDefault = chkEnableSalvageFlagByDefault.isSelected();
         model.useDynamicDifficulty = chkUseDynamicDifficulty.isSelected();
         model.useBolsterContractSkill = chkUseBolsterContractSkill.isSelected();
-        model.contractMarketReportRefresh = chkContractMarketReportRefresh.isSelected();
-        model.contractMaxSalvagePercentage = (int) spnContractMaxSalvagePercentage.getValue();
         model.dropShipBonusPercentage = (int) spnDropShipBonusPercentage.getValue();
         model.pityContracts = (int) spnPityContracts.getValue();
         model.equipmentContractBase = btnContractEquipment.isSelected();

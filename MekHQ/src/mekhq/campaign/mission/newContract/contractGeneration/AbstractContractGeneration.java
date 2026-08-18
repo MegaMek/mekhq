@@ -387,6 +387,13 @@ public class AbstractContractGeneration {
         SkillLevel employerSkill = provingGround ? SkillLevel.VETERAN : employerRating.forceSkill();
         SkillLevel enemySkill = provingGround ? SkillLevel.GREEN : enemyRating.forceSkill();
 
+        // "Bolster Contract Skill": an unofficial option that makes both allied and enemy forces one level tougher than
+        // the random tables give, to offset how skilled MekHQ crews get. Proving-ground (pity) contracts stay easy.
+        if (!provingGround && campaignOptions.get(CampaignOption.USE_BOLSTER_CONTRACT_SKILL)) {
+            employerSkill = SkillLevel.changeByDelta(employerSkill, 1);
+            enemySkill = SkillLevel.changeByDelta(enemySkill, 1);
+        }
+
         EmployerData updatedEmployerData = new EmployerData(employerData,
               employerSkill,
               employerRating.equipmentRating());

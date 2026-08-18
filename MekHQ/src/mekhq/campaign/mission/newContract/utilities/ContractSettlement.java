@@ -56,45 +56,34 @@ public final class ContractSettlement {
     private ContractSettlement() {}
 
     /**
-     * Reconciles salvage at contract end. Under normal (non-exchange) salvage rights the player physically keeps the
-     * salvage they recover during the contract; if the value they kept exceeds the fraction their salvage rights allow
-     * of the total salvage recovered, they owe the employer the excess. Salvage-exchange contracts are already paid out
-     * as cash during the contract, so there is nothing to reconcile here.
+     * The value of salvage the player kept beyond their salvage rights, which the employer is owed at contract end.
+     * Under normal (non-exchange) salvage rights the player physically keeps the salvage they recover during the
+     * contract; if the value they kept exceeds the fraction their salvage rights allow of the total salvage recovered,
+     * the excess is owed. Salvage-exchange contracts are already paid out as cash during the contract, so there is
+     * nothing owed. Whether this is actually repaid is the caller's decision (the
+     * {@code OverageRepaymentInFinalPayment} option), which folds it into the final contract payment.
      *
-     * @param campaign the settling campaign
      * @param contract the contract being completed
+     *
+     * @return the salvage overage owed, or {@link Money#zero()} when none is owed
      *
      * @author Illiani
      * @since 0.51.01
      */
-    public static void settleSalvage(Campaign campaign, AbstractContract contract) {
+    public static Money salvageOverage(AbstractContract contract) {
         if (contract.isSalvageExchange()) {
-            return;
+            return Money.zero();
         }
 
         Money playerSalvage = contract.getSalvagedByUnitValue();
         Money totalSalvage = playerSalvage.plus(contract.getSalvagedByEmployerValue());
         if (!totalSalvage.isPositive()) {
-            return;
+            return Money.zero();
         }
 
         // The salvage-rights multiplier (0-1) caps the fraction of the total salvage value the player may keep.
         Money allowedSalvage = totalSalvage.multipliedBy(contract.getSalvageRightsMultiplier());
-        if (!playerSalvage.isGreaterThan(allowedSalvage)) {
-            return;
-        }
-
-        Money overage = playerSalvage.minus(allowedSalvage);
-        campaign.getPlayerForce()
-              .getFinances()
-              .debit(TransactionType.SALVAGE,
-                    campaign.getLocalDate(),
-                    overage,
-                    getFormattedTextAt(RESOURCE_BUNDLE, "ContractSettlement.salvageOverage.transaction",
-                          contract.getName()));
-        campaign.addReport(FINANCES,
-              getFormattedTextAt(RESOURCE_BUNDLE, "ContractSettlement.salvageOverage.report",
-                    overage.toAmountAndSymbolString(), contract.getHyperlinkedName()));
+        return playerSalvage.isGreaterThan(allowedSalvage) ? playerSalvage.minus(allowedSalvage) : Money.zero();
     }
 
     /**

@@ -809,7 +809,14 @@ public abstract class AbstractContract {
             return 0;
         }
 
-        return Math.max(0, ChronoUnit.MONTHS.between(localDate, endingDate));
+        // Escrow is owed a full month for any partial month still to run, so round the whole-month count up whenever
+        // it does not reach the end date. Example: from 20 March to a 15 June end date is 2 whole months plus a
+        // partial, which owes 3 months of escrow.
+        long monthsLeft = ChronoUnit.MONTHS.between(localDate, endingDate);
+        if (localDate.plusMonths(monthsLeft).isBefore(endingDate)) {
+            monthsLeft++;
+        }
+        return Math.max(0, monthsLeft);
     }
 
     public boolean isPeaceful() {

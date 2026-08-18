@@ -51,6 +51,7 @@ import static mekhq.utilities.MHQInternationalization.getTextAt;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
+import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.GridBagConstraints;
@@ -258,6 +259,21 @@ public final class BriefingTab extends CampaignGuiTab {
 
         comboMission = new MMComboBox<>("comboMission");
         styleCompactComponent(comboMission);
+        // Show each mission's status (Active, Success, Failed, ...) alongside its name.
+        comboMission.setRenderer(new DefaultListCellRenderer() {
+            @Override
+            public Component getListCellRendererComponent(JList<?> list, Object value, int index, boolean isSelected,
+                  boolean cellHasFocus) {
+                super.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);
+                if (value instanceof AbstractContract contract) {
+                    MissionStatus status = contract.getStatus();
+                    if (status != null) {
+                        setText(getText() + " [" + status + "]");
+                    }
+                }
+                return this;
+            }
+        });
         comboMission.addActionListener(ev -> changeMission());
         gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 1;
