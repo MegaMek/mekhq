@@ -567,12 +567,23 @@ public abstract class AbstractContract {
         return enemyData.getFaction();
     }
 
-    public @Nullable String getSponsorFactionCode() {
+    /**
+     * @return the code of the covert patron bankrolling the <em>enemy</em>, or {@code null} if it has none. The
+     *       employer may have a sponsor of its own; reach that through {@link #getEmployerData()}.
+     */
+    public @Nullable String getEnemySponsorFactionCode() {
         return enemyData.sponsorFactionCode();
     }
 
-    public @Nullable Faction getSponsorFaction() {
-        return Factions.getInstance().getFaction(enemyData.sponsorFactionCode());
+    /**
+     * @return the covert patron bankrolling the <em>enemy</em>, or {@code null} if it has none. The employer may have a
+     *       sponsor of its own; reach that through {@link #getEmployerData()}.
+     */
+    public @Nullable Faction getEnemySponsorFaction() {
+        final String sponsorFactionCode = enemyData.sponsorFactionCode();
+        // Factions.getFaction hands back a blank Faction rather than null for an unknown code, so guard here or
+        // callers get an empty placeholder that passes their null check.
+        return (sponsorFactionCode == null) ? null : Factions.getInstance().getFaction(sponsorFactionCode);
     }
 
     public String getEnemyDisplayName() {
