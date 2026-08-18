@@ -114,6 +114,7 @@ public final class LegacyContractConverter {
         String description = "";
         String systemId = null;
         String legacySystemName = "";
+        String legacyParentContractId = "";
         MissionStatus status = MissionStatus.ACTIVE;
 
         LocalDate startDate = null;
@@ -211,6 +212,7 @@ public final class LegacyContractConverter {
                     case "batchallAccepted" -> batchallAccepted = Boolean.parseBoolean(value);
                     case "employerLiaison" -> legacyLiaison = legacyPerson(child, campaign, version);
                     case "clanOpponent" -> legacyOpposingCommander = legacyPerson(child, campaign, version);
+                    case "parentContractId" -> legacyParentContractId = value;
                     case "scenarios" -> convertScenarios(child, campaign, version, contract);
                     default -> {
                         if (StratConCampaignState.ROOT_XML_ELEMENT_NAME.equals(tag)) {
@@ -232,6 +234,14 @@ public final class LegacyContractConverter {
         systemId = systemIdOrPlaceholder(systemId, legacySystemName, campaign);
         if (name.isBlank()) {
             name = getFormattedTextAt(RESOURCE_BUNDLE, "legacyContract.defaultName", employerName);
+        }
+
+        // The new contract model has no parent/child linkage, so a subcontract converts as a standalone contract.
+        // Logged rather than dropped silently, so the loss shows up in the migration log alongside everything else.
+        if (!legacyParentContractId.isBlank()) {
+            LOGGER.warn("Legacy contract '{}' was a subcontract of mission {}. The new contract model has no"
+                              + " subcontract linkage, so it converts as a standalone contract.",
+                  name, legacyParentContractId);
         }
 
         // Keep the NPCs the save actually recorded; only invent one where the legacy format had none. A liaison is
