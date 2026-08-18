@@ -43,6 +43,7 @@ import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.time.LocalDate;
+import java.time.temporal.ChronoUnit;
 import java.util.AbstractMap;
 import java.util.Arrays;
 import javax.swing.*;
@@ -84,6 +85,7 @@ import mekhq.campaign.universe.enums.HiringHallLevel;
 import mekhq.gui.FactionComboBox;
 import mekhq.gui.baseComponents.roundedComponents.RoundedJButton;
 import mekhq.gui.baseComponents.roundedComponents.RoundedLineBorder;
+import mekhq.gui.dialog.DateChooser;
 import mekhq.gui.displayWrappers.RankDisplay;
 import mekhq.gui.utilities.JSuggestField;
 
@@ -107,6 +109,8 @@ public class ContractEditorDialog extends JDialog {
 
     private static final int MONEY_STEP = 1000;
     private static final int LABEL_WIDTH = 170;
+    /** The end date is held at least this many months after the start date. */
+    private static final int MINIMUM_CONTRACT_LENGTH_MONTHS = 1;
     private static final int ICON_SIZE = 48;
     /** Profession used to label ranks in the create-mode NPC pickers; the numeric rank is what actually applies. */
     private static final Profession DEFAULT_PROFESSION = Profession.MEKWARRIOR;
@@ -137,8 +141,12 @@ public class ContractEditorDialog extends JDialog {
     private JCheckBox victoryPointsAutomatic;
 
     // Schedule
-    private JTextField startDateField;
-    private JTextField endDateField;
+    private JButton startDateButton;
+    private JCheckBox startAutomatic;
+    private JButton endDateButton;
+    private JCheckBox endAutomatic;
+    private transient LocalDate startDate;
+    private transient LocalDate endDate;
     private JSpinner lengthSpinner;
 
     // Target
@@ -449,19 +457,156 @@ public class ContractEditorDialog extends JDialog {
         JPanel rows = rowsPanel();
         ContractScheduleData schedule = contract.getScheduleData();
 
-        startDateField = dateField(schedule == null ? null : schedule.startDate());
-        rows.add(formRow("edit.contractMarket.field.startDate", startDateField));
+        startDate = schedule == null ? null : schedule.startDate();
+        endDate = schedule == null ? null : schedule.endDate();
 
-        endDateField = dateField(schedule == null ? null : schedule.endDate());
-        rows.add(formRow("edit.contractMarket.field.endDate", endDateField));
+        // Automatic start/end are offered in both modes since they are deterministic (start from travel time, end from
+        // the length). They default on for a brand-new offer and off when editing, so an existing contract's dates show
+        // as they stand.
+        startDateButton = dateButton(this::pickStartDate);
+        startAutomatic = scheduleAutomaticToggle(this::onStartAutomaticToggled);
+        rows.add(formRow("edit.contractMarket.field.startDate", withAutomatic(startDateButton, startAutomatic)));
 
-        lengthSpinner = intSpinner(max(0, contract.getLengthInMonths()), 0);
-        // Reports the length the dates imply; editing it directly would just be overwritten on save.
-        lengthSpinner.setEnabled(false);
+        endDateButton = dateButton(this::pickEndDate);
+        endAutomatic = scheduleAutomaticToggle(this::onEndAutomaticToggled);
+        rows.add(formRow("edit.contractMarket.field.endDate", withAutomatic(endDateButton, endAutomatic)));
+
+        // The length is derived from the dates when the end date is set by hand, but becomes the GM's own input that
+        // drives the end date when the end date is automatic.
+        lengthSpinner = intSpinner(max(MINIMUM_CONTRACT_LENGTH_MONTHS, contract.getLengthInMonths()),
+              MINIMUM_CONTRACT_LENGTH_MONTHS);
         lengthSpinner.setToolTipText(getTextAt(RESOURCE_BUNDLE, "edit.contractMarket.field.length.tooltip"));
+        lengthSpinner.addChangeListener(e -> onLengthChanged());
         rows.add(formRow("edit.contractMarket.field.length", lengthSpinner));
 
+        // Seed the automatic values so the initial display already reflects the checkbox defaults.
+        if (startAutomatic.isSelected()) {
+            startDate = AbstractContractGeneration.determineStartDate(campaign, contract);
+        }
+        if (endAutomatic.isSelected() && startDate != null) {
+            endDate = startDate.plusMonths(lengthValue());
+        }
+        refreshScheduleControls();
         return card(rows);
+    }
+
+    /** A button that shows a date (or "not set") and runs {@code onPick} - a {@link DateChooser} flow - when clicked. */
+    private JButton dateButton(Runnable onPick) {
+        JButton button = new JButton();
+        button.setToolTipText(getTextAt(RESOURCE_BUNDLE, "edit.contractMarket.date.pick.tooltip"));
+        button.addActionListener(e -> onPick.run());
+        return button;
+    }
+
+    /** An "Automatic" checkbox for a schedule field, defaulting on for a new offer and off when editing. */
+    private JCheckBox scheduleAutomaticToggle(Runnable onToggle) {
+        JCheckBox automatic = new JCheckBox(getTextAt(RESOURCE_BUNDLE, "edit.contractMarket.field.automatic"),
+              createMode);
+        automatic.setToolTipText(getTextAt(RESOURCE_BUNDLE, "edit.contractMarket.field.automatic.tooltip"));
+        automatic.addActionListener(e -> onToggle.run());
+        return automatic;
+    }
+
+    private void onStartAutomaticToggled() {
+        if (startAutomatic.isSelected()) {
+            startDate = AbstractContractGeneration.determineStartDate(campaign, contract);
+        }
+        reconcileScheduleAfterStartChange();
+        refreshScheduleControls();
+    }
+
+    private void onEndAutomaticToggled() {
+        if (endAutomatic.isSelected() && startDate != null) {
+            endDate = startDate.plusMonths(lengthValue());
+        }
+        refreshScheduleControls();
+    }
+
+    private void onLengthChanged() {
+        if (endAutomatic.isSelected() && startDate != null) {
+            endDate = startDate.plusMonths(lengthValue());
+            endDateButton.setText(dateButtonLabel(endDate));
+        }
+    }
+
+    private void pickStartDate() {
+        LocalDate picked = pickDate(startDate);
+        if (picked == null) {
+            return;
+        }
+        startDate = picked;
+        reconcileScheduleAfterStartChange();
+        refreshScheduleControls();
+    }
+
+    private void pickEndDate() {
+        LocalDate seed = endDate != null ?
+                               endDate
+                               :
+                               (startDate != null ? startDate.plusMonths(MINIMUM_CONTRACT_LENGTH_MONTHS) : currentDate);
+        LocalDate picked = pickDate(seed);
+        if (picked == null) {
+            return;
+        }
+        // With no start yet, anchor one a month before the chosen end so the pair is valid.
+        if (startDate == null) {
+            startDate = picked.minusMonths(MINIMUM_CONTRACT_LENGTH_MONTHS);
+        }
+        // Keep the one-month minimum span: an end nearer than a month to the start is clamped up to the minimum.
+        LocalDate earliestEnd = startDate.plusMonths(MINIMUM_CONTRACT_LENGTH_MONTHS);
+        endDate = picked.isBefore(earliestEnd) ? earliestEnd : picked;
+        refreshScheduleControls();
+    }
+
+    /** After the start date moves, re-derive the end (when it is automatic) or nudge it out to keep the minimum span. */
+    private void reconcileScheduleAfterStartChange() {
+        if (startDate == null) {
+            return;
+        }
+        if (endAutomatic.isSelected()) {
+            endDate = startDate.plusMonths(lengthValue());
+            return;
+        }
+        LocalDate earliestEnd = startDate.plusMonths(MINIMUM_CONTRACT_LENGTH_MONTHS);
+        if (endDate == null || endDate.isBefore(earliestEnd)) {
+            endDate = earliestEnd;
+        }
+    }
+
+    /**
+     * Opens the shared date chooser seeded at {@code seed} (today when null); returns the chosen date, or null if
+     * cancelled.
+     */
+    private @Nullable LocalDate pickDate(@Nullable LocalDate seed) {
+        DateChooser chooser = new DateChooser(this, seed != null ? seed : currentDate);
+        return chooser.showDateChooser() == DateChooser.OK_OPTION ? chooser.getDate() : null;
+    }
+
+    /** The length spinner's value, never below the one-month minimum. */
+    private int lengthValue() {
+        return max(MINIMUM_CONTRACT_LENGTH_MONTHS, intValue(lengthSpinner));
+    }
+
+    /**
+     * Repaints the date buttons and applies the enabled states: a date button is editable only when its "Automatic" box
+     * is off, and the length spinner is editable only when the end date is automatic (where it drives the end). When
+     * the end date is set by hand the spinner instead shows the length the dates imply.
+     */
+    private void refreshScheduleControls() {
+        startDateButton.setText(dateButtonLabel(startDate));
+        endDateButton.setText(dateButtonLabel(endDate));
+        startDateButton.setEnabled(!startAutomatic.isSelected());
+        endDateButton.setEnabled(!endAutomatic.isSelected());
+        lengthSpinner.setEnabled(endAutomatic.isSelected());
+        if (!endAutomatic.isSelected() && startDate != null && endDate != null) {
+            lengthSpinner.setValue((int) max(MINIMUM_CONTRACT_LENGTH_MONTHS,
+                  ChronoUnit.MONTHS.between(startDate, endDate)));
+        }
+    }
+
+    private String dateButtonLabel(@Nullable LocalDate date) {
+        return date == null ? getTextAt(RESOURCE_BUNDLE, "edit.contractMarket.date.notSet")
+                     : MekHQ.getMHQOptions().getDisplayFormattedDate(date);
     }
 
     private JPanel buildTargetCard() {
@@ -765,19 +910,31 @@ public class ContractEditorDialog extends JDialog {
             contract.setRequiredVictoryPoints(intValue(victoryPointsSpinner));
         }
 
-        // Schedule. lengthInMonths is derived from the dates everywhere else in the model, so go through the copy
-        // constructor and let it recompute rather than saving a spinner value that can contradict them.
-        ContractScheduleData schedule = contract.getScheduleData();
-        ContractScheduleData scheduleBase = (schedule == null) ? new ContractScheduleData(null, null, 0) : schedule;
-        contract.setScheduleData(new ContractScheduleData(scheduleBase,
-              parseDate(startDateField, scheduleStart(schedule)),
-              parseDate(endDateField, scheduleEnd(schedule))));
-
-        // Target
+        // Target. Resolved before the schedule so an automatic start date can factor travel time to the chosen target.
         PlanetarySystem system = resolveSystem(systemField.getText());
         String systemId = system != null ? system.getId() : contract.getTargetSystemId();
         Planet planet = (Planet) planetCombo.getSelectedItem();
         contract.setSystemsTargetData(new SystemsTargetData(systemId, planet == null ? null : planet.getId()));
+
+        // Schedule. An automatic start is (re)derived from travel time to the target just saved; an automatic end is
+        // the start plus the GM's chosen length. The date pickers keep at least a one-month span, but enforce it
+        // defensively here too in case the loaded data predates the rule. lengthInMonths is derived from the dates
+        // everywhere else in the model, so go through the copy constructor and let it recompute.
+        LocalDate saveStart = startAutomatic.isSelected()
+                                    ? AbstractContractGeneration.determineStartDate(campaign, contract)
+                                    : startDate;
+        LocalDate saveEnd = endAutomatic.isSelected()
+                                  ? (saveStart == null ? null : saveStart.plusMonths(lengthValue()))
+                                  : endDate;
+        if (saveStart != null && saveEnd != null) {
+            LocalDate earliestEnd = saveStart.plusMonths(MINIMUM_CONTRACT_LENGTH_MONTHS);
+            if (saveEnd.isBefore(earliestEnd)) {
+                saveEnd = earliestEnd;
+            }
+        }
+        ContractScheduleData schedule = contract.getScheduleData();
+        ContractScheduleData scheduleBase = (schedule == null) ? new ContractScheduleData(null, null, 0) : schedule;
+        contract.setScheduleData(new ContractScheduleData(scheduleBase, saveStart, saveEnd));
 
         // Employer
         EmployerData employer = contract.getEmployerData();
@@ -927,15 +1084,15 @@ public class ContractEditorDialog extends JDialog {
     }
 
     /**
-     * Lays a parameter spinner beside its "Automatic" checkbox as a single field for {@link #formRow}. With no checkbox
-     * (edit mode) the spinner is the field on its own.
+     * Lays a field beside its "Automatic" checkbox as a single component for {@link #formRow}. With no checkbox (a
+     * parameter in edit mode) the field is returned on its own.
      */
-    private JComponent withAutomatic(JSpinner spinner, @Nullable JCheckBox automatic) {
+    private JComponent withAutomatic(JComponent field, @Nullable JCheckBox automatic) {
         if (automatic == null) {
-            return spinner;
+            return field;
         }
         JPanel panel = new JPanel(new BorderLayout(scaleForGUI(8), 0));
-        panel.add(spinner, BorderLayout.CENTER);
+        panel.add(field, BorderLayout.CENTER);
         panel.add(automatic, BorderLayout.EAST);
         return panel;
     }
@@ -1153,14 +1310,6 @@ public class ContractEditorDialog extends JDialog {
         } catch (Exception ex) {
             return fallback;
         }
-    }
-
-    private static LocalDate scheduleStart(ContractScheduleData schedule) {
-        return schedule == null ? null : schedule.startDate();
-    }
-
-    private static LocalDate scheduleEnd(ContractScheduleData schedule) {
-        return schedule == null ? null : schedule.endDate();
     }
 
     private static String orEmpty(String value) {

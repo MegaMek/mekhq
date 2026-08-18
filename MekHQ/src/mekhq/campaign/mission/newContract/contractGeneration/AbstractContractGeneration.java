@@ -248,6 +248,44 @@ public class AbstractContractGeneration {
     }
 
     /**
+     * Determines a contract's start date from the travel time to its target, the way generation does: the player
+     * journeys from their current system to the contract's target world and the contract begins on arrival. The
+     * computed jump path is cached on the contract as a side effect, exactly as generation does. Exposed as public so
+     * the GM contract editor's "Automatic" start date follows the same rule.
+     *
+     * @return the automatically determined start date, or the campaign date when no route can be measured
+     */
+    public static LocalDate determineStartDate(Campaign campaign, AbstractContract contract) {
+        PlayerForce playerForce = campaign.getPlayerForce();
+        return determineStartDate(campaign, campaign.getLocalDate(), campaign.getCurrentSystem(),
+              contract.getTargetSystem(), contract.getTargetPlanet(), playerForce.getFactionStandings(),
+              playerForce.isOverridingCommandCircuitRequirements(), campaign.isGM(),
+              contract.getEmployerFactionCode(), contract);
+    }
+
+    private static LocalDate determineStartDate(Campaign campaign, LocalDate currentDate,
+          @Nullable PlanetarySystem currentSystem, @Nullable PlanetarySystem targetSystem,
+          @Nullable Planet targetPlanet, FactionStandings factionStandings,
+          boolean overridingCommandCircuitRequirements, boolean isGM, String employerFactionCode,
+          AbstractContract contract) {
+        if (currentSystem == null || targetSystem == null) {
+            // No route to measure - the contract begins immediately.
+            return currentDate;
+        }
+
+        // Jump Path, terminating at the specific target planet so the journey time ends at the world the contract is
+        // fought over rather than the system's primary world.
+        JumpPath jumpPath = campaign.calculateJumpPath(currentSystem, targetSystem);
+        jumpPath.setTargetPlanet(targetPlanet);
+        contract.setCachedJumpPath(jumpPath);
+
+        boolean isUseCommandCircuit = FactionStandingUtilities.isUseCommandCircuit(overridingCommandCircuitRequirements,
+              isGM, factionStandings, employerFactionCode);
+        int journeyTimeInDays = (int) ceil(jumpPath.getTotalTime(currentDate, 0, isUseCommandCircuit));
+        return currentDate.plusDays(journeyTimeInDays);
+    }
+
+    /**
      * Rates the skill and equipment both sides commit to the contract, then rebuilds the employer and enemy data with
      * those ratings in place of the placeholder defaults.
      *
@@ -347,19 +385,10 @@ public class AbstractContractGeneration {
           PlanetarySystem currentSystem, Planet targetPlanet, FactionStandings factionStandings,
           boolean overridingCommandCircuitRequirements, boolean isGM, PlanetarySystem targetSystem,
           String employerFactionCode, ChaosObjectiveType objectiveType, ChaosContract contract) {
-        // Jump Path, terminating at the specific target planet so both the journey time below and the actual travel
-        // end at the world the contract is fought over rather than the system's primary world.
-        JumpPath jumpPath = campaign.calculateJumpPath(currentSystem, targetSystem);
-        jumpPath.setTargetPlanet(targetPlanet);
-        contract.setCachedJumpPath(jumpPath);
-
-        // Journey Duration
-        boolean isUseCommandCircuit = FactionStandingUtilities.isUseCommandCircuit(overridingCommandCircuitRequirements,
-              isGM, factionStandings, employerFactionCode);
-        int journeyTimeInDays = (int) ceil(jumpPath.getTotalTime(currentDate, 0, isUseCommandCircuit));
-
-        // Contract schedule
-        LocalDate startDate = currentDate.plusDays(journeyTimeInDays);
+        // Contract schedule - the player journeys from their current system to the target world, arriving on the
+        // start date (this also caches the jump path on the contract).
+        LocalDate startDate = determineStartDate(campaign, currentDate, currentSystem, targetSystem, targetPlanet,
+              factionStandings, overridingCommandCircuitRequirements, isGM, employerFactionCode, contract);
 
         int monthsLength = objectiveType.calculateLength(useVariableContractLength);
         LocalDate endDate = startDate.plusMonths(monthsLength);
