@@ -419,6 +419,9 @@ public class ContractEditorDialog extends JDialog {
         rows.add(formRow("edit.contractMarket.field.endDate", endDateField));
 
         lengthSpinner = intSpinner(max(0, contract.getLengthInMonths()), 0);
+        // Reports the length the dates imply; editing it directly would just be overwritten on save.
+        lengthSpinner.setEnabled(false);
+        lengthSpinner.setToolTipText(getTextAt(RESOURCE_BUNDLE, "edit.contractMarket.field.length.tooltip"));
         rows.add(formRow("edit.contractMarket.field.length", lengthSpinner));
 
         return card("edit.contractMarket.section.schedule", rows);
@@ -689,7 +692,7 @@ public class ContractEditorDialog extends JDialog {
             contract.setContractName(name);
         }
         contract.setDescription(descriptionArea.getText());
-        contract.setStatus(enumValue(statusCombo, contract.getStatus()));
+        contract.setStatus(statusValue(statusCombo));
 
         // Parameters
         contract.setScale(intValue(scaleSpinner));
@@ -697,10 +700,13 @@ public class ContractEditorDialog extends JDialog {
         contract.setRequiredCombatElements(intValue(combatElementsSpinner));
         contract.setRequiredVictoryPoints(intValue(victoryPointsSpinner));
 
-        // Schedule
+        // Schedule. lengthInMonths is derived from the dates everywhere else in the model, so go through the copy
+        // constructor and let it recompute rather than saving a spinner value that can contradict them.
         ContractScheduleData schedule = contract.getScheduleData();
-        contract.setScheduleData(new ContractScheduleData(parseDate(startDateField, scheduleStart(schedule)),
-              parseDate(endDateField, scheduleEnd(schedule)), intValue(lengthSpinner)));
+        ContractScheduleData scheduleBase = (schedule == null) ? new ContractScheduleData(null, null, 0) : schedule;
+        contract.setScheduleData(new ContractScheduleData(scheduleBase,
+              parseDate(startDateField, scheduleStart(schedule)),
+              parseDate(endDateField, scheduleEnd(schedule))));
 
         // Target
         PlanetarySystem system = resolveSystem(systemField.getText());
@@ -1015,6 +1021,14 @@ public class ContractEditorDialog extends JDialog {
 
     private static ChaosContractStepsTable stepValue(JComboBox<ChaosContractStepsTable> combo) {
         return enumValue(combo, ChaosContractStepsTable.STEP_ONE);
+    }
+
+    /**
+     * Falls back to {@link MissionStatus#ACTIVE} rather than the contract's current status: a contract being edited
+     * here is one the campaign holds, and the editor must not be able to write a status back out that is absent.
+     */
+    private static MissionStatus statusValue(JComboBox<MissionStatus> combo) {
+        return enumValue(combo, MissionStatus.ACTIVE);
     }
 
     private static ContractObjectiveType objectiveValue(JComboBox<ContractObjectiveType> combo) {
