@@ -37,6 +37,8 @@ import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
 import static mekhq.utilities.MHQInternationalization.getTextAt;
 
 import java.awt.FlowLayout;
+import java.util.HashMap;
+import java.util.Map;
 import javax.swing.ImageIcon;
 import javax.swing.JComponent;
 import javax.swing.JLabel;
@@ -61,6 +63,18 @@ public final class ContractMarketFormatting {
     private static final String SKULL_HALF_IMAGE = "data/images/misc/challenge_estimate_half.png";
     private static final int DEFAULT_DIFFICULTY = 5;
 
+    /**
+     * The skull artwork, read from disk once and cached per requested size. A market listing renders these for every
+     * offer it shows, so without this each card would re-read and re-scale both files.
+     *
+     * <p>Populated lazily from the EDT during rendering, so a plain map suffices. The cached icons are shared by all
+     * the labels that use them, which is safe: an {@link ImageIcon} is a stateless renderer.</p>
+     */
+    private static final ImageIcon SKULL_FULL_BASE = new ImageIcon(SKULL_FULL_IMAGE);
+    private static final ImageIcon SKULL_HALF_BASE = new ImageIcon(SKULL_HALF_IMAGE);
+    private static final Map<Integer, ImageIcon> SCALED_FULL_SKULLS = new HashMap<>();
+    private static final Map<Integer, ImageIcon> SCALED_HALF_SKULLS = new HashMap<>();
+
     private ContractMarketFormatting() {
     }
 
@@ -84,8 +98,8 @@ public final class ContractMarketFormatting {
         JPanel panel = new JPanel(new FlowLayout(FlowLayout.LEFT, 0, 0));
         panel.setOpaque(false);
 
-        ImageIcon full = scaleImageIcon(new ImageIcon(SKULL_FULL_IMAGE), size, true);
-        ImageIcon half = scaleImageIcon(new ImageIcon(SKULL_HALF_IMAGE), size, true);
+        ImageIcon full = scaledSkull(SCALED_FULL_SKULLS, SKULL_FULL_BASE, size);
+        ImageIcon half = scaledSkull(SCALED_HALF_SKULLS, SKULL_HALF_BASE, size);
 
         int fullSkulls = difficulty / 2;
         boolean halfSkull = (difficulty % 2) != 0;
@@ -96,6 +110,11 @@ public final class ContractMarketFormatting {
             panel.add(new JLabel(half));
         }
         return panel;
+    }
+
+    /** Returns the skull artwork scaled to {@code size}, scaling and caching it on first request for that size. */
+    private static ImageIcon scaledSkull(Map<Integer, ImageIcon> cache, ImageIcon base, int size) {
+        return cache.computeIfAbsent(size, requested -> scaleImageIcon(base, requested, true));
     }
 
     /**
