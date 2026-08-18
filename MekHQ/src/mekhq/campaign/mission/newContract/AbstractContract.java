@@ -75,6 +75,12 @@ import mekhq.campaign.universe.PlanetarySystem;
  * its inheritors, as thin as possible.</p>
  */
 public abstract class AbstractContract {
+    /**
+     * Support points negotiable per required combat team at the start of a contract. Sole definition of the rule - read
+     * it through {@link #getMaximumSupportPoints()} rather than recomputing it.
+     */
+    public static final int INITIAL_SUPPORT_POINTS_PER_COMBAT_TEAM = 3;
+
     private UUID contractId;
     private String contractName;
     private @Nonnull String description = "";
@@ -795,12 +801,12 @@ public abstract class AbstractContract {
 
     /**
      * Returns the support-point reserve this contract can be negotiated up to, used as the "full reserves" reference
-     * when displaying support points. This mirrors the cap applied during initial support-point negotiation (see
-     * {@link SupportPointNegotiation}): three per required combat team.
+     * when displaying support points, and the cap applied during initial support-point negotiation - which calls this
+     * rather than repeating the rule (see {@link SupportPointNegotiation}).
      *
      * @return the maximum support points the contract can hold in reserve
      */
     public int getMaximumSupportPoints() {
-        return scale * 3;
+        return scale * INITIAL_SUPPORT_POINTS_PER_COMBAT_TEAM;
     }
 }
