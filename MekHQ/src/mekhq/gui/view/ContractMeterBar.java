@@ -247,6 +247,22 @@ public class ContractMeterBar extends JPanel {
     }
 
     /**
+     * Creates a generic value meter in the same style as the contract gauges, with a caller-supplied title and tooltip.
+     * Useful for reusing the meter outside of contracts (for example, per-chassis familiarity).
+     *
+     * @param title          the meter's title (e.g. a chassis name)
+     * @param currentValue   the current value marked on the track
+     * @param referenceValue the reference (maximum) value; should be positive
+     * @param tooltip        the tooltip to display, or {@code null} for none
+     *
+     * @return the configured value meter
+     */
+    public static @Nonnull ContractMeterBar valueBar(final String title, final int currentValue,
+          final int referenceValue, final @Nullable String tooltip) {
+        return valueMeter(title, currentValue, referenceValue, tooltip);
+    }
+
+    /**
      * Creates a gauge of the salvage percentage claimed so far against the negotiated maximum.
      *
      * @param currentPercent the salvage percentage claimed so far

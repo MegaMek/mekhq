@@ -212,6 +212,7 @@ import mekhq.campaign.personnel.divorce.AbstractDivorce;
 import mekhq.campaign.personnel.enums.PersonnelRole;
 import mekhq.campaign.personnel.enums.PersonnelStatus;
 import mekhq.campaign.personnel.enums.SplittingSurnameStyle;
+import mekhq.campaign.personnel.familiarity.Familiarity;
 import mekhq.campaign.personnel.generator.AbstractPersonnelGenerator;
 import mekhq.campaign.personnel.marriage.AbstractMarriage;
 import mekhq.campaign.personnel.procreation.AbstractProcreation;
@@ -6575,6 +6576,19 @@ public class Campaign implements ITechManager {
 
         if (getCampaignOptions().isUseEraMods()) {
             target.addModifier(getFaction().getEraMod(getGameYear()), "era");
+        }
+
+        Familiarity familiarity = getCampaignOptions().get(CampaignOption.CHASSIS_FAMILIARITY_MODE);
+        Unit partUnit = partWork.getUnit();
+        if (familiarity.isEnabled() && partUnit != null) {
+            Entity partEntity = partUnit.getEntity();
+
+            if (partEntity != null) {
+                int bonus = tech.getChassisFamiliarityTechBonus(familiarity, partEntity, true);
+                if (bonus != 0) {
+                    target.addModifier(-bonus, "Chassis Familiarity");
+                }
+            }
         }
 
         final boolean isOvertime;
