@@ -78,7 +78,12 @@ public class ContractEmergencyExtension {
             return false;
         }
 
-        LocalDate newEndDate = contract.getEndingDate().plusMonths(extension);
+        LocalDate endingDate = contract.getEndingDate();
+        if (endingDate == null) {
+            return false;
+        }
+
+        LocalDate newEndDate = endingDate.plusMonths(extension);
         contract.updateScheduleData(null, newEndDate);
 
         // We spike morale to create a jump in contract difficulty - essentially the reason why the employer is using

@@ -115,7 +115,7 @@ public class ContractUtilities {
      */
     public static int getDeploymentDeficit(Campaign campaign, AbstractContract contract) {
         LocalDate currentDate = campaign.getLocalDate();
-        if (!contract.isActiveOn(currentDate) || contract.getStartDate().isEqual(currentDate)) {
+        if (!contract.isActiveOn(currentDate) || currentDate.equals(contract.getStartDate())) {
             // Do not check for deficits if the contract has not started, or
             // it is the first day of the contract, as players won't have
             // had time to assign forces to the contract yet

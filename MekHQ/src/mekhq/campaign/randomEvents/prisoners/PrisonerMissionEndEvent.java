@@ -50,6 +50,7 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
+import jakarta.annotation.Nullable;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.campaignOptions.CampaignOption;
 import mekhq.campaign.campaignOptions.CampaignOptions;
@@ -264,9 +265,9 @@ public class PrisonerMissionEndEvent {
      * @return the start date of the contract or mission as a {@link LocalDate}, or {@code null} if no valid date is
      *       found.
      */
-    private LocalDate getContractOrMissionStartDate() {
+    private @Nullable LocalDate getContractOrMissionStartDate() {
         LocalDate startDate = mission.getStartDate();
-        return startDate.minusDays(1);
+        return (startDate == null) ? null : startDate.minusDays(1);
     }
 
     /**

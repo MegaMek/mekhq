@@ -659,11 +659,17 @@ public abstract class AbstractContract {
         return objectiveData.opposingObjectiveType();
     }
 
-    public LocalDate getStartDate() {
+    /**
+     * @return the day this contract begins, or {@code null} when its schedule is not settled
+     */
+    public @Nullable LocalDate getStartDate() {
         return scheduleData.startDate();
     }
 
-    public LocalDate getEndingDate() {
+    /**
+     * @return the day this contract ends, or {@code null} when it is open-ended
+     */
+    public @Nullable LocalDate getEndingDate() {
         return scheduleData.endDate();
     }
 
@@ -751,8 +757,20 @@ public abstract class AbstractContract {
         salvagedByUnitValue = salvagedByUnitValue.plus(delta);
     }
 
+    /**
+     * @param localDate the day to count from
+     *
+     * @return whole months from {@code localDate} until this contract ends, never negative, and {@code 0} when it has
+     *       no end date. Every caller multiplies this by the monthly pay to settle outstanding escrow, so neither an
+     *       unsettled schedule nor a date past the contract's end owes anything.
+     */
     public long getMonthsLeft(LocalDate localDate) {
-        return ChronoUnit.MONTHS.between(localDate, getEndingDate());
+        final LocalDate endingDate = getEndingDate();
+        if (endingDate == null) {
+            return 0;
+        }
+
+        return Math.max(0, ChronoUnit.MONTHS.between(localDate, endingDate));
     }
 
     public boolean isPeaceful() {

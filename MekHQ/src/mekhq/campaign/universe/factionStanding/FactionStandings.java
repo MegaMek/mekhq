@@ -1674,7 +1674,8 @@ public class FactionStandings {
         int currentYear = today.getYear();
 
         for (AbstractContract mission : missions) {
-            int missionYear = missionYear = mission.getStartDate().getYear();
+            LocalDate missionStartDate = mission.getStartDate();
+            int missionYear = (missionStartDate == null) ? currentYear : missionStartDate.getYear();
 
             missionsByYear.computeIfAbsent(missionYear, y -> new ArrayList<>()).add(mission);
         }

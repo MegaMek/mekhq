@@ -292,7 +292,7 @@ public class StratConRulesManager {
             final LocalDate scenarioTargetDate = campaign.getLocalDate().plusDays(deploymentDelay);
             final LocalDate contractEnd = campaignState.getContract().getEndingDate();
 
-            if (!scenarioTargetDate.isBefore(contractEnd)) {
+            if ((contractEnd != null) && !scenarioTargetDate.isBefore(contractEnd)) {
                 LOGGER.info("Skipping scenario because it is on or after the contract end date.");
                 return;
             }

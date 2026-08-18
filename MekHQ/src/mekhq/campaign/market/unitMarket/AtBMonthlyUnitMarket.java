@@ -140,8 +140,9 @@ public class AtBMonthlyUnitMarket extends AbstractUnitMarket {
         addOffers(campaign, getMarketItemCount(campaign, MYTHIC, rarityModifier),
               UnitMarketType.OPEN, UnitType.JUMPSHIP, faction, DragoonRating.DRAGOON_F.getRating(), 4);
 
-        if ((contract != null)
-                  && (campaign.getLocalDate().isAfter(contract.getStartDate().minusDays(1)))) {
+        if ((contract != null) &&
+                  ((contract.getStartDate() == null) ||
+                         campaign.getLocalDate().isAfter(contract.getStartDate().minusDays(1)))) {
             // Employer Market
             faction = contract.getEmployerFaction();
 

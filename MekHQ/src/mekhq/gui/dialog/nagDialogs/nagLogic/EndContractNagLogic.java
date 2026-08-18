@@ -61,7 +61,7 @@ public class EndContractNagLogic {
 
         // There is no reason to use a stream here, as there won't be enough iterations to warrant it.
         for (AbstractContract contract : activeContracts) {
-            if (contract.getEndingDate().equals(today)) {
+            if (today.equals(contract.getEndingDate())) {
                 return true;
             }
         }

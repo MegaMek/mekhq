@@ -1279,7 +1279,7 @@ public class CampaignNewDayManager {
         for (AbstractContract contract : campaign.getActiveContracts()) {
             if (campaignOptions.isUseGenericBattleValue() &&
                       !contract.getObjectiveType().isGarrisonType() &&
-                      contract.getStartDate().equals(today)) {
+                      today.equals(contract.getStartDate())) {
                 // Batchalls
                 Faction enemyFaction = contract.getEnemyFaction();
                 String enemyFactionCode = contract.getEnemyFactionCode();
@@ -1329,7 +1329,9 @@ public class CampaignNewDayManager {
                     refreshStratConFacilities(tracks);
                 }
 
-                if (!contract.getEndingDate().equals(today)) {
+                // today-first so an open-ended contract (null end date) is simply "not ending today" rather than a
+                // dereference of null.
+                if (!today.equals(contract.getEndingDate())) {
                     boolean isUseMaplessMode = campaignOptions.isUseStratConMaplessMode();
                     int victoryPoints = ContractScore.getContractScore(isUseMaplessMode, contract);
                     int requiredVictoryPoints = contract.getRequiredVictoryPoints();

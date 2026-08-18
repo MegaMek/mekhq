@@ -94,7 +94,7 @@ public class GrayMonday {
             if (isEmployerBegging) {
                 for (AbstractContract contract : campaign.getActiveContracts()) {
                     LocalDate startDate = contract.getStartDate();
-                    if (!startDate.isBefore(today)) {
+                    if ((startDate == null) || !startDate.isBefore(today)) {
                         ContractFinanceData newFinances = new ContractFinanceData(Money.zero(),
                               Money.zero(),
                               Money.zero());
@@ -130,7 +130,7 @@ public class GrayMonday {
         if (isEmployerBegging) {
             for (AbstractContract contract : campaign.getActiveContracts()) {
                 LocalDate startDate = contract.getStartDate();
-                if (!startDate.isBefore(today)) {
+                if ((startDate == null) || !startDate.isBefore(today)) {
                     speaker = getEmployerSpeaker(contract);
                     break;
                 }
