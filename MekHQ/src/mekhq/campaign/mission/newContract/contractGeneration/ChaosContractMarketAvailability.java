@@ -288,8 +288,9 @@ public final class ChaosContractMarketAvailability {
      * {@link DailyReportType#SKILL_CHECKS}.
      *
      * <p>Each search type's map is cleared and repopulated, so last month's unaccepted offers expire. Generation is
-     * best-effort - a search type whose generator cannot place a contract yields fewer offers than rolled - but the
-     * reports reflect the availability determination itself.</p>
+     * best-effort: a search type whose generator cannot place a contract yields fewer offers than rolled. The summary
+     * counts what actually reached the market, since that is what the player can go and look at; the skill-check
+     * breakdown reports the rolls themselves, shortfall included, as the audit of the determination.</p>
      *
      * @param campaign the active campaign
      */
@@ -297,6 +298,7 @@ public final class ChaosContractMarketAvailability {
         final Map<ContractSearchType, OfferRoll> rolls = rollMonthlyOffers(campaign);
         final ContractMarket market = campaign.getPlayerForce().getContractMarket();
 
+        final Map<ContractSearchType, Integer> generatedCounts = new EnumMap<>(ContractSearchType.class);
         int totalOffers = 0;
         for (final ContractSearchType type : ContractSearchType.values()) {
             final Map<UUID, AbstractContract> offers = market.getContracts(type);
@@ -305,14 +307,16 @@ public final class ChaosContractMarketAvailability {
             for (final AbstractContract contract : generateOffers(campaign, count, false, type)) {
                 offers.put(contract.getId(), contract);
             }
-            totalOffers += count;
+            // What landed, not what was rolled - generation is best-effort and may place fewer than asked.
+            generatedCounts.put(type, offers.size());
+            totalOffers += offers.size();
         }
 
         // Top the market up with easy "Proving Ground" offers if the force has not yet earned enough successful
         // contracts. These are additional to the rolled offers above and are not counted in the summary report.
         PityContracts.generatePityContracts(campaign);
 
-        campaign.addReport(DailyReportType.GENERAL, buildSummaryReport(rolls, totalOffers));
+        campaign.addReport(DailyReportType.GENERAL, buildSummaryReport(generatedCounts, totalOffers));
         campaign.addReport(DailyReportType.SKILL_CHECKS, buildRollBreakdownReport(campaign, rolls));
     }
 
@@ -328,14 +332,15 @@ public final class ChaosContractMarketAvailability {
      * ({@code <b>count</b> <b>Type</b> contract(s) available}). When nothing is available, a plain "no contracts" line
      * is returned instead.
      */
-    private static String buildSummaryReport(final Map<ContractSearchType, OfferRoll> rolls, final int totalOffers) {
+    private static String buildSummaryReport(final Map<ContractSearchType, Integer> generatedCounts,
+          final int totalOffers) {
         if (totalOffers <= 0) {
             return getTextAt(RESOURCE_BUNDLE, "dailyReport.contractMarket.none");
         }
 
         final StringBuilder report = new StringBuilder(getTextAt(RESOURCE_BUNDLE, "hyperlink.contractMarket.report"));
         for (final ContractSearchType type : REPORTED_TYPES) {
-            final int count = offerCount(rolls, type);
+            final int count = generatedCounts.getOrDefault(type, 0);
             if (count <= 0) {
                 continue;
             }
