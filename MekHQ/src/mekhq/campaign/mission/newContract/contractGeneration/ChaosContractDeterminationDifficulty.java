@@ -39,6 +39,7 @@ import static megamek.common.enums.SkillLevel.ELITE;
 import static megamek.common.enums.SkillLevel.parseFromInteger;
 import static megamek.common.units.UnitType.MEK;
 
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
@@ -85,7 +86,14 @@ public class ChaosContractDeterminationDifficulty {
 
         SkillLevel opposingSkill = modifySkillLevelBasedOnFaction(enemyCode, contract.getEnemyForceSkill());
 
-        double enemyPower = estimateMekStrength(contract.getStartDate().getYear(),
+        // Public entry point, so the contract need not be one this class just generated - a legacy-converted one can
+        // arrive with no schedule, and without a start year there is no era to size the enemy against.
+        final LocalDate startDate = contract.getStartDate();
+        if (startDate == null) {
+            return UNKNOWN_DIFFICULTY;
+        }
+
+        double enemyPower = estimateMekStrength(startDate.getYear(),
               enemyCode,
               contract.getEnemyEquipmentRating());
 

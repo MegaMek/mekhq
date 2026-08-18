@@ -57,6 +57,7 @@ import mekhq.campaign.mission.newContract.AbstractContract;
 import mekhq.campaign.mission.newContract.ContractMarket;
 import mekhq.campaign.mission.newContract.utilities.PityContracts;
 import mekhq.campaign.universe.Faction;
+import mekhq.campaign.universe.PlanetarySystem;
 import mekhq.campaign.universe.enums.HiringHallLevel;
 import mekhq.campaign.universe.factionStanding.FactionStandings;
 
@@ -259,12 +260,20 @@ public final class ChaosContractMarketAvailability {
      * contracts.
      */
     static boolean isUninhabitedSystem(final Campaign campaign) {
-        return campaign.getCurrentSystem().getPopulation(campaign.getLocalDate()) == 0;
+        final PlanetarySystem currentSystem = campaign.getCurrentSystem();
+        // With no known system there is nothing to call uninhabited; leave the market unrestricted rather than
+        // narrowing it to pirate work on missing data.
+        return (currentSystem != null) && (currentSystem.getPopulation(campaign.getLocalDate()) == 0);
     }
 
     /** Whether the campaign's current system is controlled (at least in part) by the given faction at the current date. */
     static boolean isOnFactionControlledWorld(final Campaign campaign, final Faction faction) {
-        final List<String> factions = campaign.getCurrentSystem().getFactions(campaign.getLocalDate());
+        final PlanetarySystem currentSystem = campaign.getCurrentSystem();
+        if (currentSystem == null) {
+            return false;
+        }
+
+        final List<String> factions = currentSystem.getFactions(campaign.getLocalDate());
         return (factions != null) && factions.contains(faction.getShortName());
     }
 
@@ -359,9 +368,11 @@ public final class ChaosContractMarketAvailability {
     private static String buildRollBreakdownReport(final Campaign campaign,
           final Map<ContractSearchType, OfferRoll> rolls) {
         final HiringHallLevel level = campaign.getSystemHiringHallLevel();
+        final PlanetarySystem currentSystem = campaign.getCurrentSystem();
+        final String systemName = (currentSystem == null) ? "-" : currentSystem.getName(campaign.getLocalDate());
         final StringBuilder report = new StringBuilder(getFormattedTextAt(RESOURCE_BUNDLE,
               "skillCheck.contractMarket.header",
-              campaign.getCurrentSystem().getName(campaign.getLocalDate()),
+              systemName,
               level.name()));
 
         for (final ContractSearchType type : REPORTED_TYPES) {
