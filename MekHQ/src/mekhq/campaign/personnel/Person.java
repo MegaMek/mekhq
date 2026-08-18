@@ -1476,7 +1476,7 @@ public class Person implements ILocatable {
             case AERO_TEK -> hasSkill(S_TECH_AERO);
             case BA_TECH -> hasSkill(S_TECH_BA);
             case DOCTOR -> hasSkill(S_SURGERY);
-            case ADMINISTRATOR -> hasSkill(S_ADMIN) && hasSkill(S_APPRAISAL);
+            case ADMINISTRATOR -> hasSkill(S_ADMIN) && hasSkill(S_NEGOTIATION);
             case ADULT_ENTERTAINER -> {
                 // A character under the age of 18 should never have access to this profession
                 if (isChild(today, true)) {
@@ -4912,17 +4912,16 @@ public class Person implements ILocatable {
             return false;
         }
 
-        Skill negotiationSkill = person.getSkill(S_NEGOTIATION);
         Skill administrationSkill = person.getSkill(S_ADMIN);
-        Skill appraisalSkill = person.getSkill(S_APPRAISAL);
+        Skill negotiationSkill = person.getSkill(S_NEGOTIATION);
 
-        int newSkillLevel = negotiationSkill != null ?
-                                  negotiationSkill.getLevel() :
-                                  (administrationSkill == null ? 1 : administrationSkill.getLevel());
+        int newSkillLevel = administrationSkill != null ?
+                                  administrationSkill.getLevel() :
+                                  (negotiationSkill == null ? 1 : negotiationSkill.getLevel());
 
-        if (appraisalSkill == null || appraisalSkill.getLevel() < newSkillLevel) {
-            int bonus = appraisalSkill != null ? appraisalSkill.getBonus() : 0;
-            person.addSkill(S_APPRAISAL, newSkillLevel, bonus);
+        if (negotiationSkill == null || negotiationSkill.getLevel() < newSkillLevel) {
+            int bonus = negotiationSkill != null ? negotiationSkill.getBonus() : 0;
+            person.addSkill(S_NEGOTIATION, newSkillLevel, bonus);
         }
 
         if (isPrimary) {
@@ -5577,13 +5576,13 @@ public class Person implements ILocatable {
                 int adminLevel = getSkillLevelOrNegative(S_ADMIN, skillModifierData);
                 adminLevel = adminLevel == -1 ? 0 : adminLevel;
 
-                int appraisalLevel = getSkillLevelOrNegative(S_APPRAISAL, skillModifierData);
-                appraisalLevel = appraisalLevel == -1 ? 0 : appraisalLevel;
+                int negotiationLevel = getSkillLevelOrNegative(S_NEGOTIATION, skillModifierData);
+                negotiationLevel = negotiationLevel == -1 ? 0 : negotiationLevel;
 
                 int levelSum;
                 int divisor = 2;
 
-                levelSum = adminLevel + appraisalLevel;
+                levelSum = adminLevel + negotiationLevel;
 
                 if (levelSum == -divisor) {
                     yield EXP_NONE;
