@@ -326,7 +326,7 @@ public class MHQMorale {
     }
 
     /**
-     * Calculates the overall reliability modifier for an enemy force based on the contract’s parameters and the
+     * Calculates the overall reliability modifier for an enemy force based on the contract's parameters and the
      * characteristics of the opposing faction.
      *
      * <p>This value determines how susceptible the OpFor is to morale loss or reliability degradation during AtB
@@ -347,7 +347,7 @@ public class MHQMorale {
      *     <ul>
      *         <li><strong>Rebels, minor powers, mercenaries, pirates:</strong> {@code +1} modifier (better for the
      *         player).</li>
-     *         <li><strong>Clans:</strong> an additional {@code -1} modifier (“double-dip"), making Clan morale
+     *         <li><strong>Clans:</strong> an additional {@code -1} modifier ("double-dip"), making Clan morale
      *         harder to break.</li>
      *     </ul>
      *     </li>
@@ -407,7 +407,8 @@ public class MHQMorale {
      *
      * @param adjustedSkillLevel the skill rating to evaluate, compared against the adjusted GREEN and ELITE thresholds
      *
-     * @return {@code +1} for low-skill forces (≤ GREEN), {@code -1} for elite forces (≥ ELITE), and {@code 0} otherwise
+     * @return {@code +1} for low-skill forces (GREEN or worse), {@code -1} for elite forces (ELITE or better),
+     *       and {@code 0} otherwise
      *
      * @author Illiani
      * @since 0.50.10

@@ -187,7 +187,8 @@ public class ContractEditorDialog extends JDialog {
     private JTextField routEndDateField;
     private JSpinner routedPayoutSpinner;
 
-    // Personnel — edit mode wraps the existing NPCs; create mode captures overrides applied to NPCs generated on save.
+    // Personnel - edit mode wraps the existing NPCs; create mode captures overrides applied to NPCs generated on
+    // save.
     private transient NpcEditor negotiatorEditor;
     private transient NpcEditor liaisonEditor;
     private transient NpcEditor commanderEditor;

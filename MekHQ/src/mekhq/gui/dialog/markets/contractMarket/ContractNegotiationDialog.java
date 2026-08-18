@@ -408,9 +408,11 @@ public class ContractNegotiationDialog extends JDialog {
               termCapLabels[index].getFont().getSize2D() - 1f));
         controls.add(termCapLabels[index]);
 
-        termLowerButtons[index] = stepperButton("−", () -> lower(clause));
+        termLowerButtons[index] = stepperButton(getTextAt(RESOURCE_BUNDLE,
+              "negotiate.contractMarket.stepper.decrease"), () -> lower(clause));
         controls.add(termLowerButtons[index]);
-        termRaiseButtons[index] = stepperButton("+", () -> raise(clause));
+        termRaiseButtons[index] = stepperButton(getTextAt(RESOURCE_BUNDLE,
+              "negotiate.contractMarket.stepper.increase"), () -> raise(clause));
         controls.add(termRaiseButtons[index]);
 
         row.add(controls, BorderLayout.EAST);
@@ -466,13 +468,15 @@ public class ContractNegotiationDialog extends JDialog {
         JPanel east = new JPanel(new FlowLayout(FlowLayout.RIGHT, scaleForGUI(10), 0));
 
         JPanel stepper = new JPanel(new FlowLayout(FlowLayout.RIGHT, scaleForGUI(6), 0));
-        stepper.add(stepperButton("−", () -> adjustFacility(index, -1)));
+        stepper.add(stepperButton(getTextAt(RESOURCE_BUNDLE, "negotiate.contractMarket.stepper.decrease"),
+              () -> adjustFacility(index, -1)));
         // Seed with real text so the label has a non-zero preferred height before we pin its width.
         facilityQuantityLabels[index] = new JLabel(Integer.toString(facilityQuantity[index]), SwingConstants.CENTER);
         facilityQuantityLabels[index].setPreferredSize(new Dimension(scaleForGUI(28),
               facilityQuantityLabels[index].getPreferredSize().height));
         stepper.add(facilityQuantityLabels[index]);
-        stepper.add(stepperButton("+", () -> adjustFacility(index, 1)));
+        stepper.add(stepperButton(getTextAt(RESOURCE_BUNDLE, "negotiate.contractMarket.stepper.increase"),
+              () -> adjustFacility(index, 1)));
         east.add(stepper);
 
         Money initialTotal = Money.of((double) facilityQuantity[index] * facilityUnitCost[index]);
