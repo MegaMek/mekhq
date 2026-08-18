@@ -5396,20 +5396,12 @@ public class Campaign implements ITechManager {
             getPlayerForce().getHumanResources().getPersonnelMarket().writeToXML(writer, indent, this);
         }
 
-        // TODO : AbstractContractMarket : Uncomment
-        // CAW: implicit DEPENDS-ON to the <missions> and <campaignOptions> node, do not
-        // move this above it
-        // getContractMarket().writeToXML(pw, indent);
-
         // Windchild: implicit DEPENDS-ON to the <campaignOptions> node, do not move
         // this above it
         getUnitMarket().writeToXML(writer, indent);
 
         // Against the Bot
         if (getCampaignOptions().isUseStratCon()) {
-            // TODO : AbstractContractMarket : Remove next two lines
-            // CAW: implicit DEPENDS-ON to the <missions> node, do not move this above it
-
             if (!playerForce.getCombatTeamsMap().isEmpty()) {
                 MHQXMLUtility.writeSimpleXMLOpenTag(writer, indent++, "combatTeams");
                 for (CombatTeam combatTeam : playerForce.getCombatTeamsMap().values()) {
