@@ -116,6 +116,7 @@ public final class ContractXmlCodec {
         MHQXMLUtility.writeSimpleXMLTag(printWriter, indent, "scale", contract.getScale());
         MHQXMLUtility.writeSimpleXMLTag(printWriter, indent, "trackCount", contract.getTrackCount());
         MHQXMLUtility.writeSimpleXMLTag(printWriter, indent, "provingGround", contract.isProvingGround());
+        MHQXMLUtility.writeSimpleXMLTag(printWriter, indent, "sharesPercent", contract.getSharesPercent());
         if (contract.getStatus() != null) {
             MHQXMLUtility.writeSimpleXMLTag(printWriter, indent, "missionStatus", contract.getStatus().name());
         }
@@ -371,6 +372,8 @@ public final class ContractXmlCodec {
         readers.put("trackCount", (contract, node, campaign, version) -> contract.setTrackCount(parseInt(node)));
         readers.put("provingGround",
               (contract, node, campaign, version) -> contract.setProvingGround(Boolean.parseBoolean(text(node))));
+        readers.put("sharesPercent",
+              (contract, node, campaign, version) -> contract.setSharesPercent(parseInt(node)));
         readers.put("missionStatus",
               (contract, node, campaign, version) -> contract.setStatus(MissionStatus.parseFromString(text(node))));
         readers.put("salvagedByUnitValue",

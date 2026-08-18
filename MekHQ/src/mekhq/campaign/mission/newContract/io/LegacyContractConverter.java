@@ -155,6 +155,7 @@ public final class LegacyContractConverter {
 
         // Matches the legacy default: a contract that never involved a Batchall counts as accepted.
         boolean batchallAccepted = true;
+        int sharesPercent = AbstractContract.DEFAULT_SHARES_PERCENT;
 
         // The legacy format stores these two NPCs in full; the new model's third NPC (the employer's negotiator) has
         // no legacy equivalent and is always a placeholder.
@@ -210,6 +211,7 @@ public final class LegacyContractConverter {
                     case "routEnd" -> routEndDate = MHQXMLUtility.parseDate(value);
                     case "routedPayout" -> routedPayout = Money.fromXmlString(value);
                     case "batchallAccepted" -> batchallAccepted = Boolean.parseBoolean(value);
+                    case "sharesPct" -> sharesPercent = MathUtility.parseInt(value);
                     case "employerLiaison" -> legacyLiaison = legacyPerson(child, campaign, version);
                     case "clanOpponent" -> legacyOpposingCommander = legacyPerson(child, campaign, version);
                     case "parentContractId" -> legacyParentContractId = value;
@@ -260,6 +262,7 @@ public final class LegacyContractConverter {
         final boolean wasActive = status.isActive();
         contract.setStatus(wasActive ? MissionStatus.SUCCESS : status);
         contract.setScale(Math.max(1, scale));
+        contract.setSharesPercent(sharesPercent);
         contract.setRequiredCombatElements(requiredCombatElements);
         contract.setCachedContractDifficulty(difficulty);
 

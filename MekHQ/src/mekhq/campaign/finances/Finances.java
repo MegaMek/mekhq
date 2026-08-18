@@ -59,6 +59,7 @@ import megamek.common.annotations.Nullable;
 import megamek.logging.MMLogger;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
+import mekhq.campaign.campaignOptions.CampaignOption;
 import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.events.loans.LoanDefaultedEvent;
 import mekhq.campaign.events.transactions.TransactionCreditEvent;
@@ -379,6 +380,8 @@ public class Finances {
                 campaign.addReport(FINANCES, String.format(resourceMap.getString("ContractPaymentCredit.text"),
                       contract.getMonthlyPayOut().toAmountAndSymbolString(),
                       contract.getHyperlinkedName()));
+
+                payoutShares(campaign, contract, today);
             }
         }
 
@@ -580,6 +583,65 @@ public class Finances {
      * @param campaign The campaign for which taxes are to be paid.
      * @param profits  The profits made by the campaign.
      */
+    /**
+     * Pays shareholding personnel their cut of a contract's monthly payment, immediately after that payment lands.
+     *
+     * <p>Runs only when the share system is enabled. The share is a percentage of the monthly payout, so it is always
+     * smaller than the credit just received - a failed debit therefore means something else drained the account, and is
+     * reported rather than retried.</p>
+     *
+     * @param campaign the paying campaign
+     * @param contract the contract that just paid out
+     * @param date     the day the payment was made
+     */
+    private void payoutShares(Campaign campaign, AbstractContract contract, LocalDate date) {
+        if (!campaign.getCampaignOptions().get(CampaignOption.USE_SHARE_SYSTEM)) {
+            return;
+        }
+
+        Money shares = contract.getMonthlyPayOut().multipliedBy(contract.getSharesPercent()).dividedBy(100);
+        if (!shares.isGreaterThan(Money.zero())) {
+            return;
+        }
+
+        if (debit(TransactionType.SALARIES, date, shares,
+              String.format(resourceMap.getString("ContractSharePayment.text"), contract.getName()))) {
+            campaign.addReport(FINANCES, resourceMap.getString("DistributedShares.text"),
+                  shares.toAmountAndSymbolString());
+
+            payOutSharesToPersonnel(campaign, shares);
+        } else {
+            campaign.addReport(FINANCES, messageSurroundedBySpanWithColor(getNegativeColor(),
+                  String.format(resourceMap.getString("InsufficientFunds.text"),
+                        resourceMap.getString("Shares.text"))));
+            LOGGER.error("Attempted to payout share amount larger than the payment of the contract");
+        }
+    }
+
+    /**
+     * Distributes an already-debited share pot across the personnel holding shares, in proportion to how many each
+     * holds.
+     *
+     * @param campaign where to pull personnel from
+     * @param shares   total value of the shares to pay out
+     */
+    public void payOutSharesToPersonnel(Campaign campaign, Money shares) {
+        boolean sharesForAll = campaign.getCampaignOptions().isSharesForAll();
+        List<Person> shareholders = campaign.getPlayerForce().getHumanResources().getActivePersonnel(false, true);
+
+        int numberOfShares = shareholders.stream()
+                                   .mapToInt(person -> person.getNumShares(campaign, sharesForAll))
+                                   .sum();
+        if (numberOfShares <= 0) {
+            return;
+        }
+
+        Money singleShare = shares.dividedBy(numberOfShares);
+        for (Person person : shareholders) {
+            person.payPersonShares(campaign, singleShare, sharesForAll);
+        }
+    }
+
     private void payTaxes(Campaign campaign, Money profits) {
         Money taxAmount = profits.multipliedBy((double) campaign.getCampaignOptions().getTaxesPercentage() / 100)
                                 .round();

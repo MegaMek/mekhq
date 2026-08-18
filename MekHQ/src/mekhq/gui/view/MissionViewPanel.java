@@ -63,6 +63,7 @@ import megamek.client.ui.util.UIUtil;
 import mekhq.MekHQ;
 import mekhq.campaign.AbstractLocation;
 import mekhq.campaign.Campaign;
+import mekhq.campaign.campaignOptions.CampaignOption;
 import mekhq.campaign.location.ILocation;
 import mekhq.campaign.mission.newContract.AbstractContract;
 import mekhq.campaign.mission.newContract.utilities.ContractScore;
@@ -313,6 +314,14 @@ public class MissionViewPanel extends JScrollablePanel {
         txtEnemyRating.setName("txtEnemyRating");
         txtEnemyRating.setText(mission.getEnemyForceSkill() + "/" + ratingNames[mission.getEnemyEquipmentRating()]);
         addStatRow(lblEnemyRating, txtEnemyRating, y++);
+
+        if (campaign.getCampaignOptions().get(CampaignOption.USE_SHARE_SYSTEM)) {
+            lblSharePct.setName("lblSharePct");
+            lblSharePct.setText(getTextAt(RESOURCE_BUNDLE, "lblSharePct.text"));
+            txtSharePct.setName("txtSharePct");
+            txtSharePct.setText(mission.getSharesPercent() + "%");
+            addStatRow(lblSharePct, txtSharePct, y++);
+        }
 
         lblPayout.setName("lblPayout");
         lblPayout.setText(getTextAt(RESOURCE_BUNDLE, "lblPayout.text"));

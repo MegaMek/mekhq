@@ -80,6 +80,8 @@ public abstract class AbstractContract {
      * it through {@link #getMaximumSupportPoints()} rather than recomputing it.
      */
     public static final int INITIAL_SUPPORT_POINTS_PER_COMBAT_TEAM = 3;
+    /** The share of each monthly payment owed to shareholding personnel when the share system is enabled. */
+    public static final int DEFAULT_SHARES_PERCENT = 30;
 
     private UUID contractId;
     private String contractName;
@@ -116,6 +118,9 @@ public abstract class AbstractContract {
      * is written from {@link #playerNegotiator}.</p>
      */
     private transient UUID pendingPlayerNegotiatorId;
+
+    /** Percentage of each monthly payment distributed to shareholding personnel. */
+    private int sharesPercent = DEFAULT_SHARES_PERCENT;
 
     private StratConCampaignState stratConCampaignState;
     private int scale;
@@ -452,6 +457,18 @@ public abstract class AbstractContract {
      */
     public void setPendingPlayerNegotiatorId(final @Nullable UUID pendingPlayerNegotiatorId) {
         this.pendingPlayerNegotiatorId = pendingPlayerNegotiatorId;
+    }
+
+    /**
+     * @return the percentage of each monthly payment owed to shareholding personnel, applied when the share system is
+     *       enabled
+     */
+    public int getSharesPercent() {
+        return sharesPercent;
+    }
+
+    public void setSharesPercent(int sharesPercent) {
+        this.sharesPercent = sharesPercent;
     }
 
     public @Nullable StratConCampaignState getStratConCampaignState() {
