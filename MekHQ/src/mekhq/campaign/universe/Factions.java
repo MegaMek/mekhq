@@ -238,8 +238,18 @@ public class Factions {
     /**
      * Loads Factions data from a file.
      *
+     * @param isForTesting whether to load the test faction data instead of the shipped data
      */
     public static Factions load(boolean isForTesting) {
+        // Factions2 pins its data directory the first time anything touches it, and #getFaction reaches it (through
+        // the alias lookup) for any code it cannot resolve directly. Something that resolves an unknown code before
+        // the faction data is loaded therefore pins the production directory, after which this flag would be silently
+        // ignored - and under test, where that directory is not on the path, every later lookup would come back as a
+        // blank faction. Clearing it first makes the flag mean what it says.
+        if (isForTesting) {
+            Factions2.setInstance(null);
+        }
+
         // Factions are populated from the new unified factions list instead of loading them directly
         Factions factionsObject = new Factions();
         Factions2.getInstance(isForTesting).getFactions().stream()
