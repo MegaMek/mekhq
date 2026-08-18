@@ -736,7 +736,7 @@ public abstract class AbstractContract {
     }
 
     public void changeSalvagedByEmployerValue(Money delta) {
-        salvagedByEmployerValue.plus(delta);
+        salvagedByEmployerValue = salvagedByEmployerValue.plus(delta);
     }
 
     public Money getSalvagedByUnitValue() {
@@ -748,7 +748,7 @@ public abstract class AbstractContract {
     }
 
     public void changeSalvagedByUnitValue(Money delta) {
-        salvagedByUnitValue.plus(delta);
+        salvagedByUnitValue = salvagedByUnitValue.plus(delta);
     }
 
     public long getMonthsLeft(LocalDate localDate) {

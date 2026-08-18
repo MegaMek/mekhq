@@ -151,6 +151,9 @@ public final class LegacyContractConverter {
         LocalDate routEndDate = null;
         Money routedPayout = Money.zero();
 
+        // Matches the legacy default: a contract that never involved a Batchall counts as accepted.
+        boolean batchallAccepted = true;
+
         // The legacy format stores these two NPCs in full; the new model's third NPC (the employer's negotiator) has
         // no legacy equivalent and is always a placeholder.
         Person legacyLiaison = null;
@@ -201,6 +204,7 @@ public final class LegacyContractConverter {
                     case "moraleLevel" -> moraleLevel = ContractMoraleLevel.valueOf(value);
                     case "routEnd" -> routEndDate = MHQXMLUtility.parseDate(value);
                     case "routedPayout" -> routedPayout = Money.fromXmlString(value);
+                    case "batchallAccepted" -> batchallAccepted = Boolean.parseBoolean(value);
                     case "employerLiaison" -> legacyLiaison = legacyPerson(child, campaign, version);
                     case "clanOpponent" -> legacyOpposingCommander = legacyPerson(child, campaign, version);
                     case "scenarios" -> convertScenarios(child, campaign, version, contract);
@@ -252,7 +256,7 @@ public final class LegacyContractConverter {
               null, employerName, negotiator, liaison, allySkill, allyQuality,
               camouflage(allyCamoCategory, allyCamoFileName), allyColour));
         contract.setEnemyData(new EnemyData(enemyCode, null, enemyName, enemySkill, enemyQuality, opposingCommander,
-              camouflage(enemyCamoCategory, enemyCamoFileName), enemyColour, true));
+              camouflage(enemyCamoCategory, enemyCamoFileName), enemyColour, batchallAccepted));
 
         contract.setContractTerms(new ContractTermsData(DEFAULT_STEP, DEFAULT_STEP, DEFAULT_STEP, DEFAULT_STEP,
               DEFAULT_STEP));
