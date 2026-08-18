@@ -68,12 +68,14 @@ import megamek.logging.MMLogger;
 import mekhq.MHQConstants;
 import mekhq.MekHQ;
 import mekhq.Utilities;
+import mekhq.campaign.campaignOptions.CampaignOption;
 import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.events.persons.PersonBattleFinishedEvent;
 import mekhq.campaign.finances.Money;
 import mekhq.campaign.finances.enums.TransactionType;
 import mekhq.campaign.force.Formation;
 import mekhq.campaign.log.ServiceLogger;
+import mekhq.campaign.log.UnitLogger;
 import mekhq.campaign.mission.AtBContract;
 import mekhq.campaign.mission.AtBScenario;
 import mekhq.campaign.mission.BotForce;
@@ -87,6 +89,8 @@ import mekhq.campaign.parts.Part;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.enums.PersonnelRole;
 import mekhq.campaign.personnel.enums.PersonnelStatus;
+import mekhq.campaign.personnel.familiarity.Familiarity;
+import mekhq.campaign.personnel.familiarity.FamiliarityGainType;
 import mekhq.campaign.personnel.medical.InjurySPAUtility;
 import mekhq.campaign.personnel.turnoverAndRetention.Fatigue;
 import mekhq.campaign.randomEvents.prisoners.CapturePrisoners;
@@ -670,6 +674,15 @@ public class ResolveScenarioTracker {
                               unit.getId().toString());
                         continue;
                     }
+
+                    // one unit history entry per kill, regardless of how many named crew the unit has - a unit run
+                    // entirely by temporary crew still scored the kill
+                    Person commander = unit.getCommander();
+                    UnitLogger.scoredKill(unit,
+                          campaign.getLocalDate(),
+                          killed,
+                          (commander == null) ? null : commander.getFullName());
+
                     for (Person person : unit.getActiveCrew()) {
                         PersonStatus status = peopleStatus.get(person.getId());
 
@@ -1843,6 +1856,12 @@ public class ResolveScenarioTracker {
             }
         }
 
+        Familiarity familiarity = campaignOptions.get(CampaignOption.CHASSIS_FAMILIARITY_MODE);
+        int familiarityDice = campaignOptions.get(CampaignOption.CHASSIS_FAMILIARITY_SPEED);
+        if (familiarity.isEnabled()) {
+            processFamiliarity(familiarityDice, familiarity);
+        }
+
         // Process payouts for killed temp crew (blob crew)
         if (!killedTempCrew.isEmpty()) {
             processTempCrewDeathPayouts();
@@ -1904,6 +1923,11 @@ public class ResolveScenarioTracker {
                 continue;
             }
             Entity en = unitStatus.getEntity();
+
+            // the unit took part in the scenario, so this is the point at which the deployment becomes history. It is
+            // deliberately not logged when the unit is assigned to the scenario, as that assignment can be undone.
+            UnitLogger.deployed(unit, campaign.getLocalDate(), scenario.getName());
+
             Money unitValue = unit.getBuyCost();
             if (campaignOptions.isBLCSaleValue()) {
                 unitValue = unit.getSellValue();
@@ -2017,6 +2041,18 @@ public class ResolveScenarioTracker {
         campaign.refreshNetworks();
         scenario.setDate(campaign.getLocalDate());
         client = null;
+    }
+
+    private void processFamiliarity(int familiaritySpeed, Familiarity familiarity) {
+        // Techs gaining familiarity even if the unit is undamaged is intentional. I opted not to have techs gain
+        // familiarity when repairing or maintaining directly because otherwise tech familiarity gain would skyrocket
+        // - Illiani Aug/1/26
+        int cap = familiarity.getFamiliarityCap();
+        if (familiaritySpeed > 0) {
+            for (Unit unit : units) {
+                Familiarity.assignFamiliarity(campaign, unit, cap, familiaritySpeed, FamiliarityGainType.D6);
+            }
+        }
     }
 
     @Deprecated(since = "0.51.0", forRemoval = true)

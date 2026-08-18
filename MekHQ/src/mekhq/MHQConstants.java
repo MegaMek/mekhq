@@ -77,6 +77,23 @@ public final class MHQConstants extends SuiteConstants {
     public static final String COMPANY_GENERATOR_STARTUP = "companyGeneratorStartup";
     public static final String SHOW_COMPANY_GENERATOR = "showCompanyGenerator";
     public static final String SHOW_UNIT_PICTURES_ON_TOE = "showUnitPicturesOnTOE";
+    public static final String SHOW_WARRIORS_ALMANAC = "showWarriorsAlmanac";
+
+    // Personnel record logs - controls whether each personnel record section starts expanded
+    public static final String DISPLAY_PERSONNEL_LOG = "displayPersonnelLog";
+    public static final String DISPLAY_SCENARIO_LOG = "displayScenarioLog";
+    public static final String DISPLAY_KILL_RECORD = "displayKillRecord";
+    public static final String DISPLAY_MEDICAL_RECORD = "displayMedicalRecord";
+    public static final String DISPLAY_PATIENT_RECORD = "displayPatientRecord";
+    public static final String DISPLAY_ASSIGNMENT_RECORD = "displayAssignmentRecord";
+    public static final String DISPLAY_PERFORMANCE_RECORD = "displayPerformanceRecord";
+
+    // Unit record logs - controls whether each unit log section starts expanded
+    public static final String DISPLAY_UNIT_LOG = "displayUnitLog";
+    public static final String DISPLAY_UNIT_KILL_LOG = "displayUnitKillLog";
+    public static final String DISPLAY_UNIT_CREW_LOG = "displayUnitCrewLog";
+    public static final String DISPLAY_UNIT_DEPLOYMENT_LOG = "displayUnitDeploymentLog";
+    public static final String DISPLAY_UNIT_REPAIR_LOG = "displayUnitRepairLog";
 
     // region Command Center Tab
     @Deprecated(since = "0.50.07", forRemoval = true)

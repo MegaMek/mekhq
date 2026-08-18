@@ -607,9 +607,8 @@ public class MissionViewPanel extends JScrollablePanel {
             int currentScore = contract.getContractScore(campaign.getCampaignOptions().isUseStratConMaplessMode());
             int neededScore = contract.getRequiredVictoryPoints();
             if (neededScore > 0) {
-                final boolean canEndEarly = (contract.getStratConCampaignState() == null) ||
-                                                  contract.getStratConCampaignState().allowEarlyVictory();
-                addGaugeRow(ContractMeterBar.victoryPoints(currentScore, neededScore, canEndEarly), y++);
+                addGaugeRow(ContractMeterBar.victoryPoints(currentScore, neededScore,
+                      contract.getStratConCampaignState()), y++);
             } else {
                 lblScore.setName("lblScore");
                 lblScore.setText(getTextAt(RESOURCE_BUNDLE, "lblScore.text"));

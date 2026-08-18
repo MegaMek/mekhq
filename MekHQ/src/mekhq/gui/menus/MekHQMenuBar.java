@@ -108,6 +108,7 @@ import mekhq.campaign.report.HangarReport;
 import mekhq.campaign.report.PersonnelReport;
 import mekhq.campaign.report.TransportReport;
 import mekhq.campaign.unit.Unit;
+import mekhq.campaign.unit.UnitAcquisitionType;
 import mekhq.campaign.universe.Faction;
 import mekhq.campaign.universe.Systems;
 import mekhq.gui.CampaignGUI;
@@ -509,6 +510,8 @@ public class MekHQMenuBar extends JMenuBar {
               evt -> new TransportReportDialog(getFrame(), new TransportReport(getCampaign())).setVisible(true)));
         menuReports.add(createMenuItem("miCargoReport.text", KeyEvent.VK_C,
               evt -> new CargoReportDialog(getFrame(), new CargoReport(getCampaign())).setVisible(true)));
+        menuReports.add(createMenuItem("miAlmanac.text", KeyEvent.VK_A,
+              evt -> new WarriorsAlmanacDialog(getCampaign(), false)));
         return menuReports;
     }
 
@@ -739,7 +742,7 @@ public class MekHQMenuBar extends JMenuBar {
                     return;
                 }
                 for (Entity entity : parser.getEntities()) {
-                    getCampaign().addNewUnit(entity, allowNewPilots, 0, quality);
+                    getCampaign().addNewUnit(entity, allowNewPilots, 0, quality, UnitAcquisitionType.GM_ADDED);
                 }
             } catch (Exception e) {
                 logger.error("", e);

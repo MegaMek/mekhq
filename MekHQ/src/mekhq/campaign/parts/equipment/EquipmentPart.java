@@ -35,6 +35,7 @@ package mekhq.campaign.parts.equipment;
 
 import java.io.PrintWriter;
 
+import jakarta.annotation.Nonnull;
 import megamek.common.CriticalSlot;
 import megamek.common.TechAdvancement;
 import megamek.common.annotations.Nullable;
@@ -215,7 +216,7 @@ public class EquipmentPart extends Part {
     }
 
     @Override
-    public TechRating getTechRating() {
+    public @Nonnull TechRating getTechRating() {
         return type.getTechRating();
     }
 
@@ -611,7 +612,8 @@ public class EquipmentPart extends Part {
         return (type instanceof MiscType) &&
                      (type.hasFlag(MiscType.F_TARGETING_COMPUTER) ||
                             type.hasFlag(MiscType.F_CLUB) ||
-                            type.hasFlag(MiscType.F_TALON));
+                            type.hasFlag(MiscType.F_TALON) ||
+                            type.hasFlag(MiscType.F_SHIELD));
     }
 
     public static double getStartingTonnage(EquipmentType type) {

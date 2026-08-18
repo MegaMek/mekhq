@@ -83,6 +83,7 @@ import java.awt.event.MouseListener;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.List;
@@ -131,6 +132,7 @@ import mekhq.campaign.personnel.enums.PersonnelRole;
 import mekhq.campaign.personnel.enums.PersonnelStatus;
 import mekhq.campaign.personnel.enums.education.EducationLevel;
 import mekhq.campaign.personnel.enums.education.EducationStage;
+import mekhq.campaign.personnel.familiarity.Familiarity;
 import mekhq.campaign.personnel.familyTree.FormerSpouse;
 import mekhq.campaign.personnel.medical.advancedMedicalAlternate.InjuryEffect;
 import mekhq.campaign.personnel.medical.advancedMedicalAlternate.InjurySubType;
@@ -253,6 +255,13 @@ public class PersonViewPanel extends JScrollablePanel {
         initializeLogs(pnlPersonnelRecordTab);
         tabbedPane.addTab(getTextAt(RESOURCE_BUNDLE, "pnlPersonnelRecordTab.title"), pnlPersonnelRecordTab);
 
+        if (campaignOptions.get(CampaignOption.CHASSIS_FAMILIARITY_MODE).isEnabled()) {
+            JPanel pnlFamiliarityTab = new JPanel();
+            pnlFamiliarityTab.setLayout(new GridBagLayout());
+            initializeFamiliarity(pnlFamiliarityTab);
+            tabbedPane.addTab(getTextAt(RESOURCE_BUNDLE, "pnlFamiliarityTab.title"), pnlFamiliarityTab);
+        }
+
         // use glue to fill up the remaining space so everything is aligned to the top
         gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 0;
@@ -264,6 +273,52 @@ public class PersonViewPanel extends JScrollablePanel {
         add(Box.createGlue(), gridBagConstraints);
     }
 
+    private void initializeFamiliarity(JPanel pnlFamiliarityTab) {
+        GridBagConstraints gridBagConstraints = new GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 0;
+        gridBagConstraints.weightx = 1.0;
+        gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
+        gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
+        gridBagConstraints.insets = new Insets(5, 5, 5, 5);
+
+        Map<String, Integer> familiarityMap = person.getChassisFamiliarity();
+        if (familiarityMap.isEmpty()) {
+            pnlFamiliarityTab.add(new JLabel(getTextAt(RESOURCE_BUNDLE, "pnlFamiliarityTab.none")), gridBagConstraints);
+            return;
+        }
+
+        List<Map.Entry<String, Integer>> entries = new ArrayList<>(familiarityMap.entrySet());
+        entries.sort(Comparator.<Map.Entry<String, Integer>>comparingInt(Map.Entry::getValue)
+                           .reversed()
+                           .thenComparing(Map.Entry::getKey));
+
+        Familiarity familiarityMode = campaignOptions.get(CampaignOption.CHASSIS_FAMILIARITY_MODE);
+        int cap = familiarityMode.getFamiliarityCap();
+        for (Map.Entry<String, Integer> entry : entries) {
+            String chassis = entry.getKey();
+            // Clamp to the active mode's cap for display: a value stored under a higher-cap mode (e.g. 250 under Hard)
+            // survives a switch to a lower-cap mode until the next gain self-corrects it, and would otherwise overflow
+            // the meter bar. Bonuses saturate at the top level anyway, so clamping does not change the reported bonus.
+            int familiarity = Math.min(entry.getValue(), cap);
+            int pilotingMaintenance = familiarityMode.getPilotingMaintenanceBonus(familiarity);
+            int gunneryRepairs = familiarityMode.getGunneryRepairBonus(familiarity);
+            String tooltip = getFormattedTextAt(RESOURCE_BUNDLE,
+                  "pnlFamiliarityTab.tooltip",
+                  chassis,
+                  familiarity,
+                  cap,
+                  pilotingMaintenance,
+                  gunneryRepairs);
+            pnlFamiliarityTab.add(ContractMeterBar.valueBar(chassis, familiarity, cap, tooltip), gridBagConstraints);
+            gridBagConstraints.gridy++;
+        }
+
+        gridBagConstraints.weighty = 1.0;
+        gridBagConstraints.fill = GridBagConstraints.BOTH;
+        pnlFamiliarityTab.add(Box.createGlue(), gridBagConstraints);
+    }
+
     private void initializeLogs(JPanel pnlPersonnelRecordTab) {
         int gridY = 0;
         GridBagConstraints gridBagConstraints;
@@ -273,13 +328,13 @@ public class PersonViewPanel extends JScrollablePanel {
             pnlKillsHeader.setName("killsHeader");
             pnlKillsHeader.setBorder(RoundedLineBorder.createRoundedLineBorder(getTextAt(RESOURCE_BUNDLE,
                   "pnlKillsHeader.title")));
-            pnlKillsHeader.setVisible(!campaignOptions.isDisplayKillRecord());
+            pnlKillsHeader.setVisible(!MekHQ.getMHQOptions().getDisplayKillRecord());
 
             JPanel pnlKills = fillKillRecord();
 
             pnlKills.setName("txtKills");
             pnlKills.setBorder(RoundedLineBorder.createRoundedLineBorder(getTextAt(RESOURCE_BUNDLE, "pnlKills.title")));
-            pnlKills.setVisible(campaignOptions.isDisplayKillRecord());
+            pnlKills.setVisible(MekHQ.getMHQOptions().getDisplayKillRecord());
 
             pnlKillsHeader.addMouseListener(getSwitchListener(pnlKillsHeader, pnlKills));
             pnlKills.addMouseListener(getSwitchListener(pnlKills, pnlKillsHeader));
@@ -303,14 +358,14 @@ public class PersonViewPanel extends JScrollablePanel {
             pnlScenariosLogHeader.setName("scenarioLogHeader");
             pnlScenariosLogHeader.setBorder(RoundedLineBorder.createRoundedLineBorder(getTextAt(RESOURCE_BUNDLE,
                   "scenarioLogHeader.title")));
-            pnlScenariosLogHeader.setVisible(!campaignOptions.isDisplayScenarioLog());
+            pnlScenariosLogHeader.setVisible(!MekHQ.getMHQOptions().getDisplayScenarioLog());
 
             JPanel pnlScenariosLog = fillScenarioLog();
 
             pnlScenariosLog.setName("scenarioLog");
             pnlScenariosLog.setBorder(RoundedLineBorder.createRoundedLineBorder(getTextAt(RESOURCE_BUNDLE,
                   "scenarioLog.title")));
-            pnlScenariosLog.setVisible(campaignOptions.isDisplayScenarioLog());
+            pnlScenariosLog.setVisible(MekHQ.getMHQOptions().getDisplayScenarioLog());
 
             pnlScenariosLogHeader.addMouseListener(getSwitchListener(pnlScenariosLogHeader, pnlScenariosLog));
             pnlScenariosLog.addMouseListener(getSwitchListener(pnlScenariosLog, pnlScenariosLogHeader));
@@ -334,13 +389,13 @@ public class PersonViewPanel extends JScrollablePanel {
             pnlPersonalLogHeader.setName("pnlLogHeader");
             pnlPersonalLogHeader.setBorder(RoundedLineBorder.createRoundedLineBorder(getTextAt(RESOURCE_BUNDLE,
                   "pnlLogHeader.title")));
-            pnlPersonalLogHeader.setVisible(!campaignOptions.isDisplayPersonnelLog());
+            pnlPersonalLogHeader.setVisible(!MekHQ.getMHQOptions().getDisplayPersonnelLog());
 
             JPanel pnlPersonalLog = fillPersonalLog();
             pnlPersonalLog.setName("pnlLog");
             pnlPersonalLog.setBorder(RoundedLineBorder.createRoundedLineBorder(getTextAt(RESOURCE_BUNDLE,
                   "pnlLog.title")));
-            pnlPersonalLog.setVisible(campaignOptions.isDisplayPersonnelLog());
+            pnlPersonalLog.setVisible(MekHQ.getMHQOptions().getDisplayPersonnelLog());
 
             pnlPersonalLogHeader.addMouseListener(getSwitchListener(pnlPersonalLogHeader, pnlPersonalLog));
             pnlPersonalLog.addMouseListener(getSwitchListener(pnlPersonalLog, pnlPersonalLogHeader));
@@ -364,13 +419,13 @@ public class PersonViewPanel extends JScrollablePanel {
             pnlPerformanceLogHeader.setName("pnlPerformanceLogHeader");
             pnlPerformanceLogHeader.setBorder(RoundedLineBorder.createRoundedLineBorder(getTextAt(RESOURCE_BUNDLE,
                   "pnlPerformanceLogHeader.title")));
-            pnlPerformanceLogHeader.setVisible(!campaignOptions.isDisplayPerformanceRecord());
+            pnlPerformanceLogHeader.setVisible(!MekHQ.getMHQOptions().getDisplayPerformanceRecord());
 
             JPanel pnlPerformanceLog = fillPerformanceLog();
             pnlPerformanceLog.setName("pnlPerformanceLog");
             pnlPerformanceLog.setBorder(RoundedLineBorder.createRoundedLineBorder(getTextAt(RESOURCE_BUNDLE,
                   "pnlPerformanceLog.title")));
-            pnlPerformanceLog.setVisible(campaignOptions.isDisplayPerformanceRecord());
+            pnlPerformanceLog.setVisible(MekHQ.getMHQOptions().getDisplayPerformanceRecord());
 
             pnlPerformanceLogHeader.addMouseListener(getSwitchListener(pnlPerformanceLogHeader, pnlPerformanceLog));
             pnlPerformanceLog.addMouseListener(getSwitchListener(pnlPerformanceLog, pnlPerformanceLogHeader));
@@ -394,13 +449,13 @@ public class PersonViewPanel extends JScrollablePanel {
             pnlMedicalLogHeader.setName("pnlMedicalLogHeader");
             pnlMedicalLogHeader.setBorder(RoundedLineBorder.createRoundedLineBorder(getTextAt(RESOURCE_BUNDLE,
                   "pnlMedicalLogHeader.title")));
-            pnlMedicalLogHeader.setVisible(!campaignOptions.isDisplayMedicalRecord());
+            pnlMedicalLogHeader.setVisible(!MekHQ.getMHQOptions().getDisplayMedicalRecord());
 
             JPanel pnlMedicalLog = fillMedicalLog();
             pnlMedicalLog.setName("pnlMedicalLog");
             pnlMedicalLog.setBorder(RoundedLineBorder.createRoundedLineBorder(getTextAt(RESOURCE_BUNDLE,
                   "pnlMedicalLog.title")));
-            pnlMedicalLog.setVisible(campaignOptions.isDisplayMedicalRecord());
+            pnlMedicalLog.setVisible(MekHQ.getMHQOptions().getDisplayMedicalRecord());
 
             pnlMedicalLogHeader.addMouseListener(getSwitchListener(pnlMedicalLogHeader, pnlMedicalLog));
             pnlMedicalLog.addMouseListener(getSwitchListener(pnlMedicalLog, pnlMedicalLogHeader));
@@ -424,13 +479,13 @@ public class PersonViewPanel extends JScrollablePanel {
             pnlPatientLogHeader.setName("pnlPatientLogHeader");
             pnlPatientLogHeader.setBorder(RoundedLineBorder.createRoundedLineBorder(getTextAt(RESOURCE_BUNDLE,
                   "pnlPatientLogHeader.title")));
-            pnlPatientLogHeader.setVisible(!campaignOptions.isDisplayPatientRecord());
+            pnlPatientLogHeader.setVisible(!MekHQ.getMHQOptions().getDisplayPatientRecord());
 
             JPanel pnlPatientLog = fillPatientLog();
             pnlPatientLog.setName("pnlPatientLog");
             pnlPatientLog.setBorder(RoundedLineBorder.createRoundedLineBorder(getTextAt(RESOURCE_BUNDLE,
                   "pnlPatientLog.title")));
-            pnlPatientLog.setVisible(campaignOptions.isDisplayPatientRecord());
+            pnlPatientLog.setVisible(MekHQ.getMHQOptions().getDisplayPatientRecord());
 
             pnlPatientLogHeader.addMouseListener(getSwitchListener(pnlPatientLogHeader, pnlPatientLog));
             pnlPatientLog.addMouseListener(getSwitchListener(pnlPatientLog, pnlPatientLogHeader));
@@ -454,14 +509,14 @@ public class PersonViewPanel extends JScrollablePanel {
             pnlAssignmentsLogHeader.setName("assignmentLogHeader");
             pnlAssignmentsLogHeader.setBorder(RoundedLineBorder.createRoundedLineBorder(getTextAt(RESOURCE_BUNDLE,
                   "assignmentLogHeader.title")));
-            pnlAssignmentsLogHeader.setVisible(!campaignOptions.isDisplayAssignmentRecord());
+            pnlAssignmentsLogHeader.setVisible(!MekHQ.getMHQOptions().getDisplayAssignmentRecord());
 
             JPanel pnlAssignmentsLog = fillAssignmentLog();
 
             pnlAssignmentsLog.setName("assignmentLog");
             pnlAssignmentsLog.setBorder(RoundedLineBorder.createRoundedLineBorder(getTextAt(RESOURCE_BUNDLE,
                   "assignmentLog.title")));
-            pnlAssignmentsLog.setVisible(campaignOptions.isDisplayAssignmentRecord());
+            pnlAssignmentsLog.setVisible(MekHQ.getMHQOptions().getDisplayAssignmentRecord());
 
             pnlAssignmentsLogHeader.addMouseListener(getSwitchListener(pnlAssignmentsLogHeader, pnlAssignmentsLog));
             pnlAssignmentsLog.addMouseListener(getSwitchListener(pnlAssignmentsLog, pnlAssignmentsLogHeader));

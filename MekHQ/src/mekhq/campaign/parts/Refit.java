@@ -46,6 +46,7 @@ import java.io.PrintStream;
 import java.io.PrintWriter;
 import java.util.*;
 
+import jakarta.annotation.Nonnull;
 import megamek.Version;
 import megamek.common.CriticalSlot;
 import megamek.common.TechAdvancement;
@@ -87,6 +88,7 @@ import mekhq.campaign.enums.CampaignTransportType;
 import mekhq.campaign.events.parts.PartChangedEvent;
 import mekhq.campaign.events.units.UnitRefitEvent;
 import mekhq.campaign.finances.Money;
+import mekhq.campaign.log.UnitLogger;
 import mekhq.campaign.parts.equipment.AmmoBin;
 import mekhq.campaign.parts.equipment.EquipmentPart;
 import mekhq.campaign.parts.equipment.HeatSink;
@@ -1435,12 +1437,12 @@ public class Refit extends Part implements IAcquisitionWork {
         }
 
         return (Armor) getWarehouse().findSparePart(part -> part instanceof Armor &&
-                                                                                ((Armor) part).getType() ==
-                                                                                      newArmorSupplies.getType() &&
-                                                                                part.isClanTechBase() ==
-                                                                                      newArmorSupplies.isClanTechBase() &&
-                                                                                !part.isReservedForRefit() &&
-                                                                                part.isPresent());
+                                                                  ((Armor) part).getType() ==
+                                                                        newArmorSupplies.getType() &&
+                                                                  part.isClanTechBase() ==
+                                                                        newArmorSupplies.isClanTechBase() &&
+                                                                  !part.isReservedForRefit() &&
+                                                                  part.isPresent());
     }
 
     /**
@@ -1588,9 +1590,15 @@ public class Refit extends Part implements IAcquisitionWork {
             campaign.getQuartermaster().addPart(part, 0, false);
         }
 
+        // capture the model names before we swap entities so we can log the refit against the unit
+        final String oldModelName = oldEntity.getShortName();
+        final String newModelName = newEntity.getShortName();
+
         // don't forget to switch entities!
         // ----------------- from here on oldUnit refers to the new entity -------------------------
         oldUnit.setEntity(newEntity);
+
+        UnitLogger.refit(oldUnit, getCampaign().getLocalDate(), oldModelName, newModelName);
 
         // set up new parts
         ArrayList<Part> newParts = new ArrayList<>();
@@ -3018,7 +3026,7 @@ public class Refit extends Part implements IAcquisitionWork {
      * @return 0
      */
     @Override
-    public TechRating getTechRating() {
+    public @Nonnull TechRating getTechRating() {
         return TechRating.A; // Was 0 pre-conversion to ENUM, so this is the same
     }
 

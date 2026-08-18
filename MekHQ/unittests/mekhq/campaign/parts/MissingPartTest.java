@@ -36,6 +36,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertInstanceOf;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.mock;
@@ -45,6 +46,7 @@ import static testUtilities.MHQTestUtilities.mockCampaign;
 import java.util.UUID;
 
 import megamek.common.equipment.EquipmentType;
+import megamek.common.units.Entity;
 import megamek.common.units.Mek;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.LocalWarehouse;
@@ -535,6 +537,28 @@ public class MissingPartTest {
     }
 
     @Test
+    public void munitioneerDoesNotApplyToComponents() {
+        Campaign mockCampaign = mockCampaign();
+        when(mockCampaign.getCampaignOptions()).thenReturn(new CampaignOptions());
+        // Standard mek internal structure is Tech Rating D - not fabricable in the field by a plain tech.
+        MissingPart missingPart = new MissingMekLocation(Mek.LOC_LEFT_ARM, 20, EquipmentType.T_STRUCTURE_STANDARD,
+              false, false, false, mockCampaign);
+
+        Unit unit = mock(Unit.class, org.mockito.Mockito.RETURNS_DEEP_STUBS);
+        when(unit.getEntity().getWeight()).thenReturn(20.0);
+        when(unit.getSite()).thenReturn(Unit.SITE_FIELD_WORKSHOP);
+        missingPart.setUnit(unit);
+
+        Person munitioneerTech = mock(Person.class);
+        PersonnelOptions munitioneerOptions = new PersonnelOptions();
+        munitioneerOptions.getOption(PersonnelOptions.TECH_MUNITIONEER).setValue(true);
+        when(munitioneerTech.getOptions()).thenReturn(munitioneerOptions);
+
+        // Munitioneer is ammunition-only, so it does not help fabricate a (non-ammo) component.
+        assertFalse(missingPart.canFabricate(munitioneerTech).isBlank());
+    }
+
+    @Test
     public void maintenanceFacilityOptionAllowsTechRatingDFabrication() {
         Campaign mockCampaign = mockCampaign();
         CampaignOptions options = new CampaignOptions();
@@ -637,5 +661,48 @@ public class MissingPartTest {
         assertTrue(leftArm.isSpare());
         assertFalse(leftArm.isReservedForReplacement());
         assertEquals(startingQuantity - 1, leftArm.getQuantity());
+    }
+
+    /**
+     * Succeeding at a missing-part replacement installs the new component and discards the placeholder, which clears
+     * the placeholder's unit reference. Anything that reports on the repair - such as the unit history written by
+     * {@link mekhq.campaign.Campaign#fixPart} - must therefore read the target unit and part name BEFORE calling
+     * {@link MissingPart#succeed()}, or it will find nothing to report against.
+     */
+    @Test
+    public void succeedClearsTheUnitReferenceOfTheReplacedPart() {
+        Campaign mockCampaign = mockCampaign();
+        LocalWarehouse warehouse = new LocalWarehouse();
+        when(mockCampaign.getPlayerForce().getWarehouse()).thenReturn(warehouse);
+        mekhq.campaign.ForceQuartermaster quartermaster = new mekhq.campaign.ForceQuartermaster(mockCampaign);
+        when(mockCampaign.getQuartermaster()).thenReturn(quartermaster);
+
+        // A suitable replacement is on the shelf
+        Part leftArm = new MekLocation(Mek.LOC_LEFT_ARM, 20, EquipmentType.T_STRUCTURE_STANDARD,
+              false, false, false, false, false, mockCampaign);
+        warehouse.addPart(leftArm);
+
+        MissingPart missingPart = new MissingMekLocation(Mek.LOC_LEFT_ARM, 20, EquipmentType.T_STRUCTURE_STANDARD,
+              false, false, false, mockCampaign);
+        Unit unit = mock(Unit.class);
+        Entity entity = mock(Entity.class);
+        when(entity.getWeight()).thenReturn(20.0);
+        when(unit.getEntity()).thenReturn(entity);
+        missingPart.setUnit(unit);
+
+        Person person = mock(Person.class);
+        when(person.getId()).thenReturn(UUID.randomUUID());
+        missingPart.setTech(person);
+
+        // Before the repair the placeholder knows its unit and reports a usable name
+        assertEquals(unit, missingPart.getUnit());
+        String partName = missingPart.getPartName();
+        assertNotNull(partName);
+        assertFalse(partName.isBlank());
+
+        missingPart.succeed();
+
+        // ...and afterwards it does not, which is the trap this ordering guards against
+        assertNull(missingPart.getUnit());
     }
 }

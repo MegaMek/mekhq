@@ -54,6 +54,7 @@ import mekhq.campaign.market.enums.ContractMarketMethod;
 import mekhq.campaign.market.enums.UnitMarketMethod;
 import mekhq.campaign.market.personnelMarket.enums.PersonnelMarketStyle;
 import mekhq.campaign.personnel.enums.*;
+import mekhq.campaign.personnel.familiarity.Familiarity;
 import mekhq.campaign.randomEvents.prisoners.PrisonerCaptureStyle;
 import mekhq.campaign.universe.PlanetarySystem.PlanetaryRating;
 import mekhq.campaign.universe.PlanetarySystem.PlanetarySophistication;
@@ -103,7 +104,16 @@ public final class CampaignOption<T> {
           of(Boolean.class, true, "useBalancedFabrication");
     public static final CampaignOption<Boolean> FABRICATE_D_IN_MAINTENANCE_FACILITY =
           of(Boolean.class, false, "maintenanceFabrication");
+    public static final CampaignOption<Boolean> USE_AMMO_FABRICATION =
+          of(Boolean.class, false, "useAmmoFabrication");
     // endregion Repair and Maintenance
+
+    // region Chassis Familiarity
+    public static final CampaignOption<Familiarity> CHASSIS_FAMILIARITY_MODE =
+          of(Familiarity.class, Familiarity.DISABLED, "chassisFamiliarityMode");
+    public static final CampaignOption<Integer> CHASSIS_FAMILIARITY_SPEED =
+          of(Integer.class, 2, "chassisFamiliaritySpeed");
+    // endregion Chassis Familiarity
 
     // region Migrated Options (generated storage-only migration)
     public static final CampaignOption<Boolean> REQUIRE_SUPPORT_FORCE_TRANSPORTATION =
@@ -294,20 +304,6 @@ public final class CampaignOption<T> {
           of(Boolean.class, false, "personnelLogAbilityGain");
     public static final CampaignOption<Boolean> PERSONNEL_LOG_EDGE_GAIN =
           of(Boolean.class, false, "personnelLogEdgeGain");
-    public static final CampaignOption<Boolean> DISPLAY_PERSONNEL_LOG =
-          of(Boolean.class, false, "displayPersonnelLog");
-    public static final CampaignOption<Boolean> DISPLAY_SCENARIO_LOG =
-          of(Boolean.class, false, "displayScenarioLog");
-    public static final CampaignOption<Boolean> DISPLAY_KILL_RECORD =
-          of(Boolean.class, false, "displayKillRecord");
-    public static final CampaignOption<Boolean> DISPLAY_MEDICAL_RECORD =
-          of(Boolean.class, false, "displayMedicalRecord");
-    public static final CampaignOption<Boolean> DISPLAY_PATIENT_RECORD =
-          of(Boolean.class, false, "displayPatientRecord");
-    public static final CampaignOption<Boolean> DISPLAY_ASSIGNMENT_RECORD =
-          of(Boolean.class, false, "displayAssignmentRecord");
-    public static final CampaignOption<Boolean> DISPLAY_PERFORMANCE_RECORD =
-          of(Boolean.class, false, "displayPerformanceRecord");
     public static final CampaignOption<Boolean> AWARD_VETERANCY_SP_AS =
           of(Boolean.class, false, "awardVeterancySPAs");
     public static final CampaignOption<Boolean> AWARD_RELEVANT_VETERANCY_SP_AS =

@@ -41,6 +41,7 @@ import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.personnel.enums.AwardBonus;
 import mekhq.campaign.personnel.enums.EdgeRefreshPeriod;
 import mekhq.campaign.personnel.enums.TimeInDisplayFormat;
+import mekhq.campaign.personnel.familiarity.Familiarity;
 import mekhq.campaign.randomEvents.prisoners.PrisonerCaptureStyle;
 
 class PersonnelOptionsModel {
@@ -80,13 +81,6 @@ class PersonnelOptionsModel {
     boolean personnelLogSkillGain;
     boolean personnelLogAbilityGain;
     boolean personnelLogEdgeGain;
-    boolean displayPersonnelLog;
-    boolean displayScenarioLog;
-    boolean displayKillRecord;
-    boolean displayMedicalRecord;
-    boolean displayPatientRecord;
-    boolean displayAssignmentRecord;
-    boolean displayPerformanceRecord;
     boolean useTimeInService;
     TimeInDisplayFormat timeInServiceDisplayFormat;
     boolean useTimeInRank;
@@ -136,6 +130,8 @@ class PersonnelOptionsModel {
     boolean useRandomDependentRemoval;
     int dependentProfessionDieSize;
     int civilianProfessionDieSize;
+    Familiarity chassisFamiliarity;
+    int chassisFamiliaritySpeed;
 
     PersonnelOptionsModel(@Nonnull CampaignOptions options) {
         useTactics = options.isUseTactics();
@@ -174,13 +170,6 @@ class PersonnelOptionsModel {
         personnelLogSkillGain = options.isPersonnelLogSkillGain();
         personnelLogAbilityGain = options.isPersonnelLogAbilityGain();
         personnelLogEdgeGain = options.isPersonnelLogEdgeGain();
-        displayPersonnelLog = options.isDisplayPersonnelLog();
-        displayScenarioLog = options.isDisplayScenarioLog();
-        displayKillRecord = options.isDisplayKillRecord();
-        displayMedicalRecord = options.isDisplayMedicalRecord();
-        displayPatientRecord = options.isDisplayPatientRecord();
-        displayAssignmentRecord = options.isDisplayAssignmentRecord();
-        displayPerformanceRecord = options.isDisplayPerformanceRecord();
         useTimeInService = options.isUseTimeInService();
         timeInServiceDisplayFormat = options.getTimeInServiceDisplayFormat();
         useTimeInRank = options.isUseTimeInRank();
@@ -230,6 +219,8 @@ class PersonnelOptionsModel {
         useRandomDependentRemoval = options.isUseRandomDependentRemoval();
         dependentProfessionDieSize = options.getDependentProfessionDieSize();
         civilianProfessionDieSize = options.getCivilianProfessionDieSize();
+        chassisFamiliarity = options.get(CampaignOption.CHASSIS_FAMILIARITY_MODE);
+        chassisFamiliaritySpeed = options.get(CampaignOption.CHASSIS_FAMILIARITY_SPEED);
     }
 
     void applyTo(@Nonnull Campaign campaign, @Nonnull CampaignOptions options) {
@@ -269,13 +260,6 @@ class PersonnelOptionsModel {
         options.setPersonnelLogSkillGain(personnelLogSkillGain);
         options.setPersonnelLogAbilityGain(personnelLogAbilityGain);
         options.setPersonnelLogEdgeGain(personnelLogEdgeGain);
-        options.setDisplayPersonnelLog(displayPersonnelLog);
-        options.setDisplayScenarioLog(displayScenarioLog);
-        options.setDisplayKillRecord(displayKillRecord);
-        options.setDisplayMedicalRecord(displayMedicalRecord);
-        options.setDisplayPatientRecord(displayPatientRecord);
-        options.setDisplayAssignmentRecord(displayAssignmentRecord);
-        options.setDisplayPerformanceRecord(displayPerformanceRecord);
         options.setUseTimeInService(useTimeInService);
         options.setTimeInServiceDisplayFormat(timeInServiceDisplayFormat);
         options.setUseTimeInRank(useTimeInRank);
@@ -328,5 +312,7 @@ class PersonnelOptionsModel {
         options.setUseRandomDependentRemoval(useRandomDependentRemoval);
         options.setDependentProfessionDieSize(dependentProfessionDieSize);
         options.setCivilianProfessionDieSize(civilianProfessionDieSize);
+        options.set(CampaignOption.CHASSIS_FAMILIARITY_MODE, chassisFamiliarity);
+        options.set(CampaignOption.CHASSIS_FAMILIARITY_SPEED, chassisFamiliaritySpeed);
     }
 }

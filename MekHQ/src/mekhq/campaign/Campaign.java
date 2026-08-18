@@ -168,6 +168,7 @@ import mekhq.campaign.location.LocationUtils;
 import mekhq.campaign.log.HistoricalLogEntry;
 import mekhq.campaign.log.LogEntry;
 import mekhq.campaign.log.ServiceLogger;
+import mekhq.campaign.log.UnitLogger;
 import mekhq.campaign.market.ForceShoppingList;
 import mekhq.campaign.market.PartsStore;
 import mekhq.campaign.market.PersonnelMarket;
@@ -213,10 +214,11 @@ import mekhq.campaign.personnel.divorce.AbstractDivorce;
 import mekhq.campaign.personnel.enums.PersonnelRole;
 import mekhq.campaign.personnel.enums.PersonnelStatus;
 import mekhq.campaign.personnel.enums.SplittingSurnameStyle;
+import mekhq.campaign.personnel.familiarity.Familiarity;
 import mekhq.campaign.personnel.generator.AbstractPersonnelGenerator;
 import mekhq.campaign.personnel.marriage.AbstractMarriage;
 import mekhq.campaign.personnel.procreation.AbstractProcreation;
-import mekhq.campaign.personnel.ranks.AutoAssignRankForCompanyGenerator;
+import mekhq.campaign.personnel.ranks.AutomaticRankAssigner;
 import mekhq.campaign.personnel.ranks.RankSystem;
 import mekhq.campaign.personnel.skills.ActionCheckResult;
 import mekhq.campaign.personnel.skills.Appraisal;
@@ -237,6 +239,7 @@ import mekhq.campaign.unit.CrewType;
 import mekhq.campaign.unit.HangarStatistics;
 import mekhq.campaign.unit.TestUnit;
 import mekhq.campaign.unit.Unit;
+import mekhq.campaign.unit.UnitAcquisitionType;
 import mekhq.campaign.unit.UnitOrder;
 import mekhq.campaign.unit.enums.TransporterType;
 import mekhq.campaign.universe.*;
@@ -252,7 +255,9 @@ import mekhq.campaign.universe.factionStanding.FactionStandings;
 import mekhq.campaign.universe.fameAndInfamy.FameAndInfamyController;
 import mekhq.campaign.universe.selectors.factionSelectors.AbstractFactionSelector;
 import mekhq.campaign.universe.selectors.planetSelectors.AbstractPlanetSelector;
+import mekhq.campaign.universe.warriorsAlmanac.WarriorsAlmanacEntry;
 import mekhq.campaign.work.IAcquisitionWork;
+import mekhq.campaign.work.IFabricatable;
 import mekhq.campaign.work.IPartWork;
 import mekhq.gui.CampaignGUI;
 import mekhq.gui.baseComponents.immersiveDialogs.ImmersiveDialogSimple;
@@ -369,6 +374,9 @@ public class Campaign implements ITechManager {
     private RandomEventLibraries randomEventLibraries;
     private FactionStandingUltimatumsLibrary factionStandingUltimatumsLibrary;
     private Map<UUID, LifePath> lifePathLibrary;
+
+    private Map<Integer, List<WarriorsAlmanacEntry>> partsAlmanac;
+    private Map<Integer, List<WarriorsAlmanacEntry>> unitsAlmanac;
 
     /**
      * A constant that provides the ISO-8601 definition of week-based fields.
@@ -1831,6 +1839,14 @@ public class Campaign implements ITechManager {
         Unit unit = new Unit(testUnit.getEntity(), this);
         getPlayerForce().getHangar().addUnit(unit);
 
+        // record who the unit was salvaged from before we take ownership of it
+        final String formerOwner = (unit.getEntity().getOwner() != null) ? unit.getEntity().getOwner().getName() : null;
+        if ((formerOwner != null) && !formerOwner.isBlank()) {
+            UnitLogger.salvagedFrom(unit, getLocalDate(), formerOwner);
+        } else {
+            UnitLogger.acquired(unit, getLocalDate(), UnitAcquisitionType.SALVAGED);
+        }
+
         // we decided we like the test unit so much we are going to keep it
         unit.getEntity().setOwner(player);
         unit.getEntity().setGame(game);
@@ -1875,7 +1891,7 @@ public class Campaign implements ITechManager {
     }
 
     /**
-     * Add a new unit to the campaign and set its quality.
+     * Add a new unit to the campaign and set its quality, without recording a specific form of acquisition.
      *
      * @param en             An <code>Entity</code> object that the new unit will be wrapped around
      * @param allowNewPilots A boolean indicating whether to add new pilots for the unit
@@ -1887,6 +1903,27 @@ public class Campaign implements ITechManager {
      * @throws IllegalArgumentException If the quality is not within the valid range (0-5)
      */
     public Unit addNewUnit(Entity en, boolean allowNewPilots, int days, PartQuality quality) {
+        return addNewUnit(en, allowNewPilots, days, quality, UnitAcquisitionType.ACQUIRED);
+    }
+
+    /**
+     * Add a new unit to the campaign and set its quality.
+     *
+     * <p>The acquisition is recorded in the new unit's log, so every unit added through this method carries the form
+     * and date by which it entered the campaign.</p>
+     *
+     * @param en              An <code>Entity</code> object that the new unit will be wrapped around
+     * @param allowNewPilots  A boolean indicating whether to add new pilots for the unit
+     * @param days            The number of days for the new unit to arrive
+     * @param quality         The quality of the new unit (0-5)
+     * @param acquisitionType The means by which the campaign acquired the unit
+     *
+     * @return The newly added unit
+     *
+     * @throws IllegalArgumentException If the quality is not within the valid range (0-5)
+     */
+    public Unit addNewUnit(Entity en, boolean allowNewPilots, int days, PartQuality quality,
+          UnitAcquisitionType acquisitionType) {
         Unit unit = new Unit(en, this);
         if (!unit.isSelfCrewed()) {
             unit.setMaintenanceMultiplier(getCampaignOptions().getDefaultMaintenanceTime());
@@ -1939,6 +1976,8 @@ public class Campaign implements ITechManager {
                 }
             }
         }
+
+        UnitLogger.acquired(unit, getLocalDate(), acquisitionType);
 
         checkDuplicateNamesDuringAdd(en);
         addReport(ACQUISITIONS, unit.getHyperlinkedName() + " has been added to the unit roster.");
@@ -4135,7 +4174,18 @@ public class Campaign implements ITechManager {
 
         final boolean taskSucceeded = roll >= target.getValue();
         if (taskSucceeded) {
+            // capture the repair target before succeeding: replacing a MissingPart removes the placeholder from the
+            // unit, which clears its unit reference and its part name along with it
+            final Unit repairedUnit = partWork.getUnit();
+            final String repairedPartName = partWork.getPartName();
+            final boolean isRepair = !partWork.isSalvaging() && !(partWork instanceof AmmoBin);
+
             report = report + partWork.succeed();
+            // log successful repairs (fixes and missing-part replacements) against the unit; salvage and ammo
+            // reloads are not repairs
+            if ((repairedUnit != null) && isRepair) {
+                UnitLogger.repaired(repairedUnit, getLocalDate(), repairedPartName, tech.getFullName());
+            }
             if (getCampaignOptions().isPayForRepairs() && action.equals(" fix ") && !(partWork instanceof Armor)) {
                 Money cost = partWork.getUndamagedValue().multipliedBy(0.2);
                 report += "<br>Repairs cost " + cost.toAmountAndSymbolString() + " worth of parts.";
@@ -4189,12 +4239,12 @@ public class Campaign implements ITechManager {
         partWork.cancelAssignment(true);
 
         if (!taskSucceeded
-                  && (partWork instanceof MissingPart missingPart)
-                  && missingPart.isFabricating()
-                  && missingPart.isFabricateUntilSuccess()
-                  && missingPart.canFabricate(tech).isBlank()
+                  && (partWork instanceof IFabricatable fabricatable)
+                  && fabricatable.isFabricating()
+                  && fabricatable.isFabricateUntilSuccess()
+                  && fabricatable.canFabricate(tech).isBlank()
                   && (tech.getSkillForWorkingOn(partWork) != null)) {
-            final Money nextCost = missingPart.getFabricationCost(tech);
+            final Money nextCost = fabricatable.getFabricationCost(tech);
             if (nextCost.isZero() || !playerForce.getFinances().getBalance().isLessThan(nextCost)) {
                 partWork.setTech(tech);
                 partWork.reservePart();
@@ -4417,7 +4467,7 @@ public class Campaign implements ITechManager {
             final String factionCode = chosenFaction.getShortName();
             Person speaker = getPlayerForce().getHumanResources().newPerson(this, role, factionCode, Gender.RANDOMIZE);
 
-            AutoAssignRankForCompanyGenerator.assignRankSystemFromFaction(speaker, RO_MIN);
+            AutomaticRankAssigner.assignRankSystemFromFaction(speaker, RO_MIN);
 
             new FactionJudgmentDialog(this, speaker, getPlayerForce().getHumanResources()
                                                            .getCommander(getCampaignOptions(),
@@ -5369,6 +5419,23 @@ public class Campaign implements ITechManager {
 
     public FactionStandingUltimatumsLibrary getFactionStandingUltimatumsLibrary() {
         return factionStandingUltimatumsLibrary;
+    }
+
+
+    public Map<Integer, List<WarriorsAlmanacEntry>> getPartsAlmanac() {
+        return partsAlmanac;
+    }
+
+    public void setPartsAlmanac(Map<Integer, List<WarriorsAlmanacEntry>> partsAlmanac) {
+        this.partsAlmanac = partsAlmanac;
+    }
+
+    public Map<Integer, List<WarriorsAlmanacEntry>> getUnitsAlmanac() {
+        return unitsAlmanac;
+    }
+
+    public void setUnitsAlmanac(Map<Integer, List<WarriorsAlmanacEntry>> unitsAlmanac) {
+        this.unitsAlmanac = unitsAlmanac;
     }
 
     public Map<UUID, LifePath> getLifePathLibrary() {
@@ -6464,23 +6531,21 @@ public class Campaign implements ITechManager {
             return new TargetRoll(TargetRoll.IMPOSSIBLE, "Task is impossible.");
         } else if (!partWork.needsFixing() && !partWork.isSalvaging()) {
             return new TargetRoll(TargetRoll.IMPOSSIBLE, "Task is not needed.");
-        } else if (partWork instanceof MissingPart missingPart) {
-            if (missingPart.isFabricating()) {
-                // A part flagged for fabrication that is no longer eligible (tech rating above C without a
-                // factory-grade facility) cannot be worked on.
-                String cannotFabricateReason = missingPart.canFabricate(tech);
-                if (!cannotFabricateReason.isBlank()) {
-                    return new TargetRoll(TargetRoll.IMPOSSIBLE,
-                          "This part cannot be fabricated here: " + cannotFabricateReason);
-                }
-                // Each fabrication attempt is paid up front
-                final Money fabricationCost = missingPart.getFabricationCost(tech);
-                if (!fabricationCost.isZero() && playerForce.getFinances().getBalance().isLessThan(fabricationCost)) {
-                    return new TargetRoll(TargetRoll.IMPOSSIBLE, "Cannot afford this fabrication attempt.");
-                }
-            } else if (missingPart.findReplacement(false) == null) {
-                return new TargetRoll(TargetRoll.IMPOSSIBLE, "Replacement part not available.");
+        } else if ((partWork instanceof IFabricatable fabricatable) && fabricatable.isFabricating()) {
+            // A task flagged for fabrication that is no longer eligible (tech rating above C without a
+            // factory-grade facility) cannot be worked on.
+            String cannotFabricateReason = fabricatable.canFabricate(tech);
+            if (!cannotFabricateReason.isBlank()) {
+                return new TargetRoll(TargetRoll.IMPOSSIBLE,
+                      "This cannot be fabricated here: " + cannotFabricateReason);
             }
+            // Each fabrication attempt is paid up front
+            final Money fabricationCost = fabricatable.getFabricationCost(tech);
+            if (!fabricationCost.isZero() && playerForce.getFinances().getBalance().isLessThan(fabricationCost)) {
+                return new TargetRoll(TargetRoll.IMPOSSIBLE, "Cannot afford this fabrication attempt.");
+            }
+        } else if ((partWork instanceof MissingPart missingPart) && (missingPart.findReplacement(false) == null)) {
+            return new TargetRoll(TargetRoll.IMPOSSIBLE, "Replacement part not available.");
         }
 
         final int techTime = isOvertimeAllowed() ?
@@ -6537,6 +6602,19 @@ public class Campaign implements ITechManager {
 
         if (getCampaignOptions().isUseEraMods()) {
             target.addModifier(getFaction().getEraMod(getGameYear()), "era");
+        }
+
+        Familiarity familiarity = getCampaignOptions().get(CampaignOption.CHASSIS_FAMILIARITY_MODE);
+        Unit partUnit = partWork.getUnit();
+        if (familiarity.isEnabled() && partUnit != null) {
+            Entity partEntity = partUnit.getEntity();
+
+            if (partEntity != null) {
+                int bonus = tech.getChassisFamiliarityTechBonus(familiarity, partEntity, true);
+                if (bonus != 0) {
+                    target.addModifier(-bonus, "Chassis Familiarity");
+                }
+            }
         }
 
         final boolean isOvertime;
