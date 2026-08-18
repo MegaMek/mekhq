@@ -33,6 +33,7 @@
 package mekhq.gui.dialog.markets.contractMarket;
 
 import static java.lang.Math.max;
+import static megamek.client.ui.WrapLayout.wordWrap;
 import static megamek.client.ui.util.UIUtil.scaleForGUI;
 import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
 import static mekhq.utilities.MHQInternationalization.getTextAt;
@@ -441,7 +442,8 @@ public class ContractEditorDialog extends JDialog {
         statusCombo = enumCombo(statusOptions, status);
         statusCombo.setEnabled(statusEditable);
         if (!statusEditable) {
-            statusCombo.setToolTipText(getTextAt(RESOURCE_BUNDLE, "edit.contractMarket.field.status.disabled.tooltip"));
+            statusCombo.setToolTipText(wordWrap(getTextAt(RESOURCE_BUNDLE,
+                  "edit.contractMarket.field.status.disabled.tooltip")));
         }
         rows.add(formRow("edit.contractMarket.field.status", statusCombo));
 
@@ -495,7 +497,7 @@ public class ContractEditorDialog extends JDialog {
         // drives the end date when the end date is automatic.
         lengthSpinner = intSpinner(max(MINIMUM_CONTRACT_LENGTH_MONTHS, contract.getLengthInMonths()),
               MINIMUM_CONTRACT_LENGTH_MONTHS);
-        lengthSpinner.setToolTipText(getTextAt(RESOURCE_BUNDLE, "edit.contractMarket.field.length.tooltip"));
+        lengthSpinner.setToolTipText(wordWrap(getTextAt(RESOURCE_BUNDLE, "edit.contractMarket.field.length.tooltip")));
         lengthSpinner.addChangeListener(e -> onLengthChanged());
         rows.add(formRow("edit.contractMarket.field.length", lengthSpinner));
 
@@ -513,7 +515,7 @@ public class ContractEditorDialog extends JDialog {
     /** A button that shows a date (or "not set") and runs {@code onPick} - a {@link DateChooser} flow - when clicked. */
     private JButton dateButton(Runnable onPick) {
         JButton button = new JButton();
-        button.setToolTipText(getTextAt(RESOURCE_BUNDLE, "edit.contractMarket.date.pick.tooltip"));
+        button.setToolTipText(wordWrap(getTextAt(RESOURCE_BUNDLE, "edit.contractMarket.date.pick.tooltip")));
         button.addActionListener(e -> onPick.run());
         return button;
     }
@@ -522,7 +524,7 @@ public class ContractEditorDialog extends JDialog {
     private JCheckBox scheduleAutomaticToggle(Runnable onToggle) {
         JCheckBox automatic = new JCheckBox(getTextAt(RESOURCE_BUNDLE, "edit.contractMarket.field.automatic"),
               createMode);
-        automatic.setToolTipText(getTextAt(RESOURCE_BUNDLE, "edit.contractMarket.field.automatic.tooltip"));
+        automatic.setToolTipText(wordWrap(getTextAt(RESOURCE_BUNDLE, "edit.contractMarket.field.automatic.tooltip")));
         automatic.addActionListener(e -> onToggle.run());
         return automatic;
     }
@@ -637,7 +639,7 @@ public class ContractEditorDialog extends JDialog {
         if (targetSystem != null) {
             systemField.setText(targetSystem.getName(currentDate));
         }
-        systemField.setToolTipText(getTextAt(RESOURCE_BUNDLE, "edit.contractMarket.system.tooltip"));
+        systemField.setToolTipText(wordWrap(getTextAt(RESOURCE_BUNDLE, "edit.contractMarket.system.tooltip")));
         // Repopulate the planet list for the newly-named system. JSuggestField reports a suggestion picked from its
         // dropdown through addSelectionListener, while a bare Enter typed in the field fires the text field's own
         // action event - wire both so the planet list tracks the system however it is chosen.
@@ -720,6 +722,10 @@ public class ContractEditorDialog extends JDialog {
 
         batchallAcceptedCheckbox = new JCheckBox(getTextAt(RESOURCE_BUNDLE, "edit.contractMarket.field.batchall"),
               data != null && data.batchallAccepted());
+        // A batchall is only offered on an accepted contract fought against a Clan enemy, so keep the checkbox in step
+        // with the enemy faction the GM picks.
+        enemyFactionCombo.addActionListener(e -> refreshBatchallEnabled());
+        refreshBatchallEnabled();
         rows.add(formRow("edit.contractMarket.field.batchall.label", batchallAcceptedCheckbox));
 
         enemyColorCombo = enumCombo(PlayerColour.values(), contract.getEnemyColour());
@@ -730,6 +736,28 @@ public class ContractEditorDialog extends JDialog {
         rows.add(formRow("edit.contractMarket.field.camouflage", enemyCamoButton));
 
         return card(rows);
+    }
+
+    /** Whether the player's batchall acceptance is editable: an accepted contract fought against a Clan enemy. */
+    private boolean batchallEditable() {
+        return contract.getStatus() != null && isEnemyClan();
+    }
+
+    /** Whether the enemy faction currently selected in the combo is a Clan. */
+    private boolean isEnemyClan() {
+        String code = enemyFactionCombo.getSelectedItemKey();
+        return code != null && !code.isBlank() && Factions.getInstance().getFaction(code).isClan();
+    }
+
+    /** Enables the batchall checkbox only when it is editable, with a tooltip explaining when it is not. */
+    private void refreshBatchallEnabled() {
+        boolean editable = batchallEditable();
+        batchallAcceptedCheckbox.setEnabled(editable);
+        batchallAcceptedCheckbox.setToolTipText(editable ?
+                                                      null
+                                                      :
+                                                      wordWrap(getTextAt(RESOURCE_BUNDLE,
+                                                            "edit.contractMarket.field.batchall.disabled.tooltip")));
     }
 
     private JPanel buildTermsCard() {
@@ -781,8 +809,8 @@ public class ContractEditorDialog extends JDialog {
               withAutomatic(monthlyPaySpinner, monthlyPayAutomatic)));
 
         transportPaySpinner = moneySpinner(transport);
-        transportPaySpinner.setToolTipText(getTextAt(RESOURCE_BUNDLE,
-              "edit.contractMarket.field.transportPay.tooltip"));
+        transportPaySpinner.setToolTipText(wordWrap(getTextAt(RESOURCE_BUNDLE,
+              "edit.contractMarket.field.transportPay.tooltip")));
         transportPayAutomatic = financeAutomatic(transportPaySpinner);
         rows.add(formRow("edit.contractMarket.field.transportPay",
               withAutomatic(transportPaySpinner, transportPayAutomatic)));
@@ -826,7 +854,7 @@ public class ContractEditorDialog extends JDialog {
         routedPayoutSpinner = moneySpinner(contract.getRoutPayout());
         routedPayoutSpinner.setEnabled(routFieldsEditable);
         if (!routFieldsEditable) {
-            String tooltip = getTextAt(RESOURCE_BUNDLE, "edit.contractMarket.field.rout.disabled.tooltip");
+            String tooltip = wordWrap(getTextAt(RESOURCE_BUNDLE, "edit.contractMarket.field.rout.disabled.tooltip"));
             routEndDateField.setToolTipText(tooltip);
             routedPayoutSpinner.setToolTipText(tooltip);
         }
@@ -1015,11 +1043,16 @@ public class ContractEditorDialog extends JDialog {
 
         // Enemy
         EnemyData enemy = contract.getEnemyData();
+        // The batchall is only written when editable (an accepted contract against a Clan enemy); otherwise the
+        // contract's existing value is preserved.
+        boolean batchallAccepted = batchallEditable()
+                                         ? batchallAcceptedCheckbox.isSelected()
+                                         : (enemy != null && enemy.batchallAccepted());
         contract.setEnemyData(new EnemyData(factionKey(enemyFactionCombo, contract.getEnemyFactionCode()),
               sponsorKey(enemySponsorCombo), text(enemyDisplayNameField),
               enumValue(enemySkillCombo, SkillLevel.REGULAR), equipmentValue(enemyEquipmentCombo),
               enemy == null ? null : enemy.opposingCommander(), enemyCamouflage,
-              enumValue(enemyColorCombo, PlayerColour.RED), batchallAcceptedCheckbox.isSelected()));
+              enumValue(enemyColorCombo, PlayerColour.RED), batchallAccepted));
 
         // Terms
         contract.setContractTerms(new ContractTermsData(stepValue(payRateCombo), stepValue(supportCombo),
@@ -1140,7 +1173,7 @@ public class ContractEditorDialog extends JDialog {
         // checkboxes - untouched). Only set one when a "<labelKey>.tooltip" string actually exists.
         String tooltip = getTextAt(RESOURCE_BUNDLE, labelKey + ".tooltip");
         if (isResourceKeyValid(tooltip)) {
-            label.setToolTipText(tooltip);
+            label.setToolTipText(wordWrap(tooltip));
         }
         label.setPreferredSize(new Dimension(scaleForGUI(LABEL_WIDTH), label.getPreferredSize().height));
         label.setVerticalAlignment(JLabel.TOP);
@@ -1165,7 +1198,7 @@ public class ContractEditorDialog extends JDialog {
             return null;
         }
         JCheckBox automatic = new JCheckBox(getTextAt(RESOURCE_BUNDLE, "edit.contractMarket.field.automatic"), true);
-        automatic.setToolTipText(getTextAt(RESOURCE_BUNDLE, "edit.contractMarket.field.automatic.tooltip"));
+        automatic.setToolTipText(wordWrap(getTextAt(RESOURCE_BUNDLE, "edit.contractMarket.field.automatic.tooltip")));
         field.setEnabled(false); // ticked by default, so the field starts disabled
         automatic.addActionListener(e -> field.setEnabled(!automatic.isSelected()));
         return automatic;
@@ -1204,7 +1237,7 @@ public class ContractEditorDialog extends JDialog {
     private JCheckBox financeAutomatic(JSpinner spinner) {
         JCheckBox automatic = new JCheckBox(getTextAt(RESOURCE_BUNDLE, "edit.contractMarket.field.automatic"),
               createMode);
-        automatic.setToolTipText(getTextAt(RESOURCE_BUNDLE, "edit.contractMarket.field.automatic.tooltip"));
+        automatic.setToolTipText(wordWrap(getTextAt(RESOURCE_BUNDLE, "edit.contractMarket.field.automatic.tooltip")));
         spinner.setEnabled(!automatic.isSelected());
         automatic.addActionListener(e -> spinner.setEnabled(!automatic.isSelected()));
         return automatic;
@@ -1212,7 +1245,7 @@ public class ContractEditorDialog extends JDialog {
 
     private JTextField dateField(LocalDate date) {
         JTextField field = new JTextField(date == null ? "" : date.toString(), 12);
-        field.setToolTipText(getTextAt(RESOURCE_BUNDLE, "edit.contractMarket.date.tooltip"));
+        field.setToolTipText(wordWrap(getTextAt(RESOURCE_BUNDLE, "edit.contractMarket.date.tooltip")));
         return field;
     }
 
@@ -1405,7 +1438,7 @@ public class ContractEditorDialog extends JDialog {
         if (step == null) {
             return null;
         }
-        return switch (term) {
+        String text = switch (term) {
             case PAY_RATE -> getFormattedTextAt(RESOURCE_BUNDLE, "edit.contractMarket.term.tooltip.payRate",
                   percent(step.getBasePayMultiplier()));
             case SUPPORT -> getFormattedTextAt(RESOURCE_BUNDLE, "edit.contractMarket.term.tooltip.support",
@@ -1419,6 +1452,7 @@ public class ContractEditorDialog extends JDialog {
             case COMMAND -> getFormattedTextAt(RESOURCE_BUNDLE, "edit.contractMarket.term.tooltip.command",
                   step.getContractCommandRights().toString());
         };
+        return wordWrap(text);
     }
 
     /** A 0-1 (or higher, for pay) multiplier as a whole-number percentage. */
@@ -1437,7 +1471,7 @@ public class ContractEditorDialog extends JDialog {
                 super.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);
                 if (value instanceof ContractObjectiveType type) {
                     setText(type.toString());
-                    setToolTipText(type.getToolTipText());
+                    setToolTipText(wordWrap(type.getToolTipText()));
                 }
                 return this;
             }
@@ -1676,8 +1710,8 @@ public class ContractEditorDialog extends JDialog {
 
         private NpcOverride() {
             applyIcon(portraitButton, new Portrait()); // placeholder; portrait stays null until the GM picks one
-            givenNameField.setToolTipText(getTextAt(RESOURCE_BUNDLE, "create.contractMarket.npc.tooltip"));
-            surnameField.setToolTipText(getTextAt(RESOURCE_BUNDLE, "create.contractMarket.npc.tooltip"));
+            givenNameField.setToolTipText(wordWrap(getTextAt(RESOURCE_BUNDLE, "create.contractMarket.npc.tooltip")));
+            surnameField.setToolTipText(wordWrap(getTextAt(RESOURCE_BUNDLE, "create.contractMarket.npc.tooltip")));
             refreshRanks(null);
             portraitButton.addActionListener(e -> {
                 PortraitChooserDialog chooser = new PortraitChooserDialog(campaign.getGUI().getFrame(),

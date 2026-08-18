@@ -33,6 +33,7 @@
 package mekhq.gui.dialog.markets.contractMarket;
 
 import static java.lang.Math.max;
+import static megamek.client.ui.WrapLayout.wordWrap;
 import static megamek.client.ui.util.UIUtil.scaleForGUI;
 import static mekhq.campaign.mission.newContract.contractData.ChaosContractStepsTable.CHAOS_CONTRACT_MAXIMUM_STEP_VALUE;
 import static mekhq.campaign.mission.newContract.contractData.ChaosContractStepsTable.CHAOS_CONTRACT_MINIMUM_STEP_VALUE;
@@ -315,7 +316,8 @@ public class ContractNegotiationDialog extends JDialog {
                       Image.SCALE_SMOOTH)));
             }
             negotiatorButton.setBorder(BorderFactory.createLineBorder(muted(), scaleForGUI(1)));
-            negotiatorButton.setToolTipText(getTextAt(RESOURCE_BUNDLE, "negotiate.contractMarket.negotiator.tooltip"));
+            negotiatorButton.setToolTipText(wordWrap(getTextAt(RESOURCE_BUNDLE,
+                  "negotiate.contractMarket.negotiator.tooltip")));
             negotiatorLabel.setText(escape(negotiator.getFullTitle()));
             negotiatorLabel.setForeground(null);
         } else {
@@ -325,7 +327,8 @@ public class ContractNegotiationDialog extends JDialog {
                       Image.SCALE_SMOOTH)));
             }
             negotiatorButton.setBorder(BorderFactory.createLineBorder(warning(), scaleForGUI(2)));
-            negotiatorButton.setToolTipText(getTextAt(RESOURCE_BUNDLE, "negotiate.contractMarket.negotiator.tooltip"));
+            negotiatorButton.setToolTipText(wordWrap(getTextAt(RESOURCE_BUNDLE,
+                  "negotiate.contractMarket.negotiator.tooltip")));
             negotiatorLabel.setText(getTextAt(RESOURCE_BUNDLE, "negotiate.contractMarket.negotiator.none"));
             negotiatorLabel.setForeground(warning());
         }

@@ -32,6 +32,7 @@
  */
 package mekhq.gui.dialog.markets.contractMarket;
 
+import static megamek.client.ui.WrapLayout.wordWrap;
 import static megamek.client.ui.util.UIUtil.scaleForGUI;
 import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
 import static mekhq.utilities.MHQInternationalization.getTextAt;
@@ -565,7 +566,7 @@ public class ChaosContractMarketDialog extends JDialog implements ContractMarket
      */
     private static JCheckBox buildOptionCheckbox(String labelKey, String tooltipKey) {
         JCheckBox checkbox = new JCheckBox(getTextAt(RESOURCE_BUNDLE, labelKey), true);
-        checkbox.setToolTipText(getTextAt(RESOURCE_BUNDLE, tooltipKey));
+        checkbox.setToolTipText(wordWrap(getTextAt(RESOURCE_BUNDLE, tooltipKey)));
         return checkbox;
     }
 
