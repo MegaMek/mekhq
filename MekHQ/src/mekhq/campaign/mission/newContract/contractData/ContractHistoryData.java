@@ -95,7 +95,8 @@ public record ContractHistoryData(LinkedHashMap<UUID, AbstractContract> contract
      * @param currentDate the date to test against
      *
      * @return the accepted contracts that have not begun yet, that is, those whose status is active and whose start
-     *       date is strictly after {@code currentDate} - a contract starting today has started, so it is excluded
+     *       date is strictly after {@code currentDate} - a contract starting today has started, so it is excluded, as
+     *       is one with no start date at all, which counts as already begun
      */
     public List<AbstractContract> getActiveAndNotYetStarted(LocalDate currentDate) {
         List<AbstractContract> activeContracts = new ArrayList<>();
@@ -103,7 +104,7 @@ public record ContractHistoryData(LinkedHashMap<UUID, AbstractContract> contract
         for (AbstractContract contract : contractHistory.values()) {
             if (contract.getStatus().isActive() && !activeContracts.contains(contract)) {
                 LocalDate startDate = contract.getStartDate();
-                if (startDate.isAfter(currentDate)) {
+                if ((startDate != null) && startDate.isAfter(currentDate)) {
                     activeContracts.add(contract);
                 }
             }

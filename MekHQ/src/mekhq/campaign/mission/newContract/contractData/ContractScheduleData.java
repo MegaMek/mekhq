@@ -37,8 +37,19 @@ import java.time.temporal.ChronoUnit;
 
 import jakarta.annotation.Nullable;
 
-public record ContractScheduleData(LocalDate startDate,
-      LocalDate endDate,
+/**
+ * When a contract runs.
+ *
+ * <p>Either endpoint may be absent: a contract can be held without a settled schedule, and a save need not carry both
+ * dates. {@link #isActiveOn(LocalDate)} treats a missing endpoint as unbounded on that side, matching the convention
+ * used when sorting missions - an active contract with no start date is treated as starting today.</p>
+ *
+ * @param startDate      the day the contract begins, or {@code null} when not yet settled
+ * @param endDate        the day the contract ends, or {@code null} when open-ended
+ * @param lengthInMonths the contract's length in months
+ */
+public record ContractScheduleData(@Nullable LocalDate startDate,
+      @Nullable LocalDate endDate,
       int lengthInMonths
 ) {
     public ContractScheduleData(ContractScheduleData existingData, @Nullable LocalDate newStartDate,
@@ -53,7 +64,15 @@ public record ContractScheduleData(LocalDate startDate,
         );
     }
 
+    /**
+     * @param date the day to test
+     *
+     * @return whether the contract runs on {@code date}, inclusive of both endpoints. An absent start date counts as
+     *       already begun and an absent end date as not yet over, so a contract with neither is active on any day.
+     */
     public boolean isActiveOn(LocalDate date) {
-        return !date.isBefore(startDate) && !date.isAfter(endDate);
+        final boolean begun = (startDate == null) || !date.isBefore(startDate);
+        final boolean notOver = (endDate == null) || !date.isAfter(endDate);
+        return begun && notOver;
     }
 }
