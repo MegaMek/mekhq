@@ -52,16 +52,43 @@ public record ContractScheduleData(@Nullable LocalDate startDate,
       @Nullable LocalDate endDate,
       int lengthInMonths
 ) {
+    /**
+     * Copies {@code existingData}, replacing either endpoint with the one supplied; a {@code null} argument keeps the
+     * existing value.
+     *
+     * <p><b>{@code lengthInMonths} is recomputed from the resulting dates</b>, so it always describes the span the
+     * contract actually runs for rather than a separately agreed figure. That is what makes an extension work: pushing
+     * the end date back lengthens the contract. It also means moving only the start date shortens or lengthens it, so a
+     * caller that means to shift the whole contract must pass both dates - as {@code setStartAndEndDate} does, where
+     * the recomputed length comes back identical.</p>
+     *
+     * <p>The length is left untouched when either resulting date is absent, since there is no span to measure.</p>
+     *
+     * @param existingData the schedule to copy
+     * @param newStartDate the replacement start date, or {@code null} to keep the existing one
+     * @param newEndDate   the replacement end date, or {@code null} to keep the existing one
+     */
     public ContractScheduleData(ContractScheduleData existingData, @Nullable LocalDate newStartDate,
           @Nullable LocalDate newEndDate) {
-        this(newStartDate == null ? existingData.startDate : newStartDate,
-              newEndDate == null ? existingData.endDate : newEndDate,
-              // This is ugly but is necessary so that it can be included in the constructor
-              (int) ChronoUnit.MONTHS.between(
-                    (newStartDate == null ? existingData.startDate : newStartDate),
-                    (newEndDate == null ? existingData.endDate : newEndDate)
-              )
-        );
+        this(orElse(newStartDate, existingData.startDate),
+              orElse(newEndDate, existingData.endDate),
+              monthsBetween(orElse(newStartDate, existingData.startDate),
+                    orElse(newEndDate, existingData.endDate),
+                    existingData.lengthInMonths));
+    }
+
+    private static @Nullable LocalDate orElse(final @Nullable LocalDate replacement,
+          final @Nullable LocalDate existing) {
+        return (replacement == null) ? existing : replacement;
+    }
+
+    private static int monthsBetween(final @Nullable LocalDate startDate, final @Nullable LocalDate endDate,
+          final int fallback) {
+        if ((startDate == null) || (endDate == null)) {
+            return fallback;
+        }
+
+        return (int) ChronoUnit.MONTHS.between(startDate, endDate);
     }
 
     /**
