@@ -47,6 +47,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
+import jakarta.annotation.Nullable;
 import megamek.common.compute.Compute;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.campaignOptions.CampaignOptions;
@@ -445,13 +446,13 @@ public final class ChaosContractMarketAvailability {
      *
      * @return the generated offer, or {@code null} if generation could not place one
      */
-    public static @jakarta.annotation.Nullable AbstractContract generateProvingGroundOffer(final Campaign campaign,
+    public static @Nullable AbstractContract generateProvingGroundOffer(final Campaign campaign,
           final ContractSearchType searchType) {
         return generateOne(campaign, searchType, false, true);
     }
 
     /** Assembles the generation context from the campaign and produces one contract (or {@code null}). */
-    private static @jakarta.annotation.Nullable AbstractContract generateOne(final Campaign campaign,
+    private static @Nullable AbstractContract generateOne(final Campaign campaign,
           final ContractSearchType searchType, final boolean isGM, final boolean provingGround) {
         final CampaignOptions campaignOptions = campaign.getCampaignOptions();
         final LocalDate currentDate = campaign.getLocalDate();

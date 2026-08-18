@@ -575,8 +575,6 @@ public class CampaignNewDayManager {
             showRarePersonnelDialog(campaign, false);
         }
 
-        // TODO : AbstractContractMarket : Uncomment
-        // getContractMarket().processNewDay(campaign);
         campaign.getUnitMarket().processNewDay(campaign);
 
         // Roll this month's Chaos contract-market offers (and post the roll to the daily report).
