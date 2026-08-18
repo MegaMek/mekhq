@@ -120,6 +120,8 @@ import mekhq.campaign.mission.enums.ScenarioType;
 import mekhq.campaign.mission.newContract.AbstractContract;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.PersonnelOptions;
+import mekhq.campaign.personnel.familiarity.Familiarity;
+import mekhq.campaign.personnel.familiarity.FamiliarityGainType;
 import mekhq.campaign.personnel.skills.ActionCheckResult;
 import mekhq.campaign.personnel.skills.ScoutingSkills;
 import mekhq.campaign.personnel.skills.Skill;
@@ -1209,6 +1211,14 @@ public class StratConRulesManager {
         boolean isPatrol = combatRole.isPatrol();
         boolean isTraining = combatRole.isTraining();
 
+        // A patrol spends its deployment riding the sector, so the patrolling force earns a little familiarity with
+        // their own chassis. No other role earns it. The award sits here rather than in processForceDeployment: that
+        // runs again whenever a force is committed to a scenario - both from the branches below and from
+        // assignForceToScenario - and a scenario grants its own, larger award at resolution.
+        if (isPatrol) {
+            Familiarity.assignFamiliarityToCombatTeam(campaign, combatTeam, FamiliarityGainType.D3);
+        }
+
         // A force that deploys into an unexplored hex is walking in blind. If that deployment trips a scenario, the
         // force is caught off-guard: the scenario is pinned to the deployed hex (bypassing the patrol adjacent-shift)
         // and counts as an ambush - or a bungled patrol, if the force was on patrol. This must be captured *before*
@@ -1632,11 +1642,13 @@ public class StratConRulesManager {
         // we want to ensure we only increase Fatigue once
         boolean hasFatigueIncreased = false;
 
-        // Determine scan range (this is the furthest a hex can be revealed)
         int scanRangeIncrease = track.getScanRangeIncrease();
         CombatTeam combatTeam = campaign.getPlayerForce().getCombatTeamsAsMap(campaign).get(forceID);
-        if (combatTeam != null && combatTeam.getRole().isPatrol()) {
-            scanRangeIncrease++;
+        if (combatTeam != null) {
+            boolean isPatrol = combatTeam.getRole().isPatrol();
+            if (isPatrol) {
+                scanRangeIncrease++; // Determine scan range (this is the furthest a hex can be revealed)
+            }
         }
 
         // Process starting point

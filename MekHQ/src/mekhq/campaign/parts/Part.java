@@ -1937,7 +1937,7 @@ public abstract class Part implements IPartWork, ITechnology, ILocatable {
     }
 
     @Override
-    public TechRating getTechRating() {
+    public @Nonnull TechRating getTechRating() {
         return getTechAdvancement().getTechRating();
     }
 

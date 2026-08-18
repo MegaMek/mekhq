@@ -77,6 +77,7 @@ public final class MHQConstants extends SuiteConstants {
     public static final String COMPANY_GENERATOR_STARTUP = "companyGeneratorStartup";
     public static final String SHOW_COMPANY_GENERATOR = "showCompanyGenerator";
     public static final String SHOW_UNIT_PICTURES_ON_TOE = "showUnitPicturesOnTOE";
+    public static final String SHOW_WARRIORS_ALMANAC = "showWarriorsAlmanac";
 
     // Personnel record logs - controls whether each personnel record section starts expanded
     public static final String DISPLAY_PERSONNEL_LOG = "displayPersonnelLog";

@@ -35,6 +35,7 @@ package mekhq.campaign.parts;
 
 import java.io.PrintWriter;
 
+import jakarta.annotation.Nonnull;
 import megamek.common.TechAdvancement;
 import megamek.common.TechConstants;
 import megamek.common.annotations.Nullable;
@@ -206,7 +207,7 @@ public class AeroHeatSink extends Part {
     }
 
     @Override
-    public TechRating getTechRating() {
+    public @Nonnull TechRating getTechRating() {
         if (type == CLAN_HEAT_DOUBLE) {
             return TechRating.F;
         } else if (type == Aero.HEAT_DOUBLE) {

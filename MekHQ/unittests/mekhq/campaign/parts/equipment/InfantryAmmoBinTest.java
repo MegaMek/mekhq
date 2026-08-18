@@ -1762,4 +1762,62 @@ public class InfantryAmmoBinTest {
         // ... which should return null.
         assertNull(incorrectBin.findPartnerBin());
     }
+
+    /**
+     * Fabrication manufactures the clips for money rather than drawing them from stock, so a successful attempt must
+     * fill the bin even with an empty warehouse.
+     */
+    @Test
+    public void fabricationLoadsTheBinFromAnEmptyWarehouse() {
+        Campaign mockCampaign = mockCampaign();
+        when(mockCampaign.getCampaignOptions()).thenReturn(new CampaignOptions());
+        LocalWarehouse warehouse = new LocalWarehouse();
+        when(mockCampaign.getPlayerForce().getWarehouse()).thenReturn(warehouse);
+        mekhq.campaign.ForceQuartermaster quartermaster = new mekhq.campaign.ForceQuartermaster(mockCampaign);
+        when(mockCampaign.getQuartermaster()).thenReturn(quartermaster);
+
+        AmmoType ammoType = getAmmoType(EquipmentTypeLookup.INFANTRY_AMMO);
+        InfantryWeapon weaponType = getInfantryWeapon(EquipmentTypeLookup.INFANTRY_ASSAULT_RIFLE);
+
+        // Create an empty Ammo Bin ...
+        int clips = 5;
+        int shotsNeeded = weaponType.getShots() * clips;
+        int equipmentNum = 42;
+        InfantryAmmoBin ammoBin = new InfantryAmmoBin(0,
+              ammoType,
+              equipmentNum,
+              shotsNeeded,
+              weaponType,
+              clips,
+              false,
+              mockCampaign);
+
+        // ... place the ammo bin on a unit ...
+        Unit mockUnit = mock(Unit.class);
+        Infantry mockEntity = mock(Infantry.class);
+        when(mockUnit.getEntity()).thenReturn(mockEntity);
+        AmmoMounted mockMounted = mock(AmmoMounted.class);
+        when(mockMounted.getType()).thenReturn(ammoType);
+        when(mockMounted.getBaseShotsLeft()).thenReturn(0);
+        doAnswer(invocation -> {
+            int shotsLeft = invocation.getArgument(0);
+            when(mockMounted.getBaseShotsLeft()).thenReturn(shotsLeft);
+            return null;
+        }).when(mockMounted).setShotsLeft(anyInt());
+        when(mockEntity.getEquipment(eq(equipmentNum))).thenReturn((Mounted) mockMounted);
+        ammoBin.setUnit(mockUnit);
+
+        ammoBin.setFabricating(true);
+
+        // The warehouse is empty, but the attempt can still be worked on ...
+        assertNull(ammoBin.checkFixable());
+        ammoBin.succeed();
+
+        // ... and it fills the bin with manufactured shots ...
+        assertEquals(0, ammoBin.getShotsNeeded());
+        assertEquals(shotsNeeded, mockMounted.getBaseShotsLeft());
+
+        // ... without drawing anything from stock.
+        assertEquals(0, quartermaster.getAmmoAvailable(ammoType, weaponType));
+    }
 }

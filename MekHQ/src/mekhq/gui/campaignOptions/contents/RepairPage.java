@@ -79,6 +79,7 @@ class RepairPage {
     private JCheckBox chkUseFabrication;
     private JCheckBox chkUseBalancedFabrication;
     private JCheckBox chkMaintenanceFabrication;
+    private JCheckBox chkUseAmmoFabrication;
     private JCheckBox useAeroSystemHitsBox;
     private JCheckBox useDamageMargin;
     private JLabel lblDamageMargin;
@@ -140,6 +141,10 @@ class RepairPage {
         chkMaintenanceFabrication.addMouseListener(
               createTipPanelUpdater("MaintenanceFabrication"));
 
+        chkUseAmmoFabrication = new CampaignOptionsCheckBox("UseAmmoFabrication",
+              getMetadata(new Version(0, 51, 1), CampaignOptionFlag.CUSTOM_SYSTEM));
+        chkUseAmmoFabrication.addMouseListener(createTipPanelUpdater("UseAmmoFabrication"));
+
         useAeroSystemHitsBox = new CampaignOptionsCheckBox("UseAeroSystemHitsBox");
         useAeroSystemHitsBox.addMouseListener(createTipPanelUpdater("UseAeroSystemHitsBox"));
 
@@ -190,7 +195,8 @@ class RepairPage {
               useQuirksBox,
               chkUseFabrication,
               chkUseBalancedFabrication,
-              chkMaintenanceFabrication);
+              chkMaintenanceFabrication,
+              chkUseAmmoFabrication);
 
         return panel;
     }
@@ -228,6 +234,7 @@ class RepairPage {
         chkUseFabrication.setSelected(model.useFabrication);
         chkUseBalancedFabrication.setSelected(model.useBalancedFabrication);
         chkMaintenanceFabrication.setSelected(model.maintenanceFabrication);
+        chkUseAmmoFabrication.setSelected(model.useAmmoFabrication);
         useAeroSystemHitsBox.setSelected(model.useAeroSystemHits);
         useDamageMargin.setSelected(model.destroyByMargin);
         spnDamageMargin.setValue(model.destroyMargin);
@@ -254,6 +261,7 @@ class RepairPage {
         model.useFabrication = chkUseFabrication.isSelected();
         model.useBalancedFabrication = chkUseBalancedFabrication.isSelected();
         model.maintenanceFabrication = chkMaintenanceFabrication.isSelected();
+        model.useAmmoFabrication = chkUseAmmoFabrication.isSelected();
         model.useAeroSystemHits = useAeroSystemHitsBox.isSelected();
         model.destroyByMargin = useDamageMargin.isSelected();
         model.destroyMargin = (int) spnDamageMargin.getValue();

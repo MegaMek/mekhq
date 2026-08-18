@@ -1,6 +1,6 @@
 /*
  * Copyright (c) 2009 - Jay Lawson (jaylawson39 at yahoo.com). All Rights Reserved.
- * Copyright (C) 2013-2025 The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2013-2026 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -43,6 +43,7 @@ import megamek.logging.MMLogger;
 import mekhq.campaign.unit.Unit;
 import mekhq.campaign.universe.Systems;
 import mekhq.gui.dialog.VocationalExperienceAwardDialog;
+import mekhq.gui.dialog.WarriorsAlmanacDialog;
 import mekhq.gui.dialog.reportDialogs.MaintenanceReportDialog;
 
 /**
@@ -60,6 +61,7 @@ public record ReportHyperlinkListener(CampaignGUI campaignGUI) implements Hyperl
     public static final String CONTRACT_MARKET = "CONTRACT_MARKET";
     public static final String UNIT_MARKET = "UNIT_MARKET";
     public static final String PERSONNEL_ADVANCEMENT = "PERSONNEL_ADVANCEMENT";
+    public static final String WARRIORS_ALMANAC = "WARRIORS_ALMANAC";
     public static final String SCENARIO = "SCENARIO";
     public static final String MISSION = "MISSION";
     public static final String SYSTEM = "SYSTEM";
@@ -159,6 +161,8 @@ public record ReportHyperlinkListener(CampaignGUI campaignGUI) implements Hyperl
                 } catch (Exception e) {
                     LOGGER.error("", e);
                 }
+            } else if (evt.getDescription().startsWith(WARRIORS_ALMANAC)) {
+                new WarriorsAlmanacDialog(campaignGUI.getCampaign(), false);
             }
         }
     }
