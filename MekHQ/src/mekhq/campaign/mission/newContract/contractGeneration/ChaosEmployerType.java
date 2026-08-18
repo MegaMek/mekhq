@@ -32,26 +32,34 @@
  */
 package mekhq.campaign.mission.newContract.contractGeneration;
 
-public enum ChaosEmployerType {
-    ANY_PLANETARY_GOVERNMENT(0, 1, 0, 1, 0),
-    ANY_SYSTEM_OWNER(1, 2, 1, -2, -3),
-    CIVILIAN_ORGANIZATION_BUSINESS(-2, -2, -1, 4, 4),
-    CIVILIAN_ORGANIZATION_MILITIA(-2, -2, -1, 4, 4),
-    CIVILIAN_ORGANIZATION_REBELS(-2, -2, -1, 4, 4),
-    CORPORATION(2, -2, 1, 2, 0),
-    LOCAL_PLANETARY_GOVERNMENT(0, 1, 0, 1, 0),
-    LOCAL_SYSTEM_OWNER(0, 2, 1, -2, -3),
-    MERCENARY_SUBCONTRACT(0, 0, 0, 0, 3),
-    NOBLE(0, 0, 0, 0, 0);
+import static mekhq.utilities.MHQInternationalization.getTextAt;
 
+public enum ChaosEmployerType {
+    ANY_PLANETARY_GOVERNMENT("ChaosEmployerType.ANY_PLANETARY_GOVERNMENT.text", 0, 1, 0, 1, 0),
+    ANY_SYSTEM_OWNER("ChaosEmployerType.ANY_SYSTEM_OWNER.text", 1, 2, 1, -2, -3),
+    CIVILIAN_ORGANIZATION_BUSINESS("ChaosEmployerType.CIVILIAN_ORGANIZATION_BUSINESS.text", -2, -2, -1, 4, 4),
+    CIVILIAN_ORGANIZATION_MILITIA("ChaosEmployerType.CIVILIAN_ORGANIZATION_MILITIA.text", -2, -2, -1, 4, 4),
+    CIVILIAN_ORGANIZATION_REBELS("ChaosEmployerType.CIVILIAN_ORGANIZATION_REBELS.text", -2, -2, -1, 4, 4),
+    CORPORATION("ChaosEmployerType.CORPORATION.text", 2, -2, 1, 2, 0),
+    LOCAL_PLANETARY_GOVERNMENT("ChaosEmployerType.LOCAL_PLANETARY_GOVERNMENT.text", 0, 1, 0, 1, 0),
+    LOCAL_SYSTEM_OWNER("ChaosEmployerType.LOCAL_SYSTEM_OWNER.text", 0, 2, 1, -2, -3),
+    MERCENARY_SUBCONTRACT("ChaosEmployerType.MERCENARY_SUBCONTRACT.text", 0, 0, 0, 0, 3),
+    NOBLE("ChaosEmployerType.NOBLE.text", 0, 0, 0, 0, 0);
+
+    private static final String RESOURCE_BUNDLE = "mekhq.resources.Mission";
+
+    private final String lookup;
+    private final String label;
     private final int payRateModifier; // Hot Spots Draconis Reach pg 144 first printing
     private final int supportModifier; // Hot Spots Draconis Reach pg 144 first printing
     private final int transportModifier; // Hot Spots Draconis Reach pg 144 first printing
     private final int salvageRightsModifier; // Hot Spots Draconis Reach pg 144 first printing
     private final int commandRightsModifier; // Hot Spots Draconis Reach pg 144 first printing
 
-    ChaosEmployerType(final int payRateModifier, final int supportModifier, final int transportModifier,
-          final int salvageRightsModifier, final int commandRightsModifier) {
+    ChaosEmployerType(final String lookup, final int payRateModifier, final int supportModifier,
+          final int transportModifier, final int salvageRightsModifier, final int commandRightsModifier) {
+        this.lookup = lookup;
+        this.label = getTextAt(RESOURCE_BUNDLE, "ChaosEmployerType." + lookup + ".text");
         this.payRateModifier = payRateModifier;
         this.supportModifier = supportModifier;
         this.transportModifier = transportModifier;
@@ -87,5 +95,15 @@ public enum ChaosEmployerType {
 
     public int getCommandRightsModifier() {
         return commandRightsModifier;
+    }
+
+    /** @return the player-facing label for this employer type. */
+    public String getLabel() {
+        return label;
+    }
+
+    @Override
+    public String toString() {
+        return label;
     }
 }

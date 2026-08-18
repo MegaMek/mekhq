@@ -46,7 +46,14 @@ import java.awt.event.ActionListener;
 import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
 import java.util.AbstractMap;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 import javax.swing.*;
 
 import jakarta.annotation.Nullable;
@@ -63,6 +70,7 @@ import megamek.common.ui.EnhancedTabbedPane;
 import megamek.logging.MMLogger;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
+import mekhq.campaign.enums.DragoonRating;
 import mekhq.campaign.finances.Money;
 import mekhq.campaign.mission.enums.ContractMoraleLevel;
 import mekhq.campaign.mission.enums.ContractObjectiveType;
@@ -112,6 +120,11 @@ public class ContractEditorDialog extends JDialog {
     private static final int LABEL_WIDTH = 170;
     /** The end date is held at least this many months after the start date. */
     private static final int MINIMUM_CONTRACT_LENGTH_MONTHS = 1;
+
+    /** Synthetic "Custom" faction codes offered as leading options in the employer and enemy faction pickers. */
+    private static final String CUSTOM_INNER_SPHERE_CODE = "IS";
+    private static final String CUSTOM_PERIPHERY_CODE = "Periphery";
+    private static final String CUSTOM_CLAN_CODE = "CLAN";
     private static final int ICON_SIZE = 48;
     /** Profession used to label ranks in the create-mode NPC pickers; the numeric rank is what actually applies. */
     private static final Profession DEFAULT_PROFESSION = Profession.MEKWARRIOR;
@@ -162,7 +175,7 @@ public class ContractEditorDialog extends JDialog {
     private FactionComboBox employerSponsorCombo;
     private JTextField employerDisplayNameField;
     private JComboBox<SkillLevel> employerSkillCombo;
-    private JSpinner employerEquipmentSpinner;
+    private JComboBox<DragoonRating> employerEquipmentCombo;
     private JComboBox<PlayerColour> employerColorCombo;
     private JButton employerCamoButton;
     private transient Camouflage employerCamouflage;
@@ -172,7 +185,7 @@ public class ContractEditorDialog extends JDialog {
     private FactionComboBox enemySponsorCombo;
     private JTextField enemyDisplayNameField;
     private JComboBox<SkillLevel> enemySkillCombo;
-    private JSpinner enemyEquipmentSpinner;
+    private JComboBox<DragoonRating> enemyEquipmentCombo;
     private JCheckBox batchallAcceptedCheckbox;
     private JComboBox<PlayerColour> enemyColorCombo;
     private JButton enemyCamoButton;
@@ -650,10 +663,10 @@ public class ContractEditorDialog extends JDialog {
         JPanel rows = rowsPanel();
         EmployerData data = contract.getEmployerData();
 
-        employerTypeCombo = enumCombo(ChaosEmployerType.values(), contract.getEmployerType());
+        employerTypeCombo = employerTypeCombo(contract.getEmployerType());
         rows.add(formRow("edit.contractMarket.field.employerType", employerTypeCombo));
 
-        employerFactionCombo = factionCombo(contract.getEmployerFactionCode());
+        employerFactionCombo = factionComboWithCustoms(contract.getEmployerFactionCode(), false);
         rows.add(formRow("edit.contractMarket.field.factionCode", employerFactionCombo));
 
         employerAnchorCombo = factionCombo(data == null ? null : data.anchorFactionCode());
@@ -668,8 +681,8 @@ public class ContractEditorDialog extends JDialog {
         employerSkillCombo = enumCombo(SkillLevel.values(), contract.getEmployerForceSkill());
         rows.add(formRow("edit.contractMarket.field.forceSkill", employerSkillCombo));
 
-        employerEquipmentSpinner = intSpinner(contract.getEmployerEquipmentRating(), 0);
-        rows.add(formRow("edit.contractMarket.field.equipmentRating", employerEquipmentSpinner));
+        employerEquipmentCombo = equipmentRatingCombo(contract.getEmployerEquipmentRating());
+        rows.add(formRow("edit.contractMarket.field.equipmentRating", employerEquipmentCombo));
 
         employerColorCombo = enumCombo(PlayerColour.values(), contract.getEmployerColor());
         rows.add(formRow("edit.contractMarket.field.color", employerColorCombo));
@@ -685,7 +698,7 @@ public class ContractEditorDialog extends JDialog {
         JPanel rows = rowsPanel();
         EnemyData data = contract.getEnemyData();
 
-        enemyFactionCombo = factionCombo(contract.getEnemyFactionCode());
+        enemyFactionCombo = factionComboWithCustoms(contract.getEnemyFactionCode(), false);
         rows.add(formRow("edit.contractMarket.field.factionCode", enemyFactionCombo));
 
         enemySponsorCombo = sponsorCombo(data == null ? null : data.sponsorFactionCode());
@@ -697,8 +710,8 @@ public class ContractEditorDialog extends JDialog {
         enemySkillCombo = enumCombo(SkillLevel.values(), contract.getEnemyForceSkill());
         rows.add(formRow("edit.contractMarket.field.forceSkill", enemySkillCombo));
 
-        enemyEquipmentSpinner = intSpinner(contract.getEnemyEquipmentRating(), 0);
-        rows.add(formRow("edit.contractMarket.field.equipmentRating", enemyEquipmentSpinner));
+        enemyEquipmentCombo = equipmentRatingCombo(contract.getEnemyEquipmentRating());
+        rows.add(formRow("edit.contractMarket.field.equipmentRating", enemyEquipmentCombo));
 
         batchallAcceptedCheckbox = new JCheckBox(getTextAt(RESOURCE_BUNDLE, "edit.contractMarket.field.batchall"),
               data != null && data.batchallAccepted());
@@ -717,19 +730,19 @@ public class ContractEditorDialog extends JDialog {
     private JPanel buildTermsCard() {
         JPanel rows = rowsPanel();
 
-        payRateCombo = stepsCombo(contract.getBasePayRateStep());
+        payRateCombo = stepsCombo(contract.getBasePayRateStep(), TermEffect.PAY_RATE);
         rows.add(formRow("edit.contractMarket.field.payRate", payRateCombo));
 
-        supportCombo = stepsCombo(contract.getSupportStep());
+        supportCombo = stepsCombo(contract.getSupportStep(), TermEffect.SUPPORT);
         rows.add(formRow("edit.contractMarket.field.support", supportCombo));
 
-        transportTermCombo = stepsCombo(contract.getTransportStep());
+        transportTermCombo = stepsCombo(contract.getTransportStep(), TermEffect.TRANSPORT);
         rows.add(formRow("edit.contractMarket.field.transport", transportTermCombo));
 
-        salvageCombo = stepsCombo(contract.getSalvageRightsStep());
+        salvageCombo = stepsCombo(contract.getSalvageRightsStep(), TermEffect.SALVAGE);
         rows.add(formRow("edit.contractMarket.field.salvage", salvageCombo));
 
-        commandCombo = stepsCombo(contract.getCommandRightsStep());
+        commandCombo = stepsCombo(contract.getCommandRightsStep(), TermEffect.COMMAND);
         rows.add(formRow("edit.contractMarket.field.command", commandCombo));
 
         return card(rows);
@@ -954,14 +967,14 @@ public class ContractEditorDialog extends JDialog {
               factionKey(employerAnchorCombo, employer == null ? null : employer.anchorFactionCode()),
               sponsorKey(employerSponsorCombo), text(employerDisplayNameField),
               employer == null ? null : employer.negotiator(), employer == null ? null : employer.liaison(),
-              enumValue(employerSkillCombo, SkillLevel.REGULAR), intValue(employerEquipmentSpinner), employerCamouflage,
-              enumValue(employerColorCombo, PlayerColour.BLUE)));
+              enumValue(employerSkillCombo, SkillLevel.REGULAR), equipmentValue(employerEquipmentCombo),
+              employerCamouflage, enumValue(employerColorCombo, PlayerColour.BLUE)));
 
         // Enemy
         EnemyData enemy = contract.getEnemyData();
         contract.setEnemyData(new EnemyData(factionKey(enemyFactionCombo, contract.getEnemyFactionCode()),
               sponsorKey(enemySponsorCombo), text(enemyDisplayNameField),
-              enumValue(enemySkillCombo, SkillLevel.REGULAR), intValue(enemyEquipmentSpinner),
+              enumValue(enemySkillCombo, SkillLevel.REGULAR), equipmentValue(enemyEquipmentCombo),
               enemy == null ? null : enemy.opposingCommander(), enemyCamouflage,
               enumValue(enemyColorCombo, PlayerColour.RED), batchallAcceptedCheckbox.isSelected()));
 
@@ -1119,19 +1132,60 @@ public class ContractEditorDialog extends JDialog {
         return field;
     }
 
-    /** A faction picker over every known faction, keyed by faction code, seeded to the given code. */
+    /**
+     * A faction picker keyed by faction code, seeded to the given code. Following the Faction Standings GM tool, it
+     * lists only real factions active in the campaign year - Commands (dot-coded) and aggregate factions are excluded.
+     * A code already on the contract that is no longer active is still added, so it stays visible for editing.
+     */
     private FactionComboBox factionCombo(String selectedCode) {
+        Collection<String> codes = activeFactionCodes();
+        if (selectedCode != null && !selectedCode.isBlank() && !codes.contains(selectedCode)) {
+            codes.add(selectedCode);
+        }
         FactionComboBox combo = new FactionComboBox();
-        combo.addFactionEntries(Factions.getInstance().getFactionList(), campaign.getGameYear());
+        combo.addFactionEntries(codes, campaign.getGameYear());
         combo.setSelectedItemByKey(selectedCode);
         return combo;
     }
 
-    /** A faction picker that also offers a leading "none" entry, for the optional covert sponsor. */
-    private FactionComboBox sponsorCombo(String selectedCode) {
-        FactionComboBox combo = factionCombo(null);
-        combo.insertItemAt(new AbstractMap.SimpleEntry<>("", getTextAt(RESOURCE_BUNDLE,
-              "edit.contractMarket.faction.none")), 0);
+    /** The codes of the real factions active in the campaign year (Commands and aggregate factions excluded). */
+    private Collection<String> activeFactionCodes() {
+        Collection<String> codes = new ArrayList<>();
+        for (Faction faction : Factions.getInstance().getActiveFactions(currentDate)) {
+            if (!faction.isAggregate()) {
+                codes.add(faction.getShortName());
+            }
+        }
+        return codes;
+    }
+
+    /**
+     * A faction picker that leads with the synthetic "Custom Inner Sphere / Periphery / Clan" options, followed by the
+     * real active factions. The value-sorting {@link FactionComboBox} model is replaced with an explicit ordered one so
+     * the leading entries stay on top rather than being sorted in among the factions.
+     *
+     * @param selectedCode the code to preselect (a custom code, a faction code, or {@code null}/blank)
+     * @param includeNone  whether to lead with a "None" entry before the customs (used for the sponsor pickers)
+     */
+    private FactionComboBox factionComboWithCustoms(@Nullable String selectedCode, boolean includeNone) {
+        FactionComboBox combo = new FactionComboBox();
+        DefaultComboBoxModel<Map.Entry<String, String>> model = new DefaultComboBoxModel<>();
+        combo.setModel(model);
+
+        if (includeNone) {
+            model.addElement(new AbstractMap.SimpleEntry<>("",
+                  getTextAt(RESOURCE_BUNDLE, "edit.contractMarket.faction.none")));
+        }
+        model.addElement(new AbstractMap.SimpleEntry<>(CUSTOM_INNER_SPHERE_CODE,
+              getTextAt(RESOURCE_BUNDLE, "edit.contractMarket.faction.customInnerSphere")));
+        model.addElement(new AbstractMap.SimpleEntry<>(CUSTOM_PERIPHERY_CODE,
+              getTextAt(RESOURCE_BUNDLE, "edit.contractMarket.faction.customPeriphery")));
+        model.addElement(new AbstractMap.SimpleEntry<>(CUSTOM_CLAN_CODE,
+              getTextAt(RESOURCE_BUNDLE, "edit.contractMarket.faction.customClan")));
+        for (Map.Entry<String, String> faction : factionEntries(selectedCode)) {
+            model.addElement(faction);
+        }
+
         if (selectedCode == null || selectedCode.isBlank()) {
             combo.setSelectedIndex(0);
         } else {
@@ -1140,13 +1194,107 @@ public class ContractEditorDialog extends JDialog {
         return combo;
     }
 
+    /**
+     * The real active-faction entries (code -&gt; display name), sorted by name, with name collisions disambiguated by
+     * appending the code - the same treatment {@link FactionComboBox#addFactionEntries} gives them. A non-custom
+     * {@code extraCode} that is not currently active is included so an already-set faction stays visible.
+     */
+    private List<Map.Entry<String, String>> factionEntries(@Nullable String extraCode) {
+        Collection<String> codes = activeFactionCodes();
+        codes.removeIf(this::isCustomFactionCode); // the customs are added separately, never duplicated here
+        if (extraCode != null &&
+                  !extraCode.isBlank() &&
+                  !isCustomFactionCode(extraCode) &&
+                  !codes.contains(extraCode)) {
+            codes.add(extraCode);
+        }
+
+        int year = campaign.getGameYear();
+        Map<String, String> names = new HashMap<>();
+        Set<String> collisions = new HashSet<>();
+        for (String code : codes) {
+            String name = Factions.getInstance().getFaction(code).getFullName(year);
+            if (names.containsValue(name)) {
+                collisions.add(name);
+            }
+            names.put(code, name);
+        }
+
+        List<Map.Entry<String, String>> entries = new ArrayList<>();
+        for (Map.Entry<String, String> entry : names.entrySet()) {
+            String label = collisions.contains(entry.getValue())
+                                 ? entry.getValue() + " (" + entry.getKey() + ")"
+                                 : entry.getValue();
+            entries.add(new AbstractMap.SimpleEntry<>(entry.getKey(), label));
+        }
+        entries.sort(Map.Entry.comparingByValue());
+        return entries;
+    }
+
+    private boolean isCustomFactionCode(String code) {
+        return CUSTOM_INNER_SPHERE_CODE.equals(code) || CUSTOM_PERIPHERY_CODE.equals(code)
+                     || CUSTOM_CLAN_CODE.equals(code);
+    }
+
+    /** A faction picker that also offers a leading "none" entry, for the optional covert sponsor. */
+    /** The sponsor picker: a "None" entry, then the custom options, then the real active factions. */
+    private FactionComboBox sponsorCombo(String selectedCode) {
+        return factionComboWithCustoms(selectedCode, true);
+    }
+
     private static <E> JComboBox<E> enumCombo(E[] values, E selected) {
         JComboBox<E> combo = new JComboBox<>(new DefaultComboBoxModel<>(values));
         combo.setSelectedItem(selected);
         return combo;
     }
 
-    private JComboBox<ChaosContractStepsTable> stepsCombo(ChaosContractStepsTable selected) {
+    /** The employer-type picker, rendering each {@link ChaosEmployerType} with its player-facing label. */
+    private JComboBox<ChaosEmployerType> employerTypeCombo(ChaosEmployerType selected) {
+        JComboBox<ChaosEmployerType> combo = enumCombo(ChaosEmployerType.values(), selected);
+        combo.setRenderer(new DefaultListCellRenderer() {
+            @Override
+            public Component getListCellRendererComponent(JList<?> list, Object value, int index, boolean isSelected,
+                  boolean cellHasFocus) {
+                super.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);
+                if (value instanceof ChaosEmployerType type) {
+                    setText(type.toString());
+                }
+                return this;
+            }
+        });
+        return combo;
+    }
+
+    /**
+     * An equipment-rating picker showing the {@link DragoonRating} letter codes (F - A*), seeded from a numeric
+     * rating.
+     */
+    private JComboBox<DragoonRating> equipmentRatingCombo(int rating) {
+        JComboBox<DragoonRating> combo = enumCombo(DragoonRating.values(), DragoonRating.fromRating(rating));
+        combo.setRenderer(new DefaultListCellRenderer() {
+            @Override
+            public Component getListCellRendererComponent(JList<?> list, Object value, int index, boolean isSelected,
+                  boolean cellHasFocus) {
+                super.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);
+                if (value instanceof DragoonRating dragoonRating) {
+                    setText(dragoonRating.getLabel());
+                }
+                return this;
+            }
+        });
+        return combo;
+    }
+
+    /** The numeric equipment rating for the combo's selection, defaulting to the middling C rating. */
+    private static int equipmentValue(JComboBox<DragoonRating> combo) {
+        DragoonRating rating = (DragoonRating) combo.getSelectedItem();
+        return (rating == null ? DragoonRating.DRAGOON_C : rating).getRating();
+    }
+
+    /** Which single facet of a {@link ChaosContractStepsTable} step a Terms picker governs, for its effect tooltips. */
+    private enum TermEffect {PAY_RATE, SUPPORT, TRANSPORT, SALVAGE, COMMAND}
+
+    private JComboBox<ChaosContractStepsTable> stepsCombo(ChaosContractStepsTable selected, TermEffect term) {
         JComboBox<ChaosContractStepsTable> combo = enumCombo(ChaosContractStepsTable.values(), selected);
         combo.setRenderer(new DefaultListCellRenderer() {
             @Override
@@ -1154,12 +1302,44 @@ public class ContractEditorDialog extends JDialog {
                   boolean cellHasFocus) {
                 super.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);
                 if (value instanceof ChaosContractStepsTable step) {
+                    // Per-option tooltip in the dropdown, showing only this term's effect for the hovered step.
+                    setToolTipText(termEffectTooltip(term, step));
                     setText(getFormattedTextAt(RESOURCE_BUNDLE, "edit.contractMarket.stepLabel", step.stepValue()));
                 }
                 return this;
             }
         });
+        // Mirror the selected option's effect onto the closed combo so it shows on hover without opening the dropdown.
+        combo.addActionListener(e -> combo.setToolTipText(
+              termEffectTooltip(term, (ChaosContractStepsTable) combo.getSelectedItem())));
+        combo.setToolTipText(termEffectTooltip(term, selected));
         return combo;
+    }
+
+    /** The tooltip describing only the effect the given term draws from a step (pay multiplier, salvage %, and so on). */
+    private @Nullable String termEffectTooltip(TermEffect term, @Nullable ChaosContractStepsTable step) {
+        if (step == null) {
+            return null;
+        }
+        return switch (term) {
+            case PAY_RATE -> getFormattedTextAt(RESOURCE_BUNDLE, "edit.contractMarket.term.tooltip.payRate",
+                  percent(step.getBasePayMultiplier()));
+            case SUPPORT -> getFormattedTextAt(RESOURCE_BUNDLE, "edit.contractMarket.term.tooltip.support",
+                  percent(step.getStraightSupportMultiplier()), percent(step.getBattlefieldLossMultiplier()));
+            case TRANSPORT -> getFormattedTextAt(RESOURCE_BUNDLE, "edit.contractMarket.term.tooltip.transport",
+                  percent(step.getTransportMultiplier()));
+            case SALVAGE -> getFormattedTextAt(RESOURCE_BUNDLE,
+                  step.isExchangeSalvage() ? "edit.contractMarket.term.tooltip.salvage.exchange"
+                        : "edit.contractMarket.term.tooltip.salvage",
+                  percent(step.getSalvageMultiplier()));
+            case COMMAND -> getFormattedTextAt(RESOURCE_BUNDLE, "edit.contractMarket.term.tooltip.command",
+                  step.getContractCommandRights().toString());
+        };
+    }
+
+    /** A 0-1 (or higher, for pay) multiplier as a whole-number percentage. */
+    private static int percent(double multiplier) {
+        return (int) Math.round(multiplier * 100);
     }
 
     private static JComboBox<ContractObjectiveType> objectiveCombo(ContractObjectiveType selected) {
