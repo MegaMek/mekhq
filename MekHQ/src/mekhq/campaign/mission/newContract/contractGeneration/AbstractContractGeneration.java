@@ -50,6 +50,7 @@ import mekhq.campaign.LocalHangar;
 import mekhq.campaign.campaignOptions.CampaignOption;
 import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.digitalGM.stratCon.StratConCampaignState;
+import mekhq.campaign.finances.Money;
 import mekhq.campaign.force.Detachment;
 import mekhq.campaign.force.PlayerForce;
 import mekhq.campaign.location.ILocation;
@@ -272,6 +273,28 @@ public class AbstractContractGeneration {
         }
         return ChaosPlanetSelector.selectTargetPlanet(targetSystem.getPlanets(),
               contract.getObjectiveType().getChaosObjectiveType(), currentDate);
+    }
+
+    /**
+     * Determines a contract's monthly pay the way generation does (from its scale and base pay rate). Exposed as public
+     * so the GM contract editor's "Automatic" monthly pay follows the same rule.
+     */
+    public static Money determineMonthlyPay(AbstractContract contract) {
+        return ChaosContractPayDetermination.getMonthlyPay(contract);
+    }
+
+    /** Determines a contract's combat pay the way generation does (from its scale). */
+    public static Money determineCombatPay(AbstractContract contract) {
+        return ChaosContractPayDetermination.getCombatPay(contract);
+    }
+
+    /**
+     * Determines a contract's transport pay the way generation does (from its scale, transport terms, and the journey
+     * to the target from the player's current location).
+     */
+    public static Money determineTransportPay(Campaign campaign, AbstractContract contract) {
+        return ChaosContractPayDetermination.getTransportPay(campaign, campaign.getLocalDate(), contract,
+              campaign.getPlayerForce().getForceDetachment().getCurrentLocation());
     }
 
     public static LocalDate determineStartDate(Campaign campaign, AbstractContract contract) {

@@ -59,7 +59,7 @@ public enum ChaosEmployerType {
     ChaosEmployerType(final String lookup, final int payRateModifier, final int supportModifier,
           final int transportModifier, final int salvageRightsModifier, final int commandRightsModifier) {
         this.lookup = lookup;
-        this.label = getTextAt(RESOURCE_BUNDLE, "ChaosEmployerType." + lookup + ".text");
+        this.label = getTextAt(RESOURCE_BUNDLE, lookup);
         this.payRateModifier = payRateModifier;
         this.supportModifier = supportModifier;
         this.transportModifier = transportModifier;

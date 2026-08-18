@@ -204,8 +204,11 @@ public class ContractEditorDialog extends JDialog {
 
     // Finance
     private JSpinner monthlyPaySpinner;
+    private JCheckBox monthlyPayAutomatic;
     private JSpinner transportPaySpinner;
+    private JCheckBox transportPayAutomatic;
     private JSpinner combatPaySpinner;
+    private JCheckBox combatPayAutomatic;
 
     // Facilities
     private JSpinner hospitalBedsSpinner;
@@ -216,6 +219,7 @@ public class ContractEditorDialog extends JDialog {
     private JComboBox<ContractMoraleLevel> moraleLevelCombo;
     private JTextField routEndDateField;
     private JSpinner routedPayoutSpinner;
+    private boolean routFieldsEditable;
 
     // Personnel - edit mode wraps the existing NPCs; create mode captures overrides applied to NPCs generated on
     // save.
@@ -771,15 +775,21 @@ public class ContractEditorDialog extends JDialog {
         Money combatPay = finance == null ? Money.zero() : finance.combatPay();
 
         monthlyPaySpinner = moneySpinner(monthlyPay);
-        rows.add(formRow("edit.contractMarket.field.monthlyPay", monthlyPaySpinner));
+        monthlyPayAutomatic = financeAutomatic(monthlyPaySpinner);
+        rows.add(formRow("edit.contractMarket.field.monthlyPay",
+              withAutomatic(monthlyPaySpinner, monthlyPayAutomatic)));
 
         transportPaySpinner = moneySpinner(transport);
         transportPaySpinner.setToolTipText(getTextAt(RESOURCE_BUNDLE,
               "edit.contractMarket.field.transportPay.tooltip"));
-        rows.add(formRow("edit.contractMarket.field.transportPay", transportPaySpinner));
+        transportPayAutomatic = financeAutomatic(transportPaySpinner);
+        rows.add(formRow("edit.contractMarket.field.transportPay",
+              withAutomatic(transportPaySpinner, transportPayAutomatic)));
 
         combatPaySpinner = moneySpinner(combatPay);
-        rows.add(formRow("edit.contractMarket.field.combatPay", combatPaySpinner));
+        combatPayAutomatic = financeAutomatic(combatPaySpinner);
+        rows.add(formRow("edit.contractMarket.field.combatPay",
+              withAutomatic(combatPaySpinner, combatPayAutomatic)));
 
         return card(rows);
     }
@@ -805,10 +815,21 @@ public class ContractEditorDialog extends JDialog {
         moraleLevelCombo = enumCombo(ContractMoraleLevel.values(), contract.getMoraleLevel());
         rows.add(formRow("edit.contractMarket.field.moraleLevel", moraleLevelCombo));
 
-        routEndDateField = dateField(contract.getRoutEndDate());
-        rows.add(formRow("edit.contractMarket.field.routEndDate", routEndDateField));
+        // A rout only begins once the contract is accepted (and even then only for certain objectives), so the rout
+        // fields are only editable for an accepted contract - one with a status. On an unstarted offer they are
+        // disabled, never hidden.
+        routFieldsEditable = contract.getStatus() != null;
 
+        routEndDateField = dateField(contract.getRoutEndDate());
+        routEndDateField.setEnabled(routFieldsEditable);
         routedPayoutSpinner = moneySpinner(contract.getRoutPayout());
+        routedPayoutSpinner.setEnabled(routFieldsEditable);
+        if (!routFieldsEditable) {
+            String tooltip = getTextAt(RESOURCE_BUNDLE, "edit.contractMarket.field.rout.disabled.tooltip");
+            routEndDateField.setToolTipText(tooltip);
+            routedPayoutSpinner.setToolTipText(tooltip);
+        }
+        rows.add(formRow("edit.contractMarket.field.routEndDate", routEndDateField));
         rows.add(formRow("edit.contractMarket.field.routedPayout", routedPayoutSpinner));
 
         return card(rows);
@@ -986,17 +1007,32 @@ public class ContractEditorDialog extends JDialog {
         contract.setObjectiveData(new ContractObjectiveData(objectiveValue(playerObjectiveCombo),
               objectiveValue(opposingObjectiveCombo)));
 
-        // Finance (record components are ordered transport, monthlyPay, combatPay)
-        contract.setContractFinanceData(new ContractFinanceData(moneyValue(transportPaySpinner),
-              moneyValue(monthlyPaySpinner), moneyValue(combatPaySpinner)));
+        // Finance (record components are ordered transport, monthlyPay, combatPay). A ticked "Automatic" box computes
+        // the value with the generator's rule from the contract's just-saved scale, terms, and target; otherwise the
+        // GM's spinner value is used.
+        Money transportPay = transportPayAutomatic.isSelected()
+                                   ? AbstractContractGeneration.determineTransportPay(campaign, contract)
+                                   : moneyValue(transportPaySpinner);
+        Money monthlyPayValue = monthlyPayAutomatic.isSelected()
+                                      ? AbstractContractGeneration.determineMonthlyPay(contract)
+                                      : moneyValue(monthlyPaySpinner);
+        Money combatPayValue = combatPayAutomatic.isSelected()
+                                     ? AbstractContractGeneration.determineCombatPay(contract)
+                                     : moneyValue(combatPaySpinner);
+        contract.setContractFinanceData(new ContractFinanceData(transportPay, monthlyPayValue, combatPayValue));
 
         // Facilities
         contract.setRentedFacilitiesData(new RentedFacilitiesData(intValue(hospitalBedsSpinner),
               intValue(kitchensSpinner), intValue(holdingCellsSpinner)));
 
-        // Morale
+        // Morale. The rout fields are only written when editable (an accepted contract); on an unstarted offer they
+        // are disabled and the contract's existing rout values (an absent end date, a zero payout) are preserved.
+        LocalDate routEndDate = routFieldsEditable
+                                      ? parseDate(routEndDateField, contract.getRoutEndDate())
+                                      : contract.getRoutEndDate();
+        Money routPayout = routFieldsEditable ? moneyValue(routedPayoutSpinner) : contract.getRoutPayout();
         contract.setMoraleData(new MoraleData(enumValue(moraleLevelCombo, contract.getMoraleLevel()),
-              parseDate(routEndDateField, contract.getRoutEndDate()), moneyValue(routedPayoutSpinner)));
+              routEndDate, routPayout));
 
         // Personnel. Create mode generates the NPCs now (from the just-applied factions) and layers the GM's overrides
         // on top; edit mode mutates the existing NPCs in place (their references are preserved by the rebuilds above).
@@ -1123,7 +1159,27 @@ public class ContractEditorDialog extends JDialog {
 
     private static JSpinner moneySpinner(Money money) {
         double amount = money == null ? 0.0 : money.getAmount().doubleValue();
-        return new JSpinner(new SpinnerNumberModel(amount, 0.0, Double.MAX_VALUE, (double) MONEY_STEP));
+        JSpinner spinner = new JSpinner(new SpinnerNumberModel(amount, 0.0, Double.MAX_VALUE, (double) MONEY_STEP));
+        // Without this the editor sizes itself to fit Double.MAX_VALUE, blowing the row far past the viewport.
+        if (spinner.getEditor() instanceof JSpinner.NumberEditor editor) {
+            editor.getTextField().setColumns(12);
+        }
+        return spinner;
+    }
+
+    /**
+     * An "Automatic" checkbox for a finance field. Finance determination is deterministic (derived from scale, terms,
+     * and the journey to the target), so unlike the parameter automatics it is offered in both modes - defaulting on
+     * for a new offer and off when editing, so an existing contract's figures show as they stand. Ticking it disables
+     * the spinner and, on save, (re)computes the value via {@link AbstractContractGeneration}.
+     */
+    private JCheckBox financeAutomatic(JSpinner spinner) {
+        JCheckBox automatic = new JCheckBox(getTextAt(RESOURCE_BUNDLE, "edit.contractMarket.field.automatic"),
+              createMode);
+        automatic.setToolTipText(getTextAt(RESOURCE_BUNDLE, "edit.contractMarket.field.automatic.tooltip"));
+        spinner.setEnabled(!automatic.isSelected());
+        automatic.addActionListener(e -> spinner.setEnabled(!automatic.isSelected()));
+        return automatic;
     }
 
     private JTextField dateField(LocalDate date) {
@@ -1585,6 +1641,10 @@ public class ContractEditorDialog extends JDialog {
         private final JComboBox<RankDisplay> ranks = new JComboBox<>();
         private final JButton portraitButton = new JButton();
         private transient Portrait portrait;
+        private JCheckBox givenNameAutomatic;
+        private JCheckBox surnameAutomatic;
+        private JCheckBox rankAutomatic;
+        private JCheckBox portraitAutomatic;
 
         private NpcOverride() {
             applyIcon(portraitButton, new Portrait()); // placeholder; portrait stays null until the GM picks one
@@ -1612,46 +1672,57 @@ public class ContractEditorDialog extends JDialog {
         }
 
         /**
-         * Repopulates the rank options for the given rank system, keeping a leading "(use generated)" entry selected so
-         * rank is only overridden when the GM explicitly picks one.
+         * Repopulates the rank options for the given rank system. Whether the generated rank is kept is governed by the
+         * field's "Automatic" checkbox, so no synthetic "(use generated)" entry is needed here.
          */
         private void refreshRanks(RankSystem rankSystem) {
             DefaultComboBoxModel<RankDisplay> model = new DefaultComboBoxModel<>();
-            model.addElement(null); // "(use generated)"
             if (rankSystem != null) {
                 model.addAll(RankDisplay.getRankDisplaysForSystem(rankSystem, DEFAULT_PROFESSION));
             }
             ranks.setModel(model);
-            ranks.setSelectedIndex(0);
+            if (model.getSize() > 0) {
+                ranks.setSelectedIndex(0);
+            }
         }
 
         private JPanel buildCard() {
             JPanel rows = rowsPanel();
-            rows.add(formRow("edit.contractMarket.field.givenName", givenNameField));
-            rows.add(formRow("edit.contractMarket.field.surname", surnameField));
-            rows.add(formRow("edit.contractMarket.field.rank", ranks));
-            rows.add(formRow("edit.contractMarket.field.portrait", portraitButton));
+            givenNameAutomatic = automaticToggle(givenNameField);
+            rows.add(formRow("edit.contractMarket.field.givenName", withAutomatic(givenNameField, givenNameAutomatic)));
+            surnameAutomatic = automaticToggle(surnameField);
+            rows.add(formRow("edit.contractMarket.field.surname", withAutomatic(surnameField, surnameAutomatic)));
+            rankAutomatic = automaticToggle(ranks);
+            rows.add(formRow("edit.contractMarket.field.rank", withAutomatic(ranks, rankAutomatic)));
+            portraitAutomatic = automaticToggle(portraitButton);
+            rows.add(formRow("edit.contractMarket.field.portrait", withAutomatic(portraitButton, portraitAutomatic)));
             return card(rows);
         }
 
-        /** Applies whichever overrides the GM supplied to the freshly-generated NPC, leaving blank fields alone. */
+        /** Applies each field the GM took off "Automatic" onto the freshly-generated NPC, leaving the rest generated. */
         private void applyTo(Person generated) {
             if (generated == null) {
                 return;
             }
-            String givenName = givenNameField.getText().trim();
-            String surname = surnameField.getText().trim();
-            if (!givenName.isEmpty()) {
-                generated.setGivenName(givenName);
+            if (!givenNameAutomatic.isSelected()) {
+                String givenName = givenNameField.getText().trim();
+                if (!givenName.isEmpty()) {
+                    generated.setGivenName(givenName);
+                }
             }
-            if (!surname.isEmpty()) {
-                generated.setSurname(surname);
+            if (!surnameAutomatic.isSelected()) {
+                String surname = surnameField.getText().trim();
+                if (!surname.isEmpty()) {
+                    generated.setSurname(surname);
+                }
             }
-            RankDisplay rank = (RankDisplay) ranks.getSelectedItem();
-            if (rank != null) {
-                generated.setRank(rank.rankNumeric());
+            if (!rankAutomatic.isSelected()) {
+                RankDisplay rank = (RankDisplay) ranks.getSelectedItem();
+                if (rank != null) {
+                    generated.setRank(rank.rankNumeric());
+                }
             }
-            if (portrait != null) {
+            if (!portraitAutomatic.isSelected() && portrait != null) {
                 generated.setPortrait(portrait);
             }
         }
