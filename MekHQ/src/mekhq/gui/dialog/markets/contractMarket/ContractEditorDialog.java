@@ -42,6 +42,7 @@ import java.awt.Color;
 import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
+import java.awt.event.ActionListener;
 import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
 import java.util.AbstractMap;
@@ -152,6 +153,7 @@ public class ContractEditorDialog extends JDialog {
     // Target
     private JSuggestField systemField;
     private JComboBox<Planet> planetCombo;
+    private JCheckBox planetAutomatic;
 
     // Employer
     private JComboBox<ChaosEmployerType> employerTypeCombo;
@@ -618,8 +620,12 @@ public class ContractEditorDialog extends JDialog {
             systemField.setText(targetSystem.getName(currentDate));
         }
         systemField.setToolTipText(getTextAt(RESOURCE_BUNDLE, "edit.contractMarket.system.tooltip"));
-        // Changing the system repopulates the planet list for the newly-named system.
-        systemField.addActionListener(e -> repopulatePlanets(resolveSystem(systemField.getText()), null));
+        // Repopulate the planet list for the newly-named system. JSuggestField reports a suggestion picked from its
+        // dropdown through addSelectionListener, while a bare Enter typed in the field fires the text field's own
+        // action event - wire both so the planet list tracks the system however it is chosen.
+        ActionListener onSystemChanged = e -> repopulatePlanets(resolveSystem(systemField.getText()), null);
+        systemField.addActionListener(onSystemChanged);
+        systemField.addSelectionListener(onSystemChanged);
         rows.add(formRow("edit.contractMarket.field.systemId", systemField));
 
         planetCombo = new JComboBox<>();
@@ -634,7 +640,8 @@ public class ContractEditorDialog extends JDialog {
             }
         });
         repopulatePlanets(targetSystem, contract.getTargetPlanetId());
-        rows.add(formRow("edit.contractMarket.field.planetId", planetCombo));
+        planetAutomatic = automaticToggle(planetCombo);
+        rows.add(formRow("edit.contractMarket.field.planetId", withAutomatic(planetCombo, planetAutomatic)));
 
         return card(rows);
     }
@@ -912,8 +919,12 @@ public class ContractEditorDialog extends JDialog {
 
         // Target. Resolved before the schedule so an automatic start date can factor travel time to the chosen target.
         PlanetarySystem system = resolveSystem(systemField.getText());
-        String systemId = system != null ? system.getId() : contract.getTargetSystemId();
-        Planet planet = (Planet) planetCombo.getSelectedItem();
+        PlanetarySystem targetSystem = system != null ? system : contract.getTargetSystem();
+        String systemId = targetSystem != null ? targetSystem.getId() : contract.getTargetSystemId();
+        // An automatic planet is drawn for the resolved system with the generator's own rule; otherwise the GM's pick.
+        Planet planet = (planetAutomatic != null && planetAutomatic.isSelected())
+                              ? AbstractContractGeneration.determineTargetPlanet(contract, targetSystem, currentDate)
+                              : (Planet) planetCombo.getSelectedItem();
         contract.setSystemsTargetData(new SystemsTargetData(systemId, planet == null ? null : planet.getId()));
 
         // Schedule. An automatic start is (re)derived from travel time to the target just saved; an automatic end is
@@ -1066,20 +1077,20 @@ public class ContractEditorDialog extends JDialog {
     }
 
     /**
-     * Builds the "Automatic" checkbox that governs a parameter spinner, or {@code null} when the dialog is editing an
-     * existing contract rather than creating one. The checkbox (re)generates the value with the contract-generation
-     * rules, which for some fields carry random variance - appropriate for a brand-new offer, but not for a GM tuning
-     * an accepted contract's values by hand - so it is only offered in create mode. When present it is ticked by
-     * default, which disables the spinner; unticking it hands control back to the GM.
+     * Builds the "Automatic" checkbox that governs a field, or {@code null} when the dialog is editing an existing
+     * contract rather than creating one. The checkbox (re)generates the value with the contract-generation rules,
+     * which for some fields (combat elements, target planet) carry random variance - appropriate for a brand-new
+     * offer, but not for a GM tuning an accepted contract's values by hand - so it is only offered in create mode.
+     * When present it is ticked by default, which disables the field; unticking it hands control back to the GM.
      */
-    private @Nullable JCheckBox automaticToggle(JSpinner spinner) {
+    private @Nullable JCheckBox automaticToggle(JComponent field) {
         if (!createMode) {
             return null;
         }
         JCheckBox automatic = new JCheckBox(getTextAt(RESOURCE_BUNDLE, "edit.contractMarket.field.automatic"), true);
         automatic.setToolTipText(getTextAt(RESOURCE_BUNDLE, "edit.contractMarket.field.automatic.tooltip"));
-        spinner.setEnabled(false); // ticked by default, so the spinner starts disabled
-        automatic.addActionListener(e -> spinner.setEnabled(!automatic.isSelected()));
+        field.setEnabled(false); // ticked by default, so the field starts disabled
+        automatic.addActionListener(e -> field.setEnabled(!automatic.isSelected()));
         return automatic;
     }
 

@@ -36,7 +36,6 @@ import static java.lang.Math.ceil;
 import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
 
 import java.time.LocalDate;
-import java.util.Collection;
 import java.util.List;
 import java.util.UUID;
 
@@ -255,6 +254,26 @@ public class AbstractContractGeneration {
      *
      * @return the automatically determined start date, or the campaign date when no route can be measured
      */
+    /**
+     * Determines which planet within a target system a contract is fought over, the way generation does: a weighted
+     * random draw over the system's worlds by strategic value, in the direction the contract's objective sets. Exposed
+     * as public so the GM contract editor's "Automatic" planet option follows the same rule.
+     *
+     * @param contract     the contract whose objective sets the weighting direction
+     * @param targetSystem the already-chosen target system, or {@code null}
+     * @param currentDate  the date the worlds are read for
+     *
+     * @return the automatically chosen planet, or {@code null} when there is no system or it has no eligible worlds
+     */
+    public static @Nullable Planet determineTargetPlanet(AbstractContract contract,
+          @Nullable PlanetarySystem targetSystem, LocalDate currentDate) {
+        if (targetSystem == null) {
+            return null;
+        }
+        return ChaosPlanetSelector.selectTargetPlanet(targetSystem.getPlanets(),
+              contract.getObjectiveType().getChaosObjectiveType(), currentDate);
+    }
+
     public static LocalDate determineStartDate(Campaign campaign, AbstractContract contract) {
         PlayerForce playerForce = campaign.getPlayerForce();
         return determineStartDate(campaign, campaign.getLocalDate(), campaign.getCurrentSystem(),
@@ -439,12 +458,9 @@ public class AbstractContractGeneration {
             return null;
         }
 
-        Collection<Planet> candidatePlanets = targetSystem.getPlanets();
         // Weight the pick toward (or, for pirate hunts, away from) strategically valuable worlds, the same way the
         // target system itself is chosen.
-        Planet targetPlanet = ChaosPlanetSelector.selectTargetPlanet(candidatePlanets,
-              objectiveData.playerObjectiveType().getChaosObjectiveType(),
-              currentDate);
+        Planet targetPlanet = determineTargetPlanet(contract, targetSystem, currentDate);
         if (targetPlanet == null) {
             LOGGER.warn("Target system {} has no planets to situate a contract on. Contract generation failed.",
                   targetSystemId);
