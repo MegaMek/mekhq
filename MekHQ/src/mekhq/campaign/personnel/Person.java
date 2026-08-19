@@ -4943,41 +4943,6 @@ public class Person implements ILocatable {
         return true;
     }
 
-    public static boolean updateSkillsForAdminProfessions(LocalDate today, Person person, PersonnelRole role,
-          boolean isPrimary) {
-        boolean upgradeSkills = role == PersonnelRole.ADMINISTRATOR_COMMAND ||
-                                      role == PersonnelRole.ADMINISTRATOR_HR ||
-                                      role == PersonnelRole.ADMINISTRATOR_LOGISTICS ||
-                                      role == PersonnelRole.ADMINISTRATOR_TRANSPORT;
-        if (!upgradeSkills) {
-            return false;
-        }
-
-        Skill administrationSkill = person.getSkill(S_ADMIN);
-        Skill negotiationSkill = person.getSkill(S_NEGOTIATION);
-
-        int newSkillLevel = administrationSkill != null ?
-                                  administrationSkill.getLevel() :
-                                  (negotiationSkill == null ? 1 : negotiationSkill.getLevel());
-
-        if (negotiationSkill == null || negotiationSkill.getLevel() < newSkillLevel) {
-            int bonus = negotiationSkill != null ? negotiationSkill.getBonus() : 0;
-            person.addSkill(S_NEGOTIATION, newSkillLevel, bonus);
-        }
-
-        if (isPrimary) {
-            person.setPrimaryRole(today, PersonnelRole.ADMINISTRATOR);
-        } else {
-            person.setSecondaryRole(PersonnelRole.ADMINISTRATOR);
-        }
-
-        if (person.getPrimaryRole() == person.getSecondaryRole()) {
-            person.setSecondaryRole(PersonnelRole.NONE);
-        }
-
-        return true;
-    }
-
     /**
      * Configures a person's sexual orientation preferences based on their marriageability status and weighted random
      * probabilities.
