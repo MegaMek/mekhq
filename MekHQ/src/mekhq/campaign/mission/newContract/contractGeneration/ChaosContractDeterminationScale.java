@@ -44,6 +44,8 @@ import mekhq.campaign.unit.Unit;
 
 public class ChaosContractDeterminationScale {
     private final static double BATTLE_VALUE_PER_SCALE = 4_500.0; // Draconis Reach first printing pg 36
+    private final static double BATTLEFIELD_SUPPORT_POINTS_PER_SCALE = 32.0; // Draconis Reach first printing pg 36
+    private final static double BATTLE_VALUE_PER_BSP = 500.0; // Battle for Tukayyid, pg24
 
     static int generateScaleForDetachment(PlayerForce playerForce, LocalHangar hangar, boolean isCadreDuty) {
         int validBattleValue = 0;
@@ -61,6 +63,9 @@ public class ChaosContractDeterminationScale {
             }
         }
 
-        return (int) ceil(validBattleValue / BATTLE_VALUE_PER_SCALE);
+        double battleValuePerScale = BATTLE_VALUE_PER_SCALE;
+        battleValuePerScale += BATTLEFIELD_SUPPORT_POINTS_PER_SCALE * BATTLE_VALUE_PER_BSP;
+
+        return (int) ceil(validBattleValue / battleValuePerScale);
     }
 }
