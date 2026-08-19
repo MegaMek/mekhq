@@ -182,7 +182,7 @@ public class AbstractContractGeneration {
         contract.setContractName(contractName);
 
         // Morale
-        MHQMorale.performMoraleCheck(currentDate, contract, 0, 0, 0, 0);
+        MHQMorale.determineStartingMorale(contract, campaign);
 
         // Rented Facilities
         RentedFacilitiesData rentedFacilitiesData = new RentedFacilitiesData(0, 0, 0);

@@ -73,9 +73,7 @@ import mekhq.campaign.mission.Scenario;
 import mekhq.campaign.mission.ScenarioForceTemplate.ForceAlignment;
 import mekhq.campaign.mission.ScenarioTemplate;
 import mekhq.campaign.mission.atb.AtBScenarioModifier;
-import mekhq.campaign.mission.enums.ContractMoraleLevel;
 import mekhq.campaign.mission.newContract.AbstractContract;
-import mekhq.campaign.mission.newContract.utilities.MHQMorale;
 import mekhq.campaign.universe.Faction;
 import mekhq.campaign.universe.Planet;
 import mekhq.campaign.universe.enums.Alphabet;
@@ -326,28 +324,6 @@ public class StratConContractInitializer {
         if (!isUseMaplessMode) {
             for (StratConTrackState track : campaignState.getTracks()) {
                 connectFacilitiesToRoads(track, contract, campaign);
-            }
-        }
-
-        // Determine starting morale
-        if (contract.getObjectiveType().isGarrisonDuty() || contract.getObjectiveType().isRetainer()) {
-            contract.changeMorale(ContractMoraleLevel.ROUTED);
-
-            LocalDate startDate = contract.getStartDate();
-            startDate = startDate == null ? campaign.getLocalDate() : startDate;
-            LocalDate routEnd = startDate.plusMonths(max(1, Compute.d6() - 3)).minusDays(1);
-            contract.changeMorale(routEnd);
-        } else {
-            MHQMorale.checkMorale(campaign, contract);
-
-            if (contract.getMoraleLevel().isRouted()) {
-                contract.changeMorale(ContractMoraleLevel.CRITICAL);
-            }
-
-            if (contract.getObjectiveType().isReliefDuty()) {
-                int currentMoraleLevel = min(6, contract.getMoraleLevel().ordinal() + 1);
-
-                contract.changeMorale(ContractMoraleLevel.parseFromString(String.valueOf(currentMoraleLevel)));
             }
         }
 

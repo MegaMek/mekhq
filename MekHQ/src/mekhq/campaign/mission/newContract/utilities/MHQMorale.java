@@ -33,6 +33,7 @@
 package mekhq.campaign.mission.newContract.utilities;
 
 import static java.lang.Math.max;
+import static java.lang.Math.min;
 import static megamek.common.compute.Compute.d6;
 import static megamek.common.compute.Compute.randomInt;
 import static megamek.common.enums.SkillLevel.ELITE;
@@ -60,6 +61,7 @@ import java.time.LocalDate;
 import java.util.List;
 
 import megamek.common.annotations.Nullable;
+import megamek.common.compute.Compute;
 import megamek.common.rolls.TargetRoll;
 import megamek.logging.MMLogger;
 import mekhq.campaign.Campaign;
@@ -640,7 +642,7 @@ public class MHQMorale {
      * Checks and updates the morale which depends on various conditions such as the rout end date, skill levels,
      * victories, defeats, etc. This method also updates the enemy status based on the morale level.
      */
-    public static void checkMorale(Campaign campaign, AbstractContract contract) {
+    public static void checkMorale(Campaign campaign, AbstractContract contract, boolean showDialog) {
         LocalDate today = campaign.getLocalDate();
         // If there is a rout end date, and it's past today, update morale and enemy state accordingly
         if (contract.getRoutEndDate() != null) {
@@ -685,17 +687,19 @@ public class MHQMorale {
                     key = "routEnded.aNewChallenger";
                 }
 
-                new ImmersiveDialogSimple(campaign,
-                      contract.getEmployerLiaison(),
-                      null,
-                      getFormattedTextAt(RESOURCE_BUNDLE,
-                            key,
-                            campaign.getCommanderAddress(),
-                            FactionStandingUtilities.getFactionName(contract.getEnemyFaction(), today.getYear())),
-                      null,
-                      null,
-                      null,
-                      false);
+                if (showDialog) {
+                    new ImmersiveDialogSimple(campaign,
+                          contract.getEmployerLiaison(),
+                          null,
+                          getFormattedTextAt(RESOURCE_BUNDLE,
+                                key,
+                                campaign.getCommanderAddress(),
+                                FactionStandingUtilities.getFactionName(contract.getEnemyFaction(), today.getYear())),
+                          null,
+                          null,
+                          null,
+                          false);
+                }
             }
 
             return;
@@ -827,6 +831,29 @@ public class MHQMorale {
                       null,
                       null,
                       false);
+            }
+        }
+    }
+
+    public static void determineStartingMorale(AbstractContract contract, Campaign campaign) {
+        if (contract.getObjectiveType().isGarrisonDuty() || contract.getObjectiveType().isRetainer()) {
+            contract.changeMorale(ContractMoraleLevel.ROUTED);
+
+            LocalDate startDate = contract.getStartDate();
+            startDate = startDate == null ? campaign.getLocalDate() : startDate;
+            LocalDate routEnd = startDate.plusMonths(max(1, Compute.d6() - 3)).minusDays(1);
+            contract.changeMorale(routEnd);
+        } else {
+            MHQMorale.checkMorale(campaign, contract, false);
+
+            if (contract.getMoraleLevel().isRouted()) {
+                contract.changeMorale(ContractMoraleLevel.CRITICAL);
+            }
+
+            if (contract.getObjectiveType().isReliefDuty()) {
+                int currentMoraleLevel = min(6, contract.getMoraleLevel().ordinal() + 1);
+
+                contract.changeMorale(ContractMoraleLevel.parseFromString(String.valueOf(currentMoraleLevel)));
             }
         }
     }

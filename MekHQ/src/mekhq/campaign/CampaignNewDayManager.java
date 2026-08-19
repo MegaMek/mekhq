@@ -1229,7 +1229,7 @@ public class CampaignNewDayManager {
             for (AbstractContract contract : campaign.getActiveContracts()) {
                 ContractMoraleLevel oldMorale = contract.getMoraleLevel();
 
-                MHQMorale.checkMorale(campaign, contract);
+                MHQMorale.checkMorale(campaign, contract, true);
                 ContractMoraleLevel newMorale = contract.getMoraleLevel();
 
                 String report = "";
