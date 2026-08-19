@@ -526,17 +526,22 @@ public final class ContractXmlCodec {
 
     private static Map<String, FieldBinder<EmployerDataBuilder>> createEmployerBinders() {
         final Map<String, FieldBinder<EmployerDataBuilder>> binders = new HashMap<>();
-        binders.put("type", (b, n, c, v) -> b.type = ChaosEmployerType.valueOf(text(n)));
-        binders.put("factionCode", (b, n, c, v) -> b.factionCode = text(n));
-        binders.put("anchorFactionCode", (b, n, c, v) -> b.anchorFactionCode = text(n));
-        binders.put("sponsorFactionCode", (b, n, c, v) -> b.sponsorFactionCode = text(n));
-        binders.put("displayName", (b, n, c, v) -> b.displayName = text(n));
-        binders.put("forceSkill", (b, n, c, v) -> b.forceSkill = SkillLevel.valueOf(text(n)));
-        binders.put("equipmentRating", (b, n, c, v) -> b.equipmentRating = parseInt(n));
-        binders.put("color", (b, n, c, v) -> b.color = PlayerColour.valueOf(text(n)));
-        binders.put(Camouflage.XML_TAG, (b, n, c, v) -> b.camouflage = Camouflage.parseFromXML(n));
-        binders.put("negotiator", (b, n, c, v) -> b.negotiator = parseWrappedPerson(n, c, v));
-        binders.put("liaison", (b, n, c, v) -> b.liaison = parseWrappedPerson(n, c, v));
+        binders.put("type", (builder, node, campaign, version) -> builder.type = ChaosEmployerType.valueOf(text(node)));
+        binders.put("factionCode", (builder, node, campaign, version) -> builder.factionCode = text(node));
+        binders.put("anchorFactionCode", (builder, node, campaign, version) -> builder.anchorFactionCode = text(node));
+        binders.put("sponsorFactionCode",
+              (builder, node, campaign, version) -> builder.sponsorFactionCode = text(node));
+        binders.put("displayName", (builder, node, campaign, version) -> builder.displayName = text(node));
+        binders.put("forceSkill",
+              (builder, node, campaign, version) -> builder.forceSkill = SkillLevel.valueOf(text(node)));
+        binders.put("equipmentRating", (builder, node, campaign, version) -> builder.equipmentRating = parseInt(node));
+        binders.put("color", (builder, node, campaign, version) -> builder.color = PlayerColour.valueOf(text(node)));
+        binders.put(Camouflage.XML_TAG,
+              (builder, node, campaign, version) -> builder.camouflage = Camouflage.parseFromXML(node));
+        binders.put("negotiator",
+              (builder, node, campaign, version) -> builder.negotiator = parseWrappedPerson(node, campaign, version));
+        binders.put("liaison",
+              (builder, node, campaign, version) -> builder.liaison = parseWrappedPerson(node, campaign, version));
         return binders;
     }
 
@@ -564,15 +569,22 @@ public final class ContractXmlCodec {
 
     private static Map<String, FieldBinder<EnemyDataBuilder>> createEnemyBinders() {
         final Map<String, FieldBinder<EnemyDataBuilder>> binders = new HashMap<>();
-        binders.put("factionCode", (b, n, c, v) -> b.factionCode = text(n));
-        binders.put("sponsorFactionCode", (b, n, c, v) -> b.sponsorFactionCode = text(n));
-        binders.put("displayName", (b, n, c, v) -> b.displayName = text(n));
-        binders.put("forceSkill", (b, n, c, v) -> b.forceSkill = SkillLevel.valueOf(text(n)));
-        binders.put("equipmentRating", (b, n, c, v) -> b.equipmentRating = parseInt(n));
-        binders.put("color", (b, n, c, v) -> b.color = PlayerColour.valueOf(text(n)));
-        binders.put("batchallAccepted", (b, n, c, v) -> b.batchallAccepted = Boolean.parseBoolean(text(n)));
-        binders.put(Camouflage.XML_TAG, (b, n, c, v) -> b.camouflage = Camouflage.parseFromXML(n));
-        binders.put("opposingCommander", (b, n, c, v) -> b.opposingCommander = parseWrappedPerson(n, c, v));
+        binders.put("factionCode", (builder, node, campaign, version) -> builder.factionCode = text(node));
+        binders.put("sponsorFactionCode",
+              (builder, node, campaign, version) -> builder.sponsorFactionCode = text(node));
+        binders.put("displayName", (builder, node, campaign, version) -> builder.displayName = text(node));
+        binders.put("forceSkill",
+              (builder, node, campaign, version) -> builder.forceSkill = SkillLevel.valueOf(text(node)));
+        binders.put("equipmentRating", (builder, node, campaign, version) -> builder.equipmentRating = parseInt(node));
+        binders.put("color", (builder, node, campaign, version) -> builder.color = PlayerColour.valueOf(text(node)));
+        binders.put("batchallAccepted",
+              (builder, node, campaign, version) -> builder.batchallAccepted = Boolean.parseBoolean(text(node)));
+        binders.put(Camouflage.XML_TAG,
+              (builder, node, campaign, version) -> builder.camouflage = Camouflage.parseFromXML(node));
+        binders.put("opposingCommander",
+              (builder, node, campaign, version) -> builder.opposingCommander = parseWrappedPerson(node,
+                    campaign,
+                    version));
         return binders;
     }
 
@@ -603,11 +615,16 @@ public final class ContractXmlCodec {
 
     private static Map<String, FieldBinder<ContractTermsBuilder>> createContractTermsBinders() {
         final Map<String, FieldBinder<ContractTermsBuilder>> binders = new HashMap<>();
-        binders.put("payRate", (b, n, c, v) -> b.payRate = ChaosContractStepsTable.valueOf(text(n)));
-        binders.put("support", (b, n, c, v) -> b.support = ChaosContractStepsTable.valueOf(text(n)));
-        binders.put("transport", (b, n, c, v) -> b.transport = ChaosContractStepsTable.valueOf(text(n)));
-        binders.put("salvageRights", (b, n, c, v) -> b.salvageRights = ChaosContractStepsTable.valueOf(text(n)));
-        binders.put("commandRights", (b, n, c, v) -> b.commandRights = ChaosContractStepsTable.valueOf(text(n)));
+        binders.put("payRate",
+              (builder, node, campaign, version) -> builder.payRate = ChaosContractStepsTable.valueOf(text(node)));
+        binders.put("support",
+              (builder, node, campaign, version) -> builder.support = ChaosContractStepsTable.valueOf(text(node)));
+        binders.put("transport",
+              (builder, node, campaign, version) -> builder.transport = ChaosContractStepsTable.valueOf(text(node)));
+        binders.put("salvageRights",
+              (builder, node, campaign, version) -> builder.salvageRights = ChaosContractStepsTable.valueOf(text(node)));
+        binders.put("commandRights",
+              (builder, node, campaign, version) -> builder.commandRights = ChaosContractStepsTable.valueOf(text(node)));
         return binders;
     }
 
@@ -628,9 +645,11 @@ public final class ContractXmlCodec {
     private static Map<String, FieldBinder<ObjectiveDataBuilder>> createObjectiveBinders() {
         final Map<String, FieldBinder<ObjectiveDataBuilder>> binders = new HashMap<>();
         binders.put("playerObjectiveType",
-              (b, n, c, v) -> b.playerObjectiveType = ContractObjectiveType.valueOf(text(n)));
+              (builder, node, campaign, version) -> builder.playerObjectiveType = ContractObjectiveType.valueOf(text(
+                    node)));
         binders.put("opposingObjectiveType",
-              (b, n, c, v) -> b.opposingObjectiveType = ContractObjectiveType.valueOf(text(n)));
+              (builder, node, campaign, version) -> builder.opposingObjectiveType = ContractObjectiveType.valueOf(text(
+                    node)));
         return binders;
     }
 
@@ -650,9 +669,12 @@ public final class ContractXmlCodec {
 
     private static Map<String, FieldBinder<FinanceDataBuilder>> createFinanceBinders() {
         final Map<String, FieldBinder<FinanceDataBuilder>> binders = new HashMap<>();
-        binders.put("transport", (b, n, c, v) -> b.transport = Money.fromXmlString(text(n)));
-        binders.put("monthlyPay", (b, n, c, v) -> b.monthlyPay = Money.fromXmlString(text(n)));
-        binders.put("combatPay", (b, n, c, v) -> b.combatPay = Money.fromXmlString(text(n)));
+        binders.put("transport",
+              (builder, node, campaign, version) -> builder.transport = Money.fromXmlString(text(node)));
+        binders.put("monthlyPay",
+              (builder, node, campaign, version) -> builder.monthlyPay = Money.fromXmlString(text(node)));
+        binders.put("combatPay",
+              (builder, node, campaign, version) -> builder.combatPay = Money.fromXmlString(text(node)));
         return binders;
     }
 
@@ -672,9 +694,11 @@ public final class ContractXmlCodec {
 
     private static Map<String, FieldBinder<ScheduleDataBuilder>> createScheduleBinders() {
         final Map<String, FieldBinder<ScheduleDataBuilder>> binders = new HashMap<>();
-        binders.put("startDate", (b, n, c, v) -> b.startDate = MHQXMLUtility.parseDate(text(n)));
-        binders.put("endDate", (b, n, c, v) -> b.endDate = MHQXMLUtility.parseDate(text(n)));
-        binders.put("lengthInMonths", (b, n, c, v) -> b.lengthInMonths = parseInt(n));
+        binders.put("startDate",
+              (builder, node, campaign, version) -> builder.startDate = MHQXMLUtility.parseDate(text(node)));
+        binders.put("endDate",
+              (builder, node, campaign, version) -> builder.endDate = MHQXMLUtility.parseDate(text(node)));
+        binders.put("lengthInMonths", (builder, node, campaign, version) -> builder.lengthInMonths = parseInt(node));
         return binders;
     }
 
@@ -694,8 +718,8 @@ public final class ContractXmlCodec {
 
     private static Map<String, FieldBinder<SystemsTargetBuilder>> createSystemsTargetBinders() {
         final Map<String, FieldBinder<SystemsTargetBuilder>> binders = new HashMap<>();
-        binders.put("systemId", (b, n, c, v) -> b.systemId = text(n));
-        binders.put("planetId", (b, n, c, v) -> b.planetId = text(n));
+        binders.put("systemId", (builder, node, campaign, version) -> builder.systemId = text(node));
+        binders.put("planetId", (builder, node, campaign, version) -> builder.planetId = text(node));
         return binders;
     }
 
@@ -716,9 +740,9 @@ public final class ContractXmlCodec {
 
     private static Map<String, FieldBinder<RentedFacilitiesBuilder>> createRentedFacilitiesBinders() {
         final Map<String, FieldBinder<RentedFacilitiesBuilder>> binders = new HashMap<>();
-        binders.put("hospitalBeds", (b, n, c, v) -> b.hospitalBeds = parseInt(n));
-        binders.put("kitchens", (b, n, c, v) -> b.kitchens = parseInt(n));
-        binders.put("holdingCells", (b, n, c, v) -> b.holdingCells = parseInt(n));
+        binders.put("hospitalBeds", (builder, node, campaign, version) -> builder.hospitalBeds = parseInt(node));
+        binders.put("kitchens", (builder, node, campaign, version) -> builder.kitchens = parseInt(node));
+        binders.put("holdingCells", (builder, node, campaign, version) -> builder.holdingCells = parseInt(node));
         return binders;
     }
 
@@ -738,9 +762,12 @@ public final class ContractXmlCodec {
 
     private static Map<String, FieldBinder<MoraleDataBuilder>> createMoraleBinders() {
         final Map<String, FieldBinder<MoraleDataBuilder>> binders = new HashMap<>();
-        binders.put("moraleLevel", (b, n, c, v) -> b.moraleLevel = ContractMoraleLevel.valueOf(text(n)));
-        binders.put("routEndDate", (b, n, c, v) -> b.routEndDate = MHQXMLUtility.parseDate(text(n)));
-        binders.put("routedPayout", (b, n, c, v) -> b.routedPayout = Money.fromXmlString(text(n)));
+        binders.put("moraleLevel",
+              (builder, node, campaign, version) -> builder.moraleLevel = ContractMoraleLevel.valueOf(text(node)));
+        binders.put("routEndDate",
+              (builder, node, campaign, version) -> builder.routEndDate = MHQXMLUtility.parseDate(text(node)));
+        binders.put("routedPayout",
+              (builder, node, campaign, version) -> builder.routedPayout = Money.fromXmlString(text(node)));
         return binders;
     }
 
@@ -767,15 +794,19 @@ public final class ContractXmlCodec {
 
     private static Map<String, FieldBinder<NegotiationDataBuilder>> createNegotiationBinders() {
         final Map<String, FieldBinder<NegotiationDataBuilder>> binders = new HashMap<>();
-        binders.put("originalPayStep", (b, n, c, v) -> b.originalPayStep = parseInt(n));
-        binders.put("originalSupportStep", (b, n, c, v) -> b.originalSupportStep = parseInt(n));
-        binders.put("originalTransportStep", (b, n, c, v) -> b.originalTransportStep = parseInt(n));
-        binders.put("originalSalvageStep", (b, n, c, v) -> b.originalSalvageStep = parseInt(n));
-        binders.put("originalCommandStep", (b, n, c, v) -> b.originalCommandStep = parseInt(n));
-        binders.put("reputationUsed", (b, n, c, v) -> b.reputationUsed = parseInt(n));
-        binders.put("swapsUsed", (b, n, c, v) -> b.swapsUsed = parseInt(n));
-        binders.put("sacrificeBank", (b, n, c, v) -> b.sacrificeBank = parseInt(n));
-        binders.put("funding", (b, n, c, v) -> b.funding = parseFunding(n));
+        binders.put("originalPayStep", (builder, node, campaign, version) -> builder.originalPayStep = parseInt(node));
+        binders.put("originalSupportStep",
+              (builder, node, campaign, version) -> builder.originalSupportStep = parseInt(node));
+        binders.put("originalTransportStep",
+              (builder, node, campaign, version) -> builder.originalTransportStep = parseInt(node));
+        binders.put("originalSalvageStep",
+              (builder, node, campaign, version) -> builder.originalSalvageStep = parseInt(node));
+        binders.put("originalCommandStep",
+              (builder, node, campaign, version) -> builder.originalCommandStep = parseInt(node));
+        binders.put("reputationUsed", (builder, node, campaign, version) -> builder.reputationUsed = parseInt(node));
+        binders.put("swapsUsed", (builder, node, campaign, version) -> builder.swapsUsed = parseInt(node));
+        binders.put("sacrificeBank", (builder, node, campaign, version) -> builder.sacrificeBank = parseInt(node));
+        binders.put("funding", (builder, node, campaign, version) -> builder.funding = parseFunding(node));
         return binders;
     }
 

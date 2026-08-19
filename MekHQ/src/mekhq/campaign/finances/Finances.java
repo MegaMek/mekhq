@@ -578,12 +578,6 @@ public class Finances {
     }
 
     /**
-     * Calculates and pays the taxes for the given campaign based on the profits.
-     *
-     * @param campaign The campaign for which taxes are to be paid.
-     * @param profits  The profits made by the campaign.
-     */
-    /**
      * Pays shareholding personnel their cut of a contract's monthly payment, immediately after that payment lands.
      *
      * <p>Runs only when the share system is enabled. The share is a percentage of the monthly payout, so it is always
@@ -642,6 +636,12 @@ public class Finances {
         }
     }
 
+    /**
+     * Calculates and pays the taxes for the given campaign based on the profits.
+     *
+     * @param campaign The campaign for which taxes are to be paid.
+     * @param profits  The profits made by the campaign.
+     */
     private void payTaxes(Campaign campaign, Money profits) {
         Money taxAmount = profits.multipliedBy((double) campaign.getCampaignOptions().getTaxesPercentage() / 100)
                                 .round();
