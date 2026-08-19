@@ -883,7 +883,7 @@ public class CampaignNewDayManager {
      * each person,
      * separating the responsibilities for modularity and readability.
      *
-     * @see Campaign#getPersonnelFilteringOutDeparted() Filters out departed personnel before daily processing
+     * @see ForceHumanResources#getPersonnelFilteringOutDeparted() Filters out departed personnel before daily processing
      */
     public void processNewDayPersonnel() {
         RecoverMIAPersonnel recovery = new RecoverMIAPersonnel(campaign, faction, campaign.getAtBUnitRatingMod());

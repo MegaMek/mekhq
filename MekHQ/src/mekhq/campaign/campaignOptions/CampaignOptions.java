@@ -340,8 +340,6 @@ public class CampaignOptions {
      * medical system is enabled.</p>
      *
      * @return {@code true} if either advanced medical system is in use, {@code false} otherwise
-     *
-     * @see #isUseAdvancedMedicalDirect()
      */
     public boolean isUseAdvancedMedical() {
         return get(CampaignOption.USE_ADVANCED_MEDICAL) || get(CampaignOption.USE_ALTERNATIVE_ADVANCED_MEDICAL);

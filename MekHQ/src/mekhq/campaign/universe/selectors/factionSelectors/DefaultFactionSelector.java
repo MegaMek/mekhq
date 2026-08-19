@@ -48,7 +48,7 @@ public class DefaultFactionSelector extends AbstractFactionSelector {
     //region Constructors
 
     /**
-     * Creates a new DefaultFactionSelector class which uses {@link Campaign#getFaction()} to select the faction.
+     * Creates a new DefaultFactionSelector class which uses {@code Campaign#getFaction()} to select the faction.
      *
      * @param options the {@link RandomOriginOptions} to use in faction selection
      */

@@ -429,7 +429,7 @@ public class Formation {
 
     /**
      * Add a sub formation to the sub formation vector. In general, this should not be called directly to add formations
-     * to the campaign because they will not be assigned an id. Use {@link Campaign#addFormation(Formation, Formation)}
+     * to the campaign because they will not be assigned an id. Use {@code Campaign#addFormation(Formation, Formation)}
      * instead The boolean assignParent here is set to false when assigning formations from the TOE to a scenario,
      * because we don't want to switch this formations real parent
      *
@@ -535,7 +535,7 @@ public class Formation {
      * Add a unit id to the unit's vector.
      *
      * <p><b>Warning:</b> In general, this should not be called directly to add unid because they will not be
-     * assigned a formation id. Use {@link Campaign#addUnitToFormation(Unit, int)} instead</p>
+     * assigned a formation id. Use {@code Campaign#addUnitToFormation(Unit, int)} instead</p>
      */
     public void addUnit(UUID uid) {
         addUnit(null, uid, false, null);
@@ -567,7 +567,7 @@ public class Formation {
     }
 
     /**
-     * This should not be directly called except by {@link Campaign#removeUnitFromFormation(Unit)} instead
+     * This should not be directly called except by {@code Campaign#removeUnitFromFormation(Unit)} instead
      */
     public void removeUnit(Campaign campaign, UUID id, boolean log) {
         int idx = 0;

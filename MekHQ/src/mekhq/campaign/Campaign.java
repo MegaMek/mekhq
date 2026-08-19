@@ -1951,12 +1951,10 @@ public class Campaign implements ITechManager {
      * Imports a {@link Person} into a campaign.
      *
      * <p><b>Notes:</b> This is a super lightweight way of adding a character to the campaign. It doesn't include
-     * all the extra steps that the various {@link #recruitPerson(Person)} methods need to go through. That makes this
+     * all the extra steps that the various {@code recruitPerson(Person)} methods need to go through. That makes this
      * method particularly useful for inclusion in Unit Tests.</p>
      *
      * @param person A {@link Person} to import into the campaign.
-     *
-     * @see #recruitPerson(Person)
      */
     public void importPerson(Person person) {
         getPlayerForce().getHumanResources().importPerson(person);
@@ -3313,7 +3311,7 @@ public class Campaign implements ITechManager {
     /**
      * Retrieves the flagged commander from the personnel list. If no flagged commander is found returns {@code null}.
      *
-     * <p><b>Usage:</b> consider using {@link #getCommander()} instead.</p>
+     * <p><b>Usage:</b> consider using {@code getCommander()} instead.</p>
      *
      * @return the flagged commander if present, otherwise {@code null}
      */
@@ -3330,7 +3328,7 @@ public class Campaign implements ITechManager {
      * Retrieves the flagged second-in-command from the personnel list. If no flagged second-in-command is found returns
      * {@code null}.
      *
-     * <p><b>Usage:</b> consider using {@link #getSecondInCommand()} instead.</p>
+     * <p><b>Usage:</b> consider using {@code getSecondInCommand()} instead.</p>
      *
      * @return the flagged second-in-command if present, otherwise {@code null}
      */

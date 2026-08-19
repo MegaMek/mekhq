@@ -91,7 +91,7 @@ public final class LocationDisplay {
      *   <li>In transit with a {@link JumpPath}: returns a travel-status string identical to the
      *       one shown for persons (e.g. {@code "In Transit (3 days to jump point)"}).</li>
      *   <li>Arrived at a base: returns {@link AbstractBase#getDisplayName()}.</li>
-     *   <li>Main force / unknown: returns {@link Campaign#getName()}.</li>
+     *   <li>Main force / unknown: returns {@code Campaign#getName()}.</li>
      * </ul>
      */
     public static String getLocationName(ILocation item, Campaign campaign, LocalDate today) {

@@ -101,7 +101,7 @@ import org.jspecify.annotations.NonNull;
  *   <li>Above that threshold, each trainee's target skill receives {@code max(1, marginOfSuccess)} XP.
  *       Accumulated XP persists across sessions until the improvement cost is met.</li>
  *   <li>When accumulated XP meets or exceeds the cost to improve (adjusted by
- *       {@link CampaignOptions#getXpCostMultiplier()} and optional
+ *       {@code CampaignOptions#getXpCostMultiplier()} and optional
  *       reasoning-based adjustments), the skill advances one level and veterancy awards are evaluated.</li>
  * </ol>
  *
