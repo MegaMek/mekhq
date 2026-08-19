@@ -77,6 +77,7 @@ import mekhq.campaign.personnel.Bloodname;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.PersonnelOptions;
 import mekhq.campaign.personnel.SpecialAbility;
+import mekhq.campaign.personnel.enums.BloodGroup;
 import mekhq.campaign.personnel.enums.Phenotype;
 import mekhq.campaign.personnel.enums.education.EducationLevel;
 import mekhq.campaign.personnel.skills.Skill;
@@ -140,6 +141,7 @@ public class CustomizePersonDialog extends JDialog implements DialogOptionListen
     private JTextField textExtraIncome;
     private JTextField textFatigue;
     private JComboBox<EducationLevel> textEducationLevel;
+    private JComboBox<BloodGroup> comboBloodtype;
     private JTextField textLoyalty;
     private JTextField textPreNominal;
     private JTextField textGivenName;
@@ -260,6 +262,19 @@ public class CustomizePersonDialog extends JDialog implements DialogOptionListen
         JLabel lblToughness = new JLabel();
         textEducationLevel = new JComboBox<>();
         JLabel lblEducationLevel = new JLabel();
+        JLabel lblBloodtype = new JLabel();
+        comboBloodtype = new JComboBox<>(BloodGroup.values());
+        comboBloodtype.setRenderer(new DefaultListCellRenderer() {
+            @Override
+            public Component getListCellRendererComponent(final JList<?> list, final Object value, final int index,
+                    final boolean isSelected, final boolean cellHasFocus) {
+                super.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);
+                if (value instanceof BloodGroup bg) {
+                    setText(bg.getDisplayLabel());
+                }
+                return this;
+            }
+        });
         FastJScrollPane scrOptions = new FastJScrollPane();
         FastJScrollPane scrSkills = new FastJScrollPane();
         JPanel panButtons = new JPanel();
@@ -284,7 +299,7 @@ public class CustomizePersonDialog extends JDialog implements DialogOptionListen
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = y;
         gridBagConstraints.anchor = GridBagConstraints.WEST;
-        gridBagConstraints.insets = new Insets(0, 5, 0, 0);
+        gridBagConstraints.insets = new Insets(0, UIUtil.scaleForGUI(5), 0, 0);
         panDemographics.add(lblName, gridBagConstraints);
 
         gridBagConstraints = new GridBagConstraints();
@@ -349,7 +364,7 @@ public class CustomizePersonDialog extends JDialog implements DialogOptionListen
             gridBagConstraints.gridx = 0;
             gridBagConstraints.gridy = y;
             gridBagConstraints.anchor = GridBagConstraints.WEST;
-            gridBagConstraints.insets = new Insets(0, 5, 0, 0);
+            gridBagConstraints.insets = new Insets(0, UIUtil.scaleForGUI(5), 0, 0);
             panDemographics.add(lblBloodname, gridBagConstraints);
 
             textBloodname.setMinimumSize(UIUtil.scaleForGUI(150, 28));
@@ -376,7 +391,7 @@ public class CustomizePersonDialog extends JDialog implements DialogOptionListen
             gridBagConstraints.gridx = 0;
             gridBagConstraints.gridy = y;
             gridBagConstraints.anchor = GridBagConstraints.WEST;
-            gridBagConstraints.insets = new Insets(0, 5, 0, 0);
+            gridBagConstraints.insets = new Insets(0, UIUtil.scaleForGUI(5), 0, 0);
             panDemographics.add(lblNickname, gridBagConstraints);
 
             textNickname.setText(person.getCallsign());
@@ -405,7 +420,7 @@ public class CustomizePersonDialog extends JDialog implements DialogOptionListen
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = y;
         gridBagConstraints.anchor = GridBagConstraints.WEST;
-        gridBagConstraints.insets = new Insets(0, 5, 0, 0);
+        gridBagConstraints.insets = new Insets(0, UIUtil.scaleForGUI(5), 0, 0);
         panDemographics.add(lblGender, gridBagConstraints);
 
         choiceGender = new JComboBox<>(Gender.values());
@@ -417,7 +432,7 @@ public class CustomizePersonDialog extends JDialog implements DialogOptionListen
         gridBagConstraints.gridwidth = 1;
         gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
         gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
-        gridBagConstraints.insets = new Insets(5, 5, 0, 0);
+        gridBagConstraints.insets = new Insets(UIUtil.scaleForGUI(5), UIUtil.scaleForGUI(5), 0, 0);
         panDemographics.add(choiceGender, gridBagConstraints);
 
         y++;
@@ -426,7 +441,7 @@ public class CustomizePersonDialog extends JDialog implements DialogOptionListen
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = y;
         gridBagConstraints.anchor = GridBagConstraints.WEST;
-        gridBagConstraints.insets = new Insets(0, 5, 0, 0);
+        gridBagConstraints.insets = new Insets(0, UIUtil.scaleForGUI(5), 0, 0);
         panDemographics.add(new JLabel("Origin Faction:"), gridBagConstraints);
 
         // Decide the initial faction-picker model up front so we can construct the JComboBox with
@@ -475,7 +490,7 @@ public class CustomizePersonDialog extends JDialog implements DialogOptionListen
         gridBagConstraints.gridwidth = 1;
         gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
         gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
-        gridBagConstraints.insets = new Insets(5, 5, 0, 0);
+        gridBagConstraints.insets = new Insets(UIUtil.scaleForGUI(5), UIUtil.scaleForGUI(5), 0, 0);
         panDemographics.add(choiceFaction, gridBagConstraints);
 
         // "Show All Factions" sibling checkbox. Default unchecked = strict lifespan filter (the
@@ -493,7 +508,7 @@ public class CustomizePersonDialog extends JDialog implements DialogOptionListen
         gridBagConstraints.gridwidth = 1;
         gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
         gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
-        gridBagConstraints.insets = new Insets(5, 5, 0, 0);
+        gridBagConstraints.insets = new Insets(UIUtil.scaleForGUI(5), UIUtil.scaleForGUI(5), 0, 0);
         panDemographics.add(chkShowAllFactions, gridBagConstraints);
 
         y++;
@@ -502,7 +517,7 @@ public class CustomizePersonDialog extends JDialog implements DialogOptionListen
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = y;
         gridBagConstraints.anchor = GridBagConstraints.WEST;
-        gridBagConstraints.insets = new Insets(0, 5, 0, 0);
+        gridBagConstraints.insets = new Insets(0, UIUtil.scaleForGUI(5), 0, 0);
         panDemographics.add(new JLabel("Origin System:"), gridBagConstraints);
 
         DefaultComboBoxModel<Planet> planetsModel = new DefaultComboBoxModel<>();
@@ -557,7 +572,7 @@ public class CustomizePersonDialog extends JDialog implements DialogOptionListen
         gridBagConstraints.gridwidth = 1;
         gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
         gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
-        gridBagConstraints.insets = new Insets(5, 5, 0, 0);
+        gridBagConstraints.insets = new Insets(UIUtil.scaleForGUI(5), UIUtil.scaleForGUI(5), 0, 0);
         panDemographics.add(choiceSystem, gridBagConstraints);
 
         chkShowAllWorlds = new JCheckBox("Show All Worlds");
@@ -570,7 +585,7 @@ public class CustomizePersonDialog extends JDialog implements DialogOptionListen
         gridBagConstraints.gridwidth = 1;
         gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
         gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
-        gridBagConstraints.insets = new Insets(5, 5, 0, 0);
+        gridBagConstraints.insets = new Insets(UIUtil.scaleForGUI(5), UIUtil.scaleForGUI(5), 0, 0);
         panDemographics.add(chkShowAllWorlds, gridBagConstraints);
 
         y++;
@@ -579,7 +594,7 @@ public class CustomizePersonDialog extends JDialog implements DialogOptionListen
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = y;
         gridBagConstraints.anchor = GridBagConstraints.WEST;
-        gridBagConstraints.insets = new Insets(0, 5, 0, 0);
+        gridBagConstraints.insets = new Insets(0, UIUtil.scaleForGUI(5), 0, 0);
         panDemographics.add(new JLabel("Origin Planet:"), gridBagConstraints);
 
         choicePlanet.setRenderer(new DefaultListCellRenderer() {
@@ -604,7 +619,7 @@ public class CustomizePersonDialog extends JDialog implements DialogOptionListen
         gridBagConstraints.gridwidth = 1;
         gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
         gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
-        gridBagConstraints.insets = new Insets(5, 5, 0, 0);
+        gridBagConstraints.insets = new Insets(UIUtil.scaleForGUI(5), UIUtil.scaleForGUI(5), 0, 0);
         panDemographics.add(choicePlanet, gridBagConstraints);
 
         y++;
@@ -613,7 +628,7 @@ public class CustomizePersonDialog extends JDialog implements DialogOptionListen
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = y;
         gridBagConstraints.anchor = GridBagConstraints.WEST;
-        gridBagConstraints.insets = new Insets(0, 5, 0, 0);
+        gridBagConstraints.insets = new Insets(0, UIUtil.scaleForGUI(5), 0, 0);
         panDemographics.add(new JLabel("Phenotype:"), gridBagConstraints);
 
         DefaultComboBoxModel<Phenotype> phenotypeModel = new DefaultComboBoxModel<>();
@@ -631,7 +646,7 @@ public class CustomizePersonDialog extends JDialog implements DialogOptionListen
         gridBagConstraints.gridwidth = 1;
         gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
         gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
-        gridBagConstraints.insets = new Insets(5, 5, 0, 0);
+        gridBagConstraints.insets = new Insets(UIUtil.scaleForGUI(5), UIUtil.scaleForGUI(5), 0, 0);
         panDemographics.add(choicePhenotype, gridBagConstraints);
 
         chkClan = new JCheckBox("Clan Personnel");
@@ -643,7 +658,7 @@ public class CustomizePersonDialog extends JDialog implements DialogOptionListen
         gridBagConstraints.gridwidth = 1;
         gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
         gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
-        gridBagConstraints.insets = new Insets(5, 5, 0, 0);
+        gridBagConstraints.insets = new Insets(UIUtil.scaleForGUI(5), UIUtil.scaleForGUI(5), 0, 0);
         panDemographics.add(chkClan, gridBagConstraints);
 
         y++;
@@ -654,7 +669,7 @@ public class CustomizePersonDialog extends JDialog implements DialogOptionListen
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = y;
         gridBagConstraints.anchor = GridBagConstraints.WEST;
-        gridBagConstraints.insets = new Insets(0, 5, 0, 0);
+        gridBagConstraints.insets = new Insets(0, UIUtil.scaleForGUI(5), 0, 0);
         panDemographics.add(lblBirthday, gridBagConstraints);
 
         btnDate = new JButton(MekHQ.getMHQOptions().getDisplayFormattedDate(birthdate));
@@ -672,7 +687,7 @@ public class CustomizePersonDialog extends JDialog implements DialogOptionListen
         gridBagConstraints.gridx = 2;
         gridBagConstraints.gridy = y;
         gridBagConstraints.anchor = GridBagConstraints.WEST;
-        gridBagConstraints.insets = new Insets(0, 5, 0, 0);
+        gridBagConstraints.insets = new Insets(0, UIUtil.scaleForGUI(5), 0, 0);
         panDemographics.add(lblAge, gridBagConstraints);
 
         y++;
@@ -684,7 +699,7 @@ public class CustomizePersonDialog extends JDialog implements DialogOptionListen
             gridBagConstraints.gridx = 0;
             gridBagConstraints.gridy = y;
             gridBagConstraints.anchor = GridBagConstraints.WEST;
-            gridBagConstraints.insets = new Insets(0, 5, 0, 0);
+            gridBagConstraints.insets = new Insets(0, UIUtil.scaleForGUI(5), 0, 0);
             panDemographics.add(lblRecruitment, gridBagConstraints);
 
             btnServiceDate = new JButton(MekHQ.getMHQOptions().getDisplayFormattedDate(recruitment));
@@ -706,7 +721,7 @@ public class CustomizePersonDialog extends JDialog implements DialogOptionListen
             gridBagConstraints.gridx = 0;
             gridBagConstraints.gridy = y;
             gridBagConstraints.anchor = GridBagConstraints.WEST;
-            gridBagConstraints.insets = new Insets(0, 5, 0, 0);
+            gridBagConstraints.insets = new Insets(0, UIUtil.scaleForGUI(5), 0, 0);
             panDemographics.add(lblLastRankChangeDate, gridBagConstraints);
 
             btnRankDate = new JButton(MekHQ.getMHQOptions().getDisplayFormattedDate(lastRankChangeDate));
@@ -728,7 +743,7 @@ public class CustomizePersonDialog extends JDialog implements DialogOptionListen
             gridBagConstraints.gridx = 0;
             gridBagConstraints.gridy = y;
             gridBagConstraints.anchor = GridBagConstraints.WEST;
-            gridBagConstraints.insets = new Insets(0, 5, 0, 0);
+            gridBagConstraints.insets = new Insets(0, UIUtil.scaleForGUI(5), 0, 0);
             panDemographics.add(lblRetirement, gridBagConstraints);
 
             btnRetirementDate = new JButton(MekHQ.getMHQOptions().getDisplayFormattedDate(retirement));
@@ -754,7 +769,7 @@ public class CustomizePersonDialog extends JDialog implements DialogOptionListen
             gridBagConstraints.gridx = 0;
             gridBagConstraints.gridy = y;
             gridBagConstraints.anchor = GridBagConstraints.WEST;
-            gridBagConstraints.insets = new Insets(0, 5, 0, 0);
+            gridBagConstraints.insets = new Insets(0, UIUtil.scaleForGUI(5), 0, 0);
             panDemographics.add(lblToughness, gridBagConstraints);
             gridBagConstraints = new GridBagConstraints();
             gridBagConstraints.gridx = 1;
@@ -776,7 +791,7 @@ public class CustomizePersonDialog extends JDialog implements DialogOptionListen
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = y;
         gridBagConstraints.anchor = GridBagConstraints.WEST;
-        gridBagConstraints.insets = new Insets(0, 5, 0, 0);
+        gridBagConstraints.insets = new Insets(0, UIUtil.scaleForGUI(5), 0, 0);
         panDemographics.add(lblConnections, gridBagConstraints);
         gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 1;
@@ -797,7 +812,7 @@ public class CustomizePersonDialog extends JDialog implements DialogOptionListen
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = y;
         gridBagConstraints.anchor = GridBagConstraints.WEST;
-        gridBagConstraints.insets = new Insets(0, 5, 0, 0);
+        gridBagConstraints.insets = new Insets(0, UIUtil.scaleForGUI(5), 0, 0);
         panDemographics.add(lblWealth, gridBagConstraints);
         gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 1;
@@ -818,7 +833,7 @@ public class CustomizePersonDialog extends JDialog implements DialogOptionListen
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = y;
         gridBagConstraints.anchor = GridBagConstraints.WEST;
-        gridBagConstraints.insets = new Insets(0, 5, 0, 0);
+        gridBagConstraints.insets = new Insets(0, UIUtil.scaleForGUI(5), 0, 0);
         panDemographics.add(lblReputation, gridBagConstraints);
         gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 1;
@@ -839,7 +854,7 @@ public class CustomizePersonDialog extends JDialog implements DialogOptionListen
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = y;
         gridBagConstraints.anchor = GridBagConstraints.WEST;
-        gridBagConstraints.insets = new Insets(0, 5, 0, 0);
+        gridBagConstraints.insets = new Insets(0, UIUtil.scaleForGUI(5), 0, 0);
         panDemographics.add(lblUnlucky, gridBagConstraints);
         gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 1;
@@ -860,7 +875,7 @@ public class CustomizePersonDialog extends JDialog implements DialogOptionListen
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = y;
         gridBagConstraints.anchor = GridBagConstraints.WEST;
-        gridBagConstraints.insets = new Insets(0, 5, 0, 0);
+        gridBagConstraints.insets = new Insets(0, UIUtil.scaleForGUI(5), 0, 0);
         panDemographics.add(lblBloodmark, gridBagConstraints);
         gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 1;
@@ -881,7 +896,7 @@ public class CustomizePersonDialog extends JDialog implements DialogOptionListen
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = y;
         gridBagConstraints.anchor = GridBagConstraints.WEST;
-        gridBagConstraints.insets = new Insets(0, 5, 0, 0);
+        gridBagConstraints.insets = new Insets(0, UIUtil.scaleForGUI(5), 0, 0);
         panDemographics.add(lblExtraIncome, gridBagConstraints);
         gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 1;
@@ -903,7 +918,7 @@ public class CustomizePersonDialog extends JDialog implements DialogOptionListen
             gridBagConstraints.gridx = 0;
             gridBagConstraints.gridy = y;
             gridBagConstraints.anchor = GridBagConstraints.WEST;
-            gridBagConstraints.insets = new Insets(0, 5, 0, 0);
+            gridBagConstraints.insets = new Insets(0, UIUtil.scaleForGUI(5), 0, 0);
             panDemographics.add(lblFatigue, gridBagConstraints);
             gridBagConstraints = new GridBagConstraints();
             gridBagConstraints.gridx = 1;
@@ -929,7 +944,7 @@ public class CustomizePersonDialog extends JDialog implements DialogOptionListen
             gridBagConstraints.gridx = 0;
             gridBagConstraints.gridy = y;
             gridBagConstraints.anchor = GridBagConstraints.WEST;
-            gridBagConstraints.insets = new Insets(0, 5, 0, 0);
+            gridBagConstraints.insets = new Insets(0, UIUtil.scaleForGUI(5), 0, 0);
             panDemographics.add(lblEducationLevel, gridBagConstraints);
             gridBagConstraints = new GridBagConstraints();
             gridBagConstraints.gridx = 1;
@@ -940,6 +955,26 @@ public class CustomizePersonDialog extends JDialog implements DialogOptionListen
 
             y++;
         }
+
+        lblBloodtype.setText(resourceMap.getString("lblBloodtype.text"));
+        lblBloodtype.setName("lblBloodtype");
+
+        comboBloodtype.setSelectedItem(person.getBloodGroup());
+
+        gridBagConstraints = new GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = y;
+        gridBagConstraints.anchor = GridBagConstraints.WEST;
+        gridBagConstraints.insets = new Insets(0, UIUtil.scaleForGUI(5), 0, 0);
+        panDemographics.add(lblBloodtype, gridBagConstraints);
+        gridBagConstraints = new GridBagConstraints();
+        gridBagConstraints.gridx = 1;
+        gridBagConstraints.gridy = y;
+        gridBagConstraints.anchor = GridBagConstraints.WEST;
+        gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
+        panDemographics.add(comboBloodtype, gridBagConstraints);
+
+        y++;
 
         if ((campaign.getCampaignOptions().isUseLoyaltyModifiers()) &&
                   (!campaign.getCampaignOptions().isUseHideLoyalty())) {
@@ -953,7 +988,7 @@ public class CustomizePersonDialog extends JDialog implements DialogOptionListen
             gridBagConstraints.gridx = 0;
             gridBagConstraints.gridy = y;
             gridBagConstraints.anchor = GridBagConstraints.WEST;
-            gridBagConstraints.insets = new Insets(0, 5, 0, 0);
+            gridBagConstraints.insets = new Insets(0, UIUtil.scaleForGUI(5), 0, 0);
             panDemographics.add(lblLoyalty, gridBagConstraints);
             gridBagConstraints = new GridBagConstraints();
             gridBagConstraints.gridx = 1;
@@ -1036,7 +1071,7 @@ public class CustomizePersonDialog extends JDialog implements DialogOptionListen
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = y;
         gridBagConstraints.anchor = GridBagConstraints.WEST;
-        gridBagConstraints.insets = new Insets(0, 5, 0, 0);
+        gridBagConstraints.insets = new Insets(0, UIUtil.scaleForGUI(5), 0, 0);
         panDemographics.add(lblUnit, gridBagConstraints);
 
         gridBagConstraints.gridx = 1;
@@ -1055,7 +1090,7 @@ public class CustomizePersonDialog extends JDialog implements DialogOptionListen
         gridBagConstraints.gridy = y;
         gridBagConstraints.gridwidth = 3;
         gridBagConstraints.anchor = GridBagConstraints.WEST;
-        gridBagConstraints.insets = new Insets(0, 5, 0, 0);
+        gridBagConstraints.insets = new Insets(0, UIUtil.scaleForGUI(5), 0, 0);
         panDemographics.add(choiceOriginalUnit, gridBagConstraints);
 
         y++;
@@ -1064,7 +1099,7 @@ public class CustomizePersonDialog extends JDialog implements DialogOptionListen
         gridBagConstraints.gridy = y;
         gridBagConstraints.gridwidth = 2;
         gridBagConstraints.anchor = GridBagConstraints.WEST;
-        gridBagConstraints.insets = new Insets(0, 5, 0, 0);
+        gridBagConstraints.insets = new Insets(0, UIUtil.scaleForGUI(5), 0, 0);
         panDemographics.add(chkFounder, gridBagConstraints);
 
         if (campaign.getCampaignOptions().isUseShareSystem()) {
@@ -1086,7 +1121,7 @@ public class CustomizePersonDialog extends JDialog implements DialogOptionListen
             gridBagConstraints.gridx = 0;
             gridBagConstraints.gridy = y;
             gridBagConstraints.anchor = GridBagConstraints.WEST;
-            gridBagConstraints.insets = new Insets(0, 5, 0, 0);
+            gridBagConstraints.insets = new Insets(0, UIUtil.scaleForGUI(5), 0, 0);
             panDemographics.add(labelAggression, gridBagConstraints);
 
             comboAggression = new MMComboBox<>("comboAggression", Aggression.values());
@@ -1096,7 +1131,7 @@ public class CustomizePersonDialog extends JDialog implements DialogOptionListen
             gridBagConstraints.gridy = y;
             gridBagConstraints.gridwidth = 2;
             gridBagConstraints.anchor = GridBagConstraints.WEST;
-            gridBagConstraints.insets = new Insets(0, 5, 0, 0);
+            gridBagConstraints.insets = new Insets(0, UIUtil.scaleForGUI(5), 0, 0);
             panDemographics.add(comboAggression, gridBagConstraints);
 
             spnAggression = new JSpinner(new SpinnerNumberModel(person.getAggressionDescriptionIndex(),
@@ -1106,7 +1141,7 @@ public class CustomizePersonDialog extends JDialog implements DialogOptionListen
             gridBagConstraints.gridy = y++;
             gridBagConstraints.gridwidth = 2;
             gridBagConstraints.anchor = GridBagConstraints.WEST;
-            gridBagConstraints.insets = new Insets(0, 5, 0, 0);
+            gridBagConstraints.insets = new Insets(0, UIUtil.scaleForGUI(5), 0, 0);
             panDemographics.add(spnAggression, gridBagConstraints);
 
             JLabel labelAmbition = new JLabel();
@@ -1116,7 +1151,7 @@ public class CustomizePersonDialog extends JDialog implements DialogOptionListen
             gridBagConstraints.gridx = 0;
             gridBagConstraints.gridy = y;
             gridBagConstraints.anchor = GridBagConstraints.WEST;
-            gridBagConstraints.insets = new Insets(0, 5, 0, 0);
+            gridBagConstraints.insets = new Insets(0, UIUtil.scaleForGUI(5), 0, 0);
             panDemographics.add(labelAmbition, gridBagConstraints);
 
             comboAmbition = new MMComboBox<>("comboAmbition", Ambition.values());
@@ -1126,7 +1161,7 @@ public class CustomizePersonDialog extends JDialog implements DialogOptionListen
             gridBagConstraints.gridy = y;
             gridBagConstraints.gridwidth = 2;
             gridBagConstraints.anchor = GridBagConstraints.WEST;
-            gridBagConstraints.insets = new Insets(0, 5, 0, 0);
+            gridBagConstraints.insets = new Insets(0, UIUtil.scaleForGUI(5), 0, 0);
             panDemographics.add(comboAmbition, gridBagConstraints);
 
             spnAmbition = new JSpinner(new SpinnerNumberModel(person.getAmbitionDescriptionIndex(),
@@ -1136,7 +1171,7 @@ public class CustomizePersonDialog extends JDialog implements DialogOptionListen
             gridBagConstraints.gridy = y++;
             gridBagConstraints.gridwidth = 2;
             gridBagConstraints.anchor = GridBagConstraints.WEST;
-            gridBagConstraints.insets = new Insets(0, 5, 0, 0);
+            gridBagConstraints.insets = new Insets(0, UIUtil.scaleForGUI(5), 0, 0);
             panDemographics.add(spnAmbition, gridBagConstraints);
 
             JLabel labelGreed = new JLabel();
@@ -1146,7 +1181,7 @@ public class CustomizePersonDialog extends JDialog implements DialogOptionListen
             gridBagConstraints.gridx = 0;
             gridBagConstraints.gridy = y;
             gridBagConstraints.anchor = GridBagConstraints.WEST;
-            gridBagConstraints.insets = new Insets(0, 5, 0, 0);
+            gridBagConstraints.insets = new Insets(0, UIUtil.scaleForGUI(5), 0, 0);
             panDemographics.add(labelGreed, gridBagConstraints);
 
             comboGreed = new MMComboBox<>("comboGreed", Greed.values());
@@ -1156,7 +1191,7 @@ public class CustomizePersonDialog extends JDialog implements DialogOptionListen
             gridBagConstraints.gridy = y;
             gridBagConstraints.gridwidth = 2;
             gridBagConstraints.anchor = GridBagConstraints.WEST;
-            gridBagConstraints.insets = new Insets(0, 5, 0, 0);
+            gridBagConstraints.insets = new Insets(0, UIUtil.scaleForGUI(5), 0, 0);
             panDemographics.add(comboGreed, gridBagConstraints);
 
             spnGreed = new JSpinner(new SpinnerNumberModel(person.getGreedDescriptionIndex(),
@@ -1166,7 +1201,7 @@ public class CustomizePersonDialog extends JDialog implements DialogOptionListen
             gridBagConstraints.gridy = y++;
             gridBagConstraints.gridwidth = 2;
             gridBagConstraints.anchor = GridBagConstraints.WEST;
-            gridBagConstraints.insets = new Insets(0, 5, 0, 0);
+            gridBagConstraints.insets = new Insets(0, UIUtil.scaleForGUI(5), 0, 0);
             panDemographics.add(spnGreed, gridBagConstraints);
 
             JLabel labelSocial = new JLabel();
@@ -1176,7 +1211,7 @@ public class CustomizePersonDialog extends JDialog implements DialogOptionListen
             gridBagConstraints.gridx = 0;
             gridBagConstraints.gridy = y;
             gridBagConstraints.anchor = GridBagConstraints.WEST;
-            gridBagConstraints.insets = new Insets(0, 5, 0, 0);
+            gridBagConstraints.insets = new Insets(0, UIUtil.scaleForGUI(5), 0, 0);
             panDemographics.add(labelSocial, gridBagConstraints);
 
             comboSocial = new MMComboBox<>("comboSocial", Social.values());
@@ -1186,7 +1221,7 @@ public class CustomizePersonDialog extends JDialog implements DialogOptionListen
             gridBagConstraints.gridy = y;
             gridBagConstraints.gridwidth = 2;
             gridBagConstraints.anchor = GridBagConstraints.WEST;
-            gridBagConstraints.insets = new Insets(0, 5, 0, 0);
+            gridBagConstraints.insets = new Insets(0, UIUtil.scaleForGUI(5), 0, 0);
             panDemographics.add(comboSocial, gridBagConstraints);
 
             spnSocial = new JSpinner(new SpinnerNumberModel(person.getSocialDescriptionIndex(),
@@ -1196,7 +1231,7 @@ public class CustomizePersonDialog extends JDialog implements DialogOptionListen
             gridBagConstraints.gridy = y++;
             gridBagConstraints.gridwidth = 2;
             gridBagConstraints.anchor = GridBagConstraints.WEST;
-            gridBagConstraints.insets = new Insets(0, 5, 0, 0);
+            gridBagConstraints.insets = new Insets(0, UIUtil.scaleForGUI(5), 0, 0);
             panDemographics.add(spnSocial, gridBagConstraints);
 
             JLabel labelPersonalityQuirk = new JLabel();
@@ -1206,7 +1241,7 @@ public class CustomizePersonDialog extends JDialog implements DialogOptionListen
             gridBagConstraints.gridx = 0;
             gridBagConstraints.gridy = y;
             gridBagConstraints.anchor = GridBagConstraints.WEST;
-            gridBagConstraints.insets = new Insets(0, 5, 0, 0);
+            gridBagConstraints.insets = new Insets(0, UIUtil.scaleForGUI(5), 0, 0);
             panDemographics.add(labelPersonalityQuirk, gridBagConstraints);
 
             comboPersonalityQuirk = new MMComboBox<>("comboPersonalityQuirk", personalityQuirksSortedAlphabetically());
@@ -1216,7 +1251,7 @@ public class CustomizePersonDialog extends JDialog implements DialogOptionListen
             gridBagConstraints.gridy = y;
             gridBagConstraints.gridwidth = 2;
             gridBagConstraints.anchor = GridBagConstraints.WEST;
-            gridBagConstraints.insets = new Insets(0, 5, 0, 0);
+            gridBagConstraints.insets = new Insets(0, UIUtil.scaleForGUI(5), 0, 0);
             panDemographics.add(comboPersonalityQuirk, gridBagConstraints);
 
             spnPersonalityQuirk = new JSpinner(new SpinnerNumberModel(person.getPersonalityQuirkDescriptionIndex(),
@@ -1226,7 +1261,7 @@ public class CustomizePersonDialog extends JDialog implements DialogOptionListen
             gridBagConstraints.gridy = y++;
             gridBagConstraints.gridwidth = 2;
             gridBagConstraints.anchor = GridBagConstraints.WEST;
-            gridBagConstraints.insets = new Insets(0, 5, 0, 0);
+            gridBagConstraints.insets = new Insets(0, UIUtil.scaleForGUI(5), 0, 0);
             panDemographics.add(spnPersonalityQuirk, gridBagConstraints);
 
             y++;
@@ -1238,7 +1273,7 @@ public class CustomizePersonDialog extends JDialog implements DialogOptionListen
             gridBagConstraints.gridx = 0;
             gridBagConstraints.gridy = y;
             gridBagConstraints.anchor = GridBagConstraints.WEST;
-            gridBagConstraints.insets = new Insets(0, 5, 0, 0);
+            gridBagConstraints.insets = new Insets(0, UIUtil.scaleForGUI(5), 0, 0);
             panDemographics.add(labelReasoning, gridBagConstraints);
 
             comboReasoning = new MMComboBox<>("comboReasoning", Reasoning.values());
@@ -1248,7 +1283,7 @@ public class CustomizePersonDialog extends JDialog implements DialogOptionListen
             gridBagConstraints.gridy = y;
             gridBagConstraints.gridwidth = 2;
             gridBagConstraints.anchor = GridBagConstraints.WEST;
-            gridBagConstraints.insets = new Insets(0, 5, 0, 0);
+            gridBagConstraints.insets = new Insets(0, UIUtil.scaleForGUI(5), 0, 0);
             panDemographics.add(comboReasoning, gridBagConstraints);
 
             y++;
@@ -1263,7 +1298,7 @@ public class CustomizePersonDialog extends JDialog implements DialogOptionListen
             gridBagConstraints.gridwidth = 1;
             gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
             gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
-            gridBagConstraints.insets = new Insets(5, 5, 0, 0);
+            gridBagConstraints.insets = new Insets(UIUtil.scaleForGUI(5), UIUtil.scaleForGUI(5), 0, 0);
             panDemographics.add(chkDarkSecretRevealed, gridBagConstraints);
 
             y++;
@@ -1280,7 +1315,7 @@ public class CustomizePersonDialog extends JDialog implements DialogOptionListen
         gridBagConstraints.weighty = 1.0;
         gridBagConstraints.fill = GridBagConstraints.BOTH;
         gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
-        gridBagConstraints.insets = new Insets(5, 5, 5, 5);
+        gridBagConstraints.insets = new Insets(UIUtil.scaleForGUI(5), UIUtil.scaleForGUI(5), UIUtil.scaleForGUI(5), UIUtil.scaleForGUI(5));
         panDemographics.add(txtBio, gridBagConstraints);
 
         FastJScrollPane scrollPane = new FastJScrollPane(panDemographics);
@@ -1926,6 +1961,8 @@ public class CustomizePersonDialog extends JDialog implements DialogOptionListen
         if (campaign.getCampaignOptions().isUseEducationModule()) {
             person.setEduHighestEducation((EducationLevel) textEducationLevel.getSelectedItem());
         }
+
+        person.setBloodGroup((BloodGroup) comboBloodtype.getSelectedItem());
 
         if (campaign.getCampaignOptions().isUseLoyaltyModifiers()) {
             currentValue = person.getBaseLoyalty();
