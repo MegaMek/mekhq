@@ -64,7 +64,9 @@ public class PityContracts {
      *
      * @param campaign the campaign for which pity contracts are generated
      *
-     * @return the number of pity contracts added to the market
+     * @return the shortfall that was attempted - how many offers generation was asked to place - regardless of how many
+     *       actually generated (a best-effort generation may fail to place an offer, which is skipped rather than
+     *       filed as a null)
      *
      * @author Illiani
      * @since 0.51.0
@@ -77,17 +79,15 @@ public class PityContracts {
 
         ContractMarket contractMarket = campaign.getPlayerForce().getContractMarket();
         ContractSearchType bucket = pityBucket(campaign);
-        int addedCount = 0;
         for (int i = 0; i < contractCount; i++) {
             AbstractContract contract = ChaosContractMarketAvailability.generateProvingGroundOffer(campaign, bucket);
-            // Generation is best-effort and may fail to place an offer, so count only what actually landed.
+            // Generation is best-effort and may fail to place an offer; a null result is skipped rather than filed.
             if (contract != null) {
                 contractMarket.addContract(bucket, contract);
-                addedCount++;
             }
         }
 
-        return addedCount;
+        return contractCount;
     }
 
     /**
