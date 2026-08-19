@@ -253,7 +253,7 @@ public class ContractNegotiationDialog extends JDialog {
                                            escape(getFormattedTextAt(RESOURCE_BUNDLE,
                                                  "negotiate.contractMarket.subtitle",
                                                  contract.getName(),
-                                                 contract.getEmployerDisplayName(),
+                                                 contract.getEmployerMarketDisplayName(),
                                                  scale)) +
                                            "</span></html>");
 

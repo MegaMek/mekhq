@@ -282,13 +282,13 @@ public class ContractDossierPanel extends JPanel {
         portrait.setPreferredSize(new Dimension(PORTRAIT_SIZE, PORTRAIT_SIZE));
         row.add(portrait, BorderLayout.WEST);
 
-        String name = negotiator == null ? contract.getEmployerDisplayName() : negotiator.getFullTitle();
+        String name = negotiator == null ? contract.getEmployerMarketDisplayName() : negotiator.getFullTitle();
         JLabel details = new JLabel("<html><b>" +
                                           escape(name) +
                                           "</b><br>"
                                           +
                                           "<span style='font-size:smaller'>" +
-                                          escape(contract.getEmployerDisplayName()) +
+                                          escape(contract.getEmployerMarketDisplayName()) +
                                           "</span></html>");
         row.add(details, BorderLayout.CENTER);
 

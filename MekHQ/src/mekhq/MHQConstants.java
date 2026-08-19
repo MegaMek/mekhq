@@ -418,6 +418,30 @@ public final class MHQConstants extends SuiteConstants {
           "data/universe/backgrounds/randomCompanyNameGenerator/endWordMercenary.csv").toString();
     public static final String NAME_END_WORD_MERCENARY_USER = Paths.get(
           "userdata/data/universe/backgrounds/randomCompanyNameGenerator/endWordMercenary.csv").toString();
+    public static final String NAME_MIDDLE_WORD_REBEL = Paths.get(
+          "data/universe/backgrounds/randomCompanyNameGenerator/middleWordRebel.csv").toString();
+    public static final String NAME_MIDDLE_WORD_REBEL_USER = Paths.get(
+          "userdata/data/universe/backgrounds/randomCompanyNameGenerator/middleWordRebel.csv").toString();
+    public static final String NAME_END_WORD_REBEL = Paths.get(
+          "data/universe/backgrounds/randomCompanyNameGenerator/endWordRebel.csv").toString();
+    public static final String NAME_END_WORD_REBEL_USER = Paths.get(
+          "userdata/data/universe/backgrounds/randomCompanyNameGenerator/endWordRebel.csv").toString();
+    public static final String NAME_MIDDLE_WORD_MILITIA = Paths.get(
+          "data/universe/backgrounds/randomCompanyNameGenerator/middleWordMilitia.csv").toString();
+    public static final String NAME_MIDDLE_WORD_MILITIA_USER = Paths.get(
+          "userdata/data/universe/backgrounds/randomCompanyNameGenerator/middleWordMilitia.csv").toString();
+    public static final String NAME_END_WORD_MILITIA = Paths.get(
+          "data/universe/backgrounds/randomCompanyNameGenerator/endWordMilitia.csv").toString();
+    public static final String NAME_END_WORD_MILITIA_USER = Paths.get(
+          "userdata/data/universe/backgrounds/randomCompanyNameGenerator/endWordMilitia.csv").toString();
+    public static final String NAME_MIDDLE_WORD_CIVILIAN = Paths.get(
+          "data/universe/backgrounds/randomCompanyNameGenerator/middleWordCivilian.csv").toString();
+    public static final String NAME_MIDDLE_WORD_CIVILIAN_USER = Paths.get(
+          "userdata/data/universe/backgrounds/randomCompanyNameGenerator/middleWordCivilian.csv").toString();
+    public static final String NAME_END_WORD_CIVILIAN = Paths.get(
+          "data/universe/backgrounds/randomCompanyNameGenerator/endWordCivilian.csv").toString();
+    public static final String NAME_END_WORD_CIVILIAN_USER = Paths.get(
+          "userdata/data/universe/backgrounds/randomCompanyNameGenerator/endWordCivilian.csv").toString();
     public static final String NAME_PRE_FAB = Paths.get(
           "data/universe/backgrounds/randomCompanyNameGenerator/preFab.csv").toString();
     public static final String NAME_PRE_FAB_USER = Paths.get(

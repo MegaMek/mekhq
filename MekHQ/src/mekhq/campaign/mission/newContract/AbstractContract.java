@@ -556,6 +556,23 @@ public abstract class AbstractContract {
         return employerData.displayName();
     }
 
+    /**
+     * The employer's display name with a parenthesized employer-type tag appended, for example
+     * {@code "Freedom United (Rebels)"}. Intended <em>only</em> for the contract-market GUI, where the tag helps the
+     * player tell an employer's kind at a glance; everywhere else (briefing, scenarios, ally force names) use
+     * {@link #getEmployerDisplayName()}.
+     *
+     * <p>Employer types that keep their faction's own name (system owners, planetary governments, nobles) have no tag,
+     * so this returns the plain display name unchanged.</p>
+     *
+     * @return the display name, with a {@code " (Tag)"} suffix when the employer type carries a market tag
+     */
+    public String getEmployerMarketDisplayName() {
+        String tag = employerData.type().getMarketDisplayTag();
+        String displayName = employerData.displayName();
+        return (tag == null) ? displayName : displayName + " (" + tag + ')';
+    }
+
     public Person getEmployerNegotiator() {
         return employerData.negotiator();
     }

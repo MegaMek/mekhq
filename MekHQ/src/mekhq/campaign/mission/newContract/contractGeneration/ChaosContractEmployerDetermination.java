@@ -96,7 +96,11 @@ public class ChaosContractEmployerDetermination {
         String anchorFactionCode = employerFactions.anchor().getShortName();
         Faction sponsor = employerFactions.sponsor();
         String sponsorFactionCode = sponsor == null ? null : sponsor.getShortName();
-        String displayName = employer.getFullName(currentYear);
+        // Non-system-owner employers (mercenary commands, corporations, and civilian rebel/militia/business
+        // organizations) field a generic, landless flavor faction, so they get their own generated name. System
+        // owners, planetary governments, and nobles keep their faction's own name.
+        String generatedName = type.generateEmployerName();
+        String displayName = (generatedName != null) ? generatedName : employer.getFullName(currentYear);
 
         Planet currentPlanet = currentLocation.getPlanet();
         if (currentPlanet == null) {

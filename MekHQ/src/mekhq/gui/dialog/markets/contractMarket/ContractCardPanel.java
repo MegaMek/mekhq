@@ -155,7 +155,7 @@ public class ContractCardPanel extends JPanel {
 
     private void applyTitleText() {
         String name = wrapInner(escape(contract.getName().replace('_', ' ')), NAME_MAX_CHARS);
-        String subtitle = wrapInner(escape(contract.getEmployerDisplayName()) + " &middot; "
+        String subtitle = wrapInner(escape(contract.getEmployerMarketDisplayName()) + " &middot; "
                                           + escape(contract.getObjectiveType().toString()), SUBTITLE_MAX_CHARS);
         titlesLabel.setText("<html><b>" + name + "</b><br>"
                                   + "<span style='font-size:smaller'>" + subtitle + "</span></html>");

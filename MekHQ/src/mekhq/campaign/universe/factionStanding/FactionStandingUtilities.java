@@ -635,7 +635,25 @@ public class FactionStandingUtilities {
         final String THE = getTextAt(RESOURCE_BUNDLE, "FactionStandingUtilities.the");
 
         String lowerCaseBaseName = baseName.toLowerCase();
-        if (lowerCaseBaseName.startsWith(CLAN) || lowerCaseBaseName.startsWith(COMSTAR)) {
+        // Clan and ComStar are part of the faction's name rather than a prefix, so such names take no article and keep
+        // their own capitalization ("Clan Wolf", "ComStar") even in a lowercase context.
+        if (lowerCaseBaseName.startsWith(CLAN.toLowerCase()) || lowerCaseBaseName.startsWith(COMSTAR.toLowerCase())) {
+            return baseName;
+        }
+
+        // Some names already carry their own leading definite article - notably the mercenary, rebel, and militia
+        // employer names generated for the contract market ("The Grim Reapers"). Prefixing another article would read
+        // as "The The Grim Reapers", so re-case the existing article to match the requested capitalization instead.
+        final String lowerCaseArticle = THE.toLowerCase();
+        if (lowerCaseBaseName.equals(lowerCaseArticle) || lowerCaseBaseName.startsWith(lowerCaseArticle + ' ')) {
+            return (capitalize ? THE : lowerCaseArticle) + baseName.substring(THE.length());
+        }
+
+        // Likewise, a name led by a possessive proper noun ("Halloran's Partisans") is already definite and must not
+        // take an article: "The Halloran's Partisans" is ungrammatical.
+        int firstSpace = baseName.indexOf(' ');
+        String firstWord = (firstSpace < 0) ? baseName : baseName.substring(0, firstSpace);
+        if (firstWord.endsWith("'s")) {
             return baseName;
         }
 

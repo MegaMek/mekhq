@@ -32,7 +32,14 @@
  */
 package mekhq.campaign.mission.newContract.contractGeneration;
 
+import static mekhq.campaign.personnel.backgrounds.BackgroundsController.randomCivilianCompanyNameGenerator;
+import static mekhq.campaign.personnel.backgrounds.BackgroundsController.randomCorporationCompanyNameGenerator;
+import static mekhq.campaign.personnel.backgrounds.BackgroundsController.randomMercenaryCompanyNameGenerator;
+import static mekhq.campaign.personnel.backgrounds.BackgroundsController.randomMilitiaCompanyNameGenerator;
+import static mekhq.campaign.personnel.backgrounds.BackgroundsController.randomRebelCompanyNameGenerator;
 import static mekhq.utilities.MHQInternationalization.getTextAt;
+
+import jakarta.annotation.Nullable;
 
 public enum ChaosEmployerType {
     ANY_PLANETARY_GOVERNMENT("ChaosEmployerType.ANY_PLANETARY_GOVERNMENT.text", 0, 1, 0, 1, 0),
@@ -100,6 +107,50 @@ public enum ChaosEmployerType {
     /** @return the player-facing label for this employer type. */
     public String getLabel() {
         return label;
+    }
+
+    /**
+     * Generates a flavorful, one-off employer name for this type using the matching random name generator.
+     *
+     * <p>Only the non-system-owner employer types that field a generic, landless flavor faction (mercenary commands,
+     * corporations, and the civilian rebel/militia/business organizations) get a generated name. The system owners,
+     * planetary governments, and nobles keep their own faction's name, so this returns {@code null} for them.</p>
+     *
+     * <p>No player commander is supplied, so any vanity prefix is seeded from a random callsign rather than the
+     * player's own commander &mdash; the employer is not the player.</p>
+     *
+     * @return the generated employer name, or {@code null} if this type should use its faction's name instead
+     */
+    public @Nullable String generateEmployerName() {
+        return switch (this) {
+            case MERCENARY_SUBCONTRACT -> randomMercenaryCompanyNameGenerator(null);
+            case CORPORATION -> randomCorporationCompanyNameGenerator();
+            case CIVILIAN_ORGANIZATION_BUSINESS -> randomCivilianCompanyNameGenerator();
+            case CIVILIAN_ORGANIZATION_MILITIA -> randomMilitiaCompanyNameGenerator(null);
+            case CIVILIAN_ORGANIZATION_REBELS -> randomRebelCompanyNameGenerator(null);
+            default -> null;
+        };
+    }
+
+    /**
+     * @return a short player-facing tag naming this employer type (for example {@code "Rebels"}), shown in brackets
+     *       after a generated employer name in the contract-market GUI only, or {@code null} for types that keep their
+     *       faction's own name. A non-null tag mirrors exactly the types for which {@link #generateEmployerName()}
+     *       produces a name.
+     */
+    public @Nullable String getMarketDisplayTag() {
+        return switch (this) {
+            case MERCENARY_SUBCONTRACT ->
+                  getTextAt(RESOURCE_BUNDLE, "ChaosEmployerType.MERCENARY_SUBCONTRACT.marketTag");
+            case CORPORATION -> getTextAt(RESOURCE_BUNDLE, "ChaosEmployerType.CORPORATION.marketTag");
+            case CIVILIAN_ORGANIZATION_BUSINESS ->
+                  getTextAt(RESOURCE_BUNDLE, "ChaosEmployerType.CIVILIAN_ORGANIZATION_BUSINESS.marketTag");
+            case CIVILIAN_ORGANIZATION_MILITIA ->
+                  getTextAt(RESOURCE_BUNDLE, "ChaosEmployerType.CIVILIAN_ORGANIZATION_MILITIA.marketTag");
+            case CIVILIAN_ORGANIZATION_REBELS ->
+                  getTextAt(RESOURCE_BUNDLE, "ChaosEmployerType.CIVILIAN_ORGANIZATION_REBELS.marketTag");
+            default -> null;
+        };
     }
 
     @Override
