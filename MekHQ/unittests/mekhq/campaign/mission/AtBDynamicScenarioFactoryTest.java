@@ -32,6 +32,8 @@
  */
 package mekhq.campaign.mission;
 
+import static org.mockito.Mockito.lenient;
+
 import static megamek.common.units.UnitType.MEK;
 import static mekhq.campaign.mission.AtBDynamicScenarioFactory.createEntityWithCrew;
 import static mekhq.campaign.mission.Scenario.T_GROUND;
@@ -104,6 +106,8 @@ class AtBDynamicScenarioFactoryTest {
         when(campaign.getGame()).thenReturn(game);
 
         when(campaign.getCampaignOptions()).thenReturn(options);
+        lenient().when(options.get(CampaignOption.USE_IMPLANTS)).thenReturn(false);
+        lenient().when(options.get(CampaignOption.USE_SENSIBLE_TACTICS)).thenReturn(false);
         when(campaign.getRandomSkillPreferences()).thenReturn(randomSkillPreferences);
 
         when(campaign.getGameYear()).thenReturn(3025);
@@ -389,6 +393,8 @@ class AtBDynamicScenarioFactoryTest {
         CampaignOptions campaignOptions = mock(CampaignOptions.class);
 
         when(campaign.getCampaignOptions()).thenReturn(campaignOptions);
+        lenient().when(campaignOptions.get(CampaignOption.USE_IMPLANTS)).thenReturn(false);
+        lenient().when(campaignOptions.get(CampaignOption.USE_SENSIBLE_TACTICS)).thenReturn(false);
         when(campaignOptions.get(CampaignOption.NO_SEED_FORCES)).thenReturn(true);
         when(campaignOptions.isUseStratConSinglesMode()).thenReturn(false);
         when(campaignOptions.get(CampaignOption.USE_GENERIC_BATTLE_VALUE)).thenReturn(false);

@@ -33,6 +33,8 @@
 
 package mekhq.campaign.unit;
 
+import static org.mockito.Mockito.lenient;
+
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
@@ -77,6 +79,9 @@ public class UnitCommandersMatterOptionTest {
     @Test
     public void testIsOnlyCommandersMatter_Vehicles() {
         CampaignOptions options = mock(CampaignOptions.class);
+        lenient().when(options.get(CampaignOption.ONLY_COMMANDERS_MATTER_VEHICLES)).thenReturn(false);
+        lenient().when(options.get(CampaignOption.ONLY_COMMANDERS_MATTER_INFANTRY)).thenReturn(false);
+        lenient().when(options.get(CampaignOption.ONLY_COMMANDERS_MATTER_BATTLE_ARMOR)).thenReturn(false);
         when(options.get(CampaignOption.ONLY_COMMANDERS_MATTER_VEHICLES)).thenReturn(true);
         Set<Class<? extends Entity>> expectedTrue = Set.of(
               LargeSupportTank.class, SuperHeavyTank.class, Tank.class, VTOL.class);
@@ -86,6 +91,9 @@ public class UnitCommandersMatterOptionTest {
     @Test
     public void testIsOnlyCommandersMatter_Infantry() {
         CampaignOptions options = mock(CampaignOptions.class);
+        lenient().when(options.get(CampaignOption.ONLY_COMMANDERS_MATTER_VEHICLES)).thenReturn(false);
+        lenient().when(options.get(CampaignOption.ONLY_COMMANDERS_MATTER_INFANTRY)).thenReturn(false);
+        lenient().when(options.get(CampaignOption.ONLY_COMMANDERS_MATTER_BATTLE_ARMOR)).thenReturn(false);
         when(options.get(CampaignOption.ONLY_COMMANDERS_MATTER_INFANTRY)).thenReturn(true);
         Set<Class<? extends Entity>> expectedTrue = Set.of(ConvInfantry.class, EjectedCrew.class, MekWarrior.class);
         runTest(options, expectedTrue);
@@ -94,6 +102,9 @@ public class UnitCommandersMatterOptionTest {
     @Test
     public void testIsOnlyCommandersMatter_BA() {
         CampaignOptions options = mock(CampaignOptions.class);
+        lenient().when(options.get(CampaignOption.ONLY_COMMANDERS_MATTER_VEHICLES)).thenReturn(false);
+        lenient().when(options.get(CampaignOption.ONLY_COMMANDERS_MATTER_INFANTRY)).thenReturn(false);
+        lenient().when(options.get(CampaignOption.ONLY_COMMANDERS_MATTER_BATTLE_ARMOR)).thenReturn(false);
         when(options.get(CampaignOption.ONLY_COMMANDERS_MATTER_BATTLE_ARMOR)).thenReturn(true);
         Set<Class<? extends Entity>> expectedTrue = Set.of(BattleArmor.class);
         runTest(options, expectedTrue);

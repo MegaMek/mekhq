@@ -32,6 +32,8 @@
  */
 package mekhq.campaign.personnel;
 
+import static org.mockito.Mockito.lenient;
+
 import static mekhq.campaign.personnel.Person.MAXIMUM_WEALTH;
 import static mekhq.campaign.personnel.Person.MINIMUM_WEALTH;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -123,6 +125,13 @@ public class PersonTest {
 
         Campaign mockCampaign = mockCampaign();
         when(mockCampaign.getCampaignOptions()).thenReturn(mockCampaignOpts);
+        lenient().when(mockCampaignOpts.get(CampaignOption.NATURAL_HEALING_WAITING_PERIOD)).thenReturn(0);
+        lenient().when(mockCampaignOpts.get(CampaignOption.USE_TOUGHNESS)).thenReturn(false);
+        lenient().when(mockCampaignOpts.get(CampaignOption.USE_TWIST_OF_FATE_SURVIVAL)).thenReturn(false);
+        lenient().when(mockCampaignOpts.get(CampaignOption.USE_ALTERNATIVE_ADVANCED_MEDICAL)).thenReturn(false);
+        lenient().when(mockCampaignOpts.get(CampaignOption.IS_ENABLE_SALVAGE_FLAG_BY_DEFAULT)).thenReturn(false);
+        lenient().when(mockCampaignOpts.get(CampaignOption.TECHS_USE_ADMINISTRATION)).thenReturn(false);
+        lenient().when(mockCampaignOpts.get(CampaignOption.USE_REPLACE_EDGE_AWARDS)).thenReturn(false);
 
         mockPerson.getAwardController().addAndLogAward(mockCampaign, "TestSet", "Test Award 1",
               LocalDate.parse("3000-01-01"));
@@ -161,6 +170,13 @@ public class PersonTest {
 
         Campaign mockCampaign = mockCampaign();
         when(mockCampaign.getCampaignOptions()).thenReturn(mockCampaignOpts);
+        lenient().when(mockCampaignOpts.get(CampaignOption.NATURAL_HEALING_WAITING_PERIOD)).thenReturn(0);
+        lenient().when(mockCampaignOpts.get(CampaignOption.USE_TOUGHNESS)).thenReturn(false);
+        lenient().when(mockCampaignOpts.get(CampaignOption.USE_TWIST_OF_FATE_SURVIVAL)).thenReturn(false);
+        lenient().when(mockCampaignOpts.get(CampaignOption.USE_ALTERNATIVE_ADVANCED_MEDICAL)).thenReturn(false);
+        lenient().when(mockCampaignOpts.get(CampaignOption.IS_ENABLE_SALVAGE_FLAG_BY_DEFAULT)).thenReturn(false);
+        lenient().when(mockCampaignOpts.get(CampaignOption.TECHS_USE_ADMINISTRATION)).thenReturn(false);
+        lenient().when(mockCampaignOpts.get(CampaignOption.USE_REPLACE_EDGE_AWARDS)).thenReturn(false);
 
         mockPerson.getAwardController().addAndLogAward(mockCampaign, "TestSet", "Test Award 1",
               LocalDate.parse("3000-01-01"));
@@ -385,6 +401,13 @@ public class PersonTest {
         when(mockCampaign.getLocalDate()).thenReturn(LocalDate.now());
         when(mockCampaign.getPlayerForce().getName()).thenReturn("Campaign");
         when(mockCampaign.getCampaignOptions()).thenReturn(mockCampaignOpts);
+        lenient().when(mockCampaignOpts.get(CampaignOption.NATURAL_HEALING_WAITING_PERIOD)).thenReturn(0);
+        lenient().when(mockCampaignOpts.get(CampaignOption.USE_TOUGHNESS)).thenReturn(false);
+        lenient().when(mockCampaignOpts.get(CampaignOption.USE_TWIST_OF_FATE_SURVIVAL)).thenReturn(false);
+        lenient().when(mockCampaignOpts.get(CampaignOption.USE_ALTERNATIVE_ADVANCED_MEDICAL)).thenReturn(false);
+        lenient().when(mockCampaignOpts.get(CampaignOption.IS_ENABLE_SALVAGE_FLAG_BY_DEFAULT)).thenReturn(false);
+        lenient().when(mockCampaignOpts.get(CampaignOption.TECHS_USE_ADMINISTRATION)).thenReturn(false);
+        lenient().when(mockCampaignOpts.get(CampaignOption.USE_REPLACE_EDGE_AWARDS)).thenReturn(false);
 
         // Add a unit to the person
         UUID id0 = UUID.randomUUID();
@@ -409,6 +432,13 @@ public class PersonTest {
         when(mockCampaign.getLocalDate()).thenReturn(LocalDate.now());
         when(mockCampaign.getPlayerForce().getName()).thenReturn("Campaign");
         when(mockCampaign.getCampaignOptions()).thenReturn(mockCampaignOpts);
+        lenient().when(mockCampaignOpts.get(CampaignOption.NATURAL_HEALING_WAITING_PERIOD)).thenReturn(0);
+        lenient().when(mockCampaignOpts.get(CampaignOption.USE_TOUGHNESS)).thenReturn(false);
+        lenient().when(mockCampaignOpts.get(CampaignOption.USE_TWIST_OF_FATE_SURVIVAL)).thenReturn(false);
+        lenient().when(mockCampaignOpts.get(CampaignOption.USE_ALTERNATIVE_ADVANCED_MEDICAL)).thenReturn(false);
+        lenient().when(mockCampaignOpts.get(CampaignOption.IS_ENABLE_SALVAGE_FLAG_BY_DEFAULT)).thenReturn(false);
+        lenient().when(mockCampaignOpts.get(CampaignOption.TECHS_USE_ADMINISTRATION)).thenReturn(false);
+        lenient().when(mockCampaignOpts.get(CampaignOption.USE_REPLACE_EDGE_AWARDS)).thenReturn(false);
 
         // Add a unit to the person
         UUID id0 = UUID.randomUUID();
@@ -433,6 +463,13 @@ public class PersonTest {
         when(mockCampaign.getLocalDate()).thenReturn(LocalDate.now());
         when(mockCampaign.getPlayerForce().getName()).thenReturn("Campaign");
         when(mockCampaign.getCampaignOptions()).thenReturn(mockCampaignOpts);
+        lenient().when(mockCampaignOpts.get(CampaignOption.NATURAL_HEALING_WAITING_PERIOD)).thenReturn(0);
+        lenient().when(mockCampaignOpts.get(CampaignOption.USE_TOUGHNESS)).thenReturn(false);
+        lenient().when(mockCampaignOpts.get(CampaignOption.USE_TWIST_OF_FATE_SURVIVAL)).thenReturn(false);
+        lenient().when(mockCampaignOpts.get(CampaignOption.USE_ALTERNATIVE_ADVANCED_MEDICAL)).thenReturn(false);
+        lenient().when(mockCampaignOpts.get(CampaignOption.IS_ENABLE_SALVAGE_FLAG_BY_DEFAULT)).thenReturn(false);
+        lenient().when(mockCampaignOpts.get(CampaignOption.TECHS_USE_ADMINISTRATION)).thenReturn(false);
+        lenient().when(mockCampaignOpts.get(CampaignOption.USE_REPLACE_EDGE_AWARDS)).thenReturn(false);
 
         // Add a unit to the person
         UUID id0 = UUID.randomUUID();
@@ -457,6 +494,13 @@ public class PersonTest {
         when(mockCampaign.getLocalDate()).thenReturn(LocalDate.now());
         when(mockCampaign.getPlayerForce().getName()).thenReturn("Campaign");
         when(mockCampaign.getCampaignOptions()).thenReturn(mockCampaignOpts);
+        lenient().when(mockCampaignOpts.get(CampaignOption.NATURAL_HEALING_WAITING_PERIOD)).thenReturn(0);
+        lenient().when(mockCampaignOpts.get(CampaignOption.USE_TOUGHNESS)).thenReturn(false);
+        lenient().when(mockCampaignOpts.get(CampaignOption.USE_TWIST_OF_FATE_SURVIVAL)).thenReturn(false);
+        lenient().when(mockCampaignOpts.get(CampaignOption.USE_ALTERNATIVE_ADVANCED_MEDICAL)).thenReturn(false);
+        lenient().when(mockCampaignOpts.get(CampaignOption.IS_ENABLE_SALVAGE_FLAG_BY_DEFAULT)).thenReturn(false);
+        lenient().when(mockCampaignOpts.get(CampaignOption.TECHS_USE_ADMINISTRATION)).thenReturn(false);
+        lenient().when(mockCampaignOpts.get(CampaignOption.USE_REPLACE_EDGE_AWARDS)).thenReturn(false);
 
         // Add a unit to the person
         UUID id0 = UUID.randomUUID();
@@ -630,6 +674,13 @@ public class PersonTest {
         when(mockFaction.getShortName()).thenReturn("MERC");
         when(mockCampaign.getLocalDate()).thenReturn(currentDate);
         when(mockCampaign.getCampaignOptions()).thenReturn(mockCampaignOptions);
+        lenient().when(mockCampaignOptions.get(CampaignOption.NATURAL_HEALING_WAITING_PERIOD)).thenReturn(0);
+        lenient().when(mockCampaignOptions.get(CampaignOption.USE_TOUGHNESS)).thenReturn(false);
+        lenient().when(mockCampaignOptions.get(CampaignOption.USE_TWIST_OF_FATE_SURVIVAL)).thenReturn(false);
+        lenient().when(mockCampaignOptions.get(CampaignOption.USE_ALTERNATIVE_ADVANCED_MEDICAL)).thenReturn(false);
+        lenient().when(mockCampaignOptions.get(CampaignOption.IS_ENABLE_SALVAGE_FLAG_BY_DEFAULT)).thenReturn(false);
+        lenient().when(mockCampaignOptions.get(CampaignOption.TECHS_USE_ADMINISTRATION)).thenReturn(false);
+        lenient().when(mockCampaignOptions.get(CampaignOption.USE_REPLACE_EDGE_AWARDS)).thenReturn(false);
 
         Person person = new Person(mockCampaign);
         person.processDiscontinuationSyndrome(mockCampaign, false, false, true, 1, true, true);
@@ -649,6 +700,13 @@ public class PersonTest {
         when(mockFaction.getShortName()).thenReturn("MERC");
         when(mockCampaign.getLocalDate()).thenReturn(currentDate);
         when(mockCampaign.getCampaignOptions()).thenReturn(mockCampaignOptions);
+        lenient().when(mockCampaignOptions.get(CampaignOption.NATURAL_HEALING_WAITING_PERIOD)).thenReturn(0);
+        lenient().when(mockCampaignOptions.get(CampaignOption.USE_TOUGHNESS)).thenReturn(false);
+        lenient().when(mockCampaignOptions.get(CampaignOption.USE_TWIST_OF_FATE_SURVIVAL)).thenReturn(false);
+        lenient().when(mockCampaignOptions.get(CampaignOption.USE_ALTERNATIVE_ADVANCED_MEDICAL)).thenReturn(false);
+        lenient().when(mockCampaignOptions.get(CampaignOption.IS_ENABLE_SALVAGE_FLAG_BY_DEFAULT)).thenReturn(false);
+        lenient().when(mockCampaignOptions.get(CampaignOption.TECHS_USE_ADMINISTRATION)).thenReturn(false);
+        lenient().when(mockCampaignOptions.get(CampaignOption.USE_REPLACE_EDGE_AWARDS)).thenReturn(false);
 
         Person person = new Person(mockCampaign);
         person.processDiscontinuationSyndrome(mockCampaign, true, false, true, 1, true, true);
@@ -683,6 +741,13 @@ public class PersonTest {
         when(mockFaction.getShortName()).thenReturn("MERC");
         when(mockCampaign.getLocalDate()).thenReturn(currentDate);
         when(mockCampaign.getCampaignOptions()).thenReturn(mockCampaignOptions);
+        lenient().when(mockCampaignOptions.get(CampaignOption.NATURAL_HEALING_WAITING_PERIOD)).thenReturn(0);
+        lenient().when(mockCampaignOptions.get(CampaignOption.USE_TOUGHNESS)).thenReturn(false);
+        lenient().when(mockCampaignOptions.get(CampaignOption.USE_TWIST_OF_FATE_SURVIVAL)).thenReturn(false);
+        lenient().when(mockCampaignOptions.get(CampaignOption.USE_ALTERNATIVE_ADVANCED_MEDICAL)).thenReturn(false);
+        lenient().when(mockCampaignOptions.get(CampaignOption.IS_ENABLE_SALVAGE_FLAG_BY_DEFAULT)).thenReturn(false);
+        lenient().when(mockCampaignOptions.get(CampaignOption.TECHS_USE_ADMINISTRATION)).thenReturn(false);
+        lenient().when(mockCampaignOptions.get(CampaignOption.USE_REPLACE_EDGE_AWARDS)).thenReturn(false);
 
         Person person = new Person(mockCampaign);
         person.processDiscontinuationSyndrome(mockCampaign, true, false, false, 1, true, true);
@@ -707,6 +772,13 @@ public class PersonTest {
         //TODO: This won't work once we support multiple warehouse. Method separated from getWarehouse() for future
         when(mockCampaign.getPlayerForce().getWarehouse()).thenReturn(mockWarehouse);
         when(mockCampaign.getCampaignOptions()).thenReturn(mockCampaignOptions);
+        lenient().when(mockCampaignOptions.get(CampaignOption.NATURAL_HEALING_WAITING_PERIOD)).thenReturn(0);
+        lenient().when(mockCampaignOptions.get(CampaignOption.USE_TOUGHNESS)).thenReturn(false);
+        lenient().when(mockCampaignOptions.get(CampaignOption.USE_TWIST_OF_FATE_SURVIVAL)).thenReturn(false);
+        lenient().when(mockCampaignOptions.get(CampaignOption.USE_ALTERNATIVE_ADVANCED_MEDICAL)).thenReturn(false);
+        lenient().when(mockCampaignOptions.get(CampaignOption.IS_ENABLE_SALVAGE_FLAG_BY_DEFAULT)).thenReturn(false);
+        lenient().when(mockCampaignOptions.get(CampaignOption.TECHS_USE_ADMINISTRATION)).thenReturn(false);
+        lenient().when(mockCampaignOptions.get(CampaignOption.USE_REPLACE_EDGE_AWARDS)).thenReturn(false);
 
         Person person = new Person(mockCampaign);
         person.setHits(5);
@@ -733,6 +805,13 @@ public class PersonTest {
         //TODO: This won't work once we support multiple warehouse. Method separated from getWarehouse() for future
         when(mockCampaign.getPlayerForce().getWarehouse()).thenReturn(mockWarehouse);
         when(mockCampaign.getCampaignOptions()).thenReturn(mockCampaignOptions);
+        lenient().when(mockCampaignOptions.get(CampaignOption.NATURAL_HEALING_WAITING_PERIOD)).thenReturn(0);
+        lenient().when(mockCampaignOptions.get(CampaignOption.USE_TOUGHNESS)).thenReturn(false);
+        lenient().when(mockCampaignOptions.get(CampaignOption.USE_TWIST_OF_FATE_SURVIVAL)).thenReturn(false);
+        lenient().when(mockCampaignOptions.get(CampaignOption.USE_ALTERNATIVE_ADVANCED_MEDICAL)).thenReturn(false);
+        lenient().when(mockCampaignOptions.get(CampaignOption.IS_ENABLE_SALVAGE_FLAG_BY_DEFAULT)).thenReturn(false);
+        lenient().when(mockCampaignOptions.get(CampaignOption.TECHS_USE_ADMINISTRATION)).thenReturn(false);
+        lenient().when(mockCampaignOptions.get(CampaignOption.USE_REPLACE_EDGE_AWARDS)).thenReturn(false);
 
         Person person = new Person(mockCampaign);
         for (int i = 0; i < 5; i++) {
@@ -798,6 +877,13 @@ public class PersonTest {
         when(mockFaction.getShortName()).thenReturn("MERC");
         when(mockCampaign.getLocalDate()).thenReturn(currentDate);
         when(mockCampaign.getCampaignOptions()).thenReturn(mockCampaignOptions);
+        lenient().when(mockCampaignOptions.get(CampaignOption.NATURAL_HEALING_WAITING_PERIOD)).thenReturn(0);
+        lenient().when(mockCampaignOptions.get(CampaignOption.USE_TOUGHNESS)).thenReturn(false);
+        lenient().when(mockCampaignOptions.get(CampaignOption.USE_TWIST_OF_FATE_SURVIVAL)).thenReturn(false);
+        lenient().when(mockCampaignOptions.get(CampaignOption.USE_ALTERNATIVE_ADVANCED_MEDICAL)).thenReturn(false);
+        lenient().when(mockCampaignOptions.get(CampaignOption.IS_ENABLE_SALVAGE_FLAG_BY_DEFAULT)).thenReturn(false);
+        lenient().when(mockCampaignOptions.get(CampaignOption.TECHS_USE_ADMINISTRATION)).thenReturn(false);
+        lenient().when(mockCampaignOptions.get(CampaignOption.USE_REPLACE_EDGE_AWARDS)).thenReturn(false);
 
         Person person = new Person(mockCampaign);
         person.processCripplingFlashbacks(mockCampaign, true, false, true, true);
@@ -821,6 +907,13 @@ public class PersonTest {
         //TODO: This won't work once we support multiple warehouse. Method separated from getWarehouse() for future
         when(mockCampaign.getPlayerForce().getWarehouse()).thenReturn(mockWarehouse);
         when(mockCampaign.getCampaignOptions()).thenReturn(mockCampaignOptions);
+        lenient().when(mockCampaignOptions.get(CampaignOption.NATURAL_HEALING_WAITING_PERIOD)).thenReturn(0);
+        lenient().when(mockCampaignOptions.get(CampaignOption.USE_TOUGHNESS)).thenReturn(false);
+        lenient().when(mockCampaignOptions.get(CampaignOption.USE_TWIST_OF_FATE_SURVIVAL)).thenReturn(false);
+        lenient().when(mockCampaignOptions.get(CampaignOption.USE_ALTERNATIVE_ADVANCED_MEDICAL)).thenReturn(false);
+        lenient().when(mockCampaignOptions.get(CampaignOption.IS_ENABLE_SALVAGE_FLAG_BY_DEFAULT)).thenReturn(false);
+        lenient().when(mockCampaignOptions.get(CampaignOption.TECHS_USE_ADMINISTRATION)).thenReturn(false);
+        lenient().when(mockCampaignOptions.get(CampaignOption.USE_REPLACE_EDGE_AWARDS)).thenReturn(false);
 
         Person person = new Person(mockCampaign);
         person.setHits(5);
@@ -846,6 +939,13 @@ public class PersonTest {
         //TODO: This won't work once we support multiple warehouse. Method separated from getWarehouse() for future
         when(mockCampaign.getPlayerForce().getWarehouse()).thenReturn(mockWarehouse);
         when(mockCampaign.getCampaignOptions()).thenReturn(mockCampaignOptions);
+        lenient().when(mockCampaignOptions.get(CampaignOption.NATURAL_HEALING_WAITING_PERIOD)).thenReturn(0);
+        lenient().when(mockCampaignOptions.get(CampaignOption.USE_TOUGHNESS)).thenReturn(false);
+        lenient().when(mockCampaignOptions.get(CampaignOption.USE_TWIST_OF_FATE_SURVIVAL)).thenReturn(false);
+        lenient().when(mockCampaignOptions.get(CampaignOption.USE_ALTERNATIVE_ADVANCED_MEDICAL)).thenReturn(false);
+        lenient().when(mockCampaignOptions.get(CampaignOption.IS_ENABLE_SALVAGE_FLAG_BY_DEFAULT)).thenReturn(false);
+        lenient().when(mockCampaignOptions.get(CampaignOption.TECHS_USE_ADMINISTRATION)).thenReturn(false);
+        lenient().when(mockCampaignOptions.get(CampaignOption.USE_REPLACE_EDGE_AWARDS)).thenReturn(false);
 
         Person person = new Person(mockCampaign);
         for (int i = 0; i < 5; i++) {
@@ -1035,6 +1135,13 @@ public class PersonTest {
         when(mockFaction.getShortName()).thenReturn("MERC");
         when(mockCampaign.getLocalDate()).thenReturn(currentDate);
         when(mockCampaign.getCampaignOptions()).thenReturn(mockCampaignOptions);
+        lenient().when(mockCampaignOptions.get(CampaignOption.NATURAL_HEALING_WAITING_PERIOD)).thenReturn(0);
+        lenient().when(mockCampaignOptions.get(CampaignOption.USE_TOUGHNESS)).thenReturn(false);
+        lenient().when(mockCampaignOptions.get(CampaignOption.USE_TWIST_OF_FATE_SURVIVAL)).thenReturn(false);
+        lenient().when(mockCampaignOptions.get(CampaignOption.USE_ALTERNATIVE_ADVANCED_MEDICAL)).thenReturn(false);
+        lenient().when(mockCampaignOptions.get(CampaignOption.IS_ENABLE_SALVAGE_FLAG_BY_DEFAULT)).thenReturn(false);
+        lenient().when(mockCampaignOptions.get(CampaignOption.TECHS_USE_ADMINISTRATION)).thenReturn(false);
+        lenient().when(mockCampaignOptions.get(CampaignOption.USE_REPLACE_EDGE_AWARDS)).thenReturn(false);
 
         Person person = new Person(mockCampaign);
         person.processConfusion(mockCampaign, false, false, true, true);
@@ -1054,6 +1161,13 @@ public class PersonTest {
         when(mockFaction.getShortName()).thenReturn("MERC");
         when(mockCampaign.getLocalDate()).thenReturn(currentDate);
         when(mockCampaign.getCampaignOptions()).thenReturn(mockCampaignOptions);
+        lenient().when(mockCampaignOptions.get(CampaignOption.NATURAL_HEALING_WAITING_PERIOD)).thenReturn(0);
+        lenient().when(mockCampaignOptions.get(CampaignOption.USE_TOUGHNESS)).thenReturn(false);
+        lenient().when(mockCampaignOptions.get(CampaignOption.USE_TWIST_OF_FATE_SURVIVAL)).thenReturn(false);
+        lenient().when(mockCampaignOptions.get(CampaignOption.USE_ALTERNATIVE_ADVANCED_MEDICAL)).thenReturn(false);
+        lenient().when(mockCampaignOptions.get(CampaignOption.IS_ENABLE_SALVAGE_FLAG_BY_DEFAULT)).thenReturn(false);
+        lenient().when(mockCampaignOptions.get(CampaignOption.TECHS_USE_ADMINISTRATION)).thenReturn(false);
+        lenient().when(mockCampaignOptions.get(CampaignOption.USE_REPLACE_EDGE_AWARDS)).thenReturn(false);
 
         Person person = new Person(mockCampaign);
         person.processConfusion(mockCampaign, true, false, true, true);
@@ -1078,6 +1192,13 @@ public class PersonTest {
         //TODO: This won't work once we support multiple warehouse. Method separated from getWarehouse() for future
         when(mockCampaign.getPlayerForce().getWarehouse()).thenReturn(mockWarehouse);
         when(mockCampaign.getCampaignOptions()).thenReturn(mockCampaignOptions);
+        lenient().when(mockCampaignOptions.get(CampaignOption.NATURAL_HEALING_WAITING_PERIOD)).thenReturn(0);
+        lenient().when(mockCampaignOptions.get(CampaignOption.USE_TOUGHNESS)).thenReturn(false);
+        lenient().when(mockCampaignOptions.get(CampaignOption.USE_TWIST_OF_FATE_SURVIVAL)).thenReturn(false);
+        lenient().when(mockCampaignOptions.get(CampaignOption.USE_ALTERNATIVE_ADVANCED_MEDICAL)).thenReturn(false);
+        lenient().when(mockCampaignOptions.get(CampaignOption.IS_ENABLE_SALVAGE_FLAG_BY_DEFAULT)).thenReturn(false);
+        lenient().when(mockCampaignOptions.get(CampaignOption.TECHS_USE_ADMINISTRATION)).thenReturn(false);
+        lenient().when(mockCampaignOptions.get(CampaignOption.USE_REPLACE_EDGE_AWARDS)).thenReturn(false);
 
         Person person = new Person(mockCampaign);
         person.setHits(5);
@@ -1104,6 +1225,13 @@ public class PersonTest {
         //TODO: This won't work once we support multiple warehouse. Method separated from getWarehouse() for future
         when(mockCampaign.getPlayerForce().getWarehouse()).thenReturn(mockWarehouse);
         when(mockCampaign.getCampaignOptions()).thenReturn(mockCampaignOptions);
+        lenient().when(mockCampaignOptions.get(CampaignOption.NATURAL_HEALING_WAITING_PERIOD)).thenReturn(0);
+        lenient().when(mockCampaignOptions.get(CampaignOption.USE_TOUGHNESS)).thenReturn(false);
+        lenient().when(mockCampaignOptions.get(CampaignOption.USE_TWIST_OF_FATE_SURVIVAL)).thenReturn(false);
+        lenient().when(mockCampaignOptions.get(CampaignOption.USE_ALTERNATIVE_ADVANCED_MEDICAL)).thenReturn(false);
+        lenient().when(mockCampaignOptions.get(CampaignOption.IS_ENABLE_SALVAGE_FLAG_BY_DEFAULT)).thenReturn(false);
+        lenient().when(mockCampaignOptions.get(CampaignOption.TECHS_USE_ADMINISTRATION)).thenReturn(false);
+        lenient().when(mockCampaignOptions.get(CampaignOption.USE_REPLACE_EDGE_AWARDS)).thenReturn(false);
 
         Person person = new Person(mockCampaign);
         for (int i = 0; i < 5; i++) {
@@ -1168,6 +1296,13 @@ public class PersonTest {
         when(mockFaction.getShortName()).thenReturn("MERC");
         when(mockCampaign.getLocalDate()).thenReturn(currentDate);
         when(mockCampaign.getCampaignOptions()).thenReturn(mockCampaignOptions);
+        lenient().when(mockCampaignOptions.get(CampaignOption.NATURAL_HEALING_WAITING_PERIOD)).thenReturn(0);
+        lenient().when(mockCampaignOptions.get(CampaignOption.USE_TOUGHNESS)).thenReturn(false);
+        lenient().when(mockCampaignOptions.get(CampaignOption.USE_TWIST_OF_FATE_SURVIVAL)).thenReturn(false);
+        lenient().when(mockCampaignOptions.get(CampaignOption.USE_ALTERNATIVE_ADVANCED_MEDICAL)).thenReturn(false);
+        lenient().when(mockCampaignOptions.get(CampaignOption.IS_ENABLE_SALVAGE_FLAG_BY_DEFAULT)).thenReturn(false);
+        lenient().when(mockCampaignOptions.get(CampaignOption.TECHS_USE_ADMINISTRATION)).thenReturn(false);
+        lenient().when(mockCampaignOptions.get(CampaignOption.USE_REPLACE_EDGE_AWARDS)).thenReturn(false);
 
         Person person = new Person(mockCampaign);
         person.processChildlikeRegression(mockCampaign, true, false, true, true);
@@ -1191,6 +1326,13 @@ public class PersonTest {
         //TODO: This won't work once we support multiple warehouse. Method separated from getWarehouse() for future
         when(mockCampaign.getPlayerForce().getWarehouse()).thenReturn(mockWarehouse);
         when(mockCampaign.getCampaignOptions()).thenReturn(mockCampaignOptions);
+        lenient().when(mockCampaignOptions.get(CampaignOption.NATURAL_HEALING_WAITING_PERIOD)).thenReturn(0);
+        lenient().when(mockCampaignOptions.get(CampaignOption.USE_TOUGHNESS)).thenReturn(false);
+        lenient().when(mockCampaignOptions.get(CampaignOption.USE_TWIST_OF_FATE_SURVIVAL)).thenReturn(false);
+        lenient().when(mockCampaignOptions.get(CampaignOption.USE_ALTERNATIVE_ADVANCED_MEDICAL)).thenReturn(false);
+        lenient().when(mockCampaignOptions.get(CampaignOption.IS_ENABLE_SALVAGE_FLAG_BY_DEFAULT)).thenReturn(false);
+        lenient().when(mockCampaignOptions.get(CampaignOption.TECHS_USE_ADMINISTRATION)).thenReturn(false);
+        lenient().when(mockCampaignOptions.get(CampaignOption.USE_REPLACE_EDGE_AWARDS)).thenReturn(false);
 
         Person person = new Person(mockCampaign);
         person.setHits(5);
@@ -1216,6 +1358,13 @@ public class PersonTest {
         //TODO: This won't work once we support multiple warehouse. Method separated from getWarehouse() for future
         when(mockCampaign.getPlayerForce().getWarehouse()).thenReturn(mockWarehouse);
         when(mockCampaign.getCampaignOptions()).thenReturn(mockCampaignOptions);
+        lenient().when(mockCampaignOptions.get(CampaignOption.NATURAL_HEALING_WAITING_PERIOD)).thenReturn(0);
+        lenient().when(mockCampaignOptions.get(CampaignOption.USE_TOUGHNESS)).thenReturn(false);
+        lenient().when(mockCampaignOptions.get(CampaignOption.USE_TWIST_OF_FATE_SURVIVAL)).thenReturn(false);
+        lenient().when(mockCampaignOptions.get(CampaignOption.USE_ALTERNATIVE_ADVANCED_MEDICAL)).thenReturn(false);
+        lenient().when(mockCampaignOptions.get(CampaignOption.IS_ENABLE_SALVAGE_FLAG_BY_DEFAULT)).thenReturn(false);
+        lenient().when(mockCampaignOptions.get(CampaignOption.TECHS_USE_ADMINISTRATION)).thenReturn(false);
+        lenient().when(mockCampaignOptions.get(CampaignOption.USE_REPLACE_EDGE_AWARDS)).thenReturn(false);
 
         Person person = new Person(mockCampaign);
         for (int i = 0; i < 5; i++) {
@@ -1280,6 +1429,13 @@ public class PersonTest {
         when(mockFaction.getShortName()).thenReturn("MERC");
         when(mockCampaign.getLocalDate()).thenReturn(currentDate);
         when(mockCampaign.getCampaignOptions()).thenReturn(mockCampaignOptions);
+        lenient().when(mockCampaignOptions.get(CampaignOption.NATURAL_HEALING_WAITING_PERIOD)).thenReturn(0);
+        lenient().when(mockCampaignOptions.get(CampaignOption.USE_TOUGHNESS)).thenReturn(false);
+        lenient().when(mockCampaignOptions.get(CampaignOption.USE_TWIST_OF_FATE_SURVIVAL)).thenReturn(false);
+        lenient().when(mockCampaignOptions.get(CampaignOption.USE_ALTERNATIVE_ADVANCED_MEDICAL)).thenReturn(false);
+        lenient().when(mockCampaignOptions.get(CampaignOption.IS_ENABLE_SALVAGE_FLAG_BY_DEFAULT)).thenReturn(false);
+        lenient().when(mockCampaignOptions.get(CampaignOption.TECHS_USE_ADMINISTRATION)).thenReturn(false);
+        lenient().when(mockCampaignOptions.get(CampaignOption.USE_REPLACE_EDGE_AWARDS)).thenReturn(false);
 
         Person person = new Person(mockCampaign);
         person.processCatatonia(mockCampaign, true, false, true, true);
@@ -1303,6 +1459,13 @@ public class PersonTest {
         //TODO: This won't work once we support multiple warehouse. Method separated from getWarehouse() for future
         when(mockCampaign.getPlayerForce().getWarehouse()).thenReturn(mockWarehouse);
         when(mockCampaign.getCampaignOptions()).thenReturn(mockCampaignOptions);
+        lenient().when(mockCampaignOptions.get(CampaignOption.NATURAL_HEALING_WAITING_PERIOD)).thenReturn(0);
+        lenient().when(mockCampaignOptions.get(CampaignOption.USE_TOUGHNESS)).thenReturn(false);
+        lenient().when(mockCampaignOptions.get(CampaignOption.USE_TWIST_OF_FATE_SURVIVAL)).thenReturn(false);
+        lenient().when(mockCampaignOptions.get(CampaignOption.USE_ALTERNATIVE_ADVANCED_MEDICAL)).thenReturn(false);
+        lenient().when(mockCampaignOptions.get(CampaignOption.IS_ENABLE_SALVAGE_FLAG_BY_DEFAULT)).thenReturn(false);
+        lenient().when(mockCampaignOptions.get(CampaignOption.TECHS_USE_ADMINISTRATION)).thenReturn(false);
+        lenient().when(mockCampaignOptions.get(CampaignOption.USE_REPLACE_EDGE_AWARDS)).thenReturn(false);
 
         Person person = new Person(mockCampaign);
         person.setHits(5);
@@ -1328,6 +1491,13 @@ public class PersonTest {
         //TODO: This won't work once we support multiple warehouse. Method separated from getWarehouse() for future
         when(mockCampaign.getPlayerForce().getWarehouse()).thenReturn(mockWarehouse);
         when(mockCampaign.getCampaignOptions()).thenReturn(mockCampaignOptions);
+        lenient().when(mockCampaignOptions.get(CampaignOption.NATURAL_HEALING_WAITING_PERIOD)).thenReturn(0);
+        lenient().when(mockCampaignOptions.get(CampaignOption.USE_TOUGHNESS)).thenReturn(false);
+        lenient().when(mockCampaignOptions.get(CampaignOption.USE_TWIST_OF_FATE_SURVIVAL)).thenReturn(false);
+        lenient().when(mockCampaignOptions.get(CampaignOption.USE_ALTERNATIVE_ADVANCED_MEDICAL)).thenReturn(false);
+        lenient().when(mockCampaignOptions.get(CampaignOption.IS_ENABLE_SALVAGE_FLAG_BY_DEFAULT)).thenReturn(false);
+        lenient().when(mockCampaignOptions.get(CampaignOption.TECHS_USE_ADMINISTRATION)).thenReturn(false);
+        lenient().when(mockCampaignOptions.get(CampaignOption.USE_REPLACE_EDGE_AWARDS)).thenReturn(false);
 
         Person person = new Person(mockCampaign);
         for (int i = 0; i < 5; i++) {
@@ -1630,6 +1800,13 @@ public class PersonTest {
                 CampaignOptions options = mock(CampaignOptions.class);
                 when(options.get(CampaignOption.NATURAL_HEALING_WAITING_PERIOD)).thenReturn(0);
                 when(campaign.getCampaignOptions()).thenReturn(options);
+                lenient().when(options.get(CampaignOption.NATURAL_HEALING_WAITING_PERIOD)).thenReturn(0);
+                lenient().when(options.get(CampaignOption.USE_TOUGHNESS)).thenReturn(false);
+                lenient().when(options.get(CampaignOption.USE_TWIST_OF_FATE_SURVIVAL)).thenReturn(false);
+                lenient().when(options.get(CampaignOption.USE_ALTERNATIVE_ADVANCED_MEDICAL)).thenReturn(false);
+                lenient().when(options.get(CampaignOption.IS_ENABLE_SALVAGE_FLAG_BY_DEFAULT)).thenReturn(false);
+                lenient().when(options.get(CampaignOption.TECHS_USE_ADMINISTRATION)).thenReturn(false);
+                lenient().when(options.get(CampaignOption.USE_REPLACE_EDGE_AWARDS)).thenReturn(false);
 
                 mekhq.campaign.LocalHangar hangar = mock(mekhq.campaign.LocalHangar.class);
                 when(campaign.getPlayerForce().getHangar()).thenReturn(hangar);
@@ -1715,6 +1892,13 @@ public class PersonTest {
                 CampaignOptions options = mock(CampaignOptions.class);
                 when(options.get(CampaignOption.NATURAL_HEALING_WAITING_PERIOD)).thenReturn(0);
                 when(campaign.getCampaignOptions()).thenReturn(options);
+                lenient().when(options.get(CampaignOption.NATURAL_HEALING_WAITING_PERIOD)).thenReturn(0);
+                lenient().when(options.get(CampaignOption.USE_TOUGHNESS)).thenReturn(false);
+                lenient().when(options.get(CampaignOption.USE_TWIST_OF_FATE_SURVIVAL)).thenReturn(false);
+                lenient().when(options.get(CampaignOption.USE_ALTERNATIVE_ADVANCED_MEDICAL)).thenReturn(false);
+                lenient().when(options.get(CampaignOption.IS_ENABLE_SALVAGE_FLAG_BY_DEFAULT)).thenReturn(false);
+                lenient().when(options.get(CampaignOption.TECHS_USE_ADMINISTRATION)).thenReturn(false);
+                lenient().when(options.get(CampaignOption.USE_REPLACE_EDGE_AWARDS)).thenReturn(false);
 
                 mekhq.campaign.LocalHangar hangar = mock(mekhq.campaign.LocalHangar.class);
                 when(campaign.getPlayerForce().getHangar()).thenReturn(hangar);
@@ -2010,6 +2194,13 @@ public class PersonTest {
                 LocalDate date = LocalDate.of(3151, 1, 1);
 
                 when(campaign.getCampaignOptions()).thenReturn(options);
+                lenient().when(options.get(CampaignOption.NATURAL_HEALING_WAITING_PERIOD)).thenReturn(0);
+                lenient().when(options.get(CampaignOption.USE_TOUGHNESS)).thenReturn(false);
+                lenient().when(options.get(CampaignOption.USE_TWIST_OF_FATE_SURVIVAL)).thenReturn(false);
+                lenient().when(options.get(CampaignOption.USE_ALTERNATIVE_ADVANCED_MEDICAL)).thenReturn(false);
+                lenient().when(options.get(CampaignOption.IS_ENABLE_SALVAGE_FLAG_BY_DEFAULT)).thenReturn(false);
+                lenient().when(options.get(CampaignOption.TECHS_USE_ADMINISTRATION)).thenReturn(false);
+                lenient().when(options.get(CampaignOption.USE_REPLACE_EDGE_AWARDS)).thenReturn(false);
                 when(options.get(CampaignOption.USE_AGE_EFFECTS)).thenReturn(true);
                 when(campaign.getPlayerForce().isClanForce()).thenReturn(false);
                 when(campaign.getLocalDate()).thenReturn(date);
@@ -2103,6 +2294,13 @@ public class PersonTest {
         private Campaign mockCampaignWith(CampaignOptions options) {
             Campaign campaign = mockCampaign();
             when(campaign.getCampaignOptions()).thenReturn(options);
+            lenient().when(options.get(CampaignOption.NATURAL_HEALING_WAITING_PERIOD)).thenReturn(0);
+            lenient().when(options.get(CampaignOption.USE_TOUGHNESS)).thenReturn(false);
+            lenient().when(options.get(CampaignOption.USE_TWIST_OF_FATE_SURVIVAL)).thenReturn(false);
+            lenient().when(options.get(CampaignOption.USE_ALTERNATIVE_ADVANCED_MEDICAL)).thenReturn(false);
+            lenient().when(options.get(CampaignOption.IS_ENABLE_SALVAGE_FLAG_BY_DEFAULT)).thenReturn(false);
+            lenient().when(options.get(CampaignOption.TECHS_USE_ADMINISTRATION)).thenReturn(false);
+            lenient().when(options.get(CampaignOption.USE_REPLACE_EDGE_AWARDS)).thenReturn(false);
             when(campaign.getLocalDate()).thenReturn(LocalDate.of(3151, 1, 1));
             return campaign;
         }

@@ -32,6 +32,8 @@
  */
 package mekhq.campaign.personnel.medical.advancedMedicalAlternate;
 
+import static org.mockito.Mockito.lenient;
+
 import static mekhq.campaign.personnel.PersonnelOptions.ATOW_FIT;
 import static mekhq.campaign.personnel.PersonnelOptions.ATOW_TOUGHNESS;
 import static mekhq.campaign.personnel.PersonnelOptions.EDGE_MEDICAL;
@@ -206,6 +208,8 @@ class AdvancedMedicalAlternateHealingTest {
 
         when(campaign.getLocalDate()).thenReturn(MONDAY);
         when(campaign.getCampaignOptions()).thenReturn(campaignOptions);
+        lenient().when(campaignOptions.get(CampaignOption.USE_ALTERNATIVE_ADVANCED_MEDICAL)).thenReturn(false);
+        lenient().when(campaignOptions.get(CampaignOption.USE_ALTERNATIVE_ADVANCED_MEDICAL_FEWER_PERMANENT_INJURIES)).thenReturn(false);
         when(campaignOptions.get(CampaignOption.USE_EDGE)).thenReturn(false);
         when(campaignOptions.get(CampaignOption.USE_FATIGUE)).thenReturn(false);
         when(patient.getOptions()).thenReturn(options);
@@ -294,6 +298,8 @@ class AdvancedMedicalAlternateHealingTest {
 
         when(campaign.getLocalDate()).thenReturn(MONDAY);
         when(campaign.getCampaignOptions()).thenReturn(campaignOptions);
+        lenient().when(campaignOptions.get(CampaignOption.USE_ALTERNATIVE_ADVANCED_MEDICAL)).thenReturn(false);
+        lenient().when(campaignOptions.get(CampaignOption.USE_ALTERNATIVE_ADVANCED_MEDICAL_FEWER_PERMANENT_INJURIES)).thenReturn(false);
         when(campaignOptions.get(CampaignOption.USE_EDGE)).thenReturn(false);
         when(campaignOptions.get(CampaignOption.USE_FATIGUE)).thenReturn(false);
         when(doctor.getOptions()).thenReturn(doctorOptions);
@@ -411,6 +417,8 @@ class AdvancedMedicalAlternateHealingTest {
 
         when(campaign.getLocalDate()).thenReturn(MONDAY);
         when(campaign.getCampaignOptions()).thenReturn(campaignOptions);
+        lenient().when(campaignOptions.get(CampaignOption.USE_ALTERNATIVE_ADVANCED_MEDICAL)).thenReturn(false);
+        lenient().when(campaignOptions.get(CampaignOption.USE_ALTERNATIVE_ADVANCED_MEDICAL_FEWER_PERMANENT_INJURIES)).thenReturn(false);
         when(campaignOptions.get(CampaignOption.USE_FATIGUE)).thenReturn(true);
         when(campaignOptions.get(CampaignOption.FATIGUE_RATE)).thenReturn(2);
         when(patient.getInjuries()).thenAnswer(invocation -> List.of());
@@ -442,6 +450,8 @@ class AdvancedMedicalAlternateHealingTest {
         Injury injury = mock(Injury.class);
 
         when(campaign.getCampaignOptions()).thenReturn(campaignOptions);
+        lenient().when(campaignOptions.get(CampaignOption.USE_ALTERNATIVE_ADVANCED_MEDICAL)).thenReturn(false);
+        lenient().when(campaignOptions.get(CampaignOption.USE_ALTERNATIVE_ADVANCED_MEDICAL_FEWER_PERMANENT_INJURIES)).thenReturn(false);
         when(campaignOptions.get(CampaignOption.USE_FATIGUE)).thenReturn(true);
         when(campaignOptions.get(CampaignOption.FATIGUE_RATE)).thenReturn(3);
         when(patient.getInjuries()).thenReturn(List.of(injury));
@@ -472,6 +482,8 @@ class AdvancedMedicalAlternateHealingTest {
         PersonnelOptions patientOptions = mock(PersonnelOptions.class);
 
         when(campaign.getCampaignOptions()).thenReturn(campaignOptions);
+        lenient().when(campaignOptions.get(CampaignOption.USE_ALTERNATIVE_ADVANCED_MEDICAL)).thenReturn(false);
+        lenient().when(campaignOptions.get(CampaignOption.USE_ALTERNATIVE_ADVANCED_MEDICAL_FEWER_PERMANENT_INJURIES)).thenReturn(false);
         when(campaignOptions.get(CampaignOption.USE_FATIGUE)).thenReturn(false);
         when(campaign.getLocalDate()).thenReturn(MONDAY);
         when(patient.getOptions()).thenReturn(patientOptions);

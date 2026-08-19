@@ -32,6 +32,8 @@
  */
 package mekhq.campaign.randomEvents.randomEventsSystem;
 
+import static org.mockito.Mockito.lenient;
+
 import static mekhq.campaign.mission.enums.ContractMoraleLevel.OVERWHELMING;
 import static mekhq.campaign.mission.enums.ContractMoraleLevel.STALEMATE;
 import static mekhq.campaign.personnel.PersonnelOptions.ATOW_POISON_RESISTANCE;
@@ -94,6 +96,17 @@ class RandomEventEffectsManagerTest {
         when(campaignFaction.getShortName()).thenReturn("MERC");
         when(mockCampaign.getPlayerForce().getFaction()).thenReturn(campaignFaction);
         when(mockCampaign.getCampaignOptions()).thenReturn(mockCampaignOptions);
+        lenient().when(mockCampaignOptions.get(CampaignOption.FATIGUE_LEAVE_THRESHOLD)).thenReturn(0);
+        lenient().when(mockCampaignOptions.get(CampaignOption.USE_AGE_EFFECTS)).thenReturn(false);
+        lenient().when(mockCampaignOptions.get(CampaignOption.USE_TOUGHNESS)).thenReturn(false);
+        lenient().when(mockCampaignOptions.get(CampaignOption.ALTERNATIVE_QUALITY_AVERAGING)).thenReturn(false);
+        lenient().when(mockCampaignOptions.get(CampaignOption.USE_ALTERNATIVE_ADVANCED_MEDICAL)).thenReturn(false);
+        lenient().when(mockCampaignOptions.get(CampaignOption.USE_ARTILLERY)).thenReturn(false);
+        lenient().when(mockCampaignOptions.get(CampaignOption.FATIGUE_RATE)).thenReturn(0);
+        lenient().when(mockCampaignOptions.get(CampaignOption.USE_INJURY_FATIGUE)).thenReturn(false);
+        lenient().when(mockCampaignOptions.get(CampaignOption.ADMIN_EXPERIENCE_LEVEL_INCLUDE_NEGOTIATION)).thenReturn(false);
+        lenient().when(mockCampaignOptions.get(CampaignOption.IS_ENABLE_SALVAGE_FLAG_BY_DEFAULT)).thenReturn(false);
+        lenient().when(mockCampaignOptions.get(CampaignOption.TECHS_USE_ADMINISTRATION)).thenReturn(false);
         when(mockCampaign.getLocalDate()).thenReturn(LocalDate.of(3151, 1, 1));
     }
 

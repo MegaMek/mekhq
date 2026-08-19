@@ -32,6 +32,8 @@
  */
 package mekhq.campaign;
 
+import static org.mockito.Mockito.lenient;
+
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
@@ -95,6 +97,7 @@ public class HumanResourcesTest {
     @BeforeEach
     void setup() {
         campaignOptions = mock(CampaignOptions.class);
+        lenient().when(campaignOptions.get(CampaignOption.TECHS_USE_ADMINISTRATION)).thenReturn(false);
         today = LocalDate.of(3067, 1, 1);
         campaign = MHQTestUtilities.getTestCampaign();
     }

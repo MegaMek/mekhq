@@ -32,6 +32,8 @@
  */
 package mekhq.service.mrms;
 
+import static org.mockito.Mockito.lenient;
+
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
@@ -138,6 +140,16 @@ public class MRMSServiceTest {
 
         mockCampaign = mockCampaign();
         when(mockCampaign.getCampaignOptions()).thenReturn(mockCampaignOptions);
+        lenient().when(mockCampaignOptions.get(CampaignOption.MRMS_REPLACE_POD)).thenReturn(false);
+        lenient().when(mockCampaignOptions.get(CampaignOption.MRMS_USE_ASSIGNED_TECHS_FIRST)).thenReturn(false);
+        lenient().when(mockCampaignOptions.get(CampaignOption.MRMS_OPTIMIZE_TO_COMPLETE_TODAY)).thenReturn(false);
+        lenient().when(mockCampaignOptions.get(CampaignOption.MRMS_SCRAP_IMPOSSIBLE)).thenReturn(false);
+        lenient().when(mockCampaignOptions.get(CampaignOption.MRMS_USE_EXTRA_TIME)).thenReturn(false);
+        lenient().when(mockCampaignOptions.get(CampaignOption.MRMS_USE_RUSH_JOB)).thenReturn(false);
+        lenient().when(mockCampaignOptions.get(CampaignOption.IS_ENABLE_SALVAGE_FLAG_BY_DEFAULT)).thenReturn(false);
+        lenient().when(mockCampaignOptions.get(CampaignOption.MRMS_ALLOW_CARRYOVER)).thenReturn(false);
+        lenient().when(mockCampaignOptions.get(CampaignOption.MRMS_USE_SALVAGE)).thenReturn(false);
+        lenient().when(mockCampaignOptions.get(CampaignOption.TECHS_USE_ADMINISTRATION)).thenReturn(false);
         when(mockCampaign.getPlayerForce().getWarehouse()).thenReturn(warehouse);
         when(mockCampaign.getQuartermaster()).thenReturn(mockQuartermaster);
         when(mockCampaign.getPartInventory(any(Part.class))).thenReturn(mockPartInventory);

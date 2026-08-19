@@ -32,6 +32,8 @@
  */
 package mekhq.campaign.finances;
 
+import static org.mockito.Mockito.lenient;
+
 import static mekhq.campaign.finances.Accountant.*;
 import static mekhq.campaign.force.Formation.FORMATION_NONE;
 import static mekhq.campaign.personnel.enums.PersonnelRole.DEPENDENT;
@@ -91,6 +93,8 @@ public class AccountantTest {
 
         CampaignOptions mockCampaignOptions = mock(CampaignOptions.class);
         when(mockCampaign.getCampaignOptions()).thenReturn(mockCampaignOptions);
+        lenient().when(mockCampaignOptions.get(CampaignOption.IS_ENABLE_SALVAGE_FLAG_BY_DEFAULT)).thenReturn(false);
+        lenient().when(mockCampaignOptions.get(CampaignOption.TECHS_USE_ADMINISTRATION)).thenReturn(false);
         when(mockCampaignOptions.get(CampaignOption.PAY_FOR_FOOD)).thenReturn(false);
         when(mockCampaignOptions.get(CampaignOption.PAY_FOR_HOUSING)).thenReturn(false);
 
@@ -115,6 +119,8 @@ public class AccountantTest {
 
         CampaignOptions mockCampaignOptions = mock(CampaignOptions.class);
         when(mockCampaign.getCampaignOptions()).thenReturn(mockCampaignOptions);
+        lenient().when(mockCampaignOptions.get(CampaignOption.IS_ENABLE_SALVAGE_FLAG_BY_DEFAULT)).thenReturn(false);
+        lenient().when(mockCampaignOptions.get(CampaignOption.TECHS_USE_ADMINISTRATION)).thenReturn(false);
         when(mockCampaignOptions.get(CampaignOption.PAY_FOR_FOOD)).thenReturn(false);
         when(mockCampaignOptions.get(CampaignOption.PAY_FOR_HOUSING)).thenReturn(false);
 
@@ -139,6 +145,8 @@ public class AccountantTest {
 
         CampaignOptions mockCampaignOptions = mock(CampaignOptions.class);
         when(mockCampaign.getCampaignOptions()).thenReturn(mockCampaignOptions);
+        lenient().when(mockCampaignOptions.get(CampaignOption.IS_ENABLE_SALVAGE_FLAG_BY_DEFAULT)).thenReturn(false);
+        lenient().when(mockCampaignOptions.get(CampaignOption.TECHS_USE_ADMINISTRATION)).thenReturn(false);
         when(mockCampaignOptions.get(CampaignOption.PAY_FOR_FOOD)).thenReturn(true);
         when(mockCampaignOptions.get(CampaignOption.PAY_FOR_HOUSING)).thenReturn(true);
 
@@ -172,6 +180,8 @@ public class AccountantTest {
 
         CampaignOptions mockCampaignOptions = mock(CampaignOptions.class);
         when(mockCampaign.getCampaignOptions()).thenReturn(mockCampaignOptions);
+        lenient().when(mockCampaignOptions.get(CampaignOption.IS_ENABLE_SALVAGE_FLAG_BY_DEFAULT)).thenReturn(false);
+        lenient().when(mockCampaignOptions.get(CampaignOption.TECHS_USE_ADMINISTRATION)).thenReturn(false);
         when(mockCampaignOptions.get(CampaignOption.PAY_FOR_FOOD)).thenReturn(false);
         when(mockCampaignOptions.get(CampaignOption.PAY_FOR_HOUSING)).thenReturn(true);
 
@@ -204,6 +214,8 @@ public class AccountantTest {
 
         CampaignOptions mockCampaignOptions = mock(CampaignOptions.class);
         when(mockCampaign.getCampaignOptions()).thenReturn(mockCampaignOptions);
+        lenient().when(mockCampaignOptions.get(CampaignOption.IS_ENABLE_SALVAGE_FLAG_BY_DEFAULT)).thenReturn(false);
+        lenient().when(mockCampaignOptions.get(CampaignOption.TECHS_USE_ADMINISTRATION)).thenReturn(false);
         when(mockCampaignOptions.get(CampaignOption.PAY_FOR_FOOD)).thenReturn(true);
         when(mockCampaignOptions.get(CampaignOption.PAY_FOR_HOUSING)).thenReturn(false);
 
@@ -236,6 +248,8 @@ public class AccountantTest {
 
         CampaignOptions mockCampaignOptions = mock(CampaignOptions.class);
         when(mockCampaign.getCampaignOptions()).thenReturn(mockCampaignOptions);
+        lenient().when(mockCampaignOptions.get(CampaignOption.IS_ENABLE_SALVAGE_FLAG_BY_DEFAULT)).thenReturn(false);
+        lenient().when(mockCampaignOptions.get(CampaignOption.TECHS_USE_ADMINISTRATION)).thenReturn(false);
         when(mockCampaignOptions.get(CampaignOption.PAY_FOR_FOOD)).thenReturn(true);
         when(mockCampaignOptions.get(CampaignOption.PAY_FOR_HOUSING)).thenReturn(true);
 
@@ -269,6 +283,8 @@ public class AccountantTest {
 
         CampaignOptions mockCampaignOptions = mock(CampaignOptions.class);
         when(mockCampaign.getCampaignOptions()).thenReturn(mockCampaignOptions);
+        lenient().when(mockCampaignOptions.get(CampaignOption.IS_ENABLE_SALVAGE_FLAG_BY_DEFAULT)).thenReturn(false);
+        lenient().when(mockCampaignOptions.get(CampaignOption.TECHS_USE_ADMINISTRATION)).thenReturn(false);
         when(mockCampaignOptions.get(CampaignOption.PAY_FOR_FOOD)).thenReturn(false);
         when(mockCampaignOptions.get(CampaignOption.PAY_FOR_HOUSING)).thenReturn(true);
 
@@ -301,6 +317,8 @@ public class AccountantTest {
 
         CampaignOptions mockCampaignOptions = mock(CampaignOptions.class);
         when(mockCampaign.getCampaignOptions()).thenReturn(mockCampaignOptions);
+        lenient().when(mockCampaignOptions.get(CampaignOption.IS_ENABLE_SALVAGE_FLAG_BY_DEFAULT)).thenReturn(false);
+        lenient().when(mockCampaignOptions.get(CampaignOption.TECHS_USE_ADMINISTRATION)).thenReturn(false);
         when(mockCampaignOptions.get(CampaignOption.PAY_FOR_FOOD)).thenReturn(true);
         when(mockCampaignOptions.get(CampaignOption.PAY_FOR_HOUSING)).thenReturn(false);
 
@@ -333,6 +351,8 @@ public class AccountantTest {
 
         CampaignOptions mockCampaignOptions = mock(CampaignOptions.class);
         when(mockCampaign.getCampaignOptions()).thenReturn(mockCampaignOptions);
+        lenient().when(mockCampaignOptions.get(CampaignOption.IS_ENABLE_SALVAGE_FLAG_BY_DEFAULT)).thenReturn(false);
+        lenient().when(mockCampaignOptions.get(CampaignOption.TECHS_USE_ADMINISTRATION)).thenReturn(false);
         when(mockCampaignOptions.get(CampaignOption.PAY_FOR_FOOD)).thenReturn(true);
         when(mockCampaignOptions.get(CampaignOption.PAY_FOR_HOUSING)).thenReturn(true);
 
@@ -367,6 +387,8 @@ public class AccountantTest {
 
         CampaignOptions mockCampaignOptions = mock(CampaignOptions.class);
         when(mockCampaign.getCampaignOptions()).thenReturn(mockCampaignOptions);
+        lenient().when(mockCampaignOptions.get(CampaignOption.IS_ENABLE_SALVAGE_FLAG_BY_DEFAULT)).thenReturn(false);
+        lenient().when(mockCampaignOptions.get(CampaignOption.TECHS_USE_ADMINISTRATION)).thenReturn(false);
         when(mockCampaignOptions.get(CampaignOption.PAY_FOR_FOOD)).thenReturn(false);
         when(mockCampaignOptions.get(CampaignOption.PAY_FOR_HOUSING)).thenReturn(true);
 
@@ -400,6 +422,8 @@ public class AccountantTest {
 
         CampaignOptions mockCampaignOptions = mock(CampaignOptions.class);
         when(mockCampaign.getCampaignOptions()).thenReturn(mockCampaignOptions);
+        lenient().when(mockCampaignOptions.get(CampaignOption.IS_ENABLE_SALVAGE_FLAG_BY_DEFAULT)).thenReturn(false);
+        lenient().when(mockCampaignOptions.get(CampaignOption.TECHS_USE_ADMINISTRATION)).thenReturn(false);
         when(mockCampaignOptions.get(CampaignOption.PAY_FOR_FOOD)).thenReturn(true);
         when(mockCampaignOptions.get(CampaignOption.PAY_FOR_HOUSING)).thenReturn(false);
 
@@ -433,6 +457,8 @@ public class AccountantTest {
 
         CampaignOptions mockCampaignOptions = mock(CampaignOptions.class);
         when(mockCampaign.getCampaignOptions()).thenReturn(mockCampaignOptions);
+        lenient().when(mockCampaignOptions.get(CampaignOption.IS_ENABLE_SALVAGE_FLAG_BY_DEFAULT)).thenReturn(false);
+        lenient().when(mockCampaignOptions.get(CampaignOption.TECHS_USE_ADMINISTRATION)).thenReturn(false);
         when(mockCampaignOptions.get(CampaignOption.PAY_FOR_FOOD)).thenReturn(true);
         when(mockCampaignOptions.get(CampaignOption.PAY_FOR_HOUSING)).thenReturn(true);
 
@@ -467,6 +493,8 @@ public class AccountantTest {
 
         CampaignOptions mockCampaignOptions = mock(CampaignOptions.class);
         when(mockCampaign.getCampaignOptions()).thenReturn(mockCampaignOptions);
+        lenient().when(mockCampaignOptions.get(CampaignOption.IS_ENABLE_SALVAGE_FLAG_BY_DEFAULT)).thenReturn(false);
+        lenient().when(mockCampaignOptions.get(CampaignOption.TECHS_USE_ADMINISTRATION)).thenReturn(false);
         when(mockCampaignOptions.get(CampaignOption.PAY_FOR_FOOD)).thenReturn(false);
         when(mockCampaignOptions.get(CampaignOption.PAY_FOR_HOUSING)).thenReturn(true);
 
@@ -500,6 +528,8 @@ public class AccountantTest {
 
         CampaignOptions mockCampaignOptions = mock(CampaignOptions.class);
         when(mockCampaign.getCampaignOptions()).thenReturn(mockCampaignOptions);
+        lenient().when(mockCampaignOptions.get(CampaignOption.IS_ENABLE_SALVAGE_FLAG_BY_DEFAULT)).thenReturn(false);
+        lenient().when(mockCampaignOptions.get(CampaignOption.TECHS_USE_ADMINISTRATION)).thenReturn(false);
         when(mockCampaignOptions.get(CampaignOption.PAY_FOR_FOOD)).thenReturn(true);
         when(mockCampaignOptions.get(CampaignOption.PAY_FOR_HOUSING)).thenReturn(false);
 
@@ -533,6 +563,8 @@ public class AccountantTest {
 
         CampaignOptions mockCampaignOptions = mock(CampaignOptions.class);
         when(mockCampaign.getCampaignOptions()).thenReturn(mockCampaignOptions);
+        lenient().when(mockCampaignOptions.get(CampaignOption.IS_ENABLE_SALVAGE_FLAG_BY_DEFAULT)).thenReturn(false);
+        lenient().when(mockCampaignOptions.get(CampaignOption.TECHS_USE_ADMINISTRATION)).thenReturn(false);
         when(mockCampaignOptions.get(CampaignOption.PAY_FOR_FOOD)).thenReturn(true);
         when(mockCampaignOptions.get(CampaignOption.PAY_FOR_HOUSING)).thenReturn(true);
 
@@ -592,6 +624,8 @@ public class AccountantTest {
 
         CampaignOptions mockCampaignOptions = mock(CampaignOptions.class);
         when(mockCampaign.getCampaignOptions()).thenReturn(mockCampaignOptions);
+        lenient().when(mockCampaignOptions.get(CampaignOption.IS_ENABLE_SALVAGE_FLAG_BY_DEFAULT)).thenReturn(false);
+        lenient().when(mockCampaignOptions.get(CampaignOption.TECHS_USE_ADMINISTRATION)).thenReturn(false);
         when(mockCampaignOptions.get(CampaignOption.PAY_FOR_FOOD)).thenReturn(false);
         when(mockCampaignOptions.get(CampaignOption.PAY_FOR_HOUSING)).thenReturn(true);
 
@@ -647,6 +681,8 @@ public class AccountantTest {
 
         CampaignOptions mockCampaignOptions = mock(CampaignOptions.class);
         when(mockCampaign.getCampaignOptions()).thenReturn(mockCampaignOptions);
+        lenient().when(mockCampaignOptions.get(CampaignOption.IS_ENABLE_SALVAGE_FLAG_BY_DEFAULT)).thenReturn(false);
+        lenient().when(mockCampaignOptions.get(CampaignOption.TECHS_USE_ADMINISTRATION)).thenReturn(false);
         when(mockCampaignOptions.get(CampaignOption.PAY_FOR_FOOD)).thenReturn(true);
         when(mockCampaignOptions.get(CampaignOption.PAY_FOR_HOUSING)).thenReturn(false);
 
@@ -702,6 +738,8 @@ public class AccountantTest {
 
         CampaignOptions mockCampaignOptions = mock(CampaignOptions.class);
         when(mockCampaign.getCampaignOptions()).thenReturn(mockCampaignOptions);
+        lenient().when(mockCampaignOptions.get(CampaignOption.IS_ENABLE_SALVAGE_FLAG_BY_DEFAULT)).thenReturn(false);
+        lenient().when(mockCampaignOptions.get(CampaignOption.TECHS_USE_ADMINISTRATION)).thenReturn(false);
         when(mockCampaignOptions.get(CampaignOption.PAY_FOR_FOOD)).thenReturn(true);
         when(mockCampaignOptions.get(CampaignOption.PAY_FOR_HOUSING)).thenReturn(true);
 
@@ -760,6 +798,8 @@ public class AccountantTest {
 
         CampaignOptions mockCampaignOptions = mock(CampaignOptions.class);
         when(mockCampaign.getCampaignOptions()).thenReturn(mockCampaignOptions);
+        lenient().when(mockCampaignOptions.get(CampaignOption.IS_ENABLE_SALVAGE_FLAG_BY_DEFAULT)).thenReturn(false);
+        lenient().when(mockCampaignOptions.get(CampaignOption.TECHS_USE_ADMINISTRATION)).thenReturn(false);
         when(mockCampaignOptions.get(CampaignOption.PAY_FOR_FOOD)).thenReturn(true);
         when(mockCampaignOptions.get(CampaignOption.PAY_FOR_HOUSING)).thenReturn(true);
 
@@ -832,6 +872,8 @@ public class AccountantTest {
 
         CampaignOptions mockCampaignOptions = mock(CampaignOptions.class);
         when(mockCampaign.getCampaignOptions()).thenReturn(mockCampaignOptions);
+        lenient().when(mockCampaignOptions.get(CampaignOption.IS_ENABLE_SALVAGE_FLAG_BY_DEFAULT)).thenReturn(false);
+        lenient().when(mockCampaignOptions.get(CampaignOption.TECHS_USE_ADMINISTRATION)).thenReturn(false);
         when(mockCampaignOptions.get(CampaignOption.PAY_FOR_FOOD)).thenReturn(false);
         when(mockCampaignOptions.get(CampaignOption.PAY_FOR_HOUSING)).thenReturn(true);
         when(mockCampaignOptions.isUseFactionStandingBarracksCostsSafe()).thenReturn(true);
@@ -877,6 +919,8 @@ public class AccountantTest {
 
         CampaignOptions mockCampaignOptions = mock(CampaignOptions.class);
         when(mockCampaign.getCampaignOptions()).thenReturn(mockCampaignOptions);
+        lenient().when(mockCampaignOptions.get(CampaignOption.IS_ENABLE_SALVAGE_FLAG_BY_DEFAULT)).thenReturn(false);
+        lenient().when(mockCampaignOptions.get(CampaignOption.TECHS_USE_ADMINISTRATION)).thenReturn(false);
         when(mockCampaignOptions.get(CampaignOption.PAY_FOR_FOOD)).thenReturn(false);
         when(mockCampaignOptions.get(CampaignOption.PAY_FOR_HOUSING)).thenReturn(true);
         when(mockCampaignOptions.isUseFactionStandingBarracksCostsSafe()).thenReturn(true);
@@ -946,6 +990,8 @@ public class AccountantTest {
         void testGetPayrollSummary_emptyCampaign() {
             // Arrange
             when(mockCampaign.getCampaignOptions()).thenReturn(campaignOptions);
+            lenient().when(campaignOptions.get(CampaignOption.IS_ENABLE_SALVAGE_FLAG_BY_DEFAULT)).thenReturn(false);
+            lenient().when(campaignOptions.get(CampaignOption.TECHS_USE_ADMINISTRATION)).thenReturn(false);
 
             // Act
             Map<Person, Money> expectedMap = accountant.getPayRollSummary();
@@ -962,6 +1008,8 @@ public class AccountantTest {
             Person mockPerson = getMockPerson();
 
             when(mockCampaign.getCampaignOptions()).thenReturn(campaignOptions);
+            lenient().when(campaignOptions.get(CampaignOption.IS_ENABLE_SALVAGE_FLAG_BY_DEFAULT)).thenReturn(false);
+            lenient().when(campaignOptions.get(CampaignOption.TECHS_USE_ADMINISTRATION)).thenReturn(false);
             when(mockCampaign.getPlayerForce().getHumanResources().getSalaryEligiblePersonnel()).thenReturn(List.of(
                   mockPerson));
 
@@ -981,6 +1029,8 @@ public class AccountantTest {
             // Arrange
             when(mockCampaign.getPlayerForce().getHumanResources().getTemporaryAsTechPool()).thenReturn(5);
             when(mockCampaign.getCampaignOptions()).thenReturn(campaignOptions);
+            lenient().when(campaignOptions.get(CampaignOption.IS_ENABLE_SALVAGE_FLAG_BY_DEFAULT)).thenReturn(false);
+            lenient().when(campaignOptions.get(CampaignOption.TECHS_USE_ADMINISTRATION)).thenReturn(false);
 
             // Act
 
@@ -997,6 +1047,8 @@ public class AccountantTest {
             // Arrange
             when(mockCampaign.getPlayerForce().getHumanResources().getTemporaryMedicPool()).thenReturn(5);
             when(mockCampaign.getCampaignOptions()).thenReturn(campaignOptions);
+            lenient().when(campaignOptions.get(CampaignOption.IS_ENABLE_SALVAGE_FLAG_BY_DEFAULT)).thenReturn(false);
+            lenient().when(campaignOptions.get(CampaignOption.TECHS_USE_ADMINISTRATION)).thenReturn(false);
 
             // Act
 
@@ -1015,6 +1067,8 @@ public class AccountantTest {
             // Arrange
             when(mockHumanResources.getTempPersonnelRoleMap()).thenReturn(Map.of(role, CREWCOUNT));
             when(mockCampaign.getCampaignOptions()).thenReturn(campaignOptions);
+            lenient().when(campaignOptions.get(CampaignOption.IS_ENABLE_SALVAGE_FLAG_BY_DEFAULT)).thenReturn(false);
+            lenient().when(campaignOptions.get(CampaignOption.TECHS_USE_ADMINISTRATION)).thenReturn(false);
 
             // Act
             Map<Person, Money> expectedMap = accountant.getPayRollSummary();
@@ -1438,6 +1492,8 @@ public class AccountantTest {
             accountant = new Accountant(mockCampaign);
 
             when(mockCampaign.getCampaignOptions()).thenReturn(mockCampaignOptions);
+            lenient().when(mockCampaignOptions.get(CampaignOption.IS_ENABLE_SALVAGE_FLAG_BY_DEFAULT)).thenReturn(false);
+            lenient().when(mockCampaignOptions.get(CampaignOption.TECHS_USE_ADMINISTRATION)).thenReturn(false);
             when(mockCampaign.getPlayerForce().getHangar()).thenReturn(mockHangar);
             when(mockCampaign.getPlayerForce().isClanForce()).thenReturn(false);
             when(mockCampaign.getLocalDate()).thenReturn(TODAY);
@@ -2414,6 +2470,8 @@ public class AccountantTest {
             accountant = new Accountant(mockCampaign);
 
             when(mockCampaign.getCampaignOptions()).thenReturn(campaignOptions);
+            lenient().when(campaignOptions.get(CampaignOption.IS_ENABLE_SALVAGE_FLAG_BY_DEFAULT)).thenReturn(false);
+            lenient().when(campaignOptions.get(CampaignOption.TECHS_USE_ADMINISTRATION)).thenReturn(false);
             when(mockCampaign.getPlayerForce().getHangar()).thenReturn(mockHangar);
             when(mockCampaign.getPlayerForce().isClanForce()).thenReturn(false);
             when(mockCampaign.getLocalDate()).thenReturn(TODAY);

@@ -32,6 +32,8 @@
  */
 package mekhq.campaign.reputation.camOpsReputation;
 
+import static org.mockito.Mockito.lenient;
+
 import static megamek.common.options.OptionsConstants.ATOW_COMBAT_PARALYSIS;
 import static megamek.common.options.OptionsConstants.ATOW_COMBAT_SENSE;
 import static megamek.common.options.PilotOptions.LVL3_ADVANTAGES;
@@ -83,6 +85,10 @@ class CommandRatingTest {
     void setUp() {
         MockitoAnnotations.openMocks(this);
         when(campaign.getCampaignOptions()).thenReturn(campaignOptions);
+        lenient().when(campaignOptions.get(CampaignOption.IS_ENABLE_SALVAGE_FLAG_BY_DEFAULT)).thenReturn(false);
+        lenient().when(campaignOptions.get(CampaignOption.USE_RANDOM_PERSONALITY_REPUTATION)).thenReturn(false);
+        lenient().when(campaignOptions.get(CampaignOption.TECHS_USE_ADMINISTRATION)).thenReturn(false);
+        lenient().when(campaignOptions.get(CampaignOption.USE_AGE_EFFECTS)).thenReturn(false);
     }
 
     private void assertRating(Person commander, Map<String, Integer> overrides) {
