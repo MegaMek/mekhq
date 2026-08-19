@@ -959,7 +959,8 @@ public final class BriefingTab extends CampaignGuiTab {
 
             double regardMultiplier = campaignOptions.getRegardMultiplier();
 
-            Faction employer = mission.getEmployerFaction();
+            // A covert sponsor, if any, takes the standing change in the visible employer's place.
+            Faction employer = mission.getStandingEmployerFaction();
             reports = factionStandings.processContractCompletion(getCampaign().getFaction(), employer, today,
                   status, regardMultiplier, mission.getLengthInMonths());
         }

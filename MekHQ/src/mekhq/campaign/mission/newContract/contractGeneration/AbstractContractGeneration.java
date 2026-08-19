@@ -78,6 +78,9 @@ public class AbstractContractGeneration {
     private static final MMLogger LOGGER = MMLogger.create(AbstractContractGeneration.class);
     private static final String RESOURCE_BUNDLES = "mekhq.resources.AbstractMission";
 
+    /** How many times {@link #pickEnemy} will redraw to avoid an employer-versus-itself contract before giving up. */
+    private static final int MAX_ENEMY_REDRAWS = 5;
+
     public static @Nullable AbstractContract createContract(Campaign campaign, CampaignOptions campaignOptions,
           LocalDate currentDate, Detachment detachment, int contractGenerationModifier, ContractSearchType searchType,
           FactionStandings factionStandings, boolean overridingCommandCircuitRequirements, boolean isGM,
@@ -456,11 +459,19 @@ public class AbstractContractGeneration {
                   employerData.getAnchorFaction(),
                   currentDate);
         } else {
-            enemyData = ChaosContractDeterminationEnemy.generateEnemyFactionForObjective(campaign,
-                  currentLocation,
-                  currentDate,
-                  employerData.getAnchorFaction(),
-                  objectiveData.playerObjectiveType());
+            // The randomly drawn belligerent must not be the employer itself - an "employer versus itself" contract is
+            // nonsensical outside of a rebellion (handled above). Redraw a few times, then accept whatever we get
+            // rather than loop forever if the pool genuinely cannot offer an alternative.
+            String employerFactionCode = employerData.factionCode();
+            int attempts = 0;
+            do {
+                enemyData = ChaosContractDeterminationEnemy.generateEnemyFactionForObjective(campaign,
+                        currentLocation,
+                        currentDate,
+                        employerData.getAnchorFaction(),
+                        objectiveData.playerObjectiveType());
+                attempts++;
+            } while (enemyData.factionCode().equals(employerFactionCode) && attempts < MAX_ENEMY_REDRAWS);
         }
         contract.setEnemyData(enemyData);
         return enemyData;

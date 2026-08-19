@@ -257,7 +257,13 @@ public class ChaosContractEmployerDetermination {
             case CIVILIAN_ORGANIZATION_REBELS -> firstNonNull(getCurrentSystemEmployer(currentDate, currentLocation),
                   () -> pickRegionalOwner(currentDate, currentLocation, isMercenarySearch, flavor));
             case NOBLE, CORPORATION, CIVILIAN_ORGANIZATION_BUSINESS, MERCENARY_SUBCONTRACT ->
-                  pickRegionalOwner(currentDate, currentLocation, isMercenarySearch, flavor);
+                // These types usually field a landless flavor faction (a mercenary command, a corporation, a
+                // stateless noble), so the conflict anchors on a nearby landed power. When the flavor faction is
+                // itself a landed government - for example a noble of a Great House - it anchors on itself, rather
+                // than borrowing an unrelated neighbor and risking an employer-versus-itself contract.
+                  flavor.isGovernment()
+                        ? flavor
+                        : pickRegionalOwner(currentDate, currentLocation, isMercenarySearch, flavor);
         };
     }
 

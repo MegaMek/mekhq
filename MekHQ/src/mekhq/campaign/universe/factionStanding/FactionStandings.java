@@ -1690,12 +1690,8 @@ public class FactionStandings {
 
                 int contractLength = mission.getLengthInMonths();
 
-                // First try and fetch the enemy mercenary employer if none exists (because the enemy faction
-                // isn't an employed mercenary), then fetch the actual enemy
-                Faction enemyFaction = mission.getEnemyFaction();
-                if (enemyFaction == null) {
-                    enemyFaction = mission.getEnemyFaction();
-                }
+                // A covert sponsor, if any, takes the standing change in the visible enemy's/employer's place.
+                Faction enemyFaction = mission.getStandingEnemyFaction();
 
                 String report = processContractAccept(campaignFactionCode,
                       enemyFaction,
@@ -1707,7 +1703,7 @@ public class FactionStandings {
                 }
 
                 if (missionStatus != MissionStatus.ACTIVE) {
-                    reports.addAll(processContractCompletion(campaignFaction, mission.getEmployerFaction(),
+                    reports.addAll(processContractCompletion(campaignFaction, mission.getStandingEmployerFaction(),
                           today, missionStatus, regardMultiplier, contractLength));
                 }
             }

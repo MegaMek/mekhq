@@ -736,27 +736,29 @@ public class MHQMorale {
               contract.getObjectiveType()
         );
 
-        // Update the Batchall information
-        Faction newEnemyFaction = contract.getEnemyFaction();
-        if (campaign.getCampaignOptions().isUseGenericBattleValue() && newEnemyFaction.performsBatchalls()) {
-            boolean tracksStanding = campaign.getCampaignOptions().get(CampaignOption.TRACK_FACTION_STANDING);
-            FactionStandings factionStandings = campaign.getPlayerForce().getFactionStandings();
+        // The Batchall, standing update, and salvage clause below all concern the newly generated enemy, so read its
+        // faction here rather than the outgoing one still on the contract.
+        Faction newEnemyFaction = newEnemyData.getFaction();
 
-            boolean acceptedBatchall = true;
+        boolean tracksStanding = campaign.getCampaignOptions().get(CampaignOption.TRACK_FACTION_STANDING);
+        FactionStandings factionStandings = campaign.getPlayerForce().getFactionStandings();
+        double regardMultiplier = campaign.getCampaignOptions().getRegardMultiplier();
+        String campaignFactionCode = campaign.getPlayerForce().getFaction().getShortName();
+
+        // A Clan challenger issues a Batchall before battle.
+        if (campaign.getCampaignOptions().isUseGenericBattleValue() && newEnemyFaction.performsBatchalls()) {
             boolean allowBatchalls = true;
             if (campaign.getCampaignOptions().isUseFactionStandingBatchallRestrictionsSafe()) {
                 double regard = factionStandings.getRegardForFaction(newEnemyFaction.getShortName(), true);
                 allowBatchalls = FactionStandingUtilities.isBatchallAllowed(regard);
             }
 
-            double regardMultiplier = campaign.getCampaignOptions().getRegardMultiplier();
-            String campaignFactionCode = campaign.getPlayerForce().getFaction().getShortName();
-            if (newEnemyFaction.performsBatchalls() && allowBatchalls) {
+            if (allowBatchalls) {
                 PerformBatchall batchallDialog = new PerformBatchall(campaign,
-                      contract.getEnemyData().opposingCommander(),
+                      newEnemyData.opposingCommander(),
                       enemyCode);
 
-                acceptedBatchall = batchallDialog.isBatchallAccepted();
+                boolean acceptedBatchall = batchallDialog.isBatchallAccepted();
 
                 if (!acceptedBatchall && tracksStanding) {
                     List<String> reports = factionStandings.processRefusedBatchall(campaignFactionCode, enemyCode,
@@ -768,16 +770,19 @@ public class MHQMorale {
                 }
                 newEnemyData = new EnemyData(newEnemyData, acceptedBatchall);
             }
+        }
 
-            contract.setEnemyData(newEnemyData);
+        // Commit the new enemy before deriving anything from the contract below.
+        contract.setEnemyData(newEnemyData);
 
-            if (tracksStanding) {
-                // Whenever we dynamically change the enemy faction, we update standing accordingly
-                String report = factionStandings.processContractAccept(campaignFactionCode, newEnemyFaction, today,
-                      regardMultiplier, contract.getLengthInMonths());
-                if (report != null) {
-                    campaign.addReport(POLITICS, report);
-                }
+        if (tracksStanding) {
+            // Whenever we dynamically change the enemy faction, we update standing accordingly. A covert sponsor, if
+            // any, takes the standing change in the visible enemy's place.
+            Faction standingEnemyFaction = contract.getStandingEnemyFaction();
+            String report = factionStandings.processContractAccept(campaignFactionCode, standingEnemyFaction, today,
+                  regardMultiplier, contract.getLengthInMonths());
+            if (report != null) {
+                campaign.addReport(POLITICS, report);
             }
         }
 

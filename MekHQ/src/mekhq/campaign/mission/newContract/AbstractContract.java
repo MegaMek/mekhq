@@ -598,6 +598,18 @@ public abstract class AbstractContract {
         return employerData.color();
     }
 
+    /**
+     * The faction whose Faction Standing shifts for this contract's <em>employer</em> side. When the employer is
+     * fronting for a covert sponsor, the standing change accrues to that hidden patron rather than the visible
+     * employer; otherwise it is the employer itself.
+     *
+     * @return the employer's sponsor when one exists, otherwise the employer faction
+     */
+    public Faction getStandingEmployerFaction() {
+        Faction sponsor = employerData.getSponsorFaction();
+        return (sponsor != null) ? sponsor : getEmployerFaction();
+    }
+
     public String getEnemyFactionCode() {
         return enemyData.factionCode();
     }
@@ -623,6 +635,18 @@ public abstract class AbstractContract {
         // Factions.getFaction hands back a blank Faction rather than null for an unknown code, so guard here or
         // callers get an empty placeholder that passes their null check.
         return (sponsorFactionCode == null) ? null : Factions.getInstance().getFaction(sponsorFactionCode);
+    }
+
+    /**
+     * The faction whose Faction Standing shifts for this contract's <em>enemy</em> side. When the enemy is fronting for
+     * a covert sponsor, the standing change accrues to that hidden patron rather than the visible belligerent;
+     * otherwise it is the enemy itself.
+     *
+     * @return the enemy's sponsor when one exists, otherwise the enemy faction
+     */
+    public Faction getStandingEnemyFaction() {
+        Faction sponsor = getEnemySponsorFaction();
+        return (sponsor != null) ? sponsor : getEnemyFaction();
     }
 
     public String getEnemyDisplayName() {
