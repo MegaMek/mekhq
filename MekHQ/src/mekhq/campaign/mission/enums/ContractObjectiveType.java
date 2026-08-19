@@ -34,13 +34,11 @@ package mekhq.campaign.mission.enums;
 
 import static megamek.common.compute.Compute.randomInt;
 import static mekhq.campaign.mission.enums.AtBEventType.*;
-
-import java.util.ResourceBundle;
+import static mekhq.utilities.MHQInternationalization.getTextAt;
 
 import megamek.common.compute.Compute;
 import megamek.common.eras.EraFlag;
 import megamek.logging.MMLogger;
-import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.mission.AtBScenario;
 import mekhq.campaign.mission.newContract.contractGeneration.ChaosObjectiveType;
@@ -176,6 +174,8 @@ public enum ContractObjectiveType {
     // endregion Enum Declarations
 
     // region Variable Declarations
+    private final static String RESOURCE_BUNDLE = "mekhq.resources.Mission";
+    
     private final String name;
     private final String toolTipText;
     private final double operationsTempoMultiplier;
@@ -189,10 +189,8 @@ public enum ContractObjectiveType {
     ContractObjectiveType(final String name, final String toolTipText, final ChaosObjectiveType chaosObjectiveType,
           final double operationsTempoMultiplier, final EnemySelectionProfile enemySelectionProfile,
           final MissionLocationProfile missionLocationProfile, final CombatRole requiredCombatRole) {
-        final ResourceBundle resources = ResourceBundle.getBundle("mekhq.resources.Mission",
-              MekHQ.getMHQOptions().getLocale());
-        this.name = resources.getString(name);
-        this.toolTipText = resources.getString(toolTipText);
+        this.name = getTextAt(RESOURCE_BUNDLE, name);
+        this.toolTipText = getTextAt(RESOURCE_BUNDLE, toolTipText);
         this.operationsTempoMultiplier = operationsTempoMultiplier;
         this.chaosObjectiveType = chaosObjectiveType;
         this.enemySelectionProfile = enemySelectionProfile;

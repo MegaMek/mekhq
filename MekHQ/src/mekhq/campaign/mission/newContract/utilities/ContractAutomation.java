@@ -77,9 +77,8 @@ public class ContractAutomation {
     private static final int DIALOG_CONFIRM_OPTION = 0;
 
     /**
-     * Non-interactive counterpart to {@link #contractStartPrompt(Campaign, AbstractContract)}: runs the contract-start
-     * automation directly from pre-made choices instead of prompting the player, because the market dialog has already
-     * captured those choices as checkboxes.
+     * Runs the contract-start automation directly from pre-made choices instead of prompting the player, because the
+     * market dialog has already captured those choices as checkboxes.
      *
      * <p>Regardless of the transit choice the contract is dated to <b>start on the day the force should arrive</b> at
      * the target system (today plus the computed travel time; today if already there). When {@code mothball} is set,
