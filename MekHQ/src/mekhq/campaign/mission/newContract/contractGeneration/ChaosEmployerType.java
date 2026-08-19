@@ -149,6 +149,9 @@ public enum ChaosEmployerType {
                   getTextAt(RESOURCE_BUNDLE, "ChaosEmployerType.CIVILIAN_ORGANIZATION_MILITIA.marketTag");
             case CIVILIAN_ORGANIZATION_REBELS ->
                   getTextAt(RESOURCE_BUNDLE, "ChaosEmployerType.CIVILIAN_ORGANIZATION_REBELS.marketTag");
+            case NOBLE -> getTextAt(RESOURCE_BUNDLE, "ChaosEmployerType.NOBLE.marketTag");
+            case LOCAL_PLANETARY_GOVERNMENT, ANY_PLANETARY_GOVERNMENT ->
+                  getTextAt(RESOURCE_BUNDLE, "ChaosEmployerType.PLANETARY_GOVERNMENT.marketTag");
             default -> null;
         };
     }
