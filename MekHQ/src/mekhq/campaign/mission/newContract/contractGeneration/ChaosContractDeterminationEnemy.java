@@ -35,6 +35,8 @@ package mekhq.campaign.mission.newContract.contractGeneration;
 import static megamek.common.compute.Compute.randomInt;
 import static mekhq.campaign.mission.RandomFactionCamouflage.pickRandomCamouflage;
 import static mekhq.campaign.universe.Faction.MERCENARY_FACTION_CODE;
+import static mekhq.campaign.universe.Faction.PIRATE_FACTION_CODE;
+import static mekhq.campaign.universe.Faction.REBEL_FACTION_CODE;
 
 import java.time.LocalDate;
 
@@ -92,7 +94,13 @@ public class ChaosContractDeterminationEnemy {
         }
 
         int currentYear = currentDate.getYear();
-        String displayName = enemyFaction.getFullName(currentYear);
+        String generatedName = switch (factionCode) {
+            case MERCENARY_FACTION_CODE, PIRATE_FACTION_CODE ->
+                  ChaosEmployerType.MERCENARY_SUBCONTRACT.generateEmployerName();
+            case REBEL_FACTION_CODE -> ChaosEmployerType.CIVILIAN_ORGANIZATION_REBELS.generateEmployerName();
+            default -> enemyFaction.getFullName(currentYear);
+        };
+        String displayName = (generatedName != null) ? generatedName : enemyFaction.getFullName(currentYear);
 
         Camouflage camouflage = pickRandomCamouflage(currentYear, factionCode);
         Person opposingCommander = OpposingCommander.generateOpposingCommander(campaign, enemyFaction);
