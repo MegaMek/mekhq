@@ -127,7 +127,7 @@ public class GoingRogue {
               commander,
               second,
               FactionJudgmentSceneType.GO_ROGUE,
-              campaign.getFaction());
+              campaign.getPlayerForce().getFaction());
 
         processGoingRogue(campaign, chosenFaction, commander, second, isUsingFactionStandings, false);
     }
@@ -151,7 +151,7 @@ public class GoingRogue {
      */
     public static void processGoingRogue(Campaign campaign, Faction chosenFaction, Person commander,
           @Nullable Person second, boolean isUsingFactionStandings, boolean isUltimatum) {
-        boolean isDefection = !chosenFaction.isAggregate() && !campaign.getFaction().isAggregate();
+        boolean isDefection = !chosenFaction.isAggregate() && !campaign.getPlayerForce().getFaction().isAggregate();
 
         processGoingRogue(campaign,
               chosenFaction,
@@ -180,7 +180,7 @@ public class GoingRogue {
      */
     public static void processGoingRogue(Campaign campaign, Faction chosenFaction, Person commander,
           @Nullable Person second, boolean isDefection, boolean isUltimatum, boolean isUsingFactionStandings) {
-        Faction currentFaction = campaign.getFaction();
+        Faction currentFaction = campaign.getPlayerForce().getFaction();
         String chosenFactionCode = chosenFaction.getShortName();
 
         if (isUsingFactionStandings) {
@@ -270,7 +270,7 @@ public class GoingRogue {
             boolean altAdvancedMedicalEnabled = campaign.getCampaignOptions().get(CampaignOption.USE_ALTERNATIVE_ADVANCED_MEDICAL);
             int loyalty;
             if (loyaltyEnabled) {
-                loyalty = person.getAdjustedLoyalty(campaign.getFaction(), altAdvancedMedicalEnabled);
+                loyalty = person.getAdjustedLoyalty(campaign.getPlayerForce().getFaction(), altAdvancedMedicalEnabled);
             } else {loyalty = 0;}
             int modifier = loyaltyEnabled ? person.getLoyaltyModifier(loyalty) : 0;
             int roll = Compute.d6(2);
@@ -352,7 +352,7 @@ public class GoingRogue {
      * @param campaign the current campaign context
      */
     private static void processFactionStandingChangeForOldFaction(Campaign campaign) {
-        processFactionStandingChangeForOldFaction(campaign, campaign.getFaction());
+        processFactionStandingChangeForOldFaction(campaign, campaign.getPlayerForce().getFaction());
     }
 
     /**
@@ -379,7 +379,7 @@ public class GoingRogue {
             return;
         }
 
-        String report = factionStandings.setRegardForFaction(campaign.getFaction().getShortName(),
+        String report = factionStandings.setRegardForFaction(campaign.getPlayerForce().getFaction().getShortName(),
               factionCode,
               targetRegard,
               campaign.getGameYear(),
@@ -407,7 +407,7 @@ public class GoingRogue {
      *                 ultimatum
      */
     public static void processRegardBump(Campaign campaign) {
-        Faction faction = campaign.getFaction();
+        Faction faction = campaign.getPlayerForce().getFaction();
         if (faction.isAggregate()) {
             return;
         }
@@ -435,7 +435,7 @@ public class GoingRogue {
         }
 
         String report = factionStandings.setRegardForFaction(
-              campaign.getFaction().getShortName(),
+              campaign.getPlayerForce().getFaction().getShortName(),
               factionCode,
               targetRegard,
               campaign.getGameYear(),
@@ -468,7 +468,7 @@ public class GoingRogue {
             return;
         }
 
-        String report = factionStandings.setRegardForFaction(campaign.getFaction().getShortName(),
+        String report = factionStandings.setRegardForFaction(campaign.getPlayerForce().getFaction().getShortName(),
               factionCode,
               targetRegard,
               campaign.getGameYear(),

@@ -141,7 +141,7 @@ public class MRMSServiceTest {
         when(mockCampaign.getPlayerForce().getWarehouse()).thenReturn(warehouse);
         when(mockCampaign.getQuartermaster()).thenReturn(mockQuartermaster);
         when(mockCampaign.getPartInventory(any(Part.class))).thenReturn(mockPartInventory);
-        when(mockCampaign.getFaction()).thenReturn(mockFaction);
+        when(mockCampaign.getPlayerForce().getFaction()).thenReturn(mockFaction);
         when(mockCampaign.fixPart(any(IPartWork.class), any(Person.class))).thenReturn("Part Fixed");
 
         when(mockCampaign.getTargetFor(any(IPartWork.class), any(Person.class))).thenReturn(mockBaseTargetRoll);

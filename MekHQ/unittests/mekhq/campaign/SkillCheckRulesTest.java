@@ -80,7 +80,7 @@ public class SkillCheckRulesTest {
             doCallRealMethod().when(campaign).checkAcquisition(any(), any(), anyBoolean());
             Faction faction = new Faction();
             when(campaign.getCampaignOptions()).thenReturn(options);
-            when(campaign.getFaction()).thenReturn(faction);
+            when(campaign.getPlayerForce().getFaction()).thenReturn(faction);
             mekhq.campaign.market.ForceShoppingList shoppingList = mock(mekhq.campaign.market.ForceShoppingList.class);
             when(campaign.getPlayerForce().getShoppingList()).thenReturn(shoppingList);
             return campaign;

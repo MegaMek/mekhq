@@ -132,7 +132,7 @@ public final class BatchXPDialog extends JDialog {
         personTypeModel.addElement(new PersonTypeItem(resourceMap.getString("primaryRole.choice.text"), null));
         final PersonnelRole[] personnelRoles = PersonnelRole.values();
         for (PersonnelRole personnelRole : personnelRoles) {
-            personTypeModel.addElement(new PersonTypeItem(personnelRole.getLabel(campaign.getFaction().isClan()),
+            personTypeModel.addElement(new PersonTypeItem(personnelRole.getLabel(campaign.getPlayerForce().getFaction().isClan()),
                   personnelRole.ordinal()));
         }
         choiceType.setModel(personTypeModel);

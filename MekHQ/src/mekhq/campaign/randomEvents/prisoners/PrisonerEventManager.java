@@ -763,7 +763,7 @@ public class PrisonerEventManager {
             return campaign.getPlayerForce().getHumanResources()
                          .getSeniorAdminPerson(TRANSPORT,
                                campaign.getCampaignOptions(),
-                               campaign.isClanCampaign(),
+                               campaign.getPlayerForce().isClanForce(),
                                campaign.getLocalDate());
         } else {
             return speaker;

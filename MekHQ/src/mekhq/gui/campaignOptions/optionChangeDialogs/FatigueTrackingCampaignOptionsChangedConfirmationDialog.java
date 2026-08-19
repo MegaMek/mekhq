@@ -188,7 +188,7 @@ public class FatigueTrackingCampaignOptionsChangedConfirmationDialog extends JDi
         RoundedJButton btnConfirm = new RoundedJButton(getTextAt(RESOURCE_BUNDLE,
               "FatigueTrackingCampaignOptionsChangedConfirmationDialog.confirm"));
         btnConfirm.addActionListener(evt -> {
-            processFreeUnit(campaign, campaign.getFaction(), true);
+            processFreeUnit(campaign, campaign.getPlayerForce().getFaction(), true);
             dispose();
         });
 

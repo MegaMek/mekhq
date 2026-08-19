@@ -96,10 +96,10 @@ public final class LocationDisplay {
      */
     public static String getLocationName(ILocation item, Campaign campaign, LocalDate today) {
         if (!item.hasLocationNode()) {
-            return campaign.getName();
+            return campaign.getPlayerForce().getName();
         }
         if (isUnderMainForce(item, campaign)) {
-            return campaign.getName();
+            return campaign.getPlayerForce().getName();
         }
         if (item.getCurrentLocation() instanceof AbstractMobileLocation mobileLocation
                   && mobileLocation.getTransitTime() > 0) {
@@ -114,7 +114,7 @@ public final class LocationDisplay {
         if (campus != null) {
             return campus.getAcademyName();
         }
-        return campaign.getName();
+        return campaign.getPlayerForce().getName();
     }
 
     /**
@@ -246,7 +246,7 @@ public final class LocationDisplay {
                 return formatBaseName(base);
             }
             if (cursor instanceof AcademyCampusLocation campus) {
-                return isCampusAtSystem(campus, destination) ? campus.getAcademyName() : campaign.getName();
+                return isCampusAtSystem(campus, destination) ? campus.getAcademyName() : campaign.getPlayerForce().getName();
             }
         }
         return null;

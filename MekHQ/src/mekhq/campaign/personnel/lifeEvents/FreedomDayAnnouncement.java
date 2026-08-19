@@ -84,7 +84,7 @@ public record FreedomDayAnnouncement(Campaign campaign) {
         this.campaign = campaign;
         Person commander = campaign.getPlayerForce().getHumanResources()
                                  .getCommander(campaign.getCampaignOptions(),
-                                       campaign.isClanCampaign(),
+                                       campaign.getPlayerForce().isClanForce(),
                                        campaign.getLocalDate());
 
         String inCharacterMessage = getInCharacterMessage();

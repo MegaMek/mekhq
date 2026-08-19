@@ -120,7 +120,7 @@ public class RandomEventDialog {
         isUseAgingEffects = campaignOptions.get(CampaignOption.USE_AGE_EFFECTS);
         isUseRandomPersonalities = campaignOptions.get(CampaignOption.USE_RANDOM_PERSONALITIES);
 
-        isClanCampaign = campaign.isClanCampaign();
+        isClanCampaign = campaign.getPlayerForce().isClanForce();
         today = campaign.getLocalDate();
 
         populateActiveParticipantSpecialValues(activeEventParticipant, campaignOptions);

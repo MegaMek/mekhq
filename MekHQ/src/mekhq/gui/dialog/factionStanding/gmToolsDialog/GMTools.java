@@ -116,7 +116,7 @@ public class GMTools extends JDialog {
     public GMTools(JDialog parent, Campaign campaign) {
         this.campaign = campaign;
         this.campaignIcon = campaign.getCampaignFactionIcon();
-        this.campaignFaction = campaign.getFaction();
+        this.campaignFaction = campaign.getPlayerForce().getFaction();
         this.today = campaign.getLocalDate();
         this.gameYear = today.getYear();
         this.factionStandings = campaign.getPlayerForce().getFactionStandings();

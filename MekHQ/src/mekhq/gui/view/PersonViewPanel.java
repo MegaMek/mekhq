@@ -2757,7 +2757,7 @@ public class PersonViewPanel extends JScrollablePanel {
         JLabel lblFame = null;
         int baseFame = person.getFame();
         int adjustedFame = person.getAdjustedFame(campaignOptions.get(CampaignOption.USE_AGE_EFFECTS),
-              campaign.isClanCampaign(),
+              campaign.getPlayerForce().isClanForce(),
               campaign.getLocalDate());
         if (baseFame != 0 || adjustedFame != 0) {
             String adjustment = getTraitAdjustmentIcon(baseFame, adjustedFame);
@@ -2783,7 +2783,7 @@ public class PersonViewPanel extends JScrollablePanel {
         }
 
         JLabel lblLoyalty = null;
-        int loyaltyModifier = person.getLoyaltyModifier(person.getAdjustedLoyalty(campaign.getFaction(),
+        int loyaltyModifier = person.getLoyaltyModifier(person.getAdjustedLoyalty(campaign.getPlayerForce().getFaction(),
               campaignOptions.get(CampaignOption.USE_ALTERNATIVE_ADVANCED_MEDICAL)));
         if ((campaignOptions.get(CampaignOption.USE_LOYALTY_MODIFIERS)) &&
                   (!campaignOptions.get(CampaignOption.USE_HIDE_LOYALTY)) &&

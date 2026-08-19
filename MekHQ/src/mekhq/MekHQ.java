@@ -476,7 +476,7 @@ public class MekHQ implements GameListener {
     }
 
     public void joinGame(Scenario scenario, List<Unit> meks) {
-        ConnectDialog joinGameDialog = new ConnectDialog(campaignGUI.getFrame(), campaignGUI.getCampaign().getName());
+        ConnectDialog joinGameDialog = new ConnectDialog(campaignGUI.getFrame(), campaignGUI.getCampaign().getPlayerForce().getName());
         joinGameDialog.setVisible(true);
 
         if (!joinGameDialog.dataValidation("MegaMek.ConnectDialog.title")) {
@@ -527,7 +527,7 @@ public class MekHQ implements GameListener {
      */
     public void startHost(Scenario scenario, boolean loadSaveGame, List<Unit> meks,
           @Nullable BehaviorSettings autoResolveBehaviorSettings) {
-        HostDialog hostDialog = new HostDialog(campaignGUI.getFrame(), getCampaign().getName());
+        HostDialog hostDialog = new HostDialog(campaignGUI.getFrame(), getCampaign().getPlayerForce().getName());
         hostDialog.setVisible(true);
 
         if (!hostDialog.dataValidation("MegaMek.HostGameAlert.title")) {

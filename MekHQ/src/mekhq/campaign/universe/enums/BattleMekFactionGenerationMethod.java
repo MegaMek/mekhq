@@ -90,7 +90,7 @@ public enum BattleMekFactionGenerationMethod {
           final Faction specifiedFaction) {
         return switch (this) {
             case CAMPAIGN_FACTION -> {
-                yield campaign.getFaction();
+                yield campaign.getPlayerForce().getFaction();
             }
             case SPECIFIED_FACTION -> specifiedFaction;
             default -> person.getOriginFaction();

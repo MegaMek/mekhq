@@ -185,7 +185,7 @@ public class RetirementTableModel extends AbstractTableModel {
         if (data.isEmpty()) {
             return "";
         } else {
-            person = campaign.getPerson(data.get(row));
+            person = campaign.getPlayerForce().getHumanResources().getPerson(data.get(row));
         }
         switch (col) {
             case COL_PERSON:
@@ -383,7 +383,7 @@ public class RetirementTableModel extends AbstractTableModel {
     }
 
     public Person getPerson(int row) {
-        return campaign.getPerson(data.get(row));
+        return campaign.getPlayerForce().getHumanResources().getPerson(data.get(row));
     }
 
     public boolean getPayBonus(UUID id) {

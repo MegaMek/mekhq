@@ -212,12 +212,12 @@ public class ForceViewPanel extends JScrollablePanel {
         String assigned = "";
         String type = null;
 
-        Person commanderPerson = campaign.getPerson(formation.getFormationCommanderID());
+        Person commanderPerson = campaign.getPlayerForce().getHumanResources().getPerson(formation.getFormationCommanderID());
 
         if (formation.getId() == 0) {
             commanderPerson = campaign.getPlayerForce().getHumanResources()
                                     .getCommander(campaign.getCampaignOptions(),
-                                          campaign.isClanCampaign(),
+                                          campaign.getPlayerForce().isClanForce(),
                                           campaign.getLocalDate());
         }
         String commanderName = commanderPerson != null ? commanderPerson.getFullTitle() : "";
@@ -239,7 +239,7 @@ public class ForceViewPanel extends JScrollablePanel {
         }
 
         if (formation.getTechID() != null) {
-            final Person person = campaign.getPerson(formation.getTechID());
+            final Person person = campaign.getPlayerForce().getHumanResources().getPerson(formation.getTechID());
             if (person != null) {
                 lanceTech = person.getFullName();
             }

@@ -113,8 +113,8 @@ public class PersonnelMarketCamOpsRevised extends NewPersonnelMarket {
         Set<Faction> systemFactions = getCurrentSystem().getFactionSet(getToday());
         ArrayList<Faction> interestedFactions = new ArrayList<>();
 
-        if (getCampaign().isClanCampaign()) {
-            interestedFactions.add(getCampaign().getFaction());
+        if (getCampaign().getPlayerForce().isClanForce()) {
+            interestedFactions.add(getCampaign().getPlayerForce().getFaction());
             return interestedFactions;
         }
 
@@ -170,7 +170,7 @@ public class PersonnelMarketCamOpsRevised extends NewPersonnelMarket {
     @Override
     public void generateApplicants() {
         calculateNumberOfRecruitmentRolls();
-        Map<PersonnelRole, PersonnelMarketEntry> unorderedMarketEntries = getCampaign().isClanCampaign() ?
+        Map<PersonnelRole, PersonnelMarketEntry> unorderedMarketEntries = getCampaign().getPlayerForce().isClanForce() ?
                                                                                 getClanMarketEntries() :
                                                                                 getInnerSphereMarketEntries();
         unorderedMarketEntries = sanitizeMarketEntries(unorderedMarketEntries);

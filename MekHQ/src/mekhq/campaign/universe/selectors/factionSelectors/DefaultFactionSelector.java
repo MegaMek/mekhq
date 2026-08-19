@@ -80,6 +80,6 @@ public class DefaultFactionSelector extends AbstractFactionSelector {
 
     @Override
     public @Nullable Faction selectFaction(final Campaign campaign) {
-        if ((getFaction() == null)) {return campaign.getFaction();} else {return getFaction();}
+        if ((getFaction() == null)) {return campaign.getPlayerForce().getFaction();} else {return getFaction();}
     }
 }

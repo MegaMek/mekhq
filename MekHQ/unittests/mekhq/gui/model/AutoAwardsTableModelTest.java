@@ -61,7 +61,7 @@ class AutoAwardsTableModelTest {
 
         UUID personId = UUID.randomUUID();
         Person person = mock(Person.class);
-        when(campaign.getPerson(personId)).thenReturn(person);
+        when(campaign.getPlayerForce().getHumanResources().getPerson(personId)).thenReturn(person);
 
         Award award = new Award("Test Award", "Test Set", "Award description", "Group", List.of(), List.of(),
               List.of(), 10, 1, false, 0, "", "", "", 1);

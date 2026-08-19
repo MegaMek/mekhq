@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2024-2025 The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2024-2026 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -235,7 +235,7 @@ public class FameAndInfamyController {
      */
     @Deprecated(since = "0.50.07", forRemoval = true)
     public static void parseFromXML(final NodeList nodeList, Campaign campaign) {
-        FameAndInfamyController fameAndInfamy = campaign.getFameAndInfamy();
+        FameAndInfamyController fameAndInfamy = null;
         try {
             for (int x = 0; x < nodeList.getLength(); x++) {
                 final Node workingNode = nodeList.item(x);

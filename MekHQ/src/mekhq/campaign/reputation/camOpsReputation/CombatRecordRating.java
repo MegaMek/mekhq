@@ -69,7 +69,7 @@ public class CombatRecordRating {
         // immediately,
         // CamOps says pirates don't track combat record rating, but we still want these
         // values for use elsewhere
-        if (campaign.getFaction().isPirate()) {
+        if (campaign.getPlayerForce().getFaction().isPirate()) {
             combatRecord.put("partialSuccesses", 0);
             combatRecord.put("successes", 0);
             combatRecord.put("failures", 0);

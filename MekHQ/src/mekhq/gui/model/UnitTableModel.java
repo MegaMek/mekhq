@@ -226,7 +226,7 @@ public class UnitTableModel extends DataTableModel<Unit> {
         List<String> reports = new ArrayList<>();
 
         Campaign campaign = unit.getCampaign();
-        boolean isClanCampaign = campaign != null && campaign.isClanCampaign();
+        boolean isClanCampaign = campaign != null && campaign.getPlayerForce().isClanForce();
 
         // Check if driver and gunner use the same role (e.g., VEHICLE_CREW_GROUND)
         PersonnelRole driverRole = unit.getDriverRole();

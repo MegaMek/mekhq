@@ -125,7 +125,7 @@ public class PersonnelReport extends AbstractReport {
         for (PersonnelRole role : personnelRoles) {
             if (role.isCombat()) {
                 sb.append(String.format("    %-30s    %4s\n",
-                      role.getLabel(getCampaign().getFaction().isClan()),
+                      role.getLabel(getCampaign().getPlayerForce().getFaction().isClan()),
                       countPersonByType[role.ordinal()]));
             }
         }
@@ -143,7 +143,7 @@ public class PersonnelReport extends AbstractReport {
                         String labelKey = "combat.temp." + role.name().toLowerCase() + ".text";
                         String label;
                         if (resources.containsKey(labelKey)) {label = resources.getString(labelKey);} else {
-                            label = "Temp " + role.getLabel(getCampaign().getFaction().isClan());
+                            label = "Temp " + role.getLabel(getCampaign().getPlayerForce().getFaction().isClan());
                         }
                         sb.append(String.format("    %-30s    %4s\n", label, poolSize));
                     }
@@ -256,7 +256,7 @@ public class PersonnelReport extends AbstractReport {
         for (PersonnelRole role : personnelRoles) {
             if (role.isSupport(true)) {
                 sb.append(String.format("    %-30s       %4s\n",
-                      role.getLabel(getCampaign().getFaction().isClan()),
+                      role.getLabel(getCampaign().getPlayerForce().getFaction().isClan()),
                       countPersonByType[role.ordinal()]));
             }
         }
@@ -343,7 +343,7 @@ public class PersonnelReport extends AbstractReport {
         {
             if (role.isSupport(true) && value >= 0) {
                 sb.append(String.format("    %-30s       %4s\n",
-                      role.getLabel(getCampaign().getFaction().isClan()),
+                      role.getLabel(getCampaign().getPlayerForce().getFaction().isClan()),
                       value));
             }
         });
@@ -374,7 +374,7 @@ public class PersonnelReport extends AbstractReport {
         {
             if (role.isCombat() && value >= 0) {
                 sb.append(String.format("    %-30s    %4s\n",
-                      role.getLabel(getCampaign().getFaction().isClan()),
+                      role.getLabel(getCampaign().getPlayerForce().getFaction().isClan()),
                       value));
             }
         });

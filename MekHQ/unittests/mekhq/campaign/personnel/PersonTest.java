@@ -1443,7 +1443,7 @@ public class PersonTest {
         secondInCommand.setSecondInCommand(true);
         when(mockCampaign.getPlayerForce().getHumanResources()
                    .getSecondInCommand(mockCampaign.getCampaignOptions(),
-                         mockCampaign.isClanCampaign(),
+                         mockCampaign.getPlayerForce().isClanForce(),
                          mockCampaign.getLocalDate())).thenReturn(secondInCommand);
 
         Person person = new Person(mockCampaign);
@@ -2011,7 +2011,7 @@ public class PersonTest {
 
                 when(campaign.getCampaignOptions()).thenReturn(options);
                 when(options.get(CampaignOption.USE_AGE_EFFECTS)).thenReturn(true);
-                when(campaign.isClanCampaign()).thenReturn(false);
+                when(campaign.getPlayerForce().isClanForce()).thenReturn(false);
                 when(campaign.getLocalDate()).thenReturn(date);
 
                 SkillCheck check = person.checkSkill(SkillType.S_GUN_MEK, campaign);
@@ -2020,7 +2020,7 @@ public class PersonTest {
                 assertEquals(3, check.getTargetNumber().getValue());
                 verify(campaign).getCampaignOptions();
                 verify(options).get(CampaignOption.USE_AGE_EFFECTS);
-                verify(campaign).isClanCampaign();
+                verify(campaign).getPlayerForce().isClanForce();
                 verify(campaign).getLocalDate();
             }
         }

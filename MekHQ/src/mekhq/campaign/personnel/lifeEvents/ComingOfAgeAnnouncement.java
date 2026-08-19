@@ -181,7 +181,7 @@ public class ComingOfAgeAnnouncement {
         Genealogy genealogy = birthdayHaver.getGenealogy();
         Person commander = campaign.getPlayerForce().getHumanResources()
                                  .getCommander(campaign.getCampaignOptions(),
-                                       campaign.isClanCampaign(),
+                                       campaign.getPlayerForce().isClanForce(),
                                        campaign.getLocalDate());
 
         if (genealogy == null) {
@@ -247,14 +247,14 @@ public class ComingOfAgeAnnouncement {
         Person speaker = campaign.getPlayerForce().getHumanResources()
                                .getSeniorAdminPerson(mekhq.campaign.Campaign.AdministratorSpecialization.HR,
                                      campaign.getCampaignOptions(),
-                                     campaign.isClanCampaign(),
+                                     campaign.getPlayerForce().isClanForce(),
                                      campaign.getLocalDate());
 
         if (speaker == null) {
             speaker = campaign.getPlayerForce().getHumanResources()
                             .getSeniorAdminPerson(mekhq.campaign.Campaign.AdministratorSpecialization.COMMAND,
                                   campaign.getCampaignOptions(),
-                                  campaign.isClanCampaign(),
+                                  campaign.getPlayerForce().isClanForce(),
                                   campaign.getLocalDate());
         } else {
             return speaker;

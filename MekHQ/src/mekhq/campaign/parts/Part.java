@@ -616,7 +616,7 @@ public abstract class Part implements IPartWork, ITechnology, ILocatable {
      * @return TechConstants tech level
      */
     public int getTechLevel() {
-        return getSimpleTechLevel().getCompoundTechLevel(campaign.getFaction().isClan());
+        return getSimpleTechLevel().getCompoundTechLevel(campaign.getPlayerForce().getFaction().isClan());
     }
 
     public SimpleTechLevel getSimpleTechLevel() {
@@ -2043,10 +2043,10 @@ public abstract class Part implements IPartWork, ITechnology, ILocatable {
     @Override
     public AvailabilityValue calcYearAvailability(int year, boolean clan) {
         AvailabilityValue av = getTechAdvancement().calcYearAvailability(campaign.getGameYear(),
-              campaign.getFaction().isClan());
+              campaign.getPlayerForce().getFaction().isClan());
         if (omniPodded) {
             AvailabilityValue podRating = TA_POD.calcYearAvailability(campaign.getGameYear(),
-                  campaign.getFaction().isClan());
+                  campaign.getPlayerForce().getFaction().isClan());
             if (podRating.isBetterThan(av)) {
                 av = podRating;
             }

@@ -75,7 +75,7 @@ public class ContractAwards {
               "diversionary raid", "objective raid", "recon raid", "extraction raid");
 
         for (Award award : awards) {
-            if (award.canBeAwarded(campaign.getPerson(person))) {
+            if (award.canBeAwarded(campaign.getPlayerForce().getHumanResources().getPerson(person))) {
                 if (award.getRange().equalsIgnoreCase("months")) {
                     try {
                         int requiredDuration = award.getQty();

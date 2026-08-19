@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2022-2025 The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2022-2026 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -686,7 +686,7 @@ class PersonnelRoleTest {
     void testRoleEligibility(PersonnelRole role) {
         // Setup
         Campaign mockCampaign = mockCampaign();
-        when(mockCampaign.getFaction()).thenReturn(Factions.getInstance().getFaction("MERC"));
+        when(mockCampaign.getPlayerForce().getFaction()).thenReturn(Factions.getInstance().getFaction("MERC"));
 
         Person person = new Person(mockCampaign);
 
@@ -746,7 +746,7 @@ class PersonnelRoleTest {
     @MethodSource(value = "seventeenToEighteenYearsOld")
     void testAdultEntertain_ageLimit(int daysOld) {
         Campaign mockCampaign = mockCampaign();
-        when(mockCampaign.getFaction()).thenReturn(Factions.getInstance().getFaction("MERC"));
+        when(mockCampaign.getPlayerForce().getFaction()).thenReturn(Factions.getInstance().getFaction("MERC"));
 
         LocalDate today = LocalDate.of(3000, 1, 1);
         when(mockCampaign.getLocalDate()).thenReturn(today);
@@ -783,7 +783,7 @@ class PersonnelRoleTest {
     @Test
     void testAdultEntertainer_atAgeLimit() {
         Campaign mockCampaign = mockCampaign();
-        when(mockCampaign.getFaction()).thenReturn(Factions.getInstance().getFaction("MERC"));
+        when(mockCampaign.getPlayerForce().getFaction()).thenReturn(Factions.getInstance().getFaction("MERC"));
 
         LocalDate today = LocalDate.of(3030, 1, 1);
         when(mockCampaign.getLocalDate()).thenReturn(today.minusYears(19));
@@ -814,7 +814,7 @@ class PersonnelRoleTest {
     @MethodSource(value = "seventeenToEighteenYearsOld")
     void testLuxuryCompanion_ageLimit(int daysOld) {
         Campaign mockCampaign = mockCampaign();
-        when(mockCampaign.getFaction()).thenReturn(Factions.getInstance().getFaction("MERC"));
+        when(mockCampaign.getPlayerForce().getFaction()).thenReturn(Factions.getInstance().getFaction("MERC"));
 
         LocalDate today = LocalDate.of(3000, 1, 1);
         when(mockCampaign.getLocalDate()).thenReturn(today);
@@ -836,7 +836,7 @@ class PersonnelRoleTest {
     @Test
     void testLuxuryCompanion_atAgeLimit() {
         Campaign mockCampaign = mockCampaign();
-        when(mockCampaign.getFaction()).thenReturn(Factions.getInstance().getFaction("MERC"));
+        when(mockCampaign.getPlayerForce().getFaction()).thenReturn(Factions.getInstance().getFaction("MERC"));
 
         LocalDate today = LocalDate.of(3030, 1, 1);
         when(mockCampaign.getLocalDate()).thenReturn(today.minusYears(19));

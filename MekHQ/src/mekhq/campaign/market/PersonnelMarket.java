@@ -144,11 +144,11 @@ public class PersonnelMarket {
      *                 current planetary system, date, settings, factions, and more.
      */
     public void generatePersonnelForDay(Campaign campaign) {
-        PlanetarySystem location = campaign.getCurrentLocation().getCurrentSystem();
+        PlanetarySystem location = campaign.getPlayerForce().getForceDetachment().getCurrentLocation().getCurrentSystem();
         LocalDate today = campaign.getLocalDate();
 
         // Determine conditions
-        boolean isOnPlanet = campaign.getCurrentLocation().isOnPlanet();
+        boolean isOnPlanet = campaign.getPlayerForce().getForceDetachment().getCurrentLocation().isOnPlanet();
         boolean useCapitalsHiringHallsOnly = campaign.getCampaignOptions().get(CampaignOption.USE_PERSONNEL_HIRE_HIRING_HALL_ONLY);
         boolean isHiringHall = location.isHiringHall(today);
         boolean isCapital = location.getFactionSet(today)
@@ -557,7 +557,7 @@ public class PersonnelMarket {
                                       .findBestInRole(mekhq.campaign.personnel.enums.PersonnelRole.ADMINISTRATOR_LOGISTICS,
                                             mekhq.campaign.personnel.skills.SkillType.S_ADMIN,
                                             campaign.getCampaignOptions(),
-                                            campaign.isClanCampaign(),
+                                            campaign.getPlayerForce().isClanForce(),
                                             campaign.getLocalDate());
 
         int experienceLevel = EXP_ULTRA_GREEN;

@@ -448,7 +448,7 @@ public class Maintenance {
         }
 
         if (campaignOptions.get(CampaignOption.USE_ERA_MODS)) {
-            target.addModifier(campaign.getFaction().getEraMod(campaign.getGameYear()), "era");
+            target.addModifier(campaign.getPlayerForce().getFaction().getEraMod(campaign.getGameYear()), "era");
         }
 
         if (partUnit != null && partUnit.getSite() < SITE_FACILITY_BASIC) {
@@ -587,7 +587,7 @@ public class Maintenance {
                                       .getHumanResources()
                                       .getTechsExpanded(campaign.getPlayerForce().getHangar().getUnits(),
                                             campaign.getCampaignOptions(),
-                                            campaign.isClanCampaign(),
+                                            campaign.getPlayerForce().isClanForce(),
                                             campaign.getLocalDate());
         for (Person tech : allTechs) {
             int dailyWorkMinutes = tech.getDailyAvailableTechTime(techsUseAdmin);

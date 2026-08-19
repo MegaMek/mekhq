@@ -172,7 +172,7 @@ public class PityContracts {
      * @since 0.51.0
      */
     static void updateEnemyFaction(Campaign campaign, AtBContract contract) {
-        String enemyCode = campaign.isClanCampaign() ? BANDIT_CASTE_FACTION_CODE : PIRATE_FACTION_CODE;
+        String enemyCode = campaign.getPlayerForce().isClanForce() ? BANDIT_CASTE_FACTION_CODE : PIRATE_FACTION_CODE;
 
         contract.setEnemyCode(enemyCode);
         contract.updateEnemy(campaign, campaign.getLocalDate(), enemyCode);

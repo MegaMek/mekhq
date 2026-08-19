@@ -720,7 +720,7 @@ public final class WarehouseTab extends CampaignGuiTab implements ITechWorkPanel
                                  .getHumanResources()
                                  .getTechs(campaign.getPlayerForce().getHangar().getUnits(),
                                        campaign.getCampaignOptions(),
-                                       campaign.isClanCampaign(),
+                                       campaign.getPlayerForce().isClanForce(),
                                        campaign.getLocalDate(),
                                        true));
         refreshAsTechPool();

@@ -1802,7 +1802,7 @@ public class Refit extends Part implements IAcquisitionWork {
         String fileName = MHQXMLUtility.escape(unitName).replace("/", "_").replace("\\", "_");
         String sCustomsDir = String.join(File.separator, "data", "mekfiles", "customs"); // TODO : Remove inline file
         // path
-        String sCustomsDirCampaign = sCustomsDir + File.separator + getCampaign().getName();
+        String sCustomsDirCampaign = sCustomsDir + File.separator + getCampaign().getPlayerForce().getName();
         File customsDir = new File(sCustomsDir);
         if (!customsDir.exists()) {
             if (!customsDir.mkdir()) {

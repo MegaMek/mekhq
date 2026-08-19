@@ -415,7 +415,7 @@ public class DataLoadingDialog extends AbstractMHQDialogBasic implements Propert
                 CampaignOptions campaignOptions = campaign.getCampaignOptions();
                 if (campaignOptions.get(CampaignOption.TRACK_FACTION_STANDING)) {
                     FactionStandings factionStandings = campaign.getPlayerForce().getFactionStandings();
-                    String report = factionStandings.updateClimateRegard(campaign.getFaction(),
+                    String report = factionStandings.updateClimateRegard(campaign.getPlayerForce().getFaction(),
                           campaign.getLocalDate(), campaignOptions.get(CampaignOption.REGARD_MULTIPLIER),
                           true);
                     campaign.addReport(POLITICS, report);
@@ -585,14 +585,14 @@ public class DataLoadingDialog extends AbstractMHQDialogBasic implements Propert
          * @param units The {@link Collection} of {@link Unit} instances to process. Must not be {@code null}.
          */
         private static void showRarePersonnelDialog(Campaign campaign, boolean isCampaignStart) {
-            if (!campaign.getNewPersonnelMarket().getHasRarePersonnel()) {
+            if (!campaign.getPlayerForce().getHumanResources().getNewPersonnelMarket().getHasRarePersonnel()) {
                 return;
             }
 
             StringBuilder oocReport = new StringBuilder(
                   campaign.getResources().getString("personnelMarket.rareProfession.outOfCharacter"));
-            for (PersonnelRole profession : campaign.getNewPersonnelMarket().getRareProfessions()) {
-                oocReport.append("<p>- ").append(profession.getLabel(campaign.isClanCampaign())).append("</p>");
+            for (PersonnelRole profession : campaign.getPlayerForce().getHumanResources().getNewPersonnelMarket().getRareProfessions()) {
+                oocReport.append("<p>- ").append(profession.getLabel(campaign.getPlayerForce().isClanForce())).append("</p>");
             }
 
             List<String> buttons = new ArrayList<>();
@@ -603,7 +603,7 @@ public class DataLoadingDialog extends AbstractMHQDialogBasic implements Propert
             }
 
             ImmersiveDialogSimple dialog = new ImmersiveDialogSimple(campaign,
-                  campaign.getSeniorAdminPerson(AdministratorSpecialization.HR),
+                  campaign.getPlayerForce().getHumanResources() .getSeniorAdminPerson(AdministratorSpecialization.HR, campaign.getCampaignOptions(), campaign.getPlayerForce().isClanForce(), campaign.getLocalDate()),
                   null,
                   campaign.getResources().getString("personnelMarket.rareProfession.inCharacter"),
                   buttons,
@@ -612,7 +612,7 @@ public class DataLoadingDialog extends AbstractMHQDialogBasic implements Propert
                   true);
 
             if (dialog.getDialogChoice() == 2) {
-                campaign.getNewPersonnelMarket().showPersonnelMarketDialog();
+                campaign.getPlayerForce().getHumanResources().getNewPersonnelMarket().showPersonnelMarketDialog();
             }
         }
 

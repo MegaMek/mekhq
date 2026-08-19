@@ -455,7 +455,7 @@ public class AtBDynamicScenario extends AtBScenario {
                   commander.hasSkill(skillType)) {
             SkillModifierData skillModifierData = commander.getSkillModifierData(campaign.getCampaignOptions()
                                                                                        .get(CampaignOption.USE_AGE_EFFECTS),
-                  campaign.isClanCampaign(), campaign.getLocalDate());
+                  campaign.getPlayerForce().isClanForce(), campaign.getLocalDate());
             skillValue = commander.getSkill(skillType).getTotalSkillLevel(skillModifierData);
         }
 

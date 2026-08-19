@@ -127,7 +127,7 @@ public class CamOpsContractMarket extends AbstractContractMarket {
         Person negotiator = campaign.getPlayerForce().getHumanResources()
                                   .getSeniorAdminPerson(Campaign.AdministratorSpecialization.COMMAND,
                                         campaign.getCampaignOptions(),
-                                        campaign.isClanCampaign(),
+                                        campaign.getPlayerForce().isClanForce(),
                                         campaign.getLocalDate());
         int negotiatorModifier = 0;
         if (negotiator != null) {
@@ -207,10 +207,10 @@ public class CamOpsContractMarket extends AbstractContractMarket {
 
     private HiringHallModifiers getHiringHallModifiers(Campaign campaign) {
         HiringHallModifiers modifiers;
-        if (campaign.getFaction().isMercenary()) {
+        if (campaign.getPlayerForce().getFaction().isMercenary()) {
             modifiers = new HiringHallModifiers(campaign.getSystemHiringHallLevel());
         } else {
-            if (campaign.getFaction().isGovernment()) {
+            if (campaign.getPlayerForce().getFaction().isGovernment()) {
                 modifiers = new HiringHallModifiers(HiringHallLevel.GREAT);
             } else {
                 modifiers = new HiringHallModifiers(HiringHallLevel.NONE);
@@ -224,14 +224,14 @@ public class CamOpsContractMarket extends AbstractContractMarket {
         Person negotiator = campaign.getPlayerForce().getHumanResources()
                                   .findBestAtSkill(mekhq.campaign.personnel.skills.SkillType.S_NEGOTIATION,
                                         campaign.getCampaignOptions(),
-                                        campaign.isClanCampaign(),
+                                        campaign.getPlayerForce().isClanForce(),
                                         campaign.getLocalDate());
         if (negotiator == null) {
             return 0;
         }
         return negotiator.getSkillLevel(S_NEGOTIATION,
               campaign.getCampaignOptions().get(CampaignOption.USE_AGE_EFFECTS),
-              campaign.isClanCampaign(),
+              campaign.getPlayerForce().isClanForce(),
               campaign.getLocalDate());
     }
 
@@ -382,7 +382,7 @@ public class CamOpsContractMarket extends AbstractContractMarket {
         for (Faction faction : factions) {
             // Clans only hire units within their own clan
             if (faction.isClan()) {
-                if (!faction.equals(campaign.getFaction())) {
+                if (!faction.equals(campaign.getPlayerForce().getFaction())) {
                     continue;
                 }
             }
@@ -452,12 +452,12 @@ public class CamOpsContractMarket extends AbstractContractMarket {
     }
 
     private ContractObjectiveType determineMission(Campaign campaign, Faction employer, int ratingMod) {
-        if (campaign.getFaction().isPirate()) {
+        if (campaign.getPlayerForce().getFaction().isPirate()) {
             return MissionSelector.getPirateMission(Compute.d6(2), 0);
         }
         int margin = rollNegotiation(findNegotiationSkill(campaign),
               ratingMod + getHiringHallModifiers(campaign).missionsMod) - BASE_NEGOTIATION_TARGET;
-        boolean isClan = campaign.getFaction().isClan();
+        boolean isClan = campaign.getPlayerForce().getFaction().isClan();
         if (employer.isInnerSphere() || employer.isClan()) {
             return MissionSelector.getInnerSphereClanMission(Compute.d6(2), margin, isClan);
         } else if (employer.isIndependent() || employer.isPlanetaryGovt()) {

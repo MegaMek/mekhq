@@ -624,13 +624,13 @@ public class PersonnelMarketDialog extends JDialog {
      * @since 0.50.06
      */
     private void setDialogTitle() {
-        Faction campaignFaction = campaign.getFaction();
+        Faction campaignFaction = campaign.getPlayerForce().getFaction();
         if (campaignFaction.isClan()) {
             setTitle(getTextAt(RESOURCE_BUNDLE, "title.personnelMarket.clan"));
         } else if (campaignFaction.isComStarOrWoB()) {
             Person commander = campaign.getPlayerForce().getHumanResources()
                                      .getCommander(campaign.getCampaignOptions(),
-                                           campaign.isClanCampaign(),
+                                           campaign.getPlayerForce().isClanForce(),
                                            campaign.getLocalDate());
             String address = commander != null ? commander.getTitleAndSurname() : campaign.getCommanderAddress(false);
             setTitle(getFormattedTextAt(RESOURCE_BUNDLE,

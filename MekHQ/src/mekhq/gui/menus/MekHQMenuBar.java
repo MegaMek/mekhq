@@ -348,7 +348,7 @@ public class MekHQMenuBar extends JMenuBar {
             try {
                 exportPlanets(FileType.XML,
                       getTextAt("dlgSavePlanetsXML.text"),
-                      getCampaign().getName() +
+                      getCampaign().getPlayerForce().getName() +
                             getCampaign().getLocalDate()
                                   .format(DateTimeFormatter.ofPattern(MHQConstants.FILENAME_DATE_FORMAT)
                                                 .withLocale(MekHQ.getMHQOptions().getDateLocale())) +
@@ -456,14 +456,14 @@ public class MekHQMenuBar extends JMenuBar {
         JMenu menuSupportRecruitment = new JMenu(getTextAt("menuRecruitment.support"));
         JMenu menuCivilianRecruitment = new JMenu(getTextAt("menuRecruitment.civilian"));
 
-        PersonnelRole[] roles = PersonnelRole.getValuesSortedAlphabetically(getCampaign().isClanCampaign());
+        PersonnelRole[] roles = PersonnelRole.getValuesSortedAlphabetically(getCampaign().getPlayerForce().isClanForce());
         for (PersonnelRole role : roles) {
-            JMenuItem miRoleRecruitment = new JMenuItem(role.getLabel(getCampaign().getFaction().isClan()));
+            JMenuItem miRoleRecruitment = new JMenuItem(role.getLabel(getCampaign().getPlayerForce().getFaction().isClan()));
             if (role.getMnemonic() != KeyEvent.VK_UNDEFINED) {
                 miRoleRecruitment.setMnemonic(role.getMnemonic());
             }
 
-            miRoleRecruitment.setToolTipText(role.getDescription(getCampaign().isClanCampaign()));
+            miRoleRecruitment.setToolTipText(role.getDescription(getCampaign().getPlayerForce().isClanForce()));
             miRoleRecruitment.setActionCommand(role.name());
             miRoleRecruitment.addActionListener(this::hirePerson);
 
@@ -1057,7 +1057,7 @@ public class MekHQMenuBar extends JMenuBar {
         getCampaign().initTurnover();
 
         if (factionIntroDate != newOptions.get(CampaignOption.FACTION_INTRO_DATE)) {
-            getCampaign().updateTechFactionCode();
+            getCampaign().getPlayerForce().updateTechFactionCode();
         }
         getGui().refreshWindowTitle();
         getCampaign().reloadNews();

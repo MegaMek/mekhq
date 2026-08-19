@@ -119,21 +119,21 @@ public class ContractSummaryPanel extends JPanel {
                 commandNegotiator = campaign.getPlayerForce().getHumanResources()
                                           .getSeniorAdminPerson(Campaign.AdministratorSpecialization.COMMAND,
                                                 campaign.getCampaignOptions(),
-                                                campaign.isClanCampaign(),
+                                                campaign.getPlayerForce().isClanForce(),
                                                 campaign.getLocalDate());
                 cmdRerolls = (commandNegotiator == null ||
                                     commandNegotiator.getSkill(SkillType.S_NEGOTIATION) == null) ? 0 : 1;
                 logisticsNegotiator = campaign.getPlayerForce().getHumanResources()
                                             .getSeniorAdminPerson(Campaign.AdministratorSpecialization.LOGISTICS,
                                                   campaign.getCampaignOptions(),
-                                                  campaign.isClanCampaign(),
+                                                  campaign.getPlayerForce().isClanForce(),
                                                   campaign.getLocalDate());
                 logRerolls = (logisticsNegotiator == null ||
                                     logisticsNegotiator.getSkill(SkillType.S_NEGOTIATION) == null) ? 0 : 1;
                 transportNegotiator = campaign.getPlayerForce().getHumanResources()
                                             .getSeniorAdminPerson(Campaign.AdministratorSpecialization.TRANSPORT,
                                                   campaign.getCampaignOptions(),
-                                                  campaign.isClanCampaign(),
+                                                  campaign.getPlayerForce().isClanForce(),
                                                   campaign.getLocalDate());
                 tranRerolls = (transportNegotiator == null ||
                                      transportNegotiator.getSkill(SkillType.S_NEGOTIATION) == null) ? 0 : 1;

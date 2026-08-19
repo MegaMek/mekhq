@@ -221,7 +221,7 @@ public abstract class AbstractUnitMarket {
     public String addSingleUnit(final Campaign campaign, final UnitMarketType market, final int unitType,
           final MekSummary mekSummary, final int percent) {
 
-        Faction campaignFaction = campaign.getFaction();
+        Faction campaignFaction = campaign.getPlayerForce().getFaction();
         LocalDate currentDate = campaign.getLocalDate();
 
         if (!campaignFaction.isClan()) {

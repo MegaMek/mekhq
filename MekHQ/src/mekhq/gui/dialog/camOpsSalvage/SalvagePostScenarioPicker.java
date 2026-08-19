@@ -419,7 +419,7 @@ public class SalvagePostScenarioPicker {
     private void setAvailableTechTime(Campaign campaign, Scenario scenario) {
         List<UUID> assignedTechIds = scenario.getSalvageTechs();
         for (UUID techId : assignedTechIds) {
-            Person tech = campaign.getPerson(techId);
+            Person tech = campaign.getPlayerForce().getHumanResources().getPerson(techId);
             if (tech == null) {
                 LOGGER.error("Salvage tech {} not found in campaign", techId);
                 continue;

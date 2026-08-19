@@ -384,7 +384,7 @@ public class CampaignExportWizard extends JDialog {
             }
 
             if (formation.getTechID() != null) {
-                personList.setSelectedValue(sourceCampaign.getPerson(formation.getTechID()), false);
+                personList.setSelectedValue(sourceCampaign.getPlayerForce().getHumanResources().getPerson(formation.getTechID()), false);
                 selectedIndices.add(personList.getSelectedIndex());
             }
         }
@@ -526,9 +526,9 @@ public class CampaignExportWizard extends JDialog {
         }
 
         if (chkExportState.isSelected()) {
-            final Faction faction = sourceCampaign.getFaction();
+            final Faction faction = sourceCampaign.getPlayerForce().getFaction();
             destinationCampaign.getPlayerForce().setFaction(faction);
-            final Camouflage camouflage = sourceCampaign.getCamouflage().clone();
+            final Camouflage camouflage = sourceCampaign.getPlayerForce().getCamouflage().clone();
             destinationCampaign.getPlayerForce().setCamouflage(camouflage);
             destinationCampaign.setLocalDate(sourceCampaign.getLocalDate());
             destinationCampaign.setLocation(sourceCampaign.getPlayerForce().getForceDetachment().getCurrentLocation());
@@ -553,7 +553,7 @@ public class CampaignExportWizard extends JDialog {
             if (money > 0) {
                 destinationCampaign.addFunds(TransactionType.STARTING_CAPITAL,
                       Money.of(money),
-                      String.format("Transfer from %s", sourceCampaign.getName()));
+                      String.format("Transfer from %s", sourceCampaign.getPlayerForce().getName()));
             }
         } catch (NumberFormatException ex) {
             JOptionPane.showMessageDialog(this,

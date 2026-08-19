@@ -78,17 +78,17 @@ public class TimeAwards {
                 continue;
             }
 
-            if (award.canBeAwarded(campaign.getPerson(person))) {
+            if (award.canBeAwarded(campaign.getPlayerForce().getHumanResources().getPerson(person))) {
                 try {
-                    yearsOfService = campaign.getPerson(person).getYearsInService(campaign);
+                    yearsOfService = campaign.getPlayerForce().getHumanResources().getPerson(person).getYearsInService(campaign);
                 } catch (Exception e) {
                     LOGGER.error("Unable to parse yearsOfService for {} while processing Award {} from the [{}] set.",
-                          campaign.getPerson(person).getFullName(), award.getName(), award.getSet());
+                          campaign.getPlayerForce().getHumanResources().getPerson(person).getFullName(), award.getName(), award.getSet());
                     continue;
                 }
 
                 if (isCumulative) {
-                    requiredYearsOfService *= campaign.getPerson(person).getAwardController().getNumberOfAwards(award)
+                    requiredYearsOfService *= campaign.getPlayerForce().getHumanResources().getPerson(person).getAwardController().getNumberOfAwards(award)
                                                     + 1;
                 }
 

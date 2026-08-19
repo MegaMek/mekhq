@@ -2042,8 +2042,8 @@ public class CustomizePersonDialog extends JDialog implements DialogOptionListen
 
     private void randomBloodname() {
         Faction faction;
-        if (campaign.getFaction().isClan()) {
-            faction = campaign.getFaction();
+        if (campaign.getPlayerForce().getFaction().isClan()) {
+            faction = campaign.getPlayerForce().getFaction();
         } else {
             faction = (mekhq.campaign.universe.Faction) choiceFaction.getSelectedItem();
         }
@@ -2075,7 +2075,7 @@ public class CustomizePersonDialog extends JDialog implements DialogOptionListen
         constraints.gridx = 0;
 
         SkillModifierData skillModifierData = person.getSkillModifierData(
-              campaign.getCampaignOptions().get(CampaignOption.USE_AGE_EFFECTS), campaign.isClanCampaign(), campaign.getLocalDate(),
+              campaign.getCampaignOptions().get(CampaignOption.USE_AGE_EFFECTS), campaign.getPlayerForce().isClanForce(), campaign.getLocalDate(),
               true);
 
         List<String> sortedSkillNames = getSortedSkills();
@@ -2337,7 +2337,7 @@ public class CustomizePersonDialog extends JDialog implements DialogOptionListen
             return;
         }
 
-        boolean isClanCampaign = campaign.isClanCampaign();
+        boolean isClanCampaign = campaign.getPlayerForce().isClanForce();
         boolean isUseAgeEffects = campaign.getCampaignOptions().get(CampaignOption.USE_AGE_EFFECTS);
         LocalDate today = campaign.getLocalDate();
 

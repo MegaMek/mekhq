@@ -67,7 +67,7 @@ class RandomDependentsTest {
         when(mockCampaign.getPlayerForce().getHangar()).thenReturn(mockHangar);
         when(mockCampaign.getPlayerForce().getWarehouse()).thenReturn(mockWarehouse);
         when(campaignFaction.isMercenary()).thenReturn(true);
-        when(mockCampaign.getFaction()).thenReturn(campaignFaction);
+        when(mockCampaign.getPlayerForce().getFaction()).thenReturn(campaignFaction);
         when(campaignFaction.getShortName()).thenReturn("MERC");
 
         CampaignOptions mockCampaignOptions = mock(CampaignOptions.class);
@@ -114,7 +114,7 @@ class RandomDependentsTest {
         Campaign mockCampaign = mockCampaign();
         Faction campaignFaction = mock(Faction.class);
         when(campaignFaction.isMercenary()).thenReturn(true);
-        when(mockCampaign.getFaction()).thenReturn(campaignFaction);
+        when(mockCampaign.getPlayerForce().getFaction()).thenReturn(campaignFaction);
         when(campaignFaction.getShortName()).thenReturn("MERC");
 
         CampaignOptions mockCampaignOptions = mock(CampaignOptions.class);

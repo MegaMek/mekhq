@@ -130,7 +130,7 @@ public class QuickTrainDialog extends ImmersiveDialogCore {
               campaign.getPlayerForce().getHumanResources()
                     .getSeniorAdminPerson(mekhq.campaign.Campaign.AdministratorSpecialization.HR,
                           campaign.getCampaignOptions(),
-                          campaign.isClanCampaign(),
+                          campaign.getPlayerForce().isClanForce(),
                           campaign.getLocalDate()),
               null,
               getCenterMessage(campaign.getCommanderAddress(), isNobodySelected),

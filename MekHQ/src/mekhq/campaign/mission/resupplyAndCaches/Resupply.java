@@ -562,7 +562,7 @@ public class Resupply {
     private Map<Part, PartDetails> collectParts() {
         Set<PartInUse> partsInUse = collectPartsInUseAcrossLocations();
 
-        Faction campaignFaction = campaign.getFaction();
+        Faction campaignFaction = campaign.getPlayerForce().getFaction();
         LocalDate today = campaign.getLocalDate();
         boolean removeClan = !campaignFaction.isClan() && today.isBefore(BATTLE_OF_TUKAYYID);
 
@@ -839,7 +839,7 @@ public class Resupply {
         if (contract.getContractType().isGuerrillaType() || PIRATE_FACTION_CODE.equals(contract.getEmployerCode())) {
             negotiator = campaign.getPlayerForce().getHumanResources()
                                .getCommander(campaign.getCampaignOptions(),
-                                     campaign.isClanCampaign(),
+                                     campaign.getPlayerForce().isClanForce(),
                                      campaign.getLocalDate());
         } else {
             negotiator = null;
@@ -860,7 +860,7 @@ public class Resupply {
             if (skill != null) {
                 SkillModifierData skillModifierData = negotiator.getSkillModifierData(campaign.getCampaignOptions()
                                                                                             .get(CampaignOption.USE_AGE_EFFECTS),
-                      campaign.isClanCampaign(), campaign.getLocalDate());
+                      campaign.getPlayerForce().isClanForce(), campaign.getLocalDate());
                 int skillLevel = skill.getFinalSkillValue(skillModifierData);
                 negotiatorSkill = skill.getType().getExperienceLevel(skillLevel);
             }

@@ -757,7 +757,7 @@ public abstract class AtBScenario extends Scenario implements IAtBScenario {
         if (getContract(campaign).getContractType().isCadreDuty()) {
             numAttachedPlayer = 3;
         } else {
-            if (campaign.getFaction().isMercenary()) {
+            if (campaign.getPlayerForce().getFaction().isMercenary()) {
                 switch (getContract(campaign).getCommandRights()) {
                     case INTEGRATED:
                         if (campaign.getCampaignOptions().get(CampaignOption.PLAYER_CONTROLS_ATTACHED_UNITS)) {

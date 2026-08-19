@@ -409,6 +409,6 @@ public class UnitOrder extends Unit implements IAcquisitionWork {
      */
     @Override
     public int getTechLevel() {
-        return getSimpleTechLevel().getCompoundTechLevel(getCampaign().getFaction().isClan());
+        return getSimpleTechLevel().getCompoundTechLevel(getCampaign().getPlayerForce().getFaction().isClan());
     }
 }

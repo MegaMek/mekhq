@@ -348,7 +348,7 @@ public class RandomDeath {
         }
 
         Era era = campaign.getEra();
-        Faction faction = campaign.getFaction();
+        Faction faction = campaign.getPlayerForce().getFaction();
 
         // Determine base chance
         double randomDeathChance = getBaseDeathChance(person);

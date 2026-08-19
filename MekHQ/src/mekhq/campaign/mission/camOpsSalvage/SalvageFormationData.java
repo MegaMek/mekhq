@@ -64,7 +64,7 @@ public record SalvageFormationData(Formation formation, FormationType formationT
         FormationType formationType = formation.getFormationType();
         UUID techId = formation.getTechID();
         Person tech;
-        if (techId == null || !formationType.isSalvage()) {tech = null;} else {tech = campaign.getPerson(techId);}
+        if (techId == null || !formationType.isSalvage()) {tech = null;} else {tech = campaign.getPlayerForce().getHumanResources().getPerson(techId);}
         if (tech != null && tech.isEngineer()) { // Engineers cannot salvage
             tech = null;
         }

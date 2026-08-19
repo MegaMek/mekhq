@@ -167,9 +167,9 @@ public class PersonnelMarketMekHQ extends NewPersonnelMarket {
             filterOutLegalFactions = true;
         }
 
-        if (getCampaign().isClanCampaign()) {
+        if (getCampaign().getPlayerForce().isClanForce()) {
             if (!filterOutLegalFactions) {
-                interestedFactions.add(getCampaign().getFaction());
+                interestedFactions.add(getCampaign().getPlayerForce().getFaction());
             }
 
             return interestedFactions;
@@ -287,7 +287,7 @@ public class PersonnelMarketMekHQ extends NewPersonnelMarket {
         // of the campaign minus 2 to a minimum of 2 (Green).
         averageSkillLevel = max(averageSkillLevel - (isOfferingGoldenHello() ? 1 : 2), 2);
 
-        Map<PersonnelRole, PersonnelMarketEntry> unorderedMarketEntries = getCampaign().isClanCampaign() ?
+        Map<PersonnelRole, PersonnelMarketEntry> unorderedMarketEntries = getCampaign().getPlayerForce().isClanForce() ?
                                                                                 getClanMarketEntries() :
                                                                                 getInnerSphereMarketEntries();
         unorderedMarketEntries = sanitizeMarketEntries(unorderedMarketEntries);

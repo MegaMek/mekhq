@@ -55,7 +55,7 @@ public class ScenarioAwards {
      */
     public static Map<Integer, List<Object>> ScenarioAwardsProcessor(Campaign campaign, UUID person,
           List<Award> awards) {
-        int logSize = campaign.getPerson(person).getScenarioLog().size();
+        int logSize = campaign.getPlayerForce().getHumanResources().getPerson(person).getScenarioLog().size();
         int requiredScenarioCount;
 
         List<Award> eligibleAwards = new ArrayList<>();
@@ -63,7 +63,7 @@ public class ScenarioAwards {
         Award bestAward = new Award();
 
         for (Award award : awards) {
-            if (award.canBeAwarded(campaign.getPerson(person))) {
+            if (award.canBeAwarded(campaign.getPlayerForce().getHumanResources().getPerson(person))) {
                 try {
                     requiredScenarioCount = award.getQty();
                 } catch (Exception e) {

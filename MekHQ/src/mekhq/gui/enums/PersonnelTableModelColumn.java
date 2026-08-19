@@ -336,7 +336,7 @@ public enum PersonnelTableModelColumn implements MHQTableColumn {
           Object::toString),
     LOYALTY("Column.LOYALTY.title", Comparators.INT_COMPARATOR,
           (person, campaign) -> {
-              return person.getAdjustedLoyalty(campaign.getFaction(),
+              return person.getAdjustedLoyalty(campaign.getPlayerForce().getFaction(),
                     campaign.getCampaignOptions().get(CampaignOption.USE_ALTERNATIVE_ADVANCED_MEDICAL));
           }, Object::toString),
     HIGHEST_EDUCATION("Column.HIGHEST_EDUCATION.title", fieldBasedSorter(EducationLevel::getLevel),
@@ -820,7 +820,7 @@ public enum PersonnelTableModelColumn implements MHQTableColumn {
     private static @NonNull Function<String, Integer> getSkillValue(Person person, Campaign campaign) {
         CampaignOptions campaignOptions = campaign.getCampaignOptions();
         SkillModifierData skillModifierData = person.getSkillModifierData(
-              campaignOptions.get(CampaignOption.USE_AGE_EFFECTS), campaign.isClanCampaign(), campaign.getLocalDate(), true);
+              campaignOptions.get(CampaignOption.USE_AGE_EFFECTS), campaign.getPlayerForce().isClanForce(), campaign.getLocalDate(), true);
         return skillName -> (skillName == null) || !person.hasSkill(skillName) ? null :
                                   person.getSkill(skillName).getFinalSkillValue(skillModifierData);
     }

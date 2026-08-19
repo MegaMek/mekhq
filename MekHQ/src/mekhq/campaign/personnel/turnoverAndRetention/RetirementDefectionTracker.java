@@ -184,7 +184,7 @@ public class RetirementDefectionTracker {
 
     public static List<TargetRollModifier> getFactionModifiers(Person person, Campaign campaign) {
         ArrayList<TargetRollModifier> result = new ArrayList<>();
-        Faction campaignFaction = campaign.getFaction();
+        Faction campaignFaction = campaign.getPlayerForce().getFaction();
 
         // campaign faction modifiers
         if (campaignFaction.isPirate()) {
@@ -214,7 +214,7 @@ public class RetirementDefectionTracker {
 
         // wartime modifier
         if (FactionHints.getInstance()
-                  .isAtWarWith(campaign.getFaction(), person.getOriginFaction(), campaign.getLocalDate())) {
+                  .isAtWarWith(campaign.getPlayerForce().getFaction(), person.getOriginFaction(), campaign.getLocalDate())) {
             result.add(new TargetRollModifier(4, getTextAt(RESOURCE_BUNDLE, "factionEnemy.text")));
         }
         return result;
@@ -560,7 +560,7 @@ public class RetirementDefectionTracker {
             if ((campaignOptions.get(CampaignOption.USE_LOYALTY_MODIFIERS)) &&
                       (!campaignOptions.get(CampaignOption.USE_HIDE_LOYALTY))) {
 
-                int loyaltyScore = person.getAdjustedLoyalty(campaign.getFaction(),
+                int loyaltyScore = person.getAdjustedLoyalty(campaign.getPlayerForce().getFaction(),
                       campaignOptions.get(CampaignOption.USE_ALTERNATIVE_ADVANCED_MEDICAL));
 
                 if (person.isCommander()) {
@@ -667,7 +667,7 @@ public class RetirementDefectionTracker {
         if (campaign.getCampaignOptions().get(CampaignOption.USE_COMMANDER_LEADERSHIP_ONLY)) {
             Person commander = campaign.getPlayerForce().getHumanResources()
                                      .getCommander(campaign.getCampaignOptions(),
-                                           campaign.isClanCampaign(),
+                                           campaign.getPlayerForce().isClanForce(),
                                            campaign.getLocalDate());
             if (commander != null && commander.hasSkill((SkillType.S_LEADER))) {
                 SkillModifierData skillModifierData = commander.getSkillModifierData(true);
@@ -691,7 +691,7 @@ public class RetirementDefectionTracker {
     private int getBaseTargetNumber(Campaign campaign, Person person) {
         if ((campaign.getCampaignOptions().get(CampaignOption.USE_LOYALTY_MODIFIERS)) &&
                   (campaign.getCampaignOptions().get(CampaignOption.USE_HIDE_LOYALTY))) {
-            int loyaltyScore = person.getAdjustedLoyalty(campaign.getFaction(),
+            int loyaltyScore = person.getAdjustedLoyalty(campaign.getPlayerForce().getFaction(),
                   campaign.getCampaignOptions().get(CampaignOption.USE_ALTERNATIVE_ADVANCED_MEDICAL));
 
             if (person.isCommander()) {

@@ -139,7 +139,7 @@ public record Accountant(Campaign campaign) {
     }
 
     private boolean isClanCampaign() {
-        return campaign().isClanCampaign();
+        return campaign().getPlayerForce().isClanForce();
     }
 
     private LocalDate getLocalDate() {
@@ -895,7 +895,7 @@ public record Accountant(Campaign campaign) {
     public Money getForceValue(boolean useDiminishingContractPay, boolean excludeInfantry,
           double dropShipContractPercent, double warShipContractPercent, double jumpShipContractPercent,
           boolean useEquipmentSaleValue) {
-        return getForceValue(this.campaign().getPlayerForce().getAllFormations(), getHangar(), campaign().getFaction(),
+        return getForceValue(this.campaign().getPlayerForce().getAllFormations(), getHangar(), campaign().getPlayerForce().getFaction(),
               getCampaignOptions(), useDiminishingContractPay, excludeInfantry, dropShipContractPercent,
               warShipContractPercent, jumpShipContractPercent, useEquipmentSaleValue);
     }
@@ -1072,7 +1072,7 @@ public record Accountant(Campaign campaign) {
      */
     public Money getContractBase() {
         return getContractBase(getCampaignOptions(),
-              campaign().getFaction(),
+              campaign().getPlayerForce().getFaction(),
               getLocalDate(),
               getHangar(),
               this.campaign().getPlayerForce().getHumanResources().getSalaryEligiblePersonnel(),

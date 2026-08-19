@@ -297,7 +297,7 @@ public abstract class AbstractCompanyGenerator {
                                                           .booleanOption(OptionsConstants.MISC_TACTICAL_GENIUS));
 
             boolean isUseAgingEffects = campaign.getCampaignOptions().get(CampaignOption.USE_AGE_EFFECTS);
-            boolean isClanCampaign = campaign.isClanCampaign();
+            boolean isClanCampaign = campaign.getPlayerForce().isClanForce();
             LocalDate today = campaign.getLocalDate();
 
             // Then prioritize either combat or command skills based on the selected option
@@ -356,7 +356,7 @@ public abstract class AbstractCompanyGenerator {
                                                           .booleanOption(OptionsConstants.MISC_TACTICAL_GENIUS));
 
             boolean isUseAgingEffects = campaign.getCampaignOptions().get(CampaignOption.USE_AGE_EFFECTS);
-            boolean isClanCampaign = campaign.isClanCampaign();
+            boolean isClanCampaign = campaign.getPlayerForce().isClanForce();
             LocalDate today = campaign.getLocalDate();
 
             // Then prioritize either combat or command skills based on the selected option
@@ -465,7 +465,7 @@ public abstract class AbstractCompanyGenerator {
             final Faction faction;
             if (getOptions().isUseSpecifiedFactionToAssignRanks()) {
                 faction = getOptions().getSpecifiedFaction();
-            } else {faction = campaign.getFaction();}
+            } else {faction = campaign.getPlayerForce().getFaction();}
             generateCommandingOfficerRank(faction, tracker, numMekWarriors);
         }
     }
@@ -621,7 +621,7 @@ public abstract class AbstractCompanyGenerator {
             final Faction faction;
             if (getOptions().isUseSpecifiedFactionToAssignRanks()) {
                 faction = getOptions().getSpecifiedFaction();
-            } else {faction = campaign.getFaction();}
+            } else {faction = campaign.getPlayerForce().getFaction();}
             tracker.getPerson().setRank((faction.isComStarOrWoB() || faction.isClan())
                                               ? 4
                                               : 12);
@@ -1224,7 +1224,7 @@ public abstract class AbstractCompanyGenerator {
         final Faction formationIconFaction;
         if (getOptions().isUseSpecifiedFactionToGenerateFormationIcons()) {
             formationIconFaction = getOptions().getSpecifiedFaction();
-        } else {formationIconFaction = campaign.getFaction();}
+        } else {formationIconFaction = campaign.getPlayerForce().getFaction();}
         FormationPieceIcon background = null;
 
         if (getOptions().isGenerateFormationIcons()) {
@@ -1276,7 +1276,7 @@ public abstract class AbstractCompanyGenerator {
         // Generate the Mercenary Company Command Lance
         if (getOptions().isGenerateMercenaryCompanyCommandLance()) {
             final Formation commandLance = createLance(campaign, formationIconFaction, originFormation, trackers,
-                  campaign.getName() + resources.getString("AbstractCompanyGenerator.CommandLance.text"),
+                  campaign.getPlayerForce().getName() + resources.getString("AbstractCompanyGenerator.CommandLance.text"),
                   background);
             if (getOptions().isGenerateFormationIcons()
                       && (commandLance.getFormationIcon() instanceof LayeredFormationIcon icon)) {

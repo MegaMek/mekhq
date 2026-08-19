@@ -947,7 +947,7 @@ public class RetirementDefectionDialog extends JDialog {
         dialog.setLayout(new BorderLayout());
 
         // Creating and scaling the image label
-        ImageIcon originalIcon = Factions.getFactionLogo(campaign.getGameYear(), campaign.getFaction().getShortName());
+        ImageIcon originalIcon = Factions.getFactionLogo(campaign.getGameYear(), campaign.getPlayerForce().getFaction().getShortName());
         ImageIcon scaledIcon = new ImageIcon(originalIcon.getImage()
                                                    .getScaledInstance(originalIcon.getIconWidth() / 2,
                                                          originalIcon.getIconHeight() / 2,

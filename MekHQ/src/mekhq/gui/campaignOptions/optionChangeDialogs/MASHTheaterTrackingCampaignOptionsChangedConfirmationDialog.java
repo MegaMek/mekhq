@@ -188,7 +188,7 @@ public class MASHTheaterTrackingCampaignOptionsChangedConfirmationDialog extends
         RoundedJButton btnConfirm = new RoundedJButton(getTextAt(RESOURCE_BUNDLE,
               "MASHTheaterTrackingCampaignOptionsChangedConfirmationDialog.confirm"));
         btnConfirm.addActionListener(evt -> {
-            processFreeUnit(campaign, campaign.getFaction(), true);
+            processFreeUnit(campaign, campaign.getPlayerForce().getFaction(), true);
             dispose();
         });
 

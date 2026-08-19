@@ -221,7 +221,7 @@ public abstract class AbstractProcreation {
             return mother.getGenealogy().getSpouse();
         } else {
             if ((mother.getExtraData().get(PREGNANCY_FATHER_DATA) != null)) {
-                return (campaign.getPerson(UUID.fromString(mother.getExtraData().get(PREGNANCY_FATHER_DATA))));
+                return (campaign.getPlayerForce().getHumanResources().getPerson(UUID.fromString(mother.getExtraData().get(PREGNANCY_FATHER_DATA))));
             } else {return (null);}
         }
     }
@@ -487,7 +487,7 @@ public abstract class AbstractProcreation {
             baby.setLoyalty(Compute.d6(4, 3));
 
             // Recruit the baby but do not employ the baby. Babies can't have jobs. They don't have object permanence.
-            campaign.recruitPerson(baby, prisonerStatus, true, true, false);
+            campaign.getPlayerForce().getHumanResources().recruitPerson(campaign, baby, prisonerStatus, true, true, false);
 
             // if the mother is at school, add the baby to the list of tag along
             if (mother.getStatus().isStudent()) {

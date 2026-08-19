@@ -174,7 +174,7 @@ public class CurrentLocationPanel extends ScalingWidthConstrainedPanel {
      */
     private void refresh() {
         CampaignOptions options = campaign.getCampaignOptions();
-        AbstractLocation location = campaign.getCurrentLocation();
+        AbstractLocation location = campaign.getPlayerForce().getForceDetachment().getCurrentLocation();
         PlanetarySystem system = location.getCurrentSystem();
         LocalDate date = campaign.getLocalDate();
 

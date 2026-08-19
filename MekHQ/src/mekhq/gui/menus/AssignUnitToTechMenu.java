@@ -108,7 +108,7 @@ public class AssignUnitToTechMenu extends JScrollableMenu {
                                            .getHumanResources()
                                            .getTechs(campaign.getPlayerForce().getHangar().getUnits(),
                                                  campaign.getCampaignOptions(),
-                                                 campaign.isClanCampaign(),
+                                                 campaign.getPlayerForce().isClanForce(),
                                                  campaign.getLocalDate())) {
                 if (allShareTech && tech.equals(units[0].getTech())) {
                     continue;

@@ -173,7 +173,7 @@ public class CompanyGenerationDialog extends AbstractMHQValidationButtonDialog {
     private void confirmationActionListener(final ActionEvent evt) {
         okButtonActionPerformed(evt);
 
-        Faction campaignFaction = campaign.getFaction();
+        Faction campaignFaction = campaign.getPlayerForce().getFaction();
         String campaignFactionCode = campaignFaction.getShortName();
         if (campaignFactionCode.equals(MERCENARY_FACTION_CODE)) {
             final boolean IS_STARTUP = true;
@@ -189,7 +189,7 @@ public class CompanyGenerationDialog extends AbstractMHQValidationButtonDialog {
         AutomaticRankAssigner.assignRankSystemFromFaction(speaker, RO_MIN);
         new FactionJudgmentDialog(campaign, speaker, campaign.getPlayerForce().getHumanResources()
                                                            .getCommander(campaign.getCampaignOptions(),
-                                                                 campaign.isClanCampaign(),
+                                                                 campaign.getPlayerForce().isClanForce(),
                                                                  campaign.getLocalDate()), "HELLO", campaignFaction,
               FactionStandingJudgmentType.WELCOME, ImmersiveDialogWidth.MEDIUM, null, null);
     }
@@ -256,7 +256,7 @@ public class CompanyGenerationDialog extends AbstractMHQValidationButtonDialog {
 
         final Faction faction;
         if (options.isUseSpecifiedFactionToAssignRanks()) {faction = options.getSpecifiedFaction();} else {
-            faction = campaign.getFaction();
+            faction = campaign.getPlayerForce().getFaction();
         }
         final boolean isAutomaticallyAssignRanks = options.isAutomaticallyAssignRanks();
 
@@ -311,7 +311,7 @@ public class CompanyGenerationDialog extends AbstractMHQValidationButtonDialog {
         if (options.isAutomaticallyAssignRanks()) {
             final Faction faction;
             if (options.isUseSpecifiedFactionToAssignRanks()) {faction = options.getSpecifiedFaction();} else {
-                faction = campaign.getFaction();
+                faction = campaign.getPlayerForce().getFaction();
             }
             person.setRank((faction.isComStarOrWoB() || faction.isClan())
                                  ? 4

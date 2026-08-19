@@ -162,7 +162,7 @@ class AtbMonthlyContractMarketTest {
             LocalHangar hangar = mock(LocalHangar.class);
             doReturn(Money.of(1)).when(hangar).getUnitCosts(any(), any());
 
-            when(campaign.getFaction()).thenReturn(employerFaction);
+            when(campaign.getPlayerForce().getFaction()).thenReturn(employerFaction);
             when(campaign.getAtBUnitRatingMod()).thenReturn(DragoonRating.DRAGOON_C.getRating());
             when(campaign.getLocalDate()).thenReturn(TODAY);
             when(campaign.getGameYear()).thenReturn(GAME_YEAR);

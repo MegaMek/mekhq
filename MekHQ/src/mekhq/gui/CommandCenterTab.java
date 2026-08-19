@@ -496,7 +496,7 @@ public final class CommandCenterTab extends CampaignGuiTab {
             panInfo.add(lblFacilityCapacities, gridBagConstraints);
         }
 
-        panInfo.setBorder(RoundedLineBorder.createRoundedLineBorder(getCampaign().getName()));
+        panInfo.setBorder(RoundedLineBorder.createRoundedLineBorder(getCampaign().getPlayerForce().getName()));
     }
 
     private void initFactionPanel() {
@@ -514,11 +514,11 @@ public final class CommandCenterTab extends CampaignGuiTab {
             new mekhq.campaign.universe.factionStanding.GoingRogue(getCampaign(),
                   campaign.getPlayerForce().getHumanResources()
                         .getCommander(campaign.getCampaignOptions(),
-                              campaign.isClanCampaign(),
+                              campaign.getPlayerForce().isClanForce(),
                               campaign.getLocalDate()),
                   campaign1.getPlayerForce().getHumanResources()
                         .getSecondInCommand(campaign1.getCampaignOptions(),
-                              campaign1.isClanCampaign(),
+                              campaign1.getPlayerForce().isClanForce(),
                               campaign1.getLocalDate()));
         });
 
@@ -538,7 +538,7 @@ public final class CommandCenterTab extends CampaignGuiTab {
         RoundedJButton btnDiplomacy = new RoundedJButton(resourceMap.getString("btnDiplomacy.text"));
         btnDiplomacy.setMaximumSize(new Dimension(Integer.MAX_VALUE, btnDiplomacy.getPreferredSize().height));
         btnDiplomacy.addActionListener(evt -> new DiplomacyReport(getCampaignGui().getFrame(),
-              getCampaign().isClanCampaign(),
+              getCampaign().getPlayerForce().isClanForce(),
               getCampaign().getLocalDate()));
 
         panFaction = new JPanel();
@@ -889,7 +889,7 @@ public final class CommandCenterTab extends CampaignGuiTab {
         final CampaignSummary campaignSummary = campaign.getCampaignSummary();
 
         if (panInfo.getBorder() instanceof TitledBorder titledBorder) {
-            titledBorder.setTitle(getCampaign().getName());
+            titledBorder.setTitle(getCampaign().getPlayerForce().getName());
             panInfo.repaint();
         }
 

@@ -271,7 +271,7 @@ public abstract class AbstractMarriage {
 
         // recruit the spouse if they're not already in the unit
         if ((!isBackground) && (spouse.getJoinedCampaign() == null)) {
-            campaign.recruitPerson(spouse, PrisonerStatus.FREE, true, false, false);
+            campaign.getPlayerForce().getHumanResources().recruitPerson(campaign, spouse, PrisonerStatus.FREE, true, false, false);
 
             ResourceBundle recruitmentResources = ResourceBundle.getBundle("mekhq.resources.Campaign",
                   MekHQ.getMHQOptions().getLocale());

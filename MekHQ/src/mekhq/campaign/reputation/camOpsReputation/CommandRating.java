@@ -83,7 +83,7 @@ public class CommandRating {
         commandRating.put("traits",
               getATOWTraitScore(commander,
                     campaign.getCampaignOptions().get(CampaignOption.USE_AGE_EFFECTS),
-                    campaign.isClanCampaign(),
+                    campaign.getPlayerForce().isClanForce(),
                     campaign.getLocalDate()));
 
         int personalityValue = 0;

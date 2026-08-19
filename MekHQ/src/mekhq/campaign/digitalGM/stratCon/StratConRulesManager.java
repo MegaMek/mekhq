@@ -3300,7 +3300,7 @@ public class StratConRulesManager {
                         continue;
                     }
 
-                    int standardForceSize = CombatTeam.getStandardFormationSize(campaign.getFaction());
+                    int standardForceSize = CombatTeam.getStandardFormationSize(campaign.getPlayerForce().getFaction());
                     int formationSize = formation.getSize(campaign);
                     if (formationSize <= standardForceSize) {
                         retVal.add(force.getId());

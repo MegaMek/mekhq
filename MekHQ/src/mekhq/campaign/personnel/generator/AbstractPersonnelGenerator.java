@@ -115,7 +115,7 @@ public abstract class AbstractPersonnelGenerator {
      * @return A new {@link Person} object for the given campaign.
      */
     protected Person createPerson(Campaign campaign) {
-        return new Person(campaign, campaign.getFaction().getShortName());
+        return new Person(campaign, campaign.getPlayerForce().getFaction().getShortName());
     }
 
     /**

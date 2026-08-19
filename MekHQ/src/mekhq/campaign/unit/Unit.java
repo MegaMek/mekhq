@@ -4955,7 +4955,7 @@ public class Unit implements ITechnology, ILocatable {
         if (getCamouflage().hasDefaultCategory()) {
             int id1 = getFormationId();
             final Formation formation = campaign.getPlayerForce().getFormation(id1);
-            if ((formation != null)) {return formation.getCamouflageOrElse(campaign.getCamouflage());} else {
+            if ((formation != null)) {return formation.getCamouflageOrElse(campaign.getPlayerForce().getCamouflage());} else {
                 return campaign.getPlayerForce().getCamouflage();
             }
         } else {
@@ -6371,7 +6371,7 @@ public class Unit implements ITechnology, ILocatable {
         Campaign campaign1 = getCampaign();
         final UUID id1 = person.getId();
         if (campaign1.getPlayerForce().getHumanResources().getPerson(id1) == null) {
-            getCampaign().recruitPerson(person, person.getPrisonerStatus(), true, false, true);
+            getCampaign().getPlayerForce().getHumanResources().recruitPerson(getCampaign(), person, person.getPrisonerStatus(), true, false, true);
             LOGGER.debug("The person {} added this unit {}, was not in the campaign.", person.getFullName(), getName());
         }
     }
@@ -7114,7 +7114,7 @@ public class Unit implements ITechnology, ILocatable {
             // as many probably outlive the production of parts it would be better to just use the unit extinction
             // date itself, but given that there are no canon extinction/re-intro dates for units, we will use this
             // instead
-            if (p.isExtinct(getCampaign().getGameYear(), getCampaign().getFaction().isClan())) {
+            if (p.isExtinct(getCampaign().getGameYear(), getCampaign().getPlayerForce().getFaction().isClan())) {
                 newAvailability = AvailabilityValue.X;
             }
             if (newAvailability.isBetterThan(availability)) {
@@ -7674,7 +7674,7 @@ public class Unit implements ITechnology, ILocatable {
             int currentYear = getCampaign().getGameYear();
             TechRating rating = getTechRating();
             if (((currentYear > 2859) && (currentYear < 3040))) {
-                if (!getCampaign().getFaction().isClan()) {
+                if (!getCampaign().getPlayerForce().getFaction().isClan()) {
                     if (!getCampaign().getPlayerForce().getFaction().isComStar()) {
                         if (rating.isBetterThan(TechRating.D)) {
                             partsCost = partsCost.multipliedBy(5.0);

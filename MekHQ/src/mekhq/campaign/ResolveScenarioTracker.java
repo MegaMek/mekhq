@@ -198,7 +198,7 @@ public class ResolveScenarioTracker {
             AtBContract contract = ((AtBScenario) scenario).getContract(campaign);
 
             if (control) {
-                searchingFaction = campaign.getFaction();
+                searchingFaction = campaign.getPlayerForce().getFaction();
             } else {
                 searchingFaction = contract.getEnemy();
                 sarQuality = contract.getEnemyQuality();
@@ -2038,7 +2038,7 @@ public class ResolveScenarioTracker {
         scenario.clearAllFormationsAndPersonnel(campaign);
         // let's reset the network ids from the c3UUIDs
         campaign.reloadGameEntities();
-        campaign.refreshNetworks();
+        campaign.getPlayerForce().refreshNetworks(campaign.getGame());
         scenario.setDate(campaign.getLocalDate());
         client = null;
     }

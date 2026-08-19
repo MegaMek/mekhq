@@ -187,13 +187,13 @@ public class TrainingCombatTeams {
         // If the force is empty, we skip it
         Vector<UUID> units = formation.getUnits(); // We only want units in the direct force, not child forces
         if (units.isEmpty()) {
-            LOGGER.info("No units in force '{}' for campaign '{}'", formation.getName(), campaign.getName());
+            LOGGER.info("No units in force '{}' for campaign '{}'", formation.getName(), campaign.getPlayerForce().getName());
             return;
         }
 
         // Identify the Combat Team's commander (i.e., the Trainer)
         UUID commanderID = formation.getFormationCommanderID();
-        Person commander = campaign.getPerson(commanderID);
+        Person commander = campaign.getPlayerForce().getHumanResources().getPerson(commanderID);
 
         if (commander == null) {
             campaign.addReport(GENERAL, getFormattedTextAt(RESOURCE_BUNDLE, "noCommander.text", formation.getName(),

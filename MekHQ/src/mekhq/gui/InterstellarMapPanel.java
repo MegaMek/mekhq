@@ -773,7 +773,7 @@ public class InterstellarMapPanel extends JPanel {
 
                 boolean isUseFactionStandingOutlawing =
                       campaign.getCampaignOptions().isUseFactionStandingOutlawedSafe();
-                Faction campaignFaction = campaign.getFaction();
+                Faction campaignFaction = campaign.getPlayerForce().getFaction();
                 FactionStandings factionStandings = campaign.getPlayerForce().getFactionStandings();
                 LocalDate today = campaign.getLocalDate();
                 List<AtBContract> activeAtBContracts = campaign.getActiveAtBContracts();

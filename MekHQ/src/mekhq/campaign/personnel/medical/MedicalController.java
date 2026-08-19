@@ -136,7 +136,7 @@ public class MedicalController {
             return; // Early exit as there is no point continuing to process the character
         }
 
-        Person doctor = campaign.getPerson(patient.getDoctorId());
+        Person doctor = campaign.getPlayerForce().getHumanResources().getPerson(patient.getDoctorId());
 
         if (doctor != null) {
             doctor = isValidDoctor(patient, doctor) ? doctor : null;

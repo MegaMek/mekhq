@@ -347,7 +347,7 @@ class EducationControllerTest {
         @Test
         void homeSchool_setsStageToEducation() {
             Academy academy = buildAcademy(true, false);
-            when(campaign.getName()).thenReturn("TestCampaign");
+            when(campaign.getPlayerForce().getName()).thenReturn("TestCampaign");
 
             Person person = buildStudentPerson();
             EducationController.enrollPerson(campaign, person, academy, null, "MERC", 0);
@@ -386,7 +386,7 @@ class EducationControllerTest {
         @Test
         void homeSchool_setsAcademyNameToCampaignName() {
             Academy academy = buildAcademy(true, false);
-            when(campaign.getName()).thenReturn("My Campaign");
+            when(campaign.getPlayerForce().getName()).thenReturn("My Campaign");
 
             Person person = buildStudentPerson();
             EducationController.enrollPerson(campaign, person, academy, null, "MERC", 0);
@@ -444,7 +444,7 @@ class EducationControllerTest {
         @Test
         void anyAcademy_setsAcademySetOnPerson() {
             Academy academy = buildAcademy(true, false);
-            when(campaign.getName()).thenReturn("TestCampaign");
+            when(campaign.getPlayerForce().getName()).thenReturn("TestCampaign");
 
             Person person = buildStudentPerson();
             EducationController.enrollPerson(campaign, person, academy, null, "MERC", 0);
@@ -455,7 +455,7 @@ class EducationControllerTest {
         @Test
         void anyAcademy_setsAcademyNameInSetOnPerson() {
             Academy academy = buildAcademy(true, false);
-            when(campaign.getName()).thenReturn("TestCampaign");
+            when(campaign.getPlayerForce().getName()).thenReturn("TestCampaign");
 
             Person person = buildStudentPerson();
             EducationController.enrollPerson(campaign, person, academy, null, "MERC", 0);

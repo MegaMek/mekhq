@@ -163,8 +163,8 @@ public class AtBContract extends Contract {
     }
 
     public void initContractDetails(Campaign campaign) {
-        int companySize = getStandardFormationSize(campaign.getFaction(), COMPANY.getDepth());
-        int battalionSize = getStandardFormationSize(campaign.getFaction(), BATTALION.getDepth());
+        int companySize = getStandardFormationSize(campaign.getPlayerForce().getFaction(), COMPANY.getDepth());
+        int battalionSize = getStandardFormationSize(campaign.getPlayerForce().getFaction(), BATTALION.getDepth());
 
         if (ContractUtilities.getEffectiveNumUnits(campaign) <= companySize) {
             setOverheadCompensation(OH_FULL);
@@ -287,7 +287,7 @@ public class AtBContract extends Contract {
             // Re-rolled with the same contract-type enemy preference the market uses, so e.g. a riot duty that
             // "mixes it up" still ends up against rebels rather than a random neighboring power.
             enemyCode = RandomFactionGenerator.getInstance()
-                              .getRandomEnemy(campaign.getCurrentLocation(), today, employer,
+                              .getRandomEnemy(campaign.getPlayerForce().getForceDetachment().getCurrentLocation(), today, employer,
                                     getContractType().getEnemySelectionProfile())
                               .getShortName();
         }
@@ -323,7 +323,7 @@ public class AtBContract extends Contract {
             }
 
             double regardMultiplier = campaign.getCampaignOptions().get(CampaignOption.REGARD_MULTIPLIER);
-            String campaignFactionCode = campaign.getFaction().getShortName();
+            String campaignFactionCode = campaign.getPlayerForce().getFaction().getShortName();
             if (enemyFaction.performsBatchalls() && allowBatchalls) {
                 PerformBatchall batchallDialog = new PerformBatchall(campaign, getClanOpponent(), enemyCode);
 
@@ -515,7 +515,7 @@ public class AtBContract extends Contract {
                         Person person = campaign.getPlayerForce()
                                               .getHumanResources()
                                               .newDependent(campaign, megamek.common.enums.Gender.RANDOMIZE);
-                        campaign.recruitPerson(person, FREE, true, false, false);
+                        campaign.getPlayerForce().getHumanResources().recruitPerson(campaign, person, FREE, true, false, false);
                     }
                 } else {
                     campaign.addReport(GENERAL, "Bonus: Ronin");

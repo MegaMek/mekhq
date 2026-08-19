@@ -100,7 +100,7 @@ public class ContractStartRentalDialog extends ImmersiveDialogCore {
               campaign.getPlayerForce().getHumanResources()
                     .getSeniorAdminPerson(mekhq.campaign.Campaign.AdministratorSpecialization.LOGISTICS,
                           campaign.getCampaignOptions(),
-                          campaign.isClanCampaign(),
+                          campaign.getPlayerForce().isClanForce(),
                           campaign.getLocalDate()),
               null,
               getCenterMessage(campaign.getCommanderAddress(), contract, campaign.getGameYear()),

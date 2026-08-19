@@ -432,7 +432,7 @@ public class CamOpsSalvageUtilities {
     private static @NonNull List<Person> getValidTechs(Campaign campaign, List<UUID> techUUIDs) {
         List<Person> techs = new ArrayList<>();
         for (UUID uuid : techUUIDs) {
-            Person tech = campaign.getPerson(uuid);
+            Person tech = campaign.getPlayerForce().getHumanResources().getPerson(uuid);
             if (tech == null) {
                 LOGGER.error("null tech was passed into risky salvage");
                 continue;
@@ -470,7 +470,7 @@ public class CamOpsSalvageUtilities {
      */
     public static void depleteTechMinutes(Campaign campaign, List<UUID> techs) {
         for (UUID uuid : techs) {
-            Person tech = campaign.getPerson(uuid);
+            Person tech = campaign.getPlayerForce().getHumanResources().getPerson(uuid);
             if (tech == null) {
                 LOGGER.error("null tech was passed into depleteTechMinutes");
                 continue;

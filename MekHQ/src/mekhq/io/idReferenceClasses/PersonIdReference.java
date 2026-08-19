@@ -73,7 +73,7 @@ public class PersonIdReference extends Person {
 
         // Spouse
         if (person.getGenealogy().getSpouse() instanceof PersonIdReference) {
-            final Person spouse = campaign.getPerson(person.getGenealogy().getSpouse().getId());
+            final Person spouse = campaign.getPlayerForce().getHumanResources().getPerson(person.getGenealogy().getSpouse().getId());
             if (spouse == null) {
                 LOGGER.warn("Failed to find the spouse for {} with id {}",
                       person.getFullTitle(),
@@ -90,7 +90,7 @@ public class PersonIdReference extends Person {
                 if (!(formerSpouse.getFormerSpouse() instanceof PersonIdReference)) {
                     continue;
                 }
-                final Person ex = campaign.getPerson(formerSpouse.getFormerSpouse().getId());
+                final Person ex = campaign.getPlayerForce().getHumanResources().getPerson(formerSpouse.getFormerSpouse().getId());
                 if (ex == null) {
                     LOGGER.warn("Failed to find a person with id {}", formerSpouse.getFormerSpouse().getId());
                     unknownPersonnel.add(formerSpouse.getFormerSpouse());
@@ -123,7 +123,7 @@ public class PersonIdReference extends Person {
                 }
                 final Person familyMember;
                 if ((familyMemberReference instanceof mekhq.io.idReferenceClasses.PersonIdReference)) {
-                    familyMember = campaign.getPerson(familyMemberReference.getId());
+                    familyMember = campaign.getPlayerForce().getHumanResources().getPerson(familyMemberReference.getId());
                 } else {
                     familyMember = familyMemberReference;
                 }

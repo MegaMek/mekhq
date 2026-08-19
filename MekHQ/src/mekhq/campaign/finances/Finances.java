@@ -317,7 +317,7 @@ public class Finances {
      */
     public void newFiscalYear(final Campaign campaign) {
         if (campaign.getCampaignOptions().get(CampaignOption.NEW_FINANCIAL_YEAR_FINANCES_TO_CSV_EXPORT)) {
-            final String exportFileName = campaign.getName() +
+            final String exportFileName = campaign.getPlayerForce().getName() +
                                                 " Finances for " +
                                                 campaign.getCampaignOptions()
                                                       .get(CampaignOption.FINANCIAL_YEAR_DURATION)

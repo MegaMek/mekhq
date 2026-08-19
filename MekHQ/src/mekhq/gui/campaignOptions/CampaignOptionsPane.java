@@ -1118,7 +1118,7 @@ public class CampaignOptionsPane extends JPanel {
         CampaignOptions presetCampaignOptions = campaignPreset.getCampaignOptions();
 
         LocalDate presetDate = campaign.getLocalDate();
-        Faction presetFaction = campaign.getFaction();
+        Faction presetFaction = campaign.getPlayerForce().getFaction();
         if (isStartup) {
             presetDate = campaignPreset.getDate();
             presetFaction = campaignPreset.getFaction();

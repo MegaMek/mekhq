@@ -156,7 +156,7 @@ public class FactionStandingReport extends JDialog {
         this.campaign = campaign;
         this.today = campaign.getLocalDate();
         this.gameYear = today.getYear();
-        this.campaignFaction = campaign.getFaction();
+        this.campaignFaction = campaign.getPlayerForce().getFaction();
         this.factionStandings = campaign.getPlayerForce().getFactionStandings();
         factions = Factions.getInstance();
         this.campaignOptions = campaign.getCampaignOptions();

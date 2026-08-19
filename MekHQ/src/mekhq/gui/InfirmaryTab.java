@@ -547,7 +547,7 @@ public final class InfirmaryTab extends CampaignGuiTab {
                                     .getPatientsWithNonPermanentInjuries()) {
             // Knock out inactive doctors
             if ((patient.getDoctorId() != null) &&
-                      (getCampaign().getPerson(patient.getDoctorId()) != null)) {
+                      (getCampaign().getPlayerForce().getHumanResources().getPerson(patient.getDoctorId()) != null)) {
                 Campaign campaign = getCampaign();
                 final UUID id = patient.getDoctorId();
                 if (!campaign.getPlayerForce().getHumanResources().getPerson(id).getStatus().isActiveFlexible()) {

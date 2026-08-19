@@ -82,7 +82,7 @@ public class ContractAutomation {
      */
     public static void contractStartPrompt(Campaign campaign, Contract contract) {
         // If we're already in the right system, there is no need to automate these actions
-        if (Objects.equals(campaign.getCurrentLocation().getCurrentSystem(), contract.getSystem())) {
+        if (Objects.equals(campaign.getPlayerForce().getForceDetachment().getCurrentLocation().getCurrentSystem(), contract.getSystem())) {
             return;
         }
 
@@ -93,7 +93,7 @@ public class ContractAutomation {
         final Person speaker = campaign.getPlayerForce().getHumanResources()
                                      .getSeniorAdminPerson(mekhq.campaign.Campaign.AdministratorSpecialization.TRANSPORT,
                                            campaign.getCampaignOptions(),
-                                           campaign.isClanCampaign(),
+                                           campaign.getPlayerForce().isClanForce(),
                                            campaign.getLocalDate());
 
         // Mothballing
@@ -152,7 +152,7 @@ public class ContractAutomation {
                 return;
             }
 
-            campaign.getCurrentLocation().setJumpPath(jumpPath);
+            campaign.getPlayerForce().getForceDetachment().getCurrentLocation().setJumpPath(jumpPath);
             campaign.getUnits().forEach(unit -> unit.setSite(Unit.SITE_FACILITY_BASIC));
             campaign.getGUI().refreshAllTabs();
             boolean useTwoWayPay = campaign.getCampaignOptions().get(CampaignOption.IS_USE_TWO_WAY_PAY);
@@ -266,7 +266,7 @@ public class ContractAutomation {
         final Person speaker = campaign.getPlayerForce().getHumanResources()
                                      .getSeniorAdminPerson(mekhq.campaign.Campaign.AdministratorSpecialization.TRANSPORT,
                                            campaign.getCampaignOptions(),
-                                           campaign.isClanCampaign(),
+                                           campaign.getPlayerForce().isClanForce(),
                                            campaign.getLocalDate());
 
         final String commanderAddress = campaign.getCommanderAddress();

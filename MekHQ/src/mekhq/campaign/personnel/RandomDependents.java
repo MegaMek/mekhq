@@ -267,7 +267,7 @@ public class RandomDependents {
                                                    .getHumanResources()
                                                    .newDependent(campaign, megamek.common.enums.Gender.RANDOMIZE);
 
-                    campaign.recruitPerson(dependent, FREE, true, false, false);
+                    campaign.getPlayerForce().getHumanResources().recruitPerson(campaign, dependent, FREE, true, false, false);
 
                     campaign.addReport(PERSONNEL, getFormattedTextAt(RESOURCE_BUNDLE, "dependentJoinsForce.report",
                           dependent.getFullName(),

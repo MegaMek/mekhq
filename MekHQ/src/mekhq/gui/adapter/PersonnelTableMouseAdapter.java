@@ -2251,7 +2251,7 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
 
                     List<Person> listOfPrisoners = Arrays.asList(prisoners);
                     List<String> reports =
-                          factionStandings.executePrisonersOfWar(getCampaign().getFaction().getShortName(),
+                          factionStandings.executePrisonersOfWar(getCampaign().getPlayerForce().getFaction().getShortName(),
                                 listOfPrisoners,
                                 getCampaign().getGameYear(),
                                 getCampaign().getCampaignOptions().get(CampaignOption.REGARD_MULTIPLIER));
@@ -2480,7 +2480,7 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
                 popup.add(newMenuItem(resources.getString("recruit.text"), CMD_RECRUIT));
             }
 
-            if ((getCampaign().isClanCampaign()) && (StaticChecks.areAnyBondsmen(selected))) {
+            if ((getCampaign().getPlayerForce().isClanForce()) && (StaticChecks.areAnyBondsmen(selected))) {
                 popup.add(newMenuItem(resources.getString("abtakha.text"), CMD_ABTAKHA));
             }
         }
@@ -3163,7 +3163,7 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
 
                     SkillModifierData skillModifierData =
                           person.getSkillModifierData(getCampaignOptions().get(CampaignOption.USE_AGE_EFFECTS),
-                                getCampaign().isClanCampaign(), getCampaign().getLocalDate());
+                                getCampaign().getPlayerForce().isClanForce(), getCampaign().getLocalDate());
 
                     menuItem = new JMenuItem(description);
                     menuItem.setActionCommand(makeCommand(CMD_IMPROVE, typeName, String.valueOf(cost)));
@@ -4875,9 +4875,9 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
         JMenu deprecatedRoles = new JMenu(deprecatedString);
 
         for (PersonnelRole role : roles) {
-            String label = role.getLabel(getCampaign().isClanCampaign());
+            String label = role.getLabel(getCampaign().getPlayerForce().isClanForce());
             JMenuItem menuItem = new JCheckBoxMenuItem(label);
-            menuItem.setToolTipText(wordWrap(role.getTooltip(getCampaign().isClanCampaign())));
+            menuItem.setToolTipText(wordWrap(role.getTooltip(getCampaign().getPlayerForce().isClanForce())));
             if (enabled) {
                 menuItem.setActionCommand(makeCommand(primary ? CMD_PRIMARY_ROLE : CMD_SECONDARY_ROLE, role.name()));
                 menuItem.addActionListener(this);
@@ -5501,7 +5501,7 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
                       List.of(person),
                       academyOption,
                       campus,
-                      campaign.getFaction().getShortName());
+                      campaign.getPlayerForce().getFaction().getShortName());
             } else {
                 buildEducationSubMenus(campaign,
                       academy,
@@ -5607,7 +5607,7 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
                       List.of(person),
                       academyOption,
                       campaign.getCurrentSystem().getId(),
-                      campaign.getFaction().getShortName());
+                      campaign.getPlayerForce().getFaction().getShortName());
             } else {
                 // what campuses are accepting applicants?
                 List<String> campuses = new ArrayList<>();
@@ -5690,7 +5690,7 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
                       personnel,
                       academyOption,
                       campus,
-                      campaign.getFaction().getShortName());
+                      campaign.getPlayerForce().getFaction().getShortName());
             } else {
                 buildEducationSubMenus(campaign,
                       academy,
@@ -5766,7 +5766,7 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
                       personnel,
                       academyOption,
                       campaign.getCurrentSystem().getId(),
-                      campaign.getFaction().getShortName());
+                      campaign.getPlayerForce().getFaction().getShortName());
             } else {
                 // find the campuses that accept applications from all members of the group
                 List<String> suitableCampuses = personnel.stream()

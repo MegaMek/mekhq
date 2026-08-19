@@ -188,7 +188,7 @@ public class StratConConvoyCampaignOptionsChangedConfirmationDialog extends JDia
         RoundedJButton btnConfirm = new RoundedJButton(getTextAt(RESOURCE_BUNDLE,
               "StratConConvoyCampaignOptionsChangedConfirmationDialog.confirm"));
         btnConfirm.addActionListener(evt -> {
-            processFreeUnits(campaign, campaign.getFaction(), true);
+            processFreeUnits(campaign, campaign.getPlayerForce().getFaction(), true);
             dispose();
         });
 
@@ -200,8 +200,8 @@ public class StratConConvoyCampaignOptionsChangedConfirmationDialog extends JDia
     }
 
     public static void processFreeUnits(Campaign campaign, Faction faction, boolean isAutomaticallyAssignRanks) {
-        int truckCount = campaign.getFaction().getFormationBaseSize();
-        if (campaign.isClanCampaign()) {
+        int truckCount = campaign.getPlayerForce().getFaction().getFormationBaseSize();
+        if (campaign.getPlayerForce().isClanForce()) {
             truckCount *= 2; // 2 vehicles per point
         }
 

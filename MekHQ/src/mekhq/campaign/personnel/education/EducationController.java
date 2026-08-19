@@ -412,7 +412,7 @@ public class EducationController {
         // if the academy is Local, we need to generate a name,
         // otherwise we use the listed name or the campaign name
         if (academy.isHomeSchool()) {
-            person.setEduAcademyName(campaign.getName());
+            person.setEduAcademyName(campaign.getPlayerForce().getName());
         } else if (academy.isLocal()) {
             person.setEduAcademyName(generateName(academy, person.getEduAcademySystem()));
         } else {
@@ -1798,7 +1798,7 @@ public class EducationController {
         }
 
         if (academy.isReeducationCamp()) {
-            Faction campaignFaction = campaign.getFaction();
+            Faction campaignFaction = campaign.getPlayerForce().getFaction();
             boolean isUseReeducationChangesFaction = campaign.getCampaignOptions().get(CampaignOption.USE_REEDUCATION_CAMPS);
 
             if (isUseReeducationChangesFaction) {

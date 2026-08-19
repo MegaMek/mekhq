@@ -2057,8 +2057,8 @@ public class ForceHumanResources {
         if (ignoreDice || (d6(2) >= bloodnameTarget)) {
             final Phenotype phenotype = person.getPhenotype().isNone() ? Phenotype.GENERAL : person.getPhenotype();
 
-            final Bloodname bloodname = Bloodname.randomBloodname((campaign.getFaction().isClan() ?
-                                                                         campaign.getFaction() :
+            final Bloodname bloodname = Bloodname.randomBloodname((campaign.getPlayerForce().getFaction().isClan() ?
+                                                                         campaign.getPlayerForce().getFaction() :
                                                                          person.getOriginFaction()).getShortName(),
                   phenotype,
                   campaign.getGameYear());

@@ -149,7 +149,7 @@ public class AbstractProcreationTest {
         final Person mother = new Person(mockCampaign);
         final Person father = new Person(mockCampaign);
 
-        given(mockCampaign.getPerson(argThat(matchPersonUUID(father.getId())))).willReturn(father);
+        given(mockCampaign.getPlayerForce().getHumanResources().getPerson(argThat(matchPersonUUID(father.getId())))).willReturn(father);
 
         when(mockCampaignOptions.get(CampaignOption.DETERMINE_FATHER_AT_BIRTH)).thenReturn(false);
         assertNull(mockProcreation.determineFather(mockCampaign, mother));

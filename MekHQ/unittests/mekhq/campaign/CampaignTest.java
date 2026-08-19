@@ -320,7 +320,7 @@ public class CampaignTest {
                     .getHumanResources()
                     .getTechs(testCampaign.getPlayerForce().getHangar().getUnits(),
                           testCampaign.getCampaignOptions(),
-                          testCampaign.isClanCampaign(),
+                          testCampaign.getPlayerForce().isClanForce(),
                           testCampaign.getLocalDate()));
 
         // Test getting active techs with time remaining.
@@ -332,7 +332,7 @@ public class CampaignTest {
                     .getHumanResources()
                     .getTechs(testCampaign.getPlayerForce().getHangar().getUnits(),
                           testCampaign.getCampaignOptions(),
-                          testCampaign.isClanCampaign(),
+                          testCampaign.getPlayerForce().isClanForce(),
                           testCampaign.getLocalDate(),
                           true));
     }
@@ -387,14 +387,14 @@ public class CampaignTest {
     void testInitiative() {
         Campaign campaign = MHQTestUtilities.getTestCampaign();
 
-        campaign.applyInitiativeBonus(6);
+        campaign.getPlayerForce().applyInitiativeBonus(6);
         // should increase bonus to 6 and max to 6
         assertEquals(6, campaign.getPlayerForce().getInitiativeBonus());
         assertEquals(6, campaign.getPlayerForce().getInitiativeMaxBonus());
         // Should not be able to increment over max of 6
         campaign.getPlayerForce().initiativeBonusIncrement(true);
         assertNotEquals(7, campaign.getPlayerForce().getInitiativeBonus());
-        campaign.applyInitiativeBonus(2);
+        campaign.getPlayerForce().applyInitiativeBonus(2);
         assertEquals(6, campaign.getPlayerForce().getInitiativeBonus());
         // But should be able to decrease below max
         campaign.getPlayerForce().initiativeBonusIncrement(false);
@@ -402,7 +402,7 @@ public class CampaignTest {
         // After setting lower Max Bonus any applied bonus that's less than max should set
         // bonus to max
         campaign.getPlayerForce().setInitiativeMaxBonus(3);
-        campaign.applyInitiativeBonus(2);
+        campaign.getPlayerForce().applyInitiativeBonus(2);
         assertEquals(3, campaign.getPlayerForce().getInitiativeBonus());
 
     }

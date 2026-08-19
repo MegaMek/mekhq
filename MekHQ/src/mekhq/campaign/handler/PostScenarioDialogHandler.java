@@ -153,7 +153,7 @@ public class PostScenarioDialogHandler {
             HashMap<UUID, List<Kill>> scenarioKills = new HashMap<>();
 
             for (UUID personId : tracker.getPeopleStatus().keySet()) {
-                Person person = campaign.getPerson(personId);
+                Person person = campaign.getPlayerForce().getHumanResources().getPerson(personId);
                 PersonStatus status = tracker.getPeopleStatus().get(personId);
                 int injuryCount = 0;
 

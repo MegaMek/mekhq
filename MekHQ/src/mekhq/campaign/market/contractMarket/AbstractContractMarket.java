@@ -190,7 +190,7 @@ public abstract class AbstractContractMarket {
      * @param campaign the active campaign context, used to access campaign-specific options and rules
      */
     public void rerollClause(AtBContract contract, int clause, Campaign campaign) {
-        final Faction faction = campaign.getFaction();
+        final Faction faction = campaign.getPlayerForce().getFaction();
         final boolean isMercenary = faction.isMercenary();
         if (null != clauseMods.get(contract.getId())) {
             switch (clause) {
@@ -550,7 +550,7 @@ public abstract class AbstractContractMarket {
     protected void setEnemyCode(AtBContract contract, Campaign campaign) {
         EnemySelectionProfile profile = contract.getContractType().getEnemySelectionProfile();
         Faction enemyFaction = RandomFactionGenerator.getInstance()
-                                     .getRandomEnemy(campaign.getCurrentLocation(), campaign.getLocalDate(),
+                                     .getRandomEnemy(campaign.getPlayerForce().getForceDetachment().getCurrentLocation(), campaign.getLocalDate(),
                                            contract.getEmployerFaction(), profile);
 
         // If the OpFor isn't Clan (or an aggregate like pirates and rebels), there is a 1-in-5 chance they've hired
@@ -596,11 +596,11 @@ public abstract class AbstractContractMarket {
         if (contract.isPlayerAttacker()) {
             contract.setSystemId(RandomFactionGenerator.getInstance()
                                        .getMissionTarget(contract.getEmployerCode(), contract.getEnemyCode(),
-                                             campaign.getCurrentLocation(), profile));
+                                             campaign.getPlayerForce().getForceDetachment().getCurrentLocation(), profile));
         } else {
             contract.setSystemId(RandomFactionGenerator.getInstance()
                                        .getMissionTarget(contract.getEnemyCode(), contract.getEmployerCode(),
-                                             campaign.getCurrentLocation(), profile));
+                                             campaign.getPlayerForce().getForceDetachment().getCurrentLocation(), profile));
         }
         if (contract.getSystem() == null) {
             String errorMessage = "Could not find contract location for " +

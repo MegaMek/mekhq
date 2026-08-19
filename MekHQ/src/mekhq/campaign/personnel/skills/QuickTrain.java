@@ -124,7 +124,7 @@ public class QuickTrain {
 
         // These are used to determining the current total skill level? Used when prioritizing skill training
         boolean isUseAgingEffects = campaignOptions.get(CampaignOption.USE_AGE_EFFECTS);
-        boolean isClanCampaign = campaign.isClanCampaign();
+        boolean isClanCampaign = campaign.getPlayerForce().isClanForce();
 
         LocalDate today = campaign.getLocalDate();
 

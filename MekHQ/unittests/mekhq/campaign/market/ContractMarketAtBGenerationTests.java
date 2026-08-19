@@ -110,7 +110,7 @@ public class ContractMarketAtBGenerationTests {
 
         Faction campaignFaction = mock(Faction.class);
         when(campaignFaction.isMercenary()).thenReturn(true);
-        when(campaign.getFaction()).thenReturn(campaignFaction);
+        when(campaign.getPlayerForce().getFaction()).thenReturn(campaignFaction);
         when(campaignFaction.getShortName()).thenReturn("MERC");
 
         CampaignOptions campaignOptions = mock(CampaignOptions.class);
@@ -166,7 +166,7 @@ public class ContractMarketAtBGenerationTests {
         doReturn(currentSystem).when(campaign).getSystemByName(eq(current));
 
         CurrentLocation currentLocation = mock(CurrentLocation.class);
-        when(campaign.getCurrentLocation()).thenReturn(currentLocation);
+        when(campaign.getPlayerForce().getForceDetachment().getCurrentLocation()).thenReturn(currentLocation);
 
         String missionTarget = "TARGET";
         PlanetarySystem targetSystem = mock(PlanetarySystem.class);
@@ -214,7 +214,7 @@ public class ContractMarketAtBGenerationTests {
 
         Faction campaignFaction = mock(Faction.class);
         when(campaignFaction.isMercenary()).thenReturn(true);
-        when(campaign.getFaction()).thenReturn(campaignFaction);
+        when(campaign.getPlayerForce().getFaction()).thenReturn(campaignFaction);
         when(campaignFaction.getShortName()).thenReturn("MERC");
 
         CampaignOptions campaignOptions = mock(CampaignOptions.class);
@@ -321,7 +321,7 @@ public class ContractMarketAtBGenerationTests {
 
         Faction campaignFaction = mock(Faction.class);
         when(campaignFaction.isMercenary()).thenReturn(true);
-        when(campaign.getFaction()).thenReturn(campaignFaction);
+        when(campaign.getPlayerForce().getFaction()).thenReturn(campaignFaction);
         when(campaignFaction.getShortName()).thenReturn("MERC");
 
         CampaignOptions campaignOptions = mock(CampaignOptions.class);
@@ -428,7 +428,7 @@ public class ContractMarketAtBGenerationTests {
 
         Faction campaignFaction = mock(Faction.class);
         when(campaignFaction.isMercenary()).thenReturn(true);
-        when(campaign.getFaction()).thenReturn(campaignFaction);
+        when(campaign.getPlayerForce().getFaction()).thenReturn(campaignFaction);
         when(campaignFaction.getShortName()).thenReturn("MERC");
 
         CampaignOptions campaignOptions = mock(CampaignOptions.class);
@@ -544,7 +544,7 @@ public class ContractMarketAtBGenerationTests {
 
         Faction campaignFaction = mock(Faction.class);
         when(campaignFaction.isMercenary()).thenReturn(true);
-        when(campaign.getFaction()).thenReturn(campaignFaction);
+        when(campaign.getPlayerForce().getFaction()).thenReturn(campaignFaction);
         when(campaignFaction.getShortName()).thenReturn("MERC");
 
         CampaignOptions campaignOptions = mock(CampaignOptions.class);
@@ -655,7 +655,7 @@ public class ContractMarketAtBGenerationTests {
 
         Faction campaignFaction = mock(Faction.class);
         when(campaignFaction.isMercenary()).thenReturn(true);
-        when(campaign.getFaction()).thenReturn(campaignFaction);
+        when(campaign.getPlayerForce().getFaction()).thenReturn(campaignFaction);
         when(campaignFaction.getShortName()).thenReturn("MERC");
 
         Factions factions = mock(Factions.class);
@@ -692,7 +692,7 @@ public class ContractMarketAtBGenerationTests {
 
         Faction campaignFaction = mock(Faction.class);
         when(campaignFaction.isMercenary()).thenReturn(true);
-        when(campaign.getFaction()).thenReturn(campaignFaction);
+        when(campaign.getPlayerForce().getFaction()).thenReturn(campaignFaction);
         when(campaignFaction.getShortName()).thenReturn("MERC");
 
         CampaignOptions campaignOptions = mock(CampaignOptions.class);
@@ -799,7 +799,7 @@ public class ContractMarketAtBGenerationTests {
 
         Faction campaignFaction = mock(Faction.class);
         when(campaignFaction.isMercenary()).thenReturn(true);
-        when(campaign.getFaction()).thenReturn(campaignFaction);
+        when(campaign.getPlayerForce().getFaction()).thenReturn(campaignFaction);
         when(campaignFaction.getShortName()).thenReturn("MERC");
 
         CampaignOptions campaignOptions = mock(CampaignOptions.class);
@@ -898,7 +898,7 @@ public class ContractMarketAtBGenerationTests {
 
         Faction campaignFaction = mock(Faction.class);
         when(campaignFaction.isMercenary()).thenReturn(true);
-        when(campaign.getFaction()).thenReturn(campaignFaction);
+        when(campaign.getPlayerForce().getFaction()).thenReturn(campaignFaction);
         when(campaignFaction.getShortName()).thenReturn("MERC");
 
         CampaignOptions campaignOptions = mock(CampaignOptions.class);
@@ -1005,7 +1005,7 @@ public class ContractMarketAtBGenerationTests {
 
         Faction campaignFaction = mock(Faction.class);
         when(campaignFaction.isMercenary()).thenReturn(true);
-        when(campaign.getFaction()).thenReturn(campaignFaction);
+        when(campaign.getPlayerForce().getFaction()).thenReturn(campaignFaction);
         when(campaignFaction.getShortName()).thenReturn("MERC");
 
         CampaignOptions campaignOptions = mock(CampaignOptions.class);
@@ -1108,7 +1108,7 @@ public class ContractMarketAtBGenerationTests {
 
         Faction campaignFaction = mock(Faction.class);
         when(campaignFaction.isMercenary()).thenReturn(true);
-        when(campaign.getFaction()).thenReturn(campaignFaction);
+        when(campaign.getPlayerForce().getFaction()).thenReturn(campaignFaction);
         when(campaignFaction.getShortName()).thenReturn("MERC");
 
         CampaignOptions campaignOptions = mock(CampaignOptions.class);
@@ -1215,7 +1215,7 @@ public class ContractMarketAtBGenerationTests {
 
         Faction campaignFaction = mock(Faction.class);
         when(campaignFaction.isMercenary()).thenReturn(true);
-        when(campaign.getFaction()).thenReturn(campaignFaction);
+        when(campaign.getPlayerForce().getFaction()).thenReturn(campaignFaction);
         when(campaignFaction.getShortName()).thenReturn("MERC");
 
         CampaignOptions campaignOptions = mock(CampaignOptions.class);
@@ -1322,7 +1322,7 @@ public class ContractMarketAtBGenerationTests {
 
         Faction campaignFaction = mock(Faction.class);
         when(campaignFaction.isMercenary()).thenReturn(true);
-        when(campaign.getFaction()).thenReturn(campaignFaction);
+        when(campaign.getPlayerForce().getFaction()).thenReturn(campaignFaction);
         when(campaignFaction.getShortName()).thenReturn("MERC");
 
         CampaignOptions campaignOptions = mock(CampaignOptions.class);
@@ -1429,7 +1429,7 @@ public class ContractMarketAtBGenerationTests {
 
         Faction campaignFaction = mock(Faction.class);
         when(campaignFaction.isMercenary()).thenReturn(true);
-        when(campaign.getFaction()).thenReturn(campaignFaction);
+        when(campaign.getPlayerForce().getFaction()).thenReturn(campaignFaction);
         when(campaignFaction.getShortName()).thenReturn("MERC");
 
         CampaignOptions campaignOptions = mock(CampaignOptions.class);
@@ -1536,7 +1536,7 @@ public class ContractMarketAtBGenerationTests {
         Faction campaignFaction = mock(Faction.class);
         when(campaignFaction.isMercenary()).thenReturn(false);
         when(campaignFaction.getShortName()).thenReturn(employer);
-        when(campaign.getFaction()).thenReturn(campaignFaction);
+        when(campaign.getPlayerForce().getFaction()).thenReturn(campaignFaction);
         when(campaignFaction.getShortName()).thenReturn(employer);
 
         CampaignOptions campaignOptions = mock(CampaignOptions.class);
@@ -1644,7 +1644,7 @@ public class ContractMarketAtBGenerationTests {
         Faction campaignFaction = mock(Faction.class);
         when(campaignFaction.isMercenary()).thenReturn(false);
         when(campaignFaction.getShortName()).thenReturn(employer);
-        when(campaign.getFaction()).thenReturn(campaignFaction);
+        when(campaign.getPlayerForce().getFaction()).thenReturn(campaignFaction);
         when(campaignFaction.getShortName()).thenReturn(employer);
 
         CampaignOptions campaignOptions = mock(CampaignOptions.class);
@@ -1751,7 +1751,7 @@ public class ContractMarketAtBGenerationTests {
         Faction campaignFaction = mock(Faction.class);
         when(campaignFaction.isMercenary()).thenReturn(false);
         when(campaignFaction.getShortName()).thenReturn(employer);
-        when(campaign.getFaction()).thenReturn(campaignFaction);
+        when(campaign.getPlayerForce().getFaction()).thenReturn(campaignFaction);
         when(campaignFaction.getShortName()).thenReturn(employer);
 
         CampaignOptions campaignOptions = mock(CampaignOptions.class);
@@ -1859,7 +1859,7 @@ public class ContractMarketAtBGenerationTests {
         Faction campaignFaction = mock(Faction.class);
         when(campaignFaction.isMercenary()).thenReturn(false);
         when(campaignFaction.getShortName()).thenReturn(employer);
-        when(campaign.getFaction()).thenReturn(campaignFaction);
+        when(campaign.getPlayerForce().getFaction()).thenReturn(campaignFaction);
         when(campaignFaction.getShortName()).thenReturn(employer);
 
         CampaignOptions campaignOptions = mock(CampaignOptions.class);

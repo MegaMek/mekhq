@@ -129,7 +129,7 @@ public class AtbMonthlyContractMarket extends AbstractContractMarket {
 
             Person campaignCommander = campaign.getPlayerForce().getHumanResources()
                                              .getCommander(campaign.getCampaignOptions(),
-                                                   campaign.isClanCampaign(),
+                                                   campaign.getPlayerForce().isClanForce(),
                                                    campaign.getLocalDate());
             if (campaignCommander != null && !newCampaign) {
                 if (campaignCommander.getAdjustedConnections(false) > 0) {
@@ -174,7 +174,7 @@ public class AtbMonthlyContractMarket extends AbstractContractMarket {
             Person negotiator = campaign.getPlayerForce().getHumanResources()
                                       .getSeniorAdminPerson(mekhq.campaign.Campaign.AdministratorSpecialization.COMMAND,
                                             campaign.getCampaignOptions(),
-                                            campaign.isClanCampaign(),
+                                            campaign.getPlayerForce().isClanForce(),
                                             campaign.getLocalDate());
             int negotiatorModifier = 0;
             if (negotiator != null) {
@@ -247,7 +247,7 @@ public class AtbMonthlyContractMarket extends AbstractContractMarket {
                 numContracts--;
             }
 
-            if (campaign.getFaction().isMercenary() || campaign.getFaction().isPirate()) {
+            if (campaign.getPlayerForce().getFaction().isMercenary() || campaign.getPlayerForce().getFaction().isPirate()) {
                 if (campaign.getCurrentSystem().isHiringHall(campaign.getLocalDate())) {
                     numContracts++;
                     /* Though the rules do not state these modifiers are mutually exclusive, the fact that the
@@ -306,12 +306,12 @@ public class AtbMonthlyContractMarket extends AbstractContractMarket {
         AtBContract contract = null;
 
         boolean isMercenaryCampaign = campaign.isMercenaryCampaign();
-        if (campaign.getFaction().isMercenary()) {
+        if (campaign.getPlayerForce().getFaction().isMercenary()) {
             if (null == campaign.getPlayerForce().getRetainerEmployerCode()) {
                 int retries = MAXIMUM_GENERATION_RETRIES;
                 while ((retries > 0) && (contract == null)) {
                     Faction employer =
-                          RandomFactionGenerator.getInstance().getRandomEmployerFaction(campaign.getCurrentLocation(),
+                          RandomFactionGenerator.getInstance().getRandomEmployerFaction(campaign.getPlayerForce().getForceDetachment().getCurrentLocation(),
                                 campaign.getLocalDate(), isMercenaryCampaign);
                     if (employer == null) {
                         retries--;
@@ -328,7 +328,7 @@ public class AtbMonthlyContractMarket extends AbstractContractMarket {
                       campaign.getPlayerForce().getRetainerEmployerCode(), unitRatingMod);
             }
         } else {
-            contract = generateAtBContract(campaign, campaign.getFaction().getShortName(), unitRatingMod);
+            contract = generateAtBContract(campaign, campaign.getPlayerForce().getFaction().getShortName(), unitRatingMod);
         }
 
         // This try-catch is specifically implemented to make testing easier. Otherwise, we would need to
@@ -480,7 +480,7 @@ public class AtbMonthlyContractMarket extends AbstractContractMarket {
             contract.setMercSubcontract(true);
             for (int attempts = 0; attempts < MAXIMUM_ATTEMPTS_TO_FIND_NON_MERC_EMPLOYER; ++attempts) {
                 Faction rerolledEmployer = RandomFactionGenerator.getInstance()
-                                                 .getRandomEmployerFaction(campaign.getCurrentLocation(),
+                                                 .getRandomEmployerFaction(campaign.getPlayerForce().getForceDetachment().getCurrentLocation(),
                                                        campaign.getLocalDate(),
                                                        true);
                 employer = rerolledEmployer == null ? null : rerolledEmployer.getShortName();
@@ -631,7 +631,7 @@ public class AtbMonthlyContractMarket extends AbstractContractMarket {
         // Same type-derived enemy preference as setEnemyCode, minus the mercenary-opposition substitution, which
         // subcontracts have never rolled for.
         Faction enemyFaction = RandomFactionGenerator.getInstance()
-                                     .getRandomEnemy(campaign.getCurrentLocation(), campaign.getLocalDate(),
+                                     .getRandomEnemy(campaign.getPlayerForce().getForceDetachment().getCurrentLocation(), campaign.getLocalDate(),
                                            contract.getEmployerFaction(),
                                            contract.getContractType().getEnemySelectionProfile());
         contract.setEnemyCode(enemyFaction.getShortName());
@@ -951,21 +951,21 @@ public class AtbMonthlyContractMarket extends AbstractContractMarket {
         Person adminCommand = campaign.getPlayerForce().getHumanResources()
                                     .getSeniorAdminPerson(mekhq.campaign.Campaign.AdministratorSpecialization.COMMAND,
                                           campaign.getCampaignOptions(),
-                                          campaign.isClanCampaign(),
+                                          campaign.getPlayerForce().isClanForce(),
                                           campaign.getLocalDate());
         Person adminTransport = campaign.getPlayerForce().getHumanResources()
                                       .getSeniorAdminPerson(mekhq.campaign.Campaign.AdministratorSpecialization.TRANSPORT,
                                             campaign.getCampaignOptions(),
-                                            campaign.isClanCampaign(),
+                                            campaign.getPlayerForce().isClanForce(),
                                             campaign.getLocalDate());
         Person adminLogistics = campaign.getPlayerForce().getHumanResources()
                                       .getSeniorAdminPerson(mekhq.campaign.Campaign.AdministratorSpecialization.LOGISTICS,
                                             campaign.getCampaignOptions(),
-                                            campaign.isClanCampaign(),
+                                            campaign.getPlayerForce().isClanForce(),
                                             campaign.getLocalDate());
 
         boolean isUseAgeEffects = campaign.getCampaignOptions().get(CampaignOption.USE_AGE_EFFECTS);
-        boolean isClanCampaign = campaign.isClanCampaign();
+        boolean isClanCampaign = campaign.getPlayerForce().isClanForce();
         LocalDate today = campaign.getLocalDate();
 
         int adminCommandExp = SkillType.EXP_NONE;
@@ -999,7 +999,7 @@ public class AtbMonthlyContractMarket extends AbstractContractMarket {
         }
 
         /* Treat government units like merc units that have a retainer contract */
-        if ((!campaign.getFaction().isMercenary() && !campaign.getFaction().isPirate()) ||
+        if ((!campaign.getPlayerForce().getFaction().isMercenary() && !campaign.getPlayerForce().getFaction().isPirate()) ||
                   (null != campaign.getPlayerForce().getRetainerEmployerCode())) {
             for (int i = 0; i < CLAUSE_NUM; i++) {
                 mods.mods[i]++;
@@ -1081,7 +1081,7 @@ public class AtbMonthlyContractMarket extends AbstractContractMarket {
         if (contract.getContractType().isGuerrillaType()) {
             contract.setCommandRights(ContractCommandRights.INDEPENDENT);
         } else {
-            rollCommandClause(contract, mods.mods[CLAUSE_COMMAND], campaign.getFaction().isMercenary());
+            rollCommandClause(contract, mods.mods[CLAUSE_COMMAND], campaign.getPlayerForce().getFaction().isMercenary());
         }
 
         rollSalvageClause(contract,

@@ -148,7 +148,7 @@ public class FactionAccoladeEvent {
 
         Person commander = campaign.getPlayerForce().getHumanResources()
                                  .getCommander(campaign.getCampaignOptions(),
-                                       campaign.isClanCampaign(),
+                                       campaign.getPlayerForce().isClanForce(),
                                        campaign.getLocalDate());
         String factionName = getFactionName(accoladingFaction, campaign.getGameYear());
 
@@ -222,7 +222,7 @@ public class FactionAccoladeEvent {
             if (!isSameFaction) {
                 GoingRogue.processGoingRogue(campaign, accoladingFaction, campaign.getPlayerForce().getHumanResources()
                                                                                 .getCommander(campaign.getCampaignOptions(),
-                                                                                      campaign.isClanCampaign(),
+                                                                                      campaign.getPlayerForce().isClanForce(),
                                                                                       campaign.getLocalDate()), null,
                       campaign.getCampaignOptions().get(CampaignOption.TRACK_FACTION_STANDING), false);
             }
@@ -275,7 +275,7 @@ public class FactionAccoladeEvent {
             speaker = campaign.getPlayerForce().getHumanResources()
                             .getSeniorAdminPerson(Campaign.AdministratorSpecialization.COMMAND,
                                   campaign.getCampaignOptions(),
-                                  campaign.isClanCampaign(),
+                                  campaign.getPlayerForce().isClanForce(),
                                   campaign.getLocalDate());
         } else {
             boolean isLetterFromHeadOfState = accoladeLevel.is(LETTER_FROM_HEAD_OF_STATE);

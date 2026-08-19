@@ -131,7 +131,7 @@ public record WinterHolidayAnnouncement(Campaign campaign) {
         String commanderAddress = campaign.getCommanderAddress();
 
         // Determine the location context
-        String location = campaign.getCurrentLocation().isOnPlanet() ? "planetside" : "transit";
+        String location = campaign.getPlayerForce().getForceDetachment().getCurrentLocation().isOnPlanet() ? "planetside" : "transit";
 
         // Generate each paragraph and concatenate the full message
         StringBuilder messageBuilder = new StringBuilder();
@@ -193,14 +193,14 @@ public record WinterHolidayAnnouncement(Campaign campaign) {
         Person speaker = campaign.getPlayerForce().getHumanResources()
                                .getSeniorAdminPerson(mekhq.campaign.Campaign.AdministratorSpecialization.HR,
                                      campaign.getCampaignOptions(),
-                                     campaign.isClanCampaign(),
+                                     campaign.getPlayerForce().isClanForce(),
                                      campaign.getLocalDate());
 
         if (speaker == null) {
             speaker = campaign.getPlayerForce().getHumanResources()
                             .getSeniorAdminPerson(mekhq.campaign.Campaign.AdministratorSpecialization.COMMAND,
                                   campaign.getCampaignOptions(),
-                                  campaign.isClanCampaign(),
+                                  campaign.getPlayerForce().isClanForce(),
                                   campaign.getLocalDate());
         } else {
             return speaker;

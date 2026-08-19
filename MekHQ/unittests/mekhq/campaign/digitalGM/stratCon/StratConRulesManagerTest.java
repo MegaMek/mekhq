@@ -1165,7 +1165,7 @@ class StratConRulesManagerTest {
 
         private static Campaign mockCampaign(boolean useAgingEffects, boolean isClanCampaign) {
             Campaign campaign = MHQTestUtilities.mockCampaign();
-            when(campaign.isClanCampaign()).thenReturn(isClanCampaign);
+            when(campaign.getPlayerForce().isClanForce()).thenReturn(isClanCampaign);
             when(campaign.getLocalDate()).thenReturn(LocalDate.now());
             CampaignOptions campaignOptions = mock(CampaignOptions.class);
             when(campaignOptions.get(CampaignOption.USE_AGE_EFFECTS)).thenReturn(useAgingEffects);

@@ -90,7 +90,7 @@ public final class InjuryUtil {
 
     /** Run a daily healing check */
     public static void resolveDailyHealing(Campaign campaign, Person person) {
-        Person doctor = campaign.getPerson(person.getDoctorId());
+        Person doctor = campaign.getPlayerForce().getHumanResources().getPerson(person.getDoctorId());
         if (null != doctor && doctor.isDoctor()) {
             if (person.getDaysToWaitForHealing() <= 0) {
                 genMedicalTreatment(campaign, person, doctor).forEach(GameEffect::apply);

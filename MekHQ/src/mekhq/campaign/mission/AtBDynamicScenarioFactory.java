@@ -3829,7 +3829,7 @@ public class AtBDynamicScenarioFactory {
      * @since 0.50.10
      */
     private static int getUnitCountForStratConSingles(Campaign campaign) {
-        int defaultUnitCount = CombatTeam.getStandardFormationSize(campaign.getFaction());
+        int defaultUnitCount = CombatTeam.getStandardFormationSize(campaign.getPlayerForce().getFaction());
 
         int forceCount = 0;
         int unitCount = 0;
@@ -3891,7 +3891,7 @@ public class AtBDynamicScenarioFactory {
      * @since 0.50.10
      */
     private static int getUnitCountWithoutUsingASeedForce(Campaign campaign) {
-        int defaultUnitCount = CombatTeam.getStandardFormationSize(campaign.getFaction());
+        int defaultUnitCount = CombatTeam.getStandardFormationSize(campaign.getPlayerForce().getFaction());
 
         // We need to start by gathering the different unit counts. This is because we need that information for
         // calculating the gaussian-weighted average. Specifically, we need it to calculate the crude mean (which the

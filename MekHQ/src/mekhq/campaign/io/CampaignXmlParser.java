@@ -211,13 +211,13 @@ public record CampaignXmlParser(InputStream is, MekHQ app) {
                     String val = childNode.getTextContent().trim();
 
                     if (!val.equals("null")) {
-                        campaign.getCamouflage().setCategory(val);
+                        campaign.getPlayerForce().getCamouflage().setCategory(val);
                     }
                 } else if (nodeName.equalsIgnoreCase("camoFileName")) {
                     String val = childNode.getTextContent().trim();
 
                     if (!val.equals("null")) {
-                        campaign.getCamouflage().setFilename(val);
+                        campaign.getPlayerForce().getCamouflage().setFilename(val);
                     }
                 } else if (nodeName.equalsIgnoreCase("colour")) {
                     final PlayerColour colour = PlayerColour.parseFromString(childNode.getTextContent().trim());
@@ -1634,7 +1634,7 @@ public record CampaignXmlParser(InputStream is, MekHQ app) {
                                    "mekfiles" +
                                    File.separator +
                                    "customs"; // TODO : Remove inline file path
-        String sCustomsDirCampaign = sCustomsDir + File.separator + retVal.getName();
+        String sCustomsDirCampaign = sCustomsDir + File.separator + retVal.getPlayerForce().getName();
         File customsDir = new File(sCustomsDir);
         if (!customsDir.exists()) {
             if (!customsDir.mkdir()) {
@@ -1923,7 +1923,7 @@ public record CampaignXmlParser(InputStream is, MekHQ app) {
                                  .getHumanResources()
                                  .getTechs(retVal.getPlayerForce().getHangar().getUnits(),
                                        retVal.getCampaignOptions(),
-                                       retVal.isClanCampaign(),
+                                       retVal.getPlayerForce().isClanForce(),
                                        retVal.getLocalDate())) {
             for (Unit u : new ArrayList<>(tech.getTechUnits())) {
                 String reason = null;
@@ -2443,7 +2443,7 @@ public record CampaignXmlParser(InputStream is, MekHQ app) {
             // This needs to be down here so that it can factor in any changes made to personnel prior to this point.
             unit.resetPilotAndEntity();
         });
-        campaign.refreshNetworks();
+        campaign.getPlayerForce().refreshNetworks(campaign.getGame());
 
         LOGGER.info("[Campaign Load] C3 networks refreshed in {}ms", System.currentTimeMillis() - timestamp);
         timestamp = System.currentTimeMillis();

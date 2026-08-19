@@ -249,7 +249,7 @@ public class CampaignNewDayManager {
 
         this.campaign = campaign;
         this.campaignOptions = campaign.getCampaignOptions();
-        this.faction = campaign.getFaction();
+        this.faction = campaign.getPlayerForce().getFaction();
         this.finances = campaign.getPlayerForce().getFinances();
         this.updatedLocation = campaign.getPlayerForce().getForceDetachment().getCurrentLocation();
     }
@@ -265,7 +265,7 @@ public class CampaignNewDayManager {
                                               .getHumanResources()
                                               .getNewPersonnelMarket()
                                               .getRareProfessions()) {
-            oocReport.append("<p>- ").append(profession.getLabel(campaign.isClanCampaign())).append("</p>");
+            oocReport.append("<p>- ").append(profession.getLabel(campaign.getPlayerForce().isClanForce())).append("</p>");
         }
 
         List<String> buttons = new ArrayList<>();
@@ -279,7 +279,7 @@ public class CampaignNewDayManager {
               campaign.getPlayerForce().getHumanResources()
                     .getSeniorAdminPerson(AdministratorSpecialization.HR,
                           campaign.getCampaignOptions(),
-                          campaign.isClanCampaign(),
+                          campaign.getPlayerForce().isClanForce(),
                           campaign.getLocalDate()),
               null,
               campaign.getResources().getString("personnelMarket.rareProfession.inCharacter"),
@@ -304,7 +304,7 @@ public class CampaignNewDayManager {
 
     public void reset() {
         this.campaignOptions = campaign.getCampaignOptions();
-        this.faction = campaign.getFaction();
+        this.faction = campaign.getPlayerForce().getFaction();
         this.finances = campaign.getPlayerForce().getFinances();
         this.updatedLocation = campaign.getPlayerForce().getForceDetachment().getCurrentLocation();
 
@@ -702,7 +702,7 @@ public class CampaignNewDayManager {
             new ImmersiveDialogSimple(campaign,
                   campaign.getPlayerForce().getHumanResources()
                         .getSeniorMedicalPerson(campaign.getCampaignOptions(),
-                              campaign.isClanCampaign(),
+                              campaign.getPlayerForce().isClanForce(),
                               campaign.getLocalDate()),
                   null,
                   getFormattedTextAt(RESOURCE_BUNDLE, "bioweaponAttack.inCharacter",
@@ -732,7 +732,7 @@ public class CampaignNewDayManager {
             new ImmersiveDialogSimple(campaign,
                   campaign.getPlayerForce().getHumanResources()
                         .getSeniorMedicalPerson(campaign.getCampaignOptions(),
-                              campaign.isClanCampaign(),
+                              campaign.getPlayerForce().isClanForce(),
                               campaign.getLocalDate()),
                   null,
                   getFormattedTextAt(RESOURCE_BUNDLE, "diseaseOutbreak.inCharacter." + keySuffix,
@@ -918,7 +918,7 @@ public class CampaignNewDayManager {
         boolean isCommandersDay = isCommandersDay(today) &&
                                         campaign.getPlayerForce().getHumanResources()
                                               .getCommander(campaign.getCampaignOptions(),
-                                                    campaign.isClanCampaign(),
+                                                    campaign.getPlayerForce().isClanForce(),
                                                     campaign.getLocalDate()) != null &&
                                         campaignOptions.get(CampaignOption.SHOW_LIFE_EVENT_DIALOG_CELEBRATIONS);
         boolean isCampaignPlanetside = updatedLocation.isOnPlanet();
@@ -938,7 +938,7 @@ public class CampaignNewDayManager {
             // Daily events
             medicalController.processMedicalEvents(person,
                   campaignOptions.get(CampaignOption.USE_AGE_EFFECTS),
-                  campaign.isClanCampaign(),
+                  campaign.getPlayerForce().isClanForce(),
                   today);
 
             // The character can die during the prior step, if so we stop processing them.
@@ -1184,7 +1184,7 @@ public class CampaignNewDayManager {
         if (campaignOptions.get(CampaignOption.ALLOW_MONTHLY_CONNECTIONS)) {
             Person commander = campaign.getPlayerForce().getHumanResources()
                                      .getCommander(campaign.getCampaignOptions(),
-                                           campaign.isClanCampaign(),
+                                           campaign.getPlayerForce().isClanForce(),
                                            campaign.getLocalDate());
             if (commander != null && commander.getBurnedConnectionsEndDate() == null) {
                 String report = commander.checkForBurnedContacts(today);
@@ -1670,7 +1670,7 @@ public class CampaignNewDayManager {
                           spanOpeningWithCustomColor(ReportingUtilities.getPositiveColor()),
                           yearsOfEmployment,
                           CLOSING_SPAN_TAG,
-                          campaign.getName()));
+                          campaign.getPlayerForce().getName()));
                 }
             }
         } else if (person.getAge(today) == 18 && isBirthday) {

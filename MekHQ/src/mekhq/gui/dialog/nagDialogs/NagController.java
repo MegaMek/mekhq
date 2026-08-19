@@ -92,7 +92,7 @@ public class NagController {
         final boolean isSunday = today.getDayOfWeek() == DayOfWeek.SUNDAY;
         final boolean isLastDayOfMonth = today.getDayOfMonth() == today.lengthOfMonth();
 
-        if (InvalidFactionNagDialog.checkNag(campaign.getFaction(), today)) {
+        if (InvalidFactionNagDialog.checkNag(campaign.getPlayerForce().getFaction(), today)) {
             InvalidFactionNagDialog invalidFactionNagDialog = new InvalidFactionNagDialog(campaign);
             if (invalidFactionNagDialog.shouldCancelAdvanceDay()) {
                 return true;

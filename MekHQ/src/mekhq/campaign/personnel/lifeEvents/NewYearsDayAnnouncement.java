@@ -119,7 +119,7 @@ public record NewYearsDayAnnouncement(Campaign campaign) {
 
         Person commander = campaign.getPlayerForce().getHumanResources()
                                  .getCommander(campaign.getCampaignOptions(),
-                                       campaign.isClanCampaign(),
+                                       campaign.getPlayerForce().isClanForce(),
                                        campaign.getLocalDate());
         if (commander != null) {
             activePersonnel.remove(commander);

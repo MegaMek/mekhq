@@ -264,7 +264,7 @@ public class CapturePrisoners {
                       campaign.getPlayerForce().getHumanResources()
                             .getSeniorAdminPerson(mekhq.campaign.Campaign.AdministratorSpecialization.HR,
                                   campaign.getCampaignOptions(),
-                                  campaign.isClanCampaign(),
+                                  campaign.getPlayerForce().isClanForce(),
                                   campaign.getLocalDate()),
                       null,
                       createInCharacterMessage(prisoner, isBondsman),

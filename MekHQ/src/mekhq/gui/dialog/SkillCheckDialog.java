@@ -102,7 +102,7 @@ public class SkillCheckDialog {
         this.character = character;
 
         boolean isUseAgingEffects = campaign.getCampaignOptions().get(CampaignOption.USE_AGE_EFFECTS);
-        boolean isClanCampaign = campaign.isClanCampaign();
+        boolean isClanCampaign = campaign.getPlayerForce().isClanForce();
         LocalDate today = campaign.getLocalDate();
 
         // Initial Dialog

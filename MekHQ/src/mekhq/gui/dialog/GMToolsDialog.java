@@ -1087,7 +1087,7 @@ public class GMToolsDialog extends AbstractMHQDialogBasic {
         lblCurrentCompanyName.setName("lblCurrentCompanyName");
         addComponent(panel, lblCurrentCompanyName, gridBagConstraints, 0, 0);
 
-        JLabel lblCurrentCompanyNameValue = new JLabel(gui.getCampaign().getName());
+        JLabel lblCurrentCompanyNameValue = new JLabel(gui.getCampaign().getPlayerForce().getName());
         lblCurrentCompanyNameValue.setName("lblCurrentCompanyName");
         lblCurrentCompanyName.setLabelFor(lblCurrentCompanyNameValue);
         addComponent(panel, lblCurrentCompanyNameValue, gridBagConstraints, 1, 0);
@@ -1096,7 +1096,7 @@ public class GMToolsDialog extends AbstractMHQDialogBasic {
         lblCompanyNameGenerated.setName("lblCompanyNameGenerated");
         addComponent(panel, lblCompanyNameGenerated, gridBagConstraints, 0, 1);
 
-        txtCompanyNamesGenerated = new JTextArea(gui.getCampaign().getName());
+        txtCompanyNamesGenerated = new JTextArea(gui.getCampaign().getPlayerForce().getName());
         txtCompanyNamesGenerated.setName("txtCompanyNamesGenerated");
         addComponent(panel, txtCompanyNamesGenerated, gridBagConstraints, 1, 1);
         lblCompanyNameGenerated.setLabelFor(txtCompanyNamesGenerated);
@@ -1126,7 +1126,7 @@ public class GMToolsDialog extends AbstractMHQDialogBasic {
                   lastGeneratedCompanyName = randomMercenaryCompanyNameGenerator(campaign.getPlayerForce()
                                                                                        .getHumanResources()
                                                                                        .getCommander(campaign.getCampaignOptions(),
-                                                                                             campaign.isClanCampaign(),
+                                                                                             campaign.getPlayerForce().isClanForce(),
                                                                                              campaign.getLocalDate()));
                   txtCompanyNamesGenerated.setText(lastGeneratedCompanyName);
               });
@@ -1153,7 +1153,7 @@ public class GMToolsDialog extends AbstractMHQDialogBasic {
      */
     private void assignCompanyName(ActionEvent evt) {
         Campaign campaign1 = gui.getCampaign();
-        if (campaign1.getPlayerForce().getFormation(0).getName().equals(gui.getCampaign().getName())) {
+        if (campaign1.getPlayerForce().getFormation(0).getName().equals(gui.getCampaign().getPlayerForce().getName())) {
             Campaign campaign = gui.getCampaign();
             campaign.getPlayerForce().getFormation(0).setName(lastGeneratedCompanyName);
         }
@@ -1396,8 +1396,8 @@ public class GMToolsDialog extends AbstractMHQDialogBasic {
             }
         }
 
-        final Clan clan = Clan.getClan((getGUI().getCampaign().getFaction().isClan() ?
-                                              getGUI().getCampaign().getFaction() :
+        final Clan clan = Clan.getClan((getGUI().getCampaign().getPlayerForce().getFaction().isClan() ?
+                                              getGUI().getCampaign().getPlayerForce().getFaction() :
                                               getPerson().getOriginFaction()).getShortName());
         if (clan != null) {
             getComboOriginClan().setSelectedItem(new ClanDisplay(clan, getGUI().getCampaign().getLocalDate()));

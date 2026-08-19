@@ -221,7 +221,7 @@ public class PersonnelMarketDialog extends JDialog {
                 radioNormalRoll.setSelected(true);
             }
 
-            final boolean isClan = campaign.getFaction().isClan();
+            final boolean isClan = campaign.getPlayerForce().getFaction().isClan();
             comboRecruitRole.setRenderer(new DefaultListCellRenderer() {
                 @Override
                 public Component getListCellRendererComponent(JList<?> list, Object value, int index,

@@ -943,7 +943,7 @@ public final class BriefingTab extends CampaignGuiTab {
                                              .findBestInRole(role,
                                                    SkillType.S_ADMIN,
                                                    campaign.getCampaignOptions(),
-                                                   campaign.isClanCampaign(),
+                                                   campaign.getPlayerForce().isClanForce(),
                                                    campaign.getLocalDate());
                         if (admin != null) {
                             admin.awardXP(getCampaign(), 1);
@@ -983,7 +983,7 @@ public final class BriefingTab extends CampaignGuiTab {
 
             if (mission instanceof AtBContract contract) {
                 Faction employer = contract.getEmployerFaction();
-                reports = factionStandings.processContractCompletion(getCampaign().getFaction(), employer, today,
+                reports = factionStandings.processContractCompletion(getCampaign().getPlayerForce().getFaction(), employer, today,
                       status, regardMultiplier, contract.getLengthInMonths());
             } else {
                 SimulateMissionDialog dialog = getSimulateMissionDialog(mission, status);
@@ -993,7 +993,7 @@ public final class BriefingTab extends CampaignGuiTab {
                 MissionStatus statusChoice = dialog.getStatusChoice();
                 int durationChoice = dialog.getDurationChoice();
 
-                reports.addAll(handleFactionRegardUpdates(getCampaign().getFaction(), employerChoice, enemyChoice,
+                reports.addAll(handleFactionRegardUpdates(getCampaign().getPlayerForce().getFaction(), employerChoice, enemyChoice,
                       statusChoice, today, factionStandings, regardMultiplier, durationChoice));
             }
 
@@ -1112,7 +1112,7 @@ public final class BriefingTab extends CampaignGuiTab {
 
         return new ManualMissionDialog(getFrame(),
               getCampaign().getCampaignFactionIcon(),
-              getCampaign().getFaction(),
+              getCampaign().getPlayerForce().getFaction(),
               startDate,
               status,
               mission.getName(),
@@ -1546,7 +1546,7 @@ public final class BriefingTab extends CampaignGuiTab {
 
         Campaign campaign = getCampaign();
         CampaignOptions campaignOptions = campaign.getCampaignOptions();
-        boolean isClanCampaign = campaign.isClanCampaign();
+        boolean isClanCampaign = campaign.getPlayerForce().isClanForce();
         boolean isUseEdge = campaignOptions.get(CampaignOption.USE_EDGE);
         SalvageTechPicker techPicker = new SalvageTechPicker(techData, priorSelectedTechs,
               isClanCampaign, getBattlefieldControlType(scenario), isUseEdge);
@@ -1586,7 +1586,7 @@ public final class BriefingTab extends CampaignGuiTab {
                                  .getHumanResources()
                                  .getTechsExpanded(campaign.getPlayerForce().getHangar().getUnits(),
                                        campaign.getCampaignOptions(),
-                                       campaign.isClanCampaign(),
+                                       campaign.getPlayerForce().isClanForce(),
                                        campaign.getLocalDate(),
                                        true,
                                        false,
@@ -2292,7 +2292,7 @@ public final class BriefingTab extends CampaignGuiTab {
         for (final Unit unit : chosen) {
             playerEntities.add(unit.getEntity());
         }
-        allyFactionCodes.add(getCampaign().getFaction().getShortName());
+        allyFactionCodes.add(getCampaign().getPlayerForce().getFaction().getShortName());
 
         // Split up bot forces into teams for separate handling
         for (final BotForce botForce : scenario.getBotForces()) {
@@ -2349,8 +2349,8 @@ public final class BriefingTab extends CampaignGuiTab {
               allEnemyEntities,
               opForFactionCodes,
               opForQuality,
-              (getCampaign().getFaction().isPirate()) ? TeamLoadOutGenerator.UNSET_FILL_RATIO : 1.0f);
-        rp.isPirate = getCampaign().getFaction().isPirate();
+              (getCampaign().getPlayerForce().getFaction().isPirate()) ? TeamLoadOutGenerator.UNSET_FILL_RATIO : 1.0f);
+        rp.isPirate = getCampaign().getPlayerForce().getFaction().isPirate();
         rp.groundMap = groundMap;
         rp.spaceEnvironment = spaceMap;
         MunitionTree mt = TeamLoadOutGenerator.generateMunitionTree(rp, alliedEntities, "");
@@ -2450,7 +2450,7 @@ public final class BriefingTab extends CampaignGuiTab {
             }
         }
 
-        File file = determineMULFilePath(scenario, getCampaign().getName());
+        File file = determineMULFilePath(scenario, getCampaign().getPlayerForce().getName());
         if (file == null) {
             return;
         }

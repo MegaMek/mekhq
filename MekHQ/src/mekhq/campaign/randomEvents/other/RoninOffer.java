@@ -182,7 +182,7 @@ public class RoninOffer {
               campaign.getPlayerForce().getHumanResources()
                     .getSeniorAdminPerson(Campaign.AdministratorSpecialization.HR,
                           campaign.getCampaignOptions(),
-                          campaign.isClanCampaign(),
+                          campaign.getPlayerForce().isClanForce(),
                           campaign.getLocalDate()),
               null,
               centerMessage,

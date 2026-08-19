@@ -67,7 +67,7 @@ public class VocationalExperienceAwardDialog extends ImmersiveDialogSimple {
         super(campaign, campaign.getPlayerForce().getHumanResources()
                               .getSeniorAdminPerson(mekhq.campaign.Campaign.AdministratorSpecialization.HR,
                                     campaign.getCampaignOptions(),
-                                    campaign.isClanCampaign(),
+                                    campaign.getPlayerForce().isClanForce(),
                                     campaign.getLocalDate()),
               null,
               createInCharacterMessage(campaign), null,

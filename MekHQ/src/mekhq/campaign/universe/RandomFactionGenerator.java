@@ -153,7 +153,7 @@ public class RandomFactionGenerator {
      */
     public void startup(Campaign campaign) {
         borderTracker.setDate(campaign.getLocalDate());
-        final PlanetarySystem location = campaign.getCurrentLocation().getCurrentSystem();
+        final PlanetarySystem location = campaign.getPlayerForce().getForceDetachment().getCurrentLocation().getCurrentSystem();
         borderTracker.setRegionCenter(location.getX(), location.getY());
         borderTracker.setRegionRadius(campaign.getCampaignOptions().get(CampaignOption.CONTRACT_SEARCH_RADIUS));
         MekHQ.registerHandler(borderTracker);

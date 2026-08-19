@@ -182,7 +182,7 @@ class ExtraIncomeTest {
         Finances finances = new Finances();
 
         when(mockCampaign.getPlayerForce().getFinances()).thenReturn(finances);
-        when(mockCampaign.getFaction()).thenReturn(mockFaction);
+        when(mockCampaign.getPlayerForce().getFaction()).thenReturn(mockFaction);
         when(mockFaction.getShortName()).thenReturn("MERC");
 
         Person person = new Person(mockCampaign);
@@ -199,7 +199,7 @@ class ExtraIncomeTest {
         Finances finances = new Finances();
 
         when(mockCampaign.getPlayerForce().getFinances()).thenReturn(finances);
-        when(mockCampaign.getFaction()).thenReturn(mockFaction);
+        when(mockCampaign.getPlayerForce().getFaction()).thenReturn(mockFaction);
         when(mockFaction.getShortName()).thenReturn("MERC");
 
         Person person = new Person(mockCampaign);
@@ -217,7 +217,7 @@ class ExtraIncomeTest {
         Finances finances = new Finances();
 
         when(mockCampaign.getPlayerForce().getFinances()).thenReturn(finances);
-        when(mockCampaign.getFaction()).thenReturn(mockFaction);
+        when(mockCampaign.getPlayerForce().getFaction()).thenReturn(mockFaction);
         when(mockFaction.getShortName()).thenReturn("MERC");
 
         Person person = new Person(mockCampaign);
@@ -236,7 +236,7 @@ class ExtraIncomeTest {
         Finances finances = new Finances();
 
         when(mockCampaign.getPlayerForce().getFinances()).thenReturn(finances);
-        when(mockCampaign.getFaction()).thenReturn(mockFaction);
+        when(mockCampaign.getPlayerForce().getFaction()).thenReturn(mockFaction);
         when(mockFaction.getShortName()).thenReturn("MERC");
 
         Person person = new Person(mockCampaign);
@@ -255,7 +255,7 @@ class ExtraIncomeTest {
         Finances finances = new Finances();
 
         when(mockCampaign.getPlayerForce().getFinances()).thenReturn(finances);
-        when(mockCampaign.getFaction()).thenReturn(mockFaction);
+        when(mockCampaign.getPlayerForce().getFaction()).thenReturn(mockFaction);
         when(mockFaction.getShortName()).thenReturn("MERC");
 
         Person person = new Person(mockCampaign);
@@ -273,7 +273,7 @@ class ExtraIncomeTest {
         Finances finances = new Finances();
 
         when(mockCampaign.getPlayerForce().getFinances()).thenReturn(finances);
-        when(mockCampaign.getFaction()).thenReturn(mockFaction);
+        when(mockCampaign.getPlayerForce().getFaction()).thenReturn(mockFaction);
         when(mockFaction.getShortName()).thenReturn("MERC");
 
         Person person = new Person(mockCampaign);
@@ -292,7 +292,7 @@ class ExtraIncomeTest {
         Finances finances = new Finances();
 
         when(mockCampaign.getPlayerForce().getFinances()).thenReturn(finances);
-        when(mockCampaign.getFaction()).thenReturn(mockFaction);
+        when(mockCampaign.getPlayerForce().getFaction()).thenReturn(mockFaction);
         when(mockFaction.getShortName()).thenReturn("MERC");
 
         Person person = new Person(mockCampaign);
@@ -321,7 +321,7 @@ class ExtraIncomeTest {
         Finances finances = new Finances();
 
         when(mockCampaign.getPlayerForce().getFinances()).thenReturn(finances);
-        when(mockCampaign.getFaction()).thenReturn(mockFaction);
+        when(mockCampaign.getPlayerForce().getFaction()).thenReturn(mockFaction);
         when(mockFaction.getShortName()).thenReturn("MERC");
 
         Person person = new Person(mockCampaign);
@@ -351,7 +351,7 @@ class ExtraIncomeTest {
         Finances finances = new Finances();
 
         when(mockCampaign.getPlayerForce().getFinances()).thenReturn(finances);
-        when(mockCampaign.getFaction()).thenReturn(mockFaction);
+        when(mockCampaign.getPlayerForce().getFaction()).thenReturn(mockFaction);
         when(mockFaction.getShortName()).thenReturn("MERC");
 
         Person person = new Person(mockCampaign);
@@ -380,7 +380,7 @@ class ExtraIncomeTest {
         Finances finances = new Finances();
 
         when(mockCampaign.getPlayerForce().getFinances()).thenReturn(finances);
-        when(mockCampaign.getFaction()).thenReturn(mockFaction);
+        when(mockCampaign.getPlayerForce().getFaction()).thenReturn(mockFaction);
         when(mockFaction.getShortName()).thenReturn("MERC");
 
         Person person = new Person(mockCampaign);
@@ -410,7 +410,7 @@ class ExtraIncomeTest {
         Finances finances = new Finances();
 
         when(mockCampaign.getPlayerForce().getFinances()).thenReturn(finances);
-        when(mockCampaign.getFaction()).thenReturn(mockFaction);
+        when(mockCampaign.getPlayerForce().getFaction()).thenReturn(mockFaction);
         when(mockFaction.getShortName()).thenReturn("MERC");
 
         Person person = new Person(mockCampaign);

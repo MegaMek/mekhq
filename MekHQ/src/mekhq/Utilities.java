@@ -303,7 +303,7 @@ public class Utilities {
                 continue;
             }
 
-            Faction campaignFaction = campaign.getFaction();
+            Faction campaignFaction = campaign.getPlayerForce().getFaction();
             boolean campaignIsClan = campaignFaction.isClan();
             String techBase = summary.getTechBase().toLowerCase();
             boolean modelIsClan = summary.isClan() || techBase.contains("clan") || techBase.contains("mixed");

@@ -268,7 +268,7 @@ public class SupportPointNegotiation {
         }
 
         boolean isUseAgingEffects = campaign.getCampaignOptions().get(CampaignOption.USE_AGE_EFFECTS);
-        boolean isClanCampaign = campaign.isClanCampaign();
+        boolean isClanCampaign = campaign.getPlayerForce().isClanForce();
         LocalDate today = campaign.getLocalDate();
         adminTransport.sort((p1, p2) -> Integer.compare(getSkillValue(p2,
               isUseAgingEffects,

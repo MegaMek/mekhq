@@ -346,7 +346,7 @@ public class UnitTableMouseAdapter extends JPopupMenuAdapter {
             Person logisticsAdmin = campaign.getPlayerForce().getHumanResources()
                                           .getSeniorAdminPerson(Campaign.AdministratorSpecialization.LOGISTICS,
                                                 campaign.getCampaignOptions(),
-                                                campaign.isClanCampaign(),
+                                                campaign.getPlayerForce().isClanForce(),
                                                 campaign.getLocalDate());
 
             // Cancel is first (index 0), so closing dialog via X defaults to cancel
@@ -1510,7 +1510,7 @@ public class UnitTableMouseAdapter extends JPopupMenuAdapter {
     }
 
     private void addCustomUnitTag(Unit... units) {
-        String sCustomsDirCampaign = MHQConstants.CUSTOM_MEKFILES_DIRECTORY_PATH + gui.getCampaign().getName() + '/';
+        String sCustomsDirCampaign = MHQConstants.CUSTOM_MEKFILES_DIRECTORY_PATH + gui.getCampaign().getPlayerForce().getName() + '/';
         File customsDir = new File(MHQConstants.CUSTOM_MEKFILES_DIRECTORY_PATH);
         if (!customsDir.exists()) {
             if (!customsDir.mkdir()) {

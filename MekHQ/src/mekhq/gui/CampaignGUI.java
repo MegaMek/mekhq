@@ -1006,7 +1006,7 @@ public class CampaignGUI extends JPanel {
                                            .getHumanResources()
                                            .getTechs(campaign1.getPlayerForce().getHangar().getUnits(),
                                                  campaign1.getCampaignOptions(),
-                                                 campaign1.isClanCampaign(),
+                                                 campaign1.getPlayerForce().isClanForce(),
                                                  campaign1.getLocalDate(),
                                                  false,
                                                  true);
@@ -1149,7 +1149,7 @@ public class CampaignGUI extends JPanel {
                                  .getHumanResources()
                                  .getTechsExpanded(campaign.getPlayerForce().getHangar().getUnits(),
                                        campaign.getCampaignOptions(),
-                                       campaign.isClanCampaign(),
+                                       campaign.getPlayerForce().isClanForce(),
                                        campaign.getLocalDate())) {
             if (tech.isTechLargeVessel()) {
                 Entity entity = unit.getEntity();
@@ -1919,7 +1919,7 @@ public class CampaignGUI extends JPanel {
                   campaign.getPlayerForce().getHumanResources()
                         .getSeniorAdminPerson(Campaign.AdministratorSpecialization.LOGISTICS,
                               campaign.getCampaignOptions(),
-                              campaign.isClanCampaign(),
+                              campaign.getPlayerForce().isClanForce(),
                               campaign.getLocalDate()),
                   null,
                   inCharacterMessage,
@@ -1951,7 +1951,7 @@ public class CampaignGUI extends JPanel {
      */
     private boolean checkForInvalidFaction(DayEndingEvent dayEndingEvent) {
         Campaign campaign = getCampaign();
-        Faction campaignFaction = campaign.getFaction();
+        Faction campaignFaction = campaign.getPlayerForce().getFaction();
         LocalDate currentDate = campaign.getLocalDate();
 
         if (!campaignFaction.validIn(currentDate)) {
@@ -1965,7 +1965,7 @@ public class CampaignGUI extends JPanel {
                   campaign.getPlayerForce().getHumanResources()
                         .getSeniorAdminPerson(Campaign.AdministratorSpecialization.COMMAND,
                               campaign.getCampaignOptions(),
-                              campaign.isClanCampaign(),
+                              campaign.getPlayerForce().isClanForce(),
                               campaign.getLocalDate()),
                   null,
                   inCharacterMessage,

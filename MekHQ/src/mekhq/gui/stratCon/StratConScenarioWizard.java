@@ -856,7 +856,7 @@ public class StratConScenarioWizard extends JDialog {
         Person commandLiaison = campaign.getPlayerForce().getHumanResources()
                                       .getSeniorAdminPerson(AdministratorSpecialization.COMMAND,
                                             campaign.getCampaignOptions(),
-                                            campaign.isClanCampaign(),
+                                            campaign.getPlayerForce().isClanForce(),
                                             campaign.getLocalDate());
         int baseTargetNumber = campaign.getCampaignOptions().get(CampaignOption.REINFORCEMENT_BASE_TARGET_NUMBER);
         TargetRoll targetNumber = calculateReinforcementTargetNumber(commandLiaison,
@@ -1059,7 +1059,7 @@ public class StratConScenarioWizard extends JDialog {
         Person speaker = campaign.getPlayerForce().getHumanResources()
                                .getSeniorAdminPerson(AdministratorSpecialization.COMMAND,
                                      campaign.getCampaignOptions(),
-                                     campaign.isClanCampaign(),
+                                     campaign.getPlayerForce().isClanForce(),
                                      campaign.getLocalDate());
         String inCharacterMessage = String.format(resources.getString("batchallBreach.ic"),
               campaign.getCommanderAddress());
@@ -1108,7 +1108,7 @@ public class StratConScenarioWizard extends JDialog {
             // is far worse than if you never agreed to it in the first place.
             regardMultiplier *= 2;
 
-            List<String> reports = factionStandings.processRefusedBatchall(campaign.getFaction().getShortName(),
+            List<String> reports = factionStandings.processRefusedBatchall(campaign.getPlayerForce().getFaction().getShortName(),
                   enemyCode, campaign.getGameYear(), regardMultiplier);
 
             for (String report : reports) {

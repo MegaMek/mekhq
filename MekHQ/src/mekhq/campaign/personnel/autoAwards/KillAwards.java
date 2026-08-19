@@ -94,7 +94,7 @@ public class KillAwards {
             int killsNeeded;
             String awardScope;
 
-            if (award.canBeAwarded(campaign.getPerson(person))) {
+            if (award.canBeAwarded(campaign.getPlayerForce().getHumanResources().getPerson(person))) {
                 List<String> validOptions = Arrays.asList("scenario", "mission", "lifetime");
 
                 if (validOptions.contains(award.getRange().toLowerCase())) {
@@ -185,7 +185,7 @@ public class KillAwards {
                             // this will fail if the character doesn't have a unit,
                             // but that's ok, in that case we just use a default value
                             try {
-                                originForce = campaign.getPerson(person).getUnit().getFormationId();
+                                originForce = campaign.getPlayerForce().getHumanResources().getPerson(person).getUnit().getFormationId();
                             } catch (Exception ignored) {}
 
                             if ((originForce != -1) && (!forceCredits.contains(originForce))) {

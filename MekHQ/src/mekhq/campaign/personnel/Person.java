@@ -779,9 +779,9 @@ public class Person implements ILocatable {
                 setLastRankChangeDate(null);
                 if (log) {
                     if (isPrisoner) {
-                        ServiceLogger.madePrisoner(this, campaign.getLocalDate(), campaign.getName(), "");
+                        ServiceLogger.madePrisoner(this, campaign.getLocalDate(), campaign.getPlayerForce().getName(), "");
                     } else {
-                        ServiceLogger.madeBondsman(this, campaign.getLocalDate(), campaign.getName(), "");
+                        ServiceLogger.madeBondsman(this, campaign.getLocalDate(), campaign.getPlayerForce().getName(), "");
                     }
                 }
                 break;
@@ -798,9 +798,9 @@ public class Person implements ILocatable {
 
                 if (log) {
                     if (freed) {
-                        ServiceLogger.freed(this, campaign.getLocalDate(), campaign.getName(), "");
+                        ServiceLogger.freed(this, campaign.getLocalDate(), campaign.getPlayerForce().getName(), "");
                     } else {
-                        ServiceLogger.joined(this, campaign.getLocalDate(), campaign.getName(), "");
+                        ServiceLogger.joined(this, campaign.getLocalDate(), campaign.getPlayerForce().getName(), "");
                     }
                 }
                 break;
@@ -1758,7 +1758,7 @@ public class Person implements ILocatable {
             // promote second in command
             Person secondInCommand = campaign.getPlayerForce().getHumanResources()
                                            .getSecondInCommand(campaign.getCampaignOptions(),
-                                                 campaign.isClanCampaign(),
+                                                 campaign.getPlayerForce().isClanForce(),
                                                  campaign.getLocalDate());
             if (secondInCommand != null) {
                 secondInCommand.setSecondInCommand(false);
@@ -4993,7 +4993,7 @@ public class Person implements ILocatable {
     /** Use {@link #getSalary(CampaignOptions, boolean, LocalDate)} instead */
     @Deprecated(since = "0.51.01")
     public Money getSalary(final Campaign campaign) {
-        return getSalary(campaign.getCampaignOptions(), campaign.isClanCampaign(), campaign.getLocalDate());
+        return getSalary(campaign.getCampaignOptions(), campaign.getPlayerForce().isClanForce(), campaign.getLocalDate());
     }
 
     /**
@@ -5356,7 +5356,7 @@ public class Person implements ILocatable {
     public boolean outRanksUsingSkillTiebreaker(Campaign campaign, @Nullable Person otherPerson) {
         return outRanksUsingSkillTiebreaker(
               campaign.getCampaignOptions(),
-              campaign.isClanCampaign(),
+              campaign.getPlayerForce().isClanForce(),
               campaign.getLocalDate(),
               otherPerson);
     }
@@ -6017,7 +6017,7 @@ public class Person implements ILocatable {
      */
     public SkillCheck checkSkill(String skillName, Campaign campaign) {
         return new SkillCheck(this, skillName, campaign.getCampaignOptions().get(CampaignOption.USE_AGE_EFFECTS),
-              campaign.isClanCampaign(), campaign.getLocalDate());
+              campaign.getPlayerForce().isClanForce(), campaign.getLocalDate());
     }
 
     /**

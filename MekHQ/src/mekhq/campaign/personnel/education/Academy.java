@@ -642,7 +642,7 @@ public class Academy implements Comparable<Academy> {
                                       locationSystems;
 
         Set<String> relevantFactions = new HashSet<>();
-        relevantFactions.add(campaign.getFaction().getShortName());
+        relevantFactions.add(campaign.getPlayerForce().getFaction().getShortName());
         relevantFactions.add(person.getOriginFaction().getShortName());
 
         for (String campus : campuses) {
@@ -673,7 +673,7 @@ public class Academy implements Comparable<Academy> {
         }
 
         Faction originFaction = person.getOriginFaction();
-        Faction campaignFaction = campaign.getFaction();
+        Faction campaignFaction = campaign.getPlayerForce().getFaction();
         FactionHints hints = RandomFactionGenerator.getInstance().getFactionHints();
 
         for (String shortName : factions) {
@@ -773,7 +773,7 @@ public class Academy implements Comparable<Academy> {
         }
 
         String effectiveOrigin = effectiveFactionFor(person, today);
-        String campaignShort = campaign.getFaction().getShortName();
+        String campaignShort = campaign.getPlayerForce().getFaction().getShortName();
         Factions factionsRegistry = Factions.getInstance();
 
         for (String ownerShort : currentOwners) {
@@ -812,7 +812,7 @@ public class Academy implements Comparable<Academy> {
                     return ownerShort;
                 }
             }
-            Faction campaignFaction = campaign.getFaction();
+            Faction campaignFaction = campaign.getPlayerForce().getFaction();
             if (campaignFaction != null && !"FC".equals(campaignFaction.getShortName())
                       && campaignFaction.isLineageCompatible(owner)) {
                 return ownerShort;
@@ -991,7 +991,7 @@ public class Academy implements Comparable<Academy> {
         if (isReeducationCamp) {
             return RandomFactionGenerator.getInstance()
                          .getFactionHints()
-                         .isAtWarWith(campaign.getFaction(),
+                         .isAtWarWith(campaign.getPlayerForce().getFaction(),
                                Factions.getInstance().getFaction(person.getEduAcademyFaction()),
                                campaign.getLocalDate());
         }
@@ -1007,7 +1007,7 @@ public class Academy implements Comparable<Academy> {
         } else {
             return RandomFactionGenerator.getInstance()
                          .getFactionHints()
-                         .isAtWarWith(campaign.getFaction(),
+                         .isAtWarWith(campaign.getPlayerForce().getFaction(),
                                Factions.getInstance().getFaction(person.getEduAcademyFaction()),
                                campaign.getLocalDate());
         }
@@ -1171,13 +1171,13 @@ public class Academy implements Comparable<Academy> {
 
                 if (personnel.size() == 1) {
                     if (!Objects.equals(person.getOriginFaction().getShortName(),
-                          campaign.getFaction().getShortName())) {
-                        tooltip.append(campaign.getFaction().getFullName(campaign.getGameYear())).append("<br>");
+                          campaign.getPlayerForce().getFaction().getShortName())) {
+                        tooltip.append(campaign.getPlayerForce().getFaction().getFullName(campaign.getGameYear())).append("<br>");
                     } else {
                         tooltip.append(resources.getString("reeducationNoChange.text")).append("<br>");
                     }
                 } else {
-                    tooltip.append(campaign.getFaction().getFullName(campaign.getGameYear())).append("<br>");
+                    tooltip.append(campaign.getPlayerForce().getFaction().getFullName(campaign.getGameYear())).append("<br>");
                 }
 
                 tooltip.append("<br>");

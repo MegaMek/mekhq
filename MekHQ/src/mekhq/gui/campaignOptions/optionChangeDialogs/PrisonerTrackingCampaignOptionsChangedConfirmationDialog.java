@@ -188,7 +188,7 @@ public class PrisonerTrackingCampaignOptionsChangedConfirmationDialog extends JD
         RoundedJButton btnConfirm = new RoundedJButton(getTextAt(RESOURCE_BUNDLE,
               "PrisonerTrackingCampaignOptionsChangedConfirmationDialog.confirm"));
         btnConfirm.addActionListener(evt -> {
-            processFreeUnit(campaign, campaign.getFaction(), true);
+            processFreeUnit(campaign, campaign.getPlayerForce().getFaction(), true);
             dispose();
         });
 
@@ -201,7 +201,7 @@ public class PrisonerTrackingCampaignOptionsChangedConfirmationDialog extends JD
 
     public static void processFreeUnit(Campaign campaign, Faction faction, boolean automaticallyAssignRanks) {
         String unitName;
-        if (campaign.isClanCampaign()) {
+        if (campaign.getPlayerForce().isClanForce()) {
             unitName = "Clan Foot Point (Rifle Light)";
         } else {
             unitName = "Foot Platoon (Rifle)";

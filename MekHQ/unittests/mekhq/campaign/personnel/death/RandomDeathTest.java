@@ -207,7 +207,7 @@ public class RandomDeathTest {
 
         // Mocking the Campaign object
         when(mockedCampaign.getEra()).thenReturn(mockedEra);
-        when(mockedCampaign.getFaction()).thenReturn(mockedFaction);
+        when(mockedCampaign.getPlayerForce().getFaction()).thenReturn(mockedFaction);
         when(mockedCampaign.getLocalDate()).thenReturn(LocalDate.now());
 
         // Create the RandomDeath object normally, then spy on it
@@ -255,7 +255,7 @@ public class RandomDeathTest {
 
         // Mocking the Campaign object
         when(mockedCampaign.getEra()).thenReturn(mockedEra);
-        when(mockedCampaign.getFaction()).thenReturn(mockedFaction);
+        when(mockedCampaign.getPlayerForce().getFaction()).thenReturn(mockedFaction);
         when(mockedCampaign.getLocalDate()).thenReturn(LocalDate.now());
 
         // Create the RandomDeath object normally, then spy on it

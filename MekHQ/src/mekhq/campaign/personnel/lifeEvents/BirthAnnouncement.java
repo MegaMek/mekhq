@@ -121,7 +121,7 @@ public class BirthAnnouncement {
      */
     private String getInCharacterMessage(Gender babyGender, int babyCount, String parentFirstName) {
         // Campaign Data
-        Faction campaignFaction = campaign.getFaction();
+        Faction campaignFaction = campaign.getPlayerForce().getFaction();
 
         // Parent Data
         Gender parentGender = parent.getGender();
@@ -253,14 +253,14 @@ public class BirthAnnouncement {
         Person speaker = campaign.getPlayerForce().getHumanResources()
                                .getSeniorAdminPerson(Campaign.AdministratorSpecialization.HR,
                                      campaign.getCampaignOptions(),
-                                     campaign.isClanCampaign(),
+                                     campaign.getPlayerForce().isClanForce(),
                                      campaign.getLocalDate());
 
         if (speaker == null) {
             speaker = campaign.getPlayerForce().getHumanResources()
                             .getSeniorAdminPerson(Campaign.AdministratorSpecialization.COMMAND,
                                   campaign.getCampaignOptions(),
-                                  campaign.isClanCampaign(),
+                                  campaign.getPlayerForce().isClanForce(),
                                   campaign.getLocalDate());
         } else {
             return speaker;

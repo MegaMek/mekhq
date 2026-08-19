@@ -981,7 +981,7 @@ public final class RepairTab extends CampaignGuiTab implements ITechWorkPanel {
                                    .getHumanResources()
                                    .getTechs(campaign.getPlayerForce().getHangar().getUnits(),
                                          campaign.getCampaignOptions(),
-                                         campaign.isClanCampaign(),
+                                         campaign.getPlayerForce().isClanForce(),
                                          campaign.getLocalDate(),
                                          true);
         techsModel.setData(techs);

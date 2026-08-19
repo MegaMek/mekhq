@@ -128,13 +128,13 @@ public class FactionCensureEvent {
 
         commander = campaign.getPlayerForce().getHumanResources()
                           .getCommander(campaign.getCampaignOptions(),
-                                campaign.isClanCampaign(),
+                                campaign.getPlayerForce().isClanForce(),
                                 campaign.getLocalDate()); // Can be null if the campaign is effectively empty
         if (commander == null) {
             // If there isn't a commander in the campaign, we're going to invent someone. This avoids us needing to
             // add null protection throughout this class (and the dialogs it spawns). This clause should only trigger
             // in the event the campaign is effectively empty. So it shouldn't come up during normal play.
-            final String factionCode = campaign.getFaction().getShortName();
+            final String factionCode = campaign.getPlayerForce().getFaction().getShortName();
             commander = campaign.getPlayerForce()
                               .getHumanResources()
                               .newPerson(campaign, PersonnelRole.MEKWARRIOR, factionCode, Gender.RANDOMIZE);
@@ -144,11 +144,11 @@ public class FactionCensureEvent {
 
         secondInCommand = campaign.getPlayerForce().getHumanResources()
                                 .getSecondInCommand(campaign.getCampaignOptions(),
-                                      campaign.isClanCampaign(),
+                                      campaign.getPlayerForce().isClanForce(),
                                       campaign.getLocalDate()); // Can be null if the campaign is effectively empty
         if (secondInCommand == null) {
             // See comments for the 'commander == null' clause
-            final String factionCode = campaign.getFaction().getShortName();
+            final String factionCode = campaign.getPlayerForce().getFaction().getShortName();
             secondInCommand = campaign.getPlayerForce()
                                     .getHumanResources()
                                     .newPerson(campaign, PersonnelRole.MEKWARRIOR, factionCode, Gender.RANDOMIZE);
@@ -395,10 +395,10 @@ public class FactionCensureEvent {
      */
     private void processFactionStandingChange(boolean isMajor) {
         double delta = isMajor ? REGARD_DELTA_CONTRACT_SUCCESS_EMPLOYER : REGARD_DELTA_CONTRACT_PARTIAL_EMPLOYER;
-        Faction faction = campaign.getFaction();
+        Faction faction = campaign.getPlayerForce().getFaction();
         String factionCode = faction.getShortName();
         FactionStandings factionStandings = campaign.getPlayerForce().getFactionStandings();
-        String report = factionStandings.changeRegardForFaction(campaign.getFaction().getShortName(), factionCode,
+        String report = factionStandings.changeRegardForFaction(campaign.getPlayerForce().getFaction().getShortName(), factionCode,
               delta, campaign.getGameYear(), campaign.getCampaignOptions().get(CampaignOption.REGARD_MULTIPLIER));
 
         campaign.addReport(POLITICS, report);

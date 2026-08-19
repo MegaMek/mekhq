@@ -110,7 +110,7 @@ public class PersonIdReferenceTest {
 
         // Testing Known Spouse
         genealogy.setSpouse(new PersonIdReference(spouse.getId().toString()));
-        given(mockCampaign.getPerson(argThat(matchPersonUUID(spouse.getId())))).willReturn(spouse);
+        given(mockCampaign.getPlayerForce().getHumanResources().getPerson(argThat(matchPersonUUID(spouse.getId())))).willReturn(spouse);
 
         PersonIdReference.fixGenealogyReferences(mockCampaign, origin);
         assertEquals(spouse, origin.getGenealogy().getSpouse());
@@ -133,7 +133,7 @@ public class PersonIdReferenceTest {
         // Testing Known Former Spouse
         genealogy.addFormerSpouse(new FormerSpouse(new PersonIdReference(formerSpouse.getId().toString()),
               LocalDate.now(), FormerSpouseReason.DIVORCE));
-        given(mockCampaign.getPerson(argThat(matchPersonUUID(formerSpouse.getId())))).willReturn(formerSpouse);
+        given(mockCampaign.getPlayerForce().getHumanResources().getPerson(argThat(matchPersonUUID(formerSpouse.getId())))).willReturn(formerSpouse);
 
         PersonIdReference.fixGenealogyReferences(mockCampaign, origin);
         assertEquals(1, origin.getGenealogy().getFormerSpouses().size());
@@ -166,8 +166,8 @@ public class PersonIdReferenceTest {
               .get(FamilialRelationshipType.PARENT)
               .add(new PersonIdReference(parent2.getId().toString()));
 
-        doReturn(null).when(mockCampaign).getPerson(argThat(matchPersonUUID(child.getId())));
-        doReturn(parent2).when(mockCampaign).getPerson(argThat(matchPersonUUID(parent2.getId())));
+        doReturn(null).when(mockCampaign).getPlayerForce().getHumanResources().getPerson(argThat(matchPersonUUID(child.getId())));
+        doReturn(parent2).when(mockCampaign).getPlayerForce().getHumanResources().getPerson(argThat(matchPersonUUID(parent2.getId())));
 
         PersonIdReference.fixGenealogyReferences(mockCampaign, origin);
         assertTrue(origin.getGenealogy().getFamily().containsKey(FamilialRelationshipType.PARENT));

@@ -126,7 +126,7 @@ public class ContractMarketDialog extends JDialog {
         this.campaign = campaign;
         contractMarket = campaign.getContractMarket();
         possibleRetainerContracts = new ArrayList<>();
-        if (campaign.getFaction().isMercenary()) {
+        if (campaign.getPlayerForce().getFaction().isMercenary()) {
             countSuccessfulContracts();
         }
         initComponents();
@@ -188,7 +188,7 @@ public class ContractMarketDialog extends JDialog {
         }
 
         // Add retainer contracts if faction is mercenary
-        if (campaign.getFaction().isMercenary()) {
+        if (campaign.getPlayerForce().getFaction().isMercenary()) {
             contractCount += getPossibleRetainerContracts(campaign).size();
         }
 
@@ -638,7 +638,7 @@ public class ContractMarketDialog extends JDialog {
                 if (!isGarrisonType) {
                     FactionStandings factionStandings = campaign.getPlayerForce().getFactionStandings();
                     String standingsReport =
-                          factionStandings.processContractAccept(campaign.getFaction().getShortName(), enemyFaction,
+                          factionStandings.processContractAccept(campaign.getPlayerForce().getFaction().getShortName(), enemyFaction,
                                 campaign.getLocalDate(), campaign.getCampaignOptions().get(CampaignOption.REGARD_MULTIPLIER), 1);
 
                     if (standingsReport != null) {

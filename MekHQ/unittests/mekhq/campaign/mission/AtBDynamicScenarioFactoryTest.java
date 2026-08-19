@@ -394,7 +394,7 @@ class AtBDynamicScenarioFactoryTest {
         when(campaignOptions.get(CampaignOption.USE_GENERIC_BATTLE_VALUE)).thenReturn(false);
 
         Faction faction = mock(Faction.class);
-        when(campaign.getFaction()).thenReturn(faction);
+        when(campaign.getPlayerForce().getFaction()).thenReturn(faction);
 
         return campaign;
     }

@@ -794,7 +794,7 @@ public class Formation {
     }
 
     public @Nullable Person getFormationCommander(Campaign campaign) {
-        if (formationCommanderID == null) {return null;} else {return campaign.getPerson(formationCommanderID);}
+        if (formationCommanderID == null) {return null;} else {return campaign.getPlayerForce().getHumanResources().getPerson(formationCommanderID);}
     }
 
     public void removeSubFormation(int id) {
@@ -1208,7 +1208,7 @@ public class Formation {
 
     private int getOddFormationSizeModifier(Campaign campaign, int depth) {
         int actualUnitCount = getTotalUnitCount(campaign, false);
-        final int baseFormationSize = campaign.getFaction().getFormationBaseSize();
+        final int baseFormationSize = campaign.getPlayerForce().getFaction().getFormationBaseSize();
         if (depth == 1) {
             if (actualUnitCount <= baseFormationSize / 2) {
                 return -1;

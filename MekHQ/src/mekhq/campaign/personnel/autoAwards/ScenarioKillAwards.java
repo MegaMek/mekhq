@@ -64,7 +64,7 @@ public class ScenarioKillAwards {
         Award bestAward = new Award();
 
         for (Award award : awards) {
-            if (award.canBeAwarded(campaign.getPerson(person))) {
+            if (award.canBeAwarded(campaign.getPlayerForce().getHumanResources().getPerson(person))) {
                 try {
                     killsNeeded = award.getQty();
                 } catch (Exception e) {
