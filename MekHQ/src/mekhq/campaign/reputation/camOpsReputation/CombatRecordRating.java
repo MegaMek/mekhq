@@ -45,6 +45,7 @@ import mekhq.campaign.Campaign;
 import mekhq.campaign.mission.AtBContract;
 import mekhq.campaign.mission.Mission;
 import mekhq.campaign.mission.enums.MissionStatus;
+import mekhq.campaign.campaignOptions.CampaignOption;
 
 public class CombatRecordRating {
     private static final MMLogger LOGGER = MMLogger.create(CombatRecordRating.class);
@@ -79,7 +80,7 @@ public class CombatRecordRating {
         }
 
         // Construct a map with mission statuses and their counts
-        boolean usePerformanceCutOff = campaign.getCampaignOptions().isReputationPerformanceModifierCutOff();
+        boolean usePerformanceCutOff = campaign.getCampaignOptions().get(CampaignOption.REPUTATION_PERFORMANCE_MODIFIER_CUT_OFF);
         LocalDate cutOffDate = campaign.getLocalDate().minusYears(REPUTATION_PERFORMANCE_CUT_OFF_YEARS);
         Map<MissionStatus, Long> missionCountsByStatus = new HashMap<>();
         for (Mission mission : campaign.getCompletedMissions()) {
@@ -112,7 +113,7 @@ public class CombatRecordRating {
         combatRecord.put("contractsBreached", contractBreaches);
 
         // Calculate combat record rating
-        boolean usePerformanceModifierReduction = campaign.getCampaignOptions().isReduceReputationPerformanceModifier();
+        boolean usePerformanceModifierReduction = campaign.getCampaignOptions().get(CampaignOption.REDUCE_REPUTATION_PERFORMANCE_MODIFIER);
         int successMultiplier = usePerformanceModifierReduction ? 1 : 5;
         int failureMultiplier = usePerformanceModifierReduction ? 2 : 10;
         int breachMultiplier = usePerformanceModifierReduction ? 5 : 25;

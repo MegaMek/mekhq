@@ -148,7 +148,7 @@ class AtbMonthlyContractMarketTest {
 
         private void setupCampaign() {
             CampaignOptions campaignOptions = mock(CampaignOptions.class);
-            when(campaignOptions.getContractMaxSalvagePercentage()).thenReturn(100);
+            when(campaignOptions.get(CampaignOption.CONTRACT_MAX_SALVAGE_PERCENTAGE)).thenReturn(100);
             when(campaignOptions.get(CampaignOption.USE_CHAOS_REPUTATION)).thenReturn(false);
 
             ForceReputationController reputation = mock(ForceReputationController.class);

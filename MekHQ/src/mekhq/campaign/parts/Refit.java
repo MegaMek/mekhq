@@ -109,6 +109,7 @@ import mekhq.utilities.ReportingUtilities;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
+import mekhq.campaign.campaignOptions.CampaignOption;
 
 /**
  * This object tracks the refit of a given unit into a new unit. It has fields for the current entity and the new
@@ -2690,14 +2691,14 @@ public class Refit extends Part implements IAcquisitionWork {
         int techBaseMod = 0;
         for (Part part : shoppingList) {
             if (getTechBase() == TechBase.CLAN &&
-                      campaign.getCampaignOptions().getClanAcquisitionPenalty() > techBaseMod) {
-                techBaseMod = campaign.getCampaignOptions().getClanAcquisitionPenalty();
+                      campaign.getCampaignOptions().get(CampaignOption.CLAN_ACQUISITION_PENALTY) > techBaseMod) {
+                techBaseMod = campaign.getCampaignOptions().get(CampaignOption.CLAN_ACQUISITION_PENALTY);
             } else if (getTechBase() == TechBase.IS &&
-                             campaign.getCampaignOptions().getIsAcquisitionPenalty() > techBaseMod) {
-                techBaseMod = campaign.getCampaignOptions().getIsAcquisitionPenalty();
+                             campaign.getCampaignOptions().get(CampaignOption.IS_ACQUISITION_PENALTY) > techBaseMod) {
+                techBaseMod = campaign.getCampaignOptions().get(CampaignOption.IS_ACQUISITION_PENALTY);
             } else if (getTechBase() == TechBase.ALL) {
-                int penalty = Math.min(campaign.getCampaignOptions().getClanAcquisitionPenalty(),
-                      campaign.getCampaignOptions().getIsAcquisitionPenalty());
+                int penalty = Math.min(campaign.getCampaignOptions().get(CampaignOption.CLAN_ACQUISITION_PENALTY),
+                      campaign.getCampaignOptions().get(CampaignOption.IS_ACQUISITION_PENALTY));
                 if (penalty > techBaseMod) {
                     techBaseMod = penalty;
                 }

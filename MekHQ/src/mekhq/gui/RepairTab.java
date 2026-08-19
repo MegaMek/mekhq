@@ -110,6 +110,7 @@ import mekhq.gui.sorter.UnitTypeSorter;
 import mekhq.service.PartsAcquisitionService;
 import mekhq.service.enums.MRMSMode;
 import mekhq.service.mrms.MRMSService;
+import mekhq.campaign.campaignOptions.CampaignOption;
 
 /**
  * Shows damaged units and controls for repair.
@@ -732,7 +733,7 @@ public final class RepairTab extends CampaignGuiTab implements ITechWorkPanel {
             }
 
             // If requested, switch to top entry
-            if (getCampaignOptions().isResetToFirstTech() && (techTable.getRowCount() > 0)) {
+            if (getCampaignOptions().get(CampaignOption.RESET_TO_FIRST_TECH) && (techTable.getRowCount() > 0)) {
                 techTable.setRowSelectionInterval(0, 0);
             } else {
                 // Or get the selected tech back
@@ -828,7 +829,7 @@ public final class RepairTab extends CampaignGuiTab implements ITechWorkPanel {
                     return false;
                 } else {
                     SkillModifierData skillModifierData = tech.getSkillModifierData();
-                    return getCampaign().getCampaignOptions().isDestroyByMargin() ||
+                    return getCampaign().getCampaignOptions().get(CampaignOption.DESTROY_BY_MARGIN) ||
                                  (part.getSkillMin() <=
                                         (skill.getExperienceLevel(skillModifierData) -
                                                modePenalty));
@@ -836,7 +837,7 @@ public final class RepairTab extends CampaignGuiTab implements ITechWorkPanel {
             }
         };
 
-        if (getCampaignOptions().isAssignedTechFirst()) {
+        if (getCampaignOptions().get(CampaignOption.ASSIGNED_TECH_FIRST)) {
             ((TechSorter) techSorter.getComparator(0)).setPart(part);
         }
         techSorter.setRowFilter(techTypeFilter);
@@ -989,7 +990,7 @@ public final class RepairTab extends CampaignGuiTab implements ITechWorkPanel {
         refreshAsTechPool();
 
         // Ensuring valid row selection after refresh
-        if (getCampaignOptions().isResetToFirstTech() && (techTable.getRowCount() > 0)) {
+        if (getCampaignOptions().get(CampaignOption.RESET_TO_FIRST_TECH) && (techTable.getRowCount() > 0)) {
             // Double-check the row count and safely select the first row
             techTable.setRowSelectionInterval(0, 0);
         } else if (selectedTech != null) {

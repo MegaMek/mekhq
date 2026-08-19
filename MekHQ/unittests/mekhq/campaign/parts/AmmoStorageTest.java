@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2020-2025 The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2020-2026 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -59,6 +59,7 @@ import megamek.common.equipment.AmmoType;
 import megamek.common.equipment.enums.BombType;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.campaignOptions.CampaignOptions;
+import mekhq.campaign.campaignOptions.CampaignOption;
 import mekhq.campaign.finances.Money;
 import mekhq.campaign.parts.equipment.AmmoBin;
 import mekhq.campaign.parts.meks.MekSensor;
@@ -104,7 +105,7 @@ public class AmmoStorageTest {
         AmmoType ammoType = getAmmoType("ISAC5 Ammo");
 
         CampaignOptions mockCampaignOptions = mock(CampaignOptions.class);
-        when(mockCampaignOptions.getCommonPartPriceMultiplier()).thenReturn(1d);
+        when(mockCampaignOptions.get(CampaignOption.COMMON_PART_PRICE_MULTIPLIER)).thenReturn(1d);
 
         Campaign mockCampaign = mockCampaign();
         when(mockCampaign.getCampaignOptions()).thenReturn(mockCampaignOptions);
@@ -126,7 +127,7 @@ public class AmmoStorageTest {
         AmmoType ammoType = getAmmoType("ISAC5 Ammo");
 
         CampaignOptions mockCampaignOptions = mock(CampaignOptions.class);
-        when(mockCampaignOptions.getCommonPartPriceMultiplier()).thenReturn(1d);
+        when(mockCampaignOptions.get(CampaignOption.COMMON_PART_PRICE_MULTIPLIER)).thenReturn(1d);
 
         Campaign mockCampaign = mockCampaign();
         when(mockCampaign.getCampaignOptions()).thenReturn(mockCampaignOptions);
@@ -155,7 +156,7 @@ public class AmmoStorageTest {
         AmmoType ammoType = getAmmoType("ISAC5 Ammo");
 
         CampaignOptions mockCampaignOptions = mock(CampaignOptions.class);
-        when(mockCampaignOptions.getCommonPartPriceMultiplier()).thenReturn(1d);
+        when(mockCampaignOptions.get(CampaignOption.COMMON_PART_PRICE_MULTIPLIER)).thenReturn(1d);
 
         Campaign mockCampaign = mockCampaign();
         when(mockCampaign.getCampaignOptions()).thenReturn(mockCampaignOptions);
@@ -184,7 +185,7 @@ public class AmmoStorageTest {
         AmmoType ammoType = getAmmoType("ISSRM6 Inferno Ammo");
 
         CampaignOptions mockCampaignOptions = mock(CampaignOptions.class);
-        when(mockCampaignOptions.getCommonPartPriceMultiplier()).thenReturn(1d);
+        when(mockCampaignOptions.get(CampaignOption.COMMON_PART_PRICE_MULTIPLIER)).thenReturn(1d);
 
         Campaign mockCampaign = mockCampaign();
         when(mockCampaign.getCampaignOptions()).thenReturn(mockCampaignOptions);
@@ -423,7 +424,7 @@ public class AmmoStorageTest {
         AmmoType isAC5Ammo = getAmmoType("ISAC5 Ammo");
 
         CampaignOptions mockCampaignOptions = mock(CampaignOptions.class);
-        when(mockCampaignOptions.getCommonPartPriceMultiplier()).thenReturn(1d);
+        when(mockCampaignOptions.get(CampaignOption.COMMON_PART_PRICE_MULTIPLIER)).thenReturn(1d);
 
         Campaign mockCampaign = mockCampaign();
         when(mockCampaign.getCampaignOptions()).thenReturn(mockCampaignOptions);

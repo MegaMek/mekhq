@@ -60,6 +60,7 @@ import megamek.common.units.Entity;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.LocalHangar;
 import mekhq.campaign.campaignOptions.CampaignOptions;
+import mekhq.campaign.campaignOptions.CampaignOption;
 import mekhq.campaign.force.CombatTeam;
 import mekhq.campaign.force.Formation;
 import mekhq.campaign.force.PlayerForce;
@@ -89,11 +90,11 @@ class AtBDynamicScenarioFactoryTest {
         // Initialize the mock objects
         campaign = mockCampaign();
         CampaignOptions options = mock(CampaignOptions.class);
-        when(options.getNonBinaryDiceSize()).thenReturn(60);
-        when(options.isAutoGenerateOpForCallSigns()).thenReturn(false);
-        when(options.getMinimumCallsignSkillLevel()).thenReturn(SkillLevel.VETERAN);
-        when(options.isUseTactics()).thenReturn(false);
-        when(options.isUseInitiativeBonus()).thenReturn(false);
+        when(options.get(CampaignOption.NON_BINARY_DICE_SIZE)).thenReturn(60);
+        when(options.get(CampaignOption.AUTO_GENERATE_OP_FOR_CALL_SIGNS)).thenReturn(false);
+        when(options.get(CampaignOption.MINIMUM_CALLSIGN_SKILL_LEVEL)).thenReturn(SkillLevel.VETERAN);
+        when(options.get(CampaignOption.USE_TACTICS)).thenReturn(false);
+        when(options.get(CampaignOption.USE_INITIATIVE_BONUS)).thenReturn(false);
 
         RandomSkillPreferences randomSkillPreferences = mock(RandomSkillPreferences.class);
         when(randomSkillPreferences.randomizeSkill()).thenReturn(false);
@@ -149,8 +150,8 @@ class AtBDynamicScenarioFactoryTest {
     public void testCreateEntityWithCrew_allPossible() {
         // Auto-generated call signs enabled for all
         CampaignOptions options = campaign.getCampaignOptions();
-        when(options.isAutoGenerateOpForCallSigns()).thenReturn(true);
-        when(options.getMinimumCallsignSkillLevel()).thenReturn(SkillLevel.ULTRA_GREEN);
+        when(options.get(CampaignOption.AUTO_GENERATE_OP_FOR_CALL_SIGNS)).thenReturn(true);
+        when(options.get(CampaignOption.MINIMUM_CALLSIGN_SKILL_LEVEL)).thenReturn(SkillLevel.ULTRA_GREEN);
 
         // Auto-generated call signs disabled
         Faction faction = new Faction();
@@ -167,8 +168,8 @@ class AtBDynamicScenarioFactoryTest {
         // Auto-generated call signs enabled for pilots above a certain skill
         // VETERAN will always be >= REGULAR even with randomization
         CampaignOptions options = campaign.getCampaignOptions();
-        when(options.isAutoGenerateOpForCallSigns()).thenReturn(true);
-        when(options.getMinimumCallsignSkillLevel()).thenReturn(SkillLevel.REGULAR);
+        when(options.get(CampaignOption.AUTO_GENERATE_OP_FOR_CALL_SIGNS)).thenReturn(true);
+        when(options.get(CampaignOption.MINIMUM_CALLSIGN_SKILL_LEVEL)).thenReturn(SkillLevel.REGULAR);
 
         // Two mekwarriors, both alike in dignity (but not in exp or pay grade)
         Faction faction = new Faction();
@@ -191,8 +192,8 @@ class AtBDynamicScenarioFactoryTest {
         // Auto-generated call signs enabled for pilots above a certain skill
         // VETERAN will always be < HEROIC even with randomization
         CampaignOptions options = campaign.getCampaignOptions();
-        when(options.isAutoGenerateOpForCallSigns()).thenReturn(true);
-        when(options.getMinimumCallsignSkillLevel()).thenReturn(SkillLevel.HEROIC);
+        when(options.get(CampaignOption.AUTO_GENERATE_OP_FOR_CALL_SIGNS)).thenReturn(true);
+        when(options.get(CampaignOption.MINIMUM_CALLSIGN_SKILL_LEVEL)).thenReturn(SkillLevel.HEROIC);
 
         Faction faction = new Faction();
         Entity entity1 = getShadowHawk();
@@ -388,9 +389,9 @@ class AtBDynamicScenarioFactoryTest {
         CampaignOptions campaignOptions = mock(CampaignOptions.class);
 
         when(campaign.getCampaignOptions()).thenReturn(campaignOptions);
-        when(campaignOptions.isNoSeedForces()).thenReturn(true);
+        when(campaignOptions.get(CampaignOption.NO_SEED_FORCES)).thenReturn(true);
         when(campaignOptions.isUseStratConSinglesMode()).thenReturn(false);
-        when(campaignOptions.isUseGenericBattleValue()).thenReturn(false);
+        when(campaignOptions.get(CampaignOption.USE_GENERIC_BATTLE_VALUE)).thenReturn(false);
 
         Faction faction = mock(Faction.class);
         when(campaign.getFaction()).thenReturn(faction);

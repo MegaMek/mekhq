@@ -73,6 +73,7 @@ import mekhq.gui.baseComponents.SortedComboBoxModel;
 import mekhq.gui.dialog.factionStanding.events.FactionStandingGreeting;
 import mekhq.gui.utilities.JSuggestField;
 import mekhq.gui.utilities.MarkdownEditorPanel;
+import mekhq.campaign.campaignOptions.CampaignOption;
 
 /**
  * @author Neoancient
@@ -641,7 +642,7 @@ public class NewAtBContractDialog extends NewContractDialog {
 
         contractStartPrompt(campaign, contract);
 
-        if (campaign.getCampaignOptions().isTrackFactionStanding()) {
+        if (campaign.getCampaignOptions().get(CampaignOption.TRACK_FACTION_STANDING)) {
             new FactionStandingGreeting(campaign, contract);
         }
     }
@@ -680,7 +681,7 @@ public class NewAtBContractDialog extends NewContractDialog {
             needUpdatePayment = true;
         } else if (source.equals(comboContractType)) {
             contract.setContractTypeAndName(Objects.requireNonNull(comboContractType.getSelectedItem()));
-            contract.calculateLength(campaign.getCampaignOptions().isVariableContractLength());
+            contract.calculateLength(campaign.getCampaignOptions().get(CampaignOption.VARIABLE_CONTRACT_LENGTH));
             spnLength.setValue(contract.getLengthInMonths());
             updatePlanets();
             needUpdatePayment = true;

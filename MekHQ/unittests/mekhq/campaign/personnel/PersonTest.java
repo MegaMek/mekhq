@@ -119,7 +119,7 @@ public class PersonTest {
 
         CampaignOptions mockCampaignOpts = mock(CampaignOptions.class);
         when(mockCampaignOpts.get(CampaignOption.TRACK_TOTAL_XP_EARNINGS)).thenReturn(false);
-        when(mockCampaignOpts.getAwardBonusStyle()).thenReturn(AwardBonus.BOTH);
+        when(mockCampaignOpts.get(CampaignOption.AWARD_BONUS_STYLE)).thenReturn(AwardBonus.BOTH);
 
         Campaign mockCampaign = mockCampaign();
         when(mockCampaign.getCampaignOptions()).thenReturn(mockCampaignOpts);
@@ -157,7 +157,7 @@ public class PersonTest {
 
         CampaignOptions mockCampaignOpts = mock(CampaignOptions.class);
         when(mockCampaignOpts.get(CampaignOption.TRACK_TOTAL_XP_EARNINGS)).thenReturn(false);
-        when(mockCampaignOpts.getAwardBonusStyle()).thenReturn(AwardBonus.BOTH);
+        when(mockCampaignOpts.get(CampaignOption.AWARD_BONUS_STYLE)).thenReturn(AwardBonus.BOTH);
 
         Campaign mockCampaign = mockCampaign();
         when(mockCampaign.getCampaignOptions()).thenReturn(mockCampaignOpts);
@@ -1628,7 +1628,7 @@ public class PersonTest {
                 when(campaign.getLocalDate()).thenReturn(LocalDate.of(3025, 1, 1));
 
                 CampaignOptions options = mock(CampaignOptions.class);
-                when(options.getNaturalHealingWaitingPeriod()).thenReturn(0);
+                when(options.get(CampaignOption.NATURAL_HEALING_WAITING_PERIOD)).thenReturn(0);
                 when(campaign.getCampaignOptions()).thenReturn(options);
 
                 mekhq.campaign.LocalHangar hangar = mock(mekhq.campaign.LocalHangar.class);
@@ -1713,7 +1713,7 @@ public class PersonTest {
                 when(campaign.getLocalDate()).thenReturn(LocalDate.of(3025, 1, 1));
 
                 CampaignOptions options = mock(CampaignOptions.class);
-                when(options.getNaturalHealingWaitingPeriod()).thenReturn(0);
+                when(options.get(CampaignOption.NATURAL_HEALING_WAITING_PERIOD)).thenReturn(0);
                 when(campaign.getCampaignOptions()).thenReturn(options);
 
                 mekhq.campaign.LocalHangar hangar = mock(mekhq.campaign.LocalHangar.class);
@@ -2010,7 +2010,7 @@ public class PersonTest {
                 LocalDate date = LocalDate.of(3151, 1, 1);
 
                 when(campaign.getCampaignOptions()).thenReturn(options);
-                when(options.isUseAgeEffects()).thenReturn(true);
+                when(options.get(CampaignOption.USE_AGE_EFFECTS)).thenReturn(true);
                 when(campaign.isClanCampaign()).thenReturn(false);
                 when(campaign.getLocalDate()).thenReturn(date);
 
@@ -2019,7 +2019,7 @@ public class PersonTest {
                 assertNotNull(check);
                 assertEquals(3, check.getTargetNumber().getValue());
                 verify(campaign).getCampaignOptions();
-                verify(options).isUseAgeEffects();
+                verify(options).get(CampaignOption.USE_AGE_EFFECTS);
                 verify(campaign).isClanCampaign();
                 verify(campaign).getLocalDate();
             }
@@ -2113,7 +2113,7 @@ public class PersonTest {
             person.setAttributeScore(SkillAttribute.EDGE, 3);
 
             CampaignOptions options = mock(CampaignOptions.class);
-            when(options.isUseTwistOfFateSurvival()).thenReturn(false);
+            when(options.get(CampaignOption.USE_TWIST_OF_FATE_SURVIVAL)).thenReturn(false);
             Campaign campaign = mockCampaignWith(options);
 
             assertFalse(invokeAttemptToCheatDeath(person, campaign));
@@ -2129,7 +2129,7 @@ public class PersonTest {
             assertEquals(0, person.getAttributeScore(SkillAttribute.EDGE));
 
             CampaignOptions options = mock(CampaignOptions.class);
-            when(options.isUseTwistOfFateSurvival()).thenReturn(true);
+            when(options.get(CampaignOption.USE_TWIST_OF_FATE_SURVIVAL)).thenReturn(true);
             Campaign campaign = mockCampaignWith(options);
 
             assertFalse(invokeAttemptToCheatDeath(person, campaign));
@@ -2143,7 +2143,7 @@ public class PersonTest {
             person.setAttributeScore(SkillAttribute.EDGE, 3);
 
             CampaignOptions options = mock(CampaignOptions.class);
-            when(options.isUseTwistOfFateSurvival()).thenReturn(true);
+            when(options.get(CampaignOption.USE_TWIST_OF_FATE_SURVIVAL)).thenReturn(true);
             when(options.isUseAdvancedMedical()).thenReturn(false);
             Campaign campaign = mockCampaignWith(options);
 
@@ -2163,7 +2163,7 @@ public class PersonTest {
             person.setHits(DEATH + 2); // lethal hit total
 
             CampaignOptions options = mock(CampaignOptions.class);
-            when(options.isUseTwistOfFateSurvival()).thenReturn(true);
+            when(options.get(CampaignOption.USE_TWIST_OF_FATE_SURVIVAL)).thenReturn(true);
             when(options.isUseAdvancedMedical()).thenReturn(false);
             Campaign campaign = mockCampaignWith(options);
 
@@ -2187,7 +2187,7 @@ public class PersonTest {
                   LocalDate.of(3151, 1, 1), false));
 
             CampaignOptions options = mock(CampaignOptions.class);
-            when(options.isUseTwistOfFateSurvival()).thenReturn(true);
+            when(options.get(CampaignOption.USE_TWIST_OF_FATE_SURVIVAL)).thenReturn(true);
             when(options.isUseAdvancedMedical()).thenReturn(true);
             Campaign campaign = mockCampaignWith(options);
 

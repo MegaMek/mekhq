@@ -97,6 +97,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
+import mekhq.campaign.campaignOptions.CampaignOption;
 
 /**
  * Parts do the lions share of the work of repairing, salvaging, reloading, refueling, etc. for units. Each unit has an
@@ -248,7 +249,7 @@ public abstract class Part implements IPartWork, ITechnology, ILocatable {
     }
 
     public String getQualityName() {
-        return quality.toName(campaign.getCampaignOptions().isReverseQualityNames());
+        return quality.toName(campaign.getCampaignOptions().get(CampaignOption.REVERSE_QUALITY_NAMES));
     }
 
     public void setId(int id) {
@@ -318,26 +319,26 @@ public abstract class Part implements IPartWork, ITechnology, ILocatable {
 
         switch (getTechBase()) {
             case IS:
-                cost = cost.multipliedBy(campaign.getCampaignOptions().getInnerSphereUnitPriceMultiplier());
+                cost = cost.multipliedBy(campaign.getCampaignOptions().get(CampaignOption.INNER_SPHERE_UNIT_PRICE_MULTIPLIER));
                 break;
             case CLAN:
-                cost = cost.multipliedBy(campaign.getCampaignOptions().getClanUnitPriceMultiplier());
+                cost = cost.multipliedBy(campaign.getCampaignOptions().get(CampaignOption.CLAN_UNIT_PRICE_MULTIPLIER));
                 break;
             case ALL:
             default:
-                cost = cost.multipliedBy(campaign.getCampaignOptions().getCommonPartPriceMultiplier());
+                cost = cost.multipliedBy(campaign.getCampaignOptions().get(CampaignOption.COMMON_PART_PRICE_MULTIPLIER));
                 break;
         }
 
         if (!isBrandNew()) {
             cost = cost.multipliedBy(campaign.getCampaignOptions()
-                                           .getUsedPartPriceMultipliers()[getQuality().toNumeric()]);
+                                           .get(CampaignOption.USED_PART_PRICE_MULTIPLIERS)[getQuality().toNumeric()]);
         }
 
         if (!ignoreDamage && needsFixing() && !isPriceAdjustedForAmount()) {
             cost = cost.multipliedBy((getSkillMin() > SkillType.EXP_LEGENDARY) ?
-                                           campaign.getCampaignOptions().getUnrepairablePartsValueMultiplier() :
-                                           campaign.getCampaignOptions().getDamagedPartsValueMultiplier());
+                                           campaign.getCampaignOptions().get(CampaignOption.UNREPAIRABLE_PARTS_VALUE_MULTIPLIER) :
+                                           campaign.getCampaignOptions().get(CampaignOption.DAMAGED_PARTS_VALUE_MULTIPLIER));
         }
 
         return cost;
@@ -501,7 +502,7 @@ public abstract class Part implements IPartWork, ITechnology, ILocatable {
             toReturn.append(" (").append(tonnage).append(" ton)");
         }
 
-        if (!getCampaign().getCampaignOptions().isDestroyByMargin()) {
+        if (!getCampaign().getCampaignOptions().get(CampaignOption.DESTROY_BY_MARGIN)) {
             toReturn.append(" - ")
                   .append(ReportingUtilities.messageSurroundedBySpanWithColor(SkillType.getExperienceLevelColor(
                         getSkillMin()), SkillType.getExperienceLevelName(getSkillMin()) + "+"));
@@ -519,7 +520,7 @@ public abstract class Part implements IPartWork, ITechnology, ILocatable {
                 LocalWarehouse localWarehouse = getWarehouse();
                 if (localWarehouse != null) {
                     megamek.common.equipment.AmmoType ammoType = ammoBin.getType();
-                    boolean useAmmoByType = campaign.getCampaignOptions().isUseAmmoByType();
+                    boolean useAmmoByType = campaign.getCampaignOptions().get(CampaignOption.USE_AMMO_BY_TYPE);
                     inStock = localWarehouse.streamSpareParts()
                                     .filter(p -> p instanceof AmmoStorage
                                                        && p.isPresent()
@@ -580,7 +581,7 @@ public abstract class Part implements IPartWork, ITechnology, ILocatable {
                   .append(" minutes")
                   .append(null != getTech() ? " (scheduled) " : "");
 
-            if (!getCampaign().getCampaignOptions().isDestroyByMargin()) {
+            if (!getCampaign().getCampaignOptions().get(CampaignOption.DESTROY_BY_MARGIN)) {
                 toReturn.append(" - <b>")
                       .append(ReportingUtilities.messageSurroundedBySpanWithColor(SkillType.getExperienceLevelColor(
                             getSkillMin()), SkillType.getExperienceLevelName(getSkillMin()) + "+"))
@@ -1050,7 +1051,7 @@ public abstract class Part implements IPartWork, ITechnology, ILocatable {
         }
 
         final TargetRoll mods = new TargetRoll(difficulty, "difficulty");
-        final int modeMod = getMode().getMod(getCampaign().getCampaignOptions().isDestroyByMargin());
+        final int modeMod = getMode().getMod(getCampaign().getCampaignOptions().get(CampaignOption.DESTROY_BY_MARGIN));
         if (modeMod != 0) {
             mods.addModifier(modeMod, getCurrentModeName());
         }
@@ -1115,7 +1116,7 @@ public abstract class Part implements IPartWork, ITechnology, ILocatable {
     public TargetRoll getAllModsForMaintenance() {
         // according to Campaign Ops [p.197] you get a -1 mod when performing a maintenance check on individual parts,
         // but we will make this user customizable
-        final TargetRoll mods = new TargetRoll(campaign.getCampaignOptions().getMaintenanceBonus(), "maintenance");
+        final TargetRoll mods = new TargetRoll(campaign.getCampaignOptions().get(CampaignOption.MAINTENANCE_BONUS), "maintenance");
         mods.addModifier(Availability.getTechModifier(getTechRating()),
               "tech rating " + getTechRating().getName());
 
@@ -1170,7 +1171,7 @@ public abstract class Part implements IPartWork, ITechnology, ILocatable {
             mods.addModifier(1, "prototype TSM");
         }
 
-        return getCampaign().getCampaignOptions().isUseQualityMaintenance() ?
+        return getCampaign().getCampaignOptions().get(CampaignOption.USE_QUALITY_MAINTENANCE) ?
                      getQualityMods(mods, getUnit().getTech()) :
                      mods;
     }
@@ -1368,7 +1369,7 @@ public abstract class Part implements IPartWork, ITechnology, ILocatable {
 
         if (includeRepairDetails && hits > 0) {
             details.add(hits + (hits == 1 ? " hit" : " hits"));
-            if (campaign.getCampaignOptions().isPayForRepairs()) {
+            if (campaign.getCampaignOptions().get(CampaignOption.PAY_FOR_REPAIRS)) {
                 details.add(getActualValue().multipliedBy(0.2).toAmountAndSymbolString() + " to repair");
             }
         }
@@ -1676,7 +1677,7 @@ public abstract class Part implements IPartWork, ITechnology, ILocatable {
     }
 
     public void resetDaysToWait() {
-        this.daysToWait = campaign.getCampaignOptions().getWaitingPeriod();
+        this.daysToWait = campaign.getCampaignOptions().get(CampaignOption.WAITING_PERIOD);
     }
 
     public void decrementDaysToWait() {

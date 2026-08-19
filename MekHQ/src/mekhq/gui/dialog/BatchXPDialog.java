@@ -52,6 +52,7 @@ import megamek.logging.MMLogger;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.campaignOptions.CampaignOptions;
+import mekhq.campaign.campaignOptions.CampaignOption;
 import mekhq.campaign.log.PerformanceLogger;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.enums.PersonnelRole;
@@ -337,8 +338,8 @@ public final class BatchXPDialog extends JDialog {
 
                 Person person = personnelTable.getModel().getRow(personnelTable.convertRowIndexToModel(i));
 
-                int cost = person.getCostToImprove(skillName, campaignOptions.isUseReasoningXpMultiplier());
-                double costMultiplier = campaignOptions.getXpCostMultiplier();
+                int cost = person.getCostToImprove(skillName, campaignOptions.get(CampaignOption.USE_REASONING_XP_MULTIPLIER));
+                double costMultiplier = campaignOptions.get(CampaignOption.XP_COST_MULTIPLIER);
                 cost = (int) round(cost * costMultiplier);
 
                 Skill skill = person.getSkill(skillName);
@@ -356,7 +357,7 @@ public final class BatchXPDialog extends JDialog {
 
                 skill = person.getSkill(skillName);
 
-                PerformanceLogger.improvedSkill(campaignOptions.isPersonnelLogSkillGain(),
+                PerformanceLogger.improvedSkill(campaignOptions.get(CampaignOption.PERSONNEL_LOG_SKILL_GAIN),
                       person,
                       campaign.getLocalDate(),
                       skillName,
@@ -415,9 +416,9 @@ public final class BatchXPDialog extends JDialog {
                 return false;
             } else if (null != skillName) {
                 final CampaignOptions campaignOptions = campaign.getCampaignOptions();
-                final double xpCostMultiplier = campaignOptions.getXpCostMultiplier();
+                final double xpCostMultiplier = campaignOptions.get(CampaignOption.XP_COST_MULTIPLIER);
                 Skill skill = person.getSkill(skillName);
-                int cost = person.getCostToImprove(skillName, campaignOptions.isUseReasoningXpMultiplier());
+                int cost = person.getCostToImprove(skillName, campaignOptions.get(CampaignOption.USE_REASONING_XP_MULTIPLIER));
                 cost = (int) round(cost * xpCostMultiplier);
 
                 if (null == skill) {

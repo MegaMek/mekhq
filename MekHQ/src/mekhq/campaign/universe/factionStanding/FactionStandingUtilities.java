@@ -52,6 +52,7 @@ import mekhq.campaign.personnel.enums.PersonnelRole;
 import mekhq.campaign.universe.Faction;
 import mekhq.campaign.universe.PlanetarySystem;
 import mekhq.campaign.universe.factionHints.FactionHints;
+import mekhq.campaign.campaignOptions.CampaignOption;
 
 
 public class FactionStandingUtilities {
@@ -604,7 +605,7 @@ public class FactionStandingUtilities {
      * @since 0.50.07
      */
     static void processMassLoyaltyChange(Campaign campaign, boolean isMajor, boolean isPositiveChange) {
-        if (!campaign.getCampaignOptions().isUseLoyaltyModifiers()) {
+        if (!campaign.getCampaignOptions().get(CampaignOption.USE_LOYALTY_MODIFIERS)) {
             return;
         }
 

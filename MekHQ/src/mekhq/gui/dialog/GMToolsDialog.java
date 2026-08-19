@@ -92,6 +92,7 @@ import mekhq.gui.baseComponents.DefaultMHQScrollablePanel;
 import mekhq.gui.displayWrappers.ClanDisplay;
 import mekhq.gui.displayWrappers.FactionDisplay;
 import mekhq.gui.panels.LayeredFormationIconCreationPanel;
+import mekhq.campaign.campaignOptions.CampaignOption;
 
 public class GMToolsDialog extends AbstractMHQDialogBasic {
     private static final MMLogger LOGGER = MMLogger.create(GMToolsDialog.class);
@@ -1455,16 +1456,16 @@ public class GMToolsDialog extends AbstractMHQDialogBasic {
 
         final Predicate<MekSummary> predicate = summary -> (!getGUI().getCampaign()
                                                                    .getCampaignOptions()
-                                                                   .isLimitByYear() ||
+                                                                   .get(CampaignOption.LIMIT_BY_YEAR) ||
                                                                   (targetYear > summary.getYear())) &&
                                                                  (!summary.isClan() ||
                                                                         getGUI().getCampaign()
                                                                               .getCampaignOptions()
-                                                                              .isAllowClanPurchases()) &&
+                                                                              .get(CampaignOption.ALLOW_CLAN_PURCHASES)) &&
                                                                  (summary.isClan() ||
                                                                         getGUI().getCampaign()
                                                                               .getCampaignOptions()
-                                                                              .isAllowISPurchases());
+                                                                              .get(CampaignOption.ALLOW_IS_PURCHASES));
         final int unitType = UnitType.determineUnitTypeCode(getComboUnitType().getSelectedItem());
         final int unitWeight = getComboUnitWeight().isEnabled() ?
                                      getComboUnitWeight().getSelectedIndex() + EntityWeightClass.WEIGHT_LIGHT :
@@ -1507,7 +1508,7 @@ public class GMToolsDialog extends AbstractMHQDialogBasic {
         if (getLastRolledUnit() != null) {
             PartQuality quality;
 
-            if (getGUI().getCampaign().getCampaignOptions().isUseRandomUnitQualities()) {
+            if (getGUI().getCampaign().getCampaignOptions().get(CampaignOption.USE_RANDOM_UNIT_QUALITIES)) {
                 quality = Unit.getRandomUnitQuality(0);
             } else {
                 quality = PartQuality.QUALITY_D;

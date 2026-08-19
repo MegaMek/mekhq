@@ -72,6 +72,7 @@ import mekhq.gui.baseComponents.roundedComponents.RoundedJButton;
 import mekhq.gui.baseComponents.roundedComponents.RoundedLineBorder;
 import mekhq.gui.dialog.factionStanding.manualMissionDialogs.StandingUpdateConfirmationDialog;
 import mekhq.gui.dialog.glossary.GlossaryDialog;
+import mekhq.campaign.campaignOptions.CampaignOption;
 
 /**
  * GMTools allows Game Masters to adjust Faction Standings through various operations. These operations include zeroing
@@ -120,7 +121,7 @@ public class GMTools extends JDialog {
         this.gameYear = today.getYear();
         this.factionStandings = campaign.getPlayerForce().getFactionStandings();
         this.missions = new ArrayList<>(campaign.getMissions());
-        this.regardMultiplier = campaign.getCampaignOptions().getRegardMultiplier();
+        this.regardMultiplier = campaign.getCampaignOptions().get(CampaignOption.REGARD_MULTIPLIER);
 
         populateDialog();
         initializeDialog(parent);

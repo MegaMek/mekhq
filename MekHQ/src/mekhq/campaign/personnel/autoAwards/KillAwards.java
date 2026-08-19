@@ -58,6 +58,7 @@ import mekhq.campaign.force.Formation;
 import mekhq.campaign.force.FormationLevel;
 import mekhq.campaign.mission.Mission;
 import mekhq.campaign.personnel.Award;
+import mekhq.campaign.campaignOptions.CampaignOption;
 
 public class KillAwards {
     private static final MMLogger LOGGER = MMLogger.create(KillAwards.class);
@@ -279,7 +280,7 @@ public class KillAwards {
 
         if (!individualAwards.isEmpty()) {
             // if isIssueBestAwardOnly we need to do some filtering
-            if (campaign.getCampaignOptions().isIssueBestAwardOnly()) {
+            if (campaign.getCampaignOptions().get(CampaignOption.ISSUE_BEST_AWARD_ONLY)) {
                 for (Award a : individualAwards) {
                     if (a.getQty() > rollingQty) {
                         rollingQty = a.getQty();
@@ -294,7 +295,7 @@ public class KillAwards {
         }
 
         if (!groupAwards.isEmpty()) {
-            if (campaign.getCampaignOptions().isIssueBestAwardOnly()) {
+            if (campaign.getCampaignOptions().get(CampaignOption.ISSUE_BEST_AWARD_ONLY)) {
                 // we need to filter groupAwards into discrete Award Groups.
                 // otherwise, Forces become ineligible for Awards they should be entitled to
                 // if they are eligible for a 'better' Award from another Award Group.

@@ -51,6 +51,7 @@ import megamek.common.units.Entity;
 import megamek.common.units.Mek;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.campaignOptions.CampaignOptions;
+import mekhq.campaign.campaignOptions.CampaignOption;
 import mekhq.campaign.parts.AmmoStorage;
 import mekhq.campaign.parts.Armor;
 import mekhq.campaign.parts.Cubicle;
@@ -101,12 +102,12 @@ class PartsInUseManagerTest {
             @Test
             public void testGetSetStockPercentHeatSink() {
                 // Act
-                campaign.getCampaignOptions().setAutoLogisticsHeatSink(FIRST_DESIRED_STOCK);
-                int firstStockLevel = campaign.getCampaignOptions().getAutoLogisticsHeatSink();
+                campaign.getCampaignOptions().set(CampaignOption.AUTO_LOGISTICS_HEAT_SINK, FIRST_DESIRED_STOCK);
+                int firstStockLevel = campaign.getCampaignOptions().get(CampaignOption.AUTO_LOGISTICS_HEAT_SINK);
 
                 // Let's change the stock level to something else so we can make sure it properly changes
-                campaign.getCampaignOptions().setAutoLogisticsHeatSink(SECOND_DESIRED_STOCK);
-                int secondStockLevel = campaign.getCampaignOptions().getAutoLogisticsHeatSink();
+                campaign.getCampaignOptions().set(CampaignOption.AUTO_LOGISTICS_HEAT_SINK, SECOND_DESIRED_STOCK);
+                int secondStockLevel = campaign.getCampaignOptions().get(CampaignOption.AUTO_LOGISTICS_HEAT_SINK);
 
                 // Assert
                 assertEquals(FIRST_DESIRED_STOCK, firstStockLevel);
@@ -116,12 +117,12 @@ class PartsInUseManagerTest {
             @Test
             public void testGetSetStockPercentMekHead() {
                 // Act
-                campaign.getCampaignOptions().setAutoLogisticsMekHead(FIRST_DESIRED_STOCK);
-                int firstStockLevel = campaign.getCampaignOptions().getAutoLogisticsMekHead();
+                campaign.getCampaignOptions().set(CampaignOption.AUTO_LOGISTICS_MEK_HEAD, FIRST_DESIRED_STOCK);
+                int firstStockLevel = campaign.getCampaignOptions().get(CampaignOption.AUTO_LOGISTICS_MEK_HEAD);
 
                 // Let's change the stock level to something else so we can make sure it properly changes
-                campaign.getCampaignOptions().setAutoLogisticsMekHead(SECOND_DESIRED_STOCK);
-                int secondStockLevel = campaign.getCampaignOptions().getAutoLogisticsMekHead();
+                campaign.getCampaignOptions().set(CampaignOption.AUTO_LOGISTICS_MEK_HEAD, SECOND_DESIRED_STOCK);
+                int secondStockLevel = campaign.getCampaignOptions().get(CampaignOption.AUTO_LOGISTICS_MEK_HEAD);
 
                 // Assert
                 assertEquals(FIRST_DESIRED_STOCK, firstStockLevel);
@@ -131,12 +132,12 @@ class PartsInUseManagerTest {
             @Test
             public void testGetSetStockPercentNonRepairable() {
                 // Act
-                campaign.getCampaignOptions().setAutoLogisticsNonRepairableLocation(FIRST_DESIRED_STOCK);
-                int firstStockLevel = campaign.getCampaignOptions().getAutoLogisticsNonRepairableLocation();
+                campaign.getCampaignOptions().set(CampaignOption.AUTO_LOGISTICS_NON_REPAIRABLE_LOCATION, FIRST_DESIRED_STOCK);
+                int firstStockLevel = campaign.getCampaignOptions().get(CampaignOption.AUTO_LOGISTICS_NON_REPAIRABLE_LOCATION);
 
                 // Let's change the stock level to something else so we can make sure it properly changes
-                campaign.getCampaignOptions().setAutoLogisticsNonRepairableLocation(SECOND_DESIRED_STOCK);
-                int secondStockLevel = campaign.getCampaignOptions().getAutoLogisticsNonRepairableLocation();
+                campaign.getCampaignOptions().set(CampaignOption.AUTO_LOGISTICS_NON_REPAIRABLE_LOCATION, SECOND_DESIRED_STOCK);
+                int secondStockLevel = campaign.getCampaignOptions().get(CampaignOption.AUTO_LOGISTICS_NON_REPAIRABLE_LOCATION);
 
                 // Assert
                 assertEquals(FIRST_DESIRED_STOCK, firstStockLevel);
@@ -146,12 +147,12 @@ class PartsInUseManagerTest {
             @Test
             public void testGetSetStockPercentMekLocation() {
                 // Act
-                campaign.getCampaignOptions().setAutoLogisticsMekLocation(FIRST_DESIRED_STOCK);
-                int firstStockLevel = campaign.getCampaignOptions().getAutoLogisticsMekLocation();
+                campaign.getCampaignOptions().set(CampaignOption.AUTO_LOGISTICS_MEK_LOCATION, FIRST_DESIRED_STOCK);
+                int firstStockLevel = campaign.getCampaignOptions().get(CampaignOption.AUTO_LOGISTICS_MEK_LOCATION);
 
                 // Let's change the stock level to something else so we can make sure it properly changes
-                campaign.getCampaignOptions().setAutoLogisticsMekLocation(SECOND_DESIRED_STOCK);
-                int secondStockLevel = campaign.getCampaignOptions().getAutoLogisticsMekLocation();
+                campaign.getCampaignOptions().set(CampaignOption.AUTO_LOGISTICS_MEK_LOCATION, SECOND_DESIRED_STOCK);
+                int secondStockLevel = campaign.getCampaignOptions().get(CampaignOption.AUTO_LOGISTICS_MEK_LOCATION);
 
                 // Assert
                 assertEquals(FIRST_DESIRED_STOCK, firstStockLevel);
@@ -161,12 +162,12 @@ class PartsInUseManagerTest {
             @Test
             public void testGetSetStockPercentAmmunition() {
                 // Act
-                campaign.getCampaignOptions().setAutoLogisticsAmmunition(FIRST_DESIRED_STOCK);
-                int firstStockLevel = campaign.getCampaignOptions().getAutoLogisticsAmmunition();
+                campaign.getCampaignOptions().set(CampaignOption.AUTO_LOGISTICS_AMMUNITION, FIRST_DESIRED_STOCK);
+                int firstStockLevel = campaign.getCampaignOptions().get(CampaignOption.AUTO_LOGISTICS_AMMUNITION);
 
                 // Let's change the stock level to something else so we can make sure it properly changes
-                campaign.getCampaignOptions().setAutoLogisticsAmmunition(SECOND_DESIRED_STOCK);
-                int secondStockLevel = campaign.getCampaignOptions().getAutoLogisticsAmmunition();
+                campaign.getCampaignOptions().set(CampaignOption.AUTO_LOGISTICS_AMMUNITION, SECOND_DESIRED_STOCK);
+                int secondStockLevel = campaign.getCampaignOptions().get(CampaignOption.AUTO_LOGISTICS_AMMUNITION);
 
                 // Assert
                 assertEquals(FIRST_DESIRED_STOCK, firstStockLevel);
@@ -176,12 +177,12 @@ class PartsInUseManagerTest {
             @Test
             public void testGetSetStockPercentArmor() {
                 // Act
-                campaign.getCampaignOptions().setAutoLogisticsArmor(FIRST_DESIRED_STOCK);
-                int firstStockLevel = campaign.getCampaignOptions().getAutoLogisticsArmor();
+                campaign.getCampaignOptions().set(CampaignOption.AUTO_LOGISTICS_ARMOR, FIRST_DESIRED_STOCK);
+                int firstStockLevel = campaign.getCampaignOptions().get(CampaignOption.AUTO_LOGISTICS_ARMOR);
 
                 // Let's change the stock level to something else so we can make sure it properly changes
-                campaign.getCampaignOptions().setAutoLogisticsArmor(SECOND_DESIRED_STOCK);
-                int secondStockLevel = campaign.getCampaignOptions().getAutoLogisticsArmor();
+                campaign.getCampaignOptions().set(CampaignOption.AUTO_LOGISTICS_ARMOR, SECOND_DESIRED_STOCK);
+                int secondStockLevel = campaign.getCampaignOptions().get(CampaignOption.AUTO_LOGISTICS_ARMOR);
 
                 // Assert
                 assertEquals(FIRST_DESIRED_STOCK, firstStockLevel);
@@ -191,12 +192,12 @@ class PartsInUseManagerTest {
             @Test
             public void testGetSetStockPercentActuators() {
                 // Act
-                campaign.getCampaignOptions().setAutoLogisticsActuators(FIRST_DESIRED_STOCK);
-                int firstStockLevel = campaign.getCampaignOptions().getAutoLogisticsActuators();
+                campaign.getCampaignOptions().set(CampaignOption.AUTO_LOGISTICS_ACTUATORS, FIRST_DESIRED_STOCK);
+                int firstStockLevel = campaign.getCampaignOptions().get(CampaignOption.AUTO_LOGISTICS_ACTUATORS);
 
                 // Let's change the stock level to something else so we can make sure it properly changes
-                campaign.getCampaignOptions().setAutoLogisticsActuators(SECOND_DESIRED_STOCK);
-                int secondStockLevel = campaign.getCampaignOptions().getAutoLogisticsActuators();
+                campaign.getCampaignOptions().set(CampaignOption.AUTO_LOGISTICS_ACTUATORS, SECOND_DESIRED_STOCK);
+                int secondStockLevel = campaign.getCampaignOptions().get(CampaignOption.AUTO_LOGISTICS_ACTUATORS);
 
                 // Assert
                 assertEquals(FIRST_DESIRED_STOCK, firstStockLevel);
@@ -206,12 +207,12 @@ class PartsInUseManagerTest {
             @Test
             public void testGetSetStockPercentJumpJet() {
                 // Act
-                campaign.getCampaignOptions().setAutoLogisticsJumpJets(FIRST_DESIRED_STOCK);
-                int firstStockLevel = campaign.getCampaignOptions().getAutoLogisticsJumpJets();
+                campaign.getCampaignOptions().set(CampaignOption.AUTO_LOGISTICS_JUMP_JETS, FIRST_DESIRED_STOCK);
+                int firstStockLevel = campaign.getCampaignOptions().get(CampaignOption.AUTO_LOGISTICS_JUMP_JETS);
 
                 // Let's change the stock level to something else so we can make sure it properly changes
-                campaign.getCampaignOptions().setAutoLogisticsJumpJets(SECOND_DESIRED_STOCK);
-                int secondStockLevel = campaign.getCampaignOptions().getAutoLogisticsJumpJets();
+                campaign.getCampaignOptions().set(CampaignOption.AUTO_LOGISTICS_JUMP_JETS, SECOND_DESIRED_STOCK);
+                int secondStockLevel = campaign.getCampaignOptions().get(CampaignOption.AUTO_LOGISTICS_JUMP_JETS);
 
                 // Assert
                 assertEquals(FIRST_DESIRED_STOCK, firstStockLevel);
@@ -221,12 +222,12 @@ class PartsInUseManagerTest {
             @Test
             public void testGetSetStockPercentEngines() {
                 // Act
-                campaign.getCampaignOptions().setAutoLogisticsEngines(FIRST_DESIRED_STOCK);
-                int firstStockLevel = campaign.getCampaignOptions().getAutoLogisticsEngines();
+                campaign.getCampaignOptions().set(CampaignOption.AUTO_LOGISTICS_ENGINES, FIRST_DESIRED_STOCK);
+                int firstStockLevel = campaign.getCampaignOptions().get(CampaignOption.AUTO_LOGISTICS_ENGINES);
 
                 // Let's change the stock level to something else so we can make sure it properly changes
-                campaign.getCampaignOptions().setAutoLogisticsEngines(SECOND_DESIRED_STOCK);
-                int secondStockLevel = campaign.getCampaignOptions().getAutoLogisticsEngines();
+                campaign.getCampaignOptions().set(CampaignOption.AUTO_LOGISTICS_ENGINES, SECOND_DESIRED_STOCK);
+                int secondStockLevel = campaign.getCampaignOptions().get(CampaignOption.AUTO_LOGISTICS_ENGINES);
 
                 // Assert
                 assertEquals(FIRST_DESIRED_STOCK, firstStockLevel);
@@ -236,12 +237,12 @@ class PartsInUseManagerTest {
             @Test
             public void testGetSetStockPercentWeapons() {
                 // Act
-                campaign.getCampaignOptions().setAutoLogisticsWeapons(FIRST_DESIRED_STOCK);
-                int firstStockLevel = campaign.getCampaignOptions().getAutoLogisticsWeapons();
+                campaign.getCampaignOptions().set(CampaignOption.AUTO_LOGISTICS_WEAPONS, FIRST_DESIRED_STOCK);
+                int firstStockLevel = campaign.getCampaignOptions().get(CampaignOption.AUTO_LOGISTICS_WEAPONS);
 
                 // Let's change the stock level to something else so we can make sure it properly changes
-                campaign.getCampaignOptions().setAutoLogisticsWeapons(SECOND_DESIRED_STOCK);
-                int secondStockLevel = campaign.getCampaignOptions().getAutoLogisticsWeapons();
+                campaign.getCampaignOptions().set(CampaignOption.AUTO_LOGISTICS_WEAPONS, SECOND_DESIRED_STOCK);
+                int secondStockLevel = campaign.getCampaignOptions().get(CampaignOption.AUTO_LOGISTICS_WEAPONS);
 
                 // Assert
                 assertEquals(FIRST_DESIRED_STOCK, firstStockLevel);
@@ -251,12 +252,12 @@ class PartsInUseManagerTest {
             @Test
             public void testGetSetStockPercentGyros() {
                 // Act
-                campaign.getCampaignOptions().setAutoLogisticsGyros(FIRST_DESIRED_STOCK);
-                int firstStockLevel = campaign.getCampaignOptions().getAutoLogisticsGyros();
+                campaign.getCampaignOptions().set(CampaignOption.AUTO_LOGISTICS_GYROS, FIRST_DESIRED_STOCK);
+                int firstStockLevel = campaign.getCampaignOptions().get(CampaignOption.AUTO_LOGISTICS_GYROS);
 
                 // Let's change the stock level to something else so we can make sure it properly changes
-                campaign.getCampaignOptions().setAutoLogisticsGyros(SECOND_DESIRED_STOCK);
-                int secondStockLevel = campaign.getCampaignOptions().getAutoLogisticsGyros();
+                campaign.getCampaignOptions().set(CampaignOption.AUTO_LOGISTICS_GYROS, SECOND_DESIRED_STOCK);
+                int secondStockLevel = campaign.getCampaignOptions().get(CampaignOption.AUTO_LOGISTICS_GYROS);
 
                 // Assert
                 assertEquals(FIRST_DESIRED_STOCK, firstStockLevel);
@@ -266,12 +267,12 @@ class PartsInUseManagerTest {
             @Test
             public void testGetSetStockPercentCockpits() {
                 // Act
-                campaign.getCampaignOptions().setAutoLogisticsHeadComponents(FIRST_DESIRED_STOCK);
-                int firstStockLevel = campaign.getCampaignOptions().getAutoLogisticsHeadComponents();
+                campaign.getCampaignOptions().set(CampaignOption.AUTO_LOGISTICS_HEAD_COMPONENTS, FIRST_DESIRED_STOCK);
+                int firstStockLevel = campaign.getCampaignOptions().get(CampaignOption.AUTO_LOGISTICS_HEAD_COMPONENTS);
 
                 // Let's change the stock level to something else so we can make sure it properly changes
-                campaign.getCampaignOptions().setAutoLogisticsHeadComponents(SECOND_DESIRED_STOCK);
-                int secondStockLevel = campaign.getCampaignOptions().getAutoLogisticsHeadComponents();
+                campaign.getCampaignOptions().set(CampaignOption.AUTO_LOGISTICS_HEAD_COMPONENTS, SECOND_DESIRED_STOCK);
+                int secondStockLevel = campaign.getCampaignOptions().get(CampaignOption.AUTO_LOGISTICS_HEAD_COMPONENTS);
 
                 // Assert
                 assertEquals(FIRST_DESIRED_STOCK, firstStockLevel);
@@ -281,12 +282,12 @@ class PartsInUseManagerTest {
             @Test
             public void testGetSetStockPercentOther() {
                 // Act
-                campaign.getCampaignOptions().setAutoLogisticsOther(FIRST_DESIRED_STOCK);
-                int firstStockLevel = campaign.getCampaignOptions().getAutoLogisticsOther();
+                campaign.getCampaignOptions().set(CampaignOption.AUTO_LOGISTICS_OTHER, FIRST_DESIRED_STOCK);
+                int firstStockLevel = campaign.getCampaignOptions().get(CampaignOption.AUTO_LOGISTICS_OTHER);
 
                 // Let's change the stock level to something else so we can make sure it properly changes
-                campaign.getCampaignOptions().setAutoLogisticsOther(SECOND_DESIRED_STOCK);
-                int secondStockLevel = campaign.getCampaignOptions().getAutoLogisticsOther();
+                campaign.getCampaignOptions().set(CampaignOption.AUTO_LOGISTICS_OTHER, SECOND_DESIRED_STOCK);
+                int secondStockLevel = campaign.getCampaignOptions().get(CampaignOption.AUTO_LOGISTICS_OTHER);
 
                 // Assert
                 assertEquals(FIRST_DESIRED_STOCK, firstStockLevel);
@@ -341,19 +342,19 @@ class PartsInUseManagerTest {
 
             @BeforeEach
             void beforeEach() {
-                when(mockCampaignOptions.getAutoLogisticsHeatSink()).thenReturn(INCORRECT_STOCK_LEVEL);
-                when(mockCampaignOptions.getAutoLogisticsMekHead()).thenReturn(INCORRECT_STOCK_LEVEL);
-                when(mockCampaignOptions.getAutoLogisticsNonRepairableLocation()).thenReturn(INCORRECT_STOCK_LEVEL);
-                when(mockCampaignOptions.getAutoLogisticsMekLocation()).thenReturn(INCORRECT_STOCK_LEVEL);
-                when(mockCampaignOptions.getAutoLogisticsAmmunition()).thenReturn(INCORRECT_STOCK_LEVEL);
-                when(mockCampaignOptions.getAutoLogisticsArmor()).thenReturn(INCORRECT_STOCK_LEVEL);
-                when(mockCampaignOptions.getAutoLogisticsActuators()).thenReturn(INCORRECT_STOCK_LEVEL);
-                when(mockCampaignOptions.getAutoLogisticsJumpJets()).thenReturn(INCORRECT_STOCK_LEVEL);
-                when(mockCampaignOptions.getAutoLogisticsEngines()).thenReturn(INCORRECT_STOCK_LEVEL);
-                when(mockCampaignOptions.getAutoLogisticsWeapons()).thenReturn(INCORRECT_STOCK_LEVEL);
-                when(mockCampaignOptions.getAutoLogisticsGyros()).thenReturn(INCORRECT_STOCK_LEVEL);
-                when(mockCampaignOptions.getAutoLogisticsHeadComponents()).thenReturn(INCORRECT_STOCK_LEVEL);
-                when(mockCampaignOptions.getAutoLogisticsOther()).thenReturn(INCORRECT_STOCK_LEVEL);
+                when(mockCampaignOptions.get(CampaignOption.AUTO_LOGISTICS_HEAT_SINK)).thenReturn(INCORRECT_STOCK_LEVEL);
+                when(mockCampaignOptions.get(CampaignOption.AUTO_LOGISTICS_MEK_HEAD)).thenReturn(INCORRECT_STOCK_LEVEL);
+                when(mockCampaignOptions.get(CampaignOption.AUTO_LOGISTICS_NON_REPAIRABLE_LOCATION)).thenReturn(INCORRECT_STOCK_LEVEL);
+                when(mockCampaignOptions.get(CampaignOption.AUTO_LOGISTICS_MEK_LOCATION)).thenReturn(INCORRECT_STOCK_LEVEL);
+                when(mockCampaignOptions.get(CampaignOption.AUTO_LOGISTICS_AMMUNITION)).thenReturn(INCORRECT_STOCK_LEVEL);
+                when(mockCampaignOptions.get(CampaignOption.AUTO_LOGISTICS_ARMOR)).thenReturn(INCORRECT_STOCK_LEVEL);
+                when(mockCampaignOptions.get(CampaignOption.AUTO_LOGISTICS_ACTUATORS)).thenReturn(INCORRECT_STOCK_LEVEL);
+                when(mockCampaignOptions.get(CampaignOption.AUTO_LOGISTICS_JUMP_JETS)).thenReturn(INCORRECT_STOCK_LEVEL);
+                when(mockCampaignOptions.get(CampaignOption.AUTO_LOGISTICS_ENGINES)).thenReturn(INCORRECT_STOCK_LEVEL);
+                when(mockCampaignOptions.get(CampaignOption.AUTO_LOGISTICS_WEAPONS)).thenReturn(INCORRECT_STOCK_LEVEL);
+                when(mockCampaignOptions.get(CampaignOption.AUTO_LOGISTICS_GYROS)).thenReturn(INCORRECT_STOCK_LEVEL);
+                when(mockCampaignOptions.get(CampaignOption.AUTO_LOGISTICS_HEAD_COMPONENTS)).thenReturn(INCORRECT_STOCK_LEVEL);
+                when(mockCampaignOptions.get(CampaignOption.AUTO_LOGISTICS_OTHER)).thenReturn(INCORRECT_STOCK_LEVEL);
             }
 
             @Test
@@ -367,7 +368,7 @@ class PartsInUseManagerTest {
                     initialAllPercents = getAllDefaultStockPercents();
 
                     // Let's change it and make sure that it uses the new value
-                    when(mockCampaignOptions.getAutoLogisticsHeatSink()).thenReturn(DESIRED_STOCK_LEVEL);
+                    when(mockCampaignOptions.get(CampaignOption.AUTO_LOGISTICS_HEAT_SINK)).thenReturn(DESIRED_STOCK_LEVEL);
 
                     desiredStockPercent = (int) method.invoke(partsInUseManager, part);
                     afterChangeAllPercents = getAllDefaultStockPercents();
@@ -397,7 +398,7 @@ class PartsInUseManagerTest {
                     initialAllPercents = getAllDefaultStockPercents();
 
                     // Let's change it and make sure that it uses the new value
-                    when(mockCampaignOptions.getAutoLogisticsMekHead()).thenReturn(DESIRED_STOCK_LEVEL);
+                    when(mockCampaignOptions.get(CampaignOption.AUTO_LOGISTICS_MEK_HEAD)).thenReturn(DESIRED_STOCK_LEVEL);
 
                     desiredStockPercent = (int) method.invoke(partsInUseManager, part);
                     afterChangeAllPercents = getAllDefaultStockPercents();
@@ -427,7 +428,7 @@ class PartsInUseManagerTest {
                     initialAllPercents = getAllDefaultStockPercents();
 
                     // Let's change it and make sure that it uses the new value
-                    when(mockCampaignOptions.getAutoLogisticsNonRepairableLocation()).thenReturn(DESIRED_STOCK_LEVEL);
+                    when(mockCampaignOptions.get(CampaignOption.AUTO_LOGISTICS_NON_REPAIRABLE_LOCATION)).thenReturn(DESIRED_STOCK_LEVEL);
 
                     desiredStockPercent = (int) method.invoke(partsInUseManager, part);
                     afterChangeAllPercents = getAllDefaultStockPercents();
@@ -458,7 +459,7 @@ class PartsInUseManagerTest {
                     initialAllPercents = getAllDefaultStockPercents();
 
                     // Let's change it and make sure that it uses the new value
-                    when(mockCampaignOptions.getAutoLogisticsMekLocation()).thenReturn(DESIRED_STOCK_LEVEL);
+                    when(mockCampaignOptions.get(CampaignOption.AUTO_LOGISTICS_MEK_LOCATION)).thenReturn(DESIRED_STOCK_LEVEL);
 
                     desiredStockPercent = (int) method.invoke(partsInUseManager, part);
                     afterChangeAllPercents = getAllDefaultStockPercents();
@@ -488,7 +489,7 @@ class PartsInUseManagerTest {
                     initialAllPercents = getAllDefaultStockPercents();
 
                     // Let's change it and make sure that it uses the new value
-                    when(mockCampaignOptions.getAutoLogisticsNonRepairableLocation()).thenReturn(DESIRED_STOCK_LEVEL);
+                    when(mockCampaignOptions.get(CampaignOption.AUTO_LOGISTICS_NON_REPAIRABLE_LOCATION)).thenReturn(DESIRED_STOCK_LEVEL);
 
                     desiredStockPercent = (int) method.invoke(partsInUseManager, part);
                     afterChangeAllPercents = getAllDefaultStockPercents();
@@ -518,7 +519,7 @@ class PartsInUseManagerTest {
                     initialAllPercents = getAllDefaultStockPercents();
 
                     // Let's change it and make sure that it uses the new value
-                    when(mockCampaignOptions.getAutoLogisticsAmmunition()).thenReturn(DESIRED_STOCK_LEVEL);
+                    when(mockCampaignOptions.get(CampaignOption.AUTO_LOGISTICS_AMMUNITION)).thenReturn(DESIRED_STOCK_LEVEL);
 
                     desiredStockPercent = (int) method.invoke(partsInUseManager, part);
                     afterChangeAllPercents = getAllDefaultStockPercents();
@@ -548,7 +549,7 @@ class PartsInUseManagerTest {
                     initialAllPercents = getAllDefaultStockPercents();
 
                     // Let's change it and make sure that it uses the new value
-                    when(mockCampaignOptions.getAutoLogisticsAmmunition()).thenReturn(DESIRED_STOCK_LEVEL);
+                    when(mockCampaignOptions.get(CampaignOption.AUTO_LOGISTICS_AMMUNITION)).thenReturn(DESIRED_STOCK_LEVEL);
 
                     desiredStockPercent = (int) method.invoke(partsInUseManager, part);
                     afterChangeAllPercents = getAllDefaultStockPercents();
@@ -578,7 +579,7 @@ class PartsInUseManagerTest {
                     initialAllPercents = getAllDefaultStockPercents();
 
                     // Let's change it and make sure that it uses the new value
-                    when(mockCampaignOptions.getAutoLogisticsArmor()).thenReturn(DESIRED_STOCK_LEVEL);
+                    when(mockCampaignOptions.get(CampaignOption.AUTO_LOGISTICS_ARMOR)).thenReturn(DESIRED_STOCK_LEVEL);
 
                     desiredStockPercent = (int) method.invoke(partsInUseManager, part);
                     afterChangeAllPercents = getAllDefaultStockPercents();
@@ -608,7 +609,7 @@ class PartsInUseManagerTest {
                     initialAllPercents = getAllDefaultStockPercents();
 
                     // Let's change it and make sure that it uses the new value
-                    when(mockCampaignOptions.getAutoLogisticsActuators()).thenReturn(DESIRED_STOCK_LEVEL);
+                    when(mockCampaignOptions.get(CampaignOption.AUTO_LOGISTICS_ACTUATORS)).thenReturn(DESIRED_STOCK_LEVEL);
 
                     desiredStockPercent = (int) method.invoke(partsInUseManager, part);
                     afterChangeAllPercents = getAllDefaultStockPercents();
@@ -638,7 +639,7 @@ class PartsInUseManagerTest {
                     initialAllPercents = getAllDefaultStockPercents();
 
                     // Let's change it and make sure that it uses the new value
-                    when(mockCampaignOptions.getAutoLogisticsJumpJets()).thenReturn(DESIRED_STOCK_LEVEL);
+                    when(mockCampaignOptions.get(CampaignOption.AUTO_LOGISTICS_JUMP_JETS)).thenReturn(DESIRED_STOCK_LEVEL);
 
                     desiredStockPercent = (int) method.invoke(partsInUseManager, part);
                     afterChangeAllPercents = getAllDefaultStockPercents();
@@ -668,7 +669,7 @@ class PartsInUseManagerTest {
                     initialAllPercents = getAllDefaultStockPercents();
 
                     // Let's change it and make sure that it uses the new value
-                    when(mockCampaignOptions.getAutoLogisticsEngines()).thenReturn(DESIRED_STOCK_LEVEL);
+                    when(mockCampaignOptions.get(CampaignOption.AUTO_LOGISTICS_ENGINES)).thenReturn(DESIRED_STOCK_LEVEL);
 
                     desiredStockPercent = (int) method.invoke(partsInUseManager, part);
                     afterChangeAllPercents = getAllDefaultStockPercents();
@@ -699,7 +700,7 @@ class PartsInUseManagerTest {
                     initialAllPercents = getAllDefaultStockPercents();
 
                     // Let's change it and make sure that it uses the new value
-                    when(mockCampaignOptions.getAutoLogisticsWeapons()).thenReturn(DESIRED_STOCK_LEVEL);
+                    when(mockCampaignOptions.get(CampaignOption.AUTO_LOGISTICS_WEAPONS)).thenReturn(DESIRED_STOCK_LEVEL);
 
                     desiredStockPercent = (int) method.invoke(partsInUseManager, part);
                     afterChangeAllPercents = getAllDefaultStockPercents();
@@ -729,7 +730,7 @@ class PartsInUseManagerTest {
                     initialAllPercents = getAllDefaultStockPercents();
 
                     // Let's change it and make sure that it uses the new value
-                    when(mockCampaignOptions.getAutoLogisticsHeadComponents()).thenReturn(DESIRED_STOCK_LEVEL);
+                    when(mockCampaignOptions.get(CampaignOption.AUTO_LOGISTICS_HEAD_COMPONENTS)).thenReturn(DESIRED_STOCK_LEVEL);
 
                     desiredStockPercent = (int) method.invoke(partsInUseManager, part);
                     afterChangeAllPercents = getAllDefaultStockPercents();
@@ -759,7 +760,7 @@ class PartsInUseManagerTest {
                     initialAllPercents = getAllDefaultStockPercents();
 
                     // Let's change it and make sure that it uses the new value
-                    when(mockCampaignOptions.getAutoLogisticsHeadComponents()).thenReturn(DESIRED_STOCK_LEVEL);
+                    when(mockCampaignOptions.get(CampaignOption.AUTO_LOGISTICS_HEAD_COMPONENTS)).thenReturn(DESIRED_STOCK_LEVEL);
 
                     desiredStockPercent = (int) method.invoke(partsInUseManager, part);
                     afterChangeAllPercents = getAllDefaultStockPercents();
@@ -789,7 +790,7 @@ class PartsInUseManagerTest {
                     initialAllPercents = getAllDefaultStockPercents();
 
                     // Let's change it and make sure that it uses the new value
-                    when(mockCampaignOptions.getAutoLogisticsGyros()).thenReturn(DESIRED_STOCK_LEVEL);
+                    when(mockCampaignOptions.get(CampaignOption.AUTO_LOGISTICS_GYROS)).thenReturn(DESIRED_STOCK_LEVEL);
 
                     desiredStockPercent = (int) method.invoke(partsInUseManager, part);
                     afterChangeAllPercents = getAllDefaultStockPercents();
@@ -820,7 +821,7 @@ class PartsInUseManagerTest {
                     initialAllPercents = getAllDefaultStockPercents();
 
                     // Let's change it and make sure that it uses the new value
-                    when(mockCampaignOptions.getAutoLogisticsOther()).thenReturn(DESIRED_STOCK_LEVEL);
+                    when(mockCampaignOptions.get(CampaignOption.AUTO_LOGISTICS_OTHER)).thenReturn(DESIRED_STOCK_LEVEL);
 
                     desiredStockPercent = (int) method.invoke(partsInUseManager, part);
                     afterChangeAllPercents = getAllDefaultStockPercents();

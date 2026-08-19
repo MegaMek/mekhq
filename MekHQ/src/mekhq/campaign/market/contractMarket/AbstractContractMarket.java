@@ -76,6 +76,7 @@ import mekhq.campaign.universe.RandomFactionGenerator;
 import mekhq.utilities.MHQXMLUtility;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
+import mekhq.campaign.campaignOptions.CampaignOption;
 
 /**
  * Abstract base class for various Contract Market types in AtB/StratCon. Responsible for generation and initialization
@@ -203,9 +204,9 @@ public abstract class AbstractContractMarket {
                 case CLAUSE_SALVAGE -> {
                     rollSalvageClause(contract,
                           clauseMods.get(contract.getId()).mods[clause],
-                          campaign.getCampaignOptions().getContractMaxSalvagePercentage());
+                          campaign.getCampaignOptions().get(CampaignOption.CONTRACT_MAX_SALVAGE_PERCENTAGE));
 
-                    if (campaign.getCampaignOptions().isLimitClanTech()) {
+                    if (campaign.getCampaignOptions().get(CampaignOption.LIMIT_CLAN_TECH)) {
                         contract.clanTechSalvageOverride();
                     }
                 }
@@ -246,7 +247,7 @@ public abstract class AbstractContractMarket {
     }
 
     protected void updateReport(Campaign campaign) {
-        if (campaign.getCampaignOptions().isContractMarketReportRefresh()) {
+        if (campaign.getCampaignOptions().get(CampaignOption.CONTRACT_MARKET_REPORT_REFRESH)) {
             campaign.addReport(GENERAL, "<a href='CONTRACT_MARKET'>Contract market updated</a>");
         }
     }

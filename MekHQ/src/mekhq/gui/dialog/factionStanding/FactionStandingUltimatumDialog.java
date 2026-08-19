@@ -56,6 +56,7 @@ import mekhq.gui.baseComponents.immersiveDialogs.ImmersiveDialogSimple;
 import mekhq.gui.baseComponents.immersiveDialogs.ImmersiveDialogWidth;
 import mekhq.gui.dialog.NewsDialog;
 import mekhq.gui.dialog.factionStanding.factionJudgment.FactionJudgmentSceneDialog;
+import mekhq.campaign.campaignOptions.CampaignOption;
 
 /**
  * Dialog logic for resolving a Faction Standing ultimatum event.
@@ -262,7 +263,7 @@ public class FactionStandingUltimatumDialog {
         Faction newFaction = Factions.getInstance()
                                    .getFaction(isMercenary ? MERCENARY_FACTION_CODE : PIRATE_FACTION_CODE);
         processGoingRogue(campaign, newFaction, commander, secondInCommand,
-              isViolentTransition, true, campaign.getCampaignOptions().isTrackFactionStanding());
+              isViolentTransition, true, campaign.getCampaignOptions().get(CampaignOption.TRACK_FACTION_STANDING));
 
         if (secondInCommand != null &&
                   !(secondInCommand.getStatus().isDepartedUnit() || secondInCommand.getStatus().isDead())) {

@@ -74,6 +74,7 @@ import megamek.common.units.Dropship;
 import megamek.common.units.EntityMovementMode;
 import megamek.common.units.UnitType;
 import mekhq.campaign.campaignOptions.CampaignOptions;
+import mekhq.campaign.campaignOptions.CampaignOption;
 import mekhq.campaign.enums.CampaignTransportType;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.enums.PersonnelRole;
@@ -234,7 +235,7 @@ public class CampaignTest {
         testActivePersonList.add(mockNonTechTwo);
 
         CampaignOptions campaignOptions = mock(CampaignOptions.class);
-        when(campaignOptions.isTechsUseAdministration()).thenReturn(false);
+        when(campaignOptions.get(CampaignOption.TECHS_USE_ADMINISTRATION)).thenReturn(false);
         LocalDate today = LocalDate.of(3067, 1, 1);
         List<Unit> noUnits = List.of();
 
@@ -509,12 +510,12 @@ public class CampaignTest {
         when(campaign.getTechAvailabilityYears()).thenCallRealMethod();
 
         // Limit enabled: technology availability is capped at the current game year.
-        when(options.isLimitByYear()).thenReturn(true);
+        when(options.get(CampaignOption.LIMIT_BY_YEAR)).thenReturn(true);
         assertEquals(List.of(3025), campaign.getTechAvailabilityYears());
 
         // Limit disabled: availability is unbounded, so designs introduced after the current campaign year - and
         // their era-based tech level - are still treated as available.
-        when(options.isLimitByYear()).thenReturn(false);
+        when(options.get(CampaignOption.LIMIT_BY_YEAR)).thenReturn(false);
         assertEquals(List.of(Integer.MAX_VALUE), campaign.getTechAvailabilityYears());
     }
 
@@ -767,14 +768,14 @@ public class CampaignTest {
          */
         private void enableBlobCrewForRole(PersonnelRole role) {
             switch (role) {
-                case SOLDIER -> campaignOptions.setUseBlobInfantry(true);
-                case BATTLE_ARMOUR -> campaignOptions.setUseBlobBattleArmor(true);
-                case VEHICLE_CREW_GROUND -> campaignOptions.setUseBlobVehicleCrewGround(true);
-                case VEHICLE_CREW_VTOL -> campaignOptions.setUseBlobVehicleCrewVTOL(true);
-                case VEHICLE_CREW_NAVAL -> campaignOptions.setUseBlobVehicleCrewNaval(true);
-                case VESSEL_PILOT -> campaignOptions.setUseBlobVesselPilot(true);
-                case VESSEL_GUNNER -> campaignOptions.setUseBlobVesselGunner(true);
-                case VESSEL_CREW -> campaignOptions.setUseBlobVesselCrew(true);
+                case SOLDIER -> campaignOptions.set(CampaignOption.USE_BLOB_INFANTRY, true);
+                case BATTLE_ARMOUR -> campaignOptions.set(CampaignOption.USE_BLOB_BATTLE_ARMOR, true);
+                case VEHICLE_CREW_GROUND -> campaignOptions.set(CampaignOption.USE_BLOB_VEHICLE_CREW_GROUND, true);
+                case VEHICLE_CREW_VTOL -> campaignOptions.set(CampaignOption.USE_BLOB_VEHICLE_CREW_VTOL, true);
+                case VEHICLE_CREW_NAVAL -> campaignOptions.set(CampaignOption.USE_BLOB_VEHICLE_CREW_NAVAL, true);
+                case VESSEL_PILOT -> campaignOptions.set(CampaignOption.USE_BLOB_VESSEL_PILOT, true);
+                case VESSEL_GUNNER -> campaignOptions.set(CampaignOption.USE_BLOB_VESSEL_GUNNER, true);
+                case VESSEL_CREW -> campaignOptions.set(CampaignOption.USE_BLOB_VESSEL_CREW, true);
                 default -> throw new IllegalStateException("Unexpected value: " + role);
             }
         }
@@ -784,14 +785,14 @@ public class CampaignTest {
          */
         private void disableBlobCrewForRole(PersonnelRole role) {
             switch (role) {
-                case SOLDIER -> campaignOptions.setUseBlobInfantry(false);
-                case BATTLE_ARMOUR -> campaignOptions.setUseBlobBattleArmor(false);
-                case VEHICLE_CREW_GROUND -> campaignOptions.setUseBlobVehicleCrewGround(false);
-                case VEHICLE_CREW_VTOL -> campaignOptions.setUseBlobVehicleCrewVTOL(false);
-                case VEHICLE_CREW_NAVAL -> campaignOptions.setUseBlobVehicleCrewNaval(false);
-                case VESSEL_PILOT -> campaignOptions.setUseBlobVesselPilot(false);
-                case VESSEL_GUNNER -> campaignOptions.setUseBlobVesselGunner(false);
-                case VESSEL_CREW -> campaignOptions.setUseBlobVesselCrew(false);
+                case SOLDIER -> campaignOptions.set(CampaignOption.USE_BLOB_INFANTRY, false);
+                case BATTLE_ARMOUR -> campaignOptions.set(CampaignOption.USE_BLOB_BATTLE_ARMOR, false);
+                case VEHICLE_CREW_GROUND -> campaignOptions.set(CampaignOption.USE_BLOB_VEHICLE_CREW_GROUND, false);
+                case VEHICLE_CREW_VTOL -> campaignOptions.set(CampaignOption.USE_BLOB_VEHICLE_CREW_VTOL, false);
+                case VEHICLE_CREW_NAVAL -> campaignOptions.set(CampaignOption.USE_BLOB_VEHICLE_CREW_NAVAL, false);
+                case VESSEL_PILOT -> campaignOptions.set(CampaignOption.USE_BLOB_VESSEL_PILOT, false);
+                case VESSEL_GUNNER -> campaignOptions.set(CampaignOption.USE_BLOB_VESSEL_GUNNER, false);
+                case VESSEL_CREW -> campaignOptions.set(CampaignOption.USE_BLOB_VESSEL_CREW, false);
                 default -> throw new IllegalStateException("Unexpected value: " + role);
             }
         }

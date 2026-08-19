@@ -608,7 +608,7 @@ public abstract class AbstractForce {
         List<Unit> unitsInTOE = getFormation(FORMATION_ORIGIN).getAllUnitsAsUnits(requireSingleDetachment().getHangar(),
               false);
         int baseCapacity = MASHCapacity.checkMASHCapacity(unitsInTOE,
-              campaign.getCampaignOptions().getMASHTheatreCapacity());
+              campaign.getCampaignOptions().get(CampaignOption.MASH_THEATRE_CAPACITY));
         int rentedCapacity = FacilityRentals.getCapacityIncreaseFromRentals(campaign.getActiveContracts(),
               ContractRentalType.HOSPITAL_BEDS);
         return baseCapacity + rentedCapacity;
@@ -819,7 +819,7 @@ public abstract class AbstractForce {
         Formation formation = formationIds.get(id);
         Formation prevFormation = formationIds.get(unit.getFormationId());
         boolean useTransfers = false;
-        boolean transferLog = !campaign.getCampaignOptions().isUseTransfers();
+        boolean transferLog = !campaign.getCampaignOptions().get(CampaignOption.USE_TRANSFERS);
 
         if (null != prevFormation) {
             if (null != prevFormation.getTechID()) {

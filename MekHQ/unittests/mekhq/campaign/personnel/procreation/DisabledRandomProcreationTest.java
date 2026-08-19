@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2022-2025 The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2022-2026 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -38,6 +38,7 @@ import static org.mockito.Mockito.when;
 import java.time.LocalDate;
 
 import mekhq.campaign.campaignOptions.CampaignOptions;
+import mekhq.campaign.campaignOptions.CampaignOption;
 import mekhq.campaign.personnel.Person;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -55,11 +56,11 @@ public class DisabledRandomProcreationTest {
 
     @BeforeEach
     public void beforeEach() {
-        when(mockOptions.isUseClanPersonnelProcreation()).thenReturn(false);
-        when(mockOptions.isUsePrisonerProcreation()).thenReturn(false);
-        when(mockOptions.isUseRelationshiplessRandomProcreation()).thenReturn(false);
-        when(mockOptions.isUseRandomClanPersonnelProcreation()).thenReturn(false);
-        when(mockOptions.isUseRandomPrisonerProcreation()).thenReturn(false);
+        when(mockOptions.get(CampaignOption.USE_CLAN_PERSONNEL_PROCREATION)).thenReturn(false);
+        when(mockOptions.get(CampaignOption.USE_PRISONER_PROCREATION)).thenReturn(false);
+        when(mockOptions.get(CampaignOption.USE_RELATIONSHIPLESS_RANDOM_PROCREATION)).thenReturn(false);
+        when(mockOptions.get(CampaignOption.USE_RANDOM_CLAN_PERSONNEL_PROCREATION)).thenReturn(false);
+        when(mockOptions.get(CampaignOption.USE_RANDOM_PRISONER_PROCREATION)).thenReturn(false);
     }
 
     @Test

@@ -59,6 +59,7 @@ import megamek.logging.MMLogger;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.campaignOptions.CampaignOptions;
+import mekhq.campaign.campaignOptions.CampaignOption;
 import mekhq.campaign.force.AbstractForce;
 import mekhq.campaign.personnel.Person;
 import mekhq.utilities.MHQXMLUtility;
@@ -320,8 +321,8 @@ public class ForceReputationController {
               commanderMap.get("traits"),
               indent));
 
-        if (campaign.getCampaignOptions().isUseRandomPersonalities() &&
-                  (campaign.getCampaignOptions().isUseRandomPersonalityReputation())) {
+        if (campaign.getCampaignOptions().get(CampaignOption.USE_RANDOM_PERSONALITIES) &&
+                  (campaign.getCampaignOptions().get(CampaignOption.USE_RANDOM_PERSONALITY_REPUTATION))) {
             description.append(String.format("<tr><td><b>%s%s:</b></td> <td>%d</td></tr>",
                   indent,
                   resources.getString("personality.text"),

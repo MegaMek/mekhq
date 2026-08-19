@@ -68,6 +68,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
+import mekhq.campaign.campaignOptions.CampaignOption;
 
 /**
  * Data structure intended to hold data relevant to AtB Dynamic Scenarios (AtB 3.0)
@@ -453,7 +454,7 @@ public class AtBDynamicScenario extends AtBScenario {
         if ((commander != null) &&
                   commander.hasSkill(skillType)) {
             SkillModifierData skillModifierData = commander.getSkillModifierData(campaign.getCampaignOptions()
-                                                                                       .isUseAgeEffects(),
+                                                                                       .get(CampaignOption.USE_AGE_EFFECTS),
                   campaign.isClanCampaign(), campaign.getLocalDate());
             skillValue = commander.getSkill(skillType).getTotalSkillLevel(skillModifierData);
         }

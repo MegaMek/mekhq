@@ -45,6 +45,7 @@ import java.util.Set;
 
 import mekhq.campaign.Campaign;
 import mekhq.campaign.campaignOptions.CampaignOptions;
+import mekhq.campaign.campaignOptions.CampaignOption;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.PersonnelOptions;
 import mekhq.campaign.personnel.skills.SkillType;
@@ -160,9 +161,9 @@ class CommandRatingTest {
         assertRating(commander, Map.of("leadership", 9, "personality", 0, "total", 9));
 
         // ensure that both options are enabled before calculating personality score
-        when(campaignOptions.isUseRandomPersonalities()).thenReturn(true);
+        when(campaignOptions.get(CampaignOption.USE_RANDOM_PERSONALITIES)).thenReturn(true);
         assertRating(commander, Map.of("leadership", 9, "personality", 0, "total", 9));
-        when(campaignOptions.isUseRandomPersonalityReputation()).thenReturn(true);
+        when(campaignOptions.get(CampaignOption.USE_RANDOM_PERSONALITY_REPUTATION)).thenReturn(true);
         assertRating(commander, Map.of("leadership", 9, "personality", -5, "total", 4));
     }
 

@@ -66,6 +66,7 @@ import mekhq.campaign.universe.Faction;
 import mekhq.campaign.universe.Systems;
 import mekhq.campaign.universe.factionStanding.FactionStandingUtilities;
 import mekhq.gui.CampaignGUI;
+import mekhq.campaign.campaignOptions.CampaignOption;
 
 /**
  * Contract summary view for ContractMarketDialog
@@ -108,7 +109,7 @@ public class ContractSummaryPanel extends JPanel {
         this.contract = contract;
         this.campaign = campaign;
         this.allowRerolls = allowRerolls;
-        ContractMarketMethod method = campaign.getCampaignOptions().getContractMarketMethod();
+        ContractMarketMethod method = campaign.getCampaignOptions().get(CampaignOption.CONTRACT_MARKET_METHOD);
         if (allowRerolls) {
             if (method == ContractMarketMethod.CAM_OPS) {
                 cmdRerolls = 1;
@@ -209,7 +210,7 @@ public class ContractSummaryPanel extends JPanel {
         gridBagConstraintsText.gridy = y;
         mainPanel.add(txtName, gridBagConstraintsText);
 
-        if (campaign.getCampaignOptions().isUseGenericBattleValue()) {
+        if (campaign.getCampaignOptions().get(CampaignOption.USE_GENERIC_BATTLE_VALUE)) {
             if (contract instanceof AtBContract) {
                 JLabel lblChallenge = new JLabel(resourceMap.getString("lblChallenge.text"));
                 lblChallenge.setToolTipText(wordWrap(resourceMap.getString("lblChallenge.tooltip")));

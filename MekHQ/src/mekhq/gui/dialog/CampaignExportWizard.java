@@ -70,6 +70,7 @@ import mekhq.campaign.unit.Unit;
 import mekhq.campaign.universe.Faction;
 import mekhq.gui.CampaignGUI;
 import mekhq.gui.FileDialogs;
+import mekhq.campaign.campaignOptions.CampaignOption;
 
 /**
  * This class manages the GUI and logic for the campaign subset export wizard. May Knuth forgive me.
@@ -606,7 +607,7 @@ public class CampaignExportWizard extends JDialog {
             destinationCampaign.importPerson(person);
             final UUID id = person.getId();
             destinationCampaign.getPlayerForce().getHumanResources().getPerson(id)
-                  .resetMinutesLeft(destinationCampaign.getCampaignOptions().isTechsUseAdministration());
+                  .resetMinutesLeft(destinationCampaign.getCampaignOptions().get(CampaignOption.TECHS_USE_ADMINISTRATION));
 
             for (Kill kill : sourceCampaign.getKillsFor(person.getId())) {
                 // we don't preserve IDs to avoid conflicts with the destination campaign

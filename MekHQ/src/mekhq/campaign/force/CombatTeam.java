@@ -60,6 +60,7 @@ import megamek.logging.MMLogger;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.campaignOptions.CampaignOptions;
+import mekhq.campaign.campaignOptions.CampaignOption;
 import mekhq.campaign.events.OrganizationChangedEvent;
 import mekhq.campaign.mission.AtBContract;
 import mekhq.campaign.mission.AtBScenario;
@@ -482,7 +483,7 @@ public class CombatTeam {
                           false,
                           getBattleDate(campaign.getLocalDate()));
                 } else if (roll < 33) {
-                    if (campaign.getCampaignOptions().isGenerateChases()) {
+                    if (campaign.getCampaignOptions().get(CampaignOption.GENERATE_CHASES)) {
                         return AtBScenarioFactory.createScenario(campaign,
                               this,
                               AtBScenario.CHASE,
@@ -518,7 +519,7 @@ public class CombatTeam {
                           false,
                           getBattleDate(campaign.getLocalDate()));
                 } else if (roll < 11) {
-                    if (campaign.getCampaignOptions().isGenerateChases()) {
+                    if (campaign.getCampaignOptions().get(CampaignOption.GENERATE_CHASES)) {
                         return AtBScenarioFactory.createScenario(campaign,
                               this,
                               AtBScenario.CHASE,
@@ -624,7 +625,7 @@ public class CombatTeam {
                           true,
                           getBattleDate(campaign.getLocalDate()));
                 } else if (roll < 7) {
-                    if (campaign.getCampaignOptions().isGenerateChases()) {
+                    if (campaign.getCampaignOptions().get(CampaignOption.GENERATE_CHASES)) {
                         return AtBScenarioFactory.createScenario(campaign,
                               this,
                               AtBScenario.CHASE,
@@ -644,7 +645,7 @@ public class CombatTeam {
                           false,
                           getBattleDate(campaign.getLocalDate()));
                 } else {
-                    if (campaign.getCampaignOptions().isGenerateChases()) {
+                    if (campaign.getCampaignOptions().get(CampaignOption.GENERATE_CHASES)) {
                         return AtBScenarioFactory.createScenario(campaign,
                               this,
                               AtBScenario.CHASE,
@@ -822,7 +823,7 @@ public class CombatTeam {
             }
         }
 
-        if (campaign.getCampaignOptions().isLimitLanceWeight() &&
+        if (false &&
                   getWeightClass(campaign) > EntityWeightClass.WEIGHT_ASSAULT) {
             formation.setCombatTeamStatus(false);
             return false;

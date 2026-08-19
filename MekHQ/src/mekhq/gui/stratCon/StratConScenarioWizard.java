@@ -74,6 +74,7 @@ import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.Campaign.AdministratorSpecialization;
 import mekhq.campaign.campaignOptions.CampaignOptions;
+import mekhq.campaign.campaignOptions.CampaignOption;
 import mekhq.campaign.digitalGM.stratCon.StratConCampaignState;
 import mekhq.campaign.digitalGM.stratCon.StratConRulesManager;
 import mekhq.campaign.digitalGM.stratCon.StratConScenario;
@@ -857,7 +858,7 @@ public class StratConScenarioWizard extends JDialog {
                                             campaign.getCampaignOptions(),
                                             campaign.isClanCampaign(),
                                             campaign.getLocalDate());
-        int baseTargetNumber = campaign.getCampaignOptions().getReinforcementBaseTargetNumber();
+        int baseTargetNumber = campaign.getCampaignOptions().get(CampaignOption.REINFORCEMENT_BASE_TARGET_NUMBER);
         TargetRoll targetNumber = calculateReinforcementTargetNumber(commandLiaison,
               currentCampaignState.getContract(),
               baseTargetNumber);
@@ -1100,9 +1101,9 @@ public class StratConScenarioWizard extends JDialog {
         contract.setBatchallAccepted(false);
 
         CampaignOptions campaignOptions = campaign.getCampaignOptions();
-        if (campaignOptions.isTrackFactionStanding()) {
+        if (campaignOptions.get(CampaignOption.TRACK_FACTION_STANDING)) {
             FactionStandings factionStandings = campaign.getPlayerForce().getFactionStandings();
-            double regardMultiplier = campaignOptions.getRegardMultiplier();
+            double regardMultiplier = campaignOptions.get(CampaignOption.REGARD_MULTIPLIER);
             // We double the regard multiplier for Batchall breaches as agreeing to a Batchall and then breaking it
             // is far worse than if you never agreed to it in the first place.
             regardMultiplier *= 2;

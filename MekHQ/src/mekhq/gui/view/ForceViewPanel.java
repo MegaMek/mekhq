@@ -66,6 +66,7 @@ import mekhq.gui.baseComponents.JScrollablePanel;
 import mekhq.gui.baseComponents.roundedComponents.RoundedLineBorder;
 import mekhq.gui.utilities.MarkdownRenderer;
 import mekhq.utilities.ReportingUtilities;
+import mekhq.campaign.campaignOptions.CampaignOption;
 
 /**
  * A custom panel that gets filled in with goodies from a Force record
@@ -602,7 +603,7 @@ public class ForceViewPanel extends JScrollablePanel {
         }
 
         int effectiveFatigue = getEffectiveFatigue(person, campaign);
-        if (campaign.getCampaignOptions().isUseFatigue() && (effectiveFatigue > 0)) {
+        if (campaign.getCampaignOptions().get(CampaignOption.USE_FATIGUE) && (effectiveFatigue > 0)) {
             isFatigued = true;
             if (isInjured) {
                 toReturn.append(',');

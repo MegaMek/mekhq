@@ -41,6 +41,7 @@ import java.util.List;
 import megamek.common.annotations.Nullable;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.campaignOptions.CampaignOptions;
+import mekhq.campaign.campaignOptions.CampaignOption;
 import mekhq.campaign.personnel.Person;
 import mekhq.gui.baseComponents.immersiveDialogs.ImmersiveDialogSimple;
 
@@ -91,7 +92,7 @@ public record NewYearsDayAnnouncement(Campaign campaign) {
 
         if (dialog.getDialogChoice() == SUPPRESS_DIALOG_RESPONSE_INDEX) {
             CampaignOptions campaignOptions = campaign.getCampaignOptions();
-            campaignOptions.setShowLifeEventDialogCelebrations(false);
+            campaignOptions.set(CampaignOption.SHOW_LIFE_EVENT_DIALOG_CELEBRATIONS, false);
         }
     }
 

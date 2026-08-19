@@ -55,6 +55,7 @@ import mekhq.campaign.CampaignLocationManager;
 import mekhq.campaign.JumpPath;
 import mekhq.campaign.LocalWarehouse;
 import mekhq.campaign.campaignOptions.CampaignOptions;
+import mekhq.campaign.campaignOptions.CampaignOption;
 import mekhq.campaign.force.Detachment;
 import mekhq.campaign.force.PlayerForce;
 import mekhq.campaign.location.AcademyCampusLocation;
@@ -100,7 +101,7 @@ class EducationControllerTest {
         when(campaign.getLocalDate()).thenReturn(LocalDate.of(3025, 1, 1));
 
         CampaignOptions options = mock(CampaignOptions.class);
-        when(options.getNaturalHealingWaitingPeriod()).thenReturn(0);
+        when(options.get(CampaignOption.NATURAL_HEALING_WAITING_PERIOD)).thenReturn(0);
         when(campaign.getCampaignOptions()).thenReturn(options);
 
         mekhq.campaign.LocalHangar hangar = mock(mekhq.campaign.LocalHangar.class);

@@ -49,6 +49,7 @@ import java.util.stream.Stream;
 import megamek.common.enums.Gender;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.campaignOptions.CampaignOptions;
+import mekhq.campaign.campaignOptions.CampaignOption;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.enums.MergingSurnameStyle;
 import mekhq.campaign.personnel.enums.PersonnelStatus;
@@ -87,10 +88,10 @@ public class AbstractMarriageTest {
     //region Getters/Setters
     @Test
     public void testGettersAndSetters() {
-        when(mockCampaignOptions.isUseClanPersonnelMarriages()).thenReturn(false);
-        when(mockCampaignOptions.isUsePrisonerMarriages()).thenReturn(false);
-        when(mockCampaignOptions.isUseRandomClanPersonnelMarriages()).thenReturn(false);
-        when(mockCampaignOptions.isUseRandomPrisonerMarriages()).thenReturn(false);
+        when(mockCampaignOptions.get(CampaignOption.USE_CLAN_PERSONNEL_MARRIAGES)).thenReturn(false);
+        when(mockCampaignOptions.get(CampaignOption.USE_PRISONER_MARRIAGES)).thenReturn(false);
+        when(mockCampaignOptions.get(CampaignOption.USE_RANDOM_CLAN_PERSONNEL_MARRIAGES)).thenReturn(false);
+        when(mockCampaignOptions.get(CampaignOption.USE_RANDOM_PRISONER_MARRIAGES)).thenReturn(false);
 
         final AbstractMarriage disabledMarriage = new DisabledRandomMarriage(mockCampaignOptions);
 

@@ -106,11 +106,11 @@ public abstract class AbstractProcreation {
     //region Constructors
     protected AbstractProcreation(final RandomProcreationMethod method, final CampaignOptions options) {
         this.method = method;
-        setUseClanPersonnelProcreation(options.isUseClanPersonnelProcreation());
-        setUsePrisonerProcreation(options.isUsePrisonerProcreation());
-        setUseRelationshiplessProcreation(options.isUseRelationshiplessRandomProcreation());
-        setUseRandomClanPersonnelProcreation(options.isUseRandomClanPersonnelProcreation());
-        setUseRandomPrisonerProcreation(options.isUseRandomPrisonerProcreation());
+        setUseClanPersonnelProcreation(options.get(CampaignOption.USE_CLAN_PERSONNEL_PROCREATION));
+        setUsePrisonerProcreation(options.get(CampaignOption.USE_PRISONER_PROCREATION));
+        setUseRelationshiplessProcreation(options.get(CampaignOption.USE_RELATIONSHIPLESS_RANDOM_PROCREATION));
+        setUseRandomClanPersonnelProcreation(options.get(CampaignOption.USE_RANDOM_CLAN_PERSONNEL_PROCREATION));
+        setUseRandomPrisonerProcreation(options.get(CampaignOption.USE_RANDOM_PRISONER_PROCREATION));
     }
     //endregion Constructors
 
@@ -217,7 +217,7 @@ public abstract class AbstractProcreation {
      * @param mother   the mother of the baby
      */
     protected @Nullable Person determineFather(final Campaign campaign, final Person mother) {
-        if ((campaign.getCampaignOptions().isDetermineFatherAtBirth() && mother.getGenealogy().hasSpouse())) {
+        if ((campaign.getCampaignOptions().get(CampaignOption.DETERMINE_FATHER_AT_BIRTH) && mother.getGenealogy().hasSpouse())) {
             return mother.getGenealogy().getSpouse();
         } else {
             if ((mother.getExtraData().get(PREGNANCY_FATHER_DATA) != null)) {
@@ -338,7 +338,7 @@ public abstract class AbstractProcreation {
         addPregnancy(campaign,
               today,
               mother,
-              determineNumberOfBabies(campaign.getCampaignOptions().getMultiplePregnancyOccurrences()),
+              determineNumberOfBabies(campaign.getCampaignOptions().get(CampaignOption.MULTIPLE_PREGNANCY_OCCURRENCES)),
               isNoReport);
     }
 
@@ -377,7 +377,7 @@ public abstract class AbstractProcreation {
                   babyAmount).trim());
         }
 
-        if (campaign.getCampaignOptions().isLogProcreation()) {
+        if (campaign.getCampaignOptions().get(CampaignOption.LOG_PROCREATION)) {
             MedicalLogger.hasConceived(mother, today, babyAmount);
 
             if (mother.getGenealogy().hasSpouse()) {
@@ -441,7 +441,7 @@ public abstract class AbstractProcreation {
             final Person baby = campaign.getPlayerForce()
                                       .getHumanResources()
                                       .newDependent(campaign, Gender.RANDOMIZE, originFaction, originPlanet);
-            baby.setSurname(campaignOptions.getBabySurnameStyle()
+            baby.setSurname(campaignOptions.get(CampaignOption.BABY_SURNAME_STYLE)
                                   .generateBabySurname(mother, father, baby.getGender()));
 
             // Every one of these lines fixes a bug we've had with babies. Who knew children were so good at
@@ -453,7 +453,7 @@ public abstract class AbstractProcreation {
             baby.setPreNominal(""); // Stop babies being born with doctorates
             baby.setPostNominal(""); // Stop babies being born with post-nominal titles
 
-            if (campaign.getCampaignOptions().isNoRandomPortraitsForChildren() &&
+            if (campaign.getCampaignOptions().get(CampaignOption.NO_RANDOM_PORTRAITS_FOR_CHILDREN) &&
                       baby.isChild(campaign.getLocalDate(), false)) {
                 baby.setPortrait(new Portrait());
             }
@@ -470,9 +470,9 @@ public abstract class AbstractProcreation {
             logAndUpdateFamily(campaign, today, mother, baby, father);
 
             // Founder Tag Assignment
-            if (campaignOptions.isAssignNonPrisonerBabiesFounderTag() && !prisonerStatus.isCurrentPrisoner()) {
+            if (campaignOptions.get(CampaignOption.ASSIGN_NON_PRISONER_BABIES_FOUNDER_TAG) && !prisonerStatus.isCurrentPrisoner()) {
                 baby.setFounder(true);
-            } else if (campaignOptions.isAssignChildrenOfFoundersFounderTag()) {
+            } else if (campaignOptions.get(CampaignOption.ASSIGN_CHILDREN_OF_FOUNDERS_FOUNDER_TAG)) {
                 baby.setFounder(baby.getGenealogy().getParents().stream().anyMatch(Person::isFounder));
             }
 
@@ -499,7 +499,7 @@ public abstract class AbstractProcreation {
             if (i == 0) {
                 if (campaignOptions.isUseAdvancedMedical()) {
                     Injury injury;
-                    if (campaignOptions.isUseAlternativeAdvancedMedical() &&
+                    if (campaignOptions.get(CampaignOption.USE_ALTERNATIVE_ADVANCED_MEDICAL) &&
                               // These injury types don't stack
                               !AdvancedMedicalAlternate.hasInjuryOfType(mother.getInjuries(),
                                     AlternateInjuries.POSTPARTUM_RECOVERY)) {
@@ -530,7 +530,7 @@ public abstract class AbstractProcreation {
             }
 
             // Alert the player, but only show this dialog for the first child with twins/triplets/etc
-            if (campaignOptions.isShowLifeEventDialogBirths() && (i == 0)) {
+            if (campaignOptions.get(CampaignOption.SHOW_LIFE_EVENT_DIALOG_BIRTHS) && (i == 0)) {
                 new BirthAnnouncement(campaign, mother, baby.getGender(), size);
             }
         }
@@ -567,7 +567,7 @@ public abstract class AbstractProcreation {
      */
     private static void logAndUpdateFamily(Campaign campaign, LocalDate today, Person mother, Person baby,
           Person father) {
-        if (campaign.getCampaignOptions().isLogProcreation()) {
+        if (campaign.getCampaignOptions().get(CampaignOption.LOG_PROCREATION)) {
             MedicalLogger.deliveredBaby(mother, baby, today);
             if (father != null) {
                 PersonalLogger.ourChildBorn(father, baby, mother.getFullName(), today);
@@ -618,14 +618,14 @@ public abstract class AbstractProcreation {
                                       .newDependent(campaign, Gender.RANDOMIZE, originFaction, originPlanet);
 
             baby.setSurname(campaign.getCampaignOptions()
-                                  .getBabySurnameStyle()
+                                  .get(CampaignOption.BABY_SURNAME_STYLE)
                                   .generateBabySurname(mother, father, baby.getGender()));
 
             baby.setDateOfBirth(mother.getDueDate());
             baby.removeAllSkills(); // Limit skills by age for children and adolescents
             baby.setPrimaryRole(campaign, PersonnelRole.DEPENDENT); // Babies can't have jobs
 
-            if (campaign.getCampaignOptions().isNoRandomPortraitsForChildren() &&
+            if (campaign.getCampaignOptions().get(CampaignOption.NO_RANDOM_PORTRAITS_FOR_CHILDREN) &&
                       baby.isChild(campaign.getLocalDate(), false)) {
                 baby.setPortrait(new Portrait());
             }
@@ -732,7 +732,7 @@ public abstract class AbstractProcreation {
                 return;
             }
 
-            if (campaign.getCampaignOptions().isUseMaternityLeave() && !person.isBlockMaternityLeave()) {
+            if (campaign.getCampaignOptions().get(CampaignOption.USE_MATERNITY_LEAVE) && !person.isBlockMaternityLeave()) {
                 if (!person.isBusy()
                           && !person.getStatus().isCampFollower()
                           && person.getNonPermanentInjurySeverity() == 0

@@ -76,6 +76,7 @@ import mekhq.gui.dialog.factionStanding.factionJudgment.FactionCensureConfirmati
 import mekhq.gui.dialog.factionStanding.factionJudgment.FactionJudgmentDialog;
 import mekhq.gui.dialog.factionStanding.factionJudgment.FactionJudgmentNewsArticle;
 import mekhq.gui.dialog.factionStanding.factionJudgment.FactionJudgmentSceneDialog;
+import mekhq.campaign.campaignOptions.CampaignOption;
 
 /**
  * Represents a faction censure event within a campaign, handling the narrative and mechanical consequences associated
@@ -398,7 +399,7 @@ public class FactionCensureEvent {
         String factionCode = faction.getShortName();
         FactionStandings factionStandings = campaign.getPlayerForce().getFactionStandings();
         String report = factionStandings.changeRegardForFaction(campaign.getFaction().getShortName(), factionCode,
-              delta, campaign.getGameYear(), campaign.getCampaignOptions().getRegardMultiplier());
+              delta, campaign.getGameYear(), campaign.getCampaignOptions().get(CampaignOption.REGARD_MULTIPLIER));
 
         campaign.addReport(POLITICS, report);
     }
@@ -461,7 +462,7 @@ public class FactionCensureEvent {
      */
     private @Nullable Person getReplacementCharacter(Person seniorPerson) {
         boolean useExtraRandomness = campaign.getRandomSkillPreferences().randomizeSkill();
-        boolean isUseArtillery = campaign.getCampaignOptions().isUseArtillery();
+        boolean isUseArtillery = campaign.getCampaignOptions().get(CampaignOption.USE_ARTILLERY);
 
         PersonnelRole primaryRole = seniorPerson.getPrimaryRole();
         PersonnelRole politicalRole = getPoliticalRole();

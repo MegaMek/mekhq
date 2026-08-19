@@ -115,7 +115,7 @@ public class DefaultSkillGenerator extends AbstractSkillGenerator {
         final CampaignOptions campaignOptions = campaign.getCampaignOptions();
 
         // roll artillery skill
-        if (campaignOptions.isUseArtillery() &&
+        if (campaignOptions.get(CampaignOption.USE_ARTILLERY) &&
                   (primaryRole.isMekWarrior() ||
                          primaryRole.isVehicleCrewGround() ||
                          primaryRole.isVehicleCrewNaval() ||
@@ -126,21 +126,21 @@ public class DefaultSkillGenerator extends AbstractSkillGenerator {
         }
 
         // roll Negotiation skill
-        if (campaignOptions.isAdminsHaveNegotiation() && (primaryRole.isAdministrator())) {
+        if (campaignOptions.get(CampaignOption.ADMINS_HAVE_NEGOTIATION) && (primaryRole.isAdministrator())) {
             addSkill(person, SkillType.S_NEGOTIATION, expLvl, skillPreferences.randomizeSkill(), 0, mod);
         }
 
         // roll Administration skill
-        if (campaignOptions.isTechsUseAdministration() && (person.isTech() || primaryRole.isVesselCrew())) {
+        if (campaignOptions.get(CampaignOption.TECHS_USE_ADMINISTRATION) && (person.isTech() || primaryRole.isVesselCrew())) {
             addSkill(person, SkillType.S_ADMIN, expLvl, skillPreferences.randomizeSkill(), 0, mod);
         }
 
-        if (campaignOptions.isDoctorsUseAdministration() && (primaryRole.isDoctor())) {
+        if (campaignOptions.get(CampaignOption.DOCTORS_USE_ADMINISTRATION) && (primaryRole.isDoctor())) {
             addSkill(person, SkillType.S_ADMIN, expLvl, skillPreferences.randomizeSkill(), 0, mod);
         }
 
         // roll Infantry Gunnery Skills
-        if (!campaignOptions.isUseSmallArmsOnly()) {
+        if (!campaignOptions.get(CampaignOption.USE_SMALL_ARMS_ONLY)) {
             if (primaryRole.isSoldier() || secondaryRole.isSoldier()) {
                 Skills skills = person.getSkills();
                 for (String skillName : INFANTRY_GUNNERY_SKILLS) {
@@ -153,7 +153,7 @@ public class DefaultSkillGenerator extends AbstractSkillGenerator {
 
         // roll random secondary skill
         if (Utilities.rollProbability(skillPreferences.getSecondSkillProb())) {
-            boolean isUseArtillery = campaignOptions.isUseArtillery();
+            boolean isUseArtillery = campaignOptions.get(CampaignOption.USE_ARTILLERY);
             List<String> possibleSkills = new ArrayList<>();
             for (String skillType : SkillType.skillList) {
                 SkillType type = SkillType.getType(skillType);

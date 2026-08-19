@@ -71,6 +71,7 @@ import mekhq.campaign.universe.IUnitGenerator;
 import mekhq.campaign.universe.RandomFactionGenerator;
 import mekhq.campaign.universe.factionStanding.FactionStandingUtilities;
 import mekhq.campaign.universe.factionStanding.FactionStandings;
+import mekhq.campaign.campaignOptions.CampaignOption;
 
 public class AtBMonthlyUnitMarket extends AbstractUnitMarket {
     private static final String RESOURCE_BUNDLE = "mekhq.resources.Market";
@@ -109,7 +110,7 @@ public class AtBMonthlyUnitMarket extends AbstractUnitMarket {
         final AtBContract contract = contracts.isEmpty() ? null : contracts.getFirst();
 
         Faction faction = campaign.getFaction();
-        int rarityModifier = campaign.getCampaignOptions().getUnitMarketRarityModifier();
+        int rarityModifier = campaign.getCampaignOptions().get(CampaignOption.UNIT_MARKET_RARITY_MODIFIER);
 
         // Civilian Market
         addOffers(campaign, getMarketItemCount(campaign, UBIQUITOUS, rarityModifier),
@@ -349,7 +350,7 @@ public class AtBMonthlyUnitMarket extends AbstractUnitMarket {
     private int getMarketItemCount(Campaign campaign, UnitMarketRarity rarity, int rarityModifier) {
         int totalRarity = rarity.getRarityValue() + rarityModifier;
 
-        if (isGrayMonday(campaign.getLocalDate(), campaign.getCampaignOptions().isSimulateGrayMonday())) {
+        if (isGrayMonday(campaign.getLocalDate(), campaign.getCampaignOptions().get(CampaignOption.SIMULATE_GRAY_MONDAY))) {
             totalRarity -= 4;
         }
 
@@ -390,7 +391,7 @@ public class AtBMonthlyUnitMarket extends AbstractUnitMarket {
                     }
                 } else {
                     movementModes.addAll(IUnitGenerator.MIXED_TANK_VTOL);
-                    int specialUnitChance = campaign.getCampaignOptions().getUnitMarketArtilleryUnitChance();
+                    int specialUnitChance = campaign.getCampaignOptions().get(CampaignOption.UNIT_MARKET_ARTILLERY_UNIT_CHANCE);
                     if (specialUnitChance != 0) {
                         if ((specialUnitChance == 1) || (Compute.randomInt(specialUnitChance) == 0)) {
                             missionRoles.add(MissionRole.ARTILLERY);

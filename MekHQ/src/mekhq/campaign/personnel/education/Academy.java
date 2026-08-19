@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2018-2025 The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2018-2026 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -64,6 +64,7 @@ import mekhq.campaign.universe.Planet;
 import mekhq.campaign.universe.PlanetarySystem;
 import mekhq.campaign.universe.RandomFactionGenerator;
 import mekhq.campaign.universe.factionHints.FactionHints;
+import mekhq.campaign.campaignOptions.CampaignOption;
 
 /**
  * The Academy class represents an academy with various properties and methods.
@@ -1083,7 +1084,7 @@ public class Academy implements Comparable<Academy> {
                         if (person.getEduHighestEducation().getLevel() >= educationLevel) {
                             tooltip.append(resources.getString("nothingToLearn.text")).append(")<br>");
                         } else {
-                            tooltip.append(educationLevel * campaign.getCampaignOptions().getCurriculumXpRate())
+                            tooltip.append(educationLevel * campaign.getCampaignOptions().get(CampaignOption.CURRICULUM_XP_RATE))
                                   .append(")<br>");
                         }
                     } else if (!skillName.equalsIgnoreCase("none")) {
@@ -1114,7 +1115,7 @@ public class Academy implements Comparable<Academy> {
 
             // with the skill content resolved, we can move onto the rest of the tooltip
             if (!isLocal && !isHomeSchool) {
-                int targetNumber = campaign.getCampaignOptions().getEntranceExamBaseTargetNumber() - facultySkill;
+                int targetNumber = campaign.getCampaignOptions().get(CampaignOption.ENTRANCE_EXAM_BASE_TARGET_NUMBER) - facultySkill;
                 tooltip.append("<b>")
                       .append(resources.getString("entranceExam.text"))
                       .append("</b> ")
@@ -1165,7 +1166,7 @@ public class Academy implements Comparable<Academy> {
 
             // with travel time out the way, all that's left is to add the last couple of
             // entries
-            if ((isReeducationCamp) && (campaign.getCampaignOptions().isUseReeducationCamps())) {
+            if ((isReeducationCamp) && (campaign.getCampaignOptions().get(CampaignOption.USE_REEDUCATION_CAMPS))) {
                 tooltip.append("<b>").append(resources.getString("reeducation.text")).append("</b> ");
 
                 if (personnel.size() == 1) {

@@ -44,6 +44,7 @@ import mekhq.campaign.Campaign;
 import mekhq.campaign.finances.Money;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.enums.PersonnelRole;
+import mekhq.campaign.campaignOptions.CampaignOption;
 
 /**
  * @author Jay Lawson
@@ -317,7 +318,7 @@ public class PersonnelReport extends AbstractReport {
 
     private double getTempCrewPay(PersonnelRole personnelRole, int tempPersonnelPool) {
         return getCampaign().getCampaignOptions()
-                     .getRoleBaseSalaries()[personnelRole.ordinal()].getAmount().doubleValue() * tempPersonnelPool;
+                     .get(CampaignOption.ROLE_BASE_SALARIES)[personnelRole.ordinal()].getAmount().doubleValue() * tempPersonnelPool;
     }
 
     public String getSecondarySupportPersonnelDetails() {

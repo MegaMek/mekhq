@@ -53,6 +53,7 @@ import mekhq.utilities.MHQXMLUtility;
 import mekhq.utilities.ReportingUtilities;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
+import mekhq.campaign.campaignOptions.CampaignOption;
 
 /**
  * This will be a special type of part that will only exist as spares It will determine the amount of ammo of a
@@ -362,10 +363,10 @@ public class AmmoStorage extends EquipmentPart implements IAcquisitionWork {
     public TargetRoll getAllAcquisitionMods() {
         TargetRoll target = new TargetRoll();
         // Faction and Tech mod
-        if (isClanTechBase() && (campaign.getCampaignOptions().getClanAcquisitionPenalty() > 0)) {
-            target.addModifier(campaign.getCampaignOptions().getClanAcquisitionPenalty(), "clan-tech");
-        } else if (campaign.getCampaignOptions().getIsAcquisitionPenalty() > 0) {
-            target.addModifier(campaign.getCampaignOptions().getIsAcquisitionPenalty(), "Inner Sphere tech");
+        if (isClanTechBase() && (campaign.getCampaignOptions().get(CampaignOption.CLAN_ACQUISITION_PENALTY) > 0)) {
+            target.addModifier(campaign.getCampaignOptions().get(CampaignOption.CLAN_ACQUISITION_PENALTY), "clan-tech");
+        } else if (campaign.getCampaignOptions().get(CampaignOption.IS_ACQUISITION_PENALTY) > 0) {
+            target.addModifier(campaign.getCampaignOptions().get(CampaignOption.IS_ACQUISITION_PENALTY), "Inner Sphere tech");
         }
         // availability mod
         AvailabilityValue avail = getAvailability();

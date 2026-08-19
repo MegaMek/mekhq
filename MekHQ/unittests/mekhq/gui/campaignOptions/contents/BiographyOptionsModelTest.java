@@ -37,6 +37,7 @@ import static org.mockito.Mockito.mock;
 
 import mekhq.campaign.RandomOriginOptions;
 import mekhq.campaign.campaignOptions.CampaignOptions;
+import mekhq.campaign.campaignOptions.CampaignOption;
 import mekhq.campaign.personnel.enums.AgeGroup;
 import mekhq.campaign.universe.Planet;
 import org.junit.jupiter.api.Test;
@@ -52,7 +53,7 @@ class BiographyOptionsModelTest {
     @Test
     void applyToRoundTripsEveryField() {
         CampaignOptions sourceOptions = new CampaignOptions();
-        RandomOriginOptions sourceOrigin = sourceOptions.getRandomOriginOptions();
+        RandomOriginOptions sourceOrigin = sourceOptions.get(CampaignOption.RANDOM_ORIGIN_OPTIONS);
         BiographyOptionsModel model = new BiographyOptionsModel(sourceOptions, sourceOrigin);
 
         OptionsModelTestSupport.mutateScalarFields(model, "percentFemale");
@@ -63,7 +64,7 @@ class BiographyOptionsModelTest {
         model.enabledRandomDeathAgeGroups.put(ageGroup, ageGroupValue);
 
         CampaignOptions destinationOptions = new CampaignOptions();
-        RandomOriginOptions destinationOrigin = destinationOptions.getRandomOriginOptions();
+        RandomOriginOptions destinationOrigin = destinationOptions.get(CampaignOption.RANDOM_ORIGIN_OPTIONS);
         model.applyTo(destinationOptions, destinationOrigin);
         BiographyOptionsModel roundTripped = new BiographyOptionsModel(destinationOptions, destinationOrigin);
 

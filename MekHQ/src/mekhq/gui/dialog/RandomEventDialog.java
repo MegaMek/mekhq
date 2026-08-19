@@ -50,6 +50,7 @@ import megamek.common.TargetRollModifier;
 import megamek.common.enums.SkillLevel;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.campaignOptions.CampaignOptions;
+import mekhq.campaign.campaignOptions.CampaignOption;
 import mekhq.campaign.enums.DailyReportType;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.skills.ActionCheck;
@@ -116,8 +117,8 @@ public class RandomEventDialog {
         this.activeEventParticipant = activeEventParticipant;
 
         CampaignOptions campaignOptions = campaign.getCampaignOptions();
-        isUseAgingEffects = campaignOptions.isUseAgeEffects();
-        isUseRandomPersonalities = campaignOptions.isUseRandomPersonalities();
+        isUseAgingEffects = campaignOptions.get(CampaignOption.USE_AGE_EFFECTS);
+        isUseRandomPersonalities = campaignOptions.get(CampaignOption.USE_RANDOM_PERSONALITIES);
 
         isClanCampaign = campaign.isClanCampaign();
         today = campaign.getLocalDate();
@@ -134,7 +135,7 @@ public class RandomEventDialog {
 
     private void populateActiveParticipantSpecialValues(Person activeEventParticipant,
           CampaignOptions campaignOptions) {
-        boolean edgeEnabled = campaignOptions.isUseEdge();
+        boolean edgeEnabled = campaignOptions.get(CampaignOption.USE_EDGE);
         boolean speakerIsReal = activeEventParticipant != null;
 
         if (speakerIsReal) {

@@ -102,6 +102,7 @@ import mekhq.campaign.universe.PlanetarySystem;
 import mekhq.gui.utilities.MarkdownEditorPanel;
 import mekhq.gui.utilities.MarkdownRenderer;
 import mekhq.gui.utilities.OriginFactionPickerHelper;
+import mekhq.campaign.campaignOptions.CampaignOption;
 
 /**
  * This dialog is used to create a character in story arcs from a pool of XP
@@ -671,7 +672,7 @@ public class CreateCharacterDialog extends JDialog implements DialogOptionListen
         textToughness.setText(Integer.toString(person.getDirectToughness()));
         textToughness.setName("textToughness"); // NOI18N
 
-        if (campaign.getCampaignOptions().isUseToughness()) {
+        if (campaign.getCampaignOptions().get(CampaignOption.USE_TOUGHNESS)) {
             gridBagConstraints = new GridBagConstraints();
             gridBagConstraints.gridx = 0;
             gridBagConstraints.gridy = y;
@@ -823,7 +824,7 @@ public class CreateCharacterDialog extends JDialog implements DialogOptionListen
 
         textEducationLevel.setName("textEducationLevel");
 
-        if (campaign.getCampaignOptions().isUseEducationModule()) {
+        if (campaign.getCampaignOptions().get(CampaignOption.USE_EDUCATION_MODULE)) {
             gridBagConstraints = new GridBagConstraints();
             gridBagConstraints.gridx = 0;
             gridBagConstraints.gridy = y;
@@ -846,8 +847,8 @@ public class CreateCharacterDialog extends JDialog implements DialogOptionListen
         textLoyalty.setText(Integer.toString(person.getBaseLoyalty()));
         textLoyalty.setName("textLoyalty");
 
-        if ((campaign.getCampaignOptions().isUseLoyaltyModifiers()) &&
-                  (!campaign.getCampaignOptions().isUseHideLoyalty())) {
+        if ((campaign.getCampaignOptions().get(CampaignOption.USE_LOYALTY_MODIFIERS)) &&
+                  (!campaign.getCampaignOptions().get(CampaignOption.USE_HIDE_LOYALTY))) {
             gridBagConstraints = new GridBagConstraints();
             gridBagConstraints.gridx = 0;
             gridBagConstraints.gridy = y;
@@ -865,7 +866,7 @@ public class CreateCharacterDialog extends JDialog implements DialogOptionListen
         }
 
         //region random personality
-        if (campaign.getCampaignOptions().isUseRandomPersonalities()) {
+        if (campaign.getCampaignOptions().get(CampaignOption.USE_RANDOM_PERSONALITIES)) {
             JLabel labelAggression = new JLabel();
             labelAggression.setText("Aggression:");
             labelAggression.setName("labelAggression");
@@ -1108,7 +1109,7 @@ public class CreateCharacterDialog extends JDialog implements DialogOptionListen
         scrOptions.setPreferredSize(new Dimension(500, 500));
 
         tabStats.addTab(resourceMap.getString("scrSkills.TabConstraints.tabTitle"), scrSkills); // NOI18N
-        if (campaign.getCampaignOptions().isUseAbilities() || campaign.getCampaignOptions().isUseImplants()) {
+        if (campaign.getCampaignOptions().get(CampaignOption.USE_ABILITIES) || campaign.getCampaignOptions().get(CampaignOption.USE_IMPLANTS)) {
             tabStats.addTab(resourceMap.getString("scrOptions.TabConstraints.tabTitle"), scrOptions); // NOI18N
         }
 
@@ -1255,7 +1256,7 @@ public class CreateCharacterDialog extends JDialog implements DialogOptionListen
         List<String> sortedSkillNames = SkillType.getSortedSkillNames();
 
         SkillModifierData skillModifierData = person.getSkillModifierData(
-              campaign.getCampaignOptions().isUseAgeEffects(), campaign.isClanCampaign(), campaign.getLocalDate(),
+              campaign.getCampaignOptions().get(CampaignOption.USE_AGE_EFFECTS), campaign.isClanCampaign(), campaign.getLocalDate(),
               true);
         SkillType skillType;
         for (int index = 0; index < sortedSkillNames.size(); index++) {
@@ -1370,7 +1371,7 @@ public class CreateCharacterDialog extends JDialog implements DialogOptionListen
             IOptionGroup group = i.nextElement();
 
             if (group.getKey().equalsIgnoreCase(PersonnelOptions.LVL3_ADVANTAGES) &&
-                      !campaign.getCampaignOptions().isUseAbilities()) {
+                      !campaign.getCampaignOptions().get(CampaignOption.USE_ABILITIES)) {
                 continue;
             }
 
@@ -1379,7 +1380,7 @@ public class CreateCharacterDialog extends JDialog implements DialogOptionListen
             }
 
             if (group.getKey().equalsIgnoreCase(PersonnelOptions.MD_ADVANTAGES) &&
-                      !campaign.getCampaignOptions().isUseImplants()) {
+                      !campaign.getCampaignOptions().get(CampaignOption.USE_IMPLANTS)) {
                 continue;
             }
 
@@ -1555,7 +1556,7 @@ public class CreateCharacterDialog extends JDialog implements DialogOptionListen
         }
 
         boolean isClanCampaign = campaign.isClanCampaign();
-        boolean isUseAgeEffects = campaign.getCampaignOptions().isUseAgeEffects();
+        boolean isUseAgeEffects = campaign.getCampaignOptions().get(CampaignOption.USE_AGE_EFFECTS);
         LocalDate today = campaign.getLocalDate();
 
         int level = (Integer) skillLvls.get(type).getModel().getValue();
@@ -1668,7 +1669,7 @@ public class CreateCharacterDialog extends JDialog implements DialogOptionListen
     }
 
     private void randomName() {
-        String factionCode = campaign.getCampaignOptions().isUseOriginFactionForNames() ?
+        String factionCode = campaign.getCampaignOptions().get(CampaignOption.USE_ORIGIN_FACTION_FOR_NAMES) ?
                                    person.getOriginFaction().getShortName() :
                                    RandomNameGenerator.getInstance().getChosenFaction();
 
@@ -1717,7 +1718,7 @@ public class CreateCharacterDialog extends JDialog implements DialogOptionListen
         person.setPhenotype((Phenotype) choicePhenotype.getSelectedItem());
         person.setClanPersonnel(chkClan.isSelected());
 
-        if (campaign.getCampaignOptions().isUseToughness()) {
+        if (campaign.getCampaignOptions().get(CampaignOption.USE_TOUGHNESS)) {
             person.setToughness(MathUtility.parseInt(textToughness.getText(), person.getDirectToughness()));
         }
 
@@ -1741,11 +1742,11 @@ public class CreateCharacterDialog extends JDialog implements DialogOptionListen
 
         person.setLoyalty(MathUtility.parseInt(textLoyalty.getText(), person.getBaseLoyalty()));
 
-        if (campaign.getCampaignOptions().isUseEducationModule()) {
+        if (campaign.getCampaignOptions().get(CampaignOption.USE_EDUCATION_MODULE)) {
             person.setEduHighestEducation((EducationLevel) textEducationLevel.getSelectedItem());
         }
 
-        if (campaign.getCampaignOptions().isUseRandomPersonalities()) {
+        if (campaign.getCampaignOptions().get(CampaignOption.USE_RANDOM_PERSONALITIES)) {
             person.setAggression(comboAggression.getSelectedItem());
             person.setAggressionDescriptionIndex((int) spnAggression.getValue());
 

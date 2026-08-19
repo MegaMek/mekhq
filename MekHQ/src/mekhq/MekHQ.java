@@ -130,6 +130,7 @@ import mekhq.gui.utilities.ObservableString;
 import mekhq.service.AutosaveService;
 import mekhq.service.IAutosaveService;
 import mekhq.utilities.ScenarioUtils;
+import mekhq.campaign.campaignOptions.CampaignOption;
 
 /**
  * The main class of the application.
@@ -569,7 +570,7 @@ public class MekHQ implements GameListener {
             return;
         }
         // Refactor this into a factory
-        var useExperimentalPacarGui = getCampaign().getCampaignOptions().isAutoResolveExperimentalPacarGuiEnabled();
+        var useExperimentalPacarGui = getCampaign().getCampaignOptions().get(CampaignOption.AUTO_RESOLVE_EXPERIMENTAL_PACAR_GUI_ENABLED);
         if (autoResolveBehaviorSettings != null && useExperimentalPacarGui) {
             client = new HeadlessClient(playerName, LOCALHOST_IP, port);
         } else {
@@ -847,10 +848,10 @@ public class MekHQ implements GameListener {
         SetupForces setupForces = getSetupForces(scenario, units);
 
         PlanetaryConditions planetaryConditions = getCampaign().getCurrentPlanetaryConditions(scenario);
-        if (getCampaign().getCampaignOptions().isAutoResolveVictoryChanceEnabled()) {
+        if (getCampaign().getCampaignOptions().get(CampaignOption.AUTO_RESOLVE_VICTORY_CHANCE_ENABLED)) {
 
             var proceed = AutoResolveChanceDialog.showDialog(campaignGUI.getFrame(),
-                  getCampaign().getCampaignOptions().getAutoResolveNumberOfScenarios(),
+                  getCampaign().getCampaignOptions().get(CampaignOption.AUTO_RESOLVE_NUMBER_OF_SCENARIOS),
                   Runtime.getRuntime().availableProcessors(),
                   1,
                   setupForces,

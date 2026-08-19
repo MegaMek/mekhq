@@ -390,8 +390,8 @@ public final class CommandCenterTab extends CampaignGuiTab {
         gridBagConstraints.weightx = 1.0;
         panInfo.add(lblPersonnel, gridBagConstraints);
 
-        if ((getCampaign().getCampaignOptions().isUseRandomRetirement()) &&
-                  (getCampaign().getCampaignOptions().isUseHRStrain())) {
+        if ((getCampaign().getCampaignOptions().get(CampaignOption.USE_RANDOM_RETIREMENT)) &&
+                  (getCampaign().getCampaignOptions().get(CampaignOption.USE_HR_STRAIN))) {
             JLabel lblHRCapacityHead = new JLabel(resourceMap.getString("lblHRCapacity.text"));
             gridBagConstraints = new GridBagConstraints();
             gridBagConstraints.gridx = 0;
@@ -477,9 +477,9 @@ public final class CommandCenterTab extends CampaignGuiTab {
         gridBagConstraints.weightx = 1.0;
         panInfo.add(lblCargoSummary, gridBagConstraints);
 
-        if ((getCampaignOptions().isUseFatigue()) ||
+        if ((getCampaignOptions().get(CampaignOption.USE_FATIGUE)) ||
                   (getCampaignOptions().isUseAdvancedMedical() ||
-                         (!getCampaignOptions().getPrisonerCaptureStyle().isNone()))) {
+                         (!getCampaignOptions().get(CampaignOption.PRISONER_CAPTURE_STYLE).isNone()))) {
             JLabel lblFacilityCapacitiesHead = new JLabel(resourceMap.getString("lblFacilityCapacities.text"));
             gridBagConstraints = new GridBagConstraints();
             gridBagConstraints.gridx = 0;
@@ -915,7 +915,7 @@ public final class CommandCenterTab extends CampaignGuiTab {
         lblRepairStatus.setText(campaignSummary.getForceRepairReport());
         lblTransportCapacity.setText(campaignSummary.getTransportCapacity());
 
-        if (campaignOptions.isUseHRStrain()) {
+        if (campaignOptions.get(CampaignOption.USE_HR_STRAIN)) {
             try {
                 lblHRCapacity.setText(campaignSummary.getHRCapacityReport(campaign));
             } catch (Exception ignored) {

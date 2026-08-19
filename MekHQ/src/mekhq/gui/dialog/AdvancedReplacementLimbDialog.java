@@ -89,6 +89,7 @@ import mekhq.MekHQ;
 import mekhq.Utilities;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.campaignOptions.CampaignOptions;
+import mekhq.campaign.campaignOptions.CampaignOption;
 import mekhq.campaign.finances.Finances;
 import mekhq.campaign.finances.Money;
 import mekhq.campaign.finances.enums.TransactionType;
@@ -413,7 +414,7 @@ public class AdvancedReplacementLimbDialog extends JDialog {
         Faction campaignFaction = campaign.getFaction();
         int currentYear = campaign.getGameYear();
         boolean isOnPlanet = campaign.getPlayerForce().getForceDetachment().getCurrentLocation().isOnPlanet();
-        double healingTimeMultiplier = campaignOptions.getAlternativeAdvancedMedicalHealingTimeMultiplier();
+        double healingTimeMultiplier = campaignOptions.get(CampaignOption.ALTERNATIVE_ADVANCED_MEDICAL_HEALING_TIME_MULTIPLIER);
 
 
         JComboBox<ProstheticType> comboBox = new JComboBox<>();
@@ -856,13 +857,13 @@ public class AdvancedReplacementLimbDialog extends JDialog {
      * @since 0.50.10
      */
     private void addImplantsAndAbilities(ProstheticType type) {
-        if (campaignOptions.isUseImplants()) {
+        if (campaignOptions.get(CampaignOption.USE_IMPLANTS)) {
             for (String implant : type.getAssociatedPilotOptions()) {
                 patient.getOptions().acquireAbility(MD_ADVANTAGES, implant, true);
             }
         }
 
-        if (campaignOptions.isUseAbilities()) {
+        if (campaignOptions.get(CampaignOption.USE_ABILITIES)) {
             for (String option : type.getAssociatedPersonnelOptions()) {
                 patient.getOptions().acquireAbility(LVL3_ADVANTAGES, option, true);
             }
@@ -1002,7 +1003,7 @@ public class AdvancedReplacementLimbDialog extends JDialog {
     private void performSurgerySkillChecks(List<PlannedSurgery> prioritizedSurgeries,
           List<PlannedSurgery> successfulSurgeries, List<PlannedSurgery> unsuccessfulSurgeries) {
         boolean hasMachinistSPA = surgeon.getOptions().booleanOption(UNOFFICIAL_BIOLOGICAL_MACHINIST);
-        boolean isUseEdge = campaignOptions.isUseEdge() &&
+        boolean isUseEdge = campaignOptions.get(CampaignOption.USE_EDGE) &&
                                   surgeon.getOptions().booleanOption(EDGE_ADVANCED_SURGERY);
 
         for (PlannedSurgery surgery : new ArrayList<>(prioritizedSurgeries)) {

@@ -50,6 +50,7 @@ import megamek.common.compute.Compute;
 import megamek.common.enums.Gender;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.campaignOptions.CampaignOptions;
+import mekhq.campaign.campaignOptions.CampaignOption;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.enums.PersonnelStatus;
 import mekhq.campaign.personnel.enums.RandomProcreationMethod;
@@ -84,11 +85,11 @@ public class AbstractProcreationTest {
     //region Getters/Setters
     @Test
     public void testGettersAndSetters() {
-        when(mockCampaignOptions.isUseClanPersonnelProcreation()).thenReturn(false);
-        when(mockCampaignOptions.isUsePrisonerProcreation()).thenReturn(false);
-        when(mockCampaignOptions.isUseRelationshiplessRandomProcreation()).thenReturn(false);
-        when(mockCampaignOptions.isUseRandomClanPersonnelProcreation()).thenReturn(false);
-        when(mockCampaignOptions.isUseRandomPrisonerProcreation()).thenReturn(false);
+        when(mockCampaignOptions.get(CampaignOption.USE_CLAN_PERSONNEL_PROCREATION)).thenReturn(false);
+        when(mockCampaignOptions.get(CampaignOption.USE_PRISONER_PROCREATION)).thenReturn(false);
+        when(mockCampaignOptions.get(CampaignOption.USE_RELATIONSHIPLESS_RANDOM_PROCREATION)).thenReturn(false);
+        when(mockCampaignOptions.get(CampaignOption.USE_RANDOM_CLAN_PERSONNEL_PROCREATION)).thenReturn(false);
+        when(mockCampaignOptions.get(CampaignOption.USE_RANDOM_PRISONER_PROCREATION)).thenReturn(false);
 
         final AbstractProcreation disabledProcreation = new DisabledRandomProcreation(mockCampaignOptions);
 
@@ -150,13 +151,13 @@ public class AbstractProcreationTest {
 
         given(mockCampaign.getPerson(argThat(matchPersonUUID(father.getId())))).willReturn(father);
 
-        when(mockCampaignOptions.isDetermineFatherAtBirth()).thenReturn(false);
+        when(mockCampaignOptions.get(CampaignOption.DETERMINE_FATHER_AT_BIRTH)).thenReturn(false);
         assertNull(mockProcreation.determineFather(mockCampaign, mother));
 
         mother.getExtraData().set(AbstractProcreation.PREGNANCY_FATHER_DATA, father.getId().toString());
         assertEquals(father, mockProcreation.determineFather(mockCampaign, mother));
 
-        when(mockCampaignOptions.isDetermineFatherAtBirth()).thenReturn(true);
+        when(mockCampaignOptions.get(CampaignOption.DETERMINE_FATHER_AT_BIRTH)).thenReturn(true);
         assertEquals(father, mockProcreation.determineFather(mockCampaign, mother));
 
         mother.getGenealogy().setSpouse(father);
@@ -718,7 +719,7 @@ public class AbstractProcreationTest {
         assertNull(mother.getDueDate());
         assertTrue(mother.getExtraData().isEmpty());
 
-        when(mockCampaignOptions.isLogProcreation()).thenReturn(false);
+        when(mockCampaignOptions.get(CampaignOption.LOG_PROCREATION)).thenReturn(false);
         mockProcreation.addPregnancy(mockCampaign, LocalDate.ofYearDay(3025, 1), mother, 1, false);
         assertEquals(LocalDate.ofYearDay(3025, 281), mother.getExpectedDueDate());
         assertNotNull(mother.getDueDate());
@@ -727,7 +728,7 @@ public class AbstractProcreationTest {
         assertNotNull(mother.getExtraData().get(AbstractProcreation.PREGNANCY_CHILDREN_DATA));
         assertEquals(1, mother.getExtraData().get(AbstractProcreation.PREGNANCY_CHILDREN_DATA));
 
-        when(mockCampaignOptions.isLogProcreation()).thenReturn(true);
+        when(mockCampaignOptions.get(CampaignOption.LOG_PROCREATION)).thenReturn(true);
         mockProcreation.addPregnancy(mockCampaign, LocalDate.ofYearDay(3025, 1), mother, 2, false);
         assertEquals(LocalDate.ofYearDay(3025, 281), mother.getExpectedDueDate());
         assertNotNull(mother.getDueDate());

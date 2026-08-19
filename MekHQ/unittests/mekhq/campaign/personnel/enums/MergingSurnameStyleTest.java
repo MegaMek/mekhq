@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2022-2025 The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2022-2026 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -52,6 +52,7 @@ import megamek.common.util.weightedMaps.WeightedIntMap;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.campaignOptions.CampaignOptions;
+import mekhq.campaign.campaignOptions.CampaignOption;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.universe.Faction;
 import org.junit.jupiter.api.BeforeEach;
@@ -257,7 +258,7 @@ class MergingSurnameStyleTest {
 
     @Test
     void testApplyNoChange() {
-        when(mockCampaignOptions.isLogMarriageNameChanges()).thenReturn(false);
+        when(mockCampaignOptions.get(CampaignOption.LOG_MARRIAGE_NAME_CHANGES)).thenReturn(false);
 
         Faction campaignFaction = mock(Faction.class);
         when(mockCampaign.getPlayerForce().getFaction()).thenReturn(campaignFaction);
@@ -275,7 +276,7 @@ class MergingSurnameStyleTest {
 
     @Test
     void testApplyYours() {
-        when(mockCampaignOptions.isLogMarriageNameChanges()).thenReturn(true);
+        when(mockCampaignOptions.get(CampaignOption.LOG_MARRIAGE_NAME_CHANGES)).thenReturn(true);
         Faction campaignFaction = mock(Faction.class);
         when(mockCampaign.getPlayerForce().getFaction()).thenReturn(campaignFaction);
         when(campaignFaction.getShortName()).thenReturn("MERC");
@@ -292,7 +293,7 @@ class MergingSurnameStyleTest {
 
     @Test
     void testApplySpouse() {
-        when(mockCampaignOptions.isLogMarriageNameChanges()).thenReturn(true);
+        when(mockCampaignOptions.get(CampaignOption.LOG_MARRIAGE_NAME_CHANGES)).thenReturn(true);
         Faction campaignFaction = mock(Faction.class);
         when(mockCampaign.getPlayerForce().getFaction()).thenReturn(campaignFaction);
         when(campaignFaction.getShortName()).thenReturn("MERC");
@@ -309,7 +310,7 @@ class MergingSurnameStyleTest {
 
     @Test
     void testApplySpaceYours() {
-        when(mockCampaignOptions.isLogMarriageNameChanges()).thenReturn(false);
+        when(mockCampaignOptions.get(CampaignOption.LOG_MARRIAGE_NAME_CHANGES)).thenReturn(false);
         Faction campaignFaction = mock(Faction.class);
         when(mockCampaign.getPlayerForce().getFaction()).thenReturn(campaignFaction);
         when(campaignFaction.getShortName()).thenReturn("MERC");
@@ -338,7 +339,7 @@ class MergingSurnameStyleTest {
 
     @Test
     void testApplyBothSpaceYours() {
-        when(mockCampaignOptions.isLogMarriageNameChanges()).thenReturn(false);
+        when(mockCampaignOptions.get(CampaignOption.LOG_MARRIAGE_NAME_CHANGES)).thenReturn(false);
         Faction campaignFaction = mock(Faction.class);
         when(mockCampaign.getPlayerForce().getFaction()).thenReturn(campaignFaction);
         when(campaignFaction.getShortName()).thenReturn("MERC");
@@ -373,7 +374,7 @@ class MergingSurnameStyleTest {
 
     @Test
     void testApplyHyphenYours() {
-        when(mockCampaignOptions.isLogMarriageNameChanges()).thenReturn(false);
+        when(mockCampaignOptions.get(CampaignOption.LOG_MARRIAGE_NAME_CHANGES)).thenReturn(false);
         Faction campaignFaction = mock(Faction.class);
         when(mockCampaign.getPlayerForce().getFaction()).thenReturn(campaignFaction);
         when(campaignFaction.getShortName()).thenReturn("MERC");
@@ -402,7 +403,7 @@ class MergingSurnameStyleTest {
 
     @Test
     void testApplyBothHyphenYours() {
-        when(mockCampaignOptions.isLogMarriageNameChanges()).thenReturn(false);
+        when(mockCampaignOptions.get(CampaignOption.LOG_MARRIAGE_NAME_CHANGES)).thenReturn(false);
         Faction campaignFaction = mock(Faction.class);
         when(mockCampaign.getPlayerForce().getFaction()).thenReturn(campaignFaction);
         when(campaignFaction.getShortName()).thenReturn("MERC");
@@ -437,7 +438,7 @@ class MergingSurnameStyleTest {
 
     @Test
     void testApplySpaceSpouse() {
-        when(mockCampaignOptions.isLogMarriageNameChanges()).thenReturn(false);
+        when(mockCampaignOptions.get(CampaignOption.LOG_MARRIAGE_NAME_CHANGES)).thenReturn(false);
         Faction campaignFaction = mock(Faction.class);
         when(mockCampaign.getPlayerForce().getFaction()).thenReturn(campaignFaction);
         when(campaignFaction.getShortName()).thenReturn("MERC");
@@ -466,7 +467,7 @@ class MergingSurnameStyleTest {
 
     @Test
     void testApplyBothSpaceSpouse() {
-        when(mockCampaignOptions.isLogMarriageNameChanges()).thenReturn(false);
+        when(mockCampaignOptions.get(CampaignOption.LOG_MARRIAGE_NAME_CHANGES)).thenReturn(false);
         Faction campaignFaction = mock(Faction.class);
         when(mockCampaign.getPlayerForce().getFaction()).thenReturn(campaignFaction);
         when(campaignFaction.getShortName()).thenReturn("MERC");
@@ -501,7 +502,7 @@ class MergingSurnameStyleTest {
 
     @Test
     void testApplyHyphenSpouse() {
-        when(mockCampaignOptions.isLogMarriageNameChanges()).thenReturn(false);
+        when(mockCampaignOptions.get(CampaignOption.LOG_MARRIAGE_NAME_CHANGES)).thenReturn(false);
         Faction campaignFaction = mock(Faction.class);
         when(mockCampaign.getPlayerForce().getFaction()).thenReturn(campaignFaction);
         when(campaignFaction.getShortName()).thenReturn("MERC");
@@ -530,7 +531,7 @@ class MergingSurnameStyleTest {
 
     @Test
     void testApplyBothHyphenSpouse() {
-        when(mockCampaignOptions.isLogMarriageNameChanges()).thenReturn(false);
+        when(mockCampaignOptions.get(CampaignOption.LOG_MARRIAGE_NAME_CHANGES)).thenReturn(false);
         Faction campaignFaction = mock(Faction.class);
         when(mockCampaign.getPlayerForce().getFaction()).thenReturn(campaignFaction);
         when(campaignFaction.getShortName()).thenReturn("MERC");
@@ -565,7 +566,7 @@ class MergingSurnameStyleTest {
 
     @Test
     void testApplyMale() {
-        when(mockCampaignOptions.isLogMarriageNameChanges()).thenReturn(false);
+        when(mockCampaignOptions.get(CampaignOption.LOG_MARRIAGE_NAME_CHANGES)).thenReturn(false);
         Faction campaignFaction = mock(Faction.class);
         when(mockCampaign.getPlayerForce().getFaction()).thenReturn(campaignFaction);
         when(campaignFaction.getShortName()).thenReturn("MERC");
@@ -593,7 +594,7 @@ class MergingSurnameStyleTest {
 
     @Test
     void testApplyFemale() {
-        when(mockCampaignOptions.isLogMarriageNameChanges()).thenReturn(false);
+        when(mockCampaignOptions.get(CampaignOption.LOG_MARRIAGE_NAME_CHANGES)).thenReturn(false);
         Faction campaignFaction = mock(Faction.class);
         when(mockCampaign.getPlayerForce().getFaction()).thenReturn(campaignFaction);
         when(campaignFaction.getShortName()).thenReturn("MERC");
@@ -621,7 +622,7 @@ class MergingSurnameStyleTest {
 
     @Test
     void testApplyWeighted() {
-        when(mockCampaignOptions.isLogMarriageNameChanges()).thenReturn(false);
+        when(mockCampaignOptions.get(CampaignOption.LOG_MARRIAGE_NAME_CHANGES)).thenReturn(false);
         Faction campaignFaction = mock(Faction.class);
         when(mockCampaign.getPlayerForce().getFaction()).thenReturn(campaignFaction);
         when(campaignFaction.getShortName()).thenReturn("MERC");

@@ -50,6 +50,7 @@ import mekhq.campaign.Campaign;
 import mekhq.campaign.parts.Avionics;
 import mekhq.campaign.parts.Part;
 import org.w3c.dom.Node;
+import mekhq.campaign.campaignOptions.CampaignOption;
 
 /**
  * @author Jay Lawson (jaylawson39 at yahoo.com)
@@ -66,7 +67,7 @@ public class MissingAvionics extends MissingPart {
 
     @Override
     public int getBaseTime() {
-        if (campaign.getCampaignOptions().isUseAeroSystemHits()) {
+        if (campaign.getCampaignOptions().get(CampaignOption.USE_AERO_SYSTEM_HITS)) {
             int time;
             // Test of proposed errata for repair times
             if (null != unit && (unit.getEntity() instanceof Dropship || unit.getEntity() instanceof Jumpship)) {

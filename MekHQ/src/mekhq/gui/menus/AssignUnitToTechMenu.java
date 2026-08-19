@@ -45,6 +45,7 @@ import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.skills.SkillModifierData;
 import mekhq.campaign.unit.Unit;
 import mekhq.gui.baseComponents.JScrollableMenu;
+import mekhq.campaign.campaignOptions.CampaignOption;
 
 /**
  * This is a standard menu that takes either a unit or multiple units, and allows the user to assign or remove a tech
@@ -72,7 +73,7 @@ public class AssignUnitToTechMenu extends JScrollableMenu {
             return;
         }
 
-        boolean techsUseAdmin = campaign.getCampaignOptions().isTechsUseAdministration();
+        boolean techsUseAdmin = campaign.getCampaignOptions().get(CampaignOption.TECHS_USE_ADMINISTRATION);
 
         // Initialize Menu
         setText(resources.getString("AssignUnitToTechMenu.title"));

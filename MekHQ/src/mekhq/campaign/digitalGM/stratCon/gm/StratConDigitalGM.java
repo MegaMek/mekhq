@@ -33,6 +33,7 @@
 package mekhq.campaign.digitalGM.stratCon.gm;
 
 import mekhq.campaign.campaignOptions.CampaignOptions;
+import mekhq.campaign.campaignOptions.CampaignOption;
 
 /**
  * The default digital GM: classic map-based StratCon ("Normal" play, {@link StratConPlayType#NORMAL}). It inherits the
@@ -54,6 +55,6 @@ public class StratConDigitalGM extends AbstractStratConGM {
 
     @Override
     public boolean isEnabled(CampaignOptions campaignOptions) {
-        return campaignOptions.getStratConPlayType() == StratConPlayType.NORMAL;
+        return campaignOptions.get(CampaignOption.STRAT_CON_PLAY_TYPE) == StratConPlayType.NORMAL;
     }
 }

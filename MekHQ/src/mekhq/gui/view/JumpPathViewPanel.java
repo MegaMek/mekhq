@@ -52,6 +52,7 @@ import mekhq.campaign.mission.TransportCostCalculations;
 import mekhq.campaign.universe.PlanetarySystem;
 import mekhq.campaign.universe.factionStanding.FactionStandingUtilities;
 import mekhq.gui.baseComponents.JScrollablePanel;
+import mekhq.campaign.campaignOptions.CampaignOption;
 
 /**
  * A custom panel that gets filled in with goodies from a JumpPath record
@@ -293,7 +294,7 @@ public class JumpPathViewPanel extends JScrollablePanel {
         gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
         pnlStats.add(txtTotalTime, gridBagConstraints);
 
-        if (campaign.getCampaignOptions().isPayForTransport()) {
+        if (campaign.getCampaignOptions().get(CampaignOption.PAY_FOR_TRANSPORT)) {
             lblCost.setName("lblCost1");
             lblCost.setText(resourceMap.getString("lblCost1.text"));
             gridBagConstraints = new GridBagConstraints();

@@ -292,8 +292,8 @@ class StratConRulesManagerTest {
         when(unit.getCrew()).thenReturn(List.of(mock(Person.class)));
 
         // CampaignOptions needed by scanNeighboringCoords
-        when(options.isUseFatigue()).thenReturn(false);
-        when(options.getFatigueRate()).thenReturn(0);
+        when(options.get(CampaignOption.USE_FATIGUE)).thenReturn(false);
+        when(options.get(CampaignOption.FATIGUE_RATE)).thenReturn(0);
 
         // processForceDeployment needs LocalDate and Hangar
         when(campaign.getLocalDate()).thenReturn(LocalDate.of(3025, 1, 15));
@@ -990,7 +990,7 @@ class StratConRulesManagerTest {
         when(template.getAllowedUnitType()).thenReturn(allowedUnitType);
 
         CampaignOptions options = mock(CampaignOptions.class);
-        when(options.isUseDropShips()).thenReturn(isUseDropShips);
+        when(options.get(CampaignOption.USE_DROP_SHIPS)).thenReturn(isUseDropShips);
 
         Campaign campaign = MHQTestUtilities.mockCampaign();
         when(campaign.getCampaignOptions()).thenReturn(options);
@@ -1168,7 +1168,7 @@ class StratConRulesManagerTest {
             when(campaign.isClanCampaign()).thenReturn(isClanCampaign);
             when(campaign.getLocalDate()).thenReturn(LocalDate.now());
             CampaignOptions campaignOptions = mock(CampaignOptions.class);
-            when(campaignOptions.isUseAgeEffects()).thenReturn(useAgingEffects);
+            when(campaignOptions.get(CampaignOption.USE_AGE_EFFECTS)).thenReturn(useAgingEffects);
             when(campaign.getCampaignOptions()).thenReturn(campaignOptions);
             return campaign;
         }

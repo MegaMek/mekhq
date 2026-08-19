@@ -74,6 +74,7 @@ import mekhq.campaign.universe.Faction;
 import mekhq.campaign.universe.companyGeneration.AddSupportUnitsToTOE;
 import mekhq.gui.baseComponents.roundedComponents.RoundedJButton;
 import mekhq.gui.baseComponents.roundedComponents.RoundedLineBorder;
+import mekhq.campaign.campaignOptions.CampaignOption;
 
 public class SalvageCampaignOptionsChangedConfirmationDialog extends JDialog {
     private static final MMLogger LOGGER = MMLogger.create(SalvageCampaignOptionsChangedConfirmationDialog.class);
@@ -217,7 +218,7 @@ public class SalvageCampaignOptionsChangedConfirmationDialog extends JDialog {
 
             try {
                 PartQuality quality = PartQuality.QUALITY_D;
-                if (campaign.getCampaignOptions().isUseRandomUnitQualities()) {
+                if (campaign.getCampaignOptions().get(CampaignOption.USE_RANDOM_UNIT_QUALITIES)) {
                     quality = UnitOrder.getRandomUnitQuality(0);
                 }
                 Unit unit = campaign.addNewUnit(mekSummary.loadEntity(),

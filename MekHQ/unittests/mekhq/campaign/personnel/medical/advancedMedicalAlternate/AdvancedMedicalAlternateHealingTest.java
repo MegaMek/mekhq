@@ -76,6 +76,7 @@ import megamek.common.compute.Compute;
 import megamek.common.enums.Gender;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.campaignOptions.CampaignOptions;
+import mekhq.campaign.campaignOptions.CampaignOption;
 import mekhq.campaign.log.MedicalLogger;
 import mekhq.campaign.log.PatientLogger;
 import mekhq.campaign.personnel.Injury;
@@ -205,8 +206,8 @@ class AdvancedMedicalAlternateHealingTest {
 
         when(campaign.getLocalDate()).thenReturn(MONDAY);
         when(campaign.getCampaignOptions()).thenReturn(campaignOptions);
-        when(campaignOptions.isUseEdge()).thenReturn(false);
-        when(campaignOptions.isUseFatigue()).thenReturn(false);
+        when(campaignOptions.get(CampaignOption.USE_EDGE)).thenReturn(false);
+        when(campaignOptions.get(CampaignOption.USE_FATIGUE)).thenReturn(false);
         when(patient.getOptions()).thenReturn(options);
         when(options.booleanOption(ATOW_FIT)).thenReturn(false);
         when(options.booleanOption(ATOW_TOUGHNESS)).thenReturn(false);
@@ -293,8 +294,8 @@ class AdvancedMedicalAlternateHealingTest {
 
         when(campaign.getLocalDate()).thenReturn(MONDAY);
         when(campaign.getCampaignOptions()).thenReturn(campaignOptions);
-        when(campaignOptions.isUseEdge()).thenReturn(false);
-        when(campaignOptions.isUseFatigue()).thenReturn(false);
+        when(campaignOptions.get(CampaignOption.USE_EDGE)).thenReturn(false);
+        when(campaignOptions.get(CampaignOption.USE_FATIGUE)).thenReturn(false);
         when(doctor.getOptions()).thenReturn(doctorOptions);
         when(patient.getOptions()).thenReturn(patientOptions);
         when(doctorOptions.booleanOption(EDGE_MEDICAL)).thenReturn(false);
@@ -410,8 +411,8 @@ class AdvancedMedicalAlternateHealingTest {
 
         when(campaign.getLocalDate()).thenReturn(MONDAY);
         when(campaign.getCampaignOptions()).thenReturn(campaignOptions);
-        when(campaignOptions.isUseFatigue()).thenReturn(true);
-        when(campaignOptions.getFatigueRate()).thenReturn(2);
+        when(campaignOptions.get(CampaignOption.USE_FATIGUE)).thenReturn(true);
+        when(campaignOptions.get(CampaignOption.FATIGUE_RATE)).thenReturn(2);
         when(patient.getInjuries()).thenAnswer(invocation -> List.of());
         when(patient.getDoctorId()).thenReturn(UUID.randomUUID());
         when(patient.getPrisonerStatus()).thenReturn(PrisonerStatus.FREE);
@@ -441,8 +442,8 @@ class AdvancedMedicalAlternateHealingTest {
         Injury injury = mock(Injury.class);
 
         when(campaign.getCampaignOptions()).thenReturn(campaignOptions);
-        when(campaignOptions.isUseFatigue()).thenReturn(true);
-        when(campaignOptions.getFatigueRate()).thenReturn(3);
+        when(campaignOptions.get(CampaignOption.USE_FATIGUE)).thenReturn(true);
+        when(campaignOptions.get(CampaignOption.FATIGUE_RATE)).thenReturn(3);
         when(patient.getInjuries()).thenReturn(List.of(injury));
         when(injury.getOriginalTime()).thenReturn(7);
         when(injury.getName()).thenReturn("Burn");
@@ -471,7 +472,7 @@ class AdvancedMedicalAlternateHealingTest {
         PersonnelOptions patientOptions = mock(PersonnelOptions.class);
 
         when(campaign.getCampaignOptions()).thenReturn(campaignOptions);
-        when(campaignOptions.isUseFatigue()).thenReturn(false);
+        when(campaignOptions.get(CampaignOption.USE_FATIGUE)).thenReturn(false);
         when(campaign.getLocalDate()).thenReturn(MONDAY);
         when(patient.getOptions()).thenReturn(patientOptions);
         when(patientOptions.booleanOption(anyString())).thenReturn(false);

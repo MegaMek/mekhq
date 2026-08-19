@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2022-2025 The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2022-2026 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -37,6 +37,7 @@ import megamek.common.units.EntityWeightClass;
 import megamek.common.units.UnitType;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.universe.Faction;
+import mekhq.campaign.campaignOptions.CampaignOption;
 
 public class AtBStaticWeightGenerator {
     /**
@@ -48,7 +49,7 @@ public class AtBStaticWeightGenerator {
      */
     public static int getRandomWeight(final Campaign campaign, final int unitType,
           final Faction faction) {
-        return getRandomWeight(unitType, faction, campaign.getCampaignOptions().isRegionalMekVariations());
+        return getRandomWeight(unitType, faction, campaign.getCampaignOptions().get(CampaignOption.REGIONAL_MEK_VARIATIONS));
     }
 
     /**

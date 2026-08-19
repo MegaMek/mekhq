@@ -61,6 +61,7 @@ import mekhq.gui.dialog.factionStanding.factionJudgment.FactionCensureGoingRogue
 import mekhq.gui.dialog.factionStanding.factionJudgment.FactionJudgmentDialog;
 import mekhq.gui.dialog.factionStanding.factionJudgment.FactionJudgmentNewsArticle;
 import mekhq.gui.dialog.factionStanding.factionJudgment.FactionJudgmentSceneDialog;
+import mekhq.campaign.campaignOptions.CampaignOption;
 
 /**
  * Handles the "going rogue" event for a campaign, where a force defects or leaves its current faction.
@@ -110,7 +111,7 @@ public class GoingRogue {
      * @since 0.50.07
      */
     public GoingRogue(Campaign campaign, Person commander, @Nullable Person second) {
-        boolean isUsingFactionStandings = campaign.getCampaignOptions().isTrackFactionStanding();
+        boolean isUsingFactionStandings = campaign.getCampaignOptions().get(CampaignOption.TRACK_FACTION_STANDING);
         FactionCensureGoingRogueDialog dialog = new FactionCensureGoingRogueDialog(campaign, isUsingFactionStandings);
         wasConfirmed = dialog.wasConfirmed();
         if (!wasConfirmed) {
@@ -265,8 +266,8 @@ public class GoingRogue {
             }
 
             // Loyalty check: personnel with low loyalty may leave or be killed (homicide/deserted), others remain
-            boolean loyaltyEnabled = campaign.getCampaignOptions().isUseLoyaltyModifiers();
-            boolean altAdvancedMedicalEnabled = campaign.getCampaignOptions().isUseAlternativeAdvancedMedical();
+            boolean loyaltyEnabled = campaign.getCampaignOptions().get(CampaignOption.USE_LOYALTY_MODIFIERS);
+            boolean altAdvancedMedicalEnabled = campaign.getCampaignOptions().get(CampaignOption.USE_ALTERNATIVE_ADVANCED_MEDICAL);
             int loyalty;
             if (loyaltyEnabled) {
                 loyalty = person.getAdjustedLoyalty(campaign.getFaction(), altAdvancedMedicalEnabled);

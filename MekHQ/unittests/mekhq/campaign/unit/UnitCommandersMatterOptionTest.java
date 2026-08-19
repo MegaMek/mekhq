@@ -44,6 +44,7 @@ import megamek.common.battleArmor.BattleArmor;
 import megamek.common.equipment.EquipmentType;
 import megamek.common.units.*;
 import mekhq.campaign.campaignOptions.CampaignOptions;
+import mekhq.campaign.campaignOptions.CampaignOption;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
@@ -76,7 +77,7 @@ public class UnitCommandersMatterOptionTest {
     @Test
     public void testIsOnlyCommandersMatter_Vehicles() {
         CampaignOptions options = mock(CampaignOptions.class);
-        when(options.isOnlyCommandersMatterVehicles()).thenReturn(true);
+        when(options.get(CampaignOption.ONLY_COMMANDERS_MATTER_VEHICLES)).thenReturn(true);
         Set<Class<? extends Entity>> expectedTrue = Set.of(
               LargeSupportTank.class, SuperHeavyTank.class, Tank.class, VTOL.class);
         runTest(options, expectedTrue);
@@ -85,7 +86,7 @@ public class UnitCommandersMatterOptionTest {
     @Test
     public void testIsOnlyCommandersMatter_Infantry() {
         CampaignOptions options = mock(CampaignOptions.class);
-        when(options.isOnlyCommandersMatterInfantry()).thenReturn(true);
+        when(options.get(CampaignOption.ONLY_COMMANDERS_MATTER_INFANTRY)).thenReturn(true);
         Set<Class<? extends Entity>> expectedTrue = Set.of(ConvInfantry.class, EjectedCrew.class, MekWarrior.class);
         runTest(options, expectedTrue);
     }
@@ -93,7 +94,7 @@ public class UnitCommandersMatterOptionTest {
     @Test
     public void testIsOnlyCommandersMatter_BA() {
         CampaignOptions options = mock(CampaignOptions.class);
-        when(options.isOnlyCommandersMatterBattleArmor()).thenReturn(true);
+        when(options.get(CampaignOption.ONLY_COMMANDERS_MATTER_BATTLE_ARMOR)).thenReturn(true);
         Set<Class<? extends Entity>> expectedTrue = Set.of(BattleArmor.class);
         runTest(options, expectedTrue);
     }

@@ -73,6 +73,7 @@ import megamek.logging.MMLogger;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.campaignOptions.CampaignOptions;
+import mekhq.campaign.campaignOptions.CampaignOption;
 import mekhq.campaign.digitalGM.stratCon.StratConCampaignState;
 import mekhq.campaign.digitalGM.stratCon.StratConContractDefinition;
 import mekhq.campaign.digitalGM.stratCon.StratConContractInitializer;
@@ -254,8 +255,8 @@ public class AtBContract extends Contract {
 
         CampaignOptions campaignOptions = campaign.getCampaignOptions();
         String moraleReport = MHQMorale.performMoraleCheck(today, this,
-              campaignOptions.getMoraleDecisiveVictoryEffect(), campaignOptions.getMoraleVictoryEffect(),
-              campaignOptions.getMoraleDecisiveDefeatEffect(), campaignOptions.getMoraleDefeatEffect());
+              campaignOptions.get(CampaignOption.MORALE_DECISIVE_VICTORY_EFFECT), campaignOptions.get(CampaignOption.MORALE_VICTORY_EFFECT),
+              campaignOptions.get(CampaignOption.MORALE_DECISIVE_DEFEAT_EFFECT), campaignOptions.get(CampaignOption.MORALE_DEFEAT_EFFECT));
         String flavorText = MHQMorale.getFormattedTitle()
                                   + "<h2 style='text-align:center;'>" + getName() + "</h2>"
                                   + MoraleBar.getMoraleDisplay(this).tooltip();
@@ -311,8 +312,8 @@ public class AtBContract extends Contract {
 
         // Update the Batchall information
         setBatchallAccepted(true);
-        if (campaign.getCampaignOptions().isUseGenericBattleValue() && enemyFaction.performsBatchalls()) {
-            boolean tracksStanding = campaign.getCampaignOptions().isTrackFactionStanding();
+        if (campaign.getCampaignOptions().get(CampaignOption.USE_GENERIC_BATTLE_VALUE) && enemyFaction.performsBatchalls()) {
+            boolean tracksStanding = campaign.getCampaignOptions().get(CampaignOption.TRACK_FACTION_STANDING);
             FactionStandings factionStandings = campaign.getPlayerForce().getFactionStandings();
 
             boolean allowBatchalls = true;
@@ -321,7 +322,7 @@ public class AtBContract extends Contract {
                 allowBatchalls = FactionStandingUtilities.isBatchallAllowed(regard);
             }
 
-            double regardMultiplier = campaign.getCampaignOptions().getRegardMultiplier();
+            double regardMultiplier = campaign.getCampaignOptions().get(CampaignOption.REGARD_MULTIPLIER);
             String campaignFactionCode = campaign.getFaction().getShortName();
             if (enemyFaction.performsBatchalls() && allowBatchalls) {
                 PerformBatchall batchallDialog = new PerformBatchall(campaign, getClanOpponent(), enemyCode);
@@ -506,7 +507,7 @@ public class AtBContract extends Contract {
 
         return switch (roll) {
             case 1 -> { /* 1d6 dependents */
-                if (campaignOptions.isUseRandomDependentAddition()) {
+                if (campaignOptions.get(CampaignOption.USE_RANDOM_DEPENDENT_ADDITION)) {
                     number = d6();
                     campaign.addReport(GENERAL, "Bonus: " + number + " dependent" + ((number > 1) ? "s" : ""));
 
@@ -747,7 +748,7 @@ public class AtBContract extends Contract {
                 if (atBScenario != null) {
                     campaign.addScenario(atBScenario, this);
 
-                    if (campaign.getCampaignOptions().isUsePlanetaryConditions()) {
+                    if (campaign.getCampaignOptions().get(CampaignOption.USE_PLANETARY_CONDITIONS)) {
                         atBScenario.setPlanetaryConditions(this, campaign);
                     }
 
@@ -1054,7 +1055,7 @@ public class AtBContract extends Contract {
         setContractDifficulty(calculateContractDifficulty(contract, contract.getStartDate().getYear(),
               true, campaign.getAllCombatEntities()));
 
-        if (campaign.getCampaignOptions().isLimitClanTech()) {
+        if (campaign.getCampaignOptions().get(CampaignOption.LIMIT_CLAN_TECH)) {
             clanTechSalvageOverride();
         }
     }

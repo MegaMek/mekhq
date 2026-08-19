@@ -38,6 +38,7 @@ import java.util.List;
 
 import mekhq.campaign.Campaign;
 import mekhq.campaign.campaignOptions.CampaignOptions;
+import mekhq.campaign.campaignOptions.CampaignOption;
 import mekhq.campaign.mission.AtBContract;
 import mekhq.campaign.personnel.Person;
 import mekhq.gui.baseComponents.immersiveDialogs.ImmersiveDialogSimple;
@@ -143,7 +144,7 @@ public class VocationalExperienceAwardDialog extends ImmersiveDialogSimple {
     private static String createOutOfCharacterMessage(Campaign campaign) {
         final CampaignOptions campaignOptions = campaign.getCampaignOptions();
 
-        int advancement = campaignOptions.getVocationalXP();
+        int advancement = campaignOptions.get(CampaignOption.VOCATIONAL_XP);
 
         if (campaign.hasActiveContract()) {
             if (campaignOptions.isUseStratCon()) {

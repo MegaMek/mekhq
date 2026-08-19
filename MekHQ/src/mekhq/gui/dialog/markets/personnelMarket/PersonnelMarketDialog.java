@@ -310,10 +310,10 @@ public class PersonnelMarketDialog extends JDialog {
     }
 
     private JSlider getPersonnelAvailabilitySlider() {
-        int recruitmentSliderMaximum = campaignOptions.getPersonnelMarketStyle() != PERSONNEL_MARKET_DISABLED ?
+        int recruitmentSliderMaximum = campaignOptions.get(CampaignOption.PERSONNEL_MARKET_STYLE) != PERSONNEL_MARKET_DISABLED ?
                                              MAXIMUM_DAYS_IN_MONTH * MAXIMUM_NUMBER_OF_SYSTEM_ROLLS :
                                              MAXIMUM_DAYS_IN_MONTH;
-        if (campaignOptions.isUseAlternativeAdvancedMedical()) {
+        if (campaignOptions.get(CampaignOption.USE_ALTERNATIVE_ADVANCED_MEDICAL)) {
             recruitmentSliderMaximum *= ALTERNATE_ADVANCED_MEDICAL_RECRUITMENT_MULTIPLIER;
         }
 

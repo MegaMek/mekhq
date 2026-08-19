@@ -40,6 +40,7 @@ import megamek.common.units.Entity;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.enums.PersonnelRole;
+import mekhq.campaign.campaignOptions.CampaignOption;
 
 /**
  * Personnel market generation method that uses Dylan's method
@@ -85,7 +86,7 @@ public class PersonnelMarketDylan extends PersonnelMarketRandom {
         final PersonnelRole[] personnelRoles = PersonnelRole.values();
         final List<PersonnelRole> vesselRoles = PersonnelRole.getVesselRoles();
         Person p;
-        int weight = (int) (c.getCampaignOptions().getPersonnelMarketDylansWeight() * 100);
+        int weight = (int) (c.getCampaignOptions().get(CampaignOption.PERSONNEL_MARKET_DYLANS_WEIGHT) * 100);
         for (int i = 0; i < q; i++) {
             long choice = mtf.get(Compute.randomInt(Math.max(mtf.size() - 1, 1)));
             if (Compute.randomInt(99) < weight) {

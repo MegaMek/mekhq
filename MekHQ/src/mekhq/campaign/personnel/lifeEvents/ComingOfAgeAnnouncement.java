@@ -47,6 +47,7 @@ import megamek.common.enums.Gender;
 import megamek.logging.MMLogger;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.campaignOptions.CampaignOptions;
+import mekhq.campaign.campaignOptions.CampaignOption;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.PronounData;
 import mekhq.campaign.personnel.enums.PersonnelStatus;
@@ -114,7 +115,7 @@ public class ComingOfAgeAnnouncement {
 
         if (dialog.getDialogChoice() == SUPPRESS_DIALOG_RESPONSE_INDEX) {
             CampaignOptions campaignOptions = campaign.getCampaignOptions();
-            campaignOptions.setShowLifeEventDialogComingOfAge(false);
+            campaignOptions.set(CampaignOption.SHOW_LIFE_EVENT_DIALOG_COMING_OF_AGE, false);
         }
     }
 

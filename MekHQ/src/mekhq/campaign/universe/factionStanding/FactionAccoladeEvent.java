@@ -77,6 +77,7 @@ import mekhq.gui.baseComponents.immersiveDialogs.ImmersiveDialogWidth;
 import mekhq.gui.dialog.factionStanding.factionJudgment.FactionAccoladeConfirmationDialog;
 import mekhq.gui.dialog.factionStanding.factionJudgment.FactionJudgmentDialog;
 import mekhq.gui.dialog.factionStanding.factionJudgment.FactionJudgmentNewsArticle;
+import mekhq.campaign.campaignOptions.CampaignOption;
 
 /**
  * Handles events where a campaign receives a faction accolade, such as adoption.
@@ -223,7 +224,7 @@ public class FactionAccoladeEvent {
                                                                                 .getCommander(campaign.getCampaignOptions(),
                                                                                       campaign.isClanCampaign(),
                                                                                       campaign.getLocalDate()), null,
-                      campaign.getCampaignOptions().isTrackFactionStanding(), false);
+                      campaign.getCampaignOptions().get(CampaignOption.TRACK_FACTION_STANDING), false);
             }
 
             List<Entity> generatedEntities = generateUnits();

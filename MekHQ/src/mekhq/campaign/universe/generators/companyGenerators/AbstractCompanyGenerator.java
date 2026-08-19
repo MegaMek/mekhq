@@ -296,7 +296,7 @@ public abstract class AbstractCompanyGenerator {
                                                           .getOptions()
                                                           .booleanOption(OptionsConstants.MISC_TACTICAL_GENIUS));
 
-            boolean isUseAgingEffects = campaign.getCampaignOptions().isUseAgeEffects();
+            boolean isUseAgingEffects = campaign.getCampaignOptions().get(CampaignOption.USE_AGE_EFFECTS);
             boolean isClanCampaign = campaign.isClanCampaign();
             LocalDate today = campaign.getLocalDate();
 
@@ -355,7 +355,7 @@ public abstract class AbstractCompanyGenerator {
                                                           .getOptions()
                                                           .booleanOption(OptionsConstants.MISC_TACTICAL_GENIUS));
 
-            boolean isUseAgingEffects = campaign.getCampaignOptions().isUseAgeEffects();
+            boolean isUseAgingEffects = campaign.getCampaignOptions().get(CampaignOption.USE_AGE_EFFECTS);
             boolean isClanCampaign = campaign.isClanCampaign();
             LocalDate today = campaign.getLocalDate();
 
@@ -1122,7 +1122,7 @@ public abstract class AbstractCompanyGenerator {
     protected @Nullable MekSummary generateMekSummary(final Campaign campaign,
           final AtBRandomMekParameters parameters,
           final String factionCode, final int year) {
-        Predicate<MekSummary> filter = ms -> (!campaign.getCampaignOptions().isLimitByYear() || (year > ms.getYear()));
+        Predicate<MekSummary> filter = ms -> (!campaign.getCampaignOptions().get(CampaignOption.LIMIT_BY_YEAR) || (year > ms.getYear()));
         if (getOptions().isOnlyGenerateOmniMeks()) {
             filter = filter.and(ms -> "Omni".equalsIgnoreCase(ms.getUnitSubType()));
         }
@@ -1149,7 +1149,7 @@ public abstract class AbstractCompanyGenerator {
 
             PartQuality quality = PartQuality.QUALITY_D;
 
-            if (campaign.getCampaignOptions().isUseRandomUnitQualities()) {
+            if (campaign.getCampaignOptions().get(CampaignOption.USE_RANDOM_UNIT_QUALITIES)) {
                 int modifier = 0;
 
                 if (tracker.getPerson().isCommander()) {
@@ -1530,7 +1530,7 @@ public abstract class AbstractCompanyGenerator {
           final List<Entity> mothballedEntities) {
         PartQuality quality;
 
-        if (campaign.getCampaignOptions().isUseRandomUnitQualities()) {
+        if (campaign.getCampaignOptions().get(CampaignOption.USE_RANDOM_UNIT_QUALITIES)) {
             quality = Unit.getRandomUnitQuality(0);
         } else {
             quality = PartQuality.QUALITY_D;

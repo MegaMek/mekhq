@@ -62,6 +62,7 @@ import mekhq.campaign.Campaign;
 import mekhq.campaign.CurrentLocation;
 import mekhq.campaign.LocalHangar;
 import mekhq.campaign.campaignOptions.CampaignOptions;
+import mekhq.campaign.campaignOptions.CampaignOption;
 import mekhq.campaign.force.Formation;
 import mekhq.campaign.force.FormationType;
 import mekhq.campaign.market.contractMarket.AlternatePaymentModelValues;
@@ -90,8 +91,8 @@ public class AccountantTest {
 
         CampaignOptions mockCampaignOptions = mock(CampaignOptions.class);
         when(mockCampaign.getCampaignOptions()).thenReturn(mockCampaignOptions);
-        when(mockCampaignOptions.isPayForFood()).thenReturn(false);
-        when(mockCampaignOptions.isPayForHousing()).thenReturn(false);
+        when(mockCampaignOptions.get(CampaignOption.PAY_FOR_FOOD)).thenReturn(false);
+        when(mockCampaignOptions.get(CampaignOption.PAY_FOR_HOUSING)).thenReturn(false);
 
         Accountant accountant = new Accountant(mockCampaign);
 
@@ -114,8 +115,8 @@ public class AccountantTest {
 
         CampaignOptions mockCampaignOptions = mock(CampaignOptions.class);
         when(mockCampaign.getCampaignOptions()).thenReturn(mockCampaignOptions);
-        when(mockCampaignOptions.isPayForFood()).thenReturn(false);
-        when(mockCampaignOptions.isPayForHousing()).thenReturn(false);
+        when(mockCampaignOptions.get(CampaignOption.PAY_FOR_FOOD)).thenReturn(false);
+        when(mockCampaignOptions.get(CampaignOption.PAY_FOR_HOUSING)).thenReturn(false);
 
         Accountant accountant = new Accountant(mockCampaign);
 
@@ -138,8 +139,8 @@ public class AccountantTest {
 
         CampaignOptions mockCampaignOptions = mock(CampaignOptions.class);
         when(mockCampaign.getCampaignOptions()).thenReturn(mockCampaignOptions);
-        when(mockCampaignOptions.isPayForFood()).thenReturn(true);
-        when(mockCampaignOptions.isPayForHousing()).thenReturn(true);
+        when(mockCampaignOptions.get(CampaignOption.PAY_FOR_FOOD)).thenReturn(true);
+        when(mockCampaignOptions.get(CampaignOption.PAY_FOR_HOUSING)).thenReturn(true);
 
         Accountant accountant = new Accountant(mockCampaign);
 
@@ -171,8 +172,8 @@ public class AccountantTest {
 
         CampaignOptions mockCampaignOptions = mock(CampaignOptions.class);
         when(mockCampaign.getCampaignOptions()).thenReturn(mockCampaignOptions);
-        when(mockCampaignOptions.isPayForFood()).thenReturn(false);
-        when(mockCampaignOptions.isPayForHousing()).thenReturn(true);
+        when(mockCampaignOptions.get(CampaignOption.PAY_FOR_FOOD)).thenReturn(false);
+        when(mockCampaignOptions.get(CampaignOption.PAY_FOR_HOUSING)).thenReturn(true);
 
         Accountant accountant = new Accountant(mockCampaign);
 
@@ -203,8 +204,8 @@ public class AccountantTest {
 
         CampaignOptions mockCampaignOptions = mock(CampaignOptions.class);
         when(mockCampaign.getCampaignOptions()).thenReturn(mockCampaignOptions);
-        when(mockCampaignOptions.isPayForFood()).thenReturn(true);
-        when(mockCampaignOptions.isPayForHousing()).thenReturn(false);
+        when(mockCampaignOptions.get(CampaignOption.PAY_FOR_FOOD)).thenReturn(true);
+        when(mockCampaignOptions.get(CampaignOption.PAY_FOR_HOUSING)).thenReturn(false);
 
         Accountant accountant = new Accountant(mockCampaign);
 
@@ -235,8 +236,8 @@ public class AccountantTest {
 
         CampaignOptions mockCampaignOptions = mock(CampaignOptions.class);
         when(mockCampaign.getCampaignOptions()).thenReturn(mockCampaignOptions);
-        when(mockCampaignOptions.isPayForFood()).thenReturn(true);
-        when(mockCampaignOptions.isPayForHousing()).thenReturn(true);
+        when(mockCampaignOptions.get(CampaignOption.PAY_FOR_FOOD)).thenReturn(true);
+        when(mockCampaignOptions.get(CampaignOption.PAY_FOR_HOUSING)).thenReturn(true);
 
         Accountant accountant = new Accountant(mockCampaign);
 
@@ -268,8 +269,8 @@ public class AccountantTest {
 
         CampaignOptions mockCampaignOptions = mock(CampaignOptions.class);
         when(mockCampaign.getCampaignOptions()).thenReturn(mockCampaignOptions);
-        when(mockCampaignOptions.isPayForFood()).thenReturn(false);
-        when(mockCampaignOptions.isPayForHousing()).thenReturn(true);
+        when(mockCampaignOptions.get(CampaignOption.PAY_FOR_FOOD)).thenReturn(false);
+        when(mockCampaignOptions.get(CampaignOption.PAY_FOR_HOUSING)).thenReturn(true);
 
         Accountant accountant = new Accountant(mockCampaign);
 
@@ -300,8 +301,8 @@ public class AccountantTest {
 
         CampaignOptions mockCampaignOptions = mock(CampaignOptions.class);
         when(mockCampaign.getCampaignOptions()).thenReturn(mockCampaignOptions);
-        when(mockCampaignOptions.isPayForFood()).thenReturn(true);
-        when(mockCampaignOptions.isPayForHousing()).thenReturn(false);
+        when(mockCampaignOptions.get(CampaignOption.PAY_FOR_FOOD)).thenReturn(true);
+        when(mockCampaignOptions.get(CampaignOption.PAY_FOR_HOUSING)).thenReturn(false);
 
         Accountant accountant = new Accountant(mockCampaign);
 
@@ -332,8 +333,8 @@ public class AccountantTest {
 
         CampaignOptions mockCampaignOptions = mock(CampaignOptions.class);
         when(mockCampaign.getCampaignOptions()).thenReturn(mockCampaignOptions);
-        when(mockCampaignOptions.isPayForFood()).thenReturn(true);
-        when(mockCampaignOptions.isPayForHousing()).thenReturn(true);
+        when(mockCampaignOptions.get(CampaignOption.PAY_FOR_FOOD)).thenReturn(true);
+        when(mockCampaignOptions.get(CampaignOption.PAY_FOR_HOUSING)).thenReturn(true);
 
         Accountant accountant = new Accountant(mockCampaign);
 
@@ -366,8 +367,8 @@ public class AccountantTest {
 
         CampaignOptions mockCampaignOptions = mock(CampaignOptions.class);
         when(mockCampaign.getCampaignOptions()).thenReturn(mockCampaignOptions);
-        when(mockCampaignOptions.isPayForFood()).thenReturn(false);
-        when(mockCampaignOptions.isPayForHousing()).thenReturn(true);
+        when(mockCampaignOptions.get(CampaignOption.PAY_FOR_FOOD)).thenReturn(false);
+        when(mockCampaignOptions.get(CampaignOption.PAY_FOR_HOUSING)).thenReturn(true);
 
         Accountant accountant = new Accountant(mockCampaign);
 
@@ -399,8 +400,8 @@ public class AccountantTest {
 
         CampaignOptions mockCampaignOptions = mock(CampaignOptions.class);
         when(mockCampaign.getCampaignOptions()).thenReturn(mockCampaignOptions);
-        when(mockCampaignOptions.isPayForFood()).thenReturn(true);
-        when(mockCampaignOptions.isPayForHousing()).thenReturn(false);
+        when(mockCampaignOptions.get(CampaignOption.PAY_FOR_FOOD)).thenReturn(true);
+        when(mockCampaignOptions.get(CampaignOption.PAY_FOR_HOUSING)).thenReturn(false);
 
         Accountant accountant = new Accountant(mockCampaign);
 
@@ -432,8 +433,8 @@ public class AccountantTest {
 
         CampaignOptions mockCampaignOptions = mock(CampaignOptions.class);
         when(mockCampaign.getCampaignOptions()).thenReturn(mockCampaignOptions);
-        when(mockCampaignOptions.isPayForFood()).thenReturn(true);
-        when(mockCampaignOptions.isPayForHousing()).thenReturn(true);
+        when(mockCampaignOptions.get(CampaignOption.PAY_FOR_FOOD)).thenReturn(true);
+        when(mockCampaignOptions.get(CampaignOption.PAY_FOR_HOUSING)).thenReturn(true);
 
         Accountant accountant = new Accountant(mockCampaign);
 
@@ -466,8 +467,8 @@ public class AccountantTest {
 
         CampaignOptions mockCampaignOptions = mock(CampaignOptions.class);
         when(mockCampaign.getCampaignOptions()).thenReturn(mockCampaignOptions);
-        when(mockCampaignOptions.isPayForFood()).thenReturn(false);
-        when(mockCampaignOptions.isPayForHousing()).thenReturn(true);
+        when(mockCampaignOptions.get(CampaignOption.PAY_FOR_FOOD)).thenReturn(false);
+        when(mockCampaignOptions.get(CampaignOption.PAY_FOR_HOUSING)).thenReturn(true);
 
         Accountant accountant = new Accountant(mockCampaign);
 
@@ -499,8 +500,8 @@ public class AccountantTest {
 
         CampaignOptions mockCampaignOptions = mock(CampaignOptions.class);
         when(mockCampaign.getCampaignOptions()).thenReturn(mockCampaignOptions);
-        when(mockCampaignOptions.isPayForFood()).thenReturn(true);
-        when(mockCampaignOptions.isPayForHousing()).thenReturn(false);
+        when(mockCampaignOptions.get(CampaignOption.PAY_FOR_FOOD)).thenReturn(true);
+        when(mockCampaignOptions.get(CampaignOption.PAY_FOR_HOUSING)).thenReturn(false);
 
         Accountant accountant = new Accountant(mockCampaign);
 
@@ -532,8 +533,8 @@ public class AccountantTest {
 
         CampaignOptions mockCampaignOptions = mock(CampaignOptions.class);
         when(mockCampaign.getCampaignOptions()).thenReturn(mockCampaignOptions);
-        when(mockCampaignOptions.isPayForFood()).thenReturn(true);
-        when(mockCampaignOptions.isPayForHousing()).thenReturn(true);
+        when(mockCampaignOptions.get(CampaignOption.PAY_FOR_FOOD)).thenReturn(true);
+        when(mockCampaignOptions.get(CampaignOption.PAY_FOR_HOUSING)).thenReturn(true);
 
         Accountant accountant = new Accountant(mockCampaign);
 
@@ -591,8 +592,8 @@ public class AccountantTest {
 
         CampaignOptions mockCampaignOptions = mock(CampaignOptions.class);
         when(mockCampaign.getCampaignOptions()).thenReturn(mockCampaignOptions);
-        when(mockCampaignOptions.isPayForFood()).thenReturn(false);
-        when(mockCampaignOptions.isPayForHousing()).thenReturn(true);
+        when(mockCampaignOptions.get(CampaignOption.PAY_FOR_FOOD)).thenReturn(false);
+        when(mockCampaignOptions.get(CampaignOption.PAY_FOR_HOUSING)).thenReturn(true);
 
         Accountant accountant = new Accountant(mockCampaign);
 
@@ -646,8 +647,8 @@ public class AccountantTest {
 
         CampaignOptions mockCampaignOptions = mock(CampaignOptions.class);
         when(mockCampaign.getCampaignOptions()).thenReturn(mockCampaignOptions);
-        when(mockCampaignOptions.isPayForFood()).thenReturn(true);
-        when(mockCampaignOptions.isPayForHousing()).thenReturn(false);
+        when(mockCampaignOptions.get(CampaignOption.PAY_FOR_FOOD)).thenReturn(true);
+        when(mockCampaignOptions.get(CampaignOption.PAY_FOR_HOUSING)).thenReturn(false);
 
         Accountant accountant = new Accountant(mockCampaign);
 
@@ -701,8 +702,8 @@ public class AccountantTest {
 
         CampaignOptions mockCampaignOptions = mock(CampaignOptions.class);
         when(mockCampaign.getCampaignOptions()).thenReturn(mockCampaignOptions);
-        when(mockCampaignOptions.isPayForFood()).thenReturn(true);
-        when(mockCampaignOptions.isPayForHousing()).thenReturn(true);
+        when(mockCampaignOptions.get(CampaignOption.PAY_FOR_FOOD)).thenReturn(true);
+        when(mockCampaignOptions.get(CampaignOption.PAY_FOR_HOUSING)).thenReturn(true);
 
         Accountant accountant = new Accountant(mockCampaign);
 
@@ -759,8 +760,8 @@ public class AccountantTest {
 
         CampaignOptions mockCampaignOptions = mock(CampaignOptions.class);
         when(mockCampaign.getCampaignOptions()).thenReturn(mockCampaignOptions);
-        when(mockCampaignOptions.isPayForFood()).thenReturn(true);
-        when(mockCampaignOptions.isPayForHousing()).thenReturn(true);
+        when(mockCampaignOptions.get(CampaignOption.PAY_FOR_FOOD)).thenReturn(true);
+        when(mockCampaignOptions.get(CampaignOption.PAY_FOR_HOUSING)).thenReturn(true);
 
         Accountant accountant = new Accountant(mockCampaign);
 
@@ -831,8 +832,8 @@ public class AccountantTest {
 
         CampaignOptions mockCampaignOptions = mock(CampaignOptions.class);
         when(mockCampaign.getCampaignOptions()).thenReturn(mockCampaignOptions);
-        when(mockCampaignOptions.isPayForFood()).thenReturn(false);
-        when(mockCampaignOptions.isPayForHousing()).thenReturn(true);
+        when(mockCampaignOptions.get(CampaignOption.PAY_FOR_FOOD)).thenReturn(false);
+        when(mockCampaignOptions.get(CampaignOption.PAY_FOR_HOUSING)).thenReturn(true);
         when(mockCampaignOptions.isUseFactionStandingBarracksCostsSafe()).thenReturn(true);
 
         Accountant accountant = new Accountant(mockCampaign);
@@ -876,8 +877,8 @@ public class AccountantTest {
 
         CampaignOptions mockCampaignOptions = mock(CampaignOptions.class);
         when(mockCampaign.getCampaignOptions()).thenReturn(mockCampaignOptions);
-        when(mockCampaignOptions.isPayForFood()).thenReturn(false);
-        when(mockCampaignOptions.isPayForHousing()).thenReturn(true);
+        when(mockCampaignOptions.get(CampaignOption.PAY_FOR_FOOD)).thenReturn(false);
+        when(mockCampaignOptions.get(CampaignOption.PAY_FOR_HOUSING)).thenReturn(true);
         when(mockCampaignOptions.isUseFactionStandingBarracksCostsSafe()).thenReturn(true);
 
         Accountant accountant = new Accountant(mockCampaign);
@@ -1022,7 +1023,7 @@ public class AccountantTest {
             assertEquals(1, expectedMap.size());
             assertTrue(expectedMap.containsKey(null));
             assertEquals(Money.of(CREWCOUNT *
-                                        campaignOptions.getRoleBaseSalaries()[role.ordinal()].getAmount()
+                                        campaignOptions.get(CampaignOption.ROLE_BASE_SALARIES)[role.ordinal()].getAmount()
                                               .doubleValue()),
                   expectedMap.get(null));
         }
@@ -1309,7 +1310,7 @@ public class AccountantTest {
             when(formation.getUnits()).thenReturn(new Vector<>(List.of(unitId)));
             when(formation.getSubFormations()).thenReturn(new Vector<>());
 
-            campaignOptions.setPayForSalaries(true);
+            campaignOptions.set(CampaignOption.PAY_FOR_SALARIES, true);
 
             Money actual = getPeacetimeOperatingCosts(List.of(formation), mockHangar, campaignOptions, false, TODAY,
                   0, 0, Map.of(), false);
@@ -1332,7 +1333,7 @@ public class AccountantTest {
             when(formation.getUnits()).thenReturn(new Vector<>(List.of(unitId)));
             when(formation.getSubFormations()).thenReturn(new Vector<>());
 
-            campaignOptions.setPayForSalaries(false);
+            campaignOptions.set(CampaignOption.PAY_FOR_SALARIES, false);
 
             Money actual = getPeacetimeOperatingCosts(List.of(formation), mockHangar, campaignOptions, false, TODAY,
                   0, 0, Map.of(), true);
@@ -1355,8 +1356,8 @@ public class AccountantTest {
             when(formation.getUnits()).thenReturn(new Vector<>(List.of(unitId)));
             when(formation.getSubFormations()).thenReturn(new Vector<>());
 
-            campaignOptions.setPayForSalaries(true);
-            campaignOptions.setUseInfantryDontCount(false);
+            campaignOptions.set(CampaignOption.PAY_FOR_SALARIES, true);
+            campaignOptions.set(CampaignOption.INFANTRY_DONT_COUNT, false);
 
             Money actual = getPeacetimeOperatingCosts(List.of(formation), mockHangar, campaignOptions, false, TODAY,
                   0, 0, Map.of(), true);
@@ -1376,9 +1377,9 @@ public class AccountantTest {
         void testGetPeacetimeOperatingCosts_includesTemporaryCrewPay() {
             // With no formations there are no units or crews at all, so any nonzero total here can only
             // have come from the astech pool - isolating the temporary-crew-pay contribution.
-            campaignOptions.setPayForSalaries(true);
+            campaignOptions.set(CampaignOption.PAY_FOR_SALARIES, true);
 
-            double expectedTempCrewPay = campaignOptions.getRoleBaseSalaries()[PersonnelRole.ASTECH.ordinal()]
+            double expectedTempCrewPay = campaignOptions.get(CampaignOption.ROLE_BASE_SALARIES)[PersonnelRole.ASTECH.ordinal()]
                                                .getAmount()
                                                .doubleValue() * 5;
 
@@ -1442,8 +1443,8 @@ public class AccountantTest {
             when(mockCampaign.getLocalDate()).thenReturn(TODAY);
             when(mockCampaign.getPlayerForce()
                        .getHumanResources()).thenReturn(mock(mekhq.campaign.ForceHumanResources.class));
-            mockCampaignOptions.setPayForSalaries(true);
-            mockCampaignOptions.setUseInfantryDontCount(false);
+            mockCampaignOptions.set(CampaignOption.PAY_FOR_SALARIES, true);
+            mockCampaignOptions.set(CampaignOption.INFANTRY_DONT_COUNT, false);
 
             // Two units, each with a fusion engine, each in the TO&E, each fully paid for
             UUID unitId1 = UUID.randomUUID();
@@ -1852,7 +1853,7 @@ public class AccountantTest {
             // percentages to small real-game maximums (e.g. 5% for combat equipment), which would get in the
             // way of asserting simple round-number totals here.
             campaignOptions = mock(CampaignOptions.class);
-            when(campaignOptions.getEquipmentContractPercent()).thenReturn(100.0);
+            when(campaignOptions.get(CampaignOption.EQUIPMENT_CONTRACT_PERCENT)).thenReturn(100.0);
             faction = new Faction();
         }
 
@@ -2096,7 +2097,7 @@ public class AccountantTest {
 
         @Test
         void testGetEquipmentContractValue_regularUnitUsesEquipmentContractPercent() {
-            when(campaignOptions.getEquipmentContractPercent()).thenReturn(50.0);
+            when(campaignOptions.get(CampaignOption.EQUIPMENT_CONTRACT_PERCENT)).thenReturn(50.0);
 
             Unit unit = mock(Unit.class);
             Entity entity = mock(Entity.class);
@@ -2110,7 +2111,7 @@ public class AccountantTest {
 
         @Test
         void testGetEquipmentContractValue_dropShipUsesDropShipContractPercent() {
-            when(campaignOptions.getDropShipContractPercent()).thenReturn(20.0);
+            when(campaignOptions.get(CampaignOption.DROP_SHIP_CONTRACT_PERCENT)).thenReturn(20.0);
 
             Unit unit = mock(Unit.class);
             Entity entity = mock(Entity.class);
@@ -2125,7 +2126,7 @@ public class AccountantTest {
 
         @Test
         void testGetEquipmentContractValue_useSaleValueUsesSellValue() {
-            when(campaignOptions.getEquipmentContractPercent()).thenReturn(100.0);
+            when(campaignOptions.get(CampaignOption.EQUIPMENT_CONTRACT_PERCENT)).thenReturn(100.0);
 
             Unit unit = mock(Unit.class);
             Entity entity = mock(Entity.class);
@@ -2139,7 +2140,7 @@ public class AccountantTest {
 
         @Test
         void testGetEquipmentContractValue_warShipUsesWarShipContractPercent() {
-            when(campaignOptions.getWarShipContractPercent()).thenReturn(30.0);
+            when(campaignOptions.get(CampaignOption.WAR_SHIP_CONTRACT_PERCENT)).thenReturn(30.0);
 
             Unit unit = mock(Unit.class);
             Entity entity = mock(Entity.class);
@@ -2154,7 +2155,7 @@ public class AccountantTest {
 
         @Test
         void testGetEquipmentContractValue_jumpShipUsesJumpShipContractPercent() {
-            when(campaignOptions.getJumpShipContractPercent()).thenReturn(40.0);
+            when(campaignOptions.get(CampaignOption.JUMP_SHIP_CONTRACT_PERCENT)).thenReturn(40.0);
 
             Unit unit = mock(Unit.class);
             Entity entity = mock(Entity.class);
@@ -2169,7 +2170,7 @@ public class AccountantTest {
 
         @Test
         void testGetEquipmentContractValue_spaceStationUsesJumpShipContractPercent() {
-            when(campaignOptions.getJumpShipContractPercent()).thenReturn(40.0);
+            when(campaignOptions.get(CampaignOption.JUMP_SHIP_CONTRACT_PERCENT)).thenReturn(40.0);
 
             Unit unit = mock(Unit.class);
             Entity entity = mock(Entity.class);
@@ -2216,7 +2217,7 @@ public class AccountantTest {
 
         @Test
         void testGetContractBase_equipmentContractBaseUsesForceValue() {
-            campaignOptions.setEquipmentContractBase(true);
+            campaignOptions.set(CampaignOption.EQUIPMENT_CONTRACT_BASE, true);
             // Left at its real default (5%) rather than set explicitly - CampaignOptions clamps
             // setEquipmentContractPercent() to MAXIMUM_COMBAT_EQUIPMENT_PERCENT (5.0), so the expected total below
             // is computed against that real-game cap rather than an artificial round number.
@@ -2244,7 +2245,7 @@ public class AccountantTest {
 
         @Test
         void testGetContractBase_alternatePaymentModeSkipsTheoreticalPayrollFallback() {
-            campaignOptions.setUseAlternatePaymentMode(true);
+            campaignOptions.set(CampaignOption.USE_ALTERNATE_PAYMENT_MODE, true);
 
             Person person = mock(Person.class);
             when(person.getPrimaryRole()).thenReturn(MEKWARRIOR);
@@ -2262,7 +2263,7 @@ public class AccountantTest {
 
         @Test
         void testGetContractBase_alternatePaymentModeUsesAlternatePaymentModelValues() {
-            campaignOptions.setUseAlternatePaymentMode(true);
+            campaignOptions.set(CampaignOption.USE_ALTERNATE_PAYMENT_MODE, true);
 
             UUID unitId = UUID.randomUUID();
             // isProtoMek() is the simplest single-condition branch in
@@ -2292,8 +2293,8 @@ public class AccountantTest {
 
         @Test
         void testGetContractBase_alternatePaymentModeHalvesResultWhenUsingSaleValue() {
-            campaignOptions.setUseAlternatePaymentMode(true);
-            campaignOptions.setEquipmentContractSaleValue(true);
+            campaignOptions.set(CampaignOption.USE_ALTERNATE_PAYMENT_MODE, true);
+            campaignOptions.set(CampaignOption.EQUIPMENT_CONTRACT_SALE_VALUE, true);
 
             UUID unitId = UUID.randomUUID();
             Entity entity = mock(Entity.class);
@@ -2319,7 +2320,7 @@ public class AccountantTest {
 
         @Test
         void testGetContractBase_usePeacetimeCostCombinesForceValueAndPeacetimeCost() {
-            campaignOptions.setUsePeacetimeCost(true);
+            campaignOptions.set(CampaignOption.USE_PEACETIME_COST, true);
 
             UUID unitId = UUID.randomUUID();
             Unit unit = mock(Unit.class);
@@ -2422,7 +2423,7 @@ public class AccountantTest {
 
         @Test
         void testGetMaintenanceCosts_delegatesToStaticTotal() {
-            campaignOptions.setPayForMaintain(true);
+            campaignOptions.set(CampaignOption.PAY_FOR_MAINTAIN, true);
 
             Unit unit = mock(Unit.class);
             when(unit.requiresMaintenance()).thenReturn(true);
@@ -2437,7 +2438,7 @@ public class AccountantTest {
 
         @Test
         void testGetMaintenanceCosts_payForMaintainFalseIsZero() {
-            campaignOptions.setPayForMaintain(false);
+            campaignOptions.set(CampaignOption.PAY_FOR_MAINTAIN, false);
 
             Unit unit = mock(Unit.class);
             when(unit.requiresMaintenance()).thenReturn(true);
@@ -2463,7 +2464,7 @@ public class AccountantTest {
 
         @Test
         void testGetOverheadExpenses_delegatesToStaticTotal() {
-            campaignOptions.setPayForOverhead(true);
+            campaignOptions.set(CampaignOption.PAY_FOR_OVERHEAD, true);
 
             Person person = mock(Person.class);
             when(person.getPrimaryRole()).thenReturn(MEKWARRIOR);
@@ -2478,7 +2479,7 @@ public class AccountantTest {
 
         @Test
         void testGetOverheadExpenses_payForOverheadFalseIsZero() {
-            campaignOptions.setPayForOverhead(false);
+            campaignOptions.set(CampaignOption.PAY_FOR_OVERHEAD, false);
 
             Person person = mock(Person.class);
             when(person.getPrimaryRole()).thenReturn(MEKWARRIOR);

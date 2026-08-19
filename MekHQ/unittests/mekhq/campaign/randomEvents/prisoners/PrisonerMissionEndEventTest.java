@@ -169,7 +169,7 @@ class PrisonerMissionEndEventTest {
         when(campaignFaction.getShortName()).thenReturn("MERC");
 
         CampaignOptions mockCampaignOptions = mock(CampaignOptions.class);
-        when(mockCampaignOptions.isAlternativeQualityAveraging()).thenReturn(false);
+        when(mockCampaignOptions.get(CampaignOption.ALTERNATIVE_QUALITY_AVERAGING)).thenReturn(false);
         when(mockCampaign.getCampaignOptions()).thenReturn(mockCampaignOptions);
 
         AtBContract contract = new AtBContract("TEST");
@@ -202,7 +202,7 @@ class PrisonerMissionEndEventTest {
         when(campaignFaction.getShortName()).thenReturn("MERC");
 
         CampaignOptions mockCampaignOptions = mock(CampaignOptions.class);
-        when(mockCampaignOptions.isAlternativeQualityAveraging()).thenReturn(false);
+        when(mockCampaignOptions.get(CampaignOption.ALTERNATIVE_QUALITY_AVERAGING)).thenReturn(false);
         when(mockCampaign.getCampaignOptions()).thenReturn(mockCampaignOptions);
 
         AtBContract contract = new AtBContract("TEST");

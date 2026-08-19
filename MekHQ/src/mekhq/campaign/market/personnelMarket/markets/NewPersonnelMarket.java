@@ -84,6 +84,7 @@ import mekhq.gui.dialog.markets.personnelMarket.PersonnelMarketDialog;
 import mekhq.utilities.MHQXMLUtility;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
+import mekhq.campaign.campaignOptions.CampaignOption;
 
 /**
  * Represents the Personnel Market system for managing the recruitment, listing, and data persistence of potential
@@ -242,7 +243,7 @@ public class NewPersonnelMarket {
         } else {
             logger.debug("Generated {} applicants for the campaign.", currentApplicants.size());
 
-            if (campaign.getCampaignOptions().isPersonnelMarketReportRefresh()) {
+            if (campaign.getCampaignOptions().get(CampaignOption.PERSONNEL_MARKET_REPORT_REFRESH)) {
                 campaign.addReport(GENERAL, generatePersonnelReport(campaign));
             }
 

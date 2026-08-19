@@ -101,6 +101,7 @@ import mekhq.gui.control.EditLogControl.LogType;
 import mekhq.gui.control.EditScenarioLogControl;
 import mekhq.gui.utilities.MarkdownEditorPanel;
 import mekhq.gui.utilities.OriginFactionPickerHelper;
+import mekhq.campaign.campaignOptions.CampaignOption;
 
 /**
  * This dialog is used to both hire new pilots and to edit existing ones
@@ -692,7 +693,7 @@ public class CustomizePersonDialog extends JDialog implements DialogOptionListen
 
         y++;
 
-        if (campaign.getCampaignOptions().isUseTimeInService() && (recruitment != null)) {
+        if (campaign.getCampaignOptions().get(CampaignOption.USE_TIME_IN_SERVICE) && (recruitment != null)) {
             lblRecruitment.setText(resourceMap.getString("lblRecruitment.text"));
             lblRecruitment.setName("lblRecruitment");
             gridBagConstraints = new GridBagConstraints();
@@ -714,7 +715,7 @@ public class CustomizePersonDialog extends JDialog implements DialogOptionListen
             y++;
         }
 
-        if (campaign.getCampaignOptions().isUseTimeInRank() && (lastRankChangeDate != null)) {
+        if (campaign.getCampaignOptions().get(CampaignOption.USE_TIME_IN_RANK) && (lastRankChangeDate != null)) {
             JLabel lblLastRankChangeDate = new JLabel(resourceMap.getString("lblLastRankChangeDate.text"));
             lblLastRankChangeDate.setName("lblLastRankChangeDate");
             gridBagConstraints = new GridBagConstraints();
@@ -758,7 +759,7 @@ public class CustomizePersonDialog extends JDialog implements DialogOptionListen
             y++;
         }
 
-        if (campaign.getCampaignOptions().isUseToughness()) {
+        if (campaign.getCampaignOptions().get(CampaignOption.USE_TOUGHNESS)) {
             lblToughness.setText(resourceMap.getString("lblToughness.text"));
             lblToughness.setName("lblToughness");
 
@@ -907,7 +908,7 @@ public class CustomizePersonDialog extends JDialog implements DialogOptionListen
 
         y++;
 
-        if (campaign.getCampaignOptions().isUseFatigue()) {
+        if (campaign.getCampaignOptions().get(CampaignOption.USE_FATIGUE)) {
             lblFatigue.setText(resourceMap.getString("lblFatigue.text"));
             lblFatigue.setName("lblFatigue");
 
@@ -930,7 +931,7 @@ public class CustomizePersonDialog extends JDialog implements DialogOptionListen
             y++;
         }
 
-        if (campaign.getCampaignOptions().isUseEducationModule()) {
+        if (campaign.getCampaignOptions().get(CampaignOption.USE_EDUCATION_MODULE)) {
             lblEducationLevel.setText(resourceMap.getString("lblEducationLevel.text"));
             lblEducationLevel.setName("lblEducationLevel");
 
@@ -976,8 +977,8 @@ public class CustomizePersonDialog extends JDialog implements DialogOptionListen
 
         y++;
 
-        if ((campaign.getCampaignOptions().isUseLoyaltyModifiers()) &&
-                  (!campaign.getCampaignOptions().isUseHideLoyalty())) {
+        if ((campaign.getCampaignOptions().get(CampaignOption.USE_LOYALTY_MODIFIERS)) &&
+                  (!campaign.getCampaignOptions().get(CampaignOption.USE_HIDE_LOYALTY))) {
             lblLoyalty.setText(resourceMap.getString("lblLoyalty.text"));
             lblLoyalty.setName("lblLoyalty");
 
@@ -1019,7 +1020,7 @@ public class CustomizePersonDialog extends JDialog implements DialogOptionListen
         choiceUnitTech.setSelectedIndex(person.getOriginalUnitTech());
 
         JLabel lblShares = new JLabel();
-        lblShares.setText(person.getNumShares(campaign, campaign.getCampaignOptions().isSharesForAll()) + " shares");
+        lblShares.setText(person.getNumShares(campaign, campaign.getCampaignOptions().get(CampaignOption.SHARES_FOR_ALL)) + " shares");
 
         chkFounder = new JCheckBox("Founding member");
         chkFounder.setSelected(person.isFounder());
@@ -1102,7 +1103,7 @@ public class CustomizePersonDialog extends JDialog implements DialogOptionListen
         gridBagConstraints.insets = new Insets(0, UIUtil.scaleForGUI(5), 0, 0);
         panDemographics.add(chkFounder, gridBagConstraints);
 
-        if (campaign.getCampaignOptions().isUseShareSystem()) {
+        if (campaign.getCampaignOptions().get(CampaignOption.USE_SHARE_SYSTEM)) {
             gridBagConstraints.gridx = 2;
             gridBagConstraints.gridy = y;
             gridBagConstraints.gridwidth = 1;
@@ -1113,7 +1114,7 @@ public class CustomizePersonDialog extends JDialog implements DialogOptionListen
         y++;
 
         // region random personality
-        if (campaign.getCampaignOptions().isUseRandomPersonalities()) {
+        if (campaign.getCampaignOptions().get(CampaignOption.USE_RANDOM_PERSONALITIES)) {
             JLabel labelAggression = new JLabel();
             labelAggression.setText("Aggression:");
             labelAggression.setName("labelAggression");
@@ -1344,9 +1345,9 @@ public class CustomizePersonDialog extends JDialog implements DialogOptionListen
         scrOptions.setPreferredSize(UIUtil.scaleForGUI(500, 500));
 
         tabStats.addTab(resourceMap.getString("scrSkills.TabConstraints.tabTitle"), scrSkills);
-        if (campaign.getCampaignOptions().isUseAbilities() ||
-                  campaign.getCampaignOptions().isUseEdge() ||
-                  campaign.getCampaignOptions().isUseImplants()) {
+        if (campaign.getCampaignOptions().get(CampaignOption.USE_ABILITIES) ||
+                  campaign.getCampaignOptions().get(CampaignOption.USE_EDGE) ||
+                  campaign.getCampaignOptions().get(CampaignOption.USE_IMPLANTS)) {
             tabStats.addTab(resourceMap.getString("scrOptions.TabConstraints.tabTitle"), scrOptions);
         }
         tabStats.add(resourceMap.getString("panLog.TabConstraints.tabTitle"),
@@ -1416,8 +1417,8 @@ public class CustomizePersonDialog extends JDialog implements DialogOptionListen
 
             // Add units to the combo box based on the person's capabilities
             if (person.canDrive(entity,
-                  campaign.getCampaignOptions().isUseAlternativeAdvancedMedical(),
-                  campaign.getCampaignOptions().isUseImplants())) {
+                  campaign.getCampaignOptions().get(CampaignOption.USE_ALTERNATIVE_ADVANCED_MEDICAL),
+                  campaign.getCampaignOptions().get(CampaignOption.USE_IMPLANTS))) {
                 choiceOriginalUnit.addItem(unit);
                 continue; // Skip further checks if already added
             }
@@ -1929,7 +1930,7 @@ public class CustomizePersonDialog extends JDialog implements DialogOptionListen
         person.setPhenotype((Phenotype) choicePhenotype.getSelectedItem());
         person.setClanPersonnel(chkClan.isSelected());
 
-        if (campaign.getCampaignOptions().isUseToughness()) {
+        if (campaign.getCampaignOptions().get(CampaignOption.USE_TOUGHNESS)) {
             int currentValue = person.getDirectToughness();
             person.setToughness(MathUtility.parseInt(textToughness.getText(), currentValue));
         }
@@ -1958,13 +1959,13 @@ public class CustomizePersonDialog extends JDialog implements DialogOptionListen
         newValue = MathUtility.parseInt(textExtraIncome.getText(), currentValue);
         person.setExtraIncomeFromTraitLevel(Math.clamp(newValue, MINIMUM_EXTRA_INCOME, MAXIMUM_EXTRA_INCOME));
 
-        if (campaign.getCampaignOptions().isUseEducationModule()) {
+        if (campaign.getCampaignOptions().get(CampaignOption.USE_EDUCATION_MODULE)) {
             person.setEduHighestEducation((EducationLevel) textEducationLevel.getSelectedItem());
         }
 
         person.setBloodGroup((BloodGroup) comboBloodtype.getSelectedItem());
 
-        if (campaign.getCampaignOptions().isUseLoyaltyModifiers()) {
+        if (campaign.getCampaignOptions().get(CampaignOption.USE_LOYALTY_MODIFIERS)) {
             currentValue = person.getBaseLoyalty();
             person.setLoyalty(MathUtility.parseInt(textLoyalty.getText(), currentValue));
         }
@@ -1982,7 +1983,7 @@ public class CustomizePersonDialog extends JDialog implements DialogOptionListen
 
         person.setFounder(chkFounder.isSelected());
 
-        if (campaign.getCampaignOptions().isUseRandomPersonalities()) {
+        if (campaign.getCampaignOptions().get(CampaignOption.USE_RANDOM_PERSONALITIES)) {
             person.setAggression(comboAggression.getSelectedItem());
             person.setAggressionDescriptionIndex((int) spnAggression.getValue());
 
@@ -2027,7 +2028,7 @@ public class CustomizePersonDialog extends JDialog implements DialogOptionListen
     }
 
     private void randomName() {
-        String factionCode = campaign.getCampaignOptions().isUseOriginFactionForNames() ?
+        String factionCode = campaign.getCampaignOptions().get(CampaignOption.USE_ORIGIN_FACTION_FOR_NAMES) ?
                                    person.getOriginFaction().getShortName() :
                                    RandomNameGenerator.getInstance().getChosenFaction();
 
@@ -2074,7 +2075,7 @@ public class CustomizePersonDialog extends JDialog implements DialogOptionListen
         constraints.gridx = 0;
 
         SkillModifierData skillModifierData = person.getSkillModifierData(
-              campaign.getCampaignOptions().isUseAgeEffects(), campaign.isClanCampaign(), campaign.getLocalDate(),
+              campaign.getCampaignOptions().get(CampaignOption.USE_AGE_EFFECTS), campaign.isClanCampaign(), campaign.getLocalDate(),
               true);
 
         List<String> sortedSkillNames = getSortedSkills();
@@ -2219,17 +2220,17 @@ public class CustomizePersonDialog extends JDialog implements DialogOptionListen
             IOptionGroup group = i.nextElement();
 
             if (group.getKey().equalsIgnoreCase(PersonnelOptions.LVL3_ADVANTAGES) &&
-                      !campaign.getCampaignOptions().isUseAbilities()) {
+                      !campaign.getCampaignOptions().get(CampaignOption.USE_ABILITIES)) {
                 continue;
             }
 
             if (group.getKey().equalsIgnoreCase(PersonnelOptions.EDGE_ADVANTAGES) &&
-                      !campaign.getCampaignOptions().isUseEdge()) {
+                      !campaign.getCampaignOptions().get(CampaignOption.USE_EDGE)) {
                 continue;
             }
 
             if (group.getKey().equalsIgnoreCase(PersonnelOptions.MD_ADVANTAGES) &&
-                      !campaign.getCampaignOptions().isUseImplants()) {
+                      !campaign.getCampaignOptions().get(CampaignOption.USE_IMPLANTS)) {
                 continue;
             }
 
@@ -2337,7 +2338,7 @@ public class CustomizePersonDialog extends JDialog implements DialogOptionListen
         }
 
         boolean isClanCampaign = campaign.isClanCampaign();
-        boolean isUseAgeEffects = campaign.getCampaignOptions().isUseAgeEffects();
+        boolean isUseAgeEffects = campaign.getCampaignOptions().get(CampaignOption.USE_AGE_EFFECTS);
         LocalDate today = campaign.getLocalDate();
 
         int level = (Integer) skillLevels.get(type).getModel().getValue();

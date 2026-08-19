@@ -59,6 +59,7 @@ import mekhq.campaign.unit.actions.ActivateUnitAction;
 import mekhq.campaign.unit.actions.MothballUnitAction;
 import mekhq.campaign.utilities.JumpBlockers;
 import mekhq.gui.baseComponents.immersiveDialogs.ImmersiveDialogSimple;
+import mekhq.campaign.campaignOptions.CampaignOption;
 
 /**
  * The {@link ContractAutomation} class provides a suite of methods used in automating actions when a contract starts.
@@ -126,7 +127,7 @@ public class ContractAutomation {
         JumpPath jumpPath = contract.getJumpPath(campaign);
         int travelDays = contract.getTravelDays(campaign);
 
-        boolean isUseTwoWayPay = campaign.getCampaignOptions().isUseTwoWayPay();
+        boolean isUseTwoWayPay = campaign.getCampaignOptions().get(CampaignOption.IS_USE_TWO_WAY_PAY);
         String totalCost = contract.getTotalTransportationFees(campaign)
                                  .dividedBy(isUseTwoWayPay ? 2 : 1)
                                  .toAmountString();
@@ -154,7 +155,7 @@ public class ContractAutomation {
             campaign.getCurrentLocation().setJumpPath(jumpPath);
             campaign.getUnits().forEach(unit -> unit.setSite(Unit.SITE_FACILITY_BASIC));
             campaign.getGUI().refreshAllTabs();
-            boolean useTwoWayPay = campaign.getCampaignOptions().isUseTwoWayPay();
+            boolean useTwoWayPay = campaign.getCampaignOptions().get(CampaignOption.IS_USE_TWO_WAY_PAY);
 
             // This will return an empty string if the transaction was successful
             String jumpReport = TransportCostCalculations.performJumpTransaction(campaign.getPlayerForce()

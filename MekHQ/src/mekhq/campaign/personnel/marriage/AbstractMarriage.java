@@ -45,6 +45,7 @@ import megamek.common.enums.Gender;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.campaignOptions.CampaignOptions;
+import mekhq.campaign.campaignOptions.CampaignOption;
 import mekhq.campaign.events.persons.PersonChangedEvent;
 import mekhq.campaign.log.PersonalLogger;
 import mekhq.campaign.personnel.Person;
@@ -71,10 +72,10 @@ public abstract class AbstractMarriage {
     //region Constructors
     protected AbstractMarriage(final RandomMarriageMethod method, final CampaignOptions options) {
         this.method = method;
-        setUseClanPersonnelMarriages(options.isUseClanPersonnelMarriages());
-        setUsePrisonerMarriages(options.isUsePrisonerMarriages());
-        setUseRandomClanPersonnelMarriages(options.isUseRandomClanPersonnelMarriages());
-        setUseRandomPrisonerMarriages(options.isUseRandomPrisonerMarriages());
+        setUseClanPersonnelMarriages(options.get(CampaignOption.USE_CLAN_PERSONNEL_MARRIAGES));
+        setUsePrisonerMarriages(options.get(CampaignOption.USE_PRISONER_MARRIAGES));
+        setUseRandomClanPersonnelMarriages(options.get(CampaignOption.USE_RANDOM_CLAN_PERSONNEL_MARRIAGES));
+        setUseRandomPrisonerMarriages(options.get(CampaignOption.USE_RANDOM_PRISONER_MARRIAGES));
     }
     //endregion Constructors
 
@@ -191,7 +192,7 @@ public abstract class AbstractMarriage {
                   (canMarry(today, potentialSpouse, randomMarriage) != null) ||
                   person.getGenealogy()
                         .checkMutualAncestors(potentialSpouse,
-                              campaign.getCampaignOptions().getCheckMutualAncestorsDepth())) {
+                              campaign.getCampaignOptions().get(CampaignOption.CHECK_MUTUAL_ANCESTORS_DEPTH))) {
             return false;
         } else if (randomMarriage) {
             return person.getPrisonerStatus().isCurrentPrisoner() ==
@@ -258,7 +259,7 @@ public abstract class AbstractMarriage {
                   spouse.getHyperlinkedName()));
 
             // Process the loyalty change
-            if (campaign.getCampaignOptions().isUseLoyaltyModifiers()) {
+            if (campaign.getCampaignOptions().get(CampaignOption.USE_LOYALTY_MODIFIERS)) {
                 origin.performRandomizedLoyaltyChange(campaign, false, true);
                 spouse.performRandomizedLoyaltyChange(campaign, false, true);
             }
@@ -300,7 +301,7 @@ public abstract class AbstractMarriage {
 
         if (randomMarriage()) {
             boolean isInterUnit = false;
-            int interUnitDiceSize = campaign.getCampaignOptions().getRandomNewDependentMarriage();
+            int interUnitDiceSize = campaign.getCampaignOptions().get(CampaignOption.RANDOM_NEW_DEPENDENT_MARRIAGE);
 
             if (interUnitDiceSize == 1) {
                 isInterUnit = true;
@@ -412,8 +413,8 @@ public abstract class AbstractMarriage {
      * @return the created external spouse
      */
     Person createExternalSpouse(final Campaign campaign, final LocalDate today, final Person person, Gender gender) {
-        boolean isNonBinary = (campaign.getCampaignOptions().getNonBinaryDiceSize() > 0) &&
-                                    (Compute.randomInt(campaign.getCampaignOptions().getNonBinaryDiceSize()) == 0);
+        boolean isNonBinary = (campaign.getCampaignOptions().get(CampaignOption.NON_BINARY_DICE_SIZE) > 0) &&
+                                    (Compute.randomInt(campaign.getCampaignOptions().get(CampaignOption.NON_BINARY_DICE_SIZE)) == 0);
 
         if (isNonBinary) {
             gender = gender.isMale() ?
@@ -426,7 +427,7 @@ public abstract class AbstractMarriage {
         // Calculate person's age and the maximum and minimum allowable spouse ages
         int personAge = person.getAge(today);
         int externalSpouseAge = externalSpouse.getAge(today);
-        int maximumAgeDifference = campaign.getCampaignOptions().getRandomMarriageAgeRange();
+        int maximumAgeDifference = campaign.getCampaignOptions().get(CampaignOption.RANDOM_MARRIAGE_AGE_RANGE);
         int externalSpouseMinAge = Math.max(18, personAge - maximumAgeDifference);
         int externalSpouseMaxAge = personAge + maximumAgeDifference;
 
@@ -475,7 +476,7 @@ public abstract class AbstractMarriage {
         }
 
         // 3. Be within the random marriage age range
-        return isWithinAgeRange(campaign.getCampaignOptions().getRandomMarriageAgeRange(), today, person,
+        return isWithinAgeRange(campaign.getCampaignOptions().get(CampaignOption.RANDOM_MARRIAGE_AGE_RANGE), today, person,
               potentialSpouse);
     }
 

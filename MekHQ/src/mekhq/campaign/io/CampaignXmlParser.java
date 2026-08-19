@@ -859,7 +859,7 @@ public record CampaignXmlParser(InputStream is, MekHQ app) {
                     int newEdge = person.getAttributeScore(SkillAttribute.EDGE);
                     int difference = oldEdge - newEdge;
                     if (difference > 0) { // We were unable to convert some over
-                        int edgeCost = campaign.getCampaignOptions().getEdgeCost();
+                        int edgeCost = campaign.getCampaignOptions().get(CampaignOption.EDGE_COST);
                         int rebate = edgeCost * difference;
                         person.awardXP(campaign, rebate);
                         campaign.addReport(GENERAL, getFormattedTextAt(RESOURCE_BUNDLE,
@@ -2205,7 +2205,7 @@ public record CampaignXmlParser(InputStream is, MekHQ app) {
                     foundContractMarket = true;
                 } else if (nodeName.equalsIgnoreCase("unitMarket")) {
                     // Windchild: implicit DEPENDS ON to the <campaignOptions> nodes
-                    campaign.setUnitMarket(campaign.getCampaignOptions().getUnitMarketMethod().getUnitMarket());
+                    campaign.setUnitMarket(campaign.getCampaignOptions().get(CampaignOption.UNIT_MARKET_METHOD).getUnitMarket());
                     campaign.getUnitMarket().fillFromXML(workingNode, campaign, version);
                     foundUnitMarket = true;
                 } else if (nodeName.equalsIgnoreCase("lances") || nodeName.equalsIgnoreCase("combatTeams")) {
@@ -2254,11 +2254,11 @@ public record CampaignXmlParser(InputStream is, MekHQ app) {
         cleanupGhostKills(campaign);
 
         // Update the Personnel Modules
-        final AbstractDivorce divorce = options.getRandomDivorceMethod().getMethod(options);
+        final AbstractDivorce divorce = options.get(CampaignOption.RANDOM_DIVORCE_METHOD).getMethod(options);
         campaign.getPlayerForce().getHumanResources().setDivorce(divorce);
-        final AbstractMarriage marriage = options.getRandomMarriageMethod().getMethod(options);
+        final AbstractMarriage marriage = options.get(CampaignOption.RANDOM_MARRIAGE_METHOD).getMethod(options);
         campaign.getPlayerForce().getHumanResources().setMarriage(marriage);
-        final AbstractProcreation procreation = options.getRandomProcreationMethod().getMethod(options);
+        final AbstractProcreation procreation = options.get(CampaignOption.RANDOM_PROCREATION_METHOD).getMethod(options);
         campaign.getPlayerForce().getHumanResources().setProcreation(procreation);
 
         long timestamp = System.currentTimeMillis();
@@ -2519,7 +2519,7 @@ public record CampaignXmlParser(InputStream is, MekHQ app) {
         }
 
         if (!foundUnitMarket) {
-            campaign.setUnitMarket(campaign.getCampaignOptions().getUnitMarketMethod().getUnitMarket());
+            campaign.setUnitMarket(campaign.getCampaignOptions().get(CampaignOption.UNIT_MARKET_METHOD).getUnitMarket());
         }
 
         if (null == campaign.getPlayerForce().getHumanResources().getRetirementDefectionTracker()) {

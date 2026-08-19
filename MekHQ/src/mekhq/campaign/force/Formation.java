@@ -64,6 +64,7 @@ import mekhq.utilities.MHQXMLUtility;
 import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
+import mekhq.campaign.campaignOptions.CampaignOption;
 
 /**
  * This is a hierarchical object to define formations for TO&amp;E. Each Formation object can have a parent formation
@@ -1049,7 +1050,7 @@ public class Formation {
                 continue;
             }
 
-            if (campaign.getCampaignOptions().isUseGenericBattleValue() && !formationStandardBattleValue) {
+            if (campaign.getCampaignOptions().get(CampaignOption.USE_GENERIC_BATTLE_VALUE) && !formationStandardBattleValue) {
                 bvTotal += campaign.getUnit(unitId).getEntity().getGenericBattleValue();
             } else {
                 bvTotal += campaign.getUnit(unitId).getEntity().calculateBattleValue();

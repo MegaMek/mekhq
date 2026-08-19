@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2024-2025 The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2024-2026 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -48,6 +48,7 @@ import javax.swing.table.TableCellRenderer;
 import megamek.logging.MMLogger;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.campaignOptions.CampaignOptions;
+import mekhq.campaign.campaignOptions.CampaignOption;
 import mekhq.campaign.personnel.Award;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.enums.AwardBonus;
@@ -175,8 +176,8 @@ public class AutoAwardsTableModel extends AbstractTableModel {
      */
     private String getDescriptionString(Award award) {
         CampaignOptions campaignOptions = campaign.getCampaignOptions();
-        boolean isReplaceEdgeAwards = campaignOptions.isUseReplaceEdgeAwards();
-        AwardBonus style = campaignOptions.getAwardBonusStyle();
+        boolean isReplaceEdgeAwards = campaignOptions.get(CampaignOption.USE_REPLACE_EDGE_AWARDS);
+        AwardBonus style = campaignOptions.get(CampaignOption.AWARD_BONUS_STYLE);
         int xpAward = award.getXPReward();
         int edgeAward = award.getEdgeReward();
         boolean awardXP = style.isBoth() || style.isXP();

@@ -52,6 +52,7 @@ import mekhq.campaign.personnel.enums.PersonnelRole;
 import mekhq.campaign.personnel.generator.DefaultSkillGenerator;
 import mekhq.campaign.personnel.skills.SkillType;
 import mekhq.campaign.unit.Unit;
+import mekhq.campaign.campaignOptions.CampaignOption;
 
 /**
  * Hires a full complement of personnel for a unit.
@@ -249,7 +250,7 @@ public record HirePersonnelUnitAction(boolean isGM) implements IUnitAction {
 
         // Ensure we generate at least one person with the artillery skill if using that skill and
         // the unit has an artillery weapon
-        if (campaign.getCampaignOptions().isUseArtillery() && (unit.getEntity() != null)
+        if (campaign.getCampaignOptions().get(CampaignOption.USE_ARTILLERY) && (unit.getEntity() != null)
                   && unit.getEntity().getWeaponList().stream()
                            .anyMatch(weapon -> (weapon.getType() != null)
                                                      &&

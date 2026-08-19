@@ -44,6 +44,7 @@ import java.util.UUID;
 
 import mekhq.campaign.Campaign;
 import mekhq.campaign.campaignOptions.CampaignOptions;
+import mekhq.campaign.campaignOptions.CampaignOption;
 import mekhq.campaign.personnel.Award;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.enums.AwardBonus;
@@ -54,8 +55,8 @@ class AutoAwardsTableModelTest {
     void combinesEdgeXpIntoSingleDescriptionWhenReplaceEdgeAwardsIsEnabled() {
         Campaign campaign = mockCampaign();
         CampaignOptions options = mock(CampaignOptions.class);
-        when(options.isUseReplaceEdgeAwards()).thenReturn(true);
-        when(options.getAwardBonusStyle()).thenReturn(AwardBonus.BOTH);
+        when(options.get(CampaignOption.USE_REPLACE_EDGE_AWARDS)).thenReturn(true);
+        when(options.get(CampaignOption.AWARD_BONUS_STYLE)).thenReturn(AwardBonus.BOTH);
         when(campaign.getCampaignOptions()).thenReturn(options);
 
         UUID personId = UUID.randomUUID();

@@ -387,7 +387,7 @@ public class HireBulkPersonnelDialog extends JDialog {
                     person.limitSkills(0);
                 }
 
-                if (isUnderSixteen && campaignOptions.isNoRandomPortraitsForChildren()) {
+                if (isUnderSixteen && campaignOptions.get(CampaignOption.NO_RANDOM_PORTRAITS_FOR_CHILDREN)) {
                     person.setPortrait(new Portrait());
                 }
             }

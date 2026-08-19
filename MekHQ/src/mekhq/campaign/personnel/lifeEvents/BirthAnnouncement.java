@@ -47,6 +47,7 @@ import megamek.common.annotations.Nullable;
 import megamek.common.enums.Gender;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.campaignOptions.CampaignOptions;
+import mekhq.campaign.campaignOptions.CampaignOption;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.PronounData;
 import mekhq.campaign.personnel.enums.PersonnelRole;
@@ -95,7 +96,7 @@ public class BirthAnnouncement {
 
         if (dialog.getDialogChoice() == SUPPRESS_DIALOG_RESPONSE_INDEX) {
             CampaignOptions campaignOptions = campaign.getCampaignOptions();
-            campaignOptions.setShowLifeEventDialogBirths(false);
+            campaignOptions.set(CampaignOption.SHOW_LIFE_EVENT_DIALOG_BIRTHS, false);
         }
     }
 

@@ -39,6 +39,7 @@ import jakarta.annotation.Nullable;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.RandomOriginOptions;
 import mekhq.campaign.campaignOptions.CampaignOptions;
+import mekhq.campaign.campaignOptions.CampaignOption;
 import mekhq.campaign.personnel.ranks.RankSystem;
 
 /**
@@ -80,7 +81,7 @@ public class BiographyPages {
         this.campaign = campaign;
         this.generalPage = generalPage;
         this.campaignOptions = campaign.getCampaignOptions();
-        this.randomOriginOptions = campaignOptions.getRandomOriginOptions();
+        this.randomOriginOptions = campaignOptions.get(CampaignOption.RANDOM_ORIGIN_OPTIONS);
         this.rankPage = new RankPage(campaign);
 
         loadValuesFromCampaignOptions();
@@ -243,7 +244,7 @@ public class BiographyPages {
             options = this.campaignOptions;
             originOptions = this.randomOriginOptions;
         } else {
-            originOptions = options.getRandomOriginOptions();
+            originOptions = options.get(CampaignOption.RANDOM_ORIGIN_OPTIONS);
         }
 
         updateModelFromCreatedControls();

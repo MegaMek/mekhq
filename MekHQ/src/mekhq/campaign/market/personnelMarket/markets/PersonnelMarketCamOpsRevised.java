@@ -50,6 +50,7 @@ import mekhq.campaign.universe.Factions;
 import mekhq.campaign.universe.factionHints.FactionHints;
 import mekhq.campaign.universe.factionStanding.FactionStandingUtilities;
 import mekhq.campaign.universe.factionStanding.FactionStandings;
+import mekhq.campaign.campaignOptions.CampaignOption;
 
 /**
  * Implements the personnel market logic using the Campaign Operations Revised ruleset.
@@ -194,7 +195,7 @@ public class PersonnelMarketCamOpsRevised extends NewPersonnelMarket {
     private void calculateNumberOfRecruitmentRolls() {
         int rolls = getToday().getMonth().length(getToday().isLeapYear());
 
-        if (getCampaign().getCampaignOptions().isAllowMonthlyConnections()) {
+        if (getCampaign().getCampaignOptions().get(CampaignOption.ALLOW_MONTHLY_CONNECTIONS)) {
             int additionalRecruits = performConnectionsRecruitsCheck();
             rolls += additionalRecruits;
         }

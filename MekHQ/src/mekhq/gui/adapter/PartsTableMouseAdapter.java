@@ -62,6 +62,7 @@ import mekhq.gui.menus.LocationMenu;
 import mekhq.gui.model.PartsTableModel;
 import mekhq.gui.utilities.JMenuHelpers;
 import mekhq.service.enums.MRMSMode;
+import mekhq.campaign.campaignOptions.CampaignOption;
 
 public class PartsTableMouseAdapter extends JPopupMenuAdapter {
 
@@ -122,7 +123,7 @@ public class PartsTableMouseAdapter extends JPopupMenuAdapter {
                                                            .multipliedBy(p.getQuantity())
                                                            .multipliedBy(gui.getCampaign()
                                                                                .getCampaignOptions()
-                                                                               .getCancelledOrderRefundMultiplier()));
+                                                                               .get(CampaignOption.CANCELLED_ORDER_REFUND_MULTIPLIER)));
                     gui.getCampaign().getPlayerForce().getWarehouse().removePart(p);
                 }
             }
@@ -179,7 +180,7 @@ public class PartsTableMouseAdapter extends JPopupMenuAdapter {
                 gui.getCampaign().getPlayerForce().getWarehouse().addPart(clonedPart, true);
             }
         } else if (command.contains("SET_QUALITY")) {
-            boolean reverse = gui.getCampaign().getCampaignOptions().isReverseQualityNames();
+            boolean reverse = gui.getCampaign().getCampaignOptions().get(CampaignOption.REVERSE_QUALITY_NAMES);
             Object[] possibilities = { PartQuality.QUALITY_A.toName(reverse), PartQuality.QUALITY_B.toName(reverse),
                                        PartQuality.QUALITY_C.toName(reverse), PartQuality.QUALITY_D.toName(reverse),
                                        PartQuality.QUALITY_E.toName(reverse), PartQuality.QUALITY_F.toName(reverse) };
@@ -370,7 +371,7 @@ public class PartsTableMouseAdapter extends JPopupMenuAdapter {
         }
         // **let's fill the pop-up menu**//
         // sell part
-        if (gui.getCampaign().getCampaignOptions().isSellParts() && areAllPartsPresent(parts)) {
+        if (gui.getCampaign().getCampaignOptions().get(CampaignOption.SELL_PARTS) && areAllPartsPresent(parts)) {
             menu = new JMenu("Sell");
             if (areAllPartsAmmo(parts)) {
                 menuItem = new JMenuItem("Sell All Ammo of This Type");
