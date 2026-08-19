@@ -50,6 +50,7 @@ import java.util.UUID;
 import jakarta.annotation.Nullable;
 import megamek.common.compute.Compute;
 import mekhq.campaign.Campaign;
+import mekhq.campaign.campaignOptions.CampaignOption;
 import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.enums.DailyReportType;
 import mekhq.campaign.force.Detachment;
@@ -296,6 +297,10 @@ public final class ChaosContractMarketAvailability {
      * @param campaign the active campaign
      */
     public static void processNewMonth(final Campaign campaign) {
+        if (campaign.getCampaignOptions().get(CampaignOption.CONTRACT_MARKET_METHOD).isNone()) {
+            return;
+        }
+
         final Map<ContractSearchType, OfferRoll> rolls = rollMonthlyOffers(campaign);
         final ContractMarket market = campaign.getPlayerForce().getContractMarket();
 
