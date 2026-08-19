@@ -113,7 +113,7 @@ class MHQRemindersPage extends MHQOptionsPage {
 
     private JPanel createRemindersConfirmationsSection() {
         String[][] confirmationOptions = {
-              { "optionContractRentalConfirmation", MHQConstants.CONFIRMATION_CONTRACT_RENTAL },
+              { "confirmationAcceptContract", MHQConstants.CONFIRMATION_ACCEPT_CONTRACT },
               { "optionFactionStandingsUltimatumConfirmation", MHQConstants.CONFIRMATION_FACTION_STANDINGS_ULTIMATUM },
               { "optionBeginTransitConfirmation", MHQConstants.CONFIRMATION_BEGIN_TRANSIT },
               { "optionStratConBatchallBreachConfirmation", MHQConstants.CONFIRMATION_STRATCON_BATCHALL_BREACH },

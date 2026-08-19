@@ -32,6 +32,7 @@
  */
 package mekhq.campaign.mission.newContract.utilities;
 
+import static mekhq.MHQConstants.CONFIRMATION_ACCEPT_CONTRACT;
 import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
 
 import mekhq.MekHQ;
@@ -60,9 +61,6 @@ import mekhq.gui.baseComponents.immersiveDialogs.ImmersiveDialogConfirmation;
  */
 public final class ContractAcceptance {
     private static final String RESOURCE_BUNDLE = "mekhq.resources.ContractAutomation";
-
-    /** Nag key for the "are you sure you want to accept?" confirmation, also used to persist the "don't ask" choice. */
-    private static final String CONFIRMATION_ACCEPT_CONTRACT = "confirmationAcceptContract";
 
     private ContractAcceptance() {}
 
