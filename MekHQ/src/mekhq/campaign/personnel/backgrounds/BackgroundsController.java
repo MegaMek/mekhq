@@ -72,6 +72,17 @@ public class BackgroundsController {
     }
 
     /**
+     * Generates a random pirate company name.
+     *
+     * @return A string containing the generated name.
+     *
+     * @throws IllegalStateException if an unexpected value is encountered during the generation process.
+     */
+    public static String randomPirateCompanyNameGenerator() {
+        return getWeightedPreFab().randomItem();
+    }
+
+    /**
      * Generates a random corporate company name.
      *
      * @return A string containing the generated name.

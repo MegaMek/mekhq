@@ -34,6 +34,9 @@ package mekhq.campaign.mission.newContract.contractGeneration;
 
 import static megamek.common.compute.Compute.randomInt;
 import static mekhq.campaign.mission.RandomFactionCamouflage.pickRandomCamouflage;
+import static mekhq.campaign.personnel.backgrounds.BackgroundsController.randomMercenaryCompanyNameGenerator;
+import static mekhq.campaign.personnel.backgrounds.BackgroundsController.randomPirateCompanyNameGenerator;
+import static mekhq.campaign.personnel.backgrounds.BackgroundsController.randomRebelCompanyNameGenerator;
 import static mekhq.campaign.universe.Faction.MERCENARY_FACTION_CODE;
 import static mekhq.campaign.universe.Faction.PIRATE_FACTION_CODE;
 import static mekhq.campaign.universe.Faction.REBEL_FACTION_CODE;
@@ -95,9 +98,9 @@ public class ChaosContractDeterminationEnemy {
 
         int currentYear = currentDate.getYear();
         String generatedName = switch (factionCode) {
-            case MERCENARY_FACTION_CODE, PIRATE_FACTION_CODE ->
-                  ChaosEmployerType.MERCENARY_SUBCONTRACT.generateEmployerName();
-            case REBEL_FACTION_CODE -> ChaosEmployerType.CIVILIAN_ORGANIZATION_REBELS.generateEmployerName();
+            case MERCENARY_FACTION_CODE -> randomMercenaryCompanyNameGenerator(null);
+            case PIRATE_FACTION_CODE -> randomPirateCompanyNameGenerator();
+            case REBEL_FACTION_CODE -> randomRebelCompanyNameGenerator(null);
             default -> enemyFaction.getFullName(currentYear);
         };
         String displayName = (generatedName != null) ? generatedName : enemyFaction.getFullName(currentYear);
