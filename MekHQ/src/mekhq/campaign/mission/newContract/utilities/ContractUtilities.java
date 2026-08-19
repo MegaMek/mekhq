@@ -45,6 +45,7 @@ import mekhq.campaign.JumpPath;
 import mekhq.campaign.force.CombatTeam;
 import mekhq.campaign.mission.enums.CombatRole;
 import mekhq.campaign.mission.newContract.AbstractContract;
+import mekhq.campaign.universe.Faction;
 import mekhq.campaign.universe.Planet;
 import mekhq.campaign.universe.PlanetarySystem;
 import mekhq.campaign.universe.factionStanding.FactionStandingUtilities;
@@ -172,5 +173,16 @@ public class ContractUtilities {
             return 0;
         }
         return Math.abs(Math.min(total, role));
+    }
+
+
+    public static String getEnemyDisplayNameIncludingFaction(Faction enemyFaction, String enemyDisplayName,
+          int gameYear) {
+        String factionFullName = enemyFaction.getFullName(gameYear);
+        if (!factionFullName.equals(enemyDisplayName)) {
+            return enemyDisplayName + " (" + factionFullName + ")";
+        }
+
+        return enemyDisplayName;
     }
 }

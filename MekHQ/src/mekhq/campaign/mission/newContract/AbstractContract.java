@@ -653,6 +653,12 @@ public abstract class AbstractContract {
         return enemyData.displayName();
     }
 
+    public String getEnemyDisplayNameIncludingFaction(int gameYear) {
+        return ContractUtilities.getEnemyDisplayNameIncludingFaction(enemyData.getFaction(),
+              enemyData.displayName(),
+              gameYear);
+    }
+
     public SkillLevel getEnemyForceSkill() {
         return enemyData.forceSkill();
     }

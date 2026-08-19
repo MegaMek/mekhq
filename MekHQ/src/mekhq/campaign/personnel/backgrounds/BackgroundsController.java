@@ -122,23 +122,10 @@ public class BackgroundsController {
      * @throws IllegalStateException if an unexpected value is encountered in the switch statement.
      */
     private static String getCorporateNameBody() {
-        int roll = Compute.randomInt(2);
-
-        return switch (roll) {
-            // Single word
-            case 0 -> getWeightedEndWordCorporate().randomItem();
-            // Middle + End
-            case 1 -> {
-                String name = getWeightedMiddleWordCorporate().randomItem() + ' ';
+        String name = getWeightedMiddleWordCorporate().randomItem() + ' ';
                 String newWordSuggestion = getNewWord(name, getWeightedEndWordCorporate());
 
-                yield name + newWordSuggestion;
-            }
-            default -> throw new IllegalStateException(
-                  "Unexpected value in mekhq/campaign/personnel/backgrounds/BackgroundsController.java/getCorporateNameBody: "
-                        + roll
-            );
-        };
+        return name + newWordSuggestion;
     }
 
     /**

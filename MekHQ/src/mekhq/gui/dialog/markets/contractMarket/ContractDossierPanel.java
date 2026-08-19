@@ -310,7 +310,10 @@ public class ContractDossierPanel extends JPanel {
 
         JPanel intel = section(getTextAt(RESOURCE_BUNDLE, "dossier.contractMarket.section.intel"));
         addDetailRow(intel, "dossier.contractMarket.intel.alliedCommand", alliedCommand(contract), null);
-        addDetailRow(intel, "dossier.contractMarket.intel.opposition", contract.getEnemyDisplayName(), null);
+        addDetailRow(intel,
+              "dossier.contractMarket.intel.opposition",
+              contract.getEnemyDisplayNameIncludingFaction(currentDate.getYear()),
+              null);
         addDetailRow(intel, "dossier.contractMarket.intel.threat", threat(contract), null);
         addDetailRow(intel, "dossier.contractMarket.intel.morale", contract.getMoraleLevel().toString(), null);
         int difficulty = assessmentDifficulty(contract);
