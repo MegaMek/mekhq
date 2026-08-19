@@ -69,6 +69,15 @@ public class ChaosContractEmployerDetermination {
     private static final int COMSTAR_EMPLOYER_CHANCE = 100;
     private static final int WORD_OF_BLAKE_EMPLOYER_CHANCE = 40;
 
+    /**
+     * Aggregate factions (pirates, the Bandit Caste, rebels, mercenaries) and Commands (whose short name carries a dot)
+     * do not plausibly issue contracts, so the pool-based employer pickers exclude them. Employer types that are
+     * deliberately fielded by such a faction (rebellions, mercenary subcontracts) assign it directly rather than
+     * drawing from the pool, so they are unaffected.
+     */
+    private static final Predicate<Faction> PLAUSIBLE_EMPLOYER =
+          faction -> !faction.isAggregate() && !faction.isSubunit() && !faction.isMercenaryOrganization();
+
     public static @Nullable EmployerData getEmployerGenerationData(LocalDate currentDate, ILocation currentLocation,
           Campaign campaign, ContractSearchType searchType) {
         ChaosEmployerType type = determineEmployerType();
@@ -193,7 +202,13 @@ public class ChaosContractEmployerDetermination {
         }
 
         Faction anchor = resolveAnchorFaction(employerType, currentDate, currentLocation, isMercenarySearch, flavor);
-        return new EmployerFactions(flavor, anchor, null);
+        // A mercenary subcontract is a merc command (the flavor) fighting on behalf of the power that actually hired
+        // them - the anchor - so that power is the sponsor bankrolling the work. Only when the anchor is a real power
+        // distinct from the merc command itself.
+        Faction sponsor = (employerType == ChaosEmployerType.MERCENARY_SUBCONTRACT) && !anchor.equals(flavor)
+                                ? anchor
+                                : null;
+        return new EmployerFactions(flavor, anchor, sponsor);
     }
 
     /**
@@ -250,9 +265,10 @@ public class ChaosContractEmployerDetermination {
           boolean isMercenarySearch, @Nullable Faction fallback) {
         RandomFactionGenerator generator = RandomFactionGenerator.getInstance();
         Faction owner = generator.getRandomEmployerFaction(currentLocation, currentDate, isMercenarySearch,
-              Faction::isGovernment);
+              PLAUSIBLE_EMPLOYER.and(Faction::isGovernment));
         if (owner == null) {
-            owner = generator.getRandomEmployerFaction(currentLocation, currentDate, isMercenarySearch);
+            owner = generator.getRandomEmployerFaction(currentLocation, currentDate, isMercenarySearch,
+                  PLAUSIBLE_EMPLOYER);
         }
         return owner != null ? owner : fallback;
     }
@@ -263,8 +279,10 @@ public class ChaosContractEmployerDetermination {
      */
     private static @Nullable Faction pickThemedFaction(LocalDate currentDate, ILocation currentLocation,
           boolean isMercenarySearch, Predicate<Faction> predicate) {
+        final Predicate<Faction> employerPredicate = predicate.and(PLAUSIBLE_EMPLOYER);
         Faction regional = RandomFactionGenerator.getInstance()
-                                 .getRandomEmployerFaction(currentLocation, currentDate, isMercenarySearch, predicate);
+                                 .getRandomEmployerFaction(currentLocation, currentDate, isMercenarySearch,
+                                       employerPredicate);
         if (regional != null) {
             return regional;
         }
@@ -272,7 +290,7 @@ public class ChaosContractEmployerDetermination {
         List<Faction> candidates = Factions.getInstance()
                                          .getActiveFactions(currentDate)
                                          .stream()
-                                         .filter(predicate)
+                                         .filter(employerPredicate)
                                          .toList();
         if (candidates.isEmpty()) {
             return null;
@@ -300,7 +318,9 @@ public class ChaosContractEmployerDetermination {
         Collections.shuffle(residentFactions);
         for (String residentFaction : residentFactions) {
             Faction employer = factionsInstance.getFaction(residentFaction);
-            if (employer != null) {
+            // Skip pirate-, rebel-, or command-held worlds; they do not issue contracts. Falls through to the regional
+            // pool (also filtered) when the current system has no plausible employer.
+            if (employer != null && PLAUSIBLE_EMPLOYER.test(employer)) {
                 return employer;
             }
         }

@@ -77,6 +77,7 @@ import mekhq.Utilities;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.againstTheBot.AtBConfiguration;
 import mekhq.campaign.againstTheBot.AtBStaticWeightGenerator;
+import mekhq.campaign.campaignOptions.CampaignOption;
 import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.digitalGM.stratCon.StratConCampaignState;
 import mekhq.campaign.digitalGM.stratCon.StratConScenario;
@@ -348,7 +349,7 @@ public abstract class AtBScenario extends Scenario implements IAtBScenario {
         setTerrain();
         CampaignOptions campaignOptions = campaign.getCampaignOptions();
         AbstractContract contract = campaign.getContract(getMissionId());
-        if (campaignOptions.isUsePlanetaryConditions() && null != contract) {
+        if (campaignOptions.get(CampaignOption.USE_PLANETARY_CONDITIONS) && null != contract) {
             setPlanetaryConditions(contract.getTargetPlanet(), campaign.getLocalDate());
         }
         if (campaignOptions.isUseLightConditions()) {

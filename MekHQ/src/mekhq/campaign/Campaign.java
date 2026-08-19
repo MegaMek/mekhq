@@ -7708,7 +7708,7 @@ public class Campaign implements ITechManager {
 
         // With OverageRepaymentInFinalPayment enabled, salvage the player kept beyond their rights is repaid as part of
         // the final payment, which can push it into a debit (the negative branch below).
-        if (getCampaignOptions().isOverageRepaymentInFinalPayment()) {
+        if (getCampaignOptions().get(CampaignOption.OVERAGE_REPAYMENT_IN_FINAL_PAYMENT)) {
             remainingMoney = remainingMoney.minus(ContractSettlement.salvageOverage(mission));
         }
 

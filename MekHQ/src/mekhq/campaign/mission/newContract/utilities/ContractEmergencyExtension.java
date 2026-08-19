@@ -57,8 +57,10 @@ public class ContractEmergencyExtension {
         Factions factions = Factions.getInstance();
         // We use anchor faction to allow for the breadth of faction political interactions
         Faction employerFaction = factions.getFaction(contract.getEmployerData().anchorFactionCode());
-        Faction sponsorFaction = contract.getEmployerData().getSponsorFaction();
-        Faction enemyFaction = sponsorFaction == null ? contract.getEnemyFaction() : sponsorFaction;
+        // An enemy fielded by a covert sponsor fights that sponsor's war, so check against the sponsor when there is
+        // one; otherwise against the enemy itself.
+        Faction enemySponsor = contract.getEnemySponsorFaction();
+        Faction enemyFaction = enemySponsor == null ? contract.getEnemyFaction() : enemySponsor;
         LocalDate localDate = campaign.getLocalDate();
         final String warName = RandomFactionGenerator.getInstance()
                                      .getFactionHints()

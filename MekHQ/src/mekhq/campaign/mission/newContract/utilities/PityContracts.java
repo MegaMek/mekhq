@@ -118,7 +118,7 @@ public class PityContracts {
      * @since 0.51.0
      */
     private static ContractSearchType pityBucket(Campaign campaign) {
-        Faction faction = campaign.getFaction();
+        Faction faction = campaign.getPlayerForce().getFaction();
         if (faction.isPirate()) {
             return ContractSearchType.PIRATE;
         }

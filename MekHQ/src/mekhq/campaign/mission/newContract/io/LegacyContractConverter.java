@@ -229,7 +229,7 @@ public final class LegacyContractConverter {
         }
 
         // Fill placeholders for values that must never be null in the new model.
-        employerCode = codeOrPlaceholder(employerCode, campaign.getFaction().getShortName());
+        employerCode = codeOrPlaceholder(employerCode, campaign.getPlayerForce().getFaction().getShortName());
         enemyCode = codeOrPlaceholder(enemyCode, PIRATE_FACTION_CODE);
         employerName = nameOrPlaceholder(employerName, employerCode, year);
         enemyName = nameOrPlaceholder(enemyName, enemyCode, year);

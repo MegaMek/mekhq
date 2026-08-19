@@ -207,7 +207,7 @@ public record SalvageFormationData(Formation formation, FormationType formationT
             }
 
             String unitName = unit.getName();
-            double weight = isTow ? entity.getWeight() : unit.getCargoCapacity();
+            double weight = isTow ? entity.getWeight() : unit.getCargoCapacityForSalvage();
             capacityMap.put(unitName, weight);
         }
         return capacityMap;

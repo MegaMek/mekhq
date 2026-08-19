@@ -620,7 +620,7 @@ public class Finances {
      * @param shares   total value of the shares to pay out
      */
     public void payOutSharesToPersonnel(Campaign campaign, Money shares) {
-        boolean sharesForAll = campaign.getCampaignOptions().isSharesForAll();
+        boolean sharesForAll = campaign.getCampaignOptions().get(CampaignOption.SHARES_FOR_ALL);
         List<Person> shareholders = campaign.getPlayerForce().getHumanResources().getActivePersonnel(false, true);
 
         int numberOfShares = shareholders.stream()
@@ -643,7 +643,8 @@ public class Finances {
      * @param profits  The profits made by the campaign.
      */
     private void payTaxes(Campaign campaign, Money profits) {
-        Money taxAmount = profits.multipliedBy((double) campaign.getCampaignOptions().getTaxesPercentage() / 100)
+        Money taxAmount = profits.multipliedBy((double) campaign.getCampaignOptions()
+                                                              .get(CampaignOption.TAXES_PERCENTAGE) / 100)
                                 .round();
 
         debit(TransactionType.TAXES, campaign.getLocalDate(), taxAmount, resourceMap.getString("Taxes.finances"));

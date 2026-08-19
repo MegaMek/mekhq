@@ -36,6 +36,7 @@ import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
 
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
+import mekhq.campaign.campaignOptions.CampaignOption;
 import mekhq.campaign.digitalGM.stratCon.StratConContractDefinition;
 import mekhq.campaign.digitalGM.stratCon.StratConContractInitializer;
 import mekhq.campaign.enums.DailyReportType;
@@ -127,7 +128,7 @@ public final class ContractAcceptance {
         // Announce the fully-initialized contract so listeners (e.g. the StratCon tab) pick it up.
         MekHQ.triggerEvent(new MissionChangedEvent(contract));
 
-        if (campaign.getCampaignOptions().isTrackFactionStanding()) {
+        if (campaign.getCampaignOptions().get(CampaignOption.TRACK_FACTION_STANDING)) {
             new FactionStandingGreeting(campaign, contract);
         }
 

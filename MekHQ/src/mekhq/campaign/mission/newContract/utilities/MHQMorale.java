@@ -63,6 +63,7 @@ import megamek.common.annotations.Nullable;
 import megamek.common.rolls.TargetRoll;
 import megamek.logging.MMLogger;
 import mekhq.campaign.Campaign;
+import mekhq.campaign.campaignOptions.CampaignOption;
 import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.digitalGM.stratCon.StratConCampaignState;
 import mekhq.campaign.digitalGM.stratCon.StratConContractDefinition;
@@ -702,7 +703,8 @@ public class MHQMorale {
 
         CampaignOptions campaignOptions = campaign.getCampaignOptions();
         String moraleReport = MHQMorale.performMoraleCheck(today, contract,
-              campaignOptions.getMoraleDecisiveVictoryEffect(), campaignOptions.getMoraleVictoryEffect(),
+              campaignOptions.get(CampaignOption.MORALE_DECISIVE_VICTORY_EFFECT),
+              campaignOptions.get(CampaignOption.MORALE_VICTORY_EFFECT),
               campaignOptions.getMoraleDecisiveDefeatEffect(), campaignOptions.getMoraleDefeatEffect());
         String flavorText = MHQMorale.getFormattedTitle()
                                   + "<h2 style='text-align:center;'>" + contract.getName() + "</h2>"
@@ -737,7 +739,7 @@ public class MHQMorale {
         // Update the Batchall information
         Faction newEnemyFaction = contract.getEnemyFaction();
         if (campaign.getCampaignOptions().isUseGenericBattleValue() && newEnemyFaction.performsBatchalls()) {
-            boolean tracksStanding = campaign.getCampaignOptions().isTrackFactionStanding();
+            boolean tracksStanding = campaign.getCampaignOptions().get(CampaignOption.TRACK_FACTION_STANDING);
             FactionStandings factionStandings = campaign.getPlayerForce().getFactionStandings();
 
             boolean acceptedBatchall = true;
