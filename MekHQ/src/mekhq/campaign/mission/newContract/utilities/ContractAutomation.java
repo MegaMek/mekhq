@@ -35,7 +35,6 @@ package mekhq.campaign.mission.newContract.utilities;
 import static mekhq.campaign.enums.DailyReportType.GENERAL;
 import static mekhq.campaign.enums.DailyReportType.TECHNICAL;
 import static mekhq.campaign.personnel.skills.SkillType.EXP_REGULAR;
-import static mekhq.campaign.universe.Faction.PIRATE_FACTION_CODE;
 import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
 import static mekhq.utilities.MHQInternationalization.getTextAt;
 
@@ -50,7 +49,6 @@ import mekhq.MekHQ;
 import mekhq.campaign.AbstractLocation;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.JumpPath;
-import mekhq.campaign.campaignOptions.CampaignOption;
 import mekhq.campaign.events.units.UnitChangedEvent;
 import mekhq.campaign.finances.Money;
 import mekhq.campaign.force.Detachment;
@@ -77,126 +75,6 @@ public class ContractAutomation {
     private static final MMLogger logger = MMLogger.create(ContractAutomation.class);
 
     private static final int DIALOG_CONFIRM_OPTION = 0;
-
-    /**
-     * Main function to initiate a sequence of automated tasks when a contract is started. The tasks include prompt and
-     * execution for unit mothballing, calculating and starting the journey to the target system.
-     *
-     * @param campaign The current campaign.
-     * @param contract Selected contract.
-     */
-    public static void contractStartPrompt(Campaign campaign, AbstractContract contract) {
-        // If we're already in the right system, there is no need to automate these actions
-        if (Objects.equals(campaign.getPlayerForce().getForceDetachment().getCurrentLocation().getCurrentSystem(),
-              contract.getTargetSystem())) {
-            return;
-        }
-
-        // Initial setup
-        final String commanderAddress = campaign.getCommanderAddress();
-        final List<String> buttonLabels = List.of(getTextAt(RESOURCE_BUNDLE, "generalConfirm.text"),
-              getTextAt(RESOURCE_BUNDLE, "generalDecline.text"));
-        final Person speaker = campaign.getPlayerForce().getHumanResources()
-                                     .getSeniorAdminPerson(mekhq.campaign.Campaign.AdministratorSpecialization.TRANSPORT,
-                                           campaign.getCampaignOptions(),
-                                           campaign.getPlayerForce().isClanForce(),
-                                           campaign.getLocalDate());
-
-        // Mothballing
-        String inCharacterMessage = getFormattedTextAt(RESOURCE_BUNDLE, "mothballDescription.text", commanderAddress);
-        String employerCode = contract.getEmployerFactionCode();
-        if (employerCode.equals(PIRATE_FACTION_CODE)) {
-            inCharacterMessage = getFormattedTextAt(RESOURCE_BUNDLE, "mothballDescription.text.PIR",
-                  commanderAddress);
-        }
-
-        String outOfCharacterMessage = getFormattedTextAt(RESOURCE_BUNDLE, "mothballDescription.addendum");
-
-        ImmersiveDialogSimple mothballDialog = new ImmersiveDialogSimple(campaign,
-              speaker,
-              null,
-              inCharacterMessage,
-              buttonLabels,
-              outOfCharacterMessage,
-              null,
-              false);
-
-        if (mothballDialog.getDialogChoice() == DIALOG_CONFIRM_OPTION) {
-            List<UUID> automatedMothballUnits = performAutomatedMothballing(campaign);
-            campaign.getPlayerForce().setAutomatedMothballUnits(automatedMothballUnits);
-        }
-
-        // Transit
-        // Hyperlinked so the player can jump straight to the destination on the interstellar map.
-        PlanetarySystem targetPlanetarySystem = contract.getTargetSystem();
-        String targetSystem = (targetPlanetarySystem == null) ?
-                                    contract.getTargetSystemName(campaign.getLocalDate()) :
-                                    targetPlanetarySystem.getHyperlinkedName(campaign.getLocalDate());
-        AbstractLocation currentLocation = campaign.getPlayerForce().getForceDetachment().getCurrentLocation();
-        JumpPath jumpPath = ContractUtilities.getJumpPath(campaign,
-              contract,
-              currentLocation);
-
-        if (jumpPath == null) {
-            return;
-        }
-
-        PlayerForce playerForce = campaign.getPlayerForce();
-        jumpPath.setTargetPlanet(contract.getTargetPlanet());
-        int travelDays = ContractUtilities.getTravelDays(campaign, contract, currentLocation,
-              playerForce.isOverridingCommandCircuitRequirements(),
-              playerForce.getFactionStandings());
-
-        Detachment detachment = playerForce.getForceDetachment();
-        boolean isUseTwoWayPay = campaign.getCampaignOptions().get(CampaignOption.IS_USE_TWO_WAY_PAY);
-        TransportCostCalculations costCalculations = new TransportCostCalculations(detachment.getHangar().getUnits(),
-              playerForce.getWarehouse().getSpareParts(),
-              detachment.getPersonnel().values(),
-              EXP_REGULAR);
-
-        Money cost = costCalculations.calculateJumpCostForEntireJourney(travelDays, jumpPath.getJumps());
-        inCharacterMessage = getFormattedTextAt(RESOURCE_BUNDLE,
-              "transitDescription.text",
-              targetSystem,
-              travelDays,
-              cost.toAmountString());
-
-        ImmersiveDialogSimple transitDialog = new ImmersiveDialogSimple(campaign,
-              speaker,
-              null,
-              inCharacterMessage,
-              buttonLabels,
-              null,
-              null,
-              false);
-
-        if (transitDialog.getDialogChoice() == DIALOG_CONFIRM_OPTION) {
-            if (!JumpBlockers.areAllUnitsJumpCapable(campaign)) {
-                return;
-            }
-
-            campaign.getPlayerForce().getForceDetachment().getCurrentLocation().setJumpPath(jumpPath);
-            campaign.getUnits().forEach(unit -> unit.setSite(Unit.SITE_FACILITY_BASIC));
-            campaign.getGUI().refreshAllTabs();
-            boolean useTwoWayPay = campaign.getCampaignOptions().get(CampaignOption.IS_USE_TWO_WAY_PAY);
-
-            // This will return an empty string if the transaction was successful
-            String jumpReport = TransportCostCalculations.performJumpTransaction(campaign.getPlayerForce()
-                                                                                       .getFinances(), jumpPath,
-                  campaign.getLocalDate(),
-                  cost,
-                  campaign.getCurrentSystem());
-
-            if (jumpReport.isBlank()) {
-                campaign.addReport(GENERAL, getFormattedTextAt(RESOURCE_BUNDLE,
-                      "transitDescription.report",
-                      targetSystem,
-                      travelDays));
-            } else {
-                campaign.addReport(GENERAL, jumpReport);
-            }
-        }
-    }
 
     /**
      * Non-interactive counterpart to {@link #contractStartPrompt(Campaign, AbstractContract)}: runs the contract-start

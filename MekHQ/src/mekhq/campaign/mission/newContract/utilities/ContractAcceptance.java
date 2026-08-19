@@ -36,7 +36,6 @@ import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
 
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
-import mekhq.campaign.campaignOptions.CampaignOption;
 import mekhq.campaign.digitalGM.stratCon.StratConContractDefinition;
 import mekhq.campaign.digitalGM.stratCon.StratConContractInitializer;
 import mekhq.campaign.enums.DailyReportType;
@@ -47,7 +46,6 @@ import mekhq.campaign.mission.enums.MissionStatus;
 import mekhq.campaign.mission.newContract.AbstractContract;
 import mekhq.campaign.mission.newContract.contractGeneration.ContractSearchType;
 import mekhq.gui.baseComponents.immersiveDialogs.ImmersiveDialogConfirmation;
-import mekhq.gui.dialog.factionStanding.events.FactionStandingGreeting;
 
 /**
  * Commits a {@link AbstractContract} offer from the market into an active campaign mission.
@@ -127,10 +125,6 @@ public final class ContractAcceptance {
 
         // Announce the fully-initialized contract so listeners (e.g. the StratCon tab) pick it up.
         MekHQ.triggerEvent(new MissionChangedEvent(contract));
-
-        if (campaign.getCampaignOptions().get(CampaignOption.TRACK_FACTION_STANDING)) {
-            new FactionStandingGreeting(campaign, contract);
-        }
 
         return true;
     }
