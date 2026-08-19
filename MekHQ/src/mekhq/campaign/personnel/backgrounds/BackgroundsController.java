@@ -122,7 +122,7 @@ public class BackgroundsController {
      * @throws IllegalStateException if an unexpected value is encountered in the switch statement.
      */
     private static String getCorporateNameBody() {
-        int roll = Compute.randomInt(3);
+        int roll = Compute.randomInt(2);
 
         return switch (roll) {
             // Single word
@@ -134,8 +134,6 @@ public class BackgroundsController {
 
                 yield name + newWordSuggestion;
             }
-            // Pre-Fab
-            case 2 -> getWeightedPreFab().randomItem();
             default -> throw new IllegalStateException(
                   "Unexpected value in mekhq/campaign/personnel/backgrounds/BackgroundsController.java/getCorporateNameBody: "
                         + roll
