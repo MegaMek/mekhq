@@ -623,6 +623,11 @@ public class ChaosContractMarketDialog extends JDialog implements ContractMarket
 
         JPanel actionRow = new JPanel(new FlowLayout(FlowLayout.CENTER, PADDING, PADDING));
 
+        RoundedJButton instructions = new RoundedJButton(getTextAt(RESOURCE_BUNDLE,
+              "button.contractMarket.instructions"));
+        instructions.addActionListener(e -> showInstructions());
+        actionRow.add(instructions);
+
         RoundedJButton close = new RoundedJButton(getTextAt(RESOURCE_BUNDLE, "button.contractMarket.close"));
         close.addActionListener(e -> dispose());
         actionRow.add(close);
@@ -648,6 +653,18 @@ public class ChaosContractMarketDialog extends JDialog implements ContractMarket
         bar.add(optionRow, BorderLayout.NORTH);
         bar.add(actionRow, BorderLayout.SOUTH);
         return bar;
+    }
+
+    /** Opens a modal, scrollable overview of the contract market board and what its controls do. */
+    private void showInstructions() {
+        JEditorPane pane = new JEditorPane("text/html",
+              getTextAt(RESOURCE_BUNDLE, "instructions.contractMarket.board.body"));
+        pane.setEditable(false);
+        pane.setCaretPosition(0);
+        JScrollPane scroll = new JScrollPane(pane);
+        scroll.setPreferredSize(new Dimension(scaleForGUI(580), scaleForGUI(520)));
+        JOptionPane.showMessageDialog(this, scroll,
+              getTextAt(RESOURCE_BUNDLE, "instructions.contractMarket.board.title"), JOptionPane.INFORMATION_MESSAGE);
     }
 
     /**
