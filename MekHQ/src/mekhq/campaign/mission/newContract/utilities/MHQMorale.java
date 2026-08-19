@@ -713,8 +713,10 @@ public class MHQMorale {
         String flavorText = MHQMorale.getFormattedTitle()
                                   + "<h2 style='text-align:center;'>" + contract.getName() + "</h2>"
                                   + MoraleBar.getMoraleDisplay(contract).tooltip();
-        new ImmersiveDialogNotification(campaign, flavorText, moraleReport, MoraleBar.createDialogPanel(contract),
-              true);
+        if (showDialog) {
+            new ImmersiveDialogNotification(campaign, flavorText, moraleReport, MoraleBar.createDialogPanel(contract),
+                  true);
+        }
 
         MHQMorale.routedMoraleUpdate(campaign, contract);
     }
