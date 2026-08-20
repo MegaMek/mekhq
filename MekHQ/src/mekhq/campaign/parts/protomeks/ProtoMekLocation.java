@@ -63,6 +63,7 @@ import mekhq.utilities.MHQXMLUtility;
 import mekhq.utilities.ReportingUtilities;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
+import mekhq.campaign.campaignOptions.CampaignOption;
 
 /**
  * @author Jay Lawson (jaylawson39 at yahoo.com)
@@ -616,7 +617,7 @@ public class ProtoMekLocation extends Part {
         if (isUnitTonnageMatters()) {
             toReturn.append(" (").append(getUnitTonnage()).append(" ton)");
         }
-        if (!getCampaign().getCampaignOptions().isDestroyByMargin()) {
+        if (!getCampaign().getCampaignOptions().get(CampaignOption.DESTROY_BY_MARGIN)) {
             toReturn.append(" - ")
                   .append(ReportingUtilities.messageSurroundedBySpanWithColor(SkillType.getExperienceLevelColor(
                         getSkillMin()), SkillType.getExperienceLevelName(getSkillMin()) + "+"));

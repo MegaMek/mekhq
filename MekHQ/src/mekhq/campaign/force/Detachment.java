@@ -47,6 +47,7 @@ import mekhq.campaign.LocalHangar;
 import mekhq.campaign.LocalPersonnel;
 import mekhq.campaign.LocalWarehouse;
 import mekhq.campaign.campaignOptions.CampaignOptions;
+import mekhq.campaign.campaignOptions.CampaignOption;
 import mekhq.campaign.location.ILocation;
 import mekhq.campaign.location.IPlace;
 import mekhq.campaign.location.LocationNode;
@@ -141,7 +142,7 @@ public class Detachment implements IPlace {
         }
 
         CampaignOptions campaignOptions = campaign.getCampaignOptions();
-        if (campaignOptions.isUseRandomDiseases() && campaignOptions.isUseAlternativeAdvancedMedical()) {
+        if (campaignOptions.get(CampaignOption.USE_RANDOM_DISEASES) && campaignOptions.get(CampaignOption.USE_ALTERNATIVE_ADVANCED_MEDICAL)) {
             if (getParentLocation() instanceof AbstractLocation loc) {
                 loc.checkForDiseaseOrBioweaponOutbreaks(campaign, campaign.getLocalDate());
             }

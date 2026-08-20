@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2025 The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2025-2026 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -62,6 +62,7 @@ import java.util.List;
 import megamek.codeUtilities.ObjectUtility;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.campaignOptions.CampaignOptions;
+import mekhq.campaign.campaignOptions.CampaignOption;
 import mekhq.campaign.personnel.Injury;
 import mekhq.campaign.personnel.InjuryType;
 import mekhq.campaign.personnel.Person;
@@ -170,8 +171,8 @@ public class AdvancedMedicalAlternateImplants {
         }
 
         CampaignOptions campaignOptions = campaign.getCampaignOptions();
-        boolean useFatigue = campaignOptions.isUseFatigue();
-        boolean useAbilities = campaignOptions.isUseAbilities();
+        boolean useFatigue = campaignOptions.get(CampaignOption.USE_FATIGUE);
+        boolean useAbilities = campaignOptions.get(CampaignOption.USE_ABILITIES);
 
         if (!useFatigue && !useAbilities) { // We have nothing to process
             return;
@@ -389,13 +390,13 @@ public class AdvancedMedicalAlternateImplants {
         Injury injury = ENHANCED_IMAGING_IMPLANT.newInjury(campaign, person, BRAIN, 0);
         person.addInjury(injury);
 
-        if (campaign.getCampaignOptions().isUseImplants()) {
+        if (campaign.getCampaignOptions().get(CampaignOption.USE_IMPLANTS)) {
             for (String implant : ENHANCED_IMAGING.getAssociatedPilotOptions()) {
                 person.getOptions().acquireAbility(LVL3_ADVANTAGES, implant, true);
             }
         }
 
-        if (campaign.getCampaignOptions().isUseAbilities()) {
+        if (campaign.getCampaignOptions().get(CampaignOption.USE_ABILITIES)) {
             for (String option : ENHANCED_IMAGING.getAssociatedPersonnelOptions()) {
                 person.getOptions().acquireAbility(LVL3_ADVANTAGES, option, true);
             }

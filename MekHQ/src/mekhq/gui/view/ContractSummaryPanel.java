@@ -66,6 +66,7 @@ import mekhq.campaign.universe.Faction;
 import mekhq.campaign.universe.Systems;
 import mekhq.campaign.universe.factionStanding.FactionStandingUtilities;
 import mekhq.gui.CampaignGUI;
+import mekhq.campaign.campaignOptions.CampaignOption;
 
 /**
  * Contract summary view for ContractMarketDialog
@@ -108,7 +109,7 @@ public class ContractSummaryPanel extends JPanel {
         this.contract = contract;
         this.campaign = campaign;
         this.allowRerolls = allowRerolls;
-        ContractMarketMethod method = campaign.getCampaignOptions().getContractMarketMethod();
+        ContractMarketMethod method = campaign.getCampaignOptions().get(CampaignOption.CONTRACT_MARKET_METHOD);
         if (allowRerolls) {
             if (method == ContractMarketMethod.CAM_OPS) {
                 cmdRerolls = 1;
@@ -118,21 +119,21 @@ public class ContractSummaryPanel extends JPanel {
                 commandNegotiator = campaign.getPlayerForce().getHumanResources()
                                           .getSeniorAdminPerson(Campaign.AdministratorSpecialization.COMMAND,
                                                 campaign.getCampaignOptions(),
-                                                campaign.isClanCampaign(),
+                                                campaign.getPlayerForce().isClanForce(),
                                                 campaign.getLocalDate());
                 cmdRerolls = (commandNegotiator == null ||
                                     commandNegotiator.getSkill(SkillType.S_NEGOTIATION) == null) ? 0 : 1;
                 logisticsNegotiator = campaign.getPlayerForce().getHumanResources()
                                             .getSeniorAdminPerson(Campaign.AdministratorSpecialization.LOGISTICS,
                                                   campaign.getCampaignOptions(),
-                                                  campaign.isClanCampaign(),
+                                                  campaign.getPlayerForce().isClanForce(),
                                                   campaign.getLocalDate());
                 logRerolls = (logisticsNegotiator == null ||
                                     logisticsNegotiator.getSkill(SkillType.S_NEGOTIATION) == null) ? 0 : 1;
                 transportNegotiator = campaign.getPlayerForce().getHumanResources()
                                             .getSeniorAdminPerson(Campaign.AdministratorSpecialization.TRANSPORT,
                                                   campaign.getCampaignOptions(),
-                                                  campaign.isClanCampaign(),
+                                                  campaign.getPlayerForce().isClanForce(),
                                                   campaign.getLocalDate());
                 tranRerolls = (transportNegotiator == null ||
                                      transportNegotiator.getSkill(SkillType.S_NEGOTIATION) == null) ? 0 : 1;
@@ -209,7 +210,7 @@ public class ContractSummaryPanel extends JPanel {
         gridBagConstraintsText.gridy = y;
         mainPanel.add(txtName, gridBagConstraintsText);
 
-        if (campaign.getCampaignOptions().isUseGenericBattleValue()) {
+        if (campaign.getCampaignOptions().get(CampaignOption.USE_GENERIC_BATTLE_VALUE)) {
             if (contract instanceof AtBContract) {
                 JLabel lblChallenge = new JLabel(resourceMap.getString("lblChallenge.text"));
                 lblChallenge.setToolTipText(wordWrap(resourceMap.getString("lblChallenge.tooltip")));

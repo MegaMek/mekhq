@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2024-2025 The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2024-2026 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -70,7 +70,7 @@ public class SkillAwards {
                 continue;
             }
 
-            if (award.canBeAwarded(campaign.getPerson(person))) {
+            if (award.canBeAwarded(campaign.getPlayerForce().getHumanResources().getPerson(person))) {
                 // this allows the user to specify multiple skills to be checked against,
                 // where all skill levels need to be met.
                 // if the user puts two ',' next to each other (creating an empty skill) the
@@ -315,7 +315,7 @@ public class SkillAwards {
      * @param personId       the person whose Skill Levels are being checked
      */
     private static int getSkillLevel(Campaign campaign, List<String> relevantSkills, UUID personId) {
-        Person person = campaign.getPerson(personId);
+        Person person = campaign.getPlayerForce().getHumanResources().getPerson(personId);
 
         int[] skillLevels = new int[relevantSkills.size()];
 

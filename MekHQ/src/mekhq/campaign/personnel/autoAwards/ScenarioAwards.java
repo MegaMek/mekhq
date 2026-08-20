@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2024-2025 The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2024-2026 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -40,6 +40,7 @@ import java.util.UUID;
 import megamek.logging.MMLogger;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.personnel.Award;
+import mekhq.campaign.campaignOptions.CampaignOption;
 
 public class ScenarioAwards {
     private static final MMLogger LOGGER = MMLogger.create(ScenarioAwards.class);
@@ -54,7 +55,7 @@ public class ScenarioAwards {
      */
     public static Map<Integer, List<Object>> ScenarioAwardsProcessor(Campaign campaign, UUID person,
           List<Award> awards) {
-        int logSize = campaign.getPerson(person).getScenarioLog().size();
+        int logSize = campaign.getPlayerForce().getHumanResources().getPerson(person).getScenarioLog().size();
         int requiredScenarioCount;
 
         List<Award> eligibleAwards = new ArrayList<>();
@@ -62,7 +63,7 @@ public class ScenarioAwards {
         Award bestAward = new Award();
 
         for (Award award : awards) {
-            if (award.canBeAwarded(campaign.getPerson(person))) {
+            if (award.canBeAwarded(campaign.getPlayerForce().getHumanResources().getPerson(person))) {
                 try {
                     requiredScenarioCount = award.getQty();
                 } catch (Exception e) {
@@ -78,7 +79,7 @@ public class ScenarioAwards {
         }
 
         if (!bestEligibleAwards.isEmpty()) {
-            if (campaign.getCampaignOptions().isIssueBestAwardOnly()) {
+            if (campaign.getCampaignOptions().get(CampaignOption.ISSUE_BEST_AWARD_ONLY)) {
                 int rollingQty = 0;
 
                 for (Award award : bestEligibleAwards) {

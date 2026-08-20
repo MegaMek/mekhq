@@ -58,6 +58,7 @@ import mekhq.utilities.MHQXMLUtility;
 import mekhq.utilities.ReportingUtilities;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
+import mekhq.campaign.campaignOptions.CampaignOption;
 
 /**
  * A list of IAcquisitionWork
@@ -218,14 +219,14 @@ public class ForceShoppingList {
             // nothing was found
             // because it is not reported elsewhere
             if ((newWork.getQuantity() == origQuantity) &&
-                      campaign.getCampaignOptions().isUsePlanetaryAcquisition() &&
-                      !campaign.getCampaignOptions().isPlanetAcquisitionVerbose()) {
+                      campaign.getCampaignOptions().get(CampaignOption.USE_PLANETARY_ACQUISITION) &&
+                      !campaign.getCampaignOptions().get(CampaignOption.PLANET_ACQUISITION_VERBOSE)) {
                 campaign.addReport(ACQUISITIONS, "<font color='" +
                                                        ReportingUtilities.getNegativeColor() +
                                                        "'><b>You failed to find " +
                                                        newWork.getAcquisitionName() +
                                                        " within " +
-                                                       campaign.getCampaignOptions().getMaxJumpsPlanetaryAcquisition() +
+                                                       campaign.getCampaignOptions().get(CampaignOption.MAX_JUMPS_PLANETARY_ACQUISITION) +
                                                        " jumps</b></font>");
             }
 

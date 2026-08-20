@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014-2025 The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2014-2026 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -61,6 +61,7 @@ import mekhq.gui.model.UnitTableModel;
 import mekhq.gui.utilities.JMenuHelpers;
 import mekhq.gui.utilities.StaticChecks;
 import mekhq.service.mrms.MRMSService;
+import mekhq.campaign.campaignOptions.CampaignOption;
 
 public class ServicedUnitsTableMouseAdapter extends JPopupMenuAdapter {
 
@@ -107,7 +108,7 @@ public class ServicedUnitsTableMouseAdapter extends JPopupMenuAdapter {
             boolean wasSiteChangeSuccessful = true;
             Campaign campaign = gui.getCampaign();
             if (selected >= Unit.SITE_FACILITY_MAINTENANCE &&
-                      campaign.getCampaignOptions().getRentedFacilitiesCostRepairBays() > 0) {
+                      campaign.getCampaignOptions().get(CampaignOption.RENTED_FACILITIES_COST_REPAIR_BAYS) > 0) {
                 wasSiteChangeSuccessful = FacilityRentals.processBayChangeRequest(campaign, units, selected);
             }
 
@@ -203,7 +204,7 @@ public class ServicedUnitsTableMouseAdapter extends JPopupMenuAdapter {
                     AmmoType curType = ammo.getType();
                     for (AmmoType ammoType : Utilities.getMunitionsFor(unit.getEntity(),
                           curType,
-                          gui.getCampaign().getCampaignOptions().getTechLevel())) {
+                          gui.getCampaign().getCampaignOptions().get(CampaignOption.TECH_LEVEL))) {
                         cbMenuItem = new JCheckBoxMenuItem(ammoType.getDesc());
                         if (ammoType.equals(curType)) {
                             cbMenuItem.setSelected(true);

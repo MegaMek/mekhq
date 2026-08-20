@@ -208,7 +208,7 @@ public class MassMothballDialog extends JDialog implements ActionListener, ListS
                                  .getHumanResources()
                                  .getTechs(campaign.getPlayerForce().getHangar().getUnits(),
                                        campaign.getCampaignOptions(),
-                                       campaign.isClanCampaign(),
+                                       campaign.getPlayerForce().isClanForce(),
                                        campaign.getLocalDate())) {
             if (tech.canTech(unitsByType.get(unitType).getFirst().getEntity())) {
                 listModel.addElement(tech);
@@ -331,7 +331,7 @@ public class MassMothballDialog extends JDialog implements ActionListener, ListS
             // to approximately # units / # techs in mothball/reactivation tasks
             for (Unit unit : unitsByType.get(unitType)) {
                 UUID id = selectedTechs.get(techIndex).getId();
-                Person tech = campaign.getPerson(id);
+                Person tech = campaign.getPlayerForce().getHumanResources().getPerson(id);
                 if (isMothballing) {
                     if (clearDesignationsCheckbox != null && clearDesignationsCheckbox.isSelected()) {
                         unit.clearCrew();

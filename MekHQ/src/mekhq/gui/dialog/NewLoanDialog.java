@@ -62,6 +62,7 @@ import mekhq.campaign.Campaign;
 import mekhq.campaign.finances.Loan;
 import mekhq.campaign.finances.Money;
 import mekhq.campaign.finances.enums.FinancialTerm;
+import mekhq.campaign.campaignOptions.CampaignOption;
 
 /**
  * @author Taharqa
@@ -114,7 +115,7 @@ public class NewLoanDialog extends JDialog implements ActionListener, ChangeList
 
         rating = campaign.getAtBUnitRatingMod();
         loan = Loan.getBaseLoan(rating,
-              this.campaign.getCampaignOptions().isSimulateGrayMonday(),
+              this.campaign.getCampaignOptions().get(CampaignOption.SIMULATE_GRAY_MONDAY),
               this.campaign.getLocalDate());
         maxCollateralValue = this.campaign.getPlayerForce().getFinances().getMaxCollateral(this.campaign);
         initComponents();
@@ -146,7 +147,7 @@ public class NewLoanDialog extends JDialog implements ActionListener, ChangeList
         panMain.setLayout(new GridBagLayout());
         panBtn.setLayout(new GridLayout(0, 2));
 
-        if (isGrayMonday(campaign.getLocalDate(), campaign.getCampaignOptions().isSimulateGrayMonday())) {
+        if (isGrayMonday(campaign.getLocalDate(), campaign.getCampaignOptions().get(CampaignOption.SIMULATE_GRAY_MONDAY))) {
             txtName = new JTextField(resourceMap.getString("lblName.grayMonday"));
         } else {
             txtName = new JTextField(loan.getInstitution());
@@ -590,9 +591,9 @@ public class NewLoanDialog extends JDialog implements ActionListener, ChangeList
 
     private void setSliders() {
         boolean isGrayMonday = isGrayMonday(campaign.getLocalDate(),
-              campaign.getCampaignOptions().isSimulateGrayMonday());
+              campaign.getCampaignOptions().get(CampaignOption.SIMULATE_GRAY_MONDAY));
 
-        if (campaign.getCampaignOptions().isUseLoanLimits()) {
+        if (campaign.getCampaignOptions().get(CampaignOption.USE_LOAN_LIMITS)) {
             int[] interest = Loan.getInterestBracket(rating);
             sldInterest = new JSlider(interest[0], interest[2], loan.getRate());
             sldInterest.setEnabled(!isGrayMonday);
@@ -648,7 +649,7 @@ public class NewLoanDialog extends JDialog implements ActionListener, ChangeList
 
     @Override
     public void stateChanged(ChangeEvent e) {
-        if (campaign.getCampaignOptions().isUseLoanLimits()) {
+        if (campaign.getCampaignOptions().get(CampaignOption.USE_LOAN_LIMITS)) {
             if (Objects.equals(e.getSource(), sldInterest)) {
                 sldCollateral.removeChangeListener(this);
                 sldCollateral.setValue(Loan.recalculateCollateralFromInterest(rating, sldInterest.getValue()));

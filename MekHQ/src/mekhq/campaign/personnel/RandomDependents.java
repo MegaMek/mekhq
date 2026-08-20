@@ -49,6 +49,7 @@ import java.util.List;
 import megamek.common.compute.Compute;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.campaignOptions.CampaignOptions;
+import mekhq.campaign.campaignOptions.CampaignOption;
 import mekhq.campaign.personnel.familyTree.Genealogy;
 
 /**
@@ -84,8 +85,8 @@ public class RandomDependents {
         this.campaign = campaign;
 
         CampaignOptions campaignOptions = campaign.getCampaignOptions();
-        this.isUseRandomDependentAddition = campaignOptions.isUseRandomDependentAddition();
-        this.isUseRandomDependentRemoval = campaignOptions.isUseRandomDependentRemoval();
+        this.isUseRandomDependentAddition = campaignOptions.get(CampaignOption.USE_RANDOM_DEPENDENT_ADDITION);
+        this.isUseRandomDependentRemoval = campaignOptions.get(CampaignOption.USE_RANDOM_DEPENDENT_REMOVAL);
         currentDay = campaign.getLocalDate();
 
         // Prepare the data
@@ -266,7 +267,7 @@ public class RandomDependents {
                                                    .getHumanResources()
                                                    .newDependent(campaign, megamek.common.enums.Gender.RANDOMIZE);
 
-                    campaign.recruitPerson(dependent, FREE, true, false, false);
+                    campaign.getPlayerForce().getHumanResources().recruitPerson(campaign, dependent, FREE, true, false, false);
 
                     campaign.addReport(PERSONNEL, getFormattedTextAt(RESOURCE_BUNDLE, "dependentJoinsForce.report",
                           dependent.getFullName(),

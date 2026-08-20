@@ -50,6 +50,7 @@ import mekhq.campaign.universe.Factions;
 import mekhq.campaign.universe.factionHints.FactionHints;
 import mekhq.campaign.universe.factionStanding.FactionStandingUtilities;
 import mekhq.campaign.universe.factionStanding.FactionStandings;
+import mekhq.campaign.campaignOptions.CampaignOption;
 
 /**
  * Implements the personnel market logic using the Campaign Operations Revised ruleset.
@@ -112,8 +113,8 @@ public class PersonnelMarketCamOpsRevised extends NewPersonnelMarket {
         Set<Faction> systemFactions = getCurrentSystem().getFactionSet(getToday());
         ArrayList<Faction> interestedFactions = new ArrayList<>();
 
-        if (getCampaign().isClanCampaign()) {
-            interestedFactions.add(getCampaign().getFaction());
+        if (getCampaign().getPlayerForce().isClanForce()) {
+            interestedFactions.add(getCampaign().getPlayerForce().getFaction());
             return interestedFactions;
         }
 
@@ -169,7 +170,7 @@ public class PersonnelMarketCamOpsRevised extends NewPersonnelMarket {
     @Override
     public void generateApplicants() {
         calculateNumberOfRecruitmentRolls();
-        Map<PersonnelRole, PersonnelMarketEntry> unorderedMarketEntries = getCampaign().isClanCampaign() ?
+        Map<PersonnelRole, PersonnelMarketEntry> unorderedMarketEntries = getCampaign().getPlayerForce().isClanForce() ?
                                                                                 getClanMarketEntries() :
                                                                                 getInnerSphereMarketEntries();
         unorderedMarketEntries = sanitizeMarketEntries(unorderedMarketEntries);
@@ -194,7 +195,7 @@ public class PersonnelMarketCamOpsRevised extends NewPersonnelMarket {
     private void calculateNumberOfRecruitmentRolls() {
         int rolls = getToday().getMonth().length(getToday().isLeapYear());
 
-        if (getCampaign().getCampaignOptions().isAllowMonthlyConnections()) {
+        if (getCampaign().getCampaignOptions().get(CampaignOption.ALLOW_MONTHLY_CONNECTIONS)) {
             int additionalRecruits = performConnectionsRecruitsCheck();
             rolls += additionalRecruits;
         }

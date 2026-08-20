@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2022-2025 The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2022-2026 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -108,7 +108,7 @@ class BattleMekFactionGenerationMethodTest {
 
         final Faction mockCampaignFaction = mock(Faction.class);
         final Campaign mockCampaign = mockCampaign();
-        when(mockCampaign.getFaction()).thenReturn(mockCampaignFaction);
+        when(mockCampaign.getPlayerForce().getFaction()).thenReturn(mockCampaignFaction);
 
         final Faction mockSpecifiedFaction = mock(Faction.class);
 

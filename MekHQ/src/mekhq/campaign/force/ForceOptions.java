@@ -33,6 +33,7 @@
 package mekhq.campaign.force;
 
 import mekhq.campaign.campaignOptions.CampaignOptions;
+import mekhq.campaign.campaignOptions.CampaignOption;
 import mekhq.campaign.universe.Faction;
 
 /**
@@ -79,7 +80,7 @@ public class ForceOptions {
     // region CampaignOptions pass-throughs
 
     public boolean isFactionIntroDate() {
-        return campaignOptions.isFactionIntroDate();
+        return campaignOptions.get(CampaignOption.FACTION_INTRO_DATE);
     }
 
     // endregion CampaignOptions pass-throughs

@@ -72,6 +72,7 @@ import mekhq.campaign.personnel.skills.Skill;
 import mekhq.campaign.personnel.skills.SkillType;
 import mekhq.gui.baseComponents.roundedComponents.RoundedJButton;
 import mekhq.gui.baseComponents.roundedComponents.RoundedLineBorder;
+import mekhq.campaign.campaignOptions.CampaignOption;
 
 public class AdvancedScoutingCampaignOptionsChangedConfirmationDialog extends JDialog {
     private static final MMLogger LOGGER = MMLogger.create(AdvancedScoutingCampaignOptionsChangedConfirmationDialog.class);
@@ -198,7 +199,7 @@ public class AdvancedScoutingCampaignOptionsChangedConfirmationDialog extends JD
 
     public static void processFreeSkills(Campaign campaign, boolean isSilent) {
         List<Person> personnel = campaign.getPlayerForce().getHumanResources().getPersonnelFilteringOutDeparted();
-        boolean logSkillGain = campaign.getCampaignOptions().isPersonnelLogSkillGain();
+        boolean logSkillGain = campaign.getCampaignOptions().get(CampaignOption.PERSONNEL_LOG_SKILL_GAIN);
         LocalDate today = campaign.getLocalDate();
         for (Person person : personnel) {
             if (!person.isCombat() || randomInt(4) != 0) {

@@ -53,6 +53,7 @@ import mekhq.campaign.personnel.SpecialAbility;
 import mekhq.campaign.universe.Faction;
 import mekhq.campaign.universe.eras.Era;
 import mekhq.campaign.universe.eras.Eras;
+import mekhq.campaign.campaignOptions.CampaignOption;
 
 /**
  * Generates a single special ability for a {@link Person}.
@@ -63,7 +64,7 @@ public class SingleSpecialAbilityGenerator extends AbstractSpecialAbilityGenerat
     @Override
     public boolean generateSpecialAbilities(final Campaign campaign, final Person person,
           final int expLvl) {
-        return campaign.getCampaignOptions().isUseAbilities() && (rollSPA(campaign, person) != null);
+        return campaign.getCampaignOptions().get(CampaignOption.USE_ABILITIES) && (rollSPA(campaign, person) != null);
     }
 
     /**
@@ -163,14 +164,14 @@ public class SingleSpecialAbilityGenerator extends AbstractSpecialAbilityGenerat
             }
             case OptionsConstants.GUNNERY_WEAPON_SPECIALIST: {
                 final String special = SpecialAbility.chooseWeaponSpecialization(person,
-                      campaign.getCampaignOptions().getTechLevel(), campaign.getGameYear(), false);
+                      campaign.getCampaignOptions().get(CampaignOption.TECH_LEVEL), campaign.getGameYear(), false);
                 person.getOptions().acquireAbility(PersonnelOptions.LVL3_ADVANTAGES, name, special);
                 displayName += " " + special;
                 break;
             }
             case OptionsConstants.GUNNERY_SANDBLASTER: {
                 final String special = SpecialAbility.chooseWeaponSpecialization(person,
-                      campaign.getCampaignOptions().getTechLevel(), campaign.getGameYear(), true);
+                      campaign.getCampaignOptions().get(CampaignOption.TECH_LEVEL), campaign.getGameYear(), true);
                 person.getOptions().acquireAbility(PersonnelOptions.LVL3_ADVANTAGES, name, special);
                 displayName += " " + special;
                 break;

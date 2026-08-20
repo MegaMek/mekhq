@@ -116,7 +116,7 @@ public class PrisonerMissionEndEvent {
               campaign.getPlayerForce().getHumanResources()
                     .getSeniorAdminPerson(Campaign.AdministratorSpecialization.HR,
                           campaign.getCampaignOptions(),
-                          campaign.isClanCampaign(),
+                          campaign.getPlayerForce().isClanForce(),
                           campaign.getLocalDate()),
               null,
               inCharacterMessage,
@@ -173,7 +173,7 @@ public class PrisonerMissionEndEvent {
               campaign.getPlayerForce().getHumanResources()
                     .getSeniorAdminPerson(Campaign.AdministratorSpecialization.COMMAND,
                           campaign.getCampaignOptions(),
-                          campaign.isClanCampaign(),
+                          campaign.getPlayerForce().isClanForce(),
                           campaign.getLocalDate()),
               null,
               inCharacterMessage,

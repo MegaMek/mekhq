@@ -53,6 +53,7 @@ import mekhq.campaign.parts.missing.MissingAvionics;
 import mekhq.campaign.parts.missing.MissingPart;
 import mekhq.campaign.personnel.skills.SkillType;
 import org.w3c.dom.Node;
+import mekhq.campaign.campaignOptions.CampaignOption;
 
 /**
  * @author Jay Lawson (jaylawson39 at yahoo.com)
@@ -83,8 +84,8 @@ public class Avionics extends Part {
             hits = ((IAero) unit.getEntity()).getAvionicsHits();
             if (checkForDestruction &&
                       hits > priorHits &&
-                      (hits < 3 && !campaign.getCampaignOptions().isUseAeroSystemHits()) &&
-                      Compute.d6(2) < campaign.getCampaignOptions().getDestroyPartTarget()) {
+                      (hits < 3 && !campaign.getCampaignOptions().get(CampaignOption.USE_AERO_SYSTEM_HITS)) &&
+                      Compute.d6(2) < campaign.getCampaignOptions().get(CampaignOption.DESTROY_PART_TARGET)) {
                 remove(false);
             } else if (hits >= 3) {
                 remove(false);
@@ -95,7 +96,7 @@ public class Avionics extends Part {
     @Override
     public int getBaseTime() {
         int time;
-        if (campaign.getCampaignOptions().isUseAeroSystemHits()) {
+        if (campaign.getCampaignOptions().get(CampaignOption.USE_AERO_SYSTEM_HITS)) {
             // Test of proposed errata for repair times
             if (null != unit && (unit.getEntity() instanceof Dropship || unit.getEntity() instanceof Jumpship)) {
                 time = 240;
@@ -124,7 +125,7 @@ public class Avionics extends Part {
 
     @Override
     public int getDifficulty() {
-        if (campaign.getCampaignOptions().isUseAeroSystemHits()) {
+        if (campaign.getCampaignOptions().get(CampaignOption.USE_AERO_SYSTEM_HITS)) {
             // Test of proposed errata for repair time and difficulty
             if (isSalvaging()) {
                 return 1;

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2022-2025 The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2022-2026 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -43,6 +43,7 @@ import java.util.ResourceBundle;
 
 import mekhq.MekHQ;
 import mekhq.campaign.campaignOptions.CampaignOptions;
+import mekhq.campaign.campaignOptions.CampaignOption;
 import mekhq.campaign.personnel.procreation.DisabledRandomProcreation;
 import mekhq.campaign.personnel.procreation.RandomProcreation;
 import org.junit.jupiter.api.Test;
@@ -92,13 +93,13 @@ public class RandomProcreationMethodTest {
     @Test
     public void testGetMethod() {
         final CampaignOptions mockOptions = mock(CampaignOptions.class);
-        when(mockOptions.isUseClanPersonnelProcreation()).thenReturn(false);
-        when(mockOptions.isUsePrisonerProcreation()).thenReturn(false);
-        when(mockOptions.isUseRelationshiplessRandomProcreation()).thenReturn(false);
-        when(mockOptions.isUseRandomClanPersonnelProcreation()).thenReturn(false);
-        when(mockOptions.isUseRandomPrisonerProcreation()).thenReturn(false);
-        when(mockOptions.getRandomProcreationRelationshipDiceSize()).thenReturn(5);
-        when(mockOptions.getRandomProcreationRelationshiplessDiceSize()).thenReturn(5);
+        when(mockOptions.get(CampaignOption.USE_CLAN_PERSONNEL_PROCREATION)).thenReturn(false);
+        when(mockOptions.get(CampaignOption.USE_PRISONER_PROCREATION)).thenReturn(false);
+        when(mockOptions.get(CampaignOption.USE_RELATIONSHIPLESS_RANDOM_PROCREATION)).thenReturn(false);
+        when(mockOptions.get(CampaignOption.USE_RANDOM_CLAN_PERSONNEL_PROCREATION)).thenReturn(false);
+        when(mockOptions.get(CampaignOption.USE_RANDOM_PRISONER_PROCREATION)).thenReturn(false);
+        when(mockOptions.get(CampaignOption.RANDOM_PROCREATION_RELATIONSHIP_DICE_SIZE)).thenReturn(5);
+        when(mockOptions.get(CampaignOption.RANDOM_PROCREATION_RELATIONSHIPLESS_DICE_SIZE)).thenReturn(5);
 
         assertInstanceOf(DisabledRandomProcreation.class, RandomProcreationMethod.NONE.getMethod(mockOptions));
         assertInstanceOf(RandomProcreation.class, RandomProcreationMethod.DICE_ROLL.getMethod(mockOptions));

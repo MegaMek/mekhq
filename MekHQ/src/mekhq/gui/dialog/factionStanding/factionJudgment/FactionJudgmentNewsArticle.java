@@ -171,7 +171,7 @@ public class FactionJudgmentNewsArticle {
         String commanderAddress = campaign.getCommanderAddress(false);
 
         String newsReport = getInCharacterText(RESOURCE_BUNDLE, dialogKey, commander, secondInCommand, factionName,
-              campaign.getName(), locationName, null, commanderAddress);
+              campaign.getPlayerForce().getName(), locationName, null, commanderAddress);
 
         new NewsDialog(campaign, newsReport);
     }

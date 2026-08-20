@@ -63,6 +63,7 @@ import megamek.logging.MMLogger;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.campaignOptions.CampaignOptions;
+import mekhq.campaign.campaignOptions.CampaignOption;
 import mekhq.campaign.events.OptionsChangedEvent;
 import mekhq.campaign.parts.Part;
 import mekhq.campaign.parts.enums.PartRepairType;
@@ -649,7 +650,7 @@ public class MRMSDialog extends JDialog {
 
     private MRMSOptionControl createMRMSOptionControls(PartRepairType type, String text, String tooltipText,
           String activeBoxName, JPanel pnlItems, int rowIdx) {
-        MRMSOption mrmsOption = campaignOptions.getMRMSOptions()
+        MRMSOption mrmsOption = campaignOptions.get(CampaignOption.MRMS_OPTIONS)
                                       .stream()
                                       .filter(option -> option.getType() == type)
                                       .findFirst()
@@ -1126,33 +1127,33 @@ public class MRMSDialog extends JDialog {
 
     // region Campaign Options
     private void refreshOptions() {
-        getUseRepairBox().setSelected(campaignOptions.isMRMSUseRepair());
-        getUseSalvageBox().setSelected(campaignOptions.isMRMSUseSalvage());
-        getUseExtraTimeBox().setSelected(campaignOptions.isMRMSUseExtraTime());
-        getUseRushJobBox().setSelected(campaignOptions.isMRMSUseRushJob());
-        getAllowCarryoverBox().setSelected(campaignOptions.isMRMSAllowCarryover());
-        getOptimizeToCompleteTodayBox().setSelected(campaignOptions.isMRMSOptimizeToCompleteToday());
-        getOptimizeToCompleteTodayBox().setEnabled(campaignOptions.isMRMSAllowCarryover());
+        getUseRepairBox().setSelected(campaignOptions.get(CampaignOption.MRMS_USE_REPAIR));
+        getUseSalvageBox().setSelected(campaignOptions.get(CampaignOption.MRMS_USE_SALVAGE));
+        getUseExtraTimeBox().setSelected(campaignOptions.get(CampaignOption.MRMS_USE_EXTRA_TIME));
+        getUseRushJobBox().setSelected(campaignOptions.get(CampaignOption.MRMS_USE_RUSH_JOB));
+        getAllowCarryoverBox().setSelected(campaignOptions.get(CampaignOption.MRMS_ALLOW_CARRYOVER));
+        getOptimizeToCompleteTodayBox().setSelected(campaignOptions.get(CampaignOption.MRMS_OPTIMIZE_TO_COMPLETE_TODAY));
+        getOptimizeToCompleteTodayBox().setEnabled(campaignOptions.get(CampaignOption.MRMS_ALLOW_CARRYOVER));
 
         if (!getMode().isWarehouse()) {
-            getScrapImpossibleBox().setSelected(campaignOptions.isMRMSScrapImpossible());
-            getUseAssignedTechsFirstBox().setSelected(campaignOptions.isMRMSUseAssignedTechsFirst());
-            getReplacePodPartsBox().setSelected(campaignOptions.isMRMSReplacePod());
+            getScrapImpossibleBox().setSelected(campaignOptions.get(CampaignOption.MRMS_SCRAP_IMPOSSIBLE));
+            getUseAssignedTechsFirstBox().setSelected(campaignOptions.get(CampaignOption.MRMS_USE_ASSIGNED_TECHS_FIRST));
+            getReplacePodPartsBox().setSelected(campaignOptions.get(CampaignOption.MRMS_REPLACE_POD));
         }
     }
 
     private void updateOptions() {
-        campaignOptions.setMRMSUseRepair(getUseRepairBox().isSelected());
-        campaignOptions.setMRMSUseSalvage(getUseSalvageBox().isSelected());
-        campaignOptions.setMRMSUseExtraTime(getUseExtraTimeBox().isSelected());
-        campaignOptions.setMRMSUseRushJob(getUseRushJobBox().isSelected());
-        campaignOptions.setMRMSAllowCarryover(getAllowCarryoverBox().isSelected());
-        campaignOptions.setMRMSOptimizeToCompleteToday(getOptimizeToCompleteTodayBox().isSelected());
+        campaignOptions.set(CampaignOption.MRMS_USE_REPAIR, getUseRepairBox().isSelected());
+        campaignOptions.set(CampaignOption.MRMS_USE_SALVAGE, getUseSalvageBox().isSelected());
+        campaignOptions.set(CampaignOption.MRMS_USE_EXTRA_TIME, getUseExtraTimeBox().isSelected());
+        campaignOptions.set(CampaignOption.MRMS_USE_RUSH_JOB, getUseRushJobBox().isSelected());
+        campaignOptions.set(CampaignOption.MRMS_ALLOW_CARRYOVER, getAllowCarryoverBox().isSelected());
+        campaignOptions.set(CampaignOption.MRMS_OPTIMIZE_TO_COMPLETE_TODAY, getOptimizeToCompleteTodayBox().isSelected());
 
         if (!getMode().isWarehouse()) {
-            campaignOptions.setMRMSScrapImpossible(scrapImpossibleBox.isSelected());
-            campaignOptions.setMRMSUseAssignedTechsFirst(useAssignedTechsFirstBox.isSelected());
-            campaignOptions.setMRMSReplacePod(replacePodPartsBox.isSelected());
+            campaignOptions.set(CampaignOption.MRMS_SCRAP_IMPOSSIBLE, scrapImpossibleBox.isSelected());
+            campaignOptions.set(CampaignOption.MRMS_USE_ASSIGNED_TECHS_FIRST, useAssignedTechsFirstBox.isSelected());
+            campaignOptions.set(CampaignOption.MRMS_REPLACE_POD, replacePodPartsBox.isSelected());
         }
 
         for (PartRepairType partRepairType : PartRepairType.getMRMSValidTypes()) {

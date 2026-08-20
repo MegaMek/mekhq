@@ -74,6 +74,7 @@ import mekhq.utilities.MHQXMLUtility;
 import mekhq.utilities.ReportingUtilities;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
+import mekhq.campaign.campaignOptions.CampaignOption;
 
 /**
  * @author Jay Lawson (jaylawson39 at yahoo.com)
@@ -287,7 +288,7 @@ public class Loot {
         for (Entity entity : units) {
             LOGGER.debug("Looting unit: {}", entity.getDisplayName());
 
-            if (campaign.getCampaignOptions().isUseRandomUnitQualities()) {
+            if (campaign.getCampaignOptions().get(CampaignOption.USE_RANDOM_UNIT_QUALITIES)) {
                 qualityAndModifier.put("quality",
                       Unit.getRandomUnitQuality(qualityAndModifier.get("modifier")).toNumeric());
             }

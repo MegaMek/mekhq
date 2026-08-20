@@ -75,6 +75,7 @@ import mekhq.gui.CampaignGUI;
 import mekhq.gui.model.PartsStoreModel;
 import mekhq.gui.model.PartsStoreModel.PartProxy;
 import mekhq.gui.sorter.PartsDetailSorter;
+import mekhq.campaign.campaignOptions.CampaignOption;
 
 /**
  * @author Taharqa
@@ -418,10 +419,10 @@ public class PartsStoreDialog extends JDialog {
                           !part.getDetails().toLowerCase().contains(txtFilter.getText().toLowerCase())) {
                     return false;
                 } else if (((part.getTechBase() == TechBase.CLAN) || part.isClan()) &&
-                                 !campaign.getCampaignOptions().isAllowClanPurchases()) {
+                                 !campaign.getCampaignOptions().get(CampaignOption.ALLOW_CLAN_PURCHASES)) {
                     return false;
                 } else if ((part.getTechBase() == TechBase.IS) &&
-                                 !campaign.getCampaignOptions().isAllowISPurchases()
+                                 !campaign.getCampaignOptions().get(CampaignOption.ALLOW_IS_PURCHASES)
                                  // Hack to allow Clan access to SL tech but not post-Exodus tech
                                  // until 3050.
                                  &&

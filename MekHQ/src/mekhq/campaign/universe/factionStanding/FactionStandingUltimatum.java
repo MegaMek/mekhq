@@ -109,7 +109,7 @@ public class FactionStandingUltimatum {
     public FactionStandingUltimatum(final LocalDate date, final Campaign campaign,
           FactionStandingUltimatumsLibrary ultimatumsLibrary) {
         this.campaign = campaign;
-        Faction campaignFaction = campaign.getFaction();
+        Faction campaignFaction = campaign.getPlayerForce().getFaction();
         String campaignFactionCode = campaignFaction.getShortName();
 
         // We should have used 'checkUltimatumForDate' before initializing 'FactionStandingUltimatum', so we should

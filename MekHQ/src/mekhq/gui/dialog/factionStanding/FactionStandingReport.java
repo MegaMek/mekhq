@@ -70,6 +70,7 @@ import mekhq.MHQConstants;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.campaignOptions.CampaignOptions;
+import mekhq.campaign.campaignOptions.CampaignOption;
 import mekhq.campaign.mission.enums.MissionStatus;
 import mekhq.campaign.universe.Faction;
 import mekhq.campaign.universe.Factions;
@@ -155,11 +156,11 @@ public class FactionStandingReport extends JDialog {
         this.campaign = campaign;
         this.today = campaign.getLocalDate();
         this.gameYear = today.getYear();
-        this.campaignFaction = campaign.getFaction();
+        this.campaignFaction = campaign.getPlayerForce().getFaction();
         this.factionStandings = campaign.getPlayerForce().getFactionStandings();
         factions = Factions.getInstance();
         this.campaignOptions = campaign.getCampaignOptions();
-        this.isFactionStandingEnabled = campaignOptions.isTrackFactionStanding();
+        this.isFactionStandingEnabled = campaignOptions.get(CampaignOption.TRACK_FACTION_STANDING);
 
         // We minus a day as otherwise this will return false if today is the first day of the First Wave
         boolean clanInvasionHasBegun = MHQConstants.CLAN_INVASION_FIRST_WAVE_BEGINS.minusDays(1).isBefore(today);
@@ -489,7 +490,7 @@ public class FactionStandingReport extends JDialog {
         int durationChoice = dialog.getDurationChoice();
 
         reports.addAll(handleFactionRegardUpdates(campaignFaction, employerChoice, enemyChoice, statusChoice, today,
-              factionStandings, campaignOptions.getRegardMultiplier(), durationChoice));
+              factionStandings, campaignOptions.get(CampaignOption.REGARD_MULTIPLIER), durationChoice));
     }
 
     /**

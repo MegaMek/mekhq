@@ -255,7 +255,7 @@ public class FactionStandingGreeting {
     }
 
     public Person createEmployerLiaison(Campaign campaign) {
-        Faction campaignFaction = campaign.getFaction();
+        Faction campaignFaction = campaign.getPlayerForce().getFaction();
         final String factionCode = campaignFaction.getShortName();
         Person employerLiaison = campaign.getPlayerForce()
                                        .getHumanResources()

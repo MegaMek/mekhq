@@ -42,6 +42,7 @@ import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.force.Formation;
 import mekhq.campaign.personnel.Person;
+import mekhq.campaign.campaignOptions.CampaignOption;
 
 /**
  * This class is responsible to control the logging of unit assignment Log Entries.
@@ -74,7 +75,7 @@ public class AssignmentLogger {
             String message = logEntriesResourceMap.getString("addToTOEForce.text");
             person.addAssignmentLogEntry(new AssignmentLogEntry(date,
                   MessageFormat.format(message,
-                        campaign.getCampaignOptions().isUseExtendedTOEForceName() ?
+                        campaign.getCampaignOptions().get(CampaignOption.USE_EXTENDED_TOE_FORCE_NAME) ?
                               formation.getFullName() :
                               formation.getName())));
         }
@@ -93,10 +94,10 @@ public class AssignmentLogger {
             String message = logEntriesResourceMap.getString("reassignedTOEForce.text");
             person.addAssignmentLogEntry(new AssignmentLogEntry(date,
                   MessageFormat.format(message,
-                        campaign.getCampaignOptions().isUseExtendedTOEForceName() ?
+                        campaign.getCampaignOptions().get(CampaignOption.USE_EXTENDED_TOE_FORCE_NAME) ?
                               oldFormation.getFullName() :
                               oldFormation.getName(),
-                        campaign.getCampaignOptions().isUseExtendedTOEForceName() ?
+                        campaign.getCampaignOptions().get(CampaignOption.USE_EXTENDED_TOE_FORCE_NAME) ?
                               newFormation.getFullName() :
                               newFormation.getName())));
         } else if (oldFormation == null) {
@@ -111,7 +112,7 @@ public class AssignmentLogger {
             String message = logEntriesResourceMap.getString("removedFromTOEForce.text");
             person.addAssignmentLogEntry(new AssignmentLogEntry(date,
                   MessageFormat.format(message,
-                        campaign.getCampaignOptions().isUseExtendedTOEForceName() ?
+                        campaign.getCampaignOptions().get(CampaignOption.USE_EXTENDED_TOE_FORCE_NAME) ?
                               formation.getFullName() :
                               formation.getName())));
         }

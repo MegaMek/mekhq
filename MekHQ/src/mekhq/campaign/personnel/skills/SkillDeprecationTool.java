@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2025 The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2025-2026 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -39,6 +39,7 @@ import java.util.List;
 
 import mekhq.campaign.Campaign;
 import mekhq.campaign.campaignOptions.CampaignOptions;
+import mekhq.campaign.campaignOptions.CampaignOption;
 import mekhq.campaign.personnel.Person;
 import mekhq.gui.baseComponents.immersiveDialogs.ImmersiveDialogSimple;
 
@@ -117,9 +118,9 @@ public class SkillDeprecationTool {
     private void checkForDeprecatedSkills(Person person) {
         final CampaignOptions campaignOptions = campaign.getCampaignOptions();
 
-        final double xpCostMultiplier = campaignOptions.getXpCostMultiplier();
+        final double xpCostMultiplier = campaignOptions.get(CampaignOption.XP_COST_MULTIPLIER);
 
-        final boolean isUseReasoningMultiplier = campaignOptions.isUseReasoningXpMultiplier();
+        final boolean isUseReasoningMultiplier = campaignOptions.get(CampaignOption.USE_REASONING_XP_MULTIPLIER);
         final double reasoningXpMultiplier = person.getReasoningXpCostMultiplier(isUseReasoningMultiplier);
 
         final Skills skills = person.getSkills();

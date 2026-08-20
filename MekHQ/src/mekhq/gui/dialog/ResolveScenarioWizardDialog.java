@@ -99,6 +99,7 @@ import mekhq.gui.baseComponents.immersiveDialogs.ImmersiveDialogConfirmation;
 import mekhq.gui.utilities.MarkdownEditorPanel;
 import mekhq.gui.view.PersonViewPanel;
 import mekhq.utilities.ReportingUtilities;
+import mekhq.campaign.campaignOptions.CampaignOption;
 
 /**
  * @author Taharqa
@@ -216,7 +217,7 @@ public class ResolveScenarioWizardDialog extends JDialog {
         objectiveProcessor = new ScenarioObjectiveProcessor();
         loots = tracker.getPotentialLoot();
         salvageableUnites = new ArrayList<>();
-        isUseCamOpsSalvage = campaign.getCampaignOptions().isUseCamOpsSalvage();
+        isUseCamOpsSalvage = campaign.getCampaignOptions().get(CampaignOption.IS_USE_CAM_OPS_SALVAGE);
         if (tracker.getMission() instanceof Contract contract) {
             salvageEmployer = contract.getSalvagedByEmployer();
             salvageUnit = contract.getSalvagedByUnit();
@@ -736,7 +737,7 @@ public class ResolveScenarioWizardDialog extends JDialog {
             JCheckBox sold = new JCheckBox("");
             sold.setName("sold");
             sold.getAccessibleContext().setAccessibleName(resourceMap.getString("lblSell.text"));
-            sold.setEnabled(!tracker.usesSalvageExchange() && tracker.getCampaign().getCampaignOptions().isSellUnits());
+            sold.setEnabled(!tracker.usesSalvageExchange() && tracker.getCampaign().getCampaignOptions().get(CampaignOption.SELL_UNITS));
             sold.addItemListener(evt -> checkSalvageRights());
             sold.setVisible(!isUseCamOpsSalvage);
             soldUnitBoxes.add(sold);
@@ -869,7 +870,7 @@ public class ResolveScenarioWizardDialog extends JDialog {
             pnlPrisonerStatus.add(btnViewPrisoner, gridBagConstraints);
 
             // if the person is dead, set the checkbox and skip all this captured stuff
-            PrisonerCaptureStyle prisonerCaptureStyle = campaign.getCampaignOptions().getPrisonerCaptureStyle();
+            PrisonerCaptureStyle prisonerCaptureStyle = campaign.getCampaignOptions().get(CampaignOption.PRISONER_CAPTURE_STYLE);
             if ((status.getHits() > 5) || status.isDead()) {
                 kiaCheck.setSelected(true);
             } else if (status.isCaptured() && !prisonerCaptureStyle.isNone()) {
@@ -1831,7 +1832,7 @@ public class ResolveScenarioWizardDialog extends JDialog {
             } else {
                 salvaged.setEnabled(!tracker.usesSalvageExchange() || isUseCamOpsSalvage);
                 sold.setEnabled(!tracker.usesSalvageExchange() &&
-                                      tracker.getCampaign().getCampaignOptions().isSellUnits());
+                                      tracker.getCampaign().getCampaignOptions().get(CampaignOption.SELL_UNITS));
                 escaped.setEnabled(true);
                 buttonsSalvageEditUnit.get(i).setEnabled(true);
             }

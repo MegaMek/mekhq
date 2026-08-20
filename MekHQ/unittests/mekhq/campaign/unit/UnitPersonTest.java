@@ -87,7 +87,7 @@ public class UnitPersonTest {
         UUID id = UUID.randomUUID();
         Person mockTech = mock(Person.class);
         when(mockTech.getId()).thenReturn(id);
-        when(mockCampaign.getPerson(eq(id))).thenReturn(mockTech);
+        when(mockCampaign.getPlayerForce().getHumanResources().getPerson(eq(id))).thenReturn(mockTech);
 
         // Set the tech
         unit.setTech(mockTech);
@@ -113,7 +113,7 @@ public class UnitPersonTest {
         UUID id = UUID.randomUUID();
         Person mockTech = mock(Person.class);
         when(mockTech.getId()).thenReturn(id);
-        when(mockCampaign.getPerson(eq(id))).thenReturn(mockTech);
+        when(mockCampaign.getPlayerForce().getHumanResources().getPerson(eq(id))).thenReturn(mockTech);
 
         // Set the tech
         unit.setTech(mockTech);
@@ -159,7 +159,7 @@ public class UnitPersonTest {
         UUID id = UUID.randomUUID();
         Person mockTech = mock(Person.class);
         when(mockTech.getId()).thenReturn(id);
-        when(mockCampaign.getPerson(eq(id))).thenReturn(mockTech);
+        when(mockCampaign.getPlayerForce().getHumanResources().getPerson(eq(id))).thenReturn(mockTech);
 
         // Set the tech
         unit.setTech(mockTech);
@@ -201,7 +201,7 @@ public class UnitPersonTest {
         UUID id = UUID.randomUUID();
         Person mockTech = mock(Person.class);
         when(mockTech.getId()).thenReturn(id);
-        when(mockCampaign.getPerson(eq(id))).thenReturn(mockTech);
+        when(mockCampaign.getPlayerForce().getHumanResources().getPerson(eq(id))).thenReturn(mockTech);
         unit.setTech(mockTech);
 
         // ...then it is no longer unmaintained.
@@ -219,7 +219,7 @@ public class UnitPersonTest {
         UUID id = UUID.randomUUID();
         Person mockTech = mock(Person.class);
         when(mockTech.getId()).thenReturn(id);
-        when(mockCampaign.getPerson(eq(id))).thenReturn(mockTech);
+        when(mockCampaign.getPlayerForce().getHumanResources().getPerson(eq(id))).thenReturn(mockTech);
         when(mockTech.getUnit()).thenReturn(null);
 
         // Set the tech
@@ -269,7 +269,7 @@ public class UnitPersonTest {
         UUID id = UUID.randomUUID();
         Person mockDriver = mock(Person.class);
         when(mockDriver.getId()).thenReturn(id);
-        when(mockCampaign.getPerson(eq(id))).thenReturn(mockDriver);
+        when(mockCampaign.getPlayerForce().getHumanResources().getPerson(eq(id))).thenReturn(mockDriver);
         when(mockDriver.getUnit()).thenReturn(unit);
 
         // This person is NOT a driver (yet)
@@ -328,7 +328,7 @@ public class UnitPersonTest {
         UUID id = UUID.randomUUID();
         Person mockGunner = mock(Person.class);
         when(mockGunner.getId()).thenReturn(id);
-        when(mockCampaign.getPerson(eq(id))).thenReturn(mockGunner);
+        when(mockCampaign.getPlayerForce().getHumanResources().getPerson(eq(id))).thenReturn(mockGunner);
         when(mockGunner.getUnit()).thenReturn(unit);
 
         // This person is NOT a gunner (yet)
@@ -387,7 +387,7 @@ public class UnitPersonTest {
         UUID id = UUID.randomUUID();
         Person mockVesselCrew = mock(Person.class);
         when(mockVesselCrew.getId()).thenReturn(id);
-        when(mockCampaign.getPerson(eq(id))).thenReturn(mockVesselCrew);
+        when(mockCampaign.getPlayerForce().getHumanResources().getPerson(eq(id))).thenReturn(mockVesselCrew);
         when(mockVesselCrew.getUnit()).thenReturn(unit);
 
         // Add the vessel crew
@@ -435,7 +435,7 @@ public class UnitPersonTest {
         UUID id = UUID.randomUUID();
         Person mockTechOfficer = mock(Person.class);
         when(mockTechOfficer.getId()).thenReturn(id);
-        when(mockCampaign.getPerson(eq(id))).thenReturn(mockTechOfficer);
+        when(mockCampaign.getPlayerForce().getHumanResources().getPerson(eq(id))).thenReturn(mockTechOfficer);
         when(mockTechOfficer.getUnit()).thenReturn(unit);
 
         // This person is NOT a tech officer (yet)
@@ -493,7 +493,7 @@ public class UnitPersonTest {
         UUID id = UUID.randomUUID();
         Person mockNavigator = mock(Person.class);
         when(mockNavigator.getId()).thenReturn(id);
-        when(mockCampaign.getPerson(eq(id))).thenReturn(mockNavigator);
+        when(mockCampaign.getPlayerForce().getHumanResources().getPerson(eq(id))).thenReturn(mockNavigator);
         when(mockNavigator.getUnit()).thenReturn(unit);
 
         // This person is NOT a navigator (yet)

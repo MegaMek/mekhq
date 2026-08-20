@@ -73,6 +73,7 @@ import mekhq.gui.baseComponents.SortedComboBoxModel;
 import mekhq.gui.dialog.factionStanding.events.FactionStandingGreeting;
 import mekhq.gui.utilities.JSuggestField;
 import mekhq.gui.utilities.MarkdownEditorPanel;
+import mekhq.campaign.campaignOptions.CampaignOption;
 
 /**
  * @author Neoancient
@@ -213,7 +214,7 @@ public class NewAtBContractDialog extends NewContractDialog {
         gbc.insets = new Insets(5, 5, 5, 5);
         descPanel.add(txtName, gbc);
 
-        if (campaign.getFaction().isMercenary()) {
+        if (campaign.getPlayerForce().getFaction().isMercenary()) {
             lblEmployer.setText(resourceMap.getString("lblEmployer.text"));
             lblEmployer.setName("lblEmployer");
             gbc.gridx = 0;
@@ -445,10 +446,10 @@ public class NewAtBContractDialog extends NewContractDialog {
     }
 
     private String getCurrentEmployerCode() {
-        if (campaign.getFaction().isMercenary()) {
+        if (campaign.getPlayerForce().getFaction().isMercenary()) {
             return cbEmployer.getSelectedItemKey();
         } else {
-            return campaign.getFaction().getShortName();
+            return campaign.getPlayerForce().getFaction().getShortName();
         }
     }
 
@@ -507,7 +508,7 @@ public class NewAtBContractDialog extends NewContractDialog {
                   Factions.getInstance().getFaction(getCurrentEnemyCode()).isRebelOrPirate()) {
             for (PlanetarySystem p : RandomFactionGenerator.getInstance()
                                            .getMissionTargetList(getCurrentEmployerCode(), getCurrentEnemyCode(),
-                                                 campaign.getCurrentLocation())) {
+                                                 campaign.getPlayerForce().getForceDetachment().getCurrentLocation())) {
                 systems.add(p.getName(campaign.getLocalDate()));
             }
         }
@@ -516,7 +517,7 @@ public class NewAtBContractDialog extends NewContractDialog {
                   !contract.getEnemy().isRebel()) {
             for (PlanetarySystem p : RandomFactionGenerator.getInstance()
                                            .getMissionTargetList(getCurrentEnemyCode(), getCurrentEmployerCode(),
-                                                 campaign.getCurrentLocation())) {
+                                                 campaign.getPlayerForce().getForceDetachment().getCurrentLocation())) {
                 systems.add(p.getName(campaign.getLocalDate()));
             }
         }
@@ -641,7 +642,7 @@ public class NewAtBContractDialog extends NewContractDialog {
 
         contractStartPrompt(campaign, contract);
 
-        if (campaign.getCampaignOptions().isTrackFactionStanding()) {
+        if (campaign.getCampaignOptions().get(CampaignOption.TRACK_FACTION_STANDING)) {
             new FactionStandingGreeting(campaign, contract);
         }
     }
@@ -680,7 +681,7 @@ public class NewAtBContractDialog extends NewContractDialog {
             needUpdatePayment = true;
         } else if (source.equals(comboContractType)) {
             contract.setContractTypeAndName(Objects.requireNonNull(comboContractType.getSelectedItem()));
-            contract.calculateLength(campaign.getCampaignOptions().isVariableContractLength());
+            contract.calculateLength(campaign.getCampaignOptions().get(CampaignOption.VARIABLE_CONTRACT_LENGTH));
             spnLength.setValue(contract.getLengthInMonths());
             updatePlanets();
             needUpdatePayment = true;

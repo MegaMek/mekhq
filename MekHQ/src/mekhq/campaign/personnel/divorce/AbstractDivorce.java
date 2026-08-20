@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2021-2025 The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2021-2026 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -44,6 +44,7 @@ import megamek.common.compute.Compute;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.campaignOptions.CampaignOptions;
+import mekhq.campaign.campaignOptions.CampaignOption;
 import mekhq.campaign.events.persons.PersonChangedEvent;
 import mekhq.campaign.log.PersonalLogger;
 import mekhq.campaign.personnel.Person;
@@ -76,12 +77,12 @@ public abstract class AbstractDivorce {
     //region Constructors
     protected AbstractDivorce(final RandomDivorceMethod method, final CampaignOptions options) {
         this.method = method;
-        setUseClanPersonnelDivorce(options.isUseClanPersonnelDivorce());
-        setUsePrisonerDivorce(options.isUsePrisonerDivorce());
-        setUseRandomOppositeSexDivorce(options.isUseRandomOppositeSexDivorce());
-        setUseRandomSameSexDivorce(options.isUseRandomSameSexDivorce());
-        setUseRandomClanPersonnelDivorce(options.isUseRandomClanPersonnelDivorce());
-        setUseRandomPrisonerDivorce(options.isUseRandomPrisonerDivorce());
+        setUseClanPersonnelDivorce(options.get(CampaignOption.USE_CLAN_PERSONNEL_DIVORCE));
+        setUsePrisonerDivorce(options.get(CampaignOption.USE_PRISONER_DIVORCE));
+        setUseRandomOppositeSexDivorce(options.get(CampaignOption.USE_RANDOM_OPPOSITE_SEX_DIVORCE));
+        setUseRandomSameSexDivorce(options.get(CampaignOption.USE_RANDOM_SAME_SEX_DIVORCE));
+        setUseRandomClanPersonnelDivorce(options.get(CampaignOption.USE_RANDOM_CLAN_PERSONNEL_DIVORCE));
+        setUseRandomPrisonerDivorce(options.get(CampaignOption.USE_RANDOM_PRISONER_DIVORCE));
     }
     //endregion Constructors
 
@@ -297,7 +298,7 @@ public abstract class AbstractDivorce {
         }
 
         // Process any relevant loyalty changes
-        if (campaign.getCampaignOptions().isUseLoyaltyModifiers()) {
+        if (campaign.getCampaignOptions().get(CampaignOption.USE_LOYALTY_MODIFIERS)) {
             if (origin.getStatus().isLeft() && !spouse.getStatus().isLeft()) {
                 spouse.performRandomizedLoyaltyChange(campaign, false, true);
             } else if (!origin.getStatus().isLeft() && spouse.getStatus().isLeft()) {

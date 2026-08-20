@@ -51,6 +51,7 @@ import mekhq.campaign.parts.missing.MissingLandingGear;
 import mekhq.campaign.parts.missing.MissingPart;
 import mekhq.campaign.personnel.skills.SkillType;
 import org.w3c.dom.Node;
+import mekhq.campaign.campaignOptions.CampaignOption;
 
 /**
  * @author Jay Lawson (jaylawson39 at yahoo.com)
@@ -88,7 +89,7 @@ public class LandingGear extends Part {
             }
             if (checkForDestruction
                       && hits > priorHits
-                      && Compute.d6(2) < campaign.getCampaignOptions().getDestroyPartTarget()) {
+                      && Compute.d6(2) < campaign.getCampaignOptions().get(CampaignOption.DESTROY_PART_TARGET)) {
                 remove(false);
             }
         }
@@ -97,7 +98,7 @@ public class LandingGear extends Part {
     @Override
     public int getBaseTime() {
         int time;
-        if (campaign.getCampaignOptions().isUseAeroSystemHits()) {
+        if (campaign.getCampaignOptions().get(CampaignOption.USE_AERO_SYSTEM_HITS)) {
             // Test of proposed errata for repair times
             if (unit != null && unit.getEntity() instanceof Dropship) {
                 time = 120;

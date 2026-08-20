@@ -63,6 +63,7 @@ import mekhq.campaign.unit.Unit;
 import mekhq.utilities.MHQXMLUtility;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
+import mekhq.campaign.campaignOptions.CampaignOption;
 
 /**
  * Battle Armor suits are crazy - you can't crit the equipment in them, so if we remove the suit we should remove all
@@ -511,7 +512,7 @@ public class BattleArmorSuit extends Part {
                 if (!checkForDestruction) {
                     remove(false);
                 } else {
-                    if (Compute.d6(2) < campaign.getCampaignOptions().getDestroyPartTarget()) {
+                    if (Compute.d6(2) < campaign.getCampaignOptions().get(CampaignOption.DESTROY_PART_TARGET)) {
                         remove(false);
                     } else {
                         // it seems a little weird to change the entity here, but no other

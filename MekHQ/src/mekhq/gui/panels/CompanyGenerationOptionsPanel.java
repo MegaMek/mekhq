@@ -1069,7 +1069,7 @@ public class CompanyGenerationOptionsPanel extends AbstractScrollablePanel {
         setSpnSupportPersonnelNumbers(new HashMap<>());
         final Map<PersonnelRole, JLabel> labels = new HashMap<>();
         for (final PersonnelRole role : personnelRoles) {
-            final String name = role.getLabel(getCampaign().getFaction().isClan());
+            final String name = role.getLabel(getCampaign().getPlayerForce().getFaction().isClan());
             final String toolTipText = String.format(resources.getString("supportPersonnelNumber.toolTipText"), name);
 
             labels.put(role, new JLabel(name));
@@ -1107,7 +1107,7 @@ public class CompanyGenerationOptionsPanel extends AbstractScrollablePanel {
     private JPanel createPersonnelRandomizationPanel() {
         setRandomOriginOptionsPanel(new RandomOriginOptionsPanel(getFrame(),
               getCampaign(),
-              getCampaign().getFaction()));
+              getCampaign().getPlayerForce().getFaction()));
         return getRandomOriginOptionsPanel();
     }
 

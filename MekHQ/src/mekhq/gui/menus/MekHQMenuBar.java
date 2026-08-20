@@ -80,6 +80,7 @@ import mekhq.MekHQ;
 import mekhq.Utilities;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.campaignOptions.CampaignOptions;
+import mekhq.campaign.campaignOptions.CampaignOption;
 import mekhq.campaign.events.OptionsChangedEvent;
 import mekhq.campaign.events.OrganizationChangedEvent;
 import mekhq.campaign.finances.Finances;
@@ -348,7 +349,7 @@ public class MekHQMenuBar extends JMenuBar {
             try {
                 exportPlanets(FileType.XML,
                       getTextAt("dlgSavePlanetsXML.text"),
-                      getCampaign().getName() +
+                      getCampaign().getPlayerForce().getName() +
                             getCampaign().getLocalDate()
                                   .format(DateTimeFormatter.ofPattern(MHQConstants.FILENAME_DATE_FORMAT)
                                                 .withLocale(MekHQ.getMHQOptions().getDateLocale())) +
@@ -456,14 +457,14 @@ public class MekHQMenuBar extends JMenuBar {
         JMenu menuSupportRecruitment = new JMenu(getTextAt("menuRecruitment.support"));
         JMenu menuCivilianRecruitment = new JMenu(getTextAt("menuRecruitment.civilian"));
 
-        PersonnelRole[] roles = PersonnelRole.getValuesSortedAlphabetically(getCampaign().isClanCampaign());
+        PersonnelRole[] roles = PersonnelRole.getValuesSortedAlphabetically(getCampaign().getPlayerForce().isClanForce());
         for (PersonnelRole role : roles) {
-            JMenuItem miRoleRecruitment = new JMenuItem(role.getLabel(getCampaign().getFaction().isClan()));
+            JMenuItem miRoleRecruitment = new JMenuItem(role.getLabel(getCampaign().getPlayerForce().getFaction().isClan()));
             if (role.getMnemonic() != KeyEvent.VK_UNDEFINED) {
                 miRoleRecruitment.setMnemonic(role.getMnemonic());
             }
 
-            miRoleRecruitment.setToolTipText(role.getDescription(getCampaign().isClanCampaign()));
+            miRoleRecruitment.setToolTipText(role.getDescription(getCampaign().getPlayerForce().isClanForce()));
             miRoleRecruitment.setActionCommand(role.name());
             miRoleRecruitment.addActionListener(this::hirePerson);
 
@@ -535,12 +536,12 @@ public class MekHQMenuBar extends JMenuBar {
 
         miRetirementDefectionDialog = createMenuItem("miRetirementDefectionDialog.text", KeyEvent.VK_R,
               evt -> getGui().showRetirementDefectionDialog());
-        miRetirementDefectionDialog.setVisible(getCampaign().getCampaignOptions().isUseRandomRetirement());
+        miRetirementDefectionDialog.setVisible(getCampaign().getCampaignOptions().get(CampaignOption.USE_RANDOM_RETIREMENT));
         menuView.add(miRetirementDefectionDialog);
 
         miAwardEligibilityDialog = createMenuItem("miAwardEligibilityDialog.text", KeyEvent.VK_R,
               evt -> showAwardEligibilityDialog());
-        miAwardEligibilityDialog.setVisible(getCampaign().getCampaignOptions().isEnableAutoAwards());
+        miAwardEligibilityDialog.setVisible(getCampaign().getCampaignOptions().get(CampaignOption.ENABLE_AUTO_AWARDS));
         menuView.add(miAwardEligibilityDialog);
 
         return menuView;
@@ -731,7 +732,7 @@ public class MekHQMenuBar extends JMenuBar {
 
         PartQuality quality = PartQuality.QUALITY_D;
 
-        if (getCampaign().getCampaignOptions().isUseRandomUnitQualities()) {
+        if (getCampaign().getCampaignOptions().get(CampaignOption.USE_RANDOM_UNIT_QUALITIES)) {
             quality = Unit.getRandomUnitQuality(0);
         }
 
@@ -960,69 +961,69 @@ public class MekHQMenuBar extends JMenuBar {
         final CampaignOptions oldOptions = getCampaign().getCampaignOptions();
         // We need to handle it like this for now, as the options above get written to currently
         boolean atb = oldOptions.isUseStratCon();
-        boolean factionIntroDate = oldOptions.isFactionIntroDate();
-        final RandomDivorceMethod randomDivorceMethod = oldOptions.getRandomDivorceMethod();
-        final RandomMarriageMethod randomMarriageMethod = oldOptions.getRandomMarriageMethod();
-        final RandomProcreationMethod randomProcreationMethod = oldOptions.getRandomProcreationMethod();
+        boolean factionIntroDate = oldOptions.get(CampaignOption.FACTION_INTRO_DATE);
+        final RandomDivorceMethod randomDivorceMethod = oldOptions.get(CampaignOption.RANDOM_DIVORCE_METHOD);
+        final RandomMarriageMethod randomMarriageMethod = oldOptions.get(CampaignOption.RANDOM_MARRIAGE_METHOD);
+        final RandomProcreationMethod randomProcreationMethod = oldOptions.get(CampaignOption.RANDOM_PROCREATION_METHOD);
 
         CampaignOptionsDialog optionsDialog = new CampaignOptionsDialog(getFrame(), getCampaign());
         optionsDialog.setVisible(true);
 
         final CampaignOptions newOptions = getCampaign().getCampaignOptions();
 
-        if (randomDivorceMethod != newOptions.getRandomDivorceMethod()) {
+        if (randomDivorceMethod != newOptions.get(CampaignOption.RANDOM_DIVORCE_METHOD)) {
             Campaign campaign = getCampaign();
-            final AbstractDivorce divorce = newOptions.getRandomDivorceMethod().getMethod(newOptions);
+            final AbstractDivorce divorce = newOptions.get(CampaignOption.RANDOM_DIVORCE_METHOD).getMethod(newOptions);
             campaign.getPlayerForce().getHumanResources().setDivorce(divorce);
         } else {
             AbstractDivorce divorce = getCampaign().getPlayerForce().getHumanResources().getDivorce();
-            divorce.setUseClanPersonnelDivorce(newOptions.isUseClanPersonnelDivorce());
-            divorce.setUsePrisonerDivorce(newOptions.isUsePrisonerDivorce());
-            divorce.setUseRandomOppositeSexDivorce(newOptions.isUseRandomOppositeSexDivorce());
-            divorce.setUseRandomSameSexDivorce(newOptions.isUseRandomSameSexDivorce());
-            divorce.setUseRandomClanPersonnelDivorce(newOptions.isUseRandomClanPersonnelDivorce());
-            divorce.setUseRandomPrisonerDivorce(newOptions.isUseRandomPrisonerDivorce());
+            divorce.setUseClanPersonnelDivorce(newOptions.get(CampaignOption.USE_CLAN_PERSONNEL_DIVORCE));
+            divorce.setUsePrisonerDivorce(newOptions.get(CampaignOption.USE_PRISONER_DIVORCE));
+            divorce.setUseRandomOppositeSexDivorce(newOptions.get(CampaignOption.USE_RANDOM_OPPOSITE_SEX_DIVORCE));
+            divorce.setUseRandomSameSexDivorce(newOptions.get(CampaignOption.USE_RANDOM_SAME_SEX_DIVORCE));
+            divorce.setUseRandomClanPersonnelDivorce(newOptions.get(CampaignOption.USE_RANDOM_CLAN_PERSONNEL_DIVORCE));
+            divorce.setUseRandomPrisonerDivorce(newOptions.get(CampaignOption.USE_RANDOM_PRISONER_DIVORCE));
             if (divorce.getMethod().isDiceRoll()) {
-                ((RandomDivorce) divorce).setDivorceDiceSize(newOptions.getRandomDivorceDiceSize());
+                ((RandomDivorce) divorce).setDivorceDiceSize(newOptions.get(CampaignOption.RANDOM_DIVORCE_DICE_SIZE));
             }
         }
 
-        if (randomMarriageMethod != newOptions.getRandomMarriageMethod()) {
+        if (randomMarriageMethod != newOptions.get(CampaignOption.RANDOM_MARRIAGE_METHOD)) {
             Campaign campaign = getCampaign();
-            final AbstractMarriage marriage = newOptions.getRandomMarriageMethod().getMethod(newOptions);
+            final AbstractMarriage marriage = newOptions.get(CampaignOption.RANDOM_MARRIAGE_METHOD).getMethod(newOptions);
             campaign.getPlayerForce().getHumanResources().setMarriage(marriage);
         } else {
             AbstractMarriage marriage = getCampaign().getPlayerForce().getHumanResources().getMarriage();
-            marriage.setUseClanPersonnelMarriages(newOptions.isUseClanPersonnelMarriages());
-            marriage.setUsePrisonerMarriages(newOptions.isUsePrisonerMarriages());
-            marriage.setUseRandomClanPersonnelMarriages(newOptions.isUseRandomClanPersonnelMarriages());
-            marriage.setUseRandomPrisonerMarriages(newOptions.isUseRandomPrisonerMarriages());
+            marriage.setUseClanPersonnelMarriages(newOptions.get(CampaignOption.USE_CLAN_PERSONNEL_MARRIAGES));
+            marriage.setUsePrisonerMarriages(newOptions.get(CampaignOption.USE_PRISONER_MARRIAGES));
+            marriage.setUseRandomClanPersonnelMarriages(newOptions.get(CampaignOption.USE_RANDOM_CLAN_PERSONNEL_MARRIAGES));
+            marriage.setUseRandomPrisonerMarriages(newOptions.get(CampaignOption.USE_RANDOM_PRISONER_MARRIAGES));
             if (marriage.getMethod().isDiceRoll()) {
-                ((RandomMarriage) marriage).setMarriageDiceSize(newOptions.getRandomMarriageDiceSize());
+                ((RandomMarriage) marriage).setMarriageDiceSize(newOptions.get(CampaignOption.RANDOM_MARRIAGE_DICE_SIZE));
             }
         }
 
-        if (randomProcreationMethod != newOptions.getRandomProcreationMethod()) {
+        if (randomProcreationMethod != newOptions.get(CampaignOption.RANDOM_PROCREATION_METHOD)) {
             Campaign campaign = getCampaign();
-            final AbstractProcreation procreation = newOptions.getRandomProcreationMethod().getMethod(newOptions);
+            final AbstractProcreation procreation = newOptions.get(CampaignOption.RANDOM_PROCREATION_METHOD).getMethod(newOptions);
             campaign.getPlayerForce().getHumanResources().setProcreation(procreation);
         } else {
             AbstractProcreation procreation = getCampaign().getPlayerForce().getHumanResources().getProcreation();
-            procreation.setUseClanPersonnelProcreation(newOptions.isUseClanPersonnelProcreation());
-            procreation.setUsePrisonerProcreation(newOptions.isUsePrisonerProcreation());
-            procreation.setUseRelationshiplessProcreation(newOptions.isUseRelationshiplessRandomProcreation());
-            procreation.setUseRandomClanPersonnelProcreation(newOptions.isUseRandomClanPersonnelProcreation());
-            procreation.setUseRandomPrisonerProcreation(newOptions.isUseRandomPrisonerProcreation());
+            procreation.setUseClanPersonnelProcreation(newOptions.get(CampaignOption.USE_CLAN_PERSONNEL_PROCREATION));
+            procreation.setUsePrisonerProcreation(newOptions.get(CampaignOption.USE_PRISONER_PROCREATION));
+            procreation.setUseRelationshiplessProcreation(newOptions.get(CampaignOption.USE_RELATIONSHIPLESS_RANDOM_PROCREATION));
+            procreation.setUseRandomClanPersonnelProcreation(newOptions.get(CampaignOption.USE_RANDOM_CLAN_PERSONNEL_PROCREATION));
+            procreation.setUseRandomPrisonerProcreation(newOptions.get(CampaignOption.USE_RANDOM_PRISONER_PROCREATION));
             if (procreation.getMethod().isDiceRoll()) {
                 ((RandomProcreation) procreation).setRelationshipDieSize(
-                      newOptions.getRandomProcreationRelationshipDiceSize());
+                      newOptions.get(CampaignOption.RANDOM_PROCREATION_RELATIONSHIP_DICE_SIZE));
                 ((RandomProcreation) procreation).setRelationshiplessDieSize(
-                      newOptions.getRandomProcreationRelationshiplessDiceSize());
+                      newOptions.get(CampaignOption.RANDOM_PROCREATION_RELATIONSHIPLESS_DICE_SIZE));
             }
         }
 
         // Clear Procreation Data if Disabled
-        if (!newOptions.isUseManualProcreation() && newOptions.getRandomProcreationMethod().isNone()) {
+        if (!newOptions.get(CampaignOption.USE_MANUAL_PROCREATION) && newOptions.get(CampaignOption.RANDOM_PROCREATION_METHOD).isNone()) {
             getCampaign().getPlayerForce().getHumanResources().getPersonnel()
                   .parallelStream()
                   .filter(Person::isPregnant)
@@ -1033,14 +1034,14 @@ public class MekHQMenuBar extends JMenuBar {
         }
 
         final AbstractUnitMarket unitMarket = getCampaign().getUnitMarket();
-        if (unitMarket.getMethod() != newOptions.getUnitMarketMethod()) {
-            getCampaign().setUnitMarket(newOptions.getUnitMarketMethod().getUnitMarket());
+        if (unitMarket.getMethod() != newOptions.get(CampaignOption.UNIT_MARKET_METHOD)) {
+            getCampaign().setUnitMarket(newOptions.get(CampaignOption.UNIT_MARKET_METHOD).getUnitMarket());
             getCampaign().getUnitMarket().setOffers(unitMarket.getOffers());
         }
 
         AbstractContractMarket contractMarket = getCampaign().getContractMarket();
-        if (contractMarket.getMethod() != newOptions.getContractMarketMethod()) {
-            getCampaign().setContractMarket(newOptions.getContractMarketMethod().getContractMarket());
+        if (contractMarket.getMethod() != newOptions.get(CampaignOption.CONTRACT_MARKET_METHOD)) {
+            getCampaign().setContractMarket(newOptions.get(CampaignOption.CONTRACT_MARKET_METHOD).getContractMarket());
         }
 
         if (atb != newOptions.isUseStratCon()) {
@@ -1069,8 +1070,8 @@ public class MekHQMenuBar extends JMenuBar {
 
         getCampaign().initTurnover();
 
-        if (factionIntroDate != newOptions.isFactionIntroDate()) {
-            getCampaign().updateTechFactionCode();
+        if (factionIntroDate != newOptions.get(CampaignOption.FACTION_INTRO_DATE)) {
+            getCampaign().getPlayerForce().updateTechFactionCode();
         }
         getGui().refreshWindowTitle();
         getCampaign().reloadNews();
@@ -1194,8 +1195,8 @@ public class MekHQMenuBar extends JMenuBar {
      */
     @Subscribe
     public void handle(final OptionsChangedEvent optionsChangedEvent) {
-        miRetirementDefectionDialog.setVisible(optionsChangedEvent.getOptions().isUseRandomRetirement());
-        miAwardEligibilityDialog.setVisible((optionsChangedEvent.getOptions().isEnableAutoAwards()));
+        miRetirementDefectionDialog.setVisible(optionsChangedEvent.getOptions().get(CampaignOption.USE_RANDOM_RETIREMENT));
+        miAwardEligibilityDialog.setVisible((optionsChangedEvent.getOptions().get(CampaignOption.ENABLE_AUTO_AWARDS)));
     }
 
     /**

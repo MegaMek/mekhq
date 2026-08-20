@@ -85,7 +85,7 @@ public class MercenaryAuctionDialog extends ImmersiveDialogCore {
               campaign.getPlayerForce().getHumanResources()
                     .getSeniorAdminPerson(mekhq.campaign.Campaign.AdministratorSpecialization.TRANSPORT,
                           campaign.getCampaignOptions(),
-                          campaign.isClanCampaign(),
+                          campaign.getPlayerForce().isClanForce(),
                           campaign.getLocalDate()),
               null,
               createCenterMessage(campaign, entity.getShortName()),

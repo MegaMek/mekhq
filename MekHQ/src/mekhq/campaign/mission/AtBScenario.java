@@ -78,6 +78,7 @@ import mekhq.campaign.Campaign;
 import mekhq.campaign.againstTheBot.AtBConfiguration;
 import mekhq.campaign.againstTheBot.AtBStaticWeightGenerator;
 import mekhq.campaign.campaignOptions.CampaignOptions;
+import mekhq.campaign.campaignOptions.CampaignOption;
 import mekhq.campaign.digitalGM.stratCon.StratConCampaignState;
 import mekhq.campaign.digitalGM.stratCon.StratConScenario;
 import mekhq.campaign.digitalGM.stratCon.StratConTrackState;
@@ -348,14 +349,14 @@ public abstract class AtBScenario extends Scenario implements IAtBScenario {
     private void initBattle(Campaign campaign) {
         setTerrain();
         CampaignOptions campaignOptions = campaign.getCampaignOptions();
-        if (campaignOptions.isUsePlanetaryConditions() && null != campaign.getMission(getMissionId())) {
+        if (campaignOptions.get(CampaignOption.USE_PLANETARY_CONDITIONS) && null != campaign.getMission(getMissionId())) {
             setPlanetaryConditions(campaign.getMission(getMissionId()), campaign);
         }
-        if (campaignOptions.isUseLightConditions()) {
+        if (campaignOptions.get(CampaignOption.USE_LIGHT_CONDITIONS)) {
             setLightConditions();
         }
-        if (campaignOptions.isUseWeatherConditions()) {
-            setWeatherConditions(campaignOptions.isUseNoTornadoes());
+        if (campaignOptions.get(CampaignOption.USE_WEATHER_CONDITIONS)) {
+            setWeatherConditions(campaignOptions.get(CampaignOption.USE_NO_TORNADOES));
         }
         setMapSize(campaign);
         setMapFile();
@@ -756,17 +757,17 @@ public abstract class AtBScenario extends Scenario implements IAtBScenario {
         if (getContract(campaign).getContractType().isCadreDuty()) {
             numAttachedPlayer = 3;
         } else {
-            if (campaign.getFaction().isMercenary()) {
+            if (campaign.getPlayerForce().getFaction().isMercenary()) {
                 switch (getContract(campaign).getCommandRights()) {
                     case INTEGRATED:
-                        if (campaign.getCampaignOptions().isPlayerControlsAttachedUnits()) {
+                        if (campaign.getCampaignOptions().get(CampaignOption.PLAYER_CONTROLS_ATTACHED_UNITS)) {
                             numAttachedPlayer = 2;
                         } else {
                             numAttachedBot = 2;
                         }
                         break;
                     case HOUSE:
-                        if (campaign.getCampaignOptions().isPlayerControlsAttachedUnits()) {
+                        if (campaign.getCampaignOptions().get(CampaignOption.PLAYER_CONTROLS_ATTACHED_UNITS)) {
                             numAttachedPlayer = 1;
                         } else {
                             numAttachedBot = 1;
@@ -798,7 +799,7 @@ public abstract class AtBScenario extends Scenario implements IAtBScenario {
                 attachedUnitIds.add(UUID.fromString(en.getExternalIdAsString()));
                 getExternalIDLookup().put(en.getExternalIdAsString(), en);
 
-                if (!campaign.getCampaignOptions().isAttachedPlayerCamouflage()) {
+                if (!campaign.getCampaignOptions().get(CampaignOption.ATTACHED_PLAYER_CAMOUFLAGE)) {
                     en.setCamouflage(camouflage.clone());
                 }
             } else {
@@ -875,7 +876,7 @@ public abstract class AtBScenario extends Scenario implements IAtBScenario {
             addBotForce(bf, campaign);
         }
 
-        if (campaign.getCampaignOptions().isUseDropShips()) {
+        if (campaign.getCampaignOptions().get(CampaignOption.USE_DROP_SHIPS)) {
             if (canAddDropShips()) {
                 boolean dropshipFound = false;
                 mekhq.campaign.LocalHangar hangar = campaign.getPlayerForce().getHangar();
@@ -936,7 +937,7 @@ public abstract class AtBScenario extends Scenario implements IAtBScenario {
         }
 
         // and for fun, run everyone through the crew upgrader
-        if (campaign.getCampaignOptions().isUseAbilities()) {
+        if (campaign.getCampaignOptions().get(CampaignOption.USE_ABILITIES)) {
             AtBDynamicScenarioFactory.upgradeBotCrews(this, campaign);
         }
 
@@ -1171,7 +1172,7 @@ public abstract class AtBScenario extends Scenario implements IAtBScenario {
                   weightClass);
             return;
         }
-        int maxLances = Math.min(lances.length(), campaign.getCampaignOptions().getSkillLevel().getAdjustedValue() + 1);
+        int maxLances = Math.min(lances.length(), campaign.getCampaignOptions().get(CampaignOption.SKILL_LEVEL).getAdjustedValue() + 1);
 
         for (int i = 0; i < maxLances; i++) {
             addEnemyLance(list, AtBConfiguration.decodeWeightStr(lances, i) + weightMod, maxWeight, campaign);
@@ -1322,20 +1323,20 @@ public abstract class AtBScenario extends Scenario implements IAtBScenario {
         weights = adjustForMaxWeight(weights, maxWeight);
 
         int forceType = FORCE_MEK;
-        int totalWeight = campaign.getCampaignOptions().getOpForLanceTypeMeks() +
-                                campaign.getCampaignOptions().getOpForLanceTypeMixed() +
-                                campaign.getCampaignOptions().getOpForLanceTypeVehicles();
+        int totalWeight = campaign.getCampaignOptions().get(CampaignOption.OP_FOR_LANCE_TYPE_MEKS) +
+                                campaign.getCampaignOptions().get(CampaignOption.OP_FOR_LANCE_TYPE_MIXED) +
+                                campaign.getCampaignOptions().get(CampaignOption.OP_FOR_LANCE_TYPE_VEHICLES);
         if (totalWeight > 0) {
             int roll = Compute.randomInt(totalWeight);
-            if (roll < campaign.getCampaignOptions().getOpForLanceTypeVehicles()) {
+            if (roll < campaign.getCampaignOptions().get(CampaignOption.OP_FOR_LANCE_TYPE_VEHICLES)) {
                 forceType = FORCE_VEHICLE;
             } else if (roll <
-                             campaign.getCampaignOptions().getOpForLanceTypeVehicles() +
-                                   campaign.getCampaignOptions().getOpForLanceTypeMixed()) {
+                             campaign.getCampaignOptions().get(CampaignOption.OP_FOR_LANCE_TYPE_VEHICLES) +
+                                   campaign.getCampaignOptions().get(CampaignOption.OP_FOR_LANCE_TYPE_MIXED)) {
                 forceType = FORCE_MIXED;
             }
         }
-        if (forceType == FORCE_MEK && campaign.getCampaignOptions().isRegionalMekVariations()) {
+        if (forceType == FORCE_MEK && campaign.getCampaignOptions().get(CampaignOption.REGIONAL_MEK_VARIATIONS)) {
             weights = adjustWeightsForFaction(weights, faction);
         }
 
@@ -1417,7 +1418,7 @@ public abstract class AtBScenario extends Scenario implements IAtBScenario {
 
         int unitType = (forceType == FORCE_VEHICLE) ? UnitType.TANK : UnitType.MEK;
 
-        if (campaign.getCampaignOptions().isRegionalMekVariations()) {
+        if (campaign.getCampaignOptions().get(CampaignOption.REGIONAL_MEK_VARIATIONS)) {
             if (unitType == UnitType.MEK) {
                 weights = adjustWeightsForFaction(weights, faction);
             }
@@ -1559,7 +1560,7 @@ public abstract class AtBScenario extends Scenario implements IAtBScenario {
     protected void addTurrets(List<Entity> list, int num, SkillLevel skill, int quality, Campaign campaign,
           Faction faction) {
         List<Entity> turrets =
-              campaign.getCampaignOptions().isUseAdvancedBuildingGunEmplacements()
+              campaign.getCampaignOptions().get(CampaignOption.USE_ADVANCED_BUILDING_GUN_EMPLACEMENTS)
                     ? AtBDynamicScenarioFactory.generateGunEmplacements(num, skill, quality, campaign, faction)
                     : AtBDynamicScenarioFactory.generateTurrets(num, skill, quality, campaign, faction);
         list.addAll(turrets);
@@ -1606,7 +1607,7 @@ public abstract class AtBScenario extends Scenario implements IAtBScenario {
         if (spawnConventional) {
             // skill level is an enum going from ultra-green to legendary
             for (int unitCount = 0;
-                  unitCount <= campaign.getCampaignOptions().getSkillLevel().getAdjustedValue();
+                  unitCount <= campaign.getCampaignOptions().get(CampaignOption.SKILL_LEVEL).getAdjustedValue();
                   unitCount++) {
                 aero = getEntity(contract.getEnemyCode(),
                       contract.getEnemySkill(),
@@ -1620,7 +1621,7 @@ public abstract class AtBScenario extends Scenario implements IAtBScenario {
             }
         } else if (spawnAeroTech) {
             for (int unitCount = 0;
-                  unitCount <= campaign.getCampaignOptions().getSkillLevel().getAdjustedValue();
+                  unitCount <= campaign.getCampaignOptions().get(CampaignOption.SKILL_LEVEL).getAdjustedValue();
                   unitCount++) {
                 // compute weight class
                 int weightClass = randomAeroWeights[Compute.d6() - 1];
@@ -1714,7 +1715,7 @@ public abstract class AtBScenario extends Scenario implements IAtBScenario {
             // skill level is an enum from ultra-green to legendary, and drives the number
             // of extra units
             addTurrets(scrubs,
-                  campaign.getCampaignOptions().getSkillLevel().getAdjustedValue() + 1,
+                  campaign.getCampaignOptions().get(CampaignOption.SKILL_LEVEL).getAdjustedValue() + 1,
                   contract.getEnemySkill(),
                   contract.getEnemyQuality(),
                   campaign,
@@ -1723,7 +1724,7 @@ public abstract class AtBScenario extends Scenario implements IAtBScenario {
 
         if (spawnConventionalInfantry && isInfantryAppropriateTerrain) {
             for (int unitCount = 0;
-                  unitCount <= campaign.getCampaignOptions().getSkillLevel().getAdjustedValue();
+                  unitCount <= campaign.getCampaignOptions().get(CampaignOption.SKILL_LEVEL).getAdjustedValue();
                   unitCount++) {
                 Entity infantry = getEntity(contract.getEnemyCode(),
                       contract.getEnemySkill(),
@@ -1739,7 +1740,7 @@ public abstract class AtBScenario extends Scenario implements IAtBScenario {
 
         if (spawnBattleArmor && isInfantryAppropriateTerrain) {
             for (int unitCount = 0;
-                  unitCount <= campaign.getCampaignOptions().getSkillLevel().getAdjustedValue();
+                  unitCount <= campaign.getCampaignOptions().get(CampaignOption.SKILL_LEVEL).getAdjustedValue();
                   unitCount++) {
                 // some factions don't have access to battle armor, so they get conventional
                 // infantry instead
@@ -1778,7 +1779,7 @@ public abstract class AtBScenario extends Scenario implements IAtBScenario {
                 // the option being enabled and the difficulty
                 if (campaign.getGameOptions().booleanOption(OptionsConstants.ADVANCED_HIDDEN_UNITS) &&
                           (en.getMaxWeaponRange() <= 4) &&
-                          (Compute.randomInt(5) <= campaign.getCampaignOptions().getSkillLevel().getAdjustedValue())) {
+                          (Compute.randomInt(5) <= campaign.getCampaignOptions().get(CampaignOption.SKILL_LEVEL).getAdjustedValue())) {
                     en.setHidden(true);
                 }
             });

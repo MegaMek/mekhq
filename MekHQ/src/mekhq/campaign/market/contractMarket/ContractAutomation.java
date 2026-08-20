@@ -59,6 +59,7 @@ import mekhq.campaign.unit.actions.ActivateUnitAction;
 import mekhq.campaign.unit.actions.MothballUnitAction;
 import mekhq.campaign.utilities.JumpBlockers;
 import mekhq.gui.baseComponents.immersiveDialogs.ImmersiveDialogSimple;
+import mekhq.campaign.campaignOptions.CampaignOption;
 
 /**
  * The {@link ContractAutomation} class provides a suite of methods used in automating actions when a contract starts.
@@ -81,7 +82,7 @@ public class ContractAutomation {
      */
     public static void contractStartPrompt(Campaign campaign, Contract contract) {
         // If we're already in the right system, there is no need to automate these actions
-        if (Objects.equals(campaign.getCurrentLocation().getCurrentSystem(), contract.getSystem())) {
+        if (Objects.equals(campaign.getPlayerForce().getForceDetachment().getCurrentLocation().getCurrentSystem(), contract.getSystem())) {
             return;
         }
 
@@ -92,7 +93,7 @@ public class ContractAutomation {
         final Person speaker = campaign.getPlayerForce().getHumanResources()
                                      .getSeniorAdminPerson(mekhq.campaign.Campaign.AdministratorSpecialization.TRANSPORT,
                                            campaign.getCampaignOptions(),
-                                           campaign.isClanCampaign(),
+                                           campaign.getPlayerForce().isClanForce(),
                                            campaign.getLocalDate());
 
         // Mothballing
@@ -126,7 +127,7 @@ public class ContractAutomation {
         JumpPath jumpPath = contract.getJumpPath(campaign);
         int travelDays = contract.getTravelDays(campaign);
 
-        boolean isUseTwoWayPay = campaign.getCampaignOptions().isUseTwoWayPay();
+        boolean isUseTwoWayPay = campaign.getCampaignOptions().get(CampaignOption.IS_USE_TWO_WAY_PAY);
         String totalCost = contract.getTotalTransportationFees(campaign)
                                  .dividedBy(isUseTwoWayPay ? 2 : 1)
                                  .toAmountString();
@@ -151,10 +152,10 @@ public class ContractAutomation {
                 return;
             }
 
-            campaign.getCurrentLocation().setJumpPath(jumpPath);
+            campaign.getPlayerForce().getForceDetachment().getCurrentLocation().setJumpPath(jumpPath);
             campaign.getUnits().forEach(unit -> unit.setSite(Unit.SITE_FACILITY_BASIC));
             campaign.getGUI().refreshAllTabs();
-            boolean useTwoWayPay = campaign.getCampaignOptions().isUseTwoWayPay();
+            boolean useTwoWayPay = campaign.getCampaignOptions().get(CampaignOption.IS_USE_TWO_WAY_PAY);
 
             // This will return an empty string if the transaction was successful
             String jumpReport = TransportCostCalculations.performJumpTransaction(campaign.getPlayerForce()
@@ -265,7 +266,7 @@ public class ContractAutomation {
         final Person speaker = campaign.getPlayerForce().getHumanResources()
                                      .getSeniorAdminPerson(mekhq.campaign.Campaign.AdministratorSpecialization.TRANSPORT,
                                            campaign.getCampaignOptions(),
-                                           campaign.isClanCampaign(),
+                                           campaign.getPlayerForce().isClanForce(),
                                            campaign.getLocalDate());
 
         final String commanderAddress = campaign.getCommanderAddress();
