@@ -32,8 +32,6 @@
  */
 package mekhq.campaign.mission.contract.contractData;
 
-import jakarta.annotation.Nullable;
-
 public record ContractTermsData(
       ChaosContractStepsTable payRate,
       ChaosContractStepsTable support,
@@ -41,15 +39,38 @@ public record ContractTermsData(
       ChaosContractStepsTable salvageRights,
       ChaosContractStepsTable commandRights
 ) {
-    public ContractTermsData(ContractTermsData existingTerms, @Nullable ChaosContractStepsTable newPayRate,
-          @Nullable ChaosContractStepsTable newSupport, @Nullable ChaosContractStepsTable newTransport,
-          @Nullable ChaosContractStepsTable newSalvageRights, @Nullable ChaosContractStepsTable newCommandRights) {
-        this(
-              newPayRate != null ? newPayRate : existingTerms.payRate,
-              newSupport != null ? newSupport : existingTerms.support,
-              newTransport != null ? newTransport : existingTerms.transport,
-              newSalvageRights != null ? newSalvageRights : existingTerms.salvageRights,
-              newCommandRights != null ? newCommandRights : existingTerms.commandRights
-        );
+    /**
+     * @return a copy of these terms with {@code payRate} replaced.
+     */
+    public ContractTermsData withPayRate(ChaosContractStepsTable payRate) {
+        return new ContractTermsData(payRate, support, transport, salvageRights, commandRights);
+    }
+
+    /**
+     * @return a copy of these terms with {@code support} replaced.
+     */
+    public ContractTermsData withSupport(ChaosContractStepsTable support) {
+        return new ContractTermsData(payRate, support, transport, salvageRights, commandRights);
+    }
+
+    /**
+     * @return a copy of these terms with {@code transport} replaced.
+     */
+    public ContractTermsData withTransport(ChaosContractStepsTable transport) {
+        return new ContractTermsData(payRate, support, transport, salvageRights, commandRights);
+    }
+
+    /**
+     * @return a copy of these terms with {@code salvageRights} replaced.
+     */
+    public ContractTermsData withSalvageRights(ChaosContractStepsTable salvageRights) {
+        return new ContractTermsData(payRate, support, transport, salvageRights, commandRights);
+    }
+
+    /**
+     * @return a copy of these terms with {@code commandRights} replaced.
+     */
+    public ContractTermsData withCommandRights(ChaosContractStepsTable commandRights) {
+        return new ContractTermsData(payRate, support, transport, salvageRights, commandRights);
     }
 }

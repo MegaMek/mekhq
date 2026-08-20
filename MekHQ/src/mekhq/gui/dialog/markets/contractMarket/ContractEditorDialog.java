@@ -1026,8 +1026,14 @@ public class ContractEditorDialog extends JDialog {
             }
         }
         ContractScheduleData schedule = contract.getScheduleData();
-        ContractScheduleData scheduleBase = (schedule == null) ? new ContractScheduleData(null, null, 0) : schedule;
-        contract.setScheduleData(new ContractScheduleData(scheduleBase, saveStart, saveEnd));
+        ContractScheduleData updatedSchedule = (schedule == null) ? new ContractScheduleData(null, null, 0) : schedule;
+        if (saveStart != null) {
+            updatedSchedule = updatedSchedule.withStartDate(saveStart);
+        }
+        if (saveEnd != null) {
+            updatedSchedule = updatedSchedule.withEndDate(saveEnd);
+        }
+        contract.setScheduleData(updatedSchedule);
 
         // Employer
         EmployerData employer = contract.getEmployerData();

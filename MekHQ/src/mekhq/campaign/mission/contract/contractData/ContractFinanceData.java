@@ -32,16 +32,29 @@
  */
 package mekhq.campaign.mission.contract.contractData;
 
-import jakarta.annotation.Nullable;
 import mekhq.campaign.finances.Money;
 
 public record ContractFinanceData(Money transport, Money monthlyPay, Money combatPay
 ) {
-    public ContractFinanceData(ContractFinanceData existingData, @Nullable Money transport, @Nullable Money monthlyPay,
-          @Nullable Money combatPay) {
-        this(transport == null ? existingData.transport : transport,
-              monthlyPay == null ? existingData.monthlyPay : monthlyPay,
-              combatPay == null ? existingData.combatPay : combatPay);
+    /**
+     * @return a copy of this record with {@code transport} replaced.
+     */
+    public ContractFinanceData withTransport(Money transport) {
+        return new ContractFinanceData(transport, monthlyPay, combatPay);
+    }
+
+    /**
+     * @return a copy of this record with {@code monthlyPay} replaced.
+     */
+    public ContractFinanceData withMonthlyPay(Money monthlyPay) {
+        return new ContractFinanceData(transport, monthlyPay, combatPay);
+    }
+
+    /**
+     * @return a copy of this record with {@code combatPay} replaced.
+     */
+    public ContractFinanceData withCombatPay(Money combatPay) {
+        return new ContractFinanceData(transport, monthlyPay, combatPay);
     }
 
     public Money getTotalMonthlyPay(int lengthInMonths) {

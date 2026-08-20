@@ -74,7 +74,6 @@ import mekhq.campaign.digitalGM.stratCon.StratConTrackState;
 import mekhq.campaign.mission.contract.AbstractContract;
 import mekhq.campaign.mission.contract.contractData.ChaosContractStepsTable;
 import mekhq.campaign.mission.contract.contractData.ContractMoraleLevel;
-import mekhq.campaign.mission.contract.contractData.ContractTermsData;
 import mekhq.campaign.mission.contract.contractData.EnemyData;
 import mekhq.campaign.mission.contract.contractGeneration.ChaosContractDeterminationEnemy;
 import mekhq.campaign.mission.scenarios.Scenario;
@@ -819,12 +818,8 @@ public class MHQMorale {
           AbstractContract contract) {
         if (!contract.getEmployerFaction().isClan() && enemyFaction.isClan()) {
             if (!today.isAfter(BATTLE_OF_TUKAYYID)) {
-                contract.setContractTerms(new ContractTermsData(contract.getContractTerms(),
-                      null,
-                      null,
-                      null,
-                      ChaosContractStepsTable.STEP_FIVE,
-                      null));
+                contract.setContractTerms(
+                      contract.getContractTerms().withSalvageRights(ChaosContractStepsTable.STEP_FIVE));
 
                 String message = getTextAt(RESOURCE_BUNDLE, "emergencySalvageClause.message");
                 new ImmersiveDialogSimple(campaign,

@@ -45,9 +45,10 @@ import org.junit.jupiter.api.Test;
  * Tests {@link ContractScheduleData} - when a contract runs.
  *
  * <p>Two behaviors carry weight here. {@link ContractScheduleData#isActiveOn} treats a missing endpoint as unbounded
- * on that side, which is how a contract with no settled schedule stays visible rather than vanishing. And the copy
- * constructor <em>recomputes</em> the length from the resulting dates, which is what makes an extension work - pushing
- * the end date back lengthens the contract rather than leaving a stale figure behind.</p>
+ * on that side, which is how a contract with no settled schedule stays visible rather than vanishing. And the
+ * {@code withStartDate}/{@code withEndDate} withers <em>recompute</em> the length from the resulting dates, which is
+ * what makes an extension work - pushing the end date back lengthens the contract rather than leaving a stale figure
+ * behind.</p>
  */
 class ContractScheduleDataTest {
     private static final LocalDate START = LocalDate.of(3051, 1, 10);
@@ -103,20 +104,18 @@ class ContractScheduleDataTest {
 
     // endregion isActiveOn
 
-    // region copy constructor
+    // region withers
 
     @Test
-    void copyingWithNoReplacementsKeepsEverything() {
-        ContractScheduleData copy = new ContractScheduleData(sixMonthContract(), null, null);
+    void aWitherLeavesTheOtherEndpointUntouched() {
+        ContractScheduleData reEnded = sixMonthContract().withEndDate(END.plusMonths(3));
 
-        assertEquals(START, copy.startDate());
-        assertEquals(END, copy.endDate());
-        assertEquals(6, copy.lengthInMonths());
+        assertEquals(START, reEnded.startDate(), "changing the end date must not move the start date");
     }
 
     @Test
     void pushingTheEndDateBackLengthensTheContract() {
-        ContractScheduleData extended = new ContractScheduleData(sixMonthContract(), null, END.plusMonths(3));
+        ContractScheduleData extended = sixMonthContract().withEndDate(END.plusMonths(3));
 
         assertEquals(START, extended.startDate(), "an extension does not move the start date");
         assertEquals(END.plusMonths(3), extended.endDate());
@@ -125,38 +124,35 @@ class ContractScheduleDataTest {
 
     @Test
     void pullingTheEndDateForwardShortensTheContract() {
-        ContractScheduleData shortened = new ContractScheduleData(sixMonthContract(), null, END.minusMonths(2));
+        ContractScheduleData shortened = sixMonthContract().withEndDate(END.minusMonths(2));
 
         assertEquals(4, shortened.lengthInMonths());
     }
 
     @Test
     void movingOnlyTheStartDateAlsoChangesTheLength() {
-        ContractScheduleData moved = new ContractScheduleData(sixMonthContract(), START.plusMonths(2), null);
+        ContractScheduleData moved = sixMonthContract().withStartDate(START.plusMonths(2));
 
         assertEquals(4, moved.lengthInMonths(),
               "the length always describes the span the contract runs for, so a caller meaning to shift the whole "
-                    + "contract must pass both dates");
+                      + "contract must move both dates");
     }
 
     @Test
     void shiftingBothDatesLeavesTheLengthUnchanged() {
-        ContractScheduleData shifted = new ContractScheduleData(sixMonthContract(),
-              START.plusYears(1),
-              END.plusYears(1));
+        ContractScheduleData shifted = sixMonthContract().withStartDate(START.plusYears(1))
+                                               .withEndDate(END.plusYears(1));
 
         assertEquals(6, shifted.lengthInMonths(), "shifting the whole contract must not resize it");
     }
 
     @Test
     void lengthIsLeftAloneWhenEitherResultingDateIsAbsent() {
-        ContractScheduleData openEnded = new ContractScheduleData(new ContractScheduleData(START, null, 6),
-              START.plusMonths(2),
-              null);
+        ContractScheduleData openEnded = new ContractScheduleData(START, null, 6).withStartDate(START.plusMonths(2));
 
         assertEquals(6, openEnded.lengthInMonths(), "there is no span to measure, so the agreed length stands");
         assertNull(openEnded.endDate());
     }
 
-    // endregion copy constructor
+    // endregion withers
 }

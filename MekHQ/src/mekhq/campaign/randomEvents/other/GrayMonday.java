@@ -101,12 +101,8 @@ public class GrayMonday {
                               Money.zero());
                         contract.setContractFinanceData(newFinances);
 
-                        ContractTermsData newTerms = new ContractTermsData(contract.getContractTerms(),
-                              null,
-                              null,
-                              null,
-                              ChaosContractStepsTable.STEP_SEVENTEEN,
-                              null);
+                        ContractTermsData newTerms = contract.getContractTerms()
+                                                             .withSalvageRights(ChaosContractStepsTable.STEP_SEVENTEEN);
                         contract.setContractTerms(newTerms);
                     }
                 }

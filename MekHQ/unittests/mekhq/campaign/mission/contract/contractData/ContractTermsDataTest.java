@@ -40,9 +40,9 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import org.junit.jupiter.api.Test;
 
 /**
- * Tests {@link ContractTermsData}'s selective copy constructor, which the negotiation table uses to raise one clause at
- * a time. A {@code null} argument means "leave this clause alone", so a copy that dropped an untouched clause back to a
- * default would silently undo an earlier round of negotiation.
+ * Tests {@link ContractTermsData}'s per-clause withers, which the negotiation table uses to raise one clause at a time.
+ * Each wither must leave every other clause on its negotiated step, so that raising one clause cannot silently undo an
+ * earlier round of negotiation.
  */
 class ContractTermsDataTest {
     private static final ContractTermsData BASELINE = new ContractTermsData(STEP_SEVEN,
@@ -52,13 +52,8 @@ class ContractTermsDataTest {
           STEP_SEVEN);
 
     @Test
-    void copyingWithNoReplacementsKeepsEveryClause() {
-        assertEquals(BASELINE, new ContractTermsData(BASELINE, null, null, null, null, null));
-    }
-
-    @Test
     void raisingOneClauseLeavesTheOthersUntouched() {
-        ContractTermsData raised = new ContractTermsData(BASELINE, STEP_NINE, null, null, null, null);
+        ContractTermsData raised = BASELINE.withPayRate(STEP_NINE);
 
         assertEquals(STEP_NINE, raised.payRate(), "the named clause moves");
         assertEquals(STEP_SEVEN, raised.support(), "an untouched clause must keep its negotiated step");
@@ -69,21 +64,20 @@ class ContractTermsDataTest {
 
     @Test
     void everyClauseCanBeReplacedIndependently() {
-        assertEquals(STEP_NINE, new ContractTermsData(BASELINE, STEP_NINE, null, null, null, null).payRate());
-        assertEquals(STEP_NINE, new ContractTermsData(BASELINE, null, STEP_NINE, null, null, null).support());
-        assertEquals(STEP_NINE, new ContractTermsData(BASELINE, null, null, STEP_NINE, null, null).transport());
-        assertEquals(STEP_NINE, new ContractTermsData(BASELINE, null, null, null, STEP_NINE, null).salvageRights());
-        assertEquals(STEP_NINE, new ContractTermsData(BASELINE, null, null, null, null, STEP_NINE).commandRights());
+        assertEquals(STEP_NINE, BASELINE.withPayRate(STEP_NINE).payRate());
+        assertEquals(STEP_NINE, BASELINE.withSupport(STEP_NINE).support());
+        assertEquals(STEP_NINE, BASELINE.withTransport(STEP_NINE).transport());
+        assertEquals(STEP_NINE, BASELINE.withSalvageRights(STEP_NINE).salvageRights());
+        assertEquals(STEP_NINE, BASELINE.withCommandRights(STEP_NINE).commandRights());
     }
 
     @Test
-    void replacingEveryClauseAtOnceAppliesAllOfThem() {
-        ContractTermsData replaced = new ContractTermsData(BASELINE,
-              STEP_NINE,
-              STEP_FIVE,
-              STEP_NINE,
-              STEP_FIVE,
-              STEP_NINE);
+    void chainingWithersAppliesAllOfThem() {
+        ContractTermsData replaced = BASELINE.withPayRate(STEP_NINE)
+                                             .withSupport(STEP_FIVE)
+                                             .withTransport(STEP_NINE)
+                                             .withSalvageRights(STEP_FIVE)
+                                             .withCommandRights(STEP_NINE);
 
         assertEquals(new ContractTermsData(STEP_NINE, STEP_FIVE, STEP_NINE, STEP_FIVE, STEP_NINE), replaced);
     }

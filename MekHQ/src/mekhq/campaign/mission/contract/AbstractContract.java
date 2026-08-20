@@ -294,15 +294,15 @@ public abstract class AbstractContract {
     }
 
     public void updateMonthlyPay(Money newMoney) {
-        contractFinanceData = new ContractFinanceData(contractFinanceData, null, newMoney, null);
+        contractFinanceData = contractFinanceData.withMonthlyPay(newMoney);
     }
 
     public void updateTransportPay(Money newMoney) {
-        contractFinanceData = new ContractFinanceData(contractFinanceData, newMoney, null, null);
+        contractFinanceData = contractFinanceData.withTransport(newMoney);
     }
 
     public void updateCombatPay(Money newMoney) {
-        contractFinanceData = new ContractFinanceData(contractFinanceData, null, null, newMoney);
+        contractFinanceData = contractFinanceData.withCombatPay(newMoney);
     }
 
     /**
@@ -326,7 +326,14 @@ public abstract class AbstractContract {
     }
 
     public void updateScheduleData(@Nullable LocalDate newStartDate, @Nullable LocalDate newEndDate) {
-        setScheduleData(new ContractScheduleData(scheduleData, newStartDate, newEndDate));
+        ContractScheduleData updated = scheduleData;
+        if (newStartDate != null) {
+            updated = updated.withStartDate(newStartDate);
+        }
+        if (newEndDate != null) {
+            updated = updated.withEndDate(newEndDate);
+        }
+        setScheduleData(updated);
     }
 
     public boolean isActiveOn(LocalDate date) {
@@ -868,7 +875,8 @@ public abstract class AbstractContract {
     }
 
     public void setStartAndEndDate(LocalDate localDate) {
-        setScheduleData(new ContractScheduleData(scheduleData, localDate, localDate.plusMonths(getLengthInMonths())));
+        setScheduleData(scheduleData.withStartDate(localDate)
+                              .withEndDate(localDate.plusMonths(getLengthInMonths())));
     }
 
     /**

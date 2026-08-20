@@ -53,33 +53,33 @@ public record ContractScheduleData(@Nullable LocalDate startDate,
       int lengthInMonths
 ) {
     /**
-     * Copies {@code existingData}, replacing either endpoint with the one supplied; a {@code null} argument keeps the
-     * existing value.
+     * Returns a copy with {@code startDate} replaced.
      *
      * <p><b>{@code lengthInMonths} is recomputed from the resulting dates</b>, so it always describes the span the
-     * contract actually runs for rather than a separately agreed figure. That is what makes an extension work: pushing
-     * the end date back lengthens the contract. It also means moving only the start date shortens or lengthens it, so a
-     * caller that means to shift the whole contract must pass both dates - as {@code setStartAndEndDate} does, where
-     * the recomputed length comes back identical.</p>
+     * contract actually runs for rather than a separately agreed figure. Moving only the start date therefore shortens
+     * or lengthens the contract; a caller that means to shift the whole contract unchanged must move both endpoints (as
+     * chaining {@code withStartDate(...).withEndDate(...)} does, where the final recomputed length comes back
+     * identical). The length is left untouched when either resulting date is absent, since there is no span to
+     * measure.</p>
      *
-     * <p>The length is left untouched when either resulting date is absent, since there is no span to measure.</p>
+     * @param startDate the replacement start date
      *
-     * @param existingData the schedule to copy
-     * @param newStartDate the replacement start date, or {@code null} to keep the existing one
-     * @param newEndDate   the replacement end date, or {@code null} to keep the existing one
+     * @return a copy of this schedule with {@code startDate} replaced and the length recomputed
      */
-    public ContractScheduleData(ContractScheduleData existingData, @Nullable LocalDate newStartDate,
-          @Nullable LocalDate newEndDate) {
-        this(orElse(newStartDate, existingData.startDate),
-              orElse(newEndDate, existingData.endDate),
-              monthsBetween(orElse(newStartDate, existingData.startDate),
-                    orElse(newEndDate, existingData.endDate),
-                    existingData.lengthInMonths));
+    public ContractScheduleData withStartDate(LocalDate startDate) {
+        return new ContractScheduleData(startDate, endDate, monthsBetween(startDate, endDate, lengthInMonths));
     }
 
-    private static @Nullable LocalDate orElse(final @Nullable LocalDate replacement,
-          final @Nullable LocalDate existing) {
-        return (replacement == null) ? existing : replacement;
+    /**
+     * Returns a copy with {@code endDate} replaced. As with {@link #withStartDate(LocalDate)}, the length is recomputed
+     * from the resulting dates - pushing the end date back is what lengthens (or an extension shortens) the contract.
+     *
+     * @param endDate the replacement end date
+     *
+     * @return a copy of this schedule with {@code endDate} replaced and the length recomputed
+     */
+    public ContractScheduleData withEndDate(LocalDate endDate) {
+        return new ContractScheduleData(startDate, endDate, monthsBetween(startDate, endDate, lengthInMonths));
     }
 
     private static int monthsBetween(final @Nullable LocalDate startDate, final @Nullable LocalDate endDate,
