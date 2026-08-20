@@ -189,25 +189,30 @@ public class RandomCompanyNameGenerator implements Serializable {
      */
     //region Synchronization
     public static RandomCompanyNameGenerator getInstance() {
-        if (randomCompanyNameGenerator == null) { // First check
+        RandomCompanyNameGenerator instance = randomCompanyNameGenerator;
+        if (instance == null) { // First check
             synchronized (RandomCompanyNameGenerator.class) {
-                if (randomCompanyNameGenerator == null) { // Double check
-                    randomCompanyNameGenerator = new RandomCompanyNameGenerator();
-                    randomCompanyNameGenerator.runThreadLoader(NAME_MIDDLE_WORD_CORPORATE);
-                    randomCompanyNameGenerator.runThreadLoader(NAME_END_WORD_CORPORATE);
-                    randomCompanyNameGenerator.runThreadLoader(NAME_MIDDLE_WORD_MERCENARY);
-                    randomCompanyNameGenerator.runThreadLoader(NAME_END_WORD_MERCENARY);
-                    randomCompanyNameGenerator.runThreadLoader(NAME_PRE_FAB);
-                    randomCompanyNameGenerator.runThreadLoader(NAME_MIDDLE_WORD_REBEL);
-                    randomCompanyNameGenerator.runThreadLoader(NAME_END_WORD_REBEL);
-                    randomCompanyNameGenerator.runThreadLoader(NAME_MIDDLE_WORD_MILITIA);
-                    randomCompanyNameGenerator.runThreadLoader(NAME_END_WORD_MILITIA);
-                    randomCompanyNameGenerator.runThreadLoader(NAME_MIDDLE_WORD_CIVILIAN);
-                    randomCompanyNameGenerator.runThreadLoader(NAME_END_WORD_CIVILIAN);
+                instance = randomCompanyNameGenerator;
+                if (instance == null) { // Double check
+                    instance = new RandomCompanyNameGenerator();
+                    instance.runThreadLoader(NAME_MIDDLE_WORD_CORPORATE);
+                    instance.runThreadLoader(NAME_END_WORD_CORPORATE);
+                    instance.runThreadLoader(NAME_MIDDLE_WORD_MERCENARY);
+                    instance.runThreadLoader(NAME_END_WORD_MERCENARY);
+                    instance.runThreadLoader(NAME_PRE_FAB);
+                    instance.runThreadLoader(NAME_MIDDLE_WORD_REBEL);
+                    instance.runThreadLoader(NAME_END_WORD_REBEL);
+                    instance.runThreadLoader(NAME_MIDDLE_WORD_MILITIA);
+                    instance.runThreadLoader(NAME_END_WORD_MILITIA);
+                    instance.runThreadLoader(NAME_MIDDLE_WORD_CIVILIAN);
+                    instance.runThreadLoader(NAME_END_WORD_CIVILIAN);
+                    // Publish only after the fully constructed instance has kicked off initialization,
+                    // so no other thread can observe a partially-initialized instance through the field.
+                    randomCompanyNameGenerator = instance;
                 }
             }
         }
-        return randomCompanyNameGenerator;
+        return instance;
     }
     //endregion Synchronization
 
@@ -258,7 +263,7 @@ public class RandomCompanyNameGenerator implements Serializable {
      */
     //region Initialization
     private void runThreadLoader(int origin) {
-        Thread loader = new Thread(() -> randomCompanyNameGenerator.populateCompanyNameSegments(origin),
+        Thread loader = new Thread(() -> populateCompanyNameSegments(origin),
               "Random Company Name Generator initializer");
         loader.setPriority(Thread.NORM_PRIORITY - 1);
         loader.start();
