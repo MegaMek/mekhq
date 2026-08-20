@@ -38,7 +38,10 @@ import static mekhq.campaign.mission.contract.contractData.ContractMoraleLevel.M
 import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.EnumSet;
 import java.util.List;
+import java.util.Set;
 import java.util.UUID;
 
 import jakarta.annotation.Nonnull;
@@ -135,6 +138,13 @@ public abstract class AbstractContract {
 
     /** Percentage of each monthly payment distributed to shareholding personnel. */
     private int sharesPercent = DEFAULT_SHARES_PERCENT;
+
+    /**
+     * The intel fields hidden from the player while this contract is an unaccepted market offer. Empty by default;
+     * populated automatically at generation (when the campaign opts in) or by the GM contract editor. Only consulted in
+     * the contract-market dossier - it has no effect once the contract is accepted.
+     */
+    private final EnumSet<ObfuscatableIntel> obfuscatedIntel = EnumSet.noneOf(ObfuscatableIntel.class);
 
     private StratConCampaignState stratConCampaignState;
     private int scale;
@@ -498,6 +508,37 @@ public abstract class AbstractContract {
      */
     public void setPendingLegacySettlementMultiplier(final @Nullable Double pendingLegacySettlementMultiplier) {
         this.pendingLegacySettlementMultiplier = pendingLegacySettlementMultiplier;
+    }
+
+    /**
+     * @return an unmodifiable view of the intel fields hidden from the player while this contract is a market offer
+     */
+    public Set<ObfuscatableIntel> getObfuscatedIntel() {
+        return Collections.unmodifiableSet(obfuscatedIntel);
+    }
+
+    /**
+     * @param field the intel field to test
+     *
+     * @return {@code true} when that intel field is hidden from the player in the contract market
+     */
+    public boolean isIntelObfuscated(ObfuscatableIntel field) {
+        return obfuscatedIntel.contains(field);
+    }
+
+    /** Hides or reveals one intel field in the contract market. */
+    public void setIntelObfuscated(ObfuscatableIntel field, boolean obfuscated) {
+        if (obfuscated) {
+            obfuscatedIntel.add(field);
+        } else {
+            obfuscatedIntel.remove(field);
+        }
+    }
+
+    /** Replaces the whole set of hidden intel fields (used by save loading). */
+    public void setObfuscatedIntel(Set<ObfuscatableIntel> fields) {
+        obfuscatedIntel.clear();
+        obfuscatedIntel.addAll(fields);
     }
 
     /**

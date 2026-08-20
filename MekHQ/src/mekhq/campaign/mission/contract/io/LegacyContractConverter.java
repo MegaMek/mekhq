@@ -292,15 +292,32 @@ public final class LegacyContractConverter {
         }
 
         // Only a contract that was still running needs settling and an advisory; one that had already concluded was
-        // settled when it ended. The advisory is logged now, but the remaining balance is reconstructed from the
-        // campaign's contract base - which is unavailable this early in the load (forces are parsed after missions) -
-        // so the monetary settlement is deferred to a post-load pass via a pending marker.
+        // settled when it ended.
         if (wasActive) {
-            contract.setPendingLegacySettlementMultiplier(paymentMultiplier);
             campaign.addReport(GENERAL,
                   getFormattedTextAt(RESOURCE_BUNDLE, "legacyContract.report", contract.getName()));
+            if (routedPayout.isPositive()) {
+                // A routed contract's outstanding payout is an explicit lump sum known here (it needs no force data),
+                // so settle it immediately - mirroring how completeMission pays a routed contract.
+                settle(campaign, contract, routedPayout);
+            } else {
+                // Otherwise the remaining balance is the leftover monthly pay, reconstructed from the campaign's
+                // contract base. That is unavailable this early in the load (forces are parsed after missions), so the
+                // settlement is deferred to a post-load pass via a pending marker.
+                contract.setPendingLegacySettlementMultiplier(paymentMultiplier);
+            }
         }
         return contract;
+    }
+
+    /** Credits a closed-out legacy contract's outstanding lump sum (its routed payout) to the player. */
+    private static void settle(final Campaign campaign, final AbstractContract contract, final Money settlementAmount) {
+        campaign.getPlayerForce()
+              .getFinances()
+              .credit(TransactionType.CONTRACT_PAYMENT,
+                    campaign.getLocalDate(),
+                    settlementAmount,
+                    getFormattedTextAt(RESOURCE_BUNDLE, "legacyContract.settlement", contract.getName()));
     }
 
     /**

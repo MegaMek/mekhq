@@ -51,6 +51,7 @@ import jakarta.annotation.Nullable;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.mission.contract.AbstractContract;
+import mekhq.campaign.mission.contract.contractData.ObfuscatableIntel;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.universe.Faction;
 import mekhq.campaign.universe.Planet;
@@ -115,13 +116,18 @@ public class ContractDossierPanel extends JPanel {
         header.setBorder(BorderFactory.createEmptyBorder(pad, pad, pad, pad));
 
         Color onAccent = contrastingText(accent);
+        // The title names the enemy, so when the opposition is hidden the title reads as unknown too.
+        boolean oppositionHidden = contract.isIntelObfuscated(ObfuscatableIntel.OPPOSITION);
+        String titleText = oppositionHidden
+                                 ? getTextAt(RESOURCE_BUNDLE, "dossier.contractMarket.title.unknown")
+                                 : contract.getName();
         JLabel title = new JLabel("<html><span style='font-size:smaller'>"
                                         +
                                         getTextAt(RESOURCE_BUNDLE, "dossier.contractMarket.eyebrow").toUpperCase() +
                                         "</span><br>"
                                         +
                                         "<b style='font-size:larger'>" +
-                                        escape(contract.getName()) +
+                                        escape(titleText) +
                                         "</b></html>");
         title.setForeground(onAccent);
         header.add(title, BorderLayout.WEST);
@@ -130,8 +136,9 @@ public class ContractDossierPanel extends JPanel {
         badges.setLayout(new BoxLayout(badges, BoxLayout.Y_AXIS));
         badges.setOpaque(false);
 
+        // A batchall badge would reveal the enemy is a Clan, so suppress it while the opposition is hidden.
         Faction enemyFaction = contract.getEnemyFaction();
-        boolean hasBatchall = (enemyFaction != null) && enemyFaction.isClan();
+        boolean hasBatchall = !oppositionHidden && (enemyFaction != null) && enemyFaction.isClan();
         if (hasBatchall) {
             badges.add(headerBadge(getTextAt(RESOURCE_BUNDLE, "dossier.contractMarket.batchall"), onAccent));
         }
@@ -309,13 +316,18 @@ public class ContractDossierPanel extends JPanel {
         columns.add(terms);
 
         JPanel intel = section(getTextAt(RESOURCE_BUNDLE, "dossier.contractMarket.section.intel"));
-        addDetailRow(intel, "dossier.contractMarket.intel.alliedCommand", alliedCommand(contract), null);
+        addDetailRow(intel, "dossier.contractMarket.intel.alliedCommand",
+              intelValue(ObfuscatableIntel.ALLIED_COMMAND, alliedCommand(contract)), null);
         addDetailRow(intel,
               "dossier.contractMarket.intel.opposition",
-              contract.getEnemyDisplayNameIncludingFaction(currentDate.getYear()),
+              intelValue(ObfuscatableIntel.OPPOSITION,
+                    contract.getEnemyDisplayNameIncludingFaction(currentDate.getYear())),
               null);
-        addDetailRow(intel, "dossier.contractMarket.intel.threat", threat(contract), null);
-        addDetailRow(intel, "dossier.contractMarket.intel.morale", contract.getMoraleLevel().toString(), null);
+        addDetailRow(intel, "dossier.contractMarket.intel.threat",
+              intelValue(ObfuscatableIntel.THREAT, threat(contract)), null);
+        addDetailRow(intel, "dossier.contractMarket.intel.morale",
+              intelValue(ObfuscatableIntel.MORALE, contract.getMoraleLevel().toString()), null);
+        // Assessment is never obfuscated.
         int difficulty = assessmentDifficulty(contract);
         Color assessmentColor = difficulty >= 8 ? dangerColor() : (difficulty <= 2 ? positiveColor() : null);
         addDetailRow(intel, "dossier.contractMarket.intel.assessment", assessmentLabel(contract), assessmentColor);
@@ -373,6 +385,16 @@ public class ContractDossierPanel extends JPanel {
         gbc.insets = new Insets(0, 0, scaleForGUI(4), 0);
         panel.add(title, gbc);
         return panel;
+    }
+
+    /**
+     * The intel value to display: the real {@code value}, or a "No Intel" placeholder when the contract hides that
+     * field from the player in the market.
+     */
+    private String intelValue(ObfuscatableIntel field, String value) {
+        return contract.isIntelObfuscated(field)
+                     ? getTextAt(RESOURCE_BUNDLE, "dossier.contractMarket.intel.obfuscated")
+                     : value;
     }
 
     private void addDetailRow(JPanel section, String labelKey, String value, Color valueColor) {

@@ -114,6 +114,10 @@ public final class ContractXmlCodec {
         MHQXMLUtility.writeSimpleXMLTag(printWriter, indent, "trackCount", contract.getTrackCount());
         MHQXMLUtility.writeSimpleXMLTag(printWriter, indent, "provingGround", contract.isProvingGround());
         MHQXMLUtility.writeSimpleXMLTag(printWriter, indent, "sharesPercent", contract.getSharesPercent());
+        if (!contract.getObfuscatedIntel().isEmpty()) {
+            MHQXMLUtility.writeSimpleXMLTag(printWriter, indent, "obfuscatedIntel",
+                  contract.getObfuscatedIntel().stream().map(Enum::name).collect(Collectors.joining(",")));
+        }
         if (contract.getStatus() != null) {
             MHQXMLUtility.writeSimpleXMLTag(printWriter, indent, "missionStatus", contract.getStatus().name());
         }
@@ -397,6 +401,8 @@ public final class ContractXmlCodec {
               (contract, node, campaign, version) -> contract.setContractFinanceData(parseFinanceData(node)));
         readers.put("scheduleData",
               (contract, node, campaign, version) -> contract.setScheduleData(parseScheduleData(node)));
+        readers.put("obfuscatedIntel",
+              (contract, node, campaign, version) -> contract.setObfuscatedIntel(parseObfuscatedIntel(node)));
         readers.put("systemsTargetData",
               (contract, node, campaign, version) -> contract.setSystemsTargetData(parseSystemsTargetData(node)));
         readers.put("rentedFacilitiesData",
@@ -706,6 +712,26 @@ public final class ContractXmlCodec {
         final ScheduleDataBuilder builder = readFields(wn, new ScheduleDataBuilder(), SCHEDULE_BINDERS, null, null,
               "scheduleData");
         return new ContractScheduleData(builder.startDate, builder.endDate, builder.lengthInMonths);
+    }
+
+    /**
+     * Parses the comma-separated list of hidden intel fields, skipping any name a newer save carried that this build no
+     * longer recognizes.
+     */
+    private static java.util.Set<ObfuscatableIntel> parseObfuscatedIntel(final Node wn) {
+        final java.util.Set<ObfuscatableIntel> fields = java.util.EnumSet.noneOf(ObfuscatableIntel.class);
+        for (final String token : text(wn).split(",")) {
+            final String name = token.trim();
+            if (name.isEmpty()) {
+                continue;
+            }
+            try {
+                fields.add(ObfuscatableIntel.valueOf(name));
+            } catch (IllegalArgumentException ex) {
+                LOGGER.warn("Unknown obfuscated-intel field '{}' ignored.", name);
+            }
+        }
+        return fields;
     }
 
     private static final class SystemsTargetBuilder {

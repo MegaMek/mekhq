@@ -769,6 +769,8 @@ public final class CampaignOption<T> {
           of(Boolean.class, true, "useChaosScaleSupportPointConversion");
     public static final CampaignOption<Boolean> USE_CONTRACT_FACTION_MODIFIERS =
           of(Boolean.class, true, "useContractFactionModifiers");
+    public static final CampaignOption<Boolean> USE_INTEL_OBFUSCATION =
+          of(Boolean.class, true, "useIntelObfuscation");
     public static final CampaignOption<Double> CONTRACT_BASE_PAY_MULTIPLIER =
           of(Double.class, 1.0, "contractBasePayMultiplier");
     public static final CampaignOption<Double> CONTRACT_STRAIGHT_SUPPORT_MULTIPLIER =

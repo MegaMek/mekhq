@@ -209,6 +209,12 @@ public class ContractEditorDialog extends JDialog {
     private JSpinner combatPaySpinner;
     private JCheckBox combatPayAutomatic;
 
+    // Intel obfuscation (hidden from the player in the market; always GM-editable, never auto-applied here)
+    private JCheckBox obfuscateAlliedCommandCheckbox;
+    private JCheckBox obfuscateOppositionCheckbox;
+    private JCheckBox obfuscateThreatCheckbox;
+    private JCheckBox obfuscateMoraleCheckbox;
+
     // Facilities
     private JSpinner hospitalBedsSpinner;
     private JSpinner kitchensSpinner;
@@ -362,6 +368,7 @@ public class ContractEditorDialog extends JDialog {
         addTab(tabs, "edit.contractMarket.section.target", buildTargetCard());
         addTab(tabs, "edit.contractMarket.section.employer", buildEmployerCard());
         addTab(tabs, "edit.contractMarket.section.enemy", buildEnemyCard());
+        addTab(tabs, "edit.contractMarket.section.intel", buildIntelCard());
         addTab(tabs, "edit.contractMarket.section.terms", buildTermsCard());
         addTab(tabs, "edit.contractMarket.section.objectives", buildObjectivesCard());
         addTab(tabs, "edit.contractMarket.section.finance", buildFinanceCard());
@@ -735,6 +742,38 @@ public class ContractEditorDialog extends JDialog {
         return card(rows);
     }
 
+    /**
+     * The Intel tab: GM toggles for which intel fields are hidden from the player in the contract market. Always
+     * available (create and edit alike); the editor itself always shows the true values. Ticking a box hides that field
+     * behind a "No Intel" label in the market dossier - and hiding the opposition also blanks the offer's title.
+     * Assessment is intentionally absent: it is never obfuscated.
+     */
+    private JPanel buildIntelCard() {
+        JPanel rows = rowsPanel();
+
+        obfuscateAlliedCommandCheckbox = obfuscationCheckbox(ObfuscatableIntel.ALLIED_COMMAND);
+        rows.add(formRow("dossier.contractMarket.intel.alliedCommand", obfuscateAlliedCommandCheckbox));
+
+        obfuscateOppositionCheckbox = obfuscationCheckbox(ObfuscatableIntel.OPPOSITION);
+        rows.add(formRow("dossier.contractMarket.intel.opposition", obfuscateOppositionCheckbox));
+
+        obfuscateThreatCheckbox = obfuscationCheckbox(ObfuscatableIntel.THREAT);
+        rows.add(formRow("dossier.contractMarket.intel.threat", obfuscateThreatCheckbox));
+
+        obfuscateMoraleCheckbox = obfuscationCheckbox(ObfuscatableIntel.MORALE);
+        rows.add(formRow("dossier.contractMarket.intel.morale", obfuscateMoraleCheckbox));
+
+        return card(rows);
+    }
+
+    /** A checkbox for hiding one intel field from the player, initialized from the contract's current state. */
+    private JCheckBox obfuscationCheckbox(ObfuscatableIntel field) {
+        JCheckBox checkbox = new JCheckBox(getTextAt(RESOURCE_BUNDLE, "edit.contractMarket.field.obfuscate"),
+              contract.isIntelObfuscated(field));
+        checkbox.setToolTipText(getTextAt(RESOURCE_BUNDLE, "edit.contractMarket.field.obfuscate.tooltip"));
+        return checkbox;
+    }
+
     /** Whether the player's batchall acceptance is editable: an accepted contract fought against a Clan enemy. */
     private boolean batchallEditable() {
         return contract.getStatus() != null && isEnemyClan();
@@ -1078,6 +1117,12 @@ public class ContractEditorDialog extends JDialog {
                                      ? AbstractContractGeneration.determineCombatPay(campaign, contract)
                                      : moneyValue(combatPaySpinner);
         contract.setContractFinanceData(new ContractFinanceData(transportPay, monthlyPayValue, combatPayValue));
+
+        // Intel obfuscation - which fields are hidden from the player in the market.
+        contract.setIntelObfuscated(ObfuscatableIntel.ALLIED_COMMAND, obfuscateAlliedCommandCheckbox.isSelected());
+        contract.setIntelObfuscated(ObfuscatableIntel.OPPOSITION, obfuscateOppositionCheckbox.isSelected());
+        contract.setIntelObfuscated(ObfuscatableIntel.THREAT, obfuscateThreatCheckbox.isSelected());
+        contract.setIntelObfuscated(ObfuscatableIntel.MORALE, obfuscateMoraleCheckbox.isSelected());
 
         // Facilities
         contract.setRentedFacilitiesData(new RentedFacilitiesData(intValue(hospitalBedsSpinner),

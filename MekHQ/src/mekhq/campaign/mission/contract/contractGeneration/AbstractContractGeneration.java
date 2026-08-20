@@ -41,6 +41,7 @@ import java.util.UUID;
 
 import jakarta.annotation.Nonnull;
 import jakarta.annotation.Nullable;
+import megamek.common.compute.Compute;
 import megamek.common.enums.SkillLevel;
 import megamek.logging.MMLogger;
 import mekhq.campaign.AbstractLocation;
@@ -61,6 +62,7 @@ import mekhq.campaign.mission.contract.contractData.ContractScheduleData;
 import mekhq.campaign.mission.contract.contractData.ContractTermsData;
 import mekhq.campaign.mission.contract.contractData.EmployerData;
 import mekhq.campaign.mission.contract.contractData.EnemyData;
+import mekhq.campaign.mission.contract.contractData.ObfuscatableIntel;
 import mekhq.campaign.mission.contract.contractData.RentedFacilitiesData;
 import mekhq.campaign.mission.contract.contractData.SystemsTargetData;
 import mekhq.campaign.mission.contract.utilities.MHQMorale;
@@ -80,6 +82,9 @@ public class AbstractContractGeneration {
 
     /** How many times {@link #pickEnemy} will redraw to avoid an employer-versus-itself contract before giving up. */
     private static final int MAX_ENEMY_REDRAWS = 5;
+
+    /** Auto intel obfuscation hides each obfuscatable field with a 1-in-this chance (so ~1 field hidden on average). */
+    private static final int INTEL_OBFUSCATION_ODDS = 4;
 
     public static @Nullable AbstractContract createContract(Campaign campaign, CampaignOptions campaignOptions,
           LocalDate currentDate, Detachment detachment, int contractGenerationModifier, ContractSearchType searchType,
@@ -204,6 +209,26 @@ public class AbstractContractGeneration {
         } else {
             ChaosContractPayDetermination.determineContractPayForChaosContract(campaign, currentDate, contract,
                   currentLocation);
+        }
+
+        // Intel Obfuscation - optionally hide some market-offer intel from the player.
+        applyIntelObfuscation(campaign, contract);
+    }
+
+    /**
+     * When the campaign opts into intel obfuscation, independently hides each obfuscatable intel field of a freshly
+     * generated offer with a fixed per-field chance, so the player must sometimes commit with incomplete information.
+     * The GM can still adjust the result by hand in the contract editor. Assessment is never obfuscated (it is not an
+     * {@link ObfuscatableIntel} field).
+     */
+    private static void applyIntelObfuscation(Campaign campaign, ChaosContract contract) {
+        if (!campaign.getCampaignOptions().get(CampaignOption.USE_INTEL_OBFUSCATION)) {
+            return;
+        }
+        for (ObfuscatableIntel field : ObfuscatableIntel.values()) {
+            if (Compute.randomInt(INTEL_OBFUSCATION_ODDS) == 0) {
+                contract.setIntelObfuscated(field, true);
+            }
         }
     }
 

@@ -35,6 +35,7 @@ package mekhq.gui.dialog.markets.contractMarket;
 import static megamek.client.ui.WrapLayout.wordWrap;
 import static megamek.client.ui.util.UIUtil.scaleForGUI;
 import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
+import static mekhq.utilities.MHQInternationalization.getTextAt;
 
 import java.awt.*;
 import java.awt.event.MouseAdapter;
@@ -51,6 +52,7 @@ import javax.swing.JPanel;
 import javax.swing.SwingConstants;
 
 import mekhq.campaign.mission.contract.AbstractContract;
+import mekhq.campaign.mission.contract.contractData.ObfuscatableIntel;
 import mekhq.campaign.universe.Factions;
 import mekhq.gui.baseComponents.roundedComponents.RoundedLineBorder;
 
@@ -154,7 +156,11 @@ public class ContractCardPanel extends JPanel {
     }
 
     private void applyTitleText() {
-        String name = wrapInner(escape(contract.getName().replace('_', ' ')), NAME_MAX_CHARS);
+        // The name reveals the enemy, so a hidden opposition blanks the card title too, matching the dossier.
+        String rawName = contract.isIntelObfuscated(ObfuscatableIntel.OPPOSITION)
+                               ? getTextAt(RESOURCE_BUNDLE, "dossier.contractMarket.title.unknown")
+                               : contract.getName().replace('_', ' ');
+        String name = wrapInner(escape(rawName), NAME_MAX_CHARS);
         String subtitle = wrapInner(escape(contract.getEmployerMarketDisplayName()) + " &middot; "
                                           + escape(contract.getObjectiveType().toString()), SUBTITLE_MAX_CHARS);
         titlesLabel.setText("<html><b>" + name + "</b><br>"
