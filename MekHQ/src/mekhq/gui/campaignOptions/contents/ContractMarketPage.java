@@ -203,7 +203,7 @@ class ContractMarketPage {
         chkVariableContractLength.addMouseListener(createTipPanelUpdater("VariableContractLength"));
 
         chkUseTwoWayPay = new CampaignOptionsCheckBox("UseTwoWayPay",
-              getMetadata(MILESTONE_BEFORE_METADATA));
+              getMetadata(new Version(0, 51, 1)));
         chkUseTwoWayPay.addMouseListener(createTipPanelUpdater("UseTwoWayPay"));
 
         chkUseCamOpsSalvage = new CampaignOptionsCheckBox("UseCamOpsSalvage",
@@ -226,7 +226,8 @@ class ContractMarketPage {
               getMetadata(MILESTONE_BEFORE_METADATA, CampaignOptionFlag.CUSTOM_SYSTEM));
         chkUseBolsterContractSkill.addMouseListener(createTipPanelUpdater("UseBolsterContractSkill"));
 
-        chkUseChaosScaleSupportPointConversion = new CampaignOptionsCheckBox("UseChaosScaleSupportPointConversion");
+        chkUseChaosScaleSupportPointConversion = new CampaignOptionsCheckBox("UseChaosScaleSupportPointConversion",
+              getMetadata(new Version(0, 51, 1)));
         chkUseChaosScaleSupportPointConversion.addMouseListener(
                 createTipPanelUpdater("UseChaosScaleSupportPointConversion"));
 
@@ -278,12 +279,13 @@ class ContractMarketPage {
 
         // A general Chaos-pay option (applies to the default scheme, not the legacy bases): whether Chaos support-point
         // pay is converted to C-bills. Enabled by default.
-        chkUseChaosSupportPointConversion = new CampaignOptionsCheckBox("UseChaosSupportPointConversion");
+        chkUseChaosSupportPointConversion = new CampaignOptionsCheckBox("UseChaosSupportPointConversion",
+              getMetadata(new Version(0, 51, 1)));
         chkUseChaosSupportPointConversion.addMouseListener(createTipPanelUpdater("UseChaosSupportPointConversion"));
 
         // Top-level pay scheme: the default Chaos Campaign scheme, or the legacy force-value / payroll schemes whose
         // basis and options are configured in the nested card below. Leaving the box unticked keeps Chaos pay.
-        chkUseLegacyOptions = new CampaignOptionsCheckBox("UseLegacyOptions");
+        chkUseLegacyOptions = new CampaignOptionsCheckBox("UseLegacyOptions", getMetadata(new Version(0, 51, 1)));
         chkUseLegacyOptions.addMouseListener(createTipPanelUpdater("UseLegacyOptions"));
 
         btnContractEquipment = new JRadioButton(getTextAt(getCampaignOptionsResourceBundle(),

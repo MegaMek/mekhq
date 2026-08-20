@@ -48,7 +48,7 @@ import org.jspecify.annotations.NonNull;
  * <p>Where the Chaos scheme derives pay from the contract's abstract scale and support-point multipliers, the CamOps
  * scheme grounds the monthly retainer in the force-value calculation configured on the Contract Market campaign options
  * page ({@link mekhq.campaign.finances.Accountant#getContractBase()}): the total value of the units the player commits,
- * honoring the TO&E-percent / sale-value / diminishing-returns / alternate-payment-model settings, or the theoretical
+ * honoring the TOE-percent / sale-value / diminishing-returns / alternate-payment-model settings, or the theoretical
  * payroll when the "Payroll Influences Pay" basis is chosen.</p>
  *
  * <p>The mapping into the contract's {@link ContractFinanceData} is:</p>
