@@ -82,6 +82,7 @@ public class SkillCheckRulesTest {
             doCallRealMethod().when(campaign).checkAcquisition(any(), any(), anyBoolean());
             Faction faction = new Faction();
             when(campaign.getCampaignOptions()).thenReturn(options);
+            lenient().when(options.get(CampaignOption.DISALLOW_EXTINCT_STUFF)).thenReturn(false);
             lenient().when(options.get(CampaignOption.LIMIT_BY_YEAR)).thenReturn(false);
             lenient().when(options.get(CampaignOption.TECH_LEVEL)).thenReturn(0);
             lenient().when(options.get(CampaignOption.USE_AGE_EFFECTS)).thenReturn(false);

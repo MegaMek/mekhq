@@ -2209,7 +2209,7 @@ public class PersonTest {
                 assertEquals(3, check.getTargetNumber().getValue());
                 verify(campaign).getCampaignOptions();
                 verify(options).get(CampaignOption.USE_AGE_EFFECTS);
-                verify(campaign).getPlayerForce().isClanForce();
+                verify(campaign.getPlayerForce()).isClanForce();
                 verify(campaign).getLocalDate();
             }
         }

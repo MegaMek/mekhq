@@ -122,6 +122,8 @@ class QuickTrainTest {
         CampaignOptions campaignOptions = mock(CampaignOptions.class);
         lenient().when(campaignOptions.get(CampaignOption.USE_ARTILLERY)).thenReturn(false);
         lenient().when(campaignOptions.get(CampaignOption.ADMINS_HAVE_NEGOTIATION)).thenReturn(false);
+        lenient().when(campaignOptions.get(CampaignOption.USE_ADVANCED_SCOUTING)).thenReturn(false);
+        lenient().when(campaignOptions.get(CampaignOption.USE_FUNCTIONAL_ESCAPE_ARTIST)).thenReturn(false);
         QuickTrain.QuickTrainOptions quickTrainOptions =
               QuickTrain.QuickTrainOptions.buildQuickTrainOptions(campaignOptions);
 

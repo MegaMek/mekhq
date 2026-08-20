@@ -34,6 +34,7 @@ package mekhq.campaign.market.contractMarket;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.RETURNS_DEEP_STUBS;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -73,7 +74,7 @@ class AbstractContractMarketEnemySelectionTest {
         AtBContract contract = mock(AtBContract.class);
         when(contract.getContractType()).thenReturn(ContractObjectiveType.GUERRILLA_WARFARE);
         when(contract.getEmployerCode()).thenReturn("EMPLOYER");
-        Campaign campaign = mock(Campaign.class);
+        Campaign campaign = mock(Campaign.class, RETURNS_DEEP_STUBS);
 
         new AtbMonthlyContractMarket().setEnemyCode(contract, campaign);
 

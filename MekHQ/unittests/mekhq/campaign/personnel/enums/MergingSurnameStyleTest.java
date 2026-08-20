@@ -82,6 +82,7 @@ class MergingSurnameStyleTest {
         lenient().when(mockCampaign.getCampaignOptions()).thenReturn(mockCampaignOptions);
         lenient().when(mockCampaignOptions.get(CampaignOption.TECHS_USE_ADMINISTRATION)).thenReturn(false);
         lenient().when(mockCampaignOptions.get(CampaignOption.IS_ENABLE_SALVAGE_FLAG_BY_DEFAULT)).thenReturn(false);
+        lenient().when(mockCampaignOptions.get(CampaignOption.MARRIAGE_SURNAME_WEIGHTS)).thenReturn(new java.util.HashMap<>());
     }
 
     // region Getters

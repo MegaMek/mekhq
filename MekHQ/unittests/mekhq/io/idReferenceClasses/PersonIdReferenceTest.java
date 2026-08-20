@@ -70,9 +70,13 @@ public class PersonIdReferenceTest {
 
     @BeforeEach
     void stubPlayerForce() {
-        // getPlayerForce() must be non-null for Person construction and the getPersonnel() lookups, but
-        // getPerson(...) must stay a plain mock so unknown ids resolve to null (exercised by the fix* methods).
-        lenient().when(mockCampaign.getPlayerForce()).thenReturn(mock(PlayerForce.class, RETURNS_DEEP_STUBS));
+        // getPlayerForce() and getHumanResources() must be non-null for Person construction and the getPersonnel()
+        // lookups, but getPerson(...) must stay a plain mock so unknown ids resolve to null (exercised by the fix*
+        // methods). A deep-stub here would make getPerson(...) return a non-null mock, defeating those tests.
+        PlayerForce playerForce = mock(PlayerForce.class);
+        mekhq.campaign.ForceHumanResources humanResources = mock(mekhq.campaign.ForceHumanResources.class);
+        lenient().when(playerForce.getHumanResources()).thenReturn(humanResources);
+        lenient().when(mockCampaign.getPlayerForce()).thenReturn(playerForce);
     }
 
     @Test
@@ -166,8 +170,8 @@ public class PersonIdReferenceTest {
               .get(FamilialRelationshipType.PARENT)
               .add(new PersonIdReference(parent2.getId().toString()));
 
-        doReturn(null).when(mockCampaign).getPlayerForce().getHumanResources().getPerson(argThat(matchPersonUUID(child.getId())));
-        doReturn(parent2).when(mockCampaign).getPlayerForce().getHumanResources().getPerson(argThat(matchPersonUUID(parent2.getId())));
+        given(mockCampaign.getPlayerForce().getHumanResources().getPerson(argThat(matchPersonUUID(child.getId())))).willReturn(null);
+        given(mockCampaign.getPlayerForce().getHumanResources().getPerson(argThat(matchPersonUUID(parent2.getId())))).willReturn(parent2);
 
         PersonIdReference.fixGenealogyReferences(mockCampaign, origin);
         assertTrue(origin.getGenealogy().getFamily().containsKey(FamilialRelationshipType.PARENT));
