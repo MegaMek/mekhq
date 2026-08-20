@@ -54,7 +54,6 @@ import static mekhq.campaign.personnel.skills.SkillType.EXP_NONE;
 import static mekhq.campaign.personnel.skills.SkillType.S_ADMIN;
 import static mekhq.campaign.personnel.skills.SkillType.S_MEDTECH;
 import static mekhq.campaign.personnel.skills.SkillType.S_NEGOTIATION;
-import static mekhq.campaign.personnel.skills.SkillType.S_STRATEGY;
 import static mekhq.campaign.personnel.skills.SkillType.S_TECH_MECHANIC;
 import static mekhq.campaign.personnel.skills.SkillType.getType;
 import static mekhq.campaign.personnel.turnoverAndRetention.RetirementDefectionTracker.Payout.isBreakingContract;
@@ -90,7 +89,6 @@ import megamek.client.bot.princess.BehaviorSettings;
 import megamek.client.generator.RandomGenderGenerator;
 import megamek.client.generator.RandomNameGenerator;
 import megamek.client.generator.RandomUnitGenerator;
-import megamek.client.ui.util.PlayerColour;
 import megamek.codeUtilities.ObjectUtility;
 import megamek.codeUtilities.StringUtility;
 import megamek.common.Player;
@@ -105,7 +103,6 @@ import megamek.common.equipment.BombMounted;
 import megamek.common.equipment.EquipmentTypeLookup;
 import megamek.common.equipment.Mounted;
 import megamek.common.game.Game;
-import megamek.common.icons.Camouflage;
 import megamek.common.interfaces.ITechManager;
 import megamek.common.loaders.BLKFile;
 import megamek.common.loaders.EntityLoadingException;
@@ -157,9 +154,7 @@ import mekhq.campaign.finances.Loan;
 import mekhq.campaign.finances.Money;
 import mekhq.campaign.finances.enums.TransactionType;
 import mekhq.campaign.force.CombatTeam;
-import mekhq.campaign.force.Detachment;
 import mekhq.campaign.force.Formation;
-import mekhq.campaign.force.FormationType;
 import mekhq.campaign.force.PlayerForce;
 import mekhq.campaign.icons.StandardFormationIcon;
 import mekhq.campaign.location.ILocation;
@@ -172,7 +167,6 @@ import mekhq.campaign.log.UnitLogger;
 import mekhq.campaign.market.ForceShoppingList;
 import mekhq.campaign.market.PartsStore;
 import mekhq.campaign.market.PersonnelMarket;
-import mekhq.campaign.market.RequestedStockLevels;
 import mekhq.campaign.market.personnelMarket.markets.NewPersonnelMarket;
 import mekhq.campaign.market.unitMarket.AbstractUnitMarket;
 import mekhq.campaign.mission.AtBDynamicScenario;
@@ -210,7 +204,6 @@ import mekhq.campaign.personnel.enums.PersonnelRole;
 import mekhq.campaign.personnel.enums.PersonnelStatus;
 import mekhq.campaign.personnel.enums.SplittingSurnameStyle;
 import mekhq.campaign.personnel.familiarity.Familiarity;
-import mekhq.campaign.personnel.generator.AbstractPersonnelGenerator;
 import mekhq.campaign.personnel.marriage.AbstractMarriage;
 import mekhq.campaign.personnel.procreation.AbstractProcreation;
 import mekhq.campaign.personnel.ranks.AutomaticRankAssigner;
@@ -224,7 +217,6 @@ import mekhq.campaign.personnel.skills.SkillCheck;
 import mekhq.campaign.personnel.skills.SkillModifierData;
 import mekhq.campaign.personnel.skills.SkillType;
 import mekhq.campaign.personnel.turnoverAndRetention.RetirementDefectionTracker;
-import mekhq.campaign.randomEvents.prisoners.PrisonerStatus;
 import mekhq.campaign.randomEvents.randomEventsSystem.RandomEventLibraries;
 import mekhq.campaign.reputation.camOpsReputation.ForceReputationController;
 import mekhq.campaign.reputation.chaosReputation.ChaosReputation;
@@ -247,9 +239,6 @@ import mekhq.campaign.universe.factionStanding.FactionStandingJudgmentType;
 import mekhq.campaign.universe.factionStanding.FactionStandingUltimatumsLibrary;
 import mekhq.campaign.universe.factionStanding.FactionStandingUtilities;
 import mekhq.campaign.universe.factionStanding.FactionStandings;
-import mekhq.campaign.universe.fameAndInfamy.FameAndInfamyController;
-import mekhq.campaign.universe.selectors.factionSelectors.AbstractFactionSelector;
-import mekhq.campaign.universe.selectors.planetSelectors.AbstractPlanetSelector;
 import mekhq.campaign.universe.warriorsAlmanac.WarriorsAlmanacEntry;
 import mekhq.campaign.work.IAcquisitionWork;
 import mekhq.campaign.work.IFabricatable;
@@ -257,7 +246,6 @@ import mekhq.campaign.work.IPartWork;
 import mekhq.gui.CampaignGUI;
 import mekhq.gui.baseComponents.immersiveDialogs.ImmersiveDialogSimple;
 import mekhq.gui.baseComponents.immersiveDialogs.ImmersiveDialogWidth;
-import mekhq.gui.campaignOptions.enums.ProcurementPersonnelPick;
 import mekhq.gui.dialog.factionStanding.factionJudgment.FactionJudgmentDialog;
 import mekhq.service.IAutosaveService;
 import mekhq.utilities.MHQXMLUtility;
@@ -687,14 +675,6 @@ public class Campaign implements ITechManager {
     }
 
     // region Markets
-
-    public AbstractContractMarket getContractMarket() {
-        return contractMarket;
-    }
-
-    public void setContractMarket(final AbstractContractMarket contractMarket) {
-        this.contractMarket = contractMarket;
-    }
 
     public AbstractUnitMarket getUnitMarket() {
         return unitMarket;
@@ -5238,26 +5218,8 @@ public class Campaign implements ITechManager {
                     remainingMoney = routedPayout == null ? remainingMoney : routedPayout;
    }
 
-            // If overage repayment is enabled, we first need to check if the salvage
-            // percent is
-            // under 100. 100 means you cannot have an overage.
-            // Then, we check if the salvage percent is less than the percent salvaged by
-            // the
-            // unit in question. If it is, then they owe the assigner some cash
-            if (getCampaignOptions().get(CampaignOption.OVERAGE_REPAYMENT_IN_FINAL_PAYMENT) && (contract.getSalvagePercent() < 100.0)) {
-                final double salvagePercent = contract.getSalvagePercent() / 100.0;
-                final Money maxSalvage = contract.getSalvagedByEmployer()
-                                               .multipliedBy(salvagePercent / (1 - salvagePercent));
-                if (contract.getSalvagedByUnit().isGreaterThan(maxSalvage)) {
-                    final Money amountToRepay = contract.getSalvagedByUnit().minus(maxSalvage);
-                    remainingMoney = remainingMoney.minus(amountToRepay);
-                    contract.subtractSalvageByUnit(amountToRepay);
-                }
-            }
-
-            if (getCampaignOptions().get(CampaignOption.USE_SHARE_SYSTEM)) {
-                ResourceBundle financeResources = ResourceBundle.getBundle("mekhq.resources.Finances",
-                      MekHQ.getMHQOptions().getLocale());
+        // Shareholders take their cut of the contract's gross final payout, mirroring the monthly share payout.
+        final Money grossPayout = remainingMoney;
 
         // With OverageRepaymentInFinalPayment enabled, salvage the player kept beyond their rights is repaid as part of
         // the final payment, which can push it into a debit (the negative branch below).

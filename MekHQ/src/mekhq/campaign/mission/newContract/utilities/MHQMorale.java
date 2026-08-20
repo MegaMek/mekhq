@@ -709,7 +709,8 @@ public class MHQMorale {
         String moraleReport = MHQMorale.performMoraleCheck(today, contract,
               campaignOptions.get(CampaignOption.MORALE_DECISIVE_VICTORY_EFFECT),
               campaignOptions.get(CampaignOption.MORALE_VICTORY_EFFECT),
-              campaignOptions.getMoraleDecisiveDefeatEffect(), campaignOptions.getMoraleDefeatEffect());
+              campaignOptions.get(CampaignOption.MORALE_DECISIVE_DEFEAT_EFFECT),
+              campaignOptions.get(CampaignOption.MORALE_DEFEAT_EFFECT));
         String flavorText = MHQMorale.getFormattedTitle()
                                   + "<h2 style='text-align:center;'>" + contract.getName() + "</h2>"
                                   + MoraleBar.getMoraleDisplay(contract).tooltip();
@@ -748,11 +749,12 @@ public class MHQMorale {
 
         boolean tracksStanding = campaign.getCampaignOptions().get(CampaignOption.TRACK_FACTION_STANDING);
         FactionStandings factionStandings = campaign.getPlayerForce().getFactionStandings();
-        double regardMultiplier = campaign.getCampaignOptions().getRegardMultiplier();
+        double regardMultiplier = campaign.getCampaignOptions().get(CampaignOption.REGARD_MULTIPLIER);
         String campaignFactionCode = campaign.getPlayerForce().getFaction().getShortName();
 
         // A Clan challenger issues a Batchall before battle.
-        if (campaign.getCampaignOptions().isUseGenericBattleValue() && newEnemyFaction.performsBatchalls()) {
+        if (campaign.getCampaignOptions().get(CampaignOption.USE_GENERIC_BATTLE_VALUE) &&
+                  newEnemyFaction.performsBatchalls()) {
             boolean allowBatchalls = true;
             if (campaign.getCampaignOptions().isUseFactionStandingBatchallRestrictionsSafe()) {
                 double regard = factionStandings.getRegardForFaction(newEnemyFaction.getShortName(), true);

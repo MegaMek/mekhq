@@ -61,7 +61,6 @@ import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.campaignOptions.CampaignOption;
 import mekhq.campaign.campaignOptions.CampaignOptions;
-import mekhq.campaign.campaignOptions.CampaignOption;
 import mekhq.campaign.events.loans.LoanDefaultedEvent;
 import mekhq.campaign.events.transactions.TransactionCreditEvent;
 import mekhq.campaign.events.transactions.TransactionDebitEvent;
@@ -578,25 +577,7 @@ public class Finances {
         }
     }
 
-    /**
-     * Pays shareholding personnel their cut of a contract's monthly payment, immediately after that payment lands.
-     *
-     * <p>Runs only when the share system is enabled. The share is a percentage of the monthly payout, so it is always
-     * smaller than the credit just received - a failed debit therefore means something else drained the account, and is
-     * reported rather than retried.</p>
-     *
-     * @param campaign the paying campaign
-     * @param contract the contract that just paid out
-     * @param date     the day the payment was made
-     */
-    private void payTaxes(Campaign campaign, Money profits) {
-        Money taxAmount = profits.multipliedBy((double) campaign.getCampaignOptions().get(CampaignOption.TAXES_PERCENTAGE) / 100)
-                                .round();
-
-        debit(TransactionType.TAXES, campaign.getLocalDate(), taxAmount, resourceMap.getString("Taxes.finances"));
-    }
-
-    private void payoutShares(Campaign campaign, Contract contract, LocalDate date) {
+    private void payoutShares(Campaign campaign, AbstractContract contract, LocalDate date) {
         if (!campaign.getCampaignOptions().get(CampaignOption.USE_SHARE_SYSTEM)) {
             return;
         }
@@ -651,10 +632,8 @@ public class Finances {
      * @param profits  The profits made by the campaign.
      */
     private void payTaxes(Campaign campaign, Money profits) {
-        Money taxAmount = profits.multipliedBy((double) campaign.getCampaignOptions()
-                                                              .get(CampaignOption.TAXES_PERCENTAGE) / 100)
-                                .round();
-
+        Money taxAmount = profits.multipliedBy(campaign.getCampaignOptions().get(CampaignOption.TAXES_PERCENTAGE) *
+                                                     0.01);
         debit(TransactionType.TAXES, campaign.getLocalDate(), taxAmount, resourceMap.getString("Taxes.finances"));
     }
 

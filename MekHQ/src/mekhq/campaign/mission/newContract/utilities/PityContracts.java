@@ -35,6 +35,7 @@ package mekhq.campaign.mission.newContract.utilities;
 import static java.lang.Math.max;
 
 import mekhq.campaign.Campaign;
+import mekhq.campaign.campaignOptions.CampaignOption;
 import mekhq.campaign.mission.newContract.AbstractContract;
 import mekhq.campaign.mission.newContract.ContractMarket;
 import mekhq.campaign.mission.newContract.contractGeneration.ChaosContractMarketAvailability;
@@ -73,7 +74,7 @@ public class PityContracts {
      */
     public static int generatePityContracts(Campaign campaign) {
         int successfulContractCount = getSuccessfulContractCount(campaign);
-        int targetPityContractCount = campaign.getCampaignOptions().getPityContracts();
+        int targetPityContractCount = campaign.getCampaignOptions().get(CampaignOption.PITY_CONTRACTS);
 
         int contractCount = max(0, targetPityContractCount - successfulContractCount);
 
@@ -118,7 +119,7 @@ public class PityContracts {
      * @since 0.51.0
      */
     private static ContractSearchType pityBucket(Campaign campaign) {
-        Faction faction = campaign.getFaction();
+        Faction faction = campaign.getPlayerForce().getFaction();
         if (faction.isPirate()) {
             return ContractSearchType.PIRATE;
         }

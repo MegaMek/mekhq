@@ -57,7 +57,6 @@ import megamek.logging.MMLogger;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.campaignOptions.CampaignOption;
 import mekhq.campaign.campaignOptions.CampaignOptions;
-import mekhq.campaign.campaignOptions.CampaignOption;
 import mekhq.campaign.finances.Money;
 import mekhq.campaign.mission.enums.ContractObjectiveType;
 import mekhq.campaign.mission.newContract.AbstractContract;
@@ -397,7 +396,7 @@ public class RetirementDefectionTracker {
      *
      * @return A map with person ids as key and calculated target roll as value.
      */
-    public Map<UUID, TargetRoll> getTargetNumbers(final @Nullable AbstractContract mission, final Campaign campaign) {
+    public Map<UUID, TargetRoll> getTargetNumbers(@Nullable AbstractContract mission, final Campaign campaign) {
         final Map<UUID, TargetRoll> targets = new HashMap<>();
 
         if (null != mission) {
@@ -512,29 +511,20 @@ public class RetirementDefectionTracker {
                 // the share percentage should still apply.
                 // In the case of multiple active contracts, pick the one with the best
                 // percentage.
-
-                AtBContract contract;
-
-                try {
-                    contract = (AtBContract) mission;
-                } catch (Exception e) {
-                    contract = null;
-                }
-
-                if (contract == null) {
-                    List<AtBContract> atbContracts = campaign.getActiveAtBContracts();
+                if (mission == null) {
+                    List<AbstractContract> atbContracts = campaign.getActiveContracts();
 
                     if (!atbContracts.isEmpty()) {
-                        for (AtBContract atbContract : atbContracts) {
-                            if ((contract == null) || (contract.getSharesPercent() > atbContract.getSharesPercent())) {
-                                contract = atbContract;
+                        for (AbstractContract contract : atbContracts) {
+                            if ((contract == null) || (contract.getSharesPercent() > contract.getSharesPercent())) {
+                                mission = contract;
                             }
                         }
                     }
                 }
 
-                if (contract != null) {
-                    targetNumber.addModifier(-max(0, ((contract.getSharesPercent() / 10) - 2)),
+                if (mission != null) {
+                    targetNumber.addModifier(-max(0, ((mission.getSharesPercent() / 10) - 2)),
                           resources.getString("shares.text"));
                 }
             }

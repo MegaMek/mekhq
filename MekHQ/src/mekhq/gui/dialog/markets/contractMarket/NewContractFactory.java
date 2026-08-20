@@ -82,7 +82,7 @@ public final class NewContractFactory {
         final int year = campaign.getGameYear();
         final LocalDate today = campaign.getLocalDate();
 
-        final Faction employerFaction = campaign.getFaction();
+        final Faction employerFaction = campaign.getPlayerForce().getFaction();
         final Faction enemyFaction = Factions.getInstance().getFaction(Faction.PIRATE_FACTION_CODE);
 
         final String employerCode = employerFaction == null ? "" : employerFaction.getShortName();
