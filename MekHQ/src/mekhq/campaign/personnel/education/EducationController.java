@@ -2010,7 +2010,7 @@ public class EducationController {
         if (person.getEduHighestEducation().getLevel() < academy.getEducationLevel(person)) {
             int xpRate = max(1, (12 - academy.getFacultySkill()) * (academyDuration / 600));
 
-            xpRate *= campaign.getCampaignOptions().get(CampaignOption.FACULTY_XP_RATE);
+            xpRate = (int) round(xpRate * campaign.getCampaignOptions().get(CampaignOption.FACULTY_XP_RATE));
 
             int bonusAmount = (int) max(bonusCount, xpRate * bonusPercentage);
             person.awardXP(campaign, xpRate + bonusAmount);

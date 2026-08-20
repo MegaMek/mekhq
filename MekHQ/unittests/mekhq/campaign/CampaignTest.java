@@ -163,7 +163,6 @@ public class CampaignTest {
 
     @Test
     void testGetTechs() {
-        List<Person> testPersonList = new ArrayList<>(5);
         List<Person> testActivePersonList = new ArrayList<>(5);
 
         Person mockTechActive = mock(Person.class);
@@ -178,7 +177,6 @@ public class CampaignTest {
               anyBoolean(),
               anyBoolean())).thenReturn(SkillLevel.REGULAR);
         when(mockTechActive.getDailyAvailableTechTime(anyBoolean())).thenReturn(240);
-        testPersonList.add(mockTechActive);
         testActivePersonList.add(mockTechActive);
 
         Person mockTechActiveTwo = mock(Person.class);
@@ -190,16 +188,7 @@ public class CampaignTest {
         when(mockTechActiveTwo.getSkillLevel(any(), anyBoolean(), any(), anyBoolean(), anyBoolean())).thenReturn(
               SkillLevel.REGULAR);
         when(mockTechActiveTwo.getDailyAvailableTechTime(anyBoolean())).thenReturn(1);
-        testPersonList.add(mockTechActiveTwo);
         testActivePersonList.add(mockTechActiveTwo);
-
-        Person mockTechInactive = mock(Person.class);
-        when(mockTechInactive.isTech()).thenReturn(true);
-        when(mockTechInactive.getPrimaryRole()).thenReturn(PersonnelRole.MEK_TECH);
-        when(mockTechInactive.getSecondaryRole()).thenReturn(PersonnelRole.NONE);
-        doReturn(PersonnelStatus.RETIRED).when(mockTechInactive).getStatus();
-        when(mockTechInactive.getMinutesLeft()).thenReturn(240);
-        testPersonList.add(mockTechInactive);
 
         Person mockTechNoTime = mock(Person.class);
         when(mockTechNoTime.isTech()).thenReturn(true);
@@ -213,7 +202,6 @@ public class CampaignTest {
               anyBoolean(),
               anyBoolean())).thenReturn(SkillLevel.REGULAR);
         when(mockTechNoTime.getDailyAvailableTechTime(anyBoolean())).thenReturn(0);
-        testPersonList.add(mockTechNoTime);
         testActivePersonList.add(mockTechNoTime);
 
         Person mockNonTechOne = mock(Person.class);
@@ -222,7 +210,6 @@ public class CampaignTest {
         when(mockNonTechOne.getSecondaryRole()).thenReturn(PersonnelRole.NONE);
         doReturn(PersonnelStatus.ACTIVE).when(mockNonTechOne).getStatus();
         when(mockNonTechOne.getMinutesLeft()).thenReturn(240);
-        testPersonList.add(mockNonTechOne);
         testActivePersonList.add(mockNonTechOne);
 
         Person mockNonTechTwo = mock(Person.class);
@@ -231,7 +218,6 @@ public class CampaignTest {
         when(mockNonTechTwo.getSecondaryRole()).thenReturn(PersonnelRole.NONE);
         doReturn(PersonnelStatus.ACTIVE).when(mockNonTechTwo).getStatus();
         when(mockNonTechTwo.getMinutesLeft()).thenReturn(240);
-        testPersonList.add(mockNonTechTwo);
         testActivePersonList.add(mockNonTechTwo);
 
         CampaignOptions campaignOptions = mock(CampaignOptions.class);
