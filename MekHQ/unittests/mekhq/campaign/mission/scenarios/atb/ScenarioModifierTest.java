@@ -30,13 +30,12 @@
  * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
  * affiliated with Microsoft.
  */
-package mekhq.campaign.mission.atb;
+package mekhq.campaign.mission.scenarios.atb;
 
 import static mekhq.campaign.mission.scenarios.atb.AtBScenarioModifier.initializeScenarioModifiers;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
-import mekhq.campaign.mission.scenarios.atb.AtBScenarioModifier;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 

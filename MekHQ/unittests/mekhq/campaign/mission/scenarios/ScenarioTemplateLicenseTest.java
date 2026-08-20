@@ -30,7 +30,7 @@
  * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
  * affiliated with Microsoft.
  */
-package mekhq.campaign.mission.atb;
+package mekhq.campaign.mission.scenarios;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
@@ -41,39 +41,29 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 
-import mekhq.campaign.mission.scenarios.atb.AtBScenarioModifier;
-import mekhq.campaign.mission.scenarios.atb.AtBScenarioModifier.EventTiming;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
 
-/**
- * Serialization guards for {@link AtBScenarioModifier}: JSON is the read/write format, with the license header as
- * leading {@code #} comment lines.
- */
-class AtBScenarioModifierSerializationTest {
+class ScenarioTemplateLicenseTest {
 
     @Test
-    void jsonRoundTripPreservesFieldsAndCarriesLicense(@TempDir Path tempDir) throws IOException {
-        AtBScenarioModifier original = new AtBScenarioModifier();
-        original.setModifierName("Test Modifier");
-        original.setAdditionalBriefingText("Enemy reinforcements inbound.");
-        original.setEventTiming(EventTiming.PostForceGeneration);
-        original.setBenefitsPlayer(false);
+    void savedTemplateBeginsWithLicenseAndReloadsCleanly(@TempDir Path tempDir) throws IOException {
+        ScenarioTemplate template = new ScenarioTemplate();
+        template.name = "Licensed";
 
-        File out = tempDir.resolve("TestModifier.json").toFile();
-        original.Serialize(out);
+        File out = tempDir.resolve("licensed.json").toFile();
+        template.Serialize(out);
 
         String content = Files.readString(out.toPath());
         assertTrue(content.startsWith("# MegaMek Data (C)"), "saved JSON should begin with the '#' license header");
-        assertTrue(content.contains("CC BY-NC-SA 4.0"), "license text should be the MegaMek Data notice");
+        assertTrue(content.contains("CC BY-NC-SA 4.0"), "the license text should be the MegaMek Data notice");
         assertTrue(content.contains("affiliated with Microsoft."), "the license header should be complete");
-        assertTrue(content.substring(0, content.indexOf('{')).contains("# MegaMek Data"),
+        int objectStart = content.indexOf('{');
+        assertTrue(objectStart > 0 && content.substring(0, objectStart).contains("# MegaMek Data"),
               "the license header must precede the JSON object");
 
-        AtBScenarioModifier reloaded = AtBScenarioModifier.Deserialize(out.getPath());
-        assertNotNull(reloaded, "a modifier carrying a leading license header should still deserialize");
-        assertEquals("Test Modifier", reloaded.getModifierName());
-        assertEquals("Enemy reinforcements inbound.", reloaded.getAdditionalBriefingText());
-        assertEquals(EventTiming.PostForceGeneration, reloaded.getEventTiming());
+        ScenarioTemplate reloaded = ScenarioTemplate.Deserialize(out);
+        assertNotNull(reloaded, "a template carrying a _license block should still deserialize");
+        assertEquals("Licensed", reloaded.name, "the license block must not disturb the model on read");
     }
 }

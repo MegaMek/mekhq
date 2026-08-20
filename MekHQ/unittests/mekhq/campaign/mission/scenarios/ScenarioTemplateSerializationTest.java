@@ -30,7 +30,7 @@
  * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
  * affiliated with Microsoft.
  */
-package mekhq.campaign.mission;
+package mekhq.campaign.mission.scenarios;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
@@ -49,17 +49,12 @@ import java.util.stream.Stream;
 import megamek.common.OffBoardDirection;
 import megamek.common.units.EntityWeightClass;
 import megamek.common.units.UnitType;
-import mekhq.campaign.mission.scenarios.ObjectiveEffect;
 import mekhq.campaign.mission.scenarios.ObjectiveEffect.EffectScalingType;
 import mekhq.campaign.mission.scenarios.ObjectiveEffect.ObjectiveEffectType;
-import mekhq.campaign.mission.scenarios.ScenarioForceTemplate;
 import mekhq.campaign.mission.scenarios.ScenarioForceTemplate.SynchronizedDeploymentType;
-import mekhq.campaign.mission.scenarios.ScenarioMapParameters;
 import mekhq.campaign.mission.scenarios.ScenarioMapParameters.MapLocation;
-import mekhq.campaign.mission.scenarios.ScenarioObjective;
 import mekhq.campaign.mission.scenarios.ScenarioObjective.ObjectiveCriterion;
 import mekhq.campaign.mission.scenarios.ScenarioObjective.TimeLimitType;
-import mekhq.campaign.mission.scenarios.ScenarioTemplate;
 import mekhq.campaign.mission.scenarios.ScenarioTemplate.BattlefieldControlType;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
@@ -325,8 +320,8 @@ class ScenarioTemplateSerializationTest {
     }
 
     /**
-     * Round-trips a template through the production JSON file path: saves it to a scratch {@code .json} file and reads it
-     * back. JSON is the only standalone format, so a save/load cycle goes through it.
+     * Round-trips a template through the production JSON file path: saves it to a scratch {@code .json} file and reads
+     * it back. JSON is the only standalone format, so a save/load cycle goes through it.
      */
     private static ScenarioTemplate roundTripViaJson(ScenarioTemplate template, Path scratchFile) {
         template.Serialize(scratchFile.toFile());

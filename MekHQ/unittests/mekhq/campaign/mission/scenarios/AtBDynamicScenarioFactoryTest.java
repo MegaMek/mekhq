@@ -30,7 +30,7 @@
  * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
  * affiliated with Microsoft.
  */
-package mekhq.campaign.mission;
+package mekhq.campaign.mission.scenarios;
 
 import static megamek.common.units.UnitType.MEK;
 import static mekhq.campaign.mission.scenarios.AtBDynamicScenarioFactory.createEntityWithCrew;
@@ -66,9 +66,6 @@ import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.force.CombatTeam;
 import mekhq.campaign.force.Formation;
 import mekhq.campaign.force.PlayerForce;
-import mekhq.campaign.mission.scenarios.AtBDynamicScenario;
-import mekhq.campaign.mission.scenarios.AtBDynamicScenarioFactory;
-import mekhq.campaign.mission.scenarios.AtBScenario;
 import mekhq.campaign.mission.utilities.CombatRole;
 import mekhq.campaign.personnel.skills.RandomSkillPreferences;
 import mekhq.campaign.unit.Unit;

@@ -30,7 +30,7 @@
  * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
  * affiliated with Microsoft.
  */
-package mekhq.campaign.mission;
+package mekhq.campaign.mission.scenarios;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
@@ -41,13 +41,13 @@ import java.io.StringWriter;
 import java.nio.file.Files;
 import java.nio.file.Path;
 
-import mekhq.campaign.mission.scenarios.ScenarioTemplate;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
 
 /**
- * Verifies the model's file IO. {@code Serialize(File)} writes JSON led by the license header, {@code Deserialize(File)}
- * reads JSON, and the {@code PrintWriter} serializer used for the campaign-save embedding stays XML.
+ * Verifies the model's file IO. {@code Serialize(File)} writes JSON led by the license header,
+ * {@code Deserialize(File)} reads JSON, and the {@code PrintWriter} serializer used for the campaign-save embedding
+ * stays XML.
  */
 class ScenarioTemplateFormatIOTest {
 

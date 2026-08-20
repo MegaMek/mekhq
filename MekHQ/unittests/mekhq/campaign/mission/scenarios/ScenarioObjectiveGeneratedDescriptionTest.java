@@ -30,15 +30,13 @@
  * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
  * affiliated with Microsoft.
  */
-package mekhq.campaign.mission;
+package mekhq.campaign.mission.scenarios;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-import mekhq.campaign.mission.scenarios.ObjectiveEffect;
 import mekhq.campaign.mission.scenarios.ObjectiveEffect.EffectScalingType;
 import mekhq.campaign.mission.scenarios.ObjectiveEffect.ObjectiveEffectType;
-import mekhq.campaign.mission.scenarios.ScenarioObjective;
 import mekhq.campaign.mission.scenarios.ScenarioObjective.ObjectiveCriterion;
 import org.junit.jupiter.api.Test;
 
