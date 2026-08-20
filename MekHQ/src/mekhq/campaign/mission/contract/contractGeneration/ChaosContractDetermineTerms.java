@@ -34,23 +34,67 @@ package mekhq.campaign.mission.contract.contractGeneration;
 
 import static megamek.common.compute.Compute.d6;
 
+import jakarta.annotation.Nullable;
 import mekhq.campaign.mission.contract.contractData.ChaosContractStepsTable;
 import mekhq.campaign.mission.contract.contractData.ContractTermsData;
+import mekhq.campaign.universe.Faction;
 
 public class ChaosContractDetermineTerms {
     public static ContractTermsData determineInitialTerms(ChaosObjectiveType objectiveType,
-          ChaosEmployerType employerType) {
-        ChaosContractStepsTable payRate = determinePayRate(objectiveType, employerType);
+          ChaosEmployerType employerType, @Nullable Faction employerFaction, boolean useFactionModifiers) {
+        int factionPayDelta = useFactionModifiers ? getFactionPayRateModifier(employerFaction) : 0;
+        int factionCommandDelta = useFactionModifiers ? getFactionCommandRightsModifier(employerFaction) : 0;
+
+        ChaosContractStepsTable payRate = determinePayRate(objectiveType, employerType, factionPayDelta);
         ChaosContractStepsTable support = determineSupport(objectiveType, employerType);
         ChaosContractStepsTable transport = determineTransport(objectiveType, employerType);
         ChaosContractStepsTable salvageRights = determineSalvageRights(objectiveType, employerType);
-        ChaosContractStepsTable commandRights = determineCommandRights(objectiveType, employerType);
+        ChaosContractStepsTable commandRights = determineCommandRights(objectiveType,
+              employerType,
+              factionCommandDelta);
 
         return new ContractTermsData(payRate, support, transport, salvageRights, commandRights);
     }
 
+    /**
+     * The base-pay step modifier a faction's disposition contributes: a generous employer pays more (+1), a stingy one
+     * pays less (-1). Both tags cancel; neither yields 0.
+     */
+    static int getFactionPayRateModifier(@Nullable Faction employerFaction) {
+        if (employerFaction == null) {
+            return 0;
+        }
+        int delta = 0;
+        if (employerFaction.isGenerous()) {
+            delta += 1;
+        }
+        if (employerFaction.isStingy()) {
+            delta -= 1;
+        }
+        return delta;
+    }
+
+    /**
+     * The command-rights step modifier a faction's disposition contributes: a lenient employer grants more independence
+     * (+1, toward Independent command), a controlling one keeps a tighter grip (-1, toward Integrated). Both tags
+     * cancel; neither yields 0.
+     */
+    static int getFactionCommandRightsModifier(@Nullable Faction employerFaction) {
+        if (employerFaction == null) {
+            return 0;
+        }
+        int delta = 0;
+        if (employerFaction.isLenient()) {
+            delta += 1;
+        }
+        if (employerFaction.isControlling()) {
+            delta -= 1;
+        }
+        return delta;
+    }
+
     private static ChaosContractStepsTable determinePayRate(ChaosObjectiveType objectiveType,
-          ChaosEmployerType employerType) {
+          ChaosEmployerType employerType, int factionDelta) {
         int roll = d6(2);
         ChaosContractStepsTable step = switch (roll) {
             case 2, 3 -> ChaosContractStepsTable.STEP_THREE;
@@ -64,7 +108,7 @@ public class ChaosContractDetermineTerms {
 
         int contractDelta = objectiveType.getPayRateModifier();
         int employerDelta = employerType.getPayRateModifier();
-        int totalDelta = contractDelta + employerDelta;
+        int totalDelta = contractDelta + employerDelta + factionDelta;
 
         return step.influenceStep(totalDelta);
     }
@@ -127,7 +171,7 @@ public class ChaosContractDetermineTerms {
     }
 
     private static ChaosContractStepsTable determineCommandRights(ChaosObjectiveType objectiveType,
-          ChaosEmployerType employerType) {
+          ChaosEmployerType employerType, int factionDelta) {
         int roll = d6(2);
         ChaosContractStepsTable step = switch (roll) {
             case 2, 3, 4, 5 -> ChaosContractStepsTable.STEP_THREE;
@@ -139,7 +183,7 @@ public class ChaosContractDetermineTerms {
 
         int contractDelta = objectiveType.getCommandRightsModifier();
         int employerDelta = employerType.getCommandRightsModifier();
-        int totalDelta = contractDelta + employerDelta;
+        int totalDelta = contractDelta + employerDelta + factionDelta;
 
         return step.influenceStep(totalDelta);
     }

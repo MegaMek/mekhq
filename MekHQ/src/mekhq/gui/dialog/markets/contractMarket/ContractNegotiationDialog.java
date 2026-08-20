@@ -45,6 +45,7 @@ import java.awt.Color;
 import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
+import java.awt.Font;
 import java.awt.Image;
 import java.util.ArrayList;
 import java.util.List;
@@ -76,6 +77,7 @@ import mekhq.campaign.mission.contract.contractData.RentedFacilitiesData;
 import mekhq.campaign.mission.contract.contractGeneration.ChaosContractPayDetermination;
 import mekhq.campaign.mission.contract.contractGeneration.negotiationsAndNPCs.TermFunding;
 import mekhq.campaign.personnel.Person;
+import mekhq.campaign.universe.Faction;
 import mekhq.gui.baseComponents.roundedComponents.RoundedJButton;
 import mekhq.gui.baseComponents.roundedComponents.RoundedLineBorder;
 
@@ -398,8 +400,19 @@ public class ContractNegotiationDialog extends JDialog {
         row.setBorder(BorderFactory.createEmptyBorder(scaleForGUI(4), 0, scaleForGUI(4), 0));
 
         JLabel name = new JLabel(getTextAt(RESOURCE_BUNDLE, clause.labelKey));
-        name.setPreferredSize(new Dimension(scaleForGUI(150), name.getPreferredSize().height));
-        row.add(name, BorderLayout.WEST);
+        JPanel namePanel = new JPanel(new FlowLayout(FlowLayout.LEFT, scaleForGUI(6), 0));
+        namePanel.setPreferredSize(new Dimension(scaleForGUI(210), name.getPreferredSize().height));
+        namePanel.add(name);
+        // Mark a term the employer's faction disposition shifts (e.g. "Stingy" next to Base Pay), when the campaign
+        // uses faction modifiers.
+        String factionMarker = factionModifierMarker(clause);
+        if (factionMarker != null) {
+            JLabel marker = new JLabel(factionMarker);
+            marker.setForeground(muted());
+            marker.setFont(marker.getFont().deriveFont(Font.ITALIC, marker.getFont().getSize2D() - 1f));
+            namePanel.add(marker);
+        }
+        row.add(namePanel, BorderLayout.WEST);
 
         termValueLabels[index] = new JLabel();
         row.add(termValueLabels[index], BorderLayout.CENTER);
@@ -420,6 +433,42 @@ public class ContractNegotiationDialog extends JDialog {
 
         row.add(controls, BorderLayout.EAST);
         return row;
+    }
+
+    /**
+     * The faction-disposition marker to show beside a term, or {@code null} when none applies. Only returned when the
+     * campaign uses faction modifiers and the employer's faction carries the relevant tag: Base Pay is marked
+     * Generous/Stingy, Command Rights is marked Lenient/Controlling.
+     */
+    private String factionModifierMarker(Clause clause) {
+        if (!campaign.getCampaignOptions().get(CampaignOption.USE_CONTRACT_FACTION_MODIFIERS)) {
+            return null;
+        }
+        Faction employerFaction = contract.getEmployerFaction();
+        if (employerFaction == null) {
+            return null;
+        }
+        return switch (clause) {
+            case PAY -> {
+                if (employerFaction.isGenerous()) {
+                    yield getTextAt(RESOURCE_BUNDLE, "negotiate.contractMarket.factionModifier.generous");
+                }
+                if (employerFaction.isStingy()) {
+                    yield getTextAt(RESOURCE_BUNDLE, "negotiate.contractMarket.factionModifier.stingy");
+                }
+                yield null;
+            }
+            case COMMAND -> {
+                if (employerFaction.isLenient()) {
+                    yield getTextAt(RESOURCE_BUNDLE, "negotiate.contractMarket.factionModifier.lenient");
+                }
+                if (employerFaction.isControlling()) {
+                    yield getTextAt(RESOURCE_BUNDLE, "negotiate.contractMarket.factionModifier.controlling");
+                }
+                yield null;
+            }
+            default -> null;
+        };
     }
 
     private JPanel buildFacilitiesCard() {

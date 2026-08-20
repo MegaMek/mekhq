@@ -32,6 +32,7 @@
  */
 package mekhq.gui.campaignOptions.contents;
 
+import static mekhq.gui.campaignOptions.CampaignOptionFlag.CUSTOM_SYSTEM;
 import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.MILESTONE_BEFORE_METADATA;
 import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.createTipPanelUpdater;
 import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.getCampaignOptionsResourceBundle;
@@ -60,7 +61,6 @@ import megamek.client.ui.comboBoxes.MMComboBox;
 import megamek.client.ui.settings.SettingsFormPanel;
 import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.market.enums.ContractMarketMethod;
-import mekhq.gui.campaignOptions.CampaignOptionFlag;
 import mekhq.gui.campaignOptions.components.CampaignOptionsCheckBox;
 import mekhq.gui.campaignOptions.components.CampaignOptionsHeaderPanel;
 import mekhq.gui.campaignOptions.components.CampaignOptionsLabel;
@@ -108,6 +108,7 @@ class ContractMarketPage {
     private JCheckBox chkUseDynamicDifficulty;
     private JCheckBox chkUseBolsterContractSkill;
     private JCheckBox chkUseChaosScaleSupportPointConversion;
+    private JCheckBox chkUseContractFactionModifiers;
     private JLabel lblDropShipBonusPercentage;
     private JSpinner spnDropShipBonusPercentage;
     private JLabel lblPityContracts;
@@ -211,7 +212,7 @@ class ContractMarketPage {
         chkUseCamOpsSalvage.addMouseListener(createTipPanelUpdater("UseCamOpsSalvage"));
 
         chkUseRiskySalvage = new CampaignOptionsCheckBox("UseRiskySalvage",
-              getMetadata(MILESTONE_BEFORE_METADATA, CampaignOptionFlag.CUSTOM_SYSTEM));
+              getMetadata(MILESTONE_BEFORE_METADATA, CUSTOM_SYSTEM));
         chkUseRiskySalvage.addMouseListener(createTipPanelUpdater("UseRiskySalvage"));
 
         chkEnableSalvageFlagByDefault = new CampaignOptionsCheckBox("EnableSalvageFlagByDefault",
@@ -223,13 +224,17 @@ class ContractMarketPage {
               .addMouseListener(createTipPanelUpdater("UseDynamicDifficulty"));
 
         chkUseBolsterContractSkill = new CampaignOptionsCheckBox("UseBolsterContractSkill",
-              getMetadata(MILESTONE_BEFORE_METADATA, CampaignOptionFlag.CUSTOM_SYSTEM));
+              getMetadata(MILESTONE_BEFORE_METADATA, CUSTOM_SYSTEM));
         chkUseBolsterContractSkill.addMouseListener(createTipPanelUpdater("UseBolsterContractSkill"));
 
         chkUseChaosScaleSupportPointConversion = new CampaignOptionsCheckBox("UseChaosScaleSupportPointConversion",
               getMetadata(new Version(0, 51, 1)));
         chkUseChaosScaleSupportPointConversion.addMouseListener(
                 createTipPanelUpdater("UseChaosScaleSupportPointConversion"));
+
+        chkUseContractFactionModifiers = new CampaignOptionsCheckBox("UseContractFactionModifiers",
+              getMetadata(new Version(0, 51, 1), CUSTOM_SYSTEM));
+        chkUseContractFactionModifiers.addMouseListener(createTipPanelUpdater("UseContractFactionModifiers"));
 
         lblDropShipBonusPercentage = new CampaignOptionsLabel("DropShipBonusPercentage");
         lblDropShipBonusPercentage.addMouseListener(createTipPanelUpdater("DropShipBonusPercentage"));
@@ -259,7 +264,8 @@ class ContractMarketPage {
               chkEnableSalvageFlagByDefault,
               chkUseDynamicDifficulty,
                 chkUseBolsterContractSkill,
-                chkUseChaosScaleSupportPointConversion);
+              chkUseChaosScaleSupportPointConversion,
+              chkUseContractFactionModifiers);
         panel.addRow(lblDropShipBonusPercentage, spnDropShipBonusPercentage);
         panel.addRow(lblPityContracts, spnPityContracts);
 
@@ -305,11 +311,11 @@ class ContractMarketPage {
         contractGroup.add(btnContractPersonnel);
 
         chkUseAlternatePaymentMode = new CampaignOptionsCheckBox("UseAlternatePaymentMode",
-              getMetadata(MILESTONE_BEFORE_METADATA, CampaignOptionFlag.CUSTOM_SYSTEM));
+              getMetadata(MILESTONE_BEFORE_METADATA, CUSTOM_SYSTEM));
         chkUseAlternatePaymentMode.addMouseListener(createTipPanelUpdater("UseAlternatePaymentMode"));
 
         chkUseDiminishingContractPay = new CampaignOptionsCheckBox("UseDiminishingContractPay",
-              getMetadata(MILESTONE_BEFORE_METADATA, CampaignOptionFlag.CUSTOM_SYSTEM));
+              getMetadata(MILESTONE_BEFORE_METADATA, CUSTOM_SYSTEM));
         chkUseDiminishingContractPay.addMouseListener(createTipPanelUpdater("UseDiminishingContractPay"));
 
         chkEquipContractSaleValue = new CampaignOptionsCheckBox("EquipContractSaleValue");
@@ -530,6 +536,7 @@ class ContractMarketPage {
         chkUseDynamicDifficulty.setSelected(model.useDynamicDifficulty);
         chkUseBolsterContractSkill.setSelected(model.useBolsterContractSkill);
         chkUseChaosScaleSupportPointConversion.setSelected(model.useChaosScaleSupportPointConversion);
+        chkUseContractFactionModifiers.setSelected(model.useContractFactionModifiers);
         spnDropShipBonusPercentage.setValue(model.dropShipBonusPercentage);
         spnPityContracts.setValue(model.pityContracts);
         chkUseChaosSupportPointConversion.setSelected(model.useChaosSupportPointConversion);
@@ -573,6 +580,7 @@ class ContractMarketPage {
         model.useDynamicDifficulty = chkUseDynamicDifficulty.isSelected();
         model.useBolsterContractSkill = chkUseBolsterContractSkill.isSelected();
         model.useChaosScaleSupportPointConversion = chkUseChaosScaleSupportPointConversion.isSelected();
+        model.useContractFactionModifiers = chkUseContractFactionModifiers.isSelected();
         model.dropShipBonusPercentage = (int) spnDropShipBonusPercentage.getValue();
         model.pityContracts = (int) spnPityContracts.getValue();
         model.useChaosSupportPointConversion = chkUseChaosSupportPointConversion.isSelected();

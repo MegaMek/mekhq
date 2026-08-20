@@ -67,6 +67,7 @@ import mekhq.campaign.mission.contract.utilities.MHQMorale;
 import mekhq.campaign.mission.utilities.ContractUtilities;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.reputation.chaosReputation.ChaosReputation;
+import mekhq.campaign.universe.Faction;
 import mekhq.campaign.universe.Planet;
 import mekhq.campaign.universe.PlanetarySystem;
 import mekhq.campaign.universe.Systems;
@@ -151,7 +152,9 @@ public class AbstractContractGeneration {
               contract);
 
         // Step 7: Initial Terms
-        setContractTerms(chaosObjectiveType, employerData.type(), contract);
+        boolean useFactionModifiers = campaignOptions.get(CampaignOption.USE_CONTRACT_FACTION_MODIFIERS);
+        setContractTerms(chaosObjectiveType, employerData.type(), employerData.getFaction(), useFactionModifiers,
+              contract);
 
         // Step 9: Final Tasks
         performFinalTasks(campaign, currentDate, contract, currentLocation);
@@ -446,9 +449,9 @@ public class AbstractContractGeneration {
     }
 
     private static void setContractTerms(ChaosObjectiveType objectiveType, ChaosEmployerType employerType,
-          ChaosContract contract) {
+          Faction employerFaction, boolean useFactionModifiers, ChaosContract contract) {
         ContractTermsData initialContractTerms = ChaosContractDetermineTerms.determineInitialTerms(objectiveType,
-              employerType);
+              employerType, employerFaction, useFactionModifiers);
         contract.setContractTerms(initialContractTerms);
     }
 
