@@ -1072,10 +1072,10 @@ public class ContractEditorDialog extends JDialog {
                                    ? AbstractContractGeneration.determineTransportPay(campaign, contract)
                                    : moneyValue(transportPaySpinner);
         Money monthlyPayValue = monthlyPayAutomatic.isSelected()
-                                      ? AbstractContractGeneration.determineMonthlyPay(contract)
+                                      ? AbstractContractGeneration.determineMonthlyPay(campaign, contract)
                                       : moneyValue(monthlyPaySpinner);
         Money combatPayValue = combatPayAutomatic.isSelected()
-                                     ? AbstractContractGeneration.determineCombatPay(contract)
+                                     ? AbstractContractGeneration.determineCombatPay(campaign, contract)
                                      : moneyValue(combatPaySpinner);
         contract.setContractFinanceData(new ContractFinanceData(transportPay, monthlyPayValue, combatPayValue));
 

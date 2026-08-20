@@ -63,7 +63,6 @@ import mekhq.campaign.mission.contract.contractData.EmployerData;
 import mekhq.campaign.mission.contract.contractData.EnemyData;
 import mekhq.campaign.mission.contract.contractData.RentedFacilitiesData;
 import mekhq.campaign.mission.contract.contractData.SystemsTargetData;
-import mekhq.campaign.mission.contract.contractGeneration.targetFinder.ChaosContractPayDetermination;
 import mekhq.campaign.mission.contract.utilities.MHQMorale;
 import mekhq.campaign.mission.utilities.ContractUtilities;
 import mekhq.campaign.personnel.Person;
@@ -192,9 +191,14 @@ public class AbstractContractGeneration {
         StratConCampaignState stratConCampaignState = new StratConCampaignState();
         contract.setStratConCampaignState(stratConCampaignState);
 
-        // Pay
-        ChaosContractPayDetermination.determineContractPayForChaosContract(campaign, currentDate, contract,
-              currentLocation);
+        // Pay - the default Chaos Campaign scheme, or the CamOps force-value scheme when the campaign opts into it.
+        if (campaign.getCampaignOptions().get(CampaignOption.USE_LEGACY_CONTRACT_PAY)) {
+            CamOpsContractPayDetermination.determineContractPayForCamOpsContract(campaign, currentDate, contract,
+                  currentLocation);
+        } else {
+            ChaosContractPayDetermination.determineContractPayForChaosContract(campaign, currentDate, contract,
+                  currentLocation);
+        }
     }
 
     private static void setAncillaryValues(Campaign campaign, LocalHangar detachmentHangar, ChaosContract contract) {
@@ -279,15 +283,26 @@ public class AbstractContractGeneration {
     }
 
     /**
-     * Determines a contract's monthly pay the way generation does (from its scale and base pay rate). Exposed as public
-     * so the GM contract editor's "Automatic" monthly pay follows the same rule.
+     * Determines a contract's monthly pay the way generation does. Exposed as public so the GM contract editor's
+     * "Automatic" monthly pay follows the same rule, tracking the campaign's chosen pay scheme: the CamOps force value
+     * when {@link CampaignOption#USE_LEGACY_CONTRACT_PAY} is set, otherwise the Chaos scale-and-base-pay scheme.
      */
-    public static Money determineMonthlyPay(AbstractContract contract) {
+    public static Money determineMonthlyPay(Campaign campaign, AbstractContract contract) {
+        if (campaign.getCampaignOptions().get(CampaignOption.USE_LEGACY_CONTRACT_PAY)) {
+            return CamOpsContractPayDetermination.getMonthlyPay(campaign, contract);
+        }
         return ChaosContractPayDetermination.getMonthlyPay(contract);
     }
 
-    /** Determines a contract's combat pay the way generation does (from its scale). */
-    public static Money determineCombatPay(AbstractContract contract) {
+    /**
+     * Determines a contract's combat pay the way generation does, tracking the campaign's chosen pay scheme: CamOps
+     * folds combat compensation into the monthly retainer (zero here), while the Chaos scheme pays a separate combat
+     * bonus derived from scale.
+     */
+    public static Money determineCombatPay(Campaign campaign, AbstractContract contract) {
+        if (campaign.getCampaignOptions().get(CampaignOption.USE_LEGACY_CONTRACT_PAY)) {
+            return CamOpsContractPayDetermination.getCombatPay();
+        }
         return ChaosContractPayDetermination.getCombatPay(contract);
     }
 

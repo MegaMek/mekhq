@@ -35,8 +35,8 @@ package mekhq.gui.campaignOptions.contents;
 import jakarta.annotation.Nonnull;
 import jakarta.annotation.Nullable;
 import mekhq.campaign.Campaign;
-import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.campaignOptions.CampaignOption;
+import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.market.enums.ContractMarketMethod;
 import mekhq.campaign.market.enums.UnitMarketMethod;
 import mekhq.campaign.market.personnelMarket.enums.PersonnelMarketStyle;
@@ -69,6 +69,7 @@ class MarketsOptionsModel {
     int contractMaxSalvagePercentage;
     int dropShipBonusPercentage;
     int pityContracts;
+    boolean useLegacyContractPay;
     boolean equipmentContractBase;
     double equipmentContractPercent;
     boolean useAlternatePaymentMode;
@@ -105,6 +106,7 @@ class MarketsOptionsModel {
         contractMaxSalvagePercentage = options.get(CampaignOption.CONTRACT_MAX_SALVAGE_PERCENTAGE);
         dropShipBonusPercentage = options.get(CampaignOption.DROP_SHIP_BONUS_PERCENTAGE);
         pityContracts = options.get(CampaignOption.PITY_CONTRACTS);
+        useLegacyContractPay = options.get(CampaignOption.USE_LEGACY_CONTRACT_PAY);
         equipmentContractBase = options.get(CampaignOption.EQUIPMENT_CONTRACT_BASE);
         equipmentContractPercent = options.get(CampaignOption.EQUIPMENT_CONTRACT_PERCENT);
         useAlternatePaymentMode = options.get(CampaignOption.USE_ALTERNATE_PAYMENT_MODE);
@@ -156,6 +158,7 @@ class MarketsOptionsModel {
         options.set(CampaignOption.CONTRACT_MAX_SALVAGE_PERCENTAGE, contractMaxSalvagePercentage);
         options.set(CampaignOption.DROP_SHIP_BONUS_PERCENTAGE, dropShipBonusPercentage);
         options.set(CampaignOption.PITY_CONTRACTS, pityContracts);
+        options.set(CampaignOption.USE_LEGACY_CONTRACT_PAY, useLegacyContractPay);
         options.set(CampaignOption.EQUIPMENT_CONTRACT_BASE, equipmentContractBase);
         options.setEquipmentContractPercent(equipmentContractPercent);
         options.setDropShipContractPercent(dropShipContractPercent);

@@ -113,9 +113,10 @@ class ContractMarketPage {
     private JSpinner spnPityContracts;
 
     private JPanel pnlContractPay;
+    private JCheckBox chkUseLegacyOptions;
+    private JPanel pnlLegacyContractPayOptions;
     private JRadioButton btnContractEquipment;
     private JPanel pnlContractPayEquipmentOptions;
-    private JPanel pnlContractPayPersonnelOptions;
     private JLabel lblEquipPercent;
     private JSpinner spnEquipPercent;
     private JCheckBox chkUseAlternatePaymentMode;
@@ -267,6 +268,12 @@ class ContractMarketPage {
      */
     private @Nonnull JPanel createContractPayPanel() {
         // Contents
+
+        // Top-level pay scheme: the default Chaos Campaign scheme, or the legacy force-value / payroll schemes whose
+        // basis and options are configured in the nested card below. Leaving the box unticked keeps Chaos pay.
+        chkUseLegacyOptions = new CampaignOptionsCheckBox("UseLegacyOptions");
+        chkUseLegacyOptions.addMouseListener(createTipPanelUpdater("UseLegacyOptions"));
+
         btnContractEquipment = new JRadioButton(getTextAt(getCampaignOptionsResourceBundle(),
               "lblContractEquipment.text"));
         btnContractEquipment.setToolTipText(getTextAt(getCampaignOptionsResourceBundle(),
@@ -354,18 +361,41 @@ class ContractMarketPage {
         equipmentValuePanel.addRow(lblWarShipPercent, spnWarShipPercent);
         pnlContractPayEquipmentOptions = equipmentValuePanel;
 
-        final SettingsFormPanel personnelPayPanel = new SettingsFormPanel(
-              "ContractPayPersonnelPanel",
+        // Shared options that apply to both legacy bases (TO&E value and payroll), so they sit outside the basis radios
+        // rather than under either one.
+        final SettingsFormPanel sharedOptionsPanel = new SettingsFormPanel(
+                "ContractPaySharedPanel",
               CONTRACT_PAY_LABEL_COLUMN_WIDTH,
               CONTROL_COLUMN_WIDTH);
-        personnelPayPanel.addCheckBoxGrid(CHECKBOX_GRID_COLUMNS,
+        sharedOptionsPanel.addCheckBoxGrid(CHECKBOX_GRID_COLUMNS,
               chkBLCSaleValue,
               chkUseInfantryDoesNotCount,
               chkOverageRepaymentInFinalPayment);
-        pnlContractPayPersonnelOptions = personnelPayPanel;
 
         btnContractEquipment.addActionListener(event -> updateContractPayEnabledState());
         btnContractPersonnel.addActionListener(event -> updateContractPayEnabledState());
+        chkUseLegacyOptions.addActionListener(event -> updateContractPayModelEnabledState());
+
+        // The legacy container holds the TO&E-value / payroll basis radios and the shared options; it is only
+        // interactive when "Use Legacy Options" is ticked above, otherwise Chaos pay is used.
+        final JPanel legacyOptions = new CampaignOptionsStandardPanel("ContractPayLegacyOptions");
+        legacyOptions.setLayout(new GridBagLayout());
+        final GridBagConstraints legacyLayout = defaultGridBagConstraints();
+        legacyLayout.weightx = 1.0;
+        legacyLayout.fill = GridBagConstraints.HORIZONTAL;
+
+        legacyLayout.gridx = 0;
+        legacyLayout.gridy = 0;
+        legacyOptions.add(createContractPaySubsection("ContractPayEquipmentSubsection",
+                btnContractEquipment,
+                equipmentValuePanel), legacyLayout);
+
+        legacyLayout.gridy++;
+        legacyOptions.add(btnContractPersonnel, legacyLayout);
+
+        legacyLayout.gridy++;
+        legacyOptions.add(sharedOptionsPanel, legacyLayout);
+        pnlLegacyContractPayOptions = legacyOptions;
 
         final JPanel panel = new CampaignOptionsStandardPanel("ContractPayPanel");
         panel.setLayout(new GridBagLayout());
@@ -375,14 +405,11 @@ class ContractMarketPage {
 
         layout.gridx = 0;
         layout.gridy = 0;
-        panel.add(createContractPaySubsection("ContractPayEquipmentSubsection",
-              btnContractEquipment,
-              equipmentValuePanel), layout);
+        panel.add(chkUseLegacyOptions, layout);
 
         layout.gridy++;
-        panel.add(createContractPaySubsection("ContractPayPersonnelSubsection",
-              btnContractPersonnel,
-              personnelPayPanel), layout);
+        legacyOptions.setBorder(BorderFactory.createEmptyBorder(0, CONTRACT_PAY_OPTION_INDENT, 0, 0));
+        panel.add(legacyOptions, layout);
 
         return panel;
     }
@@ -430,13 +457,30 @@ class ContractMarketPage {
      * the other basis, so only the relevant settings are interactive.
      */
     private void updateContractPayEnabledState() {
-        if (pnlContractPayEquipmentOptions == null || pnlContractPayPersonnelOptions == null) {
+        if (pnlContractPayEquipmentOptions == null) {
             return;
         }
 
-        boolean equipmentSelected = btnContractEquipment.isSelected();
-        setContainerEnabled(pnlContractPayEquipmentOptions, equipmentSelected);
-        setContainerEnabled(pnlContractPayPersonnelOptions, !equipmentSelected);
+        // The TO&E-value percentages only apply to the equipment basis; the payroll basis has no dedicated options
+        // (the shared options below apply to both bases and stay enabled).
+        setContainerEnabled(pnlContractPayEquipmentOptions, btnContractEquipment.isSelected());
+    }
+
+    /**
+     * Enables the whole legacy contract-pay card only when "Use Legacy Options" is ticked; otherwise Chaos Campaign pay
+     * is used and the card (basis radios and shared options alike) is greyed out. When legacy pay is active, the
+     * equipment-basis gating is applied within it.
+     */
+    private void updateContractPayModelEnabledState() {
+        if (pnlLegacyContractPayOptions == null) {
+            return;
+        }
+
+        boolean legacySelected = chkUseLegacyOptions.isSelected();
+        setContainerEnabled(pnlLegacyContractPayOptions, legacySelected);
+        if (legacySelected) {
+            updateContractPayEnabledState();
+        }
     }
 
     private void setContainerEnabled(Container container, boolean enabled) {
@@ -470,6 +514,7 @@ class ContractMarketPage {
         chkUseBolsterContractSkill.setSelected(model.useBolsterContractSkill);
         spnDropShipBonusPercentage.setValue(model.dropShipBonusPercentage);
         spnPityContracts.setValue(model.pityContracts);
+        chkUseLegacyOptions.setSelected(model.useLegacyContractPay);
         if (model.equipmentContractBase) {
             btnContractEquipment.setSelected(true);
         } else {
@@ -485,7 +530,7 @@ class ContractMarketPage {
         chkUseInfantryDoesNotCount.setSelected(model.infantryDontCount);
         chkBLCSaleValue.setSelected(model.blcSaleValue);
         chkOverageRepaymentInFinalPayment.setSelected(model.overageRepaymentInFinalPayment);
-        updateContractPayEnabledState();
+        updateContractPayModelEnabledState();
     }
 
     /**
@@ -510,6 +555,7 @@ class ContractMarketPage {
         model.useBolsterContractSkill = chkUseBolsterContractSkill.isSelected();
         model.dropShipBonusPercentage = (int) spnDropShipBonusPercentage.getValue();
         model.pityContracts = (int) spnPityContracts.getValue();
+        model.useLegacyContractPay = chkUseLegacyOptions.isSelected();
         model.equipmentContractBase = btnContractEquipment.isSelected();
         model.equipmentContractPercent = (double) spnEquipPercent.getValue();
         model.dropShipContractPercent = (double) spnDropShipPercent.getValue();

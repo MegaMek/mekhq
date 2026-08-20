@@ -763,6 +763,8 @@ public final class CampaignOption<T> {
           of(Integer.class, 0, "rentedFacilitiesCostHoldingCells");
     public static final CampaignOption<Integer> RENTED_FACILITIES_COST_REPAIR_BAYS =
           of(Integer.class, 0, "rentedFacilitiesCostRepairBays");
+    public static final CampaignOption<Boolean> USE_LEGACY_CONTRACT_PAY =
+          of(Boolean.class, false, "useLegacyContractPay");
     public static final CampaignOption<Boolean> USE_ALTERNATE_PAYMENT_MODE =
           of(Boolean.class, false, "useAlternatePaymentMode");
     public static final CampaignOption<Boolean> USE_DIMINISHING_CONTRACT_PAY =
