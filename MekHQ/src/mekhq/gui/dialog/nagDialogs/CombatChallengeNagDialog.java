@@ -64,6 +64,6 @@ public class CombatChallengeNagDialog extends ImmersiveDialogNag {
     @Override
     protected String getInCharacterMessage(Campaign campaign, String key, String commanderAddress) {
         return getFormattedTextAt(getResourceBundle(), key + ".ic", commanderAddress,
-              CombatTeam.getStandardFormationSize(campaign.getFaction()));
+              CombatTeam.getStandardFormationSize(campaign.getPlayerForce().getFaction()));
     }
 }

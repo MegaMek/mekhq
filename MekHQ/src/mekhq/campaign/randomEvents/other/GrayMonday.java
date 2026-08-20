@@ -47,6 +47,7 @@ import mekhq.campaign.mission.AtBContract;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.universe.Factions;
 import mekhq.gui.baseComponents.immersiveDialogs.ImmersiveDialogSimple;
+import mekhq.campaign.campaignOptions.CampaignOption;
 
 public class GrayMonday {
     private static final String RESOURCE_BUNDLE = "mekhq.resources.GrayMonday";
@@ -74,7 +75,7 @@ public class GrayMonday {
         this.campaign = campaign;
 
         boolean isEmployerBegging = today.equals(EMPLOYER_BEGGING);
-        if (campaign.getCampaignOptions().isSimulateGrayMonday()) {
+        if (campaign.getCampaignOptions().get(CampaignOption.SIMULATE_GRAY_MONDAY)) {
             if (today.equals(BANKRUPTCY)) {
                 Finances finances = campaign.getPlayerForce().getFinances();
                 Money balance = finances.getBalance();
@@ -160,7 +161,7 @@ public class GrayMonday {
     private @Nullable Person getSpeaker() {
         return campaign.getPlayerForce().getHumanResources()
                      .getSeniorAdminPerson(campaign.getCampaignOptions(),
-                           campaign.isClanCampaign(),
+                           campaign.getPlayerForce().isClanForce(),
                            campaign.getLocalDate());
     }
 

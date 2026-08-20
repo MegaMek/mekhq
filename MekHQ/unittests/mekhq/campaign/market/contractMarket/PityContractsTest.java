@@ -32,6 +32,10 @@
  */
 package mekhq.campaign.market.contractMarket;
 
+import mekhq.campaign.campaignOptions.CampaignOption;
+
+import static org.mockito.Mockito.lenient;
+
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.RETURNS_DEEP_STUBS;
@@ -76,7 +80,9 @@ class PityContractsTest {
         Campaign campaign = mock(Campaign.class, RETURNS_DEEP_STUBS);
         when(campaign.getLocalDate()).thenReturn(LocalDate.of(3025, 1, 1));
         when(campaign.isPirateCampaign()).thenReturn(false);
-        when(campaign.getCampaignOptions()).thenReturn(mock(CampaignOptions.class));
+        CampaignOptions campaignOptions = mock(CampaignOptions.class);
+        lenient().when(campaignOptions.get(CampaignOption.USE_GENERIC_BATTLE_VALUE)).thenReturn(false);
+        when(campaign.getCampaignOptions()).thenReturn(campaignOptions);
         when(campaign.getAllCombatEntities()).thenReturn(List.of());
         return campaign;
     }

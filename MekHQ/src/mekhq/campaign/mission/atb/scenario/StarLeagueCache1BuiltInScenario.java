@@ -155,7 +155,7 @@ public class StarLeagueCache1BuiltInScenario extends AtBScenario {
         if ((ms == null)) {
             en = null;
         } else {
-            en = mekhq.campaign.mission.AtBDynamicScenarioFactory.createEntityWithCrew(campaign.getFaction()
+            en = mekhq.campaign.mission.AtBDynamicScenarioFactory.createEntityWithCrew(campaign.getPlayerForce().getFaction()
                                                                                              .getShortName(),
                   megamek.common.enums.SkillLevel.GREEN,
                   campaign,

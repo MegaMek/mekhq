@@ -60,6 +60,7 @@ import mekhq.MHQOptions;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.campaignOptions.CampaignOptions;
+import mekhq.campaign.campaignOptions.CampaignOption;
 import mekhq.campaign.force.Formation;
 import mekhq.campaign.icons.StandardFormationIcon;
 import mekhq.campaign.personnel.Person;
@@ -236,11 +237,11 @@ public class PersonnelTableModel extends MHQTableModel<Person, PersonnelTableMod
                 colorReasonKeys.add("colorReason.personnel.pregnant");
                 cellColors = (cellColors == null) ? mhqOptions.getPregnantColors() : cellColors;
             }
-            if (campaignOptions.isUseFatigue() && (getEffectiveFatigue(person, campaign) >= 5)) {
+            if (campaignOptions.get(CampaignOption.USE_FATIGUE) && (getEffectiveFatigue(person, campaign) >= 5)) {
                 colorReasonKeys.add("colorReason.personnel.fatigued");
                 cellColors = (cellColors == null) ? mhqOptions.getFatiguedColors() : cellColors;
             }
-            if (person.hasNonProstheticPermanentInjuries(campaignOptions.isUseAlternativeAdvancedMedical())) {
+            if (person.hasNonProstheticPermanentInjuries(campaignOptions.get(CampaignOption.USE_ALTERNATIVE_ADVANCED_MEDICAL))) {
                 colorReasonKeys.add("colorReason.personnel.healedInjuries");
                 cellColors = (cellColors == null) ? mhqOptions.getHealedInjuriesColors() : cellColors;
             }

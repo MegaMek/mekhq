@@ -35,6 +35,7 @@ package mekhq.gui.campaignOptions.contents;
 import jakarta.annotation.Nonnull;
 import mekhq.campaign.campaignOptions.AcquisitionsType;
 import mekhq.campaign.campaignOptions.CampaignOptions;
+import mekhq.campaign.campaignOptions.CampaignOption;
 import mekhq.campaign.enums.PlanetaryAcquisitionFactionLimit;
 import mekhq.campaign.universe.PlanetarySystem.PlanetaryRating;
 import mekhq.campaign.universe.PlanetarySystem.PlanetarySophistication;
@@ -85,35 +86,35 @@ class EquipmentAndSuppliesOptionsModel {
     boolean limitClanTech;
 
     EquipmentAndSuppliesOptionsModel(@Nonnull CampaignOptions options) {
-        acquisitionType = options.getAcquisitionType();
-        useFunctionalAppraisal = options.isUseFunctionalAppraisal();
-        acquisitionPersonnelCategory = options.getAcquisitionPersonnelCategory();
-        clanAcquisitionPenalty = options.getClanAcquisitionPenalty();
-        isAcquisitionPenalty = options.getIsAcquisitionPenalty();
-        waitingPeriod = options.getWaitingPeriod();
-        maxAcquisitions = options.getMaxAcquisitions();
-        autoLogisticsMekHead = options.getAutoLogisticsMekHead();
-        autoLogisticsMekLocation = options.getAutoLogisticsMekLocation();
-        autoLogisticsNonRepairableLocation = options.getAutoLogisticsNonRepairableLocation();
-        autoLogisticsArmor = options.getAutoLogisticsArmor();
-        autoLogisticsAmmunition = options.getAutoLogisticsAmmunition();
-        autoLogisticsActuators = options.getAutoLogisticsActuators();
-        autoLogisticsJumpJets = options.getAutoLogisticsJumpJets();
-        autoLogisticsHeadComponents = options.getAutoLogisticsHeadComponents();
-        autoLogisticsEngines = options.getAutoLogisticsEngines();
-        autoLogisticsGyros = options.getAutoLogisticsGyros();
-        autoLogisticsHeatSink = options.getAutoLogisticsHeatSink();
-        autoLogisticsWeapons = options.getAutoLogisticsWeapons();
-        autoLogisticsOther = options.getAutoLogisticsOther();
-        unitTransitTime = options.getUnitTransitTime();
-        noDeliveriesInTransit = options.isNoDeliveriesInTransit();
-        usePlanetaryAcquisition = options.isUsePlanetaryAcquisition();
-        maxJumpsPlanetaryAcquisition = options.getMaxJumpsPlanetaryAcquisition();
-        planetAcquisitionFactionLimit = options.getPlanetAcquisitionFactionLimit();
-        disallowPlanetAcquisitionClanCrossover = options.isPlanetAcquisitionNoClanCrossover();
-        noClanPartsFromIS = options.isNoClanPartsFromIS();
-        penaltyClanPartsFromIS = options.getPenaltyClanPartsFromIS();
-        planetAcquisitionVerbose = options.isPlanetAcquisitionVerbose();
+        acquisitionType = options.get(CampaignOption.ACQUISITIONS_TYPE);
+        useFunctionalAppraisal = options.get(CampaignOption.USE_FUNCTIONAL_APPRAISAL);
+        acquisitionPersonnelCategory = options.get(CampaignOption.ACQUISITION_PERSONNEL_CATEGORY);
+        clanAcquisitionPenalty = options.get(CampaignOption.CLAN_ACQUISITION_PENALTY);
+        isAcquisitionPenalty = options.get(CampaignOption.IS_ACQUISITION_PENALTY);
+        waitingPeriod = options.get(CampaignOption.WAITING_PERIOD);
+        maxAcquisitions = options.get(CampaignOption.MAX_ACQUISITIONS);
+        autoLogisticsMekHead = options.get(CampaignOption.AUTO_LOGISTICS_MEK_HEAD);
+        autoLogisticsMekLocation = options.get(CampaignOption.AUTO_LOGISTICS_MEK_LOCATION);
+        autoLogisticsNonRepairableLocation = options.get(CampaignOption.AUTO_LOGISTICS_NON_REPAIRABLE_LOCATION);
+        autoLogisticsArmor = options.get(CampaignOption.AUTO_LOGISTICS_ARMOR);
+        autoLogisticsAmmunition = options.get(CampaignOption.AUTO_LOGISTICS_AMMUNITION);
+        autoLogisticsActuators = options.get(CampaignOption.AUTO_LOGISTICS_ACTUATORS);
+        autoLogisticsJumpJets = options.get(CampaignOption.AUTO_LOGISTICS_JUMP_JETS);
+        autoLogisticsHeadComponents = options.get(CampaignOption.AUTO_LOGISTICS_HEAD_COMPONENTS);
+        autoLogisticsEngines = options.get(CampaignOption.AUTO_LOGISTICS_ENGINES);
+        autoLogisticsGyros = options.get(CampaignOption.AUTO_LOGISTICS_GYROS);
+        autoLogisticsHeatSink = options.get(CampaignOption.AUTO_LOGISTICS_HEAT_SINK);
+        autoLogisticsWeapons = options.get(CampaignOption.AUTO_LOGISTICS_WEAPONS);
+        autoLogisticsOther = options.get(CampaignOption.AUTO_LOGISTICS_OTHER);
+        unitTransitTime = options.get(CampaignOption.UNIT_TRANSIT_TIME);
+        noDeliveriesInTransit = options.get(CampaignOption.NO_DELIVERIES_IN_TRANSIT);
+        usePlanetaryAcquisition = options.get(CampaignOption.USE_PLANETARY_ACQUISITION);
+        maxJumpsPlanetaryAcquisition = options.get(CampaignOption.MAX_JUMPS_PLANETARY_ACQUISITION);
+        planetAcquisitionFactionLimit = options.get(CampaignOption.PLANET_ACQUISITION_FACTION_LIMIT);
+        disallowPlanetAcquisitionClanCrossover = options.get(CampaignOption.PLANET_ACQUISITION_NO_CLAN_CROSSOVER);
+        noClanPartsFromIS = options.get(CampaignOption.NO_CLAN_PARTS_FROM_IS);
+        penaltyClanPartsFromIS = options.get(CampaignOption.PENALTY_CLAN_PARTS_FROM_IS);
+        planetAcquisitionVerbose = options.get(CampaignOption.PLANET_ACQUISITION_VERBOSE);
 
         int index = 0;
         for (PlanetarySophistication sophistication : PlanetarySophistication.values()) {
@@ -127,48 +128,48 @@ class EquipmentAndSuppliesOptionsModel {
             index++;
         }
 
-        limitByYear = options.isLimitByYear();
-        disallowExtinctStuff = options.isDisallowExtinctStuff();
-        allowClanPurchases = options.isAllowClanPurchases();
-        allowISPurchases = options.isAllowISPurchases();
-        allowCanonOnly = options.isAllowCanonOnly();
-        allowCanonRefitOnly = options.isAllowCanonRefitOnly();
-        limitClanTech = options.isLimitClanTech();
-        techLevel = options.getTechLevel();
-        variableTechLevel = options.isVariableTechLevel();
-        useAmmoByType = options.isUseAmmoByType();
+        limitByYear = options.get(CampaignOption.LIMIT_BY_YEAR);
+        disallowExtinctStuff = options.get(CampaignOption.DISALLOW_EXTINCT_STUFF);
+        allowClanPurchases = options.get(CampaignOption.ALLOW_CLAN_PURCHASES);
+        allowISPurchases = options.get(CampaignOption.ALLOW_IS_PURCHASES);
+        allowCanonOnly = options.get(CampaignOption.ALLOW_CANON_ONLY);
+        allowCanonRefitOnly = options.get(CampaignOption.ALLOW_CANON_REFIT_ONLY);
+        limitClanTech = options.get(CampaignOption.LIMIT_CLAN_TECH);
+        techLevel = options.get(CampaignOption.TECH_LEVEL);
+        variableTechLevel = options.get(CampaignOption.VARIABLE_TECH_LEVEL);
+        useAmmoByType = options.get(CampaignOption.USE_AMMO_BY_TYPE);
     }
 
     void applyTo(@Nonnull CampaignOptions options) {
-        options.setAcquisitionType(acquisitionType);
-        options.setUseFunctionalAppraisal(useFunctionalAppraisal);
-        options.setAcquisitionPersonnelCategory(acquisitionPersonnelCategory);
-        options.setClanAcquisitionPenalty(clanAcquisitionPenalty);
-        options.setIsAcquisitionPenalty(isAcquisitionPenalty);
-        options.setWaitingPeriod(waitingPeriod);
-        options.setMaxAcquisitions(maxAcquisitions);
-        options.setAutoLogisticsMekHead(autoLogisticsMekHead);
-        options.setAutoLogisticsMekLocation(autoLogisticsMekLocation);
-        options.setAutoLogisticsNonRepairableLocation(autoLogisticsNonRepairableLocation);
-        options.setAutoLogisticsArmor(autoLogisticsArmor);
-        options.setAutoLogisticsAmmunition(autoLogisticsAmmunition);
-        options.setAutoLogisticsActuators(autoLogisticsActuators);
-        options.setAutoLogisticsJumpJets(autoLogisticsJumpJets);
-        options.setAutoLogisticsHeadComponents(autoLogisticsHeadComponents);
-        options.setAutoLogisticsEngines(autoLogisticsEngines);
-        options.setAutoLogisticsGyros(autoLogisticsGyros);
-        options.setAutoLogisticsHeatSink(autoLogisticsHeatSink);
-        options.setAutoLogisticsWeapons(autoLogisticsWeapons);
-        options.setAutoLogisticsOther(autoLogisticsOther);
-        options.setUnitTransitTime(unitTransitTime);
-        options.setNoDeliveriesInTransit(noDeliveriesInTransit);
-        options.setPlanetaryAcquisition(usePlanetaryAcquisition);
-        options.setMaxJumpsPlanetaryAcquisition(maxJumpsPlanetaryAcquisition);
-        options.setPlanetAcquisitionFactionLimit(planetAcquisitionFactionLimit);
-        options.setDisallowPlanetAcquisitionClanCrossover(disallowPlanetAcquisitionClanCrossover);
-        options.setDisallowClanPartsFromIS(noClanPartsFromIS);
-        options.setPenaltyClanPartsFromIS(penaltyClanPartsFromIS);
-        options.setPlanetAcquisitionVerboseReporting(planetAcquisitionVerbose);
+        options.set(CampaignOption.ACQUISITIONS_TYPE, acquisitionType);
+        options.set(CampaignOption.USE_FUNCTIONAL_APPRAISAL, useFunctionalAppraisal);
+        options.set(CampaignOption.ACQUISITION_PERSONNEL_CATEGORY, acquisitionPersonnelCategory);
+        options.set(CampaignOption.CLAN_ACQUISITION_PENALTY, clanAcquisitionPenalty);
+        options.set(CampaignOption.IS_ACQUISITION_PENALTY, isAcquisitionPenalty);
+        options.set(CampaignOption.WAITING_PERIOD, waitingPeriod);
+        options.set(CampaignOption.MAX_ACQUISITIONS, maxAcquisitions);
+        options.set(CampaignOption.AUTO_LOGISTICS_MEK_HEAD, autoLogisticsMekHead);
+        options.set(CampaignOption.AUTO_LOGISTICS_MEK_LOCATION, autoLogisticsMekLocation);
+        options.set(CampaignOption.AUTO_LOGISTICS_NON_REPAIRABLE_LOCATION, autoLogisticsNonRepairableLocation);
+        options.set(CampaignOption.AUTO_LOGISTICS_ARMOR, autoLogisticsArmor);
+        options.set(CampaignOption.AUTO_LOGISTICS_AMMUNITION, autoLogisticsAmmunition);
+        options.set(CampaignOption.AUTO_LOGISTICS_ACTUATORS, autoLogisticsActuators);
+        options.set(CampaignOption.AUTO_LOGISTICS_JUMP_JETS, autoLogisticsJumpJets);
+        options.set(CampaignOption.AUTO_LOGISTICS_HEAD_COMPONENTS, autoLogisticsHeadComponents);
+        options.set(CampaignOption.AUTO_LOGISTICS_ENGINES, autoLogisticsEngines);
+        options.set(CampaignOption.AUTO_LOGISTICS_GYROS, autoLogisticsGyros);
+        options.set(CampaignOption.AUTO_LOGISTICS_HEAT_SINK, autoLogisticsHeatSink);
+        options.set(CampaignOption.AUTO_LOGISTICS_WEAPONS, autoLogisticsWeapons);
+        options.set(CampaignOption.AUTO_LOGISTICS_OTHER, autoLogisticsOther);
+        options.set(CampaignOption.UNIT_TRANSIT_TIME, unitTransitTime);
+        options.set(CampaignOption.NO_DELIVERIES_IN_TRANSIT, noDeliveriesInTransit);
+        options.set(CampaignOption.USE_PLANETARY_ACQUISITION, usePlanetaryAcquisition);
+        options.set(CampaignOption.MAX_JUMPS_PLANETARY_ACQUISITION, maxJumpsPlanetaryAcquisition);
+        options.set(CampaignOption.PLANET_ACQUISITION_FACTION_LIMIT, planetAcquisitionFactionLimit);
+        options.set(CampaignOption.PLANET_ACQUISITION_NO_CLAN_CROSSOVER, disallowPlanetAcquisitionClanCrossover);
+        options.set(CampaignOption.NO_CLAN_PARTS_FROM_IS, noClanPartsFromIS);
+        options.set(CampaignOption.PENALTY_CLAN_PARTS_FROM_IS, penaltyClanPartsFromIS);
+        options.set(CampaignOption.PLANET_ACQUISITION_VERBOSE, planetAcquisitionVerbose);
 
         int index = 0;
         for (PlanetarySophistication sophistication : PlanetarySophistication.values()) {
@@ -182,15 +183,15 @@ class EquipmentAndSuppliesOptionsModel {
             index++;
         }
 
-        options.setLimitByYear(limitByYear);
-        options.setDisallowExtinctStuff(disallowExtinctStuff);
-        options.setAllowClanPurchases(allowClanPurchases);
-        options.setAllowISPurchases(allowISPurchases);
-        options.setAllowCanonOnly(allowCanonOnly);
-        options.setAllowCanonRefitOnly(allowCanonRefitOnly);
-        options.setTechLevel(techLevel);
-        options.setVariableTechLevel(variableTechLevel);
-        options.setUseAmmoByType(useAmmoByType);
-        options.setLimitClanTech(limitClanTech);
+        options.set(CampaignOption.LIMIT_BY_YEAR, limitByYear);
+        options.set(CampaignOption.DISALLOW_EXTINCT_STUFF, disallowExtinctStuff);
+        options.set(CampaignOption.ALLOW_CLAN_PURCHASES, allowClanPurchases);
+        options.set(CampaignOption.ALLOW_IS_PURCHASES, allowISPurchases);
+        options.set(CampaignOption.ALLOW_CANON_ONLY, allowCanonOnly);
+        options.set(CampaignOption.ALLOW_CANON_REFIT_ONLY, allowCanonRefitOnly);
+        options.set(CampaignOption.TECH_LEVEL, techLevel);
+        options.set(CampaignOption.VARIABLE_TECH_LEVEL, variableTechLevel);
+        options.set(CampaignOption.USE_AMMO_BY_TYPE, useAmmoByType);
+        options.set(CampaignOption.LIMIT_CLAN_TECH, limitClanTech);
     }
 }

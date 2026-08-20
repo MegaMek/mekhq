@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014-2025 The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2014-2026 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -256,7 +256,7 @@ public class AutoAwardsDialog extends JDialog {
             if (event.getSource().equals(btnDone)) {
                 for (int rowIndex = 0; rowIndex < personnelTable.getRowCount(); rowIndex++) {
                     if ((boolean) personnelTable.getValueAt(rowIndex, 3)) {
-                        Person person = campaign.getPerson((UUID) data.get(rowIndex).getFirst());
+                        Person person = campaign.getPlayerForce().getHumanResources().getPerson((UUID) data.get(rowIndex).getFirst());
                         Award award = (Award) data.get(rowIndex).get(1);
 
                         List<Award> awardsForRemoval = new ArrayList<>();

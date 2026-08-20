@@ -94,7 +94,7 @@ class UnitHistoryLoggingTest {
         UUID id = UUID.randomUUID();
         when(person.getId()).thenReturn(id);
         when(person.getFullName()).thenReturn(fullName);
-        when(campaign.getPerson(eq(id))).thenReturn(person);
+        when(campaign.getPlayerForce().getHumanResources().getPerson(eq(id))).thenReturn(person);
         return person;
     }
 

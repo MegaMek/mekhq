@@ -155,7 +155,7 @@ public class PrisonerEventManager {
             return;
         }
 
-        if (!campaign.getCampaignOptions().getPrisonerCaptureStyle().isMekHQ()) {
+        if (!campaign.getCampaignOptions().get(CampaignOption.PRISONER_CAPTURE_STYLE).isMekHQ()) {
             return;
         }
 
@@ -260,7 +260,7 @@ public class PrisonerEventManager {
      * @return The total prisoner capacity usage.
      */
     public static int calculatePrisonerCapacityUsage(Campaign campaign) {
-        PrisonerCaptureStyle captureStyle = campaign.getCampaignOptions().getPrisonerCaptureStyle();
+        PrisonerCaptureStyle captureStyle = campaign.getCampaignOptions().get(CampaignOption.PRISONER_CAPTURE_STYLE);
         boolean isMekHQCaptureStyle = captureStyle.isMekHQ();
 
         int prisonerCapacityUsage = 0;
@@ -422,7 +422,7 @@ public class PrisonerEventManager {
      */
     public static int calculatePrisonerCapacity(Campaign campaign) {
         CampaignOptions campaignOptions = campaign.getCampaignOptions();
-        PrisonerCaptureStyle captureStyle = campaignOptions.getPrisonerCaptureStyle();
+        PrisonerCaptureStyle captureStyle = campaignOptions.get(CampaignOption.PRISONER_CAPTURE_STYLE);
         boolean isMekHQCaptureStyle = captureStyle.isMekHQ();
 
         int prisonerCapacity = 0;
@@ -524,7 +524,7 @@ public class PrisonerEventManager {
      * @since 0.50.10
      */
     public static void checkForIntelBreachEvent(Campaign campaign, int freedPrisonerCount) {
-        if (!campaign.getCampaignOptions().getPrisonerCaptureStyle().isMekHQ()) {
+        if (!campaign.getCampaignOptions().get(CampaignOption.PRISONER_CAPTURE_STYLE).isMekHQ()) {
             return;
         }
 
@@ -690,12 +690,12 @@ public class PrisonerEventManager {
      */
     private void processExecutions(int executions, List<Person> prisoners) {
         CampaignOptions campaignOptions = campaign.getCampaignOptions();
-        if (campaignOptions.isTrackFactionStanding()) {
+        if (campaignOptions.get(CampaignOption.TRACK_FACTION_STANDING)) {
             FactionStandings factionStandings = campaign.getPlayerForce().getFactionStandings();
             List<String> reports = factionStandings.executePrisonersOfWar(campaign.getPlayerForce()
                                                                                 .getFaction()
                                                                                 .getShortName(),
-                  prisoners, campaign.getGameYear(), campaignOptions.getRegardMultiplier());
+                  prisoners, campaign.getGameYear(), campaignOptions.get(CampaignOption.REGARD_MULTIPLIER));
 
             for (String report : reports) {
                 campaign.addReport(POLITICS, report);
@@ -761,7 +761,7 @@ public class PrisonerEventManager {
         if (speaker == null) {
             return campaign.getPlayerForce().getHumanResources()
                          .getSeniorAdminPerson(campaign.getCampaignOptions(),
-                               campaign.isClanCampaign(),
+                               campaign.getPlayerForce().isClanForce(),
                                campaign.getLocalDate());
         } else {
             return speaker;

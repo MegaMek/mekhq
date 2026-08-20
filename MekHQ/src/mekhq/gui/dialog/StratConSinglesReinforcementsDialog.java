@@ -82,7 +82,7 @@ public class StratConSinglesReinforcementsDialog {
         ImmersiveDialogCore dialog = new ImmersiveDialogCore(campaign,
               campaign.getPlayerForce().getHumanResources()
                     .getSeniorAdminPerson(campaign.getCampaignOptions(),
-                          campaign.isClanCampaign(),
+                          campaign.getPlayerForce().isClanForce(),
                           campaign.getLocalDate()),
               null,
               getFormattedTextAt(RESOURCE_BUNDLE,

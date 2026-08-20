@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2025 The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2025-2026 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -59,7 +59,7 @@ class AgingMilestoneTest {
     @BeforeAll
     static void beforeAll() {
         mockCampaign = mockCampaign();
-        when(mockCampaign.getFaction()).thenReturn(Factions.getInstance().getDefaultFaction());
+        when(mockCampaign.getPlayerForce().getFaction()).thenReturn(Factions.getInstance().getDefaultFaction());
     }
 
     record milestoneRecord(int age, AgingMilestone expected) {

@@ -32,6 +32,10 @@
  */
 package mekhq.campaign.parts.equipment;
 
+import mekhq.campaign.campaignOptions.CampaignOption;
+
+import static org.mockito.Mockito.lenient;
+
 import static mekhq.campaign.parts.AmmoUtilities.getAmmoType;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
@@ -326,6 +330,7 @@ public class BattleArmorAmmoBinTest {
             mockCampaign = mockCampaign();
             mockCampaignOptions = mock(CampaignOptions.class);
             when(mockCampaign.getCampaignOptions()).thenReturn(mockCampaignOptions);
+            lenient().when(mockCampaignOptions.get(CampaignOption.USE_AMMO_BY_TYPE)).thenReturn(false);
             warehouse = new LocalWarehouse();
             when(mockCampaign.getPlayerForce().getWarehouse()).thenReturn(warehouse);
             quartermaster = new mekhq.campaign.ForceQuartermaster(mockCampaign);

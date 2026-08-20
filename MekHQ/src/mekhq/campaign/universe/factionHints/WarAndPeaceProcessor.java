@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2025 The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2025-2026 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -110,7 +110,7 @@ public class WarAndPeaceProcessor {
     public WarAndPeaceProcessor(final Campaign campaign, final boolean activeOnly) {
         this.campaign = campaign;
         this.today = campaign.getLocalDate();
-        final Faction campaignFaction = campaign.getFaction();
+        final Faction campaignFaction = campaign.getPlayerForce().getFaction();
 
         FactionHints factionHints = FactionHints.getInstance();
         processFactionHints(campaignFaction, activeOnly, factionHints);

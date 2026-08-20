@@ -123,13 +123,13 @@ public class DialogItinerary {
         if (resupplyType.equals(RESUPPLY_LOOT) || resupplyType.equals(RESUPPLY_CONTRACT_END)) {
             speaker = campaign.getPlayerForce().getHumanResources()
                             .getSeniorAdminPerson(campaign.getCampaignOptions(),
-                                  campaign.isClanCampaign(),
+                                  campaign.getPlayerForce().isClanForce(),
                                   campaign.getLocalDate());
 
             if (speaker != null) {
                 speakerName = speaker.getFullTitle();
             } else {
-                speakerName = campaign.getName();
+                speakerName = campaign.getPlayerForce().getName();
             }
 
             speakerIcon = getSpeakerIcon(campaign, speaker);

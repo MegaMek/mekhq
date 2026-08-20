@@ -1118,7 +1118,7 @@ public class CampaignOptionsPane extends JPanel {
         CampaignOptions presetCampaignOptions = campaignPreset.getCampaignOptions();
 
         LocalDate presetDate = campaign.getLocalDate();
-        Faction presetFaction = campaign.getFaction();
+        Faction presetFaction = campaign.getPlayerForce().getFaction();
         if (isStartup) {
             presetDate = campaignPreset.getDate();
             presetFaction = campaignPreset.getFaction();
@@ -1129,7 +1129,7 @@ public class CampaignOptionsPane extends JPanel {
         // Human Resources
         personnelPages.loadValuesFromCampaignOptions(presetCampaignOptions, campaign.getVersion());
         biographyPages.loadValuesFromCampaignOptions(presetCampaignOptions,
-              presetCampaignOptions.getRandomOriginOptions(),
+              presetCampaignOptions.get(CampaignOption.RANDOM_ORIGIN_OPTIONS),
               campaignPreset.getRankSystem());
         relationshipsPages.loadValuesFromCampaignOptions(presetCampaignOptions);
         turnoverAndRetentionPages.loadValuesFromCampaignOptions(presetCampaignOptions);

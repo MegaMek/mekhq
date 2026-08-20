@@ -83,7 +83,7 @@ public class FactionCensureConfirmationDialog {
     public FactionCensureConfirmationDialog(Campaign campaign) {
         Person speaker = campaign.getPlayerForce().getHumanResources()
                                .getSeniorAdminPerson(campaign.getCampaignOptions(),
-                                     campaign.isClanCampaign(),
+                                     campaign.getPlayerForce().isClanForce(),
                                      campaign.getLocalDate());
 
         ImmersiveDialogSimple dialog = new ImmersiveDialogSimple(campaign,

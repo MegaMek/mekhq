@@ -104,7 +104,7 @@ public class ResupplyConvoyChoice {
         ImmersiveDialogSimple dialog = new ImmersiveDialogSimple(campaign,
               campaign.getPlayerForce().getHumanResources()
                     .getSeniorAdminPerson(campaign.getCampaignOptions(),
-                          campaign.isClanCampaign(),
+                          campaign.getPlayerForce().isClanForce(),
                           campaign.getLocalDate()),
               null,
               getInCharacterMessage(isForcedPlayerConvoy, campaign.getCommanderAddress(), enhancedTonnage,

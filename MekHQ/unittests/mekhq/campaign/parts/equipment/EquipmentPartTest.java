@@ -72,6 +72,7 @@ import megamek.common.weapons.bayWeapons.BayWeapon;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.LocalWarehouse;
 import mekhq.campaign.campaignOptions.CampaignOptions;
+import mekhq.campaign.campaignOptions.CampaignOption;
 import mekhq.campaign.parts.Part;
 import mekhq.campaign.unit.Unit;
 import mekhq.utilities.MHQXMLUtility;
@@ -1173,7 +1174,7 @@ public class EquipmentPartTest {
             MMRoll roll = mock(MMRoll.class);
             when(roll.getIntValue()).thenReturn(12, 2);
             doReturn(roll).when(rng).d6(eq(2));
-            when(campaignOptions.getDestroyPartTarget()).thenReturn(6);
+            when(campaignOptions.get(CampaignOption.DESTROY_PART_TARGET)).thenReturn(6);
 
             // The underlying equipment has a hit so this should hit the part
             equipmentPart.updateConditionFromEntity(true);

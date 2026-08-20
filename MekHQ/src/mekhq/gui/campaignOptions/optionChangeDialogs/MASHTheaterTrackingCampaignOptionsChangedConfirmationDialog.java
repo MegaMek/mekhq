@@ -74,6 +74,7 @@ import mekhq.campaign.universe.Faction;
 import mekhq.campaign.universe.companyGeneration.AddSupportUnitsToTOE;
 import mekhq.gui.baseComponents.roundedComponents.RoundedJButton;
 import mekhq.gui.baseComponents.roundedComponents.RoundedLineBorder;
+import mekhq.campaign.campaignOptions.CampaignOption;
 
 public class MASHTheaterTrackingCampaignOptionsChangedConfirmationDialog extends JDialog {
     private static final MMLogger LOGGER = MMLogger.create(MASHTheaterTrackingCampaignOptionsChangedConfirmationDialog.class);
@@ -187,7 +188,7 @@ public class MASHTheaterTrackingCampaignOptionsChangedConfirmationDialog extends
         RoundedJButton btnConfirm = new RoundedJButton(getTextAt(RESOURCE_BUNDLE,
               "MASHTheaterTrackingCampaignOptionsChangedConfirmationDialog.confirm"));
         btnConfirm.addActionListener(evt -> {
-            processFreeUnit(campaign, campaign.getFaction(), true);
+            processFreeUnit(campaign, campaign.getPlayerForce().getFaction(), true);
             dispose();
         });
 
@@ -208,7 +209,7 @@ public class MASHTheaterTrackingCampaignOptionsChangedConfirmationDialog extends
         List<Unit> units = new ArrayList<>();
         try {
             PartQuality quality = PartQuality.QUALITY_D;
-            if (campaign.getCampaignOptions().isUseRandomUnitQualities()) {
+            if (campaign.getCampaignOptions().get(CampaignOption.USE_RANDOM_UNIT_QUALITIES)) {
                 quality = UnitOrder.getRandomUnitQuality(0);
             }
             Unit unit = campaign.addNewUnit(mekSummary.loadEntity(), true, 0, quality, UnitAcquisitionType.GM_ADDED);

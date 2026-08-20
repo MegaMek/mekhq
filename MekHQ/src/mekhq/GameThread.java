@@ -202,7 +202,7 @@ class GameThread extends Thread implements CloseClientListener {
 
             if ((client.getGame() != null) && client.getGame().getPhase().isLounge()) {
                 LOGGER.info("Thread in lounge");
-                client.getLocalPlayer().setCamouflage(app.getCampaign().getCamouflage().clone());
+                client.getLocalPlayer().setCamouflage(app.getCampaign().getPlayerForce().getCamouflage().clone());
 
                 if (started) {
                     client.getGame().getOptions().loadOptions();

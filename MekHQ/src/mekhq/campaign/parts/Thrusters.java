@@ -50,6 +50,7 @@ import mekhq.campaign.personnel.skills.SkillType;
 import mekhq.utilities.MHQXMLUtility;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
+import mekhq.campaign.campaignOptions.CampaignOption;
 
 /**
  * @author Jay Lawson (jaylawson39 at yahoo.com)
@@ -89,8 +90,8 @@ public class Thrusters extends Part {
             }
             if (checkForDestruction
                       && hits > priorHits
-                      && (hits < 4 && !campaign.getCampaignOptions().isUseAeroSystemHits())
-                      && Compute.d6(2) < campaign.getCampaignOptions().getDestroyPartTarget()) {
+                      && (hits < 4 && !campaign.getCampaignOptions().get(CampaignOption.USE_AERO_SYSTEM_HITS))
+                      && Compute.d6(2) < campaign.getCampaignOptions().get(CampaignOption.DESTROY_PART_TARGET)) {
                 remove(false);
             } else if (hits >= 4) {
                 remove(false);
@@ -101,7 +102,7 @@ public class Thrusters extends Part {
     @Override
     public int getBaseTime() {
         int time;
-        if (campaign.getCampaignOptions().isUseAeroSystemHits()) {
+        if (campaign.getCampaignOptions().get(CampaignOption.USE_AERO_SYSTEM_HITS)) {
             // Test of proposed errata for repair times
             if (isSalvaging()) {
                 time = 600;
@@ -126,7 +127,7 @@ public class Thrusters extends Part {
 
     @Override
     public int getDifficulty() {
-        if (campaign.getCampaignOptions().isUseAeroSystemHits()) {
+        if (campaign.getCampaignOptions().get(CampaignOption.USE_AERO_SYSTEM_HITS)) {
             // Test of proposed errata for repair time and difficulty
             if (isSalvaging()) {
                 return -2;

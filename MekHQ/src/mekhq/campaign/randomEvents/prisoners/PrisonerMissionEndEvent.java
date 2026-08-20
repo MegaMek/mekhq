@@ -115,7 +115,7 @@ public class PrisonerMissionEndEvent {
         ImmersiveDialogSimple dialog = new ImmersiveDialogSimple(campaign,
               campaign.getPlayerForce().getHumanResources()
                     .getSeniorAdminPerson(campaign.getCampaignOptions(),
-                          campaign.isClanCampaign(),
+                          campaign.getPlayerForce().isClanForce(),
                           campaign.getLocalDate()),
               null,
               inCharacterMessage,
@@ -171,7 +171,7 @@ public class PrisonerMissionEndEvent {
         ImmersiveDialogSimple dialog = new ImmersiveDialogSimple(campaign,
               campaign.getPlayerForce().getHumanResources()
                     .getSeniorAdminPerson(campaign.getCampaignOptions(),
-                          campaign.isClanCampaign(),
+                          campaign.getPlayerForce().isClanForce(),
                           campaign.getLocalDate()),
               null,
               inCharacterMessage,

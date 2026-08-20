@@ -49,6 +49,7 @@ import mekhq.campaign.Campaign;
 import mekhq.campaign.CurrentLocation;
 import mekhq.campaign.JumpPath;
 import mekhq.campaign.campaignOptions.CampaignOptions;
+import mekhq.campaign.campaignOptions.CampaignOption;
 import mekhq.campaign.finances.Accountant;
 import mekhq.campaign.finances.Money;
 import mekhq.campaign.universe.PlanetarySystem;
@@ -278,9 +279,9 @@ public class ContractTest {
         mockCampaign = mockCampaign();
 
         CampaignOptions mockCampaignOptions = mock(CampaignOptions.class);
-        when(mockCampaignOptions.isUsePeacetimeCost()).thenReturn(true);
-        when(mockCampaignOptions.isPayForTransport()).thenReturn(true);
-        when(mockCampaignOptions.isUseTwoWayPay()).thenReturn(true);
+        when(mockCampaignOptions.get(CampaignOption.USE_PEACETIME_COST)).thenReturn(true);
+        when(mockCampaignOptions.get(CampaignOption.PAY_FOR_TRANSPORT)).thenReturn(true);
+        when(mockCampaignOptions.get(CampaignOption.IS_USE_TWO_WAY_PAY)).thenReturn(true);
 
         Money jumpCost = Money.of(5);
         Money contractBase = Money.of(10);

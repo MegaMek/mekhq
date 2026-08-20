@@ -164,9 +164,9 @@ public class PersonUtility {
     public static void overrideSkills(Campaign campaign, Person person, PersonnelRole personnelRole,
           SkillLevel skillLevel, boolean checkVeterancyEligibility) {
         CampaignOptions campaignOptions = campaign.getCampaignOptions();
-        boolean isDoctorsUseAdministration = campaignOptions.isDoctorsUseAdministration();
-        boolean isTechsUseAdministration = campaignOptions.isTechsUseAdministration();
-        boolean isUseArtillery = campaignOptions.isUseArtillery();
+        boolean isDoctorsUseAdministration = campaignOptions.get(CampaignOption.DOCTORS_USE_ADMINISTRATION);
+        boolean isTechsUseAdministration = campaignOptions.get(CampaignOption.TECHS_USE_ADMINISTRATION);
+        boolean isUseArtillery = campaignOptions.get(CampaignOption.USE_ARTILLERY);
 
         RandomSkillPreferences randomSkillPreferences = campaign.getRandomSkillPreferences();
         boolean isUseExtraRandom = randomSkillPreferences.randomizeSkill();

@@ -576,7 +576,7 @@ public class PersonViewPanel extends JScrollablePanel {
 
     private void initializeMechanics(JPanel pnlProfileTab) {
         JPanel pnlAttributes = null;
-        if (campaignOptions.isDisplayAllAttributes()) {
+        if (campaignOptions.get(CampaignOption.DISPLAY_ALL_ATTRIBUTES)) {
             pnlAttributes = fillAttributeScores();
         } else {
             Map<SkillAttribute, Integer> relevantAttributes = getRelevantAttributes();
@@ -786,8 +786,8 @@ public class PersonViewPanel extends JScrollablePanel {
         GridBagConstraints gridBagConstraints;
         boolean isChild = person.isChild(campaign.getLocalDate());
 
-        boolean isUseRandomPersonality = campaignOptions.isUseRandomPersonalities();
-        boolean isShowLabelsOnly = campaignOptions.isUsePersonalityLabelsOnly();
+        boolean isUseRandomPersonality = campaignOptions.get(CampaignOption.USE_RANDOM_PERSONALITIES);
+        boolean isShowLabelsOnly = campaignOptions.get(CampaignOption.USE_PERSONALITY_LABELS_ONLY);
         boolean isHidePersonality = person.isHidePersonality();
         boolean isRecruit = person.getJoinedCampaign() == null;
 
@@ -918,7 +918,7 @@ public class PersonViewPanel extends JScrollablePanel {
         Map<IOption, String> relevantAbilities = new HashMap<>();
 
         PersonnelOptions options = person.getOptions();
-        if (campaignOptions.isUseAbilities() && (person.countOptions(LVL3_ADVANTAGES) > 0)) {
+        if (campaignOptions.get(CampaignOption.USE_ABILITIES) && (person.countOptions(LVL3_ADVANTAGES) > 0)) {
             for (Enumeration<IOption> i = person.getOptions(LVL3_ADVANTAGES); i.hasMoreElements(); ) {
                 IOption option = i.nextElement();
                 if (option.booleanValue()) {
@@ -928,7 +928,7 @@ public class PersonViewPanel extends JScrollablePanel {
             }
         }
 
-        if (campaignOptions.isUseImplants() && (person.countOptions(MD_ADVANTAGES) > 0)) {
+        if (campaignOptions.get(CampaignOption.USE_IMPLANTS) && (person.countOptions(MD_ADVANTAGES) > 0)) {
             for (Enumeration<IOption> i = person.getOptions(MD_ADVANTAGES); i.hasMoreElements(); ) {
                 IOption option = i.nextElement();
                 if (option.booleanValue()) {
@@ -972,7 +972,7 @@ public class PersonViewPanel extends JScrollablePanel {
             }
         }
 
-        if (!campaignOptions.isUseEdge()) {
+        if (!campaignOptions.get(CampaignOption.USE_EDGE)) {
             relevantAttributes.remove(SkillAttribute.EDGE);
         }
 
@@ -1069,7 +1069,7 @@ public class PersonViewPanel extends JScrollablePanel {
      */
     private int getAwardTierCount(Award award, int maximumTiers) {
         int numAwards = person.getAwardController().getNumberOfAwards(award);
-        int tierSize = campaignOptions.getAwardTierSize();
+        int tierSize = campaignOptions.get(CampaignOption.AWARD_TIER_SIZE);
 
         int divisionResult = numAwards / tierSize;
         int addition = (tierSize == 1) ? 0 : 1;
@@ -1276,7 +1276,7 @@ public class PersonViewPanel extends JScrollablePanel {
         addRow.accept(new String[] { String.format(resourceMap.getString("format.italic"), '-') }, 4);
         addRow.accept(new String[] { resourceMap.getString("lblStatus1.text"), ACTIVE.toString() }, 4);
 
-        if (campaign.getCampaignOptions().isShowOriginFaction()) {
+        if (campaign.getCampaignOptions().get(CampaignOption.SHOW_ORIGIN_FACTION)) {
             addRow.accept(new String[] { resourceMap.getString("lblOrigin1.text"),
                                          "<html><a href='#'>-</a> (-)</html>" }, 4);
         }
@@ -1396,7 +1396,7 @@ public class PersonViewPanel extends JScrollablePanel {
         pnlInfo.add(lblStatus2, gridBagConstraints);
         y++;
 
-        if (campaignOptions.isShowOriginFaction()) {
+        if (campaignOptions.get(CampaignOption.SHOW_ORIGIN_FACTION)) {
             lblOrigin1.setName("lblOrigin1");
             lblOrigin1.setText(resourceMap.getString("lblOrigin1.text"));
             gridBagConstraints = new GridBagConstraints();
@@ -1620,7 +1620,7 @@ public class PersonViewPanel extends JScrollablePanel {
         // We show the following if track total earnings is on for a free person or if
         // the
         // person has previously tracked total earnings
-        if (campaignOptions.isTrackTotalEarnings() &&
+        if (campaignOptions.get(CampaignOption.TRACK_TOTAL_EARNINGS) &&
                   (person.getPrisonerStatus().isFree() || person.getTotalEarnings().isGreaterThan(Money.zero()))) {
             JLabel lblTotalEarnings1 = new JLabel(resourceMap.getString("lblTotalEarnings1.text"));
             lblTotalEarnings1.setName("lblTotalEarnings1");
@@ -1648,7 +1648,7 @@ public class PersonViewPanel extends JScrollablePanel {
         // We show the following if track total xp earnings is on for a free person or
         // if the
         // person has previously tracked total xp earnings
-        if (campaignOptions.isTrackTotalXPEarnings() &&
+        if (campaignOptions.get(CampaignOption.TRACK_TOTAL_XP_EARNINGS) &&
                   (person.getPrisonerStatus().isFree() || (person.getTotalXPEarnings() != 0))) {
             JLabel lblTotalXPEarnings1 = new JLabel(resourceMap.getString("lblTotalXPEarnings1.text"));
             lblTotalXPEarnings1.setName("lblTotalXPEarnings1");
@@ -1949,7 +1949,7 @@ public class PersonViewPanel extends JScrollablePanel {
             }
         }
 
-        if (campaignOptions.getFamilyDisplayLevel().displayParentsChildrenSiblings()) {
+        if (campaignOptions.get(CampaignOption.FAMILY_DISPLAY_LEVEL).displayParentsChildrenSiblings()) {
             final List<Person> children = person.getGenealogy().getChildren();
             if (!children.isEmpty()) {
                 lblChildren1.setName("lblChildren1");
@@ -1989,7 +1989,7 @@ public class PersonViewPanel extends JScrollablePanel {
 
             final List<Person> grandchildren = person.getGenealogy().getGrandchildren();
             if (!grandchildren.isEmpty() &&
-                      campaignOptions.getFamilyDisplayLevel().displayGrandparentsGrandchildren()) {
+                      campaignOptions.get(CampaignOption.FAMILY_DISPLAY_LEVEL).displayGrandparentsGrandchildren()) {
                 lblGrandchildren1.setName("lblGrandchildren1");
                 lblGrandchildren1.setText(getTextAt(RESOURCE_BUNDLE, "lblGrandchildren1.text"));
                 gridBagConstraints = new GridBagConstraints();
@@ -2098,7 +2098,7 @@ public class PersonViewPanel extends JScrollablePanel {
             }
 
             final List<Person> grandparents = person.getGenealogy().getGrandparents();
-            if (!grandparents.isEmpty() && campaignOptions.getFamilyDisplayLevel().displayGrandparentsGrandchildren()) {
+            if (!grandparents.isEmpty() && campaignOptions.get(CampaignOption.FAMILY_DISPLAY_LEVEL).displayGrandparentsGrandchildren()) {
                 lblGrandparents1.setName("lblGrandparents1");
                 lblGrandparents1.setText(getTextAt(RESOURCE_BUNDLE, "lblGrandparents1.text"));
                 gridBagConstraints = new GridBagConstraints();
@@ -2137,7 +2137,7 @@ public class PersonViewPanel extends JScrollablePanel {
             }
 
             final List<Person> auntsAndUncles = person.getGenealogy().getsAuntsAndUncles();
-            if (!auntsAndUncles.isEmpty() && campaignOptions.getFamilyDisplayLevel().isAuntsUnclesCousins()) {
+            if (!auntsAndUncles.isEmpty() && campaignOptions.get(CampaignOption.FAMILY_DISPLAY_LEVEL).isAuntsUnclesCousins()) {
                 lblAuntsOrUncles1.setName("lblAuntsOrUncles1");
                 lblAuntsOrUncles1.setText(getTextAt(RESOURCE_BUNDLE, "lblAuntsOrUncles1.text"));
                 gridBagConstraints = new GridBagConstraints();
@@ -2177,7 +2177,7 @@ public class PersonViewPanel extends JScrollablePanel {
             }
 
             final List<Person> cousins = person.getGenealogy().getCousins();
-            if (!cousins.isEmpty() && campaignOptions.getFamilyDisplayLevel().isAuntsUnclesCousins()) {
+            if (!cousins.isEmpty() && campaignOptions.get(CampaignOption.FAMILY_DISPLAY_LEVEL).isAuntsUnclesCousins()) {
                 lblCousins1.setName("lblCousins1");
                 lblCousins1.setText(getTextAt(RESOURCE_BUNDLE, "lblCousins1.text"));
                 gridBagConstraints = new GridBagConstraints();
@@ -2263,9 +2263,9 @@ public class PersonViewPanel extends JScrollablePanel {
               campaign.getPlayerForce().isClanForce(),
               campaign.getLocalDate());
 
-        boolean doctorsUseAdmin = campaignOptions.isDoctorsUseAdministration();
-        boolean techsUseAdmin = campaignOptions.isTechsUseAdministration();
-        boolean isUseArtillery = campaignOptions.isUseArtillery();
+        boolean doctorsUseAdmin = campaignOptions.get(CampaignOption.DOCTORS_USE_ADMINISTRATION);
+        boolean techsUseAdmin = campaignOptions.get(CampaignOption.TECHS_USE_ADMINISTRATION);
+        boolean isUseArtillery = campaignOptions.get(CampaignOption.USE_ARTILLERY);
         PersonnelRole primaryProfession = person.getPrimaryRole();
         List<String> primaryProfessionSkills = primaryProfession.getSkillsForProfession(doctorsUseAdmin,
               techsUseAdmin,
@@ -2352,7 +2352,7 @@ public class PersonViewPanel extends JScrollablePanel {
               "pnlInProgress.hide")));
         pnlProgressHide.setVisible(false);
 
-        boolean isUseReasoning = campaignOptions.isUseReasoningXpMultiplier();
+        boolean isUseReasoning = campaignOptions.get(CampaignOption.USE_REASONING_XP_MULTIPLIER);
 
         // Calculate how many rows per column for even distribution
         double numColumns = 3.0;
@@ -2601,7 +2601,7 @@ public class PersonViewPanel extends JScrollablePanel {
                                                 .getTooltip(attribute, activeInjuryEffects, options, personAge));
                 lblName.setToolTipText(tooltip);
                 lblValue.setToolTipText(tooltip);
-            } else if (campaignOptions.isUseEdge()) {
+            } else if (campaignOptions.get(CampaignOption.USE_EDGE)) {
                 String attributeName = attribute.getLabel();
                 String adjustment = getTraitAdjustmentIcon(baseEdge, adjustedEdge);
                 String value = "<html>" + currentEdge + "/" + adjustedEdge + adjustment + addendum + "</html>";
@@ -2742,7 +2742,7 @@ public class PersonViewPanel extends JScrollablePanel {
         JLabel lblExtraIncome = null;
         ExtraIncome extraIncome = person.getExtraIncome();
         int traitLevel = extraIncome.getTraitLevel();
-        boolean isUseBetterExtraIncome = campaignOptions.isUseBetterExtraIncome();
+        boolean isUseBetterExtraIncome = campaignOptions.get(CampaignOption.USE_BETTER_EXTRA_INCOME);
         Money incomeAmount = extraIncome.getMonthlyIncomeAdjusted(isUseBetterExtraIncome);
         if (traitLevel != 0) {
             String extraIncomeLabel = getFormattedTextAt(RESOURCE_BUNDLE, "lblExtraIncome.text",
@@ -2754,7 +2754,7 @@ public class PersonViewPanel extends JScrollablePanel {
         JLabel lblFame = null;
         int baseFame = person.getFame();
         int adjustedFame = person.getAdjustedFame(campaignOptions.get(CampaignOption.USE_AGE_EFFECTS),
-              campaign.isClanCampaign(),
+              campaign.getPlayerForce().isClanForce(),
               campaign.getLocalDate());
         if (baseFame != 0 || adjustedFame != 0) {
             String adjustment = getTraitAdjustmentIcon(baseFame, adjustedFame);
@@ -2770,7 +2770,7 @@ public class PersonViewPanel extends JScrollablePanel {
 
         JLabel lblToughness = null;
         int totalToughness = person.getAdjustedToughness();
-        if ((campaignOptions.isUseToughness()) && (totalToughness != 0)) {
+        if ((campaignOptions.get(CampaignOption.USE_TOUGHNESS)) && (totalToughness != 0)) {
             String toughnessLabel = String.format(resourceMap.getString("format.traitValue"),
                   resourceMap.getString("lblToughness.text"),
                   totalToughness,
@@ -2780,10 +2780,10 @@ public class PersonViewPanel extends JScrollablePanel {
         }
 
         JLabel lblLoyalty = null;
-        int loyaltyModifier = person.getLoyaltyModifier(person.getAdjustedLoyalty(campaign.getFaction(),
-              campaignOptions.isUseAlternativeAdvancedMedical()));
-        if ((campaignOptions.isUseLoyaltyModifiers()) &&
-                  (!campaignOptions.isUseHideLoyalty()) &&
+        int loyaltyModifier = person.getLoyaltyModifier(person.getAdjustedLoyalty(campaign.getPlayerForce().getFaction(),
+              campaignOptions.get(CampaignOption.USE_ALTERNATIVE_ADVANCED_MEDICAL)));
+        if ((campaignOptions.get(CampaignOption.USE_LOYALTY_MODIFIERS)) &&
+                  (!campaignOptions.get(CampaignOption.USE_HIDE_LOYALTY)) &&
                   (loyaltyModifier != 0)) {
             String loyaltyLabel = String.format(resourceMap.getString("format.traitValue"),
                   resourceMap.getString("lblLoyalty.text"),
@@ -2796,7 +2796,7 @@ public class PersonViewPanel extends JScrollablePanel {
         JLabel lblFatigue = null;
         int baseFatigue = person.getAdjustedFatigue();
         int effectiveFatigue = getEffectiveFatigue(person, campaign);
-        if (campaignOptions.isUseFatigue() && (baseFatigue != 0 || effectiveFatigue != 0)) {
+        if (campaignOptions.get(CampaignOption.USE_FATIGUE) && (baseFatigue != 0 || effectiveFatigue != 0)) {
             StringBuilder fatigueDisplay = new StringBuilder("<html>");
             int fatigueTurnoverModifier = Math.clamp(((effectiveFatigue - 1) / 4) - 1, 0, 3);
             if (effectiveFatigue != baseFatigue) {
@@ -2823,7 +2823,7 @@ public class PersonViewPanel extends JScrollablePanel {
 
         JLabel lblHighestEducation = null;
         JLabel lblEducationStage = null;
-        if (campaignOptions.isUseEducationModule()) {
+        if (campaignOptions.get(CampaignOption.USE_EDUCATION_MODULE)) {
             EducationLevel highestEducation = person.getEduHighestEducation();
             String highestEducationLabel = String.format(resourceMap.getString("format.traitValue"),
                   resourceMap.getString("lblHighestEducation.text"),
@@ -3116,7 +3116,7 @@ public class PersonViewPanel extends JScrollablePanel {
         }
 
         if (!isProstheticReport) {
-            if (campaignOptions.isUseAlternativeAdvancedMedical()) {
+            if (campaignOptions.get(CampaignOption.USE_ALTERNATIVE_ADVANCED_MEDICAL)) {
                 getAlternativeAdvancedMedicalDisplay(lblAdvancedMedical2,
                       lblAdvancedMedical1,
                       gridBagConstraints,

@@ -90,7 +90,7 @@ public class PersonnelMarketAtB implements PersonnelMarketMethod {
                 };
             } else if (roll == 3 || roll == 11) {
                 int secondaryRoll = Compute.d6();
-                if ((secondaryRoll == 1) && (campaign.getGameYear() > (campaign.getFaction().isClan() ? 2870 : 3050))) {
+                if ((secondaryRoll == 1) && (campaign.getGameYear() > (campaign.getPlayerForce().getFaction().isClan() ? 2870 : 3050))) {
                     recruit = campaign.getPlayerForce()
                                     .getHumanResources()
                                     .newPerson(campaign, mekhq.campaign.personnel.enums.PersonnelRole.BA_TECH);
@@ -116,12 +116,12 @@ public class PersonnelMarketAtB implements PersonnelMarketMethod {
                                 .getHumanResources()
                                 .newPerson(campaign, mekhq.campaign.personnel.enums.PersonnelRole.AEROSPACE_PILOT);
             } else if (roll == 6 || roll == 8) {
-                if (campaign.getFaction().isClan() && (campaign.getGameYear() > 2870) && (Compute.d6(2) > 3)) {
+                if (campaign.getPlayerForce().getFaction().isClan() && (campaign.getGameYear() > 2870) && (Compute.d6(2) > 3)) {
                     recruit = campaign.getPlayerForce()
                                     .getHumanResources()
                                     .newPerson(campaign, mekhq.campaign.personnel.enums.PersonnelRole.BATTLE_ARMOUR);
                 } else {
-                    if (!campaign.getFaction().isClan() && (campaign.getGameYear() > 3050) && (Compute.d6(2) > 11)) {
+                    if (!campaign.getPlayerForce().getFaction().isClan() && (campaign.getGameYear() > 3050) && (Compute.d6(2) > 11)) {
                         recruit = campaign.getPlayerForce()
                                         .getHumanResources()
                                         .newPerson(campaign, PersonnelRole.BATTLE_ARMOUR);
@@ -158,7 +158,7 @@ public class PersonnelMarketAtB implements PersonnelMarketMethod {
                                        .findBestInRole(PersonnelRole.ADMINISTRATOR_HR,
                                              SkillType.S_ADMIN,
                                              campaign.getCampaignOptions(),
-                                             campaign.isClanCampaign(),
+                                             campaign.getPlayerForce().isClanForce(),
                                              campaign.getLocalDate());
                 int adminExperienceLevel = EXP_NONE;
                 if (adminHR != null && adminHR.hasSkill(S_ADMIN)) {

@@ -74,7 +74,7 @@ public class PrisonersNagDialog extends ImmersiveDialogNag {
         for (Formation formation : formations) {
             if (formation.isFormationType(SECURITY)) {
                 UUID commanderId = formation.getFormationCommanderID();
-                Person commander = campaign.getPerson(commanderId);
+                Person commander = campaign.getPlayerForce().getHumanResources().getPerson(commanderId);
                 if (commander == null) {
                     continue;
                 }
@@ -111,13 +111,13 @@ public class PrisonersNagDialog extends ImmersiveDialogNag {
     private @Nullable Person getFallbackSpeaker(Campaign campaign) {
         Person speaker = campaign.getPlayerForce().getHumanResources()
                                .getSeniorAdminPerson(campaign.getCampaignOptions(),
-                                     campaign.isClanCampaign(),
+                                     campaign.getPlayerForce().isClanForce(),
                                      campaign.getLocalDate());
 
         if (speaker == null) {
             speaker = campaign.getPlayerForce().getHumanResources()
                             .getSeniorAdminPerson(campaign.getCampaignOptions(),
-                                  campaign.isClanCampaign(),
+                                  campaign.getPlayerForce().isClanForce(),
                                   campaign.getLocalDate());
         } else {
             return speaker;

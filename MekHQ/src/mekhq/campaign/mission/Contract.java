@@ -48,6 +48,7 @@ import mekhq.campaign.mission.enums.ContractCommandRights;
 import mekhq.campaign.unit.Unit;
 import mekhq.campaign.universe.factionStanding.FactionStandingUtilities;
 import org.w3c.dom.Node;
+import mekhq.campaign.campaignOptions.CampaignOption;
 
 /**
  * Contracts - we need to track static amounts here because changes in the underlying campaign don't change the figures
@@ -113,7 +114,7 @@ public class Contract extends Mission {
         }
 
         // calculate support amount
-        if (campaign.getCampaignOptions().isUsePeacetimeCost()) {
+        if (campaign.getCampaignOptions().get(CampaignOption.USE_PEACETIME_COST)) {
             setSupportAmount(accountant.getPeacetimeCost()
                                    .multipliedBy(getLengthInMonths())
                                    .multipliedBy(getStraightSupport())
@@ -130,17 +131,17 @@ public class Contract extends Mission {
 
         // calculate employer's transport reimbursement (this is income - what they pay you toward transport)
         // The full transport cost will be subtracted in getEstimatedTotalProfit()
-        if (null != getSystem() && campaign.getCampaignOptions().isPayForTransport()) {
+        if (null != getSystem() && campaign.getCampaignOptions().get(CampaignOption.PAY_FOR_TRANSPORT)) {
             setTransportAmount(getEmployerTransportReimbursement(campaign));
         } else {
             setTransportAmount(Money.zero());
         }
 
         // calculate transit amount for CO
-        if (campaign.getCampaignOptions().isUsePeacetimeCost()) {
+        if (campaign.getCampaignOptions().get(CampaignOption.USE_PEACETIME_COST)) {
             // contract base * transport period * reputation * employer modifier
 
-            boolean useTwoWayPay = campaign.getCampaignOptions().isUseTwoWayPay();
+            boolean useTwoWayPay = campaign.getCampaignOptions().get(CampaignOption.IS_USE_TWO_WAY_PAY);
             setTransitAmount(accountant.getContractBase()
                                    .multipliedBy(((getJumpPath(campaign).getJumps()) * (useTwoWayPay ? 2.0 : 1.0)) /
                                                        4.0)
@@ -213,7 +214,7 @@ public class Contract extends Mission {
         // Version compatibility fix: Prior to 0.50.12, transportAmount stored the player's out-of-pocket
         // transport cost. Now it stores the employer's transport reimbursement. Recalculate for old saves.
         if (version.isLowerThan(new Version("0.50.12"))) {
-            if ((null != getSystem()) && campaign.getCampaignOptions().isPayForTransport()) {
+            if ((null != getSystem()) && campaign.getCampaignOptions().get(CampaignOption.PAY_FOR_TRANSPORT)) {
                 setTransportAmount(getEmployerTransportReimbursement(campaign));
             } else {
                 setTransportAmount(Money.zero());

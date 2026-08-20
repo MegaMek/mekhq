@@ -44,6 +44,7 @@ import megamek.common.annotations.Nullable;
 import megamek.utilities.ImageUtilities;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.campaignOptions.CampaignOptions;
+import mekhq.campaign.campaignOptions.CampaignOption;
 import mekhq.campaign.personnel.Person;
 import mekhq.gui.baseComponents.immersiveDialogs.ImmersiveDialogSimple;
 
@@ -95,7 +96,7 @@ public record CommandersDayAnnouncement(Campaign campaign) {
 
         if (dialog.getDialogChoice() == SUPPRESS_DIALOG_RESPONSE_INDEX) {
             CampaignOptions campaignOptions = campaign.getCampaignOptions();
-            campaignOptions.setShowLifeEventDialogCelebrations(false);
+            campaignOptions.set(CampaignOption.SHOW_LIFE_EVENT_DIALOG_CELEBRATIONS, false);
         }
     }
 
@@ -110,7 +111,7 @@ public record CommandersDayAnnouncement(Campaign campaign) {
         // Commander Data
         Person commander = campaign.getPlayerForce().getHumanResources()
                                  .getCommander(campaign.getCampaignOptions(),
-                                       campaign.isClanCampaign(),
+                                       campaign.getPlayerForce().isClanForce(),
                                        campaign.getLocalDate());
         String commanderAddress = campaign.getCommanderAddress();
 
@@ -137,13 +138,13 @@ public record CommandersDayAnnouncement(Campaign campaign) {
     private @Nullable Person getSpeaker() {
         Person speaker = campaign.getPlayerForce().getHumanResources()
                                .getSeniorAdminPerson(campaign.getCampaignOptions(),
-                                     campaign.isClanCampaign(),
+                                     campaign.getPlayerForce().isClanForce(),
                                      campaign.getLocalDate());
 
         if (speaker == null) {
             speaker = campaign.getPlayerForce().getHumanResources()
                             .getSeniorAdminPerson(campaign.getCampaignOptions(),
-                                  campaign.isClanCampaign(),
+                                  campaign.getPlayerForce().isClanForce(),
                                   campaign.getLocalDate());
         } else {
             return speaker;

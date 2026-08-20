@@ -214,7 +214,7 @@ public class StratConReinforcementsConfirmationDialog {
 
         return campaign.getPlayerForce().getHumanResources()
                      .getSeniorAdminPerson(campaign.getCampaignOptions(),
-                           campaign.isClanCampaign(),
+                           campaign.getPlayerForce().isClanForce(),
                            campaign.getLocalDate());
     }
 

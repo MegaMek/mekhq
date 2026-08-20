@@ -48,6 +48,7 @@ import mekhq.campaign.personnel.Person;
 import mekhq.campaign.unit.HangarSorter;
 import mekhq.campaign.unit.Unit;
 import mekhq.gui.baseComponents.JScrollableMenu;
+import mekhq.campaign.campaignOptions.CampaignOption;
 
 /**
  * This is a standard menu that takes a person and lets the user assign a unit for them to tech
@@ -71,7 +72,7 @@ public class AssignTechToUnitMenu extends JScrollableMenu {
                   || person.isDeployed() || !person.isTech()) {
             return;
         }
-        boolean techsUseAdmin = campaign.getCampaignOptions().isTechsUseAdministration();
+        boolean techsUseAdmin = campaign.getCampaignOptions().get(CampaignOption.TECHS_USE_ADMINISTRATION);
 
         // Initialize Menu
         setText(resources.getString("AssignTechToUnitMenu.title"));

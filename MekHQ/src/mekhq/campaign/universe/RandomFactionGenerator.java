@@ -68,6 +68,7 @@ import mekhq.campaign.mission.newContract.contractGeneration.targetFinder.Missio
 import mekhq.campaign.universe.PlanetarySystem.PlanetaryRating;
 import mekhq.campaign.universe.enums.HPGRating;
 import mekhq.campaign.universe.factionHints.FactionHints;
+import mekhq.campaign.campaignOptions.CampaignOption;
 
 /**
  * Uses Factions and Planets to weighted lists of potential employers and enemies for contract generation. Also finds a
@@ -152,9 +153,9 @@ public class RandomFactionGenerator {
      */
     public void startup(Campaign campaign) {
         borderTracker.setDate(campaign.getLocalDate());
-        final PlanetarySystem location = campaign.getCurrentLocation().getCurrentSystem();
+        final PlanetarySystem location = campaign.getPlayerForce().getForceDetachment().getCurrentLocation().getCurrentSystem();
         borderTracker.setRegionCenter(location.getX(), location.getY());
-        borderTracker.setRegionRadius(campaign.getCampaignOptions().getContractSearchRadius());
+        borderTracker.setRegionRadius(campaign.getCampaignOptions().get(CampaignOption.CONTRACT_SEARCH_RADIUS));
         MekHQ.registerHandler(borderTracker);
         for (final Faction faction : Factions.getInstance().getFactions()) {
             if (faction.isDeepPeriphery()) {

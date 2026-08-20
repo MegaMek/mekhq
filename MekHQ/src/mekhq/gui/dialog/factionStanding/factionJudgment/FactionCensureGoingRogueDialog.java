@@ -154,7 +154,7 @@ public class FactionCensureGoingRogueDialog {
     private Person getSpeaker() {
         return campaign.getPlayerForce().getHumanResources()
                      .getSeniorAdminPerson(campaign.getCampaignOptions(),
-                           campaign.isClanCampaign(),
+                           campaign.getPlayerForce().isClanForce(),
                            campaign.getLocalDate());
     }
 
@@ -217,7 +217,7 @@ public class FactionCensureGoingRogueDialog {
      * @since 0.50.07
      */
     private void getPossibleFactions(boolean isUsingFactionStandings) {
-        Faction campaignFaction = campaign.getFaction();
+        Faction campaignFaction = campaign.getPlayerForce().getFaction();
         LocalDate today = campaign.getLocalDate();
         Factions factions = Factions.getInstance();
 

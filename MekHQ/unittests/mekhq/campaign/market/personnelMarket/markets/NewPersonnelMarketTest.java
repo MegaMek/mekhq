@@ -533,7 +533,7 @@ class NewPersonnelMarketTest {
 
         Faction faction = new Faction();
         market.setApplicantOriginFactions(List.of(faction));
-        when(mockCampaign.getFaction()).thenReturn(faction);
+        when(mockCampaign.getPlayerForce().getFaction()).thenReturn(faction);
 
         Person person = new Person(mockCampaign);
         when(mockCampaign.getPlayerForce()

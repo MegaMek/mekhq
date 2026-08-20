@@ -89,6 +89,7 @@ import mekhq.campaign.Campaign;
 import mekhq.campaign.LocalHangar;
 import mekhq.campaign.ResolveScenarioTracker;
 import mekhq.campaign.campaignOptions.CampaignOptions;
+import mekhq.campaign.campaignOptions.CampaignOption;
 import mekhq.campaign.digitalGM.stratCon.StratConContractDefinition.StrategicObjectiveType;
 import mekhq.campaign.digitalGM.stratCon.StratConScenario.ScenarioState;
 import mekhq.campaign.digitalGM.stratCon.biome.StratConBiome;
@@ -741,7 +742,7 @@ public class StratConRulesManager {
 
         // Finally, finish scenario set up
         StratConGMs.mapGeneration(campaignOptions)
-              .setScenarioTerrain(track, scenario, campaign.getCampaignOptions().isUseNoTornadoes());
+              .setScenarioTerrain(track, scenario, campaign.getCampaignOptions().get(CampaignOption.USE_NO_TORNADOES));
         StratConGMs.opForGeneration(campaignOptions).generateOpFor(backingScenario, contract, campaign);
         swapInPlayerUnits(scenario, campaign, FORMATION_NONE);
 
@@ -1135,7 +1136,7 @@ public class StratConRulesManager {
             return false;
         }
 
-        if (entity.getUnitType() == DROPSHIP && !campaign.getCampaignOptions().isUseDropShips()) {
+        if (entity.getUnitType() == DROPSHIP && !campaign.getCampaignOptions().get(CampaignOption.USE_DROP_SHIPS)) {
             return false;
         }
 
@@ -1322,7 +1323,7 @@ public class StratConRulesManager {
                     StratConGMs.mapGeneration(campaignOptions)
                           .setScenarioTerrain(track,
                                 revealedScenario,
-                                campaign.getCampaignOptions().isUseNoTornadoes());
+                                campaign.getCampaignOptions().get(CampaignOption.USE_NO_TORNADOES));
                     StratConGMs.opForGeneration(campaignOptions)
                           .generateOpFor(revealedScenario.getBackingScenario(), contract, campaign);
                 }
@@ -1454,7 +1455,7 @@ public class StratConRulesManager {
         commitPrimaryForces(campaign, scenario, track);
         if (!backingScenario.isFinalized()) {
             StratConGMs.mapGeneration(campaignOptions)
-                  .setScenarioTerrain(track, scenario, campaign.getCampaignOptions().isUseNoTornadoes());
+                  .setScenarioTerrain(track, scenario, campaign.getCampaignOptions().get(CampaignOption.USE_NO_TORNADOES));
             StratConGMs.opForGeneration(campaignOptions).generateOpFor(backingScenario, contract, campaign);
         }
     }
@@ -1769,7 +1770,7 @@ public class StratConRulesManager {
               campaign.getPlayerForce().getHangar(), campaign);
 
         CampaignOptions campaignOptions = campaign.getCampaignOptions();
-        boolean useAdvancedScouting = campaignOptions.isUseAdvancedScouting();
+        boolean useAdvancedScouting = campaignOptions.get(CampaignOption.USE_ADVANCED_SCOUTING);
         // Each scout may scan up to scanMultiplier hexes
         // Each scout may scan up to a radius of individualScanRange hexes
         for (ScoutRecord scoutData : scouts) {
@@ -1797,7 +1798,7 @@ public class StratConRulesManager {
                     continue;
                 }
 
-                boolean isUseEdge = campaignOptions.isUseEdge() && scout.getOptions().booleanOption(EDGE_RECON_FAIL);
+                boolean isUseEdge = campaignOptions.get(CampaignOption.USE_EDGE) && scout.getOptions().booleanOption(EDGE_RECON_FAIL);
                 for (int direction = 0; direction < 6; direction++) {
                     StratConCoords checkCoords = currentCoords.translate(direction);
 
@@ -2084,8 +2085,8 @@ public class StratConRulesManager {
      */
     private static void increaseFatigue(int forceID, Campaign campaign) {
         CampaignOptions campaignOptions = campaign.getCampaignOptions();
-        boolean isUseFatigue = campaignOptions.isUseFatigue();
-        int fatigueRate = campaignOptions.getFatigueRate();
+        boolean isUseFatigue = campaignOptions.get(CampaignOption.USE_FATIGUE);
+        int fatigueRate = campaignOptions.get(CampaignOption.FATIGUE_RATE);
         for (UUID unit : campaign.getPlayerForce().getFormation(forceID).getAllUnits(false)) {
             for (Person person : campaign.getUnit(unit).getCrew()) {
                 person.changeFatigue(fatigueRate);
@@ -2278,7 +2279,7 @@ public class StratConRulesManager {
                   spanOpeningWithCustomColor(ReportingUtilities.getPositiveColor()),
                   CLOSING_SPAN_TAG));
 
-            if (campaign.getCampaignOptions().isUseFatigue()) {
+            if (campaign.getCampaignOptions().get(CampaignOption.USE_FATIGUE)) {
                 increaseFatigue(formation.getId(), campaign);
             }
 
@@ -2707,7 +2708,7 @@ public class StratConRulesManager {
 
         // do any facility or global modifiers
         CampaignOptions campaignOptions = campaign.getCampaignOptions();
-        boolean isClansObeyBiddingRules = campaignOptions.isClansObeyBiddingRules();
+        boolean isClansObeyBiddingRules = campaignOptions.get(CampaignOption.CLANS_OBEY_BIDDING_RULES);
         boolean isBatchallAccepted = contract.isBatchallAccepted();
 
         boolean restrictAlliedModifiers = isClansObeyBiddingRules &&
@@ -2718,8 +2719,8 @@ public class StratConRulesManager {
                                                contract.getEnemy().isClan();
 
         if (!campaign.getCampaignOptions().isUseStratConMaplessMode()) {
-            int alliedFacilityModifierChance = campaignOptions.getAlliedFacilityModifierDieSize();
-            int enemyFacilityModifierChance = campaignOptions.getEnemyFacilityModifierDieSize();
+            int alliedFacilityModifierChance = campaignOptions.get(CampaignOption.ALLIED_FACILITY_MODIFIER_DIE_SIZE);
+            int enemyFacilityModifierChance = campaignOptions.get(CampaignOption.ENEMY_FACILITY_MODIFIER_DIE_SIZE);
 
             applyFacilityModifiers(scenario,
                   track,
@@ -3299,7 +3300,7 @@ public class StratConRulesManager {
                         continue;
                     }
 
-                    int standardForceSize = CombatTeam.getStandardFormationSize(campaign.getFaction());
+                    int standardForceSize = CombatTeam.getStandardFormationSize(campaign.getPlayerForce().getFaction());
                     int formationSize = formation.getSize(campaign);
                     if (formationSize <= standardForceSize) {
                         retVal.add(force.getId());

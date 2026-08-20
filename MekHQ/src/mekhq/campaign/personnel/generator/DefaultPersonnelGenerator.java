@@ -43,6 +43,7 @@ import megamek.common.compute.Compute;
 import megamek.common.enums.Gender;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.campaignOptions.CampaignOptions;
+import mekhq.campaign.campaignOptions.CampaignOption;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.PersonnelOptions;
 import mekhq.campaign.personnel.SpecialAbility;
@@ -144,17 +145,17 @@ public class DefaultPersonnelGenerator extends AbstractPersonnelGenerator {
         generateNameAndGender(campaign, person, gender);
 
         // Set relationship flags
-        determineOrientation(person, campaignOptions.getNoInterestInRelationshipsDiceSize(),
-              campaignOptions.getInterestedInSameSexDiceSize(), campaignOptions.getInterestedInBothSexesDiceSize());
+        determineOrientation(person, campaignOptions.get(CampaignOption.NO_INTEREST_IN_RELATIONSHIPS_DICE_SIZE),
+              campaignOptions.get(CampaignOption.INTERESTED_IN_SAME_SEX_DICE_SIZE), campaignOptions.get(CampaignOption.INTERESTED_IN_BOTH_SEXES_DICE_SIZE));
 
-        int interestInChildren = campaignOptions.getNoInterestInChildrenDiceSize();
+        int interestInChildren = campaignOptions.get(CampaignOption.NO_INTEREST_IN_CHILDREN_DICE_SIZE);
         person.setWantsChildren(((interestInChildren != 0) && (randomInt(interestInChildren)) != 0));
 
         //check for Bloodname
         campaign.getPlayerForce().getHumanResources().checkBloodnameAdd(campaign, person, false);
 
         if (person.getOriginFaction().isClan() &&
-                  campaignOptions.isUseAbilities() &&
+                  campaignOptions.get(CampaignOption.USE_ABILITIES) &&
                   !(person.getPrimaryRole().isSoldierOrBattleArmour() || person.getPrimaryRole().isProtoMekPilot())) {
             if (SpecialAbility.getSpecialAbilities().containsKey("clan_pilot_training")) {
                 PersonnelOptions personnelOptions = person.getOptions();
@@ -162,7 +163,7 @@ public class DefaultPersonnelGenerator extends AbstractPersonnelGenerator {
             }
         }
 
-        person.setDaysToWaitForHealing(campaignOptions.getNaturalHealingWaitingPeriod());
+        person.setDaysToWaitForHealing(campaignOptions.get(CampaignOption.NATURAL_HEALING_WAITING_PERIOD));
 
         // set loyalty
         if (expLvl <= 0) {

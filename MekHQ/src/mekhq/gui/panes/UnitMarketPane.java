@@ -73,6 +73,7 @@ import mekhq.gui.model.UnitMarketTableModel;
 import mekhq.gui.sorter.FormattedNumberSorter;
 import mekhq.gui.sorter.WeightClassSorter;
 import mekhq.utilities.ReportingUtilities;
+import mekhq.campaign.campaignOptions.CampaignOption;
 
 public class UnitMarketPane extends AbstractMHQSplitPane {
     private static final MMLogger LOGGER = MMLogger.create(UnitMarketPane.class);
@@ -393,7 +394,7 @@ public class UnitMarketPane extends AbstractMHQSplitPane {
         getMarketTable().setIntercellSpacing(new Dimension(0, 0));
         getMarketTable().setShowGrid(false);
         columnModel.setColumnVisible(columnModel.getColumnByModelIndex(UnitMarketTableModel.COL_DELIVERY),
-              !getCampaign().getCampaignOptions().isInstantUnitMarketDelivery());
+              !getCampaign().getCampaignOptions().get(CampaignOption.INSTANT_UNIT_MARKET_DELIVERY));
         getMarketTable().getSelectionModel().addListSelectionListener(evt -> updateDisplay());
 
         final JScrollPane marketTableScrollPane = new FastJScrollPane(getMarketTable(),
@@ -519,7 +520,7 @@ public class UnitMarketPane extends AbstractMHQSplitPane {
                               entity.getShortName()));
         }
 
-        boolean isInstantDelivery = getCampaign().getCampaignOptions().isInstantUnitMarketDelivery();
+        boolean isInstantDelivery = getCampaign().getCampaignOptions().get(CampaignOption.INSTANT_UNIT_MARKET_DELIVERY);
         finalizeEntityAcquisition(offers, isInstantDelivery);
     }
 
@@ -577,7 +578,7 @@ public class UnitMarketPane extends AbstractMHQSplitPane {
         final Entity entity = getSelectedEntity();
         getEntityViewPane().updateDisplayedEntity(entity);
         getEntityImagePanel().updateDisplayedEntity(entity,
-              (entity == null) ? new Camouflage() : entity.getCamouflageOrElse(getCampaign().getCamouflage(), false));
+              (entity == null) ? new Camouflage() : entity.getCamouflageOrElse(getCampaign().getPlayerForce().getCamouflage(), false));
     }
 
     private void filterOffers() {

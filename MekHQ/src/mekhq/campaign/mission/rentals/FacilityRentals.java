@@ -53,6 +53,7 @@ import megamek.common.units.Entity;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.campaignOptions.CampaignOptions;
+import mekhq.campaign.campaignOptions.CampaignOption;
 import mekhq.campaign.events.RepairStatusChangedEvent;
 import mekhq.campaign.finances.Finances;
 import mekhq.campaign.finances.Money;
@@ -115,9 +116,9 @@ public class FacilityRentals {
 
     public static void offerContractRentalOpportunity(Campaign campaign, Contract contract) {
         CampaignOptions campaignOptions = campaign.getCampaignOptions();
-        int hospitalCost = campaignOptions.getRentedFacilitiesCostHospitalBeds();
-        int kitchenCost = campaignOptions.getRentedFacilitiesCostKitchens();
-        int holdingCellCost = campaignOptions.getRentedFacilitiesCostHoldingCells();
+        int hospitalCost = campaignOptions.get(CampaignOption.RENTED_FACILITIES_COST_HOSPITAL_BEDS);
+        int kitchenCost = campaignOptions.get(CampaignOption.RENTED_FACILITIES_COST_KITCHENS);
+        int holdingCellCost = campaignOptions.get(CampaignOption.RENTED_FACILITIES_COST_HOLDING_CELLS);
 
         // If all rentals are disabled, we're just going to back out entirely
         if ((hospitalCost + kitchenCost + holdingCellCost) == 0) {
@@ -160,7 +161,7 @@ public class FacilityRentals {
     public static boolean offerBayRentalOpportunity(Campaign campaign, int unitCount, int largeCraftCount,
           ContractRentalType rentalType) {
         CampaignOptions campaignOptions = campaign.getCampaignOptions();
-        int baseCost = campaignOptions.getRentedFacilitiesCostRepairBays();
+        int baseCost = campaignOptions.get(CampaignOption.RENTED_FACILITIES_COST_REPAIR_BAYS);
         if (baseCost <= 0) { // This rental option is disabled
             return true;
         }
@@ -321,7 +322,7 @@ public class FacilityRentals {
      */
     public static Money getTotalRentSumFromRentedBays(Campaign campaign, Finances finances) {
         CampaignOptions campaignOptions = campaign.getCampaignOptions();
-        int costPerBay = campaignOptions.getRentedFacilitiesCostRepairBays();
+        int costPerBay = campaignOptions.get(CampaignOption.RENTED_FACILITIES_COST_REPAIR_BAYS);
         if (costPerBay <= 0) { // Costs have been disabled, so we're not going to perform any actions
             return Money.zero();
         }

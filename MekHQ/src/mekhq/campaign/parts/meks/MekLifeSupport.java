@@ -49,6 +49,7 @@ import mekhq.campaign.parts.missing.MissingMekLifeSupport;
 import mekhq.campaign.parts.missing.MissingPart;
 import mekhq.campaign.personnel.skills.SkillType;
 import org.w3c.dom.Node;
+import mekhq.campaign.campaignOptions.CampaignOption;
 
 /**
  * @author Jay Lawson (jaylawson39 at yahoo.com)
@@ -149,7 +150,7 @@ public class MekLifeSupport extends Part {
             }
             if (checkForDestruction
                       && hits > priorHits && hits >= 2
-                      && Compute.d6(2) < campaign.getCampaignOptions().getDestroyPartTarget()) {
+                      && Compute.d6(2) < campaign.getCampaignOptions().get(CampaignOption.DESTROY_PART_TARGET)) {
                 remove(false);
             }
         }

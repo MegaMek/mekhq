@@ -47,6 +47,7 @@ import megamek.common.units.Entity;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.mission.AtBContract;
 import mekhq.campaign.mission.enums.ContractObjectiveType;
+import mekhq.campaign.campaignOptions.CampaignOption;
 
 /**
  * Utility class for generating pity contracts when a campaign does not have enough successful completed contracts.
@@ -79,7 +80,7 @@ public class PityContracts {
         AbstractContractMarket contractMarket = campaign.getContractMarket();
 
         int successfulContractCount = getSuccessfulContractCount(campaign);
-        int targetPityContractCount = campaign.getCampaignOptions().getPityContracts();
+        int targetPityContractCount = campaign.getCampaignOptions().get(CampaignOption.PITY_CONTRACTS);
 
         int contractCount = targetPityContractCount - successfulContractCount;
         contractCount = max(0, contractCount);
@@ -148,7 +149,7 @@ public class PityContracts {
 
         // We need to rebuild the difficulty estimate as otherwise it will still be reporting for the contract's
         // original enemy
-        boolean isUseGenericBattleValue = campaign.getCampaignOptions().isUseGenericBattleValue();
+        boolean isUseGenericBattleValue = campaign.getCampaignOptions().get(CampaignOption.USE_GENERIC_BATTLE_VALUE);
         List<Entity> combatUnits = campaign.getAllCombatEntities();
         int difficulty = calculateContractDifficulty(contract, campaign.getGameYear(),
               isUseGenericBattleValue,
@@ -171,7 +172,7 @@ public class PityContracts {
      * @since 0.51.0
      */
     static void updateEnemyFaction(Campaign campaign, AtBContract contract) {
-        String enemyCode = campaign.isClanCampaign() ? BANDIT_CASTE_FACTION_CODE : PIRATE_FACTION_CODE;
+        String enemyCode = campaign.getPlayerForce().isClanForce() ? BANDIT_CASTE_FACTION_CODE : PIRATE_FACTION_CODE;
 
         contract.setEnemyCode(enemyCode);
         contract.updateEnemy(campaign, campaign.getLocalDate(), enemyCode);

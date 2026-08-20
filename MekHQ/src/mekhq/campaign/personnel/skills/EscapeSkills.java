@@ -48,6 +48,7 @@ import java.util.List;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.campaignOptions.CampaignOptions;
+import mekhq.campaign.campaignOptions.CampaignOption;
 import mekhq.campaign.events.persons.PersonChangedEvent;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.enums.PersonnelStatus;
@@ -98,7 +99,7 @@ public class EscapeSkills {
 
         LocalDate today = campaign.getLocalDate();
         CampaignOptions campaignOptions = campaign.getCampaignOptions();
-        boolean useEdge = campaignOptions.isUseEdge();
+        boolean useEdge = campaignOptions.get(CampaignOption.USE_EDGE);
         useEdge = useEdge && person.getOptions().booleanOption(EDGE_ESCAPE_ATTEMPTS);
         ActionCheckResult actionCheckResult =
               person.checkSkill(skillToUse, false, false, today)
@@ -197,8 +198,8 @@ public class EscapeSkills {
         int injuries = (int) floor(roll / 2.0);
 
         CampaignOptions campaignOptions = campaign.getCampaignOptions();
-        InjurySPAUtility.adjustInjuriesAndFatigueForSPAs(prisoner, campaignOptions.isUseInjuryFatigue(),
-              campaignOptions.getFatigueRate(), injuries);
+        InjurySPAUtility.adjustInjuriesAndFatigueForSPAs(prisoner, campaignOptions.get(CampaignOption.USE_INJURY_FATIGUE),
+              campaignOptions.get(CampaignOption.FATIGUE_RATE), injuries);
 
         boolean useAdvancedMedical = campaignOptions.isUseAdvancedMedical();
         if (useAdvancedMedical) {

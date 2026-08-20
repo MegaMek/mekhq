@@ -115,7 +115,7 @@ class ResolveScenarioTrackerTest {
 
         // Mock Campaign
         campaign = mockCampaign();
-        when(campaign.getFaction()).thenReturn(null);
+        when(campaign.getPlayerForce().getFaction()).thenReturn(null);
         when(campaign.getLocalDate()).thenReturn(LocalDate.of(3067, 1, 1));
         CampaignOptions campaignOptions = new CampaignOptions();
         when(campaign.getCampaignOptions()).thenReturn(campaignOptions);

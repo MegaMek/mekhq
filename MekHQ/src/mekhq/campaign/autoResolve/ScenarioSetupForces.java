@@ -241,8 +241,8 @@ public class ScenarioSetupForces<SCENARIO extends Scenario> extends SetupForces 
      */
     protected Player getCleanPlayer() {
         var campaignPlayer = campaign.getPlayer();
-        var player = new Player(campaignPlayer.getId(), campaign.getName());
-        player.setCamouflage(campaign.getCamouflage().clone());
+        var player = new Player(campaignPlayer.getId(), campaign.getPlayerForce().getName());
+        player.setCamouflage(campaign.getPlayerForce().getCamouflage().clone());
         player.setColour(campaign.getPlayerForce().getColour());
         player.setStartingPos(scenario.getStartingPos());
         player.setStartOffset(scenario.getStartOffset());

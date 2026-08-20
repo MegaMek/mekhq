@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2018-2025 The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2018-2026 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -45,6 +45,7 @@ import jakarta.xml.bind.annotation.XmlElement;
 import jakarta.xml.bind.annotation.XmlRootElement;
 import mekhq.MekHQ;
 import mekhq.campaign.campaignOptions.CampaignOptions;
+import mekhq.campaign.campaignOptions.CampaignOption;
 import mekhq.utilities.MHQXMLUtility;
 
 /**
@@ -385,11 +386,11 @@ public class Award implements Comparable<Award> {
      * @return the tooltip for an award.
      */
     public String getTooltip(CampaignOptions campaignOptions, Person person) {
-        boolean awardXP = (campaignOptions.getAwardBonusStyle().isBoth()) ||
-                                (campaignOptions.getAwardBonusStyle().isXP());
-        boolean awardEdge = (campaignOptions.getAwardBonusStyle().isBoth()) ||
-                                  (campaignOptions.getAwardBonusStyle().isEdge());
-        boolean isReplaceEdgeAwards = campaignOptions.isUseReplaceEdgeAwards();
+        boolean awardXP = (campaignOptions.get(CampaignOption.AWARD_BONUS_STYLE).isBoth()) ||
+                                (campaignOptions.get(CampaignOption.AWARD_BONUS_STYLE).isXP());
+        boolean awardEdge = (campaignOptions.get(CampaignOption.AWARD_BONUS_STYLE).isBoth()) ||
+                                  (campaignOptions.get(CampaignOption.AWARD_BONUS_STYLE).isEdge());
+        boolean isReplaceEdgeAwards = campaignOptions.get(CampaignOption.USE_REPLACE_EDGE_AWARDS);
 
         int issueCount = person.getAwardController().getNumberOfAwards(this);
 

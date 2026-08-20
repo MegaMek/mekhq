@@ -101,7 +101,7 @@ import org.jspecify.annotations.NonNull;
  *   <li>Above that threshold, each trainee's target skill receives {@code max(1, marginOfSuccess)} XP.
  *       Accumulated XP persists across sessions until the improvement cost is met.</li>
  *   <li>When accumulated XP meets or exceeds the cost to improve (adjusted by
- *       {@link CampaignOptions#getXpCostMultiplier()} and optional
+ *       {@code CampaignOptions#getXpCostMultiplier()} and optional
  *       reasoning-based adjustments), the skill advances one level and veterancy awards are evaluated.</li>
  * </ol>
  *
@@ -187,13 +187,13 @@ public class TrainingCombatTeams {
         // If the force is empty, we skip it
         Vector<UUID> units = formation.getUnits(); // We only want units in the direct force, not child forces
         if (units.isEmpty()) {
-            LOGGER.info("No units in force '{}' for campaign '{}'", formation.getName(), campaign.getName());
+            LOGGER.info("No units in force '{}' for campaign '{}'", formation.getName(), campaign.getPlayerForce().getName());
             return;
         }
 
         // Identify the Combat Team's commander (i.e., the Trainer)
         UUID commanderID = formation.getFormationCommanderID();
-        Person commander = campaign.getPerson(commanderID);
+        Person commander = campaign.getPlayerForce().getHumanResources().getPerson(commanderID);
 
         if (commander == null) {
             campaign.addReport(GENERAL, getFormattedTextAt(RESOURCE_BUNDLE, "noCommander.text", formation.getName(),
@@ -244,10 +244,10 @@ public class TrainingCombatTeams {
     private static void performTraining(Campaign campaign, Formation formation, Person commander,
           Map<String, Integer> educatorSkills, ActionCheckResult actionCheckResult) {
         CampaignOptions campaignOptions = campaign.getCampaignOptions();
-        boolean useReasoningXPChanges = campaignOptions.isUseReasoningXpMultiplier();
-        boolean isUseFatigue = campaignOptions.isUseFatigue();
-        int fatigueRate = campaignOptions.getFatigueRate();
-        double xpCostMultiplier = campaignOptions.getXpCostMultiplier();
+        boolean useReasoningXPChanges = campaignOptions.get(CampaignOption.USE_REASONING_XP_MULTIPLIER);
+        boolean isUseFatigue = campaignOptions.get(CampaignOption.USE_FATIGUE);
+        int fatigueRate = campaignOptions.get(CampaignOption.FATIGUE_RATE);
+        double xpCostMultiplier = campaignOptions.get(CampaignOption.XP_COST_MULTIPLIER);
 
         Familiarity familiarityMode = campaignOptions.get(CampaignOption.CHASSIS_FAMILIARITY_MODE);
         if (familiarityMode.isEnabled()) {
@@ -309,7 +309,7 @@ public class TrainingCombatTeams {
                 }
 
                 String report = processTrainingTime(campaign, commander, trainee, skillsBeingTrained, actionCheckResult,
-                      xpCostMultiplier, useReasoningXPChanges, campaign.getCampaignOptions().isPersonnelLogSkillGain(),
+                      xpCostMultiplier, useReasoningXPChanges, campaign.getCampaignOptions().get(CampaignOption.PERSONNEL_LOG_SKILL_GAIN),
                       campaign.getLocalDate());
 
                 campaign.getPlayerForce().getHumanResources().personUpdated(campaign, trainee);
@@ -618,7 +618,7 @@ public class TrainingCombatTeams {
     private static ActionCheckResult performTrainingSkillCheck(Campaign campaign, Person educator,
           int classSizeModifier) {
         final CampaignOptions campaignOptions = campaign.getCampaignOptions();
-        boolean isUseEdge = campaignOptions.isUseEdge();
+        boolean isUseEdge = campaignOptions.get(CampaignOption.USE_EDGE);
         isUseEdge = isUseEdge && educator.getOptions().booleanOption(EDGE_TRAINING);
 
         ActionCheckResult actionCheckResult =
@@ -649,8 +649,8 @@ public class TrainingCombatTeams {
      */
     private static Map<String, Integer> createSkillsList(Campaign campaign, Set<Person> educators) {
         final CampaignOptions campaignOptions = campaign.getCampaignOptions();
-        final boolean isUseArtillery = campaignOptions.isUseArtillery();
-        final boolean isUseAdvancedScouting = campaign.getCampaignOptions().isUseAdvancedScouting();
+        final boolean isUseArtillery = campaignOptions.get(CampaignOption.USE_ARTILLERY);
+        final boolean isUseAdvancedScouting = campaign.getCampaignOptions().get(CampaignOption.USE_ADVANCED_SCOUTING);
 
         Set<String> professionSkills = new HashSet<>();
         for (Person educator : educators) {

@@ -134,13 +134,13 @@ public class InsufficientAsTechsNagDialog extends ImmersiveDialogNag {
     private @Nullable Person getFallbackSpeaker(Campaign campaign) {
         Person speaker = campaign.getPlayerForce().getHumanResources()
                                .getSeniorAdminPerson(campaign.getCampaignOptions(),
-                                     campaign.isClanCampaign(),
+                                     campaign.getPlayerForce().isClanForce(),
                                      campaign.getLocalDate());
 
         if (speaker == null) {
             speaker = campaign.getPlayerForce().getHumanResources()
                             .getSeniorAdminPerson(campaign.getCampaignOptions(),
-                                  campaign.isClanCampaign(),
+                                  campaign.getPlayerForce().isClanForce(),
                                   campaign.getLocalDate());
         } else {
             return speaker;

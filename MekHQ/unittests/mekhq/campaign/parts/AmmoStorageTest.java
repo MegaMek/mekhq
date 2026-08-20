@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2020-2025 The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2020-2026 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -32,6 +32,8 @@
  */
 package mekhq.campaign.parts;
 
+import static org.mockito.Mockito.lenient;
+
 import static mekhq.campaign.parts.AmmoUtilities.getAmmoType;
 import static mekhq.campaign.parts.AmmoUtilities.getBombType;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -59,6 +61,7 @@ import megamek.common.equipment.AmmoType;
 import megamek.common.equipment.enums.BombType;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.campaignOptions.CampaignOptions;
+import mekhq.campaign.campaignOptions.CampaignOption;
 import mekhq.campaign.finances.Money;
 import mekhq.campaign.parts.equipment.AmmoBin;
 import mekhq.campaign.parts.meks.MekSensor;
@@ -104,10 +107,11 @@ public class AmmoStorageTest {
         AmmoType ammoType = getAmmoType("ISAC5 Ammo");
 
         CampaignOptions mockCampaignOptions = mock(CampaignOptions.class);
-        when(mockCampaignOptions.getCommonPartPriceMultiplier()).thenReturn(1d);
+        when(mockCampaignOptions.get(CampaignOption.COMMON_PART_PRICE_MULTIPLIER)).thenReturn(1d);
 
         Campaign mockCampaign = mockCampaign();
         when(mockCampaign.getCampaignOptions()).thenReturn(mockCampaignOptions);
+        lenient().when(mockCampaignOptions.get(CampaignOption.INNER_SPHERE_UNIT_PRICE_MULTIPLIER)).thenReturn(0.0);
 
         AmmoStorage ammoStorage = new AmmoStorage(0, ammoType, 2 * ammoType.getShots(), mockCampaign);
         ammoStorage.setBrandNew(true);
@@ -126,10 +130,11 @@ public class AmmoStorageTest {
         AmmoType ammoType = getAmmoType("ISAC5 Ammo");
 
         CampaignOptions mockCampaignOptions = mock(CampaignOptions.class);
-        when(mockCampaignOptions.getCommonPartPriceMultiplier()).thenReturn(1d);
+        when(mockCampaignOptions.get(CampaignOption.COMMON_PART_PRICE_MULTIPLIER)).thenReturn(1d);
 
         Campaign mockCampaign = mockCampaign();
         when(mockCampaign.getCampaignOptions()).thenReturn(mockCampaignOptions);
+        lenient().when(mockCampaignOptions.get(CampaignOption.INNER_SPHERE_UNIT_PRICE_MULTIPLIER)).thenReturn(0.0);
 
         AmmoStorage ammoStorage = new AmmoStorage(0, ammoType, 2 * ammoType.getShots(), mockCampaign);
         ammoStorage.setBrandNew(true);
@@ -155,10 +160,11 @@ public class AmmoStorageTest {
         AmmoType ammoType = getAmmoType("ISAC5 Ammo");
 
         CampaignOptions mockCampaignOptions = mock(CampaignOptions.class);
-        when(mockCampaignOptions.getCommonPartPriceMultiplier()).thenReturn(1d);
+        when(mockCampaignOptions.get(CampaignOption.COMMON_PART_PRICE_MULTIPLIER)).thenReturn(1d);
 
         Campaign mockCampaign = mockCampaign();
         when(mockCampaign.getCampaignOptions()).thenReturn(mockCampaignOptions);
+        lenient().when(mockCampaignOptions.get(CampaignOption.INNER_SPHERE_UNIT_PRICE_MULTIPLIER)).thenReturn(0.0);
 
         AmmoStorage ammoStorage = new AmmoStorage(0, ammoType, 2 * ammoType.getShots(), mockCampaign);
         ammoStorage.setBrandNew(true);
@@ -184,10 +190,11 @@ public class AmmoStorageTest {
         AmmoType ammoType = getAmmoType("ISSRM6 Inferno Ammo");
 
         CampaignOptions mockCampaignOptions = mock(CampaignOptions.class);
-        when(mockCampaignOptions.getCommonPartPriceMultiplier()).thenReturn(1d);
+        when(mockCampaignOptions.get(CampaignOption.COMMON_PART_PRICE_MULTIPLIER)).thenReturn(1d);
 
         Campaign mockCampaign = mockCampaign();
         when(mockCampaign.getCampaignOptions()).thenReturn(mockCampaignOptions);
+        lenient().when(mockCampaignOptions.get(CampaignOption.INNER_SPHERE_UNIT_PRICE_MULTIPLIER)).thenReturn(0.0);
 
         AmmoStorage ammoStorage = new AmmoStorage(0, ammoType, 2 * ammoType.getShots(), mockCampaign);
         ammoStorage.setBrandNew(true);
@@ -423,10 +430,11 @@ public class AmmoStorageTest {
         AmmoType isAC5Ammo = getAmmoType("ISAC5 Ammo");
 
         CampaignOptions mockCampaignOptions = mock(CampaignOptions.class);
-        when(mockCampaignOptions.getCommonPartPriceMultiplier()).thenReturn(1d);
+        when(mockCampaignOptions.get(CampaignOption.COMMON_PART_PRICE_MULTIPLIER)).thenReturn(1d);
 
         Campaign mockCampaign = mockCampaign();
         when(mockCampaign.getCampaignOptions()).thenReturn(mockCampaignOptions);
+        lenient().when(mockCampaignOptions.get(CampaignOption.INNER_SPHERE_UNIT_PRICE_MULTIPLIER)).thenReturn(0.0);
 
         AmmoStorage ammoStorage = new AmmoStorage(0, isAC5Ammo, 0, mockCampaign);
         ammoStorage.setBrandNew(true);

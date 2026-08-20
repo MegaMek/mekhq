@@ -360,7 +360,7 @@ public class AtBConfiguration {
                                       .findBestInRole(PersonnelRole.ADMINISTRATOR,
                                             SkillType.S_ADMIN,
                                             campaign.getCampaignOptions(),
-                                            campaign.isClanCampaign(),
+                                            campaign.getPlayerForce().isClanForce(),
                                             campaign.getLocalDate());
 
         int experienceLevel = EXP_ULTRA_GREEN;

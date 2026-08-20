@@ -32,6 +32,8 @@
  */
 package mekhq.campaign.market.contractMarket;
 
+import static org.mockito.Mockito.lenient;
+
 import static megamek.common.enums.SkillLevel.REGULAR;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertSame;
@@ -148,7 +150,7 @@ class AtbMonthlyContractMarketTest {
 
         private void setupCampaign() {
             CampaignOptions campaignOptions = mock(CampaignOptions.class);
-            when(campaignOptions.getContractMaxSalvagePercentage()).thenReturn(100);
+            when(campaignOptions.get(CampaignOption.CONTRACT_MAX_SALVAGE_PERCENTAGE)).thenReturn(100);
             when(campaignOptions.get(CampaignOption.USE_CHAOS_REPUTATION)).thenReturn(false);
 
             ForceReputationController reputation = mock(ForceReputationController.class);
@@ -162,11 +164,21 @@ class AtbMonthlyContractMarketTest {
             LocalHangar hangar = mock(LocalHangar.class);
             doReturn(Money.of(1)).when(hangar).getUnitCosts(any(), any());
 
-            when(campaign.getFaction()).thenReturn(employerFaction);
+            when(campaign.getPlayerForce().getFaction()).thenReturn(employerFaction);
             when(campaign.getAtBUnitRatingMod()).thenReturn(DragoonRating.DRAGOON_C.getRating());
             when(campaign.getLocalDate()).thenReturn(TODAY);
             when(campaign.getGameYear()).thenReturn(GAME_YEAR);
             when(campaign.getCampaignOptions()).thenReturn(campaignOptions);
+            lenient().when(campaignOptions.get(CampaignOption.LIMIT_CLAN_TECH)).thenReturn(false);
+            lenient().when(campaignOptions.get(CampaignOption.PAY_FOR_TRANSPORT)).thenReturn(false);
+            lenient().when(campaignOptions.get(CampaignOption.USE_PEACETIME_COST)).thenReturn(false);
+            lenient().when(campaignOptions.get(CampaignOption.SIMULATE_GRAY_MONDAY)).thenReturn(false);
+            lenient().when(campaignOptions.get(CampaignOption.USE_GENERIC_BATTLE_VALUE)).thenReturn(false);
+            lenient().when(campaignOptions.get(CampaignOption.CLAMP_REPUTATION_PAY_MULTIPLIER)).thenReturn(false);
+            lenient().when(campaignOptions.get(CampaignOption.USE_AGE_EFFECTS)).thenReturn(false);
+            lenient().when(campaignOptions.get(CampaignOption.VARIABLE_CONTRACT_LENGTH)).thenReturn(false);
+            lenient().when(campaignOptions.get(CampaignOption.USE_BOLSTER_CONTRACT_SKILL)).thenReturn(false);
+            lenient().when(campaignOptions.get(CampaignOption.USE_DYNAMIC_DIFFICULTY)).thenReturn(false);
             when(campaign.getPlayerForce().getCamOpsReputation()).thenReturn(reputation);
             when(campaign.getPlayerForce().getAverageSkillLevel(any(), any())).thenReturn(REGULAR);
             when(campaign.getAccountant()).thenReturn(accountant);

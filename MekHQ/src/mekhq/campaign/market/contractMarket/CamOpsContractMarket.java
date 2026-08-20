@@ -69,6 +69,7 @@ import mekhq.campaign.universe.Factions;
 import mekhq.campaign.universe.enums.HiringHallLevel;
 import mekhq.campaign.universe.factionStanding.FactionStandingUtilities;
 import mekhq.campaign.universe.factionStanding.FactionStandings;
+import mekhq.campaign.campaignOptions.CampaignOption;
 
 /**
  * Contract Market as described in Campaign Operations, 4th printing.
@@ -99,7 +100,7 @@ public class CamOpsContractMarket extends AbstractContractMarket {
     @Override
     public void generateContractOffers(Campaign campaign, boolean newCampaign) {
         boolean isGrayMonday = isGrayMonday(campaign.getLocalDate(),
-              campaign.getCampaignOptions().isSimulateGrayMonday());
+              campaign.getCampaignOptions().get(CampaignOption.SIMULATE_GRAY_MONDAY));
         boolean hasActiveContract = campaign.hasActiveContract() || campaign.hasActiveAtBContract(true);
 
         if (!(campaign.getLocalDate().getDayOfMonth() == 1) && !newCampaign) {
@@ -125,7 +126,7 @@ public class CamOpsContractMarket extends AbstractContractMarket {
 
         Person negotiator = campaign.getPlayerForce().getHumanResources()
                                   .getSeniorAdminPerson(campaign.getCampaignOptions(),
-                                        campaign.isClanCampaign(),
+                                        campaign.getPlayerForce().isClanForce(),
                                         campaign.getLocalDate());
         int negotiatorModifier = 0;
         if (negotiator != null) {
@@ -205,10 +206,10 @@ public class CamOpsContractMarket extends AbstractContractMarket {
 
     private HiringHallModifiers getHiringHallModifiers(Campaign campaign) {
         HiringHallModifiers modifiers;
-        if (campaign.getFaction().isMercenary()) {
+        if (campaign.getPlayerForce().getFaction().isMercenary()) {
             modifiers = new HiringHallModifiers(campaign.getSystemHiringHallLevel());
         } else {
-            if (campaign.getFaction().isGovernment()) {
+            if (campaign.getPlayerForce().getFaction().isGovernment()) {
                 modifiers = new HiringHallModifiers(HiringHallLevel.GREAT);
             } else {
                 modifiers = new HiringHallModifiers(HiringHallLevel.NONE);
@@ -222,14 +223,14 @@ public class CamOpsContractMarket extends AbstractContractMarket {
         Person negotiator = campaign.getPlayerForce().getHumanResources()
                                   .findBestAtSkill(mekhq.campaign.personnel.skills.SkillType.S_NEGOTIATION,
                                         campaign.getCampaignOptions(),
-                                        campaign.isClanCampaign(),
+                                        campaign.getPlayerForce().isClanForce(),
                                         campaign.getLocalDate());
         if (negotiator == null) {
             return 0;
         }
         return negotiator.getSkillLevel(S_NEGOTIATION,
-              campaign.getCampaignOptions().isUseAgeEffects(),
-              campaign.isClanCampaign(),
+              campaign.getCampaignOptions().get(CampaignOption.USE_AGE_EFFECTS),
+              campaign.getPlayerForce().isClanForce(),
               campaign.getLocalDate());
     }
 
@@ -294,8 +295,8 @@ public class CamOpsContractMarket extends AbstractContractMarket {
         final SkillLevel campaignSkillLevel = campaign.getPlayerForce()
                                                     .getAverageSkillLevel(campaign.getCampaignOptions(),
                                                           campaign.getLocalDate());
-        final boolean useDynamicDifficulty = campaign.getCampaignOptions().isUseDynamicDifficulty();
-        final boolean useBolsterContractSkill = campaign.getCampaignOptions().isUseBolsterContractSkill();
+        final boolean useDynamicDifficulty = campaign.getCampaignOptions().get(CampaignOption.USE_DYNAMIC_DIFFICULTY);
+        final boolean useBolsterContractSkill = campaign.getCampaignOptions().get(CampaignOption.USE_BOLSTER_CONTRACT_SKILL);
         setAllyRating(contract,
               campaign.getGameYear(),
               useDynamicDifficulty ? campaignSkillLevel : REGULAR,
@@ -305,11 +306,11 @@ public class CamOpsContractMarket extends AbstractContractMarket {
               useDynamicDifficulty ? campaignSkillLevel : REGULAR,
               useBolsterContractSkill);
         if (contract.getContractType().isCadreDuty()) {
-            contract.setAllySkill(campaign.getCampaignOptions().isUseBolsterContractSkill() ? REGULAR : GREEN);
+            contract.setAllySkill(campaign.getCampaignOptions().get(CampaignOption.USE_BOLSTER_CONTRACT_SKILL) ? REGULAR : GREEN);
             contract.setAllyQuality(DragoonRating.DRAGOON_F.getRating());
         }
         // Step 5: Determine the contract length (Not CamOps RAW)
-        contract.calculateLength(campaign.getCampaignOptions().isVariableContractLength());
+        contract.calculateLength(campaign.getCampaignOptions().get(CampaignOption.VARIABLE_CONTRACT_LENGTH));
         // Step 6: Determine the initial contract clauses
         setContractClauses(contract, contractTerms);
         // Step 7: Determine the number of required lances (Not CamOps RAW)
@@ -332,7 +333,7 @@ public class CamOpsContractMarket extends AbstractContractMarket {
               contract.getSystem().getName(contract.getStartDate()),
               contract.getContractType()));
 
-        if (campaign.getCampaignOptions().isLimitClanTech()) {
+        if (campaign.getCampaignOptions().get(CampaignOption.LIMIT_CLAN_TECH)) {
             contract.clanTechSalvageOverride();
         }
 
@@ -380,7 +381,7 @@ public class CamOpsContractMarket extends AbstractContractMarket {
         for (Faction faction : factions) {
             // Clans only hire units within their own clan
             if (faction.isClan()) {
-                if (!faction.equals(campaign.getFaction())) {
+                if (!faction.equals(campaign.getPlayerForce().getFaction())) {
                     continue;
                 }
             }
@@ -450,12 +451,12 @@ public class CamOpsContractMarket extends AbstractContractMarket {
     }
 
     private ContractObjectiveType determineMission(Campaign campaign, Faction employer, int ratingMod) {
-        if (campaign.getFaction().isPirate()) {
+        if (campaign.getPlayerForce().getFaction().isPirate()) {
             return MissionSelector.getPirateMission(Compute.d6(2), 0);
         }
         int margin = rollNegotiation(findNegotiationSkill(campaign),
               ratingMod + getHiringHallModifiers(campaign).missionsMod) - BASE_NEGOTIATION_TARGET;
-        boolean isClan = campaign.getFaction().isClan();
+        boolean isClan = campaign.getPlayerForce().getFaction().isClan();
         if (employer.isInnerSphere() || employer.isClan()) {
             return MissionSelector.getInnerSphereClanMission(Compute.d6(2), margin, isClan);
         } else if (employer.isIndependent() || employer.isPlanetaryGovt()) {

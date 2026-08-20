@@ -32,6 +32,8 @@
  */
 package mekhq.campaign.randomEvents.randomEventsSystem;
 
+import static org.mockito.Mockito.lenient;
+
 import static mekhq.campaign.mission.enums.ContractMoraleLevel.OVERWHELMING;
 import static mekhq.campaign.mission.enums.ContractMoraleLevel.STALEMATE;
 import static mekhq.campaign.personnel.PersonnelOptions.ATOW_POISON_RESISTANCE;
@@ -66,6 +68,7 @@ import mekhq.campaign.Campaign;
 import mekhq.campaign.LocalHangar;
 import mekhq.campaign.LocalWarehouse;
 import mekhq.campaign.campaignOptions.CampaignOptions;
+import mekhq.campaign.campaignOptions.CampaignOption;
 import mekhq.campaign.digitalGM.stratCon.StratConCampaignState;
 import mekhq.campaign.mission.AtBContract;
 import mekhq.campaign.personnel.Person;
@@ -93,6 +96,17 @@ class RandomEventEffectsManagerTest {
         when(campaignFaction.getShortName()).thenReturn("MERC");
         when(mockCampaign.getPlayerForce().getFaction()).thenReturn(campaignFaction);
         when(mockCampaign.getCampaignOptions()).thenReturn(mockCampaignOptions);
+        lenient().when(mockCampaignOptions.get(CampaignOption.FATIGUE_LEAVE_THRESHOLD)).thenReturn(0);
+        lenient().when(mockCampaignOptions.get(CampaignOption.USE_AGE_EFFECTS)).thenReturn(false);
+        lenient().when(mockCampaignOptions.get(CampaignOption.USE_TOUGHNESS)).thenReturn(false);
+        lenient().when(mockCampaignOptions.get(CampaignOption.ALTERNATIVE_QUALITY_AVERAGING)).thenReturn(false);
+        lenient().when(mockCampaignOptions.get(CampaignOption.USE_ALTERNATIVE_ADVANCED_MEDICAL)).thenReturn(false);
+        lenient().when(mockCampaignOptions.get(CampaignOption.USE_ARTILLERY)).thenReturn(false);
+        lenient().when(mockCampaignOptions.get(CampaignOption.FATIGUE_RATE)).thenReturn(0);
+        lenient().when(mockCampaignOptions.get(CampaignOption.USE_INJURY_FATIGUE)).thenReturn(false);
+        lenient().when(mockCampaignOptions.get(CampaignOption.ADMIN_EXPERIENCE_LEVEL_INCLUDE_NEGOTIATION)).thenReturn(false);
+        lenient().when(mockCampaignOptions.get(CampaignOption.IS_ENABLE_SALVAGE_FLAG_BY_DEFAULT)).thenReturn(false);
+        lenient().when(mockCampaignOptions.get(CampaignOption.TECHS_USE_ADMINISTRATION)).thenReturn(false);
         when(mockCampaign.getLocalDate()).thenReturn(LocalDate.of(3151, 1, 1));
     }
 
@@ -144,8 +158,8 @@ class RandomEventEffectsManagerTest {
 
     /** Enables fatigue and stubs the hangar/warehouse mocks needed by the fatigue path. */
     private void enableFatigue() {
-        when(mockCampaignOptions.isUseFatigue()).thenReturn(true);
-        when(mockCampaignOptions.getFatigueRate()).thenReturn(1);
+        when(mockCampaignOptions.get(CampaignOption.USE_FATIGUE)).thenReturn(true);
+        when(mockCampaignOptions.get(CampaignOption.FATIGUE_RATE)).thenReturn(1);
         when(mockCampaign.getPlayerForce().getHangar()).thenReturn(mock(LocalHangar.class));
         when(mockCampaign.getPlayerForce().getWarehouse()).thenReturn(mock(LocalWarehouse.class));
     }
@@ -371,7 +385,7 @@ class RandomEventEffectsManagerTest {
 
     @Test
     void testEffectLoyaltyOne_loyaltyEnabled_loyaltyIncreased() {
-        when(mockCampaignOptions.isUseLoyaltyModifiers()).thenReturn(true);
+        when(mockCampaignOptions.get(CampaignOption.USE_LOYALTY_MODIFIERS)).thenReturn(true);
 
         Person prisoner = makePrisoner();
         stubAllPersonnel(prisoner);
@@ -384,7 +398,7 @@ class RandomEventEffectsManagerTest {
 
     @Test
     void testEffectLoyaltyOne_negativeMagnitude_loyaltyDecreased() {
-        when(mockCampaignOptions.isUseLoyaltyModifiers()).thenReturn(true);
+        when(mockCampaignOptions.get(CampaignOption.USE_LOYALTY_MODIFIERS)).thenReturn(true);
 
         Person prisoner = makePrisoner();
         stubAllPersonnel(prisoner);
@@ -397,7 +411,7 @@ class RandomEventEffectsManagerTest {
 
     @Test
     void testEffectLoyaltyOne_loyaltyDisabled_noChangeAndEmptyReport() {
-        when(mockCampaignOptions.isUseLoyaltyModifiers()).thenReturn(false);
+        when(mockCampaignOptions.get(CampaignOption.USE_LOYALTY_MODIFIERS)).thenReturn(false);
 
         Person prisoner = makePrisoner();
         stubAllPersonnel(prisoner);
@@ -415,7 +429,7 @@ class RandomEventEffectsManagerTest {
 
     @Test
     void testEffectLoyaltyAll_loyaltyEnabled_allPrisonersAdjusted() {
-        when(mockCampaignOptions.isUseLoyaltyModifiers()).thenReturn(true);
+        when(mockCampaignOptions.get(CampaignOption.USE_LOYALTY_MODIFIERS)).thenReturn(true);
 
         Person person0 = makePrisoner();
         Person person1 = makePrisoner();
@@ -437,7 +451,7 @@ class RandomEventEffectsManagerTest {
 
     @Test
     void testEffectLoyaltyAll_loyaltyDisabled_emptyReport() {
-        when(mockCampaignOptions.isUseLoyaltyModifiers()).thenReturn(false);
+        when(mockCampaignOptions.get(CampaignOption.USE_LOYALTY_MODIFIERS)).thenReturn(false);
 
         Person prisoner = makePrisoner();
         stubAllPersonnel(prisoner);
@@ -535,7 +549,7 @@ class RandomEventEffectsManagerTest {
 
     @Test
     void testEffectFatigueOne_fatigueDisabled_noChangeAndEmptyReport() {
-        when(mockCampaignOptions.isUseFatigue()).thenReturn(false);
+        when(mockCampaignOptions.get(CampaignOption.USE_FATIGUE)).thenReturn(false);
 
         Person prisoner = makePrisoner();
         stubAllPersonnel(prisoner);
@@ -575,7 +589,7 @@ class RandomEventEffectsManagerTest {
 
     @Test
     void testEffectFatigueAll_fatigueDisabled_emptyReport() {
-        when(mockCampaignOptions.isUseFatigue()).thenReturn(false);
+        when(mockCampaignOptions.get(CampaignOption.USE_FATIGUE)).thenReturn(false);
 
         Person prisoner = makePrisoner();
         stubAllPersonnel(prisoner);
@@ -777,7 +791,7 @@ class RandomEventEffectsManagerTest {
 
     @Test
     void testEffectUniquePoison_fatigueDisabled_emptyReport() {
-        when(mockCampaignOptions.isUseFatigue()).thenReturn(false);
+        when(mockCampaignOptions.get(CampaignOption.USE_FATIGUE)).thenReturn(false);
 
         Person soldier = new Person(mockCampaign);
         stubAllPersonnel(soldier);
@@ -792,7 +806,7 @@ class RandomEventEffectsManagerTest {
 
     @Test
     void testFailureBranch_usesFailureResultsList() {
-        when(mockCampaignOptions.isUseLoyaltyModifiers()).thenReturn(true);
+        when(mockCampaignOptions.get(CampaignOption.USE_LOYALTY_MODIFIERS)).thenReturn(true);
 
         Person prisoner = makePrisoner();
         stubAllPersonnel(prisoner);
@@ -817,7 +831,7 @@ class RandomEventEffectsManagerTest {
 
     @Test
     void testPersonnelFiltering_prisonerEffectDoesNotTargetActiveCombatPersonnel() {
-        when(mockCampaignOptions.isUseLoyaltyModifiers()).thenReturn(true);
+        when(mockCampaignOptions.get(CampaignOption.USE_LOYALTY_MODIFIERS)).thenReturn(true);
 
         Person prisoner = makePrisoner();
         Person combatPersonnel = new Person(mockCampaign); // not a prisoner

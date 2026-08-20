@@ -183,19 +183,19 @@ final class CampaignOptionCodecs {
     private static void registerClampedContractPercents() {
         register(CampaignOption.EQUIPMENT_CONTRACT_PERCENT, CampaignOptionCodec.of(
               (pw, indent, option, options) -> MHQXMLUtility.writeSimpleXMLTag(pw, indent, option.xmlTag(),
-                    options.getEquipmentContractPercent()),
+                    options.get(CampaignOption.EQUIPMENT_CONTRACT_PERCENT)),
               (node, text, version, option, options) -> options.setEquipmentContractPercent(parseDouble(text))));
         register(CampaignOption.DROP_SHIP_CONTRACT_PERCENT, CampaignOptionCodec.of(
               (pw, indent, option, options) -> MHQXMLUtility.writeSimpleXMLTag(pw, indent, option.xmlTag(),
-                    options.getDropShipContractPercent()),
+                    options.get(CampaignOption.DROP_SHIP_CONTRACT_PERCENT)),
               (node, text, version, option, options) -> options.setDropShipContractPercent(parseDouble(text))));
         register(CampaignOption.JUMP_SHIP_CONTRACT_PERCENT, CampaignOptionCodec.of(
               (pw, indent, option, options) -> MHQXMLUtility.writeSimpleXMLTag(pw, indent, option.xmlTag(),
-                    options.getJumpShipContractPercent()),
+                    options.get(CampaignOption.JUMP_SHIP_CONTRACT_PERCENT)),
               (node, text, version, option, options) -> options.setJumpShipContractPercent(parseDouble(text))));
         register(CampaignOption.WAR_SHIP_CONTRACT_PERCENT, CampaignOptionCodec.of(
               (pw, indent, option, options) -> MHQXMLUtility.writeSimpleXMLTag(pw, indent, option.xmlTag(),
-                    options.getWarShipContractPercent()),
+                    options.get(CampaignOption.WAR_SHIP_CONTRACT_PERCENT)),
               (node, text, version, option, options) -> options.setWarShipContractPercent(parseDouble(text))));
     }
 
@@ -204,7 +204,7 @@ final class CampaignOptionCodecs {
         register(CampaignOption.SALARY_XP_MULTIPLIERS, CampaignOptionCodec.of(
               (pw, indent, option, options) -> {
                   MHQXMLUtility.writeSimpleXMLOpenTag(pw, indent, option.xmlTag());
-                  for (final Entry<SkillLevel, Double> entry : options.getSalaryXPMultipliers().entrySet()) {
+                  for (final Entry<SkillLevel, Double> entry : options.get(CampaignOption.SALARY_XP_MULTIPLIERS).entrySet()) {
                       MHQXMLUtility.writeSimpleXMLTag(pw, indent + 1, entry.getKey().name(), entry.getValue());
                   }
                   MHQXMLUtility.writeSimpleXMLCloseTag(pw, indent, option.xmlTag());
@@ -219,7 +219,7 @@ final class CampaignOptionCodecs {
                       if (child.getNodeType() != Node.ELEMENT_NODE) {
                           continue;
                       }
-                      options.getSalaryXPMultipliers()
+                      options.get(CampaignOption.SALARY_XP_MULTIPLIERS)
                             .put(SkillLevel.valueOf(child.getNodeName().trim()),
                                   parseDouble(child.getTextContent().trim()));
                   }
@@ -228,7 +228,7 @@ final class CampaignOptionCodecs {
         register(CampaignOption.MARRIAGE_SURNAME_WEIGHTS, CampaignOptionCodec.of(
               (pw, indent, option, options) -> {
                   MHQXMLUtility.writeSimpleXMLOpenTag(pw, indent, option.xmlTag());
-                  for (final Entry<MergingSurnameStyle, Integer> entry : options.getMarriageSurnameWeights()
+                  for (final Entry<MergingSurnameStyle, Integer> entry : options.get(CampaignOption.MARRIAGE_SURNAME_WEIGHTS)
                                                                                .entrySet()) {
                       MHQXMLUtility.writeSimpleXMLTag(pw, indent + 1, entry.getKey().name(), entry.getValue());
                   }
@@ -244,7 +244,7 @@ final class CampaignOptionCodecs {
                       if (child.getNodeType() != Node.ELEMENT_NODE) {
                           continue;
                       }
-                      options.getMarriageSurnameWeights()
+                      options.get(CampaignOption.MARRIAGE_SURNAME_WEIGHTS)
                             .put(MergingSurnameStyle.parseFromString(child.getNodeName().trim()),
                                   parseInt(child.getTextContent().trim()));
                   }
@@ -253,7 +253,7 @@ final class CampaignOptionCodecs {
         register(CampaignOption.DIVORCE_SURNAME_WEIGHTS, CampaignOptionCodec.of(
               (pw, indent, option, options) -> {
                   MHQXMLUtility.writeSimpleXMLOpenTag(pw, indent, option.xmlTag());
-                  for (final Entry<SplittingSurnameStyle, Integer> entry : options.getDivorceSurnameWeights()
+                  for (final Entry<SplittingSurnameStyle, Integer> entry : options.get(CampaignOption.DIVORCE_SURNAME_WEIGHTS)
                                                                                  .entrySet()) {
                       MHQXMLUtility.writeSimpleXMLTag(pw, indent + 1, entry.getKey().name(), entry.getValue());
                   }
@@ -269,7 +269,7 @@ final class CampaignOptionCodecs {
                       if (child.getNodeType() != Node.ELEMENT_NODE) {
                           continue;
                       }
-                      options.getDivorceSurnameWeights()
+                      options.get(CampaignOption.DIVORCE_SURNAME_WEIGHTS)
                             .put(SplittingSurnameStyle.valueOf(child.getNodeName().trim()),
                                   parseInt(child.getTextContent().trim()));
                   }
@@ -278,7 +278,7 @@ final class CampaignOptionCodecs {
         register(CampaignOption.ENABLED_RANDOM_DEATH_AGE_GROUPS, CampaignOptionCodec.of(
               (pw, indent, option, options) -> {
                   MHQXMLUtility.writeSimpleXMLOpenTag(pw, indent, option.xmlTag());
-                  for (final Entry<AgeGroup, Boolean> entry : options.getEnabledRandomDeathAgeGroups().entrySet()) {
+                  for (final Entry<AgeGroup, Boolean> entry : options.get(CampaignOption.ENABLED_RANDOM_DEATH_AGE_GROUPS).entrySet()) {
                       MHQXMLUtility.writeSimpleXMLTag(pw, indent + 1, entry.getKey().name(), entry.getValue());
                   }
                   MHQXMLUtility.writeSimpleXMLCloseTag(pw, indent, option.xmlTag());
@@ -291,7 +291,7 @@ final class CampaignOptionCodecs {
                   for (int i = 0; i < children.getLength(); i++) {
                       final Node child = children.item(i);
                       try {
-                          options.getEnabledRandomDeathAgeGroups()
+                          options.get(CampaignOption.ENABLED_RANDOM_DEATH_AGE_GROUPS)
                                 .put(AgeGroup.valueOf(child.getNodeName()),
                                       parseBoolean(child.getTextContent().trim()));
                       } catch (Exception ignored) {
@@ -303,7 +303,7 @@ final class CampaignOptionCodecs {
         register(CampaignOption.PERSONNEL_MARKET_RANDOM_REMOVAL_TARGETS, CampaignOptionCodec.of(
               (pw, indent, option, options) -> {
                   MHQXMLUtility.writeSimpleXMLOpenTag(pw, indent, option.xmlTag());
-                  for (final Entry<SkillLevel, Integer> entry : options.getPersonnelMarketRandomRemovalTargets()
+                  for (final Entry<SkillLevel, Integer> entry : options.get(CampaignOption.PERSONNEL_MARKET_RANDOM_REMOVAL_TARGETS)
                                                                       .entrySet()) {
                       MHQXMLUtility.writeSimpleXMLTag(pw, indent + 1, entry.getKey().name(), entry.getValue());
                   }
@@ -319,7 +319,7 @@ final class CampaignOptionCodecs {
                       if (child.getNodeType() != Node.ELEMENT_NODE) {
                           continue;
                       }
-                      options.getPersonnelMarketRandomRemovalTargets()
+                      options.get(CampaignOption.PERSONNEL_MARKET_RANDOM_REMOVAL_TARGETS)
                             .put(SkillLevel.valueOf(child.getNodeName().trim()),
                                   parseInt(child.getTextContent().trim()));
                   }
@@ -330,10 +330,10 @@ final class CampaignOptionCodecs {
         register(CampaignOption.PLANET_TECH_ACQUISITION_BONUS, CampaignOptionCodec.of(
               (pw, indent, option, options) -> MHQXMLUtility.writeSimpleXMLTag(pw, indent, option.xmlTag(),
                     Arrays.stream(PlanetarySophistication.values())
-                          .map(value -> options.getAllPlanetTechAcquisitionBonuses().getOrDefault(value, 0).toString())
+                          .map(value -> options.get(CampaignOption.PLANET_TECH_ACQUISITION_BONUS).getOrDefault(value, 0).toString())
                           .collect(Collectors.joining(","))),
               (node, text, version, option, options) -> {
-                  final EnumMap<PlanetarySophistication, Integer> bonuses = options.getAllPlanetTechAcquisitionBonuses();
+                  final EnumMap<PlanetarySophistication, Integer> bonuses = options.get(CampaignOption.PLANET_TECH_ACQUISITION_BONUS);
                   final String[] values = text.split(",");
                   if (values.length == 6) {
                       bonuses.put(PlanetarySophistication.A, parseInt(values[0]));
@@ -353,33 +353,33 @@ final class CampaignOptionCodecs {
         register(CampaignOption.PLANET_INDUSTRY_ACQUISITION_BONUS, CampaignOptionCodec.of(
               (pw, indent, option, options) -> MHQXMLUtility.writeSimpleXMLTag(pw, indent, option.xmlTag(),
                     Arrays.stream(PlanetaryRating.values())
-                          .map(value -> options.getAllPlanetIndustryAcquisitionBonuses()
+                          .map(value -> options.get(CampaignOption.PLANET_INDUSTRY_ACQUISITION_BONUS)
                                               .getOrDefault(value, 0)
                                               .toString())
                           .collect(Collectors.joining(","))),
               (node, text, version, option, options) -> readPlanetRatingBonuses(text,
-                    options.getAllPlanetIndustryAcquisitionBonuses(), "planetIndustryAcquisitionBonus")));
+                    options.get(CampaignOption.PLANET_INDUSTRY_ACQUISITION_BONUS), "planetIndustryAcquisitionBonus")));
 
         register(CampaignOption.PLANET_OUTPUT_ACQUISITION_BONUS, CampaignOptionCodec.of(
               (pw, indent, option, options) -> MHQXMLUtility.writeSimpleXMLTag(pw, indent, option.xmlTag(),
                     Arrays.stream(PlanetaryRating.values())
-                          .map(value -> options.getAllPlanetOutputAcquisitionBonuses()
+                          .map(value -> options.get(CampaignOption.PLANET_OUTPUT_ACQUISITION_BONUS)
                                               .getOrDefault(value, 0)
                                               .toString())
                           .collect(Collectors.joining(","))),
               (node, text, version, option, options) -> readPlanetRatingBonuses(text,
-                    options.getAllPlanetOutputAcquisitionBonuses(), "planetOutputAcquisitionBonus")));
+                    options.get(CampaignOption.PLANET_OUTPUT_ACQUISITION_BONUS), "planetOutputAcquisitionBonus")));
         // endregion Planet acquisition bonuses
 
         // region Primitive arrays (single tag; delimited value merged into the existing array)
         register(CampaignOption.USED_PART_PRICE_MULTIPLIERS, CampaignOptionCodec.of(
               (pw, indent, option, options) -> MHQXMLUtility.writeSimpleXMLTag(pw, indent, option.xmlTag(),
-                    options.getUsedPartPriceMultipliers()),
+                    options.get(CampaignOption.USED_PART_PRICE_MULTIPLIERS)),
               (node, text, version, option, options) -> {
                   final String[] values = text.split(",");
                   for (int i = 0; i < values.length; i++) {
                       try {
-                          options.getUsedPartPriceMultipliers()[i] = parseDouble(values[i]);
+                          options.get(CampaignOption.USED_PART_PRICE_MULTIPLIERS)[i] = parseDouble(values[i]);
                       } catch (Exception ignored) {
                           // ignore extra/short entries, as the legacy handler did
                       }
@@ -388,7 +388,7 @@ final class CampaignOptionCodecs {
 
         register(CampaignOption.PHENOTYPE_PROBABILITIES, CampaignOptionCodec.of(
               (pw, indent, option, options) -> MHQXMLUtility.writeSimpleXMLTag(pw, indent, option.xmlTag(),
-                    options.getPhenotypeProbabilities()),
+                    options.get(CampaignOption.PHENOTYPE_PROBABILITIES)),
               (node, text, version, option, options) -> {
                   final String[] values = text.split(",");
                   for (int i = 0; i < values.length; i++) {
@@ -398,7 +398,7 @@ final class CampaignOptionCodecs {
 
         register(CampaignOption.USE_PORTRAIT_FOR_ROLE, CampaignOptionCodec.of(
               (pw, indent, option, options) -> MHQXMLUtility.writeSimpleXMLTag(pw, indent, option.xmlTag(),
-                    options.isUsePortraitForRoles()),
+                    options.get(CampaignOption.USE_PORTRAIT_FOR_ROLE)),
               (node, text, version, option, options) -> {
                   final String[] values = text.split(",");
                   for (int i = 0; i < values.length; i++) {
@@ -408,7 +408,7 @@ final class CampaignOptionCodecs {
 
         register(CampaignOption.ATB_BATTLE_CHANCE, CampaignOptionCodec.of(
               (pw, indent, option, options) -> MHQXMLUtility.writeSimpleXMLTag(pw, indent, option.xmlTag(),
-                    options.getAllAtBBattleChances()),
+                    options.get(CampaignOption.ATB_BATTLE_CHANCE)),
               (node, text, version, option, options) -> {
                   final String[] values = text.split(",");
                   for (int i = 0; i < values.length; i++) {
@@ -425,16 +425,16 @@ final class CampaignOptionCodecs {
         register(CampaignOption.MRMS_OPTIONS, CampaignOptionCodec.of(
               (pw, indent, option, options) -> {
                   MHQXMLUtility.writeSimpleXMLOpenTag(pw, indent, option.xmlTag());
-                  for (final MRMSOption mrmsOption : options.getMRMSOptions()) {
+                  for (final MRMSOption mrmsOption : options.get(CampaignOption.MRMS_OPTIONS)) {
                       mrmsOption.writeToXML(pw, indent + 1);
                   }
                   MHQXMLUtility.writeSimpleXMLCloseTag(pw, indent, option.xmlTag());
               },
-              (node, text, version, option, options) -> options.setMRMSOptions(MRMSOption.parseListFromXML(node,
+              (node, text, version, option, options) -> options.set(CampaignOption.MRMS_OPTIONS, MRMSOption.parseListFromXML(node,
                     version))));
 
         register(CampaignOption.RANDOM_ORIGIN_OPTIONS, CampaignOptionCodec.of(
-              (pw, indent, option, options) -> options.getRandomOriginOptions().writeToXML(pw, indent),
+              (pw, indent, option, options) -> options.get(CampaignOption.RANDOM_ORIGIN_OPTIONS).writeToXML(pw, indent),
               (node, text, version, option, options) -> {
                   if (!node.hasChildNodes()) {
                       return;
@@ -444,14 +444,14 @@ final class CampaignOptionCodecs {
                   if (randomOriginOptions == null) {
                       return;
                   }
-                  options.setRandomOriginOptions(randomOriginOptions);
+                  options.set(CampaignOption.RANDOM_ORIGIN_OPTIONS, randomOriginOptions);
               }));
 
         register(CampaignOption.ROLE_BASE_SALARIES, CampaignOptionCodec.of(
               (pw, indent, option, options) -> MHQXMLUtility.writeSimpleXMLTag(pw, indent, option.xmlTag(),
-                    Utilities.printMoneyArray(options.getRoleBaseSalaries())),
+                    Utilities.printMoneyArray(options.get(CampaignOption.ROLE_BASE_SALARIES))),
               (node, text, version, option, options) -> {
-                  final Money[] defaultSalaries = options.getRoleBaseSalaries();
+                  final Money[] defaultSalaries = options.get(CampaignOption.ROLE_BASE_SALARIES);
                   final Money[] newSalaries = Utilities.readMoneyArray(node);
                   final Money[] mergedSalaries = new Money[PersonnelRole.values().length];
                   for (int i = 0; i < mergedSalaries.length; i++) {
@@ -464,7 +464,7 @@ final class CampaignOptionCodecs {
                           }
                       }
                   }
-                  options.setRoleBaseSalaries(mergedSalaries);
+                  options.set(CampaignOption.ROLE_BASE_SALARIES, mergedSalaries);
               }));
         // endregion Objects with their own XML (de)serialization
     }
@@ -479,14 +479,14 @@ final class CampaignOptionCodecs {
         // Personnel market name has a pre-CamOps backward-compatibility rename.
         register(CampaignOption.PERSONNEL_MARKET_NAME, CampaignOptionCodec.of(
               (pw, indent, option, options) -> MHQXMLUtility.writeSimpleXMLTag(pw, indent, option.xmlTag(),
-                    options.getPersonnelMarketName()),
+                    options.get(CampaignOption.PERSONNEL_MARKET_NAME)),
               (node, text, version, option, options) ->
-                    options.setPersonnelMarketName(text.equals("Strat Ops") ? "Campaign Ops" : text)));
+                    options.set(CampaignOption.PERSONNEL_MARKET_NAME, text.equals("Strat Ops") ? "Campaign Ops" : text)));
 
         // Legacy in-memory marker: read from the old "useAtB" tag on presence, never written.
         register(CampaignOption.HAD_AT_B_ENABLED_MARKER,
               CampaignOptionCodec.readOnly((node, text, version, option, options) ->
-                                                 options.setHadAtBEnabledMarker(true)));
+                                                 options.set(CampaignOption.HAD_AT_B_ENABLED_MARKER, true)));
 
         // Regard multiplier falls back to 1.0 (rather than 0.0) when a save has a malformed value.
         register(CampaignOption.REGARD_MULTIPLIER, CampaignOptionCodec.of(

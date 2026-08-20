@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2022-2025 The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2022-2026 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -134,7 +134,7 @@ public class ContractMarketMethodTest {
             mockFaction = mock(Faction.class);
             mockCampaign = mockCampaign();
 
-            when(mockCampaign.getFaction()).thenReturn(mockFaction);
+            when(mockCampaign.getPlayerForce().getFaction()).thenReturn(mockFaction);
 
             mockAtBContract = mock(AtBContract.class);
 

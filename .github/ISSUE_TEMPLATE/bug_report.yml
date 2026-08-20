@@ -15,7 +15,8 @@ body:
         split into several ZIP parts - please attach all of them.
 
         If you would rather do it by hand, attach your campaign file and the contents of the `logs`
-        folder.
+        folder. GitHub will not accept a bare `.cpnx`, so zip it up first - a `.cpnx.gz` is fine as it
+        is.
 
   - type: textarea
     id: brief-description
@@ -55,11 +56,11 @@ body:
     attributes:
       label: "Attach your files"
       description: >
-        The ZIP from Help > Report Bug, or your campaign file and the files from the logs folder.
-        Archives up to 25 MB, video up to 100 MB.
+        The ZIP from Help > Report Bug, or your zipped campaign file and the files from the logs
+        folder. Archives up to 25 MB, video up to 100 MB.
     validations:
       required: false
-      accept: ".zip,.gz,.cpnx,.xml,.log,.txt,.csv,.png,.jpg,.jpeg,.gif,.mp4,.mov"
+      accept: ".zip,.gz,.xml,.log,.txt,.csv,.png,.jpg,.jpeg,.gif,.mp4,.mov"
 
   - type: textarea
     id: log-excerpt
