@@ -2773,6 +2773,9 @@ public record CampaignXmlParser(InputStream is, MekHQ app) {
         reconnectPersonsToTravelLocations(campaign);
         relinkLegacyMissions(campaign, legacyMissionIdMap, pendingMissionRelinks);
         resolvePlayerNegotiators(campaign);
+        // Settle the remaining balance of any legacy contracts closed out on load; deferred to here so the force is
+        // populated and the campaign's contract base can be computed.
+        LegacyContractConverter.settlePendingLegacyContracts(campaign);
         LOGGER.info("Load of campaign file complete!");
 
         return campaign;

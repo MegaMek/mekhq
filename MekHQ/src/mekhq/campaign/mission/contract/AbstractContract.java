@@ -119,6 +119,13 @@ public abstract class AbstractContract {
     private transient UUID pendingPlayerNegotiatorId;
 
     /**
+     * The payment multiplier of a converted-active legacy contract awaiting settlement of its remaining balance, or
+     * {@code null} when nothing is pending. Transient; set during legacy conversion and cleared by the post-load
+     * settlement pass. See {@link #getPendingLegacySettlementMultiplier()}.
+     */
+    private transient Double pendingLegacySettlementMultiplier;
+
+    /**
      * The active campaign options, injected so the term getters can apply the campaign's configured per-term
      * multipliers (base pay, straight support, battlefield loss, transport, salvage). Transient and never serialized;
      * set at generation, on load ({@link Campaign#importMission}), and on registration ({@link Campaign#addMission}).
@@ -471,6 +478,26 @@ public abstract class AbstractContract {
      */
     public void setPendingPlayerNegotiatorId(final @Nullable UUID pendingPlayerNegotiatorId) {
         this.pendingPlayerNegotiatorId = pendingPlayerNegotiatorId;
+    }
+
+    /**
+     * @return the payment multiplier of a converted-active legacy contract whose remaining balance still needs
+     *       settling, or {@code null} when there is nothing pending. A non-{@code null} value marks a legacy contract
+     *       closed out on load whose base pay must be reconstructed from the campaign's contract base in a post-load
+     *       pass (forces, which the contract base needs, are not loaded when the contract is converted).
+     */
+    public @Nullable Double getPendingLegacySettlementMultiplier() {
+        return pendingLegacySettlementMultiplier;
+    }
+
+    /**
+     * Stashes the legacy contract's payment multiplier so the loader can settle its remaining balance once the force is
+     * populated. Cleared by that pass; not for general use.
+     *
+     * @param pendingLegacySettlementMultiplier the payment multiplier to settle with later, or {@code null} to clear
+     */
+    public void setPendingLegacySettlementMultiplier(final @Nullable Double pendingLegacySettlementMultiplier) {
+        this.pendingLegacySettlementMultiplier = pendingLegacySettlementMultiplier;
     }
 
     /**

@@ -32,6 +32,7 @@
  */
 package mekhq.campaign.mission.contract.io;
 
+import static java.lang.Math.max;
 import static mekhq.campaign.enums.DailyReportType.GENERAL;
 import static mekhq.campaign.universe.Faction.PIRATE_FACTION_CODE;
 import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
@@ -138,6 +139,10 @@ public final class LegacyContractConverter {
 
         Money transportAmount = Money.zero();
         Money baseAmount = Money.zero();
+        // Legacy contracts almost never persist their resolved pay amounts (they recomputed them live from the
+        // campaign's contract base); the amount fields above read as zero, so the base pay is reconstructed from this
+        // multiplier and the contract base in a post-load pass.
+        double paymentMultiplier = 1.0;
 
         int hospitalBeds = 0;
         int kitchens = 0;
@@ -199,6 +204,7 @@ public final class LegacyContractConverter {
                     case "contractType" -> objective = ContractObjectiveType.parseFromString(value);
                     case "transportAmount" -> transportAmount = Money.fromXmlString(value);
                     case "baseAmount" -> baseAmount = Money.fromXmlString(value);
+                    case "paymentMultiplier" -> paymentMultiplier = MathUtility.parseDouble(value);
                     case "hospitalBedsRented" -> hospitalBeds = MathUtility.parseInt(value);
                     case "kitchensRented" -> kitchens = MathUtility.parseInt(value);
                     case "holdingCellsRented" -> holdingCells = MathUtility.parseInt(value);
@@ -259,7 +265,7 @@ public final class LegacyContractConverter {
         // A contract that had already concluded keeps the outcome it finished with - there is nothing to close out.
         final boolean wasActive = status.isActive();
         contract.setStatus(wasActive ? MissionStatus.SUCCESS : status);
-        contract.setScale(Math.max(1, scale));
+        contract.setScale(max(1, scale));
         contract.setSharesPercent(sharesPercent);
         contract.setRequiredCombatElements(requiredCombatElements);
         contract.setCachedContractDifficulty(difficulty);
@@ -286,30 +292,53 @@ public final class LegacyContractConverter {
         }
 
         // Only a contract that was still running needs settling and an advisory; one that had already concluded was
-        // settled when it ended.
+        // settled when it ended. The advisory is logged now, but the remaining balance is reconstructed from the
+        // campaign's contract base - which is unavailable this early in the load (forces are parsed after missions) -
+        // so the monetary settlement is deferred to a post-load pass via a pending marker.
         if (wasActive) {
-            Money settlementAmount = baseAmount.multipliedBy(ChronoUnit.MONTHS.between(endDate,
-                  campaign.getLocalDate()));
-            settle(campaign, contract, settlementAmount);
+            contract.setPendingLegacySettlementMultiplier(paymentMultiplier);
+            campaign.addReport(GENERAL,
+                  getFormattedTextAt(RESOURCE_BUNDLE, "legacyContract.report", contract.getName()));
         }
         return contract;
     }
 
     /**
-     * Settles a closed-out legacy contract: pays any explicitly-outstanding amount (the routed payout) and advises the
-     * player that the old-format contract has been ended.
+     * Post-load pass that settles the remaining balance of every legacy contract closed out on load. Runs once the whole
+     * save is read, so the force is populated and the campaign's contract base can be computed. For each contract still
+     * carrying a pending-settlement marker, the monthly base pay is reconstructed as
+     * {@code contractBase * paymentMultiplier}, written onto the contract's finance record (the legacy amounts were
+     * never persisted, so it reads zero without this), and its remaining months are paid to the player as a lump sum.
+     *
+     * @param campaign the loaded campaign whose converted legacy contracts are settled
      */
-    private static void settle(final Campaign campaign, final AbstractContract contract, final Money settlementAmount) {
-        if ((settlementAmount != null) && settlementAmount.isPositive()) {
-            campaign.getPlayerForce()
-                  .getFinances()
-                  .credit(TransactionType.CONTRACT_PAYMENT,
-                        campaign.getLocalDate(),
-                        settlementAmount,
-                        getFormattedTextAt(RESOURCE_BUNDLE, "legacyContract.settlement", contract.getName()));
-        }
+    public static void settlePendingLegacyContracts(final Campaign campaign) {
+        final Money contractBase = campaign.getAccountant().getContractBase();
 
-        campaign.addReport(GENERAL, getFormattedTextAt(RESOURCE_BUNDLE, "legacyContract.report", contract.getName()));
+        for (final AbstractContract contract : campaign.getContractHistoryAsMap().values()) {
+            final Double paymentMultiplier = contract.getPendingLegacySettlementMultiplier();
+            if (paymentMultiplier == null) {
+                continue;
+            }
+            contract.setPendingLegacySettlementMultiplier(null);
+
+            final Money monthlyBase = contractBase.multipliedBy(paymentMultiplier);
+            // Fix the finance record, which the conversion left at the save's (zero) base amount.
+            contract.updateMonthlyPay(monthlyBase);
+
+            final LocalDate endDate = contract.getEndingDate();
+            final long monthsRemaining = max(1,
+                  endDate == null ? 0 : ChronoUnit.MONTHS.between(campaign.getLocalDate(), endDate));
+            final Money settlementAmount = monthlyBase.multipliedBy(monthsRemaining);
+            if (settlementAmount.isPositive()) {
+                campaign.getPlayerForce()
+                      .getFinances()
+                      .credit(TransactionType.CONTRACT_PAYMENT,
+                            campaign.getLocalDate(),
+                            settlementAmount,
+                            getFormattedTextAt(RESOURCE_BUNDLE, "legacyContract.settlement", contract.getName()));
+            }
+        }
     }
 
     private static void convertScenarios(final Node scenariosNode, final Campaign campaign, final Version version,
