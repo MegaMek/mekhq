@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2022-2025 The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2022-2026 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -44,6 +44,7 @@ import java.util.ResourceBundle;
 
 import mekhq.MekHQ;
 import mekhq.campaign.campaignOptions.CampaignOptions;
+import mekhq.campaign.campaignOptions.CampaignOption;
 import mekhq.campaign.personnel.marriage.DisabledRandomMarriage;
 import mekhq.campaign.personnel.marriage.RandomMarriage;
 import org.junit.jupiter.api.Test;
@@ -109,11 +110,11 @@ public class RandomMarriageMethodTest {
     @Test
     public void testGetMethod() {
         final CampaignOptions mockOptions = mock(CampaignOptions.class);
-        when(mockOptions.isUseClanPersonnelMarriages()).thenReturn(false);
-        when(mockOptions.isUsePrisonerMarriages()).thenReturn(false);
-        when(mockOptions.isUseRandomClanPersonnelMarriages()).thenReturn(false);
-        when(mockOptions.isUseRandomPrisonerMarriages()).thenReturn(false);
-        when(mockOptions.getRandomMarriageDiceSize()).thenReturn(5);
+        when(mockOptions.get(CampaignOption.USE_CLAN_PERSONNEL_MARRIAGES)).thenReturn(false);
+        when(mockOptions.get(CampaignOption.USE_PRISONER_MARRIAGES)).thenReturn(false);
+        when(mockOptions.get(CampaignOption.USE_RANDOM_CLAN_PERSONNEL_MARRIAGES)).thenReturn(false);
+        when(mockOptions.get(CampaignOption.USE_RANDOM_PRISONER_MARRIAGES)).thenReturn(false);
+        when(mockOptions.get(CampaignOption.RANDOM_MARRIAGE_DICE_SIZE)).thenReturn(5);
 
         assertInstanceOf(DisabledRandomMarriage.class, RandomMarriageMethod.NONE.getMethod(mockOptions));
         assertInstanceOf(RandomMarriage.class, RandomMarriageMethod.DICE_ROLL.getMethod(mockOptions));

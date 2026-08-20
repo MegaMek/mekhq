@@ -63,6 +63,7 @@ import mekhq.campaign.unit.actions.MothballUnitAction;
 import mekhq.campaign.universe.PlanetarySystem;
 import mekhq.campaign.utilities.JumpBlockers;
 import mekhq.gui.baseComponents.immersiveDialogs.ImmersiveDialogSimple;
+import mekhq.campaign.campaignOptions.CampaignOption;
 
 /**
  * The {@link ContractAutomation} class provides a suite of methods used in automating actions when a contract starts.
@@ -124,9 +125,9 @@ public class ContractAutomation {
             return;
         }
 
-        jumpPath.setTargetPlanet(contract.getTargetPlanet());
-        campaign.getPlayerForce().getForceDetachment().getCurrentLocation().setJumpPath(jumpPath);
-        campaign.getUnits().forEach(unit -> unit.setSite(Unit.SITE_FACILITY_BASIC));
+            campaign.getPlayerForce().getForceDetachment().getCurrentLocation().setJumpPath(jumpPath);
+            campaign.getUnits().forEach(unit -> unit.setSite(Unit.SITE_FACILITY_BASIC));
+            campaign.getGUI().refreshAllTabs();
 
         Detachment detachment = playerForce.getForceDetachment();
         TransportCostCalculations costCalculations = new TransportCostCalculations(detachment.getHangar().getUnits(),

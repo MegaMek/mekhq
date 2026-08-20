@@ -41,6 +41,7 @@ import java.util.stream.Collectors;
 import megamek.logging.MMLogger;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.mission.enums.ContractObjectiveType;
+import mekhq.campaign.campaignOptions.CampaignOption;
 import mekhq.campaign.mission.newContract.AbstractContract;
 
 public class OtherModifiers {
@@ -58,7 +59,7 @@ public class OtherModifiers {
     protected static Map<String, Integer> calculateOtherModifiers(Campaign campaign) {
         // Calculate inactive years if campaign options allow
         int inactiveYears = campaign.getCampaignOptions().isUseStratCon() ? getInactiveYears(campaign) : 0;
-        int manualModifier = campaign.getCampaignOptions().getManualUnitRatingModifier();
+        int manualModifier = campaign.getCampaignOptions().get(CampaignOption.MANUAL_UNIT_RATING_MODIFIER);
 
         // Crime rating improvements are handled on New Day, so are not included here.
 

@@ -217,7 +217,7 @@ public class CommonObjectiveFactory {
      */
     private static void addAssignedPlayerUnitsToObjective(AtBScenario scenario, Campaign campaign,
           ScenarioObjective objective) {
-        int expectedNumUnits = CombatTeam.getStandardFormationSize(campaign.getFaction());
+        int expectedNumUnits = CombatTeam.getStandardFormationSize(campaign.getPlayerForce().getFaction());
         if (scenario.isBigBattle()) {
             expectedNumUnits *= 2;
         } else if (scenario.isSpecialScenario()) {

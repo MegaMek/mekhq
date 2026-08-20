@@ -512,7 +512,7 @@ public final class PersonnelTab extends CampaignGuiTab {
         }
         // The person is outside the active location scope, so the grid does not contain them. Pin them to the detail
         // panel so it shows them without forcing them onto the grid, surviving later table refreshes.
-        Person person = getCampaign().getPerson(id);
+        Person person = getCampaign().getPlayerForce().getHumanResources().getPerson(id);
         if (person != null) {
             pinnedPerson = person;
             personnelTable.clearSelection();

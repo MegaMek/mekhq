@@ -50,6 +50,7 @@ import mekhq.campaign.parts.missing.MissingPart;
 import mekhq.campaign.parts.missing.MissingProtoMekSensor;
 import mekhq.campaign.personnel.skills.SkillType;
 import org.w3c.dom.Node;
+import mekhq.campaign.campaignOptions.CampaignOption;
 
 /**
  * @author Jay Lawson (jaylawson39 at yahoo.com)
@@ -151,7 +152,7 @@ public class ProtoMekSensor extends Part {
                                ProtoMek.LOC_HEAD);
             if (checkForDestruction
                       && hits > priorHits
-                      && Compute.d6(2) < campaign.getCampaignOptions().getDestroyPartTarget()) {
+                      && Compute.d6(2) < campaign.getCampaignOptions().get(CampaignOption.DESTROY_PART_TARGET)) {
                 remove(false);
             }
         }

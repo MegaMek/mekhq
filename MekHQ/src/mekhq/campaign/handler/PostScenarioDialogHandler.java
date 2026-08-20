@@ -54,6 +54,7 @@ import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.autoAwards.AutoAwardsController;
 import mekhq.gui.CampaignGUI;
 import mekhq.gui.dialog.RetirementDefectionDialog;
+import mekhq.campaign.campaignOptions.CampaignOption;
 
 /**
  * @author Luana Coppio
@@ -147,16 +148,16 @@ public class PostScenarioDialogHandler {
     }
 
     private static void postCombatAutoApplyAward(Campaign campaign, ResolveScenarioTracker tracker) {
-        if (campaign.getCampaignOptions().isEnableAutoAwards()) {
+        if (campaign.getCampaignOptions().get(CampaignOption.ENABLE_AUTO_AWARDS)) {
             HashMap<UUID, Integer> personnel = new HashMap<>();
             HashMap<UUID, List<Kill>> scenarioKills = new HashMap<>();
 
             for (UUID personId : tracker.getPeopleStatus().keySet()) {
-                Person person = campaign.getPerson(personId);
+                Person person = campaign.getPlayerForce().getHumanResources().getPerson(personId);
                 PersonStatus status = tracker.getPeopleStatus().get(personId);
                 int injuryCount = 0;
 
-                if (!person.getStatus().isDead() || campaign.getCampaignOptions().isIssuePosthumousAwards()) {
+                if (!person.getStatus().isDead() || campaign.getCampaignOptions().get(CampaignOption.ISSUE_POSTHUMOUS_AWARDS)) {
                     if (status.getHits() > person.getHitsPrior()) {
                         injuryCount = status.getHits() - person.getHitsPrior();
                     }

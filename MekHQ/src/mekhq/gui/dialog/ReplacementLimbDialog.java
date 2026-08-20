@@ -72,7 +72,7 @@ public class ReplacementLimbDialog {
     public ReplacementLimbDialog(Campaign campaign, List<Person> suitableDoctors, Person patient, Money cost) {
         this.campaign = campaign;
 
-        final boolean isPlanetside = campaign.getCurrentLocation().isOnPlanet();
+        final boolean isPlanetside = campaign.getPlayerForce().getForceDetachment().getCurrentLocation().isOnPlanet();
         final boolean hasQualifiedDoctors = !suitableDoctors.isEmpty();
         final boolean hasSufficientFunds = campaign.getPlayerForce().getFunds().isGreaterOrEqualThan(cost);
 
@@ -194,7 +194,7 @@ public class ReplacementLimbDialog {
             return campaign.getPlayerForce().getHumanResources()
                          .getSeniorAdminPerson(HR,
                                campaign.getCampaignOptions(),
-                               campaign.isClanCampaign(),
+                               campaign.getPlayerForce().isClanForce(),
                                campaign.getLocalDate());
         }
     }

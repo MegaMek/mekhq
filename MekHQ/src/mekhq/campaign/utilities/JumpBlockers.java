@@ -203,7 +203,7 @@ public class JumpBlockers {
                   campaign.getPlayerForce().getHumanResources()
                         .getSeniorAdminPerson(Campaign.AdministratorSpecialization.TRANSPORT,
                               campaign.getCampaignOptions(),
-                              campaign.isClanCampaign(),
+                              campaign.getPlayerForce().isClanForce(),
                               campaign.getLocalDate()),
                   null,
                   centerMessage,

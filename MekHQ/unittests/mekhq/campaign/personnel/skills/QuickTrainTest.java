@@ -32,6 +32,10 @@
  */
 package mekhq.campaign.personnel.skills;
 
+import mekhq.campaign.campaignOptions.CampaignOption;
+
+import static org.mockito.Mockito.lenient;
+
 import static mekhq.campaign.personnel.enums.PersonnelStatus.ACTIVE;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -115,8 +119,13 @@ class QuickTrainTest {
 
     @Test
     void manualOptionsDoNotIgnoreTrainingFormations() {
+        CampaignOptions campaignOptions = mock(CampaignOptions.class);
+        lenient().when(campaignOptions.get(CampaignOption.USE_ARTILLERY)).thenReturn(false);
+        lenient().when(campaignOptions.get(CampaignOption.ADMINS_HAVE_NEGOTIATION)).thenReturn(false);
+        lenient().when(campaignOptions.get(CampaignOption.USE_ADVANCED_SCOUTING)).thenReturn(false);
+        lenient().when(campaignOptions.get(CampaignOption.USE_FUNCTIONAL_ESCAPE_ARTIST)).thenReturn(false);
         QuickTrain.QuickTrainOptions quickTrainOptions =
-              QuickTrain.QuickTrainOptions.buildQuickTrainOptions(mock(CampaignOptions.class));
+              QuickTrain.QuickTrainOptions.buildQuickTrainOptions(campaignOptions);
 
         assertFalse(quickTrainOptions.ignoreTrainingFormations());
     }
@@ -178,7 +187,19 @@ class QuickTrainTest {
 
     private static Campaign processCampaign(Person person, Formation formation) {
         Campaign campaign = campaign(person, formation);
-        when(campaign.getCampaignOptions()).thenReturn(mock(CampaignOptions.class));
+        CampaignOptions campaignOptions = mock(CampaignOptions.class);
+        lenient().when(campaignOptions.get(CampaignOption.USE_ARTILLERY)).thenReturn(false);
+        lenient().when(campaignOptions.get(CampaignOption.ADMINS_HAVE_NEGOTIATION)).thenReturn(false);
+        when(campaign.getCampaignOptions()).thenReturn(campaignOptions);
+        lenient().when(campaignOptions.get(CampaignOption.USE_AGE_EFFECTS)).thenReturn(false);
+        lenient().when(campaignOptions.get(CampaignOption.PERSONNEL_LOG_SKILL_GAIN)).thenReturn(false);
+        lenient().when(campaignOptions.get(CampaignOption.XP_COST_MULTIPLIER)).thenReturn(0.0);
+        lenient().when(campaignOptions.get(CampaignOption.USE_REASONING_XP_MULTIPLIER)).thenReturn(false);
+        lenient().when(campaignOptions.get(CampaignOption.USE_FUNCTIONAL_APPRAISAL)).thenReturn(false);
+        lenient().when(campaignOptions.get(CampaignOption.USE_SMALL_ARMS_ONLY)).thenReturn(false);
+        lenient().when(campaignOptions.get(CampaignOption.TECHS_USE_ADMINISTRATION)).thenReturn(false);
+        lenient().when(campaignOptions.get(CampaignOption.USE_FUNCTIONAL_ESCAPE_ARTIST)).thenReturn(false);
+        lenient().when(campaignOptions.get(CampaignOption.DOCTORS_USE_ADMINISTRATION)).thenReturn(false);
         when(campaign.getLocalDate()).thenReturn(LocalDate.of(3151, 1, 1));
         return campaign;
     }

@@ -406,7 +406,7 @@ class FormationTest {
 
         private void setFaction(Faction faction) {
             mockFaction = faction;
-            when(mockCampaign.getFaction()).thenReturn(mockFaction);
+            when(mockCampaign.getPlayerForce().getFaction()).thenReturn(mockFaction);
         }
 
         private Formation newTeam() {

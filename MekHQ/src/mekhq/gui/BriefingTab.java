@@ -893,7 +893,7 @@ public final class BriefingTab extends CampaignGuiTab {
         }
 
         // resolve turnover
-        if ((campaignOptions.isUseRandomRetirement()) && (campaignOptions.isUseContractCompletionRandomRetirement())) {
+        if ((campaignOptions.get(CampaignOption.USE_RANDOM_RETIREMENT)) && (campaignOptions.get(CampaignOption.USE_CONTRACT_COMPLETION_RANDOM_RETIREMENT))) {
             RetirementDefectionDialog rdd = new RetirementDefectionDialog(getCampaignGui(), mission, true);
 
             if (rdd.wasAborted()) {
@@ -925,7 +925,7 @@ public final class BriefingTab extends CampaignGuiTab {
                                              .findBestInRole(role,
                                                    SkillType.S_ADMIN,
                                                    campaign.getCampaignOptions(),
-                                                   campaign.isClanCampaign(),
+                                                   campaign.getPlayerForce().isClanForce(),
                                                    campaign.getLocalDate());
                         if (admin != null) {
                             admin.awardXP(getCampaign(), 1);
@@ -941,7 +941,7 @@ public final class BriefingTab extends CampaignGuiTab {
         }
 
         // prompt autoAwards ceremony
-        if (campaignOptions.isEnableAutoAwards()) {
+        if (campaignOptions.get(CampaignOption.ENABLE_AUTO_AWARDS)) {
             AutoAwardsController autoAwardsController = new AutoAwardsController();
 
             // for the purposes of Mission Accomplished awards, we do not count partial
@@ -953,11 +953,11 @@ public final class BriefingTab extends CampaignGuiTab {
         }
 
         // Update Faction Standings
-        if (campaignOptions.isTrackFactionStanding()) {
+        if (campaignOptions.get(CampaignOption.TRACK_FACTION_STANDING)) {
             FactionStandings factionStandings = getCampaign().getPlayerForce().getFactionStandings();
             List<String> reports = new ArrayList<>();
 
-            double regardMultiplier = campaignOptions.getRegardMultiplier();
+            double regardMultiplier = campaignOptions.get(CampaignOption.REGARD_MULTIPLIER);
 
             // A covert sponsor, if any, takes the standing change in the visible employer's place.
             Faction employer = mission.getStandingEmployerFaction();
@@ -1067,7 +1067,7 @@ public final class BriefingTab extends CampaignGuiTab {
 
         return new ManualMissionDialog(getFrame(),
               getCampaign().getCampaignFactionIcon(),
-              getCampaign().getFaction(),
+              getCampaign().getPlayerForce().getFaction(),
               startDate,
               status,
               mission.getName(),
@@ -1084,17 +1084,17 @@ public final class BriefingTab extends CampaignGuiTab {
      */
     private int getMissionXpAward(MissionStatus missionStatus, AbstractContract mission) {
         return switch (missionStatus) {
-            case FAILED, BREACH -> getCampaignOptions().getMissionXpFail();
+            case FAILED, BREACH -> getCampaignOptions().get(CampaignOption.MISSION_XP_FAIL);
             case SUCCESS, PARTIAL -> {
                 StratConCampaignState stratConCampaignState = mission.getStratConCampaignState();
                 if (stratConCampaignState != null) {
                     if (stratConCampaignState.getVictoryPoints() < 3) {
-                        yield getCampaignOptions().getMissionXpSuccess();
+                        yield getCampaignOptions().get(CampaignOption.MISSION_XP_SUCCESS);
                     } else {
-                        yield getCampaignOptions().getMissionXpOutstandingSuccess();
+                        yield getCampaignOptions().get(CampaignOption.MISSION_XP_OUTSTANDING_SUCCESS);
                     }
                 } else {
-                    yield getCampaignOptions().getMissionXpSuccess();
+                    yield getCampaignOptions().get(CampaignOption.MISSION_XP_SUCCESS);
                 }
             }
             case ACTIVE -> 0;
@@ -1309,7 +1309,7 @@ public final class BriefingTab extends CampaignGuiTab {
      * @since 0.50.10
      */
     private boolean handleSalvageAssignments(Scenario scenario) {
-        if (!getCampaignOptions().isUseCamOpsSalvage()) {
+        if (!getCampaignOptions().get(CampaignOption.IS_USE_CAM_OPS_SALVAGE)) {
             return false;
         }
 
@@ -1363,7 +1363,7 @@ public final class BriefingTab extends CampaignGuiTab {
      * @since 0.50.10
      */
     private boolean displaySalvageFormationPicker(Scenario scenario) {
-        if (!getCampaignOptions().isUseCamOpsSalvage()) {
+        if (!getCampaignOptions().get(CampaignOption.IS_USE_CAM_OPS_SALVAGE)) {
             return true;
         }
 
@@ -1444,7 +1444,7 @@ public final class BriefingTab extends CampaignGuiTab {
      * @since 0.50.10
      */
     private boolean displaySalvageTechPicker(Scenario scenario) {
-        if (!getCampaignOptions().isUseCamOpsSalvage()) {
+        if (!getCampaignOptions().get(CampaignOption.IS_USE_CAM_OPS_SALVAGE)) {
             return true;
         }
 
@@ -1496,8 +1496,8 @@ public final class BriefingTab extends CampaignGuiTab {
 
         Campaign campaign = getCampaign();
         CampaignOptions campaignOptions = campaign.getCampaignOptions();
-        boolean isClanCampaign = campaign.isClanCampaign();
-        boolean isUseEdge = campaignOptions.isUseEdge();
+        boolean isClanCampaign = campaign.getPlayerForce().isClanForce();
+        boolean isUseEdge = campaignOptions.get(CampaignOption.USE_EDGE);
         SalvageTechPicker techPicker = new SalvageTechPicker(techData, priorSelectedTechs,
               isClanCampaign, getBattlefieldControlType(scenario), isUseEdge);
         boolean wasConfirmed = techPicker.wasConfirmed();
@@ -1536,7 +1536,7 @@ public final class BriefingTab extends CampaignGuiTab {
                                  .getHumanResources()
                                  .getTechsExpanded(campaign.getPlayerForce().getHangar().getUnits(),
                                        campaign.getCampaignOptions(),
-                                       campaign.isClanCampaign(),
+                                       campaign.getPlayerForce().isClanForce(),
                                        campaign.getLocalDate(),
                                        true,
                                        false,
@@ -1820,7 +1820,7 @@ public final class BriefingTab extends CampaignGuiTab {
         Object[] options = new Object[] { getText("AutoResolveMethod.PRINCESS.text"),
                                           getText("AutoResolveMethod.ABSTRACT_COMBAT.text"), };
 
-        var preSelectedOptionIndex = getCampaignOptions().getAutoResolveMethod().ordinal();
+        var preSelectedOptionIndex = getCampaignOptions().get(CampaignOption.AUTO_RESOLVE_METHOD).ordinal();
 
         var selectedOption = JOptionPane.showOptionDialog(getFrame(),
               getText("AutoResolveMethod.promptForAutoResolveMethod.text"),
@@ -2045,7 +2045,7 @@ public final class BriefingTab extends CampaignGuiTab {
 
             // Autoconfigure munitions for all non-player forces once more, using finalized
             // forces
-            if (getCampaignOptions().isAutoConfigMunitions()) {
+            if (getCampaignOptions().get(CampaignOption.AUTO_CONFIG_MUNITIONS)) {
                 autoconfigureBotMunitions(atBScenario, chosen);
             }
 
@@ -2226,7 +2226,7 @@ public final class BriefingTab extends CampaignGuiTab {
         for (final Unit unit : chosen) {
             playerEntities.add(unit.getEntity());
         }
-        allyFactionCodes.add(getCampaign().getFaction().getShortName());
+        allyFactionCodes.add(getCampaign().getPlayerForce().getFaction().getShortName());
 
         // Split up bot forces into teams for separate handling
         for (final BotForce botForce : scenario.getBotForces()) {
@@ -2283,8 +2283,8 @@ public final class BriefingTab extends CampaignGuiTab {
               allEnemyEntities,
               opForFactionCodes,
               opForQuality,
-              (getCampaign().getFaction().isPirate()) ? TeamLoadOutGenerator.UNSET_FILL_RATIO : 1.0f);
-        rp.isPirate = getCampaign().getFaction().isPirate();
+              (getCampaign().getPlayerForce().getFaction().isPirate()) ? TeamLoadOutGenerator.UNSET_FILL_RATIO : 1.0f);
+        rp.isPirate = getCampaign().getPlayerForce().getFaction().isPirate();
         rp.groundMap = groundMap;
         rp.spaceEnvironment = spaceMap;
         MunitionTree mt = TeamLoadOutGenerator.generateMunitionTree(rp, alliedEntities, "");
@@ -2384,7 +2384,7 @@ public final class BriefingTab extends CampaignGuiTab {
             }
         }
 
-        File file = determineMULFilePath(scenario, getCampaign().getName());
+        File file = determineMULFilePath(scenario, getCampaign().getPlayerForce().getName());
         if (file == null) {
             return;
         }
@@ -2449,7 +2449,7 @@ public final class BriefingTab extends CampaignGuiTab {
      */
     private int calculateGenericBattleValue(ArrayList<Entity> chosen) {
         int genericBattleValue = 0;
-        if (getCampaignOptions().isUseGenericBattleValue()) {
+        if (getCampaignOptions().get(CampaignOption.USE_GENERIC_BATTLE_VALUE)) {
             genericBattleValue = chosen.stream().mapToInt(Entity::getGenericBattleValue).sum();
         }
         return genericBattleValue;

@@ -340,7 +340,7 @@ public class AddOrEditKillEntryDialog extends JDialog {
         // potentially be missing.
         if (forceId == -1) {
             try {
-                kill.setForceId(campaign.getPerson(kill.getPilotId()).getUnit().getFormationId());
+                kill.setForceId(campaign.getPlayerForce().getHumanResources().getPerson(kill.getPilotId()).getUnit().getFormationId());
             } catch (Exception ignored) {
             }
         }

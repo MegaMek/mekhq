@@ -75,7 +75,7 @@ public class MercenaryAuction {
      */
     public MercenaryAuction(Campaign campaign, int requiredCombatTeams, StratConCampaignState campaignState,
           int unitType) {
-        String faction = campaign.getFaction().getShortName();
+        String faction = campaign.getPlayerForce().getFaction().getShortName();
 
         Entity entity = getEntity(faction,
               REGULAR,
@@ -118,7 +118,7 @@ public class MercenaryAuction {
                   campaign.getPlayerForce().getHumanResources()
                         .getSeniorAdminPerson(mekhq.campaign.Campaign.AdministratorSpecialization.TRANSPORT,
                               campaign.getCampaignOptions(),
-                              campaign.isClanCampaign(),
+                              campaign.getPlayerForce().isClanForce(),
                               campaign.getLocalDate()),
                   null,
                   inCharacterMessage,
@@ -163,7 +163,7 @@ public class MercenaryAuction {
                   campaign.getPlayerForce().getHumanResources()
                         .getSeniorAdminPerson(mekhq.campaign.Campaign.AdministratorSpecialization.TRANSPORT,
                               campaign.getCampaignOptions(),
-                              campaign.isClanCampaign(),
+                              campaign.getPlayerForce().isClanForce(),
                               campaign.getLocalDate()),
                   null,
                   getFormattedTextAt(RESOURCE_BUNDLE, "auction.successful", entity.getChassis(), deliveryTime),
@@ -177,7 +177,7 @@ public class MercenaryAuction {
                   campaign.getPlayerForce().getHumanResources()
                         .getSeniorAdminPerson(mekhq.campaign.Campaign.AdministratorSpecialization.TRANSPORT,
                               campaign.getCampaignOptions(),
-                              campaign.isClanCampaign(),
+                              campaign.getPlayerForce().isClanForce(),
                               campaign.getLocalDate()),
                   null,
                   getFormattedTextAt(RESOURCE_BUNDLE, "auction.failure", entity.getChassis()),

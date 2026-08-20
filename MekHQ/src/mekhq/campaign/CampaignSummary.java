@@ -56,6 +56,7 @@ import megamek.common.units.Entity;
 import megamek.common.units.Infantry;
 import megamek.common.units.UnitType;
 import mekhq.campaign.campaignOptions.CampaignOptions;
+import mekhq.campaign.campaignOptions.CampaignOption;
 import mekhq.campaign.force.Formation;
 import mekhq.campaign.mission.enums.MissionStatus;
 import mekhq.campaign.mission.newContract.AbstractContract;
@@ -412,7 +413,7 @@ public class CampaignSummary {
         StringBuilder hrCapacityReport = new StringBuilder().append("<html>")
                                                .append(getHRStrain(campaign))
                                                .append(" / ")
-                                               .append(campaign.getCampaignOptions().getHRCapacity() *
+                                               .append(campaign.getCampaignOptions().get(CampaignOption.HR_CAPACITY) *
                                                              combinedSkillValues)
                                                .append(" personnel");
 
@@ -450,15 +451,15 @@ public class CampaignSummary {
         // Field Kitchens
         List<Unit> unitsInToe = campaign.getPlayerForce().getFormation(Formation.FORMATION_ORIGIN)
                                       .getAllUnitsAsUnits(campaign.getPlayerForce().getHangar(), false);
-        if (campaignOptions.isUseFatigue()) {
-            int fieldKitchenCapacity = checkFieldKitchenCapacity(unitsInToe, campaignOptions.getFieldKitchenCapacity());
+        if (campaignOptions.get(CampaignOption.USE_FATIGUE)) {
+            int fieldKitchenCapacity = checkFieldKitchenCapacity(unitsInToe, campaignOptions.get(CampaignOption.FIELD_KITCHEN_CAPACITY));
             fieldKitchenCapacity += FacilityRentals.getCapacityIncreaseFromRentals(campaign.getActiveContracts(),
                   ContractRentalType.KITCHENS);
 
             int fieldKitchenUsage = checkFieldKitchenUsage(campaign.getPlayerForce()
                                                                  .getHumanResources()
                                                                  .getActivePersonnel(false, true),
-                  campaignOptions.isUseFieldKitchenIgnoreNonCombatants(), campaign);
+                  campaignOptions.get(CampaignOption.FIELD_KITCHEN_IGNORE_NON_COMBATANTS), campaign);
 
             boolean isWithinCapacity = areFieldKitchensWithinCapacity(fieldKitchenCapacity, fieldKitchenUsage);
             color = isWithinCapacity ?
@@ -477,19 +478,19 @@ public class CampaignSummary {
 
         // Hospital Beds
         if (campaignOptions.isUseAdvancedMedical()) {
-            if (campaignOptions.isUseFatigue()) {
+            if (campaignOptions.get(CampaignOption.USE_FATIGUE)) {
                 report.append("<br>");
             }
 
             int injuredPersonnel = campaign.getPlayerForce().getHumanResources().getPatients().size();
-            boolean useMASHTheatres = campaignOptions.isUseMASHTheatres();
+            boolean useMASHTheatres = campaignOptions.get(CampaignOption.USE_MASH_THEATRES);
             int mashTheatreCapacity;
             mashTheatreCapacity = useMASHTheatres ?
                                         campaign.getPlayerForce().calculateMASHTheaterCapacity(campaign) :
                                         Integer.MAX_VALUE;
 
-            final boolean isDoctorsUseAdministration = campaignOptions.isDoctorsUseAdministration();
-            final int maximumPatients = campaignOptions.getMaximumPatients();
+            final boolean isDoctorsUseAdministration = campaignOptions.get(CampaignOption.DOCTORS_USE_ADMINISTRATION);
+            final int maximumPatients = campaignOptions.get(CampaignOption.MAXIMUM_PATIENTS);
             int doctorCapacity = 0;
             for (Person person : campaign.getPlayerForce().getHumanResources().getActivePersonnel(false, false)) {
                 doctorCapacity += person.getDoctorMedicalCapacity(isDoctorsUseAdministration, maximumPatients);
@@ -530,8 +531,8 @@ public class CampaignSummary {
         }
 
         // Prisoners
-        if (!campaignOptions.getPrisonerCaptureStyle().isNone()) {
-            if (campaignOptions.isUseFatigue() || campaignOptions.isUseAdvancedMedical()) {
+        if (!campaignOptions.get(CampaignOption.PRISONER_CAPTURE_STYLE).isNone()) {
+            if (campaignOptions.get(CampaignOption.USE_FATIGUE) || campaignOptions.isUseAdvancedMedical()) {
                 report.append("<br>");
             }
             int capacityUsage = calculatePrisonerCapacityUsage(campaign);

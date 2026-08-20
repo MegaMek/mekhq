@@ -61,6 +61,7 @@ import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.campaignOptions.CampaignOption;
 import mekhq.campaign.campaignOptions.CampaignOptions;
+import mekhq.campaign.campaignOptions.CampaignOption;
 import mekhq.campaign.events.loans.LoanDefaultedEvent;
 import mekhq.campaign.events.transactions.TransactionCreditEvent;
 import mekhq.campaign.events.transactions.TransactionDebitEvent;
@@ -315,11 +316,11 @@ public class Finances {
      * at the beginning of each new financial term
      */
     public void newFiscalYear(final Campaign campaign) {
-        if (campaign.getCampaignOptions().isNewFinancialYearFinancesToCSVExport()) {
-            final String exportFileName = campaign.getName() +
+        if (campaign.getCampaignOptions().get(CampaignOption.NEW_FINANCIAL_YEAR_FINANCES_TO_CSV_EXPORT)) {
+            final String exportFileName = campaign.getPlayerForce().getName() +
                                                 " Finances for " +
                                                 campaign.getCampaignOptions()
-                                                      .getFinancialYearDuration()
+                                                      .get(CampaignOption.FINANCIAL_YEAR_DURATION)
                                                       .getExportFilenameDateString(campaign.getLocalDate()) +
                                                 '.' +
                                                 FileType.CSV.getRecommendedExtension();
@@ -350,7 +351,7 @@ public class Finances {
     public void newDay(final Campaign campaign, final LocalDate yesterday, final LocalDate today) {
         // Getting frequently used variables to simplify later statements
         CampaignOptions campaignOptions = campaign.getCampaignOptions();
-        boolean isNewYear = campaignOptions.getFinancialYearDuration().isEndOfFinancialYear(today);
+        boolean isNewYear = campaignOptions.get(CampaignOption.FINANCIAL_YEAR_DURATION).isEndOfFinancialYear(today);
         boolean isNewMonth = (today.getDayOfMonth() == 1);
         boolean isMonday = today.getDayOfWeek() == DayOfWeek.MONDAY;
         Accountant accountant = campaign.getAccountant();
@@ -365,7 +366,7 @@ public class Finances {
             newFiscalYear(campaign);
 
             // pay taxes
-            if ((campaignOptions.isUseTaxes()) && (!profits.isZero())) {
+            if ((campaignOptions.get(CampaignOption.USE_TAXES)) && (!profits.isZero())) {
                 payTaxes(campaign, profits);
             }
         }
@@ -390,8 +391,8 @@ public class Finances {
 
         // Handle peacetime operating expenses, payroll, and loan payments
         if (isNewMonth) {
-            if (campaignOptions.isUsePeacetimeCost()) {
-                if (!campaignOptions.isShowPeacetimeCost()) {
+            if (campaignOptions.get(CampaignOption.USE_PEACETIME_COST)) {
+                if (!campaignOptions.get(CampaignOption.SHOW_PEACETIME_COST)) {
                     // Do not include salaries as that will be tracked below
                     Money peacetimeCost = accountant.getPeacetimeCost(false);
 
@@ -442,7 +443,7 @@ public class Finances {
                 }
             }
 
-            if (campaignOptions.isPayForSalaries()) {
+            if (campaignOptions.get(CampaignOption.PAY_FOR_SALARIES)) {
 
                 Money payRollCost = accountant.getPayRoll();
 
@@ -451,14 +452,14 @@ public class Finances {
                       payRollCost,
                       resourceMap.getString("Salaries.title"),
                       accountant.getPayRollSummary(),
-                      campaignOptions.isTrackTotalEarnings())) {
+                      campaignOptions.get(CampaignOption.TRACK_TOTAL_EARNINGS))) {
                     campaign.addReport(FINANCES, String.format(resourceMap.getString("Salaries.text"),
                           payRollCost.toAmountAndSymbolString()));
 
                 } else {
                     addReportInsufficientFunds(campaign, resourceMap.getString("Payroll.text"));
 
-                    if (campaignOptions.isUseLoyaltyModifiers()) {
+                    if (campaignOptions.get(CampaignOption.USE_LOYALTY_MODIFIERS)) {
                         for (Person person : campaign.getPlayerForce().getHumanResources().getPersonnel()) {
                             if (person.getStatus().isDepartedUnit()) {
                                 continue;
@@ -483,7 +484,7 @@ public class Finances {
             }
 
             // Handle overhead expenses
-            if (campaignOptions.isPayForOverhead()) {
+            if (campaignOptions.get(CampaignOption.PAY_FOR_OVERHEAD)) {
                 Money overheadCost = accountant.getOverheadExpenses();
 
                 if (debit(TransactionType.OVERHEAD, today, overheadCost, resourceMap.getString("Overhead.title"))) {
@@ -588,7 +589,14 @@ public class Finances {
      * @param contract the contract that just paid out
      * @param date     the day the payment was made
      */
-    private void payoutShares(Campaign campaign, AbstractContract contract, LocalDate date) {
+    private void payTaxes(Campaign campaign, Money profits) {
+        Money taxAmount = profits.multipliedBy((double) campaign.getCampaignOptions().get(CampaignOption.TAXES_PERCENTAGE) / 100)
+                                .round();
+
+        debit(TransactionType.TAXES, campaign.getLocalDate(), taxAmount, resourceMap.getString("Taxes.finances"));
+    }
+
+    private void payoutShares(Campaign campaign, Contract contract, LocalDate date) {
         if (!campaign.getCampaignOptions().get(CampaignOption.USE_SHARE_SYSTEM)) {
             return;
         }

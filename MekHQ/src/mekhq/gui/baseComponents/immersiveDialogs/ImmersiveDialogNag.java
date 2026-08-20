@@ -277,21 +277,21 @@ public class ImmersiveDialogNag {
             return campaign.getPlayerForce().getHumanResources()
                          .getSeniorAdminPerson(COMMAND,
                                campaign.getCampaignOptions(),
-                               campaign.isClanCampaign(),
+                               campaign.getPlayerForce().isClanForce(),
                                campaign.getLocalDate());
         }
 
         Person speaker = campaign.getPlayerForce().getHumanResources()
                                .getSeniorAdminPerson(specialization,
                                      campaign.getCampaignOptions(),
-                                     campaign.isClanCampaign(),
+                                     campaign.getPlayerForce().isClanForce(),
                                      campaign.getLocalDate());
 
         if (speaker == null && specialization != COMMAND) {
             speaker = campaign.getPlayerForce().getHumanResources()
                             .getSeniorAdminPerson(mekhq.campaign.Campaign.AdministratorSpecialization.COMMAND,
                                   campaign.getCampaignOptions(),
-                                  campaign.isClanCampaign(),
+                                  campaign.getPlayerForce().isClanForce(),
                                   campaign.getLocalDate());
         }
 

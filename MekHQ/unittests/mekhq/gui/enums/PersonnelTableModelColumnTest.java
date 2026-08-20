@@ -179,7 +179,7 @@ public class PersonnelTableModelColumnTest {
             Campaign campaign = MHQTestUtilities.mockCampaign();
             CampaignOptions opts = mock(CampaignOptions.class);
             when(campaign.getLocalDate()).thenReturn(TODAY);
-            when(campaign.getName()).thenReturn(CAMPAIGN_NAME);
+            when(campaign.getPlayerForce().getName()).thenReturn(CAMPAIGN_NAME);
             when(campaign.getPlayerForce().getPersonnel()).thenReturn(mainForce);
             when(campaign.getCampaignOptions()).thenReturn(opts);
             when(campaign.getPlayerForce().isOverridingCommandCircuitRequirements()).thenReturn(false);

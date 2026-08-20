@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2024-2025 The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2024-2026 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -48,6 +48,7 @@ import javax.swing.table.TableCellRenderer;
 import megamek.logging.MMLogger;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.campaignOptions.CampaignOptions;
+import mekhq.campaign.campaignOptions.CampaignOption;
 import mekhq.campaign.personnel.Award;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.enums.AwardBonus;
@@ -149,7 +150,7 @@ public class AutoAwardsTableModel extends AbstractTableModel {
         List<Object> rowData = data.get(rowIndex);
 
         UUID personUUID = (UUID) rowData.getFirst();
-        Person person = campaign.getPerson(personUUID);
+        Person person = campaign.getPlayerForce().getHumanResources().getPerson(personUUID);
         Award award = (Award) rowData.get(1);
 
         return switch (columnIndex) {
@@ -175,8 +176,8 @@ public class AutoAwardsTableModel extends AbstractTableModel {
      */
     private String getDescriptionString(Award award) {
         CampaignOptions campaignOptions = campaign.getCampaignOptions();
-        boolean isReplaceEdgeAwards = campaignOptions.isUseReplaceEdgeAwards();
-        AwardBonus style = campaignOptions.getAwardBonusStyle();
+        boolean isReplaceEdgeAwards = campaignOptions.get(CampaignOption.USE_REPLACE_EDGE_AWARDS);
+        AwardBonus style = campaignOptions.get(CampaignOption.AWARD_BONUS_STYLE);
         int xpAward = award.getXPReward();
         int edgeAward = award.getEdgeReward();
         boolean awardXP = style.isBoth() || style.isXP();
@@ -227,7 +228,7 @@ public class AutoAwardsTableModel extends AbstractTableModel {
     }
 
     public Person getPerson(int rowIndex) {
-        return campaign.getPerson((UUID) data.get(rowIndex).getFirst());
+        return campaign.getPlayerForce().getHumanResources().getPerson((UUID) data.get(rowIndex).getFirst());
     }
 
     public String getAwardName(int rowIndex) {

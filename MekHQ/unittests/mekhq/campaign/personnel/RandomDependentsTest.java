@@ -32,6 +32,10 @@
  */
 package mekhq.campaign.personnel;
 
+import mekhq.campaign.campaignOptions.CampaignOption;
+
+import static org.mockito.Mockito.lenient;
+
 import static java.lang.Math.max;
 import static java.lang.Math.round;
 import static mekhq.campaign.personnel.RandomDependents.DEPENDENT_CAPACITY_MULTIPLIER;
@@ -67,11 +71,15 @@ class RandomDependentsTest {
         when(mockCampaign.getPlayerForce().getHangar()).thenReturn(mockHangar);
         when(mockCampaign.getPlayerForce().getWarehouse()).thenReturn(mockWarehouse);
         when(campaignFaction.isMercenary()).thenReturn(true);
-        when(mockCampaign.getFaction()).thenReturn(campaignFaction);
+        when(mockCampaign.getPlayerForce().getFaction()).thenReturn(campaignFaction);
         when(campaignFaction.getShortName()).thenReturn("MERC");
 
         CampaignOptions mockCampaignOptions = mock(CampaignOptions.class);
         when(mockCampaign.getCampaignOptions()).thenReturn(mockCampaignOptions);
+        lenient().when(mockCampaignOptions.get(CampaignOption.USE_RANDOM_DEPENDENT_REMOVAL)).thenReturn(false);
+        lenient().when(mockCampaignOptions.get(CampaignOption.USE_RANDOM_DEPENDENT_ADDITION)).thenReturn(false);
+        lenient().when(mockCampaignOptions.get(CampaignOption.IS_ENABLE_SALVAGE_FLAG_BY_DEFAULT)).thenReturn(false);
+        lenient().when(mockCampaignOptions.get(CampaignOption.TECHS_USE_ADMINISTRATION)).thenReturn(false);
 
         LocalDate currentDay = LocalDate.of(3151, 1, 1);
         when(mockCampaign.getLocalDate()).thenReturn(currentDay);
@@ -114,11 +122,15 @@ class RandomDependentsTest {
         Campaign mockCampaign = mockCampaign();
         Faction campaignFaction = mock(Faction.class);
         when(campaignFaction.isMercenary()).thenReturn(true);
-        when(mockCampaign.getFaction()).thenReturn(campaignFaction);
+        when(mockCampaign.getPlayerForce().getFaction()).thenReturn(campaignFaction);
         when(campaignFaction.getShortName()).thenReturn("MERC");
 
         CampaignOptions mockCampaignOptions = mock(CampaignOptions.class);
         when(mockCampaign.getCampaignOptions()).thenReturn(mockCampaignOptions);
+        lenient().when(mockCampaignOptions.get(CampaignOption.USE_RANDOM_DEPENDENT_REMOVAL)).thenReturn(false);
+        lenient().when(mockCampaignOptions.get(CampaignOption.USE_RANDOM_DEPENDENT_ADDITION)).thenReturn(false);
+        lenient().when(mockCampaignOptions.get(CampaignOption.IS_ENABLE_SALVAGE_FLAG_BY_DEFAULT)).thenReturn(false);
+        lenient().when(mockCampaignOptions.get(CampaignOption.TECHS_USE_ADMINISTRATION)).thenReturn(false);
 
         LocalDate currentDay = LocalDate.of(3151, 1, 1);
         when(mockCampaign.getLocalDate()).thenReturn(currentDay);

@@ -476,7 +476,7 @@ public class PerformResupply {
                       commanderAddress);
             }
 
-            Person speaker = campaign.getPerson(convoy.getFormationCommanderID());
+            Person speaker = campaign.getPlayerForce().getHumanResources().getPerson(convoy.getFormationCommanderID());
             String outOfCharacterMessage = getFormattedTextAt(RESOURCE_BUNDLE, "outOfCharacter.roleplay");
             new ImmersiveDialogSimple(campaign, speaker, null, eventText, null, outOfCharacterMessage, null, false);
 

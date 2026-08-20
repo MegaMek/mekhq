@@ -49,6 +49,7 @@ import mekhq.campaign.Campaign;
 import mekhq.campaign.LocalWarehouse;
 import mekhq.campaign.base.PlayerBase;
 import mekhq.campaign.campaignOptions.CampaignOptions;
+import mekhq.campaign.campaignOptions.CampaignOption;
 import mekhq.campaign.location.IPlace;
 import mekhq.campaign.parts.AmmoStorage;
 import mekhq.campaign.parts.Armor;
@@ -225,40 +226,40 @@ public class PartsInUseManager {
         }
 
         if (part instanceof HeatSink) {
-            return campaignOptions.getAutoLogisticsHeatSink();
+            return campaignOptions.get(CampaignOption.AUTO_LOGISTICS_HEAT_SINK);
         } else if (part instanceof MekLocation) {
             if (((MekLocation) part).getLoc() == Mek.LOC_HEAD) {
-                return campaignOptions.getAutoLogisticsMekHead();
+                return campaignOptions.get(CampaignOption.AUTO_LOGISTICS_MEK_HEAD);
             }
 
             if (((MekLocation) part).getLoc() == Mek.LOC_CENTER_TORSO) {
-                return campaignOptions.getAutoLogisticsNonRepairableLocation();
+                return campaignOptions.get(CampaignOption.AUTO_LOGISTICS_NON_REPAIRABLE_LOCATION);
             }
 
-            return campaignOptions.getAutoLogisticsMekLocation();
+            return campaignOptions.get(CampaignOption.AUTO_LOGISTICS_MEK_LOCATION);
         } else if (part instanceof TankLocation) {
-            return campaignOptions.getAutoLogisticsNonRepairableLocation();
+            return campaignOptions.get(CampaignOption.AUTO_LOGISTICS_NON_REPAIRABLE_LOCATION);
         } else if (part instanceof AmmoBin || part instanceof AmmoStorage) {
-            return campaignOptions.getAutoLogisticsAmmunition();
+            return campaignOptions.get(CampaignOption.AUTO_LOGISTICS_AMMUNITION);
         } else if (part instanceof Armor) {
-            return campaignOptions.getAutoLogisticsArmor();
+            return campaignOptions.get(CampaignOption.AUTO_LOGISTICS_ARMOR);
         } else if (part instanceof MekActuator) {
-            return campaignOptions.getAutoLogisticsActuators();
+            return campaignOptions.get(CampaignOption.AUTO_LOGISTICS_ACTUATORS);
         } else if (part instanceof JumpJet) {
-            return campaignOptions.getAutoLogisticsJumpJets();
+            return campaignOptions.get(CampaignOption.AUTO_LOGISTICS_JUMP_JETS);
         } else if (part instanceof EnginePart) {
-            return campaignOptions.getAutoLogisticsEngines();
+            return campaignOptions.get(CampaignOption.AUTO_LOGISTICS_ENGINES);
         } else if (part instanceof MekGyro) {
-            return campaignOptions.getAutoLogisticsGyros();
+            return campaignOptions.get(CampaignOption.AUTO_LOGISTICS_GYROS);
         } else if (part instanceof MekCockpit || part instanceof MekSensor || part instanceof MekLifeSupport) {
-            return campaignOptions.getAutoLogisticsHeadComponents();
+            return campaignOptions.get(CampaignOption.AUTO_LOGISTICS_HEAD_COMPONENTS);
         } else if (part instanceof EquipmentPart equipmentPart) {
             if (equipmentPart.getType() instanceof WeaponType) {
-                return campaignOptions.getAutoLogisticsWeapons();
+                return campaignOptions.get(CampaignOption.AUTO_LOGISTICS_WEAPONS);
             }
         }
 
-        return campaignOptions.getAutoLogisticsOther();
+        return campaignOptions.get(CampaignOption.AUTO_LOGISTICS_OTHER);
     }
 
 

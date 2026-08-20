@@ -66,6 +66,7 @@ import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.ResolveScenarioTracker;
 import mekhq.campaign.campaignOptions.CampaignOptions;
+import mekhq.campaign.campaignOptions.CampaignOption;
 import mekhq.campaign.digitalGM.stratCon.StratConCampaignState;
 import mekhq.campaign.digitalGM.stratCon.StratConCoords;
 import mekhq.campaign.digitalGM.stratCon.StratConScenario;
@@ -342,8 +343,8 @@ public class CamOpsSalvageUtilities {
 
         final CampaignOptions campaignOptions = campaign.getCampaignOptions();
         final boolean isUseAdvancedMedical = campaignOptions.isUseAdvancedMedical();
-        final int fatigueRate = campaignOptions.getFatigueRate();
-        final boolean useInjuryFatigue = campaignOptions.isUseInjuryFatigue();
+        final int fatigueRate = campaignOptions.get(CampaignOption.FATIGUE_RATE);
+        final boolean useInjuryFatigue = campaignOptions.get(CampaignOption.USE_INJURY_FATIGUE);
 
         int injuryEvents = getInjuryEventsCount(numberOfSalvagedUnits);
 
@@ -357,7 +358,7 @@ public class CamOpsSalvageUtilities {
 
             Person victim = ObjectUtility.getRandomItem(techs);
 
-            if (campaignOptions.isUseEdge() && victim.getCurrentEdge() > 0) {
+            if (campaignOptions.get(CampaignOption.USE_EDGE) && victim.getCurrentEdge() > 0) {
                 if (performEdgeReroll(campaign, victim)) {
                     continue;
                 }
@@ -415,7 +416,7 @@ public class CamOpsSalvageUtilities {
     private static @NonNull List<Person> getValidTechs(Campaign campaign, List<UUID> techUUIDs) {
         List<Person> techs = new ArrayList<>();
         for (UUID uuid : techUUIDs) {
-            Person tech = campaign.getPerson(uuid);
+            Person tech = campaign.getPlayerForce().getHumanResources().getPerson(uuid);
             if (tech == null) {
                 LOGGER.error("null tech was passed into risky salvage");
                 continue;
@@ -453,7 +454,7 @@ public class CamOpsSalvageUtilities {
      */
     public static void depleteTechMinutes(Campaign campaign, List<UUID> techs) {
         for (UUID uuid : techs) {
-            Person tech = campaign.getPerson(uuid);
+            Person tech = campaign.getPlayerForce().getHumanResources().getPerson(uuid);
             if (tech == null) {
                 LOGGER.error("null tech was passed into depleteTechMinutes");
                 continue;

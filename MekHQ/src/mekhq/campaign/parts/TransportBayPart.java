@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2017-2025 The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2017-2026 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -48,6 +48,7 @@ import mekhq.campaign.parts.missing.MissingPart;
 import mekhq.utilities.MHQXMLUtility;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
+import mekhq.campaign.campaignOptions.CampaignOption;
 
 /**
  * @author Neoancient
@@ -116,7 +117,7 @@ public class TransportBayPart extends Part {
                                          .toList();
                 for (Part door : doors) {
                     if (checkForDestruction
-                              && Compute.d6(2) < campaign.getCampaignOptions().getDestroyPartTarget()) {
+                              && Compute.d6(2) < campaign.getCampaignOptions().get(CampaignOption.DESTROY_PART_TARGET)) {
                         door.remove(false);
                     } else {
                         door.hits = 1;

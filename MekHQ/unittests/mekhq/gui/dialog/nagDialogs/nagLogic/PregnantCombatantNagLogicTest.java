@@ -73,7 +73,7 @@ class PregnantCombatantNagLogicTest {
 
         Faction campaignFaction = mock(Faction.class);
         when(campaignFaction.isMercenary()).thenReturn(true);
-        when(campaign.getFaction()).thenReturn(campaignFaction);
+        when(campaign.getPlayerForce().getFaction()).thenReturn(campaignFaction);
         when(campaignFaction.getShortName()).thenReturn("MERC");
 
         personNotPregnant = new Person(campaign);

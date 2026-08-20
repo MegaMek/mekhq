@@ -82,6 +82,7 @@ import mekhq.gui.panels.TutorialHyperlinkPanel;
 import mekhq.gui.view.ForceViewPanel;
 import mekhq.gui.view.PersonViewPanel;
 import mekhq.gui.view.UnitViewPanel;
+import mekhq.campaign.campaignOptions.CampaignOption;
 
 /**
  * Display organization tree (TO&amp;E) and force/unit summary
@@ -314,7 +315,7 @@ public final class TOETab extends CampaignGuiTab {
                 scrollPerson.setBorder(null);
                 crewPanel.add(scrollPerson, BorderLayout.CENTER);
                 CrewListModel model = new CrewListModel();
-                model.setData(unit, getCampaign().getCampaignOptions().isUseSmallArmsOnly());
+                model.setData(unit, getCampaign().getCampaignOptions().get(CampaignOption.USE_SMALL_ARMS_ONLY));
                 /* For units with multiple crew members, present a horizontal list above the PersonViewPanel.
                  * This custom version of JList was the only way I could figure out how to limit the JList
                  * to a single row with a horizontal scrollbar.

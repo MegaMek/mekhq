@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2024-2025 The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2024-2026 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -74,7 +74,7 @@ class InvalidFactionNagLogicTest {
         dateInvalid = LocalDate.of(1936, 1, 1);
 
         // When the Campaign mock calls 'getFaction()' return the mocked faction
-        when(campaign.getFaction()).thenReturn(faction);
+        when(campaign.getPlayerForce().getFaction()).thenReturn(faction);
     }
 
     // In the following tests, the beginning of the isFactionInvalid() method is called, and its

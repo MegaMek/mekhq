@@ -333,8 +333,8 @@ public class RandomEventEffectsManager {
         int priorHits = target.getTotalInjurySeverity();
 
         wounds = InjurySPAUtility.adjustInjuriesAndFatigueForSPAs(target,
-              campaign.getCampaignOptions().isUseInjuryFatigue(),
-              campaign.getCampaignOptions().getFatigueRate(), wounds);
+              campaign.getCampaignOptions().get(CampaignOption.USE_INJURY_FATIGUE),
+              campaign.getCampaignOptions().get(CampaignOption.FATIGUE_RATE), wounds);
 
         if (priorHits + wounds > 5) {
             wounds = 5 - priorHits;
@@ -383,8 +383,8 @@ public class RandomEventEffectsManager {
         int targetCount = (int) max(1, potentialTargets.size() * magnitude);
 
         CampaignOptions campaignOptions = campaign.getCampaignOptions();
-        boolean isUseInjuryFatigue = campaignOptions.isUseInjuryFatigue();
-        int fatigueRate = campaignOptions.getFatigueRate();
+        boolean isUseInjuryFatigue = campaignOptions.get(CampaignOption.USE_INJURY_FATIGUE);
+        int fatigueRate = campaignOptions.get(CampaignOption.FATIGUE_RATE);
         for (int i = 0; i < targetCount; i++) {
             Person target = getRandomItem(potentialTargets);
 
@@ -660,7 +660,7 @@ public class RandomEventEffectsManager {
      * @return A {@link String} summarizing the loyalty adjustment or an empty string if loyalty modifiers are disabled.
      */
     String eventEffectLoyaltyOne(RandomEventResult result) {
-        boolean isUseLoyalty = campaign.getCampaignOptions().isUseLoyaltyModifiers();
+        boolean isUseLoyalty = campaign.getCampaignOptions().get(CampaignOption.USE_LOYALTY_MODIFIERS);
 
         if (!isUseLoyalty) {
             return "";
@@ -709,7 +709,7 @@ public class RandomEventEffectsManager {
      *       are disabled.
      */
     private String eventEffectLoyaltyAll(RandomEventResult result) {
-        boolean isUseLoyalty = campaign.getCampaignOptions().isUseLoyaltyModifiers();
+        boolean isUseLoyalty = campaign.getCampaignOptions().get(CampaignOption.USE_LOYALTY_MODIFIERS);
 
         if (!isUseLoyalty) {
             return "";
@@ -866,8 +866,8 @@ public class RandomEventEffectsManager {
      */
     private String eventEffectFatigueOne(RandomEventResult result) {
         CampaignOptions campaignOptions = campaign.getCampaignOptions();
-        boolean isUseFatigue = campaignOptions.isUseFatigue();
-        int fatigueRate = campaignOptions.getFatigueRate();
+        boolean isUseFatigue = campaignOptions.get(CampaignOption.USE_FATIGUE);
+        int fatigueRate = campaignOptions.get(CampaignOption.FATIGUE_RATE);
 
         if (!isUseFatigue) {
             return "";
@@ -884,7 +884,7 @@ public class RandomEventEffectsManager {
 
         target.changeFatigue(magnitude * fatigueRate);
 
-        if (campaign.getCampaignOptions().isUseFatigue()) {
+        if (campaign.getCampaignOptions().get(CampaignOption.USE_FATIGUE)) {
             Fatigue.processFatigueActions(campaign, target);
 
             MekHQ.triggerEvent(new PersonChangedEvent(target));
@@ -920,8 +920,8 @@ public class RandomEventEffectsManager {
      */
     private String eventEffectFatigueAll(RandomEventResult result) {
         CampaignOptions campaignOptions = campaign.getCampaignOptions();
-        boolean isUseFatigue = campaignOptions.isUseFatigue();
-        int fatigueRate = campaignOptions.getFatigueRate();
+        boolean isUseFatigue = campaignOptions.get(CampaignOption.USE_FATIGUE);
+        int fatigueRate = campaignOptions.get(CampaignOption.FATIGUE_RATE);
 
         if (!isUseFatigue) {
             return "";
@@ -939,7 +939,7 @@ public class RandomEventEffectsManager {
         for (Person target : targets) {
             target.changeFatigue(magnitude * fatigueRate);
 
-            if (campaign.getCampaignOptions().isUseFatigue()) {
+            if (campaign.getCampaignOptions().get(CampaignOption.USE_FATIGUE)) {
                 Fatigue.processFatigueActions(campaign, target);
 
                 MekHQ.triggerEvent(new PersonChangedEvent(target));
@@ -1160,8 +1160,8 @@ public class RandomEventEffectsManager {
      */
     private String eventEffectUniquePoison(RandomEventResult result) {
         CampaignOptions campaignOptions = campaign.getCampaignOptions();
-        boolean isUseFatigue = campaignOptions.isUseFatigue();
-        int fatigueRate = campaignOptions.getFatigueRate();
+        boolean isUseFatigue = campaignOptions.get(CampaignOption.USE_FATIGUE);
+        int fatigueRate = campaignOptions.get(CampaignOption.FATIGUE_RATE);
 
         if (!isUseFatigue) {
             return "";
@@ -1187,7 +1187,7 @@ public class RandomEventEffectsManager {
             target.changeFatigue(fatigueChange);
             madeChange = true;
 
-            if (campaign.getCampaignOptions().isUseFatigue()) {
+            if (campaign.getCampaignOptions().get(CampaignOption.USE_FATIGUE)) {
                 Fatigue.processFatigueActions(campaign, target);
             }
 
@@ -1250,7 +1250,7 @@ public class RandomEventEffectsManager {
         AbstractContract targetContract = getRandomItem(potentialTargets);
         Faction targetFaction = targetContract.getEnemyFaction();
 
-        RandomOriginOptions originOptions = campaign.getCampaignOptions().getRandomOriginOptions();
+        RandomOriginOptions originOptions = campaign.getCampaignOptions().get(CampaignOption.RANDOM_ORIGIN_OPTIONS);
 
         if (potentialTargets.isEmpty()) {
             return "";

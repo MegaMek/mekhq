@@ -60,6 +60,7 @@ import mekhq.campaign.work.IAcquisitionWork;
 import mekhq.campaign.work.IFabricatable;
 import mekhq.campaign.work.WorkTime;
 import mekhq.utilities.ReportingUtilities;
+import mekhq.campaign.campaignOptions.CampaignOption;
 
 /**
  * A missing part is a placeholder on a unit to indicate that a replacement task needs to be performed
@@ -370,13 +371,13 @@ public abstract class MissingPart extends Part implements IAcquisitionWork, IFab
     @Override
     public TargetRoll getAllAcquisitionMods() {
         TargetRoll target = new TargetRoll();
-        if (getTechBase() == TechBase.CLAN && campaign.getCampaignOptions().getClanAcquisitionPenalty() > 0) {
-            target.addModifier(campaign.getCampaignOptions().getClanAcquisitionPenalty(), "clan-tech");
-        } else if (getTechBase() == TechBase.IS && campaign.getCampaignOptions().getIsAcquisitionPenalty() > 0) {
-            target.addModifier(campaign.getCampaignOptions().getIsAcquisitionPenalty(), "Inner Sphere tech");
+        if (getTechBase() == TechBase.CLAN && campaign.getCampaignOptions().get(CampaignOption.CLAN_ACQUISITION_PENALTY) > 0) {
+            target.addModifier(campaign.getCampaignOptions().get(CampaignOption.CLAN_ACQUISITION_PENALTY), "clan-tech");
+        } else if (getTechBase() == TechBase.IS && campaign.getCampaignOptions().get(CampaignOption.IS_ACQUISITION_PENALTY) > 0) {
+            target.addModifier(campaign.getCampaignOptions().get(CampaignOption.IS_ACQUISITION_PENALTY), "Inner Sphere tech");
         } else if (getTechBase() == TechBase.ALL) {
-            int penalty = Math.min(campaign.getCampaignOptions().getClanAcquisitionPenalty(),
-                  campaign.getCampaignOptions().getIsAcquisitionPenalty());
+            int penalty = Math.min(campaign.getCampaignOptions().get(CampaignOption.CLAN_ACQUISITION_PENALTY),
+                  campaign.getCampaignOptions().get(CampaignOption.IS_ACQUISITION_PENALTY));
             if (penalty > 0) {
                 target.addModifier(penalty, "tech limit");
             }

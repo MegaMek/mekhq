@@ -41,6 +41,7 @@ import mekhq.campaign.ExtraData;
 import mekhq.campaign.events.NewDayEvent;
 import mekhq.campaign.events.OptionsChangedEvent;
 import mekhq.campaign.personnel.Person;
+import mekhq.campaign.campaignOptions.CampaignOption;
 
 /**
  * Event handler for all kind of XP calculations
@@ -53,8 +54,8 @@ public class XPHandler {
     @Subscribe
     @Deprecated(since = "0.51.0", forRemoval = true)
     public void campaignOptionsHandler(OptionsChangedEvent event) {
-        this.adminXP = event.getOptions().getAdminXP();
-        this.adminXPPeriod = event.getOptions().getAdminXPPeriod();
+        this.adminXP = event.getOptions().get(CampaignOption.ADMIN_XP);
+        this.adminXPPeriod = event.getOptions().get(CampaignOption.ADMIN_XP_PERIOD);
     }
 
     @Subscribe

@@ -125,13 +125,13 @@ public class DialogItinerary {
             speaker = campaign.getPlayerForce().getHumanResources()
                             .getSeniorAdminPerson(AdministratorSpecialization.LOGISTICS,
                                   campaign.getCampaignOptions(),
-                                  campaign.isClanCampaign(),
+                                  campaign.getPlayerForce().isClanForce(),
                                   campaign.getLocalDate());
 
             if (speaker != null) {
                 speakerName = speaker.getFullTitle();
             } else {
-                speakerName = campaign.getName();
+                speakerName = campaign.getPlayerForce().getName();
             }
 
             speakerIcon = getSpeakerIcon(campaign, speaker);

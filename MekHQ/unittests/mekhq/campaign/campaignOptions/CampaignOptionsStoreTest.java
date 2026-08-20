@@ -86,14 +86,14 @@ class CampaignOptionsStoreTest {
     void newCampaignOptions_reportsPreRefactorMaintenanceDefaults() {
         CampaignOptions campaignOptions = new CampaignOptions();
 
-        assertEquals(true, campaignOptions.isCheckMaintenance());
-        assertEquals(7, campaignOptions.getMaintenanceCycleDays());
-        assertEquals(-1, campaignOptions.getMaintenanceBonus());
-        assertEquals(true, campaignOptions.isUseQualityMaintenance());
-        assertEquals(false, campaignOptions.isReverseQualityNames());
-        assertEquals(true, campaignOptions.isUseRandomUnitQualities());
-        assertEquals(false, campaignOptions.isUseUnofficialMaintenance());
-        assertEquals(false, campaignOptions.isLogMaintenance());
-        assertEquals(4, campaignOptions.getDefaultMaintenanceTime());
+        assertEquals(true, campaignOptions.get(CampaignOption.CHECK_MAINTENANCE));
+        assertEquals(7, campaignOptions.get(CampaignOption.MAINTENANCE_CYCLE_DAYS));
+        assertEquals(-1, campaignOptions.get(CampaignOption.MAINTENANCE_BONUS));
+        assertEquals(true, campaignOptions.get(CampaignOption.USE_QUALITY_MAINTENANCE));
+        assertEquals(false, campaignOptions.get(CampaignOption.REVERSE_QUALITY_NAMES));
+        assertEquals(true, campaignOptions.get(CampaignOption.USE_RANDOM_UNIT_QUALITIES));
+        assertEquals(false, campaignOptions.get(CampaignOption.USE_UNOFFICIAL_MAINTENANCE));
+        assertEquals(false, campaignOptions.get(CampaignOption.LOG_MAINTENANCE));
+        assertEquals(4, campaignOptions.get(CampaignOption.DEFAULT_MAINTENANCE_TIME));
     }
 }

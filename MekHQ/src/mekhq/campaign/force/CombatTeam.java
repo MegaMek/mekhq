@@ -59,6 +59,7 @@ import megamek.logging.MMLogger;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.campaignOptions.CampaignOptions;
+import mekhq.campaign.campaignOptions.CampaignOption;
 import mekhq.campaign.events.OrganizationChangedEvent;
 import mekhq.campaign.mission.AtBScenario;
 import mekhq.campaign.mission.enums.CombatRole;
@@ -179,7 +180,7 @@ public class CombatTeam {
     }
 
     public @Nullable Person getCommander(Campaign campaign) {
-        return campaign.getPerson(commanderId);
+        return campaign.getPlayerForce().getHumanResources().getPerson(commanderId);
     }
 
     public void setCommander(UUID id) {
@@ -216,7 +217,7 @@ public class CombatTeam {
                 Entity entity = unit.getEntity();
                 long entityType = entity.getEntityType();
 
-                boolean isClan = campaign.isClanCampaign();
+                boolean isClan = campaign.getPlayerForce().isClanForce();
 
                 CampaignOptions campaignOptions = campaign.getCampaignOptions();
                 if (!campaignOptions.isUseStratCon()) {
@@ -347,7 +348,7 @@ public class CombatTeam {
      * @return effective size of the combat team
      */
     public int getSize(Campaign campaign) {
-        if (campaign.getFaction().isClan()) {
+        if (campaign.getPlayerForce().getFaction().isClan()) {
             return (int) Math.ceil(getEffectivePoints(campaign));
         }
         if (campaign.getPlayerForce().getFormation(formationId) != null) {
@@ -552,7 +553,7 @@ public class CombatTeam {
             weight = weight / subFormationsCount;
         }
 
-        int standardFormationSize = getStandardFormationSize(campaign.getFaction());
+        int standardFormationSize = getStandardFormationSize(campaign.getPlayerForce().getFaction());
 
         weight = weight / standardFormationSize;
 
@@ -598,14 +599,14 @@ public class CombatTeam {
          */
         if (campaign.getCampaignOptions().isLimitLanceNumUnits()) {
             int size = getSize(campaign);
-            if (size < getStandardFormationSize(campaign.getFaction()) - 1 ||
-                      size > getStandardFormationSize(campaign.getFaction()) + 2) {
+            if (size < getStandardFormationSize(campaign.getPlayerForce().getFaction()) - 1 ||
+                      size > getStandardFormationSize(campaign.getPlayerForce().getFaction()) + 2) {
                 formation.setCombatTeamStatus(false);
                 return false;
             }
         }
 
-        if (campaign.getCampaignOptions().isLimitLanceWeight() &&
+        if (false &&
                   getWeightClass(campaign) > EntityWeightClass.WEIGHT_ASSAULT) {
             formation.setCombatTeamStatus(false);
             return false;

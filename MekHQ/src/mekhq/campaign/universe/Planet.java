@@ -52,6 +52,7 @@ import megamek.common.rolls.TargetRoll;
 import megamek.common.universe.FactionTag;
 import megamek.logging.MMLogger;
 import mekhq.campaign.campaignOptions.CampaignOptions;
+import mekhq.campaign.campaignOptions.CampaignOption;
 import mekhq.campaign.universe.PlanetarySystem.PlanetaryRating;
 import mekhq.campaign.universe.PlanetarySystem.PlanetarySophistication;
 import mekhq.campaign.universe.enums.HPGRating;
@@ -836,26 +837,26 @@ public class Planet {
                 if (enemies &&
                           !neutrals &&
                           !allies &&
-                          !options.getPlanetAcquisitionFactionLimit().generateOnEnemyPlanets()) {
+                          !options.get(CampaignOption.PLANET_ACQUISITION_FACTION_LIMIT).generateOnEnemyPlanets()) {
                     return List.of(new TargetRollModifier(TargetRoll.IMPOSSIBLE, "No supplies from enemy planets"));
                 } else if (neutrals &&
                                  !allies &&
-                                 !options.getPlanetAcquisitionFactionLimit().generateOnNeutralPlanets()) {
+                                 !options.get(CampaignOption.PLANET_ACQUISITION_FACTION_LIMIT).generateOnNeutralPlanets()) {
                     return List.of(new TargetRollModifier(TargetRoll.IMPOSSIBLE, "No supplies from neutral planets"));
-                } else if (allies && !options.getPlanetAcquisitionFactionLimit().generateOnAlliedPlanets()) {
+                } else if (allies && !options.get(CampaignOption.PLANET_ACQUISITION_FACTION_LIMIT).generateOnAlliedPlanets()) {
                     return List.of(new TargetRollModifier(TargetRoll.IMPOSSIBLE, "No supplies from allied planets"));
-                } else if (clanCrossover && options.isPlanetAcquisitionNoClanCrossover()) {
+                } else if (clanCrossover && options.get(CampaignOption.PLANET_ACQUISITION_NO_CLAN_CROSSOVER)) {
                     return List.of(new TargetRollModifier(TargetRoll.IMPOSSIBLE,
                           "The clans and inner sphere do not trade supplies"));
                 }
             }
 
             if (noClansPresent && clanPart) {
-                if (options.isNoClanPartsFromIS()) {
+                if (options.get(CampaignOption.NO_CLAN_PARTS_FROM_IS)) {
                     return List.of(new TargetRollModifier(TargetRoll.IMPOSSIBLE,
                           "No clan parts from non-clan factions"));
                 }
-                result.add(new TargetRollModifier(options.getPenaltyClanPartsFromIS(),
+                result.add(new TargetRollModifier(options.get(CampaignOption.PENALTY_CLAN_PARTS_FROM_IS),
                       "clan parts from non-clan faction"));
             }
         }

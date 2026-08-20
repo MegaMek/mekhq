@@ -264,7 +264,7 @@ public class RiotScenario {
         // Trigger a dialog to inform the user that an interception has taken place
         String commanderAddress = campaign.getCommanderAddress();
         String key;
-        if (campaign.isClanCampaign()) {
+        if (campaign.getPlayerForce().isClanForce()) {
             key = "RiotScenario.report.clan";
         } else {
             if (campaign.getPlayerForce().getFaction().isComStarOrWoB()) {

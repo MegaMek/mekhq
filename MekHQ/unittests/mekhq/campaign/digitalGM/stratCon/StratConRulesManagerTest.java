@@ -32,6 +32,8 @@
  */
 package mekhq.campaign.digitalGM.stratCon;
 
+import static org.mockito.Mockito.lenient;
+
 import static mekhq.campaign.personnel.skills.SkillType.S_SENSOR_OPERATIONS;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
@@ -292,8 +294,8 @@ class StratConRulesManagerTest {
         when(unit.getCrew()).thenReturn(List.of(mock(Person.class)));
 
         // CampaignOptions needed by scanNeighboringCoords
-        when(options.isUseFatigue()).thenReturn(false);
-        when(options.getFatigueRate()).thenReturn(0);
+        when(options.get(CampaignOption.USE_FATIGUE)).thenReturn(false);
+        when(options.get(CampaignOption.FATIGUE_RATE)).thenReturn(0);
 
         // processForceDeployment needs LocalDate and Hangar
         when(campaign.getLocalDate()).thenReturn(LocalDate.of(3025, 1, 15));
@@ -316,6 +318,7 @@ class StratConRulesManagerTest {
         Campaign campaign = MHQTestUtilities.mockCampaign();
         CampaignOptions options = mock(CampaignOptions.class);
         when(campaign.getCampaignOptions()).thenReturn(options);
+        lenient().when(options.get(CampaignOption.USE_ADVANCED_SCOUTING)).thenReturn(false);
         when(options.get(CampaignOption.CHASSIS_FAMILIARITY_MODE)).thenReturn(Familiarity.DISABLED);
 
         AbstractContract contract = mock(AbstractContract.class);
@@ -364,6 +367,7 @@ class StratConRulesManagerTest {
         Campaign campaign = MHQTestUtilities.mockCampaign();
         CampaignOptions options = mock(CampaignOptions.class);
         when(campaign.getCampaignOptions()).thenReturn(options);
+        lenient().when(options.get(CampaignOption.USE_ADVANCED_SCOUTING)).thenReturn(false);
         when(options.get(CampaignOption.CHASSIS_FAMILIARITY_MODE)).thenReturn(Familiarity.DISABLED);
 
         AbstractContract contract = mock(AbstractContract.class);
@@ -417,6 +421,7 @@ class StratConRulesManagerTest {
         Campaign campaign = MHQTestUtilities.mockCampaign();
         CampaignOptions options = mock(CampaignOptions.class);
         when(campaign.getCampaignOptions()).thenReturn(options);
+        lenient().when(options.get(CampaignOption.USE_ADVANCED_SCOUTING)).thenReturn(false);
         when(options.get(CampaignOption.CHASSIS_FAMILIARITY_MODE)).thenReturn(Familiarity.DISABLED);
 
         AbstractContract contract = mock(AbstractContract.class);
@@ -569,6 +574,7 @@ class StratConRulesManagerTest {
         Campaign campaign = MHQTestUtilities.mockCampaign();
         CampaignOptions options = mock(CampaignOptions.class);
         when(campaign.getCampaignOptions()).thenReturn(options);
+        lenient().when(options.get(CampaignOption.USE_ADVANCED_SCOUTING)).thenReturn(false);
         when(options.get(CampaignOption.CHASSIS_FAMILIARITY_MODE)).thenReturn(Familiarity.NORMAL);
 
         AbstractContract contract = mock(AbstractContract.class);
@@ -683,6 +689,7 @@ class StratConRulesManagerTest {
         Campaign campaign = MHQTestUtilities.mockCampaign();
         CampaignOptions options = mock(CampaignOptions.class);
         when(campaign.getCampaignOptions()).thenReturn(options);
+        lenient().when(options.get(CampaignOption.USE_ADVANCED_SCOUTING)).thenReturn(false);
         when(campaign.getLocalDate()).thenReturn(LocalDate.of(3025, 1, 15));
 
         AbstractContract contract = mock(AbstractContract.class);
@@ -835,6 +842,7 @@ class StratConRulesManagerTest {
         Campaign campaign = MHQTestUtilities.mockCampaign();
         CampaignOptions options = mock(CampaignOptions.class);
         when(campaign.getCampaignOptions()).thenReturn(options);
+        lenient().when(options.get(CampaignOption.USE_ADVANCED_SCOUTING)).thenReturn(false);
         when(options.get(CampaignOption.CHASSIS_FAMILIARITY_MODE)).thenReturn(Familiarity.DISABLED);
 
         AbstractContract contract = mock(AbstractContract.class);
@@ -885,6 +893,7 @@ class StratConRulesManagerTest {
         Campaign campaign = MHQTestUtilities.mockCampaign();
         CampaignOptions options = mock(CampaignOptions.class);
         when(campaign.getCampaignOptions()).thenReturn(options);
+        lenient().when(options.get(CampaignOption.USE_ADVANCED_SCOUTING)).thenReturn(false);
         when(options.isUseStratConMaplessMode()).thenReturn(false);
 
         AbstractContract contract = mock(AbstractContract.class);
@@ -927,6 +936,7 @@ class StratConRulesManagerTest {
         Campaign campaign = MHQTestUtilities.mockCampaign();
         CampaignOptions options = mock(CampaignOptions.class);
         when(campaign.getCampaignOptions()).thenReturn(options);
+        lenient().when(options.get(CampaignOption.USE_ADVANCED_SCOUTING)).thenReturn(false);
         when(options.isUseStratConMaplessMode()).thenReturn(false);
 
         AbstractContract contract = mock(AbstractContract.class);
@@ -990,10 +1000,11 @@ class StratConRulesManagerTest {
         when(template.getAllowedUnitType()).thenReturn(allowedUnitType);
 
         CampaignOptions options = mock(CampaignOptions.class);
-        when(options.isUseDropShips()).thenReturn(isUseDropShips);
+        when(options.get(CampaignOption.USE_DROP_SHIPS)).thenReturn(isUseDropShips);
 
         Campaign campaign = MHQTestUtilities.mockCampaign();
         when(campaign.getCampaignOptions()).thenReturn(options);
+        lenient().when(options.get(CampaignOption.USE_ADVANCED_SCOUTING)).thenReturn(false);
         when(campaign.getLocalDate()).thenReturn(LocalDate.of(3025, 1, 15));
 
         CurrentLocation location = mock(CurrentLocation.class);
@@ -1165,11 +1176,12 @@ class StratConRulesManagerTest {
 
         private static Campaign mockCampaign(boolean useAgingEffects, boolean isClanCampaign) {
             Campaign campaign = MHQTestUtilities.mockCampaign();
-            when(campaign.isClanCampaign()).thenReturn(isClanCampaign);
+            when(campaign.getPlayerForce().isClanForce()).thenReturn(isClanCampaign);
             when(campaign.getLocalDate()).thenReturn(LocalDate.now());
             CampaignOptions campaignOptions = mock(CampaignOptions.class);
-            when(campaignOptions.isUseAgeEffects()).thenReturn(useAgingEffects);
+            when(campaignOptions.get(CampaignOption.USE_AGE_EFFECTS)).thenReturn(useAgingEffects);
             when(campaign.getCampaignOptions()).thenReturn(campaignOptions);
+            lenient().when(campaignOptions.get(CampaignOption.USE_ADVANCED_SCOUTING)).thenReturn(false);
             return campaign;
         }
 

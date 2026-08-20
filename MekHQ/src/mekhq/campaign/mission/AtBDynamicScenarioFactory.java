@@ -114,6 +114,7 @@ import mekhq.campaign.LocalHangar;
 import mekhq.campaign.againstTheBot.AtBConfiguration;
 import mekhq.campaign.campaignOptions.BoardScalingType;
 import mekhq.campaign.campaignOptions.CampaignOptions;
+import mekhq.campaign.campaignOptions.CampaignOption;
 import mekhq.campaign.digitalGM.stratCon.StratConCampaignState;
 import mekhq.campaign.digitalGM.stratCon.StratConContractInitializer;
 import mekhq.campaign.digitalGM.stratCon.StratConScenario;
@@ -202,7 +203,7 @@ public class AtBDynamicScenarioFactory {
         boolean planetsideScenario = template.isPlanetSurface();
 
         CampaignOptions campaignOptions = campaign.getCampaignOptions();
-        if (campaignOptions.isUsePlanetaryConditions() && planetsideScenario) {
+        if (campaignOptions.get(CampaignOption.USE_PLANETARY_CONDITIONS) && planetsideScenario) {
             setPlanetaryConditions(scenario, contract, campaign);
         }
 
@@ -212,14 +213,14 @@ public class AtBDynamicScenarioFactory {
         // ground map
         // theoretically some lighting conditions apply to space maps as well, but
         // requires additional work to implement properly
-        if (campaignOptions.isUseLightConditions() && planetsideScenario) {
+        if (campaignOptions.get(CampaignOption.USE_LIGHT_CONDITIONS) && planetsideScenario) {
             setLightConditions(scenario);
         }
 
         // set weather conditions if the user wants to play with them and is on a ground
         // map
-        if (campaignOptions.isUseWeatherConditions() && planetsideScenario) {
-            setWeather(scenario, campaignOptions.isUseNoTornadoes());
+        if (campaignOptions.get(CampaignOption.USE_WEATHER_CONDITIONS) && planetsideScenario) {
+            setWeather(scenario, campaignOptions.get(CampaignOption.USE_NO_TORNADOES));
         }
 
         // apply a default "reinforcements" force template if a scenario-specific one
@@ -284,7 +285,7 @@ public class AtBDynamicScenarioFactory {
         // approximate estimate, anyway.
         scenario.setForceCount(generatedLanceCount + (playerForceUnitCount / 4));
         setScenarioMapSize(scenario, campaign);
-        scenario.setScenarioMap(campaign.getCampaignOptions().getFixedMapChance());
+        scenario.setScenarioMap(campaign.getCampaignOptions().get(CampaignOption.FIXED_MAP_CHANCE));
         setDeploymentZones(scenario);
         setDestinationZones(scenario);
 
@@ -299,7 +300,7 @@ public class AtBDynamicScenarioFactory {
         translateTemplateObjectives(scenario, campaign);
         scaleObjectiveTimeLimits(scenario, campaign);
 
-        if (campaign.getCampaignOptions().isUseAbilities()) {
+        if (campaign.getCampaignOptions().get(CampaignOption.USE_ABILITIES)) {
             upgradeBotCrews(scenario, campaign);
         }
 
@@ -575,7 +576,7 @@ public class AtBDynamicScenarioFactory {
         int forceBVBudget = (int) (effectiveBV * forceMultiplier);
 
         if (isScenarioModifier) {
-            forceBVBudget = (int) (forceBVBudget * ((double) campaign.getCampaignOptions().getScenarioModBV() / 100));
+            forceBVBudget = (int) (forceBVBudget * ((double) campaign.getCampaignOptions().get(CampaignOption.SCENARIO_MOD_BV) / 100));
         }
 
         if (forceTemplate.getForceMultiplier() != 1 &&
@@ -605,7 +606,7 @@ public class AtBDynamicScenarioFactory {
         boolean allowsBattleArmor = true;
         boolean allowsTanks = true;
 
-        if (campaign.getCampaignOptions().isUsePlanetaryModifiers()) {
+        if (campaign.getCampaignOptions().get(CampaignOption.USE_PLANETARY_MODIFIERS)) {
             if (scenario.getAtmosphere().isLighterThan(THIN)) {
                 LOGGER.info("Atmosphere is lighter than {}, setting low pressure flag and disallowing Tanks", THIN);
                 isLowPressure = true;
@@ -638,7 +639,7 @@ public class AtBDynamicScenarioFactory {
             }
         }
 
-        if (campaign.getCampaignOptions().isUseWeatherConditions()) {
+        if (campaign.getCampaignOptions().get(CampaignOption.USE_WEATHER_CONDITIONS)) {
             Wind wind = scenario.getWind();
             if (wind.isTornadoF1ToF3() || wind.isTornadoF4()) {
                 LOGGER.info("Tornado detected, disallowing Infantry");
@@ -756,7 +757,7 @@ public class AtBDynamicScenarioFactory {
 
                 // Gun emplacements use fixed tables instead of the force generator system
                 if (actualUnitType == GUN_EMPLACEMENT) {
-                    if (campaign.getCampaignOptions().isUseAdvancedBuildingGunEmplacements()) {
+                    if (campaign.getCampaignOptions().get(CampaignOption.USE_ADVANCED_BUILDING_GUN_EMPLACEMENTS)) {
                         generatedLance = generateGunEmplacements(4, skill, quality, campaign, faction);
                     } else {
                         generatedLance = generateTurrets(4, skill, quality, campaign, faction);
@@ -842,7 +843,7 @@ public class AtBDynamicScenarioFactory {
                 continue;
             }
 
-            if (campaign.getCampaignOptions().isAutoConfigMunitions() || forceTemplate.getAllowAeroBombs()) {
+            if (campaign.getCampaignOptions().get(CampaignOption.AUTO_CONFIG_MUNITIONS) || forceTemplate.getAllowAeroBombs()) {
                 MapLocation mapLocation = scenario.getTemplate().mapParameters.getMapLocation();
                 boolean onGround = (mapLocation != MapLocation.LowAtmosphere && mapLocation != MapLocation.Space);
                 int ownerBaseQuality;
@@ -869,7 +870,7 @@ public class AtBDynamicScenarioFactory {
 
                 Game cGame = campaign.getGame();
                 TeamLoadOutGenerator tlg = new TeamLoadOutGenerator(cGame);
-                if (campaign.getCampaignOptions().isAutoConfigMunitions()) {
+                if (campaign.getCampaignOptions().get(CampaignOption.AUTO_CONFIG_MUNITIONS)) {
                     // Configure non-Turret generated units with appropriate munitions (for BV calculations)
                     ArrayList<Entity> arrayGeneratedLance = new ArrayList<>(
                           generatedLance.stream().filter(e -> !(e.isBuildingEntityOrGunEmplacement())).toList()
@@ -927,7 +928,7 @@ public class AtBDynamicScenarioFactory {
             for (Entity entity : generatedLance) {
                 int individualBV;
 
-                if (campaign.getCampaignOptions().isUseGenericBattleValue()) {
+                if (campaign.getCampaignOptions().get(CampaignOption.USE_GENERIC_BATTLE_VALUE)) {
                     individualBV = entity.getGenericBattleValue();
                 } else {
                     individualBV = entity.calculateBattleValue();
@@ -961,7 +962,7 @@ public class AtBDynamicScenarioFactory {
         if (forceTemplate.getGenerationMethod() == ForceGenerationMethod.BVScaled.ordinal()) {
             String balancingType = "";
 
-            if (campaign.getCampaignOptions().isUseGenericBattleValue()) {
+            if (campaign.getCampaignOptions().get(CampaignOption.USE_GENERIC_BATTLE_VALUE)) {
                 balancingType = " Generic";
             }
 
@@ -1111,7 +1112,7 @@ public class AtBDynamicScenarioFactory {
         }
 
         for (Entity entity : generatedEntities) {
-            if (campaign.getCampaignOptions().isUseAbilities()) {
+            if (campaign.getCampaignOptions().get(CampaignOption.USE_ABILITIES)) {
                 if (faction.isClan() && !entity.isInfantry() && !entity.isProtoMek()) {
                     if (SpecialAbility.getSpecialAbilities().containsKey("clan_pilot_training")) {
                         entity.getCrew().getOptions().getOption("clan_pilot_training").setValue(true);
@@ -1142,7 +1143,7 @@ public class AtBDynamicScenarioFactory {
 
         if (generatedForce.getTeam() != 1 &&
                   forceTemplate.getGenerationMethod() != ForceGenerationMethod.None.ordinal() &&
-                  campaign.getCampaignOptions().isUseGenericBattleValue() &&
+                  campaign.getCampaignOptions().get(CampaignOption.USE_GENERIC_BATTLE_VALUE) &&
                   faction.performsBatchalls() &&
                   contract.isBatchallAccepted()) {
             // Simulate bidding away of forces
@@ -1150,7 +1151,7 @@ public class AtBDynamicScenarioFactory {
             int supplementedForces = 0;
 
             if (generatedForce.getTeam() != 1 &&
-                      campaign.getCampaignOptions().isUseGenericBattleValue() &&
+                      campaign.getCampaignOptions().get(CampaignOption.USE_GENERIC_BATTLE_VALUE) &&
                       faction.performsBatchalls() &&
                       contract.isBatchallAccepted()) {
                 // Player force values
@@ -1169,7 +1170,7 @@ public class AtBDynamicScenarioFactory {
 
                 if (isScenarioModifier) {
                     forceBVBudget = (int) round(forceBVBudget *
-                                                      ((double) campaign.getCampaignOptions().getScenarioModBV() /
+                                                      ((double) campaign.getCampaignOptions().get(CampaignOption.SCENARIO_MOD_BV) /
                                                              100));
 
                     LOGGER.info("As this force came from a Scenario Modifier it's budget has been modified based on " +
@@ -1298,7 +1299,7 @@ public class AtBDynamicScenarioFactory {
 
             // Report the bidding results (if any) to the player
             if (generatedForce.getTeam() != 1 &&
-                      campaign.getCampaignOptions().isUseGenericBattleValue() &&
+                      campaign.getCampaignOptions().get(CampaignOption.USE_GENERIC_BATTLE_VALUE) &&
                       faction.performsBatchalls() &&
                       contract.isBatchallAccepted()) {
                 reportResultsOfBidding(campaign, bidAwayForces, generatedForce, supplementedForces, faction);
@@ -1437,7 +1438,7 @@ public class AtBDynamicScenarioFactory {
     private static int getBattleValue(Campaign campaign, Entity entity, boolean forceStandardBV, boolean ignoreC3,
           boolean ignoreCrew) {
         int battleValue;
-        if (campaign.getCampaignOptions().isUseGenericBattleValue() && !forceStandardBV) {
+        if (campaign.getCampaignOptions().get(CampaignOption.USE_GENERIC_BATTLE_VALUE) && !forceStandardBV) {
             battleValue = entity.getGenericBattleValue();
 
             for (Transporter transporter : entity.getTransports()) {
@@ -1471,7 +1472,7 @@ public class AtBDynamicScenarioFactory {
 
         LOGGER.info("The honor of {} is rated as {}", faction.getFullName(campaign.getGameYear()), honorRating);
 
-        boolean useVerboseBidding = campaign.getCampaignOptions().isUseVerboseBidding();
+        boolean useVerboseBidding = campaign.getCampaignOptions().get(CampaignOption.USE_VERBOSE_BIDDING);
         StringBuilder report = new StringBuilder();
 
         if (useVerboseBidding) {
@@ -1593,7 +1594,7 @@ public class AtBDynamicScenarioFactory {
                     scenario.getAlliesPlayer().add(en);
                     scenario.getBotUnitTemplates().put(UUID.fromString(en.getExternalIdAsString()), forceTemplate);
 
-                    if (!campaign.getCampaignOptions().isAttachedPlayerCamouflage()) {
+                    if (!campaign.getCampaignOptions().get(CampaignOption.ATTACHED_PLAYER_CAMOUFLAGE)) {
                         en.setCamouflage(camouflage.clone());
                     }
                 }
@@ -1965,7 +1966,7 @@ public class AtBDynamicScenarioFactory {
         ScenarioMapParameters mapParameters = template.mapParameters;
         if (mapParameters.isUseStandardAtBSizing()) {
             CampaignOptions campaignOptions = campaign.getCampaignOptions();
-            BoardScalingType boardScaling = campaignOptions.getBoardScalingType();
+            BoardScalingType boardScaling = campaignOptions.get(CampaignOption.BOARD_SCALING_TYPE);
 
             // We're using this as a shortcut, rather than fetching the player force directly
             int unitCount = getUnitCountWithoutUsingASeedForce(campaign);
@@ -2037,8 +2038,8 @@ public class AtBDynamicScenarioFactory {
           boolean restrictAlliedModifiers, boolean restrictEnemyModifiers) {
         int numMods = 0;
         boolean addMods = true;
-        int modMax = campaignOptions.getScenarioModMax();
-        int modChance = campaignOptions.getScenarioModChance();
+        int modMax = campaignOptions.get(CampaignOption.SCENARIO_MOD_MAX);
+        int modChance = campaignOptions.get(CampaignOption.SCENARIO_MOD_CHANCE);
 
         if (modMax != 0) {
             while (addMods) {
@@ -2919,7 +2920,7 @@ public class AtBDynamicScenarioFactory {
         RandomNameGenerator nameGenerator = RandomNameGenerator.getInstance();
 
         Gender gender;
-        int nonBinaryDiceSize = campaign.getCampaignOptions().getNonBinaryDiceSize();
+        int nonBinaryDiceSize = campaign.getCampaignOptions().get(CampaignOption.NON_BINARY_DICE_SIZE);
 
         if ((nonBinaryDiceSize > 0) && (randomInt(nonBinaryDiceSize) == 0)) {
             gender = RandomGenderGenerator.generateOther();
@@ -3014,8 +3015,8 @@ public class AtBDynamicScenarioFactory {
         CampaignOptions campaignOptions = campaign.getCampaignOptions();
 
         // Optionally assign a callsign to the unit commander if enabled and skill at or above minimum level
-        if (campaignOptions.isAutoGenerateOpForCallSigns() &&
-                  (skill.equalsOrGreaterThan(campaignOptions.getMinimumCallsignSkillLevel()))) {
+        if (campaignOptions.get(CampaignOption.AUTO_GENERATE_OP_FOR_CALL_SIGNS) &&
+                  (skill.equalsOrGreaterThan(campaignOptions.get(CampaignOption.MINIMUM_CALLSIGN_SKILL_LEVEL)))) {
             entityCrew.setNickname(RandomCallsignGenerator.getInstance(isTest).generate(), 0);
         }
 
@@ -3024,16 +3025,16 @@ public class AtBDynamicScenarioFactory {
 
         int tacticsInitiativeBonus = getTacticsModifier(skill,
               campaign.getRandomSkillPreferences(),
-              campaignOptions.isUseSensibleTactics());
-        if (campaignOptions.isUseTactics()) {
+              campaignOptions.get(CampaignOption.USE_SENSIBLE_TACTICS));
+        if (campaignOptions.get(CampaignOption.USE_TACTICS)) {
             entity.getCrew().setCommandBonus(tacticsInitiativeBonus);
-        } else if (campaignOptions.isUseInitiativeBonus()) {
+        } else if (campaignOptions.get(CampaignOption.USE_INITIATIVE_BONUS)) {
             entity.getCrew().setInitBonus(tacticsInitiativeBonus);
         }
 
         entity.setExternalIdAsString(UUID.randomUUID().toString());
 
-        if (campaignOptions.isUseImplants() && campaignOptions.isUseAlternativeAdvancedMedical()) {
+        if (campaignOptions.get(CampaignOption.USE_IMPLANTS) && campaignOptions.get(CampaignOption.USE_ALTERNATIVE_ADVANCED_MEDICAL)) {
             if (entity.isProtoMek()) {
                 entity.getCrew().getOptions().getOption(UNOFFICIAL_EI_IMPLANT).setValue(true);
             }
@@ -3225,9 +3226,9 @@ public class AtBDynamicScenarioFactory {
                 // Use the Mek/Vehicle/Mixed ratios from campaign options as weighted values for
                 // random unit types.
                 // Then modify based on faction.
-                int mekLanceWeight = campaign.getCampaignOptions().getOpForLanceTypeMeks();
-                int mixedLanceWeight = campaign.getCampaignOptions().getOpForLanceTypeMixed();
-                int vehicleLanceWeight = campaign.getCampaignOptions().getOpForLanceTypeVehicles();
+                int mekLanceWeight = campaign.getCampaignOptions().get(CampaignOption.OP_FOR_LANCE_TYPE_MEKS);
+                int mixedLanceWeight = campaign.getCampaignOptions().get(CampaignOption.OP_FOR_LANCE_TYPE_MIXED);
+                int vehicleLanceWeight = campaign.getCampaignOptions().get(CampaignOption.OP_FOR_LANCE_TYPE_VEHICLES);
 
                 if (faction.isClan()) {
                     if (Objects.equals(factionCode, "CHH")) {
@@ -3286,8 +3287,8 @@ public class AtBDynamicScenarioFactory {
         } else if (unitTypeCode == SPECIAL_UNIT_TYPE_ATB_CIVILIANS) {
             // Use the Vehicle/Mixed ratios from campaign options as weighted values for
             // random unit types.
-            int vehicleLanceWeight = campaign.getCampaignOptions().getOpForLanceTypeVehicles();
-            int mixedLanceWeight = campaign.getCampaignOptions().getOpForLanceTypeMixed();
+            int vehicleLanceWeight = campaign.getCampaignOptions().get(CampaignOption.OP_FOR_LANCE_TYPE_VEHICLES);
+            int mixedLanceWeight = campaign.getCampaignOptions().get(CampaignOption.OP_FOR_LANCE_TYPE_MIXED);
 
             int totalWeight = mixedLanceWeight + vehicleLanceWeight;
 
@@ -3487,7 +3488,7 @@ public class AtBDynamicScenarioFactory {
             }
         }
 
-        if (campaign.getCampaignOptions().isRegionalMekVariations()) {
+        if (campaign.getCampaignOptions().get(CampaignOption.REGIONAL_MEK_VARIATIONS)) {
             weights = adjustWeightsForFaction(weights, faction);
         }
 
@@ -3509,8 +3510,8 @@ public class AtBDynamicScenarioFactory {
         int bvBudget = 0;
 
         CampaignOptions campaignOptions = campaign.getCampaignOptions();
-        boolean isGenericBattleValue = campaignOptions.isUseGenericBattleValue() && !forceStandardBattleValue;
-        boolean isUseNoSeedForce = campaignOptions.isNoSeedForces();
+        boolean isGenericBattleValue = campaignOptions.get(CampaignOption.USE_GENERIC_BATTLE_VALUE) && !forceStandardBattleValue;
+        boolean isUseNoSeedForce = campaignOptions.get(CampaignOption.NO_SEED_FORCES);
         boolean isStratConSingles = campaignOptions.isUseStratConSinglesMode();
 
         String generationMethod = isGenericBattleValue ? "Generic BV" : "BV2";
@@ -3769,7 +3770,7 @@ public class AtBDynamicScenarioFactory {
         int unitCount = 0;
 
         CampaignOptions campaignOptions = campaign.getCampaignOptions();
-        boolean isUseNoSeedForce = campaignOptions.isNoSeedForces();
+        boolean isUseNoSeedForce = campaignOptions.get(CampaignOption.NO_SEED_FORCES);
         boolean isStratConSingles = campaignOptions.isUseStratConSinglesMode();
 
         if (isStratConSingles) {
@@ -3832,7 +3833,7 @@ public class AtBDynamicScenarioFactory {
      * @since 0.50.10
      */
     private static int getUnitCountForStratConSingles(Campaign campaign) {
-        int defaultUnitCount = CombatTeam.getStandardFormationSize(campaign.getFaction());
+        int defaultUnitCount = CombatTeam.getStandardFormationSize(campaign.getPlayerForce().getFaction());
 
         int forceCount = 0;
         int unitCount = 0;
@@ -3895,7 +3896,7 @@ public class AtBDynamicScenarioFactory {
      * @since 0.50.10
      */
     private static int getUnitCountWithoutUsingASeedForce(Campaign campaign) {
-        int defaultUnitCount = CombatTeam.getStandardFormationSize(campaign.getFaction());
+        int defaultUnitCount = CombatTeam.getStandardFormationSize(campaign.getPlayerForce().getFaction());
 
         // We need to start by gathering the different unit counts. This is because we need that information for
         // calculating the gaussian-weighted average. Specifically, we need it to calculate the crude mean (which the
@@ -3937,7 +3938,7 @@ public class AtBDynamicScenarioFactory {
      * @return the difficulty multiplier
      */
     private static double getDifficultyMultiplier(Campaign campaign) {
-        return switch (campaign.getCampaignOptions().getSkillLevel()) {
+        return switch (campaign.getCampaignOptions().get(CampaignOption.SKILL_LEVEL)) {
             case NONE, ULTRA_GREEN -> 0.5;
             case GREEN -> 0.75;
             case REGULAR -> 1.0;
@@ -5242,7 +5243,7 @@ public class AtBDynamicScenarioFactory {
      * @param campaign A pointer to the campaign
      */
     public static void upgradeBotCrews(AtBScenario scenario, Campaign campaign) {
-        CrewSkillUpgrader csu = new CrewSkillUpgrader(campaign.getCampaignOptions().getSpaUpgradeIntensity());
+        CrewSkillUpgrader csu = new CrewSkillUpgrader(campaign.getCampaignOptions().get(CampaignOption.SPA_UPGRADE_INTENSITY));
 
         for (int forceIndex = 0; forceIndex < scenario.getNumBots(); forceIndex++) {
             for (Entity entity : scenario.getBotForce(forceIndex).getFullEntityList(campaign)) {

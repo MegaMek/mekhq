@@ -105,7 +105,7 @@ class StratConPlayTypePersistenceTest {
     @EnumSource(StratConPlayType.class)
     void playTypeSurvivesFullRoundTrip(StratConPlayType playType) throws Exception {
         CampaignOptions original = new CampaignOptions();
-        original.setStratConPlayType(playType);
+        original.set(CampaignOption.STRAT_CON_PLAY_TYPE, playType);
 
         String xml = marshal(original);
         // Guard the write side too: the lookup name must appear in the serialized form
@@ -114,7 +114,7 @@ class StratConPlayTypePersistenceTest {
 
         CampaignOptions loaded = unmarshal(xml);
 
-        assertEquals(playType, loaded.getStratConPlayType(), "play type must survive the round trip");
+        assertEquals(playType, loaded.get(CampaignOption.STRAT_CON_PLAY_TYPE), "play type must survive the round trip");
         // Derived flags the GMs and rules read must be restored consistently
         assertEquals(playType != StratConPlayType.DISABLED, loaded.isUseStratCon());
         assertEquals(playType == StratConPlayType.MAPLESS || playType == StratConPlayType.SINGLES,
@@ -130,7 +130,7 @@ class StratConPlayTypePersistenceTest {
     @EnumSource(StratConPlayType.class)
     void correctGmIsEnabledAfterRoundTrip(StratConPlayType playType) throws Exception {
         CampaignOptions original = new CampaignOptions();
-        original.setStratConPlayType(playType);
+        original.set(CampaignOption.STRAT_CON_PLAY_TYPE, playType);
 
         Campaign campaign = campaignWith(unmarshal(marshal(original)));
         CampaignOptions options = campaign.getCampaignOptions();
@@ -152,7 +152,7 @@ class StratConPlayTypePersistenceTest {
     void legacyUseStratConTrueMigratesToNormal() throws Exception {
         CampaignOptions loaded = unmarshal(legacyCampaignOptions("<useStratCon>true</useStratCon>"));
 
-        assertEquals(StratConPlayType.NORMAL, loaded.getStratConPlayType());
+        assertEquals(StratConPlayType.NORMAL, loaded.get(CampaignOption.STRAT_CON_PLAY_TYPE));
     }
 
     @Test
@@ -160,14 +160,14 @@ class StratConPlayTypePersistenceTest {
         CampaignOptions loaded = unmarshal(legacyCampaignOptions(
               "<useStratCon>true</useStratCon><useMaplessStratCon>true</useMaplessStratCon>"));
 
-        assertEquals(StratConPlayType.MAPLESS, loaded.getStratConPlayType());
+        assertEquals(StratConPlayType.MAPLESS, loaded.get(CampaignOption.STRAT_CON_PLAY_TYPE));
     }
 
     @Test
     void legacyUseStratConFalseStaysDisabled() throws Exception {
         CampaignOptions loaded = unmarshal(legacyCampaignOptions("<useStratCon>false</useStratCon>"));
 
-        assertEquals(StratConPlayType.DISABLED, loaded.getStratConPlayType());
+        assertEquals(StratConPlayType.DISABLED, loaded.get(CampaignOption.STRAT_CON_PLAY_TYPE));
         assertFalse(loaded.isUseStratCon());
     }
 
@@ -175,7 +175,7 @@ class StratConPlayTypePersistenceTest {
     void saveWithNoStratConTagsDefaultsToDisabled() throws Exception {
         CampaignOptions loaded = unmarshal(legacyCampaignOptions(""));
 
-        assertEquals(StratConPlayType.DISABLED, loaded.getStratConPlayType());
+        assertEquals(StratConPlayType.DISABLED, loaded.get(CampaignOption.STRAT_CON_PLAY_TYPE));
     }
 
     // endregion

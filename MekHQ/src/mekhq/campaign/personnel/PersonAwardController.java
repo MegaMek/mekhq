@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2018-2025 The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2018-2026 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -149,11 +149,11 @@ public class PersonAwardController {
         }
 
         CampaignOptions campaignOptions = campaign.getCampaignOptions();
-        AwardBonus awardStyle = campaignOptions.getAwardBonusStyle();
+        AwardBonus awardStyle = campaignOptions.get(CampaignOption.AWARD_BONUS_STYLE);
         boolean isBoth = awardStyle.isBoth();
         boolean isXP = awardStyle.isXP();
         boolean isEdge = awardStyle.isEdge();
-        boolean isReplaceEdgeAwards = campaignOptions.isUseReplaceEdgeAwards();
+        boolean isReplaceEdgeAwards = campaignOptions.get(CampaignOption.USE_REPLACE_EDGE_AWARDS);
 
         if (isBoth || isXP) {
             if (award.getXPReward() < 0) {

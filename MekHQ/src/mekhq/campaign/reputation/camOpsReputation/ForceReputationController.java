@@ -59,6 +59,7 @@ import megamek.logging.MMLogger;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.campaignOptions.CampaignOptions;
+import mekhq.campaign.campaignOptions.CampaignOption;
 import mekhq.campaign.force.AbstractForce;
 import mekhq.campaign.personnel.Person;
 import mekhq.utilities.MHQXMLUtility;
@@ -168,7 +169,7 @@ public class ForceReputationController {
         // step two: calculate command rating
         commanderMap = calculateCommanderRating(campaign, campaign.getPlayerForce().getHumanResources()
                                                                 .getCommander(campaign.getCampaignOptions(),
-                                                                      campaign.isClanCampaign(),
+                                                                      campaign.getPlayerForce().isClanForce(),
                                                                       campaign.getLocalDate()));
         commanderRating = commanderMap.get("total");
 
@@ -253,7 +254,7 @@ public class ForceReputationController {
         // HEADER
         description.append(String.format("<div style='text-align: center;'><font size='%d'><b>%s:</b> %d</font></div>",
               titleFontSize,
-              campaign.getName(),
+              campaign.getPlayerForce().getName(),
               reputationRating));
         description.append(String.format("<div style='text-align: center;'><i>%s</i></div><br>",
               resources.getString("refresh.text")));
@@ -281,7 +282,7 @@ public class ForceReputationController {
         description.append("<table>");
         Person commander = campaign.getPlayerForce().getHumanResources()
                                  .getCommander(campaign.getCampaignOptions(),
-                                       campaign.isClanCampaign(),
+                                       campaign.getPlayerForce().isClanForce(),
                                        campaign.getLocalDate());
 
         String commanderName = resources.getString("commanderNone.text");
@@ -320,8 +321,8 @@ public class ForceReputationController {
               commanderMap.get("traits"),
               indent));
 
-        if (campaign.getCampaignOptions().isUseRandomPersonalities() &&
-                  (campaign.getCampaignOptions().isUseRandomPersonalityReputation())) {
+        if (campaign.getCampaignOptions().get(CampaignOption.USE_RANDOM_PERSONALITIES) &&
+                  (campaign.getCampaignOptions().get(CampaignOption.USE_RANDOM_PERSONALITY_REPUTATION))) {
             description.append(String.format("<tr><td><b>%s%s:</b></td> <td>%d</td></tr>",
                   indent,
                   resources.getString("personality.text"),

@@ -76,6 +76,7 @@ import mekhq.gui.baseComponents.JScrollablePanel;
 import mekhq.gui.utilities.BriefingStyle;
 import mekhq.gui.utilities.MarkdownRenderer;
 import org.apache.commons.lang3.StringUtils;
+import mekhq.campaign.campaignOptions.CampaignOption;
 
 /**
  * A custom panel that gets filled in with goodies from a scenario object
@@ -369,6 +370,16 @@ public class MissionViewPanel extends JScrollablePanel {
                 txtSalvagePct.setText(getTextAt(RESOURCE_BUNDLE, "none"));
             }
             addStatRow(lblSalvagePct, txtSalvagePct, y++);
+        }
+
+        if (campaign.getCampaignOptions().get(CampaignOption.USE_SHARE_SYSTEM)) {
+            lblSharePct.setName("lblSharePct");
+            lblSharePct.setText(getTextAt(RESOURCE_BUNDLE, "lblSharePct.text"));
+            lblSharePct.setToolTipText(wordWrap(contract.getMoraleLevel().getToolTipText()));
+            txtSharePct.setName("txtSharePct");
+            txtSharePct.setText(contract.getSharesPercent() + "%");
+            txtSharePct.setToolTipText(wordWrap(contract.getMoraleLevel().getToolTipText()));
+            addStatRow(lblSharePct, txtSharePct, y++);
         }
 
         if (useStratCon) {

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2021-2025 The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2021-2026 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -99,8 +99,8 @@ public class PersonTitleStringSorter implements Comparator<String> {
             matcher.find();
             final String id1 = matcher.group(1);
 
-            return getPersonTitleSorter().compare(getCampaign().getPerson(UUID.fromString(id0)),
-                  getCampaign().getPerson(UUID.fromString(id1)));
+            return getPersonTitleSorter().compare(getCampaign().getPlayerForce().getHumanResources().getPerson(UUID.fromString(id0)),
+                  getCampaign().getPlayerForce().getHumanResources().getPerson(UUID.fromString(id1)));
         } catch (Exception e) {
             LOGGER.error("s0: {}, s1: {}", s0, s1, e);
             return 0;

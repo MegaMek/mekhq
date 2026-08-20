@@ -72,6 +72,7 @@ import mekhq.utilities.MHQXMLUtility;
 import mekhq.utilities.ReportingUtilities;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
+import mekhq.campaign.campaignOptions.CampaignOption;
 
 /**
  * @author Jay Lawson (jaylawson39 at yahoo.com)
@@ -667,7 +668,7 @@ public class MekLocation extends Part {
                 toReturn.append(" (Bad Hip/Shoulder)");
             } else if (getPercent() < 1.0) {
                 toReturn.append(" (").append(Math.round(100 * getPercent())).append("%)");
-                if (campaign.getCampaignOptions().isPayForRepairs()) {
+                if (campaign.getCampaignOptions().get(CampaignOption.PAY_FOR_REPAIRS)) {
                     toReturn.append(", ")
                           .append(getUndamagedValue().multipliedBy(0.2).toAmountAndSymbolString())
                           .append(" to repair");

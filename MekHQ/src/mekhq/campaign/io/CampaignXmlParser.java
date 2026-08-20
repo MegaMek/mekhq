@@ -213,13 +213,13 @@ public record CampaignXmlParser(InputStream is, MekHQ app) {
                     String val = childNode.getTextContent().trim();
 
                     if (!val.equals("null")) {
-                        campaign.getCamouflage().setCategory(val);
+                        campaign.getPlayerForce().getCamouflage().setCategory(val);
                     }
                 } else if (nodeName.equalsIgnoreCase("camoFileName")) {
                     String val = childNode.getTextContent().trim();
 
                     if (!val.equals("null")) {
-                        campaign.getCamouflage().setFilename(val);
+                        campaign.getPlayerForce().getCamouflage().setFilename(val);
                     }
                 } else if (nodeName.equalsIgnoreCase("colour")) {
                     final PlayerColour colour = PlayerColour.parseFromString(childNode.getTextContent().trim());
@@ -875,7 +875,7 @@ public record CampaignXmlParser(InputStream is, MekHQ app) {
                     int newEdge = person.getAttributeScore(SkillAttribute.EDGE);
                     int difference = oldEdge - newEdge;
                     if (difference > 0) { // We were unable to convert some over
-                        int edgeCost = campaign.getCampaignOptions().getEdgeCost();
+                        int edgeCost = campaign.getCampaignOptions().get(CampaignOption.EDGE_COST);
                         int rebate = edgeCost * difference;
                         person.awardXP(campaign, rebate);
                         campaign.addReport(GENERAL, getFormattedTextAt(RESOURCE_BUNDLE,
@@ -1741,7 +1741,7 @@ public record CampaignXmlParser(InputStream is, MekHQ app) {
                                    "mekfiles" +
                                    File.separator +
                                    "customs"; // TODO : Remove inline file path
-        String sCustomsDirCampaign = sCustomsDir + File.separator + retVal.getName();
+        String sCustomsDirCampaign = sCustomsDir + File.separator + retVal.getPlayerForce().getName();
         File customsDir = new File(sCustomsDir);
         if (!customsDir.exists()) {
             if (!customsDir.mkdir()) {
@@ -2049,7 +2049,7 @@ public record CampaignXmlParser(InputStream is, MekHQ app) {
                                  .getHumanResources()
                                  .getTechs(retVal.getPlayerForce().getHangar().getUnits(),
                                        retVal.getCampaignOptions(),
-                                       retVal.isClanCampaign(),
+                                       retVal.getPlayerForce().isClanForce(),
                                        retVal.getLocalDate())) {
             for (Unit u : new ArrayList<>(tech.getTechUnits())) {
                 String reason = null;
@@ -2330,7 +2330,7 @@ public record CampaignXmlParser(InputStream is, MekHQ app) {
                     foundPersonnelMarket = true;
                 } else if (nodeName.equalsIgnoreCase("unitMarket")) {
                     // Windchild: implicit DEPENDS ON to the <campaignOptions> nodes
-                    campaign.setUnitMarket(campaign.getCampaignOptions().getUnitMarketMethod().getUnitMarket());
+                    campaign.setUnitMarket(campaign.getCampaignOptions().get(CampaignOption.UNIT_MARKET_METHOD).getUnitMarket());
                     campaign.getUnitMarket().fillFromXML(workingNode, campaign, version);
                     foundUnitMarket = true;
                 } else if (nodeName.equalsIgnoreCase("lances") || nodeName.equalsIgnoreCase("combatTeams")) {
@@ -2379,11 +2379,11 @@ public record CampaignXmlParser(InputStream is, MekHQ app) {
         cleanupGhostKills(campaign);
 
         // Update the Personnel Modules
-        final AbstractDivorce divorce = options.getRandomDivorceMethod().getMethod(options);
+        final AbstractDivorce divorce = options.get(CampaignOption.RANDOM_DIVORCE_METHOD).getMethod(options);
         campaign.getPlayerForce().getHumanResources().setDivorce(divorce);
-        final AbstractMarriage marriage = options.getRandomMarriageMethod().getMethod(options);
+        final AbstractMarriage marriage = options.get(CampaignOption.RANDOM_MARRIAGE_METHOD).getMethod(options);
         campaign.getPlayerForce().getHumanResources().setMarriage(marriage);
-        final AbstractProcreation procreation = options.getRandomProcreationMethod().getMethod(options);
+        final AbstractProcreation procreation = options.get(CampaignOption.RANDOM_PROCREATION_METHOD).getMethod(options);
         campaign.getPlayerForce().getHumanResources().setProcreation(procreation);
 
         long timestamp = System.currentTimeMillis();
@@ -2568,7 +2568,7 @@ public record CampaignXmlParser(InputStream is, MekHQ app) {
             // This needs to be down here so that it can factor in any changes made to personnel prior to this point.
             unit.resetPilotAndEntity();
         });
-        campaign.refreshNetworks();
+        campaign.getPlayerForce().refreshNetworks(campaign.getGame());
 
         LOGGER.info("[Campaign Load] C3 networks refreshed in {}ms", System.currentTimeMillis() - timestamp);
         timestamp = System.currentTimeMillis();
@@ -2640,7 +2640,7 @@ public record CampaignXmlParser(InputStream is, MekHQ app) {
         }
 
         if (!foundUnitMarket) {
-            campaign.setUnitMarket(campaign.getCampaignOptions().getUnitMarketMethod().getUnitMarket());
+            campaign.setUnitMarket(campaign.getCampaignOptions().get(CampaignOption.UNIT_MARKET_METHOD).getUnitMarket());
         }
 
         if (null == campaign.getPlayerForce().getHumanResources().getRetirementDefectionTracker()) {

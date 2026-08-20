@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016-2025 The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2016-2026 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -49,6 +49,7 @@ import mekhq.campaign.personnel.medical.BodyLocation;
 import mekhq.campaign.personnel.medical.advancedMedical.InjuryUtil;
 import mekhq.campaign.personnel.medical.advancedMedicalAlternate.InjuryEffect;
 import mekhq.campaign.personnel.medical.advancedMedicalAlternate.InjurySubType;
+import mekhq.campaign.campaignOptions.CampaignOption;
 
 /**
  * Flyweight design pattern implementation. InjuryType instances should be singletons and never hold any data related to
@@ -245,9 +246,9 @@ public class InjuryType {
         // Under Alternate Advanced Medical, all healing times are scaled by the campaign's healing-time multiplier.
         // Applying it here ensures every injury-creation path (combat, surgery, diseases, postpartum, complications,
         // etc.) is scaled consistently. Injuries with no recovery time (e.g., permanent modifications) are left alone.
-        if (campaign.getCampaignOptions().isUseAlternativeAdvancedMedical() && recoveryTime > 0) {
+        if (campaign.getCampaignOptions().get(CampaignOption.USE_ALTERNATIVE_ADVANCED_MEDICAL) && recoveryTime > 0) {
             double healingTimeMultiplier = campaign.getCampaignOptions()
-                                                 .getAlternativeAdvancedMedicalHealingTimeMultiplier();
+                                                 .get(CampaignOption.ALTERNATIVE_ADVANCED_MEDICAL_HEALING_TIME_MULTIPLIER);
             if (healingTimeMultiplier != 1.0) {
                 recoveryTime = Math.max(1, (int) Math.round(recoveryTime * healingTimeMultiplier));
             }

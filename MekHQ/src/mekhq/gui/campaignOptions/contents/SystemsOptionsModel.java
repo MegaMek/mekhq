@@ -65,7 +65,7 @@ class SystemsOptionsModel {
     boolean useFactionStandingSupportPoints;
 
     SystemsOptionsModel(@Nonnull CampaignOptions options) {
-        manualUnitRatingModifier = options.getManualUnitRatingModifier();
+        manualUnitRatingModifier = options.get(CampaignOption.MANUAL_UNIT_RATING_MODIFIER);
         resetCriminalRecord = false;
         useChaosReputation = options.get(CampaignOption.USE_CHAOS_REPUTATION);
         campaignLevelChaosReputation = options.get(CampaignOption.CAMPAIGN_LEVEL_CHAOS_REPUTATION);
@@ -74,27 +74,27 @@ class SystemsOptionsModel {
         chaosNoPartialSuccessReputation = options.get(CampaignOption.CHAOS_NO_PARTIAL_SUCCESS_REPUTATION);
         chaosPersonalityAffectsReputation = options.get(CampaignOption.CHAOS_PERSONALITY_AFFECTS_REPUTATION);
         chaosNewRecruitsHaveReputation = options.get(CampaignOption.CHAOS_NEW_RECRUITS_HAVE_REPUTATION);
-        requireSupportForceTransportation = options.isRequireSupportForceTransportation();
-        clampReputationPayMultiplier = options.isClampReputationPayMultiplier();
-        reduceReputationPerformanceModifier = options.isReduceReputationPerformanceModifier();
-        reputationPerformanceModifierCutOff = options.isReputationPerformanceModifierCutOff();
-        trackFactionStanding = options.isTrackFactionStanding();
-        trackClimateRegardChanges = options.isTrackClimateRegardChanges();
-        regardMultiplier = options.getRegardMultiplier();
-        useFactionStandingNegotiation = options.isUseFactionStandingNegotiation();
-        useFactionStandingResupply = options.isUseFactionStandingResupply();
-        useFactionStandingCommandCircuit = options.isUseFactionStandingCommandCircuit();
-        useFactionStandingOutlawed = options.isUseFactionStandingOutlawed();
-        useFactionStandingBatchallRestrictions = options.isUseFactionStandingBatchallRestrictions();
-        useFactionStandingRecruitment = options.isUseFactionStandingRecruitment();
-        useFactionStandingBarracksCosts = options.isUseFactionStandingBarracksCosts();
-        useFactionStandingUnitMarket = options.isUseFactionStandingUnitMarket();
-        useFactionStandingContractPay = options.isUseFactionStandingContractPay();
-        useFactionStandingSupportPoints = options.isUseFactionStandingSupportPoints();
+        requireSupportForceTransportation = options.get(CampaignOption.REQUIRE_SUPPORT_FORCE_TRANSPORTATION);
+        clampReputationPayMultiplier = options.get(CampaignOption.CLAMP_REPUTATION_PAY_MULTIPLIER);
+        reduceReputationPerformanceModifier = options.get(CampaignOption.REDUCE_REPUTATION_PERFORMANCE_MODIFIER);
+        reputationPerformanceModifierCutOff = options.get(CampaignOption.REPUTATION_PERFORMANCE_MODIFIER_CUT_OFF);
+        trackFactionStanding = options.get(CampaignOption.TRACK_FACTION_STANDING);
+        trackClimateRegardChanges = options.get(CampaignOption.TRACK_CLIMATE_REGARD_CHANGES);
+        regardMultiplier = options.get(CampaignOption.REGARD_MULTIPLIER);
+        useFactionStandingNegotiation = options.get(CampaignOption.USE_FACTION_STANDING_NEGOTIATION);
+        useFactionStandingResupply = options.get(CampaignOption.USE_FACTION_STANDING_RESUPPLY);
+        useFactionStandingCommandCircuit = options.get(CampaignOption.USE_FACTION_STANDING_COMMAND_CIRCUIT);
+        useFactionStandingOutlawed = options.get(CampaignOption.USE_FACTION_STANDING_OUTLAWED);
+        useFactionStandingBatchallRestrictions = options.get(CampaignOption.USE_FACTION_STANDING_BATCHALL_RESTRICTIONS);
+        useFactionStandingRecruitment = options.get(CampaignOption.USE_FACTION_STANDING_RECRUITMENT);
+        useFactionStandingBarracksCosts = options.get(CampaignOption.USE_FACTION_STANDING_BARRACKS_COSTS);
+        useFactionStandingUnitMarket = options.get(CampaignOption.USE_FACTION_STANDING_UNIT_MARKET);
+        useFactionStandingContractPay = options.get(CampaignOption.USE_FACTION_STANDING_CONTRACT_PAY);
+        useFactionStandingSupportPoints = options.get(CampaignOption.USE_FACTION_STANDING_SUPPORT_POINTS);
     }
 
     void applyTo(@Nonnull CampaignOptions options) {
-        options.setManualUnitRatingModifier(manualUnitRatingModifier);
+        options.set(CampaignOption.MANUAL_UNIT_RATING_MODIFIER, manualUnitRatingModifier);
         options.set(CampaignOption.USE_CHAOS_REPUTATION, useChaosReputation);
         options.set(CampaignOption.CAMPAIGN_LEVEL_CHAOS_REPUTATION, campaignLevelChaosReputation);
         options.set(CampaignOption.CHAOS_REPUTATION_CAP, chaosReputationCap);
@@ -102,22 +102,22 @@ class SystemsOptionsModel {
         options.set(CampaignOption.CHAOS_NO_PARTIAL_SUCCESS_REPUTATION, chaosNoPartialSuccessReputation);
         options.set(CampaignOption.CHAOS_PERSONALITY_AFFECTS_REPUTATION, chaosPersonalityAffectsReputation);
         options.set(CampaignOption.CHAOS_NEW_RECRUITS_HAVE_REPUTATION, chaosNewRecruitsHaveReputation);
-        options.setRequireSupportForceTransportation(requireSupportForceTransportation);
-        options.setClampReputationPayMultiplier(clampReputationPayMultiplier);
-        options.setReduceReputationPerformanceModifier(reduceReputationPerformanceModifier);
-        options.setReputationPerformanceModifierCutOff(reputationPerformanceModifierCutOff);
-        options.setTrackFactionStanding(trackFactionStanding);
-        options.setTrackClimateRegardChanges(trackClimateRegardChanges);
-        options.setRegardMultiplier(regardMultiplier);
-        options.setUseFactionStandingNegotiation(useFactionStandingNegotiation);
-        options.setUseFactionStandingResupply(useFactionStandingResupply);
-        options.setUseFactionStandingCommandCircuit(useFactionStandingCommandCircuit);
-        options.setUseFactionStandingOutlawed(useFactionStandingOutlawed);
-        options.setUseFactionStandingBatchallRestrictions(useFactionStandingBatchallRestrictions);
-        options.setUseFactionStandingRecruitment(useFactionStandingRecruitment);
-        options.setUseFactionStandingBarracksCosts(useFactionStandingBarracksCosts);
-        options.setUseFactionStandingUnitMarket(useFactionStandingUnitMarket);
-        options.setUseFactionStandingContractPay(useFactionStandingContractPay);
-        options.setUseFactionStandingSupportPoints(useFactionStandingSupportPoints);
+        options.set(CampaignOption.REQUIRE_SUPPORT_FORCE_TRANSPORTATION, requireSupportForceTransportation);
+        options.set(CampaignOption.CLAMP_REPUTATION_PAY_MULTIPLIER, clampReputationPayMultiplier);
+        options.set(CampaignOption.REDUCE_REPUTATION_PERFORMANCE_MODIFIER, reduceReputationPerformanceModifier);
+        options.set(CampaignOption.REPUTATION_PERFORMANCE_MODIFIER_CUT_OFF, reputationPerformanceModifierCutOff);
+        options.set(CampaignOption.TRACK_FACTION_STANDING, trackFactionStanding);
+        options.set(CampaignOption.TRACK_CLIMATE_REGARD_CHANGES, trackClimateRegardChanges);
+        options.set(CampaignOption.REGARD_MULTIPLIER, regardMultiplier);
+        options.set(CampaignOption.USE_FACTION_STANDING_NEGOTIATION, useFactionStandingNegotiation);
+        options.set(CampaignOption.USE_FACTION_STANDING_RESUPPLY, useFactionStandingResupply);
+        options.set(CampaignOption.USE_FACTION_STANDING_COMMAND_CIRCUIT, useFactionStandingCommandCircuit);
+        options.set(CampaignOption.USE_FACTION_STANDING_OUTLAWED, useFactionStandingOutlawed);
+        options.set(CampaignOption.USE_FACTION_STANDING_BATCHALL_RESTRICTIONS, useFactionStandingBatchallRestrictions);
+        options.set(CampaignOption.USE_FACTION_STANDING_RECRUITMENT, useFactionStandingRecruitment);
+        options.set(CampaignOption.USE_FACTION_STANDING_BARRACKS_COSTS, useFactionStandingBarracksCosts);
+        options.set(CampaignOption.USE_FACTION_STANDING_UNIT_MARKET, useFactionStandingUnitMarket);
+        options.set(CampaignOption.USE_FACTION_STANDING_CONTRACT_PAY, useFactionStandingContractPay);
+        options.set(CampaignOption.USE_FACTION_STANDING_SUPPORT_POINTS, useFactionStandingSupportPoints);
     }
 }

@@ -78,6 +78,7 @@ import mekhq.gui.model.UnitTableModel;
 import mekhq.gui.utilities.ImgLabel;
 import mekhq.gui.utilities.MarkdownRenderer;
 import mekhq.gui.utilities.MultiLineTooltip;
+import mekhq.campaign.campaignOptions.CampaignOption;
 
 /**
  * A custom panel that gets filled in with goodies from a unit record
@@ -483,7 +484,7 @@ public class UnitViewPanel extends JScrollablePanel {
         labelConstraints.gridy++;
         valueConstraints.gridy++;
 
-        if (campaign.getCampaignOptions().isUseQuirks() && (entity.countQuirks() > 0)) {
+        if (campaign.getCampaignOptions().get(CampaignOption.USE_QUIRKS) && (entity.countQuirks() > 0)) {
             JLabel lblQuirk = new JLabel();
             lblQuirk.setName("lblQuirk1");
             lblQuirk.setText(getTextAt(RESOURCE_BUNDLE, "lblQuirk1.text"));

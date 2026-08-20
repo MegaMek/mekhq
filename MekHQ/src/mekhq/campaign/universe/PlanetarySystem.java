@@ -63,6 +63,7 @@ import mekhq.campaign.personnel.education.Academy;
 import mekhq.campaign.personnel.education.AcademyFactory;
 import mekhq.campaign.universe.enums.HPGRating;
 import mekhq.campaign.universe.enums.HiringHallLevel;
+import mekhq.campaign.campaignOptions.CampaignOption;
 
 /**
  * This is a PlanetarySystem object that will contain information about the system as well as an ArrayList of the Planet
@@ -763,7 +764,7 @@ public class PlanetarySystem {
                                               && (!setName.equalsIgnoreCase("Prestigious Academies")
                                                         ||
                                                         campaign.getCampaignOptions()
-                                                              .isEnablePrestigiousAcademies())) // Additional
+                                                              .get(CampaignOption.ENABLE_PRESTIGIOUS_ACADEMIES))) // Additional
                      // condition for
                      // "Prestigious
                      // Academies"

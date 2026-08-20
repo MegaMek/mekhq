@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2025 The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2025-2026 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -87,7 +87,7 @@ public class MilestoneUpgradePathDialog {
         // Are any upgrades necessary?
         final List<MilestoneData> upgradePath = getUpgradePath(currentCampaignVersion);
         if (upgradePath.isEmpty()) {
-            LOGGER.info("No upgrade path found for campaign {}", campaign.getName());
+            LOGGER.info("No upgrade path found for campaign {}", campaign.getPlayerForce().getName());
             return;
         }
 

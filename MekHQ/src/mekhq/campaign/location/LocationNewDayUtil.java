@@ -56,6 +56,7 @@ import mekhq.campaign.parts.Refit;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.unit.Maintenance;
 import mekhq.campaign.unit.Unit;
+import mekhq.campaign.campaignOptions.CampaignOption;
 
 /**
  * Utility class for new-day processing of a single {@link IPlace}: maintenance, parts arrival, and unit state
@@ -87,7 +88,7 @@ public final class LocationNewDayUtil {
                     unit.resetEngineer();
                     if (unit.getEngineer() != null) {
                         unit.getEngineer().resetMinutesLeft(
-                              campaign.getCampaignOptions().isTechsUseAdministration());
+                              campaign.getCampaignOptions().get(CampaignOption.TECHS_USE_ADMINISTRATION));
                     }
                     Maintenance.doMaintenance(campaign, unit);
                 } catch (Exception ex) {
@@ -122,7 +123,7 @@ public final class LocationNewDayUtil {
 
                     // If we're in transit and we don't allow deliveries while in transit the part will remain fixed
                     // with a delivery time of 1 day until we arrive at our destination.
-                    if (campaign.getCampaignOptions().isNoDeliveriesInTransit() &&
+                    if (campaign.getCampaignOptions().get(CampaignOption.NO_DELIVERIES_IN_TRANSIT) &&
                               !place.isOnPlanet() &&
                               newDaysToArrival <= 0) {
                         return;
@@ -209,7 +210,7 @@ public final class LocationNewDayUtil {
                 }
                 if (!unit.isPresent()) {
                     unit.checkArrival(!place.isOnPlanet() &&
-                                            campaign.getCampaignOptions().isNoDeliveriesInTransit());
+                                            campaign.getCampaignOptions().get(CampaignOption.NO_DELIVERIES_IN_TRANSIT));
                     // Has unit just been delivered?
                     if (unit.isPresent()) {
                         campaign.addReport(ACQUISITIONS, getFormattedTextAt(RESOURCE_BUNDLE,

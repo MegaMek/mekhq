@@ -213,7 +213,7 @@ public class PerformBatchall {
      */
     private String getBatchallIntroText(Person clanOpponent) {
         final String bundleKey = "performBatchall." + standingLevel.name() + ".batchall." + batchallVersion + ".intro";
-        final String campaignName = campaign.getName();
+        final String campaignName = campaign.getPlayerForce().getName();
         final String opponentName = clanOpponent == null ? "" : clanOpponent.getFullTitle();
 
         Faction opponentClan = Factions.getInstance().getFaction(enemyFactionCode);
@@ -302,7 +302,7 @@ public class PerformBatchall {
               campaign.getPlayerForce().getHumanResources()
                     .getSeniorAdminPerson(mekhq.campaign.Campaign.AdministratorSpecialization.COMMAND,
                           campaign.getCampaignOptions(),
-                          campaign.isClanCampaign(),
+                          campaign.getPlayerForce().isClanForce(),
                           campaign.getLocalDate()),
               null,
               getAreYouSureDialogText(),

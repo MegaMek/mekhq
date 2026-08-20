@@ -89,6 +89,7 @@ import mekhq.campaign.universe.factionHints.FactionHints;
 import mekhq.campaign.universe.factionStanding.FactionStandingUtilities;
 import mekhq.campaign.universe.factionStanding.FactionStandings;
 import mekhq.gui.dialog.PlanetarySystemEditorDialog;
+import mekhq.campaign.campaignOptions.CampaignOption;
 
 /**
  * This is not functional yet. Just testing things out. A lot of this code is borrowed from InterstellarMap.java in
@@ -490,12 +491,12 @@ public class InterstellarMapPanel extends JPanel {
                     final double x = map2scrX(selectedSystem.getX());
                     final double y = map2scrY(selectedSystem.getY());
                     // Contract Search Radius Aura
-                    if (!InterstellarMapPanel.this.campaign.getCampaignOptions().getContractMarketMethod().isNone()
+                    if (!InterstellarMapPanel.this.campaign.getCampaignOptions().get(CampaignOption.CONTRACT_MARKET_METHOD).isNone()
                               && MekHQ.getMHQOptions().getInterstellarMapShowContractSearchRadius()) {
                         final double z = map2scrX(selectedSystem.getX()
                                                         +
                                                         InterstellarMapPanel.this.campaign.getCampaignOptions()
-                                                              .getContractSearchRadius());
+                                                              .get(CampaignOption.CONTRACT_SEARCH_RADIUS));
                         final double contractSearchRadius = z - x;
                         g2.setPaint(MekHQ.getMHQOptions().getInterstellarMapContractSearchRadiusColour());
                         g2.setStroke(dashedThick);
@@ -504,7 +505,7 @@ public class InterstellarMapPanel extends JPanel {
                     }
 
                     // Acquisition Search Radius Aura
-                    if (InterstellarMapPanel.this.campaign.getCampaignOptions().isUsePlanetaryAcquisition()
+                    if (InterstellarMapPanel.this.campaign.getCampaignOptions().get(CampaignOption.USE_PLANETARY_ACQUISITION)
                               && MekHQ.getMHQOptions().getInterstellarMapShowPlanetaryAcquisitionRadius()
                               && (conf.scale > MekHQ.getMHQOptions()
                                                      .getInterstellarMapShowPlanetaryAcquisitionRadiusMinimumZoom())) {
@@ -512,7 +513,7 @@ public class InterstellarMapPanel extends JPanel {
                                                         + (MHQConstants.MAX_JUMP_RADIUS
                                                                  *
                                                                  InterstellarMapPanel.this.campaign.getCampaignOptions()
-                                                                       .getMaxJumpsPlanetaryAcquisition()));
+                                                                       .get(CampaignOption.MAX_JUMPS_PLANETARY_ACQUISITION)));
                         final double acquisitionRadius = z - x;
                         g2.setPaint(MekHQ.getMHQOptions().getInterstellarMapPlanetaryAcquisitionRadiusColour());
                         g2.setStroke(dashedThick);
@@ -772,7 +773,7 @@ public class InterstellarMapPanel extends JPanel {
 
                 boolean isUseFactionStandingOutlawing =
                       campaign.getCampaignOptions().isUseFactionStandingOutlawedSafe();
-                Faction campaignFaction = campaign.getFaction();
+                Faction campaignFaction = campaign.getPlayerForce().getFaction();
                 FactionStandings factionStandings = campaign.getPlayerForce().getFactionStandings();
                 LocalDate today = campaign.getLocalDate();
                 List<AbstractContract> activeAtBContracts = campaign.getActiveContracts();

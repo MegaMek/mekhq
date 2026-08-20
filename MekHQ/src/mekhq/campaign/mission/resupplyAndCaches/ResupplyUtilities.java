@@ -106,7 +106,7 @@ public class ResupplyUtilities {
             }
 
             if (formation.isFormationType(CONVOY) && formation.getScenarioId() == scenarioId) {
-                Person speaker = campaign.getPerson(formation.getFormationCommanderID());
+                Person speaker = campaign.getPlayerForce().getHumanResources().getPerson(formation.getFormationCommanderID());
 
                 String commanderAddress = campaign.getCommanderAddress();
                 String inCharacterMessage = getFormattedTextAt(RESOURCE_BUNDLE,

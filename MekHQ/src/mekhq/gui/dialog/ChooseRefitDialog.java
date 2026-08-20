@@ -1,6 +1,6 @@
 /*
  * Copyright (c) 2009 Jay Lawson (jaylawson39 at yahoo.com). All rights reserved.
- * Copyright (C) 2013-2025 The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2013-2026 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -65,6 +65,7 @@ import mekhq.Utilities;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.parts.Refit;
 import mekhq.campaign.unit.Unit;
+import mekhq.campaign.campaignOptions.CampaignOption;
 
 /**
  * @author Taharqa
@@ -275,7 +276,7 @@ public class ChooseRefitDialog extends JDialog {
             return;
         }
 
-        btnRefit.setEnabled(!campaign.getCampaignOptions().isAllowCanonRefitOnly() || r.getNewEntity().isCanon());
+        btnRefit.setEnabled(!campaign.getCampaignOptions().get(CampaignOption.ALLOW_CANON_REFIT_ONLY) || r.getNewEntity().isCanon());
         btnCustomize.setEnabled(true);
 
         JList<String> lstShopping = new JList<>(r.getShoppingListDescription());

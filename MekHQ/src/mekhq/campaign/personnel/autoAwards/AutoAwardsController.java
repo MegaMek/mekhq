@@ -48,6 +48,7 @@ import mekhq.campaign.personnel.Award;
 import mekhq.campaign.personnel.AwardsFactory;
 import mekhq.campaign.personnel.Person;
 import mekhq.gui.dialog.AutoAwardsDialog;
+import mekhq.campaign.campaignOptions.CampaignOption;
 
 public class AutoAwardsController {
     private Campaign campaign;
@@ -260,7 +261,7 @@ public class AutoAwardsController {
      */
     private List<UUID> getPersonnel() {
         // Get whether to issue posthumous awards from campaign options.
-        boolean issuePosthumous = campaign.getCampaignOptions().isIssuePosthumousAwards();
+        boolean issuePosthumous = campaign.getCampaignOptions().get(CampaignOption.ISSUE_POSTHUMOUS_AWARDS);
 
         // Get the last mission end date.
         LocalDate lastMissionEndDate = getLastMissionEndDate();
@@ -358,12 +359,12 @@ public class AutoAwardsController {
         ArrayList<Award> awards = new ArrayList<>();
         List<String> allSetNames = AwardsFactory.getInstance().getAllSetNames();
 
-        if (campaign.getCampaignOptions().isIgnoreStandardSet()) {
+        if (campaign.getCampaignOptions().get(CampaignOption.IGNORE_STANDARD_SET)) {
             allSetNames.removeIf(setName -> setName.equalsIgnoreCase("standard"));
             logger.info("Ignoring the Standard Set");
         }
 
-        String[] filterList = campaign.getCampaignOptions().getAwardSetFilterList().split(",");
+        String[] filterList = campaign.getCampaignOptions().get(CampaignOption.AWARD_SET_FILTER_LIST).split(",");
 
         // we start by building a primary list of all awards
         logger.info("Getting all Award Sets");
@@ -397,7 +398,7 @@ public class AutoAwardsController {
                         case "kill":
                             if ((!award.getRange().equalsIgnoreCase("scenario"))
                                       && (!award.getRange().equalsIgnoreCase("mission"))) {
-                                if (campaign.getCampaignOptions().isEnableFormationKillAwards()) {
+                                if (campaign.getCampaignOptions().get(CampaignOption.ENABLE_FORMATION_KILL_AWARDS)) {
                                     killAwards.add(award);
                                 } else {
                                     ignoredAwards.add(award);
@@ -407,35 +408,35 @@ public class AutoAwardsController {
                             }
                             break;
                         case "misc":
-                            if (campaign.getCampaignOptions().isEnableMiscAwards()) {
+                            if (campaign.getCampaignOptions().get(CampaignOption.ENABLE_MISC_AWARDS)) {
                                 miscAwards.add(award);
                             } else {
                                 ignoredAwards.add(award);
                             }
                             break;
                         case "rank":
-                            if (campaign.getCampaignOptions().isEnableRankAwards()) {
+                            if (campaign.getCampaignOptions().get(CampaignOption.ENABLE_RANK_AWARDS)) {
                                 rankAwards.add(award);
                             } else {
                                 ignoredAwards.add(award);
                             }
                             break;
                         case "scenario":
-                            if (campaign.getCampaignOptions().isEnableScenarioAwards()) {
+                            if (campaign.getCampaignOptions().get(CampaignOption.ENABLE_SCENARIO_AWARDS)) {
                                 scenarioAwards.add(award);
                             } else {
                                 ignoredAwards.add(award);
                             }
                             break;
                         case "skill":
-                            if (campaign.getCampaignOptions().isEnableSkillAwards()) {
+                            if (campaign.getCampaignOptions().get(CampaignOption.ENABLE_SKILL_AWARDS)) {
                                 skillAwards.add(award);
                             } else {
                                 ignoredAwards.add(award);
                             }
                             break;
                         case "time":
-                            if (campaign.getCampaignOptions().isEnableTimeAwards()) {
+                            if (campaign.getCampaignOptions().get(CampaignOption.ENABLE_TIME_AWARDS)) {
                                 timeAwards.add(award);
                             } else {
                                 ignoredAwards.add(award);
@@ -471,14 +472,14 @@ public class AutoAwardsController {
                         case "divider":
                             break;
                         case "contract":
-                            if (campaign.getCampaignOptions().isEnableContractAwards()) {
+                            if (campaign.getCampaignOptions().get(CampaignOption.ENABLE_CONTRACT_AWARDS)) {
                                 contractAwards.add(award);
                             } else {
                                 ignoredAwards.add(award);
                             }
                             break;
                         case "factionhunter":
-                            if (campaign.getCampaignOptions().isEnableFactionHunterAwards()) {
+                            if (campaign.getCampaignOptions().get(CampaignOption.ENABLE_FACTION_HUNTER_AWARDS)) {
                                 factionHunterAwards.add(award);
                             } else {
                                 ignoredAwards.add(award);
@@ -491,8 +492,8 @@ public class AutoAwardsController {
                         case "kill":
                             // Scenario Kill Awards are handled by the post-scenario controller
                             if (!award.getRange().equalsIgnoreCase("scenario")) {
-                                if ((campaign.getCampaignOptions().isEnableIndividualKillAwards())
-                                          || (campaign.getCampaignOptions().isEnableFormationKillAwards())) {
+                                if ((campaign.getCampaignOptions().get(CampaignOption.ENABLE_INDIVIDUAL_KILL_AWARDS))
+                                          || (campaign.getCampaignOptions().get(CampaignOption.ENABLE_FORMATION_KILL_AWARDS))) {
                                     killAwards.add(award);
                                 } else {
                                     ignoredAwards.add(award);
@@ -502,42 +503,42 @@ public class AutoAwardsController {
                             }
                             break;
                         case "misc":
-                            if (campaign.getCampaignOptions().isEnableMiscAwards()) {
+                            if (campaign.getCampaignOptions().get(CampaignOption.ENABLE_MISC_AWARDS)) {
                                 miscAwards.add(award);
                             } else {
                                 ignoredAwards.add(award);
                             }
                             break;
                         case "rank":
-                            if (campaign.getCampaignOptions().isEnableRankAwards()) {
+                            if (campaign.getCampaignOptions().get(CampaignOption.ENABLE_RANK_AWARDS)) {
                                 rankAwards.add(award);
                             } else {
                                 ignoredAwards.add(award);
                             }
                             break;
                         case "scenario":
-                            if (campaign.getCampaignOptions().isEnableScenarioAwards()) {
+                            if (campaign.getCampaignOptions().get(CampaignOption.ENABLE_SCENARIO_AWARDS)) {
                                 scenarioAwards.add(award);
                             } else {
                                 ignoredAwards.add(award);
                             }
                             break;
                         case "skill":
-                            if (campaign.getCampaignOptions().isEnableSkillAwards()) {
+                            if (campaign.getCampaignOptions().get(CampaignOption.ENABLE_SKILL_AWARDS)) {
                                 skillAwards.add(award);
                             } else {
                                 ignoredAwards.add(award);
                             }
                             break;
                         case "theatreofwar":
-                            if (campaign.getCampaignOptions().isEnableTheatreOfWarAwards()) {
+                            if (campaign.getCampaignOptions().get(CampaignOption.ENABLE_THEATRE_OF_WAR_AWARDS)) {
                                 theatreOfWarAwards.add(award);
                             } else {
                                 ignoredAwards.add(award);
                             }
                             break;
                         case "time":
-                            if (campaign.getCampaignOptions().isEnableTimeAwards()) {
+                            if (campaign.getCampaignOptions().get(CampaignOption.ENABLE_TIME_AWARDS)) {
                                 timeAwards.add(award);
                             } else {
                                 ignoredAwards.add(award);
@@ -570,27 +571,27 @@ public class AutoAwardsController {
                         case "divider":
                             break;
                         case "kill":
-                            if ((campaign.getCampaignOptions().isEnableIndividualKillAwards()) &&
+                            if ((campaign.getCampaignOptions().get(CampaignOption.ENABLE_INDIVIDUAL_KILL_AWARDS)) &&
                                       (award.getRange().equalsIgnoreCase("scenario"))) {
 
                                 killAwards.add(award);
                             }
                             break;
                         case "injury":
-                            if (campaign.getCampaignOptions().isEnableInjuryAwards()) {
+                            if (campaign.getCampaignOptions().get(CampaignOption.ENABLE_INJURY_AWARDS)) {
 
                                 injuryAwards.add(award);
                             }
                             break;
                         case "misc":
-                            if (campaign.getCampaignOptions().isEnableMiscAwards()) {
+                            if (campaign.getCampaignOptions().get(CampaignOption.ENABLE_MISC_AWARDS)) {
                                 miscAwards.add(award);
                             } else {
                                 ignoredAwards.add(award);
                             }
                             break;
                         case "scenario":
-                            if (campaign.getCampaignOptions().isEnableScenarioAwards()) {
+                            if (campaign.getCampaignOptions().get(CampaignOption.ENABLE_SCENARIO_AWARDS)) {
                                 scenarioAwards.add(award);
                             } else {
                                 ignoredAwards.add(award);
@@ -616,7 +617,7 @@ public class AutoAwardsController {
                         case "divider":
                             break;
                         case "training":
-                            if (campaign.getCampaignOptions().isEnableTrainingAwards()) {
+                            if (campaign.getCampaignOptions().get(CampaignOption.ENABLE_TRAINING_AWARDS)) {
                                 trainingAwards.add(award);
                             }
                             break;
@@ -636,7 +637,7 @@ public class AutoAwardsController {
                         case "divider":
                             break;
                         case "rank":
-                            if (campaign.getCampaignOptions().isEnableRankAwards()) {
+                            if (campaign.getCampaignOptions().get(CampaignOption.ENABLE_RANK_AWARDS)) {
                                 rankAwards.add(award);
                             }
                             break;

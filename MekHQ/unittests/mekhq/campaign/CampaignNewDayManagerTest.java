@@ -41,6 +41,7 @@ import megamek.common.equipment.EquipmentType;
 import mekhq.MHQOptions;
 import mekhq.MekHQ;
 import mekhq.campaign.campaignOptions.CampaignOptions;
+import mekhq.campaign.campaignOptions.CampaignOption;
 import mekhq.campaign.personnel.enums.PersonnelRole;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
@@ -175,7 +176,7 @@ public class CampaignNewDayManagerTest {
         @Test
         void testDailyProcessingIsolation() {
             // Arrange
-            campaignOptions.setUseBlobInfantry(true);
+            campaignOptions.set(CampaignOption.USE_BLOB_INFANTRY, true);
             mhqOptions.setNewDaySoldierPoolFill(true);
 
             testCampaign.getPlayerForce().getHumanResources().setTempCrewPool(testCampaign, PersonnelRole.SOLDIER, 10);
@@ -200,14 +201,14 @@ public class CampaignNewDayManagerTest {
          */
         private void configureCampaignOption(PersonnelRole role, boolean enabled) {
             switch (role) {
-                case SOLDIER -> campaignOptions.setUseBlobInfantry(enabled);
-                case BATTLE_ARMOUR -> campaignOptions.setUseBlobBattleArmor(enabled);
-                case VEHICLE_CREW_GROUND -> campaignOptions.setUseBlobVehicleCrewGround(enabled);
-                case VEHICLE_CREW_VTOL -> campaignOptions.setUseBlobVehicleCrewVTOL(enabled);
-                case VEHICLE_CREW_NAVAL -> campaignOptions.setUseBlobVehicleCrewNaval(enabled);
-                case VESSEL_PILOT -> campaignOptions.setUseBlobVesselPilot(enabled);
-                case VESSEL_GUNNER -> campaignOptions.setUseBlobVesselGunner(enabled);
-                case VESSEL_CREW -> campaignOptions.setUseBlobVesselCrew(enabled);
+                case SOLDIER -> campaignOptions.set(CampaignOption.USE_BLOB_INFANTRY, enabled);
+                case BATTLE_ARMOUR -> campaignOptions.set(CampaignOption.USE_BLOB_BATTLE_ARMOR, enabled);
+                case VEHICLE_CREW_GROUND -> campaignOptions.set(CampaignOption.USE_BLOB_VEHICLE_CREW_GROUND, enabled);
+                case VEHICLE_CREW_VTOL -> campaignOptions.set(CampaignOption.USE_BLOB_VEHICLE_CREW_VTOL, enabled);
+                case VEHICLE_CREW_NAVAL -> campaignOptions.set(CampaignOption.USE_BLOB_VEHICLE_CREW_NAVAL, enabled);
+                case VESSEL_PILOT -> campaignOptions.set(CampaignOption.USE_BLOB_VESSEL_PILOT, enabled);
+                case VESSEL_GUNNER -> campaignOptions.set(CampaignOption.USE_BLOB_VESSEL_GUNNER, enabled);
+                case VESSEL_CREW -> campaignOptions.set(CampaignOption.USE_BLOB_VESSEL_CREW, enabled);
             }
         }
 

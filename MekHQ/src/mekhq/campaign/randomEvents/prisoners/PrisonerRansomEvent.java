@@ -155,7 +155,7 @@ public class PrisonerRansomEvent {
               campaign.getPlayerForce().getHumanResources()
                     .getSeniorAdminPerson(Campaign.AdministratorSpecialization.COMMAND,
                           campaign.getCampaignOptions(),
-                          campaign.isClanCampaign(),
+                          campaign.getPlayerForce().isClanForce(),
                           campaign.getLocalDate()),
               null,
               inCharacterMessage,

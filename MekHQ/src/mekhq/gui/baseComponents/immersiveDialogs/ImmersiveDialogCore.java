@@ -716,7 +716,7 @@ public class ImmersiveDialogCore extends JDialog {
         speakerBox.setMaximumSize(new Dimension(IMAGE_WIDTH, scaleForGUI(MAX_VALUE)));
 
         // Get speaker details
-        String speakerName = campaign.getName();
+        String speakerName = campaign.getPlayerForce().getName();
         if (speaker != null) {
             speakerName = speaker.getFullTitle();
         }
@@ -787,7 +787,7 @@ public class ImmersiveDialogCore extends JDialog {
         if (speaker != null) {
             speakerDescription.append("<b>").append(speakerName).append("</b>");
 
-            boolean isClan = campaign.getFaction().isClan();
+            boolean isClan = campaign.getPlayerForce().getFaction().isClan();
 
             PersonnelRole primaryRole = speaker.getPrimaryRole();
             if (!primaryRole.isNone()) {
@@ -812,7 +812,7 @@ public class ImmersiveDialogCore extends JDialog {
                 }
             }
         } else {
-            speakerDescription.append("<b>").append(campaign.getName()).append("</b>");
+            speakerDescription.append("<b>").append(campaign.getPlayerForce().getName()).append("</b>");
         }
         return speakerDescription;
     }

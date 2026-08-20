@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2019-2025 The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2019-2026 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -136,7 +136,7 @@ public class RangedFactionSelector extends AbstractFactionSelector {
         final PlanetarySystem currentSystem = centralPlanet.getParentSystem();
 
         final LocalDate now = campaign.getLocalDate();
-        final boolean isClan = campaign.getFaction().isClan();
+        final boolean isClan = campaign.getPlayerForce().getFaction().isClan();
 
         final Map<Faction, Double> weights = new HashMap<>();
         Systems.getInstance().visitNearbySystems(currentSystem, getOptions().getOriginSearchRadius(),
@@ -185,7 +185,7 @@ public class RangedFactionSelector extends AbstractFactionSelector {
                 // ... and if we're not a clan faction, we can have mercs too.
                 factions.add(1.0, mercenaries);
             }
-            factions.add(2.0, campaign.getFaction());
+            factions.add(2.0, campaign.getPlayerForce().getFaction());
 
             setCachedDate(now);
             setCachedPlanet(centralPlanet);
@@ -215,7 +215,7 @@ public class RangedFactionSelector extends AbstractFactionSelector {
                 // ... and if we're not a clan faction, we can have mercs too.
                 factions.add(1.0, mercenaries);
             }
-            factions.add(2.0, campaign.getFaction());
+            factions.add(2.0, campaign.getPlayerForce().getFaction());
         } else {
             if (!isClan) {
                 // There is a good chance they're a merc if we're not a clan faction!
@@ -223,7 +223,7 @@ public class RangedFactionSelector extends AbstractFactionSelector {
                 factions.add((total == 0.0) ? 1.0 : total + total * getFactionWeight(mercenaries), mercenaries);
             } else {
                 // There is a lopsided chance they're from the campaign faction if it is a clan faction.
-                factions.add((total == 0.0) ? 1.0 : total + (15 * total), campaign.getFaction());
+                factions.add((total == 0.0) ? 1.0 : total + (15 * total), campaign.getPlayerForce().getFaction());
             }
         }
 

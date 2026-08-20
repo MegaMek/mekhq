@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2025 The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2025-2026 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -47,6 +47,7 @@ import java.util.EnumSet;
 import megamek.common.enums.Gender;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.campaignOptions.CampaignOptions;
+import mekhq.campaign.campaignOptions.CampaignOption;
 import mekhq.campaign.personnel.enums.InjuryLevel;
 import mekhq.campaign.personnel.medical.BodyLocation;
 import mekhq.campaign.personnel.medical.advancedMedical.InjuryUtil;
@@ -242,8 +243,8 @@ class InjuryTypeTest {
         CampaignOptions campaignOptions = mock(CampaignOptions.class);
         when(campaign.getCampaignOptions()).thenReturn(campaignOptions);
         when(campaign.getLocalDate()).thenReturn(LocalDate.of(3151, 1, 1));
-        when(campaignOptions.isUseAlternativeAdvancedMedical()).thenReturn(useAlternateAdvancedMedical);
-        when(campaignOptions.getAlternativeAdvancedMedicalHealingTimeMultiplier()).thenReturn(healingTimeMultiplier);
+        when(campaignOptions.get(CampaignOption.USE_ALTERNATIVE_ADVANCED_MEDICAL)).thenReturn(useAlternateAdvancedMedical);
+        when(campaignOptions.get(CampaignOption.ALTERNATIVE_ADVANCED_MEDICAL_HEALING_TIME_MULTIPLIER)).thenReturn(healingTimeMultiplier);
         return campaign;
     }
 
