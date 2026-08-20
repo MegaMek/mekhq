@@ -86,6 +86,9 @@ public class AbstractContractGeneration {
           FactionStandings factionStandings, boolean overridingCommandCircuitRequirements, boolean isGM,
           boolean provingGround) {
         final ChaosContract contract = new ChaosContract();
+        // Inject the options so the contract's term getters apply the configured per-term multipliers even while the
+        // offer is still in the market (before it is accepted and registered on the campaign).
+        contract.setCampaignOptions(campaignOptions);
         contract.setProvingGround(provingGround);
 
         // Step 1: Employer

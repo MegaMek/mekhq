@@ -845,17 +845,28 @@ public class ContractNegotiationDialog extends JDialog {
     }
 
     private String valueOf(Clause clause, ChaosContractStepsTable step) {
+        // Show the effective term value: the step multiplier scaled by the campaign's configured per-term multiplier,
+        // so the negotiation screen matches the pay/salvage the contract will actually deliver.
         return switch (clause) {
             case COMMAND -> step.getContractCommandRights().toString();
-            case PAY -> percent(step.getBasePayMultiplier());
+            case PAY -> percent(step.getBasePayMultiplier() * termOption(CampaignOption.CONTRACT_BASE_PAY_MULTIPLIER));
             case SUPPORT -> getFormattedTextAt(RESOURCE_BUNDLE, "negotiate.contractMarket.value.support",
-                  (int) Math.round(step.getStraightSupportMultiplier() * 100),
-                  (int) Math.round(step.getBattlefieldLossMultiplier() * 100));
-            case TRANSPORT -> percent(step.getTransportMultiplier());
+                  (int) Math.round(step.getStraightSupportMultiplier()
+                                         * termOption(CampaignOption.CONTRACT_STRAIGHT_SUPPORT_MULTIPLIER) * 100),
+                  (int) Math.round(step.getBattlefieldLossMultiplier()
+                                         * termOption(CampaignOption.CONTRACT_BATTLEFIELD_LOSS_MULTIPLIER) * 100));
+            case TRANSPORT ->
+                  percent(step.getTransportMultiplier() * termOption(CampaignOption.CONTRACT_TRANSPORT_MULTIPLIER));
             case SALVAGE -> step.isExchangeSalvage()
                                   ? getTextAt(RESOURCE_BUNDLE, "value.contractMarket.salvage.exchange")
-                                  : percent(step.getSalvageMultiplier());
+                                  : percent(step.getSalvageMultiplier()
+                                                  * termOption(CampaignOption.CONTRACT_SALVAGE_MULTIPLIER));
         };
+    }
+
+    /** The campaign's configured multiplier for a contract term (base pay, support, transport, salvage, etc.). */
+    private double termOption(CampaignOption<Double> option) {
+        return campaign.getCampaignOptions().get(option);
     }
 
     private String percent(double multiplier) {

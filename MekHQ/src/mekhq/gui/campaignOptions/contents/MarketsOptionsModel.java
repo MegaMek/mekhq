@@ -71,6 +71,11 @@ class MarketsOptionsModel {
     int contractMaxSalvagePercentage;
     int dropShipBonusPercentage;
     int pityContracts;
+    double contractBasePayMultiplier;
+    double contractStraightSupportMultiplier;
+    double contractBattlefieldLossMultiplier;
+    double contractTransportMultiplier;
+    double contractSalvageMultiplier;
     boolean useChaosSupportPointConversion;
     boolean useLegacyContractPay;
     boolean equipmentContractBase;
@@ -111,6 +116,11 @@ class MarketsOptionsModel {
         contractMaxSalvagePercentage = options.get(CampaignOption.CONTRACT_MAX_SALVAGE_PERCENTAGE);
         dropShipBonusPercentage = options.get(CampaignOption.DROP_SHIP_BONUS_PERCENTAGE);
         pityContracts = options.get(CampaignOption.PITY_CONTRACTS);
+        contractBasePayMultiplier = options.get(CampaignOption.CONTRACT_BASE_PAY_MULTIPLIER);
+        contractStraightSupportMultiplier = options.get(CampaignOption.CONTRACT_STRAIGHT_SUPPORT_MULTIPLIER);
+        contractBattlefieldLossMultiplier = options.get(CampaignOption.CONTRACT_BATTLEFIELD_LOSS_MULTIPLIER);
+        contractTransportMultiplier = options.get(CampaignOption.CONTRACT_TRANSPORT_MULTIPLIER);
+        contractSalvageMultiplier = options.get(CampaignOption.CONTRACT_SALVAGE_MULTIPLIER);
         useChaosSupportPointConversion = options.get(CampaignOption.USE_CHAOS_SUPPORT_POINT_CONVERSION);
         useLegacyContractPay = options.get(CampaignOption.USE_LEGACY_CONTRACT_PAY);
         equipmentContractBase = options.get(CampaignOption.EQUIPMENT_CONTRACT_BASE);
@@ -166,6 +176,11 @@ class MarketsOptionsModel {
         options.set(CampaignOption.CONTRACT_MAX_SALVAGE_PERCENTAGE, contractMaxSalvagePercentage);
         options.set(CampaignOption.DROP_SHIP_BONUS_PERCENTAGE, dropShipBonusPercentage);
         options.set(CampaignOption.PITY_CONTRACTS, pityContracts);
+        options.set(CampaignOption.CONTRACT_BASE_PAY_MULTIPLIER, contractBasePayMultiplier);
+        options.set(CampaignOption.CONTRACT_STRAIGHT_SUPPORT_MULTIPLIER, contractStraightSupportMultiplier);
+        options.set(CampaignOption.CONTRACT_BATTLEFIELD_LOSS_MULTIPLIER, contractBattlefieldLossMultiplier);
+        options.set(CampaignOption.CONTRACT_TRANSPORT_MULTIPLIER, contractTransportMultiplier);
+        options.set(CampaignOption.CONTRACT_SALVAGE_MULTIPLIER, contractSalvageMultiplier);
         options.set(CampaignOption.USE_CHAOS_SUPPORT_POINT_CONVERSION, useChaosSupportPointConversion);
         options.set(CampaignOption.USE_LEGACY_CONTRACT_PAY, useLegacyContractPay);
         options.set(CampaignOption.EQUIPMENT_CONTRACT_BASE, equipmentContractBase);

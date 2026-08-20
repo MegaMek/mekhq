@@ -769,6 +769,16 @@ public final class CampaignOption<T> {
           of(Boolean.class, true, "useChaosScaleSupportPointConversion");
     public static final CampaignOption<Boolean> USE_CONTRACT_FACTION_MODIFIERS =
           of(Boolean.class, true, "useContractFactionModifiers");
+    public static final CampaignOption<Double> CONTRACT_BASE_PAY_MULTIPLIER =
+          of(Double.class, 1.0, "contractBasePayMultiplier");
+    public static final CampaignOption<Double> CONTRACT_STRAIGHT_SUPPORT_MULTIPLIER =
+          of(Double.class, 1.0, "contractStraightSupportMultiplier");
+    public static final CampaignOption<Double> CONTRACT_BATTLEFIELD_LOSS_MULTIPLIER =
+          of(Double.class, 1.0, "contractBattlefieldLossMultiplier");
+    public static final CampaignOption<Double> CONTRACT_TRANSPORT_MULTIPLIER =
+          of(Double.class, 1.0, "contractTransportMultiplier");
+    public static final CampaignOption<Double> CONTRACT_SALVAGE_MULTIPLIER =
+          of(Double.class, 1.0, "contractSalvageMultiplier");
     public static final CampaignOption<Boolean> USE_LEGACY_CONTRACT_PAY =
           of(Boolean.class, false, "useLegacyContractPay");
     public static final CampaignOption<Boolean> USE_ALTERNATE_PAYMENT_MODE =

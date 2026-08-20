@@ -917,6 +917,7 @@ public class Campaign implements ITechManager {
      * @param mission The mission to be added
      */
     public void addMission(AbstractContract mission) {
+        mission.setCampaignOptions(getCampaignOptions());
         contractHistory.contractHistory().put(mission.getId(), mission);
         MekHQ.triggerEvent(new MissionNewEvent(mission));
     }
@@ -927,6 +928,7 @@ public class Campaign implements ITechManager {
      * @param mission Mission to import into the campaign.
      */
     public void importMission(final AbstractContract mission) {
+        mission.setCampaignOptions(getCampaignOptions());
         mission.getScenarios().forEach(this::importScenario);
         contractHistory.contractHistory().put(mission.getId(), mission);
         MekHQ.triggerEvent(new MissionNewEvent(mission));

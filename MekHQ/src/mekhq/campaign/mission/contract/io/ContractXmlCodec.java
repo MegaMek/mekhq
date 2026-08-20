@@ -427,6 +427,9 @@ public final class ContractXmlCodec {
         if (contract == null) {
             return null;
         }
+        // Inject the options so the term getters apply the configured per-term multipliers for every deserialized
+        // contract, including market offers that are never registered as campaign missions.
+        contract.setCampaignOptions(campaign.getCampaignOptions());
 
         final NodeList children = node.getChildNodes();
         for (int i = 0; i < children.getLength(); i++) {

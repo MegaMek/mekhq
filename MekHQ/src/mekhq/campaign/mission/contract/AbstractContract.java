@@ -49,6 +49,8 @@ import megamek.common.icons.Camouflage;
 import mekhq.campaign.AbstractLocation;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.JumpPath;
+import mekhq.campaign.campaignOptions.CampaignOption;
+import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.digitalGM.stratCon.StratConCampaignState;
 import mekhq.campaign.digitalGM.stratCon.SupportPointNegotiation;
 import mekhq.campaign.finances.Money;
@@ -115,6 +117,14 @@ public abstract class AbstractContract {
      * is written from {@link #playerNegotiator}.</p>
      */
     private transient UUID pendingPlayerNegotiatorId;
+
+    /**
+     * The active campaign options, injected so the term getters can apply the campaign's configured per-term
+     * multipliers (base pay, straight support, battlefield loss, transport, salvage). Transient and never serialized;
+     * set at generation, on load ({@link Campaign#importMission}), and on registration ({@link Campaign#addMission}).
+     * When absent the term multipliers fall back to no adjustment (x1.0).
+     */
+    private transient CampaignOptions campaignOptions;
 
     /** Percentage of each monthly payment distributed to shareholding personnel. */
     private int sharesPercent = DEFAULT_SHARES_PERCENT;
@@ -779,7 +789,24 @@ public abstract class AbstractContract {
     }
 
     public double getBasePayMultiplier() {
-        return getBasePayRateStep().getBasePayMultiplier();
+        return getBasePayRateStep().getBasePayMultiplier() * contractTermMultiplier(
+              CampaignOption.CONTRACT_BASE_PAY_MULTIPLIER);
+    }
+
+    /**
+     * Injects the active campaign options so the term getters can apply the configured per-term multipliers. Set at
+     * generation, on load, and on mission registration; when unset the getters apply no adjustment.
+     */
+    public void setCampaignOptions(CampaignOptions campaignOptions) {
+        this.campaignOptions = campaignOptions;
+    }
+
+    /**
+     * The campaign's configured multiplier for a contract term, or {@code 1.0} (no adjustment) when the options have
+     * not been injected.
+     */
+    private double contractTermMultiplier(CampaignOption<Double> option) {
+        return campaignOptions == null ? 1.0 : campaignOptions.get(option);
     }
 
     public ChaosContractStepsTable getSupportStep() {
@@ -787,11 +814,13 @@ public abstract class AbstractContract {
     }
 
     public double getSupportMultiplier() {
-        return getSupportStep().getStraightSupportMultiplier();
+        return getSupportStep().getStraightSupportMultiplier() * contractTermMultiplier(
+              CampaignOption.CONTRACT_STRAIGHT_SUPPORT_MULTIPLIER);
     }
 
     public double getBattlefieldLossMultiplier() {
-        return getSupportStep().getBattlefieldLossMultiplier();
+        return getSupportStep().getBattlefieldLossMultiplier() * contractTermMultiplier(
+              CampaignOption.CONTRACT_BATTLEFIELD_LOSS_MULTIPLIER);
     }
 
     public ChaosContractStepsTable getTransportStep() {
@@ -799,7 +828,8 @@ public abstract class AbstractContract {
     }
 
     public double getTransportMultiplier() {
-        return getTransportStep().getTransportMultiplier();
+        return getTransportStep().getTransportMultiplier() * contractTermMultiplier(
+              CampaignOption.CONTRACT_TRANSPORT_MULTIPLIER);
     }
 
     public ChaosContractStepsTable getSalvageRightsStep() {
@@ -807,7 +837,8 @@ public abstract class AbstractContract {
     }
 
     public double getSalvageRightsMultiplier() {
-        return getSalvageRightsStep().getSalvageMultiplier();
+        return getSalvageRightsStep().getSalvageMultiplier() * contractTermMultiplier(
+              CampaignOption.CONTRACT_SALVAGE_MULTIPLIER);
     }
 
     public boolean isSalvageExchange() {

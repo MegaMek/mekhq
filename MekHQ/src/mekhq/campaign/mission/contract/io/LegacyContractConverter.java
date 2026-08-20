@@ -37,6 +37,7 @@ import static mekhq.campaign.universe.Faction.PIRATE_FACTION_CODE;
 import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
 
 import java.time.LocalDate;
+import java.time.temporal.ChronoUnit;
 import java.util.UUID;
 
 import jakarta.annotation.Nullable;
@@ -287,7 +288,9 @@ public final class LegacyContractConverter {
         // Only a contract that was still running needs settling and an advisory; one that had already concluded was
         // settled when it ended.
         if (wasActive) {
-            settle(campaign, contract, routedPayout);
+            Money settlementAmount = baseAmount.multipliedBy(ChronoUnit.MONTHS.between(endDate,
+                  campaign.getLocalDate()));
+            settle(campaign, contract, settlementAmount);
         }
         return contract;
     }
@@ -296,13 +299,13 @@ public final class LegacyContractConverter {
      * Settles a closed-out legacy contract: pays any explicitly-outstanding amount (the routed payout) and advises the
      * player that the old-format contract has been ended.
      */
-    private static void settle(final Campaign campaign, final AbstractContract contract, final Money routedPayout) {
-        if ((routedPayout != null) && routedPayout.isPositive()) {
+    private static void settle(final Campaign campaign, final AbstractContract contract, final Money settlementAmount) {
+        if ((settlementAmount != null) && settlementAmount.isPositive()) {
             campaign.getPlayerForce()
                   .getFinances()
                   .credit(TransactionType.CONTRACT_PAYMENT,
                         campaign.getLocalDate(),
-                        routedPayout,
+                        settlementAmount,
                         getFormattedTextAt(RESOURCE_BUNDLE, "legacyContract.settlement", contract.getName()));
         }
 

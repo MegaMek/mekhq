@@ -113,6 +113,18 @@ class ContractMarketPage {
     private JSpinner spnDropShipBonusPercentage;
     private JLabel lblPityContracts;
     private JSpinner spnPityContracts;
+    private JLabel lblContractBasePayMultiplier;
+    private JSpinner spnContractBasePayMultiplier;
+    private JLabel lblContractStraightSupportMultiplier;
+    private JSpinner spnContractStraightSupportMultiplier;
+    private JLabel lblContractBattlefieldLossMultiplier;
+    private JSpinner spnContractBattlefieldLossMultiplier;
+    private JLabel lblContractTransportMultiplier;
+    private JSpinner spnContractTransportMultiplier;
+    private JLabel lblContractSalvageMultiplier;
+    private JSpinner spnContractSalvageMultiplier;
+
+    private JPanel pnlContractTermMultipliers;
 
     private JPanel pnlContractPay;
     private JCheckBox chkUseChaosSupportPointConversion;
@@ -155,6 +167,7 @@ class ContractMarketPage {
         contractMarketHeader = new CampaignOptionsHeaderPanel("ContractMarketPage", imageAddress);
         // Contents
         pnlContractMarketGeneralOptions = createContractMarketGeneralOptionsPanel();
+        pnlContractTermMultipliers = createContractTermMultipliersPanel();
         pnlContractPay = createContractPayPanel();
 
         final JPanel panel = CampaignOptionsPagePanel.builder("ContractMarketPage", "ContractMarketPage",
@@ -164,6 +177,9 @@ class ContractMarketPage {
                                    .section("lblContractMarketGeneralOptionsPanel.text",
                                          "lblContractMarketGeneralOptionsPanel.summary",
                                          pnlContractMarketGeneralOptions)
+                                   .section("lblContractTermMultipliersPanel.text",
+                                         "lblContractTermMultipliersPanel.summary",
+                                         pnlContractTermMultipliers)
                                    .section("lblContractPayPanel.text",
                                          "lblContractPayPanel.summary",
                                          pnlContractPay)
@@ -219,6 +235,13 @@ class ContractMarketPage {
               getMetadata(MILESTONE_BEFORE_METADATA));
         chkEnableSalvageFlagByDefault.addMouseListener(createTipPanelUpdater("EnableSalvageFlagByDefault"));
 
+        // General options that apply regardless of the contract-pay scheme (Chaos or legacy).
+        chkBLCSaleValue = new CampaignOptionsCheckBox("BLCSaleValue");
+        chkBLCSaleValue.addMouseListener(createTipPanelUpdater("BLCSaleValue"));
+
+        chkOverageRepaymentInFinalPayment = new CampaignOptionsCheckBox("OverageRepaymentInFinalPayment");
+        chkOverageRepaymentInFinalPayment.addMouseListener(createTipPanelUpdater("OverageRepaymentInFinalPayment"));
+
         chkUseDynamicDifficulty = new CampaignOptionsCheckBox("UseDynamicDifficulty");
         chkUseDynamicDifficulty
               .addMouseListener(createTipPanelUpdater("UseDynamicDifficulty"));
@@ -265,9 +288,66 @@ class ContractMarketPage {
               chkUseDynamicDifficulty,
                 chkUseBolsterContractSkill,
               chkUseChaosScaleSupportPointConversion,
-              chkUseContractFactionModifiers);
+              chkUseContractFactionModifiers,
+              chkBLCSaleValue,
+              chkOverageRepaymentInFinalPayment);
         panel.addRow(lblDropShipBonusPercentage, spnDropShipBonusPercentage);
         panel.addRow(lblPityContracts, spnPityContracts);
+
+        return panel;
+    }
+
+    /**
+     * Builds the Contract Term Multipliers panel: per-term multipliers (base pay, straight support, battlefield loss,
+     * transport, salvage) applied on top of a contract's negotiated step values. Each defaults to 1.0 (no change).
+     *
+     * @return a {@link JPanel} of the contract term multiplier spinners
+     */
+    private @Nonnull JPanel createContractTermMultipliersPanel() {
+        lblContractBasePayMultiplier = new CampaignOptionsLabel("ContractBasePayMultiplier",
+              getMetadata(new Version(0, 51, 1), CUSTOM_SYSTEM));
+        lblContractBasePayMultiplier.addMouseListener(createTipPanelUpdater("ContractBasePayMultiplier"));
+        spnContractBasePayMultiplier = new CampaignOptionsSpinner("ContractBasePayMultiplier", 1.0, 0.1, 2.0, 0.1);
+        spnContractBasePayMultiplier.addMouseListener(createTipPanelUpdater("ContractBasePayMultiplier"));
+
+        lblContractStraightSupportMultiplier = new CampaignOptionsLabel("ContractStraightSupportMultiplier",
+              getMetadata(new Version(0, 51, 1), CUSTOM_SYSTEM));
+        lblContractStraightSupportMultiplier.addMouseListener(
+              createTipPanelUpdater("ContractStraightSupportMultiplier"));
+        spnContractStraightSupportMultiplier = new CampaignOptionsSpinner("ContractStraightSupportMultiplier",
+              1.0, 0.1, 2.0, 0.1);
+        spnContractStraightSupportMultiplier.addMouseListener(
+              createTipPanelUpdater("ContractStraightSupportMultiplier"));
+
+        lblContractBattlefieldLossMultiplier = new CampaignOptionsLabel("ContractBattlefieldLossMultiplier",
+              getMetadata(new Version(0, 51, 1), CUSTOM_SYSTEM));
+        lblContractBattlefieldLossMultiplier.addMouseListener(
+              createTipPanelUpdater("ContractBattlefieldLossMultiplier"));
+        spnContractBattlefieldLossMultiplier = new CampaignOptionsSpinner("ContractBattlefieldLossMultiplier",
+              1.0, 0.1, 2.0, 0.1);
+        spnContractBattlefieldLossMultiplier.addMouseListener(
+              createTipPanelUpdater("ContractBattlefieldLossMultiplier"));
+
+        lblContractTransportMultiplier = new CampaignOptionsLabel("ContractTransportMultiplier",
+              getMetadata(new Version(0, 51, 1), CUSTOM_SYSTEM));
+        lblContractTransportMultiplier.addMouseListener(createTipPanelUpdater("ContractTransportMultiplier"));
+        spnContractTransportMultiplier = new CampaignOptionsSpinner("ContractTransportMultiplier", 1.0, 0.1, 2.0, 0.1);
+        spnContractTransportMultiplier.addMouseListener(createTipPanelUpdater("ContractTransportMultiplier"));
+
+        lblContractSalvageMultiplier = new CampaignOptionsLabel("ContractSalvageMultiplier",
+              getMetadata(new Version(0, 51, 1), CUSTOM_SYSTEM));
+        lblContractSalvageMultiplier.addMouseListener(createTipPanelUpdater("ContractSalvageMultiplier"));
+        spnContractSalvageMultiplier = new CampaignOptionsSpinner("ContractSalvageMultiplier", 1.0, 0.1, 2.0, 0.1);
+        spnContractSalvageMultiplier.addMouseListener(createTipPanelUpdater("ContractSalvageMultiplier"));
+
+        final SettingsFormPanel panel = new SettingsFormPanel("ContractTermMultipliersPanel",
+              LABEL_COLUMN_WIDTH,
+              CONTROL_COLUMN_WIDTH);
+        panel.addRow(lblContractBasePayMultiplier, spnContractBasePayMultiplier);
+        panel.addRow(lblContractStraightSupportMultiplier, spnContractStraightSupportMultiplier);
+        panel.addRow(lblContractBattlefieldLossMultiplier, spnContractBattlefieldLossMultiplier);
+        panel.addRow(lblContractTransportMultiplier, spnContractTransportMultiplier);
+        panel.addRow(lblContractSalvageMultiplier, spnContractSalvageMultiplier);
 
         return panel;
     }
@@ -357,14 +437,8 @@ class ContractMarketPage {
               0.1);
         spnWarShipPercent.addMouseListener(createTipPanelUpdater("WarShipPercent"));
 
-        chkBLCSaleValue = new CampaignOptionsCheckBox("BLCSaleValue");
-        chkBLCSaleValue.addMouseListener(createTipPanelUpdater("BLCSaleValue"));
-
         chkUseInfantryDoesNotCount = new CampaignOptionsCheckBox("UseInfantryDoesNotCount");
         chkUseInfantryDoesNotCount.addMouseListener(createTipPanelUpdater("UseInfantryDoesNotCount"));
-
-        chkOverageRepaymentInFinalPayment = new CampaignOptionsCheckBox("OverageRepaymentInFinalPayment");
-        chkOverageRepaymentInFinalPayment.addMouseListener(createTipPanelUpdater("OverageRepaymentInFinalPayment"));
 
         // Layout the Panel
         final SettingsFormPanel equipmentValuePanel = new SettingsFormPanel(
@@ -381,16 +455,15 @@ class ContractMarketPage {
         equipmentValuePanel.addRow(lblWarShipPercent, spnWarShipPercent);
         pnlContractPayEquipmentOptions = equipmentValuePanel;
 
-        // Shared options that apply to both legacy bases (TO&E value and payroll), so they sit outside the basis radios
-        // rather than under either one.
+        // Applies to both legacy bases (TO&E value and payroll), so it sits outside the basis radios rather than under
+        // either one. (Battle-loss-compensation and salvage-overage repayment are general options - they also apply
+        // under Chaos pay - and live in the Market Rules section instead.)
         final SettingsFormPanel sharedOptionsPanel = new SettingsFormPanel(
                 "ContractPaySharedPanel",
               CONTRACT_PAY_LABEL_COLUMN_WIDTH,
               CONTROL_COLUMN_WIDTH);
         sharedOptionsPanel.addCheckBoxGrid(CHECKBOX_GRID_COLUMNS,
-              chkBLCSaleValue,
-              chkUseInfantryDoesNotCount,
-              chkOverageRepaymentInFinalPayment);
+              chkUseInfantryDoesNotCount);
 
         btnContractEquipment.addActionListener(event -> updateContractPayEnabledState());
         btnContractPersonnel.addActionListener(event -> updateContractPayEnabledState());
@@ -539,6 +612,11 @@ class ContractMarketPage {
         chkUseContractFactionModifiers.setSelected(model.useContractFactionModifiers);
         spnDropShipBonusPercentage.setValue(model.dropShipBonusPercentage);
         spnPityContracts.setValue(model.pityContracts);
+        spnContractBasePayMultiplier.setValue(model.contractBasePayMultiplier);
+        spnContractStraightSupportMultiplier.setValue(model.contractStraightSupportMultiplier);
+        spnContractBattlefieldLossMultiplier.setValue(model.contractBattlefieldLossMultiplier);
+        spnContractTransportMultiplier.setValue(model.contractTransportMultiplier);
+        spnContractSalvageMultiplier.setValue(model.contractSalvageMultiplier);
         chkUseChaosSupportPointConversion.setSelected(model.useChaosSupportPointConversion);
         chkUseLegacyOptions.setSelected(model.useLegacyContractPay);
         if (model.equipmentContractBase) {
@@ -583,6 +661,11 @@ class ContractMarketPage {
         model.useContractFactionModifiers = chkUseContractFactionModifiers.isSelected();
         model.dropShipBonusPercentage = (int) spnDropShipBonusPercentage.getValue();
         model.pityContracts = (int) spnPityContracts.getValue();
+        model.contractBasePayMultiplier = (double) spnContractBasePayMultiplier.getValue();
+        model.contractStraightSupportMultiplier = (double) spnContractStraightSupportMultiplier.getValue();
+        model.contractBattlefieldLossMultiplier = (double) spnContractBattlefieldLossMultiplier.getValue();
+        model.contractTransportMultiplier = (double) spnContractTransportMultiplier.getValue();
+        model.contractSalvageMultiplier = (double) spnContractSalvageMultiplier.getValue();
         model.useChaosSupportPointConversion = chkUseChaosSupportPointConversion.isSelected();
         model.useLegacyContractPay = chkUseLegacyOptions.isSelected();
         model.equipmentContractBase = btnContractEquipment.isSelected();
