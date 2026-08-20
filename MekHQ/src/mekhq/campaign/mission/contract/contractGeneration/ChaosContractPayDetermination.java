@@ -79,8 +79,11 @@ public class ChaosContractPayDetermination {
         int transportCostInSupportPoints = DEFAULT_TRANSPORT_COST_MULTIPLIER * contract.getScale();
         transportCostInSupportPoints *= jumpCount;
 
+        // Two-way pay for hiring halls: when the player sets out from a hiring hall, the employer covers the return
+        // journey too, doubling transport pay. Only applied when the campaign opts into it.
         boolean isAtHiringHall = currentSystem.isHiringHall(currentDate);
-        if (isAtHiringHall) {
+        boolean useTwoWayPayForHiringHalls = campaign.getCampaignOptions().get(CampaignOption.IS_USE_TWO_WAY_PAY);
+        if (isAtHiringHall && useTwoWayPayForHiringHalls) {
             transportCostInSupportPoints *= HIRING_HALL_RETURN_MULTIPLIER;
         }
 
