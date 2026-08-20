@@ -60,6 +60,7 @@ import mekhq.campaign.personnel.enums.BloodmarkLevel;
 import mekhq.campaign.personnel.enums.PersonnelStatus;
 import mekhq.campaign.personnel.medical.InjurySPAUtility;
 import mekhq.campaign.personnel.medical.advancedMedical.InjuryUtil;
+import mekhq.campaign.campaignOptions.CampaignOption;
 
 /**
  * Handles Bloodmark-related logic for characters, including assassination attempt scheduling and execution.
@@ -263,8 +264,8 @@ public class Bloodmark {
 
         // Inflict injuries or wounds as appropriate
         wounds = InjurySPAUtility.adjustInjuriesAndFatigueForSPAs(person,
-              campaign.getCampaignOptions().isUseInjuryFatigue(),
-              campaign.getCampaignOptions().getFatigueRate(), wounds);
+              campaign.getCampaignOptions().get(CampaignOption.USE_INJURY_FATIGUE),
+              campaign.getCampaignOptions().get(CampaignOption.FATIGUE_RATE), wounds);
         processWounds(campaign, person, today, wounds);
 
         String report = getReport(person.getStatus().isDead(), person.getHyperlinkedFullTitle(), bountyHunterName);

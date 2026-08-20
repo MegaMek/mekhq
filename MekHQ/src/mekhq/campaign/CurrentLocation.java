@@ -43,6 +43,7 @@ import java.util.UUID;
 import megamek.logging.MMLogger;
 import mekhq.MekHQ;
 import mekhq.campaign.campaignOptions.CampaignOptions;
+import mekhq.campaign.campaignOptions.CampaignOption;
 import mekhq.campaign.events.LocationChangedEvent;
 import mekhq.campaign.events.TransitCompleteEvent;
 import mekhq.campaign.events.TransitStatusChangedEvent;
@@ -236,10 +237,10 @@ public class CurrentLocation extends AbstractMobileLocation {
             }
             if (isAtJumpPoint() && (rechargeTime >= neededRechargeTime)) {
                 // jump
-                if (campaignOptions.isUseAbilities()) {
+                if (campaignOptions.get(CampaignOption.USE_ABILITIES)) {
                     checkForTransitDisorientationSyndrome(campaign,
-                          campaignOptions.isUseFatigue(),
-                          campaignOptions.getFatigueRate());
+                          campaignOptions.get(CampaignOption.USE_FATIGUE),
+                          campaignOptions.get(CampaignOption.FATIGUE_RATE));
                 }
                 if (!isSilentProcessing) {
                     campaign.addReport(GENERAL, "Jumping to " + jumpPath.get(1).getPrintableName(today));

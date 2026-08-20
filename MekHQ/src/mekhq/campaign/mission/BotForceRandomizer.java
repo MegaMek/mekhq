@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2021-2025 The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2021-2026 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -70,6 +70,7 @@ import mekhq.utilities.MHQXMLUtility;
 import org.apache.commons.math3.distribution.GammaDistribution;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
+import mekhq.campaign.campaignOptions.CampaignOption;
 
 /**
  * A class that can be used to generate a random force with some parameters. Provides a simpler approach to op for
@@ -461,7 +462,7 @@ public class BotForceRandomizer {
         RandomNameGenerator rng = RandomNameGenerator.getInstance();
 
         Gender gender;
-        int nonBinaryDiceSize = campaign.getCampaignOptions().getNonBinaryDiceSize();
+        int nonBinaryDiceSize = campaign.getCampaignOptions().get(CampaignOption.NON_BINARY_DICE_SIZE);
 
         if ((nonBinaryDiceSize > 0) && (Compute.randomInt(nonBinaryDiceSize) == 0)) {
             gender = RandomGenderGenerator.generateOther();

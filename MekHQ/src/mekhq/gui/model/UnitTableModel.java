@@ -60,6 +60,7 @@ import mekhq.campaign.unit.Unit;
 import mekhq.gui.BasicInfo;
 import mekhq.gui.utilities.MekHqTableCellRenderer;
 import mekhq.utilities.ReportingUtilities;
+import mekhq.campaign.campaignOptions.CampaignOption;
 
 /**
  * A table Model for displaying information about units
@@ -225,7 +226,7 @@ public class UnitTableModel extends DataTableModel<Unit> {
         List<String> reports = new ArrayList<>();
 
         Campaign campaign = unit.getCampaign();
-        boolean isClanCampaign = campaign != null && campaign.isClanCampaign();
+        boolean isClanCampaign = campaign != null && campaign.getPlayerForce().isClanForce();
 
         // Check if driver and gunner use the same role (e.g., VEHICLE_CREW_GROUND)
         PersonnelRole driverRole = unit.getDriverRole();
@@ -384,7 +385,7 @@ public class UnitTableModel extends DataTableModel<Unit> {
             case COL_TECH_CRW -> (unit.getTech() != null) ? unit.getTech().getHTMLTitle() : "-";
             case COL_MAINTAIN -> unit.getMaintenanceCost().toAmountAndSymbolString();
             case COL_MAINTAIN_CYCLE -> {
-                if (!campaign.getCampaignOptions().isCheckMaintenance()) {
+                if (!campaign.getCampaignOptions().get(CampaignOption.CHECK_MAINTENANCE)) {
                     yield "-"; // Do not convert this into a character, it will break sorting
                 }
 
@@ -394,7 +395,7 @@ public class UnitTableModel extends DataTableModel<Unit> {
                 }
 
                 double daysSinceLastMaintenance = unit.getDaysSinceMaintenance();
-                int cycleLength = campaign.getCampaignOptions().getMaintenanceCycleDays();
+                int cycleLength = campaign.getCampaignOptions().get(CampaignOption.MAINTENANCE_CYCLE_DAYS);
                 yield (unit.getMaintenanceCycleDuration(cycleLength) - daysSinceLastMaintenance) + " days";
             }
             case COL_BV -> entity.calculateBattleValue(true, unit.getEntity().getCrew() == null);

@@ -545,7 +545,7 @@ public class StoryArc {
 
         // get commander information
         Person commander = c.getPlayerForce().getHumanResources()
-                                 .getCommander(c.getCampaignOptions(), c.isClanCampaign(), c.getLocalDate());
+                                 .getCommander(c.getCampaignOptions(), c.getPlayerForce().isClanForce(), c.getLocalDate());
         if (null == commander) {
             // shouldn't happen unless there are no personnel, but just in case
             replacementTokens.put("\\{commanderCallsign\\}", "callsign(?)");

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2022-2025 The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2022-2026 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -36,6 +36,7 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.mockito.Mockito.when;
 
 import mekhq.campaign.campaignOptions.CampaignOptions;
+import mekhq.campaign.campaignOptions.CampaignOption;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -49,10 +50,10 @@ public class DisabledRandomMarriageTest {
 
     @BeforeEach
     public void beforeEach() {
-        when(mockOptions.isUseClanPersonnelMarriages()).thenReturn(false);
-        when(mockOptions.isUsePrisonerMarriages()).thenReturn(false);
-        when(mockOptions.isUseRandomClanPersonnelMarriages()).thenReturn(false);
-        when(mockOptions.isUseRandomPrisonerMarriages()).thenReturn(false);
+        when(mockOptions.get(CampaignOption.USE_CLAN_PERSONNEL_MARRIAGES)).thenReturn(false);
+        when(mockOptions.get(CampaignOption.USE_PRISONER_MARRIAGES)).thenReturn(false);
+        when(mockOptions.get(CampaignOption.USE_RANDOM_CLAN_PERSONNEL_MARRIAGES)).thenReturn(false);
+        when(mockOptions.get(CampaignOption.USE_RANDOM_PRISONER_MARRIAGES)).thenReturn(false);
     }
 
     @Test

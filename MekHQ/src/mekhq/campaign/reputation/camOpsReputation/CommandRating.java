@@ -45,6 +45,7 @@ import java.util.stream.Collectors;
 import megamek.logging.MMLogger;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.campaignOptions.CampaignOptions;
+import mekhq.campaign.campaignOptions.CampaignOption;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.PersonnelOptions;
 import mekhq.campaign.personnel.skills.SkillType;
@@ -81,15 +82,15 @@ public class CommandRating {
 
         commandRating.put("traits",
               getATOWTraitScore(commander,
-                    campaign.getCampaignOptions().isUseAgeEffects(),
-                    campaign.isClanCampaign(),
+                    campaign.getCampaignOptions().get(CampaignOption.USE_AGE_EFFECTS),
+                    campaign.getPlayerForce().isClanForce(),
                     campaign.getLocalDate()));
 
         int personalityValue = 0;
         CampaignOptions campaignOptions = campaign.getCampaignOptions();
 
-        if (campaignOptions.isUseRandomPersonalityReputation() && commander != null) {
-            personalityValue = getPersonalityValue(campaignOptions.isUseRandomPersonalities(),
+        if (campaignOptions.get(CampaignOption.USE_RANDOM_PERSONALITY_REPUTATION) && commander != null) {
+            personalityValue = getPersonalityValue(campaignOptions.get(CampaignOption.USE_RANDOM_PERSONALITIES),
                   commander.getAggression(),
                   commander.getAmbition(),
                   commander.getGreed(),

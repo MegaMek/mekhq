@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2024-2025 The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2024-2026 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -45,6 +45,7 @@ import mekhq.campaign.Campaign;
 import mekhq.campaign.mission.Contract;
 import mekhq.campaign.mission.Mission;
 import mekhq.campaign.personnel.Award;
+import mekhq.campaign.campaignOptions.CampaignOption;
 
 public class ContractAwards {
     private static final MMLogger LOGGER = MMLogger.create(ContractAwards.class);
@@ -74,7 +75,7 @@ public class ContractAwards {
               "diversionary raid", "objective raid", "recon raid", "extraction raid");
 
         for (Award award : awards) {
-            if (award.canBeAwarded(campaign.getPerson(person))) {
+            if (award.canBeAwarded(campaign.getPlayerForce().getHumanResources().getPerson(person))) {
                 if (award.getRange().equalsIgnoreCase("months")) {
                     try {
                         int requiredDuration = award.getQty();
@@ -113,7 +114,7 @@ public class ContractAwards {
         if (!bestEligibleAwards.isEmpty()) {
             int rollingQty = 0;
 
-            if (campaign.getCampaignOptions().isIssueBestAwardOnly()) {
+            if (campaign.getCampaignOptions().get(CampaignOption.ISSUE_BEST_AWARD_ONLY)) {
                 for (Award award : bestEligibleAwards) {
                     if (award.getQty() > rollingQty) {
                         rollingQty = award.getQty();

@@ -32,6 +32,8 @@
  */
 package mekhq.campaign.reputation.camOpsReputation;
 
+import static org.mockito.Mockito.lenient;
+
 import static megamek.common.options.OptionsConstants.ATOW_COMBAT_PARALYSIS;
 import static megamek.common.options.OptionsConstants.ATOW_COMBAT_SENSE;
 import static megamek.common.options.PilotOptions.LVL3_ADVANTAGES;
@@ -45,6 +47,7 @@ import java.util.Set;
 
 import mekhq.campaign.Campaign;
 import mekhq.campaign.campaignOptions.CampaignOptions;
+import mekhq.campaign.campaignOptions.CampaignOption;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.PersonnelOptions;
 import mekhq.campaign.personnel.skills.SkillType;
@@ -82,6 +85,10 @@ class CommandRatingTest {
     void setUp() {
         MockitoAnnotations.openMocks(this);
         when(campaign.getCampaignOptions()).thenReturn(campaignOptions);
+        lenient().when(campaignOptions.get(CampaignOption.IS_ENABLE_SALVAGE_FLAG_BY_DEFAULT)).thenReturn(false);
+        lenient().when(campaignOptions.get(CampaignOption.USE_RANDOM_PERSONALITY_REPUTATION)).thenReturn(false);
+        lenient().when(campaignOptions.get(CampaignOption.TECHS_USE_ADMINISTRATION)).thenReturn(false);
+        lenient().when(campaignOptions.get(CampaignOption.USE_AGE_EFFECTS)).thenReturn(false);
     }
 
     private void assertRating(Person commander, Map<String, Integer> overrides) {
@@ -160,9 +167,9 @@ class CommandRatingTest {
         assertRating(commander, Map.of("leadership", 9, "personality", 0, "total", 9));
 
         // ensure that both options are enabled before calculating personality score
-        when(campaignOptions.isUseRandomPersonalities()).thenReturn(true);
+        when(campaignOptions.get(CampaignOption.USE_RANDOM_PERSONALITIES)).thenReturn(true);
         assertRating(commander, Map.of("leadership", 9, "personality", 0, "total", 9));
-        when(campaignOptions.isUseRandomPersonalityReputation()).thenReturn(true);
+        when(campaignOptions.get(CampaignOption.USE_RANDOM_PERSONALITY_REPUTATION)).thenReturn(true);
         assertRating(commander, Map.of("leadership", 9, "personality", -5, "total", 4));
     }
 

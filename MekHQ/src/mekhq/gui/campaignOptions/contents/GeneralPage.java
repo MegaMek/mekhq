@@ -155,7 +155,7 @@ public class GeneralPage {
         this.frame = frame;
         this.campaign = campaign;
         this.date = campaign.getLocalDate();
-        this.camouflage = campaign.getCamouflage();
+        this.camouflage = campaign.getPlayerForce().getCamouflage();
         this.unitIcon = campaign.getPlayerForce().getUnitIcon();
         this.mode = mode;
 
@@ -213,14 +213,14 @@ public class GeneralPage {
                                                                                                    .getHumanResources()
                                                                                                    .getCommander(
                                                                                                          campaign.getCampaignOptions(),
-                                                                                                         campaign.isClanCampaign(),
+                                                                                                         campaign.getPlayerForce().isClanForce(),
                                                                                                          campaign.getLocalDate()));
             txtName.setText(generatedName);
         });
 
         // Campaign faction
         lblFaction = new CampaignOptionsLabel("Faction");
-        comboFaction.setSelectedItem(new FactionDisplay(campaign.getFaction(), campaign.getLocalDate()));
+        comboFaction.setSelectedItem(new FactionDisplay(campaign.getPlayerForce().getFaction(), campaign.getLocalDate()));
         comboFaction.setToolTipText(String.format("<html>%s</html>",
               getTextAt(getCampaignOptionsResourceBundle(), "lblFaction.tooltip")));
 
@@ -590,16 +590,16 @@ public class GeneralPage {
      *                      campaign's default faction is used.
      */
     public void loadValuesFromCampaignOptions(@Nullable LocalDate presetDate, @Nullable Faction presetFaction) {
-        txtName.setText(campaign.getName());
+        txtName.setText(campaign.getPlayerForce().getName());
 
         setDate((presetDate != null) ? presetDate : campaign.getLocalDate());
 
-        comboFaction.setSelectedItem(new FactionDisplay(campaign.getFaction(), date));
+        comboFaction.setSelectedItem(new FactionDisplay(campaign.getPlayerForce().getFaction(), date));
         if (presetFaction != null) {
             comboFaction.setSelectedItem(new FactionDisplay(presetFaction, date));
         }
 
-        camouflage = campaign.getCamouflage();
+        camouflage = campaign.getPlayerForce().getCamouflage();
         unitIcon = campaign.getPlayerForce().getUnitIcon();
     }
 
@@ -617,7 +617,7 @@ public class GeneralPage {
             campaign.getPlayerForce().setName(s);
 
             if (isStartUp) {
-                campaign.getPlayerForce().getFormations().setName(campaign.getName());
+                campaign.getPlayerForce().getFormations().setName(campaign.getPlayerForce().getName());
                 campaign.setLocalDate(date);
             }
 

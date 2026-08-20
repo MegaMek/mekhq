@@ -180,7 +180,7 @@ public final class AutomaticRankAssigner {
      */
     private static List<Person> sortCrew(Campaign campaign, List<Person> crew) {
         CampaignOptions campaignOptions = campaign.getCampaignOptions();
-        boolean campaignIsClan = campaign.isClanCampaign();
+        boolean campaignIsClan = campaign.getPlayerForce().isClanForce();
         LocalDate today = campaign.getLocalDate();
 
         crew.sort(Comparator.comparing(

@@ -47,6 +47,7 @@ import mekhq.campaign.parts.missing.MissingPart;
 import mekhq.campaign.parts.missing.MissingVeeSensor;
 import mekhq.campaign.personnel.skills.SkillType;
 import org.w3c.dom.Node;
+import mekhq.campaign.campaignOptions.CampaignOption;
 
 /**
  * @author Jay Lawson (jaylawson39 at yahoo.com)
@@ -124,7 +125,7 @@ public class VeeSensor extends Part {
             int priorHits = hits;
             hits = ((Tank) unit.getEntity()).getSensorHits();
             if (checkForDestruction && (hits > priorHits)
-                      && (Compute.d6(2) < campaign.getCampaignOptions().getDestroyPartTarget())) {
+                      && (Compute.d6(2) < campaign.getCampaignOptions().get(CampaignOption.DESTROY_PART_TARGET))) {
                 remove(false);
             }
         }

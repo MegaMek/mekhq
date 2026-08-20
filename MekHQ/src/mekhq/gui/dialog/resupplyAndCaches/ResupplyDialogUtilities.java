@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2024-2025 The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2024-2026 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -77,7 +77,7 @@ public class ResupplyDialogUtilities {
      */
     static List<String> createPartsReport(Resupply resupply) {
         final Campaign campaign = resupply.getCampaign();
-        Faction originFaction = campaign.getFaction();
+        Faction originFaction = campaign.getPlayerForce().getFaction();
         int year = campaign.getGameYear();
 
         final List<Part> convoyContents = resupply.getConvoyContents();

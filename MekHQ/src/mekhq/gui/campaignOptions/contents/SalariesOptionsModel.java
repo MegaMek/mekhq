@@ -39,6 +39,7 @@ import java.util.Map.Entry;
 import jakarta.annotation.Nonnull;
 import megamek.common.enums.SkillLevel;
 import mekhq.campaign.campaignOptions.CampaignOptions;
+import mekhq.campaign.campaignOptions.CampaignOption;
 import mekhq.campaign.finances.Money;
 import mekhq.campaign.personnel.enums.PersonnelRole;
 
@@ -50,12 +51,12 @@ class SalariesOptionsModel {
     final Map<PersonnelRole, Double> roleBaseSalaries = new EnumMap<>(PersonnelRole.class);
 
     SalariesOptionsModel(@Nonnull CampaignOptions options) {
-        disableSecondaryRoleSalary = options.isDisableSecondaryRoleSalary();
-        salaryAntiMekMultiplier = options.getSalaryAntiMekMultiplier();
-        salarySpecialistInfantryMultiplier = options.getSalarySpecialistInfantryMultiplier();
-        salaryXpMultipliers.putAll(options.getSalaryXPMultipliers());
+        disableSecondaryRoleSalary = options.get(CampaignOption.DISABLE_SECONDARY_ROLE_SALARY);
+        salaryAntiMekMultiplier = options.get(CampaignOption.SALARY_ANTI_MEK_MULTIPLIER);
+        salarySpecialistInfantryMultiplier = options.get(CampaignOption.SALARY_SPECIALIST_INFANTRY_MULTIPLIER);
+        salaryXpMultipliers.putAll(options.get(CampaignOption.SALARY_XP_MULTIPLIERS));
 
-        Money[] baseSalaryTable = options.getRoleBaseSalaries();
+        Money[] baseSalaryTable = options.get(CampaignOption.ROLE_BASE_SALARIES);
         for (PersonnelRole personnelRole : PersonnelRole.values()) {
             int ordinal = personnelRole.ordinal();
             roleBaseSalaries.put(personnelRole, baseSalaryTable[ordinal].getAmount().doubleValue());
@@ -63,12 +64,12 @@ class SalariesOptionsModel {
     }
 
     void applyTo(@Nonnull CampaignOptions options) {
-        options.setDisableSecondaryRoleSalary(disableSecondaryRoleSalary);
-        options.setSalaryAntiMekMultiplier(salaryAntiMekMultiplier);
-        options.setSalarySpecialistInfantryMultiplier(salarySpecialistInfantryMultiplier);
+        options.set(CampaignOption.DISABLE_SECONDARY_ROLE_SALARY, disableSecondaryRoleSalary);
+        options.set(CampaignOption.SALARY_ANTI_MEK_MULTIPLIER, salaryAntiMekMultiplier);
+        options.set(CampaignOption.SALARY_SPECIALIST_INFANTRY_MULTIPLIER, salarySpecialistInfantryMultiplier);
 
         for (final Entry<SkillLevel, Double> entry : salaryXpMultipliers.entrySet()) {
-            options.getSalaryXPMultipliers().put(entry.getKey(), entry.getValue());
+            options.get(CampaignOption.SALARY_XP_MULTIPLIERS).put(entry.getKey(), entry.getValue());
         }
 
         for (final Entry<PersonnelRole, Double> entry : roleBaseSalaries.entrySet()) {

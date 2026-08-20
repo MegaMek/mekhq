@@ -55,6 +55,7 @@ import megamek.common.units.Entity;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.campaignOptions.CampaignOptions;
+import mekhq.campaign.campaignOptions.CampaignOption;
 import mekhq.campaign.events.OrganizationChangedEvent;
 import mekhq.campaign.force.PlayerForce;
 import mekhq.campaign.parts.AmmoStorage;
@@ -172,7 +173,7 @@ public class CompanyGenerationDialog extends AbstractMHQValidationButtonDialog {
     private void confirmationActionListener(final ActionEvent evt) {
         okButtonActionPerformed(evt);
 
-        Faction campaignFaction = campaign.getFaction();
+        Faction campaignFaction = campaign.getPlayerForce().getFaction();
         String campaignFactionCode = campaignFaction.getShortName();
         if (campaignFactionCode.equals(MERCENARY_FACTION_CODE)) {
             final boolean IS_STARTUP = true;
@@ -188,7 +189,7 @@ public class CompanyGenerationDialog extends AbstractMHQValidationButtonDialog {
         AutomaticRankAssigner.assignRankSystemFromFaction(speaker, RO_MIN);
         new FactionJudgmentDialog(campaign, speaker, campaign.getPlayerForce().getHumanResources()
                                                            .getCommander(campaign.getCampaignOptions(),
-                                                                 campaign.isClanCampaign(),
+                                                                 campaign.getPlayerForce().isClanForce(),
                                                                  campaign.getLocalDate()), "HELLO", campaignFaction,
               FactionStandingJudgmentType.WELCOME, ImmersiveDialogWidth.MEDIUM, null, null);
     }
@@ -215,7 +216,7 @@ public class CompanyGenerationDialog extends AbstractMHQValidationButtonDialog {
         MekHQ.triggerEvent(new OrganizationChangedEvent(getCampaign(),
               getCompanyGenerationOptionsPanel().getCampaign().getPlayerForce().getFormations()));
 
-        if (campaign.getCampaignOptions().isEnableAutoAwards()) {
+        if (campaign.getCampaignOptions().get(CampaignOption.ENABLE_AUTO_AWARDS)) {
             AutoAwardsController autoAwardsController = new AutoAwardsController();
             autoAwardsController.ManualController(campaign, false);
         }
@@ -235,8 +236,8 @@ public class CompanyGenerationDialog extends AbstractMHQValidationButtonDialog {
     private void processBonusUnitsBasedOnCampaignOptions(List<CompanyGenerationPersonTracker> trackers,
           CompanyGenerationOptions options) {
         CampaignOptions campaignOptions = campaign.getCampaignOptions();
-        boolean isUseAltAdvancedMedical = campaignOptions.isUseAlternativeAdvancedMedical();
-        double altAdvancedMedicalHealingTimeMultiplier = campaignOptions.getAlternativeAdvancedMedicalHealingTimeMultiplier();
+        boolean isUseAltAdvancedMedical = campaignOptions.get(CampaignOption.USE_ALTERNATIVE_ADVANCED_MEDICAL);
+        double altAdvancedMedicalHealingTimeMultiplier = campaignOptions.get(CampaignOption.ALTERNATIVE_ADVANCED_MEDICAL_HEALING_TIME_MULTIPLIER);
         boolean isUseHardAltAdvancedMedical = altAdvancedMedicalHealingTimeMultiplier >= 2.0;
         if (isUseAltAdvancedMedical && isUseHardAltAdvancedMedical) {
             int combatants = 0;
@@ -255,29 +256,29 @@ public class CompanyGenerationDialog extends AbstractMHQValidationButtonDialog {
 
         final Faction faction;
         if (options.isUseSpecifiedFactionToAssignRanks()) {faction = options.getSpecifiedFaction();} else {
-            faction = campaign.getFaction();
+            faction = campaign.getPlayerForce().getFaction();
         }
         final boolean isAutomaticallyAssignRanks = options.isAutomaticallyAssignRanks();
 
-        if (campaignOptions.isUseFatigue()) {
+        if (campaignOptions.get(CampaignOption.USE_FATIGUE)) {
             FatigueTrackingCampaignOptionsChangedConfirmationDialog.processFreeUnit(campaign,
                   faction,
                   isAutomaticallyAssignRanks);
         }
 
-        if (campaignOptions.isUseMASHTheatres()) {
+        if (campaignOptions.get(CampaignOption.USE_MASH_THEATRES)) {
             MASHTheaterTrackingCampaignOptionsChangedConfirmationDialog.processFreeUnit(campaign,
                   faction,
                   isAutomaticallyAssignRanks);
         }
 
-        if (!campaignOptions.getPrisonerCaptureStyle().isNone()) {
+        if (!campaignOptions.get(CampaignOption.PRISONER_CAPTURE_STYLE).isNone()) {
             PrisonerTrackingCampaignOptionsChangedConfirmationDialog.processFreeUnit(campaign,
                   faction,
                   isAutomaticallyAssignRanks);
         }
 
-        if (campaignOptions.isUseCamOpsSalvage()) {
+        if (campaignOptions.get(CampaignOption.IS_USE_CAM_OPS_SALVAGE)) {
             SalvageCampaignOptionsChangedConfirmationDialog.processFreeUnits(campaign,
                   faction,
                   isAutomaticallyAssignRanks);
@@ -289,7 +290,7 @@ public class CompanyGenerationDialog extends AbstractMHQValidationButtonDialog {
                   isAutomaticallyAssignRanks);
         }
 
-        if (campaignOptions.isUseAdvancedScouting() && campaignOptions.isUseStratCon()) {
+        if (campaignOptions.get(CampaignOption.USE_ADVANCED_SCOUTING) && campaignOptions.isUseStratCon()) {
             AdvancedScoutingCampaignOptionsChangedConfirmationDialog.processFreeSkills(campaign, true);
         }
 
@@ -310,7 +311,7 @@ public class CompanyGenerationDialog extends AbstractMHQValidationButtonDialog {
         if (options.isAutomaticallyAssignRanks()) {
             final Faction faction;
             if (options.isUseSpecifiedFactionToAssignRanks()) {faction = options.getSpecifiedFaction();} else {
-                faction = campaign.getFaction();
+                faction = campaign.getPlayerForce().getFaction();
             }
             person.setRank((faction.isComStarOrWoB() || faction.isClan())
                                  ? 4

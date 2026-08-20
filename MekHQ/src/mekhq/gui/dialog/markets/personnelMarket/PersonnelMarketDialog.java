@@ -310,10 +310,10 @@ public class PersonnelMarketDialog extends JDialog {
     }
 
     private JSlider getPersonnelAvailabilitySlider() {
-        int recruitmentSliderMaximum = campaignOptions.getPersonnelMarketStyle() != PERSONNEL_MARKET_DISABLED ?
+        int recruitmentSliderMaximum = campaignOptions.get(CampaignOption.PERSONNEL_MARKET_STYLE) != PERSONNEL_MARKET_DISABLED ?
                                              MAXIMUM_DAYS_IN_MONTH * MAXIMUM_NUMBER_OF_SYSTEM_ROLLS :
                                              MAXIMUM_DAYS_IN_MONTH;
-        if (campaignOptions.isUseAlternativeAdvancedMedical()) {
+        if (campaignOptions.get(CampaignOption.USE_ALTERNATIVE_ADVANCED_MEDICAL)) {
             recruitmentSliderMaximum *= ALTERNATE_ADVANCED_MEDICAL_RECRUITMENT_MULTIPLIER;
         }
 
@@ -624,13 +624,13 @@ public class PersonnelMarketDialog extends JDialog {
      * @since 0.50.06
      */
     private void setDialogTitle() {
-        Faction campaignFaction = campaign.getFaction();
+        Faction campaignFaction = campaign.getPlayerForce().getFaction();
         if (campaignFaction.isClan()) {
             setTitle(getTextAt(RESOURCE_BUNDLE, "title.personnelMarket.clan"));
         } else if (campaignFaction.isComStarOrWoB()) {
             Person commander = campaign.getPlayerForce().getHumanResources()
                                      .getCommander(campaign.getCampaignOptions(),
-                                           campaign.isClanCampaign(),
+                                           campaign.getPlayerForce().isClanForce(),
                                            campaign.getLocalDate());
             String address = commander != null ? commander.getTitleAndSurname() : campaign.getCommanderAddress(false);
             setTitle(getFormattedTextAt(RESOURCE_BUNDLE,

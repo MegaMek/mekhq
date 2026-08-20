@@ -48,6 +48,7 @@ import mekhq.gui.BasicInfo;
 import mekhq.gui.CampaignGUI;
 import mekhq.gui.ITechWorkPanel;
 import mekhq.utilities.ReportingUtilities;
+import mekhq.campaign.campaignOptions.CampaignOption;
 
 /**
  * A table model for displaying work items
@@ -168,7 +169,7 @@ public class TechTableModel extends DataTableModel<Person> {
 
         toReturn.append(String.format(" (%d XP", tech.getXP()));
         // if Edge usage is allowed for techs, display remaining edge in the dialogue
-        if (getCampaign().getCampaignOptions().isUseEdge() &&
+        if (getCampaign().getCampaignOptions().get(CampaignOption.USE_EDGE) &&
                   tech.getOptions().booleanOption(PersonnelOptions.EDGE_REPAIR_BREAK_PART)) {
             toReturn.append(String.format(", %d Edge)", tech.getCurrentEdge()));
         } else {
@@ -177,7 +178,7 @@ public class TechTableModel extends DataTableModel<Person> {
         toReturn.append("<br/>");
 
         toReturn.append(String.format("%d/%d minutes left", tech.getMinutesLeft(),
-              tech.getDailyAvailableTechTime(getCampaign().getCampaignOptions().isTechsUseAdministration())));
+              tech.getDailyAvailableTechTime(getCampaign().getCampaignOptions().get(CampaignOption.TECHS_USE_ADMINISTRATION))));
 
         if (overtimeAllowed) {
             toReturn.append(String.format(" + (%d overtime)", tech.getOvertimeLeft()));

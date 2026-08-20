@@ -92,6 +92,7 @@ import megamek.common.units.*;
 import megamek.logging.MMLogger;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.campaignOptions.CampaignOptions;
+import mekhq.campaign.campaignOptions.CampaignOption;
 import mekhq.campaign.finances.Money;
 import mekhq.campaign.mission.IPlayerSettings;
 import mekhq.campaign.personnel.Person;
@@ -302,14 +303,14 @@ public class Utilities {
                 continue;
             }
 
-            Faction campaignFaction = campaign.getFaction();
+            Faction campaignFaction = campaign.getPlayerForce().getFaction();
             boolean campaignIsClan = campaignFaction.isClan();
             String techBase = summary.getTechBase().toLowerCase();
             boolean modelIsClan = summary.isClan() || techBase.contains("clan") || techBase.contains("mixed");
 
             LocalDate today = campaign.getLocalDate();
 
-            boolean isLimitClanTech = campaign.getCampaignOptions().isLimitClanTech();
+            boolean isLimitClanTech = campaign.getCampaignOptions().get(CampaignOption.LIMIT_CLAN_TECH);
             boolean isBeforeTukayyid = !today.isAfter(BATTLE_OF_TUKAYYID);
             if (!campaignIsClan &&
                       modelIsClan &&

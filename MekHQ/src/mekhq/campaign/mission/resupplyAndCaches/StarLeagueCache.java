@@ -626,7 +626,7 @@ public class StarLeagueCache {
         if (isAnon) {
             return new ImageIcon("data/images/portraits/default.gif");
         } else {
-            return getFactionLogo(campaign.getGameYear(), campaign.getFaction().getShortName());
+            return getFactionLogo(campaign.getGameYear(), campaign.getPlayerForce().getFaction().getShortName());
         }
     }
 }

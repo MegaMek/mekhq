@@ -167,9 +167,9 @@ public class PersonnelMarketMekHQ extends NewPersonnelMarket {
             filterOutLegalFactions = true;
         }
 
-        if (getCampaign().isClanCampaign()) {
+        if (getCampaign().getPlayerForce().isClanForce()) {
             if (!filterOutLegalFactions) {
-                interestedFactions.add(getCampaign().getFaction());
+                interestedFactions.add(getCampaign().getPlayerForce().getFaction());
             }
 
             return interestedFactions;
@@ -287,7 +287,7 @@ public class PersonnelMarketMekHQ extends NewPersonnelMarket {
         // of the campaign minus 2 to a minimum of 2 (Green).
         averageSkillLevel = max(averageSkillLevel - (isOfferingGoldenHello() ? 1 : 2), 2);
 
-        Map<PersonnelRole, PersonnelMarketEntry> unorderedMarketEntries = getCampaign().isClanCampaign() ?
+        Map<PersonnelRole, PersonnelMarketEntry> unorderedMarketEntries = getCampaign().getPlayerForce().isClanForce() ?
                                                                                 getClanMarketEntries() :
                                                                                 getInnerSphereMarketEntries();
         unorderedMarketEntries = sanitizeMarketEntries(unorderedMarketEntries);
@@ -368,7 +368,7 @@ public class PersonnelMarketMekHQ extends NewPersonnelMarket {
         getLogger().debug("Base rolls: {}", lengthOfMonth);
 
         int rolls = lengthOfMonth * getSystemStatusRecruitmentMultiplier();
-        if (getCampaign().getCampaignOptions().isUseAlternativeAdvancedMedical()) {
+        if (getCampaign().getCampaignOptions().get(CampaignOption.USE_ALTERNATIVE_ADVANCED_MEDICAL)) {
             // Alt Advanced Medical increases the impact of injuries. Therefore, players need to maintain a larger
             // roster of combat personnel. This multiplier doubles the number of recruits in the pool to account for
             // this.
@@ -385,7 +385,7 @@ public class PersonnelMarketMekHQ extends NewPersonnelMarket {
             rolls = (int) round(rolls * getFactionStandingsRecruitmentModifier());
         }
 
-        if (campaignOptions.isAllowMonthlyConnections()) {
+        if (campaignOptions.get(CampaignOption.ALLOW_MONTHLY_CONNECTIONS)) {
             int additionalRecruits = performConnectionsRecruitsCheck();
             rolls += additionalRecruits;
         }

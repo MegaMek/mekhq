@@ -32,6 +32,10 @@
  */
 package mekhq.campaign.unit;
 
+import mekhq.campaign.campaignOptions.CampaignOption;
+
+import static org.mockito.Mockito.lenient;
+
 import static megamek.common.equipment.MiscType.F_CARGO;
 import static megamek.common.equipment.MiscType.F_LIFT_HOIST;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -403,6 +407,16 @@ class CargoCapacityTest {
         while (!unit.isFullyCrewed()) {
             Person crewMember = mock(Person.class);
             when(mockCampaign.getCampaignOptions()).thenReturn(mockCampaignOptions);
+            lenient().when(mockCampaignOptions.get(CampaignOption.USE_ABILITIES)).thenReturn(false);
+            lenient().when(mockCampaignOptions.get(CampaignOption.USE_EDGE)).thenReturn(false);
+            lenient().when(mockCampaignOptions.get(CampaignOption.USE_IMPLANTS)).thenReturn(false);
+            lenient().when(mockCampaignOptions.get(CampaignOption.USE_INITIATIVE_BONUS)).thenReturn(false);
+            lenient().when(mockCampaignOptions.get(CampaignOption.USE_BLOB_VESSEL_PILOT)).thenReturn(false);
+            lenient().when(mockCampaignOptions.get(CampaignOption.USE_BLOB_VESSEL_GUNNER)).thenReturn(false);
+            lenient().when(mockCampaignOptions.get(CampaignOption.USE_TACTICS)).thenReturn(false);
+            lenient().when(mockCampaignOptions.get(CampaignOption.USE_BLOB_VESSEL_CREW)).thenReturn(false);
+            lenient().when(mockCampaignOptions.get(CampaignOption.USE_SMALL_ARMS_ONLY)).thenReturn(false);
+            lenient().when(mockCampaignOptions.get(CampaignOption.ONLY_COMMANDERS_MATTER_VEHICLES)).thenReturn(false);
             when(crewMember.getPortrait()).thenReturn(mock(Portrait.class));
             when(crewMember.getId()).thenReturn(mock(UUID.class));
 

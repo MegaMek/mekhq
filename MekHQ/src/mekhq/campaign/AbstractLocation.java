@@ -246,7 +246,7 @@ public abstract class AbstractLocation implements IPlace {
 
             new ImmersiveDialogSimple(campaign, campaign.getPlayerForce().getHumanResources()
                                                       .getSeniorMedicalPerson(campaign.getCampaignOptions(),
-                                                            campaign.isClanCampaign(),
+                                                            campaign.getPlayerForce().isClanForce(),
                                                             campaign.getLocalDate()), null,
                   centerMessage, null, bottomMessage, null, false, ImmersiveDialogWidth.LARGE);
         }
@@ -263,7 +263,7 @@ public abstract class AbstractLocation implements IPlace {
 
             new ImmersiveDialogSimple(campaign, campaign.getPlayerForce().getHumanResources()
                                                       .getSeniorMedicalPerson(campaign.getCampaignOptions(),
-                                                            campaign.isClanCampaign(),
+                                                            campaign.getPlayerForce().isClanForce(),
                                                             campaign.getLocalDate()), null,
                   centerMessage, null, bottomMessage, null, false, ImmersiveDialogWidth.LARGE);
         }
@@ -289,7 +289,7 @@ public abstract class AbstractLocation implements IPlace {
                 new ImmersiveDialogSimple(campaign, campaign.getPlayerForce().getHumanResources()
                                                           .getSeniorAdminPerson(Campaign.AdministratorSpecialization.TRANSPORT,
                                                                 campaign.getCampaignOptions(),
-                                                                campaign.isClanCampaign(),
+                                                                campaign.getPlayerForce().isClanForce(),
                                                                 campaign.getLocalDate()), null,
                       inCharacterMessage, null,
                       getFormattedTextAt(RESOURCE_BUNDLE, "contract.arrivedEarly.ooc"),

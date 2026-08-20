@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2024-2025 The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2024-2026 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -46,6 +46,7 @@ import megamek.common.compute.Compute;
 import megamek.common.util.weightedMaps.WeightedIntMap;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.campaignOptions.CampaignOptions;
+import mekhq.campaign.campaignOptions.CampaignOption;
 import mekhq.campaign.personnel.Person;
 
 public class BackgroundsController {
@@ -54,7 +55,7 @@ public class BackgroundsController {
 
     public static void generateBackground(Campaign campaign, Person person) {
         CampaignOptions campaignOptions = campaign.getCampaignOptions();
-        if (campaignOptions.isUseToughness() && campaignOptions.isUseRandomToughness()) {
+        if (campaignOptions.get(CampaignOption.USE_TOUGHNESS) && campaignOptions.get(CampaignOption.USE_RANDOM_TOUGHNESS)) {
             Toughness.generateToughness(person);
         }
     }

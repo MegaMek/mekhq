@@ -345,7 +345,7 @@ public class ScenarioDeploymentLimit {
             return false;
         }
         for (UUID personId : requiredPersonnel) {
-            Person p = c.getPerson(personId);
+            Person p = c.getPlayerForce().getHumanResources().getPerson(personId);
             if ((null == p) || !p.getStatus().isActive()) {
                 // skip personnel who are not active or not present
                 continue;
@@ -390,7 +390,7 @@ public class ScenarioDeploymentLimit {
     public String getRequiredPersonnelDesc(Campaign c) {
         ArrayList<String> personNames = new ArrayList<>();
         for (UUID personId : requiredPersonnel) {
-            Person p = c.getPerson(personId);
+            Person p = c.getPlayerForce().getHumanResources().getPerson(personId);
             if ((null != p) && p.getStatus().isActive()) {
                 personNames.add(p.getFullName());
             }

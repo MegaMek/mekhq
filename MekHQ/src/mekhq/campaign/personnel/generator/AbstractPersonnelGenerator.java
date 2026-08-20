@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2019-2025 The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2019-2026 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -47,6 +47,7 @@ import mekhq.campaign.personnel.enums.PersonnelRole;
 import mekhq.campaign.personnel.enums.Phenotype;
 import mekhq.campaign.personnel.skills.RandomSkillPreferences;
 import mekhq.campaign.personnel.skills.SkillType;
+import mekhq.campaign.campaignOptions.CampaignOption;
 
 /**
  * Represents a class which can generate new {@link Person} objects for a {@link Campaign}.
@@ -114,7 +115,7 @@ public abstract class AbstractPersonnelGenerator {
      * @return A new {@link Person} object for the given campaign.
      */
     protected Person createPerson(Campaign campaign) {
-        return new Person(campaign, campaign.getFaction().getShortName());
+        return new Person(campaign, campaign.getPlayerForce().getFaction().getShortName());
     }
 
     /**
@@ -144,7 +145,7 @@ public abstract class AbstractPersonnelGenerator {
      *                 Gender.RANDOMIZE
      */
     protected void generateNameAndGender(Campaign campaign, Person person, Gender gender) {
-        int nonBinaryDiceSize = campaign.getCampaignOptions().getNonBinaryDiceSize();
+        int nonBinaryDiceSize = campaign.getCampaignOptions().get(CampaignOption.NON_BINARY_DICE_SIZE);
 
         if (gender != Gender.RANDOMIZE) {
             person.setGender(gender);
@@ -156,7 +157,7 @@ public abstract class AbstractPersonnelGenerator {
             }
         }
 
-        String factionCode = campaign.getCampaignOptions().isUseOriginFactionForNames() ?
+        String factionCode = campaign.getCampaignOptions().get(CampaignOption.USE_ORIGIN_FACTION_FOR_NAMES) ?
                                    person.getOriginFaction().getShortName() :
                                    RandomNameGenerator.getInstance().getChosenFaction();
 
@@ -174,7 +175,7 @@ public abstract class AbstractPersonnelGenerator {
      * @param person   The {@link Person} being generated.
      */
     protected void generateXp(Campaign campaign, Person person) {
-        if (campaign.getCampaignOptions().isUseDylansRandomXP()) {
+        if (campaign.getCampaignOptions().get(CampaignOption.USE_DYLANS_RANDOM_XP)) {
             person.setXP(campaign, Utilities.generateRandomExp());
         }
     }

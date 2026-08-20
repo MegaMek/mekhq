@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2024-2025 The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2024-2026 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -62,7 +62,7 @@ public class FactionHunterAwards {
         Faction missionFaction = ((AtBContract) mission).getEnemy();
 
         for (Award award : awards) {
-            if (award.canBeAwarded(campaign.getPerson(person))) {
+            if (award.canBeAwarded(campaign.getPlayerForce().getHumanResources().getPerson(person))) {
                 List<String> targetFactions = List.of(award.getRange().split(","));
 
                 if (!targetFactions.isEmpty()) {

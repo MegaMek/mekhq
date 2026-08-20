@@ -77,6 +77,7 @@ import mekhq.gui.baseComponents.immersiveDialogs.ImmersiveDialogWidth;
 import mekhq.gui.dialog.factionStanding.factionJudgment.FactionAccoladeConfirmationDialog;
 import mekhq.gui.dialog.factionStanding.factionJudgment.FactionJudgmentDialog;
 import mekhq.gui.dialog.factionStanding.factionJudgment.FactionJudgmentNewsArticle;
+import mekhq.campaign.campaignOptions.CampaignOption;
 
 /**
  * Handles events where a campaign receives a faction accolade, such as adoption.
@@ -147,7 +148,7 @@ public class FactionAccoladeEvent {
 
         Person commander = campaign.getPlayerForce().getHumanResources()
                                  .getCommander(campaign.getCampaignOptions(),
-                                       campaign.isClanCampaign(),
+                                       campaign.getPlayerForce().isClanForce(),
                                        campaign.getLocalDate());
         String factionName = getFactionName(accoladingFaction, campaign.getGameYear());
 
@@ -221,9 +222,9 @@ public class FactionAccoladeEvent {
             if (!isSameFaction) {
                 GoingRogue.processGoingRogue(campaign, accoladingFaction, campaign.getPlayerForce().getHumanResources()
                                                                                 .getCommander(campaign.getCampaignOptions(),
-                                                                                      campaign.isClanCampaign(),
+                                                                                      campaign.getPlayerForce().isClanForce(),
                                                                                       campaign.getLocalDate()), null,
-                      campaign.getCampaignOptions().isTrackFactionStanding(), false);
+                      campaign.getCampaignOptions().get(CampaignOption.TRACK_FACTION_STANDING), false);
             }
 
             List<Entity> generatedEntities = generateUnits();
@@ -274,7 +275,7 @@ public class FactionAccoladeEvent {
             speaker = campaign.getPlayerForce().getHumanResources()
                             .getSeniorAdminPerson(Campaign.AdministratorSpecialization.COMMAND,
                                   campaign.getCampaignOptions(),
-                                  campaign.isClanCampaign(),
+                                  campaign.getPlayerForce().isClanForce(),
                                   campaign.getLocalDate());
         } else {
             boolean isLetterFromHeadOfState = accoladeLevel.is(LETTER_FROM_HEAD_OF_STATE);

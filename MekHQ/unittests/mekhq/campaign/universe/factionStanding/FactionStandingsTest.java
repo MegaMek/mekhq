@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2025 The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2025-2026 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -174,7 +174,7 @@ class FactionStandingsTest {
         factionStandings.setRegardForFaction(null, "CS", -5.0, 3025, false); // Initial regard for ComStar
 
         Campaign mockCampaign = mockCampaign();
-        when(mockCampaign.getFaction()).thenReturn(factions.getDefaultFaction());
+        when(mockCampaign.getPlayerForce().getFaction()).thenReturn(factions.getDefaultFaction());
 
         Faction federatedSuns = factions.getFaction("FS");
         Faction capellanConfederation = factions.getFaction("CC");

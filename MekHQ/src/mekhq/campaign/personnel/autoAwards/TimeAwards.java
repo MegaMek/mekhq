@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2024-2025 The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2024-2026 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -40,6 +40,7 @@ import java.util.UUID;
 import megamek.logging.MMLogger;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.personnel.Award;
+import mekhq.campaign.campaignOptions.CampaignOption;
 
 public class TimeAwards {
     private static final MMLogger LOGGER = MMLogger.create(TimeAwards.class);
@@ -77,17 +78,17 @@ public class TimeAwards {
                 continue;
             }
 
-            if (award.canBeAwarded(campaign.getPerson(person))) {
+            if (award.canBeAwarded(campaign.getPlayerForce().getHumanResources().getPerson(person))) {
                 try {
-                    yearsOfService = campaign.getPerson(person).getYearsInService(campaign);
+                    yearsOfService = campaign.getPlayerForce().getHumanResources().getPerson(person).getYearsInService(campaign);
                 } catch (Exception e) {
                     LOGGER.error("Unable to parse yearsOfService for {} while processing Award {} from the [{}] set.",
-                          campaign.getPerson(person).getFullName(), award.getName(), award.getSet());
+                          campaign.getPlayerForce().getHumanResources().getPerson(person).getFullName(), award.getName(), award.getSet());
                     continue;
                 }
 
                 if (isCumulative) {
-                    requiredYearsOfService *= campaign.getPerson(person).getAwardController().getNumberOfAwards(award)
+                    requiredYearsOfService *= campaign.getPlayerForce().getHumanResources().getPerson(person).getAwardController().getNumberOfAwards(award)
                                                     + 1;
                 }
 
@@ -98,7 +99,7 @@ public class TimeAwards {
         }
 
         if (!bestEligibleAwards.isEmpty()) {
-            if (campaign.getCampaignOptions().isIssueBestAwardOnly()) {
+            if (campaign.getCampaignOptions().get(CampaignOption.ISSUE_BEST_AWARD_ONLY)) {
                 int rollingQty = 0;
 
                 for (Award award : bestEligibleAwards) {

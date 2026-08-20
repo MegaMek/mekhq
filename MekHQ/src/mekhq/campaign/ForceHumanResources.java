@@ -391,7 +391,7 @@ public class ForceHumanResources {
     public void removeAllPatientsFor(Person doctor, CampaignOptions campaignOptions) {
         for (Person person : getPersonnel()) {
             if (null != person.getDoctorId() && person.getDoctorId().equals(doctor.getId())) {
-                person.setDoctorId(null, campaignOptions.getNaturalHealingWaitingPeriod());
+                person.setDoctorId(null, campaignOptions.get(CampaignOption.NATURAL_HEALING_WAITING_PERIOD));
             }
         }
     }
@@ -500,7 +500,7 @@ public class ForceHumanResources {
      * @return the total number of primary AsTechs
      */
     public int getNumberPrimaryAsTechs(CampaignOptions campaignOptions) {
-        boolean isUseUsefulAsTechs = campaignOptions != null && campaignOptions.isUseUsefulAsTechs();
+        boolean isUseUsefulAsTechs = campaignOptions != null && campaignOptions.get(CampaignOption.USE_USEFUL_AS_TECHS);
 
         int asTechs = getTemporaryAsTechPool();
 
@@ -522,7 +522,7 @@ public class ForceHumanResources {
      * @return the total number of secondary AsTechs
      */
     public int getNumberSecondaryAsTechs(CampaignOptions campaignOptions) {
-        boolean isUseUsefulAsTechs = campaignOptions != null && campaignOptions.isUseUsefulAsTechs();
+        boolean isUseUsefulAsTechs = campaignOptions != null && campaignOptions.get(CampaignOption.USE_USEFUL_AS_TECHS);
 
         int asTechs = 0;
 
@@ -617,7 +617,7 @@ public class ForceHumanResources {
      * @return the permanent medic pool count
      */
     public int getPermanentMedicPool(CampaignOptions campaignOptions) {
-        final boolean isUseUsefulMedics = campaignOptions != null && campaignOptions.isUseUsefulMedics();
+        final boolean isUseUsefulMedics = campaignOptions != null && campaignOptions.get(CampaignOption.USE_USEFUL_MEDICS);
         int permanentMedicPool = 0;
 
         for (Person person : getActivePersonnel(false, false)) {
@@ -725,14 +725,14 @@ public class ForceHumanResources {
      */
     public boolean isBlobCrewEnabled(PersonnelRole role, CampaignOptions campaignOptions) {
         return switch (role) {
-            case SOLDIER -> campaignOptions.isUseBlobInfantry();
-            case BATTLE_ARMOUR -> campaignOptions.isUseBlobBattleArmor();
-            case VEHICLE_CREW_GROUND -> campaignOptions.isUseBlobVehicleCrewGround();
-            case VEHICLE_CREW_VTOL -> campaignOptions.isUseBlobVehicleCrewVTOL();
-            case VEHICLE_CREW_NAVAL -> campaignOptions.isUseBlobVehicleCrewNaval();
-            case VESSEL_PILOT -> campaignOptions.isUseBlobVesselPilot();
-            case VESSEL_GUNNER -> campaignOptions.isUseBlobVesselGunner();
-            case VESSEL_CREW -> campaignOptions.isUseBlobVesselCrew();
+            case SOLDIER -> campaignOptions.get(CampaignOption.USE_BLOB_INFANTRY);
+            case BATTLE_ARMOUR -> campaignOptions.get(CampaignOption.USE_BLOB_BATTLE_ARMOR);
+            case VEHICLE_CREW_GROUND -> campaignOptions.get(CampaignOption.USE_BLOB_VEHICLE_CREW_GROUND);
+            case VEHICLE_CREW_VTOL -> campaignOptions.get(CampaignOption.USE_BLOB_VEHICLE_CREW_VTOL);
+            case VEHICLE_CREW_NAVAL -> campaignOptions.get(CampaignOption.USE_BLOB_VEHICLE_CREW_NAVAL);
+            case VESSEL_PILOT -> campaignOptions.get(CampaignOption.USE_BLOB_VESSEL_PILOT);
+            case VESSEL_GUNNER -> campaignOptions.get(CampaignOption.USE_BLOB_VESSEL_GUNNER);
+            case VESSEL_CREW -> campaignOptions.get(CampaignOption.USE_BLOB_VESSEL_CREW);
             default -> false;
         };
     }
@@ -1028,7 +1028,7 @@ public class ForceHumanResources {
      * explicit at every call site.</p>
      */
     public static boolean isUsingLegacyPersonnelMarket(CampaignOptions options) {
-        return options.getPersonnelMarketStyle() == PERSONNEL_MARKET_DISABLED;
+        return options.get(CampaignOption.PERSONNEL_MARKET_STYLE) == PERSONNEL_MARKET_DISABLED;
     }
 
     /**
@@ -1115,7 +1115,7 @@ public class ForceHumanResources {
      * @return an {@link AbstractFactionSelector}
      */
     public AbstractFactionSelector getFactionSelector(CampaignOptions campaignOptions) {
-        return getFactionSelector(campaignOptions.getRandomOriginOptions());
+        return getFactionSelector(campaignOptions.get(CampaignOption.RANDOM_ORIGIN_OPTIONS));
     }
 
     /**
@@ -1137,7 +1137,7 @@ public class ForceHumanResources {
      * @return an {@link AbstractPlanetSelector}
      */
     public AbstractPlanetSelector getPlanetSelector(CampaignOptions campaignOptions) {
-        return getPlanetSelector(campaignOptions.getRandomOriginOptions());
+        return getPlanetSelector(campaignOptions.get(CampaignOption.RANDOM_ORIGIN_OPTIONS));
     }
 
     /**
@@ -1185,8 +1185,8 @@ public class ForceHumanResources {
      * @param person          the person who should receive a randomized portrait
      */
     public void assignRandomPortraitFor(CampaignOptions campaignOptions, final Person person) {
-        final boolean allowDuplicatePortraits = campaignOptions.isAllowDuplicatePortraits();
-        final boolean genderedPortraitsOnly = campaignOptions.isUseGenderedPortraitsOnly();
+        final boolean allowDuplicatePortraits = campaignOptions.get(CampaignOption.ALLOW_DUPLICATE_PORTRAITS);
+        final boolean genderedPortraitsOnly = campaignOptions.get(CampaignOption.USE_GENDERED_PORTRAITS_ONLY);
         final Portrait portrait = RandomPortraitGenerator.generate(getPersonnel(),
               person,
               allowDuplicatePortraits,
@@ -1485,7 +1485,7 @@ public class ForceHumanResources {
         }
 
         techs.sort(Comparator.comparingInt(person -> -person.getDailyAvailableTechTime(
-              campaignOptions.isTechsUseAdministration())));
+              campaignOptions.get(CampaignOption.TECHS_USE_ADMINISTRATION))));
 
         techs.sort((person1, person2) -> {
             if (person1.outRanks(person2)) {
@@ -1575,7 +1575,7 @@ public class ForceHumanResources {
      */
     public static @Nullable Person getLogisticsPerson(Collection<Person> people,
           CampaignOptions campaignOptions, boolean isClanCampaign, LocalDate today) {
-        final AcquisitionsType acquisitionsType = campaignOptions.getAcquisitionType();
+        final AcquisitionsType acquisitionsType = campaignOptions.get(CampaignOption.ACQUISITIONS_TYPE);
         String fixedSkillName = "";
         boolean isAnyTech = false;
 
@@ -1588,10 +1588,10 @@ public class ForceHumanResources {
             case NEGOTIATION -> fixedSkillName = S_NEGOTIATION;
         }
 
-        final ProcurementPersonnelPick acquisitionCategory = campaignOptions.getAcquisitionPersonnelCategory();
-        final int defaultMaxAcquisitions = campaignOptions.getMaxAcquisitions();
+        final ProcurementPersonnelPick acquisitionCategory = campaignOptions.get(CampaignOption.ACQUISITION_PERSONNEL_CATEGORY);
+        final int defaultMaxAcquisitions = campaignOptions.get(CampaignOption.MAX_ACQUISITIONS);
 
-        boolean isUseAgingEffects = campaignOptions.isUseAgeEffects();
+        boolean isUseAgingEffects = campaignOptions.get(CampaignOption.USE_AGE_EFFECTS);
 
         int bestSkill = Integer.MIN_VALUE;
         Person procurementCharacter = null;
@@ -1646,7 +1646,7 @@ public class ForceHumanResources {
      */
     public static List<Person> getLogisticsPersonnel(Collection<Person> people,
           CampaignOptions campaignOptions, boolean isClanCampaign, LocalDate today) {
-        final AcquisitionsType acquisitionsType = campaignOptions.getAcquisitionType();
+        final AcquisitionsType acquisitionsType = campaignOptions.get(CampaignOption.ACQUISITIONS_TYPE);
 
         String fixedSkillName = "";
         boolean isAnyTech = false;
@@ -1660,8 +1660,8 @@ public class ForceHumanResources {
             case NEGOTIATION -> fixedSkillName = S_NEGOTIATION;
         }
 
-        final int maxAcquisitions = campaignOptions.getMaxAcquisitions();
-        final ProcurementPersonnelPick acquisitionCategory = campaignOptions.getAcquisitionPersonnelCategory();
+        final int maxAcquisitions = campaignOptions.get(CampaignOption.MAX_ACQUISITIONS);
+        final ProcurementPersonnelPick acquisitionCategory = campaignOptions.get(CampaignOption.ACQUISITION_PERSONNEL_CATEGORY);
         List<Person> logisticsPersonnel = new ArrayList<>();
 
         for (Person person : people) {
@@ -1681,7 +1681,7 @@ public class ForceHumanResources {
             }
         }
 
-        boolean isUseAgingEffects = campaignOptions.isUseAgeEffects();
+        boolean isUseAgingEffects = campaignOptions.get(CampaignOption.USE_AGE_EFFECTS);
         final boolean sortByAnyTech = isAnyTech;
         final String sortBySkillName = fixedSkillName;
         logisticsPersonnel.sort((person1, person2) -> {
@@ -1724,12 +1724,12 @@ public class ForceHumanResources {
         CampaignOptions campaignOptions = campaign.getCampaignOptions();
         PersonnelRole civilianProfession = PersonnelRole.MISCELLANEOUS_JOB;
 
-        int dependentProfessionDieSize = campaignOptions.getDependentProfessionDieSize();
+        int dependentProfessionDieSize = campaignOptions.get(CampaignOption.DEPENDENT_PROFESSION_DIE_SIZE);
         if (dependentProfessionDieSize == 0 || randomInt(dependentProfessionDieSize) == 0) {
             civilianProfession = PersonnelRole.DEPENDENT;
         }
 
-        int civilianProfessionDieSize = campaignOptions.getCivilianProfessionDieSize();
+        int civilianProfessionDieSize = campaignOptions.get(CampaignOption.CIVILIAN_PROFESSION_DIE_SIZE);
         if (civilianProfessionDieSize > 0) {
             if (randomInt(civilianProfessionDieSize) == 0) {
                 List<PersonnelRole> civilianRoles = PersonnelRole.getCivilianRolesExceptNone();
@@ -1740,8 +1740,8 @@ public class ForceHumanResources {
         return newPerson(campaign,
               civilianProfession,
               PersonnelRole.NONE,
-              new DefaultFactionSelector(campaignOptions.getRandomOriginOptions(), originFaction),
-              new DefaultPlanetSelector(campaignOptions.getRandomOriginOptions(), originPlanet),
+              new DefaultFactionSelector(campaignOptions.get(CampaignOption.RANDOM_ORIGIN_OPTIONS), originFaction),
+              new DefaultPlanetSelector(campaignOptions.get(CampaignOption.RANDOM_ORIGIN_OPTIONS), originPlanet),
               gender);
     }
 
@@ -1765,7 +1765,7 @@ public class ForceHumanResources {
         return newPerson(campaign,
               primaryRole,
               PersonnelRole.NONE,
-              new DefaultFactionSelector(campaignOptions.getRandomOriginOptions(),
+              new DefaultFactionSelector(campaignOptions.get(CampaignOption.RANDOM_ORIGIN_OPTIONS),
                     (factionCode == null) ? null : Factions.getInstance().getFaction(factionCode)),
               getPlanetSelector(campaignOptions),
               gender);
@@ -1806,12 +1806,12 @@ public class ForceHumanResources {
 
         // Assign a random portrait after we generate a new person
         if (campaignOptions.isUsePortraitForRole(primaryRole)) {
-            if (!campaignOptions.isNoRandomPortraitsForChildren() || !person.isChild(currentDay, false)) {
+            if (!campaignOptions.get(CampaignOption.NO_RANDOM_PORTRAITS_FOR_CHILDREN) || !person.isChild(currentDay, false)) {
                 assignRandomPortraitFor(campaignOptions, person);
             }
         }
 
-        if (campaignOptions.isUseImplants() && campaignOptions.isUseAlternativeAdvancedMedical()) {
+        if (campaignOptions.get(CampaignOption.USE_IMPLANTS) && campaignOptions.get(CampaignOption.USE_ALTERNATIVE_ADVANCED_MEDICAL)) {
             if (primaryRole.isProtoMekPilot() || secondaryRole.isProtoMekPilot()) {
                 giveEIImplant(campaign, person);
             } else if (primaryRole.isMekWarrior() && person.isClanPersonnel()) {
@@ -2057,8 +2057,8 @@ public class ForceHumanResources {
         if (ignoreDice || (d6(2) >= bloodnameTarget)) {
             final Phenotype phenotype = person.getPhenotype().isNone() ? Phenotype.GENERAL : person.getPhenotype();
 
-            final Bloodname bloodname = Bloodname.randomBloodname((campaign.getFaction().isClan() ?
-                                                                         campaign.getFaction() :
+            final Bloodname bloodname = Bloodname.randomBloodname((campaign.getPlayerForce().getFaction().isClan() ?
+                                                                         campaign.getPlayerForce().getFaction() :
                                                                          person.getOriginFaction()).getShortName(),
                   phenotype,
                   campaign.getGameYear());
@@ -2288,7 +2288,7 @@ public class ForceHumanResources {
         Finances finances = campaign.getPlayerForce().getFinances();
 
         if (employ && !person.isEmployed()) {
-            if (campaign.getCampaignOptions().isPayForRecruitment() && !gmAdd) {
+            if (campaign.getCampaignOptions().get(CampaignOption.PAY_FOR_RECRUITMENT) && !gmAdd) {
                 if (!finances.debit(TransactionType.RECRUITMENT,
                       currentDay,
                       person.getSalary(campaign).multipliedBy(2),
@@ -2310,7 +2310,7 @@ public class ForceHumanResources {
             personnel.put(person.getId(), person);
             person.setParent(campaign.getPlayerForce().getPersonnel());
 
-            if (!bypassSimulateRelationships && campaign.getCampaignOptions().isUseSimulatedRelationships()) {
+            if (!bypassSimulateRelationships && campaign.getCampaignOptions().get(CampaignOption.USE_SIMULATED_RELATIONSHIPS)) {
                 if ((prisonerStatus.isFree()) &&
                           (!person.getOriginFaction().isClan()) &&
                           (!person.getPrimaryRole().isCivilian())) {
@@ -2465,7 +2465,7 @@ public class ForceHumanResources {
         int highest = 0;
         Person bestInRole = null;
 
-        boolean isUseAgingEffects = campaignOptions.isUseAgeEffects();
+        boolean isUseAgingEffects = campaignOptions.get(CampaignOption.USE_AGE_EFFECTS);
 
         for (Person person : people) {
             SkillModifierData skillModifierData = person.getSkillModifierData(isUseAgingEffects, isClanCampaign,
@@ -2534,7 +2534,7 @@ public class ForceHumanResources {
      */
     public static @Nullable Person findBestAtSkill(Collection<Person> people, String skillName,
           CampaignOptions campaignOptions, boolean isClanCampaign, LocalDate today) {
-        boolean isUseAgingEffects = campaignOptions.isUseAgeEffects();
+        boolean isUseAgingEffects = campaignOptions.get(CampaignOption.USE_AGE_EFFECTS);
 
         Person bestAtSkill = null;
         int highest = 0;

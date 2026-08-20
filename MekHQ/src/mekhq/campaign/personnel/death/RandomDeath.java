@@ -58,6 +58,7 @@ import megamek.logging.MMLogger;
 import mekhq.MHQConstants;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.campaignOptions.CampaignOptions;
+import mekhq.campaign.campaignOptions.CampaignOption;
 import mekhq.campaign.personnel.Injury;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.enums.AgeGroup;
@@ -159,9 +160,9 @@ public class RandomDeath {
         this.campaign = campaign;
         this.campaignOptions = campaign.getCampaignOptions();
 
-        enabledAgeGroups = campaignOptions.getEnabledRandomDeathAgeGroups();
-        enableRandomDeathSuicideCause = campaignOptions.isUseRandomDeathSuicideCause();
-        randomDeathMultiplier = campaignOptions.getRandomDeathMultiplier();
+        enabledAgeGroups = campaignOptions.get(CampaignOption.ENABLED_RANDOM_DEATH_AGE_GROUPS);
+        enableRandomDeathSuicideCause = campaignOptions.get(CampaignOption.USE_RANDOM_DEATH_SUICIDE_CAUSE);
+        randomDeathMultiplier = campaignOptions.get(CampaignOption.RANDOM_DEATH_MULTIPLIER);
 
         initializeCauses();
     }
@@ -347,7 +348,7 @@ public class RandomDeath {
         }
 
         Era era = campaign.getEra();
-        Faction faction = campaign.getFaction();
+        Faction faction = campaign.getPlayerForce().getFaction();
 
         // Determine base chance
         double randomDeathChance = getBaseDeathChance(person);
@@ -679,8 +680,8 @@ public class RandomDeath {
             String formatOpener = ReportingUtilities.spanOpeningWithCustomColor(color);
 
             CampaignOptions campaignOptions = campaign.getCampaignOptions();
-            boolean isReportRetireeDeaths = campaignOptions.isAnnounceRetireeDeath();
-            boolean isReportMostDeaths = campaignOptions.isAnnounceRetireeDeathExpanded();
+            boolean isReportRetireeDeaths = campaignOptions.get(CampaignOption.ANNOUNCE_RETIREE_DEATH);
+            boolean isReportMostDeaths = campaignOptions.get(CampaignOption.ANNOUNCE_RETIREE_DEATH_EXPANDED);
 
             PersonnelStatus status = person.getStatus();
             boolean isRetiredOrBackground = status.isRetired() || status.isBackground();
