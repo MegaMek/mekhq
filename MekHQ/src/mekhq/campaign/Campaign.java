@@ -54,7 +54,6 @@ import static mekhq.campaign.personnel.skills.SkillType.EXP_NONE;
 import static mekhq.campaign.personnel.skills.SkillType.S_ADMIN;
 import static mekhq.campaign.personnel.skills.SkillType.S_MEDTECH;
 import static mekhq.campaign.personnel.skills.SkillType.S_NEGOTIATION;
-import static mekhq.campaign.personnel.skills.SkillType.S_STRATEGY;
 import static mekhq.campaign.personnel.skills.SkillType.S_TECH_MECHANIC;
 import static mekhq.campaign.personnel.skills.SkillType.getType;
 import static mekhq.campaign.personnel.turnoverAndRetention.RetirementDefectionTracker.Payout.isBreakingContract;
@@ -90,7 +89,6 @@ import megamek.client.bot.princess.BehaviorSettings;
 import megamek.client.generator.RandomGenderGenerator;
 import megamek.client.generator.RandomNameGenerator;
 import megamek.client.generator.RandomUnitGenerator;
-import megamek.client.ui.util.PlayerColour;
 import megamek.codeUtilities.ObjectUtility;
 import megamek.codeUtilities.StringUtility;
 import megamek.common.Player;
@@ -105,7 +103,6 @@ import megamek.common.equipment.BombMounted;
 import megamek.common.equipment.EquipmentTypeLookup;
 import megamek.common.equipment.Mounted;
 import megamek.common.game.Game;
-import megamek.common.icons.Camouflage;
 import megamek.common.interfaces.ITechManager;
 import megamek.common.loaders.BLKFile;
 import megamek.common.loaders.EntityLoadingException;
@@ -157,9 +154,7 @@ import mekhq.campaign.finances.Loan;
 import mekhq.campaign.finances.Money;
 import mekhq.campaign.finances.enums.TransactionType;
 import mekhq.campaign.force.CombatTeam;
-import mekhq.campaign.force.Detachment;
 import mekhq.campaign.force.Formation;
-import mekhq.campaign.force.FormationType;
 import mekhq.campaign.force.PlayerForce;
 import mekhq.campaign.icons.StandardFormationIcon;
 import mekhq.campaign.location.ILocation;
@@ -172,7 +167,6 @@ import mekhq.campaign.log.UnitLogger;
 import mekhq.campaign.market.ForceShoppingList;
 import mekhq.campaign.market.PartsStore;
 import mekhq.campaign.market.PersonnelMarket;
-import mekhq.campaign.market.RequestedStockLevels;
 import mekhq.campaign.market.contractMarket.AbstractContractMarket;
 import mekhq.campaign.market.personnelMarket.markets.NewPersonnelMarket;
 import mekhq.campaign.market.unitMarket.AbstractUnitMarket;
@@ -213,7 +207,6 @@ import mekhq.campaign.personnel.enums.PersonnelRole;
 import mekhq.campaign.personnel.enums.PersonnelStatus;
 import mekhq.campaign.personnel.enums.SplittingSurnameStyle;
 import mekhq.campaign.personnel.familiarity.Familiarity;
-import mekhq.campaign.personnel.generator.AbstractPersonnelGenerator;
 import mekhq.campaign.personnel.marriage.AbstractMarriage;
 import mekhq.campaign.personnel.procreation.AbstractProcreation;
 import mekhq.campaign.personnel.ranks.AutomaticRankAssigner;
@@ -227,7 +220,6 @@ import mekhq.campaign.personnel.skills.SkillCheck;
 import mekhq.campaign.personnel.skills.SkillModifierData;
 import mekhq.campaign.personnel.skills.SkillType;
 import mekhq.campaign.personnel.turnoverAndRetention.RetirementDefectionTracker;
-import mekhq.campaign.randomEvents.prisoners.PrisonerStatus;
 import mekhq.campaign.randomEvents.randomEventsSystem.RandomEventLibraries;
 import mekhq.campaign.reputation.camOpsReputation.ForceReputationController;
 import mekhq.campaign.reputation.chaosReputation.ChaosReputation;
@@ -250,9 +242,6 @@ import mekhq.campaign.universe.factionStanding.FactionStandingJudgmentType;
 import mekhq.campaign.universe.factionStanding.FactionStandingUltimatumsLibrary;
 import mekhq.campaign.universe.factionStanding.FactionStandingUtilities;
 import mekhq.campaign.universe.factionStanding.FactionStandings;
-import mekhq.campaign.universe.fameAndInfamy.FameAndInfamyController;
-import mekhq.campaign.universe.selectors.factionSelectors.AbstractFactionSelector;
-import mekhq.campaign.universe.selectors.planetSelectors.AbstractPlanetSelector;
 import mekhq.campaign.universe.warriorsAlmanac.WarriorsAlmanacEntry;
 import mekhq.campaign.work.IAcquisitionWork;
 import mekhq.campaign.work.IFabricatable;
@@ -260,7 +249,6 @@ import mekhq.campaign.work.IPartWork;
 import mekhq.gui.CampaignGUI;
 import mekhq.gui.baseComponents.immersiveDialogs.ImmersiveDialogSimple;
 import mekhq.gui.baseComponents.immersiveDialogs.ImmersiveDialogWidth;
-import mekhq.gui.campaignOptions.enums.ProcurementPersonnelPick;
 import mekhq.gui.dialog.factionStanding.factionJudgment.FactionJudgmentDialog;
 import mekhq.service.IAutosaveService;
 import mekhq.utilities.MHQXMLUtility;
@@ -1854,8 +1842,7 @@ public class Campaign implements ITechManager {
         }
 
         Person negotiator = getPlayerForce().getHumanResources()
-                                  .getSeniorAdminPerson(AdministratorSpecialization.TRANSPORT,
-                                        getCampaignOptions(),
+                                  .getSeniorAdminPerson(getCampaignOptions(),
                                         getPlayerForce().isClanForce(),
                                         getLocalDate());
         if (negotiator != null) {

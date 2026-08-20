@@ -78,10 +78,9 @@ import mekhq.MHQStaticDirectoryManager;
 import mekhq.MekHQ;
 import mekhq.NullEntityException;
 import mekhq.campaign.Campaign;
-
 import mekhq.campaign.CampaignFactory;
-import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.campaignOptions.CampaignOption;
+import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.events.OptionsChangedEvent;
 import mekhq.campaign.finances.CurrencyManager;
 import mekhq.campaign.finances.financialInstitutions.FinancialInstitutions;
@@ -603,7 +602,11 @@ public class DataLoadingDialog extends AbstractMHQDialogBasic implements Propert
             }
 
             ImmersiveDialogSimple dialog = new ImmersiveDialogSimple(campaign,
-                  campaign.getPlayerForce().getHumanResources().getSeniorAdminPerson(AdministratorSpecialization.HR, campaign.getCampaignOptions(), campaign.getPlayerForce().isClanForce(), campaign.getLocalDate()),
+                  campaign.getPlayerForce()
+                        .getHumanResources()
+                        .getSeniorAdminPerson(campaign.getCampaignOptions(),
+                              campaign.getPlayerForce().isClanForce(),
+                              campaign.getLocalDate()),
                   null,
                   campaign.getResources().getString("personnelMarket.rareProfession.inCharacter"),
                   buttons,

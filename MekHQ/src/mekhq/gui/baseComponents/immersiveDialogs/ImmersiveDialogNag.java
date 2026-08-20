@@ -265,7 +265,7 @@ public class ImmersiveDialogNag {
     protected @Nullable Person getSpeaker(Campaign campaign) {
         return campaign.getPlayerForce().getHumanResources()
                      .getSeniorAdminPerson(campaign.getCampaignOptions(),
-                           campaign.isClanCampaign(),
+                           campaign.getPlayerForce().isClanForce(),
                            campaign.getLocalDate());
     }
 
