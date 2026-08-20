@@ -84,7 +84,7 @@ class ChaosContractDeterminationScaleTest {
     private int scaleFor(final boolean isCadreDuty, final Unit... units) {
         LocalHangar hangar = mock(LocalHangar.class);
         when(hangar.getUnits()).thenReturn(List.of(units));
-        return ChaosContractDeterminationScale.generateScaleForDetachment(playerForce, hangar, isCadreDuty);
+        return ChaosContractDeterminationScale.generateScaleForDetachment(playerForce, hangar, isCadreDuty, true);
     }
 
     @Test

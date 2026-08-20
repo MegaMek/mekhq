@@ -63,7 +63,8 @@ class ChaosContractDetermineTermsTest {
     private static ContractTermsData termsForRoll(final int roll) {
         try (MockedStatic<Compute> compute = mockStatic(Compute.class)) {
             compute.when(() -> Compute.d6(2)).thenReturn(roll);
-            return ChaosContractDetermineTerms.determineInitialTerms(ChaosObjectiveType.RAID, ChaosEmployerType.NOBLE);
+            return ChaosContractDetermineTerms.determineInitialTerms(ChaosObjectiveType.RAID, ChaosEmployerType.NOBLE,
+                  null, false);
         }
     }
 
@@ -92,7 +93,7 @@ class ChaosContractDetermineTermsTest {
             // CORPORATION carries a +2 pay-rate modifier; RAID adds nothing to pay, so base STEP_THREE climbs to
             // STEP_FIVE. This proves the employer modifier reaches influenceStep rather than being dropped.
             ContractTermsData terms = ChaosContractDetermineTerms.determineInitialTerms(ChaosObjectiveType.RAID,
-                  ChaosEmployerType.CORPORATION);
+                  ChaosEmployerType.CORPORATION, null, false);
 
             assertEquals(STEP_FIVE, terms.payRate());
         }
