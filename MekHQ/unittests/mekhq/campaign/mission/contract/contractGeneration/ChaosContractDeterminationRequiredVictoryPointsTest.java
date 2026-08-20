@@ -86,8 +86,9 @@ class ChaosContractDeterminationRequiredVictoryPointsTest {
 
     @Test
     void integratedCommandTakesTheFullTurningPointChance() {
+        StratConCampaignState state = stateWithTracks(track(50));
         AbstractContract contract = mock(AbstractContract.class);
-        when(contract.getStratConCampaignState()).thenReturn(stateWithTracks(track(50)));
+        when(contract.getStratConCampaignState()).thenReturn(state);
         when(contract.getCommandRights()).thenReturn(ContractCommandRights.INTEGRATED);
         when(contract.getObjectiveType()).thenReturn(ContractObjectiveType.OBJECTIVE_RAID);
         when(contract.getScale()).thenReturn(2);
@@ -99,8 +100,9 @@ class ChaosContractDeterminationRequiredVictoryPointsTest {
 
     @Test
     void nonIntegratedCommandOnlyTakesAThirdOfTheTurningPoints() {
+        StratConCampaignState state = stateWithTracks(track(100), track(50));
         AbstractContract contract = mock(AbstractContract.class);
-        when(contract.getStratConCampaignState()).thenReturn(stateWithTracks(track(100), track(50)));
+        when(contract.getStratConCampaignState()).thenReturn(state);
         when(contract.getCommandRights()).thenReturn(ContractCommandRights.HOUSE);
         when(contract.getObjectiveType()).thenReturn(ContractObjectiveType.OBJECTIVE_RAID);
         when(contract.getScale()).thenReturn(4);
@@ -112,8 +114,9 @@ class ChaosContractDeterminationRequiredVictoryPointsTest {
 
     @Test
     void garrisonContractsShortenTheEffectiveDuration() {
+        StratConCampaignState state = stateWithTracks(track(100));
         AbstractContract contract = mock(AbstractContract.class);
-        when(contract.getStratConCampaignState()).thenReturn(stateWithTracks(track(100)));
+        when(contract.getStratConCampaignState()).thenReturn(state);
         when(contract.getCommandRights()).thenReturn(ContractCommandRights.INTEGRATED);
         when(contract.getObjectiveType()).thenReturn(ContractObjectiveType.GARRISON_DUTY);
         when(contract.getScale()).thenReturn(2);

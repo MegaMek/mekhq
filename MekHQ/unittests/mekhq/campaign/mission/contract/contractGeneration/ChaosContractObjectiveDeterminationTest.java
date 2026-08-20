@@ -47,6 +47,11 @@ import org.mockito.MockedStatic;
  * <p>Each call rolls d6 more than once, so the stub feeds a sequence: the first value is the bracket roll and the rest
  * are consumed, in order, by the player/opposing sub-rolls. Player objectives that are fixed (raid, invasion) consume
  * no extra roll.</p>
+ *
+ * <p>Assertions compare the {@link ChaosObjectiveType} category rather than the concrete CamOps objective:
+ * {@link ChaosObjectiveType#getCamOpsObjectiveType()} picks a <em>random</em> CamOps variant among the candidates that
+ * map back to a category (e.g. RAID -> Recon Raid or Diversionary Raid), so the concrete variant is not deterministic
+ * across two independent invocations.</p>
  */
 class ChaosContractObjectiveDeterminationTest {
 
@@ -64,8 +69,8 @@ class ChaosContractObjectiveDeterminationTest {
         // Bracket roll 7 -> raid; opposing roll 11 -> RAID.
         ContractObjectiveData data = determine(0, 7, 11);
 
-        assertEquals(ChaosObjectiveType.RAID.getCamOpsObjectiveType(), data.playerObjectiveType());
-        assertEquals(ChaosObjectiveType.RAID.getCamOpsObjectiveType(), data.opposingObjectiveType());
+        assertEquals(ChaosObjectiveType.RAID, data.playerObjectiveType().getChaosObjectiveType());
+        assertEquals(ChaosObjectiveType.RAID, data.opposingObjectiveType().getChaosObjectiveType());
     }
 
     @Test
@@ -73,8 +78,8 @@ class ChaosContractObjectiveDeterminationTest {
         // Bracket roll 2 -> expedition; player roll 2 -> EXPEDITION; opposing roll 9 -> RAID.
         ContractObjectiveData data = determine(0, 2, 2, 9);
 
-        assertEquals(ChaosObjectiveType.EXPEDITION.getCamOpsObjectiveType(), data.playerObjectiveType());
-        assertEquals(ChaosObjectiveType.RAID.getCamOpsObjectiveType(), data.opposingObjectiveType());
+        assertEquals(ChaosObjectiveType.EXPEDITION, data.playerObjectiveType().getChaosObjectiveType());
+        assertEquals(ChaosObjectiveType.RAID, data.opposingObjectiveType().getChaosObjectiveType());
     }
 
     @Test
@@ -82,8 +87,8 @@ class ChaosContractObjectiveDeterminationTest {
         // Bracket roll 5 -> garrison; player roll 12 -> GARRISON; opposing roll 12 -> INVASION.
         ContractObjectiveData data = determine(0, 5, 12, 12);
 
-        assertEquals(ChaosObjectiveType.GARRISON.getCamOpsObjectiveType(), data.playerObjectiveType());
-        assertEquals(ChaosObjectiveType.INVASION.getCamOpsObjectiveType(), data.opposingObjectiveType());
+        assertEquals(ChaosObjectiveType.GARRISON, data.playerObjectiveType().getChaosObjectiveType());
+        assertEquals(ChaosObjectiveType.INVASION, data.opposingObjectiveType().getChaosObjectiveType());
     }
 
     @Test
@@ -91,8 +96,8 @@ class ChaosContractObjectiveDeterminationTest {
         // Bracket roll 6 + modifier 5 = 11 -> invasion; opposing roll 2 -> EXPEDITION.
         ContractObjectiveData data = determine(5, 6, 2);
 
-        assertEquals(ChaosObjectiveType.INVASION.getCamOpsObjectiveType(), data.playerObjectiveType());
-        assertEquals(ChaosObjectiveType.EXPEDITION.getCamOpsObjectiveType(), data.opposingObjectiveType());
+        assertEquals(ChaosObjectiveType.INVASION, data.playerObjectiveType().getChaosObjectiveType());
+        assertEquals(ChaosObjectiveType.EXPEDITION, data.opposingObjectiveType().getChaosObjectiveType());
     }
 
     @Test
@@ -100,7 +105,7 @@ class ChaosContractObjectiveDeterminationTest {
         // Bracket roll 2 + modifier -5 = -3, clamped to 1 -> expedition (must not throw).
         ContractObjectiveData data = determine(-5, 2, 2, 9);
 
-        assertEquals(ChaosObjectiveType.EXPEDITION.getCamOpsObjectiveType(), data.playerObjectiveType());
-        assertEquals(ChaosObjectiveType.RAID.getCamOpsObjectiveType(), data.opposingObjectiveType());
+        assertEquals(ChaosObjectiveType.EXPEDITION, data.playerObjectiveType().getChaosObjectiveType());
+        assertEquals(ChaosObjectiveType.RAID, data.opposingObjectiveType().getChaosObjectiveType());
     }
 }
