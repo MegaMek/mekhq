@@ -82,13 +82,12 @@ public class SkillCheckRulesTest {
             doCallRealMethod().when(campaign).checkAcquisition(any(), any(), anyBoolean());
             Faction faction = new Faction();
             when(campaign.getCampaignOptions()).thenReturn(options);
+            lenient().when(options.get(CampaignOption.LIMIT_BY_YEAR)).thenReturn(false);
+            lenient().when(options.get(CampaignOption.TECH_LEVEL)).thenReturn(0);
             lenient().when(options.get(CampaignOption.USE_AGE_EFFECTS)).thenReturn(false);
             lenient().when(options.get(CampaignOption.SIMULATE_GRAY_MONDAY)).thenReturn(false);
-            lenient().when(options.get(CampaignOption.DISALLOW_EXTINCT_STUFF)).thenReturn(false);
             lenient().when(options.get(CampaignOption.IS_ENABLE_SALVAGE_FLAG_BY_DEFAULT)).thenReturn(false);
-            lenient().when(options.get(CampaignOption.LIMIT_BY_YEAR)).thenReturn(false);
             lenient().when(options.get(CampaignOption.TECHS_USE_ADMINISTRATION)).thenReturn(false);
-            lenient().when(options.get(CampaignOption.TECH_LEVEL)).thenReturn(0);
             when(campaign.getPlayerForce().getFaction()).thenReturn(faction);
             mekhq.campaign.market.ForceShoppingList shoppingList = mock(mekhq.campaign.market.ForceShoppingList.class);
             when(campaign.getPlayerForce().getShoppingList()).thenReturn(shoppingList);

@@ -1800,7 +1800,6 @@ public class PersonTest {
                 CampaignOptions options = mock(CampaignOptions.class);
                 when(options.get(CampaignOption.NATURAL_HEALING_WAITING_PERIOD)).thenReturn(0);
                 when(campaign.getCampaignOptions()).thenReturn(options);
-                lenient().when(options.get(CampaignOption.NATURAL_HEALING_WAITING_PERIOD)).thenReturn(0);
                 lenient().when(options.get(CampaignOption.USE_TOUGHNESS)).thenReturn(false);
                 lenient().when(options.get(CampaignOption.USE_TWIST_OF_FATE_SURVIVAL)).thenReturn(false);
                 lenient().when(options.get(CampaignOption.USE_ALTERNATIVE_ADVANCED_MEDICAL)).thenReturn(false);
@@ -1892,7 +1891,6 @@ public class PersonTest {
                 CampaignOptions options = mock(CampaignOptions.class);
                 when(options.get(CampaignOption.NATURAL_HEALING_WAITING_PERIOD)).thenReturn(0);
                 when(campaign.getCampaignOptions()).thenReturn(options);
-                lenient().when(options.get(CampaignOption.NATURAL_HEALING_WAITING_PERIOD)).thenReturn(0);
                 lenient().when(options.get(CampaignOption.USE_TOUGHNESS)).thenReturn(false);
                 lenient().when(options.get(CampaignOption.USE_TWIST_OF_FATE_SURVIVAL)).thenReturn(false);
                 lenient().when(options.get(CampaignOption.USE_ALTERNATIVE_ADVANCED_MEDICAL)).thenReturn(false);
@@ -2296,7 +2294,6 @@ public class PersonTest {
             when(campaign.getCampaignOptions()).thenReturn(options);
             lenient().when(options.get(CampaignOption.NATURAL_HEALING_WAITING_PERIOD)).thenReturn(0);
             lenient().when(options.get(CampaignOption.USE_TOUGHNESS)).thenReturn(false);
-            lenient().when(options.get(CampaignOption.USE_TWIST_OF_FATE_SURVIVAL)).thenReturn(false);
             lenient().when(options.get(CampaignOption.USE_ALTERNATIVE_ADVANCED_MEDICAL)).thenReturn(false);
             lenient().when(options.get(CampaignOption.IS_ENABLE_SALVAGE_FLAG_BY_DEFAULT)).thenReturn(false);
             lenient().when(options.get(CampaignOption.TECHS_USE_ADMINISTRATION)).thenReturn(false);

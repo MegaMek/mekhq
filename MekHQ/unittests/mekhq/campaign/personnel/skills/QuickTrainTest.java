@@ -189,6 +189,8 @@ class QuickTrainTest {
         lenient().when(campaignOptions.get(CampaignOption.USE_ARTILLERY)).thenReturn(false);
         lenient().when(campaignOptions.get(CampaignOption.ADMINS_HAVE_NEGOTIATION)).thenReturn(false);
         when(campaign.getCampaignOptions()).thenReturn(campaignOptions);
+        lenient().when(campaignOptions.get(CampaignOption.USE_AGE_EFFECTS)).thenReturn(false);
+        lenient().when(campaignOptions.get(CampaignOption.PERSONNEL_LOG_SKILL_GAIN)).thenReturn(false);
         lenient().when(campaignOptions.get(CampaignOption.XP_COST_MULTIPLIER)).thenReturn(0.0);
         lenient().when(campaignOptions.get(CampaignOption.USE_REASONING_XP_MULTIPLIER)).thenReturn(false);
         lenient().when(campaignOptions.get(CampaignOption.USE_FUNCTIONAL_APPRAISAL)).thenReturn(false);

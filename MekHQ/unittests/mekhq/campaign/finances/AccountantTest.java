@@ -990,8 +990,6 @@ public class AccountantTest {
         void testGetPayrollSummary_emptyCampaign() {
             // Arrange
             when(mockCampaign.getCampaignOptions()).thenReturn(campaignOptions);
-            lenient().when(campaignOptions.get(CampaignOption.IS_ENABLE_SALVAGE_FLAG_BY_DEFAULT)).thenReturn(false);
-            lenient().when(campaignOptions.get(CampaignOption.TECHS_USE_ADMINISTRATION)).thenReturn(false);
 
             // Act
             Map<Person, Money> expectedMap = accountant.getPayRollSummary();
@@ -1008,8 +1006,6 @@ public class AccountantTest {
             Person mockPerson = getMockPerson();
 
             when(mockCampaign.getCampaignOptions()).thenReturn(campaignOptions);
-            lenient().when(campaignOptions.get(CampaignOption.IS_ENABLE_SALVAGE_FLAG_BY_DEFAULT)).thenReturn(false);
-            lenient().when(campaignOptions.get(CampaignOption.TECHS_USE_ADMINISTRATION)).thenReturn(false);
             when(mockCampaign.getPlayerForce().getHumanResources().getSalaryEligiblePersonnel()).thenReturn(List.of(
                   mockPerson));
 
@@ -1029,8 +1025,6 @@ public class AccountantTest {
             // Arrange
             when(mockCampaign.getPlayerForce().getHumanResources().getTemporaryAsTechPool()).thenReturn(5);
             when(mockCampaign.getCampaignOptions()).thenReturn(campaignOptions);
-            lenient().when(campaignOptions.get(CampaignOption.IS_ENABLE_SALVAGE_FLAG_BY_DEFAULT)).thenReturn(false);
-            lenient().when(campaignOptions.get(CampaignOption.TECHS_USE_ADMINISTRATION)).thenReturn(false);
 
             // Act
 
@@ -1047,8 +1041,6 @@ public class AccountantTest {
             // Arrange
             when(mockCampaign.getPlayerForce().getHumanResources().getTemporaryMedicPool()).thenReturn(5);
             when(mockCampaign.getCampaignOptions()).thenReturn(campaignOptions);
-            lenient().when(campaignOptions.get(CampaignOption.IS_ENABLE_SALVAGE_FLAG_BY_DEFAULT)).thenReturn(false);
-            lenient().when(campaignOptions.get(CampaignOption.TECHS_USE_ADMINISTRATION)).thenReturn(false);
 
             // Act
 
@@ -1067,8 +1059,6 @@ public class AccountantTest {
             // Arrange
             when(mockHumanResources.getTempPersonnelRoleMap()).thenReturn(Map.of(role, CREWCOUNT));
             when(mockCampaign.getCampaignOptions()).thenReturn(campaignOptions);
-            lenient().when(campaignOptions.get(CampaignOption.IS_ENABLE_SALVAGE_FLAG_BY_DEFAULT)).thenReturn(false);
-            lenient().when(campaignOptions.get(CampaignOption.TECHS_USE_ADMINISTRATION)).thenReturn(false);
 
             // Act
             Map<Person, Money> expectedMap = accountant.getPayRollSummary();
@@ -1492,8 +1482,6 @@ public class AccountantTest {
             accountant = new Accountant(mockCampaign);
 
             when(mockCampaign.getCampaignOptions()).thenReturn(mockCampaignOptions);
-            lenient().when(mockCampaignOptions.get(CampaignOption.IS_ENABLE_SALVAGE_FLAG_BY_DEFAULT)).thenReturn(false);
-            lenient().when(mockCampaignOptions.get(CampaignOption.TECHS_USE_ADMINISTRATION)).thenReturn(false);
             when(mockCampaign.getPlayerForce().getHangar()).thenReturn(mockHangar);
             when(mockCampaign.getPlayerForce().isClanForce()).thenReturn(false);
             when(mockCampaign.getLocalDate()).thenReturn(TODAY);
@@ -2470,8 +2458,6 @@ public class AccountantTest {
             accountant = new Accountant(mockCampaign);
 
             when(mockCampaign.getCampaignOptions()).thenReturn(campaignOptions);
-            lenient().when(campaignOptions.get(CampaignOption.IS_ENABLE_SALVAGE_FLAG_BY_DEFAULT)).thenReturn(false);
-            lenient().when(campaignOptions.get(CampaignOption.TECHS_USE_ADMINISTRATION)).thenReturn(false);
             when(mockCampaign.getPlayerForce().getHangar()).thenReturn(mockHangar);
             when(mockCampaign.getPlayerForce().isClanForce()).thenReturn(false);
             when(mockCampaign.getLocalDate()).thenReturn(TODAY);

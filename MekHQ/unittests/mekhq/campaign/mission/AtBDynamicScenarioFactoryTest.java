@@ -46,6 +46,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.Mockito.RETURNS_DEEP_STUBS;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import static testUtilities.MHQTestUtilities.getEntityForUnitTesting;
@@ -389,7 +390,7 @@ class AtBDynamicScenarioFactoryTest {
     }
 
     private static Campaign mockCampaignWithNoSeedForces() {
-        Campaign campaign = mock(Campaign.class);
+        Campaign campaign = mock(Campaign.class, RETURNS_DEEP_STUBS);
         CampaignOptions campaignOptions = mock(CampaignOptions.class);
 
         when(campaign.getCampaignOptions()).thenReturn(campaignOptions);

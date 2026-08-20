@@ -85,14 +85,14 @@ public class AbstractMarriageTest {
     @BeforeEach
     public void beforeEach() {
         lenient().when(mockCampaign.getCampaignOptions()).thenReturn(mockCampaignOptions);
-        lenient().when(mockCampaignOptions.get(CampaignOption.RANDOM_MARRIAGE_DICE_SIZE)).thenReturn(0);
         lenient().when(mockCampaignOptions.get(CampaignOption.USE_RANDOM_PRISONER_MARRIAGES)).thenReturn(false);
         lenient().when(mockCampaignOptions.get(CampaignOption.USE_RANDOM_CLAN_PERSONNEL_MARRIAGES)).thenReturn(false);
-        lenient().when(mockCampaignOptions.get(CampaignOption.USE_LOYALTY_MODIFIERS)).thenReturn(false);
         lenient().when(mockCampaignOptions.get(CampaignOption.USE_PRISONER_MARRIAGES)).thenReturn(false);
+        lenient().when(mockCampaignOptions.get(CampaignOption.USE_CLAN_PERSONNEL_MARRIAGES)).thenReturn(false);
+        lenient().when(mockCampaignOptions.get(CampaignOption.RANDOM_MARRIAGE_DICE_SIZE)).thenReturn(0);
+        lenient().when(mockCampaignOptions.get(CampaignOption.USE_LOYALTY_MODIFIERS)).thenReturn(false);
         lenient().when(mockCampaignOptions.get(CampaignOption.IS_ENABLE_SALVAGE_FLAG_BY_DEFAULT)).thenReturn(false);
         lenient().when(mockCampaignOptions.get(CampaignOption.CHECK_MUTUAL_ANCESTORS_DEPTH)).thenReturn(0);
-        lenient().when(mockCampaignOptions.get(CampaignOption.USE_CLAN_PERSONNEL_MARRIAGES)).thenReturn(false);
         lenient().when(mockCampaignOptions.get(CampaignOption.TECHS_USE_ADMINISTRATION)).thenReturn(false);
         lenient().when(mockCampaignOptions.get(CampaignOption.RANDOM_NEW_DEPENDENT_MARRIAGE)).thenReturn(0);
     }

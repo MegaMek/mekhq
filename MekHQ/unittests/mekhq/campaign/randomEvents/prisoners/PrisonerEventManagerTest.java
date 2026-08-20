@@ -1022,8 +1022,6 @@ public class PrisonerEventManagerTest {
             CampaignOptions campaignOptions = new CampaignOptions();
             campaignOptions.set(CampaignOption.USE_CHAOS_REPUTATION, false);
             when(campaign.getCampaignOptions()).thenReturn(campaignOptions);
-            lenient().when(campaignOptions.get(CampaignOption.IS_ENABLE_SALVAGE_FLAG_BY_DEFAULT)).thenReturn(false);
-            lenient().when(campaignOptions.get(CampaignOption.TECHS_USE_ADMINISTRATION)).thenReturn(false);
             return campaign;
         }
 

@@ -301,11 +301,6 @@ class PrisonerMissionEndEventTest {
         CampaignOptions campaignOptions = new CampaignOptions();
         campaignOptions.set(CampaignOption.USE_CHAOS_REPUTATION, false);
         when(mockCampaign.getCampaignOptions()).thenReturn(campaignOptions);
-        lenient().when(campaignOptions.get(CampaignOption.USE_AGE_EFFECTS)).thenReturn(false);
-        lenient().when(campaignOptions.get(CampaignOption.USE_ARTILLERY)).thenReturn(false);
-        lenient().when(campaignOptions.get(CampaignOption.ADMIN_EXPERIENCE_LEVEL_INCLUDE_NEGOTIATION)).thenReturn(false);
-        lenient().when(campaignOptions.get(CampaignOption.IS_ENABLE_SALVAGE_FLAG_BY_DEFAULT)).thenReturn(false);
-        lenient().when(campaignOptions.get(CampaignOption.TECHS_USE_ADMINISTRATION)).thenReturn(false);
         LocalDate today = LocalDate.of(3151, 1, 1);
         when(mockCampaign.getLocalDate()).thenReturn(today);
         AtBContract contract = new AtBContract("TEST");
@@ -331,11 +326,6 @@ class PrisonerMissionEndEventTest {
         CampaignOptions campaignOptions = new CampaignOptions();
         campaignOptions.set(CampaignOption.USE_CHAOS_REPUTATION, false);
         when(mockCampaign.getCampaignOptions()).thenReturn(campaignOptions);
-        lenient().when(campaignOptions.get(CampaignOption.USE_AGE_EFFECTS)).thenReturn(false);
-        lenient().when(campaignOptions.get(CampaignOption.USE_ARTILLERY)).thenReturn(false);
-        lenient().when(campaignOptions.get(CampaignOption.ADMIN_EXPERIENCE_LEVEL_INCLUDE_NEGOTIATION)).thenReturn(false);
-        lenient().when(campaignOptions.get(CampaignOption.IS_ENABLE_SALVAGE_FLAG_BY_DEFAULT)).thenReturn(false);
-        lenient().when(campaignOptions.get(CampaignOption.TECHS_USE_ADMINISTRATION)).thenReturn(false);
         when(mockCampaign.getLocalDate()).thenReturn(LocalDate.of(3151, 1, 1));
         AtBContract contract = new AtBContract("TEST");
         PrisonerMissionEndEvent endEvent = new PrisonerMissionEndEvent(mockCampaign, contract);
@@ -362,11 +352,6 @@ class PrisonerMissionEndEventTest {
         CampaignOptions campaignOptions = new CampaignOptions();
         campaignOptions.set(CampaignOption.USE_CHAOS_REPUTATION, false);
         when(mockCampaign.getCampaignOptions()).thenReturn(campaignOptions);
-        lenient().when(campaignOptions.get(CampaignOption.USE_AGE_EFFECTS)).thenReturn(false);
-        lenient().when(campaignOptions.get(CampaignOption.USE_ARTILLERY)).thenReturn(false);
-        lenient().when(campaignOptions.get(CampaignOption.ADMIN_EXPERIENCE_LEVEL_INCLUDE_NEGOTIATION)).thenReturn(false);
-        lenient().when(campaignOptions.get(CampaignOption.IS_ENABLE_SALVAGE_FLAG_BY_DEFAULT)).thenReturn(false);
-        lenient().when(campaignOptions.get(CampaignOption.TECHS_USE_ADMINISTRATION)).thenReturn(false);
         when(mockCampaign.getLocalDate()).thenReturn(LocalDate.of(3151, 1, 1));
         AtBContract contract = new AtBContract("TEST");
         PrisonerMissionEndEvent endEvent = new PrisonerMissionEndEvent(mockCampaign, contract);

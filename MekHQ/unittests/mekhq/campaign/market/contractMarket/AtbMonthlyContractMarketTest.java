@@ -169,6 +169,9 @@ class AtbMonthlyContractMarketTest {
             when(campaign.getLocalDate()).thenReturn(TODAY);
             when(campaign.getGameYear()).thenReturn(GAME_YEAR);
             when(campaign.getCampaignOptions()).thenReturn(campaignOptions);
+            lenient().when(campaignOptions.get(CampaignOption.LIMIT_CLAN_TECH)).thenReturn(false);
+            lenient().when(campaignOptions.get(CampaignOption.PAY_FOR_TRANSPORT)).thenReturn(false);
+            lenient().when(campaignOptions.get(CampaignOption.USE_PEACETIME_COST)).thenReturn(false);
             lenient().when(campaignOptions.get(CampaignOption.SIMULATE_GRAY_MONDAY)).thenReturn(false);
             lenient().when(campaignOptions.get(CampaignOption.USE_GENERIC_BATTLE_VALUE)).thenReturn(false);
             lenient().when(campaignOptions.get(CampaignOption.CLAMP_REPUTATION_PAY_MULTIPLIER)).thenReturn(false);

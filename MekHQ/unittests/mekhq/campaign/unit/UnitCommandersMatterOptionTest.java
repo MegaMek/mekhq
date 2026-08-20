@@ -79,9 +79,8 @@ public class UnitCommandersMatterOptionTest {
     @Test
     public void testIsOnlyCommandersMatter_Vehicles() {
         CampaignOptions options = mock(CampaignOptions.class);
-        lenient().when(options.get(CampaignOption.ONLY_COMMANDERS_MATTER_VEHICLES)).thenReturn(false);
-        lenient().when(options.get(CampaignOption.ONLY_COMMANDERS_MATTER_INFANTRY)).thenReturn(false);
         lenient().when(options.get(CampaignOption.ONLY_COMMANDERS_MATTER_BATTLE_ARMOR)).thenReturn(false);
+        lenient().when(options.get(CampaignOption.ONLY_COMMANDERS_MATTER_INFANTRY)).thenReturn(false);
         when(options.get(CampaignOption.ONLY_COMMANDERS_MATTER_VEHICLES)).thenReturn(true);
         Set<Class<? extends Entity>> expectedTrue = Set.of(
               LargeSupportTank.class, SuperHeavyTank.class, Tank.class, VTOL.class);
@@ -92,7 +91,6 @@ public class UnitCommandersMatterOptionTest {
     public void testIsOnlyCommandersMatter_Infantry() {
         CampaignOptions options = mock(CampaignOptions.class);
         lenient().when(options.get(CampaignOption.ONLY_COMMANDERS_MATTER_VEHICLES)).thenReturn(false);
-        lenient().when(options.get(CampaignOption.ONLY_COMMANDERS_MATTER_INFANTRY)).thenReturn(false);
         lenient().when(options.get(CampaignOption.ONLY_COMMANDERS_MATTER_BATTLE_ARMOR)).thenReturn(false);
         when(options.get(CampaignOption.ONLY_COMMANDERS_MATTER_INFANTRY)).thenReturn(true);
         Set<Class<? extends Entity>> expectedTrue = Set.of(ConvInfantry.class, EjectedCrew.class, MekWarrior.class);
@@ -104,7 +102,6 @@ public class UnitCommandersMatterOptionTest {
         CampaignOptions options = mock(CampaignOptions.class);
         lenient().when(options.get(CampaignOption.ONLY_COMMANDERS_MATTER_VEHICLES)).thenReturn(false);
         lenient().when(options.get(CampaignOption.ONLY_COMMANDERS_MATTER_INFANTRY)).thenReturn(false);
-        lenient().when(options.get(CampaignOption.ONLY_COMMANDERS_MATTER_BATTLE_ARMOR)).thenReturn(false);
         when(options.get(CampaignOption.ONLY_COMMANDERS_MATTER_BATTLE_ARMOR)).thenReturn(true);
         Set<Class<? extends Entity>> expectedTrue = Set.of(BattleArmor.class);
         runTest(options, expectedTrue);

@@ -1650,7 +1650,6 @@ public class AmmoBinTest {
             options.set(CampaignOption.PAY_FOR_REPAIRS, false);
             options.set(CampaignOption.USE_BALANCED_FABRICATION, true);
             when(mockCampaign.getCampaignOptions()).thenReturn(options);
-            lenient().when(options.get(CampaignOption.USE_AMMO_BY_TYPE)).thenReturn(false);
 
             AmmoBin ammoBin = newBin(mockCampaign, 10);
 
@@ -1666,7 +1665,6 @@ public class AmmoBinTest {
             options.set(CampaignOption.PAY_FOR_PARTS, false);
             options.set(CampaignOption.PAY_FOR_REPAIRS, false);
             when(mockCampaign.getCampaignOptions()).thenReturn(options);
-            lenient().when(options.get(CampaignOption.USE_AMMO_BY_TYPE)).thenReturn(false);
 
             AmmoBin ammoBin = newBin(mockCampaign, 10);
 
@@ -1858,7 +1856,6 @@ public class AmmoBinTest {
             options.set(CampaignOption.PAY_FOR_REPAIRS, false);
             options.set(CampaignOption.USE_BALANCED_FABRICATION, true);
             when(mockCampaign.getCampaignOptions()).thenReturn(options);
-            lenient().when(options.get(CampaignOption.USE_AMMO_BY_TYPE)).thenReturn(false);
             when(mockCampaign.getLocalDate()).thenReturn(LocalDate.of(3151, 1, 1));
 
             LocalWarehouse warehouse = new LocalWarehouse();

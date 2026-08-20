@@ -1667,7 +1667,6 @@ public class LargeCraftAmmoBinTest {
         options.set(CampaignOption.PAY_FOR_REPAIRS, false);
         options.set(CampaignOption.USE_BALANCED_FABRICATION, true);
         when(mockCampaign.getCampaignOptions()).thenReturn(options);
-        lenient().when(options.get(CampaignOption.USE_AMMO_BY_TYPE)).thenReturn(false);
 
         AmmoType ammoType = getAmmoType("ISLRM20 Ammo");
         int capacity = 10;
@@ -1700,7 +1699,6 @@ public class LargeCraftAmmoBinTest {
         options.set(CampaignOption.PAY_FOR_REPAIRS, false);
         options.set(CampaignOption.USE_BALANCED_FABRICATION, true);
         when(mockCampaign.getCampaignOptions()).thenReturn(options);
-        lenient().when(options.get(CampaignOption.USE_AMMO_BY_TYPE)).thenReturn(false);
 
         AmmoType standardAmmo = getAmmoType("ISLRM20 Ammo");
         AmmoType artemisAmmo = getAmmoType("ISLRM20 Artemis-capable Ammo");
