@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2021-2025 The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2021-2026 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -43,6 +43,7 @@ import megamek.common.units.Entity;
 import megamek.logging.MMLogger;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.campaignOptions.CampaignOptions;
+import mekhq.campaign.campaignOptions.CampaignOption;
 import mekhq.campaign.finances.Money;
 import mekhq.campaign.market.enums.UnitMarketType;
 import mekhq.utilities.MHQXMLUtility;
@@ -140,11 +141,11 @@ public class UnitMarketOffer {
         Money cost = Money.of((double) getUnit().getCost()).multipliedBy(getPercent()).dividedBy(100);
 
         if (getEntity().isMixedTech()) {
-            cost = cost.multipliedBy(campaignOptions.getMixedTechUnitPriceMultiplier());
+            cost = cost.multipliedBy(campaignOptions.get(CampaignOption.MIXED_TECH_UNIT_PRICE_MULTIPLIER));
         } else if (getEntity().isClan()) {
-            cost = cost.multipliedBy(campaignOptions.getClanUnitPriceMultiplier());
+            cost = cost.multipliedBy(campaignOptions.get(CampaignOption.CLAN_UNIT_PRICE_MULTIPLIER));
         } else { // Inner Sphere Entity
-            cost = cost.multipliedBy(campaignOptions.getInnerSphereUnitPriceMultiplier());
+            cost = cost.multipliedBy(campaignOptions.get(CampaignOption.INNER_SPHERE_UNIT_PRICE_MULTIPLIER));
         }
 
         return cost;

@@ -54,6 +54,7 @@ import megamek.common.units.SupportTank;
 import megamek.common.units.Tank;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.campaignOptions.CampaignOptions;
+import mekhq.campaign.campaignOptions.CampaignOption;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.unit.Unit;
 import org.junit.jupiter.api.Test;
@@ -64,7 +65,7 @@ public class HirePersonnelUnitActionTest {
         Campaign mockCampaign = mock(Campaign.class, RETURNS_DEEP_STUBS);
         CampaignOptions mockOptions = mock(CampaignOptions.class);
         doReturn(mockOptions).when(mockCampaign).getCampaignOptions();
-        doReturn(false).when(mockOptions).isUseArtillery();
+        doReturn(false).when(mockOptions).get(CampaignOption.USE_ARTILLERY);
         Entity mockEntity = mock(Mek.class);
         Unit unit = spy(new Unit(mockEntity, mockCampaign));
 
@@ -92,7 +93,7 @@ public class HirePersonnelUnitActionTest {
         Campaign mockCampaign = mock(Campaign.class, RETURNS_DEEP_STUBS);
         CampaignOptions mockOptions = mock(CampaignOptions.class);
         doReturn(mockOptions).when(mockCampaign).getCampaignOptions();
-        doReturn(false).when(mockOptions).isUseArtillery();
+        doReturn(false).when(mockOptions).get(CampaignOption.USE_ARTILLERY);
         Entity mockEntity = mock(Mek.class);
         Unit unit = spy(new Unit(mockEntity, mockCampaign));
 
@@ -135,7 +136,7 @@ public class HirePersonnelUnitActionTest {
         Campaign mockCampaign = mock(Campaign.class, RETURNS_DEEP_STUBS);
         CampaignOptions mockOptions = mock(CampaignOptions.class);
         doReturn(mockOptions).when(mockCampaign).getCampaignOptions();
-        doReturn(false).when(mockOptions).isUseArtillery();
+        doReturn(false).when(mockOptions).get(CampaignOption.USE_ARTILLERY);
         Entity mockEntity = mock(Mek.class);
         Unit unit = spy(new Unit(mockEntity, mockCampaign));
 
@@ -218,7 +219,7 @@ public class HirePersonnelUnitActionTest {
         Campaign mockCampaign = mock(Campaign.class, RETURNS_DEEP_STUBS);
         CampaignOptions mockOptions = mock(CampaignOptions.class);
         doReturn(mockOptions).when(mockCampaign).getCampaignOptions();
-        doReturn(false).when(mockOptions).isUseArtillery();
+        doReturn(false).when(mockOptions).get(CampaignOption.USE_ARTILLERY);
         Entity mockEntity = mock(LandAirMek.class);
         Unit unit = spy(new Unit(mockEntity, mockCampaign));
 
@@ -261,7 +262,7 @@ public class HirePersonnelUnitActionTest {
         Campaign mockCampaign = mock(Campaign.class, RETURNS_DEEP_STUBS);
         CampaignOptions mockOptions = mock(CampaignOptions.class);
         doReturn(mockOptions).when(mockCampaign).getCampaignOptions();
-        doReturn(false).when(mockOptions).isUseArtillery();
+        doReturn(false).when(mockOptions).get(CampaignOption.USE_ARTILLERY);
         Entity mockEntity = mock(Mek.class);
         Unit unit = spy(new Unit(mockEntity, mockCampaign));
 
@@ -303,7 +304,7 @@ public class HirePersonnelUnitActionTest {
         Campaign mockCampaign = mock(Campaign.class, RETURNS_DEEP_STUBS);
         CampaignOptions mockOptions = mock(CampaignOptions.class);
         doReturn(mockOptions).when(mockCampaign).getCampaignOptions();
-        doReturn(false).when(mockOptions).isUseArtillery();
+        doReturn(false).when(mockOptions).get(CampaignOption.USE_ARTILLERY);
         Entity mockEntity = mock(Tank.class);
         when(mockEntity.getMovementMode()).thenReturn(EntityMovementMode.TRACKED);
         Unit unit = spy(new Unit(mockEntity, mockCampaign));
@@ -346,7 +347,7 @@ public class HirePersonnelUnitActionTest {
         Campaign mockCampaign = mock(Campaign.class, RETURNS_DEEP_STUBS);
         CampaignOptions mockOptions = mock(CampaignOptions.class);
         doReturn(mockOptions).when(mockCampaign).getCampaignOptions();
-        doReturn(false).when(mockOptions).isUseArtillery();
+        doReturn(false).when(mockOptions).get(CampaignOption.USE_ARTILLERY);
         Entity mockEntity = mock(Jumpship.class);
         Unit unit = spy(new Unit(mockEntity, mockCampaign));
 
@@ -388,7 +389,7 @@ public class HirePersonnelUnitActionTest {
         Campaign mockCampaign = mock(Campaign.class, RETURNS_DEEP_STUBS);
         CampaignOptions mockOptions = mock(CampaignOptions.class);
         doReturn(mockOptions).when(mockCampaign).getCampaignOptions();
-        doReturn(false).when(mockOptions).isUseArtillery();
+        doReturn(false).when(mockOptions).get(CampaignOption.USE_ARTILLERY);
         Entity mockEntity = mock(SmallCraft.class);
         Unit unit = spy(new Unit(mockEntity, mockCampaign));
 
@@ -430,7 +431,7 @@ public class HirePersonnelUnitActionTest {
         Campaign mockCampaign = mock(Campaign.class, RETURNS_DEEP_STUBS);
         CampaignOptions mockOptions = mock(CampaignOptions.class);
         doReturn(mockOptions).when(mockCampaign).getCampaignOptions();
-        doReturn(false).when(mockOptions).isUseArtillery();
+        doReturn(false).when(mockOptions).get(CampaignOption.USE_ARTILLERY);
         Entity mockEntity = mock(Jumpship.class);
         when(mockEntity.isSupportVehicle()).thenReturn(false);
         when(mockEntity.isLargeCraft()).thenReturn(true);
@@ -474,7 +475,7 @@ public class HirePersonnelUnitActionTest {
         Campaign mockCampaign = mock(Campaign.class, RETURNS_DEEP_STUBS);
         CampaignOptions mockOptions = mock(CampaignOptions.class);
         doReturn(mockOptions).when(mockCampaign).getCampaignOptions();
-        doReturn(false).when(mockOptions).isUseArtillery();
+        doReturn(false).when(mockOptions).get(CampaignOption.USE_ARTILLERY);
         Entity mockEntity = mock(SupportTank.class);
         when(mockEntity.isSupportVehicle()).thenReturn(true);
         when(mockEntity.getMovementMode()).thenReturn(EntityMovementMode.HOVER);
@@ -519,7 +520,7 @@ public class HirePersonnelUnitActionTest {
         Campaign mockCampaign = mock(Campaign.class, RETURNS_DEEP_STUBS);
         CampaignOptions mockOptions = mock(CampaignOptions.class);
         doReturn(mockOptions).when(mockCampaign).getCampaignOptions();
-        doReturn(false).when(mockOptions).isUseArtillery();
+        doReturn(false).when(mockOptions).get(CampaignOption.USE_ARTILLERY);
         Entity mockEntity = mock(Jumpship.class);
         when(mockEntity.isSupportVehicle()).thenReturn(false);
         Unit unit = spy(new Unit(mockEntity, mockCampaign));
@@ -562,7 +563,7 @@ public class HirePersonnelUnitActionTest {
         Campaign mockCampaign = mock(Campaign.class, RETURNS_DEEP_STUBS);
         CampaignOptions mockOptions = mock(CampaignOptions.class);
         doReturn(mockOptions).when(mockCampaign).getCampaignOptions();
-        doReturn(false).when(mockOptions).isUseArtillery();
+        doReturn(false).when(mockOptions).get(CampaignOption.USE_ARTILLERY);
         Entity mockEntity = mock(Mek.class);
         Unit unit = spy(new Unit(mockEntity, mockCampaign));
 
@@ -604,7 +605,7 @@ public class HirePersonnelUnitActionTest {
         Campaign mockCampaign = mock(Campaign.class, RETURNS_DEEP_STUBS);
         CampaignOptions mockOptions = mock(CampaignOptions.class);
         doReturn(mockOptions).when(mockCampaign).getCampaignOptions();
-        doReturn(false).when(mockOptions).isUseArtillery();
+        doReturn(false).when(mockOptions).get(CampaignOption.USE_ARTILLERY);
         Entity mockEntity = mock(Tank.class);
         when(mockEntity.getMovementMode()).thenReturn(EntityMovementMode.TRACKED);
         Unit unit = spy(new Unit(mockEntity, mockCampaign));

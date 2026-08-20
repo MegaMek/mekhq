@@ -68,6 +68,7 @@ import megamek.logging.MMLogger;
 import mekhq.MHQConstants;
 import mekhq.MekHQ;
 import mekhq.Utilities;
+import mekhq.campaign.campaignOptions.CampaignOption;
 import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.events.persons.PersonBattleFinishedEvent;
 import mekhq.campaign.finances.Money;
@@ -88,6 +89,8 @@ import mekhq.campaign.parts.Part;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.enums.PersonnelRole;
 import mekhq.campaign.personnel.enums.PersonnelStatus;
+import mekhq.campaign.personnel.familiarity.Familiarity;
+import mekhq.campaign.personnel.familiarity.FamiliarityGainType;
 import mekhq.campaign.personnel.medical.InjurySPAUtility;
 import mekhq.campaign.personnel.turnoverAndRetention.Fatigue;
 import mekhq.campaign.randomEvents.prisoners.CapturePrisoners;
@@ -195,7 +198,7 @@ public class ResolveScenarioTracker {
             AtBContract contract = ((AtBScenario) scenario).getContract(campaign);
 
             if (control) {
-                searchingFaction = campaign.getFaction();
+                searchingFaction = campaign.getPlayerForce().getFaction();
             } else {
                 searchingFaction = contract.getEnemy();
                 sarQuality = contract.getEnemyQuality();
@@ -496,7 +499,7 @@ public class ResolveScenarioTracker {
             } else if (wreck.getOwner().isEnemyOf(client.getLocalPlayer())) {
                 if (wreck.isDropShip() && scenario.getBoardType() != T_SPACE) {
                     double dropShipBonusPercentage = (double) campaign.getCampaignOptions()
-                                                                    .getDropShipBonusPercentage() / 100;
+                                                                    .get(CampaignOption.DROP_SHIP_BONUS_PERCENTAGE) / 100;
 
                     if (dropShipBonusPercentage > 0) {
                         dropShipBonus = dropShipBonus.plus(generateNewTestUnit(wreck).getSellValue()
@@ -874,16 +877,16 @@ public class ResolveScenarioTracker {
                             }
                         }
                         if (wounded) {
-                            int hits = campaign.getCampaignOptions().getMinimumHitsForVehicles();
+                            int hits = campaign.getCampaignOptions().get(CampaignOption.MINIMUM_HITS_FOR_VEHICLES);
                             if (campaign.getCampaignOptions().isUseAdvancedMedical() ||
-                                      campaign.getCampaignOptions().isUseRandomHitsForVehicles()) {
+                                      campaign.getCampaignOptions().get(CampaignOption.USE_RANDOM_HITS_FOR_VEHICLES)) {
                                 int range = 6 - hits;
                                 hits = hits + Compute.randomInt(range);
                             }
                             status.setHits(hits);
                         }
                     }
-                    status.setXP(campaign.getCampaignOptions().getScenarioXP());
+                    status.setXP(campaign.getCampaignOptions().get(CampaignOption.SCENARIO_XP));
                     status.setDeployed(!en.wasNeverDeployed());
                     peopleStatus.put(p.getId(), status);
                 }
@@ -891,7 +894,7 @@ public class ResolveScenarioTracker {
         }
 
         // And now we have potential prisoners that are crewing a unit...
-        if (!campaign.getCampaignOptions().getPrisonerCaptureStyle().isNone()) {
+        if (!campaign.getCampaignOptions().get(CampaignOption.PRISONER_CAPTURE_STYLE).isNone()) {
             processPrisonerCapture(potentialSalvage);
             processPrisonerCapture(devastatedEnemyUnits);
         }
@@ -1054,15 +1057,15 @@ public class ResolveScenarioTracker {
             }
 
             if (wounded) {
-                int hits = campaign.getCampaignOptions().getMinimumHitsForVehicles();
+                int hits = campaign.getCampaignOptions().get(CampaignOption.MINIMUM_HITS_FOR_VEHICLES);
                 if (campaign.getCampaignOptions().isUseAdvancedMedical() ||
-                          campaign.getCampaignOptions().isUseRandomHitsForVehicles()) {
+                          campaign.getCampaignOptions().get(CampaignOption.USE_RANDOM_HITS_FOR_VEHICLES)) {
                     int range = 6 - hits;
                     hits = hits + Compute.randomInt(range);
                 }
                 status.setHits(hits);
             }
-            status.setXP(campaign.getCampaignOptions().getScenarioXP());
+            status.setXP(campaign.getCampaignOptions().get(CampaignOption.SCENARIO_XP));
             status.setDeployed(!en.wasNeverDeployed());
             peopleStatus.put(p.getId(), status);
         }
@@ -1101,9 +1104,9 @@ public class ResolveScenarioTracker {
                             }
 
                             if (wounded) {
-                                int hits = campaign.getCampaignOptions().getMinimumHitsForVehicles();
+                                int hits = campaign.getCampaignOptions().get(CampaignOption.MINIMUM_HITS_FOR_VEHICLES);
                                 if (campaign.getCampaignOptions().isUseAdvancedMedical() ||
-                                          campaign.getCampaignOptions().isUseRandomHitsForVehicles()) {
+                                          campaign.getCampaignOptions().get(CampaignOption.USE_RANDOM_HITS_FOR_VEHICLES)) {
                                     int range = 6 - hits;
                                     hits = hits + Compute.randomInt(range);
                                 }
@@ -1356,9 +1359,9 @@ public class ResolveScenarioTracker {
                         }
                     }
                     if (wounded) {
-                        int hits = campaign.getCampaignOptions().getMinimumHitsForVehicles();
+                        int hits = campaign.getCampaignOptions().get(CampaignOption.MINIMUM_HITS_FOR_VEHICLES);
                         if (campaign.getCampaignOptions().isUseAdvancedMedical() ||
-                                  campaign.getCampaignOptions().isUseRandomHitsForVehicles()) {
+                                  campaign.getCampaignOptions().get(CampaignOption.USE_RANDOM_HITS_FOR_VEHICLES)) {
                             int range = 6 - hits;
                             hits = hits + Compute.randomInt(range);
                         }
@@ -1373,7 +1376,7 @@ public class ResolveScenarioTracker {
                 } else {
                     status.setCaptured(pickedUp);
                 }
-                status.setXP(campaign.getCampaignOptions().getScenarioXP());
+                status.setXP(campaign.getCampaignOptions().get(CampaignOption.SCENARIO_XP));
                 oppositionPersonnel.put(person.getId(), status);
             }
         }
@@ -1714,7 +1717,7 @@ public class ResolveScenarioTracker {
             int count = entry.getValue();
 
             if (count > 0) {
-                Money baseSalary = options.getRoleBaseSalaries()[role.ordinal()];
+                Money baseSalary = options.get(CampaignOption.ROLE_BASE_SALARIES)[role.ordinal()];
                 Money payout = calculateTempCrewPayout(baseSalary, false);
                 totalPayout = totalPayout.plus(payout.multipliedBy(count));
                 totalKilled += count;
@@ -1751,10 +1754,10 @@ public class ResolveScenarioTracker {
      */
     private Money calculateTempCrewPayout(Money baseSalary, boolean isOfficer) {
         CampaignOptions options = campaign.getCampaignOptions();
-        double bonusMultiplier = options.getPayoutRateEnlisted();
+        double bonusMultiplier = options.get(CampaignOption.PAYOUT_RATE_ENLISTED);
 
         if (isOfficer) {
-            bonusMultiplier = options.getPayoutRateOfficer();
+            bonusMultiplier = options.get(CampaignOption.PAYOUT_RATE_OFFICER);
         }
 
         return baseSalary.multipliedBy(bonusMultiplier);
@@ -1788,8 +1791,8 @@ public class ResolveScenarioTracker {
 
         // now lets update personnel
         CampaignOptions campaignOptions = campaign.getCampaignOptions();
-        boolean isUseInjuryFatigue = campaignOptions.isUseInjuryFatigue();
-        int fatigueRate = campaignOptions.getFatigueRate();
+        boolean isUseInjuryFatigue = campaignOptions.get(CampaignOption.USE_INJURY_FATIGUE);
+        int fatigueRate = campaignOptions.get(CampaignOption.FATIGUE_RATE);
         for (UUID pid : peopleStatus.keySet()) {
             Person person = campaign.getPlayerForce().getHumanResources().getPerson(pid);
             PersonStatus status = peopleStatus.get(pid);
@@ -1838,7 +1841,7 @@ public class ResolveScenarioTracker {
             if (!status.isDead()) {
                 person.changeFatigue(fatigueRate);
 
-                if (campaignOptions.isUseFatigue()) {
+                if (campaignOptions.get(CampaignOption.USE_FATIGUE)) {
                     Fatigue.processFatigueActions(campaign, person);
                 }
             }
@@ -1851,6 +1854,12 @@ public class ResolveScenarioTracker {
                 Campaign campaign1 = getCampaign();
                 campaign1.getPlayerForce().getHumanResources().removePerson(campaign1, person, false);
             }
+        }
+
+        Familiarity familiarity = campaignOptions.get(CampaignOption.CHASSIS_FAMILIARITY_MODE);
+        int familiarityDice = campaignOptions.get(CampaignOption.CHASSIS_FAMILIARITY_SPEED);
+        if (familiarity.isEnabled()) {
+            processFamiliarity(familiarityDice, familiarity);
         }
 
         // Process payouts for killed temp crew (blob crew)
@@ -1920,7 +1929,7 @@ public class ResolveScenarioTracker {
             UnitLogger.deployed(unit, campaign.getLocalDate(), scenario.getName());
 
             Money unitValue = unit.getBuyCost();
-            if (campaignOptions.isBLCSaleValue()) {
+            if (campaignOptions.get(CampaignOption.BLC_SALE_VALUE)) {
                 unitValue = unit.getSellValue();
             }
 
@@ -1947,7 +1956,7 @@ public class ResolveScenarioTracker {
                 if (en.isAero()) {
                     ((IAero) en).setFuelTonnage(((IAero) unitStatus.getBaseEntity()).getFuelTonnage());
                 }
-                if (campaign.getCampaignOptions().isPayForRepairs()) {
+                if (campaign.getCampaignOptions().get(CampaignOption.PAY_FOR_REPAIRS)) {
                     Money amount = unit.getValueOfAllDamagedParts()
                                          .multipliedBy(DAMANGED_PART_COMPENSATION_MODIFIER);
                     repairBLC = repairBLC.minus(amount);
@@ -1973,7 +1982,7 @@ public class ResolveScenarioTracker {
                     blcValue = unitValue.minus(unit.getSellValue());
                     blcString = "battle loss compensation for " + unit.getName();
                 }
-                if (campaignOptions.isPayForRepairs()) {
+                if (campaignOptions.get(CampaignOption.PAY_FOR_REPAIRS)) {
                     Money amount = unit.getValueOfAllDamagedParts()
                                          .multipliedBy(DAMANGED_PART_COMPENSATION_MODIFIER);
                     repairBLC = repairBLC.minus(amount);
@@ -1994,7 +2003,7 @@ public class ResolveScenarioTracker {
             }
         }
 
-        if (campaignOptions.isUseCamOpsSalvage()) {
+        if (campaignOptions.get(CampaignOption.IS_USE_CAM_OPS_SALVAGE)) {
             boolean hasAssignedSalvageForce = !scenario.getSalvageFormations().isEmpty();
             boolean hasAssignedSalvageTechs = !scenario.getSalvageTechs().isEmpty();
 
@@ -2007,7 +2016,7 @@ public class ResolveScenarioTracker {
                       getActualSalvage(), getSoldSalvage());
 
                 List<UUID> techUUIDs = scenario.getSalvageTechs();
-                if (campaignOptions.isUseRiskySalvage()) {
+                if (campaignOptions.get(CampaignOption.IS_USE_RISKY_SALVAGE)) {
                     CamOpsSalvageUtilities.performRiskySalvageChecks(campaign,
                           techUUIDs,
                           picker.getCountOfSalvageUnits());
@@ -2029,9 +2038,21 @@ public class ResolveScenarioTracker {
         scenario.clearAllFormationsAndPersonnel(campaign);
         // let's reset the network ids from the c3UUIDs
         campaign.reloadGameEntities();
-        campaign.refreshNetworks();
+        campaign.getPlayerForce().refreshNetworks(campaign.getGame());
         scenario.setDate(campaign.getLocalDate());
         client = null;
+    }
+
+    private void processFamiliarity(int familiaritySpeed, Familiarity familiarity) {
+        // Techs gaining familiarity even if the unit is undamaged is intentional. I opted not to have techs gain
+        // familiarity when repairing or maintaining directly because otherwise tech familiarity gain would skyrocket
+        // - Illiani Aug/1/26
+        int cap = familiarity.getFamiliarityCap();
+        if (familiaritySpeed > 0) {
+            for (Unit unit : units) {
+                Familiarity.assignFamiliarity(campaign, unit, cap, familiaritySpeed, FamiliarityGainType.D6);
+            }
+        }
     }
 
     @Deprecated(since = "0.51.0", forRemoval = true)

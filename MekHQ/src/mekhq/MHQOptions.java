@@ -120,6 +120,14 @@ public final class MHQOptions extends SuiteOptions {
         userPreferences.node(MHQConstants.DISPLAY_NODE).putBoolean(MHQConstants.SHOW_UNIT_PICTURES_ON_TOE, value);
     }
 
+    public boolean getShowWarriorsAlmanac() {
+        return userPreferences.node(MHQConstants.DISPLAY_NODE).getBoolean(MHQConstants.SHOW_WARRIORS_ALMANAC, true);
+    }
+
+    public void setShowWarriorsAlmanac(final boolean value) {
+        userPreferences.node(MHQConstants.DISPLAY_NODE).putBoolean(MHQConstants.SHOW_WARRIORS_ALMANAC, value);
+    }
+
     // region Personnel Record Logs
     public boolean getDisplayPersonnelLog() {
         return userPreferences.node(MHQConstants.DISPLAY_NODE).getBoolean(MHQConstants.DISPLAY_PERSONNEL_LOG, false);

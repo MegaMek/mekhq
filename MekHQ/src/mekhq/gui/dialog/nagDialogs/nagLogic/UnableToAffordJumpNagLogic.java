@@ -38,6 +38,7 @@ import mekhq.campaign.AbstractLocation;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.JumpPath;
 import mekhq.campaign.finances.Money;
+import mekhq.campaign.campaignOptions.CampaignOption;
 
 /** no longer in use **/
 @Deprecated(since = "50.10", forRemoval = true)
@@ -69,7 +70,7 @@ public class UnableToAffordJumpNagLogic {
      * </p>
      */
     public static Money getNextJumpCost(Campaign campaign) {
-        AbstractLocation location = campaign.getCurrentLocation();
+        AbstractLocation location = campaign.getPlayerForce().getForceDetachment().getCurrentLocation();
         JumpPath jumpPath = location.getJumpPath();
 
         if (jumpPath == null) {
@@ -80,7 +81,7 @@ public class UnableToAffordJumpNagLogic {
             return Money.zero();
         }
 
-        boolean isContractPayBasedOnToeUnitsValue = campaign.getCampaignOptions().isEquipmentContractBase();
+        boolean isContractPayBasedOnToeUnitsValue = campaign.getCampaignOptions().get(CampaignOption.EQUIPMENT_CONTRACT_BASE);
 
         return campaign.calculateCostPerJump(true, isContractPayBasedOnToeUnitsValue);
     }

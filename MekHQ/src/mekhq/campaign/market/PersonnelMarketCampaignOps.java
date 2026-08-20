@@ -64,7 +64,7 @@ public class PersonnelMarketCampaignOps implements PersonnelMarketMethod {
                       .getHumanResources()
                       .newPerson(c, mekhq.campaign.personnel.enums.PersonnelRole.DOCTOR);
         } else if (roll == 3) { // ASF or Proto Pilot
-            if (c.getFaction().isClan() && c.getLocalDate().isAfter(LocalDate.of(3059, 1, 1))
+            if (c.getPlayerForce().getFaction().isClan() && c.getLocalDate().isAfter(LocalDate.of(3059, 1, 1))
                       && Compute.d6(2) < 6) {
                 p = c.getPlayerForce()
                           .getHumanResources()
@@ -83,7 +83,7 @@ public class PersonnelMarketCampaignOps implements PersonnelMarketMethod {
                       .getHumanResources()
                       .newPerson(c, mekhq.campaign.personnel.enums.PersonnelRole.VEHICLE_CREW_GROUND);
         } else if (roll == 6 || roll == 8) { // Infantry
-            final mekhq.campaign.personnel.enums.PersonnelRole role = (c.getFaction().isClan() &&
+            final mekhq.campaign.personnel.enums.PersonnelRole role = (c.getPlayerForce().getFaction().isClan() &&
                                                                              megamek.common.compute.Compute.d6(2) > 3)
                                                                             ?
                                                                             mekhq.campaign.personnel.enums.PersonnelRole.BATTLE_ARMOUR :

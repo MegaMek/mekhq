@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2021-2025 The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2021-2026 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -34,6 +34,7 @@ package mekhq.campaign.personnel.procreation;
 
 import megamek.common.compute.Compute;
 import mekhq.campaign.campaignOptions.CampaignOptions;
+import mekhq.campaign.campaignOptions.CampaignOption;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.enums.RandomProcreationMethod;
 
@@ -56,8 +57,8 @@ public class RandomProcreation extends AbstractProcreation {
      */
     public RandomProcreation(final CampaignOptions options) {
         super(RandomProcreationMethod.DICE_ROLL, options);
-        setRelationshipDieSize(options.getRandomProcreationRelationshipDiceSize());
-        setRelationshiplessDieSize(options.getRandomProcreationRelationshiplessDiceSize());
+        setRelationshipDieSize(options.get(CampaignOption.RANDOM_PROCREATION_RELATIONSHIP_DICE_SIZE));
+        setRelationshiplessDieSize(options.get(CampaignOption.RANDOM_PROCREATION_RELATIONSHIPLESS_DICE_SIZE));
     }
     //endregion Constructors
 

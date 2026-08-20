@@ -50,6 +50,7 @@ import megamek.common.units.Entity;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.campaignOptions.CampaignOption;
 import mekhq.campaign.campaignOptions.CampaignOptions;
+import mekhq.campaign.campaignOptions.CampaignOption;
 import mekhq.campaign.digitalGM.stratCon.StratConRulesManager;
 import mekhq.campaign.digitalGM.stratCon.StratConTrackState;
 import mekhq.campaign.force.CombatTeam;
@@ -188,7 +189,7 @@ public class Fatigue {
         int effectiveFatigue = getEffectiveFatigue(person, campaign);
 
         CampaignOptions campaignOptions = campaign.getCampaignOptions();
-        if (!campaignOptions.isUseFatigue()) {
+        if (!campaignOptions.get(CampaignOption.USE_FATIGUE)) {
             return;
         }
 
@@ -222,7 +223,7 @@ public class Fatigue {
             person.setIsRecoveringFromFatigue(true);
         }
 
-        int fatigueThreshold = campaignOptions.getFatigueLeaveThreshold();
+        int fatigueThreshold = campaignOptions.get(CampaignOption.FATIGUE_LEAVE_THRESHOLD);
         boolean hasThreshold = fatigueThreshold != 0;
 
         boolean isFatigued = effectiveFatigue >= fatigueThreshold;
@@ -260,7 +261,7 @@ public class Fatigue {
      */
     public static void processDeploymentFatigueResponses(Campaign campaign) {
         CampaignOptions campaignOptions = campaign.getCampaignOptions();
-        if (!campaignOptions.isUseStratCon() || !campaignOptions.isUseFatigue()) {
+        if (!campaignOptions.isUseStratCon() || !campaignOptions.get(CampaignOption.USE_FATIGUE)) {
             return;
         }
 
@@ -403,7 +404,7 @@ public class Fatigue {
             person.changeFatigue(-fatigueAdjustment);
         }
 
-        if (campaign.getCampaignOptions().isUseFatigue()) {
+        if (campaign.getCampaignOptions().get(CampaignOption.USE_FATIGUE)) {
             if ((!person.getStatus().isOnLeave()) && (!person.getIsRecoveringFromFatigue())) {
                 processFatigueActions(campaign, person);
             }
@@ -417,7 +418,7 @@ public class Fatigue {
 
                     person.setIsRecoveringFromFatigue(false);
 
-                    if ((campaign.getCampaignOptions().getFatigueLeaveThreshold() != 0)
+                    if ((campaign.getCampaignOptions().get(CampaignOption.FATIGUE_LEAVE_THRESHOLD) != 0)
                               && (person.getStatus().isOnLeave())) {
                         person.changeStatus(campaign, campaign.getLocalDate(), PersonnelStatus.ACTIVE);
                     }

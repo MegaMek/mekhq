@@ -214,7 +214,7 @@ public class PlanetarySystemMapPanel extends JPanel {
                 // where is the JumpShip
                 int jumpshipX = zenithX + jumpPointImgWidth + 8;
                 int jumpshipY = zenithY + (jumpPointImgHeight / 2) - (shipImgSize / 2);
-                if (!PlanetarySystemMapPanel.this.campaign.getCurrentLocation().isJumpZenith()) {
+                if (!PlanetarySystemMapPanel.this.campaign.getPlayerForce().getForceDetachment().getCurrentLocation().isJumpZenith()) {
                     jumpshipX = nadirX + jumpPointImgWidth + 8;
                     jumpshipY = nadirY + (jumpPointImgHeight / 2) - (shipImgSize / 2);
                 }

@@ -32,6 +32,8 @@
  */
 package mekhq.campaign.randomEvents.prisoners;
 
+import static org.mockito.Mockito.lenient;
+
 import static java.lang.Math.max;
 import static java.lang.Math.min;
 import static java.lang.Math.round;
@@ -95,7 +97,9 @@ public class PrisonerEventManagerTest {
 
         CampaignOptions mockCampaignOptions = mock(CampaignOptions.class);
         when(mockCampaign.getCampaignOptions()).thenReturn(mockCampaignOptions);
-        when(mockCampaignOptions.getPrisonerCaptureStyle()).thenReturn(mekhq.campaign.randomEvents.prisoners.PrisonerCaptureStyle.NONE);
+        lenient().when(mockCampaignOptions.get(CampaignOption.IS_ENABLE_SALVAGE_FLAG_BY_DEFAULT)).thenReturn(false);
+        lenient().when(mockCampaignOptions.get(CampaignOption.TECHS_USE_ADMINISTRATION)).thenReturn(false);
+        when(mockCampaignOptions.get(CampaignOption.PRISONER_CAPTURE_STYLE)).thenReturn(mekhq.campaign.randomEvents.prisoners.PrisonerCaptureStyle.NONE);
 
         LocalDate today = LocalDate.of(3151, 1, 3);
         when(mockCampaign.getLocalDate()).thenReturn(today);
@@ -126,7 +130,9 @@ public class PrisonerEventManagerTest {
 
         CampaignOptions mockCampaignOptions = mock(CampaignOptions.class);
         when(mockCampaign.getCampaignOptions()).thenReturn(mockCampaignOptions);
-        when(mockCampaignOptions.getPrisonerCaptureStyle()).thenReturn(mekhq.campaign.randomEvents.prisoners.PrisonerCaptureStyle.NONE);
+        lenient().when(mockCampaignOptions.get(CampaignOption.IS_ENABLE_SALVAGE_FLAG_BY_DEFAULT)).thenReturn(false);
+        lenient().when(mockCampaignOptions.get(CampaignOption.TECHS_USE_ADMINISTRATION)).thenReturn(false);
+        when(mockCampaignOptions.get(CampaignOption.PRISONER_CAPTURE_STYLE)).thenReturn(mekhq.campaign.randomEvents.prisoners.PrisonerCaptureStyle.NONE);
 
         LocalDate today = LocalDate.of(3151, 1, 3);
         when(mockCampaign.getLocalDate()).thenReturn(today);
@@ -155,7 +161,9 @@ public class PrisonerEventManagerTest {
 
         CampaignOptions mockCampaignOptions = mock(CampaignOptions.class);
         when(mockCampaign.getCampaignOptions()).thenReturn(mockCampaignOptions);
-        when(mockCampaignOptions.getPrisonerCaptureStyle()).thenReturn(mekhq.campaign.randomEvents.prisoners.PrisonerCaptureStyle.NONE);
+        lenient().when(mockCampaignOptions.get(CampaignOption.IS_ENABLE_SALVAGE_FLAG_BY_DEFAULT)).thenReturn(false);
+        lenient().when(mockCampaignOptions.get(CampaignOption.TECHS_USE_ADMINISTRATION)).thenReturn(false);
+        when(mockCampaignOptions.get(CampaignOption.PRISONER_CAPTURE_STYLE)).thenReturn(mekhq.campaign.randomEvents.prisoners.PrisonerCaptureStyle.NONE);
 
         LocalDate today = LocalDate.of(3151, 1, 3);
         when(mockCampaign.getLocalDate()).thenReturn(today);
@@ -187,7 +195,9 @@ public class PrisonerEventManagerTest {
 
         CampaignOptions mockCampaignOptions = mock(CampaignOptions.class);
         when(mockCampaign.getCampaignOptions()).thenReturn(mockCampaignOptions);
-        when(mockCampaignOptions.getPrisonerCaptureStyle()).thenReturn(mekhq.campaign.randomEvents.prisoners.PrisonerCaptureStyle.NONE);
+        lenient().when(mockCampaignOptions.get(CampaignOption.IS_ENABLE_SALVAGE_FLAG_BY_DEFAULT)).thenReturn(false);
+        lenient().when(mockCampaignOptions.get(CampaignOption.TECHS_USE_ADMINISTRATION)).thenReturn(false);
+        when(mockCampaignOptions.get(CampaignOption.PRISONER_CAPTURE_STYLE)).thenReturn(mekhq.campaign.randomEvents.prisoners.PrisonerCaptureStyle.NONE);
 
         LocalDate today = LocalDate.of(3151, 1, 3);
         when(mockCampaign.getLocalDate()).thenReturn(today);
@@ -213,7 +223,9 @@ public class PrisonerEventManagerTest {
 
         CampaignOptions mockCampaignOptions = mock(CampaignOptions.class);
         when(mockCampaign.getCampaignOptions()).thenReturn(mockCampaignOptions);
-        when(mockCampaignOptions.getPrisonerCaptureStyle()).thenReturn(mekhq.campaign.randomEvents.prisoners.PrisonerCaptureStyle.NONE);
+        lenient().when(mockCampaignOptions.get(CampaignOption.IS_ENABLE_SALVAGE_FLAG_BY_DEFAULT)).thenReturn(false);
+        lenient().when(mockCampaignOptions.get(CampaignOption.TECHS_USE_ADMINISTRATION)).thenReturn(false);
+        when(mockCampaignOptions.get(CampaignOption.PRISONER_CAPTURE_STYLE)).thenReturn(mekhq.campaign.randomEvents.prisoners.PrisonerCaptureStyle.NONE);
 
         LocalDate today = LocalDate.of(3151, 1, 3);
         when(mockCampaign.getLocalDate()).thenReturn(today);
@@ -253,7 +265,9 @@ public class PrisonerEventManagerTest {
 
         CampaignOptions mockCampaignOptions = mock(CampaignOptions.class);
         when(mockCampaign.getCampaignOptions()).thenReturn(mockCampaignOptions);
-        when(mockCampaignOptions.getPrisonerCaptureStyle()).thenReturn(mekhq.campaign.randomEvents.prisoners.PrisonerCaptureStyle.NONE);
+        lenient().when(mockCampaignOptions.get(CampaignOption.IS_ENABLE_SALVAGE_FLAG_BY_DEFAULT)).thenReturn(false);
+        lenient().when(mockCampaignOptions.get(CampaignOption.TECHS_USE_ADMINISTRATION)).thenReturn(false);
+        when(mockCampaignOptions.get(CampaignOption.PRISONER_CAPTURE_STYLE)).thenReturn(mekhq.campaign.randomEvents.prisoners.PrisonerCaptureStyle.NONE);
 
         LocalDate today = LocalDate.of(3151, 1, 3);
         when(mockCampaign.getLocalDate()).thenReturn(today);
@@ -305,7 +319,9 @@ public class PrisonerEventManagerTest {
 
         CampaignOptions mockCampaignOptions = mock(CampaignOptions.class);
         when(mockCampaign.getCampaignOptions()).thenReturn(mockCampaignOptions);
-        when(mockCampaignOptions.getPrisonerCaptureStyle()).thenReturn(mekhq.campaign.randomEvents.prisoners.PrisonerCaptureStyle.NONE);
+        lenient().when(mockCampaignOptions.get(CampaignOption.IS_ENABLE_SALVAGE_FLAG_BY_DEFAULT)).thenReturn(false);
+        lenient().when(mockCampaignOptions.get(CampaignOption.TECHS_USE_ADMINISTRATION)).thenReturn(false);
+        when(mockCampaignOptions.get(CampaignOption.PRISONER_CAPTURE_STYLE)).thenReturn(mekhq.campaign.randomEvents.prisoners.PrisonerCaptureStyle.NONE);
 
         LocalDate today = LocalDate.of(3151, 1, 3);
         when(mockCampaign.getLocalDate()).thenReturn(today);
@@ -563,10 +579,12 @@ public class PrisonerEventManagerTest {
 
         private Campaign buildCampaign(PrisonerCaptureStyle captureStyle, int temporaryCapacity) {
             CampaignOptions mockOptions = mock(CampaignOptions.class);
-            when(mockOptions.getPrisonerCaptureStyle()).thenReturn(captureStyle);
+            when(mockOptions.get(CampaignOption.PRISONER_CAPTURE_STYLE)).thenReturn(captureStyle);
 
             Campaign mockCampaign = mockCampaign();
             when(mockCampaign.getCampaignOptions()).thenReturn(mockOptions);
+            lenient().when(mockOptions.get(CampaignOption.IS_ENABLE_SALVAGE_FLAG_BY_DEFAULT)).thenReturn(false);
+            lenient().when(mockOptions.get(CampaignOption.TECHS_USE_ADMINISTRATION)).thenReturn(false);
             when(mockCampaign.getPlayerForce().getTemporaryPrisonerCapacity()).thenReturn(temporaryCapacity);
             when(mockCampaign.getActiveContracts()).thenReturn(List.of());
             when(mockCampaign.getPlayerForce().getAllFormations()).thenReturn(List.of());
@@ -921,10 +939,12 @@ public class PrisonerEventManagerTest {
 
         private Campaign campaignWithPrisoners(PrisonerCaptureStyle captureStyle, List<Person> prisoners) {
             CampaignOptions mockOptions = mock(CampaignOptions.class);
-            when(mockOptions.getPrisonerCaptureStyle()).thenReturn(captureStyle);
+            when(mockOptions.get(CampaignOption.PRISONER_CAPTURE_STYLE)).thenReturn(captureStyle);
 
             Campaign mockCampaign = mockCampaign();
             when(mockCampaign.getCampaignOptions()).thenReturn(mockOptions);
+            lenient().when(mockOptions.get(CampaignOption.IS_ENABLE_SALVAGE_FLAG_BY_DEFAULT)).thenReturn(false);
+            lenient().when(mockOptions.get(CampaignOption.TECHS_USE_ADMINISTRATION)).thenReturn(false);
             when(mockCampaign.getPlayerForce().getHumanResources().getCurrentPrisoners()).thenReturn(prisoners);
             return mockCampaign;
         }
@@ -1099,10 +1119,12 @@ public class PrisonerEventManagerTest {
 
         private Campaign campaignWithCaptureStyle(PrisonerCaptureStyle captureStyle) {
             CampaignOptions mockOptions = mock(CampaignOptions.class);
-            when(mockOptions.getPrisonerCaptureStyle()).thenReturn(captureStyle);
+            when(mockOptions.get(CampaignOption.PRISONER_CAPTURE_STYLE)).thenReturn(captureStyle);
 
             Campaign mockCampaign = mockCampaign();
             when(mockCampaign.getCampaignOptions()).thenReturn(mockOptions);
+            lenient().when(mockOptions.get(CampaignOption.IS_ENABLE_SALVAGE_FLAG_BY_DEFAULT)).thenReturn(false);
+            lenient().when(mockOptions.get(CampaignOption.TECHS_USE_ADMINISTRATION)).thenReturn(false);
             return mockCampaign;
         }
 

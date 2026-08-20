@@ -359,7 +359,7 @@ public class AtBConfiguration {
                                       .findBestInRole(mekhq.campaign.personnel.enums.PersonnelRole.ADMINISTRATOR_LOGISTICS,
                                             mekhq.campaign.personnel.skills.SkillType.S_ADMIN,
                                             campaign.getCampaignOptions(),
-                                            campaign.isClanCampaign(),
+                                            campaign.getPlayerForce().isClanForce(),
                                             campaign.getLocalDate());
 
         int experienceLevel = EXP_ULTRA_GREEN;

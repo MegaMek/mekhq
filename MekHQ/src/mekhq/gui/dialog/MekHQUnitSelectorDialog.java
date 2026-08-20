@@ -72,6 +72,7 @@ import mekhq.campaign.unit.UnitOrder;
 import mekhq.campaign.unit.UnitTechProgression;
 import mekhq.utilities.MHQInternationalization;
 import mekhq.utilities.ReportingUtilities;
+import mekhq.campaign.campaignOptions.CampaignOption;
 
 public class MekHQUnitSelectorDialog extends AbstractUnitSelectorDialog {
     private final Campaign campaign;
@@ -131,16 +132,16 @@ public class MekHQUnitSelectorDialog extends AbstractUnitSelectorDialog {
     @Override
     public void updateOptionValues() {
         gameOptions = campaign.getGameOptions();
-        enableYearLimits = campaign.getCampaignOptions().isLimitByYear();
+        enableYearLimits = campaign.getCampaignOptions().get(CampaignOption.LIMIT_BY_YEAR);
         allowedYear = campaign.getGameYear();
-        canonOnly = campaign.getCampaignOptions().isAllowCanonOnly();
-        gameTechLevel = campaign.getCampaignOptions().getTechLevel();
-        eraBasedTechLevel = campaign.getCampaignOptions().isVariableTechLevel();
+        canonOnly = campaign.getCampaignOptions().get(CampaignOption.ALLOW_CANON_ONLY);
+        gameTechLevel = campaign.getCampaignOptions().get(CampaignOption.TECH_LEVEL);
+        eraBasedTechLevel = campaign.getCampaignOptions().get(CampaignOption.VARIABLE_TECH_LEVEL);
 
-        if (campaign.getCampaignOptions().isAllowClanPurchases() &&
-                  campaign.getCampaignOptions().isAllowISPurchases()) {
+        if (campaign.getCampaignOptions().get(CampaignOption.ALLOW_CLAN_PURCHASES) &&
+                  campaign.getCampaignOptions().get(CampaignOption.ALLOW_IS_PURCHASES)) {
             techLevelDisplayType = TECH_LEVEL_DISPLAY_IS_CLAN;
-        } else if (campaign.getCampaignOptions().isAllowClanPurchases()) {
+        } else if (campaign.getCampaignOptions().get(CampaignOption.ALLOW_CLAN_PURCHASES)) {
             techLevelDisplayType = TECH_LEVEL_DISPLAY_CLAN;
         } else {
             techLevelDisplayType = TECH_LEVEL_DISPLAY_IS;
@@ -247,7 +248,7 @@ public class MekHQUnitSelectorDialog extends AbstractUnitSelectorDialog {
         }
 
         PartQuality quality = PartQuality.QUALITY_D;
-        if (campaign.getCampaignOptions().isUseRandomUnitQualities()) {
+        if (campaign.getCampaignOptions().get(CampaignOption.USE_RANDOM_UNIT_QUALITIES)) {
             quality = UnitOrder.getRandomUnitQuality(0);
         }
 
@@ -369,10 +370,10 @@ public class MekHQUnitSelectorDialog extends AbstractUnitSelectorDialog {
         if (enableYearLimits && (unitSummary.getYear() > allowedYear)) {
             return false;
         }
-        if (!(campaign.getCampaignOptions().isAllowClanPurchases()) && TechConstants.isClan(unitSummary.getType())) {
+        if (!(campaign.getCampaignOptions().get(CampaignOption.ALLOW_CLAN_PURCHASES)) && TechConstants.isClan(unitSummary.getType())) {
             return false;
         }
-        if (!(campaign.getCampaignOptions().isAllowISPurchases()) && !TechConstants.isClan(unitSummary.getType())) {
+        if (!(campaign.getCampaignOptions().get(CampaignOption.ALLOW_IS_PURCHASES)) && !TechConstants.isClan(unitSummary.getType())) {
             return false;
         }
         if (canonOnly && !unitSummary.isCanon()) {

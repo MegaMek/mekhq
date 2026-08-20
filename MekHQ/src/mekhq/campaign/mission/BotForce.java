@@ -434,7 +434,7 @@ public class BotForce implements IPlayerSettings {
     public List<Entity> getTraitorEntities(Campaign campaign) {
         List<Entity> traitorEntities = new ArrayList<>();
         for (UUID traitor : traitors) {
-            Person p = campaign.getPerson(traitor);
+            Person p = campaign.getPlayerForce().getHumanResources().getPerson(traitor);
             if ((null != p) && (null != p.getUnit()) && (null != p.getUnit().getEntity())) {
                 traitorEntities.add(p.getUnit().getEntity());
             }
@@ -450,7 +450,7 @@ public class BotForce implements IPlayerSettings {
     public List<Unit> getTraitorUnits(Campaign campaign) {
         List<Unit> traitorUnits = new ArrayList<>();
         for (UUID traitor : traitors) {
-            Person p = campaign.getPerson(traitor);
+            Person p = campaign.getPlayerForce().getHumanResources().getPerson(traitor);
             if ((null != p) && (null != p.getUnit())) {
                 traitorUnits.add(p.getUnit());
             }

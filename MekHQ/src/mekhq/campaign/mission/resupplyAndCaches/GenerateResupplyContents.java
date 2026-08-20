@@ -250,7 +250,7 @@ public class GenerateResupplyContents {
         // If the player faction matches the employer faction (and is not Mercenary, or Pirate),
         // then supplies are free.
         final Campaign campaign = resupply.getCampaign();
-        final Faction campaignFaction = campaign.getFaction();
+        final Faction campaignFaction = campaign.getPlayerForce().getFaction();
 
         final AtBContract contract = resupply.getContract();
         final Faction employerFaction = contract.getEmployerFaction();

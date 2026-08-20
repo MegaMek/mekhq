@@ -32,6 +32,8 @@
  */
 package mekhq.campaign;
 
+import static org.mockito.Mockito.lenient;
+
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
@@ -62,6 +64,7 @@ import megamek.common.units.Entity;
 import mekhq.campaign.Campaign.AdministratorSpecialization;
 import mekhq.campaign.campaignOptions.AcquisitionsType;
 import mekhq.campaign.campaignOptions.CampaignOptions;
+import mekhq.campaign.campaignOptions.CampaignOption;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.enums.PersonnelRole;
 import mekhq.campaign.personnel.enums.PersonnelStatus;
@@ -94,6 +97,7 @@ public class HumanResourcesTest {
     @BeforeEach
     void setup() {
         campaignOptions = mock(CampaignOptions.class);
+        lenient().when(campaignOptions.get(CampaignOption.TECHS_USE_ADMINISTRATION)).thenReturn(false);
         today = LocalDate.of(3067, 1, 1);
         campaign = MHQTestUtilities.getTestCampaign();
     }
@@ -742,7 +746,7 @@ public class HumanResourcesTest {
         void emptyInputReturnsNull() {
             // Arrange
             List<Person> people = List.of();
-            when(campaignOptions.isUseAgeEffects()).thenReturn(false);
+            when(campaignOptions.get(CampaignOption.USE_AGE_EFFECTS)).thenReturn(false);
 
             // Act
             Person result = ForceHumanResources.findBestAtSkill(people, "Negotiation", campaignOptions, false, today);
@@ -754,7 +758,7 @@ public class HumanResourcesTest {
         @Test
         void personWithSkillIsReturned() {
             // Arrange
-            when(campaignOptions.isUseAgeEffects()).thenReturn(false);
+            when(campaignOptions.get(CampaignOption.USE_AGE_EFFECTS)).thenReturn(false);
 
             Skill skill = mock(Skill.class);
             when(skill.getTotalSkillLevel(any())).thenReturn(5);
@@ -774,7 +778,7 @@ public class HumanResourcesTest {
         @Test
         void personWithoutSkillIsNotReturned() {
             // Arrange
-            when(campaignOptions.isUseAgeEffects()).thenReturn(false);
+            when(campaignOptions.get(CampaignOption.USE_AGE_EFFECTS)).thenReturn(false);
 
             Person person = mock(Person.class);
             when(person.getSkill(anyString())).thenReturn(null);
@@ -790,7 +794,7 @@ public class HumanResourcesTest {
         @Test
         void personWithHigherSkillWins() {
             // Arrange
-            when(campaignOptions.isUseAgeEffects()).thenReturn(false);
+            when(campaignOptions.get(CampaignOption.USE_AGE_EFFECTS)).thenReturn(false);
 
             Skill lowSkill = mock(Skill.class);
             when(lowSkill.getTotalSkillLevel(any())).thenReturn(3);
@@ -826,7 +830,7 @@ public class HumanResourcesTest {
         @Test
         void emptyInputReturnsNull() {
             // Arrange
-            when(campaignOptions.isUseAgeEffects()).thenReturn(false);
+            when(campaignOptions.get(CampaignOption.USE_AGE_EFFECTS)).thenReturn(false);
             List<Person> people = List.of();
 
             // Act
@@ -840,7 +844,7 @@ public class HumanResourcesTest {
         @Test
         void personInRoleWithSkillIsReturned() {
             // Arrange
-            when(campaignOptions.isUseAgeEffects()).thenReturn(false);
+            when(campaignOptions.get(CampaignOption.USE_AGE_EFFECTS)).thenReturn(false);
 
             Skill skill = mock(Skill.class);
             when(skill.getTotalSkillLevel(any())).thenReturn(5);
@@ -862,7 +866,7 @@ public class HumanResourcesTest {
         @Test
         void personNotInRoleIsExcluded() {
             // Arrange
-            when(campaignOptions.isUseAgeEffects()).thenReturn(false);
+            when(campaignOptions.get(CampaignOption.USE_AGE_EFFECTS)).thenReturn(false);
 
             Skill skill = mock(Skill.class);
             when(skill.getTotalSkillLevel(any())).thenReturn(5);
@@ -884,7 +888,7 @@ public class HumanResourcesTest {
         @Test
         void higherPrimarySkillWins() {
             // Arrange
-            when(campaignOptions.isUseAgeEffects()).thenReturn(false);
+            when(campaignOptions.get(CampaignOption.USE_AGE_EFFECTS)).thenReturn(false);
 
             Skill weakSkill = mock(Skill.class);
             when(weakSkill.getTotalSkillLevel(any())).thenReturn(3);
@@ -915,7 +919,7 @@ public class HumanResourcesTest {
         @Test
         void secondaryRoleMatchCounts() {
             // Arrange
-            when(campaignOptions.isUseAgeEffects()).thenReturn(false);
+            when(campaignOptions.get(CampaignOption.USE_AGE_EFFECTS)).thenReturn(false);
 
             Skill skill = mock(Skill.class);
             when(skill.getTotalSkillLevel(any())).thenReturn(5);
@@ -944,7 +948,7 @@ public class HumanResourcesTest {
         @Test
         void automaticAcquisitionTypeReturnsNull() {
             // Arrange
-            when(campaignOptions.getAcquisitionType()).thenReturn(AcquisitionsType.AUTOMATIC);
+            when(campaignOptions.get(CampaignOption.ACQUISITIONS_TYPE)).thenReturn(AcquisitionsType.AUTOMATIC);
 
             Person admin = mock(Person.class);
 
@@ -958,10 +962,10 @@ public class HumanResourcesTest {
         @Test
         void emptyInputReturnsNull() {
             // Arrange
-            when(campaignOptions.getAcquisitionType()).thenReturn(AcquisitionsType.ADMINISTRATION);
-            when(campaignOptions.getAcquisitionPersonnelCategory()).thenReturn(ProcurementPersonnelPick.ALL);
-            when(campaignOptions.getMaxAcquisitions()).thenReturn(0);
-            when(campaignOptions.isUseAgeEffects()).thenReturn(false);
+            when(campaignOptions.get(CampaignOption.ACQUISITIONS_TYPE)).thenReturn(AcquisitionsType.ADMINISTRATION);
+            when(campaignOptions.get(CampaignOption.ACQUISITION_PERSONNEL_CATEGORY)).thenReturn(ProcurementPersonnelPick.ALL);
+            when(campaignOptions.get(CampaignOption.MAX_ACQUISITIONS)).thenReturn(0);
+            when(campaignOptions.get(CampaignOption.USE_AGE_EFFECTS)).thenReturn(false);
 
             // Act
             Person result = ForceHumanResources.getLogisticsPerson(List.of(), campaignOptions, false, today);
@@ -973,10 +977,10 @@ public class HumanResourcesTest {
         @Test
         void bestAdminSkillWinsForAdministrationMode() {
             // Arrange
-            when(campaignOptions.getAcquisitionType()).thenReturn(AcquisitionsType.ADMINISTRATION);
-            when(campaignOptions.getAcquisitionPersonnelCategory()).thenReturn(ProcurementPersonnelPick.ALL);
-            when(campaignOptions.getMaxAcquisitions()).thenReturn(0);
-            when(campaignOptions.isUseAgeEffects()).thenReturn(false);
+            when(campaignOptions.get(CampaignOption.ACQUISITIONS_TYPE)).thenReturn(AcquisitionsType.ADMINISTRATION);
+            when(campaignOptions.get(CampaignOption.ACQUISITION_PERSONNEL_CATEGORY)).thenReturn(ProcurementPersonnelPick.ALL);
+            when(campaignOptions.get(CampaignOption.MAX_ACQUISITIONS)).thenReturn(0);
+            when(campaignOptions.get(CampaignOption.USE_AGE_EFFECTS)).thenReturn(false);
 
             Skill weakAdmin = mock(Skill.class);
             when(weakAdmin.getTotalSkillLevel(any())).thenReturn(3);

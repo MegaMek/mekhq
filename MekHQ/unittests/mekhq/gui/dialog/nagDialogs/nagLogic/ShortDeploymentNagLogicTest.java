@@ -76,19 +76,19 @@ public class ShortDeploymentNagLogicTest {
         contract = mock(AtBContract.class);
 
         // Stubs
-        when(campaign.getCurrentLocation()).thenReturn(location);
+        when(campaign.getPlayerForce().getForceDetachment().getCurrentLocation()).thenReturn(location);
     }
 
     @Test
     void notOnPlanet() {
-        when(campaign.getCurrentLocation().isOnPlanet()).thenReturn(false);
+        when(campaign.getPlayerForce().getForceDetachment().getCurrentLocation().isOnPlanet()).thenReturn(false);
 
         assertFalse(hasDeploymentShortfall(campaign));
     }
 
     @Test
     void notSunday() {
-        when(campaign.getCurrentLocation().isOnPlanet()).thenReturn(true);
+        when(campaign.getPlayerForce().getForceDetachment().getCurrentLocation().isOnPlanet()).thenReturn(true);
         when(campaign.getLocalDate()).thenReturn(monday);
 
         assertFalse(hasDeploymentShortfall(campaign));
@@ -96,7 +96,7 @@ public class ShortDeploymentNagLogicTest {
 
     @Test
     void noContract() {
-        when(campaign.getCurrentLocation().isOnPlanet()).thenReturn(true);
+        when(campaign.getPlayerForce().getForceDetachment().getCurrentLocation().isOnPlanet()).thenReturn(true);
         when(campaign.getLocalDate()).thenReturn(sunday);
 
         when(campaign.getActiveAtBContracts()).thenReturn(new ArrayList<>());
@@ -106,7 +106,7 @@ public class ShortDeploymentNagLogicTest {
 
     @Test
     void noDeploymentDeficit() {
-        when(campaign.getCurrentLocation().isOnPlanet()).thenReturn(true);
+        when(campaign.getPlayerForce().getForceDetachment().getCurrentLocation().isOnPlanet()).thenReturn(true);
         when(campaign.getLocalDate()).thenReturn(sunday);
 
         when(campaign.getActiveAtBContracts()).thenReturn(List.of(contract));
@@ -117,7 +117,7 @@ public class ShortDeploymentNagLogicTest {
 
     @Test
     void negativeDeploymentDeficit() {
-        when(campaign.getCurrentLocation().isOnPlanet()).thenReturn(true);
+        when(campaign.getPlayerForce().getForceDetachment().getCurrentLocation().isOnPlanet()).thenReturn(true);
         when(campaign.getLocalDate()).thenReturn(sunday);
 
         when(campaign.getActiveAtBContracts()).thenReturn(List.of(contract));
@@ -128,7 +128,7 @@ public class ShortDeploymentNagLogicTest {
 
     @Test
     void positiveDeploymentDeficit() {
-        when(campaign.getCurrentLocation().isOnPlanet()).thenReturn(true);
+        when(campaign.getPlayerForce().getForceDetachment().getCurrentLocation().isOnPlanet()).thenReturn(true);
         when(campaign.getLocalDate()).thenReturn(sunday);
 
         when(campaign.getActiveAtBContracts()).thenReturn(List.of(contract));

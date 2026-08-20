@@ -67,6 +67,7 @@ import mekhq.campaign.universe.Systems;
 import mekhq.gui.utilities.JSuggestField;
 import mekhq.gui.utilities.MarkdownEditorPanel;
 import mekhq.gui.view.ContractPaymentBreakdown;
+import mekhq.campaign.campaignOptions.CampaignOption;
 
 /**
  * @author Taharqa
@@ -720,8 +721,8 @@ public class NewContractDialog extends JDialog {
 
         // Negotiator XP
         Person negotiator = (Person) cboNegotiator.getSelectedItem();
-        if ((negotiator != null) && (campaign.getCampaignOptions().getContractNegotiationXP() > 0)) {
-            negotiator.awardXP(campaign, campaign.getCampaignOptions().getContractNegotiationXP());
+        if ((negotiator != null) && (campaign.getCampaignOptions().get(CampaignOption.CONTRACT_NEGOTIATION_XP) > 0)) {
+            negotiator.awardXP(campaign, campaign.getCampaignOptions().get(CampaignOption.CONTRACT_NEGOTIATION_XP));
         }
 
         this.setVisible(false);

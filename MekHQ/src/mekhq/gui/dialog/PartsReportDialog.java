@@ -84,6 +84,7 @@ import mekhq.gui.model.LocationFilterItem;
 import mekhq.gui.model.PartsInUseTableModel;
 import mekhq.gui.sorter.FormattedNumberSorter;
 import mekhq.gui.sorter.TwoNumbersSorter;
+import mekhq.campaign.campaignOptions.CampaignOption;
 
 /**
  * A dialog to show parts in use, ordered, in transit with actionable buttons for buying or adding more taken from the
@@ -406,7 +407,7 @@ public class PartsReportDialog extends JDialog {
         resetRequestedStockButton.setMargin(new Insets(10, 20, 10, 20));
         resetRequestedStockButton.addActionListener(evt -> resetRequestedStock());
 
-        boolean reverse = campaign.getCampaignOptions().isReverseQualityNames();
+        boolean reverse = campaign.getCampaignOptions().get(CampaignOption.REVERSE_QUALITY_NAMES);
         String[] qualities = {
               " ", // Combo box is blank for first one because it accepts everything and is default
               PartQuality.QUALITY_B.toName(reverse),
@@ -558,7 +559,7 @@ public class PartsReportDialog extends JDialog {
             // The blank spot always means "everything", so minimum = lowest
             return PartQuality.QUALITY_A;
         } else {
-            return PartQuality.fromName(rating, campaign.getCampaignOptions().isReverseQualityNames());
+            return PartQuality.fromName(rating, campaign.getCampaignOptions().get(CampaignOption.REVERSE_QUALITY_NAMES));
         }
     }
 

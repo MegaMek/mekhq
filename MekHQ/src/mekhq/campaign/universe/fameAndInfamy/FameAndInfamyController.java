@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2024-2025 The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2024-2026 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -225,27 +225,5 @@ public class FameAndInfamyController {
             }
         }
         MHQXMLUtility.writeSimpleXMLCloseTag(printWriter, --indent, "fameAndInfamy");
-    }
-
-    /**
-     * Parses the XML {@link NodeList} and updates the fame values for factions in a {@link Campaign}.
-     *
-     * @param nodeList The XML {@link NodeList} containing the faction fame values.
-     * @param campaign The {@link Campaign} object to update with the parsed fame values.
-     */
-    @Deprecated(since = "0.50.07", forRemoval = true)
-    public static void parseFromXML(final NodeList nodeList, Campaign campaign) {
-        FameAndInfamyController fameAndInfamy = campaign.getFameAndInfamy();
-        try {
-            for (int x = 0; x < nodeList.getLength(); x++) {
-                final Node workingNode = nodeList.item(x);
-                if (workingNode.getNodeType() == Node.ELEMENT_NODE) {
-                    double value = Double.parseDouble(workingNode.getTextContent());
-                    fameAndInfamy.setFameForFaction(workingNode.getNodeName(), value);
-                }
-            }
-        } catch (Exception e) {
-            logger.error(e);
-        }
     }
 }

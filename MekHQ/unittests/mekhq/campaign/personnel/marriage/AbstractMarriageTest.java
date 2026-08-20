@@ -32,6 +32,8 @@
  */
 package mekhq.campaign.personnel.marriage;
 
+import static org.mockito.Mockito.lenient;
+
 import static mekhq.campaign.enums.DailyReportType.PERSONNEL;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
@@ -49,6 +51,7 @@ import java.util.stream.Stream;
 import megamek.common.enums.Gender;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.campaignOptions.CampaignOptions;
+import mekhq.campaign.campaignOptions.CampaignOption;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.enums.MergingSurnameStyle;
 import mekhq.campaign.personnel.enums.PersonnelStatus;
@@ -82,15 +85,25 @@ public class AbstractMarriageTest {
     @BeforeEach
     public void beforeEach() {
         lenient().when(mockCampaign.getCampaignOptions()).thenReturn(mockCampaignOptions);
+        lenient().when(mockCampaignOptions.get(CampaignOption.USE_RANDOM_PRISONER_MARRIAGES)).thenReturn(false);
+        lenient().when(mockCampaignOptions.get(CampaignOption.USE_RANDOM_CLAN_PERSONNEL_MARRIAGES)).thenReturn(false);
+        lenient().when(mockCampaignOptions.get(CampaignOption.USE_PRISONER_MARRIAGES)).thenReturn(false);
+        lenient().when(mockCampaignOptions.get(CampaignOption.USE_CLAN_PERSONNEL_MARRIAGES)).thenReturn(false);
+        lenient().when(mockCampaignOptions.get(CampaignOption.RANDOM_MARRIAGE_DICE_SIZE)).thenReturn(0);
+        lenient().when(mockCampaignOptions.get(CampaignOption.USE_LOYALTY_MODIFIERS)).thenReturn(false);
+        lenient().when(mockCampaignOptions.get(CampaignOption.IS_ENABLE_SALVAGE_FLAG_BY_DEFAULT)).thenReturn(false);
+        lenient().when(mockCampaignOptions.get(CampaignOption.CHECK_MUTUAL_ANCESTORS_DEPTH)).thenReturn(0);
+        lenient().when(mockCampaignOptions.get(CampaignOption.TECHS_USE_ADMINISTRATION)).thenReturn(false);
+        lenient().when(mockCampaignOptions.get(CampaignOption.RANDOM_NEW_DEPENDENT_MARRIAGE)).thenReturn(0);
     }
 
     //region Getters/Setters
     @Test
     public void testGettersAndSetters() {
-        when(mockCampaignOptions.isUseClanPersonnelMarriages()).thenReturn(false);
-        when(mockCampaignOptions.isUsePrisonerMarriages()).thenReturn(false);
-        when(mockCampaignOptions.isUseRandomClanPersonnelMarriages()).thenReturn(false);
-        when(mockCampaignOptions.isUseRandomPrisonerMarriages()).thenReturn(false);
+        when(mockCampaignOptions.get(CampaignOption.USE_CLAN_PERSONNEL_MARRIAGES)).thenReturn(false);
+        when(mockCampaignOptions.get(CampaignOption.USE_PRISONER_MARRIAGES)).thenReturn(false);
+        when(mockCampaignOptions.get(CampaignOption.USE_RANDOM_CLAN_PERSONNEL_MARRIAGES)).thenReturn(false);
+        when(mockCampaignOptions.get(CampaignOption.USE_RANDOM_PRISONER_MARRIAGES)).thenReturn(false);
 
         final AbstractMarriage disabledMarriage = new DisabledRandomMarriage(mockCampaignOptions);
 

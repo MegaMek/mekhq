@@ -192,7 +192,7 @@ public class VoiceOfKerensky {
         return campaign.getPlayerForce().getHumanResources()
                      .getSeniorAdminPerson(COMMAND,
                            campaign.getCampaignOptions(),
-                           campaign.isClanCampaign(),
+                           campaign.getPlayerForce().isClanForce(),
                            campaign.getLocalDate());
     }
 }

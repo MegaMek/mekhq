@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2021-2025 The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2021-2026 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -34,6 +34,7 @@ package mekhq.campaign.personnel.divorce;
 
 import megamek.common.compute.Compute;
 import mekhq.campaign.campaignOptions.CampaignOptions;
+import mekhq.campaign.campaignOptions.CampaignOption;
 import mekhq.campaign.personnel.enums.RandomDivorceMethod;
 
 /**
@@ -53,7 +54,7 @@ public class RandomDivorce extends AbstractDivorce {
      */
     public RandomDivorce(final CampaignOptions options) {
         super(RandomDivorceMethod.DICE_ROLL, options);
-        setDivorceDiceSize(options.getRandomDivorceDiceSize());
+        setDivorceDiceSize(options.get(CampaignOption.RANDOM_DIVORCE_DICE_SIZE));
     }
     //endregion Constructors
 

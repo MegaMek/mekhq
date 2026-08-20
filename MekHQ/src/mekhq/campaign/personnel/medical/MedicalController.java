@@ -50,6 +50,7 @@ import megamek.logging.MMLogger;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.campaignOptions.CampaignOptions;
+import mekhq.campaign.campaignOptions.CampaignOption;
 import mekhq.campaign.events.persons.PersonMedicalAssignmentEvent;
 import mekhq.campaign.log.MedicalLogger;
 import mekhq.campaign.personnel.Person;
@@ -91,13 +92,13 @@ public class MedicalController {
         this.campaign = campaign;
 
         CampaignOptions campaignOptions = campaign.getCampaignOptions();
-        isDoctorsUseAdministration = campaignOptions.isDoctorsUseAdministration();
-        maximumPatients = campaignOptions.getMaximumPatients();
-        healingWaitingPeriod = campaignOptions.getHealingWaitingPeriod();
-        naturalHealingWaitingPeriod = campaignOptions.getNaturalHealingWaitingPeriod();
-        isUseEdge = campaignOptions.isUseEdge();
+        isDoctorsUseAdministration = campaignOptions.get(CampaignOption.DOCTORS_USE_ADMINISTRATION);
+        maximumPatients = campaignOptions.get(CampaignOption.MAXIMUM_PATIENTS);
+        healingWaitingPeriod = campaignOptions.get(CampaignOption.HEAL_WAITING_PERIOD);
+        naturalHealingWaitingPeriod = campaignOptions.get(CampaignOption.NATURAL_HEALING_WAITING_PERIOD);
+        isUseEdge = campaignOptions.get(CampaignOption.USE_EDGE);
         isUseAdvancedMedical = campaignOptions.isUseAdvancedMedical();
-        isUseAltAdvancedMedical = campaignOptions.isUseAlternativeAdvancedMedical();
+        isUseAltAdvancedMedical = campaignOptions.get(CampaignOption.USE_ALTERNATIVE_ADVANCED_MEDICAL);
     }
 
     /**
@@ -135,7 +136,7 @@ public class MedicalController {
             return; // Early exit as there is no point continuing to process the character
         }
 
-        Person doctor = campaign.getPerson(patient.getDoctorId());
+        Person doctor = campaign.getPlayerForce().getHumanResources().getPerson(patient.getDoctorId());
 
         if (doctor != null) {
             doctor = isValidDoctor(patient, doctor) ? doctor : null;
@@ -173,10 +174,10 @@ public class MedicalController {
     }
 
     private Person verifyTheatreAvailability(Person patient, Person doctor) {
-        if (campaign.getCampaignOptions().isUseMASHTheatres()) {
+        if (campaign.getCampaignOptions().get(CampaignOption.USE_MASH_THEATRES)) {
             if (!campaign.getPlayerForce().getMashTheatresWithinCapacity(campaign)) {
                 doctor = null;
-                patient.setDoctorId(null, campaign.getCampaignOptions().getNaturalHealingWaitingPeriod());
+                patient.setDoctorId(null, campaign.getCampaignOptions().get(CampaignOption.NATURAL_HEALING_WAITING_PERIOD));
                 campaign.addReport(MEDICAL, getFormattedTextAt(RESOURCE_BUNDLE,
                       "MedicalController.report.overTheatreCapacity",
                       spanOpeningWithCustomColor(getNegativeColor()), CLOSING_SPAN_TAG,

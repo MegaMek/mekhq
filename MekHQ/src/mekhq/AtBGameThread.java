@@ -170,7 +170,7 @@ public class AtBGameThread extends GameThread {
             if ((client.getGame() != null) && client.getGame().getPhase().isLounge()) {
                 LOGGER.info("Thread in lounge");
 
-                client.getLocalPlayer().setCamouflage(app.getCampaign().getCamouflage().clone());
+                client.getLocalPlayer().setCamouflage(app.getCampaign().getPlayerForce().getCamouflage().clone());
                 client.getLocalPlayer().setColour(app.getCampaign().getPlayerForce().getColour());
                 client.getLocalPlayer().setConstantInitBonus(campaign.getPlayerForce().getInitiativeBonus());
 

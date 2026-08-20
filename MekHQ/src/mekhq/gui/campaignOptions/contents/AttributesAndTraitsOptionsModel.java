@@ -34,6 +34,7 @@ package mekhq.gui.campaignOptions.contents;
 
 import jakarta.annotation.Nonnull;
 import mekhq.campaign.campaignOptions.CampaignOptions;
+import mekhq.campaign.campaignOptions.CampaignOption;
 import mekhq.campaign.personnel.skills.RandomSkillPreferences;
 
 /**
@@ -53,18 +54,18 @@ class AttributesAndTraitsOptionsModel {
     AttributesAndTraitsOptionsModel(@Nonnull CampaignOptions options, @Nonnull RandomSkillPreferences skillPreferences) {
         useAttributes = skillPreferences.isUseAttributes();
         randomizeAttributes = skillPreferences.isRandomizeAttributes();
-        displayAllAttributes = options.isDisplayAllAttributes();
-        useAgeEffects = options.isUseAgeEffects();
+        displayAllAttributes = options.get(CampaignOption.DISPLAY_ALL_ATTRIBUTES);
+        useAgeEffects = options.get(CampaignOption.USE_AGE_EFFECTS);
         randomizeTraits = skillPreferences.isRandomizeTraits();
-        useSmallArmsOnly = options.isUseSmallArmsOnly();
+        useSmallArmsOnly = options.get(CampaignOption.USE_SMALL_ARMS_ONLY);
     }
 
     void applyTo(@Nonnull CampaignOptions options, @Nonnull RandomSkillPreferences skillPreferences) {
         skillPreferences.setUseAttributes(useAttributes);
         skillPreferences.setRandomizeAttributes(randomizeAttributes);
-        options.setDisplayAllAttributes(displayAllAttributes);
-        options.setUseAgeEffects(useAgeEffects);
+        options.set(CampaignOption.DISPLAY_ALL_ATTRIBUTES, displayAllAttributes);
+        options.set(CampaignOption.USE_AGE_EFFECTS, useAgeEffects);
         skillPreferences.setRandomizeTraits(randomizeTraits);
-        options.setUseSmallArmsOnly(useSmallArmsOnly);
+        options.set(CampaignOption.USE_SMALL_ARMS_ONLY, useSmallArmsOnly);
     }
 }

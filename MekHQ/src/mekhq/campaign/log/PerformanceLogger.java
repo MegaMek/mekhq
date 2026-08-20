@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2018-2025 The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2018-2026 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -39,6 +39,7 @@ import java.util.ResourceBundle;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.personnel.Person;
+import mekhq.campaign.campaignOptions.CampaignOption;
 
 /**
  * This class is responsible to control the logging of Service Log Entries.
@@ -55,7 +56,7 @@ public class PerformanceLogger {
     @Deprecated(since = "0.50.07", forRemoval = true)
     public static void improvedSkill(final Campaign campaign, final Person person, final LocalDate date,
           final String skill, final String value) {
-        if (campaign.getCampaignOptions().isPersonnelLogSkillGain()) {
+        if (campaign.getCampaignOptions().get(CampaignOption.PERSONNEL_LOG_SKILL_GAIN)) {
             person.addPerformanceLogEntry(new PerformanceLogEntry(date,
                   MessageFormat.format(resources.getString("improvedSkill.text"), skill, value)));
         }
@@ -80,7 +81,7 @@ public class PerformanceLogger {
     }
 
     public static void gainedSPA(final Campaign campaign, final Person person, final LocalDate date, final String spa) {
-        if (campaign.getCampaignOptions().isPersonnelLogAbilityGain()) {
+        if (campaign.getCampaignOptions().get(CampaignOption.PERSONNEL_LOG_ABILITY_GAIN)) {
             person.addPerformanceLogEntry(new PerformanceLogEntry(date,
                   MessageFormat.format(resources.getString("gained.text"), spa)));
         }
@@ -88,14 +89,14 @@ public class PerformanceLogger {
 
     public static void paidOffFlaw(final Campaign campaign, final Person person, final LocalDate date,
           final String spa) {
-        if (campaign.getCampaignOptions().isPersonnelLogAbilityGain()) {
+        if (campaign.getCampaignOptions().get(CampaignOption.PERSONNEL_LOG_ABILITY_GAIN)) {
             person.addPerformanceLogEntry(new PerformanceLogEntry(date,
                   MessageFormat.format(resources.getString("removed.text"), spa)));
         }
     }
 
     public static void gainedEdge(final Campaign campaign, final Person person, final LocalDate date) {
-        if (campaign.getCampaignOptions().isPersonnelLogEdgeGain()) {
+        if (campaign.getCampaignOptions().get(CampaignOption.PERSONNEL_LOG_EDGE_GAIN)) {
             person.addPerformanceLogEntry(new PerformanceLogEntry(date,
                   MessageFormat.format(resources.getString("gainedEdge.text"), person.getEdge())));
         }
@@ -103,7 +104,7 @@ public class PerformanceLogger {
 
     @Deprecated(since = "0.51.0", forRemoval = true)
     public static void changedEdge(final Campaign campaign, final Person person, final LocalDate date) {
-        if (campaign.getCampaignOptions().isPersonnelLogEdgeGain()) {
+        if (campaign.getCampaignOptions().get(CampaignOption.PERSONNEL_LOG_EDGE_GAIN)) {
             person.addPerformanceLogEntry(new PerformanceLogEntry(date,
                   MessageFormat.format(resources.getString("changedEdge.text"), person.getEdge())));
         }

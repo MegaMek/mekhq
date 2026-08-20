@@ -32,6 +32,8 @@
  */
 package mekhq.campaign.digitalGM.stratCon;
 
+import static org.mockito.Mockito.lenient;
+
 import static mekhq.campaign.personnel.skills.SkillType.S_SENSOR_OPERATIONS;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
@@ -50,6 +52,7 @@ import static org.mockito.Mockito.mockConstruction;
 import static org.mockito.Mockito.mockStatic;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.spy;
+import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -63,6 +66,7 @@ import megamek.common.units.Entity;
 import megamek.common.units.UnitType;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.CurrentLocation;
+import mekhq.campaign.campaignOptions.CampaignOption;
 import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.digitalGM.stratCon.StratConContractDefinition.StrategicObjectiveType;
 import mekhq.campaign.digitalGM.stratCon.facility.StratConFacility;
@@ -79,6 +83,8 @@ import mekhq.campaign.mission.enums.CombatRole;
 import mekhq.campaign.mission.enums.ScenarioType;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.PersonnelOptions;
+import mekhq.campaign.personnel.familiarity.Familiarity;
+import mekhq.campaign.personnel.familiarity.FamiliarityGainType;
 import mekhq.campaign.personnel.skills.ScoutingSkills;
 import mekhq.campaign.personnel.skills.Skill;
 import mekhq.campaign.personnel.skills.SkillCheck;
@@ -288,8 +294,8 @@ class StratConRulesManagerTest {
         when(unit.getCrew()).thenReturn(List.of(mock(Person.class)));
 
         // CampaignOptions needed by scanNeighboringCoords
-        when(options.isUseFatigue()).thenReturn(false);
-        when(options.getFatigueRate()).thenReturn(0);
+        when(options.get(CampaignOption.USE_FATIGUE)).thenReturn(false);
+        when(options.get(CampaignOption.FATIGUE_RATE)).thenReturn(0);
 
         // processForceDeployment needs LocalDate and Hangar
         when(campaign.getLocalDate()).thenReturn(LocalDate.of(3025, 1, 15));
@@ -312,6 +318,8 @@ class StratConRulesManagerTest {
         Campaign campaign = MHQTestUtilities.mockCampaign();
         CampaignOptions options = mock(CampaignOptions.class);
         when(campaign.getCampaignOptions()).thenReturn(options);
+        lenient().when(options.get(CampaignOption.USE_ADVANCED_SCOUTING)).thenReturn(false);
+        when(options.get(CampaignOption.CHASSIS_FAMILIARITY_MODE)).thenReturn(Familiarity.DISABLED);
 
         AtBContract contract = mock(AtBContract.class);
         StratConTrackState track = mock(StratConTrackState.class);
@@ -359,6 +367,8 @@ class StratConRulesManagerTest {
         Campaign campaign = MHQTestUtilities.mockCampaign();
         CampaignOptions options = mock(CampaignOptions.class);
         when(campaign.getCampaignOptions()).thenReturn(options);
+        lenient().when(options.get(CampaignOption.USE_ADVANCED_SCOUTING)).thenReturn(false);
+        when(options.get(CampaignOption.CHASSIS_FAMILIARITY_MODE)).thenReturn(Familiarity.DISABLED);
 
         AtBContract contract = mock(AtBContract.class);
         StratConTrackState track = mock(StratConTrackState.class);
@@ -411,6 +421,8 @@ class StratConRulesManagerTest {
         Campaign campaign = MHQTestUtilities.mockCampaign();
         CampaignOptions options = mock(CampaignOptions.class);
         when(campaign.getCampaignOptions()).thenReturn(options);
+        lenient().when(options.get(CampaignOption.USE_ADVANCED_SCOUTING)).thenReturn(false);
+        when(options.get(CampaignOption.CHASSIS_FAMILIARITY_MODE)).thenReturn(Familiarity.DISABLED);
 
         AtBContract contract = mock(AtBContract.class);
         StratConTrackState track = mock(StratConTrackState.class);
@@ -546,6 +558,120 @@ class StratConRulesManagerTest {
     }
 
     /**
+     * Bundles the mocks a patrol-familiarity test needs.
+     */
+    private record FamiliarityFixture(Campaign campaign, AtBContract contract, StratConTrackState track,
+          StratConCoords coords, int forceID) {}
+
+    /**
+     * Builds the mock infrastructure for a deployment onto a hex that already holds an ordinary scenario, so that both
+     * {@link StratConRulesManager#deployForceToCoords} and {@link StratConRulesManager#assignForceToScenario} run to
+     * completion without generating a scenario of their own.
+     *
+     * @param isPatrol whether the deploying force is on a patrol role
+     */
+    private FamiliarityFixture buildFamiliarityFixture(boolean isPatrol) {
+        Campaign campaign = MHQTestUtilities.mockCampaign();
+        CampaignOptions options = mock(CampaignOptions.class);
+        when(campaign.getCampaignOptions()).thenReturn(options);
+        lenient().when(options.get(CampaignOption.USE_ADVANCED_SCOUTING)).thenReturn(false);
+        when(options.get(CampaignOption.CHASSIS_FAMILIARITY_MODE)).thenReturn(Familiarity.NORMAL);
+
+        AtBContract contract = mock(AtBContract.class);
+        StratConTrackState track = mock(StratConTrackState.class);
+        StratConCoords coords = new StratConCoords(2, 3);
+        int forceID = 1;
+
+        StratConScenario scenario = mock(StratConScenario.class);
+        AtBDynamicScenario backingScenario = mock(AtBDynamicScenario.class);
+        when(backingScenario.getStratConScenarioType()).thenReturn(ScenarioType.NONE);
+        when(backingScenario.isFinalized()).thenReturn(true);
+        when(backingScenario.isCloaked()).thenReturn(false);
+        when(backingScenario.getForceIDs()).thenReturn(new ArrayList<>());
+        when(scenario.getBackingScenario()).thenReturn(backingScenario);
+        when(scenario.getPrimaryForceIDs()).thenReturn(new ArrayList<>());
+        when(scenario.getPlayerTemplateForceIDs()).thenReturn(new ArrayList<>());
+        when(track.getScenario(coords)).thenReturn(scenario);
+
+        CombatTeam combatTeam = mock(CombatTeam.class);
+        CombatRole combatRole = mock(CombatRole.class);
+        when(combatRole.isPatrol()).thenReturn(isPatrol);
+        when(combatRole.isTraining()).thenReturn(false);
+        when(combatTeam.getRole()).thenReturn(combatRole);
+        var combatTeamsMap = new Hashtable<Integer, CombatTeam>();
+        combatTeamsMap.put(forceID, combatTeam);
+        when(campaign.getPlayerForce().getCombatTeamsAsMap(campaign)).thenReturn(combatTeamsMap);
+
+        setupProcessForceDeploymentMocks(campaign, options, track, forceID);
+
+        return new FamiliarityFixture(campaign, contract, track, coords, forceID);
+    }
+
+    /**
+     * A patrol deployment earns the patrol familiarity award, and earns it exactly once for the deployment.
+     */
+    @Test
+    void deployForceToCoords_patrolForce_awardsPatrolFamiliarityOnce() {
+        FamiliarityFixture fixture = buildFamiliarityFixture(true);
+
+        try (MockedStatic<Familiarity> familiarity = mockStatic(Familiarity.class)) {
+            StratConRulesManager.deployForceToCoords(fixture.coords(), fixture.forceID(), fixture.campaign(),
+                  fixture.contract(), fixture.track(), false);
+
+            familiarity.verify(() -> Familiarity.assignFamiliarityToCombatTeam(eq(fixture.campaign()), any(),
+                  eq(FamiliarityGainType.D3)), times(1));
+        }
+    }
+
+    /**
+     * The award is Patrol-only: every other combat role deploys without earning it.
+     */
+    @Test
+    void deployForceToCoords_nonPatrolForce_awardsNoFamiliarity() {
+        FamiliarityFixture fixture = buildFamiliarityFixture(false);
+
+        try (MockedStatic<Familiarity> familiarity = mockStatic(Familiarity.class)) {
+            StratConRulesManager.deployForceToCoords(fixture.coords(), fixture.forceID(), fixture.campaign(),
+                  fixture.contract(), fixture.track(), false);
+
+            familiarity.verify(() -> Familiarity.assignFamiliarityToCombatTeam(any(), any(), any()), never());
+        }
+    }
+
+    /**
+     * Assigning a force to an existing scenario is not a patrol sweep, so it earns nothing here - the scenario grants
+     * its own award at resolution. This holds even for a force on a patrol role.
+     */
+    @Test
+    void assignForceToScenario_patrolForce_awardsNoFamiliarity() {
+        FamiliarityFixture fixture = buildFamiliarityFixture(true);
+
+        try (MockedStatic<Familiarity> familiarity = mockStatic(Familiarity.class)) {
+            StratConRulesManager.assignForceToScenario(fixture.coords(), fixture.forceID(), fixture.campaign(),
+                  fixture.contract(), fixture.track(), false);
+
+            familiarity.verify(() -> Familiarity.assignFamiliarityToCombatTeam(any(), any(), any()), never());
+        }
+    }
+
+    /**
+     * The award hangs off the deployment decision, not off the hex-revealing pass. Every route that commits a force to
+     * a scenario re-runs {@code processForceDeployment}, so an award made there would land more than once per
+     * deployment.
+     */
+    @Test
+    void processForceDeployment_patrolForce_awardsNoFamiliarity() {
+        FamiliarityFixture fixture = buildFamiliarityFixture(true);
+
+        try (MockedStatic<Familiarity> familiarity = mockStatic(Familiarity.class)) {
+            StratConRulesManager.processForceDeployment(fixture.coords(), fixture.forceID(), fixture.campaign(),
+                  fixture.track(), false);
+
+            familiarity.verify(() -> Familiarity.assignFamiliarityToCombatTeam(any(), any(), any()), never());
+        }
+    }
+
+    /**
      * Bundles the mocks a {@link StratConRulesManager#generateDailyScenariosForTrack} ambush test needs.
      */
     private record DailyAmbushFixture(Campaign campaign, StratConCampaignState campaignState, AtBContract contract,
@@ -563,6 +689,7 @@ class StratConRulesManagerTest {
         Campaign campaign = MHQTestUtilities.mockCampaign();
         CampaignOptions options = mock(CampaignOptions.class);
         when(campaign.getCampaignOptions()).thenReturn(options);
+        lenient().when(options.get(CampaignOption.USE_ADVANCED_SCOUTING)).thenReturn(false);
         when(campaign.getLocalDate()).thenReturn(LocalDate.of(3025, 1, 15));
 
         AtBContract contract = mock(AtBContract.class);
@@ -715,6 +842,8 @@ class StratConRulesManagerTest {
         Campaign campaign = MHQTestUtilities.mockCampaign();
         CampaignOptions options = mock(CampaignOptions.class);
         when(campaign.getCampaignOptions()).thenReturn(options);
+        lenient().when(options.get(CampaignOption.USE_ADVANCED_SCOUTING)).thenReturn(false);
+        when(options.get(CampaignOption.CHASSIS_FAMILIARITY_MODE)).thenReturn(Familiarity.DISABLED);
 
         AtBContract contract = mock(AtBContract.class);
         StratConTrackState track = mock(StratConTrackState.class);
@@ -764,6 +893,7 @@ class StratConRulesManagerTest {
         Campaign campaign = MHQTestUtilities.mockCampaign();
         CampaignOptions options = mock(CampaignOptions.class);
         when(campaign.getCampaignOptions()).thenReturn(options);
+        lenient().when(options.get(CampaignOption.USE_ADVANCED_SCOUTING)).thenReturn(false);
         when(options.isUseStratConMaplessMode()).thenReturn(false);
 
         AtBContract contract = mock(AtBContract.class);
@@ -806,6 +936,7 @@ class StratConRulesManagerTest {
         Campaign campaign = MHQTestUtilities.mockCampaign();
         CampaignOptions options = mock(CampaignOptions.class);
         when(campaign.getCampaignOptions()).thenReturn(options);
+        lenient().when(options.get(CampaignOption.USE_ADVANCED_SCOUTING)).thenReturn(false);
         when(options.isUseStratConMaplessMode()).thenReturn(false);
 
         AtBContract contract = mock(AtBContract.class);
@@ -869,10 +1000,11 @@ class StratConRulesManagerTest {
         when(template.getAllowedUnitType()).thenReturn(allowedUnitType);
 
         CampaignOptions options = mock(CampaignOptions.class);
-        when(options.isUseDropShips()).thenReturn(isUseDropShips);
+        when(options.get(CampaignOption.USE_DROP_SHIPS)).thenReturn(isUseDropShips);
 
         Campaign campaign = MHQTestUtilities.mockCampaign();
         when(campaign.getCampaignOptions()).thenReturn(options);
+        lenient().when(options.get(CampaignOption.USE_ADVANCED_SCOUTING)).thenReturn(false);
         when(campaign.getLocalDate()).thenReturn(LocalDate.of(3025, 1, 15));
 
         CurrentLocation location = mock(CurrentLocation.class);
@@ -1044,11 +1176,12 @@ class StratConRulesManagerTest {
 
         private static Campaign mockCampaign(boolean useAgingEffects, boolean isClanCampaign) {
             Campaign campaign = MHQTestUtilities.mockCampaign();
-            when(campaign.isClanCampaign()).thenReturn(isClanCampaign);
+            when(campaign.getPlayerForce().isClanForce()).thenReturn(isClanCampaign);
             when(campaign.getLocalDate()).thenReturn(LocalDate.now());
             CampaignOptions campaignOptions = mock(CampaignOptions.class);
-            when(campaignOptions.isUseAgeEffects()).thenReturn(useAgingEffects);
+            when(campaignOptions.get(CampaignOption.USE_AGE_EFFECTS)).thenReturn(useAgingEffects);
             when(campaign.getCampaignOptions()).thenReturn(campaignOptions);
+            lenient().when(campaignOptions.get(CampaignOption.USE_ADVANCED_SCOUTING)).thenReturn(false);
             return campaign;
         }
 

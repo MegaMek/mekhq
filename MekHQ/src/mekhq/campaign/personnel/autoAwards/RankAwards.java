@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2024-2025 The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2024-2026 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -105,7 +105,7 @@ public class RankAwards {
                       award.getRange());
             }
 
-            Person person = campaign.getPerson(personId);
+            Person person = campaign.getPlayerForce().getHumanResources().getPerson(personId);
 
             isEligible = switch (award.getRange()) {
                 case "Promotion" -> (person.getRankNumeric() == requiredRankNumeric)

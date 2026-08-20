@@ -84,6 +84,7 @@ import mekhq.gui.dialog.markets.personnelMarket.PersonnelMarketDialog;
 import mekhq.utilities.MHQXMLUtility;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
+import mekhq.campaign.campaignOptions.CampaignOption;
 
 /**
  * Represents the Personnel Market system for managing the recruitment, listing, and data persistence of potential
@@ -242,7 +243,7 @@ public class NewPersonnelMarket {
         } else {
             logger.debug("Generated {} applicants for the campaign.", currentApplicants.size());
 
-            if (campaign.getCampaignOptions().isPersonnelMarketReportRefresh()) {
+            if (campaign.getCampaignOptions().get(CampaignOption.PERSONNEL_MARKET_REPORT_REFRESH)) {
                 campaign.addReport(GENERAL, generatePersonnelReport(campaign));
             }
 
@@ -265,7 +266,7 @@ public class NewPersonnelMarket {
      * @return a {@link Person}, or {@code null} if no applicant exists
      */
     public @Nullable Person getSingleApplicant() {
-        Map<PersonnelRole, PersonnelMarketEntry> unorderedMarketEntries = getCampaign().isClanCampaign() ?
+        Map<PersonnelRole, PersonnelMarketEntry> unorderedMarketEntries = getCampaign().getPlayerForce().isClanForce() ?
                                                                                 getClanMarketEntries() :
                                                                                 getInnerSphereMarketEntries();
         unorderedMarketEntries = sanitizeMarketEntries(unorderedMarketEntries);
@@ -290,7 +291,7 @@ public class NewPersonnelMarket {
     int performConnectionsRecruitsCheck() {
         Person commander = campaign.getPlayerForce().getHumanResources()
                                  .getCommander(campaign.getCampaignOptions(),
-                                       campaign.isClanCampaign(),
+                                       campaign.getPlayerForce().isClanForce(),
                                        campaign.getLocalDate());
         if (commander == null) {
             return 0;
@@ -530,7 +531,7 @@ public class NewPersonnelMarket {
      */
     public Faction getCampaignFaction() {
         if (campaignFaction == null) {
-            campaignFaction = campaign.getFaction();
+            campaignFaction = campaign.getPlayerForce().getFaction();
         }
         return campaignFaction;
     }
@@ -893,7 +894,7 @@ public class NewPersonnelMarket {
      * @since 0.50.06
      */
     void reinitializeKeyData() {
-        campaignFaction = campaign.getFaction();
+        campaignFaction = campaign.getPlayerForce().getFaction();
         today = campaign.getLocalDate();
         gameYear = today.getYear();
         currentSystem = campaign.getCurrentSystem();

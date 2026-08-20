@@ -82,6 +82,7 @@ import mekhq.campaign.unit.Unit;
 import mekhq.campaign.universe.Faction;
 import mekhq.campaign.universe.factionStanding.FactionStandingUtilities;
 import mekhq.campaign.universe.factionStanding.FactionStandings;
+import mekhq.campaign.campaignOptions.CampaignOption;
 
 /**
  * The {@code Resupply} class manages the resupply process during a campaign. It calculates the required resupply
@@ -561,7 +562,7 @@ public class Resupply {
     private Map<Part, PartDetails> collectParts() {
         Set<PartInUse> partsInUse = collectPartsInUseAcrossLocations();
 
-        Faction campaignFaction = campaign.getFaction();
+        Faction campaignFaction = campaign.getPlayerForce().getFaction();
         LocalDate today = campaign.getLocalDate();
         boolean removeClan = !campaignFaction.isClan() && today.isBefore(BATTLE_OF_TUKAYYID);
 
@@ -838,7 +839,7 @@ public class Resupply {
         if (contract.getContractType().isGuerrillaType() || PIRATE_FACTION_CODE.equals(contract.getEmployerCode())) {
             negotiator = campaign.getPlayerForce().getHumanResources()
                                .getCommander(campaign.getCampaignOptions(),
-                                     campaign.isClanCampaign(),
+                                     campaign.getPlayerForce().isClanForce(),
                                      campaign.getLocalDate());
         } else {
             negotiator = null;
@@ -858,8 +859,8 @@ public class Resupply {
 
             if (skill != null) {
                 SkillModifierData skillModifierData = negotiator.getSkillModifierData(campaign.getCampaignOptions()
-                                                                                            .isUseAgeEffects(),
-                      campaign.isClanCampaign(), campaign.getLocalDate());
+                                                                                            .get(CampaignOption.USE_AGE_EFFECTS),
+                      campaign.getPlayerForce().isClanForce(), campaign.getLocalDate());
                 int skillLevel = skill.getFinalSkillValue(skillModifierData);
                 negotiatorSkill = skill.getType().getExperienceLevel(skillLevel);
             }

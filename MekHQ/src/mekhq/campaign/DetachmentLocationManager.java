@@ -47,6 +47,7 @@ import mekhq.campaign.location.LocationDispatch;
 import mekhq.campaign.location.LocationNode;
 import mekhq.campaign.personnel.medical.advancedMedicalAlternate.Inoculations;
 import mekhq.campaign.universe.PlanetarySystem;
+import mekhq.campaign.campaignOptions.CampaignOption;
 
 /**
  * Manages a {@link Detachment}'s position in the {@link LocationNode} tree.
@@ -132,8 +133,8 @@ public class DetachmentLocationManager {
             performAutomatedActivation(campaign);
         }
 
-        if (campaign.getCampaignOptions().isUseRandomDiseases()
-                  && campaign.getCampaignOptions().isUseAlternativeAdvancedMedical()) {
+        if (campaign.getCampaignOptions().get(CampaignOption.USE_RANDOM_DISEASES)
+                  && campaign.getCampaignOptions().get(CampaignOption.USE_ALTERNATIVE_ADVANCED_MEDICAL)) {
             Inoculations.triggerInoculationPrompt(campaign, false);
         }
     }

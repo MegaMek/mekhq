@@ -394,7 +394,7 @@ public class CampaignLocationManager {
 
     private boolean isStillInCampaign(ILocation traveler, Campaign campaign) {
         return switch (traveler) {
-            case Person person -> {yield campaign.getPerson(person.getId()) != null;}
+            case Person person -> {yield campaign.getPlayerForce().getHumanResources().getPerson(person.getId()) != null;}
             case Unit unit -> campaign.getUnit(unit.getId()) != null;
             case Part part -> findPartAnywhere(campaign, part.getId()) != null;
             default -> true;

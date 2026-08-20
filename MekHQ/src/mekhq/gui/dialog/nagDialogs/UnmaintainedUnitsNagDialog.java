@@ -140,14 +140,14 @@ public class UnmaintainedUnitsNagDialog extends ImmersiveDialogNag {
         Person speaker = campaign.getPlayerForce().getHumanResources()
                                .getSeniorAdminPerson(AdministratorSpecialization.LOGISTICS,
                                      campaign.getCampaignOptions(),
-                                     campaign.isClanCampaign(),
+                                     campaign.getPlayerForce().isClanForce(),
                                      campaign.getLocalDate());
 
         if (speaker == null) {
             speaker = campaign.getPlayerForce().getHumanResources()
                             .getSeniorAdminPerson(AdministratorSpecialization.COMMAND,
                                   campaign.getCampaignOptions(),
-                                  campaign.isClanCampaign(),
+                                  campaign.getPlayerForce().isClanForce(),
                                   campaign.getLocalDate());
         } else {
             return speaker;

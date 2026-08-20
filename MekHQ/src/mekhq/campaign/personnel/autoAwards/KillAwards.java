@@ -58,6 +58,7 @@ import mekhq.campaign.force.Formation;
 import mekhq.campaign.force.FormationLevel;
 import mekhq.campaign.mission.Mission;
 import mekhq.campaign.personnel.Award;
+import mekhq.campaign.campaignOptions.CampaignOption;
 
 public class KillAwards {
     private static final MMLogger LOGGER = MMLogger.create(KillAwards.class);
@@ -93,7 +94,7 @@ public class KillAwards {
             int killsNeeded;
             String awardScope;
 
-            if (award.canBeAwarded(campaign.getPerson(person))) {
+            if (award.canBeAwarded(campaign.getPlayerForce().getHumanResources().getPerson(person))) {
                 List<String> validOptions = Arrays.asList("scenario", "mission", "lifetime");
 
                 if (validOptions.contains(award.getRange().toLowerCase())) {
@@ -184,7 +185,7 @@ public class KillAwards {
                             // this will fail if the character doesn't have a unit,
                             // but that's ok, in that case we just use a default value
                             try {
-                                originForce = campaign.getPerson(person).getUnit().getFormationId();
+                                originForce = campaign.getPlayerForce().getHumanResources().getPerson(person).getUnit().getFormationId();
                             } catch (Exception ignored) {}
 
                             if ((originForce != -1) && (!forceCredits.contains(originForce))) {
@@ -279,7 +280,7 @@ public class KillAwards {
 
         if (!individualAwards.isEmpty()) {
             // if isIssueBestAwardOnly we need to do some filtering
-            if (campaign.getCampaignOptions().isIssueBestAwardOnly()) {
+            if (campaign.getCampaignOptions().get(CampaignOption.ISSUE_BEST_AWARD_ONLY)) {
                 for (Award a : individualAwards) {
                     if (a.getQty() > rollingQty) {
                         rollingQty = a.getQty();
@@ -294,7 +295,7 @@ public class KillAwards {
         }
 
         if (!groupAwards.isEmpty()) {
-            if (campaign.getCampaignOptions().isIssueBestAwardOnly()) {
+            if (campaign.getCampaignOptions().get(CampaignOption.ISSUE_BEST_AWARD_ONLY)) {
                 // we need to filter groupAwards into discrete Award Groups.
                 // otherwise, Forces become ineligible for Awards they should be entitled to
                 // if they are eligible for a 'better' Award from another Award Group.

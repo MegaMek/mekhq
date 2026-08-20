@@ -43,6 +43,7 @@ import mekhq.campaign.LocalHangar;
 import mekhq.campaign.LocalPersonnel;
 import mekhq.campaign.LocalWarehouse;
 import mekhq.campaign.campaignOptions.CampaignOptions;
+import mekhq.campaign.campaignOptions.CampaignOption;
 import mekhq.campaign.market.RequestedStockLevels;
 import mekhq.campaign.parts.AmmoStorage;
 import mekhq.campaign.parts.Armor;
@@ -169,7 +170,7 @@ public interface IPlace extends ILocation {
      */
     default void onArrival(Campaign campaign, boolean isSilentProcessing) {
         CampaignOptions campaignOptions = campaign.getCampaignOptions();
-        if (campaignOptions.isUseRandomDiseases() && campaignOptions.isUseAlternativeAdvancedMedical()) {
+        if (campaignOptions.get(CampaignOption.USE_RANDOM_DISEASES) && campaignOptions.get(CampaignOption.USE_ALTERNATIVE_ADVANCED_MEDICAL)) {
             if (!isSilentProcessing) {
                 Inoculations.triggerInoculationPrompt(campaign, false);
             } else if (getParentLocation() instanceof AbstractLocation loc) {

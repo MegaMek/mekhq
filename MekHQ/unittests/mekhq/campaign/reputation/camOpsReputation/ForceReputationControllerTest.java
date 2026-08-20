@@ -68,7 +68,7 @@ class ForceReputationControllerTest {
         campaign = mockCampaign();
         when(campaign.getPlayerForce().getHumanResources()
                    .getCommander(campaign.getCampaignOptions(),
-                         campaign.isClanCampaign(),
+                         campaign.getPlayerForce().isClanForce(),
                          campaign.getLocalDate())).thenReturn(null);
         when(campaign.getPlayerForce().getFinances()).thenReturn(null);
         when(campaign.getPlayerForce().getCampOpsDateOfLastCrime()).thenReturn(null);

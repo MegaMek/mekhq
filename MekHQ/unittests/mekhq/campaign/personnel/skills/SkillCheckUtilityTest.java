@@ -203,7 +203,7 @@ class SkillCheckUtilityTest {
         // Setup
         Campaign mockCampaign = mockCampaign();
         Faction campaignFaction = mock(Faction.class);
-        when(mockCampaign.getFaction()).thenReturn(campaignFaction);
+        when(mockCampaign.getPlayerForce().getFaction()).thenReturn(campaignFaction);
         when(campaignFaction.getShortName()).thenReturn("MERC");
         Person person = new Person(mockCampaign);
 
@@ -228,7 +228,7 @@ class SkillCheckUtilityTest {
         // Setup
         Campaign mockCampaign = mockCampaign();
         Faction campaignFaction = mock(Faction.class);
-        when(mockCampaign.getFaction()).thenReturn(campaignFaction);
+        when(mockCampaign.getPlayerForce().getFaction()).thenReturn(campaignFaction);
         when(campaignFaction.getShortName()).thenReturn("MERC");
 
         Person person = new Person(mockCampaign);
@@ -392,7 +392,7 @@ class SkillCheckUtilityTest {
         // Setup
         Campaign mockCampaign = mockCampaign();
         Faction campaignFaction = mock(Faction.class);
-        when(mockCampaign.getFaction()).thenReturn(campaignFaction);
+        when(mockCampaign.getPlayerForce().getFaction()).thenReturn(campaignFaction);
         when(campaignFaction.getShortName()).thenReturn("MERC");
         Person person = new Person(mockCampaign);
 
@@ -423,7 +423,7 @@ class SkillCheckUtilityTest {
         // Setup
         Campaign mockCampaign = mockCampaign();
         Faction campaignFaction = mock(Faction.class);
-        when(mockCampaign.getFaction()).thenReturn(campaignFaction);
+        when(mockCampaign.getPlayerForce().getFaction()).thenReturn(campaignFaction);
         when(campaignFaction.getShortName()).thenReturn("MERC");
         Person person = new Person(mockCampaign);
 
@@ -450,7 +450,7 @@ class SkillCheckUtilityTest {
         // Setup
         Campaign mockCampaign = mockCampaign();
         Faction campaignFaction = mock(Faction.class);
-        when(mockCampaign.getFaction()).thenReturn(campaignFaction);
+        when(mockCampaign.getPlayerForce().getFaction()).thenReturn(campaignFaction);
         when(campaignFaction.getShortName()).thenReturn("MERC");
         Person person = new Person(mockCampaign);
 

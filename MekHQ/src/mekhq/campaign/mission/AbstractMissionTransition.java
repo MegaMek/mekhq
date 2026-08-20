@@ -97,6 +97,7 @@ import mekhq.utilities.MHQXMLUtility;
 import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
+import mekhq.campaign.campaignOptions.CampaignOption;
 
 /*
  * This is a utility class designed to facilitate the transition old Mission, Contract, and AtBContract objects to
@@ -1138,7 +1139,7 @@ public abstract class AbstractMissionTransition {
      */
     public Money getEstimatedPayrollExpenses(Campaign campaign) {
         Accountant accountant = campaign.getAccountant();
-        if (campaign.getCampaignOptions().isUsePeacetimeCost()) {
+        if (campaign.getCampaignOptions().get(CampaignOption.USE_PEACETIME_COST)) {
             return accountant.getPeacetimeCost();
         } else {
             return accountant.getPayRoll();
@@ -1161,7 +1162,7 @@ public abstract class AbstractMissionTransition {
      *       planet
      */
     public Money getTotalTransportationFees(Campaign campaign) {
-        if ((null != getSystem()) && campaign.getCampaignOptions().isPayForTransport()) {
+        if ((null != getSystem()) && campaign.getCampaignOptions().get(CampaignOption.PAY_FOR_TRANSPORT)) {
             return getTransportCost(campaign, false);
         }
 
@@ -1179,7 +1180,7 @@ public abstract class AbstractMissionTransition {
      * @return the {@link Money} amount the employer reimburses for transport
      */
     public Money getEmployerTransportReimbursement(Campaign campaign) {
-        if ((null == getSystem()) || !campaign.getCampaignOptions().isPayForTransport()) {
+        if ((null == getSystem()) || !campaign.getCampaignOptions().get(CampaignOption.PAY_FOR_TRANSPORT)) {
             return Money.zero();
         }
 
@@ -1198,7 +1199,7 @@ public abstract class AbstractMissionTransition {
      * @return the {@link Money} amount the player pays for transport after employer reimbursement
      */
     public Money getPlayerTransportCost(Campaign campaign) {
-        if ((null == getSystem()) || !campaign.getCampaignOptions().isPayForTransport()) {
+        if ((null == getSystem()) || !campaign.getCampaignOptions().get(CampaignOption.PAY_FOR_TRANSPORT)) {
             return Money.zero();
         }
 
@@ -1235,7 +1236,7 @@ public abstract class AbstractMissionTransition {
         }
 
         TransportCostCalculations transportCostCalculations = campaign.getTransportCostCalculation(EXP_REGULAR);
-        boolean useTwoWayPay = campaign.getCampaignOptions().isUseTwoWayPay();
+        boolean useTwoWayPay = campaign.getCampaignOptions().get(CampaignOption.IS_USE_TWO_WAY_PAY);
         boolean isUseCommandCircuits = campaign.isUseCommandCircuitForContract(this);
         int duration = (int) ceil(jumpPath.getTotalTime(campaign.getLocalDate(),
               campaign.getPlayerForce().getForceDetachment().getCurrentLocation().getTransitTime(),

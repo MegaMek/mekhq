@@ -2101,7 +2101,7 @@ public class PlanetarySystemEditorDialog extends AbstractMHQDialogBasic {
     }
 
     private String defaultEditorSource() {
-        String campaignName = blankToNull(campaign.getName());
+        String campaignName = blankToNull(campaign.getPlayerForce().getName());
         return campaignName == null ? "MekHQ GM" : "MekHQ GM: " + campaignName;
     }
 

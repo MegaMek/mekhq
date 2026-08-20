@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2019-2025 The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2019-2026 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -150,7 +150,7 @@ public class AutosaveService implements IAutosaveService {
             while (repeatedName) {
                 fileName = String.format("Autosave-%d-%s-%s.cpnx.gz",
                       index++,
-                      campaign.getName(),
+                      campaign.getPlayerForce().getName(),
                       campaign.getLocalDate()
                             .format(DateTimeFormatter.ofPattern(MHQConstants.FILENAME_DATE_FORMAT)
                                           .withLocale(MekHQ.getMHQOptions().getDateLocale())));
