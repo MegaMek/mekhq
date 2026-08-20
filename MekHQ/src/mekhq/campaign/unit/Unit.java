@@ -4250,7 +4250,8 @@ public class Unit implements ITechnology, ILocatable {
                     partsToAdd.add(door);
                 }
                 if (bayType.getCategory() == BayType.CATEGORY_NON_INFANTRY) {
-                    for (int i = 0; i < bay.getCapacity(); i++) {
+                    int cubicleCount = (int) bay.getCapacity();
+                    for (int i = 0; i < cubicleCount; i++) {
                         Part cubicle = new Cubicle((int) entity.getWeight(), bayType, getCampaign());
                         bayPartsToAdd.get(bay.getBayNumber()).add(cubicle);
                         addPart(cubicle);
@@ -4274,7 +4275,7 @@ public class Unit implements ITechnology, ILocatable {
                                                 .stream()
                                                 .filter(p -> ((p instanceof Cubicle) || (p instanceof MissingCubicle)))
                                                 .collect(Collectors.toList());
-                    while (bay.getCapacity() > cubicles.size()) {
+                    while ((int) bay.getCapacity() > cubicles.size()) {
                         Part cubicle = new MissingCubicle((int) entity.getWeight(), bayType, getCampaign());
                         bayPartsToAdd.get(bay.getBayNumber()).add(cubicle);
                         addPart(cubicle);
