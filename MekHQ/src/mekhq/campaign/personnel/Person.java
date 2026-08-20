@@ -1483,7 +1483,7 @@ public class Person implements ILocatable {
             case AERO_TEK -> hasSkill(S_TECH_AERO);
             case BA_TECH -> hasSkill(S_TECH_BA);
             case DOCTOR -> hasSkill(S_SURGERY);
-            case ADMINISTRATOR -> hasSkill(S_ADMIN) && hasSkill(S_NEGOTIATION);
+            case ADMINISTRATOR -> hasSkill(S_ADMIN);
             case ADULT_ENTERTAINER -> {
                 // A character under the age of 18 should never have access to this profession
                 if (isChild(today, true)) {
@@ -5522,6 +5522,7 @@ public class Person implements ILocatable {
           final LocalDate today, final boolean secondary, boolean excludeInjuryEffects) {
         final PersonnelRole role = secondary ? getSecondaryRole() : getPrimaryRole();
 
+        final boolean doAdminCountNegotiation = campaignOptions.get(CampaignOption.ADMIN_EXPERIENCE_LEVEL_INCLUDE_NEGOTIATION);
         final boolean isUseArtillery = campaignOptions.get(CampaignOption.USE_ARTILLERY);
         final boolean isAlternativeQualityAveraging = campaignOptions.get(CampaignOption.ALTERNATIVE_QUALITY_AVERAGING);
         final boolean isUseAgingEffects = campaignOptions.get(CampaignOption.USE_AGE_EFFECTS);
@@ -5586,9 +5587,15 @@ public class Person implements ILocatable {
                 negotiationLevel = negotiationLevel == -1 ? 0 : negotiationLevel;
 
                 int levelSum;
-                int divisor = 2;
+                int divisor;
 
-                levelSum = adminLevel + negotiationLevel;
+                if (doAdminCountNegotiation) {
+                    levelSum = adminLevel + negotiationLevel;
+                    divisor = 2;
+                } else {
+                    levelSum = adminLevel;
+                    divisor = 1;
+                }
 
                 if (levelSum == -divisor) {
                     yield EXP_NONE;
@@ -5700,11 +5707,13 @@ public class Person implements ILocatable {
         final PersonnelRole profession = secondary ? getSecondaryRole() : getPrimaryRole();
 
         final CampaignOptions campaignOptions = campaign.getCampaignOptions();
+        final boolean isAdminsHaveNegotiation = campaignOptions.get(CampaignOption.ADMINS_HAVE_NEGOTIATION);
         final boolean isDoctorsUseAdministration = campaignOptions.get(CampaignOption.DOCTORS_USE_ADMINISTRATION);
         final boolean isTechsUseAdministration = campaignOptions.get(CampaignOption.TECHS_USE_ADMINISTRATION);
         final boolean isUseArtillery = campaignOptions.get(CampaignOption.USE_ARTILLERY);
 
-        return profession.getSkillsForProfession(isDoctorsUseAdministration,
+        return profession.getSkillsForProfession(isAdminsHaveNegotiation,
+              isDoctorsUseAdministration,
               isTechsUseAdministration,
               isUseArtillery);
     }

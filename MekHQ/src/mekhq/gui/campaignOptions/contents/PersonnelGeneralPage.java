@@ -98,6 +98,8 @@ class PersonnelGeneralPage {
     private JSpinner spnEdgeRefreshCost;
     private JCheckBox chkUseImplants;
     private JCheckBox chkUseAlternativeQualityAveraging;
+    private JCheckBox chkAdminsHaveNegotiation;
+    private JCheckBox chkAdminExperienceLevelIncludeNegotiation;
 
     private JCheckBox chkUsePersonnelRemoval;
     private JCheckBox chkUseRemovalExemptCemetery;
@@ -135,6 +137,7 @@ class PersonnelGeneralPage {
         // Contents
         comboEdgeRefreshPeriod = new MMComboBox<>("comboEdgeRefreshPeriod", EdgeRefreshPeriod.values());
         JPanel pnlPersonnelGeneralOptions = createGeneralOptionsPanel();
+        JPanel pnlAdministrators = createAdministratorsPanel();
         JPanel pnlPersonnelCleanup = createPersonnelCleanUpPanel();
         JPanel pnlBlobCrew = createBlobCrewPanel();
         JPanel familiarityPanel = createChassisFamiliarityPanel();
@@ -144,6 +147,9 @@ class PersonnelGeneralPage {
                              .section("lblPersonnelGeneralPage.text",
                                    "lblPersonnelGeneralPage.summary",
                                    pnlPersonnelGeneralOptions)
+                             .section("lblAdministratorsPanel.text",
+                                   "lblAdministratorsPanel.summary",
+                                   pnlAdministrators)
                              .section("lblPersonnelCleanUpPanel.text",
                                    "lblPersonnelCleanUpPanel.summary",
                                    pnlPersonnelCleanup,
@@ -303,6 +309,31 @@ class PersonnelGeneralPage {
     }
 
     /**
+     * Creates the panel for administrator skill options in the General Page.
+     *
+     * @return a {@link JPanel} containing options controlling the Negotiation skill for administrators
+     */
+    private @Nonnull JPanel createAdministratorsPanel() {
+        // Contents
+        chkAdminsHaveNegotiation = new CampaignOptionsCheckBox("AdminsHaveNegotiation");
+        chkAdminsHaveNegotiation.addMouseListener(createTipPanelUpdater("AdminsHaveNegotiation"));
+        chkAdminExperienceLevelIncludeNegotiation =
+              new CampaignOptionsCheckBox("AdminExperienceLevelIncludeNegotiation");
+        chkAdminExperienceLevelIncludeNegotiation
+              .addMouseListener(createTipPanelUpdater("AdminExperienceLevelIncludeNegotiation"));
+
+        // Layout the Panel
+        final SettingsFormPanel panel = new SettingsFormPanel("AdministratorsPanel",
+              LABEL_COLUMN_WIDTH,
+              CONTROL_COLUMN_WIDTH);
+        panel.addCheckBoxGrid(2,
+              chkAdminsHaveNegotiation,
+              chkAdminExperienceLevelIncludeNegotiation);
+
+        return panel;
+    }
+
+    /**
      * Creates the panel for personnel cleanup options in the General Page.
      *
      * @return a {@link JPanel} containing options for personnel cleanup, such as removal exemptions
@@ -409,6 +440,8 @@ class PersonnelGeneralPage {
         spnEdgeRefreshCost.setValue(model.edgeRefreshCost);
         chkUseImplants.setSelected(model.useImplants);
         chkUseAlternativeQualityAveraging.setSelected(model.alternativeQualityAveraging);
+        chkAdminsHaveNegotiation.setSelected(model.adminsHaveNegotiation);
+        chkAdminExperienceLevelIncludeNegotiation.setSelected(model.adminExperienceLevelIncludeNegotiation);
         chkUsePersonnelRemoval.setSelected(model.usePersonnelRemoval);
         chkUseRemovalExemptCemetery.setSelected(model.useRemovalExemptCemetery);
         chkUseRemovalExemptRetirees.setSelected(model.useRemovalExemptRetirees);
@@ -453,6 +486,8 @@ class PersonnelGeneralPage {
         model.edgeRefreshCost = (int) spnEdgeRefreshCost.getValue();
         model.useImplants = chkUseImplants.isSelected();
         model.alternativeQualityAveraging = chkUseAlternativeQualityAveraging.isSelected();
+        model.adminsHaveNegotiation = chkAdminsHaveNegotiation.isSelected();
+        model.adminExperienceLevelIncludeNegotiation = chkAdminExperienceLevelIncludeNegotiation.isSelected();
         model.usePersonnelRemoval = chkUsePersonnelRemoval.isSelected();
         model.useRemovalExemptCemetery = chkUseRemovalExemptCemetery.isSelected();
         model.useRemovalExemptRetirees = chkUseRemovalExemptRetirees.isSelected();

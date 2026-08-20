@@ -2263,16 +2263,19 @@ public class PersonViewPanel extends JScrollablePanel {
               campaign.getPlayerForce().isClanForce(),
               campaign.getLocalDate());
 
+        boolean adminsHaveNegotiation = campaignOptions.get(CampaignOption.ADMINS_HAVE_NEGOTIATION);
         boolean doctorsUseAdmin = campaignOptions.get(CampaignOption.DOCTORS_USE_ADMINISTRATION);
         boolean techsUseAdmin = campaignOptions.get(CampaignOption.TECHS_USE_ADMINISTRATION);
         boolean isUseArtillery = campaignOptions.get(CampaignOption.USE_ARTILLERY);
         PersonnelRole primaryProfession = person.getPrimaryRole();
-        List<String> primaryProfessionSkills = primaryProfession.getSkillsForProfession(doctorsUseAdmin,
+        List<String> primaryProfessionSkills = primaryProfession.getSkillsForProfession(adminsHaveNegotiation,
+              doctorsUseAdmin,
               techsUseAdmin,
               isUseArtillery);
 
         PersonnelRole secondaryProfession = person.getSecondaryRole();
         List<String> secondaryProfessionSkills = new ArrayList<>(secondaryProfession.getSkillsForProfession(
+              adminsHaveNegotiation,
               doctorsUseAdmin,
               techsUseAdmin,
               isUseArtillery));

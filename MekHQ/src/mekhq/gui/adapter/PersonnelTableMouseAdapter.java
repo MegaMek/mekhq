@@ -3110,17 +3110,20 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
             JMenu roleplaySkillsInterestNew = new JMenu(resources.getString("roleplaySkills.interest"));
             JMenu roleplaySkillsScienceNew = new JMenu(resources.getString("roleplaySkills.science"));
 
+            boolean adminsHaveNegotiation = getCampaignOptions().get(CampaignOption.ADMINS_HAVE_NEGOTIATION);
             boolean doctorsUseAdmin = getCampaignOptions().get(CampaignOption.DOCTORS_USE_ADMINISTRATION);
             boolean techsUseAdmin = getCampaignOptions().get(CampaignOption.TECHS_USE_ADMINISTRATION);
             boolean isUseArtillery = getCampaignOptions().get(CampaignOption.USE_ARTILLERY);
             PersonnelRole primaryProfession = person.getPrimaryRole();
-            List<String> primaryProfessionSkills = primaryProfession.getSkillsForProfession(doctorsUseAdmin,
+            List<String> primaryProfessionSkills = primaryProfession.getSkillsForProfession(adminsHaveNegotiation,
+                  doctorsUseAdmin,
                   techsUseAdmin,
                   isUseArtillery,
                   true);
 
             PersonnelRole secondaryProfession = person.getSecondaryRole();
             List<String> secondaryProfessionSkills = new ArrayList<>(secondaryProfession.getSkillsForProfession(
+                  adminsHaveNegotiation,
                   doctorsUseAdmin,
                   techsUseAdmin,
                   isUseArtillery,

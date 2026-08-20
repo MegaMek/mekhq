@@ -322,6 +322,10 @@ public final class CampaignOption<T> {
           of(Boolean.class, false, "trackTotalXPEarnings");
     public static final CampaignOption<Boolean> SHOW_ORIGIN_FACTION =
           of(Boolean.class, true, "showOriginFaction");
+    public static final CampaignOption<Boolean> ADMINS_HAVE_NEGOTIATION =
+          of(Boolean.class, false, "adminsHaveNegotiation");
+    public static final CampaignOption<Boolean> ADMIN_EXPERIENCE_LEVEL_INCLUDE_NEGOTIATION =
+          of(Boolean.class, false, "adminExperienceLevelIncludeNegotiation");
     public static final CampaignOption<Integer> HEAL_WAITING_PERIOD =
           of(Integer.class, 1, "healWaitingPeriod");
     public static final CampaignOption<Integer> NATURAL_HEALING_WAITING_PERIOD =

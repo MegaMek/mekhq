@@ -63,6 +63,8 @@ class PersonnelOptionsModel {
     int edgeRefreshCost;
     boolean useImplants;
     boolean alternativeQualityAveraging;
+    boolean adminsHaveNegotiation;
+    boolean adminExperienceLevelIncludeNegotiation;
     boolean usePersonnelRemoval;
     boolean useRemovalExemptCemetery;
     boolean useRemovalExemptRetirees;
@@ -150,6 +152,8 @@ class PersonnelOptionsModel {
         edgeRefreshCost = options.get(CampaignOption.EDGE_REFRESH_COST);
         useImplants = options.get(CampaignOption.USE_IMPLANTS);
         alternativeQualityAveraging = options.get(CampaignOption.ALTERNATIVE_QUALITY_AVERAGING);
+        adminsHaveNegotiation = options.get(CampaignOption.ADMINS_HAVE_NEGOTIATION);
+        adminExperienceLevelIncludeNegotiation = options.get(CampaignOption.ADMIN_EXPERIENCE_LEVEL_INCLUDE_NEGOTIATION);
         usePersonnelRemoval = options.get(CampaignOption.USE_PERSONNEL_REMOVAL);
         useRemovalExemptCemetery = options.get(CampaignOption.USE_REMOVAL_EXEMPT_CEMETERY);
         useRemovalExemptRetirees = options.get(CampaignOption.USE_REMOVAL_EXEMPT_RETIREES);
@@ -238,6 +242,8 @@ class PersonnelOptionsModel {
         options.set(CampaignOption.EDGE_REFRESH_COST, edgeRefreshCost);
         options.set(CampaignOption.USE_IMPLANTS, useImplants);
         options.set(CampaignOption.ALTERNATIVE_QUALITY_AVERAGING, alternativeQualityAveraging);
+        options.set(CampaignOption.ADMINS_HAVE_NEGOTIATION, adminsHaveNegotiation);
+        options.set(CampaignOption.ADMIN_EXPERIENCE_LEVEL_INCLUDE_NEGOTIATION, adminExperienceLevelIncludeNegotiation);
         options.set(CampaignOption.USE_PERSONNEL_REMOVAL, usePersonnelRemoval);
         options.set(CampaignOption.USE_REMOVAL_EXEMPT_CEMETERY, useRemovalExemptCemetery);
         options.set(CampaignOption.USE_REMOVAL_EXEMPT_RETIREES, useRemovalExemptRetirees);
