@@ -90,6 +90,9 @@ public class ChaosContractEmployerDetermination {
             return null;
         }
 
+        // A special employer may override the rolled type (ComStar fronts a CORPORATION), so use the effective type
+        // from here on for the display name and the stored employer data.
+        type = employerFactions.type();
         Faction employer = employerFactions.flavor();
         int currentYear = currentDate.getYear();
         String factionCode = employer.getShortName();
@@ -159,8 +162,13 @@ public class ChaosContractEmployerDetermination {
      * conflict is situated in, and an optional covert {@code sponsor} bankrolling the employer. Flavor and anchor are
      * equal for territorial employer types and differ when the flavor faction is landless (rebels, a mercenary command,
      * a corporation, a stateless noble). The sponsor is {@code null} unless a patron is backing the employer.
+     *
+     * <p>The {@code type} is usually the rolled employer type, but a special employer may override it &mdash; a ComStar
+     * takeover fronts a {@link ChaosEmployerType#CORPORATION} while ComStar itself stays in the shadows as anchor and
+     * sponsor &mdash; so the caller reads the effective type from here rather than the one it rolled.</p>
      */
-    record EmployerFactions(@NonNull Faction flavor, @NonNull Faction anchor, @Nullable Faction sponsor) {}
+    record EmployerFactions(@NonNull ChaosEmployerType type, @NonNull Faction flavor, @NonNull Faction anchor,
+          @Nullable Faction sponsor) {}
 
     /**
      * Resolves the flavor (paying) faction, the territorial anchor faction, and any covert sponsor for the given
@@ -189,18 +197,32 @@ public class ChaosContractEmployerDetermination {
                   rebels);
             // A Blakist/ComStar patron does not replace the rebels as employer; it secretly funds them.
             Faction sponsor = isMercenarySearch ? checkForSpecialEmployer(currentDate.getYear()) : null;
-            return new EmployerFactions(rebels, anchor, sponsor);
+            return new EmployerFactions(employerType, rebels, anchor, sponsor);
         }
 
-        Faction flavor;
-        if (isMercenarySearch && (flavor = checkForSpecialEmployer(currentDate.getYear())) != null) {
-            // ComStar/Word of Blake overrides keep their flavor but anchor on a regional owner: in most eras they hold
-            // little or no territory, so the conflict still needs a landed power to sit inside.
-            Faction anchor = pickRegionalOwner(currentDate, currentLocation, isMercenarySearch, flavor);
-            return new EmployerFactions(flavor, anchor, null);
+        Faction specialEmployer;
+        if (isMercenarySearch && (specialEmployer = checkForSpecialEmployer(currentDate.getYear())) != null) {
+            if (specialEmployer.getShortName().equals(COMSTAR_FACTION_CODE)) {
+                // ComStar works in the shadows: rather than take the contract openly it fronts a corporation as the
+                // visible employer while bankrolling (sponsor) and territorially anchoring the work itself. The
+                // employer type becomes CORPORATION, so the player sees a corporation with its own generated name,
+                // never ComStar.
+                Faction corporation = resolveFlavorFaction(ChaosEmployerType.CORPORATION, currentDate, currentLocation,
+                      isMercenarySearch);
+                if (corporation == null) {
+                    return null;
+                }
+                return new EmployerFactions(ChaosEmployerType.CORPORATION, corporation, specialEmployer,
+                      specialEmployer);
+            }
+            // Word of Blake openly takes over as the employer, keeping the rolled type but anchoring on a regional
+            // owner: in most eras it holds little or no territory, so the conflict still needs a landed power to sit
+            // inside.
+            Faction anchor = pickRegionalOwner(currentDate, currentLocation, isMercenarySearch, specialEmployer);
+            return new EmployerFactions(employerType, specialEmployer, anchor, null);
         }
 
-        flavor = resolveFlavorFaction(employerType, currentDate, currentLocation, isMercenarySearch);
+        Faction flavor = resolveFlavorFaction(employerType, currentDate, currentLocation, isMercenarySearch);
         if (flavor == null) {
             return null;
         }
@@ -212,7 +234,7 @@ public class ChaosContractEmployerDetermination {
         Faction sponsor = (employerType == ChaosEmployerType.MERCENARY_SUBCONTRACT) && !anchor.equals(flavor)
                                 ? anchor
                                 : null;
-        return new EmployerFactions(flavor, anchor, sponsor);
+        return new EmployerFactions(employerType, flavor, anchor, sponsor);
     }
 
     /**

@@ -32,6 +32,7 @@
  */
 package mekhq.campaign.mission.contract.contractGeneration;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.mockito.ArgumentMatchers.any;
@@ -190,7 +191,7 @@ class ChaosContractEmployerDeterminationTest {
     }
 
     @Test
-    void aNonRebelPatronOpenlyTakesOverAsEmployer() {
+    void aComStarPatronFrontsACorporationFromTheShadows() {
         Faction rebels = namedFaction("REB");
         Faction house = namedFaction("HOUSE");
         Faction comStar = namedFaction("CS");
@@ -205,12 +206,45 @@ class ChaosContractEmployerDeterminationTest {
 
             RandomFactionGenerator generator = mock(RandomFactionGenerator.class);
             generatorStatic.when(RandomFactionGenerator::getInstance).thenReturn(generator);
+            // Resolves the fronting corporation's flavor faction.
             when(generator.getRandomEmployerFaction(eq(location), eq(DATE), eq(true), any())).thenReturn(house);
 
             EmployerFactions result = ChaosContractEmployerDetermination.determineEmployerFactions(
                   ChaosEmployerType.CORPORATION, DATE, location, true);
 
-            assertSame(comStar, result.flavor(), "for a non-rebel type the patron becomes the employer outright");
+            assertEquals(ChaosEmployerType.CORPORATION, result.type(),
+                  "ComStar fronts a corporation, so the effective employer type is CORPORATION");
+            assertSame(house, result.flavor(), "a corporation is the player-visible employer, never ComStar");
+            assertSame(comStar, result.anchor(), "ComStar anchors the contract itself");
+            assertSame(comStar, result.sponsor(), "ComStar bankrolls it from the shadows");
+        }
+    }
+
+    @Test
+    void aWordOfBlakePatronOpenlyTakesOverAsEmployer() {
+        Faction rebels = namedFaction("REB");
+        Faction house = namedFaction("HOUSE");
+        Faction comStar = namedFaction("CS");
+        Faction wordOfBlake = namedFaction("WOB");
+        ILocation location = locationOwnedByHouse();
+
+        try (MockedStatic<Factions> factionsStatic = mockStatic(Factions.class);
+              MockedStatic<Compute> compute = mockStatic(Compute.class);
+              MockedStatic<RandomFactionGenerator> generatorStatic = mockStatic(RandomFactionGenerator.class)) {
+            stubFactions(factionsStatic, rebels, house, comStar, wordOfBlake);
+            // Close ComStar's override window so the Word of Blake override is the one that opens.
+            when(comStar.getEndYear()).thenReturn(YEAR - 1);
+            compute.when(() -> Compute.randomInt(anyInt())).thenReturn(0);
+
+            RandomFactionGenerator generator = mock(RandomFactionGenerator.class);
+            generatorStatic.when(RandomFactionGenerator::getInstance).thenReturn(generator);
+            when(generator.getRandomEmployerFaction(eq(location), eq(DATE), eq(true), any())).thenReturn(house);
+
+            EmployerFactions result = ChaosContractEmployerDetermination.determineEmployerFactions(
+                  ChaosEmployerType.CORPORATION, DATE, location, true);
+
+            assertEquals(ChaosEmployerType.CORPORATION, result.type(), "Word of Blake keeps the rolled employer type");
+            assertSame(wordOfBlake, result.flavor(), "Word of Blake takes over as the visible employer outright");
             assertSame(house, result.anchor(), "the conflict still sits inside a landed power near the player");
             assertNull(result.sponsor(), "an openly-employing patron is not a covert sponsor");
         }
