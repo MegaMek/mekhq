@@ -34,8 +34,8 @@ package mekhq.campaign.mission.contract.contractGeneration;
 
 import jakarta.annotation.Nullable;
 import mekhq.campaign.location.ILocation;
+import mekhq.campaign.mission.contract.contractData.ContractObjectiveType;
 import mekhq.campaign.mission.contract.contractGeneration.targetFinder.MissionLocationProfile;
-import mekhq.campaign.mission.enums.ContractObjectiveType;
 import mekhq.campaign.universe.RandomFactionGenerator;
 
 /**

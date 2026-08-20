@@ -52,7 +52,7 @@ import jakarta.xml.bind.annotation.XmlElementWrapper;
 import jakarta.xml.bind.annotation.XmlRootElement;
 import megamek.logging.MMLogger;
 import mekhq.MHQConstants;
-import mekhq.campaign.mission.enums.ContractObjectiveType;
+import mekhq.campaign.mission.contract.contractData.ContractObjectiveType;
 import mekhq.utilities.MMDataLicenseHeader;
 
 /**

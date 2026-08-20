@@ -63,7 +63,6 @@ import mekhq.campaign.mission.contract.ChaosGameWorlds;
 import mekhq.campaign.mission.contract.contractData.*;
 import mekhq.campaign.mission.contract.contractGeneration.ChaosEmployerType;
 import mekhq.campaign.mission.contract.contractGeneration.negotiationsAndNPCs.TermFunding;
-import mekhq.campaign.mission.enums.ContractObjectiveType;
 import mekhq.utilities.MHQXMLUtility;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;

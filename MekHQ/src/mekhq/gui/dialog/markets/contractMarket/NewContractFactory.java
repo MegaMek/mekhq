@@ -46,7 +46,6 @@ import mekhq.campaign.mission.contract.AbstractContract;
 import mekhq.campaign.mission.contract.ChaosContract;
 import mekhq.campaign.mission.contract.contractData.*;
 import mekhq.campaign.mission.contract.contractGeneration.ChaosEmployerType;
-import mekhq.campaign.mission.enums.ContractObjectiveType;
 import mekhq.campaign.universe.Faction;
 import mekhq.campaign.universe.Factions;
 import mekhq.campaign.universe.PlanetarySystem;

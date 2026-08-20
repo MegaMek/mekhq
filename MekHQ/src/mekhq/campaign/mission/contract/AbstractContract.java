@@ -55,7 +55,6 @@ import mekhq.campaign.finances.Money;
 import mekhq.campaign.mission.contract.contractData.*;
 import mekhq.campaign.mission.contract.contractGeneration.ChaosEmployerType;
 import mekhq.campaign.mission.contract.io.ContractXmlCodec;
-import mekhq.campaign.mission.enums.ContractObjectiveType;
 import mekhq.campaign.mission.scenarios.AtBScenario;
 import mekhq.campaign.mission.scenarios.Scenario;
 import mekhq.campaign.mission.utilities.ContractUtilities;

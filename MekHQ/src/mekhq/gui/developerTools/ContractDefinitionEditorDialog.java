@@ -49,7 +49,7 @@ import megamek.codeUtilities.MathUtility;
 import megamek.common.ui.FastJScrollPane;
 import mekhq.campaign.digitalGM.stratCon.StratConContractDefinition;
 import mekhq.campaign.digitalGM.stratCon.StratConContractDefinition.ObjectiveParameters;
-import mekhq.campaign.mission.enums.ContractObjectiveType;
+import mekhq.campaign.mission.contract.contractData.ContractObjectiveType;
 import mekhq.gui.FileDialogs;
 
 /**

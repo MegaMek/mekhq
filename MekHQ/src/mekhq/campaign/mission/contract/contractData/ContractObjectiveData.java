@@ -32,7 +32,6 @@
  */
 package mekhq.campaign.mission.contract.contractData;
 
-import mekhq.campaign.mission.enums.ContractObjectiveType;
 
 public record ContractObjectiveData(
       ContractObjectiveType playerObjectiveType, ContractObjectiveType opposingObjectiveType) {

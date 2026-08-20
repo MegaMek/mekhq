@@ -48,7 +48,7 @@ import java.util.List;
 
 import megamek.codeUtilities.ObjectUtility;
 import megamek.logging.MMLogger;
-import mekhq.campaign.mission.enums.ContractObjectiveType;
+import mekhq.campaign.mission.contract.contractData.ContractObjectiveType;
 
 public enum ChaosObjectiveType {
     EXPEDITION(3, 1, 0, 1, 0, 0, 2, -1, true,

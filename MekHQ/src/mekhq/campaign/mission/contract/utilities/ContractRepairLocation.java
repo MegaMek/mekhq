@@ -35,7 +35,7 @@ package mekhq.campaign.mission.contract.utilities;
 import java.util.List;
 
 import mekhq.campaign.mission.contract.AbstractContract;
-import mekhq.campaign.mission.enums.ContractObjectiveType;
+import mekhq.campaign.mission.contract.contractData.ContractObjectiveType;
 import mekhq.campaign.unit.Unit;
 
 public class ContractRepairLocation {

@@ -82,7 +82,6 @@ import mekhq.campaign.mission.contract.contractGeneration.ContractSearchType;
 import mekhq.campaign.mission.contract.contractGeneration.negotiationsAndNPCs.EmployerLiaison;
 import mekhq.campaign.mission.contract.contractGeneration.negotiationsAndNPCs.EmployerNegotiator;
 import mekhq.campaign.mission.contract.contractGeneration.negotiationsAndNPCs.OpposingCommander;
-import mekhq.campaign.mission.enums.ContractObjectiveType;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.enums.Profession;
 import mekhq.campaign.personnel.ranks.RankSystem;

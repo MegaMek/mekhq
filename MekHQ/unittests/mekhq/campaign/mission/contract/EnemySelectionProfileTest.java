@@ -32,8 +32,8 @@
  */
 package mekhq.campaign.mission.contract;
 
+import mekhq.campaign.mission.contract.contractData.ContractObjectiveType;
 import mekhq.campaign.mission.contract.contractGeneration.targetFinder.EnemySelectionProfile;
-import mekhq.campaign.mission.enums.ContractObjectiveType;
 import org.junit.jupiter.api.Test;
 
 /**

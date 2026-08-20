@@ -59,7 +59,7 @@ import mekhq.campaign.campaignOptions.CampaignOption;
 import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.finances.Money;
 import mekhq.campaign.mission.contract.AbstractContract;
-import mekhq.campaign.mission.enums.ContractObjectiveType;
+import mekhq.campaign.mission.contract.contractData.ContractObjectiveType;
 import mekhq.campaign.personnel.Injury;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.PersonnelOptions;

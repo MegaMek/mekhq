@@ -55,7 +55,6 @@ import mekhq.campaign.mission.contract.AbstractContract;
 import mekhq.campaign.mission.contract.ChaosContract;
 import mekhq.campaign.mission.contract.contractData.*;
 import mekhq.campaign.mission.contract.contractGeneration.ChaosEmployerType;
-import mekhq.campaign.mission.enums.ContractObjectiveType;
 import mekhq.campaign.mission.scenarios.Scenario;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.enums.PersonnelRole;

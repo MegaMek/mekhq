@@ -58,7 +58,6 @@ import mekhq.campaign.mission.contract.ChaosGameWorlds;
 import mekhq.campaign.mission.contract.contractData.*;
 import mekhq.campaign.mission.contract.contractGeneration.ChaosEmployerType;
 import mekhq.campaign.mission.contract.contractGeneration.negotiationsAndNPCs.TermFunding;
-import mekhq.campaign.mission.enums.ContractObjectiveType;
 import mekhq.campaign.mission.scenarios.Scenario;
 import mekhq.campaign.personnel.Person;
 import mekhq.utilities.MHQXMLUtility;

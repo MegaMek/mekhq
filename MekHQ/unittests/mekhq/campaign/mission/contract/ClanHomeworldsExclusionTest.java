@@ -50,7 +50,7 @@ import mekhq.campaign.Campaign;
 import mekhq.campaign.CurrentLocation;
 import mekhq.campaign.JumpPath;
 import mekhq.campaign.force.PlayerForce;
-import mekhq.campaign.mission.enums.ContractObjectiveType;
+import mekhq.campaign.mission.contract.contractData.ContractObjectiveType;
 import mekhq.campaign.universe.Faction;
 import mekhq.campaign.universe.PlanetarySystem;
 import mekhq.campaign.universe.Systems;

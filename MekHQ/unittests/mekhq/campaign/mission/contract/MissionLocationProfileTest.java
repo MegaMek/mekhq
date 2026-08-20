@@ -35,8 +35,8 @@ package mekhq.campaign.mission.contract;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import mekhq.campaign.mission.contract.contractData.ContractObjectiveType;
 import mekhq.campaign.mission.contract.contractGeneration.targetFinder.MissionLocationProfile;
-import mekhq.campaign.mission.enums.ContractObjectiveType;
 import org.junit.jupiter.api.Test;
 
 /**
