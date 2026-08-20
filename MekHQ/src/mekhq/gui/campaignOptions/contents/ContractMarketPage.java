@@ -107,12 +107,14 @@ class ContractMarketPage {
     private JCheckBox chkEnableSalvageFlagByDefault;
     private JCheckBox chkUseDynamicDifficulty;
     private JCheckBox chkUseBolsterContractSkill;
+    private JCheckBox chkUseChaosScaleSupportPointConversion;
     private JLabel lblDropShipBonusPercentage;
     private JSpinner spnDropShipBonusPercentage;
     private JLabel lblPityContracts;
     private JSpinner spnPityContracts;
 
     private JPanel pnlContractPay;
+    private JCheckBox chkUseChaosSupportPointConversion;
     private JCheckBox chkUseLegacyOptions;
     private JPanel pnlLegacyContractPayOptions;
     private JRadioButton btnContractEquipment;
@@ -224,6 +226,10 @@ class ContractMarketPage {
               getMetadata(MILESTONE_BEFORE_METADATA, CampaignOptionFlag.CUSTOM_SYSTEM));
         chkUseBolsterContractSkill.addMouseListener(createTipPanelUpdater("UseBolsterContractSkill"));
 
+        chkUseChaosScaleSupportPointConversion = new CampaignOptionsCheckBox("UseChaosScaleSupportPointConversion");
+        chkUseChaosScaleSupportPointConversion.addMouseListener(
+                createTipPanelUpdater("UseChaosScaleSupportPointConversion"));
+
         lblDropShipBonusPercentage = new CampaignOptionsLabel("DropShipBonusPercentage");
         lblDropShipBonusPercentage.addMouseListener(createTipPanelUpdater("DropShipBonusPercentage"));
         spnDropShipBonusPercentage = new CampaignOptionsSpinner("DropShipBonusPercentage", 0, 0, 20, 5);
@@ -251,7 +257,8 @@ class ContractMarketPage {
               chkUseRiskySalvage,
               chkEnableSalvageFlagByDefault,
               chkUseDynamicDifficulty,
-              chkUseBolsterContractSkill);
+                chkUseBolsterContractSkill,
+                chkUseChaosScaleSupportPointConversion);
         panel.addRow(lblDropShipBonusPercentage, spnDropShipBonusPercentage);
         panel.addRow(lblPityContracts, spnPityContracts);
 
@@ -268,6 +275,11 @@ class ContractMarketPage {
      */
     private @Nonnull JPanel createContractPayPanel() {
         // Contents
+
+        // A general Chaos-pay option (applies to the default scheme, not the legacy bases): whether Chaos support-point
+        // pay is converted to C-bills. Enabled by default.
+        chkUseChaosSupportPointConversion = new CampaignOptionsCheckBox("UseChaosSupportPointConversion");
+        chkUseChaosSupportPointConversion.addMouseListener(createTipPanelUpdater("UseChaosSupportPointConversion"));
 
         // Top-level pay scheme: the default Chaos Campaign scheme, or the legacy force-value / payroll schemes whose
         // basis and options are configured in the nested card below. Leaving the box unticked keeps Chaos pay.
@@ -405,6 +417,9 @@ class ContractMarketPage {
 
         layout.gridx = 0;
         layout.gridy = 0;
+        panel.add(chkUseChaosSupportPointConversion, layout);
+
+        layout.gridy++;
         panel.add(chkUseLegacyOptions, layout);
 
         layout.gridy++;
@@ -512,8 +527,10 @@ class ContractMarketPage {
         chkEnableSalvageFlagByDefault.setSelected(model.enableSalvageFlagByDefault);
         chkUseDynamicDifficulty.setSelected(model.useDynamicDifficulty);
         chkUseBolsterContractSkill.setSelected(model.useBolsterContractSkill);
+        chkUseChaosScaleSupportPointConversion.setSelected(model.useChaosScaleSupportPointConversion);
         spnDropShipBonusPercentage.setValue(model.dropShipBonusPercentage);
         spnPityContracts.setValue(model.pityContracts);
+        chkUseChaosSupportPointConversion.setSelected(model.useChaosSupportPointConversion);
         chkUseLegacyOptions.setSelected(model.useLegacyContractPay);
         if (model.equipmentContractBase) {
             btnContractEquipment.setSelected(true);
@@ -553,8 +570,10 @@ class ContractMarketPage {
         model.enableSalvageFlagByDefault = chkEnableSalvageFlagByDefault.isSelected();
         model.useDynamicDifficulty = chkUseDynamicDifficulty.isSelected();
         model.useBolsterContractSkill = chkUseBolsterContractSkill.isSelected();
+        model.useChaosScaleSupportPointConversion = chkUseChaosScaleSupportPointConversion.isSelected();
         model.dropShipBonusPercentage = (int) spnDropShipBonusPercentage.getValue();
         model.pityContracts = (int) spnPityContracts.getValue();
+        model.useChaosSupportPointConversion = chkUseChaosSupportPointConversion.isSelected();
         model.useLegacyContractPay = chkUseLegacyOptions.isSelected();
         model.equipmentContractBase = btnContractEquipment.isSelected();
         model.equipmentContractPercent = (double) spnEquipPercent.getValue();

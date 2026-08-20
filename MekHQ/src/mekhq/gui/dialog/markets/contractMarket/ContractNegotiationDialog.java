@@ -642,7 +642,7 @@ public class ContractNegotiationDialog extends JDialog {
         ChaosContractStepsTable command = step(Clause.COMMAND);
 
         contract.setContractTerms(new ContractTermsData(payRate, support, transport, salvage, command));
-        contract.updateMonthlyPay(ChaosContractPayDetermination.getMonthlyPay(contract));
+        contract.updateMonthlyPay(ChaosContractPayDetermination.getMonthlyPay(campaign, contract));
         contract.updateTransportPay(ChaosContractPayDetermination.getTransportPay(campaign,
               campaign.getLocalDate(), contract, currentLocation));
 

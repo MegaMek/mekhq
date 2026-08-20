@@ -203,7 +203,7 @@ public class AbstractContractGeneration {
 
     private static void setAncillaryValues(Campaign campaign, LocalHangar detachmentHangar, ChaosContract contract) {
         // Scale must be set before the required victory points, which are derived from it.
-        contract.setScale(determineScale(campaign.getPlayerForce(), detachmentHangar, contract));
+        contract.setScale(determineScale(campaign, campaign.getPlayerForce(), detachmentHangar, contract));
         contract.setRequiredCombatElements(determineRequiredCombatElements(campaign));
         contract.setTrackCount(determineTrackCount(contract));
         contract.setRequiredVictoryPoints(determineRequiredVictoryPoints(contract));
@@ -213,15 +213,19 @@ public class AbstractContractGeneration {
      * Determines a contract's scale from the units the player force commits to it. Exposed as public so the GM contract
      * editor's "Automatic" scale option follows exactly the same rule generation uses.
      *
+     * @param campaign         the campaign, for the support-point-to-Battle-Value scale conversion option
      * @param playerForce      the player force whose committed units set the scale
      * @param detachmentHangar the hangar whose units are weighed
      * @param contract         the contract being sized (its objective decides whether cadre units count)
      *
      * @return the automatically determined scale
      */
-    public static int determineScale(PlayerForce playerForce, LocalHangar detachmentHangar, AbstractContract contract) {
+    public static int determineScale(Campaign campaign, PlayerForce playerForce, LocalHangar detachmentHangar,
+          AbstractContract contract) {
+        boolean convertSupportPointsToBattleValue = campaign.getCampaignOptions()
+                                                          .get(CampaignOption.USE_CHAOS_SCALE_SUPPORT_POINT_CONVERSION);
         return ChaosContractDeterminationScale.generateScaleForDetachment(playerForce, detachmentHangar,
-              contract.getObjectiveType().isCadreDuty());
+              contract.getObjectiveType().isCadreDuty(), convertSupportPointsToBattleValue);
     }
 
     /**
@@ -291,7 +295,7 @@ public class AbstractContractGeneration {
         if (campaign.getCampaignOptions().get(CampaignOption.USE_LEGACY_CONTRACT_PAY)) {
             return CamOpsContractPayDetermination.getMonthlyPay(campaign, contract);
         }
-        return ChaosContractPayDetermination.getMonthlyPay(contract);
+        return ChaosContractPayDetermination.getMonthlyPay(campaign, contract);
     }
 
     /**
@@ -303,7 +307,7 @@ public class AbstractContractGeneration {
         if (campaign.getCampaignOptions().get(CampaignOption.USE_LEGACY_CONTRACT_PAY)) {
             return CamOpsContractPayDetermination.getCombatPay();
         }
-        return ChaosContractPayDetermination.getCombatPay(contract);
+        return ChaosContractPayDetermination.getCombatPay(campaign, contract);
     }
 
     /**

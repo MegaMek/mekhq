@@ -975,7 +975,7 @@ public class ContractEditorDialog extends JDialog {
         // spinner values are written directly, with no regeneration.
         if (createMode) {
             contract.setScale(scaleAutomatic.isSelected()
-                                    ? AbstractContractGeneration.determineScale(campaign.getPlayerForce(),
+                                    ? AbstractContractGeneration.determineScale(campaign, campaign.getPlayerForce(),
                   campaign.getPlayerForce().getForceDetachment().getHangar(), contract)
                                     : intValue(scaleSpinner));
             contract.setRequiredCombatElements(combatElementsAutomatic.isSelected()

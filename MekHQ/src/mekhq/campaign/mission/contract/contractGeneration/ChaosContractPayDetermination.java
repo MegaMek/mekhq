@@ -39,6 +39,7 @@ import java.time.LocalDate;
 import mekhq.campaign.AbstractLocation;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.JumpPath;
+import mekhq.campaign.campaignOptions.CampaignOption;
 import mekhq.campaign.chaosCampaign.ChaosCampaignUtilities;
 import mekhq.campaign.finances.Money;
 import mekhq.campaign.mission.contract.AbstractContract;
@@ -56,8 +57,8 @@ public class ChaosContractPayDetermination {
     public static void determineContractPayForChaosContract(Campaign campaign, LocalDate currentDate,
           AbstractContract contract,
           AbstractLocation currentLocation) {
-        Money monthlyPay = getMonthlyPay(contract);
-        Money combatPay = getCombatPay(contract);
+        Money monthlyPay = getMonthlyPay(campaign, contract);
+        Money combatPay = getCombatPay(campaign, contract);
         Money transportPay = getTransportPay(campaign, currentDate, contract, currentLocation);
 
         ContractFinanceData contractFinanceData = new ContractFinanceData(transportPay, monthlyPay, combatPay);
@@ -84,17 +85,28 @@ public class ChaosContractPayDetermination {
         }
 
         transportCostInSupportPoints = (int) round(transportCostInSupportPoints * contract.getTransportMultiplier());
-        return ChaosCampaignUtilities.getMoneyFromChaosSupportPoints(transportCostInSupportPoints);
+        return ChaosCampaignUtilities.getMoneyFromChaosSupportPoints(transportCostInSupportPoints,
+              shouldConvertSupportPoints(campaign));
     }
 
-    public static @NonNull Money getCombatPay(AbstractContract contract) {
+    public static @NonNull Money getCombatPay(Campaign campaign, AbstractContract contract) {
         int combatPayInSupportPoints = DEFAULT_COMBAT_PAY_MULTIPLIER * contract.getScale();
-        return ChaosCampaignUtilities.getMoneyFromChaosSupportPoints(combatPayInSupportPoints);
+        return ChaosCampaignUtilities.getMoneyFromChaosSupportPoints(combatPayInSupportPoints,
+              shouldConvertSupportPoints(campaign));
     }
 
-    public static @NonNull Money getMonthlyPay(AbstractContract contract) {
+    public static @NonNull Money getMonthlyPay(Campaign campaign, AbstractContract contract) {
         int monthlyPayInSupportPoints = DEFAULT_MONTHLY_PAY_MULTIPLIER * contract.getScale();
         monthlyPayInSupportPoints = (int) round(monthlyPayInSupportPoints * contract.getBasePayMultiplier());
-        return ChaosCampaignUtilities.getMoneyFromChaosSupportPoints(monthlyPayInSupportPoints);
+        return ChaosCampaignUtilities.getMoneyFromChaosSupportPoints(monthlyPayInSupportPoints,
+              shouldConvertSupportPoints(campaign));
+    }
+
+    /**
+     * Whether Chaos support-point pay should be converted to C-bills (the "BSP to BV" conversion). Enabled by default;
+     * when disabled, pay is expressed in raw support points.
+     */
+    private static boolean shouldConvertSupportPoints(Campaign campaign) {
+        return campaign.getCampaignOptions().get(CampaignOption.USE_CHAOS_SUPPORT_POINT_CONVERSION);
     }
 }

@@ -47,7 +47,8 @@ public class ChaosContractDeterminationScale {
     private final static double BATTLEFIELD_SUPPORT_POINTS_PER_SCALE = 32.0; // Draconis Reach first printing pg 36
     private final static double BATTLE_VALUE_PER_BSP = 500.0; // Battle for Tukayyid, pg24
 
-    static int generateScaleForDetachment(PlayerForce playerForce, LocalHangar hangar, boolean isCadreDuty) {
+    static int generateScaleForDetachment(PlayerForce playerForce, LocalHangar hangar, boolean isCadreDuty,
+          boolean convertSupportPointsToBattleValue) {
         int validBattleValue = 0;
 
         for (Unit unit : hangar.getUnits()) {
@@ -64,7 +65,10 @@ public class ChaosContractDeterminationScale {
         }
 
         double battleValuePerScale = BATTLE_VALUE_PER_SCALE;
-        battleValuePerScale += BATTLEFIELD_SUPPORT_POINTS_PER_SCALE * BATTLE_VALUE_PER_BSP;
+        if (convertSupportPointsToBattleValue) {
+            // Fold the battlefield-support-point allotment into the per-scale Battle Value by converting it to BV.
+            battleValuePerScale += BATTLEFIELD_SUPPORT_POINTS_PER_SCALE * BATTLE_VALUE_PER_BSP;
+        }
 
         return (int) ceil(validBattleValue / battleValuePerScale);
     }
