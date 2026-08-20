@@ -32,10 +32,11 @@
  */
 package mekhq.campaign.mission.atb;
 
-import static mekhq.campaign.mission.atb.AtBScenarioModifier.initializeScenarioModifiers;
+import static mekhq.campaign.mission.scenarios.atb.AtBScenarioModifier.initializeScenarioModifiers;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
+import mekhq.campaign.mission.scenarios.atb.AtBScenarioModifier;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 

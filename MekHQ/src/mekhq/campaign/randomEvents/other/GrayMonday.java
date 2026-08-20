@@ -40,17 +40,17 @@ import java.time.LocalDate;
 
 import megamek.common.annotations.Nullable;
 import mekhq.campaign.Campaign;
+import mekhq.campaign.campaignOptions.CampaignOption;
 import mekhq.campaign.finances.Finances;
 import mekhq.campaign.finances.Money;
-import mekhq.campaign.mission.newContract.AbstractContract;
-import mekhq.campaign.mission.newContract.contractData.ChaosContractStepsTable;
-import mekhq.campaign.mission.newContract.contractData.ContractFinanceData;
-import mekhq.campaign.mission.newContract.contractData.ContractTermsData;
-import mekhq.campaign.mission.newContract.contractGeneration.ContractSearchType;
+import mekhq.campaign.mission.contract.AbstractContract;
+import mekhq.campaign.mission.contract.contractData.ChaosContractStepsTable;
+import mekhq.campaign.mission.contract.contractData.ContractFinanceData;
+import mekhq.campaign.mission.contract.contractData.ContractTermsData;
+import mekhq.campaign.mission.contract.contractGeneration.ContractSearchType;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.universe.Factions;
 import mekhq.gui.baseComponents.immersiveDialogs.ImmersiveDialogSimple;
-import mekhq.campaign.campaignOptions.CampaignOption;
 
 public class GrayMonday {
     private static final String RESOURCE_BUNDLE = "mekhq.resources.GrayMonday";

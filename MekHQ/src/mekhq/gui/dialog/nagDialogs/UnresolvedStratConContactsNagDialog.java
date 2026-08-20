@@ -43,7 +43,7 @@ import java.util.List;
 
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
-import mekhq.campaign.mission.newContract.AbstractContract;
+import mekhq.campaign.mission.contract.AbstractContract;
 import mekhq.gui.baseComponents.immersiveDialogs.ImmersiveDialogNag;
 
 public class UnresolvedStratConContactsNagDialog extends ImmersiveDialogNag {

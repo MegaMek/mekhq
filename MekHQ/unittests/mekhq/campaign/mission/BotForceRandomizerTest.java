@@ -51,6 +51,7 @@ import megamek.common.units.EntityWeightClass;
 import megamek.common.units.UnitType;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.campaignOptions.CampaignOptions;
+import mekhq.campaign.mission.scenarios.BotForceRandomizer;
 import mekhq.campaign.unit.Unit;
 import mekhq.campaign.universe.IUnitGenerator;
 import mekhq.campaign.universe.UnitGeneratorParameters;

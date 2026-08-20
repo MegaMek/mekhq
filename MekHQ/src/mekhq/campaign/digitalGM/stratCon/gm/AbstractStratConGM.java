@@ -56,7 +56,7 @@ import mekhq.campaign.digitalGM.stratCon.strategy.StratConReinforcementStrategy;
 import mekhq.campaign.digitalGM.stratCon.strategy.StratConScenarioGenerationStrategy;
 import mekhq.campaign.digitalGM.stratCon.strategy.StratConScenarioLifecycleStrategy;
 import mekhq.campaign.events.NewDayEvent;
-import mekhq.campaign.mission.newContract.AbstractContract;
+import mekhq.campaign.mission.contract.AbstractContract;
 
 /**
  * Base for every digital GM built on the StratCon data model (tracks, scenarios, facilities). It owns the shared

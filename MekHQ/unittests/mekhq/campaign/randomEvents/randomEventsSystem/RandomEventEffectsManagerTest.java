@@ -32,10 +32,8 @@
  */
 package mekhq.campaign.randomEvents.randomEventsSystem;
 
-import static org.mockito.Mockito.lenient;
-
-import static mekhq.campaign.mission.enums.ContractMoraleLevel.OVERWHELMING;
-import static mekhq.campaign.mission.enums.ContractMoraleLevel.STALEMATE;
+import static mekhq.campaign.mission.contract.contractData.ContractMoraleLevel.OVERWHELMING;
+import static mekhq.campaign.mission.contract.contractData.ContractMoraleLevel.STALEMATE;
 import static mekhq.campaign.personnel.PersonnelOptions.ATOW_POISON_RESISTANCE;
 import static mekhq.campaign.personnel.enums.PersonnelRole.ADMINISTRATOR_LOGISTICS;
 import static mekhq.campaign.personnel.enums.PersonnelRole.DEPENDENT;
@@ -55,6 +53,7 @@ import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.Mockito.lenient;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import static testUtilities.MHQTestUtilities.mockCampaign;
@@ -67,11 +66,11 @@ import java.util.stream.Stream;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.LocalHangar;
 import mekhq.campaign.LocalWarehouse;
-import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.campaignOptions.CampaignOption;
+import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.digitalGM.stratCon.StratConCampaignState;
-import mekhq.campaign.mission.newContract.AbstractContract;
-import mekhq.campaign.mission.newContract.ChaosContract;
+import mekhq.campaign.mission.contract.AbstractContract;
+import mekhq.campaign.mission.contract.ChaosContract;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.skills.SkillType;
 import mekhq.campaign.randomEvents.prisoners.PrisonerStatus;

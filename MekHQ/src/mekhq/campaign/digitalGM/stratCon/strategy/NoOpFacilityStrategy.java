@@ -37,8 +37,8 @@ import mekhq.campaign.digitalGM.stratCon.StratConCampaignState;
 import mekhq.campaign.digitalGM.stratCon.StratConContractInitializer;
 import mekhq.campaign.digitalGM.stratCon.StratConTrackState;
 import mekhq.campaign.digitalGM.stratCon.facility.StratConFacility;
-import mekhq.campaign.mission.AtBScenario;
-import mekhq.campaign.mission.newContract.AbstractContract;
+import mekhq.campaign.mission.contract.AbstractContract;
+import mekhq.campaign.mission.scenarios.AtBScenario;
 
 /**
  * {@link IFacilityStrategy} for play types with no facility map (Mapless and Singles). Every facility operation is a

@@ -46,7 +46,7 @@ import mekhq.campaign.events.OptionsChangedEvent;
 import mekhq.campaign.events.assets.AssetEvent;
 import mekhq.campaign.events.loans.LoanEvent;
 import mekhq.campaign.events.transactions.TransactionEvent;
-import mekhq.campaign.mission.AtBDynamicScenarioFactory;
+import mekhq.campaign.mission.scenarios.AtBDynamicScenarioFactory;
 import mekhq.campaign.personnel.skills.SkillType;
 import mekhq.gui.ActionScheduler;
 import mekhq.gui.CampaignGUI;

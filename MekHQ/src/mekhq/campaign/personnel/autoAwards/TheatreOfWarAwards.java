@@ -41,7 +41,7 @@ import java.util.stream.IntStream;
 import megamek.codeUtilities.MathUtility;
 import megamek.logging.MMLogger;
 import mekhq.campaign.Campaign;
-import mekhq.campaign.mission.newContract.AbstractContract;
+import mekhq.campaign.mission.contract.AbstractContract;
 import mekhq.campaign.personnel.Award;
 import mekhq.campaign.universe.Faction;
 import mekhq.campaign.universe.Factions;

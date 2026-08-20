@@ -35,7 +35,7 @@ package mekhq.gui.dialog.nagDialogs.nagLogic;
 import java.time.LocalDate;
 import java.util.List;
 
-import mekhq.campaign.mission.newContract.AbstractContract;
+import mekhq.campaign.mission.contract.AbstractContract;
 
 public class EndContractNagLogic {
     /**

@@ -32,8 +32,6 @@
  */
 package mekhq.campaign.randomEvents.prisoners;
 
-import static org.mockito.Mockito.lenient;
-
 import static mekhq.campaign.personnel.Person.MEKWARRIOR_AERO_RANSOM_VALUES;
 import static mekhq.campaign.personnel.Person.OTHER_RANSOM_VALUES;
 import static mekhq.campaign.personnel.enums.PersonnelRole.MEKWARRIOR;
@@ -47,6 +45,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.lenient;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.mockStatic;
 import static org.mockito.Mockito.never;
@@ -64,9 +63,9 @@ import mekhq.campaign.campaignOptions.CampaignOption;
 import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.finances.Money;
 import mekhq.campaign.finances.enums.TransactionType;
-import mekhq.campaign.mission.newContract.AbstractContract;
-import mekhq.campaign.mission.newContract.ChaosContract;
-import mekhq.campaign.mission.newContract.contractData.ContractScheduleData;
+import mekhq.campaign.mission.contract.AbstractContract;
+import mekhq.campaign.mission.contract.ChaosContract;
+import mekhq.campaign.mission.contract.contractData.ContractScheduleData;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.skills.SkillType;
 import mekhq.campaign.universe.Faction;

@@ -54,13 +54,14 @@ import mekhq.NullEntityException;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.CampaignFactory;
 import mekhq.campaign.Kill;
+import mekhq.campaign.campaignOptions.CampaignOption;
 import mekhq.campaign.enums.CampaignTransportType;
 import mekhq.campaign.finances.Money;
 import mekhq.campaign.finances.enums.TransactionType;
 import mekhq.campaign.force.Formation;
-import mekhq.campaign.mission.newContract.AbstractContract;
-import mekhq.campaign.mission.newContract.ContractMarket;
-import mekhq.campaign.mission.newContract.contractGeneration.ContractSearchType;
+import mekhq.campaign.mission.contract.AbstractContract;
+import mekhq.campaign.mission.contract.ContractMarket;
+import mekhq.campaign.mission.contract.contractGeneration.ContractSearchType;
 import mekhq.campaign.parts.AmmoStorage;
 import mekhq.campaign.parts.Armor;
 import mekhq.campaign.parts.Part;
@@ -71,7 +72,6 @@ import mekhq.campaign.unit.Unit;
 import mekhq.campaign.universe.Faction;
 import mekhq.gui.CampaignGUI;
 import mekhq.gui.FileDialogs;
-import mekhq.campaign.campaignOptions.CampaignOption;
 
 /**
  * This class manages the GUI and logic for the campaign subset export wizard. May Knuth forgive me.

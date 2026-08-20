@@ -39,8 +39,8 @@ import javax.swing.SwingConstants;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.force.CombatTeam;
 import mekhq.campaign.force.Formation;
-import mekhq.campaign.mission.enums.CombatRole;
-import mekhq.campaign.mission.newContract.AbstractContract;
+import mekhq.campaign.mission.contract.AbstractContract;
+import mekhq.campaign.mission.utilities.CombatRole;
 import mekhq.gui.model.DataTableModel;
 
 class LanceAssignmentTableModel extends DataTableModel<CombatTeam> {

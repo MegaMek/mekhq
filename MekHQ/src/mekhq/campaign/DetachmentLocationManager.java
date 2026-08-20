@@ -33,13 +33,14 @@
 
 package mekhq.campaign;
 
-import static mekhq.campaign.mission.newContract.utilities.ContractAutomation.performAutomatedActivation;
+import static mekhq.campaign.mission.contract.utilities.ContractAutomation.performAutomatedActivation;
 
 import java.io.PrintWriter;
 import java.util.ArrayList;
 
 import jakarta.annotation.Nonnull;
 import mekhq.MekHQ;
+import mekhq.campaign.campaignOptions.CampaignOption;
 import mekhq.campaign.events.LocationChangedEvent;
 import mekhq.campaign.force.Detachment;
 import mekhq.campaign.location.ILocation;
@@ -47,7 +48,6 @@ import mekhq.campaign.location.LocationDispatch;
 import mekhq.campaign.location.LocationNode;
 import mekhq.campaign.personnel.medical.advancedMedicalAlternate.Inoculations;
 import mekhq.campaign.universe.PlanetarySystem;
-import mekhq.campaign.campaignOptions.CampaignOption;
 
 /**
  * Manages a {@link Detachment}'s position in the {@link LocationNode} tree.

@@ -44,8 +44,9 @@ import java.io.File;
 import java.nio.file.Path;
 import java.util.List;
 
-import mekhq.campaign.mission.AtBDynamicScenario;
-import mekhq.campaign.mission.ScenarioMapParameters.MapLocation;
+import mekhq.campaign.mission.scenarios.AtBDynamicScenario;
+import mekhq.campaign.mission.scenarios.ScenarioMapParameters.MapLocation;
+import mekhq.campaign.mission.scenarios.atb.AtBScenarioModifier;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
 

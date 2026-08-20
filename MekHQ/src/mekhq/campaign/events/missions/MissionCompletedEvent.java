@@ -33,7 +33,7 @@
 
 package mekhq.campaign.events.missions;
 
-import mekhq.campaign.mission.newContract.AbstractContract;
+import mekhq.campaign.mission.contract.AbstractContract;
 
 /**
  * Triggered when a mission is resolved.

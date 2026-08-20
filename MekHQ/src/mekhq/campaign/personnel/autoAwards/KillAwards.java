@@ -55,11 +55,11 @@ import java.util.UUID;
 import megamek.logging.MMLogger;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.Kill;
+import mekhq.campaign.campaignOptions.CampaignOption;
 import mekhq.campaign.force.Formation;
 import mekhq.campaign.force.FormationLevel;
-import mekhq.campaign.mission.newContract.AbstractContract;
+import mekhq.campaign.mission.contract.AbstractContract;
 import mekhq.campaign.personnel.Award;
-import mekhq.campaign.campaignOptions.CampaignOption;
 
 public class KillAwards {
     private static final MMLogger LOGGER = MMLogger.create(KillAwards.class);

@@ -38,7 +38,7 @@ import java.util.List;
 import megamek.common.annotations.Nullable;
 import megamek.logging.MMLogger;
 import mekhq.campaign.Campaign;
-import mekhq.campaign.mission.newContract.AbstractContract;
+import mekhq.campaign.mission.contract.AbstractContract;
 import mekhq.campaign.universe.Atmosphere;
 import mekhq.campaign.universe.LandMass;
 import mekhq.campaign.universe.Planet;

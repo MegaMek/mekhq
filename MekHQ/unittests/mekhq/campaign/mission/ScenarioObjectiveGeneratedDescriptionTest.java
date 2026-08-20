@@ -35,9 +35,11 @@ package mekhq.campaign.mission;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-import mekhq.campaign.mission.ObjectiveEffect.EffectScalingType;
-import mekhq.campaign.mission.ObjectiveEffect.ObjectiveEffectType;
-import mekhq.campaign.mission.ScenarioObjective.ObjectiveCriterion;
+import mekhq.campaign.mission.scenarios.ObjectiveEffect;
+import mekhq.campaign.mission.scenarios.ObjectiveEffect.EffectScalingType;
+import mekhq.campaign.mission.scenarios.ObjectiveEffect.ObjectiveEffectType;
+import mekhq.campaign.mission.scenarios.ScenarioObjective;
+import mekhq.campaign.mission.scenarios.ScenarioObjective.ObjectiveCriterion;
 import org.junit.jupiter.api.Test;
 
 /**

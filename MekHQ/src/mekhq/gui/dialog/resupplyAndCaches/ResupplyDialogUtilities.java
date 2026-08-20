@@ -40,7 +40,7 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 import mekhq.campaign.Campaign;
-import mekhq.campaign.mission.newContract.AbstractContract;
+import mekhq.campaign.mission.contract.AbstractContract;
 import mekhq.campaign.mission.resupplyAndCaches.Resupply;
 import mekhq.campaign.parts.Armor;
 import mekhq.campaign.parts.Part;

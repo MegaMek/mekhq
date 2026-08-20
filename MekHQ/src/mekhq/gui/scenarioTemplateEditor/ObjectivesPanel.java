@@ -47,8 +47,8 @@ import javax.swing.JPanel;
 import javax.swing.ListSelectionModel;
 
 import megamek.common.ui.FastJScrollPane;
-import mekhq.campaign.mission.ScenarioObjective;
-import mekhq.campaign.mission.ScenarioTemplate;
+import mekhq.campaign.mission.scenarios.ScenarioObjective;
+import mekhq.campaign.mission.scenarios.ScenarioTemplate;
 import org.jspecify.annotations.NonNull;
 
 /**

@@ -46,8 +46,8 @@ import java.util.List;
 
 import mekhq.campaign.Campaign;
 import mekhq.campaign.CurrentLocation;
-import mekhq.campaign.mission.newContract.AbstractContract;
-import mekhq.campaign.mission.newContract.utilities.ContractUtilities;
+import mekhq.campaign.mission.contract.AbstractContract;
+import mekhq.campaign.mission.utilities.ContractUtilities;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.MockedStatic;

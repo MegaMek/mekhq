@@ -45,41 +45,30 @@ import static megamek.common.options.OptionsConstants.RPG_PILOT_ADVANTAGES;
 import static megamek.common.options.OptionsConstants.RPG_TOUGHNESS;
 
 import java.io.File;
-import java.io.PrintWriter;
 import java.util.Arrays;
-import java.util.EnumMap;
 import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 import java.util.Objects;
 
 import jakarta.annotation.Nonnull;
-import megamek.Version;
 import megamek.common.TechConstants;
 import megamek.common.enums.SkillLevel;
 import megamek.common.options.GameOptions;
 import megamek.common.preference.ClientPreferences;
 import megamek.common.preference.PreferenceManager;
 import megamek.logging.MMLogger;
-import mekhq.campaign.RandomOriginOptions;
-import mekhq.campaign.autoResolve.AutoResolveMethod;
 import mekhq.campaign.digitalGM.stratCon.gm.StratConPlayType;
-import mekhq.campaign.enums.PlanetaryAcquisitionFactionLimit;
 import mekhq.campaign.finances.Money;
-import mekhq.campaign.finances.enums.FinancialYearDuration;
 import mekhq.campaign.market.PersonnelMarket;
-import mekhq.campaign.market.enums.ContractMarketMethod;
-import mekhq.campaign.market.enums.UnitMarketMethod;
-import mekhq.campaign.market.personnelMarket.enums.PersonnelMarketStyle;
-import mekhq.campaign.mission.enums.CombatRole;
+import mekhq.campaign.mission.utilities.CombatRole;
 import mekhq.campaign.parts.enums.PartRepairType;
-import mekhq.campaign.personnel.enums.*;
-import mekhq.campaign.randomEvents.prisoners.PrisonerCaptureStyle;
+import mekhq.campaign.personnel.enums.AgeGroup;
+import mekhq.campaign.personnel.enums.MergingSurnameStyle;
+import mekhq.campaign.personnel.enums.PersonnelRole;
+import mekhq.campaign.personnel.enums.Phenotype;
+import mekhq.campaign.personnel.enums.SplittingSurnameStyle;
 import mekhq.campaign.universe.PlanetarySystem.PlanetaryRating;
 import mekhq.campaign.universe.PlanetarySystem.PlanetarySophistication;
-import mekhq.gui.campaignOptions.enums.ProcurementPersonnelPick;
 import mekhq.service.mrms.MRMSOption;
-import org.w3c.dom.Node;
 
 /**
  * @author natit

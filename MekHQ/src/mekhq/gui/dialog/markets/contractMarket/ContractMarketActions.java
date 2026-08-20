@@ -32,7 +32,7 @@
  */
 package mekhq.gui.dialog.markets.contractMarket;
 
-import mekhq.campaign.mission.newContract.AbstractContract;
+import mekhq.campaign.mission.contract.AbstractContract;
 
 /**
  * The per-offer actions the {@link ContractDossierPanel} can invoke, implemented by the owning

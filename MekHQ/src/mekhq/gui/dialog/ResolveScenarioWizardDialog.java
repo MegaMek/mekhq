@@ -81,16 +81,17 @@ import mekhq.campaign.ResolveScenarioTracker;
 import mekhq.campaign.ResolveScenarioTracker.OppositionPersonnelStatus;
 import mekhq.campaign.ResolveScenarioTracker.PersonStatus;
 import mekhq.campaign.ResolveScenarioTracker.UnitStatus;
+import mekhq.campaign.campaignOptions.CampaignOption;
 import mekhq.campaign.digitalGM.stratCon.StratConRulesManager;
 import mekhq.campaign.finances.Money;
 import mekhq.campaign.finances.enums.TransactionType;
-import mekhq.campaign.mission.AtBScenario;
-import mekhq.campaign.mission.Loot;
-import mekhq.campaign.mission.ScenarioObjective;
-import mekhq.campaign.mission.ScenarioObjectiveProcessor;
-import mekhq.campaign.mission.enums.ScenarioStatus;
-import mekhq.campaign.mission.newContract.utilities.MHQMorale;
-import mekhq.campaign.mission.newContract.utilities.SalvageUtilities;
+import mekhq.campaign.mission.contract.utilities.MHQMorale;
+import mekhq.campaign.mission.contract.utilities.SalvageUtilities;
+import mekhq.campaign.mission.scenarios.AtBScenario;
+import mekhq.campaign.mission.scenarios.Loot;
+import mekhq.campaign.mission.scenarios.ScenarioObjective;
+import mekhq.campaign.mission.scenarios.ScenarioObjectiveProcessor;
+import mekhq.campaign.mission.scenarios.ScenarioStatus;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.randomEvents.prisoners.PrisonerCaptureStyle;
 import mekhq.campaign.unit.TestUnit;
@@ -100,7 +101,6 @@ import mekhq.gui.baseComponents.immersiveDialogs.ImmersiveDialogConfirmation;
 import mekhq.gui.utilities.MarkdownEditorPanel;
 import mekhq.gui.view.PersonViewPanel;
 import mekhq.utilities.ReportingUtilities;
-import mekhq.campaign.campaignOptions.CampaignOption;
 
 /**
  * @author Taharqa

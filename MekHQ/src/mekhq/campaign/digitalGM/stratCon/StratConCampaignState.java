@@ -51,8 +51,8 @@ import jakarta.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 import megamek.common.annotations.Nullable;
 import megamek.logging.MMLogger;
 import mekhq.campaign.Campaign;
-import mekhq.campaign.mission.AtBScenario;
-import mekhq.campaign.mission.newContract.AbstractContract;
+import mekhq.campaign.mission.contract.AbstractContract;
+import mekhq.campaign.mission.scenarios.AtBScenario;
 import org.w3c.dom.Node;
 
 /**

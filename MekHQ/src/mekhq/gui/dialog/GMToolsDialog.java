@@ -76,8 +76,9 @@ import megamek.common.units.UnitType;
 import megamek.logging.MMLogger;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
+import mekhq.campaign.campaignOptions.CampaignOption;
 import mekhq.campaign.events.persons.PersonChangedEvent;
-import mekhq.campaign.mission.AtBDynamicScenarioFactory;
+import mekhq.campaign.mission.scenarios.AtBDynamicScenarioFactory;
 import mekhq.campaign.parts.enums.PartQuality;
 import mekhq.campaign.personnel.Bloodname;
 import mekhq.campaign.personnel.Clan;
@@ -92,7 +93,6 @@ import mekhq.gui.baseComponents.DefaultMHQScrollablePanel;
 import mekhq.gui.displayWrappers.ClanDisplay;
 import mekhq.gui.displayWrappers.FactionDisplay;
 import mekhq.gui.panels.LayeredFormationIconCreationPanel;
-import mekhq.campaign.campaignOptions.CampaignOption;
 
 public class GMToolsDialog extends AbstractMHQDialogBasic {
     private static final MMLogger LOGGER = MMLogger.create(GMToolsDialog.class);

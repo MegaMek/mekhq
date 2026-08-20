@@ -35,7 +35,7 @@ package mekhq.gui.scenarioTemplateEditor;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import megamek.client.bot.princess.CardinalEdge;
-import mekhq.campaign.mission.ScenarioForceTemplate;
+import mekhq.campaign.mission.scenarios.ScenarioForceTemplate;
 import org.junit.jupiter.api.Test;
 
 /**

@@ -49,6 +49,7 @@ import megamek.logging.MMLogger;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.LocalHangar;
+import mekhq.campaign.campaignOptions.CampaignOption;
 import mekhq.campaign.events.OrganizationChangedEvent;
 import mekhq.campaign.icons.FormationPieceIcon;
 import mekhq.campaign.icons.LayeredFormationIcon;
@@ -56,15 +57,14 @@ import mekhq.campaign.icons.StandardFormationIcon;
 import mekhq.campaign.icons.enums.LayeredFormationIconLayer;
 import mekhq.campaign.icons.enums.OperationalStatus;
 import mekhq.campaign.log.AssignmentLogger;
-import mekhq.campaign.mission.Scenario;
-import mekhq.campaign.mission.enums.CombatRole;
+import mekhq.campaign.mission.scenarios.Scenario;
+import mekhq.campaign.mission.utilities.CombatRole;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.unit.Unit;
 import mekhq.utilities.MHQXMLUtility;
 import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
-import mekhq.campaign.campaignOptions.CampaignOption;
 
 /**
  * This is a hierarchical object to define formations for TO&amp;E. Each Formation object can have a parent formation

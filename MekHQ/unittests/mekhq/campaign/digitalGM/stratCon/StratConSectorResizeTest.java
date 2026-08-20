@@ -51,7 +51,7 @@ import mekhq.campaign.digitalGM.stratCon.StratConContractInitializer.ResizeImpac
 import mekhq.campaign.digitalGM.stratCon.biome.StratConBiomeManifest;
 import mekhq.campaign.digitalGM.stratCon.facility.StratConFacility;
 import mekhq.campaign.digitalGM.stratCon.sectorGeneration.StratConSectorCountMethod;
-import mekhq.campaign.mission.newContract.AbstractContract;
+import mekhq.campaign.mission.contract.AbstractContract;
 import mekhq.campaign.universe.Faction;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;

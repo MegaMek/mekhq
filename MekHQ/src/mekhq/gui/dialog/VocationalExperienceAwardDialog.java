@@ -37,9 +37,9 @@ import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
 import java.util.List;
 
 import mekhq.campaign.Campaign;
-import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.campaignOptions.CampaignOption;
-import mekhq.campaign.mission.newContract.AbstractContract;
+import mekhq.campaign.campaignOptions.CampaignOptions;
+import mekhq.campaign.mission.contract.AbstractContract;
 import mekhq.campaign.personnel.Person;
 import mekhq.gui.baseComponents.immersiveDialogs.ImmersiveDialogSimple;
 

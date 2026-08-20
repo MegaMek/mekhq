@@ -37,8 +37,8 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.util.List;
 
-import mekhq.campaign.mission.ScenarioMapParameters;
-import mekhq.campaign.mission.ScenarioMapParameters.MapLocation;
+import mekhq.campaign.mission.scenarios.ScenarioMapParameters;
+import mekhq.campaign.mission.scenarios.ScenarioMapParameters.MapLocation;
 import org.junit.jupiter.api.Test;
 
 /**

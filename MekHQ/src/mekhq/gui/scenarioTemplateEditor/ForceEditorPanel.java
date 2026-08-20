@@ -55,10 +55,10 @@ import megamek.client.bot.princess.CardinalEdge;
 import megamek.common.ui.FastJScrollPane;
 import megamek.common.units.EntityWeightClass;
 import megamek.common.units.UnitType;
-import mekhq.campaign.mission.ScenarioForceTemplate;
-import mekhq.campaign.mission.ScenarioForceTemplate.ForceAlignment;
-import mekhq.campaign.mission.ScenarioForceTemplate.ForceGenerationMethod;
-import mekhq.campaign.mission.ScenarioForceTemplate.SynchronizedDeploymentType;
+import mekhq.campaign.mission.scenarios.ScenarioForceTemplate;
+import mekhq.campaign.mission.scenarios.ScenarioForceTemplate.ForceAlignment;
+import mekhq.campaign.mission.scenarios.ScenarioForceTemplate.ForceGenerationMethod;
+import mekhq.campaign.mission.scenarios.ScenarioForceTemplate.SynchronizedDeploymentType;
 
 /**
  * Editor panel for a single {@link ScenarioForceTemplate} - the "Participating Forces" editor. Owns the ~30 input

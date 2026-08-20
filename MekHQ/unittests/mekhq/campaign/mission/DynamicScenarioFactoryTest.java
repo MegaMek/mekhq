@@ -35,6 +35,7 @@ package mekhq.campaign.mission;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import megamek.common.board.Board;
+import mekhq.campaign.mission.scenarios.AtBDynamicScenarioFactory;
 import org.junit.jupiter.api.Test;
 
 /**

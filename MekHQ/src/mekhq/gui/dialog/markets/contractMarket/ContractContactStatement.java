@@ -37,8 +37,8 @@ import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
 import java.util.Locale;
 
 import mekhq.campaign.Campaign;
+import mekhq.campaign.mission.contract.AbstractContract;
 import mekhq.campaign.mission.enums.ContractObjectiveType;
-import mekhq.campaign.mission.newContract.AbstractContract;
 import mekhq.campaign.universe.Faction;
 import mekhq.campaign.universe.factionStanding.FactionStandingLevel;
 import mekhq.campaign.universe.factionStanding.FactionStandingUtilities;

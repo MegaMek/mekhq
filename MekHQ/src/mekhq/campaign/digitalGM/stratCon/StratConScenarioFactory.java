@@ -45,10 +45,10 @@ import megamek.common.annotations.Nullable;
 import megamek.common.units.UnitType;
 import megamek.logging.MMLogger;
 import mekhq.MHQConstants;
-import mekhq.campaign.mission.ScenarioForceTemplate;
-import mekhq.campaign.mission.ScenarioMapParameters.MapLocation;
-import mekhq.campaign.mission.ScenarioTemplate;
-import mekhq.campaign.mission.atb.AtBScenarioManifest;
+import mekhq.campaign.mission.scenarios.ScenarioForceTemplate;
+import mekhq.campaign.mission.scenarios.ScenarioMapParameters.MapLocation;
+import mekhq.campaign.mission.scenarios.ScenarioTemplate;
+import mekhq.campaign.mission.scenarios.atb.AtBScenarioManifest;
 
 /**
  * This class handles functionality related to loading and sorting scenario templates.

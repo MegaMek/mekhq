@@ -39,7 +39,7 @@ import java.util.UUID;
 import megamek.Version;
 import megamek.logging.MMLogger;
 import mekhq.campaign.Campaign;
-import mekhq.campaign.mission.newContract.AbstractContract;
+import mekhq.campaign.mission.contract.AbstractContract;
 import mekhq.campaign.storyArc.StoryPoint;
 import mekhq.utilities.MHQXMLUtility;
 import org.w3c.dom.Node;

@@ -77,10 +77,10 @@ import mekhq.campaign.digitalGM.stratCon.strategy.StratConOpForDeploymentStrateg
 import mekhq.campaign.digitalGM.stratCon.strategy.StratConOpForGenerationStrategy;
 import mekhq.campaign.digitalGM.stratCon.strategy.StratConReinforcementStrategy;
 import mekhq.campaign.force.Formation;
-import mekhq.campaign.mission.AtBDynamicScenario;
-import mekhq.campaign.mission.AtBDynamicScenarioFactory;
-import mekhq.campaign.mission.AtBScenario;
-import mekhq.campaign.mission.newContract.AbstractContract;
+import mekhq.campaign.mission.contract.AbstractContract;
+import mekhq.campaign.mission.scenarios.AtBDynamicScenario;
+import mekhq.campaign.mission.scenarios.AtBDynamicScenarioFactory;
+import mekhq.campaign.mission.scenarios.AtBScenario;
 import mekhq.campaign.personnel.Person;
 import org.junit.jupiter.api.Test;
 import org.mockito.MockedStatic;

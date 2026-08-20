@@ -43,9 +43,9 @@ import java.util.List;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.digitalGM.stratCon.StratConScenario;
 import mekhq.campaign.digitalGM.stratCon.StratConTrackState;
-import mekhq.campaign.mission.AtBDynamicScenario;
-import mekhq.campaign.mission.AtBScenario;
-import mekhq.campaign.mission.newContract.AbstractContract;
+import mekhq.campaign.mission.contract.AbstractContract;
+import mekhq.campaign.mission.scenarios.AtBDynamicScenario;
+import mekhq.campaign.mission.scenarios.AtBScenario;
 
 public class OutstandingScenariosNagLogic {
     final static String RESOURCE_BUNDLE = "mekhq.resources.NagDialogs";

@@ -50,13 +50,13 @@ import mekhq.MekHQ;
 import mekhq.campaign.AbstractLocation;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.LocalWarehouse;
-import mekhq.campaign.mission.newContract.utilities.ContractRepairLocation;
+import mekhq.campaign.campaignOptions.CampaignOption;
+import mekhq.campaign.mission.contract.utilities.ContractRepairLocation;
 import mekhq.campaign.parts.Part;
 import mekhq.campaign.parts.Refit;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.unit.Maintenance;
 import mekhq.campaign.unit.Unit;
-import mekhq.campaign.campaignOptions.CampaignOption;
 
 /**
  * Utility class for new-day processing of a single {@link IPlace}: maintenance, parts arrival, and unit state

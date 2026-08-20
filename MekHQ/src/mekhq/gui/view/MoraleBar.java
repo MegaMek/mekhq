@@ -45,8 +45,8 @@ import javax.swing.SwingConstants;
 import jakarta.annotation.Nonnull;
 import jakarta.annotation.Nullable;
 import megamek.client.ui.util.UIUtil;
-import mekhq.campaign.mission.enums.ContractMoraleLevel;
-import mekhq.campaign.mission.newContract.AbstractContract;
+import mekhq.campaign.mission.contract.AbstractContract;
+import mekhq.campaign.mission.contract.contractData.ContractMoraleLevel;
 import mekhq.gui.baseComponents.SegmentedBar;
 
 /**

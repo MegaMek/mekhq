@@ -34,7 +34,7 @@ package mekhq.gui.dialog.nagDialogs.nagLogic;
 
 import java.util.List;
 
-import mekhq.campaign.mission.newContract.AbstractContract;
+import mekhq.campaign.mission.contract.AbstractContract;
 
 /**
  * Provides nag logic related to the single-drop setup flow.

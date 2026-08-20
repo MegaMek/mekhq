@@ -39,7 +39,7 @@ import java.util.Objects;
 import java.util.UUID;
 
 import mekhq.campaign.Campaign;
-import mekhq.campaign.mission.newContract.AbstractContract;
+import mekhq.campaign.mission.contract.AbstractContract;
 import mekhq.campaign.personnel.Award;
 import mekhq.campaign.universe.Faction;
 

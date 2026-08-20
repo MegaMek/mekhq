@@ -33,10 +33,10 @@
  */
 package mekhq.gui.view;
 
-import static mekhq.campaign.mission.enums.CombatRole.CADRE;
-import static mekhq.campaign.mission.enums.CombatRole.FRONTLINE;
-import static mekhq.campaign.mission.enums.CombatRole.MANEUVER;
-import static mekhq.campaign.mission.enums.CombatRole.PATROL;
+import static mekhq.campaign.mission.utilities.CombatRole.CADRE;
+import static mekhq.campaign.mission.utilities.CombatRole.FRONTLINE;
+import static mekhq.campaign.mission.utilities.CombatRole.MANEUVER;
+import static mekhq.campaign.mission.utilities.CombatRole.PATROL;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -44,8 +44,8 @@ import javax.swing.SwingConstants;
 
 import mekhq.campaign.Campaign;
 import mekhq.campaign.force.CombatTeam;
-import mekhq.campaign.mission.enums.CombatRole;
-import mekhq.campaign.mission.newContract.AbstractContract;
+import mekhq.campaign.mission.contract.AbstractContract;
+import mekhq.campaign.mission.utilities.CombatRole;
 import mekhq.gui.model.DataTableModel;
 
 class RequiredLancesTableModel extends DataTableModel<AbstractContract> {

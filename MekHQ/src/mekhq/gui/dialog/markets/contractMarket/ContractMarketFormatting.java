@@ -45,7 +45,7 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 
 import mekhq.campaign.enums.DragoonRating;
-import mekhq.campaign.mission.newContract.AbstractContract;
+import mekhq.campaign.mission.contract.AbstractContract;
 
 /**
  * Shared, presentation-only formatting helpers for the Chaos contract market UI.

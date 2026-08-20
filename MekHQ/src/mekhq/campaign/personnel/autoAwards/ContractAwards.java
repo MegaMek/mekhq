@@ -42,9 +42,9 @@ import java.util.UUID;
 
 import megamek.logging.MMLogger;
 import mekhq.campaign.Campaign;
-import mekhq.campaign.mission.newContract.AbstractContract;
-import mekhq.campaign.personnel.Award;
 import mekhq.campaign.campaignOptions.CampaignOption;
+import mekhq.campaign.mission.contract.AbstractContract;
+import mekhq.campaign.personnel.Award;
 
 public class ContractAwards {
     private static final MMLogger LOGGER = MMLogger.create(ContractAwards.class);

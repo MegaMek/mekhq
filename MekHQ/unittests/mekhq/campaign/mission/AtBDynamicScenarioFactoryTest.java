@@ -32,21 +32,20 @@
  */
 package mekhq.campaign.mission;
 
-import static org.mockito.Mockito.lenient;
-
 import static megamek.common.units.UnitType.MEK;
-import static mekhq.campaign.mission.AtBDynamicScenarioFactory.createEntityWithCrew;
-import static mekhq.campaign.mission.Scenario.T_GROUND;
-import static mekhq.campaign.mission.Scenario.T_SPACE;
-import static mekhq.campaign.mission.enums.CombatRole.CADRE;
-import static mekhq.campaign.mission.enums.CombatRole.FRONTLINE;
-import static mekhq.campaign.mission.enums.CombatRole.MANEUVER;
-import static mekhq.campaign.mission.enums.CombatRole.PATROL;
+import static mekhq.campaign.mission.scenarios.AtBDynamicScenarioFactory.createEntityWithCrew;
+import static mekhq.campaign.mission.scenarios.Scenario.T_GROUND;
+import static mekhq.campaign.mission.scenarios.Scenario.T_SPACE;
+import static mekhq.campaign.mission.utilities.CombatRole.CADRE;
+import static mekhq.campaign.mission.utilities.CombatRole.FRONTLINE;
+import static mekhq.campaign.mission.utilities.CombatRole.MANEUVER;
+import static mekhq.campaign.mission.utilities.CombatRole.PATROL;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.RETURNS_DEEP_STUBS;
+import static org.mockito.Mockito.lenient;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import static testUtilities.MHQTestUtilities.getEntityForUnitTesting;
@@ -62,12 +61,15 @@ import megamek.common.game.Game;
 import megamek.common.units.Entity;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.LocalHangar;
-import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.campaignOptions.CampaignOption;
+import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.force.CombatTeam;
 import mekhq.campaign.force.Formation;
 import mekhq.campaign.force.PlayerForce;
-import mekhq.campaign.mission.enums.CombatRole;
+import mekhq.campaign.mission.scenarios.AtBDynamicScenario;
+import mekhq.campaign.mission.scenarios.AtBDynamicScenarioFactory;
+import mekhq.campaign.mission.scenarios.AtBScenario;
+import mekhq.campaign.mission.utilities.CombatRole;
 import mekhq.campaign.personnel.skills.RandomSkillPreferences;
 import mekhq.campaign.unit.Unit;
 import mekhq.campaign.universe.Faction;

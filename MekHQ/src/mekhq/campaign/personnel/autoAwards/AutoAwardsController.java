@@ -43,12 +43,12 @@ import megamek.logging.MMLogger;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.Kill;
-import mekhq.campaign.mission.newContract.AbstractContract;
+import mekhq.campaign.campaignOptions.CampaignOption;
+import mekhq.campaign.mission.contract.AbstractContract;
 import mekhq.campaign.personnel.Award;
 import mekhq.campaign.personnel.AwardsFactory;
 import mekhq.campaign.personnel.Person;
 import mekhq.gui.dialog.AutoAwardsDialog;
-import mekhq.campaign.campaignOptions.CampaignOption;
 
 public class AutoAwardsController {
     private Campaign campaign;

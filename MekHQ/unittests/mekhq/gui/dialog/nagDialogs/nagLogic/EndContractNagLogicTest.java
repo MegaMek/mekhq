@@ -42,7 +42,7 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
-import mekhq.campaign.mission.newContract.AbstractContract;
+import mekhq.campaign.mission.contract.AbstractContract;
 import mekhq.gui.dialog.nagDialogs.EndContractNagDialog;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;

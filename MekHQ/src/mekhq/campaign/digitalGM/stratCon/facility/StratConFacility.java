@@ -39,7 +39,7 @@ import java.util.TreeMap;
 
 import megamek.logging.MMLogger;
 import mekhq.campaign.digitalGM.stratCon.biome.StratConBiome;
-import mekhq.campaign.mission.ScenarioForceTemplate.ForceAlignment;
+import mekhq.campaign.mission.scenarios.ScenarioForceTemplate.ForceAlignment;
 
 /**
  * This represents a facility in the StratCon context

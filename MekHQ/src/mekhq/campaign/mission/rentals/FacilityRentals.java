@@ -51,14 +51,14 @@ import java.util.function.Predicate;
 import megamek.common.units.Entity;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
-import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.campaignOptions.CampaignOption;
+import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.events.RepairStatusChangedEvent;
 import mekhq.campaign.finances.Finances;
 import mekhq.campaign.finances.Money;
 import mekhq.campaign.finances.enums.TransactionType;
-import mekhq.campaign.mission.newContract.AbstractContract;
-import mekhq.campaign.mission.newContract.utilities.ContractRepairLocation;
+import mekhq.campaign.mission.contract.AbstractContract;
+import mekhq.campaign.mission.contract.utilities.ContractRepairLocation;
 import mekhq.campaign.unit.Unit;
 import mekhq.gui.dialog.BayRentalDialog;
 

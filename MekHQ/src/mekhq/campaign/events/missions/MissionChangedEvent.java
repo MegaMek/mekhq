@@ -33,7 +33,7 @@
 
 package mekhq.campaign.events.missions;
 
-import mekhq.campaign.mission.newContract.AbstractContract;
+import mekhq.campaign.mission.contract.AbstractContract;
 
 /**
  * Triggered when a mission or contract is modified. Specific changes not involving addition or deletion should extend

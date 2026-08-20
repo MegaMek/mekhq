@@ -40,9 +40,9 @@ import java.util.stream.Collectors;
 
 import megamek.logging.MMLogger;
 import mekhq.campaign.Campaign;
-import mekhq.campaign.mission.enums.ContractObjectiveType;
 import mekhq.campaign.campaignOptions.CampaignOption;
-import mekhq.campaign.mission.newContract.AbstractContract;
+import mekhq.campaign.mission.contract.AbstractContract;
+import mekhq.campaign.mission.enums.ContractObjectiveType;
 
 public class OtherModifiers {
     private static final MMLogger LOGGER = MMLogger.create(OtherModifiers.class);

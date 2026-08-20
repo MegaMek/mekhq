@@ -36,7 +36,7 @@ package mekhq.campaign.events.missions;
 import java.util.Objects;
 
 import megamek.common.event.MMEvent;
-import mekhq.campaign.mission.newContract.AbstractContract;
+import mekhq.campaign.mission.contract.AbstractContract;
 
 /**
  * Abstract base class for events involving missions or contracts.

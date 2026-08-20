@@ -62,14 +62,14 @@ import megamek.logging.MMLogger;
 import mekhq.MHQConstants;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
+import mekhq.campaign.campaignOptions.CampaignOption;
 import mekhq.campaign.location.ILocation;
-import mekhq.campaign.mission.newContract.contractGeneration.targetFinder.EnemySelectionProfile;
-import mekhq.campaign.mission.newContract.contractGeneration.targetFinder.MissionLocationProfile;
-import mekhq.campaign.mission.newContract.contractGeneration.targetFinder.MissionTargetFinder;
+import mekhq.campaign.mission.contract.contractGeneration.targetFinder.EnemySelectionProfile;
+import mekhq.campaign.mission.contract.contractGeneration.targetFinder.MissionLocationProfile;
+import mekhq.campaign.mission.contract.contractGeneration.targetFinder.MissionTargetFinder;
 import mekhq.campaign.universe.PlanetarySystem.PlanetaryRating;
 import mekhq.campaign.universe.enums.HPGRating;
 import mekhq.campaign.universe.factionHints.FactionHints;
-import mekhq.campaign.campaignOptions.CampaignOption;
 
 /**
  * Uses Factions and Planets to weighted lists of potential employers and enemies for contract generation. Also finds a

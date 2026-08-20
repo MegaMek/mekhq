@@ -37,7 +37,7 @@ import mekhq.campaign.digitalGM.IScenarioGenerationStrategy;
 import mekhq.campaign.digitalGM.stratCon.StratConCampaignState;
 import mekhq.campaign.digitalGM.stratCon.StratConRulesManager;
 import mekhq.campaign.digitalGM.stratCon.StratConTrackState;
-import mekhq.campaign.mission.newContract.AbstractContract;
+import mekhq.campaign.mission.contract.AbstractContract;
 
 /**
  * Default StratCon implementation of {@link IScenarioGenerationStrategy}. Every method delegates to the existing static

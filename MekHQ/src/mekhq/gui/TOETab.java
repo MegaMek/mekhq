@@ -53,6 +53,7 @@ import megamek.common.event.Subscribe;
 import megamek.common.ui.FastJScrollPane;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
+import mekhq.campaign.campaignOptions.CampaignOption;
 import mekhq.campaign.digitalGM.stratCon.gm.MaplessStratCon;
 import mekhq.campaign.events.DeploymentChangedEvent;
 import mekhq.campaign.events.NetworkChangedEvent;
@@ -63,9 +64,9 @@ import mekhq.campaign.events.scenarios.ScenarioResolvedEvent;
 import mekhq.campaign.events.units.UnitChangedEvent;
 import mekhq.campaign.events.units.UnitRemovedEvent;
 import mekhq.campaign.force.Formation;
-import mekhq.campaign.mission.AtBDynamicScenario;
-import mekhq.campaign.mission.Scenario;
-import mekhq.campaign.mission.newContract.AbstractContract;
+import mekhq.campaign.mission.contract.AbstractContract;
+import mekhq.campaign.mission.scenarios.AtBDynamicScenario;
+import mekhq.campaign.mission.scenarios.Scenario;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.unit.Unit;
 import mekhq.gui.adapter.TOEMouseAdapter;
@@ -82,7 +83,6 @@ import mekhq.gui.panels.TutorialHyperlinkPanel;
 import mekhq.gui.view.ForceViewPanel;
 import mekhq.gui.view.PersonViewPanel;
 import mekhq.gui.view.UnitViewPanel;
-import mekhq.campaign.campaignOptions.CampaignOption;
 
 /**
  * Display organization tree (TO&amp;E) and force/unit summary

@@ -60,18 +60,18 @@ import megamek.common.units.EntityMovementMode;
 import megamek.common.units.UnitType;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.againstTheBot.AtBStaticWeightGenerator;
+import mekhq.campaign.campaignOptions.CampaignOption;
 import mekhq.campaign.enums.DragoonRating;
 import mekhq.campaign.market.enums.UnitMarketMethod;
 import mekhq.campaign.market.enums.UnitMarketRarity;
 import mekhq.campaign.market.enums.UnitMarketType;
-import mekhq.campaign.mission.newContract.AbstractContract;
+import mekhq.campaign.mission.contract.AbstractContract;
 import mekhq.campaign.universe.Faction;
 import mekhq.campaign.universe.Factions;
 import mekhq.campaign.universe.IUnitGenerator;
 import mekhq.campaign.universe.RandomFactionGenerator;
 import mekhq.campaign.universe.factionStanding.FactionStandingUtilities;
 import mekhq.campaign.universe.factionStanding.FactionStandings;
-import mekhq.campaign.campaignOptions.CampaignOption;
 
 public class AtBMonthlyUnitMarket extends AbstractUnitMarket {
     private static final String RESOURCE_BUNDLE = "mekhq.resources.Market";

@@ -46,6 +46,7 @@ import megamek.common.equipment.EquipmentType;
 import megamek.common.options.IOption;
 import megamek.common.options.PilotOptions;
 import megamek.common.units.*;
+import mekhq.campaign.mission.scenarios.CrewSkillUpgrader;
 import mekhq.campaign.personnel.SpecialAbility;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;

@@ -50,7 +50,7 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.SwingConstants;
 
-import mekhq.campaign.mission.newContract.AbstractContract;
+import mekhq.campaign.mission.contract.AbstractContract;
 import mekhq.campaign.universe.Factions;
 import mekhq.gui.baseComponents.roundedComponents.RoundedLineBorder;
 
