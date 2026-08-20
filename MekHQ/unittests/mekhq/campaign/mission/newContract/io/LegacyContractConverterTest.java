@@ -226,7 +226,7 @@ class LegacyContractConverterTest {
     void missingFactionCodesFallBackToThePlayersFactionAndPirates() throws Exception {
         AbstractContract contract = convert(legacyMission(""));
 
-        assertEquals(campaign.getFaction().getShortName(), contract.getEmployerFactionCode(),
+        assertEquals(campaign.getPlayerForce().getFaction().getShortName(), contract.getEmployerFactionCode(),
               "an employer-less legacy record falls back to the player's own faction");
         assertEquals("PIR", contract.getEnemyFactionCode(), "an enemy-less legacy record falls back to pirates");
     }

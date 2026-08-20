@@ -93,7 +93,7 @@ class ContractUtilitiesFormationSizingTest {
         mockFaction = mock(Faction.class);
         mockCampaign = mockCampaign();
 
-        when(mockCampaign.getFaction()).thenReturn(mockFaction);
+        when(mockCampaign.getPlayerForce().getFaction()).thenReturn(mockFaction);
         when(mockCampaign.getPlayerForce().getHangar()).thenReturn(hangar);
     }
 

@@ -43,6 +43,7 @@ import java.util.List;
 import java.util.UUID;
 
 import mekhq.campaign.Campaign;
+import mekhq.campaign.campaignOptions.CampaignOption;
 import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.mission.enums.MissionStatus;
 import mekhq.campaign.mission.newContract.AbstractContract;
@@ -75,14 +76,14 @@ class PityContractsTest {
         Campaign campaign = MHQTestUtilities.mockCampaign();
 
         CampaignOptions options = mock(CampaignOptions.class);
-        when(options.getPityContracts()).thenReturn(pityCount);
         when(campaign.getCampaignOptions()).thenReturn(options);
+        when(options.get(CampaignOption.PITY_CONTRACTS)).thenReturn(pityCount);
         when(campaign.getCompletedContracts()).thenReturn(completed);
 
         Faction faction = mock(Faction.class);
         when(faction.isPirate()).thenReturn(isPirate);
         when(faction.isMercenary()).thenReturn(isMercenary);
-        when(campaign.getFaction()).thenReturn(faction);
+        when(campaign.getPlayerForce().getFaction()).thenReturn(faction);
         when(campaign.getPlayerForce().getContractMarket()).thenReturn(market);
 
         return campaign;
