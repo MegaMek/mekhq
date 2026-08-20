@@ -43,7 +43,7 @@ import mekhq.campaign.digitalGM.stratCon.StratConRulesManager.ReinforcementResul
 import mekhq.campaign.digitalGM.stratCon.StratConScenario;
 import mekhq.campaign.digitalGM.stratCon.StratConTrackState;
 import mekhq.campaign.force.Formation;
-import mekhq.campaign.mission.AtBContract;
+import mekhq.campaign.mission.contract.AbstractContract;
 import mekhq.campaign.personnel.Person;
 
 /**
@@ -61,7 +61,7 @@ public class StratConReinforcementStrategy implements IReinforcementStrategy {
     }
 
     @Override
-    public TargetRoll calculateReinforcementTargetNumber(@Nullable Person commandLiaison, AtBContract contract,
+    public TargetRoll calculateReinforcementTargetNumber(@Nullable Person commandLiaison, AbstractContract contract,
           int baseTargetNumber) {
         return StratConRulesManager.calculateReinforcementTargetNumber(commandLiaison, contract, baseTargetNumber);
     }

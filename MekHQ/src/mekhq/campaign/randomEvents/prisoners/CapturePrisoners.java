@@ -65,13 +65,13 @@ import megamek.common.rolls.TargetRoll;
 import megamek.common.universe.HonorRating;
 import megamek.logging.MMLogger;
 import mekhq.campaign.Campaign;
-import mekhq.campaign.mission.Scenario;
+import mekhq.campaign.campaignOptions.CampaignOption;
+import mekhq.campaign.mission.scenarios.Scenario;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.universe.Faction;
 import mekhq.campaign.universe.Factions;
 import mekhq.gui.baseComponents.immersiveDialogs.ImmersiveDialogSimple;
 import mekhq.utilities.ReportingUtilities;
-import mekhq.campaign.campaignOptions.CampaignOption;
 
 /**
  * Handles events and processes related to capturing prisoners.

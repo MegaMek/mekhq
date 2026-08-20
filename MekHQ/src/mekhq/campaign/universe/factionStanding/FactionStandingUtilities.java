@@ -44,15 +44,15 @@ import megamek.common.annotations.Nullable;
 import megamek.common.enums.Gender;
 import megamek.logging.MMLogger;
 import mekhq.campaign.Campaign;
-import mekhq.campaign.mission.AtBContract;
-import mekhq.campaign.mission.Mission;
+import mekhq.campaign.campaignOptions.CampaignOption;
+import mekhq.campaign.mission.contract.AbstractContract;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.PronounData;
 import mekhq.campaign.personnel.enums.PersonnelRole;
 import mekhq.campaign.universe.Faction;
 import mekhq.campaign.universe.PlanetarySystem;
 import mekhq.campaign.universe.factionHints.FactionHints;
-import mekhq.campaign.campaignOptions.CampaignOption;
+import org.jspecify.annotations.NonNull;
 
 
 public class FactionStandingUtilities {
@@ -358,7 +358,7 @@ public class FactionStandingUtilities {
      */
     public static boolean isUseCommandCircuit(boolean overridingCommandCircuitRequirements, boolean isGM,
           boolean useFactionStandingCommandCircuit, FactionStandings factionStandings,
-          List<AtBContract> activeContracts) {
+          List<AbstractContract> activeContracts) {
         boolean useCommandCircuit = overridingCommandCircuitRequirements && isGM;
 
         if (useCommandCircuit) {
@@ -371,8 +371,8 @@ public class FactionStandingUtilities {
 
         double highestRegard = FactionStandingLevel.STANDING_LEVEL_0.getMinimumRegard();
         if (useFactionStandingCommandCircuit) {
-            for (AtBContract contract : activeContracts) {
-                double currentRegard = factionStandings.getRegardForFaction(contract.getEmployerCode(), true);
+            for (AbstractContract contract : activeContracts) {
+                double currentRegard = factionStandings.getRegardForFaction(contract.getEmployerFactionCode(), true);
                 if (currentRegard > highestRegard) {
                     highestRegard = currentRegard;
                 }
@@ -435,13 +435,13 @@ public class FactionStandingUtilities {
      *   <li>If none of the above conditions block entry, it is permitted.</li>
      * </ol>
      *
-     * @param campaignFaction    the campaign's primary faction
-     * @param factionStandings   the standings of the campaign with all factions
-     * @param currentSystem      the planetary system currently occupied
-     * @param targetSystem       the planetary system to test entry for
-     * @param when               the date of attempted entry (population/ownership may change over time)
-     * @param activeAtBContracts list of currently active contracts
-     * @param factionHints       the details of the current factional relations
+     * @param campaignFaction  the campaign's primary faction
+     * @param factionStandings the standings of the campaign with all factions
+     * @param currentSystem    the planetary system currently occupied
+     * @param targetSystem     the planetary system to test entry for
+     * @param when             the date of attempted entry (population/ownership may change over time)
+     * @param activeContracts  list of currently active contracts
+     * @param factionHints     the details of the current factional relations
      *
      * @return {@code true} if entry to the target system is allowed; {@code false} otherwise
      *
@@ -450,7 +450,7 @@ public class FactionStandingUtilities {
      */
     public static boolean canEnterTargetSystem(Faction campaignFaction, FactionStandings factionStandings,
           @Nullable PlanetarySystem currentSystem, PlanetarySystem targetSystem, LocalDate when,
-          List<AtBContract> activeAtBContracts, FactionHints factionHints) {
+          List<AbstractContract> activeContracts, FactionHints factionHints) {
         // Always allowed in empty systems
         if (targetSystem.getPopulation(when) == 0) {
             LOGGER.debug("Target system is empty, access granted");
@@ -461,9 +461,9 @@ public class FactionStandingUtilities {
 
         Set<Faction> contractEmployers = new HashSet<>();
         Set<Faction> contractTargets = new HashSet<>();
-        for (AtBContract contract : activeAtBContracts) {
+        for (AbstractContract contract : activeContracts) {
             contractEmployers.add(contract.getEmployerFaction());
-            contractTargets.add(contract.getEnemy());
+            contractTargets.add(contract.getEnemyFaction());
         }
 
         // Entry always allowed if the system is owned by any contract employer or target
@@ -530,67 +530,6 @@ public class FactionStandingUtilities {
         }
 
         return isOutlawed(highestRegard);
-    }
-
-    /**
-     * Checks whether the campaign is presently undertaking a mission for the specified faction.
-     *
-     * <p>This method verifies all the following conditions to determine mission status:</p>
-     * <ul>
-     *     <li>The campaign must currently be located on a planet.</li>
-     *     <li>There must be at least one active AtB (Against the Bot) contract.</li>
-     *     <li>At least one such AtB contract must have both an employer code matching the specified faction and a
-     *     system matching the current location.</li>
-     *     <li>Alternatively, the presence of any active mission also qualifies as being on a mission for the
-     *     faction. This is to ensure compatibility with non-AtB campaigns.</li>
-     * </ul>
-     *
-     * <p>Returns {@code true} if these checks indicate the campaign is actively on a mission or contract
-     * corresponding to the specified faction.</p>
-     *
-     * @param isOnPlanet         whether the campaign is currently on a planet
-     * @param activeAtBContracts list of all currently active AtB contracts
-     * @param activeMissions     list of all currently active missions
-     * @param factionCode        the code identifying the relevant faction
-     * @param currentSystem      the planetary system in which the campaign is currently located
-     * @param ignoreEmployer     whether the contract employer faction should be ignored
-     *
-     * @return {@code true} if the campaign is on a qualifying mission for the given faction; {@code false} otherwise
-     *
-     * @author Illiani
-     * @since 0.50.07
-     */
-    @Deprecated(since = "0.50.11", forRemoval = true)
-    public static boolean isIsOnMission(boolean isOnPlanet, List<AtBContract> activeAtBContracts,
-          List<Mission> activeMissions, String factionCode, PlanetarySystem currentSystem, boolean ignoreEmployer) {
-        if (!isOnPlanet) {
-            return false;
-        }
-
-        // Check if there are any active missions
-        if (activeMissions.isEmpty()) {
-            return false;
-        }
-
-        // Check if AtB contracts are not disabled and at least one matches the current system
-        for (AtBContract contract : activeAtBContracts) {
-            if (!ignoreEmployer) {
-                if (!contract.getEmployerCode().equals(factionCode)) {
-                    continue;
-                }
-            }
-
-            if (contract.getSystem().equals(currentSystem)) {
-                return true;
-            }
-        }
-
-        if (!activeAtBContracts.isEmpty()) {
-            return false;
-        }
-
-        // Check if there are any active missions
-        return !activeMissions.isEmpty();
     }
 
     /**
@@ -662,21 +601,66 @@ public class FactionStandingUtilities {
      * @since 0.50.07
      */
     public static String getFactionName(Faction faction, int gameYear) {
+        return getFactionName(faction, gameYear, true);
+    }
+
+    /**
+     * Returns the formatted full name of a {@link Faction} for the specified game year.
+     *
+     * <p>If the faction's name starts with the localized "clan" prefix, the method returns the full name as-is.
+     * Otherwise, the localized "the" article is prefixed to the base name. This helps ensure proper grammatical usage
+     * for varying factions based on localization and faction naming conventions.</p>
+     *
+     * @param faction    the {@link Faction} whose name should be formatted
+     * @param gameYear   the year for which the faction's full name is relevant
+     * @param capitalize If {@code true}, the first letter of the faction name will be capitalized, but only if the
+     *                   first word is {@code "the"}.
+     *
+     * @return the formatted faction name, including the appropriate localized prefix if necessary
+     *
+     * @author Illiani
+     * @since 0.50.07
+     */
+    public static String getFactionName(Faction faction, int gameYear, boolean capitalize) {
         if (faction == null) {
             return getTextAt(RESOURCE_BUNDLE, "FactionStandingUtilities.faction");
         }
 
+        String baseName = faction.getFullName(gameYear);
+        return addNamePrefix(baseName, capitalize);
+    }
+
+    public static @NonNull String addNamePrefix(String baseName, boolean capitalize) {
         final String CLAN = getTextAt(RESOURCE_BUNDLE, "FactionStandingUtilities.clan");
+        final String COMSTAR = getTextAt(RESOURCE_BUNDLE, "FactionStandingUtilities.comStar");
         final String THE = getTextAt(RESOURCE_BUNDLE, "FactionStandingUtilities.the");
 
-        String baseName = faction.getFullName(gameYear);
-        if (baseName.startsWith(CLAN)) {
+        String lowerCaseBaseName = baseName.toLowerCase();
+        // Clan and ComStar are part of the faction's name rather than a prefix, so such names take no article and keep
+        // their own capitalization ("Clan Wolf", "ComStar") even in a lowercase context.
+        if (lowerCaseBaseName.startsWith(CLAN.toLowerCase()) || lowerCaseBaseName.startsWith(COMSTAR.toLowerCase())) {
+            return baseName;
+        }
+
+        // Some names already carry their own leading definite article - notably the mercenary, rebel, and militia
+        // employer names generated for the contract market ("The Grim Reapers"). Prefixing another article would read
+        // as "The The Grim Reapers", so re-case the existing article to match the requested capitalization instead.
+        final String lowerCaseArticle = THE.toLowerCase();
+        if (lowerCaseBaseName.equals(lowerCaseArticle) || lowerCaseBaseName.startsWith(lowerCaseArticle + ' ')) {
+            return (capitalize ? THE : lowerCaseArticle) + baseName.substring(THE.length());
+        }
+
+        // Likewise, a name led by a possessive proper noun ("Halloran's Partisans") is already definite and must not
+        // take an article: "The Halloran's Partisans" is ungrammatical.
+        int firstSpace = baseName.indexOf(' ');
+        String firstWord = (firstSpace < 0) ? baseName : baseName.substring(0, firstSpace);
+        if (firstWord.endsWith("'s")) {
             return baseName;
         }
 
         // Add additional conditionals here as necessary.
-
-        return THE + ' ' + baseName;
+        String prefix = capitalize ? THE : THE.toLowerCase();
+        return prefix + ' ' + baseName;
     }
 
     /**

@@ -55,13 +55,11 @@ import megamek.common.options.IOption;
 import megamek.common.rolls.TargetRoll;
 import megamek.logging.MMLogger;
 import mekhq.campaign.Campaign;
-import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.campaignOptions.CampaignOption;
+import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.finances.Money;
-import mekhq.campaign.mission.AtBContract;
-import mekhq.campaign.mission.Contract;
-import mekhq.campaign.mission.Mission;
-import mekhq.campaign.mission.enums.ContractObjectiveType;
+import mekhq.campaign.mission.contract.AbstractContract;
+import mekhq.campaign.mission.contract.contractData.ContractObjectiveType;
 import mekhq.campaign.personnel.Injury;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.PersonnelOptions;
@@ -95,10 +93,18 @@ public class RetirementDefectionTracker {
      * and determining payouts, but before the retirees have been paid,
      * we store those results to avoid making the rolls again.
      */
-    final private Set<Integer> rollRequired;
-    final private Map<Integer, HashSet<UUID>> unresolvedPersonnel;
+    final private Set<UUID> rollRequired;
+    final private Map<UUID, HashSet<UUID>> unresolvedPersonnel;
     final private Map<UUID, Payout> payouts;
     private LocalDate lastRetirementRoll;
+
+    /**
+     * Contract references loaded from a pre-UUID save, held until the campaign loader can map their legacy integer
+     * mission ids onto the converted contracts' {@link UUID}s (see {@link #relinkLegacyMissionIds(Map)}). Empty for
+     * modern saves.
+     */
+    final private transient Set<Integer> legacyRollRequired = new HashSet<>();
+    final private transient Map<Integer, HashSet<UUID>> legacyUnresolvedPersonnel = new HashMap<>();
 
     private static Person asfCommander;
     private static Integer asfCommanderModifier;
@@ -164,14 +170,14 @@ public class RetirementDefectionTracker {
               ContractObjectiveType.SECURITY_DUTY,
               ContractObjectiveType.RIOT_DUTY);
 
-        List<Contract> activeContracts = campaign.getActiveContracts();
+        List<AbstractContract> activeContracts = campaign.getActiveContracts();
 
         if (!activeContracts.isEmpty()) {
             if (campaign.getCampaignOptions().isUseStratCon()) {
-                Optional<Contract> defensiveContract = activeContracts.stream()
-                                                             .filter(contract -> contract instanceof AtBContract)
-                                                             .filter(atBContract -> !defensiveContracts.contains(((AtBContract) atBContract).getContractType()))
-                                                             .findFirst();
+                Optional<AbstractContract> defensiveContract = activeContracts.stream()
+                                                                     .filter(mission -> !defensiveContracts.contains(
+                                                                           mission.getObjectiveType()))
+                                                                     .findFirst();
 
                 return defensiveContract.isPresent();
             } else {
@@ -390,7 +396,7 @@ public class RetirementDefectionTracker {
      *
      * @return A map with person ids as key and calculated target roll as value.
      */
-    public Map<UUID, TargetRoll> getTargetNumbers(final @Nullable Mission mission, final Campaign campaign) {
+    public Map<UUID, TargetRoll> getTargetNumbers(@Nullable AbstractContract mission, final Campaign campaign) {
         final Map<UUID, TargetRoll> targets = new HashMap<>();
 
         if (null != mission) {
@@ -505,29 +511,20 @@ public class RetirementDefectionTracker {
                 // the share percentage should still apply.
                 // In the case of multiple active contracts, pick the one with the best
                 // percentage.
-
-                AtBContract contract;
-
-                try {
-                    contract = (AtBContract) mission;
-                } catch (Exception e) {
-                    contract = null;
-                }
-
-                if (contract == null) {
-                    List<AtBContract> atbContracts = campaign.getActiveAtBContracts();
+                if (mission == null) {
+                    List<AbstractContract> atbContracts = campaign.getActiveContracts();
 
                     if (!atbContracts.isEmpty()) {
-                        for (AtBContract atbContract : atbContracts) {
-                            if ((contract == null) || (contract.getSharesPercent() > atbContract.getSharesPercent())) {
-                                contract = atbContract;
+                        for (AbstractContract contract : atbContracts) {
+                            if ((contract == null) || (contract.getSharesPercent() > contract.getSharesPercent())) {
+                                mission = contract;
                             }
                         }
                     }
                 }
 
-                if (contract != null) {
-                    targetNumber.addModifier(-max(0, ((contract.getSharesPercent() / 10) - 2)),
+                if (mission != null) {
+                    targetNumber.addModifier(-max(0, ((mission.getSharesPercent() / 10) - 2)),
                           resources.getString("shares.text"));
                 }
             }
@@ -553,6 +550,14 @@ public class RetirementDefectionTracker {
                     targetNumber.addModifier(1, resources.getString("missionFailure.text"));
                 } else if (mission.getStatus().isBreach()) {
                     targetNumber.addModifier(2, resources.getString("missionBreach.text"));
+                }
+            }
+
+            // Shares modifier: a share-heavy contract gives the crew a larger stake, suppressing turnover.
+            if ((mission != null) && campaignOptions.get(CampaignOption.USE_SHARE_SYSTEM)) {
+                int sharesModifier = max(0, (mission.getSharesPercent() / 10) - 2);
+                if (sharesModifier > 0) {
+                    targetNumber.addModifier(-sharesModifier, resources.getString("shares.text"));
                 }
             }
 
@@ -876,7 +881,7 @@ public class RetirementDefectionTracker {
      * @param shareValue The value of each share in the unit; if not using the share system, this is zero.
      * @param campaign   the current campaign
      */
-    public void rollRetirement(final @Nullable Mission mission, final Map<UUID, TargetRoll> targets,
+    public void rollRetirement(final @Nullable AbstractContract mission, final Map<UUID, TargetRoll> targets,
           final Money shareValue, final Campaign campaign) {
         if ((mission != null) && !unresolvedPersonnel.containsKey(mission.getId())) {
             unresolvedPersonnel.put(mission.getId(), new HashSet<>());
@@ -960,7 +965,7 @@ public class RetirementDefectionTracker {
      * @return True if the person was successfully removed from the campaign, false otherwise.
      */
     public boolean removeFromCampaign(Person person, boolean killed, boolean sacked, Campaign campaign,
-          Mission contract) {
+          AbstractContract contract) {
         if (!person.getPrisonerStatus().isFree()) {
             return false;
         }
@@ -993,7 +998,7 @@ public class RetirementDefectionTracker {
     public void removePerson(Person person) {
         payouts.remove(person.getId());
 
-        for (int contractID : unresolvedPersonnel.keySet()) {
+        for (UUID contractID : unresolvedPersonnel.keySet()) {
             unresolvedPersonnel.get(contractID).remove(person.getId());
         }
     }
@@ -1006,37 +1011,31 @@ public class RetirementDefectionTracker {
             return campaign.getPlayerForce().getHumanResources().getPerson(personID) == null;
         });
 
-        for (int contractID : unresolvedPersonnel.keySet()) {
+        for (UUID contractID : unresolvedPersonnel.keySet()) {
             unresolvedPersonnel.get(contractID).removeIf(personID -> {
                 return campaign.getPlayerForce().getHumanResources().getPerson(personID) == null;
             });
         }
     }
 
-    public boolean isOutstanding(int id) {
+    public boolean isOutstanding(UUID id) {
         return unresolvedPersonnel.containsKey(id);
     }
 
     /**
-     * Called by when all payouts have been resolved for the contract. If the contract is null, the dialog has been
-     * invoked without a specific contract and all outstanding payouts have been resolved.
+     * Clears every outstanding payout, for all contracts at once. Called when the turnover dialog was opened without a
+     * specific contract, so settling it settles everything.
+     *
+     * <p>Each contract is resolved individually before the map is emptied, so the roll-required flags go with it -
+     * {@link #resolveContract(UUID)} keys off a contract id and so cannot stand in for "all of them".</p>
      */
     public void resolveAllContracts() {
-        resolveContract(null);
+        unresolvedPersonnel.keySet().forEach(this::resolveContract);
+        unresolvedPersonnel.clear();
         payouts.clear();
     }
 
-    public void resolveContract(final @Nullable Mission mission) {
-        if (mission == null) {
-            unresolvedPersonnel.keySet().forEach(this::resolveContract);
-            unresolvedPersonnel.clear();
-        } else {
-            resolveContract(mission.getId());
-            unresolvedPersonnel.remove(mission.getId());
-        }
-    }
-
-    private void resolveContract(int contractId) {
+    private void resolveContract(UUID contractId) {
         if (null != unresolvedPersonnel.get(contractId)) {
             for (UUID pid : unresolvedPersonnel.get(contractId)) {
                 payouts.remove(pid);
@@ -1049,7 +1048,7 @@ public class RetirementDefectionTracker {
         return getRetirees(null);
     }
 
-    public Set<UUID> getRetirees(final @Nullable Mission mission) {
+    public Set<UUID> getRetirees(final @Nullable AbstractContract mission) {
         return (mission == null) ? payouts.keySet() : unresolvedPersonnel.get(mission.getId());
     }
 
@@ -1225,13 +1224,13 @@ public class RetirementDefectionTracker {
         MHQXMLUtility.writeSimpleXMLOpenTag(pw, indent++, "retirementDefectionTracker");
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "rollRequired", createCsv(rollRequired));
         MHQXMLUtility.writeSimpleXMLOpenTag(pw, indent++, "unresolvedPersonnel");
-        for (Integer i : unresolvedPersonnel.keySet()) {
+        for (UUID id : unresolvedPersonnel.keySet()) {
             MHQXMLUtility.writeSimpleXMLAttributedTag(pw,
                   indent,
                   "contract",
                   "id",
-                  i,
-                  createCsv(unresolvedPersonnel.get(i)));
+                  id,
+                  createCsv(unresolvedPersonnel.get(id)));
         }
         MHQXMLUtility.writeSimpleXMLCloseTag(pw, --indent, "unresolvedPersonnel");
 
@@ -1249,6 +1248,81 @@ public class RetirementDefectionTracker {
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "lastRetirementRoll", lastRetirementRoll);
         MHQXMLUtility.writeSimpleXMLCloseTag(pw, --indent, "retirementDefectionTracker");
     }
+
+    /**
+     * Parses a contract reference, returning {@code null} when the value is not a {@link UUID} (i.e. a legacy integer
+     * mission id from a pre-UUID save) rather than throwing.
+     */
+    private static @Nullable UUID parseMissionId(final String text) {
+        if ((text == null) || text.isBlank()) {
+            return null;
+        }
+
+        try {
+            return UUID.fromString(text.trim());
+        } catch (IllegalArgumentException ex) {
+            return null;
+        }
+    }
+
+    /** Parses a legacy integer mission id, or {@code null} when the value is not an integer. */
+    private static @Nullable Integer parseLegacyMissionId(final String text) {
+        if ((text == null) || text.isBlank()) {
+            return null;
+        }
+
+        try {
+            return Integer.valueOf(text.trim());
+        } catch (NumberFormatException ex) {
+            return null;
+        }
+    }
+
+    /**
+     * Re-hooks contract references loaded from a pre-UUID save onto the contracts those legacy missions were converted
+     * into. Called by the campaign loader once every mission has been read, so it does not matter whether the tracker
+     * or the missions were parsed first. References whose mission was not converted are discarded (the tracker's own
+     * orphan-record cleanup would drop them anyway).
+     *
+     * @param legacyMissionIdMap legacy integer mission id to converted contract {@link UUID}
+     *
+     * @return how many references were held and how many of them were re-hooked
+     */
+    public LegacyRelinkResult relinkLegacyMissionIds(final Map<Integer, UUID> legacyMissionIdMap) {
+        final int attempted = legacyRollRequired.size() + legacyUnresolvedPersonnel.size();
+        int relinked = 0;
+
+        for (final Integer legacyId : legacyRollRequired) {
+            final UUID missionId = legacyMissionIdMap.get(legacyId);
+            if (missionId != null) {
+                rollRequired.add(missionId);
+                relinked++;
+            }
+        }
+        legacyRollRequired.clear();
+
+        for (final Map.Entry<Integer, HashSet<UUID>> entry : legacyUnresolvedPersonnel.entrySet()) {
+            final UUID missionId = legacyMissionIdMap.get(entry.getKey());
+            if (missionId != null) {
+                unresolvedPersonnel.put(missionId, entry.getValue());
+                relinked++;
+            }
+        }
+        legacyUnresolvedPersonnel.clear();
+
+        return new LegacyRelinkResult(attempted, relinked);
+    }
+
+    /**
+     * The outcome of a {@link #relinkLegacyMissionIds(Map)} pass.
+     *
+     * <p>Both counts are reported because they differ whenever a legacy reference has no converted contract to hook
+     * onto; a caller that logs only the successes cannot tell how many were dropped.</p>
+     *
+     * @param attempted the number of legacy references the tracker held
+     * @param relinked  how many of them resolved to a converted contract
+     */
+    public record LegacyRelinkResult(int attempted, int relinked) {}
 
     public static RetirementDefectionTracker generateInstanceFromXML(Node wn, Campaign c) {
         RetirementDefectionTracker retVal = null;
@@ -1273,7 +1347,17 @@ public class RetirementDefectionTracker {
                     if (!wn2.getTextContent().isBlank()) {
                         String[] ids = wn2.getTextContent().split(",");
                         for (String id : ids) {
-                            retVal.rollRequired.add(Integer.parseInt(id));
+                            // Pre-UUID saves stored a legacy integer mission id here; hold it for re-hooking rather
+                            // than throwing (which would abort the rest of the tracker's parse).
+                            UUID missionId = parseMissionId(id);
+                            if (missionId != null) {
+                                retVal.rollRequired.add(missionId);
+                            } else {
+                                Integer legacyId = parseLegacyMissionId(id);
+                                if (legacyId != null) {
+                                    retVal.legacyRollRequired.add(legacyId);
+                                }
+                            }
                         }
                     }
                 } else if (wn2.getNodeName().equalsIgnoreCase("unresolvedPersonnel")) {
@@ -1284,12 +1368,21 @@ public class RetirementDefectionTracker {
                             continue;
                         }
                         if (wn3.getNodeName().equalsIgnoreCase("contract")) {
-                            int id = Integer.parseInt(wn3.getAttributes().getNamedItem("id").getTextContent());
+                            String rawId = wn3.getAttributes().getNamedItem("id").getTextContent();
                             String[] ids = wn3.getTextContent().split(",");
                             HashSet<UUID> pids = Arrays.stream(ids)
                                                        .map(UUID::fromString)
                                                        .collect(Collectors.toCollection(HashSet::new));
-                            retVal.unresolvedPersonnel.put(id, pids);
+
+                            UUID id = parseMissionId(rawId);
+                            if (id != null) {
+                                retVal.unresolvedPersonnel.put(id, pids);
+                            } else {
+                                Integer legacyId = parseLegacyMissionId(rawId);
+                                if (legacyId != null) {
+                                    retVal.legacyUnresolvedPersonnel.put(legacyId, pids);
+                                }
+                            }
                         }
                     }
                 } else if (wn2.getNodeName().equalsIgnoreCase("payouts")) {

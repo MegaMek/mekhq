@@ -50,7 +50,7 @@ import java.time.LocalDate;
 import java.util.List;
 
 import mekhq.campaign.Campaign;
-import mekhq.campaign.mission.AtBContract;
+import mekhq.campaign.mission.contract.AbstractContract;
 import mekhq.campaign.universe.Atmosphere;
 import mekhq.campaign.universe.LandMass;
 import mekhq.campaign.universe.Planet;
@@ -513,47 +513,55 @@ class PlanetProfileTest {
     }
 
     @Test
-    void from_contract_readsThePrimaryPlanetOfTheDestinationSystem() {
+    void from_contract_readsTheContractsTargetPlanet() {
         Planet planet = mock(Planet.class);
         when(planet.getTemperature(DATE)).thenReturn(-40);
 
-        PlanetarySystem system = mock(PlanetarySystem.class);
-        when(system.getPrimaryPlanet()).thenReturn(planet);
-
-        AtBContract contract = mock(AtBContract.class);
-        when(contract.getSystem()).thenReturn(system);
+        AbstractContract contract = mock(AbstractContract.class);
+        when(contract.getTargetPlanet()).thenReturn(planet);
 
         Campaign campaign = mock(Campaign.class);
         when(campaign.getLocalDate()).thenReturn(DATE);
 
         assertEquals(-40,
               PlanetProfile.from(contract, campaign).temperatureCelsius(),
-              "the profile should come from the contract's destination planet");
+              "the profile should come from the contract's target planet");
     }
 
+    /**
+     * A contract targets a specific world, not merely a system, so the profile is read from the target planet alone. A
+     * contract that names a destination system but no world inside it is still unprofiled - the system's primary world
+     * is not substituted, since the fighting may well be somewhere else in the system.
+     */
     @Test
-    void from_contractWithNoSystem_fallsBackToANeutralProfile() {
-        AtBContract contract = mock(AtBContract.class);
-        Campaign campaign = mock(Campaign.class);
-        when(campaign.getLocalDate()).thenReturn(DATE);
+    void from_contractWithASystemButNoTargetPlanet_fallsBackToANeutralProfile() {
+        Planet primaryPlanet = mock(Planet.class);
+        when(primaryPlanet.getTemperature(DATE)).thenReturn(-40);
 
-        assertEquals(PlanetProfile.neutral(NEUTRAL_TEMPERATURE_CELSIUS),
-              PlanetProfile.from(contract, campaign),
-              "a contract with no destination system should yield a fully neutral profile rather than throwing");
-    }
-
-    @Test
-    void from_systemWithNoPrimaryPlanet_fallsBackToANeutralProfile() {
         PlanetarySystem system = mock(PlanetarySystem.class);
-        AtBContract contract = mock(AtBContract.class);
-        when(contract.getSystem()).thenReturn(system);
+        when(system.getPrimaryPlanet()).thenReturn(primaryPlanet);
+
+        AbstractContract contract = mock(AbstractContract.class);
+        when(contract.getTargetSystem()).thenReturn(system);
 
         Campaign campaign = mock(Campaign.class);
         when(campaign.getLocalDate()).thenReturn(DATE);
 
         assertEquals(PlanetProfile.neutral(NEUTRAL_TEMPERATURE_CELSIUS),
               PlanetProfile.from(contract, campaign),
-              "a system with no primary planet should yield a fully neutral profile rather than throwing");
+              "a contract with no target planet should yield a neutral profile rather than the system's primary "
+                    + "world");
+    }
+
+    @Test
+    void from_contractWithNoTargetPlanet_fallsBackToANeutralProfile() {
+        AbstractContract contract = mock(AbstractContract.class);
+        Campaign campaign = mock(Campaign.class);
+        when(campaign.getLocalDate()).thenReturn(DATE);
+
+        assertEquals(PlanetProfile.neutral(NEUTRAL_TEMPERATURE_CELSIUS),
+              PlanetProfile.from(contract, campaign),
+              "a contract with no destination should yield a fully neutral profile rather than throwing");
     }
 
     // endregion from()

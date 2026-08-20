@@ -75,13 +75,12 @@ import mekhq.campaign.Campaign;
 import mekhq.campaign.enums.CampaignTransportType;
 import mekhq.campaign.finances.Money;
 import mekhq.campaign.force.Formation;
-import mekhq.campaign.mission.AtBScenario;
-import mekhq.campaign.mission.Contract;
-import mekhq.campaign.mission.Mission;
-import mekhq.campaign.mission.Scenario;
-import mekhq.campaign.mission.camOpsSalvage.CamOpsSalvageUtilities;
-import mekhq.campaign.mission.camOpsSalvage.RecoveryTimeCalculations;
-import mekhq.campaign.mission.camOpsSalvage.RecoveryTimeData;
+import mekhq.campaign.mission.contract.AbstractContract;
+import mekhq.campaign.mission.scenarios.AtBScenario;
+import mekhq.campaign.mission.scenarios.Scenario;
+import mekhq.campaign.mission.scenarios.camOpsSalvage.CamOpsSalvageUtilities;
+import mekhq.campaign.mission.scenarios.camOpsSalvage.RecoveryTimeCalculations;
+import mekhq.campaign.mission.scenarios.camOpsSalvage.RecoveryTimeData;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.unit.ITransportAssignment;
 import mekhq.campaign.unit.TestUnit;
@@ -236,7 +235,7 @@ public class SalvagePostScenarioPicker {
      * automatically allocated.</p>
      *
      * @param campaign      the current {@link Campaign} in which the scenario took place
-     * @param mission       the {@link Mission} associated with the scenario
+     * @param mission       the {@link AbstractContract} associated with the scenario
      * @param scenario      the {@link Scenario} that was just completed
      * @param actualSalvage the list of {@link TestUnit}s available as salvage that the player can claim
      * @param soldSalvage   the list of {@link TestUnit}s that are marked for immediate sale
@@ -244,7 +243,7 @@ public class SalvagePostScenarioPicker {
      * @author Illiani
      * @since 0.50.10
      */
-    public SalvagePostScenarioPicker(Campaign campaign, Mission mission, Scenario scenario,
+    public SalvagePostScenarioPicker(Campaign campaign, AbstractContract mission, Scenario scenario,
           List<TestUnit> actualSalvage, List<TestUnit> soldSalvage) {
         this.isInSpace = scenario.getBoardType() == AtBScenario.T_SPACE;
 
@@ -256,22 +255,19 @@ public class SalvagePostScenarioPicker {
         arrangeUnits(actualSalvage, soldSalvage);
         setRecoveryTimeDataMap(campaign, scenario);
 
-        boolean isContract = mission instanceof Contract;
-        boolean playerGetsNoSalvage = isContract && ((Contract) mission).getSalvagePercent() <= 0;
+        boolean playerGetsNoSalvage = !mission.canSalvage();
         if (playerGetsNoSalvage) {
             return; // There isn't going to be anything to process
         }
 
-        if (isContract) {
-            salvagePercent = ((Contract) mission).getSalvagePercent();
-            employerSalvageMoneyInitial = ((Contract) mission).getSalvagedByEmployer();
-            employerSalvageMoneyCurrent = employerSalvageMoneyInitial;
-            unitSalvageMoneyInitial = ((Contract) mission).getSalvagedByUnit();
-            unitSalvageMoneyCurrent = unitSalvageMoneyInitial;
-            isExchangeRights = ((Contract) mission).isSalvageExchange();
-        }
+        salvagePercent = (int) round(mission.getSalvageRightsMultiplier() * 100);
+        employerSalvageMoneyInitial = mission.getSalvagedByEmployerValue();
+        employerSalvageMoneyCurrent = employerSalvageMoneyInitial;
+        unitSalvageMoneyInitial = mission.getSalvagedByUnitValue();
+        unitSalvageMoneyCurrent = unitSalvageMoneyInitial;
+        isExchangeRights = mission.isSalvageExchange();
 
-        List<SalvageComboBoxGroup> selectedGroups = showSalvageDialog(campaign, isContract);
+        List<SalvageComboBoxGroup> selectedGroups = showSalvageDialog(campaign);
         if (selectedGroups != null) {
             processSalvageAssignments(selectedGroups);
         }
@@ -489,15 +485,14 @@ public class SalvagePostScenarioPicker {
      * For contract missions, also displays salvage percentage information and enforces salvage limits. The dialog
      * validates all assignments and prevents confirmation if any assignments are invalid.</p>
      *
-     * @param campaign   the current campaign
-     * @param isContract whether this is a contract mission (affects displayed information and validation)
+     * @param campaign the current campaign
      *
      * @return list of combo box groups with user selections, or null if the dialog was canceled
      *
      * @author Illiani
      * @since 0.50.10
      */
-    private List<SalvageComboBoxGroup> showSalvageDialog(Campaign campaign, boolean isContract) {
+    private List<SalvageComboBoxGroup> showSalvageDialog(Campaign campaign) {
         JDialog dialog = new JDialog((Frame) null, getText("accessingTerminal.title"), true);
         dialog.setLayout(new BorderLayout());
         dialog.setDefaultCloseOperation(JDialog.DO_NOTHING_ON_CLOSE); // We don't want the player to cancel out
@@ -508,60 +503,58 @@ public class SalvagePostScenarioPicker {
         JLabel unitSalvageLabel = null;
         JLabel availableTimeLabel = null;
 
-        if (isContract) {
-            JPanel infoContainer = new JPanel(new BorderLayout());
-            infoContainer.setBorder(BorderFactory.createEmptyBorder(PADDING, PADDING, PADDING, PADDING));
+        JPanel infoContainer = new JPanel(new BorderLayout());
+        infoContainer.setBorder(BorderFactory.createEmptyBorder(PADDING, PADDING, PADDING, PADDING));
 
-            // Left column (existing info labels)
-            JPanel infoPanel = new JPanel(new GridLayout(4, 1, 5, 5));
+        // Left column (existing info labels)
+        JPanel infoPanel = new JPanel(new GridLayout(4, 1, 5, 5));
 
-            if (isExchangeRights) {
-                salvagePercentLabel = new JLabel(getFormattedTextAt(RESOURCE_BUNDLE,
-                      "SalvagePostScenarioPicker.salvagePercent.exchange",
-                      salvagePercent));
-            } else {
-                salvagePercentLabel = new JLabel(getFormattedTextAt(RESOURCE_BUNDLE,
-                      "SalvagePostScenarioPicker.salvagePercent.normal",
-                      getCurrentPercentAsBigDecimal(),
-                      salvagePercent));
-            }
-            employerSalvageLabel = new JLabel(getFormattedTextAt(RESOURCE_BUNDLE,
-                  "SalvagePostScenarioPicker.employerSalvage", employerSalvageMoneyCurrent.toAmountString()));
-            if (isExchangeRights) {
-                Money actualFunds = employerSalvageMoneyCurrent.dividedBy(100).multipliedBy(salvagePercent);
-                unitSalvageLabel = new JLabel(getFormattedTextAt(RESOURCE_BUNDLE,
-                      "SalvagePostScenarioPicker.unitSalvage", actualFunds.toAmountString()));
-            } else {
-                unitSalvageLabel = new JLabel(getFormattedTextAt(RESOURCE_BUNDLE,
-                      "SalvagePostScenarioPicker.unitSalvage", unitSalvageMoneyCurrent.toAmountString()));
-            }
-            availableTimeLabel = new JLabel(getFormattedTextAt(RESOURCE_BUNDLE,
-                  "SalvagePostScenarioPicker.time", usedSalvageTime, maximumSalvageTime));
-
-            infoPanel.add(salvagePercentLabel);
-            infoPanel.add(employerSalvageLabel);
-            infoPanel.add(unitSalvageLabel);
-            infoPanel.add(availableTimeLabel);
-
-            // Right column (tutorial text)
-            JEditorPane tutorialPane = new JEditorPane();
-            tutorialPane.setContentType("text/html");
-            tutorialPane.setEditable(false);
-            tutorialPane.setOpaque(false);
-            tutorialPane.setText(getTextAt(RESOURCE_BUNDLE, "SalvagePostScenarioPicker.tutorial"));
-            tutorialPane.setBorder(RoundedLineBorder.createRoundedLineBorder());
-            int preferredWidth = scaleForGUI(700);
-            tutorialPane.setSize(preferredWidth, Short.MAX_VALUE);
-            Dimension preferredSize = tutorialPane.getPreferredSize();
-            preferredSize.width = preferredWidth;
-            tutorialPane.setPreferredSize(preferredSize);
-
-            // Add both to container
-            infoContainer.add(infoPanel, BorderLayout.CENTER);
-            infoContainer.add(tutorialPane, BorderLayout.EAST);
-
-            dialog.add(infoContainer, BorderLayout.NORTH);
+        if (isExchangeRights) {
+            salvagePercentLabel = new JLabel(getFormattedTextAt(RESOURCE_BUNDLE,
+                  "SalvagePostScenarioPicker.salvagePercent.exchange",
+                  salvagePercent));
+        } else {
+            salvagePercentLabel = new JLabel(getFormattedTextAt(RESOURCE_BUNDLE,
+                  "SalvagePostScenarioPicker.salvagePercent.normal",
+                  getCurrentPercentAsBigDecimal(),
+                  salvagePercent));
         }
+        employerSalvageLabel = new JLabel(getFormattedTextAt(RESOURCE_BUNDLE,
+              "SalvagePostScenarioPicker.employerSalvage", employerSalvageMoneyCurrent.toAmountString()));
+        if (isExchangeRights) {
+            Money actualFunds = employerSalvageMoneyCurrent.dividedBy(100).multipliedBy(salvagePercent);
+            unitSalvageLabel = new JLabel(getFormattedTextAt(RESOURCE_BUNDLE,
+                  "SalvagePostScenarioPicker.unitSalvage", actualFunds.toAmountString()));
+        } else {
+            unitSalvageLabel = new JLabel(getFormattedTextAt(RESOURCE_BUNDLE,
+                  "SalvagePostScenarioPicker.unitSalvage", unitSalvageMoneyCurrent.toAmountString()));
+        }
+        availableTimeLabel = new JLabel(getFormattedTextAt(RESOURCE_BUNDLE,
+              "SalvagePostScenarioPicker.time", usedSalvageTime, maximumSalvageTime));
+
+        infoPanel.add(salvagePercentLabel);
+        infoPanel.add(employerSalvageLabel);
+        infoPanel.add(unitSalvageLabel);
+        infoPanel.add(availableTimeLabel);
+
+        // Right column (tutorial text)
+        JEditorPane tutorialPane = new JEditorPane();
+        tutorialPane.setContentType("text/html");
+        tutorialPane.setEditable(false);
+        tutorialPane.setOpaque(false);
+        tutorialPane.setText(getTextAt(RESOURCE_BUNDLE, "SalvagePostScenarioPicker.tutorial"));
+        tutorialPane.setBorder(RoundedLineBorder.createRoundedLineBorder());
+        int preferredWidth = scaleForGUI(700);
+        tutorialPane.setSize(preferredWidth, Short.MAX_VALUE);
+        Dimension preferredSize = tutorialPane.getPreferredSize();
+        preferredSize.width = preferredWidth;
+        tutorialPane.setPreferredSize(preferredSize);
+
+        // Add both to container
+        infoContainer.add(infoPanel, BorderLayout.CENTER);
+        infoContainer.add(tutorialPane, BorderLayout.EAST);
+
+        dialog.add(infoContainer, BorderLayout.NORTH);
 
         // Final references for use in lambdas
         final JLabel finalSalvagePercentLabel = salvagePercentLabel;
@@ -671,16 +664,16 @@ public class SalvagePostScenarioPicker {
             salvageComboBoxGroups.add(group);
 
             // These need to be after the above lines, as we're going to use 'group' in the listeners.
-            comboBox1.addActionListener(e -> performComboChangeAction(isContract, salvageComboBoxGroups,
+            comboBox1.addActionListener(e -> performComboChangeAction(salvageComboBoxGroups,
                   group, finalSalvagePercentLabel, finalEmployerSalvageLabel, finalUnitSalvageLabel,
                   finalAvailableTimeLabel, confirmButton));
-            comboBox2.addActionListener(e -> performComboChangeAction(isContract, salvageComboBoxGroups,
+            comboBox2.addActionListener(e -> performComboChangeAction(salvageComboBoxGroups,
                   group, finalSalvagePercentLabel, finalEmployerSalvageLabel, finalUnitSalvageLabel,
                   finalAvailableTimeLabel, confirmButton));
-            claimedSalvageForKeeps.addActionListener(e -> performComboChangeAction(isContract,
+            claimedSalvageForKeeps.addActionListener(e -> performComboChangeAction(
                   salvageComboBoxGroups, group, finalSalvagePercentLabel, finalEmployerSalvageLabel,
                   finalUnitSalvageLabel, finalAvailableTimeLabel, confirmButton));
-            claimedSalvageForSale.addActionListener(e -> performComboChangeAction(isContract,
+            claimedSalvageForSale.addActionListener(e -> performComboChangeAction(
                   salvageComboBoxGroups, group, finalSalvagePercentLabel, finalEmployerSalvageLabel,
                   finalUnitSalvageLabel, finalAvailableTimeLabel, confirmButton));
             viewButton.addActionListener(new ViewUnitListener(group.targetUnit));
@@ -719,8 +712,7 @@ public class SalvagePostScenarioPicker {
         dialog.add(buttonPanel, BorderLayout.SOUTH);
 
         // Initial button state check
-        updateConfirmButtonState(salvageComboBoxGroups, confirmButton, finalUnitSalvageLabel, finalAvailableTimeLabel,
-              isContract);
+        updateConfirmButtonState(salvageComboBoxGroups, confirmButton, finalUnitSalvageLabel, finalAvailableTimeLabel);
 
         dialog.setPreferredSize(DEFAULT_SIZE);
         dialog.setSize(DEFAULT_SIZE);
@@ -779,7 +771,6 @@ public class SalvagePostScenarioPicker {
      *   <li>Updating the confirm button state</li>
      * </ul>
      *
-     * @param isContract                whether this is a contract mission
      * @param salvageComboBoxGroups     list of all combo box groups
      * @param group                     the specific group that changed
      * @param finalEmployerSalvageLabel label displaying employer salvage value
@@ -790,7 +781,7 @@ public class SalvagePostScenarioPicker {
      * @author Illiani
      * @since 0.50.10
      */
-    private void performComboChangeAction(boolean isContract, List<SalvageComboBoxGroup> salvageComboBoxGroups,
+    private void performComboChangeAction(List<SalvageComboBoxGroup> salvageComboBoxGroups,
           SalvageComboBoxGroup group, JLabel finalSalvagePercentLabel, JLabel finalEmployerSalvageLabel,
           JLabel finalUnitSalvageLabel, JLabel finalAvailableTimeLabel, JButton confirmButton) {
         // Prevent recursive calls
@@ -815,7 +806,7 @@ public class SalvagePostScenarioPicker {
                   finalUnitSalvageLabel,
                   finalAvailableTimeLabel);
             updateConfirmButtonState(salvageComboBoxGroups, confirmButton, finalUnitSalvageLabel,
-                  finalAvailableTimeLabel, isContract);
+                  finalAvailableTimeLabel);
         } finally {
             group.isUpdating = false;
         }
@@ -837,13 +828,12 @@ public class SalvagePostScenarioPicker {
      * @param confirmButton         the confirm button to enable/disable
      * @param unitSalvageLabel      label showing unit salvage value (colored red if limit exceeded)
      * @param salvageTimeLabel      label showing salvage time spent (colored red if limit exceeded)
-     * @param isContract            whether this is a contract mission
      *
      * @author Illiani
      * @since 0.50.10
      */
     private void updateConfirmButtonState(List<SalvageComboBoxGroup> salvageComboBoxGroups, JButton confirmButton,
-          JLabel unitSalvageLabel, JLabel salvageTimeLabel, boolean isContract) {
+          JLabel unitSalvageLabel, JLabel salvageTimeLabel) {
         boolean shouldEnable = true;
 
         // Check for any invalid units
@@ -861,14 +851,12 @@ public class SalvagePostScenarioPicker {
         }
 
         // Check salvage percentage if this is a contract
-        if (isContract) {
-            unitSalvageLabel.setForeground(null);
-            BigDecimal currentPercent = getCurrentPercentAsBigDecimal();
-            if (currentPercent.compareTo(BigDecimal.valueOf(salvagePercent)) > 0 && !isExchangeRights) {
-                disableConfirmAndColorName(confirmButton, unitSalvageLabel);
-                // If we've gone over our %, we only block progression if the player is trying to salvage even more.
-                shouldEnable = unitSalvageMoneyCurrent.compareTo(unitSalvageMoneyInitial) <= 0;
-            }
+        unitSalvageLabel.setForeground(null);
+        BigDecimal currentPercent = getCurrentPercentAsBigDecimal();
+        if (currentPercent.compareTo(BigDecimal.valueOf(salvagePercent)) > 0 && !isExchangeRights) {
+            disableConfirmAndColorName(confirmButton, unitSalvageLabel);
+            // If we've gone over our %, we only block progression if the player is trying to salvage even more.
+            shouldEnable = unitSalvageMoneyCurrent.compareTo(unitSalvageMoneyInitial) <= 0;
         }
 
         // Time budget check (disable and, ideally, color the time label in updateSalvageAllocation)

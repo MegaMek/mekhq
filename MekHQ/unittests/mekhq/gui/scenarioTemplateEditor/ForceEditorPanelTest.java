@@ -39,10 +39,10 @@ import java.util.List;
 
 import megamek.common.units.EntityWeightClass;
 import megamek.common.units.UnitType;
-import mekhq.campaign.mission.ScenarioForceTemplate;
-import mekhq.campaign.mission.ScenarioForceTemplate.ForceAlignment;
-import mekhq.campaign.mission.ScenarioForceTemplate.ForceGenerationMethod;
-import mekhq.campaign.mission.ScenarioForceTemplate.SynchronizedDeploymentType;
+import mekhq.campaign.mission.scenarios.ScenarioForceTemplate;
+import mekhq.campaign.mission.scenarios.ScenarioForceTemplate.ForceAlignment;
+import mekhq.campaign.mission.scenarios.ScenarioForceTemplate.ForceGenerationMethod;
+import mekhq.campaign.mission.scenarios.ScenarioForceTemplate.SynchronizedDeploymentType;
 import org.junit.jupiter.api.Test;
 
 /**

@@ -43,7 +43,7 @@ import java.util.List;
 
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
-import mekhq.campaign.mission.AtBContract;
+import mekhq.campaign.mission.contract.AbstractContract;
 import mekhq.gui.baseComponents.immersiveDialogs.ImmersiveDialogNag;
 
 public class UnresolvedStratConContactsNagDialog extends ImmersiveDialogNag {
@@ -55,7 +55,7 @@ public class UnresolvedStratConContactsNagDialog extends ImmersiveDialogNag {
     protected String getInCharacterMessage(Campaign campaign, String key, String commanderAddress) {
         final String RESOURCE_BUNDLE = "mekhq.resources.NagDialogs";
 
-        String unresolvedContactsReport = determineUnresolvedContacts(campaign.getActiveAtBContracts(),
+        String unresolvedContactsReport = determineUnresolvedContacts(campaign.getActiveContracts(),
               campaign.getLocalDate());
 
         return getFormattedTextAt(RESOURCE_BUNDLE, key + ".ic", commanderAddress, unresolvedContactsReport);
@@ -72,13 +72,13 @@ public class UnresolvedStratConContactsNagDialog extends ImmersiveDialogNag {
      * </ul>
      *
      * @param isUseStratCon   A flag indicating whether StratCon functionality is enabled in the campaign options.
-     * @param activeContracts A list of active {@link AtBContract} objects to evaluate for unresolved StratCon
+     * @param activeContracts A list of active {@link AbstractContract} objects to evaluate for unresolved StratCon
      *                        contacts.
      * @param today           The current campaign date, used to filter unresolved scenarios.
      *
      * @return {@code true} if all conditions are met and the nag dialog should be displayed; {@code false} otherwise.
      */
-    public static boolean checkNag(boolean isUseStratCon, List<AtBContract> activeContracts, LocalDate today) {
+    public static boolean checkNag(boolean isUseStratCon, List<AbstractContract> activeContracts, LocalDate today) {
 
         return isUseStratCon &&
                      !MekHQ.getMHQOptions().getNagDialogIgnore(NAG_UNRESOLVED_STRAT_CON_CONTACTS) &&

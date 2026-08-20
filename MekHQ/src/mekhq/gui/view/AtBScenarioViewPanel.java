@@ -73,20 +73,20 @@ import megamek.common.units.Entity;
 import mekhq.MekHQ;
 import mekhq.Utilities;
 import mekhq.campaign.Campaign;
+import mekhq.campaign.campaignOptions.CampaignOption;
 import mekhq.campaign.force.Formation;
 import mekhq.campaign.force.FormationStub;
 import mekhq.campaign.force.UnitStub;
-import mekhq.campaign.mission.AtBDynamicScenario;
-import mekhq.campaign.mission.AtBScenario;
-import mekhq.campaign.mission.BotForceStub;
-import mekhq.campaign.mission.Loot;
-import mekhq.campaign.mission.Scenario;
-import mekhq.campaign.mission.ScenarioForceTemplate;
-import mekhq.campaign.mission.ScenarioObjective;
+import mekhq.campaign.mission.scenarios.AtBDynamicScenario;
+import mekhq.campaign.mission.scenarios.AtBScenario;
+import mekhq.campaign.mission.scenarios.BotForceStub;
+import mekhq.campaign.mission.scenarios.Loot;
+import mekhq.campaign.mission.scenarios.Scenario;
+import mekhq.campaign.mission.scenarios.ScenarioForceTemplate;
+import mekhq.campaign.mission.scenarios.ScenarioObjective;
 import mekhq.gui.baseComponents.JScrollablePanel;
 import mekhq.gui.utilities.BriefingStyle;
 import mekhq.gui.utilities.MarkdownRenderer;
-import mekhq.campaign.campaignOptions.CampaignOption;
 
 /**
  * @author Neoancient

@@ -32,13 +32,10 @@
  */
 package mekhq.campaign.personnel.skills;
 
-import mekhq.campaign.campaignOptions.CampaignOption;
-
-import static org.mockito.Mockito.lenient;
-
 import static mekhq.campaign.personnel.enums.PersonnelStatus.ACTIVE;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.Mockito.lenient;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
@@ -49,10 +46,11 @@ import java.util.List;
 
 import mekhq.MHQOptions;
 import mekhq.campaign.Campaign;
+import mekhq.campaign.campaignOptions.CampaignOption;
 import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.force.Formation;
 import mekhq.campaign.force.PlayerForce;
-import mekhq.campaign.mission.enums.CombatRole;
+import mekhq.campaign.mission.utilities.CombatRole;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.enums.PersonnelRole;
 import mekhq.campaign.unit.Unit;

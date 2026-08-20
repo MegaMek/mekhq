@@ -36,8 +36,6 @@ import static java.lang.Integer.MAX_VALUE;
 import static megamek.client.ui.util.FlatLafStyleBuilder.setFontScaling;
 import static megamek.client.ui.util.UIUtil.scaleForGUI;
 import static megamek.utilities.ImageUtilities.scaleImageIcon;
-import static mekhq.gui.dialog.factionStanding.gmToolsDialog.FactionStandingsGMToolsActionType.UPDATE_HISTORIC_CONTRACTS;
-import static mekhq.gui.dialog.factionStanding.gmToolsDialog.FactionStandingsGMToolsActionType.ZERO_ALL_REGARD;
 import static mekhq.utilities.MHQInternationalization.getTextAt;
 
 import java.awt.BorderLayout;
@@ -61,7 +59,8 @@ import javax.swing.event.HyperlinkEvent;
 
 import megamek.logging.MMLogger;
 import mekhq.campaign.Campaign;
-import mekhq.campaign.mission.Mission;
+import mekhq.campaign.campaignOptions.CampaignOption;
+import mekhq.campaign.mission.contract.AbstractContract;
 import mekhq.campaign.universe.Faction;
 import mekhq.campaign.universe.factionStanding.FactionAccoladeEvent;
 import mekhq.campaign.universe.factionStanding.FactionAccoladeLevel;
@@ -72,7 +71,6 @@ import mekhq.gui.baseComponents.roundedComponents.RoundedJButton;
 import mekhq.gui.baseComponents.roundedComponents.RoundedLineBorder;
 import mekhq.gui.dialog.factionStanding.manualMissionDialogs.StandingUpdateConfirmationDialog;
 import mekhq.gui.dialog.glossary.GlossaryDialog;
-import mekhq.campaign.campaignOptions.CampaignOption;
 
 /**
  * GMTools allows Game Masters to adjust Faction Standings through various operations. These operations include zeroing
@@ -99,7 +97,7 @@ public class GMTools extends JDialog {
     private final LocalDate today;
     private final int gameYear;
     private final FactionStandings factionStandings;
-    private final List<Mission> missions;
+    private final List<AbstractContract> missions;
     private final double regardMultiplier;
 
     private final List<String> reports = new ArrayList<>();
@@ -120,7 +118,7 @@ public class GMTools extends JDialog {
         this.today = campaign.getLocalDate();
         this.gameYear = today.getYear();
         this.factionStandings = campaign.getPlayerForce().getFactionStandings();
-        this.missions = new ArrayList<>(campaign.getMissions());
+        this.missions = new ArrayList<>(campaign.getContractHistoryAsMap().values());
         this.regardMultiplier = campaign.getCampaignOptions().get(CampaignOption.REGARD_MULTIPLIER);
 
         populateDialog();
@@ -234,10 +232,6 @@ public class GMTools extends JDialog {
         int row = 0;
 
         for (FactionStandingsGMToolsActionType actionType : FactionStandingsGMToolsActionType.values()) {
-            if (ZERO_ALL_REGARD.equals(actionType) || UPDATE_HISTORIC_CONTRACTS.equals(actionType)) {
-                continue;
-            }
-
             JPanel pnlTool = populateGMToolOption(actionType);
 
             gbc.gridx = column;
@@ -377,7 +371,7 @@ public class GMTools extends JDialog {
             new StandingUpdateConfirmationDialog(this, campaignIcon, true);
 
             switch (actionType) {
-                case RESET_ALL_REGARD, ZERO_ALL_REGARD -> {
+                case RESET_ALL_REGARD -> {
                     reports.add(getTextAt(RESOURCE_BUNDLE, "gmTools.ZERO_ALL_REGARD.report"));
                     factionStandings.resetAllFactionStandings();
                     factionStandings.updateClimateRegard(campaignFaction, today, regardMultiplier, false);
@@ -392,16 +386,6 @@ public class GMTools extends JDialog {
                     double newRegard = factionSelectionDialog.getSelectedRegard();
                     reports.add(factionStandings.setRegardForFaction(campaignFaction.getShortName(),
                           selectedFaction.getShortName(), newRegard, gameYear, true));
-                }
-                case UPDATE_HISTORIC_CONTRACTS -> {
-                    reports.add(getTextAt(RESOURCE_BUNDLE, "gmTools.ZERO_ALL_REGARD.report"));
-                    factionStandings.resetAllFactionStandings();
-                    factionStandings.updateClimateRegard(campaignFaction, today, regardMultiplier, false);
-                    reports.addAll(factionStandings.updateCampaignForPastMissions(missions,
-                          campaignIcon,
-                          campaignFaction,
-                          today,
-                          regardMultiplier));
                 }
                 case TRIGGER_ACCOLADE -> {
                     FactionAccoladeLevel chosenAccolade = accoladeSelectionDialog.getSelectedAccolade();

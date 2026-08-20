@@ -35,9 +35,9 @@ package mekhq.gui.scenarioTemplateEditor;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-import mekhq.campaign.mission.ScenarioTemplate;
-import mekhq.campaign.mission.ScenarioTemplate.BattlefieldControlType;
-import mekhq.campaign.mission.enums.ScenarioType;
+import mekhq.campaign.mission.scenarios.ScenarioTemplate;
+import mekhq.campaign.mission.scenarios.ScenarioTemplate.BattlefieldControlType;
+import mekhq.campaign.mission.scenarios.ScenarioType;
 import org.junit.jupiter.api.Test;
 
 /**

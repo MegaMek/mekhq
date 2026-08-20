@@ -47,7 +47,7 @@ import javax.swing.JPanel;
 
 import megamek.client.ui.comboBoxes.MMComboBox;
 import mekhq.campaign.Campaign;
-import mekhq.campaign.mission.Scenario;
+import mekhq.campaign.mission.scenarios.Scenario;
 import mekhq.gui.baseComponents.immersiveDialogs.ImmersiveDialogCore;
 import mekhq.gui.baseComponents.immersiveDialogs.ImmersiveDialogWidth;
 

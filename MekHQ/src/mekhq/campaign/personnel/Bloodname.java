@@ -1,6 +1,6 @@
 /*
  * Copyright (c) 2014 - Carl Spain. All Rights Reserved.
- * Copyright (C) 2014-2025 The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2014-2026 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -404,7 +404,9 @@ public class Bloodname {
         }
         List<Bloodname> nameList = new ArrayList<>();
         for (Bloodname b : weights.keySet()) {
-            for (int i = 0; i < weights.get(b).value(); i++) {
+            // After scaling by the LCD above, each weight is a whole number, so value() is exactly integral.
+            int count = (int) weights.get(b).value();
+            for (int i = 0; i < count; i++) {
                 nameList.add(b);
             }
         }

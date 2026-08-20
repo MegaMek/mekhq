@@ -55,7 +55,7 @@ import mekhq.campaign.digitalGM.stratCon.StratConCoords;
 import mekhq.campaign.digitalGM.stratCon.StratConRulesManager;
 import mekhq.campaign.digitalGM.stratCon.gm.StratConGMs;
 import mekhq.campaign.force.Formation;
-import mekhq.campaign.mission.ScenarioForceTemplate;
+import mekhq.campaign.mission.scenarios.ScenarioForceTemplate;
 import mekhq.gui.StratConPanel;
 import mekhq.gui.baseComponents.immersiveDialogs.ImmersiveDialogConfirmation;
 

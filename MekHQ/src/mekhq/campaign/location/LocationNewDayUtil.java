@@ -50,13 +50,13 @@ import mekhq.MekHQ;
 import mekhq.campaign.AbstractLocation;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.LocalWarehouse;
-import mekhq.campaign.mission.AtBContract;
+import mekhq.campaign.campaignOptions.CampaignOption;
+import mekhq.campaign.mission.contract.utilities.ContractRepairLocation;
 import mekhq.campaign.parts.Part;
 import mekhq.campaign.parts.Refit;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.unit.Maintenance;
 import mekhq.campaign.unit.Unit;
-import mekhq.campaign.campaignOptions.CampaignOption;
 
 /**
  * Utility class for new-day processing of a single {@link IPlace}: maintenance, parts arrival, and unit state
@@ -199,7 +199,7 @@ public final class LocationNewDayUtil {
 
         if (hangar != null) {
             // ok now we can check for other stuff we might need to do to units
-            int defaultRepairSite = AtBContract.getBestRepairLocation(campaign.getActiveAtBContracts());
+            int defaultRepairSite = ContractRepairLocation.getBestRepairLocation(campaign.getActiveContracts());
             List<UUID> unitsToRemove = new ArrayList<>();
             for (Unit unit : hangar.getUnits()) {
                 if (unit.isRefitting()) {
@@ -241,8 +241,8 @@ public final class LocationNewDayUtil {
     }
 
     /**
-     * Runs {@link #processNewDayUnits(IPlace, Campaign)} for every top-level {@link IPlace} in the campaign. Each
-     * call propagates recursively to child places (e.g., academy campuses hosted under a base or under a fixed planet
+     * Runs {@link #processNewDayUnits(IPlace, Campaign)} for every top-level {@link IPlace} in the campaign. Each call
+     * propagates recursively to child places (e.g., academy campuses hosted under a base or under a fixed planet
      * location).
      */
     public static void processAllLocationUnits(Campaign campaign) {

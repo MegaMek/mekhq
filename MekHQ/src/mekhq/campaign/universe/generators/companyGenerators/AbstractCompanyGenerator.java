@@ -74,7 +74,8 @@ import mekhq.campaign.force.Formation;
 import mekhq.campaign.icons.FormationPieceIcon;
 import mekhq.campaign.icons.LayeredFormationIcon;
 import mekhq.campaign.icons.enums.LayeredFormationIconLayer;
-import mekhq.campaign.mission.Contract;
+import mekhq.campaign.mission.contract.AbstractContract;
+import mekhq.campaign.mission.utilities.ContractUtilities;
 import mekhq.campaign.parts.AmmoStorage;
 import mekhq.campaign.parts.Armor;
 import mekhq.campaign.parts.Part;
@@ -1675,7 +1676,7 @@ public abstract class AbstractCompanyGenerator {
      * @param campaign the campaign to apply changes to
      * @param contract the selected contract, if any
      */
-    private void processContract(final Campaign campaign, final @Nullable Contract contract) {
+    private void processContract(final Campaign campaign, final @Nullable AbstractContract contract) {
         if (contract == null) {
             return;
         }
@@ -1684,7 +1685,9 @@ public abstract class AbstractCompanyGenerator {
             campaign.getPlayerForce()
                   .getForceDetachment()
                   .getCurrentLocation()
-                  .setJumpPath(contract.getJumpPath(campaign));
+                  .setJumpPath(ContractUtilities.getJumpPath(campaign,
+                        contract,
+                        campaign.getPlayerForce().getForceDetachment().getCurrentLocation()));
         }
     }
     // endregion Contract
@@ -1705,8 +1708,7 @@ public abstract class AbstractCompanyGenerator {
     private void processFinances(final Campaign campaign,
           final List<CompanyGenerationPersonTracker> trackers,
           final List<Unit> units, final List<Part> parts,
-          final List<Armor> armour, final List<AmmoStorage> ammunition,
-          final @Nullable Contract contract) {
+          final List<Armor> armour, final List<AmmoStorage> ammunition) {
         // Don't bother processing if it's disabled
         if (!getOptions().isProcessFinances()) {
             return;
@@ -2002,12 +2004,12 @@ public abstract class AbstractCompanyGenerator {
           final List<Unit> units, final List<Part> parts,
           final List<Armor> armour,
           final List<AmmoStorage> ammunition,
-          final @Nullable Contract contract) {
+          final @Nullable AbstractContract contract) {
         // Process Contract
         processContract(campaign, contract);
 
         // Process Finances
-        processFinances(campaign, trackers, units, parts, armour, ammunition, contract);
+        processFinances(campaign, trackers, units, parts, armour, ammunition);
     }
     // endregion Apply to Campaign
 }

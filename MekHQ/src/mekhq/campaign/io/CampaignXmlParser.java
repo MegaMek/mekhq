@@ -64,6 +64,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.UUID;
+import java.util.function.Consumer;
 
 import megamek.Version;
 import megamek.client.bot.princess.BehaviorSettingsFactory;
@@ -110,11 +111,11 @@ import mekhq.campaign.location.LocationNode;
 import mekhq.campaign.market.ForceShoppingList;
 import mekhq.campaign.market.PersonnelMarket;
 import mekhq.campaign.market.RequestedStockLevels;
-import mekhq.campaign.market.contractMarket.AbstractContractMarket;
-import mekhq.campaign.market.contractMarket.AtbMonthlyContractMarket;
-import mekhq.campaign.mission.AtBContract;
-import mekhq.campaign.mission.Mission;
-import mekhq.campaign.mission.Scenario;
+import mekhq.campaign.mission.contract.AbstractContract;
+import mekhq.campaign.mission.contract.ContractMarket;
+import mekhq.campaign.mission.contract.contractGeneration.ContractSearchType;
+import mekhq.campaign.mission.contract.io.LegacyContractConverter;
+import mekhq.campaign.mission.scenarios.Scenario;
 import mekhq.campaign.parts.AmmoStorage;
 import mekhq.campaign.parts.EnginePart;
 import mekhq.campaign.parts.Part;
@@ -150,6 +151,7 @@ import mekhq.campaign.personnel.skills.SkillDeprecationTool;
 import mekhq.campaign.personnel.skills.SkillType;
 import mekhq.campaign.personnel.skills.enums.SkillAttribute;
 import mekhq.campaign.personnel.turnoverAndRetention.RetirementDefectionTracker;
+import mekhq.campaign.personnel.turnoverAndRetention.RetirementDefectionTracker.LegacyRelinkResult;
 import mekhq.campaign.reputation.camOpsReputation.ForceReputationController;
 import mekhq.campaign.storyArc.StoryArc;
 import mekhq.campaign.unit.Unit;
@@ -258,6 +260,10 @@ public record CampaignXmlParser(InputStream is, MekHQ app) {
                 } else if (nodeName.equalsIgnoreCase("initiativeMaxBonus")) {
                     int bonus = parseInt(childNode.getTextContent(), 1);
                     playerForce.setInitiativeMaxBonus(bonus);
+                } else if (nodeName.equalsIgnoreCase(PlayerForce.CONTRACTS_TAG)) {
+                    playerForce.loadContractsFromXML(childNode, campaign, version);
+                } else if (nodeName.equalsIgnoreCase(ContractMarket.MARKET_TAG)) {
+                    playerForce.getContractMarket().loadFromXML(childNode, campaign, version);
                 } else if (nodeName.equalsIgnoreCase("crimePirateModifier")) {
                     int crimePirateModifier = parseInt(childNode.getTextContent());
                     playerForce.setCampOpsCrimePirateModifier(crimePirateModifier);
@@ -572,7 +578,8 @@ public record CampaignXmlParser(InputStream is, MekHQ app) {
               campusMigrated, travelMigrated);
     }
 
-    private static void processCombatTeamNodes(Campaign campaign, Node workingNode) {
+    private static void processCombatTeamNodes(Campaign campaign, Node workingNode,
+          List<LegacyMissionRelink> pendingMissionRelinks) {
         NodeList workingNodes = workingNode.getChildNodes();
 
         // Okay, let's iterate through the children, eh?
@@ -595,6 +602,15 @@ public record CampaignXmlParser(InputStream is, MekHQ app) {
 
             if (combatTeam != null) {
                 campaign.getPlayerForce().addCombatTeam(combatTeam);
+
+                // Missions are now UUID-keyed; a combat team that came in with a legacy integer mission id has had it
+                // dropped by its own parse. Capture the raw legacy id so it can be re-hooked to the converted contract.
+                if (combatTeam.getMissionId() == null) {
+                    Integer legacyMissionId = intChildValue(wn2, "missionId");
+                    if (legacyMissionId != null) {
+                        pendingMissionRelinks.add(new LegacyMissionRelink(legacyMissionId, combatTeam::setMissionId));
+                    }
+                }
             }
         }
     }
@@ -1555,7 +1571,8 @@ public record CampaignXmlParser(InputStream is, MekHQ app) {
         LOGGER.info("Load Special Ability Nodes Complete!");
     }
 
-    private static void processKillNodes(Campaign retVal, Node wn, Version version) {
+    private static void processKillNodes(Campaign retVal, Node wn, Version version,
+          List<LegacyMissionRelink> pendingMissionRelinks) {
         LOGGER.info("Loading Kill Nodes from XML...");
 
         NodeList wList = wn.getChildNodes();
@@ -1577,10 +1594,100 @@ public record CampaignXmlParser(InputStream is, MekHQ app) {
             Kill kill = Kill.generateInstanceFromXML(wn2, version);
             if (kill != null) {
                 retVal.importKill(kill);
+
+                // Missions are now UUID-keyed; a kill that came in with a legacy integer mission id has had it dropped
+                // by its own parse. Capture that raw legacy id here so it can be re-hooked to the converted contract
+                // once every mission has been read (kills may appear before missions in the save).
+                if (kill.getMissionId() == null) {
+                    Integer legacyMissionId = intChildValue(wn2, "missionId");
+                    if (legacyMissionId != null) {
+                        pendingMissionRelinks.add(new LegacyMissionRelink(legacyMissionId, kill::setMissionId));
+                    }
+                }
             }
         }
 
         LOGGER.info("Load Kill Nodes Complete!");
+    }
+
+    /**
+     * A legacy integer mission reference (from a kill, a combat team, etc.) pending re-hook to the converted contract's
+     * new {@link UUID}. {@code apply} writes the resolved id back onto the owning object.
+     */
+    private record LegacyMissionRelink(int legacyMissionId, Consumer<UUID> apply) {}
+
+    /**
+     * Re-hooks objects that referenced a mission by its legacy integer id to the converted contract's new {@link UUID}.
+     * Runs once the whole save is parsed, so it does not matter whether the referencing nodes or the missions were read
+     * first. A reference whose old mission was not converted (e.g. its mission node was missing) is left unlinked.
+     */
+    private static void relinkLegacyMissions(final Campaign campaign, final Map<Integer, UUID> legacyMissionIdMap,
+          final List<LegacyMissionRelink> pendingMissionRelinks) {
+        // The turnover tracker holds its own legacy contract references (pending rolls and unresolved personnel), which
+        // it stashed during its parse; resolve those too. It is absent from saves that never had one.
+        final RetirementDefectionTracker turnoverTracker = campaign.getPlayerForce()
+                                                                 .getHumanResources()
+                                                                 .getRetirementDefectionTracker();
+        final LegacyRelinkResult trackerResult = (turnoverTracker == null) ?
+                                                       new LegacyRelinkResult(0, 0) :
+                                                       turnoverTracker.relinkLegacyMissionIds(legacyMissionIdMap);
+
+        int relinked = trackerResult.relinked();
+        int total = trackerResult.attempted();
+
+        for (final LegacyMissionRelink link : pendingMissionRelinks) {
+            final UUID newMissionId = legacyMissionIdMap.get(link.legacyMissionId());
+            if (newMissionId != null) {
+                link.apply().accept(newMissionId);
+                relinked++;
+            }
+        }
+        total += pendingMissionRelinks.size();
+
+        if (total > 0) {
+            LOGGER.info("Re-hooked {} of {} legacy mission reference(s) to their converted contracts ({} had no match).",
+                  relinked, total, total - relinked);
+        }
+    }
+
+    /**
+     * Resolves the player's chosen negotiator on every contract read from the save.
+     *
+     * <p>Contracts live inside {@code <info>}, which is parsed before the personnel roster is populated, so the codec
+     * can only stash the negotiator's id while reading. This runs once the whole save is parsed and turns those ids
+     * back into roster members. An id with no matching person (e.g. the negotiator was deleted) is left unresolved,
+     * which the contract already tolerates - its negotiator is nullable.</p>
+     */
+    private static void resolvePlayerNegotiators(final Campaign campaign) {
+        final PlayerForce playerForce = campaign.getPlayerForce();
+        final ContractMarket contractMarket = playerForce.getContractMarket();
+
+        final List<AbstractContract> contracts = new ArrayList<>(playerForce.getContractHistory().values());
+        for (final ContractSearchType searchType : ContractSearchType.values()) {
+            contracts.addAll(contractMarket.getContracts(searchType).values());
+        }
+
+        int resolved = 0;
+        int total = 0;
+        for (final AbstractContract contract : contracts) {
+            final UUID negotiatorId = contract.getPendingPlayerNegotiatorId();
+            if (negotiatorId == null) {
+                continue;
+            }
+            total++;
+
+            final Person negotiator = playerForce.getHumanResources().getPerson(negotiatorId);
+            if (negotiator != null) {
+                contract.setPlayerNegotiator(negotiator);
+                resolved++;
+            }
+            contract.setPendingPlayerNegotiatorId(null);
+        }
+
+        if (total > 0) {
+            LOGGER.info("Resolved {} of {} contract negotiator(s) to roster members ({} had no match).",
+                  resolved, total, total - resolved);
+        }
     }
 
     /**
@@ -1724,40 +1831,59 @@ public record CampaignXmlParser(InputStream is, MekHQ app) {
         }
     }
 
-    private static void processMissionNodes(Campaign retVal, Node wn, Version version) {
-        LOGGER.info("Loading Mission Nodes from XML...");
+    /**
+     * Loads a legacy {@code <missions>} node from a pre-migration save. Each {@code <mission>} child is converted to a
+     * new {@link AbstractContract} via {@link LegacyContractConverter} and imported into the campaign, so old saves
+     * keep their contracts once the legacy mission classes are removed.
+     *
+     * <p>The legacy integer mission id is recorded against the new contract's {@link UUID} in
+     * {@code legacyMissionIdMap} so kills (and anything else that referenced a mission by its old integer id) can be
+     * re-hooked to the converted contract once the whole save is parsed.</p>
+     */
+    private static void processLegacyMissionNodes(final Campaign campaign, final Node missionsNode,
+          final Version version, final Map<Integer, UUID> legacyMissionIdMap) {
+        LOGGER.info("Converting legacy mission nodes to contracts...");
 
-        NodeList wList = wn.getChildNodes();
-
-        // Okay, lets iterate through the children, eh?
-        for (int x = 0; x < wList.getLength(); x++) {
-            Node wn2 = wList.item(x);
-
-            // If it's not an element node, we ignore it.
-            if (wn2.getNodeType() != Node.ELEMENT_NODE) {
+        final NodeList missionNodes = missionsNode.getChildNodes();
+        for (int i = 0; i < missionNodes.getLength(); i++) {
+            final Node missionNode = missionNodes.item(i);
+            if ((missionNode.getNodeType() != Node.ELEMENT_NODE)
+                      || !missionNode.getNodeName().equalsIgnoreCase("mission")) {
                 continue;
             }
 
-            if (!wn2.getNodeName().equalsIgnoreCase("mission")) {
-                // Error condition of sorts!
-                // Errr, what should we do here?
-                LOGGER.warn("Unknown node type not loaded in Mission nodes: {}", wn2.getNodeName());
-                continue;
-            }
-
-            Mission m = Mission.generateInstanceFromXML(wn2, retVal, version);
-
-            if (m != null) {
-                retVal.importMission(m);
+            try {
+                final Integer legacyId = intChildValue(missionNode, "id");
+                final AbstractContract contract = LegacyContractConverter.convert(missionNode, campaign, version);
+                campaign.importMission(contract);
+                if (legacyId != null) {
+                    legacyMissionIdMap.put(legacyId, contract.getId());
+                }
+            } catch (Exception ex) {
+                LOGGER.error(ex, "Failed to convert a legacy mission node; it was skipped.");
             }
         }
 
-        // Restore references on AtBContracts
-        for (AtBContract contract : retVal.getAtBContracts()) {
-            contract.restore(retVal);
-        }
+        LOGGER.info("Legacy mission conversion complete.");
+    }
 
-        LOGGER.info("Load Mission Nodes Complete!");
+    /**
+     * Returns the integer value of a named direct child element of {@code parent}, or {@code null} when the child is
+     * absent or its text is not an integer (e.g. a modern {@link UUID}).
+     */
+    private static @Nullable Integer intChildValue(final Node parent, final String childTag) {
+        final NodeList children = parent.getChildNodes();
+        for (int i = 0; i < children.getLength(); i++) {
+            final Node child = children.item(i);
+            if ((child.getNodeType() == Node.ELEMENT_NODE) && child.getNodeName().equalsIgnoreCase(childTag)) {
+                try {
+                    return Integer.valueOf(child.getTextContent().trim());
+                } catch (NumberFormatException ex) {
+                    return null;
+                }
+            }
+        }
+        return null;
     }
 
     private static @Nullable String checkUnits(final Node wn) {
@@ -1999,6 +2125,12 @@ public record CampaignXmlParser(InputStream is, MekHQ app) {
         Campaign campaign = CampaignFactory.createCampaign();
         campaign.setGUI(app.getCampaigngui());
 
+        // Legacy-save compatibility: maps a converted contract's old integer mission id to its new UUID, and collects
+        // the objects (kills, combat teams) that referenced a mission by that old id, so they can be re-hooked once
+        // everything is parsed.
+        final Map<Integer, UUID> legacyMissionIdMap = new HashMap<>();
+        final List<LegacyMissionRelink> pendingMissionRelinks = new ArrayList<>();
+
         Document xmlDoc;
 
         try {
@@ -2110,7 +2242,6 @@ public record CampaignXmlParser(InputStream is, MekHQ app) {
         }
 
         boolean foundPersonnelMarket = false;
-        boolean foundContractMarket = false;
         boolean foundUnitMarket = false;
 
         // Saves made in 0.51.00 do not have a <location> but will have a <locations> with a single item.
@@ -2157,7 +2288,7 @@ public record CampaignXmlParser(InputStream is, MekHQ app) {
                 } else if (nodeName.equalsIgnoreCase("units")) {
                     processUnitNodes(campaign, workingNode, version);
                 } else if (nodeName.equalsIgnoreCase("missions")) {
-                    processMissionNodes(campaign, workingNode, version);
+                    processLegacyMissionNodes(campaign, workingNode, version, legacyMissionIdMap);
                 } else if (nodeName.equalsIgnoreCase("forces")) {
                     processForces(campaign, workingNode, version);
                 } else if (nodeName.equalsIgnoreCase("formations")) {
@@ -2187,7 +2318,7 @@ public record CampaignXmlParser(InputStream is, MekHQ app) {
                 } else if (nodeName.equalsIgnoreCase("storyArc")) {
                     processStoryArcNodes(campaign, workingNode, version);
                 } else if (nodeName.equalsIgnoreCase("kills")) {
-                    processKillNodes(campaign, workingNode, version);
+                    processKillNodes(campaign, workingNode, version, pendingMissionRelinks);
                 } else if (nodeName.equalsIgnoreCase("shoppingList")) {
                     ForceShoppingList sl = ForceShoppingList.generateInstanceFromXML(workingNode, campaign, version);
                     campaign.getPlayerForce().setShoppingList(sl);
@@ -2197,19 +2328,13 @@ public record CampaignXmlParser(InputStream is, MekHQ app) {
                           version);
                     campaign.getPlayerForce().getHumanResources().setPersonnelMarket(personnelMarket);
                     foundPersonnelMarket = true;
-                } else if (nodeName.equalsIgnoreCase("contractMarket")) {
-                    // CAW: implicit DEPENDS-ON to the <missions> node
-                    campaign.setContractMarket(AbstractContractMarket.generateInstanceFromXML(workingNode,
-                          campaign,
-                          version));
-                    foundContractMarket = true;
                 } else if (nodeName.equalsIgnoreCase("unitMarket")) {
                     // Windchild: implicit DEPENDS ON to the <campaignOptions> nodes
                     campaign.setUnitMarket(campaign.getCampaignOptions().get(CampaignOption.UNIT_MARKET_METHOD).getUnitMarket());
                     campaign.getUnitMarket().fillFromXML(workingNode, campaign, version);
                     foundUnitMarket = true;
                 } else if (nodeName.equalsIgnoreCase("lances") || nodeName.equalsIgnoreCase("combatTeams")) {
-                    processCombatTeamNodes(campaign, workingNode);
+                    processCombatTeamNodes(campaign, workingNode, pendingMissionRelinks);
                 } else if (nodeName.equalsIgnoreCase("retirementDefectionTracker")) {
                     RetirementDefectionTracker rdt = RetirementDefectionTracker.generateInstanceFromXML(
                           workingNode,
@@ -2514,10 +2639,6 @@ public record CampaignXmlParser(InputStream is, MekHQ app) {
             campaign.getPlayerForce().getHumanResources().setPersonnelMarket(personnelMarket);
         }
 
-        if (!foundContractMarket) {
-            campaign.setContractMarket(new AtbMonthlyContractMarket());
-        }
-
         if (!foundUnitMarket) {
             campaign.setUnitMarket(campaign.getCampaignOptions().get(CampaignOption.UNIT_MARKET_METHOD).getUnitMarket());
         }
@@ -2650,6 +2771,11 @@ public record CampaignXmlParser(InputStream is, MekHQ app) {
 
         migrateLegacyEducationTravel(campaign);
         reconnectPersonsToTravelLocations(campaign);
+        relinkLegacyMissions(campaign, legacyMissionIdMap, pendingMissionRelinks);
+        resolvePlayerNegotiators(campaign);
+        // Settle the remaining balance of any legacy contracts closed out on load; deferred to here so the force is
+        // populated and the campaign's contract base can be computed.
+        LegacyContractConverter.settlePendingLegacyContracts(campaign);
         LOGGER.info("Load of campaign file complete!");
 
         return campaign;

@@ -46,7 +46,7 @@ import static mekhq.utilities.MHQInternationalization.getTextAt;
 
 import java.io.PrintWriter;
 import java.time.LocalDate;
-import java.util.Objects;
+import java.time.temporal.ChronoUnit;
 import java.util.Set;
 
 import jakarta.annotation.Nonnull;
@@ -60,7 +60,8 @@ import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.location.ILocation;
 import mekhq.campaign.location.IPlace;
 import mekhq.campaign.location.LocationNode;
-import mekhq.campaign.mission.Contract;
+import mekhq.campaign.mission.contract.AbstractContract;
+import mekhq.campaign.mission.utilities.ContractUtilities;
 import mekhq.campaign.personnel.Injury;
 import mekhq.campaign.personnel.InjuryType;
 import mekhq.campaign.personnel.Person;
@@ -85,6 +86,14 @@ public abstract class AbstractLocation implements IPlace {
     @XmlElement(name = "currentSystemId")
     @XmlJavaTypeAdapter(PlanetarySystemAdapter.class)
     protected PlanetarySystem currentSystem;
+
+    /**
+     * The world within {@link #currentSystem} the force is actually at, or {@code null} when that is not known - in
+     * transit between systems, or a save written before locations tracked this. {@link #getPlanet()} falls back to the
+     * system's primary world in that case, which is what every location reported before planets were tracked.
+     */
+    @XmlTransient
+    protected Planet currentPlanet;
 
     @XmlTransient
     protected LocationNode locationNode;
@@ -146,12 +155,29 @@ public abstract class AbstractLocation implements IPlace {
     }
 
     /**
-     * @return the current planet location. This is currently the primary planet of the system, but in the future this
-     *       will not be the case.
+     * @return the world the force is at: the specific planet when one is known, otherwise the system's primary world
      */
     @Override
     public Planet getPlanet() {
-        return getCurrentSystem().getPrimaryPlanet();
+        return (currentPlanet != null) ? currentPlanet : getCurrentSystem().getPrimaryPlanet();
+    }
+
+    /**
+     * @return the world the force is at, or {@code null} when it is not known. Unlike {@link #getPlanet()} this does
+     *       not fall back to the system's primary world, so callers can tell "at the primary world" apart from "world
+     *       not tracked" - a save predating planet tracking knows only the system.
+     */
+    public @Nullable Planet getCurrentPlanetDirect() {
+        return currentPlanet;
+    }
+
+    /**
+     * Records which world within the current system the force is at.
+     *
+     * @param currentPlanet the world, or {@code null} when it is not known (in transit, or at a jump point)
+     */
+    public void setCurrentPlanet(final @Nullable Planet currentPlanet) {
+        this.currentPlanet = currentPlanet;
     }
 
     @Override
@@ -228,7 +254,7 @@ public abstract class AbstractLocation implements IPlace {
               campaign.isGM(),
               campaignOptions.isUseFactionStandingCommandCircuitSafe(),
               campaign.getPlayerForce().getFactionStandings(),
-              campaign.getFutureAtBContracts());
+              campaign.getFutureContracts());
     }
 
     public void checkForDiseaseOrBioweaponOutbreaks(Campaign campaign, LocalDate today) {
@@ -277,9 +303,11 @@ public abstract class AbstractLocation implements IPlace {
      * @param campaign The {@link Campaign} instance.
      */
     public void testForEarlyArrival(Campaign campaign) {
-        for (Contract contract : campaign.getFutureContracts()) {
-            if (Objects.equals(currentSystem, contract.getSystem())) {
-                int daysTillStart = campaign.getLocalDate().until(contract.getStartDate()).getDays();
+        for (AbstractContract contract : campaign.getFutureContracts()) {
+            if (ContractUtilities.hasArrivedAtContractLocation(this, contract)) {
+                // DAYS.between, not Period.getDays() - the latter yields only the day component, so a start two
+                // months out would report the leftover days rather than the whole wait.
+                long daysTillStart = ChronoUnit.DAYS.between(campaign.getLocalDate(), contract.getStartDate());
 
                 String inCharacterMessage = getFormattedTextAt(RESOURCE_BUNDLE,
                       "contract.arrivedEarly.ic." + randomInt(10),

@@ -66,7 +66,6 @@ public class PerformBatchall {
     private static final int DIALOG_DECLINE_OPTION_ARE_YOU_SURE_INDEX = 1;
 
     private final Campaign campaign;
-    private final Person clanOpponent;
     private final String enemyFactionCode;
     private final FactionStandingLevel standingLevel;
     private final int batchallVersion;
@@ -87,29 +86,28 @@ public class PerformBatchall {
      */
     public PerformBatchall(Campaign campaign, Person clanOpponent, String enemyFactionCode) {
         this.campaign = campaign;
-        this.clanOpponent = clanOpponent;
         this.enemyFactionCode = enemyFactionCode;
         standingLevel = getFactionStandingLevel(campaign.getPlayerForce().getFactionStandings());
         batchallVersion = randomInt(BATCHALL_OPTIONS_COUNT);
 
         if (campaign.getCampaignOptions().isUseFactionStandingBatchallRestrictionsSafe()) {
             if (!standingLevel.isBatchallAllowed()) {
-                getBatchallStandingTooLowDialog();
+                getBatchallStandingTooLowDialog(clanOpponent);
                 isBatchallAccepted = false;
                 return;
             }
         }
 
-        if (getInitialChallengeDialog() < DIALOG_DECLINE_OPTION_START_INDEX) {
-            getBatchallFollowUpDialog(false);
+        if (getInitialChallengeDialog(clanOpponent) < DIALOG_DECLINE_OPTION_START_INDEX) {
+            getBatchallFollowUpDialog(false, clanOpponent);
             return;
         }
 
         if (getAreYouSureDialog() == DIALOG_DECLINE_OPTION_ARE_YOU_SURE_INDEX) {
-            getBatchallFollowUpDialog(true);
+            getBatchallFollowUpDialog(true, clanOpponent);
             isBatchallAccepted = false;
         } else {
-            getBatchallFollowUpDialog(false);
+            getBatchallFollowUpDialog(false, clanOpponent);
         }
     }
 
@@ -147,7 +145,7 @@ public class PerformBatchall {
      * @author Illiani
      * @since 0.50.07
      */
-    private void getBatchallStandingTooLowDialog() {
+    private void getBatchallStandingTooLowDialog(Person clanOpponent) {
         new ImmersiveDialogSimple(campaign,
               clanOpponent,
               null,
@@ -191,11 +189,11 @@ public class PerformBatchall {
      * @author Illiani
      * @since 0.50.07
      */
-    private int getInitialChallengeDialog() {
+    private int getInitialChallengeDialog(Person clanOpponent) {
         ImmersiveDialogSimple dialog = new ImmersiveDialogSimple(campaign,
               clanOpponent,
               null,
-              getBatchallIntroText(),
+              getBatchallIntroText(clanOpponent),
               getInitialChallengeDialogOptions(),
               getTextAt(RESOURCE_BUNDLE, "performBatchall.intro.ooc"),
               null,
@@ -213,7 +211,7 @@ public class PerformBatchall {
      * @author Illiani
      * @since 0.50.07
      */
-    private String getBatchallIntroText() {
+    private String getBatchallIntroText(Person clanOpponent) {
         final String bundleKey = "performBatchall." + standingLevel.name() + ".batchall." + batchallVersion + ".intro";
         final String campaignName = campaign.getPlayerForce().getName();
         final String opponentName = clanOpponent == null ? "" : clanOpponent.getFullTitle();
@@ -261,7 +259,7 @@ public class PerformBatchall {
      * @author Illiani
      * @since 0.50.07
      */
-    private void getBatchallFollowUpDialog(boolean isRefuse) {
+    private void getBatchallFollowUpDialog(boolean isRefuse, Person clanOpponent) {
         String message = getBatchallPostIntroText(isRefuse);
 
         new ImmersiveDialogSimple(campaign, clanOpponent, null, message, null, null, null, true);

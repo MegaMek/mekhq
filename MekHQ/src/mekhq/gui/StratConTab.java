@@ -49,6 +49,7 @@ import java.awt.event.MouseEvent;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import javax.swing.JComboBox;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
@@ -76,7 +77,8 @@ import mekhq.campaign.events.StratConDeploymentEvent;
 import mekhq.campaign.events.missions.MissionChangedEvent;
 import mekhq.campaign.events.missions.MissionCompletedEvent;
 import mekhq.campaign.events.missions.MissionRemovedEvent;
-import mekhq.campaign.mission.AtBContract;
+import mekhq.campaign.mission.contract.AbstractContract;
+import mekhq.campaign.mission.contract.utilities.ContractScore;
 import mekhq.campaign.universe.PlanetarySystem;
 import mekhq.gui.baseComponents.roundedComponents.RoundedJButton;
 import mekhq.gui.baseComponents.roundedComponents.RoundedLineBorder;
@@ -120,7 +122,7 @@ public class StratConTab extends CampaignGuiTab {
     private JScrollPane expandedObjectivePanel;
     private boolean objectivesCollapsed = false;
 
-    private AtBContract currentContract;
+    private AbstractContract currentContract;
     private StratConTrackState currentSectorTrack;
 
     private boolean adjustingSelectors = false;
@@ -590,7 +592,7 @@ public class StratConTab extends CampaignGuiTab {
         victoryPointsPanel.setVisible(true);
 
         boolean maplessMode = getCampaignGui().getCampaign().getCampaignOptions().isUseStratConMaplessMode();
-        int currentScore = currentContract.getContractScore(maplessMode);
+        int currentScore = ContractScore.getContractScore(maplessMode, currentContract);
         int requiredScore = currentContract.getRequiredVictoryPoints();
 
         if (requiredScore > 0) {
@@ -859,8 +861,10 @@ public class StratConTab extends CampaignGuiTab {
 
         Campaign campaign = getCampaignGui().getCampaign();
         PlanetarySystem currentSystem = campaign.getCurrentSystem();
-        for (AtBContract contract : campaign.getActiveAtBContracts(false)) {
-            if (!currentSystem.equals(contract.getSystem())) {
+        for (AbstractContract contract : campaign.getActiveContracts(false)) {
+            // The contract's location is a system, not a planet within one - comparing against getTargetPlanet()
+            // can never match, since PlanetarySystem.equals requires the same class.
+            if (!Objects.equals(currentSystem, contract.getTargetSystem())) {
                 continue;
             }
             if (contract.getStratConCampaignState() == null) {
@@ -903,7 +907,7 @@ public class StratConTab extends CampaignGuiTab {
      * Rebuilds the sector tabs for the given contract, one tab per track. Preserves the currently displayed sector when
      * it still exists, otherwise selects the first sector.
      */
-    private void repopulateSectorTabs(AtBContract contract) {
+    private void repopulateSectorTabs(AbstractContract contract) {
         StratConTrackState previousTrack = currentSectorTrack;
 
         adjustingSelectors = true;
@@ -1057,7 +1061,7 @@ public class StratConTab extends CampaignGuiTab {
     /**
      * Data structure backing an entry in the contract selection dropdown.
      */
-    private record ContractItem(AtBContract contract) {
+    private record ContractItem(AbstractContract contract) {
         @Override
         @Nonnull
         public String toString() {

@@ -54,12 +54,14 @@ import mekhq.NullEntityException;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.CampaignFactory;
 import mekhq.campaign.Kill;
+import mekhq.campaign.campaignOptions.CampaignOption;
 import mekhq.campaign.enums.CampaignTransportType;
 import mekhq.campaign.finances.Money;
 import mekhq.campaign.finances.enums.TransactionType;
 import mekhq.campaign.force.Formation;
-import mekhq.campaign.mission.Contract;
-import mekhq.campaign.mission.Mission;
+import mekhq.campaign.mission.contract.AbstractContract;
+import mekhq.campaign.mission.contract.ContractMarket;
+import mekhq.campaign.mission.contract.contractGeneration.ContractSearchType;
 import mekhq.campaign.parts.AmmoStorage;
 import mekhq.campaign.parts.Armor;
 import mekhq.campaign.parts.Part;
@@ -70,7 +72,6 @@ import mekhq.campaign.unit.Unit;
 import mekhq.campaign.universe.Faction;
 import mekhq.gui.CampaignGUI;
 import mekhq.gui.FileDialogs;
-import mekhq.campaign.campaignOptions.CampaignOption;
 
 /**
  * This class manages the GUI and logic for the campaign subset export wizard. May Knuth forgive me.
@@ -454,11 +455,10 @@ public class CampaignExportWizard extends JDialog {
     }
 
     /**
-     * Parses the C-bill amount entered by the user using the supplied locale, so it accepts that locale's
-     * grouping and decimal separators (e.g. "1,000,000.50" in en-US, "1.000.000,50" in es-ES,
-     * "1 000 000,50" in fr-FR). Returns 0 for empty or null input. Throws {@link NumberFormatException}
-     * when the input is non-empty but not a valid number, so callers can surface the error rather than
-     * silently dropping the transfer (see issue #5939).
+     * Parses the C-bill amount entered by the user using the supplied locale, so it accepts that locale's grouping and
+     * decimal separators (e.g. "1,000,000.50" in en-US, "1.000.000,50" in es-ES, "1 000 000,50" in fr-FR). Returns 0
+     * for empty or null input. Throws {@link NumberFormatException} when the input is non-empty but not a valid number,
+     * so callers can surface the error rather than silently dropping the transfer (see issue #5939).
      *
      * <p>Note: C-bills are a real currency stored as {@link java.math.BigDecimal} inside {@link Money},
      * so fractional amounts are allowed.
@@ -535,13 +535,17 @@ public class CampaignExportWizard extends JDialog {
         }
 
         if (chkExportContractOffers.isSelected()) {
-            for (Contract contract : sourceCampaign.getContractMarket().getContracts()) {
-                destinationCampaign.getContractMarket().getContracts().add(contract);
+            final ContractMarket sourceMarket = sourceCampaign.getPlayerForce().getContractMarket();
+            final ContractMarket destinationMarket = destinationCampaign.getPlayerForce().getContractMarket();
+            for (final ContractSearchType searchType : ContractSearchType.values()) {
+                for (final AbstractContract contract : sourceMarket.getContracts(searchType).values()) {
+                    destinationMarket.addContract(searchType, contract);
+                }
             }
         }
 
         if (chkExportCompletedContracts.isSelected()) {
-            for (Mission mission : sourceCampaign.getCompletedMissions()) {
+            for (AbstractContract mission : sourceCampaign.getCompletedContracts()) {
                 destinationCampaign.importMission(mission);
             }
         }
@@ -612,7 +616,7 @@ public class CampaignExportWizard extends JDialog {
             for (Kill kill : sourceCampaign.getKillsFor(person.getId())) {
                 // we don't preserve IDs to avoid conflicts with the destination campaign
                 kill.setScenarioId(0);
-                kill.setMissionId(0);
+                kill.setMissionId(null);
 
                 destinationCampaign.importKill(kill);
             }

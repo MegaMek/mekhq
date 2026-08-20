@@ -67,16 +67,16 @@ import megamek.common.units.IAero;
 import megamek.common.units.Infantry;
 import megamek.common.units.UnitType;
 import megamek.logging.MMLogger;
+import mekhq.campaign.Campaign;
 import mekhq.campaign.digitalGM.stratCon.gm.StratConGMs;
 import mekhq.campaign.enums.CampaignTransportType;
-import mekhq.campaign.Campaign;
 import mekhq.campaign.force.CombatTeam;
 import mekhq.campaign.force.Formation;
-import mekhq.campaign.mission.AtBContract;
-import mekhq.campaign.mission.AtBDynamicScenario;
-import mekhq.campaign.mission.AtBScenario;
-import mekhq.campaign.mission.BotForce;
-import mekhq.campaign.mission.Scenario;
+import mekhq.campaign.mission.contract.AbstractContract;
+import mekhq.campaign.mission.scenarios.AtBDynamicScenario;
+import mekhq.campaign.mission.scenarios.AtBScenario;
+import mekhq.campaign.mission.scenarios.BotForce;
+import mekhq.campaign.mission.scenarios.Scenario;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.unit.ITransportAssignment;
 import mekhq.campaign.unit.Unit;
@@ -653,15 +653,14 @@ public class AtBGameThread extends GameThread {
     }
 
     /**
-     * Lists the entity ids of every trailer behind the given lead tractor, in hitch order, ready to
-     * hand to a single {@code sendBuildTrain}. A tow train is stored as a linked list - each unit
-     * records only the trailer directly behind it - so the train is read by following those links
-     * hop by hop.
+     * Lists the entity ids of every trailer behind the given lead tractor, in hitch order, ready to hand to a single
+     * {@code sendBuildTrain}. A tow train is stored as a linked list - each unit records only the trailer directly
+     * behind it - so the train is read by following those links hop by hop.
      *
      * <p>The walk stops at the first gap (a unit missing from the campaign or with no entity) and at
-     * the first unit it has already seen. That second guard is what bounds the loop: every pass adds
-     * a new id to {@code visitedUnits} or ends the loop, so a save file with a hitch that loops back
-     * on itself returns the trailers it managed to read instead of spinning.</p>
+     * the first unit it has already seen. That second guard is what bounds the loop: every pass adds a new id to
+     * {@code visitedUnits} or ends the loop, so a save file with a hitch that loops back on itself returns the trailers
+     * it managed to read instead of spinning.</p>
      *
      * @param campaign            current campaign
      * @param potentialTransports transports deployed in this scenario
@@ -809,11 +808,11 @@ public class AtBGameThread extends GameThread {
         String lanceName = RCG.generate();
         botForce.generateRandomForces(units, campaign);
         List<Entity> entitiesSorted = botForce.getFullEntityList(campaign);
-        AtBContract contract = (AtBContract) campaign.getMission(scenario.getMissionId());
+        AbstractContract contract = campaign.getContract(scenario.getMissionId());
         int lanceSize;
 
         if (botForce.getTeam() == 2) {
-            lanceSize = CombatTeam.getStandardFormationSize(contract.getEnemy());
+            lanceSize = CombatTeam.getStandardFormationSize(contract.getEnemyFaction());
         } else {
             lanceSize = CombatTeam.getStandardFormationSize(contract.getEmployerFaction());
         }

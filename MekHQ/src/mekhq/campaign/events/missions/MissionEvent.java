@@ -36,25 +36,20 @@ package mekhq.campaign.events.missions;
 import java.util.Objects;
 
 import megamek.common.event.MMEvent;
-import mekhq.campaign.mission.Contract;
-import mekhq.campaign.mission.Mission;
+import mekhq.campaign.mission.contract.AbstractContract;
 
 /**
  * Abstract base class for events involving missions or contracts.
  */
 public abstract class MissionEvent extends MMEvent {
 
-    private final Mission mission;
+    private final AbstractContract mission;
 
-    public MissionEvent(Mission mission) {
+    public MissionEvent(AbstractContract mission) {
         this.mission = Objects.requireNonNull(mission);
     }
 
-    public Mission getMission() {
+    public AbstractContract getMission() {
         return mission;
-    }
-
-    public boolean isContract() {
-        return mission instanceof Contract;
     }
 }

@@ -40,11 +40,11 @@ import java.util.Collection;
 import java.util.List;
 
 import mekhq.campaign.Campaign;
-import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.campaignOptions.CampaignOption;
+import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.finances.Finances;
 import mekhq.campaign.finances.Money;
-import mekhq.campaign.mission.AtBContract;
+import mekhq.campaign.mission.contract.AbstractContract;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.unit.Unit;
 
@@ -213,7 +213,7 @@ public class NagController {
 
         // Unresolved StratCon AO Contacts
         final boolean isUseStratCon = campaignOptions.isUseStratCon();
-        final List<AtBContract> activeContracts = campaign.getActiveAtBContracts();
+        final List<AbstractContract> activeContracts = campaign.getActiveContracts();
 
         if (UnresolvedStratConContactsNagDialog.checkNag(isUseStratCon, activeContracts, today)) {
             UnresolvedStratConContactsNagDialog unresolvedStratConContactsNagDialog = new UnresolvedStratConContactsNagDialog(

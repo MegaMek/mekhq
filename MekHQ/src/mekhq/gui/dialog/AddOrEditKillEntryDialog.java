@@ -59,8 +59,8 @@ import megamek.logging.MMLogger;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.Kill;
-import mekhq.campaign.mission.Mission;
-import mekhq.campaign.mission.Scenario;
+import mekhq.campaign.mission.contract.AbstractContract;
+import mekhq.campaign.mission.scenarios.Scenario;
 
 /**
  * @author Taharqa
@@ -73,7 +73,7 @@ public class AddOrEditKillEntryDialog extends JDialog {
     private final int operationType;
     private Kill kill;
     private LocalDate date;
-    private final int missionId;
+    private final UUID missionId;
     private final int scenarioId;
     private final int forceId;
     private final Campaign campaign;
@@ -81,8 +81,8 @@ public class AddOrEditKillEntryDialog extends JDialog {
     private JTextField txtKill;
     private JTextField txtKiller;
     private JButton btnDate;
-    private MMComboBox<Mission> cboMissionId;
-    private ArrayList<Integer> missionIdList;
+    private MMComboBox<AbstractContract> cboMissionId;
+    private ArrayList<UUID> missionIdList;
     private MMComboBox<String> cboScenarioId;
     private ArrayList<Integer> scenarioIdList;
 
@@ -90,8 +90,8 @@ public class AddOrEditKillEntryDialog extends JDialog {
 
     public AddOrEditKillEntryDialog(JFrame parent, boolean modal, UUID killerPerson, String killerUnit,
           LocalDate entryDate, Campaign campaign) {
-        // We default missionId & scenarioId to 0 when adding new kills
-        this(parent, modal, ADD_OPERATION, new Kill(killerPerson, "?", killerUnit, entryDate, 0, 0, -1, -1), campaign);
+        this(parent, modal, ADD_OPERATION, new Kill(killerPerson, "?", killerUnit, entryDate, null, 0, -1, -1),
+              campaign);
     }
 
     public AddOrEditKillEntryDialog(JFrame parent, boolean modal, Kill kill, Campaign campaign) {
@@ -212,18 +212,19 @@ public class AddOrEditKillEntryDialog extends JDialog {
         getContentPane().add(lblMissionId, gridBagConstraints);
 
         cboMissionId = new MMComboBox<>("cboMissionId");
-        missionIdList = createIdList(true);
-        for (int id : missionIdList) {
-            if (id == 0) {
+        missionIdList = createContractIdList();
+        for (UUID id : missionIdList) {
+            if (id == null) {
                 cboMissionId.addItem(null);
             } else {
-                cboMissionId.addItem(campaign.getMission(id));
+                cboMissionId.addItem(campaign.getContract(id));
             }
         }
 
         // if missionId is valid, default to the option matching missionId
-        if (campaign.getMission(missionId) != null) {
-            cboMissionId.setSelectedItem(campaign.getMission(missionId));
+        AbstractContract contract = campaign.getContract(missionId);
+        if (contract != null) {
+            cboMissionId.setSelectedItem(contract);
         }
         cboMissionId.setMinimumSize(new Dimension(150, 28));
         gridBagConstraints = new GridBagConstraints();
@@ -247,7 +248,7 @@ public class AddOrEditKillEntryDialog extends JDialog {
         getContentPane().add(lblScenarioId, gridBagConstraints);
 
         cboScenarioId = new MMComboBox<>("cboScenarioId");
-        scenarioIdList = createIdList(false);
+        scenarioIdList = createScenarioIdList();
         for (int id : scenarioIdList) {
             if (id == 0) {
                 cboScenarioId.addItem(null);
@@ -322,9 +323,9 @@ public class AddOrEditKillEntryDialog extends JDialog {
         kill.setKilledByWhat(txtKiller.getText());
         kill.setDate(date);
 
-        // if an invalid mission or scenario was selected default to 0
+        // if an invalid mission or scenario was selected default to null
         if (cboMissionId.getSelectedIndex() == -1) {
-            kill.setMissionId(0);
+            kill.setMissionId(null);
         } else {
             kill.setMissionId(missionIdList.get(cboMissionId.getSelectedIndex()));
         }
@@ -360,24 +361,25 @@ public class AddOrEditKillEntryDialog extends JDialog {
         }
     }
 
-    private ArrayList<Integer> createIdList(boolean isMission) {
+    private ArrayList<UUID> createContractIdList() {
+        ArrayList<UUID> idList = new ArrayList<>();
+
+        idList.add(null);
+
+        idList.addAll(campaign.getContractHistoryAsMap().keySet());
+
+        return idList;
+    }
+
+    private ArrayList<Integer> createScenarioIdList() {
         ArrayList<Integer> idList = new ArrayList<>();
 
-        if (isMission) {
-            // the default value should be the first value
-            idList.add(0);
-
-            for (Mission mission : campaign.getSortedMissions()) {
-                idList.add(mission.getId());
-            }
-        } else {
-            for (Scenario scenario : campaign.getScenarios()) {
-                idList.add(scenario.getId());
-            }
-            // this ensures the default value becomes the first value, when we reverse
-            idList.add(0);
-            Collections.reverse(idList);
+        for (Scenario scenario : campaign.getScenarios()) {
+            idList.add(scenario.getId());
         }
+        // this ensures the default value becomes the first value, when we reverse
+        idList.add(0);
+        Collections.reverse(idList);
 
         return idList;
     }

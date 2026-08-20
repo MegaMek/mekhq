@@ -43,8 +43,8 @@ import megamek.common.autoResolve.acar.order.Orders;
 import megamek.common.units.Entity;
 import megamek.logging.MMLogger;
 import mekhq.campaign.Campaign;
-import mekhq.campaign.mission.Scenario;
-import mekhq.campaign.mission.ScenarioObjective;
+import mekhq.campaign.mission.scenarios.Scenario;
+import mekhq.campaign.mission.scenarios.ScenarioObjective;
 
 /**
  * @author Luana Coppio

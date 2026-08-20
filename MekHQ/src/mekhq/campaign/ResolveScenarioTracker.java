@@ -36,9 +36,10 @@ package mekhq.campaign;
 import static java.lang.Math.ceil;
 import static mekhq.campaign.enums.DailyReportType.FINANCES;
 import static mekhq.campaign.enums.DailyReportType.TECHNICAL;
-import static mekhq.campaign.mission.Scenario.T_SPACE;
+import static mekhq.campaign.mission.scenarios.Scenario.T_SPACE;
 import static mekhq.campaign.parts.enums.PartQuality.QUALITY_D;
 import static mekhq.campaign.randomEvents.prisoners.NonCombatPrisoners.getCivilianCaptives;
+import static mekhq.campaign.universe.Faction.INDEPENDENT_FACTION_CODE;
 import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
 import static mekhq.utilities.MHQInternationalization.getTextAt;
 
@@ -76,15 +77,13 @@ import mekhq.campaign.finances.enums.TransactionType;
 import mekhq.campaign.force.Formation;
 import mekhq.campaign.log.ServiceLogger;
 import mekhq.campaign.log.UnitLogger;
-import mekhq.campaign.mission.AtBContract;
-import mekhq.campaign.mission.AtBScenario;
-import mekhq.campaign.mission.BotForce;
-import mekhq.campaign.mission.Contract;
-import mekhq.campaign.mission.Loot;
-import mekhq.campaign.mission.Mission;
-import mekhq.campaign.mission.Scenario;
-import mekhq.campaign.mission.camOpsSalvage.CamOpsSalvageUtilities;
-import mekhq.campaign.mission.enums.ScenarioStatus;
+import mekhq.campaign.mission.contract.AbstractContract;
+import mekhq.campaign.mission.scenarios.AtBScenario;
+import mekhq.campaign.mission.scenarios.BotForce;
+import mekhq.campaign.mission.scenarios.Loot;
+import mekhq.campaign.mission.scenarios.Scenario;
+import mekhq.campaign.mission.scenarios.ScenarioStatus;
+import mekhq.campaign.mission.scenarios.camOpsSalvage.CamOpsSalvageUtilities;
 import mekhq.campaign.parts.Part;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.enums.PersonnelRole;
@@ -195,13 +194,13 @@ public class ResolveScenarioTracker {
         Faction searchingFaction = null;
         int sarQuality = QUALITY_D.ordinal();
         if (scenario instanceof AtBScenario) {
-            AtBContract contract = ((AtBScenario) scenario).getContract(campaign);
+            AbstractContract contract = ((AtBScenario) scenario).getContract(campaign);
 
             if (control) {
                 searchingFaction = campaign.getPlayerForce().getFaction();
             } else {
-                searchingFaction = contract.getEnemy();
-                sarQuality = contract.getEnemyQuality();
+                searchingFaction = contract.getEnemyFaction();
+                sarQuality = contract.getEnemyEquipmentRating();
             }
         }
         capturePrisoners = new CapturePrisoners(campaign, searchingFaction, scenario, sarQuality);
@@ -649,10 +648,9 @@ public class ResolveScenarioTracker {
 
     private List<Person> shuffleCrew(List<Person> source) {
         List<Person> sortedList = new ArrayList<>();
-        Random generator = new Random();
 
         while (!source.isEmpty()) {
-            int position = generator.nextInt(source.size());
+            int position = Compute.randomInt(source.size());
             sortedList.add(source.get(position));
             source.remove(position);
         }
@@ -1166,12 +1164,12 @@ public class ResolveScenarioTracker {
      *                       be in the salvageStatus hashtable.
      */
     private void processPrisonerCapture(List<TestUnit> unitsToProcess) {
-        Mission currentMission = campaign.getMission(scenario.getMissionId());
+        AbstractContract currentMission = campaign.getContract(scenario.getMissionId());
         String enemyCode;
-        if (currentMission instanceof AtBContract) {
-            enemyCode = ((AtBContract) currentMission).getEnemyCode();
+        if (currentMission == null) {
+            enemyCode = INDEPENDENT_FACTION_CODE;
         } else {
-            enemyCode = "IND";
+            enemyCode = currentMission.getEnemyFactionCode();
         }
 
         for (Unit unit : unitsToProcess) {
@@ -1694,12 +1692,12 @@ public class ResolveScenarioTracker {
         return scenario;
     }
 
-    public Mission getMission() {
-        return campaign.getMission(scenario.getMissionId());
+    public @jakarta.annotation.Nullable AbstractContract getMission() {
+        return campaign.getContract(scenario.getMissionId());
     }
 
-    public int getMissionId() {
-        return campaign.getMission(scenario.getMissionId()).getId();
+    public @jakarta.annotation.Nullable UUID getMissionId() {
+        return getMission() == null ? null : getMission().getId();
     }
 
     /**
@@ -1782,12 +1780,10 @@ public class ResolveScenarioTracker {
         // ok lets do the whole enchilada and go ahead and update campaign
         // first figure out if we need any battle loss comp
         double blc = 0;
-        final Mission mission = getMission();
+        final AbstractContract mission = getMission();
 
-        final boolean isContract = mission instanceof Contract;
-        if (isContract) {
-            blc = ((Contract) mission).getBattleLossCompensation() / 100.0;
-        }
+
+        blc = mission.getBattlefieldLossMultiplier();
 
         // now lets update personnel
         CampaignOptions campaignOptions = campaign.getCampaignOptions();
@@ -2168,19 +2164,17 @@ public class ResolveScenarioTracker {
      * @return {@code true} if the current mission uses a salvage exchange, {@code false} otherwise.
      */
     public boolean usesSalvageExchange() {
-        if (getMission() instanceof Contract contract) {
-            if (contract.isSalvageExchange()) {
-                return true;
-            }
+        if (getMission().isSalvageExchange()) {
+            return true;
         }
 
         return isEmployerEvokingSpecialClause();
     }
 
     public boolean isEmployerEvokingSpecialClause() {
-        if (getMission() instanceof AtBContract atbContract) {
-            boolean enemyIsClan = atbContract.getEnemy().isClan();
-            boolean employerIsClan = atbContract.getEmployerFaction().isClan();
+        if (getMission() != null) {
+            boolean enemyIsClan = getMission().getEnemyFaction().isClan();
+            boolean employerIsClan = getMission().getEmployerFaction().isClan();
             boolean isBeforeTukayyid = campaign.getLocalDate().isBefore(MHQConstants.BATTLE_OF_TUKAYYID);
 
             return enemyIsClan && !employerIsClan && isBeforeTukayyid;

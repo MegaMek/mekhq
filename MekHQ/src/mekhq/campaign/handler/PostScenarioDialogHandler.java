@@ -47,14 +47,14 @@ import mekhq.campaign.Campaign;
 import mekhq.campaign.Kill;
 import mekhq.campaign.ResolveScenarioTracker;
 import mekhq.campaign.ResolveScenarioTracker.PersonStatus;
+import mekhq.campaign.campaignOptions.CampaignOption;
 import mekhq.campaign.events.scenarios.ScenarioResolvedEvent;
-import mekhq.campaign.mission.AtBScenario;
-import mekhq.campaign.mission.Scenario;
+import mekhq.campaign.mission.scenarios.AtBScenario;
+import mekhq.campaign.mission.scenarios.Scenario;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.autoAwards.AutoAwardsController;
 import mekhq.gui.CampaignGUI;
 import mekhq.gui.dialog.RetirementDefectionDialog;
-import mekhq.campaign.campaignOptions.CampaignOption;
 
 /**
  * @author Luana Coppio
@@ -139,7 +139,7 @@ public class PostScenarioDialogHandler {
           Scenario currentScenario) {
         if (!campaign.getPlayerForce().getHumanResources().getRetirementDefectionTracker().getRetirees().isEmpty()) {
             RetirementDefectionDialog rdd = new RetirementDefectionDialog(campaignGUI,
-                  campaign.getMission(currentScenario.getMissionId()), false);
+                  campaign.getContract(currentScenario.getMissionId()), false);
 
             if (!rdd.wasAborted()) {
                 campaign.applyRetirement(rdd.totalPayout(), rdd.getUnitAssignments());

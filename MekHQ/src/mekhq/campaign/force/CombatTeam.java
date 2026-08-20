@@ -49,7 +49,6 @@ import java.util.Hashtable;
 import java.util.List;
 import java.util.UUID;
 
-import megamek.codeUtilities.MathUtility;
 import megamek.common.annotations.Nullable;
 import megamek.common.compute.Compute;
 import megamek.common.units.Entity;
@@ -60,13 +59,10 @@ import megamek.logging.MMLogger;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.campaignOptions.CampaignOptions;
-import mekhq.campaign.campaignOptions.CampaignOption;
 import mekhq.campaign.events.OrganizationChangedEvent;
-import mekhq.campaign.mission.AtBContract;
-import mekhq.campaign.mission.AtBScenario;
-import mekhq.campaign.mission.atb.AtBScenarioFactory;
-import mekhq.campaign.mission.enums.CombatRole;
-import mekhq.campaign.mission.enums.ContractMoraleLevel;
+import mekhq.campaign.mission.contract.AbstractContract;
+import mekhq.campaign.mission.scenarios.AtBScenario;
+import mekhq.campaign.mission.utilities.CombatRole;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.unit.Unit;
 import mekhq.campaign.universe.Faction;
@@ -90,11 +86,12 @@ public class CombatTeam {
     public static final int LEVEL_II_SIZE = 6;
 
     /** Indicates a lance has no assigned mission */
-    public static final int NO_MISSION = -1;
+    @jakarta.annotation.Nullable
+    public static final UUID NO_MISSION = null;
 
     private int formationId;
-    private int missionId;
-    private CombatRole role;
+    private UUID missionId;
+    private CombatRole role = CombatRole.RESERVE;
     private UUID commanderId;
 
     /**
@@ -138,9 +135,9 @@ public class CombatTeam {
         Formation formation = campaign.getPlayerForce().getFormation(formationId);
         role = formation != null ? formation.getCombatRoleInMemory() : CombatRole.FRONTLINE;
 
-        missionId = -1;
-        for (AtBContract contract : campaign.getActiveAtBContracts()) {
-            missionId = ((contract.getParentContract() == null) ? contract : contract.getParentContract()).getId();
+        missionId = null;
+        for (AbstractContract contract : campaign.getActiveContracts()) {
+            missionId = contract.getId();
         }
         commanderId = findCommander(this.formationId, campaign);
     }
@@ -149,15 +146,19 @@ public class CombatTeam {
         return formationId;
     }
 
-    public int getMissionId() {
+    public @jakarta.annotation.Nullable UUID getMissionId() {
         return missionId;
     }
 
-    public AtBContract getContract(Campaign campaign) {
-        return (AtBContract) campaign.getMission(missionId);
+    public void setMissionId(@jakarta.annotation.Nullable UUID missionId) {
+        this.missionId = missionId;
     }
 
-    public void setContract(AtBContract atBContract) {
+    public AbstractContract getContract(Campaign campaign) {
+        return campaign.getContract(missionId);
+    }
+
+    public void setContract(AbstractContract atBContract) {
         if (null == atBContract) {
             missionId = NO_MISSION;
         } else {
@@ -419,251 +420,8 @@ public class CombatTeam {
     }
 
     public AtBScenario checkForBattle(Campaign campaign) {
-        // Make sure there is a battle first
-        if ((campaign.getCampaignOptions().getAtBBattleChance(role, true) == 0) ||
-                  (Compute.randomInt(100) > campaign.getCampaignOptions().getAtBBattleChance(role, true))) {
-            // No battle
-            return null;
-        }
-
-        // if we are using StratCon, don't *also* generate legacy scenarios
-        if (campaign.getCampaignOptions().isUseStratCon() &&
-                  (getContract(campaign).getStratConCampaignState() != null)) {
-            return null;
-        }
-
-        int roll;
-        // thresholds are coded from charts with 1-100 range, so we add 1 to mod to
-        // adjust 0-based random int
-        int battleTypeMod = 1 +
-                                  (ContractMoraleLevel.STALEMATE.ordinal() -
-                                         getContract(campaign).getMoraleLevel().ordinal()) * 5;
-        battleTypeMod += getContract(campaign).getBattleTypeMod();
-
-        // debugging code that will allow you to force the generation of a particular
-        // scenario.
-        // when generating a lance-based scenario (Standup, Probe, etc.), the second
-        // parameter in
-        // createScenario is "this" (the lance). Otherwise, it should be null.
-
-        /*
-         * if (true) {
-         * AtBScenario scenario = AtBScenarioFactory.createScenario(campaign, this,
-         * AtBScenario.BASE_ATTACK, true, getBattleDate(campaign.getLocalDate()));
-         * scenario.setMissionId(this.getMissionId());
-         * return scenario;
-         * }
-         */
-
-        switch (role) {
-            case MANEUVER: {
-                roll = Compute.randomInt(40) + battleTypeMod;
-                if (roll < 1) {
-                    return AtBScenarioFactory.createScenario(campaign,
-                          this,
-                          AtBScenario.BASE_ATTACK,
-                          false,
-                          getBattleDate(campaign.getLocalDate()));
-                } else if (roll < 9) {
-                    return AtBScenarioFactory.createScenario(campaign,
-                          this,
-                          AtBScenario.BREAKTHROUGH,
-                          true,
-                          getBattleDate(campaign.getLocalDate()));
-                } else if (roll < 17) {
-                    return AtBScenarioFactory.createScenario(campaign,
-                          this,
-                          AtBScenario.STANDUP,
-                          true,
-                          getBattleDate(campaign.getLocalDate()));
-                } else if (roll < 25) {
-                    return AtBScenarioFactory.createScenario(campaign,
-                          this,
-                          AtBScenario.STANDUP,
-                          false,
-                          getBattleDate(campaign.getLocalDate()));
-                } else if (roll < 33) {
-                    if (campaign.getCampaignOptions().get(CampaignOption.GENERATE_CHASES)) {
-                        return AtBScenarioFactory.createScenario(campaign,
-                              this,
-                              AtBScenario.CHASE,
-                              false,
-                              getBattleDate(campaign.getLocalDate()));
-                    } else {
-                        return AtBScenarioFactory.createScenario(campaign,
-                              this,
-                              AtBScenario.HOLD_THE_LINE,
-                              false,
-                              getBattleDate(campaign.getLocalDate()));
-                    }
-                } else if (roll < 41) {
-                    return AtBScenarioFactory.createScenario(campaign,
-                          this,
-                          AtBScenario.HOLD_THE_LINE,
-                          true,
-                          getBattleDate(campaign.getLocalDate()));
-                } else {
-                    return AtBScenarioFactory.createScenario(campaign,
-                          this,
-                          AtBScenario.BASE_ATTACK,
-                          true,
-                          getBattleDate(campaign.getLocalDate()));
-                }
-            }
-            case PATROL: {
-                roll = Compute.randomInt(60) + battleTypeMod;
-                if (roll < 1) {
-                    return AtBScenarioFactory.createScenario(campaign,
-                          this,
-                          AtBScenario.BASE_ATTACK,
-                          false,
-                          getBattleDate(campaign.getLocalDate()));
-                } else if (roll < 11) {
-                    if (campaign.getCampaignOptions().get(CampaignOption.GENERATE_CHASES)) {
-                        return AtBScenarioFactory.createScenario(campaign,
-                              this,
-                              AtBScenario.CHASE,
-                              true,
-                              getBattleDate(campaign.getLocalDate()));
-                    } else {
-                        return AtBScenarioFactory.createScenario(campaign,
-                              this,
-                              AtBScenario.HIDE_AND_SEEK,
-                              false,
-                              getBattleDate(campaign.getLocalDate()));
-                    }
-                } else if (roll < 21) {
-                    return AtBScenarioFactory.createScenario(campaign,
-                          this,
-                          AtBScenario.HIDE_AND_SEEK,
-                          true,
-                          getBattleDate(campaign.getLocalDate()));
-                } else if (roll < 31) {
-                    return AtBScenarioFactory.createScenario(campaign,
-                          this,
-                          AtBScenario.PROBE,
-                          true,
-                          getBattleDate(campaign.getLocalDate()));
-                } else if (roll < 41) {
-                    return AtBScenarioFactory.createScenario(campaign,
-                          this,
-                          AtBScenario.PROBE,
-                          false,
-                          getBattleDate(campaign.getLocalDate()));
-                } else if (roll < 51) {
-                    return AtBScenarioFactory.createScenario(campaign,
-                          this,
-                          AtBScenario.EXTRACTION,
-                          true,
-                          getBattleDate(campaign.getLocalDate()));
-                } else {
-                    return AtBScenarioFactory.createScenario(campaign,
-                          this,
-                          AtBScenario.RECON_RAID,
-                          true,
-                          getBattleDate(campaign.getLocalDate()));
-                }
-            }
-            case FRONTLINE: {
-                roll = Compute.randomInt(20) + battleTypeMod;
-                if (roll < 1) {
-                    return AtBScenarioFactory.createScenario(campaign,
-                          this,
-                          AtBScenario.BASE_ATTACK,
-                          false,
-                          getBattleDate(campaign.getLocalDate()));
-                } else if (roll < 5) {
-                    return AtBScenarioFactory.createScenario(campaign,
-                          this,
-                          AtBScenario.HOLD_THE_LINE,
-                          false,
-                          getBattleDate(campaign.getLocalDate()));
-                } else if (roll < 9) {
-                    return AtBScenarioFactory.createScenario(campaign,
-                          this,
-                          AtBScenario.RECON_RAID,
-                          false,
-                          getBattleDate(campaign.getLocalDate()));
-                } else if (roll < 13) {
-                    return AtBScenarioFactory.createScenario(campaign,
-                          this,
-                          AtBScenario.EXTRACTION,
-                          false,
-                          getBattleDate(campaign.getLocalDate()));
-                } else if (roll < 17) {
-                    return AtBScenarioFactory.createScenario(campaign,
-                          this,
-                          AtBScenario.HIDE_AND_SEEK,
-                          true,
-                          getBattleDate(campaign.getLocalDate()));
-                } else {
-                    return AtBScenarioFactory.createScenario(campaign,
-                          this,
-                          AtBScenario.BREAKTHROUGH,
-                          false,
-                          getBattleDate(campaign.getLocalDate()));
-                }
-            }
-            case TRAINING, CADRE: {
-                roll = Compute.randomInt(10) + battleTypeMod;
-                if (roll < 1) {
-                    return AtBScenarioFactory.createScenario(campaign,
-                          this,
-                          AtBScenario.BASE_ATTACK,
-                          false,
-                          getBattleDate(campaign.getLocalDate()));
-                } else if (roll < 3) {
-                    return AtBScenarioFactory.createScenario(campaign,
-                          this,
-                          AtBScenario.HOLD_THE_LINE,
-                          false,
-                          getBattleDate(campaign.getLocalDate()));
-                } else if (roll < 5) {
-                    return AtBScenarioFactory.createScenario(campaign,
-                          this,
-                          AtBScenario.BREAKTHROUGH,
-                          true,
-                          getBattleDate(campaign.getLocalDate()));
-                } else if (roll < 7) {
-                    if (campaign.getCampaignOptions().get(CampaignOption.GENERATE_CHASES)) {
-                        return AtBScenarioFactory.createScenario(campaign,
-                              this,
-                              AtBScenario.CHASE,
-                              true,
-                              getBattleDate(campaign.getLocalDate()));
-                    } else {
-                        return AtBScenarioFactory.createScenario(campaign,
-                              this,
-                              AtBScenario.BREAKTHROUGH,
-                              false,
-                              getBattleDate(campaign.getLocalDate()));
-                    }
-                } else if (roll < 9) {
-                    return AtBScenarioFactory.createScenario(campaign,
-                          this,
-                          AtBScenario.HIDE_AND_SEEK,
-                          false,
-                          getBattleDate(campaign.getLocalDate()));
-                } else {
-                    if (campaign.getCampaignOptions().get(CampaignOption.GENERATE_CHASES)) {
-                        return AtBScenarioFactory.createScenario(campaign,
-                              this,
-                              AtBScenario.CHASE,
-                              false,
-                              getBattleDate(campaign.getLocalDate()));
-                    } else {
-                        return AtBScenarioFactory.createScenario(campaign,
-                              this,
-                              AtBScenario.HOLD_THE_LINE,
-                              false,
-                              getBattleDate(campaign.getLocalDate()));
-                    }
-                }
-            }
-            default: {
-                return null;
-            }
-        }
+        // Old AtB method
+        return null;
     }
 
     public void writeToXML(final PrintWriter pw, int indent) {
@@ -691,7 +449,7 @@ public class CombatTeam {
                     // If this breaks, we need it to break loudly so we immediately notice
                     retVal.formationId = Integer.parseInt(wn2.getTextContent());
                 } else if (wn2.getNodeName().equalsIgnoreCase("missionId")) {
-                    retVal.missionId = MathUtility.parseInt(wn2.getTextContent());
+                    retVal.missionId = parseMissionId(wn2.getTextContent());
                 } else if (wn2.getNodeName().equalsIgnoreCase("role")) {
                     retVal.setRole(CombatRole.parseFromString(wn2.getTextContent().trim()));
                 } else if (wn2.getNodeName().equalsIgnoreCase("commanderId")) {
@@ -702,6 +460,30 @@ public class CombatTeam {
             LOGGER.error("", ex);
         }
         return retVal;
+    }
+
+    /**
+     * Parses a combat team's mission id for backward compatibility.
+     *
+     * <p>Missions are now identified by {@link UUID}. Saves written before that change stored the mission id as a
+     * plain integer, which is not a valid {@link UUID}. Returning {@code null} for such a value (rather than throwing)
+     * keeps the rest of the combat team's parse - including its role - intact; the campaign loader re-hooks the team to
+     * the contract the legacy mission was converted into, so the assignment is not lost.</p>
+     *
+     * @param text the raw {@code missionId} element text
+     *
+     * @return the parsed {@link UUID}, or {@code null} for a blank or legacy integer value (to be re-hooked on load)
+     */
+    private static @jakarta.annotation.Nullable UUID parseMissionId(final String text) {
+        if ((text == null) || text.isBlank()) {
+            return null;
+        }
+
+        try {
+            return UUID.fromString(text.trim());
+        } catch (IllegalArgumentException ex) {
+            return null;
+        }
     }
 
     private double getEffectivePoints(Campaign campaign) {

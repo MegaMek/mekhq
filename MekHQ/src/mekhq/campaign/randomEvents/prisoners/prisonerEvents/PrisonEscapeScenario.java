@@ -62,10 +62,10 @@ import mekhq.campaign.digitalGM.stratCon.StratConCampaignState;
 import mekhq.campaign.digitalGM.stratCon.StratConCoords;
 import mekhq.campaign.digitalGM.stratCon.StratConScenario;
 import mekhq.campaign.digitalGM.stratCon.StratConTrackState;
-import mekhq.campaign.mission.AtBContract;
-import mekhq.campaign.mission.AtBScenario;
-import mekhq.campaign.mission.BotForce;
-import mekhq.campaign.mission.ScenarioTemplate;
+import mekhq.campaign.mission.contract.AbstractContract;
+import mekhq.campaign.mission.scenarios.AtBScenario;
+import mekhq.campaign.mission.scenarios.BotForce;
+import mekhq.campaign.mission.scenarios.ScenarioTemplate;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.unit.Unit;
 import mekhq.gui.baseComponents.immersiveDialogs.ImmersiveDialogSimple;
@@ -83,7 +83,7 @@ import mekhq.gui.baseComponents.immersiveDialogs.ImmersiveDialogSimple;
  */
 public class PrisonEscapeScenario {
     private final Campaign campaign;
-    private final AtBContract contract;
+    private final AbstractContract contract;
     private final Set<Person> escapees;
 
     private static final String RESOURCE_BUNDLE = "mekhq.resources.PrisonerEvents";
@@ -100,7 +100,7 @@ public class PrisonEscapeScenario {
      * @param escapees A set of {@link Person} objects representing the escaped prisoners to be included in the
      *                 scenario.
      */
-    public PrisonEscapeScenario(Campaign campaign, AtBContract contract, Set<Person> escapees) {
+    public PrisonEscapeScenario(Campaign campaign, AbstractContract contract, Set<Person> escapees) {
         this.campaign = campaign;
         this.contract = contract;
         this.escapees = escapees;

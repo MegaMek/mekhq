@@ -38,9 +38,9 @@ import java.util.List;
 import java.util.Map;
 
 import megamek.common.annotations.Nullable;
-import mekhq.campaign.mission.ScenarioForceTemplate;
-import mekhq.campaign.mission.ScenarioObjective;
-import mekhq.campaign.mission.ScenarioTemplate;
+import mekhq.campaign.mission.scenarios.ScenarioForceTemplate;
+import mekhq.campaign.mission.scenarios.ScenarioObjective;
+import mekhq.campaign.mission.scenarios.ScenarioTemplate;
 
 /**
  * Commits an added or edited force into the scenario template's force roster (a map keyed by force ID). This logic is

@@ -521,7 +521,7 @@ public class FactionBorderTracker {
      *
      * @see #getDefaultBorderSize(Faction)
      */
-    public double getBorderSize(Faction f) {
+    public synchronized double getBorderSize(Faction f) {
         return factionBorderSize.getOrDefault(f, getDefaultBorderSize(f));
     }
 
@@ -533,7 +533,7 @@ public class FactionBorderTracker {
      *
      * @return The distance in light years to look for neighboring foreign planets.
      */
-    public double getDefaultBorderSize(Faction f) {
+    public synchronized double getDefaultBorderSize(Faction f) {
         if (f.isPeriphery()) {
             return peripheryBorderSize;
         } else if (f.isClan()) {

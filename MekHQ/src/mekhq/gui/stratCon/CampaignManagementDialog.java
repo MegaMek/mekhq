@@ -155,7 +155,7 @@ public class CampaignManagementDialog extends JDialog {
     }
 
     private void removeCVP(ActionEvent e) {
-        currentCampaignState.updateVictoryPoints(-1);
+        currentCampaignState.changeVictoryPoints(-1);
 
         parent.updateCampaignState();
     }
@@ -170,7 +170,7 @@ public class CampaignManagementDialog extends JDialog {
     }
 
     private void gmAddVPHandler(ActionEvent e) {
-        currentCampaignState.updateVictoryPoints(1);
+        currentCampaignState.changeVictoryPoints(1);
         btnRemoveCVP.setEnabled(currentCampaignState.getVictoryPoints() > 0);
         parent.updateCampaignState();
     }

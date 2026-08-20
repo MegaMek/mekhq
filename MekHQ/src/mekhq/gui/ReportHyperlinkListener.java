@@ -41,6 +41,7 @@ import javax.swing.event.HyperlinkListener;
 import megamek.codeUtilities.MathUtility;
 import megamek.logging.MMLogger;
 import mekhq.campaign.unit.Unit;
+import mekhq.campaign.universe.Systems;
 import mekhq.gui.dialog.VocationalExperienceAwardDialog;
 import mekhq.gui.dialog.WarriorsAlmanacDialog;
 import mekhq.gui.dialog.reportDialogs.MaintenanceReportDialog;
@@ -63,6 +64,7 @@ public record ReportHyperlinkListener(CampaignGUI campaignGUI) implements Hyperl
     public static final String WARRIORS_ALMANAC = "WARRIORS_ALMANAC";
     public static final String SCENARIO = "SCENARIO";
     public static final String MISSION = "MISSION";
+    public static final String SYSTEM = "SYSTEM";
     // endregion Variable Declarations
 
     // region Constructors
@@ -101,7 +103,7 @@ public record ReportHyperlinkListener(CampaignGUI campaignGUI) implements Hyperl
                 }
             } else if (evt.getDescription().startsWith(MISSION)) {
                 try {
-                    final int id = MathUtility.parseInt(evt.getDescription().split(":")[1]);
+                    final UUID id = UUID.fromString(evt.getDescription().split(":")[1]);
                     campaignGUI.focusOnMission(id);
                 } catch (Exception e) {
                     LOGGER.error("", e);
@@ -142,6 +144,13 @@ public record ReportHyperlinkListener(CampaignGUI campaignGUI) implements Hyperl
                 // with PERSON as well
                 try {
                     new VocationalExperienceAwardDialog(campaignGUI.getCampaign());
+                } catch (Exception e) {
+                    LOGGER.error("", e);
+                }
+            } else if (evt.getDescription().startsWith(SYSTEM)) {
+                try {
+                    final String systemId = evt.getDescription().split(":", 2)[1];
+                    campaignGUI.focusOnSystem(Systems.getInstance().getSystemById(systemId));
                 } catch (Exception e) {
                     LOGGER.error("", e);
                 }

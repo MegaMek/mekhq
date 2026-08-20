@@ -38,7 +38,7 @@ import static mekhq.campaign.force.Formation.FORMATION_NONE;
 import static mekhq.campaign.force.Formation.FORMATION_ORIGIN;
 import static mekhq.campaign.force.Formation.NO_ASSIGNED_SCENARIO;
 import static mekhq.campaign.force.FormationType.STANDARD;
-import static mekhq.campaign.mission.RandomFactionCamouflage.pickRandomCamouflage;
+import static mekhq.campaign.mission.utilities.RandomFactionCamouflage.pickRandomCamouflage;
 import static mekhq.campaign.parts.enums.PartQuality.QUALITY_A;
 import static mekhq.campaign.randomEvents.prisoners.PrisonerEventManager.DEFAULT_TEMPORARY_CAPACITY;
 import static mekhq.campaign.randomEvents.prisoners.PrisonerEventManager.MINIMUM_TEMPORARY_CAPACITY;
@@ -74,10 +74,10 @@ import mekhq.campaign.finances.enums.TransactionType;
 import mekhq.campaign.icons.StandardFormationIcon;
 import mekhq.campaign.icons.UnitIcon;
 import mekhq.campaign.market.ForceShoppingList;
-import mekhq.campaign.mission.AtBContract;
-import mekhq.campaign.mission.Scenario;
+import mekhq.campaign.mission.contract.AbstractContract;
 import mekhq.campaign.mission.rentals.ContractRentalType;
 import mekhq.campaign.mission.rentals.FacilityRentals;
+import mekhq.campaign.mission.scenarios.Scenario;
 import mekhq.campaign.parts.enums.PartQuality;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.medical.MASHCapacity;
@@ -905,7 +905,7 @@ public abstract class AbstractForce {
         }
 
         // clear out StratCon formation assignments
-        for (AtBContract contract : campaign.getActiveAtBContracts()) {
+        for (AbstractContract contract : campaign.getActiveContracts()) {
             if (contract.getStratConCampaignState() != null) {
                 for (StratConTrackState track : contract.getStratConCampaignState().getTracks()) {
                     track.unassignFormation(formationId);
