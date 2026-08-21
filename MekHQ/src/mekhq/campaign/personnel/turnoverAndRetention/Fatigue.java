@@ -48,8 +48,8 @@ import megamek.common.equipment.MiscMounted;
 import megamek.common.equipment.MiscType;
 import megamek.common.units.Entity;
 import mekhq.campaign.Campaign;
-import mekhq.campaign.campaignOptions.CampaignOption;
 import mekhq.campaign.campaignOptions.CampaignOptions;
+import mekhq.campaign.campaignOptions.CampaignOption;
 import mekhq.campaign.digitalGM.stratCon.StratConRulesManager;
 import mekhq.campaign.digitalGM.stratCon.StratConTrackState;
 import mekhq.campaign.force.CombatTeam;
@@ -265,6 +265,10 @@ public class Fatigue {
         }
 
         int leaveThreshold = campaignOptions.get(CampaignOption.FATIGUE_UNDEPLOYMENT_THRESHOLD);
+        if (leaveThreshold == 0) { // Is disabled
+            return;
+        }
+
         List<AbstractContract> activeContracts = campaign.getActiveContracts();
 
         for (CombatTeam combatTeam : campaign.getPlayerForce().getCombatTeamsAsList(campaign)) {
