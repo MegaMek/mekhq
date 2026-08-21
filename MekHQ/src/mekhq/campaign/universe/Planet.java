@@ -539,11 +539,11 @@ public class Planet {
         }
     }
 
-    public @Nullable String getName(LocalDate when) {
-        return getSourcedName(when).getValue();
+    public @Nonnull String getName(LocalDate when) {
+        return getSourcedName(when) == null ? "?" : getSourcedName(when).getValue();
     }
 
-    public @Nonnull SourceableValue<String> getSourcedName(LocalDate when) {
+    public @Nullable SourceableValue<String> getSourcedName(LocalDate when) {
         return getEventData(when, name, e -> e.name);
     }
 
