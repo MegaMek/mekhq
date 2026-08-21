@@ -41,7 +41,7 @@ import java.util.List;
 import megamek.common.annotations.Nullable;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
-import mekhq.campaign.Campaign.AdministratorSpecialization;
+
 import mekhq.campaign.personnel.Person;
 import mekhq.gui.baseComponents.immersiveDialogs.ImmersiveDialogNag;
 
@@ -66,7 +66,7 @@ public class InsufficientMedicsNagDialog extends ImmersiveDialogNag {
      *                 settings required for constructing the dialog.
      */
     public InsufficientMedicsNagDialog(final Campaign campaign) {
-        super(campaign, null, NAG_INSUFFICIENT_MEDICS, "InsufficientMedicsNagDialog");
+        super(campaign, NAG_INSUFFICIENT_MEDICS, "InsufficientMedicsNagDialog");
     }
 
     /**
@@ -81,15 +81,13 @@ public class InsufficientMedicsNagDialog extends ImmersiveDialogNag {
      * employed to determine the speaker based on senior administrators.</p>
      *
      * @param campaign       The {@link Campaign} instance providing access to personnel and administrator data.
-     * @param specialization The {@link AdministratorSpecialization} used as a criterion for selecting the speaker.
      *
      * @return The {@link Person} designated as the speaker, prioritizing medical specialists, then senior
      *       administrators with "HR" or "COMMAND" specializations. Returns {@code null} if no suitable speaker can be
      *       found.
      */
     @Override
-    protected @Nullable Person getSpeaker(@Nullable Campaign campaign,
-          @Nullable AdministratorSpecialization specialization) {
+    protected @Nullable Person getSpeaker(@Nullable Campaign campaign) {
         if (campaign == null) {
             return null;
         }
@@ -138,15 +136,13 @@ public class InsufficientMedicsNagDialog extends ImmersiveDialogNag {
      */
     private @Nullable Person getFallbackSpeaker(Campaign campaign) {
         Person speaker = campaign.getPlayerForce().getHumanResources()
-                               .getSeniorAdminPerson(AdministratorSpecialization.HR,
-                                     campaign.getCampaignOptions(),
+                               .getSeniorAdminPerson(campaign.getCampaignOptions(),
                                      campaign.getPlayerForce().isClanForce(),
                                      campaign.getLocalDate());
 
         if (speaker == null) {
             speaker = campaign.getPlayerForce().getHumanResources()
-                            .getSeniorAdminPerson(AdministratorSpecialization.COMMAND,
-                                  campaign.getCampaignOptions(),
+                            .getSeniorAdminPerson(campaign.getCampaignOptions(),
                                   campaign.getPlayerForce().isClanForce(),
                                   campaign.getLocalDate());
         } else {

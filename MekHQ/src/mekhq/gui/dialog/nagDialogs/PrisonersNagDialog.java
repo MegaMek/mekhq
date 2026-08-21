@@ -42,14 +42,14 @@ import java.util.UUID;
 import megamek.common.annotations.Nullable;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
-import mekhq.campaign.Campaign.AdministratorSpecialization;
+
 import mekhq.campaign.force.Formation;
 import mekhq.campaign.personnel.Person;
 import mekhq.gui.baseComponents.immersiveDialogs.ImmersiveDialogNag;
 
 public class PrisonersNagDialog extends ImmersiveDialogNag {
     public PrisonersNagDialog(final Campaign campaign) {
-        super(campaign, null, NAG_PRISONERS, "PrisonersNagDialog");
+        super(campaign, NAG_PRISONERS, "PrisonersNagDialog");
     }
 
     /**
@@ -60,15 +60,13 @@ public class PrisonersNagDialog extends ImmersiveDialogNag {
      * between candidates. If no qualified force commander is found, it falls back to a default speaker mechanism.</p>
      *
      * @param campaign       The {@link Campaign} instance providing access to force and personnel data.
-     * @param specialization The {@link AdministratorSpecialization} used as an optional criterion for selecting the
-     *                       speaker (maybe {@code null}).
      *
      * @return The {@link Person} designated as the speaker, favoring commanders from "SECURITY" forces, or a fallback
      *       speaker if no suitable individual is found. Returns {@code null} only if the fallback mechanism cannot
      *       resolve a speaker.
      */
     @Override
-    protected @Nullable Person getSpeaker(Campaign campaign, @Nullable AdministratorSpecialization specialization) {
+    protected @Nullable Person getSpeaker(Campaign campaign) {
         List<Formation> formations = campaign.getPlayerForce().getAllFormations();
 
 
@@ -112,15 +110,13 @@ public class PrisonersNagDialog extends ImmersiveDialogNag {
      */
     private @Nullable Person getFallbackSpeaker(Campaign campaign) {
         Person speaker = campaign.getPlayerForce().getHumanResources()
-                               .getSeniorAdminPerson(mekhq.campaign.Campaign.AdministratorSpecialization.TRANSPORT,
-                                     campaign.getCampaignOptions(),
+                               .getSeniorAdminPerson(campaign.getCampaignOptions(),
                                      campaign.getPlayerForce().isClanForce(),
                                      campaign.getLocalDate());
 
         if (speaker == null) {
             speaker = campaign.getPlayerForce().getHumanResources()
-                            .getSeniorAdminPerson(mekhq.campaign.Campaign.AdministratorSpecialization.COMMAND,
-                                  campaign.getCampaignOptions(),
+                            .getSeniorAdminPerson(campaign.getCampaignOptions(),
                                   campaign.getPlayerForce().isClanForce(),
                                   campaign.getLocalDate());
         } else {

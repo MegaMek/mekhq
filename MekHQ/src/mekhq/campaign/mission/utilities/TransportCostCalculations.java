@@ -64,7 +64,6 @@ import mekhq.campaign.finances.enums.TransactionType;
 import mekhq.campaign.parts.Part;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.PersonnelOptions;
-import mekhq.campaign.personnel.enums.PersonnelRole;
 import mekhq.campaign.unit.CargoStatistics;
 import mekhq.campaign.unit.Unit;
 import mekhq.campaign.universe.PlanetarySystem;
@@ -467,15 +466,12 @@ public class TransportCostCalculations {
         for (Person person : activePersonnel) {
             PersonnelOptions personnelOptions = person.getOptions();
 
-            boolean isTransportAdmin = person.hasRole(PersonnelRole.ADMINISTRATOR_TRANSPORT);
-            boolean isLogisticsAdmin = person.hasRole(PersonnelRole.ADMINISTRATOR_LOGISTICS);
-            if ((isTransportAdmin || isLogisticsAdmin) &&
-                      personnelOptions.booleanOption(PersonnelOptions.ADMIN_TETRIS_MASTER)) {
+            boolean isAdministrator = person.isAdministrator();
+            if (isAdministrator && personnelOptions.booleanOption(PersonnelOptions.ADMIN_TETRIS_MASTER)) {
                 tetrisMasterMultiplier += 0.05;
             }
 
-            if (isTransportAdmin &&
-                      personnelOptions.booleanOption(PersonnelOptions.UNOFFICIAL_TRANSPORT_NEGOTIATOR)) {
+            if (isAdministrator && personnelOptions.booleanOption(PersonnelOptions.UNOFFICIAL_TRANSPORT_NEGOTIATOR)) {
                 hasTransportNegotiatorSPA = true;
             }
         }

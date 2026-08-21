@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2020-2025 The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2020-2026 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -179,7 +179,7 @@ public enum ROMDesignation {
             }
             case MEK_TECH, MECHANIC, AERO_TEK, BA_TECH, ASTECH -> ZETA.toString();
             case DOCTOR, MEDIC -> KAPPA.toString();
-            case ADMINISTRATOR_COMMAND, ADMINISTRATOR_LOGISTICS,
+            case ADMINISTRATOR, ADMINISTRATOR_COMMAND, ADMINISTRATOR_LOGISTICS,
                  ADMINISTRATOR_TRANSPORT, ADMINISTRATOR_HR -> CHI.toString();
             default -> "";
         };

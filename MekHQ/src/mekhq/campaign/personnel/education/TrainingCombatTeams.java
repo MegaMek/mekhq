@@ -870,11 +870,9 @@ public class TrainingCombatTeams {
     private static void getSkillsForProfession(PersonnelRole primaryRole, Set<String> professionSkills,
           boolean isUseArtillery, PersonnelRole secondaryRole, boolean isUseAdvancedScouting) {
         if (primaryRole.isCombat()) {
-            professionSkills.addAll(primaryRole.getSkillsForProfession(false, false, false,
-                  isUseArtillery, true));
+            professionSkills.addAll(primaryRole.getSkillsForProfession(false, false, false, isUseArtillery, true));
         } else if (secondaryRole.isCombat()) { // Primary overrides secondary, so no double-dipping
-            professionSkills.addAll(secondaryRole.getSkillsForProfession(false, false, false,
-                  isUseArtillery, true));
+            professionSkills.addAll(secondaryRole.getSkillsForProfession(false, false, false, isUseArtillery, true));
         } else {
             // support professions cannot teach skills through training forces
             return;

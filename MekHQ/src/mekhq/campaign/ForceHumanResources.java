@@ -69,7 +69,6 @@ import megamek.common.units.Infantry;
 import megamek.logging.MMLogger;
 import mekhq.MHQConstants;
 import mekhq.MekHQ;
-import mekhq.campaign.Campaign.AdministratorSpecialization;
 import mekhq.campaign.campaignOptions.AcquisitionsType;
 import mekhq.campaign.campaignOptions.CampaignOption;
 import mekhq.campaign.campaignOptions.CampaignOptions;
@@ -1220,28 +1219,18 @@ public class ForceHumanResources {
      * Returns the highest-ranking administrator of the given specialization from {@code people}.
      *
      * @param people          the collection of people to search
-     * @param type            the administrator specialization to match
      * @param campaignOptions the campaign options
      * @param isClanCampaign  whether this is a Clan campaign
      * @param today           the current in-game date
      *
      * @return the senior administrator, or {@code null} if none found
      */
-    public static @Nullable Person getSeniorAdminPerson(Collection<Person> people,
-          AdministratorSpecialization type, CampaignOptions campaignOptions,
+    public static @Nullable Person getSeniorAdminPerson(Collection<Person> people, CampaignOptions campaignOptions,
           boolean isClanCampaign, LocalDate today) {
         Person seniorAdmin = null;
 
         for (Person person : people) {
-            boolean isEligible = switch (type) {
-                case COMMAND -> person.getPrimaryRole().isAdministratorCommand() ||
-                                      person.getSecondaryRole().isAdministratorCommand();
-                case LOGISTICS -> person.getPrimaryRole().isAdministratorLogistics() ||
-                                        person.getSecondaryRole().isAdministratorLogistics();
-                case TRANSPORT -> person.getPrimaryRole().isAdministratorTransport() ||
-                                        person.getSecondaryRole().isAdministratorTransport();
-                case HR -> person.getPrimaryRole().isAdministratorHR() || person.getSecondaryRole().isAdministratorHR();
-            };
+            boolean isEligible = person.isAdministrator();
 
             if (isEligible) {
                 if (seniorAdmin == null) {
@@ -1257,9 +1246,9 @@ public class ForceHumanResources {
         return seniorAdmin;
     }
 
-    public @Nullable Person getSeniorAdminPerson(AdministratorSpecialization type,
-          CampaignOptions campaignOptions, boolean isClanCampaign, LocalDate today) {
-        return getSeniorAdminPerson(getAdmins(), type, campaignOptions, isClanCampaign, today);
+    public @Nullable Person getSeniorAdminPerson(CampaignOptions campaignOptions, boolean isClanCampaign,
+          LocalDate today) {
+        return getSeniorAdminPerson(getAdmins(), campaignOptions, isClanCampaign, today);
     }
 
     /**

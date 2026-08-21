@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2025 The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2025-2026 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -47,7 +47,7 @@ import mekhq.campaign.personnel.Person;
  *   <li><b>ALL</b>: Any personnel, regardless of their role, can make procurement checks.</li>
  *   <li><b>SUPPORT</b>: Only personnel with non-combat support roles (e.g., Admin, Techs) can make
  *       procurement checks.</li>
- *   <li><b>LOGISTICS</b>: Only personnel with the Admin/Logistics role are allowed to make
+ *   <li><b>LOGISTICS</b>: Only personnel with the Admin role are allowed to make
  *       procurement checks.</li>
  * </ul>
  */
@@ -135,8 +135,7 @@ public enum ProcurementPersonnelPick {
                 }
             }
             case LOGISTICS -> {
-                if (!person.getPrimaryRole().isAdministratorLogistics() &&
-                          !person.getSecondaryRole().isAdministratorLogistics()) {
+                if (!person.isAdministrator()) {
                     return true;
                 }
             }

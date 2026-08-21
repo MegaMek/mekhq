@@ -120,7 +120,7 @@ public class PersonUtility {
      * is needed to ensure ineligible characters aren't given Veterancy awards (or worse, eligible characters
      * <b>not</b> being given them).</p>
      *
-     * @param isAdminsHaveNegotiation    if {@code true}, administrators are assigned the Negotiation skill.
+     * @param isAdminsHaveNegotiation    if {@code true}, administrators are given the Negotiation skill.
      * @param isDoctorsUseAdministration if {@code true}, doctors are given the Administration skill.
      * @param isTechsUseAdministration   if {@code true}, technicians are given the Administration skill.
      * @param isUseArtillery             if {@code true}, roles that can use it are assigned Artillery skills.
@@ -148,7 +148,8 @@ public class PersonUtility {
      *
      * <p>This method acts as a convenience wrapper that extracts the relevant skill and randomization preferences
      * from the provided {@link Campaign} before delegating to the internal
-     * {@link #overrideSkills(boolean, boolean, boolean, boolean, boolean, Person, PersonnelRole, SkillLevel)} overload.
+     * {@link #overrideSkills(boolean, boolean, boolean, boolean, boolean, Person, PersonnelRole, SkillLevel)}
+     * overload.
      * After skills are assigned, the person's eligibility for the Veterancy Award (SPA) is evaluated and updated via
      * {@link #setVeterancyAwardEligibility(Campaign, Person)}.</p>
      *
@@ -174,8 +175,14 @@ public class PersonUtility {
         RandomSkillPreferences randomSkillPreferences = campaign.getRandomSkillPreferences();
         boolean isUseExtraRandom = randomSkillPreferences.randomizeSkill();
 
-        overrideSkills(isAdminsHaveNegotiation, isDoctorsUseAdministration, isTechsUseAdministration, isUseArtillery,
-              isUseExtraRandom, person, personnelRole, skillLevel);
+        overrideSkills(isAdminsHaveNegotiation,
+              isDoctorsUseAdministration,
+              isTechsUseAdministration,
+              isUseArtillery,
+              isUseExtraRandom,
+              person,
+              personnelRole,
+              skillLevel);
 
         // Per-character starting reputation only matters under personnel tracking; campaign-level tracking uses a
         // single stored value, so there is nothing to seed per character.

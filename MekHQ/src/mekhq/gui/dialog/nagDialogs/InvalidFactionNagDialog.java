@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2021-2025 The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2021-2026 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -64,7 +64,7 @@ public class InvalidFactionNagDialog extends ImmersiveDialogNag {
      *                 settings required for constructing the dialog.
      */
     public InvalidFactionNagDialog(final Campaign campaign) {
-        super(campaign, null, NAG_INVALID_FACTION, "InvalidFactionNagDialog");
+        super(campaign, NAG_INVALID_FACTION, "InvalidFactionNagDialog");
     }
 
     /**

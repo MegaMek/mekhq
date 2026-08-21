@@ -273,8 +273,7 @@ public class FactionAccoladeEvent {
             return null;
         } else if (accoladeLevel.is(APPEARING_IN_SEARCHES)) {
             speaker = campaign.getPlayerForce().getHumanResources()
-                            .getSeniorAdminPerson(Campaign.AdministratorSpecialization.COMMAND,
-                                  campaign.getCampaignOptions(),
+                            .getSeniorAdminPerson(campaign.getCampaignOptions(),
                                   campaign.getPlayerForce().isClanForce(),
                                   campaign.getLocalDate());
         } else {

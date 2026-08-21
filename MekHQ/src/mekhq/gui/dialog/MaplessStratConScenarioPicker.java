@@ -64,8 +64,7 @@ public class MaplessStratConScenarioPicker extends ImmersiveDialogCore {
     public MaplessStratConScenarioPicker(Campaign campaign, List<Scenario> scenarios) {
         super(campaign,
               campaign.getPlayerForce().getHumanResources()
-                    .getSeniorAdminPerson(mekhq.campaign.Campaign.AdministratorSpecialization.COMMAND,
-                          campaign.getCampaignOptions(),
+                    .getSeniorAdminPerson(campaign.getCampaignOptions(),
                           campaign.getPlayerForce().isClanForce(),
                           campaign.getLocalDate()),
               null,

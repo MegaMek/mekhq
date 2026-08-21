@@ -65,7 +65,6 @@ import javax.swing.ScrollPaneConstants;
 
 import megamek.client.ui.util.UIUtil;
 import mekhq.campaign.Campaign;
-import mekhq.campaign.Campaign.AdministratorSpecialization;
 import mekhq.campaign.mission.contract.AbstractContract;
 import mekhq.campaign.mission.contract.contractData.ContractMoraleLevel;
 import mekhq.campaign.mission.resupplyAndCaches.Resupply;
@@ -123,8 +122,7 @@ public class DialogItinerary {
 
         if (resupplyType.equals(RESUPPLY_LOOT) || resupplyType.equals(RESUPPLY_CONTRACT_END)) {
             speaker = campaign.getPlayerForce().getHumanResources()
-                            .getSeniorAdminPerson(AdministratorSpecialization.LOGISTICS,
-                                  campaign.getCampaignOptions(),
+                            .getSeniorAdminPerson(campaign.getCampaignOptions(),
                                   campaign.getPlayerForce().isClanForce(),
                                   campaign.getLocalDate());
 

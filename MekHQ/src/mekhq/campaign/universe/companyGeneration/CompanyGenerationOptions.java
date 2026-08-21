@@ -178,14 +178,11 @@ public class CompanyGenerationOptions {
             supportPersonnel.put(PersonnelRole.MECHANIC, 5);
             supportPersonnel.put(PersonnelRole.AERO_TEK, 1);
             supportPersonnel.put(PersonnelRole.DOCTOR, 1);
-            supportPersonnel.put(PersonnelRole.ADMINISTRATOR_COMMAND, 1);
-            supportPersonnel.put(PersonnelRole.ADMINISTRATOR_LOGISTICS, 5);
-            supportPersonnel.put(PersonnelRole.ADMINISTRATOR_TRANSPORT, 1);
-            supportPersonnel.put(PersonnelRole.ADMINISTRATOR_HR, 8);
+            supportPersonnel.put(PersonnelRole.ADMINISTRATOR, 8);
         } else { // Defaults to AtB
             supportPersonnel.put(PersonnelRole.MEK_TECH, 10);
             supportPersonnel.put(PersonnelRole.DOCTOR, 1);
-            supportPersonnel.put(PersonnelRole.ADMINISTRATOR_LOGISTICS, 1);
+            supportPersonnel.put(PersonnelRole.ADMINISTRATOR, 1);
         }
         setSupportPersonnel(supportPersonnel);
         setPoolAssistants(true);

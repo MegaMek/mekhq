@@ -59,6 +59,7 @@ import mekhq.campaign.Campaign;
 import mekhq.campaign.enums.DragoonRating;
 import mekhq.campaign.finances.Money;
 import mekhq.campaign.personnel.Person;
+import mekhq.campaign.personnel.enums.PersonnelRole;
 import mekhq.campaign.personnel.skills.Skill;
 import mekhq.campaign.personnel.skills.SkillModifierData;
 import mekhq.campaign.personnel.skills.SkillType;
@@ -356,8 +357,8 @@ public class AtBConfiguration {
 
         TargetRoll target = new TargetRoll(baseShipSearchTarget, "Base");
         Person logisticsAdmin = campaign.getPlayerForce().getHumanResources()
-                                      .findBestInRole(mekhq.campaign.personnel.enums.PersonnelRole.ADMINISTRATOR_LOGISTICS,
-                                            mekhq.campaign.personnel.skills.SkillType.S_ADMIN,
+                                      .findBestInRole(PersonnelRole.ADMINISTRATOR,
+                                            SkillType.S_ADMIN,
                                             campaign.getCampaignOptions(),
                                             campaign.getPlayerForce().isClanForce(),
                                             campaign.getLocalDate());

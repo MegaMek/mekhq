@@ -32,7 +32,7 @@
  */
 package mekhq.gui.baseComponents.immersiveDialogs;
 
-import static mekhq.campaign.Campaign.AdministratorSpecialization.COMMAND;
+
 import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
 
 import java.util.ArrayList;
@@ -41,7 +41,7 @@ import java.util.List;
 import megamek.common.annotations.Nullable;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
-import mekhq.campaign.Campaign.AdministratorSpecialization;
+
 import mekhq.campaign.personnel.Person;
 import mekhq.gui.baseComponents.immersiveDialogs.ImmersiveDialogCore.ButtonLabelTooltipPair;
 import mekhq.gui.dialog.RandomDeathAnnouncement;
@@ -120,17 +120,13 @@ public class ImmersiveDialogNag {
      *
      * @param campaign       The {@link Campaign} instance associated with this nag dialog. Used to fetch relevant
      *                       campaign data and update settings.
-     * @param specialization The {@link AdministratorSpecialization} specifying the desired type of administrator to act
-     *                       as the speaker. If {@code null}, the fallback speaker with the {@code "COMMAND"}
-     *                       specialization will be used.
      * @param nagConstant    A {@code String} identifying the nag constant associated with the dialog. Used to manage
      *                       whether future dialogs with this constant should be suppressed.
      * @param messageKey     A {@code String} key to retrieve localized text for the in-character and out-of-character
      *                       messages from the resource bundle.
      */
-    public ImmersiveDialogNag(final Campaign campaign, final @Nullable AdministratorSpecialization specialization,
-          final String nagConstant, final String messageKey) {
-        ImmersiveDialogCore dialog = constructDialog(campaign, specialization, messageKey);
+    public ImmersiveDialogNag(final Campaign campaign, final String nagConstant, final String messageKey) {
+        ImmersiveDialogCore dialog = constructDialog(campaign, messageKey);
         processDialogChoice(dialog.getDialogChoice(), nagConstant);
     }
 
@@ -142,18 +138,15 @@ public class ImmersiveDialogNag {
      *
      * @param campaign       The {@link Campaign} instance to associate with the dialog. Used to fetch relevant campaign
      *                       data, such as the commander's address.
-     * @param specialization The {@link AdministratorSpecialization} specifying the desired administrator to act as the
-     *                       speaker.
      * @param messageKey     A {@code String} key used to retrieve localized text for the dialog's in-character and
      *                       out-of-character messages.
      *
      * @return The constructed {@link ImmersiveDialogSimple} instance containing the specified speaker, messages, and
      *       button labels.
      */
-    protected ImmersiveDialogCore constructDialog(Campaign campaign, AdministratorSpecialization specialization,
-          String messageKey) {
+    protected ImmersiveDialogCore constructDialog(Campaign campaign, String messageKey) {
         return new ImmersiveDialogCore(campaign,
-              getSpeaker(campaign, specialization),
+              getSpeaker(campaign),
               null,
               getInCharacterMessage(campaign, messageKey, campaign.getCommanderAddress()),
               createButtons(),
@@ -265,37 +258,15 @@ public class ImmersiveDialogNag {
      * specialization, it also falls back to the {@code "COMMAND"} specialization.</p>
      *
      * @param campaign       The campaign context.
-     * @param specialization The {@link AdministratorSpecialization} specifying the required type of administrator. Can
-     *                       be {@code null}, in which case the fallback to the {@code "COMMAND"} specialization is
-     *                       applied directly.
      *
      * @return The {@link Person} assigned as the speaker. This will either be the person matching the given
      *       specialization or, if unavailable, the one assigned to the {@code "COMMAND"} specialization.
      */
-    protected @Nullable Person getSpeaker(Campaign campaign, @Nullable AdministratorSpecialization specialization) {
-        if (specialization == null) {
-            return campaign.getPlayerForce().getHumanResources()
-                         .getSeniorAdminPerson(COMMAND,
-                               campaign.getCampaignOptions(),
-                               campaign.getPlayerForce().isClanForce(),
-                               campaign.getLocalDate());
-        }
-
-        Person speaker = campaign.getPlayerForce().getHumanResources()
-                               .getSeniorAdminPerson(specialization,
-                                     campaign.getCampaignOptions(),
-                                     campaign.getPlayerForce().isClanForce(),
-                                     campaign.getLocalDate());
-
-        if (speaker == null && specialization != COMMAND) {
-            speaker = campaign.getPlayerForce().getHumanResources()
-                            .getSeniorAdminPerson(mekhq.campaign.Campaign.AdministratorSpecialization.COMMAND,
-                                  campaign.getCampaignOptions(),
-                                  campaign.getPlayerForce().isClanForce(),
-                                  campaign.getLocalDate());
-        }
-
-        return speaker;
+    protected @Nullable Person getSpeaker(Campaign campaign) {
+        return campaign.getPlayerForce().getHumanResources()
+                     .getSeniorAdminPerson(campaign.getCampaignOptions(),
+                           campaign.getPlayerForce().isClanForce(),
+                           campaign.getLocalDate());
     }
 
     /**

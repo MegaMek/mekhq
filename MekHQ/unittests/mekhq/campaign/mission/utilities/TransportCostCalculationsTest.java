@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2025 The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2025-2026 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -70,6 +70,7 @@ import mekhq.campaign.finances.Money;
 import mekhq.campaign.finances.enums.TransactionType;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.PersonnelOptions;
+import mekhq.campaign.personnel.enums.PersonnelRole;
 import mekhq.campaign.personnel.enums.PersonnelStatus;
 import mekhq.campaign.unit.CargoStatistics;
 import mekhq.campaign.unit.Unit;
@@ -1442,6 +1443,8 @@ public class TransportCostCalculationsTest {
     public void testCalculateAdditionalBayRequirementsFromPassengers(int passengerCount) {
         Person person = new Person(UUID.randomUUID());
         person.setStatus(PersonnelStatus.ACTIVE);
+        person.setPrimaryRoleDirect(PersonnelRole.NONE);
+        person.setSecondaryRoleDirect(PersonnelRole.NONE);
         person.setOptions(new PersonnelOptions());
         Collection<Person> passengers = new ArrayList<>();
         for (int i = 0; i < passengerCount; i++) {

@@ -176,6 +176,7 @@ public class CampaignOptions {
         setRoleBaseSalary(PersonnelRole.ASTECH, 400);
         setRoleBaseSalary(PersonnelRole.DOCTOR, 1500);
         setRoleBaseSalary(PersonnelRole.MEDIC, 400);
+        setRoleBaseSalary(PersonnelRole.ADMINISTRATOR, 500);
         setRoleBaseSalary(PersonnelRole.ADMINISTRATOR_COMMAND, 500);
         setRoleBaseSalary(PersonnelRole.ADMINISTRATOR_LOGISTICS, 500);
         setRoleBaseSalary(PersonnelRole.ADMINISTRATOR_TRANSPORT, 500);

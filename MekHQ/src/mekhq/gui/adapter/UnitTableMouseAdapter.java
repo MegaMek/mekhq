@@ -344,8 +344,7 @@ public class UnitTableMouseAdapter extends JPopupMenuAdapter {
             Campaign campaign = gui.getCampaign();
             String commanderAddress = campaign.getCommanderAddress();
             Person logisticsAdmin = campaign.getPlayerForce().getHumanResources()
-                                          .getSeniorAdminPerson(Campaign.AdministratorSpecialization.LOGISTICS,
-                                                campaign.getCampaignOptions(),
+                                          .getSeniorAdminPerson(campaign.getCampaignOptions(),
                                                 campaign.getPlayerForce().isClanForce(),
                                                 campaign.getLocalDate());
 
