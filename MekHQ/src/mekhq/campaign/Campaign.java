@@ -6172,4 +6172,12 @@ public class Campaign implements ITechManager {
         return false;
     }
 
+    /**
+     * Returns the HPG network supplied by this campaign's systems data for the current campaign date.
+     *
+     * @return the campaign's current dated HPG links
+     */
+    public Collection<HPGLink> getHPGNetwork() {
+        return systemsInstance.getHPGNetwork(currentDay);
+    }
 }
