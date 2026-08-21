@@ -400,22 +400,22 @@ class PlanetProfileTest {
      */
     private static Planet emptyPlanet() {
         Planet planet = mock(Planet.class);
-        when(planet.getTemperature(DATE)).thenReturn(null);
+        when(planet.getTemperature(DATE)).thenReturn(Planet.UNINHABITABLE_TEMPERATURE_CELSIUS);
         when(planet.getGravity()).thenReturn(null);
-        when(planet.getPopulation(DATE)).thenReturn(null);
-        when(planet.getHPG(DATE)).thenReturn(null);
+        when(planet.getPopulation(DATE)).thenReturn(0L);
+        when(planet.getHPG(DATE)).thenReturn(HPGRating.X);
         return planet;
     }
 
     @Test
-    void from_planetRecordingNothing_usesEveryNeutralFallback() {
+    void from_planetRecordingNothing_usesEveryFallback() {
         // Most planets in play record only a handful of these fields, so the fallbacks below are the values improved
         // sector generation actually runs on.
         PlanetProfile resolved = PlanetProfile.from(emptyPlanet(), DATE);
 
-        assertEquals(NEUTRAL_TEMPERATURE_CELSIUS,
+        assertEquals(Planet.UNINHABITABLE_TEMPERATURE_CELSIUS,
               resolved.temperatureCelsius(),
-              "an unrecorded temperature should fall back to the neutral room temperature");
+              "an unrecorded temperature should fall back to the uninhabitable barren-rock default");
         assertEquals(NEUTRAL_WATER_PERCENT,
               resolved.waterPercent(),
               "unrecorded surface water should fall back to the neutral 50%");

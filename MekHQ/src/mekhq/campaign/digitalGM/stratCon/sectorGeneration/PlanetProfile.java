@@ -225,9 +225,7 @@ public record PlanetProfile(int temperatureCelsius, double diameterKm, int water
      * @return a resolved {@link PlanetProfile}
      */
     public static PlanetProfile from(Planet planet, LocalDate date) {
-        Integer temperature = planet.getTemperature(date);
-        int resolvedTemperature = (temperature != null) ? temperature : NEUTRAL_TEMPERATURE_CELSIUS;
-
+        int temperature = planet.getTemperature(date);
         double diameter = planet.getDiameter();
 
         int resolvedWater = NEUTRAL_WATER_PERCENT;
@@ -265,7 +263,7 @@ public record PlanetProfile(int temperatureCelsius, double diameterKm, int water
         Long population = planet.getPopulation(date);
         HPGRating hpg = planet.getHPG(date);
 
-        return new PlanetProfile(resolvedTemperature,
+        return new PlanetProfile(temperature,
               diameter,
               resolvedWater,
               airless,
@@ -274,7 +272,7 @@ public record PlanetProfile(int temperatureCelsius, double diameterKm, int water
               resolvedLandmassCount,
               resolvedGravity,
               population,
-              (hpg != null) ? hpg : HPGRating.X);
+              hpg);
     }
 
     /**
