@@ -59,8 +59,8 @@ import megamek.common.weapons.handlers.WeaponOrderHandler;
 import megamek.logging.MMLogger;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.force.Formation;
-import mekhq.campaign.mission.BotForce;
-import mekhq.campaign.mission.Scenario;
+import mekhq.campaign.mission.scenarios.BotForce;
+import mekhq.campaign.mission.scenarios.Scenario;
 import mekhq.campaign.unit.Unit;
 import mekhq.utilities.ScenarioUtils;
 

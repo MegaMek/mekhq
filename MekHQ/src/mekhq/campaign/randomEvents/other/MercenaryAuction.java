@@ -36,8 +36,8 @@ import static java.lang.Math.max;
 import static megamek.common.compute.Compute.d6;
 import static megamek.common.compute.Compute.randomInt;
 import static megamek.common.enums.SkillLevel.REGULAR;
-import static mekhq.campaign.mission.AtBDynamicScenarioFactory.getEntity;
-import static mekhq.campaign.mission.BotForceRandomizer.UNIT_WEIGHT_UNSPECIFIED;
+import static mekhq.campaign.mission.scenarios.AtBDynamicScenarioFactory.getEntity;
+import static mekhq.campaign.mission.scenarios.BotForceRandomizer.UNIT_WEIGHT_UNSPECIFIED;
 import static mekhq.campaign.unit.Unit.getRandomUnitQuality;
 import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
 

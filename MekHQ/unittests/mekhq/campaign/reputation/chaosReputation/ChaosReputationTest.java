@@ -66,8 +66,8 @@ import mekhq.campaign.enums.DailyReportType;
 import mekhq.campaign.finances.Finances;
 import mekhq.campaign.finances.Loan;
 import mekhq.campaign.force.PlayerForce;
-import mekhq.campaign.mission.Mission;
-import mekhq.campaign.mission.enums.MissionStatus;
+import mekhq.campaign.mission.contract.AbstractContract;
+import mekhq.campaign.mission.contract.contractData.MissionStatus;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.PersonnelOptions;
 import mekhq.campaign.personnel.enums.PersonnelRole;
@@ -540,19 +540,19 @@ class ChaosReputationTest {
     // endregion processContractCompletion
 
     // region tabulateReputationFromContracts
-    private static Mission mission(MissionStatus status, LocalDate endingDate) {
-        Mission mission = mock(Mission.class);
+    private static AbstractContract mission(MissionStatus status, LocalDate endingDate) {
+        AbstractContract mission = mock(AbstractContract.class);
         when(mission.getStatus()).thenReturn(status);
         when(mission.getEndingDate()).thenReturn(endingDate);
         return mission;
     }
 
-    private static Campaign tabulationCampaign(boolean noPartialReputation, List<Mission> missions) {
+    private static Campaign tabulationCampaign(boolean noPartialReputation, List<AbstractContract> missions) {
         Campaign campaign = mock(Campaign.class);
         CampaignOptions options = mock(CampaignOptions.class);
         when(campaign.getCampaignOptions()).thenReturn(options);
         when(options.get(CampaignOption.CHAOS_NO_PARTIAL_SUCCESS_REPUTATION)).thenReturn(noPartialReputation);
-        when(campaign.getCompletedMissions()).thenReturn(missions);
+        when(campaign.getCompletedContracts()).thenReturn(missions);
         return campaign;
     }
 
@@ -593,8 +593,8 @@ class ChaosReputationTest {
 
     @Test
     void tabulate_ignoresContractsEndingBeforeTheWindow() {
-        Mission early = mission(MissionStatus.SUCCESS, LocalDate.of(3150, 1, 1));
-        Mission late = mission(MissionStatus.SUCCESS, LocalDate.of(3151, 6, 1));
+        AbstractContract early = mission(MissionStatus.SUCCESS, LocalDate.of(3150, 1, 1));
+        AbstractContract late = mission(MissionStatus.SUCCESS, LocalDate.of(3151, 6, 1));
         Campaign campaign = tabulationCampaign(false, List.of(early, late));
 
         // Window starts after the early contract, so only the late success counts: 1 + 1 = 2.
@@ -614,7 +614,7 @@ class ChaosReputationTest {
     void tabulate_processesContractsChronologicallyByEndingDate() {
         // Supplied breach-first, but the breach ends last. Chronologically: eight successes (1 -> 9), then the breach
         // loses max(round(9 * 0.5), 3) = 5 -> 4. In list order it would instead be 6, so the result proves the sort.
-        List<Mission> missions = new ArrayList<>();
+        List<AbstractContract> missions = new ArrayList<>();
         missions.add(mission(MissionStatus.BREACH, LocalDate.of(3151, 12, 1)));
         for (int month = 1; month <= 8; month++) {
             missions.add(mission(MissionStatus.SUCCESS, LocalDate.of(3151, month, 1)));

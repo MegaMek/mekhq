@@ -70,8 +70,8 @@ import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.digitalGM.stratCon.StratConCampaignState;
 import mekhq.campaign.events.persons.PersonChangedEvent;
 import mekhq.campaign.force.Formation;
-import mekhq.campaign.mission.AtBContract;
-import mekhq.campaign.mission.enums.ContractMoraleLevel;
+import mekhq.campaign.mission.contract.AbstractContract;
+import mekhq.campaign.mission.contract.contractData.ContractMoraleLevel;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.enums.PersonnelRole;
 import mekhq.campaign.personnel.enums.PersonnelStatus;
@@ -990,9 +990,9 @@ public class RandomEventEffectsManager {
 
         final int magnitude = result.magnitude();
 
-        Map<AtBContract, StratConCampaignState> potentialTargets = new HashMap<>();
+        Map<AbstractContract, StratConCampaignState> potentialTargets = new HashMap<>();
 
-        for (AtBContract contract : campaign.getActiveAtBContracts()) {
+        for (AbstractContract contract : campaign.getActiveContracts()) {
             StratConCampaignState campaignState = contract.getStratConCampaignState();
 
             if (campaignState != null) {
@@ -1004,7 +1004,7 @@ public class RandomEventEffectsManager {
             return "";
         }
 
-        AtBContract target = getRandomItem(potentialTargets.keySet());
+        AbstractContract target = getRandomItem(potentialTargets.keySet());
 
         StratConCampaignState targetState = potentialTargets.get(target);
         targetState.changeSupportPoints(magnitude);
@@ -1070,9 +1070,9 @@ public class RandomEventEffectsManager {
      *       qualifies for the effect.
      */
     private String eventEffectUniqueBartering() {
-        List<AtBContract> potentialTargets = new ArrayList<>();
+        List<AbstractContract> potentialTargets = new ArrayList<>();
 
-        for (AtBContract contract : campaign.getActiveAtBContracts()) {
+        for (AbstractContract contract : campaign.getActiveContracts()) {
             ContractMoraleLevel currentMorale = contract.getMoraleLevel();
 
             if (!currentMorale.isOverwhelming()) {
@@ -1084,10 +1084,10 @@ public class RandomEventEffectsManager {
             return "";
         }
 
-        AtBContract target = getRandomItem(potentialTargets);
+        AbstractContract target = getRandomItem(potentialTargets);
 
         int moraleOrdinal = target.getMoraleLevel().ordinal();
-        target.setMoraleLevel(ContractMoraleLevel.values()[moraleOrdinal + 1]);
+        target.changeMorale(ContractMoraleLevel.values()[moraleOrdinal + 1]);
 
         String colorOpen = spanOpeningWithCustomColor(ReportingUtilities.getNegativeColor());
 
@@ -1129,13 +1129,13 @@ public class RandomEventEffectsManager {
      */
     private String eventEffectUniqueUndercover(RandomEventResult result) {
         Person targetCharacter = getRandomTarget(result.affectedPersonnelTypes());
-        List<AtBContract> potentialContracts = campaign.getActiveAtBContracts();
+        List<AbstractContract> potentialContracts = campaign.getActiveContracts();
 
         if (targetCharacter == null || potentialContracts.isEmpty()) {
             return "";
         }
 
-        AtBContract targetContract = getRandomItem(potentialContracts);
+        AbstractContract targetContract = getRandomItem(potentialContracts);
 
         Faction newFaction = targetContract.getEmployerFaction();
         targetCharacter.setOriginFaction(newFaction);
@@ -1246,9 +1246,9 @@ public class RandomEventEffectsManager {
 
         int prisonerCount = d6();
 
-        List<AtBContract> potentialTargets = campaign.getActiveAtBContracts();
-        AtBContract targetContract = getRandomItem(potentialTargets);
-        Faction targetFaction = targetContract.getEnemy();
+        List<AbstractContract> potentialTargets = campaign.getActiveContracts();
+        AbstractContract targetContract = getRandomItem(potentialTargets);
+        Faction targetFaction = targetContract.getEnemyFaction();
 
         RandomOriginOptions originOptions = campaign.getCampaignOptions().get(CampaignOption.RANDOM_ORIGIN_OPTIONS);
 
@@ -1259,7 +1259,7 @@ public class RandomEventEffectsManager {
         for (int i = 0; i < prisonerCount; i++) {
             final AbstractFactionSelector factionSelector = new DefaultFactionSelector(originOptions, targetFaction);
             final AbstractPlanetSelector planetSelector = new DefaultPlanetSelector(originOptions,
-                  targetContract.getSystem().getPrimaryPlanet());
+                  targetContract.getTargetPlanet());
             Person newPerson = campaign.getPlayerForce().getHumanResources()
                                      .newPerson(campaign,
                                            PersonnelRole.MEKWARRIOR,

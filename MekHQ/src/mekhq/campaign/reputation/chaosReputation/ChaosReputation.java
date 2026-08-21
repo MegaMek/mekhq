@@ -75,9 +75,9 @@ import mekhq.campaign.finances.Loan;
 import mekhq.campaign.finances.Money;
 import mekhq.campaign.finances.enums.TransactionType;
 import mekhq.campaign.force.PlayerForce;
-import mekhq.campaign.mission.AbstractMissionTransition;
-import mekhq.campaign.mission.Scenario;
-import mekhq.campaign.mission.enums.MissionStatus;
+import mekhq.campaign.mission.contract.AbstractContract;
+import mekhq.campaign.mission.contract.contractData.MissionStatus;
+import mekhq.campaign.mission.scenarios.Scenario;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.PersonnelOptions;
 import mekhq.campaign.personnel.enums.PersonnelRole;
@@ -118,10 +118,10 @@ public class ChaosReputation {
     /**
      * Recalculates and stores the force's Chaos Reputation according to the active tracking mode.
      *
-     * <p>When {@link CampaignOption#CAMPAIGN_LEVEL_CHAOS_REPUTATION} is enabled this is a no-op: the campaign-wide value
-     * is a pure base that only changes through events, and the debt, manual, and commander modifiers are applied live
-     * when it is displayed (see {@link #getEffectiveCampaignLevelReputation}). Otherwise the value is re-derived from
-     * the force's personnel, applying the configured debt-stacking, manual-modifier, and cap options.</p>
+     * <p>When {@link CampaignOption#CAMPAIGN_LEVEL_CHAOS_REPUTATION} is enabled this is a no-op: the campaign-wide
+     * value is a pure base that only changes through events, and the debt, manual, and commander modifiers are applied
+     * live when it is displayed (see {@link #getEffectiveCampaignLevelReputation}). Otherwise the value is re-derived
+     * from the force's personnel, applying the configured debt-stacking, manual-modifier, and cap options.</p>
      *
      * @param campaignOptions the campaign options driving the calculation
      * @param playerForce     the force whose reputation is recalculated and stored
@@ -342,11 +342,11 @@ public class ChaosReputation {
         boolean noPartialSuccessReputation =
               campaign.getCampaignOptions().get(CampaignOption.CHAOS_NO_PARTIAL_SUCCESS_REPUTATION);
 
-        List<AbstractMissionTransition> completedMissions = new ArrayList<>(campaign.getCompletedMissions());
-        completedMissions.sort(Comparator.comparing(AbstractMissionTransition::getEndingDate,
+        List<AbstractContract> completedMissions = new ArrayList<>(campaign.getCompletedContracts());
+        completedMissions.sort(Comparator.comparing(AbstractContract::getEndingDate,
               Comparator.nullsFirst(Comparator.naturalOrder())));
 
-        for (AbstractMissionTransition mission : completedMissions) {
+        for (AbstractContract mission : completedMissions) {
             if (!isWithinWindow(mission.getEndingDate(), windowStart, windowEnd)) {
                 continue;
             }

@@ -45,8 +45,8 @@ import javax.swing.SwingConstants;
 import jakarta.annotation.Nonnull;
 import jakarta.annotation.Nullable;
 import megamek.client.ui.util.UIUtil;
-import mekhq.campaign.mission.AtBContract;
-import mekhq.campaign.mission.enums.ContractMoraleLevel;
+import mekhq.campaign.mission.contract.AbstractContract;
+import mekhq.campaign.mission.contract.contractData.ContractMoraleLevel;
 import mekhq.gui.baseComponents.SegmentedBar;
 
 /**
@@ -139,7 +139,7 @@ public class MoraleBar extends JPanel {
      *
      * @return a transparent panel containing the configured morale bar
      */
-    public static @Nonnull JPanel createDialogPanel(@Nonnull final AtBContract contract) {
+    public static @Nonnull JPanel createDialogPanel(@Nonnull final AbstractContract contract) {
         final JPanel panel = new JPanel(new BorderLayout());
         panel.setOpaque(false);
         final int horizontalPadding = UIUtil.scaleForGUI(40);
@@ -172,9 +172,9 @@ public class MoraleBar extends JPanel {
      *
      * @return the label and tooltip to display
      */
-    public static @Nonnull MoraleDisplay getMoraleDisplay(@Nonnull final AtBContract contract) {
+    public static @Nonnull MoraleDisplay getMoraleDisplay(@Nonnull final AbstractContract contract) {
         final ContractMoraleLevel level = contract.getMoraleLevel();
-        if ((contract.getContractType().isGarrisonDuty() || contract.getContractType().isRetainer()) &&
+        if ((contract.getObjectiveType().isGarrisonDuty() || contract.getObjectiveType().isRetainer()) &&
                   level.isRouted()) {
             return new MoraleDisplay(getTextAt(RESOURCE_BUNDLE, "txtGarrisonMoraleRouted.text"),
                   getTextAt(RESOURCE_BUNDLE, "txtGarrisonMoraleRouted.tooltip"));

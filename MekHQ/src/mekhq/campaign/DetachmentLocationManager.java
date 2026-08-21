@@ -33,13 +33,14 @@
 
 package mekhq.campaign;
 
-import static mekhq.campaign.market.contractMarket.ContractAutomation.performAutomatedActivation;
+import static mekhq.campaign.mission.contract.utilities.ContractAutomation.performAutomatedActivation;
 
 import java.io.PrintWriter;
 import java.util.ArrayList;
 
 import jakarta.annotation.Nonnull;
 import mekhq.MekHQ;
+import mekhq.campaign.campaignOptions.CampaignOption;
 import mekhq.campaign.events.LocationChangedEvent;
 import mekhq.campaign.force.Detachment;
 import mekhq.campaign.location.ILocation;
@@ -47,7 +48,6 @@ import mekhq.campaign.location.LocationDispatch;
 import mekhq.campaign.location.LocationNode;
 import mekhq.campaign.personnel.medical.advancedMedicalAlternate.Inoculations;
 import mekhq.campaign.universe.PlanetarySystem;
-import mekhq.campaign.campaignOptions.CampaignOption;
 
 /**
  * Manages a {@link Detachment}'s position in the {@link LocationNode} tree.
@@ -140,8 +140,8 @@ public class DetachmentLocationManager {
     }
 
     /**
-     * Writes the {@code <location>} block for the detachment's current location and the
-     * {@code <locationNodeChildren>} block for the detachment's direct children in the location tree.
+     * Writes the {@code <location>} block for the detachment's current location and the {@code <locationNodeChildren>}
+     * block for the detachment's direct children in the location tree.
      */
     public void writeToXML(PrintWriter pw, int indent) {
         AbstractLocation currentLocation = locationNode.getNearestAbstractLocation();

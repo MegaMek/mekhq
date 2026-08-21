@@ -40,7 +40,7 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 import mekhq.campaign.Campaign;
-import mekhq.campaign.mission.AtBContract;
+import mekhq.campaign.mission.contract.AbstractContract;
 import mekhq.campaign.mission.resupplyAndCaches.Resupply;
 import mekhq.campaign.parts.Armor;
 import mekhq.campaign.parts.Part;
@@ -152,9 +152,9 @@ public class ResupplyDialogUtilities {
      * @return a {@link String} containing the enemy faction reference.
      */
     public static String getEnemyFactionReference(Resupply resupply) {
-        final AtBContract contract = resupply.getContract();
+        final AbstractContract contract = resupply.getContract();
 
-        String enemyFactionReference = contract.getEnemyBotName();
+        String enemyFactionReference = contract.getEnemyDisplayName();
 
         if (!enemyFactionReference.contains("Clan")) {
             enemyFactionReference = "the " + enemyFactionReference;

@@ -84,6 +84,7 @@ import megameklab.util.UnitUtil;
 import mekhq.MekHQ;
 import mekhq.Utilities;
 import mekhq.campaign.Campaign;
+import mekhq.campaign.campaignOptions.CampaignOption;
 import mekhq.campaign.enums.CampaignTransportType;
 import mekhq.campaign.events.parts.PartChangedEvent;
 import mekhq.campaign.events.units.UnitRefitEvent;
@@ -109,7 +110,6 @@ import mekhq.utilities.ReportingUtilities;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
-import mekhq.campaign.campaignOptions.CampaignOption;
 
 /**
  * This object tracks the refit of a given unit into a new unit. It has fields for the current entity and the new
@@ -1087,7 +1087,7 @@ public class Refit extends Part implements IAcquisitionWork {
         }
 
         // multiply time by refit class
-        time *= getTimeMultiplier();
+        time = (int) (time * getTimeMultiplier());
 
         // Refit Kits cost an additional 10% beyond the cost of their components. (SO p188)
         if (!customJob) {
@@ -2927,7 +2927,8 @@ public class Refit extends Part implements IAcquisitionWork {
                 bayPart.addChildPart(door);
             }
             if (bayType.getCategory() == BayType.CATEGORY_NON_INFANTRY) {
-                for (int i = 0; i < bay.getCapacity(); i++) {
+                int cubicleCount = (int) bay.getCapacity();
+                for (int i = 0; i < cubicleCount; i++) {
                     Part cubicle;
                     if (cubicles.containsKey(bayType) && !cubicles.get(bayType).isEmpty()) {
                         cubicle = cubicles.get(bayType).removeFirst();

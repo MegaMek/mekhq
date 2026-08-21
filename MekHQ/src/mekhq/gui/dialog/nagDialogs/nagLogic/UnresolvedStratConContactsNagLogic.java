@@ -41,8 +41,8 @@ import java.util.List;
 import mekhq.campaign.digitalGM.stratCon.StratConScenario;
 import mekhq.campaign.digitalGM.stratCon.StratConScenario.ScenarioState;
 import mekhq.campaign.digitalGM.stratCon.StratConTrackState;
-import mekhq.campaign.mission.AtBContract;
-import mekhq.campaign.mission.AtBDynamicScenario;
+import mekhq.campaign.mission.contract.AbstractContract;
+import mekhq.campaign.mission.scenarios.AtBDynamicScenario;
 
 public class UnresolvedStratConContactsNagLogic {
     final static String RESOURCE_BUNDLE = "mekhq.resources.NagDialogs";
@@ -54,12 +54,12 @@ public class UnresolvedStratConContactsNagLogic {
      * to see if it contains any unresolved contacts. If the report is not empty, it indicates that there are unresolved
      * StratCon scenarios, and the method returns {@code true}. Otherwise, it returns {@code false}.</p>
      *
-     * @param activeContracts A list of active {@link AtBContract} objects to evaluate for unresolved scenarios.
+     * @param activeContracts A list of active {@link AbstractContract} objects to evaluate for unresolved scenarios.
      * @param today           The current campaign date used to filter scenarios by deployment date.
      *
      * @return {@code true} if there are unresolved StratCon contacts in the report; {@code false} otherwise.
      */
-    public static boolean hasUnresolvedContacts(List<AtBContract> activeContracts, LocalDate today) {
+    public static boolean hasUnresolvedContacts(List<AbstractContract> activeContracts, LocalDate today) {
         String unresolvedContactsReport = determineUnresolvedContacts(activeContracts, today);
         return !unresolvedContactsReport.isEmpty();
     }
@@ -78,18 +78,18 @@ public class UnresolvedStratConContactsNagLogic {
      * <p>For every unresolved scenario, a formatted report entry is generated, including details such as the scenario's name,
      * its associated contract, the track location, and whether it is marked as a Turning Point.</p>
      *
-     * @param activeContracts A list of active {@link AtBContract} objects to be checked for unresolved scenarios.
+     * @param activeContracts A list of active {@link AbstractContract} objects to be checked for unresolved scenarios.
      * @param today           The current campaign date used to filter scenarios by deployment date.
      *
      * @return A formatted HTML string summarizing all unresolved scenarios, with critical scenarios (e.g., Turning
      *       Points) marked.
      */
-    public static String determineUnresolvedContacts(List<AtBContract> activeContracts, LocalDate today) {
+    public static String determineUnresolvedContacts(List<AbstractContract> activeContracts, LocalDate today) {
         StringBuilder unresolvedContacts = new StringBuilder();
 
         // check every track attached to an active contract for unresolved scenarios
         // to which the player can deploy forces
-        for (AtBContract contract : activeContracts) {
+        for (AbstractContract contract : activeContracts) {
             if (contract.getStratConCampaignState() == null) {
                 continue; // Skip contracts without a Stratcon campaign state
             }

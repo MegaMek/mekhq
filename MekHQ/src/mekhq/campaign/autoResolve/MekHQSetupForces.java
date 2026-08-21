@@ -36,7 +36,7 @@ import java.util.List;
 
 import megamek.common.autoResolve.converter.ForceConsolidation;
 import mekhq.campaign.Campaign;
-import mekhq.campaign.mission.Scenario;
+import mekhq.campaign.mission.scenarios.Scenario;
 import mekhq.campaign.unit.Unit;
 
 /**

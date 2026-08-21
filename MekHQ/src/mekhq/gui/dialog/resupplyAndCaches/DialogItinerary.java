@@ -65,8 +65,8 @@ import javax.swing.ScrollPaneConstants;
 
 import megamek.client.ui.util.UIUtil;
 import mekhq.campaign.Campaign;
-import mekhq.campaign.mission.AtBContract;
-import mekhq.campaign.mission.enums.ContractMoraleLevel;
+import mekhq.campaign.mission.contract.AbstractContract;
+import mekhq.campaign.mission.contract.contractData.ContractMoraleLevel;
 import mekhq.campaign.mission.resupplyAndCaches.Resupply;
 import mekhq.campaign.mission.resupplyAndCaches.Resupply.ResupplyType;
 import mekhq.campaign.parts.Part;
@@ -101,7 +101,7 @@ public class DialogItinerary {
      */
     public static void itineraryDialog(Resupply resupply) {
         final Campaign campaign = resupply.getCampaign();
-        final AtBContract contract = resupply.getContract();
+        final AbstractContract contract = resupply.getContract();
         final ResupplyType resupplyType = resupply.getResupplyType();
 
         final int DIALOG_WIDTH = UIUtil.scaleForGUI(700);
@@ -140,9 +140,9 @@ public class DialogItinerary {
             speakerIcon = getFactionLogo(campaign.getGameYear(), "PIR");
             speakerIcon = scaleImageIcon(speakerIcon, 200, true);
         } else {
-            speakerName = contract.getEmployerName(campaign.getGameYear());
+            speakerName = contract.getEmployerDisplayName();
 
-            speakerIcon = getFactionLogo(campaign.getGameYear(), contract.getEmployerCode());
+            speakerIcon = getFactionLogo(campaign.getGameYear(), contract.getEmployerFactionCode());
             speakerIcon = scaleImageIcon(speakerIcon, 200, true);
         }
 
@@ -356,7 +356,7 @@ public class DialogItinerary {
 
         return switch (resupplyType) {
             case RESUPPLY_NORMAL -> {
-                AtBContract contract = resupply.getContract();
+                AbstractContract contract = resupply.getContract();
                 ContractMoraleLevel morale = contract.getMoraleLevel();
 
                 yield getFormattedTextAt(RESOURCE_BUNDLE,

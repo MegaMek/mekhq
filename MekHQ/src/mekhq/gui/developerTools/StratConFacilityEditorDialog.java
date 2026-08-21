@@ -49,7 +49,7 @@ import mekhq.campaign.digitalGM.stratCon.biome.StratConBiome;
 import mekhq.campaign.digitalGM.stratCon.facility.StratConFacility;
 import mekhq.campaign.digitalGM.stratCon.facility.StratConFacility.FacilityType;
 import mekhq.campaign.digitalGM.stratCon.facility.StratConFacilityManifest;
-import mekhq.campaign.mission.ScenarioForceTemplate.ForceAlignment;
+import mekhq.campaign.mission.scenarios.ScenarioForceTemplate.ForceAlignment;
 import mekhq.gui.FileDialogs;
 
 /**

@@ -61,7 +61,7 @@ import megamek.common.units.EjectedCrew;
 import megamek.common.units.Entity;
 import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.force.Formation;
-import mekhq.campaign.mission.Scenario;
+import mekhq.campaign.mission.scenarios.Scenario;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.unit.TestUnit;
 import mekhq.campaign.unit.Unit;

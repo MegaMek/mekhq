@@ -35,7 +35,7 @@ package mekhq.campaign.events;
 
 import mekhq.campaign.events.scenarios.ScenarioChangedEvent;
 import mekhq.campaign.force.Formation;
-import mekhq.campaign.mission.Scenario;
+import mekhq.campaign.mission.scenarios.Scenario;
 import mekhq.campaign.unit.Unit;
 
 /**

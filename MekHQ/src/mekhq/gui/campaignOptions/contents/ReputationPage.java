@@ -90,7 +90,6 @@ class ReputationPage {
     private JCheckBox chkChaosPersonalityAffectsReputation;
     private JCheckBox chkChaosNewRecruitsHaveReputation;
     private JCheckBox chkRequireSupportForceTransportation;
-    private JCheckBox chkClampReputationPayMultiplier;
     private JCheckBox chkReduceReputationPerformanceModifier;
     private JCheckBox chkReputationPerformanceModifierCutOff;
 
@@ -252,11 +251,6 @@ class ReputationPage {
               getMetadata(new Version(0, 51, 0)));
         chkRequireSupportForceTransportation.addMouseListener(createTipPanelUpdater("RequireSupportForceTransportation"));
 
-        chkClampReputationPayMultiplier = new CampaignOptionsCheckBox("ClampReputationPayMultiplier",
-              getMetadata(LEGACY_RULE_BEFORE_METADATA, CampaignOptionFlag.IMPORTANT,
-                    CampaignOptionFlag.RECOMMENDED));
-        chkClampReputationPayMultiplier.addMouseListener(createTipPanelUpdater("ClampReputationPayMultiplier"));
-
         chkReduceReputationPerformanceModifier = new CampaignOptionsCheckBox("ReduceReputationPerformanceModifier",
               getMetadata(LEGACY_RULE_BEFORE_METADATA, CampaignOptionFlag.IMPORTANT,
                     CampaignOptionFlag.RECOMMENDED));
@@ -275,7 +269,6 @@ class ReputationPage {
               FORM_CONTROL_COLUMN_WIDTH);
         panel.addRow(lblResetCriminalRecord, createLeftAlignedButtonPanel(btnResetCriminalRecord));
         panel.addCheckBoxGrid(CHECKBOX_GRID_COLUMNS,
-              chkClampReputationPayMultiplier,
               chkRequireSupportForceTransportation,
               chkReduceReputationPerformanceModifier,
               chkReputationPerformanceModifierCutOff);
@@ -326,7 +319,6 @@ class ReputationPage {
         chaosReputationCap.setValue(model.chaosReputationCap);
         updateResetCriminalRecordButtonFromModel();
         chkRequireSupportForceTransportation.setSelected(model.requireSupportForceTransportation);
-        chkClampReputationPayMultiplier.setSelected(model.clampReputationPayMultiplier);
         chkReduceReputationPerformanceModifier.setSelected(model.reduceReputationPerformanceModifier);
         chkReputationPerformanceModifierCutOff.setSelected(model.reputationPerformanceModifierCutOff);
     }
@@ -351,7 +343,6 @@ class ReputationPage {
         model.chaosNewRecruitsHaveReputation = chkChaosNewRecruitsHaveReputation.isSelected();
         model.chaosReputationCap = (int) chaosReputationCap.getValue();
         model.requireSupportForceTransportation = chkRequireSupportForceTransportation.isSelected();
-        model.clampReputationPayMultiplier = chkClampReputationPayMultiplier.isSelected();
         model.reduceReputationPerformanceModifier = chkReduceReputationPerformanceModifier.isSelected();
         model.reputationPerformanceModifierCutOff = chkReputationPerformanceModifierCutOff.isSelected();
     }

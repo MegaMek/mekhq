@@ -580,7 +580,7 @@ public class Maintenance {
         final int maintenanceCycleDuration = campaignOptions.get(CampaignOption.MAINTENANCE_CYCLE_DAYS);
         final boolean techsUseAdmin = campaignOptions.get(CampaignOption.TECHS_USE_ADMINISTRATION);
 
-        final boolean hasActiveMission = !campaign.getActiveMissions(false).isEmpty();
+        final boolean hasActiveMission = !campaign.getActiveContracts().isEmpty();
         final LocalDate today = campaign.getLocalDate();
 
         List<Person> allTechs = campaign.getPlayerForce()

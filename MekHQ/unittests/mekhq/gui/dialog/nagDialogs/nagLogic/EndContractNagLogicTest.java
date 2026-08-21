@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2024-2025 The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2024-2026 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -42,7 +42,7 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
-import mekhq.campaign.mission.AtBContract;
+import mekhq.campaign.mission.contract.AbstractContract;
 import mekhq.gui.dialog.nagDialogs.EndContractNagDialog;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -54,7 +54,7 @@ import org.junit.jupiter.api.Test;
 public class EndContractNagLogicTest {
     // Mock objects for the tests
     private LocalDate today;
-    private AtBContract contract1, contract2;
+    private AbstractContract contract1, contract2;
 
     /**
      * Test setup for each test, runs before each test. Initializes the mock objects and sets up the necessary mock
@@ -66,8 +66,8 @@ public class EndContractNagLogicTest {
 
         // Initialize the mock objects
         today = LocalDate.now();
-        contract1 = mock(AtBContract.class);
-        contract2 = mock(AtBContract.class);
+        contract1 = mock(AbstractContract.class);
+        contract2 = mock(AbstractContract.class);
     }
 
     // In the following tests the isContractEnded() method is called, and its response is

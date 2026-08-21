@@ -4447,7 +4447,7 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
                     continue;
                 }
                 menuItem = new JMenuItem(attribute.getLabel());
-                menuItem.setToolTipText(wordWrap(String.format(resources.getString("spendOnAttributes.tooltip"))));
+                menuItem.setToolTipText(wordWrap(String.format(resources.getString("spendOnAttributesSetValue.tooltip"))));
                 menuItem.setActionCommand(makeCommand(CMD_SET_ATTRIBUTE, String.valueOf(attribute)));
                 menuItem.addActionListener(this);
                 menuItem.setEnabled(getCampaign().isGM());

@@ -32,11 +32,7 @@
  */
 package mekhq.campaign.personnel.backgrounds;
 
-import static mekhq.campaign.personnel.backgrounds.RandomCompanyNameGenerator.getWeightedEndWordCorporate;
-import static mekhq.campaign.personnel.backgrounds.RandomCompanyNameGenerator.getWeightedEndWordMercenary;
-import static mekhq.campaign.personnel.backgrounds.RandomCompanyNameGenerator.getWeightedMiddleWordCorporate;
-import static mekhq.campaign.personnel.backgrounds.RandomCompanyNameGenerator.getWeightedMiddleWordMercenary;
-import static mekhq.campaign.personnel.backgrounds.RandomCompanyNameGenerator.getWeightedPreFab;
+import static mekhq.campaign.personnel.backgrounds.RandomCompanyNameGenerator.*;
 
 import java.util.ResourceBundle;
 
@@ -77,35 +73,207 @@ public class BackgroundsController {
     }
 
     /**
-     * Returns the body of the generated name.
+     * Generates a random pirate company name.
+     *
+     * @return A string containing the generated name.
+     *
+     * @throws IllegalStateException if an unexpected value is encountered during the generation process.
+     */
+    public static String randomPirateCompanyNameGenerator() {
+        return getWeightedPreFab().randomItem();
+    }
+
+    /**
+     * Generates a random corporate company name.
+     *
+     * @return A string containing the generated name.
+     *
+     * @throws IllegalStateException if an unexpected value is encountered during the generation process.
+     */
+    public static String randomCorporationCompanyNameGenerator() {
+        try { // this allows us to use getCampaign() in tests without needing to also mock RandomCallsignGenerator
+            return getCorporateNameBody();
+        } catch (NullPointerException e) {
+            return resources.getString("fallbackValue");
+        }
+    }
+
+    /**
+     * Returns the body of the generated mercenary name.
      *
      * @return the name body as a String.
      *
      * @throws IllegalStateException if an unexpected value is encountered in the switch statement.
      */
     private static String getNameBody(String name) {
-        int roll = Compute.randomInt(4);
+        int roll = Compute.randomInt(3);
 
         return switch (roll) {
-            // Corporate
-            case 0 -> {
-                name += getNewWord(name, getWeightedMiddleWordCorporate()) + ' ';
-                String newWordSuggestion = getNewWord(name, getWeightedEndWordCorporate());
-
-                yield name + newWordSuggestion;
-            }
             // Mercenary
-            case 1 -> name + getNewWord(name, getWeightedEndWordMercenary());
-            case 2 -> {
+            case 0 -> name + getNewWord(name, getWeightedEndWordMercenary());
+            case 1 -> {
                 name += getNewWord(name, getWeightedMiddleWordMercenary()) + ' ';
                 String newWordSuggestion = getNewWord(name, getWeightedEndWordMercenary());
 
                 yield name + newWordSuggestion;
             }
             // Pre-Fab
-            case 3 -> getWeightedPreFab().randomItem();
+            case 2 -> getWeightedPreFab().randomItem();
             default -> throw new IllegalStateException(
                   "Unexpected value in mekhq/campaign/personnel/backgrounds/BackgroundsController.java/getNameBody: "
+                        + roll
+            );
+        };
+    }
+
+    /**
+     * Returns the body of the generated corporate name.
+     *
+     * @return the name body as a String.
+     *
+     * @throws IllegalStateException if an unexpected value is encountered in the switch statement.
+     */
+    private static String getCorporateNameBody() {
+        String name = getWeightedMiddleWordCorporate().randomItem() + ' ';
+                String newWordSuggestion = getNewWord(name, getWeightedEndWordCorporate());
+
+        return name + newWordSuggestion;
+    }
+
+    /**
+     * Generates a random name for a civilian coalition; that is, a group of business concerns banding together to hire
+     * the player.
+     *
+     * @return A string containing the generated name.
+     *
+     * @throws IllegalStateException if an unexpected value is encountered during the generation process.
+     */
+    public static String randomCivilianCompanyNameGenerator() {
+        try { // this allows us to use getCampaign() in tests without needing to also mock RandomCallsignGenerator
+            return getCivilianNameBody();
+        } catch (NullPointerException e) {
+            return resources.getString("fallbackValue");
+        }
+    }
+
+    /**
+     * Returns the body of the generated civilian coalition name.
+     *
+     * @return the name body as a String.
+     *
+     * @throws IllegalStateException if an unexpected value is encountered in the switch statement.
+     */
+    private static String getCivilianNameBody() {
+        int roll = Compute.randomInt(2);
+
+        return switch (roll) {
+            // Descriptor + Collective
+            case 0 -> {
+                String name = getWeightedMiddleWordCivilian().randomItem() + ' ';
+                String newWordSuggestion = getNewWord(name, getWeightedEndWordCivilian());
+
+                yield name + newWordSuggestion;
+            }
+            // Descriptor + Descriptor + Collective
+            case 1 -> {
+                String name = getWeightedMiddleWordCivilian().randomItem() + ' ';
+                name += getNewWord(name, getWeightedMiddleWordCivilian()) + ' ';
+                String newWordSuggestion = getNewWord(name, getWeightedEndWordCivilian());
+
+                yield name + newWordSuggestion;
+            }
+            default -> throw new IllegalStateException(
+                  "Unexpected value in mekhq/campaign/personnel/backgrounds/BackgroundsController.java/getCivilianNameBody: "
+                        + roll
+            );
+        };
+    }
+
+    /**
+     * Generates a random rebel force name.
+     *
+     * @param commander The person object representing the commander. Can be null.
+     *
+     * @return A string containing the generated name.
+     *
+     * @throws IllegalStateException if an unexpected value is encountered during the generation process.
+     */
+    public static String randomRebelCompanyNameGenerator(@Nullable Person commander) {
+        try { // this allows us to use getCampaign() in tests without needing to also mock RandomCallsignGenerator
+            String prefix = getPrefix(commander);
+            return getRebelNameBody(prefix + ' ');
+        } catch (NullPointerException e) {
+            return resources.getString("fallbackValue");
+        }
+    }
+
+    /**
+     * Returns the body of the generated rebel name.
+     *
+     * @return the name body as a String.
+     *
+     * @throws IllegalStateException if an unexpected value is encountered in the switch statement.
+     */
+    private static String getRebelNameBody(String name) {
+        int roll = Compute.randomInt(2);
+
+        return switch (roll) {
+            // Single word
+            case 0 -> name + getNewWord(name, getWeightedEndWordRebel());
+            // Middle + End
+            case 1 -> {
+                name += getNewWord(name, getWeightedMiddleWordRebel()) + ' ';
+                String newWordSuggestion = getNewWord(name, getWeightedEndWordRebel());
+
+                yield name + newWordSuggestion;
+            }
+            default -> throw new IllegalStateException(
+                  "Unexpected value in mekhq/campaign/personnel/backgrounds/BackgroundsController.java/getRebelNameBody: "
+                        + roll
+            );
+        };
+    }
+
+    /**
+     * Generates a random militia force name.
+     *
+     * @param commander The person object representing the commander. Can be null.
+     *
+     * @return A string containing the generated name.
+     *
+     * @throws IllegalStateException if an unexpected value is encountered during the generation process.
+     */
+    public static String randomMilitiaCompanyNameGenerator(@Nullable Person commander) {
+        try { // this allows us to use getCampaign() in tests without needing to also mock RandomCallsignGenerator
+            String prefix = getPrefix(commander);
+            return getMilitiaNameBody(prefix + ' ');
+        } catch (NullPointerException e) {
+            return resources.getString("fallbackValue");
+        }
+    }
+
+    /**
+     * Returns the body of the generated militia name.
+     *
+     * @return the name body as a String.
+     *
+     * @throws IllegalStateException if an unexpected value is encountered in the switch statement.
+     */
+    private static String getMilitiaNameBody(String name) {
+        int roll = Compute.randomInt(2);
+
+        return switch (roll) {
+            // Single word
+            case 0 -> name + getNewWord(name, getWeightedEndWordMilitia());
+            // Middle + End
+            case 1 -> {
+                name += getNewWord(name, getWeightedMiddleWordMilitia()) + ' ';
+                String newWordSuggestion = getNewWord(name, getWeightedEndWordMilitia());
+
+                yield name + newWordSuggestion;
+            }
+            default -> throw new IllegalStateException(
+                  "Unexpected value in mekhq/campaign/personnel/backgrounds/BackgroundsController.java/getMilitiaNameBody: "
                         + roll
             );
         };

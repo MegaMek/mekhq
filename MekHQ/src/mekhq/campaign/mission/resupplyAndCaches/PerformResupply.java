@@ -37,9 +37,9 @@ import static mekhq.campaign.digitalGM.stratCon.StratConContractInitializer.getU
 import static mekhq.campaign.digitalGM.stratCon.StratConRulesManager.generateExternalScenario;
 import static mekhq.campaign.enums.DailyReportType.ACQUISITIONS;
 import static mekhq.campaign.enums.DailyReportType.BATTLE;
-import static mekhq.campaign.mission.enums.ContractMoraleLevel.CRITICAL;
-import static mekhq.campaign.mission.enums.ContractMoraleLevel.DOMINATING;
-import static mekhq.campaign.mission.enums.ContractMoraleLevel.STALEMATE;
+import static mekhq.campaign.mission.contract.contractData.ContractMoraleLevel.CRITICAL;
+import static mekhq.campaign.mission.contract.contractData.ContractMoraleLevel.DOMINATING;
+import static mekhq.campaign.mission.contract.contractData.ContractMoraleLevel.STALEMATE;
 import static mekhq.campaign.mission.resupplyAndCaches.GenerateResupplyContents.DropType.DROP_TYPE_AMMO;
 import static mekhq.campaign.mission.resupplyAndCaches.GenerateResupplyContents.DropType.DROP_TYPE_ARMOR;
 import static mekhq.campaign.mission.resupplyAndCaches.GenerateResupplyContents.DropType.DROP_TYPE_PARTS;
@@ -77,12 +77,12 @@ import mekhq.campaign.digitalGM.stratCon.StratConCoords;
 import mekhq.campaign.digitalGM.stratCon.StratConScenario;
 import mekhq.campaign.digitalGM.stratCon.StratConTrackState;
 import mekhq.campaign.force.Formation;
-import mekhq.campaign.mission.AtBContract;
-import mekhq.campaign.mission.AtBDynamicScenario;
-import mekhq.campaign.mission.Loot;
-import mekhq.campaign.mission.ScenarioTemplate;
-import mekhq.campaign.mission.enums.ContractMoraleLevel;
+import mekhq.campaign.mission.contract.AbstractContract;
+import mekhq.campaign.mission.contract.contractData.ContractMoraleLevel;
 import mekhq.campaign.mission.resupplyAndCaches.Resupply.ResupplyType;
+import mekhq.campaign.mission.scenarios.AtBDynamicScenario;
+import mekhq.campaign.mission.scenarios.Loot;
+import mekhq.campaign.mission.scenarios.ScenarioTemplate;
 import mekhq.campaign.parts.Armor;
 import mekhq.campaign.parts.Part;
 import mekhq.campaign.parts.equipment.AmmoBin;
@@ -113,18 +113,18 @@ public class PerformResupply {
      *
      * <p>This method provides a simplified entry point to the resupply workflow, using a default value
      * of 1 for the supply drop count. It delegates to the overloaded method
-     * {@link #performResupply(Resupply, AtBContract, int)} for the main execution of the resupply process, encompassing
-     * supply generation, convoy interaction, and delivery confirmation.</p>
+     * {@link #performResupply(Resupply, AbstractContract, int)} for the main execution of the resupply process,
+     * encompassing supply generation, convoy interaction, and delivery confirmation.</p>
      *
      * <p>This entry point is typically used when the exact number of supply drops is not specified or
      * defaults to a single drop per invocation.</p>
      *
      * @param resupply the {@link Resupply} instance containing information about the resupply operation, such as the
      *                 supplies to be delivered, convoy setup, and context-specific rules.
-     * @param contract the {@link AtBContract} representing the current contract, which provides the operational context
-     *                 for the resupply, including permissions and restrictions.
+     * @param contract the {@link AbstractContract} representing the current contract, which provides the operational
+     *                 context for the resupply, including permissions and restrictions.
      */
-    public static void performResupply(Resupply resupply, AtBContract contract) {
+    public static void performResupply(Resupply resupply, AbstractContract contract) {
         performResupply(resupply, contract, 1);
     }
 
@@ -143,12 +143,12 @@ public class PerformResupply {
      *
      * @param resupply  the {@link Resupply} instance that defines the campaign's resupply operation, including cargo,
      *                  player and NPC convoys, and mission-related data.
-     * @param contract  the {@link AtBContract} representing the context of the current contract, determining aspects
-     *                  such as independent resupply permissions and guerrilla warfare rules.
+     * @param contract  the {@link AbstractContract} representing the context of the current contract, determining
+     *                  aspects such as independent resupply permissions and guerrilla warfare rules.
      * @param dropCount the number of supply drops planned for this resupply operation. If zero, the method exits
      *                  early.
      */
-    public static void performResupply(Resupply resupply, AtBContract contract, int dropCount) {
+    public static void performResupply(Resupply resupply, AbstractContract contract, int dropCount) {
         // These early exits should only occur if the player literally has no units.
         if (dropCount == 0) {
             logger.info("Resupply exited early, as DropCount is 0");
@@ -162,8 +162,8 @@ public class PerformResupply {
         }
 
         final boolean isIndependent = contract.getCommandRights().isIndependent();
-        final boolean isGuerrilla = contract.getContractType().isGuerrillaType();
-        final boolean isPirate = PIRATE_FACTION_CODE.equals(contract.getEmployerCode());
+        final boolean isGuerrilla = contract.getObjectiveType().isGuerrillaType();
+        final boolean isPirate = PIRATE_FACTION_CODE.equals(contract.getEmployerFactionCode());
         final ResupplyType resupplyType = resupply.getResupplyType();
 
         // If appropriate, prompt the player to use their own convoys
@@ -275,7 +275,7 @@ public class PerformResupply {
      * @param resupply the {@link Resupply} instance defining the resupply context.
      */
     public static void makeSmugglerDelivery(Resupply resupply) {
-        final AtBContract contract = resupply.getContract();
+        final AbstractContract contract = resupply.getContract();
         int swindleChance = contract.getMoraleLevel().ordinal();
 
         if (randomInt(10) < swindleChance) {
@@ -366,7 +366,7 @@ public class PerformResupply {
      */
     public static void processConvoy(Resupply resupply, List<Part> convoyContents, @Nullable Formation playerConvoy) {
         final Campaign campaign = resupply.getCampaign();
-        final AtBContract contract = resupply.getContract();
+        final AbstractContract contract = resupply.getContract();
 
         // First, we need to identify whether the convoy has been intercepted.
         ContractMoraleLevel morale = contract.getMoraleLevel();
@@ -434,7 +434,7 @@ public class PerformResupply {
     private static void generateInterceptionOrConvoyEvent(Resupply resupply, @Nullable Formation convoy,
           @Nullable List<Part> convoyContents, int interceptionChance) {
         final Campaign campaign = resupply.getCampaign();
-        final AtBContract contract = resupply.getContract();
+        final AbstractContract contract = resupply.getContract();
 
         if (randomInt(10) < interceptionChance) {
             processConvoyInterception(resupply, convoy, convoyContents);
@@ -527,7 +527,7 @@ public class PerformResupply {
         final String PLAYER_CONVOY = DIRECTORY + "Emergency Convoy Defense - Player.json";
 
         final Campaign campaign = resupply.getCampaign();
-        final AtBContract contract = resupply.getContract();
+        final AbstractContract contract = resupply.getContract();
 
         // Trigger a dialog to inform the user that an interception has taken place
         displayDialog(targetConvoy, campaign, contract);
@@ -642,7 +642,7 @@ public class PerformResupply {
         }
     }
 
-    private static void displayDialog(Formation targetConvoy, Campaign campaign, AtBContract contract) {
+    private static void displayDialog(Formation targetConvoy, Campaign campaign, AbstractContract contract) {
         Person speaker;
         String inCharacterMessage = "";
         String commanderAddress = campaign.getCommanderAddress();
@@ -659,7 +659,7 @@ public class PerformResupply {
             }
         } else {
             // We invent an NPC driver for NPC convoys
-            final String factionCode = contract.getEmployerCode();
+            final String factionCode = contract.getEmployerFactionCode();
             speaker = campaign.getPlayerForce()
                             .getHumanResources()
                             .newPerson(campaign, PersonnelRole.VEHICLE_CREW_GROUND, factionCode, Gender.RANDOMIZE);

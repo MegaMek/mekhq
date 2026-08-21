@@ -44,25 +44,36 @@ import static megamek.utilities.ImageUtilities.scaleImageIcon;
 import static mekhq.campaign.force.Formation.FORMATION_NONE;
 import static mekhq.gui.dialog.glossary.GlossaryDialog.DOCUMENTATION_COMMAND_STRING;
 import static mekhq.gui.dialog.glossary.GlossaryDialog.GLOSSARY_COMMAND_STRING;
-import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
+import static mekhq.utilities.MHQInternationalization.getText;
 
 import java.awt.BorderLayout;
 import java.awt.Component;
 import java.awt.Dimension;
+import java.awt.FlowLayout;
+import java.awt.FontMetrics;
+import java.awt.GraphicsConfiguration;
+import java.awt.GraphicsDevice;
+import java.awt.GraphicsEnvironment;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Image;
 import java.awt.Insets;
+import java.awt.KeyboardFocusManager;
 import java.awt.Point;
+import java.awt.Rectangle;
 import java.awt.Toolkit;
+import java.awt.Window;
 import java.awt.image.ImageObserver;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
+import java.util.Objects;
 import java.util.UUID;
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
 import javax.swing.event.HyperlinkEvent;
 import javax.swing.event.HyperlinkEvent.EventType;
+import javax.swing.plaf.basic.BasicHTML;
 
 import megamek.client.ui.comboBoxes.MMComboBox;
 import megamek.codeUtilities.MathUtility;
@@ -70,8 +81,11 @@ import megamek.common.annotations.Nullable;
 import megamek.common.icons.Portrait;
 import megamek.common.ui.FastJScrollPane;
 import megamek.logging.MMLogger;
+import mekhq.MHQConstants;
 import mekhq.campaign.Campaign;
+import mekhq.campaign.ForceHumanResources;
 import mekhq.campaign.force.Formation;
+import mekhq.campaign.force.PlayerForce;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.enums.PersonnelRole;
 import mekhq.campaign.unit.Unit;
@@ -79,10 +93,10 @@ import mekhq.campaign.universe.Factions;
 import mekhq.campaign.utilities.glossary.DocumentationEntry;
 import mekhq.campaign.utilities.glossary.GlossaryEntry;
 import mekhq.gui.CampaignGUI;
-import mekhq.gui.baseComponents.roundedComponents.RoundedJButton;
-import mekhq.gui.baseComponents.roundedComponents.RoundedLineBorder;
+import mekhq.gui.baseComponents.JScrollablePanel;
 import mekhq.gui.dialog.glossary.GlossaryDocumentationEntryDialog;
 import mekhq.gui.dialog.glossary.GlossaryEntryDialog;
+import mekhq.gui.utilities.WrapLayout;
 
 /**
  * An immersive dialog used in MekHQ to display interactions between speakers, messages, and actions. The dialog
@@ -95,7 +109,14 @@ import mekhq.gui.dialog.glossary.GlossaryEntryDialog;
  * allowing for dynamic configurations based on the input parameters.</p>
  */
 public class ImmersiveDialogCore extends JDialog {
-    private final static String RESOURCE_BUNDLE = "mekhq.resources.GUI";
+    private static final int RESPONSE_BUTTON_HORIZONTAL_LAYOUT_ALLOWANCE = 4;
+    private static final int RESPONSE_BUTTON_VERTICAL_LAYOUT_ALLOWANCE = 2;
+    private static final String FLATLAF_CLASS_PREFIX = "com.formdev.flatlaf.";
+    private static final String FLATLAF_WINDOW_DECORATIONS_PROPERTY = "flatlaf.useWindowDecorations";
+    private static final String USE_WINDOW_DECORATIONS_PROPERTY = "JRootPane.useWindowDecorations";
+    private static final String FULL_WINDOW_CONTENT_PROPERTY = "FlatLaf.fullWindowContent";
+    private static final String TITLE_BAR_SHOW_TITLE_PROPERTY = "JRootPane.titleBarShowTitle";
+    private static final String TITLE_BAR_SHOW_ICON_PROPERTY = "JRootPane.titleBarShowIcon";
     public final static String PERSON_COMMAND_STRING = "PERSON";
     public final static String MISSION_COMMAND_STRING = "MISSION";
     public final static String SCENARIO_COMMAND_STRING = "SCENARIO";
@@ -110,11 +131,14 @@ public class ImmersiveDialogCore extends JDialog {
     private final JPanel southPanel;
     private final Person leftSpeaker;
     private final Person rightSpeaker;
+    private final TransmissionSignalQuality signalQuality;
+    private final ResponseActivationController responseActivationController;
 
     private JSpinner spinner;
     private int spinnerValue;
     private MMComboBox<?> comboBox; // can be null
     private int comboBoxChoiceIndex;
+    private FastJScrollPane messageScrollPane;
 
     private int dialogChoice = 0;
 
@@ -130,6 +154,8 @@ public class ImmersiveDialogCore extends JDialog {
      *
      * @return An integer representing the index of the button selected by the user. If the dialog is closed without
      *       selection, this will return the {@code defaultChoiceIndex} defined during construction.
+    *       Response activation stores this choice and any supplemental control values before the brief transmission
+    *       confirmation; a modal constructor returns after that confirmation closes the dialog.
      */
     public int getDialogChoice() {
         return dialogChoice;
@@ -221,20 +247,67 @@ public class ImmersiveDialogCore extends JDialog {
           String centerMessage, List<ButtonLabelTooltipPair> buttons, @Nullable String outOfCharacterMessage,
           @Nullable Integer centerWidth, boolean isVerticalLayout, @Nullable JPanel supplementalPanel,
           @Nullable ImageIcon imageIcon, boolean isModal) {
+        this(campaign,
+              leftSpeaker,
+              rightSpeaker,
+              centerMessage,
+              buttons,
+              outOfCharacterMessage,
+              centerWidth,
+              isVerticalLayout,
+              supplementalPanel,
+              imageIcon,
+              TransmissionSignalQualityResolver.resolve(campaign, leftSpeaker, rightSpeaker),
+              isModal);
+    }
+
+    /**
+     * Constructs an immersive dialog using an explicit video transmission quality override.
+     *
+     * <p>The remaining parameters inherit the contracts documented by the adjacent constructor.</p>
+     *
+     * @param signalQuality non-null visual fidelity override applied to speaker portraits
+     *
+     * @throws NullPointerException if {@code signalQuality} is {@code null}
+     */
+    public ImmersiveDialogCore(Campaign campaign, @Nullable Person leftSpeaker, @Nullable Person rightSpeaker,
+          String centerMessage, List<ButtonLabelTooltipPair> buttons, @Nullable String outOfCharacterMessage,
+          @Nullable Integer centerWidth, boolean isVerticalLayout, @Nullable JPanel supplementalPanel,
+          @Nullable ImageIcon imageIcon, TransmissionSignalQuality signalQuality, boolean isModal) {
         // Initialize
         this.campaign = campaign;
         this.leftSpeaker = leftSpeaker;
         this.rightSpeaker = rightSpeaker;
+        this.signalQuality = Objects.requireNonNull(signalQuality, "signalQuality");
+        responseActivationController = new ResponseActivationController(this::dispose);
 
         CENTER_WIDTH = (centerWidth != null) ? centerWidth : CENTER_WIDTH;
 
         // Title
         setTitle();
 
+        boolean useFullWindowContent = configureWindowsFullWindowContent();
+
+        JPanel transmissionPanel = ImmersiveDialogStyle.createBackdropPanel();
+        transmissionPanel.setBorder(useFullWindowContent
+                                          ? BorderFactory.createEmptyBorder()
+                                          : new EmptyBorder(PADDING * 2, PADDING * 2, PADDING * 2, PADDING * 2));
+        transmissionPanel.add(ImmersiveDialogStyle.createHeaderPanel(
+              getText("ImmersiveDialog.header.title"),
+              getText(signalQuality.statusResourceKey),
+              useFullWindowContent), BorderLayout.NORTH);
+
+        JPanel transmissionBody = new JPanel(new BorderLayout(0, scaleForGUI(10)));
+        transmissionBody.setOpaque(false);
+        if (useFullWindowContent) {
+            transmissionBody.setBorder(new EmptyBorder(0, PADDING * 2, PADDING * 2, PADDING * 2));
+        }
+
         // Main Panel to hold all boxes
         JPanel mainPanel = new JPanel(new GridBagLayout());
+        mainPanel.setOpaque(false);
         GridBagConstraints constraints = new GridBagConstraints();
-        constraints.insets = new Insets(PADDING, 0, PADDING, 0);
+        constraints.insets = new Insets(0, PADDING, 0, PADDING);
         constraints.fill = GridBagConstraints.BOTH;
         constraints.weighty = 1;
 
@@ -242,70 +315,153 @@ public class ImmersiveDialogCore extends JDialog {
 
         // Left box for speaker details
         if (leftSpeaker != null) {
-            JPanel pnlLeftSpeaker = buildLeftSpeakerPanel(leftSpeaker, campaign);
-            pnlLeftSpeaker.setBorder(new EmptyBorder(0, getPadding(), 0, 0));
+            JPanel pnlLeftSpeaker = ImmersiveDialogStyle.createSourcePanel(
+                  getSourceLabel(leftSpeaker),
+                  buildLeftSpeakerPanel(leftSpeaker, campaign));
 
             // Add pnlLeftSpeaker to mainPanel
             constraints.gridx = gridx;
             constraints.gridy = 0;
-            constraints.weightx = 1;
+            constraints.weightx = 0;
             mainPanel.add(pnlLeftSpeaker, constraints);
             gridx++;
         }
 
         // Center box for the message
         JPanel pnlCenter = createCenterBox(centerMessage, buttons, isVerticalLayout, supplementalPanel, imageIcon);
+        TransmissionRevealPanel transmissionReveal = new TransmissionRevealPanel(pnlCenter);
         constraints.gridx = gridx;
         constraints.gridy = 0;
-        constraints.weightx = 2;
+        constraints.weightx = 1;
         constraints.weighty = 2;
-        mainPanel.add(pnlCenter, constraints);
+        mainPanel.add(transmissionReveal, constraints);
         gridx++;
 
         // Right box for speaker details
         if (rightSpeaker != null) {
-            JPanel pnlRightSpeaker = buildRightSpeakerPanel(rightSpeaker, campaign);
-            pnlRightSpeaker.setBorder(new EmptyBorder(0, 0, 0, getPadding()));
+            JPanel pnlRightSpeaker = ImmersiveDialogStyle.createSourcePanel(
+                  getSourceLabel(rightSpeaker),
+                  buildRightSpeakerPanel(rightSpeaker, campaign));
 
             // Add pnlRightSpeaker to mainPanel
             constraints.gridx = gridx;
             constraints.gridy = 0;
-            constraints.weightx = 1;
+            constraints.weightx = 0;
             constraints.weighty = 1;
             mainPanel.add(pnlRightSpeaker, constraints);
         }
 
         // Add mainPanel to dialog
-        add(mainPanel, BorderLayout.CENTER);
+        transmissionBody.add(mainPanel, BorderLayout.CENTER);
 
         // Bottom panel, for OOC information
         southPanel = new JPanel(new BorderLayout());
+        southPanel.setOpaque(false);
         if (outOfCharacterMessage != null) {
             populateOutOfCharacterPanel(outOfCharacterMessage);
         }
 
         // Add southPanel to the dialog
-        add(southPanel, BorderLayout.SOUTH);
+        transmissionBody.add(southPanel, BorderLayout.SOUTH);
+        transmissionPanel.add(transmissionBody, BorderLayout.CENTER);
+        add(transmissionPanel, BorderLayout.CENTER);
 
         // Dialog settings
+        Window locationReference = KeyboardFocusManager.getCurrentKeyboardFocusManager().getActiveWindow();
         pack();
-        // The reason for this unusual size setup is to account for the Windows taskbar
-        Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
-        int screenHeight = screenSize.height;
-        int screenWidth = screenSize.width;
-        setSize(min(screenWidth, getWidth()), (int) min(getHeight(), screenHeight * 0.8));
+        applyDynamicDialogSize(locationReference);
+        messageScrollPane.getViewport().setViewPosition(new Point(0, 0));
 
         setDefaultCloseOperation(DISPOSE_ON_CLOSE);
         setModal(isModal);
-        setLocationRelativeTo(null); // Needs to be after pack
+        setLocationRelativeTo(locationReference); // Needs to be after pack
         setVisible(true);
+    }
+
+    @Override
+    public void dispose() {
+        if (responseActivationController != null) {
+            responseActivationController.cancel();
+        }
+        super.dispose();
+    }
+
+    @Override
+    public void removeNotify() {
+        if (responseActivationController != null) {
+            responseActivationController.cancel();
+        }
+        super.removeNotify();
     }
 
     /**
      * Sets the title of the dialog window using localized text.
      */
     protected void setTitle() {
-        setTitle(getFormattedTextAt(RESOURCE_BUNDLE, "incomingTransmission.title"));
+        setTitle(MHQConstants.PROJECT_NAME);
+    }
+
+    private String getSourceLabel(Person speaker) {
+        return getText(resolveSourceLabelResourceKey(
+              speaker.isCommander(), isPlayerForcePersonnel(campaign, speaker)));
+    }
+
+    static boolean isPlayerForcePersonnel(@Nullable Campaign campaign, Person speaker) {
+        if (campaign == null) {
+            return false;
+        }
+
+        PlayerForce playerForce = campaign.getPlayerForce();
+        if (playerForce == null) {
+            return false;
+        }
+
+        ForceHumanResources humanResources = playerForce.getHumanResources();
+        if (humanResources == null) {
+            return false;
+        }
+
+        Collection<Person> personnel = humanResources.getPersonnel();
+        return personnel != null && personnel.contains(speaker);
+    }
+
+    static String resolveSourceLabelResourceKey(boolean isCommander, boolean isPlayerForcePersonnel) {
+        if (isCommander) {
+            return "ImmersiveDialog.source.command";
+        }
+        if (isPlayerForcePersonnel) {
+            return "ImmersiveDialog.source.unitChannel";
+        }
+        return "ImmersiveDialog.source.fieldContact";
+    }
+
+    private boolean configureWindowsFullWindowContent() {
+        String lookAndFeelClass = UIManager.getLookAndFeel().getClass().getName();
+        boolean decorationsDisabled = "false".equalsIgnoreCase(
+              System.getProperty(FLATLAF_WINDOW_DECORATIONS_PROPERTY));
+        if (!isWindows10OrLater() ||
+                  !lookAndFeelClass.startsWith(FLATLAF_CLASS_PREFIX) ||
+                  decorationsDisabled) {
+            return false;
+        }
+
+        JRootPane rootPane = getRootPane();
+        rootPane.putClientProperty(USE_WINDOW_DECORATIONS_PROPERTY, Boolean.TRUE);
+        rootPane.putClientProperty(FULL_WINDOW_CONTENT_PROPERTY, Boolean.TRUE);
+        rootPane.putClientProperty(TITLE_BAR_SHOW_TITLE_PROPERTY, Boolean.FALSE);
+        rootPane.putClientProperty(TITLE_BAR_SHOW_ICON_PROPERTY, Boolean.FALSE);
+        return true;
+    }
+
+    private static boolean isWindows10OrLater() {
+        if (!System.getProperty("os.name", "").startsWith("Windows")) {
+            return false;
+        }
+
+        String version = System.getProperty("os.version", "");
+        int separator = version.indexOf('.');
+        String majorVersion = (separator < 0) ? version : version.substring(0, separator);
+        return MathUtility.parseInt(majorVersion, -1) >= 10;
     }
 
     /**
@@ -327,7 +483,7 @@ public class ImmersiveDialogCore extends JDialog {
      */
     private JPanel createCenterBox(String centerMessage, List<ButtonLabelTooltipPair> buttons, boolean isVerticalLayout,
           @Nullable JPanel supplementalPanel, @Nullable ImageIcon imageIcon) {
-        JPanel northPanel = new JPanel(new BorderLayout());
+          JPanel centerPanel = ImmersiveDialogStyle.createAngularSurfacePanel();
 
         // Buttons panel
         JPanel buttonPanel = populateButtonPanel(buttons, isVerticalLayout);
@@ -339,21 +495,28 @@ public class ImmersiveDialogCore extends JDialog {
         // Add a HyperlinkListener to capture hyperlink clicks
         editorPane.addHyperlinkListener(this::hyperlinkEventListenerActions);
 
-        JPanel viewport = new JPanel(new BorderLayout());
+        JScrollablePanel viewport = new JScrollablePanel();
+        viewport.setLayout(new BorderLayout());
+        viewport.setOpaque(false);
         viewport.add(editorPane, BorderLayout.CENTER);
         if (supplementalPanel != null) {
+            supplementalPanel.setOpaque(false);
+            ImmersiveDialogStyle.applySupplementalControlStyle(supplementalPanel);
             viewport.add(supplementalPanel, BorderLayout.SOUTH);
             fetchSpinnerFromPanel(supplementalPanel);
             fetchComboBoxFromPanel(supplementalPanel);
         }
 
         FastJScrollPane scrollPane = new FastJScrollPane();
+        messageScrollPane = scrollPane;
         scrollPane.setViewportView(viewport);
         scrollPane.setBorder(BorderFactory.createEmptyBorder());
-        SwingUtilities.invokeLater(() -> scrollPane.getViewport().setViewPosition(new Point(0, 0)));
+        scrollPane.setOpaque(false);
+        scrollPane.getViewport().setOpaque(false);
 
         // Create a container with a border for the padding
         JPanel scrollPaneContainer = new JPanel(new BorderLayout());
+        scrollPaneContainer.setOpaque(false);
         scrollPaneContainer.add(scrollPane, BorderLayout.CENTER);
 
         // Create a JLabel for the image above the JEditorPane
@@ -361,25 +524,91 @@ public class ImmersiveDialogCore extends JDialog {
         if (imageIcon != null) {
             imageLabel.setIcon(imageIcon);
             imageLabel.setHorizontalAlignment(SwingConstants.CENTER);
+            imageLabel.setBorder(new EmptyBorder(0, 0, PADDING, 0));
         }
 
         // Create a panel for the image and editorPane
         JPanel contentPanel = new JPanel();
         contentPanel.setLayout(new BorderLayout());
+        contentPanel.setOpaque(false);
         if (imageIcon != null) {
             contentPanel.add(imageLabel, BorderLayout.NORTH);
         }
         contentPanel.add(scrollPaneContainer, BorderLayout.CENTER);
 
-        // Add the contentPanel to the northPanel
-        northPanel.add(contentPanel, BorderLayout.CENTER);
+        JPanel messagePanel = new JPanel(new BorderLayout());
+        messagePanel.setOpaque(false);
+        messagePanel.setBorder(ImmersiveDialogStyle.createSectionSpacingBorder());
+        messagePanel.add(ImmersiveDialogStyle.createSectionHeader(
+              getText("ImmersiveDialog.message.title"),
+              ImmersiveDialogStyle.getSignalColor()), BorderLayout.NORTH);
+        messagePanel.add(contentPanel, BorderLayout.CENTER);
 
-        // Add the buttons panel to the northPanel
-        northPanel.add(buttonPanel, BorderLayout.SOUTH);
+        JPanel responsePanel = new JPanel(new BorderLayout());
+        responsePanel.setOpaque(false);
+        responsePanel.setBorder(ImmersiveDialogStyle.createSectionSpacingBorder());
+        responsePanel.add(ImmersiveDialogStyle.createSectionHeader(
+              getText("ImmersiveDialog.response.title"),
+              ImmersiveDialogStyle.getSignalColor()), BorderLayout.NORTH);
+        responsePanel.add(buttonPanel, BorderLayout.CENTER);
 
-        northPanel.setBorder(RoundedLineBorder.createRoundedLineBorder());
+        centerPanel.setLayout(new GridBagLayout());
+        GridBagConstraints sectionConstraints = new GridBagConstraints();
+        sectionConstraints.gridx = 0;
+        sectionConstraints.gridy = 0;
+        sectionConstraints.fill = GridBagConstraints.BOTH;
+        sectionConstraints.weightx = 1;
+        sectionConstraints.weighty = 1;
+        centerPanel.add(messagePanel, sectionConstraints);
 
-        return northPanel;
+        sectionConstraints.gridy = 1;
+        sectionConstraints.weighty = 0;
+        centerPanel.add(responsePanel, sectionConstraints);
+
+        return centerPanel;
+    }
+
+    private void applyDynamicDialogSize(@Nullable Window locationReference) {
+        if (messageScrollPane == null) {
+            return;
+        }
+
+        Rectangle usableScreenBounds = getUsableScreenBounds(locationReference);
+        Dimension naturalDialogSize = getPreferredSize();
+        Dimension naturalViewportSize = messageScrollPane.getPreferredSize();
+        ImmersiveDialogSizing.SizingResult sizing = ImmersiveDialogSizing.calculate(
+              naturalDialogSize.height,
+              naturalViewportSize.height,
+              scaleForGUI(120),
+              usableScreenBounds.height);
+
+        messageScrollPane.setVerticalScrollBarPolicy(sizing.requiresScrolling()
+                                                           ? ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED
+                                                           : ScrollPaneConstants.VERTICAL_SCROLLBAR_NEVER);
+        messageScrollPane.setPreferredSize(new Dimension(naturalViewportSize.width, sizing.viewportHeight()));
+
+        pack();
+        setSize(min(usableScreenBounds.width, getWidth()), min(sizing.dialogHeight(), getHeight()));
+    }
+
+    private Rectangle getUsableScreenBounds(@Nullable Window locationReference) {
+        GraphicsConfiguration configuration = locationReference == null
+                                                    ? null
+                                                    : locationReference.getGraphicsConfiguration();
+        if (configuration == null) {
+            configuration = getGraphicsConfiguration();
+        }
+        if (configuration == null) {
+            GraphicsDevice device = GraphicsEnvironment.getLocalGraphicsEnvironment().getDefaultScreenDevice();
+            configuration = device.getDefaultConfiguration();
+        }
+
+        Rectangle bounds = configuration.getBounds();
+        Insets insets = Toolkit.getDefaultToolkit().getScreenInsets(configuration);
+        return new Rectangle(bounds.x + insets.left,
+              bounds.y + insets.top,
+              bounds.width - insets.left - insets.right,
+              bounds.height - insets.top - insets.bottom);
     }
 
     private JEditorPane getJEditorPane(String centerMessage, JPanel buttonPanel) {
@@ -387,12 +616,12 @@ public class ImmersiveDialogCore extends JDialog {
         editorPane.setContentType("text/html");
         editorPane.setEditable(false);
         editorPane.setFocusable(false);
-        editorPane.setBorder(BorderFactory.createEmptyBorder());
+        editorPane.setOpaque(false);
         editorPane.setBorder(new EmptyBorder(0, getPadding(), 0, getPadding()));
 
         // Use inline CSS to set font family, size, and other style properties
         String fontStyle = "font-family: Noto Sans;";
-        editorPane.setText(String.format("<div style='width: %s; %s'>%s</div>",
+        editorPane.setText(String.format("<html><div style='width: %dpx; %s'>%s</div></html>",
               max(buttonPanel.getPreferredSize().width, CENTER_WIDTH),
               fontStyle,
               centerMessage));
@@ -461,7 +690,7 @@ public class ImmersiveDialogCore extends JDialog {
             campaignGUI.focusOnPerson(id);
         } else if (commandKey.equalsIgnoreCase(MISSION_COMMAND_STRING)) {
             try {
-                final int targetId = MathUtility.parseInt(entryKey, -1);
+                final UUID targetId = UUID.fromString(entryKey);
                 campaignGUI.focusOnMission(targetId);
             } catch (Exception e) {
                 LOGGER.error("Failed to parse mission ID: {}", entryKey, e);
@@ -485,10 +714,10 @@ public class ImmersiveDialogCore extends JDialog {
      * @param outOfCharacterMessage The OOC message to display.
      */
     private void populateOutOfCharacterPanel(String outOfCharacterMessage) {
-        JPanel pnlOutOfCharacter = new JPanel(new GridBagLayout());
-
-        // Create a compound border with an etched border and padding (empty border)
-        pnlOutOfCharacter.setBorder(RoundedLineBorder.createRoundedLineBorder());
+        JPanel pnlOutOfCharacter = ImmersiveDialogStyle.createInformationPanel();
+        pnlOutOfCharacter.add(ImmersiveDialogStyle.createSectionHeader(
+              getText("ImmersiveDialog.information.title"),
+              ImmersiveDialogStyle.getInformationColor()), BorderLayout.NORTH);
 
         // Create a JEditorPane for the message
         JEditorPane editorPane = getJEditorPane(outOfCharacterMessage);
@@ -498,10 +727,10 @@ public class ImmersiveDialogCore extends JDialog {
         editorPane.addHyperlinkListener(this::hyperlinkEventListenerActions);
 
         // Add the editor pane to the panel
-        pnlOutOfCharacter.add(editorPane);
+        pnlOutOfCharacter.add(editorPane, BorderLayout.CENTER);
 
         // Add the panel to the southPanel
-        southPanel.add(pnlOutOfCharacter, BorderLayout.SOUTH);
+        southPanel.add(pnlOutOfCharacter, BorderLayout.CENTER);
     }
 
     private JEditorPane getJEditorPane(String outOfCharacterMessage) {
@@ -509,13 +738,19 @@ public class ImmersiveDialogCore extends JDialog {
         editorPane.setContentType("text/html");
         editorPane.setEditable(false);
         editorPane.setFocusable(false);
+        editorPane.setOpaque(false);
+        editorPane.setBorder(BorderFactory.createEmptyBorder());
 
         int width = CENTER_WIDTH;
         width += leftSpeaker != null ? IMAGE_WIDTH + PADDING : 0;
         width += rightSpeaker != null ? IMAGE_WIDTH + PADDING : 0;
 
         // Use inline CSS to set font family, size, and other style properties
-        editorPane.setText(String.format("<div style='width: %s'>%s</div>", width, outOfCharacterMessage));
+        editorPane.setText(String.format("<html><head><style>body { margin: 0; } " +
+                                               "p { margin-top: 0; margin-bottom: 0; }</style></head>" +
+                                               "<body><div style='width: %dpx'>%s</div></body></html>",
+              width,
+              outOfCharacterMessage));
         return editorPane;
     }
 
@@ -552,23 +787,23 @@ public class ImmersiveDialogCore extends JDialog {
         // Main container panel to hold the button panel
         JPanel containerPanel = new JPanel();
         containerPanel.setLayout(new BorderLayout(padding, padding));
+        containerPanel.setOpaque(false);
 
         // Create button panel
-        JPanel buttonPanel = new JPanel();
-        buttonPanel.setLayout(new GridBagLayout());
+        JPanel buttonPanel = createResponseButtonPanel(isVerticalLayout, padding);
         GridBagConstraints gbc = new GridBagConstraints();
         gbc.gridx = 0;
         gbc.gridy = 0;
         gbc.insets = new Insets(padding, padding, padding, padding);
         gbc.anchor = GridBagConstraints.WEST;
-        gbc.fill = GridBagConstraints.NONE;
+        gbc.fill = isVerticalLayout ? GridBagConstraints.HORIZONTAL : GridBagConstraints.NONE;
+        gbc.weightx = isVerticalLayout ? 1 : 0;
 
-        List<RoundedJButton> buttonList = new ArrayList<>();
-        Dimension largestSize = scaleForGUI(0, 0);
+        List<TransmissionResponseButton> buttonList = new ArrayList<>();
 
         // First pass: Create buttons and determine the largest size
         for (ButtonLabelTooltipPair buttonStrings : buttons) {
-            RoundedJButton button = null;
+            TransmissionResponseButton button = null;
 
             if (isVerticalLayout) {
                 StringBuilder buttonLabel = new StringBuilder("<html>");
@@ -587,19 +822,17 @@ public class ImmersiveDialogCore extends JDialog {
                     buttonLabel.append(label);
                 }
 
-                button = new RoundedJButton(buttonLabel.toString());
+                button = new TransmissionResponseButton(buttonLabel.toString());
             } else {
                 String label = buttonStrings.btnLabel();
                 String tooltip = buttonStrings.btnTooltip();
-                if (label != null) {
-                    String text = String.format("<html><div style='text-align:center;'>%s</div></html>", label);
-                    button = new RoundedJButton(text);
+                String text = resolveHorizontalButtonText(label, tooltip);
+                if (text != null) {
+                    button = new TransmissionResponseButton(text);
 
-                    if (tooltip != null) {
+                    if (label != null && tooltip != null) {
                         button.setToolTipText(wordWrap(tooltip));
                     }
-                } else if (tooltip != null) {
-                    button = new RoundedJButton(tooltip);
                 }
             }
 
@@ -607,61 +840,37 @@ public class ImmersiveDialogCore extends JDialog {
                 continue;
             }
 
+            ImmersiveDialogStyle.applyResponseButtonStyle(button);
+
             // Left-align text, if using vertical layout, otherwise we want text centralized (default)
             if (isVerticalLayout) {
                 button.setHorizontalAlignment(SwingConstants.LEFT);
                 button.setHorizontalTextPosition(SwingConstants.LEFT);
             }
 
-            // Add action listener
-            button.addActionListener(evt -> {
-                setDialogChoice(buttons.indexOf(buttonStrings));
-
-                if (spinner != null) {
-                    setSpinnerValue((int) spinner.getValue());
-                }
-
-                if (comboBox != null) {
-                    setComboBoxChoiceIndex(comboBox.getSelectedIndex());
-                }
-
-                dispose();
-            });
-
-            // Update largest size
-            Dimension preferredSize = button.getPreferredSize();
-            if (preferredSize.width > largestSize.width) {
-                largestSize.width = preferredSize.width;
-            }
-            if (preferredSize.height > largestSize.height) {
-                largestSize.height = preferredSize.height;
-            }
+            TransmissionResponseButton responseButton = button;
+            int responseIndex = buttons.indexOf(buttonStrings);
+            button.addActionListener(evt -> responseActivationController.activate(
+                  responseButton,
+                  buttonList,
+                  () -> captureResponseState(responseIndex),
+                getText("ImmersiveDialog.response.transmitting.text"),
+                getText("ImmersiveDialog.response.transmitting.compact"),
+                getText("ImmersiveDialog.response.transmitting.accessible")));
 
             buttonList.add(button);
         }
 
-        // Second pass: Set all buttons to the largest size
-        for (RoundedJButton button : buttonList) {
-            button.setPreferredSize(largestSize);
-        }
+        applyUniformButtonSizes(buttonList);
 
         // Final pass: Add buttons to the panel
-        for (RoundedJButton button : buttonList) {
-            buttonPanel.add(button, gbc);
-
-            // This ensures we don't have a button selected by default
-            button.setFocusable(false);
-
+        for (TransmissionResponseButton button : buttonList) {
             if (isVerticalLayout) {
+                buttonPanel.add(button, gbc);
                 // If we're using a vertical layout, we just want the buttons stacked
                 gbc.gridy++;
             } else {
-                // Horizontal layout with wrapping after every 3 buttons
-                gbc.gridx++;
-                if (gbc.gridx % 3 == 0) { // Move to a new row after every third button
-                    gbc.gridx = 0;
-                    gbc.gridy++;
-                }
+                buttonPanel.add(button);
             }
         }
 
@@ -669,6 +878,76 @@ public class ImmersiveDialogCore extends JDialog {
         containerPanel.add(buttonPanel, BorderLayout.CENTER);
 
         return containerPanel;
+    }
+
+    static JPanel createResponseButtonPanel(boolean isVerticalLayout, int padding) {
+        JPanel buttonPanel = new JPanel(isVerticalLayout
+                                              ? new GridBagLayout()
+                                              : new WrapLayout(FlowLayout.CENTER, padding, padding));
+        buttonPanel.setOpaque(false);
+        return buttonPanel;
+    }
+
+    static String resolveHorizontalButtonText(String label, String tooltip) {
+        return label != null ? label : tooltip;
+    }
+
+    static void applyUniformButtonSizes(List<? extends JButton> buttons) {
+        int largestWidth = 0;
+        int largestHeight = 0;
+        for (JButton button : buttons) {
+            if (button == null) {
+                throw new IllegalArgumentException("buttons cannot contain null");
+            }
+            Dimension requiredSize = calculateRequiredButtonSize(button);
+            largestWidth = max(largestWidth, requiredSize.width);
+            largestHeight = max(largestHeight, requiredSize.height);
+        }
+
+        Dimension largestSize = new Dimension(largestWidth, largestHeight);
+        for (JButton button : buttons) {
+            if (button == null) {
+                throw new IllegalArgumentException("buttons cannot contain null");
+            }
+            button.setMinimumSize(new Dimension(largestSize));
+            button.setPreferredSize(new Dimension(largestSize));
+        }
+    }
+
+    private static Dimension calculateRequiredButtonSize(JButton button) {
+        Dimension uiPreferredSize = button.getPreferredSize();
+        String text = button.getText();
+        if (BasicHTML.isHTMLString(text)) {
+            return new Dimension(uiPreferredSize);
+        }
+
+        FontMetrics fontMetrics = button.getFontMetrics(button.getFont());
+        Insets insets = button.getInsets();
+        int contentWidth = text == null ? 0 : fontMetrics.stringWidth(text);
+        int contentHeight = fontMetrics.getHeight();
+        Icon icon = button.getIcon();
+        if (icon != null) {
+            contentWidth += icon.getIconWidth() + button.getIconTextGap();
+            contentHeight = max(contentHeight, icon.getIconHeight());
+        }
+
+        int horizontalAllowance = scaleForGUI(RESPONSE_BUTTON_HORIZONTAL_LAYOUT_ALLOWANCE);
+        int verticalAllowance = scaleForGUI(RESPONSE_BUTTON_VERTICAL_LAYOUT_ALLOWANCE);
+        int requiredWidth = contentWidth + insets.left + insets.right + horizontalAllowance * 2;
+        int requiredHeight = contentHeight + insets.top + insets.bottom + verticalAllowance * 2;
+        return new Dimension(max(uiPreferredSize.width, requiredWidth), max(uiPreferredSize.height, requiredHeight));
+    }
+
+    private void captureResponseState(int responseIndex) {
+        setDialogChoice(responseIndex);
+
+        if (spinner != null) {
+            setSpinnerValue((int) spinner.getValue());
+        }
+
+        if (comboBox != null) {
+            setComboBoxChoiceIndex(comboBox.getSelectedIndex());
+        }
     }
 
     /**
@@ -712,6 +991,7 @@ public class ImmersiveDialogCore extends JDialog {
     protected JPanel buildLeftSpeakerPanel(@Nullable Person speaker, Campaign campaign) {
         JPanel speakerBox = new JPanel();
         speakerBox.setLayout(new BoxLayout(speakerBox, BoxLayout.Y_AXIS));
+        speakerBox.setOpaque(false);
         speakerBox.setAlignmentX(Component.CENTER_ALIGNMENT);
         speakerBox.setMaximumSize(new Dimension(IMAGE_WIDTH, scaleForGUI(MAX_VALUE)));
 
@@ -726,9 +1006,8 @@ public class ImmersiveDialogCore extends JDialog {
         if (speakerIcon != null) {
             speakerIcon = scaleImageIcon(speakerIcon, IMAGE_WIDTH, true);
         }
-        JLabel imageLabel = new JLabel();
-        imageLabel.setIcon(speakerIcon);
-        imageLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
+        TransmissionImagePanel imagePanel = new TransmissionImagePanel(speakerIcon, signalQuality);
+        imagePanel.setAlignmentX(Component.CENTER_ALIGNMENT);
 
         // Speaker description (below the icon)
         StringBuilder speakerDescription = getSpeakerDescription(campaign, speaker, speakerName);
@@ -739,7 +1018,10 @@ public class ImmersiveDialogCore extends JDialog {
         leftDescription.setAlignmentX(Component.CENTER_ALIGNMENT);
 
         // Add the image and description to the speakerBox
-        speakerBox.add(imageLabel);
+        speakerBox.add(imagePanel);
+        if (speakerIcon != null) {
+            speakerBox.add(Box.createRigidArea(scaleForGUI(0, PADDING)));
+        }
         speakerBox.add(leftDescription);
 
         return speakerBox;
@@ -864,11 +1146,95 @@ public class ImmersiveDialogCore extends JDialog {
         return new ImageIcon(baseImage.getScaledInstance(targetWidth, height, Image.SCALE_SMOOTH));
     }
 
+    static final class ResponseActivationController {
+        static final int TRANSMISSION_CONFIRMATION_DELAY_MS = 350;
+
+        private final Runnable dialogDisposer;
+        private Timer confirmationTimer;
+        private TransmissionResponseButton selectedButton;
+        private boolean responseActivated;
+        private boolean completionPending;
+        private boolean transmissionFeedbackVisible;
+
+          ResponseActivationController(Runnable dialogDisposer) {
+            this.dialogDisposer = dialogDisposer;
+        }
+
+        boolean activate(TransmissionResponseButton selectedButton,
+              List<TransmissionResponseButton> responseButtons, Runnable captureResponse,
+              String confirmationText, String compactConfirmationText, String accessibleFeedbackText) {
+            if (responseActivated) {
+                return false;
+            }
+
+            responseActivated = true;
+            captureResponse.run();
+            for (TransmissionResponseButton responseButton : responseButtons) {
+                if (responseButton != selectedButton) {
+                    responseButton.setEnabled(false);
+                }
+            }
+            this.selectedButton = selectedButton;
+            selectedButton.lockTransmissionConfirmation(
+                confirmationText, compactConfirmationText, accessibleFeedbackText);
+            transmissionFeedbackVisible = true;
+
+            completionPending = true;
+            confirmationTimer = new Timer(TRANSMISSION_CONFIRMATION_DELAY_MS,
+                  event -> completeTransmission());
+            confirmationTimer.setRepeats(false);
+            confirmationTimer.start();
+            return true;
+        }
+
+        void completeTransmission() {
+            if (!completionPending) {
+                return;
+            }
+
+            completionPending = false;
+            stopTimer();
+            clearTransmissionFeedback();
+            dialogDisposer.run();
+        }
+
+        void cancel() {
+            completionPending = false;
+            stopTimer();
+            clearTransmissionFeedback();
+        }
+
+        boolean isConfirmationTimerRunning() {
+            return confirmationTimer != null && confirmationTimer.isRunning();
+        }
+
+        boolean isConfirmationTimerRepeating() {
+            return confirmationTimer != null && confirmationTimer.isRepeats();
+        }
+
+        private void stopTimer() {
+            if (confirmationTimer != null) {
+                confirmationTimer.stop();
+                confirmationTimer = null;
+            }
+        }
+
+        private void clearTransmissionFeedback() {
+            if (!transmissionFeedbackVisible) {
+                return;
+            }
+
+            transmissionFeedbackVisible = false;
+            selectedButton.clearTransmissionConfirmation();
+            selectedButton = null;
+        }
+    }
+
     /**
      * Represents a label-tooltip pair for constructing UI buttons. Each button displays a label and optionally provides
      * a tooltip when hovered.
      */
-    public record ButtonLabelTooltipPair(String btnLabel, String btnTooltip) {
+    public record ButtonLabelTooltipPair(String btnLabel, @Nullable String btnTooltip) {
         /**
          * Constructs a ButtonLabelTooltipPair with the given label and tooltip.
          *
@@ -877,12 +1243,10 @@ public class ImmersiveDialogCore extends JDialog {
          *
          * @throws IllegalArgumentException if both {@code btnLabel} and {@code btnTooltip} are {@code null}.
          */
-        public ButtonLabelTooltipPair(String btnLabel, @Nullable String btnTooltip) {
+        public ButtonLabelTooltipPair {
             if (btnLabel == null && btnTooltip == null) {
                 throw new IllegalArgumentException("btnLabel and btnTooltip cannot be null at the same time.");
             }
-            this.btnLabel = btnLabel;
-            this.btnTooltip = btnTooltip;
         }
 
         /**

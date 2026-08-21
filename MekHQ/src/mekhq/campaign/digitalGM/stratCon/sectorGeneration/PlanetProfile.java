@@ -38,11 +38,10 @@ import java.util.List;
 import megamek.common.annotations.Nullable;
 import megamek.logging.MMLogger;
 import mekhq.campaign.Campaign;
-import mekhq.campaign.mission.AtBContract;
+import mekhq.campaign.mission.contract.AbstractContract;
 import mekhq.campaign.universe.Atmosphere;
 import mekhq.campaign.universe.LandMass;
 import mekhq.campaign.universe.Planet;
-import mekhq.campaign.universe.PlanetarySystem;
 import mekhq.campaign.universe.SourceableValue;
 import mekhq.campaign.universe.enums.HPGRating;
 
@@ -206,17 +205,10 @@ public record PlanetProfile(int temperatureCelsius, double diameterKm, int water
      *
      * @return a resolved {@link PlanetProfile}
      */
-    public static PlanetProfile from(AtBContract contract, Campaign campaign) {
-        PlanetarySystem system = contract.getSystem();
-        if (system == null) {
-            LOGGER.warn("Contract {} has no system; using a neutral planet profile", contract.getName());
-            return neutral(NEUTRAL_TEMPERATURE_CELSIUS);
-        }
-
-        Planet planet = system.getPrimaryPlanet();
+    public static PlanetProfile from(AbstractContract contract, Campaign campaign) {
+        Planet planet = contract.getTargetPlanet();
         if (planet == null) {
-            LOGGER.warn("System {} has no primary planet; using a neutral planet profile",
-                  system.getName(campaign.getLocalDate()));
+            LOGGER.warn("No target planet; using a neutral planet profile");
             return neutral(NEUTRAL_TEMPERATURE_CELSIUS);
         }
 

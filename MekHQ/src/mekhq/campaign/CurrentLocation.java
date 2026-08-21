@@ -165,6 +165,8 @@ public class CurrentLocation extends AbstractMobileLocation {
     @Override
     public void setJumpPath(JumpPath path) {
         jumpPath = path;
+        // Underway: the force is no longer at a world until the path completes.
+        currentPlanet = null;
         MekHQ.triggerEvent(new TransitStatusChangedEvent(this));
     }
 
@@ -246,6 +248,7 @@ public class CurrentLocation extends AbstractMobileLocation {
                     campaign.addReport(GENERAL, "Jumping to " + jumpPath.get(1).getPrintableName(today));
                 }
                 currentSystem = jumpPath.get(1);
+                currentPlanet = null;
                 jumpZenith = pickJumpPoint(today);
                 jumpPath.removeFirstSystem();
                 MekHQ.triggerEvent(new LocationChangedEvent(this, true));
@@ -285,8 +288,11 @@ public class CurrentLocation extends AbstractMobileLocation {
                     campaign.addReport(GENERAL,
                           jumpPath.getLastSystem().getPrintableName(campaign.getLocalDate()) + " reached.");
                 }
-                // we are here!
+                // we are here! Capture the world the path aimed at before discarding it - this is the only point
+                // where the destination is still known. A path with no target world leaves this null, so getPlanet()
+                // keeps reporting the system's primary world.
                 transitTime = 0;
+                currentPlanet = jumpPath.getTargetPlanet();
                 jumpPath = null;
                 MekHQ.triggerEvent(new TransitCompleteEvent(this));
             }
@@ -306,6 +312,11 @@ public class CurrentLocation extends AbstractMobileLocation {
     public void writeToXML(final PrintWriter pw, int indent) {
         MHQXMLUtility.writeSimpleXMLOpenTag(pw, indent++, "location");
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "currentSystemId", currentSystem.getId());
+        // Deliberately not "currentPlanetId"/"currentPlanetName" - those are read as aliases for the system id, from
+        // when systems were called planets.
+        if (currentPlanet != null) {
+            MHQXMLUtility.writeSimpleXMLTag(pw, indent, "currentWorldId", currentPlanet.getId());
+        }
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "transitTime", transitTime);
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "rechargeTime", rechargeTime);
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "jumpZenith", jumpZenith);
@@ -330,6 +341,8 @@ public class CurrentLocation extends AbstractMobileLocation {
         try {
             retVal = new CurrentLocation();
             NodeList nl = wn.getChildNodes();
+            // A world id only resolves against its system, and the tags can arrive in any order, so resolve after.
+            String pendingWorldId = null;
 
             for (int x = 0; x < nl.getLength(); x++) {
                 Node wn2 = nl.item(x);
@@ -347,6 +360,8 @@ public class CurrentLocation extends AbstractMobileLocation {
                         }
                     }
                     retVal.currentSystem = p;
+                } else if (wn2.getNodeName().equalsIgnoreCase("currentWorldId")) {
+                    pendingWorldId = wn2.getTextContent().trim();
                 } else if (wn2.getNodeName().equalsIgnoreCase("transitTime")) {
                     retVal.transitTime = Double.parseDouble(wn2.getTextContent());
                 } else if (wn2.getNodeName().equalsIgnoreCase("rechargeTime")) {
@@ -361,6 +376,13 @@ public class CurrentLocation extends AbstractMobileLocation {
                     retVal.pendingUnitIds.add(UUID.fromString(wn2.getTextContent().trim()));
                 } else if (wn2.getNodeName().equalsIgnoreCase("partId")) {
                     retVal.pendingPartIds.add(Integer.parseInt(wn2.getTextContent().trim()));
+                }
+            }
+            if ((pendingWorldId != null) && (retVal.currentSystem != null)) {
+                retVal.currentPlanet = retVal.currentSystem.getPlanetById(pendingWorldId);
+                if (retVal.currentPlanet == null) {
+                    logger.warn("Couldn't find world {} in system {}; falling back to the primary world.",
+                          pendingWorldId, retVal.currentSystem.getId());
                 }
             }
         } catch (Exception ex) {

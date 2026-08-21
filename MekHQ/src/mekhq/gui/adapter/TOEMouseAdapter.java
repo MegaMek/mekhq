@@ -43,7 +43,15 @@ import static mekhq.campaign.force.FormationType.STANDARD;
 import static mekhq.campaign.force.FormationType.SUPPORT;
 
 import java.awt.event.ActionEvent;
-import java.util.*;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Optional;
+import java.util.StringJoiner;
+import java.util.StringTokenizer;
+import java.util.UUID;
+import java.util.Vector;
 import javax.swing.JMenu;
 import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
@@ -70,10 +78,10 @@ import mekhq.campaign.force.Formation;
 import mekhq.campaign.force.FormationLevel;
 import mekhq.campaign.force.FormationType;
 import mekhq.campaign.log.AssignmentLogger;
-import mekhq.campaign.mission.AtBDynamicScenario;
-import mekhq.campaign.mission.Mission;
-import mekhq.campaign.mission.Scenario;
-import mekhq.campaign.mission.enums.CombatRole;
+import mekhq.campaign.mission.contract.AbstractContract;
+import mekhq.campaign.mission.scenarios.AtBDynamicScenario;
+import mekhq.campaign.mission.scenarios.Scenario;
+import mekhq.campaign.mission.utilities.CombatRole;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.enums.PersonnelRole;
 import mekhq.campaign.unit.HangarSorter;
@@ -1273,7 +1281,7 @@ public class TOEMouseAdapter extends JPopupMenuAdapter {
                 menu = new JMenu("Deploy Force");
 
                 JMenu missionMenu;
-                for (final Mission mission : gui.getCampaign().getActiveMissions(true)) {
+                for (final AbstractContract mission : gui.getCampaign().getActiveContracts(true)) {
                     missionMenu = new JMenu(mission.getName());
                     for (final Scenario scenario : mission.getCurrentScenarios()) {
                         if (scenario.isCloaked() || !scenario.canDeployForces(formations, gui.getCampaign())) {
@@ -1565,7 +1573,7 @@ public class TOEMouseAdapter extends JPopupMenuAdapter {
                 // Deploy unit to a scenario - includes submenus for scenario selection
                 menu = new JMenu("Deploy Unit");
                 JMenu missionMenu;
-                for (final Mission mission : gui.getCampaign().getActiveMissions(true)) {
+                for (final AbstractContract mission : gui.getCampaign().getActiveContracts(true)) {
                     missionMenu = new JMenu(mission.getName());
                     for (final Scenario scenario : mission.getCurrentScenarios()) {
                         if (scenario.isCloaked() || !scenario.canDeployUnits(units, gui.getCampaign())) {

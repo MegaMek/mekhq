@@ -42,10 +42,9 @@ import java.util.stream.Collectors;
 
 import megamek.logging.MMLogger;
 import mekhq.campaign.Campaign;
-import mekhq.campaign.mission.AtBContract;
-import mekhq.campaign.mission.Mission;
-import mekhq.campaign.mission.enums.MissionStatus;
 import mekhq.campaign.campaignOptions.CampaignOption;
+import mekhq.campaign.mission.contract.AbstractContract;
+import mekhq.campaign.mission.contract.contractData.MissionStatus;
 
 public class CombatRecordRating {
     private static final MMLogger LOGGER = MMLogger.create(CombatRecordRating.class);
@@ -83,16 +82,15 @@ public class CombatRecordRating {
         boolean usePerformanceCutOff = campaign.getCampaignOptions().get(CampaignOption.REPUTATION_PERFORMANCE_MODIFIER_CUT_OFF);
         LocalDate cutOffDate = campaign.getLocalDate().minusYears(REPUTATION_PERFORMANCE_CUT_OFF_YEARS);
         Map<MissionStatus, Long> missionCountsByStatus = new HashMap<>();
-        for (Mission mission : campaign.getCompletedMissions()) {
+        for (AbstractContract mission : campaign.getCompletedContracts()) {
             if (mission.getStatus() == MissionStatus.ACTIVE) {
                 continue;
             }
 
             if (usePerformanceCutOff) {
-                if (mission instanceof AtBContract) {
-                    if (((AtBContract) mission).getEndingDate().isBefore(cutOffDate)) {
-                        continue;
-                    }
+                LocalDate endingDate = mission.getEndingDate();
+                if ((endingDate != null) && endingDate.isBefore(cutOffDate)) {
+                    continue;
                 }
             }
 

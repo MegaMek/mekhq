@@ -70,7 +70,7 @@ public record CampaignOptionsFreebieTracker(boolean awardVeterancySPAs, boolean 
       boolean trackPrisoners, boolean useMASHTheatres, boolean useFatigue, boolean useAdvancedSalvage,
       boolean useStratCon, boolean useMapless, boolean useAdvancedScouting, boolean useAltAdvancedMedical,
       boolean useDiseases, boolean useNormalizedContractPayModel, boolean useDiminishingContractPay,
-      boolean useChaosReputation) {
+      boolean useChaosReputation, boolean useLegacyContractOptions) {
     /**
      * Creates a tracker snapshot from the provided {@link CampaignOptions}.
      *
@@ -102,7 +102,8 @@ public record CampaignOptionsFreebieTracker(boolean awardVeterancySPAs, boolean 
               options.get(CampaignOption.USE_ALTERNATIVE_ADVANCED_MEDICAL) && options.get(CampaignOption.USE_RANDOM_DISEASES),
               options.get(CampaignOption.USE_ALTERNATE_PAYMENT_MODE),
               options.get(CampaignOption.USE_DIMINISHING_CONTRACT_PAY) && isDiminishingContractPayRelevant(options),
-              options.get(CampaignOption.USE_CHAOS_REPUTATION)
+              options.get(CampaignOption.USE_CHAOS_REPUTATION),
+              options.get(CampaignOption.USE_LEGACY_CONTRACT_PAY)
         );
     }
 

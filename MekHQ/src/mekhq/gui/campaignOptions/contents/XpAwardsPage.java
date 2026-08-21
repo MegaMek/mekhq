@@ -44,12 +44,12 @@ import javax.swing.JSpinner;
 
 import jakarta.annotation.Nonnull;
 import jakarta.annotation.Nullable;
-import mekhq.gui.campaignOptions.CampaignOptionFlag;
 import megamek.client.ui.settings.SettingsFormPanel;
+import megamek.client.ui.settings.SettingsPairedFieldGridPanel;
+import mekhq.gui.campaignOptions.CampaignOptionFlag;
 import mekhq.gui.campaignOptions.components.CampaignOptionsHeaderPanel;
 import mekhq.gui.campaignOptions.components.CampaignOptionsLabel;
 import mekhq.gui.campaignOptions.components.CampaignOptionsPagePanel;
-import megamek.client.ui.settings.SettingsPairedFieldGridPanel;
 import mekhq.gui.campaignOptions.components.CampaignOptionsSpinner;
 
 /**
@@ -116,8 +116,6 @@ class XpAwardsPage {
     private JSpinner spnMissionXpOutstandingSuccess;
 
     private JPanel pnlAdministrators;
-    private JLabel lblContractNegotiationXP;
-    private JSpinner spnContractNegotiationXP;
     private JLabel lblAdminWeeklyXP;
     private JSpinner spnAdminWeeklyXP;
     private JLabel lblAdminWeeklyXPPeriod;
@@ -347,14 +345,8 @@ class XpAwardsPage {
         spnAdminWeeklyXPPeriod = new CampaignOptionsSpinner("AdminWeeklyXPPeriod", 1, 1, 52, 1);
         spnAdminWeeklyXPPeriod.addMouseListener(createTipPanelUpdater("AdminWeeklyXPPeriod"));
 
-        lblContractNegotiationXP = new CampaignOptionsLabel("ContractNegotiationXP",
-                getMetadata(LEGACY_RULE_BEFORE_METADATA, CampaignOptionFlag.IMPORTANT, CampaignOptionFlag.RECOMMENDED));
-        lblContractNegotiationXP.addMouseListener(createTipPanelUpdater("ContractNegotiationXP"));
-        spnContractNegotiationXP = new CampaignOptionsSpinner("ContractNegotiationXP", 0, 0, 20, 1);
-        spnContractNegotiationXP.addMouseListener(createTipPanelUpdater("ContractNegotiationXP"));
-
-        JComponent[] labels = { lblAdminWeeklyXP, lblAdminWeeklyXPPeriod, lblContractNegotiationXP };
-        JComponent[] controls = { spnAdminWeeklyXP, spnAdminWeeklyXPPeriod, spnContractNegotiationXP };
+        JComponent[] labels = { lblAdminWeeklyXP, lblAdminWeeklyXPPeriod };
+        JComponent[] controls = { spnAdminWeeklyXP, spnAdminWeeklyXPPeriod };
 
         return createAdvancementPairedGrid("AdministratorsXpPanel", labels, controls);
     }
@@ -384,7 +376,6 @@ class XpAwardsPage {
         spnMissionXpFail.setValue(model.missionXpFail);
         spnMissionXpSuccess.setValue(model.missionXpSuccess);
         spnMissionXpOutstandingSuccess.setValue(model.missionXpOutstandingSuccess);
-        spnContractNegotiationXP.setValue(model.contractNegotiationXP);
         spnAdminWeeklyXP.setValue(model.adminWeeklyXP);
         spnAdminWeeklyXPPeriod.setValue(model.adminWeeklyXPPeriod);
     }
@@ -414,7 +405,6 @@ class XpAwardsPage {
         model.missionXpFail = (int) spnMissionXpFail.getValue();
         model.missionXpSuccess = (int) spnMissionXpSuccess.getValue();
         model.missionXpOutstandingSuccess = (int) spnMissionXpOutstandingSuccess.getValue();
-        model.contractNegotiationXP = (int) spnContractNegotiationXP.getValue();
         model.adminWeeklyXP = (int) spnAdminWeeklyXP.getValue();
         model.adminWeeklyXPPeriod = (int) spnAdminWeeklyXPPeriod.getValue();
     }

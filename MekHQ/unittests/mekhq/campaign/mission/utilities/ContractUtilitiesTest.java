@@ -47,7 +47,6 @@ import mekhq.campaign.Campaign;
 import mekhq.campaign.force.CombatTeam;
 import mekhq.campaign.force.Formation;
 import mekhq.campaign.force.FormationType;
-import mekhq.campaign.mission.enums.CombatRole;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;

@@ -39,7 +39,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import mekhq.campaign.Campaign;
-import mekhq.campaign.mission.enums.ContractMoraleLevel;
+import mekhq.campaign.mission.contract.contractData.ContractMoraleLevel;
 import mekhq.campaign.mission.resupplyAndCaches.Resupply;
 import mekhq.gui.baseComponents.immersiveDialogs.ImmersiveDialogSimple;
 

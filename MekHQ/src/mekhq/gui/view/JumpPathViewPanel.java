@@ -47,12 +47,12 @@ import javax.swing.JPanel;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.JumpPath;
+import mekhq.campaign.campaignOptions.CampaignOption;
 import mekhq.campaign.finances.Money;
-import mekhq.campaign.mission.TransportCostCalculations;
+import mekhq.campaign.mission.utilities.TransportCostCalculations;
 import mekhq.campaign.universe.PlanetarySystem;
 import mekhq.campaign.universe.factionStanding.FactionStandingUtilities;
 import mekhq.gui.baseComponents.JScrollablePanel;
-import mekhq.campaign.campaignOptions.CampaignOption;
 
 /**
  * A custom panel that gets filled in with goodies from a JumpPath record
@@ -121,7 +121,7 @@ public class JumpPathViewPanel extends JScrollablePanel {
                                                                  .isOverridingCommandCircuitRequirements(),
                     campaign.isGM(),
                     campaign.getCampaignOptions().isUseFactionStandingCommandCircuitSafe(),
-                    campaign.getPlayerForce().getFactionStandings(), campaign.getFutureAtBContracts());
+                    campaign.getPlayerForce().getFactionStandings(), campaign.getFutureContracts());
 
         for (PlanetarySystem system : path.getSystems()) {
             lblPlanet =
@@ -253,7 +253,7 @@ public class JumpPathViewPanel extends JScrollablePanel {
         boolean isUseCommandCircuit = FactionStandingUtilities.isUseCommandCircuit(campaign.getPlayerForce()
                                                                                          .isOverridingCommandCircuitRequirements(),
               campaign.isGM(), campaign.getCampaignOptions().isUseFactionStandingCommandCircuitSafe(),
-              campaign.getPlayerForce().getFactionStandings(), campaign.getFutureAtBContracts());
+              campaign.getPlayerForce().getFactionStandings(), campaign.getFutureContracts());
 
         txtRechargeTime.setName("lblRechargeTime2");
         txtRechargeTime.setText("<html>" +

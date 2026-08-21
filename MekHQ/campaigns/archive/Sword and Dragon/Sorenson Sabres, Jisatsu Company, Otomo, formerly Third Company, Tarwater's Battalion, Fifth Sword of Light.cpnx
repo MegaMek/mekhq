@@ -1045,7 +1045,7 @@
 				Sabres</desc>
 			<id>1</id>
 			<scenarios>
-				<scenario id="1" type="mekhq.campaign.mission.Scenario">
+				<scenario id="1" type="mekhq.campaign.mission.scenarios.Scenario">
 					<name>Main Track</name>
 					<desc>Outer Gorge
 						Udibi, Federated Suns

@@ -61,10 +61,10 @@ import megamek.common.units.Entity;
 import megamek.common.util.BoardUtilities;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.force.Formation;
-import mekhq.campaign.mission.AtBContract;
-import mekhq.campaign.mission.AtBDynamicScenario;
-import mekhq.campaign.mission.BotForce;
-import mekhq.campaign.mission.enums.CombatRole;
+import mekhq.campaign.mission.contract.AbstractContract;
+import mekhq.campaign.mission.scenarios.AtBDynamicScenario;
+import mekhq.campaign.mission.scenarios.BotForce;
+import mekhq.campaign.mission.utilities.CombatRole;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.enums.PersonnelRole;
 import mekhq.campaign.personnel.ranks.Ranks;
@@ -179,9 +179,9 @@ class ScenarioSetupForcesTest {
     }
 
     private AtBDynamicScenario createScenario(Campaign campaign) {
-        var contract = mock(AtBContract.class);
-        when(contract.getEnemySkill()).thenReturn(SkillLevel.REGULAR);
-        when(contract.getAllySkill()).thenReturn(SkillLevel.REGULAR);
+        var contract = mock(AbstractContract.class);
+        when(contract.getEnemyForceSkill()).thenReturn(SkillLevel.REGULAR);
+        when(contract.getEmployerForceSkill()).thenReturn(SkillLevel.REGULAR);
 
         var scenario = mock(AtBDynamicScenario.class);
         when(scenario.getContract(any())).thenReturn(contract);

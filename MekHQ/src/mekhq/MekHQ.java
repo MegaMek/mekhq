@@ -106,17 +106,18 @@ import mekhq.campaign.CampaignController;
 import mekhq.campaign.ResolveScenarioTracker;
 import mekhq.campaign.autoResolve.MekHQSetupForces;
 import mekhq.campaign.autoResolve.StratConSetupForces;
+import mekhq.campaign.campaignOptions.CampaignOption;
 import mekhq.campaign.digitalGM.IDigitalGM;
 import mekhq.campaign.digitalGM.stratCon.gm.MaplessStratConGM;
 import mekhq.campaign.digitalGM.stratCon.gm.SinglesStratConGM;
 import mekhq.campaign.digitalGM.stratCon.gm.StratConDigitalGM;
 import mekhq.campaign.handler.PostScenarioDialogHandler;
 import mekhq.campaign.handler.XPHandler;
-import mekhq.campaign.mission.AtBDynamicScenario;
-import mekhq.campaign.mission.AtBScenario;
-import mekhq.campaign.mission.Scenario;
-import mekhq.campaign.mission.ScenarioTemplate;
-import mekhq.campaign.mission.ScenarioTemplate.BattlefieldControlType;
+import mekhq.campaign.mission.scenarios.AtBDynamicScenario;
+import mekhq.campaign.mission.scenarios.AtBScenario;
+import mekhq.campaign.mission.scenarios.Scenario;
+import mekhq.campaign.mission.scenarios.ScenarioTemplate;
+import mekhq.campaign.mission.scenarios.ScenarioTemplate.BattlefieldControlType;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.unit.Unit;
 import mekhq.gui.CampaignGUI;
@@ -130,7 +131,6 @@ import mekhq.gui.utilities.ObservableString;
 import mekhq.service.AutosaveService;
 import mekhq.service.IAutosaveService;
 import mekhq.utilities.ScenarioUtils;
-import mekhq.campaign.campaignOptions.CampaignOption;
 
 /**
  * The main class of the application.

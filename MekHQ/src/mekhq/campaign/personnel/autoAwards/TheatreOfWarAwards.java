@@ -38,11 +38,10 @@ import java.util.Map;
 import java.util.UUID;
 import java.util.stream.IntStream;
 
+import megamek.codeUtilities.MathUtility;
 import megamek.logging.MMLogger;
 import mekhq.campaign.Campaign;
-import mekhq.campaign.mission.AtBContract;
-import mekhq.campaign.mission.Contract;
-import mekhq.campaign.mission.Mission;
+import mekhq.campaign.mission.contract.AbstractContract;
 import mekhq.campaign.personnel.Award;
 import mekhq.campaign.universe.Faction;
 import mekhq.campaign.universe.Factions;
@@ -59,20 +58,14 @@ public class TheatreOfWarAwards {
      * @param person   the person to check award eligibility for
      * @param awards   the awards to be processed (should only include awards where item == TheatreOfWar)
      */
-    public static Map<Integer, List<Object>> TheatreOfWarAwardsProcessor(Campaign campaign, Mission mission,
+    public static Map<Integer, List<Object>> TheatreOfWarAwardsProcessor(Campaign campaign, AbstractContract mission,
           UUID person, List<Award> awards) {
         boolean isEligible;
         List<Award> eligibleAwards = new ArrayList<>();
 
-        // if the mission isn't an instance of 'AtBContract' we won't have the information we need,
-        // so abort processing.
-        if (!(mission instanceof AtBContract)) {
-            return AutoAwardsController.prepareAwardData(person, eligibleAwards);
-        }
+        String employer = mission.getEmployerFactionCode();
 
-        String employer = ((AtBContract) mission).getEmployerCode();
-
-        int contractStartYear = ((Contract) mission).getStartDate().getYear();
+        int contractStartYear = mission.getStartDate().getYear();
         int currentYear = campaign.getGameYear();
 
         for (Award award : awards) {
@@ -125,7 +118,7 @@ public class TheatreOfWarAwards {
                         continue;
                     }
                 } else if (campaign.getCampaignOptions().isUseStratCon()) {
-                    String enemy = ((AtBContract) mission).getEnemyCode();
+                    String enemy = mission.getEnemyFactionCode();
 
                     if (hasLoyalty(employer, attackers)) {
                         isEligible = hasLoyalty(enemy, defenders);
@@ -157,8 +150,8 @@ public class TheatreOfWarAwards {
 
         try {
             return IntStream.rangeClosed(0, contractLength).map(year -> contractStartYear + year)
-                         .anyMatch(checkYear -> (checkYear >= Integer.parseInt(wartime.getFirst()))
-                                                      && (checkYear <= Integer.parseInt(wartime.get(1))));
+                         .anyMatch(checkYear -> (checkYear >= MathUtility.parseInt(wartime.getFirst()))
+                                                      && (checkYear <= MathUtility.parseInt(wartime.get(1))));
         } catch (Exception e) {
             LOGGER.error("Failed to parse isDuringWartime. Returning false.");
             return false;

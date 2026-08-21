@@ -40,9 +40,9 @@ import megamek.Version;
 import megamek.logging.MMLogger;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.force.Formation;
-import mekhq.campaign.mission.Mission;
-import mekhq.campaign.mission.Scenario;
-import mekhq.campaign.mission.enums.ScenarioStatus;
+import mekhq.campaign.mission.contract.AbstractContract;
+import mekhq.campaign.mission.scenarios.Scenario;
+import mekhq.campaign.mission.scenarios.ScenarioStatus;
 import mekhq.campaign.storyArc.StoryPoint;
 import mekhq.utilities.MHQXMLUtility;
 import org.w3c.dom.Node;
@@ -93,7 +93,7 @@ public class ScenarioStoryPoint extends StoryPoint {
         super.start();
         StoryPoint missionStoryPoint = getStoryArc().getStoryPoint(missionStoryPointId);
         if (missionStoryPoint instanceof MissionStoryPoint) {
-            Mission m = ((MissionStoryPoint) missionStoryPoint).getMission();
+            AbstractContract m = ((MissionStoryPoint) missionStoryPoint).getMission();
             if (null != m & null != scenario) {
                 // set date for the scenario
                 scenario.setDate(getStoryArc().getCampaign().getLocalDate().plusDays(days));

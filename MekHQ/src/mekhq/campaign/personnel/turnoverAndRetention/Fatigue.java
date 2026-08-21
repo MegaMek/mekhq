@@ -48,13 +48,13 @@ import megamek.common.equipment.MiscMounted;
 import megamek.common.equipment.MiscType;
 import megamek.common.units.Entity;
 import mekhq.campaign.Campaign;
-import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.campaignOptions.CampaignOption;
+import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.digitalGM.stratCon.StratConRulesManager;
 import mekhq.campaign.digitalGM.stratCon.StratConTrackState;
 import mekhq.campaign.force.CombatTeam;
 import mekhq.campaign.force.Formation;
-import mekhq.campaign.mission.AtBContract;
+import mekhq.campaign.mission.contract.AbstractContract;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.enums.PersonnelRole;
 import mekhq.campaign.personnel.enums.PersonnelStatus;
@@ -265,7 +265,7 @@ public class Fatigue {
         }
 
         int leaveThreshold = campaignOptions.get(CampaignOption.FATIGUE_UNDEPLOYMENT_THRESHOLD);
-        List<AtBContract> activeContracts = campaign.getActiveAtBContracts();
+        List<AbstractContract> activeContracts = campaign.getActiveContracts();
 
         for (CombatTeam combatTeam : campaign.getPlayerForce().getCombatTeamsAsList(campaign)) {
             Formation formation = combatTeam.getFormation(campaign);
@@ -296,7 +296,7 @@ public class Fatigue {
             }
 
             if (fatiguedUnits >= (unitsInForce.size() + 1) / 2) {
-                for (AtBContract contract : campaign.getActiveAtBContracts()) {
+                for (AbstractContract contract : campaign.getActiveContracts()) {
                     if (contract.getStratConCampaignState() != null) {
                         for (StratConTrackState track : contract.getStratConCampaignState().getTracks()) {
                             track.unassignFormation(formation.getId());

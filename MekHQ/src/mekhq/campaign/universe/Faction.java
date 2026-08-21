@@ -268,9 +268,9 @@ public class Faction {
      *
      * @return {@code true} if this faction observed the Ares Conventions in the given year; {@code false} by default
      */
-public boolean isAresConventionsSignatory(int year) {
-    return faction2 != null && faction2.isAresConventionsSignatory(year);
-}
+    public boolean isAresConventionsSignatory(int year) {
+        return faction2 != null && faction2.isAresConventionsSignatory(year);
+    }
 
     public int getEraMod(int year) {
         if (eraMods == null) {
@@ -810,6 +810,6 @@ public boolean isAresConventionsSignatory(int year) {
     }
 
     public boolean isUsesMercenaries(int year) {
-        return faction2 != null ? faction2.isUsesMercenaries(year) : true;
+        return faction2 == null || faction2.isUsesMercenaries(year);
     }
 }

@@ -1496,7 +1496,7 @@
 			</desc>
 			<id>1</id>
 			<scenarios>
-				<scenario id="1" type="mekhq.campaign.mission.Scenario">
+				<scenario id="1" type="mekhq.campaign.mission.scenarios.Scenario">
 					<name>Setting the Tone</name>
 					<desc>There had better be something to shoot up ahead, else I will challenge the fledgling
 						myself and we will get ourselves back to the war at Spot. How this whelp won this

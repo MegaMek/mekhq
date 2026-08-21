@@ -46,7 +46,7 @@ import java.util.Map;
 
 import mekhq.campaign.digitalGM.stratCon.StratConContractDefinition.ObjectiveParameters;
 import mekhq.campaign.digitalGM.stratCon.StratConContractDefinition.StrategicObjectiveType;
-import mekhq.campaign.mission.enums.ContractObjectiveType;
+import mekhq.campaign.mission.contract.contractData.ContractObjectiveType;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
 
