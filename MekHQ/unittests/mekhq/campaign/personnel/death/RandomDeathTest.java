@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2025 The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2025-2026 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -59,6 +59,7 @@ import java.util.Set;
 import megamek.common.enums.Gender;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.campaignOptions.CampaignOptions;
+import mekhq.campaign.campaignOptions.CampaignOption;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.enums.AgeGroup;
 import mekhq.campaign.personnel.enums.PersonnelStatus;
@@ -116,9 +117,9 @@ public class RandomDeathTest {
         mockedPerson = mock(Person.class);
 
         when(mockedCampaign.getCampaignOptions()).thenReturn(mockedCampaignOptions);
-        when(mockedCampaignOptions.getEnabledRandomDeathAgeGroups()).thenReturn(ageGroups);
-        when(mockedCampaignOptions.isUseRandomDeathSuicideCause()).thenReturn(false);
-        when(mockedCampaignOptions.getRandomDeathMultiplier()).thenReturn(1.0);
+        when(mockedCampaignOptions.get(CampaignOption.ENABLED_RANDOM_DEATH_AGE_GROUPS)).thenReturn(ageGroups);
+        when(mockedCampaignOptions.get(CampaignOption.USE_RANDOM_DEATH_SUICIDE_CAUSE)).thenReturn(false);
+        when(mockedCampaignOptions.get(CampaignOption.RANDOM_DEATH_MULTIPLIER)).thenReturn(1.0);
         when(mockedCampaign.getLocalDate()).thenReturn(mockedToday);
 
         randomDeath = new RandomDeath();
@@ -206,7 +207,7 @@ public class RandomDeathTest {
 
         // Mocking the Campaign object
         when(mockedCampaign.getEra()).thenReturn(mockedEra);
-        when(mockedCampaign.getFaction()).thenReturn(mockedFaction);
+        when(mockedCampaign.getPlayerForce().getFaction()).thenReturn(mockedFaction);
         when(mockedCampaign.getLocalDate()).thenReturn(LocalDate.now());
 
         // Create the RandomDeath object normally, then spy on it
@@ -228,7 +229,7 @@ public class RandomDeathTest {
         doReturn(null).when(randomDeath).canDie(mockedPerson, true);
 
         // Use mocked CampaignOptions
-        when(mockedCampaignOptions.getRandomDeathMultiplier()).thenReturn(1.0);
+        when(mockedCampaignOptions.get(CampaignOption.RANDOM_DEATH_MULTIPLIER)).thenReturn(1.0);
         when(mockedCampaign.getCampaignOptions()).thenReturn(mockedCampaignOptions);
 
         // Act
@@ -254,7 +255,7 @@ public class RandomDeathTest {
 
         // Mocking the Campaign object
         when(mockedCampaign.getEra()).thenReturn(mockedEra);
-        when(mockedCampaign.getFaction()).thenReturn(mockedFaction);
+        when(mockedCampaign.getPlayerForce().getFaction()).thenReturn(mockedFaction);
         when(mockedCampaign.getLocalDate()).thenReturn(LocalDate.now());
 
         // Create the RandomDeath object normally, then spy on it
@@ -276,7 +277,7 @@ public class RandomDeathTest {
         doReturn(null).when(randomDeath).canDie(mockedPerson, true);
 
         // Use mocked CampaignOptions
-        when(mockedCampaignOptions.getRandomDeathMultiplier()).thenReturn(1.0);
+        when(mockedCampaignOptions.get(CampaignOption.RANDOM_DEATH_MULTIPLIER)).thenReturn(1.0);
         when(mockedCampaign.getCampaignOptions()).thenReturn(mockedCampaignOptions);
 
         // Act

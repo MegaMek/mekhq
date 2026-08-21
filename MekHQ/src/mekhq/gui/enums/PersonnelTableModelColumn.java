@@ -58,7 +58,7 @@ import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.finances.Money;
 import mekhq.campaign.force.Formation;
 import mekhq.campaign.market.PersonnelMarket;
-import mekhq.campaign.mission.Scenario;
+import mekhq.campaign.mission.scenarios.Scenario;
 import mekhq.campaign.personnel.Injury;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.PersonnelOptions;
@@ -171,7 +171,7 @@ public enum PersonnelTableModelColumn implements MHQTableColumn {
     SMALL_ARMS("Column.SMALL_ARMS.title", Comparators.SKILL_COMPARATOR,
           (person, campaign) -> getSkillValue(person, campaign).apply(InfantryGunnerySkills.getBestInfantryGunnerySkill(
                 person,
-                campaign.getCampaignOptions().isUseSmallArmsOnly())), PersonnelTableModelColumn::skillToText),
+                campaign.getCampaignOptions().get(CampaignOption.USE_SMALL_ARMS_ONLY))), PersonnelTableModelColumn::skillToText),
     ANTI_MEK("Column.ANTI_MEK.title", Comparators.SKILL_COMPARATOR,
           skillModelExtractor(SkillType.S_ANTI_MEK), PersonnelTableModelColumn::skillToText),
     ARTILLERY("Column.ARTILLERY.title", Comparators.SKILL_COMPARATOR,
@@ -219,14 +219,14 @@ public enum PersonnelTableModelColumn implements MHQTableColumn {
           person -> person.isTechExpanded() ? person.getMaintenanceTimeUsing() : 0, Object::toString),
     MAX_TECH_MINUTES("Column.MAX_TECH_MINUTES.title", Comparators.INT_COMPARATOR,
           (person, campaign) -> {
-              boolean isUseTechAdmin = campaign.getCampaignOptions().isTechsUseAdministration();
+              boolean isUseTechAdmin = campaign.getCampaignOptions().get(CampaignOption.TECHS_USE_ADMINISTRATION);
               return person.isTechExpanded() ? person.getDailyAvailableTechTime(isUseTechAdmin) : 0;
           }, Object::toString),
     MEDICAL_CAPACITY("Column.MEDICAL_CAPACITY.title", Comparators.INT_COMPARATOR,
           (person, campaign) -> {
-              int baseBedCapacity = campaign.getCampaignOptions().getMaximumPatients();
+              int baseBedCapacity = campaign.getCampaignOptions().get(CampaignOption.MAXIMUM_PATIENTS);
               return person.isDoctor() ? person.getDoctorMedicalCapacity(
-                    campaign.getCampaignOptions().isDoctorsUseAdministration(), baseBedCapacity) : 0;
+                    campaign.getCampaignOptions().get(CampaignOption.DOCTORS_USE_ADMINISTRATION), baseBedCapacity) : 0;
           }, Object::toString),
     INJURIES("Column.INJURIES.title", Comparators.INT_COMPARATOR,
           (person, campaign) ->
@@ -336,8 +336,8 @@ public enum PersonnelTableModelColumn implements MHQTableColumn {
           Object::toString),
     LOYALTY("Column.LOYALTY.title", Comparators.INT_COMPARATOR,
           (person, campaign) -> {
-              return person.getAdjustedLoyalty(campaign.getFaction(),
-                    campaign.getCampaignOptions().isUseAlternativeAdvancedMedical());
+              return person.getAdjustedLoyalty(campaign.getPlayerForce().getFaction(),
+                    campaign.getCampaignOptions().get(CampaignOption.USE_ALTERNATIVE_ADVANCED_MEDICAL));
           }, Object::toString),
     HIGHEST_EDUCATION("Column.HIGHEST_EDUCATION.title", fieldBasedSorter(EducationLevel::getLevel),
           Person::getEduHighestEducation, Object::toString),
@@ -687,7 +687,7 @@ public enum PersonnelTableModelColumn implements MHQTableColumn {
             case PersonnelRole.BATTLE_ARMOUR -> skillValue.apply(SkillType.S_GUN_BA);
             case PersonnelRole.SOLDIER -> {
                 String gunnerySkill = InfantryGunnerySkills.getBestInfantryGunnerySkill(person,
-                      campaignOptions.isUseSmallArmsOnly());
+                      campaignOptions.get(CampaignOption.USE_SMALL_ARMS_ONLY));
                 yield skillValue.apply(gunnerySkill) + '/' + skillValue.apply(SkillType.S_ANTI_MEK);
             }
             case PersonnelRole.PROTOMEK_PILOT -> skillValue.apply(SkillType.S_GUN_PROTO);
@@ -820,7 +820,7 @@ public enum PersonnelTableModelColumn implements MHQTableColumn {
     private static @NonNull Function<String, Integer> getSkillValue(Person person, Campaign campaign) {
         CampaignOptions campaignOptions = campaign.getCampaignOptions();
         SkillModifierData skillModifierData = person.getSkillModifierData(
-              campaignOptions.isUseAgeEffects(), campaign.isClanCampaign(), campaign.getLocalDate(), true);
+              campaignOptions.get(CampaignOption.USE_AGE_EFFECTS), campaign.getPlayerForce().isClanForce(), campaign.getLocalDate(), true);
         return skillName -> (skillName == null) || !person.hasSkill(skillName) ? null :
                                   person.getSkill(skillName).getFinalSkillValue(skillModifierData);
     }

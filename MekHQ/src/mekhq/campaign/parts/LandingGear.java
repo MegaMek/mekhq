@@ -35,6 +35,7 @@ package mekhq.campaign.parts;
 
 import java.io.PrintWriter;
 
+import jakarta.annotation.Nonnull;
 import megamek.common.CriticalSlot;
 import megamek.common.TechAdvancement;
 import megamek.common.annotations.Nullable;
@@ -50,6 +51,7 @@ import mekhq.campaign.parts.missing.MissingLandingGear;
 import mekhq.campaign.parts.missing.MissingPart;
 import mekhq.campaign.personnel.skills.SkillType;
 import org.w3c.dom.Node;
+import mekhq.campaign.campaignOptions.CampaignOption;
 
 /**
  * @author Jay Lawson (jaylawson39 at yahoo.com)
@@ -87,7 +89,7 @@ public class LandingGear extends Part {
             }
             if (checkForDestruction
                       && hits > priorHits
-                      && Compute.d6(2) < campaign.getCampaignOptions().getDestroyPartTarget()) {
+                      && Compute.d6(2) < campaign.getCampaignOptions().get(CampaignOption.DESTROY_PART_TARGET)) {
                 remove(false);
             }
         }
@@ -96,7 +98,7 @@ public class LandingGear extends Part {
     @Override
     public int getBaseTime() {
         int time;
-        if (campaign.getCampaignOptions().isUseAeroSystemHits()) {
+        if (campaign.getCampaignOptions().get(CampaignOption.USE_AERO_SYSTEM_HITS)) {
             // Test of proposed errata for repair times
             if (unit != null && unit.getEntity() instanceof Dropship) {
                 time = 120;
@@ -197,7 +199,7 @@ public class LandingGear extends Part {
     }
 
     @Override
-    public TechRating getTechRating() {
+    public @Nonnull TechRating getTechRating() {
         //go with conventional fighter avionics
         return TechRating.B;
     }

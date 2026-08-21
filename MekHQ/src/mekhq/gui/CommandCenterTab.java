@@ -85,8 +85,8 @@ import mekhq.campaign.events.units.UnitEvent;
 import mekhq.campaign.events.units.UnitRefitEvent;
 import mekhq.campaign.finances.FinancialReport;
 import mekhq.campaign.finances.Money;
-import mekhq.campaign.mission.Mission;
-import mekhq.campaign.mission.Scenario;
+import mekhq.campaign.mission.contract.AbstractContract;
+import mekhq.campaign.mission.scenarios.Scenario;
 import mekhq.campaign.personnel.skills.SkillType;
 import mekhq.campaign.report.CargoReport;
 import mekhq.campaign.report.HangarReport;
@@ -390,8 +390,8 @@ public final class CommandCenterTab extends CampaignGuiTab {
         gridBagConstraints.weightx = 1.0;
         panInfo.add(lblPersonnel, gridBagConstraints);
 
-        if ((getCampaign().getCampaignOptions().isUseRandomRetirement()) &&
-                  (getCampaign().getCampaignOptions().isUseHRStrain())) {
+        if ((getCampaign().getCampaignOptions().get(CampaignOption.USE_RANDOM_RETIREMENT)) &&
+                  (getCampaign().getCampaignOptions().get(CampaignOption.USE_HR_STRAIN))) {
             JLabel lblHRCapacityHead = new JLabel(resourceMap.getString("lblHRCapacity.text"));
             gridBagConstraints = new GridBagConstraints();
             gridBagConstraints.gridx = 0;
@@ -477,9 +477,9 @@ public final class CommandCenterTab extends CampaignGuiTab {
         gridBagConstraints.weightx = 1.0;
         panInfo.add(lblCargoSummary, gridBagConstraints);
 
-        if ((getCampaignOptions().isUseFatigue()) ||
+        if ((getCampaignOptions().get(CampaignOption.USE_FATIGUE)) ||
                   (getCampaignOptions().isUseAdvancedMedical() ||
-                         (!getCampaignOptions().getPrisonerCaptureStyle().isNone()))) {
+                         (!getCampaignOptions().get(CampaignOption.PRISONER_CAPTURE_STYLE).isNone()))) {
             JLabel lblFacilityCapacitiesHead = new JLabel(resourceMap.getString("lblFacilityCapacities.text"));
             gridBagConstraints = new GridBagConstraints();
             gridBagConstraints.gridx = 0;
@@ -496,7 +496,7 @@ public final class CommandCenterTab extends CampaignGuiTab {
             panInfo.add(lblFacilityCapacities, gridBagConstraints);
         }
 
-        panInfo.setBorder(RoundedLineBorder.createRoundedLineBorder(getCampaign().getName()));
+        panInfo.setBorder(RoundedLineBorder.createRoundedLineBorder(getCampaign().getPlayerForce().getName()));
     }
 
     private void initFactionPanel() {
@@ -514,11 +514,11 @@ public final class CommandCenterTab extends CampaignGuiTab {
             new mekhq.campaign.universe.factionStanding.GoingRogue(getCampaign(),
                   campaign.getPlayerForce().getHumanResources()
                         .getCommander(campaign.getCampaignOptions(),
-                              campaign.isClanCampaign(),
+                              campaign.getPlayerForce().isClanForce(),
                               campaign.getLocalDate()),
                   campaign1.getPlayerForce().getHumanResources()
                         .getSecondInCommand(campaign1.getCampaignOptions(),
-                              campaign1.isClanCampaign(),
+                              campaign1.getPlayerForce().isClanForce(),
                               campaign1.getLocalDate()));
         });
 
@@ -538,7 +538,7 @@ public final class CommandCenterTab extends CampaignGuiTab {
         RoundedJButton btnDiplomacy = new RoundedJButton(resourceMap.getString("btnDiplomacy.text"));
         btnDiplomacy.setMaximumSize(new Dimension(Integer.MAX_VALUE, btnDiplomacy.getPreferredSize().height));
         btnDiplomacy.addActionListener(evt -> new DiplomacyReport(getCampaignGui().getFrame(),
-              getCampaign().isClanCampaign(),
+              getCampaign().getPlayerForce().isClanForce(),
               getCampaign().getLocalDate()));
 
         panFaction = new JPanel();
@@ -889,7 +889,7 @@ public final class CommandCenterTab extends CampaignGuiTab {
         final CampaignSummary campaignSummary = campaign.getCampaignSummary();
 
         if (panInfo.getBorder() instanceof TitledBorder titledBorder) {
-            titledBorder.setTitle(getCampaign().getName());
+            titledBorder.setTitle(getCampaign().getPlayerForce().getName());
             panInfo.repaint();
         }
 
@@ -915,7 +915,7 @@ public final class CommandCenterTab extends CampaignGuiTab {
         lblRepairStatus.setText(campaignSummary.getForceRepairReport());
         lblTransportCapacity.setText(campaignSummary.getTransportCapacity());
 
-        if (campaignOptions.isUseHRStrain()) {
+        if (campaignOptions.get(CampaignOption.USE_HR_STRAIN)) {
             try {
                 lblHRCapacity.setText(campaignSummary.getHRCapacityReport(campaign));
             } catch (Exception ignored) {
@@ -942,7 +942,7 @@ public final class CommandCenterTab extends CampaignGuiTab {
                 model.addElement(String.format(report));
             }
 
-            for (Mission mission : getCampaign().getActiveMissions(false)) {
+            for (AbstractContract mission : getCampaign().getActiveContracts()) {
                 List<Scenario> scenarios = mission.getScenarios();
 
                 scenarios.sort(Comparator.comparing(Scenario::getDate,

@@ -87,7 +87,7 @@ class MHQOptionsModel {
           MHQConstants.NAG_SOMEONE_RANDOMLY_DIED_CIVILIAN,
           MHQConstants.NAG_SOMEONE_RANDOMLY_DIED_CAMP_FOLLOWER,
           MHQConstants.NAG_SOMEONE_RANDOMLY_DIED_RETIREE,
-          MHQConstants.CONFIRMATION_CONTRACT_RENTAL,
+          MHQConstants.CONFIRMATION_ACCEPT_CONTRACT,
           MHQConstants.CONFIRMATION_FACTION_STANDINGS_ULTIMATUM,
           MHQConstants.CONFIRMATION_BEGIN_TRANSIT,
           MHQConstants.CONFIRMATION_STRATCON_BATCHALL_BREACH,
@@ -111,6 +111,7 @@ class MHQOptionsModel {
     boolean companyGeneratorStartup;
     boolean showCompanyGenerator;
     boolean showUnitPicturesOnTOE;
+    boolean showWarriorsAlmanac;
     // endregion Display - General
 
     // region Display - Record Logs
@@ -225,6 +226,7 @@ class MHQOptionsModel {
         companyGeneratorStartup = options.getCompanyGeneratorStartup();
         showCompanyGenerator = options.getShowCompanyGenerator();
         showUnitPicturesOnTOE = options.getShowUnitPicturesOnTOE();
+        showWarriorsAlmanac = options.getShowWarriorsAlmanac();
 
         // Display - Record Logs
         displayPersonnelLog = options.getDisplayPersonnelLog();
@@ -410,6 +412,7 @@ class MHQOptionsModel {
         options.setCompanyGeneratorStartup(companyGeneratorStartup);
         options.setShowCompanyGenerator(showCompanyGenerator);
         options.setShowUnitPicturesOnTOE(showUnitPicturesOnTOE);
+        options.setShowWarriorsAlmanac(showWarriorsAlmanac);
 
         options.setDisplayPersonnelLog(displayPersonnelLog);
         options.setDisplayScenarioLog(displayScenarioLog);

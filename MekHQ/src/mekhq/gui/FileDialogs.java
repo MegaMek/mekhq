@@ -43,9 +43,9 @@ import mekhq.Utilities;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.digitalGM.stratCon.StratConContractDefinition;
 import mekhq.campaign.digitalGM.stratCon.facility.StratConFacility;
-import mekhq.campaign.mission.Scenario;
-import mekhq.campaign.mission.ScenarioTemplate;
-import mekhq.campaign.mission.atb.AtBScenarioModifier;
+import mekhq.campaign.mission.scenarios.Scenario;
+import mekhq.campaign.mission.scenarios.ScenarioTemplate;
+import mekhq.campaign.mission.scenarios.atb.AtBScenarioModifier;
 import mekhq.gui.utilities.ObservableString;
 import mekhq.io.FileType;
 import mekhq.utilities.MHQInternationalization;
@@ -89,7 +89,7 @@ public class FileDialogs {
 
         String fileName = String.format(
               "%s%s_ExportedPersonnel.prsx",
-              campaign.getName(),
+              campaign.getPlayerForce().getName(),
               campaign.getLocalDate().format(DATE_TIME_FORMATTER));
 
         Optional<File> value = GUI.fileDialogSave(
@@ -189,7 +189,7 @@ public class FileDialogs {
     public static Optional<File> saveParts(JFrame frame, Campaign campaign) {
         String fileName = String.format(
               "%s%s_ExportedParts.parts",
-              campaign.getName(),
+              campaign.getPlayerForce().getName(),
               campaign.getLocalDate().format(DATE_TIME_FORMATTER));
 
         Optional<File> value = GUI.fileDialogSave(
@@ -275,7 +275,7 @@ public class FileDialogs {
      * @return the file selected, if any
      */
     public static Optional<File> saveCampaign(JFrame frame, Campaign campaign) {
-        String fileName = String.format("%s%s.%s", campaign.getName(),
+        String fileName = String.format("%s%s.%s", campaign.getPlayerForce().getName(),
               campaign.getLocalDate().format(DATE_TIME_FORMATTER),
               MekHQ.getMHQOptions().getPreferGzippedOutput() ? "cpnx.gz" : "cpnx");
 
@@ -574,7 +574,7 @@ public class FileDialogs {
     }
 
     private static String getDefaultFilename(Campaign campaign, String filenameSuffix) {
-        return campaign.getName() + campaign.getLocalDate().format(DATE_TIME_FORMATTER) + "_" + filenameSuffix;
+        return campaign.getPlayerForce().getName() + campaign.getLocalDate().format(DATE_TIME_FORMATTER) + "_" + filenameSuffix;
     }
 
 

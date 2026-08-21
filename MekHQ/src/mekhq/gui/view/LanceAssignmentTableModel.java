@@ -39,8 +39,8 @@ import javax.swing.SwingConstants;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.force.CombatTeam;
 import mekhq.campaign.force.Formation;
-import mekhq.campaign.mission.AtBContract;
-import mekhq.campaign.mission.enums.CombatRole;
+import mekhq.campaign.mission.contract.AbstractContract;
+import mekhq.campaign.mission.utilities.CombatRole;
 import mekhq.gui.model.DataTableModel;
 
 class LanceAssignmentTableModel extends DataTableModel<CombatTeam> {
@@ -84,7 +84,7 @@ class LanceAssignmentTableModel extends DataTableModel<CombatTeam> {
     public Class<?> getColumnClass(int c) {
         return switch (c) {
             case COL_FORCE -> Formation.class;
-            case COL_CONTRACT -> AtBContract.class;
+            case COL_CONTRACT -> AbstractContract.class;
             case COL_ROLE -> CombatRole.class;
             default -> String.class;
         };
@@ -112,7 +112,7 @@ class LanceAssignmentTableModel extends DataTableModel<CombatTeam> {
                 yield campaign.getPlayerForce().getFormation(id);
             }
             case COL_WEIGHT_CLASS -> WEIGHT_CODES[data.get(row).getWeightClass(campaign)];
-            case COL_CONTRACT -> campaign.getMission(data.get(row).getMissionId());
+            case COL_CONTRACT -> campaign.getContract(data.get(row).getMissionId());
             case COL_ROLE -> data.get(row).getRole();
             default -> "?";
         };
@@ -121,7 +121,7 @@ class LanceAssignmentTableModel extends DataTableModel<CombatTeam> {
     @Override
     public void setValueAt(Object value, int row, int col) {
         if (col == COL_CONTRACT) {
-            data.get(row).setContract((AtBContract) value);
+            data.get(row).setContract((AbstractContract) value);
         } else if (col == COL_ROLE) {
             if (value instanceof CombatRole) {
                 data.get(row).setRole((CombatRole) value);

@@ -43,8 +43,9 @@ import megamek.common.units.Mek;
 import megamek.common.units.ProtoMek;
 import megamek.common.units.Tank;
 import mekhq.campaign.Campaign;
+import mekhq.campaign.campaignOptions.CampaignOption;
 import mekhq.campaign.campaignOptions.CampaignOptions;
-import mekhq.campaign.mission.Contract;
+import mekhq.campaign.mission.contract.AbstractContract;
 
 public class FinancialReport {
     private Money assets = Money.zero();
@@ -198,16 +199,16 @@ public class FinancialReport {
         CampaignOptions campaignOptions = campaign.getCampaignOptions();
         Accountant accountant = campaign.getAccountant();
 
-        if (campaignOptions.isPayForMaintain()) {
+        if (campaignOptions.get(CampaignOption.PAY_FOR_MAINTAIN)) {
             financialReport.maintenance = accountant.getWeeklyMaintenanceCosts().multipliedBy(4);
         }
-        if (campaignOptions.isPayForSalaries()) {
+        if (campaignOptions.get(CampaignOption.PAY_FOR_SALARIES)) {
             financialReport.salaries = accountant.getPayRoll();
         }
-        if (campaignOptions.isPayForOverhead()) {
+        if (campaignOptions.get(CampaignOption.PAY_FOR_OVERHEAD)) {
             financialReport.overhead = accountant.getOverheadExpenses();
         }
-        if (campaignOptions.isUsePeacetimeCost()) {
+        if (campaignOptions.get(CampaignOption.USE_PEACETIME_COST)) {
             financialReport.coSpareParts = accountant.getMonthlySpareParts();
             financialReport.coAmmo = accountant.getMonthlyAmmo();
             financialReport.coFuel = accountant.getMonthlyFuel();
@@ -215,7 +216,7 @@ public class FinancialReport {
 
         financialReport.contracts = financialReport.contracts.plus(
               campaign.getActiveContracts()
-                    .stream().map(Contract::getMonthlyPayOut)
+                    .stream().map(AbstractContract::getMonthlyPayOut)
                     .collect(Collectors.toList()));
 
         return financialReport;

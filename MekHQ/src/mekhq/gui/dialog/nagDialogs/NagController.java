@@ -40,10 +40,11 @@ import java.util.Collection;
 import java.util.List;
 
 import mekhq.campaign.Campaign;
+import mekhq.campaign.campaignOptions.CampaignOption;
 import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.finances.Finances;
 import mekhq.campaign.finances.Money;
-import mekhq.campaign.mission.AtBContract;
+import mekhq.campaign.mission.contract.AbstractContract;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.unit.Unit;
 
@@ -91,7 +92,7 @@ public class NagController {
         final boolean isSunday = today.getDayOfWeek() == DayOfWeek.SUNDAY;
         final boolean isLastDayOfMonth = today.getDayOfMonth() == today.lengthOfMonth();
 
-        if (InvalidFactionNagDialog.checkNag(campaign.getFaction(), today)) {
+        if (InvalidFactionNagDialog.checkNag(campaign.getPlayerForce().getFaction(), today)) {
             InvalidFactionNagDialog invalidFactionNagDialog = new InvalidFactionNagDialog(campaign);
             if (invalidFactionNagDialog.shouldCancelAdvanceDay()) {
                 return true;
@@ -102,11 +103,11 @@ public class NagController {
                                                    .getHumanResources()
                                                    .getActivePersonnel(false, false);
         final CampaignOptions campaignOptions = campaign.getCampaignOptions();
-        final int doctorCapacity = campaignOptions.getMaximumPatients();
-        final boolean isDoctorsUseAdministration = campaignOptions.isDoctorsUseAdministration();
+        final int doctorCapacity = campaignOptions.get(CampaignOption.MAXIMUM_PATIENTS);
+        final boolean isDoctorsUseAdministration = campaignOptions.get(CampaignOption.DOCTORS_USE_ADMINISTRATION);
 
         // Untreated personnel
-        boolean isUseMASHTheatres = campaignOptions.isUseMASHTheatres();
+        boolean isUseMASHTheatres = campaignOptions.get(CampaignOption.USE_MASH_THEATRES);
         int mashTheatreCapacity;
         mashTheatreCapacity = isUseMASHTheatres && campaign.isOnContractAndPlanetside() ?
                                     campaign.getPlayerForce().calculateMASHTheaterCapacity(campaign) :
@@ -163,7 +164,7 @@ public class NagController {
 
         // Unmaintained Units
         final Collection<Unit> units = campaign.getAllUnits();
-        final boolean isCheckMaintenance = campaignOptions.isCheckMaintenance();
+        final boolean isCheckMaintenance = campaignOptions.get(CampaignOption.CHECK_MAINTENANCE);
 
         if (UnmaintainedUnitsNagDialog.checkNag(units, isCheckMaintenance)) {
             UnmaintainedUnitsNagDialog unmaintainedUnitsNagDialog = new UnmaintainedUnitsNagDialog(campaign);
@@ -212,7 +213,7 @@ public class NagController {
 
         // Unresolved StratCon AO Contacts
         final boolean isUseStratCon = campaignOptions.isUseStratCon();
-        final List<AtBContract> activeContracts = campaign.getActiveAtBContracts();
+        final List<AbstractContract> activeContracts = campaign.getActiveContracts();
 
         if (UnresolvedStratConContactsNagDialog.checkNag(isUseStratCon, activeContracts, today)) {
             UnresolvedStratConContactsNagDialog unresolvedStratConContactsNagDialog = new UnresolvedStratConContactsNagDialog(
@@ -260,8 +261,8 @@ public class NagController {
         }
 
         // HR Strain
-        if (HRStrainNagDialog.checkNag(campaignOptions.isUseRandomRetirement(),
-              campaignOptions.isUseHRStrain(),
+        if (HRStrainNagDialog.checkNag(campaignOptions.get(CampaignOption.USE_RANDOM_RETIREMENT),
+              campaignOptions.get(CampaignOption.USE_HR_STRAIN),
               getHRStrainModifier(campaign))) {
             HRStrainNagDialog HRStrainNagDialog = new HRStrainNagDialog(campaign);
             if (HRStrainNagDialog.shouldCancelAdvanceDay()) {

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2025 The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2025-2026 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -144,7 +144,7 @@ public class NewsDialog extends ImmersiveDialogSimple {
         String networkCode = getFormattedTextAt(RESOURCE_BUNDLE, NETWORK_NAME + ".network");
         String networkName = "";
         if (NETWORK_NAME.equals(CHATTER_WEB_NETWORK_NAME)) {
-            networkName = campaign.getFaction().getFullName(campaign.getGameYear());
+            networkName = campaign.getPlayerForce().getFaction().getFullName(campaign.getGameYear());
         } else if (!NETWORK_NAME.equals(AFFILIATE_NETWORK_NAME)) {
             networkName = getFormattedTextAt(RESOURCE_BUNDLE, NETWORK_NAME + ".name");
         }
@@ -179,7 +179,7 @@ public class NewsDialog extends ImmersiveDialogSimple {
     private NewsNetwork getNetwork(Campaign campaign) {
         int currentYear = campaign.getGameYear();
 
-        if (campaign.getFaction().isClan() && currentYear >= OPERATION_KLONDIKE) {
+        if (campaign.getPlayerForce().getFaction().isClan() && currentYear >= OPERATION_KLONDIKE) {
             // After Klondike Chatter web comes along, and it makes sense for that to be used by the
             // Clans moving forward
             return NEWS_NETWORKS.get(NEWS_NETWORKS.size() - 2); // Chatter web

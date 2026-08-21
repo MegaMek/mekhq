@@ -387,7 +387,7 @@ public class MedicalViewDialog extends JDialog {
         Formation f = c.getPlayerForce().getFormationFor(p);
         String force = (null != f) ? f.getFullName() : "-";
 
-        Person doc = c.getPerson(p.getDoctorId());
+        Person doc = c.getPlayerForce().getHumanResources().getPerson(p.getDoctorId());
         String doctor = resourceMap.getString("none.text");
         if ((null != doc) && doc.getStatus().isActive()) {
             doctor = doc.getFullTitle();

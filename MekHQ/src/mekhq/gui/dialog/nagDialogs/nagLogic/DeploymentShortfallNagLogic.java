@@ -35,7 +35,8 @@ package mekhq.gui.dialog.nagDialogs.nagLogic;
 import java.time.DayOfWeek;
 
 import mekhq.campaign.Campaign;
-import mekhq.campaign.mission.AtBContract;
+import mekhq.campaign.mission.contract.AbstractContract;
+import mekhq.campaign.mission.utilities.ContractUtilities;
 
 public class DeploymentShortfallNagLogic {
     /**
@@ -53,7 +54,7 @@ public class DeploymentShortfallNagLogic {
      * @return {@code true} if there are unmet deployment requirements; otherwise, {@code false}.
      */
     public static boolean hasDeploymentShortfall(Campaign campaign) {
-        if (!campaign.getCurrentLocation().isOnPlanet()) {
+        if (!campaign.getPlayerForce().getForceDetachment().getCurrentLocation().isOnPlanet()) {
             return false;
         }
 
@@ -63,8 +64,8 @@ public class DeploymentShortfallNagLogic {
         }
 
         // There is no need to use a stream here, as the number of iterations doesn't warrant it.
-        for (AtBContract contract : campaign.getActiveAtBContracts()) {
-            if (campaign.getDeploymentDeficit(contract) > 0) {
+        for (AbstractContract contract : campaign.getActiveContracts()) {
+            if (ContractUtilities.getDeploymentDeficit(campaign, contract) > 0) {
                 return true;
             }
         }

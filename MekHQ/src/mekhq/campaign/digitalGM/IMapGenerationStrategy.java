@@ -36,7 +36,7 @@ import megamek.common.loaders.MapSettings;
 import mekhq.campaign.digitalGM.stratCon.StratConScenario;
 import mekhq.campaign.digitalGM.stratCon.StratConTrackState;
 import mekhq.campaign.digitalGM.stratCon.gm.AbstractStratConGM;
-import mekhq.campaign.mission.AtBScenario;
+import mekhq.campaign.mission.scenarios.AtBScenario;
 
 /**
  * Strategy for building the battlefield &mdash; picking a scenario's terrain and temperature from the biome of its

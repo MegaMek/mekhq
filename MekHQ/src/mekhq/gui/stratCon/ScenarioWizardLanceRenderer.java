@@ -52,6 +52,7 @@ import mekhq.campaign.icons.enums.OperationalStatus;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.unit.Unit;
 import mekhq.utilities.ReportingUtilities;
+import mekhq.campaign.campaignOptions.CampaignOption;
 
 /**
  * Handles rendering of individual lances in the StratCon scenario wizard.
@@ -109,7 +110,7 @@ public class ScenarioWizardLanceRenderer extends JLabel implements ListCellRende
         forceName = forceName.replaceAll(originNodeName, "");
 
         String fatigueReport = "";
-        if (campaign.getCampaignOptions().isUseFatigue()) {
+        if (campaign.getCampaignOptions().get(CampaignOption.USE_FATIGUE)) {
             int highestFatigue = 0;
             for (UUID unitId : formation.getAllUnits(false)) {
                 Unit unit = campaign.getUnit(unitId);

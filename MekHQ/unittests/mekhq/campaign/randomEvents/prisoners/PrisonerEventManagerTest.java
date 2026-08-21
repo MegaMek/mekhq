@@ -36,13 +36,14 @@ import static java.lang.Math.max;
 import static java.lang.Math.min;
 import static java.lang.Math.round;
 import static mekhq.campaign.force.FormationType.SECURITY;
-import static mekhq.campaign.mission.enums.ContractMoraleLevel.STALEMATE;
+import static mekhq.campaign.mission.contract.contractData.ContractMoraleLevel.STALEMATE;
 import static mekhq.campaign.randomEvents.prisoners.PrisonerEventManager.*;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.anyInt;
+import static org.mockito.Mockito.lenient;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.mockStatic;
 import static org.mockito.Mockito.never;
@@ -63,8 +64,9 @@ import mekhq.campaign.campaignOptions.CampaignOption;
 import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.force.Formation;
 import mekhq.campaign.force.PlayerForce;
-import mekhq.campaign.mission.AtBContract;
-import mekhq.campaign.mission.enums.ContractMoraleLevel;
+import mekhq.campaign.mission.contract.AbstractContract;
+import mekhq.campaign.mission.contract.ChaosContract;
+import mekhq.campaign.mission.contract.contractData.ContractMoraleLevel;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.unit.Unit;
 import mekhq.campaign.universe.Faction;
@@ -95,7 +97,9 @@ public class PrisonerEventManagerTest {
 
         CampaignOptions mockCampaignOptions = mock(CampaignOptions.class);
         when(mockCampaign.getCampaignOptions()).thenReturn(mockCampaignOptions);
-        when(mockCampaignOptions.getPrisonerCaptureStyle()).thenReturn(mekhq.campaign.randomEvents.prisoners.PrisonerCaptureStyle.NONE);
+        lenient().when(mockCampaignOptions.get(CampaignOption.IS_ENABLE_SALVAGE_FLAG_BY_DEFAULT)).thenReturn(false);
+        lenient().when(mockCampaignOptions.get(CampaignOption.TECHS_USE_ADMINISTRATION)).thenReturn(false);
+        when(mockCampaignOptions.get(CampaignOption.PRISONER_CAPTURE_STYLE)).thenReturn(mekhq.campaign.randomEvents.prisoners.PrisonerCaptureStyle.NONE);
 
         LocalDate today = LocalDate.of(3151, 1, 3);
         when(mockCampaign.getLocalDate()).thenReturn(today);
@@ -126,7 +130,9 @@ public class PrisonerEventManagerTest {
 
         CampaignOptions mockCampaignOptions = mock(CampaignOptions.class);
         when(mockCampaign.getCampaignOptions()).thenReturn(mockCampaignOptions);
-        when(mockCampaignOptions.getPrisonerCaptureStyle()).thenReturn(mekhq.campaign.randomEvents.prisoners.PrisonerCaptureStyle.NONE);
+        lenient().when(mockCampaignOptions.get(CampaignOption.IS_ENABLE_SALVAGE_FLAG_BY_DEFAULT)).thenReturn(false);
+        lenient().when(mockCampaignOptions.get(CampaignOption.TECHS_USE_ADMINISTRATION)).thenReturn(false);
+        when(mockCampaignOptions.get(CampaignOption.PRISONER_CAPTURE_STYLE)).thenReturn(mekhq.campaign.randomEvents.prisoners.PrisonerCaptureStyle.NONE);
 
         LocalDate today = LocalDate.of(3151, 1, 3);
         when(mockCampaign.getLocalDate()).thenReturn(today);
@@ -155,7 +161,9 @@ public class PrisonerEventManagerTest {
 
         CampaignOptions mockCampaignOptions = mock(CampaignOptions.class);
         when(mockCampaign.getCampaignOptions()).thenReturn(mockCampaignOptions);
-        when(mockCampaignOptions.getPrisonerCaptureStyle()).thenReturn(mekhq.campaign.randomEvents.prisoners.PrisonerCaptureStyle.NONE);
+        lenient().when(mockCampaignOptions.get(CampaignOption.IS_ENABLE_SALVAGE_FLAG_BY_DEFAULT)).thenReturn(false);
+        lenient().when(mockCampaignOptions.get(CampaignOption.TECHS_USE_ADMINISTRATION)).thenReturn(false);
+        when(mockCampaignOptions.get(CampaignOption.PRISONER_CAPTURE_STYLE)).thenReturn(mekhq.campaign.randomEvents.prisoners.PrisonerCaptureStyle.NONE);
 
         LocalDate today = LocalDate.of(3151, 1, 3);
         when(mockCampaign.getLocalDate()).thenReturn(today);
@@ -187,7 +195,9 @@ public class PrisonerEventManagerTest {
 
         CampaignOptions mockCampaignOptions = mock(CampaignOptions.class);
         when(mockCampaign.getCampaignOptions()).thenReturn(mockCampaignOptions);
-        when(mockCampaignOptions.getPrisonerCaptureStyle()).thenReturn(mekhq.campaign.randomEvents.prisoners.PrisonerCaptureStyle.NONE);
+        lenient().when(mockCampaignOptions.get(CampaignOption.IS_ENABLE_SALVAGE_FLAG_BY_DEFAULT)).thenReturn(false);
+        lenient().when(mockCampaignOptions.get(CampaignOption.TECHS_USE_ADMINISTRATION)).thenReturn(false);
+        when(mockCampaignOptions.get(CampaignOption.PRISONER_CAPTURE_STYLE)).thenReturn(mekhq.campaign.randomEvents.prisoners.PrisonerCaptureStyle.NONE);
 
         LocalDate today = LocalDate.of(3151, 1, 3);
         when(mockCampaign.getLocalDate()).thenReturn(today);
@@ -213,13 +223,15 @@ public class PrisonerEventManagerTest {
 
         CampaignOptions mockCampaignOptions = mock(CampaignOptions.class);
         when(mockCampaign.getCampaignOptions()).thenReturn(mockCampaignOptions);
-        when(mockCampaignOptions.getPrisonerCaptureStyle()).thenReturn(mekhq.campaign.randomEvents.prisoners.PrisonerCaptureStyle.NONE);
+        lenient().when(mockCampaignOptions.get(CampaignOption.IS_ENABLE_SALVAGE_FLAG_BY_DEFAULT)).thenReturn(false);
+        lenient().when(mockCampaignOptions.get(CampaignOption.TECHS_USE_ADMINISTRATION)).thenReturn(false);
+        when(mockCampaignOptions.get(CampaignOption.PRISONER_CAPTURE_STYLE)).thenReturn(mekhq.campaign.randomEvents.prisoners.PrisonerCaptureStyle.NONE);
 
         LocalDate today = LocalDate.of(3151, 1, 3);
         when(mockCampaign.getLocalDate()).thenReturn(today);
 
-        AtBContract contract = new AtBContract("TEST");
-        contract.setMoraleLevel(STALEMATE);
+        AbstractContract contract = new ChaosContract();
+        contract.changeMorale(STALEMATE);
         when(mockCampaign.hasActiveContract()).thenReturn(true);
         when(mockCampaign.getActiveContracts()).thenReturn(List.of(contract));
 
@@ -253,7 +265,9 @@ public class PrisonerEventManagerTest {
 
         CampaignOptions mockCampaignOptions = mock(CampaignOptions.class);
         when(mockCampaign.getCampaignOptions()).thenReturn(mockCampaignOptions);
-        when(mockCampaignOptions.getPrisonerCaptureStyle()).thenReturn(mekhq.campaign.randomEvents.prisoners.PrisonerCaptureStyle.NONE);
+        lenient().when(mockCampaignOptions.get(CampaignOption.IS_ENABLE_SALVAGE_FLAG_BY_DEFAULT)).thenReturn(false);
+        lenient().when(mockCampaignOptions.get(CampaignOption.TECHS_USE_ADMINISTRATION)).thenReturn(false);
+        when(mockCampaignOptions.get(CampaignOption.PRISONER_CAPTURE_STYLE)).thenReturn(mekhq.campaign.randomEvents.prisoners.PrisonerCaptureStyle.NONE);
 
         LocalDate today = LocalDate.of(3151, 1, 3);
         when(mockCampaign.getLocalDate()).thenReturn(today);
@@ -305,7 +319,9 @@ public class PrisonerEventManagerTest {
 
         CampaignOptions mockCampaignOptions = mock(CampaignOptions.class);
         when(mockCampaign.getCampaignOptions()).thenReturn(mockCampaignOptions);
-        when(mockCampaignOptions.getPrisonerCaptureStyle()).thenReturn(mekhq.campaign.randomEvents.prisoners.PrisonerCaptureStyle.NONE);
+        lenient().when(mockCampaignOptions.get(CampaignOption.IS_ENABLE_SALVAGE_FLAG_BY_DEFAULT)).thenReturn(false);
+        lenient().when(mockCampaignOptions.get(CampaignOption.TECHS_USE_ADMINISTRATION)).thenReturn(false);
+        when(mockCampaignOptions.get(CampaignOption.PRISONER_CAPTURE_STYLE)).thenReturn(mekhq.campaign.randomEvents.prisoners.PrisonerCaptureStyle.NONE);
 
         LocalDate today = LocalDate.of(3151, 1, 3);
         when(mockCampaign.getLocalDate()).thenReturn(today);
@@ -563,10 +579,12 @@ public class PrisonerEventManagerTest {
 
         private Campaign buildCampaign(PrisonerCaptureStyle captureStyle, int temporaryCapacity) {
             CampaignOptions mockOptions = mock(CampaignOptions.class);
-            when(mockOptions.getPrisonerCaptureStyle()).thenReturn(captureStyle);
+            when(mockOptions.get(CampaignOption.PRISONER_CAPTURE_STYLE)).thenReturn(captureStyle);
 
             Campaign mockCampaign = mockCampaign();
             when(mockCampaign.getCampaignOptions()).thenReturn(mockOptions);
+            lenient().when(mockOptions.get(CampaignOption.IS_ENABLE_SALVAGE_FLAG_BY_DEFAULT)).thenReturn(false);
+            lenient().when(mockOptions.get(CampaignOption.TECHS_USE_ADMINISTRATION)).thenReturn(false);
             when(mockCampaign.getPlayerForce().getTemporaryPrisonerCapacity()).thenReturn(temporaryCapacity);
             when(mockCampaign.getActiveContracts()).thenReturn(List.of());
             when(mockCampaign.getPlayerForce().getAllFormations()).thenReturn(List.of());
@@ -921,10 +939,12 @@ public class PrisonerEventManagerTest {
 
         private Campaign campaignWithPrisoners(PrisonerCaptureStyle captureStyle, List<Person> prisoners) {
             CampaignOptions mockOptions = mock(CampaignOptions.class);
-            when(mockOptions.getPrisonerCaptureStyle()).thenReturn(captureStyle);
+            when(mockOptions.get(CampaignOption.PRISONER_CAPTURE_STYLE)).thenReturn(captureStyle);
 
             Campaign mockCampaign = mockCampaign();
             when(mockCampaign.getCampaignOptions()).thenReturn(mockOptions);
+            lenient().when(mockOptions.get(CampaignOption.IS_ENABLE_SALVAGE_FLAG_BY_DEFAULT)).thenReturn(false);
+            lenient().when(mockOptions.get(CampaignOption.TECHS_USE_ADMINISTRATION)).thenReturn(false);
             when(mockCampaign.getPlayerForce().getHumanResources().getCurrentPrisoners()).thenReturn(prisoners);
             return mockCampaign;
         }
@@ -1099,16 +1119,18 @@ public class PrisonerEventManagerTest {
 
         private Campaign campaignWithCaptureStyle(PrisonerCaptureStyle captureStyle) {
             CampaignOptions mockOptions = mock(CampaignOptions.class);
-            when(mockOptions.getPrisonerCaptureStyle()).thenReturn(captureStyle);
+            when(mockOptions.get(CampaignOption.PRISONER_CAPTURE_STYLE)).thenReturn(captureStyle);
 
             Campaign mockCampaign = mockCampaign();
             when(mockCampaign.getCampaignOptions()).thenReturn(mockOptions);
+            lenient().when(mockOptions.get(CampaignOption.IS_ENABLE_SALVAGE_FLAG_BY_DEFAULT)).thenReturn(false);
+            lenient().when(mockOptions.get(CampaignOption.TECHS_USE_ADMINISTRATION)).thenReturn(false);
             return mockCampaign;
         }
 
-        private AtBContract contractWithMorale(ContractMoraleLevel morale) {
-            AtBContract contract = new AtBContract("TEST");
-            contract.setMoraleLevel(morale);
+        private AbstractContract contractWithMorale(ContractMoraleLevel morale) {
+            AbstractContract contract = new ChaosContract();
+            contract.changeMorale(morale);
             return contract;
         }
 
@@ -1118,14 +1140,14 @@ public class PrisonerEventManagerTest {
 
             PrisonerEventManager.checkForIntelBreachEvent(campaign, 5);
 
-            verify(campaign, never()).getActiveAtBContracts();
+            verify(campaign, never()).getActiveContracts();
         }
 
         @Test
         void allContractsOverwhelmingOrRouted_filteredOut_noBreach() {
             Campaign campaign = campaignWithCaptureStyle(PrisonerCaptureStyle.MEKHQ);
-            AtBContract contract = contractWithMorale(ContractMoraleLevel.OVERWHELMING);
-            when(campaign.getActiveAtBContracts()).thenReturn(new ArrayList<>(List.of(contract)));
+            AbstractContract contract = contractWithMorale(ContractMoraleLevel.OVERWHELMING);
+            when(campaign.getActiveContracts()).thenReturn(new ArrayList<>(List.of(contract)));
 
             PrisonerEventManager.checkForIntelBreachEvent(campaign, 5);
 
@@ -1136,8 +1158,8 @@ public class PrisonerEventManagerTest {
         @Test
         void zeroFreedPrisoners_noBreach() {
             Campaign campaign = campaignWithCaptureStyle(PrisonerCaptureStyle.MEKHQ);
-            AtBContract contract = contractWithMorale(STALEMATE);
-            when(campaign.getActiveAtBContracts()).thenReturn(new ArrayList<>(List.of(contract)));
+            AbstractContract contract = contractWithMorale(STALEMATE);
+            when(campaign.getActiveContracts()).thenReturn(new ArrayList<>(List.of(contract)));
 
             PrisonerEventManager.checkForIntelBreachEvent(campaign, 0);
 
@@ -1147,8 +1169,8 @@ public class PrisonerEventManagerTest {
         @Test
         void breachRollAtOrAboveFreedCount_noBreach() {
             Campaign campaign = campaignWithCaptureStyle(PrisonerCaptureStyle.MEKHQ);
-            AtBContract contract = contractWithMorale(STALEMATE);
-            when(campaign.getActiveAtBContracts()).thenReturn(new ArrayList<>(List.of(contract)));
+            AbstractContract contract = contractWithMorale(STALEMATE);
+            when(campaign.getActiveContracts()).thenReturn(new ArrayList<>(List.of(contract)));
 
             try (MockedStatic<Compute> compute = mockStatic(Compute.class)) {
                 // A roll that is not less than the freed count (freed = 1, roll = 40) means no breach.

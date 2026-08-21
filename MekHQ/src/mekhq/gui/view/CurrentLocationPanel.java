@@ -52,12 +52,13 @@ import mekhq.MekHQ;
 import mekhq.campaign.AbstractLocation;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.JumpPath;
+import mekhq.campaign.campaignOptions.CampaignOption;
 import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.events.LocationChangedEvent;
 import mekhq.campaign.events.TransitStatusChangedEvent;
 import mekhq.campaign.events.missions.MissionEvent;
 import mekhq.campaign.finances.Money;
-import mekhq.campaign.mission.TransportCostCalculations;
+import mekhq.campaign.mission.utilities.TransportCostCalculations;
 import mekhq.campaign.universe.Atmosphere;
 import mekhq.campaign.universe.Planet;
 import mekhq.campaign.universe.PlanetarySystem;
@@ -173,7 +174,7 @@ public class CurrentLocationPanel extends ScalingWidthConstrainedPanel {
      */
     private void refresh() {
         CampaignOptions options = campaign.getCampaignOptions();
-        AbstractLocation location = campaign.getCurrentLocation();
+        AbstractLocation location = campaign.getPlayerForce().getForceDetachment().getCurrentLocation();
         PlanetarySystem system = location.getCurrentSystem();
         LocalDate date = campaign.getLocalDate();
 
@@ -188,7 +189,7 @@ public class CurrentLocationPanel extends ScalingWidthConstrainedPanel {
         float scale = location.isAtJumpPoint() ? 1 : (float) (location.getPercentageTransit() * 1.3 + 0.1);
         imgLocation.setImage(locationImage, scale);
 
-        if (options.getPersonnelMarketStyle() == PERSONNEL_MARKET_DISABLED) {
+        if (options.get(CampaignOption.PERSONNEL_MARKET_STYLE) == PERSONNEL_MARKET_DISABLED) {
             // keep the legacy recruitment always available
             btnRecruitment.setEnabled(true);
             btnRecruitment.setText(getTextAt("recruitment.legacy"));

@@ -68,6 +68,7 @@ import mekhq.campaign.personnel.medical.advancedMedicalAlternate.AlternateInjuri
 import mekhq.campaign.personnel.skills.Skill;
 import mekhq.campaign.personnel.skills.SkillType;
 import mekhq.campaign.unit.Unit;
+import mekhq.campaign.campaignOptions.CampaignOption;
 
 /**
  * Static helper methods implementing the "advanced medical" sub-system
@@ -89,7 +90,7 @@ public final class InjuryUtil {
 
     /** Run a daily healing check */
     public static void resolveDailyHealing(Campaign campaign, Person person) {
-        Person doctor = campaign.getPerson(person.getDoctorId());
+        Person doctor = campaign.getPlayerForce().getHumanResources().getPerson(person.getDoctorId());
         if (null != doctor && doctor.isDoctor()) {
             if (person.getDaysToWaitForHealing() <= 0) {
                 genMedicalTreatment(campaign, person, doctor).forEach(GameEffect::apply);
@@ -125,7 +126,7 @@ public final class InjuryUtil {
      * @param hits     the number of TW-scale Hits taken
      */
     public static void resolveCombatDamage(Campaign campaign, Person person, int hits) {
-        if (campaign.getCampaignOptions().isUseAlternativeAdvancedMedical()) {
+        if (campaign.getCampaignOptions().get(CampaignOption.USE_ALTERNATIVE_ADVANCED_MEDICAL)) {
             resolveCombatDamageUsingAlternateModel(campaign, person, hits, campaign.getLocalDate());
         } else {
             resolveCombatDamageUsingStandardModel(campaign, person, hits);
@@ -454,15 +455,15 @@ public final class InjuryUtil {
                 int roll = Compute.randomInt(100);
                 // Determine XP, if any
                 if (roll < max(1, fumbleLimit / 10)) {
-                    mistakeXP += campaign.getCampaignOptions().getMistakeXP();
+                    mistakeXP += campaign.getCampaignOptions().get(CampaignOption.MISTAKE_XP);
                     xpGained += mistakeXP;
                 } else if (roll > Math.min(98, 99 - (int) round((99 - critLimit) / 10.0))) {
-                    successXP += campaign.getCampaignOptions().getSuccessXP();
+                    successXP += campaign.getCampaignOptions().get(CampaignOption.SUCCESS_XP);
                     xpGained += successXP;
                 }
                 final int critTimeReduction = injury.getTime() - (int) Math.floor(injury.getTime() * 0.9);
                 // Reroll fumbled treatment check with Edge if applicable
-                if (campaign.getCampaignOptions().isUseEdge() &&
+                if (campaign.getCampaignOptions().get(CampaignOption.USE_EDGE) &&
                           (roll < fumbleLimit) &&
                           doctor.getOptions().booleanOption(PersonnelOptions.EDGE_MEDICAL) &&
                           (doctor.getCurrentEdge() > 0)) {
@@ -507,14 +508,14 @@ public final class InjuryUtil {
                               critTimeReduction);
                     }));
                 } else {
-                    final int xpChance = (int) round(100.0 / campaign.getCampaignOptions().getNTasksXP());
+                    final int xpChance = (int) round(100.0 / campaign.getCampaignOptions().get(CampaignOption.N_TASKS_XP));
                     result.add(new GameEffect(String.format("%s successfully treated %s [%d%% chance of gaining %d XP]",
                           doctor.getHyperlinkedFullTitle(),
                           person.getHyperlinkedName(),
                           xpChance,
-                          campaign.getCampaignOptions().getTaskXP()), rnd -> {
-                        int taskXP = campaign.getCampaignOptions().getTaskXP();
-                        if ((taskXP > 0) && (doctor.getNTasks() >= campaign.getCampaignOptions().getNTasksXP())) {
+                          campaign.getCampaignOptions().get(CampaignOption.TASKS_XP)), rnd -> {
+                        int taskXP = campaign.getCampaignOptions().get(CampaignOption.TASKS_XP);
+                        if ((taskXP > 0) && (doctor.getNTasks() >= campaign.getCampaignOptions().get(CampaignOption.N_TASKS_XP))) {
                             doctor.awardXP(campaign, taskXP);
                             doctor.setNTasks(0);
                         } else {
@@ -567,7 +568,7 @@ public final class InjuryUtil {
                     doctor.awardXP(campaign, xp);
                 }
                 PatientLogger.successfullyTreated(doctor, person, campaign.getLocalDate(), injuries);
-                person.setDaysToWaitForHealing(campaign.getCampaignOptions().getHealingWaitingPeriod());
+                person.setDaysToWaitForHealing(campaign.getCampaignOptions().get(CampaignOption.HEAL_WAITING_PERIOD));
             }));
         }
         if (numResting > 0) {
@@ -645,7 +646,7 @@ public final class InjuryUtil {
                 }
 
                 if (dismissed) {
-                    person.setDoctorId(null, campaign.getCampaignOptions().getHealingWaitingPeriod());
+                    person.setDoctorId(null, campaign.getCampaignOptions().get(CampaignOption.HEAL_WAITING_PERIOD));
                 }
             }));
         }

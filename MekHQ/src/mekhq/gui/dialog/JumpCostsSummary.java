@@ -51,7 +51,7 @@ import javax.swing.JScrollPane;
 
 import megamek.common.ui.FastJScrollPane;
 import mekhq.campaign.finances.Money;
-import mekhq.campaign.mission.TransportCostCalculations;
+import mekhq.campaign.mission.utilities.TransportCostCalculations;
 import mekhq.gui.baseComponents.roundedComponents.RoundedLineBorder;
 
 /**

@@ -74,6 +74,7 @@ import mekhq.campaign.universe.Faction;
 import mekhq.campaign.universe.companyGeneration.AddSupportUnitsToTOE;
 import mekhq.gui.baseComponents.roundedComponents.RoundedJButton;
 import mekhq.gui.baseComponents.roundedComponents.RoundedLineBorder;
+import mekhq.campaign.campaignOptions.CampaignOption;
 
 public class StratConConvoyCampaignOptionsChangedConfirmationDialog extends JDialog {
     private static final MMLogger LOGGER = MMLogger.create(StratConConvoyCampaignOptionsChangedConfirmationDialog.class);
@@ -187,7 +188,7 @@ public class StratConConvoyCampaignOptionsChangedConfirmationDialog extends JDia
         RoundedJButton btnConfirm = new RoundedJButton(getTextAt(RESOURCE_BUNDLE,
               "StratConConvoyCampaignOptionsChangedConfirmationDialog.confirm"));
         btnConfirm.addActionListener(evt -> {
-            processFreeUnits(campaign, campaign.getFaction(), true);
+            processFreeUnits(campaign, campaign.getPlayerForce().getFaction(), true);
             dispose();
         });
 
@@ -199,8 +200,8 @@ public class StratConConvoyCampaignOptionsChangedConfirmationDialog extends JDia
     }
 
     public static void processFreeUnits(Campaign campaign, Faction faction, boolean isAutomaticallyAssignRanks) {
-        int truckCount = campaign.getFaction().getFormationBaseSize();
-        if (campaign.isClanCampaign()) {
+        int truckCount = campaign.getPlayerForce().getFaction().getFormationBaseSize();
+        if (campaign.getPlayerForce().isClanForce()) {
             truckCount *= 2; // 2 vehicles per point
         }
 
@@ -214,7 +215,7 @@ public class StratConConvoyCampaignOptionsChangedConfirmationDialog extends JDia
 
             try {
                 PartQuality quality = PartQuality.QUALITY_D;
-                if (campaign.getCampaignOptions().isUseRandomUnitQualities()) {
+                if (campaign.getCampaignOptions().get(CampaignOption.USE_RANDOM_UNIT_QUALITIES)) {
                     quality = UnitOrder.getRandomUnitQuality(0);
                 }
                 Unit unit = campaign.addNewUnit(mekSummary.loadEntity(),

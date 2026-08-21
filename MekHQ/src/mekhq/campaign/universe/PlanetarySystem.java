@@ -63,6 +63,7 @@ import mekhq.campaign.personnel.education.Academy;
 import mekhq.campaign.personnel.education.AcademyFactory;
 import mekhq.campaign.universe.enums.HPGRating;
 import mekhq.campaign.universe.enums.HiringHallLevel;
+import mekhq.campaign.campaignOptions.CampaignOption;
 
 /**
  * This is a PlanetarySystem object that will contain information about the system as well as an ArrayList of the Planet
@@ -399,6 +400,15 @@ public class PlanetarySystem {
     /**
      * @return short name if set, else full name, else "unnamed"
      */
+    /**
+     * @param when the date to name the system as of, since ownership and name can change over time
+     *
+     * @return the system's name as a report hyperlink that focuses the interstellar map on it
+     */
+    public String getHyperlinkedName(LocalDate when) {
+        return String.format("<a href='SYSTEM:%s'>%s</a>", getId(), getName(when));
+    }
+
     public String getPrintableName(LocalDate when) {
         final String system = getName(when);
         return (system == null) ? "Unknown System" : system;
@@ -754,7 +764,7 @@ public class PlanetarySystem {
                                               && (!setName.equalsIgnoreCase("Prestigious Academies")
                                                         ||
                                                         campaign.getCampaignOptions()
-                                                              .isEnablePrestigiousAcademies())) // Additional
+                                                              .get(CampaignOption.ENABLE_PRESTIGIOUS_ACADEMIES))) // Additional
                      // condition for
                      // "Prestigious
                      // Academies"

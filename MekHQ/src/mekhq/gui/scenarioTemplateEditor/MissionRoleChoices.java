@@ -38,12 +38,13 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import megamek.client.ratgenerator.MissionRole;
+import mekhq.campaign.mission.scenarios.ScenarioForceTemplate;
 
 /**
  * Helpers for the scenario template editor's role-choices control. A force template stores its role choices as a list
  * of "role set" strings; each string is a comma-separated set of {@link MissionRole} names that apply together, and one
  * set is chosen at random when the force is generated (see
- * {@link mekhq.campaign.mission.ScenarioForceTemplate#getRequiredRoles()}). This class owns the parse/format and the
+ * {@link ScenarioForceTemplate#getRequiredRoles()}). This class owns the parse/format and the
  * unit-type filtering so those pieces can be tested without the Swing UI.
  */
 public final class MissionRoleChoices {

@@ -33,14 +33,14 @@
 
 package mekhq.campaign.events.missions;
 
-import mekhq.campaign.mission.Mission;
+import mekhq.campaign.mission.contract.AbstractContract;
 
 /**
  * Triggered when a new mission or contract is added to the campaign.
  */
 public class MissionNewEvent extends MissionEvent {
 
-    public MissionNewEvent(Mission mission) {
+    public MissionNewEvent(AbstractContract mission) {
         super(mission);
     }
 }

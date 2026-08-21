@@ -53,10 +53,10 @@ import javax.swing.*;
 
 import megamek.common.ui.FastJScrollPane;
 import mekhq.campaign.digitalGM.stratCon.biome.StratConBiomeManifest;
-import mekhq.campaign.mission.ScenarioForceTemplate.ForceAlignment;
-import mekhq.campaign.mission.ScenarioMapParameters.MapLocation;
-import mekhq.campaign.mission.atb.AtBScenarioModifier;
-import mekhq.campaign.mission.atb.AtBScenarioModifier.EventTiming;
+import mekhq.campaign.mission.scenarios.ScenarioForceTemplate.ForceAlignment;
+import mekhq.campaign.mission.scenarios.ScenarioMapParameters.MapLocation;
+import mekhq.campaign.mission.scenarios.atb.AtBScenarioModifier;
+import mekhq.campaign.mission.scenarios.atb.AtBScenarioModifier.EventTiming;
 import mekhq.gui.FileDialogs;
 import mekhq.utilities.MMDataLicenseHeader;
 

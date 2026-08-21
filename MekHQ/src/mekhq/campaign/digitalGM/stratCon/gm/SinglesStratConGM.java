@@ -33,6 +33,7 @@
 package mekhq.campaign.digitalGM.stratCon.gm;
 
 import mekhq.campaign.campaignOptions.CampaignOptions;
+import mekhq.campaign.campaignOptions.CampaignOption;
 import mekhq.campaign.digitalGM.IFacilityStrategy;
 import mekhq.campaign.digitalGM.stratCon.strategy.NoOpFacilityStrategy;
 
@@ -56,7 +57,7 @@ public class SinglesStratConGM extends AbstractStratConGM {
 
     @Override
     public boolean isEnabled(CampaignOptions campaignOptions) {
-        return campaignOptions.getStratConPlayType() == StratConPlayType.SINGLES;
+        return campaignOptions.get(CampaignOption.STRAT_CON_PLAY_TYPE) == StratConPlayType.SINGLES;
     }
 
     @Override

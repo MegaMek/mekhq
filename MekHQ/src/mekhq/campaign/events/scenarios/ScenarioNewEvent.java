@@ -33,7 +33,7 @@
 
 package mekhq.campaign.events.scenarios;
 
-import mekhq.campaign.mission.Scenario;
+import mekhq.campaign.mission.scenarios.Scenario;
 
 /**
  * Triggered when a scenario is added to a mission or contract.

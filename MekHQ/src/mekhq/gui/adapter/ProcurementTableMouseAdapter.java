@@ -56,6 +56,7 @@ import mekhq.gui.CampaignGUI;
 import mekhq.gui.model.ProcurementTableModel;
 import mekhq.gui.utilities.JMenuHelpers;
 import mekhq.utilities.ReportingUtilities;
+import mekhq.campaign.campaignOptions.CampaignOption;
 
 public class ProcurementTableMouseAdapter extends JPopupMenuAdapter {
     private static final MMLogger LOGGER = MMLogger.create(ProcurementTableMouseAdapter.class);
@@ -258,7 +259,7 @@ public class ProcurementTableMouseAdapter extends JPopupMenuAdapter {
         } else if (equipment instanceof Entity) {
             PartQuality quality;
 
-            if (gui.getCampaign().getCampaignOptions().isUseRandomUnitQualities()) {
+            if (gui.getCampaign().getCampaignOptions().get(CampaignOption.USE_RANDOM_UNIT_QUALITIES)) {
                 quality = Unit.getRandomUnitQuality(0);
             } else {
                 quality = PartQuality.QUALITY_D;

@@ -55,12 +55,11 @@ import megamek.common.options.IOption;
 import megamek.common.rolls.TargetRoll;
 import megamek.logging.MMLogger;
 import mekhq.campaign.Campaign;
+import mekhq.campaign.campaignOptions.CampaignOption;
 import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.finances.Money;
-import mekhq.campaign.mission.AtBContract;
-import mekhq.campaign.mission.Contract;
-import mekhq.campaign.mission.Mission;
-import mekhq.campaign.mission.enums.ContractObjectiveType;
+import mekhq.campaign.mission.contract.AbstractContract;
+import mekhq.campaign.mission.contract.contractData.ContractObjectiveType;
 import mekhq.campaign.personnel.Injury;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.PersonnelOptions;
@@ -94,10 +93,18 @@ public class RetirementDefectionTracker {
      * and determining payouts, but before the retirees have been paid,
      * we store those results to avoid making the rolls again.
      */
-    final private Set<Integer> rollRequired;
-    final private Map<Integer, HashSet<UUID>> unresolvedPersonnel;
+    final private Set<UUID> rollRequired;
+    final private Map<UUID, HashSet<UUID>> unresolvedPersonnel;
     final private Map<UUID, Payout> payouts;
     private LocalDate lastRetirementRoll;
+
+    /**
+     * Contract references loaded from a pre-UUID save, held until the campaign loader can map their legacy integer
+     * mission ids onto the converted contracts' {@link UUID}s (see {@link #relinkLegacyMissionIds(Map)}). Empty for
+     * modern saves.
+     */
+    final private transient Set<Integer> legacyRollRequired = new HashSet<>();
+    final private transient Map<Integer, HashSet<UUID>> legacyUnresolvedPersonnel = new HashMap<>();
 
     private static Person asfCommander;
     private static Integer asfCommanderModifier;
@@ -163,14 +170,14 @@ public class RetirementDefectionTracker {
               ContractObjectiveType.SECURITY_DUTY,
               ContractObjectiveType.RIOT_DUTY);
 
-        List<Contract> activeContracts = campaign.getActiveContracts();
+        List<AbstractContract> activeContracts = campaign.getActiveContracts();
 
         if (!activeContracts.isEmpty()) {
             if (campaign.getCampaignOptions().isUseStratCon()) {
-                Optional<Contract> defensiveContract = activeContracts.stream()
-                                                             .filter(contract -> contract instanceof AtBContract)
-                                                             .filter(atBContract -> !defensiveContracts.contains(((AtBContract) atBContract).getContractType()))
-                                                             .findFirst();
+                Optional<AbstractContract> defensiveContract = activeContracts.stream()
+                                                                     .filter(mission -> !defensiveContracts.contains(
+                                                                           mission.getObjectiveType()))
+                                                                     .findFirst();
 
                 return defensiveContract.isPresent();
             } else {
@@ -183,7 +190,7 @@ public class RetirementDefectionTracker {
 
     public static List<TargetRollModifier> getFactionModifiers(Person person, Campaign campaign) {
         ArrayList<TargetRollModifier> result = new ArrayList<>();
-        Faction campaignFaction = campaign.getFaction();
+        Faction campaignFaction = campaign.getPlayerForce().getFaction();
 
         // campaign faction modifiers
         if (campaignFaction.isPirate()) {
@@ -213,7 +220,7 @@ public class RetirementDefectionTracker {
 
         // wartime modifier
         if (FactionHints.getInstance()
-                  .isAtWarWith(campaign.getFaction(), person.getOriginFaction(), campaign.getLocalDate())) {
+                  .isAtWarWith(campaign.getPlayerForce().getFaction(), person.getOriginFaction(), campaign.getLocalDate())) {
             result.add(new TargetRollModifier(4, getTextAt(RESOURCE_BUNDLE, "factionEnemy.text")));
         }
         return result;
@@ -299,7 +306,7 @@ public class RetirementDefectionTracker {
      * @return The value of each share in C-bills
      */
     public static Money getShareValue(Campaign campaign) {
-        if (!campaign.getCampaignOptions().isUseShareSystem()) {
+        if (!campaign.getCampaignOptions().get(CampaignOption.USE_SHARE_SYSTEM)) {
             return Money.zero();
         }
 
@@ -307,7 +314,7 @@ public class RetirementDefectionTracker {
 
         int totalShares = campaign.getPlayerForce().getHumanResources().getActivePersonnel(false, true)
                                 .stream()
-                                .mapToInt(p -> p.getNumShares(campaign, campaign.getCampaignOptions().isSharesForAll()))
+                                .mapToInt(p -> p.getNumShares(campaign, campaign.getCampaignOptions().get(CampaignOption.SHARES_FOR_ALL)))
                                 .sum();
 
         if (totalShares <= 0) {
@@ -352,7 +359,7 @@ public class RetirementDefectionTracker {
     public static int getHRStrainModifier(Campaign campaign) {
         int personnel = getHRStrain(campaign);
 
-        int maximumStrain = campaign.getCampaignOptions().getHRCapacity() *
+        int maximumStrain = campaign.getCampaignOptions().get(CampaignOption.HR_CAPACITY) *
                                   getCombinedSkillValues(campaign, SkillType.S_ADMIN);
 
         // divide by zero protection - uses HR_DEFAULT_NOADMIN_PENALTY
@@ -389,7 +396,7 @@ public class RetirementDefectionTracker {
      *
      * @return A map with person ids as key and calculated target roll as value.
      */
-    public Map<UUID, TargetRoll> getTargetNumbers(final @Nullable Mission mission, final Campaign campaign) {
+    public Map<UUID, TargetRoll> getTargetNumbers(@Nullable AbstractContract mission, final Campaign campaign) {
         final Map<UUID, TargetRoll> targets = new HashMap<>();
 
         if (null != mission) {
@@ -397,11 +404,11 @@ public class RetirementDefectionTracker {
         }
 
         CampaignOptions campaignOptions = campaign.getCampaignOptions();
-        if (campaignOptions.isUseManagementSkill()) {
+        if (campaignOptions.get(CampaignOption.USE_MANAGEMENT_SKILL)) {
             refreshManagementSkillValues(campaign);
         }
 
-        boolean includeCivilians = campaignOptions.isIncludeCivilians();
+        boolean includeCivilians = campaignOptions.get(CampaignOption.INCLUDE_CIVILIANS);
         for (Person person : campaign.getPlayerForce().getHumanResources().getActivePersonnel(false, false)) {
             if (!includeCivilians && person.isCivilian()) {
                 continue;
@@ -413,15 +420,15 @@ public class RetirementDefectionTracker {
 
             if (person.isFounder()) {
                 if (person.getAge(campaign.getLocalDate()) < RETIREMENT_AGE) {
-                    if (!campaignOptions.isUseRandomFounderTurnover()) {
+                    if (!campaignOptions.get(CampaignOption.USE_RANDOM_FOUNDER_TURNOVER)) {
                         continue;
                     }
-                } else if (!campaignOptions.isUseFounderRetirement()) {
+                } else if (!campaignOptions.get(CampaignOption.USE_FOUNDER_RETIREMENT)) {
                     continue;
                 }
             }
 
-            if (campaignOptions.isUseSubContractSoldiers()) {
+            if (campaignOptions.get(CampaignOption.USE_SUB_CONTRACT_SOLDIERS)) {
                 if ((person.getUnit() != null) &&
                           (person.getUnit().usesSoldiers()) &&
                           (!person.getUnit().isCommander(person))) {
@@ -440,13 +447,13 @@ public class RetirementDefectionTracker {
             // Service Contract
             if (isBreakingContract(person,
                   campaign.getLocalDate(),
-                  campaignOptions.getServiceContractDuration())) {
-                targetNumber.addModifier(-campaignOptions.getServiceContractModifier(),
+                  campaignOptions.get(CampaignOption.SERVICE_CONTRACT_DURATION))) {
+                targetNumber.addModifier(-campaignOptions.get(CampaignOption.SERVICE_CONTRACT_MODIFIER),
                       resources.getString("contract.text"));
             }
 
             // Desirability modifier
-            if ((campaignOptions.isUseSkillModifiers()) &&
+            if ((campaignOptions.get(CampaignOption.USE_SKILL_MODIFIERS)) &&
                       (person.getAge(campaign.getLocalDate()) < RETIREMENT_AGE)) {
                 targetNumber.addModifier(min(EXP_ELITE - 2,
                             person.getExperienceLevel(campaignOptions,
@@ -458,7 +465,7 @@ public class RetirementDefectionTracker {
             }
 
             // Recent Promotion Modifier
-            if (campaignOptions.isUseTimeInRank()) {
+            if (campaignOptions.get(CampaignOption.USE_TIME_IN_RANK)) {
                 LocalDate today = campaign.getLocalDate();
                 LocalDate lastPromotionDate = person.getLastRankChangeDate();
 
@@ -472,8 +479,8 @@ public class RetirementDefectionTracker {
             }
 
             // Fatigue modifier
-            if ((campaignOptions.isUseFatigue()) &&
-                      (campaignOptions.isUseFatigueModifiers())) {
+            if ((campaignOptions.get(CampaignOption.USE_FATIGUE)) &&
+                      (campaignOptions.get(CampaignOption.USE_FATIGUE_MODIFIERS))) {
                 int fatigueModifier = Math.clamp(((person.getAdjustedFatigue() - 1) / 4) - 1, 0, 3);
 
                 if (fatigueModifier > 0) {
@@ -482,7 +489,7 @@ public class RetirementDefectionTracker {
             }
 
             // HR Strain Modifiers
-            if (campaignOptions.isUseHRStrain()) {
+            if (campaignOptions.get(CampaignOption.USE_HR_STRAIN)) {
                 int hrStrainModifier = getHRStrainModifier(campaign);
 
                 if (hrStrainModifier > 0) {
@@ -492,60 +499,51 @@ public class RetirementDefectionTracker {
             }
 
             // Management Skill Modifier
-            if (campaignOptions.isUseManagementSkill()) {
+            if (campaignOptions.get(CampaignOption.USE_MANAGEMENT_SKILL)) {
                 int modifier = getManagementSkillPenalty(person, campaign);
                 targetNumber.addModifier(modifier, resources.getString("managementSkill.text"));
             }
 
             // Shares Modifiers
-            if (campaignOptions.isUseShareSystem()) {
+            if (campaignOptions.get(CampaignOption.USE_SHARE_SYSTEM)) {
                 // If this retirement roll is not being made at the end of a contract (e.g. >12
                 // months since last roll),
                 // the share percentage should still apply.
                 // In the case of multiple active contracts, pick the one with the best
                 // percentage.
-
-                AtBContract contract;
-
-                try {
-                    contract = (AtBContract) mission;
-                } catch (Exception e) {
-                    contract = null;
-                }
-
-                if (contract == null) {
-                    List<AtBContract> atbContracts = campaign.getActiveAtBContracts();
+                if (mission == null) {
+                    List<AbstractContract> atbContracts = campaign.getActiveContracts();
 
                     if (!atbContracts.isEmpty()) {
-                        for (AtBContract atbContract : atbContracts) {
-                            if ((contract == null) || (contract.getSharesPercent() > atbContract.getSharesPercent())) {
-                                contract = atbContract;
+                        for (AbstractContract contract : atbContracts) {
+                            if ((contract == null) || (contract.getSharesPercent() > contract.getSharesPercent())) {
+                                mission = contract;
                             }
                         }
                     }
                 }
 
-                if (contract != null) {
-                    targetNumber.addModifier(-max(0, ((contract.getSharesPercent() / 10) - 2)),
+                if (mission != null) {
+                    targetNumber.addModifier(-max(0, ((mission.getSharesPercent() / 10) - 2)),
                           resources.getString("shares.text"));
                 }
             }
 
             // Unit Rating modifier
-            if (campaignOptions.isUseUnitRatingModifiers()) {
+            if (campaignOptions.get(CampaignOption.USE_UNIT_RATING_MODIFIERS)) {
                 int unitRatingModifier = getUnitRatingModifier(campaign);
                 targetNumber.addModifier(unitRatingModifier, resources.getString("unitRating.text"));
             }
 
             // Active Mission modifier
-            if (campaignOptions.isUseHostileTerritoryModifiers()) {
+            if (campaignOptions.get(CampaignOption.USE_HOSTILE_TERRITORY_MODIFIERS)) {
                 if (isHostileTerritory(campaign)) {
                     targetNumber.addModifier(-2, resources.getString("hostileTerritory.text"));
                 }
             }
 
             // Mission completion status modifiers
-            if ((mission != null) && (campaignOptions.isUseMissionStatusModifiers())) {
+            if ((mission != null) && (campaignOptions.get(CampaignOption.USE_MISSION_STATUS_MODIFIERS))) {
                 if (mission.getStatus().isSuccess()) {
                     targetNumber.addModifier(-1, resources.getString("missionSuccess.text"));
                 } else if (mission.getStatus().isFailed()) {
@@ -555,12 +553,20 @@ public class RetirementDefectionTracker {
                 }
             }
 
-            // Loyalty
-            if ((campaignOptions.isUseLoyaltyModifiers()) &&
-                      (!campaignOptions.isUseHideLoyalty())) {
+            // Shares modifier: a share-heavy contract gives the crew a larger stake, suppressing turnover.
+            if ((mission != null) && campaignOptions.get(CampaignOption.USE_SHARE_SYSTEM)) {
+                int sharesModifier = max(0, (mission.getSharesPercent() / 10) - 2);
+                if (sharesModifier > 0) {
+                    targetNumber.addModifier(-sharesModifier, resources.getString("shares.text"));
+                }
+            }
 
-                int loyaltyScore = person.getAdjustedLoyalty(campaign.getFaction(),
-                      campaignOptions.isUseAlternativeAdvancedMedical());
+            // Loyalty
+            if ((campaignOptions.get(CampaignOption.USE_LOYALTY_MODIFIERS)) &&
+                      (!campaignOptions.get(CampaignOption.USE_HIDE_LOYALTY))) {
+
+                int loyaltyScore = person.getAdjustedLoyalty(campaign.getPlayerForce().getFaction(),
+                      campaignOptions.get(CampaignOption.USE_ALTERNATIVE_ADVANCED_MEDICAL));
 
                 if (person.isCommander()) {
                     loyaltyScore += 2;
@@ -574,13 +580,13 @@ public class RetirementDefectionTracker {
             }
 
             // Faction Modifiers
-            if (campaignOptions.isUseFactionModifiers()) {
+            if (campaignOptions.get(CampaignOption.USE_FACTION_MODIFIERS)) {
                 List<TargetRollModifier> factionModifiers = getFactionModifiers(person, campaign);
                 factionModifiers.forEach(targetNumber::addModifier);
             }
 
             // Age Modifiers
-            if (campaignOptions.isUseAgeModifiers()) {
+            if (campaignOptions.get(CampaignOption.USE_AGE_MODIFIERS)) {
                 int ageMod = getAgeMod(person.getAge(campaign.getLocalDate()));
 
                 if (ageMod < 0) {
@@ -588,13 +594,13 @@ public class RetirementDefectionTracker {
                 } else if ((ageMod > 0) &&
                                  (!isBreakingContract(person,
                                        campaign.getLocalDate(),
-                                       campaignOptions.getServiceContractDuration()))) {
+                                       campaignOptions.get(CampaignOption.SERVICE_CONTRACT_DURATION)))) {
                     targetNumber.addModifier(ageMod, resources.getString("ageRetirement.text"));
                 }
             }
 
             // Family Modifier
-            if (campaignOptions.isUseFamilyModifiers()) {
+            if (campaignOptions.get(CampaignOption.USE_FAMILY_MODIFIERS)) {
                 Person spouse = person.getGenealogy().getSpouse();
                 List<Person> children = person.getGenealogy().getChildren();
 
@@ -661,12 +667,12 @@ public class RetirementDefectionTracker {
             // calculate the modifiers if they're not populated yet
             refreshManagementSkillValues(campaign);
         }
-        int modifier = campaign.getCampaignOptions().getManagementSkillPenalty();
+        int modifier = campaign.getCampaignOptions().get(CampaignOption.MANAGEMENT_SKILL_PENALTY);
 
-        if (campaign.getCampaignOptions().isUseCommanderLeadershipOnly()) {
+        if (campaign.getCampaignOptions().get(CampaignOption.USE_COMMANDER_LEADERSHIP_ONLY)) {
             Person commander = campaign.getPlayerForce().getHumanResources()
                                      .getCommander(campaign.getCampaignOptions(),
-                                           campaign.isClanCampaign(),
+                                           campaign.getPlayerForce().isClanForce(),
                                            campaign.getLocalDate());
             if (commander != null && commander.hasSkill((SkillType.S_LEADER))) {
                 SkillModifierData skillModifierData = commander.getSkillModifierData(true);
@@ -688,10 +694,10 @@ public class RetirementDefectionTracker {
      * @return the base target number
      */
     private int getBaseTargetNumber(Campaign campaign, Person person) {
-        if ((campaign.getCampaignOptions().isUseLoyaltyModifiers()) &&
-                  (campaign.getCampaignOptions().isUseHideLoyalty())) {
-            int loyaltyScore = person.getAdjustedLoyalty(campaign.getFaction(),
-                  campaign.getCampaignOptions().isUseAlternativeAdvancedMedical());
+        if ((campaign.getCampaignOptions().get(CampaignOption.USE_LOYALTY_MODIFIERS)) &&
+                  (campaign.getCampaignOptions().get(CampaignOption.USE_HIDE_LOYALTY))) {
+            int loyaltyScore = person.getAdjustedLoyalty(campaign.getPlayerForce().getFaction(),
+                  campaign.getCampaignOptions().get(CampaignOption.USE_ALTERNATIVE_ADVANCED_MEDICAL));
 
             if (person.isCommander()) {
                 loyaltyScore += 2;
@@ -699,9 +705,9 @@ public class RetirementDefectionTracker {
 
             int loyaltyModifier = person.getLoyaltyModifier(loyaltyScore);
 
-            return campaign.getCampaignOptions().getTurnoverFixedTargetNumber() + loyaltyModifier;
+            return campaign.getCampaignOptions().get(CampaignOption.TURNOVER_FIXED_TARGET_NUMBER) + loyaltyModifier;
         } else {
-            return campaign.getCampaignOptions().getTurnoverFixedTargetNumber();
+            return campaign.getCampaignOptions().get(CampaignOption.TURNOVER_FIXED_TARGET_NUMBER);
         }
     }
 
@@ -875,7 +881,7 @@ public class RetirementDefectionTracker {
      * @param shareValue The value of each share in the unit; if not using the share system, this is zero.
      * @param campaign   the current campaign
      */
-    public void rollRetirement(final @Nullable Mission mission, final Map<UUID, TargetRoll> targets,
+    public void rollRetirement(final @Nullable AbstractContract mission, final Map<UUID, TargetRoll> targets,
           final Money shareValue, final Campaign campaign) {
         if ((mission != null) && !unresolvedPersonnel.containsKey(mission.getId())) {
             unresolvedPersonnel.put(mission.getId(), new HashSet<>());
@@ -897,13 +903,13 @@ public class RetirementDefectionTracker {
 
                 // if the retiree is the commander of an infantry platoon, all non-founders in
                 // the platoon follow them into retirement
-                if (campaign.getCampaignOptions().isUseSubContractSoldiers()) {
+                if (campaign.getCampaignOptions().get(CampaignOption.USE_SUB_CONTRACT_SOLDIERS)) {
                     if ((person.getUnit() != null) &&
                               (person.getUnit().usesSoldiers()) &&
                               (person.getUnit().isCommander(person))) {
                         for (Person soldier : person.getUnit().getAllInfantry()) {
                             if ((!soldier.isFounder()) ||
-                                      (campaign.getCampaignOptions().isUseRandomFounderTurnover())) {
+                                      (campaign.getCampaignOptions().get(CampaignOption.USE_RANDOM_FOUNDER_TURNOVER))) {
                                 // this shouldn't be an issue, but we include it here as insurance
                                 if (!payouts.containsKey(id)) {
                                     final java.util.UUID id1 = soldier.getId();
@@ -913,7 +919,7 @@ public class RetirementDefectionTracker {
                                                 shareValue,
                                                 false,
                                                 false,
-                                                campaign.getCampaignOptions().isSharesForAll()));
+                                                campaign.getCampaignOptions().get(CampaignOption.SHARES_FOR_ALL)));
                                 }
                             }
                         }
@@ -928,7 +934,7 @@ public class RetirementDefectionTracker {
                             shareValue,
                             false,
                             false,
-                            campaign.getCampaignOptions().isSharesForAll()));
+                            campaign.getCampaignOptions().get(CampaignOption.SHARES_FOR_ALL)));
             }
         }
 
@@ -959,7 +965,7 @@ public class RetirementDefectionTracker {
      * @return True if the person was successfully removed from the campaign, false otherwise.
      */
     public boolean removeFromCampaign(Person person, boolean killed, boolean sacked, Campaign campaign,
-          Mission contract) {
+          AbstractContract contract) {
         if (!person.getPrisonerStatus().isFree()) {
             return false;
         }
@@ -970,7 +976,7 @@ public class RetirementDefectionTracker {
                     getShareValue(campaign),
                     killed,
                     sacked,
-                    campaign.getCampaignOptions().isSharesForAll()));
+                    campaign.getCampaignOptions().get(CampaignOption.SHARES_FOR_ALL)));
 
         if (null != contract) {
             unresolvedPersonnel.computeIfAbsent(contract.getId(), k -> new HashSet<>());
@@ -992,7 +998,7 @@ public class RetirementDefectionTracker {
     public void removePerson(Person person) {
         payouts.remove(person.getId());
 
-        for (int contractID : unresolvedPersonnel.keySet()) {
+        for (UUID contractID : unresolvedPersonnel.keySet()) {
             unresolvedPersonnel.get(contractID).remove(person.getId());
         }
     }
@@ -1005,37 +1011,31 @@ public class RetirementDefectionTracker {
             return campaign.getPlayerForce().getHumanResources().getPerson(personID) == null;
         });
 
-        for (int contractID : unresolvedPersonnel.keySet()) {
+        for (UUID contractID : unresolvedPersonnel.keySet()) {
             unresolvedPersonnel.get(contractID).removeIf(personID -> {
                 return campaign.getPlayerForce().getHumanResources().getPerson(personID) == null;
             });
         }
     }
 
-    public boolean isOutstanding(int id) {
+    public boolean isOutstanding(UUID id) {
         return unresolvedPersonnel.containsKey(id);
     }
 
     /**
-     * Called by when all payouts have been resolved for the contract. If the contract is null, the dialog has been
-     * invoked without a specific contract and all outstanding payouts have been resolved.
+     * Clears every outstanding payout, for all contracts at once. Called when the turnover dialog was opened without a
+     * specific contract, so settling it settles everything.
+     *
+     * <p>Each contract is resolved individually before the map is emptied, so the roll-required flags go with it -
+     * {@link #resolveContract(UUID)} keys off a contract id and so cannot stand in for "all of them".</p>
      */
     public void resolveAllContracts() {
-        resolveContract(null);
+        unresolvedPersonnel.keySet().forEach(this::resolveContract);
+        unresolvedPersonnel.clear();
         payouts.clear();
     }
 
-    public void resolveContract(final @Nullable Mission mission) {
-        if (mission == null) {
-            unresolvedPersonnel.keySet().forEach(this::resolveContract);
-            unresolvedPersonnel.clear();
-        } else {
-            resolveContract(mission.getId());
-            unresolvedPersonnel.remove(mission.getId());
-        }
-    }
-
-    private void resolveContract(int contractId) {
+    private void resolveContract(UUID contractId) {
         if (null != unresolvedPersonnel.get(contractId)) {
             for (UUID pid : unresolvedPersonnel.get(contractId)) {
                 payouts.remove(pid);
@@ -1048,7 +1048,7 @@ public class RetirementDefectionTracker {
         return getRetirees(null);
     }
 
-    public Set<UUID> getRetirees(final @Nullable Mission mission) {
+    public Set<UUID> getRetirees(final @Nullable AbstractContract mission) {
         return (mission == null) ? payouts.keySet() : unresolvedPersonnel.get(mission.getId());
     }
 
@@ -1063,15 +1063,15 @@ public class RetirementDefectionTracker {
      * @return The amount in C-bills required to get a bonus to the Employee Turnover roll
      */
     public static Money getPayoutOrBonusValue(final Campaign campaign, Person person) {
-        double bonusMultiplier = campaign.getCampaignOptions().getPayoutRateEnlisted();
+        double bonusMultiplier = campaign.getCampaignOptions().get(CampaignOption.PAYOUT_RATE_ENLISTED);
 
         if (person.getRank().isOfficer()) {
-            bonusMultiplier = campaign.getCampaignOptions().getPayoutRateOfficer();
+            bonusMultiplier = campaign.getCampaignOptions().get(CampaignOption.PAYOUT_RATE_OFFICER);
         }
 
-        if (campaign.getCampaignOptions().isUsePayoutServiceBonus()) {
+        if (campaign.getCampaignOptions().get(CampaignOption.USE_PAYOUT_SERVICE_BONUS)) {
             bonusMultiplier += person.getYearsInService(campaign) *
-                                     ((double) campaign.getCampaignOptions().getPayoutServiceBonusRate() / 100);
+                                     ((double) campaign.getCampaignOptions().get(CampaignOption.PAYOUT_SERVICE_BONUS_RATE) / 100);
         }
 
         return person.getSalary(campaign).multipliedBy(bonusMultiplier);
@@ -1131,7 +1131,7 @@ public class RetirementDefectionTracker {
 
             calculatePayout(campaign, person, killed, sacked, shareValue.isPositive());
 
-            if ((shareValue.isPositive()) && (campaign.getCampaignOptions().isUseShareSystem())) {
+            if ((shareValue.isPositive()) && (campaign.getCampaignOptions().get(CampaignOption.USE_SHARE_SYSTEM))) {
                 payoutAmount = payoutAmount.plus(shareValue.multipliedBy(person.getNumShares(campaign, sharesForAll)));
             }
         }
@@ -1143,20 +1143,20 @@ public class RetirementDefectionTracker {
             // person was killed
             if (killed) {
                 payoutAmount = getPayoutOrBonusValue(campaign, person).multipliedBy(campaign.getCampaignOptions()
-                                                                                          .getPayoutRetirementMultiplier());
+                                                                                          .get(CampaignOption.PAYOUT_RETIREMENT_MULTIPLIER));
                 // person is getting medically discharged
             } else if (hasMedicalDischargeInjuries(person)) {
                 payoutAmount = getPayoutOrBonusValue(campaign, person).multipliedBy(campaign.getCampaignOptions()
-                                                                                          .getPayoutRetirementMultiplier());
+                                                                                          .get(CampaignOption.PAYOUT_RETIREMENT_MULTIPLIER));
                 // person is defecting
             } else if (isBreakingContract(person,
                   campaign.getLocalDate(),
-                  campaign.getCampaignOptions().getServiceContractDuration())) {
+                  campaign.getCampaignOptions().get(CampaignOption.SERVICE_CONTRACT_DURATION))) {
                 payoutAmount = Money.of(0);
                 // person is retiring
             } else if (person.getAge(campaign.getLocalDate()) >= RETIREMENT_AGE) {
                 payoutAmount = getPayoutOrBonusValue(campaign, person).multipliedBy(campaign.getCampaignOptions()
-                                                                                          .getPayoutRetirementMultiplier());
+                                                                                          .get(CampaignOption.PAYOUT_RETIREMENT_MULTIPLIER));
                 // person was sacked
             } else if (sacked) {
                 payoutAmount = Money.of(0);
@@ -1224,13 +1224,13 @@ public class RetirementDefectionTracker {
         MHQXMLUtility.writeSimpleXMLOpenTag(pw, indent++, "retirementDefectionTracker");
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "rollRequired", createCsv(rollRequired));
         MHQXMLUtility.writeSimpleXMLOpenTag(pw, indent++, "unresolvedPersonnel");
-        for (Integer i : unresolvedPersonnel.keySet()) {
+        for (UUID id : unresolvedPersonnel.keySet()) {
             MHQXMLUtility.writeSimpleXMLAttributedTag(pw,
                   indent,
                   "contract",
                   "id",
-                  i,
-                  createCsv(unresolvedPersonnel.get(i)));
+                  id,
+                  createCsv(unresolvedPersonnel.get(id)));
         }
         MHQXMLUtility.writeSimpleXMLCloseTag(pw, --indent, "unresolvedPersonnel");
 
@@ -1248,6 +1248,81 @@ public class RetirementDefectionTracker {
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "lastRetirementRoll", lastRetirementRoll);
         MHQXMLUtility.writeSimpleXMLCloseTag(pw, --indent, "retirementDefectionTracker");
     }
+
+    /**
+     * Parses a contract reference, returning {@code null} when the value is not a {@link UUID} (i.e. a legacy integer
+     * mission id from a pre-UUID save) rather than throwing.
+     */
+    private static @Nullable UUID parseMissionId(final String text) {
+        if ((text == null) || text.isBlank()) {
+            return null;
+        }
+
+        try {
+            return UUID.fromString(text.trim());
+        } catch (IllegalArgumentException ex) {
+            return null;
+        }
+    }
+
+    /** Parses a legacy integer mission id, or {@code null} when the value is not an integer. */
+    private static @Nullable Integer parseLegacyMissionId(final String text) {
+        if ((text == null) || text.isBlank()) {
+            return null;
+        }
+
+        try {
+            return Integer.valueOf(text.trim());
+        } catch (NumberFormatException ex) {
+            return null;
+        }
+    }
+
+    /**
+     * Re-hooks contract references loaded from a pre-UUID save onto the contracts those legacy missions were converted
+     * into. Called by the campaign loader once every mission has been read, so it does not matter whether the tracker
+     * or the missions were parsed first. References whose mission was not converted are discarded (the tracker's own
+     * orphan-record cleanup would drop them anyway).
+     *
+     * @param legacyMissionIdMap legacy integer mission id to converted contract {@link UUID}
+     *
+     * @return how many references were held and how many of them were re-hooked
+     */
+    public LegacyRelinkResult relinkLegacyMissionIds(final Map<Integer, UUID> legacyMissionIdMap) {
+        final int attempted = legacyRollRequired.size() + legacyUnresolvedPersonnel.size();
+        int relinked = 0;
+
+        for (final Integer legacyId : legacyRollRequired) {
+            final UUID missionId = legacyMissionIdMap.get(legacyId);
+            if (missionId != null) {
+                rollRequired.add(missionId);
+                relinked++;
+            }
+        }
+        legacyRollRequired.clear();
+
+        for (final Map.Entry<Integer, HashSet<UUID>> entry : legacyUnresolvedPersonnel.entrySet()) {
+            final UUID missionId = legacyMissionIdMap.get(entry.getKey());
+            if (missionId != null) {
+                unresolvedPersonnel.put(missionId, entry.getValue());
+                relinked++;
+            }
+        }
+        legacyUnresolvedPersonnel.clear();
+
+        return new LegacyRelinkResult(attempted, relinked);
+    }
+
+    /**
+     * The outcome of a {@link #relinkLegacyMissionIds(Map)} pass.
+     *
+     * <p>Both counts are reported because they differ whenever a legacy reference has no converted contract to hook
+     * onto; a caller that logs only the successes cannot tell how many were dropped.</p>
+     *
+     * @param attempted the number of legacy references the tracker held
+     * @param relinked  how many of them resolved to a converted contract
+     */
+    public record LegacyRelinkResult(int attempted, int relinked) {}
 
     public static RetirementDefectionTracker generateInstanceFromXML(Node wn, Campaign c) {
         RetirementDefectionTracker retVal = null;
@@ -1272,7 +1347,17 @@ public class RetirementDefectionTracker {
                     if (!wn2.getTextContent().isBlank()) {
                         String[] ids = wn2.getTextContent().split(",");
                         for (String id : ids) {
-                            retVal.rollRequired.add(Integer.parseInt(id));
+                            // Pre-UUID saves stored a legacy integer mission id here; hold it for re-hooking rather
+                            // than throwing (which would abort the rest of the tracker's parse).
+                            UUID missionId = parseMissionId(id);
+                            if (missionId != null) {
+                                retVal.rollRequired.add(missionId);
+                            } else {
+                                Integer legacyId = parseLegacyMissionId(id);
+                                if (legacyId != null) {
+                                    retVal.legacyRollRequired.add(legacyId);
+                                }
+                            }
                         }
                     }
                 } else if (wn2.getNodeName().equalsIgnoreCase("unresolvedPersonnel")) {
@@ -1283,12 +1368,21 @@ public class RetirementDefectionTracker {
                             continue;
                         }
                         if (wn3.getNodeName().equalsIgnoreCase("contract")) {
-                            int id = Integer.parseInt(wn3.getAttributes().getNamedItem("id").getTextContent());
+                            String rawId = wn3.getAttributes().getNamedItem("id").getTextContent();
                             String[] ids = wn3.getTextContent().split(",");
                             HashSet<UUID> pids = Arrays.stream(ids)
                                                        .map(UUID::fromString)
                                                        .collect(Collectors.toCollection(HashSet::new));
-                            retVal.unresolvedPersonnel.put(id, pids);
+
+                            UUID id = parseMissionId(rawId);
+                            if (id != null) {
+                                retVal.unresolvedPersonnel.put(id, pids);
+                            } else {
+                                Integer legacyId = parseLegacyMissionId(rawId);
+                                if (legacyId != null) {
+                                    retVal.legacyUnresolvedPersonnel.put(legacyId, pids);
+                                }
+                            }
                         }
                     }
                 } else if (wn2.getNodeName().equalsIgnoreCase("payouts")) {

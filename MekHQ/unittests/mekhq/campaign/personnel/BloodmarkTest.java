@@ -32,6 +32,10 @@
  */
 package mekhq.campaign.personnel;
 
+import mekhq.campaign.campaignOptions.CampaignOption;
+
+import static org.mockito.Mockito.lenient;
+
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -71,7 +75,11 @@ class BloodmarkTest {
         LocalWarehouse campaignWarehouse = mock(LocalWarehouse.class);
 
         when(campaign.getCampaignOptions()).thenReturn(campaignOptions);
-        when(campaign.getFaction()).thenReturn(campaignFaction);
+        lenient().when(campaignOptions.get(CampaignOption.NATURAL_HEALING_WAITING_PERIOD)).thenReturn(0);
+        lenient().when(campaignOptions.get(CampaignOption.USE_TWIST_OF_FATE_SURVIVAL)).thenReturn(false);
+        lenient().when(campaignOptions.get(CampaignOption.IS_ENABLE_SALVAGE_FLAG_BY_DEFAULT)).thenReturn(false);
+        lenient().when(campaignOptions.get(CampaignOption.TECHS_USE_ADMINISTRATION)).thenReturn(false);
+        when(campaign.getPlayerForce().getFaction()).thenReturn(campaignFaction);
         when(campaignFaction.getShortName()).thenReturn("MERC");
         when(campaign.getPlayerForce().getHangar()).thenReturn(campaignHangar);
         //TODO: This won't work once we support multiple warehouse. Method separated from getWarehouse() for future

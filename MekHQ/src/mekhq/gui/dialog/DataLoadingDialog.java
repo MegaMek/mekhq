@@ -34,6 +34,8 @@ package mekhq.gui.dialog;
 
 import static java.util.Arrays.sort;
 import static mekhq.campaign.enums.DailyReportType.POLITICS;
+import static mekhq.campaign.universe.warriorsAlmanac.WarriorsAlmanacEntry.buildAlmanacPartsData;
+import static mekhq.campaign.universe.warriorsAlmanac.WarriorsAlmanacEntry.buildAlmanacUnitsData;
 import static mekhq.gui.campaignOptions.CampaignOptionsDialog.CampaignOptionsDialogMode.STARTUP;
 import static mekhq.gui.campaignOptions.CampaignOptionsDialog.CampaignOptionsDialogMode.STARTUP_ABRIDGED;
 import static mekhq.utilities.EntityUtilities.isUnsupportedEntity;
@@ -78,12 +80,13 @@ import mekhq.NullEntityException;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.Campaign.AdministratorSpecialization;
 import mekhq.campaign.CampaignFactory;
+import mekhq.campaign.campaignOptions.CampaignOption;
 import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.events.OptionsChangedEvent;
 import mekhq.campaign.finances.CurrencyManager;
 import mekhq.campaign.finances.financialInstitutions.FinancialInstitutions;
-import mekhq.campaign.market.enums.ContractMarketMethod;
-import mekhq.campaign.mission.atb.AtBScenarioModifier;
+import mekhq.campaign.market.PartsStore;
+import mekhq.campaign.mission.scenarios.atb.AtBScenarioModifier;
 import mekhq.campaign.personnel.Bloodname;
 import mekhq.campaign.personnel.SpecialAbility;
 import mekhq.campaign.personnel.backgrounds.RandomCompanyNameGenerator;
@@ -190,7 +193,7 @@ public class DataLoadingDialog extends AbstractMHQDialogBasic implements Propert
     }
 
     private JProgressBar createProgressBar() {
-        setProgressBar(new JProgressBar(0, 7));
+        setProgressBar(new JProgressBar(0, 8));
         getProgressBar().setString(resources.getString("loadingBaseData.text"));
         getProgressBar().setValue(0);
         getProgressBar().setStringPainted(true);
@@ -243,6 +246,9 @@ public class DataLoadingDialog extends AbstractMHQDialogBasic implements Propert
                 progressBar.setString(resources.getString((getCampaignFile() == null) ?
                                                                 "applyingNewCampaign.text" :
                                                                 "applyingLoadedCampaign.text"));
+                break;
+            case 8:
+                progressBar.setString(resources.getString("performingFinalSteps.text"));
                 break;
             default:
                 progressBar.setString(resources.getString("Error.text"));
@@ -406,10 +412,10 @@ public class DataLoadingDialog extends AbstractMHQDialogBasic implements Propert
 
                 // initialize starting faction standings
                 CampaignOptions campaignOptions = campaign.getCampaignOptions();
-                if (campaignOptions.isTrackFactionStanding()) {
+                if (campaignOptions.get(CampaignOption.TRACK_FACTION_STANDING)) {
                     FactionStandings factionStandings = campaign.getPlayerForce().getFactionStandings();
-                    String report = factionStandings.updateClimateRegard(campaign.getFaction(),
-                          campaign.getLocalDate(), campaignOptions.getRegardMultiplier(),
+                    String report = factionStandings.updateClimateRegard(campaign.getPlayerForce().getFaction(),
+                          campaign.getLocalDate(), campaignOptions.get(CampaignOption.REGARD_MULTIPLIER),
                           true);
                     campaign.addReport(POLITICS, report);
                 }
@@ -423,30 +429,24 @@ public class DataLoadingDialog extends AbstractMHQDialogBasic implements Propert
 
                 // Setup Personnel Modules
                 final AbstractMarriage marriage = campaignOptions
-                                                        .getRandomMarriageMethod()
+                                                        .get(CampaignOption.RANDOM_MARRIAGE_METHOD)
                                                         .getMethod(campaignOptions);
                 campaign.getPlayerForce().getHumanResources().setMarriage(marriage);
                 final AbstractDivorce divorce = campaignOptions
-                                                      .getRandomDivorceMethod()
+                                                      .get(CampaignOption.RANDOM_DIVORCE_METHOD)
                                                       .getMethod(campaignOptions);
                 campaign.getPlayerForce().getHumanResources().setDivorce(divorce);
                 final AbstractProcreation procreation = campaignOptions
-                                                              .getRandomProcreationMethod()
+                                                              .get(CampaignOption.RANDOM_PROCREATION_METHOD)
                                                               .getMethod(campaignOptions);
                 campaign.getPlayerForce().getHumanResources().setProcreation(procreation);
 
                 // Setup Markets
                 campaign.getPlayerForce().getHumanResources().refreshApplicants(campaign, true);
                 showRarePersonnelDialog(campaign, true);
-                ContractMarketMethod contractMarketMethod = campaignOptions.getContractMarketMethod();
-                campaign.setContractMarket(contractMarketMethod.getContractMarket());
 
-                // AtBMonthly initial contract generation is handled using AtB initialization
-                if (!contractMarketMethod.isNone() && !contractMarketMethod.isAtBMonthly()) {
-                    campaign.getContractMarket().generateContractOffers(campaign, true);
-                }
-                if (!campaignOptions.getUnitMarketMethod().isNone()) {
-                    campaign.setUnitMarket(campaignOptions.getUnitMarketMethod().getUnitMarket());
+                if (!campaignOptions.get(CampaignOption.UNIT_MARKET_METHOD).isNone()) {
+                    campaign.setUnitMarket(campaignOptions.get(CampaignOption.UNIT_MARKET_METHOD).getUnitMarket());
                     campaign.getUnitMarket().generateUnitOffers(campaign);
                 }
 
@@ -500,9 +500,19 @@ public class DataLoadingDialog extends AbstractMHQDialogBasic implements Propert
                 // endregion Progress 7
             }
 
+            // region progress 8
+            setProgress(8);
+
+            PartsStore partsStore = campaign.getPartsStore();
+            // Parts carry separate Inner Sphere and Clan tech dates; use the player force's perspective.
+            boolean isClanForce = campaign.getPlayerForce().isClanForce();
+            campaign.setPartsAlmanac(buildAlmanacPartsData(partsStore, isClanForce));
+            campaign.setUnitsAlmanac(buildAlmanacUnitsData());
+
             if (isNewCampaign) {
                 new WarAndPeaceProcessor(campaign, true);
             }
+            // endregion Progress 8
 
             return campaign;
         }
@@ -568,14 +578,14 @@ public class DataLoadingDialog extends AbstractMHQDialogBasic implements Propert
          * @param units The {@link Collection} of {@link Unit} instances to process. Must not be {@code null}.
          */
         private static void showRarePersonnelDialog(Campaign campaign, boolean isCampaignStart) {
-            if (!campaign.getNewPersonnelMarket().getHasRarePersonnel()) {
+            if (!campaign.getPlayerForce().getHumanResources().getNewPersonnelMarket().getHasRarePersonnel()) {
                 return;
             }
 
             StringBuilder oocReport = new StringBuilder(
                   campaign.getResources().getString("personnelMarket.rareProfession.outOfCharacter"));
-            for (PersonnelRole profession : campaign.getNewPersonnelMarket().getRareProfessions()) {
-                oocReport.append("<p>- ").append(profession.getLabel(campaign.isClanCampaign())).append("</p>");
+            for (PersonnelRole profession : campaign.getPlayerForce().getHumanResources().getNewPersonnelMarket().getRareProfessions()) {
+                oocReport.append("<p>- ").append(profession.getLabel(campaign.getPlayerForce().isClanForce())).append("</p>");
             }
 
             List<String> buttons = new ArrayList<>();
@@ -586,7 +596,7 @@ public class DataLoadingDialog extends AbstractMHQDialogBasic implements Propert
             }
 
             ImmersiveDialogSimple dialog = new ImmersiveDialogSimple(campaign,
-                  campaign.getSeniorAdminPerson(AdministratorSpecialization.HR),
+                  campaign.getPlayerForce().getHumanResources() .getSeniorAdminPerson(AdministratorSpecialization.HR, campaign.getCampaignOptions(), campaign.getPlayerForce().isClanForce(), campaign.getLocalDate()),
                   null,
                   campaign.getResources().getString("personnelMarket.rareProfession.inCharacter"),
                   buttons,
@@ -595,7 +605,7 @@ public class DataLoadingDialog extends AbstractMHQDialogBasic implements Propert
                   true);
 
             if (dialog.getDialogChoice() == 2) {
-                campaign.getNewPersonnelMarket().showPersonnelMarketDialog();
+                campaign.getPlayerForce().getHumanResources().getNewPersonnelMarket().showPersonnelMarketDialog();
             }
         }
 

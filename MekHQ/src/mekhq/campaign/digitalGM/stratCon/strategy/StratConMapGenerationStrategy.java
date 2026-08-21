@@ -38,7 +38,7 @@ import mekhq.campaign.digitalGM.stratCon.StratConRulesManager;
 import mekhq.campaign.digitalGM.stratCon.StratConScenario;
 import mekhq.campaign.digitalGM.stratCon.StratConTrackState;
 import mekhq.campaign.digitalGM.stratCon.sectorGeneration.StratConMapTuner;
-import mekhq.campaign.mission.AtBScenario;
+import mekhq.campaign.mission.scenarios.AtBScenario;
 
 /**
  * Default StratCon implementation of {@link IMapGenerationStrategy}: the standard biome-driven terrain selection.

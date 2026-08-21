@@ -68,6 +68,7 @@ import mekhq.campaign.personnel.enums.Profession;
 import mekhq.gui.CampaignGUI;
 import mekhq.gui.displayWrappers.RankDisplay;
 import mekhq.gui.view.PersonViewPanel;
+import mekhq.campaign.campaignOptions.CampaignOption;
 
 /**
  * This dialog is used to both hire new pilots and to edit existing ones
@@ -169,7 +170,7 @@ public class NewRecruitDialog extends JDialog {
     }
 
     private JPanel createSidebar(ResourceBundle resourceMap) {
-        boolean randomizeOrigin = getCampaign().getCampaignOptions().getRandomOriginOptions().isRandomizeOrigin();
+        boolean randomizeOrigin = getCampaign().getCampaignOptions().get(CampaignOption.RANDOM_ORIGIN_OPTIONS).isRandomizeOrigin();
 
         JPanel panSidebar = new JPanel();
         panSidebar.setName("panButtons");
@@ -255,7 +256,7 @@ public class NewRecruitDialog extends JDialog {
     }
 
     private void randomName() {
-        String factionCode = getCampaign().getCampaignOptions().isUseOriginFactionForNames() ?
+        String factionCode = getCampaign().getCampaignOptions().get(CampaignOption.USE_ORIGIN_FACTION_FOR_NAMES) ?
                                    person.getOriginFaction().getShortName() :
                                    RandomNameGenerator.getInstance().getChosenFaction();
 

@@ -44,7 +44,7 @@ import megamek.logging.MMLogger;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.digitalGM.stratCon.StratConCampaignState;
 import mekhq.campaign.force.Formation;
-import mekhq.campaign.mission.AtBContract;
+import mekhq.campaign.mission.contract.AbstractContract;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.enums.PersonnelRole;
 import mekhq.utilities.MHQXMLUtility;
@@ -144,13 +144,13 @@ public class MothballInfo {
      * @param campaign The campaign in which this is happening
      */
     public void restorePreMothballInfo(Unit unit, Campaign campaign) {
-        Person tech = campaign.getPerson(techId);
+        Person tech = campaign.getPlayerForce().getHumanResources().getPerson(techId);
         if (tech != null && tech.getStatus().isActive()) {
             unit.setTech(tech);
         }
 
         for (UUID driverId : driverIds) {
-            Person driver = campaign.getPerson(driverId);
+            Person driver = campaign.getPlayerForce().getHumanResources().getPerson(driverId);
             if (driver != null && driver.getStatus().isActive() && (driver.getUnit() == null)) {
                 unit.addDriver(driver);
             }
@@ -160,7 +160,7 @@ public class MothballInfo {
             // add the gunner if they exist, aren't dead/retired/etc and aren't already
             // assigned to some
             // other unit. Caveat: single-person units have the same driver and gunner.
-            Person gunner = campaign.getPerson(gunnerId);
+            Person gunner = campaign.getPlayerForce().getHumanResources().getPerson(gunnerId);
             if (gunner != null &&
                       gunner.getStatus().isActive() &&
                       ((gunner.getUnit() == null) || (gunner.getUnit() == unit))) {
@@ -169,18 +169,18 @@ public class MothballInfo {
         }
 
         for (UUID crewId : vesselCrewIds) {
-            Person crew = campaign.getPerson(crewId);
+            Person crew = campaign.getPlayerForce().getHumanResources().getPerson(crewId);
             if (crew != null && crew.getStatus().isActive() && (crew.getUnit() == null)) {
                 unit.addVesselCrew(crew);
             }
         }
 
-        Person techOfficer = campaign.getPerson(techOfficerId);
+        Person techOfficer = campaign.getPlayerForce().getHumanResources().getPerson(techOfficerId);
         if ((techOfficer != null) && (techOfficer.getStatus().isActive()) && (techOfficer.getUnit() == null)) {
             unit.setTechOfficer(techOfficer);
         }
 
-        Person navigator = campaign.getPerson(navigatorId);
+        Person navigator = campaign.getPlayerForce().getHumanResources().getPerson(navigatorId);
         if ((navigator != null) && (navigator.getStatus().isActive()) && (navigator.getUnit() == null)) {
             unit.setNavigator(navigator);
         }
@@ -210,7 +210,7 @@ public class MothballInfo {
             // currently deployed to the Area of Operations.
             boolean isUseStratCon = campaign.getCampaignOptions().isUseStratCon();
             if (isUseStratCon) {
-                for (AtBContract contract : campaign.getActiveAtBContracts()) {
+                for (AbstractContract contract : campaign.getActiveContracts()) {
                     StratConCampaignState campaignState = contract.getStratConCampaignState();
 
                     if (campaignState != null) {

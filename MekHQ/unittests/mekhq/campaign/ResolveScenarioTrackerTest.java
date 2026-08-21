@@ -61,7 +61,7 @@ import megamek.common.units.EjectedCrew;
 import megamek.common.units.Entity;
 import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.force.Formation;
-import mekhq.campaign.mission.Scenario;
+import mekhq.campaign.mission.scenarios.Scenario;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.unit.TestUnit;
 import mekhq.campaign.unit.Unit;
@@ -115,7 +115,7 @@ class ResolveScenarioTrackerTest {
 
         // Mock Campaign
         campaign = mockCampaign();
-        when(campaign.getFaction()).thenReturn(null);
+        when(campaign.getPlayerForce().getFaction()).thenReturn(null);
         when(campaign.getLocalDate()).thenReturn(LocalDate.of(3067, 1, 1));
         CampaignOptions campaignOptions = new CampaignOptions();
         when(campaign.getCampaignOptions()).thenReturn(campaignOptions);

@@ -55,11 +55,11 @@ import mekhq.campaign.Campaign;
 import mekhq.campaign.enums.CampaignTransportType;
 import mekhq.campaign.events.DeploymentChangedEvent;
 import mekhq.campaign.force.Formation;
-import mekhq.campaign.mission.AtBContract;
-import mekhq.campaign.mission.AtBDynamicScenario;
-import mekhq.campaign.mission.Scenario;
-import mekhq.campaign.mission.ScenarioForceTemplate;
-import mekhq.campaign.mission.ScenarioTemplate;
+import mekhq.campaign.mission.contract.AbstractContract;
+import mekhq.campaign.mission.scenarios.AtBDynamicScenario;
+import mekhq.campaign.mission.scenarios.Scenario;
+import mekhq.campaign.mission.scenarios.ScenarioForceTemplate;
+import mekhq.campaign.mission.scenarios.ScenarioTemplate;
 import mekhq.campaign.unit.ITransportAssignment;
 import mekhq.campaign.unit.Unit;
 import mekhq.utilities.ReportingUtilities;
@@ -378,7 +378,7 @@ public class StratConScenario implements IStratConDisplayable {
     }
 
     /**
-     * Retrieves the {@link AtBContract} associated with the backing scenario.
+     * Retrieves the {@link AbstractContract} associated with the backing scenario.
      *
      * <p>If the backing scenario is null, this method will return {@code null}. Otherwise, it
      * retrieves the associated contract through the provided campaign instance.
@@ -388,7 +388,7 @@ public class StratConScenario implements IStratConDisplayable {
      * @return The {@code AtBContract} associated with the current backing scenario, or {@code null} if no backing
      *       scenario exists.
      */
-    public @Nullable AtBContract getBackingContract(Campaign campaign) {
+    public @Nullable AbstractContract getBackingContract(Campaign campaign) {
         if (backingScenario == null) {
             return null;
         }
@@ -546,7 +546,7 @@ public class StratConScenario implements IStratConDisplayable {
                 return null;
             }
 
-            AtBContract contract = backingScenario.getContract(campaign);
+            AbstractContract contract = backingScenario.getContract(campaign);
 
             campaignState = contract.getStratConCampaignState();
 
@@ -611,7 +611,7 @@ public class StratConScenario implements IStratConDisplayable {
         Scenario backingScenario = campaign.getScenario(backingScenarioId);
 
         if (backingScenarioId != -1 && backingScenario instanceof AtBDynamicScenario) {
-            AtBContract contract = ((AtBDynamicScenario) backingScenario).getContract(campaign);
+            AbstractContract contract = ((AtBDynamicScenario) backingScenario).getContract(campaign);
             if (contract == null) {
                 return;
             }

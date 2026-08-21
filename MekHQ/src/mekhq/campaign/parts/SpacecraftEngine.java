@@ -59,6 +59,7 @@ import mekhq.campaign.personnel.skills.SkillType;
 import mekhq.utilities.MHQXMLUtility;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
+import mekhq.campaign.campaignOptions.CampaignOption;
 
 /**
  * @author Jay Lawson (jaylawson39 at yahoo.com)
@@ -256,7 +257,7 @@ public class SpacecraftEngine extends Part {
             }
             return time;
         }
-        if (campaign.getCampaignOptions().isUseAeroSystemHits()) {
+        if (campaign.getCampaignOptions().get(CampaignOption.USE_AERO_SYSTEM_HITS)) {
             // Test of proposed errata for repair times
             time = 300;
             // Light Damage
@@ -282,7 +283,7 @@ public class SpacecraftEngine extends Part {
         if (null != unit && (unit.getEntity() instanceof SmallCraft && !(unit.getEntity() instanceof Dropship))) {
             return -1;
         }
-        if (campaign.getCampaignOptions().isUseAeroSystemHits()) {
+        if (campaign.getCampaignOptions().get(CampaignOption.USE_AERO_SYSTEM_HITS)) {
             // Test of proposed errata for repair times and difficulty
             // Light Damage
             if (hits > 0 && hits < 3) {

@@ -70,8 +70,8 @@ import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.digitalGM.stratCon.StratConCampaignState;
 import mekhq.campaign.events.persons.PersonChangedEvent;
 import mekhq.campaign.force.Formation;
-import mekhq.campaign.mission.AtBContract;
-import mekhq.campaign.mission.enums.ContractMoraleLevel;
+import mekhq.campaign.mission.contract.AbstractContract;
+import mekhq.campaign.mission.contract.contractData.ContractMoraleLevel;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.enums.PersonnelRole;
 import mekhq.campaign.personnel.enums.PersonnelStatus;
@@ -333,8 +333,8 @@ public class RandomEventEffectsManager {
         int priorHits = target.getTotalInjurySeverity();
 
         wounds = InjurySPAUtility.adjustInjuriesAndFatigueForSPAs(target,
-              campaign.getCampaignOptions().isUseInjuryFatigue(),
-              campaign.getCampaignOptions().getFatigueRate(), wounds);
+              campaign.getCampaignOptions().get(CampaignOption.USE_INJURY_FATIGUE),
+              campaign.getCampaignOptions().get(CampaignOption.FATIGUE_RATE), wounds);
 
         if (priorHits + wounds > 5) {
             wounds = 5 - priorHits;
@@ -383,8 +383,8 @@ public class RandomEventEffectsManager {
         int targetCount = (int) max(1, potentialTargets.size() * magnitude);
 
         CampaignOptions campaignOptions = campaign.getCampaignOptions();
-        boolean isUseInjuryFatigue = campaignOptions.isUseInjuryFatigue();
-        int fatigueRate = campaignOptions.getFatigueRate();
+        boolean isUseInjuryFatigue = campaignOptions.get(CampaignOption.USE_INJURY_FATIGUE);
+        int fatigueRate = campaignOptions.get(CampaignOption.FATIGUE_RATE);
         for (int i = 0; i < targetCount; i++) {
             Person target = getRandomItem(potentialTargets);
 
@@ -660,7 +660,7 @@ public class RandomEventEffectsManager {
      * @return A {@link String} summarizing the loyalty adjustment or an empty string if loyalty modifiers are disabled.
      */
     String eventEffectLoyaltyOne(RandomEventResult result) {
-        boolean isUseLoyalty = campaign.getCampaignOptions().isUseLoyaltyModifiers();
+        boolean isUseLoyalty = campaign.getCampaignOptions().get(CampaignOption.USE_LOYALTY_MODIFIERS);
 
         if (!isUseLoyalty) {
             return "";
@@ -709,7 +709,7 @@ public class RandomEventEffectsManager {
      *       are disabled.
      */
     private String eventEffectLoyaltyAll(RandomEventResult result) {
-        boolean isUseLoyalty = campaign.getCampaignOptions().isUseLoyaltyModifiers();
+        boolean isUseLoyalty = campaign.getCampaignOptions().get(CampaignOption.USE_LOYALTY_MODIFIERS);
 
         if (!isUseLoyalty) {
             return "";
@@ -866,8 +866,8 @@ public class RandomEventEffectsManager {
      */
     private String eventEffectFatigueOne(RandomEventResult result) {
         CampaignOptions campaignOptions = campaign.getCampaignOptions();
-        boolean isUseFatigue = campaignOptions.isUseFatigue();
-        int fatigueRate = campaignOptions.getFatigueRate();
+        boolean isUseFatigue = campaignOptions.get(CampaignOption.USE_FATIGUE);
+        int fatigueRate = campaignOptions.get(CampaignOption.FATIGUE_RATE);
 
         if (!isUseFatigue) {
             return "";
@@ -884,7 +884,7 @@ public class RandomEventEffectsManager {
 
         target.changeFatigue(magnitude * fatigueRate);
 
-        if (campaign.getCampaignOptions().isUseFatigue()) {
+        if (campaign.getCampaignOptions().get(CampaignOption.USE_FATIGUE)) {
             Fatigue.processFatigueActions(campaign, target);
 
             MekHQ.triggerEvent(new PersonChangedEvent(target));
@@ -920,8 +920,8 @@ public class RandomEventEffectsManager {
      */
     private String eventEffectFatigueAll(RandomEventResult result) {
         CampaignOptions campaignOptions = campaign.getCampaignOptions();
-        boolean isUseFatigue = campaignOptions.isUseFatigue();
-        int fatigueRate = campaignOptions.getFatigueRate();
+        boolean isUseFatigue = campaignOptions.get(CampaignOption.USE_FATIGUE);
+        int fatigueRate = campaignOptions.get(CampaignOption.FATIGUE_RATE);
 
         if (!isUseFatigue) {
             return "";
@@ -939,7 +939,7 @@ public class RandomEventEffectsManager {
         for (Person target : targets) {
             target.changeFatigue(magnitude * fatigueRate);
 
-            if (campaign.getCampaignOptions().isUseFatigue()) {
+            if (campaign.getCampaignOptions().get(CampaignOption.USE_FATIGUE)) {
                 Fatigue.processFatigueActions(campaign, target);
 
                 MekHQ.triggerEvent(new PersonChangedEvent(target));
@@ -990,9 +990,9 @@ public class RandomEventEffectsManager {
 
         final int magnitude = result.magnitude();
 
-        Map<AtBContract, StratConCampaignState> potentialTargets = new HashMap<>();
+        Map<AbstractContract, StratConCampaignState> potentialTargets = new HashMap<>();
 
-        for (AtBContract contract : campaign.getActiveAtBContracts()) {
+        for (AbstractContract contract : campaign.getActiveContracts()) {
             StratConCampaignState campaignState = contract.getStratConCampaignState();
 
             if (campaignState != null) {
@@ -1004,7 +1004,7 @@ public class RandomEventEffectsManager {
             return "";
         }
 
-        AtBContract target = getRandomItem(potentialTargets.keySet());
+        AbstractContract target = getRandomItem(potentialTargets.keySet());
 
         StratConCampaignState targetState = potentialTargets.get(target);
         targetState.changeSupportPoints(magnitude);
@@ -1070,9 +1070,9 @@ public class RandomEventEffectsManager {
      *       qualifies for the effect.
      */
     private String eventEffectUniqueBartering() {
-        List<AtBContract> potentialTargets = new ArrayList<>();
+        List<AbstractContract> potentialTargets = new ArrayList<>();
 
-        for (AtBContract contract : campaign.getActiveAtBContracts()) {
+        for (AbstractContract contract : campaign.getActiveContracts()) {
             ContractMoraleLevel currentMorale = contract.getMoraleLevel();
 
             if (!currentMorale.isOverwhelming()) {
@@ -1084,10 +1084,10 @@ public class RandomEventEffectsManager {
             return "";
         }
 
-        AtBContract target = getRandomItem(potentialTargets);
+        AbstractContract target = getRandomItem(potentialTargets);
 
         int moraleOrdinal = target.getMoraleLevel().ordinal();
-        target.setMoraleLevel(ContractMoraleLevel.values()[moraleOrdinal + 1]);
+        target.changeMorale(ContractMoraleLevel.values()[moraleOrdinal + 1]);
 
         String colorOpen = spanOpeningWithCustomColor(ReportingUtilities.getNegativeColor());
 
@@ -1129,13 +1129,13 @@ public class RandomEventEffectsManager {
      */
     private String eventEffectUniqueUndercover(RandomEventResult result) {
         Person targetCharacter = getRandomTarget(result.affectedPersonnelTypes());
-        List<AtBContract> potentialContracts = campaign.getActiveAtBContracts();
+        List<AbstractContract> potentialContracts = campaign.getActiveContracts();
 
         if (targetCharacter == null || potentialContracts.isEmpty()) {
             return "";
         }
 
-        AtBContract targetContract = getRandomItem(potentialContracts);
+        AbstractContract targetContract = getRandomItem(potentialContracts);
 
         Faction newFaction = targetContract.getEmployerFaction();
         targetCharacter.setOriginFaction(newFaction);
@@ -1160,8 +1160,8 @@ public class RandomEventEffectsManager {
      */
     private String eventEffectUniquePoison(RandomEventResult result) {
         CampaignOptions campaignOptions = campaign.getCampaignOptions();
-        boolean isUseFatigue = campaignOptions.isUseFatigue();
-        int fatigueRate = campaignOptions.getFatigueRate();
+        boolean isUseFatigue = campaignOptions.get(CampaignOption.USE_FATIGUE);
+        int fatigueRate = campaignOptions.get(CampaignOption.FATIGUE_RATE);
 
         if (!isUseFatigue) {
             return "";
@@ -1187,7 +1187,7 @@ public class RandomEventEffectsManager {
             target.changeFatigue(fatigueChange);
             madeChange = true;
 
-            if (campaign.getCampaignOptions().isUseFatigue()) {
+            if (campaign.getCampaignOptions().get(CampaignOption.USE_FATIGUE)) {
                 Fatigue.processFatigueActions(campaign, target);
             }
 
@@ -1246,11 +1246,11 @@ public class RandomEventEffectsManager {
 
         int prisonerCount = d6();
 
-        List<AtBContract> potentialTargets = campaign.getActiveAtBContracts();
-        AtBContract targetContract = getRandomItem(potentialTargets);
-        Faction targetFaction = targetContract.getEnemy();
+        List<AbstractContract> potentialTargets = campaign.getActiveContracts();
+        AbstractContract targetContract = getRandomItem(potentialTargets);
+        Faction targetFaction = targetContract.getEnemyFaction();
 
-        RandomOriginOptions originOptions = campaign.getCampaignOptions().getRandomOriginOptions();
+        RandomOriginOptions originOptions = campaign.getCampaignOptions().get(CampaignOption.RANDOM_ORIGIN_OPTIONS);
 
         if (potentialTargets.isEmpty()) {
             return "";
@@ -1259,7 +1259,7 @@ public class RandomEventEffectsManager {
         for (int i = 0; i < prisonerCount; i++) {
             final AbstractFactionSelector factionSelector = new DefaultFactionSelector(originOptions, targetFaction);
             final AbstractPlanetSelector planetSelector = new DefaultPlanetSelector(originOptions,
-                  targetContract.getSystem().getPrimaryPlanet());
+                  targetContract.getTargetPlanet());
             Person newPerson = campaign.getPlayerForce().getHumanResources()
                                      .newPerson(campaign,
                                            PersonnelRole.MEKWARRIOR,

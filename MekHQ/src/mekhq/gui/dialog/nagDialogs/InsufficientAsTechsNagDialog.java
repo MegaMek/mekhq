@@ -136,14 +136,14 @@ public class InsufficientAsTechsNagDialog extends ImmersiveDialogNag {
         Person speaker = campaign.getPlayerForce().getHumanResources()
                                .getSeniorAdminPerson(AdministratorSpecialization.HR,
                                      campaign.getCampaignOptions(),
-                                     campaign.isClanCampaign(),
+                                     campaign.getPlayerForce().isClanForce(),
                                      campaign.getLocalDate());
 
         if (speaker == null) {
             speaker = campaign.getPlayerForce().getHumanResources()
                             .getSeniorAdminPerson(AdministratorSpecialization.COMMAND,
                                   campaign.getCampaignOptions(),
-                                  campaign.isClanCampaign(),
+                                  campaign.getPlayerForce().isClanForce(),
                                   campaign.getLocalDate());
         } else {
             return speaker;

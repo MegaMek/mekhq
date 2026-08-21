@@ -35,6 +35,7 @@ package mekhq.campaign.parts.equipment;
 
 import java.io.PrintWriter;
 
+import jakarta.annotation.Nonnull;
 import megamek.common.CriticalSlot;
 import megamek.common.TechAdvancement;
 import megamek.common.annotations.Nullable;
@@ -56,6 +57,7 @@ import mekhq.campaign.unit.Unit;
 import mekhq.utilities.MHQXMLUtility;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
+import mekhq.campaign.campaignOptions.CampaignOption;
 
 /**
  * This part covers most of the equipment types in WeaponType, AmmoType, and MiscType It can robustly handle all
@@ -215,7 +217,7 @@ public class EquipmentPart extends Part {
     }
 
     @Override
-    public TechRating getTechRating() {
+    public @Nonnull TechRating getTechRating() {
         return type.getTechRating();
     }
 
@@ -313,7 +315,7 @@ public class EquipmentPart extends Part {
 
         if (checkForDestruction &&
                   (getHits() > priorHits) &&
-                  (Compute.d6(2) < campaign.getCampaignOptions().getDestroyPartTarget())) {
+                  (Compute.d6(2) < campaign.getCampaignOptions().get(CampaignOption.DESTROY_PART_TARGET))) {
             remove(false);
         }
     }

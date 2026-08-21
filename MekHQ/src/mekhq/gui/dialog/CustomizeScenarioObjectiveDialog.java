@@ -47,14 +47,14 @@ import megamek.client.ui.comboBoxes.MMComboBox;
 import megamek.common.OffBoardDirection;
 import megamek.common.ui.FastJScrollPane;
 import mekhq.MHQConstants;
-import mekhq.campaign.mission.ObjectiveEffect;
-import mekhq.campaign.mission.ObjectiveEffect.EffectScalingType;
-import mekhq.campaign.mission.ObjectiveEffect.ObjectiveEffectConditionType;
-import mekhq.campaign.mission.ObjectiveEffect.ObjectiveEffectType;
-import mekhq.campaign.mission.ScenarioObjective;
-import mekhq.campaign.mission.ScenarioObjective.ObjectiveAmountType;
-import mekhq.campaign.mission.ScenarioObjective.ObjectiveCriterion;
-import mekhq.campaign.mission.ScenarioObjective.TimeLimitType;
+import mekhq.campaign.mission.scenarios.ObjectiveEffect;
+import mekhq.campaign.mission.scenarios.ObjectiveEffect.EffectScalingType;
+import mekhq.campaign.mission.scenarios.ObjectiveEffect.ObjectiveEffectConditionType;
+import mekhq.campaign.mission.scenarios.ObjectiveEffect.ObjectiveEffectType;
+import mekhq.campaign.mission.scenarios.ScenarioObjective;
+import mekhq.campaign.mission.scenarios.ScenarioObjective.ObjectiveAmountType;
+import mekhq.campaign.mission.scenarios.ScenarioObjective.ObjectiveCriterion;
+import mekhq.campaign.mission.scenarios.ScenarioObjective.TimeLimitType;
 
 public class CustomizeScenarioObjectiveDialog extends JDialog {
 

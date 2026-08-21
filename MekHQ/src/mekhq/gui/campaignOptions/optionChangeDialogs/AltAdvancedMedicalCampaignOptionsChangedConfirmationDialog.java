@@ -74,6 +74,7 @@ import mekhq.campaign.personnel.medical.advancedMedicalAlternate.AdvancedMedical
 import mekhq.campaign.personnel.medical.advancedMedicalAlternate.AlternateInjuries;
 import mekhq.gui.baseComponents.roundedComponents.RoundedJButton;
 import mekhq.gui.baseComponents.roundedComponents.RoundedLineBorder;
+import mekhq.campaign.campaignOptions.CampaignOption;
 
 public class AltAdvancedMedicalCampaignOptionsChangedConfirmationDialog extends JDialog {
     private static final String RESOURCE_BUNDLE = "mekhq.resources.AltAdvancedMedicalCampaignOptionsChangedConfirmationDialog";
@@ -229,7 +230,7 @@ public class AltAdvancedMedicalCampaignOptionsChangedConfirmationDialog extends 
     }
 
     public static void processFreeEnhancedImaging(Campaign campaign) {
-        if (!campaign.getCampaignOptions().isUseImplants()) {
+        if (!campaign.getCampaignOptions().get(CampaignOption.USE_IMPLANTS)) {
             return;
         }
 

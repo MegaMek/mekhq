@@ -62,7 +62,7 @@ public class BayRentalDialog extends ImmersiveDialogSimple {
               campaign.getPlayerForce().getHumanResources()
                     .getSeniorAdminPerson(mekhq.campaign.Campaign.AdministratorSpecialization.LOGISTICS,
                           campaign.getCampaignOptions(),
-                          campaign.isClanCampaign(),
+                          campaign.getPlayerForce().isClanForce(),
                           campaign.getLocalDate()),
               null,
               getCenterMessage(campaign.getCommanderAddress(), rentalCost),
@@ -98,7 +98,7 @@ public class BayRentalDialog extends ImmersiveDialogSimple {
     }
 
     public static void showNoFacilitiesAvailableDialog(Campaign campaign) {
-        boolean isInSpace = !campaign.getCurrentLocation().isOnPlanet();
+        boolean isInSpace = !campaign.getPlayerForce().getForceDetachment().getCurrentLocation().isOnPlanet();
 
         String message;
         if (isInSpace) {

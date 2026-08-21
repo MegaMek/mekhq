@@ -48,6 +48,7 @@ import mekhq.campaign.personnel.skills.SkillType;
 import mekhq.utilities.MHQXMLUtility;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
+import mekhq.campaign.campaignOptions.CampaignOption;
 
 /**
  * @author MKerensky
@@ -80,8 +81,8 @@ public class CombatInformationCenter extends Part {
             hits = ((Aero) unit.getEntity()).getCICHits();
             if (checkForDestruction
                       && hits > priorHits
-                      && (hits < 3 && !campaign.getCampaignOptions().isUseAeroSystemHits())
-                      && Compute.d6(2) < campaign.getCampaignOptions().getDestroyPartTarget()) {
+                      && (hits < 3 && !campaign.getCampaignOptions().get(CampaignOption.USE_AERO_SYSTEM_HITS))
+                      && Compute.d6(2) < campaign.getCampaignOptions().get(CampaignOption.DESTROY_PART_TARGET)) {
                 remove(false);
             } else if (hits >= 3) {
                 remove(false);
@@ -92,7 +93,7 @@ public class CombatInformationCenter extends Part {
     @Override
     public int getBaseTime() {
         int time;
-        if (campaign.getCampaignOptions().isUseAeroSystemHits()) {
+        if (campaign.getCampaignOptions().get(CampaignOption.USE_AERO_SYSTEM_HITS)) {
             // Test of proposed errata for repair times
             time = 120;
             if (unit != null && unit.getEntity().hasNavalC3()) {
@@ -113,7 +114,7 @@ public class CombatInformationCenter extends Part {
 
     @Override
     public int getDifficulty() {
-        if (campaign.getCampaignOptions().isUseAeroSystemHits()) {
+        if (campaign.getCampaignOptions().get(CampaignOption.USE_AERO_SYSTEM_HITS)) {
             // Test of proposed errata for repair time and difficulty
             if (hits == 1) {
                 return 1;

@@ -40,8 +40,9 @@ import java.util.stream.Collectors;
 
 import megamek.logging.MMLogger;
 import mekhq.campaign.Campaign;
-import mekhq.campaign.mission.AtBContract;
-import mekhq.campaign.mission.enums.ContractObjectiveType;
+import mekhq.campaign.campaignOptions.CampaignOption;
+import mekhq.campaign.mission.contract.AbstractContract;
+import mekhq.campaign.mission.contract.contractData.ContractObjectiveType;
 
 public class OtherModifiers {
     private static final MMLogger LOGGER = MMLogger.create(OtherModifiers.class);
@@ -58,7 +59,7 @@ public class OtherModifiers {
     protected static Map<String, Integer> calculateOtherModifiers(Campaign campaign) {
         // Calculate inactive years if campaign options allow
         int inactiveYears = campaign.getCampaignOptions().isUseStratCon() ? getInactiveYears(campaign) : 0;
-        int manualModifier = campaign.getCampaignOptions().getManualUnitRatingModifier();
+        int manualModifier = campaign.getCampaignOptions().get(CampaignOption.MANUAL_UNIT_RATING_MODIFIER);
 
         // Crime rating improvements are handled on New Day, so are not included here.
 
@@ -88,14 +89,14 @@ public class OtherModifiers {
         LocalDate today = campaign.getLocalDate();
 
         // Build a list of completed contracts, excluding Garrison and Cadre contracts
-        List<AtBContract> contracts = getSuitableContracts(campaign);
+        List<AbstractContract> contracts = getSuitableContracts(campaign);
 
         // Decide the oldest mission date based on the earliest completion date of the
         // contracts
         // or the campaign start date if there are no completed contracts
         LocalDate oldestMissionDate = contracts.isEmpty() ? campaign.getCampaignStartDate()
                                             : contracts.stream()
-                                                    .map(AtBContract::getEndingDate)
+                                                    .map(AbstractContract::getEndingDate)
                                                     .min(LocalDate::compareTo)
                                                     .orElse(today);
 
@@ -115,13 +116,10 @@ public class OtherModifiers {
      *
      * @return A List of suitable AtBContracts.
      */
-    private static List<AtBContract> getSuitableContracts(Campaign campaign) {
-        // Filter mission of type AtBContract and with completed status, check if it's
-        // suitable
-        return campaign.getMissions().stream()
-                     .filter(c -> (c instanceof AtBContract) && (c.getStatus().isCompleted()))
-                     .filter(c -> isSuitableContract((AtBContract) c))
-                     .map(c -> (AtBContract) c)
+    private static List<AbstractContract> getSuitableContracts(Campaign campaign) {
+        // getCompletedContracts covers exactly the non-active statuses and skips any contract without one
+        return campaign.getCompletedContracts().stream()
+                     .filter(OtherModifiers::isSuitableContract)
                      .toList();
     }
 
@@ -133,8 +131,8 @@ public class OtherModifiers {
      *
      * @return true if the contract is suitable, false otherwise.
      */
-    private static boolean isSuitableContract(AtBContract contract) {
-        ContractObjectiveType contractType = contract.getContractType();
+    private static boolean isSuitableContract(AbstractContract contract) {
+        ContractObjectiveType contractType = contract.getObjectiveType();
 
         return (!contractType.isGarrisonType() && !contractType.isCadreDuty());
     }

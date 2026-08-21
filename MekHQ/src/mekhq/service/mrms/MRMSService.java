@@ -112,7 +112,7 @@ public class MRMSService {
                                    .getHumanResources()
                                    .getTechs(campaign.getPlayerForce().getHangar().getUnits(),
                                          campaign.getCampaignOptions(),
-                                         campaign.isClanCampaign(),
+                                         campaign.getPlayerForce().isClanForce(),
                                          campaign.getLocalDate(),
                                          true);
 
@@ -225,7 +225,7 @@ public class MRMSService {
                                    .getHumanResources()
                                    .getTechs(campaign.getPlayerForce().getHangar().getUnits(),
                                          campaign.getCampaignOptions(),
-                                         campaign.isClanCampaign(),
+                                         campaign.getPlayerForce().isClanForce(),
                                          campaign.getLocalDate());
 
         if (!techs.isEmpty()) {
@@ -254,7 +254,7 @@ public class MRMSService {
                                    .getHumanResources()
                                    .getTechs(campaign.getPlayerForce().getHangar().getUnits(),
                                          campaign.getCampaignOptions(),
-                                         campaign.isClanCampaign(),
+                                         campaign.getPlayerForce().isClanForce(),
                                          campaign.getLocalDate(),
                                          true);
         if (!configuredOptions.isEnabled()) {
@@ -433,7 +433,7 @@ public class MRMSService {
                                        .getHumanResources()
                                        .getTechs(campaign.getPlayerForce().getHangar().getUnits(),
                                              campaign.getCampaignOptions(),
-                                             campaign.isClanCampaign(),
+                                             campaign.getPlayerForce().isClanForce(),
                                              campaign.getLocalDate());
 
             if (!techs.isEmpty()) {
@@ -513,7 +513,7 @@ public class MRMSService {
                                    .getHumanResources()
                                    .getTechs(campaign.getPlayerForce().getHangar().getUnits(),
                                          campaign.getCampaignOptions(),
-                                         campaign.isClanCampaign(),
+                                         campaign.getPlayerForce().isClanForce(),
                                          campaign.getLocalDate(),
                                          true);
 

@@ -56,7 +56,7 @@ import megamek.common.loaders.MapSettings;
 import megamek.common.universe.FactionTag;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.enums.DragoonRating;
-import mekhq.campaign.mission.Scenario;
+import mekhq.campaign.mission.scenarios.Scenario;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.universe.Faction;
 import mekhq.campaign.universe.Factions;

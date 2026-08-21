@@ -38,8 +38,8 @@ import static mekhq.utilities.ReportingUtilities.getNegativeColor;
 import static mekhq.utilities.ReportingUtilities.spanOpeningWithCustomColor;
 
 import mekhq.campaign.Campaign;
-import mekhq.campaign.mission.AtBContract;
-import mekhq.campaign.mission.enums.ContractMoraleLevel;
+import mekhq.campaign.mission.contract.AbstractContract;
+import mekhq.campaign.mission.contract.contractData.ContractMoraleLevel;
 import mekhq.gui.baseComponents.immersiveDialogs.ImmersiveDialogNotification;
 
 /**
@@ -57,14 +57,14 @@ public class PrisonerIntelBreachDialog {
      * Displays the Intel Breach notification for the given contract.
      *
      * @param campaign  the current campaign instance
-     * @param contract  the {@link AtBContract} whose morale was affected by the breach
+     * @param contract  the {@link AbstractContract} whose morale was affected by the breach
      * @param oldMorale the contract's morale level before the breach
      * @param newMorale the contract's morale level after the breach
      *
      * @author Illiani
      * @since 0.51.01
      */
-    public PrisonerIntelBreachDialog(Campaign campaign, AtBContract contract, ContractMoraleLevel oldMorale,
+    public PrisonerIntelBreachDialog(Campaign campaign, AbstractContract contract, ContractMoraleLevel oldMorale,
           ContractMoraleLevel newMorale) {
         String centerMessage = getFormattedTextAt(RESOURCE_BUNDLE, "intelBreach.ic",
               spanOpeningWithCustomColor(getNegativeColor()), CLOSING_SPAN_TAG);

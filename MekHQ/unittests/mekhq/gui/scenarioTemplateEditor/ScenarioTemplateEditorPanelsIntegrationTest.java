@@ -39,18 +39,18 @@ import java.io.StringWriter;
 import java.util.List;
 
 import megamek.common.units.UnitType;
-import mekhq.campaign.mission.ObjectiveEffect;
-import mekhq.campaign.mission.ObjectiveEffect.EffectScalingType;
-import mekhq.campaign.mission.ObjectiveEffect.ObjectiveEffectType;
-import mekhq.campaign.mission.ScenarioForceTemplate;
-import mekhq.campaign.mission.ScenarioForceTemplate.ForceAlignment;
-import mekhq.campaign.mission.ScenarioForceTemplate.ForceGenerationMethod;
-import mekhq.campaign.mission.ScenarioForceTemplate.SynchronizedDeploymentType;
-import mekhq.campaign.mission.ScenarioMapParameters.MapLocation;
-import mekhq.campaign.mission.ScenarioObjective;
-import mekhq.campaign.mission.ScenarioObjective.ObjectiveCriterion;
-import mekhq.campaign.mission.ScenarioTemplate;
-import mekhq.campaign.mission.ScenarioTemplate.BattlefieldControlType;
+import mekhq.campaign.mission.scenarios.ObjectiveEffect;
+import mekhq.campaign.mission.scenarios.ObjectiveEffect.EffectScalingType;
+import mekhq.campaign.mission.scenarios.ObjectiveEffect.ObjectiveEffectType;
+import mekhq.campaign.mission.scenarios.ScenarioForceTemplate;
+import mekhq.campaign.mission.scenarios.ScenarioForceTemplate.ForceAlignment;
+import mekhq.campaign.mission.scenarios.ScenarioForceTemplate.ForceGenerationMethod;
+import mekhq.campaign.mission.scenarios.ScenarioForceTemplate.SynchronizedDeploymentType;
+import mekhq.campaign.mission.scenarios.ScenarioMapParameters.MapLocation;
+import mekhq.campaign.mission.scenarios.ScenarioObjective;
+import mekhq.campaign.mission.scenarios.ScenarioObjective.ObjectiveCriterion;
+import mekhq.campaign.mission.scenarios.ScenarioTemplate;
+import mekhq.campaign.mission.scenarios.ScenarioTemplate.BattlefieldControlType;
 import org.junit.jupiter.api.Test;
 
 /**

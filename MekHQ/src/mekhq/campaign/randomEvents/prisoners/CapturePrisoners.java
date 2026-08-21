@@ -65,7 +65,8 @@ import megamek.common.rolls.TargetRoll;
 import megamek.common.universe.HonorRating;
 import megamek.logging.MMLogger;
 import mekhq.campaign.Campaign;
-import mekhq.campaign.mission.Scenario;
+import mekhq.campaign.campaignOptions.CampaignOption;
+import mekhq.campaign.mission.scenarios.Scenario;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.universe.Faction;
 import mekhq.campaign.universe.Factions;
@@ -224,7 +225,7 @@ public class CapturePrisoners {
      * @param prisoner The {@link Person} object representing the captured NPC.
      */
     public void processCaptureOfNPC(Person prisoner) {
-        PrisonerCaptureStyle prisonerCaptureStyle = campaign.getCampaignOptions().getPrisonerCaptureStyle();
+        PrisonerCaptureStyle prisonerCaptureStyle = campaign.getCampaignOptions().get(CampaignOption.PRISONER_CAPTURE_STYLE);
 
         if (prisonerCaptureStyle.isNone()) {
             return;
@@ -263,7 +264,7 @@ public class CapturePrisoners {
                       campaign.getPlayerForce().getHumanResources()
                             .getSeniorAdminPerson(mekhq.campaign.Campaign.AdministratorSpecialization.HR,
                                   campaign.getCampaignOptions(),
-                                  campaign.isClanCampaign(),
+                                  campaign.getPlayerForce().isClanForce(),
                                   campaign.getLocalDate()),
                       null,
                       createInCharacterMessage(prisoner, isBondsman),
@@ -468,7 +469,7 @@ public class CapturePrisoners {
             return;
         }
 
-        PrisonerCaptureStyle prisonerCaptureStyle = campaign.getCampaignOptions().getPrisonerCaptureStyle();
+        PrisonerCaptureStyle prisonerCaptureStyle = campaign.getCampaignOptions().get(CampaignOption.PRISONER_CAPTURE_STYLE);
 
         if (prisonerCaptureStyle.isNone()) {
             prisoner.changeStatus(campaign, campaign.getLocalDate(), MIA);

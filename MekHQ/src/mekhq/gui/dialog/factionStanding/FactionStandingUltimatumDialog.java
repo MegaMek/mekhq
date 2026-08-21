@@ -56,6 +56,7 @@ import mekhq.gui.baseComponents.immersiveDialogs.ImmersiveDialogSimple;
 import mekhq.gui.baseComponents.immersiveDialogs.ImmersiveDialogWidth;
 import mekhq.gui.dialog.NewsDialog;
 import mekhq.gui.dialog.factionStanding.factionJudgment.FactionJudgmentSceneDialog;
+import mekhq.campaign.campaignOptions.CampaignOption;
 
 /**
  * Dialog logic for resolving a Faction Standing ultimatum event.
@@ -108,15 +109,15 @@ public class FactionStandingUltimatumDialog {
         this.campaign = campaign;
         Person commander = campaign.getPlayerForce().getHumanResources()
                                  .getCommander(campaign.getCampaignOptions(),
-                                       campaign.isClanCampaign(),
+                                       campaign.getPlayerForce().isClanForce(),
                                        campaign.getLocalDate());
         String commanderAddress = campaign.getCommanderAddress(false);
         Person secondInCommand = campaign.getPlayerForce().getHumanResources()
                                        .getSecondInCommand(campaign.getCampaignOptions(),
-                                             campaign.isClanCampaign(),
+                                             campaign.getPlayerForce().isClanForce(),
                                              campaign.getLocalDate());
         Person thirdInCommand = getThirdInCommand(commander, secondInCommand);
-        String campaignName = campaign.getName();
+        String campaignName = campaign.getPlayerForce().getName();
 
         // Helper to show an ImmersiveDialogSimple with i18n text key
         showDialog(ultimatumName, KEY_INITIAL_OFFER, commander, secondInCommand, challenger, null, campaignName,
@@ -256,13 +257,13 @@ public class FactionStandingUltimatumDialog {
               commander,
               secondInCommand,
               FactionJudgmentSceneType.GO_ROGUE,
-              campaign.getFaction());
+              campaign.getPlayerForce().getFaction());
 
-        Faction oldFaction = campaign.getFaction();
+        Faction oldFaction = campaign.getPlayerForce().getFaction();
         Faction newFaction = Factions.getInstance()
                                    .getFaction(isMercenary ? MERCENARY_FACTION_CODE : PIRATE_FACTION_CODE);
         processGoingRogue(campaign, newFaction, commander, secondInCommand,
-              isViolentTransition, true, campaign.getCampaignOptions().isTrackFactionStanding());
+              isViolentTransition, true, campaign.getCampaignOptions().get(CampaignOption.TRACK_FACTION_STANDING));
 
         if (secondInCommand != null &&
                   !(secondInCommand.getStatus().isDepartedUnit() || secondInCommand.getStatus().isDead())) {

@@ -94,6 +94,7 @@ import mekhq.campaign.Campaign;
 import mekhq.campaign.CampaignController;
 import mekhq.campaign.base.PlayerBase;
 import mekhq.campaign.campaignOptions.AcquisitionsType;
+import mekhq.campaign.campaignOptions.CampaignOption;
 import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.enums.DailyReportType;
 import mekhq.campaign.events.*;
@@ -105,7 +106,7 @@ import mekhq.campaign.finances.Money;
 import mekhq.campaign.force.Formation;
 import mekhq.campaign.icons.StandardFormationIcon;
 import mekhq.campaign.market.personnelMarket.enums.PersonnelMarketStyle;
-import mekhq.campaign.mission.Scenario;
+import mekhq.campaign.mission.scenarios.Scenario;
 import mekhq.campaign.parts.Part;
 import mekhq.campaign.parts.Refit;
 import mekhq.campaign.personnel.Person;
@@ -115,6 +116,7 @@ import mekhq.campaign.personnel.skills.SkillType;
 import mekhq.campaign.unit.Unit;
 import mekhq.campaign.universe.Faction;
 import mekhq.campaign.universe.NewsItem;
+import mekhq.campaign.universe.PlanetarySystem;
 import mekhq.campaign.utilities.AutomatedTechAssignments;
 import mekhq.gui.baseComponents.ScalingWidthConstrainedPanel;
 import mekhq.gui.baseComponents.immersiveDialogs.ImmersiveDialogSimple;
@@ -123,6 +125,7 @@ import mekhq.gui.baseComponents.roundedComponents.RoundedLineBorder;
 import mekhq.gui.baseComponents.roundedComponents.RoundedMMToggleButton;
 import mekhq.gui.dialog.*;
 import mekhq.gui.dialog.glossary.GlossaryDialog;
+import mekhq.gui.dialog.markets.contractMarket.ChaosContractMarketDialog;
 import mekhq.gui.enums.MHQTabType;
 import mekhq.gui.menus.MekHQMenuBar;
 import mekhq.gui.model.LocationFilterItem;
@@ -518,7 +521,7 @@ public class CampaignGUI extends JPanel {
 
     public void refreshMarketButtonLabels() {
         CampaignOptions campaignOptions = getCampaign().getCampaignOptions();
-        String labelKey = campaignOptions.getContractMarketMethod().isNone() ? "manual" : "market";
+        String labelKey = campaignOptions.get(CampaignOption.CONTRACT_MARKET_METHOD).isNone() ? "manual" : "market";
         String label = resourceMap.getString("btnContractMarket." + labelKey);
 
         btnContractMarket.setText(label);
@@ -778,9 +781,24 @@ public class CampaignGUI extends JPanel {
      * @author Illiani
      * @since 0.50.05
      */
-    public void focusOnMission(int targetId) {
+    public void focusOnMission(UUID targetId) {
         getBriefingRoomTab().focusOnMission(targetId);
         tabMain.setSelectedIndex(getTabIndexByName(resourceMap.getString("panBriefing.TabConstraints.tabTitle")));
+    }
+
+    /**
+     * Shows the given system on the interstellar map and brings the navigation tab forward.
+     *
+     * @param system the system to focus on; ignored when {@code null}, as an unresolvable link should do nothing rather
+     *               than switch tabs
+     */
+    public void focusOnSystem(final @Nullable PlanetarySystem system) {
+        if (system == null) {
+            return;
+        }
+
+        getNavigationTab().showSystem(system);
+        tabMain.setSelectedComponent(getNavigationTab());
     }
 
     public void focusOnUnitInRepairBay(UUID id) {
@@ -822,7 +840,7 @@ public class CampaignGUI extends JPanel {
      */
     public void openRecruitmentDialog() {
         CampaignOptions campaignOptions = getCampaign().getCampaignOptions();
-        PersonnelMarketStyle marketStyle = campaignOptions.getPersonnelMarketStyle();
+        PersonnelMarketStyle marketStyle = campaignOptions.get(CampaignOption.PERSONNEL_MARKET_STYLE);
 
         if (marketStyle != PERSONNEL_MARKET_DISABLED || !getCampaign().getPlayerForce()
                                                                .getHumanResources()
@@ -846,33 +864,7 @@ public class CampaignGUI extends JPanel {
     }
 
     public void showContractMarket() {
-        CampaignOptions campaignOptions = getCampaign().getCampaignOptions();
-
-        if (campaignOptions.getContractMarketMethod().isNone()) {
-            MissionTypeDialog missionTypeDialog = getMissionTypeDialog(campaignOptions);
-
-            if (missionTypeDialog.isMission()) {
-                CustomizeMissionDialog customizeMissionDialog =
-                      new CustomizeMissionDialog(getFrame(), true, null, getCampaign());
-                customizeMissionDialog.setVisible(true);
-            }
-        } else {
-            ContractMarketDialog contractMarketDialog = new ContractMarketDialog(getFrame(), getCampaign());
-            contractMarketDialog.setVisible(true);
-        }
-    }
-
-    private MissionTypeDialog getMissionTypeDialog(CampaignOptions campaignOptions) {
-        MissionTypeDialog missionTypeDialog = new MissionTypeDialog(getFrame(), true);
-        missionTypeDialog.setVisible(true);
-
-        if (missionTypeDialog.isContract()) {
-            NewContractDialog newContractDialog = campaignOptions.isUseStratCon() ?
-                                                        new NewAtBContractDialog(getFrame(), true, getCampaign()) :
-                                                        new NewContractDialog(getFrame(), true, getCampaign());
-            newContractDialog.setVisible(true);
-        }
-        return missionTypeDialog;
+        new ChaosContractMarketDialog(getCampaign());
     }
 
     public void showUnitMarket() {
@@ -1005,7 +997,7 @@ public class CampaignGUI extends JPanel {
                                            .getHumanResources()
                                            .getTechs(campaign1.getPlayerForce().getHangar().getUnits(),
                                                  campaign1.getCampaignOptions(),
-                                                 campaign1.isClanCampaign(),
+                                                 campaign1.getPlayerForce().isClanForce(),
                                                  campaign1.getLocalDate(),
                                                  false,
                                                  true);
@@ -1033,7 +1025,7 @@ public class CampaignGUI extends JPanel {
                                  tech.getMinutesLeft() +
                                  '/' +
                                  tech.getDailyAvailableTechTime(getCampaign().getCampaignOptions()
-                                                                      .isTechsUseAdministration()) +
+                                                                      .get(CampaignOption.TECHS_USE_ADMINISTRATION)) +
                                  " minutes</html>";
                     techHash.put(name, tech);
                     if (tech.isRightTechTypeFor(r)) {
@@ -1148,7 +1140,7 @@ public class CampaignGUI extends JPanel {
                                  .getHumanResources()
                                  .getTechsExpanded(campaign.getPlayerForce().getHangar().getUnits(),
                                        campaign.getCampaignOptions(),
-                                       campaign.isClanCampaign(),
+                                       campaign.getPlayerForce().isClanForce(),
                                        campaign.getLocalDate())) {
             if (tech.isTechLargeVessel()) {
                 Entity entity = unit.getEntity();
@@ -1230,7 +1222,8 @@ public class CampaignGUI extends JPanel {
             logger.warn("Cannot export person if no one is selected! Ignoring.");
             return;
         }
-        Person selectedPerson = pt.getPersonnelTableModel().getPerson(pt.getPersonnelTable().convertRowIndexToModel(row));
+        Person selectedPerson = pt.getPersonnelTableModel()
+                                      .getPerson(pt.getPersonnelTable().convertRowIndexToModel(row));
         int[] rows = pt.getPersonnelTable().getSelectedRows();
         Person[] people = Arrays.stream(rows)
                                 .mapToObj(j -> pt.getPersonnelTableModel()
@@ -1558,7 +1551,7 @@ public class CampaignGUI extends JPanel {
     }
 
     private void refreshTempSoldiers() {
-        if (!getCampaign().getCampaignOptions().isUseBlobInfantry()) {
+        if (!getCampaign().getCampaignOptions().get(CampaignOption.USE_BLOB_INFANTRY)) {
             lblTempSoldiers.setVisible(false);
             return;
         }
@@ -1569,7 +1562,7 @@ public class CampaignGUI extends JPanel {
     }
 
     private void refreshTempBattleArmor() {
-        if (!getCampaign().getCampaignOptions().isUseBlobBattleArmor()) {
+        if (!getCampaign().getCampaignOptions().get(CampaignOption.USE_BLOB_BATTLE_ARMOR)) {
             lblTempBattleArmor.setVisible(false);
             return;
         }
@@ -1580,7 +1573,7 @@ public class CampaignGUI extends JPanel {
     }
 
     private void refreshTempVehicleCrewGround() {
-        if (!getCampaign().getCampaignOptions().isUseBlobVehicleCrewGround()) {
+        if (!getCampaign().getCampaignOptions().get(CampaignOption.USE_BLOB_VEHICLE_CREW_GROUND)) {
             lblTempVehicleCrewGround.setVisible(false);
             refreshVehicleCrewPanelVisibility();
             return;
@@ -1593,7 +1586,7 @@ public class CampaignGUI extends JPanel {
     }
 
     private void refreshTempVehicleCrewVTOL() {
-        if (!getCampaign().getCampaignOptions().isUseBlobVehicleCrewVTOL()) {
+        if (!getCampaign().getCampaignOptions().get(CampaignOption.USE_BLOB_VEHICLE_CREW_VTOL)) {
             lblTempVehicleCrewVTOL.setVisible(false);
             refreshVehicleCrewPanelVisibility();
             return;
@@ -1606,7 +1599,7 @@ public class CampaignGUI extends JPanel {
     }
 
     private void refreshTempVehicleCrewNaval() {
-        if (!getCampaign().getCampaignOptions().isUseBlobVehicleCrewNaval()) {
+        if (!getCampaign().getCampaignOptions().get(CampaignOption.USE_BLOB_VEHICLE_CREW_NAVAL)) {
             lblTempVehicleCrewNaval.setVisible(false);
             refreshVehicleCrewPanelVisibility();
             return;
@@ -1625,7 +1618,7 @@ public class CampaignGUI extends JPanel {
     }
 
     private void refreshTempVesselPilot() {
-        if (!getCampaign().getCampaignOptions().isUseBlobVesselPilot()) {
+        if (!getCampaign().getCampaignOptions().get(CampaignOption.USE_BLOB_VESSEL_PILOT)) {
             lblTempVesselPilot.setVisible(false);
             refreshVesselCrewPanelVisibility();
             return;
@@ -1638,7 +1631,7 @@ public class CampaignGUI extends JPanel {
     }
 
     private void refreshTempVesselGunner() {
-        if (!getCampaign().getCampaignOptions().isUseBlobVesselGunner()) {
+        if (!getCampaign().getCampaignOptions().get(CampaignOption.USE_BLOB_VESSEL_GUNNER)) {
             lblTempVesselGunner.setVisible(false);
             refreshVesselCrewPanelVisibility();
             return;
@@ -1651,7 +1644,7 @@ public class CampaignGUI extends JPanel {
     }
 
     private void refreshTempVesselCrew() {
-        if (!getCampaign().getCampaignOptions().isUseBlobVesselCrew()) {
+        if (!getCampaign().getCampaignOptions().get(CampaignOption.USE_BLOB_VESSEL_CREW)) {
             lblTempVesselCrew.setVisible(false);
             refreshVesselCrewPanelVisibility();
             return;
@@ -1670,10 +1663,10 @@ public class CampaignGUI extends JPanel {
     }
 
     private void refreshPartsAvailability() {
-        if (getCampaign().getCampaignOptions().getAcquisitionType() == AcquisitionsType.ANY_TECH) {
+        if (getCampaign().getCampaignOptions().get(CampaignOption.ACQUISITIONS_TYPE) == AcquisitionsType.ANY_TECH) {
             lblPartsAvailabilityRating.setText("");
         } else {
-            int partsAvailability = getCampaign().findAtBPartsAvailabilityLevel();
+            int partsAvailability = getCampaign().findPartsAvailabilityLevel();
             lblPartsAvailabilityRating.setText(statusBarLabel("statusBar.lblPartsAvailabilityRating.text",
                   partsAvailability));
         }
@@ -1804,7 +1797,7 @@ public class CampaignGUI extends JPanel {
         }
 
         // Optional New Day Blocker
-        if (getCampaign().getCampaignOptions().isUseRandomRetirement()) {
+        if (getCampaign().getCampaignOptions().get(CampaignOption.USE_RANDOM_RETIREMENT)) {
             int turnoverPrompt = getCampaign().checkTurnoverPrompt();
 
             switch (turnoverPrompt) {
@@ -1918,7 +1911,7 @@ public class CampaignGUI extends JPanel {
                   campaign.getPlayerForce().getHumanResources()
                         .getSeniorAdminPerson(Campaign.AdministratorSpecialization.LOGISTICS,
                               campaign.getCampaignOptions(),
-                              campaign.isClanCampaign(),
+                              campaign.getPlayerForce().isClanForce(),
                               campaign.getLocalDate()),
                   null,
                   inCharacterMessage,
@@ -1950,7 +1943,7 @@ public class CampaignGUI extends JPanel {
      */
     private boolean checkForInvalidFaction(DayEndingEvent dayEndingEvent) {
         Campaign campaign = getCampaign();
-        Faction campaignFaction = campaign.getFaction();
+        Faction campaignFaction = campaign.getPlayerForce().getFaction();
         LocalDate currentDate = campaign.getLocalDate();
 
         if (!campaignFaction.validIn(currentDate)) {
@@ -1964,7 +1957,7 @@ public class CampaignGUI extends JPanel {
                   campaign.getPlayerForce().getHumanResources()
                         .getSeniorAdminPerson(Campaign.AdministratorSpecialization.COMMAND,
                               campaign.getCampaignOptions(),
-                              campaign.isClanCampaign(),
+                              campaign.getPlayerForce().isClanForce(),
                               campaign.getLocalDate()),
                   null,
                   inCharacterMessage,

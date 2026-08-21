@@ -947,7 +947,7 @@ public class CampaignOptionsPane extends JPanel {
                   campaign.getPlayerForce().getFaction(),
                   campaign.getLocalDate(),
                   campaign.getPlayerForce().getFactionStandings(),
-                  campaign.getMissions(),
+                  campaign.getContractHistoryAsMap().values(),
                   newIsTrackFactionStandings,
                   campaign.getCampaignOptions().get(CampaignOption.REGARD_MULTIPLIER));
 
@@ -1009,12 +1009,14 @@ public class CampaignOptionsPane extends JPanel {
             inoculateAllCharacters(campaign);
         }
 
-        boolean newUseNormalizedContractPayModel = newOptions.useNormalizedContractPayModel();
+        boolean newUseNormalizedContractPayModel = newOptions.useNormalizedContractPayModel() &&
+                                                         newOptions.useLegacyContractOptions();
         if (!isStartUp && newUseNormalizedContractPayModel && !oldUseNormalizedContractPayModel) {
             new NormalizedContractPayCampaignOptionsChangedConfirmationDialog(campaign);
         }
 
-        boolean newIsDiminishReturnsContractPay = newOptions.useDiminishingContractPay();
+        boolean newIsDiminishReturnsContractPay = newOptions.useDiminishingContractPay() &&
+                                                        newOptions.useLegacyContractOptions();
         if (!isStartUp && newIsDiminishReturnsContractPay && !oldIsDiminishReturnsContractPay) {
             new DiminishingReturnsCampaignOptionsChangedConfirmationDialog(campaign);
         }
@@ -1118,7 +1120,7 @@ public class CampaignOptionsPane extends JPanel {
         CampaignOptions presetCampaignOptions = campaignPreset.getCampaignOptions();
 
         LocalDate presetDate = campaign.getLocalDate();
-        Faction presetFaction = campaign.getFaction();
+        Faction presetFaction = campaign.getPlayerForce().getFaction();
         if (isStartup) {
             presetDate = campaignPreset.getDate();
             presetFaction = campaignPreset.getFaction();
@@ -1129,7 +1131,7 @@ public class CampaignOptionsPane extends JPanel {
         // Human Resources
         personnelPages.loadValuesFromCampaignOptions(presetCampaignOptions, campaign.getVersion());
         biographyPages.loadValuesFromCampaignOptions(presetCampaignOptions,
-              presetCampaignOptions.getRandomOriginOptions(),
+              presetCampaignOptions.get(CampaignOption.RANDOM_ORIGIN_OPTIONS),
               campaignPreset.getRankSystem());
         relationshipsPages.loadValuesFromCampaignOptions(presetCampaignOptions);
         turnoverAndRetentionPages.loadValuesFromCampaignOptions(presetCampaignOptions);

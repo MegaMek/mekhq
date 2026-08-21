@@ -690,7 +690,7 @@ public class ImmersiveDialogCore extends JDialog {
             campaignGUI.focusOnPerson(id);
         } else if (commandKey.equalsIgnoreCase(MISSION_COMMAND_STRING)) {
             try {
-                final int targetId = MathUtility.parseInt(entryKey, -1);
+                final UUID targetId = UUID.fromString(entryKey);
                 campaignGUI.focusOnMission(targetId);
             } catch (Exception e) {
                 LOGGER.error("Failed to parse mission ID: {}", entryKey, e);
@@ -996,7 +996,7 @@ public class ImmersiveDialogCore extends JDialog {
         speakerBox.setMaximumSize(new Dimension(IMAGE_WIDTH, scaleForGUI(MAX_VALUE)));
 
         // Get speaker details
-        String speakerName = campaign.getName();
+        String speakerName = campaign.getPlayerForce().getName();
         if (speaker != null) {
             speakerName = speaker.getFullTitle();
         }
@@ -1069,7 +1069,7 @@ public class ImmersiveDialogCore extends JDialog {
         if (speaker != null) {
             speakerDescription.append("<b>").append(speakerName).append("</b>");
 
-            boolean isClan = campaign.getFaction().isClan();
+            boolean isClan = campaign.getPlayerForce().getFaction().isClan();
 
             PersonnelRole primaryRole = speaker.getPrimaryRole();
             if (!primaryRole.isNone()) {
@@ -1094,7 +1094,7 @@ public class ImmersiveDialogCore extends JDialog {
                 }
             }
         } else {
-            speakerDescription.append("<b>").append(campaign.getName()).append("</b>");
+            speakerDescription.append("<b>").append(campaign.getPlayerForce().getName()).append("</b>");
         }
         return speakerDescription;
     }

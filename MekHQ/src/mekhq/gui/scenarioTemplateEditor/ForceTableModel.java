@@ -42,9 +42,9 @@ import java.util.stream.Collectors;
 import javax.swing.table.AbstractTableModel;
 
 import megamek.common.units.EntityWeightClass;
-import mekhq.campaign.mission.ScenarioForceTemplate;
-import mekhq.campaign.mission.ScenarioForceTemplate.ForceAlignment;
-import mekhq.campaign.mission.ScenarioForceTemplate.ForceGenerationMethod;
+import mekhq.campaign.mission.scenarios.ScenarioForceTemplate;
+import mekhq.campaign.mission.scenarios.ScenarioForceTemplate.ForceAlignment;
+import mekhq.campaign.mission.scenarios.ScenarioForceTemplate.ForceGenerationMethod;
 
 /**
  * Table model backing the "Participating Forces" list in {@link ScenarioTemplateEditorDialog}. Replaces the former

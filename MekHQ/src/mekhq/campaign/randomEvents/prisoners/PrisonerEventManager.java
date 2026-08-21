@@ -63,8 +63,8 @@ import mekhq.campaign.Campaign;
 import mekhq.campaign.campaignOptions.CampaignOption;
 import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.force.Formation;
-import mekhq.campaign.mission.AtBContract;
-import mekhq.campaign.mission.enums.ContractMoraleLevel;
+import mekhq.campaign.mission.contract.AbstractContract;
+import mekhq.campaign.mission.contract.contractData.ContractMoraleLevel;
 import mekhq.campaign.mission.rentals.ContractRentalType;
 import mekhq.campaign.mission.rentals.FacilityRentals;
 import mekhq.campaign.personnel.Person;
@@ -156,11 +156,11 @@ public class PrisonerEventManager {
             return;
         }
 
-        if (!campaign.getCampaignOptions().getPrisonerCaptureStyle().isMekHQ()) {
+        if (!campaign.getCampaignOptions().get(CampaignOption.PRISONER_CAPTURE_STYLE).isMekHQ()) {
             return;
         }
 
-        if (campaign.getActiveMissions(false).isEmpty()) {
+        if (campaign.getActiveContracts().isEmpty()) {
             return;
         }
 
@@ -261,7 +261,7 @@ public class PrisonerEventManager {
      * @return The total prisoner capacity usage.
      */
     public static int calculatePrisonerCapacityUsage(Campaign campaign) {
-        PrisonerCaptureStyle captureStyle = campaign.getCampaignOptions().getPrisonerCaptureStyle();
+        PrisonerCaptureStyle captureStyle = campaign.getCampaignOptions().get(CampaignOption.PRISONER_CAPTURE_STYLE);
         boolean isMekHQCaptureStyle = captureStyle.isMekHQ();
 
         int prisonerCapacityUsage = 0;
@@ -388,7 +388,7 @@ public class PrisonerEventManager {
 
         if (!escapees.isEmpty() && campaign.hasActiveAtBContract()) {
             if (randomInt(100) < escapees.size()) {
-                List<AtBContract> contracts = campaign.getActiveAtBContracts();
+                List<AbstractContract> contracts = campaign.getActiveContracts();
                 Collections.shuffle(contracts);
 
                 new PrisonEscapeScenario(campaign, contracts.getFirst(), escapees);
@@ -423,7 +423,7 @@ public class PrisonerEventManager {
      */
     public static int calculatePrisonerCapacity(Campaign campaign) {
         CampaignOptions campaignOptions = campaign.getCampaignOptions();
-        PrisonerCaptureStyle captureStyle = campaignOptions.getPrisonerCaptureStyle();
+        PrisonerCaptureStyle captureStyle = campaignOptions.get(CampaignOption.PRISONER_CAPTURE_STYLE);
         boolean isMekHQCaptureStyle = captureStyle.isMekHQ();
 
         int prisonerCapacity = 0;
@@ -506,7 +506,7 @@ public class PrisonerEventManager {
 
     /**
      * Evaluates whether freeing prisoners during a scenario triggers one or more Intel Breach events, and applies the
-     * resulting morale penalties to a relevant active {@link AtBContract}.
+     * resulting morale penalties to a relevant active {@link AbstractContract}.
      *
      * <p>The chance of an Intel Breach scales with the number of prisoners freed. The method divides the freed
      * prisoners into groups of up to 50 and performs one breach roll per group. Each roll compares a uniform random
@@ -525,11 +525,11 @@ public class PrisonerEventManager {
      * @since 0.50.10
      */
     public static void checkForIntelBreachEvent(Campaign campaign, int freedPrisonerCount) {
-        if (!campaign.getCampaignOptions().getPrisonerCaptureStyle().isMekHQ()) {
+        if (!campaign.getCampaignOptions().get(CampaignOption.PRISONER_CAPTURE_STYLE).isMekHQ()) {
             return;
         }
 
-        List<AtBContract> activeContracts = campaign.getActiveAtBContracts();
+        List<AbstractContract> activeContracts = campaign.getActiveContracts();
         activeContracts.removeIf(contract -> contract.getMoraleLevel().isOverwhelming() ||
                                                    contract.getMoraleLevel().isRouted());
         if (activeContracts.isEmpty()) {
@@ -541,9 +541,9 @@ public class PrisonerEventManager {
         boolean hadIntelBreach = freedPrisonerCount > 0 && Compute.randomInt(baseChance) < freedPrisonerCount;
 
         if (hadIntelBreach) {
-            AtBContract relevantContract = ObjectUtility.getRandomItem(activeContracts);
+            AbstractContract relevantContract = ObjectUtility.getRandomItem(activeContracts);
             ContractMoraleLevel oldMorale = relevantContract.getMoraleLevel();
-            ContractMoraleLevel newMorale = relevantContract.changeMoraleLevel(1);
+            ContractMoraleLevel newMorale = relevantContract.changeMorale(1);
 
             new PrisonerIntelBreachDialog(campaign, relevantContract, oldMorale, newMorale);
         }
@@ -691,12 +691,12 @@ public class PrisonerEventManager {
      */
     private void processExecutions(int executions, List<Person> prisoners) {
         CampaignOptions campaignOptions = campaign.getCampaignOptions();
-        if (campaignOptions.isTrackFactionStanding()) {
+        if (campaignOptions.get(CampaignOption.TRACK_FACTION_STANDING)) {
             FactionStandings factionStandings = campaign.getPlayerForce().getFactionStandings();
             List<String> reports = factionStandings.executePrisonersOfWar(campaign.getPlayerForce()
                                                                                 .getFaction()
                                                                                 .getShortName(),
-                  prisoners, campaign.getGameYear(), campaignOptions.getRegardMultiplier());
+                  prisoners, campaign.getGameYear(), campaignOptions.get(CampaignOption.REGARD_MULTIPLIER));
 
             for (String report : reports) {
                 campaign.addReport(POLITICS, report);
@@ -763,7 +763,7 @@ public class PrisonerEventManager {
             return campaign.getPlayerForce().getHumanResources()
                          .getSeniorAdminPerson(TRANSPORT,
                                campaign.getCampaignOptions(),
-                               campaign.isClanCampaign(),
+                               campaign.getPlayerForce().isClanForce(),
                                campaign.getLocalDate());
         } else {
             return speaker;

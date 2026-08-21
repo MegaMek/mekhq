@@ -42,7 +42,7 @@ import java.util.List;
 import megamek.common.loaders.MapSettings;
 import mekhq.campaign.digitalGM.stratCon.StratConTestData;
 import mekhq.campaign.digitalGM.stratCon.biome.StratConBiomeManifest;
-import mekhq.campaign.mission.AtBScenario;
+import mekhq.campaign.mission.scenarios.AtBScenario;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 

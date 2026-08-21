@@ -44,6 +44,7 @@ import megamek.common.units.Entity;
 import megamek.common.weapons.infantry.InfantryWeapon;
 import mekhq.MekHQ;
 import mekhq.campaign.campaignOptions.CampaignOptions;
+import mekhq.campaign.campaignOptions.CampaignOption;
 import mekhq.campaign.events.parts.PartArrivedEvent;
 import mekhq.campaign.events.parts.PartChangedEvent;
 import mekhq.campaign.finances.Money;
@@ -278,7 +279,7 @@ public record ForceQuartermaster(Campaign campaign) {
         int shotsRemoved = removeAmmo(warehouse, ammoStorage, shotsNeeded);
         int shotsRemaining = shotsNeeded - shotsRemoved;
 
-        if ((shotsRemaining > 0) && getCampaignOptions().isUseAmmoByType()) {
+        if ((shotsRemaining > 0) && getCampaignOptions().get(CampaignOption.USE_AMMO_BY_TYPE)) {
             shotsRemoved += removeCompatibleAmmo(warehouse, ammoType, shotsRemaining);
         }
 
@@ -503,7 +504,7 @@ public record ForceQuartermaster(Campaign campaign) {
     public int getAmmoAvailable(AmmoType ammoType) {
         Objects.requireNonNull(ammoType);
 
-        if (!getCampaignOptions().isUseAmmoByType()) {
+        if (!getCampaignOptions().get(CampaignOption.USE_AMMO_BY_TYPE)) {
             // We can't just use findSpareAmmo, that will return the first
             // matching ammo. There may be multiple instances of matching
             // ammo that have different qualities, so we should return
@@ -671,11 +672,11 @@ public record ForceQuartermaster(Campaign campaign) {
 
         PartQuality quality = PartQuality.QUALITY_D;
 
-        if (campaign.getCampaignOptions().isUseRandomUnitQualities()) {
+        if (campaign.getCampaignOptions().get(CampaignOption.USE_RANDOM_UNIT_QUALITIES)) {
             quality = Unit.getRandomUnitQuality(0);
         }
 
-        if (getCampaignOptions().isPayForUnits()) {
+        if (getCampaignOptions().get(CampaignOption.PAY_FOR_UNITS)) {
             Money cost = new Unit(en, campaign()).getBuyCost().multipliedBy(valueMultiplier);
             if (campaign().getPlayerForce()
                       .getFinances()
@@ -910,7 +911,7 @@ public record ForceQuartermaster(Campaign campaign) {
      * @return True if the refurbishment was purchased, otherwise false.
      */
     public boolean buyRefurbishment(Part part) {
-        if (getCampaignOptions().isPayForParts()) {
+        if (getCampaignOptions().get(CampaignOption.PAY_FOR_PARTS)) {
             return campaign().getPlayerForce().getFinances().debit(TransactionType.EQUIPMENT_PURCHASE,
                   campaign().getLocalDate(), part.getActualValue(),
                   "Purchase of " + part.getName());
@@ -958,7 +959,7 @@ public record ForceQuartermaster(Campaign campaign) {
     public boolean buyPart(Part part, double costMultiplier, int transitDays, @Nullable LocalWarehouse target) {
         Objects.requireNonNull(part);
 
-        if (getCampaignOptions().isPayForParts()) {
+        if (getCampaignOptions().get(CampaignOption.PAY_FOR_PARTS)) {
             Money cost = part.getActualValue().multipliedBy(costMultiplier);
             if (campaign().getPlayerForce().getFinances().debit(TransactionType.EQUIPMENT_PURCHASE,
                   campaign().getLocalDate(), cost, "Purchase of " + part.getName())) {

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2024-2025 The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2024-2026 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -179,7 +179,7 @@ class AcademyTests {
         when(campaign.getSystemById("Sol")).thenReturn(system);
         when(system.getFactions(Mockito.any())).thenReturn(List.of("Lyr"));
         when(person.getOriginFaction()).thenReturn(new Faction("FWL", ""));
-        when(campaign.getFaction()).thenReturn(new Faction("FWL", ""));
+        when(campaign.getPlayerForce().getFaction()).thenReturn(new Faction("FWL", ""));
         assertEquals(1.0, academy.getFactionDiscountAdjusted(campaign, person));
     }
 }

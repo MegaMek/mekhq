@@ -133,7 +133,7 @@ public class FactionJudgmentDialog {
         String factionName = getFactionName(judgingFaction, campaign.getGameYear());
 
         LocalDate today = campaign.getLocalDate();
-        AbstractLocation location = campaign.getCurrentLocation();
+        AbstractLocation location = campaign.getPlayerForce().getForceDetachment().getCurrentLocation();
         boolean isPlanetside = location.isOnPlanet();
         String locationName = isPlanetside
                                     ? location.getPlanet().getName(today)
@@ -141,11 +141,11 @@ public class FactionJudgmentDialog {
 
         String dialogText = getInCharacterText(
               RESOURCE_BUNDLE, dialogKey, commander, null, factionName,
-              campaign.getName(), locationName, moneyReward, commanderAddress);
+              campaign.getPlayerForce().getName(), locationName, moneyReward, commanderAddress);
 
         // Determine available button choices
         boolean includeGoRogueOption = judgmentType.equals(FactionStandingJudgmentType.CENSURE);
-        boolean isDraconisCombineCampaign = campaign.getFaction().getShortName().equals(DRACONIS_COMBINE_FACTION_CODE);
+        boolean isDraconisCombineCampaign = campaign.getPlayerForce().getFaction().getShortName().equals(DRACONIS_COMBINE_FACTION_CODE);
         boolean includeSeppukuOption = includeGoRogueOption && isDraconisCombineCampaign;
 
         List<String> buttonLabels = getButtonLabels(judgmentLookupName, includeGoRogueOption, includeSeppukuOption);

@@ -48,8 +48,7 @@ import megamek.common.util.weightedMaps.WeightedIntMap;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.ResolveScenarioTracker;
 import mekhq.campaign.campaignOptions.CampaignOptions;
-import mekhq.campaign.mission.AtBContract;
-import mekhq.campaign.mission.Mission;
+import mekhq.campaign.mission.contract.AbstractContract;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.PersonUtility;
 import mekhq.campaign.personnel.enums.PersonnelRole;
@@ -112,14 +111,14 @@ public class NonCombatPrisoners {
      *
      * <p>The number of captives in each category is determined by die rolls. Each generated {@link Person} has their
      * skills overridden according to the current {@link CampaignOptions} and a target {@link SkillLevel}: for
-     * {@link AtBContract} missions the enemy skill is used, otherwise {@link SkillLevel#REGULAR} is assumed.</p>
+     * {@link AbstractContract} missions the enemy skill is used, otherwise {@link SkillLevel#REGULAR} is assumed.</p>
      *
      * <p>All returned {@link ResolveScenarioTracker.OppositionPersonnelStatus} entries are flagged as captured and
      * keyed by the captive's {@link Person#getId() ID}.</p>
      *
      * @param campaign the campaign used to generate new personnel and read campaign options
-     * @param mission  the mission that produced these prisoners; may be an {@link AtBContract} to derive the target
-     *                 skill level
+     * @param mission  the mission that produced these prisoners; may be an {@link AbstractContract} to derive the
+     *                 target skill level
      *
      * @return a {@link Hashtable} mapping each captive's {@link UUID} to their corresponding opposition personnel
      *       status
@@ -128,14 +127,11 @@ public class NonCombatPrisoners {
      * @since 0.50.10
      */
     public static Hashtable<UUID, ResolveScenarioTracker.OppositionPersonnelStatus> getCivilianCaptives(
-          Campaign campaign, Mission mission) {
+          Campaign campaign, AbstractContract mission) {
         CampaignOptions campaignOptions = campaign.getCampaignOptions();
         boolean isUseAdvancedMedical = campaignOptions.isUseAdvancedMedical();
 
-        SkillLevel targetSkillLevel = SkillLevel.REGULAR;
-        if (mission instanceof AtBContract contract) {
-            targetSkillLevel = contract.getEnemySkill();
-        }
+        SkillLevel targetSkillLevel = mission.getEnemyForceSkill();
 
         int supportCount = d6(3); // Support Personnel
         int soldierCount = d6(5); // Guards

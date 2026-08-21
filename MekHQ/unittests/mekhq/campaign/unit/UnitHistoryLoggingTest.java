@@ -57,7 +57,7 @@ import mekhq.campaign.Campaign;
 import mekhq.campaign.log.AssignmentLogEntry;
 import mekhq.campaign.log.LogEntry;
 import mekhq.campaign.log.UnitLogger;
-import mekhq.campaign.mission.Scenario;
+import mekhq.campaign.mission.scenarios.Scenario;
 import mekhq.campaign.personnel.Person;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -94,7 +94,7 @@ class UnitHistoryLoggingTest {
         UUID id = UUID.randomUUID();
         when(person.getId()).thenReturn(id);
         when(person.getFullName()).thenReturn(fullName);
-        when(campaign.getPerson(eq(id))).thenReturn(person);
+        when(campaign.getPlayerForce().getHumanResources().getPerson(eq(id))).thenReturn(person);
         return person;
     }
 

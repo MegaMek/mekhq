@@ -36,8 +36,8 @@ import static java.lang.Math.max;
 import static megamek.common.compute.Compute.d6;
 import static megamek.common.compute.Compute.randomInt;
 import static megamek.common.enums.SkillLevel.REGULAR;
-import static mekhq.campaign.mission.AtBDynamicScenarioFactory.getEntity;
-import static mekhq.campaign.mission.BotForceRandomizer.UNIT_WEIGHT_UNSPECIFIED;
+import static mekhq.campaign.mission.scenarios.AtBDynamicScenarioFactory.getEntity;
+import static mekhq.campaign.mission.scenarios.BotForceRandomizer.UNIT_WEIGHT_UNSPECIFIED;
 import static mekhq.campaign.unit.Unit.getRandomUnitQuality;
 import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
 
@@ -75,7 +75,7 @@ public class MercenaryAuction {
      */
     public MercenaryAuction(Campaign campaign, int requiredCombatTeams, StratConCampaignState campaignState,
           int unitType) {
-        String faction = campaign.getFaction().getShortName();
+        String faction = campaign.getPlayerForce().getFaction().getShortName();
 
         Entity entity = getEntity(faction,
               REGULAR,
@@ -118,7 +118,7 @@ public class MercenaryAuction {
                   campaign.getPlayerForce().getHumanResources()
                         .getSeniorAdminPerson(mekhq.campaign.Campaign.AdministratorSpecialization.TRANSPORT,
                               campaign.getCampaignOptions(),
-                              campaign.isClanCampaign(),
+                              campaign.getPlayerForce().isClanForce(),
                               campaign.getLocalDate()),
                   null,
                   inCharacterMessage,
@@ -163,7 +163,7 @@ public class MercenaryAuction {
                   campaign.getPlayerForce().getHumanResources()
                         .getSeniorAdminPerson(mekhq.campaign.Campaign.AdministratorSpecialization.TRANSPORT,
                               campaign.getCampaignOptions(),
-                              campaign.isClanCampaign(),
+                              campaign.getPlayerForce().isClanForce(),
                               campaign.getLocalDate()),
                   null,
                   getFormattedTextAt(RESOURCE_BUNDLE, "auction.successful", entity.getChassis(), deliveryTime),
@@ -177,7 +177,7 @@ public class MercenaryAuction {
                   campaign.getPlayerForce().getHumanResources()
                         .getSeniorAdminPerson(mekhq.campaign.Campaign.AdministratorSpecialization.TRANSPORT,
                               campaign.getCampaignOptions(),
-                              campaign.isClanCampaign(),
+                              campaign.getPlayerForce().isClanForce(),
                               campaign.getLocalDate()),
                   null,
                   getFormattedTextAt(RESOURCE_BUNDLE, "auction.failure", entity.getChassis()),

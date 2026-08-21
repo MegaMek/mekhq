@@ -1097,7 +1097,7 @@
 				—From the journals of Daniel Waylen (3048)</desc>
 			<id>1</id>
 			<scenarios>
-				<scenario id="1" type="mekhq.campaign.mission.Scenario">
+				<scenario id="1" type="mekhq.campaign.mission.scenarios.Scenario">
 					<name>Main Track</name>
 					<desc>Fortress Ningpo
 						Thestria, Draconis Combine

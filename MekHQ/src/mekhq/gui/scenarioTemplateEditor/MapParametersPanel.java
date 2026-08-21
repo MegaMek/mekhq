@@ -44,8 +44,8 @@ import javax.swing.*;
 
 import megamek.codeUtilities.MathUtility;
 import megamek.common.ui.FastJScrollPane;
-import mekhq.campaign.mission.ScenarioMapParameters;
-import mekhq.campaign.mission.ScenarioMapParameters.MapLocation;
+import mekhq.campaign.mission.scenarios.ScenarioMapParameters;
+import mekhq.campaign.mission.scenarios.ScenarioMapParameters.MapLocation;
 
 /**
  * Editor panel for a scenario template's {@link ScenarioMapParameters}: base and scaled dimensions, additional map

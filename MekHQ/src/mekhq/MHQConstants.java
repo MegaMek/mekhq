@@ -77,6 +77,7 @@ public final class MHQConstants extends SuiteConstants {
     public static final String COMPANY_GENERATOR_STARTUP = "companyGeneratorStartup";
     public static final String SHOW_COMPANY_GENERATOR = "showCompanyGenerator";
     public static final String SHOW_UNIT_PICTURES_ON_TOE = "showUnitPicturesOnTOE";
+    public static final String SHOW_WARRIORS_ALMANAC = "showWarriorsAlmanac";
 
     // Personnel record logs - controls whether each personnel record section starts expanded
     public static final String DISPLAY_PERSONNEL_LOG = "displayPersonnelLog";
@@ -284,7 +285,7 @@ public final class MHQConstants extends SuiteConstants {
     public static final String NAG_SOMEONE_RANDOMLY_DIED_CAMP_FOLLOWER = "nagSomeoneRandomlyDiedCampFollower";
     public static final String NAG_SOMEONE_RANDOMLY_DIED_RETIREE = "nagSomeoneRandomlyDiedRetired";
 
-    public static final String CONFIRMATION_CONTRACT_RENTAL = "confirmationContractRental";
+    public static final String CONFIRMATION_ACCEPT_CONTRACT = "confirmationAcceptContract";
     public static final String CONFIRMATION_FACTION_STANDINGS_ULTIMATUM = "confirmationFactionStandingsUltimatum";
     public static final String CONFIRMATION_BEGIN_TRANSIT = "confirmationBeginTransit";
     public static final String CONFIRMATION_RESOLVE_SCENARIO = "confirmationResolveScenario";
@@ -417,6 +418,30 @@ public final class MHQConstants extends SuiteConstants {
           "data/universe/backgrounds/randomCompanyNameGenerator/endWordMercenary.csv").toString();
     public static final String NAME_END_WORD_MERCENARY_USER = Paths.get(
           "userdata/data/universe/backgrounds/randomCompanyNameGenerator/endWordMercenary.csv").toString();
+    public static final String NAME_MIDDLE_WORD_REBEL = Paths.get(
+          "data/universe/backgrounds/randomCompanyNameGenerator/middleWordRebel.csv").toString();
+    public static final String NAME_MIDDLE_WORD_REBEL_USER = Paths.get(
+          "userdata/data/universe/backgrounds/randomCompanyNameGenerator/middleWordRebel.csv").toString();
+    public static final String NAME_END_WORD_REBEL = Paths.get(
+          "data/universe/backgrounds/randomCompanyNameGenerator/endWordRebel.csv").toString();
+    public static final String NAME_END_WORD_REBEL_USER = Paths.get(
+          "userdata/data/universe/backgrounds/randomCompanyNameGenerator/endWordRebel.csv").toString();
+    public static final String NAME_MIDDLE_WORD_MILITIA = Paths.get(
+          "data/universe/backgrounds/randomCompanyNameGenerator/middleWordMilitia.csv").toString();
+    public static final String NAME_MIDDLE_WORD_MILITIA_USER = Paths.get(
+          "userdata/data/universe/backgrounds/randomCompanyNameGenerator/middleWordMilitia.csv").toString();
+    public static final String NAME_END_WORD_MILITIA = Paths.get(
+          "data/universe/backgrounds/randomCompanyNameGenerator/endWordMilitia.csv").toString();
+    public static final String NAME_END_WORD_MILITIA_USER = Paths.get(
+          "userdata/data/universe/backgrounds/randomCompanyNameGenerator/endWordMilitia.csv").toString();
+    public static final String NAME_MIDDLE_WORD_CIVILIAN = Paths.get(
+          "data/universe/backgrounds/randomCompanyNameGenerator/middleWordCivilian.csv").toString();
+    public static final String NAME_MIDDLE_WORD_CIVILIAN_USER = Paths.get(
+          "userdata/data/universe/backgrounds/randomCompanyNameGenerator/middleWordCivilian.csv").toString();
+    public static final String NAME_END_WORD_CIVILIAN = Paths.get(
+          "data/universe/backgrounds/randomCompanyNameGenerator/endWordCivilian.csv").toString();
+    public static final String NAME_END_WORD_CIVILIAN_USER = Paths.get(
+          "userdata/data/universe/backgrounds/randomCompanyNameGenerator/endWordCivilian.csv").toString();
     public static final String NAME_PRE_FAB = Paths.get(
           "data/universe/backgrounds/randomCompanyNameGenerator/preFab.csv").toString();
     public static final String NAME_PRE_FAB_USER = Paths.get(

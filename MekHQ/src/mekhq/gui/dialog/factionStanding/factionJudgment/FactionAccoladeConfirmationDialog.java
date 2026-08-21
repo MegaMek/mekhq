@@ -95,7 +95,7 @@ public class FactionAccoladeConfirmationDialog {
         Person speaker = campaign.getPlayerForce().getHumanResources()
                                .getSeniorAdminPerson(mekhq.campaign.Campaign.AdministratorSpecialization.COMMAND,
                                      campaign.getCampaignOptions(),
-                                     campaign.isClanCampaign(),
+                                     campaign.getPlayerForce().isClanForce(),
                                      campaign.getLocalDate());
         ImmersiveDialogSimple dialog = new ImmersiveDialogSimple(
               campaign,

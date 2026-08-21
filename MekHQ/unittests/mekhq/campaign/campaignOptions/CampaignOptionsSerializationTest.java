@@ -136,66 +136,66 @@ class CampaignOptionsSerializationTest {
     void roundTrip_preservesCollectionArrayAndObjectValues() {
         final CampaignOptions original = new CampaignOptions();
         original.setRoleBaseSalary(PersonnelRole.DOCTOR, 4321);
-        original.getSalaryXPMultipliers().put(SkillLevel.ELITE, 9.5);
-        original.getPersonnelMarketRandomRemovalTargets().put(SkillLevel.ELITE, 99);
+        original.get(CampaignOption.SALARY_XP_MULTIPLIERS).put(SkillLevel.ELITE, 9.5);
+        original.get(CampaignOption.PERSONNEL_MARKET_RANDOM_REMOVAL_TARGETS).put(SkillLevel.ELITE, 99);
         original.setPlanetTechAcquisitionBonus(9, PlanetarySophistication.A);
         original.setPhenotypeProbability(0, 42);
         original.setAtBBattleChance(0, 77);
         original.setUsePortraitForRole(2, true);
-        original.setUsedPartPriceMultipliers(0.11, 0.22, 0.33, 0.44, 0.55, 0.66);
+        original.set(CampaignOption.USED_PART_PRICE_MULTIPLIERS, new double[] { 0.11, 0.22, 0.33, 0.44, 0.55, 0.66 });
 
         final CampaignOptions reloaded = roundTrip(original);
 
-        assertEquals(Money.of(4321), reloaded.getRoleBaseSalaries()[PersonnelRole.DOCTOR.ordinal()]);
-        assertEquals(9.5, reloaded.getSalaryXPMultipliers().get(SkillLevel.ELITE));
-        assertEquals(99, reloaded.getPersonnelMarketRandomRemovalTargets().get(SkillLevel.ELITE));
+        assertEquals(Money.of(4321), reloaded.get(CampaignOption.ROLE_BASE_SALARIES)[PersonnelRole.DOCTOR.ordinal()]);
+        assertEquals(9.5, reloaded.get(CampaignOption.SALARY_XP_MULTIPLIERS).get(SkillLevel.ELITE));
+        assertEquals(99, reloaded.get(CampaignOption.PERSONNEL_MARKET_RANDOM_REMOVAL_TARGETS).get(SkillLevel.ELITE));
         assertEquals(9, reloaded.getPlanetTechAcquisitionBonus(PlanetarySophistication.A));
-        assertEquals(42, reloaded.getPhenotypeProbabilities()[0]);
-        assertEquals(77, reloaded.getAllAtBBattleChances()[0]);
-        assertTrue(reloaded.isUsePortraitForRoles()[2]);
-        assertEquals(0.11, reloaded.getUsedPartPriceMultipliers()[0]);
-        assertFalse(reloaded.getMRMSOptions().isEmpty());
-        assertNotNull(reloaded.getRandomOriginOptions());
+        assertEquals(42, reloaded.get(CampaignOption.PHENOTYPE_PROBABILITIES)[0]);
+        assertEquals(77, reloaded.get(CampaignOption.ATB_BATTLE_CHANCE)[0]);
+        assertTrue(reloaded.get(CampaignOption.USE_PORTRAIT_FOR_ROLE)[2]);
+        assertEquals(0.11, reloaded.get(CampaignOption.USED_PART_PRICE_MULTIPLIERS)[0]);
+        assertFalse(reloaded.get(CampaignOption.MRMS_OPTIONS).isEmpty());
+        assertNotNull(reloaded.get(CampaignOption.RANDOM_ORIGIN_OPTIONS));
     }
 
     @Test
     void roundTrip_preservesEnumAndLookupEnumValues() {
         final CampaignOptions original = new CampaignOptions();
-        original.setStratConPlayType(StratConPlayType.MAPLESS);
-        original.setSkillLevel(SkillLevel.VETERAN);
+        original.set(CampaignOption.STRAT_CON_PLAY_TYPE, StratConPlayType.MAPLESS);
+        original.set(CampaignOption.SKILL_LEVEL, SkillLevel.VETERAN);
 
         final CampaignOptions reloaded = roundTrip(original);
 
-        assertEquals(StratConPlayType.MAPLESS, reloaded.getStratConPlayType());
-        assertEquals(SkillLevel.VETERAN, reloaded.getSkillLevel());
+        assertEquals(StratConPlayType.MAPLESS, reloaded.get(CampaignOption.STRAT_CON_PLAY_TYPE));
+        assertEquals(SkillLevel.VETERAN, reloaded.get(CampaignOption.SKILL_LEVEL));
     }
 
     @Test
     void contractPercent_isClampedOnRead() {
         final CampaignOptions reloaded = reloadTags("<dropShipContractPercent>2.0</dropShipContractPercent>");
 
-        assertEquals(1.0, reloaded.getDropShipContractPercent());
+        assertEquals(1.0, reloaded.get(CampaignOption.DROP_SHIP_CONTRACT_PERCENT));
     }
 
     @Test
     void atBEnabledMarker_isNotWrittenButReadFromLegacyTag() {
         final CampaignOptions original = new CampaignOptions();
-        original.setHadAtBEnabledMarker(true);
+        original.set(CampaignOption.HAD_AT_B_ENABLED_MARKER, true);
 
         // The marker is a read-only migration flag: it is never emitted, so it does not survive a round-trip.
-        assertFalse(roundTrip(original).isHadAtBEnabledMarker());
+        assertFalse(roundTrip(original).get(CampaignOption.HAD_AT_B_ENABLED_MARKER));
 
         // It is still recovered from the legacy "useAtB" tag on load.
-        assertTrue(reloadTags("<useAtB>true</useAtB>").isHadAtBEnabledMarker());
+        assertTrue(reloadTags("<useAtB>true</useAtB>").get(CampaignOption.HAD_AT_B_ENABLED_MARKER));
     }
 
     @Test
     void legacyAliasTags_areAppliedToTheirOptions() {
-        assertEquals(42, reloadTags("<administrativeStrain>42</administrativeStrain>").getHRCapacity());
-        assertTrue(reloadTags("<useAdministrativeStrain>true</useAdministrativeStrain>").isUseHRStrain());
+        assertEquals(42, reloadTags("<administrativeStrain>42</administrativeStrain>").get(CampaignOption.HR_CAPACITY));
+        assertTrue(reloadTags("<useAdministrativeStrain>true</useAdministrativeStrain>").get(CampaignOption.USE_HR_STRAIN));
         assertEquals(AcquisitionsType.NEGOTIATION,
-              reloadTags("<acquisitionSkill>Negotiation</acquisitionSkill>").getAcquisitionType());
+              reloadTags("<acquisitionSkill>Negotiation</acquisitionSkill>").get(CampaignOption.ACQUISITIONS_TYPE));
         assertEquals(StratConPlayType.MAPLESS,
-              reloadTags("<useMaplessStratCon>true</useMaplessStratCon>").getStratConPlayType());
+              reloadTags("<useMaplessStratCon>true</useMaplessStratCon>").get(CampaignOption.STRAT_CON_PLAY_TYPE));
     }
 }

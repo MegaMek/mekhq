@@ -60,11 +60,12 @@ import megamek.common.units.EntityMovementMode;
 import megamek.common.units.UnitType;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.againstTheBot.AtBStaticWeightGenerator;
+import mekhq.campaign.campaignOptions.CampaignOption;
 import mekhq.campaign.enums.DragoonRating;
 import mekhq.campaign.market.enums.UnitMarketMethod;
 import mekhq.campaign.market.enums.UnitMarketRarity;
 import mekhq.campaign.market.enums.UnitMarketType;
-import mekhq.campaign.mission.AtBContract;
+import mekhq.campaign.mission.contract.AbstractContract;
 import mekhq.campaign.universe.Faction;
 import mekhq.campaign.universe.Factions;
 import mekhq.campaign.universe.IUnitGenerator;
@@ -105,11 +106,11 @@ public class AtBMonthlyUnitMarket extends AbstractUnitMarket {
      */
     @Override
     public void generateUnitOffers(final Campaign campaign) {
-        final List<AtBContract> contracts = campaign.getActiveAtBContracts();
-        final AtBContract contract = contracts.isEmpty() ? null : contracts.getFirst();
+        final List<AbstractContract> contracts = campaign.getActiveContracts();
+        final AbstractContract contract = contracts.isEmpty() ? null : contracts.getFirst();
 
-        Faction faction = campaign.getFaction();
-        int rarityModifier = campaign.getCampaignOptions().getUnitMarketRarityModifier();
+        Faction faction = campaign.getPlayerForce().getFaction();
+        int rarityModifier = campaign.getCampaignOptions().get(CampaignOption.UNIT_MARKET_RARITY_MODIFIER);
 
         // Civilian Market
         addOffers(campaign, getMarketItemCount(campaign, UBIQUITOUS, rarityModifier),
@@ -140,8 +141,9 @@ public class AtBMonthlyUnitMarket extends AbstractUnitMarket {
         addOffers(campaign, getMarketItemCount(campaign, MYTHIC, rarityModifier),
               UnitMarketType.OPEN, UnitType.JUMPSHIP, faction, DragoonRating.DRAGOON_F.getRating(), 4);
 
-        if ((contract != null)
-                  && (campaign.getLocalDate().isAfter(contract.getStartDate().minusDays(1)))) {
+        if ((contract != null) &&
+                  ((contract.getStartDate() == null) ||
+                         campaign.getLocalDate().isAfter(contract.getStartDate().minusDays(1)))) {
             // Employer Market
             faction = contract.getEmployerFaction();
 
@@ -149,14 +151,14 @@ public class AtBMonthlyUnitMarket extends AbstractUnitMarket {
             int standingsModifier = 0;
             if (campaign.getCampaignOptions().isUseFactionStandingUnitMarketSafe()) {
                 FactionStandings factionStandings = campaign.getPlayerForce().getFactionStandings();
-                double regard = factionStandings.getRegardForFaction(contract.getEmployerCode(), true);
+                double regard = factionStandings.getRegardForFaction(contract.getEmployerFactionCode(), true);
                 standingsModifier = FactionStandingUtilities.getUnitMarketRarityModifier(regard);
             }
 
             totalModifier = rarityModifier + standingsModifier;
 
             // ComStar and WoB won't sell their goodies out of faction
-            if (campaign.getFaction().isComStarOrWoB() || !faction.isComStarOrWoB()) {
+            if (campaign.getPlayerForce().getFaction().isComStarOrWoB() || !faction.isComStarOrWoB()) {
 
                 addOffers(campaign, getMarketItemCount(campaign, RARE, totalModifier),
                       UnitMarketType.EMPLOYER, UnitType.MEK, faction, DragoonRating.DRAGOON_D.getRating(), -1);
@@ -183,7 +185,7 @@ public class AtBMonthlyUnitMarket extends AbstractUnitMarket {
             }
 
             // Unwanted Salvage Market
-            faction = contract.getEnemy();
+            faction = contract.getEnemyFaction();
 
             addOffers(campaign, getMarketItemCount(campaign, RARE, totalModifier),
                   UnitMarketType.EMPLOYER, UnitType.MEK, faction, DragoonRating.DRAGOON_F.getRating(), 2);
@@ -205,12 +207,12 @@ public class AtBMonthlyUnitMarket extends AbstractUnitMarket {
         }
 
         // Mercenary Market
-        if (!campaign.getFaction().isClan()) {
+        if (!campaign.getPlayerForce().getFaction().isClan()) {
             faction = Factions.getInstance().getFaction("MERC");
 
             int modifier = 1;
 
-            if (campaign.getFaction().isMercenary()) {
+            if (campaign.getPlayerForce().getFaction().isMercenary()) {
                 modifier = -1;
             }
 
@@ -253,7 +255,7 @@ public class AtBMonthlyUnitMarket extends AbstractUnitMarket {
             faction = ObjectUtility.getRandomItem(campaign.getCurrentSystem()
                                                         .getFactionSet(campaign.getLocalDate()));
 
-            if ((!campaign.getFaction().isClan()) && (faction != null) && (!faction.isClan())) {
+            if ((!campaign.getPlayerForce().getFaction().isClan()) && (faction != null) && (!faction.isClan())) {
                 addOffers(campaign, getMarketItemCount(campaign, RARE, rarityModifier),
                       UnitMarketType.FACTORY, UnitType.MEK, faction, DragoonRating.DRAGOON_A.getRating(), 2);
 
@@ -279,7 +281,7 @@ public class AtBMonthlyUnitMarket extends AbstractUnitMarket {
             }
         }
 
-        faction = campaign.getFaction();
+        faction = campaign.getPlayerForce().getFaction();
 
         // Clan Factory Market
         if ((faction.isClan()) &&
@@ -307,7 +309,7 @@ public class AtBMonthlyUnitMarket extends AbstractUnitMarket {
         }
 
         // Black Market
-        if (!campaign.getFaction().isClan()) {
+        if (!campaign.getPlayerForce().getFaction().isClan()) {
             faction = ObjectUtility.getRandomItem(campaign.getCurrentSystem()
                                                         .getFactionSet(campaign.getLocalDate()));
 
@@ -349,7 +351,7 @@ public class AtBMonthlyUnitMarket extends AbstractUnitMarket {
     private int getMarketItemCount(Campaign campaign, UnitMarketRarity rarity, int rarityModifier) {
         int totalRarity = rarity.getRarityValue() + rarityModifier;
 
-        if (isGrayMonday(campaign.getLocalDate(), campaign.getCampaignOptions().isSimulateGrayMonday())) {
+        if (isGrayMonday(campaign.getLocalDate(), campaign.getCampaignOptions().get(CampaignOption.SIMULATE_GRAY_MONDAY))) {
             totalRarity -= 4;
         }
 
@@ -363,12 +365,12 @@ public class AtBMonthlyUnitMarket extends AbstractUnitMarket {
           final int unitType, @Nullable Faction faction, final int quality,
           final int priceModifier) {
         if (faction == null) {
-            faction = RandomFactionGenerator.getInstance().getRandomEmployerFaction(campaign.getCurrentLocation(),
+            faction = RandomFactionGenerator.getInstance().getRandomEmployerFaction(campaign.getPlayerForce().getForceDetachment().getCurrentLocation(),
                   campaign.getLocalDate(), campaign.isMercenaryCampaign());
         }
 
         if (faction == null) {
-            faction = campaign.getFaction();
+            faction = campaign.getPlayerForce().getFaction();
             market = UnitMarketType.OPEN;
         }
 
@@ -390,7 +392,7 @@ public class AtBMonthlyUnitMarket extends AbstractUnitMarket {
                     }
                 } else {
                     movementModes.addAll(IUnitGenerator.MIXED_TANK_VTOL);
-                    int specialUnitChance = campaign.getCampaignOptions().getUnitMarketArtilleryUnitChance();
+                    int specialUnitChance = campaign.getCampaignOptions().get(CampaignOption.UNIT_MARKET_ARTILLERY_UNIT_CHANCE);
                     if (specialUnitChance != 0) {
                         if ((specialUnitChance == 1) || (Compute.randomInt(specialUnitChance) == 0)) {
                             missionRoles.add(MissionRole.ARTILLERY);

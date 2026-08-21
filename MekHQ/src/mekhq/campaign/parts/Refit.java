@@ -46,6 +46,7 @@ import java.io.PrintStream;
 import java.io.PrintWriter;
 import java.util.*;
 
+import jakarta.annotation.Nonnull;
 import megamek.Version;
 import megamek.common.CriticalSlot;
 import megamek.common.TechAdvancement;
@@ -83,6 +84,7 @@ import megameklab.util.UnitUtil;
 import mekhq.MekHQ;
 import mekhq.Utilities;
 import mekhq.campaign.Campaign;
+import mekhq.campaign.campaignOptions.CampaignOption;
 import mekhq.campaign.enums.CampaignTransportType;
 import mekhq.campaign.events.parts.PartChangedEvent;
 import mekhq.campaign.events.units.UnitRefitEvent;
@@ -1085,7 +1087,7 @@ public class Refit extends Part implements IAcquisitionWork {
         }
 
         // multiply time by refit class
-        time *= getTimeMultiplier();
+        time = (int) (time * getTimeMultiplier());
 
         // Refit Kits cost an additional 10% beyond the cost of their components. (SO p188)
         if (!customJob) {
@@ -1436,12 +1438,12 @@ public class Refit extends Part implements IAcquisitionWork {
         }
 
         return (Armor) getWarehouse().findSparePart(part -> part instanceof Armor &&
-                                                                                ((Armor) part).getType() ==
-                                                                                      newArmorSupplies.getType() &&
-                                                                                part.isClanTechBase() ==
-                                                                                      newArmorSupplies.isClanTechBase() &&
-                                                                                !part.isReservedForRefit() &&
-                                                                                part.isPresent());
+                                                                  ((Armor) part).getType() ==
+                                                                        newArmorSupplies.getType() &&
+                                                                  part.isClanTechBase() ==
+                                                                        newArmorSupplies.isClanTechBase() &&
+                                                                  !part.isReservedForRefit() &&
+                                                                  part.isPresent());
     }
 
     /**
@@ -1800,7 +1802,7 @@ public class Refit extends Part implements IAcquisitionWork {
         String fileName = MHQXMLUtility.escape(unitName).replace("/", "_").replace("\\", "_");
         String sCustomsDir = String.join(File.separator, "data", "mekfiles", "customs"); // TODO : Remove inline file
         // path
-        String sCustomsDirCampaign = sCustomsDir + File.separator + getCampaign().getName();
+        String sCustomsDirCampaign = sCustomsDir + File.separator + getCampaign().getPlayerForce().getName();
         File customsDir = new File(sCustomsDir);
         if (!customsDir.exists()) {
             if (!customsDir.mkdir()) {
@@ -2689,14 +2691,14 @@ public class Refit extends Part implements IAcquisitionWork {
         int techBaseMod = 0;
         for (Part part : shoppingList) {
             if (getTechBase() == TechBase.CLAN &&
-                      campaign.getCampaignOptions().getClanAcquisitionPenalty() > techBaseMod) {
-                techBaseMod = campaign.getCampaignOptions().getClanAcquisitionPenalty();
+                      campaign.getCampaignOptions().get(CampaignOption.CLAN_ACQUISITION_PENALTY) > techBaseMod) {
+                techBaseMod = campaign.getCampaignOptions().get(CampaignOption.CLAN_ACQUISITION_PENALTY);
             } else if (getTechBase() == TechBase.IS &&
-                             campaign.getCampaignOptions().getIsAcquisitionPenalty() > techBaseMod) {
-                techBaseMod = campaign.getCampaignOptions().getIsAcquisitionPenalty();
+                             campaign.getCampaignOptions().get(CampaignOption.IS_ACQUISITION_PENALTY) > techBaseMod) {
+                techBaseMod = campaign.getCampaignOptions().get(CampaignOption.IS_ACQUISITION_PENALTY);
             } else if (getTechBase() == TechBase.ALL) {
-                int penalty = Math.min(campaign.getCampaignOptions().getClanAcquisitionPenalty(),
-                      campaign.getCampaignOptions().getIsAcquisitionPenalty());
+                int penalty = Math.min(campaign.getCampaignOptions().get(CampaignOption.CLAN_ACQUISITION_PENALTY),
+                      campaign.getCampaignOptions().get(CampaignOption.IS_ACQUISITION_PENALTY));
                 if (penalty > techBaseMod) {
                     techBaseMod = penalty;
                 }
@@ -2925,7 +2927,8 @@ public class Refit extends Part implements IAcquisitionWork {
                 bayPart.addChildPart(door);
             }
             if (bayType.getCategory() == BayType.CATEGORY_NON_INFANTRY) {
-                for (int i = 0; i < bay.getCapacity(); i++) {
+                int cubicleCount = (int) bay.getCapacity();
+                for (int i = 0; i < cubicleCount; i++) {
                     Part cubicle;
                     if (cubicles.containsKey(bayType) && !cubicles.get(bayType).isEmpty()) {
                         cubicle = cubicles.get(bayType).removeFirst();
@@ -3025,7 +3028,7 @@ public class Refit extends Part implements IAcquisitionWork {
      * @return 0
      */
     @Override
-    public TechRating getTechRating() {
+    public @Nonnull TechRating getTechRating() {
         return TechRating.A; // Was 0 pre-conversion to ENUM, so this is the same
     }
 

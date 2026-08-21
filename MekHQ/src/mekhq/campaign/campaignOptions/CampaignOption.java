@@ -54,6 +54,7 @@ import mekhq.campaign.market.enums.ContractMarketMethod;
 import mekhq.campaign.market.enums.UnitMarketMethod;
 import mekhq.campaign.market.personnelMarket.enums.PersonnelMarketStyle;
 import mekhq.campaign.personnel.enums.*;
+import mekhq.campaign.personnel.familiarity.Familiarity;
 import mekhq.campaign.randomEvents.prisoners.PrisonerCaptureStyle;
 import mekhq.campaign.universe.PlanetarySystem.PlanetaryRating;
 import mekhq.campaign.universe.PlanetarySystem.PlanetarySophistication;
@@ -103,7 +104,16 @@ public final class CampaignOption<T> {
           of(Boolean.class, true, "useBalancedFabrication");
     public static final CampaignOption<Boolean> FABRICATE_D_IN_MAINTENANCE_FACILITY =
           of(Boolean.class, false, "maintenanceFabrication");
+    public static final CampaignOption<Boolean> USE_AMMO_FABRICATION =
+          of(Boolean.class, false, "useAmmoFabrication");
     // endregion Repair and Maintenance
+
+    // region Chassis Familiarity
+    public static final CampaignOption<Familiarity> CHASSIS_FAMILIARITY_MODE =
+          of(Familiarity.class, Familiarity.DISABLED, "chassisFamiliarityMode");
+    public static final CampaignOption<Integer> CHASSIS_FAMILIARITY_SPEED =
+          of(Integer.class, 2, "chassisFamiliaritySpeed");
+    // endregion Chassis Familiarity
 
     // region Migrated Options (generated storage-only migration)
     public static final CampaignOption<Boolean> REQUIRE_SUPPORT_FORCE_TRANSPORTATION =
@@ -753,6 +763,26 @@ public final class CampaignOption<T> {
           of(Integer.class, 0, "rentedFacilitiesCostHoldingCells");
     public static final CampaignOption<Integer> RENTED_FACILITIES_COST_REPAIR_BAYS =
           of(Integer.class, 0, "rentedFacilitiesCostRepairBays");
+    public static final CampaignOption<Boolean> USE_CHAOS_SUPPORT_POINT_CONVERSION =
+          of(Boolean.class, true, "useChaosSupportPointConversion");
+    public static final CampaignOption<Boolean> USE_CHAOS_SCALE_SUPPORT_POINT_CONVERSION =
+          of(Boolean.class, true, "useChaosScaleSupportPointConversion");
+    public static final CampaignOption<Boolean> USE_CONTRACT_FACTION_MODIFIERS =
+          of(Boolean.class, true, "useContractFactionModifiers");
+    public static final CampaignOption<Boolean> USE_INTEL_OBFUSCATION =
+          of(Boolean.class, true, "useIntelObfuscation");
+    public static final CampaignOption<Double> CONTRACT_BASE_PAY_MULTIPLIER =
+          of(Double.class, 1.0, "contractBasePayMultiplier");
+    public static final CampaignOption<Double> CONTRACT_STRAIGHT_SUPPORT_MULTIPLIER =
+          of(Double.class, 1.0, "contractStraightSupportMultiplier");
+    public static final CampaignOption<Double> CONTRACT_BATTLEFIELD_LOSS_MULTIPLIER =
+          of(Double.class, 1.0, "contractBattlefieldLossMultiplier");
+    public static final CampaignOption<Double> CONTRACT_TRANSPORT_MULTIPLIER =
+          of(Double.class, 1.0, "contractTransportMultiplier");
+    public static final CampaignOption<Double> CONTRACT_SALVAGE_MULTIPLIER =
+          of(Double.class, 1.0, "contractSalvageMultiplier");
+    public static final CampaignOption<Boolean> USE_LEGACY_CONTRACT_PAY =
+          of(Boolean.class, false, "useLegacyContractPay");
     public static final CampaignOption<Boolean> USE_ALTERNATE_PAYMENT_MODE =
           of(Boolean.class, false, "useAlternatePaymentMode");
     public static final CampaignOption<Boolean> USE_DIMINISHING_CONTRACT_PAY =

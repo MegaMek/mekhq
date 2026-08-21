@@ -40,9 +40,9 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import java.util.ArrayList;
 import java.util.List;
 
-import mekhq.campaign.mission.ScenarioForceTemplate;
-import mekhq.campaign.mission.ScenarioObjective;
-import mekhq.campaign.mission.ScenarioTemplate;
+import mekhq.campaign.mission.scenarios.ScenarioForceTemplate;
+import mekhq.campaign.mission.scenarios.ScenarioObjective;
+import mekhq.campaign.mission.scenarios.ScenarioTemplate;
 import mekhq.gui.scenarioTemplateEditor.ForceRosterEditor.CommitResult;
 import org.junit.jupiter.api.Test;
 

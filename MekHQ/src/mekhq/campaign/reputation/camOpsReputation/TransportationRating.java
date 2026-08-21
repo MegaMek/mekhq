@@ -44,6 +44,7 @@ import megamek.logging.MMLogger;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.force.Formation;
 import mekhq.campaign.unit.Unit;
+import mekhq.campaign.campaignOptions.CampaignOption;
 
 public class TransportationRating {
     final static int BELOW_CAPACITY = 0;
@@ -374,7 +375,7 @@ public class TransportationRating {
               heavyVehicleCount = 0, lightVehicleCount = 0, protoMekCount = 0, battleArmorCount = 0,
               infantryCount = 0;
 
-        boolean excludeNonCombatUnits = !campaign.getCampaignOptions().isRequireSupportForceTransportation();
+        boolean excludeNonCombatUnits = !campaign.getCampaignOptions().get(CampaignOption.REQUIRE_SUPPORT_FORCE_TRANSPORTATION);
         TreeMap<Integer, Formation> formationIds = campaign.getPlayerForce().getFormationIds();
         // Iterate through each unit in the campaign
         for (Unit unit : campaign.getActiveUnits()) {
