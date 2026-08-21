@@ -42,10 +42,9 @@ import java.util.UUID;
 
 import megamek.logging.MMLogger;
 import mekhq.campaign.Campaign;
-import mekhq.campaign.mission.Contract;
-import mekhq.campaign.mission.Mission;
-import mekhq.campaign.personnel.Award;
 import mekhq.campaign.campaignOptions.CampaignOption;
+import mekhq.campaign.mission.contract.AbstractContract;
+import mekhq.campaign.personnel.Award;
 
 public class ContractAwards {
     private static final MMLogger LOGGER = MMLogger.create(ContractAwards.class);
@@ -59,14 +58,14 @@ public class ContractAwards {
      * @param person   the person to check award eligibility for
      * @param awards   the awards to be processed (should only include awards where item == Kill)
      */
-    public static Map<Integer, List<Object>> ContractAwardsProcessor(Campaign campaign, Mission mission,
+    public static Map<Integer, List<Object>> ContractAwardsProcessor(Campaign campaign, AbstractContract mission,
           UUID person, List<Award> awards) {
         List<Award> eligibleAwards = new ArrayList<>();
         List<Award> bestEligibleAwards = new ArrayList<>();
         Award bestAward = new Award();
 
         long contractDuration = ChronoUnit.MONTHS.between(
-              ((Contract) mission).getStartDate(),
+              mission.getStartDate(),
               campaign.getLocalDate());
 
         // these entries should always be in lower case
@@ -90,17 +89,17 @@ public class ContractAwards {
                 } else if (validTypes.contains(award.getRange().toLowerCase())) {
                     switch (award.getRange().toLowerCase()) {
                         case "duty":
-                            if (mission.getContractTypeName().toLowerCase().contains("duty")) {
+                            if (mission.getObjectiveType().toString().toLowerCase().contains("duty")) {
                                 eligibleAwards.add(award);
                             }
                             break;
                         case "raid":
-                            if (mission.getContractTypeName().toLowerCase().contains("raid")) {
+                            if (mission.getObjectiveType().toString().toLowerCase().contains("raid")) {
                                 eligibleAwards.add(award);
                             }
                             break;
                         default:
-                            if (mission.getContractTypeName().equalsIgnoreCase(award.getRange())) {
+                            if (mission.getObjectiveType().toString().equalsIgnoreCase(award.getRange())) {
                                 eligibleAwards.add(award);
                             }
                     }

@@ -80,14 +80,13 @@ import mekhq.NullEntityException;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.Campaign.AdministratorSpecialization;
 import mekhq.campaign.CampaignFactory;
-import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.campaignOptions.CampaignOption;
+import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.events.OptionsChangedEvent;
 import mekhq.campaign.finances.CurrencyManager;
 import mekhq.campaign.finances.financialInstitutions.FinancialInstitutions;
 import mekhq.campaign.market.PartsStore;
-import mekhq.campaign.market.enums.ContractMarketMethod;
-import mekhq.campaign.mission.atb.AtBScenarioModifier;
+import mekhq.campaign.mission.scenarios.atb.AtBScenarioModifier;
 import mekhq.campaign.personnel.Bloodname;
 import mekhq.campaign.personnel.SpecialAbility;
 import mekhq.campaign.personnel.backgrounds.RandomCompanyNameGenerator;
@@ -445,13 +444,7 @@ public class DataLoadingDialog extends AbstractMHQDialogBasic implements Propert
                 // Setup Markets
                 campaign.getPlayerForce().getHumanResources().refreshApplicants(campaign, true);
                 showRarePersonnelDialog(campaign, true);
-                ContractMarketMethod contractMarketMethod = campaignOptions.get(CampaignOption.CONTRACT_MARKET_METHOD);
-                campaign.setContractMarket(contractMarketMethod.getContractMarket());
 
-                // AtBMonthly initial contract generation is handled using AtB initialization
-                if (!contractMarketMethod.isNone() && !contractMarketMethod.isAtBMonthly()) {
-                    campaign.getContractMarket().generateContractOffers(campaign, true);
-                }
                 if (!campaignOptions.get(CampaignOption.UNIT_MARKET_METHOD).isNone()) {
                     campaign.setUnitMarket(campaignOptions.get(CampaignOption.UNIT_MARKET_METHOD).getUnitMarket());
                     campaign.getUnitMarket().generateUnitOffers(campaign);

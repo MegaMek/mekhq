@@ -75,7 +75,8 @@ import mekhq.MHQConstants;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.JumpPath;
-import mekhq.campaign.mission.AtBContract;
+import mekhq.campaign.campaignOptions.CampaignOption;
+import mekhq.campaign.mission.contract.AbstractContract;
 import mekhq.campaign.personnel.InjuryType;
 import mekhq.campaign.universe.Faction;
 import mekhq.campaign.universe.Factions;
@@ -89,7 +90,6 @@ import mekhq.campaign.universe.factionHints.FactionHints;
 import mekhq.campaign.universe.factionStanding.FactionStandingUtilities;
 import mekhq.campaign.universe.factionStanding.FactionStandings;
 import mekhq.gui.dialog.PlanetarySystemEditorDialog;
-import mekhq.campaign.campaignOptions.CampaignOption;
 
 /**
  * This is not functional yet. Just testing things out. A lot of this code is borrowed from InterstellarMap.java in
@@ -776,7 +776,7 @@ public class InterstellarMapPanel extends JPanel {
                 Faction campaignFaction = campaign.getPlayerForce().getFaction();
                 FactionStandings factionStandings = campaign.getPlayerForce().getFactionStandings();
                 LocalDate today = campaign.getLocalDate();
-                List<AtBContract> activeAtBContracts = campaign.getActiveAtBContracts();
+                List<AbstractContract> activeAtBContracts = campaign.getActiveContracts();
 
                 FactionHints factionHints = FactionHints.getInstance();
 

@@ -34,15 +34,7 @@ package mekhq.campaign.personnel.autoAwards;
 
 import java.awt.Dialog.ModalityType;
 import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.ResourceBundle;
-import java.util.UUID;
+import java.util.*;
 import java.util.stream.Collectors;
 import javax.swing.JOptionPane;
 
@@ -51,18 +43,16 @@ import megamek.logging.MMLogger;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.Kill;
-import mekhq.campaign.mission.AtBContract;
-import mekhq.campaign.mission.Contract;
-import mekhq.campaign.mission.Mission;
+import mekhq.campaign.campaignOptions.CampaignOption;
+import mekhq.campaign.mission.contract.AbstractContract;
 import mekhq.campaign.personnel.Award;
 import mekhq.campaign.personnel.AwardsFactory;
 import mekhq.campaign.personnel.Person;
 import mekhq.gui.dialog.AutoAwardsDialog;
-import mekhq.campaign.campaignOptions.CampaignOption;
 
 public class AutoAwardsController {
     private Campaign campaign;
-    private Mission mission;
+    private AbstractContract mission;
 
     final private List<Award> contractAwards = new ArrayList<>();
     final private List<Award> factionHunterAwards = new ArrayList<>();
@@ -149,7 +139,7 @@ public class AutoAwardsController {
      * @param missionWasSuccessful true if the Mission was a complete Success, otherwise false
      * @param POWPersonnel         a list of persons that have been a prisoner of war in the current mission
      */
-    public void PostMissionController(Campaign campaign, Mission mission, Boolean missionWasSuccessful,
+    public void PostMissionController(Campaign campaign, AbstractContract mission, Boolean missionWasSuccessful,
           @Nullable List<Person> POWPersonnel) {
         logger.info("autoAwards (Mission Conclusion) has started");
 
@@ -324,7 +314,7 @@ public class AutoAwardsController {
         LocalDate today = campaign.getLocalDate();
 
         // Get the list of completed contracts from the campaign object.
-        List<AtBContract> completedContracts = campaign.getCompletedAtBContracts();
+        List<AbstractContract> completedContracts = campaign.getCompletedContracts();
 
         // If there are no completed contracts, return the current date.
         if (completedContracts.isEmpty()) {
@@ -337,11 +327,11 @@ public class AutoAwardsController {
         return getLastContractEndingDate(completedContracts);
     }
 
-    private static LocalDate getLastContractEndingDate(List<AtBContract> completedContracts) {
+    private static LocalDate getLastContractEndingDate(List<AbstractContract> completedContracts) {
         LocalDate lastContractEndingDate = null;
 
         // Loop through each contract in the list of completed contracts.
-        for (AtBContract contract : completedContracts) {
+        for (AbstractContract contract : completedContracts) {
             // Get the ending date of the current contract.
             LocalDate endingDate = contract.getEndingDate();
 
@@ -694,7 +684,7 @@ public class AutoAwardsController {
         Map<Integer, List<Object>> processedData;
         int allAwardDataKey = 0;
 
-        if ((!contractAwards.isEmpty()) && (mission instanceof Contract)) {
+        if (!contractAwards.isEmpty()) {
             processedData = ContractAwardsManager(personnel);
 
             // if processedData == null, nobody was eligible for this type of award, so they should be skipped
@@ -704,9 +694,7 @@ public class AutoAwardsController {
             }
         }
 
-        if ((!factionHunterAwards.isEmpty()) &&
-                  (campaign.getCampaignOptions().isUseStratCon()) &&
-                  (mission instanceof AtBContract)) {
+        if (!factionHunterAwards.isEmpty() && campaign.getCampaignOptions().isUseStratCon()) {
             processedData = FactionHunterAwardsManager(personnel);
 
             if (processedData != null) {
@@ -770,7 +758,7 @@ public class AutoAwardsController {
             }
         }
 
-        if ((!theatreOfWarAwards.isEmpty()) && (mission instanceof Contract)) {
+        if (!theatreOfWarAwards.isEmpty()) {
             processedData = TheatreOfWarAwardsManager(personnel);
 
             if (processedData != null) {
@@ -936,7 +924,8 @@ public class AutoAwardsController {
         Map<Integer, List<Kill>> missionKillData = personnel.stream()
                                                          .flatMap(person -> campaign.getKillsFor(person).stream())
                                                          .filter(kill -> mission != null &&
-                                                                               (kill.getMissionId() == mission.getId()))
+                                                                               (Objects.equals(kill.getMissionId(),
+                                                                                     mission.getId())))
                                                          .collect(Collectors.groupingBy(Kill::getForceId));
 
         // process the award data, checking for award eligibility

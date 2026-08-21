@@ -44,10 +44,9 @@ import mekhq.campaign.digitalGM.stratCon.StratConCampaignState;
 import mekhq.campaign.digitalGM.stratCon.StratConCoords;
 import mekhq.campaign.digitalGM.stratCon.StratConScenario;
 import mekhq.campaign.digitalGM.stratCon.StratConTrackState;
-import mekhq.campaign.mission.AtBContract;
-import mekhq.campaign.mission.AtBDynamicScenario;
-import mekhq.campaign.mission.Mission;
-import mekhq.campaign.mission.Scenario;
+import mekhq.campaign.mission.contract.AbstractContract;
+import mekhq.campaign.mission.scenarios.AtBDynamicScenario;
+import mekhq.campaign.mission.scenarios.Scenario;
 import mekhq.gui.StratConPanel;
 import mekhq.gui.stratCon.StratConScenarioWizard;
 import mekhq.gui.stratCon.TrackForceAssignmentUI;
@@ -123,16 +122,15 @@ public class MaplessStratCon {
      * @since 0.50.10
      */
     private static @Nullable StratConDeploymentContext buildScenarioData(Campaign campaign, Scenario scenario) {
-        Mission mission = campaign.getMission(scenario.getMissionId());
-        if (!(mission instanceof AtBContract atbContract)) {
-            // We should have obstructed the user before they get to this point
-            LOGGER.error("Mission is not an AtBContract: {}", mission);
+        AbstractContract mission = campaign.getContract(scenario.getMissionId());
+        if (mission == null) {
+            LOGGER.warn("Found null contract");
             return null;
         }
 
-        StratConCampaignState campaignState = atbContract.getStratConCampaignState();
+        StratConCampaignState campaignState = mission.getStratConCampaignState();
         if (campaignState == null) {
-            LOGGER.warn("CampaignState is null for contract: {}", atbContract);
+            LOGGER.warn("CampaignState is null for contract: {}", mission);
             return null;
         }
 

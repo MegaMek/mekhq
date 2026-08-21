@@ -57,16 +57,5 @@ public enum FactionStandingsGMToolsActionType {
      * Triggers a censure action for a specific faction. This can be used to kickstart a faction's censure chain or to
      * provide a fun narrative moment.
      */
-    TRIGGER_CENSURE,
-    /**
-     * Sets all faction regard values to zero.
-     */
-    @Deprecated(since = "0.50.07", forRemoval = true)
-    ZERO_ALL_REGARD,
-    /**
-     * Updates faction standings based on historical contract data (i.e., completed
-     * {@link mekhq.campaign.mission.Mission} objects).
-     */
-    @Deprecated(since = "0.50.07", forRemoval = true)
-    UPDATE_HISTORIC_CONTRACTS
+    TRIGGER_CENSURE
 }

@@ -42,7 +42,7 @@ import mekhq.campaign.digitalGM.stratCon.StratConScenario;
 import mekhq.campaign.digitalGM.stratCon.StratConTrackState;
 import mekhq.campaign.digitalGM.stratCon.gm.AbstractStratConGM;
 import mekhq.campaign.force.Formation;
-import mekhq.campaign.mission.AtBContract;
+import mekhq.campaign.mission.contract.AbstractContract;
 import mekhq.campaign.personnel.Person;
 
 /**
@@ -81,7 +81,7 @@ public interface IReinforcementStrategy {
      *
      * @return the assembled reinforcement target roll
      */
-    TargetRoll calculateReinforcementTargetNumber(@Nullable Person commandLiaison, AtBContract contract,
+    TargetRoll calculateReinforcementTargetNumber(@Nullable Person commandLiaison, AbstractContract contract,
           int baseTargetNumber);
 
     /**

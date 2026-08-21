@@ -36,7 +36,7 @@ import megamek.common.annotations.Nullable;
 import megamek.common.loaders.MapSettings;
 import mekhq.campaign.digitalGM.stratCon.biome.StratConBiomeManifest;
 import mekhq.campaign.digitalGM.stratCon.biome.StratConTerrainCategory;
-import mekhq.campaign.mission.AtBScenario;
+import mekhq.campaign.mission.scenarios.AtBScenario;
 
 /**
  * Tunes a scenario's generated battle map so it reflects the StratCon sector hex it is fought on. Battle-map selection

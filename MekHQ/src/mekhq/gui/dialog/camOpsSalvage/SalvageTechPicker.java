@@ -65,8 +65,8 @@ import megamek.common.annotations.Nullable;
 import megamek.common.util.sorter.NaturalOrderComparator;
 import megamek.logging.MMLogger;
 import mekhq.MekHQ;
-import mekhq.campaign.mission.ScenarioTemplate;
-import mekhq.campaign.mission.camOpsSalvage.SalvageTechData;
+import mekhq.campaign.mission.scenarios.ScenarioTemplate;
+import mekhq.campaign.mission.scenarios.camOpsSalvage.SalvageTechData;
 import mekhq.gui.baseComponents.roundedComponents.RoundedJButton;
 import mekhq.gui.sorter.LevelSorter;
 

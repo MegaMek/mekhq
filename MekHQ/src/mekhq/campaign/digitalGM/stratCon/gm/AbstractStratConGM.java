@@ -56,7 +56,7 @@ import mekhq.campaign.digitalGM.stratCon.strategy.StratConReinforcementStrategy;
 import mekhq.campaign.digitalGM.stratCon.strategy.StratConScenarioGenerationStrategy;
 import mekhq.campaign.digitalGM.stratCon.strategy.StratConScenarioLifecycleStrategy;
 import mekhq.campaign.events.NewDayEvent;
-import mekhq.campaign.mission.AtBContract;
+import mekhq.campaign.mission.contract.AbstractContract;
 
 /**
  * Base for every digital GM built on the StratCon data model (tracks, scenarios, facilities). It owns the shared
@@ -189,7 +189,7 @@ public abstract class AbstractStratConGM extends AbstractDigitalGM {
         boolean singleDrop = isSingleDropMode();
 
         // run scenario generation routine for every track attached to an active contract
-        for (AtBContract contract : campaign.getActiveAtBContracts()) {
+        for (AbstractContract contract : campaign.getActiveContracts()) {
             StratConCampaignState campaignState = contract.getStratConCampaignState();
 
             if (campaignState == null) {

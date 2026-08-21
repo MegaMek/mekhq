@@ -38,7 +38,7 @@ import mekhq.campaign.digitalGM.stratCon.StratConCoords;
 import mekhq.campaign.digitalGM.stratCon.StratConRulesManager;
 import mekhq.campaign.digitalGM.stratCon.StratConScenario;
 import mekhq.campaign.digitalGM.stratCon.StratConTrackState;
-import mekhq.campaign.mission.AtBContract;
+import mekhq.campaign.mission.contract.AbstractContract;
 
 /**
  * Default StratCon implementation of {@link IForceDeploymentStrategy}. Every method delegates to the existing static
@@ -50,13 +50,13 @@ import mekhq.campaign.mission.AtBContract;
 public class StratConForceDeploymentStrategy implements IForceDeploymentStrategy {
 
     @Override
-    public void deployForceToCoords(StratConCoords coords, int forceID, Campaign campaign, AtBContract contract,
+    public void deployForceToCoords(StratConCoords coords, int forceID, Campaign campaign, AbstractContract contract,
           StratConTrackState track, boolean sticky) {
         StratConRulesManager.deployForceToCoords(coords, forceID, campaign, contract, track, sticky);
     }
 
     @Override
-    public void assignForceToScenario(StratConCoords coords, int forceID, Campaign campaign, AtBContract contract,
+    public void assignForceToScenario(StratConCoords coords, int forceID, Campaign campaign, AbstractContract contract,
           StratConTrackState track, boolean sticky) {
         StratConRulesManager.assignForceToScenario(coords, forceID, campaign, contract, track, sticky);
     }

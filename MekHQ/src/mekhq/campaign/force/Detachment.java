@@ -32,7 +32,7 @@
  */
 package mekhq.campaign.force;
 
-import static mekhq.campaign.market.contractMarket.ContractAutomation.performAutomatedActivation;
+import static mekhq.campaign.mission.contract.utilities.ContractAutomation.performAutomatedActivation;
 
 import java.util.Objects;
 
@@ -46,8 +46,8 @@ import mekhq.campaign.ForceHumanResources;
 import mekhq.campaign.LocalHangar;
 import mekhq.campaign.LocalPersonnel;
 import mekhq.campaign.LocalWarehouse;
-import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.campaignOptions.CampaignOption;
+import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.location.ILocation;
 import mekhq.campaign.location.IPlace;
 import mekhq.campaign.location.LocationNode;

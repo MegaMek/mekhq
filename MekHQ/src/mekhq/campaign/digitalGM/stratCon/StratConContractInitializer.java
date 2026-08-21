@@ -68,16 +68,14 @@ import mekhq.campaign.digitalGM.stratCon.sectorGeneration.StratConSectorGenerato
 import mekhq.campaign.digitalGM.stratCon.sectorGeneration.StratConSectorPlanner;
 import mekhq.campaign.digitalGM.stratCon.sectorGeneration.StratConSectorShape;
 import mekhq.campaign.force.Formation;
-import mekhq.campaign.mission.AtBContract;
-import mekhq.campaign.mission.AtBDynamicScenario;
-import mekhq.campaign.mission.Mission;
-import mekhq.campaign.mission.Scenario;
-import mekhq.campaign.mission.ScenarioForceTemplate.ForceAlignment;
-import mekhq.campaign.mission.ScenarioTemplate;
-import mekhq.campaign.mission.atb.AtBScenarioModifier;
-import mekhq.campaign.mission.enums.ContractMoraleLevel;
+import mekhq.campaign.mission.contract.AbstractContract;
+import mekhq.campaign.mission.scenarios.AtBDynamicScenario;
+import mekhq.campaign.mission.scenarios.Scenario;
+import mekhq.campaign.mission.scenarios.ScenarioForceTemplate.ForceAlignment;
+import mekhq.campaign.mission.scenarios.ScenarioTemplate;
+import mekhq.campaign.mission.scenarios.atb.AtBScenarioModifier;
 import mekhq.campaign.universe.Faction;
-import mekhq.campaign.universe.PlanetarySystem;
+import mekhq.campaign.universe.Planet;
 import mekhq.campaign.universe.enums.Alphabet;
 
 /**
@@ -143,7 +141,7 @@ public class StratConContractInitializer {
     /**
      * Initializes the campaign state given a contract, campaign and contract definition
      */
-    public static void initializeCampaignState(AtBContract contract, Campaign campaign,
+    public static void initializeCampaignState(AbstractContract contract, Campaign campaign,
           StratConContractDefinition contractDefinition) {
         StratConCampaignState campaignState = new StratConCampaignState(contract);
         campaignState.setBriefingText(contractDefinition.getBriefing() +
@@ -171,7 +169,7 @@ public class StratConContractInitializer {
 
         // Decide how many sectors to generate and how large each one is. The planner always returns at least one
         // sector, so no separate zero-sector fallback is needed.
-        List<SectorSpec> sectorSpecs = StratConSectorPlanner.generateSectorSpecs(contract.getRequiredCombatTeams(),
+        List<SectorSpec> sectorSpecs = StratConSectorPlanner.generateSectorSpecs(contract.getScale(),
               campaignOptions.get(CampaignOption.STRAT_CON_SECTOR_COUNT_METHOD),
               maximumTeamsPerSector(planetProfile,
                     campaignOptions.get(CampaignOption.STRAT_CON_SECTOR_SIZE_MULTIPLIER)));
@@ -179,7 +177,7 @@ public class StratConContractInitializer {
         // Ares Conventions: when both the employer and the enemy are signatories, urban targeting is off-limits.
         int year = campaign.getLocalDate().getYear();
         boolean allowCities = !(contract.getEmployerFaction().isAresConventionsSignatory(year) &&
-                                      contract.getEnemy().isAresConventionsSignatory(year));
+                                      contract.getEnemyFaction().isAresConventionsSignatory(year));
 
         // Sectors are named after the Greek alphabet in order (Sector Alpha, Sector Beta, ...). When there are more
         // sectors than letters the letters wrap around, so first tally how many sectors will share each letter; any
@@ -218,7 +216,7 @@ public class StratConContractInitializer {
                 int objectiveCount = objectiveParams.objectiveCount > 0 ?
                                            (int) objectiveParams.objectiveCount :
                                            (int) max(1,
-                                                 -objectiveParams.objectiveCount * contract.getRequiredCombatTeams());
+                                                 -objectiveParams.objectiveCount * contract.getScale());
 
                 List<Integer> trackObjects = trackObjectDistribution(objectiveCount, campaignState.getTrackCount());
 
@@ -288,7 +286,7 @@ public class StratConContractInitializer {
             int facilityCount = contractDefinition.getAlliedFacilityCount() > 0 ?
                                       (int) contractDefinition.getAlliedFacilityCount() :
                                       (int) (-contractDefinition.getAlliedFacilityCount() *
-                                                   contract.getRequiredCombatTeams());
+                                                   contract.getScale());
 
             List<Integer> trackObjects = trackObjectDistribution(facilityCount, campaignState.getTrackCount());
 
@@ -306,7 +304,7 @@ public class StratConContractInitializer {
             facilityCount = contractDefinition.getHostileFacilityCount() > 0 ?
                                   (int) contractDefinition.getHostileFacilityCount() :
                                   (int) (-contractDefinition.getHostileFacilityCount() *
-                                               contract.getRequiredCombatTeams());
+                                               contract.getScale());
 
             trackObjects = trackObjectDistribution(facilityCount, campaignState.getTrackCount());
 
@@ -326,28 +324,6 @@ public class StratConContractInitializer {
         if (!isUseMaplessMode) {
             for (StratConTrackState track : campaignState.getTracks()) {
                 connectFacilitiesToRoads(track, contract, campaign);
-            }
-        }
-
-        // Determine starting morale
-        if (contract.getContractType().isGarrisonDuty() || contract.getContractType().isRetainer()) {
-            contract.setMoraleLevel(ContractMoraleLevel.ROUTED);
-
-            LocalDate startDate = contract.getStartDate();
-            startDate = startDate == null ? campaign.getLocalDate() : startDate;
-            LocalDate routEnd = startDate.plusMonths(max(1, Compute.d6() - 3)).minusDays(1);
-            contract.setRoutEndDate(routEnd);
-        } else {
-            contract.checkMorale(campaign, campaign.getLocalDate());
-
-            if (contract.getMoraleLevel().isRouted()) {
-                contract.setMoraleLevel(ContractMoraleLevel.CRITICAL);
-            }
-
-            if (contract.getContractType().isReliefDuty()) {
-                int currentMoraleLevel = min(6, contract.getMoraleLevel().ordinal() + 1);
-
-                contract.setMoraleLevel(ContractMoraleLevel.parseFromString(String.valueOf(currentMoraleLevel)));
             }
         }
 
@@ -455,13 +431,13 @@ public class StratConContractInitializer {
      * @param contract the contract the track belongs to (source of the planet profile and Ares-Conventions status)
      * @param campaign the campaign (source of options and the current date)
      */
-    public static void regenerateTrack(StratConTrackState track, AtBContract contract, Campaign campaign) {
+    public static void regenerateTrack(StratConTrackState track, AbstractContract contract, Campaign campaign) {
         CampaignOptions campaignOptions = campaign.getCampaignOptions();
         PlanetProfile planetProfile = PlanetProfile.from(contract, campaign);
 
         int year = campaign.getLocalDate().getYear();
         boolean allowCities = !(contract.getEmployerFaction().isAresConventionsSignatory(year) &&
-                                      contract.getEnemy().isAresConventionsSignatory(year));
+                                      contract.getEnemyFaction().isAresConventionsSignatory(year));
 
         // Re-roll the latitude band and recompute the temperature from it (matching initializeTrackState), so a
         // regenerated sector's climate actually changes and drives the new biome selection - not just its terrain.
@@ -602,7 +578,7 @@ public class StratConContractInitializer {
      * @param contract  the contract, for the planet-owner road rules
      * @param campaign  the campaign, for the current date and options
      */
-    public static boolean resizeTrack(StratConTrackState track, int newWidth, int newHeight, AtBContract contract,
+    public static boolean resizeTrack(StratConTrackState track, int newWidth, int newHeight, AbstractContract contract,
           Campaign campaign) {
         int width = max(1, newWidth);
         int height = max(1, newHeight);
@@ -788,7 +764,7 @@ public class StratConContractInitializer {
      * @param contract the contract, for the planet-owner road rules
      * @param campaign the campaign, for the current date and options
      */
-    public static void applyTerrainChange(StratConTrackState track, AtBContract contract, Campaign campaign) {
+    public static void applyTerrainChange(StratConTrackState track, AbstractContract contract, Campaign campaign) {
         // A city that has just been flooded is no longer a city.
         track.getCities().removeIf(coords -> StratConBiomeManifest.isOceanTerrain(track.getTerrainTile(coords)));
 
@@ -813,7 +789,8 @@ public class StratConContractInitializer {
      * @param contract the contract (source of the planet and the employer/enemy factions)
      * @param campaign the campaign, for the current date and options
      */
-    public static void connectFacilitiesToRoads(StratConTrackState track, AtBContract contract, Campaign campaign) {
+    public static void connectFacilitiesToRoads(StratConTrackState track, AbstractContract contract,
+          Campaign campaign) {
         StratConGMs.sectorGeneration(campaign.getCampaignOptions())
               .connectFacilitiesToRoads(track,
                     planetOwnedFacilityCoords(track, contract, campaign.getLocalDate()));
@@ -830,18 +807,18 @@ public class StratConContractInitializer {
      *
      * @return the coordinates of the qualifying facilities (possibly empty)
      */
-    private static Set<StratConCoords> planetOwnedFacilityCoords(StratConTrackState track, AtBContract contract,
+    private static Set<StratConCoords> planetOwnedFacilityCoords(StratConTrackState track, AbstractContract contract,
           LocalDate date) {
         Set<StratConCoords> result = new HashSet<>();
 
-        PlanetarySystem system = contract.getSystem();
-        if (system == null) {
+        Planet planet = contract.getTargetPlanet();
+        if (planet == null) {
             return result;
         }
 
-        Set<Faction> owners = system.getFactionSet(date);
+        Set<Faction> owners = planet.getFactionSet(date);
         boolean employerOwns = owners.contains(contract.getEmployerFaction());
-        boolean enemyOwns = owners.contains(contract.getEnemy());
+        boolean enemyOwns = owners.contains(contract.getEnemyFaction());
 
         if (!employerOwns && !enemyOwns) {
             return result;
@@ -1201,14 +1178,14 @@ public class StratConContractInitializer {
      * </ul>
      *
      * @param campaign           the {@link Campaign} managing the state of the overall gameplay
-     * @param contract           the {@link AtBContract} related to the current StratCon campaign
+     * @param contract           the {@link AbstractContract} related to the current StratCon campaign
      * @param trackState         the {@link StratConTrackState} representing the track where objectives are placed
      * @param numScenarios       the number of objective scenarios to generate
      * @param objectiveScenarios a list of {@link String} identifiers for potential scenarios that can be generated
      * @param objectiveModifiers a list of optional {@link String} modifiers to apply to the generated scenarios; can be
      *                           {@code null} if no modifiers are required
      */
-    private static void initializeObjectiveScenarios(Campaign campaign, AtBContract contract,
+    private static void initializeObjectiveScenarios(Campaign campaign, AbstractContract contract,
           StratConTrackState trackState, int numScenarios, List<String> objectiveScenarios,
           List<String> objectiveModifiers) {
         // pick scenario from subset
@@ -1392,24 +1369,23 @@ public class StratConContractInitializer {
      * Given a mission (that's an AtB contract), restore track state information, such as pointers from StratCon
      * scenario objects to AtB scenario objects.
      */
-    public static void restoreTransientStratconInformation(Mission m, Campaign campaign) {
-        if (m instanceof AtBContract atbContract) {
-            // Having loaded scenarios and such, we now need to go through any StratCon
-            // scenarios for this contract
-            // and set their backing scenario pointers to the existing scenarios stored in
-            // the campaign for this contract
-            if (atbContract.getStratConCampaignState() != null) {
-                for (StratConTrackState track : atbContract.getStratConCampaignState().getTracks()) {
-                    for (StratConScenario scenario : track.getScenarios().values()) {
-                        Scenario campaignScenario = campaign.getScenario(scenario.getBackingScenarioID());
+    public static void restoreTransientStratconInformation(AbstractContract mission, Campaign campaign) {
+        // Having loaded scenarios and such, we now need to go through any StratCon
+        // scenarios for this contract
+        // and set their backing scenario pointers to the existing scenarios stored in
+        // the campaign for this contract
+        StratConCampaignState campaignState = mission.getStratConCampaignState();
+        if (campaignState != null) {
+            for (StratConTrackState track : campaignState.getTracks()) {
+                for (StratConScenario scenario : track.getScenarios().values()) {
+                    Scenario campaignScenario = campaign.getScenario(scenario.getBackingScenarioID());
 
-                        if ((campaignScenario instanceof AtBDynamicScenario)) {
-                            scenario.setBackingScenario((AtBDynamicScenario) campaignScenario);
-                        } else {
-                            LOGGER.warn("Unable to set backing scenario for StratCon scenario in track {} ID {}",
-                                  track.getDisplayableName(),
-                                  scenario.getBackingScenarioID());
-                        }
+                    if ((campaignScenario instanceof AtBDynamicScenario)) {
+                        scenario.setBackingScenario((AtBDynamicScenario) campaignScenario);
+                    } else {
+                        LOGGER.warn("Unable to set backing scenario for StratCon scenario in track {} ID {}",
+                              track.getDisplayableName(),
+                              scenario.getBackingScenarioID());
                     }
                 }
             }

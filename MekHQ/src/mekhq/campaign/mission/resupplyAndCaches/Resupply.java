@@ -57,13 +57,14 @@ import megamek.common.equipment.MiscType;
 import megamek.common.units.Entity;
 import megamek.common.units.Mek;
 import mekhq.campaign.Campaign;
+import mekhq.campaign.campaignOptions.CampaignOption;
 import mekhq.campaign.finances.Money;
 import mekhq.campaign.force.CombatTeam;
 import mekhq.campaign.force.Formation;
 import mekhq.campaign.location.IPlace;
 import mekhq.campaign.market.PartsInUseManager;
 import mekhq.campaign.market.procurement.Procurement;
-import mekhq.campaign.mission.AtBContract;
+import mekhq.campaign.mission.contract.AbstractContract;
 import mekhq.campaign.parts.*;
 import mekhq.campaign.parts.enums.PartQuality;
 import mekhq.campaign.parts.equipment.AmmoBin;
@@ -82,7 +83,6 @@ import mekhq.campaign.unit.Unit;
 import mekhq.campaign.universe.Faction;
 import mekhq.campaign.universe.factionStanding.FactionStandingUtilities;
 import mekhq.campaign.universe.factionStanding.FactionStandings;
-import mekhq.campaign.campaignOptions.CampaignOption;
 
 /**
  * The {@code Resupply} class manages the resupply process during a campaign. It calculates the required resupply
@@ -95,7 +95,7 @@ import mekhq.campaign.campaignOptions.CampaignOption;
  */
 public class Resupply {
     private final Campaign campaign;
-    private final AtBContract contract;
+    private final AbstractContract contract;
     private final ResupplyType resupplyType;
     private final Faction employerFaction;
     private final int currentYear;
@@ -134,7 +134,7 @@ public class Resupply {
      * @param campaign The current campaign.
      * @param contract The specific contract under which the resupply process is conducted.
      */
-    public Resupply(Campaign campaign, AtBContract contract, ResupplyType resupplyType) {
+    public Resupply(Campaign campaign, AbstractContract contract, ResupplyType resupplyType) {
         this.campaign = campaign;
         this.contract = contract;
         this.resupplyType = resupplyType;
@@ -171,9 +171,9 @@ public class Resupply {
     /**
      * Retrieves the current contract associated with the resupply operation.
      *
-     * @return An {@link AtBContract} representing the current contract.
+     * @return An {@link AbstractContract} representing the current contract.
      */
-    public AtBContract getContract() {
+    public AbstractContract getContract() {
         return contract;
     }
 
@@ -405,7 +405,7 @@ public class Resupply {
         this.usePlayerConvoy = usePlayerConvoy;
     }
 
-    static int calculateTargetCargoTonnage(Campaign campaign, AtBContract contract) {
+    static int calculateTargetCargoTonnage(Campaign campaign, AbstractContract contract) {
         double unitTonnage = 0;
 
         // First, calculate the total tonnage across all combat units in the campaign.
@@ -443,7 +443,7 @@ public class Resupply {
 
         if (campaign.getCampaignOptions().isUseFactionStandingResupplySafe()) {
             FactionStandings standings = campaign.getPlayerForce().getFactionStandings();
-            double regard = standings.getRegardForFaction(contract.getEmployerCode(), true);
+            double regard = standings.getRegardForFaction(contract.getEmployerFactionCode(), true);
             double resupplyMultiplier = FactionStandingUtilities.getResupplyWeightModifier(regard);
             dropSize *= resupplyMultiplier;
         }
@@ -451,7 +451,7 @@ public class Resupply {
         return (int) max(CARGO_MINIMUM_WEIGHT, round(dropSize));
     }
 
-    private static double getDropSize(AtBContract contract, double unitTonnage) {
+    private static double getDropSize(AbstractContract contract, double unitTonnage) {
         final int INDIVIDUAL_TONNAGE_ALLOWANCE = 80; // This is how many tons the employer will budget per unit
         final int tonnageCap = contract.getRequiredCombatElements() * INDIVIDUAL_TONNAGE_ALLOWANCE;
 
@@ -836,7 +836,8 @@ public class Resupply {
         Person negotiator;
         negotiatorSkill = NONE.ordinal();
 
-        if (contract.getContractType().isGuerrillaType() || PIRATE_FACTION_CODE.equals(contract.getEmployerCode())) {
+        if (contract.getObjectiveType().isGuerrillaType() ||
+                  PIRATE_FACTION_CODE.equals(contract.getEmployerFactionCode())) {
             negotiator = campaign.getPlayerForce().getHumanResources()
                                .getCommander(campaign.getCampaignOptions(),
                                      campaign.getPlayerForce().isClanForce(),

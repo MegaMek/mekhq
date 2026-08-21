@@ -7,7 +7,7 @@
         <desc></desc>
         <id>2</id>
         <scenarios>
-            <scenario id="1" type="mekhq.campaign.mission.AtBDynamicScenario">
+            <scenario id="1" type="mekhq.campaign.mission.scenarios.AtBDynamicScenario">
                 <name>Assassination</name>
                 <stratConScenarioType>NONE</stratConScenarioType>
                 <desc>This is a precision strike inside an active warzone. The enemy dominates the field, but we’re not here for a prolonged engagement—we’re here for a kill mission. Your primary objective is to assassinate a high-value target before they can escape. This individual is critical to the enemy’s war effort, and their elimination will shift the balance in our favor.

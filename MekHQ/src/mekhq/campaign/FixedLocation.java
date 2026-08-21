@@ -72,6 +72,10 @@ public class FixedLocation extends AbstractLocation {
     public void writeToXML(PrintWriter pw, int indent) {
         MHQXMLUtility.writeSimpleXMLOpenTag(pw, indent++, "fixedLocation");
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "currentSystemId", currentSystem.getId());
+        // Deliberately not "currentPlanetId" - that name is read elsewhere as an alias for the system id.
+        if (currentPlanet != null) {
+            MHQXMLUtility.writeSimpleXMLTag(pw, indent, "currentWorldId", currentPlanet.getId());
+        }
         locationNode.writeToXML(pw, indent);
         MHQXMLUtility.writeSimpleXMLCloseTag(pw, --indent, "fixedLocation");
     }
@@ -103,6 +107,8 @@ public class FixedLocation extends AbstractLocation {
         try {
             returnValue = new FixedLocation(null);
             NodeList nodeList = wn.getChildNodes();
+            // A world id only resolves against its system, and the tags can arrive in any order, so resolve after.
+            String pendingWorldId = null;
             for (int x = 0; x < nodeList.getLength(); x++) {
                 Node wn2 = nodeList.item(x);
                 if (wn2.getNodeType() != Node.ELEMENT_NODE) {
@@ -119,8 +125,18 @@ public class FixedLocation extends AbstractLocation {
                         }
                     }
                     returnValue.currentSystem = system;
+                } else if (wn2.getNodeName().equalsIgnoreCase("currentWorldId")) {
+                    pendingWorldId = wn2.getTextContent().trim();
                 } else if (wn2.getNodeName().equalsIgnoreCase("locationNodeChildren")) {
                     LocationNode.reconnectChildren(wn2, returnValue, campaign);
+                }
+            }
+
+            if ((pendingWorldId != null) && (returnValue.currentSystem != null)) {
+                returnValue.currentPlanet = returnValue.currentSystem.getPlanetById(pendingWorldId);
+                if (returnValue.currentPlanet == null) {
+                    logger.warn("Couldn't find world {} in system {}; falling back to the primary world.",
+                          pendingWorldId, returnValue.currentSystem.getId());
                 }
             }
         } catch (Exception ex) {

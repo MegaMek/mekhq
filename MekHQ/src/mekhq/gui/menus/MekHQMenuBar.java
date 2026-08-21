@@ -85,7 +85,6 @@ import mekhq.campaign.events.OptionsChangedEvent;
 import mekhq.campaign.events.OrganizationChangedEvent;
 import mekhq.campaign.finances.Finances;
 import mekhq.campaign.finances.financialInstitutions.FinancialInstitutions;
-import mekhq.campaign.market.contractMarket.AbstractContractMarket;
 import mekhq.campaign.market.unitMarket.AbstractUnitMarket;
 import mekhq.campaign.parts.Part;
 import mekhq.campaign.parts.enums.PartQuality;
@@ -1023,11 +1022,6 @@ public class MekHQMenuBar extends JMenuBar {
         if (unitMarket.getMethod() != newOptions.get(CampaignOption.UNIT_MARKET_METHOD)) {
             getCampaign().setUnitMarket(newOptions.get(CampaignOption.UNIT_MARKET_METHOD).getUnitMarket());
             getCampaign().getUnitMarket().setOffers(unitMarket.getOffers());
-        }
-
-        AbstractContractMarket contractMarket = getCampaign().getContractMarket();
-        if (contractMarket.getMethod() != newOptions.get(CampaignOption.CONTRACT_MARKET_METHOD)) {
-            getCampaign().setContractMarket(newOptions.get(CampaignOption.CONTRACT_MARKET_METHOD).getContractMarket());
         }
 
         if (atb != newOptions.isUseStratCon()) {

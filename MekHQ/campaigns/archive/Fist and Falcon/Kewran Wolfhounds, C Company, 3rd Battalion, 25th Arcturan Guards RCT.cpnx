@@ -1703,7 +1703,7 @@
 				keep tabs on the Falcons’ movements.</desc>
 			<id>1</id>
 			<scenarios>
-				<scenario id="1" type="mekhq.campaign.mission.Scenario">
+				<scenario id="1" type="mekhq.campaign.mission.scenarios.Scenario">
 					<name>Setting the Tone</name>
 					<desc>I can hear the hauptmann tapping on his console. He doesn’t know his mike is hot and
 						it’s broadcasting his noise. If the first leutnant were here I’m sure she’d say

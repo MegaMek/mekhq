@@ -51,7 +51,7 @@ import mekhq.campaign.digitalGM.stratCon.StratConContractInitializer.ResizeImpac
 import mekhq.campaign.digitalGM.stratCon.biome.StratConBiomeManifest;
 import mekhq.campaign.digitalGM.stratCon.facility.StratConFacility;
 import mekhq.campaign.digitalGM.stratCon.sectorGeneration.StratConSectorCountMethod;
-import mekhq.campaign.mission.AtBContract;
+import mekhq.campaign.mission.contract.AbstractContract;
 import mekhq.campaign.universe.Faction;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
@@ -105,13 +105,13 @@ class StratConSectorResizeTest {
      * A contract on a world held by neither party, so no facility is folded into the road network. The factions are
      * stubbed because regeneration consults them for the Ares Conventions before it generates anything.
      */
-    private static AtBContract contract() {
+    private static AbstractContract contract() {
         Faction faction = mock(Faction.class);
         when(faction.isAresConventionsSignatory(anyInt())).thenReturn(false);
 
-        AtBContract contract = mock(AtBContract.class);
+        AbstractContract contract = mock(AbstractContract.class);
         when(contract.getEmployerFaction()).thenReturn(faction);
-        when(contract.getEnemy()).thenReturn(faction);
+        when(contract.getEnemyFaction()).thenReturn(faction);
         return contract;
     }
 

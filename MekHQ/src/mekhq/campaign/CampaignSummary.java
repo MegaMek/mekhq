@@ -55,11 +55,11 @@ import java.util.List;
 import megamek.common.units.Entity;
 import megamek.common.units.Infantry;
 import megamek.common.units.UnitType;
-import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.campaignOptions.CampaignOption;
+import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.force.Formation;
-import mekhq.campaign.mission.Mission;
-import mekhq.campaign.mission.enums.MissionStatus;
+import mekhq.campaign.mission.contract.AbstractContract;
+import mekhq.campaign.mission.contract.contractData.MissionStatus;
 import mekhq.campaign.mission.rentals.ContractRentalType;
 import mekhq.campaign.mission.rentals.FacilityRentals;
 import mekhq.campaign.personnel.Person;
@@ -190,8 +190,13 @@ public class CampaignSummary {
 
         // missions
         countMissionByStatus = new int[MissionStatus.values().length];
-        for (Mission m : campaign.getMissions()) {
-            countMissionByStatus[m.getStatus().ordinal()]++;
+        for (AbstractContract contract : campaign.getContractHistoryAsMap().values()) {
+            // No status-based accessor covers "every status including active", so the raw map is right here - but it
+            // is unfiltered, so a contract without a status has to be skipped rather than indexed on.
+            MissionStatus status = contract.getStatus();
+            if (status != null) {
+                countMissionByStatus[status.ordinal()]++;
+            }
         }
 
         completedMissions = 0;

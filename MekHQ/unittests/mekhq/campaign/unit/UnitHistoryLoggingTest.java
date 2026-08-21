@@ -57,7 +57,7 @@ import mekhq.campaign.Campaign;
 import mekhq.campaign.log.AssignmentLogEntry;
 import mekhq.campaign.log.LogEntry;
 import mekhq.campaign.log.UnitLogger;
-import mekhq.campaign.mission.Scenario;
+import mekhq.campaign.mission.scenarios.Scenario;
 import mekhq.campaign.personnel.Person;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;

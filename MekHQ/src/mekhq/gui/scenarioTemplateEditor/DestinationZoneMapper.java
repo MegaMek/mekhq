@@ -36,7 +36,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import megamek.client.bot.princess.CardinalEdge;
-import mekhq.campaign.mission.ScenarioForceTemplate;
+import mekhq.campaign.mission.scenarios.ScenarioForceTemplate;
 
 /**
  * Translates between the "Destination Zone" combo box index shown in {@link ScenarioTemplateEditorDialog} and the

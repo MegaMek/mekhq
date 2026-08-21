@@ -33,15 +33,14 @@
 
 package mekhq.campaign.events.missions;
 
-import mekhq.campaign.mission.Mission;
+import mekhq.campaign.mission.contract.AbstractContract;
 
 /**
  * Triggered when a mission or contract is removed from the campaign.
  */
 public class MissionRemovedEvent extends MissionEvent {
 
-    public MissionRemovedEvent(Mission mission) {
+    public MissionRemovedEvent(AbstractContract mission) {
         super(mission);
     }
-
 }

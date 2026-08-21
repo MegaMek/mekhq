@@ -38,7 +38,7 @@ import javax.swing.JFrame;
 
 import megamek.client.ui.comboBoxes.MMComboBox;
 import megamek.common.annotations.Nullable;
-import mekhq.campaign.mission.enums.MissionStatus;
+import mekhq.campaign.mission.contract.contractData.MissionStatus;
 import mekhq.campaign.universe.Faction;
 
 /**

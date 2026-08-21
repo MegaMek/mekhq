@@ -32,9 +32,9 @@
  */
 package mekhq.campaign.finances;
 
+import static mekhq.campaign.finances.AlternatePaymentModelValues.adjustValuesForDiminishingReturns;
+import static mekhq.campaign.finances.AlternatePaymentModelValues.getDiminishingReturnsStart;
 import static mekhq.campaign.force.Formation.FORMATION_NONE;
-import static mekhq.campaign.market.contractMarket.AlternatePaymentModelValues.adjustValuesForDiminishingReturns;
-import static mekhq.campaign.market.contractMarket.AlternatePaymentModelValues.getDiminishingReturnsStart;
 import static mekhq.campaign.personnel.ranks.Rank.RWO_MIN;
 
 import java.time.LocalDate;
@@ -43,6 +43,7 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.UUID;
 
 import megamek.common.equipment.Engine;
@@ -50,12 +51,11 @@ import megamek.common.units.Entity;
 import megamek.logging.MMLogger;
 import mekhq.campaign.AbstractLocation;
 import mekhq.campaign.Campaign;
-import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.campaignOptions.CampaignOption;
+import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.finances.enums.TransactionType;
 import mekhq.campaign.force.Formation;
-import mekhq.campaign.market.contractMarket.AlternatePaymentModelValues;
-import mekhq.campaign.mission.AtBContract;
+import mekhq.campaign.mission.contract.AbstractContract;
 import mekhq.campaign.parts.Part;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.education.EducationController;
@@ -173,7 +173,7 @@ public record Accountant(Campaign campaign) {
         if (isOnPlanet && campaignOptions.isUseFactionStandingBarracksCostsSafe()) {
             barrackCostMultiplier = setFactionStandingBarrackCostMultiplier(campaign.getPlayerForce()
                                                                                   .getFactionStandings(),
-                  location.getCurrentSystem(), campaign.getActiveAtBContracts(), campaign.getLocalDate());
+                  location.getCurrentSystem(), campaign.getActiveContracts(), campaign.getLocalDate());
         }
 
         return getFoodAndHousingTotal(personnel, payForFood, payForHousing, barrackCostMultiplier);
@@ -520,14 +520,14 @@ public record Accountant(Campaign campaign) {
      * @since 0.50.07
      */
     private static double setFactionStandingBarrackCostMultiplier(FactionStandings factionStandings,
-          PlanetarySystem currentSystem, List<AtBContract> activeAtBContracts, LocalDate today) {
+          PlanetarySystem currentSystem, List<AbstractContract> activeContracts, LocalDate today) {
         double maxRegard = 0.0;
         boolean foundContract = false;
 
         // Consider contracts in the current system
-        for (AtBContract contract : activeAtBContracts) {
-            if (contract.getSystem().equals(currentSystem)) {
-                double currentRegard = factionStandings.getRegardForFaction(contract.getEmployerCode(), true);
+        for (AbstractContract contract : activeContracts) {
+            if (Objects.equals(contract.getTargetSystem(), currentSystem)) {
+                double currentRegard = factionStandings.getRegardForFaction(contract.getEmployerFactionCode(), true);
                 if (currentRegard > maxRegard) {
                     maxRegard = currentRegard;
                 }

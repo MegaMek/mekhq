@@ -48,14 +48,14 @@ import megamek.common.annotations.Nullable;
 import megamek.common.compute.Compute;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
-import mekhq.campaign.mission.AtBContract;
+import mekhq.campaign.campaignOptions.CampaignOption;
+import mekhq.campaign.mission.contract.AbstractContract;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.skills.Skill;
 import mekhq.campaign.personnel.skills.SkillModifierData;
 import mekhq.campaign.universe.factionStanding.FactionStandingUtilities;
 import mekhq.campaign.universe.factionStanding.FactionStandings;
 import mekhq.utilities.ReportingUtilities;
-import mekhq.campaign.campaignOptions.CampaignOption;
 
 /**
  * This class handles Support Point negotiations for StratCon.
@@ -90,13 +90,13 @@ public class SupportPointNegotiation {
      */
     public static void negotiateAdditionalSupportPoints(Campaign campaign) {
         // Fetch all active contracts and sort them by start date (oldest -> newest)
-        List<AtBContract> activeContracts = campaign.getActiveAtBContracts();
+        List<AbstractContract> activeContracts = campaign.getActiveContracts();
 
         if (activeContracts.isEmpty()) {
             return;
         }
 
-        List<AtBContract> sortedContracts = getSortedContractsByStartDate(activeContracts);
+        List<AbstractContract> sortedContracts = getSortedContractsByStartDate(activeContracts);
 
         // Get sorted Admin/Transport personnel
         List<Person> adminTransport = getSortedAdminTransportPersonnel(campaign);
@@ -108,7 +108,7 @@ public class SupportPointNegotiation {
         }
 
         // Iterate over contracts and negotiate support points
-        for (AtBContract contract : sortedContracts) {
+        for (AbstractContract contract : sortedContracts) {
             if (adminTransport.isEmpty()) {
                 break;
             }
@@ -128,10 +128,10 @@ public class SupportPointNegotiation {
      * outcome is appended to the campaign reports.</p>
      *
      * @param campaign The {@link Campaign} instance managing the current game state.
-     * @param contract The {@link AtBContract} instance representing the contract for which initial support points are
-     *                 being negotiated.
+     * @param contract The {@link AbstractContract} instance representing the contract for which initial support points
+     *                 are being negotiated.
      */
-    public static void negotiateInitialSupportPoints(Campaign campaign, AtBContract contract) {
+    public static void negotiateInitialSupportPoints(Campaign campaign, AbstractContract contract) {
         // Get sorted Admin/Transport personnel
         List<Person> adminTransport = getSortedAdminTransportPersonnel(campaign);
 
@@ -153,21 +153,19 @@ public class SupportPointNegotiation {
      * assigned, and support points are added to the contract if successfully negotiated.</p>
      *
      * @param campaign             The {@link Campaign} instance managing the current game state.
-     * @param contract             The {@link AtBContract} instance for which support points are being processed.
+     * @param contract             The {@link AbstractContract} instance for which support points are being processed.
      * @param adminTransport       A {@link List} of available {@link Person} objects representing Admin/Transport
      *                             personnel.
      * @param isInitialNegotiation {@code true} if the negotiation took place at the beginning of the contract,
      *                             otherwise {@code false}
      */
-    private static void processContractSupportPoints(Campaign campaign, AtBContract contract,
+    private static void processContractSupportPoints(Campaign campaign, AbstractContract contract,
           List<Person> adminTransport, boolean isInitialNegotiation) {
         int negotiatedSupportPoints = 0;
-        int maxSupportPoints = isInitialNegotiation ?
-                                     contract.getRequiredCombatTeams() * 3 :
-                                     contract.getRequiredCombatTeams();
+        int maxSupportPoints = isInitialNegotiation ? contract.getMaximumSupportPoints() : contract.getScale();
 
         FactionStandings factionStandings = campaign.getPlayerForce().getFactionStandings();
-        double regard = factionStandings.getRegardForFaction(contract.getEmployerCode(), true);
+        double regard = factionStandings.getRegardForFaction(contract.getEmployerFactionCode(), true);
         boolean isUseFactionStandingSupportPoints = campaign.getCampaignOptions()
                                                           .isUseFactionStandingSupportPointsSafe();
 
@@ -214,7 +212,7 @@ public class SupportPointNegotiation {
         }
 
         if (isInitialNegotiation && isUseFactionStandingSupportPoints) {
-            int multiplier = contract.getRequiredCombatTeams();
+            int multiplier = contract.getScale();
             negotiatedSupportPoints += FactionStandingUtilities.getSupportPointModifierContractStart(regard) *
                                              multiplier;
         }
@@ -280,10 +278,10 @@ public class SupportPointNegotiation {
     /**
      * Sorts all active AtB contracts by their start date in ascending order.
      *
-     * @return A {@link List} of {@link AtBContract} instances, sorted by start date.
+     * @return A {@link List} of {@link AbstractContract} instances, sorted by start date.
      */
-    private static List<AtBContract> getSortedContractsByStartDate(List<AtBContract> activeContracts) {
-        activeContracts.sort(Comparator.comparing(AtBContract::getStartDate));
+    private static List<AbstractContract> getSortedContractsByStartDate(List<AbstractContract> activeContracts) {
+        activeContracts.sort(Comparator.comparing(AbstractContract::getStartDate));
         return activeContracts;
     }
 
@@ -295,10 +293,10 @@ public class SupportPointNegotiation {
      * (e.g., for weekly negotiations).</p>
      *
      * @param campaign The {@link Campaign} instance managing the current game state.
-     * @param contract An optional {@link AtBContract} instance representing the affected contract (can be
+     * @param contract An optional {@link AbstractContract} instance representing the affected contract (can be
      *                 {@code null}).
      */
-    private static void addReportNoPersonnel(Campaign campaign, @Nullable AtBContract contract) {
+    private static void addReportNoPersonnel(Campaign campaign, @Nullable AbstractContract contract) {
         String reportKey = String.format("supportPoints.%s.noAdministrators", contract == null ? "weekly" : "initial");
 
         if (contract == null) {

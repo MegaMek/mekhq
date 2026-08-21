@@ -42,9 +42,9 @@ import javax.swing.JTable;
 import mekhq.MekHQ;
 import mekhq.campaign.digitalGM.stratCon.gm.MaplessStratCon;
 import mekhq.campaign.events.scenarios.ScenarioChangedEvent;
-import mekhq.campaign.mission.AtBDynamicScenario;
-import mekhq.campaign.mission.Mission;
-import mekhq.campaign.mission.Scenario;
+import mekhq.campaign.mission.contract.AbstractContract;
+import mekhq.campaign.mission.scenarios.AtBDynamicScenario;
+import mekhq.campaign.mission.scenarios.Scenario;
 import mekhq.gui.CampaignGUI;
 import mekhq.gui.dialog.CustomizeScenarioDialog;
 import mekhq.gui.model.ScenarioTableModel;
@@ -118,7 +118,7 @@ public class ScenarioTableMouseAdapter extends JPopupMenuAdapter {
     }
 
     private void editScenario(Scenario scenario) {
-        Mission mission = gui.getCampaign().getMission(scenario.getMissionId());
+        AbstractContract mission = gui.getCampaign().getContract(scenario.getMissionId());
         if (mission != null) {
             CustomizeScenarioDialog csd = new CustomizeScenarioDialog(gui.getFrame(), true,
                   scenario, mission, gui);

@@ -48,9 +48,9 @@ import javax.swing.JTextArea;
 import javax.swing.JTextField;
 
 import megamek.common.ui.FastJScrollPane;
-import mekhq.campaign.mission.ScenarioTemplate;
-import mekhq.campaign.mission.ScenarioTemplate.BattlefieldControlType;
-import mekhq.campaign.mission.enums.ScenarioType;
+import mekhq.campaign.mission.scenarios.ScenarioTemplate;
+import mekhq.campaign.mission.scenarios.ScenarioTemplate.BattlefieldControlType;
+import mekhq.campaign.mission.scenarios.ScenarioType;
 
 /**
  * Editor panel for the top-level properties of a {@link ScenarioTemplate}: name, briefings, scenario type, battlefield

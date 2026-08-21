@@ -44,7 +44,7 @@ import megamek.logging.MMLogger;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.digitalGM.stratCon.StratConCampaignState;
 import mekhq.campaign.force.Formation;
-import mekhq.campaign.mission.AtBContract;
+import mekhq.campaign.mission.contract.AbstractContract;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.enums.PersonnelRole;
 import mekhq.utilities.MHQXMLUtility;
@@ -210,7 +210,7 @@ public class MothballInfo {
             // currently deployed to the Area of Operations.
             boolean isUseStratCon = campaign.getCampaignOptions().isUseStratCon();
             if (isUseStratCon) {
-                for (AtBContract contract : campaign.getActiveAtBContracts()) {
+                for (AbstractContract contract : campaign.getActiveContracts()) {
                     StratConCampaignState campaignState = contract.getStratConCampaignState();
 
                     if (campaignState != null) {

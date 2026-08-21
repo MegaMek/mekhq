@@ -43,7 +43,7 @@ import javax.swing.JDialog;
 import megamek.common.units.Entity;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.force.Formation;
-import mekhq.campaign.mission.AtBContract;
+import mekhq.campaign.mission.contract.AbstractContract;
 import mekhq.campaign.unit.Unit;
 import mekhq.gui.baseComponents.immersiveDialogs.ImmersiveDialogSimple;
 
@@ -55,11 +55,12 @@ public class DialogContractStart extends JDialog {
     private static final String RESOURCE_BUNDLE = "mekhq.resources.Resupply";
 
     private final Campaign campaign;
-    private final AtBContract contract;
+    private final AbstractContract contract;
 
     /**
      * Displays a dialog at the start of a contract, providing summarized details about the mission and player convoy
-     * capabilities. The content is dynamically generated based on the given {@link Campaign} and {@link AtBContract}.
+     * capabilities. The content is dynamically generated based on the given {@link Campaign} and
+     * {@link AbstractContract}.
      * <p>
      * This method: - Generates a message summarizing the player's convoy capabilities and cargo capacity. - Fetches
      * localized text from the resource bundle based on the contract type and command rights. - Displays a dialog with
@@ -68,12 +69,12 @@ public class DialogContractStart extends JDialog {
      * @param campaign the current {@link Campaign}.
      * @param contract the active contract.
      */
-    public DialogContractStart(Campaign campaign, AtBContract contract) {
+    public DialogContractStart(Campaign campaign, AbstractContract contract) {
         this.campaign = campaign;
         this.contract = contract;
 
         String outOfCharacterMessageKey = "outOfCharacter.contractStart." +
-                                                (contract.getContractType().isGuerrillaType() ?
+                                                (contract.getObjectiveType().isGuerrillaType() ?
                                                        "guerrilla" :
                                                        "normal");
 
@@ -154,7 +155,7 @@ public class DialogContractStart extends JDialog {
         String convoyMessage;
         String commanderTitle = campaign.getCommanderAddress();
 
-        if (contract.getContractType().isGuerrillaType() || campaign.isPirateCampaign()) {
+        if (contract.getObjectiveType().isGuerrillaType() || campaign.isPirateCampaign()) {
             String convoyMessageTemplate = "contractStartMessageGuerrilla.text";
             convoyMessage = getFormattedTextAt(RESOURCE_BUNDLE, convoyMessageTemplate, commanderTitle);
         } else {

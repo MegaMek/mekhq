@@ -52,6 +52,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
+import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
 import megamek.codeUtilities.ObjectUtility;
@@ -61,14 +62,14 @@ import megamek.logging.MMLogger;
 import mekhq.MHQConstants;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
+import mekhq.campaign.campaignOptions.CampaignOption;
 import mekhq.campaign.location.ILocation;
-import mekhq.campaign.mission.newContract.contractGeneration.targetFinder.EnemySelectionProfile;
-import mekhq.campaign.mission.newContract.contractGeneration.targetFinder.MissionLocationProfile;
-import mekhq.campaign.mission.newContract.contractGeneration.targetFinder.MissionTargetFinder;
+import mekhq.campaign.mission.contract.contractGeneration.targetFinder.EnemySelectionProfile;
+import mekhq.campaign.mission.contract.contractGeneration.targetFinder.MissionLocationProfile;
+import mekhq.campaign.mission.contract.contractGeneration.targetFinder.MissionTargetFinder;
 import mekhq.campaign.universe.PlanetarySystem.PlanetaryRating;
 import mekhq.campaign.universe.enums.HPGRating;
 import mekhq.campaign.universe.factionHints.FactionHints;
-import mekhq.campaign.campaignOptions.CampaignOption;
 
 /**
  * Uses Factions and Planets to weighted lists of potential employers and enemies for contract generation. Also finds a
@@ -321,6 +322,26 @@ public class RandomFactionGenerator {
      *       {@code null} if the location has no current system or no eligible faction controls anything in range.
      */
     public @Nullable Faction getRandomEmployerFaction(ILocation location, LocalDate date, boolean isMercenaryCampaign) {
+        return getRandomEmployerFaction(location, date, isMercenaryCampaign, null);
+    }
+
+    /**
+     * As {@link #getRandomEmployerFaction(ILocation, LocalDate, boolean)}, but restricting the candidate pool to
+     * factions accepted by {@code filter}. This lets callers request a theme-appropriate employer (a corporation, a
+     * noble house, a territorial government) while still drawing from factions with a regional presence near the
+     * player. Returns {@code null} when no candidate near the player satisfies the filter, so callers can fall back to
+     * a broader pool.
+     *
+     * @param location            the current location used to determine the system context for employer selection
+     * @param date                the date to use for filtering factions by temporal availability
+     * @param isMercenaryCampaign whether the selection is for a mercenary campaign
+     * @param filter              an additional predicate the candidate faction must satisfy, or {@code null} for no
+     *                            extra filtering
+     *
+     * @return a randomly selected eligible employer faction satisfying {@code filter}, or {@code null} if none exists
+     */
+    public @Nullable Faction getRandomEmployerFaction(ILocation location, LocalDate date, boolean isMercenaryCampaign,
+          @Nullable Predicate<Faction> filter) {
         PlanetarySystem system = location.getCurrentSystem();
         if (system == null) {
             return null;
@@ -338,10 +359,13 @@ public class RandomFactionGenerator {
                 continue;
             }
 
-            finalWeights.merge(faction, weight, Integer::sum);
+            if (filter == null || filter.test(faction)) {
+                finalWeights.merge(faction, weight, Integer::sum);
+            }
 
             for (Faction containedFaction : factionHints.getContainedFactions(faction, date)) {
-                if (!checkForEarlyExit(containedFaction, date, currentYear, isMercenaryCampaign)) {
+                if (!checkForEarlyExit(containedFaction, date, currentYear, isMercenaryCampaign)
+                          && (filter == null || filter.test(containedFaction))) {
                     double fractionalPresence = factionHints.getAltLocationFraction(faction, containedFaction, date);
                     int adjustedWeight = (int) ceil(weight * fractionalPresence);
                     finalWeights.merge(containedFaction, adjustedWeight, Integer::sum);

@@ -94,8 +94,8 @@ import mekhq.campaign.Campaign;
 import mekhq.campaign.CampaignController;
 import mekhq.campaign.base.PlayerBase;
 import mekhq.campaign.campaignOptions.AcquisitionsType;
-import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.campaignOptions.CampaignOption;
+import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.enums.DailyReportType;
 import mekhq.campaign.events.*;
 import mekhq.campaign.events.loans.LoanEvent;
@@ -106,7 +106,7 @@ import mekhq.campaign.finances.Money;
 import mekhq.campaign.force.Formation;
 import mekhq.campaign.icons.StandardFormationIcon;
 import mekhq.campaign.market.personnelMarket.enums.PersonnelMarketStyle;
-import mekhq.campaign.mission.Scenario;
+import mekhq.campaign.mission.scenarios.Scenario;
 import mekhq.campaign.parts.Part;
 import mekhq.campaign.parts.Refit;
 import mekhq.campaign.personnel.Person;
@@ -116,6 +116,7 @@ import mekhq.campaign.personnel.skills.SkillType;
 import mekhq.campaign.unit.Unit;
 import mekhq.campaign.universe.Faction;
 import mekhq.campaign.universe.NewsItem;
+import mekhq.campaign.universe.PlanetarySystem;
 import mekhq.campaign.utilities.AutomatedTechAssignments;
 import mekhq.gui.baseComponents.ScalingWidthConstrainedPanel;
 import mekhq.gui.baseComponents.immersiveDialogs.ImmersiveDialogSimple;
@@ -124,6 +125,7 @@ import mekhq.gui.baseComponents.roundedComponents.RoundedLineBorder;
 import mekhq.gui.baseComponents.roundedComponents.RoundedMMToggleButton;
 import mekhq.gui.dialog.*;
 import mekhq.gui.dialog.glossary.GlossaryDialog;
+import mekhq.gui.dialog.markets.contractMarket.ChaosContractMarketDialog;
 import mekhq.gui.enums.MHQTabType;
 import mekhq.gui.menus.MekHQMenuBar;
 import mekhq.gui.model.LocationFilterItem;
@@ -779,9 +781,24 @@ public class CampaignGUI extends JPanel {
      * @author Illiani
      * @since 0.50.05
      */
-    public void focusOnMission(int targetId) {
+    public void focusOnMission(UUID targetId) {
         getBriefingRoomTab().focusOnMission(targetId);
         tabMain.setSelectedIndex(getTabIndexByName(resourceMap.getString("panBriefing.TabConstraints.tabTitle")));
+    }
+
+    /**
+     * Shows the given system on the interstellar map and brings the navigation tab forward.
+     *
+     * @param system the system to focus on; ignored when {@code null}, as an unresolvable link should do nothing rather
+     *               than switch tabs
+     */
+    public void focusOnSystem(final @Nullable PlanetarySystem system) {
+        if (system == null) {
+            return;
+        }
+
+        getNavigationTab().showSystem(system);
+        tabMain.setSelectedComponent(getNavigationTab());
     }
 
     public void focusOnUnitInRepairBay(UUID id) {
@@ -847,33 +864,7 @@ public class CampaignGUI extends JPanel {
     }
 
     public void showContractMarket() {
-        CampaignOptions campaignOptions = getCampaign().getCampaignOptions();
-
-        if (campaignOptions.get(CampaignOption.CONTRACT_MARKET_METHOD).isNone()) {
-            MissionTypeDialog missionTypeDialog = getMissionTypeDialog(campaignOptions);
-
-            if (missionTypeDialog.isMission()) {
-                CustomizeMissionDialog customizeMissionDialog =
-                      new CustomizeMissionDialog(getFrame(), true, null, getCampaign());
-                customizeMissionDialog.setVisible(true);
-            }
-        } else {
-            ContractMarketDialog contractMarketDialog = new ContractMarketDialog(getFrame(), getCampaign());
-            contractMarketDialog.setVisible(true);
-        }
-    }
-
-    private MissionTypeDialog getMissionTypeDialog(CampaignOptions campaignOptions) {
-        MissionTypeDialog missionTypeDialog = new MissionTypeDialog(getFrame(), true);
-        missionTypeDialog.setVisible(true);
-
-        if (missionTypeDialog.isContract()) {
-            NewContractDialog newContractDialog = campaignOptions.isUseStratCon() ?
-                                                        new NewAtBContractDialog(getFrame(), true, getCampaign()) :
-                                                        new NewContractDialog(getFrame(), true, getCampaign());
-            newContractDialog.setVisible(true);
-        }
-        return missionTypeDialog;
+        new ChaosContractMarketDialog(getCampaign());
     }
 
     public void showUnitMarket() {
@@ -1231,7 +1222,8 @@ public class CampaignGUI extends JPanel {
             logger.warn("Cannot export person if no one is selected! Ignoring.");
             return;
         }
-        Person selectedPerson = pt.getPersonnelTableModel().getPerson(pt.getPersonnelTable().convertRowIndexToModel(row));
+        Person selectedPerson = pt.getPersonnelTableModel()
+                                      .getPerson(pt.getPersonnelTable().convertRowIndexToModel(row));
         int[] rows = pt.getPersonnelTable().getSelectedRows();
         Person[] people = Arrays.stream(rows)
                                 .mapToObj(j -> pt.getPersonnelTableModel()
@@ -1674,7 +1666,7 @@ public class CampaignGUI extends JPanel {
         if (getCampaign().getCampaignOptions().get(CampaignOption.ACQUISITIONS_TYPE) == AcquisitionsType.ANY_TECH) {
             lblPartsAvailabilityRating.setText("");
         } else {
-            int partsAvailability = getCampaign().findAtBPartsAvailabilityLevel();
+            int partsAvailability = getCampaign().findPartsAvailabilityLevel();
             lblPartsAvailabilityRating.setText(statusBarLabel("statusBar.lblPartsAvailabilityRating.text",
                   partsAvailability));
         }

@@ -32,10 +32,8 @@
  */
 package mekhq.campaign.randomEvents.randomEventsSystem;
 
-import static org.mockito.Mockito.lenient;
-
-import static mekhq.campaign.mission.enums.ContractMoraleLevel.OVERWHELMING;
-import static mekhq.campaign.mission.enums.ContractMoraleLevel.STALEMATE;
+import static mekhq.campaign.mission.contract.contractData.ContractMoraleLevel.OVERWHELMING;
+import static mekhq.campaign.mission.contract.contractData.ContractMoraleLevel.STALEMATE;
 import static mekhq.campaign.personnel.PersonnelOptions.ATOW_POISON_RESISTANCE;
 import static mekhq.campaign.personnel.enums.PersonnelRole.ADMINISTRATOR_LOGISTICS;
 import static mekhq.campaign.personnel.enums.PersonnelRole.DEPENDENT;
@@ -55,6 +53,7 @@ import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.Mockito.lenient;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import static testUtilities.MHQTestUtilities.mockCampaign;
@@ -67,10 +66,11 @@ import java.util.stream.Stream;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.LocalHangar;
 import mekhq.campaign.LocalWarehouse;
-import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.campaignOptions.CampaignOption;
+import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.digitalGM.stratCon.StratConCampaignState;
-import mekhq.campaign.mission.AtBContract;
+import mekhq.campaign.mission.contract.AbstractContract;
+import mekhq.campaign.mission.contract.ChaosContract;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.skills.SkillType;
 import mekhq.campaign.randomEvents.prisoners.PrisonerStatus;
@@ -609,10 +609,10 @@ class RandomEventEffectsManagerTest {
     void testEffectSupportPoint_stratConEnabled_pointsIncreased() {
         when(mockCampaignOptions.isUseStratCon()).thenReturn(true);
 
-        AtBContract contract = new AtBContract("Test");
+        AbstractContract contract = new ChaosContract();
         StratConCampaignState state = new StratConCampaignState(contract);
         contract.setStratConCampaignState(state);
-        when(mockCampaign.getActiveAtBContracts()).thenReturn(List.of(contract));
+        when(mockCampaign.getActiveContracts()).thenReturn(List.of(contract));
 
         runEffect(SUPPORT_POINT, List.of(PRISONERS), 5);
 
@@ -629,7 +629,7 @@ class RandomEventEffectsManagerTest {
     @Test
     void testEffectSupportPoint_noActiveContracts_emptyReport() {
         when(mockCampaignOptions.isUseStratCon()).thenReturn(true);
-        when(mockCampaign.getActiveAtBContracts()).thenReturn(List.of());
+        when(mockCampaign.getActiveContracts()).thenReturn(List.of());
 
         assertTrue(runEffect(SUPPORT_POINT, List.of(PRISONERS), 5).getMechanicalEffectsReport().isBlank());
     }
@@ -640,9 +640,9 @@ class RandomEventEffectsManagerTest {
 
     @Test
     void testEffectUniqueBartering_stalemateMorale_moraleBumped() {
-        AtBContract contract = new AtBContract("Test");
-        contract.setMoraleLevel(STALEMATE);
-        when(mockCampaign.getActiveAtBContracts()).thenReturn(List.of(contract));
+        AbstractContract contract = new ChaosContract();
+        contract.changeMorale(STALEMATE);
+        when(mockCampaign.getActiveContracts()).thenReturn(List.of(contract));
 
         runEffectForType("BARTERING", List.of(PRISONERS), 1);
 
@@ -652,9 +652,9 @@ class RandomEventEffectsManagerTest {
 
     @Test
     void testEffectUniqueBartering_overwhelmingMorale_noChange() {
-        AtBContract contract = new AtBContract("Test");
-        contract.setMoraleLevel(OVERWHELMING);
-        when(mockCampaign.getActiveAtBContracts()).thenReturn(List.of(contract));
+        AbstractContract contract = new ChaosContract();
+        contract.changeMorale(OVERWHELMING);
+        when(mockCampaign.getActiveContracts()).thenReturn(List.of(contract));
 
         RandomEventEffectsManager manager = runEffectForType("BARTERING", List.of(PRISONERS), 1);
 
@@ -665,7 +665,7 @@ class RandomEventEffectsManagerTest {
 
     @Test
     void testEffectUniqueBartering_noContracts_emptyReport() {
-        when(mockCampaign.getActiveAtBContracts()).thenReturn(List.of());
+        when(mockCampaign.getActiveContracts()).thenReturn(List.of());
 
         assertTrue(runEffectForType("BARTERING", List.of(PRISONERS), 1)
                          .getMechanicalEffectsReport().isBlank());
@@ -711,10 +711,10 @@ class RandomEventEffectsManagerTest {
 
     @Test
     void testEffectUniqueUndercover_prisonerFactionChanged() {
-        AtBContract contract = mock(AtBContract.class);
+        AbstractContract contract = mock(AbstractContract.class);
         Faction employerFaction = new Faction("employerFaction", "employerFaction");
         when(contract.getEmployerFaction()).thenReturn(employerFaction);
-        when(mockCampaign.getActiveAtBContracts()).thenReturn(List.of(contract));
+        when(mockCampaign.getActiveContracts()).thenReturn(List.of(contract));
 
         Person prisoner = makePrisoner();
         Faction originalFaction = new Faction("prisonerFaction", "prisonerFaction");
@@ -730,7 +730,7 @@ class RandomEventEffectsManagerTest {
 
     @Test
     void testEffectUniqueUndercover_noContracts_noChange() {
-        when(mockCampaign.getActiveAtBContracts()).thenReturn(List.of());
+        when(mockCampaign.getActiveContracts()).thenReturn(List.of());
 
         Person prisoner = makePrisoner();
         Faction originalFaction = new Faction();

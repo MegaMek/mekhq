@@ -39,7 +39,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import java.util.Collections;
 
 import mekhq.campaign.digitalGM.stratCon.biome.StratConBiomeManifest;
-import mekhq.campaign.mission.ScenarioForceTemplate.ForceAlignment;
+import mekhq.campaign.mission.scenarios.ScenarioForceTemplate.ForceAlignment;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
