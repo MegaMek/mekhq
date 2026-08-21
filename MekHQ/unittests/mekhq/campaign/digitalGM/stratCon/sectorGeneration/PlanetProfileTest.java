@@ -402,7 +402,7 @@ class PlanetProfileTest {
         Planet planet = mock(Planet.class);
         when(planet.getTemperature(DATE)).thenReturn(Planet.UNINHABITABLE_TEMPERATURE_CELSIUS);
         when(planet.getGravity()).thenReturn(null);
-        when(planet.getPopulation(DATE)).thenReturn(null);
+        when(planet.getPopulation(DATE)).thenReturn(0L);
         when(planet.getHPG(DATE)).thenReturn(HPGRating.X);
         return planet;
     }
