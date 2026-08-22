@@ -33,18 +33,34 @@
 package mekhq.campaign.mission.contract.contractData;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import java.io.ByteArrayInputStream;
+import java.io.InputStream;
+import java.io.PrintWriter;
+import java.io.StringWriter;
+import java.nio.charset.StandardCharsets;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.UUID;
 
+import megamek.Version;
+import megamek.common.equipment.EquipmentType;
+import mekhq.campaign.Campaign;
+import mekhq.campaign.digitalGM.stratCon.StratConCampaignState;
 import mekhq.campaign.mission.contract.AbstractContract;
 import mekhq.campaign.mission.contract.ChaosContract;
+import mekhq.campaign.mission.scenarios.Scenario;
+import mekhq.campaign.personnel.skills.SkillType;
+import mekhq.utilities.MHQXMLUtility;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.w3c.dom.Document;
+import testUtilities.MHQTestUtilities;
 
 /**
  * Tests {@link ContractHistoryData}, the campaign's single store of every contract it has ever held.
@@ -57,11 +73,23 @@ import org.junit.jupiter.api.Test;
 class ContractHistoryDataTest {
     private static final LocalDate TODAY = LocalDate.of(3051, 6, 1);
 
+    /** Any version at or above the current release; keeps the version-gated compatibility branches dormant. */
+    private static final Version VERSION = new Version(999, 0, 0);
+
     private ContractHistoryData history;
+    private Campaign campaign;
+
+    @BeforeAll
+    static void initSingletons() {
+        EquipmentType.initializeTypes();
+        // A full campaign save writes the skill-type table, so it has to exist before writeToXML is exercised.
+        SkillType.initializeTypes();
+    }
 
     @BeforeEach
     void setUp() {
         history = new ContractHistoryData();
+        campaign = MHQTestUtilities.getTestCampaign();
     }
 
     private AbstractContract add(MissionStatus status, LocalDate startDate, LocalDate endDate) {
@@ -252,4 +280,162 @@ class ContractHistoryDataTest {
     }
 
     // endregion sorting
+
+    // region save and load
+
+    /**
+     * Accepts a contract into {@code target}'s history the way {@code ContractAcceptance} does - status first, then
+     * {@link Campaign#addMission(AbstractContract)}.
+     */
+    private static AbstractContract acceptInto(Campaign target, String name) {
+        AbstractContract contract = new ChaosContract();
+        contract.setContractId(UUID.randomUUID());
+        contract.setContractName(name);
+        contract.setStatus(MissionStatus.ACTIVE);
+        contract.setScheduleData(new ContractScheduleData(TODAY, TODAY.plusMonths(6), 6));
+        target.addMission(contract);
+        return contract;
+    }
+
+    private static String write(Campaign source) {
+        StringWriter stringWriter = new StringWriter();
+        try (PrintWriter printWriter = new PrintWriter(stringWriter)) {
+            source.getContractHistoryData().writeToXML(printWriter, 0, source);
+        }
+        return stringWriter.toString();
+    }
+
+    private static void load(Campaign target, String contractsXml) throws Exception {
+        try (InputStream inputStream = new ByteArrayInputStream(contractsXml.getBytes(StandardCharsets.UTF_8))) {
+            Document document = MHQXMLUtility.newSafeDocumentBuilder().parse(inputStream);
+            assertNotNull(document.getDocumentElement());
+            ContractHistoryData.loadFromXML(document.getDocumentElement(), target, VERSION);
+        }
+    }
+
+    /**
+     * The regression behind issue #9804. Contract history used to be written from a second, always-empty map on
+     * {@code PlayerForce}, so nothing reached the save and the Briefing Room came back empty after every reload.
+     */
+    @Test
+    void anAcceptedContractSurvivesASaveAndReload() throws Exception {
+        AbstractContract accepted = acceptInto(campaign, "Reach Garrison");
+
+        Campaign reloaded = MHQTestUtilities.getTestCampaign();
+        load(reloaded, write(campaign));
+
+        AbstractContract restored = reloaded.getContract(accepted.getId());
+        assertNotNull(restored, "a contract in the campaign's history must still be there after a save and reload");
+        assertEquals("Reach Garrison", restored.getName());
+        assertEquals(1, reloaded.getContractHistoryData().size());
+    }
+
+    /** The history is what the save is written from, so a campaign holding contracts must emit a block. */
+    @Test
+    void aCampaignHoldingContractsActuallyWritesThem() {
+        acceptInto(campaign, "Reach Garrison");
+
+        String xml = write(campaign);
+
+        assertTrue(xml.contains('<' + ContractHistoryData.CONTRACTS_TAG + '>'),
+              "a campaign with contracts must emit a <contracts> block");
+        assertTrue(xml.contains("Reach Garrison"));
+    }
+
+    /**
+     * Guards the wiring rather than the codec. Issue #9804 was not a broken serializer - the serializer worked, but
+     * {@code Campaign.writeToXML} handed it a second, always-empty map on {@code PlayerForce}, so the block never
+     * reached the save. Pointing the save back at anything other than the campaign's own history fails here.
+     */
+    @Test
+    void aFullCampaignSaveCarriesTheContractHistory() {
+        acceptInto(campaign, "Reach Garrison");
+
+        StringWriter stringWriter = new StringWriter();
+        try (PrintWriter printWriter = new PrintWriter(stringWriter)) {
+            campaign.writeToXML(printWriter, false);
+        }
+        String saved = stringWriter.toString();
+
+        assertTrue(saved.contains('<' + ContractHistoryData.CONTRACTS_TAG + '>'),
+              "a full campaign save must contain the <contracts> block");
+        assertTrue(saved.contains("Reach Garrison"), "the accepted contract must appear in the campaign save");
+    }
+
+    @Test
+    void anEmptyHistoryWritesNothingAtAll() {
+        assertTrue(write(campaign).isEmpty(), "a campaign with no contracts must not emit an empty block");
+    }
+
+    @Test
+    void aLoadFullyReplacesTheCurrentHistory() throws Exception {
+        acceptInto(campaign, "Saved");
+        String saved = write(campaign);
+
+        Campaign target = MHQTestUtilities.getTestCampaign();
+        AbstractContract stale = acceptInto(target, "Stale");
+        load(target, saved);
+
+        assertNull(target.getContract(stale.getId()), "a load must not leave the previous history behind");
+        assertEquals(1, target.getContractHistoryData().size());
+    }
+
+    /**
+     * Loading goes through {@link Campaign#importMission(AbstractContract)} rather than a bare map put, so a restored
+     * contract's scenarios are registered with the campaign. A plain map put would bring the contract back with its
+     * scenarios unreachable through {@link Campaign#getScenario(int)}.
+     */
+    @Test
+    void aRestoredContractsScenariosAreRegisteredWithTheCampaign() throws Exception {
+        AbstractContract accepted = acceptInto(campaign, "Reach Garrison");
+        Scenario scenario = new Scenario("Ambush at Rasalhague");
+        scenario.setId(4242);
+        accepted.addScenario(scenario);
+
+        Campaign reloaded = MHQTestUtilities.getTestCampaign();
+        load(reloaded, write(campaign));
+
+        assertNotNull(reloaded.getScenario(4242),
+              "a restored contract's scenarios must be reachable through the campaign");
+    }
+
+    /**
+     * {@code StratConCampaignState.contract} is an {@code @XmlTransient} back-pointer, so it is null on the way back
+     * in and has to be restored. Deploying a force to a StratCon scenario reads it, so a null there crashes scenario
+     * generation with no contract to draw an enemy faction from.
+     */
+    @Test
+    void restoredStratConStatePointsBackAtItsOwnContract() throws Exception {
+        AbstractContract accepted = acceptInto(campaign, "Reach Garrison");
+        accepted.setStratConCampaignState(new StratConCampaignState(accepted));
+
+        Campaign reloaded = MHQTestUtilities.getTestCampaign();
+        load(reloaded, write(campaign));
+
+        AbstractContract restored = reloaded.getContract(accepted.getId());
+        assertNotNull(restored);
+        StratConCampaignState restoredState = restored.getStratConCampaignState();
+        assertNotNull(restoredState, "the StratCon campaign state must survive the save");
+        assertSame(restored, restoredState.getContract(),
+              "a restored StratCon state must point back at its own contract, not null");
+    }
+
+    /**
+     * A contract in the history was accepted, so it has a status. Saves written before acceptance set one carry none;
+     * those load as active rather than dropping out of every status filter.
+     */
+    @Test
+    void aContractSavedWithoutAStatusLoadsAsActive() throws Exception {
+        AbstractContract accepted = acceptInto(campaign, "Reach Garrison");
+        accepted.setStatus(null);
+
+        Campaign reloaded = MHQTestUtilities.getTestCampaign();
+        load(reloaded, write(campaign));
+
+        AbstractContract restored = reloaded.getContract(accepted.getId());
+        assertNotNull(restored);
+        assertEquals(MissionStatus.ACTIVE, restored.getStatus());
+    }
+
+    // endregion save and load
 }
