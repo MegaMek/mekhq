@@ -68,7 +68,6 @@ import java.util.UUID;
 import java.util.stream.IntStream;
 import java.util.zip.GZIPOutputStream;
 import javax.swing.*;
-import javax.swing.SwingConstants;
 import javax.swing.border.Border;
 
 import megamek.client.ui.dialogs.UnitLoadingDialog;
