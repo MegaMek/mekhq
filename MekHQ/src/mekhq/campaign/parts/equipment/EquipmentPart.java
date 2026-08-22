@@ -173,14 +173,32 @@ public class EquipmentPart extends Part {
         // they are not acceptable substitutes, so we need to check for that as
         // well
         // http://bg.battletech.com/forums/strategic-operations/(answered)-can-a-lance-for-a-35-ton-mech-be-used-on-a-40-ton-mech-and-so-on/
-        return (getClass() == part.getClass()) &&
-                     getType().equals(((EquipmentPart) part).getType()) &&
-                     getTonnage() == part.getTonnage() &&
+        if (getClass() != part.getClass()) {
+            return false;
+        }
+
+        EquipmentPart other = (EquipmentPart) part;
+
+        // Fix for Issue #9756: Retractable Blades scale dynamic tonnage when mounted.
+        // Stored loose parts remain at 1.0 ton base size and have an unassigned unit tonnage profile (0).
+        boolean isRetractableBlade = getType().hasFlag(MiscType.F_CLUB) 
+                && getType().hasFlag(MiscTypeFlag.S_RETRACTABLE_BLADE);
+
+        boolean warehouseMatches = isRetractableBlade 
+                && ((getTonnage() == 1.0 && getUnitTonnage() == 0) 
+                || (other.getTonnage() == 1.0 && other.getUnitTonnage() == 0));
+
+        boolean tonnageMatches = (getTonnage() == part.getTonnage()) || warehouseMatches;
+
+        return getType().equals(other.getType()) &&
+                     tonnageMatches &&
                      getStickerPrice().equals(part.getStickerPrice()) &&
-                     getSize() == ((EquipmentPart) part).getSize() &&
+                     getSize() == other.getSize() &&
                      isOmniPodded() == part.isOmniPodded()
                      && (!isUnitTonnageMatters() || getUnitTonnage() == part.getUnitTonnage());
     }
+
+
 
     @Override
     public void writeToXML(final PrintWriter pw, int indent) {

@@ -60,6 +60,7 @@ import megamek.common.equipment.EquipmentFlag;
 import megamek.common.equipment.EquipmentType;
 import megamek.common.equipment.EquipmentTypeLookup;
 import megamek.common.equipment.MiscType;
+import megamek.common.equipment.enums.MiscTypeFlag;
 import megamek.common.equipment.Mounted;
 import megamek.common.equipment.WeaponMounted;
 import megamek.common.equipment.WeaponType;
@@ -1788,5 +1789,40 @@ public class EquipmentPartTest {
         verify(weaponBay, times(1)).setMissing(eq(false));
         verify(weaponBay, times(1)).setDestroyed(eq(false));
         verify(unit, times(1)).repairSystem(eq(CriticalSlot.TYPE_EQUIPMENT), eq(bayEqNum));
+    }
+
+    @Test
+    public void testRetractableBladeWarehouseMatching() {
+        Campaign mockCampaign = mockCampaign();
+        EquipmentType mockBladeType = mock(EquipmentType.class);
+
+        // 1. Setup the type flags cleanly to fit under the 120 line limit
+        when(mockBladeType.hasFlag(MiscType.F_CLUB)).thenReturn(true);
+        when(mockBladeType.hasFlag(MiscTypeFlag.S_RETRACTABLE_BLADE))
+                .thenReturn(true);
+        when(mockBladeType.getInternalName())
+                .thenReturn("Equipment_Retractable_Blade");
+
+        // 2. Create the Mounted Blade (4.0 tons on an 80-ton chassis)
+        EquipmentPart mountedBlade = spy(new EquipmentPart(80, mockBladeType, 0, 0.0, false, mockCampaign));
+        doReturn(4.0).when(mountedBlade).getTonnage(); 
+
+        // 3. Create the Unmounted Warehouse Blade (1.0 ton, unit tonnage is 0)
+        EquipmentPart warehouseBlade = spy(new EquipmentPart(0, mockBladeType, 0, 0.0, false, mockCampaign));
+        doReturn(1.0).when(warehouseBlade).getTonnage(); 
+
+        // 4. Create an explicit 1.0-ton blade mounted on a tiny 20-ton unit to test the edge case
+        EquipmentPart lightMountedBlade = spy(new EquipmentPart(20, mockBladeType, 0, 0.0, false, mockCampaign));
+        doReturn(1.0).when(lightMountedBlade).getTonnage();
+
+        // 5. Run assertions
+        assertTrue(mountedBlade.isSamePartType(warehouseBlade), 
+            "Mounted blade must match loose warehouse item.");
+        assertTrue(warehouseBlade.isSamePartType(mountedBlade), 
+            "Symmetry check failed.");
+            
+        // Negative case check: A mounted 1.0-ton blade shouldn't match a mounted 4.0-ton blade
+        assertFalse(mountedBlade.isSamePartType(lightMountedBlade),
+            "Two different mounted blades should not match.");
     }
 }
