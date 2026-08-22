@@ -50,6 +50,7 @@ import java.util.UUID;
 import megamek.Version;
 import megamek.common.equipment.EquipmentType;
 import mekhq.campaign.Campaign;
+import mekhq.campaign.digitalGM.stratCon.StratConCampaignState;
 import mekhq.campaign.mission.contract.AbstractContract;
 import mekhq.campaign.mission.contract.ChaosContract;
 import mekhq.campaign.mission.scenarios.Scenario;
@@ -396,6 +397,27 @@ class ContractHistoryDataTest {
 
         assertNotNull(reloaded.getScenario(4242),
               "a restored contract's scenarios must be reachable through the campaign");
+    }
+
+    /**
+     * {@code StratConCampaignState.contract} is an {@code @XmlTransient} back-pointer, so it is null on the way back
+     * in and has to be restored. Deploying a force to a StratCon scenario reads it, so a null there crashes scenario
+     * generation with no contract to draw an enemy faction from.
+     */
+    @Test
+    void restoredStratConStatePointsBackAtItsOwnContract() throws Exception {
+        AbstractContract accepted = acceptInto(campaign, "Reach Garrison");
+        accepted.setStratConCampaignState(new StratConCampaignState(accepted));
+
+        Campaign reloaded = MHQTestUtilities.getTestCampaign();
+        load(reloaded, write(campaign));
+
+        AbstractContract restored = reloaded.getContract(accepted.getId());
+        assertNotNull(restored);
+        StratConCampaignState restoredState = restored.getStratConCampaignState();
+        assertNotNull(restoredState, "the StratCon campaign state must survive the save");
+        assertSame(restored, restoredState.getContract(),
+              "a restored StratCon state must point back at its own contract, not null");
     }
 
     /**

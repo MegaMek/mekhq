@@ -1376,6 +1376,11 @@ public class StratConContractInitializer {
         // the campaign for this contract
         StratConCampaignState campaignState = mission.getStratConCampaignState();
         if (campaignState != null) {
+            // The campaign state's contract is an @XmlTransient back-pointer, so it comes back null from the save.
+            // Restore it before anything reads it: deploying a force to a scenario goes through
+            // StratConCampaignState.getContract(), which would otherwise hand a null contract to scenario generation.
+            campaignState.setContract(mission);
+
             for (StratConTrackState track : campaignState.getTracks()) {
                 for (StratConScenario scenario : track.getScenarios().values()) {
                     Scenario campaignScenario = campaign.getScenario(scenario.getBackingScenarioID());
