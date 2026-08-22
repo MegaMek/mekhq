@@ -32,6 +32,7 @@
  */
 package mekhq.campaign.mission.contract.contractData;
 
+import java.io.PrintWriter;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Comparator;
@@ -39,11 +40,29 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.UUID;
 
+import megamek.Version;
 import mekhq.MekHQ;
+import mekhq.campaign.Campaign;
 import mekhq.campaign.events.missions.MissionNewEvent;
 import mekhq.campaign.mission.contract.AbstractContract;
+import mekhq.campaign.mission.contract.io.ContractXmlCodec;
+import mekhq.utilities.MHQXMLUtility;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
 
+/**
+ * The campaign's single store of every contract it has ever held, keyed by {@link AbstractContract#getId()} and
+ * iterated in insertion order.
+ *
+ * <p>This is the only place contract history lives. A campaign's contracts are global, not a property of any one
+ * force, so they are stored, queried and serialized here.</p>
+ *
+ * @param contractHistory the live, insertion-ordered map of contracts, keyed by contract id
+ */
 public record ContractHistoryData(LinkedHashMap<UUID, AbstractContract> contractHistory) {
+
+    public static final String CONTRACTS_TAG = "contracts";
+
     public ContractHistoryData() {
         this(new LinkedHashMap<>());
     }
@@ -166,6 +185,67 @@ public record ContractHistoryData(LinkedHashMap<UUID, AbstractContract> contract
         long startDay = startDate.toEpochDay();
         return isCompleted(mission) ? -startDay : startDay;
     }
+
+    // region I/O
+
+    /**
+     * Writes the whole history as a single {@code <contracts>} block. Emits nothing when there are no contracts.
+     *
+     * @param printWriter the writer to emit to
+     * @param indent      the indentation level of the {@code <contracts>} element
+     * @param campaign    the owning campaign (threaded through to serialize nested personnel)
+     */
+    public void writeToXML(final PrintWriter printWriter, int indent, final Campaign campaign) {
+        if (contractHistory.isEmpty()) {
+            return;
+        }
+
+        MHQXMLUtility.writeSimpleXMLOpenTag(printWriter, indent++, CONTRACTS_TAG);
+        for (final AbstractContract contract : contractHistory.values()) {
+            ContractXmlCodec.writeContract(printWriter, indent, contract, campaign);
+        }
+        MHQXMLUtility.writeSimpleXMLCloseTag(printWriter, --indent, CONTRACTS_TAG);
+    }
+
+    /**
+     * Repopulates the campaign's contract history from a {@code <contracts>} node previously written by
+     * {@link #writeToXML(PrintWriter, int, Campaign)}.
+     *
+     * <p>Each contract is handed to {@link Campaign#importMission(AbstractContract)} rather than put straight into
+     * the map, because importing also registers the contract's scenarios with the campaign and re-hooks StratCon's
+     * backing scenario pointers. A bare map put would restore the contract with neither.</p>
+     *
+     * @param contractsNode the {@code <contracts>} element
+     * @param campaign      the owning campaign, whose history is cleared and refilled
+     * @param version       the save file's version
+     */
+    public static void loadFromXML(final Node contractsNode, final Campaign campaign, final Version version) {
+        campaign.getContractHistoryData().clear();
+
+        final NodeList children = contractsNode.getChildNodes();
+        for (int i = 0; i < children.getLength(); i++) {
+            final Node contractNode = children.item(i);
+            if ((contractNode.getNodeType() != Node.ELEMENT_NODE)
+                      || !ContractXmlCodec.CONTRACT_TAG.equals(contractNode.getNodeName())) {
+                continue;
+            }
+
+            final AbstractContract contract = ContractXmlCodec.readContract(contractNode, campaign, version);
+            if ((contract == null) || (contract.getId() == null)) {
+                continue;
+            }
+
+            // A contract in the history was accepted, so it has a status. Saves written before acceptance set one
+            // carry none; treat those as active rather than letting them drop out of every status filter.
+            if (contract.getStatus() == null) {
+                contract.setStatus(MissionStatus.ACTIVE);
+            }
+
+            campaign.importMission(contract);
+        }
+    }
+
+    // endregion I/O
 
     /**
      * A contract only has a status once it has been accepted; an un-accepted market offer has none. These treat a
