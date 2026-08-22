@@ -82,7 +82,7 @@ public class QuickTrainDialog extends ImmersiveDialogCore {
     }
 
     public QuickTrain.QuickTrainOptions getSelectedOptions() {
-      return supplementalControls.getSelectedOptions();
+        return supplementalControls.getSelectedOptions();
     }
 
     /**
@@ -110,7 +110,7 @@ public class QuickTrainDialog extends ImmersiveDialogCore {
      * @since 0.50.10
      */
     public QuickTrainDialog(Campaign campaign, boolean isNobodySelected, QuickTrain.QuickTrainOptions trainingOptions) {
-      this(campaign, isNobodySelected, createSupplementalControls(trainingOptions));
+        this(campaign, isNobodySelected, createSupplementalControls(trainingOptions));
     }
 
     private QuickTrainDialog(Campaign campaign, boolean isNobodySelected, SupplementalControls supplementalControls) {

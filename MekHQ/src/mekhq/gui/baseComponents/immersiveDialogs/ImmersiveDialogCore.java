@@ -469,7 +469,7 @@ public class ImmersiveDialogCore extends JDialog {
      * to display a central message, typically in HTML format, using a {@link JEditorPane}, along with an optional list
      * of buttons displayed below the message.
      * <ul>
-    *   <li>The message is placed in the {@link JEditorPane}, sized initially from the configured content width.</li>
+     *   <li>The message is placed in the {@link JEditorPane}, sized initially from the configured content width.</li>
      *   <li>The panel includes a scrollable viewport if the message content overflows.</li>
      *   <li>An additional button panel is added at the bottom of the central panel.</li>
      * </ul>
@@ -577,7 +577,7 @@ public class ImmersiveDialogCore extends JDialog {
         Rectangle usableScreenBounds = getUsableScreenBounds(locationReference);
         Dimension naturalDialogSize = getPreferredSize();
         Dimension naturalViewportSize = messageScrollPane.getPreferredSize();
-          int minimumViewportHeight = scaleForGUI(120);
+        int minimumViewportHeight = scaleForGUI(120);
         ImmersiveDialogSizing.SizingResult sizing = ImmersiveDialogSizing.calculate(
               naturalDialogSize.height,
               naturalViewportSize.height,
