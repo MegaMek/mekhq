@@ -36,6 +36,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.awt.Font;
+import java.awt.Graphics2D;
 import java.awt.image.BufferedImage;
 
 import org.junit.jupiter.api.Test;
@@ -82,7 +83,12 @@ class AccentRoundedJButtonTest {
         button.setSize(120, 40);
 
         BufferedImage image = new BufferedImage(120, 40, BufferedImage.TYPE_INT_ARGB);
-        button.paint(image.getGraphics());
+        Graphics2D graphics = image.createGraphics();
+        try {
+            button.paint(graphics);
+        } finally {
+            graphics.dispose();
+        }
 
         // A point well inside the face, away from the text, is the hazard red.
         assertEquals(Accent.HAZARD.getFace().getRGB(), image.getRGB(12, 20));

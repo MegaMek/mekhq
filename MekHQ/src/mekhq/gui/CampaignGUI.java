@@ -41,7 +41,6 @@ import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
 import static mekhq.utilities.MHQInternationalization.getTextAt;
 
 import java.awt.*;
-import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.WindowAdapter;
@@ -2010,17 +2009,6 @@ public class CampaignGUI extends JPanel {
     }
 
     /**
-     * Handles the transition to a new day in the campaign.
-     *
-     * <p>Refreshes the calendar, location, funds, parts availability, and all relevant UI tabs to ensure the user
-     * interface and data are up to date at the beginning of a new day.</p>
-     *
-     * <p><b>Important:</b> This method is not directly evoked, so IDEA will tell you it has no uses. IDEA is
-     * wrong.</p>
-     *
-     * @param newDayEvent the event signalling that a new day has started
-     */
-    /**
      * Hides the Company Generator button as soon as the campaign gains units or personnel, which the generator
      * reports by firing this event when it completes.
      *
@@ -2031,6 +2019,17 @@ public class CampaignGUI extends JPanel {
         refreshCampaignControlButtons();
     }
 
+    /**
+     * Handles the transition to a new day in the campaign.
+     *
+     * <p>Refreshes the calendar, location, funds, parts availability, and all relevant UI tabs to ensure the user
+     * interface and data are up to date at the beginning of a new day.</p>
+     *
+     * <p><b>Important:</b> This method is not directly evoked, so IDEA will tell you it has no uses. IDEA is
+     * wrong.</p>
+     *
+     * @param newDayEvent the event signalling that a new day has started
+     */
     @Subscribe
     public void handleNewDay(NewDayEvent newDayEvent) {
         refreshWindowTitle();
