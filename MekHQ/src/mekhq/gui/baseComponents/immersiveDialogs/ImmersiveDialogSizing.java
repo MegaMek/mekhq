@@ -42,17 +42,21 @@ final class ImmersiveDialogSizing {
     static SizingResult calculate(int naturalDialogHeight, int naturalViewportHeight, int minimumViewportHeight,
           int usableScreenHeight) {
         int maximumDialogHeight = Math.max(1, (int) Math.floor(usableScreenHeight * USABLE_SCREEN_FRACTION));
-        if (naturalDialogHeight <= maximumDialogHeight) {
-            return new SizingResult(naturalDialogHeight, naturalViewportHeight, false);
+        int dialogHeight = naturalDialogHeight;
+        int viewportHeight = naturalViewportHeight;
+        if (naturalDialogHeight > maximumDialogHeight) {
+            int overflow = naturalDialogHeight - maximumDialogHeight;
+            viewportHeight = Math.max(minimumViewportHeight, naturalViewportHeight - overflow);
+            dialogHeight = Math.min(maximumDialogHeight,
+                  naturalDialogHeight - (naturalViewportHeight - viewportHeight));
         }
 
-        int overflow = naturalDialogHeight - maximumDialogHeight;
-        int viewportHeight = Math.max(minimumViewportHeight, naturalViewportHeight - overflow);
-        int dialogHeight = Math.min(maximumDialogHeight,
-              naturalDialogHeight - (naturalViewportHeight - viewportHeight));
-        return new SizingResult(dialogHeight, viewportHeight, viewportHeight < naturalViewportHeight);
+        int nonMessageHeight = Math.max(0, naturalDialogHeight - naturalViewportHeight);
+        int minimumDialogHeight = Math.min(dialogHeight,
+              nonMessageHeight + Math.min(naturalViewportHeight, minimumViewportHeight));
+        return new SizingResult(dialogHeight, viewportHeight, minimumDialogHeight);
     }
 
-    record SizingResult(int dialogHeight, int viewportHeight, boolean requiresScrolling) {
+    record SizingResult(int dialogHeight, int viewportHeight, int minimumDialogHeight) {
     }
 }

@@ -469,7 +469,7 @@ public class ImmersiveDialogCore extends JDialog {
      * to display a central message, typically in HTML format, using a {@link JEditorPane}, along with an optional list
      * of buttons displayed below the message.
      * <ul>
-     *   <li>The message is placed in the {@link JEditorPane}, styled for a consistent width.</li>
+     *   <li>The message is placed in the {@link JEditorPane}, sized initially from the configured content width.</li>
      *   <li>The panel includes a scrollable viewport if the message content overflows.</li>
      *   <li>An additional button panel is added at the bottom of the central panel.</li>
      * </ul>
@@ -483,7 +483,7 @@ public class ImmersiveDialogCore extends JDialog {
      */
     private JPanel createCenterBox(String centerMessage, List<ButtonLabelTooltipPair> buttons, boolean isVerticalLayout,
           @Nullable JPanel supplementalPanel, @Nullable ImageIcon imageIcon) {
-          JPanel centerPanel = ImmersiveDialogStyle.createAngularSurfacePanel();
+        JPanel centerPanel = ImmersiveDialogStyle.createAngularSurfacePanel();
 
         // Buttons panel
         JPanel buttonPanel = populateButtonPanel(buttons, isVerticalLayout);
@@ -513,6 +513,7 @@ public class ImmersiveDialogCore extends JDialog {
         scrollPane.setBorder(BorderFactory.createEmptyBorder());
         scrollPane.setOpaque(false);
         scrollPane.getViewport().setOpaque(false);
+        scrollPane.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
 
         // Create a container with a border for the padding
         JPanel scrollPaneContainer = new JPanel(new BorderLayout());
@@ -576,18 +577,18 @@ public class ImmersiveDialogCore extends JDialog {
         Rectangle usableScreenBounds = getUsableScreenBounds(locationReference);
         Dimension naturalDialogSize = getPreferredSize();
         Dimension naturalViewportSize = messageScrollPane.getPreferredSize();
+        int minimumViewportHeight = scaleForGUI(120);
         ImmersiveDialogSizing.SizingResult sizing = ImmersiveDialogSizing.calculate(
               naturalDialogSize.height,
               naturalViewportSize.height,
-              scaleForGUI(120),
+              minimumViewportHeight,
               usableScreenBounds.height);
 
-        messageScrollPane.setVerticalScrollBarPolicy(sizing.requiresScrolling()
-                                                           ? ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED
-                                                           : ScrollPaneConstants.VERTICAL_SCROLLBAR_NEVER);
+        messageScrollPane.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED);
         messageScrollPane.setPreferredSize(new Dimension(naturalViewportSize.width, sizing.viewportHeight()));
 
         pack();
+        setMinimumSize(new Dimension(0, sizing.minimumDialogHeight()));
         setSize(min(usableScreenBounds.width, getWidth()), min(sizing.dialogHeight(), getHeight()));
     }
 
@@ -612,7 +613,8 @@ public class ImmersiveDialogCore extends JDialog {
     }
 
     private JEditorPane getJEditorPane(String centerMessage, JPanel buttonPanel) {
-        JEditorPane editorPane = new JEditorPane();
+        int preferredWidth = max(buttonPanel.getPreferredSize().width, CENTER_WIDTH) + (getPadding() * 2);
+        JEditorPane editorPane = new ResponsiveHtmlEditorPane(preferredWidth);
         editorPane.setContentType("text/html");
         editorPane.setEditable(false);
         editorPane.setFocusable(false);
@@ -621,10 +623,7 @@ public class ImmersiveDialogCore extends JDialog {
 
         // Use inline CSS to set font family, size, and other style properties
         String fontStyle = "font-family: Noto Sans;";
-        editorPane.setText(String.format("<html><div style='width: %dpx; %s'>%s</div></html>",
-              max(buttonPanel.getPreferredSize().width, CENTER_WIDTH),
-              fontStyle,
-              centerMessage));
+        editorPane.setText(String.format("<html><div style='%s'>%s</div></html>", fontStyle, centerMessage));
         return editorPane;
     }
 
@@ -727,31 +726,62 @@ public class ImmersiveDialogCore extends JDialog {
         editorPane.addHyperlinkListener(this::hyperlinkEventListenerActions);
 
         // Add the editor pane to the panel
-        pnlOutOfCharacter.add(editorPane, BorderLayout.CENTER);
+        pnlOutOfCharacter.add(createBoundedInformationScrollPane(editorPane), BorderLayout.CENTER);
 
         // Add the panel to the southPanel
         southPanel.add(pnlOutOfCharacter, BorderLayout.CENTER);
     }
 
+    static FastJScrollPane createBoundedInformationScrollPane(JEditorPane editorPane) {
+        JScrollablePanel viewport = new JScrollablePanel();
+        viewport.setLayout(new BorderLayout());
+        viewport.setOpaque(false);
+        viewport.add(editorPane, BorderLayout.CENTER);
+
+        FastJScrollPane scrollPane = new FastJScrollPane(viewport);
+        scrollPane.setBorder(BorderFactory.createEmptyBorder());
+        scrollPane.setOpaque(false);
+        scrollPane.getViewport().setOpaque(false);
+        scrollPane.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
+        scrollPane.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED);
+        scrollPane.setPreferredSize(viewport.getPreferredSize());
+        return scrollPane;
+    }
+
     private JEditorPane getJEditorPane(String outOfCharacterMessage) {
-        JEditorPane editorPane = new JEditorPane();
+        int width = CENTER_WIDTH;
+        width += leftSpeaker != null ? IMAGE_WIDTH + PADDING : 0;
+        width += rightSpeaker != null ? IMAGE_WIDTH + PADDING : 0;
+
+        JEditorPane editorPane = new ResponsiveHtmlEditorPane(width);
         editorPane.setContentType("text/html");
         editorPane.setEditable(false);
         editorPane.setFocusable(false);
         editorPane.setOpaque(false);
         editorPane.setBorder(BorderFactory.createEmptyBorder());
 
-        int width = CENTER_WIDTH;
-        width += leftSpeaker != null ? IMAGE_WIDTH + PADDING : 0;
-        width += rightSpeaker != null ? IMAGE_WIDTH + PADDING : 0;
-
         // Use inline CSS to set font family, size, and other style properties
         editorPane.setText(String.format("<html><head><style>body { margin: 0; } " +
                                                "p { margin-top: 0; margin-bottom: 0; }</style></head>" +
-                                               "<body><div style='width: %dpx'>%s</div></body></html>",
-              width,
+                                               "<body><div>%s</div></body></html>",
               outOfCharacterMessage));
         return editorPane;
+    }
+
+    static final class ResponsiveHtmlEditorPane extends JEditorPane {
+        private final int initialPreferredWidth;
+
+        ResponsiveHtmlEditorPane(int initialPreferredWidth) {
+            this.initialPreferredWidth = initialPreferredWidth;
+            setSize(initialPreferredWidth, Short.MAX_VALUE);
+        }
+
+        @Override
+        public Dimension getPreferredSize() {
+            Dimension preferredSize = super.getPreferredSize();
+            preferredSize.width = getWidth() > 0 ? getWidth() : initialPreferredWidth;
+            return preferredSize;
+        }
     }
 
     /**

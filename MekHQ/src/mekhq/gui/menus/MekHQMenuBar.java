@@ -322,9 +322,17 @@ public class MekHQMenuBar extends JMenuBar {
         JMenu miExportCSVFile = new JMenu(getTextAt("menuExportCSV.text"));
         miExportCSVFile.setMnemonic(KeyEvent.VK_C);
 
-        miExportCSVFile.add(createMenuItem("miExportPersonnel.text", KeyEvent.VK_P, evt -> exportPersonnel()));
-        miExportCSVFile.add(createMenuItem("miExportUnit.text", KeyEvent.VK_U, evt -> exportUnits()));
-        miExportCSVFile.add(createMenuItem("miExportFinances.text", KeyEvent.VK_F, evt -> exportFinances()));
+        JMenuItem miExportPersonnel = createMenuItem("miExportPersonnel.text", KeyEvent.VK_P, evt -> exportPersonnel());
+        miExportPersonnel.setToolTipText(getTextAt("miExportPersonnel.toolTipText"));
+        miExportCSVFile.add(miExportPersonnel);
+
+        JMenuItem miExportUnit = createMenuItem("miExportUnit.text", KeyEvent.VK_U, evt -> exportUnits());
+        miExportUnit.setToolTipText(getTextAt("miExportUnit.toolTipText"));
+        miExportCSVFile.add(miExportUnit);
+
+        JMenuItem miExportFinances = createMenuItem("miExportFinances.text", KeyEvent.VK_F, evt -> exportFinances());
+        miExportFinances.setToolTipText(getTextAt("miExportFinances.toolTipText"));
+        miExportCSVFile.add(miExportFinances);
 
         menuExport.add(miExportCSVFile);
         // endregion CSV Export
