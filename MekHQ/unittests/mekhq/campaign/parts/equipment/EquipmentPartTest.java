@@ -60,6 +60,7 @@ import megamek.common.equipment.EquipmentFlag;
 import megamek.common.equipment.EquipmentType;
 import megamek.common.equipment.EquipmentTypeLookup;
 import megamek.common.equipment.MiscType;
+import megamek.common.equipment.enums.MiscTypeFlag;
 import megamek.common.equipment.Mounted;
 import megamek.common.equipment.WeaponMounted;
 import megamek.common.equipment.WeaponType;
@@ -1795,25 +1796,33 @@ public class EquipmentPartTest {
         Campaign mockCampaign = mockCampaign();
         EquipmentType mockBladeType = mock(EquipmentType.class);
 
-        // 1. Setup the type flags so the production code path identifies this as a Retractable Blade
-        when(mockBladeType.hasFlag(megamek.common.equipment.MiscType.F_CLUB)).thenReturn(true);
-        when(mockBladeType.hasFlag(megamek.common.equipment.enums.MiscTypeFlag.S_RETRACTABLE_BLADE)).thenReturn(true);
-        when(mockBladeType.getInternalName()).thenReturn("Equipment_Retractable_Blade");
+        // 1. Setup the type flags cleanly to fit under the 120 line limit
+        when(mockBladeType.hasFlag(MiscType.F_CLUB)).thenReturn(true);
+        when(mockBladeType.hasFlag(MiscTypeFlag.S_RETRACTABLE_BLADE))
+                .thenReturn(true);
+        when(mockBladeType.getInternalName())
+                .thenReturn("Equipment_Retractable_Blade");
 
-        // 2. Create the Mounted Blade (Using a Mockito spy to explicitly override mounted tonnage)
-        EquipmentPart rawMountedBlade = new EquipmentPart(80, mockBladeType, 0, 0.0, false, mockCampaign);
-        EquipmentPart mountedBlade = spy(rawMountedBlade);
-        doReturn(4.0).when(mountedBlade).getTonnage(); // Mounted Assault-frame footprint tonnage (4.0 tons)
+        // 2. Create the Mounted Blade (4.0 tons on an 80-ton chassis)
+        EquipmentPart mountedBlade = spy(new EquipmentPart(80, mockBladeType, 0, 0.0, false, mockCampaign));
+        doReturn(4.0).when(mountedBlade).getTonnage(); 
 
-        // 3. Create the Unmounted Warehouse Blade (Using a spy to explicitly override warehouse tonnage)
-        EquipmentPart rawWarehouseBlade = new EquipmentPart(0, mockBladeType, 0, 0.0, false, mockCampaign);
-        EquipmentPart warehouseBlade = spy(rawWarehouseBlade);
-        doReturn(1.0).when(warehouseBlade).getTonnage(); // Unmounted storage footprint tonnage (1.0 ton)
+        // 3. Create the Unmounted Warehouse Blade (1.0 ton, unit tonnage is 0)
+        EquipmentPart warehouseBlade = spy(new EquipmentPart(0, mockBladeType, 0, 0.0, false, mockCampaign));
+        doReturn(1.0).when(warehouseBlade).getTonnage(); 
 
-        // 4. Assert that our isSamePartType override correctly hooks them up as identical structural substitutes
+        // 4. Create an explicit 1.0-ton blade mounted on a tiny 20-ton unit to test the edge case
+        EquipmentPart lightMountedBlade = spy(new EquipmentPart(20, mockBladeType, 0, 0.0, false, mockCampaign));
+        doReturn(1.0).when(lightMountedBlade).getTonnage();
+
+        // 5. Run assertions
         assertTrue(mountedBlade.isSamePartType(warehouseBlade), 
-            "The fix for #9756 failed: A 4.0-ton mounted blade must match a 1.0-ton warehouse reserve item.");
+            "Mounted blade must match loose warehouse item.");
         assertTrue(warehouseBlade.isSamePartType(mountedBlade), 
-            "The fix for #9756 failed: Symmetry mismatch in part cross-evaluation layout.");
+            "Symmetry check failed.");
+            
+        // Negative case check: A mounted 1.0-ton blade shouldn't match a mounted 4.0-ton blade
+        assertFalse(mountedBlade.isSamePartType(lightMountedBlade),
+            "Two different mounted blades should not match.");
     }
 }

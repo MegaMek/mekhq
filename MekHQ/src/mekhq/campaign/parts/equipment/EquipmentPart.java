@@ -180,11 +180,15 @@ public class EquipmentPart extends Part {
         EquipmentPart other = (EquipmentPart) part;
 
         // Fix for Issue #9756: Retractable Blades scale dynamic tonnage when mounted.
-        // Stored loose parts remain at 1.0 ton base size, causing inventory lookups to fail.
-        // We allow a 1.0-ton warehouse stock blade to satisfy any operational frame requirements.
-        boolean isRetractableBlade = getType().hasFlag(MiscType.F_CLUB) && getType().hasFlag(MiscTypeFlag.S_RETRACTABLE_BLADE);
+        // Stored loose parts remain at 1.0 ton base size and have an unassigned unit tonnage profile (0).
+        boolean isRetractableBlade = getType().hasFlag(MiscType.F_CLUB) 
+                && getType().hasFlag(MiscTypeFlag.S_RETRACTABLE_BLADE);
 
-        boolean tonnageMatches = (getTonnage() == part.getTonnage()) || (isRetractableBlade && (getTonnage() == 1.0 || part.getTonnage() == 1.0));
+        boolean warehouseMatches = isRetractableBlade 
+                && ((getTonnage() == 1.0 && getUnitTonnage() == 0) 
+                || (other.getTonnage() == 1.0 && other.getUnitTonnage() == 0));
+
+        boolean tonnageMatches = (getTonnage() == part.getTonnage()) || warehouseMatches;
 
         return getType().equals(other.getType()) &&
                      tonnageMatches &&
@@ -193,6 +197,8 @@ public class EquipmentPart extends Part {
                      isOmniPodded() == part.isOmniPodded()
                      && (!isUnitTonnageMatters() || getUnitTonnage() == part.getUnitTonnage());
     }
+
+
 
     @Override
     public void writeToXML(final PrintWriter pw, int indent) {
