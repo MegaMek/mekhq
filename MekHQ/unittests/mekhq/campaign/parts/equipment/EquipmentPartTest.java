@@ -1789,4 +1789,31 @@ public class EquipmentPartTest {
         verify(weaponBay, times(1)).setDestroyed(eq(false));
         verify(unit, times(1)).repairSystem(eq(CriticalSlot.TYPE_EQUIPMENT), eq(bayEqNum));
     }
+
+    @Test
+    public void testRetractableBladeWarehouseMatching() {
+        Campaign mockCampaign = mockCampaign();
+        EquipmentType mockBladeType = mock(EquipmentType.class);
+
+        // 1. Setup the type flags so the production code path identifies this as a Retractable Blade
+        when(mockBladeType.hasFlag(megamek.common.equipment.MiscType.F_CLUB)).thenReturn(true);
+        when(mockBladeType.hasFlag(megamek.common.equipment.enums.MiscTypeFlag.S_RETRACTABLE_BLADE)).thenReturn(true);
+        when(mockBladeType.getInternalName()).thenReturn("Equipment_Retractable_Blade");
+
+        // 2. Create the Mounted Blade (Using a Mockito spy to explicitly override mounted tonnage)
+        EquipmentPart rawMountedBlade = new EquipmentPart(80, mockBladeType, 0, 0.0, false, mockCampaign);
+        EquipmentPart mountedBlade = spy(rawMountedBlade);
+        doReturn(4.0).when(mountedBlade).getTonnage(); // Mounted Assault-frame footprint tonnage (4.0 tons)
+
+        // 3. Create the Unmounted Warehouse Blade (Using a spy to explicitly override warehouse tonnage)
+        EquipmentPart rawWarehouseBlade = new EquipmentPart(0, mockBladeType, 0, 0.0, false, mockCampaign);
+        EquipmentPart warehouseBlade = spy(rawWarehouseBlade);
+        doReturn(1.0).when(warehouseBlade).getTonnage(); // Unmounted storage footprint tonnage (1.0 ton)
+
+        // 4. Assert that our isSamePartType override correctly hooks them up as identical structural substitutes
+        assertTrue(mountedBlade.isSamePartType(warehouseBlade), 
+            "The fix for #9756 failed: A 4.0-ton mounted blade must match a 1.0-ton warehouse reserve item.");
+        assertTrue(warehouseBlade.isSamePartType(mountedBlade), 
+            "The fix for #9756 failed: Symmetry mismatch in part cross-evaluation layout.");
+    }
 }
