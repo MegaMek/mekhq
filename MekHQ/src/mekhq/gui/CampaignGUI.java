@@ -57,6 +57,7 @@ import java.nio.charset.StandardCharsets;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -120,10 +121,13 @@ import mekhq.campaign.universe.PlanetarySystem;
 import mekhq.campaign.utilities.AutomatedTechAssignments;
 import mekhq.gui.baseComponents.ScalingWidthConstrainedPanel;
 import mekhq.gui.baseComponents.immersiveDialogs.ImmersiveDialogSimple;
+import mekhq.gui.baseComponents.roundedComponents.AccentRoundedJButton;
+import mekhq.gui.baseComponents.roundedComponents.AccentRoundedJButton.Accent;
 import mekhq.gui.baseComponents.roundedComponents.RoundedJButton;
 import mekhq.gui.baseComponents.roundedComponents.RoundedLineBorder;
 import mekhq.gui.baseComponents.roundedComponents.RoundedMMToggleButton;
 import mekhq.gui.dialog.*;
+import mekhq.gui.dialog.CompanyGenerationDialog;
 import mekhq.gui.dialog.glossary.GlossaryDialog;
 import mekhq.gui.dialog.markets.contractMarket.ChaosContractMarketDialog;
 import mekhq.gui.enums.MHQTabType;
@@ -484,9 +488,37 @@ public class CampaignGUI extends JPanel {
         pnlTop.add(createMarketsPanel(95, 130));
         pnlTop.add(new CommandSummaryPanel(250, 280, getCampaign()));
         pnlTop.add(Box.createHorizontalGlue());
-        pnlTop.add(new AdvanceTimePanel(170, 240, getCampaign().getLocalDate(),
-              getCampaignController()::advanceDay, () -> new AdvanceDaysDialog(getFrame(), this).setVisible(true)));
+        AdvanceTimePanel advanceTimePanel = new AdvanceTimePanel(170, 240, getCampaign().getLocalDate(),
+              getCampaignController()::advanceDay, () -> new AdvanceDaysDialog(getFrame(), this).setVisible(true));
+        pnlTop.add(createCompanyGeneratorButton());
+        pnlTop.add(Box.createHorizontalStrut(SMALL_GAP));
+        pnlTop.add(advanceTimePanel);
         pnlTop.add(createCampaignControlPanel(140, 170));
+
+        // The box layout stretches every child to the panel's height, so the button is squared to that height,
+        // measured once all the other children are in place.
+        int side = pnlTop.getPreferredSize().height;
+        btnCompanyGenerator.setMinimumSize(new Dimension(side, side));
+        btnCompanyGenerator.setPreferredSize(new Dimension(side, side));
+        btnCompanyGenerator.setMaximumSize(new Dimension(side, side));
+    }
+
+    /**
+     * Creates the Company Generator button that sits to the left of the Advance Day panel. It is squared to the
+     * top panel's height by {@link #initTopPanel()}, and is only shown while the campaign has no units and no
+     * personnel - the one time a player needs it. See {@link #refreshCampaignControlButtons()}.
+     *
+     * @return the button
+     */
+    private RoundedJButton createCompanyGeneratorButton() {
+        btnCompanyGenerator = new RoundedJButton(resourceMap.getString("btnCompanyGenerator.text"));
+        btnCompanyGenerator.setToolTipText(resourceMap.getString("btnCompanyGenerator.toolTipText"));
+        btnCompanyGenerator.setHorizontalAlignment(SwingConstants.CENTER);
+        btnCompanyGenerator.addActionListener(event -> {
+            new CompanyGenerationDialog(getFrame(), getCampaign()).setVisible(true);
+            refreshCampaignControlButtons();
+        });
+        return btnCompanyGenerator;
     }
 
     private JPanel createMarketsPanel(int minWidth, int maxWidth) {
@@ -538,46 +570,34 @@ public class CampaignGUI extends JPanel {
 
         gridBagConstraints.weightx = 1;
         gridBagConstraints.weighty = 1;
-        gridBagConstraints.gridwidth = 2;
         gridBagConstraints.fill = GridBagConstraints.BOTH;
 
-        btnCompanyGenerator = new RoundedJButton(resourceMap.getString("btnCompanyGenerator.text"));
-        btnCompanyGenerator.setToolTipText(resourceMap.getString("btnCompanyGenerator.toolTipText"));
-        btnCompanyGenerator.addActionListener(
-              e -> new CompanyGenerationDialog(getFrame(), getCampaign()).setVisible(true));
+        AccentRoundedJButton btnGlossary = new AccentRoundedJButton(resourceMap.getString("btnGlossary.text"),
+              Accent.REFERENCE);
+        btnGlossary.setToolTipText(resourceMap.getString("btnGlossary.toolTipText"));
+        btnGlossary.addActionListener(event -> new GlossaryDialog(getFrame()));
         gridBagConstraints.gridy = 0;
         gridBagConstraints.insets = new Insets(MEDIUM_GAP - 2, SMALL_GAP, -2, SMALL_GAP);
-        pnlButton.add(btnCompanyGenerator, gridBagConstraints);
+        pnlButton.add(btnGlossary, gridBagConstraints);
+
+        AccentRoundedJButton btnBugReport = new AccentRoundedJButton(resourceMap.getString("btnBugReport.text"),
+              Accent.HAZARD);
+        btnBugReport.setToolTipText(resourceMap.getString("btnBugReport.toolTipText"));
+        btnBugReport.addActionListener(event -> new EasyBugReportDialog(getFrame(), getCampaign()));
+        gridBagConstraints.gridy = 1;
+        gridBagConstraints.insets = new Insets(MEDIUM_GAP - 2, SMALL_GAP, -2, SMALL_GAP);
+        pnlButton.add(btnBugReport, gridBagConstraints);
 
         RoundedMMToggleButton btnGMMode = new RoundedMMToggleButton(resourceMap.getString("btnGMMode.text"));
         btnGMMode.setToolTipText(resourceMap.getString("btnGMMode.toolTipText"));
         btnGMMode.setSelected(getCampaign().isGM());
-        btnGMMode.addActionListener(e -> {
+        btnGMMode.addActionListener(event -> {
             getCampaign().setGMMode(btnGMMode.isSelected());
             windowMenu.refreshGMMenuItems();
         });
-        gridBagConstraints.gridy = 1;
-        gridBagConstraints.insets = new Insets(MEDIUM_GAP - 2, SMALL_GAP, 0, SMALL_GAP);
-        pnlButton.add(btnGMMode, gridBagConstraints);
-
         gridBagConstraints.gridy = 2;
-        gridBagConstraints.weighty = 0;
-        gridBagConstraints.gridwidth = 1;
-        gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
-
-        RoundedJButton btnGlossary = new RoundedJButton(resourceMap.getString("btnGlossary.text"));
-        btnGlossary.setToolTipText(resourceMap.getString("btnGlossary.toolTipText"));
-        btnGlossary.addActionListener(evt -> new GlossaryDialog(getFrame()));
-        gridBagConstraints.weightx = 0.4;
-        gridBagConstraints.insets = new Insets(SMALL_GAP, SMALL_GAP, THIN_GAP, 0);
-        pnlButton.add(btnGlossary, gridBagConstraints);
-
-        RoundedJButton btnBugReport = new RoundedJButton(resourceMap.getString("btnBugReport.text"));
-        btnBugReport.setToolTipText(resourceMap.getString("btnBugReport.toolTipText"));
-        btnBugReport.addActionListener(evt -> new EasyBugReportDialog(getFrame(), getCampaign()));
-        gridBagConstraints.weightx = 0.6;
-        gridBagConstraints.insets = new Insets(SMALL_GAP, SMALL_GAP, THIN_GAP, SMALL_GAP);
-        pnlButton.add(btnBugReport, gridBagConstraints);
+        gridBagConstraints.insets = new Insets(MEDIUM_GAP - 2, SMALL_GAP, SMALL_GAP, SMALL_GAP);
+        pnlButton.add(btnGMMode, gridBagConstraints);
 
         return pnlButton;
     }
@@ -1672,13 +1692,28 @@ public class CampaignGUI extends JPanel {
         }
     }
 
+    /**
+     * Shows the Company Generator button only while the campaign is empty: no units anywhere, including base
+     * hangars, and no personnel.
+     */
     private void refreshCampaignControlButtons() {
-        boolean emptyHangar = getCampaign().getUnits().isEmpty() &&
-                                    getCampaign().getCampaignLocationManager().getPlayerBases()
-                                          .stream()
-                                          .allMatch(base -> base.getBaseHangar().getUnits().isEmpty());
-        boolean noPersonnel = getCampaign().getPlayerForce().getHumanResources().getPersonnel().isEmpty();
-        btnCompanyGenerator.setVisible(emptyHangar && noPersonnel);
+        btnCompanyGenerator.setVisible(isHangarEmpty() && getPlayerPersonnel().isEmpty());
+    }
+
+    private boolean isHangarEmpty() {
+        if (!getCampaign().getUnits().isEmpty()) {
+            return false;
+        }
+        for (PlayerBase base : getCampaign().getCampaignLocationManager().getPlayerBases()) {
+            if (!base.getBaseHangar().getUnits().isEmpty()) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    private Collection<Person> getPlayerPersonnel() {
+        return getCampaign().getPlayerForce().getHumanResources().getPersonnel();
     }
 
     public int getTabIndexByName(String tabTitle) {
@@ -1970,6 +2005,17 @@ public class CampaignGUI extends JPanel {
         }
 
         return false;
+    }
+
+    /**
+     * Hides the Company Generator button as soon as the campaign gains units or personnel, which the generator
+     * reports by firing this event when it completes.
+     *
+     * @param organizationChangedEvent the event
+     */
+    @Subscribe
+    public void handleOrganizationChanged(OrganizationChangedEvent organizationChangedEvent) {
+        refreshCampaignControlButtons();
     }
 
     /**

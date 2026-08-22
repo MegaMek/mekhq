@@ -113,6 +113,7 @@ import mekhq.campaign.market.PersonnelMarket;
 import mekhq.campaign.market.RequestedStockLevels;
 import mekhq.campaign.mission.contract.AbstractContract;
 import mekhq.campaign.mission.contract.ContractMarket;
+import mekhq.campaign.mission.contract.contractData.ContractHistoryData;
 import mekhq.campaign.mission.contract.contractGeneration.ContractSearchType;
 import mekhq.campaign.mission.contract.io.LegacyContractConverter;
 import mekhq.campaign.mission.scenarios.Scenario;
@@ -260,8 +261,8 @@ public record CampaignXmlParser(InputStream is, MekHQ app) {
                 } else if (nodeName.equalsIgnoreCase("initiativeMaxBonus")) {
                     int bonus = parseInt(childNode.getTextContent(), 1);
                     playerForce.setInitiativeMaxBonus(bonus);
-                } else if (nodeName.equalsIgnoreCase(PlayerForce.CONTRACTS_TAG)) {
-                    playerForce.loadContractsFromXML(childNode, campaign, version);
+                } else if (nodeName.equalsIgnoreCase(ContractHistoryData.CONTRACTS_TAG)) {
+                    ContractHistoryData.loadFromXML(childNode, campaign, version);
                 } else if (nodeName.equalsIgnoreCase(ContractMarket.MARKET_TAG)) {
                     playerForce.getContractMarket().loadFromXML(childNode, campaign, version);
                 } else if (nodeName.equalsIgnoreCase("crimePirateModifier")) {
@@ -1662,7 +1663,7 @@ public record CampaignXmlParser(InputStream is, MekHQ app) {
         final PlayerForce playerForce = campaign.getPlayerForce();
         final ContractMarket contractMarket = playerForce.getContractMarket();
 
-        final List<AbstractContract> contracts = new ArrayList<>(playerForce.getContractHistory().values());
+        final List<AbstractContract> contracts = new ArrayList<>(campaign.getContractHistoryAsMap().values());
         for (final ContractSearchType searchType : ContractSearchType.values()) {
             contracts.addAll(contractMarket.getContracts(searchType).values());
         }
