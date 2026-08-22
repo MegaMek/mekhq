@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2020-2025 The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2020-2026 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -86,14 +86,11 @@ public enum PersonnelFilter {
     MEDICAL("PersonnelFilter.MEDICAL.text", "PersonnelFilter.MEDICAL.toolTipText", true, false),
     DOCTOR("PersonnelFilter.DOCTOR.text", "PersonnelFilter.DOCTOR.toolTipText", false, true),
     MEDIC("PersonnelFilter.MEDIC.text", "PersonnelFilter.MEDIC.toolTipText", false, true),
-    ADMINISTRATOR("PersonnelFilter.ADMINISTRATOR.text", "PersonnelFilter.ADMINISTRATOR.toolTipText", true, false),
-    ADMINISTRATOR_COMMAND("PersonnelFilter.ADMINISTRATOR_COMMAND.text",
-          "PersonnelFilter.ADMINISTRATOR_COMMAND.toolTipText", false, true),
-    ADMINISTRATOR_LOGISTICS("PersonnelFilter.ADMINISTRATOR_LOGISTICS.text",
-          "PersonnelFilter.ADMINISTRATOR_LOGISTICS.toolTipText", false, true),
-    ADMINISTRATOR_TRANSPORT("PersonnelFilter.ADMINISTRATOR_TRANSPORT.text",
-          "PersonnelFilter.ADMINISTRATOR_TRANSPORT.toolTipText", false, true),
-    ADMINISTRATOR_HR("PersonnelFilter.ADMINISTRATOR_HR.text", "PersonnelFilter.ADMINISTRATOR_HR.toolTipText", false,
+    ADMINISTRATOR_GLOBAL("PersonnelFilter.ADMINISTRATOR.text",
+          "PersonnelFilter.ADMINISTRATOR.toolTipText",
+          true,
+          false),
+    ADMINISTRATOR_SINGLE("PersonnelFilter.ADMINISTRATOR.text", "PersonnelFilter.ADMINISTRATOR.toolTipText", false,
           true),
     DEPENDENT("PersonnelFilter.DEPENDENT.text", "PersonnelFilter.DEPENDENT.toolTipText"),
     CAMP_FOLLOWER("PersonnelFilter.CAMP_FOLLOWER.text", "PersonnelFilter.CAMP_FOLLOWER.toolTipText"),
@@ -289,23 +286,7 @@ public enum PersonnelFilter {
     }
 
     public boolean isAdministrator() {
-        return this == ADMINISTRATOR;
-    }
-
-    public boolean isAdministratorCommand() {
-        return this == ADMINISTRATOR_COMMAND;
-    }
-
-    public boolean isAdministratorLogistics() {
-        return this == ADMINISTRATOR_LOGISTICS;
-    }
-
-    public boolean isAdministratorTransport() {
-        return this == ADMINISTRATOR_TRANSPORT;
-    }
-
-    public boolean isAdministratorHR() {
-        return this == ADMINISTRATOR_HR;
+        return this == ADMINISTRATOR_GLOBAL;
     }
 
     public boolean isDependent() {
@@ -481,21 +462,10 @@ public enum PersonnelFilter {
                                             person.getPrimaryRole().isDoctor() : person.hasRole(PersonnelRole.DOCTOR));
             case MEDIC -> active && (MekHQ.getMHQOptions().getPersonnelFilterOnPrimaryRole() ?
                                            person.getPrimaryRole().isMedic() : person.hasRole(PersonnelRole.MEDIC));
-            case ADMINISTRATOR -> active && (MekHQ.getMHQOptions().getPersonnelFilterOnPrimaryRole() ?
+            case ADMINISTRATOR_GLOBAL -> active && (MekHQ.getMHQOptions().getPersonnelFilterOnPrimaryRole() ?
                                                    person.getPrimaryRole().isAdministrator() :
                                                    person.isAdministrator());
-            case ADMINISTRATOR_COMMAND -> active && (MekHQ.getMHQOptions().getPersonnelFilterOnPrimaryRole() ?
-                                                           person.getPrimaryRole().isAdministratorCommand() :
-                                                           person.hasRole(PersonnelRole.ADMINISTRATOR_COMMAND));
-            case ADMINISTRATOR_LOGISTICS -> active && (MekHQ.getMHQOptions().getPersonnelFilterOnPrimaryRole() ?
-                                                             person.getPrimaryRole().isAdministratorLogistics() :
-                                                             person.hasRole(PersonnelRole.ADMINISTRATOR_LOGISTICS));
-            case ADMINISTRATOR_TRANSPORT -> active && (MekHQ.getMHQOptions().getPersonnelFilterOnPrimaryRole() ?
-                                                             person.getPrimaryRole().isAdministratorTransport() :
-                                                             person.hasRole(PersonnelRole.ADMINISTRATOR_TRANSPORT));
-            case ADMINISTRATOR_HR -> active && (MekHQ.getMHQOptions().getPersonnelFilterOnPrimaryRole() ?
-                                                      person.getPrimaryRole().isAdministratorHR() :
-                                                      person.hasRole(PersonnelRole.ADMINISTRATOR_HR));
+            case ADMINISTRATOR_SINGLE -> active && person.hasRole(PersonnelRole.ADMINISTRATOR);
             case DEPENDENT -> ((!dead) && (active && person.getPrimaryRole().isCivilian()));
             case CAMP_FOLLOWER -> ((!dead) && (active && person.getStatus().isCampFollower()));
             case BACKGROUND_CHARACTER -> person.getStatus().isBackground();

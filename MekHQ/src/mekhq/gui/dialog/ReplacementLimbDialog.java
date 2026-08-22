@@ -32,7 +32,7 @@
  */
 package mekhq.gui.dialog;
 
-import static mekhq.campaign.Campaign.AdministratorSpecialization.HR;
+
 import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
 
 import java.util.ArrayList;
@@ -192,8 +192,7 @@ public class ReplacementLimbDialog {
             return seniorDoctor;
         } else {
             return campaign.getPlayerForce().getHumanResources()
-                         .getSeniorAdminPerson(HR,
-                               campaign.getCampaignOptions(),
+                         .getSeniorAdminPerson(campaign.getCampaignOptions(),
                                campaign.getPlayerForce().isClanForce(),
                                campaign.getLocalDate());
         }

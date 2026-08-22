@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2020-2025 The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2020-2026 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -75,10 +75,15 @@ public enum PersonnelRole {
     ASTECH(PersonnelRoleSubType.SUPPORT, KeyEvent.VK_UNDEFINED, 4, 4, 5, 3, 5, 5, 4),
     DOCTOR(PersonnelRoleSubType.SUPPORT, KeyEvent.VK_D, 3, 4, 5, 4, 5, 5, 4),
     MEDIC(PersonnelRoleSubType.SUPPORT, KeyEvent.VK_UNDEFINED, 3, 4, 5, 4, 5, 5, 4),
-    ADMINISTRATOR_COMMAND(PersonnelRoleSubType.SUPPORT, KeyEvent.VK_UNDEFINED, 3, 4, 4, 4, 5, 5, 5),
-    ADMINISTRATOR_LOGISTICS(PersonnelRoleSubType.SUPPORT, KeyEvent.VK_L, 3, 4, 4, 4, 5, 5, 5),
-    ADMINISTRATOR_TRANSPORT(PersonnelRoleSubType.SUPPORT, KeyEvent.VK_R, 3, 4, 4, 4, 5, 5, 5),
-    ADMINISTRATOR_HR(PersonnelRoleSubType.SUPPORT, KeyEvent.VK_H, 3, 4, 4, 4, 5, 5, 5),
+    ADMINISTRATOR(PersonnelRoleSubType.SUPPORT, KeyEvent.VK_UNDEFINED, 3, 4, 4, 4, 5, 5, 5),
+    @Deprecated(since = "0.51.01", forRemoval = true)
+    ADMINISTRATOR_COMMAND(true),
+    @Deprecated(since = "0.51.01", forRemoval = true)
+    ADMINISTRATOR_LOGISTICS(true),
+    @Deprecated(since = "0.51.01", forRemoval = true)
+    ADMINISTRATOR_TRANSPORT(true),
+    @Deprecated(since = "0.51.01", forRemoval = true)
+    ADMINISTRATOR_HR(true),
 
     // If we're generating a character without a Profession, we're just going to leave them with middle of the road
     // Attribute scores (4 in everything)
@@ -364,8 +369,8 @@ public enum PersonnelRole {
 
     public static final List<PersonnelRole> VEHICLE_CREW_EXTENDED_ROLES = List.of(MEK_TECH, AERO_TEK, MECHANIC,
           BA_TECH, ASTECH, DOCTOR, MEDIC, COMMS_OPERATOR, TECH_COMMUNICATIONS, SENSOR_TECHNICIAN, SOLDIER,
-          ADMINISTRATOR_COMMAND, ADMINISTRATOR_TRANSPORT, ADMINISTRATOR_LOGISTICS, ADMINISTRATOR_HR, CHEF,
-          VEHICLE_CREW_GROUND, VEHICLE_CREW_NAVAL, VEHICLE_CREW_VTOL);
+          ADMINISTRATOR, ADMINISTRATOR_COMMAND, ADMINISTRATOR_TRANSPORT, ADMINISTRATOR_LOGISTICS, ADMINISTRATOR_HR,
+          CHEF, VEHICLE_CREW_GROUND, VEHICLE_CREW_NAVAL, VEHICLE_CREW_VTOL);
 
     private final PersonnelRoleSubType subType;
     private final boolean hasClanName;
@@ -574,7 +579,7 @@ public enum PersonnelRole {
     /**
      * @return a list of skill names representing the profession-appropriate skills
      *
-     * @see #getSkillsForProfession(boolean, boolean, boolean, boolean)
+     * @see #getSkillsForProfession(boolean, boolean, boolean, boolean, boolean)
      */
     public List<String> getSkillsForProfession() {
         return getSkillsForProfession(false, false, false, false, false);
@@ -716,7 +721,8 @@ public enum PersonnelRole {
                 }
             }
             case MEDIC -> List.of(SkillType.S_MEDTECH);
-            case ADMINISTRATOR_COMMAND, ADMINISTRATOR_LOGISTICS, ADMINISTRATOR_TRANSPORT, ADMINISTRATOR_HR -> {
+            case ADMINISTRATOR, ADMINISTRATOR_COMMAND, ADMINISTRATOR_LOGISTICS, ADMINISTRATOR_TRANSPORT,
+                 ADMINISTRATOR_HR -> {
                 if (isAdminsHaveNegotiation) {
                     yield List.of(SkillType.S_ADMIN, SkillType.S_NEGOTIATION);
                 } else {
@@ -1152,34 +1158,6 @@ public enum PersonnelRole {
     }
 
     /**
-     * @return {@code true} if the personnel has the Admin/Command role, {@code false} otherwise.
-     */
-    public boolean isAdministratorCommand() {
-        return this == ADMINISTRATOR_COMMAND;
-    }
-
-    /**
-     * @return {@code true} if the personnel has the Admin/Logistics role, {@code false} otherwise.
-     */
-    public boolean isAdministratorLogistics() {
-        return this == ADMINISTRATOR_LOGISTICS;
-    }
-
-    /**
-     * @return {@code true} if the personnel has the Admin/Transport role, {@code false} otherwise.
-     */
-    public boolean isAdministratorTransport() {
-        return this == ADMINISTRATOR_TRANSPORT;
-    }
-
-    /**
-     * @return {@code true} if the personnel has the Admin/HR role, {@code false} otherwise.
-     */
-    public boolean isAdministratorHR() {
-        return this == ADMINISTRATOR_HR;
-    }
-
-    /**
      * @return {@code true} if the personnel has the Dependent role, {@code false} otherwise.
      */
     public boolean isDependent() {
@@ -1334,10 +1312,7 @@ public enum PersonnelRole {
      * @return {@code true} if the character is assigned to an Administrative role, {@code false} otherwise.
      */
     public boolean isAdministrator() {
-        return isAdministratorCommand() ||
-                     isAdministratorLogistics() ||
-                     isAdministratorTransport() ||
-                     isAdministratorHR();
+        return this == ADMINISTRATOR;
     }
 
     /**

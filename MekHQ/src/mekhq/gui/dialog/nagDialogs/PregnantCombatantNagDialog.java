@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2021-2025 The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2021-2026 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -33,7 +33,7 @@
 package mekhq.gui.dialog.nagDialogs;
 
 import static mekhq.MHQConstants.NAG_PREGNANT_COMBATANT;
-import static mekhq.campaign.Campaign.AdministratorSpecialization.HR;
+
 import static mekhq.gui.dialog.nagDialogs.nagLogic.PregnantCombatantNagLogic.hasActivePregnantCombatant;
 
 import java.util.List;
@@ -64,7 +64,7 @@ public class PregnantCombatantNagDialog extends ImmersiveDialogNag {
      *                 settings required for constructing the dialog.
      */
     public PregnantCombatantNagDialog(final Campaign campaign) {
-        super(campaign, HR, NAG_PREGNANT_COMBATANT, "PregnantCombatantNagDialog");
+        super(campaign, NAG_PREGNANT_COMBATANT, "PregnantCombatantNagDialog");
     }
 
     /**

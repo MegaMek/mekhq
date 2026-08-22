@@ -262,8 +262,7 @@ public class CapturePrisoners {
                 boolean isBondsman = prisoner.isClanPersonnel();
                 new ImmersiveDialogSimple(campaign,
                       campaign.getPlayerForce().getHumanResources()
-                            .getSeniorAdminPerson(mekhq.campaign.Campaign.AdministratorSpecialization.HR,
-                                  campaign.getCampaignOptions(),
+                            .getSeniorAdminPerson(campaign.getCampaignOptions(),
                                   campaign.getPlayerForce().isClanForce(),
                                   campaign.getLocalDate()),
                       null,

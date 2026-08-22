@@ -1060,10 +1060,7 @@ public class CompanyGenerationOptionsPanel extends AbstractScrollablePanel {
         final PersonnelRole[] personnelRoles = new PersonnelRole[] { PersonnelRole.MEK_TECH, PersonnelRole.MECHANIC,
                                                                      PersonnelRole.AERO_TEK, PersonnelRole.BA_TECH,
                                                                      PersonnelRole.DOCTOR,
-                                                                     PersonnelRole.ADMINISTRATOR_COMMAND,
-                                                                     PersonnelRole.ADMINISTRATOR_LOGISTICS,
-                                                                     PersonnelRole.ADMINISTRATOR_TRANSPORT,
-                                                                     PersonnelRole.ADMINISTRATOR_HR };
+                                                                     PersonnelRole.ADMINISTRATOR };
 
         // Create Panel Components
         setSpnSupportPersonnelNumbers(new HashMap<>());

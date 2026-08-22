@@ -35,7 +35,15 @@ package mekhq.campaign.randomEvents.prisoners;
 import static megamek.common.compute.Compute.d6;
 import static megamek.common.compute.Compute.randomInt;
 import static mekhq.campaign.personnel.PersonUtility.overrideSkills;
-import static mekhq.campaign.personnel.enums.PersonnelRole.*;
+import static mekhq.campaign.personnel.enums.PersonnelRole.ADMINISTRATOR;
+import static mekhq.campaign.personnel.enums.PersonnelRole.AERO_TEK;
+import static mekhq.campaign.personnel.enums.PersonnelRole.ASTECH;
+import static mekhq.campaign.personnel.enums.PersonnelRole.BA_TECH;
+import static mekhq.campaign.personnel.enums.PersonnelRole.DOCTOR;
+import static mekhq.campaign.personnel.enums.PersonnelRole.MECHANIC;
+import static mekhq.campaign.personnel.enums.PersonnelRole.MEDIC;
+import static mekhq.campaign.personnel.enums.PersonnelRole.MEK_TECH;
+import static mekhq.campaign.personnel.enums.PersonnelRole.SOLDIER;
 
 import java.util.Hashtable;
 import java.util.List;
@@ -91,10 +99,7 @@ public class NonCombatPrisoners {
                     Map.entry(ASTECH, 108), // 6 per tech 'pick'
                     Map.entry(DOCTOR, 1),
                     Map.entry(MEDIC, 4), // 4 per doctor
-                    Map.entry(ADMINISTRATOR_COMMAND, 1),
-                    Map.entry(ADMINISTRATOR_LOGISTICS, 5),
-                    Map.entry(ADMINISTRATOR_TRANSPORT, 1),
-                    Map.entry(ADMINISTRATOR_HR, 3)
+                    Map.entry(ADMINISTRATOR, 10)
               );
 
         WeightedIntMap<PersonnelRole> weightSortedMap = new WeightedIntMap<>();

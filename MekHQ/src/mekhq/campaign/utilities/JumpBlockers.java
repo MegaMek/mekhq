@@ -201,8 +201,7 @@ public class JumpBlockers {
         while (!wasOverallConfirmed) {
             ImmersiveDialogSimple notice = new ImmersiveDialogSimple(campaign,
                   campaign.getPlayerForce().getHumanResources()
-                        .getSeniorAdminPerson(Campaign.AdministratorSpecialization.TRANSPORT,
-                              campaign.getCampaignOptions(),
+                        .getSeniorAdminPerson(campaign.getCampaignOptions(),
                               campaign.getPlayerForce().isClanForce(),
                               campaign.getLocalDate()),
                   null,

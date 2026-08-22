@@ -465,15 +465,19 @@ public class Maintenance {
                     zeroGSkillLevel = zeroGSkill.getTotalSkillLevel(skillModifierData);
                 }
 
-                if (planet.getGravity() < 0.8) {
+                // getGravity() is nullable (a planet may record no gravity); default to standard Terran gravity so
+                // an unrecorded value contributes no modifier rather than throwing on the unboxing below.
+                Double recordedGravity = planet.getGravity();
+                double gravity = (recordedGravity != null) ? recordedGravity : 1.0;
+                if (gravity < 0.8) {
                     int modifier = 2;
                     target.addModifier(modifier, "Low Gravity");
                     addZeroGOperationsModifier(zeroGSkillLevel, modifier, target);
-                } else if (planet.getGravity() >= 2.0) {
+                } else if (gravity >= 2.0) {
                     int modifier = 4;
                     target.addModifier(modifier, "Very High Gravity");
                     addZeroGOperationsModifier(zeroGSkillLevel, modifier, target);
-                } else if (planet.getGravity() > 1.2) {
+                } else if (gravity > 1.2) {
                     int modifier = 1;
                     target.addModifier(modifier, "High Gravity");
                     addZeroGOperationsModifier(zeroGSkillLevel, modifier, target);

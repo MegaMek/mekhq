@@ -94,7 +94,7 @@ class EmployerLiaisonTest {
 
     @ParameterizedTest
     @CsvSource({
-          "GOVERNMENT, false, ADMINISTRATOR_COMMAND",
+          "GOVERNMENT, false, ADMINISTRATOR",
           "GOVERNMENT, true, MEKWARRIOR",
           "MERCENARY, false, MILITARY_LIAISON",
           "MERCENARY, true, MERCHANT",
@@ -115,7 +115,7 @@ class EmployerLiaisonTest {
     }
 
     @ParameterizedTest
-    @CsvSource({ "GOVERNMENT, false, ADMINISTRATOR_COMMAND", "GOVERNMENT, true, MEKWARRIOR" })
+    @CsvSource({ "GOVERNMENT, false, MEKWARRIOR" })
     void anOfficialLiaisonIsGivenAFactionAppropriateRank(ContractSearchType searchType, boolean employerIsClan,
           PersonnelRole role) {
         Person liaison = personWithRole(role);

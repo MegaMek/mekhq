@@ -746,8 +746,7 @@ public class ChaosReputation {
         PlayerForce playerForce = campaign.getPlayerForce();
         ForceHumanResources forceHumanResources = playerForce.getHumanResources();
         boolean isClanForce = playerForce.isClanForce();
-        Person seniorAdmin = forceHumanResources.getSeniorAdminPerson(Campaign.AdministratorSpecialization.COMMAND,
-              campaign.getCampaignOptions(),
+        Person seniorAdmin = forceHumanResources.getSeniorAdminPerson(campaign.getCampaignOptions(),
               isClanForce,
               campaign.getLocalDate());
 

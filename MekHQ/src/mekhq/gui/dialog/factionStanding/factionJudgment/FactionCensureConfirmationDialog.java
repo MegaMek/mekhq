@@ -82,8 +82,7 @@ public class FactionCensureConfirmationDialog {
      */
     public FactionCensureConfirmationDialog(Campaign campaign) {
         Person speaker = campaign.getPlayerForce().getHumanResources()
-                               .getSeniorAdminPerson(mekhq.campaign.Campaign.AdministratorSpecialization.COMMAND,
-                                     campaign.getCampaignOptions(),
+                               .getSeniorAdminPerson(campaign.getCampaignOptions(),
                                      campaign.getPlayerForce().isClanForce(),
                                      campaign.getLocalDate());
 

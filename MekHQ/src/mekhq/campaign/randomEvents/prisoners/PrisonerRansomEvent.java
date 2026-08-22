@@ -153,8 +153,7 @@ public class PrisonerRansomEvent {
 
         ImmersiveDialogSimple eventDialog = new ImmersiveDialogSimple(campaign,
               campaign.getPlayerForce().getHumanResources()
-                    .getSeniorAdminPerson(Campaign.AdministratorSpecialization.COMMAND,
-                          campaign.getCampaignOptions(),
+                    .getSeniorAdminPerson(campaign.getCampaignOptions(),
                           campaign.getPlayerForce().isClanForce(),
                           campaign.getLocalDate()),
               null,

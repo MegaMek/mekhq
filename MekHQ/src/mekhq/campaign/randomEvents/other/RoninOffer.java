@@ -180,8 +180,7 @@ public class RoninOffer {
 
         ImmersiveDialogSimple initialMessage = new ImmersiveDialogSimple(campaign,
               campaign.getPlayerForce().getHumanResources()
-                    .getSeniorAdminPerson(Campaign.AdministratorSpecialization.HR,
-                          campaign.getCampaignOptions(),
+                    .getSeniorAdminPerson(campaign.getCampaignOptions(),
                           campaign.getPlayerForce().isClanForce(),
                           campaign.getLocalDate()),
               null,

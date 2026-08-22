@@ -33,7 +33,6 @@
 package mekhq.gui.dialog.nagDialogs;
 
 import static mekhq.MHQConstants.NAG_UNABLE_TO_AFFORD_JUMP;
-import static mekhq.campaign.Campaign.AdministratorSpecialization.TRANSPORT;
 import static mekhq.gui.dialog.nagDialogs.nagLogic.UnableToAffordJumpNagLogic.getNextJumpCost;
 import static mekhq.gui.dialog.nagDialogs.nagLogic.UnableToAffordJumpNagLogic.unableToAffordNextJump;
 import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
@@ -64,7 +63,7 @@ public class UnableToAffordJumpNagDialog extends ImmersiveDialogNag {
      *                 required for constructing the nag dialog.
      */
     public UnableToAffordJumpNagDialog(final Campaign campaign) {
-        super(campaign, TRANSPORT, NAG_UNABLE_TO_AFFORD_JUMP, "UnableToAffordJumpNagDialog");
+        super(campaign, NAG_UNABLE_TO_AFFORD_JUMP, "UnableToAffordJumpNagDialog");
     }
 
     @Override

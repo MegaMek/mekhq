@@ -366,19 +366,6 @@ public class Campaign implements ITechManager {
      */
     public static final WeekFields WEEK_FIELDS = WeekFields.ISO;
 
-    /**
-     * Represents the different types of administrative specializations. Each specialization corresponds to a distinct
-     * administrative role within the organization.
-     *
-     * <p>
-     * These specializations are used to determine administrative roles and responsibilities, such as by identifying the
-     * most senior administrator for a given role.
-     * </p>
-     */
-    public enum AdministratorSpecialization {
-        COMMAND, LOGISTICS, TRANSPORT, HR
-    }
-
     @Deprecated(since = "0.51.0")
     private final transient ResourceBundle resources = ResourceBundle.getBundle("mekhq.resources.Campaign",
           MekHQ.getMHQOptions().getLocale());
@@ -1729,8 +1716,7 @@ public class Campaign implements ITechManager {
         }
 
         Person negotiator = getPlayerForce().getHumanResources()
-                                  .getSeniorAdminPerson(AdministratorSpecialization.TRANSPORT,
-                                        getCampaignOptions(),
+                                  .getSeniorAdminPerson(getCampaignOptions(),
                                         getPlayerForce().isClanForce(),
                                         getLocalDate());
         if (negotiator != null) {
@@ -4067,8 +4053,7 @@ public class Campaign implements ITechManager {
         if (!skipEmptySystemCheck && getPlayerForce().isAvoidingEmptySystems()
                   && end.getPopulation(currentDay) == 0) {
             new ImmersiveDialogSimple(this, getPlayerForce().getHumanResources()
-                                                  .getSeniorAdminPerson(AdministratorSpecialization.TRANSPORT,
-                                                        getCampaignOptions(),
+                                                  .getSeniorAdminPerson(getCampaignOptions(),
                                                         getPlayerForce().isClanForce(),
                                                         getLocalDate()), null,
                   String.format(resources.getString("unableToEnterSystem.abandoned.ic"), getCommanderAddress()),
@@ -4086,8 +4071,7 @@ public class Campaign implements ITechManager {
                   start, end, currentDay, activeAtBContracts, factionHints);
             if (!canAccessSystem) {
                 new ImmersiveDialogSimple(this, getPlayerForce().getHumanResources()
-                                                      .getSeniorAdminPerson(AdministratorSpecialization.TRANSPORT,
-                                                            getCampaignOptions(),
+                                                      .getSeniorAdminPerson(getCampaignOptions(),
                                                             getPlayerForce().isClanForce(),
                                                             getLocalDate()), null,
                       String.format(resources.getString("unableToEnterSystem.outlawed.ic"), getCommanderAddress()),

@@ -304,8 +304,7 @@ public class PrisonEscapeScenario {
               coords.toBTString());
         new ImmersiveDialogSimple(campaign,
               campaign.getPlayerForce().getHumanResources()
-                    .getSeniorAdminPerson(mekhq.campaign.Campaign.AdministratorSpecialization.COMMAND,
-                          campaign.getCampaignOptions(),
+                    .getSeniorAdminPerson(campaign.getCampaignOptions(),
                           campaign.getPlayerForce().isClanForce(),
                           campaign.getLocalDate()),
               null,

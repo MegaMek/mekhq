@@ -32,8 +32,7 @@
  */
 package mekhq.campaign.market.personnelMarket.markets;
 
-import static mekhq.campaign.personnel.enums.PersonnelRole.ADMINISTRATOR_COMMAND;
-import static mekhq.campaign.personnel.enums.PersonnelRole.ADMINISTRATOR_HR;
+import static mekhq.campaign.personnel.enums.PersonnelRole.ADMINISTRATOR;
 import static mekhq.campaign.personnel.enums.PersonnelRole.DEPENDENT;
 import static mekhq.campaign.personnel.enums.PersonnelRole.DOCTOR;
 import static mekhq.campaign.personnel.enums.PersonnelRole.LAM_PILOT;
@@ -69,7 +68,7 @@ import org.mockito.ArgumentMatchers;
 import org.mockito.MockedStatic;
 
 class NewPersonnelMarketTest {
-    static PersonnelMarketEntry marketEntryAdminHR = entry(ADMINISTRATOR_HR, 1, 1);
+    static PersonnelMarketEntry marketEntryAdmin = entry(ADMINISTRATOR, 1, 1);
     static PersonnelMarketEntry marketEntryDoctor = entry(DOCTOR, 2, 2);
     static PersonnelMarketEntry marketEntryMekWarrior = entry(MEKWARRIOR, 3, 3);
 
@@ -108,9 +107,9 @@ class NewPersonnelMarketTest {
               marketEntryDoctor,
               MEKWARRIOR,
               marketEntryMekWarrior,
-              ADMINISTRATOR_HR,
-              marketEntryAdminHR);
-        List<PersonnelRole> expectedOrder = List.of(ADMINISTRATOR_HR, DOCTOR, MEKWARRIOR);
+              ADMINISTRATOR,
+              marketEntryAdmin);
+        List<PersonnelRole> expectedOrder = List.of(ADMINISTRATOR, DOCTOR, MEKWARRIOR);
 
         List<PersonnelMarketEntry> sortedList = personnelMarket.getMarketEntriesAsList(marketEntries);
 
@@ -202,8 +201,7 @@ class NewPersonnelMarketTest {
         Map<PersonnelRole, PersonnelMarketEntry> marketEntries = new HashMap<>();
         marketEntries.put(DOCTOR, entry(DOCTOR, -2, 4));
         marketEntries.put(MEKWARRIOR, entry(MEKWARRIOR, 0, 1));
-        marketEntries.put(ADMINISTRATOR_HR, entry(ADMINISTRATOR_HR, 1, -1));
-        marketEntries.put(ADMINISTRATOR_COMMAND, entry(ADMINISTRATOR_COMMAND, 1, 0));
+        marketEntries.put(ADMINISTRATOR, entry(ADMINISTRATOR, 1, -1));
         marketEntries.put(LAM_PILOT, entry(LAM_PILOT, -1, -1));
         marketEntries.put(PROTOMEK_PILOT, entry(PROTOMEK_PILOT, 1, 1));
 
@@ -216,8 +214,7 @@ class NewPersonnelMarketTest {
         assertTrue(sanitizedEntries.containsKey(PROTOMEK_PILOT));
         assertFalse(sanitizedEntries.containsKey(DOCTOR));
         assertFalse(sanitizedEntries.containsKey(MEKWARRIOR));
-        assertFalse(sanitizedEntries.containsKey(ADMINISTRATOR_HR));
-        assertFalse(sanitizedEntries.containsKey(ADMINISTRATOR_COMMAND));
+        assertFalse(sanitizedEntries.containsKey(ADMINISTRATOR));
         assertFalse(sanitizedEntries.containsKey(LAM_PILOT));
     }
 
@@ -289,11 +286,11 @@ class NewPersonnelMarketTest {
     }
 
     @ParameterizedTest
-    @CsvSource(value = { "0, ADMINISTRATOR_HR", "1, DOCTOR", "2, DOCTOR", "3, MEKWARRIOR", "4, MEKWARRIOR",
+    @CsvSource(value = { "0, ADMINISTRATOR", "1, DOCTOR", "2, DOCTOR", "3, MEKWARRIOR", "4, MEKWARRIOR",
                          "5, MEKWARRIOR" })
     void testPickEntry_multiplePositiveEntriesEachPickable(int randomValue, String expectedEntryKey) {
         // Setup
-        List<PersonnelMarketEntry> entries = List.of(marketEntryAdminHR, marketEntryDoctor, marketEntryMekWarrior);
+        List<PersonnelMarketEntry> entries = List.of(marketEntryAdmin, marketEntryDoctor, marketEntryMekWarrior);
         NewPersonnelMarket market = new NewPersonnelMarket();
 
         // Act
@@ -356,7 +353,7 @@ class NewPersonnelMarketTest {
         PersonnelMarketEntry negativeCountDoctor = entry(DOCTOR, 100, -1);
         PersonnelMarketEntry zeroCountLAMPilot = entry(LAM_PILOT, 100, 0);
         PersonnelMarketEntry negativeWeightProtoMekPilot = entry(PROTOMEK_PILOT, -1, 10);
-        PersonnelMarketEntry zeroWeightAdmin = entry(ADMINISTRATOR_COMMAND, 0, 10);
+        PersonnelMarketEntry zeroWeightAdmin = entry(ADMINISTRATOR, 0, 10);
 
         List<PersonnelMarketEntry> entries = List.of(weightedMekWarrior,
               negativeCountDoctor,

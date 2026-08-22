@@ -1,0 +1,163 @@
+Windchild's Guide to Loading Portraits in MekHQ
+Written 08-Feb-2020, Updated 05-Aug-2020, 01-Nov-2021, 17-Aug-2026.
+MekHQ version 0.51.01
+
+
+When Does MekHQ Assign a Random Portrait?
+Random portraits are only handed out when the campaign options allow it. The relevant options live under
+Campaign Options -> Name and Portrait Generation Options:
+- The "Portrait Assignment" section holds a checkbox per primary role. If the box for a character's PRIMARY role is
+  off, that character is never given a random portrait, no matter what is in the folders. Only MekWarrior is ticked by
+  default, so this is usually the first thing to change.
+- "No Random Portraits for Children" (default ON) skips children entirely. If "Generate Random Portraits for Children
+  Coming of Age" (default ON) is also set, those characters get a portrait when they turn 16, provided they still have
+  the default portrait at that point.
+- "Allow Duplicate Portraits" (default ON) lets a portrait be reused. With it off, any portrait already assigned to
+  another character in the campaign is removed from the pool before the random pick.
+- "Portraits Ignore Roles" (default OFF) skips the role and role-group folders completely, going straight to the
+  Combat/Support step and then the gendered folder.
+
+
+How Portrait Loading Works:
+MekHQ first determines the character's gender, then walks the following folders in order:
+    1. /<Gender>/<Primary Role Label>       e.g. /Male/MekWarrior, /Female/Vehicle Crew/Ground
+    2. /<Gender>/<Role Group>               e.g. /Male/Admin, /Female/Tech (only some roles have a group; see below)
+    3. /<Gender>/Combat or /<Gender>/Support
+    4. /<Gender>                            everything for that gender
+
+The first folder in that list which contains at least one eligible picture wins, and a random picture is chosen from
+that folder. The search then stops. So if you put pictures in both /Male/MekWarrior and /Male/Combat, Male MekWarriors
+will never be assigned one of the Combat pictures unless every Male MekWarrior-specific picture is already taken.
+
+Subfolders count. As of 0.51.01 a folder search matches that folder AND everything nested underneath it. This has two
+consequences worth knowing:
+- A folder can be organised into subfolders however you like. /Male/Admin covers /Male/Admin/Veterans, and so on.
+- The final /<Gender> step therefore covers every portrait filed anywhere under that gender. In practice a character
+  will nearly always end up with something rather than the default silhouette.
+Pictures sitting loose in the top-level portraits folder (such as default.gif) are outside every gendered folder and
+are never picked at random.
+
+
+Where the Portraits Live:
+Two locations are read and merged together:
+- <MekHQ install directory>/data/images/portraits
+- <your MegaMek user directory>/data/images/portraits
+
+The user directory is the better home for your own portraits: it is set in MegaMek's client settings, and its contents
+survive upgrading MekHQ. Story arcs may also ship their own data/images/portraits folder, which is merged in as well.
+
+The paths below are all relative to one of those two portraits folders.
+
+For example, to load a group of portraits only for Male MekWarriors, the folder is:
+    <portraits>/Male/MekWarrior
+For a portrait usable by any Female administrator:
+    <portraits>/Female/Administrator
+For a portrait usable by any Female technician (MekTech, Mechanic, AeroTek or Battle Armor Tech):
+    <portraits>/Female/Tech
+
+
+Gendered Folders: All of the folders below MUST sit inside one of these two, or the portraits will not be loaded.
+Female characters:              /Female
+Everyone else:                  /Male
+
+
+Primary Role Folders:
+The folder name is the role's in-game label, spelled exactly as it appears in the personnel table. Where a label
+contains a "/", that is a real nested folder: the Vehicle Crew/Ground role reads from /<Gender>/Vehicle Crew/Ground.
+
+Role                            Folder
+MekWarrior:                     /MekWarrior
+LAM Pilot:                      /LAM Pilot
+Vehicle Crew/Ground:            /Vehicle Crew/Ground
+Vehicle Crew/Naval:             /Vehicle Crew/Naval
+Vehicle Crew/VTOL:              /Vehicle Crew/VTOL
+Aerospace Pilot:                /Aerospace Pilot
+Conventional Aircraft Crew:     /Conventional Aircraft Crew
+ProtoMek Pilot:                 /ProtoMek Pilot
+Battle Armor Pilot:             /Battle Armor Pilot
+Battle Armor Pilot (Clan):      /Elemental
+Soldier:                        /Soldier
+Vessel Pilot:                   /Vessel Pilot
+Vessel Gunner:                  /Vessel Gunner
+Vessel Crewmember:              /Vessel Crewmember
+Hyperspace Navigator:           /Hyperspace Navigator
+MekTech:                        /MekTech
+Mechanic:                       /Mechanic
+AeroTek:                        /AeroTek
+Battle Armor Tech:              /Battle Armor Tech
+Astech:                         /Astech
+Doctor:                         /Doctor
+Medic:                          /Medic
+Administrator:                  /Administrator
+Every civilian role:            /Civilian
+
+Battle Armor Pilot is the only role with a separate Clan name. Characters flagged as Clan personnel read from
+/Elemental instead of /Battle Armor Pilot; everyone else reads from /Battle Armor Pilot.
+
+All civilian roles share a single /Civilian folder. That covers Dependent, None, and the whole list of civilian
+professions (Chef, Broker, Noble, and the rest), plus any role that has since been deprecated. There is no folder for
+an individual civilian profession, and there are no longer separate /Dependent or /None folders.
+
+
+Role Group Folders:
+These are a fallback for when the role folder above is missing or exhausted. Only the roles listed here have one.
+Administrators:                 /Admin           Administrator
+Vehicle Crews:                  /Vehicle Crew    Vehicle Crew/Ground, Vehicle Crew/Naval, Vehicle Crew/VTOL
+Vessel Crewmembers:             /Vessel Crew     Vessel Pilot, Vessel Gunner, Vessel Crewmember, Hyperspace Navigator
+Techs:                          /Tech            MekTech, Mechanic, AeroTek, Battle Armor Tech
+Medical Staff:                  /Medical         Doctor, Medic
+
+Two traps here:
+- /Vessel Crew applies only to the Vessel Crewmember role. Vessel Pilots, Vessel Gunners and Hyperspace Navigators do
+  NOT fall back to it; they go straight from their own role folder to /Combat.
+- Astechs have no group folder. They go from /Astech straight to /Support.
+
+This step predates the current portrait folders and is kept so that collections sorted by role family keep working. The
+stock portraits are all filed under their own role folder, so nothing shipped depends on it. The one you are most
+likely to have is /<Gender>/Admin, which is where administrator portraits shipped before 0.51.01; it still works, and
+still feeds every administrator.
+
+
+General Grouping Folders:
+Combat Personnel:               /Combat
+Support Personnel:              /Support
+
+Combat covers every combat role: MekWarrior, LAM Pilot, the three Vehicle Crew roles, Aerospace Pilot, Conventional
+Aircraft Crew, ProtoMek Pilot, Battle Armor Pilot, Soldier, Vessel Pilot, Vessel Gunner, Vessel Crewmember and
+Hyperspace Navigator. Everything else -- support staff and civilians alike -- uses Support.
+
+
+Post-0.51.01 Compatibility:
+The four administrator roles were merged into a single Administrator role. Admin/Command, Admin/Logistical,
+Admin/Transport and Admin/HR no longer exist as assignable roles, and all administrators now read from
+/<Gender>/Administrator, falling back to /<Gender>/Admin.
+
+The stock portraits moved to match. The four /<Gender>/Admin/{Command,HR,Logistical,Transport} folders are gone and
+their portraits now sit in /<Gender>/Administrator.
+
+Existing campaigns are migrated for you and need no attention:
+- Characters keep the portrait they already had. Loading a campaign repoints any portrait that referenced one of the
+  four old sub-folders at /<Gender>/Administrator, and the new path is written back out the next time the campaign is
+  saved. The picture itself is unchanged.
+- A character keeps the old administrator role only until the save is opened; MekHQ converts them to Administrator on
+  load.
+
+Your own portraits are not touched. If you had built your own /<Gender>/Admin folder, it keeps its name, keeps its
+contents, and keeps feeding administrators through the role group fallback. Only the four folder names that shipped
+with MekHQ are repointed, so sorting your own portraits into an /Admin folder still works exactly as before.
+
+
+Post-0.50.10 Compatibility:
+The vehicle crew update replaced the old vehicle roles and, with them, their portrait folders.
+
+Old folder                      New folder
+/Vehicle Driver                 /Vehicle Crew/Ground
+/Naval Driver                   /Vehicle Crew/Naval
+/VTOL Pilot                     /Vehicle Crew/VTOL
+/Vehicle Gunner                 /Vehicle Crew/Ground  (the Vehicle Gunner role was removed)
+/Vehicle Crewmember             /Vehicle Crew/Generic (no role targets this folder directly any more; it is reached
+                                                       through the /Vehicle Crew group fallback)
+
+For existing campaigns you will need to rename your folders to match the new format. Anything left in an old folder
+name is not lost -- it still sits under /<Gender>, so it can be picked by the final fallback step -- but it will no
+longer be tied to the role you filed it under.

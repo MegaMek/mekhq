@@ -483,7 +483,7 @@ public class SystemValidator {
           String planetInfo, ValidationResult result) {
         LocalDate baseDate = LocalDate.of(1, 1, 1);
 
-        if (planet.getPressure(baseDate) == null) {
+        if (planet.getSourcedPressure(baseDate) == null) {
             result.addMessage(new ValidationMessage(Severity.WARNING,
                   Category.MISSING_ATMOSPHERE_DATA, fileName, systemId, planetInfo,
                   "Terrestrial planet missing pressure"));

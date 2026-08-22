@@ -116,8 +116,7 @@ public class MercenaryAuction {
 
             new ImmersiveDialogSimple(campaign,
                   campaign.getPlayerForce().getHumanResources()
-                        .getSeniorAdminPerson(mekhq.campaign.Campaign.AdministratorSpecialization.TRANSPORT,
-                              campaign.getCampaignOptions(),
+                        .getSeniorAdminPerson(campaign.getCampaignOptions(),
                               campaign.getPlayerForce().isClanForce(),
                               campaign.getLocalDate()),
                   null,
@@ -161,8 +160,7 @@ public class MercenaryAuction {
             // This dialog informs the player their bid was successful
             new ImmersiveDialogSimple(campaign,
                   campaign.getPlayerForce().getHumanResources()
-                        .getSeniorAdminPerson(mekhq.campaign.Campaign.AdministratorSpecialization.TRANSPORT,
-                              campaign.getCampaignOptions(),
+                        .getSeniorAdminPerson(campaign.getCampaignOptions(),
                               campaign.getPlayerForce().isClanForce(),
                               campaign.getLocalDate()),
                   null,
@@ -175,8 +173,7 @@ public class MercenaryAuction {
             // This dialog informs the player their bid was unsuccessful
             new ImmersiveDialogSimple(campaign,
                   campaign.getPlayerForce().getHumanResources()
-                        .getSeniorAdminPerson(mekhq.campaign.Campaign.AdministratorSpecialization.TRANSPORT,
-                              campaign.getCampaignOptions(),
+                        .getSeniorAdminPerson(campaign.getCampaignOptions(),
                               campaign.getPlayerForce().isClanForce(),
                               campaign.getLocalDate()),
                   null,

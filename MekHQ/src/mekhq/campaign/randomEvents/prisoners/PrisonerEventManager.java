@@ -37,7 +37,6 @@ import static java.lang.Math.max;
 import static java.lang.Math.min;
 import static java.lang.Math.round;
 import static java.time.temporal.IsoFields.WEEK_OF_WEEK_BASED_YEAR;
-import static mekhq.campaign.Campaign.AdministratorSpecialization.TRANSPORT;
 import static mekhq.campaign.enums.DailyReportType.GENERAL;
 import static mekhq.campaign.enums.DailyReportType.PERSONNEL;
 import static mekhq.campaign.enums.DailyReportType.POLITICS;
@@ -761,8 +760,7 @@ public class PrisonerEventManager {
 
         if (speaker == null) {
             return campaign.getPlayerForce().getHumanResources()
-                         .getSeniorAdminPerson(TRANSPORT,
-                               campaign.getCampaignOptions(),
+                         .getSeniorAdminPerson(campaign.getCampaignOptions(),
                                campaign.getPlayerForce().isClanForce(),
                                campaign.getLocalDate());
         } else {

@@ -32,7 +32,7 @@
  */
 package mekhq.campaign.mission.contract.contractGeneration.negotiationsAndNPCs;
 
-import static mekhq.campaign.personnel.enums.PersonnelRole.ADMINISTRATOR_COMMAND;
+import static mekhq.campaign.personnel.enums.PersonnelRole.ADMINISTRATOR;
 import static mekhq.campaign.personnel.enums.PersonnelRole.BROKER;
 import static mekhq.campaign.personnel.enums.PersonnelRole.MEKWARRIOR;
 import static mekhq.campaign.personnel.enums.PersonnelRole.MERCHANT;
@@ -51,7 +51,7 @@ import mekhq.campaign.personnel.ranks.AutomaticRankAssigner;
 
 public class EmployerLiaison {
     private final static PersonnelRole PIRATE_LIAISON_ROLE = BROKER;
-    private final static PersonnelRole GOVERNMENT_LIAISON_NORMAL = ADMINISTRATOR_COMMAND;
+    private final static PersonnelRole GOVERNMENT_LIAISON_NORMAL = ADMINISTRATOR;
     private final static PersonnelRole GOVERNMENT_LIAISON_CLAN = MEKWARRIOR;
     private final static PersonnelRole MERCENARY_LIAISON_NORMAL = MILITARY_LIAISON;
     private final static PersonnelRole MERCENARY_LIAISON_CLAN = MERCHANT;

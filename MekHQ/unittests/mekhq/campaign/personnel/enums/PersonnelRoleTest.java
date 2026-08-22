@@ -325,51 +325,6 @@ class PersonnelRoleTest {
             }
         }
     }
-
-    @Test
-    void testIsAdministratorCommand() {
-        for (final PersonnelRole personnelRole : roles) {
-            if (personnelRole == PersonnelRole.ADMINISTRATOR_COMMAND) {
-                assertTrue(personnelRole.isAdministratorCommand());
-            } else {
-                assertFalse(personnelRole.isAdministratorCommand());
-            }
-        }
-    }
-
-    @Test
-    void testIsAdministratorLogistics() {
-        for (final PersonnelRole personnelRole : roles) {
-            if (personnelRole == PersonnelRole.ADMINISTRATOR_LOGISTICS) {
-                assertTrue(personnelRole.isAdministratorLogistics());
-            } else {
-                assertFalse(personnelRole.isAdministratorLogistics());
-            }
-        }
-    }
-
-    @Test
-    void testIsAdministratorTransport() {
-        for (final PersonnelRole personnelRole : roles) {
-            if (personnelRole == PersonnelRole.ADMINISTRATOR_TRANSPORT) {
-                assertTrue(personnelRole.isAdministratorTransport());
-            } else {
-                assertFalse(personnelRole.isAdministratorTransport());
-            }
-        }
-    }
-
-    @Test
-    void testIsAdministratorHR() {
-        for (final PersonnelRole personnelRole : roles) {
-            if (personnelRole == PersonnelRole.ADMINISTRATOR_HR) {
-                assertTrue(personnelRole.isAdministratorHR());
-            } else {
-                assertFalse(personnelRole.isAdministratorHR());
-            }
-        }
-    }
-
     @Test
     void testIsDependent() {
         for (final PersonnelRole personnelRole : roles) {
@@ -509,14 +464,14 @@ class PersonnelRoleTest {
         assertFalse(PersonnelRole.VESSEL_NAVIGATOR.isSupport());
         assertTrue(PersonnelRole.MEK_TECH.isSupport());
         assertTrue(PersonnelRole.ASTECH.isSupport());
-        assertTrue(PersonnelRole.ADMINISTRATOR_COMMAND.isSupport());
+        assertTrue(PersonnelRole.ADMINISTRATOR.isSupport());
         assertFalse(PersonnelRole.DEPENDENT.isSupport());
         assertFalse(PersonnelRole.NONE.isSupport());
         assertFalse(PersonnelRole.MEKWARRIOR.isSupport(true));
         assertFalse(PersonnelRole.VESSEL_NAVIGATOR.isSupport(true));
         assertTrue(PersonnelRole.MEK_TECH.isSupport(true));
         assertTrue(PersonnelRole.ASTECH.isSupport(true));
-        assertTrue(PersonnelRole.ADMINISTRATOR_COMMAND.isSupport(true));
+        assertTrue(PersonnelRole.ADMINISTRATOR.isSupport(true));
         assertFalse(PersonnelRole.DEPENDENT.isSupport(true));
         assertFalse(PersonnelRole.NONE.isSupport(true));
     }
@@ -571,10 +526,7 @@ class PersonnelRoleTest {
     void testIsAdministrator() {
         for (final PersonnelRole personnelRole : roles) {
             switch (personnelRole) {
-                case ADMINISTRATOR_COMMAND:
-                case ADMINISTRATOR_LOGISTICS:
-                case ADMINISTRATOR_TRANSPORT:
-                case ADMINISTRATOR_HR:
+                case ADMINISTRATOR:
                     assertTrue(personnelRole.isAdministrator());
                     break;
                 default:
@@ -662,10 +614,7 @@ class PersonnelRoleTest {
     @Test
     void testGetAdministratorRoles() {
         final List<PersonnelRole> expected = new ArrayList<>();
-        expected.add(PersonnelRole.ADMINISTRATOR_COMMAND);
-        expected.add(PersonnelRole.ADMINISTRATOR_LOGISTICS);
-        expected.add(PersonnelRole.ADMINISTRATOR_TRANSPORT);
-        expected.add(PersonnelRole.ADMINISTRATOR_HR);
+        expected.add(PersonnelRole.ADMINISTRATOR);
         assertEquals(expected, PersonnelRole.getAdministratorRoles());
     }
 

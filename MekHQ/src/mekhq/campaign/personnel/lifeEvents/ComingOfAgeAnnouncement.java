@@ -245,15 +245,13 @@ public class ComingOfAgeAnnouncement {
      */
     private @Nullable Person getFallbackSpeaker() {
         Person speaker = campaign.getPlayerForce().getHumanResources()
-                               .getSeniorAdminPerson(mekhq.campaign.Campaign.AdministratorSpecialization.HR,
-                                     campaign.getCampaignOptions(),
+                               .getSeniorAdminPerson(campaign.getCampaignOptions(),
                                      campaign.getPlayerForce().isClanForce(),
                                      campaign.getLocalDate());
 
         if (speaker == null) {
             speaker = campaign.getPlayerForce().getHumanResources()
-                            .getSeniorAdminPerson(mekhq.campaign.Campaign.AdministratorSpecialization.COMMAND,
-                                  campaign.getCampaignOptions(),
+                            .getSeniorAdminPerson(campaign.getCampaignOptions(),
                                   campaign.getPlayerForce().isClanForce(),
                                   campaign.getLocalDate());
         } else {

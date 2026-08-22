@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2021-2025 The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2021-2026 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -33,7 +33,7 @@
 package mekhq.gui.dialog.nagDialogs;
 
 import static mekhq.MHQConstants.NAG_UNRESOLVED_STRAT_CON_CONTACTS;
-import static mekhq.campaign.Campaign.AdministratorSpecialization.COMMAND;
+
 import static mekhq.gui.dialog.nagDialogs.nagLogic.UnresolvedStratConContactsNagLogic.determineUnresolvedContacts;
 import static mekhq.gui.dialog.nagDialogs.nagLogic.UnresolvedStratConContactsNagLogic.hasUnresolvedContacts;
 import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
@@ -48,7 +48,7 @@ import mekhq.gui.baseComponents.immersiveDialogs.ImmersiveDialogNag;
 
 public class UnresolvedStratConContactsNagDialog extends ImmersiveDialogNag {
     public UnresolvedStratConContactsNagDialog(final Campaign campaign) {
-        super(campaign, COMMAND, NAG_UNRESOLVED_STRAT_CON_CONTACTS, "UnresolvedStratConContactsNagDialog");
+        super(campaign, NAG_UNRESOLVED_STRAT_CON_CONTACTS, "UnresolvedStratConContactsNagDialog");
     }
 
     @Override

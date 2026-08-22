@@ -83,8 +83,7 @@ public class MercenaryAuctionDialog extends ImmersiveDialogCore {
           int percentPerStep) {
         super(campaign,
               campaign.getPlayerForce().getHumanResources()
-                    .getSeniorAdminPerson(mekhq.campaign.Campaign.AdministratorSpecialization.TRANSPORT,
-                          campaign.getCampaignOptions(),
+                    .getSeniorAdminPerson(campaign.getCampaignOptions(),
                           campaign.getPlayerForce().isClanForce(),
                           campaign.getLocalDate()),
               null,

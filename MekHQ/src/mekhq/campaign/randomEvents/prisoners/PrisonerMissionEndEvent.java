@@ -113,8 +113,7 @@ public class PrisonerMissionEndEvent {
         String outOfCharacterMessage = getFormattedTextAt(RESOURCE_BUNDLE, "prisonerDefectors.ooc");
         ImmersiveDialogSimple dialog = new ImmersiveDialogSimple(campaign,
               campaign.getPlayerForce().getHumanResources()
-                    .getSeniorAdminPerson(Campaign.AdministratorSpecialization.HR,
-                          campaign.getCampaignOptions(),
+                    .getSeniorAdminPerson(campaign.getCampaignOptions(),
                           campaign.getPlayerForce().isClanForce(),
                           campaign.getLocalDate()),
               null,
@@ -170,8 +169,7 @@ public class PrisonerMissionEndEvent {
 
         ImmersiveDialogSimple dialog = new ImmersiveDialogSimple(campaign,
               campaign.getPlayerForce().getHumanResources()
-                    .getSeniorAdminPerson(Campaign.AdministratorSpecialization.COMMAND,
-                          campaign.getCampaignOptions(),
+                    .getSeniorAdminPerson(campaign.getCampaignOptions(),
                           campaign.getPlayerForce().isClanForce(),
                           campaign.getLocalDate()),
               null,

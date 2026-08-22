@@ -145,10 +145,21 @@ public class QuickTrain {
 
             SkillModifierData skillModifierData = person.getSkillModifierData(isUseAgingEffects, isClanCampaign,
                   today, true);
-            processSkills(person, isAdminsHaveNegotiation, isDoctorsUseAdministration, isTechsUseAdministration,
-                  isLevelArtillery, isUseSmallArmsOnly, isLevelScoutingSkills, isLevelEscapeSkills,
-                  isUseAppraisal, procurementPersonnel, isLevelLeadership, isLevelTraining, isLevelOtherCommandSkills,
-                  targetSkills, skillModifierData);
+            processSkills(person,
+                  isAdminsHaveNegotiation,
+                  isDoctorsUseAdministration,
+                  isTechsUseAdministration,
+                  isLevelArtillery,
+                  isUseSmallArmsOnly,
+                  isLevelScoutingSkills,
+                  isLevelEscapeSkills,
+                  isUseAppraisal,
+                  procurementPersonnel,
+                  isLevelLeadership,
+                  isLevelTraining,
+                  isLevelOtherCommandSkills,
+                  targetSkills,
+                  skillModifierData);
 
             if (targetSkills.isEmpty()) {
                 continue;
@@ -287,8 +298,7 @@ public class QuickTrain {
      * <p>The {@code targetSkills} list is modified in place; skills may be added, removed, and finally reordered.
      *
      * @param person                     the person whose skills and roles are being evaluated
-     * @param isAdminsHaveNegotiation    {@code true} if administrators should use negotiation instead of administration
-     *                                   for their profession-based skill picks
+     * @param isAdminsHaveNegotiation    {@code true} if administrators should also be trained in the Negotiation skill
      * @param isDoctorsUseAdministration {@code true} if doctors should use administration instead of medical-specific
      *                                   skills for their profession-based picks
      * @param isTechsUseAdministration   {@code true} if technicians should use administration instead of
@@ -321,12 +331,24 @@ public class QuickTrain {
           SkillModifierData skillModifierData) {
         Skills personSkills = person.getSkills();
 
-        fetchSkillsForProfession(isAdminsHaveNegotiation, isDoctorsUseAdministration,
-              isTechsUseAdministration, isLevelArtillery, isUseSmallArmsOnly, person, targetSkills,
-              person.getPrimaryRole(), skillModifierData);
-        fetchSkillsForProfession(isAdminsHaveNegotiation, isDoctorsUseAdministration,
-              isTechsUseAdministration, isLevelArtillery, isUseSmallArmsOnly, person, targetSkills,
-              person.getSecondaryRole(), skillModifierData);
+        fetchSkillsForProfession(isAdminsHaveNegotiation,
+              isDoctorsUseAdministration,
+              isTechsUseAdministration,
+              isLevelArtillery,
+              isUseSmallArmsOnly,
+              person,
+              targetSkills,
+              person.getPrimaryRole(),
+              skillModifierData);
+        fetchSkillsForProfession(isAdminsHaveNegotiation,
+              isDoctorsUseAdministration,
+              isTechsUseAdministration,
+              isLevelArtillery,
+              isUseSmallArmsOnly,
+              person,
+              targetSkills,
+              person.getSecondaryRole(),
+              skillModifierData);
 
         if (!personSkills.hasSkill(SkillType.S_ARTILLERY)) {
             targetSkills.remove(SkillType.S_ARTILLERY);
@@ -360,8 +382,7 @@ public class QuickTrain {
                     }
                 }
                 case LOGISTICS -> {
-                    boolean isLogisticsCharacter = person.getPrimaryRole().isAdministratorLogistics() ||
-                                                         person.getSecondaryRole().isAdministratorLogistics();
+                    boolean isLogisticsCharacter = person.isAdministrator();
                     if (isLogisticsCharacter && shouldAddSkill(personSkills, S_APPRAISAL, targetSkills)) {
                         targetSkills.add(S_APPRAISAL);
                     }
@@ -428,7 +449,7 @@ public class QuickTrain {
      * Identifies and adds to the target skills list all relevant trainable skills for a given profession of a person,
      * observing special rules for vehicle crews and soldiers.
      *
-     * @param isAdminsHaveNegotiation    campaign option: admins substitute negotiation
+     * @param isAdminsHaveNegotiation    campaign option: admins also train Negotiation
      * @param isDoctorsUseAdministration campaign option: doctors substitute administration
      * @param isTechsUseAdministration   campaign option: techs substitute administration
      * @param isUseArtillery             campaign option: include artillery skills
@@ -458,13 +479,19 @@ public class QuickTrain {
 
             if (highestSkillName == null) {
                 targetSkills.addAll(PersonnelRole.SOLDIER.getSkillsForProfession(isAdminsHaveNegotiation,
-                      isDoctorsUseAdministration, isTechsUseAdministration, isUseArtillery, false));
+                      isDoctorsUseAdministration,
+                      isTechsUseAdministration,
+                      isUseArtillery,
+                      false));
             } else {
                 targetSkills.add(highestSkillName);
             }
         } else {
             targetSkills.addAll(profession.getSkillsForProfession(isAdminsHaveNegotiation,
-                  isDoctorsUseAdministration, isTechsUseAdministration, isUseArtillery, false));
+                  isDoctorsUseAdministration,
+                  isTechsUseAdministration,
+                  isUseArtillery,
+                  false));
         }
     }
 

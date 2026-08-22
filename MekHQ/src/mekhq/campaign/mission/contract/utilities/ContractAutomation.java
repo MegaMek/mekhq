@@ -246,8 +246,7 @@ public class ContractAutomation {
               getTextAt(RESOURCE_BUNDLE, "generalDecline.text"));
 
         final Person speaker = campaign.getPlayerForce().getHumanResources()
-                                     .getSeniorAdminPerson(mekhq.campaign.Campaign.AdministratorSpecialization.TRANSPORT,
-                                           campaign.getCampaignOptions(),
+                                     .getSeniorAdminPerson(campaign.getCampaignOptions(),
                                            campaign.getPlayerForce().isClanForce(),
                                            campaign.getLocalDate());
 

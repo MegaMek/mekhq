@@ -227,18 +227,17 @@ public class RetirementDefectionTracker {
     }
 
     /**
-     * Calculates the combined skill values of active Admin/HR personnel.
+     * Calculates the combined skill values of active Admin personnel.
      *
      * @param campaign the campaign for which to calculate the combined skill values
      *
-     * @return the combined skill values of active Admin/HR personnel in the campaign
+     * @return the combined skill values of active Admin personnel in the campaign
      */
     public static int getCombinedSkillValues(Campaign campaign, String skillType) {
         int combinedSkillValues = 0;
 
         for (Person person : campaign.getPlayerForce().getHumanResources().getActivePersonnel(false, false)) {
-            boolean isAdmin = person.getPrimaryRole().isAdministratorHR() ||
-                                    person.getSecondaryRole().isAdministratorHR();
+            boolean isAdmin = person.isAdministrator();
             if (!isAdmin) {
                 continue;
             }
@@ -373,7 +372,7 @@ public class RetirementDefectionTracker {
                 return 0; // personnel is within capacity, no modifier
             }
         } else {
-            // return penalty here on no Admin/HR staff, based on constant
+            // return penalty here on no Admin staff, based on constant
             return HR_DEFAULT_NOADMIN_PENALTY;
         }
     }
