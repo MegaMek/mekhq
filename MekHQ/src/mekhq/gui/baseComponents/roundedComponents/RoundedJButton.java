@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2025 The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2025-2026 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -53,18 +53,18 @@ public class RoundedJButton extends JButton {
     /**
      * The padding between the button border and its contents, in pixels.
      */
-    private static final int VERTICAL_PADDING = 5;
-    private static final int HORIZONTAL_PADDING = 5;
+    protected static final int VERTICAL_PADDING = 5;
+    protected static final int HORIZONTAL_PADDING = 5;
 
     /**
      * The thickness of the border, in pixels.
      */
-    private static final int THICKNESS = 2;
+    protected static final int THICKNESS = 2;
 
     /**
      * The arc diameter for the button's rounded corners, in pixels.
      */
-    private static final int ARC = 16;
+    protected static final int ARC = 16;
 
     /**
      * Constructs a default {@link RoundedJButton} with no text.
