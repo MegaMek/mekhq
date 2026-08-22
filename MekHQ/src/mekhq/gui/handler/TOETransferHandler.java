@@ -40,6 +40,7 @@ import java.io.IOException;
 import java.util.StringTokenizer;
 import java.util.UUID;
 import javax.swing.JComponent;
+import javax.swing.JOptionPane;
 import javax.swing.JTree;
 import javax.swing.TransferHandler;
 import javax.swing.tree.TreePath;
@@ -83,13 +84,34 @@ public class TOETransferHandler extends TransferHandler {
     protected Transferable createTransferable(JComponent c) {
         JTree tree = (JTree) c;
         Object node = tree.getLastSelectedPathComponent();
-        if (node instanceof Unit) {
-            return new StringSelection("UNIT|" + ((Unit) node).getId().toString());
-        } else if (node instanceof Formation) {
-            return new StringSelection("FORCE|" + ((Formation) node).getId());
+        if (node instanceof Unit unit) {
+            if (unit.isDeployed()) {
+                showCannotMoveDialog(c, unit.getEntity().getShortName());
+                return null;
+            }
+            return new StringSelection("UNIT|" + unit.getId().toString());
+        } else if (node instanceof Formation formation) {
+            if (formation.isDeployed()) {
+                showCannotMoveDialog(c, formation.toString());
+                return null;
+            }
+            return new StringSelection("FORCE|" + formation.getId());
         } else {
             return null;
         }
+    }
+
+    /**
+     * A method that displays a dialog for units or formations that cannot be moved in the
+     * TO&E because they are already deployed.
+     *
+     */
+    private void showCannotMoveDialog(JComponent parent, String unit_formation_string) {
+        JOptionPane.showMessageDialog(
+            parent,
+            unit_formation_string + " cannot be moved because it is currently deployed to a mission.",
+            "Cannot Move: " + unit_formation_string,
+            JOptionPane.WARNING_MESSAGE);
     }
 
     @Override
