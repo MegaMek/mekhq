@@ -119,7 +119,7 @@ public class ContractDossierPanel extends JPanel {
         // The title names the enemy, so when the opposition is hidden the title reads as unknown too.
         boolean oppositionHidden = contract.isIntelObfuscated(ObfuscatableIntel.OPPOSITION);
         String titleText = oppositionHidden
-                                 ? getTextAt(RESOURCE_BUNDLE, "dossier.contractMarket.title.obfuscated")
+                                 ? getTextAt(RESOURCE_BUNDLE, "dossier.contractMarket.intel.obfuscated")
                                  : contract.getName();
         JLabel title = new JLabel("<html><span style='font-size:smaller'>"
                                         +
