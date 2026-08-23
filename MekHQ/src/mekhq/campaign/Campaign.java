@@ -916,10 +916,28 @@ public class Campaign implements ITechManager {
      */
     public void importMission(final AbstractContract mission) {
         mission.setCampaignOptions(getCampaignOptions());
-        mission.getScenarios().forEach(this::importScenario);
+        mission.getScenarios().forEach(scenario -> importScenario(scenario, mission));
         contractHistory.contractHistory().put(mission.getId(), mission);
         MekHQ.triggerEvent(new MissionNewEvent(mission));
         StratConContractInitializer.restoreTransientStratconInformation(mission, this);
+    }
+
+    /**
+     * Imports a scenario that was loaded as part of {@code mission}, restoring its link back to that contract before
+     * registering it with the campaign.
+     *
+     * <p>{@link Scenario#getMissionId()} is a back-pointer that never reaches the save file. A contract's scenarios
+     * are nested inside the contract itself, so the link is implied by position rather than stored, and it is
+     * {@link AbstractContract#addScenario(Scenario)} that stamps it. Both load paths build the scenario list directly
+     * instead, so the id has to be restored here or every restored scenario comes back with no contract and each
+     * lookup of its contract returns {@code null}.</p>
+     *
+     * @param scenario the scenario being restored
+     * @param mission  the contract the scenario belongs to
+     */
+    private void importScenario(final Scenario scenario, final AbstractContract mission) {
+        scenario.setMissionId(mission.getId());
+        importScenario(scenario);
     }
 
     public ContractHistoryData getContractHistoryData() {
@@ -930,7 +948,13 @@ public class Campaign implements ITechManager {
         return contractHistory.contractHistory();
     }
 
-    public @jakarta.annotation.Nullable AbstractContract getContract(UUID contractId) {
+    /**
+     * @param contractId the id of the contract to look up, or {@code null} when the caller holds no id - for example a
+     *                   scenario that has yet to be attached to a contract
+     *
+     * @return the contract with that id, or {@code null} if the campaign has never held one
+     */
+    public @Nullable AbstractContract getContract(@Nullable UUID contractId) {
         return contractHistory.get(contractId);
     }
 
