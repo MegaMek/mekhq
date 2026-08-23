@@ -769,8 +769,21 @@ public final class BriefingTab extends CampaignGuiTab {
         refreshScenarioActionButtonEmphasis();
     }
 
+    /**
+     * @param scenario the scenario to test
+     *
+     * @return {@code true} if the scenario belongs to a contract that is running a StratCon campaign, otherwise
+     *       {@code false} - including when the scenario has no contract to ask
+     */
     private boolean isStratConScenario(Scenario scenario) {
         AbstractContract mission = getCampaign().getContract(scenario.getMissionId());
+        if (mission == null) {
+            logger.warn("[Briefing] Scenario {} ({}) is not linked to any contract; treating it as non-StratCon.",
+                  scenario.getId(),
+                  scenario.getName());
+            return false;
+        }
+
         return mission.getStratConCampaignState() != null;
     }
 
