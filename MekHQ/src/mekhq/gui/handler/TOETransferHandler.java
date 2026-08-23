@@ -32,6 +32,8 @@
  */
 package mekhq.gui.handler;
 
+import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
+
 import java.awt.datatransfer.DataFlavor;
 import java.awt.datatransfer.StringSelection;
 import java.awt.datatransfer.Transferable;
@@ -55,6 +57,8 @@ import mekhq.gui.CampaignGUI;
 
 public class TOETransferHandler extends TransferHandler {
     private static final MMLogger LOGGER = MMLogger.create(TOETransferHandler.class);
+
+    private static final String RESOURCE_BUNDLE = "mekhq.resources.TOETransferHandler";
 
     private final CampaignGUI gui;
 
@@ -109,8 +113,8 @@ public class TOETransferHandler extends TransferHandler {
     private void showCannotMoveDialog(JComponent parent, String unit_formation_string) {
         JOptionPane.showMessageDialog(
             parent,
-            unit_formation_string + " cannot be moved because it is currently deployed to a mission.",
-            "Cannot Move: " + unit_formation_string,
+            getFormattedTextAt(RESOURCE_BUNDLE, "popup.TOETransferHandler.cannotMove", unit_formation_string),
+            getFormattedTextAt(RESOURCE_BUNDLE, "popup.TOETransferHandler.cannotMoveTitle", unit_formation_string),
             JOptionPane.WARNING_MESSAGE);
     }
 
