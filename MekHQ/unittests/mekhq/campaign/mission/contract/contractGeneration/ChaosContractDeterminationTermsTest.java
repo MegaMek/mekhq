@@ -50,7 +50,7 @@ import org.junit.jupiter.api.Test;
 import org.mockito.MockedStatic;
 
 /**
- * Tests the roll-to-step tables in {@link ChaosContractDetermineTerms}.
+ * Tests the roll-to-step tables in {@link ChaosContractDeterminationTerms}.
  *
  * <p>Every clause rolls the same stubbed 2d6, then shifts the base step by (objective modifier + employer modifier).
  * The cases below pair {@link ChaosObjectiveType#RAID} with {@link ChaosEmployerType#NOBLE}: NOBLE is neutral on every
@@ -58,12 +58,13 @@ import org.mockito.MockedStatic;
  * tables directly and only salvage carries a one-step drop. That keeps the roll tables - the typo-prone part - pinned
  * without re-deriving the modifier arithmetic.</p>
  */
-class ChaosContractDetermineTermsTest {
+class ChaosContractDeterminationTermsTest {
 
     private static ContractTermsData termsForRoll(final int roll) {
         try (MockedStatic<Compute> compute = mockStatic(Compute.class)) {
             compute.when(() -> Compute.d6(2)).thenReturn(roll);
-            return ChaosContractDetermineTerms.determineInitialTerms(ChaosObjectiveType.RAID, ChaosEmployerType.NOBLE,
+            return ChaosContractDeterminationTerms.determineInitialTerms(ChaosObjectiveType.RAID,
+                    ChaosEmployerType.NOBLE,
                   null, false);
         }
     }
@@ -92,7 +93,7 @@ class ChaosContractDetermineTermsTest {
             compute.when(() -> Compute.d6(2)).thenReturn(2);
             // CORPORATION carries a +2 pay-rate modifier; RAID adds nothing to pay, so base STEP_THREE climbs to
             // STEP_FIVE. This proves the employer modifier reaches influenceStep rather than being dropped.
-            ContractTermsData terms = ChaosContractDetermineTerms.determineInitialTerms(ChaosObjectiveType.RAID,
+            ContractTermsData terms = ChaosContractDeterminationTerms.determineInitialTerms(ChaosObjectiveType.RAID,
                   ChaosEmployerType.CORPORATION, null, false);
 
             assertEquals(STEP_FIVE, terms.payRate());

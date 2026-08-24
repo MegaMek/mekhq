@@ -204,10 +204,10 @@ public class AbstractContractGeneration {
 
         // Pay - the default Chaos Campaign scheme, or the CamOps force-value scheme when the campaign opts into it.
         if (campaign.getCampaignOptions().get(CampaignOption.USE_LEGACY_CONTRACT_PAY)) {
-            CamOpsContractPayDetermination.determineContractPayForCamOpsContract(campaign, currentDate, contract,
+            CamOpsContractDeterminationPay.determineContractPayForCamOpsContract(campaign, currentDate, contract,
                   currentLocation);
         } else {
-            ChaosContractPayDetermination.determineContractPayForChaosContract(campaign, currentDate, contract,
+            ChaosContractDeterminationPay.determineContractPayForChaosContract(campaign, currentDate, contract,
                   currentLocation);
         }
 
@@ -276,7 +276,8 @@ public class AbstractContractGeneration {
      * @return the automatically determined track count
      */
     public static int determineTrackCount(AbstractContract contract) {
-        return ChaosContractDetermineIntensity.determineTrackCount(contract.getObjectiveType().getChaosObjectiveType());
+        return ChaosContractDeterminationIntensity.determineTrackCount(contract.getObjectiveType()
+                                                                               .getChaosObjectiveType());
     }
 
     /**
@@ -324,9 +325,9 @@ public class AbstractContractGeneration {
      */
     public static Money determineMonthlyPay(Campaign campaign, AbstractContract contract) {
         if (campaign.getCampaignOptions().get(CampaignOption.USE_LEGACY_CONTRACT_PAY)) {
-            return CamOpsContractPayDetermination.getMonthlyPay(campaign, contract);
+            return CamOpsContractDeterminationPay.getMonthlyPay(campaign, contract);
         }
-        return ChaosContractPayDetermination.getMonthlyPay(campaign, contract);
+        return ChaosContractDeterminationPay.getMonthlyPay(campaign, contract);
     }
 
     /**
@@ -336,9 +337,9 @@ public class AbstractContractGeneration {
      */
     public static Money determineCombatPay(Campaign campaign, AbstractContract contract) {
         if (campaign.getCampaignOptions().get(CampaignOption.USE_LEGACY_CONTRACT_PAY)) {
-            return CamOpsContractPayDetermination.getCombatPay();
+            return CamOpsContractDeterminationPay.getCombatPay();
         }
-        return ChaosContractPayDetermination.getCombatPay(campaign, contract);
+        return ChaosContractDeterminationPay.getCombatPay(campaign, contract);
     }
 
     /**
@@ -346,7 +347,7 @@ public class AbstractContractGeneration {
      * to the target from the player's current location).
      */
     public static Money determineTransportPay(Campaign campaign, AbstractContract contract) {
-        return ChaosContractPayDetermination.getTransportPay(campaign, campaign.getLocalDate(), contract,
+        return ChaosContractDeterminationPay.getTransportPay(campaign, campaign.getLocalDate(), contract,
               campaign.getPlayerForce().getForceDetachment().getCurrentLocation());
     }
 
@@ -478,7 +479,7 @@ public class AbstractContractGeneration {
 
     private static void setContractTerms(ChaosObjectiveType objectiveType, ChaosEmployerType employerType,
           Faction employerFaction, boolean useFactionModifiers, ChaosContract contract) {
-        ContractTermsData initialContractTerms = ChaosContractDetermineTerms.determineInitialTerms(objectiveType,
+        ContractTermsData initialContractTerms = ChaosContractDeterminationTerms.determineInitialTerms(objectiveType,
               employerType, employerFaction, useFactionModifiers);
         contract.setContractTerms(initialContractTerms);
     }
@@ -565,7 +566,7 @@ public class AbstractContractGeneration {
 
     private static @Nonnull ContractObjectiveData pickObjective(int contractGenerationModifier,
           ChaosContract contract) {
-        ContractObjectiveData objectiveData = ChaosContractObjectiveDetermination.determineContractObjectiveType(
+        ContractObjectiveData objectiveData = ChaosContractDeterminationObjective.determineContractObjectiveType(
               contractGenerationModifier);
         contract.setObjectiveData(objectiveData);
         return objectiveData;
@@ -573,7 +574,7 @@ public class AbstractContractGeneration {
 
     private static @Nullable EmployerData pickEmployer(Campaign campaign, LocalDate currentDate,
           ILocation currentLocation, ContractSearchType searchType, ChaosContract contract) {
-        EmployerData employerData = ChaosContractEmployerDetermination.getEmployerGenerationData(currentDate,
+        EmployerData employerData = ChaosContractDeterminationEmployer.getEmployerGenerationData(currentDate,
               currentLocation,
               campaign,
               searchType);

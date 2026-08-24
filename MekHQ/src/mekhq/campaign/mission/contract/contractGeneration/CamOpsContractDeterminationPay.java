@@ -43,7 +43,7 @@ import org.jspecify.annotations.NonNull;
 
 /**
  * Determines contract pay the Campaign Operations (CamOps) way, as an alternative to the default Chaos Campaign scheme
- * in {@link ChaosContractPayDetermination}.
+ * in {@link ChaosContractDeterminationPay}.
  *
  * <p>Where the Chaos scheme derives pay from the contract's abstract scale and support-point multipliers, the CamOps
  * scheme grounds the monthly retainer in the force-value calculation configured on the Contract Market campaign options
@@ -61,14 +61,14 @@ import org.jspecify.annotations.NonNull;
  *     to the target), which already applies the negotiated transport multiplier.</li>
  * </ul>
  *
- * @see ChaosContractPayDetermination
+ * @see ChaosContractDeterminationPay
  */
-public class CamOpsContractPayDetermination {
+public class CamOpsContractDeterminationPay {
     public static void determineContractPayForCamOpsContract(Campaign campaign, LocalDate currentDate,
           AbstractContract contract, AbstractLocation currentLocation) {
         Money monthlyPay = getMonthlyPay(campaign, contract);
         Money combatPay = getCombatPay();
-        Money transportPay = ChaosContractPayDetermination.getTransportPay(campaign, currentDate, contract,
+        Money transportPay = ChaosContractDeterminationPay.getTransportPay(campaign, currentDate, contract,
               currentLocation);
 
         ContractFinanceData contractFinanceData = new ContractFinanceData(transportPay, monthlyPay, combatPay);

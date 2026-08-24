@@ -48,7 +48,7 @@ import mekhq.campaign.mission.utilities.ContractUtilities;
 import mekhq.campaign.universe.PlanetarySystem;
 import org.jspecify.annotations.NonNull;
 
-public class ChaosContractPayDetermination {
+public class ChaosContractDeterminationPay {
     public final static int DEFAULT_MONTHLY_PAY_MULTIPLIER = 500; // Draconis Reach first printing pg 26
     public final static int DEFAULT_COMBAT_PAY_MULTIPLIER = 500; // Draconis Reach first printing pg 26
     public final static int DEFAULT_TRANSPORT_COST_MULTIPLIER = 50; // Draconis Reach first printing pg 26

@@ -48,7 +48,7 @@ import java.util.List;
 
 import megamek.common.compute.Compute;
 import mekhq.campaign.location.ILocation;
-import mekhq.campaign.mission.contract.contractGeneration.ChaosContractEmployerDetermination.EmployerFactions;
+import mekhq.campaign.mission.contract.contractGeneration.ChaosContractDeterminationEmployer.EmployerFactions;
 import mekhq.campaign.universe.Faction;
 import mekhq.campaign.universe.Factions;
 import mekhq.campaign.universe.PlanetarySystem;
@@ -57,14 +57,14 @@ import org.junit.jupiter.api.Test;
 import org.mockito.MockedStatic;
 
 /**
- * Covers the flavor/anchor/sponsor resolution in {@link ChaosContractEmployerDetermination#determineEmployerFactions}
+ * Covers the flavor/anchor/sponsor resolution in {@link ChaosContractDeterminationEmployer#determineEmployerFactions}
  * &mdash; in particular the rebel-sponsor rule: rebels always remain the visible employer, and a ComStar/Word of Blake
  * patron that would otherwise take over the contract instead becomes their covert backer on a mercenary search.
  *
  * <p>The faction singletons, the random faction generator, and the dice are all stubbed so these tests are fully
  * deterministic and need no loaded universe.</p>
  */
-class ChaosContractEmployerDeterminationTest {
+class ChaosContractDeterminationEmployerTest {
 
     private static final int YEAR = 3050;
     private static final LocalDate DATE = LocalDate.of(YEAR, 1, 1);
@@ -121,7 +121,7 @@ class ChaosContractEmployerDeterminationTest {
             // A roll of 0 opens the ComStar override, which is checked before Word of Blake.
             compute.when(() -> Compute.randomInt(anyInt())).thenReturn(0);
 
-            EmployerFactions result = ChaosContractEmployerDetermination.determineEmployerFactions(
+            EmployerFactions result = ChaosContractDeterminationEmployer.determineEmployerFactions(
                   ChaosEmployerType.CIVILIAN_ORGANIZATION_REBELS, DATE, locationOwnedByHouse(), true);
 
             assertSame(rebels, result.flavor(), "rebels remain the visible employer");
@@ -143,7 +143,7 @@ class ChaosContractEmployerDeterminationTest {
             // A non-zero roll misses both the ComStar and Word of Blake override windows.
             compute.when(() -> Compute.randomInt(anyInt())).thenReturn(1);
 
-            EmployerFactions result = ChaosContractEmployerDetermination.determineEmployerFactions(
+            EmployerFactions result = ChaosContractDeterminationEmployer.determineEmployerFactions(
                   ChaosEmployerType.CIVILIAN_ORGANIZATION_REBELS, DATE, locationOwnedByHouse(), true);
 
             assertSame(rebels, result.flavor());
@@ -162,7 +162,7 @@ class ChaosContractEmployerDeterminationTest {
         try (MockedStatic<Factions> factionsStatic = mockStatic(Factions.class)) {
             stubFactions(factionsStatic, rebels, house, comStar, wordOfBlake);
 
-            EmployerFactions result = ChaosContractEmployerDetermination.determineEmployerFactions(
+            EmployerFactions result = ChaosContractDeterminationEmployer.determineEmployerFactions(
                   ChaosEmployerType.CIVILIAN_ORGANIZATION_REBELS, DATE, locationOwnedByHouse(), false);
 
             assertSame(rebels, result.flavor());
@@ -181,7 +181,7 @@ class ChaosContractEmployerDeterminationTest {
         try (MockedStatic<Factions> factionsStatic = mockStatic(Factions.class)) {
             stubFactions(factionsStatic, rebels, house, comStar, wordOfBlake);
 
-            EmployerFactions result = ChaosContractEmployerDetermination.determineEmployerFactions(
+            EmployerFactions result = ChaosContractDeterminationEmployer.determineEmployerFactions(
                   ChaosEmployerType.LOCAL_SYSTEM_OWNER, DATE, locationOwnedByHouse(), false);
 
             assertSame(house, result.flavor(), "a local system owner is the current system's controller");
@@ -209,7 +209,7 @@ class ChaosContractEmployerDeterminationTest {
             // Resolves the fronting corporation's flavor faction.
             when(generator.getRandomEmployerFaction(eq(location), eq(DATE), eq(true), any())).thenReturn(house);
 
-            EmployerFactions result = ChaosContractEmployerDetermination.determineEmployerFactions(
+            EmployerFactions result = ChaosContractDeterminationEmployer.determineEmployerFactions(
                   ChaosEmployerType.CORPORATION, DATE, location, true);
 
             assertEquals(ChaosEmployerType.CORPORATION, result.type(),
@@ -240,7 +240,7 @@ class ChaosContractEmployerDeterminationTest {
             generatorStatic.when(RandomFactionGenerator::getInstance).thenReturn(generator);
             when(generator.getRandomEmployerFaction(eq(location), eq(DATE), eq(true), any())).thenReturn(house);
 
-            EmployerFactions result = ChaosContractEmployerDetermination.determineEmployerFactions(
+            EmployerFactions result = ChaosContractDeterminationEmployer.determineEmployerFactions(
                   ChaosEmployerType.CORPORATION, DATE, location, true);
 
             assertEquals(ChaosEmployerType.CORPORATION, result.type(), "Word of Blake keeps the rolled employer type");
