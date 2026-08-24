@@ -203,13 +203,8 @@ public class AbstractContractGeneration {
         contract.setStratConCampaignState(stratConCampaignState);
 
         // Pay - the default Chaos Campaign scheme, or the CamOps force-value scheme when the campaign opts into it.
-        if (campaign.getCampaignOptions().get(CampaignOption.USE_LEGACY_CONTRACT_PAY)) {
-            CamOpsContractDeterminationPay.determineContractPayForCamOpsContract(campaign, currentDate, contract,
-                  currentLocation);
-        } else {
-            ChaosContractDeterminationPay.determineContractPayForChaosContract(campaign, currentDate, contract,
-                  currentLocation);
-        }
+        AbstractContractDeterminationPay.forCampaign(campaign)
+              .determineContractPay(campaign, currentDate, contract, currentLocation);
 
         // Intel Obfuscation - optionally hide some market-offer intel from the player.
         applyIntelObfuscation(campaign, contract);
@@ -324,10 +319,7 @@ public class AbstractContractGeneration {
      * when {@link CampaignOption#USE_LEGACY_CONTRACT_PAY} is set, otherwise the Chaos scale-and-base-pay scheme.
      */
     public static Money determineMonthlyPay(Campaign campaign, AbstractContract contract) {
-        if (campaign.getCampaignOptions().get(CampaignOption.USE_LEGACY_CONTRACT_PAY)) {
-            return CamOpsContractDeterminationPay.getMonthlyPay(campaign, contract);
-        }
-        return ChaosContractDeterminationPay.getMonthlyPay(campaign, contract);
+        return AbstractContractDeterminationPay.forCampaign(campaign).getMonthlyPay(campaign, contract);
     }
 
     /**
@@ -336,10 +328,7 @@ public class AbstractContractGeneration {
      * bonus derived from scale.
      */
     public static Money determineCombatPay(Campaign campaign, AbstractContract contract) {
-        if (campaign.getCampaignOptions().get(CampaignOption.USE_LEGACY_CONTRACT_PAY)) {
-            return CamOpsContractDeterminationPay.getCombatPay();
-        }
-        return ChaosContractDeterminationPay.getCombatPay(campaign, contract);
+        return AbstractContractDeterminationPay.forCampaign(campaign).getCombatPay(campaign, contract);
     }
 
     /**
@@ -347,7 +336,8 @@ public class AbstractContractGeneration {
      * to the target from the player's current location).
      */
     public static Money determineTransportPay(Campaign campaign, AbstractContract contract) {
-        return ChaosContractDeterminationPay.getTransportPay(campaign, campaign.getLocalDate(), contract,
+        return AbstractContractDeterminationPay.forCampaign(campaign).getTransportPay(campaign,
+              campaign.getLocalDate(), contract,
               campaign.getPlayerForce().getForceDetachment().getCurrentLocation());
     }
 

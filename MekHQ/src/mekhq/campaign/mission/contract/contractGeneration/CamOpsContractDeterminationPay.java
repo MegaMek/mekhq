@@ -32,9 +32,6 @@
  */
 package mekhq.campaign.mission.contract.contractGeneration;
 
-import java.time.LocalDate;
-
-import mekhq.campaign.AbstractLocation;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.finances.Money;
 import mekhq.campaign.mission.contract.AbstractContract;
@@ -57,35 +54,27 @@ import org.jspecify.annotations.NonNull;
  *     negotiation terms still matter under CamOps.</li>
  *     <li><b>Combat pay</b> &mdash; zero; CamOps folds combat compensation into the monthly retainer rather than a
  *     separate battle bonus.</li>
- *     <li><b>Transport pay</b> &mdash; reuses the Chaos transport calculation (scale, transport terms, and the journey
- *     to the target), which already applies the negotiated transport multiplier.</li>
+ *     <li><b>Transport pay</b> &mdash; inherited from {@link AbstractContractDeterminationPay} (scale, transport terms,
+ *     and the journey to the target), which already applies the negotiated transport multiplier.</li>
  * </ul>
  *
+ * @see AbstractContractDeterminationPay
  * @see ChaosContractDeterminationPay
  */
-public class CamOpsContractDeterminationPay {
-    public static void determineContractPayForCamOpsContract(Campaign campaign, LocalDate currentDate,
-          AbstractContract contract, AbstractLocation currentLocation) {
-        Money monthlyPay = getMonthlyPay(campaign, contract);
-        Money combatPay = getCombatPay();
-        Money transportPay = ChaosContractDeterminationPay.getTransportPay(campaign, currentDate, contract,
-              currentLocation);
-
-        ContractFinanceData contractFinanceData = new ContractFinanceData(transportPay, monthlyPay, combatPay);
-        contract.setContractFinanceData(contractFinanceData);
-    }
-
+public class CamOpsContractDeterminationPay extends AbstractContractDeterminationPay {
     /**
      * The CamOps monthly retainer: the campaign's CamOps contract-base force value, scaled by the contract's negotiated
      * base-pay multiplier.
      */
-    public static @NonNull Money getMonthlyPay(Campaign campaign, AbstractContract contract) {
+    @Override
+    public @NonNull Money getMonthlyPay(Campaign campaign, AbstractContract contract) {
         Money base = campaign.getAccountant().getContractBase();
         return base.multipliedBy(contract.getBasePayMultiplier());
     }
 
     /** CamOps folds combat compensation into the monthly retainer, so there is no separate combat bonus. */
-    public static @NonNull Money getCombatPay() {
+    @Override
+    public @NonNull Money getCombatPay(Campaign campaign, AbstractContract contract) {
         return Money.zero();
     }
 }
