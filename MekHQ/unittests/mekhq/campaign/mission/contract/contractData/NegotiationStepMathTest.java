@@ -33,6 +33,7 @@
 package mekhq.campaign.mission.contract.contractData;
 
 import static mekhq.campaign.mission.contract.contractData.NegotiationStepMath.distinctTermsSacrificed;
+import static mekhq.campaign.mission.contract.contractData.NegotiationStepMath.nextHigherDifferentStep;
 import static mekhq.campaign.mission.contract.contractData.NegotiationStepMath.nextLowerDifferentStep;
 import static mekhq.campaign.mission.contract.contractData.NegotiationStepMath.rawValue;
 import static mekhq.campaign.mission.contract.contractData.NegotiationStepMath.restoreStep;
@@ -95,6 +96,30 @@ class NegotiationStepMathTest {
     void nextLowerDifferentStepFromTheBottomStepIsAlwaysMinusOne(final Term term) {
         assertEquals(-1, nextLowerDifferentStep(term, 1),
               "no term has a lower distinct value than its step-1 value");
+    }
+
+    @ParameterizedTest
+    @CsvSource({
+          // Base Pay: every step distinct, so the next higher value is the next step (until the top).
+          "BASE_PAY, 1, 2", "BASE_PAY, 16, 17", "BASE_PAY, 17, -1",
+          // Command Rights bands crossed upward; INDEPENDENT (11-17) has nothing higher that differs.
+          "COMMAND_RIGHTS, 1, 4", "COMMAND_RIGHTS, 3, 4", "COMMAND_RIGHTS, 7, 8", "COMMAND_RIGHTS, 10, 11",
+          "COMMAND_RIGHTS, 11, -1", "COMMAND_RIGHTS, 15, -1",
+          // Transport: 0.0(1-5) -> 0.25, and 1.0(9-17) is the top band.
+          "TRANSPORT, 1, 6", "TRANSPORT, 5, 6", "TRANSPORT, 8, 9", "TRANSPORT, 9, -1",
+          // Salvage: percent-0(1) -> exchange(2-3) -> percentages, 1.0(13-17) top band.
+          "SALVAGE, 1, 2", "SALVAGE, 2, 4", "SALVAGE, 12, 13", "SALVAGE, 13, -1",
+          // Support: (1.0,1.0) spans 15-17.
+          "SUPPORT, 1, 2", "SUPPORT, 8, 9", "SUPPORT, 14, 15", "SUPPORT, 15, -1" })
+    void nextHigherDifferentStepCrossesPlateaus(final Term term, final int fromStep, final int expected) {
+        assertEquals(expected, nextHigherDifferentStep(term, fromStep));
+    }
+
+    @ParameterizedTest
+    @EnumSource(Term.class)
+    void nextHigherDifferentStepFromTheTopStepIsAlwaysMinusOne(final Term term) {
+        assertEquals(-1, nextHigherDifferentStep(term, 17),
+              "no term has a higher distinct value than its step-17 value");
     }
 
     @ParameterizedTest

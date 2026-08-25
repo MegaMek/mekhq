@@ -61,6 +61,7 @@ import javax.swing.SwingConstants;
 
 import megamek.client.ui.preferences.JWindowPreference;
 import megamek.client.ui.preferences.PreferencesNode;
+import megamek.common.compute.Compute;
 import megamek.common.icons.Portrait;
 import megamek.logging.MMLogger;
 import mekhq.MekHQ;
@@ -68,8 +69,11 @@ import mekhq.campaign.AbstractLocation;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.campaignOptions.CampaignOption;
 import mekhq.campaign.campaignOptions.CampaignOptions;
+import mekhq.campaign.enums.DailyReportType;
 import mekhq.campaign.finances.Money;
 import mekhq.campaign.mission.contract.AbstractContract;
+import mekhq.campaign.mission.contract.contractData.ActiveNegotiationData;
+import mekhq.campaign.mission.contract.contractData.ActiveNegotiationMath;
 import mekhq.campaign.mission.contract.contractData.ChaosContractStepsTable;
 import mekhq.campaign.mission.contract.contractData.ContractTermsData;
 import mekhq.campaign.mission.contract.contractData.NegotiationData;
@@ -80,7 +84,11 @@ import mekhq.campaign.mission.contract.contractData.RentedFacilitiesData;
 import mekhq.campaign.mission.contract.contractGeneration.ChaosContractDeterminationPay;
 import mekhq.campaign.mission.contract.contractGeneration.negotiationsAndNPCs.TermFunding;
 import mekhq.campaign.personnel.Person;
+import mekhq.campaign.personnel.skills.ActionCheckResult;
+import mekhq.campaign.personnel.skills.SkillType;
+import mekhq.campaign.personnel.skills.enums.MarginOfSuccess;
 import mekhq.campaign.universe.Faction;
+import mekhq.gui.baseComponents.immersiveDialogs.ImmersiveDialogSimple;
 import mekhq.gui.baseComponents.roundedComponents.RoundedJButton;
 import mekhq.gui.baseComponents.roundedComponents.RoundedLineBorder;
 
@@ -121,11 +129,12 @@ public class ContractNegotiationDialog extends JDialog {
     private final transient Campaign campaign;
     private final transient AbstractContract contract;
     private final transient AbstractLocation currentLocation;
-    private final transient NonNegotiableTermsData nonNegotiableTerms;
+    private transient NonNegotiableTermsData nonNegotiableTerms;
 
     private final int scale;
     private final int capPerTerm;
     private final int reputationPool;
+    private final boolean activeNegotiators;
 
     private int reputationUsed;
     private int swapsUsed;
@@ -156,6 +165,8 @@ public class ContractNegotiationDialog extends JDialog {
     private JLabel bankBudgetLabel;
     private JLabel payImpactLabel;
     private JLabel summaryLabel;
+    private JLabel resultsLabel;
+    private RoundedJButton renegotiateButton;
 
     private boolean confirmed;
 
@@ -199,6 +210,7 @@ public class ContractNegotiationDialog extends JDialog {
 
         NonNegotiableTermsData lockedTerms = contract.getNonNegotiableTermsData();
         this.nonNegotiableTerms = lockedTerms != null ? lockedTerms : NonNegotiableTermsData.none();
+        this.activeNegotiators = campaignOptions.get(CampaignOption.USE_ACTIVE_NEGOTIATORS);
 
         for (Clause clause : Clause.values()) {
             currentStep[clause.ordinal()] = initialStep(clause);
@@ -359,6 +371,7 @@ public class ContractNegotiationDialog extends JDialog {
         if (picker.wasConfirmed()) {
             contract.setPlayerNegotiator(picker.getSelectedNegotiator());
             updateNegotiatorControl();
+            updateRenegotiateButton();
         }
     }
 
@@ -559,7 +572,7 @@ public class ContractNegotiationDialog extends JDialog {
     }
 
     private JPanel buildFooter() {
-        // Summary on its own line (left), buttons on the line below (right).
+        // Summary on its own line (top), the results area below it, buttons on the line below that (right).
         JPanel footer = new JPanel(new BorderLayout(0, PADDING));
         footer.setBorder(BorderFactory.createEmptyBorder(PADDING, PADDING, 0, PADDING));
 
@@ -567,7 +580,18 @@ public class ContractNegotiationDialog extends JDialog {
         summaryLabel.setForeground(muted());
         footer.add(summaryLabel, BorderLayout.NORTH);
 
+        // The active-negotiation results area only appears when the feature is enabled.
+        if (activeNegotiators) {
+            footer.add(buildResultsCard(), BorderLayout.CENTER);
+        }
+
         JPanel buttons = new JPanel(new FlowLayout(FlowLayout.RIGHT, PADDING, 0));
+        if (activeNegotiators) {
+            renegotiateButton = new RoundedJButton(getTextAt(RESOURCE_BUNDLE,
+                  "button.contractMarket.negotiate.renegotiate"));
+            renegotiateButton.addActionListener(e -> renegotiateAction());
+            buttons.add(renegotiateButton);
+        }
         RoundedJButton explain = new RoundedJButton(getTextAt(RESOURCE_BUNDLE,
               "button.contractMarket.negotiate.explain"));
         explain.addActionListener(e -> explainAction());
@@ -586,6 +610,25 @@ public class ContractNegotiationDialog extends JDialog {
         footer.add(buttons, BorderLayout.SOUTH);
 
         return footer;
+    }
+
+    /** The bordered "Negotiation Results" area shown at the bottom when active negotiators are enabled. */
+    private JPanel buildResultsCard() {
+        JPanel card = new JPanel(new BorderLayout());
+        card.setBorder(BorderFactory.createCompoundBorder(RoundedLineBorder.createSubtleRoundedLineBorder(),
+              BorderFactory.createEmptyBorder(PADDING, PADDING, PADDING, PADDING)));
+
+        JLabel section = new JLabel(getTextAt(RESOURCE_BUNDLE,
+              "negotiate.contractMarket.section.results").toUpperCase());
+        section.setFont(section.getFont().deriveFont(section.getFont().getSize2D() - 2f));
+        section.setForeground(muted());
+        card.add(section, BorderLayout.NORTH);
+
+        resultsLabel = new JLabel();
+        resultsLabel.setBorder(BorderFactory.createEmptyBorder(PADDING, 0, 0, 0));
+        card.add(resultsLabel, BorderLayout.CENTER);
+
+        return card;
     }
 
     private JButton stepperButton(String text, Runnable action) {
@@ -756,17 +799,7 @@ public class ContractNegotiationDialog extends JDialog {
     }
 
     private void confirmAction() {
-        ChaosContractStepsTable payRate = step(Clause.PAY);
-        ChaosContractStepsTable support = step(Clause.SUPPORT);
-        ChaosContractStepsTable transport = step(Clause.TRANSPORT);
-        ChaosContractStepsTable salvage = step(Clause.SALVAGE);
-        ChaosContractStepsTable command = step(Clause.COMMAND);
-
-        contract.setContractTerms(new ContractTermsData(payRate, support, transport, salvage, command));
-        ChaosContractDeterminationPay payScheme = new ChaosContractDeterminationPay();
-        contract.updateMonthlyPay(payScheme.getMonthlyPay(campaign, contract));
-        contract.updateTransportPay(payScheme.getTransportPay(campaign,
-              campaign.getLocalDate(), contract, currentLocation));
+        commitTermsAndPay();
 
         contract.setRentedFacilitiesData(new RentedFacilitiesData(facilityQuantity[0],
               facilityQuantity[1], facilityQuantity[2]));
@@ -785,7 +818,259 @@ public class ContractNegotiationDialog extends JDialog {
         dispose();
     }
 
+    /** Writes the current proposed term steps onto the contract and recomputes its pay from them. */
+    private void commitTermsAndPay() {
+        contract.setContractTerms(new ContractTermsData(step(Clause.PAY), step(Clause.SUPPORT), step(Clause.TRANSPORT),
+              step(Clause.SALVAGE), step(Clause.COMMAND)));
+        ChaosContractDeterminationPay payScheme = new ChaosContractDeterminationPay();
+        contract.updateMonthlyPay(payScheme.getMonthlyPay(campaign, contract));
+        contract.updateTransportPay(payScheme.getTransportPay(campaign,
+              campaign.getLocalDate(), contract, currentLocation));
+    }
+
     // endregion Negotiation logic
+
+    // region Active negotiation
+
+    /**
+     * Runs the one active-negotiation attempt a contract allows: an opposed Negotiation check between the player's and
+     * the employer's negotiators. Each margin-of-success level the player wins improves a random term one meaningful
+     * step; each level lost lowers one (non-negotiable terms are skipped). The outcome rewrites the contract's terms as
+     * a fresh baseline - clearing any in-progress manual haggling - and is committed immediately: it cannot be undone,
+     * and the attempt can only be made once per contract.
+     */
+    private void renegotiateAction() {
+        if (contract.getPlayerNegotiator() == null || contract.getActiveNegotiationData() != null) {
+            return;
+        }
+
+        // The employer's negotiator opens the floor; the player picks how to press their case. The player's own
+        // negotiator is deliberately not shown as a speaker. Cancel is first (index 0) so closing the window - which
+        // defaults the dialog choice to 0 - safely cancels rather than spending the one-shot attempt.
+        List<String> options = List.of(getTextAt(RESOURCE_BUNDLE, "negotiate.contractMarket.renegotiate.option.cancel"),
+              getTextAt(RESOURCE_BUNDLE, "negotiate.contractMarket.renegotiate.option.better"),
+              getTextAt(RESOURCE_BUNDLE, "negotiate.contractMarket.renegotiate.option.exception"));
+        ImmersiveDialogSimple dialog = new ImmersiveDialogSimple(campaign,
+              contract.getEmployerNegotiator(), null,
+              getTextAt(RESOURCE_BUNDLE, "negotiate.contractMarket.renegotiate.prompt"),
+              options,
+              getTextAt(RESOURCE_BUNDLE, "negotiate.contractMarket.renegotiate.ooc"),
+              null, true);
+
+        switch (dialog.getDialogChoice()) {
+            case 1 -> performHaggle();
+            case 2 -> performException();
+            default -> { /* cancelled (or window closed) - the attempt is not spent */ }
+        }
+    }
+
+    /**
+     * The net margin of the opposed Negotiation check between the player's and the employer's negotiators (positive
+     * favors the player). A missing employer negotiator counts as a neutral result.
+     */
+    private int rollNetMargin() {
+        MarginOfSuccess playerMargin = reportedNegotiationCheck(contract.getPlayerNegotiator(),
+              "negotiate.contractMarket.renegotiate.roll.player");
+        Person employerNegotiator = contract.getEmployerNegotiator();
+        MarginOfSuccess employerMargin = employerNegotiator != null
+                                               ?
+                                               reportedNegotiationCheck(employerNegotiator,
+                                                     "negotiate.contractMarket.renegotiate.roll.employer")
+                                               :
+                                               MarginOfSuccess.BARELY_MADE_IT;
+        return ActiveNegotiationMath.netMargin(playerMargin, employerMargin);
+    }
+
+    /**
+     * Resolves a Negotiation check for the given person, posts the result to the daily report's skill-checks tab, and
+     * returns its margin of success.
+     */
+    private MarginOfSuccess reportedNegotiationCheck(Person negotiator, String reasonKey) {
+        ActionCheckResult result = negotiator.checkSkill(SkillType.S_NEGOTIATION, campaign)
+                                         .resolve(false, getTextAt(RESOURCE_BUNDLE, reasonKey));
+        campaign.addReport(DailyReportType.SKILL_CHECKS, result.getReport(true));
+        return result.getReportMargin();
+    }
+
+    /** Runs the opposed check and rewrites the terms as a fresh baseline. Spends the contract's one attempt. */
+    private void performHaggle() {
+        int net = rollNetMargin();
+        int[] moveCounts = applyActiveNegotiation(net);
+
+        // The re-negotiated terms become the new baseline; manual haggling starts fresh from here.
+        reputationUsed = 0;
+        swapsUsed = 0;
+        sacrificeBank = 0;
+        for (Clause clause : Clause.values()) {
+            funding.get(clause.ordinal()).clear();
+        }
+
+        commitTermsAndPay();
+        contract.setNegotiationData(null);
+        contract.setActiveNegotiationData(ActiveNegotiationData.haggle(net,
+              moveCounts[Clause.PAY.ordinal()], moveCounts[Clause.SUPPORT.ordinal()],
+              moveCounts[Clause.TRANSPORT.ordinal()], moveCounts[Clause.SALVAGE.ordinal()],
+              moveCounts[Clause.COMMAND.ordinal()]));
+
+        LOGGER.info("Active negotiation (haggle) for contract {}: net margin {}", contract.getName(), net);
+        refresh();
+    }
+
+    /**
+     * Runs the same opposed check, but the stakes are the non-negotiable flags: each margin of success waives a random
+     * locked term, each margin of failure locks a random unlocked one. Spends the contract's one attempt.
+     */
+    private void performException() {
+        int net = rollNetMargin();
+        int[] lockChanges = applyLockChanges(net);
+        contract.setNonNegotiableTermsData(nonNegotiableTerms);
+        contract.setActiveNegotiationData(ActiveNegotiationData.exception(net,
+              lockChanges[Clause.PAY.ordinal()], lockChanges[Clause.SUPPORT.ordinal()],
+              lockChanges[Clause.TRANSPORT.ordinal()], lockChanges[Clause.SALVAGE.ordinal()],
+              lockChanges[Clause.COMMAND.ordinal()]));
+
+        LOGGER.info("Active negotiation (exception) for contract {}: net margin {}", contract.getName(), net);
+        refresh();
+    }
+
+    /**
+     * Applies {@code net} lock toggles: each step (net &gt; 0) waives a randomly chosen still-locked term, or (net &lt;
+     * 0) locks a randomly chosen still-unlocked one, with the pool shrinking as it goes; when none remain the rest are
+     * dropped. Returns the signed change per term (+1 waived, -1 locked, indexed by clause ordinal).
+     */
+    private int[] applyLockChanges(int net) {
+        int[] changes = new int[Clause.values().length];
+        boolean waive = net > 0;
+        int count = Math.abs(net);
+        for (int move = 0; move < count; move++) {
+            List<Clause> eligible = new ArrayList<>();
+            for (Clause clause : Clause.values()) {
+                if (nonNegotiableTerms.isLocked(clause.term) != waive) {
+                    eligible.add(clause);
+                }
+            }
+            if (eligible.isEmpty()) {
+                break;
+            }
+            Clause chosen = eligible.get(Compute.randomInt(eligible.size()));
+            nonNegotiableTerms = waive
+                                       ? nonNegotiableTerms.withUnlocked(chosen.term)
+                                       : nonNegotiableTerms.withLocked(chosen.term);
+            changes[chosen.ordinal()] += waive ? 1 : -1;
+        }
+        return changes;
+    }
+
+    /**
+     * Applies {@code net} meaningful steps to the term baseline: each step improves (net &gt; 0) or lowers (net &lt; 0)
+     * a randomly chosen eligible term, with repeats. Non-negotiable terms, and terms already at the end of the table in
+     * that direction, are skipped; when none remain eligible the remaining steps are dropped. Sets both the baseline
+     * and the current step to the outcome, and returns the signed count of meaningful steps applied to each term
+     * (indexed by clause ordinal).
+     */
+    private int[] applyActiveNegotiation(int net) {
+        int[] moveCounts = new int[Clause.values().length];
+        boolean improve = net > 0;
+        int moves = Math.abs(net);
+        for (int move = 0; move < moves; move++) {
+            List<Clause> eligible = new ArrayList<>();
+            for (Clause clause : Clause.values()) {
+                if (!isLocked(clause) && meaningfulStep(clause, improve) >= CHAOS_CONTRACT_MINIMUM_STEP_VALUE) {
+                    eligible.add(clause);
+                }
+            }
+            if (eligible.isEmpty()) {
+                break;
+            }
+            Clause chosen = eligible.get(Compute.randomInt(eligible.size()));
+            originalStep[chosen.ordinal()] = meaningfulStep(chosen, improve);
+            moveCounts[chosen.ordinal()] += improve ? 1 : -1;
+        }
+        System.arraycopy(originalStep, 0, currentStep, 0, originalStep.length);
+        return moveCounts;
+    }
+
+    /** The step a term's baseline moves to on one meaningful improve/lower, or -1 if there is none in that direction. */
+    private int meaningfulStep(Clause clause, boolean improve) {
+        int from = originalStep[clause.ordinal()];
+        return improve
+                     ? NegotiationStepMath.nextHigherDifferentStep(clause.term, from)
+                     : NegotiationStepMath.nextLowerDifferentStep(clause.term, from);
+    }
+
+    /** Enables the Re-negotiate button only when a negotiator is set and the one attempt has not been spent. */
+    private void updateRenegotiateButton() {
+        if (renegotiateButton == null) {
+            return;
+        }
+        boolean attempted = contract.getActiveNegotiationData() != null;
+        boolean hasNegotiator = contract.getPlayerNegotiator() != null;
+        renegotiateButton.setEnabled(!attempted && hasNegotiator);
+        String tooltipKey = attempted
+                                  ? "negotiate.contractMarket.renegotiate.tooltip.spent"
+                                  : hasNegotiator
+                                          ? "negotiate.contractMarket.renegotiate.tooltip"
+                                          : "negotiate.contractMarket.renegotiate.tooltip.noNegotiator";
+        renegotiateButton.setToolTipText(wordWrap(getTextAt(RESOURCE_BUNDLE, tooltipKey)));
+    }
+
+    /** Renders the active-negotiation results area from the contract's stored outcome, or a placeholder when unspent. */
+    private void renderResults() {
+        if (resultsLabel == null) {
+            return;
+        }
+        ActiveNegotiationData data = contract.getActiveNegotiationData();
+        if (data == null) {
+            resultsLabel.setText("<html><span style='color:" +
+                                       MUTED_HEX +
+                                       "'>"
+                                       +
+                                       escape(getTextAt(RESOURCE_BUNDLE, "negotiate.contractMarket.results.none")) +
+                                       "</span></html>");
+            return;
+        }
+
+        int net = data.netMargin();
+        String headlineKey = net > 0 ? "negotiate.contractMarket.results.won"
+                                   : net < 0 ? "negotiate.contractMarket.results.lost"
+                                           : "negotiate.contractMarket.results.stalemate";
+        String headlineColor = net > 0 ? hex(positiveHex()) : net < 0 ? hex(negativeHex()) : MUTED_HEX;
+        StringBuilder html = new StringBuilder("<html><b style='color:").append(headlineColor)
+                                   .append("'>")
+                                   .append(escape(getFormattedTextAt(RESOURCE_BUNDLE, headlineKey, Math.abs(net))))
+                                   .append("</b>");
+
+        boolean anyTerm = false;
+        for (Clause clause : Clause.values()) {
+            int change = data.deltaFor(clause.term);
+            if (change == 0) {
+                continue;
+            }
+            anyTerm = true;
+            String termLabel = getTextAt(RESOURCE_BUNDLE, clause.labelKey);
+            String color = change > 0 ? hex(positiveHex()) : hex(negativeHex());
+            String line = switch (data.kind()) {
+                case HAGGLE -> getFormattedTextAt(RESOURCE_BUNDLE,
+                      change > 0 ? "negotiate.contractMarket.results.termImproved"
+                            : "negotiate.contractMarket.results.termWorsened",
+                      termLabel, Math.abs(change));
+                case EXCEPTION -> getFormattedTextAt(RESOURCE_BUNDLE,
+                      change > 0 ? "negotiate.contractMarket.results.termUnlocked"
+                            : "negotiate.contractMarket.results.termLocked",
+                      termLabel);
+            };
+            html.append("<br><span style='color:").append(color).append("'>").append(escape(line)).append("</span>");
+        }
+        if (!anyTerm && net != 0) {
+            // A win or loss that changed nothing (no eligible term left in that direction).
+            html.append("<br><span style='color:").append(MUTED_HEX).append("'>")
+                  .append(escape(getTextAt(RESOURCE_BUNDLE, "negotiate.contractMarket.results.noTerms")))
+                  .append("</span>");
+        }
+        resultsLabel.setText(html.append("</html>").toString());
+    }
+
+    // endregion Active negotiation
 
     // region Rendering
 
@@ -825,6 +1110,9 @@ public class ContractNegotiationDialog extends JDialog {
               rentalTotal.toAmountAndSymbolString(), reputationPool - reputationUsed,
               NegotiationStepMath.totalStepsSacrificed(originalStep, currentStep), MAXIMUM_SACRIFICED_STEPS,
               NegotiationStepMath.distinctTermsSacrificed(originalStep, currentStep), MAXIMUM_SACRIFICED_TERMS));
+
+        updateRenegotiateButton();
+        renderResults();
     }
 
     private boolean canRaise(Clause clause) {

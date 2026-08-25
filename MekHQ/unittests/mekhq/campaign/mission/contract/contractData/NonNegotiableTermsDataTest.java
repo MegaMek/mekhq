@@ -67,4 +67,15 @@ class NonNegotiableTermsDataTest {
                   "only " + locked + " should read as locked, but " + term + " disagreed");
         }
     }
+
+    @ParameterizedTest
+    @EnumSource(Term.class)
+    void withUnlockedClearsOnlyThatTerm(final Term toUnlock) {
+        NonNegotiableTermsData allLocked = new NonNegotiableTermsData(true, true, true, true, true);
+        NonNegotiableTermsData result = allLocked.withUnlocked(toUnlock);
+        for (Term term : Term.values()) {
+            assertEquals(term != toUnlock, result.isLocked(term),
+                  toUnlock + " should be the only term cleared, but " + term + " disagreed");
+        }
+    }
 }

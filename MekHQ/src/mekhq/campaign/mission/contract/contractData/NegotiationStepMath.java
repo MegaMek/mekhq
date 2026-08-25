@@ -32,6 +32,7 @@
  */
 package mekhq.campaign.mission.contract.contractData;
 
+import static mekhq.campaign.mission.contract.contractData.ChaosContractStepsTable.CHAOS_CONTRACT_MAXIMUM_STEP_VALUE;
 import static mekhq.campaign.mission.contract.contractData.ChaosContractStepsTable.CHAOS_CONTRACT_MINIMUM_STEP_VALUE;
 
 import java.util.List;
@@ -88,6 +89,25 @@ public final class NegotiationStepMath {
     public static int nextLowerDifferentStep(Term term, int fromStep) {
         Object currentValue = rawValue(term, ChaosContractStepsTable.fromStepValue(fromStep));
         for (int step = fromStep - 1; step >= CHAOS_CONTRACT_MINIMUM_STEP_VALUE; step--) {
+            if (!Objects.equals(currentValue, rawValue(term, ChaosContractStepsTable.fromStepValue(step)))) {
+                return step;
+            }
+        }
+        return -1;
+    }
+
+    /**
+     * The nearest step above {@code fromStep} whose value for this term differs from the value at {@code fromStep}, or
+     * {@code -1} when every higher step shares the same value (the term already sits at its highest distinct value).
+     * The upward mirror of {@link #nextLowerDifferentStep}: it moves a term to the next better value in a single
+     * meaningful step, crossing any plateau in one move. Used by active negotiation to improve a term.
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    public static int nextHigherDifferentStep(Term term, int fromStep) {
+        Object currentValue = rawValue(term, ChaosContractStepsTable.fromStepValue(fromStep));
+        for (int step = fromStep + 1; step <= CHAOS_CONTRACT_MAXIMUM_STEP_VALUE; step++) {
             if (!Objects.equals(currentValue, rawValue(term, ChaosContractStepsTable.fromStepValue(step)))) {
                 return step;
             }
