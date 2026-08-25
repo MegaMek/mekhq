@@ -143,6 +143,8 @@ public final class ContractXmlCodec {
         writeRentedFacilitiesData(printWriter, indent, contract.getRentedFacilitiesData());
 
         writeNonNegotiableTermsData(printWriter, indent, contract.getNonNegotiableTermsData());
+
+        writeActiveNegotiationData(printWriter, indent, contract.getActiveNegotiationData());
         writeMoraleData(printWriter, indent, contract.getMoraleData());
         writeNegotiationData(printWriter, indent, contract.getNegotiationData());
 
@@ -291,6 +293,22 @@ public final class ContractXmlCodec {
         MHQXMLUtility.writeSimpleXMLCloseTag(pw, --indent, "nonNegotiableTermsData");
     }
 
+    private static void writeActiveNegotiationData(final PrintWriter pw, int indent,
+          final @Nullable ActiveNegotiationData data) {
+        if (data == null) {
+            return;
+        }
+        MHQXMLUtility.writeSimpleXMLOpenTag(pw, indent++, "activeNegotiationData");
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "kind", data.kind().name());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "netMargin", data.netMargin());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "payDelta", data.payDelta());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "supportDelta", data.supportDelta());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "transportDelta", data.transportDelta());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "salvageDelta", data.salvageDelta());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "commandDelta", data.commandDelta());
+        MHQXMLUtility.writeSimpleXMLCloseTag(pw, --indent, "activeNegotiationData");
+    }
+
     private static void writeMoraleData(final PrintWriter pw, int indent, final @Nullable MoraleData data) {
         if (data == null) {
             return;
@@ -427,6 +445,10 @@ public final class ContractXmlCodec {
         readers.put("nonNegotiableTermsData",
               (contract, node, campaign, version) -> contract.setNonNegotiableTermsData(
                     parseNonNegotiableTermsData(node)));
+
+        readers.put("activeNegotiationData",
+              (contract, node, campaign, version) -> contract.setActiveNegotiationData(
+                    parseActiveNegotiationData(node)));
         readers.put("moraleData", (contract, node, campaign, version) -> contract.setMoraleData(parseMoraleData(node)));
         readers.put("negotiationData",
               (contract, node, campaign, version) -> contract.setNegotiationData(parseNegotiationData(node)));
@@ -829,6 +851,39 @@ public final class ContractXmlCodec {
               NON_NEGOTIABLE_TERMS_BINDERS, null, null, "nonNegotiableTermsData");
         return new NonNegotiableTermsData(builder.payLocked, builder.supportLocked, builder.transportLocked,
               builder.salvageLocked, builder.commandLocked);
+    }
+
+    private static final class ActiveNegotiationBuilder {
+        ActiveNegotiationData.Kind kind = ActiveNegotiationData.Kind.HAGGLE;
+        int netMargin;
+        int payDelta;
+        int supportDelta;
+        int transportDelta;
+        int salvageDelta;
+        int commandDelta;
+    }
+
+    private static final Map<String, FieldBinder<ActiveNegotiationBuilder>> ACTIVE_NEGOTIATION_BINDERS =
+          createActiveNegotiationBinders();
+
+    private static Map<String, FieldBinder<ActiveNegotiationBuilder>> createActiveNegotiationBinders() {
+        final Map<String, FieldBinder<ActiveNegotiationBuilder>> binders = new HashMap<>();
+        binders.put("kind",
+              (builder, node, campaign, version) -> builder.kind = ActiveNegotiationData.Kind.valueOf(text(node)));
+        binders.put("netMargin", (builder, node, campaign, version) -> builder.netMargin = parseInt(node));
+        binders.put("payDelta", (builder, node, campaign, version) -> builder.payDelta = parseInt(node));
+        binders.put("supportDelta", (builder, node, campaign, version) -> builder.supportDelta = parseInt(node));
+        binders.put("transportDelta", (builder, node, campaign, version) -> builder.transportDelta = parseInt(node));
+        binders.put("salvageDelta", (builder, node, campaign, version) -> builder.salvageDelta = parseInt(node));
+        binders.put("commandDelta", (builder, node, campaign, version) -> builder.commandDelta = parseInt(node));
+        return binders;
+    }
+
+    private static ActiveNegotiationData parseActiveNegotiationData(final Node wn) {
+        final ActiveNegotiationBuilder builder = readFields(wn, new ActiveNegotiationBuilder(),
+              ACTIVE_NEGOTIATION_BINDERS, null, null, "activeNegotiationData");
+        return new ActiveNegotiationData(builder.kind, builder.netMargin, builder.payDelta, builder.supportDelta,
+              builder.transportDelta, builder.salvageDelta, builder.commandDelta);
     }
 
     private static final class MoraleDataBuilder {
