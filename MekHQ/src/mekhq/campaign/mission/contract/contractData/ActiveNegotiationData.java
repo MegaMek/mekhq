@@ -35,8 +35,9 @@ package mekhq.campaign.mission.contract.contractData;
 import mekhq.campaign.mission.contract.contractData.NegotiationStepMath.Term;
 
 /**
- * The outcome of the one active-negotiation attempt a contract is allowed. Its presence on a contract records that the
- * attempt has been spent (so it cannot be repeated), and describes what happened.
+ * The outcome of the latest active-negotiation attempt on a contract. Its presence records that at least one attempt
+ * has been spent, {@code attempts} records how many have been spent in total (a negotiator with the Relentless
+ * Bargainer SPA is allowed a second), and the rest describes what the latest attempt did.
  *
  * <p>Both outcomes come from the same opposed check and carry a {@code netMargin} (positive = the player prevailed,
  * negative = the employer did) plus a signed per-term change. What the change means depends on the {@link Kind}: for a
@@ -48,7 +49,7 @@ import mekhq.campaign.mission.contract.contractData.NegotiationStepMath.Term;
  * @since 0.51.01
  */
 public record ActiveNegotiationData(Kind kind, int netMargin, int payDelta, int supportDelta, int transportDelta,
-      int salvageDelta, int commandDelta) {
+      int salvageDelta, int commandDelta, int attempts) {
 
     /** Which stakes the re-negotiation played for: the terms' values, or their non-negotiable flags. */
     public enum Kind {
@@ -56,22 +57,23 @@ public record ActiveNegotiationData(Kind kind, int netMargin, int payDelta, int 
     }
 
     /** A haggle outcome: per-term change is the signed count of meaningful steps the term moved. */
-    public static ActiveNegotiationData haggle(int netMargin, int payDelta, int supportDelta, int transportDelta,
-          int salvageDelta, int commandDelta) {
+    public static ActiveNegotiationData haggle(int attempts, int netMargin, int payDelta, int supportDelta,
+          int transportDelta, int salvageDelta, int commandDelta) {
         return new ActiveNegotiationData(Kind.HAGGLE, netMargin, payDelta, supportDelta, transportDelta, salvageDelta,
-              commandDelta);
+              commandDelta, attempts);
     }
 
     /** An exception outcome: per-term change is +1 (waived), -1 (newly locked), or 0 (unchanged). */
-    public static ActiveNegotiationData exception(int netMargin, int payDelta, int supportDelta, int transportDelta,
-          int salvageDelta, int commandDelta) {
+    public static ActiveNegotiationData exception(int attempts, int netMargin, int payDelta, int supportDelta,
+          int transportDelta, int salvageDelta, int commandDelta) {
         return new ActiveNegotiationData(Kind.EXCEPTION,
               netMargin,
               payDelta,
               supportDelta,
               transportDelta,
               salvageDelta,
-              commandDelta);
+              commandDelta,
+              attempts);
     }
 
     /** The signed change applied to the given term (steps for a haggle, lock toggle for an exception). */

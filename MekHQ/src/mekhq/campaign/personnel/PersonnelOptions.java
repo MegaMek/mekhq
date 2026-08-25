@@ -113,6 +113,8 @@ public class PersonnelOptions extends PilotOptions {
     public static final String DISAPPOINTING_LEADER = "disappointing_leader";
     public static final String GOOD_REPUTATION = "good_reputation";
     public static final String BAD_REPUTATION = "bad_reputation";
+    // Chaos contract negotiation SPAs and Flaws
+    public static final String RELENTLESS_BARGAINER = "relentless_bargainer";
     public static final String FLAW_ANIMAL_ANTIPATHY = "flaw_animal_antipathy";
     public static final String ATOW_ANIMAL_EMPATHY = "atow_animal_empathy";
     public static final String ATOW_AMBIDEXTROUS = "atow_ambidextrous";
@@ -329,6 +331,7 @@ public class PersonnelOptions extends PilotOptions {
         addOption(l3a, DISAPPOINTING_LEADER, false);
         addOption(l3a, GOOD_REPUTATION, false);
         addOption(l3a, BAD_REPUTATION, false);
+        addOption(l3a, RELENTLESS_BARGAINER, false);
         addOption(l3a, FLAW_ANIMAL_ANTIPATHY, false);
         addOption(l3a, ATOW_ANIMAL_EMPATHY, false);
         addOption(l3a, ATOW_AMBIDEXTROUS, false);

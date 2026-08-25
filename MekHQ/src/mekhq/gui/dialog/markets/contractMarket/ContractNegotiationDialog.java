@@ -85,6 +85,7 @@ import mekhq.campaign.mission.contract.contractData.RentedFacilitiesData;
 import mekhq.campaign.mission.contract.contractGeneration.ChaosContractDeterminationPay;
 import mekhq.campaign.mission.contract.contractGeneration.negotiationsAndNPCs.TermFunding;
 import mekhq.campaign.personnel.Person;
+import mekhq.campaign.personnel.PersonnelOptions;
 import mekhq.campaign.personnel.skills.ActionCheckResult;
 import mekhq.campaign.personnel.skills.SkillType;
 import mekhq.campaign.personnel.skills.enums.MarginOfSuccess;
@@ -841,7 +842,7 @@ public class ContractNegotiationDialog extends JDialog {
      * and the attempt can only be made once per contract.
      */
     private void renegotiateAction() {
-        if (contract.getPlayerNegotiator() == null || contract.getActiveNegotiationData() != null) {
+        if (contract.getPlayerNegotiator() == null || attemptsSoFar() >= maxRenegotiationAttempts()) {
             return;
         }
 
@@ -912,7 +913,7 @@ public class ContractNegotiationDialog extends JDialog {
 
         commitTermsAndPay();
         contract.setNegotiationData(null);
-        contract.setActiveNegotiationData(ActiveNegotiationData.haggle(net,
+        contract.setActiveNegotiationData(ActiveNegotiationData.haggle(attemptsSoFar() + 1, net,
               moveCounts[Clause.PAY.ordinal()], moveCounts[Clause.SUPPORT.ordinal()],
               moveCounts[Clause.TRANSPORT.ordinal()], moveCounts[Clause.SALVAGE.ordinal()],
               moveCounts[Clause.COMMAND.ordinal()]));
@@ -929,7 +930,7 @@ public class ContractNegotiationDialog extends JDialog {
         int net = rollNetMargin();
         int[] lockChanges = applyLockChanges(net);
         contract.setNonNegotiableTermsData(nonNegotiableTerms);
-        contract.setActiveNegotiationData(ActiveNegotiationData.exception(net,
+        contract.setActiveNegotiationData(ActiveNegotiationData.exception(attemptsSoFar() + 1, net,
               lockChanges[Clause.PAY.ordinal()], lockChanges[Clause.SUPPORT.ordinal()],
               lockChanges[Clause.TRANSPORT.ordinal()], lockChanges[Clause.SALVAGE.ordinal()],
               lockChanges[Clause.COMMAND.ordinal()]));
@@ -1003,19 +1004,36 @@ public class ContractNegotiationDialog extends JDialog {
                      : NegotiationStepMath.nextLowerDifferentStep(clause.term, from);
     }
 
-    /** Enables the Re-negotiate button only when a negotiator is set and the one attempt has not been spent. */
+    /** How many re-negotiation attempts have already been spent on this contract. */
+    private int attemptsSoFar() {
+        ActiveNegotiationData data = contract.getActiveNegotiationData();
+        return data == null ? 0 : data.attempts();
+    }
+
+    /**
+     * How many re-negotiation attempts this contract allows: one, plus one more when the chosen negotiator carries the
+     * Relentless Bargainer SPA.
+     */
+    private int maxRenegotiationAttempts() {
+        Person negotiator = contract.getPlayerNegotiator();
+        boolean relentless = negotiator != null
+                                   && negotiator.getOptions().booleanOption(PersonnelOptions.RELENTLESS_BARGAINER);
+        return relentless ? 2 : 1;
+    }
+
+    /** Enables the Re-negotiate button only when a negotiator is set and an attempt remains. */
     private void updateRenegotiateButton() {
         if (renegotiateButton == null) {
             return;
         }
-        boolean attempted = contract.getActiveNegotiationData() != null;
         boolean hasNegotiator = contract.getPlayerNegotiator() != null;
-        renegotiateButton.setEnabled(!attempted && hasNegotiator);
-        String tooltipKey = attempted
-                                  ? "negotiate.contractMarket.renegotiate.tooltip.spent"
-                                  : hasNegotiator
-                                          ? "negotiate.contractMarket.renegotiate.tooltip"
-                                          : "negotiate.contractMarket.renegotiate.tooltip.noNegotiator";
+        boolean spent = attemptsSoFar() >= maxRenegotiationAttempts();
+        renegotiateButton.setEnabled(hasNegotiator && !spent);
+        String tooltipKey = !hasNegotiator
+                                  ? "negotiate.contractMarket.renegotiate.tooltip.noNegotiator"
+                                  : spent
+                                          ? "negotiate.contractMarket.renegotiate.tooltip.spent"
+                                          : "negotiate.contractMarket.renegotiate.tooltip";
         renegotiateButton.setToolTipText(wordWrap(getTextAt(RESOURCE_BUNDLE, tooltipKey)));
     }
 

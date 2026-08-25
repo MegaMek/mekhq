@@ -306,6 +306,7 @@ public final class ContractXmlCodec {
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "transportDelta", data.transportDelta());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "salvageDelta", data.salvageDelta());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "commandDelta", data.commandDelta());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "attempts", data.attempts());
         MHQXMLUtility.writeSimpleXMLCloseTag(pw, --indent, "activeNegotiationData");
     }
 
@@ -861,6 +862,7 @@ public final class ContractXmlCodec {
         int transportDelta;
         int salvageDelta;
         int commandDelta;
+        int attempts = 1; // a stored record means at least one attempt was spent
     }
 
     private static final Map<String, FieldBinder<ActiveNegotiationBuilder>> ACTIVE_NEGOTIATION_BINDERS =
@@ -876,6 +878,7 @@ public final class ContractXmlCodec {
         binders.put("transportDelta", (builder, node, campaign, version) -> builder.transportDelta = parseInt(node));
         binders.put("salvageDelta", (builder, node, campaign, version) -> builder.salvageDelta = parseInt(node));
         binders.put("commandDelta", (builder, node, campaign, version) -> builder.commandDelta = parseInt(node));
+        binders.put("attempts", (builder, node, campaign, version) -> builder.attempts = parseInt(node));
         return binders;
     }
 
@@ -883,7 +886,7 @@ public final class ContractXmlCodec {
         final ActiveNegotiationBuilder builder = readFields(wn, new ActiveNegotiationBuilder(),
               ACTIVE_NEGOTIATION_BINDERS, null, null, "activeNegotiationData");
         return new ActiveNegotiationData(builder.kind, builder.netMargin, builder.payDelta, builder.supportDelta,
-              builder.transportDelta, builder.salvageDelta, builder.commandDelta);
+              builder.transportDelta, builder.salvageDelta, builder.commandDelta, builder.attempts);
     }
 
     private static final class MoraleDataBuilder {
