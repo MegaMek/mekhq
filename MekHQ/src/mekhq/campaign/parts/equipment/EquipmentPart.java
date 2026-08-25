@@ -71,6 +71,12 @@ import mekhq.campaign.campaignOptions.CampaignOption;
 public class EquipmentPart extends Part {
     private static final MMLogger LOGGER = MMLogger.create(EquipmentPart.class);
 
+    /**
+     * The weight of a Retractable Blade's retraction mechanism, in tons. A blade's total weight is this mechanism plus
+     * one ton of blade per twenty tons of the unit carrying it.
+     */
+    private static final double RETRACTABLE_BLADE_MECHANISM_TONNAGE = 0.5;
+
     // crap EquipmentType is not serialized!
     protected transient EquipmentType type;
     protected String typeName;
@@ -575,7 +581,11 @@ public class EquipmentPart extends Part {
             } else if (type.hasFlag(MiscType.F_CLUB) && type.hasFlag(MiscTypeFlag.S_SWORD)) {
                 varCost = Money.of(getTonnage() * 10000);
             } else if (type.hasFlag(MiscType.F_CLUB) && type.hasFlag(MiscTypeFlag.S_RETRACTABLE_BLADE)) {
-                varCost = Money.of((1 + getTonnage()) * 10000);
+                // A blade costs 10,000 per ton of blade, plus a flat 10,000 for the retraction mechanism. The
+                // mechanism is also half a ton of the item's total weight, so the blade itself weighs half a ton
+                // less than the part does. Charging (1 + total weight) would bill the mechanism twice.
+                double bladeTonnage = getTonnage() - RETRACTABLE_BLADE_MECHANISM_TONNAGE;
+                varCost = Money.of((1 + bladeTonnage) * 10000);
             } else if (type.hasFlag(MiscType.F_TRACKS)) {
                 // TODO: Handle this through subtyping
             } else if (type.hasFlag(MiscType.F_TALON)) {

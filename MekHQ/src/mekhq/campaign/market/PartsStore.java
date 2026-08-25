@@ -1,6 +1,6 @@
 /*
  * Copyright (c) 2011 Jay Lawson (jaylawson39 at yahoo.com). All rights reserved.
- * Copyright (C) 2013-2025 The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2013-2026 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -53,6 +53,7 @@ import megamek.common.loaders.MekFileParser;
 import megamek.common.loaders.MekSummary;
 import megamek.common.loaders.MekSummaryCache;
 import megamek.common.units.Aero;
+import megamek.common.units.BipedMek;
 import megamek.common.units.Dropship;
 import megamek.common.units.Entity;
 import megamek.common.units.Jumpship;
@@ -97,6 +98,11 @@ import mekhq.campaign.parts.protomeks.ProtoMekSensor;
 public class PartsStore {
     private static final MMLogger LOGGER = MMLogger.create(PartsStore.class);
     private static final int EXPECTED_SIZE = 50000;
+
+    /** The lightest, heaviest and step size of BattleMek chassis weights, used to stock per-chassis equipment. */
+    private static final int MIN_MEK_TONNAGE = 20;
+    private static final int MAX_MEK_TONNAGE = 100;
+    private static final int MEK_TONNAGE_STEP = 5;
 
     private final ArrayList<Part> parts;
     private final Map<String, Part> nameAndDetailMap;
@@ -261,7 +267,9 @@ public class PartsStore {
                                        || equipmentType.hasFlag(WeaponType.F_AERO_WEAPON))
                                       && !((WeaponType) equipmentType).isCapital();
                 }
-                if (EquipmentPart.hasVariableTonnage(equipmentType)) {
+                if (isRetractableBlade(equipmentType)) {
+                    stockRetractableBlades(campaign, equipmentType, poddable);
+                } else if (EquipmentPart.hasVariableTonnage(equipmentType)) {
                     EquipmentPart equipmentPart;
                     for (double ton = EquipmentPart.getStartingTonnage(equipmentType);
                           ton <= EquipmentPart
@@ -302,6 +310,65 @@ public class PartsStore {
         hs = new AeroHeatSink(0, AeroHeatSink.CLAN_HEAT_DOUBLE, false, campaign);
         parts.add(new OmniPod(hs, campaign));
         parts.add(new AeroHeatSink(0, AeroHeatSink.CLAN_HEAT_DOUBLE, true, campaign));
+    }
+
+    /**
+     * @param equipmentType the equipment type to test
+     *
+     * @return {@code true} if the given equipment is a Retractable Blade
+     */
+    private static boolean isRetractableBlade(EquipmentType equipmentType) {
+        return (equipmentType instanceof MiscType) &&
+                     equipmentType.hasFlag(MiscType.F_CLUB) &&
+                     equipmentType.hasFlag(MiscTypeFlag.S_RETRACTABLE_BLADE);
+    }
+
+    /**
+     * Stocks Retractable Blades with one entry per unit tonnage, rather than one entry per item weight the way other
+     * variable-weight equipment is stocked.
+     *
+     * <p>A blade is built for a specific chassis and is not interchangeable between chassis of different weights, so
+     * {@link Part#isUnitTonnageMatters()} is {@code true} for it. Stocking by item weight left every loose blade with a
+     * unit tonnage of zero, which could never match the blade it was meant to replace, so warehouse stock was reported
+     * as unavailable. This mirrors how jump jets and MASC are already stocked.</p>
+     *
+     * @param campaign  the campaign the parts belong to
+     * @param bladeType the Retractable Blade equipment type
+     * @param poddable  {@code true} if omnipod variants should be stocked alongside the fixed ones
+     */
+    private void stockRetractableBlades(Campaign campaign, EquipmentType bladeType, boolean poddable) {
+        for (int unitTonnage = MIN_MEK_TONNAGE; unitTonnage <= MAX_MEK_TONNAGE; unitTonnage += MEK_TONNAGE_STEP) {
+            // Ask MegaMek what the blade weighs on a chassis of this weight rather than repeating the formula here.
+            Entity referenceChassis = new BipedMek();
+            referenceChassis.setWeight(unitTonnage);
+            double itemTonnage = bladeType.getTonnage(referenceChassis, 1.0);
+
+            parts.add(retractableBladeFor(campaign, bladeType, unitTonnage, itemTonnage, false));
+            if (poddable) {
+                parts.add(retractableBladeFor(campaign, bladeType, unitTonnage, itemTonnage, true));
+                parts.add(new OmniPod(retractableBladeFor(campaign, bladeType, unitTonnage, itemTonnage, false),
+                      campaign));
+            }
+        }
+    }
+
+    /**
+     * Builds a single loose Retractable Blade carrying both the tonnage of the chassis it was built for and its own
+     * resulting weight.
+     *
+     * @param campaign    the campaign the part belongs to
+     * @param bladeType   the Retractable Blade equipment type
+     * @param unitTonnage the weight of the chassis the blade was built for
+     * @param itemTonnage the weight of the blade itself
+     * @param omniPodded  {@code true} if the blade is omnipod mounted
+     *
+     * @return the stocked blade
+     */
+    private EquipmentPart retractableBladeFor(Campaign campaign, EquipmentType bladeType, int unitTonnage,
+          double itemTonnage, boolean omniPodded) {
+        EquipmentPart blade = new EquipmentPart(unitTonnage, bladeType, -1, 1.0, omniPodded, campaign);
+        blade.setEquipTonnage(itemTonnage);
+        return blade;
     }
 
     protected void stockMekActuators(Campaign c) {
