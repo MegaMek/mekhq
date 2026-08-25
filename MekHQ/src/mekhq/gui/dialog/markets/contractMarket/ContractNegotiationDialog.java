@@ -37,6 +37,7 @@ import static megamek.client.ui.WrapLayout.wordWrap;
 import static megamek.client.ui.util.UIUtil.scaleForGUI;
 import static mekhq.campaign.mission.contract.contractData.ChaosContractStepsTable.CHAOS_CONTRACT_MAXIMUM_STEP_VALUE;
 import static mekhq.campaign.mission.contract.contractData.ChaosContractStepsTable.CHAOS_CONTRACT_MINIMUM_STEP_VALUE;
+import static mekhq.campaign.personnel.skills.enums.MarginOfSuccess.DISASTROUS;
 import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
 import static mekhq.utilities.MHQInternationalization.getTextAt;
 
@@ -869,14 +870,18 @@ public class ContractNegotiationDialog extends JDialog {
      * favors the player). A missing employer negotiator counts as a neutral result.
      */
     private int rollNetMargin() {
-        MarginOfSuccess playerMargin = reportedNegotiationCheck(contract.getPlayerNegotiator(),
+        Person playerNegotiator = contract.getPlayerNegotiator();
+        if (playerNegotiator == null) {
+            // This shouldn't happen, so we go ahead and log it.
+            LOGGER.warn("Contract {} has no player negotiator", contract.getName());
+            return DISASTROUS.getLowerBound();
+        }
+        MarginOfSuccess playerMargin = reportedNegotiationCheck(playerNegotiator,
               "negotiate.contractMarket.renegotiate.roll.player");
         Person employerNegotiator = contract.getEmployerNegotiator();
-        MarginOfSuccess employerMargin = employerNegotiator != null
-                                               ?
+        MarginOfSuccess employerMargin = employerNegotiator != null ?
                                                reportedNegotiationCheck(employerNegotiator,
-                                                     "negotiate.contractMarket.renegotiate.roll.employer")
-                                               :
+                                                     "negotiate.contractMarket.renegotiate.roll.employer") :
                                                MarginOfSuccess.BARELY_MADE_IT;
         return ActiveNegotiationMath.netMargin(playerMargin, employerMargin);
     }
