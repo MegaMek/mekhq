@@ -39,7 +39,7 @@ import mekhq.campaign.mission.contract.contractData.ContractObjectiveData;
 import mekhq.campaign.mission.contract.contractData.ContractObjectiveType;
 import org.jspecify.annotations.NonNull;
 
-public class ChaosContractObjectiveDetermination {
+public class ChaosContractDeterminationObjective {
     public static ContractObjectiveData determineContractObjectiveType(int contractGenerationModifier) {
         int roll = d6(2);
         int result = clamp(roll + contractGenerationModifier, 1, 13);

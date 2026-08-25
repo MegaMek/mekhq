@@ -48,14 +48,41 @@ import mekhq.campaign.mission.utilities.ContractUtilities;
 import mekhq.campaign.universe.PlanetarySystem;
 import org.jspecify.annotations.NonNull;
 
-public class ChaosContractPayDetermination {
-    public final static int DEFAULT_MONTHLY_PAY_MULTIPLIER = 500; // Draconis Reach first printing pg 26
-    public final static int DEFAULT_COMBAT_PAY_MULTIPLIER = 500; // Draconis Reach first printing pg 26
+/**
+ * Base class for the contract pay schemes: given a generated contract, each scheme decides how much the employer pays
+ * as a monthly retainer, a per-battle combat bonus, and up-front transport compensation.
+ *
+ * <p>Two schemes exist. The default {@link ChaosContractDeterminationPay} derives pay from the contract's abstract
+ * scale and support-point multipliers; {@link CamOpsContractDeterminationPay} grounds the monthly retainer in the
+ * Campaign Operations force-value calculation instead. A campaign opts into the CamOps scheme with
+ * {@link CampaignOption#USE_LEGACY_CONTRACT_PAY}; use {@link #forCampaign(Campaign)} to obtain the scheme it has
+ * chosen.</p>
+ *
+ * <p>Both schemes share the transport-pay calculation, so it lives here rather than in either subclass.</p>
+ *
+ * @see ChaosContractDeterminationPay
+ * @see CamOpsContractDeterminationPay
+ */
+public abstract class AbstractContractDeterminationPay {
     public final static int DEFAULT_TRANSPORT_COST_MULTIPLIER = 50; // Draconis Reach first printing pg 26
     public final static int HIRING_HALL_RETURN_MULTIPLIER = 2; // Draconis Reach first printing pg 26
 
-    public static void determineContractPayForChaosContract(Campaign campaign, LocalDate currentDate,
-          AbstractContract contract,
+    /**
+     * Returns the pay scheme the campaign has opted into: the CamOps force-value scheme when
+     * {@link CampaignOption#USE_LEGACY_CONTRACT_PAY} is set, otherwise the default Chaos scheme.
+     */
+    public static @NonNull AbstractContractDeterminationPay forCampaign(Campaign campaign) {
+        if (campaign.getCampaignOptions().get(CampaignOption.USE_LEGACY_CONTRACT_PAY)) {
+            return new CamOpsContractDeterminationPay();
+        }
+        return new ChaosContractDeterminationPay();
+    }
+
+    /**
+     * Populates the contract's {@link ContractFinanceData} from this scheme's three pay components: the monthly
+     * retainer, the per-battle combat bonus, and up-front transport compensation.
+     */
+    public void determineContractPay(Campaign campaign, LocalDate currentDate, AbstractContract contract,
           AbstractLocation currentLocation) {
         Money monthlyPay = getMonthlyPay(campaign, contract);
         Money combatPay = getCombatPay(campaign, contract);
@@ -65,7 +92,17 @@ public class ChaosContractPayDetermination {
         contract.setContractFinanceData(contractFinanceData);
     }
 
-    public static @NonNull Money getTransportPay(Campaign campaign, LocalDate currentDate, AbstractContract contract,
+    /** The monthly retainer the employer pays. */
+    public abstract @NonNull Money getMonthlyPay(Campaign campaign, AbstractContract contract);
+
+    /** The per-battle combat bonus the employer pays; some schemes fold this into the monthly retainer and return zero. */
+    public abstract @NonNull Money getCombatPay(Campaign campaign, AbstractContract contract);
+
+    /**
+     * Up-front transport compensation for the journey from the player's current location to the contract's target,
+     * derived from the contract's scale, transport terms, and jump count. Shared by every pay scheme.
+     */
+    public @NonNull Money getTransportPay(Campaign campaign, LocalDate currentDate, AbstractContract contract,
           AbstractLocation currentLocation) {
         PlanetarySystem currentSystem = currentLocation.getCurrentSystem();
 
@@ -92,24 +129,11 @@ public class ChaosContractPayDetermination {
               shouldConvertSupportPoints(campaign));
     }
 
-    public static @NonNull Money getCombatPay(Campaign campaign, AbstractContract contract) {
-        int combatPayInSupportPoints = DEFAULT_COMBAT_PAY_MULTIPLIER * contract.getScale();
-        return ChaosCampaignUtilities.getMoneyFromChaosSupportPoints(combatPayInSupportPoints,
-              shouldConvertSupportPoints(campaign));
-    }
-
-    public static @NonNull Money getMonthlyPay(Campaign campaign, AbstractContract contract) {
-        int monthlyPayInSupportPoints = DEFAULT_MONTHLY_PAY_MULTIPLIER * contract.getScale();
-        monthlyPayInSupportPoints = (int) round(monthlyPayInSupportPoints * contract.getBasePayMultiplier());
-        return ChaosCampaignUtilities.getMoneyFromChaosSupportPoints(monthlyPayInSupportPoints,
-              shouldConvertSupportPoints(campaign));
-    }
-
     /**
      * Whether Chaos support-point pay should be converted to C-bills (the "BSP to BV" conversion). Enabled by default;
      * when disabled, pay is expressed in raw support points.
      */
-    private static boolean shouldConvertSupportPoints(Campaign campaign) {
+    protected static boolean shouldConvertSupportPoints(Campaign campaign) {
         return campaign.getCampaignOptions().get(CampaignOption.USE_CHAOS_SUPPORT_POINT_CONVERSION);
     }
 }

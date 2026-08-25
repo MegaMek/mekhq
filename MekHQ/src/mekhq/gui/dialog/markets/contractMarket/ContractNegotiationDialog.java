@@ -76,7 +76,7 @@ import mekhq.campaign.mission.contract.contractData.NegotiationData;
 import mekhq.campaign.mission.contract.contractData.NegotiationStepMath;
 import mekhq.campaign.mission.contract.contractData.NegotiationStepMath.Term;
 import mekhq.campaign.mission.contract.contractData.RentedFacilitiesData;
-import mekhq.campaign.mission.contract.contractGeneration.ChaosContractPayDetermination;
+import mekhq.campaign.mission.contract.contractGeneration.ChaosContractDeterminationPay;
 import mekhq.campaign.mission.contract.contractGeneration.negotiationsAndNPCs.TermFunding;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.universe.Faction;
@@ -750,8 +750,9 @@ public class ContractNegotiationDialog extends JDialog {
         ChaosContractStepsTable command = step(Clause.COMMAND);
 
         contract.setContractTerms(new ContractTermsData(payRate, support, transport, salvage, command));
-        contract.updateMonthlyPay(ChaosContractPayDetermination.getMonthlyPay(campaign, contract));
-        contract.updateTransportPay(ChaosContractPayDetermination.getTransportPay(campaign,
+        ChaosContractDeterminationPay payScheme = new ChaosContractDeterminationPay();
+        contract.updateMonthlyPay(payScheme.getMonthlyPay(campaign, contract));
+        contract.updateTransportPay(payScheme.getTransportPay(campaign,
               campaign.getLocalDate(), contract, currentLocation));
 
         contract.setRentedFacilitiesData(new RentedFacilitiesData(facilityQuantity[0],

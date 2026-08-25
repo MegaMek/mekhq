@@ -39,7 +39,7 @@ import mekhq.campaign.mission.contract.contractData.ChaosContractStepsTable;
 import mekhq.campaign.mission.contract.contractData.ContractTermsData;
 import mekhq.campaign.universe.Faction;
 
-public class ChaosContractDetermineTerms {
+public class ChaosContractDeterminationTerms {
     public static ContractTermsData determineInitialTerms(ChaosObjectiveType objectiveType,
           ChaosEmployerType employerType, @Nullable Faction employerFaction, boolean useFactionModifiers) {
         int factionPayDelta = useFactionModifiers ? getFactionPayRateModifier(employerFaction) : 0;
