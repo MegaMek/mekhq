@@ -75,6 +75,7 @@ import mekhq.campaign.mission.contract.contractData.ContractTermsData;
 import mekhq.campaign.mission.contract.contractData.NegotiationData;
 import mekhq.campaign.mission.contract.contractData.NegotiationStepMath;
 import mekhq.campaign.mission.contract.contractData.NegotiationStepMath.Term;
+import mekhq.campaign.mission.contract.contractData.NonNegotiableTermsData;
 import mekhq.campaign.mission.contract.contractData.RentedFacilitiesData;
 import mekhq.campaign.mission.contract.contractGeneration.ChaosContractDeterminationPay;
 import mekhq.campaign.mission.contract.contractGeneration.negotiationsAndNPCs.TermFunding;
@@ -120,6 +121,7 @@ public class ContractNegotiationDialog extends JDialog {
     private final transient Campaign campaign;
     private final transient AbstractContract contract;
     private final transient AbstractLocation currentLocation;
+    private final transient NonNegotiableTermsData nonNegotiableTerms;
 
     private final int scale;
     private final int capPerTerm;
@@ -194,6 +196,9 @@ public class ContractNegotiationDialog extends JDialog {
         boolean useChaosReputation = campaignOptions.get(CampaignOption.USE_CHAOS_REPUTATION);
         int reputation = campaign.getPlayerForce().getReputationRating(useChaosReputation);
         this.reputationPool = Math.clamp(reputation, 0, 2 * scale);
+
+        NonNegotiableTermsData lockedTerms = contract.getNonNegotiableTermsData();
+        this.nonNegotiableTerms = lockedTerms != null ? lockedTerms : NonNegotiableTermsData.none();
 
         for (Clause clause : Clause.values()) {
             currentStep[clause.ordinal()] = initialStep(clause);
@@ -704,8 +709,16 @@ public class ContractNegotiationDialog extends JDialog {
               MAXIMUM_SACRIFICED_TERMS, MAXIMUM_SACRIFICED_STEPS);
     }
 
+    /** Whether the employer has locked this clause as non-negotiable - it can be neither raised nor lowered. */
+    private boolean isLocked(Clause clause) {
+        return nonNegotiableTerms.isLocked(clause.term);
+    }
+
     /** Whether this clause's lower button should be active: an earlier raise can be undone, or a sacrifice is allowed. */
     private boolean canLower(Clause clause) {
+        if (isLocked(clause)) {
+            return false;
+        }
         int index = clause.ordinal();
         if (currentStep[index] > originalStep[index]) {
             return true;
@@ -789,7 +802,10 @@ public class ContractNegotiationDialog extends JDialog {
         for (Clause clause : Clause.values()) {
             int index = clause.ordinal();
             termValueLabels[index].setText(termValueHtml(clause));
-            termCapLabels[index].setText(getFormattedTextAt(RESOURCE_BUNDLE, "negotiate.contractMarket.cap",
+            // A locked term shows a "non-negotiable" badge in place of its raise-cap counter; its steppers are disabled.
+            termCapLabels[index].setText(isLocked(clause)
+                                               ? getTextAt(RESOURCE_BUNDLE, "negotiate.contractMarket.locked")
+                                               : getFormattedTextAt(RESOURCE_BUNDLE, "negotiate.contractMarket.cap",
                   max(0, currentStep[index] - originalStep[index]), capPerTerm));
             termRaiseButtons[index].setEnabled(canRaise(clause));
             termLowerButtons[index].setEnabled(canLower(clause));
@@ -812,6 +828,9 @@ public class ContractNegotiationDialog extends JDialog {
     }
 
     private boolean canRaise(Clause clause) {
+        if (isLocked(clause)) {
+            return false;
+        }
         int index = clause.ordinal();
         if (currentStep[index] >= CHAOS_CONTRACT_MAXIMUM_STEP_VALUE) {
             return false;
