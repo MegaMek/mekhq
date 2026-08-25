@@ -913,6 +913,18 @@ public class ContractNegotiationDialog extends JDialog {
     }
 
     /**
+     * A net-margin modifier specific to the "give me a better offer" option (shifting the terms' values). Fine Print
+     * Reader wins better terms.
+     */
+    private static int haggleNegotiationModifier(Person negotiator) {
+        int modifier = 0;
+        if (negotiator != null && negotiator.getOptions().booleanOption(PersonnelOptions.FINE_PRINT_READER)) {
+            modifier++;
+        }
+        return modifier;
+    }
+
+    /**
      * Resolves a Negotiation check for the given person, posts the result to the daily report's skill-checks tab, and
      * returns its margin of success.
      */
@@ -925,7 +937,7 @@ public class ContractNegotiationDialog extends JDialog {
 
     /** Runs the opposed check and rewrites the terms as a fresh baseline. Spends the contract's one attempt. */
     private void performHaggle() {
-        int net = rollNetMargin();
+        int net = rollNetMargin() + haggleNegotiationModifier(contract.getPlayerNegotiator());
         int[] moveCounts = applyActiveNegotiation(net);
 
         // The re-negotiated terms become the new baseline; manual haggling starts fresh from here.
