@@ -141,6 +141,8 @@ public final class ContractXmlCodec {
         writeScheduleData(printWriter, indent, contract.getScheduleData());
         writeSystemsTargetData(printWriter, indent, contract.getSystemsTargetData());
         writeRentedFacilitiesData(printWriter, indent, contract.getRentedFacilitiesData());
+
+        writeNonNegotiableTermsData(printWriter, indent, contract.getNonNegotiableTermsData());
         writeMoraleData(printWriter, indent, contract.getMoraleData());
         writeNegotiationData(printWriter, indent, contract.getNegotiationData());
 
@@ -275,6 +277,20 @@ public final class ContractXmlCodec {
         MHQXMLUtility.writeSimpleXMLCloseTag(pw, --indent, "rentedFacilitiesData");
     }
 
+    private static void writeNonNegotiableTermsData(final PrintWriter pw, int indent,
+          final @Nullable NonNegotiableTermsData data) {
+        if (data == null || !data.anyLocked()) {
+            return;
+        }
+        MHQXMLUtility.writeSimpleXMLOpenTag(pw, indent++, "nonNegotiableTermsData");
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "payLocked", data.payLocked());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "supportLocked", data.supportLocked());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "transportLocked", data.transportLocked());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "salvageLocked", data.salvageLocked());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "commandLocked", data.commandLocked());
+        MHQXMLUtility.writeSimpleXMLCloseTag(pw, --indent, "nonNegotiableTermsData");
+    }
+
     private static void writeMoraleData(final PrintWriter pw, int indent, final @Nullable MoraleData data) {
         if (data == null) {
             return;
@@ -407,6 +423,10 @@ public final class ContractXmlCodec {
               (contract, node, campaign, version) -> contract.setSystemsTargetData(parseSystemsTargetData(node)));
         readers.put("rentedFacilitiesData",
               (contract, node, campaign, version) -> contract.setRentedFacilitiesData(parseRentedFacilitiesData(node)));
+
+        readers.put("nonNegotiableTermsData",
+              (contract, node, campaign, version) -> contract.setNonNegotiableTermsData(
+                    parseNonNegotiableTermsData(node)));
         readers.put("moraleData", (contract, node, campaign, version) -> contract.setMoraleData(parseMoraleData(node)));
         readers.put("negotiationData",
               (contract, node, campaign, version) -> contract.setNegotiationData(parseNegotiationData(node)));
@@ -776,6 +796,39 @@ public final class ContractXmlCodec {
         final RentedFacilitiesBuilder builder = readFields(wn, new RentedFacilitiesBuilder(),
               RENTED_FACILITIES_BINDERS, null, null, "rentedFacilitiesData");
         return new RentedFacilitiesData(builder.hospitalBeds, builder.kitchens, builder.holdingCells);
+    }
+
+    private static final class NonNegotiableTermsBuilder {
+        boolean payLocked;
+        boolean supportLocked;
+        boolean transportLocked;
+        boolean salvageLocked;
+        boolean commandLocked;
+    }
+
+    private static final Map<String, FieldBinder<NonNegotiableTermsBuilder>> NON_NEGOTIABLE_TERMS_BINDERS =
+          createNonNegotiableTermsBinders();
+
+    private static Map<String, FieldBinder<NonNegotiableTermsBuilder>> createNonNegotiableTermsBinders() {
+        final Map<String, FieldBinder<NonNegotiableTermsBuilder>> binders = new HashMap<>();
+        binders.put("payLocked",
+              (builder, node, campaign, version) -> builder.payLocked = Boolean.parseBoolean(text(node)));
+        binders.put("supportLocked",
+              (builder, node, campaign, version) -> builder.supportLocked = Boolean.parseBoolean(text(node)));
+        binders.put("transportLocked",
+              (builder, node, campaign, version) -> builder.transportLocked = Boolean.parseBoolean(text(node)));
+        binders.put("salvageLocked",
+              (builder, node, campaign, version) -> builder.salvageLocked = Boolean.parseBoolean(text(node)));
+        binders.put("commandLocked",
+              (builder, node, campaign, version) -> builder.commandLocked = Boolean.parseBoolean(text(node)));
+        return binders;
+    }
+
+    private static NonNegotiableTermsData parseNonNegotiableTermsData(final Node wn) {
+        final NonNegotiableTermsBuilder builder = readFields(wn, new NonNegotiableTermsBuilder(),
+              NON_NEGOTIABLE_TERMS_BINDERS, null, null, "nonNegotiableTermsData");
+        return new NonNegotiableTermsData(builder.payLocked, builder.supportLocked, builder.transportLocked,
+              builder.salvageLocked, builder.commandLocked);
     }
 
     private static final class MoraleDataBuilder {
