@@ -119,6 +119,7 @@ public class PersonnelOptions extends PilotOptions {
     public static final String LOOPHOLE_FINDER = "loophole_finder";
     public static final String FINE_PRINT_READER = "fine_print_reader";
     public static final String BLACKLISTED = "blacklisted";
+    public static final String EASILY_FOOLED = "easily_fooled";
     public static final String FLAW_ANIMAL_ANTIPATHY = "flaw_animal_antipathy";
     public static final String ATOW_ANIMAL_EMPATHY = "atow_animal_empathy";
     public static final String ATOW_AMBIDEXTROUS = "atow_ambidextrous";
@@ -340,6 +341,7 @@ public class PersonnelOptions extends PilotOptions {
         addOption(l3a, LOOPHOLE_FINDER, false);
         addOption(l3a, FINE_PRINT_READER, false);
         addOption(l3a, BLACKLISTED, false);
+        addOption(l3a, EASILY_FOOLED, false);
         addOption(l3a, FLAW_ANIMAL_ANTIPATHY, false);
         addOption(l3a, ATOW_ANIMAL_EMPATHY, false);
         addOption(l3a, ATOW_AMBIDEXTROUS, false);

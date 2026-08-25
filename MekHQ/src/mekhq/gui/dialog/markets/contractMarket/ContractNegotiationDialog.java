@@ -920,12 +920,18 @@ public class ContractNegotiationDialog extends JDialog {
 
     /**
      * A net-margin modifier specific to the "give me a better offer" option (shifting the terms' values). Fine Print
-     * Reader wins better terms.
+     * Reader wins better terms; Easily Fooled, its opposite, loses ground.
      */
     private static int haggleNegotiationModifier(Person negotiator) {
+        if (negotiator == null) {
+            return 0;
+        }
         int modifier = 0;
-        if (negotiator != null && negotiator.getOptions().booleanOption(PersonnelOptions.FINE_PRINT_READER)) {
+        if (negotiator.getOptions().booleanOption(PersonnelOptions.FINE_PRINT_READER)) {
             modifier++;
+        }
+        if (negotiator.getOptions().booleanOption(PersonnelOptions.EASILY_FOOLED)) {
+            modifier--;
         }
         return modifier;
     }
