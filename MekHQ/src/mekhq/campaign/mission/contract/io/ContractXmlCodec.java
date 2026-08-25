@@ -112,7 +112,7 @@ public final class ContractXmlCodec {
         writeStringIfPresent(printWriter, indent, "description", contract.getDescription());
         MHQXMLUtility.writeSimpleXMLTag(printWriter, indent, "scale", contract.getScale());
         MHQXMLUtility.writeSimpleXMLTag(printWriter, indent, "trackCount", contract.getTrackCount());
-        MHQXMLUtility.writeSimpleXMLTag(printWriter, indent, "provingGround", contract.isProvingGround());
+        MHQXMLUtility.writeSimpleXMLTag(printWriter, indent, "contractNature", contract.getNature().name());
         MHQXMLUtility.writeSimpleXMLTag(printWriter, indent, "sharesPercent", contract.getSharesPercent());
         if (!contract.getObfuscatedIntel().isEmpty()) {
             MHQXMLUtility.writeSimpleXMLTag(printWriter, indent, "obfuscatedIntel",
@@ -405,8 +405,14 @@ public final class ContractXmlCodec {
         readers.put("description", (contract, node, campaign, version) -> contract.setDescription(text(node)));
         readers.put("scale", (contract, node, campaign, version) -> contract.setScale(parseInt(node)));
         readers.put("trackCount", (contract, node, campaign, version) -> contract.setTrackCount(parseInt(node)));
-        readers.put("provingGround",
-              (contract, node, campaign, version) -> contract.setProvingGround(Boolean.parseBoolean(text(node))));
+        readers.put("contractNature",
+              (contract, node, campaign, version) -> contract.setNature(ContractNature.fromString(text(node))));
+        // Legacy: pre-ContractNature saves stored the designation as a standalone boolean flag.
+        readers.put("provingGround", (contract, node, campaign, version) -> {
+            if (Boolean.parseBoolean(text(node))) {
+                contract.setNature(ContractNature.PROVING_GROUND);
+            }
+        });
         readers.put("sharesPercent",
               (contract, node, campaign, version) -> contract.setSharesPercent(parseInt(node)));
         readers.put("missionStatus",

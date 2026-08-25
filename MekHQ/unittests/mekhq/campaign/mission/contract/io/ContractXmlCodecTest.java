@@ -112,7 +112,7 @@ class ContractXmlCodecTest {
         contract.setDescription("A punitive raid into the Periphery.");
         contract.setScale(4);
         contract.setTrackCount(2);
-        contract.setProvingGround(true);
+        contract.setNature(ContractNature.PROVING_GROUND);
         contract.setSharesPercent(45);
         contract.setStatus(MissionStatus.ACTIVE);
         contract.setSalvagedByUnitValue(Money.of(1_250_000));
@@ -342,6 +342,7 @@ class ContractXmlCodecTest {
         assertEquals(expected.getDescription(), actual.getDescription(), "description");
         assertEquals(expected.getScale(), actual.getScale(), "scale");
         assertEquals(expected.getTrackCount(), actual.getTrackCount(), "trackCount");
+        assertEquals(expected.getNature(), actual.getNature(), "nature");
         assertTrue(actual.isProvingGround(), "provingGround");
         assertEquals(expected.getSharesPercent(), actual.getSharesPercent(), "sharesPercent");
         assertEquals(expected.getStatus(), actual.getStatus(), "missionStatus");

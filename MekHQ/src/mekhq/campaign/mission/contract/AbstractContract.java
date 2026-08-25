@@ -153,8 +153,7 @@ public abstract class AbstractContract {
     private int requiredCombatElements;
     private int requiredVictoryPoints;
     private int trackCount; // TODO future proofing
-    /** A "pity" contract: an easy top-up offer, surfaced in the market as a Proving Ground. */
-    private boolean provingGround;
+    private ContractNature nature = ContractNature.NORMAL;
 
     private final List<Scenario> scenarios = new ArrayList<>();
 
@@ -603,13 +602,26 @@ public abstract class AbstractContract {
         this.trackCount = trackCount;
     }
 
-    /** @return {@code true} if this is a pity ("Proving Ground") contract - an easy top-up offer for a struggling force */
-    public boolean isProvingGround() {
-        return provingGround;
+    /** @return this contract's special designation ({@link ContractNature#NORMAL} if it has none) */
+    public ContractNature getNature() {
+        return nature;
     }
 
-    public void setProvingGround(boolean provingGround) {
-        this.provingGround = provingGround;
+    public void setNature(ContractNature nature) {
+        this.nature = (nature == null) ? ContractNature.NORMAL : nature;
+    }
+
+    /** @return {@code true} if this is a pity ("Proving Ground") contract - an easy top-up offer for a struggling force */
+    public boolean isProvingGround() {
+        return nature.isProvingGround();
+    }
+
+    /**
+     * @return {@code true} if this is a covert operation, where the enemy is drawn under covert rules and even the
+     *       employer's allies can become rare, low-chance targets
+     */
+    public boolean isCovert() {
+        return nature.isCovert();
     }
 
     public int getRequiredVictoryPoints() {
