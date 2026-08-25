@@ -85,6 +85,7 @@ import mekhq.campaign.mission.contract.contractData.RentedFacilitiesData;
 import mekhq.campaign.mission.contract.contractGeneration.ChaosContractDeterminationPay;
 import mekhq.campaign.mission.contract.contractGeneration.negotiationsAndNPCs.TermFunding;
 import mekhq.campaign.personnel.Person;
+import mekhq.campaign.personnel.PersonnelOptions;
 import mekhq.campaign.personnel.skills.ActionCheckResult;
 import mekhq.campaign.personnel.skills.SkillType;
 import mekhq.campaign.personnel.skills.enums.MarginOfSuccess;
@@ -876,12 +877,19 @@ public class ContractNegotiationDialog extends JDialog {
             LOGGER.warn("Contract {} has no player negotiator", contract.getName());
             return DISASTROUS.getLowerBound();
         }
+
+        boolean isUseEdge = campaign.getCampaignOptions().get(CampaignOption.USE_EDGE);
+        boolean playerUsesEdge = isUseEdge &&
+                                       playerNegotiator.getOptions()
+                                             .booleanOption(PersonnelOptions.EDGE_COMMANDER_NEGOTIATION);
         MarginOfSuccess playerMargin = reportedNegotiationCheck(playerNegotiator,
-              "negotiate.contractMarket.renegotiate.roll.player");
+              "negotiate.contractMarket.renegotiate.roll.player",
+              playerUsesEdge);
         Person employerNegotiator = contract.getEmployerNegotiator();
         MarginOfSuccess employerMargin = employerNegotiator != null ?
                                                reportedNegotiationCheck(employerNegotiator,
-                                                     "negotiate.contractMarket.renegotiate.roll.employer") :
+                                                     "negotiate.contractMarket.renegotiate.roll.employer",
+                                                     isUseEdge) :
                                                MarginOfSuccess.BARELY_MADE_IT;
         return ActiveNegotiationMath.netMargin(playerMargin, employerMargin);
     }
@@ -890,9 +898,9 @@ public class ContractNegotiationDialog extends JDialog {
      * Resolves a Negotiation check for the given person, posts the result to the daily report's skill-checks tab, and
      * returns its margin of success.
      */
-    private MarginOfSuccess reportedNegotiationCheck(Person negotiator, String reasonKey) {
+    private MarginOfSuccess reportedNegotiationCheck(Person negotiator, String reasonKey, boolean useEdge) {
         ActionCheckResult result = negotiator.checkSkill(SkillType.S_NEGOTIATION, campaign)
-                                         .resolve(false, getTextAt(RESOURCE_BUNDLE, reasonKey));
+                                         .resolve(useEdge, getTextAt(RESOURCE_BUNDLE, reasonKey));
         campaign.addReport(DailyReportType.SKILL_CHECKS, result.getReport(true));
         return result.getReportMargin();
     }
