@@ -395,7 +395,7 @@ public class SetupTab {
 
         for (int i = 0; i < SUPPORT_ROLES.length; i++) {
             PersonnelRole role = SUPPORT_ROLES[i];
-            String roleDisplay = role.getLabel(campaign != null && campaign.getFaction().isClan());
+            String roleDisplay = role.getLabel(campaign != null && campaign.getPlayerForce().getFaction().isClan());
 
             JLabel roleLabel = new JLabel(roleDisplay);
             roleLabel.setName("lblSupport" + role.name());
@@ -707,7 +707,7 @@ public class SetupTab {
         gbc.fill = GridBagConstraints.HORIZONTAL;
 
         randomOriginOptionsPanel = new RandomOriginOptionsPanel(null, campaign,
-              campaign == null ? null : campaign.getFaction());
+              campaign == null ? null : campaign.getPlayerForce().getFaction());
         randomOriginOptionsPanel.setBorder(BorderFactory.createEmptyBorder());
         section.add(randomOriginOptionsPanel, gbc);
 

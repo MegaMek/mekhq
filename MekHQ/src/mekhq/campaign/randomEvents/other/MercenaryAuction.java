@@ -36,8 +36,8 @@ import static java.lang.Math.max;
 import static megamek.common.compute.Compute.d6;
 import static megamek.common.compute.Compute.randomInt;
 import static megamek.common.enums.SkillLevel.REGULAR;
-import static mekhq.campaign.mission.AtBDynamicScenarioFactory.getEntity;
-import static mekhq.campaign.mission.BotForceRandomizer.UNIT_WEIGHT_UNSPECIFIED;
+import static mekhq.campaign.mission.scenarios.AtBDynamicScenarioFactory.getEntity;
+import static mekhq.campaign.mission.scenarios.BotForceRandomizer.UNIT_WEIGHT_UNSPECIFIED;
 import static mekhq.campaign.unit.Unit.getRandomUnitQuality;
 import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
 
@@ -45,6 +45,8 @@ import megamek.common.units.Entity;
 import megamek.logging.MMLogger;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.digitalGM.stratCon.StratConCampaignState;
+import mekhq.campaign.parts.enums.PartQuality;
+import mekhq.campaign.unit.UnitAcquisitionType;
 import mekhq.gui.baseComponents.immersiveDialogs.ImmersiveDialogSimple;
 import mekhq.gui.dialog.MercenaryAuctionDialog;
 
@@ -73,7 +75,7 @@ public class MercenaryAuction {
      */
     public MercenaryAuction(Campaign campaign, int requiredCombatTeams, StratConCampaignState campaignState,
           int unitType) {
-        String faction = campaign.getFaction().getShortName();
+        String faction = campaign.getPlayerForce().getFaction().getShortName();
 
         Entity entity = getEntity(faction,
               REGULAR,
@@ -114,9 +116,8 @@ public class MercenaryAuction {
 
             new ImmersiveDialogSimple(campaign,
                   campaign.getPlayerForce().getHumanResources()
-                        .getSeniorAdminPerson(mekhq.campaign.Campaign.AdministratorSpecialization.TRANSPORT,
-                              campaign.getCampaignOptions(),
-                              campaign.isClanCampaign(),
+                        .getSeniorAdminPerson(campaign.getCampaignOptions(),
+                              campaign.getPlayerForce().isClanForce(),
                               campaign.getLocalDate()),
                   null,
                   inCharacterMessage,
@@ -153,14 +154,14 @@ public class MercenaryAuction {
             int deliveryTime = d6();
             // The +1 here is to account for this being an end of day event, so we automatically
             // eat the first day.
-            campaign.addNewUnit(entity, false, deliveryTime + 1);
+            PartQuality quality = getRandomUnitQuality(0);
+            campaign.addNewUnit(entity, false, deliveryTime + 1, quality, UnitAcquisitionType.PURCHASED);
 
             // This dialog informs the player their bid was successful
             new ImmersiveDialogSimple(campaign,
                   campaign.getPlayerForce().getHumanResources()
-                        .getSeniorAdminPerson(mekhq.campaign.Campaign.AdministratorSpecialization.TRANSPORT,
-                              campaign.getCampaignOptions(),
-                              campaign.isClanCampaign(),
+                        .getSeniorAdminPerson(campaign.getCampaignOptions(),
+                              campaign.getPlayerForce().isClanForce(),
                               campaign.getLocalDate()),
                   null,
                   getFormattedTextAt(RESOURCE_BUNDLE, "auction.successful", entity.getChassis(), deliveryTime),
@@ -172,9 +173,8 @@ public class MercenaryAuction {
             // This dialog informs the player their bid was unsuccessful
             new ImmersiveDialogSimple(campaign,
                   campaign.getPlayerForce().getHumanResources()
-                        .getSeniorAdminPerson(mekhq.campaign.Campaign.AdministratorSpecialization.TRANSPORT,
-                              campaign.getCampaignOptions(),
-                              campaign.isClanCampaign(),
+                        .getSeniorAdminPerson(campaign.getCampaignOptions(),
+                              campaign.getPlayerForce().isClanForce(),
                               campaign.getLocalDate()),
                   null,
                   getFormattedTextAt(RESOURCE_BUNDLE, "auction.failure", entity.getChassis()),

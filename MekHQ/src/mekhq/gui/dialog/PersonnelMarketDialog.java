@@ -88,6 +88,7 @@ import mekhq.gui.model.PersonnelTableModel;
 import mekhq.gui.utilities.JScrollPaneWithSpeed;
 import mekhq.gui.view.PersonViewPanel;
 import mekhq.utilities.ReportingUtilities;
+import mekhq.campaign.campaignOptions.CampaignOption;
 
 /**
  * @author Jay Lawson (jaylawson39 at yahoo.com) (code borrowed heavily from MegaMekLab UnitSelectorDialog
@@ -195,7 +196,7 @@ public class PersonnelMarketDialog extends JDialog {
         panelFilterButtons.add(comboPersonType, gridBagConstraints);
 
         boolean atbOutOfContract = campaign.getCampaignOptions().isUseStratCon() && !campaign.hasActiveContract();
-        boolean usingCamOpsMarkets = campaign.getCampaignOptions().getPersonnelMarketName().equals("Campaign Ops");
+        boolean usingCamOpsMarkets = campaign.getCampaignOptions().get(CampaignOption.PERSONNEL_MARKET_NAME).equals("Campaign Ops");
         if (atbOutOfContract && !usingCamOpsMarkets) {
             // Paid recruitment is available
             radioNormalRoll.setText("Make normal roll next week");
@@ -221,7 +222,7 @@ public class PersonnelMarketDialog extends JDialog {
                 radioNormalRoll.setSelected(true);
             }
 
-            final boolean isClan = campaign.getFaction().isClan();
+            final boolean isClan = campaign.getPlayerForce().getFaction().isClan();
             comboRecruitRole.setRenderer(new DefaultListCellRenderer() {
                 @Override
                 public Component getListCellRendererComponent(JList<?> list, Object value, int index,
@@ -383,7 +384,7 @@ public class PersonnelMarketDialog extends JDialog {
     private void hirePerson(ActionEvent evt) {
         if (null != selectedPerson) {
             if (campaign.getPlayerForce().getFunds()
-                      .isLessThan((campaign.getCampaignOptions().isPayForRecruitment() ?
+                      .isLessThan((campaign.getCampaignOptions().get(CampaignOption.PAY_FOR_RECRUITMENT) ?
                                          selectedPerson.getSalary(campaign).multipliedBy(2) :
                                          Money.zero()).plus(unitCost))) {
                 campaign.addReport(FINANCES, "<font color='" +
@@ -439,7 +440,7 @@ public class PersonnelMarketDialog extends JDialog {
 
         PartQuality quality = PartQuality.QUALITY_D;
 
-        if (campaign.getCampaignOptions().isUseRandomUnitQualities()) {
+        if (campaign.getCampaignOptions().get(CampaignOption.USE_RANDOM_UNIT_QUALITIES)) {
             quality = UnitOrder.getRandomUnitQuality(0);
         }
 
@@ -455,8 +456,8 @@ public class PersonnelMarketDialog extends JDialog {
         } else if (unit.usesSoldiers()) {
             unit.addPilotOrSoldier(selectedPerson);
         } else if (selectedPerson.canDrive(en,
-              campaign.getCampaignOptions().isUseAlternativeAdvancedMedical(),
-              campaign.getCampaignOptions().isUseImplants())) {
+              campaign.getCampaignOptions().get(CampaignOption.USE_ALTERNATIVE_ADVANCED_MEDICAL),
+              campaign.getCampaignOptions().get(CampaignOption.USE_IMPLANTS))) {
             unit.addDriver(selectedPerson);
         } else if (selectedPerson.canGun(en)) {
             unit.addGunner(selectedPerson);
@@ -517,7 +518,7 @@ public class PersonnelMarketDialog extends JDialog {
         if (null == en) {
             unitCost = Money.zero();
         } else {
-            if (!campaign.getCampaignOptions().isUseShareSystem() &&
+            if (!campaign.getCampaignOptions().get(CampaignOption.USE_SHARE_SYSTEM) &&
                       ((en instanceof Mek) || (en instanceof Tank) || (en instanceof Aero))) {
                 unitCost = Money.of(en.getCost(false)).dividedBy(2.0);
             } else {

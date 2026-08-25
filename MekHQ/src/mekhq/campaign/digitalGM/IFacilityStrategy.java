@@ -35,8 +35,8 @@ package mekhq.campaign.digitalGM;
 import mekhq.campaign.digitalGM.stratCon.StratConCampaignState;
 import mekhq.campaign.digitalGM.stratCon.StratConTrackState;
 import mekhq.campaign.digitalGM.stratCon.facility.StratConFacility;
-import mekhq.campaign.mission.AtBContract;
-import mekhq.campaign.mission.AtBScenario;
+import mekhq.campaign.mission.contract.AbstractContract;
+import mekhq.campaign.mission.scenarios.AtBScenario;
 
 /**
  * Strategy for map facilities &mdash; applying their periodic effects, updating them when a scenario resolves, and
@@ -70,7 +70,7 @@ public interface IFacilityStrategy {
      * @param destroy  {@code true} if the facility should be destroyed
      * @param capture  {@code true} if the facility should change hands
      */
-    void updateFacilityForScenario(AtBScenario scenario, AtBContract contract, boolean destroy, boolean capture);
+    void updateFacilityForScenario(AtBScenario scenario, AbstractContract contract, boolean destroy, boolean capture);
 
     /**
      * Transfers ownership of a facility to the opposing side (or its captured definition).

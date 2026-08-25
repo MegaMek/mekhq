@@ -34,7 +34,7 @@ package mekhq.campaign.digitalGM.stratCon;
 
 import mekhq.campaign.digitalGM.stratCon.StratConContractDefinition.StrategicObjectiveType;
 import mekhq.campaign.digitalGM.stratCon.facility.StratConFacility;
-import mekhq.campaign.mission.ScenarioForceTemplate.ForceAlignment;
+import mekhq.campaign.mission.scenarios.ScenarioForceTemplate.ForceAlignment;
 
 /**
  * This class is a data structure storing data relating to StratCon strategic objectives and also handles some small

@@ -46,7 +46,7 @@ import mekhq.campaign.events.OptionsChangedEvent;
 import mekhq.campaign.events.assets.AssetEvent;
 import mekhq.campaign.events.loans.LoanEvent;
 import mekhq.campaign.events.transactions.TransactionEvent;
-import mekhq.campaign.mission.AtBDynamicScenarioFactory;
+import mekhq.campaign.mission.scenarios.AtBDynamicScenarioFactory;
 import mekhq.campaign.personnel.skills.SkillType;
 import mekhq.gui.ActionScheduler;
 import mekhq.gui.CampaignGUI;
@@ -56,8 +56,8 @@ import mekhq.utilities.MHQInternationalization;
 import mekhq.utilities.ReportingUtilities;
 
 /**
- * Displays a command summary including current funds, unit reputation, experience rating, and the combat strength
- * used for StratCon calculations.
+ * Displays a command summary including current funds, unit reputation, experience rating, and the combat strength used
+ * for StratCon calculations.
  * <p>
  * This panel subscribes to the global event bus updates to stay synchronized with changes in the displayed stats.
  * </p>
@@ -72,8 +72,8 @@ public class CommandSummaryPanel extends ScalingWidthConstrainedPanel {
     private final JLabel lblCombatStrengthValue = new JLabel();
 
     /**
-     * Scheduler used to debounce funds refreshing. Multiple rapid financial events will collapse
-     * into a single UI update.
+     * Scheduler used to debounce funds refreshing. Multiple rapid financial events will collapse into a single UI
+     * update.
      */
     private final ActionScheduler refreshFundsScheduler = new ActionScheduler(this::refreshFunds);
 
@@ -138,8 +138,8 @@ public class CommandSummaryPanel extends ScalingWidthConstrainedPanel {
      */
     private void refreshAll() {
         String experience = SkillType.getColoredExperienceLevelName(campaign.getPlayerForce()
-                                                                          .getReputation()
-                                                                          .getAverageSkillLevel());
+                                                                          .getAverageSkillLevel(campaign.getCampaignOptions(),
+                                                                                campaign.getLocalDate()));
         lblUnitReputationValue.setText(getFormattedTextAt("reputation.text", campaign.getUnitRatingText(), experience));
         int totalBv = AtBDynamicScenarioFactory.getBVBudgetForStratConSingles(campaign, true);
         lblCombatStrengthValue.setText(getFormattedTextAt("combatStrength.text", totalBv));
@@ -147,22 +147,21 @@ public class CommandSummaryPanel extends ScalingWidthConstrainedPanel {
     }
 
     /**
-     * Refreshes only the funds label. Checks if the unit holds any active loans and
-     * alters the formatting accordingly.
+     * Refreshes only the funds label. Checks if the unit holds any active loans and alters the formatting accordingly.
      */
     private void refreshFunds() {
         String amount = campaign.getPlayerForce().getFunds().toAmountString();
         lblFundsValue.setText(getFormattedTextAt("funds.text", amount));
         if (campaign.getPlayerForce().getFinances().hasActiveLoans()) {
             lblFunds.setText(getFormattedTextAt("funds.label.hasLoan", ReportingUtilities.getNegativeColor()));
-        } else  {
+        } else {
             lblFunds.setText(getTextAt("funds.label.noLoan"));
         }
     }
 
     /**
-    * Retrieves and formats localized text from the panel's resource bundle.
-    */
+     * Retrieves and formats localized text from the panel's resource bundle.
+     */
     private static String getFormattedTextAt(String key, Object... args) {
         return MHQInternationalization.getFormattedTextAt(RESOURCE_BUNDLE, key, args);
     }

@@ -50,9 +50,9 @@ import mekhq.campaign.digitalGM.stratCon.StratConCampaignState;
 import mekhq.campaign.digitalGM.stratCon.StratConCoords;
 import mekhq.campaign.digitalGM.stratCon.StratConScenario;
 import mekhq.campaign.digitalGM.stratCon.StratConTrackState;
-import mekhq.campaign.mission.AtBContract;
-import mekhq.campaign.mission.AtBScenario;
-import mekhq.campaign.mission.Scenario;
+import mekhq.campaign.mission.contract.AbstractContract;
+import mekhq.campaign.mission.scenarios.AtBScenario;
+import mekhq.campaign.mission.scenarios.Scenario;
 import mekhq.gui.utilities.MekHqTableCellRenderer;
 import mekhq.utilities.ReportingUtilities;
 
@@ -232,7 +232,7 @@ public class ScenarioTableModel extends DataTableModel<Scenario> {
             return null;
         }
 
-        AtBContract contract = atBScenario.getContract(campaign);
+        AbstractContract contract = atBScenario.getContract(campaign);
         if (contract == null) {
             return null;
         }
@@ -264,7 +264,7 @@ public class ScenarioTableModel extends DataTableModel<Scenario> {
         } else if (col == COL_SECTOR) {
             if (campaign.getCampaignOptions().isUseStratCon()) {
                 if (scenario instanceof AtBScenario atBScenario) {
-                    AtBContract contract = atBScenario.getContract(campaign);
+                    AbstractContract contract = atBScenario.getContract(campaign);
                     if (contract == null) {
                         return "-";
                     }

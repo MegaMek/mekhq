@@ -37,7 +37,6 @@ import static java.lang.Math.max;
 import static java.lang.Math.min;
 import static java.lang.Math.round;
 import static java.time.temporal.IsoFields.WEEK_OF_WEEK_BASED_YEAR;
-import static mekhq.campaign.Campaign.AdministratorSpecialization.TRANSPORT;
 import static mekhq.campaign.enums.DailyReportType.GENERAL;
 import static mekhq.campaign.enums.DailyReportType.PERSONNEL;
 import static mekhq.campaign.enums.DailyReportType.POLITICS;
@@ -60,16 +59,18 @@ import megamek.common.compute.Compute;
 import megamek.common.units.Entity;
 import megamek.logging.MMLogger;
 import mekhq.campaign.Campaign;
+import mekhq.campaign.campaignOptions.CampaignOption;
 import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.force.Formation;
-import mekhq.campaign.mission.AtBContract;
-import mekhq.campaign.mission.enums.AtBMoraleLevel;
+import mekhq.campaign.mission.contract.AbstractContract;
+import mekhq.campaign.mission.contract.contractData.ContractMoraleLevel;
 import mekhq.campaign.mission.rentals.ContractRentalType;
 import mekhq.campaign.mission.rentals.FacilityRentals;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.randomEvents.prisoners.prisonerEvents.PrisonEscapeScenario;
 import mekhq.campaign.randomEvents.randomEventsSystem.RandomEventData;
 import mekhq.campaign.randomEvents.randomEventsSystem.RandomEventEffectsManager;
+import mekhq.campaign.reputation.chaosReputation.ChaosReputation;
 import mekhq.campaign.unit.Unit;
 import mekhq.campaign.universe.factionStanding.FactionStandings;
 import mekhq.gui.dialog.PrisonerIntelBreachDialog;
@@ -154,11 +155,11 @@ public class PrisonerEventManager {
             return;
         }
 
-        if (!campaign.getCampaignOptions().getPrisonerCaptureStyle().isMekHQ()) {
+        if (!campaign.getCampaignOptions().get(CampaignOption.PRISONER_CAPTURE_STYLE).isMekHQ()) {
             return;
         }
 
-        if (campaign.getActiveMissions(false).isEmpty()) {
+        if (campaign.getActiveContracts().isEmpty()) {
             return;
         }
 
@@ -202,12 +203,23 @@ public class PrisonerEventManager {
         int crimeNoticeRoll = Compute.randomInt(100);
         boolean crimeNoticed = crimeNoticeRoll < victims;
 
-        int penalty = min(MAX_CRIME_PENALTY, victims * 2);
-        if (crimeNoticed) {
-            int change = -penalty;
-            campaign.getPlayerForce().changeCrimeRating(change);
-            LocalDate dateOfLastCrime = campaign.getLocalDate();
-            campaign.getPlayerForce().setDateOfLastCrime(dateOfLastCrime);
+        int penalty;
+        CampaignOptions campaignOptions = campaign.getCampaignOptions();
+        boolean isUseChaosReputation = campaignOptions.get(CampaignOption.USE_CHAOS_REPUTATION);
+        boolean isUseCampaignReputationTracking = campaignOptions.get(CampaignOption.CAMPAIGN_LEVEL_CHAOS_REPUTATION);
+        if (isUseChaosReputation) {
+            penalty = ChaosReputation.getPrisonerExecutionPenalty(campaign.getPlayerForce(),
+                  victims,
+                  crimeNoticed,
+                  isUseCampaignReputationTracking);
+        } else {
+            penalty = min(MAX_CRIME_PENALTY, victims * 2);
+            if (crimeNoticed) {
+                int change = -penalty;
+                campaign.getPlayerForce().changeCrimeRating(change);
+                LocalDate dateOfLastCrime = campaign.getLocalDate();
+                campaign.getPlayerForce().setCampOpsDateOfLastCrime(dateOfLastCrime);
+            }
         }
 
         // Build the report
@@ -248,7 +260,7 @@ public class PrisonerEventManager {
      * @return The total prisoner capacity usage.
      */
     public static int calculatePrisonerCapacityUsage(Campaign campaign) {
-        PrisonerCaptureStyle captureStyle = campaign.getCampaignOptions().getPrisonerCaptureStyle();
+        PrisonerCaptureStyle captureStyle = campaign.getCampaignOptions().get(CampaignOption.PRISONER_CAPTURE_STYLE);
         boolean isMekHQCaptureStyle = captureStyle.isMekHQ();
 
         int prisonerCapacityUsage = 0;
@@ -375,7 +387,7 @@ public class PrisonerEventManager {
 
         if (!escapees.isEmpty() && campaign.hasActiveAtBContract()) {
             if (randomInt(100) < escapees.size()) {
-                List<AtBContract> contracts = campaign.getActiveAtBContracts();
+                List<AbstractContract> contracts = campaign.getActiveContracts();
                 Collections.shuffle(contracts);
 
                 new PrisonEscapeScenario(campaign, contracts.getFirst(), escapees);
@@ -410,7 +422,7 @@ public class PrisonerEventManager {
      */
     public static int calculatePrisonerCapacity(Campaign campaign) {
         CampaignOptions campaignOptions = campaign.getCampaignOptions();
-        PrisonerCaptureStyle captureStyle = campaignOptions.getPrisonerCaptureStyle();
+        PrisonerCaptureStyle captureStyle = campaignOptions.get(CampaignOption.PRISONER_CAPTURE_STYLE);
         boolean isMekHQCaptureStyle = captureStyle.isMekHQ();
 
         int prisonerCapacity = 0;
@@ -441,14 +453,14 @@ public class PrisonerEventManager {
                             prisonerCapacity += isMekHQCaptureStyle ?
                                                       PRISONER_CAPACITY_BATTLE_ARMOR :
                                                       PRISONER_CAPACITY_BATTLE_ARMOR *
-                                                      PRISONER_CAPACITY_CAM_OPS_MULTIPLIER;
+                                                            PRISONER_CAPACITY_CAM_OPS_MULTIPLIER;
                         }
                     }
 
                     prisonerCapacity += unit.getTotalTempCrew() * (isMekHQCaptureStyle ?
                                                                          PRISONER_CAPACITY_BATTLE_ARMOR :
                                                                          PRISONER_CAPACITY_BATTLE_ARMOR *
-                                                                         PRISONER_CAPACITY_CAM_OPS_MULTIPLIER);
+                                                                               PRISONER_CAPACITY_CAM_OPS_MULTIPLIER);
 
                     continue;
                 }
@@ -459,14 +471,14 @@ public class PrisonerEventManager {
                             prisonerCapacity += isMekHQCaptureStyle ?
                                                       PRISONER_CAPACITY_CONVENTIONAL_INFANTRY :
                                                       PRISONER_CAPACITY_CONVENTIONAL_INFANTRY *
-                                                      PRISONER_CAPACITY_CAM_OPS_MULTIPLIER;
+                                                            PRISONER_CAPACITY_CAM_OPS_MULTIPLIER;
                         }
                     }
 
                     prisonerCapacity += unit.getTotalTempCrew() * (isMekHQCaptureStyle ?
                                                                          PRISONER_CAPACITY_CONVENTIONAL_INFANTRY :
                                                                          PRISONER_CAPACITY_CONVENTIONAL_INFANTRY *
-                                                                         PRISONER_CAPACITY_CAM_OPS_MULTIPLIER);
+                                                                               PRISONER_CAPACITY_CAM_OPS_MULTIPLIER);
 
                     continue;
                 }
@@ -493,7 +505,7 @@ public class PrisonerEventManager {
 
     /**
      * Evaluates whether freeing prisoners during a scenario triggers one or more Intel Breach events, and applies the
-     * resulting morale penalties to a relevant active {@link AtBContract}.
+     * resulting morale penalties to a relevant active {@link AbstractContract}.
      *
      * <p>The chance of an Intel Breach scales with the number of prisoners freed. The method divides the freed
      * prisoners into groups of up to 50 and performs one breach roll per group. Each roll compares a uniform random
@@ -502,7 +514,8 @@ public class PrisonerEventManager {
      *
      * <p>If at least one breach occurs, the selected contract’s morale level is improved by the number of breaches,
      * and a corresponding {@link PrisonerIntelBreachDialog} is displayed to the user. Contracts at
-     * {@link AtBMoraleLevel#OVERWHELMING} or {@link AtBMoraleLevel#ROUTED} morale are excluded from selection.</p>
+     * {@link ContractMoraleLevel#OVERWHELMING} or {@link ContractMoraleLevel#ROUTED} morale are excluded from
+     * selection.</p>
      *
      * @param campaign           the {@link Campaign} context in which the event occurs
      * @param freedPrisonerCount the total number of prisoners freed by the player
@@ -511,11 +524,11 @@ public class PrisonerEventManager {
      * @since 0.50.10
      */
     public static void checkForIntelBreachEvent(Campaign campaign, int freedPrisonerCount) {
-        if (!campaign.getCampaignOptions().getPrisonerCaptureStyle().isMekHQ()) {
+        if (!campaign.getCampaignOptions().get(CampaignOption.PRISONER_CAPTURE_STYLE).isMekHQ()) {
             return;
         }
 
-        List<AtBContract> activeContracts = campaign.getActiveAtBContracts();
+        List<AbstractContract> activeContracts = campaign.getActiveContracts();
         activeContracts.removeIf(contract -> contract.getMoraleLevel().isOverwhelming() ||
                                                    contract.getMoraleLevel().isRouted());
         if (activeContracts.isEmpty()) {
@@ -527,9 +540,9 @@ public class PrisonerEventManager {
         boolean hadIntelBreach = freedPrisonerCount > 0 && Compute.randomInt(baseChance) < freedPrisonerCount;
 
         if (hadIntelBreach) {
-            AtBContract relevantContract = ObjectUtility.getRandomItem(activeContracts);
-            AtBMoraleLevel oldMorale = relevantContract.getMoraleLevel();
-            AtBMoraleLevel newMorale = relevantContract.changeMoraleLevel(1);
+            AbstractContract relevantContract = ObjectUtility.getRandomItem(activeContracts);
+            ContractMoraleLevel oldMorale = relevantContract.getMoraleLevel();
+            ContractMoraleLevel newMorale = relevantContract.changeMorale(1);
 
             new PrisonerIntelBreachDialog(campaign, relevantContract, oldMorale, newMorale);
         }
@@ -677,12 +690,12 @@ public class PrisonerEventManager {
      */
     private void processExecutions(int executions, List<Person> prisoners) {
         CampaignOptions campaignOptions = campaign.getCampaignOptions();
-        if (campaignOptions.isTrackFactionStanding()) {
+        if (campaignOptions.get(CampaignOption.TRACK_FACTION_STANDING)) {
             FactionStandings factionStandings = campaign.getPlayerForce().getFactionStandings();
             List<String> reports = factionStandings.executePrisonersOfWar(campaign.getPlayerForce()
                                                                                 .getFaction()
                                                                                 .getShortName(),
-                  prisoners, campaign.getGameYear(), campaignOptions.getRegardMultiplier());
+                  prisoners, campaign.getGameYear(), campaignOptions.get(CampaignOption.REGARD_MULTIPLIER));
 
             for (String report : reports) {
                 campaign.addReport(POLITICS, report);
@@ -747,9 +760,8 @@ public class PrisonerEventManager {
 
         if (speaker == null) {
             return campaign.getPlayerForce().getHumanResources()
-                         .getSeniorAdminPerson(TRANSPORT,
-                               campaign.getCampaignOptions(),
-                               campaign.isClanCampaign(),
+                         .getSeniorAdminPerson(campaign.getCampaignOptions(),
+                               campaign.getPlayerForce().isClanForce(),
                                campaign.getLocalDate());
         } else {
             return speaker;

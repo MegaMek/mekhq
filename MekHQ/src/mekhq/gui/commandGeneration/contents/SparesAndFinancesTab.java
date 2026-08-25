@@ -32,6 +32,7 @@
  */
 package mekhq.gui.commandGeneration.contents;
 
+import mekhq.campaign.campaignOptions.CampaignOption;
 import static mekhq.gui.commandGeneration.components.CommandGenerationUtilities.getCommandGenerationResourceBundle;
 import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
 import static mekhq.utilities.MHQInternationalization.getTextAt;
@@ -503,19 +504,19 @@ public class SparesAndFinancesTab {
         if (co == null) {
             return;
         }
-        spinners.get("SparesMekHead").setValue(clamp(co.getAutoLogisticsMekHead()));
-        spinners.get("SparesMekLocation").setValue(clamp(co.getAutoLogisticsMekLocation()));
-        spinners.get("SparesNonRepairableLocation").setValue(clamp(co.getAutoLogisticsNonRepairableLocation()));
-        spinners.get("SparesArmor").setValue(clamp(co.getAutoLogisticsArmor()));
-        spinners.get("SparesAmmunition").setValue(clamp(co.getAutoLogisticsAmmunition()));
-        spinners.get("SparesHeatSink").setValue(clamp(co.getAutoLogisticsHeatSink()));
-        spinners.get("SparesWeapons").setValue(clamp(co.getAutoLogisticsWeapons()));
-        spinners.get("SparesActuators").setValue(clamp(co.getAutoLogisticsActuators()));
-        spinners.get("SparesJumpJets").setValue(clamp(co.getAutoLogisticsJumpJets()));
-        spinners.get("SparesHeadComponents").setValue(clamp(co.getAutoLogisticsHeadComponents()));
-        spinners.get("SparesEngines").setValue(clamp(co.getAutoLogisticsEngines()));
-        spinners.get("SparesGyros").setValue(clamp(co.getAutoLogisticsGyros()));
-        spinners.get("SparesOther").setValue(clamp(co.getAutoLogisticsOther()));
+        spinners.get("SparesMekHead").setValue(clamp(co.get(CampaignOption.AUTO_LOGISTICS_MEK_HEAD)));
+        spinners.get("SparesMekLocation").setValue(clamp(co.get(CampaignOption.AUTO_LOGISTICS_MEK_LOCATION)));
+        spinners.get("SparesNonRepairableLocation").setValue(clamp(co.get(CampaignOption.AUTO_LOGISTICS_NON_REPAIRABLE_LOCATION)));
+        spinners.get("SparesArmor").setValue(clamp(co.get(CampaignOption.AUTO_LOGISTICS_ARMOR)));
+        spinners.get("SparesAmmunition").setValue(clamp(co.get(CampaignOption.AUTO_LOGISTICS_AMMUNITION)));
+        spinners.get("SparesHeatSink").setValue(clamp(co.get(CampaignOption.AUTO_LOGISTICS_HEAT_SINK)));
+        spinners.get("SparesWeapons").setValue(clamp(co.get(CampaignOption.AUTO_LOGISTICS_WEAPONS)));
+        spinners.get("SparesActuators").setValue(clamp(co.get(CampaignOption.AUTO_LOGISTICS_ACTUATORS)));
+        spinners.get("SparesJumpJets").setValue(clamp(co.get(CampaignOption.AUTO_LOGISTICS_JUMP_JETS)));
+        spinners.get("SparesHeadComponents").setValue(clamp(co.get(CampaignOption.AUTO_LOGISTICS_HEAD_COMPONENTS)));
+        spinners.get("SparesEngines").setValue(clamp(co.get(CampaignOption.AUTO_LOGISTICS_ENGINES)));
+        spinners.get("SparesGyros").setValue(clamp(co.get(CampaignOption.AUTO_LOGISTICS_GYROS)));
+        spinners.get("SparesOther").setValue(clamp(co.get(CampaignOption.AUTO_LOGISTICS_OTHER)));
     }
 
     /**
@@ -561,19 +562,19 @@ public class SparesAndFinancesTab {
         if (co == null) {
             return;
         }
-        co.setAutoLogisticsMekHead((Integer) spinners.get("SparesMekHead").getValue());
-        co.setAutoLogisticsMekLocation((Integer) spinners.get("SparesMekLocation").getValue());
-        co.setAutoLogisticsNonRepairableLocation((Integer) spinners.get("SparesNonRepairableLocation").getValue());
-        co.setAutoLogisticsArmor((Integer) spinners.get("SparesArmor").getValue());
-        co.setAutoLogisticsAmmunition((Integer) spinners.get("SparesAmmunition").getValue());
-        co.setAutoLogisticsHeatSink((Integer) spinners.get("SparesHeatSink").getValue());
-        co.setAutoLogisticsWeapons((Integer) spinners.get("SparesWeapons").getValue());
-        co.setAutoLogisticsActuators((Integer) spinners.get("SparesActuators").getValue());
-        co.setAutoLogisticsJumpJets((Integer) spinners.get("SparesJumpJets").getValue());
-        co.setAutoLogisticsHeadComponents((Integer) spinners.get("SparesHeadComponents").getValue());
-        co.setAutoLogisticsEngines((Integer) spinners.get("SparesEngines").getValue());
-        co.setAutoLogisticsGyros((Integer) spinners.get("SparesGyros").getValue());
-        co.setAutoLogisticsOther((Integer) spinners.get("SparesOther").getValue());
+        co.set(CampaignOption.AUTO_LOGISTICS_MEK_HEAD, (Integer) spinners.get("SparesMekHead").getValue());
+        co.set(CampaignOption.AUTO_LOGISTICS_MEK_LOCATION, (Integer) spinners.get("SparesMekLocation").getValue());
+        co.set(CampaignOption.AUTO_LOGISTICS_NON_REPAIRABLE_LOCATION, (Integer) spinners.get("SparesNonRepairableLocation").getValue());
+        co.set(CampaignOption.AUTO_LOGISTICS_ARMOR, (Integer) spinners.get("SparesArmor").getValue());
+        co.set(CampaignOption.AUTO_LOGISTICS_AMMUNITION, (Integer) spinners.get("SparesAmmunition").getValue());
+        co.set(CampaignOption.AUTO_LOGISTICS_HEAT_SINK, (Integer) spinners.get("SparesHeatSink").getValue());
+        co.set(CampaignOption.AUTO_LOGISTICS_WEAPONS, (Integer) spinners.get("SparesWeapons").getValue());
+        co.set(CampaignOption.AUTO_LOGISTICS_ACTUATORS, (Integer) spinners.get("SparesActuators").getValue());
+        co.set(CampaignOption.AUTO_LOGISTICS_JUMP_JETS, (Integer) spinners.get("SparesJumpJets").getValue());
+        co.set(CampaignOption.AUTO_LOGISTICS_HEAD_COMPONENTS, (Integer) spinners.get("SparesHeadComponents").getValue());
+        co.set(CampaignOption.AUTO_LOGISTICS_ENGINES, (Integer) spinners.get("SparesEngines").getValue());
+        co.set(CampaignOption.AUTO_LOGISTICS_GYROS, (Integer) spinners.get("SparesGyros").getValue());
+        co.set(CampaignOption.AUTO_LOGISTICS_OTHER, (Integer) spinners.get("SparesOther").getValue());
     }
 
     private static int clamp(int value) {

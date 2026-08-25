@@ -179,7 +179,7 @@ public final class ForceDescriptorWalker {
                     formation.setFormationLevel(level);
                 }
                 Formation parent = (Formation) parentHandle;
-                campaign.addFormation(formation, parent);
+                campaign.getPlayerForce().addFormation(formation, parent, campaign);
                 LOGGER.info("[CompanyGen][Walker]   Formation registered id={} name='{}' formationLevel={} parentId={}",
                       formation.getId(), named.name(), level,
                       parent == null ? "null" : parent.getId());

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2025 The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2025-2026 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -156,8 +156,8 @@ public record LifePathEntryData(
             //            case EXTRA_INCOME -> isMinimum ? MINIMUM_EXTRA_INCOME : clamp(value, MINIMUM_EXTRA_INCOME,
             //                  MAXIMUM_EXTRA_INCOME);
             //            case PROPERTY -> isMinimum ? MINIMUM_PROPERTY : max(value, MINIMUM_PROPERTY); // Has no maximum value
-            case REPUTATION -> isMinimum ? MINIMUM_REPUTATION : Math.clamp(value, MINIMUM_REPUTATION,
-                  MAXIMUM_REPUTATION);
+            case REPUTATION -> isMinimum ? MINIMUM_FAME : Math.clamp(value, MINIMUM_FAME,
+                  MAXIMUM_FAME);
             // case TITLE -> isMinimum ? MINIMUM_TITLE : clamp(value, MINIMUM_TITLE, MAXIMUM_TITLE);
             case UNLUCKY -> isMinimum ? MINIMUM_UNLUCKY : Math.clamp(value, MINIMUM_UNLUCKY, MAXIMUM_UNLUCKY);
             case WEALTH -> isMinimum ? MINIMUM_WEALTH : Math.clamp(value, MINIMUM_WEALTH, MAXIMUM_WEALTH);

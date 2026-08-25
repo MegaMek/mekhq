@@ -55,6 +55,7 @@ import mekhq.campaign.CampaignLocationManager;
 import mekhq.campaign.JumpPath;
 import mekhq.campaign.LocalWarehouse;
 import mekhq.campaign.campaignOptions.CampaignOptions;
+import mekhq.campaign.campaignOptions.CampaignOption;
 import mekhq.campaign.force.Detachment;
 import mekhq.campaign.force.PlayerForce;
 import mekhq.campaign.location.AcademyCampusLocation;
@@ -100,7 +101,7 @@ class EducationControllerTest {
         when(campaign.getLocalDate()).thenReturn(LocalDate.of(3025, 1, 1));
 
         CampaignOptions options = mock(CampaignOptions.class);
-        when(options.getNaturalHealingWaitingPeriod()).thenReturn(0);
+        when(options.get(CampaignOption.NATURAL_HEALING_WAITING_PERIOD)).thenReturn(0);
         when(campaign.getCampaignOptions()).thenReturn(options);
 
         mekhq.campaign.LocalHangar hangar = mock(mekhq.campaign.LocalHangar.class);
@@ -346,7 +347,7 @@ class EducationControllerTest {
         @Test
         void homeSchool_setsStageToEducation() {
             Academy academy = buildAcademy(true, false);
-            when(campaign.getName()).thenReturn("TestCampaign");
+            when(campaign.getPlayerForce().getName()).thenReturn("TestCampaign");
 
             Person person = buildStudentPerson();
             EducationController.enrollPerson(campaign, person, academy, null, "MERC", 0);
@@ -385,7 +386,7 @@ class EducationControllerTest {
         @Test
         void homeSchool_setsAcademyNameToCampaignName() {
             Academy academy = buildAcademy(true, false);
-            when(campaign.getName()).thenReturn("My Campaign");
+            when(campaign.getPlayerForce().getName()).thenReturn("My Campaign");
 
             Person person = buildStudentPerson();
             EducationController.enrollPerson(campaign, person, academy, null, "MERC", 0);
@@ -443,7 +444,7 @@ class EducationControllerTest {
         @Test
         void anyAcademy_setsAcademySetOnPerson() {
             Academy academy = buildAcademy(true, false);
-            when(campaign.getName()).thenReturn("TestCampaign");
+            when(campaign.getPlayerForce().getName()).thenReturn("TestCampaign");
 
             Person person = buildStudentPerson();
             EducationController.enrollPerson(campaign, person, academy, null, "MERC", 0);
@@ -454,7 +455,7 @@ class EducationControllerTest {
         @Test
         void anyAcademy_setsAcademyNameInSetOnPerson() {
             Academy academy = buildAcademy(true, false);
-            when(campaign.getName()).thenReturn("TestCampaign");
+            when(campaign.getPlayerForce().getName()).thenReturn("TestCampaign");
 
             Person person = buildStudentPerson();
             EducationController.enrollPerson(campaign, person, academy, null, "MERC", 0);

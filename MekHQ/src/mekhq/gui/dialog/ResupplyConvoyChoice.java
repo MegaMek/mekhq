@@ -39,7 +39,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import mekhq.campaign.Campaign;
-import mekhq.campaign.mission.enums.AtBMoraleLevel;
+import mekhq.campaign.mission.contract.contractData.ContractMoraleLevel;
 import mekhq.campaign.mission.resupplyAndCaches.Resupply;
 import mekhq.gui.baseComponents.immersiveDialogs.ImmersiveDialogSimple;
 
@@ -94,7 +94,7 @@ public class ResupplyConvoyChoice {
      * @param normalTonnage        normal convoy tonnage value (return value of {@link Resupply#getTargetCargoTonnage})
      * @param availableCargoSpace  currently available cargo space in player convoys (return value of
      *                             {@link Resupply#getTotalPlayerCargoCapacity})
-     * @param moraleString         string label for the contract's current {@link AtBMoraleLevel}
+     * @param moraleString         string label for the contract's current {@link ContractMoraleLevel}
      *
      * @author Illiani
      * @since 0.50.07
@@ -103,9 +103,8 @@ public class ResupplyConvoyChoice {
           int normalTonnage, double availableCargoSpace, String moraleString) {
         ImmersiveDialogSimple dialog = new ImmersiveDialogSimple(campaign,
               campaign.getPlayerForce().getHumanResources()
-                    .getSeniorAdminPerson(mekhq.campaign.Campaign.AdministratorSpecialization.TRANSPORT,
-                          campaign.getCampaignOptions(),
-                          campaign.isClanCampaign(),
+                    .getSeniorAdminPerson(campaign.getCampaignOptions(),
+                          campaign.getPlayerForce().isClanForce(),
                           campaign.getLocalDate()),
               null,
               getInCharacterMessage(isForcedPlayerConvoy, campaign.getCommanderAddress(), enhancedTonnage,

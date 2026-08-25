@@ -37,7 +37,7 @@ import mekhq.campaign.digitalGM.stratCon.StratConCoords;
 import mekhq.campaign.digitalGM.stratCon.StratConScenario;
 import mekhq.campaign.digitalGM.stratCon.StratConTrackState;
 import mekhq.campaign.digitalGM.stratCon.gm.AbstractStratConGM;
-import mekhq.campaign.mission.AtBContract;
+import mekhq.campaign.mission.contract.AbstractContract;
 
 /**
  * Strategy for placing player forces into scenarios &mdash; direct deployment to coordinates, assignment to a scenario,
@@ -64,7 +64,7 @@ public interface IForceDeploymentStrategy {
      * @param track    the track being deployed on
      * @param sticky   {@code true} if the deployment should persist rather than being cleared each cycle
      */
-    void deployForceToCoords(StratConCoords coords, int forceID, Campaign campaign, AtBContract contract,
+    void deployForceToCoords(StratConCoords coords, int forceID, Campaign campaign, AbstractContract contract,
           StratConTrackState track, boolean sticky);
 
     /**
@@ -77,7 +77,7 @@ public interface IForceDeploymentStrategy {
      * @param track    the track containing the scenario
      * @param sticky   {@code true} if the assignment should persist rather than being cleared each cycle
      */
-    void assignForceToScenario(StratConCoords coords, int forceID, Campaign campaign, AtBContract contract,
+    void assignForceToScenario(StratConCoords coords, int forceID, Campaign campaign, AbstractContract contract,
           StratConTrackState track, boolean sticky);
 
     /**

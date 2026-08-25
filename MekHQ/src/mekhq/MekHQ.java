@@ -106,17 +106,18 @@ import mekhq.campaign.CampaignController;
 import mekhq.campaign.ResolveScenarioTracker;
 import mekhq.campaign.autoResolve.MekHQSetupForces;
 import mekhq.campaign.autoResolve.StratConSetupForces;
+import mekhq.campaign.campaignOptions.CampaignOption;
 import mekhq.campaign.digitalGM.IDigitalGM;
 import mekhq.campaign.digitalGM.stratCon.gm.MaplessStratConGM;
 import mekhq.campaign.digitalGM.stratCon.gm.SinglesStratConGM;
 import mekhq.campaign.digitalGM.stratCon.gm.StratConDigitalGM;
 import mekhq.campaign.handler.PostScenarioDialogHandler;
 import mekhq.campaign.handler.XPHandler;
-import mekhq.campaign.mission.AtBDynamicScenario;
-import mekhq.campaign.mission.AtBScenario;
-import mekhq.campaign.mission.Scenario;
-import mekhq.campaign.mission.ScenarioTemplate;
-import mekhq.campaign.mission.ScenarioTemplate.BattlefieldControlType;
+import mekhq.campaign.mission.scenarios.AtBDynamicScenario;
+import mekhq.campaign.mission.scenarios.AtBScenario;
+import mekhq.campaign.mission.scenarios.Scenario;
+import mekhq.campaign.mission.scenarios.ScenarioTemplate;
+import mekhq.campaign.mission.scenarios.ScenarioTemplate.BattlefieldControlType;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.unit.Unit;
 import mekhq.gui.CampaignGUI;
@@ -475,7 +476,7 @@ public class MekHQ implements GameListener {
     }
 
     public void joinGame(Scenario scenario, List<Unit> meks) {
-        ConnectDialog joinGameDialog = new ConnectDialog(campaignGUI.getFrame(), campaignGUI.getCampaign().getName());
+        ConnectDialog joinGameDialog = new ConnectDialog(campaignGUI.getFrame(), campaignGUI.getCampaign().getPlayerForce().getName());
         joinGameDialog.setVisible(true);
 
         if (!joinGameDialog.dataValidation("MegaMek.ConnectDialog.title")) {
@@ -526,7 +527,7 @@ public class MekHQ implements GameListener {
      */
     public void startHost(Scenario scenario, boolean loadSaveGame, List<Unit> meks,
           @Nullable BehaviorSettings autoResolveBehaviorSettings) {
-        HostDialog hostDialog = new HostDialog(campaignGUI.getFrame(), getCampaign().getName());
+        HostDialog hostDialog = new HostDialog(campaignGUI.getFrame(), getCampaign().getPlayerForce().getName());
         hostDialog.setVisible(true);
 
         if (!hostDialog.dataValidation("MegaMek.HostGameAlert.title")) {
@@ -569,7 +570,7 @@ public class MekHQ implements GameListener {
             return;
         }
         // Refactor this into a factory
-        var useExperimentalPacarGui = getCampaign().getCampaignOptions().isAutoResolveExperimentalPacarGuiEnabled();
+        var useExperimentalPacarGui = getCampaign().getCampaignOptions().get(CampaignOption.AUTO_RESOLVE_EXPERIMENTAL_PACAR_GUI_ENABLED);
         if (autoResolveBehaviorSettings != null && useExperimentalPacarGui) {
             client = new HeadlessClient(playerName, LOCALHOST_IP, port);
         } else {
@@ -847,10 +848,10 @@ public class MekHQ implements GameListener {
         SetupForces setupForces = getSetupForces(scenario, units);
 
         PlanetaryConditions planetaryConditions = getCampaign().getCurrentPlanetaryConditions(scenario);
-        if (getCampaign().getCampaignOptions().isAutoResolveVictoryChanceEnabled()) {
+        if (getCampaign().getCampaignOptions().get(CampaignOption.AUTO_RESOLVE_VICTORY_CHANCE_ENABLED)) {
 
             var proceed = AutoResolveChanceDialog.showDialog(campaignGUI.getFrame(),
-                  getCampaign().getCampaignOptions().getAutoResolveNumberOfScenarios(),
+                  getCampaign().getCampaignOptions().get(CampaignOption.AUTO_RESOLVE_NUMBER_OF_SCENARIOS),
                   Runtime.getRuntime().availableProcessors(),
                   1,
                   setupForces,

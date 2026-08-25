@@ -33,13 +33,14 @@
 
 package mekhq.campaign;
 
-import static mekhq.campaign.market.contractMarket.ContractAutomation.performAutomatedActivation;
+import static mekhq.campaign.mission.contract.utilities.ContractAutomation.performAutomatedActivation;
 
 import java.io.PrintWriter;
 import java.util.ArrayList;
 
 import jakarta.annotation.Nonnull;
 import mekhq.MekHQ;
+import mekhq.campaign.campaignOptions.CampaignOption;
 import mekhq.campaign.events.LocationChangedEvent;
 import mekhq.campaign.force.Detachment;
 import mekhq.campaign.location.ILocation;
@@ -132,15 +133,15 @@ public class DetachmentLocationManager {
             performAutomatedActivation(campaign);
         }
 
-        if (campaign.getCampaignOptions().isUseRandomDiseases()
-                  && campaign.getCampaignOptions().isUseAlternativeAdvancedMedical()) {
+        if (campaign.getCampaignOptions().get(CampaignOption.USE_RANDOM_DISEASES)
+                  && campaign.getCampaignOptions().get(CampaignOption.USE_ALTERNATIVE_ADVANCED_MEDICAL)) {
             Inoculations.triggerInoculationPrompt(campaign, false);
         }
     }
 
     /**
-     * Writes the {@code <location>} block for the detachment's current location and the
-     * {@code <locationNodeChildren>} block for the detachment's direct children in the location tree.
+     * Writes the {@code <location>} block for the detachment's current location and the {@code <locationNodeChildren>}
+     * block for the detachment's direct children in the location tree.
      */
     public void writeToXML(PrintWriter pw, int indent) {
         AbstractLocation currentLocation = locationNode.getNearestAbstractLocation();

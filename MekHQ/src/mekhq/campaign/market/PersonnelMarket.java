@@ -72,6 +72,7 @@ import mekhq.module.api.PersonnelMarketMethod;
 import mekhq.utilities.MHQXMLUtility;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
+import mekhq.campaign.campaignOptions.CampaignOption;
 
 @Deprecated(since = "0.50.06")
 public class PersonnelMarket {
@@ -103,7 +104,7 @@ public class PersonnelMarket {
 
     public PersonnelMarket(Campaign c) {
         generatePersonnelForDay(c);
-        setType(c.getCampaignOptions().getPersonnelMarketName());
+        setType(c.getCampaignOptions().get(CampaignOption.PERSONNEL_MARKET_NAME));
     }
 
     /**
@@ -121,7 +122,7 @@ public class PersonnelMarket {
     @Subscribe
     @Deprecated(since = "0.51.0", forRemoval = true)
     public void handleCampaignOptionsEvent(OptionsChangedEvent ev) {
-        setType(ev.getOptions().getPersonnelMarketName());
+        setType(ev.getOptions().get(CampaignOption.PERSONNEL_MARKET_NAME));
     }
 
     /**
@@ -143,12 +144,12 @@ public class PersonnelMarket {
      *                 current planetary system, date, settings, factions, and more.
      */
     public void generatePersonnelForDay(Campaign campaign) {
-        PlanetarySystem location = campaign.getCurrentLocation().getCurrentSystem();
+        PlanetarySystem location = campaign.getPlayerForce().getForceDetachment().getCurrentLocation().getCurrentSystem();
         LocalDate today = campaign.getLocalDate();
 
         // Determine conditions
-        boolean isOnPlanet = campaign.getCurrentLocation().isOnPlanet();
-        boolean useCapitalsHiringHallsOnly = campaign.getCampaignOptions().isUsePersonnelHireHiringHallOnly();
+        boolean isOnPlanet = campaign.getPlayerForce().getForceDetachment().getCurrentLocation().isOnPlanet();
+        boolean useCapitalsHiringHallsOnly = campaign.getCampaignOptions().get(CampaignOption.USE_PERSONNEL_HIRE_HIRING_HALL_ONLY);
         boolean isHiringHall = location.isHiringHall(today);
         boolean isCapital = location.getFactionSet(today)
                                   .stream()
@@ -184,7 +185,7 @@ public class PersonnelMarket {
         }
 
         // Generate campaign reports if the personnel market was updated
-        if (updated && campaign.getCampaignOptions().isPersonnelMarketReportRefresh()) {
+        if (updated && campaign.getCampaignOptions().get(CampaignOption.PERSONNEL_MARKET_REPORT_REFRESH)) {
             generatePersonnelReport(campaign);
         }
     }
@@ -204,12 +205,16 @@ public class PersonnelMarket {
         StringBuilder report = new StringBuilder();
         report.append("<a href='PERSONNEL_MARKET'>Personnel market updated</a>");
 
-        if (campaign.getCampaignOptions().getPersonnelMarketName().equals("Campaign Ops")) {
+        if (campaign.getCampaignOptions().get(CampaignOption.PERSONNEL_MARKET_NAME).equals("Campaign Ops")) {
             report.append(':');
 
             // Add details about the first personnel's experience, primary role, and name
             Person person = personnel.getFirst();
-            int experienceLevel = person.getExperienceLevel(campaign, false);
+            int experienceLevel = person.getExperienceLevel(campaign.getCampaignOptions(),
+                  campaign.getPlayerForce().isClanForce(),
+                  campaign.getLocalDate(),
+                  false,
+                  false);
             String expLevel = SkillType.getExperienceLevelName(experienceLevel);
 
             if (expLevel.equals("Elite") || expLevel.equals("Ultra-Green")) {
@@ -367,7 +372,7 @@ public class PersonnelMarket {
         try {
             // Instantiate the correct child class, and call its parsing function.
             retVal = new PersonnelMarket();
-            retVal.setType(c.getCampaignOptions().getPersonnelMarketName());
+            retVal.setType(c.getCampaignOptions().get(CampaignOption.PERSONNEL_MARKET_NAME));
 
             // Okay, now load Part-specific fields!
             NodeList nl = wn.getChildNodes();
@@ -552,7 +557,7 @@ public class PersonnelMarket {
                                       .findBestInRole(mekhq.campaign.personnel.enums.PersonnelRole.ADMINISTRATOR_LOGISTICS,
                                             mekhq.campaign.personnel.skills.SkillType.S_ADMIN,
                                             campaign.getCampaignOptions(),
-                                            campaign.isClanCampaign(),
+                                            campaign.getPlayerForce().isClanForce(),
                                             campaign.getLocalDate());
 
         int experienceLevel = EXP_ULTRA_GREEN;

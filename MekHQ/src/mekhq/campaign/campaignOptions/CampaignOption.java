@@ -54,6 +54,7 @@ import mekhq.campaign.market.enums.ContractMarketMethod;
 import mekhq.campaign.market.enums.UnitMarketMethod;
 import mekhq.campaign.market.personnelMarket.enums.PersonnelMarketStyle;
 import mekhq.campaign.personnel.enums.*;
+import mekhq.campaign.personnel.familiarity.Familiarity;
 import mekhq.campaign.randomEvents.prisoners.PrisonerCaptureStyle;
 import mekhq.campaign.universe.PlanetarySystem.PlanetaryRating;
 import mekhq.campaign.universe.PlanetarySystem.PlanetarySophistication;
@@ -97,7 +98,22 @@ public final class CampaignOption<T> {
           of(Boolean.class, false, "logMaintenance");
     public static final CampaignOption<Integer> DEFAULT_MAINTENANCE_TIME =
           of(Integer.class, 4, "defaultMaintenanceTime");
+    public static final CampaignOption<Boolean> USE_FABRICATION =
+          of(Boolean.class, false, "useFabrication");
+    public static final CampaignOption<Boolean> USE_BALANCED_FABRICATION =
+          of(Boolean.class, true, "useBalancedFabrication");
+    public static final CampaignOption<Boolean> FABRICATE_D_IN_MAINTENANCE_FACILITY =
+          of(Boolean.class, false, "maintenanceFabrication");
+    public static final CampaignOption<Boolean> USE_AMMO_FABRICATION =
+          of(Boolean.class, false, "useAmmoFabrication");
     // endregion Repair and Maintenance
+
+    // region Chassis Familiarity
+    public static final CampaignOption<Familiarity> CHASSIS_FAMILIARITY_MODE =
+          of(Familiarity.class, Familiarity.DISABLED, "chassisFamiliarityMode");
+    public static final CampaignOption<Integer> CHASSIS_FAMILIARITY_SPEED =
+          of(Integer.class, 2, "chassisFamiliaritySpeed");
+    // endregion Chassis Familiarity
 
     // region Migrated Options (generated storage-only migration)
     public static final CampaignOption<Boolean> REQUIRE_SUPPORT_FORCE_TRANSPORTATION =
@@ -110,6 +126,20 @@ public final class CampaignOption<T> {
           of(Boolean.class, false, "reduceReputationPerformanceModifier");
     public static final CampaignOption<Boolean> REPUTATION_PERFORMANCE_MODIFIER_CUT_OFF =
           of(Boolean.class, false, "reputationPerformanceModifierCutOff");
+    public static final CampaignOption<Boolean> USE_CHAOS_REPUTATION =
+          of(Boolean.class, true, "useChaosReputation");
+    public static final CampaignOption<Boolean> CAMPAIGN_LEVEL_CHAOS_REPUTATION =
+          of(Boolean.class, false, "campaignLevelChaosReputation");
+    public static final CampaignOption<Integer> CHAOS_REPUTATION_CAP =
+          of(Integer.class, 0, "chaosReputationCap");
+    public static final CampaignOption<Boolean> CHAOS_DEBT_PENALTIES_STACK =
+          of(Boolean.class, false, "chaosDebtPenaltiesStack");
+    public static final CampaignOption<Boolean> CHAOS_NO_PARTIAL_SUCCESS_REPUTATION =
+          of(Boolean.class, true, "chaosNoPartialSuccessReputation");
+    public static final CampaignOption<Boolean> CHAOS_PERSONALITY_AFFECTS_REPUTATION =
+          of(Boolean.class, false, "chaosPersonalityAffectsReputation");
+    public static final CampaignOption<Boolean> CHAOS_NEW_RECRUITS_HAVE_REPUTATION =
+          of(Boolean.class, false, "chaosNewRecruitsHaveReputation");
     public static final CampaignOption<Boolean> USE_ERA_MODS =
           of(Boolean.class, false, "useEraMods");
     public static final CampaignOption<Boolean> ASSIGNED_TECH_FIRST =
@@ -274,20 +304,6 @@ public final class CampaignOption<T> {
           of(Boolean.class, false, "personnelLogAbilityGain");
     public static final CampaignOption<Boolean> PERSONNEL_LOG_EDGE_GAIN =
           of(Boolean.class, false, "personnelLogEdgeGain");
-    public static final CampaignOption<Boolean> DISPLAY_PERSONNEL_LOG =
-          of(Boolean.class, false, "displayPersonnelLog");
-    public static final CampaignOption<Boolean> DISPLAY_SCENARIO_LOG =
-          of(Boolean.class, false, "displayScenarioLog");
-    public static final CampaignOption<Boolean> DISPLAY_KILL_RECORD =
-          of(Boolean.class, false, "displayKillRecord");
-    public static final CampaignOption<Boolean> DISPLAY_MEDICAL_RECORD =
-          of(Boolean.class, false, "displayMedicalRecord");
-    public static final CampaignOption<Boolean> DISPLAY_PATIENT_RECORD =
-          of(Boolean.class, false, "displayPatientRecord");
-    public static final CampaignOption<Boolean> DISPLAY_ASSIGNMENT_RECORD =
-          of(Boolean.class, false, "displayAssignmentRecord");
-    public static final CampaignOption<Boolean> DISPLAY_PERFORMANCE_RECORD =
-          of(Boolean.class, false, "displayPerformanceRecord");
     public static final CampaignOption<Boolean> AWARD_VETERANCY_SP_AS =
           of(Boolean.class, false, "awardVeterancySPAs");
     public static final CampaignOption<Boolean> AWARD_RELEVANT_VETERANCY_SP_AS =
@@ -747,6 +763,26 @@ public final class CampaignOption<T> {
           of(Integer.class, 0, "rentedFacilitiesCostHoldingCells");
     public static final CampaignOption<Integer> RENTED_FACILITIES_COST_REPAIR_BAYS =
           of(Integer.class, 0, "rentedFacilitiesCostRepairBays");
+    public static final CampaignOption<Boolean> USE_CHAOS_SUPPORT_POINT_CONVERSION =
+          of(Boolean.class, true, "useChaosSupportPointConversion");
+    public static final CampaignOption<Boolean> USE_CHAOS_SCALE_SUPPORT_POINT_CONVERSION =
+          of(Boolean.class, true, "useChaosScaleSupportPointConversion");
+    public static final CampaignOption<Boolean> USE_CONTRACT_FACTION_MODIFIERS =
+          of(Boolean.class, true, "useContractFactionModifiers");
+    public static final CampaignOption<Boolean> USE_INTEL_OBFUSCATION =
+          of(Boolean.class, true, "useIntelObfuscation");
+    public static final CampaignOption<Double> CONTRACT_BASE_PAY_MULTIPLIER =
+          of(Double.class, 1.0, "contractBasePayMultiplier");
+    public static final CampaignOption<Double> CONTRACT_STRAIGHT_SUPPORT_MULTIPLIER =
+          of(Double.class, 1.0, "contractStraightSupportMultiplier");
+    public static final CampaignOption<Double> CONTRACT_BATTLEFIELD_LOSS_MULTIPLIER =
+          of(Double.class, 1.0, "contractBattlefieldLossMultiplier");
+    public static final CampaignOption<Double> CONTRACT_TRANSPORT_MULTIPLIER =
+          of(Double.class, 1.0, "contractTransportMultiplier");
+    public static final CampaignOption<Double> CONTRACT_SALVAGE_MULTIPLIER =
+          of(Double.class, 1.0, "contractSalvageMultiplier");
+    public static final CampaignOption<Boolean> USE_LEGACY_CONTRACT_PAY =
+          of(Boolean.class, false, "useLegacyContractPay");
     public static final CampaignOption<Boolean> USE_ALTERNATE_PAYMENT_MODE =
           of(Boolean.class, false, "useAlternatePaymentMode");
     public static final CampaignOption<Boolean> USE_DIMINISHING_CONTRACT_PAY =

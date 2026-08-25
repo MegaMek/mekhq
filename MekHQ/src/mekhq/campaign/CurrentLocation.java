@@ -43,6 +43,7 @@ import java.util.UUID;
 import megamek.logging.MMLogger;
 import mekhq.MekHQ;
 import mekhq.campaign.campaignOptions.CampaignOptions;
+import mekhq.campaign.campaignOptions.CampaignOption;
 import mekhq.campaign.events.LocationChangedEvent;
 import mekhq.campaign.events.TransitCompleteEvent;
 import mekhq.campaign.events.TransitStatusChangedEvent;
@@ -88,12 +89,30 @@ public class CurrentLocation extends AbstractMobileLocation {
 
     @Override
     public boolean isAtJumpPoint() {
-        return transitTime >= currentSystem.getTimeToJumpPoint(1.0);
+        return transitTime >= destinationTransitTime();
     }
 
     @Override
     public double getPercentageTransit() {
-        return 1 - transitTime / currentSystem.getTimeToJumpPoint(1.0);
+        return 1 - transitTime / destinationTransitTime();
+    }
+
+    /**
+     * The in-system transit time, in days, from the jump point to the ship's actual destination within the current
+     * system.
+     *
+     * <p>By default this is the transit to the system's primary world. Once the ship is on the final leg of a jump
+     * path (its last remaining system) and that path names a {@link JumpPath#getTargetPlanet() target planet}, it is
+     * instead the transit to that planet &mdash; so a journey to an outer or inner world takes correspondingly longer
+     * or shorter, and "arrival" means reaching that planet rather than the primary world.</p>
+     *
+     * @return the effective in-system transit time to the current destination
+     */
+    private double destinationTransitTime() {
+        if ((jumpPath != null) && (jumpPath.size() == 1) && (jumpPath.getTargetPlanet() != null)) {
+            return jumpPath.getTargetPlanet().getTimeToJumpPoint(1.0);
+        }
+        return currentSystem.getTimeToJumpPoint(1.0);
     }
 
     @Override
@@ -146,6 +165,8 @@ public class CurrentLocation extends AbstractMobileLocation {
     @Override
     public void setJumpPath(JumpPath path) {
         jumpPath = path;
+        // Underway: the force is no longer at a world until the path completes.
+        currentPlanet = null;
         MekHQ.triggerEvent(new TransitStatusChangedEvent(this));
     }
 
@@ -218,22 +239,25 @@ public class CurrentLocation extends AbstractMobileLocation {
             }
             if (isAtJumpPoint() && (rechargeTime >= neededRechargeTime)) {
                 // jump
-                if (campaignOptions.isUseAbilities()) {
+                if (campaignOptions.get(CampaignOption.USE_ABILITIES)) {
                     checkForTransitDisorientationSyndrome(campaign,
-                          campaignOptions.isUseFatigue(),
-                          campaignOptions.getFatigueRate());
+                          campaignOptions.get(CampaignOption.USE_FATIGUE),
+                          campaignOptions.get(CampaignOption.FATIGUE_RATE));
                 }
                 if (!isSilentProcessing) {
                     campaign.addReport(GENERAL, "Jumping to " + jumpPath.get(1).getPrintableName(today));
                 }
                 currentSystem = jumpPath.get(1);
+                currentPlanet = null;
                 jumpZenith = pickJumpPoint(today);
                 jumpPath.removeFirstSystem();
                 MekHQ.triggerEvent(new LocationChangedEvent(this, true));
                 // reduce remaining hours by usedRechargeTime or usedTransitTime, whichever is
                 // greater
                 hours -= Math.max(usedRechargeTime, usedTransitTime);
-                transitTime = currentSystem.getTimeToJumpPoint(1.0);
+                // On arriving at the final system this is the transit to the path's target planet (if any); at an
+                // intermediate system it is the primary-world transit, as before.
+                transitTime = destinationTransitTime();
                 rechargeTime = 0;
                 // if there are hours remaining, then begin recharging jump drive
                 usedRechargeTime = Math.min(hours, neededRechargeTime - rechargeTime);
@@ -264,8 +288,11 @@ public class CurrentLocation extends AbstractMobileLocation {
                     campaign.addReport(GENERAL,
                           jumpPath.getLastSystem().getPrintableName(campaign.getLocalDate()) + " reached.");
                 }
-                // we are here!
+                // we are here! Capture the world the path aimed at before discarding it - this is the only point
+                // where the destination is still known. A path with no target world leaves this null, so getPlanet()
+                // keeps reporting the system's primary world.
                 transitTime = 0;
+                currentPlanet = jumpPath.getTargetPlanet();
                 jumpPath = null;
                 MekHQ.triggerEvent(new TransitCompleteEvent(this));
             }
@@ -285,6 +312,11 @@ public class CurrentLocation extends AbstractMobileLocation {
     public void writeToXML(final PrintWriter pw, int indent) {
         MHQXMLUtility.writeSimpleXMLOpenTag(pw, indent++, "location");
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "currentSystemId", currentSystem.getId());
+        // Deliberately not "currentPlanetId"/"currentPlanetName" - those are read as aliases for the system id, from
+        // when systems were called planets.
+        if (currentPlanet != null) {
+            MHQXMLUtility.writeSimpleXMLTag(pw, indent, "currentWorldId", currentPlanet.getId());
+        }
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "transitTime", transitTime);
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "rechargeTime", rechargeTime);
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "jumpZenith", jumpZenith);
@@ -309,6 +341,8 @@ public class CurrentLocation extends AbstractMobileLocation {
         try {
             retVal = new CurrentLocation();
             NodeList nl = wn.getChildNodes();
+            // A world id only resolves against its system, and the tags can arrive in any order, so resolve after.
+            String pendingWorldId = null;
 
             for (int x = 0; x < nl.getLength(); x++) {
                 Node wn2 = nl.item(x);
@@ -326,6 +360,8 @@ public class CurrentLocation extends AbstractMobileLocation {
                         }
                     }
                     retVal.currentSystem = p;
+                } else if (wn2.getNodeName().equalsIgnoreCase("currentWorldId")) {
+                    pendingWorldId = wn2.getTextContent().trim();
                 } else if (wn2.getNodeName().equalsIgnoreCase("transitTime")) {
                     retVal.transitTime = Double.parseDouble(wn2.getTextContent());
                 } else if (wn2.getNodeName().equalsIgnoreCase("rechargeTime")) {
@@ -340,6 +376,13 @@ public class CurrentLocation extends AbstractMobileLocation {
                     retVal.pendingUnitIds.add(UUID.fromString(wn2.getTextContent().trim()));
                 } else if (wn2.getNodeName().equalsIgnoreCase("partId")) {
                     retVal.pendingPartIds.add(Integer.parseInt(wn2.getTextContent().trim()));
+                }
+            }
+            if ((pendingWorldId != null) && (retVal.currentSystem != null)) {
+                retVal.currentPlanet = retVal.currentSystem.getPlanetById(pendingWorldId);
+                if (retVal.currentPlanet == null) {
+                    logger.warn("Couldn't find world {} in system {}; falling back to the primary world.",
+                          pendingWorldId, retVal.currentSystem.getId());
                 }
             }
         } catch (Exception ex) {

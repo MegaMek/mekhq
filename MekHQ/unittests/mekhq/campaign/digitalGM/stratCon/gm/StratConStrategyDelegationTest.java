@@ -77,10 +77,10 @@ import mekhq.campaign.digitalGM.stratCon.strategy.StratConOpForDeploymentStrateg
 import mekhq.campaign.digitalGM.stratCon.strategy.StratConOpForGenerationStrategy;
 import mekhq.campaign.digitalGM.stratCon.strategy.StratConReinforcementStrategy;
 import mekhq.campaign.force.Formation;
-import mekhq.campaign.mission.AtBContract;
-import mekhq.campaign.mission.AtBDynamicScenario;
-import mekhq.campaign.mission.AtBDynamicScenarioFactory;
-import mekhq.campaign.mission.AtBScenario;
+import mekhq.campaign.mission.contract.AbstractContract;
+import mekhq.campaign.mission.scenarios.AtBDynamicScenario;
+import mekhq.campaign.mission.scenarios.AtBDynamicScenarioFactory;
+import mekhq.campaign.mission.scenarios.AtBScenario;
 import mekhq.campaign.personnel.Person;
 import org.junit.jupiter.api.Test;
 import org.mockito.MockedStatic;
@@ -100,7 +100,7 @@ class StratConStrategyDelegationTest {
     void forceDeploymentStrategyDelegatesToRulesManager() {
         StratConCoords coords = mock(StratConCoords.class);
         Campaign campaign = mock(Campaign.class);
-        AtBContract contract = mock(AtBContract.class);
+        AbstractContract contract = mock(AbstractContract.class);
         StratConTrackState track = mock(StratConTrackState.class);
         StratConScenario scenario = mock(StratConScenario.class);
         IForceDeploymentStrategy strategy = new StratConForceDeploymentStrategy();
@@ -121,7 +121,7 @@ class StratConStrategyDelegationTest {
     @Test
     void reinforcementStrategyDelegatesAndReturnsResults() {
         Campaign campaign = mock(Campaign.class);
-        AtBContract contract = mock(AtBContract.class);
+        AbstractContract contract = mock(AbstractContract.class);
         StratConTrackState track = mock(StratConTrackState.class);
         StratConCampaignState campaignState = mock(StratConCampaignState.class);
         StratConScenario scenario = mock(StratConScenario.class);
@@ -156,7 +156,7 @@ class StratConStrategyDelegationTest {
         StratConTrackState track = mock(StratConTrackState.class);
         StratConCampaignState campaignState = mock(StratConCampaignState.class);
         AtBScenario scenario = mock(AtBScenario.class);
-        AtBContract contract = mock(AtBContract.class);
+        AbstractContract contract = mock(AbstractContract.class);
         StratConFacility facility = mock(StratConFacility.class);
         StratConFacilityStrategy strategy = new StratConFacilityStrategy();
 
@@ -176,7 +176,7 @@ class StratConStrategyDelegationTest {
         StratConTrackState track = mock(StratConTrackState.class);
         StratConCampaignState campaignState = mock(StratConCampaignState.class);
         AtBScenario scenario = mock(AtBScenario.class);
-        AtBContract contract = mock(AtBContract.class);
+        AbstractContract contract = mock(AbstractContract.class);
         StratConFacility facility = mock(StratConFacility.class);
         NoOpFacilityStrategy strategy = new NoOpFacilityStrategy();
 
@@ -192,7 +192,7 @@ class StratConStrategyDelegationTest {
     @Test
     void opForGenerationStrategyDelegatesToDynamicScenarioFactory() {
         AtBDynamicScenario backingScenario = mock(AtBDynamicScenario.class);
-        AtBContract contract = mock(AtBContract.class);
+        AbstractContract contract = mock(AbstractContract.class);
         Campaign campaign = mock(Campaign.class);
         StratConOpForGenerationStrategy strategy = new StratConOpForGenerationStrategy();
 

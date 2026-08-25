@@ -112,7 +112,7 @@ public class MRMSService {
                                    .getHumanResources()
                                    .getTechs(campaign.getPlayerForce().getHangar().getUnits(),
                                          campaign.getCampaignOptions(),
-                                         campaign.isClanCampaign(),
+                                         campaign.getPlayerForce().isClanForce(),
                                          campaign.getLocalDate(),
                                          true);
 
@@ -225,7 +225,7 @@ public class MRMSService {
                                    .getHumanResources()
                                    .getTechs(campaign.getPlayerForce().getHangar().getUnits(),
                                          campaign.getCampaignOptions(),
-                                         campaign.isClanCampaign(),
+                                         campaign.getPlayerForce().isClanForce(),
                                          campaign.getLocalDate());
 
         if (!techs.isEmpty()) {
@@ -254,7 +254,7 @@ public class MRMSService {
                                    .getHumanResources()
                                    .getTechs(campaign.getPlayerForce().getHangar().getUnits(),
                                          campaign.getCampaignOptions(),
-                                         campaign.isClanCampaign(),
+                                         campaign.getPlayerForce().isClanForce(),
                                          campaign.getLocalDate(),
                                          true);
         if (!configuredOptions.isEnabled()) {
@@ -433,7 +433,7 @@ public class MRMSService {
                                        .getHumanResources()
                                        .getTechs(campaign.getPlayerForce().getHangar().getUnits(),
                                              campaign.getCampaignOptions(),
-                                             campaign.isClanCampaign(),
+                                             campaign.getPlayerForce().isClanForce(),
                                              campaign.getLocalDate());
 
             if (!techs.isEmpty()) {
@@ -513,7 +513,7 @@ public class MRMSService {
                                    .getHumanResources()
                                    .getTechs(campaign.getPlayerForce().getHangar().getUnits(),
                                          campaign.getCampaignOptions(),
-                                         campaign.isClanCampaign(),
+                                         campaign.getPlayerForce().isClanForce(),
                                          campaign.getLocalDate(),
                                          true);
 
@@ -1251,8 +1251,16 @@ public class MRMSService {
                 continue;
             }
 
-            if ((partWork instanceof MissingPart) && !((MissingPart) partWork).isReplacementAvailable()) {
-                continue;
+            if (partWork instanceof MissingPart missingPart) {
+                // A part the player has queued for fabrication is being built from scratch on purpose; MRMS must
+                // leave it alone rather than replace it from warehouse stock and undo that choice.
+                if (missingPart.isFabricating()) {
+                    continue;
+                }
+
+                if (!missingPart.isReplacementAvailable()) {
+                    continue;
+                }
             }
 
             if (mrmsOptionsByType != null) {

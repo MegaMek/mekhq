@@ -57,6 +57,7 @@ import javax.swing.table.TableRowSorter;
 
 import megamek.client.ui.util.ClickableLabel;
 import megamek.client.ui.util.UIUtil;
+import megamek.common.enums.SkillLevel;
 import megamek.common.event.Subscribe;
 import megamek.common.ui.EnhancedTabbedPane;
 import megamek.common.ui.FastJScrollPane;
@@ -64,6 +65,7 @@ import megamek.utilities.ImageUtilities;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.CampaignSummary;
+import mekhq.campaign.campaignOptions.CampaignOption;
 import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.dailyReportLog.DailyReportLog;
 import mekhq.campaign.enums.DailyReportType;
@@ -84,13 +86,14 @@ import mekhq.campaign.events.units.UnitEvent;
 import mekhq.campaign.events.units.UnitRefitEvent;
 import mekhq.campaign.finances.FinancialReport;
 import mekhq.campaign.finances.Money;
-import mekhq.campaign.mission.Mission;
-import mekhq.campaign.mission.Scenario;
+import mekhq.campaign.mission.contract.AbstractContract;
+import mekhq.campaign.mission.scenarios.Scenario;
 import mekhq.campaign.personnel.skills.SkillType;
 import mekhq.campaign.report.CargoReport;
 import mekhq.campaign.report.HangarReport;
 import mekhq.campaign.report.PersonnelReport;
 import mekhq.campaign.report.TransportReport;
+import mekhq.campaign.reputation.chaosReputation.ChaosReputation;
 import mekhq.campaign.work.IAcquisitionWork;
 import mekhq.gui.adapter.ProcurementTableMouseAdapter;
 import mekhq.gui.baseComponents.roundedComponents.RoundedJButton;
@@ -101,6 +104,7 @@ import mekhq.gui.dialog.PartsReportDialog;
 import mekhq.gui.dialog.ShoppingListPriorityDialog;
 import mekhq.gui.dialog.factionStanding.FactionStandingReport;
 import mekhq.gui.dialog.reportDialogs.CargoReportDialog;
+import mekhq.gui.dialog.reportDialogs.ChaosReputationReportDialog;
 import mekhq.gui.dialog.reportDialogs.HangarReportDialog;
 import mekhq.gui.dialog.reportDialogs.PersonnelReportDialog;
 import mekhq.gui.dialog.reportDialogs.ReputationReportDialog;
@@ -322,9 +326,17 @@ public final class CommandCenterTab extends CampaignGuiTab {
         gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
         gridBagConstraints.insets = new Insets(5, 5, 1, 5);
         panInfo.add(lblRatingHead, gridBagConstraints);
-        lblRating = new ClickableLabel(
-              evt -> new ReputationReportDialog(getCampaignGui().getFrame(),
-                    getCampaign()).setVisible(true));
+        lblRating = new ClickableLabel(evt -> {
+            if (getCampaignOptions().get(CampaignOption.USE_CHAOS_REPUTATION)) {
+                if (getCampaignOptions().get(CampaignOption.CAMPAIGN_LEVEL_CHAOS_REPUTATION)) {
+                    // Campaign-level tracking surfaces its breakdown via the rating tooltip, not a report dialog.
+                    return;
+                }
+                new ChaosReputationReportDialog(getCampaignGui().getFrame(), getCampaign()).setVisible(true);
+            } else {
+                new ReputationReportDialog(getCampaignGui().getFrame(), getCampaign()).setVisible(true);
+            }
+        });
         lblRating.setHyperlinkMode(true);
         lblRatingHead.setLabelFor(lblRating);
         gridBagConstraints.gridx = 1;
@@ -394,8 +406,8 @@ public final class CommandCenterTab extends CampaignGuiTab {
         gridBagConstraints.weightx = 1.0;
         panInfo.add(lblPersonnel, gridBagConstraints);
 
-        if ((getCampaign().getCampaignOptions().isUseRandomRetirement()) &&
-                  (getCampaign().getCampaignOptions().isUseHRStrain())) {
+        if ((getCampaign().getCampaignOptions().get(CampaignOption.USE_RANDOM_RETIREMENT)) &&
+                  (getCampaign().getCampaignOptions().get(CampaignOption.USE_HR_STRAIN))) {
             JLabel lblHRCapacityHead = new JLabel(resourceMap.getString("lblHRCapacity.text"));
             gridBagConstraints = new GridBagConstraints();
             gridBagConstraints.gridx = 0;
@@ -481,9 +493,9 @@ public final class CommandCenterTab extends CampaignGuiTab {
         gridBagConstraints.weightx = 1.0;
         panInfo.add(lblCargoSummary, gridBagConstraints);
 
-        if ((getCampaignOptions().isUseFatigue()) ||
+        if ((getCampaignOptions().get(CampaignOption.USE_FATIGUE)) ||
                   (getCampaignOptions().isUseAdvancedMedical() ||
-                         (!getCampaignOptions().getPrisonerCaptureStyle().isNone()))) {
+                         (!getCampaignOptions().get(CampaignOption.PRISONER_CAPTURE_STYLE).isNone()))) {
             JLabel lblFacilityCapacitiesHead = new JLabel(resourceMap.getString("lblFacilityCapacities.text"));
             gridBagConstraints = new GridBagConstraints();
             gridBagConstraints.gridx = 0;
@@ -500,7 +512,7 @@ public final class CommandCenterTab extends CampaignGuiTab {
             panInfo.add(lblFacilityCapacities, gridBagConstraints);
         }
 
-        panInfo.setBorder(RoundedLineBorder.createRoundedLineBorder(getCampaign().getName()));
+        panInfo.setBorder(RoundedLineBorder.createRoundedLineBorder(getCampaign().getPlayerForce().getName()));
     }
 
     private void initFactionPanel() {
@@ -518,11 +530,11 @@ public final class CommandCenterTab extends CampaignGuiTab {
             new mekhq.campaign.universe.factionStanding.GoingRogue(getCampaign(),
                   campaign.getPlayerForce().getHumanResources()
                         .getCommander(campaign.getCampaignOptions(),
-                              campaign.isClanCampaign(),
+                              campaign.getPlayerForce().isClanForce(),
                               campaign.getLocalDate()),
                   campaign1.getPlayerForce().getHumanResources()
                         .getSecondInCommand(campaign1.getCampaignOptions(),
-                              campaign1.isClanCampaign(),
+                              campaign1.getPlayerForce().isClanForce(),
                               campaign1.getLocalDate()));
         });
 
@@ -542,7 +554,7 @@ public final class CommandCenterTab extends CampaignGuiTab {
         RoundedJButton btnDiplomacy = new RoundedJButton(resourceMap.getString("btnDiplomacy.text"));
         btnDiplomacy.setMaximumSize(new Dimension(Integer.MAX_VALUE, btnDiplomacy.getPreferredSize().height));
         btnDiplomacy.addActionListener(evt -> new DiplomacyReport(getCampaignGui().getFrame(),
-              getCampaign().isClanCampaign(),
+              getCampaign().getPlayerForce().isClanForce(),
               getCampaign().getLocalDate()));
 
         panFaction = new JPanel();
@@ -903,19 +915,26 @@ public final class CommandCenterTab extends CampaignGuiTab {
         final CampaignSummary campaignSummary = campaign.getCampaignSummary();
 
         if (panInfo.getBorder() instanceof TitledBorder titledBorder) {
-            titledBorder.setTitle(getCampaign().getName());
+            titledBorder.setTitle(getCampaign().getPlayerForce().getName());
             panInfo.repaint();
         }
 
+        boolean isUseChaosReputation = getCampaignOptions().get(CampaignOption.USE_CHAOS_REPUTATION);
+        SkillLevel averageSkillLevel = campaign.getPlayerForce()
+                                             .getAverageSkillLevel(getCampaignOptions(), campaign.getLocalDate());
         String experienceString = "<html><b>" +
-                                        SkillType.getColoredExperienceLevelName(campaign.getPlayerForce()
-                                                                                      .getReputation()
-                                                                                      .getAverageSkillLevel()) +
+                                        SkillType.getColoredExperienceLevelName(averageSkillLevel) +
                                         "</b></html>";
         lblExperience.setText(experienceString);
 
         campaignSummary.updateInformation();
         lblRating.setText(campaign.getUnitRatingText());
+        if (isUseChaosReputation && campaignOptions.get(CampaignOption.CAMPAIGN_LEVEL_CHAOS_REPUTATION)) {
+            lblRating.setToolTipText(ChaosReputation.getCampaignLevelTooltip(campaign));
+        } else {
+            lblRating.setToolTipText(null);
+        }
+
         lblUnitWeight.setText(campaignSummary.getUnitWeightReport());
         lblPersonnel.setText(campaignSummary.getPersonnelReport());
         lblMissionSuccess.setText(campaignSummary.getMissionSuccessReport());
@@ -924,7 +943,7 @@ public final class CommandCenterTab extends CampaignGuiTab {
         lblRepairStatus.setText(campaignSummary.getForceRepairReport());
         lblTransportCapacity.setText(campaignSummary.getTransportCapacity());
 
-        if (campaignOptions.isUseHRStrain()) {
+        if (campaignOptions.get(CampaignOption.USE_HR_STRAIN)) {
             try {
                 lblHRCapacity.setText(campaignSummary.getHRCapacityReport(campaign));
             } catch (Exception ignored) {
@@ -951,7 +970,7 @@ public final class CommandCenterTab extends CampaignGuiTab {
                 model.addElement(String.format(report));
             }
 
-            for (Mission mission : getCampaign().getActiveMissions(false)) {
+            for (AbstractContract mission : getCampaign().getActiveContracts()) {
                 List<Scenario> scenarios = mission.getScenarios();
 
                 scenarios.sort(Comparator.comparing(Scenario::getDate,
@@ -973,7 +992,8 @@ public final class CommandCenterTab extends CampaignGuiTab {
                                                                            .getFontColorWarningHexColor() +
                                                                      "'>" +
                                                                      ChronoUnit.DAYS.between(getCampaign().getLocalDate(),
-                                                                           scenario.getDate())) + " days</font></html>");
+                                                                           scenario.getDate())) +
+                                                       " days</font></html>");
                             }
                         }
                     }

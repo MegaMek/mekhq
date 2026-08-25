@@ -40,6 +40,7 @@ import megamek.common.enums.Gender;
 import megamek.common.enums.SkillLevel;
 import megamek.logging.MMLogger;
 import mekhq.campaign.Campaign;
+import mekhq.campaign.campaignOptions.CampaignOption;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.enums.PersonnelRole;
 import mekhq.campaign.personnel.turnoverAndRetention.RetirementDefectionTracker;
@@ -231,7 +232,7 @@ public final class SupportPersonnelGenerator {
             // level this person actually rolled. With the "Random" picker each one differs.
             SkillLevel rolled = (skillLevel == null) ? rollRandomSkillLevel() : skillLevel;
             Person person = createAndRecruit(campaign, skillGen, role, toExperienceLevel(rolled),
-                  RulesetRankAssigner.supportRankFor(role, rolled, campaign.getFaction()),
+                  RulesetRankAssigner.supportRankFor(role, rolled, campaign.getPlayerForce().getFaction()),
                   faction, targetRankSystem, rankValidator);
             if (person != null) {
                 out.add(person);
@@ -251,7 +252,7 @@ public final class SupportPersonnelGenerator {
      */
     static int countActiveByRole(Campaign campaign, PersonnelRole role) {
         int matches = 0;
-        for (Person person : campaign.getActivePersonnel(false, false)) {
+        for (Person person : campaign.getPlayerForce().getHumanResources().getActivePersonnel(false, false)) {
             if (person.getPrimaryRole() == role) {
                 matches++;
             }
@@ -269,7 +270,7 @@ public final class SupportPersonnelGenerator {
     private static int topUpHumanResourcesToZeroStrain(Campaign campaign, CommandGenerationOptions options,
           AbstractSkillGenerator skillGen, int supportRank, Faction faction,
           RankSystem targetRankSystem, RankValidator rankValidator, List<Person> out) {
-        if (!campaign.getCampaignOptions().isUseHRStrain()) {
+        if (!campaign.getCampaignOptions().get(CampaignOption.USE_HR_STRAIN)) {
             return 0;
         }
         // null = "Random": each HR admin rolls its own level (below).
@@ -337,7 +338,7 @@ public final class SupportPersonnelGenerator {
             for (int i = 0; i < needed; i++) {
                 SkillLevel rolled = (skillLevel == null) ? rollRandomSkillLevel() : skillLevel;
                 Person person = createAndRecruit(campaign, skillGen, role, toExperienceLevel(rolled),
-                      RulesetRankAssigner.supportRankFor(role, rolled, campaign.getFaction()),
+                      RulesetRankAssigner.supportRankFor(role, rolled, campaign.getPlayerForce().getFaction()),
                       faction, targetRankSystem, rankValidator);
                 if (person != null) {
                     out.add(person);
@@ -347,8 +348,8 @@ public final class SupportPersonnelGenerator {
         }
         // Pool mode: anonymous slots in the campaign's astech / medic pool. No Persons created.
         switch (pool) {
-            case ASTECH -> campaign.increaseAsTechPool(needed);
-            case MEDIC -> campaign.increaseMedicPool(needed);
+            case ASTECH -> campaign.getPlayerForce().getHumanResources().increaseAsTechPool(campaign, needed);
+            case MEDIC -> campaign.getPlayerForce().getHumanResources().increaseMedicPool(campaign, needed);
         }
         return needed;
     }
@@ -374,8 +375,8 @@ public final class SupportPersonnelGenerator {
         // Only Clans are pinned. An Inner Sphere command keeps the origin variety the campaign's
         // options ask for, since its staff genuinely can come from anywhere.
         Person person = faction.isClan()
-              ? campaign.newPerson(role, faction.getShortName(), Gender.RANDOMIZE)
-              : campaign.newPerson(role);
+              ? campaign.getPlayerForce().getHumanResources().newPerson(campaign, role, faction.getShortName(), Gender.RANDOMIZE)
+              : campaign.getPlayerForce().getHumanResources().newPerson(campaign, role);
         // newPerson already runs skill generation at the campaign's default level; regenerate at
         // the user-selected experience tier so the role's primary skills land at the right level.
         skillGen.generateSkills(campaign, person, expLvl);
@@ -383,7 +384,7 @@ public final class SupportPersonnelGenerator {
         // index that no rank system is obliged to fill - SLDF leaves both 16 and 37 blank in every
         // profession column - otherwise renders as a bare "-" where the rank should be.
         RulesetRankAssigner.setRankWithFallback(person, supportRank, targetRankSystem, rankValidator);
-        boolean recruited = campaign.recruitPerson(person, PrisonerStatus.FREE, true, true);
+        boolean recruited = campaign.getPlayerForce().getHumanResources().recruitPerson(campaign, person, PrisonerStatus.FREE, true, true, true);
         if (!recruited) {
             LOGGER.warn("[CompanyGen][Pipeline][Support] failed to recruit {} ({})",
                   role.name(), person.getFullName());
@@ -399,7 +400,7 @@ public final class SupportPersonnelGenerator {
      */
     private static Faction resolveFaction(Campaign campaign, CommandGenerationOptions options) {
         Faction specifiedFaction = options.getSpecifiedFaction();
-        Faction campaignFaction = campaign.getFaction();
+        Faction campaignFaction = campaign.getPlayerForce().getFaction();
         boolean useSpecified = options.isUseSpecifiedFactionToAssignRanks();
         Faction resolved = useSpecified ? specifiedFaction : campaignFaction;
         if (resolved == null) {

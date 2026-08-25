@@ -36,6 +36,7 @@ import java.util.List;
 
 import mekhq.MekHQ;
 import mekhq.campaign.campaignOptions.CampaignOptions;
+import mekhq.campaign.campaignOptions.CampaignOption;
 import mekhq.campaign.events.persons.PersonMedicalAssignmentEvent;
 import mekhq.campaign.personnel.Person;
 
@@ -82,9 +83,9 @@ public class OptimizeInfirmaryAssignments {
         // Get campaign configuration details
         this.campaign = campaign;
         CampaignOptions campaignOptions = campaign.getCampaignOptions();
-        final boolean isDoctorsUseAdministration = campaignOptions.isDoctorsUseAdministration();
-        final int maximumPatients = campaignOptions.getMaximumPatients();
-        final int healingWaitingPeriod = campaignOptions.getHealingWaitingPeriod();
+        final boolean isDoctorsUseAdministration = campaignOptions.get(CampaignOption.DOCTORS_USE_ADMINISTRATION);
+        final int maximumPatients = campaignOptions.get(CampaignOption.MAXIMUM_PATIENTS);
+        final int healingWaitingPeriod = campaignOptions.get(CampaignOption.HEAL_WAITING_PERIOD);
 
         // First, order the doctors based on experience level, highest to lowest
         organizeDoctors();
@@ -127,7 +128,7 @@ public class OptimizeInfirmaryAssignments {
     private void assignDoctors(final boolean isDoctorsUseAdministration, final int maximumPatients,
           final int healingWaitingPeriod, final List<Person> patients, List<Person> doctors,
           final boolean isOnContractAndPlanetside) {
-        boolean useMASHTheatres = campaign.getCampaignOptions().isUseMASHTheatres();
+        boolean useMASHTheatres = campaign.getCampaignOptions().get(CampaignOption.USE_MASH_THEATRES);
         int mashTheatreCapacity;
         mashTheatreCapacity = useMASHTheatres ?
                                     campaign.getPlayerForce().calculateMASHTheaterCapacity(campaign) :
@@ -236,6 +237,10 @@ public class OptimizeInfirmaryAssignments {
      * @return the experience level of the doctor
      */
     private int getDoctorExperienceLevel(Person doctor) {
-        return doctor.getExperienceLevel(campaign, doctor.getSecondaryRole().isDoctor());
+        return doctor.getExperienceLevel(campaign.getCampaignOptions(),
+              campaign.getPlayerForce().isClanForce(),
+              campaign.getLocalDate(),
+              doctor.getSecondaryRole().isDoctor(),
+              false);
     }
 }

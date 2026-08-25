@@ -32,6 +32,10 @@
  */
 package mekhq.campaign.parts;
 
+import mekhq.campaign.campaignOptions.CampaignOption;
+
+import static org.mockito.Mockito.lenient;
+
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertInstanceOf;
@@ -2116,6 +2120,9 @@ class MekLocationTest {
         Campaign mockCampaign = mockCampaign();
         CampaignOptions mockCampaignOptions = mock(CampaignOptions.class);
         when(mockCampaign.getCampaignOptions()).thenReturn(mockCampaignOptions);
+        lenient().when(mockCampaignOptions.get(CampaignOption.REVERSE_QUALITY_NAMES)).thenReturn(false);
+        lenient().when(mockCampaignOptions.get(CampaignOption.PAY_FOR_REPAIRS)).thenReturn(false);
+        lenient().when(mockCampaignOptions.get(CampaignOption.DESTROY_BY_MARGIN)).thenReturn(false);
 
         MekLocation mekLocation = new MekLocation(Mek.LOC_CENTER_TORSO,
               25,
@@ -2168,6 +2175,9 @@ class MekLocationTest {
         Campaign mockCampaign = mockCampaign();
         CampaignOptions mockCampaignOptions = mock(CampaignOptions.class);
         when(mockCampaign.getCampaignOptions()).thenReturn(mockCampaignOptions);
+        lenient().when(mockCampaignOptions.get(CampaignOption.REVERSE_QUALITY_NAMES)).thenReturn(false);
+        lenient().when(mockCampaignOptions.get(CampaignOption.PAY_FOR_REPAIRS)).thenReturn(false);
+        lenient().when(mockCampaignOptions.get(CampaignOption.DESTROY_BY_MARGIN)).thenReturn(false);
         Unit unit = mock(Unit.class);
         Mek entity = mock(Mek.class);
         when(unit.getEntity()).thenReturn(entity);
@@ -2263,6 +2273,9 @@ class MekLocationTest {
         Campaign mockCampaign = mockCampaign();
         CampaignOptions mockCampaignOptions = mock(CampaignOptions.class);
         when(mockCampaign.getCampaignOptions()).thenReturn(mockCampaignOptions);
+        lenient().when(mockCampaignOptions.get(CampaignOption.REVERSE_QUALITY_NAMES)).thenReturn(false);
+        lenient().when(mockCampaignOptions.get(CampaignOption.PAY_FOR_REPAIRS)).thenReturn(false);
+        lenient().when(mockCampaignOptions.get(CampaignOption.DESTROY_BY_MARGIN)).thenReturn(false);
         Unit unit = mock(Unit.class);
         Mek entity = mock(Mek.class);
         when(unit.getEntity()).thenReturn(entity);
@@ -2294,6 +2307,9 @@ class MekLocationTest {
         Campaign mockCampaign = mockCampaign();
         CampaignOptions mockCampaignOptions = mock(CampaignOptions.class);
         when(mockCampaign.getCampaignOptions()).thenReturn(mockCampaignOptions);
+        lenient().when(mockCampaignOptions.get(CampaignOption.REVERSE_QUALITY_NAMES)).thenReturn(false);
+        lenient().when(mockCampaignOptions.get(CampaignOption.PAY_FOR_REPAIRS)).thenReturn(false);
+        lenient().when(mockCampaignOptions.get(CampaignOption.DESTROY_BY_MARGIN)).thenReturn(false);
         Unit unit = mock(Unit.class);
         Mek entity = mock(Mek.class);
         when(unit.getEntity()).thenReturn(entity);

@@ -62,6 +62,7 @@ import mekhq.gui.menus.LocationMenu;
 import mekhq.gui.model.PartsTableModel;
 import mekhq.gui.utilities.JMenuHelpers;
 import mekhq.service.enums.MRMSMode;
+import mekhq.campaign.campaignOptions.CampaignOption;
 
 public class PartsTableMouseAdapter extends JPopupMenuAdapter {
 
@@ -108,7 +109,7 @@ public class PartsTableMouseAdapter extends JPopupMenuAdapter {
             if (null != selectedPart) {
                 PopupValueChoiceDialog popupValueChoiceDialog = getPopupValueChoiceDialog(selectedPart,
                       "Sell How Many ");
-                if (popupValueChoiceDialog.getValue() < 0) {
+                if (popupValueChoiceDialog.wasCanceled()) {
                     return;
                 }
                 int q = popupValueChoiceDialog.getValue();
@@ -122,7 +123,7 @@ public class PartsTableMouseAdapter extends JPopupMenuAdapter {
                                                            .multipliedBy(p.getQuantity())
                                                            .multipliedBy(gui.getCampaign()
                                                                                .getCampaignOptions()
-                                                                               .getCancelledOrderRefundMultiplier()));
+                                                                               .get(CampaignOption.CANCELLED_ORDER_REFUND_MULTIPLIER)));
                     gui.getCampaign().getPlayerForce().getWarehouse().removePart(p);
                 }
             }
@@ -146,7 +147,7 @@ public class PartsTableMouseAdapter extends JPopupMenuAdapter {
         } else if (command.equalsIgnoreCase("REMOVE_N")) {
             if (null != selectedPart) {
                 PopupValueChoiceDialog dialog = getPopupValueChoiceDialog(selectedPart, "Remove How Many ");
-                if (dialog.getValue() < 0) {
+                if (dialog.wasCanceled()) {
                     return;
                 }
                 int quantity = dialog.getValue();
@@ -154,18 +155,18 @@ public class PartsTableMouseAdapter extends JPopupMenuAdapter {
             }
         } else if (command.equalsIgnoreCase("ADD_N")) {
             if (null != selectedPart) {
-                PopupValueChoiceDialog dialog = new PopupValueChoiceDialog(gui.getFrame(),
+                PopupValueChoiceDialog addQuantityDialog = new PopupValueChoiceDialog(gui.getFrame(),
                       true,
                       "Add How Many " + selectedPart.getName() + "s?",
                       0,
                       0,
                       9999999);
-                dialog.setVisible(true);
-                if (dialog.getValue() < 0) {
+                addQuantityDialog.setVisible(true);
+                if (addQuantityDialog.wasCanceled()) {
                     return;
                 }
 
-                int quantity = dialog.getValue();
+                int quantity = addQuantityDialog.getValue();
                 Part clonedPart = selectedPart.clone();
 
                 if (selectedPart instanceof AmmoStorage) {
@@ -179,7 +180,7 @@ public class PartsTableMouseAdapter extends JPopupMenuAdapter {
                 gui.getCampaign().getPlayerForce().getWarehouse().addPart(clonedPart, true);
             }
         } else if (command.contains("SET_QUALITY")) {
-            boolean reverse = gui.getCampaign().getCampaignOptions().isReverseQualityNames();
+            boolean reverse = gui.getCampaign().getCampaignOptions().get(CampaignOption.REVERSE_QUALITY_NAMES);
             Object[] possibilities = { PartQuality.QUALITY_A.toName(reverse), PartQuality.QUALITY_B.toName(reverse),
                                        PartQuality.QUALITY_C.toName(reverse), PartQuality.QUALITY_D.toName(reverse),
                                        PartQuality.QUALITY_E.toName(reverse), PartQuality.QUALITY_F.toName(reverse) };
@@ -241,7 +242,7 @@ public class PartsTableMouseAdapter extends JPopupMenuAdapter {
                       1,
                       n);
                 popupValueChoiceDialog.setVisible(true);
-                if (popupValueChoiceDialog.getValue() < 0) {
+                if (popupValueChoiceDialog.wasCanceled()) {
                     return;
                 }
                 int q = popupValueChoiceDialog.getValue();
@@ -264,7 +265,7 @@ public class PartsTableMouseAdapter extends JPopupMenuAdapter {
                       1,
                       1);
                 popupValueChoiceDialog.setVisible(true);
-                if (popupValueChoiceDialog.getValue() < 1) {
+                if (popupValueChoiceDialog.wasCanceled()) {
                     return;
                 }
                 int q = popupValueChoiceDialog.getValue();
@@ -370,7 +371,7 @@ public class PartsTableMouseAdapter extends JPopupMenuAdapter {
         }
         // **let's fill the pop-up menu**//
         // sell part
-        if (gui.getCampaign().getCampaignOptions().isSellParts() && areAllPartsPresent(parts)) {
+        if (gui.getCampaign().getCampaignOptions().get(CampaignOption.SELL_PARTS) && areAllPartsPresent(parts)) {
             menu = new JMenu("Sell");
             if (areAllPartsAmmo(parts)) {
                 menuItem = new JMenuItem("Sell All Ammo of This Type");

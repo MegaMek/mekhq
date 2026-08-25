@@ -36,23 +36,34 @@ import megamek.client.ratgenerator.ForceDescriptor;
 import megamek.logging.MMLogger;
 
 public enum DragoonRating {
-    DRAGOON_F(ForceDescriptor.RATING_0),
-    DRAGOON_D(ForceDescriptor.RATING_1),
-    DRAGOON_C(ForceDescriptor.RATING_2),
-    DRAGOON_B(ForceDescriptor.RATING_3),
-    DRAGOON_A(ForceDescriptor.RATING_4),
-    DRAGOON_ASTAR(ForceDescriptor.RATING_5);
+    DRAGOON_F(ForceDescriptor.RATING_0, "F"),
+    DRAGOON_D(ForceDescriptor.RATING_1, "D"),
+    DRAGOON_C(ForceDescriptor.RATING_2, "C"),
+    DRAGOON_B(ForceDescriptor.RATING_3, "B"),
+    DRAGOON_A(ForceDescriptor.RATING_4, "A"),
+    DRAGOON_ASTAR(ForceDescriptor.RATING_5, "A*");
 
     private static final MMLogger LOGGER = MMLogger.create(DragoonRating.class);
 
     private final int rating;
+    private final String label;
 
-    DragoonRating(int rating) {
+    DragoonRating(int rating, String label) {
         this.rating = rating;
+        this.label = label;
     }
 
     public int getRating() {
         return rating;
+    }
+
+    /**
+     * @return the single-character rating as players know it: {@code F} through {@code A}, or {@code A*} for the top
+     *       rating. Read the scale from here rather than indexing a parallel array - the array that used to back the
+     *       contract view was one element short and threw on an A* force.
+     */
+    public String getLabel() {
+        return label;
     }
 
     /**

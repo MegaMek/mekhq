@@ -32,6 +32,8 @@
  */
 package mekhq.campaign.universe.commandGeneration;
 
+import mekhq.campaign.ForceHumanResources;
+import mekhq.campaign.force.PlayerForce;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.mock;
@@ -168,7 +170,11 @@ class SupportUnitGeneratorTest {
         }
 
         Campaign campaign = mock(Campaign.class);
-        when(campaign.getActivePersonnel(false, false)).thenReturn(roster);
+        PlayerForce playerForce = mock(PlayerForce.class);
+        ForceHumanResources humanResources = mock(ForceHumanResources.class);
+        when(campaign.getPlayerForce()).thenReturn(playerForce);
+        when(playerForce.getHumanResources()).thenReturn(humanResources);
+        when(humanResources.getActivePersonnel(false, false)).thenReturn(roster);
         return campaign;
     }
 }

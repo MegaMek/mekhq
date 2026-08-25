@@ -32,7 +32,7 @@
  */
 package mekhq.campaign.randomEvents.other;
 
-import static mekhq.campaign.Campaign.AdministratorSpecialization.COMMAND;
+
 import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
 
 import java.time.LocalDate;
@@ -190,9 +190,8 @@ public class VoiceOfKerensky {
      */
     private static @Nullable Person getSpeaker(Campaign campaign) {
         return campaign.getPlayerForce().getHumanResources()
-                     .getSeniorAdminPerson(COMMAND,
-                           campaign.getCampaignOptions(),
-                           campaign.isClanCampaign(),
+                     .getSeniorAdminPerson(campaign.getCampaignOptions(),
+                           campaign.getPlayerForce().isClanForce(),
                            campaign.getLocalDate());
     }
 }

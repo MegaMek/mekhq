@@ -135,7 +135,7 @@ public final class SeniorAppointmentAssigner {
               Person::setHeadTechnician),
 
         CHIEF_ADMINISTRATOR("chief administrator",
-              PersonnelRole::isAdministrator,
+              SeniorAppointmentAssigner::isAdministrativeRole,
               Set.of(SkillType.S_ADMIN),
               Person::isChiefAdministrator,
               Person::setChiefAdministrator);
@@ -210,7 +210,7 @@ public final class SeniorAppointmentAssigner {
             return;
         }
 
-        Collection<Person> existingPersonnel = campaign.getPersonnel().values();
+        Collection<Person> existingPersonnel = campaign.getPlayerForce().getHumanResources().getPersonnel();
         // Two limits, both of which must hold: no support post outranks the force commander, and no
         // support post exceeds Colonel however senior that commander is.
         int rankCeiling = Math.min(RANK_COLONEL, commanderRankCeiling(existingPersonnel, candidates));
@@ -327,7 +327,27 @@ public final class SeniorAppointmentAssigner {
      * @return {@code true} if this role runs as a department of its own, beneath a branch-wide post
      */
     private static boolean isDepartmentRole(PersonnelRole role) {
-        return role.isTech() || role.isAdministrator();
+        return role.isTech() || isAdministrativeRole(role);
+    }
+
+    /**
+     * Whether the role heads an administrative department.
+     *
+     * <p>{@link PersonnelRole#isAdministrator()} matches only the consolidated {@code ADMINISTRATOR}
+     * role, but the support generator still creates the four speciality roles, so a force built here
+     * would otherwise have no administrative department heads at all. When those roles are finally
+     * removed this collapses back to the single consolidated role.</p>
+     *
+     * @param role the role to test
+     *
+     * @return {@code true} if the role belongs to an administrative department
+     */
+    private static boolean isAdministrativeRole(PersonnelRole role) {
+        return switch (role) {
+            case ADMINISTRATOR, ADMINISTRATOR_COMMAND, ADMINISTRATOR_LOGISTICS, ADMINISTRATOR_TRANSPORT,
+                 ADMINISTRATOR_HR -> true;
+            default -> false;
+        };
     }
 
     /**

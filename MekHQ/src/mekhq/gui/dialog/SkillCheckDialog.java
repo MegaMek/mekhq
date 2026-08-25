@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2025 The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2025-2026 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -57,6 +57,7 @@ import mekhq.campaign.personnel.skills.SkillType;
 import mekhq.gui.baseComponents.immersiveDialogs.ImmersiveDialogCore;
 import mekhq.gui.baseComponents.immersiveDialogs.ImmersiveDialogCore.ButtonLabelTooltipPair;
 import mekhq.gui.baseComponents.immersiveDialogs.ImmersiveDialogSimple;
+import mekhq.campaign.campaignOptions.CampaignOption;
 
 /**
  * A dialog that facilitates skill checks for a character.
@@ -100,8 +101,8 @@ public class SkillCheckDialog {
         this.campaign = campaign;
         this.character = character;
 
-        boolean isUseAgingEffects = campaign.getCampaignOptions().isUseAgeEffects();
-        boolean isClanCampaign = campaign.isClanCampaign();
+        boolean isUseAgingEffects = campaign.getCampaignOptions().get(CampaignOption.USE_AGE_EFFECTS);
+        boolean isClanCampaign = campaign.getPlayerForce().isClanForce();
         LocalDate today = campaign.getLocalDate();
 
         // Initial Dialog
@@ -137,7 +138,7 @@ public class SkillCheckDialog {
               character,
               null,
               getInCharacterMessage(),
-              getButtons(character.getCurrentEdge() > 0, campaign.getCampaignOptions().isUseEdge()),
+              getButtons(character.getCurrentEdge() > 0, campaign.getCampaignOptions().get(CampaignOption.USE_EDGE)),
               getFormattedTextAt(RESOURCE_BUNDLE, "message.ooc"),
               null,
               false,

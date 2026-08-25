@@ -84,6 +84,7 @@ import mekhq.gui.model.LocationFilterItem;
 import mekhq.gui.model.PartsInUseTableModel;
 import mekhq.gui.sorter.FormattedNumberSorter;
 import mekhq.gui.sorter.TwoNumbersSorter;
+import mekhq.campaign.campaignOptions.CampaignOption;
 
 /**
  * A dialog to show parts in use, ordered, in transit with actionable buttons for buying or adding more taken from the
@@ -214,12 +215,12 @@ public class PartsReportDialog extends JDialog {
                 int row = Integer.parseInt(e.getActionCommand());
                 PartInUse partInUse = overviewPartsModel.getPartInUse(row);
                 int quantity = 1;
-                PopupValueChoiceDialog pcd = new PopupValueChoiceDialog(gui.getFrame(), true,
+                PopupValueChoiceDialog bulkPurchaseDialog = new PopupValueChoiceDialog(gui.getFrame(), true,
                       "How Many " + partInUse.getPartToBuy().getAcquisitionName(), quantity, 1,
                       CampaignGUI.MAX_QUANTITY_SPINNER);
-                pcd.setVisible(true);
-                quantity = pcd.getValue();
-                if (quantity <= 0) {
+                bulkPurchaseDialog.setVisible(true);
+                quantity = bulkPurchaseDialog.getValue();
+                if (bulkPurchaseDialog.wasCanceled()) {
                     return;
                 }
                 IAcquisitionWork partToBuy = partInUse.getPartToBuy();
@@ -252,15 +253,15 @@ public class PartsReportDialog extends JDialog {
                 }
                 int spareQty = spares.stream().mapToInt(Part::getSellableQuantity).sum();
                 int sellQty = 1;
-                PopupValueChoiceDialog popupValueChoiceDialog = new PopupValueChoiceDialog(gui.getFrame(),
+                PopupValueChoiceDialog sellQuantityDialog = new PopupValueChoiceDialog(gui.getFrame(),
                       true,
                       "Sell how many " + spares.getFirst().getName(),
                       sellQty,
                       1,
                       CampaignGUI.MAX_QUANTITY_SPINNER);
-                popupValueChoiceDialog.setVisible(true);
-                sellQty = popupValueChoiceDialog.getValue();
-                if (sellQty <= 0) {
+                sellQuantityDialog.setVisible(true);
+                sellQty = sellQuantityDialog.getValue();
+                if (sellQuantityDialog.wasCanceled()) {
                     return;
                 }
                 if (sellQty > spareQty) {
@@ -302,16 +303,18 @@ public class PartsReportDialog extends JDialog {
                 int row = Integer.parseInt(e.getActionCommand());
                 PartInUse partInUse = overviewPartsModel.getPartInUse(row);
                 int quantity = 1;
-                PopupValueChoiceDialog pcd = new PopupValueChoiceDialog(gui.getFrame(), true,
+                PopupValueChoiceDialog addBulkDialog = new PopupValueChoiceDialog(gui.getFrame(), true,
                       "How Many " + partInUse.getPartToBuy().getAcquisitionName(), quantity, 1,
                       CampaignGUI.MAX_QUANTITY_SPINNER);
-                pcd.setVisible(true);
-                quantity = pcd.getValue();
+                addBulkDialog.setVisible(true);
+                quantity = addBulkDialog.getValue();
                 IAcquisitionWork partToBuy = partInUse.getPartToBuy();
-                while (quantity > 0) {
-                    campaign.getQuartermaster()
-                          .addPart((Part) partToBuy.getNewEquipment(), 0, false, getSelectedPlace().getWarehouse());
-                    --quantity;
+                if (!addBulkDialog.wasCanceled()) {
+                    while (quantity > 0) {
+                        campaign.getQuartermaster()
+                              .addPart((Part) partToBuy.getNewEquipment(), 0, false, getSelectedPlace().getWarehouse());
+                        --quantity;
+                    }
                 }
                 refreshOverviewSpecificPart(row, partInUse, partToBuy);
             }
@@ -404,7 +407,7 @@ public class PartsReportDialog extends JDialog {
         resetRequestedStockButton.setMargin(new Insets(10, 20, 10, 20));
         resetRequestedStockButton.addActionListener(evt -> resetRequestedStock());
 
-        boolean reverse = campaign.getCampaignOptions().isReverseQualityNames();
+        boolean reverse = campaign.getCampaignOptions().get(CampaignOption.REVERSE_QUALITY_NAMES);
         String[] qualities = {
               " ", // Combo box is blank for first one because it accepts everything and is default
               PartQuality.QUALITY_B.toName(reverse),
@@ -556,7 +559,7 @@ public class PartsReportDialog extends JDialog {
             // The blank spot always means "everything", so minimum = lowest
             return PartQuality.QUALITY_A;
         } else {
-            return PartQuality.fromName(rating, campaign.getCampaignOptions().isReverseQualityNames());
+            return PartQuality.fromName(rating, campaign.getCampaignOptions().get(CampaignOption.REVERSE_QUALITY_NAMES));
         }
     }
 

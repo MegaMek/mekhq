@@ -57,6 +57,7 @@ import java.nio.charset.StandardCharsets;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -94,6 +95,7 @@ import mekhq.campaign.Campaign;
 import mekhq.campaign.CampaignController;
 import mekhq.campaign.base.PlayerBase;
 import mekhq.campaign.campaignOptions.AcquisitionsType;
+import mekhq.campaign.campaignOptions.CampaignOption;
 import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.enums.DailyReportType;
 import mekhq.campaign.events.*;
@@ -105,7 +107,7 @@ import mekhq.campaign.finances.Money;
 import mekhq.campaign.force.Formation;
 import mekhq.campaign.icons.StandardFormationIcon;
 import mekhq.campaign.market.personnelMarket.enums.PersonnelMarketStyle;
-import mekhq.campaign.mission.Scenario;
+import mekhq.campaign.mission.scenarios.Scenario;
 import mekhq.campaign.parts.Part;
 import mekhq.campaign.parts.Refit;
 import mekhq.campaign.personnel.Person;
@@ -115,16 +117,21 @@ import mekhq.campaign.personnel.skills.SkillType;
 import mekhq.campaign.unit.Unit;
 import mekhq.campaign.universe.Faction;
 import mekhq.campaign.universe.NewsItem;
+import mekhq.campaign.universe.PlanetarySystem;
 import mekhq.campaign.utilities.AutomatedTechAssignments;
 import mekhq.gui.baseComponents.ScalingWidthConstrainedPanel;
 import mekhq.gui.baseComponents.immersiveDialogs.ImmersiveDialogSimple;
+import mekhq.gui.baseComponents.roundedComponents.AccentRoundedJButton;
+import mekhq.gui.baseComponents.roundedComponents.AccentRoundedJButton.Accent;
 import mekhq.gui.baseComponents.roundedComponents.RoundedJButton;
 import mekhq.gui.baseComponents.roundedComponents.RoundedLineBorder;
 import mekhq.gui.baseComponents.roundedComponents.RoundedMMToggleButton;
 import mekhq.gui.campaignOptions.CampaignOptionsDialog;
 import mekhq.gui.commandGeneration.CommandGenerationDialog;
 import mekhq.gui.dialog.*;
+import mekhq.gui.commandGeneration.CommandGenerationDialog;
 import mekhq.gui.dialog.glossary.GlossaryDialog;
+import mekhq.gui.dialog.markets.contractMarket.ChaosContractMarketDialog;
 import mekhq.gui.enums.MHQTabType;
 import mekhq.gui.menus.MekHQMenuBar;
 import mekhq.gui.model.LocationFilterItem;
@@ -483,9 +490,37 @@ public class CampaignGUI extends JPanel {
         pnlTop.add(createMarketsPanel(95, 130));
         pnlTop.add(new CommandSummaryPanel(250, 280, getCampaign()));
         pnlTop.add(Box.createHorizontalGlue());
-        pnlTop.add(new AdvanceTimePanel(170, 240, getCampaign().getLocalDate(),
-              getCampaignController()::advanceDay, () -> new AdvanceDaysDialog(getFrame(), this).setVisible(true)));
+        AdvanceTimePanel advanceTimePanel = new AdvanceTimePanel(170, 240, getCampaign().getLocalDate(),
+              getCampaignController()::advanceDay, () -> new AdvanceDaysDialog(getFrame(), this).setVisible(true));
+        pnlTop.add(createCommandGeneratorButton());
+        pnlTop.add(Box.createHorizontalStrut(SMALL_GAP));
+        pnlTop.add(advanceTimePanel);
         pnlTop.add(createCampaignControlPanel(140, 170));
+
+        // The box layout stretches every child to the panel's height, so the button is squared to that height,
+        // measured once all the other children are in place.
+        int side = pnlTop.getPreferredSize().height;
+        btnCommandGenerator.setMinimumSize(new Dimension(side, side));
+        btnCommandGenerator.setPreferredSize(new Dimension(side, side));
+        btnCommandGenerator.setMaximumSize(new Dimension(side, side));
+    }
+
+    /**
+     * Creates the Command Generator button that sits to the left of the Advance Day panel. It is squared to the
+     * top panel's height by {@link #initTopPanel()}, and is only shown while the campaign has no units and no
+     * personnel - the one time a player needs it. See {@link #refreshCampaignControlButtons()}.
+     *
+     * @return the button
+     */
+    private RoundedJButton createCommandGeneratorButton() {
+        btnCommandGenerator = new RoundedJButton(resourceMap.getString("btnCommandGenerator.text"));
+        btnCommandGenerator.setToolTipText(resourceMap.getString("btnCommandGenerator.toolTipText"));
+        btnCommandGenerator.setHorizontalAlignment(SwingConstants.CENTER);
+        btnCommandGenerator.addActionListener(event -> {
+            new CommandGenerationDialog(getFrame(), getCampaign()).setVisible(true);
+            refreshCampaignControlButtons();
+        });
+        return btnCommandGenerator;
     }
 
     private JPanel createMarketsPanel(int minWidth, int maxWidth) {
@@ -520,7 +555,7 @@ public class CampaignGUI extends JPanel {
 
     public void refreshMarketButtonLabels() {
         CampaignOptions campaignOptions = getCampaign().getCampaignOptions();
-        String labelKey = campaignOptions.getContractMarketMethod().isNone() ? "manual" : "market";
+        String labelKey = campaignOptions.get(CampaignOption.CONTRACT_MARKET_METHOD).isNone() ? "manual" : "market";
         String label = resourceMap.getString("btnContractMarket." + labelKey);
 
         btnContractMarket.setText(label);
@@ -537,46 +572,34 @@ public class CampaignGUI extends JPanel {
 
         gridBagConstraints.weightx = 1;
         gridBagConstraints.weighty = 1;
-        gridBagConstraints.gridwidth = 2;
         gridBagConstraints.fill = GridBagConstraints.BOTH;
 
-        btnCommandGenerator = new RoundedJButton(resourceMap.getString("btnCommandGenerator.text"));
-        btnCommandGenerator.setToolTipText(resourceMap.getString("btnCommandGenerator.toolTipText"));
-        btnCommandGenerator.addActionListener(
-              e -> new CommandGenerationDialog(getFrame(), getCampaign()).setVisible(true));
+        AccentRoundedJButton btnGlossary = new AccentRoundedJButton(resourceMap.getString("btnGlossary.text"),
+              Accent.REFERENCE);
+        btnGlossary.setToolTipText(resourceMap.getString("btnGlossary.toolTipText"));
+        btnGlossary.addActionListener(event -> new GlossaryDialog(getFrame()));
         gridBagConstraints.gridy = 0;
         gridBagConstraints.insets = new Insets(MEDIUM_GAP - 2, SMALL_GAP, -2, SMALL_GAP);
-        pnlButton.add(btnCommandGenerator, gridBagConstraints);
+        pnlButton.add(btnGlossary, gridBagConstraints);
+
+        AccentRoundedJButton btnBugReport = new AccentRoundedJButton(resourceMap.getString("btnBugReport.text"),
+              Accent.HAZARD);
+        btnBugReport.setToolTipText(resourceMap.getString("btnBugReport.toolTipText"));
+        btnBugReport.addActionListener(event -> new EasyBugReportDialog(getFrame(), getCampaign()));
+        gridBagConstraints.gridy = 1;
+        gridBagConstraints.insets = new Insets(MEDIUM_GAP - 2, SMALL_GAP, -2, SMALL_GAP);
+        pnlButton.add(btnBugReport, gridBagConstraints);
 
         RoundedMMToggleButton btnGMMode = new RoundedMMToggleButton(resourceMap.getString("btnGMMode.text"));
         btnGMMode.setToolTipText(resourceMap.getString("btnGMMode.toolTipText"));
         btnGMMode.setSelected(getCampaign().isGM());
-        btnGMMode.addActionListener(e -> {
+        btnGMMode.addActionListener(event -> {
             getCampaign().setGMMode(btnGMMode.isSelected());
             windowMenu.refreshGMMenuItems();
         });
-        gridBagConstraints.gridy = 1;
-        gridBagConstraints.insets = new Insets(MEDIUM_GAP - 2, SMALL_GAP, 0, SMALL_GAP);
-        pnlButton.add(btnGMMode, gridBagConstraints);
-
         gridBagConstraints.gridy = 2;
-        gridBagConstraints.weighty = 0;
-        gridBagConstraints.gridwidth = 1;
-        gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
-
-        RoundedJButton btnGlossary = new RoundedJButton(resourceMap.getString("btnGlossary.text"));
-        btnGlossary.setToolTipText(resourceMap.getString("btnGlossary.toolTipText"));
-        btnGlossary.addActionListener(evt -> new GlossaryDialog(getFrame()));
-        gridBagConstraints.weightx = 0.4;
-        gridBagConstraints.insets = new Insets(SMALL_GAP, SMALL_GAP, THIN_GAP, 0);
-        pnlButton.add(btnGlossary, gridBagConstraints);
-
-        RoundedJButton btnBugReport = new RoundedJButton(resourceMap.getString("btnBugReport.text"));
-        btnBugReport.setToolTipText(resourceMap.getString("btnBugReport.toolTipText"));
-        btnBugReport.addActionListener(evt -> new EasyBugReportDialog(getFrame(), getCampaign()));
-        gridBagConstraints.weightx = 0.6;
-        gridBagConstraints.insets = new Insets(SMALL_GAP, SMALL_GAP, THIN_GAP, SMALL_GAP);
-        pnlButton.add(btnBugReport, gridBagConstraints);
+        gridBagConstraints.insets = new Insets(MEDIUM_GAP - 2, SMALL_GAP, SMALL_GAP, SMALL_GAP);
+        pnlButton.add(btnGMMode, gridBagConstraints);
 
         return pnlButton;
     }
@@ -780,9 +803,24 @@ public class CampaignGUI extends JPanel {
      * @author Illiani
      * @since 0.50.05
      */
-    public void focusOnMission(int targetId) {
+    public void focusOnMission(UUID targetId) {
         getBriefingRoomTab().focusOnMission(targetId);
         tabMain.setSelectedIndex(getTabIndexByName(resourceMap.getString("panBriefing.TabConstraints.tabTitle")));
+    }
+
+    /**
+     * Shows the given system on the interstellar map and brings the navigation tab forward.
+     *
+     * @param system the system to focus on; ignored when {@code null}, as an unresolvable link should do nothing rather
+     *               than switch tabs
+     */
+    public void focusOnSystem(final @Nullable PlanetarySystem system) {
+        if (system == null) {
+            return;
+        }
+
+        getNavigationTab().showSystem(system);
+        tabMain.setSelectedComponent(getNavigationTab());
     }
 
     public void focusOnUnitInRepairBay(UUID id) {
@@ -824,7 +862,7 @@ public class CampaignGUI extends JPanel {
      */
     public void openRecruitmentDialog() {
         CampaignOptions campaignOptions = getCampaign().getCampaignOptions();
-        PersonnelMarketStyle marketStyle = campaignOptions.getPersonnelMarketStyle();
+        PersonnelMarketStyle marketStyle = campaignOptions.get(CampaignOption.PERSONNEL_MARKET_STYLE);
 
         if (marketStyle != PERSONNEL_MARKET_DISABLED || !getCampaign().getPlayerForce()
                                                                .getHumanResources()
@@ -848,33 +886,7 @@ public class CampaignGUI extends JPanel {
     }
 
     public void showContractMarket() {
-        CampaignOptions campaignOptions = getCampaign().getCampaignOptions();
-
-        if (campaignOptions.getContractMarketMethod().isNone()) {
-            MissionTypeDialog missionTypeDialog = getMissionTypeDialog(campaignOptions);
-
-            if (missionTypeDialog.isMission()) {
-                CustomizeMissionDialog customizeMissionDialog =
-                      new CustomizeMissionDialog(getFrame(), true, null, getCampaign());
-                customizeMissionDialog.setVisible(true);
-            }
-        } else {
-            ContractMarketDialog contractMarketDialog = new ContractMarketDialog(getFrame(), getCampaign());
-            contractMarketDialog.setVisible(true);
-        }
-    }
-
-    private MissionTypeDialog getMissionTypeDialog(CampaignOptions campaignOptions) {
-        MissionTypeDialog missionTypeDialog = new MissionTypeDialog(getFrame(), true);
-        missionTypeDialog.setVisible(true);
-
-        if (missionTypeDialog.isContract()) {
-            NewContractDialog newContractDialog = campaignOptions.isUseStratCon() ?
-                                                        new NewAtBContractDialog(getFrame(), true, getCampaign()) :
-                                                        new NewContractDialog(getFrame(), true, getCampaign());
-            newContractDialog.setVisible(true);
-        }
-        return missionTypeDialog;
+        new ChaosContractMarketDialog(getCampaign());
     }
 
     public void showUnitMarket() {
@@ -1007,7 +1019,7 @@ public class CampaignGUI extends JPanel {
                                            .getHumanResources()
                                            .getTechs(campaign1.getPlayerForce().getHangar().getUnits(),
                                                  campaign1.getCampaignOptions(),
-                                                 campaign1.isClanCampaign(),
+                                                 campaign1.getPlayerForce().isClanForce(),
                                                  campaign1.getLocalDate(),
                                                  false,
                                                  true);
@@ -1035,7 +1047,7 @@ public class CampaignGUI extends JPanel {
                                  tech.getMinutesLeft() +
                                  '/' +
                                  tech.getDailyAvailableTechTime(getCampaign().getCampaignOptions()
-                                                                      .isTechsUseAdministration()) +
+                                                                      .get(CampaignOption.TECHS_USE_ADMINISTRATION)) +
                                  " minutes</html>";
                     techHash.put(name, tech);
                     if (tech.isRightTechTypeFor(r)) {
@@ -1150,7 +1162,7 @@ public class CampaignGUI extends JPanel {
                                  .getHumanResources()
                                  .getTechsExpanded(campaign.getPlayerForce().getHangar().getUnits(),
                                        campaign.getCampaignOptions(),
-                                       campaign.isClanCampaign(),
+                                       campaign.getPlayerForce().isClanForce(),
                                        campaign.getLocalDate())) {
             if (tech.isTechLargeVessel()) {
                 Entity entity = unit.getEntity();
@@ -1232,7 +1244,8 @@ public class CampaignGUI extends JPanel {
             logger.warn("Cannot export person if no one is selected! Ignoring.");
             return;
         }
-        Person selectedPerson = pt.getPersonnelTableModel().getPerson(pt.getPersonnelTable().convertRowIndexToModel(row));
+        Person selectedPerson = pt.getPersonnelTableModel()
+                                      .getPerson(pt.getPersonnelTable().convertRowIndexToModel(row));
         int[] rows = pt.getPersonnelTable().getSelectedRows();
         Person[] people = Arrays.stream(rows)
                                 .mapToObj(j -> pt.getPersonnelTableModel()
@@ -1560,7 +1573,7 @@ public class CampaignGUI extends JPanel {
     }
 
     private void refreshTempSoldiers() {
-        if (!getCampaign().getCampaignOptions().isUseBlobInfantry()) {
+        if (!getCampaign().getCampaignOptions().get(CampaignOption.USE_BLOB_INFANTRY)) {
             lblTempSoldiers.setVisible(false);
             return;
         }
@@ -1571,7 +1584,7 @@ public class CampaignGUI extends JPanel {
     }
 
     private void refreshTempBattleArmor() {
-        if (!getCampaign().getCampaignOptions().isUseBlobBattleArmor()) {
+        if (!getCampaign().getCampaignOptions().get(CampaignOption.USE_BLOB_BATTLE_ARMOR)) {
             lblTempBattleArmor.setVisible(false);
             return;
         }
@@ -1582,7 +1595,7 @@ public class CampaignGUI extends JPanel {
     }
 
     private void refreshTempVehicleCrewGround() {
-        if (!getCampaign().getCampaignOptions().isUseBlobVehicleCrewGround()) {
+        if (!getCampaign().getCampaignOptions().get(CampaignOption.USE_BLOB_VEHICLE_CREW_GROUND)) {
             lblTempVehicleCrewGround.setVisible(false);
             refreshVehicleCrewPanelVisibility();
             return;
@@ -1595,7 +1608,7 @@ public class CampaignGUI extends JPanel {
     }
 
     private void refreshTempVehicleCrewVTOL() {
-        if (!getCampaign().getCampaignOptions().isUseBlobVehicleCrewVTOL()) {
+        if (!getCampaign().getCampaignOptions().get(CampaignOption.USE_BLOB_VEHICLE_CREW_VTOL)) {
             lblTempVehicleCrewVTOL.setVisible(false);
             refreshVehicleCrewPanelVisibility();
             return;
@@ -1608,7 +1621,7 @@ public class CampaignGUI extends JPanel {
     }
 
     private void refreshTempVehicleCrewNaval() {
-        if (!getCampaign().getCampaignOptions().isUseBlobVehicleCrewNaval()) {
+        if (!getCampaign().getCampaignOptions().get(CampaignOption.USE_BLOB_VEHICLE_CREW_NAVAL)) {
             lblTempVehicleCrewNaval.setVisible(false);
             refreshVehicleCrewPanelVisibility();
             return;
@@ -1627,7 +1640,7 @@ public class CampaignGUI extends JPanel {
     }
 
     private void refreshTempVesselPilot() {
-        if (!getCampaign().getCampaignOptions().isUseBlobVesselPilot()) {
+        if (!getCampaign().getCampaignOptions().get(CampaignOption.USE_BLOB_VESSEL_PILOT)) {
             lblTempVesselPilot.setVisible(false);
             refreshVesselCrewPanelVisibility();
             return;
@@ -1640,7 +1653,7 @@ public class CampaignGUI extends JPanel {
     }
 
     private void refreshTempVesselGunner() {
-        if (!getCampaign().getCampaignOptions().isUseBlobVesselGunner()) {
+        if (!getCampaign().getCampaignOptions().get(CampaignOption.USE_BLOB_VESSEL_GUNNER)) {
             lblTempVesselGunner.setVisible(false);
             refreshVesselCrewPanelVisibility();
             return;
@@ -1653,7 +1666,7 @@ public class CampaignGUI extends JPanel {
     }
 
     private void refreshTempVesselCrew() {
-        if (!getCampaign().getCampaignOptions().isUseBlobVesselCrew()) {
+        if (!getCampaign().getCampaignOptions().get(CampaignOption.USE_BLOB_VESSEL_CREW)) {
             lblTempVesselCrew.setVisible(false);
             refreshVesselCrewPanelVisibility();
             return;
@@ -1672,22 +1685,37 @@ public class CampaignGUI extends JPanel {
     }
 
     private void refreshPartsAvailability() {
-        if (getCampaign().getCampaignOptions().getAcquisitionType() == AcquisitionsType.ANY_TECH) {
+        if (getCampaign().getCampaignOptions().get(CampaignOption.ACQUISITIONS_TYPE) == AcquisitionsType.ANY_TECH) {
             lblPartsAvailabilityRating.setText("");
         } else {
-            int partsAvailability = getCampaign().findAtBPartsAvailabilityLevel();
+            int partsAvailability = getCampaign().findPartsAvailabilityLevel();
             lblPartsAvailabilityRating.setText(statusBarLabel("statusBar.lblPartsAvailabilityRating.text",
                   partsAvailability));
         }
     }
 
+    /**
+     * Shows the Command Generator button only while the campaign is empty: no units anywhere, including base
+     * hangars, and no personnel.
+     */
     private void refreshCampaignControlButtons() {
-        boolean emptyHangar = getCampaign().getUnits().isEmpty() &&
-                                    getCampaign().getCampaignLocationManager().getPlayerBases()
-                                          .stream()
-                                          .allMatch(base -> base.getBaseHangar().getUnits().isEmpty());
-        boolean noPersonnel = getCampaign().getPlayerForce().getHumanResources().getPersonnel().isEmpty();
-        btnCommandGenerator.setVisible(emptyHangar && noPersonnel);
+        btnCommandGenerator.setVisible(isHangarEmpty() && getPlayerPersonnel().isEmpty());
+    }
+
+    private boolean isHangarEmpty() {
+        if (!getCampaign().getUnits().isEmpty()) {
+            return false;
+        }
+        for (PlayerBase base : getCampaign().getCampaignLocationManager().getPlayerBases()) {
+            if (!base.getBaseHangar().getUnits().isEmpty()) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    private Collection<Person> getPlayerPersonnel() {
+        return getCampaign().getPlayerForce().getHumanResources().getPersonnel();
     }
 
     public int getTabIndexByName(String tabTitle) {
@@ -1806,7 +1834,7 @@ public class CampaignGUI extends JPanel {
         }
 
         // Optional New Day Blocker
-        if (getCampaign().getCampaignOptions().isUseRandomRetirement()) {
+        if (getCampaign().getCampaignOptions().get(CampaignOption.USE_RANDOM_RETIREMENT)) {
             int turnoverPrompt = getCampaign().checkTurnoverPrompt();
 
             switch (turnoverPrompt) {
@@ -1863,7 +1891,7 @@ public class CampaignGUI extends JPanel {
     public void handlePersonUpdate(PersonEvent personEvent) {
         // only bother recalculating AtB parts availability if a logistics admin has been changed
         // refreshPartsAvailability cuts out early with a "use AtB" check so it's not necessary here
-        if (personEvent.getPerson().hasRole(PersonnelRole.ADMINISTRATOR_LOGISTICS)) {
+        if (personEvent.getPerson().hasRole(PersonnelRole.ADMINISTRATOR)) {
             refreshPartsAvailability();
         }
     }
@@ -1918,9 +1946,8 @@ public class CampaignGUI extends JPanel {
 
             new ImmersiveDialogSimple(campaign,
                   campaign.getPlayerForce().getHumanResources()
-                        .getSeniorAdminPerson(Campaign.AdministratorSpecialization.LOGISTICS,
-                              campaign.getCampaignOptions(),
-                              campaign.isClanCampaign(),
+                        .getSeniorAdminPerson(campaign.getCampaignOptions(),
+                              campaign.getPlayerForce().isClanForce(),
                               campaign.getLocalDate()),
                   null,
                   inCharacterMessage,
@@ -1952,7 +1979,7 @@ public class CampaignGUI extends JPanel {
      */
     private boolean checkForInvalidFaction(DayEndingEvent dayEndingEvent) {
         Campaign campaign = getCampaign();
-        Faction campaignFaction = campaign.getFaction();
+        Faction campaignFaction = campaign.getPlayerForce().getFaction();
         LocalDate currentDate = campaign.getLocalDate();
 
         if (!campaignFaction.validIn(currentDate)) {
@@ -1964,9 +1991,8 @@ public class CampaignGUI extends JPanel {
 
             new ImmersiveDialogSimple(campaign,
                   campaign.getPlayerForce().getHumanResources()
-                        .getSeniorAdminPerson(Campaign.AdministratorSpecialization.COMMAND,
-                              campaign.getCampaignOptions(),
-                              campaign.isClanCampaign(),
+                        .getSeniorAdminPerson(campaign.getCampaignOptions(),
+                              campaign.getPlayerForce().isClanForce(),
                               campaign.getLocalDate()),
                   null,
                   inCharacterMessage,
@@ -1981,6 +2007,17 @@ public class CampaignGUI extends JPanel {
         }
 
         return false;
+    }
+
+    /**
+     * Hides the Company Generator button as soon as the campaign gains units or personnel, which the generator
+     * reports by firing this event when it completes.
+     *
+     * @param organizationChangedEvent the event
+     */
+    @Subscribe
+    public void handleOrganizationChanged(OrganizationChangedEvent organizationChangedEvent) {
+        refreshCampaignControlButtons();
     }
 
     /**

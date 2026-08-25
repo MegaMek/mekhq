@@ -86,7 +86,7 @@ public final class FormationIconBuilder {
      * non-leaf Formation. Honors the icon-related toggles on {@link CommandGenerationOptions}: if
      * {@code isGenerateFormationIcons()} is off, returns immediately.
      *
-     * @param root     the campaign's top-level Formation (typically {@code campaign.getFormations()})
+     * @param root     the campaign's top-level Formation (typically {@code campaign.getPlayerForce().getFormations()})
      * @param campaign the campaign whose units feed the weight-class math
      * @param options  the options driving icon-generation toggles
      */
@@ -105,9 +105,9 @@ public final class FormationIconBuilder {
 
         Faction iconFaction = options.isUseSpecifiedFactionToGenerateFormationIcons()
               ? options.getSpecifiedFaction()
-              : campaign.getFaction();
+              : campaign.getPlayerForce().getFaction();
         if (iconFaction == null) {
-            iconFaction = campaign.getFaction();
+            iconFaction = campaign.getPlayerForce().getFaction();
         }
 
         FormationPieceIcon background = buildBackgroundPiece(iconFaction);

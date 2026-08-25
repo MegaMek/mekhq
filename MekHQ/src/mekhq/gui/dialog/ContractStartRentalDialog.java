@@ -45,8 +45,7 @@ import javax.swing.JSpinner;
 import javax.swing.SpinnerNumberModel;
 
 import mekhq.campaign.Campaign;
-import mekhq.campaign.mission.AtBContract;
-import mekhq.campaign.mission.Contract;
+import mekhq.campaign.mission.contract.AbstractContract;
 import mekhq.campaign.universe.Faction;
 import mekhq.campaign.universe.factionStanding.FactionStandingUtilities;
 import mekhq.gui.baseComponents.immersiveDialogs.ImmersiveDialogCore;
@@ -94,13 +93,12 @@ public class ContractStartRentalDialog extends ImmersiveDialogCore {
         return (int) spnSecurity.getValue();
     }
 
-    public ContractStartRentalDialog(Campaign campaign, Contract contract, int hospitalBedCost, int kitchenCost,
+    public ContractStartRentalDialog(Campaign campaign, AbstractContract contract, int hospitalBedCost, int kitchenCost,
           int holdingCellCost) {
         super(campaign,
               campaign.getPlayerForce().getHumanResources()
-                    .getSeniorAdminPerson(mekhq.campaign.Campaign.AdministratorSpecialization.LOGISTICS,
-                          campaign.getCampaignOptions(),
-                          campaign.isClanCampaign(),
+                    .getSeniorAdminPerson(campaign.getCampaignOptions(),
+                          campaign.getPlayerForce().isClanForce(),
                           campaign.getLocalDate()),
               null,
               getCenterMessage(campaign.getCommanderAddress(), contract, campaign.getGameYear()),
@@ -113,12 +111,9 @@ public class ContractStartRentalDialog extends ImmersiveDialogCore {
               true);
     }
 
-    private static String getCenterMessage(String commanderAddress, Contract contract, int currentYear) {
-        String employerName = contract.getEmployerName();
-        if (contract instanceof AtBContract atBContract) {
-            Faction employerFaction = atBContract.getEmployerFaction();
-            employerName = FactionStandingUtilities.getFactionName(employerFaction, currentYear);
-        }
+    private static String getCenterMessage(String commanderAddress, AbstractContract contract, int currentYear) {
+        Faction employerFaction = contract.getEmployerFaction();
+        String employerName = FactionStandingUtilities.getFactionName(employerFaction, currentYear);
 
         return getFormattedTextAt(RESOURCE_BUNDLE,
               "ContractStartRentalDialog.inCharacter",

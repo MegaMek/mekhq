@@ -78,7 +78,7 @@ class PersonImplantPersistenceTest {
         Campaign campaign = mockCampaign();
         when(campaign.getVersion()).thenReturn(VERSION);
         when(campaign.getLocalDate()).thenReturn(LocalDate.of(3067, 1, 1));
-        when(campaign.getCampaignOptions()).thenReturn(mock(CampaignOptions.class));
+        when(campaign.getCampaignOptions()).thenReturn(new CampaignOptions());
         return campaign;
     }
 

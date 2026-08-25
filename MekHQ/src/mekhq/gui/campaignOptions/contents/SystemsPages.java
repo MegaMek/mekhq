@@ -41,13 +41,13 @@ import mekhq.campaign.campaignOptions.CampaignOptions;
 
 /**
  * The {@code SystemsPages} class coordinates the Systems section of the MekHQ Campaign Options dialog. It owns the
- * shared {@link SystemsOptionsModel} snapshot and delegates the construction and value synchronisation of each leaf page
- * to a dedicated view class: {@link ReputationPage} and {@link FactionStandingPage}.
+ * shared {@link SystemsOptionsModel} snapshot and delegates the construction and value synchronisation of each leaf
+ * page to a dedicated view class: {@link ReputationPage} and {@link FactionStandingPage}.
  *
  * <p>On load it builds the model from a {@link CampaignOptions} source and
  * pushes it into any pages that have already been built; on apply it gathers the page values back into the model, runs
- * any criminal-record reset requested on the Reputation page, and writes the model to the target options. Each leaf page
- * is built lazily the first time its {@code create...Page()} method is called.</p>
+ * any criminal-record reset requested on the Reputation page, and writes the model to the target options. Each leaf
+ * page is built lazily the first time its {@code create...Page()} method is called.</p>
  *
  * @author Illiani
  * @since 0.50.07
@@ -113,8 +113,8 @@ public class SystemsPages {
      * Loads values from the specified {@code presetCampaignOptions}, or the current campaign's options if {@code null},
      * into the UI form fields and controls.
      *
-     * @param presetCampaignOptions an alternative {@link CampaignOptions}, or {@code null} to use the current campaign's
-     *                              options
+     * @param presetCampaignOptions an alternative {@link CampaignOptions}, or {@code null} to use the current
+     *                              campaign's options
      *
      * @author Illiani
      * @since 0.50.07
@@ -148,9 +148,9 @@ public class SystemsPages {
         updateModelFromCreatedControls();
 
         if (model.resetCriminalRecord) {
-            campaign.getPlayerForce().setDateOfLastCrime(null);
-            campaign.getPlayerForce().setCrimeRating(0);
-            campaign.getPlayerForce().setCrimePirateModifier(0);
+            campaign.getPlayerForce().setCampOpsDateOfLastCrime(null);
+            campaign.getPlayerForce().setCamOpsCrimeRating(0);
+            campaign.getPlayerForce().setCampOpsCrimePirateModifier(0);
             model.resetCriminalRecord = false;
         }
 

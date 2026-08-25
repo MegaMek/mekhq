@@ -38,11 +38,10 @@ import java.util.List;
 import megamek.common.annotations.Nullable;
 import megamek.logging.MMLogger;
 import mekhq.campaign.Campaign;
-import mekhq.campaign.mission.AtBContract;
+import mekhq.campaign.mission.contract.AbstractContract;
 import mekhq.campaign.universe.Atmosphere;
 import mekhq.campaign.universe.LandMass;
 import mekhq.campaign.universe.Planet;
-import mekhq.campaign.universe.PlanetarySystem;
 import mekhq.campaign.universe.SourceableValue;
 import mekhq.campaign.universe.enums.HPGRating;
 
@@ -206,17 +205,10 @@ public record PlanetProfile(int temperatureCelsius, double diameterKm, int water
      *
      * @return a resolved {@link PlanetProfile}
      */
-    public static PlanetProfile from(AtBContract contract, Campaign campaign) {
-        PlanetarySystem system = contract.getSystem();
-        if (system == null) {
-            LOGGER.warn("Contract {} has no system; using a neutral planet profile", contract.getName());
-            return neutral(NEUTRAL_TEMPERATURE_CELSIUS);
-        }
-
-        Planet planet = system.getPrimaryPlanet();
+    public static PlanetProfile from(AbstractContract contract, Campaign campaign) {
+        Planet planet = contract.getTargetPlanet();
         if (planet == null) {
-            LOGGER.warn("System {} has no primary planet; using a neutral planet profile",
-                  system.getName(campaign.getLocalDate()));
+            LOGGER.warn("No target planet; using a neutral planet profile");
             return neutral(NEUTRAL_TEMPERATURE_CELSIUS);
         }
 
@@ -233,9 +225,7 @@ public record PlanetProfile(int temperatureCelsius, double diameterKm, int water
      * @return a resolved {@link PlanetProfile}
      */
     public static PlanetProfile from(Planet planet, LocalDate date) {
-        Integer temperature = planet.getTemperature(date);
-        int resolvedTemperature = (temperature != null) ? temperature : NEUTRAL_TEMPERATURE_CELSIUS;
-
+        int temperature = planet.getTemperature(date);
         double diameter = planet.getDiameter();
 
         int resolvedWater = NEUTRAL_WATER_PERCENT;
@@ -273,7 +263,7 @@ public record PlanetProfile(int temperatureCelsius, double diameterKm, int water
         Long population = planet.getPopulation(date);
         HPGRating hpg = planet.getHPG(date);
 
-        return new PlanetProfile(resolvedTemperature,
+        return new PlanetProfile(temperature,
               diameter,
               resolvedWater,
               airless,
@@ -282,7 +272,7 @@ public record PlanetProfile(int temperatureCelsius, double diameterKm, int water
               resolvedLandmassCount,
               resolvedGravity,
               population,
-              (hpg != null) ? hpg : HPGRating.X);
+              hpg);
     }
 
     /**

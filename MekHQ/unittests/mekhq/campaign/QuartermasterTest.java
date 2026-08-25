@@ -32,6 +32,8 @@
  */
 package mekhq.campaign;
 
+import static org.mockito.Mockito.lenient;
+
 import static mekhq.campaign.enums.DailyReportType.ACQUISITIONS;
 import static mekhq.campaign.parts.AmmoUtilities.getAmmoType;
 import static mekhq.campaign.parts.AmmoUtilities.getInfantryWeapon;
@@ -55,6 +57,7 @@ import megamek.common.units.Infantry;
 import megamek.common.weapons.infantry.InfantryWeapon;
 import mekhq.EventSpy;
 import mekhq.campaign.campaignOptions.CampaignOptions;
+import mekhq.campaign.campaignOptions.CampaignOption;
 import mekhq.campaign.events.parts.PartArrivedEvent;
 import mekhq.campaign.events.parts.PartChangedEvent;
 import mekhq.campaign.finances.Finances;
@@ -71,6 +74,7 @@ import mekhq.campaign.parts.meks.MekLocation;
 import mekhq.campaign.parts.missing.MissingPart;
 import mekhq.campaign.unit.TestUnit;
 import mekhq.campaign.unit.Unit;
+import mekhq.campaign.unit.UnitAcquisitionType;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
 import org.mockito.stubbing.Answer;
@@ -268,21 +272,33 @@ public class QuartermasterTest {
         Campaign mockCampaign = mockCampaign();
         CampaignOptions mockOptions = mock(CampaignOptions.class);
         when(mockCampaign.getCampaignOptions()).thenReturn(mockOptions);
+        lenient().when(mockOptions.get(CampaignOption.INNER_SPHERE_UNIT_PRICE_MULTIPLIER)).thenReturn(0.0);
+        lenient().when(mockOptions.get(CampaignOption.USE_AMMO_BY_TYPE)).thenReturn(false);
+        lenient().when(mockOptions.get(CampaignOption.USE_RANDOM_UNIT_QUALITIES)).thenReturn(false);
         ForceQuartermaster quartermaster = new ForceQuartermaster(mockCampaign);
 
         // If we don't pay for units...
-        when(mockOptions.isPayForUnits()).thenReturn(false);
+        when(mockOptions.get(CampaignOption.PAY_FOR_UNITS)).thenReturn(false);
 
         // ...then we should automatically buy a unit...
         Entity mockEntity = mock(Entity.class);
         int transitDays = 10;
+
+        Unit mockUnit = mock(Unit.class);
+        when(mockCampaign.addNewUnit(eq(mockEntity),
+              eq(false),
+              eq(transitDays),
+              eq(PartQuality.QUALITY_D),
+              eq(UnitAcquisitionType.PURCHASED))).thenReturn(mockUnit);
+
         assertTrue(quartermaster.buyUnit(mockEntity, transitDays));
 
         // ...and the new unit should be added to the campaign.
         verify(mockCampaign, times(1)).addNewUnit(eq(mockEntity),
               eq(false),
               eq(transitDays),
-              eq(PartQuality.QUALITY_D));
+              eq(PartQuality.QUALITY_D),
+              eq(UnitAcquisitionType.PURCHASED));
     }
 
     @Test
@@ -290,10 +306,13 @@ public class QuartermasterTest {
         Campaign mockCampaign = mockCampaign();
         CampaignOptions mockOptions = mock(CampaignOptions.class);
         when(mockCampaign.getCampaignOptions()).thenReturn(mockOptions);
+        lenient().when(mockOptions.get(CampaignOption.INNER_SPHERE_UNIT_PRICE_MULTIPLIER)).thenReturn(0.0);
+        lenient().when(mockOptions.get(CampaignOption.USE_AMMO_BY_TYPE)).thenReturn(false);
+        lenient().when(mockOptions.get(CampaignOption.USE_RANDOM_UNIT_QUALITIES)).thenReturn(false);
         ForceQuartermaster quartermaster = new ForceQuartermaster(mockCampaign);
 
         // If we pay for units...
-        when(mockOptions.isPayForUnits()).thenReturn(true);
+        when(mockOptions.get(CampaignOption.PAY_FOR_UNITS)).thenReturn(true);
 
         // ...but can't afford a unit...
         Finances mockFinances = mock(Finances.class);
@@ -307,7 +326,11 @@ public class QuartermasterTest {
         assertFalse(quartermaster.buyUnit(mockEntity, 0));
 
         // ...and the new unit should NOT be added to the campaign.
-        verify(mockCampaign, times(0)).addNewUnit(eq(mockEntity), eq(false), eq(0), eq(PartQuality.QUALITY_D));
+        verify(mockCampaign, times(0)).addNewUnit(eq(mockEntity),
+              eq(false),
+              eq(0),
+              eq(PartQuality.QUALITY_D),
+              eq(UnitAcquisitionType.PURCHASED));
     }
 
     @Test
@@ -315,11 +338,13 @@ public class QuartermasterTest {
         Campaign mockCampaign = mockCampaign();
         CampaignOptions mockOptions = mock(CampaignOptions.class);
         when(mockCampaign.getCampaignOptions()).thenReturn(mockOptions);
+        lenient().when(mockOptions.get(CampaignOption.USE_AMMO_BY_TYPE)).thenReturn(false);
+        lenient().when(mockOptions.get(CampaignOption.USE_RANDOM_UNIT_QUALITIES)).thenReturn(false);
         ForceQuartermaster quartermaster = new ForceQuartermaster(mockCampaign);
 
         // If we pay for units...
-        when(mockOptions.isPayForUnits()).thenReturn(true);
-        when(mockOptions.getInnerSphereUnitPriceMultiplier()).thenReturn(1.0);
+        when(mockOptions.get(CampaignOption.PAY_FOR_UNITS)).thenReturn(true);
+        when(mockOptions.get(CampaignOption.INNER_SPHERE_UNIT_PRICE_MULTIPLIER)).thenReturn(1.0);
 
         // ...and can afford a unit...
         Finances mockFinances = mock(Finances.class);
@@ -332,11 +357,23 @@ public class QuartermasterTest {
         double cost = 1.0;
         doReturn(cost).when(mockEntity).getCost(anyBoolean());
 
+        Unit mockUnit = mock(Unit.class);
+        when(mockCampaign.addNewUnit(eq(mockEntity),
+              eq(false),
+              eq(0),
+              eq(PartQuality.QUALITY_D),
+              eq(UnitAcquisitionType.PURCHASED))).thenReturn(mockUnit);
+
+
         // ...then we should be able to buy the unit...
         assertTrue(quartermaster.buyUnit(mockEntity, 0));
 
         // ...and the new unit should be added to the campaign...
-        verify(mockCampaign, times(1)).addNewUnit(eq(mockEntity), eq(false), eq(0), eq(PartQuality.QUALITY_D));
+        verify(mockCampaign, times(1)).addNewUnit(eq(mockEntity),
+              eq(false),
+              eq(0),
+              eq(PartQuality.QUALITY_D),
+              eq(UnitAcquisitionType.PURCHASED));
 
         // ...and it should cost the right amount.
         assertEquals(Money.of(cost), captor.getValue());
@@ -347,11 +384,13 @@ public class QuartermasterTest {
         Campaign mockCampaign = mockCampaign();
         CampaignOptions mockOptions = mock(CampaignOptions.class);
         when(mockCampaign.getCampaignOptions()).thenReturn(mockOptions);
+        lenient().when(mockOptions.get(CampaignOption.USE_AMMO_BY_TYPE)).thenReturn(false);
+        lenient().when(mockOptions.get(CampaignOption.USE_RANDOM_UNIT_QUALITIES)).thenReturn(false);
         ForceQuartermaster quartermaster = new ForceQuartermaster(mockCampaign);
 
         // If we pay for units...
-        when(mockOptions.isPayForUnits()).thenReturn(true);
-        when(mockOptions.getInnerSphereUnitPriceMultiplier()).thenReturn(1.0);
+        when(mockOptions.get(CampaignOption.PAY_FOR_UNITS)).thenReturn(true);
+        when(mockOptions.get(CampaignOption.INNER_SPHERE_UNIT_PRICE_MULTIPLIER)).thenReturn(1.0);
 
         // ...and can afford a unit...
         Finances mockFinances = mock(Finances.class);
@@ -364,11 +403,22 @@ public class QuartermasterTest {
         double cost = 2.0;
         when(mockEntity.getAlternateCost()).thenReturn(cost);
 
+        Unit mockUnit = mock(Unit.class);
+        when(mockCampaign.addNewUnit(eq(mockEntity),
+              eq(false),
+              eq(0),
+              eq(PartQuality.QUALITY_D),
+              eq(UnitAcquisitionType.PURCHASED))).thenReturn(mockUnit);
+
         // ...then we should be able to buy the infantry...
         assertTrue(quartermaster.buyUnit(mockEntity, 0));
 
         // ...and the new infantry should be added to the campaign...
-        verify(mockCampaign, times(1)).addNewUnit(eq(mockEntity), eq(false), eq(0), eq(PartQuality.QUALITY_D));
+        verify(mockCampaign, times(1)).addNewUnit(eq(mockEntity),
+              eq(false),
+              eq(0),
+              eq(PartQuality.QUALITY_D),
+              eq(UnitAcquisitionType.PURCHASED));
 
         // ...and it should cost the right amount.
         assertEquals(Money.of(cost), captor.getValue());
@@ -379,14 +429,17 @@ public class QuartermasterTest {
         Campaign mockCampaign = mockCampaign();
         CampaignOptions mockOptions = mock(CampaignOptions.class);
         when(mockCampaign.getCampaignOptions()).thenReturn(mockOptions);
+        lenient().when(mockOptions.get(CampaignOption.INNER_SPHERE_UNIT_PRICE_MULTIPLIER)).thenReturn(0.0);
+        lenient().when(mockOptions.get(CampaignOption.USE_AMMO_BY_TYPE)).thenReturn(false);
+        lenient().when(mockOptions.get(CampaignOption.USE_RANDOM_UNIT_QUALITIES)).thenReturn(false);
         ForceQuartermaster quartermaster = new ForceQuartermaster(mockCampaign);
 
         // If we pay for units...
-        when(mockOptions.isPayForUnits()).thenReturn(true);
+        when(mockOptions.get(CampaignOption.PAY_FOR_UNITS)).thenReturn(true);
 
         // ...and clan units cost 2x...
         double clanMultiplier = 2.0;
-        when(mockOptions.getClanUnitPriceMultiplier()).thenReturn(clanMultiplier);
+        when(mockOptions.get(CampaignOption.CLAN_UNIT_PRICE_MULTIPLIER)).thenReturn(clanMultiplier);
 
         // ...and can afford a unit...
         Finances mockFinances = mock(Finances.class);
@@ -401,11 +454,22 @@ public class QuartermasterTest {
         double cost = 1.0;
         doReturn(cost).when(mockEntity).getCost(anyBoolean());
 
+        Unit mockUnit = mock(Unit.class);
+        when(mockCampaign.addNewUnit(eq(mockEntity),
+              eq(false),
+              eq(0),
+              eq(PartQuality.QUALITY_D),
+              eq(UnitAcquisitionType.PURCHASED))).thenReturn(mockUnit);
+
         // ...then we should be able to buy the unit...
         assertTrue(quartermaster.buyUnit(mockEntity, 0));
 
         // ...and the new unit should be added to the campaign...
-        verify(mockCampaign, times(1)).addNewUnit(eq(mockEntity), eq(false), eq(0), eq(PartQuality.QUALITY_D));
+        verify(mockCampaign, times(1)).addNewUnit(eq(mockEntity),
+              eq(false),
+              eq(0),
+              eq(PartQuality.QUALITY_D),
+              eq(UnitAcquisitionType.PURCHASED));
 
         // ...and it should cost the right amount.
         assertEquals(Money.of(clanMultiplier * cost), captor.getValue());
@@ -416,14 +480,17 @@ public class QuartermasterTest {
         Campaign mockCampaign = mockCampaign();
         CampaignOptions mockOptions = mock(CampaignOptions.class);
         when(mockCampaign.getCampaignOptions()).thenReturn(mockOptions);
+        lenient().when(mockOptions.get(CampaignOption.INNER_SPHERE_UNIT_PRICE_MULTIPLIER)).thenReturn(0.0);
+        lenient().when(mockOptions.get(CampaignOption.USE_AMMO_BY_TYPE)).thenReturn(false);
+        lenient().when(mockOptions.get(CampaignOption.USE_RANDOM_UNIT_QUALITIES)).thenReturn(false);
         ForceQuartermaster quartermaster = new ForceQuartermaster(mockCampaign);
 
         // If we pay for units...
-        when(mockOptions.isPayForUnits()).thenReturn(true);
+        when(mockOptions.get(CampaignOption.PAY_FOR_UNITS)).thenReturn(true);
 
         // ...and clan units cost 2x...
         double clanMultiplier = 2.0;
-        when(mockOptions.getClanUnitPriceMultiplier()).thenReturn(clanMultiplier);
+        when(mockOptions.get(CampaignOption.CLAN_UNIT_PRICE_MULTIPLIER)).thenReturn(clanMultiplier);
 
         // ...and can afford a unit...
         Finances mockFinances = mock(Finances.class);
@@ -438,11 +505,22 @@ public class QuartermasterTest {
         double cost = 1.0;
         when(mockEntity.getAlternateCost()).thenReturn(cost);
 
+        Unit mockUnit = mock(Unit.class);
+        when(mockCampaign.addNewUnit(eq(mockEntity),
+              eq(false),
+              eq(0),
+              eq(PartQuality.QUALITY_D),
+              eq(UnitAcquisitionType.PURCHASED))).thenReturn(mockUnit);
+
         // ...then we should be able to buy the clan infantry...
         assertTrue(quartermaster.buyUnit(mockEntity, 0));
 
         // ...and the new clan infantry should be added to the campaign...
-        verify(mockCampaign, times(1)).addNewUnit(eq(mockEntity), eq(false), eq(0), eq(PartQuality.QUALITY_D));
+        verify(mockCampaign, times(1)).addNewUnit(eq(mockEntity),
+              eq(false),
+              eq(0),
+              eq(PartQuality.QUALITY_D),
+              eq(UnitAcquisitionType.PURCHASED));
 
         // ...and it should cost the right amount.
         assertEquals(Money.of(clanMultiplier * cost), captor.getValue());
@@ -491,12 +569,15 @@ public class QuartermasterTest {
         Campaign mockCampaign = mockCampaign();
         CampaignOptions mockOptions = mock(CampaignOptions.class);
         when(mockCampaign.getCampaignOptions()).thenReturn(mockOptions);
+        lenient().when(mockOptions.get(CampaignOption.INNER_SPHERE_UNIT_PRICE_MULTIPLIER)).thenReturn(0.0);
+        lenient().when(mockOptions.get(CampaignOption.USE_AMMO_BY_TYPE)).thenReturn(false);
+        lenient().when(mockOptions.get(CampaignOption.USE_RANDOM_UNIT_QUALITIES)).thenReturn(false);
         LocalWarehouse mockWarehouse = mock(LocalWarehouse.class);
         when(mockCampaign.getPlayerForce().getWarehouse()).thenReturn(mockWarehouse);
         ForceQuartermaster quartermaster = new ForceQuartermaster(mockCampaign);
 
         // If we don't pay for parts...
-        when(mockOptions.isPayForParts()).thenReturn(false);
+        when(mockOptions.get(CampaignOption.PAY_FOR_PARTS)).thenReturn(false);
 
         Part mockPart = mock(Part.class);
 
@@ -516,12 +597,15 @@ public class QuartermasterTest {
         Campaign mockCampaign = mockCampaign();
         CampaignOptions mockOptions = mock(CampaignOptions.class);
         when(mockCampaign.getCampaignOptions()).thenReturn(mockOptions);
+        lenient().when(mockOptions.get(CampaignOption.INNER_SPHERE_UNIT_PRICE_MULTIPLIER)).thenReturn(0.0);
+        lenient().when(mockOptions.get(CampaignOption.USE_AMMO_BY_TYPE)).thenReturn(false);
+        lenient().when(mockOptions.get(CampaignOption.USE_RANDOM_UNIT_QUALITIES)).thenReturn(false);
         LocalWarehouse mockWarehouse = mock(LocalWarehouse.class);
         when(mockCampaign.getPlayerForce().getWarehouse()).thenReturn(mockWarehouse);
         ForceQuartermaster quartermaster = new ForceQuartermaster(mockCampaign);
 
         // If we don't pay for parts...
-        when(mockOptions.isPayForParts()).thenReturn(false);
+        when(mockOptions.get(CampaignOption.PAY_FOR_PARTS)).thenReturn(false);
 
         Refit mockRefit = mock(Refit.class);
 
@@ -539,6 +623,9 @@ public class QuartermasterTest {
         Campaign mockCampaign = mockCampaign();
         CampaignOptions mockOptions = mock(CampaignOptions.class);
         when(mockCampaign.getCampaignOptions()).thenReturn(mockOptions);
+        lenient().when(mockOptions.get(CampaignOption.INNER_SPHERE_UNIT_PRICE_MULTIPLIER)).thenReturn(0.0);
+        lenient().when(mockOptions.get(CampaignOption.USE_AMMO_BY_TYPE)).thenReturn(false);
+        lenient().when(mockOptions.get(CampaignOption.USE_RANDOM_UNIT_QUALITIES)).thenReturn(false);
         LocalWarehouse mockWarehouse = mock(LocalWarehouse.class);
         when(mockCampaign.getPlayerForce().getWarehouse()).thenReturn(mockWarehouse);
         Finances mockFinances = mock(Finances.class);
@@ -546,7 +633,7 @@ public class QuartermasterTest {
         ForceQuartermaster quartermaster = new ForceQuartermaster(mockCampaign);
 
         // If we pay for parts...
-        when(mockOptions.isPayForParts()).thenReturn(true);
+        when(mockOptions.get(CampaignOption.PAY_FOR_PARTS)).thenReturn(true);
 
         Part mockPart = mock(Part.class);
         Money cost = Money.of(42.0);
@@ -567,6 +654,9 @@ public class QuartermasterTest {
         Campaign mockCampaign = mockCampaign();
         CampaignOptions mockOptions = mock(CampaignOptions.class);
         when(mockCampaign.getCampaignOptions()).thenReturn(mockOptions);
+        lenient().when(mockOptions.get(CampaignOption.INNER_SPHERE_UNIT_PRICE_MULTIPLIER)).thenReturn(0.0);
+        lenient().when(mockOptions.get(CampaignOption.USE_AMMO_BY_TYPE)).thenReturn(false);
+        lenient().when(mockOptions.get(CampaignOption.USE_RANDOM_UNIT_QUALITIES)).thenReturn(false);
         LocalWarehouse mockWarehouse = mock(LocalWarehouse.class);
         when(mockCampaign.getPlayerForce().getWarehouse()).thenReturn(mockWarehouse);
         Finances mockFinances = mock(Finances.class);
@@ -574,7 +664,7 @@ public class QuartermasterTest {
         ForceQuartermaster quartermaster = new ForceQuartermaster(mockCampaign);
 
         // If we pay for parts...
-        when(mockOptions.isPayForParts()).thenReturn(true);
+        when(mockOptions.get(CampaignOption.PAY_FOR_PARTS)).thenReturn(true);
 
         Refit mockRefit = mock(Refit.class);
         Money cost = Money.of(42.0);
@@ -595,6 +685,9 @@ public class QuartermasterTest {
         Campaign mockCampaign = mockCampaign();
         CampaignOptions mockOptions = mock(CampaignOptions.class);
         when(mockCampaign.getCampaignOptions()).thenReturn(mockOptions);
+        lenient().when(mockOptions.get(CampaignOption.INNER_SPHERE_UNIT_PRICE_MULTIPLIER)).thenReturn(0.0);
+        lenient().when(mockOptions.get(CampaignOption.USE_AMMO_BY_TYPE)).thenReturn(false);
+        lenient().when(mockOptions.get(CampaignOption.USE_RANDOM_UNIT_QUALITIES)).thenReturn(false);
         LocalWarehouse mockWarehouse = mock(LocalWarehouse.class);
         when(mockCampaign.getPlayerForce().getWarehouse()).thenReturn(mockWarehouse);
         Finances mockFinances = mock(Finances.class);
@@ -602,7 +695,7 @@ public class QuartermasterTest {
         ForceQuartermaster quartermaster = new ForceQuartermaster(mockCampaign);
 
         // If we pay for parts...
-        when(mockOptions.isPayForParts()).thenReturn(true);
+        when(mockOptions.get(CampaignOption.PAY_FOR_PARTS)).thenReturn(true);
 
         Part mockPart = mock(Part.class);
         Money cost = Money.of(1.0);
@@ -624,6 +717,9 @@ public class QuartermasterTest {
         Campaign mockCampaign = mockCampaign();
         CampaignOptions mockOptions = mock(CampaignOptions.class);
         when(mockCampaign.getCampaignOptions()).thenReturn(mockOptions);
+        lenient().when(mockOptions.get(CampaignOption.INNER_SPHERE_UNIT_PRICE_MULTIPLIER)).thenReturn(0.0);
+        lenient().when(mockOptions.get(CampaignOption.USE_AMMO_BY_TYPE)).thenReturn(false);
+        lenient().when(mockOptions.get(CampaignOption.USE_RANDOM_UNIT_QUALITIES)).thenReturn(false);
         LocalWarehouse mockWarehouse = mock(LocalWarehouse.class);
         when(mockCampaign.getPlayerForce().getWarehouse()).thenReturn(mockWarehouse);
         Finances mockFinances = mock(Finances.class);
@@ -631,7 +727,7 @@ public class QuartermasterTest {
         ForceQuartermaster quartermaster = new ForceQuartermaster(mockCampaign);
 
         // If we pay for parts...
-        when(mockOptions.isPayForParts()).thenReturn(true);
+        when(mockOptions.get(CampaignOption.PAY_FOR_PARTS)).thenReturn(true);
 
         Part mockPart = mock(Part.class);
         Money cost = Money.of(1.0);
@@ -654,6 +750,9 @@ public class QuartermasterTest {
         Campaign mockCampaign = mockCampaign();
         CampaignOptions mockOptions = mock(CampaignOptions.class);
         when(mockCampaign.getCampaignOptions()).thenReturn(mockOptions);
+        lenient().when(mockOptions.get(CampaignOption.INNER_SPHERE_UNIT_PRICE_MULTIPLIER)).thenReturn(0.0);
+        lenient().when(mockOptions.get(CampaignOption.USE_AMMO_BY_TYPE)).thenReturn(false);
+        lenient().when(mockOptions.get(CampaignOption.USE_RANDOM_UNIT_QUALITIES)).thenReturn(false);
         LocalWarehouse mockWarehouse = mock(LocalWarehouse.class);
         when(mockCampaign.getPlayerForce().getWarehouse()).thenReturn(mockWarehouse);
         Finances mockFinances = mock(Finances.class);
@@ -661,7 +760,7 @@ public class QuartermasterTest {
         ForceQuartermaster quartermaster = new ForceQuartermaster(mockCampaign);
 
         // If we pay for parts...
-        when(mockOptions.isPayForParts()).thenReturn(true);
+        when(mockOptions.get(CampaignOption.PAY_FOR_PARTS)).thenReturn(true);
 
         Refit mockRefit = mock(Refit.class);
         Money cost = Money.of(1.0);
@@ -683,6 +782,9 @@ public class QuartermasterTest {
         Campaign mockCampaign = mockCampaign();
         CampaignOptions mockOptions = mock(CampaignOptions.class);
         when(mockCampaign.getCampaignOptions()).thenReturn(mockOptions);
+        lenient().when(mockOptions.get(CampaignOption.INNER_SPHERE_UNIT_PRICE_MULTIPLIER)).thenReturn(0.0);
+        lenient().when(mockOptions.get(CampaignOption.USE_AMMO_BY_TYPE)).thenReturn(false);
+        lenient().when(mockOptions.get(CampaignOption.USE_RANDOM_UNIT_QUALITIES)).thenReturn(false);
         LocalWarehouse mockWarehouse = mock(LocalWarehouse.class);
         when(mockCampaign.getPlayerForce().getWarehouse()).thenReturn(mockWarehouse);
         Finances mockFinances = mock(Finances.class);
@@ -690,7 +792,7 @@ public class QuartermasterTest {
         ForceQuartermaster quartermaster = new ForceQuartermaster(mockCampaign);
 
         // If we pay for parts...
-        when(mockOptions.isPayForParts()).thenReturn(true);
+        when(mockOptions.get(CampaignOption.PAY_FOR_PARTS)).thenReturn(true);
 
         Refit mockRefit = mock(Refit.class);
         Money cost = Money.of(1.0);
@@ -713,6 +815,9 @@ public class QuartermasterTest {
         Campaign mockCampaign = mockCampaign();
         CampaignOptions mockOptions = mock(CampaignOptions.class);
         when(mockCampaign.getCampaignOptions()).thenReturn(mockOptions);
+        lenient().when(mockOptions.get(CampaignOption.INNER_SPHERE_UNIT_PRICE_MULTIPLIER)).thenReturn(0.0);
+        lenient().when(mockOptions.get(CampaignOption.USE_AMMO_BY_TYPE)).thenReturn(false);
+        lenient().when(mockOptions.get(CampaignOption.USE_RANDOM_UNIT_QUALITIES)).thenReturn(false);
         LocalWarehouse mockWarehouse = mock(LocalWarehouse.class);
         when(mockCampaign.getPlayerForce().getWarehouse()).thenReturn(mockWarehouse);
         Finances mockFinances = mock(Finances.class);
@@ -720,7 +825,7 @@ public class QuartermasterTest {
         ForceQuartermaster quartermaster = new ForceQuartermaster(mockCampaign);
 
         // If we pay for parts...
-        when(mockOptions.isPayForParts()).thenReturn(true);
+        when(mockOptions.get(CampaignOption.PAY_FOR_PARTS)).thenReturn(true);
 
         Part mockPart = mock(Part.class);
         Money cost = Money.of(42.0);
@@ -741,6 +846,9 @@ public class QuartermasterTest {
         Campaign mockCampaign = mockCampaign();
         CampaignOptions mockOptions = mock(CampaignOptions.class);
         when(mockCampaign.getCampaignOptions()).thenReturn(mockOptions);
+        lenient().when(mockOptions.get(CampaignOption.INNER_SPHERE_UNIT_PRICE_MULTIPLIER)).thenReturn(0.0);
+        lenient().when(mockOptions.get(CampaignOption.USE_AMMO_BY_TYPE)).thenReturn(false);
+        lenient().when(mockOptions.get(CampaignOption.USE_RANDOM_UNIT_QUALITIES)).thenReturn(false);
         LocalWarehouse mockWarehouse = mock(LocalWarehouse.class);
         when(mockCampaign.getPlayerForce().getWarehouse()).thenReturn(mockWarehouse);
         Finances mockFinances = mock(Finances.class);
@@ -748,7 +856,7 @@ public class QuartermasterTest {
         ForceQuartermaster quartermaster = new ForceQuartermaster(mockCampaign);
 
         // If we pay for parts...
-        when(mockOptions.isPayForParts()).thenReturn(true);
+        when(mockOptions.get(CampaignOption.PAY_FOR_PARTS)).thenReturn(true);
 
         Refit mockRefit = mock(Refit.class);
         Money cost = Money.of(42.0);
@@ -769,6 +877,9 @@ public class QuartermasterTest {
         Campaign mockCampaign = mockCampaign();
         CampaignOptions mockOptions = mock(CampaignOptions.class);
         when(mockCampaign.getCampaignOptions()).thenReturn(mockOptions);
+        lenient().when(mockOptions.get(CampaignOption.INNER_SPHERE_UNIT_PRICE_MULTIPLIER)).thenReturn(0.0);
+        lenient().when(mockOptions.get(CampaignOption.USE_AMMO_BY_TYPE)).thenReturn(false);
+        lenient().when(mockOptions.get(CampaignOption.USE_RANDOM_UNIT_QUALITIES)).thenReturn(false);
         LocalWarehouse mockWarehouse = mock(LocalWarehouse.class);
         when(mockCampaign.getPlayerForce().getWarehouse()).thenReturn(mockWarehouse);
         Finances mockFinances = mock(Finances.class);
@@ -776,7 +887,7 @@ public class QuartermasterTest {
         ForceQuartermaster quartermaster = new ForceQuartermaster(mockCampaign);
 
         // If we don't pay for parts...
-        when(mockOptions.isPayForParts()).thenReturn(false);
+        when(mockOptions.get(CampaignOption.PAY_FOR_PARTS)).thenReturn(false);
 
         Part mockPart = mock(Part.class);
         Money cost = Money.of(42.0);
@@ -794,6 +905,9 @@ public class QuartermasterTest {
         Campaign mockCampaign = mockCampaign();
         CampaignOptions mockOptions = mock(CampaignOptions.class);
         when(mockCampaign.getCampaignOptions()).thenReturn(mockOptions);
+        lenient().when(mockOptions.get(CampaignOption.INNER_SPHERE_UNIT_PRICE_MULTIPLIER)).thenReturn(0.0);
+        lenient().when(mockOptions.get(CampaignOption.USE_AMMO_BY_TYPE)).thenReturn(false);
+        lenient().when(mockOptions.get(CampaignOption.USE_RANDOM_UNIT_QUALITIES)).thenReturn(false);
         LocalWarehouse mockWarehouse = mock(LocalWarehouse.class);
         when(mockCampaign.getPlayerForce().getWarehouse()).thenReturn(mockWarehouse);
         Finances mockFinances = mock(Finances.class);
@@ -801,7 +915,7 @@ public class QuartermasterTest {
         ForceQuartermaster quartermaster = new ForceQuartermaster(mockCampaign);
 
         // If we pay for parts...
-        when(mockOptions.isPayForParts()).thenReturn(true);
+        when(mockOptions.get(CampaignOption.PAY_FOR_PARTS)).thenReturn(true);
 
         Part mockPart = mock(Part.class);
         Money cost = Money.of(42.0);
@@ -819,6 +933,9 @@ public class QuartermasterTest {
         Campaign mockCampaign = mockCampaign();
         CampaignOptions mockOptions = mock(CampaignOptions.class);
         when(mockCampaign.getCampaignOptions()).thenReturn(mockOptions);
+        lenient().when(mockOptions.get(CampaignOption.INNER_SPHERE_UNIT_PRICE_MULTIPLIER)).thenReturn(0.0);
+        lenient().when(mockOptions.get(CampaignOption.USE_AMMO_BY_TYPE)).thenReturn(false);
+        lenient().when(mockOptions.get(CampaignOption.USE_RANDOM_UNIT_QUALITIES)).thenReturn(false);
         LocalWarehouse mockWarehouse = mock(LocalWarehouse.class);
         when(mockCampaign.getPlayerForce().getWarehouse()).thenReturn(mockWarehouse);
         Finances mockFinances = mock(Finances.class);
@@ -826,7 +943,7 @@ public class QuartermasterTest {
         ForceQuartermaster quartermaster = new ForceQuartermaster(mockCampaign);
 
         // If we pay for parts...
-        when(mockOptions.isPayForParts()).thenReturn(true);
+        when(mockOptions.get(CampaignOption.PAY_FOR_PARTS)).thenReturn(true);
 
         Part mockPart = mock(Part.class);
         Money cost = Money.of(42.0);
@@ -1592,13 +1709,16 @@ public class QuartermasterTest {
     @Test
     public void remotePartAddsPartFromPodAndCorrectOmniPod() {
         CampaignOptions mockCampaignOptions = mock(CampaignOptions.class);
-        when(mockCampaignOptions.getCommonPartPriceMultiplier()).thenReturn(1d);
-        when(mockCampaignOptions.getDamagedPartsValueMultiplier()).thenReturn(1d);
+        when(mockCampaignOptions.get(CampaignOption.COMMON_PART_PRICE_MULTIPLIER)).thenReturn(1d);
+        when(mockCampaignOptions.get(CampaignOption.DAMAGED_PARTS_VALUE_MULTIPLIER)).thenReturn(1d);
 
         LocalWarehouse mockWarehouse = mock(LocalWarehouse.class);
 
         Campaign mockCampaign = mockCampaign();
         when(mockCampaign.getCampaignOptions()).thenReturn(mockCampaignOptions);
+        lenient().when(mockCampaignOptions.get(CampaignOption.INNER_SPHERE_UNIT_PRICE_MULTIPLIER)).thenReturn(0.0);
+        lenient().when(mockCampaignOptions.get(CampaignOption.USE_AMMO_BY_TYPE)).thenReturn(false);
+        lenient().when(mockCampaignOptions.get(CampaignOption.USE_RANDOM_UNIT_QUALITIES)).thenReturn(false);
         when(mockCampaign.getPlayerForce().getWarehouse()).thenReturn(mockWarehouse);
 
         ForceQuartermaster quartermaster = new ForceQuartermaster(mockCampaign);
@@ -1791,6 +1911,9 @@ public class QuartermasterTest {
         Campaign mockCampaign = mockCampaign();
         CampaignOptions mockCampaignOptions = mock(CampaignOptions.class);
         when(mockCampaign.getCampaignOptions()).thenReturn(mockCampaignOptions);
+        lenient().when(mockCampaignOptions.get(CampaignOption.INNER_SPHERE_UNIT_PRICE_MULTIPLIER)).thenReturn(0.0);
+        lenient().when(mockCampaignOptions.get(CampaignOption.USE_AMMO_BY_TYPE)).thenReturn(false);
+        lenient().when(mockCampaignOptions.get(CampaignOption.USE_RANDOM_UNIT_QUALITIES)).thenReturn(false);
 
         // Set up an empty warehouse
         LocalWarehouse warehouse = new LocalWarehouse();
@@ -1828,6 +1951,9 @@ public class QuartermasterTest {
         Campaign mockCampaign = mockCampaign();
         CampaignOptions mockCampaignOptions = mock(CampaignOptions.class);
         when(mockCampaign.getCampaignOptions()).thenReturn(mockCampaignOptions);
+        lenient().when(mockCampaignOptions.get(CampaignOption.INNER_SPHERE_UNIT_PRICE_MULTIPLIER)).thenReturn(0.0);
+        lenient().when(mockCampaignOptions.get(CampaignOption.USE_AMMO_BY_TYPE)).thenReturn(false);
+        lenient().when(mockCampaignOptions.get(CampaignOption.USE_RANDOM_UNIT_QUALITIES)).thenReturn(false);
 
         AmmoType ammoType = getAmmoType("ISSRM4 Ammo");
 
@@ -1873,6 +1999,9 @@ public class QuartermasterTest {
         Campaign mockCampaign = mockCampaign();
         CampaignOptions mockCampaignOptions = mock(CampaignOptions.class);
         when(mockCampaign.getCampaignOptions()).thenReturn(mockCampaignOptions);
+        lenient().when(mockCampaignOptions.get(CampaignOption.INNER_SPHERE_UNIT_PRICE_MULTIPLIER)).thenReturn(0.0);
+        lenient().when(mockCampaignOptions.get(CampaignOption.USE_AMMO_BY_TYPE)).thenReturn(false);
+        lenient().when(mockCampaignOptions.get(CampaignOption.USE_RANDOM_UNIT_QUALITIES)).thenReturn(false);
 
         // Set up a warehouse with ammo in transit
         LocalWarehouse warehouse = new LocalWarehouse();
@@ -1919,6 +2048,9 @@ public class QuartermasterTest {
         Campaign mockCampaign = mockCampaign();
         CampaignOptions mockCampaignOptions = mock(CampaignOptions.class);
         when(mockCampaign.getCampaignOptions()).thenReturn(mockCampaignOptions);
+        lenient().when(mockCampaignOptions.get(CampaignOption.INNER_SPHERE_UNIT_PRICE_MULTIPLIER)).thenReturn(0.0);
+        lenient().when(mockCampaignOptions.get(CampaignOption.USE_AMMO_BY_TYPE)).thenReturn(false);
+        lenient().when(mockCampaignOptions.get(CampaignOption.USE_RANDOM_UNIT_QUALITIES)).thenReturn(false);
 
         AmmoType ammoType = getAmmoType("ISSRM4 Inferno Ammo");
 
@@ -1959,6 +2091,9 @@ public class QuartermasterTest {
         Campaign mockCampaign = mockCampaign();
         CampaignOptions mockCampaignOptions = mock(CampaignOptions.class);
         when(mockCampaign.getCampaignOptions()).thenReturn(mockCampaignOptions);
+        lenient().when(mockCampaignOptions.get(CampaignOption.INNER_SPHERE_UNIT_PRICE_MULTIPLIER)).thenReturn(0.0);
+        lenient().when(mockCampaignOptions.get(CampaignOption.USE_AMMO_BY_TYPE)).thenReturn(false);
+        lenient().when(mockCampaignOptions.get(CampaignOption.USE_RANDOM_UNIT_QUALITIES)).thenReturn(false);
 
         AmmoType ammoType = getAmmoType("ISSRM4 Inferno Ammo");
 
@@ -2005,6 +2140,9 @@ public class QuartermasterTest {
         Campaign mockCampaign = mockCampaign();
         CampaignOptions mockCampaignOptions = mock(CampaignOptions.class);
         when(mockCampaign.getCampaignOptions()).thenReturn(mockCampaignOptions);
+        lenient().when(mockCampaignOptions.get(CampaignOption.INNER_SPHERE_UNIT_PRICE_MULTIPLIER)).thenReturn(0.0);
+        lenient().when(mockCampaignOptions.get(CampaignOption.USE_AMMO_BY_TYPE)).thenReturn(false);
+        lenient().when(mockCampaignOptions.get(CampaignOption.USE_RANDOM_UNIT_QUALITIES)).thenReturn(false);
 
         AmmoType ammoType = getAmmoType("ISSRM4 Inferno Ammo");
 
@@ -2043,6 +2181,9 @@ public class QuartermasterTest {
         Campaign mockCampaign = mockCampaign();
         CampaignOptions mockCampaignOptions = mock(CampaignOptions.class);
         when(mockCampaign.getCampaignOptions()).thenReturn(mockCampaignOptions);
+        lenient().when(mockCampaignOptions.get(CampaignOption.INNER_SPHERE_UNIT_PRICE_MULTIPLIER)).thenReturn(0.0);
+        lenient().when(mockCampaignOptions.get(CampaignOption.USE_AMMO_BY_TYPE)).thenReturn(false);
+        lenient().when(mockCampaignOptions.get(CampaignOption.USE_RANDOM_UNIT_QUALITIES)).thenReturn(false);
 
         AmmoType ammoType = getAmmoType("ISSRM4 Inferno Ammo");
 
@@ -2081,6 +2222,9 @@ public class QuartermasterTest {
         Campaign mockCampaign = mockCampaign();
         CampaignOptions mockCampaignOptions = mock(CampaignOptions.class);
         when(mockCampaign.getCampaignOptions()).thenReturn(mockCampaignOptions);
+        lenient().when(mockCampaignOptions.get(CampaignOption.INNER_SPHERE_UNIT_PRICE_MULTIPLIER)).thenReturn(0.0);
+        lenient().when(mockCampaignOptions.get(CampaignOption.USE_AMMO_BY_TYPE)).thenReturn(false);
+        lenient().when(mockCampaignOptions.get(CampaignOption.USE_RANDOM_UNIT_QUALITIES)).thenReturn(false);
 
         // Set up an empty warehouse
         LocalWarehouse warehouse = new LocalWarehouse();
@@ -2106,6 +2250,9 @@ public class QuartermasterTest {
         Campaign mockCampaign = mockCampaign();
         CampaignOptions mockCampaignOptions = mock(CampaignOptions.class);
         when(mockCampaign.getCampaignOptions()).thenReturn(mockCampaignOptions);
+        lenient().when(mockCampaignOptions.get(CampaignOption.INNER_SPHERE_UNIT_PRICE_MULTIPLIER)).thenReturn(0.0);
+        lenient().when(mockCampaignOptions.get(CampaignOption.USE_AMMO_BY_TYPE)).thenReturn(false);
+        lenient().when(mockCampaignOptions.get(CampaignOption.USE_RANDOM_UNIT_QUALITIES)).thenReturn(false);
 
         AmmoType ammoType = getAmmoType("ISSRM4 Ammo");
 
@@ -2148,6 +2295,9 @@ public class QuartermasterTest {
         Campaign mockCampaign = mockCampaign();
         CampaignOptions mockCampaignOptions = mock(CampaignOptions.class);
         when(mockCampaign.getCampaignOptions()).thenReturn(mockCampaignOptions);
+        lenient().when(mockCampaignOptions.get(CampaignOption.INNER_SPHERE_UNIT_PRICE_MULTIPLIER)).thenReturn(0.0);
+        lenient().when(mockCampaignOptions.get(CampaignOption.USE_AMMO_BY_TYPE)).thenReturn(false);
+        lenient().when(mockCampaignOptions.get(CampaignOption.USE_RANDOM_UNIT_QUALITIES)).thenReturn(false);
 
         AmmoType ammoType = getAmmoType("ISSRM4 Inferno Ammo");
 
@@ -2190,6 +2340,9 @@ public class QuartermasterTest {
         Campaign mockCampaign = mockCampaign();
         CampaignOptions mockCampaignOptions = mock(CampaignOptions.class);
         when(mockCampaign.getCampaignOptions()).thenReturn(mockCampaignOptions);
+        lenient().when(mockCampaignOptions.get(CampaignOption.INNER_SPHERE_UNIT_PRICE_MULTIPLIER)).thenReturn(0.0);
+        lenient().when(mockCampaignOptions.get(CampaignOption.USE_AMMO_BY_TYPE)).thenReturn(false);
+        lenient().when(mockCampaignOptions.get(CampaignOption.USE_RANDOM_UNIT_QUALITIES)).thenReturn(false);
 
         AmmoType ammoType = getAmmoType("ISSRM4 Inferno Ammo");
 
@@ -2228,6 +2381,9 @@ public class QuartermasterTest {
         Campaign mockCampaign = mockCampaign();
         CampaignOptions mockCampaignOptions = mock(CampaignOptions.class);
         when(mockCampaign.getCampaignOptions()).thenReturn(mockCampaignOptions);
+        lenient().when(mockCampaignOptions.get(CampaignOption.INNER_SPHERE_UNIT_PRICE_MULTIPLIER)).thenReturn(0.0);
+        lenient().when(mockCampaignOptions.get(CampaignOption.USE_AMMO_BY_TYPE)).thenReturn(false);
+        lenient().when(mockCampaignOptions.get(CampaignOption.USE_RANDOM_UNIT_QUALITIES)).thenReturn(false);
 
         AmmoType ammoType = getAmmoType("ISSRM4 Inferno Ammo");
 
@@ -2257,6 +2413,9 @@ public class QuartermasterTest {
         Campaign mockCampaign = mockCampaign();
         CampaignOptions mockCampaignOptions = mock(CampaignOptions.class);
         when(mockCampaign.getCampaignOptions()).thenReturn(mockCampaignOptions);
+        lenient().when(mockCampaignOptions.get(CampaignOption.INNER_SPHERE_UNIT_PRICE_MULTIPLIER)).thenReturn(0.0);
+        lenient().when(mockCampaignOptions.get(CampaignOption.USE_AMMO_BY_TYPE)).thenReturn(false);
+        lenient().when(mockCampaignOptions.get(CampaignOption.USE_RANDOM_UNIT_QUALITIES)).thenReturn(false);
 
         AmmoType ammoType = getAmmoType("ISSRM4 Inferno Ammo");
 
@@ -2291,8 +2450,10 @@ public class QuartermasterTest {
     public void removeAmmoWayMoreThanAvailableButCompatibleAmmoExists() {
         Campaign mockCampaign = mockCampaign();
         CampaignOptions mockCampaignOptions = mock(CampaignOptions.class);
-        when(mockCampaignOptions.isUseAmmoByType()).thenReturn(true);
+        when(mockCampaignOptions.get(CampaignOption.USE_AMMO_BY_TYPE)).thenReturn(true);
         when(mockCampaign.getCampaignOptions()).thenReturn(mockCampaignOptions);
+        lenient().when(mockCampaignOptions.get(CampaignOption.INNER_SPHERE_UNIT_PRICE_MULTIPLIER)).thenReturn(0.0);
+        lenient().when(mockCampaignOptions.get(CampaignOption.USE_RANDOM_UNIT_QUALITIES)).thenReturn(false);
 
         AmmoType ammoType = getAmmoType("ISSRM4 Inferno Ammo");
         AmmoType compatibleAmmoType = getAmmoType("ISSRM2 Inferno Ammo");
@@ -2351,8 +2512,10 @@ public class QuartermasterTest {
     public void removeAmmoWhenExactlyEnoughCompatibleAmmoExists() {
         Campaign mockCampaign = mockCampaign();
         CampaignOptions mockCampaignOptions = mock(CampaignOptions.class);
-        when(mockCampaignOptions.isUseAmmoByType()).thenReturn(true);
+        when(mockCampaignOptions.get(CampaignOption.USE_AMMO_BY_TYPE)).thenReturn(true);
         when(mockCampaign.getCampaignOptions()).thenReturn(mockCampaignOptions);
+        lenient().when(mockCampaignOptions.get(CampaignOption.INNER_SPHERE_UNIT_PRICE_MULTIPLIER)).thenReturn(0.0);
+        lenient().when(mockCampaignOptions.get(CampaignOption.USE_RANDOM_UNIT_QUALITIES)).thenReturn(false);
 
         AmmoType ammoType = getAmmoType("ISSRM4 Inferno Ammo");
         AmmoType compatibleAmmoType = getAmmoType("ISSRM2 Inferno Ammo");
@@ -2390,8 +2553,10 @@ public class QuartermasterTest {
     public void removeAmmoWhenExactlyEnoughCompatibleAmmoExists2() {
         Campaign mockCampaign = mockCampaign();
         CampaignOptions mockCampaignOptions = mock(CampaignOptions.class);
-        when(mockCampaignOptions.isUseAmmoByType()).thenReturn(true);
+        when(mockCampaignOptions.get(CampaignOption.USE_AMMO_BY_TYPE)).thenReturn(true);
         when(mockCampaign.getCampaignOptions()).thenReturn(mockCampaignOptions);
+        lenient().when(mockCampaignOptions.get(CampaignOption.INNER_SPHERE_UNIT_PRICE_MULTIPLIER)).thenReturn(0.0);
+        lenient().when(mockCampaignOptions.get(CampaignOption.USE_RANDOM_UNIT_QUALITIES)).thenReturn(false);
 
         AmmoType ammoType = getAmmoType("ISLRM5 Ammo");
         AmmoType compatibleAmmoType = getAmmoType("ISLRM20 Ammo");
@@ -2429,8 +2594,10 @@ public class QuartermasterTest {
     public void removeAmmoWayMoreThanAvailableButCompatibleAndIncompatibleAmmoExists() {
         Campaign mockCampaign = mockCampaign();
         CampaignOptions mockCampaignOptions = mock(CampaignOptions.class);
-        when(mockCampaignOptions.isUseAmmoByType()).thenReturn(true);
+        when(mockCampaignOptions.get(CampaignOption.USE_AMMO_BY_TYPE)).thenReturn(true);
         when(mockCampaign.getCampaignOptions()).thenReturn(mockCampaignOptions);
+        lenient().when(mockCampaignOptions.get(CampaignOption.INNER_SPHERE_UNIT_PRICE_MULTIPLIER)).thenReturn(0.0);
+        lenient().when(mockCampaignOptions.get(CampaignOption.USE_RANDOM_UNIT_QUALITIES)).thenReturn(false);
 
         AmmoType ammoType = getAmmoType("ISSRM4 Inferno Ammo");
         AmmoType compatibleAmmoType = getAmmoType("ISSRM2 Inferno Ammo");
@@ -2495,8 +2662,10 @@ public class QuartermasterTest {
     public void removeAmmoWayMoreThanAvailableButNotEnoughCompatibleAmmoExists() {
         Campaign mockCampaign = mockCampaign();
         CampaignOptions mockCampaignOptions = mock(CampaignOptions.class);
-        when(mockCampaignOptions.isUseAmmoByType()).thenReturn(true);
+        when(mockCampaignOptions.get(CampaignOption.USE_AMMO_BY_TYPE)).thenReturn(true);
         when(mockCampaign.getCampaignOptions()).thenReturn(mockCampaignOptions);
+        lenient().when(mockCampaignOptions.get(CampaignOption.INNER_SPHERE_UNIT_PRICE_MULTIPLIER)).thenReturn(0.0);
+        lenient().when(mockCampaignOptions.get(CampaignOption.USE_RANDOM_UNIT_QUALITIES)).thenReturn(false);
 
         AmmoType ammoType = getAmmoType("ISSRM4 Inferno Ammo");
         AmmoType compatibleAmmoType = getAmmoType("ISSRM2 Inferno Ammo");
@@ -2547,8 +2716,10 @@ public class QuartermasterTest {
     public void removeAmmoWhenEnoughCompatibleAmmoExists() {
         Campaign mockCampaign = mockCampaign();
         CampaignOptions mockCampaignOptions = mock(CampaignOptions.class);
-        when(mockCampaignOptions.isUseAmmoByType()).thenReturn(true);
+        when(mockCampaignOptions.get(CampaignOption.USE_AMMO_BY_TYPE)).thenReturn(true);
         when(mockCampaign.getCampaignOptions()).thenReturn(mockCampaignOptions);
+        lenient().when(mockCampaignOptions.get(CampaignOption.INNER_SPHERE_UNIT_PRICE_MULTIPLIER)).thenReturn(0.0);
+        lenient().when(mockCampaignOptions.get(CampaignOption.USE_RANDOM_UNIT_QUALITIES)).thenReturn(false);
 
         AmmoType ammoType = getAmmoType("ISLRM5 Ammo");
         AmmoType compatibleAmmoType = getAmmoType("ISLRM20 Ammo");
@@ -2589,8 +2760,10 @@ public class QuartermasterTest {
     public void removeAmmoWhenEnoughCompatibleAmmoExists2() {
         Campaign mockCampaign = mockCampaign();
         CampaignOptions mockCampaignOptions = mock(CampaignOptions.class);
-        when(mockCampaignOptions.isUseAmmoByType()).thenReturn(true);
+        when(mockCampaignOptions.get(CampaignOption.USE_AMMO_BY_TYPE)).thenReturn(true);
         when(mockCampaign.getCampaignOptions()).thenReturn(mockCampaignOptions);
+        lenient().when(mockCampaignOptions.get(CampaignOption.INNER_SPHERE_UNIT_PRICE_MULTIPLIER)).thenReturn(0.0);
+        lenient().when(mockCampaignOptions.get(CampaignOption.USE_RANDOM_UNIT_QUALITIES)).thenReturn(false);
 
         AmmoType ammoType = getAmmoType("ISLRM20 Ammo");
         AmmoType compatibleAmmoType = getAmmoType("ISLRM5 Ammo");
@@ -2815,6 +2988,9 @@ public class QuartermasterTest {
         Campaign mockCampaign = mockCampaign();
         CampaignOptions mockCampaignOptions = mock(CampaignOptions.class);
         when(mockCampaign.getCampaignOptions()).thenReturn(mockCampaignOptions);
+        lenient().when(mockCampaignOptions.get(CampaignOption.INNER_SPHERE_UNIT_PRICE_MULTIPLIER)).thenReturn(0.0);
+        lenient().when(mockCampaignOptions.get(CampaignOption.USE_AMMO_BY_TYPE)).thenReturn(false);
+        lenient().when(mockCampaignOptions.get(CampaignOption.USE_RANDOM_UNIT_QUALITIES)).thenReturn(false);
 
         // Set up an empty warehouse
         LocalWarehouse warehouse = new LocalWarehouse();
@@ -2841,6 +3017,9 @@ public class QuartermasterTest {
         Campaign mockCampaign = mockCampaign();
         CampaignOptions mockCampaignOptions = mock(CampaignOptions.class);
         when(mockCampaign.getCampaignOptions()).thenReturn(mockCampaignOptions);
+        lenient().when(mockCampaignOptions.get(CampaignOption.INNER_SPHERE_UNIT_PRICE_MULTIPLIER)).thenReturn(0.0);
+        lenient().when(mockCampaignOptions.get(CampaignOption.USE_AMMO_BY_TYPE)).thenReturn(false);
+        lenient().when(mockCampaignOptions.get(CampaignOption.USE_RANDOM_UNIT_QUALITIES)).thenReturn(false);
 
         AmmoType ammoType = getAmmoType(EquipmentTypeLookup.INFANTRY_AMMO);
         InfantryWeapon weaponType = getInfantryWeapon(EquipmentTypeLookup.INFANTRY_ASSAULT_RIFLE);
@@ -2885,6 +3064,9 @@ public class QuartermasterTest {
         Campaign mockCampaign = mockCampaign();
         CampaignOptions mockCampaignOptions = mock(CampaignOptions.class);
         when(mockCampaign.getCampaignOptions()).thenReturn(mockCampaignOptions);
+        lenient().when(mockCampaignOptions.get(CampaignOption.INNER_SPHERE_UNIT_PRICE_MULTIPLIER)).thenReturn(0.0);
+        lenient().when(mockCampaignOptions.get(CampaignOption.USE_AMMO_BY_TYPE)).thenReturn(false);
+        lenient().when(mockCampaignOptions.get(CampaignOption.USE_RANDOM_UNIT_QUALITIES)).thenReturn(false);
 
         AmmoType ammoType = getAmmoType(EquipmentTypeLookup.INFANTRY_INFERNO_AMMO);
         InfantryWeapon weaponType = getInfantryWeapon(EquipmentTypeLookup.INFANTRY_ASSAULT_RIFLE);
@@ -2928,6 +3110,9 @@ public class QuartermasterTest {
         Campaign mockCampaign = mockCampaign();
         CampaignOptions mockCampaignOptions = mock(CampaignOptions.class);
         when(mockCampaign.getCampaignOptions()).thenReturn(mockCampaignOptions);
+        lenient().when(mockCampaignOptions.get(CampaignOption.INNER_SPHERE_UNIT_PRICE_MULTIPLIER)).thenReturn(0.0);
+        lenient().when(mockCampaignOptions.get(CampaignOption.USE_AMMO_BY_TYPE)).thenReturn(false);
+        lenient().when(mockCampaignOptions.get(CampaignOption.USE_RANDOM_UNIT_QUALITIES)).thenReturn(false);
 
         AmmoType ammoType = getAmmoType(EquipmentTypeLookup.INFANTRY_INFERNO_AMMO);
         InfantryWeapon weaponType = getInfantryWeapon(EquipmentTypeLookup.INFANTRY_ASSAULT_RIFLE);
@@ -2958,6 +3143,9 @@ public class QuartermasterTest {
         Campaign mockCampaign = mockCampaign();
         CampaignOptions mockCampaignOptions = mock(CampaignOptions.class);
         when(mockCampaign.getCampaignOptions()).thenReturn(mockCampaignOptions);
+        lenient().when(mockCampaignOptions.get(CampaignOption.INNER_SPHERE_UNIT_PRICE_MULTIPLIER)).thenReturn(0.0);
+        lenient().when(mockCampaignOptions.get(CampaignOption.USE_AMMO_BY_TYPE)).thenReturn(false);
+        lenient().when(mockCampaignOptions.get(CampaignOption.USE_RANDOM_UNIT_QUALITIES)).thenReturn(false);
 
         AmmoType ammoType = getAmmoType(EquipmentTypeLookup.INFANTRY_INFERNO_AMMO);
         InfantryWeapon weaponType = getInfantryWeapon(EquipmentTypeLookup.INFANTRY_ASSAULT_RIFLE);
@@ -3079,14 +3267,17 @@ public class QuartermasterTest {
     }
 
     /**
-     * Regression test for GitHub #7414: removeAmmo should clean up 0-shot AmmoStorage entries
-     * rather than leaving them in the warehouse where they block future ammo lookups.
+     * Regression test for GitHub #7414: removeAmmo should clean up 0-shot AmmoStorage entries rather than leaving them
+     * in the warehouse where they block future ammo lookups.
      */
     @Test
     public void removeAmmoCleanUpZeroShotAmmoStorage() {
         Campaign mockCampaign = mockCampaign();
         CampaignOptions mockCampaignOptions = mock(CampaignOptions.class);
         when(mockCampaign.getCampaignOptions()).thenReturn(mockCampaignOptions);
+        lenient().when(mockCampaignOptions.get(CampaignOption.INNER_SPHERE_UNIT_PRICE_MULTIPLIER)).thenReturn(0.0);
+        lenient().when(mockCampaignOptions.get(CampaignOption.USE_AMMO_BY_TYPE)).thenReturn(false);
+        lenient().when(mockCampaignOptions.get(CampaignOption.USE_RANDOM_UNIT_QUALITIES)).thenReturn(false);
 
         AmmoType ammoType = getAmmoType("ISSRM4 Inferno Ammo");
 

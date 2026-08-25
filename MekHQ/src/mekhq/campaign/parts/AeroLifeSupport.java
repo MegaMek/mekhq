@@ -55,6 +55,7 @@ import mekhq.campaign.personnel.skills.SkillType;
 import mekhq.utilities.MHQXMLUtility;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
+import mekhq.campaign.campaignOptions.CampaignOption;
 
 /**
  * @author Jay Lawson (jaylawson39 at yahoo.com)
@@ -105,7 +106,7 @@ public class AeroLifeSupport extends Part {
             }
             if (checkForDestruction
                       && hits > priorHits
-                      && Compute.d6(2) < campaign.getCampaignOptions().getDestroyPartTarget()) {
+                      && Compute.d6(2) < campaign.getCampaignOptions().get(CampaignOption.DESTROY_PART_TARGET)) {
                 remove(false);
             }
         }
@@ -114,7 +115,7 @@ public class AeroLifeSupport extends Part {
     @Override
     public int getBaseTime() {
         int time;
-        if (campaign.getCampaignOptions().isUseAeroSystemHits()) {
+        if (campaign.getCampaignOptions().get(CampaignOption.USE_AERO_SYSTEM_HITS)) {
             // Test of proposed errata for repair times
             if (null != unit && (unit.getEntity() instanceof Dropship || unit.getEntity() instanceof Jumpship)) {
                 if (isSalvaging()) {

@@ -53,6 +53,7 @@ import megamek.common.units.EntityMovementMode;
 import megamek.common.units.UnitType;
 import megamek.logging.MMLogger;
 import mekhq.campaign.Campaign;
+import mekhq.campaign.campaignOptions.CampaignOption;
 import mekhq.campaign.parts.enums.PartQuality;
 import mekhq.campaign.unit.CargoStatistics;
 import mekhq.campaign.unit.Unit;
@@ -555,7 +556,7 @@ public final class CargoShipGenerator {
      */
     private static @Nullable Unit addCrewedShip(Campaign campaign, MekSummary hull) {
         try {
-            PartQuality quality = campaign.getCampaignOptions().isUseRandomUnitQualities()
+            PartQuality quality = campaign.getCampaignOptions().get(CampaignOption.USE_RANDOM_UNIT_QUALITIES)
                   ? UnitOrder.getRandomUnitQuality(0)
                   : PartQuality.QUALITY_D;
             // allowNewPilots = true: the ship arrives crewed, like every other generated unit.

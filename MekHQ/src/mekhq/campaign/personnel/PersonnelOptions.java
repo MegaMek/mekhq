@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2017-2025 The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2017-2026 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -81,12 +81,38 @@ public class PersonnelOptions extends PilotOptions {
     public static final String UNOFFICIAL_KITCHEN_MENACE = "unofficial_kitchen_menace";
     public static final String UNOFFICIAL_ILL_DO_IT_MYSELF = "unofficial_ill_do_it_myself";
     public static final String TECH_MAINTAINER = "tech_maintainer";
+    public static final String TECH_FABRICATOR = "tech_fabricator";
+    public static final String TECH_JURY_RIGGER = "tech_jury_rigger";
+    public static final String TECH_MACGYVER = "tech_macgyver";
+    public static final String TECH_MUNITIONEER = "tech_munitioneer";
+    public static final String TECH_WASTEFUL = "tech_wasteful";
     public static final String FLAW_GLASS_JAW = "flaw_glass_jaw";
     public static final String ATOW_TOUGHNESS = "atow_toughness";
     public static final String FLAW_SLOW_LEARNER = "flaw_slow_learner";
     public static final String ATOW_FAST_LEARNER = "atow_fast_learner";
     public static final String ATOW_ALTERNATE_ID = "atow_alternate_id";
     public static final String ATOW_CITIZENSHIP = "atow_citizenship";
+    public static final String DONT_YOU_KNOW_WHO_I_AM = "dont_you_know_who_i_am";
+    public static final String CERTIFIED_NOBODY = "certified_nobody";
+    public static final String IMPORTANT_FRIENDS = "important_friends";
+    public static final String FORGETS_TO_REPLY = "forgets_to_reply";
+    public static final String BIG_PERSONALITY = "big_personality";
+    public static final String REDACTED = "redacted";
+    public static final String LOOSE_LIPS = "loose_lips";
+    public static final String LEAVES_NO_TRAIL = "leaves_no_trail";
+    public static final String BLAMELESS = "blameless";
+    public static final String SCAPEGOAT = "scapegoat";
+    public static final String LOOKS_GOOD_ON_PAPER = "looks_good_on_paper";
+    public static final String UNASSUMING = "unassuming";
+    public static final String SILVER_TONGUE = "silver_tongue";
+    public static final String LOAN_SHARK_VICTIM = "loan_shark_victim";
+    public static final String SLIPPERY = "slippery";
+    public static final String CONSPICUOUS = "conspicuous";
+    public static final String LOOT_GOBLIN = "loot_goblin";
+    public static final String IMPRESSIVE_LEADER = "impressive_leader";
+    public static final String DISAPPOINTING_LEADER = "disappointing_leader";
+    public static final String GOOD_REPUTATION = "good_reputation";
+    public static final String BAD_REPUTATION = "bad_reputation";
     public static final String FLAW_ANIMAL_ANTIPATHY = "flaw_animal_antipathy";
     public static final String ATOW_ANIMAL_EMPATHY = "atow_animal_empathy";
     public static final String ATOW_AMBIDEXTROUS = "atow_ambidextrous";
@@ -163,44 +189,8 @@ public class PersonnelOptions extends PilotOptions {
     public static final String EXCEPTIONAL_ATTRIBUTE_CHARISMA = "exceptional_attribute_charisma";
     public static final String EXCEPTIONAL_ATTRIBUTE_EDGE = "exceptional_attribute_edge";
     public static final String UNOFFICIAL_BELOVED_PET = "unofficial_beloved_pet";
-
-    // Weight-class affinity/antipathy SPAs and Flaws.
-    public static final String MEK_AFFINITY_LIGHT = "mek_affinity_light";
-    public static final String MEK_AFFINITY_MEDIUM = "mek_affinity_medium";
-    public static final String MEK_AFFINITY_HEAVY = "mek_affinity_heavy";
-    public static final String MEK_AFFINITY_ASSAULT = "mek_affinity_assault";
-    public static final String MEK_ANTIPATHY_LIGHT = "mek_antipathy_light";
-    public static final String MEK_ANTIPATHY_MEDIUM = "mek_antipathy_medium";
-    public static final String MEK_ANTIPATHY_HEAVY = "mek_antipathy_heavy";
-    public static final String MEK_ANTIPATHY_ASSAULT = "mek_antipathy_assault";
-    public static final String VEHICULAR_AFFINITY_LIGHT = "vehicular_affinity_light";
-    public static final String VEHICULAR_AFFINITY_MEDIUM = "vehicular_affinity_medium";
-    public static final String VEHICULAR_AFFINITY_HEAVY = "vehicular_affinity_heavy";
-    public static final String VEHICULAR_AFFINITY_ASSAULT = "vehicular_affinity_assault";
-    public static final String VEHICULAR_ANTIPATHY_LIGHT = "vehicular_antipathy_light";
-    public static final String VEHICULAR_ANTIPATHY_MEDIUM = "vehicular_antipathy_medium";
-    public static final String VEHICULAR_ANTIPATHY_HEAVY = "vehicular_antipathy_heavy";
-    public static final String VEHICULAR_ANTIPATHY_ASSAULT = "vehicular_antipathy_assault";
-    public static final String FLIGHT_AFFINITY_LIGHT = "flight_affinity_light";
-    public static final String FLIGHT_AFFINITY_MEDIUM = "flight_affinity_medium";
-    public static final String FLIGHT_AFFINITY_HEAVY = "flight_affinity_heavy";
-    public static final String FLIGHT_ANTIPATHY_LIGHT = "flight_antipathy_light";
-    public static final String FLIGHT_ANTIPATHY_MEDIUM = "flight_antipathy_medium";
-    public static final String FLIGHT_ANTIPATHY_HEAVY = "flight_antipathy_heavy";
-
-    // Unit Specialist.
-    public static final String UNIT_SPECIALIST = "unit_specialist";
-    public static final String SPECIALIST_CHOICE_MEK_LIGHT = "'Mek: Light";
-    public static final String SPECIALIST_CHOICE_MEK_MEDIUM = "'Mek: Medium";
-    public static final String SPECIALIST_CHOICE_MEK_HEAVY = "'Mek: Heavy";
-    public static final String SPECIALIST_CHOICE_MEK_ASSAULT = "'Mek: Assault";
-    public static final String SPECIALIST_CHOICE_VEHICULAR_LIGHT = "Vehicular: Light";
-    public static final String SPECIALIST_CHOICE_VEHICULAR_MEDIUM = "Vehicular: Medium";
-    public static final String SPECIALIST_CHOICE_VEHICULAR_HEAVY = "Vehicular: Heavy";
-    public static final String SPECIALIST_CHOICE_VEHICULAR_ASSAULT = "Vehicular: Assault";
-    public static final String SPECIALIST_CHOICE_FLIGHT_LIGHT = "Flight: Light";
-    public static final String SPECIALIST_CHOICE_FLIGHT_MEDIUM = "Flight: Medium";
-    public static final String SPECIALIST_CHOICE_FLIGHT_HEAVY = "Flight: Heavy";
+    public static final String FAMILIARITY_IRON_BOND = "familiarity_iron_bond";
+    public static final String FAMILIARITY_EMOTIONALLY_UNAVAILABLE = "familiarity_emotionally_unavailable";
 
     public static final String ADMIN_MEDIATOR = "admin_mediator";
     public static final String ADMIN_LOGISTICIAN = "admin_logistician";
@@ -307,12 +297,38 @@ public class PersonnelOptions extends PilotOptions {
         addOption(l3a, UNOFFICIAL_KITCHEN_MENACE, false);
         addOption(l3a, UNOFFICIAL_ILL_DO_IT_MYSELF, false);
         addOption(l3a, TECH_MAINTAINER, false);
+        addOption(l3a, TECH_FABRICATOR, false);
+        addOption(l3a, TECH_JURY_RIGGER, false);
+        addOption(l3a, TECH_MACGYVER, false);
+        addOption(l3a, TECH_MUNITIONEER, false);
+        addOption(l3a, TECH_WASTEFUL, false);
         addOption(l3a, FLAW_GLASS_JAW, false);
         addOption(l3a, ATOW_TOUGHNESS, false);
         addOption(l3a, FLAW_SLOW_LEARNER, false);
         addOption(l3a, ATOW_FAST_LEARNER, false);
         addOption(l3a, ATOW_ALTERNATE_ID, false);
         addOption(l3a, ATOW_CITIZENSHIP, false);
+        addOption(l3a, DONT_YOU_KNOW_WHO_I_AM, false);
+        addOption(l3a, CERTIFIED_NOBODY, false);
+        addOption(l3a, IMPORTANT_FRIENDS, false);
+        addOption(l3a, FORGETS_TO_REPLY, false);
+        addOption(l3a, BIG_PERSONALITY, false);
+        addOption(l3a, REDACTED, false);
+        addOption(l3a, LOOSE_LIPS, false);
+        addOption(l3a, LEAVES_NO_TRAIL, false);
+        addOption(l3a, BLAMELESS, false);
+        addOption(l3a, SCAPEGOAT, false);
+        addOption(l3a, LOOKS_GOOD_ON_PAPER, false);
+        addOption(l3a, UNASSUMING, false);
+        addOption(l3a, SILVER_TONGUE, false);
+        addOption(l3a, LOAN_SHARK_VICTIM, false);
+        addOption(l3a, SLIPPERY, false);
+        addOption(l3a, CONSPICUOUS, false);
+        addOption(l3a, LOOT_GOBLIN, false);
+        addOption(l3a, IMPRESSIVE_LEADER, false);
+        addOption(l3a, DISAPPOINTING_LEADER, false);
+        addOption(l3a, GOOD_REPUTATION, false);
+        addOption(l3a, BAD_REPUTATION, false);
         addOption(l3a, FLAW_ANIMAL_ANTIPATHY, false);
         addOption(l3a, ATOW_ANIMAL_EMPATHY, false);
         addOption(l3a, ATOW_AMBIDEXTROUS, false);
@@ -388,6 +404,8 @@ public class PersonnelOptions extends PilotOptions {
         addOption(l3a, EXCEPTIONAL_ATTRIBUTE_CHARISMA, false);
         addOption(l3a, EXCEPTIONAL_ATTRIBUTE_EDGE, false);
         addOption(l3a, UNOFFICIAL_BELOVED_PET, false);
+        addOption(l3a, FAMILIARITY_IRON_BOND, false);
+        addOption(l3a, FAMILIARITY_EMOTIONALLY_UNAVAILABLE, false);
 
         addOption(l3a, ADMIN_MEDIATOR, false);
         addOption(l3a, ADMIN_LOGISTICIAN, false);
@@ -396,30 +414,6 @@ public class PersonnelOptions extends PilotOptions {
         addOption(l3a, ADMIN_NETWORKER, false);
         addOption(l3a, ADMIN_INTERSTELLAR_NEGOTIATOR, false);
         addOption(l3a, ADMIN_SCROUNGE, false);
-
-        addOption(l3a, MEK_AFFINITY_LIGHT, false);
-        addOption(l3a, MEK_AFFINITY_MEDIUM, false);
-        addOption(l3a, MEK_AFFINITY_HEAVY, false);
-        addOption(l3a, MEK_AFFINITY_ASSAULT, false);
-        addOption(l3a, MEK_ANTIPATHY_LIGHT, false);
-        addOption(l3a, MEK_ANTIPATHY_MEDIUM, false);
-        addOption(l3a, MEK_ANTIPATHY_HEAVY, false);
-        addOption(l3a, MEK_ANTIPATHY_ASSAULT, false);
-        addOption(l3a, VEHICULAR_AFFINITY_LIGHT, false);
-        addOption(l3a, VEHICULAR_AFFINITY_MEDIUM, false);
-        addOption(l3a, VEHICULAR_AFFINITY_HEAVY, false);
-        addOption(l3a, VEHICULAR_AFFINITY_ASSAULT, false);
-        addOption(l3a, VEHICULAR_ANTIPATHY_LIGHT, false);
-        addOption(l3a, VEHICULAR_ANTIPATHY_MEDIUM, false);
-        addOption(l3a, VEHICULAR_ANTIPATHY_HEAVY, false);
-        addOption(l3a, VEHICULAR_ANTIPATHY_ASSAULT, false);
-        addOption(l3a, FLIGHT_AFFINITY_LIGHT, false);
-        addOption(l3a, FLIGHT_AFFINITY_MEDIUM, false);
-        addOption(l3a, FLIGHT_AFFINITY_HEAVY, false);
-        addOption(l3a, FLIGHT_ANTIPATHY_LIGHT, false);
-        addOption(l3a, FLIGHT_ANTIPATHY_MEDIUM, false);
-        addOption(l3a, FLIGHT_ANTIPATHY_HEAVY, false);
-        addOption(l3a, UNIT_SPECIALIST, new Vector<>());
 
         addOption(l3a, COMPULSION_UNPLEASANT_PERSONALITY, false);
         addOption(l3a, COMPULSION_MILD_PARANOIA, false);

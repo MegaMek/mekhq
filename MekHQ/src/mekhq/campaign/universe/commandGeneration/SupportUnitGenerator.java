@@ -43,10 +43,11 @@ import megamek.common.loaders.MekSummaryCache;
 import megamek.common.units.Entity;
 import megamek.logging.MMLogger;
 import mekhq.campaign.Campaign;
+import mekhq.campaign.campaignOptions.CampaignOption;
 import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.parts.enums.PartQuality;
 import mekhq.campaign.personnel.Person;
-import mekhq.campaign.personnel.ranks.AutoAssignRankForCommandGenerator;
+import mekhq.campaign.personnel.ranks.AutomaticRankAssigner;
 import mekhq.campaign.personnel.turnoverAndRetention.Fatigue;
 import mekhq.campaign.unit.Unit;
 import mekhq.campaign.unit.UnitOrder;
@@ -143,7 +144,7 @@ public final class SupportUnitGenerator {
      * company (fielded as {@value #PLATOONS_PER_COMPANY} platoons).
      */
     public static void generateSecurityUnits(Campaign campaign, Faction faction, boolean autoAssignRanks) {
-        boolean isClan = campaign.isClanCampaign();
+        boolean isClan = campaign.getPlayerForce().isClanForce();
         SecurityTier tier = securityTier(campaign);
         String unitName = securityUnitName(tier, isClan);
         int count = tier == SecurityTier.COMPANY ? PLATOONS_PER_COMPANY : 1;
@@ -152,8 +153,8 @@ public final class SupportUnitGenerator {
 
     /** Formation base size, doubled for a Clan command. */
     static int scaledCount(Campaign campaign) {
-        int count = campaign.getFaction().getFormationBaseSize();
-        return campaign.isClanCampaign() ? count * CLAN_VEHICLES_PER_POINT : count;
+        int count = campaign.getPlayerForce().getFaction().getFormationBaseSize();
+        return campaign.getPlayerForce().isClanForce() ? count * CLAN_VEHICLES_PER_POINT : count;
     }
 
     /**
@@ -171,9 +172,9 @@ public final class SupportUnitGenerator {
      */
     static int commissaryUnitCount(Campaign campaign) {
         CampaignOptions campaignOptions = campaign.getCampaignOptions();
-        int personnelNeedingKitchen = Fatigue.checkFieldKitchenUsage(campaign.getActivePersonnel(false, false),
-              campaignOptions.isUseFieldKitchenIgnoreNonCombatants(), campaign);
-        int coveragePerCanteen = campaignOptions.getFieldKitchenCapacity();
+        int personnelNeedingKitchen = Fatigue.checkFieldKitchenUsage(campaign.getPlayerForce().getHumanResources().getActivePersonnel(false, false),
+              campaignOptions.get(CampaignOption.FIELD_KITCHEN_IGNORE_NON_COMBATANTS), campaign);
+        int coveragePerCanteen = campaignOptions.get(CampaignOption.FIELD_KITCHEN_CAPACITY);
         int count = vehiclesForCoverage(personnelNeedingKitchen, coveragePerCanteen);
         LOGGER.info("[CompanyGen][SupportUnits] commissary: {} personnel need feeding, {} fed per canteen -> {} canteen(s)",
               personnelNeedingKitchen, coveragePerCanteen, count);
@@ -196,7 +197,7 @@ public final class SupportUnitGenerator {
     static int medicalUnitCount(Campaign campaign) {
         CampaignOptions campaignOptions = campaign.getCampaignOptions();
         int patientsToCover = combatPersonnelCount(campaign);
-        int coveragePerTruck = countEquipment(MEDICAL_UNIT, MiscType.F_MASH) * campaignOptions.getMASHTheatreCapacity();
+        int coveragePerTruck = countEquipment(MEDICAL_UNIT, MiscType.F_MASH) * campaignOptions.get(CampaignOption.MASH_THEATRE_CAPACITY);
         int count = vehiclesForCoverage(patientsToCover, coveragePerTruck);
         LOGGER.info("[CompanyGen][SupportUnits] medical: {} combatants to cover, {} patients per MASH truck -> {} truck(s)",
               patientsToCover, coveragePerTruck, count);
@@ -255,7 +256,7 @@ public final class SupportUnitGenerator {
      */
     static int combatPersonnelCount(Campaign campaign) {
         int combatPersonnel = 0;
-        for (Person person : campaign.getActivePersonnel(false, false)) {
+        for (Person person : campaign.getPlayerForce().getHumanResources().getActivePersonnel(false, false)) {
             if (person.isCombat()) {
                 combatPersonnel++;
             }
@@ -360,7 +361,7 @@ public final class SupportUnitGenerator {
             return;
         }
 
-        boolean useRandomQuality = campaign.getCampaignOptions().isUseRandomUnitQualities();
+        boolean useRandomQuality = campaign.getCampaignOptions().get(CampaignOption.USE_RANDOM_UNIT_QUALITIES);
         List<Unit> units = new ArrayList<>();
         for (int index = 0; index < count; index++) {
             try {
@@ -368,7 +369,7 @@ public final class SupportUnitGenerator {
                 Unit unit = campaign.addNewUnit(mekSummary.loadEntity(), true, 0, quality);
                 if (unit != null) {
                     if (autoAssignRanks) {
-                        AutoAssignRankForCommandGenerator.assignRanks(campaign, unit, faction);
+                        AutomaticRankAssigner.assignRanks(campaign, unit, faction);
                     }
                     units.add(unit);
                 }

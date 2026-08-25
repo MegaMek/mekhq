@@ -166,7 +166,7 @@ public class PartsAcquisitionService {
 
         Person admin = campaign.getPlayerForce().getHumanResources()
                              .getLogisticsPerson(campaign.getCampaignOptions(),
-                                   campaign.isClanCampaign(),
+                                   campaign.getPlayerForce().isClanForce(),
                                    campaign.getLocalDate());
 
         for (List<IAcquisitionWork> awList : acquisitionMap.values()) {

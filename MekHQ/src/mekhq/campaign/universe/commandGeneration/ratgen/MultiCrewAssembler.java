@@ -231,7 +231,7 @@ public final class MultiCrewAssembler {
 
     private static Person newPerson(Campaign campaign, PersonnelRole role, CrewDescriptor descriptor,
           Entity entity, boolean overrideName) {
-        Person person = campaign.newPerson(role);
+        Person person = campaign.getPlayerForce().getHumanResources().newPerson(campaign, role);
         if (descriptor != null) {
             CrewDescriptorAdapter.apply(descriptor, person, entity, overrideName);
         }

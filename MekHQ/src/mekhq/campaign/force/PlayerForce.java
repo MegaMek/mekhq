@@ -36,10 +36,11 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
-import mekhq.campaign.camOpsReputation.ForceReputationController;
 import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.finances.Finances;
+import mekhq.campaign.mission.contract.ContractMarket;
 import mekhq.campaign.personnel.ranks.RankSystem;
+import mekhq.campaign.reputation.camOpsReputation.ForceReputationController;
 import mekhq.campaign.universe.Faction;
 import mekhq.campaign.universe.factionStanding.FactionStandings;
 
@@ -56,19 +57,28 @@ public class PlayerForce extends AbstractForce implements SingleDetachmentForce 
 
     private final Detachment forceDetachment = new Detachment();
 
+    /** The force's contract market: the currently available offers, split by {@code ContractSearchType}. */
+    private final ContractMarket contractMarket = new ContractMarket();
+
     /**
-     * @param faction              the force's starting faction
-     * @param techFaction          the resolved MegaMek tech faction
-     * @param rankSystem           the force's rank system
-     * @param finances             the force's finances ledger
-     * @param reputationController the force's reputation controller
-     * @param factionStandings     the force's standings with the wider universe
-     * @param campaignOptions      the campaign options the force's {@link ForceOptions} passes through to
+     * @param faction                 the force's starting faction
+     * @param techFaction             the resolved MegaMek tech faction
+     * @param rankSystem              the force's rank system
+     * @param finances                the force's finances ledger
+     * @param reputationController    the force's reputation controller
+     * @param chaosCampaignReputation the force's overall reputation
+     * @param factionStandings        the force's standings with the wider universe
+     * @param campaignOptions         the campaign options the force's {@link ForceOptions} passes through to
      */
     public PlayerForce(Faction faction, megamek.common.enums.Faction techFaction, RankSystem rankSystem,
-          Finances finances, ForceReputationController reputationController, FactionStandings factionStandings,
-          CampaignOptions campaignOptions) {
-        super(new ForceOptions(campaignOptions, faction), techFaction, rankSystem, finances, reputationController,
+          Finances finances, ForceReputationController reputationController, int chaosCampaignReputation,
+          FactionStandings factionStandings, CampaignOptions campaignOptions) {
+        super(new ForceOptions(campaignOptions, faction),
+              techFaction,
+              rankSystem,
+              finances,
+              reputationController,
+              chaosCampaignReputation,
               factionStandings);
     }
 
@@ -81,4 +91,15 @@ public class PlayerForce extends AbstractForce implements SingleDetachmentForce 
     public Collection<Detachment> getDetachments() {
         return new ArrayList<>(List.of(forceDetachment));
     }
+
+    // region Contracts
+
+    /**
+     * @return this force's contract market: the pool of currently available offers, split by search type
+     */
+    public ContractMarket getContractMarket() {
+        return contractMarket;
+    }
+
+    // endregion Contracts
 }

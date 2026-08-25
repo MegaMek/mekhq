@@ -44,8 +44,8 @@ import megamek.common.units.Infantry;
 import megamek.common.units.UnitType;
 import megamek.logging.MMLogger;
 import mekhq.campaign.Campaign;
-import mekhq.campaign.mission.AtBDynamicScenario;
-import mekhq.campaign.mission.AtBScenario;
+import mekhq.campaign.mission.scenarios.AtBDynamicScenario;
+import mekhq.campaign.mission.scenarios.AtBScenario;
 import mekhq.campaign.unit.Unit;
 
 /**
@@ -68,12 +68,12 @@ public class StratConSetupForces extends ScenarioSetupForces<AtBScenario> {
 
     @Override
     protected SkillLevel getEnemySkillLevel() {
-        return getScenario().getContract(campaign).getEnemySkill();
+        return getScenario().getContract(campaign).getEnemyForceSkill();
     }
 
     @Override
     protected SkillLevel getAlliedSkillLevel() {
-        return getScenario().getContract(campaign).getAllySkill();
+        return getScenario().getContract(campaign).getEmployerForceSkill();
     }
 
     /**

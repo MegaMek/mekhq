@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2024-2025 The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2024-2026 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -53,6 +53,7 @@ import megamek.client.bot.princess.PrincessException;
 import megamek.client.ui.comboBoxes.MMComboBox;
 import megamek.client.ui.dialogs.buttonDialogs.BotConfigDialog;
 import megamek.client.ui.dialogs.iconChooser.CamoChooserDialog;
+import megamek.client.ui.util.MULVersionValidator;
 import megamek.common.Player;
 import megamek.common.enums.SkillLevel;
 import megamek.common.icons.Camouflage;
@@ -66,9 +67,9 @@ import megamek.logging.MMLogger;
 import mekhq.MekHQ;
 import mekhq.Utilities;
 import mekhq.campaign.Campaign;
-import mekhq.campaign.mission.BotForce;
-import mekhq.campaign.mission.BotForceRandomizer;
-import mekhq.campaign.mission.BotForceRandomizer.BalancingMethod;
+import mekhq.campaign.mission.scenarios.BotForce;
+import mekhq.campaign.mission.scenarios.BotForceRandomizer;
+import mekhq.campaign.mission.scenarios.BotForceRandomizer.BalancingMethod;
 import mekhq.campaign.universe.Factions;
 import mekhq.gui.FileDialogs;
 import mekhq.gui.baseComponents.DefaultMHQScrollablePanel;
@@ -99,6 +100,7 @@ public class CustomizeBotForceDialog extends JDialog {
     private JLabel lblSelfPreservation;
     private JLabel lblAggression;
     private JLabel lblHerdMentality;
+    private JLabel lblPosture;
     private JLabel lblPilotingRisk;
     private JLabel lblForcedWithdrawal;
     private JLabel lblAutoFlee;
@@ -313,6 +315,7 @@ public class CustomizeBotForceDialog extends JDialog {
         lblSelfPreservation = new JLabel(Integer.toString(behavior.getSelfPreservationIndex()));
         lblAggression = new JLabel(Integer.toString(behavior.getHyperAggressionIndex()));
         lblHerdMentality = new JLabel(Integer.toString(behavior.getHerdMentalityIndex()));
+        lblPosture = new JLabel(behavior.getCombatPosture().toString());
         lblPilotingRisk = new JLabel(Integer.toString(behavior.getFallShameIndex()));
         lblForcedWithdrawal = new JLabel(getForcedWithdrawalDescription(behavior));
         lblAutoFlee = new JLabel(getAutoFleeDescription(behavior));
@@ -331,6 +334,10 @@ public class CustomizeBotForceDialog extends JDialog {
         gbcRight.gridy++;
         panBehavior.add(new JLabel(resourceMap.getString("lblHerdMentality.text")), gbcLeft);
         panBehavior.add(lblHerdMentality, gbcRight);
+        gbcLeft.gridy++;
+        gbcRight.gridy++;
+        panBehavior.add(new JLabel(resourceMap.getString("lblPosture.text")), gbcLeft);
+        panBehavior.add(lblPosture, gbcRight);
         gbcLeft.gridy++;
         gbcRight.gridy++;
         panBehavior.add(new JLabel(resourceMap.getString("lblPilotingRisk.text")), gbcLeft);
@@ -567,6 +574,7 @@ public class CustomizeBotForceDialog extends JDialog {
             lblSelfPreservation.setText(Integer.toString(behavior.getSelfPreservationIndex()));
             lblAggression.setText(Integer.toString(behavior.getHyperAggressionIndex()));
             lblHerdMentality.setText(Integer.toString(behavior.getHerdMentalityIndex()));
+            lblPosture.setText(behavior.getCombatPosture().toString());
             lblPilotingRisk.setText(Integer.toString(behavior.getFallShameIndex()));
             lblForcedWithdrawal.setText(getForcedWithdrawalDescription(behavior));
             lblAutoFlee.setText(getAutoFleeDescription(behavior));
@@ -595,6 +603,9 @@ public class CustomizeBotForceDialog extends JDialog {
                 parser = new MULParser(units.get(), campaign.getGameOptions());
             } catch (Exception ex) {
                 LOGGER.error("Could not parse BotForce entities", ex);
+                return;
+            }
+            if (!MULVersionValidator.isCorrectVersion(frame, parser)) {
                 return;
             }
             fixedEntities = Collections.list(parser.getEntities().elements());

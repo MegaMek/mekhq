@@ -51,7 +51,7 @@ import megamek.logging.MMLogger;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.finances.Money;
-import mekhq.campaign.mission.Loot;
+import mekhq.campaign.mission.scenarios.Loot;
 import mekhq.campaign.parts.Part;
 import mekhq.gui.CampaignGUI;
 

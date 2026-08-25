@@ -268,9 +268,9 @@ public class Faction {
      *
      * @return {@code true} if this faction observed the Ares Conventions in the given year; {@code false} by default
      */
-public boolean isAresConventionsSignatory(int year) {
-    return faction2 != null && faction2.isAresConventionsSignatory(year);
-}
+    public boolean isAresConventionsSignatory(int year) {
+        return faction2 != null && faction2.isAresConventionsSignatory(year);
+    }
 
     public int getEraMod(int year) {
         if (eraMods == null) {
@@ -388,6 +388,20 @@ public boolean isAresConventionsSignatory(int year) {
     // region Checks
     public boolean isPlayable() {
         return is(FactionTag.PLAYABLE);
+    }
+
+    /**
+     * Returns whether this is a subordinate formation declared inside another command's file - an individual regiment
+     * of the Davion Brigade of Guards, say - rather than a command in its own right.
+     *
+     * <p>Subunits are loaded as full factions so that they stay selectable and generatable, which means they arrive in
+     * {@link Factions#getFactions()} alongside everything else. Anywhere the player is offered a choice of factions
+     * should leave them out, or a single faction's list grows by every regiment of every command it owns.</p>
+     *
+     * @return {@code true} when this faction came from another command's subunit declaration
+     */
+    public boolean isSubunit() {
+        return (faction2 != null) && faction2.isSubunit();
     }
 
     public boolean isMercenary() {
@@ -796,6 +810,6 @@ public boolean isAresConventionsSignatory(int year) {
     }
 
     public boolean isUsesMercenaries(int year) {
-        return faction2 != null ? faction2.isUsesMercenaries(year) : true;
+        return faction2 == null || faction2.isUsesMercenaries(year);
     }
 }

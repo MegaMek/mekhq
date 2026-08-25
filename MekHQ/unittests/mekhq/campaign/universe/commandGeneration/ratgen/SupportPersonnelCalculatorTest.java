@@ -32,6 +32,9 @@
  */
 package mekhq.campaign.universe.commandGeneration.ratgen;
 
+import mekhq.campaign.ForceHumanResources;
+import mekhq.campaign.campaignOptions.CampaignOption;
+import mekhq.campaign.force.PlayerForce;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.lenient;
 import static org.mockito.Mockito.mock;
@@ -252,7 +255,7 @@ class SupportPersonnelCalculatorTest {
     @Test
     void compute_doctorDemand_zeroMaxPatientsFallsBackToOnePatientPerDoctor() {
         Campaign campaign = standardCampaign(List.of(), 5);
-        when(campaign.getCampaignOptions().getMaximumPatients()).thenReturn(0);
+        campaign.getCampaignOptions().set(CampaignOption.MAXIMUM_PATIENTS, 0);
 
         SupportDemand demand = SupportPersonnelCalculator.compute(campaign);
 
@@ -272,7 +275,7 @@ class SupportPersonnelCalculatorTest {
     @Test
     void compute_adminDemand_mercenaryFaction_oneAdminPerTenPersonnel() {
         Campaign campaign = standardCampaign(List.of(), 40);
-        when(campaign.getFaction().isMercenary()).thenReturn(true);
+        when(campaign.getPlayerForce().getFaction().isMercenary()).thenReturn(true);
 
         SupportDemand demand = SupportPersonnelCalculator.compute(campaign);
 
@@ -282,7 +285,7 @@ class SupportPersonnelCalculatorTest {
     @Test
     void compute_adminDemand_pirateFaction_oneAdminPerTenPersonnel() {
         Campaign campaign = standardCampaign(List.of(), 40);
-        when(campaign.getFaction().isPirate()).thenReturn(true);
+        when(campaign.getPlayerForce().getFaction().isPirate()).thenReturn(true);
 
         SupportDemand demand = SupportPersonnelCalculator.compute(campaign);
 
@@ -361,22 +364,27 @@ class SupportPersonnelCalculatorTest {
      */
     private Campaign standardCampaign(List<Unit> units, int personnelCount) {
         Campaign campaign = mock(Campaign.class);
+        PlayerForce playerForce = mock(PlayerForce.class);
+        ForceHumanResources humanResources = mock(ForceHumanResources.class);
+        when(campaign.getPlayerForce()).thenReturn(playerForce);
+        when(playerForce.getHumanResources()).thenReturn(humanResources);
         when(campaign.getActiveUnits()).thenReturn(units == null ? Collections.emptyList() : units);
 
         List<Person> personnel = new ArrayList<>();
         for (int i = 0; i < personnelCount; i++) {
             personnel.add(mock(Person.class));
         }
-        lenient().when(campaign.getActivePersonnel(false, false)).thenReturn(personnel);
+        lenient().when(humanResources.getActivePersonnel(false, false)).thenReturn(personnel);
 
-        CampaignOptions options = mock(CampaignOptions.class);
-        lenient().when(options.getMaximumPatients()).thenReturn(25);
+        CampaignOptions options = new CampaignOptions();
+        options.set(CampaignOption.MAXIMUM_PATIENTS, 25);
+        options.set(CampaignOption.USE_HR_STRAIN, false);
         when(campaign.getCampaignOptions()).thenReturn(options);
 
         Faction faction = mock(Faction.class);
         lenient().when(faction.isPirate()).thenReturn(false);
         lenient().when(faction.isMercenary()).thenReturn(false);
-        when(campaign.getFaction()).thenReturn(faction);
+        when(playerForce.getFaction()).thenReturn(faction);
 
         return campaign;
     }

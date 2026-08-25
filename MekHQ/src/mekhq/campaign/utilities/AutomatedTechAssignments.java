@@ -495,7 +495,7 @@ public class AutomatedTechAssignments {
                                                                                                            .getHangar()
                                                                                                            .getUnits(),
                                                                                                  campaign.getCampaignOptions(),
-                                                                                                 campaign.isClanCampaign(),
+                                                                                                 campaign.getPlayerForce().isClanForce(),
                                                                                                  campaign.getLocalDate()),
               campaign.getUnits());
         List<String> reports = automatedAssignments.getReports();

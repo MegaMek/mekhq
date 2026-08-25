@@ -54,9 +54,9 @@ import megamek.common.ui.FastJScrollPane;
 import mekhq.MekHQ;
 import mekhq.campaign.events.DeploymentChangedEvent;
 import mekhq.campaign.force.Formation;
-import mekhq.campaign.mission.AtBDynamicScenario;
-import mekhq.campaign.mission.ScenarioForceTemplate;
-import mekhq.campaign.mission.ScenarioForceTemplate.ForceGenerationMethod;
+import mekhq.campaign.mission.scenarios.AtBDynamicScenario;
+import mekhq.campaign.mission.scenarios.ScenarioForceTemplate;
+import mekhq.campaign.mission.scenarios.ScenarioForceTemplate.ForceGenerationMethod;
 import mekhq.campaign.unit.Unit;
 import mekhq.gui.CampaignGUI;
 

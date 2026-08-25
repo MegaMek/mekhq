@@ -738,7 +738,7 @@ public class CreateCampaignPreset extends AbstractMHQValidationButtonDialog {
         restoreComboStartingSystem();
         final Faction faction;
         if ((getPreset() == null) || (getPreset().getFaction() == null)) {
-            faction = getCampaign().getFaction();
+            faction = getCampaign().getPlayerForce().getFaction();
         } else {
             faction = getPreset().getFaction();
         }

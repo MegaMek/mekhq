@@ -111,6 +111,117 @@ public final class MHQOptions extends SuiteOptions {
         userPreferences.node(MHQConstants.DISPLAY_NODE).putBoolean(MHQConstants.SHOW_UNIT_PICTURES_ON_TOE, value);
     }
 
+    public boolean getShowWarriorsAlmanac() {
+        return userPreferences.node(MHQConstants.DISPLAY_NODE).getBoolean(MHQConstants.SHOW_WARRIORS_ALMANAC, true);
+    }
+
+    public void setShowWarriorsAlmanac(final boolean value) {
+        userPreferences.node(MHQConstants.DISPLAY_NODE).putBoolean(MHQConstants.SHOW_WARRIORS_ALMANAC, value);
+    }
+
+    // region Personnel Record Logs
+    public boolean getDisplayPersonnelLog() {
+        return userPreferences.node(MHQConstants.DISPLAY_NODE).getBoolean(MHQConstants.DISPLAY_PERSONNEL_LOG, false);
+    }
+
+    public void setDisplayPersonnelLog(final boolean value) {
+        userPreferences.node(MHQConstants.DISPLAY_NODE).putBoolean(MHQConstants.DISPLAY_PERSONNEL_LOG, value);
+    }
+
+    public boolean getDisplayScenarioLog() {
+        return userPreferences.node(MHQConstants.DISPLAY_NODE).getBoolean(MHQConstants.DISPLAY_SCENARIO_LOG, false);
+    }
+
+    public void setDisplayScenarioLog(final boolean value) {
+        userPreferences.node(MHQConstants.DISPLAY_NODE).putBoolean(MHQConstants.DISPLAY_SCENARIO_LOG, value);
+    }
+
+    public boolean getDisplayKillRecord() {
+        return userPreferences.node(MHQConstants.DISPLAY_NODE).getBoolean(MHQConstants.DISPLAY_KILL_RECORD, false);
+    }
+
+    public void setDisplayKillRecord(final boolean value) {
+        userPreferences.node(MHQConstants.DISPLAY_NODE).putBoolean(MHQConstants.DISPLAY_KILL_RECORD, value);
+    }
+
+    public boolean getDisplayMedicalRecord() {
+        return userPreferences.node(MHQConstants.DISPLAY_NODE).getBoolean(MHQConstants.DISPLAY_MEDICAL_RECORD, false);
+    }
+
+    public void setDisplayMedicalRecord(final boolean value) {
+        userPreferences.node(MHQConstants.DISPLAY_NODE).putBoolean(MHQConstants.DISPLAY_MEDICAL_RECORD, value);
+    }
+
+    public boolean getDisplayPatientRecord() {
+        return userPreferences.node(MHQConstants.DISPLAY_NODE).getBoolean(MHQConstants.DISPLAY_PATIENT_RECORD, false);
+    }
+
+    public void setDisplayPatientRecord(final boolean value) {
+        userPreferences.node(MHQConstants.DISPLAY_NODE).putBoolean(MHQConstants.DISPLAY_PATIENT_RECORD, value);
+    }
+
+    public boolean getDisplayAssignmentRecord() {
+        return userPreferences.node(MHQConstants.DISPLAY_NODE)
+                     .getBoolean(MHQConstants.DISPLAY_ASSIGNMENT_RECORD, false);
+    }
+
+    public void setDisplayAssignmentRecord(final boolean value) {
+        userPreferences.node(MHQConstants.DISPLAY_NODE).putBoolean(MHQConstants.DISPLAY_ASSIGNMENT_RECORD, value);
+    }
+
+    public boolean getDisplayPerformanceRecord() {
+        return userPreferences.node(MHQConstants.DISPLAY_NODE)
+                     .getBoolean(MHQConstants.DISPLAY_PERFORMANCE_RECORD, false);
+    }
+
+    public void setDisplayPerformanceRecord(final boolean value) {
+        userPreferences.node(MHQConstants.DISPLAY_NODE).putBoolean(MHQConstants.DISPLAY_PERFORMANCE_RECORD, value);
+    }
+    // endregion Personnel Record Logs
+
+    // region Unit Record Logs
+    public boolean getDisplayUnitLog() {
+        return userPreferences.node(MHQConstants.DISPLAY_NODE).getBoolean(MHQConstants.DISPLAY_UNIT_LOG, false);
+    }
+
+    public void setDisplayUnitLog(final boolean value) {
+        userPreferences.node(MHQConstants.DISPLAY_NODE).putBoolean(MHQConstants.DISPLAY_UNIT_LOG, value);
+    }
+
+    public boolean getDisplayUnitKillLog() {
+        return userPreferences.node(MHQConstants.DISPLAY_NODE).getBoolean(MHQConstants.DISPLAY_UNIT_KILL_LOG, false);
+    }
+
+    public void setDisplayUnitKillLog(final boolean value) {
+        userPreferences.node(MHQConstants.DISPLAY_NODE).putBoolean(MHQConstants.DISPLAY_UNIT_KILL_LOG, value);
+    }
+
+    public boolean getDisplayUnitCrewLog() {
+        return userPreferences.node(MHQConstants.DISPLAY_NODE).getBoolean(MHQConstants.DISPLAY_UNIT_CREW_LOG, false);
+    }
+
+    public void setDisplayUnitCrewLog(final boolean value) {
+        userPreferences.node(MHQConstants.DISPLAY_NODE).putBoolean(MHQConstants.DISPLAY_UNIT_CREW_LOG, value);
+    }
+
+    public boolean getDisplayUnitDeploymentLog() {
+        return userPreferences.node(MHQConstants.DISPLAY_NODE)
+                     .getBoolean(MHQConstants.DISPLAY_UNIT_DEPLOYMENT_LOG, false);
+    }
+
+    public void setDisplayUnitDeploymentLog(final boolean value) {
+        userPreferences.node(MHQConstants.DISPLAY_NODE).putBoolean(MHQConstants.DISPLAY_UNIT_DEPLOYMENT_LOG, value);
+    }
+
+    public boolean getDisplayUnitRepairLog() {
+        return userPreferences.node(MHQConstants.DISPLAY_NODE).getBoolean(MHQConstants.DISPLAY_UNIT_REPAIR_LOG, false);
+    }
+
+    public void setDisplayUnitRepairLog(final boolean value) {
+        userPreferences.node(MHQConstants.DISPLAY_NODE).putBoolean(MHQConstants.DISPLAY_UNIT_REPAIR_LOG, value);
+    }
+    // endregion Unit Record Logs
+
     // region Command Center Tab
     @Deprecated(since = "0.50.07", forRemoval = true)
     public boolean getCommandCenterUseUnitMarket() {
@@ -1156,7 +1267,7 @@ public final class MHQOptions extends SuiteOptions {
 
     public boolean getQuickTrainIgnoreTrainingFormations() {
         return userPreferences.node(MHQConstants.NEW_DAY_NODE)
-              .getBoolean(MHQConstants.NEW_DAY_QUICK_TRAIN_IGNORE_TRAINING_FORMATIONS, false);
+                     .getBoolean(MHQConstants.NEW_DAY_QUICK_TRAIN_IGNORE_TRAINING_FORMATIONS, false);
     }
 
     public void setQuickTrainIgnoreTrainingFormations(final boolean value) {

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2025 The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2025-2026 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -63,6 +63,7 @@ import mekhq.campaign.personnel.skills.enums.SkillAttribute;
 import mekhq.gui.baseComponents.immersiveDialogs.ImmersiveDialogCore;
 import mekhq.gui.baseComponents.immersiveDialogs.ImmersiveDialogCore.ButtonLabelTooltipPair;
 import mekhq.gui.baseComponents.immersiveDialogs.ImmersiveDialogSimple;
+import mekhq.campaign.campaignOptions.CampaignOption;
 
 /**
  * A dialog that facilitates Attribute checks for a character.
@@ -176,7 +177,7 @@ public class AttributeCheckDialog {
               character,
               null,
               getInCharacterMessage(),
-              getButtons(character.getCurrentEdge() > 0, campaign.getCampaignOptions().isUseEdge()),
+              getButtons(character.getCurrentEdge() > 0, campaign.getCampaignOptions().get(CampaignOption.USE_EDGE)),
               getFormattedTextAt(RESOURCE_BUNDLE, "message.ooc.attribute"),
               null,
               false,

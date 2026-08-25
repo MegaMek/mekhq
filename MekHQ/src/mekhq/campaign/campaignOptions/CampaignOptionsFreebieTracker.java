@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2025 The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2025-2026 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -69,7 +69,8 @@ package mekhq.campaign.campaignOptions;
 public record CampaignOptionsFreebieTracker(boolean awardVeterancySPAs, boolean trackFactionStanding,
       boolean trackPrisoners, boolean useMASHTheatres, boolean useFatigue, boolean useAdvancedSalvage,
       boolean useStratCon, boolean useMapless, boolean useAdvancedScouting, boolean useAltAdvancedMedical,
-      boolean useDiseases, boolean useNormalizedContractPayModel, boolean useDiminishingContractPay) {
+      boolean useDiseases, boolean useNormalizedContractPayModel, boolean useDiminishingContractPay,
+      boolean useChaosReputation, boolean useLegacyContractOptions) {
     /**
      * Creates a tracker snapshot from the provided {@link CampaignOptions}.
      *
@@ -88,23 +89,25 @@ public record CampaignOptionsFreebieTracker(boolean awardVeterancySPAs, boolean 
      */
     public CampaignOptionsFreebieTracker(CampaignOptions options) {
         this(
-              options.isAwardVeterancySPAs(),
-              options.isTrackFactionStanding(),
-              !options.getPrisonerCaptureStyle().isNone(),
-              options.isUseMASHTheatres(),
-              options.isUseFatigue(),
-              options.isUseCamOpsSalvage(),
+              options.get(CampaignOption.AWARD_VETERANCY_SP_AS),
+              options.get(CampaignOption.TRACK_FACTION_STANDING),
+              !options.get(CampaignOption.PRISONER_CAPTURE_STYLE).isNone(),
+              options.get(CampaignOption.USE_MASH_THEATRES),
+              options.get(CampaignOption.USE_FATIGUE),
+              options.get(CampaignOption.IS_USE_CAM_OPS_SALVAGE),
               options.isUseStratCon(),
               options.isUseStratConMaplessMode(),
-              options.isUseAdvancedScouting() && options.isUseStratCon(),
-              options.isUseAlternativeAdvancedMedical(),
-              options.isUseAlternativeAdvancedMedical() && options.isUseRandomDiseases(),
-              options.isUseAlternatePaymentMode(),
-              options.isUseDiminishingContractPay() && isDiminishingContractPayRelevant(options)
+              options.get(CampaignOption.USE_ADVANCED_SCOUTING) && options.isUseStratCon(),
+              options.get(CampaignOption.USE_ALTERNATIVE_ADVANCED_MEDICAL),
+              options.get(CampaignOption.USE_ALTERNATIVE_ADVANCED_MEDICAL) && options.get(CampaignOption.USE_RANDOM_DISEASES),
+              options.get(CampaignOption.USE_ALTERNATE_PAYMENT_MODE),
+              options.get(CampaignOption.USE_DIMINISHING_CONTRACT_PAY) && isDiminishingContractPayRelevant(options),
+              options.get(CampaignOption.USE_CHAOS_REPUTATION),
+              options.get(CampaignOption.USE_LEGACY_CONTRACT_PAY)
         );
     }
 
     private static boolean isDiminishingContractPayRelevant(CampaignOptions options) {
-        return options.isUsePeacetimeCost() || options.isEquipmentContractBase();
+        return options.get(CampaignOption.USE_PEACETIME_COST) || options.get(CampaignOption.EQUIPMENT_CONTRACT_BASE);
     }
 }

@@ -215,6 +215,24 @@ public class InfantryAmmoBin extends AmmoBin {
         return (int) Math.floor(getWeaponType().getShots() / getWeaponType().getAmmoWeight());
     }
 
+    /**
+     * Infantry ammunition is priced from its weapon rather than from the munition in the bin, so the manufactured price
+     * is the ordinary one.
+     */
+    @Override
+    protected Money getFabricationPricePerTon() {
+        return getPricePerTon();
+    }
+
+    /**
+     * A bin that is over capacity is unloaded before it is loaded (see {@link #loadBin()}), so the fabrication
+     * manufactures a full bin at the new capacity rather than nothing at all.
+     */
+    @Override
+    protected int getFabricationShots() {
+        return (shotsNeeded < 0) ? getFullShots() : super.getFabricationShots();
+    }
+
     @Override
     public void updateConditionFromEntity(boolean checkForDestruction) {
         super.updateConditionFromEntity(checkForDestruction);

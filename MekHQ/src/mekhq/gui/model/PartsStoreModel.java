@@ -516,7 +516,7 @@ public class PartsStoreModel extends AbstractTableModel {
         if (null == logisticsPerson) {
             logisticsPerson = campaign.getPlayerForce().getHumanResources()
                                     .getLogisticsPerson(campaign.getCampaignOptions(),
-                                          campaign.isClanCampaign(),
+                                          campaign.getPlayerForce().isClanForce(),
                                           campaign.getLocalDate());
         }
         return logisticsPerson;

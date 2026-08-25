@@ -53,18 +53,22 @@ import mekhq.campaign.parts.Availability;
 import mekhq.campaign.parts.Part;
 import mekhq.campaign.parts.PartInventory;
 import mekhq.campaign.parts.equipment.MissingAmmoBin;
+import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.skills.SkillType;
 import mekhq.campaign.unit.Unit;
 import mekhq.campaign.work.IAcquisitionWork;
+import mekhq.campaign.work.IFabricatable;
 import mekhq.campaign.work.WorkTime;
 import mekhq.utilities.ReportingUtilities;
+import mekhq.campaign.campaignOptions.CampaignOption;
 
 /**
  * A missing part is a placeholder on a unit to indicate that a replacement task needs to be performed
  *
  * @author Jay Lawson (jaylawson39 at yahoo.com)
  */
-public abstract class MissingPart extends Part implements IAcquisitionWork {
+public abstract class MissingPart extends Part implements IAcquisitionWork, IFabricatable {
+
     public MissingPart(int tonnage, Campaign c) {
         super(tonnage, false, c);
     }
@@ -109,9 +113,12 @@ public abstract class MissingPart extends Part implements IAcquisitionWork {
     @Override
     public String getDesc() {
         StringBuilder toReturn = new StringBuilder();
-        toReturn.append("<html><b>Replace ").append(getName());
+        toReturn.append("<html><b>").append(isFabricating() ? "Fabricate " : "Replace ").append(getName());
         if (isUnitTonnageMatters()) {
             toReturn.append(" (").append(getUnitTonnage()).append(" ton)");
+        }
+        if (isFabricating() && isFabricateUntilSuccess()) {
+            toReturn.append(" (until success)");
         }
         toReturn.append(" - ")
               .append(messageSurroundedBySpanWithColor(SkillType.getExperienceLevelColor(getSkillMin()),
@@ -137,9 +144,18 @@ public abstract class MissingPart extends Part implements IAcquisitionWork {
 
     @Override
     public String succeed() {
+        boolean wasFabricating = isFabricating();
+        if (wasFabricating) {
+            // The fabrication cost is charged per attempt, whether it succeeds or fails.
+            chargeFabricationAttempt(campaign.getPlayerForce().getFinances());
+            // Supply the freshly fabricated component as this part's replacement so the normal fix() path below
+            // installs it - with the correct slot/location linkage handled by each part type's own fix() override -
+            // exactly as if it had been pulled from stock.
+            prepareFabricatedReplacement();
+        }
         fix();
         return messageSurroundedBySpanWithColor(ReportingUtilities.getPositiveColor(),
-              " <b>replaced</b>.");
+              wasFabricating ? " <b>fabricated</b>." : " <b>replaced</b>.");
     }
 
     @Override
@@ -160,6 +176,41 @@ public abstract class MissingPart extends Part implements IAcquisitionWork {
 
             actualReplacement.updateConditionFromPart();
         }
+    }
+
+    /**
+     * Creates a brand-new fabricated component and assigns it as this part's replacement, so the normal {@link #fix()}
+     * path for this specific part type installs it (with the correct slot/location linkage). The fabricated component's
+     * quality matches that of the unit it is installed in (individual per-part quality tracking from the margin of
+     * success is not modeled). The monetary cost of the attempt is charged separately, per attempt, by
+     * {@link IFabricatable#chargeFabricationAttempt}.
+     */
+    private void prepareFabricatedReplacement() {
+        if (unit == null) {
+            return;
+        }
+
+        // Fabricating despite having a spare in stock is a legal choice, and reservePart() (which doesn't know about
+        // fabrication) may have reserved that spare for this task. Release it before overwriting the replacement
+        // reference, otherwise the stock part is left permanently reservedBy the tech and unusable.
+        cancelReservation();
+
+        Part fabricated = getNewPart();
+        fabricated.setBrandNew(true);
+        fabricated.setQuality(unit.getQuality());
+        setReplacementPart(fabricated);
+    }
+
+    @Override
+    public int getActualTime() {
+        return super.getActualTime() * fabricationTimeMultiplier();
+    }
+
+    @Override
+    public TargetRoll getAllMods(final @Nullable Person tech) {
+        TargetRoll mods = super.getAllMods(tech);
+        addFabricationMods(mods, tech);
+        return mods;
     }
 
     @Override
@@ -283,6 +334,16 @@ public abstract class MissingPart extends Part implements IAcquisitionWork {
 
     @Override
     public String fail(int rating) {
+        if (isFabricating()) {
+            // A failed fabrication wastes the time and effort, but another attempt can be made at the same
+            // difficulty (Campaign Ops, p.202). The cost is still charged, per attempt.
+            chargeFabricationAttempt(campaign.getPlayerForce().getFinances());
+            timeSpent = 0;
+            shorthandedMod = 0;
+            return messageSurroundedBySpanWithColor(getNegativeColor(),
+                  "<b> fabrication failed - time and effort wasted</b>") + '.';
+        }
+
         skillMin = ++rating;
         timeSpent = 0;
         shorthandedMod = 0;
@@ -310,13 +371,13 @@ public abstract class MissingPart extends Part implements IAcquisitionWork {
     @Override
     public TargetRoll getAllAcquisitionMods() {
         TargetRoll target = new TargetRoll();
-        if (getTechBase() == TechBase.CLAN && campaign.getCampaignOptions().getClanAcquisitionPenalty() > 0) {
-            target.addModifier(campaign.getCampaignOptions().getClanAcquisitionPenalty(), "clan-tech");
-        } else if (getTechBase() == TechBase.IS && campaign.getCampaignOptions().getIsAcquisitionPenalty() > 0) {
-            target.addModifier(campaign.getCampaignOptions().getIsAcquisitionPenalty(), "Inner Sphere tech");
+        if (getTechBase() == TechBase.CLAN && campaign.getCampaignOptions().get(CampaignOption.CLAN_ACQUISITION_PENALTY) > 0) {
+            target.addModifier(campaign.getCampaignOptions().get(CampaignOption.CLAN_ACQUISITION_PENALTY), "clan-tech");
+        } else if (getTechBase() == TechBase.IS && campaign.getCampaignOptions().get(CampaignOption.IS_ACQUISITION_PENALTY) > 0) {
+            target.addModifier(campaign.getCampaignOptions().get(CampaignOption.IS_ACQUISITION_PENALTY), "Inner Sphere tech");
         } else if (getTechBase() == TechBase.ALL) {
-            int penalty = Math.min(campaign.getCampaignOptions().getClanAcquisitionPenalty(),
-                  campaign.getCampaignOptions().getIsAcquisitionPenalty());
+            int penalty = Math.min(campaign.getCampaignOptions().get(CampaignOption.CLAN_ACQUISITION_PENALTY),
+                  campaign.getCampaignOptions().get(CampaignOption.IS_ACQUISITION_PENALTY));
             if (penalty > 0) {
                 target.addModifier(penalty, "tech limit");
             }

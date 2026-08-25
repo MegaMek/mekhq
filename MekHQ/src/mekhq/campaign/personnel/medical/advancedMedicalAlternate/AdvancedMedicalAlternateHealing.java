@@ -65,6 +65,7 @@ import mekhq.campaign.personnel.skills.ActionCheckResult;
 import mekhq.campaign.personnel.skills.AttributeCheck;
 import mekhq.campaign.personnel.skills.SkillCheck;
 import mekhq.campaign.personnel.skills.enums.SkillAttribute;
+import mekhq.campaign.campaignOptions.CampaignOption;
 
 
 /**
@@ -296,7 +297,7 @@ public class AdvancedMedicalAlternateHealing {
             miscPenalty += healingSPAOptions.hasHypochondriac() ? 1 : 0;
 
             boolean isUseKinderHealing = campaign.getCampaignOptions()
-                                               .isUseAlternativeAdvancedMedicalFewerPermanentInjuries();
+                                               .get(CampaignOption.USE_ALTERNATIVE_ADVANCED_MEDICAL_FEWER_PERMANENT_INJURIES);
 
             // The healing outcome is only applied on the cycle where the recovery timer has run out; on every other
             // cycle a bad roll simply stalls that cycle's progress. Medical Edge is a limited resource, so we only
@@ -304,7 +305,7 @@ public class AdvancedMedicalAlternateHealing {
             // genuinely permanent under the active campaign options).
             boolean willResolveThisCycle = injury.getTime() <= 0;
 
-            boolean useEdge = campaign.getCampaignOptions().isUseEdge();
+            boolean useEdge = campaign.getCampaignOptions().get(CampaignOption.USE_EDGE);
             useEdge = useEdge && healingSPAOptions.hasMedicalEdge() && willResolveThisCycle;
             int marginOfSuccess = getMarginOfSuccessForHealing(doctor,
                   campaign,
@@ -501,7 +502,7 @@ public class AdvancedMedicalAlternateHealing {
     private static HealingMarginOfSuccessEffects processHealingEffects(Campaign campaign, Person patient, Injury injury,
           int marginOfSuccess) {
         boolean isUseKinderHealing = campaign.getCampaignOptions()
-                                           .isUseAlternativeAdvancedMedicalFewerPermanentInjuries();
+                                           .get(CampaignOption.USE_ALTERNATIVE_ADVANCED_MEDICAL_FEWER_PERMANENT_INJURIES);
         HealingMarginOfSuccessEffects healingEffect = getEffectFromHealingAttempt(marginOfSuccess, isUseKinderHealing);
 
         // Some healing effects are mutually exclusive. These conditionals are constructed so we bypass illogical
@@ -527,8 +528,8 @@ public class AdvancedMedicalAlternateHealing {
         }
 
         // The following effects are universal and can apply even if the original injury is healed
-        if (campaign.getCampaignOptions().isUseFatigue()) {
-            int fatigueRate = campaign.getCampaignOptions().getFatigueRate();
+        if (campaign.getCampaignOptions().get(CampaignOption.USE_FATIGUE)) {
+            int fatigueRate = campaign.getCampaignOptions().get(CampaignOption.FATIGUE_RATE);
             patient.changeFatigue(healingEffect.getFatigueDamage() * fatigueRate);
         }
 

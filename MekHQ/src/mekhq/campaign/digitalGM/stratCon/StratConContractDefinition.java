@@ -33,26 +33,27 @@
 package mekhq.campaign.digitalGM.stratCon;
 
 import java.io.File;
-import java.io.FileInputStream;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import javax.xml.namespace.QName;
-import javax.xml.transform.Source;
 
-import jakarta.xml.bind.JAXBContext;
-import jakarta.xml.bind.JAXBElement;
-import jakarta.xml.bind.Marshaller;
-import jakarta.xml.bind.Unmarshaller;
+import com.fasterxml.jackson.annotation.JsonAutoDetect;
+import com.fasterxml.jackson.annotation.PropertyAccessor;
+import com.fasterxml.jackson.core.JsonParser;
+import com.fasterxml.jackson.databind.DeserializationFeature;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.SerializationFeature;
 import jakarta.xml.bind.annotation.XmlElement;
 import jakarta.xml.bind.annotation.XmlElementWrapper;
 import jakarta.xml.bind.annotation.XmlRootElement;
 import megamek.logging.MMLogger;
 import mekhq.MHQConstants;
-import mekhq.campaign.mission.enums.AtBContractType;
-import mekhq.utilities.MHQXMLUtility;
+import mekhq.campaign.mission.contract.contractData.ContractObjectiveType;
+import mekhq.utilities.MMDataLicenseHeader;
 
 /**
  * This class holds data relevant to the various types of contract that can occur in the StratCon campaign system.
@@ -63,10 +64,8 @@ import mekhq.utilities.MHQXMLUtility;
 public class StratConContractDefinition {
     private static final MMLogger LOGGER = MMLogger.create(StratConContractDefinition.class);
 
-    public static final String ROOT_XML_ELEMENT_NAME = "ScenarioTemplate";
-
     private static ContractDefinitionManifest definitionManifest;
-    private static final Map<AtBContractType, StratConContractDefinition> loadedDefinitions = new HashMap<>();
+    private static final Map<ContractObjectiveType, StratConContractDefinition> loadedDefinitions = new HashMap<>();
 
     private static ContractDefinitionManifest getContractDefinitionManifest() {
         if (definitionManifest == null) {
@@ -84,12 +83,12 @@ public class StratConContractDefinition {
     }
 
     /**
-     * Returns the StratCon contract definition for the given {@link AtBContractType}
+     * Returns the StratCon contract definition for the given {@link ContractObjectiveType}
      */
-    public static StratConContractDefinition getContractDefinition(final AtBContractType atbContractType) {
-        if (!loadedDefinitions.containsKey(atbContractType)) {
+    public static StratConContractDefinition getContractDefinition(final ContractObjectiveType contractObjectiveType) {
+        if (!loadedDefinitions.containsKey(contractObjectiveType)) {
             String filePath = Paths.get(MHQConstants.STRAT_CON_CONTRACT_PATH,
-                  getContractDefinitionManifest().definitionFileNames.get(atbContractType)).toString();
+                  getContractDefinitionManifest().definitionFileNames.get(contractObjectiveType)).toString();
             StratConContractDefinition def = Deserialize(new File(filePath));
 
             if (def == null) {
@@ -97,10 +96,10 @@ public class StratConContractDefinition {
                 return null;
             }
 
-            loadedDefinitions.put(atbContractType, def);
+            loadedDefinitions.put(contractObjectiveType, def);
         }
 
-        return loadedDefinitions.get(atbContractType);
+        return loadedDefinitions.get(contractObjectiveType);
     }
 
     /**
@@ -193,7 +192,6 @@ public class StratConContractDefinition {
     /**
      * @return the contract type name
      */
-    @Deprecated(since = "0.51.0", forRemoval = true)
     public String getContractTypeName() {
         return contractTypeName;
     }
@@ -201,7 +199,6 @@ public class StratConContractDefinition {
     /**
      * @param contractTypeName the contract type name to set
      */
-    @Deprecated(since = "0.51.0", forRemoval = true)
     public void setContractTypeName(final String contractTypeName) {
         this.contractTypeName = contractTypeName;
     }
@@ -224,7 +221,6 @@ public class StratConContractDefinition {
         return allowEarlyVictory;
     }
 
-    @Deprecated(since = "0.51.0", forRemoval = true)
     public void setAllowEarlyVictory(boolean allowEarlyVictory) {
         this.allowEarlyVictory = allowEarlyVictory;
     }
@@ -239,7 +235,6 @@ public class StratConContractDefinition {
     /**
      * @param alliedFacilityCount the alliedFacilityCount to set
      */
-    @Deprecated(since = "0.51.0", forRemoval = true)
     public void setAlliedFacilityCount(double alliedFacilityCount) {
         this.alliedFacilityCount = alliedFacilityCount;
     }
@@ -254,7 +249,6 @@ public class StratConContractDefinition {
     /**
      * @param hostileFacilityCount the hostileFacilityCount to set
      */
-    @Deprecated(since = "0.51.0", forRemoval = true)
     public void setHostileFacilityCount(double hostileFacilityCount) {
         this.hostileFacilityCount = hostileFacilityCount;
     }
@@ -289,7 +283,6 @@ public class StratConContractDefinition {
         return objectiveParameters;
     }
 
-    @Deprecated(since = "0.51.0", forRemoval = true)
     public void setObjectiveParameters(List<ObjectiveParameters> objectiveParameters) {
         this.objectiveParameters = objectiveParameters;
     }
@@ -300,7 +293,6 @@ public class StratConContractDefinition {
         return scenarioOdds;
     }
 
-    @Deprecated(since = "0.51.0", forRemoval = true)
     public void setScenarioOdds(List<Integer> scenarioOdds) {
         this.scenarioOdds = scenarioOdds;
     }
@@ -311,7 +303,6 @@ public class StratConContractDefinition {
         return deploymentTimes;
     }
 
-    @Deprecated(since = "0.51.0", forRemoval = true)
     public void setDeploymentTimes(List<Integer> deploymentTimes) {
         this.deploymentTimes = deploymentTimes;
     }
@@ -320,7 +311,6 @@ public class StratConContractDefinition {
         return globalScenarioModifiers;
     }
 
-    @Deprecated(since = "0.51.0", forRemoval = true)
     public void setGlobalScenarioModifiers(List<String> globalScenarioModifiers) {
         this.globalScenarioModifiers = globalScenarioModifiers;
     }
@@ -358,6 +348,35 @@ public class StratConContractDefinition {
         @XmlElementWrapper(name = "objectiveScenarioModifiers")
         @XmlElement(name = "objectiveScenarioModifier")
         List<String> objectiveScenarioModifiers = new ArrayList<>();
+
+        public StrategicObjectiveType getObjectiveType() {
+            return objectiveType;
+        }
+
+        public void setObjectiveType(StrategicObjectiveType objectiveType) {
+            this.objectiveType = objectiveType;
+        }
+
+        public double getObjectiveCount() {
+            return objectiveCount;
+        }
+
+        public void setObjectiveCount(double objectiveCount) {
+            this.objectiveCount = objectiveCount;
+        }
+
+        public List<String> getObjectiveScenarios() {
+            return objectiveScenarios;
+        }
+
+        public List<String> getObjectiveScenarioModifiers() {
+            return objectiveScenarioModifiers;
+        }
+
+        @Override
+        public String toString() {
+            return objectiveType + " (" + objectiveCount + ")";
+        }
     }
 
     /**
@@ -367,41 +386,56 @@ public class StratConContractDefinition {
      */
     public void Serialize(File outputFile) {
         try {
-            JAXBContext context = JAXBContext.newInstance(StratConContractDefinition.class);
-            JAXBElement<StratConContractDefinition> templateElement = new JAXBElement<>(
-                  new QName(ROOT_XML_ELEMENT_NAME), StratConContractDefinition.class, this);
-            Marshaller m = context.createMarshaller();
-            m.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, true);
-            m.marshal(templateElement, outputFile);
+            StratConContractDefinitionJson.toFile(this, outputFile);
         } catch (Exception e) {
             LOGGER.error("Error serializing {}", outputFile.getPath(), e);
         }
     }
 
     /**
-     * Attempt to deserialize an instance of a ScenarioTemplate from the passed-in file
+     * Attempt to deserialize an instance of a StratConContractDefinition from the passed-in JSON file.
      *
      * @param inputFile The source file
      *
-     * @return Possibly an instance of a ScenarioTemplate
+     * @return Possibly an instance of a StratConContractDefinition
      */
     public static StratConContractDefinition Deserialize(File inputFile) {
-        StratConContractDefinition resultingDefinition = null;
-
         try {
-            JAXBContext context = JAXBContext.newInstance(StratConContractDefinition.class);
-            Unmarshaller um = context.createUnmarshaller();
-            try (FileInputStream fileStream = new FileInputStream(inputFile)) {
-                Source inputSource = MHQXMLUtility.createSafeXmlSource(fileStream);
-                JAXBElement<StratConContractDefinition> definitionElement = um.unmarshal(inputSource,
-                      StratConContractDefinition.class);
-                resultingDefinition = definitionElement.getValue();
-            }
+            return StratConContractDefinitionJson.fromFile(inputFile);
         } catch (Exception e) {
             LOGGER.error("Error deserializing contract definition {}", inputFile.getPath(), e);
+            return null;
         }
+    }
 
-        return resultingDefinition;
+    /**
+     * Reads the contract-type-to-file-name mapping from a contract definition manifest file.
+     *
+     * @param manifestFile the manifest file
+     *
+     * @return the mapping, or an empty map if the file is absent or unreadable
+     */
+    public static Map<ContractObjectiveType, String> readManifestMapping(File manifestFile) {
+        ContractDefinitionManifest manifest = ContractDefinitionManifest.Deserialize(manifestFile.getPath());
+        if ((manifest == null) || (manifest.definitionFileNames == null)) {
+            return new HashMap<>();
+        }
+        return manifest.definitionFileNames;
+    }
+
+    /**
+     * Writes a contract definition manifest file mapping each {@link ContractObjectiveType} to its definition file
+     * name.
+     *
+     * @param manifestFile the destination file
+     * @param mapping      the contract-type-to-file-name mapping to write
+     *
+     * @return {@code true} if the file was written, {@code false} on error (logged)
+     */
+    public static boolean writeManifestMapping(File manifestFile, Map<ContractObjectiveType, String> mapping) {
+        ContractDefinitionManifest manifest = new ContractDefinitionManifest();
+        manifest.definitionFileNames = mapping;
+        return manifest.serialize(manifestFile);
     }
 
     /**
@@ -409,11 +443,40 @@ public class StratConContractDefinition {
      *
      * @author NickAragua
      */
-    @XmlRootElement(name = "contractDefinitionManifest")
     private static class ContractDefinitionManifest {
-        @XmlElementWrapper(name = "contractDefinitions")
-        @XmlElement(name = "contractDefinition")
-        public Map<AtBContractType, String> definitionFileNames;
+        private static final ObjectMapper MAPPER = buildMapper();
+
+        public Map<ContractObjectiveType, String> definitionFileNames;
+
+        private static ObjectMapper buildMapper() {
+            ObjectMapper mapper = new ObjectMapper();
+            // Use fields as the single source of truth, matching the shipped contract definition JSON files.
+            mapper.setVisibility(PropertyAccessor.ALL, JsonAutoDetect.Visibility.NONE);
+            mapper.setVisibility(PropertyAccessor.FIELD, JsonAutoDetect.Visibility.ANY);
+            mapper.enable(SerializationFeature.INDENT_OUTPUT);
+            // Tolerate fields absent from older files rather than failing the whole load.
+            mapper.disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES);
+            // Skip the leading '#' license-header comment lines that lead every saved file.
+            mapper.enable(JsonParser.Feature.ALLOW_YAML_COMMENTS);
+            return mapper;
+        }
+
+        /**
+         * Writes this manifest to a JSON file, led by the MegaMek Data license header. The manifest is a plain
+         * key/value map with no comments, so a full rewrite is lossless.
+         *
+         * @return {@code true} if the file was written, {@code false} on error (logged)
+         */
+        public boolean serialize(File outputFile) {
+            try {
+                String content = MMDataLicenseHeader.licenseHeader(outputFile) + '\n' + MAPPER.writeValueAsString(this);
+                Files.writeString(outputFile.toPath(), content, StandardCharsets.UTF_8);
+                return true;
+            } catch (Exception e) {
+                LOGGER.error("Error serializing contract definition manifest {}", outputFile.getPath(), e);
+                return false;
+            }
+        }
 
         /**
          * Attempt to deserialize an instance of a contract definition manifest from the passed-in file path
@@ -421,7 +484,6 @@ public class StratConContractDefinition {
          * @return Possibly an instance of a contract definition Manifest
          */
         public static ContractDefinitionManifest Deserialize(String fileName) {
-            ContractDefinitionManifest resultingManifest = null;
             File inputFile = new File(fileName);
             if (!inputFile.exists()) {
                 LOGGER.warn("Specified file {} does not exist", fileName);
@@ -429,19 +491,11 @@ public class StratConContractDefinition {
             }
 
             try {
-                JAXBContext context = JAXBContext.newInstance(ContractDefinitionManifest.class);
-                Unmarshaller um = context.createUnmarshaller();
-                try (FileInputStream fileStream = new FileInputStream(inputFile)) {
-                    Source inputSource = MHQXMLUtility.createSafeXmlSource(fileStream);
-                    JAXBElement<ContractDefinitionManifest> manifestElement = um.unmarshal(inputSource,
-                          ContractDefinitionManifest.class);
-                    resultingManifest = manifestElement.getValue();
-                }
+                return MAPPER.readValue(inputFile, ContractDefinitionManifest.class);
             } catch (Exception e) {
                 LOGGER.error("Error deserializing contract definition manifest", e);
+                return null;
             }
-
-            return resultingManifest;
         }
     }
 }

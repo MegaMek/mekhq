@@ -33,10 +33,10 @@
  */
 package mekhq.gui.view;
 
-import static mekhq.campaign.mission.enums.CombatRole.CADRE;
-import static mekhq.campaign.mission.enums.CombatRole.FRONTLINE;
-import static mekhq.campaign.mission.enums.CombatRole.MANEUVER;
-import static mekhq.campaign.mission.enums.CombatRole.PATROL;
+import static mekhq.campaign.mission.utilities.CombatRole.CADRE;
+import static mekhq.campaign.mission.utilities.CombatRole.FRONTLINE;
+import static mekhq.campaign.mission.utilities.CombatRole.MANEUVER;
+import static mekhq.campaign.mission.utilities.CombatRole.PATROL;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -44,11 +44,11 @@ import javax.swing.SwingConstants;
 
 import mekhq.campaign.Campaign;
 import mekhq.campaign.force.CombatTeam;
-import mekhq.campaign.mission.AtBContract;
-import mekhq.campaign.mission.enums.CombatRole;
+import mekhq.campaign.mission.contract.AbstractContract;
+import mekhq.campaign.mission.utilities.CombatRole;
 import mekhq.gui.model.DataTableModel;
 
-class RequiredLancesTableModel extends DataTableModel<AtBContract> {
+class RequiredLancesTableModel extends DataTableModel<AbstractContract> {
     public static final int COL_CONTRACT = 0;
     public static final int COL_TOTAL = 1;
     public static final int COL_FIGHT = 2;
@@ -66,7 +66,7 @@ class RequiredLancesTableModel extends DataTableModel<AtBContract> {
                                      CADRE.toString() };
     }
 
-    static int getAssignedCombatElementCount(Campaign campaign, AtBContract contract) {
+    static int getAssignedCombatElementCount(Campaign campaign, AbstractContract contract) {
         int assignedCombatElements = 0;
         for (CombatTeam combatTeam : campaign.getPlayerForce().getCombatTeamsAsList(campaign)) {
             if (!contract.equals(combatTeam.getContract(campaign))) {
@@ -74,7 +74,7 @@ class RequiredLancesTableModel extends DataTableModel<AtBContract> {
             }
 
             CombatRole role = combatTeam.getRole();
-            boolean isRoleSuitable = (contract.getContractType().isCadreDuty() && role.isCadre()) ||
+            boolean isRoleSuitable = (contract.getObjectiveType().isCadreDuty() && role.isCadre()) ||
                                            role.isCombatRole();
             if (isRoleSuitable && combatTeam.isEligible(campaign)) {
                 assignedCombatElements += combatTeam.getSize(campaign);
@@ -85,7 +85,7 @@ class RequiredLancesTableModel extends DataTableModel<AtBContract> {
 
     List<String> getDeploymentShortfallSummaries() {
         List<String> shortfalls = new ArrayList<>();
-        for (AtBContract contract : data) {
+        for (AbstractContract contract : data) {
             List<String> contractShortfalls = new ArrayList<>();
 
             int assignedCombatElements = getAssignedCombatElementCount(campaign, contract);
@@ -95,7 +95,7 @@ class RequiredLancesTableModel extends DataTableModel<AtBContract> {
                                              requiredCombatElements);
             }
 
-            CombatRole requiredRole = contract.getContractType().getRequiredCombatRole();
+            CombatRole requiredRole = contract.getObjectiveType().getRequiredCombatRole();
             int requiredRoleColumn = getColumnForRole(requiredRole);
             if (requiredRoleColumn >= 0) {
                 int assignedRoleElements = getAssignedCombatRoleCount(campaign, contract, requiredRole);
@@ -123,14 +123,14 @@ class RequiredLancesTableModel extends DataTableModel<AtBContract> {
      *
      * @return {@code true} if the contract is short on total coverage or on its required role, {@code false} otherwise
      */
-    static boolean hasDeploymentShortfall(Campaign campaign, AtBContract contract) {
+    static boolean hasDeploymentShortfall(Campaign campaign, AbstractContract contract) {
         int assignedCombatElements = getAssignedCombatElementCount(campaign, contract);
         int requiredCombatElements = contract.getRequiredCombatElements();
         if (assignedCombatElements < requiredCombatElements) {
             return true;
         }
 
-        CombatRole requiredRole = contract.getContractType().getRequiredCombatRole();
+        CombatRole requiredRole = contract.getObjectiveType().getRequiredCombatRole();
         if (getColumnForRole(requiredRole) >= 0) {
             int assignedRoleElements = getAssignedCombatRoleCount(campaign, contract, requiredRole);
             int requiredRoleElements = Math.max(requiredCombatElements / 2, 1);
@@ -139,7 +139,8 @@ class RequiredLancesTableModel extends DataTableModel<AtBContract> {
         return false;
     }
 
-    private static int getAssignedCombatRoleCount(Campaign campaign, AtBContract contract, CombatRole requiredRole) {
+    private static int getAssignedCombatRoleCount(Campaign campaign, AbstractContract contract,
+          CombatRole requiredRole) {
         int assignedCombatElements = 0;
         for (CombatTeam combatTeam : campaign.getPlayerForce().getCombatTeamsAsList(campaign)) {
             if (contract.equals(combatTeam.getContract(campaign)) &&
@@ -196,7 +197,7 @@ class RequiredLancesTableModel extends DataTableModel<AtBContract> {
         return getValueAt(0, c).getClass();
     }
 
-    public AtBContract getRow(int row) {
+    public AbstractContract getRow(int row) {
         return data.get(row);
     }
 
@@ -210,7 +211,7 @@ class RequiredLancesTableModel extends DataTableModel<AtBContract> {
             return data.get(row).getName();
         }
 
-        AtBContract contract = getRow(row);
+        AbstractContract contract = getRow(row);
 
         if (column == COL_TOTAL) {
             int t = getAssignedCombatElementCount(campaign, contract);
@@ -220,7 +221,7 @@ class RequiredLancesTableModel extends DataTableModel<AtBContract> {
             return Integer.toString(contract.getRequiredCombatElements());
         }
 
-        CombatRole requiredRole = contract.getContractType().getRequiredCombatRole();
+        CombatRole requiredRole = contract.getObjectiveType().getRequiredCombatRole();
         int requiredRoleColumn = getColumnForRole(requiredRole);
 
         if (column == requiredRoleColumn) {

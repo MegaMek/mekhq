@@ -52,7 +52,6 @@ import megamek.logging.MMLogger;
 import mekhq.MHQConstants;
 import mekhq.MekHQ;
 import mekhq.NullEntityException;
-import mekhq.campaign.camOpsReputation.ForceReputationController;
 import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.finances.CurrencyManager;
 import mekhq.campaign.finances.Finances;
@@ -61,7 +60,6 @@ import mekhq.campaign.io.CampaignXmlParseException;
 import mekhq.campaign.io.CampaignXmlParser;
 import mekhq.campaign.market.PartsStore;
 import mekhq.campaign.market.PersonnelMarket;
-import mekhq.campaign.market.contractMarket.AtbMonthlyContractMarket;
 import mekhq.campaign.market.personnelMarket.markets.NewPersonnelMarket;
 import mekhq.campaign.market.unitMarket.DisabledUnitMarket;
 import mekhq.campaign.personnel.death.RandomDeath;
@@ -72,6 +70,7 @@ import mekhq.campaign.personnel.ranks.RankSystem;
 import mekhq.campaign.personnel.ranks.Ranks;
 import mekhq.campaign.personnel.turnoverAndRetention.RetirementDefectionTracker;
 import mekhq.campaign.randomEvents.randomEventsSystem.RandomEventLibraries;
+import mekhq.campaign.reputation.camOpsReputation.ForceReputationController;
 import mekhq.campaign.universe.Faction;
 import mekhq.campaign.universe.Factions;
 import mekhq.campaign.universe.PlanetarySystem;
@@ -194,7 +193,6 @@ public class CampaignFactory {
         // Set up markets
         // TODO: Replace PersonnelMarket due to deprecation
         PersonnelMarket personnelMarket = new PersonnelMarket();
-        AtbMonthlyContractMarket atbMonthlyContractMarket = new AtbMonthlyContractMarket();
         DisabledUnitMarket disabledUnitMarket = new DisabledUnitMarket();
 
         // Set up Randomizers based on campaignOptions
@@ -224,12 +222,27 @@ public class CampaignFactory {
         }
 
         try {
-            campaignConfig = new CampaignConfiguration(name, date, options,
-                  faction, techFaction, currencyManager, reputationController,
-                  factionStandings, rankSystem, formation, finances, randomEvents, ultimatums,
-                  retirementDefectionTracker, autosave, behaviorSettings,
-                  personnelMarket, atbMonthlyContractMarket, disabledUnitMarket,
-                  disabledRandomDivorce, disabledRandomMarriage, disabledRandomProcreation);
+            campaignConfig = new CampaignConfiguration(name,
+                  date,
+                  options,
+                  faction,
+                  techFaction,
+                  currencyManager,
+                  reputationController,
+                  factionStandings,
+                  rankSystem,
+                  formation,
+                  finances,
+                  randomEvents,
+                  ultimatums,
+                  retirementDefectionTracker,
+                  autosave,
+                  behaviorSettings,
+                  personnelMarket,
+                  disabledUnitMarket,
+                  disabledRandomDivorce,
+                  disabledRandomMarriage,
+                  disabledRandomProcreation);
         } catch (Exception e) {
             LOGGER.error("Unable to create campaign.", e);
         }

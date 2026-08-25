@@ -32,6 +32,8 @@
  */
 package mekhq.campaign.universe.commandGeneration.ratgen;
 
+import mekhq.campaign.ForceHumanResources;
+import mekhq.campaign.force.PlayerForce;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -89,9 +91,25 @@ class SeniorAppointmentAssignerTest {
     }
 
     /** A campaign with nobody yet on the books, so every post starts vacant. */
+    /**
+     * Wires the personnel chain on a campaign mock. The roster now hangs off the player force's human
+     * resources rather than the campaign itself, so the intermediate mocks have to be stubbed for the
+     * chained call to resolve.
+     *
+     * @param campaign the campaign mock to wire
+     * @param roster   the personnel the campaign should report
+     */
+    private static void stubPersonnel(Campaign campaign, LocalPersonnel roster) {
+        PlayerForce playerForce = mock(PlayerForce.class);
+        ForceHumanResources humanResources = mock(ForceHumanResources.class);
+        when(campaign.getPlayerForce()).thenReturn(playerForce);
+        when(playerForce.getHumanResources()).thenReturn(humanResources);
+        when(humanResources.getPersonnel()).thenReturn(roster.values());
+    }
+
     private static Campaign campaign() {
         Campaign campaign = mock(Campaign.class);
-        when(campaign.getPersonnel()).thenReturn(new LocalPersonnel());
+        stubPersonnel(campaign, new LocalPersonnel());
         return campaign;
     }
 
@@ -184,7 +202,7 @@ class SeniorAppointmentAssignerTest {
         when(incumbent.isChiefMedicalOfficer()).thenReturn(true);
         LocalPersonnel roster = new LocalPersonnel();
         roster.put(UUID.randomUUID(), incumbent);
-        when(campaign.getPersonnel()).thenReturn(roster);
+        stubPersonnel(campaign, roster);
 
         Person newDoctor = senior(PersonnelRole.DOCTOR);
         SeniorAppointmentAssigner.assign(campaign, List.of(newDoctor));
@@ -493,7 +511,7 @@ class SeniorAppointmentAssignerTest {
         when(commander.getRankNumeric()).thenReturn(34);
         LocalPersonnel roster = new LocalPersonnel();
         roster.put(UUID.randomUUID(), commander);
-        when(campaign.getPersonnel()).thenReturn(roster);
+        stubPersonnel(campaign, roster);
 
         Person chosen = junior(PersonnelRole.DOCTOR);
         withSkill(chosen, SkillType.S_SURGERY, 9);
@@ -523,7 +541,7 @@ class SeniorAppointmentAssignerTest {
         when(commander.getRankNumeric()).thenReturn(35);
         LocalPersonnel roster = new LocalPersonnel();
         roster.put(UUID.randomUUID(), commander);
-        when(campaign.getPersonnel()).thenReturn(roster);
+        stubPersonnel(campaign, roster);
 
         Person chosen = junior(PersonnelRole.DOCTOR);
         withSkill(chosen, SkillType.S_SURGERY, 9);
@@ -549,7 +567,7 @@ class SeniorAppointmentAssignerTest {
         when(generalOfficer.getRankNumeric()).thenReturn(45);
         LocalPersonnel roster = new LocalPersonnel();
         roster.put(UUID.randomUUID(), generalOfficer);
-        when(campaign.getPersonnel()).thenReturn(roster);
+        stubPersonnel(campaign, roster);
 
         Person chosen = junior(PersonnelRole.ADMINISTRATOR_COMMAND);
         withSkill(chosen, SkillType.S_ADMIN, 9);
@@ -578,7 +596,7 @@ class SeniorAppointmentAssignerTest {
         when(captain.getRankNumeric()).thenReturn(34);
         LocalPersonnel roster = new LocalPersonnel();
         roster.put(UUID.randomUUID(), captain);
-        when(campaign.getPersonnel()).thenReturn(roster);
+        stubPersonnel(campaign, roster);
 
         Person chosen = junior(PersonnelRole.DOCTOR);
         withSkill(chosen, SkillType.S_SURGERY, 9);
@@ -607,7 +625,7 @@ class SeniorAppointmentAssignerTest {
         when(commander.getRankNumeric()).thenReturn(COLONEL);
         LocalPersonnel roster = new LocalPersonnel();
         roster.put(UUID.randomUUID(), commander);
-        when(campaign.getPersonnel()).thenReturn(roster);
+        stubPersonnel(campaign, roster);
 
         List<Person> staff = new ArrayList<>();
         Person bestLogistics = null;
@@ -669,7 +687,7 @@ class SeniorAppointmentAssignerTest {
         when(commander.getRankNumeric()).thenReturn(commanderRank);
         LocalPersonnel roster = new LocalPersonnel();
         roster.put(UUID.randomUUID(), commander);
-        when(campaign.getPersonnel()).thenReturn(roster);
+        stubPersonnel(campaign, roster);
         return campaign;
     }
 

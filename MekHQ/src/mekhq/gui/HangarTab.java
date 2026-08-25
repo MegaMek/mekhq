@@ -77,6 +77,7 @@ import mekhq.campaign.events.parts.PartWorkEvent;
 import mekhq.campaign.events.persons.PersonChangedEvent;
 import mekhq.campaign.events.scenarios.ScenarioResolvedEvent;
 import mekhq.campaign.events.units.UnitChangedEvent;
+import mekhq.campaign.events.units.UnitLogEvent;
 import mekhq.campaign.events.units.UnitNewEvent;
 import mekhq.campaign.events.units.UnitRemovedEvent;
 import mekhq.campaign.unit.Unit;
@@ -96,6 +97,7 @@ import mekhq.gui.sorter.UnitStatusSorter;
 import mekhq.gui.sorter.UnitTypeSorter;
 import mekhq.gui.sorter.WeightClassSorter;
 import mekhq.gui.view.UnitViewPanel;
+import mekhq.campaign.campaignOptions.CampaignOption;
 
 /**
  * Displays a table of all units in the force.
@@ -582,7 +584,7 @@ public final class HangarTab extends CampaignGuiTab {
             columnModel.setColumnVisible(columnModel.getColumnByModelIndex(UnitTableModel.COL_PARTS), false);
             columnModel.setColumnVisible(columnModel.getColumnByModelIndex(UnitTableModel.COL_SITE), false);
             columnModel.setColumnVisible(columnModel.getColumnByModelIndex(UnitTableModel.COL_QUIRKS),
-                  getCampaign().getCampaignOptions().isUseQuirks());
+                  getCampaign().getCampaignOptions().get(CampaignOption.USE_QUIRKS));
             columnModel.setColumnVisible(columnModel.getColumnByModelIndex(UnitTableModel.COL_MODE), false);
             columnModel.setColumnVisible(columnModel.getColumnByModelIndex(UnitTableModel.COL_SHIP_TRANSPORT), false);
             columnModel.setColumnVisible(columnModel.getColumnByModelIndex(UnitTableModel.COL_TAC_TRANSPORT), false);
@@ -610,9 +612,9 @@ public final class HangarTab extends CampaignGuiTab {
             columnModel.setColumnVisible(columnModel.getColumnByModelIndex(UnitTableModel.COL_CREW), true);
             columnModel.setColumnVisible(columnModel.getColumnByModelIndex(UnitTableModel.COL_TECH_CRW), false);
             columnModel.setColumnVisible(columnModel.getColumnByModelIndex(UnitTableModel.COL_MAINTAIN),
-                  getCampaign().getCampaignOptions().isPayForMaintain());
+                  getCampaign().getCampaignOptions().get(CampaignOption.PAY_FOR_MAINTAIN));
             columnModel.setColumnVisible(columnModel.getColumnByModelIndex(UnitTableModel.COL_MAINTAIN_CYCLE),
-                  getCampaign().getCampaignOptions().isCheckMaintenance());
+                  getCampaign().getCampaignOptions().get(CampaignOption.CHECK_MAINTENANCE));
             columnModel.setColumnVisible(columnModel.getColumnByModelIndex(UnitTableModel.COL_BV), false);
             columnModel.setColumnVisible(columnModel.getColumnByModelIndex(UnitTableModel.COL_REPAIR), true);
             columnModel.setColumnVisible(columnModel.getColumnByModelIndex(UnitTableModel.COL_PARTS), true);
@@ -800,6 +802,11 @@ public final class HangarTab extends CampaignGuiTab {
     @Subscribe
     public void handle(UnitChangedEvent ev) {
         filterUnitScheduler.schedule();
+    }
+
+    @Subscribe
+    public void handle(UnitLogEvent ev) {
+        refreshUnitView();
     }
 
     @Subscribe

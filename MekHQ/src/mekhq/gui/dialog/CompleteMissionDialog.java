@@ -45,7 +45,7 @@ import javax.swing.JPanel;
 import megamek.client.ui.comboBoxes.MMComboBox;
 import megamek.client.ui.dialogs.buttonDialogs.AbstractButtonDialog;
 import mekhq.MekHQ;
-import mekhq.campaign.mission.enums.MissionStatus;
+import mekhq.campaign.mission.contract.contractData.MissionStatus;
 
 public class CompleteMissionDialog extends AbstractButtonDialog {
     //region Variable Declarations

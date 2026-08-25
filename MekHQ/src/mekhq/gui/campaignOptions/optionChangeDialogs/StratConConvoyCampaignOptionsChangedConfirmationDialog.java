@@ -63,6 +63,7 @@ import mekhq.campaign.universe.Faction;
 import mekhq.campaign.universe.commandGeneration.SupportUnitGenerator;
 import mekhq.gui.baseComponents.roundedComponents.RoundedJButton;
 import mekhq.gui.baseComponents.roundedComponents.RoundedLineBorder;
+import mekhq.campaign.campaignOptions.CampaignOption;
 
 public class StratConConvoyCampaignOptionsChangedConfirmationDialog extends JDialog {
     private static final String RESOURCE_BUNDLE = "mekhq.resources.StratConConvoyCampaignOptionsChangedConfirmationDialog";
@@ -175,7 +176,7 @@ public class StratConConvoyCampaignOptionsChangedConfirmationDialog extends JDia
         RoundedJButton btnConfirm = new RoundedJButton(getTextAt(RESOURCE_BUNDLE,
               "StratConConvoyCampaignOptionsChangedConfirmationDialog.confirm"));
         btnConfirm.addActionListener(evt -> {
-            processFreeUnits(campaign, campaign.getFaction(), true);
+            processFreeUnits(campaign, campaign.getPlayerForce().getFaction(), true);
             dispose();
         });
 

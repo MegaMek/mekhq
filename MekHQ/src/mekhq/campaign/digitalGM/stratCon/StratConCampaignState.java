@@ -51,8 +51,8 @@ import jakarta.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 import megamek.common.annotations.Nullable;
 import megamek.logging.MMLogger;
 import mekhq.campaign.Campaign;
-import mekhq.campaign.mission.AtBContract;
-import mekhq.campaign.mission.AtBScenario;
+import mekhq.campaign.mission.contract.AbstractContract;
+import mekhq.campaign.mission.scenarios.AtBScenario;
 import org.w3c.dom.Node;
 
 /**
@@ -67,7 +67,7 @@ public class StratConCampaignState {
     public static final String ROOT_XML_ELEMENT_NAME = "StratConCampaignState";
 
     @XmlTransient
-    private AtBContract contract;
+    private AbstractContract contract;
 
     // these are all state variables that affect the current Stratcon Campaign
     private int supportPoints;
@@ -86,11 +86,11 @@ public class StratConCampaignState {
     private List<LocalDate> weeklyScenarios;
 
     @XmlTransient
-    public AtBContract getContract() {
+    public AbstractContract getContract() {
         return contract;
     }
 
-    public void setContract(AtBContract contract) {
+    public void setContract(AbstractContract contract) {
         this.contract = contract;
     }
 
@@ -99,7 +99,7 @@ public class StratConCampaignState {
         weeklyScenarios = new ArrayList<>();
     }
 
-    public StratConCampaignState(AtBContract contract) {
+    public StratConCampaignState(AbstractContract contract) {
         tracks = new ArrayList<>();
         weeklyScenarios = new ArrayList<>();
         setContract(contract);
@@ -169,8 +169,8 @@ public class StratConCampaignState {
         this.victoryPoints = victoryPoints;
     }
 
-    public void updateVictoryPoints(int increment) {
-        victoryPoints += increment;
+    public void changeVictoryPoints(int delta) {
+        victoryPoints += delta;
     }
 
     public String getBriefingText() {
@@ -261,7 +261,7 @@ public class StratConCampaignState {
      */
     public static @Nullable StratConScenario getStratConScenarioFromAtBScenario(Campaign campaign,
           AtBScenario scenario) {
-        AtBContract contract = scenario.getContract(campaign);
+        AbstractContract contract = scenario.getContract(campaign);
         if (contract == null) {
             return null;
         }

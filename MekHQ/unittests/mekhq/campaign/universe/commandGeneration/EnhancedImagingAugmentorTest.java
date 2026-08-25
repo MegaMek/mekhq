@@ -32,6 +32,7 @@
  */
 package mekhq.campaign.universe.commandGeneration;
 
+import mekhq.campaign.force.PlayerForce;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.mock;
@@ -107,7 +108,9 @@ class EnhancedImagingAugmentorTest {
 
         Campaign campaign = mock(Campaign.class);
         when(campaign.getGameOptions()).thenReturn(gameOptions);
-        when(campaign.getFaction()).thenReturn(faction);
+        PlayerForce playerForce = mock(PlayerForce.class);
+        when(playerForce.getFaction()).thenReturn(faction);
+        when(campaign.getPlayerForce()).thenReturn(playerForce);
         when(campaign.getCampaignOptions()).thenReturn(campaignOptions);
         return campaign;
     }

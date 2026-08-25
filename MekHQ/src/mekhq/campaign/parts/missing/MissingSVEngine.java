@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2019-2025 The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2019-2026 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -34,6 +34,7 @@ package mekhq.campaign.parts.missing;
 
 import java.io.PrintWriter;
 
+import jakarta.annotation.Nonnull;
 import megamek.common.TechAdvancement;
 import megamek.common.annotations.Nullable;
 import megamek.common.enums.TechRating;
@@ -110,7 +111,7 @@ public class MissingSVEngine extends MissingPart {
     }
 
     @Override
-    public TechRating getTechRating() {
+    public @Nonnull TechRating getTechRating() {
         return techRating;
     }
 

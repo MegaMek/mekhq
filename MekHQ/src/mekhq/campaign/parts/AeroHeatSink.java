@@ -35,6 +35,7 @@ package mekhq.campaign.parts;
 
 import java.io.PrintWriter;
 
+import jakarta.annotation.Nonnull;
 import megamek.common.TechAdvancement;
 import megamek.common.TechConstants;
 import megamek.common.annotations.Nullable;
@@ -51,6 +52,7 @@ import mekhq.campaign.personnel.skills.SkillType;
 import mekhq.utilities.MHQXMLUtility;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
+import mekhq.campaign.campaignOptions.CampaignOption;
 
 /**
  * @author Jay Lawson (jaylawson39 at yahoo.com)
@@ -112,7 +114,7 @@ public class AeroHeatSink extends Part {
 
             if (checkForDestruction
                       && hits > priorHits
-                      && Compute.d6(2) < campaign.getCampaignOptions().getDestroyPartTarget()) {
+                      && Compute.d6(2) < campaign.getCampaignOptions().get(CampaignOption.DESTROY_PART_TARGET)) {
                 remove(false);
             }
         }
@@ -206,7 +208,7 @@ public class AeroHeatSink extends Part {
     }
 
     @Override
-    public TechRating getTechRating() {
+    public @Nonnull TechRating getTechRating() {
         if (type == CLAN_HEAT_DOUBLE) {
             return TechRating.F;
         } else if (type == Aero.HEAT_DOUBLE) {

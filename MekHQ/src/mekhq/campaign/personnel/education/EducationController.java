@@ -188,11 +188,11 @@ public class EducationController {
 
         // Calculate the roll based on Reasoning if necessary
         int roll = d6(2);
-        if (campaignOptions.isUseRandomPersonalities()) {
+        if (campaignOptions.get(CampaignOption.USE_RANDOM_PERSONALITIES)) {
             roll += (person.getReasoning().getReasoningScore() / 4);
         }
         // Calculate the target number based on base target number and faculty skill
-        int targetNumber = campaignOptions.getEntranceExamBaseTargetNumber() - academy.getFacultySkill();
+        int targetNumber = campaignOptions.get(CampaignOption.ENTRANCE_EXAM_BASE_TARGET_NUMBER) - academy.getFacultySkill();
 
         // If the roll meets the target number, the application is successful
         if (roll >= targetNumber) {
@@ -412,7 +412,7 @@ public class EducationController {
         // if the academy is Local, we need to generate a name,
         // otherwise we use the listed name or the campaign name
         if (academy.isHomeSchool()) {
-            person.setEduAcademyName(campaign.getName());
+            person.setEduAcademyName(campaign.getPlayerForce().getName());
         } else if (academy.isLocal()) {
             person.setEduAcademyName(generateName(academy, person.getEduAcademySystem()));
         } else {
@@ -1070,7 +1070,7 @@ public class EducationController {
         int bloodmarkSeverity = person.getBloodmark();
         double bloodmarkDivisor = bloodmarkSeverity + 1;
 
-        int accidentDieSize = campaign.getCampaignOptions().getMilitaryAcademyAccidents();
+        int accidentDieSize = campaign.getCampaignOptions().get(CampaignOption.MILITARY_ACADEMY_ACCIDENTS);
         accidentDieSize = (int) round(accidentDieSize / bloodmarkDivisor);
 
         if (academy.isMilitary() || bloodmarkSeverity != 0) {
@@ -1091,7 +1091,7 @@ public class EducationController {
             }
 
             if (roll == 0) {
-                if ((!person.isChild(campaign.getLocalDate())) || (campaign.getCampaignOptions().isAllAges())) {
+                if ((!person.isChild(campaign.getLocalDate())) || (campaign.getCampaignOptions().get(CampaignOption.ALL_AGES))) {
                     if (d6(2) >= 5) {
                         processTrainingInjury(campaign, academy, person, resources);
                     } else {
@@ -1165,8 +1165,8 @@ public class EducationController {
         int roll;
         int diceSize;
 
-        int adultDiceSize = campaign.getCampaignOptions().getAdultDropoutChance();
-        int childDiceSize = campaign.getCampaignOptions().getChildrenDropoutChance();
+        int adultDiceSize = campaign.getCampaignOptions().get(CampaignOption.ADULT_DROPOUT_CHANCE);
+        int childDiceSize = campaign.getCampaignOptions().get(CampaignOption.CHILDREN_DROPOUT_CHANCE);
 
         // Under 18s don't generally have the same capacity for self-determination as 18+
         // characters, so we treat them as children - even though at 16 they can take Roles.
@@ -1341,7 +1341,7 @@ public class EducationController {
             // children killed when their academy is attacked unless the player has explicitly
             // opted in. While players can assign 16-year-olds to combat roles and have them killed
             // there, that doesn't have the same connotations.
-            if ((!person.isChild(campaign.getLocalDate(), true)) || (campaign.getCampaignOptions().isAllAges())) {
+            if ((!person.isChild(campaign.getLocalDate(), true)) || (campaign.getCampaignOptions().get(CampaignOption.ALL_AGES))) {
                 if (d6(2) >= 5) {
                     String reportMessage = String.format(resources.getString("eventDestruction.text"),
                           person.getHyperlinkedFullTitle(),
@@ -1409,7 +1409,7 @@ public class EducationController {
             }
         }
 
-        if (campaign.getCampaignOptions().isUseRandomPersonalities()) {
+        if (campaign.getCampaignOptions().get(CampaignOption.USE_RANDOM_PERSONALITIES)) {
             graduationRoll += person.getReasoning().getReasoningScore();
         }
 
@@ -1705,7 +1705,7 @@ public class EducationController {
             }
         }
 
-        if (campaign.getCampaignOptions().isUseRandomPersonalities()) {
+        if (campaign.getCampaignOptions().get(CampaignOption.USE_RANDOM_PERSONALITIES)) {
             graduationRoll += person.getReasoning().ordinal() - 12;
         }
 
@@ -1787,7 +1787,7 @@ public class EducationController {
 
         addFacultyXp(campaign, person, academy, bonusCount);
 
-        if ((campaign.getCampaignOptions().isEnableBonuses()) && (bonusCount > 0)) {
+        if ((campaign.getCampaignOptions().get(CampaignOption.ENABLE_BONUSES)) && (bonusCount > 0)) {
             addBonus(campaign, person, academy, bonusCount, resources);
         }
 
@@ -1798,8 +1798,8 @@ public class EducationController {
         }
 
         if (academy.isReeducationCamp()) {
-            Faction campaignFaction = campaign.getFaction();
-            boolean isUseReeducationChangesFaction = campaign.getCampaignOptions().isUseReeducationCamps();
+            Faction campaignFaction = campaign.getPlayerForce().getFaction();
+            boolean isUseReeducationChangesFaction = campaign.getCampaignOptions().get(CampaignOption.USE_REEDUCATION_CAMPS);
 
             if (isUseReeducationChangesFaction) {
                 boolean factionChangeBlocked = isFactionChangeBlocked(person, campaignFaction);
@@ -1921,8 +1921,8 @@ public class EducationController {
         }
 
         CampaignOptions campaignOptions = campaign.getCampaignOptions();
-        Integer curriculumXpRate = campaignOptions.getCurriculumXpRate();
-        boolean isLogSkillGain = campaignOptions.isPersonnelLogSkillGain();
+        Integer curriculumXpRate = campaignOptions.get(CampaignOption.CURRICULUM_XP_RATE);
+        boolean isLogSkillGain = campaignOptions.get(CampaignOption.PERSONNEL_LOG_SKILL_GAIN);
         for (String skill : curriculum) {
             if (skill.equalsIgnoreCase("none")) {
                 return;
@@ -2010,7 +2010,7 @@ public class EducationController {
         if (person.getEduHighestEducation().getLevel() < academy.getEducationLevel(person)) {
             int xpRate = max(1, (12 - academy.getFacultySkill()) * (academyDuration / 600));
 
-            xpRate *= campaign.getCampaignOptions().getFacultyXpRate();
+            xpRate = (int) round(xpRate * campaign.getCampaignOptions().get(CampaignOption.FACULTY_XP_RATE));
 
             int bonusAmount = (int) max(bonusCount, xpRate * bonusPercentage);
             person.awardXP(campaign, xpRate + bonusAmount);
@@ -2039,11 +2039,11 @@ public class EducationController {
 
             String skillName = curriculum.get(roll);
             if (skillName.equalsIgnoreCase("xp")) {
-                person.awardXP(campaign, campaign.getCampaignOptions().getCurriculumXpRate());
+                person.awardXP(campaign, campaign.getCampaignOptions().get(CampaignOption.CURRICULUM_XP_RATE));
 
                 campaign.addReport(PERSONNEL, String.format(resources.getString("bonusXp.text"),
                       person.getFirstName(),
-                      campaign.getCampaignOptions().getCurriculumXpRate()));
+                      campaign.getCampaignOptions().get(CampaignOption.CURRICULUM_XP_RATE)));
             } else if (!skillName.equalsIgnoreCase("none")) {
                 String skillParsed = Academy.skillParser(skillName);
 
@@ -2057,11 +2057,11 @@ public class EducationController {
                     campaign.addReport(PERSONNEL,
                           String.format(resources.getString("bonusAdded.text"), person.getFirstName()));
                 } else {
-                    person.awardXP(campaign, campaign.getCampaignOptions().getCurriculumXpRate());
+                    person.awardXP(campaign, campaign.getCampaignOptions().get(CampaignOption.CURRICULUM_XP_RATE));
 
                     campaign.addReport(PERSONNEL, String.format(resources.getString("bonusXp.text"),
                           person.getFirstName(),
-                          campaign.getCampaignOptions().getCurriculumXpRate()));
+                          campaign.getCampaignOptions().get(CampaignOption.CURRICULUM_XP_RATE)));
                 }
             }
         }
@@ -2344,7 +2344,11 @@ public class EducationController {
         }
 
         // Get the person's experience level and role (combat or non-combat)
-        final int experienceLevel = person.getExperienceLevel(campaign, false, true);
+        final int experienceLevel = person.getExperienceLevel(campaign.getCampaignOptions(),
+              campaign.getPlayerForce().isClanForce(),
+              campaign.getLocalDate(),
+              false,
+              true);
         final boolean isCombatRole = person.getPrimaryRole().isCombat();
         final boolean isDoctor = person.isDoctor();
 

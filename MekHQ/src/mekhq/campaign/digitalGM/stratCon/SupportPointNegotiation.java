@@ -48,7 +48,8 @@ import megamek.common.annotations.Nullable;
 import megamek.common.compute.Compute;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
-import mekhq.campaign.mission.AtBContract;
+import mekhq.campaign.campaignOptions.CampaignOption;
+import mekhq.campaign.mission.contract.AbstractContract;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.skills.Skill;
 import mekhq.campaign.personnel.skills.SkillModifierData;
@@ -60,11 +61,11 @@ import mekhq.utilities.ReportingUtilities;
  * This class handles Support Point negotiations for StratCon.
  * <p>
  * It includes functionality to negotiate both initial and weekly support points for contracts, based on the skill
- * levels of available Admin/Transport personnel.
+ * levels of available Admin personnel.
  *
  * <p>The workflow includes:</p>
  * <ul>
- *     <li>Filtering and sorting Admin/Transport personnel by their skill levels.</li>
+ *     <li>Filtering and sorting Admin personnel by their skill levels.</li>
  *     <li>Negotiating support points for either a single contract (initial negotiation) or all
  *     active contracts (weekly negotiation).</li>
  *     <li>Calculating support points based on dice rolls and personnel skill levels.</li>
@@ -78,9 +79,9 @@ public class SupportPointNegotiation {
     /**
      * Negotiates weekly additional support points for all active AtB contracts.
      *
-     * <p>Uses available Admin/Transport personnel to negotiate support points for contracts, with older contracts
+     * <p>Uses available Admin personnel to negotiate support points for contracts, with older contracts
      * being processed first. Personnel are removed from the available pool as they are assigned to contracts. If no
-     * Admin/Transport personnel are available, an error report is generated, and the method exits early.</p>
+     * Admin personnel are available, an error report is generated, and the method exits early.</p>
      *
      * <p>Calculated support points are added to the contract if successful, and reports detailing the
      * outcome are appended to the campaign reports.</p>
@@ -89,25 +90,25 @@ public class SupportPointNegotiation {
      */
     public static void negotiateAdditionalSupportPoints(Campaign campaign) {
         // Fetch all active contracts and sort them by start date (oldest -> newest)
-        List<AtBContract> activeContracts = campaign.getActiveAtBContracts();
+        List<AbstractContract> activeContracts = campaign.getActiveContracts();
 
         if (activeContracts.isEmpty()) {
             return;
         }
 
-        List<AtBContract> sortedContracts = getSortedContractsByStartDate(activeContracts);
+        List<AbstractContract> sortedContracts = getSortedContractsByStartDate(activeContracts);
 
-        // Get sorted Admin/Transport personnel
+        // Get sorted Admin personnel
         List<Person> adminTransport = getSortedAdminTransportPersonnel(campaign);
 
-        // If no Admin/Transport personnel, exit early
+        // If no Admin personnel, exit early
         if (adminTransport.isEmpty()) {
             addReportNoPersonnel(campaign, null);
             return;
         }
 
         // Iterate over contracts and negotiate support points
-        for (AtBContract contract : sortedContracts) {
+        for (AbstractContract contract : sortedContracts) {
             if (adminTransport.isEmpty()) {
                 break;
             }
@@ -119,22 +120,22 @@ public class SupportPointNegotiation {
     /**
      * Negotiates initial support points for a specific AtB contract.
      *
-     * <p>This method processes a single contract and uses available Admin/Transport personnel to negotiate
-     * support points. If no Admin/Transport personnel are available, an error report is generated, and the method exits
+     * <p>This method processes a single contract and uses available Admin personnel to negotiate
+     * support points. If no Admin personnel are available, an error report is generated, and the method exits
      * early.</p>
      *
      * <p>Calculated support points are added to the contract if successful, and a report detailing the
      * outcome is appended to the campaign reports.</p>
      *
      * @param campaign The {@link Campaign} instance managing the current game state.
-     * @param contract The {@link AtBContract} instance representing the contract for which initial support points are
-     *                 being negotiated.
+     * @param contract The {@link AbstractContract} instance representing the contract for which initial support points
+     *                 are being negotiated.
      */
-    public static void negotiateInitialSupportPoints(Campaign campaign, AtBContract contract) {
-        // Get sorted Admin/Transport personnel
+    public static void negotiateInitialSupportPoints(Campaign campaign, AbstractContract contract) {
+        // Get sorted Admin personnel
         List<Person> adminTransport = getSortedAdminTransportPersonnel(campaign);
 
-        // If no Admin/Transport personnel, exit early
+        // If no Admin personnel, exit early
         if (adminTransport.isEmpty()) {
             addReportNoPersonnel(campaign, contract);
             return;
@@ -152,21 +153,19 @@ public class SupportPointNegotiation {
      * assigned, and support points are added to the contract if successfully negotiated.</p>
      *
      * @param campaign             The {@link Campaign} instance managing the current game state.
-     * @param contract             The {@link AtBContract} instance for which support points are being processed.
-     * @param adminTransport       A {@link List} of available {@link Person} objects representing Admin/Transport
+     * @param contract             The {@link AbstractContract} instance for which support points are being processed.
+     * @param adminTransport       A {@link List} of available {@link Person} objects representing Admin/
      *                             personnel.
      * @param isInitialNegotiation {@code true} if the negotiation took place at the beginning of the contract,
      *                             otherwise {@code false}
      */
-    private static void processContractSupportPoints(Campaign campaign, AtBContract contract,
+    private static void processContractSupportPoints(Campaign campaign, AbstractContract contract,
           List<Person> adminTransport, boolean isInitialNegotiation) {
         int negotiatedSupportPoints = 0;
-        int maxSupportPoints = isInitialNegotiation ?
-                                     contract.getRequiredCombatTeams() * 3 :
-                                     contract.getRequiredCombatTeams();
+        int maxSupportPoints = isInitialNegotiation ? contract.getMaximumSupportPoints() : contract.getScale();
 
         FactionStandings factionStandings = campaign.getPlayerForce().getFactionStandings();
-        double regard = factionStandings.getRegardForFaction(contract.getEmployerCode(), true);
+        double regard = factionStandings.getRegardForFaction(contract.getEmployerFactionCode(), true);
         boolean isUseFactionStandingSupportPoints = campaign.getCampaignOptions()
                                                           .isUseFactionStandingSupportPointsSafe();
 
@@ -213,7 +212,7 @@ public class SupportPointNegotiation {
         }
 
         if (isInitialNegotiation && isUseFactionStandingSupportPoints) {
-            int multiplier = contract.getRequiredCombatTeams();
+            int multiplier = contract.getScale();
             negotiatedSupportPoints += FactionStandingUtilities.getSupportPointModifierContractStart(regard) *
                                              multiplier;
         }
@@ -248,26 +247,22 @@ public class SupportPointNegotiation {
     }
 
     /**
-     * Filters and sorts Admin/Transport personnel from the campaign by their skill levels in descending order.
+     * Filters and sorts Admin personnel from the campaign by their skill levels in descending order.
      *
      * @param campaign The {@link Campaign} instance containing personnel to be filtered and sorted.
      *
-     * @return A {@link List} of {@link Person} objects representing Admin/Transport personnel, sorted by skill.
+     * @return A {@link List} of {@link Person} objects representing Admin personnel, sorted by skill.
      */
     private static List<Person> getSortedAdminTransportPersonnel(Campaign campaign) {
         List<Person> adminTransport = new ArrayList<>();
         for (Person person : campaign.getPlayerForce().getHumanResources().getAdmins()) {
-            if (person.getPrimaryRole().isAdministratorTransport() ||
-                      person.getSecondaryRole().isAdministratorTransport()) {
-                // Each character gets to roll three times, so we add them to the list three times.
-                adminTransport.add(person);
-                adminTransport.add(person);
+            if (person.isAdministrator()) {
                 adminTransport.add(person);
             }
         }
 
-        boolean isUseAgingEffects = campaign.getCampaignOptions().isUseAgeEffects();
-        boolean isClanCampaign = campaign.isClanCampaign();
+        boolean isUseAgingEffects = campaign.getCampaignOptions().get(CampaignOption.USE_AGE_EFFECTS);
+        boolean isClanCampaign = campaign.getPlayerForce().isClanForce();
         LocalDate today = campaign.getLocalDate();
         adminTransport.sort((p1, p2) -> Integer.compare(getSkillValue(p2,
               isUseAgingEffects,
@@ -279,25 +274,25 @@ public class SupportPointNegotiation {
     /**
      * Sorts all active AtB contracts by their start date in ascending order.
      *
-     * @return A {@link List} of {@link AtBContract} instances, sorted by start date.
+     * @return A {@link List} of {@link AbstractContract} instances, sorted by start date.
      */
-    private static List<AtBContract> getSortedContractsByStartDate(List<AtBContract> activeContracts) {
-        activeContracts.sort(Comparator.comparing(AtBContract::getStartDate));
+    private static List<AbstractContract> getSortedContractsByStartDate(List<AbstractContract> activeContracts) {
+        activeContracts.sort(Comparator.comparing(AbstractContract::getStartDate));
         return activeContracts;
     }
 
     /**
-     * Adds a report to the campaign log indicating the absence of Admin/Transport personnel for support point
+     * Adds a report to the campaign log indicating the absence of Admin personnel for support point
      * negotiations.
      *
      * <p>If a contract is specified, the report is related to that contract. Otherwise, the report is general
      * (e.g., for weekly negotiations).</p>
      *
      * @param campaign The {@link Campaign} instance managing the current game state.
-     * @param contract An optional {@link AtBContract} instance representing the affected contract (can be
+     * @param contract An optional {@link AbstractContract} instance representing the affected contract (can be
      *                 {@code null}).
      */
-    private static void addReportNoPersonnel(Campaign campaign, @Nullable AtBContract contract) {
+    private static void addReportNoPersonnel(Campaign campaign, @Nullable AbstractContract contract) {
         String reportKey = String.format("supportPoints.%s.noAdministrators", contract == null ? "weekly" : "initial");
 
         if (contract == null) {

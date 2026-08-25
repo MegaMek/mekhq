@@ -32,18 +32,24 @@
  */
 package mekhq.campaign.parts.equipment;
 
+import static org.mockito.Mockito.lenient;
+
 import static mekhq.campaign.parts.AmmoUtilities.getAmmoType;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertInstanceOf;
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.RETURNS_DEEP_STUBS;
 import static org.mockito.Mockito.doAnswer;
+import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -53,23 +59,32 @@ import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.StringWriter;
+import java.time.LocalDate;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.ParserConfigurationException;
 
 import megamek.Version;
+import megamek.common.enums.TechRating;
 import megamek.common.equipment.AmmoMounted;
 import megamek.common.equipment.AmmoType;
 import megamek.common.equipment.Mounted;
 import megamek.common.equipment.WeaponMounted;
 import megamek.common.equipment.WeaponType;
+import megamek.common.rolls.TargetRoll;
 import megamek.common.units.Entity;
 import megamek.common.units.ProtoMek;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.LocalWarehouse;
+import mekhq.campaign.campaignOptions.CampaignOption;
 import mekhq.campaign.campaignOptions.CampaignOptions;
+import mekhq.campaign.finances.Finances;
+import mekhq.campaign.finances.Money;
+import mekhq.campaign.finances.enums.TransactionType;
 import mekhq.campaign.parts.AmmoStorage;
 import mekhq.campaign.parts.Part;
 import mekhq.campaign.parts.enums.PartRepairType;
+import mekhq.campaign.personnel.Person;
+import mekhq.campaign.personnel.PersonnelOptions;
 import mekhq.campaign.unit.Unit;
 import mekhq.campaign.work.IAcquisitionWork;
 import mekhq.utilities.MHQXMLUtility;
@@ -788,6 +803,7 @@ public class AmmoBinTest {
         Campaign mockCampaign = mockCampaign();
         CampaignOptions mockCampaignOptions = mock(CampaignOptions.class);
         when(mockCampaign.getCampaignOptions()).thenReturn(mockCampaignOptions);
+        lenient().when(mockCampaignOptions.get(CampaignOption.USE_AMMO_BY_TYPE)).thenReturn(false);
         LocalWarehouse warehouse = new LocalWarehouse();
         when(mockCampaign.getPlayerForce().getWarehouse()).thenReturn(warehouse);
         mekhq.campaign.ForceQuartermaster quartermaster = new mekhq.campaign.ForceQuartermaster(mockCampaign);
@@ -812,6 +828,7 @@ public class AmmoBinTest {
         Campaign mockCampaign = mockCampaign();
         CampaignOptions mockCampaignOptions = mock(CampaignOptions.class);
         when(mockCampaign.getCampaignOptions()).thenReturn(mockCampaignOptions);
+        lenient().when(mockCampaignOptions.get(CampaignOption.USE_AMMO_BY_TYPE)).thenReturn(false);
         LocalWarehouse warehouse = new LocalWarehouse();
         when(mockCampaign.getPlayerForce().getWarehouse()).thenReturn(warehouse);
         mekhq.campaign.ForceQuartermaster quartermaster = new mekhq.campaign.ForceQuartermaster(mockCampaign);
@@ -845,6 +862,7 @@ public class AmmoBinTest {
         Campaign mockCampaign = mockCampaign();
         CampaignOptions mockCampaignOptions = mock(CampaignOptions.class);
         when(mockCampaign.getCampaignOptions()).thenReturn(mockCampaignOptions);
+        lenient().when(mockCampaignOptions.get(CampaignOption.USE_AMMO_BY_TYPE)).thenReturn(false);
         LocalWarehouse warehouse = new LocalWarehouse();
         when(mockCampaign.getPlayerForce().getWarehouse()).thenReturn(warehouse);
         mekhq.campaign.ForceQuartermaster quartermaster = new mekhq.campaign.ForceQuartermaster(mockCampaign);
@@ -899,6 +917,7 @@ public class AmmoBinTest {
         Campaign mockCampaign = mockCampaign();
         CampaignOptions mockCampaignOptions = mock(CampaignOptions.class);
         when(mockCampaign.getCampaignOptions()).thenReturn(mockCampaignOptions);
+        lenient().when(mockCampaignOptions.get(CampaignOption.USE_AMMO_BY_TYPE)).thenReturn(false);
         LocalWarehouse warehouse = new LocalWarehouse();
         when(mockCampaign.getPlayerForce().getWarehouse()).thenReturn(warehouse);
         mekhq.campaign.ForceQuartermaster quartermaster = new mekhq.campaign.ForceQuartermaster(mockCampaign);
@@ -934,6 +953,7 @@ public class AmmoBinTest {
         Campaign mockCampaign = mockCampaign();
         CampaignOptions mockCampaignOptions = mock(CampaignOptions.class);
         when(mockCampaign.getCampaignOptions()).thenReturn(mockCampaignOptions);
+        lenient().when(mockCampaignOptions.get(CampaignOption.USE_AMMO_BY_TYPE)).thenReturn(false);
         LocalWarehouse warehouse = new LocalWarehouse();
         when(mockCampaign.getPlayerForce().getWarehouse()).thenReturn(warehouse);
         mekhq.campaign.ForceQuartermaster quartermaster = new mekhq.campaign.ForceQuartermaster(mockCampaign);
@@ -976,6 +996,7 @@ public class AmmoBinTest {
         Campaign mockCampaign = mockCampaign();
         CampaignOptions mockCampaignOptions = mock(CampaignOptions.class);
         when(mockCampaign.getCampaignOptions()).thenReturn(mockCampaignOptions);
+        lenient().when(mockCampaignOptions.get(CampaignOption.USE_AMMO_BY_TYPE)).thenReturn(false);
         LocalWarehouse warehouse = new LocalWarehouse();
         when(mockCampaign.getPlayerForce().getWarehouse()).thenReturn(warehouse);
         mekhq.campaign.ForceQuartermaster quartermaster = new mekhq.campaign.ForceQuartermaster(mockCampaign);
@@ -1017,6 +1038,7 @@ public class AmmoBinTest {
         Campaign mockCampaign = mockCampaign();
         CampaignOptions mockCampaignOptions = mock(CampaignOptions.class);
         when(mockCampaign.getCampaignOptions()).thenReturn(mockCampaignOptions);
+        lenient().when(mockCampaignOptions.get(CampaignOption.USE_AMMO_BY_TYPE)).thenReturn(false);
         LocalWarehouse warehouse = new LocalWarehouse();
         when(mockCampaign.getPlayerForce().getWarehouse()).thenReturn(warehouse);
         mekhq.campaign.ForceQuartermaster quartermaster = new mekhq.campaign.ForceQuartermaster(mockCampaign);
@@ -1059,6 +1081,7 @@ public class AmmoBinTest {
         Campaign mockCampaign = mockCampaign();
         CampaignOptions mockCampaignOptions = mock(CampaignOptions.class);
         when(mockCampaign.getCampaignOptions()).thenReturn(mockCampaignOptions);
+        lenient().when(mockCampaignOptions.get(CampaignOption.USE_AMMO_BY_TYPE)).thenReturn(false);
         LocalWarehouse warehouse = new LocalWarehouse();
         when(mockCampaign.getPlayerForce().getWarehouse()).thenReturn(warehouse);
         mekhq.campaign.ForceQuartermaster quartermaster = new mekhq.campaign.ForceQuartermaster(mockCampaign);
@@ -1122,6 +1145,7 @@ public class AmmoBinTest {
         Campaign mockCampaign = mockCampaign();
         CampaignOptions mockCampaignOptions = mock(CampaignOptions.class);
         when(mockCampaign.getCampaignOptions()).thenReturn(mockCampaignOptions);
+        lenient().when(mockCampaignOptions.get(CampaignOption.USE_AMMO_BY_TYPE)).thenReturn(false);
         LocalWarehouse warehouse = new LocalWarehouse();
         when(mockCampaign.getPlayerForce().getWarehouse()).thenReturn(warehouse);
         mekhq.campaign.ForceQuartermaster quartermaster = new mekhq.campaign.ForceQuartermaster(mockCampaign);
@@ -1184,6 +1208,7 @@ public class AmmoBinTest {
         Campaign mockCampaign = mockCampaign();
         CampaignOptions mockCampaignOptions = mock(CampaignOptions.class);
         when(mockCampaign.getCampaignOptions()).thenReturn(mockCampaignOptions);
+        lenient().when(mockCampaignOptions.get(CampaignOption.USE_AMMO_BY_TYPE)).thenReturn(false);
         LocalWarehouse warehouse = new LocalWarehouse();
         when(mockCampaign.getPlayerForce().getWarehouse()).thenReturn(warehouse);
         mekhq.campaign.ForceQuartermaster quartermaster = new mekhq.campaign.ForceQuartermaster(mockCampaign);
@@ -1259,6 +1284,7 @@ public class AmmoBinTest {
         Campaign mockCampaign = mockCampaign();
         CampaignOptions mockCampaignOptions = mock(CampaignOptions.class);
         when(mockCampaign.getCampaignOptions()).thenReturn(mockCampaignOptions);
+        lenient().when(mockCampaignOptions.get(CampaignOption.USE_AMMO_BY_TYPE)).thenReturn(false);
         LocalWarehouse warehouse = new LocalWarehouse();
         when(mockCampaign.getPlayerForce().getWarehouse()).thenReturn(warehouse);
         mekhq.campaign.ForceQuartermaster quartermaster = new mekhq.campaign.ForceQuartermaster(mockCampaign);
@@ -1294,6 +1320,7 @@ public class AmmoBinTest {
         Campaign mockCampaign = mockCampaign();
         CampaignOptions mockCampaignOptions = mock(CampaignOptions.class);
         when(mockCampaign.getCampaignOptions()).thenReturn(mockCampaignOptions);
+        lenient().when(mockCampaignOptions.get(CampaignOption.USE_AMMO_BY_TYPE)).thenReturn(false);
         LocalWarehouse warehouse = new LocalWarehouse();
         when(mockCampaign.getPlayerForce().getWarehouse()).thenReturn(warehouse);
         mekhq.campaign.ForceQuartermaster quartermaster = new mekhq.campaign.ForceQuartermaster(mockCampaign);
@@ -1336,6 +1363,7 @@ public class AmmoBinTest {
         Campaign mockCampaign = mockCampaign();
         CampaignOptions mockCampaignOptions = mock(CampaignOptions.class);
         when(mockCampaign.getCampaignOptions()).thenReturn(mockCampaignOptions);
+        lenient().when(mockCampaignOptions.get(CampaignOption.USE_AMMO_BY_TYPE)).thenReturn(false);
         LocalWarehouse warehouse = new LocalWarehouse();
         when(mockCampaign.getPlayerForce().getWarehouse()).thenReturn(warehouse);
         mekhq.campaign.ForceQuartermaster quartermaster = new mekhq.campaign.ForceQuartermaster(mockCampaign);
@@ -1377,6 +1405,7 @@ public class AmmoBinTest {
         Campaign mockCampaign = mockCampaign();
         CampaignOptions mockCampaignOptions = mock(CampaignOptions.class);
         when(mockCampaign.getCampaignOptions()).thenReturn(mockCampaignOptions);
+        lenient().when(mockCampaignOptions.get(CampaignOption.USE_AMMO_BY_TYPE)).thenReturn(false);
         LocalWarehouse warehouse = new LocalWarehouse();
         when(mockCampaign.getPlayerForce().getWarehouse()).thenReturn(warehouse);
         mekhq.campaign.ForceQuartermaster quartermaster = new mekhq.campaign.ForceQuartermaster(mockCampaign);
@@ -1419,6 +1448,7 @@ public class AmmoBinTest {
         Campaign mockCampaign = mockCampaign();
         CampaignOptions mockCampaignOptions = mock(CampaignOptions.class);
         when(mockCampaign.getCampaignOptions()).thenReturn(mockCampaignOptions);
+        lenient().when(mockCampaignOptions.get(CampaignOption.USE_AMMO_BY_TYPE)).thenReturn(false);
         LocalWarehouse warehouse = new LocalWarehouse();
         when(mockCampaign.getPlayerForce().getWarehouse()).thenReturn(warehouse);
         mekhq.campaign.ForceQuartermaster quartermaster = new mekhq.campaign.ForceQuartermaster(mockCampaign);
@@ -1482,6 +1512,7 @@ public class AmmoBinTest {
         Campaign mockCampaign = mockCampaign();
         CampaignOptions mockCampaignOptions = mock(CampaignOptions.class);
         when(mockCampaign.getCampaignOptions()).thenReturn(mockCampaignOptions);
+        lenient().when(mockCampaignOptions.get(CampaignOption.USE_AMMO_BY_TYPE)).thenReturn(false);
         LocalWarehouse warehouse = new LocalWarehouse();
         when(mockCampaign.getPlayerForce().getWarehouse()).thenReturn(warehouse);
         mekhq.campaign.ForceQuartermaster quartermaster = new mekhq.campaign.ForceQuartermaster(mockCampaign);
@@ -1580,6 +1611,300 @@ public class AmmoBinTest {
             AmmoBin ammoBin2 = new AmmoBin(0, ammo2, equipmentNum, shotsNeeded, false, false, mockCampaign);
 
             assertFalse(ammoBin1.isSamePartType(ammoBin2));
+        }
+    }
+
+    @Nested
+    class Fabrication {
+        private AmmoBin newBin(Campaign campaign, int shotsNeeded) {
+            AmmoType ammoType = getAmmoType("ISSRM6 Inferno Ammo");
+            return new AmmoBin(0, ammoType, -1, shotsNeeded, false, false, campaign);
+        }
+
+        @Test
+        public void fabricationMultipliesReloadTimeByTen() {
+            Campaign mockCampaign = mockCampaign();
+            AmmoBin ammoBin = newBin(mockCampaign, 10);
+
+            int normalTime = ammoBin.getActualTime();
+
+            ammoBin.setFabricating(true);
+
+            assertEquals(normalTime * 10, ammoBin.getActualTime());
+        }
+
+        @Test
+        public void routineReloadRemainsAutomaticSuccess() {
+            Campaign mockCampaign = mockCampaign();
+            AmmoBin ammoBin = newBin(mockCampaign, 10);
+
+            // A normal reload from stock loads automatically; only fabrication turns it into a genuine roll.
+            assertEquals(TargetRoll.AUTOMATIC_SUCCESS, ammoBin.getAllMods(null).getValue());
+        }
+
+        @Test
+        public void ammoFabricationCostScalesWithShotsNeeded() {
+            Campaign mockCampaign = mockCampaign();
+            CampaignOptions options = new CampaignOptions();
+            options.set(CampaignOption.PAY_FOR_PARTS, true);
+            options.set(CampaignOption.PAY_FOR_REPAIRS, false);
+            options.set(CampaignOption.USE_BALANCED_FABRICATION, true);
+            when(mockCampaign.getCampaignOptions()).thenReturn(options);
+
+            AmmoBin ammoBin = newBin(mockCampaign, 10);
+
+            // The cost basis is the value of the shots actually needed, times ten under the balanced profile.
+            Money expected = ammoBin.getValueNeeded().multipliedBy(10);
+            assertEquals(expected, ammoBin.getFabricationCost());
+        }
+
+        @Test
+        public void fabricationIsFreeWhenNotPayingForPartsOrRepairs() {
+            Campaign mockCampaign = mockCampaign();
+            CampaignOptions options = new CampaignOptions();
+            options.set(CampaignOption.PAY_FOR_PARTS, false);
+            options.set(CampaignOption.PAY_FOR_REPAIRS, false);
+            when(mockCampaign.getCampaignOptions()).thenReturn(options);
+
+            AmmoBin ammoBin = newBin(mockCampaign, 10);
+
+            assertTrue(ammoBin.getFabricationCost().isZero());
+        }
+
+        @Test
+        public void cancelFabricationClearsTheFabricationFlags() {
+            Campaign mockCampaign = mockCampaign();
+            AmmoBin ammoBin = newBin(mockCampaign, 10);
+            ammoBin.setFabricating(true);
+            ammoBin.setFabricateUntilSuccess(true);
+
+            ammoBin.cancelFabrication();
+
+            assertFalse(ammoBin.isFabricating());
+            assertFalse(ammoBin.isFabricateUntilSuccess());
+        }
+
+        /** Builds an ammo bin, installed on a field-workshop unit, whose Tech Rating is forced to the given value. */
+        private AmmoBin binAtFieldSiteWithTechRating(TechRating techRating) {
+            Campaign mockCampaign = mockCampaign();
+            when(mockCampaign.getCampaignOptions()).thenReturn(new CampaignOptions());
+            AmmoBin ammoBin = spy(newBin(mockCampaign, 10));
+            doReturn(techRating).when(ammoBin).getTechRating();
+
+            Unit unit = mock(Unit.class, RETURNS_DEEP_STUBS);
+            when(unit.getSite()).thenReturn(Unit.SITE_FIELD_WORKSHOP);
+            ammoBin.setUnit(unit);
+            return ammoBin;
+        }
+
+        private Person techWith(String... abilities) {
+            PersonnelOptions options = new PersonnelOptions();
+            for (String ability : abilities) {
+                options.getOption(ability).setValue(true);
+            }
+            Person tech = mock(Person.class);
+            when(tech.getOptions()).thenReturn(options);
+            return tech;
+        }
+
+        @Test
+        public void munitioneerLowersEffectiveTechRatingForAmmo() {
+            // Tech Rating D ammo cannot be fabricated in the field by a plain tech.
+            AmmoBin ammoBin = binAtFieldSiteWithTechRating(TechRating.D);
+
+            Person plainTech = techWith();
+            Person munitioneerTech = techWith(PersonnelOptions.TECH_MUNITIONEER);
+
+            assertFalse(ammoBin.canFabricate(plainTech).isBlank());
+            // Munitioneer treats the Tech Rating D ammo as C, so it becomes fabricable.
+            assertTrue(ammoBin.canFabricate(munitioneerTech).isBlank());
+        }
+
+        @Test
+        public void macGyverAndMunitioneerStackForAmmo() {
+            // Tech Rating E ammo needs a two-step reduction; neither ability alone is enough.
+            AmmoBin ammoBin = binAtFieldSiteWithTechRating(TechRating.E);
+
+            Person macGyverOnly = techWith(PersonnelOptions.TECH_MACGYVER);
+            Person munitioneerOnly = techWith(PersonnelOptions.TECH_MUNITIONEER);
+            Person both = techWith(PersonnelOptions.TECH_MACGYVER, PersonnelOptions.TECH_MUNITIONEER);
+
+            assertFalse(ammoBin.canFabricate(macGyverOnly).isBlank());
+            assertFalse(ammoBin.canFabricate(munitioneerOnly).isBlank());
+            // Stacked, they lower Tech Rating E to C, which is fabricable in the field.
+            assertTrue(ammoBin.canFabricate(both).isBlank());
+        }
+
+        /**
+         * A full bin whose munition type has been changed still reports zero raw shots needed, but reloading it
+         * manufactures an entire bin of the new munition. The attempt must therefore be priced as a full bin of the new
+         * munition rather than as nothing at all.
+         */
+        @Test
+        public void fabricatingAMunitionSwapOnAFullBinIsPricedAsAFullBinOfTheNewMunition() {
+            AmmoType ammoType = getAmmoType("ISSRM6 Ammo");
+            AmmoType otherAmmoType = getAmmoType("ISSRM6 Inferno Ammo");
+
+            Campaign mockCampaign = fabricationCampaign(new Finances());
+            AmmoBin ammoBin = fullBinOnAUnit(mockCampaign, ammoType);
+            ammoBin.setFabricating(true);
+
+            // A full bin needs no shots, so it costs nothing to fabricate ...
+            assertTrue(ammoBin.getFabricationCost().isZero());
+
+            // ... but once the munition type is swapped, a whole bin of the new munition gets manufactured.
+            ammoBin.changeMunition(otherAmmoType);
+
+            AmmoBin newMunitionBin = fabricatingBin(mockCampaign, otherAmmoType, otherAmmoType.getShots());
+            AmmoBin oldMunitionBin = fabricatingBin(mockCampaign, ammoType, ammoType.getShots());
+
+            assertFalse(ammoBin.getFabricationCost().isZero());
+            assertEquals(newMunitionBin.getFabricationCost(), ammoBin.getFabricationCost());
+            // The munition being manufactured is priced, not the one still sitting in the bin.
+            assertNotEquals(oldMunitionBin.getFabricationCost(), ammoBin.getFabricationCost());
+        }
+
+        /**
+         * Regression test: alternating a full bin between two munition types used to be free, because the cost was
+         * derived from the raw shots-needed count (zero on a full bin) while the reload manufactured a full bin. Each
+         * swap dumped the old rounds into the warehouse, so the loop generated unlimited free ammunition.
+         */
+        @Test
+        public void repeatedlySwappingMunitionsWhileFabricatingIsChargedEveryTime() {
+            AmmoType ammoType = getAmmoType("ISSRM6 Ammo");
+            AmmoType otherAmmoType = getAmmoType("ISSRM6 Inferno Ammo");
+
+            Finances finances = new Finances();
+            finances.credit(TransactionType.MISCELLANEOUS, LocalDate.of(3151, 1, 1), Money.of(100_000_000),
+                  "Test funds");
+            Campaign mockCampaign = fabricationCampaign(finances);
+
+            AmmoBin ammoBin = fullBinOnAUnit(mockCampaign, ammoType);
+            ammoBin.setFabricating(true);
+
+            AmmoType loaded = ammoType;
+            for (int swap = 0; swap < 4; swap++) {
+                AmmoType manufactured = (loaded == ammoType) ? otherAmmoType : ammoType;
+                ammoBin.changeMunition(manufactured);
+
+                Money costOfAttempt = ammoBin.getFabricationCost();
+                Money balanceBefore = finances.getBalance();
+                int stockOfManufacturedTypeBefore = mockCampaign.getQuartermaster().getAmmoAvailable(manufactured);
+                int stockOfDisplacedTypeBefore = mockCampaign.getQuartermaster().getAmmoAvailable(loaded);
+
+                assertFalse(costOfAttempt.isZero(), "Fabricating a bin of ammunition must never be free");
+
+                ammoBin.succeed();
+
+                // Every attempt is paid for ...
+                assertEquals(balanceBefore.minus(costOfAttempt), finances.getBalance());
+                // ... the bin ends up full of the new munition ...
+                assertEquals(0, ammoBin.getShotsNeeded());
+                // ... manufactured rather than drawn from stock ...
+                assertEquals(stockOfManufacturedTypeBefore,
+                      mockCampaign.getQuartermaster().getAmmoAvailable(manufactured));
+                // ... and the rounds it displaced were returned to the warehouse (paid for, not conjured).
+                assertEquals(stockOfDisplacedTypeBefore + loaded.getShots(),
+                      mockCampaign.getQuartermaster().getAmmoAvailable(loaded));
+
+                loaded = manufactured;
+            }
+        }
+
+        /**
+         * Regression test: refit completion loads bins by calling {@link AmmoBin#loadBin()} directly, without going
+         * through {@link AmmoBin#succeed()} and its charge. A bin that happens to be flagged for fabrication must
+         * therefore load from stock on that path - manufacturing there would fill it for free.
+         */
+        @Test
+        public void loadingAFabricationFlaggedBinDirectlyNeverManufactures() {
+            AmmoType ammoType = getAmmoType("ISSRM6 Ammo");
+
+            Finances finances = new Finances();
+            finances.credit(TransactionType.MISCELLANEOUS, LocalDate.of(3151, 1, 1), Money.of(100_000_000),
+                  "Test funds");
+            Campaign mockCampaign = fabricationCampaign(finances);
+            Money startingBalance = finances.getBalance();
+
+            // An empty bin, flagged for fabrication, being loaded the way a refit loads it ...
+            AmmoBin ammoBin = binOnAUnit(mockCampaign, ammoType, ammoType.getShots());
+            ammoBin.setFabricating(true);
+
+            // ... with an empty warehouse, loads nothing at all ...
+            ammoBin.loadBin();
+
+            assertEquals(ammoType.getShots(), ammoBin.getShotsNeeded());
+            assertEquals(startingBalance, finances.getBalance());
+
+            // ... and with some stock on hand, loads exactly what the warehouse could supply, free of charge.
+            int shotsInStock = ammoType.getShots() / 3;
+            mockCampaign.getQuartermaster().addAmmo(ammoType, shotsInStock);
+
+            ammoBin.loadBin();
+
+            assertEquals(ammoType.getShots() - shotsInStock, ammoBin.getShotsNeeded());
+            assertEquals(0, mockCampaign.getQuartermaster().getAmmoAvailable(ammoType));
+            assertEquals(startingBalance, finances.getBalance());
+        }
+
+        /** A campaign that pays for parts, with a real warehouse, quartermaster and finances. */
+        private Campaign fabricationCampaign(Finances finances) {
+            Campaign mockCampaign = mockCampaign();
+
+            CampaignOptions options = new CampaignOptions();
+            options.set(CampaignOption.PAY_FOR_PARTS, true);
+            options.set(CampaignOption.PAY_FOR_REPAIRS, false);
+            options.set(CampaignOption.USE_BALANCED_FABRICATION, true);
+            when(mockCampaign.getCampaignOptions()).thenReturn(options);
+            when(mockCampaign.getLocalDate()).thenReturn(LocalDate.of(3151, 1, 1));
+
+            LocalWarehouse warehouse = new LocalWarehouse();
+            when(mockCampaign.getPlayerForce().getWarehouse()).thenReturn(warehouse);
+            when(mockCampaign.getPlayerForce().getFinances()).thenReturn(finances);
+            when(mockCampaign.getQuartermaster()).thenReturn(new mekhq.campaign.ForceQuartermaster(mockCampaign));
+
+            return mockCampaign;
+        }
+
+        /** An off-unit bin of the given munition, set to fabricate, needing the given number of shots. */
+        private AmmoBin fabricatingBin(Campaign campaign, AmmoType ammoType, int shotsNeeded) {
+            AmmoBin ammoBin = new AmmoBin(0, ammoType, -1, shotsNeeded, false, false, campaign);
+            ammoBin.setFabricating(true);
+            return ammoBin;
+        }
+
+        /** A bin installed on a unit and full of the given munition. */
+        private AmmoBin fullBinOnAUnit(Campaign campaign, AmmoType ammoType) {
+            return binOnAUnit(campaign, ammoType, 0);
+        }
+
+        /** A bin installed on a unit, needing the given number of shots of the given munition. */
+        private AmmoBin binOnAUnit(Campaign campaign, AmmoType ammoType, int shotsNeeded) {
+            int equipmentNum = 42;
+            AmmoBin ammoBin = new AmmoBin(0, ammoType, equipmentNum, shotsNeeded, false, false, campaign);
+
+            Unit mockUnit = mock(Unit.class);
+            Entity mockEntity = mock(Entity.class);
+            when(mockUnit.getEntity()).thenReturn(mockEntity);
+
+            AmmoMounted mockMounted = mock(AmmoMounted.class);
+            when(mockMounted.getType()).thenReturn(ammoType);
+            when(mockMounted.getBaseShotsLeft()).thenReturn(ammoType.getShots() - shotsNeeded);
+            doAnswer(invocation -> {
+                AmmoType newAmmoType = invocation.getArgument(0);
+                when(mockMounted.getType()).thenReturn(newAmmoType);
+                return null;
+            }).when(mockMounted).changeAmmoType(any());
+            doAnswer(invocation -> {
+                int shotsLeft = invocation.getArgument(0);
+                when(mockMounted.getBaseShotsLeft()).thenReturn(shotsLeft);
+                return null;
+            }).when(mockMounted).setShotsLeft(anyInt());
+
+            when(mockEntity.getEquipment(eq(equipmentNum))).thenReturn((Mounted) mockMounted);
+            ammoBin.setUnit(mockUnit);
+
+            return ammoBin;
         }
     }
 }

@@ -99,29 +99,29 @@ public class CampaignOptionsUnmarshaller {
                     case "Automatic Success" -> AcquisitionsType.AUTOMATIC;
                     default -> AcquisitionsType.ANY_TECH;
                 };
-                campaignOptions.setAcquisitionType(newType);
+                campaignOptions.set(CampaignOption.ACQUISITIONS_TYPE, newType);
             }
             // Legacy boolean replaced by the ProcurementPersonnelPick category.
             case "acquisitionSupportStaffOnly" ->
-                  campaignOptions.setAcquisitionPersonnelCategory(parseBoolean(nodeContents) ? SUPPORT : ALL);
+                  campaignOptions.set(CampaignOption.ACQUISITION_PERSONNEL_CATEGORY, parseBoolean(nodeContents) ? SUPPORT : ALL);
             // < 50.10 compatibility: booleans replaced by the StratConPlayType enum.
             case "useStratCon" -> {
                 if (parseBoolean(nodeContents)) {
                     // Can still be overwritten by 'useMaplessStratCon' if that clause is hit before this one.
-                    if (campaignOptions.getStratConPlayType() == StratConPlayType.DISABLED) {
-                        campaignOptions.setStratConPlayType(StratConPlayType.NORMAL);
+                    if (campaignOptions.get(CampaignOption.STRAT_CON_PLAY_TYPE) == StratConPlayType.DISABLED) {
+                        campaignOptions.set(CampaignOption.STRAT_CON_PLAY_TYPE, StratConPlayType.NORMAL);
                     }
                 }
             }
             case "useMaplessStratCon" -> {
                 if (parseBoolean(nodeContents)) {
-                    campaignOptions.setStratConPlayType(StratConPlayType.MAPLESS);
+                    campaignOptions.set(CampaignOption.STRAT_CON_PLAY_TYPE, StratConPlayType.MAPLESS);
                 }
             }
             // Legacy boolean replaced by the alternative advanced medical healing-time multiplier.
             case "useKinderAlternativeAdvancedMedical" -> {
                 if (parseBoolean(nodeContents)) {
-                    campaignOptions.setAlternativeAdvancedMedicalHealingTimeMultiplier(0.5);
+                    campaignOptions.set(CampaignOption.ALTERNATIVE_ADVANCED_MEDICAL_HEALING_TIME_MULTIPLIER, 0.5);
                 }
             }
             default -> LOGGER.warn("Potentially unexpected entry in campaign options: {}", nodeName);

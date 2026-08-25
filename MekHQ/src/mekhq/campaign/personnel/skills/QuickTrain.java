@@ -52,6 +52,7 @@ import megamek.logging.MMLogger;
 import mekhq.MHQOptions;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.campaignOptions.CampaignOptions;
+import mekhq.campaign.campaignOptions.CampaignOption;
 import mekhq.campaign.force.Formation;
 import mekhq.campaign.log.PerformanceLogger;
 import mekhq.campaign.personnel.Person;
@@ -92,20 +93,20 @@ public class QuickTrain {
           Campaign campaign, QuickTrainOptions options, boolean isContinuousTraining) {
         CampaignOptions campaignOptions = campaign.getCampaignOptions();
         // Should we train Negotiation for Admins?
-        boolean isAdminsHaveNegotiation = campaignOptions.isAdminsHaveNegotiation();
+        boolean isAdminsHaveNegotiation = campaignOptions.get(CampaignOption.ADMINS_HAVE_NEGOTIATION);
 
         // Should we train Administration for Techs and Doctors?
-        boolean isDoctorsUseAdministration = campaignOptions.isDoctorsUseAdministration();
-        boolean isTechsUseAdministration = campaignOptions.isTechsUseAdministration();
+        boolean isDoctorsUseAdministration = campaignOptions.get(CampaignOption.DOCTORS_USE_ADMINISTRATION);
+        boolean isTechsUseAdministration = campaignOptions.get(CampaignOption.TECHS_USE_ADMINISTRATION);
 
         // Should soldiers only train Small Arms?
-        boolean isUseSmallArmsOnly = campaignOptions.isUseSmallArmsOnly();
+        boolean isUseSmallArmsOnly = campaignOptions.get(CampaignOption.USE_SMALL_ARMS_ONLY);
 
         // Should we train command utility & training skills?
         boolean isUseStratCon = campaignOptions.isUseStratCon();
         // Should we train appraisal on procurement personnel?
-        boolean isUseAppraisal = campaignOptions.isUseFunctionalAppraisal();
-        ProcurementPersonnelPick procurementPersonnel = campaignOptions.getAcquisitionPersonnelCategory();
+        boolean isUseAppraisal = campaignOptions.get(CampaignOption.USE_FUNCTIONAL_APPRAISAL);
+        ProcurementPersonnelPick procurementPersonnel = campaignOptions.get(CampaignOption.ACQUISITION_PERSONNEL_CATEGORY);
 
         boolean isLevelScoutingSkills = isUseStratCon && options.isLevelScoutingSkills();
         boolean isLevelArtillery = options.isLevelArtillery();
@@ -115,15 +116,15 @@ public class QuickTrain {
         boolean isLevelOtherCommandSkills = options.isLevelOtherCommandSkills();
 
         // Do XP costs need to be adjusted?
-        boolean isUseReasoningMultiplier = campaignOptions.isUseReasoningXpMultiplier();
-        double xpCostMultiplier = campaignOptions.getXpCostMultiplier();
+        boolean isUseReasoningMultiplier = campaignOptions.get(CampaignOption.USE_REASONING_XP_MULTIPLIER);
+        double xpCostMultiplier = campaignOptions.get(CampaignOption.XP_COST_MULTIPLIER);
 
         // Are we logging skill gain in the personnel logs?
-        boolean isLogSkillGain = campaignOptions.isPersonnelLogSkillGain();
+        boolean isLogSkillGain = campaignOptions.get(CampaignOption.PERSONNEL_LOG_SKILL_GAIN);
 
         // These are used to determining the current total skill level? Used when prioritizing skill training
-        boolean isUseAgingEffects = campaignOptions.isUseAgeEffects();
-        boolean isClanCampaign = campaign.isClanCampaign();
+        boolean isUseAgingEffects = campaignOptions.get(CampaignOption.USE_AGE_EFFECTS);
+        boolean isClanCampaign = campaign.getPlayerForce().isClanForce();
 
         LocalDate today = campaign.getLocalDate();
 
@@ -144,10 +145,21 @@ public class QuickTrain {
 
             SkillModifierData skillModifierData = person.getSkillModifierData(isUseAgingEffects, isClanCampaign,
                   today, true);
-            processSkills(person, isAdminsHaveNegotiation, isDoctorsUseAdministration, isTechsUseAdministration,
-                  isLevelArtillery, isUseSmallArmsOnly, isLevelScoutingSkills, isLevelEscapeSkills,
-                  isUseAppraisal, procurementPersonnel, isLevelLeadership, isLevelTraining, isLevelOtherCommandSkills,
-                  targetSkills, skillModifierData);
+            processSkills(person,
+                  isAdminsHaveNegotiation,
+                  isDoctorsUseAdministration,
+                  isTechsUseAdministration,
+                  isLevelArtillery,
+                  isUseSmallArmsOnly,
+                  isLevelScoutingSkills,
+                  isLevelEscapeSkills,
+                  isUseAppraisal,
+                  procurementPersonnel,
+                  isLevelLeadership,
+                  isLevelTraining,
+                  isLevelOtherCommandSkills,
+                  targetSkills,
+                  skillModifierData);
 
             if (targetSkills.isEmpty()) {
                 continue;
@@ -286,8 +298,7 @@ public class QuickTrain {
      * <p>The {@code targetSkills} list is modified in place; skills may be added, removed, and finally reordered.
      *
      * @param person                     the person whose skills and roles are being evaluated
-     * @param isAdminsHaveNegotiation    {@code true} if administrators should use negotiation instead of administration
-     *                                   for their profession-based skill picks
+     * @param isAdminsHaveNegotiation    {@code true} if administrators should also be trained in the Negotiation skill
      * @param isDoctorsUseAdministration {@code true} if doctors should use administration instead of medical-specific
      *                                   skills for their profession-based picks
      * @param isTechsUseAdministration   {@code true} if technicians should use administration instead of
@@ -320,12 +331,24 @@ public class QuickTrain {
           SkillModifierData skillModifierData) {
         Skills personSkills = person.getSkills();
 
-        fetchSkillsForProfession(isAdminsHaveNegotiation, isDoctorsUseAdministration,
-              isTechsUseAdministration, isLevelArtillery, isUseSmallArmsOnly, person, targetSkills,
-              person.getPrimaryRole(), skillModifierData);
-        fetchSkillsForProfession(isAdminsHaveNegotiation, isDoctorsUseAdministration,
-              isTechsUseAdministration, isLevelArtillery, isUseSmallArmsOnly, person, targetSkills,
-              person.getSecondaryRole(), skillModifierData);
+        fetchSkillsForProfession(isAdminsHaveNegotiation,
+              isDoctorsUseAdministration,
+              isTechsUseAdministration,
+              isLevelArtillery,
+              isUseSmallArmsOnly,
+              person,
+              targetSkills,
+              person.getPrimaryRole(),
+              skillModifierData);
+        fetchSkillsForProfession(isAdminsHaveNegotiation,
+              isDoctorsUseAdministration,
+              isTechsUseAdministration,
+              isLevelArtillery,
+              isUseSmallArmsOnly,
+              person,
+              targetSkills,
+              person.getSecondaryRole(),
+              skillModifierData);
 
         if (!personSkills.hasSkill(SkillType.S_ARTILLERY)) {
             targetSkills.remove(SkillType.S_ARTILLERY);
@@ -359,8 +382,7 @@ public class QuickTrain {
                     }
                 }
                 case LOGISTICS -> {
-                    boolean isLogisticsCharacter = person.getPrimaryRole().isAdministratorLogistics() ||
-                                                         person.getSecondaryRole().isAdministratorLogistics();
+                    boolean isLogisticsCharacter = person.isAdministrator();
                     if (isLogisticsCharacter && shouldAddSkill(personSkills, S_APPRAISAL, targetSkills)) {
                         targetSkills.add(S_APPRAISAL);
                     }
@@ -427,7 +449,7 @@ public class QuickTrain {
      * Identifies and adds to the target skills list all relevant trainable skills for a given profession of a person,
      * observing special rules for vehicle crews and soldiers.
      *
-     * @param isAdminsHaveNegotiation    campaign option: admins substitute negotiation
+     * @param isAdminsHaveNegotiation    campaign option: admins also train Negotiation
      * @param isDoctorsUseAdministration campaign option: doctors substitute administration
      * @param isTechsUseAdministration   campaign option: techs substitute administration
      * @param isUseArtillery             campaign option: include artillery skills
@@ -457,13 +479,19 @@ public class QuickTrain {
 
             if (highestSkillName == null) {
                 targetSkills.addAll(PersonnelRole.SOLDIER.getSkillsForProfession(isAdminsHaveNegotiation,
-                      isDoctorsUseAdministration, isTechsUseAdministration, isUseArtillery, false));
+                      isDoctorsUseAdministration,
+                      isTechsUseAdministration,
+                      isUseArtillery,
+                      false));
             } else {
                 targetSkills.add(highestSkillName);
             }
         } else {
             targetSkills.addAll(profession.getSkillsForProfession(isAdminsHaveNegotiation,
-                  isDoctorsUseAdministration, isTechsUseAdministration, isUseArtillery, false));
+                  isDoctorsUseAdministration,
+                  isTechsUseAdministration,
+                  isUseArtillery,
+                  false));
         }
     }
 
@@ -509,12 +537,12 @@ public class QuickTrain {
 
         // Additional logic to provide defaults for missing properties
         public static QuickTrainOptions buildQuickTrainOptions(CampaignOptions campaignOptions) {
-            boolean isLevelArtillery = campaignOptions.isUseArtillery();
+            boolean isLevelArtillery = campaignOptions.get(CampaignOption.USE_ARTILLERY);
 
             boolean isUseStratCon = campaignOptions.isUseStratCon();
-            boolean isLevelScoutingSkills = isUseStratCon && campaignOptions.isUseAdvancedScouting();
+            boolean isLevelScoutingSkills = isUseStratCon && campaignOptions.get(CampaignOption.USE_ADVANCED_SCOUTING);
 
-            boolean isLevelEscapeSkills = campaignOptions.isUseFunctionalEscapeArtist();
+            boolean isLevelEscapeSkills = campaignOptions.get(CampaignOption.USE_FUNCTIONAL_ESCAPE_ARTIST);
 
             // These values are purposefully always true, as we always want the options enabled.
             // We added them here anyway, in case that assumption ever changed.

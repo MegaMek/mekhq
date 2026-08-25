@@ -49,6 +49,7 @@ import megamek.logging.MMLogger;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.LocalHangar;
+import mekhq.campaign.campaignOptions.CampaignOption;
 import mekhq.campaign.events.OrganizationChangedEvent;
 import mekhq.campaign.icons.FormationPieceIcon;
 import mekhq.campaign.icons.LayeredFormationIcon;
@@ -56,8 +57,8 @@ import mekhq.campaign.icons.StandardFormationIcon;
 import mekhq.campaign.icons.enums.LayeredFormationIconLayer;
 import mekhq.campaign.icons.enums.OperationalStatus;
 import mekhq.campaign.log.AssignmentLogger;
-import mekhq.campaign.mission.Scenario;
-import mekhq.campaign.mission.enums.CombatRole;
+import mekhq.campaign.mission.scenarios.Scenario;
+import mekhq.campaign.mission.utilities.CombatRole;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.unit.Unit;
 import mekhq.utilities.MHQXMLUtility;
@@ -408,7 +409,7 @@ public class Formation {
      *
      * @param includeTopLevel whether the campaign-root formation (the one whose
      *                        {@code parentFormation == null}) should appear in the returned list.
-     *                        Honors {@link mekhq.campaign.campaignOptions.CampaignOptions#isUseExtendedTOEForceName()}
+     *                        Honors {@link mekhq.campaign.campaignOptions.CampaignOptions#get(CampaignOption.USE_EXTENDED_TOE_FORCE_NAME)}
      *                        at the caller; renderers should pass that option through.
      * @return formation names in leaf-first order, up to four entries
      */
@@ -505,7 +506,7 @@ public class Formation {
 
     /**
      * Add a sub formation to the sub formation vector. In general, this should not be called directly to add formations
-     * to the campaign because they will not be assigned an id. Use {@link Campaign#addFormation(Formation, Formation)}
+     * to the campaign because they will not be assigned an id. Use {@code Campaign#addFormation(Formation, Formation)}
      * instead The boolean assignParent here is set to false when assigning formations from the TOE to a scenario,
      * because we don't want to switch this formations real parent
      *
@@ -611,7 +612,7 @@ public class Formation {
      * Add a unit id to the unit's vector.
      *
      * <p><b>Warning:</b> In general, this should not be called directly to add unid because they will not be
-     * assigned a formation id. Use {@link Campaign#addUnitToFormation(Unit, int)} instead</p>
+     * assigned a formation id. Use {@code Campaign#addUnitToFormation(Unit, int)} instead</p>
      */
     public void addUnit(UUID uid) {
         addUnit(null, uid, false, null);
@@ -643,7 +644,7 @@ public class Formation {
     }
 
     /**
-     * This should not be directly called except by {@link Campaign#removeUnitFromFormation(Unit)} instead
+     * This should not be directly called except by {@code Campaign#removeUnitFromFormation(Unit)} instead
      */
     public void removeUnit(Campaign campaign, UUID id, boolean log) {
         int idx = 0;
@@ -870,7 +871,7 @@ public class Formation {
     }
 
     public @Nullable Person getFormationCommander(Campaign campaign) {
-        if (formationCommanderID == null) {return null;} else {return campaign.getPerson(formationCommanderID);}
+        if (formationCommanderID == null) {return null;} else {return campaign.getPlayerForce().getHumanResources().getPerson(formationCommanderID);}
     }
 
     public void removeSubFormation(int id) {
@@ -1126,7 +1127,7 @@ public class Formation {
                 continue;
             }
 
-            if (campaign.getCampaignOptions().isUseGenericBattleValue() && !formationStandardBattleValue) {
+            if (campaign.getCampaignOptions().get(CampaignOption.USE_GENERIC_BATTLE_VALUE) && !formationStandardBattleValue) {
                 bvTotal += campaign.getUnit(unitId).getEntity().getGenericBattleValue();
             } else {
                 bvTotal += campaign.getUnit(unitId).getEntity().calculateBattleValue();
@@ -1284,7 +1285,7 @@ public class Formation {
 
     private int getOddFormationSizeModifier(Campaign campaign, int depth) {
         int actualUnitCount = getTotalUnitCount(campaign, false);
-        final int baseFormationSize = campaign.getFaction().getFormationBaseSize();
+        final int baseFormationSize = campaign.getPlayerForce().getFaction().getFormationBaseSize();
         if (depth == 1) {
             if (actualUnitCount <= baseFormationSize / 2) {
                 return -1;

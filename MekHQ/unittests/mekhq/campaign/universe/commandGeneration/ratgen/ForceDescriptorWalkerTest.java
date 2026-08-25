@@ -36,6 +36,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.RETURNS_DEEP_STUBS;
 import static org.mockito.Mockito.atLeastOnce;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
@@ -135,7 +136,7 @@ class ForceDescriptorWalkerTest {
 
     private static List<String> namesOfCreatedFormations(Campaign campaign) {
         ArgumentCaptor<Formation> captor = ArgumentCaptor.forClass(Formation.class);
-        verify(campaign, atLeastOnce()).addFormation(captor.capture(), any());
+        verify(campaign.getPlayerForce(), atLeastOnce()).addFormation(captor.capture(), any(), any());
         return captor.getAllValues().stream().map(Formation::getName).toList();
     }
 
@@ -153,7 +154,7 @@ class ForceDescriptorWalkerTest {
 
         secondLance.setIncludedRecursively(false);
 
-        Campaign campaign = mock(Campaign.class);
+        Campaign campaign = mock(Campaign.class, RETURNS_DEEP_STUBS);
         List<String> handledUnits = new ArrayList<>();
         ForceDescriptorWalker.walk(root, campaign, new Formation("Headquarters"), namer(),
               (leaf, parent) -> handledUnits.add(leaf.parseName()));
@@ -178,7 +179,7 @@ class ForceDescriptorWalkerTest {
         lance.setIncludedRecursively(false);
         unitC.setIncluded(true);
 
-        Campaign campaign = mock(Campaign.class);
+        Campaign campaign = mock(Campaign.class, RETURNS_DEEP_STUBS);
         List<String> handledUnits = new ArrayList<>();
         ForceDescriptorWalker.walk(root, campaign, new Formation("Headquarters"), namer(),
               (leaf, parent) -> handledUnits.add(leaf.parseName()));
@@ -217,7 +218,7 @@ class ForceDescriptorWalkerTest {
 
         var previewNames = ForceDescriptorWalker.previewNames(root, namer());
 
-        Campaign campaign = mock(Campaign.class);
+        Campaign campaign = mock(Campaign.class, RETURNS_DEEP_STUBS);
         ForceDescriptorWalker.walk(root, campaign, new Formation("Headquarters"), namer(),
               (leaf, parent) -> { });
         List<String> builtNames = namesOfCreatedFormations(campaign);
@@ -240,7 +241,7 @@ class ForceDescriptorWalkerTest {
         root.addAttached(loosePlatoon("Platoon", UnitType.BATTLE_ARMOR));
         root.addAttached(loosePlatoon("Platoon", UnitType.BATTLE_ARMOR));
 
-        Campaign campaign = mock(Campaign.class);
+        Campaign campaign = mock(Campaign.class, RETURNS_DEEP_STUBS);
         List<String> handledUnits = new ArrayList<>();
         ForceDescriptorWalker.walk(root, campaign, new Formation("Headquarters"), namer(),
               (leaf, parent) -> handledUnits.add(leaf.parseName()));

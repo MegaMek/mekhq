@@ -112,6 +112,7 @@ import mekhq.gui.sorter.PartsDetailSorter;
 import mekhq.gui.sorter.TechSorter;
 import mekhq.gui.sorter.WarehouseStatusSorter;
 import mekhq.service.enums.MRMSMode;
+import mekhq.campaign.campaignOptions.CampaignOption;
 
 /**
  * Displays all spare parts in stock, parts on order, and permits repair of damaged parts.
@@ -660,7 +661,7 @@ public final class WarehouseTab extends CampaignGuiTab implements ITechWorkPanel
                     return false;
                 } else {
                     SkillModifierData skillModifierData = tech.getSkillModifierData();
-                    return getCampaign().getCampaignOptions().isDestroyByMargin() ||
+                    return getCampaign().getCampaignOptions().get(CampaignOption.DESTROY_BY_MARGIN) ||
                                  (part.getSkillMin() <=
                                         (skill.getExperienceLevel(skillModifierData) -
                                                modePenalty));
@@ -719,13 +720,13 @@ public final class WarehouseTab extends CampaignGuiTab implements ITechWorkPanel
                                  .getHumanResources()
                                  .getTechs(campaign.getPlayerForce().getHangar().getUnits(),
                                        campaign.getCampaignOptions(),
-                                       campaign.isClanCampaign(),
+                                       campaign.getPlayerForce().isClanForce(),
                                        campaign.getLocalDate(),
                                        true));
         refreshAsTechPool();
 
         // If requested, switch to top entry
-        if ((null == selectedTech || getCampaign().getCampaignOptions().isResetToFirstTech()) &&
+        if ((null == selectedTech || getCampaign().getCampaignOptions().get(CampaignOption.RESET_TO_FIRST_TECH)) &&
                   techTable.getRowCount() > 0) {
             techTable.setRowSelectionInterval(0, 0);
         } else if (null != selectedTech) {

@@ -64,9 +64,9 @@ import megamek.common.units.ProtoMek;
 import megamek.common.units.UnitType;
 import megamek.logging.MMLogger;
 import mekhq.campaign.Campaign;
-import mekhq.campaign.mission.AtBDynamicScenario;
-import mekhq.campaign.mission.BotForce;
-import mekhq.campaign.mission.Scenario;
+import mekhq.campaign.mission.scenarios.AtBDynamicScenario;
+import mekhq.campaign.mission.scenarios.BotForce;
+import mekhq.campaign.mission.scenarios.Scenario;
 import mekhq.campaign.unit.Unit;
 
 /**
@@ -181,7 +181,8 @@ public class ScenarioSetupForces<SCENARIO extends Scenario> extends SetupForces 
         var player = getCleanPlayer();
         game.addPlayer(player.getId(), player);
         var entities = setupPlayerForces(player);
-        var playerSkill = campaign.getPlayerForce().getReputation().getAverageSkillLevel();
+        var playerSkill = campaign.getPlayerForce()
+                                .getAverageSkillLevel(campaign.getCampaignOptions(), campaign.getLocalDate());
         game.setPlayerSkillLevel(player.getId(), playerSkill);
         sendEntities(entities, game);
     }
@@ -240,8 +241,8 @@ public class ScenarioSetupForces<SCENARIO extends Scenario> extends SetupForces 
      */
     protected Player getCleanPlayer() {
         var campaignPlayer = campaign.getPlayer();
-        var player = new Player(campaignPlayer.getId(), campaign.getName());
-        player.setCamouflage(campaign.getCamouflage().clone());
+        var player = new Player(campaignPlayer.getId(), campaign.getPlayerForce().getName());
+        player.setCamouflage(campaign.getPlayerForce().getCamouflage().clone());
         player.setColour(campaign.getPlayerForce().getColour());
         player.setStartingPos(scenario.getStartingPos());
         player.setStartOffset(scenario.getStartOffset());

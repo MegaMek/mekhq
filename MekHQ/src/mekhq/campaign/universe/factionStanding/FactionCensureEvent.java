@@ -68,7 +68,7 @@ import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.enums.PersonnelRole;
 import mekhq.campaign.personnel.enums.PersonnelStatus;
 import mekhq.campaign.personnel.medical.advancedMedical.InjuryUtil;
-import mekhq.campaign.personnel.ranks.AutoAssignRankForCommandGenerator;
+import mekhq.campaign.personnel.ranks.AutomaticRankAssigner;
 import mekhq.campaign.universe.Faction;
 import mekhq.gui.baseComponents.immersiveDialogs.ImmersiveDialogSimple;
 import mekhq.gui.baseComponents.immersiveDialogs.ImmersiveDialogWidth;
@@ -76,6 +76,7 @@ import mekhq.gui.dialog.factionStanding.factionJudgment.FactionCensureConfirmati
 import mekhq.gui.dialog.factionStanding.factionJudgment.FactionJudgmentDialog;
 import mekhq.gui.dialog.factionStanding.factionJudgment.FactionJudgmentNewsArticle;
 import mekhq.gui.dialog.factionStanding.factionJudgment.FactionJudgmentSceneDialog;
+import mekhq.campaign.campaignOptions.CampaignOption;
 
 /**
  * Represents a faction censure event within a campaign, handling the narrative and mechanical consequences associated
@@ -127,13 +128,13 @@ public class FactionCensureEvent {
 
         commander = campaign.getPlayerForce().getHumanResources()
                           .getCommander(campaign.getCampaignOptions(),
-                                campaign.isClanCampaign(),
+                                campaign.getPlayerForce().isClanForce(),
                                 campaign.getLocalDate()); // Can be null if the campaign is effectively empty
         if (commander == null) {
             // If there isn't a commander in the campaign, we're going to invent someone. This avoids us needing to
             // add null protection throughout this class (and the dialogs it spawns). This clause should only trigger
             // in the event the campaign is effectively empty. So it shouldn't come up during normal play.
-            final String factionCode = campaign.getFaction().getShortName();
+            final String factionCode = campaign.getPlayerForce().getFaction().getShortName();
             commander = campaign.getPlayerForce()
                               .getHumanResources()
                               .newPerson(campaign, PersonnelRole.MEKWARRIOR, factionCode, Gender.RANDOMIZE);
@@ -143,11 +144,11 @@ public class FactionCensureEvent {
 
         secondInCommand = campaign.getPlayerForce().getHumanResources()
                                 .getSecondInCommand(campaign.getCampaignOptions(),
-                                      campaign.isClanCampaign(),
+                                      campaign.getPlayerForce().isClanForce(),
                                       campaign.getLocalDate()); // Can be null if the campaign is effectively empty
         if (secondInCommand == null) {
             // See comments for the 'commander == null' clause
-            final String factionCode = campaign.getFaction().getShortName();
+            final String factionCode = campaign.getPlayerForce().getFaction().getShortName();
             secondInCommand = campaign.getPlayerForce()
                                     .getHumanResources()
                                     .newPerson(campaign, PersonnelRole.MEKWARRIOR, factionCode, Gender.RANDOMIZE);
@@ -178,7 +179,7 @@ public class FactionCensureEvent {
                     Person speaker = campaign.getPlayerForce()
                                            .getHumanResources()
                                            .newPerson(campaign, role, factionCode, Gender.RANDOMIZE);
-                    AutoAssignRankForCommandGenerator.assignRankSystemFromFaction(speaker, RO_MIN);
+                    AutomaticRankAssigner.assignRankSystemFromFaction(speaker, RO_MIN);
 
                     ImmersiveDialogWidth dialogWidth;
                     if (censureAction.equals(FINE) || censureAction.equals(FORMAL_WARNING)) {
@@ -394,11 +395,11 @@ public class FactionCensureEvent {
      */
     private void processFactionStandingChange(boolean isMajor) {
         double delta = isMajor ? REGARD_DELTA_CONTRACT_SUCCESS_EMPLOYER : REGARD_DELTA_CONTRACT_PARTIAL_EMPLOYER;
-        Faction faction = campaign.getFaction();
+        Faction faction = campaign.getPlayerForce().getFaction();
         String factionCode = faction.getShortName();
         FactionStandings factionStandings = campaign.getPlayerForce().getFactionStandings();
-        String report = factionStandings.changeRegardForFaction(campaign.getFaction().getShortName(), factionCode,
-              delta, campaign.getGameYear(), campaign.getCampaignOptions().getRegardMultiplier());
+        String report = factionStandings.changeRegardForFaction(campaign.getPlayerForce().getFaction().getShortName(), factionCode,
+              delta, campaign.getGameYear(), campaign.getCampaignOptions().get(CampaignOption.REGARD_MULTIPLIER));
 
         campaign.addReport(POLITICS, report);
     }
@@ -461,7 +462,7 @@ public class FactionCensureEvent {
      */
     private @Nullable Person getReplacementCharacter(Person seniorPerson) {
         boolean useExtraRandomness = campaign.getRandomSkillPreferences().randomizeSkill();
-        boolean isUseArtillery = campaign.getCampaignOptions().isUseArtillery();
+        boolean isUseArtillery = campaign.getCampaignOptions().get(CampaignOption.USE_ARTILLERY);
 
         PersonnelRole primaryRole = seniorPerson.getPrimaryRole();
         PersonnelRole politicalRole = getPoliticalRole();

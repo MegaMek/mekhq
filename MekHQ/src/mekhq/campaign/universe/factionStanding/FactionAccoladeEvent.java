@@ -63,9 +63,12 @@ import mekhq.campaign.finances.Money;
 import mekhq.campaign.finances.enums.TransactionType;
 import mekhq.campaign.force.CombatTeam;
 import mekhq.campaign.force.FormationLevel;
+import mekhq.campaign.parts.enums.PartQuality;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.enums.PersonnelRole;
-import mekhq.campaign.personnel.ranks.AutoAssignRankForCommandGenerator;
+import mekhq.campaign.personnel.ranks.AutomaticRankAssigner;
+import mekhq.campaign.unit.UnitAcquisitionType;
+import mekhq.campaign.unit.UnitOrder;
 import mekhq.campaign.universe.Faction;
 import mekhq.campaign.universe.Factions;
 import mekhq.campaign.universe.IUnitGenerator;
@@ -74,6 +77,7 @@ import mekhq.gui.baseComponents.immersiveDialogs.ImmersiveDialogWidth;
 import mekhq.gui.dialog.factionStanding.factionJudgment.FactionAccoladeConfirmationDialog;
 import mekhq.gui.dialog.factionStanding.factionJudgment.FactionJudgmentDialog;
 import mekhq.gui.dialog.factionStanding.factionJudgment.FactionJudgmentNewsArticle;
+import mekhq.campaign.campaignOptions.CampaignOption;
 
 /**
  * Handles events where a campaign receives a faction accolade, such as adoption.
@@ -144,7 +148,7 @@ public class FactionAccoladeEvent {
 
         Person commander = campaign.getPlayerForce().getHumanResources()
                                  .getCommander(campaign.getCampaignOptions(),
-                                       campaign.isClanCampaign(),
+                                       campaign.getPlayerForce().isClanForce(),
                                        campaign.getLocalDate());
         String factionName = getFactionName(accoladingFaction, campaign.getGameYear());
 
@@ -185,7 +189,7 @@ public class FactionAccoladeEvent {
             Person speaker = getSpeaker(campaign, accoladingFaction, accoladeLevel);
 
             if (speaker != null) {
-                AutoAssignRankForCommandGenerator.assignRankSystemFromFaction(speaker, RO_MIN);
+                AutomaticRankAssigner.assignRankSystemFromFaction(speaker, RO_MIN);
                 if (isCashReward &&
                           accoladingFaction.getShortName().equals(PIRACY_SUCCESS_INDEX_FACTION_CODE)) {
                     speaker = null;
@@ -218,14 +222,15 @@ public class FactionAccoladeEvent {
             if (!isSameFaction) {
                 GoingRogue.processGoingRogue(campaign, accoladingFaction, campaign.getPlayerForce().getHumanResources()
                                                                                 .getCommander(campaign.getCampaignOptions(),
-                                                                                      campaign.isClanCampaign(),
+                                                                                      campaign.getPlayerForce().isClanForce(),
                                                                                       campaign.getLocalDate()), null,
-                      campaign.getCampaignOptions().isTrackFactionStanding(), false);
+                      campaign.getCampaignOptions().get(CampaignOption.TRACK_FACTION_STANDING), false);
             }
 
             List<Entity> generatedEntities = generateUnits();
             for (Entity entity : generatedEntities) {
-                campaign.addNewUnit(entity, false, 0);
+                PartQuality quality = UnitOrder.getRandomUnitQuality(2);
+                campaign.addNewUnit(entity, false, 0, quality, UnitAcquisitionType.GIFT);
             }
             return;
         }
@@ -268,9 +273,8 @@ public class FactionAccoladeEvent {
             return null;
         } else if (accoladeLevel.is(APPEARING_IN_SEARCHES)) {
             speaker = campaign.getPlayerForce().getHumanResources()
-                            .getSeniorAdminPerson(Campaign.AdministratorSpecialization.COMMAND,
-                                  campaign.getCampaignOptions(),
-                                  campaign.isClanCampaign(),
+                            .getSeniorAdminPerson(campaign.getCampaignOptions(),
+                                  campaign.getPlayerForce().isClanForce(),
                                   campaign.getLocalDate());
         } else {
             boolean isLetterFromHeadOfState = accoladeLevel.is(LETTER_FROM_HEAD_OF_STATE);

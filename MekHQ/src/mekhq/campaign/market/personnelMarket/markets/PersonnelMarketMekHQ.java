@@ -55,11 +55,12 @@ import megamek.common.enums.Gender;
 import mekhq.MekHQ;
 import mekhq.campaign.AbstractLocation;
 import mekhq.campaign.Campaign;
+import mekhq.campaign.campaignOptions.CampaignOption;
 import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.finances.Money;
 import mekhq.campaign.market.personnelMarket.records.PersonnelMarketEntry;
 import mekhq.campaign.market.personnelMarket.yaml.PersonnelMarketLibraries;
-import mekhq.campaign.mission.AtBContract;
+import mekhq.campaign.mission.contract.AbstractContract;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.enums.PersonnelRole;
 import mekhq.campaign.universe.Faction;
@@ -92,6 +93,9 @@ import mekhq.campaign.universe.factionStanding.FactionStandings;
 public class PersonnelMarketMekHQ extends NewPersonnelMarket {
     public static final int ALTERNATE_ADVANCED_MEDICAL_RECRUITMENT_MULTIPLIER = 2;
 
+    private static final int DEFAULT_UNIT_REPUTATION_RECRUITMENT_CUTOFF = -25;
+    private static final int CHAOS_UNIT_REPUTATION_RECRUITMENT_CUTOFF = -3;
+
     /**
      * Constructs a personnel market using the MekHQ classic ruleset.
      *
@@ -106,11 +110,36 @@ public class PersonnelMarketMekHQ extends NewPersonnelMarket {
         setAssociatedPersonnelMarketStyle(MEKHQ);
 
         setLowPopulationRecruitmentDivider(7500000);
-        setUnitReputationRecruitmentCutoff(-25);
+
+        // The campaign reference isn't available yet at construction time, so we default the cutoff here and refine it
+        // in setCampaign(...) once the campaign has been attached.
+        setUnitReputationRecruitmentCutoff(DEFAULT_UNIT_REPUTATION_RECRUITMENT_CUTOFF);
 
         PersonnelMarketLibraries personnelMarketLibraries = new PersonnelMarketLibraries();
         setClanMarketEntries(personnelMarketLibraries.getClanMarketMekHQ());
         setInnerSphereMarketEntries(personnelMarketLibraries.getInnerSphereMarketMekHQ());
+    }
+
+    /**
+     * {@inheritDoc}
+     *
+     * <p>Once the campaign has been attached, the unit reputation recruitment cutoff is refined based on the
+     * {@link CampaignOption#USE_CHAOS_REPUTATION} campaign option. This can't be done in the constructor because the
+     * campaign reference isn't available at that point.</p>
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    @Override
+    public void setCampaign(Campaign campaign) {
+        super.setCampaign(campaign);
+
+        if (campaign != null) {
+            boolean isUseChaosReputation = campaign.getCampaignOptions().get(CampaignOption.USE_CHAOS_REPUTATION);
+            setUnitReputationRecruitmentCutoff(isUseChaosReputation ?
+                                                     CHAOS_UNIT_REPUTATION_RECRUITMENT_CUTOFF :
+                                                     DEFAULT_UNIT_REPUTATION_RECRUITMENT_CUTOFF);
+        }
     }
 
 
@@ -129,7 +158,8 @@ public class PersonnelMarketMekHQ extends NewPersonnelMarket {
         ArrayList<Faction> interestedFactions = new ArrayList<>();
 
         boolean filterOutLegalFactions = false;
-        if (getCampaign().getPlayerForce().getReputation().getReputationRating() <
+        boolean isUseChaosReputation = getCampaign().getCampaignOptions().get(CampaignOption.USE_CHAOS_REPUTATION);
+        if (getCampaign().getPlayerForce().getReputationRating(isUseChaosReputation) <
                   getUnitReputationRecruitmentCutoff()) {
             getLogger().debug(
                   "Only pirates & mercenaries will be considered for applicants, as the campaign's unit " +
@@ -137,9 +167,9 @@ public class PersonnelMarketMekHQ extends NewPersonnelMarket {
             filterOutLegalFactions = true;
         }
 
-        if (getCampaign().isClanCampaign()) {
+        if (getCampaign().getPlayerForce().isClanForce()) {
             if (!filterOutLegalFactions) {
-                interestedFactions.add(getCampaign().getFaction());
+                interestedFactions.add(getCampaign().getPlayerForce().getFaction());
             }
 
             return interestedFactions;
@@ -222,8 +252,8 @@ public class PersonnelMarketMekHQ extends NewPersonnelMarket {
                   closingBrace);
         }
 
-        for (AtBContract contract : getCampaign().getActiveAtBContracts()) {
-            if (!contract.getContractType().isGarrisonType()) {
+        for (AbstractContract contract : getCampaign().getActiveContracts()) {
+            if (!contract.getObjectiveType().isGarrisonType()) {
                 color = MekHQ.getMHQOptions().getFontColorNegativeHexColor();
 
                 return getFormattedTextAt(getResourceBundle(),
@@ -246,9 +276,10 @@ public class PersonnelMarketMekHQ extends NewPersonnelMarket {
      */
     @Override
     public void generateApplicants() {
-        mekhq.campaign.camOpsReputation.ForceReputationController reputation = getCampaign().getPlayerForce()
-                                                                                     .getReputation();
-        int averageSkillLevel = reputation.getAverageSkillLevel().getExperienceLevel();
+        int averageSkillLevel = getCampaign().getPlayerForce()
+                                      .getAverageSkillLevel(getCampaign().getCampaignOptions(),
+                                            getCampaign().getLocalDate())
+                                      .getExperienceLevel();
 
         calculateNumberOfRecruitmentRolls();
 
@@ -256,7 +287,7 @@ public class PersonnelMarketMekHQ extends NewPersonnelMarket {
         // of the campaign minus 2 to a minimum of 2 (Green).
         averageSkillLevel = max(averageSkillLevel - (isOfferingGoldenHello() ? 1 : 2), 2);
 
-        Map<PersonnelRole, PersonnelMarketEntry> unorderedMarketEntries = getCampaign().isClanCampaign() ?
+        Map<PersonnelRole, PersonnelMarketEntry> unorderedMarketEntries = getCampaign().getPlayerForce().isClanForce() ?
                                                                                 getClanMarketEntries() :
                                                                                 getInnerSphereMarketEntries();
         unorderedMarketEntries = sanitizeMarketEntries(unorderedMarketEntries);
@@ -337,7 +368,7 @@ public class PersonnelMarketMekHQ extends NewPersonnelMarket {
         getLogger().debug("Base rolls: {}", lengthOfMonth);
 
         int rolls = lengthOfMonth * getSystemStatusRecruitmentMultiplier();
-        if (getCampaign().getCampaignOptions().isUseAlternativeAdvancedMedical()) {
+        if (getCampaign().getCampaignOptions().get(CampaignOption.USE_ALTERNATIVE_ADVANCED_MEDICAL)) {
             // Alt Advanced Medical increases the impact of injuries. Therefore, players need to maintain a larger
             // roster of combat personnel. This multiplier doubles the number of recruits in the pool to account for
             // this.
@@ -354,7 +385,7 @@ public class PersonnelMarketMekHQ extends NewPersonnelMarket {
             rolls = (int) round(rolls * getFactionStandingsRecruitmentModifier());
         }
 
-        if (campaignOptions.isAllowMonthlyConnections()) {
+        if (campaignOptions.get(CampaignOption.ALLOW_MONTHLY_CONNECTIONS)) {
             int additionalRecruits = performConnectionsRecruitsCheck();
             rolls += additionalRecruits;
         }

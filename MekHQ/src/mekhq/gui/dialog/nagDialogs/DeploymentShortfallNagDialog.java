@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2021-2025 The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2021-2026 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -60,7 +60,7 @@ public class DeploymentShortfallNagDialog extends ImmersiveDialogNag {
      *                 settings required for dialog construction.
      */
     public DeploymentShortfallNagDialog(final Campaign campaign) {
-        super(campaign, null, NAG_SHORT_DEPLOYMENT, "DeploymentShortfallNagDialog");
+        super(campaign, NAG_SHORT_DEPLOYMENT, "DeploymentShortfallNagDialog");
     }
 
     /**

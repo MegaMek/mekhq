@@ -32,6 +32,7 @@
  */
 package mekhq.campaign.universe.commandGeneration.ratgen;
 
+import mekhq.campaign.campaignOptions.CampaignOption;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -70,8 +71,8 @@ class CommandGeneratorTemporaryCrewTest {
         assertNotNull(entity, "the test platoon must load");
         Unit unit = campaign.addNewUnit(entity, false, 0, PartQuality.QUALITY_D);
 
-        Person soldier = campaign.newPerson(PersonnelRole.SOLDIER);
-        campaign.recruitPerson(soldier, true, true);
+        Person soldier = campaign.getPlayerForce().getHumanResources().newPerson(campaign, PersonnelRole.SOLDIER);
+        campaign.getPlayerForce().getHumanResources().recruitPerson(campaign, soldier, true, true);
         unit.addPilotOrSoldier(soldier);
         return unit;
     }
@@ -85,7 +86,7 @@ class CommandGeneratorTemporaryCrewTest {
     @Test
     void aPlatoonLeftShortByTheAssemblerIsCrewedInFull() {
         Campaign campaign = MHQTestUtilities.getTestCampaign();
-        campaign.getCampaignOptions().setUseBlobInfantry(true);
+        campaign.getCampaignOptions().set(CampaignOption.USE_BLOB_INFANTRY, true);
         Unit platoon = footPlatoonWithOneSoldier(campaign);
 
         int seats = platoon.getFullCrewSize();
@@ -106,7 +107,7 @@ class CommandGeneratorTemporaryCrewTest {
     @Test
     void aPlatoonIsLeftAloneWhenTemporaryCrewIsOff() {
         Campaign campaign = MHQTestUtilities.getTestCampaign();
-        campaign.getCampaignOptions().setUseBlobInfantry(false);
+        campaign.getCampaignOptions().set(CampaignOption.USE_BLOB_INFANTRY, false);
         Unit platoon = footPlatoonWithOneSoldier(campaign);
 
         CommandGenerator.topUpTemporaryCrewPools(campaign);

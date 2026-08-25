@@ -32,7 +32,7 @@
  */
 package mekhq.gui.dialog;
 
-import static mekhq.campaign.Campaign.AdministratorSpecialization.HR;
+
 import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
 
 import java.util.ArrayList;
@@ -72,7 +72,7 @@ public class ReplacementLimbDialog {
     public ReplacementLimbDialog(Campaign campaign, List<Person> suitableDoctors, Person patient, Money cost) {
         this.campaign = campaign;
 
-        final boolean isPlanetside = campaign.getCurrentLocation().isOnPlanet();
+        final boolean isPlanetside = campaign.getPlayerForce().getForceDetachment().getCurrentLocation().isOnPlanet();
         final boolean hasQualifiedDoctors = !suitableDoctors.isEmpty();
         final boolean hasSufficientFunds = campaign.getPlayerForce().getFunds().isGreaterOrEqualThan(cost);
 
@@ -192,9 +192,8 @@ public class ReplacementLimbDialog {
             return seniorDoctor;
         } else {
             return campaign.getPlayerForce().getHumanResources()
-                         .getSeniorAdminPerson(HR,
-                               campaign.getCampaignOptions(),
-                               campaign.isClanCampaign(),
+                         .getSeniorAdminPerson(campaign.getCampaignOptions(),
+                               campaign.getPlayerForce().isClanForce(),
                                campaign.getLocalDate());
         }
     }

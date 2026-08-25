@@ -67,7 +67,7 @@ class AddSupportUnitsToTOETest {
               SupportTOEFormationTypes.COMMISSARY_FORMATION);
 
         String label = SupportTOEFormationTypes.COMMISSARY_FORMATION.getLabel();
-        long matching = campaign.getAllFormations().stream()
+        long matching = campaign.getPlayerForce().getAllFormations().stream()
               .filter(formation -> formation.getName().equalsIgnoreCase(label))
               .count();
         assertEquals(1, matching, "a second support batch of the same type must reuse the existing formation");

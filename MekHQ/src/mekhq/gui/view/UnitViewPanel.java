@@ -32,18 +32,30 @@
  */
 package mekhq.gui.view;
 
+import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
+import static mekhq.utilities.MHQInternationalization.getTextAt;
+
 import java.awt.BorderLayout;
+import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Image;
 import java.awt.Insets;
 import java.awt.Panel;
-import java.util.ResourceBundle;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import javax.swing.Box;
 import javax.swing.ImageIcon;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
+import javax.swing.JTable;
 import javax.swing.JTextPane;
+import javax.swing.table.TableColumn;
 
 import megamek.client.ui.entityreadout.EntityReadout;
 import megamek.client.ui.util.FluffImageHelper;
@@ -52,17 +64,21 @@ import megamek.client.ui.util.ViewFormatting;
 import megamek.common.TechConstants;
 import megamek.common.options.IOption;
 import megamek.common.preference.PreferenceManager;
+import megamek.common.ui.EnhancedTabbedPane;
 import megamek.common.units.Entity;
 import megamek.utilities.ImageUtilities;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
+import mekhq.campaign.log.LogEntry;
 import mekhq.campaign.unit.Unit;
 import mekhq.gui.baseComponents.JScrollablePanel;
 import mekhq.gui.baseComponents.roundedComponents.RoundedLineBorder;
+import mekhq.gui.model.PersonnelEventLogModel;
 import mekhq.gui.model.UnitTableModel;
 import mekhq.gui.utilities.ImgLabel;
 import mekhq.gui.utilities.MarkdownRenderer;
 import mekhq.gui.utilities.MultiLineTooltip;
+import mekhq.campaign.campaignOptions.CampaignOption;
 
 /**
  * A custom panel that gets filled in with goodies from a unit record
@@ -70,6 +86,8 @@ import mekhq.gui.utilities.MultiLineTooltip;
  * @author Jay Lawson (jaylawson39 at yahoo.com)
  */
 public class UnitViewPanel extends JScrollablePanel {
+    private static final String RESOURCE_BUNDLE = "mekhq.resources.UnitViewPanel";
+
     private final Unit unit;
     private final Entity entity;
     private final Campaign campaign;
@@ -86,143 +104,302 @@ public class UnitViewPanel extends JScrollablePanel {
     }
 
     private void initComponents() {
-        GridBagConstraints gridBagConstraints;
-
-        JTextPane txtReadout = new JTextPane();
-        JTextPane txtFluff = new JTextPane();
         pnlStats = new JPanel();
         pnlCrew = new JPanel();
 
-        final ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.UnitViewPanel",
-              MekHQ.getMHQOptions().getLocale());
-
         setLayout(new GridBagLayout());
 
-        boolean isSpritesOnly = PreferenceManager.getClientPreferences().getSpritesOnly();
-        int compWidth = 1;
-        Image image = isSpritesOnly ? null : FluffImageHelper.getFluffImage(entity);
-        JLabel lblImage;
+        // Unit image (top left)
+        JLabel lblImage = buildImageLabel();
+        GridBagConstraints gridBagConstraints = new GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 0;
+        gridBagConstraints.insets = new Insets(5, 5, 5, 5);
+        gridBagConstraints.fill = GridBagConstraints.NONE;
+        gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
+        add(lblImage, gridBagConstraints);
 
-        int y = 0;
-        if (null != image) {
-            // fluff image exists so use custom ImgLabel to get full mek porn
-            lblImage = new ImgLabel(image);
-            gridBagConstraints = new GridBagConstraints();
-            gridBagConstraints.gridx = 1;
-            gridBagConstraints.gridy = y;
-            gridBagConstraints.gridheight = 3;
-            gridBagConstraints.weightx = 0.5;
-            gridBagConstraints.insets = new Insets(5, 5, 5, 5);
-            gridBagConstraints.fill = GridBagConstraints.BOTH;
-            gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
-            add(lblImage, gridBagConstraints);
-        } else {
-            // no fluff image, so just use image icon from top-down view
-            compWidth = 2;
-            lblImage = new JLabel();
-            image = unit.getImage(lblImage);
-            if (null != image) {
-                ImageIcon icon = new ImageIcon(image);
-                icon = ImageUtilities.scaleImageIcon(icon, UIUtil.scaleForGUI(150), true);
-                lblImage.setIcon(icon);
-                gridBagConstraints = new GridBagConstraints();
-                gridBagConstraints.gridx = 1;
-                gridBagConstraints.gridy = y;
-                gridBagConstraints.gridheight = 1;
-                gridBagConstraints.weightx = 0.0;
-                gridBagConstraints.fill = GridBagConstraints.BOTH;
-                gridBagConstraints.anchor = GridBagConstraints.CENTER;
-                add(lblImage, gridBagConstraints);
-            }
-        }
-
+        // Unit stats (top right)
         pnlStats.setName("pnlBasic");
         pnlStats.setBorder(RoundedLineBorder.createRoundedLineBorder(unit.getName()));
-        fillStats(resourceMap);
+        fillStats();
         gridBagConstraints = new GridBagConstraints();
-        gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = y;
-        gridBagConstraints.weightx = 0.5;
-        gridBagConstraints.gridwidth = 1;
+        gridBagConstraints.gridx = 1;
+        gridBagConstraints.gridy = 0;
+        gridBagConstraints.weightx = 1.0;
         gridBagConstraints.insets = new Insets(5, 5, 5, 5);
         gridBagConstraints.fill = GridBagConstraints.BOTH;
         gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
         add(pnlStats, gridBagConstraints);
-        y++;
 
+        // Crew needs (spans full width, below the header)
         pnlCrew.setName("pnlCrew");
         pnlCrew.setLayout(new BorderLayout());
-        pnlCrew.setBorder(RoundedLineBorder.createRoundedLineBorder(resourceMap.getString("lblCrew.text")));
+        pnlCrew.setBorder(RoundedLineBorder.createRoundedLineBorder(getTextAt(RESOURCE_BUNDLE, "lblCrew.text")));
         JLabel lblCrew = new JLabel(UnitTableModel.getCrewTooltip(unit));
         pnlCrew.add(lblCrew, BorderLayout.WEST);
         gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = y;
-        gridBagConstraints.weightx = 0.5;
-        gridBagConstraints.gridwidth = 1;
-        gridBagConstraints.insets = new Insets(5, 5, 5, 5);
-        gridBagConstraints.fill = GridBagConstraints.BOTH;
+        gridBagConstraints.gridy = 1;
+        gridBagConstraints.gridwidth = 2;
+        gridBagConstraints.weightx = 1.0;
+        gridBagConstraints.insets = new Insets(0, 5, 5, 5);
+        gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
         gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
         add(pnlCrew, gridBagConstraints);
-        y++;
 
+        // Location (spans full width, below crew needs)
         LocationSummaryPanel pnlLocation = new LocationSummaryPanel(unit, campaign);
         gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = y;
-        gridBagConstraints.weightx = 0.5;
-        gridBagConstraints.gridwidth = 1;
-        gridBagConstraints.insets = new Insets(5, 5, 5, 5);
-        gridBagConstraints.fill = GridBagConstraints.BOTH;
+        gridBagConstraints.gridy = 2;
+        gridBagConstraints.gridwidth = 2;
+        gridBagConstraints.weightx = 1.0;
+        gridBagConstraints.insets = new Insets(0, 5, 5, 5);
+        gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
         gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
         add(pnlLocation, gridBagConstraints);
-        y++;
 
-        if (!unit.getHistory().isBlank()) {
-            txtFluff.setName("txtFluff");
-            txtFluff.setEditable(false);
-            txtFluff.setContentType("text/html");
-            txtFluff.setText(MarkdownRenderer.getRenderedHtml(unit.getHistory()));
-            txtFluff.setBorder(RoundedLineBorder.createRoundedLineBorder("Unit History"));
-            gridBagConstraints = new GridBagConstraints();
-            gridBagConstraints.gridx = 0;
-            gridBagConstraints.gridy = y;
-            gridBagConstraints.weightx = 0.5;
-            gridBagConstraints.weighty = 1.0;
-            gridBagConstraints.gridwidth = compWidth;
-            gridBagConstraints.insets = new Insets(5, 5, 5, 5);
-            gridBagConstraints.fill = GridBagConstraints.BOTH;
-            gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
-            add(txtFluff, gridBagConstraints);
-            y++;
+        // Tabs: Technical Readout and Unit History
+        EnhancedTabbedPane tabbedPane = new EnhancedTabbedPane();
+        gridBagConstraints = new GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 3;
+        gridBagConstraints.gridwidth = 2;
+        gridBagConstraints.weightx = 1.0;
+        gridBagConstraints.weighty = 1.0;
+        gridBagConstraints.insets = new Insets(0, 5, 5, 5);
+        gridBagConstraints.fill = GridBagConstraints.BOTH;
+        gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
+        add(tabbedPane, gridBagConstraints);
+
+        JPanel pnlReadoutTab = new JPanel(new GridBagLayout());
+        pnlReadoutTab.setName("pnlReadoutTab");
+        fillReadoutTab(pnlReadoutTab);
+        tabbedPane.addTab(getTextAt(RESOURCE_BUNDLE, "pnlReadoutTab.title"), pnlReadoutTab);
+
+        JPanel pnlHistoryTab = new JPanel(new GridBagLayout());
+        pnlHistoryTab.setName("pnlHistoryTab");
+        fillHistoryTab(pnlHistoryTab);
+        tabbedPane.addTab(getTextAt(RESOURCE_BUNDLE, "pnlHistoryTab.title"), pnlHistoryTab);
+    }
+
+    /**
+     * Builds the label holding the unit's image, preferring the fluff image and falling back to the top-down sprite.
+     *
+     * @return a label displaying the unit's image
+     */
+    private JLabel buildImageLabel() {
+        boolean isSpritesOnly = PreferenceManager.getClientPreferences().getSpritesOnly();
+        Image image = isSpritesOnly ? null : FluffImageHelper.getFluffImage(entity);
+
+        if (null != image) {
+            // fluff image exists so use custom ImgLabel to get full mek porn
+            return new ImgLabel(image);
         }
+
+        // no fluff image, so just use image icon from top-down view
+        JLabel lblImage = new JLabel();
+        image = unit.getImage(lblImage);
+        if (null != image) {
+            ImageIcon icon = new ImageIcon(image);
+            icon = ImageUtilities.scaleImageIcon(icon, UIUtil.scaleForGUI(150), true);
+            lblImage.setIcon(icon);
+        }
+        return lblImage;
+    }
+
+    /**
+     * Builds the Technical Readout tab.
+     *
+     * @param readoutTab the panel to populate
+     */
+    private void fillReadoutTab(JPanel readoutTab) {
+        JTextPane txtReadout = new JTextPane();
 
         EntityReadout entityReadout = EntityReadout.createReadout(entity, false, true);
         txtReadout.setName("txtReadout");
-        txtReadout.setContentType(resourceMap.getString("txtReadout.contentType"));
+        txtReadout.setContentType(getTextAt(RESOURCE_BUNDLE, "txtReadout.contentType"));
         txtReadout.setEditable(false);
-        txtReadout.setFont(Font.decode(resourceMap.getString("txtReadout.font")));
+        txtReadout.setFont(Font.decode(getTextAt(RESOURCE_BUNDLE, "txtReadout.font")));
         txtReadout.setText("<div style='font: 12pt monospaced'>" +
                                  entityReadout.getBasicSection(ViewFormatting.HTML) +
                                  "<br>" +
                                  entityReadout.getLoadoutSection(ViewFormatting.HTML) +
                                  "</div>");
-        txtReadout.setBorder(RoundedLineBorder.createRoundedLineBorder("Technical Readout"));
-        gridBagConstraints = new GridBagConstraints();
+        txtReadout.setBorder(RoundedLineBorder.createRoundedLineBorder(getTextAt(RESOURCE_BUNDLE,
+              "technicalReadout.title")));
+
+        GridBagConstraints gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = y;
-        gridBagConstraints.weightx = 0.5;
-        gridBagConstraints.gridwidth = compWidth;
-        if (unit.getHistory().isBlank()) {
-            gridBagConstraints.weighty = 1.0;
-        }
+        gridBagConstraints.gridy = 0;
+        gridBagConstraints.weightx = 1.0;
+        gridBagConstraints.weighty = 1.0;
         gridBagConstraints.insets = new Insets(5, 5, 5, 5);
         gridBagConstraints.fill = GridBagConstraints.BOTH;
         gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
-        add(txtReadout, gridBagConstraints);
+        readoutTab.add(txtReadout, gridBagConstraints);
     }
 
-    private void fillStats(ResourceBundle resourceMap) {
+    /**
+     * Builds the Unit History tab, showing the unit's written history at the top and its log below it.
+     *
+     * @param historyTab the panel to populate
+     */
+    private void fillHistoryTab(JPanel historyTab) {
+        int y = 0;
+
+        if (!unit.getHistory().isBlank()) {
+            JTextPane txtFluff = new JTextPane();
+            txtFluff.setName("txtFluff");
+            txtFluff.setEditable(false);
+            txtFluff.setContentType("text/html");
+            txtFluff.setText(MarkdownRenderer.getRenderedHtml(unit.getHistory()));
+            txtFluff.setBorder(RoundedLineBorder.createRoundedLineBorder(getTextAt(RESOURCE_BUNDLE,
+                  "unitHistory.title")));
+            GridBagConstraints gridBagConstraints = new GridBagConstraints();
+            gridBagConstraints.gridx = 0;
+            gridBagConstraints.gridy = y;
+            gridBagConstraints.weightx = 1.0;
+            gridBagConstraints.insets = new Insets(5, 5, 5, 5);
+            gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
+            gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
+            historyTab.add(txtFluff, gridBagConstraints);
+            y++;
+        }
+
+        y = addLogSection(historyTab, y, getTextAt(RESOURCE_BUNDLE, "unitLog.title"), unit.getUnitLog(),
+              MekHQ.getMHQOptions().getDisplayUnitLog());
+        y = addLogSection(historyTab, y, getTextAt(RESOURCE_BUNDLE, "killLog.title"), unit.getKillLog(),
+              MekHQ.getMHQOptions().getDisplayUnitKillLog());
+        y = addLogSection(historyTab, y, getTextAt(RESOURCE_BUNDLE, "crewLog.title"), unit.getCrewLog(),
+              MekHQ.getMHQOptions().getDisplayUnitCrewLog());
+        y = addLogSection(historyTab, y, getTextAt(RESOURCE_BUNDLE, "deploymentLog.title"), unit.getDeploymentLog(),
+              MekHQ.getMHQOptions().getDisplayUnitDeploymentLog());
+        y = addLogSection(historyTab, y, getTextAt(RESOURCE_BUNDLE, "repairLog.title"), unit.getRepairLog(),
+              MekHQ.getMHQOptions().getDisplayUnitRepairLog());
+
+        // glue to soak up remaining vertical space so the panels sit at the top at their preferred height
+        GridBagConstraints gridBagConstraints = new GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = y;
+        gridBagConstraints.weightx = 1.0;
+        gridBagConstraints.weighty = 1.0;
+        gridBagConstraints.fill = GridBagConstraints.BOTH;
+        gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
+        historyTab.add(Box.createGlue(), gridBagConstraints);
+    }
+
+    /**
+     * Adds a collapsible log section to the given panel. The section is always added, even when the log is empty. It is
+     * shown expanded by default; clicking the section title collapses it to a titled bar, and clicking a collapsed bar
+     * expands it again, mirroring the personnel record on {@code PersonViewPanel}.
+     *
+     * @param panel         the panel to add the section to
+     * @param gridY         the grid row to place the section at
+     * @param title         the title for the section
+     * @param logs          the log entries to display
+     * @param startExpanded whether the section is shown expanded initially
+     *
+     * @return the next available grid row
+     */
+    private int addLogSection(JPanel panel, int gridY, String title, List<LogEntry> logs, boolean startExpanded) {
+        // collapsed state - just the titled bar, labelled to show the log when clicked
+        JPanel header = new JPanel();
+        header.setBorder(RoundedLineBorder.createRoundedLineBorder(getFormattedTextAt(RESOURCE_BUNDLE,
+              "logSection.show.title", title)));
+        header.setVisible(!startExpanded);
+
+        // expanded state - the titled bar plus the table of entries, labelled to hide the log when clicked
+        JPanel content = fillLogTable(logs, title);
+        content.setBorder(RoundedLineBorder.createRoundedLineBorder(getFormattedTextAt(RESOURCE_BUNDLE,
+              "logSection.hide.title", title)));
+        content.setVisible(startExpanded);
+
+        header.addMouseListener(getSwitchListener(header, content));
+        content.addMouseListener(getSwitchListener(content, header));
+
+        GridBagConstraints gridBagConstraints = new GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = gridY;
+        gridBagConstraints.weightx = 1.0;
+        gridBagConstraints.insets = new Insets(5, 5, 5, 5);
+        gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
+        gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
+        panel.add(header, gridBagConstraints);
+        panel.add(content, gridBagConstraints);
+
+        return gridY + 1;
+    }
+
+    /**
+     * Returns a mouse listener that hides {@code current} and shows {@code switchTo} when {@code current} is clicked,
+     * driving the expand/collapse behaviour of the log sections.
+     *
+     * @param current  the panel that is currently visible
+     * @param switchTo the panel to show in its place
+     *
+     * @return the switch mouse listener
+     */
+    private MouseListener getSwitchListener(JPanel current, JPanel switchTo) {
+        return new MouseAdapter() {
+            @Override
+            public void mouseClicked(MouseEvent e) {
+                if (current.isVisible()) {
+                    current.setVisible(false);
+                    switchTo.setVisible(true);
+                }
+            }
+        };
+    }
+
+    /**
+     * Builds a panel containing a table of the given log entries, most recent first.
+     *
+     * @param logs           the log entries to display
+     * @param accessibleName a short name describing the log, used for the table's accessible name
+     *
+     * @return a panel with a table of the log entries
+     */
+    private JPanel fillLogTable(List<LogEntry> logs, String accessibleName) {
+        List<LogEntry> orderedLogs = new ArrayList<>(logs);
+        Collections.reverse(orderedLogs);
+
+        JPanel pnlLog = new JPanel(new GridBagLayout());
+
+        PersonnelEventLogModel eventModel = new PersonnelEventLogModel();
+        eventModel.setData(orderedLogs);
+        JTable eventTable = new JTable(eventModel);
+        eventTable.getAccessibleContext().setAccessibleName(accessibleName + " for " + unit.getName());
+        eventTable.setRowSelectionAllowed(false);
+        eventTable.setAutoResizeMode(JTable.AUTO_RESIZE_LAST_COLUMN);
+        TableColumn column;
+        for (int i = 0; i < eventModel.getColumnCount(); ++i) {
+            column = eventTable.getColumnModel().getColumn(i);
+            column.setCellRenderer(eventModel.getRenderer());
+            column.setPreferredWidth(eventModel.getPreferredWidth(i));
+            if (eventModel.hasConstantWidth(i)) {
+                column.setMinWidth(eventModel.getPreferredWidth(i));
+                column.setMaxWidth(eventModel.getPreferredWidth(i));
+            }
+        }
+        eventTable.setIntercellSpacing(new Dimension(0, 0));
+        eventTable.setShowGrid(false);
+        eventTable.setTableHeader(null);
+
+        GridBagConstraints gridBagConstraints = new GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 0;
+        gridBagConstraints.gridwidth = 1;
+        gridBagConstraints.fill = GridBagConstraints.BOTH;
+        gridBagConstraints.weightx = 1.0;
+        gridBagConstraints.weighty = 1.0;
+        pnlLog.add(eventTable, gridBagConstraints);
+
+        return pnlLog;
+    }
+
+    private void fillStats() {
         pnlStats.setLayout(new GridBagLayout());
 
         JLabel lblType = new JLabel();
@@ -257,7 +434,7 @@ public class UnitViewPanel extends JScrollablePanel {
 
         JLabel lblTech = new JLabel();
         lblTech.setName("lblTech1");
-        lblTech.setText(resourceMap.getString("lblTech1.text"));
+        lblTech.setText(getTextAt(RESOURCE_BUNDLE, "lblTech1.text"));
         pnlStats.add(lblTech, labelConstraints);
 
         JLabel txtTech = new JLabel();
@@ -270,7 +447,7 @@ public class UnitViewPanel extends JScrollablePanel {
 
         JLabel lblTonnage = new JLabel();
         lblTonnage.setName("lblTonnage1");
-        lblTonnage.setText(resourceMap.getString("lblTonnage1.text"));
+        lblTonnage.setText(getTextAt(RESOURCE_BUNDLE, "lblTonnage1.text"));
         pnlStats.add(lblTonnage, labelConstraints);
 
         JLabel txtTonnage = new JLabel();
@@ -283,7 +460,7 @@ public class UnitViewPanel extends JScrollablePanel {
 
         JLabel lblBV = new JLabel();
         lblBV.setName("lblBV1");
-        lblBV.setText(resourceMap.getString("lblBV1.text"));
+        lblBV.setText(getTextAt(RESOURCE_BUNDLE, "lblBV1.text"));
         pnlStats.add(lblBV, labelConstraints);
 
         JLabel txtBV = new JLabel();
@@ -296,7 +473,7 @@ public class UnitViewPanel extends JScrollablePanel {
 
         JLabel lblCost = new JLabel();
         lblCost.setName("lblCost1");
-        lblCost.setText(resourceMap.getString("lblCost1.text"));
+        lblCost.setText(getTextAt(RESOURCE_BUNDLE, "lblCost1.text"));
         pnlStats.add(lblCost, labelConstraints);
 
         JLabel txtCost = new JLabel();
@@ -307,16 +484,16 @@ public class UnitViewPanel extends JScrollablePanel {
         labelConstraints.gridy++;
         valueConstraints.gridy++;
 
-        if (campaign.getCampaignOptions().isUseQuirks() && (entity.countQuirks() > 0)) {
+        if (campaign.getCampaignOptions().get(CampaignOption.USE_QUIRKS) && (entity.countQuirks() > 0)) {
             JLabel lblQuirk = new JLabel();
             lblQuirk.setName("lblQuirk1");
-            lblQuirk.setText(resourceMap.getString("lblQuirk1.text"));
+            lblQuirk.setText(getTextAt(RESOURCE_BUNDLE, "lblQuirk1.text"));
             pnlStats.add(lblQuirk, labelConstraints);
 
             for (IOption quirk : unit.getQuirks()) {
                 JLabel label = new JLabel(quirk.getDisplayableNameWithValue());
                 label.setToolTipText(MultiLineTooltip.splitToolTip(quirk.getDescription()));
-                label.setName("quirk"+quirk.getName());
+                label.setName("quirk" + quirk.getName());
                 pnlStats.add(label, valueConstraints);
 
                 labelConstraints.gridy++;

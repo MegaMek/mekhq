@@ -67,6 +67,7 @@ import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.OptimizeInfirmaryAssignments;
 import mekhq.campaign.campaignOptions.CampaignOptions;
+import mekhq.campaign.campaignOptions.CampaignOption;
 import mekhq.campaign.events.MedicPoolChangedEvent;
 import mekhq.campaign.events.persons.PersonEvent;
 import mekhq.campaign.events.persons.PersonMedicalAssignmentEvent;
@@ -436,7 +437,7 @@ public final class InfirmaryTab extends CampaignGuiTab {
         }
 
         btnUnassignDoc.setEnabled(!getSelectedAssignedPatients().isEmpty());
-        btnAdvancedSurgery.setEnabled(getCampaignOptions().isUseAlternativeAdvancedMedical() &&
+        btnAdvancedSurgery.setEnabled(getCampaignOptions().get(CampaignOption.USE_ALTERNATIVE_ADVANCED_MEDICAL) &&
                                             !getAllSelectedPatients().isEmpty());
     }
 
@@ -457,15 +458,15 @@ public final class InfirmaryTab extends CampaignGuiTab {
      */
     private boolean canAssignToDoctor(Person doctor) {
         final CampaignOptions campaignOptions = getCampaign().getCampaignOptions();
-        final int baseBedCount = campaignOptions.getMaximumPatients();
-        final boolean isDoctorsUseAdministration = campaignOptions.isDoctorsUseAdministration();
+        final int baseBedCount = campaignOptions.get(CampaignOption.MAXIMUM_PATIENTS);
+        final boolean isDoctorsUseAdministration = campaignOptions.get(CampaignOption.DOCTORS_USE_ADMINISTRATION);
 
         final int doctorCapacity = doctor.getDoctorMedicalCapacity(isDoctorsUseAdministration, baseBedCount);
         Campaign campaign1 = getCampaign();
         final int patientsForDoctor = campaign1.getPlayerForce().getHumanResources().getPatientsFor(doctor);
         final boolean isWithinDoctorCapacity = doctorCapacity > patientsForDoctor;
 
-        boolean useMASHTheatres = campaignOptions.isUseMASHTheatres();
+        boolean useMASHTheatres = campaignOptions.get(CampaignOption.USE_MASH_THEATRES);
         boolean isWithinTheatreCapacity = !useMASHTheatres;
         if (useMASHTheatres) {
             mekhq.campaign.Campaign campaign = getCampaign();
@@ -487,7 +488,7 @@ public final class InfirmaryTab extends CampaignGuiTab {
         }
 
         final CampaignOptions campaignOptions = getCampaign().getCampaignOptions();
-        final int healingWaitingPeriod = campaignOptions.getHealingWaitingPeriod();
+        final int healingWaitingPeriod = campaignOptions.get(CampaignOption.HEAL_WAITING_PERIOD);
 
         Collection<Person> selectedPatients = getSelectedUnassignedPatients();
         if (selectedPatients.isEmpty()) {
@@ -519,7 +520,7 @@ public final class InfirmaryTab extends CampaignGuiTab {
         Person doctor = getSelectedDoctor();
         for (Person p : getSelectedAssignedPatients()) {
             if ((null != p)) {
-                p.setDoctorId(null, getCampaign().getCampaignOptions().getNaturalHealingWaitingPeriod());
+                p.setDoctorId(null, getCampaign().getCampaignOptions().get(CampaignOption.NATURAL_HEALING_WAITING_PERIOD));
                 if (doctor != null) {
                     MekHQ.triggerEvent(new PersonMedicalAssignmentEvent(doctor, p));
                 }
@@ -546,11 +547,11 @@ public final class InfirmaryTab extends CampaignGuiTab {
                                     .getPatientsWithNonPermanentInjuries()) {
             // Knock out inactive doctors
             if ((patient.getDoctorId() != null) &&
-                      (getCampaign().getPerson(patient.getDoctorId()) != null)) {
+                      (getCampaign().getPlayerForce().getHumanResources().getPerson(patient.getDoctorId()) != null)) {
                 Campaign campaign = getCampaign();
                 final UUID id = patient.getDoctorId();
                 if (!campaign.getPlayerForce().getHumanResources().getPerson(id).getStatus().isActiveFlexible()) {
-                    patient.setDoctorId(null, getCampaign().getCampaignOptions().getNaturalHealingWaitingPeriod());
+                    patient.setDoctorId(null, getCampaign().getCampaignOptions().get(CampaignOption.NATURAL_HEALING_WAITING_PERIOD));
                 }
             }
 

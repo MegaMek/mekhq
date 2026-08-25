@@ -74,6 +74,7 @@ import megamek.common.units.Dropship;
 import megamek.common.units.EntityMovementMode;
 import megamek.common.units.UnitType;
 import mekhq.campaign.campaignOptions.CampaignOptions;
+import mekhq.campaign.campaignOptions.CampaignOption;
 import mekhq.campaign.enums.CampaignTransportType;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.enums.PersonnelRole;
@@ -162,7 +163,6 @@ public class CampaignTest {
 
     @Test
     void testGetTechs() {
-        List<Person> testPersonList = new ArrayList<>(5);
         List<Person> testActivePersonList = new ArrayList<>(5);
 
         Person mockTechActive = mock(Person.class);
@@ -177,7 +177,6 @@ public class CampaignTest {
               anyBoolean(),
               anyBoolean())).thenReturn(SkillLevel.REGULAR);
         when(mockTechActive.getDailyAvailableTechTime(anyBoolean())).thenReturn(240);
-        testPersonList.add(mockTechActive);
         testActivePersonList.add(mockTechActive);
 
         Person mockTechActiveTwo = mock(Person.class);
@@ -189,16 +188,7 @@ public class CampaignTest {
         when(mockTechActiveTwo.getSkillLevel(any(), anyBoolean(), any(), anyBoolean(), anyBoolean())).thenReturn(
               SkillLevel.REGULAR);
         when(mockTechActiveTwo.getDailyAvailableTechTime(anyBoolean())).thenReturn(1);
-        testPersonList.add(mockTechActiveTwo);
         testActivePersonList.add(mockTechActiveTwo);
-
-        Person mockTechInactive = mock(Person.class);
-        when(mockTechInactive.isTech()).thenReturn(true);
-        when(mockTechInactive.getPrimaryRole()).thenReturn(PersonnelRole.MEK_TECH);
-        when(mockTechInactive.getSecondaryRole()).thenReturn(PersonnelRole.NONE);
-        doReturn(PersonnelStatus.RETIRED).when(mockTechInactive).getStatus();
-        when(mockTechInactive.getMinutesLeft()).thenReturn(240);
-        testPersonList.add(mockTechInactive);
 
         Person mockTechNoTime = mock(Person.class);
         when(mockTechNoTime.isTech()).thenReturn(true);
@@ -212,7 +202,6 @@ public class CampaignTest {
               anyBoolean(),
               anyBoolean())).thenReturn(SkillLevel.REGULAR);
         when(mockTechNoTime.getDailyAvailableTechTime(anyBoolean())).thenReturn(0);
-        testPersonList.add(mockTechNoTime);
         testActivePersonList.add(mockTechNoTime);
 
         Person mockNonTechOne = mock(Person.class);
@@ -221,20 +210,18 @@ public class CampaignTest {
         when(mockNonTechOne.getSecondaryRole()).thenReturn(PersonnelRole.NONE);
         doReturn(PersonnelStatus.ACTIVE).when(mockNonTechOne).getStatus();
         when(mockNonTechOne.getMinutesLeft()).thenReturn(240);
-        testPersonList.add(mockNonTechOne);
         testActivePersonList.add(mockNonTechOne);
 
         Person mockNonTechTwo = mock(Person.class);
         when(mockNonTechTwo.isTech()).thenReturn(false);
-        when(mockNonTechTwo.getPrimaryRole()).thenReturn(PersonnelRole.ADMINISTRATOR_COMMAND);
+        when(mockNonTechTwo.getPrimaryRole()).thenReturn(PersonnelRole.ADMINISTRATOR);
         when(mockNonTechTwo.getSecondaryRole()).thenReturn(PersonnelRole.NONE);
         doReturn(PersonnelStatus.ACTIVE).when(mockNonTechTwo).getStatus();
         when(mockNonTechTwo.getMinutesLeft()).thenReturn(240);
-        testPersonList.add(mockNonTechTwo);
         testActivePersonList.add(mockNonTechTwo);
 
         CampaignOptions campaignOptions = mock(CampaignOptions.class);
-        when(campaignOptions.isTechsUseAdministration()).thenReturn(false);
+        when(campaignOptions.get(CampaignOption.TECHS_USE_ADMINISTRATION)).thenReturn(false);
         LocalDate today = LocalDate.of(3067, 1, 1);
         List<Unit> noUnits = List.of();
 
@@ -319,7 +306,7 @@ public class CampaignTest {
                     .getHumanResources()
                     .getTechs(testCampaign.getPlayerForce().getHangar().getUnits(),
                           testCampaign.getCampaignOptions(),
-                          testCampaign.isClanCampaign(),
+                          testCampaign.getPlayerForce().isClanForce(),
                           testCampaign.getLocalDate()));
 
         // Test getting active techs with time remaining.
@@ -331,7 +318,7 @@ public class CampaignTest {
                     .getHumanResources()
                     .getTechs(testCampaign.getPlayerForce().getHangar().getUnits(),
                           testCampaign.getCampaignOptions(),
-                          testCampaign.isClanCampaign(),
+                          testCampaign.getPlayerForce().isClanForce(),
                           testCampaign.getLocalDate(),
                           true));
     }
@@ -386,14 +373,14 @@ public class CampaignTest {
     void testInitiative() {
         Campaign campaign = MHQTestUtilities.getTestCampaign();
 
-        campaign.applyInitiativeBonus(6);
+        campaign.getPlayerForce().applyInitiativeBonus(6);
         // should increase bonus to 6 and max to 6
         assertEquals(6, campaign.getPlayerForce().getInitiativeBonus());
         assertEquals(6, campaign.getPlayerForce().getInitiativeMaxBonus());
         // Should not be able to increment over max of 6
         campaign.getPlayerForce().initiativeBonusIncrement(true);
         assertNotEquals(7, campaign.getPlayerForce().getInitiativeBonus());
-        campaign.applyInitiativeBonus(2);
+        campaign.getPlayerForce().applyInitiativeBonus(2);
         assertEquals(6, campaign.getPlayerForce().getInitiativeBonus());
         // But should be able to decrease below max
         campaign.getPlayerForce().initiativeBonusIncrement(false);
@@ -401,7 +388,7 @@ public class CampaignTest {
         // After setting lower Max Bonus any applied bonus that's less than max should set
         // bonus to max
         campaign.getPlayerForce().setInitiativeMaxBonus(3);
-        campaign.applyInitiativeBonus(2);
+        campaign.getPlayerForce().applyInitiativeBonus(2);
         assertEquals(3, campaign.getPlayerForce().getInitiativeBonus());
 
     }
@@ -509,12 +496,12 @@ public class CampaignTest {
         when(campaign.getTechAvailabilityYears()).thenCallRealMethod();
 
         // Limit enabled: technology availability is capped at the current game year.
-        when(options.isLimitByYear()).thenReturn(true);
+        when(options.get(CampaignOption.LIMIT_BY_YEAR)).thenReturn(true);
         assertEquals(List.of(3025), campaign.getTechAvailabilityYears());
 
         // Limit disabled: availability is unbounded, so designs introduced after the current campaign year - and
         // their era-based tech level - are still treated as available.
-        when(options.isLimitByYear()).thenReturn(false);
+        when(options.get(CampaignOption.LIMIT_BY_YEAR)).thenReturn(false);
         assertEquals(List.of(Integer.MAX_VALUE), campaign.getTechAvailabilityYears());
     }
 
@@ -767,14 +754,14 @@ public class CampaignTest {
          */
         private void enableBlobCrewForRole(PersonnelRole role) {
             switch (role) {
-                case SOLDIER -> campaignOptions.setUseBlobInfantry(true);
-                case BATTLE_ARMOUR -> campaignOptions.setUseBlobBattleArmor(true);
-                case VEHICLE_CREW_GROUND -> campaignOptions.setUseBlobVehicleCrewGround(true);
-                case VEHICLE_CREW_VTOL -> campaignOptions.setUseBlobVehicleCrewVTOL(true);
-                case VEHICLE_CREW_NAVAL -> campaignOptions.setUseBlobVehicleCrewNaval(true);
-                case VESSEL_PILOT -> campaignOptions.setUseBlobVesselPilot(true);
-                case VESSEL_GUNNER -> campaignOptions.setUseBlobVesselGunner(true);
-                case VESSEL_CREW -> campaignOptions.setUseBlobVesselCrew(true);
+                case SOLDIER -> campaignOptions.set(CampaignOption.USE_BLOB_INFANTRY, true);
+                case BATTLE_ARMOUR -> campaignOptions.set(CampaignOption.USE_BLOB_BATTLE_ARMOR, true);
+                case VEHICLE_CREW_GROUND -> campaignOptions.set(CampaignOption.USE_BLOB_VEHICLE_CREW_GROUND, true);
+                case VEHICLE_CREW_VTOL -> campaignOptions.set(CampaignOption.USE_BLOB_VEHICLE_CREW_VTOL, true);
+                case VEHICLE_CREW_NAVAL -> campaignOptions.set(CampaignOption.USE_BLOB_VEHICLE_CREW_NAVAL, true);
+                case VESSEL_PILOT -> campaignOptions.set(CampaignOption.USE_BLOB_VESSEL_PILOT, true);
+                case VESSEL_GUNNER -> campaignOptions.set(CampaignOption.USE_BLOB_VESSEL_GUNNER, true);
+                case VESSEL_CREW -> campaignOptions.set(CampaignOption.USE_BLOB_VESSEL_CREW, true);
                 default -> throw new IllegalStateException("Unexpected value: " + role);
             }
         }
@@ -784,14 +771,14 @@ public class CampaignTest {
          */
         private void disableBlobCrewForRole(PersonnelRole role) {
             switch (role) {
-                case SOLDIER -> campaignOptions.setUseBlobInfantry(false);
-                case BATTLE_ARMOUR -> campaignOptions.setUseBlobBattleArmor(false);
-                case VEHICLE_CREW_GROUND -> campaignOptions.setUseBlobVehicleCrewGround(false);
-                case VEHICLE_CREW_VTOL -> campaignOptions.setUseBlobVehicleCrewVTOL(false);
-                case VEHICLE_CREW_NAVAL -> campaignOptions.setUseBlobVehicleCrewNaval(false);
-                case VESSEL_PILOT -> campaignOptions.setUseBlobVesselPilot(false);
-                case VESSEL_GUNNER -> campaignOptions.setUseBlobVesselGunner(false);
-                case VESSEL_CREW -> campaignOptions.setUseBlobVesselCrew(false);
+                case SOLDIER -> campaignOptions.set(CampaignOption.USE_BLOB_INFANTRY, false);
+                case BATTLE_ARMOUR -> campaignOptions.set(CampaignOption.USE_BLOB_BATTLE_ARMOR, false);
+                case VEHICLE_CREW_GROUND -> campaignOptions.set(CampaignOption.USE_BLOB_VEHICLE_CREW_GROUND, false);
+                case VEHICLE_CREW_VTOL -> campaignOptions.set(CampaignOption.USE_BLOB_VEHICLE_CREW_VTOL, false);
+                case VEHICLE_CREW_NAVAL -> campaignOptions.set(CampaignOption.USE_BLOB_VEHICLE_CREW_NAVAL, false);
+                case VESSEL_PILOT -> campaignOptions.set(CampaignOption.USE_BLOB_VESSEL_PILOT, false);
+                case VESSEL_GUNNER -> campaignOptions.set(CampaignOption.USE_BLOB_VESSEL_GUNNER, false);
+                case VESSEL_CREW -> campaignOptions.set(CampaignOption.USE_BLOB_VESSEL_CREW, false);
                 default -> throw new IllegalStateException("Unexpected value: " + role);
             }
         }

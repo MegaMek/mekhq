@@ -123,12 +123,12 @@ public final class EnhancedImagingAugmentor {
      */
     private static boolean isClanFaction(Campaign campaign, @Nullable String generationFaction) {
         if (generationFaction == null) {
-            return campaign.getFaction().isClan();
+            return campaign.getPlayerForce().getFaction().isClan();
         }
         // The faction record is the authority MegaMek's own generator reads. Where the generation
         // faction is unknown to it, the campaign's own faction settles it.
         FactionRecord factionRecord = RATGenerator.getInstance().getFaction(generationFaction);
-        return (factionRecord != null) ? factionRecord.isClan() : campaign.getFaction().isClan();
+        return (factionRecord != null) ? factionRecord.isClan() : campaign.getPlayerForce().getFaction().isClan();
     }
 
     /**

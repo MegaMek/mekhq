@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2019-2025 The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2019-2026 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -53,6 +53,7 @@ import mekhq.campaign.personnel.SpecialAbility;
 import mekhq.campaign.universe.Faction;
 import mekhq.campaign.universe.eras.Era;
 import mekhq.campaign.universe.eras.Eras;
+import mekhq.campaign.campaignOptions.CampaignOption;
 
 /**
  * Generates a single special ability for a {@link Person}.
@@ -63,7 +64,7 @@ public class SingleSpecialAbilityGenerator extends AbstractSpecialAbilityGenerat
     @Override
     public boolean generateSpecialAbilities(final Campaign campaign, final Person person,
           final int expLvl) {
-        return campaign.getCampaignOptions().isUseAbilities() && (rollSPA(campaign, person) != null);
+        return campaign.getCampaignOptions().get(CampaignOption.USE_ABILITIES) && (rollSPA(campaign, person) != null);
     }
 
     /**
@@ -163,32 +164,20 @@ public class SingleSpecialAbilityGenerator extends AbstractSpecialAbilityGenerat
             }
             case OptionsConstants.GUNNERY_WEAPON_SPECIALIST: {
                 final String special = SpecialAbility.chooseWeaponSpecialization(person,
-                      campaign.getCampaignOptions().getTechLevel(), campaign.getGameYear(), false);
+                      campaign.getCampaignOptions().get(CampaignOption.TECH_LEVEL), campaign.getGameYear(), false);
                 person.getOptions().acquireAbility(PersonnelOptions.LVL3_ADVANTAGES, name, special);
                 displayName += " " + special;
                 break;
             }
             case OptionsConstants.GUNNERY_SANDBLASTER: {
                 final String special = SpecialAbility.chooseWeaponSpecialization(person,
-                      campaign.getCampaignOptions().getTechLevel(), campaign.getGameYear(), true);
-                person.getOptions().acquireAbility(PersonnelOptions.LVL3_ADVANTAGES, name, special);
-                displayName += " " + special;
-                break;
-            }
-            case PersonnelOptions.UNIT_SPECIALIST: {
-                // Unit Specialist is a CHOICE ability; pick a specialty appropriate to the crewed unit (if any).
-                final String special = SpecialAbility.chooseUnitSpecialization(person);
+                      campaign.getCampaignOptions().get(CampaignOption.TECH_LEVEL), campaign.getGameYear(), true);
                 person.getOptions().acquireAbility(PersonnelOptions.LVL3_ADVANTAGES, name, special);
                 displayName += " " + special;
                 break;
             }
             default: {
-                // If a weight-class Affinity/Antipathy was rolled, re-point it at the crewed unit's weight class.
-                final String finalName = SpecialAbility.adjustWeightClassAbilityForUnit(person, name);
-                person.getOptions().acquireAbility(PersonnelOptions.LVL3_ADVANTAGES, finalName, true);
-                if (!finalName.equals(name)) {
-                    displayName = SpecialAbility.getDisplayName(finalName);
-                }
+                person.getOptions().acquireAbility(PersonnelOptions.LVL3_ADVANTAGES, name, true);
                 break;
             }
         }
@@ -295,7 +284,7 @@ public class SingleSpecialAbilityGenerator extends AbstractSpecialAbilityGenerat
             combined.addAll(negativeAbilities);
             result = SpecialAbility.getWeightedSpecialAbilities(combined);
         }
-        
+
         return result;
     }
 

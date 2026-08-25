@@ -126,16 +126,15 @@ public class DialogResupplyFocus extends JDialog {
 
         // Get speaker details
         Person speaker = campaign.getPlayerForce().getHumanResources()
-                               .getSeniorAdminPerson(mekhq.campaign.Campaign.AdministratorSpecialization.LOGISTICS,
-                                     campaign.getCampaignOptions(),
-                                     campaign.isClanCampaign(),
+                               .getSeniorAdminPerson(campaign.getCampaignOptions(),
+                                     campaign.getPlayerForce().isClanForce(),
                                      campaign.getLocalDate());
 
         String speakerName;
         if (speaker != null) {
             speakerName = speaker.getFullTitle();
         } else {
-            speakerName = campaign.getName();
+            speakerName = campaign.getPlayerForce().getName();
         }
 
         // Add speaker image (icon)

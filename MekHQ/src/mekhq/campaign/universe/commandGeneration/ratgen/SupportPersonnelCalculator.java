@@ -37,6 +37,7 @@ import java.util.Collection;
 import megamek.common.units.Entity;
 import megamek.logging.MMLogger;
 import mekhq.campaign.Campaign;
+import mekhq.campaign.campaignOptions.CampaignOption;
 import mekhq.campaign.unit.Unit;
 import mekhq.campaign.universe.Faction;
 
@@ -159,7 +160,7 @@ public final class SupportPersonnelCalculator {
         int mekTechs = mekCount + ceilDiv(protoMekCrew, PROTOMEK_POINT_SIZE);
         int baTechs = ceilDiv(baSuits, BA_SQUAD_SIZE);
 
-        int basePersonnel = campaign.getActivePersonnel(false, false).size();
+        int basePersonnel = campaign.getPlayerForce().getHumanResources().getActivePersonnel(false, false).size();
         // Doctor and admin demand reflect the post-generation roster, so add the techs we project
         // creating. Doctors and admins are not added back because including them would be circular
         // (admins counted in admin demand, doctors counted in doctor demand). This matches the
@@ -167,10 +168,10 @@ public final class SupportPersonnelCalculator {
         int totalTechs = mekTechs + vehicleCount + aeroCount + baTechs;
         int personnelForCalc = basePersonnel + totalTechs;
 
-        int maxPatients = Math.max(1, campaign.getCampaignOptions().getMaximumPatients());
+        int maxPatients = Math.max(1, campaign.getCampaignOptions().get(CampaignOption.MAXIMUM_PATIENTS));
         int doctors = ceilDiv(personnelForCalc, maxPatients);
 
-        Faction faction = campaign.getFaction();
+        Faction faction = campaign.getPlayerForce().getFaction();
         int adminDivisor = isIrregularFaction(faction) ? ADMIN_DIVISOR_IRREGULAR : ADMIN_DIVISOR_STANDARD;
         int admins = ceilDiv(personnelForCalc, adminDivisor);
 

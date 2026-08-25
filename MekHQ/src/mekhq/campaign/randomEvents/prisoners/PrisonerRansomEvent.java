@@ -92,7 +92,8 @@ public class PrisonerRansomEvent {
         // Sort prisoners by experience level in descending order
         if (!isFriendlyPOWs) {
             // The OpFor always requests their best personnel first
-            prisoners.sort(Comparator.comparing(person -> person.getExperienceLevel(campaign, false, true),
+            prisoners.sort(Comparator.comparing(person -> person.getExperienceLevel(campaign.getCampaignOptions(),
+                        campaign.getPlayerForce().isClanForce(), campaign.getLocalDate(), false, true),
                   Comparator.reverseOrder()));
         } else {
             // The OpFor offers ransom POWs
@@ -152,9 +153,8 @@ public class PrisonerRansomEvent {
 
         ImmersiveDialogSimple eventDialog = new ImmersiveDialogSimple(campaign,
               campaign.getPlayerForce().getHumanResources()
-                    .getSeniorAdminPerson(Campaign.AdministratorSpecialization.COMMAND,
-                          campaign.getCampaignOptions(),
-                          campaign.isClanCampaign(),
+                    .getSeniorAdminPerson(campaign.getCampaignOptions(),
+                          campaign.getPlayerForce().isClanForce(),
                           campaign.getLocalDate()),
               null,
               inCharacterMessage,

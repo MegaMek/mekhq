@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2020-2025 The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2020-2026 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -39,6 +39,7 @@ import java.util.stream.Collectors;
 
 import mekhq.campaign.Campaign;
 import mekhq.campaign.campaignOptions.CampaignOptions;
+import mekhq.campaign.campaignOptions.CampaignOption;
 import mekhq.campaign.parts.enums.PartRepairType;
 import mekhq.gui.dialog.MRMSDialog;
 import mekhq.gui.dialog.MRMSDialog.MRMSOptionControl;
@@ -70,16 +71,16 @@ public class MRMSConfiguredOptions {
 
     //region Initialization
     public void setup(CampaignOptions options) {
-        setUseRepair(options.isMRMSUseRepair());
-        setUseSalvage(options.isMRMSUseSalvage());
-        setUseExtraTime(options.isMRMSUseExtraTime());
-        setUseRushJob(options.isMRMSUseRushJob());
-        setAllowCarryover(options.isMRMSAllowCarryover());
-        setOptimizeToCompleteToday(options.isMRMSOptimizeToCompleteToday());
-        setScrapImpossible(options.isMRMSScrapImpossible());
-        setUseAssignedTechsFirst(options.isMRMSUseAssignedTechsFirst());
-        setReplacePodParts(options.isMRMSReplacePod());
-        setMRMSOptions(options.getMRMSOptions());
+        setUseRepair(options.get(CampaignOption.MRMS_USE_REPAIR));
+        setUseSalvage(options.get(CampaignOption.MRMS_USE_SALVAGE));
+        setUseExtraTime(options.get(CampaignOption.MRMS_USE_EXTRA_TIME));
+        setUseRushJob(options.get(CampaignOption.MRMS_USE_RUSH_JOB));
+        setAllowCarryover(options.get(CampaignOption.MRMS_ALLOW_CARRYOVER));
+        setOptimizeToCompleteToday(options.get(CampaignOption.MRMS_OPTIMIZE_TO_COMPLETE_TODAY));
+        setScrapImpossible(options.get(CampaignOption.MRMS_SCRAP_IMPOSSIBLE));
+        setUseAssignedTechsFirst(options.get(CampaignOption.MRMS_USE_ASSIGNED_TECHS_FIRST));
+        setReplacePodParts(options.get(CampaignOption.MRMS_REPLACE_POD));
+        setMRMSOptions(options.get(CampaignOption.MRMS_OPTIONS));
         setHasActiveMRMSOption(getMRMSOptions().stream().anyMatch(MRMSOption::isActive));
     }
 

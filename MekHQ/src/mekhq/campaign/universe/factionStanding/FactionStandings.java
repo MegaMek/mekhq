@@ -39,7 +39,6 @@ import static mekhq.campaign.universe.factionStanding.FactionStandingLevel.STAND
 import static mekhq.campaign.universe.factionStanding.FactionStandingLevel.STANDING_LEVEL_6;
 import static mekhq.campaign.universe.factionStanding.FactionStandingLevel.STANDING_LEVEL_8;
 import static mekhq.campaign.universe.factionStanding.FactionStandingUtilities.PIRACY_SUCCESS_INDEX_FACTION_CODE;
-import static mekhq.gui.dialog.factionStanding.manualMissionDialogs.SimulateMissionDialog.handleFactionRegardUpdates;
 import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
 import static mekhq.utilities.MHQInternationalization.getTextAt;
 import static mekhq.utilities.ReportingUtilities.CLOSING_SPAN_TAG;
@@ -50,30 +49,19 @@ import static mekhq.utilities.ReportingUtilities.spanOpeningWithCustomColor;
 
 import java.io.PrintWriter;
 import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
+import java.util.*;
 import javax.swing.ImageIcon;
 
 import megamek.codeUtilities.MathUtility;
 import megamek.common.annotations.Nullable;
 import megamek.logging.MMLogger;
 import mekhq.MHQConstants;
-import mekhq.campaign.mission.AtBContract;
-import mekhq.campaign.mission.Contract;
-import mekhq.campaign.mission.Mission;
-import mekhq.campaign.mission.enums.MissionStatus;
+import mekhq.campaign.mission.contract.AbstractContract;
+import mekhq.campaign.mission.contract.contractData.MissionStatus;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.universe.Faction;
 import mekhq.campaign.universe.Factions;
 import mekhq.campaign.universe.factionHints.FactionHints;
-import mekhq.gui.dialog.factionStanding.manualMissionDialogs.ManualMissionDialog;
 import mekhq.utilities.MHQXMLUtility;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
@@ -738,7 +726,7 @@ public class FactionStandings {
      * @since 0.50.07
      */
     public @Nullable FactionCensureLevel checkForCensure(Faction faction, LocalDate today,
-          List<Mission> activeMissions, boolean campaignInTransit) {
+          List<AbstractContract> activeMissions, boolean campaignInTransit) {
         if (faction.isAggregate()) {
             return null;
         }
@@ -1655,13 +1643,6 @@ public class FactionStandings {
         return regard;
     }
 
-    /** Use {@link #updateCampaignForPastMissions(List, ImageIcon, Faction, LocalDate, double)} instead */
-    @Deprecated(since = "0.50.07", forRemoval = true)
-    public List<String> updateCampaignForPastMissions(List<Mission> missions, ImageIcon campaignIcon,
-          Faction campaignFaction, LocalDate today) {
-        return updateCampaignForPastMissions(missions, campaignIcon, campaignFaction, today, 1.0);
-    }
-
     /**
      * Updates the campaign status for a list of past missions, adjusting faction standings, applying campaign icon and
      * faction, and generating a report of changes.
@@ -1681,7 +1662,7 @@ public class FactionStandings {
      * @author Illiani
      * @since 0.50.07
      */
-    public List<String> updateCampaignForPastMissions(List<Mission> missions, ImageIcon campaignIcon,
+    public List<String> updateCampaignForPastMissions(List<AbstractContract> missions, ImageIcon campaignIcon,
           Faction campaignFaction, LocalDate today, double regardMultiplier) {
         List<String> reports = new ArrayList<>();
 
@@ -1689,14 +1670,12 @@ public class FactionStandings {
 
         sortMissionsBasedOnStartDateAndClass(missions);
 
-        Map<Integer, List<Mission>> missionsByYear = new HashMap<>();
+        Map<Integer, List<AbstractContract>> missionsByYear = new HashMap<>();
         int currentYear = today.getYear();
 
-        for (Mission mission : missions) {
-            int missionYear = currentYear;
-            if (mission instanceof Contract contract) {
-                missionYear = contract.getStartDate().getYear();
-            }
+        for (AbstractContract mission : missions) {
+            LocalDate missionStartDate = mission.getStartDate();
+            int missionYear = (missionStartDate == null) ? currentYear : missionStartDate.getYear();
 
             missionsByYear.computeIfAbsent(missionYear, y -> new ArrayList<>()).add(mission);
         }
@@ -1705,52 +1684,27 @@ public class FactionStandings {
         List<Integer> sortedYears = new ArrayList<>(missionsByYear.keySet());
         Collections.sort(sortedYears);
         for (int year : sortedYears) {
-            List<Mission> missionsForYear = missionsByYear.get(year);
-            for (Mission mission : missionsForYear) {
+            List<AbstractContract> missionsForYear = missionsByYear.get(year);
+            for (AbstractContract mission : missionsForYear) {
                 MissionStatus missionStatus = mission.getStatus();
 
-                if (mission instanceof AtBContract atbContract) {
-                    int contractLength = atbContract.getLengthInMonths();
+                int contractLength = mission.getLengthInMonths();
 
-                    // First try and fetch the enemy mercenary employer if none exists (because the enemy faction
-                    // isn't an employed mercenary), then fetch the actual enemy
-                    Faction enemyFaction = atbContract.getEnemyMercenaryEmployer();
-                    if (enemyFaction == null) {
-                        enemyFaction = atbContract.getEnemy();
-                    }
+                // A covert sponsor, if any, takes the standing change in the visible enemy's/employer's place.
+                Faction enemyFaction = mission.getStandingEnemyFaction();
 
-                    String report = processContractAccept(campaignFactionCode,
-                          enemyFaction,
-                          today,
-                          regardMultiplier,
-                          contractLength);
-                    if (report != null) {
-                        reports.add(report);
-                    }
+                String report = processContractAccept(campaignFactionCode,
+                      enemyFaction,
+                      today,
+                      regardMultiplier,
+                      contractLength);
+                if (report != null) {
+                    reports.add(report);
+                }
 
-                    if (missionStatus != MissionStatus.ACTIVE) {
-                        reports.addAll(processContractCompletion(campaignFaction, atbContract.getEmployerFaction(),
-                              today, missionStatus, regardMultiplier, contractLength));
-                    }
-                } else {
-                    // Non-AtB missions have their Standings updated when the contract concludes
-                    if (missionStatus != MissionStatus.ACTIVE) {
-                        ManualMissionDialog dialog = new ManualMissionDialog(null,
-                              campaignIcon,
-                              campaignFaction,
-                              today,
-                              missionStatus,
-                              mission.getName(),
-                              mission.getLengthInMonths());
-
-                        Faction employerChoice = dialog.getEmployerChoice();
-                        Faction enemyChoice = dialog.getEnemyChoice();
-                        MissionStatus statusChoice = dialog.getStatusChoice();
-                        int contractLength = dialog.getDurationChoice();
-
-                        reports.addAll(handleFactionRegardUpdates(campaignFaction, employerChoice,
-                              enemyChoice, statusChoice, today, this, regardMultiplier, contractLength));
-                    }
+                if (missionStatus != MissionStatus.ACTIVE) {
+                    reports.addAll(processContractCompletion(campaignFaction, mission.getStandingEmployerFaction(),
+                          today, missionStatus, regardMultiplier, contractLength));
                 }
             }
 
@@ -1771,20 +1725,7 @@ public class FactionStandings {
      *
      * @param missions the list of missions to sort in-place
      */
-    private static void sortMissionsBasedOnStartDateAndClass(List<Mission> missions) {
-        missions.sort((mission1, mission2) -> {
-            boolean m1IsContract = mission1 instanceof Contract;
-            boolean m2IsContract = mission2 instanceof Contract;
-
-            if (m1IsContract && m2IsContract) {
-                return ((Contract) mission1).getStartDate().compareTo(((Contract) mission2).getStartDate());
-            } else if (m1IsContract) {
-                return -1; // mission1 comes before mission2
-            } else if (m2IsContract) {
-                return 1; // mission1 comes after mission2
-            } else {
-                return 0; // both are non-Contract, maintain relative order
-            }
-        });
+    private static void sortMissionsBasedOnStartDateAndClass(List<AbstractContract> missions) {
+        missions.sort(Comparator.comparing(AbstractContract::getStartDate));
     }
 }

@@ -132,9 +132,8 @@ public class CampaignUpgradeDialog {
 
         ImmersiveDialogCore upgradeDialog = new ImmersiveDialogCore(campaign,
                 campaign.getPlayerForce().getHumanResources()
-                        .getSeniorAdminPerson(mekhq.campaign.Campaign.AdministratorSpecialization.COMMAND,
-                                campaign.getCampaignOptions(),
-                                campaign.isClanCampaign(),
+                      .getSeniorAdminPerson(campaign.getCampaignOptions(),
+                                campaign.getPlayerForce().isClanForce(),
                                 campaign.getLocalDate()),
               null,
               getFormattedTextAt(RESOURCE_BUNDLE, "CampaignUpgradeDialog.inCharacter", campaign.getCommanderAddress()),

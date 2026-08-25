@@ -71,7 +71,6 @@ import mekhq.campaign.finances.FinancialReport;
 import mekhq.campaign.finances.Money;
 import mekhq.campaign.finances.Transaction;
 import mekhq.campaign.finances.WeeklyNetWorth;
-import mekhq.campaign.mission.Contract;
 import mekhq.gui.adapter.FinanceTableMouseAdapter;
 import mekhq.gui.adapter.LoanTableMouseAdapter;
 import mekhq.gui.baseComponents.roundedComponents.RoundedJButton;
@@ -101,6 +100,7 @@ import org.jfree.data.time.Day;
 import org.jfree.data.time.TimeSeries;
 import org.jfree.data.time.TimeSeriesCollection;
 import org.jfree.data.xy.XYDataset;
+import mekhq.campaign.campaignOptions.CampaignOption;
 
 /**
  * Shows record of financial transactions.
@@ -662,7 +662,7 @@ public final class FinancesTab extends CampaignGuiTab {
                   String.format(formatted, rentals.toAmountAndSymbolString())));
         }
 
-        if (getCampaign().getCampaignOptions().isUsePeacetimeCost()) {
+        if (getCampaign().getCampaignOptions().get(CampaignOption.USE_PEACETIME_COST)) {
             financialLine.append(formattingFinancialReport(resourceMap.getString("spareParts.text"), 2,
                   String.format(formatted, report.getMonthlySparePartCosts().toAmountAndSymbolString())));
             financialLine.append(formattingFinancialReport(resourceMap.getString("trainingMunitions.text"), 2,
@@ -690,16 +690,12 @@ public final class FinancesTab extends CampaignGuiTab {
 
     @Subscribe
     public void handle(MissionNewEvent ev) {
-        if (ev.getMission() instanceof Contract) {
-            financialReportScheduler.schedule();
-        }
+        financialReportScheduler.schedule();
     }
 
     @Subscribe
     public void handle(MissionChangedEvent ev) {
-        if (ev.getMission() instanceof Contract) {
-            financialReportScheduler.schedule();
-        }
+        financialReportScheduler.schedule();
     }
 
     @Subscribe

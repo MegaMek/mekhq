@@ -83,7 +83,7 @@ class PersonSeniorAppointmentTest {
         // it fail silently and hand back null.
         when(campaign.getLocalDate()).thenReturn(LocalDate.of(3067, 1, 1));
         // The loader consults campaign options while restoring relationship state.
-        when(campaign.getCampaignOptions()).thenReturn(mock(CampaignOptions.class));
+        when(campaign.getCampaignOptions()).thenReturn(new CampaignOptions());
         return campaign;
     }
 

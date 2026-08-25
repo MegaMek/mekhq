@@ -116,14 +116,14 @@ public final class RulesetRankAssigner {
             LOGGER.info("[CompanyGen][RankAssign] apply: disabled by isAutomaticallyAssignRanks");
             return null;
         }
-        Formation root = campaign.getFormations();
+        Formation root = campaign.getPlayerForce().getFormations();
         if (root == null) {
             LOGGER.info("[CompanyGen][RankAssign] apply: campaign has no root Formation, skipping");
             return null;
         }
 
         Faction specifiedFaction = options.getSpecifiedFaction();
-        Faction campaignFaction = campaign.getFaction();
+        Faction campaignFaction = campaign.getPlayerForce().getFaction();
         boolean useSpecified = options.isUseSpecifiedFactionToAssignRanks();
         Faction faction = useSpecified ? specifiedFaction : campaignFaction;
         if (faction == null) {
@@ -283,7 +283,7 @@ public final class RulesetRankAssigner {
         }
 
         FormationLevel level = ForceDescriptorWalker.mapEchelonToFormationLevel(echelon,
-              campaign.getFaction().getShortName());
+              campaign.getPlayerForce().getFaction().getShortName());
         if (level == null) {
             LOGGER.info("[CompanyGen][RankAssign] echelon {} has no level mapping; falling back to the Formation's own level {}",
                   echelon, root.getFormationLevel());

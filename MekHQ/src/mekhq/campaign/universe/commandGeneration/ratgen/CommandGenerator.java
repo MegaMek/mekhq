@@ -348,7 +348,7 @@ public final class CommandGenerator {
         if (listener != null) {
             listener.updateProgress(0.0, "Materializing units and crews...");
         }
-        Formation root = campaign.getFormations();
+        Formation root = campaign.getPlayerForce().getFormations();
         LOGGER.info("[CompanyGen][Pipeline]  campaign root Formation: id={} name={}",
               root == null ? "null" : root.getId(),
               root == null ? "null" : root.getName());
@@ -438,7 +438,7 @@ public final class CommandGenerator {
             // OrganizationChangedEvent — its subscribers (BriefingTab, TOETab) only do
             // ActionScheduler.schedule() which wraps Timer.restart() and is thread-safe.
             LOGGER.info("[CompanyGen][Leaf] BEFORE addUnitToFormation parent={} unit={}", parentInfo, unit.getId());
-            campaign.addUnitToFormation(unit, parent.getId());
+            campaign.getPlayerForce().addUnitToFormation(unit, parent.getId(), campaign);
             LOGGER.info("[CompanyGen][Leaf] AFTER addUnitToFormation unit.formationId={}", unit.getFormationId());
             leafCount[0]++;
             long leafTotalMs = (System.nanoTime() - leafStart) / 1_000_000;
@@ -475,7 +475,7 @@ public final class CommandGenerator {
         if (listener != null) {
             listener.updateProgress(0.0, "Applying formation icons...");
         }
-        FormationIconBuilder.applyIcons(campaign.getFormations(), campaign, options);
+        FormationIconBuilder.applyIcons(campaign.getPlayerForce().getFormations(), campaign, options);
 
         // 7c. Tree-aware rank assignment. Walks the Formation tree post-order and assigns each
         // node's commander the officer rank matching their FormationLevel (Lt → Lance, Capt →
@@ -610,21 +610,21 @@ public final class CommandGenerator {
         // Medical / Command) becomes infantry-style carrier units crewed by the staff, nested under a
         // Support Command formation. Crewing a carrier is separate from the setTech maintenance
         // assignment above, so techs still maintain the combat units.
-        SupportPersonnelToTOE.organize(campaign, supportResult.generatedPersons(), campaign.isClanCampaign());
+        SupportPersonnelToTOE.organize(campaign, supportResult.generatedPersons(), campaign.getPlayerForce().isClanForce());
 
         // Grant the standalone support vehicles a command gets for each enabled capability that has no
         // matching personnel section (logistics convoy, canteen, security). Salvage and medical
         // vehicles are handled inside SupportPersonnelToTOE.organize above, where they join their
         // section crewed from the generated staff (no double-generated personnel).
         CampaignOptions campaignOptions = campaign.getCampaignOptions();
-        Faction supportFaction = campaign.getFaction();
+        Faction supportFaction = campaign.getPlayerForce().getFaction();
         if (campaignOptions.isUseStratCon()) {
             SupportUnitGenerator.generateLogisticsUnits(campaign, supportFaction, true);
         }
-        if (campaignOptions.isUseFatigue()) {
+        if (campaignOptions.get(CampaignOption.USE_FATIGUE)) {
             SupportUnitGenerator.generateCommissaryUnits(campaign, supportFaction, true);
         }
-        if (!campaignOptions.getPrisonerCaptureStyle().isNone()) {
+        if (!campaignOptions.get(CampaignOption.PRISONER_CAPTURE_STYLE).isNone()) {
             SupportUnitGenerator.generateSecurityUnits(campaign, supportFaction, true);
         }
 
@@ -640,7 +640,7 @@ public final class CommandGenerator {
         SeniorAppointmentAssigner.assign(campaign, supportResult.generatedPersons());
 
         LOGGER.info("[CompanyGen][Pipeline]Stage 7e: applying formation icons to support formations");
-        FormationIconBuilder.applyIcons(campaign.getFormations(), campaign, options);
+        FormationIconBuilder.applyIcons(campaign.getPlayerForce().getFormations(), campaign, options);
 
         logOrphanAudit(campaign);
 
@@ -807,11 +807,11 @@ public final class CommandGenerator {
                                         ? entity.getAlternateCost()
                                         : entity.getCost(false));
             if (entity.isMixedTech()) {
-                cost = cost.multipliedBy(campaignOptions.getMixedTechUnitPriceMultiplier());
+                cost = cost.multipliedBy(campaignOptions.get(CampaignOption.MIXED_TECH_UNIT_PRICE_MULTIPLIER));
             } else if (entity.isClan()) {
-                cost = cost.multipliedBy(campaignOptions.getClanUnitPriceMultiplier());
+                cost = cost.multipliedBy(campaignOptions.get(CampaignOption.CLAN_UNIT_PRICE_MULTIPLIER));
             } else {
-                cost = cost.multipliedBy(campaignOptions.getInnerSphereUnitPriceMultiplier());
+                cost = cost.multipliedBy(campaignOptions.get(CampaignOption.INNER_SPHERE_UNIT_PRICE_MULTIPLIER));
             }
             total = total.plus(cost);
         }
@@ -837,7 +837,7 @@ public final class CommandGenerator {
 
         Map<PersonnelRole, Integer> unitlessByRole = new EnumMap<>(PersonnelRole.class);
         int unitlessCount = 0;
-        for (Person person : campaign.getActivePersonnel(false, false)) {
+        for (Person person : campaign.getPlayerForce().getHumanResources().getActivePersonnel(false, false)) {
             if (person.getUnit() == null) {
                 unitlessByRole.merge(person.getPrimaryRole(), 1, Integer::sum);
                 unitlessCount++;
@@ -887,7 +887,7 @@ public final class CommandGenerator {
         int founderCount = 0;
         int callsignCount = 0;
         boolean applyFounder = options.isAssignFounderFlag();
-        boolean applyCallsigns = options.isAssignMekWarriorsCallSigns() && !campaign.isClanCampaign();
+        boolean applyCallsigns = options.isAssignMekWarriorsCallSigns() && !campaign.getPlayerForce().isClanForce();
         boolean applyFounderPlotArmor = campaign.getCampaignOptions().get(CampaignOption.USE_FOUNDER_PLOT_ARMOR);
         RandomCallsignGenerator callsigns = applyCallsigns ? RandomCallsignGenerator.getInstance() : null;
         for (Person person : generatedPersons) {
@@ -904,7 +904,7 @@ public final class CommandGenerator {
             }
         }
         LOGGER.info("[CompanyGen][Pipeline][Flags] founder={} callsigns={} (clanCampaign={}, founderPlotArmor={})",
-              founderCount, callsignCount, campaign.isClanCampaign(), applyFounderPlotArmor);
+              founderCount, callsignCount, campaign.getPlayerForce().isClanForce(), applyFounderPlotArmor);
     }
 
     /**
@@ -929,7 +929,7 @@ public final class CommandGenerator {
         }
 
         Person[] topCommanders = ForceHumanResources.findTopCommanders(generatedPersons,
-              campaign.getCampaignOptions(), campaign.isClanCampaign(), campaign.getLocalDate());
+              campaign.getCampaignOptions(), campaign.getPlayerForce().isClanForce(), campaign.getLocalDate());
         Person secondInCommand = topCommanders[1];
         if (secondInCommand == null) {
             LOGGER.debug("[CompanyGen][Pipeline][Flags] second-in-command left vacant; the generated "

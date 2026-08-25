@@ -32,7 +32,7 @@
  */
 package mekhq.gui.dialog;
 
-import static mekhq.campaign.Campaign.AdministratorSpecialization.COMMAND;
+
 import static mekhq.campaign.CampaignFactory.CampaignProblemType.CANT_LOAD_FROM_NEWER_VERSION;
 import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
 
@@ -145,9 +145,8 @@ public class CampaignHasProblemOnLoad {
      */
     private @Nullable Person getSpeaker() {
         return campaign.getPlayerForce().getHumanResources()
-                     .getSeniorAdminPerson(COMMAND,
-                           campaign.getCampaignOptions(),
-                           campaign.isClanCampaign(),
+                       .getSeniorAdminPerson(campaign.getCampaignOptions(),
+                           campaign.getPlayerForce().isClanForce(),
                            campaign.getLocalDate());
     }
 

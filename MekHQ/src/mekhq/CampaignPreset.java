@@ -34,11 +34,13 @@ package mekhq;
 
 import static megamek.SuiteConstants.LAST_MILESTONE;
 import static mekhq.MHQConstants.CAMPAIGN_PRESET_DIRECTORY;
+import static mekhq.utilities.MHQInternationalization.getTextAt;
 
 import java.io.BufferedOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
+import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
@@ -51,7 +53,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
-import java.util.ResourceBundle;
 import java.util.stream.Collectors;
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
@@ -106,6 +107,7 @@ public class CampaignPreset {
      */
     private static final Version LAST_COMPATIBLE_VERSION = LAST_MILESTONE;
 
+    private static final String RESOURCE_BUNDLE = "mekhq.resources.Campaign";
     private static final MMLogger LOGGER = MMLogger.create(CampaignPreset.class);
 
     /**
@@ -322,6 +324,19 @@ public class CampaignPreset {
     // endregion Getters/Setters
 
     /**
+     * Returns the directory where user-created campaign presets should be saved. If a custom user directory is
+     * configured, presets are stored beneath it; otherwise the legacy MekHQ user-data directory is used.
+     *
+     * @return the writable campaign preset directory
+     */
+    public static File getUserCampaignPresetDirectory() {
+        final File configuredDirectory = getConfiguredUserCampaignPresetDirectory();
+        return configuredDirectory == null
+              ? new File(MHQConstants.USER_CAMPAIGN_PRESET_DIRECTORY)
+              : configuredDirectory;
+    }
+
+    /**
      * Retrieves a combined list of all campaign presets from the default directory, the old user data directory, and
      * the modern (user-defined) user data directory. The campaign presets are sourced, merged, and sorted in natural
      * order before being returned.
@@ -346,9 +361,10 @@ public class CampaignPreset {
         presets.addAll(loadCampaignPresetsFromDirectory(new File(MHQConstants.USER_CAMPAIGN_PRESET_DIRECTORY)));
 
         // Modern user data directory
-        String userDirectory = PreferenceManager.getClientPreferences().getUserDir();
-        File presetUserDirectory = new File(userDirectory + '/' + CAMPAIGN_PRESET_DIRECTORY);
-        presets.addAll(loadCampaignPresetsFromDirectory(presetUserDirectory));
+        final File configuredDirectory = getConfiguredUserCampaignPresetDirectory();
+        if (configuredDirectory != null) {
+            presets.addAll(loadCampaignPresetsFromDirectory(configuredDirectory));
+        }
 
         final NaturalOrderComparator naturalOrderComparator = new NaturalOrderComparator();
 
@@ -376,9 +392,10 @@ public class CampaignPreset {
         presets.addAll(loadCampaignPresetsMetadataFromDirectory(new File(MHQConstants.USER_CAMPAIGN_PRESET_DIRECTORY)));
 
         // Modern user data directory
-        String userDirectory = PreferenceManager.getClientPreferences().getUserDir();
-        File presetUserDirectory = new File(userDirectory + '/' + CAMPAIGN_PRESET_DIRECTORY);
-        presets.addAll(loadCampaignPresetsMetadataFromDirectory(presetUserDirectory));
+        final File configuredDirectory = getConfiguredUserCampaignPresetDirectory();
+        if (configuredDirectory != null) {
+            presets.addAll(loadCampaignPresetsMetadataFromDirectory(configuredDirectory));
+        }
 
         final NaturalOrderComparator naturalOrderComparator = new NaturalOrderComparator();
 
@@ -387,10 +404,15 @@ public class CampaignPreset {
         return presets;
     }
 
+    private static @Nullable File getConfiguredUserCampaignPresetDirectory() {
+        final String userDirectory = PreferenceManager.getClientPreferences().getUserDir();
+        return userDirectory.isBlank() ? null : new File(userDirectory, CAMPAIGN_PRESET_DIRECTORY);
+    }
+
     // region File I/O
-    public void writeToFile(final JFrame frame, @Nullable File file) {
+    public boolean writeToFile(final @Nullable JFrame frame, @Nullable File file) {
         if (file == null) {
-            return;
+            return false;
         }
 
         String path = file.getPath();
@@ -404,14 +426,19 @@ public class CampaignPreset {
               OutputStreamWriter osw = new OutputStreamWriter(bos, StandardCharsets.UTF_8);
               PrintWriter pw = new PrintWriter(osw)) {
             writeToXML(pw, 0);
+            if (pw.checkError()) {
+                throw new IOException("Failed to write campaign preset to " + file);
+            }
+            return true;
         } catch (Exception ex) {
             LOGGER.error("writeToFile() Exception", ex);
-            final ResourceBundle resources = ResourceBundle.getBundle("mekhq.resources.Campaign",
-                  MekHQ.getMHQOptions().getLocale());
-            JOptionPane.showMessageDialog(frame,
-                  resources.getString("CampaignPresetSaveFailure.text"),
-                  resources.getString("CampaignPresetSaveFailure.title"),
-                  JOptionPane.ERROR_MESSAGE);
+            if (frame != null) {
+                JOptionPane.showMessageDialog(frame,
+                      getTextAt(RESOURCE_BUNDLE, "CampaignPresetSaveFailure.text"),
+                      getTextAt(RESOURCE_BUNDLE, "CampaignPresetSaveFailure.title"),
+                      JOptionPane.ERROR_MESSAGE);
+            }
+            return false;
         }
     }
 

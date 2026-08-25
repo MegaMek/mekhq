@@ -39,6 +39,7 @@ import jakarta.annotation.Nonnull;
 import jakarta.annotation.Nullable;
 import megamek.logging.MMLogger;
 import mekhq.campaign.campaignOptions.CampaignOptions;
+import mekhq.campaign.campaignOptions.CampaignOption;
 import mekhq.campaign.personnel.skills.SkillType;
 
 class SkillsOptionsModel {
@@ -71,8 +72,8 @@ class SkillsOptionsModel {
             skillConfigurations.put(skillName, new SkillConfiguration(skill));
         }
 
-        edgeCost = options.getEdgeCost();
-        attributeCost = options.getAttributeCost();
+        edgeCost = options.get(CampaignOption.EDGE_COST);
+        attributeCost = options.get(CampaignOption.ATTRIBUTE_COST);
     }
 
     void applyTo(@Nonnull CampaignOptions options, @Nullable Map<String, SkillType> presetSkills) {
@@ -93,7 +94,7 @@ class SkillsOptionsModel {
             skillConfiguration.applyTo(type);
         }
 
-        options.setEdgeCost(edgeCost);
-        options.setAttributeCost(attributeCost);
+        options.set(CampaignOption.EDGE_COST, edgeCost);
+        options.set(CampaignOption.ATTRIBUTE_COST, attributeCost);
     }
 }

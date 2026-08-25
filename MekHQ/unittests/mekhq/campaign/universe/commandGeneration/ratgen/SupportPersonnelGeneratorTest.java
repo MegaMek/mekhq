@@ -32,6 +32,9 @@
  */
 package mekhq.campaign.universe.commandGeneration.ratgen;
 
+import mekhq.campaign.ForceHumanResources;
+import mekhq.campaign.campaignOptions.CampaignOption;
+import mekhq.campaign.force.PlayerForce;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -113,6 +116,8 @@ class SupportPersonnelGeneratorTest {
      * {@code DefaultSkillGeneratorTest} (not added here).
      */
     private AbstractSkillGenerator stubSkillGen;
+    /** Wired by {@link #newCampaignWithUnits(List, int)}; personnel calls now land here, not on the campaign. */
+    private ForceHumanResources humanResources;
 
     @BeforeEach
     void setUp() {
@@ -187,9 +192,9 @@ class SupportPersonnelGeneratorTest {
         assertEquals(0, result.doctorsGenerated());
         assertEquals(0, result.astechsAdded());
         assertEquals(0, result.medicsAdded());
-        verify(campaign, never()).newPerson(any());
-        verify(campaign, never()).increaseAsTechPool(anyInt());
-        verify(campaign, never()).increaseMedicPool(anyInt());
+        verify(humanResources, never()).newPerson(eq(campaign), any());
+        verify(humanResources, never()).increaseAsTechPool(eq(campaign), anyInt());
+        verify(humanResources, never()).increaseMedicPool(eq(campaign), anyInt());
     }
 
     // ===== Tech roles =====
@@ -202,7 +207,7 @@ class SupportPersonnelGeneratorTest {
         Result result = SupportPersonnelGenerator.generate(campaign, options, stubSkillGen);
 
         assertEquals(12, result.mekTechsGenerated());
-        verify(campaign, times(12)).newPerson(PersonnelRole.MEK_TECH);
+        verify(humanResources, times(12)).newPerson(campaign, PersonnelRole.MEK_TECH);
     }
 
     @Test
@@ -225,7 +230,7 @@ class SupportPersonnelGeneratorTest {
         Result result = SupportPersonnelGenerator.generate(campaign, options, stubSkillGen);
 
         assertEquals(0, result.mekTechsGenerated());
-        verify(campaign, never()).newPerson(PersonnelRole.MEK_TECH);
+        verify(humanResources, never()).newPerson(campaign, PersonnelRole.MEK_TECH);
     }
 
     @Test
@@ -240,14 +245,14 @@ class SupportPersonnelGeneratorTest {
         // run therefore failed roughly one time in thirty-six per additional support hire, whenever an
         // unrelated person happened to roll a 12.
         Person mekTech = mock(Person.class);
-        when(campaign.newPerson(PersonnelRole.MEK_TECH)).thenReturn(mekTech);
+        when(humanResources.newPerson(campaign, PersonnelRole.MEK_TECH)).thenReturn(mekTech);
 
         SupportPersonnelGenerator.generate(campaign, options, stubSkillGen);
 
         // We pass a stubbed AbstractSkillGenerator into the package-private overload, so verify it was
         // called for the generated Mek Tech (the role under test) with the converted experience level.
         // This proves the SkillLevel-to-EXP conversion is wired correctly.
-        verify(campaign, times(1)).newPerson(PersonnelRole.MEK_TECH);
+        verify(humanResources, times(1)).newPerson(campaign, PersonnelRole.MEK_TECH);
         verify(stubSkillGen).generateSkills(campaign, mekTech, SkillType.EXP_ELITE);
     }
 
@@ -258,8 +263,8 @@ class SupportPersonnelGeneratorTest {
 
         Result result = SupportPersonnelGenerator.generate(campaign, options, stubSkillGen);
 
-        verify(campaign, atLeast(result.totalTechsGenerated()))
-              .recruitPerson(any(), eq(PrisonerStatus.FREE), anyBoolean(), anyBoolean());
+        verify(humanResources, atLeast(result.totalTechsGenerated()))
+              .recruitPerson(eq(campaign), any(), eq(PrisonerStatus.FREE), anyBoolean(), anyBoolean(), anyBoolean());
         assertEquals(result.totalTechsGenerated() + result.doctorsGenerated() + result.totalAdministratorsGenerated(),
               result.generatedPersons().size(), "Pool-mode astechs/medics are NOT counted as Persons in the result");
     }
@@ -307,8 +312,8 @@ class SupportPersonnelGeneratorTest {
         Result result = SupportPersonnelGenerator.generate(campaign, options, stubSkillGen);
 
         assertEquals(0, result.astechsAdded());
-        verify(campaign, never()).increaseAsTechPool(anyInt());
-        verify(campaign, never()).newPerson(PersonnelRole.ASTECH);
+        verify(humanResources, never()).increaseAsTechPool(eq(campaign), anyInt());
+        verify(humanResources, never()).newPerson(campaign, PersonnelRole.ASTECH);
     }
 
     @Test
@@ -322,8 +327,8 @@ class SupportPersonnelGeneratorTest {
         Result result = SupportPersonnelGenerator.generate(campaign, options, stubSkillGen);
 
         assertEquals(24, result.astechsAdded());
-        verify(campaign).increaseAsTechPool(24);
-        verify(campaign, never()).newPerson(PersonnelRole.ASTECH);
+        verify(humanResources).increaseAsTechPool(campaign, 24);
+        verify(humanResources, never()).newPerson(campaign, PersonnelRole.ASTECH);
     }
 
     @Test
@@ -337,8 +342,8 @@ class SupportPersonnelGeneratorTest {
 
         // 2 Meks → 2 Mek Techs → 2 × 6 = 12 astech Persons.
         assertEquals(12, result.astechsAdded());
-        verify(campaign, times(12)).newPerson(PersonnelRole.ASTECH);
-        verify(campaign, never()).increaseAsTechPool(anyInt());
+        verify(humanResources, times(12)).newPerson(campaign, PersonnelRole.ASTECH);
+        verify(humanResources, never()).increaseAsTechPool(eq(campaign), anyInt());
     }
 
     @Test
@@ -351,7 +356,7 @@ class SupportPersonnelGeneratorTest {
 
         assertEquals(0, result.totalTechsGenerated());
         assertEquals(0, result.astechsAdded(), "No techs = no astechs");
-        verify(campaign, never()).increaseAsTechPool(anyInt());
+        verify(humanResources, never()).increaseAsTechPool(eq(campaign), anyInt());
     }
 
     // ===== Medics =====
@@ -368,8 +373,8 @@ class SupportPersonnelGeneratorTest {
 
         assertEquals(4, result.doctorsGenerated());
         assertEquals(16, result.medicsAdded());
-        verify(campaign).increaseMedicPool(16);
-        verify(campaign, never()).newPerson(PersonnelRole.MEDIC);
+        verify(humanResources).increaseMedicPool(campaign, 16);
+        verify(humanResources, never()).newPerson(campaign, PersonnelRole.MEDIC);
     }
 
     @Test
@@ -384,8 +389,8 @@ class SupportPersonnelGeneratorTest {
         // 50 personnel → 2 doctors → 2 × 4 = 8 medic Persons.
         assertEquals(2, result.doctorsGenerated());
         assertEquals(8, result.medicsAdded());
-        verify(campaign, times(8)).newPerson(PersonnelRole.MEDIC);
-        verify(campaign, never()).increaseMedicPool(anyInt());
+        verify(humanResources, times(8)).newPerson(campaign, PersonnelRole.MEDIC);
+        verify(humanResources, never()).increaseMedicPool(eq(campaign), anyInt());
     }
 
     @Test
@@ -397,8 +402,8 @@ class SupportPersonnelGeneratorTest {
         Result result = SupportPersonnelGenerator.generate(campaign, options, stubSkillGen);
 
         assertEquals(0, result.medicsAdded());
-        verify(campaign, never()).increaseMedicPool(anyInt());
-        verify(campaign, never()).newPerson(PersonnelRole.MEDIC);
+        verify(humanResources, never()).increaseMedicPool(eq(campaign), anyInt());
+        verify(humanResources, never()).newPerson(campaign, PersonnelRole.MEDIC);
     }
 
     // ===== Generated-persons list =====
@@ -456,16 +461,23 @@ class SupportPersonnelGeneratorTest {
 
     private Campaign newCampaignWithUnits(List<Unit> units, int personnelCount) {
         Campaign campaign = mock(Campaign.class);
+        PlayerForce playerForce = mock(PlayerForce.class);
+        humanResources = mock(ForceHumanResources.class);
+        when(campaign.getPlayerForce()).thenReturn(playerForce);
+        when(playerForce.getHumanResources()).thenReturn(humanResources);
         when(campaign.getActiveUnits()).thenReturn(units == null ? Collections.emptyList() : units);
 
         List<Person> personnel = new ArrayList<>();
         for (int i = 0; i < personnelCount; i++) {
             personnel.add(mock(Person.class));
         }
-        lenient().when(campaign.getActivePersonnel(false, false)).thenReturn(personnel);
+        lenient().when(humanResources.getActivePersonnel(false, false)).thenReturn(personnel);
 
-        CampaignOptions opts = mock(CampaignOptions.class);
-        lenient().when(opts.getMaximumPatients()).thenReturn(25);
+        CampaignOptions opts = new CampaignOptions();
+        opts.set(CampaignOption.MAXIMUM_PATIENTS, 25);
+        // These tests measure the tech/doctor counts the generator asks for. HR strain defaults on and
+        // would top the roster up on its own, so it is switched off to leave the counts as generated.
+        opts.set(CampaignOption.USE_HR_STRAIN, false);
         when(campaign.getCampaignOptions()).thenReturn(opts);
 
         Faction faction = mock(Faction.class);
@@ -473,16 +485,17 @@ class SupportPersonnelGeneratorTest {
         lenient().when(faction.isMercenary()).thenReturn(false);
         lenient().when(faction.isClan()).thenReturn(false);
         lenient().when(faction.isComStarOrWoB()).thenReturn(false);
-        when(campaign.getFaction()).thenReturn(faction);
+        when(playerForce.getFaction()).thenReturn(faction);
 
         RandomSkillPreferences skillPrefs = mock(RandomSkillPreferences.class);
         lenient().when(campaign.getRandomSkillPreferences()).thenReturn(skillPrefs);
 
         // Every newPerson(role) returns a fresh mocked Person so verify(...) can count calls.
-        lenient().when(campaign.newPerson(any(PersonnelRole.class)))
+        lenient().when(humanResources.newPerson(eq(campaign), any(PersonnelRole.class)))
               .thenAnswer(inv -> mock(Person.class));
         // Recruitment always succeeds in these tests.
-        lenient().when(campaign.recruitPerson(any(Person.class), any(PrisonerStatus.class), anyBoolean(), anyBoolean()))
+        lenient().when(humanResources.recruitPerson(eq(campaign), any(Person.class), any(PrisonerStatus.class),
+              anyBoolean(), anyBoolean(), anyBoolean()))
               .thenReturn(true);
 
         return campaign;
@@ -527,7 +540,7 @@ class SupportPersonnelGeneratorTest {
     }
 
     private static void recruitWithRole(Campaign campaign, PersonnelRole role) {
-        Person person = campaign.newPerson(role);
-        campaign.recruitPerson(person, PrisonerStatus.FREE, true, true);
+        Person person = campaign.getPlayerForce().getHumanResources().newPerson(campaign, role);
+        campaign.getPlayerForce().getHumanResources().recruitPerson(campaign, person, PrisonerStatus.FREE, true, true, true);
     }
 }

@@ -47,8 +47,8 @@ import static mekhq.campaign.digitalGM.stratCon.StratConRulesManager.processRein
 import static mekhq.campaign.digitalGM.stratCon.StratConScenario.ScenarioState.PRIMARY_FORCES_COMMITTED;
 import static mekhq.campaign.digitalGM.stratCon.StratConScenario.ScenarioState.REINFORCEMENTS_COMMITTED;
 import static mekhq.campaign.enums.DailyReportType.POLITICS;
-import static mekhq.campaign.mission.AtBDynamicScenarioFactory.scaleObjectiveTimeLimits;
-import static mekhq.campaign.mission.AtBDynamicScenarioFactory.translateTemplateObjectives;
+import static mekhq.campaign.mission.scenarios.AtBDynamicScenarioFactory.scaleObjectiveTimeLimits;
+import static mekhq.campaign.mission.scenarios.AtBDynamicScenarioFactory.translateTemplateObjectives;
 import static mekhq.campaign.personnel.skills.SkillType.S_LEADER;
 import static mekhq.campaign.utilities.CampaignTransportUtilities.getLeadershipDropdownVectorPair;
 import static mekhq.utilities.MHQInternationalization.getTextAt;
@@ -72,7 +72,7 @@ import megamek.common.ui.FastJScrollPane;
 import megamek.logging.MMLogger;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
-import mekhq.campaign.Campaign.AdministratorSpecialization;
+import mekhq.campaign.campaignOptions.CampaignOption;
 import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.digitalGM.stratCon.StratConCampaignState;
 import mekhq.campaign.digitalGM.stratCon.StratConRulesManager;
@@ -81,10 +81,11 @@ import mekhq.campaign.digitalGM.stratCon.StratConTrackState;
 import mekhq.campaign.digitalGM.stratCon.gm.StratConGMs;
 import mekhq.campaign.enums.CampaignTransportType;
 import mekhq.campaign.force.Formation;
-import mekhq.campaign.mission.AtBContract;
-import mekhq.campaign.mission.AtBDynamicScenario;
-import mekhq.campaign.mission.ScenarioForceTemplate;
-import mekhq.campaign.mission.ScenarioTemplate;
+import mekhq.campaign.mission.contract.AbstractContract;
+import mekhq.campaign.mission.contract.contractData.EnemyData;
+import mekhq.campaign.mission.scenarios.AtBDynamicScenario;
+import mekhq.campaign.mission.scenarios.ScenarioForceTemplate;
+import mekhq.campaign.mission.scenarios.ScenarioTemplate;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.unit.Unit;
 import mekhq.campaign.universe.Faction;
@@ -853,18 +854,17 @@ public class StratConScenarioWizard extends JDialog {
         }
 
         Person commandLiaison = campaign.getPlayerForce().getHumanResources()
-                                      .getSeniorAdminPerson(AdministratorSpecialization.COMMAND,
-                                            campaign.getCampaignOptions(),
-                                            campaign.isClanCampaign(),
+                                      .getSeniorAdminPerson(campaign.getCampaignOptions(),
+                                            campaign.getPlayerForce().isClanForce(),
                                             campaign.getLocalDate());
-        int baseTargetNumber = campaign.getCampaignOptions().getReinforcementBaseTargetNumber();
+        int baseTargetNumber = campaign.getCampaignOptions().get(CampaignOption.REINFORCEMENT_BASE_TARGET_NUMBER);
         TargetRoll targetNumber = calculateReinforcementTargetNumber(commandLiaison,
               currentCampaignState.getContract(),
               baseTargetNumber);
         int availableSupportPoints = currentCampaignState.getSupportPoints();
 
-        AtBContract contract = currentScenario.getBackingContract(campaign);
-        Faction enemy = contract.getEnemy();
+        AbstractContract contract = currentScenario.getBackingContract(campaign);
+        Faction enemy = contract.getEnemyFaction();
         boolean isClanEnemy = enemy.isClan();
         boolean isBatchallAccepted = contract.isBatchallAccepted();
 
@@ -916,7 +916,7 @@ public class StratConScenarioWizard extends JDialog {
                                                  0
                                                  :
                                                  (dialog.getSupportPoints() * SUPPORT_POINTS_MODIFIER) /
-                                                 selectedForceCount;
+                                                       selectedForceCount;
                 int finalTargetNumber = targetNumber.getValue() + supportPointModifier;
 
                 btnCommitClicked(finalTargetNumber, false, true);
@@ -1056,9 +1056,8 @@ public class StratConScenarioWizard extends JDialog {
         boolean backedOutOfBatchall = false;
 
         Person speaker = campaign.getPlayerForce().getHumanResources()
-                               .getSeniorAdminPerson(AdministratorSpecialization.COMMAND,
-                                     campaign.getCampaignOptions(),
-                                     campaign.isClanCampaign(),
+                               .getSeniorAdminPerson(campaign.getCampaignOptions(),
+                                     campaign.getPlayerForce().isClanForce(),
                                      campaign.getLocalDate());
         String inCharacterMessage = String.format(resources.getString("batchallBreach.ic"),
               campaign.getCommanderAddress());
@@ -1090,24 +1089,24 @@ public class StratConScenarioWizard extends JDialog {
      * <p>This method marks the Batchall as not accepted in the contract and, if the campaign is configured to track
      * faction standing, adjusts regard accordingly and adds all relevant standing reports to the campaign log.</p>
      *
-     * @param contract  the active {@link AtBContract} for which the Batchall was breached
+     * @param contract  the active {@link AbstractContract} for which the Batchall was breached
      * @param enemyCode the code representing the enemy faction involved in the breach
      *
      * @author Illiani
      * @since 0.50.07
      */
-    private void processBatchallBreach(AtBContract contract, String enemyCode) {
-        contract.setBatchallAccepted(false);
+    private void processBatchallBreach(AbstractContract contract, String enemyCode) {
+        contract.setEnemyData(new EnemyData(contract.getEnemyData(), false));
 
         CampaignOptions campaignOptions = campaign.getCampaignOptions();
-        if (campaignOptions.isTrackFactionStanding()) {
+        if (campaignOptions.get(CampaignOption.TRACK_FACTION_STANDING)) {
             FactionStandings factionStandings = campaign.getPlayerForce().getFactionStandings();
-            double regardMultiplier = campaignOptions.getRegardMultiplier();
+            double regardMultiplier = campaignOptions.get(CampaignOption.REGARD_MULTIPLIER);
             // We double the regard multiplier for Batchall breaches as agreeing to a Batchall and then breaking it
             // is far worse than if you never agreed to it in the first place.
             regardMultiplier *= 2;
 
-            List<String> reports = factionStandings.processRefusedBatchall(campaign.getFaction().getShortName(),
+            List<String> reports = factionStandings.processRefusedBatchall(campaign.getPlayerForce().getFaction().getShortName(),
                   enemyCode, campaign.getGameYear(), regardMultiplier);
 
             for (String report : reports) {

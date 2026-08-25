@@ -42,6 +42,7 @@ import java.util.List;
 
 import mekhq.campaign.Campaign;
 import mekhq.campaign.campaignOptions.CampaignOptions;
+import mekhq.campaign.campaignOptions.CampaignOption;
 import mekhq.campaign.digitalGM.stratCon.gm.MaplessStratConGM;
 import mekhq.campaign.digitalGM.stratCon.gm.SinglesStratConGM;
 import mekhq.campaign.digitalGM.stratCon.gm.StratConDigitalGM;
@@ -72,7 +73,7 @@ class IDigitalGMRegistryTest {
 
     private static Campaign campaignWith(StratConPlayType playType) {
         CampaignOptions options = mock(CampaignOptions.class);
-        when(options.getStratConPlayType()).thenReturn(playType);
+        when(options.get(CampaignOption.STRAT_CON_PLAY_TYPE)).thenReturn(playType);
 
         Campaign campaign = mock(Campaign.class);
         when(campaign.getCampaignOptions()).thenReturn(options);

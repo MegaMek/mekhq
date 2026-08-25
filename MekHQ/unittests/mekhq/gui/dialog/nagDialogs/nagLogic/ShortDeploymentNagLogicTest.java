@@ -36,6 +36,7 @@ import static mekhq.gui.dialog.nagDialogs.nagLogic.DeploymentShortfallNagLogic.h
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.mockStatic;
 import static org.mockito.Mockito.when;
 import static testUtilities.MHQTestUtilities.mockCampaign;
 
@@ -45,9 +46,11 @@ import java.util.List;
 
 import mekhq.campaign.Campaign;
 import mekhq.campaign.CurrentLocation;
-import mekhq.campaign.mission.AtBContract;
+import mekhq.campaign.mission.contract.AbstractContract;
+import mekhq.campaign.mission.utilities.ContractUtilities;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.mockito.MockedStatic;
 
 /**
  * This class is a test class for the {@link ShortDeploymentNagDialog} class. It contains tests for various scenarios
@@ -57,7 +60,7 @@ public class ShortDeploymentNagLogicTest {
     // Mock objects for the tests
     private Campaign campaign;
     private LocalDate monday, sunday;
-    private AtBContract contract;
+    private AbstractContract contract;
 
     /**
      * Test setup for each test, runs before each test. Initializes the mock objects and sets up the necessary mock
@@ -73,22 +76,22 @@ public class ShortDeploymentNagLogicTest {
         monday = LocalDate.of(2024, 10, 7);
         sunday = LocalDate.of(2024, 10, 6);
 
-        contract = mock(AtBContract.class);
+        contract = mock(AbstractContract.class);
 
         // Stubs
-        when(campaign.getCurrentLocation()).thenReturn(location);
+        when(campaign.getPlayerForce().getForceDetachment().getCurrentLocation()).thenReturn(location);
     }
 
     @Test
     void notOnPlanet() {
-        when(campaign.getCurrentLocation().isOnPlanet()).thenReturn(false);
+        when(campaign.getPlayerForce().getForceDetachment().getCurrentLocation().isOnPlanet()).thenReturn(false);
 
         assertFalse(hasDeploymentShortfall(campaign));
     }
 
     @Test
     void notSunday() {
-        when(campaign.getCurrentLocation().isOnPlanet()).thenReturn(true);
+        when(campaign.getPlayerForce().getForceDetachment().getCurrentLocation().isOnPlanet()).thenReturn(true);
         when(campaign.getLocalDate()).thenReturn(monday);
 
         assertFalse(hasDeploymentShortfall(campaign));
@@ -96,44 +99,56 @@ public class ShortDeploymentNagLogicTest {
 
     @Test
     void noContract() {
-        when(campaign.getCurrentLocation().isOnPlanet()).thenReturn(true);
+        when(campaign.getPlayerForce().getForceDetachment().getCurrentLocation().isOnPlanet()).thenReturn(true);
         when(campaign.getLocalDate()).thenReturn(sunday);
 
-        when(campaign.getActiveAtBContracts()).thenReturn(new ArrayList<>());
+        when(campaign.getActiveContracts()).thenReturn(new ArrayList<>());
 
         assertFalse(hasDeploymentShortfall(campaign));
     }
 
     @Test
     void noDeploymentDeficit() {
-        when(campaign.getCurrentLocation().isOnPlanet()).thenReturn(true);
+        when(campaign.getPlayerForce().getForceDetachment().getCurrentLocation().isOnPlanet()).thenReturn(true);
         when(campaign.getLocalDate()).thenReturn(sunday);
 
-        when(campaign.getActiveAtBContracts()).thenReturn(List.of(contract));
-        when(campaign.getDeploymentDeficit(contract)).thenReturn(0);
+        when(campaign.getActiveContracts()).thenReturn(List.of(contract));
 
-        assertFalse(hasDeploymentShortfall(campaign));
+        try (MockedStatic<ContractUtilities> contractUtilities = mockStatic(ContractUtilities.class)) {
+            contractUtilities.when(() -> ContractUtilities.getDeploymentDeficit(campaign, contract))
+                  .thenReturn(0);
+
+            assertFalse(hasDeploymentShortfall(campaign));
+        }
     }
 
     @Test
     void negativeDeploymentDeficit() {
-        when(campaign.getCurrentLocation().isOnPlanet()).thenReturn(true);
+        when(campaign.getPlayerForce().getForceDetachment().getCurrentLocation().isOnPlanet()).thenReturn(true);
         when(campaign.getLocalDate()).thenReturn(sunday);
 
-        when(campaign.getActiveAtBContracts()).thenReturn(List.of(contract));
-        when(campaign.getDeploymentDeficit(contract)).thenReturn(-3);
+        when(campaign.getActiveContracts()).thenReturn(List.of(contract));
 
-        assertFalse(hasDeploymentShortfall(campaign));
+        try (MockedStatic<ContractUtilities> contractUtilities = mockStatic(ContractUtilities.class)) {
+            contractUtilities.when(() -> ContractUtilities.getDeploymentDeficit(campaign, contract))
+                  .thenReturn(-3);
+
+            assertFalse(hasDeploymentShortfall(campaign));
+        }
     }
 
     @Test
     void positiveDeploymentDeficit() {
-        when(campaign.getCurrentLocation().isOnPlanet()).thenReturn(true);
+        when(campaign.getPlayerForce().getForceDetachment().getCurrentLocation().isOnPlanet()).thenReturn(true);
         when(campaign.getLocalDate()).thenReturn(sunday);
 
-        when(campaign.getActiveAtBContracts()).thenReturn(List.of(contract));
-        when(campaign.getDeploymentDeficit(contract)).thenReturn(1);
+        when(campaign.getActiveContracts()).thenReturn(List.of(contract));
 
-        assertTrue(hasDeploymentShortfall(campaign));
+        try (MockedStatic<ContractUtilities> contractUtilities = mockStatic(ContractUtilities.class)) {
+            contractUtilities.when(() -> ContractUtilities.getDeploymentDeficit(campaign, contract))
+                  .thenReturn(1);
+
+            assertTrue(hasDeploymentShortfall(campaign));
+        }
     }
 }

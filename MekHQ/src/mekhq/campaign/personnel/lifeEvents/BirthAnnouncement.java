@@ -47,6 +47,7 @@ import megamek.common.annotations.Nullable;
 import megamek.common.enums.Gender;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.campaignOptions.CampaignOptions;
+import mekhq.campaign.campaignOptions.CampaignOption;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.PronounData;
 import mekhq.campaign.personnel.enums.PersonnelRole;
@@ -95,7 +96,7 @@ public class BirthAnnouncement {
 
         if (dialog.getDialogChoice() == SUPPRESS_DIALOG_RESPONSE_INDEX) {
             CampaignOptions campaignOptions = campaign.getCampaignOptions();
-            campaignOptions.setShowLifeEventDialogBirths(false);
+            campaignOptions.set(CampaignOption.SHOW_LIFE_EVENT_DIALOG_BIRTHS, false);
         }
     }
 
@@ -120,7 +121,7 @@ public class BirthAnnouncement {
      */
     private String getInCharacterMessage(Gender babyGender, int babyCount, String parentFirstName) {
         // Campaign Data
-        Faction campaignFaction = campaign.getFaction();
+        Faction campaignFaction = campaign.getPlayerForce().getFaction();
 
         // Parent Data
         Gender parentGender = parent.getGender();
@@ -250,16 +251,14 @@ public class BirthAnnouncement {
      */
     private @Nullable Person getFallbackSpeaker(Campaign campaign) {
         Person speaker = campaign.getPlayerForce().getHumanResources()
-                               .getSeniorAdminPerson(Campaign.AdministratorSpecialization.HR,
-                                     campaign.getCampaignOptions(),
-                                     campaign.isClanCampaign(),
+                               .getSeniorAdminPerson(campaign.getCampaignOptions(),
+                                     campaign.getPlayerForce().isClanForce(),
                                      campaign.getLocalDate());
 
         if (speaker == null) {
             speaker = campaign.getPlayerForce().getHumanResources()
-                            .getSeniorAdminPerson(Campaign.AdministratorSpecialization.COMMAND,
-                                  campaign.getCampaignOptions(),
-                                  campaign.isClanCampaign(),
+                            .getSeniorAdminPerson(campaign.getCampaignOptions(),
+                                  campaign.getPlayerForce().isClanForce(),
                                   campaign.getLocalDate());
         } else {
             return speaker;

@@ -47,8 +47,9 @@ import javax.swing.JPanel;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.JumpPath;
+import mekhq.campaign.campaignOptions.CampaignOption;
 import mekhq.campaign.finances.Money;
-import mekhq.campaign.mission.TransportCostCalculations;
+import mekhq.campaign.mission.utilities.TransportCostCalculations;
 import mekhq.campaign.universe.PlanetarySystem;
 import mekhq.campaign.universe.factionStanding.FactionStandingUtilities;
 import mekhq.gui.baseComponents.JScrollablePanel;
@@ -120,7 +121,7 @@ public class JumpPathViewPanel extends JScrollablePanel {
                                                                  .isOverridingCommandCircuitRequirements(),
                     campaign.isGM(),
                     campaign.getCampaignOptions().isUseFactionStandingCommandCircuitSafe(),
-                    campaign.getPlayerForce().getFactionStandings(), campaign.getFutureAtBContracts());
+                    campaign.getPlayerForce().getFactionStandings(), campaign.getFutureContracts());
 
         for (PlanetarySystem system : path.getSystems()) {
             lblPlanet =
@@ -252,7 +253,7 @@ public class JumpPathViewPanel extends JScrollablePanel {
         boolean isUseCommandCircuit = FactionStandingUtilities.isUseCommandCircuit(campaign.getPlayerForce()
                                                                                          .isOverridingCommandCircuitRequirements(),
               campaign.isGM(), campaign.getCampaignOptions().isUseFactionStandingCommandCircuitSafe(),
-              campaign.getPlayerForce().getFactionStandings(), campaign.getFutureAtBContracts());
+              campaign.getPlayerForce().getFactionStandings(), campaign.getFutureContracts());
 
         txtRechargeTime.setName("lblRechargeTime2");
         txtRechargeTime.setText("<html>" +
@@ -293,7 +294,7 @@ public class JumpPathViewPanel extends JScrollablePanel {
         gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
         pnlStats.add(txtTotalTime, gridBagConstraints);
 
-        if (campaign.getCampaignOptions().isPayForTransport()) {
+        if (campaign.getCampaignOptions().get(CampaignOption.PAY_FOR_TRANSPORT)) {
             lblCost.setName("lblCost1");
             lblCost.setText(resourceMap.getString("lblCost1.text"));
             gridBagConstraints = new GridBagConstraints();

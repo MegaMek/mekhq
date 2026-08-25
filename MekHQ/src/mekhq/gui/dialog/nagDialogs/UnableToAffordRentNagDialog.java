@@ -33,7 +33,7 @@
 package mekhq.gui.dialog.nagDialogs;
 
 import static mekhq.MHQConstants.NAG_UNABLE_TO_AFFORD_RENT;
-import static mekhq.campaign.Campaign.AdministratorSpecialization.LOGISTICS;
+
 import static mekhq.gui.dialog.nagDialogs.nagLogic.UnableToAffordRentNagLogic.unableToAffordRent;
 import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
 
@@ -47,7 +47,7 @@ import mekhq.gui.baseComponents.immersiveDialogs.ImmersiveDialogNag;
 
 public class UnableToAffordRentNagDialog extends ImmersiveDialogNag {
     public UnableToAffordRentNagDialog(final Campaign campaign) {
-        super(campaign, LOGISTICS, NAG_UNABLE_TO_AFFORD_RENT, "UnableToAffordRentNagDialog");
+        super(campaign, NAG_UNABLE_TO_AFFORD_RENT, "UnableToAffordRentNagDialog");
     }
 
     /**

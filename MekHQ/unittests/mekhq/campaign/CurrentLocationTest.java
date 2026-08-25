@@ -465,6 +465,87 @@ public class CurrentLocationTest {
                 mekHQ.verify(() -> MekHQ.triggerEvent(isA(LocationChangedEvent.class)), never());
             }
         }
+
+        @Test
+        void newDayInitializesFinalLegTransitToTargetPlanet() {
+            when(system.getTimeToJumpPoint(1.0)).thenReturn(2.5); // origin
+            PlanetarySystem destination = mock(PlanetarySystem.class);
+            when(destination.getPrintableName(today)).thenReturn("Destination");
+            Planet targetPlanet = mock(Planet.class);
+            when(targetPlanet.getTimeToJumpPoint(1.0)).thenReturn(9.0); // an outer world, farther than the primary
+
+            JumpPath jumpPath = new JumpPath();
+            jumpPath.addSystem(system);
+            jumpPath.addSystem(destination);
+            jumpPath.setTargetPlanet(targetPlanet);
+
+            try (MockedStatic<MekHQ> mekHQ = mockStatic(MekHQ.class)) {
+                currentLocation.setJumpPath(jumpPath);
+                currentLocation.chargeFully(campaign);
+                currentLocation.setTransitTime(1.5); // a full day's burn short of the 2.5-day origin jump point
+
+                currentLocation.newDay(campaign, false);
+
+                assertEquals(destination, currentLocation.getCurrentSystem());
+                // The inbound leg begins at the target planet's 9.0-day transit, not the destination primary's.
+                assertEquals(9.0, currentLocation.getTransitTime(), 1e-9);
+            }
+        }
+    }
+
+    /** Tests for the target-planet aware in-system transit added to {@link CurrentLocation}. */
+    @Nested
+    class TargetPlanetTransit {
+        private JumpPath finalLegPathWithTarget(double targetTransit) {
+            Planet target = mock(Planet.class);
+            when(target.getTimeToJumpPoint(1.0)).thenReturn(targetTransit);
+            JumpPath jumpPath = mock(JumpPath.class);
+            when(jumpPath.size()).thenReturn(1);
+            when(jumpPath.getTargetPlanet()).thenReturn(target);
+            return jumpPath;
+        }
+
+        private CurrentLocation locationWithPath(double transitTime, JumpPath jumpPath) {
+            CurrentLocation loc = new CurrentLocation(system, transitTime);
+            try (MockedStatic<MekHQ> mekHQ = mockStatic(MekHQ.class)) {
+                loc.setJumpPath(jumpPath);
+            }
+            return loc;
+        }
+
+        @Test
+        void isAtJumpPointUsesTargetPlanetTransitOnFinalLeg() {
+            // The target planet is 20 days from the jump point, vs the system primary's 10.
+            CurrentLocation loc = locationWithPath(TIME_TO_JP, finalLegPathWithTarget(20.0));
+            assertFalse(loc.isAtJumpPoint(), "At 10 days we are short of the 20-day target planet's jump point");
+            loc.setTransitTime(20.0);
+            assertTrue(loc.isAtJumpPoint());
+        }
+
+        @Test
+        void getPercentageTransitUsesTargetPlanetTransitOnFinalLeg() {
+            CurrentLocation loc = locationWithPath(10.0, finalLegPathWithTarget(20.0));
+            assertEquals(0.5, loc.getPercentageTransit(), 1e-9); // 1 - 10 / 20
+        }
+
+        @Test
+        void fallsBackToPrimaryWorldWhenPathHasNoTargetPlanet() {
+            JumpPath jumpPath = mock(JumpPath.class);
+            when(jumpPath.size()).thenReturn(1);
+            when(jumpPath.getTargetPlanet()).thenReturn(null);
+            CurrentLocation loc = locationWithPath(TIME_TO_JP, jumpPath);
+            assertTrue(loc.isAtJumpPoint()); // 10 == the system primary's transit
+        }
+
+        @Test
+        void ignoresTargetPlanetWhenNotOnTheFinalLeg() {
+            Planet target = mock(Planet.class);
+            JumpPath jumpPath = mock(JumpPath.class);
+            when(jumpPath.size()).thenReturn(2); // still an intermediate hop
+            when(jumpPath.getTargetPlanet()).thenReturn(target);
+            CurrentLocation loc = locationWithPath(TIME_TO_JP, jumpPath);
+            assertTrue(loc.isAtJumpPoint()); // uses the system primary's 10, not the target planet
+        }
     }
 
     @Nested

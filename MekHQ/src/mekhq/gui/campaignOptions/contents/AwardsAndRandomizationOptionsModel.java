@@ -37,6 +37,7 @@ import java.util.Map;
 
 import jakarta.annotation.Nonnull;
 import mekhq.campaign.campaignOptions.CampaignOptions;
+import mekhq.campaign.campaignOptions.CampaignOption;
 import mekhq.campaign.personnel.enums.PersonnelRole;
 import mekhq.campaign.personnel.skills.RandomSkillPreferences;
 import mekhq.campaign.personnel.skills.SkillType;
@@ -83,25 +84,25 @@ class AwardsAndRandomizationOptionsModel {
     Map<PersonnelRole, Integer> recruitmentBonuses;
 
     AwardsAndRandomizationOptionsModel(@Nonnull CampaignOptions options, @Nonnull RandomSkillPreferences skillPreferences) {
-        xpCostMultiplier = options.getXpCostMultiplier();
-        taskXP = options.getTaskXP();
-        nTasksXP = options.getNTasksXP();
-        successXP = options.getSuccessXP();
-        mistakeXP = options.getMistakeXP();
-        scenarioXP = options.getScenarioXP();
-        killXP = options.getKillXPAward();
-        killsForXP = options.getKillsForXP();
-        vocationalXP = options.getVocationalXP();
-        vocationalXPFrequency = options.getVocationalXPCheckFrequency();
-        vocationalXPTargetNumber = options.getVocationalXPTargetNumber();
-        missionXpFail = options.getMissionXpFail();
-        missionXpSuccess = options.getMissionXpSuccess();
-        missionXpOutstandingSuccess = options.getMissionXpOutstandingSuccess();
-        contractNegotiationXP = options.getContractNegotiationXP();
-        adminWeeklyXP = options.getAdminXP();
-        adminWeeklyXPPeriod = options.getAdminXPPeriod();
+        xpCostMultiplier = options.get(CampaignOption.XP_COST_MULTIPLIER);
+        taskXP = options.get(CampaignOption.TASKS_XP);
+        nTasksXP = options.get(CampaignOption.N_TASKS_XP);
+        successXP = options.get(CampaignOption.SUCCESS_XP);
+        mistakeXP = options.get(CampaignOption.MISTAKE_XP);
+        scenarioXP = options.get(CampaignOption.SCENARIO_XP);
+        killXP = options.get(CampaignOption.KILL_XP_AWARD);
+        killsForXP = options.get(CampaignOption.KILLS_FOR_XP);
+        vocationalXP = options.get(CampaignOption.VOCATIONAL_XP);
+        vocationalXPFrequency = options.get(CampaignOption.VOCATIONAL_XP_CHECK_FREQUENCY);
+        vocationalXPTargetNumber = options.get(CampaignOption.VOCATIONAL_XP_TARGET_NUMBER);
+        missionXpFail = options.get(CampaignOption.MISSION_XP_FAIL);
+        missionXpSuccess = options.get(CampaignOption.MISSION_XP_SUCCESS);
+        missionXpOutstandingSuccess = options.get(CampaignOption.MISSION_XP_OUTSTANDING_SUCCESS);
+        contractNegotiationXP = options.get(CampaignOption.CONTRACT_NEGOTIATION_XP);
+        adminWeeklyXP = options.get(CampaignOption.ADMIN_XP);
+        adminWeeklyXPPeriod = options.get(CampaignOption.ADMIN_XP_PERIOD);
         randomizeSkill = skillPreferences.randomizeSkill();
-        phenotypeProbabilities = options.getPhenotypeProbabilities().clone();
+        phenotypeProbabilities = options.get(CampaignOption.PHENOTYPE_PROBABILITIES).clone();
         specialAbilityBonus = new int[EXPERIENCE_LEVELS.length];
         commandSkillsModifier = new int[EXPERIENCE_LEVELS.length];
         utilitySkillsModifier = new int[EXPERIENCE_LEVELS.length];
@@ -122,23 +123,23 @@ class AwardsAndRandomizationOptionsModel {
     }
 
     void applyTo(@Nonnull CampaignOptions options, @Nonnull RandomSkillPreferences skillPreferences) {
-        options.setXpCostMultiplier(xpCostMultiplier);
-        options.setTaskXP(taskXP);
-        options.setNTasksXP(nTasksXP);
-        options.setSuccessXP(successXP);
-        options.setMistakeXP(mistakeXP);
-        options.setScenarioXP(scenarioXP);
-        options.setKillXPAward(killXP);
-        options.setKillsForXP(killsForXP);
-        options.setVocationalXP(vocationalXP);
-        options.setVocationalXPCheckFrequency(vocationalXPFrequency);
-        options.setVocationalXPTargetNumber(vocationalXPTargetNumber);
-        options.setMissionXpFail(missionXpFail);
-        options.setMissionXpSuccess(missionXpSuccess);
-        options.setMissionXpOutstandingSuccess(missionXpOutstandingSuccess);
-        options.setContractNegotiationXP(contractNegotiationXP);
-        options.setAdminXP(adminWeeklyXP);
-        options.setAdminXPPeriod(adminWeeklyXPPeriod);
+        options.set(CampaignOption.XP_COST_MULTIPLIER, xpCostMultiplier);
+        options.set(CampaignOption.TASKS_XP, taskXP);
+        options.set(CampaignOption.N_TASKS_XP, nTasksXP);
+        options.set(CampaignOption.SUCCESS_XP, successXP);
+        options.set(CampaignOption.MISTAKE_XP, mistakeXP);
+        options.set(CampaignOption.SCENARIO_XP, scenarioXP);
+        options.set(CampaignOption.KILL_XP_AWARD, killXP);
+        options.set(CampaignOption.KILLS_FOR_XP, killsForXP);
+        options.set(CampaignOption.VOCATIONAL_XP, vocationalXP);
+        options.set(CampaignOption.VOCATIONAL_XP_CHECK_FREQUENCY, vocationalXPFrequency);
+        options.set(CampaignOption.VOCATIONAL_XP_TARGET_NUMBER, vocationalXPTargetNumber);
+        options.set(CampaignOption.MISSION_XP_FAIL, missionXpFail);
+        options.set(CampaignOption.MISSION_XP_SUCCESS, missionXpSuccess);
+        options.set(CampaignOption.MISSION_XP_OUTSTANDING_SUCCESS, missionXpOutstandingSuccess);
+        options.set(CampaignOption.CONTRACT_NEGOTIATION_XP, contractNegotiationXP);
+        options.set(CampaignOption.ADMIN_XP, adminWeeklyXP);
+        options.set(CampaignOption.ADMIN_XP_PERIOD, adminWeeklyXPPeriod);
 
         skillPreferences.setRandomizeSkill(randomizeSkill);
         for (int i = 0; i < phenotypeProbabilities.length; i++) {

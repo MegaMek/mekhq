@@ -63,6 +63,7 @@ import mekhq.campaign.universe.Faction;
 import mekhq.campaign.universe.commandGeneration.SupportUnitGenerator;
 import mekhq.gui.baseComponents.roundedComponents.RoundedJButton;
 import mekhq.gui.baseComponents.roundedComponents.RoundedLineBorder;
+import mekhq.campaign.campaignOptions.CampaignOption;
 
 public class PrisonerTrackingCampaignOptionsChangedConfirmationDialog extends JDialog {
     private static final String RESOURCE_BUNDLE = "mekhq.resources.PrisonerTrackingCampaignOptionsChangedConfirmationDialog";
@@ -175,7 +176,7 @@ public class PrisonerTrackingCampaignOptionsChangedConfirmationDialog extends JD
         RoundedJButton btnConfirm = new RoundedJButton(getTextAt(RESOURCE_BUNDLE,
               "PrisonerTrackingCampaignOptionsChangedConfirmationDialog.confirm"));
         btnConfirm.addActionListener(evt -> {
-            processFreeUnit(campaign, campaign.getFaction(), true);
+            processFreeUnit(campaign, campaign.getPlayerForce().getFaction(), true);
             dispose();
         });
 

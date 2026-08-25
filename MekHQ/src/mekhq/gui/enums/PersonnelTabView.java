@@ -43,6 +43,7 @@ import java.util.stream.Collectors;
 
 import megamek.common.annotations.Nullable;
 import mekhq.MekHQ;
+import mekhq.campaign.campaignOptions.CampaignOption;
 import mekhq.campaign.campaignOptions.CampaignOptions;
 
 public enum PersonnelTabView {
@@ -60,9 +61,12 @@ public enum PersonnelTabView {
     HEALTHCARE("PersonnelTabView.HEALTHCARE.text", "PersonnelTabView.HEALTHCARE.toolTipText",
           Set.of(RANK, FIRST_NAME, LAST_NAME, PERSONNEL_ROLE, INJURIES, TOUGHNESS, BODY, COVER_MEDICAL_EXPENSES,
                 DUE_DATE, MODIFICATION_COUNT),
-          Map.of(TOUGHNESS, CampaignOptions::isUseToughness,
-                MODIFICATION_COUNT, CampaignOptions::isUseAlternativeAdvancedMedical,
-                DUE_DATE, options -> options.isUseManualProcreation() || !options.getRandomProcreationMethod().isNone())),
+          Map.of(TOUGHNESS,
+                options -> options.get(CampaignOption.USE_TOUGHNESS),
+                MODIFICATION_COUNT,
+                options -> options.get(CampaignOption.USE_ALTERNATIVE_ADVANCED_MEDICAL),
+                DUE_DATE,
+                options -> options.get(CampaignOption.USE_MANUAL_PROCREATION) || !options.get(CampaignOption.RANDOM_PROCREATION_METHOD).isNone())),
     GUNNERY_PILOT_SKILLS("PersonnelTabView.GUNNERY_PILOT_SKILLS.text",
           "PersonnelTabView.GUNNERY_PILOT_SKILLS.toolTipText",
           Set.of(RANK, FIRST_NAME, LAST_NAME, PERSONNEL_ROLE, MEK, GROUND_VEHICLE, NAVAL_VEHICLE, VTOL)),
@@ -80,35 +84,37 @@ public enum PersonnelTabView {
           "PersonnelTabView.ADMINISTRATIVE_SKILLS.toolTipText",
           Set.of(RANK, FIRST_NAME, LAST_NAME, PERSONNEL_ROLE, ADMINISTRATION, NEGOTIATION, TRAINING, APPRAISAL)),
     TRAITS("PersonnelTabView.TRAITS.text", "PersonnelTabView.TRAITS.toolTipText",
-          Set.of(RANK, FIRST_NAME, LAST_NAME, CONNECTIONS, WEALTH, EXTRA_INCOME, REPUTATION, UNLUCKY, BLOODMARK)),
+          Set.of(RANK, FIRST_NAME, LAST_NAME, CONNECTIONS, WEALTH, EXTRA_INCOME, FAME, UNLUCKY, BLOODMARK)),
     ATTRIBUTES("PersonnelTabView.ATTRIBUTES.text", "PersonnelTabView.ATTRIBUTES.toolTipText",
           Set.of(RANK, FIRST_NAME, LAST_NAME, STRENGTH, BODY, REFLEXES, DEXTERITY, INTELLIGENCE, WILLPOWER, CHARISMA,
                 EDGE),
-          Map.of(EDGE, CampaignOptions::isUseEdge)),
+          Map.of(EDGE, options -> options.get(CampaignOption.USE_EDGE))),
     TURNOVER_AND_RETENTION("PersonnelTabView.TURNOVER_AND_RETENTION.text",
           "PersonnelTabView.TURNOVER_AND_RETENTION.toolTipText",
           Set.of(RANK, FIRST_NAME, LAST_NAME, SKILL_LEVEL, AGE, FATIGUE, LOYALTY, LAST_RANK_CHANGE_DATE,
                 MANAGEMENT_MODIFIER, FACTION_MODIFIER),
-          Map.of(FATIGUE, CampaignOptions::isUseFatigue,
-                MANAGEMENT_MODIFIER, CampaignOptions::isUseManagementSkill,
-                FACTION_MODIFIER, CampaignOptions::isUseFactionModifiers,
-                LAST_RANK_CHANGE_DATE, CampaignOptions::isUseTimeInRank,
-                LOYALTY, options -> options.isUseLoyaltyModifiers() && !options.isUseHideLoyalty())),
+          Map.of(FATIGUE, options -> options.get(CampaignOption.USE_FATIGUE),
+                MANAGEMENT_MODIFIER, options -> options.get(CampaignOption.USE_MANAGEMENT_SKILL),
+                FACTION_MODIFIER, options -> options.get(CampaignOption.USE_FACTION_MODIFIERS),
+                LAST_RANK_CHANGE_DATE, options -> options.get(CampaignOption.USE_TIME_IN_RANK),
+                LOYALTY, options -> options.get(CampaignOption.USE_LOYALTY_MODIFIERS) && !options.get(CampaignOption.USE_HIDE_LOYALTY))),
     PERSONALITY("PersonnelTabView.PERSONALITY.text", "PersonnelTabView.PERSONALITY.toolTipText",
           Set.of(RANK, FIRST_NAME, LAST_NAME, HIDE_PERSONALITY, AGGRESSION, AMBITION, GREED, SOCIAL, REASONING),
-          Map.of(AGGRESSION, CampaignOptions::isUseRandomPersonalities,
-                AMBITION, CampaignOptions::isUseRandomPersonalities,
-                GREED, CampaignOptions::isUseRandomPersonalities,
-                SOCIAL, CampaignOptions::isUseRandomPersonalities,
-                REASONING, CampaignOptions::isUseRandomPersonalities)),
+          Map.of(AGGRESSION, options -> options.get(CampaignOption.USE_RANDOM_PERSONALITIES),
+                AMBITION, options -> options.get(CampaignOption.USE_RANDOM_PERSONALITIES),
+                GREED, options -> options.get(CampaignOption.USE_RANDOM_PERSONALITIES),
+                SOCIAL, options -> options.get(CampaignOption.USE_RANDOM_PERSONALITIES),
+                REASONING, options -> options.get(CampaignOption.USE_RANDOM_PERSONALITIES))),
     SERVICE_RECORD("PersonnelTabView.SERVICE_RECORD.text", "PersonnelTabView.SERVICE_RECORD.toolTipText",
           Set.of(RANK, FIRST_NAME, LAST_NAME, PERSONNEL_ROLE, COMMAND_STATUS, FOUNDER, RECRUITMENT_DATE,
-                RETIREMENT_DATE, SALARY, KILLS),
-          Map.of(RECRUITMENT_DATE, CampaignOptions::isUseTimeInService)),
+                RETIREMENT_DATE, SALARY, KILLS, REPUTATION),
+          Map.of(RECRUITMENT_DATE, options -> options.get(CampaignOption.USE_TIME_IN_SERVICE),
+                REPUTATION, options -> options.get(CampaignOption.USE_CHAOS_REPUTATION) &&
+                                             !options.get(CampaignOption.CAMPAIGN_LEVEL_CHAOS_REPUTATION))),
     BIOGRAPHICAL("PersonnelTabView.BIOGRAPHICAL.text", "PersonnelTabView.BIOGRAPHICAL.toolTipText",
           Set.of(RANK, FIRST_NAME, LAST_NAME, AGE, DEATH_DATE, PERSONNEL_STATUS, BLOODNAME, ORIGIN),
-          Map.of(ORIGIN, CampaignOptions::isShowOriginFaction,
-                SALARY, CampaignOptions::isPayForSalaries)),
+          Map.of(ORIGIN, options -> options.get(CampaignOption.SHOW_ORIGIN_FACTION),
+                SALARY, options -> options.get(CampaignOption.PAY_FOR_SALARIES))),
     FLUFF("PersonnelTabView.FLUFF.text", "PersonnelTabView.FLUFF.toolTipText",
           Set.of(RANK, PRE_NOMINAL, GIVEN_NAME, SURNAME, SURNAME_GROUPED_BY_UNIT, POST_NOMINAL, CALLSIGN,
                 GENDER, PERSONNEL_ROLE)),
@@ -127,8 +133,8 @@ public enum PersonnelTabView {
     OTHER("PersonnelTabView.OTHER.text", "PersonnelTabView.OTHER.toolTipText",
           Set.of(RANK, FIRST_NAME, LAST_NAME, SPA_COUNT, IMPLANT_COUNT, QUICK_TRAIN_IGNORE, CLAN_PERSONNEL,
                 UNDER_PROTECTION, IMMORTAL, BLOCK_MATERNITY_LEAVE),
-          Map.of(SPA_COUNT, CampaignOptions::isUseAbilities,
-                IMPLANT_COUNT, CampaignOptions::isUseImplants));
+          Map.of(SPA_COUNT, options -> options.get(CampaignOption.USE_ABILITIES),
+                IMPLANT_COUNT, options -> options.get(CampaignOption.USE_IMPLANTS)));
 
     private final String name;
     private final String toolTipText;

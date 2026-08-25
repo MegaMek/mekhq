@@ -54,6 +54,7 @@ import megamek.common.event.Subscribe;
 import megamek.common.ui.FastJScrollPane;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
+import mekhq.campaign.campaignOptions.CampaignOption;
 import mekhq.campaign.digitalGM.stratCon.gm.MaplessStratCon;
 import mekhq.campaign.events.DeploymentChangedEvent;
 import mekhq.campaign.events.NetworkChangedEvent;
@@ -64,10 +65,9 @@ import mekhq.campaign.events.scenarios.ScenarioResolvedEvent;
 import mekhq.campaign.events.units.UnitChangedEvent;
 import mekhq.campaign.events.units.UnitRemovedEvent;
 import mekhq.campaign.force.Formation;
-import mekhq.campaign.mission.AtBContract;
-import mekhq.campaign.mission.AtBDynamicScenario;
-import mekhq.campaign.mission.Mission;
-import mekhq.campaign.mission.Scenario;
+import mekhq.campaign.mission.contract.AbstractContract;
+import mekhq.campaign.mission.scenarios.AtBDynamicScenario;
+import mekhq.campaign.mission.scenarios.Scenario;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.unit.Unit;
 import mekhq.gui.adapter.TOEMouseAdapter;
@@ -180,8 +180,8 @@ public final class TOETab extends CampaignGuiTab {
      */
     private void deploymentButton() {
         // Build scenario list with mission mapping
-        Map<Scenario, Mission> scenarioMissionMap = new HashMap<>();
-        for (Mission mission : getCampaign().getActiveMissions(false)) {
+        Map<Scenario, AbstractContract> scenarioMissionMap = new HashMap<>();
+        for (AbstractContract mission : getCampaign().getActiveContracts()) {
             for (Scenario scenario : mission.getCurrentScenarios()) {
                 scenarioMissionMap.put(scenario, mission);
             }
@@ -200,12 +200,11 @@ public final class TOETab extends CampaignGuiTab {
         }
 
         Scenario selectedScenario = sortedScenarios.get(scenarioPicker.getComboBoxChoiceIndex());
-        Mission selectedMission = scenarioMissionMap.get(selectedScenario);
+        AbstractContract selectedMission = scenarioMissionMap.get(selectedScenario);
 
         // Check if this is a StratCon scenario
         boolean isStratConScenario = selectedScenario instanceof AtBDynamicScenario &&
-                                           selectedMission instanceof AtBContract atbContract &&
-                                           atbContract.getStratConCampaignState() != null;
+                                           selectedMission.getStratConCampaignState() != null;
 
         if (isStratConScenario) {
             deployToStratCon(selectedScenario);
@@ -341,7 +340,7 @@ public final class TOETab extends CampaignGuiTab {
                 scrollPerson.setBorder(null);
                 crewPanel.add(scrollPerson, BorderLayout.CENTER);
                 CrewListModel model = new CrewListModel();
-                model.setData(unit, getCampaign().getCampaignOptions().isUseSmallArmsOnly());
+                model.setData(unit, getCampaign().getCampaignOptions().get(CampaignOption.USE_SMALL_ARMS_ONLY));
                 /* For units with multiple crew members, present a horizontal list above the PersonViewPanel.
                  * This custom version of JList was the only way I could figure out how to limit the JList
                  * to a single row with a horizontal scrollbar.

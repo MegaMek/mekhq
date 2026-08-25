@@ -38,16 +38,20 @@ import static mekhq.utilities.MHQInternationalization.getTextAt;
 
 import java.awt.event.ActionEvent;
 import java.util.Optional;
+import javax.swing.ButtonGroup;
 import javax.swing.JCheckBoxMenuItem;
 import javax.swing.JMenu;
 import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
 import javax.swing.JPopupMenu;
+import javax.swing.JRadioButtonMenuItem;
 import javax.swing.JTable;
 
 import megamek.common.rolls.TargetRoll;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
+import mekhq.campaign.campaignOptions.CampaignOption;
+import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.events.AcquisitionEvent;
 import mekhq.campaign.events.parts.PartChangedEvent;
 import mekhq.campaign.events.parts.PartModeChangedEvent;
@@ -62,6 +66,7 @@ import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.skills.SkillType;
 import mekhq.campaign.unit.Unit;
 import mekhq.campaign.work.IAcquisitionWork;
+import mekhq.campaign.work.IFabricatable;
 import mekhq.campaign.work.IPartWork;
 import mekhq.campaign.work.WorkTime;
 import mekhq.gui.CampaignGUI;
@@ -69,6 +74,7 @@ import mekhq.gui.ITechWorkPanel;
 import mekhq.gui.dialog.QuickStripDialog;
 import mekhq.gui.model.TaskTableModel;
 import mekhq.service.mrms.MRMSService;
+import mekhq.utilities.MHQInternationalization;
 
 public class TaskTableMouseAdapter extends JPopupMenuAdapter {
     //region Variable Declarations
@@ -180,6 +186,34 @@ public class TaskTableMouseAdapter extends JPopupMenuAdapter {
                 }
             }
             taskTable.repaint();
+        } else if (command.startsWith("FABRICATE_")) {
+            if ((partWork instanceof IFabricatable fabricatable) && !partWork.isBeingWorkedOn()) {
+                boolean wasFabricating = fabricatable.isFabricating();
+                switch (command) {
+                    case "FABRICATE_OFF" -> {
+                        fabricatable.setFabricating(false);
+                        fabricatable.setFabricateUntilSuccess(false);
+                    }
+                    case "FABRICATE_SINGLE" -> {
+                        fabricatable.setFabricating(true);
+                        fabricatable.setFabricateUntilSuccess(false);
+                    }
+                    case "FABRICATE_UNTIL" -> {
+                        fabricatable.setFabricating(true);
+                        fabricatable.setFabricateUntilSuccess(true);
+                    }
+                    default -> {}
+                }
+                // Turning fabrication on or off changes the total work time drastically (10x), so drop any partial
+                // progress. Switching only the retry mode leaves the time basis unchanged.
+                if (wasFabricating != fabricatable.isFabricating()) {
+                    fabricatable.resetTimeSpent();
+                }
+                if (partWork instanceof Part part) {
+                    MekHQ.triggerEvent(new PartChangedEvent(part));
+                }
+                taskTable.repaint();
+            }
         }
     }
 
@@ -416,7 +450,7 @@ public class TaskTableMouseAdapter extends JPopupMenuAdapter {
         // Strip part: one-click salvage removal using the currently selected tech, even though the unit is set to
         // repair. Only offered for a single installed, damaged component so the target number and time can be shown.
         if (!isBeingWorked && (rows.length == 1) && (partWork instanceof Part stripCandidate)
-              && isStripCandidate(stripCandidate)) {
+                  && isStripCandidate(stripCandidate)) {
             if (stripCandidate instanceof MekLocation) {
                 // Locations can't be stripped from here (armor and equipment must come off first, in order); show a
                 // disabled entry that explains why and points the player at Scrap.
@@ -427,10 +461,9 @@ public class TaskTableMouseAdapter extends JPopupMenuAdapter {
             } else {
                 Person tech = techWorkPanel.getSelectedTech();
                 TargetRoll target = getStripTarget(stripCandidate, tech);
-                boolean canPerformStrip = !isBeingWorked
-                                                && (tech != null)
-                                                && (target != null)
-                                                && (target.getValue() != TargetRoll.IMPOSSIBLE);
+                boolean canPerformStrip = tech != null &&
+                                                target != null &&
+                                                target.getValue() != TargetRoll.IMPOSSIBLE;
 
                 if (canPerformStrip) {
                     menuItem = new JMenuItem(getFormattedTextAt(RESOURCE_BUNDLE, "TaskTableMouseAdapter.strip",
@@ -447,6 +480,60 @@ public class TaskTableMouseAdapter extends JPopupMenuAdapter {
                 menuItem.setEnabled(canPerformStrip);
                 popup.add(menuItem);
             }
+        }
+
+        // Eligibility (and the displayed cost) can depend on the tech
+        Person fabricationTech = techWorkPanel.getSelectedTech();
+        final CampaignOptions campaignOptions = gui.getCampaign().getCampaignOptions();
+        // Component fabrication and ammunition fabrication are governed by separate campaign options.
+
+        boolean fabricationEnabled = ((partWork instanceof MissingPart) &&
+                                            campaignOptions.get(CampaignOption.USE_FABRICATION)) ||
+                                           ((partWork instanceof AmmoBin ammoBin) &&
+                                                  !ammoBin.isSalvaging() &&
+                                                  campaignOptions.get(CampaignOption.USE_AMMO_FABRICATION));
+        if (fabricationEnabled && (rows.length == 1)) {
+            IFabricatable fabricatable = (IFabricatable) partWork;
+            menu = new JMenu(getTextAt(RESOURCE_BUNDLE, "TaskTableMouseAdapter.FABRICATE"));
+            menu.setToolTipText(MHQInternationalization.getFormattedTextAt(RESOURCE_BUNDLE,
+                  "TaskTableMouseAdapter.FABRICATE.tooltip",
+                  fabricatable.getFabricationCost(fabricationTech).toAmountAndSymbolString()));
+            menu.setEnabled(!isBeingWorked);
+
+            String canFabricate = fabricatable.canFabricate(fabricationTech);
+            if (canFabricate.isBlank()) {
+                ButtonGroup fabricateGroup = new ButtonGroup();
+
+                JRadioButtonMenuItem offItem = new JRadioButtonMenuItem(
+                      getTextAt(RESOURCE_BUNDLE, "TaskTableMouseAdapter.FABRICATE.off"));
+                offItem.setSelected(!fabricatable.isFabricating());
+                offItem.setActionCommand("FABRICATE_OFF");
+                offItem.addActionListener(this);
+                fabricateGroup.add(offItem);
+                menu.add(offItem);
+
+                JRadioButtonMenuItem singleItem = new JRadioButtonMenuItem(
+                      getTextAt(RESOURCE_BUNDLE, "TaskTableMouseAdapter.FABRICATE.single"));
+                singleItem.setSelected(fabricatable.isFabricating() && !fabricatable.isFabricateUntilSuccess());
+                singleItem.setActionCommand("FABRICATE_SINGLE");
+                singleItem.addActionListener(this);
+                fabricateGroup.add(singleItem);
+                menu.add(singleItem);
+
+                JRadioButtonMenuItem untilItem = new JRadioButtonMenuItem(
+                      getTextAt(RESOURCE_BUNDLE, "TaskTableMouseAdapter.FABRICATE.untilSuccess"));
+                untilItem.setSelected(fabricatable.isFabricating() && fabricatable.isFabricateUntilSuccess());
+                untilItem.setActionCommand("FABRICATE_UNTIL");
+                untilItem.addActionListener(this);
+                fabricateGroup.add(untilItem);
+                menu.add(untilItem);
+            } else {
+                menuItem = new JMenuItem(canFabricate);
+                menuItem.setEnabled(false);
+                menu.add(menuItem);
+            }
+
+            popup.add(menu);
         }
 
         if (gui.getCampaign().isGM()) {

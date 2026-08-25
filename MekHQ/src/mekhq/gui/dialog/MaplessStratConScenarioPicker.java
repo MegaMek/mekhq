@@ -47,7 +47,7 @@ import javax.swing.JPanel;
 
 import megamek.client.ui.comboBoxes.MMComboBox;
 import mekhq.campaign.Campaign;
-import mekhq.campaign.mission.Scenario;
+import mekhq.campaign.mission.scenarios.Scenario;
 import mekhq.gui.baseComponents.immersiveDialogs.ImmersiveDialogCore;
 import mekhq.gui.baseComponents.immersiveDialogs.ImmersiveDialogWidth;
 
@@ -64,9 +64,8 @@ public class MaplessStratConScenarioPicker extends ImmersiveDialogCore {
     public MaplessStratConScenarioPicker(Campaign campaign, List<Scenario> scenarios) {
         super(campaign,
               campaign.getPlayerForce().getHumanResources()
-                    .getSeniorAdminPerson(mekhq.campaign.Campaign.AdministratorSpecialization.COMMAND,
-                          campaign.getCampaignOptions(),
-                          campaign.isClanCampaign(),
+                    .getSeniorAdminPerson(campaign.getCampaignOptions(),
+                          campaign.getPlayerForce().isClanForce(),
                           campaign.getLocalDate()),
               null,
               getInCharacterMessage(campaign.getCommanderAddress(), !scenarios.isEmpty()),

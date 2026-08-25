@@ -33,6 +33,7 @@
 package mekhq.gui.campaignOptions.contents;
 
 import jakarta.annotation.Nonnull;
+import mekhq.campaign.campaignOptions.CampaignOption;
 import mekhq.campaign.campaignOptions.CampaignOptions;
 
 class RepairAndMaintenanceOptionsModel {
@@ -56,50 +57,62 @@ class RepairAndMaintenanceOptionsModel {
     boolean usePlanetaryModifiers;
     boolean useUnofficialMaintenance;
     boolean logMaintenance;
+    boolean useFabrication;
+    boolean useBalancedFabrication;
+    boolean maintenanceFabrication;
+    boolean useAmmoFabrication;
 
     RepairAndMaintenanceOptionsModel(@Nonnull CampaignOptions options) {
-        techsUseAdministration = options.isTechsUseAdministration();
-        useUsefulAsTechs = options.isUseUsefulAsTechs();
-        useEraMods = options.isUseEraMods();
-        assignedTechFirst = options.isAssignedTechFirst();
-        resetToFirstTech = options.isResetToFirstTech();
-        useQuirks = options.isUseQuirks();
-        useAeroSystemHits = options.isUseAeroSystemHits();
-        destroyByMargin = options.isDestroyByMargin();
-        destroyMargin = options.getDestroyMargin();
-        destroyPartTarget = options.getDestroyPartTarget();
-        checkMaintenance = options.isCheckMaintenance();
-        maintenanceCycleDays = options.getMaintenanceCycleDays();
-        maintenanceBonus = options.getMaintenanceBonus();
-        defaultMaintenanceTime = options.getDefaultMaintenanceTime();
-        useQualityMaintenance = options.isUseQualityMaintenance();
-        reverseQualityNames = options.isReverseQualityNames();
-        useRandomUnitQualities = options.isUseRandomUnitQualities();
-        usePlanetaryModifiers = options.isUsePlanetaryModifiers();
-        useUnofficialMaintenance = options.isUseUnofficialMaintenance();
-        logMaintenance = options.isLogMaintenance();
+        techsUseAdministration = options.get(CampaignOption.TECHS_USE_ADMINISTRATION);
+        useUsefulAsTechs = options.get(CampaignOption.USE_USEFUL_AS_TECHS);
+        useEraMods = options.get(CampaignOption.USE_ERA_MODS);
+        assignedTechFirst = options.get(CampaignOption.ASSIGNED_TECH_FIRST);
+        resetToFirstTech = options.get(CampaignOption.RESET_TO_FIRST_TECH);
+        useQuirks = options.get(CampaignOption.USE_QUIRKS);
+        useAeroSystemHits = options.get(CampaignOption.USE_AERO_SYSTEM_HITS);
+        destroyByMargin = options.get(CampaignOption.DESTROY_BY_MARGIN);
+        destroyMargin = options.get(CampaignOption.DESTROY_MARGIN);
+        destroyPartTarget = options.get(CampaignOption.DESTROY_PART_TARGET);
+        checkMaintenance = options.get(CampaignOption.CHECK_MAINTENANCE);
+        maintenanceCycleDays = options.get(CampaignOption.MAINTENANCE_CYCLE_DAYS);
+        maintenanceBonus = options.get(CampaignOption.MAINTENANCE_BONUS);
+        defaultMaintenanceTime = options.get(CampaignOption.DEFAULT_MAINTENANCE_TIME);
+        useQualityMaintenance = options.get(CampaignOption.USE_QUALITY_MAINTENANCE);
+        reverseQualityNames = options.get(CampaignOption.REVERSE_QUALITY_NAMES);
+        useRandomUnitQualities = options.get(CampaignOption.USE_RANDOM_UNIT_QUALITIES);
+        usePlanetaryModifiers = options.get(CampaignOption.USE_PLANETARY_MODIFIERS);
+        useUnofficialMaintenance = options.get(CampaignOption.USE_UNOFFICIAL_MAINTENANCE);
+        logMaintenance = options.get(CampaignOption.LOG_MAINTENANCE);
+        useFabrication = options.get(CampaignOption.USE_FABRICATION);
+        useBalancedFabrication = options.get(CampaignOption.USE_BALANCED_FABRICATION);
+        maintenanceFabrication = options.get(CampaignOption.FABRICATE_D_IN_MAINTENANCE_FACILITY);
+        useAmmoFabrication = options.get(CampaignOption.USE_AMMO_FABRICATION);
     }
 
     void applyTo(@Nonnull CampaignOptions options) {
-        options.setTechsUseAdministration(techsUseAdministration);
-        options.setIsUseUsefulAsTechs(useUsefulAsTechs);
-        options.setEraMods(useEraMods);
-        options.setAssignedTechFirst(assignedTechFirst);
-        options.setResetToFirstTech(resetToFirstTech);
-        options.setQuirks(useQuirks);
-        options.setUseAeroSystemHits(useAeroSystemHits);
-        options.setDestroyByMargin(destroyByMargin);
-        options.setDestroyMargin(destroyMargin);
-        options.setDestroyPartTarget(destroyPartTarget);
-        options.setCheckMaintenance(checkMaintenance);
-        options.setMaintenanceCycleDays(maintenanceCycleDays);
-        options.setMaintenanceBonus(maintenanceBonus);
-        options.setDefaultMaintenanceTime(defaultMaintenanceTime);
-        options.setUseQualityMaintenance(useQualityMaintenance);
-        options.setReverseQualityNames(reverseQualityNames);
-        options.setUseRandomUnitQualities(useRandomUnitQualities);
-        options.setUsePlanetaryModifiers(usePlanetaryModifiers);
-        options.setUseUnofficialMaintenance(useUnofficialMaintenance);
-        options.setLogMaintenance(logMaintenance);
+        options.set(CampaignOption.TECHS_USE_ADMINISTRATION, techsUseAdministration);
+        options.set(CampaignOption.USE_USEFUL_AS_TECHS, useUsefulAsTechs);
+        options.set(CampaignOption.USE_ERA_MODS, useEraMods);
+        options.set(CampaignOption.ASSIGNED_TECH_FIRST, assignedTechFirst);
+        options.set(CampaignOption.RESET_TO_FIRST_TECH, resetToFirstTech);
+        options.set(CampaignOption.USE_QUIRKS, useQuirks);
+        options.set(CampaignOption.USE_AERO_SYSTEM_HITS, useAeroSystemHits);
+        options.set(CampaignOption.DESTROY_BY_MARGIN, destroyByMargin);
+        options.set(CampaignOption.DESTROY_MARGIN, destroyMargin);
+        options.set(CampaignOption.DESTROY_PART_TARGET, destroyPartTarget);
+        options.set(CampaignOption.CHECK_MAINTENANCE, checkMaintenance);
+        options.set(CampaignOption.MAINTENANCE_CYCLE_DAYS, maintenanceCycleDays);
+        options.set(CampaignOption.MAINTENANCE_BONUS, maintenanceBonus);
+        options.set(CampaignOption.DEFAULT_MAINTENANCE_TIME, defaultMaintenanceTime);
+        options.set(CampaignOption.USE_QUALITY_MAINTENANCE, useQualityMaintenance);
+        options.set(CampaignOption.REVERSE_QUALITY_NAMES, reverseQualityNames);
+        options.set(CampaignOption.USE_RANDOM_UNIT_QUALITIES, useRandomUnitQualities);
+        options.set(CampaignOption.USE_PLANETARY_MODIFIERS, usePlanetaryModifiers);
+        options.set(CampaignOption.USE_UNOFFICIAL_MAINTENANCE, useUnofficialMaintenance);
+        options.set(CampaignOption.LOG_MAINTENANCE, logMaintenance);
+        options.set(CampaignOption.USE_FABRICATION, useFabrication);
+        options.set(CampaignOption.USE_BALANCED_FABRICATION, useBalancedFabrication);
+        options.set(CampaignOption.FABRICATE_D_IN_MAINTENANCE_FACILITY, maintenanceFabrication);
+        options.set(CampaignOption.USE_AMMO_FABRICATION, useAmmoFabrication);
     }
 }

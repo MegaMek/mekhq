@@ -41,16 +41,14 @@ import java.util.Map;
 import java.util.ResourceBundle;
 import java.util.UUID;
 
+import megamek.codeUtilities.MathUtility;
 import megamek.common.annotations.Nullable;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
-import mekhq.campaign.mission.AtBContract;
-import mekhq.campaign.mission.Contract;
-import mekhq.campaign.mission.Mission;
+import mekhq.campaign.mission.contract.AbstractContract;
 import mekhq.campaign.personnel.Award;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.universe.Faction;
-import mekhq.campaign.universe.Factions;
 import mekhq.campaign.universe.PlanetarySystem;
 import mekhq.campaign.universe.RandomFactionGenerator;
 
@@ -73,7 +71,7 @@ public class MiscAwards {
      *
      * @return a map of eligible awards grouped by their respective IDs
      */
-    public static Map<Integer, List<Object>> MiscAwardsProcessor(Campaign campaign, @Nullable Mission mission,
+    public static Map<Integer, List<Object>> MiscAwardsProcessor(Campaign campaign, @Nullable AbstractContract mission,
           UUID person, List<Award> awards, Boolean missionWasSuccessful, boolean isCivilianHelp,
           @Nullable Integer killCount, @Nullable Integer injuryCount, @Nullable UUID supportPersonOfTheYear,
           @Nullable List<Person> POWPersonnel) {
@@ -123,7 +121,7 @@ public class MiscAwards {
                 }
                 case "civilianhelp" -> {
                     if ((isCivilianHelp)) {
-                        if (award.canBeAwarded(campaign.getPerson(person))) {
+                        if (award.canBeAwarded(campaign.getPlayerForce().getHumanResources().getPerson(person))) {
                             eligibleAwards.add(award);
                         }
                     }
@@ -150,7 +148,7 @@ public class MiscAwards {
      * @param person   the person to check award eligibility for
      */
     private static boolean MissionAccomplishedAward(Campaign campaign, Award award, UUID person) {
-        return award.canBeAwarded(campaign.getPerson(person));
+        return award.canBeAwarded(campaign.getPlayerForce().getHumanResources().getPerson(person));
     }
 
     /**
@@ -162,15 +160,16 @@ public class MiscAwards {
      * @param person   the person to check award eligibility for
      * @param isYesWar true if this is a Yes War Award
      */
-    private static boolean HouseWorldWar(Campaign campaign, @Nullable Mission mission, Award award, UUID person,
+    private static boolean HouseWorldWar(Campaign campaign, @Nullable AbstractContract mission, Award award,
+          UUID person,
           boolean isYesWar) {
-        if (award.canBeAwarded(campaign.getPerson(person))) {
+        if (award.canBeAwarded(campaign.getPlayerForce().getHumanResources().getPerson(person))) {
             if (mission != null) {
-                if (mission instanceof AtBContract) {
-                    PlanetarySystem system = campaign.getSystemById(mission.getSystemId());
-                    LocalDate date = campaign.getLocalDate();
-                    Faction enemyFaction = ((AtBContract) mission).getEnemy();
+                PlanetarySystem system = mission.getTargetSystem();
+                LocalDate date = campaign.getLocalDate();
+                Faction enemyFaction = mission.getEnemyFaction();
 
+                if (system != null) {
                     for (Faction faction : system.getFactionSet(campaign.getLocalDate())) {
                         if (faction.isISMajorOrSuperPower()) {
                             boolean isAtWar = RandomFactionGenerator.getInstance().getFactionHints()
@@ -199,11 +198,11 @@ public class MiscAwards {
      *
      * @return true if the person is eligible for the award, false otherwise
      */
-    private static boolean Periphery(Campaign campaign, @Nullable Mission mission, Award award, UUID person) {
-        if (award.canBeAwarded(campaign.getPerson(person))) {
+    private static boolean Periphery(Campaign campaign, @Nullable AbstractContract mission, Award award, UUID person) {
+        if (award.canBeAwarded(campaign.getPlayerForce().getHumanResources().getPerson(person))) {
             if (mission != null) {
                 try {
-                    PlanetarySystem system = campaign.getSystemById(mission.getSystemId());
+                    PlanetarySystem system = mission.getTargetSystem();
 
                     return system.getFactionSet(campaign.getLocalDate()).stream().anyMatch(Faction::isPeriphery);
                 } catch (Exception e) {
@@ -228,9 +227,9 @@ public class MiscAwards {
      */
     private static boolean MedalOfHonor(Campaign campaign, Award award, UUID person, @Nullable Integer killCount,
           @Nullable Integer injuryCount) {
-        if (award.canBeAwarded(campaign.getPerson(person))) {
+        if (award.canBeAwarded(campaign.getPlayerForce().getHumanResources().getPerson(person))) {
             if ((killCount != null) && (injuryCount != null)) {
-                return (killCount >= Integer.parseInt(award.getSize())) && (injuryCount >= award.getQty());
+                return (killCount >= MathUtility.parseInt(award.getSize())) && (injuryCount >= award.getQty());
             }
         }
         return false;
@@ -246,21 +245,18 @@ public class MiscAwards {
      *
      * @return true if the person is eligible for the award, false otherwise
      */
-    private static boolean CeremonialDuty(Campaign campaign, Award award, UUID person, @Nullable Mission mission) {
-        if (award.canBeAwarded(campaign.getPerson(person))) {
+    private static boolean CeremonialDuty(Campaign campaign, Award award, UUID person,
+          @Nullable AbstractContract mission) {
+        if (award.canBeAwarded(campaign.getPlayerForce().getHumanResources().getPerson(person))) {
             if (mission != null) {
-                if (mission instanceof Contract) {
-                    PlanetarySystem capitalSystem = Factions.getInstance()
-                                                          .getFactionFromFullNameAndYear(((Contract) mission).getEmployerName(),
-                                                                campaign.getGameYear())
-                                                          .getStartingPlanet(campaign, campaign.getLocalDate());
-                    try {
-                        if (campaign.getCurrentSystem().equals(capitalSystem)) {
-                            return true;
-                        }
-                    } catch (Exception e) {
-                        return false;
+                PlanetarySystem capitalSystem = mission.getEmployerFaction()
+                                                      .getStartingPlanet(campaign, campaign.getLocalDate());
+                try {
+                    if (campaign.getCurrentSystem().equals(capitalSystem)) {
+                        return true;
                     }
+                } catch (Exception e) {
+                    return false;
                 }
             }
         }
@@ -280,8 +276,8 @@ public class MiscAwards {
      */
     private static boolean prisonerOfWar(Campaign campaign, Award award, UUID person,
           @Nullable List<Person> POWPersonnel) {
-        if (award.canBeAwarded(campaign.getPerson(person))) {
-            return POWPersonnel.stream().anyMatch(p -> p.getId() == person);
+        if (award.canBeAwarded(campaign.getPlayerForce().getHumanResources().getPerson(person))) {
+            return POWPersonnel.stream().anyMatch(p -> person.equals(p.getId()));
         }
 
         return false;
@@ -297,7 +293,7 @@ public class MiscAwards {
      * @return true if the person is a training lance leader and is eligible for the award, false otherwise
      */
     private static boolean drillInstructor(Campaign campaign, Award award, UUID person) {
-        if (award.canBeAwarded(campaign.getPerson(person)) && campaign.hasActiveAtBContract()) {
+        if (award.canBeAwarded(campaign.getPlayerForce().getHumanResources().getPerson(person)) && campaign.hasActiveAtBContract()) {
             return campaign.getPlayerForce().getCombatTeamsAsList(campaign).stream()
                          .anyMatch(lance -> (lance.getRole().isTraining() || lance.getRole().isCadre()) &&
                                                   (lance.getCommanderId().equals(person)));
@@ -319,14 +315,14 @@ public class MiscAwards {
     private static boolean supportPersonOfTheYear(Campaign campaign, Award award, UUID person,
           UUID supportPersonOfTheYear) {
         if (supportPersonOfTheYear.equals(person)) {
-            if (award.canBeAwarded(campaign.getPerson(person))) {
+            if (award.canBeAwarded(campaign.getPlayerForce().getHumanResources().getPerson(person))) {
                 return true;
             } else {
                 final ResourceBundle resources = ResourceBundle.getBundle("mekhq.resources.AutoAwardsDialog",
                       MekHQ.getMHQOptions().getLocale());
 
                 campaign.addReport(PERSONNEL, String.format(resources.getString("supportPersonOfTheYear.tex"),
-                      campaign.getPerson(person).getHyperlinkedFullTitle(),
+                      campaign.getPlayerForce().getHumanResources().getPerson(person).getHyperlinkedFullTitle(),
                       award.getName(),
                       award.getSet()));
 

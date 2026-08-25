@@ -75,6 +75,7 @@ import mekhq.gui.CampaignGUI;
 import mekhq.gui.model.PartsStoreModel;
 import mekhq.gui.model.PartsStoreModel.PartProxy;
 import mekhq.gui.sorter.PartsDetailSorter;
+import mekhq.campaign.campaignOptions.CampaignOption;
 
 /**
  * @author Taharqa
@@ -259,16 +260,16 @@ public class PartsStoreDialog extends JDialog {
                     for (int i : selectedRow) {
                         PartProxy partProxy = partsModel.getPartProxyAt(partsTable.convertRowIndexToModel(i));
                         int quantity = 1;
-                        PopupValueChoiceDialog pcd = new PopupValueChoiceDialog(campaignGUI.getFrame(),
+                        PopupValueChoiceDialog buyBulkDialog = new PopupValueChoiceDialog(campaignGUI.getFrame(),
                               true,
                               "How Many " + partProxy.getName() + '?',
                               quantity,
                               1,
                               CampaignGUI.MAX_QUANTITY_SPINNER);
-                        pcd.setVisible(true);
-                        quantity = pcd.getValue();
+                        buyBulkDialog.setVisible(true);
+                        quantity = buyBulkDialog.getValue();
 
-                        if (quantity > 0) {
+                        if (!buyBulkDialog.wasCanceled()) {
                             addPart(true, partProxy.getPart(), quantity);
                             partProxy.updateTargetAndInventories();
                             partsModel.fireTableCellUpdated(partsTable.convertRowIndexToModel(i),
@@ -320,16 +321,16 @@ public class PartsStoreDialog extends JDialog {
                         PartProxy partProxy = partsModel.getPartProxyAt(partsTable.convertRowIndexToModel(i));
 
                         int quantity = 1;
-                        PopupValueChoiceDialog pcd = new PopupValueChoiceDialog(campaignGUI.getFrame(),
+                        PopupValueChoiceDialog bulkAddDialog = new PopupValueChoiceDialog(campaignGUI.getFrame(),
                               true,
                               "How Many " + partProxy.getName() + '?',
                               quantity,
                               1,
                               CampaignGUI.MAX_QUANTITY_SPINNER);
-                        pcd.setVisible(true);
-                        quantity = pcd.getValue();
+                        bulkAddDialog.setVisible(true);
+                        quantity = bulkAddDialog.getValue();
 
-                        if (quantity > 0) {
+                        if (bulkAddDialog.wasCanceled()) {
                             addPart(false, partProxy.getPart(), quantity);
                             partProxy.updateTargetAndInventories();
                             partsModel.fireTableCellUpdated(partsTable.convertRowIndexToModel(i),
@@ -418,10 +419,10 @@ public class PartsStoreDialog extends JDialog {
                           !part.getDetails().toLowerCase().contains(txtFilter.getText().toLowerCase())) {
                     return false;
                 } else if (((part.getTechBase() == TechBase.CLAN) || part.isClan()) &&
-                                 !campaign.getCampaignOptions().isAllowClanPurchases()) {
+                                 !campaign.getCampaignOptions().get(CampaignOption.ALLOW_CLAN_PURCHASES)) {
                     return false;
                 } else if ((part.getTechBase() == TechBase.IS) &&
-                                 !campaign.getCampaignOptions().isAllowISPurchases()
+                                 !campaign.getCampaignOptions().get(CampaignOption.ALLOW_IS_PURCHASES)
                                  // Hack to allow Clan access to SL tech but not post-Exodus tech
                                  // until 3050.
                                  &&

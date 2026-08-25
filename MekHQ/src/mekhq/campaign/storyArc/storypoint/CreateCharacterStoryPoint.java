@@ -143,7 +143,7 @@ public class CreateCharacterStoryPoint extends StoryPoint {
         Campaign campaign = getCampaign();
 
         if (null == faction) {
-            faction = campaign.getFaction();
+            faction = campaign.getPlayerForce().getFaction();
         }
         Person person = new Person(campaign, faction.getShortName());
         if (null != primaryRole) {

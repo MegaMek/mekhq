@@ -34,9 +34,9 @@ package mekhq.campaign.digitalGM.stratCon.strategy;
 
 import mekhq.campaign.Campaign;
 import mekhq.campaign.digitalGM.IOpForGenerationStrategy;
-import mekhq.campaign.mission.AtBContract;
-import mekhq.campaign.mission.AtBDynamicScenario;
-import mekhq.campaign.mission.AtBDynamicScenarioFactory;
+import mekhq.campaign.mission.contract.AbstractContract;
+import mekhq.campaign.mission.scenarios.AtBDynamicScenario;
+import mekhq.campaign.mission.scenarios.AtBDynamicScenarioFactory;
 
 /**
  * Default StratCon implementation of {@link IOpForGenerationStrategy}: the standard dynamic/random AtB generation. It
@@ -48,7 +48,7 @@ import mekhq.campaign.mission.AtBDynamicScenarioFactory;
  */
 public class StratConOpForGenerationStrategy implements IOpForGenerationStrategy {
     @Override
-    public void generateOpFor(AtBDynamicScenario backingScenario, AtBContract contract, Campaign campaign) {
+    public void generateOpFor(AtBDynamicScenario backingScenario, AbstractContract contract, Campaign campaign) {
         AtBDynamicScenarioFactory.finalizeScenario(backingScenario, contract, campaign);
     }
 }

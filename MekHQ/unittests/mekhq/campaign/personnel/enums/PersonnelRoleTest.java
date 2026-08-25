@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2022-2025 The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2022-2026 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -325,51 +325,6 @@ class PersonnelRoleTest {
             }
         }
     }
-
-    @Test
-    void testIsAdministratorCommand() {
-        for (final PersonnelRole personnelRole : roles) {
-            if (personnelRole == PersonnelRole.ADMINISTRATOR_COMMAND) {
-                assertTrue(personnelRole.isAdministratorCommand());
-            } else {
-                assertFalse(personnelRole.isAdministratorCommand());
-            }
-        }
-    }
-
-    @Test
-    void testIsAdministratorLogistics() {
-        for (final PersonnelRole personnelRole : roles) {
-            if (personnelRole == PersonnelRole.ADMINISTRATOR_LOGISTICS) {
-                assertTrue(personnelRole.isAdministratorLogistics());
-            } else {
-                assertFalse(personnelRole.isAdministratorLogistics());
-            }
-        }
-    }
-
-    @Test
-    void testIsAdministratorTransport() {
-        for (final PersonnelRole personnelRole : roles) {
-            if (personnelRole == PersonnelRole.ADMINISTRATOR_TRANSPORT) {
-                assertTrue(personnelRole.isAdministratorTransport());
-            } else {
-                assertFalse(personnelRole.isAdministratorTransport());
-            }
-        }
-    }
-
-    @Test
-    void testIsAdministratorHR() {
-        for (final PersonnelRole personnelRole : roles) {
-            if (personnelRole == PersonnelRole.ADMINISTRATOR_HR) {
-                assertTrue(personnelRole.isAdministratorHR());
-            } else {
-                assertFalse(personnelRole.isAdministratorHR());
-            }
-        }
-    }
-
     @Test
     void testIsDependent() {
         for (final PersonnelRole personnelRole : roles) {
@@ -509,14 +464,14 @@ class PersonnelRoleTest {
         assertFalse(PersonnelRole.VESSEL_NAVIGATOR.isSupport());
         assertTrue(PersonnelRole.MEK_TECH.isSupport());
         assertTrue(PersonnelRole.ASTECH.isSupport());
-        assertTrue(PersonnelRole.ADMINISTRATOR_COMMAND.isSupport());
+        assertTrue(PersonnelRole.ADMINISTRATOR.isSupport());
         assertFalse(PersonnelRole.DEPENDENT.isSupport());
         assertFalse(PersonnelRole.NONE.isSupport());
         assertFalse(PersonnelRole.MEKWARRIOR.isSupport(true));
         assertFalse(PersonnelRole.VESSEL_NAVIGATOR.isSupport(true));
         assertTrue(PersonnelRole.MEK_TECH.isSupport(true));
         assertTrue(PersonnelRole.ASTECH.isSupport(true));
-        assertTrue(PersonnelRole.ADMINISTRATOR_COMMAND.isSupport(true));
+        assertTrue(PersonnelRole.ADMINISTRATOR.isSupport(true));
         assertFalse(PersonnelRole.DEPENDENT.isSupport(true));
         assertFalse(PersonnelRole.NONE.isSupport(true));
     }
@@ -571,10 +526,7 @@ class PersonnelRoleTest {
     void testIsAdministrator() {
         for (final PersonnelRole personnelRole : roles) {
             switch (personnelRole) {
-                case ADMINISTRATOR_COMMAND:
-                case ADMINISTRATOR_LOGISTICS:
-                case ADMINISTRATOR_TRANSPORT:
-                case ADMINISTRATOR_HR:
+                case ADMINISTRATOR:
                     assertTrue(personnelRole.isAdministrator());
                     break;
                 default:
@@ -662,10 +614,7 @@ class PersonnelRoleTest {
     @Test
     void testGetAdministratorRoles() {
         final List<PersonnelRole> expected = new ArrayList<>();
-        expected.add(PersonnelRole.ADMINISTRATOR_COMMAND);
-        expected.add(PersonnelRole.ADMINISTRATOR_LOGISTICS);
-        expected.add(PersonnelRole.ADMINISTRATOR_TRANSPORT);
-        expected.add(PersonnelRole.ADMINISTRATOR_HR);
+        expected.add(PersonnelRole.ADMINISTRATOR);
         assertEquals(expected, PersonnelRole.getAdministratorRoles());
     }
 
@@ -686,7 +635,7 @@ class PersonnelRoleTest {
     void testRoleEligibility(PersonnelRole role) {
         // Setup
         Campaign mockCampaign = mockCampaign();
-        when(mockCampaign.getFaction()).thenReturn(Factions.getInstance().getFaction("MERC"));
+        when(mockCampaign.getPlayerForce().getFaction()).thenReturn(Factions.getInstance().getFaction("MERC"));
 
         Person person = new Person(mockCampaign);
 
@@ -746,7 +695,7 @@ class PersonnelRoleTest {
     @MethodSource(value = "seventeenToEighteenYearsOld")
     void testAdultEntertain_ageLimit(int daysOld) {
         Campaign mockCampaign = mockCampaign();
-        when(mockCampaign.getFaction()).thenReturn(Factions.getInstance().getFaction("MERC"));
+        when(mockCampaign.getPlayerForce().getFaction()).thenReturn(Factions.getInstance().getFaction("MERC"));
 
         LocalDate today = LocalDate.of(3000, 1, 1);
         when(mockCampaign.getLocalDate()).thenReturn(today);
@@ -783,7 +732,7 @@ class PersonnelRoleTest {
     @Test
     void testAdultEntertainer_atAgeLimit() {
         Campaign mockCampaign = mockCampaign();
-        when(mockCampaign.getFaction()).thenReturn(Factions.getInstance().getFaction("MERC"));
+        when(mockCampaign.getPlayerForce().getFaction()).thenReturn(Factions.getInstance().getFaction("MERC"));
 
         LocalDate today = LocalDate.of(3030, 1, 1);
         when(mockCampaign.getLocalDate()).thenReturn(today.minusYears(19));
@@ -814,7 +763,7 @@ class PersonnelRoleTest {
     @MethodSource(value = "seventeenToEighteenYearsOld")
     void testLuxuryCompanion_ageLimit(int daysOld) {
         Campaign mockCampaign = mockCampaign();
-        when(mockCampaign.getFaction()).thenReturn(Factions.getInstance().getFaction("MERC"));
+        when(mockCampaign.getPlayerForce().getFaction()).thenReturn(Factions.getInstance().getFaction("MERC"));
 
         LocalDate today = LocalDate.of(3000, 1, 1);
         when(mockCampaign.getLocalDate()).thenReturn(today);
@@ -836,7 +785,7 @@ class PersonnelRoleTest {
     @Test
     void testLuxuryCompanion_atAgeLimit() {
         Campaign mockCampaign = mockCampaign();
-        when(mockCampaign.getFaction()).thenReturn(Factions.getInstance().getFaction("MERC"));
+        when(mockCampaign.getPlayerForce().getFaction()).thenReturn(Factions.getInstance().getFaction("MERC"));
 
         LocalDate today = LocalDate.of(3030, 1, 1);
         when(mockCampaign.getLocalDate()).thenReturn(today.minusYears(19));

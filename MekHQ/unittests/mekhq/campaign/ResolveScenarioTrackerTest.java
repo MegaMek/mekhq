@@ -38,6 +38,8 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyBoolean;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static testUtilities.MHQTestUtilities.getEntityForUnitTesting;
 import static testUtilities.MHQTestUtilities.mockCampaign;
@@ -59,7 +61,8 @@ import megamek.common.units.EjectedCrew;
 import megamek.common.units.Entity;
 import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.force.Formation;
-import mekhq.campaign.mission.Scenario;
+import mekhq.campaign.mission.scenarios.Scenario;
+import mekhq.campaign.personnel.Person;
 import mekhq.campaign.unit.TestUnit;
 import mekhq.campaign.unit.Unit;
 import org.junit.jupiter.api.BeforeAll;
@@ -112,7 +115,7 @@ class ResolveScenarioTrackerTest {
 
         // Mock Campaign
         campaign = mockCampaign();
-        when(campaign.getFaction()).thenReturn(null);
+        when(campaign.getPlayerForce().getFaction()).thenReturn(null);
         when(campaign.getLocalDate()).thenReturn(LocalDate.of(3067, 1, 1));
         CampaignOptions campaignOptions = new CampaignOptions();
         when(campaign.getCampaignOptions()).thenReturn(campaignOptions);
@@ -302,5 +305,61 @@ class ResolveScenarioTrackerTest {
         // The entity was found in devastated results, so it should be marked as a total loss
         assertTrue(status.isTotalLoss(),
               "Unit that appeared in devastated results should remain a total loss");
+    }
+
+    /**
+     * Creates a mock crew member with a unique ID.
+     */
+    private Person mockCrewMember(String fullName) {
+        Person person = mock(Person.class);
+        when(person.getId()).thenReturn(UUID.randomUUID());
+        when(person.getFullName()).thenReturn(fullName);
+        return person;
+    }
+
+    /**
+     * Sets up a unit credited with a single kill, and returns it.
+     */
+    private Unit unitCreditedWithAKill(ResolveScenarioTracker tracker, List<Person> activeCrew) {
+        Entity playerEntity = createPlayerEntity("Locust LCT-1V");
+        UUID unitId = UUID.fromString(playerEntity.getExternalIdAsString());
+        Unit unit = createMockUnit(playerEntity, unitId);
+        when(unit.getFormationId()).thenReturn(1);
+        when(unit.getActiveCrew()).thenReturn(activeCrew);
+
+        tracker.units.add(unit);
+        tracker.killCredits.put("Atlas AS7-D", unitId.toString());
+        return unit;
+    }
+
+    /**
+     * A unit scores a kill once, not once per crew member. Multi-crew units used to record the same destroyed unit in
+     * their history for every named crew member aboard.
+     */
+    @Test
+    void assignKillsRecordsOneUnitHistoryEntryForAMultiCrewUnit() {
+        ResolveScenarioTracker tracker = createTracker();
+        Person commander = mockCrewMember("Natasha Kerensky");
+        Unit unit = unitCreditedWithAKill(tracker,
+              List.of(commander, mockCrewMember("Joanna Fetladral"), mockCrewMember("Nikolai Malthus")));
+        when(unit.getCommander()).thenReturn(commander);
+
+        tracker.assignKills();
+
+        verify(unit, times(1)).addKillLogEntry(any());
+    }
+
+    /**
+     * A unit run entirely by temporary (blob) crew still scored the kill, so it still records one. Its history used to
+     * be empty, because the entry was written from inside the loop over named crew.
+     */
+    @Test
+    void assignKillsRecordsAUnitHistoryEntryForAUnitWithoutNamedCrew() {
+        ResolveScenarioTracker tracker = createTracker();
+        Unit unit = unitCreditedWithAKill(tracker, List.of());
+
+        tracker.assignKills();
+
+        verify(unit, times(1)).addKillLogEntry(any());
     }
 }

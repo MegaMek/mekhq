@@ -55,6 +55,7 @@ import mekhq.campaign.personnel.skills.SkillType;
 import mekhq.utilities.MHQXMLUtility;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
+import mekhq.campaign.campaignOptions.CampaignOption;
 
 /**
  * @author Jay Lawson (jaylawson39 at yahoo.com)
@@ -212,7 +213,7 @@ public class MekActuator extends Part {
             }
             hits = unit.getEntity().getDamagedCriticalSlots(CriticalSlot.TYPE_SYSTEM, type, location);
             if (checkForDestruction && hits > priorHits
-                      && Compute.d6(2) < campaign.getCampaignOptions().getDestroyPartTarget()) {
+                      && Compute.d6(2) < campaign.getCampaignOptions().get(CampaignOption.DESTROY_PART_TARGET)) {
                 remove(false);
             }
         }

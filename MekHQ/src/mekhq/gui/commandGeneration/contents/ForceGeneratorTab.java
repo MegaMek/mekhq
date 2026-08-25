@@ -146,7 +146,7 @@ public class ForceGeneratorTab {
             // Must run AFTER setCurrentYear (which calls yearUpdated -> refreshFactions and would
             // otherwise reset our selection). On Accept, writeValuesToOptions reads the picker back
             // as an override on CommandGenerationOptions.specifiedFaction so ranks follow.
-            Faction campaignFaction = campaign.getFaction();
+            Faction campaignFaction = campaign.getPlayerForce().getFaction();
             if (campaignFaction != null) {
                 String code = campaignFaction.getShortName();
                 boolean seeded = optionsView.setSelectedFaction(code);
@@ -351,7 +351,7 @@ public class ForceGeneratorTab {
             targetOptions.getForceDescriptorSnapshot().populateFromForceDescriptor(fd);
             // Override the rank-authority faction with whatever the user picked in the Force Gen
             // panel's faction selector. CommandGenerationDialog seeded both inputs from
-            // campaign.getFaction() at dialog open (this tab into cbFaction via createTab,
+            // campaign.getPlayerForce().getFaction() at dialog open (this tab into cbFaction via createTab,
             // CommandGenerationOptions.specifiedFaction via seedSpecifiedFactionFromCampaign).
             // If the user changed cbFaction here mid-dialog, that becomes the final authority for
             // rank assignment so the rank picker and the unit picker stay aligned.
