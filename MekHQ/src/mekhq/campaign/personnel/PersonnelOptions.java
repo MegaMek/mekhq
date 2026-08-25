@@ -120,6 +120,10 @@ public class PersonnelOptions extends PilotOptions {
     public static final String FINE_PRINT_READER = "fine_print_reader";
     public static final String BLACKLISTED = "blacklisted";
     public static final String EASILY_FOOLED = "easily_fooled";
+    public static final String HARD_BARGAINER = "hard_bargainer";
+    public static final String PUSHOVER = "pushover";
+    public static final String SHREWD_TRADER = "shrewd_trader";
+    public static final String INFLEXIBLE = "inflexible";
     public static final String FLAW_ANIMAL_ANTIPATHY = "flaw_animal_antipathy";
     public static final String ATOW_ANIMAL_EMPATHY = "atow_animal_empathy";
     public static final String ATOW_AMBIDEXTROUS = "atow_ambidextrous";
@@ -342,6 +346,10 @@ public class PersonnelOptions extends PilotOptions {
         addOption(l3a, FINE_PRINT_READER, false);
         addOption(l3a, BLACKLISTED, false);
         addOption(l3a, EASILY_FOOLED, false);
+        addOption(l3a, HARD_BARGAINER, false);
+        addOption(l3a, PUSHOVER, false);
+        addOption(l3a, SHREWD_TRADER, false);
+        addOption(l3a, INFLEXIBLE, false);
         addOption(l3a, FLAW_ANIMAL_ANTIPATHY, false);
         addOption(l3a, ATOW_ANIMAL_EMPATHY, false);
         addOption(l3a, ATOW_AMBIDEXTROUS, false);

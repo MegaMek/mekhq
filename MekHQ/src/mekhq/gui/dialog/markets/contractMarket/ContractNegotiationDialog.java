@@ -118,8 +118,8 @@ public class ContractNegotiationDialog extends JDialog {
 
     private static final int SACRIFICE_STEPS_PER_SWAP = 2;
     private static final int MAXIMUM_SWAPS = 2;
-    private static final int MAXIMUM_SACRIFICED_TERMS = 2;
-    private static final int MAXIMUM_SACRIFICED_STEPS = 4;
+    private static final int BASE_MAXIMUM_SACRIFICED_TERMS = 2;
+    private static final int BASE_MAXIMUM_SACRIFICED_STEPS = 4;
     private static final int MAXIMUM_FACILITY_UNITS = 100;
 
     private static final String REPUTATION_HEX = "#1d5fa5";
@@ -134,9 +134,12 @@ public class ContractNegotiationDialog extends JDialog {
     private transient NonNegotiableTermsData nonNegotiableTerms;
 
     private final int scale;
-    private final int capPerTerm;
     private final int reputationPool;
     private final boolean activeNegotiators;
+
+    private int capPerTerm;
+    private int maxSacrificedTerms;
+    private int maxSacrificedSteps;
 
     private int reputationUsed;
     private int swapsUsed;
@@ -205,7 +208,7 @@ public class ContractNegotiationDialog extends JDialog {
         this.currentLocation = campaign.getPlayerForce().getForceDetachment().getCurrentLocation();
 
         this.scale = max(1, contract.getScale());
-        this.capPerTerm = scale;
+        recomputeNegotiatorCaps();
         boolean useChaosReputation = campaignOptions.get(CampaignOption.USE_CHAOS_REPUTATION);
         int reputation = campaign.getPlayerForce().getReputationRating(useChaosReputation);
         this.reputationPool = Math.clamp(reputation, 0, 2 * scale);
@@ -373,8 +376,44 @@ public class ContractNegotiationDialog extends JDialog {
         if (picker.wasConfirmed()) {
             contract.setPlayerNegotiator(picker.getSelectedNegotiator());
             updateNegotiatorControl();
-            updateRenegotiateButton();
+            recomputeNegotiatorCaps();
+            refresh();
         }
+    }
+
+    /**
+     * Recomputes the manual-haggle caps from the chosen negotiator's contract SPAs and Flaws: Hard Bargainer / Pushover
+     * shift the per-term raise cap, Shrewd Trader / Inflexible shift the sacrifice budget (both its distinct-term and
+     * its total-step limits). With no negotiator the base values apply. Called at construction and whenever the
+     * negotiator changes.
+     */
+    private void recomputeNegotiatorCaps() {
+        int raiseCapModifier = 0;
+        int sacrificeTermModifier = 0;
+        int sacrificeStepModifier = 0;
+
+        Person negotiator = contract.getPlayerNegotiator();
+        if (negotiator != null) {
+            PersonnelOptions options = negotiator.getOptions();
+            if (options.booleanOption(PersonnelOptions.HARD_BARGAINER)) {
+                raiseCapModifier++;
+            }
+            if (options.booleanOption(PersonnelOptions.PUSHOVER)) {
+                raiseCapModifier--;
+            }
+            if (options.booleanOption(PersonnelOptions.SHREWD_TRADER)) {
+                sacrificeTermModifier++;
+                sacrificeStepModifier += 2;
+            }
+            if (options.booleanOption(PersonnelOptions.INFLEXIBLE)) {
+                sacrificeTermModifier--;
+                sacrificeStepModifier -= 2;
+            }
+        }
+
+        capPerTerm = max(1, scale + raiseCapModifier);
+        maxSacrificedTerms = max(0, BASE_MAXIMUM_SACRIFICED_TERMS + sacrificeTermModifier);
+        maxSacrificedSteps = max(0, BASE_MAXIMUM_SACRIFICED_STEPS + sacrificeStepModifier);
     }
 
     private JPanel buildBody() {
@@ -742,16 +781,16 @@ public class ContractNegotiationDialog extends JDialog {
     }
 
     /**
-     * Whether {@code gap} more raw steps may be sacrificed from this clause, honoring the two global caps: at most
-     * {@link #MAXIMUM_SACRIFICED_TERMS} distinct terms sacrificed, and at most {@link #MAXIMUM_SACRIFICED_STEPS} raw
-     * steps in total across them.
+     * Whether {@code gap} more raw steps may be sacrificed from this clause, honoring the two negotiator-adjusted caps:
+     * at most {@link #maxSacrificedTerms} distinct terms sacrificed, and at most {@link #maxSacrificedSteps} raw steps
+     * in total across them.
      */
     private boolean canSacrifice(Clause clause, int gap) {
         boolean alreadySacrificed = currentStep[clause.ordinal()] < originalStep[clause.ordinal()];
         return NegotiationStepMath.sacrificeAllowed(gap, alreadySacrificed,
               NegotiationStepMath.distinctTermsSacrificed(originalStep, currentStep),
               NegotiationStepMath.totalStepsSacrificed(originalStep, currentStep),
-              MAXIMUM_SACRIFICED_TERMS, MAXIMUM_SACRIFICED_STEPS);
+              maxSacrificedTerms, maxSacrificedSteps);
     }
 
     /** Whether the employer has locked this clause as non-negotiable - it can be neither raised nor lowered. */
@@ -1180,8 +1219,8 @@ public class ContractNegotiationDialog extends JDialog {
 
         summaryLabel.setText(getFormattedTextAt(RESOURCE_BUNDLE, "negotiate.contractMarket.summary",
               rentalTotal.toAmountAndSymbolString(), reputationPool - reputationUsed,
-              NegotiationStepMath.totalStepsSacrificed(originalStep, currentStep), MAXIMUM_SACRIFICED_STEPS,
-              NegotiationStepMath.distinctTermsSacrificed(originalStep, currentStep), MAXIMUM_SACRIFICED_TERMS));
+              NegotiationStepMath.totalStepsSacrificed(originalStep, currentStep), maxSacrificedSteps,
+              NegotiationStepMath.distinctTermsSacrificed(originalStep, currentStep), maxSacrificedTerms));
 
         updateRenegotiateButton();
         renderResults();
