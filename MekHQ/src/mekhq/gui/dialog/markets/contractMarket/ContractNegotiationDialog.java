@@ -901,6 +901,18 @@ public class ContractNegotiationDialog extends JDialog {
     }
 
     /**
+     * A net-margin modifier specific to the "make an exception" option (shifting non-negotiable flags). Loophole Finder
+     * frees more terms.
+     */
+    private static int exceptionNegotiationModifier(Person negotiator) {
+        int modifier = 0;
+        if (negotiator != null && negotiator.getOptions().booleanOption(PersonnelOptions.LOOPHOLE_FINDER)) {
+            modifier++;
+        }
+        return modifier;
+    }
+
+    /**
      * Resolves a Negotiation check for the given person, posts the result to the daily report's skill-checks tab, and
      * returns its margin of success.
      */
@@ -940,7 +952,7 @@ public class ContractNegotiationDialog extends JDialog {
      * locked term, each margin of failure locks a random unlocked one. Spends the contract's one attempt.
      */
     private void performException() {
-        int net = rollNetMargin();
+        int net = rollNetMargin() + exceptionNegotiationModifier(contract.getPlayerNegotiator());
         int[] lockChanges = applyLockChanges(net);
         contract.setNonNegotiableTermsData(nonNegotiableTerms);
         contract.setActiveNegotiationData(ActiveNegotiationData.exception(attemptsSoFar() + 1, net,
