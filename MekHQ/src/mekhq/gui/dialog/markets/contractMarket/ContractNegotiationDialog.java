@@ -884,7 +884,20 @@ public class ContractNegotiationDialog extends JDialog {
                                                reportedNegotiationCheck(employerNegotiator,
                                                      "negotiate.contractMarket.renegotiate.roll.employer") :
                                                MarginOfSuccess.BARELY_MADE_IT;
-        return ActiveNegotiationMath.netMargin(playerMargin, employerMargin);
+        return ActiveNegotiationMath.netMargin(playerMargin, employerMargin)
+                     + generalNegotiationModifier(playerNegotiator);
+    }
+
+    /**
+     * A flat modifier to the net margin from the negotiator's general contract SPAs and Flaws, applied to both
+     * re-negotiation options. Abrasive worsens every re-negotiation by one.
+     */
+    private static int generalNegotiationModifier(Person negotiator) {
+        int modifier = 0;
+        if (negotiator.getOptions().booleanOption(PersonnelOptions.ABRASIVE)) {
+            modifier--;
+        }
+        return modifier;
     }
 
     /**
