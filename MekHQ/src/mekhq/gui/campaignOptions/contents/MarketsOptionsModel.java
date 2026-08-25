@@ -69,6 +69,7 @@ class MarketsOptionsModel {
     boolean useContractFactionModifiers;
     boolean useIntelObfuscation;
     boolean useNonNegotiableTerms;
+    boolean useActiveNegotiators;
     boolean contractMarketReportRefresh;
     int contractMaxSalvagePercentage;
     int dropShipBonusPercentage;
@@ -116,6 +117,7 @@ class MarketsOptionsModel {
         useContractFactionModifiers = options.get(CampaignOption.USE_CONTRACT_FACTION_MODIFIERS);
         useIntelObfuscation = options.get(CampaignOption.USE_INTEL_OBFUSCATION);
         useNonNegotiableTerms = options.get(CampaignOption.USE_NON_NEGOTIABLE_TERMS);
+        useActiveNegotiators = options.get(CampaignOption.USE_ACTIVE_NEGOTIATORS);
         contractMarketReportRefresh = options.get(CampaignOption.CONTRACT_MARKET_REPORT_REFRESH);
         contractMaxSalvagePercentage = options.get(CampaignOption.CONTRACT_MAX_SALVAGE_PERCENTAGE);
         dropShipBonusPercentage = options.get(CampaignOption.DROP_SHIP_BONUS_PERCENTAGE);
@@ -178,6 +180,7 @@ class MarketsOptionsModel {
         options.set(CampaignOption.USE_CONTRACT_FACTION_MODIFIERS, useContractFactionModifiers);
         options.set(CampaignOption.USE_INTEL_OBFUSCATION, useIntelObfuscation);
         options.set(CampaignOption.USE_NON_NEGOTIABLE_TERMS, useNonNegotiableTerms);
+        options.set(CampaignOption.USE_ACTIVE_NEGOTIATORS, useActiveNegotiators);
         options.set(CampaignOption.CONTRACT_MARKET_REPORT_REFRESH, contractMarketReportRefresh);
         options.set(CampaignOption.CONTRACT_MAX_SALVAGE_PERCENTAGE, contractMaxSalvagePercentage);
         options.set(CampaignOption.DROP_SHIP_BONUS_PERCENTAGE, dropShipBonusPercentage);
