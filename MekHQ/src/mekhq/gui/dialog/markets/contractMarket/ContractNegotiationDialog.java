@@ -73,6 +73,8 @@ import mekhq.campaign.mission.contract.AbstractContract;
 import mekhq.campaign.mission.contract.contractData.ChaosContractStepsTable;
 import mekhq.campaign.mission.contract.contractData.ContractTermsData;
 import mekhq.campaign.mission.contract.contractData.NegotiationData;
+import mekhq.campaign.mission.contract.contractData.NegotiationStepMath;
+import mekhq.campaign.mission.contract.contractData.NegotiationStepMath.Term;
 import mekhq.campaign.mission.contract.contractData.RentedFacilitiesData;
 import mekhq.campaign.mission.contract.contractGeneration.ChaosContractPayDetermination;
 import mekhq.campaign.mission.contract.contractGeneration.negotiationsAndNPCs.TermFunding;
@@ -85,10 +87,16 @@ import mekhq.gui.baseComponents.roundedComponents.RoundedLineBorder;
  * The contract negotiation table. Lets the player improve a contract's terms - spending reputation or sacrificing steps
  * between terms - and rent support facilities, before accepting the offer.
  *
- * <p>Rules (Hot Spots: Draconis Reach): each of the five terms may be raised at most {@code Scale} steps; reputation
- * raises one term one step per point, up to {@code 2 x Scale} points total; and a term may be lowered two steps to
- * raise another one step, at most twice. Steps that leave a term's value unchanged (the em-dash plateaus on the
- * Contract Steps Table) are surfaced as "no change" so the player can see they must spend more to cross a band.</p>
+ * <p>Rules (Hot Spots: Draconis Reach): each of the five terms may be raised at most {@code Scale} steps above its
+ * baseline; reputation raises one term one step per point, up to {@code 2 x Scale} points total. Lowering a term skips
+ * straight to the next step whose value differs (whole plateaus on the Contract Steps Table are crossed in one move),
+ * banking one sacrifice step per raw step crossed; at most two distinct terms may be sacrificed, four raw steps in
+ * total. Two banked steps fund a one-step raise of another term (a "swap"), at most twice.</p>
+ *
+ * <p>Raising a sacrificed term reverses its lowers one at a time, returning it to the step each lower started from and
+ * reclaiming those banked steps. Raising a term above its baseline is single-step, and such a step may land on a
+ * plateau that leaves the value unchanged - surfaced as "no change" so the player sees they must spend more to cross a
+ * band.</p>
  *
  * @author Illiani
  * @since 0.51.01
@@ -99,6 +107,8 @@ public class ContractNegotiationDialog extends JDialog {
 
     private static final int SACRIFICE_STEPS_PER_SWAP = 2;
     private static final int MAXIMUM_SWAPS = 2;
+    private static final int MAXIMUM_SACRIFICED_TERMS = 2;
+    private static final int MAXIMUM_SACRIFICED_STEPS = 4;
     private static final int MAXIMUM_FACILITY_UNITS = 100;
 
     private static final String REPUTATION_HEX = "#1d5fa5";
@@ -149,16 +159,18 @@ public class ContractNegotiationDialog extends JDialog {
 
     /** The five negotiable clauses, in display order. */
     private enum Clause {
-        COMMAND("negotiate.contractMarket.term.command"),
-        PAY("negotiate.contractMarket.term.pay"),
-        SUPPORT("negotiate.contractMarket.term.support"),
-        TRANSPORT("negotiate.contractMarket.term.transport"),
-        SALVAGE("negotiate.contractMarket.term.salvage");
+        COMMAND("negotiate.contractMarket.term.command", Term.COMMAND_RIGHTS),
+        PAY("negotiate.contractMarket.term.pay", Term.BASE_PAY),
+        SUPPORT("negotiate.contractMarket.term.support", Term.SUPPORT),
+        TRANSPORT("negotiate.contractMarket.term.transport", Term.TRANSPORT),
+        SALVAGE("negotiate.contractMarket.term.salvage", Term.SALVAGE);
 
         private final String labelKey;
+        private final Term term;
 
-        Clause(String labelKey) {
+        Clause(String labelKey, Term term) {
             this.labelKey = labelKey;
+            this.term = term;
         }
     }
 
@@ -614,8 +626,23 @@ public class ContractNegotiationDialog extends JDialog {
 
     private void raise(Clause clause) {
         int index = clause.ordinal();
-        if ((currentStep[index] - originalStep[index]) >= capPerTerm
-                  || currentStep[index] >= CHAOS_CONTRACT_MAXIMUM_STEP_VALUE) {
+        if (currentStep[index] >= CHAOS_CONTRACT_MAXIMUM_STEP_VALUE) {
+            return;
+        }
+
+        if (currentStep[index] < originalStep[index]) {
+            int target = restoreTarget(clause);
+            int gap = target - currentStep[index];
+            if (gap > sacrificeBank) {
+                return;
+            }
+            sacrificeBank -= gap;
+            currentStep[index] = target;
+            refresh();
+            return;
+        }
+
+        if ((currentStep[index] - originalStep[index]) >= capPerTerm) {
             return;
         }
 
@@ -636,12 +663,8 @@ public class ContractNegotiationDialog extends JDialog {
 
     private void lower(Clause clause) {
         int index = clause.ordinal();
-        if (currentStep[index] <= CHAOS_CONTRACT_MINIMUM_STEP_VALUE) {
-            return;
-        }
 
         if (currentStep[index] > originalStep[index]) {
-            // Undo a raise, refunding whatever paid for it.
             TermFunding paidWith = funding.get(index).removeLast();
             if (paidWith == TermFunding.REPUTATION) {
                 reputationUsed--;
@@ -649,13 +672,49 @@ public class ContractNegotiationDialog extends JDialog {
                 swapsUsed--;
                 sacrificeBank += SACRIFICE_STEPS_PER_SWAP;
             }
-        } else {
-            // Drop below the original, banking a sacrifice step.
-            sacrificeBank++;
+            currentStep[index]--;
+            refresh();
+            return;
         }
 
-        currentStep[index]--;
+        int target = NegotiationStepMath.nextLowerDifferentStep(clause.term, currentStep[index]);
+        if (target < CHAOS_CONTRACT_MINIMUM_STEP_VALUE) {
+            return;
+        }
+        int gap = currentStep[index] - target;
+        if (!canSacrifice(clause, gap)) {
+            return;
+        }
+
+        currentStep[index] = target;
+        sacrificeBank += gap;
         refresh();
+    }
+
+    /**
+     * Whether {@code gap} more raw steps may be sacrificed from this clause, honoring the two global caps: at most
+     * {@link #MAXIMUM_SACRIFICED_TERMS} distinct terms sacrificed, and at most {@link #MAXIMUM_SACRIFICED_STEPS} raw
+     * steps in total across them.
+     */
+    private boolean canSacrifice(Clause clause, int gap) {
+        boolean alreadySacrificed = currentStep[clause.ordinal()] < originalStep[clause.ordinal()];
+        return NegotiationStepMath.sacrificeAllowed(gap, alreadySacrificed,
+              NegotiationStepMath.distinctTermsSacrificed(originalStep, currentStep),
+              NegotiationStepMath.totalStepsSacrificed(originalStep, currentStep),
+              MAXIMUM_SACRIFICED_TERMS, MAXIMUM_SACRIFICED_STEPS);
+    }
+
+    /** Whether this clause's lower button should be active: an earlier raise can be undone, or a sacrifice is allowed. */
+    private boolean canLower(Clause clause) {
+        int index = clause.ordinal();
+        if (currentStep[index] > originalStep[index]) {
+            return true;
+        }
+        int target = NegotiationStepMath.nextLowerDifferentStep(clause.term, currentStep[index]);
+        if (target < CHAOS_CONTRACT_MINIMUM_STEP_VALUE) {
+            return false;
+        }
+        return canSacrifice(clause, currentStep[index] - target);
     }
 
     private void adjustFacility(int index, int delta) {
@@ -719,8 +778,8 @@ public class ContractNegotiationDialog extends JDialog {
     private void refresh() {
         reputationBudgetLabel.setText(budgetHtml(getTextAt(RESOURCE_BUNDLE,
                     "negotiate.contractMarket.budget.reputation"),
-              pips(reputationPool - reputationUsed, reputationPool, REPUTATION_HEX)
-                    + " " + (reputationPool - reputationUsed) + "/" + reputationPool));
+              pips(reputationUsed, reputationPool, REPUTATION_HEX)
+                    + " " + reputationUsed + "/" + reputationPool));
         swapsBudgetLabel.setText(budgetHtml(getTextAt(RESOURCE_BUNDLE, "negotiate.contractMarket.budget.swaps"),
               pips(swapsUsed, MAXIMUM_SWAPS, SACRIFICE_HEX) + " " + swapsUsed + "/" + MAXIMUM_SWAPS));
         bankBudgetLabel.setText(budgetHtml(getTextAt(RESOURCE_BUNDLE, "negotiate.contractMarket.budget.bank"),
@@ -732,7 +791,7 @@ public class ContractNegotiationDialog extends JDialog {
             termCapLabels[index].setText(getFormattedTextAt(RESOURCE_BUNDLE, "negotiate.contractMarket.cap",
                   max(0, currentStep[index] - originalStep[index]), capPerTerm));
             termRaiseButtons[index].setEnabled(canRaise(clause));
-            termLowerButtons[index].setEnabled(currentStep[index] > CHAOS_CONTRACT_MINIMUM_STEP_VALUE);
+            termLowerButtons[index].setEnabled(canLower(clause));
         }
 
         payImpactLabel.setText(payImpactHtml());
@@ -746,17 +805,34 @@ public class ContractNegotiationDialog extends JDialog {
         }
 
         summaryLabel.setText(getFormattedTextAt(RESOURCE_BUNDLE, "negotiate.contractMarket.summary",
-              rentalTotal.toAmountAndSymbolString(), reputationPool - reputationUsed, sacrificeBank));
+              rentalTotal.toAmountAndSymbolString(), reputationPool - reputationUsed,
+              NegotiationStepMath.totalStepsSacrificed(originalStep, currentStep), MAXIMUM_SACRIFICED_STEPS,
+              NegotiationStepMath.distinctTermsSacrificed(originalStep, currentStep), MAXIMUM_SACRIFICED_TERMS));
     }
 
     private boolean canRaise(Clause clause) {
         int index = clause.ordinal();
-        if ((currentStep[index] - originalStep[index]) >= capPerTerm
-                  || currentStep[index] >= CHAOS_CONTRACT_MAXIMUM_STEP_VALUE) {
+        if (currentStep[index] >= CHAOS_CONTRACT_MAXIMUM_STEP_VALUE) {
+            return false;
+        }
+        if (currentStep[index] < originalStep[index]) {
+            return (restoreTarget(clause) - currentStep[index]) <= sacrificeBank;
+        }
+        if ((currentStep[index] - originalStep[index]) >= capPerTerm) {
             return false;
         }
         return reputationUsed < reputationPool
                      || (sacrificeBank >= SACRIFICE_STEPS_PER_SWAP && swapsUsed < MAXIMUM_SWAPS);
+    }
+
+    /**
+     * The step a below-baseline (sacrificed) term rises to on a single raise: the sacrifice boundary directly above
+     * where it now sits, i.e. the exact step the most recent lower started from. One raise mirrors one lower, and the
+     * term never rests on a mid-plateau step that shares the baseline's value.
+     */
+    private int restoreTarget(Clause clause) {
+        int index = clause.ordinal();
+        return NegotiationStepMath.restoreStep(clause.term, originalStep[index], currentStep[index]);
     }
 
     private String termValueHtml(Clause clause) {
