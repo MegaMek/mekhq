@@ -902,12 +902,18 @@ public class ContractNegotiationDialog extends JDialog {
 
     /**
      * A net-margin modifier specific to the "make an exception" option (shifting non-negotiable flags). Loophole Finder
-     * frees more terms.
+     * frees more terms; Blacklisted, its opposite, locks more.
      */
     private static int exceptionNegotiationModifier(Person negotiator) {
+        if (negotiator == null) {
+            return 0;
+        }
         int modifier = 0;
-        if (negotiator != null && negotiator.getOptions().booleanOption(PersonnelOptions.LOOPHOLE_FINDER)) {
+        if (negotiator.getOptions().booleanOption(PersonnelOptions.LOOPHOLE_FINDER)) {
             modifier++;
+        }
+        if (negotiator.getOptions().booleanOption(PersonnelOptions.BLACKLISTED)) {
+            modifier--;
         }
         return modifier;
     }
