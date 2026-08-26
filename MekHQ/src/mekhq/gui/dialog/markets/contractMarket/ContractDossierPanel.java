@@ -218,11 +218,6 @@ public class ContractDossierPanel extends JPanel {
         }
         details.add(buildColumns());
         details.add(Box.createVerticalStrut(pad));
-        JPanel characteristics = buildCharacteristics();
-        if (characteristics != null) {
-            details.add(characteristics);
-            details.add(Box.createVerticalStrut(pad));
-        }
         details.add(buildMetrics());
         details.add(Box.createVerticalStrut(pad));
         details.add(buildProfitEstimate());
@@ -331,6 +326,8 @@ public class ContractDossierPanel extends JPanel {
         addDetailRow(terms, "dossier.contractMarket.terms.salvage", salvage(contract), null);
         addDetailRow(terms, "dossier.contractMarket.terms.support", support(contract), null);
         addDetailRow(terms, "dossier.contractMarket.terms.transport", transport(contract), null);
+        // The contract's random characteristics ride along at the foot of the Terms column.
+        appendCharacteristics(terms);
         columns.add(terms);
 
         JPanel intel = section(getTextAt(RESOURCE_BUNDLE, "dossier.contractMarket.section.intel"));
@@ -410,12 +407,10 @@ public class ContractDossierPanel extends JPanel {
      * A section listing this contract's random characteristics, or {@code null} when it has none. Each characteristic
      * shows its name, colored by whether it helps or hurts the player, with its description on hover.
      */
-    private @Nullable JPanel buildCharacteristics() {
+    private void appendCharacteristics(JPanel section) {
         if (contract.getCharacteristics().isEmpty()) {
-            return null;
+            return;
         }
-
-        JPanel characteristics = section(getTextAt(RESOURCE_BUNDLE, "dossier.contractMarket.section.characteristics"));
 
         // Lay the characteristics out in a horizontal row that wraps to further lines when they do not all fit.
         JPanel flow = new JPanel(new WrapLayout(FlowLayout.LEFT, scaleForGUI(14), scaleForGUI(2)));
@@ -428,14 +423,13 @@ public class ContractDossierPanel extends JPanel {
 
         GridBagConstraints constraints = new GridBagConstraints();
         constraints.gridx = 0;
-        constraints.gridy = 1;
+        constraints.gridy = section.getComponentCount();
         constraints.gridwidth = 2;
         constraints.weightx = 1.0;
         constraints.anchor = GridBagConstraints.WEST;
         constraints.fill = GridBagConstraints.HORIZONTAL;
-        constraints.insets = new Insets(scaleForGUI(3), 0, 0, 0);
-        characteristics.add(flow, constraints);
-        return characteristics;
+        constraints.insets = new Insets(scaleForGUI(8), 0, 0, 0);
+        section.add(flow, constraints);
     }
 
     private JLabel characteristicLabel(ContractCharacteristic characteristic) {
@@ -445,7 +439,7 @@ public class ContractDossierPanel extends JPanel {
         Color color = switch (characteristic.getPolarity()) {
             case BENEFICIAL -> hexColor(positiveColor());
             case ADVERSE -> hexColor(dangerColor());
-            case NEUTRAL -> mutedColor();
+            case NEUTRAL -> hexColor(neutralColor());
         };
         label.setForeground(color);
         return label;
@@ -706,6 +700,10 @@ public class ContractDossierPanel extends JPanel {
     }
 
     private static String dangerColor() {
+        return ReportingUtilities.getNegativeColor();
+    }
+
+    private static String neutralColor() {
         return ReportingUtilities.getWarningColor();
     }
 
