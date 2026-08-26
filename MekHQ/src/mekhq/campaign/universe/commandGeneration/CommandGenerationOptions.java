@@ -32,9 +32,12 @@
  */
 package mekhq.campaign.universe.commandGeneration;
 
+import java.util.EnumSet;
 import java.util.HashMap;
 import java.util.Map;
 
+import java.util.Set;
+import megamek.common.annotations.Nullable;
 import megamek.common.enums.SkillLevel;
 import mekhq.campaign.personnel.enums.PersonnelRole;
 import mekhq.campaign.universe.Faction;
@@ -134,6 +137,12 @@ public class CommandGenerationOptions {
     // off, and a player who has never opened either options dialog would otherwise have no way to
     // generate an augmented command.
     private boolean useImplants;
+    /**
+     * The crew roles whose seats temporary crew fill instead of named people. These live on the campaign: the
+     * dialog seeds them from the campaign's current settings and the generator writes them back before any unit is
+     * crewed, because the crew assembler reads the campaign options as it builds each unit.
+     */
+    private Set<TemporaryCrewRole> temporaryCrewRoles;
     private boolean useManeiDomini;
     private NeuralInterfaceMode neuralInterfaceMode;
 
@@ -236,6 +245,8 @@ public class CommandGenerationOptions {
         setUseImplants(false);
         setUseManeiDomini(false);
         setNeuralInterfaceMode(NeuralInterfaceMode.OFF);
+        // None by default, matching a fresh campaign; the dialog replaces this with the campaign's own settings.
+        setTemporaryCrewRoles(EnumSet.noneOf(TemporaryCrewRole.class));
 
         // Force naming and formation icons
         setForceNamingMethod(ForceNamingMethod.CCB_1943);
@@ -551,6 +562,22 @@ public class CommandGenerationOptions {
 
     public void setUseImplants(final boolean useImplants) {
         this.useImplants = useImplants;
+    }
+
+    /**
+     * @return the crew roles whose seats temporary crew fill instead of named people; never {@code null}
+     */
+    public Set<TemporaryCrewRole> getTemporaryCrewRoles() {
+        return temporaryCrewRoles;
+    }
+
+    /**
+     * @param temporaryCrewRoles the crew roles whose seats temporary crew fill; {@code null} means none
+     */
+    public void setTemporaryCrewRoles(@Nullable final Set<TemporaryCrewRole> temporaryCrewRoles) {
+        this.temporaryCrewRoles = (temporaryCrewRoles == null)
+                                        ? EnumSet.noneOf(TemporaryCrewRole.class)
+                                        : EnumSet.copyOf(temporaryCrewRoles);
     }
 
     /**

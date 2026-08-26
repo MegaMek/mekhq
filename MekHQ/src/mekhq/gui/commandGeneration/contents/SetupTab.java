@@ -32,6 +32,8 @@
  */
 package mekhq.gui.commandGeneration.contents;
 
+import java.util.EnumMap;
+import java.util.EnumSet;
 import megamek.client.ui.util.UIUtil;
 import static megamek.client.ui.WrapLayout.wordWrap;
 import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.processWrapSize;
@@ -66,8 +68,10 @@ import megamek.logging.MMLogger;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.campaignOptions.CampaignOption;
+import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.personnel.enums.PersonnelRole;
 import mekhq.campaign.universe.commandGeneration.CommandGenerationOptions;
+import mekhq.campaign.universe.commandGeneration.TemporaryCrewRole;
 import mekhq.campaign.universe.enums.ForceNamingMethod;
 import mekhq.campaign.universe.enums.TechAssignmentSortFactor;
 import mekhq.gui.commandGeneration.components.CommandGenerationCheckBox;
@@ -227,6 +231,12 @@ public class SetupTab {
     private CommandGenerationCheckBox chkUseManeiDomini;
     private MMComboBox<NeuralInterfaceMode> cmbNeuralInterfaceMode;
 
+    // Temporary crew. Campaign settings, surfaced here for the same reason as the augmentation toggles: a
+    // player building a starting force decides here whether a tank's crew are named warriors or an
+    // anonymous pool, without going through the campaign options dialog first.
+    private final Map<TemporaryCrewRole, CommandGenerationCheckBox> chkTemporaryCrew =
+          new EnumMap<>(TemporaryCrewRole.class);
+
     // Random origin
     private RandomOriginOptionsPanel randomOriginOptionsPanel;
 
@@ -266,13 +276,17 @@ public class SetupTab {
         constraints.weightx = 1.0;
         panel.add(buildForceShapeSection(), constraints);
 
-        // Row 1: Support Personnel spans both columns. With the new role/percent/skill grid the
-        // section is wider than the column-split could comfortably hold, and giving it the full
-        // width lets the headers and per-role rows breathe.
+        // Row 1: Temporary Crew on the left, Support Personnel on the right. The support section stacks
+        // its roles in one column so it fits half the width.
         constraints.gridx = 0;
         constraints.gridy = 1;
-        constraints.gridwidth = 2;
-        constraints.weightx = 1.0;
+        constraints.gridwidth = 1;
+        constraints.weightx = 0.5;
+        panel.add(buildTemporaryCrewSection(), constraints);
+        constraints.gridx = 1;
+        constraints.gridy = 1;
+        constraints.gridwidth = 1;
+        constraints.weightx = 0.5;
         panel.add(buildSupportPersonnelSection(), constraints);
 
         // Row 2: left column stacks Assistants + Naming & Ranks; right column stacks Officer
@@ -378,19 +392,14 @@ public class SetupTab {
         String skillTooltipTemplate = getTextAt(getCommandGenerationResourceBundle(),
               "supportSkillLevel.toolTipText");
 
-        // Two logical columns of (role label, % spinner, skill dropdown). Layout grid columns:
-        // [label][%][skill]   [label][%][skill]  → 6 columns total. Tech roles populate the left
-        // column, admin roles the right. Doctor anchors the bottom of the left column so the two
-        // sides share the visual baseline.
-        int halfCount = (SUPPORT_ROLES.length + 1) / 2;
+        // One column of (role label, % spinner, skill dropdown). The section shares its row with the
+        // Temporary Crew toggles, so the roles stack rather than splitting into two side-by-side columns
+        // that would not fit in half the width.
 
         // Header row labels
         addColumnHeader(section, constraints, 0, 0, "lblSupportPersonnelColumnRole.text");
         addColumnHeader(section, constraints, 1, 0, "lblSupportPersonnelColumnPercent.text");
         addColumnHeader(section, constraints, 2, 0, "lblSupportPersonnelColumnSkill.text");
-        addColumnHeader(section, constraints, 3, 0, "lblSupportPersonnelColumnRole.text");
-        addColumnHeader(section, constraints, 4, 0, "lblSupportPersonnelColumnPercent.text");
-        addColumnHeader(section, constraints, 5, 0, "lblSupportPersonnelColumnSkill.text");
 
         for (int i = 0; i < SUPPORT_ROLES.length; i++) {
             PersonnelRole role = SUPPORT_ROLES[i];
@@ -414,19 +423,16 @@ public class SetupTab {
             }
             cmbSupportSkillLevels.put(role, skillCombo);
 
-            boolean leftColumn = i < halfCount;
-            int baseX = leftColumn ? 0 : 3;
-            int row = (leftColumn ? i : i - halfCount) + 1; // +1 for header
-            constraints.gridy = row;
-            constraints.gridx = baseX;
+            constraints.gridy = i + 1; // +1 for header
+            constraints.gridx = 0;
             section.add(roleLabel, constraints);
-            constraints.gridx = baseX + 1;
+            constraints.gridx = 1;
             section.add(spinner, constraints);
-            constraints.gridx = baseX + 2;
+            constraints.gridx = 2;
             section.add(skillCombo, constraints);
         }
 
-        addLeftAlignFiller(section, 6);
+        addLeftAlignFiller(section, 3);
         return section;
     }
 
@@ -784,6 +790,37 @@ public class SetupTab {
         cmbNeuralInterfaceMode.setEnabled(tracksImplants);
     }
 
+    /**
+     * The eight temporary-crew toggles, laid out as the campaign options dialog lays them out so the same
+     * setting reads the same in both places.
+     */
+    private JPanel buildTemporaryCrewSection() {
+        CommandGenerationStandardPanel section = new CommandGenerationStandardPanel(
+              "TemporaryCrew", true, "TemporaryCrew");
+        section.setLayout(new GridBagLayout());
+        GridBagConstraints constraints = sectionConstraints();
+
+        constraints.gridy = 0;
+        constraints.gridx = 0;
+        constraints.gridwidth = 2;
+        section.add(new CommandGenerationLabel("TemporaryCrewDescription"), constraints);
+
+        constraints.gridwidth = 1;
+        chkTemporaryCrew.clear();
+        int index = 0;
+        for (TemporaryCrewRole role : TemporaryCrewRole.values()) {
+            CommandGenerationCheckBox checkBox = new CommandGenerationCheckBox(role.getLabelKey());
+            chkTemporaryCrew.put(role, checkBox);
+            constraints.gridy = 1 + (index / 2);
+            constraints.gridx = index % 2;
+            section.add(checkBox, constraints);
+            index++;
+        }
+
+        addLeftAlignFiller(section, 2);
+        return section;
+    }
+
     private static GridBagConstraints sectionConstraints() {
         GridBagConstraints constraints = new GridBagConstraints();
         constraints.gridx = 0;
@@ -991,6 +1028,7 @@ public class SetupTab {
         chkAssignFounderFlag.setSelected(sourceOptions.isAssignFounderFlag());
 
         loadAugmentationValues();
+        loadTemporaryCrewValues();
     }
 
     /**
@@ -1019,6 +1057,21 @@ public class SetupTab {
         chkUseManeiDomini.setSelected(usesManeiDomini);
         cmbNeuralInterfaceMode.setSelectedItem(mode);
         refreshAugmentationEnablement();
+    }
+
+    /**
+     * Shows the campaign's current temporary-crew settings. These are campaign options rather than generation
+     * options, so what the campaign holds is what the player must see; the toggles are written back to the
+     * campaign when the command is generated.
+     */
+    private void loadTemporaryCrewValues() {
+        if (campaign == null) {
+            return;
+        }
+        CampaignOptions campaignOptions = campaign.getCampaignOptions();
+        for (Map.Entry<TemporaryCrewRole, CommandGenerationCheckBox> entry : chkTemporaryCrew.entrySet()) {
+            entry.getValue().setSelected(campaignOptions.get(entry.getKey().getCampaignOption()));
+        }
     }
 
     /**
@@ -1090,6 +1143,14 @@ public class SetupTab {
         targetOptions.setUseSpecifiedFactionToAssignRanks(chkUseSpecifiedFactionToAssignRanks.isSelected());
         targetOptions.setAssignMekWarriorsCallSigns(chkAssignMekWarriorsCallSigns.isSelected());
         targetOptions.setAssignFounderFlag(chkAssignFounderFlag.isSelected());
+
+        EnumSet<TemporaryCrewRole> temporaryCrewRoles = EnumSet.noneOf(TemporaryCrewRole.class);
+        for (Map.Entry<TemporaryCrewRole, CommandGenerationCheckBox> entry : chkTemporaryCrew.entrySet()) {
+            if (entry.getValue().isSelected()) {
+                temporaryCrewRoles.add(entry.getKey());
+            }
+        }
+        targetOptions.setTemporaryCrewRoles(temporaryCrewRoles);
 
         targetOptions.setUseImplants(chkUseImplants.isSelected());
         targetOptions.setUseManeiDomini(chkUseManeiDomini.isSelected());

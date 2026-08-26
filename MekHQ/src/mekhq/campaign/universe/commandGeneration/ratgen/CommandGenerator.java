@@ -86,6 +86,7 @@ import mekhq.campaign.universe.commandGeneration.EnhancedImagingAugmentor;
 import mekhq.campaign.universe.commandGeneration.ManeiDominiAugmentor;
 import mekhq.campaign.universe.commandGeneration.SupportPersonnelToTOE;
 import mekhq.campaign.universe.commandGeneration.SupportUnitGenerator;
+import mekhq.campaign.universe.commandGeneration.TemporaryCrewRole;
 
 /**
  * Single entry point for the ratgen-driven Command Generator pipeline.
@@ -338,6 +339,10 @@ public final class CommandGenerator {
      */
     public static Result applyToCampaign(Campaign campaign, CommandGenerationOptions options,
           ForceDescriptor fd, Ruleset.ProgressListener listener, boolean generateSupport) {
+        // Before the first unit is crewed: the crew assembler decides per unit whether a seat is a named
+        // person or left for temporary crew, reading the campaign options at that moment.
+        applyTemporaryCrewChoices(campaign, options);
+
         // Snapshot the hangar before any unit is created so the starting-cash stage can price only
         // the units this build adds (see processStartingCash).
         Set<UUID> preExistingUnitIds = snapshotHangarUnitIds(campaign);
@@ -1081,6 +1086,28 @@ public final class CommandGenerator {
      * makes the choice take effect for the generation that follows and, because both option sets are
      * saved with the campaign, hold for the saved game.</p>
      */
+    /**
+     * Stage 3b: writes the designer's temporary-crew choices to the campaign.
+     *
+     * <p>Whether a unit's seats are filled with named people or left for temporary crew is decided by
+     * {@link MultiCrewAssembler} as each unit is built, reading the campaign options at that moment. So the
+     * choices have to reach the campaign before the first unit is crewed; written any later, every unit would
+     * already hold named crew under the previous settings and the toggles would appear to do nothing.</p>
+     *
+     * @param campaign the campaign being generated into
+     * @param options  the designer's choices
+     */
+    // Package-private so the regression test can check the choices reach the campaign.
+    static void applyTemporaryCrewChoices(Campaign campaign, CommandGenerationOptions options) {
+        Set<TemporaryCrewRole> chosenRoles = options.getTemporaryCrewRoles();
+        CampaignOptions campaignOptions = campaign.getCampaignOptions();
+        for (TemporaryCrewRole role : TemporaryCrewRole.values()) {
+            campaignOptions.set(role.getCampaignOption(), chosenRoles.contains(role));
+        }
+        LOGGER.info("[CompanyGen][Pipeline] Stage 3b: temporary crew written to the campaign - enabled for {}",
+              chosenRoles.isEmpty() ? "no roles" : chosenRoles);
+    }
+
     // Package-private so the regression test can check the choice reaches the campaign.
     static void applyAugmentationRules(Campaign campaign, CommandGenerationOptions options) {
         CampaignOptions campaignOptions = campaign.getCampaignOptions();
