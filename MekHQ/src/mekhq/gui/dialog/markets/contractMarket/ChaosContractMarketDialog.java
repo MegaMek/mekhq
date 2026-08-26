@@ -305,7 +305,8 @@ public class ChaosContractMarketDialog extends JDialog implements ContractMarket
         // The cards stay on a single row (a plain FlowLayout keeps its one-row preferred width), and the
         // FastJScrollPane scrolls horizontally when they overflow the window width rather than wrapping to a new row.
         JPanel cardRow = new JPanel(new FlowLayout(FlowLayout.LEFT, PADDING, PADDING));
-        boolean hideContractType = campaign.getCampaignOptions().get(CampaignOption.HIDE_CONTRACT_TYPE);
+        boolean hideContractType = campaign.getCampaignOptions().get(CampaignOption.HIDE_CONTRACT_TYPE)
+                                         && campaign.getCampaignOptions().get(CampaignOption.USE_OPERATION_CODENAMES);
         for (AbstractContract contract : contracts) {
             ContractCardPanel card = new ContractCardPanel(contract,
                   currentDate,
