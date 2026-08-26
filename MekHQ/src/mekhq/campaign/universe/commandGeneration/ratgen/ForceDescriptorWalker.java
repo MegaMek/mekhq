@@ -58,7 +58,7 @@ import mekhq.campaign.universe.commandGeneration.ratgen.FormationNamer.NamedForm
  * {@link Formation} nodes and hands each leaf descriptor to a caller-supplied handler.
  *
  * <p>The walker creates one Formation per non-leaf descriptor (Lance, Company, Battalion, Regiment, etc.)
- * via {@link Campaign#addFormation(Formation, Formation)}, recurses into both {@code subForces} and
+ * via {@link mekhq.campaign.force.PlayerForce#addFormation(Formation, Formation, Campaign)}, recurses into both {@code subForces} and
  * {@code attached} children, and invokes {@link LeafHandler#handle} for each descriptor whose subtree is
  * empty (leaves carry the actual {@code Entity}). The handler is responsible for building the MekHQ
  * {@code Unit}, generating crew, and attaching the unit to the supplied parent Formation.</p>

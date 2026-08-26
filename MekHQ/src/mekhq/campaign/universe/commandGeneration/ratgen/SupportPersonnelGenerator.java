@@ -66,14 +66,15 @@ import mekhq.campaign.universe.commandGeneration.ratgen.SupportPersonnelCalculat
  *       each role from the campaign's current force composition.</li>
  *   <li>For each support role this class multiplies the baseline by the user's per-role coverage
  *       percentage on {@link CommandGenerationOptions#getSupportPersonnelCoveragePercents()}
- *       (default 100%), creates that many Persons via {@link Campaign#newPerson(PersonnelRole)},
+ *       (default 100%), creates that many Persons via {@link mekhq.campaign.ForceHumanResources#newPerson(Campaign, PersonnelRole)},
  *       regenerates their skills at the user-selected experience tier via
  *       {@link AbstractSkillGenerator#generateSkills(Campaign, Person, int)}, sets the
  *       faction-appropriate support rank, and recruits them through
- *       {@link Campaign#recruitPerson(Person, PrisonerStatus, boolean, boolean)}.</li>
- *   <li>The four administrator roles share a single CamOps "1 admin per 20 personnel" demand —
- *       this class splits that demand equally across Command / Logistics / Transport / HR, then
- *       each role applies its own per-role coverage percentage independently.</li>
+ *       {@link mekhq.campaign.ForceHumanResources#recruitPerson(Campaign, Person, PrisonerStatus,
+ *       boolean, boolean, boolean)}.</li>
+ *   <li>Administrators are generated as a single role against the CamOps "1 admin per 20 personnel"
+ *       demand (1 per 10 for pirates and mercenaries), with the coverage percentage applied to that
+ *       whole figure.</li>
  *   <li>Astech and medic generation are independent toggles. When on, 6 astechs are generated per
  *       tech and 4 medics per doctor (the canonical {@code MHQConstants.AS_TECH_TEAM_SIZE} and
  *       {@code Campaign.getMedicsNeed} ratios). The pool-vs-individual-Personnel radio picks

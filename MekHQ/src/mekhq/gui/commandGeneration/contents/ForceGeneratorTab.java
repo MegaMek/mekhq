@@ -79,7 +79,7 @@ public class ForceGeneratorTab {
 
     private static final MMLogger LOGGER = MMLogger.create(ForceGeneratorTab.class);
 
-    /** Component name for the options/TO&E divider, used to persist its position across dialog opens. */
+    /** Component name for the options/TO&amp;E divider, used to persist its position across dialog opens. */
     private static final String FORCE_GENERATOR_SPLIT_NAME = "forceGeneratorSplitPane";
 
     private final JFrame frame;
@@ -107,8 +107,8 @@ public class ForceGeneratorTab {
     }
 
     public JPanel createTab() {
-        // Embed MegaMek's full force-generator view: the options panel (left) plus the TO&E tree
-        // (right). The view's own Generate button rolls a preview and fills the TO&E tree and the
+        // Embed MegaMek's full force-generator view: the options panel (left) plus the TO&amp;E tree
+        // (right). The view's own Generate button rolls a preview and fills the TO&amp;E tree and the
         // Composition Summary; the dialog's Accept button then commits the rolled ForceDescriptor.
         // Constructed lazily so we only pay the RATGenerator / Ruleset / MekSummaryCache init cost
         // when the dialog is actually shown.
@@ -174,7 +174,7 @@ public class ForceGeneratorTab {
     }
 
     /**
-     * The options/TO&E divider, or {@code null} if {@link #createTab()} hasn't run yet. The dialog
+     * The options/TO&amp;E divider, or {@code null} if {@link #createTab()} hasn't run yet. The dialog
      * registers this with a {@code JSplitPanePreference} so its position persists across opens.
      *
      * @return the tab's split pane, or {@code null} if not yet built
