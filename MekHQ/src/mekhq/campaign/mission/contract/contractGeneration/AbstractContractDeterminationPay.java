@@ -68,6 +68,13 @@ public abstract class AbstractContractDeterminationPay {
     public final static int HIRING_HALL_RETURN_MULTIPLIER = 2; // Draconis Reach first printing pg 26
 
     /**
+     * The deniability premium a false flag operation pays on its retainer and combat bonus, over the going rate for the
+     * same job. Deliberately modest: it is meant to read as "suspiciously generous" to an attentive player rather than
+     * to announce itself, the only in-market tell that a contract is a false flag.
+     */
+    private static final double FALSE_FLAG_PAY_PREMIUM = 1.25;
+
+    /**
      * Returns the pay scheme the campaign has opted into: the CamOps force-value scheme when
      * {@link CampaignOption#USE_LEGACY_CONTRACT_PAY} is set, otherwise the default Chaos scheme.
      */
@@ -87,6 +94,14 @@ public abstract class AbstractContractDeterminationPay {
         Money monthlyPay = getMonthlyPay(campaign, contract);
         Money combatPay = getCombatPay(campaign, contract);
         Money transportPay = getTransportPay(campaign, currentDate, contract, currentLocation);
+
+        // A false flag operation quietly pays a deniability premium on the retainer and combat bonus - the "too
+        // generous for this job" tell an attentive player can learn to notice. Transport is cost reimbursement, so it
+        // is left alone. Applies to whichever pay scheme is in effect, since both route through here.
+        if (contract.isFalseFlag()) {
+            monthlyPay = monthlyPay.multipliedBy(FALSE_FLAG_PAY_PREMIUM);
+            combatPay = combatPay.multipliedBy(FALSE_FLAG_PAY_PREMIUM);
+        }
 
         ContractFinanceData contractFinanceData = new ContractFinanceData(transportPay, monthlyPay, combatPay);
         contract.setContractFinanceData(contractFinanceData);

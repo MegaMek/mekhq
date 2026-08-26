@@ -339,6 +339,22 @@ public class ContractDossierPanel extends JPanel {
         int difficulty = assessmentDifficulty(contract);
         Color assessmentColor = difficulty >= 8 ? dangerColor() : (difficulty <= 2 ? positiveColor() : null);
         addDetailRow(intel, "dossier.contractMarket.intel.assessment", assessmentLabel(contract), assessmentColor);
+        // A muted, one-line advisory footnote for a contract with a special nature. The natures are mutually
+        // exclusive, so at most one shows. For a false flag it is an understated, ambiguously-worded paper-trail tell
+        // that (with the deniability pay premium) an attentive player can learn to read; for a covert operation or a
+        // Proving Ground - both already badged - it is just a plain-language note explaining what the badge means.
+        String advisoryKey = null;
+        if (contract.isFalseFlag()) {
+            advisoryKey = "dossier.contractMarket.intel.advisory.falseFlag";
+        } else if (contract.isCovert()) {
+            advisoryKey = "dossier.contractMarket.intel.advisory.covert";
+        } else if (contract.isProvingGround()) {
+            advisoryKey = "dossier.contractMarket.intel.advisory.provingGround";
+        }
+        if (advisoryKey != null) {
+            addDetailRow(intel, "dossier.contractMarket.intel.advisory", getTextAt(RESOURCE_BUNDLE, advisoryKey),
+                  mutedColor());
+        }
         columns.add(intel);
 
         return columns;
