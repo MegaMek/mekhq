@@ -470,15 +470,15 @@ public class CommandGenerationDialog extends AbstractMHQValidationButtonDialog {
                 T result;
                 try {
                     result = get();
-                } catch (Exception ex) {
+                } catch (Exception exception) {
                     // SwingWorker wraps the real failure in an ExecutionException whose own stack is
                     // just the EDT plumbing, so logging it alone says nothing about where generation
                     // actually broke. Log the cause separately to get the failing frames.
-                    Throwable cause = (ex instanceof ExecutionException) ? ex.getCause() : ex;
+                    Throwable cause = (exception instanceof ExecutionException) ? exception.getCause() : exception;
                     LOGGER.error(cause, "[CompanyGen][Worker] generation phase failed");
                     new ImmersiveDialogNotification(campaign,
                           "Force generation failed: "
-                                + ((cause == null) ? ex.getMessage() : cause.toString()), true);
+                                + ((cause == null) ? exception.getMessage() : cause.toString()), true);
                     return;
                 }
                 onSuccess.accept(result);

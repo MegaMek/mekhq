@@ -32,6 +32,7 @@
  */
 package mekhq.gui.commandGeneration.contents;
 
+import megamek.client.ui.util.UIUtil;
 import static megamek.client.ui.WrapLayout.wordWrap;
 import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.processWrapSize;
 import static mekhq.gui.commandGeneration.components.CommandGenerationUtilities.getCommandGenerationResourceBundle;
@@ -251,27 +252,28 @@ public class SetupTab {
         JPanel panel = new JPanel(new GridBagLayout());
         panel.setName("pnlSetupTab");
 
-        GridBagConstraints gbc = new GridBagConstraints();
-        gbc.fill = GridBagConstraints.BOTH;
-        gbc.anchor = GridBagConstraints.NORTHWEST;
-        gbc.insets = new Insets(3, 6, 3, 6);
+        GridBagConstraints constraints = new GridBagConstraints();
+        constraints.fill = GridBagConstraints.BOTH;
+        constraints.anchor = GridBagConstraints.NORTHWEST;
+        constraints.insets = new Insets(UIUtil.scaleForGUI(3), UIUtil.scaleForGUI(6),
+              UIUtil.scaleForGUI(3), UIUtil.scaleForGUI(6));
 
         // Row 0: Force Shape spans the full width — it's only two controls so giving it both
         // columns avoids leaving an awkward gap on the right.
-        gbc.gridx = 0;
-        gbc.gridy = 0;
-        gbc.gridwidth = 2;
-        gbc.weightx = 1.0;
-        panel.add(buildForceShapeSection(), gbc);
+        constraints.gridx = 0;
+        constraints.gridy = 0;
+        constraints.gridwidth = 2;
+        constraints.weightx = 1.0;
+        panel.add(buildForceShapeSection(), constraints);
 
         // Row 1: Support Personnel spans both columns. With the new role/percent/skill grid the
         // section is wider than the column-split could comfortably hold, and giving it the full
         // width lets the headers and per-role rows breathe.
-        gbc.gridx = 0;
-        gbc.gridy = 1;
-        gbc.gridwidth = 2;
-        gbc.weightx = 1.0;
-        panel.add(buildSupportPersonnelSection(), gbc);
+        constraints.gridx = 0;
+        constraints.gridy = 1;
+        constraints.gridwidth = 2;
+        constraints.weightx = 1.0;
+        panel.add(buildSupportPersonnelSection(), constraints);
 
         // Row 2: left column stacks Assistants + Naming & Ranks; right column stacks Officer
         // Selection + Tech Assignment. Officer Selection is the tallest single section in the tab,
@@ -280,34 +282,34 @@ public class SetupTab {
         JPanel leftColumn = new JPanel();
         leftColumn.setLayout(new BoxLayout(leftColumn, BoxLayout.Y_AXIS));
         leftColumn.add(buildAssistantsSection());
-        leftColumn.add(Box.createVerticalStrut(6));
+        leftColumn.add(Box.createVerticalStrut(UIUtil.scaleForGUI(6)));
         leftColumn.add(buildNamingAndRanksSection());
-        gbc.gridx = 0;
-        gbc.gridy = 2;
-        gbc.gridwidth = 1;
-        gbc.weightx = 0.5;
-        panel.add(leftColumn, gbc);
+        constraints.gridx = 0;
+        constraints.gridy = 2;
+        constraints.gridwidth = 1;
+        constraints.weightx = 0.5;
+        panel.add(leftColumn, constraints);
 
         JPanel rightColumn = new JPanel();
         rightColumn.setLayout(new BoxLayout(rightColumn, BoxLayout.Y_AXIS));
         rightColumn.add(buildOfficerSelectionSection());
-        rightColumn.add(Box.createVerticalStrut(6));
+        rightColumn.add(Box.createVerticalStrut(UIUtil.scaleForGUI(6)));
         rightColumn.add(buildTechAssignmentSection());
-        rightColumn.add(Box.createVerticalStrut(6));
+        rightColumn.add(Box.createVerticalStrut(UIUtil.scaleForGUI(6)));
         rightColumn.add(buildAugmentationSection());
-        gbc.gridx = 1;
-        gbc.gridy = 2;
-        gbc.gridwidth = 1;
-        gbc.weightx = 0.5;
-        panel.add(rightColumn, gbc);
+        constraints.gridx = 1;
+        constraints.gridy = 2;
+        constraints.gridwidth = 1;
+        constraints.weightx = 0.5;
+        panel.add(rightColumn, constraints);
 
         // Row 3: Random Origin spans full width — it's a dense sub-panel with its own internal
         // layout, so giving it the whole width keeps its controls from being cramped.
-        gbc.gridx = 0;
-        gbc.gridy = 3;
-        gbc.gridwidth = 2;
-        gbc.weightx = 1.0;
-        panel.add(buildRandomOriginSection(), gbc);
+        constraints.gridx = 0;
+        constraints.gridy = 3;
+        constraints.gridwidth = 2;
+        constraints.weightx = 1.0;
+        panel.add(buildRandomOriginSection(), constraints);
 
         return panel;
     }
@@ -316,7 +318,7 @@ public class SetupTab {
         CommandGenerationStandardPanel section = new CommandGenerationStandardPanel(
               "ForceShape", true, "ForceShape");
         section.setLayout(new GridBagLayout());
-        GridBagConstraints gbc = sectionConstraints();
+        GridBagConstraints constraints = sectionConstraints();
 
         comboForceNamingMethod = new MMComboBox<>("comboForceNamingMethod", ForceNamingMethod.values());
         comboForceNamingMethod.setRenderer(new DefaultListCellRenderer() {
@@ -346,17 +348,17 @@ public class SetupTab {
             }
         });
 
-        gbc.gridwidth = 1;
-        gbc.gridy = 1;
-        gbc.gridx = 0;
-        section.add(new CommandGenerationLabel("ForceNamingMethod"), gbc);
-        gbc.gridx = 1;
-        section.add(comboForceNamingMethod, gbc);
+        constraints.gridwidth = 1;
+        constraints.gridy = 1;
+        constraints.gridx = 0;
+        section.add(new CommandGenerationLabel("ForceNamingMethod"), constraints);
+        constraints.gridx = 1;
+        section.add(comboForceNamingMethod, constraints);
 
-        gbc.gridwidth = 2;
-        gbc.gridy = 2;
-        gbc.gridx = 0;
-        section.add(chkAlwaysNumberRegiments, gbc);
+        constraints.gridwidth = 2;
+        constraints.gridy = 2;
+        constraints.gridx = 0;
+        section.add(chkAlwaysNumberRegiments, constraints);
 
         addLeftAlignFiller(section, 3);
         return section;
@@ -366,7 +368,7 @@ public class SetupTab {
         CommandGenerationStandardPanel section = new CommandGenerationStandardPanel(
               "SupportPersonnel", true, "SupportPersonnel");
         section.setLayout(new GridBagLayout());
-        GridBagConstraints gbc = sectionConstraints();
+        GridBagConstraints constraints = sectionConstraints();
 
         spnSupportCoveragePercents.clear();
         cmbSupportSkillLevels.clear();
@@ -383,12 +385,12 @@ public class SetupTab {
         int halfCount = (SUPPORT_ROLES.length + 1) / 2;
 
         // Header row labels
-        addColumnHeader(section, gbc, 0, 0, "lblSupportPersonnelColumnRole.text");
-        addColumnHeader(section, gbc, 1, 0, "lblSupportPersonnelColumnPercent.text");
-        addColumnHeader(section, gbc, 2, 0, "lblSupportPersonnelColumnSkill.text");
-        addColumnHeader(section, gbc, 3, 0, "lblSupportPersonnelColumnRole.text");
-        addColumnHeader(section, gbc, 4, 0, "lblSupportPersonnelColumnPercent.text");
-        addColumnHeader(section, gbc, 5, 0, "lblSupportPersonnelColumnSkill.text");
+        addColumnHeader(section, constraints, 0, 0, "lblSupportPersonnelColumnRole.text");
+        addColumnHeader(section, constraints, 1, 0, "lblSupportPersonnelColumnPercent.text");
+        addColumnHeader(section, constraints, 2, 0, "lblSupportPersonnelColumnSkill.text");
+        addColumnHeader(section, constraints, 3, 0, "lblSupportPersonnelColumnRole.text");
+        addColumnHeader(section, constraints, 4, 0, "lblSupportPersonnelColumnPercent.text");
+        addColumnHeader(section, constraints, 5, 0, "lblSupportPersonnelColumnSkill.text");
 
         for (int i = 0; i < SUPPORT_ROLES.length; i++) {
             PersonnelRole role = SUPPORT_ROLES[i];
@@ -415,33 +417,33 @@ public class SetupTab {
             boolean leftColumn = i < halfCount;
             int baseX = leftColumn ? 0 : 3;
             int row = (leftColumn ? i : i - halfCount) + 1; // +1 for header
-            gbc.gridy = row;
-            gbc.gridx = baseX;
-            section.add(roleLabel, gbc);
-            gbc.gridx = baseX + 1;
-            section.add(spinner, gbc);
-            gbc.gridx = baseX + 2;
-            section.add(skillCombo, gbc);
+            constraints.gridy = row;
+            constraints.gridx = baseX;
+            section.add(roleLabel, constraints);
+            constraints.gridx = baseX + 1;
+            section.add(spinner, constraints);
+            constraints.gridx = baseX + 2;
+            section.add(skillCombo, constraints);
         }
 
         addLeftAlignFiller(section, 6);
         return section;
     }
 
-    private static void addColumnHeader(JPanel section, GridBagConstraints gbc, int gridX, int gridY,
+    private static void addColumnHeader(JPanel section, GridBagConstraints constraints, int gridX, int gridY,
           String bundleKey) {
         JLabel header = new JLabel(
               "<html><b>" + getTextAt(getCommandGenerationResourceBundle(), bundleKey) + "</b></html>");
-        gbc.gridx = gridX;
-        gbc.gridy = gridY;
-        section.add(header, gbc);
+        constraints.gridx = gridX;
+        constraints.gridy = gridY;
+        section.add(header, constraints);
     }
 
     private JPanel buildAssistantsSection() {
         CommandGenerationStandardPanel section = new CommandGenerationStandardPanel(
               "Assistants", true, "Assistants");
         section.setLayout(new GridBagLayout());
-        GridBagConstraints gbc = sectionConstraints();
+        GridBagConstraints constraints = sectionConstraints();
 
         // Astech block
         chkGenerateAstechs = new CommandGenerationCheckBox("GenerateAstechs");
@@ -473,37 +475,37 @@ public class SetupTab {
         rdoMedicsAsPersonnel.addActionListener(evt -> refreshMedicEnablement());
 
         // Layout
-        gbc.gridy = 0;
-        gbc.gridx = 0;
-        gbc.gridwidth = 2;
-        section.add(chkGenerateAstechs, gbc);
-        gbc.gridwidth = 1;
+        constraints.gridy = 0;
+        constraints.gridx = 0;
+        constraints.gridwidth = 2;
+        section.add(chkGenerateAstechs, constraints);
+        constraints.gridwidth = 1;
         indentAsSubOption(rdoAstechsAsPool);
-        gbc.gridy = 1;
-        gbc.gridx = 0;
-        section.add(rdoAstechsAsPool, gbc);
+        constraints.gridy = 1;
+        constraints.gridx = 0;
+        section.add(rdoAstechsAsPool, constraints);
         indentAsSubOption(rdoAstechsAsPersonnel);
-        gbc.gridy = 2;
-        gbc.gridx = 0;
-        section.add(rdoAstechsAsPersonnel, gbc);
-        gbc.gridx = 1;
-        section.add(cmbAstechSkillLevel, gbc);
+        constraints.gridy = 2;
+        constraints.gridx = 0;
+        section.add(rdoAstechsAsPersonnel, constraints);
+        constraints.gridx = 1;
+        section.add(cmbAstechSkillLevel, constraints);
 
-        gbc.gridy = 3;
-        gbc.gridx = 0;
-        gbc.gridwidth = 2;
-        section.add(chkGenerateMedics, gbc);
-        gbc.gridwidth = 1;
+        constraints.gridy = 3;
+        constraints.gridx = 0;
+        constraints.gridwidth = 2;
+        section.add(chkGenerateMedics, constraints);
+        constraints.gridwidth = 1;
         indentAsSubOption(rdoMedicsAsPool);
-        gbc.gridy = 4;
-        gbc.gridx = 0;
-        section.add(rdoMedicsAsPool, gbc);
+        constraints.gridy = 4;
+        constraints.gridx = 0;
+        section.add(rdoMedicsAsPool, constraints);
         indentAsSubOption(rdoMedicsAsPersonnel);
-        gbc.gridy = 5;
-        gbc.gridx = 0;
-        section.add(rdoMedicsAsPersonnel, gbc);
-        gbc.gridx = 1;
-        section.add(cmbMedicSkillLevel, gbc);
+        constraints.gridy = 5;
+        constraints.gridx = 0;
+        section.add(rdoMedicsAsPersonnel, constraints);
+        constraints.gridx = 1;
+        section.add(cmbMedicSkillLevel, constraints);
 
         // Medical reserve: generation-only spare MekWarriors as injury replacements, sized by a
         // percentage of the generated combatants. The spinner is live only when the box is checked.
@@ -511,12 +513,12 @@ public class SetupTab {
         spnMedicalReservePercent = new JSpinner(new SpinnerNumberModel(10, 0, 100, 5));
         chkGenerateMedicalReserve.addActionListener(evt ->
               spnMedicalReservePercent.setEnabled(chkGenerateMedicalReserve.isSelected()));
-        gbc.gridy = 6;
-        gbc.gridx = 0;
-        gbc.gridwidth = 1;
-        section.add(chkGenerateMedicalReserve, gbc);
-        gbc.gridx = 1;
-        section.add(spnMedicalReservePercent, gbc);
+        constraints.gridy = 6;
+        constraints.gridx = 0;
+        constraints.gridwidth = 1;
+        section.add(chkGenerateMedicalReserve, constraints);
+        constraints.gridx = 1;
+        section.add(spnMedicalReservePercent, constraints);
 
         addLeftAlignFiller(section, 2);
         return section;
@@ -557,7 +559,7 @@ public class SetupTab {
         CommandGenerationStandardPanel section = new CommandGenerationStandardPanel(
               "TechAssignment", true, "TechAssignment");
         section.setLayout(new GridBagLayout());
-        GridBagConstraints gbc = sectionConstraints();
+        GridBagConstraints constraints = sectionConstraints();
 
         chkAssignTechsToUnits = new CommandGenerationCheckBox("AssignTechsToUnits");
         cmbTechAssignmentPrimary = new MMComboBox<>("cmbTechAssignmentPrimary", SORT_FACTORS);
@@ -574,36 +576,36 @@ public class SetupTab {
         cmbTechAssignmentTertiary.addActionListener(evt -> refreshTechAssignmentEnablement());
 
         // Row 0: master enable checkbox spans all columns.
-        gbc.gridy = 0;
-        gbc.gridx = 0;
-        gbc.gridwidth = 3;
-        section.add(chkAssignTechsToUnits, gbc);
-        gbc.gridwidth = 1;
+        constraints.gridy = 0;
+        constraints.gridx = 0;
+        constraints.gridwidth = 3;
+        section.add(chkAssignTechsToUnits, constraints);
+        constraints.gridwidth = 1;
 
         // Rows 1-3: three sort slots, each (label, factor combo, direction combo).
-        addTechSortRow(section, gbc, 1, "TechAssignmentPrimary",
+        addTechSortRow(section, constraints, 1, "TechAssignmentPrimary",
               cmbTechAssignmentPrimary, cmbTechAssignmentPrimaryDirection);
-        addTechSortRow(section, gbc, 2, "TechAssignmentSecondary",
+        addTechSortRow(section, constraints, 2, "TechAssignmentSecondary",
               cmbTechAssignmentSecondary, cmbTechAssignmentSecondaryDirection);
-        addTechSortRow(section, gbc, 3, "TechAssignmentTertiary",
+        addTechSortRow(section, constraints, 3, "TechAssignmentTertiary",
               cmbTechAssignmentTertiary, cmbTechAssignmentTertiaryDirection);
 
         addLeftAlignFiller(section, 3);
         return section;
     }
 
-    private static void addTechSortRow(JPanel section, GridBagConstraints gbc, int row,
+    private static void addTechSortRow(JPanel section, GridBagConstraints constraints, int row,
           String labelName, MMComboBox<TechAssignmentSortFactor> factorCombo,
           MMComboBox<SortDirection> directionCombo) {
         CommandGenerationLabel label = new CommandGenerationLabel(labelName);
         indentAsSubOption(label);
-        gbc.gridy = row;
-        gbc.gridx = 0;
-        section.add(label, gbc);
-        gbc.gridx = 1;
-        section.add(factorCombo, gbc);
-        gbc.gridx = 2;
-        section.add(directionCombo, gbc);
+        constraints.gridy = row;
+        constraints.gridx = 0;
+        section.add(label, constraints);
+        constraints.gridx = 1;
+        section.add(factorCombo, constraints);
+        constraints.gridx = 2;
+        section.add(directionCombo, constraints);
     }
 
     /**
@@ -630,8 +632,8 @@ public class SetupTab {
         CommandGenerationStandardPanel section = new CommandGenerationStandardPanel(
               "OfficerSelection", true, "OfficerSelection");
         section.setLayout(new GridBagLayout());
-        GridBagConstraints gbc = sectionConstraints();
-        gbc.gridwidth = 1;
+        GridBagConstraints constraints = sectionConstraints();
+        constraints.gridwidth = 1;
 
         chkAssignBestCompanyCommander = new CommandGenerationCheckBox("AssignBestCompanyCommander");
         chkPrioritizeCompanyCommanderCombatSkills =
@@ -653,7 +655,7 @@ public class SetupTab {
         chkApplyOfficerStatBonusToWorstSkill =
               new CommandGenerationCheckBox("ApplyOfficerStatBonusToWorstSkill");
 
-        stack(section, gbc,
+        stack(section, constraints,
               chkAssignBestCompanyCommander,
               chkPrioritizeCompanyCommanderCombatSkills,
               chkAssignBestOfficers,
@@ -671,8 +673,8 @@ public class SetupTab {
         CommandGenerationStandardPanel section = new CommandGenerationStandardPanel(
               "NamingAndRanks", true, "NamingAndRanks");
         section.setLayout(new GridBagLayout());
-        GridBagConstraints gbc = sectionConstraints();
-        gbc.gridwidth = 1;
+        GridBagConstraints constraints = sectionConstraints();
+        constraints.gridwidth = 1;
 
         chkAutomaticallyAssignRanks = new CommandGenerationCheckBox("AutomaticallyAssignRanks");
         chkUseSpecifiedFactionToAssignRanks = new CommandGenerationCheckBox("UseSpecifiedFactionToAssignRanks");
@@ -682,7 +684,7 @@ public class SetupTab {
         chkAssignMekWarriorsCallSigns = new CommandGenerationCheckBox("AssignMekWarriorsCallSigns");
         chkAssignFounderFlag = new CommandGenerationCheckBox("AssignFounderFlag");
 
-        stack(section, gbc,
+        stack(section, constraints,
               chkAutomaticallyAssignRanks,
               chkUseSpecifiedFactionToAssignRanks,
               chkAssignMekWarriorsCallSigns,
@@ -696,17 +698,17 @@ public class SetupTab {
         CommandGenerationStandardPanel section = new CommandGenerationStandardPanel(
               "RandomOrigin", true, "RandomOrigin");
         section.setLayout(new GridBagLayout());
-        GridBagConstraints gbc = sectionConstraints();
-        gbc.gridx = 0;
-        gbc.gridy = 0;
-        gbc.gridwidth = 1;
-        gbc.weightx = 1.0;
-        gbc.fill = GridBagConstraints.HORIZONTAL;
+        GridBagConstraints constraints = sectionConstraints();
+        constraints.gridx = 0;
+        constraints.gridy = 0;
+        constraints.gridwidth = 1;
+        constraints.weightx = 1.0;
+        constraints.fill = GridBagConstraints.HORIZONTAL;
 
         randomOriginOptionsPanel = new RandomOriginOptionsPanel(null, campaign,
               campaign == null ? null : campaign.getPlayerForce().getFaction());
         randomOriginOptionsPanel.setBorder(BorderFactory.createEmptyBorder());
-        section.add(randomOriginOptionsPanel, gbc);
+        section.add(randomOriginOptionsPanel, constraints);
 
         return section;
     }
@@ -728,7 +730,7 @@ public class SetupTab {
         CommandGenerationStandardPanel section = new CommandGenerationStandardPanel(
               "Augmentation", true, "Augmentation");
         section.setLayout(new GridBagLayout());
-        GridBagConstraints gbc = sectionConstraints();
+        GridBagConstraints constraints = sectionConstraints();
 
         chkUseImplants = new CommandGenerationCheckBox("UseImplants");
         chkUseManeiDomini = new CommandGenerationCheckBox("UseManeiDomini");
@@ -752,24 +754,24 @@ public class SetupTab {
         // to act on.
         chkUseImplants.addActionListener(actionEvent -> refreshAugmentationEnablement());
 
-        gbc.gridy = 0;
-        gbc.gridx = 0;
-        gbc.gridwidth = 2;
-        section.add(chkUseImplants, gbc);
+        constraints.gridy = 0;
+        constraints.gridx = 0;
+        constraints.gridwidth = 2;
+        section.add(chkUseImplants, constraints);
 
-        gbc.gridy = 1;
-        gbc.gridwidth = 2;
+        constraints.gridy = 1;
+        constraints.gridwidth = 2;
         indentAsSubOption(chkUseManeiDomini);
-        section.add(chkUseManeiDomini, gbc);
+        section.add(chkUseManeiDomini, constraints);
 
         CommandGenerationLabel neuralInterfaceLabel = new CommandGenerationLabel("NeuralInterfaceMode");
         indentAsSubOption(neuralInterfaceLabel);
-        gbc.gridy = 2;
-        gbc.gridwidth = 1;
-        gbc.gridx = 0;
-        section.add(neuralInterfaceLabel, gbc);
-        gbc.gridx = 1;
-        section.add(cmbNeuralInterfaceMode, gbc);
+        constraints.gridy = 2;
+        constraints.gridwidth = 1;
+        constraints.gridx = 0;
+        section.add(neuralInterfaceLabel, constraints);
+        constraints.gridx = 1;
+        section.add(cmbNeuralInterfaceMode, constraints);
 
         addLeftAlignFiller(section, 2);
         return section;
@@ -783,21 +785,22 @@ public class SetupTab {
     }
 
     private static GridBagConstraints sectionConstraints() {
-        GridBagConstraints gbc = new GridBagConstraints();
-        gbc.gridx = 0;
-        gbc.gridy = 0;
-        gbc.gridwidth = 1;
-        gbc.anchor = GridBagConstraints.WEST;
-        gbc.fill = GridBagConstraints.HORIZONTAL;
-        gbc.insets = new Insets(3, 6, 3, 6);
-        return gbc;
+        GridBagConstraints constraints = new GridBagConstraints();
+        constraints.gridx = 0;
+        constraints.gridy = 0;
+        constraints.gridwidth = 1;
+        constraints.anchor = GridBagConstraints.WEST;
+        constraints.fill = GridBagConstraints.HORIZONTAL;
+        constraints.insets = new Insets(UIUtil.scaleForGUI(3), UIUtil.scaleForGUI(6),
+              UIUtil.scaleForGUI(3), UIUtil.scaleForGUI(6));
+        return constraints;
     }
 
-    private static void stack(JPanel section, GridBagConstraints gbc, JComponent... components) {
-        gbc.gridx = 0;
+    private static void stack(JPanel section, GridBagConstraints constraints, JComponent... components) {
+        constraints.gridx = 0;
         for (int i = 0; i < components.length; i++) {
-            gbc.gridy = i;
-            section.add(components[i], gbc);
+            constraints.gridy = i;
+            section.add(components[i], constraints);
         }
     }
 

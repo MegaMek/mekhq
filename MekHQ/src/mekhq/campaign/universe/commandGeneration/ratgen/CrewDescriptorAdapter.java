@@ -70,7 +70,7 @@ public final class CrewDescriptorAdapter {
      *
      * @param descriptor   the source descriptor from {@code ForceDescriptor.getCo()}; if {@code null},
      *                     this method is a no-op
-     * @param person       the target Person; must be non-null
+     * @param person       the target Person; must not be {@code null}
      * @param entity       the live {@link Entity} this Person is being assigned to; used to pick the
      *                     right skill names (Piloting/Aero vs Piloting/Mek vs Piloting/Ground Vehicle…)
      * @param overrideName when {@code true}, the descriptor's name replaces MekHQ's randomly assigned

@@ -558,7 +558,7 @@ public final class ForceDescriptorWalker {
      * way, rather than reading a Formation's own level back after MekHQ has recomputed it.</p>
      *
      * @param echelon     the {@code ForceDescriptor.echelon} value (boxed, may be null)
-     * @param factionCode the faction code on the descriptor (e.g. "FS", "CW", "WOB"); may be null
+     * @param factionCode the faction code on the descriptor (e.g. "FS", "CW", "WOB"); may be {@code null}
      * @return the matching {@link FormationLevel}, or {@code null} if the echelon doesn't map
      */
     static FormationLevel mapEchelonToFormationLevel(Integer echelon, String factionCode) {

@@ -77,7 +77,7 @@ public final class MultiCrewAssembler {
      * @param commander    the commander descriptor from {@code ForceDescriptor.getCo()}; may be null
      *                     (then the commander is fully randomly named)
      * @param campaign     the campaign that owns the unit and supplies the personnel generator
-     * @param overrideName when true, the descriptor's name replaces MekHQ's random name on the commander
+     * @param overrideName when {@code true}, the descriptor's name replaces MekHQ's random name on the commander
      * @return the list of Persons created and attached, with the commander first
      */
     public static List<Person> assemble(Unit unit, CrewDescriptor commander, Campaign campaign,

@@ -32,6 +32,7 @@
  */
 package mekhq.gui.commandGeneration.contents;
 
+import megamek.client.ui.util.UIUtil;
 import mekhq.campaign.campaignOptions.CampaignOption;
 import static mekhq.gui.commandGeneration.components.CommandGenerationUtilities.getCommandGenerationResourceBundle;
 import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
@@ -142,10 +143,11 @@ public class SparesAndFinancesTab {
         JPanel panel = new JPanel(new GridBagLayout());
         panel.setName("pnlSparesAndFinancesTab");
 
-        GridBagConstraints gbc = new GridBagConstraints();
-        gbc.fill = GridBagConstraints.BOTH;
-        gbc.anchor = GridBagConstraints.NORTHWEST;
-        gbc.insets = new Insets(3, 6, 3, 6);
+        GridBagConstraints constraints = new GridBagConstraints();
+        constraints.fill = GridBagConstraints.BOTH;
+        constraints.anchor = GridBagConstraints.NORTHWEST;
+        constraints.insets = new Insets(UIUtil.scaleForGUI(3), UIUtil.scaleForGUI(6),
+              UIUtil.scaleForGUI(3), UIUtil.scaleForGUI(6));
 
         // Left column: the help text leads so the player reads what the percentages do before the
         // thirteen-row spares grid beneath it - together roughly the height of the right column's
@@ -153,27 +155,27 @@ public class SparesAndFinancesTab {
         JPanel leftColumn = new JPanel();
         leftColumn.setLayout(new BoxLayout(leftColumn, BoxLayout.Y_AXIS));
         leftColumn.add(buildHelpSection());
-        leftColumn.add(Box.createVerticalStrut(6));
+        leftColumn.add(Box.createVerticalStrut(UIUtil.scaleForGUI(6)));
         leftColumn.add(buildSparesSection());
-        gbc.gridx = 0;
-        gbc.gridy = 0;
-        gbc.gridwidth = 1;
-        gbc.weightx = 0.5;
-        gbc.weighty = 1.0;
-        panel.add(leftColumn, gbc);
+        constraints.gridx = 0;
+        constraints.gridy = 0;
+        constraints.gridwidth = 1;
+        constraints.weightx = 0.5;
+        constraints.weighty = 1.0;
+        panel.add(leftColumn, constraints);
 
         // Right column: Contracts (2 rows) + Finances (the tallest section) + Starting Simulation.
         JPanel rightColumn = new JPanel();
         rightColumn.setLayout(new BoxLayout(rightColumn, BoxLayout.Y_AXIS));
         rightColumn.add(buildContractsSection());
-        rightColumn.add(Box.createVerticalStrut(6));
+        rightColumn.add(Box.createVerticalStrut(UIUtil.scaleForGUI(6)));
         rightColumn.add(buildFinancesSection());
-        rightColumn.add(Box.createVerticalStrut(6));
+        rightColumn.add(Box.createVerticalStrut(UIUtil.scaleForGUI(6)));
         rightColumn.add(buildStartingSimulationSection());
-        gbc.gridx = 1;
-        gbc.gridy = 0;
-        gbc.weightx = 0.5;
-        panel.add(rightColumn, gbc);
+        constraints.gridx = 1;
+        constraints.gridy = 0;
+        constraints.weightx = 0.5;
+        panel.add(rightColumn, constraints);
 
         return panel;
     }
@@ -184,7 +186,7 @@ public class SparesAndFinancesTab {
         CommandGenerationStandardPanel section = new CommandGenerationStandardPanel(
               "SparesPercentages", true, "SparesPercentages");
         section.setLayout(new GridBagLayout());
-        GridBagConstraints gbc = sectionConstraints();
+        GridBagConstraints constraints = sectionConstraints();
 
         // Same categories and order as the Campaign Options AutoLogistics grid.
         String[] keys = {
@@ -212,11 +214,11 @@ public class SparesAndFinancesTab {
             JLabel label = new CommandGenerationLabel(key);
             label.setLabelFor(spinner);
 
-            gbc.gridy = row;
-            gbc.gridx = 0;
-            section.add(label, gbc);
-            gbc.gridx = 1;
-            section.add(spinner, gbc);
+            constraints.gridy = row;
+            constraints.gridx = 0;
+            section.add(label, constraints);
+            constraints.gridx = 1;
+            section.add(spinner, constraints);
             row++;
         }
 
@@ -227,14 +229,14 @@ public class SparesAndFinancesTab {
         CommandGenerationStandardPanel section = new CommandGenerationStandardPanel(
               "SparesHelp", true, "SparesHelp");
         section.setLayout(new GridBagLayout());
-        GridBagConstraints gbc = sectionConstraints();
-        gbc.gridy = 0;
-        gbc.gridwidth = 2;
-        gbc.fill = GridBagConstraints.HORIZONTAL;
+        GridBagConstraints constraints = sectionConstraints();
+        constraints.gridy = 0;
+        constraints.gridwidth = 2;
+        constraints.fill = GridBagConstraints.HORIZONTAL;
         // The bundle text carries a fixed HTML body width so the label wraps; an unconstrained HTML
         // JLabel reports its whole text as one line of preferred width, which inflated this column
         // until the finances column was pushed off-screen.
-        section.add(new CommandGenerationLabel("SparesHelpBody", true), gbc);
+        section.add(new CommandGenerationLabel("SparesHelpBody", true), constraints);
         return section;
     }
 
@@ -246,17 +248,17 @@ public class SparesAndFinancesTab {
         CommandGenerationStandardPanel section = new CommandGenerationStandardPanel(
               "Contracts", true, "Contracts");
         section.setLayout(new GridBagLayout());
-        GridBagConstraints gbc = sectionConstraints();
+        GridBagConstraints constraints = sectionConstraints();
 
         chkSelectStartingContract = new CommandGenerationCheckBox("SelectStartingContract");
         chkStartCourseToContractPlanet = new CommandGenerationCheckBox("StartCourseToContractPlanet");
         chkSelectStartingContract.addActionListener(evt ->
               chkStartCourseToContractPlanet.setEnabled(chkSelectStartingContract.isSelected()));
 
-        gbc.gridy = 0;
-        section.add(chkSelectStartingContract, gbc);
-        gbc.gridy = 1;
-        section.add(chkStartCourseToContractPlanet, gbc);
+        constraints.gridy = 0;
+        section.add(chkSelectStartingContract, constraints);
+        constraints.gridy = 1;
+        section.add(chkStartCourseToContractPlanet, constraints);
 
         return section;
     }
@@ -265,7 +267,7 @@ public class SparesAndFinancesTab {
         CommandGenerationStandardPanel section = new CommandGenerationStandardPanel(
               "Finances", true, "Finances");
         section.setLayout(new GridBagLayout());
-        GridBagConstraints gbc = sectionConstraints();
+        GridBagConstraints constraints = sectionConstraints();
 
         chkProcessFinances = new CommandGenerationCheckBox("ProcessFinances");
         spnStartingCashPercent = new JSpinner(new SpinnerNumberModel(10, 0, 1000, 1));
@@ -287,49 +289,49 @@ public class SparesAndFinancesTab {
         spnStartingCashPercent.addChangeListener(evt -> refreshStartingCashPreview());
 
         int row = 0;
-        gbc.gridy = row++;
-        gbc.gridwidth = 2;
-        section.add(chkProcessFinances, gbc);
+        constraints.gridy = row++;
+        constraints.gridwidth = 2;
+        section.add(chkProcessFinances, constraints);
 
-        gbc.gridwidth = 1;
-        gbc.gridy = row;
-        gbc.gridx = 0;
-        section.add(new CommandGenerationLabel("StartingCashPercent"), gbc);
-        gbc.gridx = 1;
-        section.add(spnStartingCashPercent, gbc);
+        constraints.gridwidth = 1;
+        constraints.gridy = row;
+        constraints.gridx = 0;
+        section.add(new CommandGenerationLabel("StartingCashPercent"), constraints);
+        constraints.gridx = 1;
+        section.add(spnStartingCashPercent, constraints);
         row++;
 
-        gbc.gridy = row;
-        gbc.gridx = 0;
-        section.add(new CommandGenerationLabel("StartingCashPreview"), gbc);
-        gbc.gridx = 1;
-        section.add(lblStartingCashPreviewValue, gbc);
+        constraints.gridy = row;
+        constraints.gridx = 0;
+        section.add(new CommandGenerationLabel("StartingCashPreview"), constraints);
+        constraints.gridx = 1;
+        section.add(lblStartingCashPreviewValue, constraints);
         row++;
 
-        gbc.gridy = row++;
-        gbc.gridx = 0;
-        gbc.gridwidth = 2;
-        section.add(chkRandomizeStartingCash, gbc);
+        constraints.gridy = row++;
+        constraints.gridx = 0;
+        constraints.gridwidth = 2;
+        section.add(chkRandomizeStartingCash, constraints);
 
-        gbc.gridwidth = 1;
-        gbc.gridy = row;
-        gbc.gridx = 0;
-        section.add(new CommandGenerationLabel("RandomStartingCashDiceCount"), gbc);
-        gbc.gridx = 1;
-        section.add(spnRandomStartingCashDiceCount, gbc);
+        constraints.gridwidth = 1;
+        constraints.gridy = row;
+        constraints.gridx = 0;
+        section.add(new CommandGenerationLabel("RandomStartingCashDiceCount"), constraints);
+        constraints.gridx = 1;
+        section.add(spnRandomStartingCashDiceCount, constraints);
         row++;
 
-        gbc.gridy = row;
-        gbc.gridx = 0;
-        section.add(new CommandGenerationLabel("MinimumStartingFloat"), gbc);
-        gbc.gridx = 1;
-        section.add(spnMinimumStartingFloat, gbc);
+        constraints.gridy = row;
+        constraints.gridx = 0;
+        section.add(new CommandGenerationLabel("MinimumStartingFloat"), constraints);
+        constraints.gridx = 1;
+        section.add(spnMinimumStartingFloat, constraints);
         row++;
 
-        gbc.gridy = row++;
-        gbc.gridx = 0;
-        gbc.gridwidth = 2;
-        section.add(chkStartingLoan, gbc);
+        constraints.gridy = row++;
+        constraints.gridx = 0;
+        constraints.gridwidth = 2;
+        section.add(chkStartingLoan, constraints);
 
         // Pay For sub-section: PayForSetup is the master gate; the rest pick which generation costs
         // are debited from the starting cash.
@@ -338,10 +340,10 @@ public class SparesAndFinancesTab {
         for (String payForName : payForNames) {
             CommandGenerationCheckBox chk = new CommandGenerationCheckBox(payForName);
             payForToggles.put(payForName, chk);
-            gbc.gridy = row++;
-            gbc.gridx = 0;
-            gbc.gridwidth = 2;
-            section.add(chk, gbc);
+            constraints.gridy = row++;
+            constraints.gridx = 0;
+            constraints.gridwidth = 2;
+            section.add(chk, constraints);
         }
         payForToggles.get("PayForSetup").addActionListener(evt -> refreshFinanceEnablement());
 
@@ -401,7 +403,7 @@ public class SparesAndFinancesTab {
         CommandGenerationStandardPanel section = new CommandGenerationStandardPanel(
               "StartingSimulation", true, "StartingSimulation");
         section.setLayout(new GridBagLayout());
-        GridBagConstraints gbc = sectionConstraints();
+        GridBagConstraints constraints = sectionConstraints();
 
         chkRunStartingSimulation = new CommandGenerationCheckBox("RunStartingSimulation");
         spnSimulationDuration = new JSpinner(new SpinnerNumberModel(12, 1, 600, 1));
@@ -417,25 +419,25 @@ public class SparesAndFinancesTab {
         });
 
         int row = 0;
-        gbc.gridy = row++;
-        gbc.gridwidth = 2;
-        section.add(chkRunStartingSimulation, gbc);
+        constraints.gridy = row++;
+        constraints.gridwidth = 2;
+        section.add(chkRunStartingSimulation, constraints);
 
-        gbc.gridwidth = 1;
-        gbc.gridy = row;
-        gbc.gridx = 0;
-        section.add(new CommandGenerationLabel("SimulationDuration"), gbc);
-        gbc.gridx = 1;
-        section.add(spnSimulationDuration, gbc);
+        constraints.gridwidth = 1;
+        constraints.gridy = row;
+        constraints.gridx = 0;
+        section.add(new CommandGenerationLabel("SimulationDuration"), constraints);
+        constraints.gridx = 1;
+        section.add(spnSimulationDuration, constraints);
         row++;
 
-        gbc.gridy = row++;
-        gbc.gridx = 0;
-        gbc.gridwidth = 2;
-        section.add(chkSimulateRandomMarriages, gbc);
+        constraints.gridy = row++;
+        constraints.gridx = 0;
+        constraints.gridwidth = 2;
+        section.add(chkSimulateRandomMarriages, constraints);
 
-        gbc.gridy = row;
-        section.add(chkSimulateRandomProcreation, gbc);
+        constraints.gridy = row;
+        section.add(chkSimulateRandomProcreation, constraints);
 
         return section;
     }
@@ -443,14 +445,15 @@ public class SparesAndFinancesTab {
     // endregion Finances column
 
     private static GridBagConstraints sectionConstraints() {
-        GridBagConstraints gbc = new GridBagConstraints();
-        gbc.gridx = 0;
-        gbc.gridy = 0;
-        gbc.gridwidth = 1;
-        gbc.anchor = GridBagConstraints.WEST;
-        gbc.fill = GridBagConstraints.HORIZONTAL;
-        gbc.insets = new Insets(3, 6, 3, 6);
-        return gbc;
+        GridBagConstraints constraints = new GridBagConstraints();
+        constraints.gridx = 0;
+        constraints.gridy = 0;
+        constraints.gridwidth = 1;
+        constraints.anchor = GridBagConstraints.WEST;
+        constraints.fill = GridBagConstraints.HORIZONTAL;
+        constraints.insets = new Insets(UIUtil.scaleForGUI(3), UIUtil.scaleForGUI(6),
+              UIUtil.scaleForGUI(3), UIUtil.scaleForGUI(6));
+        return constraints;
     }
 
     /**

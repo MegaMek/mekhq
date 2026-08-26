@@ -261,8 +261,8 @@ public final class FormationIconBuilder {
                 default -> appendSingle(icon, stratOps,
                       MHQConstants.LAYERED_FORCE_ICON_BATTLEMEK_CENTER_FILENAME);
             }
-        } catch (Exception ex) {
-            LOGGER.error(ex, "[CompanyGen][Icons] cannot resolve TYPE for '{}' (dominantType={}); falling back to BattleMek (Center)",
+        } catch (Exception exception) {
+            LOGGER.error(exception, "[CompanyGen][Icons] cannot resolve TYPE for '{}' (dominantType={}); falling back to BattleMek (Center)",
                   formation.getName(), dominantType);
             icon.getPieces().get(LayeredFormationIconLayer.TYPE).clear();
             // Add the BattleMek (Center) fallback directly without going through appendSingle's
