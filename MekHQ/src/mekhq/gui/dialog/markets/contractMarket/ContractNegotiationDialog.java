@@ -863,8 +863,10 @@ public class ContractNegotiationDialog extends JDialog {
     private void commitTermsAndPay() {
         contract.setContractTerms(new ContractTermsData(step(Clause.PAY), step(Clause.SUPPORT), step(Clause.TRANSPORT),
               step(Clause.SALVAGE), step(Clause.COMMAND)));
-        ChaosContractDeterminationPay payScheme = new ChaosContractDeterminationPay();
+        mekhq.campaign.mission.contract.contractGeneration.AbstractContractDeterminationPay payScheme =
+              mekhq.campaign.mission.contract.contractGeneration.AbstractContractDeterminationPay.forCampaign(campaign);
         contract.updateMonthlyPay(payScheme.getMonthlyPay(campaign, contract));
+        contract.updateCombatPay(payScheme.getCombatPay(campaign, contract));
         contract.updateTransportPay(payScheme.getTransportPay(campaign,
               campaign.getLocalDate(), contract, currentLocation));
     }
