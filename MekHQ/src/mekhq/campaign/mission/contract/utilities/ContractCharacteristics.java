@@ -291,22 +291,36 @@ public final class ContractCharacteristics {
     }
 
     /**
-     * The multiplier to apply to a unit-reputation change from this contract. The unit-reputation characteristics
-     * ({@link ContractCharacteristic#HIGH_PROFILE} / {@link ContractCharacteristic#CAREER_MAKER} double the reward,
-     * {@link ContractCharacteristic#MEDIA_BLACKOUT} / {@link ContractCharacteristic#THANKLESS} remove it) act only on
-     * the reward for a successful contract; a breach penalty is never scaled.
+     * The multiplier to apply to a unit-reputation change from this contract, given how the contract ended.
      *
-     * @param success whether the contract was a success - the multiplier only applies when it was
+     * <ul>
+     *     <li>A <b>breach</b> penalty is never scaled by a reputation characteristic.</li>
+     *     <li>A <b>success</b> reputation gain is scaled by all four characteristics
+     *         ({@link ContractCharacteristic#HIGH_PROFILE} / {@link ContractCharacteristic#CAREER_MAKER} double it,
+     *         {@link ContractCharacteristic#MEDIA_BLACKOUT} / {@link ContractCharacteristic#THANKLESS} remove it).</li>
+     *     <li>A <b>non-breach loss</b> (a failed contract, only meaningful when the Hinterlands failure-loss option is
+     *         on) is scaled only by the "gains and losses" pair - {@link ContractCharacteristic#HIGH_PROFILE} and
+     *         {@link ContractCharacteristic#MEDIA_BLACKOUT}. The "gains only" pair
+     *         ({@link ContractCharacteristic#CAREER_MAKER} / {@link ContractCharacteristic#THANKLESS}) leaves it
+     *         alone.</li>
+     * </ul>
      *
-     * @return the multiplier, or {@code 1.0} when no unit-reputation characteristic applies or the contract was not a
-     *       success
+     * @return the multiplier, or {@code 1.0} when no unit-reputation characteristic applies to this outcome
      */
-    public static double getUnitReputationMultiplier(final AbstractContract contract, final boolean success) {
-        if (!success) {
+    public static double getUnitReputationMultiplier(final AbstractContract contract, final MissionStatus status) {
+        final ContractCharacteristic characteristic = contract.getCharacteristic(Category.UNIT_REPUTATION);
+        if (characteristic == null) {
             return 1.0;
         }
-        final ContractCharacteristic characteristic = contract.getCharacteristic(Category.UNIT_REPUTATION);
-        return (characteristic == null) ? 1.0 : characteristic.getMagnitude();
+        if (status.isBreach()) {
+            return 1.0;
+        }
+        if (status.isOverallSuccess()) {
+            return characteristic.getMagnitude();
+        }
+        final boolean scalesLosses = (characteristic == ContractCharacteristic.HIGH_PROFILE)
+                                           || (characteristic == ContractCharacteristic.MEDIA_BLACKOUT);
+        return scalesLosses ? characteristic.getMagnitude() : 1.0;
     }
 
     /**

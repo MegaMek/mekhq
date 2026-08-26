@@ -860,7 +860,7 @@ public final class BriefingTab extends CampaignGuiTab {
                                            .getHumanResources()
                                            .getPersonnelFilteringOutDepartedAndAbsent();
             ChaosReputation.processContractCompletion(getCampaign(), status, personnel,
-                  ContractCharacteristics.getUnitReputationMultiplier(mission, status.isOverallSuccess()));
+                  ContractCharacteristics.getUnitReputationMultiplier(mission, status));
 
             if (mission.getEmployerFactionCode() == PIRATE_FACTION_CODE) {
                 ChaosReputation.resolveActOfPiracy(getCampaign(),

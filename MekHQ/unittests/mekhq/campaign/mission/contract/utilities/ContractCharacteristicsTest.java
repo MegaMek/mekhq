@@ -223,24 +223,49 @@ class ContractCharacteristicsTest {
     // region reputation / standing multipliers
 
     @Test
-    void unitReputationMultiplierAppliesOnlyOnSuccess() {
-        AbstractContract highProfile = contractWith(HIGH_PROFILE);
+    void unitReputationMultiplierScalesTheSuccessGainForAllFour() {
         assertEquals(HIGH_PROFILE.getMagnitude(),
-              ContractCharacteristics.getUnitReputationMultiplier(highProfile, true));
-        assertEquals(1.0, ContractCharacteristics.getUnitReputationMultiplier(highProfile, false),
-              "a breach / failure reputation change is never scaled");
+              ContractCharacteristics.getUnitReputationMultiplier(contractWith(HIGH_PROFILE), MissionStatus.SUCCESS));
+        assertEquals(CAREER_MAKER.getMagnitude(),
+              ContractCharacteristics.getUnitReputationMultiplier(contractWith(CAREER_MAKER), MissionStatus.SUCCESS));
+        assertEquals(MEDIA_BLACKOUT.getMagnitude(),
+              ContractCharacteristics.getUnitReputationMultiplier(contractWith(MEDIA_BLACKOUT), MissionStatus.SUCCESS));
+        assertEquals(THANKLESS.getMagnitude(),
+              ContractCharacteristics.getUnitReputationMultiplier(contractWith(THANKLESS), MissionStatus.SUCCESS));
     }
 
     @Test
-    void mediaBlackoutZeroesTheSuccessReputationGain() {
-        assertEquals(0.0,
-              ContractCharacteristics.getUnitReputationMultiplier(contractWith(MEDIA_BLACKOUT), true));
+    void unitReputationMultiplierNeverScalesABreach() {
+        for (ContractCharacteristic characteristic : new ContractCharacteristic[] { HIGH_PROFILE, CAREER_MAKER,
+                                                                                    MEDIA_BLACKOUT, THANKLESS }) {
+            assertEquals(1.0,
+                  ContractCharacteristics.getUnitReputationMultiplier(contractWith(characteristic),
+                        MissionStatus.BREACH),
+                  "a breach must never be scaled: " + characteristic);
+        }
+    }
+
+    @Test
+    void onlyHighProfileAndMediaBlackoutScaleANonBreachLoss() {
+        // The "gains and losses" pair scales a failed (non-breach) contract...
+        assertEquals(HIGH_PROFILE.getMagnitude(),
+              ContractCharacteristics.getUnitReputationMultiplier(contractWith(HIGH_PROFILE), MissionStatus.FAILED));
+        assertEquals(MEDIA_BLACKOUT.getMagnitude(),
+              ContractCharacteristics.getUnitReputationMultiplier(contractWith(MEDIA_BLACKOUT), MissionStatus.FAILED));
+        // ...while the "gains only" pair leaves it alone.
+        assertEquals(1.0,
+              ContractCharacteristics.getUnitReputationMultiplier(contractWith(CAREER_MAKER), MissionStatus.FAILED));
+        assertEquals(1.0,
+              ContractCharacteristics.getUnitReputationMultiplier(contractWith(THANKLESS), MissionStatus.FAILED));
     }
 
     @Test
     void unitReputationMultiplierIsNeutralWithoutAReputationCharacteristic() {
-        assertEquals(1.0, ContractCharacteristics.getUnitReputationMultiplier(contractWith(), true));
-        assertEquals(1.0, ContractCharacteristics.getUnitReputationMultiplier(contractWith(HIGH_PAY), true));
+        for (MissionStatus status : new MissionStatus[] { MissionStatus.SUCCESS, MissionStatus.FAILED,
+                                                          MissionStatus.BREACH }) {
+            assertEquals(1.0, ContractCharacteristics.getUnitReputationMultiplier(contractWith(), status));
+            assertEquals(1.0, ContractCharacteristics.getUnitReputationMultiplier(contractWith(HIGH_PAY), status));
+        }
     }
 
     @Test
