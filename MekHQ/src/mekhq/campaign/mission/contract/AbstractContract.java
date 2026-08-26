@@ -105,6 +105,7 @@ public abstract class AbstractContract {
 
     private RentedFacilitiesData rentedFacilitiesData;
     private NonNegotiableTermsData nonNegotiableTermsData;
+    private ActiveNegotiationData activeNegotiationData;
     /**
      * Seeded with neutral morale so a freshly-constructed contract is always well-formed: generation performs its first
      * morale check (which reads the current level as its baseline) before any morale data is assigned.
@@ -389,6 +390,14 @@ public abstract class AbstractContract {
 
     public void setNonNegotiableTermsData(NonNegotiableTermsData nonNegotiableTermsData) {
         this.nonNegotiableTermsData = nonNegotiableTermsData;
+    }
+
+    public @Nullable ActiveNegotiationData getActiveNegotiationData() {
+        return activeNegotiationData;
+    }
+
+    public void setActiveNegotiationData(ActiveNegotiationData activeNegotiationData) {
+        this.activeNegotiationData = activeNegotiationData;
     }
 
     public @Nonnull MoraleData getMoraleData() {

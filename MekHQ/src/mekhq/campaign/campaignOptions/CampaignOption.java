@@ -773,6 +773,8 @@ public final class CampaignOption<T> {
           of(Boolean.class, true, "useIntelObfuscation");
     public static final CampaignOption<Boolean> USE_NON_NEGOTIABLE_TERMS =
           of(Boolean.class, true, "useNonNegotiableTerms");
+    public static final CampaignOption<Boolean> USE_ACTIVE_NEGOTIATORS =
+          of(Boolean.class, true, "useActiveNegotiators");
     public static final CampaignOption<Double> CONTRACT_BASE_PAY_MULTIPLIER =
           of(Double.class, 1.0, "contractBasePayMultiplier");
     public static final CampaignOption<Double> CONTRACT_STRAIGHT_SUPPORT_MULTIPLIER =

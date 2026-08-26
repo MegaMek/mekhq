@@ -66,4 +66,22 @@ public record NonNegotiableTermsData(boolean payLocked, boolean supportLocked, b
     public boolean anyLocked() {
         return payLocked || supportLocked || transportLocked || salvageLocked || commandLocked;
     }
+
+    /** A copy with the given term's lock cleared. */
+    public NonNegotiableTermsData withUnlocked(Term term) {
+        return new NonNegotiableTermsData(payLocked && term != Term.BASE_PAY,
+              supportLocked && term != Term.SUPPORT,
+              transportLocked && term != Term.TRANSPORT,
+              salvageLocked && term != Term.SALVAGE,
+              commandLocked && term != Term.COMMAND_RIGHTS);
+    }
+
+    /** A copy with the given term locked. */
+    public NonNegotiableTermsData withLocked(Term term) {
+        return new NonNegotiableTermsData(payLocked || term == Term.BASE_PAY,
+              supportLocked || term == Term.SUPPORT,
+              transportLocked || term == Term.TRANSPORT,
+              salvageLocked || term == Term.SALVAGE,
+              commandLocked || term == Term.COMMAND_RIGHTS);
+    }
 }
