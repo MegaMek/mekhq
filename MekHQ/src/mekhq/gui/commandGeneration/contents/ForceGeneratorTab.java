@@ -126,7 +126,8 @@ public class ForceGeneratorTab {
         viewUi.setFormationNameProvider(this::previewNameFor);
         // The chosen-units table below the controls is a Random Army concept - it collects units to add to a running
         // game - and the Command Designer never reads it, committing the preview tree instead. That inert panel
-        // holds the formation mix editor here, so the mix is always on screen rather than behind a dialog.
+        // holds the formation mix editor here, so once a force has been generated the mix is on screen rather
+        // than behind a dialog.
         viewUi.setFormationMixEditorVisible(true);
 
         ForceGeneratorOptionsView optionsView = viewUi.getOptionsView();
