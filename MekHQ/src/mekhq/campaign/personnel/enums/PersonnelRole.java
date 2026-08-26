@@ -1473,7 +1473,7 @@ public enum PersonnelRole {
 
         // Parse from name
         try {
-            return PersonnelRole.valueOf(text.toUpperCase().replace(" ", "_"));
+            return migrateDeprecatedRole(PersonnelRole.valueOf(text.toUpperCase().replace(" ", "_")));
         } catch (Exception ignored) {
         }
 
@@ -1481,11 +1481,11 @@ public enum PersonnelRole {
         try {
             for (PersonnelRole personnelRole : PersonnelRole.values()) {
                 if (personnelRole.getLabel(false).equalsIgnoreCase(text)) {
-                    return personnelRole;
+                    return migrateDeprecatedRole(personnelRole);
                 }
 
                 if (personnelRole.getLabel(true).equalsIgnoreCase(text)) {
-                    return personnelRole;
+                    return migrateDeprecatedRole(personnelRole);
                 }
             }
         } catch (Exception ignored) {
@@ -1493,12 +1493,34 @@ public enum PersonnelRole {
 
         // Parse from ordinal
         try {
-            return PersonnelRole.values()[MathUtility.parseInt(text, NONE.ordinal())];
+            return migrateDeprecatedRole(PersonnelRole.values()[MathUtility.parseInt(text, NONE.ordinal())]);
         } catch (Exception ignored) {
         }
 
         logger.error("Unable to parse {} into a PersonnelRole. Returning NONE", text);
         return NONE;
+    }
+
+    /**
+     * Migrates a parsed role to its current equivalent when the original role has since been deprecated.
+     *
+     * <p>The Administrator specializations (Command, Logistics, Transport, and HR) were deprecated in 0.51.01 and
+     * consolidated into the single {@link #ADMINISTRATOR} role. Any character loading with one of these roles is
+     * automatically reassigned to {@link #ADMINISTRATOR}.</p>
+     *
+     * @param role the freshly parsed role
+     *
+     * @return the role the character should actually be assigned
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    private static PersonnelRole migrateDeprecatedRole(final PersonnelRole role) {
+        return switch (role) {
+            case ADMINISTRATOR_COMMAND, ADMINISTRATOR_LOGISTICS, ADMINISTRATOR_TRANSPORT, ADMINISTRATOR_HR ->
+                  ADMINISTRATOR;
+            default -> role;
+        };
     }
     // endregion File I/O
 
