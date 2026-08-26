@@ -82,7 +82,7 @@ import mekhq.campaign.mission.contract.contractData.NegotiationStepMath;
 import mekhq.campaign.mission.contract.contractData.NegotiationStepMath.Term;
 import mekhq.campaign.mission.contract.contractData.NonNegotiableTermsData;
 import mekhq.campaign.mission.contract.contractData.RentedFacilitiesData;
-import mekhq.campaign.mission.contract.contractGeneration.ChaosContractDeterminationPay;
+import mekhq.campaign.mission.contract.contractGeneration.AbstractContractDeterminationPay;
 import mekhq.campaign.mission.contract.contractGeneration.negotiationsAndNPCs.TermFunding;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.skills.ActionCheckResult;
@@ -823,7 +823,7 @@ public class ContractNegotiationDialog extends JDialog {
     private void commitTermsAndPay() {
         contract.setContractTerms(new ContractTermsData(step(Clause.PAY), step(Clause.SUPPORT), step(Clause.TRANSPORT),
               step(Clause.SALVAGE), step(Clause.COMMAND)));
-        ChaosContractDeterminationPay payScheme = new ChaosContractDeterminationPay();
+        AbstractContractDeterminationPay payScheme = AbstractContractDeterminationPay.forCampaign(campaign);
         contract.updateMonthlyPay(payScheme.getMonthlyPay(campaign, contract));
         contract.updateTransportPay(payScheme.getTransportPay(campaign,
               campaign.getLocalDate(), contract, currentLocation));
