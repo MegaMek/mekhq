@@ -1157,7 +1157,8 @@ public class ContractEditorDialog extends JDialog {
                                                      :
                                                      intValue(combatElementsSpinner));
             contract.setTrackCount(trackCountAutomatic.isSelected()
-                                         ? AbstractContractGeneration.determineTrackCount(contract)
+                                         ? ContractCharacteristics.bakeTrackCount(
+                  AbstractContractGeneration.determineTrackCount(contract), contract)
                                          : intValue(trackCountSpinner));
             contract.setRequiredVictoryPoints(victoryPointsAutomatic.isSelected()
                                                     ? ContractCharacteristics.bakeRequiredVictoryPoints(

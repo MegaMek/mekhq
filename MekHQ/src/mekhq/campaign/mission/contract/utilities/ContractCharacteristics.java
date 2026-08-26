@@ -190,6 +190,7 @@ public final class ContractCharacteristics {
                 case COMBAT_PAY -> applyCombatPayMultiplier(contract, characteristic.getMagnitude());
                 case LENGTH -> applyLengthMultiplier(contract, characteristic.getMagnitude());
                 case OBJECTIVES -> applyObjectiveStep(contract, (int) Math.round(characteristic.getMagnitude()));
+                case INTENSITY -> applyTrackStep(contract, (int) Math.round(characteristic.getMagnitude()));
                 case NEGOTIATOR -> applyNegotiatorTier(contract, campaign);
                 default -> {
                     // COMPLETION_PAYMENT, UNIT_REPUTATION, EMPLOYER_STANDING and ENEMY_STANDING are applied at their
@@ -241,6 +242,10 @@ public final class ContractCharacteristics {
 
     private static void applyObjectiveStep(final AbstractContract contract, final int delta) {
         contract.setRequiredVictoryPoints(Math.max(1, contract.getRequiredVictoryPoints() + delta));
+    }
+
+    private static void applyTrackStep(final AbstractContract contract, final int delta) {
+        contract.setTrackCount(Math.max(1, contract.getTrackCount() + delta));
     }
 
     // endregion Roll & generation-time application
@@ -394,6 +399,17 @@ public final class ContractCharacteristics {
      */
     public static int bakeRequiredVictoryPoints(final int base, final AbstractContract contract) {
         final ContractCharacteristic characteristic = contract.getCharacteristic(Category.OBJECTIVES);
+        return (characteristic == null) ? base : Math.max(1, base + (int) Math.round(characteristic.getMagnitude()));
+    }
+
+    /**
+     * Applies the intensity characteristic ({@link Category#INTENSITY}) to a freshly-computed track count. As
+     * {@link #bakeMonthlyPay}, for use when the track count is on "Automatic".
+     *
+     * @return {@code base} stepped by the intensity characteristic (never below 1), or {@code base} if there is none
+     */
+    public static int bakeTrackCount(final int base, final AbstractContract contract) {
+        final ContractCharacteristic characteristic = contract.getCharacteristic(Category.INTENSITY);
         return (characteristic == null) ? base : Math.max(1, base + (int) Math.round(characteristic.getMagnitude()));
     }
 

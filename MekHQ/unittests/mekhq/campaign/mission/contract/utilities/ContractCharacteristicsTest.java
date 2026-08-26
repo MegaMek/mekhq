@@ -218,6 +218,27 @@ class ContractCharacteristicsTest {
         assertEquals(6, ContractCharacteristics.bakeLength(6, contractWith(HIGH_PAY)));
     }
 
+    @Test
+    void bakeTrackCountStepsByTheIntensityCharacteristic() {
+        int base = 3;
+        assertEquals(Math.max(1, base + (int) Math.round(HIGH_INTENSITY.getMagnitude())),
+              ContractCharacteristics.bakeTrackCount(base, contractWith(HIGH_INTENSITY)));
+        assertEquals(Math.max(1, base + (int) Math.round(LOW_INTENSITY.getMagnitude())),
+              ContractCharacteristics.bakeTrackCount(base, contractWith(LOW_INTENSITY)));
+    }
+
+    @Test
+    void bakeTrackCountNeverDropsBelowOne() {
+        // LOW_INTENSITY lowers the track count; from a base of 1 it must clamp at 1.
+        assertEquals(1, ContractCharacteristics.bakeTrackCount(1, contractWith(LOW_INTENSITY)));
+    }
+
+    @Test
+    void bakeTrackCountLeavesCountUnchangedWithoutAnIntensityCharacteristic() {
+        assertEquals(3, ContractCharacteristics.bakeTrackCount(3, contractWith()));
+        assertEquals(3, ContractCharacteristics.bakeTrackCount(3, contractWith(HIGH_PAY)));
+    }
+
     // endregion generation-time bakes
 
     // region reputation / standing multipliers

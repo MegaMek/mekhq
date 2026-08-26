@@ -72,6 +72,10 @@ public enum ContractCharacteristic {
     LENIENT(Category.OBJECTIVES, Polarity.BENEFICIAL, 10, -1.0),
     /** The contract runs longer than the rolled length. */
     LENGTHY(Category.LENGTH, Polarity.NEUTRAL, 10, 1.5),
+    /** The contract has one fewer track, to a minimum of one. */
+    LOW_INTENSITY(Category.INTENSITY, Polarity.NEUTRAL, 10, -1.0),
+    /** The contract has one more track. */
+    HIGH_INTENSITY(Category.INTENSITY, Polarity.NEUTRAL, 10, 1.0),
     /** No reputation is gained on success (a breach is unaffected). */
     MEDIA_BLACKOUT(Category.UNIT_REPUTATION, Polarity.ADVERSE, 6, 0.0),
     /** The enemy negotiator is only Regular rather than the usual Veteran, making negotiation easier for the player. */
@@ -177,6 +181,8 @@ public enum ContractCharacteristic {
         LENGTH,
         /** Adjusts required victory points at generation (a signed step). */
         OBJECTIVES,
+        /** Adjusts the contract's track count at generation (a signed step, floored at one). */
+        INTENSITY,
         /** Scales the unit reputation change at completion (a multiplier). */
         UNIT_REPUTATION,
         /** Scales the employer faction-standing change at completion (a multiplier). */
