@@ -50,8 +50,6 @@ import static mekhq.utilities.MHQInternationalization.getTextAt;
  * likelihood of the characteristic being chosen when one from its category is rolled.</p>
  */
 public enum ContractCharacteristic {
-    /** The enemy faction-standing loss for taking this contract is amplified. */
-    ITS_PERSONAL(Category.ENEMY_STANDING, Polarity.ADVERSE, 6, 1.5),
     /** The reputation gain on success is doubled (a breach is unaffected). */
     CAREER_MAKER(Category.UNIT_REPUTATION, Polarity.BENEFICIAL, 6, 2.0),
     /** On successful completion, a lump equal to 5% of total pay is credited as a bonus on top of the contract. */
@@ -62,38 +60,40 @@ public enum ContractCharacteristic {
     DEMANDING(Category.OBJECTIVES, Polarity.ADVERSE, 10, 1.0),
     /** The enemy negotiator is Elite rather than the usual Veteran. */
     ELITE_NEGOTIATOR(Category.NEGOTIATOR, Polarity.ADVERSE, 6, 1.0),
-    /** The employer faction-standing change is amplified. */
-    MONITORED(Category.EMPLOYER_STANDING, Polarity.BENEFICIAL, 6, 1.5),
     /** Combat pay is boosted by 5%. */
     HAZARD_PAY(Category.COMBAT_PAY, Polarity.BENEFICIAL, 10, 1.05),
-    /** The reputation gain on success is doubled (a breach is unaffected). */
-    HIGH_PROFILE(Category.UNIT_REPUTATION, Polarity.BENEFICIAL, 6, 2.0),
-    /** Required victory points are lowered, so the contract is easier to fulfill. */
-    LENIENT(Category.OBJECTIVES, Polarity.BENEFICIAL, 10, -1.0),
-    /** The contract runs longer than the rolled length. */
-    LENGTHY(Category.LENGTH, Polarity.NEUTRAL, 10, 1.5),
-    /** The contract has one fewer track, to a minimum of one. */
-    LOW_INTENSITY(Category.INTENSITY, Polarity.NEUTRAL, 10, -1.0),
     /** The contract has one more track. */
     HIGH_INTENSITY(Category.INTENSITY, Polarity.NEUTRAL, 10, 1.0),
-    /** No reputation is gained on success (a breach is unaffected). */
-    MEDIA_BLACKOUT(Category.UNIT_REPUTATION, Polarity.ADVERSE, 6, 0.0),
-    /** The enemy negotiator is only Regular rather than the usual Veteran, making negotiation easier for the player. */
-    NOVICE_NEGOTIATOR(Category.NEGOTIATOR, Polarity.BENEFICIAL, 6, -1.0),
-    /** The employer faction-standing change is amplified against you on failure. */
-    UNMONITORED(Category.EMPLOYER_STANDING, Polarity.ADVERSE, 6, 0.5),
     /** Monthly pay is boosted by 25%. */
     HIGH_PAY(Category.PAY, Polarity.BENEFICIAL, 3, 1.25),
-    /** Monthly pay is reduced by 25%. */
-    LOW_PAY(Category.PAY, Polarity.ADVERSE, 3, 0.75),
+    /** The reputation gain on success is doubled (a breach is unaffected). */
+    HIGH_PROFILE(Category.UNIT_REPUTATION, Polarity.NEUTRAL, 6, 2.0),
+    /** The enemy faction-standing loss for taking this contract is amplified. */
+    ITS_PERSONAL(Category.ENEMY_STANDING, Polarity.ADVERSE, 6, 1.5),
     /** The enemy faction-standing loss for taking this contract is reduced. */
     JUST_BUSINESS(Category.ENEMY_STANDING, Polarity.BENEFICIAL, 6, 0.5),
+    /** The contract runs longer than the rolled length. */
+    LENGTHY(Category.LENGTH, Polarity.NEUTRAL, 10, 1.5),
+    /** Required victory points are lowered, so the contract is easier to fulfill. */
+    LENIENT(Category.OBJECTIVES, Polarity.BENEFICIAL, 10, -1.0),
+    /** The contract has one fewer track, to a minimum of one. */
+    LOW_INTENSITY(Category.INTENSITY, Polarity.NEUTRAL, 10, -1.0),
+    /** Monthly pay is reduced by 25%. */
+    LOW_PAY(Category.PAY, Polarity.ADVERSE, 3, 0.75),
+    /** No reputation is gained on success (a breach is unaffected). */
+    MEDIA_BLACKOUT(Category.UNIT_REPUTATION, Polarity.NEUTRAL, 6, 0.0),
+    /** The employer faction-standing change is amplified. */
+    MONITORED(Category.EMPLOYER_STANDING, Polarity.BENEFICIAL, 6, 1.5),
+    /** The enemy negotiator is only Regular rather than the usual Veteran, making negotiation easier for the player. */
+    NOVICE_NEGOTIATOR(Category.NEGOTIATOR, Polarity.BENEFICIAL, 6, -1.0),
     /** The contract runs shorter than the rolled length. */
     QUICK(Category.LENGTH, Polarity.NEUTRAL, 10, 0.75),
     /** Total pay is unchanged, but 5% of it is paid up front on signing */
     SIGNING_BONUS(Category.PAY, Polarity.NEUTRAL, 6, 0.95),
     /** No reputation is gained on success (a breach is unaffected). */
-    THANKLESS(Category.UNIT_REPUTATION, Polarity.ADVERSE, 6, 0.0);
+    THANKLESS(Category.UNIT_REPUTATION, Polarity.ADVERSE, 6, 0.0),
+    /** The employer faction-standing change is amplified against you on failure. */
+    UNMONITORED(Category.EMPLOYER_STANDING, Polarity.ADVERSE, 6, 0.5);
 
     private final static String RESOURCE_BUNDLE = "mekhq.resources.Mission";
 
