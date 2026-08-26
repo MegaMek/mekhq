@@ -38,7 +38,9 @@ import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.ArgumentMatchers.intThat;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.mockStatic;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
@@ -47,6 +49,7 @@ import java.time.LocalDate;
 import java.util.Arrays;
 import java.util.EnumSet;
 
+import megamek.common.compute.Compute;
 import megamek.common.enums.SkillLevel;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.campaignOptions.CampaignOption;
@@ -62,6 +65,7 @@ import mekhq.campaign.mission.contract.contractData.ContractFinanceData;
 import mekhq.campaign.mission.contract.contractData.ContractScheduleData;
 import mekhq.campaign.mission.contract.contractData.MissionStatus;
 import org.junit.jupiter.api.Test;
+import org.mockito.MockedStatic;
 
 /**
  * Tests for {@link ContractCharacteristics} - the roll, the generation-time bakes, and the lifecycle-hook values (bonus
@@ -112,16 +116,24 @@ class ContractCharacteristicsTest {
     }
 
     @Test
-    void rollProducesBothEmptyAndNonEmptyResults() {
-        boolean sawEmpty = false;
-        boolean sawNonEmpty = false;
-        for (int iteration = 0; iteration < 1000 && !(sawEmpty && sawNonEmpty); iteration++) {
-            EnumSet<ContractCharacteristic> rolled = ContractCharacteristics.roll();
-            sawEmpty |= rolled.isEmpty();
-            sawNonEmpty |= !rolled.isEmpty();
+    void rollProducesAnEmptyResultOnALowCountRoll() {
+        // The count roll is Compute.randomInt(100); a roll below CHANCE_NONE (55) yields zero characteristics.
+        try (MockedStatic<Compute> compute = mockStatic(Compute.class)) {
+            compute.when(() -> Compute.randomInt(100)).thenReturn(0);
+            assertTrue(ContractCharacteristics.roll().isEmpty(), "a low count roll should produce no characteristics");
         }
-        assertTrue(sawEmpty, "never rolled an empty set in 1000 tries");
-        assertTrue(sawNonEmpty, "never rolled a non-empty set in 1000 tries");
+    }
+
+    @Test
+    void rollProducesANonEmptyResultOnAHighCountRoll() {
+        // A count roll at or above CHANCE_ONE (85) yields two characteristics; the per-category weighted picks then
+        // draw on Compute.randomInt(totalWeight), stubbed here to always take the first candidate.
+        try (MockedStatic<Compute> compute = mockStatic(Compute.class)) {
+            compute.when(() -> Compute.randomInt(100)).thenReturn(99);
+            compute.when(() -> Compute.randomInt(intThat(weight -> weight != 100))).thenReturn(0);
+            assertTrue(!ContractCharacteristics.roll().isEmpty(),
+                  "a high count roll should produce at least one characteristic");
+        }
     }
 
     @Test

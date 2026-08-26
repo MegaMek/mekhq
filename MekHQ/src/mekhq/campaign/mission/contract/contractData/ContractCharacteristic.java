@@ -66,7 +66,7 @@ public enum ContractCharacteristic {
     HIGH_INTENSITY(Category.INTENSITY, Polarity.NEUTRAL, 10, 1.0),
     /** Monthly pay is boosted by 25%. */
     HIGH_PAY(Category.PAY, Polarity.BENEFICIAL, 3, 1.25),
-    /** The reputation gain on success is doubled (a breach is unaffected). */
+    /** Reputation gains and non-breach losses from this contract are both doubled (a breach is unaffected). */
     HIGH_PROFILE(Category.UNIT_REPUTATION, Polarity.NEUTRAL, 6, 2.0),
     /** The enemy faction-standing loss for taking this contract is amplified. */
     ITS_PERSONAL(Category.ENEMY_STANDING, Polarity.ADVERSE, 6, 1.5),
@@ -80,7 +80,7 @@ public enum ContractCharacteristic {
     LOW_INTENSITY(Category.INTENSITY, Polarity.NEUTRAL, 10, -1.0),
     /** Monthly pay is reduced by 25%. */
     LOW_PAY(Category.PAY, Polarity.ADVERSE, 3, 0.75),
-    /** No reputation is gained on success (a breach is unaffected). */
+    /** No reputation is gained or lost from this contract (a breach is unaffected). */
     MEDIA_BLACKOUT(Category.UNIT_REPUTATION, Polarity.NEUTRAL, 6, 0.0),
     /** The employer faction-standing change is amplified. */
     MONITORED(Category.EMPLOYER_STANDING, Polarity.BENEFICIAL, 6, 1.5),
@@ -92,7 +92,7 @@ public enum ContractCharacteristic {
     SIGNING_BONUS(Category.PAY, Polarity.NEUTRAL, 6, 0.95),
     /** No reputation is gained on success (a breach is unaffected). */
     THANKLESS(Category.UNIT_REPUTATION, Polarity.ADVERSE, 6, 0.0),
-    /** The employer faction-standing change is amplified against you on failure. */
+    /** The employer faction-standing change from this contract is reduced. */
     UNMONITORED(Category.EMPLOYER_STANDING, Polarity.ADVERSE, 6, 0.5);
 
     private final static String RESOURCE_BUNDLE = "mekhq.resources.Mission";

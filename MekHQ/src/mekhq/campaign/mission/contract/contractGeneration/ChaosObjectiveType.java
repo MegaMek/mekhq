@@ -51,7 +51,7 @@ import megamek.logging.MMLogger;
 import mekhq.campaign.mission.contract.contractData.ContractObjectiveType;
 
 public enum ChaosObjectiveType {
-    EXPEDITION(false, 3, 1, 0, 1, 0, 0, 2, -1, true,
+    EXPEDITION(true, 3, 1, 0, 1, 0, 0, 2, -1, true,
           Collections.emptyList()),
     PIRATE_HUNT(false, 3, 1, 0, 0, 0, -1, 2, -1, true,
           List.of(END_CONTRACT_AFTER_TWO_CONSECUTIVE_TRACKS)),
