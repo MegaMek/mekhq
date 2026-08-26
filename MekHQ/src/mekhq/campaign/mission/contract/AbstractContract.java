@@ -34,6 +34,7 @@ package mekhq.campaign.mission.contract;
 
 import static mekhq.campaign.mission.contract.contractData.ContractMoraleLevel.MAXIMUM_MORALE_LEVEL;
 import static mekhq.campaign.mission.contract.contractData.ContractMoraleLevel.MINIMUM_MORALE_LEVEL;
+import static mekhq.utilities.MHQInternationalization.getTextAt;
 
 import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
@@ -676,9 +677,17 @@ public abstract class AbstractContract {
      * <p>Employer types that keep their faction's own name (system owners, planetary governments, nobles) have no tag,
      * so this returns the plain display name unchanged.</p>
      *
-     * @return the display name, with a {@code " (Tag)"} suffix when the employer type carries a market tag
+     * <p>A covert operation conceals its employing faction from the player, so this returns an "Undisclosed Employer"
+     * placeholder instead of the real name. Only the market display is hidden - {@link #getEmployerDisplayName()} still
+     * returns the true employer everywhere else.</p>
+     *
+     * @return the display name, with a {@code " (Tag)"} suffix when the employer type carries a market tag, or an
+     *       "Undisclosed Employer" placeholder for a covert operation
      */
     public String getEmployerMarketDisplayName() {
+        if (isCovert()) {
+            return getTextAt("mekhq.resources.ChaosContractMarketDialog", "value.contractMarket.employer.hidden");
+        }
         String tag = employerData.type().getMarketDisplayTag();
         String displayName = employerData.displayName();
         return (tag == null) ? displayName : displayName + " (" + tag + ')';

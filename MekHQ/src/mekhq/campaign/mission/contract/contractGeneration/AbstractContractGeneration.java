@@ -186,12 +186,15 @@ public class AbstractContractGeneration {
         contract.setContractId(contractId);
         contract.setStatus(null);
 
-        // Contract Details
+        // Contract Details.
+        String employerName = contract.isCovert()
+                                    ? contract.getEmployerMarketDisplayName()
+                                    : contract.getEmployerDisplayName();
         String contractName = getFormattedTextAt(RESOURCE_BUNDLES,
               "AbstractContractGeneration.contractName",
               contract.getStartDate(),
               contract.getObjectiveType().toString(),
-              contract.getEmployerDisplayName(),
+              employerName,
               contract.getEnemyDisplayName());
         contract.setContractName(contractName);
 
