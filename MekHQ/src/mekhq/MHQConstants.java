@@ -448,6 +448,93 @@ public final class MHQConstants extends SuiteConstants {
           "userdata/data/universe/backgrounds/randomCompanyNameGenerator/preFab.csv").toString();
     // endregion Backgrounds
 
+    // region Operation Names
+    public static final String OPERATION_NAME_DESCRIPTOR = Paths.get(
+          "data/universe/contracts/randomOperationNameGenerator/descriptor.csv").toString();
+    public static final String OPERATION_NAME_DESCRIPTOR_USER = Paths.get(
+          "userdata/data/universe/contracts/randomOperationNameGenerator/descriptor.csv").toString();
+    public static final String OPERATION_NAME_NOUN_ASSASSINATION = Paths.get(
+          "data/universe/contracts/randomOperationNameGenerator/nounAssassination.csv").toString();
+    public static final String OPERATION_NAME_NOUN_ASSASSINATION_USER = Paths.get(
+          "userdata/data/universe/contracts/randomOperationNameGenerator/nounAssassination.csv").toString();
+    public static final String OPERATION_NAME_NOUN_CADRE_DUTY = Paths.get(
+          "data/universe/contracts/randomOperationNameGenerator/nounCadreDuty.csv").toString();
+    public static final String OPERATION_NAME_NOUN_CADRE_DUTY_USER = Paths.get(
+          "userdata/data/universe/contracts/randomOperationNameGenerator/nounCadreDuty.csv").toString();
+    public static final String OPERATION_NAME_NOUN_DIVERSIONARY_RAID = Paths.get(
+          "data/universe/contracts/randomOperationNameGenerator/nounDiversionaryRaid.csv").toString();
+    public static final String OPERATION_NAME_NOUN_DIVERSIONARY_RAID_USER = Paths.get(
+          "userdata/data/universe/contracts/randomOperationNameGenerator/nounDiversionaryRaid.csv").toString();
+    public static final String OPERATION_NAME_NOUN_ESPIONAGE = Paths.get(
+          "data/universe/contracts/randomOperationNameGenerator/nounEspionage.csv").toString();
+    public static final String OPERATION_NAME_NOUN_ESPIONAGE_USER = Paths.get(
+          "userdata/data/universe/contracts/randomOperationNameGenerator/nounEspionage.csv").toString();
+    public static final String OPERATION_NAME_NOUN_EXTRACTION_RAID = Paths.get(
+          "data/universe/contracts/randomOperationNameGenerator/nounExtractionRaid.csv").toString();
+    public static final String OPERATION_NAME_NOUN_EXTRACTION_RAID_USER = Paths.get(
+          "userdata/data/universe/contracts/randomOperationNameGenerator/nounExtractionRaid.csv").toString();
+    public static final String OPERATION_NAME_NOUN_GARRISON_DUTY = Paths.get(
+          "data/universe/contracts/randomOperationNameGenerator/nounGarrisonDuty.csv").toString();
+    public static final String OPERATION_NAME_NOUN_GARRISON_DUTY_USER = Paths.get(
+          "userdata/data/universe/contracts/randomOperationNameGenerator/nounGarrisonDuty.csv").toString();
+    public static final String OPERATION_NAME_NOUN_GUERRILLA_WARFARE = Paths.get(
+          "data/universe/contracts/randomOperationNameGenerator/nounGuerrillaWarfare.csv").toString();
+    public static final String OPERATION_NAME_NOUN_GUERRILLA_WARFARE_USER = Paths.get(
+          "userdata/data/universe/contracts/randomOperationNameGenerator/nounGuerrillaWarfare.csv").toString();
+    public static final String OPERATION_NAME_NOUN_MOLE_HUNTING = Paths.get(
+          "data/universe/contracts/randomOperationNameGenerator/nounMoleHunting.csv").toString();
+    public static final String OPERATION_NAME_NOUN_MOLE_HUNTING_USER = Paths.get(
+          "userdata/data/universe/contracts/randomOperationNameGenerator/nounMoleHunting.csv").toString();
+    public static final String OPERATION_NAME_NOUN_OBJECTIVE_RAID = Paths.get(
+          "data/universe/contracts/randomOperationNameGenerator/nounObjectiveRaid.csv").toString();
+    public static final String OPERATION_NAME_NOUN_OBJECTIVE_RAID_USER = Paths.get(
+          "userdata/data/universe/contracts/randomOperationNameGenerator/nounObjectiveRaid.csv").toString();
+    public static final String OPERATION_NAME_NOUN_OBSERVATION_RAID = Paths.get(
+          "data/universe/contracts/randomOperationNameGenerator/nounObservationRaid.csv").toString();
+    public static final String OPERATION_NAME_NOUN_OBSERVATION_RAID_USER = Paths.get(
+          "userdata/data/universe/contracts/randomOperationNameGenerator/nounObservationRaid.csv").toString();
+    public static final String OPERATION_NAME_NOUN_PIRATE_HUNTING = Paths.get(
+          "data/universe/contracts/randomOperationNameGenerator/nounPirateHunting.csv").toString();
+    public static final String OPERATION_NAME_NOUN_PIRATE_HUNTING_USER = Paths.get(
+          "userdata/data/universe/contracts/randomOperationNameGenerator/nounPirateHunting.csv").toString();
+    public static final String OPERATION_NAME_NOUN_PLANETARY_ASSAULT = Paths.get(
+          "data/universe/contracts/randomOperationNameGenerator/nounPlanetaryAssault.csv").toString();
+    public static final String OPERATION_NAME_NOUN_PLANETARY_ASSAULT_USER = Paths.get(
+          "userdata/data/universe/contracts/randomOperationNameGenerator/nounPlanetaryAssault.csv").toString();
+    public static final String OPERATION_NAME_NOUN_RECON_RAID = Paths.get(
+          "data/universe/contracts/randomOperationNameGenerator/nounReconRaid.csv").toString();
+    public static final String OPERATION_NAME_NOUN_RECON_RAID_USER = Paths.get(
+          "userdata/data/universe/contracts/randomOperationNameGenerator/nounReconRaid.csv").toString();
+    public static final String OPERATION_NAME_NOUN_RELIEF_DUTY = Paths.get(
+          "data/universe/contracts/randomOperationNameGenerator/nounReliefDuty.csv").toString();
+    public static final String OPERATION_NAME_NOUN_RELIEF_DUTY_USER = Paths.get(
+          "userdata/data/universe/contracts/randomOperationNameGenerator/nounReliefDuty.csv").toString();
+    public static final String OPERATION_NAME_NOUN_RETAINER = Paths.get(
+          "data/universe/contracts/randomOperationNameGenerator/nounRetainer.csv").toString();
+    public static final String OPERATION_NAME_NOUN_RETAINER_USER = Paths.get(
+          "userdata/data/universe/contracts/randomOperationNameGenerator/nounRetainer.csv").toString();
+    public static final String OPERATION_NAME_NOUN_RIOT_DUTY = Paths.get(
+          "data/universe/contracts/randomOperationNameGenerator/nounRiotDuty.csv").toString();
+    public static final String OPERATION_NAME_NOUN_RIOT_DUTY_USER = Paths.get(
+          "userdata/data/universe/contracts/randomOperationNameGenerator/nounRiotDuty.csv").toString();
+    public static final String OPERATION_NAME_NOUN_SABOTAGE = Paths.get(
+          "data/universe/contracts/randomOperationNameGenerator/nounSabotage.csv").toString();
+    public static final String OPERATION_NAME_NOUN_SABOTAGE_USER = Paths.get(
+          "userdata/data/universe/contracts/randomOperationNameGenerator/nounSabotage.csv").toString();
+    public static final String OPERATION_NAME_NOUN_SECURITY_DUTY = Paths.get(
+          "data/universe/contracts/randomOperationNameGenerator/nounSecurityDuty.csv").toString();
+    public static final String OPERATION_NAME_NOUN_SECURITY_DUTY_USER = Paths.get(
+          "userdata/data/universe/contracts/randomOperationNameGenerator/nounSecurityDuty.csv").toString();
+    public static final String OPERATION_NAME_NOUN_TERRORISM = Paths.get(
+          "data/universe/contracts/randomOperationNameGenerator/nounTerrorism.csv").toString();
+    public static final String OPERATION_NAME_NOUN_TERRORISM_USER = Paths.get(
+          "userdata/data/universe/contracts/randomOperationNameGenerator/nounTerrorism.csv").toString();
+    public static final String OPERATION_NAME_NOUN_UNDEFINED = Paths.get(
+          "data/universe/contracts/randomOperationNameGenerator/nounUndefined.csv").toString();
+    public static final String OPERATION_NAME_NOUN_UNDEFINED_USER = Paths.get(
+          "userdata/data/universe/contracts/randomOperationNameGenerator/nounUndefined.csv").toString();
+    // endregion Operation Names
+
     // endregion File Paths
 
     // startregion Important Dates
