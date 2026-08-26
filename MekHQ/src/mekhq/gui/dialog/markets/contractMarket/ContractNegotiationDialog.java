@@ -82,9 +82,10 @@ import mekhq.campaign.mission.contract.contractData.NegotiationStepMath;
 import mekhq.campaign.mission.contract.contractData.NegotiationStepMath.Term;
 import mekhq.campaign.mission.contract.contractData.NonNegotiableTermsData;
 import mekhq.campaign.mission.contract.contractData.RentedFacilitiesData;
-import mekhq.campaign.mission.contract.contractGeneration.ChaosContractDeterminationPay;
+import mekhq.campaign.mission.contract.contractGeneration.AbstractContractDeterminationPay;
 import mekhq.campaign.mission.contract.contractGeneration.negotiationsAndNPCs.TermFunding;
 import mekhq.campaign.personnel.Person;
+import mekhq.campaign.personnel.PersonnelOptions;
 import mekhq.campaign.personnel.skills.ActionCheckResult;
 import mekhq.campaign.personnel.skills.SkillType;
 import mekhq.campaign.personnel.skills.enums.MarginOfSuccess;
@@ -117,8 +118,8 @@ public class ContractNegotiationDialog extends JDialog {
 
     private static final int SACRIFICE_STEPS_PER_SWAP = 2;
     private static final int MAXIMUM_SWAPS = 2;
-    private static final int MAXIMUM_SACRIFICED_TERMS = 2;
-    private static final int MAXIMUM_SACRIFICED_STEPS = 4;
+    private static final int BASE_MAXIMUM_SACRIFICED_TERMS = 2;
+    private static final int BASE_MAXIMUM_SACRIFICED_STEPS = 4;
     private static final int MAXIMUM_FACILITY_UNITS = 100;
 
     private static final String REPUTATION_HEX = "#1d5fa5";
@@ -133,9 +134,12 @@ public class ContractNegotiationDialog extends JDialog {
     private transient NonNegotiableTermsData nonNegotiableTerms;
 
     private final int scale;
-    private final int capPerTerm;
     private final int reputationPool;
     private final boolean activeNegotiators;
+
+    private int capPerTerm;
+    private int maxSacrificedTerms;
+    private int maxSacrificedSteps;
 
     private int reputationUsed;
     private int swapsUsed;
@@ -204,7 +208,7 @@ public class ContractNegotiationDialog extends JDialog {
         this.currentLocation = campaign.getPlayerForce().getForceDetachment().getCurrentLocation();
 
         this.scale = max(1, contract.getScale());
-        this.capPerTerm = scale;
+        recomputeNegotiatorCaps();
         boolean useChaosReputation = campaignOptions.get(CampaignOption.USE_CHAOS_REPUTATION);
         int reputation = campaign.getPlayerForce().getReputationRating(useChaosReputation);
         this.reputationPool = Math.clamp(reputation, 0, 2 * scale);
@@ -372,8 +376,44 @@ public class ContractNegotiationDialog extends JDialog {
         if (picker.wasConfirmed()) {
             contract.setPlayerNegotiator(picker.getSelectedNegotiator());
             updateNegotiatorControl();
-            updateRenegotiateButton();
+            recomputeNegotiatorCaps();
+            refresh();
         }
+    }
+
+    /**
+     * Recomputes the manual-haggle caps from the chosen negotiator's contract SPAs and Flaws: Hard Bargainer / Pushover
+     * shift the per-term raise cap, Shrewd Trader / Inflexible shift the sacrifice budget (both its distinct-term and
+     * its total-step limits). With no negotiator the base values apply. Called at construction and whenever the
+     * negotiator changes.
+     */
+    private void recomputeNegotiatorCaps() {
+        int raiseCapModifier = 0;
+        int sacrificeTermModifier = 0;
+        int sacrificeStepModifier = 0;
+
+        Person negotiator = contract.getPlayerNegotiator();
+        if (negotiator != null) {
+            PersonnelOptions options = negotiator.getOptions();
+            if (options.booleanOption(PersonnelOptions.HARD_BARGAINER)) {
+                raiseCapModifier++;
+            }
+            if (options.booleanOption(PersonnelOptions.PUSHOVER)) {
+                raiseCapModifier--;
+            }
+            if (options.booleanOption(PersonnelOptions.SHREWD_TRADER)) {
+                sacrificeTermModifier++;
+                sacrificeStepModifier += 2;
+            }
+            if (options.booleanOption(PersonnelOptions.INFLEXIBLE)) {
+                sacrificeTermModifier--;
+                sacrificeStepModifier -= 2;
+            }
+        }
+
+        capPerTerm = max(1, scale + raiseCapModifier);
+        maxSacrificedTerms = max(0, BASE_MAXIMUM_SACRIFICED_TERMS + sacrificeTermModifier);
+        maxSacrificedSteps = max(0, BASE_MAXIMUM_SACRIFICED_STEPS + sacrificeStepModifier);
     }
 
     private JPanel buildBody() {
@@ -741,16 +781,16 @@ public class ContractNegotiationDialog extends JDialog {
     }
 
     /**
-     * Whether {@code gap} more raw steps may be sacrificed from this clause, honoring the two global caps: at most
-     * {@link #MAXIMUM_SACRIFICED_TERMS} distinct terms sacrificed, and at most {@link #MAXIMUM_SACRIFICED_STEPS} raw
-     * steps in total across them.
+     * Whether {@code gap} more raw steps may be sacrificed from this clause, honoring the two negotiator-adjusted caps:
+     * at most {@link #maxSacrificedTerms} distinct terms sacrificed, and at most {@link #maxSacrificedSteps} raw steps
+     * in total across them.
      */
     private boolean canSacrifice(Clause clause, int gap) {
         boolean alreadySacrificed = currentStep[clause.ordinal()] < originalStep[clause.ordinal()];
         return NegotiationStepMath.sacrificeAllowed(gap, alreadySacrificed,
               NegotiationStepMath.distinctTermsSacrificed(originalStep, currentStep),
               NegotiationStepMath.totalStepsSacrificed(originalStep, currentStep),
-              MAXIMUM_SACRIFICED_TERMS, MAXIMUM_SACRIFICED_STEPS);
+              maxSacrificedTerms, maxSacrificedSteps);
     }
 
     /** Whether the employer has locked this clause as non-negotiable - it can be neither raised nor lowered. */
@@ -823,8 +863,9 @@ public class ContractNegotiationDialog extends JDialog {
     private void commitTermsAndPay() {
         contract.setContractTerms(new ContractTermsData(step(Clause.PAY), step(Clause.SUPPORT), step(Clause.TRANSPORT),
               step(Clause.SALVAGE), step(Clause.COMMAND)));
-        ChaosContractDeterminationPay payScheme = new ChaosContractDeterminationPay();
+        AbstractContractDeterminationPay payScheme = AbstractContractDeterminationPay.forCampaign(campaign);
         contract.updateMonthlyPay(payScheme.getMonthlyPay(campaign, contract));
+        contract.updateCombatPay(payScheme.getCombatPay(campaign, contract));
         contract.updateTransportPay(payScheme.getTransportPay(campaign,
               campaign.getLocalDate(), contract, currentLocation));
     }
@@ -841,7 +882,7 @@ public class ContractNegotiationDialog extends JDialog {
      * and the attempt can only be made once per contract.
      */
     private void renegotiateAction() {
-        if (contract.getPlayerNegotiator() == null || contract.getActiveNegotiationData() != null) {
+        if (contract.getPlayerNegotiator() == null || attemptsSoFar() >= maxRenegotiationAttempts()) {
             return;
         }
 
@@ -874,7 +915,7 @@ public class ContractNegotiationDialog extends JDialog {
         if (playerNegotiator == null) {
             // This shouldn't happen, so we go ahead and log it.
             LOGGER.warn("Contract {} has no player negotiator", contract.getName());
-            return DISASTROUS.getLowerBound();
+            return ActiveNegotiationMath.netMargin(DISASTROUS, MarginOfSuccess.BARELY_MADE_IT);
         }
         MarginOfSuccess playerMargin = reportedNegotiationCheck(playerNegotiator,
               "negotiate.contractMarket.renegotiate.roll.player");
@@ -883,7 +924,56 @@ public class ContractNegotiationDialog extends JDialog {
                                                reportedNegotiationCheck(employerNegotiator,
                                                      "negotiate.contractMarket.renegotiate.roll.employer") :
                                                MarginOfSuccess.BARELY_MADE_IT;
-        return ActiveNegotiationMath.netMargin(playerMargin, employerMargin);
+        return ActiveNegotiationMath.netMargin(playerMargin, employerMargin)
+                     + generalNegotiationModifier(playerNegotiator);
+    }
+
+    /**
+     * A flat modifier to the net margin from the negotiator's general contract SPAs and Flaws, applied to both
+     * re-negotiation options. Abrasive worsens every re-negotiation by one.
+     */
+    private static int generalNegotiationModifier(Person negotiator) {
+        int modifier = 0;
+        if (negotiator.getOptions().booleanOption(PersonnelOptions.ABRASIVE)) {
+            modifier--;
+        }
+        return modifier;
+    }
+
+    /**
+     * A net-margin modifier specific to the "make an exception" option (shifting non-negotiable flags). Loophole Finder
+     * frees more terms; Blacklisted, its opposite, locks more.
+     */
+    private static int exceptionNegotiationModifier(Person negotiator) {
+        if (negotiator == null) {
+            return 0;
+        }
+        int modifier = 0;
+        if (negotiator.getOptions().booleanOption(PersonnelOptions.LOOPHOLE_FINDER)) {
+            modifier++;
+        }
+        if (negotiator.getOptions().booleanOption(PersonnelOptions.BLACKLISTED)) {
+            modifier--;
+        }
+        return modifier;
+    }
+
+    /**
+     * A net-margin modifier specific to the "give me a better offer" option (shifting the terms' values). Fine Print
+     * Reader wins better terms; Easily Fooled, its opposite, loses ground.
+     */
+    private static int haggleNegotiationModifier(Person negotiator) {
+        if (negotiator == null) {
+            return 0;
+        }
+        int modifier = 0;
+        if (negotiator.getOptions().booleanOption(PersonnelOptions.FINE_PRINT_READER)) {
+            modifier++;
+        }
+        if (negotiator.getOptions().booleanOption(PersonnelOptions.EASILY_FOOLED)) {
+            modifier--;
+        }
+        return modifier;
     }
 
     /**
@@ -899,7 +989,7 @@ public class ContractNegotiationDialog extends JDialog {
 
     /** Runs the opposed check and rewrites the terms as a fresh baseline. Spends the contract's one attempt. */
     private void performHaggle() {
-        int net = rollNetMargin();
+        int net = rollNetMargin() + haggleNegotiationModifier(contract.getPlayerNegotiator());
         int[] moveCounts = applyActiveNegotiation(net);
 
         // The re-negotiated terms become the new baseline; manual haggling starts fresh from here.
@@ -912,7 +1002,7 @@ public class ContractNegotiationDialog extends JDialog {
 
         commitTermsAndPay();
         contract.setNegotiationData(null);
-        contract.setActiveNegotiationData(ActiveNegotiationData.haggle(net,
+        contract.setActiveNegotiationData(ActiveNegotiationData.haggle(attemptsSoFar() + 1, net,
               moveCounts[Clause.PAY.ordinal()], moveCounts[Clause.SUPPORT.ordinal()],
               moveCounts[Clause.TRANSPORT.ordinal()], moveCounts[Clause.SALVAGE.ordinal()],
               moveCounts[Clause.COMMAND.ordinal()]));
@@ -926,10 +1016,10 @@ public class ContractNegotiationDialog extends JDialog {
      * locked term, each margin of failure locks a random unlocked one. Spends the contract's one attempt.
      */
     private void performException() {
-        int net = rollNetMargin();
+        int net = rollNetMargin() + exceptionNegotiationModifier(contract.getPlayerNegotiator());
         int[] lockChanges = applyLockChanges(net);
         contract.setNonNegotiableTermsData(nonNegotiableTerms);
-        contract.setActiveNegotiationData(ActiveNegotiationData.exception(net,
+        contract.setActiveNegotiationData(ActiveNegotiationData.exception(attemptsSoFar() + 1, net,
               lockChanges[Clause.PAY.ordinal()], lockChanges[Clause.SUPPORT.ordinal()],
               lockChanges[Clause.TRANSPORT.ordinal()], lockChanges[Clause.SALVAGE.ordinal()],
               lockChanges[Clause.COMMAND.ordinal()]));
@@ -950,7 +1040,7 @@ public class ContractNegotiationDialog extends JDialog {
         for (int move = 0; move < count; move++) {
             List<Clause> eligible = new ArrayList<>();
             for (Clause clause : Clause.values()) {
-                if (nonNegotiableTerms.isLocked(clause.term) != waive) {
+                if (nonNegotiableTerms.isLocked(clause.term) == waive) {
                     eligible.add(clause);
                 }
             }
@@ -1003,19 +1093,36 @@ public class ContractNegotiationDialog extends JDialog {
                      : NegotiationStepMath.nextLowerDifferentStep(clause.term, from);
     }
 
-    /** Enables the Re-negotiate button only when a negotiator is set and the one attempt has not been spent. */
+    /** How many re-negotiation attempts have already been spent on this contract. */
+    private int attemptsSoFar() {
+        ActiveNegotiationData data = contract.getActiveNegotiationData();
+        return data == null ? 0 : data.attempts();
+    }
+
+    /**
+     * How many re-negotiation attempts this contract allows: one, plus one more when the chosen negotiator carries the
+     * Relentless Bargainer SPA.
+     */
+    private int maxRenegotiationAttempts() {
+        Person negotiator = contract.getPlayerNegotiator();
+        boolean relentless = negotiator != null
+                                   && negotiator.getOptions().booleanOption(PersonnelOptions.RELENTLESS_BARGAINER);
+        return relentless ? 2 : 1;
+    }
+
+    /** Enables the Re-negotiate button only when a negotiator is set and an attempt remains. */
     private void updateRenegotiateButton() {
         if (renegotiateButton == null) {
             return;
         }
-        boolean attempted = contract.getActiveNegotiationData() != null;
         boolean hasNegotiator = contract.getPlayerNegotiator() != null;
-        renegotiateButton.setEnabled(!attempted && hasNegotiator);
-        String tooltipKey = attempted
-                                  ? "negotiate.contractMarket.renegotiate.tooltip.spent"
-                                  : hasNegotiator
-                                          ? "negotiate.contractMarket.renegotiate.tooltip"
-                                          : "negotiate.contractMarket.renegotiate.tooltip.noNegotiator";
+        boolean spent = attemptsSoFar() >= maxRenegotiationAttempts();
+        renegotiateButton.setEnabled(hasNegotiator && !spent);
+        String tooltipKey = !hasNegotiator
+                                  ? "negotiate.contractMarket.renegotiate.tooltip.noNegotiator"
+                                  : spent
+                                          ? "negotiate.contractMarket.renegotiate.tooltip.spent"
+                                          : "negotiate.contractMarket.renegotiate.tooltip";
         renegotiateButton.setToolTipText(wordWrap(getTextAt(RESOURCE_BUNDLE, tooltipKey)));
     }
 
@@ -1113,8 +1220,8 @@ public class ContractNegotiationDialog extends JDialog {
 
         summaryLabel.setText(getFormattedTextAt(RESOURCE_BUNDLE, "negotiate.contractMarket.summary",
               rentalTotal.toAmountAndSymbolString(), reputationPool - reputationUsed,
-              NegotiationStepMath.totalStepsSacrificed(originalStep, currentStep), MAXIMUM_SACRIFICED_STEPS,
-              NegotiationStepMath.distinctTermsSacrificed(originalStep, currentStep), MAXIMUM_SACRIFICED_TERMS));
+              NegotiationStepMath.totalStepsSacrificed(originalStep, currentStep), maxSacrificedSteps,
+              NegotiationStepMath.distinctTermsSacrificed(originalStep, currentStep), maxSacrificedTerms));
 
         updateRenegotiateButton();
         renderResults();
