@@ -82,7 +82,6 @@ import mekhq.campaign.mission.contract.contractData.NegotiationStepMath;
 import mekhq.campaign.mission.contract.contractData.NegotiationStepMath.Term;
 import mekhq.campaign.mission.contract.contractData.NonNegotiableTermsData;
 import mekhq.campaign.mission.contract.contractData.RentedFacilitiesData;
-import mekhq.campaign.mission.contract.contractGeneration.ChaosContractDeterminationPay;
 import mekhq.campaign.mission.contract.contractGeneration.negotiationsAndNPCs.TermFunding;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.PersonnelOptions;
@@ -1041,7 +1040,7 @@ public class ContractNegotiationDialog extends JDialog {
         for (int move = 0; move < count; move++) {
             List<Clause> eligible = new ArrayList<>();
             for (Clause clause : Clause.values()) {
-                if (nonNegotiableTerms.isLocked(clause.term) != waive) {
+                if (nonNegotiableTerms.isLocked(clause.term) == waive) {
                     eligible.add(clause);
                 }
             }
