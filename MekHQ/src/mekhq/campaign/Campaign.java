@@ -2164,10 +2164,7 @@ public class Campaign implements ITechManager {
             return true;
         }
 
-        if (person.getOptions().booleanOption(PersonnelOptions.ADMIN_SCROUNGE)) {
-            maxAcquisitions += 1;
-        }
-        return person.getAcquisitions() < maxAcquisitions;
+        return person.getAcquisitions() < ForceHumanResources.maxAcquisitionsFor(person, maxAcquisitions);
     }
 
     /***

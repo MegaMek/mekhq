@@ -1589,7 +1589,8 @@ public class ForceHumanResources {
                 continue;
             }
 
-            if (defaultMaxAcquisitions > 0 && (person.getAcquisitions() >= defaultMaxAcquisitions)) {
+            if (defaultMaxAcquisitions > 0 &&
+                      (person.getAcquisitions() >= maxAcquisitionsFor(person, defaultMaxAcquisitions))) {
                 continue;
             }
 
@@ -1621,6 +1622,34 @@ public class ForceHumanResources {
             return Integer.MIN_VALUE;
         }
         return skill.getTotalSkillLevel(person.getSkillModifierData(isUseAgingEffects, isClanCampaign, today));
+    }
+
+    /**
+     * Returns the maximum number of acquisition attempts {@code person} is allowed in a period.
+     *
+     * <p>This is the campaign's base {@link CampaignOption#MAX_ACQUISITIONS} limit, plus one for personnel with the
+     * {@link PersonnelOptions#ADMIN_SCROUNGE} special ability. A {@code baseMaxAcquisitions} of zero or less means the
+     * limit is disabled (unlimited attempts) and is returned unchanged so callers can keep their existing "no limit"
+     * checks.</p>
+     *
+     * <p>This must be the single source of truth for the per-person cap: both the procurement personnel filters
+     * ({@link #getLogisticsPerson} and {@link #getLogisticsPersonnel}) and {@code Campaign.canAcquireParts} rely on it
+     * agreeing, otherwise a Scrounge admin at the base cap can be filtered out before their bonus attempt is ever
+     * considered.</p>
+     *
+     * @param person              the person whose cap is being computed
+     * @param baseMaxAcquisitions the campaign's base acquisition limit
+     *
+     * @return the effective maximum acquisition attempts for {@code person}
+     */
+    public static int maxAcquisitionsFor(Person person, int baseMaxAcquisitions) {
+        if (baseMaxAcquisitions <= 0) {
+            return baseMaxAcquisitions;
+        }
+        if (person.getOptions().booleanOption(PersonnelOptions.ADMIN_SCROUNGE)) {
+            return baseMaxAcquisitions + 1;
+        }
+        return baseMaxAcquisitions;
     }
 
     /**
@@ -1658,7 +1687,8 @@ public class ForceHumanResources {
                 continue;
             }
 
-            if ((maxAcquisitions > 0) && (person.getAcquisitions() >= maxAcquisitions)) {
+            if ((maxAcquisitions > 0) &&
+                      (person.getAcquisitions() >= maxAcquisitionsFor(person, maxAcquisitions))) {
                 continue;
             }
             if (isAnyTech) {

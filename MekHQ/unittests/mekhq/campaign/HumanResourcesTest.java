@@ -32,8 +32,6 @@
  */
 package mekhq.campaign;
 
-import static org.mockito.Mockito.lenient;
-
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
@@ -43,6 +41,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyBoolean;
 import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.Mockito.lenient;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import static testUtilities.MHQTestUtilities.mockCampaign;
@@ -61,11 +60,11 @@ import megamek.Version;
 import megamek.common.enums.SkillLevel;
 import megamek.common.equipment.EquipmentType;
 import megamek.common.units.Entity;
-
 import mekhq.campaign.campaignOptions.AcquisitionsType;
-import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.campaignOptions.CampaignOption;
+import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.personnel.Person;
+import mekhq.campaign.personnel.PersonnelOptions;
 import mekhq.campaign.personnel.enums.PersonnelRole;
 import mekhq.campaign.personnel.enums.PersonnelStatus;
 import mekhq.campaign.personnel.skills.Skill;
@@ -978,6 +977,74 @@ public class HumanResourcesTest {
 
             // Assert
             assertEquals(stronger, result);
+        }
+    }
+
+    /**
+     * Tests for {@link ForceHumanResources#maxAcquisitionsFor(Person, int)} and the ADMIN_SCROUNGE bonus it feeds into
+     * the procurement personnel filters.
+     */
+    @Nested
+    class MaxAcquisitions {
+
+        private Person personWithScrounge(boolean hasScrounge) {
+            PersonnelOptions options = mock(PersonnelOptions.class);
+            when(options.booleanOption(PersonnelOptions.ADMIN_SCROUNGE)).thenReturn(hasScrounge);
+
+            Person person = mock(Person.class);
+            when(person.getOptions()).thenReturn(options);
+            return person;
+        }
+
+        @Test
+        void scroungeAdminGetsOneExtraAttempt() {
+            // Act & Assert
+            assertEquals(2, ForceHumanResources.maxAcquisitionsFor(personWithScrounge(true), 1),
+                  "ADMIN_SCROUNGE must raise the cap by one");
+            assertEquals(1, ForceHumanResources.maxAcquisitionsFor(personWithScrounge(false), 1),
+                  "Personnel without ADMIN_SCROUNGE keep the base cap");
+        }
+
+        @Test
+        void disabledCapIsReturnedUnchanged() {
+            // A base cap of zero or less means "no limit" and must never gain a bonus, or it would flip an unlimited
+            // limit into a finite one for Scrounge admins.
+            assertEquals(0, ForceHumanResources.maxAcquisitionsFor(personWithScrounge(true), 0),
+                  "A zero base cap stays disabled for Scrounge admins");
+            assertEquals(-1, ForceHumanResources.maxAcquisitionsFor(personWithScrounge(true), -1),
+                  "A negative base cap stays disabled for Scrounge admins");
+        }
+
+        @Test
+        void scroungeAdminAtBaseCapSurvivesLogisticsFilter() {
+            // Arrange: base cap of 1, both admins have already made 1 acquisition (at the base cap).
+            when(campaignOptions.get(CampaignOption.ACQUISITIONS_TYPE)).thenReturn(AcquisitionsType.ADMINISTRATION);
+            when(campaignOptions.get(CampaignOption.ACQUISITION_PERSONNEL_CATEGORY)).thenReturn(ProcurementPersonnelPick.ALL);
+            when(campaignOptions.get(CampaignOption.MAX_ACQUISITIONS)).thenReturn(1);
+            when(campaignOptions.get(CampaignOption.USE_AGE_EFFECTS)).thenReturn(false);
+
+            Skill adminSkill = mock(Skill.class);
+            when(adminSkill.getTotalSkillLevel(any())).thenReturn(5);
+
+            Person scrounger = personWithScrounge(true);
+            when(scrounger.getAcquisitions()).thenReturn(1);
+            when(scrounger.hasSkill("Administration")).thenReturn(true);
+            when(scrounger.getSkill("Administration")).thenReturn(adminSkill);
+            when(scrounger.getSkillModifierData(anyBoolean(), anyBoolean(), any())).thenReturn(null);
+
+            Person nonScrounger = personWithScrounge(false);
+            when(nonScrounger.getAcquisitions()).thenReturn(1);
+            when(nonScrounger.hasSkill("Administration")).thenReturn(true);
+            when(nonScrounger.getSkill("Administration")).thenReturn(adminSkill);
+            when(nonScrounger.getSkillModifierData(anyBoolean(), anyBoolean(), any())).thenReturn(null);
+
+            // Act
+            List<Person> eligible = ForceHumanResources.getLogisticsPersonnel(List.of(scrounger, nonScrounger),
+                  campaignOptions, false, today);
+
+            // Assert: the Scrounge admin's bonus attempt keeps them eligible; the plain admin is filtered out.
+            assertTrue(eligible.contains(scrounger), "Scrounge admin at the base cap must remain eligible");
+            assertFalse(eligible.contains(nonScrounger), "Non-Scrounge admin at the base cap must be filtered out");
         }
     }
 
