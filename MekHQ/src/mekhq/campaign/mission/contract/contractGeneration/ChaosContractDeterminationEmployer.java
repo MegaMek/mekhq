@@ -63,8 +63,8 @@ import mekhq.campaign.universe.RandomFactionGenerator;
 import mekhq.campaign.universe.enums.HiringHallLevel;
 import org.jspecify.annotations.NonNull;
 
-public class ChaosContractEmployerDetermination {
-    private static final MMLogger LOGGER = MMLogger.create(ChaosContractEmployerDetermination.class);
+public class ChaosContractDeterminationEmployer {
+    private static final MMLogger LOGGER = MMLogger.create(ChaosContractDeterminationEmployer.class);
 
     private static final int COMSTAR_EMPLOYER_CHANCE = 100;
     private static final int WORD_OF_BLAKE_EMPLOYER_CHANCE = 40;
@@ -79,12 +79,12 @@ public class ChaosContractEmployerDetermination {
           faction -> !faction.isAggregate() && !faction.isSubunit() && !faction.isMercenaryOrganization();
 
     public static @Nullable EmployerData getEmployerGenerationData(LocalDate currentDate, ILocation currentLocation,
-          Campaign campaign, ContractSearchType searchType) {
+          Campaign campaign, ContractSearchType searchType, boolean covertViable) {
         ChaosEmployerType type = determineEmployerType();
 
         boolean isMercenarySearch = searchType == ContractSearchType.MERCENARY;
         EmployerFactions employerFactions = determineEmployerFactions(type, currentDate, currentLocation,
-              isMercenarySearch);
+              isMercenarySearch, covertViable);
         if (employerFactions == null) {
             LOGGER.info("Failed to select an employer for current location. Contract generation failed");
             return null;
@@ -187,7 +187,7 @@ public class ChaosContractEmployerDetermination {
      *       location
      */
     static @Nullable EmployerFactions determineEmployerFactions(ChaosEmployerType employerType,
-          LocalDate currentDate, ILocation currentLocation, boolean isMercenarySearch) {
+          LocalDate currentDate, ILocation currentLocation, boolean isMercenarySearch, boolean covertViable) {
         if (employerType == ChaosEmployerType.CIVILIAN_ORGANIZATION_REBELS) {
             Faction rebels = resolveFlavorFaction(employerType, currentDate, currentLocation, isMercenarySearch);
             if (rebels == null) {
@@ -196,12 +196,13 @@ public class ChaosContractEmployerDetermination {
             Faction anchor = resolveAnchorFaction(employerType, currentDate, currentLocation, isMercenarySearch,
                   rebels);
             // A Blakist/ComStar patron does not replace the rebels as employer; it secretly funds them.
-            Faction sponsor = isMercenarySearch ? checkForSpecialEmployer(currentDate.getYear()) : null;
+            Faction sponsor = isMercenarySearch ? checkForSpecialEmployer(currentDate.getYear(), covertViable) : null;
             return new EmployerFactions(employerType, rebels, anchor, sponsor);
         }
 
         Faction specialEmployer;
-        if (isMercenarySearch && (specialEmployer = checkForSpecialEmployer(currentDate.getYear())) != null) {
+        if (isMercenarySearch
+                  && (specialEmployer = checkForSpecialEmployer(currentDate.getYear(), covertViable)) != null) {
             if (specialEmployer.getShortName().equals(COMSTAR_FACTION_CODE)) {
                 // ComStar works in the shadows: rather than take the contract openly it fronts a corporation as the
                 // visible employer while bankrolling (sponsor) and territorially anchoring the work itself. The
@@ -360,18 +361,29 @@ public class ChaosContractEmployerDetermination {
         return null;
     }
 
-    private static @Nullable Faction checkForSpecialEmployer(int currentYear) {
-        Faction specialEmployer = checkForEmployerOverride(currentYear,
-              COMSTAR_FACTION_CODE,
-              COMSTAR_EMPLOYER_CHANCE,
-              true);
-        if (specialEmployer != null) {
-            return specialEmployer;
+    /**
+     * Rolls whether ComStar or the Word of Blake steps into this contract - either fronting/sponsoring it (see
+     * {@link #determineEmployerFactions}). ComStar only involves itself in covert-viable contracts, since its interest
+     * is in running them as deniable false flags; the Word of Blake is under no such restriction and will take any
+     * contract. ComStar is rolled first (it takes priority), then the Word of Blake.
+     *
+     * @param currentYear  the year, for each faction's operating window
+     * @param covertViable whether this contract's objective can be run covertly, which gates ComStar's involvement
+     *
+     * @return ComStar or the Word of Blake if one steps in, otherwise {@code null}
+     */
+    private static @Nullable Faction checkForSpecialEmployer(int currentYear, boolean covertViable) {
+        if (covertViable) {
+            Faction comStar = checkForEmployerOverride(currentYear,
+                  COMSTAR_FACTION_CODE,
+                  COMSTAR_EMPLOYER_CHANCE,
+                  true);
+            if (comStar != null) {
+                return comStar;
+            }
         }
 
-        specialEmployer = checkForEmployerOverride(currentYear, WORD_OF_BLAKE_FACTION_CODE,
-              WORD_OF_BLAKE_EMPLOYER_CHANCE, false);
-        return specialEmployer;
+        return checkForEmployerOverride(currentYear, WORD_OF_BLAKE_FACTION_CODE, WORD_OF_BLAKE_EMPLOYER_CHANCE, false);
     }
 
     private static @Nullable Faction checkForEmployerOverride(int currentYear, String factionCode, int chance,

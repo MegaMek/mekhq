@@ -266,8 +266,19 @@ public class ContractCardPanel extends JPanel {
      * @since 0.51.01
      */
     private JComponent buildEmblemTile(LocalDate currentDate) {
-        JLabel emblem = new JLabel(Factions.getFactionLogoWithScaling(currentDate.getYear(),
-              contract.getEmployerFactionCode(), EMBLEM_SIZE));
+        JLabel emblem;
+        // A plain covert operation conceals its employer behind a neutral placeholder. A false flag shows its front's
+        // logo like any normal contract, because the front is already the visible employer; everything else shows the
+        // real employer's logo.
+        if (contract.isCovert()) {
+            emblem = new JLabel("?", SwingConstants.CENTER);
+            emblem.setForeground(contrastingText(accent));
+            emblem.setFont(emblem.getFont().deriveFont(Font.BOLD, EMBLEM_SIZE * 0.7f));
+            emblem.setPreferredSize(new Dimension(EMBLEM_SIZE, EMBLEM_SIZE));
+        } else {
+            emblem = new JLabel(Factions.getFactionLogoWithScaling(currentDate.getYear(),
+                  contract.getEmployerFactionCode(), EMBLEM_SIZE));
+        }
         emblem.setOpaque(false);
 
         final int arc = scaleForGUI(10);
@@ -287,6 +298,13 @@ public class ContractCardPanel extends JPanel {
         tile.setBorder(BorderFactory.createEmptyBorder(pad, pad, pad, pad));
         tile.add(emblem, BorderLayout.CENTER);
         return tile;
+    }
+
+    /** Black or white, whichever reads better on the given background, for text drawn over the accent tile. */
+    private static Color contrastingText(Color background) {
+        double luminance = (0.299 * background.getRed() + 0.587 * background.getGreen()
+                                  + 0.114 * background.getBlue()) / 255.0;
+        return luminance > 0.6 ? Color.BLACK : Color.WHITE;
     }
 
     private JPanel buildChipsRow(LocalDate currentDate) {

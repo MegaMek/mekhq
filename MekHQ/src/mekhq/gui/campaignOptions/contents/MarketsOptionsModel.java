@@ -68,6 +68,9 @@ class MarketsOptionsModel {
     boolean useChaosScaleSupportPointConversion;
     boolean useContractFactionModifiers;
     boolean useIntelObfuscation;
+    boolean useNonNegotiableTerms;
+    boolean useActiveNegotiators;
+    boolean useRandomContractCharacteristics;
     boolean useOperationCodenames;
     boolean hideContractType;
     boolean contractMarketReportRefresh;
@@ -116,6 +119,9 @@ class MarketsOptionsModel {
         useChaosScaleSupportPointConversion = options.get(CampaignOption.USE_CHAOS_SCALE_SUPPORT_POINT_CONVERSION);
         useContractFactionModifiers = options.get(CampaignOption.USE_CONTRACT_FACTION_MODIFIERS);
         useIntelObfuscation = options.get(CampaignOption.USE_INTEL_OBFUSCATION);
+        useNonNegotiableTerms = options.get(CampaignOption.USE_NON_NEGOTIABLE_TERMS);
+        useActiveNegotiators = options.get(CampaignOption.USE_ACTIVE_NEGOTIATORS);
+        useRandomContractCharacteristics = options.get(CampaignOption.USE_RANDOM_CONTRACT_CHARACTERISTICS);
         useOperationCodenames = options.get(CampaignOption.USE_OPERATION_CODENAMES);
         hideContractType = options.get(CampaignOption.HIDE_CONTRACT_TYPE);
         contractMarketReportRefresh = options.get(CampaignOption.CONTRACT_MARKET_REPORT_REFRESH);
@@ -179,6 +185,9 @@ class MarketsOptionsModel {
         options.set(CampaignOption.USE_CHAOS_SCALE_SUPPORT_POINT_CONVERSION, useChaosScaleSupportPointConversion);
         options.set(CampaignOption.USE_CONTRACT_FACTION_MODIFIERS, useContractFactionModifiers);
         options.set(CampaignOption.USE_INTEL_OBFUSCATION, useIntelObfuscation);
+        options.set(CampaignOption.USE_NON_NEGOTIABLE_TERMS, useNonNegotiableTerms);
+        options.set(CampaignOption.USE_ACTIVE_NEGOTIATORS, useActiveNegotiators);
+        options.set(CampaignOption.USE_RANDOM_CONTRACT_CHARACTERISTICS, useRandomContractCharacteristics);
         options.set(CampaignOption.USE_OPERATION_CODENAMES, useOperationCodenames);
         options.set(CampaignOption.HIDE_CONTRACT_TYPE, hideContractType);
         options.set(CampaignOption.CONTRACT_MARKET_REPORT_REFRESH, contractMarketReportRefresh);

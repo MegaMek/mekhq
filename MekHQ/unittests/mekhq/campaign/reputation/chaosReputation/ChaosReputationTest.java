@@ -409,6 +409,7 @@ class ChaosReputationTest {
         when(options.get(CampaignOption.USE_CHAOS_REPUTATION)).thenReturn(true);
         when(options.get(CampaignOption.CAMPAIGN_LEVEL_CHAOS_REPUTATION)).thenReturn(true);
         when(options.get(CampaignOption.CHAOS_NO_PARTIAL_SUCCESS_REPUTATION)).thenReturn(false);
+        when(options.get(CampaignOption.USE_FAILED_CONTRACT_REPUTATION_LOSS)).thenReturn(false);
         when(options.get(CampaignOption.CHAOS_DEBT_PENALTIES_STACK)).thenReturn(false);
         when(options.get(CampaignOption.MANUAL_UNIT_RATING_MODIFIER)).thenReturn(0);
         when(options.get(CampaignOption.CHAOS_REPUTATION_CAP)).thenReturn(0);
@@ -446,6 +447,18 @@ class ChaosReputationTest {
 
         verify(playerForce, never()).changeChaosCampaignReputation(anyInt());
         verify(campaign, never()).addReport(any(DailyReportType.class), any());
+    }
+
+    @Test
+    void processContractCompletion_failedContractLowersReputationWhenHinterlandsOptionEnabled() {
+        PlayerForce playerForce = mock(PlayerForce.class);
+        Campaign campaign = campaignLevelCampaign(10, playerForce);
+        when(campaign.getCampaignOptions().get(CampaignOption.USE_FAILED_CONTRACT_REPUTATION_LOSS)).thenReturn(true);
+
+        ChaosReputation.processContractCompletion(campaign, MissionStatus.FAILED, Collections.emptyList());
+
+        // A failed contract loses one point of reputation - the mirror of a success gain, lighter than a breach.
+        verify(playerForce).changeChaosCampaignReputation(-1);
     }
 
     @Test

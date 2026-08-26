@@ -109,6 +109,7 @@ import mekhq.campaign.force.Formation;
 import mekhq.campaign.market.personnelMarket.markets.NewPersonnelMarket;
 import mekhq.campaign.mission.contract.AbstractContract;
 import mekhq.campaign.mission.contract.contractData.MissionStatus;
+import mekhq.campaign.mission.contract.utilities.ContractCharacteristics;
 import mekhq.campaign.mission.contract.utilities.ContractEmergencyExtension;
 import mekhq.campaign.mission.scenarios.AtBDynamicScenario;
 import mekhq.campaign.mission.scenarios.AtBDynamicScenarioFactory;
@@ -851,11 +852,15 @@ public final class BriefingTab extends CampaignGuiTab {
         getCampaign().completeMission(mission, status);
         MekHQ.triggerEvent(new MissionCompletedEvent(mission));
 
+        // Pay the completion bonus, if the contract earned one (Completion Bonus characteristic, success only).
+        ContractCharacteristics.payCompletionBonus(getCampaign(), mission, status);
+
         if (campaignOptions.get(CampaignOption.USE_CHAOS_REPUTATION)) {
             List<Person> personnel = getCampaign().getPlayerForce()
                                            .getHumanResources()
                                            .getPersonnelFilteringOutDepartedAndAbsent();
-            ChaosReputation.processContractCompletion(getCampaign(), status, personnel);
+            ChaosReputation.processContractCompletion(getCampaign(), status, personnel,
+                  ContractCharacteristics.getUnitReputationMultiplier(mission, status));
 
             if (mission.getEmployerFactionCode() == PIRATE_FACTION_CODE) {
                 ChaosReputation.resolveActOfPiracy(getCampaign(),
@@ -970,7 +975,9 @@ public final class BriefingTab extends CampaignGuiTab {
             FactionStandings factionStandings = getCampaign().getPlayerForce().getFactionStandings();
             List<String> reports = new ArrayList<>();
 
-            double regardMultiplier = campaignOptions.get(CampaignOption.REGARD_MULTIPLIER);
+            // The employer's disposition characteristic (Employer's Favorite / On Probation) scales the standing change.
+            double regardMultiplier = campaignOptions.get(CampaignOption.REGARD_MULTIPLIER)
+                                            * ContractCharacteristics.getEmployerRegardMultiplier(mission);
 
             // A covert sponsor, if any, takes the standing change in the visible employer's place.
             Faction employer = mission.getStandingEmployerFaction();
