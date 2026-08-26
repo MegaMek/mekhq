@@ -34,6 +34,7 @@ package mekhq.campaign.universe.commandGeneration.ratgen;
 
 import java.io.PrintWriter;
 import java.util.LinkedHashSet;
+import java.util.Objects;
 import java.util.Set;
 
 import org.w3c.dom.Node;
@@ -344,5 +345,51 @@ public final class ForceDescriptorSnapshot {
             }
         }
         return snap;
+    }
+
+    /**
+     * Two ForceDescriptorSnapshots are equal when every setting matches, which is how the dialog tells whether the
+     * settings have moved since the model was last generated.
+     */
+    @Override
+    public boolean equals(Object object) {
+        if (this == object) {
+            return true;
+        }
+        if (!(object instanceof ForceDescriptorSnapshot other)) {
+            return false;
+        }
+        return Objects.equals(faction, other.faction)
+              && (year == other.year)
+              && Objects.equals(echelon, other.echelon)
+              && Objects.equals(unitType, other.unitType)
+              && Objects.equals(rating, other.rating)
+              && Objects.equals(experience, other.experience)
+              && Objects.equals(weightClass, other.weightClass)
+              && Objects.equals(flags, other.flags)
+              && (augmented == other.augmented)
+              && Objects.equals(sizeMod, other.sizeMod)
+              && Objects.equals(roles, other.roles)
+              && (Double.compare(dropshipPct, other.dropshipPct) == 0)
+              && (Double.compare(jumpshipPct, other.jumpshipPct) == 0)
+              && (Double.compare(cargoPct, other.cargoPct) == 0);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(faction, 
+              year, 
+              echelon, 
+              unitType, 
+              rating, 
+              experience, 
+              weightClass, 
+              flags, 
+              augmented, 
+              sizeMod, 
+              roles, 
+              dropshipPct, 
+              jumpshipPct, 
+              cargoPct);
     }
 }

@@ -34,11 +34,13 @@ package mekhq.campaign.universe.commandGeneration;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import java.util.EnumSet;
 import megamek.common.enums.SkillLevel;
 import mekhq.campaign.personnel.enums.PersonnelRole;
 import mekhq.campaign.universe.enums.TechAssignmentSortFactor;
@@ -131,5 +133,27 @@ class CommandGenerationOptionsTest {
         assertNotNull(options.getForceDescriptorSnapshot(), "Snapshot must lazy-initialize");
         assertSame(options.getForceDescriptorSnapshot(), options.getForceDescriptorSnapshot(),
               "Repeated access must return the same snapshot instance");
+    }
+    /** The dialog compares the tabs against the settings captured at Generate, so equality must be by value. */
+    @Test
+    void twoFreshOptionsAreEqual() {
+        assertEquals(new CommandGenerationOptions(), new CommandGenerationOptions());
+        assertEquals(new CommandGenerationOptions().hashCode(), new CommandGenerationOptions().hashCode());
+    }
+
+    @Test
+    void aChangedSettingBreaksEquality() {
+        CommandGenerationOptions options = new CommandGenerationOptions();
+        CommandGenerationOptions changed = new CommandGenerationOptions();
+        changed.setTemporaryCrewRoles(EnumSet.of(TemporaryCrewRole.INFANTRY));
+        assertNotEquals(options, changed, "a temporary-crew choice is part of the settings");
+
+        changed = new CommandGenerationOptions();
+        changed.getSupportPersonnelCoveragePercents().put(PersonnelRole.DOCTOR, 200);
+        assertNotEquals(options, changed, "a coverage percentage is part of the settings");
+
+        changed = new CommandGenerationOptions();
+        changed.getForceDescriptorSnapshot().setYear(3025);
+        assertNotEquals(options, changed, "the force description is part of the settings");
     }
 }

@@ -193,6 +193,24 @@ public class ForceGeneratorTab {
     }
 
     /**
+     * Registers a callback for Generate and Clear Force on the embedded view.
+     *
+     * @param listener given the rolled force, or {@code null} on Clear Force
+     */
+    public void setForceGeneratedListener(Consumer<ForceDescriptor> listener) {
+        if (viewUi != null) {
+            viewUi.setForceGeneratedListener(listener);
+        }
+    }
+
+    /** Rolls a force as pressing Generate does. */
+    public void requestGenerate() {
+        if (viewUi != null) {
+            viewUi.getOptionsView().requestGenerate();
+        }
+    }
+
+    /**
      * Wires the live source of the Setup tab's Formation Naming Method combo into the preview naming,
      * and is invoked by the pane during construction.
      *

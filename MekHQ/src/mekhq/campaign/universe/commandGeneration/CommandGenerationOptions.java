@@ -36,6 +36,7 @@ import java.util.EnumSet;
 import java.util.HashMap;
 import java.util.Map;
 
+import java.util.Objects;
 import java.util.Set;
 import megamek.common.annotations.Nullable;
 import megamek.common.enums.SkillLevel;
@@ -806,4 +807,142 @@ public class CommandGenerationOptions {
         this.payForAmmunition = payForAmmunition;
     }
     // endregion Getters/Setters
+
+    /**
+     * Two CommandGenerationOptionss are equal when every setting matches, which is how the dialog tells whether the
+     * settings have moved since the model was last generated.
+     */
+    @Override
+    public boolean equals(Object object) {
+        if (this == object) {
+            return true;
+        }
+        if (!(object instanceof CommandGenerationOptions other)) {
+            return false;
+        }
+        return Objects.equals(specifiedFaction, other.specifiedFaction)
+              && (generateMercenaryCompanyCommandLance == other.generateMercenaryCompanyCommandLance)
+              && Objects.equals(forceDescriptorSnapshot, other.forceDescriptorSnapshot)
+              && Objects.equals(supportPersonnelCoveragePercents, other.supportPersonnelCoveragePercents)
+              && Objects.equals(supportPersonnelSkillLevels, other.supportPersonnelSkillLevels)
+              && (generateAstechs == other.generateAstechs)
+              && (astechsAsPersonnel == other.astechsAsPersonnel)
+              && Objects.equals(astechSkillLevel, other.astechSkillLevel)
+              && (generateMedics == other.generateMedics)
+              && (medicsAsPersonnel == other.medicsAsPersonnel)
+              && Objects.equals(medicSkillLevel, other.medicSkillLevel)
+              && (generateMedicalReserve == other.generateMedicalReserve)
+              && (medicalReservePercent == other.medicalReservePercent)
+              && (assignTechsToUnits == other.assignTechsToUnits)
+              && Objects.equals(techAssignmentPrimarySort, other.techAssignmentPrimarySort)
+              && (techAssignmentPrimaryDescending == other.techAssignmentPrimaryDescending)
+              && Objects.equals(techAssignmentSecondarySort, other.techAssignmentSecondarySort)
+              && (techAssignmentSecondaryDescending == other.techAssignmentSecondaryDescending)
+              && Objects.equals(techAssignmentTertiarySort, other.techAssignmentTertiarySort)
+              && (techAssignmentTertiaryDescending == other.techAssignmentTertiaryDescending)
+              && (generateCaptains == other.generateCaptains)
+              && (assignCompanyCommanderFlag == other.assignCompanyCommanderFlag)
+              && (applyOfficerStatBonusToWorstSkill == other.applyOfficerStatBonusToWorstSkill)
+              && (assignBestCompanyCommander == other.assignBestCompanyCommander)
+              && (prioritizeCompanyCommanderCombatSkills == other.prioritizeCompanyCommanderCombatSkills)
+              && (assignBestOfficers == other.assignBestOfficers)
+              && (prioritizeOfficerCombatSkills == other.prioritizeOfficerCombatSkills)
+              && (assignMostSkilledToPrimaryLances == other.assignMostSkilledToPrimaryLances)
+              && (automaticallyAssignRanks == other.automaticallyAssignRanks)
+              && (useSpecifiedFactionToAssignRanks == other.useSpecifiedFactionToAssignRanks)
+              && (assignMekWarriorsCallSigns == other.assignMekWarriorsCallSigns)
+              && (assignFounderFlag == other.assignFounderFlag)
+              && (useImplants == other.useImplants)
+              && Objects.equals(temporaryCrewRoles, other.temporaryCrewRoles)
+              && (useManeiDomini == other.useManeiDomini)
+              && Objects.equals(neuralInterfaceMode, other.neuralInterfaceMode)
+              && Objects.equals(forceNamingMethod, other.forceNamingMethod)
+              && (alwaysNumberRegiments == other.alwaysNumberRegiments)
+              && (generateFormationIcons == other.generateFormationIcons)
+              && (useSpecifiedFactionToGenerateFormationIcons == other.useSpecifiedFactionToGenerateFormationIcons)
+              && (generateOriginNodeFormationIcon == other.generateOriginNodeFormationIcon)
+              && (useOriginNodeFormationIconLogo == other.useOriginNodeFormationIconLogo)
+              && (runStartingSimulation == other.runStartingSimulation)
+              && (simulationDuration == other.simulationDuration)
+              && (simulateRandomMarriages == other.simulateRandomMarriages)
+              && (simulateRandomProcreation == other.simulateRandomProcreation)
+              && (selectStartingContract == other.selectStartingContract)
+              && (startCourseToContractPlanet == other.startCourseToContractPlanet)
+              && (processFinances == other.processFinances)
+              && (startingCashPercent == other.startingCashPercent)
+              && (randomizeStartingCash == other.randomizeStartingCash)
+              && (randomStartingCashDiceCount == other.randomStartingCashDiceCount)
+              && (minimumStartingFloat == other.minimumStartingFloat)
+              && (startingLoan == other.startingLoan)
+              && (payForSetup == other.payForSetup)
+              && (payForPersonnel == other.payForPersonnel)
+              && (payForUnits == other.payForUnits)
+              && (payForParts == other.payForParts)
+              && (payForArmour == other.payForArmour)
+              && (payForAmmunition == other.payForAmmunition);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(specifiedFaction, 
+              generateMercenaryCompanyCommandLance, 
+              forceDescriptorSnapshot, 
+              supportPersonnelCoveragePercents, 
+              supportPersonnelSkillLevels, 
+              generateAstechs, 
+              astechsAsPersonnel, 
+              astechSkillLevel, 
+              generateMedics, 
+              medicsAsPersonnel, 
+              medicSkillLevel, 
+              generateMedicalReserve, 
+              medicalReservePercent, 
+              assignTechsToUnits, 
+              techAssignmentPrimarySort, 
+              techAssignmentPrimaryDescending, 
+              techAssignmentSecondarySort, 
+              techAssignmentSecondaryDescending, 
+              techAssignmentTertiarySort, 
+              techAssignmentTertiaryDescending, 
+              generateCaptains, 
+              assignCompanyCommanderFlag, 
+              applyOfficerStatBonusToWorstSkill, 
+              assignBestCompanyCommander, 
+              prioritizeCompanyCommanderCombatSkills, 
+              assignBestOfficers, 
+              prioritizeOfficerCombatSkills, 
+              assignMostSkilledToPrimaryLances, 
+              automaticallyAssignRanks, 
+              useSpecifiedFactionToAssignRanks, 
+              assignMekWarriorsCallSigns, 
+              assignFounderFlag, 
+              useImplants, 
+              temporaryCrewRoles, 
+              useManeiDomini, 
+              neuralInterfaceMode, 
+              forceNamingMethod, 
+              alwaysNumberRegiments, 
+              generateFormationIcons, 
+              useSpecifiedFactionToGenerateFormationIcons, 
+              generateOriginNodeFormationIcon, 
+              useOriginNodeFormationIconLogo, 
+              runStartingSimulation, 
+              simulationDuration, 
+              simulateRandomMarriages, 
+              simulateRandomProcreation, 
+              selectStartingContract, 
+              startCourseToContractPlanet, 
+              processFinances, 
+              startingCashPercent, 
+              randomizeStartingCash, 
+              randomStartingCashDiceCount, 
+              minimumStartingFloat, 
+              startingLoan, 
+              payForSetup, 
+              payForPersonnel, 
+              payForUnits, 
+              payForParts, 
+              payForArmour, 
+              payForAmmunition);
+    }
 }

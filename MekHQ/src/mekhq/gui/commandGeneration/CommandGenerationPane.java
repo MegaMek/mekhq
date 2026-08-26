@@ -220,6 +220,11 @@ public class CommandGenerationPane extends AbstractMHQTabbedPane {
         return sparesAndFinancesTab;
     }
 
+    /** Brings the Force Generator tab to the front, for a caller that needs the player back at the preview. */
+    public void showForceGeneratorTab() {
+        setSelectedIndex(indexOfTab(tabTitle("forceGeneratorTab")));
+    }
+
     private static String tabTitle(String resourceKey) {
         // Matches the {namespace}.title convention used in CampaignOptionsDialog.properties (no "lbl" prefix).
         return getTextAt(getCommandGenerationResourceBundle(), resourceKey + ".title");

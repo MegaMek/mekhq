@@ -112,6 +112,13 @@ public class CommandGenerationDialog extends AbstractMHQValidationButtonDialog {
 
     private static final MMLogger LOGGER = MMLogger.create(CommandGenerationDialog.class);
 
+    /**
+     * The settings as they stood when the model was last generated, or {@code null} while there is no model.
+     * Accept compares the tabs against this so a setting changed after Generate cannot silently produce a
+     * command that differs from the one previewed.
+     */
+    private CommandGenerationOptions settingsAtLastGenerate;
+
     private Campaign campaign;
     private CommandGenerationOptions commandGenerationOptions;
     private CommandGenerationPane pane;
@@ -158,6 +165,7 @@ public class CommandGenerationDialog extends AbstractMHQValidationButtonDialog {
         pane.getSetupTab().loadValuesFromOptions(startingOptions);
         pane.getForceGeneratorTab().loadValuesFromOptions(startingOptions);
         pane.getSparesAndFinancesTab().loadValuesFromOptions(startingOptions);
+        pane.getForceGeneratorTab().setForceGeneratedListener(this::rememberSettingsAtGenerate);
 
         // Settings that follow from the faction are applied after the tabs are populated, not before.
         // Loading the options sets the naming method directly, so a Clan's Greek naming would
@@ -309,21 +317,76 @@ public class CommandGenerationDialog extends AbstractMHQValidationButtonDialog {
               campaignFaction.getShortName());
     }
 
-    @Override
-    protected void okAction() {
-        // Build a CommandGenerationOptions snapshot from the four tabs. The Setup / Force Generator /
-        // Other tabs all round-trip through this object; the Spares tab writes to CampaignOptions
-        // directly (see SparesTab.writeValuesToOptions for the rationale).
-        CommandGenerationOptions options;
-        if (commandGenerationOptions != null) {
-            options = commandGenerationOptions;
-        } else {
-            options = new CommandGenerationOptions();
-            seedSpecifiedFactionFromCampaign(options, "okAction-fresh");
-        }
+    /**
+     * Reads every tab into a fresh options object. Reading the tabs has no side effect on the campaign; the
+     * spares spinners, which are campaign options, are written separately at Accept.
+     */
+    private CommandGenerationOptions collectOptionsFromTabs(String caller) {
+        CommandGenerationOptions options = new CommandGenerationOptions();
+        seedSpecifiedFactionFromCampaign(options, caller);
         pane.getSetupTab().writeValuesToOptions(options);
         pane.getForceGeneratorTab().writeValuesToOptions(options);
         pane.getSparesAndFinancesTab().writeValuesToOptions(options);
+        return options;
+    }
+
+    /**
+     * Keeps the settings that produced the model. A roll snapshots the tabs; Clear Force drops the snapshot
+     * with the model it described.
+     *
+     * @param generated the rolled force, or {@code null} on Clear Force
+     */
+    private void rememberSettingsAtGenerate(@Nullable ForceDescriptor generated) {
+        if (generated == null) {
+            settingsAtLastGenerate = null;
+            LOGGER.debug("[CompanyGen][Dialog][Settings] force cleared; no settings to hold the build to");
+            return;
+        }
+        settingsAtLastGenerate = collectOptionsFromTabs("generate");
+        LOGGER.info("[CompanyGen][Dialog][Settings] settings captured with the generated model");
+    }
+
+    /**
+     * Decides which settings the build uses when the tabs have moved since the last Generate.
+     *
+     * @param current the settings as the tabs stand now
+     *
+     * @return the settings to build with, or {@code null} if the build should not go ahead
+     */
+    private @Nullable CommandGenerationOptions settingsToBuildWith(CommandGenerationOptions current) {
+        if ((settingsAtLastGenerate == null) || settingsAtLastGenerate.equals(current)) {
+            return current;
+        }
+        LOGGER.info("[CompanyGen][Dialog][Settings] settings changed since the last Generate; asking the player");
+        Object[] buttonLabels = { resources.getString("CommandGenerationDialog.settingsChanged.previewed"),
+                                   resources.getString("CommandGenerationDialog.settingsChanged.regenerate"),
+                                   resources.getString("Cancel.text") };
+        int choice = JOptionPane.showOptionDialog(getFrame(),
+              resources.getString("CommandGenerationDialog.settingsChanged.text"),
+              resources.getString("CommandGenerationDialog.settingsChanged.title"),
+              JOptionPane.DEFAULT_OPTION, JOptionPane.WARNING_MESSAGE, null, buttonLabels, buttonLabels[0]);
+        if (choice == 0) {
+            LOGGER.info("[CompanyGen][Dialog][Settings] building with the settings the model was generated under");
+            return settingsAtLastGenerate;
+        }
+        if (choice == 1) {
+            LOGGER.info("[CompanyGen][Dialog][Settings] regenerating with the current settings");
+            pane.showForceGeneratorTab();
+            pane.getForceGeneratorTab().requestGenerate();
+        } else {
+            LOGGER.info("[CompanyGen][Dialog][Settings] build cancelled at the changed-settings prompt");
+        }
+        return null;
+    }
+
+    @Override
+    protected void okAction() {
+        CommandGenerationOptions options = settingsToBuildWith(collectOptionsFromTabs("okAction"));
+        if (options == null) {
+            return;
+        }
+        // The spares spinners are campaign options; they take effect now, at the commit.
+        pane.getSparesAndFinancesTab().writeSparesToCampaignOptions();
 
         // Accept commits the exact force the player previewed on the Force Generator tab (its Generate
         // button rolls the ForceDescriptor and fills the TO&E tree + Composition Summary). Require a

@@ -529,8 +529,9 @@ public class SparesAndFinancesTab {
      * supplied {@code targetOptions}.
      */
     public void writeValuesToOptions(CommandGenerationOptions targetOptions) {
-        writeSparesToCampaignOptions();
-
+        // The spares spinners are campaign options and are written by writeSparesToCampaignOptions, which the
+        // dialog calls at Accept. Writing them here too made reading the tab a side effect on the campaign,
+        // which the dialog now does whenever it needs to compare settings.
         if (targetOptions == null) {
             return;
         }
@@ -557,7 +558,11 @@ public class SparesAndFinancesTab {
         targetOptions.setSimulateRandomProcreation(chkSimulateRandomProcreation.isSelected());
     }
 
-    private void writeSparesToCampaignOptions() {
+    /**
+     * Writes the spares spinners to the campaign options. Called by the dialog when the command is accepted,
+     * so the selections take effect for both the initial spawn and ongoing resupply.
+     */
+    public void writeSparesToCampaignOptions() {
         if (campaign == null) {
             return;
         }
