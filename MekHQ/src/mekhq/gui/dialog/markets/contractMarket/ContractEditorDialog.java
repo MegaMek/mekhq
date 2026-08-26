@@ -196,6 +196,11 @@ public class ContractEditorDialog extends JDialog {
     private JComboBox<ChaosContractStepsTable> transportTermCombo;
     private JComboBox<ChaosContractStepsTable> salvageCombo;
     private JComboBox<ChaosContractStepsTable> commandCombo;
+    private JCheckBox payNonNegotiableCheck;
+    private JCheckBox supportNonNegotiableCheck;
+    private JCheckBox transportNonNegotiableCheck;
+    private JCheckBox salvageNonNegotiableCheck;
+    private JCheckBox commandNonNegotiableCheck;
 
     // Objectives
     private JComboBox<ContractObjectiveType> playerObjectiveCombo;
@@ -799,22 +804,52 @@ public class ContractEditorDialog extends JDialog {
     private JPanel buildTermsCard() {
         JPanel rows = rowsPanel();
 
+        NonNegotiableTermsData locks = contract.getNonNegotiableTermsData();
+        if (locks == null) {
+            locks = NonNegotiableTermsData.none();
+        }
+        // Which terms the employer has locked can only be set while the contract is still an offer; once it has been
+        // accepted the player has agreed to those terms, so the checkboxes show their state but are disabled.
+        boolean lockEditable = contract.getStatus() == null;
+
         payRateCombo = stepsCombo(contract.getBasePayRateStep(), TermEffect.PAY_RATE);
-        rows.add(formRow("edit.contractMarket.field.payRate", payRateCombo));
+        payNonNegotiableCheck = nonNegotiableCheckbox(locks.payLocked(), lockEditable);
+        rows.add(formRow("edit.contractMarket.field.payRate", withAutomatic(payRateCombo, payNonNegotiableCheck)));
 
         supportCombo = stepsCombo(contract.getSupportStep(), TermEffect.SUPPORT);
-        rows.add(formRow("edit.contractMarket.field.support", supportCombo));
+        supportNonNegotiableCheck = nonNegotiableCheckbox(locks.supportLocked(), lockEditable);
+        rows.add(formRow("edit.contractMarket.field.support", withAutomatic(supportCombo, supportNonNegotiableCheck)));
 
         transportTermCombo = stepsCombo(contract.getTransportStep(), TermEffect.TRANSPORT);
-        rows.add(formRow("edit.contractMarket.field.transport", transportTermCombo));
+        transportNonNegotiableCheck = nonNegotiableCheckbox(locks.transportLocked(), lockEditable);
+        rows.add(formRow("edit.contractMarket.field.transport",
+              withAutomatic(transportTermCombo, transportNonNegotiableCheck)));
 
         salvageCombo = stepsCombo(contract.getSalvageRightsStep(), TermEffect.SALVAGE);
-        rows.add(formRow("edit.contractMarket.field.salvage", salvageCombo));
+        salvageNonNegotiableCheck = nonNegotiableCheckbox(locks.salvageLocked(), lockEditable);
+        rows.add(formRow("edit.contractMarket.field.salvage", withAutomatic(salvageCombo, salvageNonNegotiableCheck)));
 
         commandCombo = stepsCombo(contract.getCommandRightsStep(), TermEffect.COMMAND);
-        rows.add(formRow("edit.contractMarket.field.command", commandCombo));
+        commandNonNegotiableCheck = nonNegotiableCheckbox(locks.commandLocked(), lockEditable);
+        rows.add(formRow("edit.contractMarket.field.command", withAutomatic(commandCombo, commandNonNegotiableCheck)));
 
         return card(rows);
+    }
+
+    /**
+     * A "non-negotiable" checkbox for a term: ticked when the employer has locked that term, disabled (but still
+     * showing its state) once the contract has been accepted, since the locks can no longer change at that point.
+     */
+    private JCheckBox nonNegotiableCheckbox(boolean locked, boolean editable) {
+        JCheckBox checkbox = new JCheckBox(getTextAt(RESOURCE_BUNDLE, "edit.contractMarket.field.nonNegotiable"),
+              locked);
+        checkbox.setToolTipText(wordWrap(getTextAt(RESOURCE_BUNDLE, editable
+                                                                          ?
+                                                                          "edit.contractMarket.field.nonNegotiable.tooltip"
+                                                                          :
+                                                                          "edit.contractMarket.field.nonNegotiable.disabled.tooltip")));
+        checkbox.setEnabled(editable);
+        return checkbox;
     }
 
     private JPanel buildObjectivesCard() {
@@ -1099,6 +1134,11 @@ public class ContractEditorDialog extends JDialog {
         // Terms
         contract.setContractTerms(new ContractTermsData(stepValue(payRateCombo), stepValue(supportCombo),
               stepValue(transportTermCombo), stepValue(salvageCombo), stepValue(commandCombo)));
+        // A disabled checkbox still reports its loaded state, so on an accepted contract this preserves the existing
+        // locks unchanged.
+        contract.setNonNegotiableTermsData(new NonNegotiableTermsData(payNonNegotiableCheck.isSelected(),
+              supportNonNegotiableCheck.isSelected(), transportNonNegotiableCheck.isSelected(),
+              salvageNonNegotiableCheck.isSelected(), commandNonNegotiableCheck.isSelected()));
 
         // Objectives
         contract.setObjectiveData(new ContractObjectiveData(objectiveValue(playerObjectiveCombo),

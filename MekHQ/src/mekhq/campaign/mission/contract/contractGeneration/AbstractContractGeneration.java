@@ -62,6 +62,7 @@ import mekhq.campaign.mission.contract.contractData.ContractScheduleData;
 import mekhq.campaign.mission.contract.contractData.ContractTermsData;
 import mekhq.campaign.mission.contract.contractData.EmployerData;
 import mekhq.campaign.mission.contract.contractData.EnemyData;
+import mekhq.campaign.mission.contract.contractData.NonNegotiableTermsData;
 import mekhq.campaign.mission.contract.contractData.ObfuscatableIntel;
 import mekhq.campaign.mission.contract.contractData.RentedFacilitiesData;
 import mekhq.campaign.mission.contract.contractData.SystemsTargetData;
@@ -85,6 +86,8 @@ public class AbstractContractGeneration {
 
     /** Auto intel obfuscation hides each obfuscatable field with a 1-in-this chance (so ~1 field hidden on average). */
     private static final int INTEL_OBFUSCATION_ODDS = 4;
+    /** Each contract term independently has a 1-in-this chance of being locked as non-negotiable at generation. */
+    private static final int NON_NEGOTIABLE_TERM_ODDS = 4;
 
     public static @Nullable AbstractContract createContract(Campaign campaign, CampaignOptions campaignOptions,
           LocalDate currentDate, Detachment detachment, int contractGenerationModifier, ContractSearchType searchType,
@@ -163,6 +166,9 @@ public class AbstractContractGeneration {
         boolean useFactionModifiers = campaignOptions.get(CampaignOption.USE_CONTRACT_FACTION_MODIFIERS);
         setContractTerms(chaosObjectiveType, employerData.type(), employerData.getFaction(), useFactionModifiers,
               contract);
+        if (campaignOptions.get(CampaignOption.USE_NON_NEGOTIABLE_TERMS)) {
+            lockNonNegotiableTerms(contract);
+        }
 
         // Step 9: Final Tasks
         performFinalTasks(campaign, currentDate, contract, currentLocation);
@@ -472,6 +478,20 @@ public class AbstractContractGeneration {
         ContractTermsData initialContractTerms = ChaosContractDeterminationTerms.determineInitialTerms(objectiveType,
               employerType, employerFaction, useFactionModifiers);
         contract.setContractTerms(initialContractTerms);
+    }
+
+    /**
+     * Rolls, independently for each of the five terms, a 1-in-4 chance that the employer locks it as non-negotiable.
+     * Locked terms are fixed at their generated value: the player can neither improve nor sacrifice them in the
+     * negotiation dialog.
+     */
+    private static void lockNonNegotiableTerms(ChaosContract contract) {
+        contract.setNonNegotiableTermsData(new NonNegotiableTermsData(rollNonNegotiable(), rollNonNegotiable(),
+              rollNonNegotiable(), rollNonNegotiable(), rollNonNegotiable()));
+    }
+
+    private static boolean rollNonNegotiable() {
+        return Compute.randomInt(NON_NEGOTIABLE_TERM_ODDS) == 0;
     }
 
     private static void determineSchedule(Campaign campaign, boolean useVariableContractLength, LocalDate currentDate,

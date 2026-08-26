@@ -110,6 +110,7 @@ class ContractMarketPage {
     private JCheckBox chkUseChaosScaleSupportPointConversion;
     private JCheckBox chkUseContractFactionModifiers;
     private JCheckBox chkUseIntelObfuscation;
+    private JCheckBox chkUseNonNegotiableTerms;
     private JLabel lblDropShipBonusPercentage;
     private JSpinner spnDropShipBonusPercentage;
     private JLabel lblPityContracts;
@@ -264,6 +265,10 @@ class ContractMarketPage {
               getMetadata(new Version(0, 51, 1), CUSTOM_SYSTEM));
         chkUseIntelObfuscation.addMouseListener(createTipPanelUpdater("UseIntelObfuscation"));
 
+        chkUseNonNegotiableTerms = new CampaignOptionsCheckBox("UseNonNegotiableTerms",
+              getMetadata(new Version(0, 51, 1), CUSTOM_SYSTEM));
+        chkUseNonNegotiableTerms.addMouseListener(createTipPanelUpdater("UseNonNegotiableTerms"));
+
         lblDropShipBonusPercentage = new CampaignOptionsLabel("DropShipBonusPercentage");
         lblDropShipBonusPercentage.addMouseListener(createTipPanelUpdater("DropShipBonusPercentage"));
         spnDropShipBonusPercentage = new CampaignOptionsSpinner("DropShipBonusPercentage", 0, 0, 20, 5);
@@ -295,6 +300,7 @@ class ContractMarketPage {
               chkUseChaosScaleSupportPointConversion,
               chkUseContractFactionModifiers,
               chkUseIntelObfuscation,
+              chkUseNonNegotiableTerms,
               chkBLCSaleValue,
               chkOverageRepaymentInFinalPayment);
         panel.addRow(lblDropShipBonusPercentage, spnDropShipBonusPercentage);
@@ -617,6 +623,7 @@ class ContractMarketPage {
         chkUseChaosScaleSupportPointConversion.setSelected(model.useChaosScaleSupportPointConversion);
         chkUseContractFactionModifiers.setSelected(model.useContractFactionModifiers);
         chkUseIntelObfuscation.setSelected(model.useIntelObfuscation);
+        chkUseNonNegotiableTerms.setSelected(model.useNonNegotiableTerms);
         spnDropShipBonusPercentage.setValue(model.dropShipBonusPercentage);
         spnPityContracts.setValue(model.pityContracts);
         spnContractBasePayMultiplier.setValue(model.contractBasePayMultiplier);
@@ -667,6 +674,7 @@ class ContractMarketPage {
         model.useChaosScaleSupportPointConversion = chkUseChaosScaleSupportPointConversion.isSelected();
         model.useContractFactionModifiers = chkUseContractFactionModifiers.isSelected();
         model.useIntelObfuscation = chkUseIntelObfuscation.isSelected();
+        model.useNonNegotiableTerms = chkUseNonNegotiableTerms.isSelected();
         model.dropShipBonusPercentage = (int) spnDropShipBonusPercentage.getValue();
         model.pityContracts = (int) spnPityContracts.getValue();
         model.contractBasePayMultiplier = (double) spnContractBasePayMultiplier.getValue();
