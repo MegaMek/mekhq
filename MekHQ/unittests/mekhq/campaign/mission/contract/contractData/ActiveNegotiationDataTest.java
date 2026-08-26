@@ -46,8 +46,11 @@ class ActiveNegotiationDataTest {
 
     @Test
     void haggleIsTaggedHaggleAndExposesPerTermDeltas() {
-        ActiveNegotiationData data = ActiveNegotiationData.haggle(2, 1, -1, 2, -2, 3);
+        // haggle(attempts, netMargin, pay, support, transport, salvage, command)
+        ActiveNegotiationData data = ActiveNegotiationData.haggle(1, 2, 1, -1, 2, -2, 3);
         assertEquals(Kind.HAGGLE, data.kind());
+        assertEquals(1, data.attempts());
+        assertEquals(2, data.netMargin());
         assertEquals(1, data.deltaFor(Term.BASE_PAY));
         assertEquals(-1, data.deltaFor(Term.SUPPORT));
         assertEquals(2, data.deltaFor(Term.TRANSPORT));
@@ -57,9 +60,10 @@ class ActiveNegotiationDataTest {
 
     @Test
     void exceptionIsTaggedExceptionAndExposesPerTermLockChanges() {
-        // +1 waived, -1 newly locked, 0 unchanged.
-        ActiveNegotiationData data = ActiveNegotiationData.exception(1, 1, 0, -1, 0, 0);
+        // exception(attempts, netMargin, pay, support, transport, salvage, command); +1 waived, -1 newly locked.
+        ActiveNegotiationData data = ActiveNegotiationData.exception(2, 1, 1, 0, -1, 0, 0);
         assertEquals(Kind.EXCEPTION, data.kind());
+        assertEquals(2, data.attempts());
         assertEquals(1, data.deltaFor(Term.BASE_PAY));
         assertEquals(0, data.deltaFor(Term.SUPPORT));
         assertEquals(-1, data.deltaFor(Term.TRANSPORT));
