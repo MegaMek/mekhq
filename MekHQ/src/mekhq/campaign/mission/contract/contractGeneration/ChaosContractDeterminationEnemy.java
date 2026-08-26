@@ -64,11 +64,21 @@ public class ChaosContractDeterminationEnemy {
 
     private ChaosContractDeterminationEnemy() {}
 
+    /**
+     * Draws an enemy faction for the given objective. A covert contract overrides the objective's usual enemy-selection
+     * profile with {@link EnemySelectionProfile#COVERT}, so the enemy is drawn from the standard pool under covert
+     * rules where even the employer's allies can become rare, low-chance targets; a non-covert contract uses the
+     * objective's own profile.
+     *
+     * @param isCovert whether this contract is being run as a covert operation
+     */
     public static EnemyData generateEnemyFactionForObjective(Campaign campaign, ILocation currentLocation,
-          LocalDate currentDate, Faction employerFaction, ContractObjectiveType objectiveType) {
+          LocalDate currentDate, Faction employerFaction, ContractObjectiveType objectiveType, boolean isCovert) {
         RandomFactionGenerator randomFactionGenerator = RandomFactionGenerator.getInstance();
 
-        EnemySelectionProfile enemySelectionProfile = objectiveType.getEnemySelectionProfile();
+        EnemySelectionProfile enemySelectionProfile = isCovert ?
+                                                            EnemySelectionProfile.COVERT :
+                                                            objectiveType.getEnemySelectionProfile();
         Faction enemyFaction = randomFactionGenerator.getRandomEnemy(currentLocation, currentDate, employerFaction,
               enemySelectionProfile);
 

@@ -739,7 +739,8 @@ public class MHQMorale {
               campaign.getPlayerForce().getForceDetachment().getCurrentLocation(),
               campaign.getLocalDate(),
               contract.getEmployerFaction(),
-              contract.getObjectiveType()
+              contract.getObjectiveType(),
+              false // Always treat this as a non-covert contract to avoid weirdness
         );
 
         // The Batchall, standing update, and salvage clause below all concern the newly generated enemy, so read its

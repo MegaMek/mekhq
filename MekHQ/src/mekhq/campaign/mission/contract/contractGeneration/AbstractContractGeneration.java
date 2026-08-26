@@ -33,11 +33,13 @@
 package mekhq.campaign.mission.contract.contractGeneration;
 
 import static java.lang.Math.ceil;
+import static mekhq.campaign.mission.utilities.RandomFactionCamouflage.pickRandomCamouflage;
 import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
 
 import java.time.LocalDate;
 import java.util.List;
 import java.util.UUID;
+import java.util.function.Predicate;
 
 import jakarta.annotation.Nonnull;
 import jakarta.annotation.Nullable;
@@ -57,15 +59,7 @@ import mekhq.campaign.force.PlayerForce;
 import mekhq.campaign.location.ILocation;
 import mekhq.campaign.mission.contract.AbstractContract;
 import mekhq.campaign.mission.contract.ChaosContract;
-import mekhq.campaign.mission.contract.contractData.ContractObjectiveData;
-import mekhq.campaign.mission.contract.contractData.ContractScheduleData;
-import mekhq.campaign.mission.contract.contractData.ContractTermsData;
-import mekhq.campaign.mission.contract.contractData.EmployerData;
-import mekhq.campaign.mission.contract.contractData.EnemyData;
-import mekhq.campaign.mission.contract.contractData.NonNegotiableTermsData;
-import mekhq.campaign.mission.contract.contractData.ObfuscatableIntel;
-import mekhq.campaign.mission.contract.contractData.RentedFacilitiesData;
-import mekhq.campaign.mission.contract.contractData.SystemsTargetData;
+import mekhq.campaign.mission.contract.contractData.*;
 import mekhq.campaign.mission.contract.utilities.MHQMorale;
 import mekhq.campaign.mission.utilities.ContractUtilities;
 import mekhq.campaign.personnel.Person;
@@ -73,6 +67,7 @@ import mekhq.campaign.reputation.chaosReputation.ChaosReputation;
 import mekhq.campaign.universe.Faction;
 import mekhq.campaign.universe.Planet;
 import mekhq.campaign.universe.PlanetarySystem;
+import mekhq.campaign.universe.RandomFactionGenerator;
 import mekhq.campaign.universe.Systems;
 import mekhq.campaign.universe.factionStanding.FactionStandingUtilities;
 import mekhq.campaign.universe.factionStanding.FactionStandings;
@@ -88,6 +83,15 @@ public class AbstractContractGeneration {
     private static final int INTEL_OBFUSCATION_ODDS = 4;
     /** Each contract term independently has a 1-in-this chance of being locked as non-negotiable at generation. */
     private static final int NON_NEGOTIABLE_TERM_ODDS = 4;
+    /** A covert-candidate objective has a 1-in-this chance of the contract actually being run as a covert operation. */
+    private static final int COVERT_CONTRACT_ODDS = 6;
+    /** A covert contract has a 1-in-this chance of being a false flag operation, run under a cover-story front. */
+    private static final int FALSE_FLAG_ODDS = 6;
+    /**
+     * The steeper false flag odds (1-in-this) used when a covert contract's true backer is ComStar or the Word of
+     * Blake, for whom deniable false flag operations are a signature tactic.
+     */
+    private static final int COMSTAR_WOB_FALSE_FLAG_ODDS = 2;
 
     public static @Nullable AbstractContract createContract(Campaign campaign, CampaignOptions campaignOptions,
           LocalDate currentDate, Detachment detachment, int contractGenerationModifier, ContractSearchType searchType,
@@ -97,19 +101,26 @@ public class AbstractContractGeneration {
         // Inject the options so the contract's term getters apply the configured per-term multipliers even while the
         // offer is still in the market (before it is accepted and registered on the campaign).
         contract.setCampaignOptions(campaignOptions);
-        contract.setProvingGround(provingGround);
+        if (provingGround) {
+            contract.setNature(ContractNature.PROVING_GROUND);
+        }
 
-        // Step 1: Employer
+        // Step 1: Type. Resolved before the employer so the employer step knows whether the contract is covert-viable
+        ContractObjectiveData objectiveData = pickObjective(contractGenerationModifier, contract);
+        ChaosObjectiveType chaosObjectiveType = objectiveData.playerObjectiveType().getChaosObjectiveType();
+        boolean isDefensiveObjective = !chaosObjectiveType.isAttacker();
+
+        // Step 2: Employer
         AbstractLocation currentLocation = detachment.getCurrentLocation();
-        EmployerData employerData = pickEmployer(campaign, currentDate, currentLocation, searchType, contract);
+        EmployerData employerData = pickEmployer(campaign, currentDate, currentLocation, searchType,
+              chaosObjectiveType.isCovertCandidate(), contract);
         if (employerData == null) {
             return null;
         }
 
-        // Step 2: Type
-        ContractObjectiveData objectiveData = pickObjective(contractGenerationModifier, contract);
-        ChaosObjectiveType chaosObjectiveType = objectiveData.playerObjectiveType().getChaosObjectiveType();
-        boolean isDefensiveObjective = !objectiveData.playerObjectiveType().getChaosObjectiveType().isAttacker();
+        // Covert status - needs both the objective and the now-resolved employer/sponsor (its odds depend on the true
+        // backer). Must be set before the enemy is picked, which draws under covert rules when this is true.
+        determineCovertStatus(chaosObjectiveType, contract);
 
         // Step 3: Scale & Intensity
         setAncillaryValues(campaign, detachment.getHangar(), contract);
@@ -188,12 +199,24 @@ public class AbstractContractGeneration {
         contract.setContractId(contractId);
         contract.setStatus(null);
 
-        // Contract Details
+        // A false flag operation is run under a cover story: swap the visible employer to a front faction and preserve
+        // the real employer as the covert sponsor. Done now that the real employer and enemy are known, so everything
+        // downstream - the name, the market, the briefing, the allied forces - sees the front, while Faction Standing
+        // still accrues to the real employer through the sponsor.
+        if (contract.isFalseFlag()) {
+            applyFalseFlagCover(contract, currentLocation, currentDate);
+        }
+
+        // Contract Details. A plain covert operation keeps the true employer out of the title (getEmployerMarketDisplayName
+        // returns the "Undisclosed Employer" placeholder); a false flag already shows its front as the visible employer.
+        String employerName = contract.isCovert()
+                                    ? contract.getEmployerMarketDisplayName()
+                                    : contract.getEmployerDisplayName();
         String contractName = getFormattedTextAt(RESOURCE_BUNDLES,
               "AbstractContractGeneration.contractName",
               contract.getStartDate(),
               contract.getObjectiveType().toString(),
-              contract.getEmployerDisplayName(),
+              employerName,
               contract.getEnemyDisplayName());
         contract.setContractName(contractName);
 
@@ -231,6 +254,85 @@ public class AbstractContractGeneration {
                 contract.setIntelObfuscated(field, true);
             }
         }
+    }
+
+    /**
+     * Decides whether a freshly generated contract is a covert operation. Only objectives flagged as covert candidates
+     * are eligible, and even those turn covert only on a {@link #COVERT_CONTRACT_ODDS} chance roll; every other
+     * contract is left as-is. A contract that already has a special designation (a Proving Ground) is never overridden
+     * - the designations are mutually exclusive and the deliberate market top-up takes priority over the random covert
+     * roll. A portion of the covert contracts become false flag operations instead, run under a cover-story front
+     * (applied later, once the enemy is known - see {@link #applyFalseFlagCover}). That portion is much larger when the
+     * contract's true backer is ComStar or the Word of Blake ({@link #COMSTAR_WOB_FALSE_FLAG_ODDS} rather than
+     * {@link #FALSE_FLAG_ODDS}), since deniable false flags are their signature. Either way the enemy is later drawn
+     * under covert rules (see {@link ChaosContractDeterminationEnemy#generateEnemyFactionForObjective}), where even the
+     * employer's allies can become rare targets.
+     */
+    private static void determineCovertStatus(ChaosObjectiveType chaosObjectiveType, ChaosContract contract) {
+        if (contract.getNature() != ContractNature.NORMAL) {
+            return;
+        }
+        if (chaosObjectiveType.isCovertCandidate() && Compute.randomInt(COVERT_CONTRACT_ODDS) == 0) {
+            int falseFlagOdds = contract.getStandingEmployerFaction().isComStarOrWoB()
+                                      ? COMSTAR_WOB_FALSE_FLAG_ODDS
+                                      : FALSE_FLAG_ODDS;
+            boolean isFalseFlag = Compute.randomInt(falseFlagOdds) == 0;
+            contract.setNature(isFalseFlag ? ContractNature.FALSE_FLAG : ContractNature.COVERT);
+        }
+    }
+
+    /**
+     * Dresses a false flag operation in its cover story by making a front faction the visible employer while preserving
+     * the real employer as the covert sponsor. The front is a regionally plausible employer faction near the contract -
+     * drawn the same way a real employer would be - that is neither the true employer nor the enemy, so the cover holds
+     * up. The rest of the employer record (type, territorial anchor, negotiator, force ratings, camouflage, color) is
+     * carried over unchanged, so only the presented identity changes; the real employer survives in the sponsor slot,
+     * where {@link AbstractContract#getStandingEmployerFaction()} still routes Faction Standing to it.
+     *
+     * <p>If no plausible front can be found the contract falls back to a plain covert operation, concealing the
+     * employer
+     * as "Undisclosed Employer" instead.</p>
+     *
+     * @param contract the false flag contract to dress in a cover story
+     * @param location the contract's current location, used to find regionally present factions
+     * @param date     the current date, used for faction availability and the front's era-correct name
+     */
+    private static void applyFalseFlagCover(ChaosContract contract, ILocation location, LocalDate date) {
+        EmployerData realEmployer = contract.getEmployerData();
+        Faction realEmployerFaction = contract.getEmployerFaction();
+        Faction enemy = contract.getEnemyFaction();
+        Predicate<Faction> notAPrincipal = faction -> !faction.equals(realEmployerFaction) && !faction.equals(enemy);
+
+        Faction front = RandomFactionGenerator.getInstance().getRandomEmployerFaction(location, date, true,
+              notAPrincipal);
+        if (front == null) {
+            // No plausible front; degrade to a plain covert operation, which conceals the employer outright.
+            contract.setNature(ContractNature.COVERT);
+            return;
+        }
+
+        // Preserve the party that bears the standing consequences: the real employer's existing sponsor if it has one,
+        // otherwise the real employer itself.
+        String sponsorFactionCode = (realEmployer.sponsorFactionCode() != null)
+                                          ? realEmployer.sponsorFactionCode()
+                                          : realEmployer.factionCode();
+
+        // Re-roll the camouflage for the front so allied units in battle wear the cover faction's colours, not the real
+        // employer's - otherwise the front's faction camo would give the operation away. Force ratings are kept: the
+        // troops are still the real employer's, only their presented identity changes. The player colour is left as the
+        // generated default, which is uniform across all employers and so reveals nothing.
+        EmployerData cover = new EmployerData(realEmployer.type(),
+              front.getShortName(),
+              realEmployer.anchorFactionCode(),
+              sponsorFactionCode,
+              front.getFullName(date.getYear()),
+              realEmployer.negotiator(),
+              realEmployer.liaison(),
+              realEmployer.forceSkill(),
+              realEmployer.equipmentRating(),
+              pickRandomCamouflage(date.getYear(), front.getShortName()),
+              realEmployer.color());
+        contract.setEmployerData(cover);
     }
 
     private static void setAncillaryValues(Campaign campaign, LocalHangar detachmentHangar, ChaosContract contract) {
@@ -530,7 +632,8 @@ public class AbstractContractGeneration {
                         currentLocation,
                         currentDate,
                         employerData.getAnchorFaction(),
-                        objectiveData.playerObjectiveType());
+                      objectiveData.playerObjectiveType(),
+                      contract.isCovertOperation());
                 attempts++;
             } while (enemyData.factionCode().equals(employerFactionCode) && attempts < MAX_ENEMY_REDRAWS);
         }
@@ -583,11 +686,12 @@ public class AbstractContractGeneration {
     }
 
     private static @Nullable EmployerData pickEmployer(Campaign campaign, LocalDate currentDate,
-          ILocation currentLocation, ContractSearchType searchType, ChaosContract contract) {
+          ILocation currentLocation, ContractSearchType searchType, boolean covertViable, ChaosContract contract) {
         EmployerData employerData = ChaosContractDeterminationEmployer.getEmployerGenerationData(currentDate,
               currentLocation,
               campaign,
-              searchType);
+              searchType,
+              covertViable);
         if (employerData == null) {
             // No employer means no contract
             return null;

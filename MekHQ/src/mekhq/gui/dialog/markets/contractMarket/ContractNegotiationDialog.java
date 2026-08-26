@@ -82,6 +82,7 @@ import mekhq.campaign.mission.contract.contractData.NegotiationStepMath;
 import mekhq.campaign.mission.contract.contractData.NegotiationStepMath.Term;
 import mekhq.campaign.mission.contract.contractData.NonNegotiableTermsData;
 import mekhq.campaign.mission.contract.contractData.RentedFacilitiesData;
+import mekhq.campaign.mission.contract.contractGeneration.AbstractContractDeterminationPay;
 import mekhq.campaign.mission.contract.contractGeneration.negotiationsAndNPCs.TermFunding;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.PersonnelOptions;
@@ -862,8 +863,7 @@ public class ContractNegotiationDialog extends JDialog {
     private void commitTermsAndPay() {
         contract.setContractTerms(new ContractTermsData(step(Clause.PAY), step(Clause.SUPPORT), step(Clause.TRANSPORT),
               step(Clause.SALVAGE), step(Clause.COMMAND)));
-        mekhq.campaign.mission.contract.contractGeneration.AbstractContractDeterminationPay payScheme =
-              mekhq.campaign.mission.contract.contractGeneration.AbstractContractDeterminationPay.forCampaign(campaign);
+        AbstractContractDeterminationPay payScheme = AbstractContractDeterminationPay.forCampaign(campaign);
         contract.updateMonthlyPay(payScheme.getMonthlyPay(campaign, contract));
         contract.updateCombatPay(payScheme.getCombatPay(campaign, contract));
         contract.updateTransportPay(payScheme.getTransportPay(campaign,
@@ -915,7 +915,7 @@ public class ContractNegotiationDialog extends JDialog {
         if (playerNegotiator == null) {
             // This shouldn't happen, so we go ahead and log it.
             LOGGER.warn("Contract {} has no player negotiator", contract.getName());
-            return DISASTROUS.getLowerBound();
+            return ActiveNegotiationMath.netMargin(DISASTROUS, MarginOfSuccess.BARELY_MADE_IT);
         }
         MarginOfSuccess playerMargin = reportedNegotiationCheck(playerNegotiator,
               "negotiate.contractMarket.renegotiate.roll.player");

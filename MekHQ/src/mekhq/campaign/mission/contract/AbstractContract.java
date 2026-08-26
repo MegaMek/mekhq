@@ -34,6 +34,7 @@ package mekhq.campaign.mission.contract;
 
 import static mekhq.campaign.mission.contract.contractData.ContractMoraleLevel.MAXIMUM_MORALE_LEVEL;
 import static mekhq.campaign.mission.contract.contractData.ContractMoraleLevel.MINIMUM_MORALE_LEVEL;
+import static mekhq.utilities.MHQInternationalization.getTextAt;
 
 import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
@@ -153,8 +154,7 @@ public abstract class AbstractContract {
     private int requiredCombatElements;
     private int requiredVictoryPoints;
     private int trackCount; // TODO future proofing
-    /** A "pity" contract: an easy top-up offer, surfaced in the market as a Proving Ground. */
-    private boolean provingGround;
+    private ContractNature nature = ContractNature.NORMAL;
 
     private final List<Scenario> scenarios = new ArrayList<>();
 
@@ -603,13 +603,40 @@ public abstract class AbstractContract {
         this.trackCount = trackCount;
     }
 
-    /** @return {@code true} if this is a pity ("Proving Ground") contract - an easy top-up offer for a struggling force */
-    public boolean isProvingGround() {
-        return provingGround;
+    /** @return this contract's special designation ({@link ContractNature#NORMAL} if it has none) */
+    public ContractNature getNature() {
+        return nature;
     }
 
-    public void setProvingGround(boolean provingGround) {
-        this.provingGround = provingGround;
+    public void setNature(ContractNature nature) {
+        this.nature = (nature == null) ? ContractNature.NORMAL : nature;
+    }
+
+    /** @return {@code true} if this is a pity ("Proving Ground") contract - an easy top-up offer for a struggling force */
+    public boolean isProvingGround() {
+        return nature.isProvingGround();
+    }
+
+    /**
+     * @return {@code true} if this is specifically a plain covert operation (not a false flag), where the employer is
+     *       concealed from the market outright
+     */
+    public boolean isCovert() {
+        return nature.isCovert();
+    }
+
+    /** @return {@code true} if this is a false flag operation, presenting a front faction as its cover-story employer */
+    public boolean isFalseFlag() {
+        return nature.isFalseFlag();
+    }
+
+    /**
+     * @return {@code true} if this is any kind of covert operation ({@link ContractNature#COVERT} or
+     *       {@link ContractNature#FALSE_FLAG}), which share covert enemy selection and conceal the true employer from
+     *       the market
+     */
+    public boolean isCovertOperation() {
+        return nature.isCovertOperation();
     }
 
     public int getRequiredVictoryPoints() {
@@ -664,9 +691,19 @@ public abstract class AbstractContract {
      * <p>Employer types that keep their faction's own name (system owners, planetary governments, nobles) have no tag,
      * so this returns the plain display name unchanged.</p>
      *
-     * @return the display name, with a {@code " (Tag)"} suffix when the employer type carries a market tag
+     * <p>A plain covert operation conceals its employing faction from the player, returning an "Undisclosed Employer"
+     * placeholder; only the market display is affected, as {@link #getEmployerDisplayName()} still returns the true
+     * employer everywhere else. A false flag operation needs no special handling here: its visible employer is already
+     * the cover-story front (the real employer is preserved as the covert sponsor), so it displays like any normal
+     * contract.</p>
+     *
+     * @return the display name, with a {@code " (Tag)"} suffix when the employer type carries a market tag, or an
+     *       "Undisclosed Employer" placeholder for a plain covert operation
      */
     public String getEmployerMarketDisplayName() {
+        if (isCovert()) {
+            return getTextAt("mekhq.resources.ChaosContractMarketDialog", "value.contractMarket.employer.hidden");
+        }
         String tag = employerData.type().getMarketDisplayTag();
         String displayName = employerData.displayName();
         return (tag == null) ? displayName : displayName + " (" + tag + ')';
