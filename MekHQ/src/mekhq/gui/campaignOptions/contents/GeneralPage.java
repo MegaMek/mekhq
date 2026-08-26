@@ -76,7 +76,6 @@ import mekhq.gui.campaignOptions.CampaignOptionsMetadata;
 import mekhq.gui.campaignOptions.components.CampaignOptionsCheckBox;
 import megamek.client.ui.settings.SettingsFormPanel;
 import megamek.client.ui.settings.SettingsIntroPanel;
-import mekhq.gui.commandGeneration.CommandGenerationDialog;
 import mekhq.gui.campaignOptions.components.CampaignOptionsLabel;
 import mekhq.gui.campaignOptions.components.CampaignOptionsPagePanel;
 import mekhq.gui.campaignOptions.components.CampaignOptionsTextField;
@@ -121,7 +120,6 @@ public class GeneralPage {
     private JLabel lblFaction;
     private MMComboBox<FactionDisplay> comboFaction;
     private JButton btnRandomFaction;
-    private JButton btnCommandGenerator;
     private JLabel lblDate;
     private JButton btnDate;
     private JButton btnRandomDate;
@@ -235,17 +233,6 @@ public class GeneralPage {
             }
         });
 
-        // Open the Company Generator. Only meaningful when this tab is being shown as part of new-campaign
-        // startup — outside of STARTUP / STARTUP_ABRIDGED the campaign's units are already on the books and
-        // the generator's purpose (seeding the starting force) doesn't apply. The button is disabled in
-        // those modes (matching how btnDate / btnRandomDate are gated) so it stays visually consistent in
-        // the layout but can't be clicked.
-        btnCommandGenerator = createButton("CommandGenerator");
-        btnCommandGenerator.addActionListener(e -> new CommandGenerationDialog(frame, campaign).setVisible(true));
-        if (mode != CampaignOptionsDialogMode.STARTUP && mode != CampaignOptionsDialogMode.STARTUP_ABRIDGED) {
-            btnCommandGenerator.setEnabled(false);
-        }
-
         // Date
         lblDate = new CampaignOptionsLabel("Date");
         btnDate = createButton("Date");
@@ -328,7 +315,7 @@ public class GeneralPage {
         panel.addRow(lblDate, createInlineControls(btnDate, btnRandomDate));
         panel.addRow(lblName, createInlineControls(createFixedWidthControl(txtName), btnNameGenerator));
         panel.addRow(lblFaction,
-              createInlineControls(createFixedWidthControl(comboFaction), btnRandomFaction, btnCommandGenerator));
+              createInlineControls(createFixedWidthControl(comboFaction), btnRandomFaction));
         panel.addRow(lblStartingLocation, startingLocationControl);
         panel.addRow(lblStartingLocationFaction, startingLocationFactionControl);
         panel.addRow(lblStartingWorld, startingWorldControl);
