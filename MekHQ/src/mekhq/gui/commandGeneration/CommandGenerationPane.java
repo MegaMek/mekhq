@@ -121,8 +121,10 @@ public class CommandGenerationPane extends AbstractMHQTabbedPane {
               forceGeneratorTab::getGeneratedForce);
 
         addTab(tabTitle("setupTab"), wrap(setupTab.createTab()));
-        addTab(tabTitle("forceGeneratorTab"), wrap(forceGeneratorTab.createTab()));
+        // Spares & Finances before the Force Generator: the generator is where the player ends up, building
+        // and previewing the command, so the settings tabs come first and it sits last.
         addTab(tabTitle("sparesAndFinancesTab"), wrap(sparesAndFinancesTab.createTab()));
+        addTab(tabTitle("forceGeneratorTab"), wrap(forceGeneratorTab.createTab()));
 
         // The preview tree shows the final TOE callsigns, which depend on the Setup tab's Formation
         // Naming Method: read the combo live (options only get the value on OK) and refresh the

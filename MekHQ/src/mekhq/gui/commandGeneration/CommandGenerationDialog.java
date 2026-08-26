@@ -32,7 +32,12 @@
  */
 package mekhq.gui.commandGeneration;
 
+import java.awt.Component;
+import java.awt.Insets;
+import javax.swing.JButton;
+import megamek.client.ui.util.UIUtil;
 import mekhq.campaign.campaignOptions.CampaignOption;
+import static megamek.client.ui.util.FlatLafStyleBuilder.setFontScaling;
 import static mekhq.campaign.personnel.PersonUtility.overrideSkills;
 import static mekhq.campaign.personnel.PersonUtility.reRollAdvantages;
 import static mekhq.campaign.personnel.PersonUtility.reRollLoyalty;
@@ -207,7 +212,27 @@ public class CommandGenerationDialog extends AbstractMHQValidationButtonDialog {
         rightButtons.add(getOkButton());
         panel.add(rightButtons, BorderLayout.EAST);
 
+        enlargeButtons(leftButtons);
+        enlargeButtons(rightButtons);
         return panel;
+    }
+
+    /**
+     * Gives every button on the bar more padding and a slightly larger face. At default size the bar reads as
+     * an afterthought under a dialog this large, and Accept &amp; Build is the one action that changes the
+     * campaign, so it should not be the smallest thing on screen.
+     *
+     * @param bar the button strip to enlarge; checkboxes and labels on it are left alone
+     */
+    private static void enlargeButtons(JPanel bar) {
+        Insets padding = new Insets(UIUtil.scaleForGUI(6), UIUtil.scaleForGUI(14),
+              UIUtil.scaleForGUI(6), UIUtil.scaleForGUI(14));
+        for (Component component : bar.getComponents()) {
+            if (component instanceof JButton button) {
+                button.setMargin(padding);
+                setFontScaling(button, false, 1.1);
+            }
+        }
     }
 
     @Override
