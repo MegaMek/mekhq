@@ -87,6 +87,11 @@ public class AbstractContractGeneration {
     private static final int COVERT_CONTRACT_ODDS = 6;
     /** A covert contract has a 1-in-this chance of being a false flag operation, run under a cover-story front. */
     private static final int FALSE_FLAG_ODDS = 6;
+    /**
+     * The steeper false flag odds (1-in-this) used when a covert contract's true backer is ComStar or the Word of
+     * Blake, for whom deniable false flag operations are a signature tactic.
+     */
+    private static final int COMSTAR_WOB_FALSE_FLAG_ODDS = 2;
 
     public static @Nullable AbstractContract createContract(Campaign campaign, CampaignOptions campaignOptions,
           LocalDate currentDate, Detachment detachment, int contractGenerationModifier, ContractSearchType searchType,
@@ -100,18 +105,21 @@ public class AbstractContractGeneration {
             contract.setNature(ContractNature.PROVING_GROUND);
         }
 
-        // Step 1: Employer
+        // Step 1: Type. Resolved before the employer so the employer step knows whether the contract is covert-viable
+        ContractObjectiveData objectiveData = pickObjective(contractGenerationModifier, contract);
+        ChaosObjectiveType chaosObjectiveType = objectiveData.playerObjectiveType().getChaosObjectiveType();
+        boolean isDefensiveObjective = !chaosObjectiveType.isAttacker();
+
+        // Step 2: Employer
         AbstractLocation currentLocation = detachment.getCurrentLocation();
-        EmployerData employerData = pickEmployer(campaign, currentDate, currentLocation, searchType, contract);
+        EmployerData employerData = pickEmployer(campaign, currentDate, currentLocation, searchType,
+              chaosObjectiveType.isCovertCandidate(), contract);
         if (employerData == null) {
             return null;
         }
 
-        // Step 2: Type
-        ContractObjectiveData objectiveData = pickObjective(contractGenerationModifier, contract);
-        ChaosObjectiveType chaosObjectiveType = objectiveData.playerObjectiveType().getChaosObjectiveType();
-        boolean isDefensiveObjective = !objectiveData.playerObjectiveType().getChaosObjectiveType().isAttacker();
-        // Must be set before the enemy is picked, which draws under covert rules when this is true.
+        // Covert status - needs both the objective and the now-resolved employer/sponsor (its odds depend on the true
+        // backer). Must be set before the enemy is picked, which draws under covert rules when this is true.
         determineCovertStatus(chaosObjectiveType, contract);
 
         // Step 3: Scale & Intensity
@@ -253,18 +261,22 @@ public class AbstractContractGeneration {
      * are eligible, and even those turn covert only on a {@link #COVERT_CONTRACT_ODDS} chance roll; every other
      * contract is left as-is. A contract that already has a special designation (a Proving Ground) is never overridden
      * - the designations are mutually exclusive and the deliberate market top-up takes priority over the random covert
-     * roll. A {@link #FALSE_FLAG_ODDS} portion of the covert contracts become false flag operations instead, run under
-     * a cover-story front (applied later, once the enemy is known - see {@link #applyFalseFlagCover}). Either way the
-     * enemy is later drawn under covert rules (see
-     * {@link ChaosContractDeterminationEnemy#generateEnemyFactionForObjective}), where even the employer's allies can
-     * become rare targets.
+     * roll. A portion of the covert contracts become false flag operations instead, run under a cover-story front
+     * (applied later, once the enemy is known - see {@link #applyFalseFlagCover}). That portion is much larger when the
+     * contract's true backer is ComStar or the Word of Blake ({@link #COMSTAR_WOB_FALSE_FLAG_ODDS} rather than
+     * {@link #FALSE_FLAG_ODDS}), since deniable false flags are their signature. Either way the enemy is later drawn
+     * under covert rules (see {@link ChaosContractDeterminationEnemy#generateEnemyFactionForObjective}), where even the
+     * employer's allies can become rare targets.
      */
     private static void determineCovertStatus(ChaosObjectiveType chaosObjectiveType, ChaosContract contract) {
         if (contract.getNature() != ContractNature.NORMAL) {
             return;
         }
         if (chaosObjectiveType.isCovertCandidate() && Compute.randomInt(COVERT_CONTRACT_ODDS) == 0) {
-            boolean isFalseFlag = Compute.randomInt(FALSE_FLAG_ODDS) == 0;
+            int falseFlagOdds = contract.getStandingEmployerFaction().isComStarOrWoB()
+                                      ? COMSTAR_WOB_FALSE_FLAG_ODDS
+                                      : FALSE_FLAG_ODDS;
+            boolean isFalseFlag = Compute.randomInt(falseFlagOdds) == 0;
             contract.setNature(isFalseFlag ? ContractNature.FALSE_FLAG : ContractNature.COVERT);
         }
     }
@@ -674,11 +686,12 @@ public class AbstractContractGeneration {
     }
 
     private static @Nullable EmployerData pickEmployer(Campaign campaign, LocalDate currentDate,
-          ILocation currentLocation, ContractSearchType searchType, ChaosContract contract) {
+          ILocation currentLocation, ContractSearchType searchType, boolean covertViable, ChaosContract contract) {
         EmployerData employerData = ChaosContractDeterminationEmployer.getEmployerGenerationData(currentDate,
               currentLocation,
               campaign,
-              searchType);
+              searchType,
+              covertViable);
         if (employerData == null) {
             // No employer means no contract
             return null;
