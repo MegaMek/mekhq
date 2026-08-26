@@ -183,12 +183,20 @@ public class AbstractContractGeneration {
         contract.setStatus(null);
 
         // Contract Details
-        String contractName = getFormattedTextAt(RESOURCE_BUNDLES,
-              "AbstractContractGeneration.contractName",
-              contract.getStartDate(),
-              contract.getObjectiveType().toString(),
-              contract.getEmployerDisplayName(),
-              contract.getEnemyDisplayName());
+        String contractName;
+        if (campaign.getCampaignOptions().get(CampaignOption.USE_OPERATION_CODENAMES)) {
+            contractName = getFormattedTextAt(RESOURCE_BUNDLES,
+                  "AbstractContractGeneration.operationContractName",
+                  contract.getStartDate(),
+                  OperationNameController.generateOperationName(contract.getObjectiveType()));
+        } else {
+            contractName = getFormattedTextAt(RESOURCE_BUNDLES,
+                  "AbstractContractGeneration.contractName",
+                  contract.getStartDate(),
+                  contract.getObjectiveType().toString(),
+                  contract.getEmployerDisplayName(),
+                  contract.getEnemyDisplayName());
+        }
         contract.setContractName(contractName);
 
         // Morale
