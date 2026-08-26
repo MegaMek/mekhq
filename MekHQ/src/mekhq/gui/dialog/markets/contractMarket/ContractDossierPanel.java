@@ -142,11 +142,19 @@ public class ContractDossierPanel extends JPanel {
         if (hasBatchall) {
             badges.add(headerBadge(getTextAt(RESOURCE_BUNDLE, "dossier.contractMarket.batchall"), onAccent));
         }
+        // A contract's special type (Proving Ground / Covert Operation) is mutually exclusive, so at most one of these
+        // badges shows. A separator strut precedes any badge that follows an earlier one (e.g. a batchall).
         if (contract.isProvingGround()) {
-            if (hasBatchall) {
+            if (badges.getComponentCount() > 0) {
                 badges.add(Box.createVerticalStrut(scaleForGUI(4)));
             }
             badges.add(headerBadge(getTextAt(RESOURCE_BUNDLE, "dossier.contractMarket.provingGround"), onAccent));
+        }
+        if (contract.isCovert()) {
+            if (badges.getComponentCount() > 0) {
+                badges.add(Box.createVerticalStrut(scaleForGUI(4)));
+            }
+            badges.add(headerBadge(getTextAt(RESOURCE_BUNDLE, "dossier.contractMarket.covert"), onAccent));
         }
 
         if (badges.getComponentCount() > 0) {
