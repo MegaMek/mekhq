@@ -426,7 +426,7 @@ class SupportPersonnelAssignerTest {
               countOf(techs, PersonnelRole.MECHANIC),
               countOf(techs, PersonnelRole.AERO_TEK),
               countOf(techs, PersonnelRole.BA_TECH),
-              0, 0, 0, 0, 0, 0, 0,
+              0, 0, 0, 0,
               new ArrayList<>(techs));
     }
 

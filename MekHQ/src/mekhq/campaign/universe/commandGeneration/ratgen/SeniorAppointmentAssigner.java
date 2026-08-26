@@ -135,7 +135,7 @@ public final class SeniorAppointmentAssigner {
               Person::setHeadTechnician),
 
         CHIEF_ADMINISTRATOR("chief administrator",
-              SeniorAppointmentAssigner::isAdministrativeRole,
+              PersonnelRole::isAdministrator,
               Set.of(SkillType.S_ADMIN),
               Person::isChiefAdministrator,
               Person::setChiefAdministrator);
@@ -324,30 +324,18 @@ public final class SeniorAppointmentAssigner {
     }
 
     /**
-     * @return {@code true} if this role runs as a department of its own, beneath a branch-wide post
-     */
-    private static boolean isDepartmentRole(PersonnelRole role) {
-        return role.isTech() || isAdministrativeRole(role);
-    }
-
-    /**
-     * Whether the role heads an administrative department.
+     * Whether the role runs as a department of its own, beneath a branch-wide post.
      *
-     * <p>{@link PersonnelRole#isAdministrator()} matches only the consolidated {@code ADMINISTRATOR}
-     * role, but the support generator still creates the four speciality roles, so a force built here
-     * would otherwise have no administrative department heads at all. When those roles are finally
-     * removed this collapses back to the single consolidated role.</p>
+     * <p>Only the tech roles do. Administrators are a single role, so the chief administrator is
+     * already their senior appointment; a department head as well would name a second leader over
+     * the same one-role department.</p>
      *
      * @param role the role to test
      *
-     * @return {@code true} if the role belongs to an administrative department
+     * @return {@code true} if the role forms a department that gets a head
      */
-    private static boolean isAdministrativeRole(PersonnelRole role) {
-        return switch (role) {
-            case ADMINISTRATOR, ADMINISTRATOR_COMMAND, ADMINISTRATOR_LOGISTICS, ADMINISTRATOR_TRANSPORT,
-                 ADMINISTRATOR_HR -> true;
-            default -> false;
-        };
+    private static boolean isDepartmentRole(PersonnelRole role) {
+        return role.isTech();
     }
 
     /**

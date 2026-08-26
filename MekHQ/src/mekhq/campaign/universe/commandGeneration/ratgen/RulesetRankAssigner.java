@@ -490,8 +490,7 @@ public final class RulesetRankAssigner {
      */
     private static boolean isCommissionedSupportRole(PersonnelRole role) {
         return switch (role) {
-            case DOCTOR, ADMINISTRATOR_COMMAND, ADMINISTRATOR_LOGISTICS, ADMINISTRATOR_TRANSPORT,
-                 ADMINISTRATOR_HR -> true;
+            case DOCTOR, ADMINISTRATOR -> true;
             default -> false;
         };
     }

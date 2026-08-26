@@ -92,8 +92,6 @@ public final class SupportPersonnelGenerator {
     private static final int ASTECHS_PER_TECH = 6;
     /** Canonical 4 medics per doctor (one full medical team). */
     private static final int MEDICS_PER_DOCTOR = 4;
-    /** Number of administrator roles the total admin demand is split across. */
-    private static final int ADMIN_ROLE_COUNT = 4;
 
     /** Guard on the HR-strain top-up loop so a misconfigured admin skill can't spin it forever. */
     private static final int MAX_HR_STRAIN_TOPUP = 100;
@@ -109,10 +107,7 @@ public final class SupportPersonnelGenerator {
           int aeroTeksGenerated,
           int baTechsGenerated,
           int doctorsGenerated,
-          int administratorCommandGenerated,
-          int administratorLogisticsGenerated,
-          int administratorTransportGenerated,
-          int administratorHRGenerated,
+          int administratorsGenerated,
           int astechsAdded,
           int medicsAdded,
           List<Person> generatedPersons
@@ -121,19 +116,11 @@ public final class SupportPersonnelGenerator {
         public int totalTechsGenerated() {
             return mekTechsGenerated + mechanicsGenerated + aeroTeksGenerated + baTechsGenerated;
         }
-
-        /** Sum of the four administrator-role generated counts. */
-        public int totalAdministratorsGenerated() {
-            return administratorCommandGenerated
-                  + administratorLogisticsGenerated
-                  + administratorTransportGenerated
-                  + administratorHRGenerated;
-        }
     }
 
     public static Result generate(Campaign campaign, CommandGenerationOptions options) {
         if (campaign == null || options == null) {
-            return new Result(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, new ArrayList<>());
+            return new Result(0, 0, 0, 0, 0, 0, 0, 0, new ArrayList<>());
         }
         return generate(campaign, options,
               new DefaultSkillGenerator(campaign.getRandomSkillPreferences()));
@@ -147,7 +134,7 @@ public final class SupportPersonnelGenerator {
     static Result generate(Campaign campaign, CommandGenerationOptions options,
           AbstractSkillGenerator skillGen) {
         if (campaign == null || options == null) {
-            return new Result(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, new ArrayList<>());
+            return new Result(0, 0, 0, 0, 0, 0, 0, 0, new ArrayList<>());
         }
 
         long start = System.nanoTime();
@@ -174,21 +161,15 @@ public final class SupportPersonnelGenerator {
         int doctors = generateRole(campaign, options, skillGen, PersonnelRole.DOCTOR,
               demand.doctorsNeeded(), supportRank, faction, targetRankSystem, rankValidator, generated);
 
-        // Equal split of total admin demand across the four administrator roles. Each role then
-        // applies its own per-role coverage percentage in generateRole().
-        int adminBaselinePerRole = (int) Math.ceil(demand.administratorsNeeded() / (double) ADMIN_ROLE_COUNT);
-        int adminCmd = generateRole(campaign, options, skillGen, PersonnelRole.ADMINISTRATOR_COMMAND,
-              adminBaselinePerRole, supportRank, faction, targetRankSystem, rankValidator, generated);
-        int adminLog = generateRole(campaign, options, skillGen, PersonnelRole.ADMINISTRATOR_LOGISTICS,
-              adminBaselinePerRole, supportRank, faction, targetRankSystem, rankValidator, generated);
-        int adminTpt = generateRole(campaign, options, skillGen, PersonnelRole.ADMINISTRATOR_TRANSPORT,
-              adminBaselinePerRole, supportRank, faction, targetRankSystem, rankValidator, generated);
-        int adminHR = generateRole(campaign, options, skillGen, PersonnelRole.ADMINISTRATOR_HR,
-              adminBaselinePerRole, supportRank, faction, targetRankSystem, rankValidator, generated);
+        // CamOps states admin demand as a single total, so it is generated as one role. Splitting it
+        // across the retired speciality roles rounded each share up and produced more administrators
+        // than the rule asks for.
+        int administrators = generateRole(campaign, options, skillGen, PersonnelRole.ADMINISTRATOR,
+              demand.administratorsNeeded(), supportRank, faction, targetRankSystem, rankValidator, generated);
 
         // A freshly generated command should not open with an HR-strain turnover penalty, so top up
-        // HR administrators until the strain modifier reaches zero (no-op when the rule is off).
-        adminHR += topUpHumanResourcesToZeroStrain(campaign, options, skillGen, supportRank, faction,
+        // administrators until the strain modifier reaches zero (no-op when the rule is off).
+        administrators += topUpHumanResourcesToZeroStrain(campaign, options, skillGen, supportRank, faction,
               targetRankSystem, rankValidator, generated);
 
         int totalTechs = mekTechs + mechanics + aeroTeks + baTechs;
@@ -199,12 +180,12 @@ public final class SupportPersonnelGenerator {
 
         long elapsedMs = (System.nanoTime() - start) / 1_000_000;
         LOGGER.info("[CompanyGen][Pipeline][Support] generated techs(mekTech={} mechanic={} aero={} ba={}) " +
-                          "doctors={} admin(cmd={} log={} tpt={} hr={}) astechs={} medics={} elapsed={}ms",
+                          "doctors={} administrators={} astechs={} medics={} elapsed={}ms",
               mekTechs, mechanics, aeroTeks, baTechs, doctors,
-              adminCmd, adminLog, adminTpt, adminHR, astechs, medics, elapsedMs);
+              administrators, astechs, medics, elapsedMs);
 
         return new Result(mekTechs, mechanics, aeroTeks, baTechs, doctors,
-              adminCmd, adminLog, adminTpt, adminHR, astechs, medics, generated);
+              administrators, astechs, medics, generated);
     }
 
     /**
@@ -261,11 +242,11 @@ public final class SupportPersonnelGenerator {
     }
 
     /**
-     * Generates HR administrators until the campaign's HR-strain modifier reaches zero, so a freshly
+     * Generates administrators until the campaign's HR-strain modifier reaches zero, so a freshly
      * generated command does not start with an HR-strain turnover penalty. A no-op when the HR-strain
      * rule is disabled; guarded by {@link #MAX_HR_STRAIN_TOPUP} against runaway generation.
      *
-     * @return the number of HR administrators added
+     * @return the number of administrators added
      */
     private static int topUpHumanResourcesToZeroStrain(Campaign campaign, CommandGenerationOptions options,
           AbstractSkillGenerator skillGen, int supportRank, Faction faction,
@@ -273,12 +254,12 @@ public final class SupportPersonnelGenerator {
         if (!campaign.getCampaignOptions().get(CampaignOption.USE_HR_STRAIN)) {
             return 0;
         }
-        // null = "Random": each HR admin rolls its own level (below).
-        SkillLevel skillLevel = options.getSupportPersonnelSkillLevels().get(PersonnelRole.ADMINISTRATOR_HR);
+        // null = "Random": each administrator rolls its own level (below).
+        SkillLevel skillLevel = options.getSupportPersonnelSkillLevels().get(PersonnelRole.ADMINISTRATOR);
 
         int added = 0;
         while (RetirementDefectionTracker.getHRStrainModifier(campaign) > 0 && added < MAX_HR_STRAIN_TOPUP) {
-            Person admin = createAndRecruit(campaign, skillGen, PersonnelRole.ADMINISTRATOR_HR,
+            Person admin = createAndRecruit(campaign, skillGen, PersonnelRole.ADMINISTRATOR,
                   experienceLevelFor(skillLevel), supportRank, faction, targetRankSystem, rankValidator);
             if (admin == null) {
                 break;
@@ -286,7 +267,7 @@ public final class SupportPersonnelGenerator {
             out.add(admin);
             added++;
         }
-        LOGGER.info("[CompanyGen][Pipeline][Support] HR-strain top-up: added {} HR admins, strain modifier now {}",
+        LOGGER.info("[CompanyGen][Pipeline][Support] HR-strain top-up: added {} administrators, strain modifier now {}",
               added, RetirementDefectionTracker.getHRStrainModifier(campaign));
         return added;
     }

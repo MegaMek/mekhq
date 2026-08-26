@@ -147,7 +147,7 @@ class SeniorAppointmentAssignerTest {
         Campaign campaign = campaign();
         Person doctor = junior(PersonnelRole.DOCTOR);
         Person mekTech = junior(PersonnelRole.MEK_TECH);
-        Person administrator = junior(PersonnelRole.ADMINISTRATOR_COMMAND);
+        Person administrator = junior(PersonnelRole.ADMINISTRATOR);
 
         SeniorAppointmentAssigner.assign(campaign, List.of(doctor, mekTech, administrator));
 
@@ -266,9 +266,9 @@ class SeniorAppointmentAssignerTest {
         // Administration is that post's discipline skill. Counting it again as a management skill would
         // let a pure administrator beat someone equally administrative who can also lead.
         Campaign campaign = campaign();
-        Person pureAdministrator = junior(PersonnelRole.ADMINISTRATOR_COMMAND);
+        Person pureAdministrator = junior(PersonnelRole.ADMINISTRATOR);
         withSkill(pureAdministrator, SkillType.S_ADMIN, 6);
-        Person leadingAdministrator = junior(PersonnelRole.ADMINISTRATOR_HR);
+        Person leadingAdministrator = junior(PersonnelRole.ADMINISTRATOR);
         withSkill(leadingAdministrator, SkillType.S_ADMIN, 6);
         withSkill(leadingAdministrator, SkillType.S_LEADER, 2);
 
@@ -416,18 +416,25 @@ class SeniorAppointmentAssignerTest {
         verify(otherMechanic, never()).setDepartmentHead(anyBoolean());
     }
 
+    /**
+     * Administrators are one role rather than four specialities, so they form a single department and
+     * the chief administrator is already its senior post. Naming a department head as well would put
+     * two leaders over the same people.
+     */
     @Test
-    void administrativeSpecialitiesGetDepartmentHeadsToo() {
+    void administratorsGetAChiefRatherThanADepartmentHead() {
         Campaign campaign = campaign();
-        Person bestLogistics = junior(PersonnelRole.ADMINISTRATOR_LOGISTICS);
-        withSkill(bestLogistics, SkillType.S_ADMIN, 8);
-        Person otherLogistics = junior(PersonnelRole.ADMINISTRATOR_LOGISTICS);
-        withSkill(otherLogistics, SkillType.S_ADMIN, 2);
+        Person bestAdministrator = junior(PersonnelRole.ADMINISTRATOR);
+        withSkill(bestAdministrator, SkillType.S_ADMIN, 8);
+        Person otherAdministrator = junior(PersonnelRole.ADMINISTRATOR);
+        withSkill(otherAdministrator, SkillType.S_ADMIN, 2);
 
-        SeniorAppointmentAssigner.assign(campaign, List.of(bestLogistics, otherLogistics));
+        SeniorAppointmentAssigner.assign(campaign, List.of(bestAdministrator, otherAdministrator));
 
-        verify(bestLogistics).setDepartmentHead(true);
-        verify(otherLogistics, never()).setDepartmentHead(anyBoolean());
+        verify(bestAdministrator).setChiefAdministrator(true);
+        verify(bestAdministrator, never()).setDepartmentHead(anyBoolean());
+        verify(otherAdministrator, never()).setChiefAdministrator(anyBoolean());
+        verify(otherAdministrator, never()).setDepartmentHead(anyBoolean());
     }
 
     @Test
@@ -569,12 +576,12 @@ class SeniorAppointmentAssignerTest {
         roster.put(UUID.randomUUID(), generalOfficer);
         stubPersonnel(campaign, roster);
 
-        Person chosen = junior(PersonnelRole.ADMINISTRATOR_COMMAND);
+        Person chosen = junior(PersonnelRole.ADMINISTRATOR);
         withSkill(chosen, SkillType.S_ADMIN, 9);
         when(chosen.getRankNumeric()).thenReturn(20);
         when(chosen.getRankSystem()).thenReturn(sldf());
 
-        Person seniorStaff = junior(PersonnelRole.ADMINISTRATOR_COMMAND);
+        Person seniorStaff = junior(PersonnelRole.ADMINISTRATOR);
         withSkill(seniorStaff, SkillType.S_ADMIN, 2);
         when(seniorStaff.getRankNumeric()).thenReturn(38);
 
@@ -628,33 +635,26 @@ class SeniorAppointmentAssignerTest {
         stubPersonnel(campaign, roster);
 
         List<Person> staff = new ArrayList<>();
-        Person bestLogistics = null;
-        for (int index = 0; index < 2; index++) {
-            Person person = junior(PersonnelRole.ADMINISTRATOR_LOGISTICS);
+        Person bestAdministrator = null;
+        for (int index = 0; index < 4; index++) {
+            Person person = junior(PersonnelRole.ADMINISTRATOR);
             withSkill(person, SkillType.S_ADMIN, index == 0 ? 8 : 3);
             when(person.getRankNumeric()).thenReturn(CAPTAIN);
             when(person.getRankSystem()).thenReturn(sldf());
             staff.add(person);
             if (index == 0) {
-                bestLogistics = person;
+                bestAdministrator = person;
             }
-        }
-        for (int index = 0; index < 2; index++) {
-            Person person = junior(PersonnelRole.ADMINISTRATOR_HR);
-            withSkill(person, SkillType.S_ADMIN, 2);
-            when(person.getRankNumeric()).thenReturn(CAPTAIN);
-            when(person.getRankSystem()).thenReturn(sldf());
-            staff.add(person);
         }
 
         SeniorAppointmentAssigner.assign(campaign, staff);
 
-        // The strongest logistics administrator heads that department and is raised above Captain.
-        verify(bestLogistics).setDepartmentHead(true);
-        ArgumentCaptor<Integer> logisticsRank = ArgumentCaptor.forClass(Integer.class);
-        verify(bestLogistics, atLeastOnce()).setRank(logisticsRank.capture());
-        int headRank = logisticsRank.getAllValues().get(logisticsRank.getAllValues().size() - 1);
-        assertTrue(headRank > CAPTAIN, "a department head should sit above their staff, got " + headRank);
+        // The strongest administrator takes the chief post and is raised above the Captains they lead.
+        verify(bestAdministrator).setChiefAdministrator(true);
+        ArgumentCaptor<Integer> chiefRank = ArgumentCaptor.forClass(Integer.class);
+        verify(bestAdministrator, atLeastOnce()).setRank(chiefRank.capture());
+        int headRank = chiefRank.getAllValues().get(chiefRank.getAllValues().size() - 1);
+        assertTrue(headRank > CAPTAIN, "a chief administrator should sit above their staff, got " + headRank);
         assertTrue(headRank <= COLONEL, "and no higher than Colonel, got " + headRank);
     }
 

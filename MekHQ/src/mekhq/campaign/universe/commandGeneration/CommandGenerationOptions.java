@@ -63,7 +63,7 @@ public class CommandGenerationOptions {
 
     /**
      * Support roles seeded with default coverage percentages and skill levels: the four tech roles,
-     * doctor, and the four administrator roles - matches the SetupTab spinner/dropdown layout.
+     * doctor, and administrators - matches the SetupTab spinner/dropdown layout.
      */
     private static final PersonnelRole[] SUPPORT_ROLES_FOR_COVERAGE = {
           PersonnelRole.MEK_TECH,
@@ -71,10 +71,7 @@ public class CommandGenerationOptions {
           PersonnelRole.AERO_TEK,
           PersonnelRole.BA_TECH,
           PersonnelRole.DOCTOR,
-          PersonnelRole.ADMINISTRATOR_COMMAND,
-          PersonnelRole.ADMINISTRATOR_LOGISTICS,
-          PersonnelRole.ADMINISTRATOR_TRANSPORT,
-          PersonnelRole.ADMINISTRATOR_HR
+          PersonnelRole.ADMINISTRATOR
     };
 
     // region Variable Declarations

@@ -174,7 +174,7 @@ class SupportPersonnelGeneratorTest {
         for (Result r : List.of(a, b, c)) {
             assertEquals(0, r.totalTechsGenerated());
             assertEquals(0, r.doctorsGenerated());
-            assertEquals(0, r.totalAdministratorsGenerated());
+            assertEquals(0, r.administratorsGenerated());
             assertEquals(0, r.astechsAdded());
             assertEquals(0, r.medicsAdded());
             assertTrue(r.generatedPersons().isEmpty());
@@ -265,40 +265,34 @@ class SupportPersonnelGeneratorTest {
 
         verify(humanResources, atLeast(result.totalTechsGenerated()))
               .recruitPerson(eq(campaign), any(), eq(PrisonerStatus.FREE), anyBoolean(), anyBoolean(), anyBoolean());
-        assertEquals(result.totalTechsGenerated() + result.doctorsGenerated() + result.totalAdministratorsGenerated(),
+        assertEquals(result.totalTechsGenerated() + result.doctorsGenerated() + result.administratorsGenerated(),
               result.generatedPersons().size(), "Pool-mode astechs/medics are NOT counted as Persons in the result");
     }
 
-    // ===== Admin split =====
+    // ===== Administrators =====
 
     @Test
-    void generate_adminDemandSplitEquallyAcrossFourRoles() {
-        // 400 personnel + 0 techs = 400. ceil(400/20) = 20 admins. Split / 4 = 5 per admin role.
+    void generate_adminDemandMatchesTheCamOpsTotal() {
+        // 400 personnel + 0 techs = 400. CamOps asks for 1 administrator per 20, so ceil(400/20) = 20.
+        // The old four-way split rounded each share up and produced more than the rule asks for.
         Campaign campaign = newCampaignWithUnits(Collections.emptyList(), 400);
         CommandGenerationOptions options = baseOptions();
 
         Result result = SupportPersonnelGenerator.generate(campaign, options, stubSkillGen);
 
-        assertEquals(5, result.administratorCommandGenerated());
-        assertEquals(5, result.administratorLogisticsGenerated());
-        assertEquals(5, result.administratorTransportGenerated());
-        assertEquals(5, result.administratorHRGenerated());
-        assertEquals(20, result.totalAdministratorsGenerated());
+        assertEquals(20, result.administratorsGenerated());
     }
 
     @Test
-    void generate_adminPerRoleCoverage_appliedIndependently() {
-        // 400 personnel → 20 admins → 5 per role. With Logistics at 200%, only Logistics scales.
+    void generate_adminCoverage_scalesTheWholeDemand() {
+        // 400 personnel -> 20 administrators. At 200% coverage the single admin demand doubles.
         Campaign campaign = newCampaignWithUnits(Collections.emptyList(), 400);
         CommandGenerationOptions options = baseOptions();
-        options.getSupportPersonnelCoveragePercents().put(PersonnelRole.ADMINISTRATOR_LOGISTICS, 200);
+        options.getSupportPersonnelCoveragePercents().put(PersonnelRole.ADMINISTRATOR, 200);
 
         Result result = SupportPersonnelGenerator.generate(campaign, options, stubSkillGen);
 
-        assertEquals(5, result.administratorCommandGenerated());
-        assertEquals(10, result.administratorLogisticsGenerated(), "Logistics doubled per coverage");
-        assertEquals(5, result.administratorTransportGenerated());
-        assertEquals(5, result.administratorHRGenerated());
+        assertEquals(40, result.administratorsGenerated(), "coverage scales the whole admin demand");
     }
 
     // ===== Astechs =====
@@ -422,7 +416,7 @@ class SupportPersonnelGeneratorTest {
         // 2 Meks → 2 Mek Techs → 12 astechs (Person mode). 24 + 2 techs = 26 → 2 doctors → 8 medics.
         int expected = result.totalTechsGenerated()
               + result.doctorsGenerated()
-              + result.totalAdministratorsGenerated()
+              + result.administratorsGenerated()
               + result.astechsAdded()
               + result.medicsAdded();
         assertEquals(expected, result.generatedPersons().size(),
@@ -442,7 +436,7 @@ class SupportPersonnelGeneratorTest {
 
         int expectedListSize = result.totalTechsGenerated()
               + result.doctorsGenerated()
-              + result.totalAdministratorsGenerated();
+              + result.administratorsGenerated();
         assertEquals(expectedListSize, result.generatedPersons().size(),
               "Pool-mode astechs/medics are anonymous pool counts, not Persons");
     }
@@ -536,7 +530,7 @@ class SupportPersonnelGeneratorTest {
 
         assertEquals(2, SupportPersonnelGenerator.countActiveByRole(campaign, PersonnelRole.MEK_TECH));
         assertEquals(1, SupportPersonnelGenerator.countActiveByRole(campaign, PersonnelRole.DOCTOR));
-        assertEquals(0, SupportPersonnelGenerator.countActiveByRole(campaign, PersonnelRole.ADMINISTRATOR_HR));
+        assertEquals(0, SupportPersonnelGenerator.countActiveByRole(campaign, PersonnelRole.ADMINISTRATOR));
     }
 
     private static void recruitWithRole(Campaign campaign, PersonnelRole role) {

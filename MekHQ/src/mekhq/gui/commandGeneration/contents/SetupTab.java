@@ -244,10 +244,7 @@ public class SetupTab {
           PersonnelRole.AERO_TEK,
           PersonnelRole.BA_TECH,
           PersonnelRole.DOCTOR,
-          PersonnelRole.ADMINISTRATOR_COMMAND,
-          PersonnelRole.ADMINISTRATOR_LOGISTICS,
-          PersonnelRole.ADMINISTRATOR_TRANSPORT,
-          PersonnelRole.ADMINISTRATOR_HR
+          PersonnelRole.ADMINISTRATOR
     };
 
     public JPanel createTab() {

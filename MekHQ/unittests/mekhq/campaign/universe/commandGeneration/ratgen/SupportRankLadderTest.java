@@ -109,7 +109,7 @@ class SupportRankLadderTest {
                                                    SkillLevel.HEROIC, SkillLevel.LEGENDARY }) {
             assertTrue(rankFor(PersonnelRole.DOCTOR, skill) <= captain,
                   skill + " doctors should be no higher than Captain");
-            assertTrue(rankFor(PersonnelRole.ADMINISTRATOR_COMMAND, skill) <= captain,
+            assertTrue(rankFor(PersonnelRole.ADMINISTRATOR, skill) <= captain,
                   skill + " administrators should be no higher than Captain");
         }
     }
@@ -128,7 +128,7 @@ class SupportRankLadderTest {
 
     @Test
     void administratorsAreCommissionedAndTechniciansAreNot() {
-        assertTrue(rankFor(PersonnelRole.ADMINISTRATOR_COMMAND, SkillLevel.REGULAR) >= Rank.RO_MIN,
+        assertTrue(rankFor(PersonnelRole.ADMINISTRATOR, SkillLevel.REGULAR) >= Rank.RO_MIN,
               "administrators should be commissioned");
         for (PersonnelRole role : new PersonnelRole[] { PersonnelRole.MEK_TECH, PersonnelRole.MECHANIC,
                                                         PersonnelRole.AERO_TEK, PersonnelRole.BA_TECH,
