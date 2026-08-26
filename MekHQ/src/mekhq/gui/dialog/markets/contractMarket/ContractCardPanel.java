@@ -261,6 +261,9 @@ public class ContractCardPanel extends JPanel {
      */
     private JComponent buildEmblemTile(LocalDate currentDate) {
         JLabel emblem;
+        // A plain covert operation conceals its employer behind a neutral placeholder. A false flag shows its front's
+        // logo like any normal contract, because the front is already the visible employer; everything else shows the
+        // real employer's logo.
         if (contract.isCovert()) {
             emblem = new JLabel("?", SwingConstants.CENTER);
             emblem.setForeground(contrastingText(accent));

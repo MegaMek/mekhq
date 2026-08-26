@@ -33,11 +33,13 @@
 package mekhq.campaign.mission.contract.contractGeneration;
 
 import static java.lang.Math.ceil;
+import static mekhq.campaign.mission.utilities.RandomFactionCamouflage.pickRandomCamouflage;
 import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
 
 import java.time.LocalDate;
 import java.util.List;
 import java.util.UUID;
+import java.util.function.Predicate;
 
 import jakarta.annotation.Nonnull;
 import jakarta.annotation.Nullable;
@@ -65,6 +67,7 @@ import mekhq.campaign.reputation.chaosReputation.ChaosReputation;
 import mekhq.campaign.universe.Faction;
 import mekhq.campaign.universe.Planet;
 import mekhq.campaign.universe.PlanetarySystem;
+import mekhq.campaign.universe.RandomFactionGenerator;
 import mekhq.campaign.universe.Systems;
 import mekhq.campaign.universe.factionStanding.FactionStandingUtilities;
 import mekhq.campaign.universe.factionStanding.FactionStandings;
@@ -82,6 +85,8 @@ public class AbstractContractGeneration {
     private static final int NON_NEGOTIABLE_TERM_ODDS = 4;
     /** A covert-candidate objective has a 1-in-this chance of the contract actually being run as a covert operation. */
     private static final int COVERT_CONTRACT_ODDS = 6;
+    /** A covert contract has a 1-in-this chance of being a false flag operation, run under a cover-story front. */
+    private static final int FALSE_FLAG_ODDS = 6;
 
     public static @Nullable AbstractContract createContract(Campaign campaign, CampaignOptions campaignOptions,
           LocalDate currentDate, Detachment detachment, int contractGenerationModifier, ContractSearchType searchType,
@@ -186,7 +191,16 @@ public class AbstractContractGeneration {
         contract.setContractId(contractId);
         contract.setStatus(null);
 
-        // Contract Details.
+        // A false flag operation is run under a cover story: swap the visible employer to a front faction and preserve
+        // the real employer as the covert sponsor. Done now that the real employer and enemy are known, so everything
+        // downstream - the name, the market, the briefing, the allied forces - sees the front, while Faction Standing
+        // still accrues to the real employer through the sponsor.
+        if (contract.isFalseFlag()) {
+            applyFalseFlagCover(contract, currentLocation, currentDate);
+        }
+
+        // Contract Details. A plain covert operation keeps the true employer out of the title (getEmployerMarketDisplayName
+        // returns the "Undisclosed Employer" placeholder); a false flag already shows its front as the visible employer.
         String employerName = contract.isCovert()
                                     ? contract.getEmployerMarketDisplayName()
                                     : contract.getEmployerDisplayName();
@@ -239,7 +253,9 @@ public class AbstractContractGeneration {
      * are eligible, and even those turn covert only on a {@link #COVERT_CONTRACT_ODDS} chance roll; every other
      * contract is left as-is. A contract that already has a special designation (a Proving Ground) is never overridden
      * - the designations are mutually exclusive and the deliberate market top-up takes priority over the random covert
-     * roll. When covert, the enemy is later drawn under covert rules (see
+     * roll. A {@link #FALSE_FLAG_ODDS} portion of the covert contracts become false flag operations instead, run under
+     * a cover-story front (applied later, once the enemy is known - see {@link #applyFalseFlagCover}). Either way the
+     * enemy is later drawn under covert rules (see
      * {@link ChaosContractDeterminationEnemy#generateEnemyFactionForObjective}), where even the employer's allies can
      * become rare targets.
      */
@@ -248,8 +264,63 @@ public class AbstractContractGeneration {
             return;
         }
         if (chaosObjectiveType.isCovertCandidate() && Compute.randomInt(COVERT_CONTRACT_ODDS) == 0) {
-            contract.setNature(ContractNature.COVERT);
+            boolean isFalseFlag = Compute.randomInt(FALSE_FLAG_ODDS) == 0;
+            contract.setNature(isFalseFlag ? ContractNature.FALSE_FLAG : ContractNature.COVERT);
         }
+    }
+
+    /**
+     * Dresses a false flag operation in its cover story by making a front faction the visible employer while preserving
+     * the real employer as the covert sponsor. The front is a regionally plausible employer faction near the contract -
+     * drawn the same way a real employer would be - that is neither the true employer nor the enemy, so the cover holds
+     * up. The rest of the employer record (type, territorial anchor, negotiator, force ratings, camouflage, color) is
+     * carried over unchanged, so only the presented identity changes; the real employer survives in the sponsor slot,
+     * where {@link AbstractContract#getStandingEmployerFaction()} still routes Faction Standing to it.
+     *
+     * <p>If no plausible front can be found the contract falls back to a plain covert operation, concealing the
+     * employer
+     * as "Undisclosed Employer" instead.</p>
+     *
+     * @param contract the false flag contract to dress in a cover story
+     * @param location the contract's current location, used to find regionally present factions
+     * @param date     the current date, used for faction availability and the front's era-correct name
+     */
+    private static void applyFalseFlagCover(ChaosContract contract, ILocation location, LocalDate date) {
+        EmployerData realEmployer = contract.getEmployerData();
+        Faction realEmployerFaction = contract.getEmployerFaction();
+        Faction enemy = contract.getEnemyFaction();
+        Predicate<Faction> notAPrincipal = faction -> !faction.equals(realEmployerFaction) && !faction.equals(enemy);
+
+        Faction front = RandomFactionGenerator.getInstance().getRandomEmployerFaction(location, date, true,
+              notAPrincipal);
+        if (front == null) {
+            // No plausible front; degrade to a plain covert operation, which conceals the employer outright.
+            contract.setNature(ContractNature.COVERT);
+            return;
+        }
+
+        // Preserve the party that bears the standing consequences: the real employer's existing sponsor if it has one,
+        // otherwise the real employer itself.
+        String sponsorFactionCode = (realEmployer.sponsorFactionCode() != null)
+                                          ? realEmployer.sponsorFactionCode()
+                                          : realEmployer.factionCode();
+
+        // Re-roll the camouflage for the front so allied units in battle wear the cover faction's colours, not the real
+        // employer's - otherwise the front's faction camo would give the operation away. Force ratings are kept: the
+        // troops are still the real employer's, only their presented identity changes. The player colour is left as the
+        // generated default, which is uniform across all employers and so reveals nothing.
+        EmployerData cover = new EmployerData(realEmployer.type(),
+              front.getShortName(),
+              realEmployer.anchorFactionCode(),
+              sponsorFactionCode,
+              front.getFullName(date.getYear()),
+              realEmployer.negotiator(),
+              realEmployer.liaison(),
+              realEmployer.forceSkill(),
+              realEmployer.equipmentRating(),
+              pickRandomCamouflage(date.getYear(), front.getShortName()),
+              realEmployer.color());
+        contract.setEmployerData(cover);
     }
 
     private static void setAncillaryValues(Campaign campaign, LocalHangar detachmentHangar, ChaosContract contract) {
@@ -550,7 +621,7 @@ public class AbstractContractGeneration {
                         currentDate,
                         employerData.getAnchorFaction(),
                       objectiveData.playerObjectiveType(),
-                      contract.isCovert());
+                      contract.isCovertOperation());
                 attempts++;
             } while (enemyData.factionCode().equals(employerFactionCode) && attempts < MAX_ENEMY_REDRAWS);
         }
