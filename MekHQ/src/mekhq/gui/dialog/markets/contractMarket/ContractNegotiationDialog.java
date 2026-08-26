@@ -874,7 +874,7 @@ public class ContractNegotiationDialog extends JDialog {
         if (playerNegotiator == null) {
             // This shouldn't happen, so we go ahead and log it.
             LOGGER.warn("Contract {} has no player negotiator", contract.getName());
-            return DISASTROUS.getLowerBound();
+            return ActiveNegotiationMath.netMargin(DISASTROUS, MarginOfSuccess.BARELY_MADE_IT);
         }
         MarginOfSuccess playerMargin = reportedNegotiationCheck(playerNegotiator,
               "negotiate.contractMarket.renegotiate.roll.player");
@@ -950,7 +950,7 @@ public class ContractNegotiationDialog extends JDialog {
         for (int move = 0; move < count; move++) {
             List<Clause> eligible = new ArrayList<>();
             for (Clause clause : Clause.values()) {
-                if (nonNegotiableTerms.isLocked(clause.term) != waive) {
+                if (nonNegotiableTerms.isLocked(clause.term) == waive) {
                     eligible.add(clause);
                 }
             }
