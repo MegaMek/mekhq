@@ -36,6 +36,7 @@ import static mekhq.campaign.enums.DailyReportType.FINANCES;
 import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
 import static mekhq.utilities.MHQInternationalization.getTextAt;
 
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.EnumMap;
 import java.util.HashSet;
@@ -443,7 +444,15 @@ public final class CommandGenerator {
             // OrganizationChangedEvent — its subscribers (BriefingTab, TOETab) only do
             // ActionScheduler.schedule() which wraps Timer.restart() and is thread-safe.
             LOGGER.info("[CompanyGen][Leaf] BEFORE addUnitToFormation parent={} unit={}", parentInfo, unit.getId());
-            campaign.getPlayerForce().addUnitToFormation(unit, parent.getId(), campaign);
+            // A leaf with no parent formation is a force of one unit with no structure above it. It is
+            // filed under the root formation rather than dropped or left to throw.
+            Formation targetFormation = parent;
+            if (targetFormation == null) {
+                LOGGER.warn("[CompanyGen][Leaf] unit {} has no parent formation; filing it under '{}'",
+                      unit.getId(), root.getName());
+                targetFormation = root;
+            }
+            campaign.getPlayerForce().addUnitToFormation(unit, targetFormation.getId(), campaign);
             LOGGER.info("[CompanyGen][Leaf] AFTER addUnitToFormation unit.formationId={}", unit.getFormationId());
             leafCount[0]++;
             long leafTotalMs = (System.nanoTime() - leafStart) / 1_000_000;
@@ -733,8 +742,12 @@ public final class CommandGenerator {
             Money costs = Money.zero();
             if (options.isPayForPersonnel()) {
                 Money hiringCosts = Money.zero();
+                CampaignOptions campaignOptions = campaign.getCampaignOptions();
+                boolean isClanForce = campaign.getPlayerForce().isClanForce();
+                LocalDate today = campaign.getLocalDate();
                 for (Person person : generatedPersons) {
-                    hiringCosts = hiringCosts.plus(person.getSalary(campaign).multipliedBy(2));
+                    hiringCosts = hiringCosts.plus(
+                          person.getSalary(campaignOptions, isClanForce, today).multipliedBy(2));
                 }
                 costs = costs.plus(hiringCosts);
             }

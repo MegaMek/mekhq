@@ -138,7 +138,7 @@ class SeniorAppointmentAssignerTest {
     /** A person in the given role who wins every rank comparison. */
     private static Person senior(PersonnelRole role) {
         Person person = junior(role);
-        when(person.outRanksUsingSkillTiebreaker(any(Campaign.class), any())).thenReturn(true);
+        when(person.outRanksUsingSkillTiebreaker(any(), anyBoolean(), any(), any())).thenReturn(true);
         return person;
     }
 

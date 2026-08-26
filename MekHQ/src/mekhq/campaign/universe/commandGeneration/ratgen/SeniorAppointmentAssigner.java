@@ -355,7 +355,8 @@ public final class SeniorAppointmentAssigner {
             int score = scoreFor(candidate, disciplineSkills);
             boolean outscoresBest = (bestCandidate == null) || (score > bestScore);
             boolean tiedButOutranksBest = (bestCandidate != null) && (score == bestScore)
-                  && candidate.outRanksUsingSkillTiebreaker(campaign, bestCandidate);
+                  && candidate.outRanksUsingSkillTiebreaker(campaign.getCampaignOptions(),
+                        campaign.getPlayerForce().isClanForce(), campaign.getLocalDate(), bestCandidate);
             if (outscoresBest || tiedButOutranksBest) {
                 bestCandidate = candidate;
                 bestScore = score;

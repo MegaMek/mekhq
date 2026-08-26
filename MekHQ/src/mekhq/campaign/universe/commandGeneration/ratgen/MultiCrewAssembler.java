@@ -39,7 +39,6 @@ import megamek.client.ratgenerator.CrewDescriptor;
 import megamek.common.units.Entity;
 import megamek.common.units.Jumpship;
 import megamek.common.units.SmallCraft;
-import megamek.common.units.SpaceStation;
 import megamek.common.units.UnitType;
 import megamek.logging.MMLogger;
 import mekhq.campaign.Campaign;
@@ -243,11 +242,13 @@ public final class MultiCrewAssembler {
      * SpaceStations all need them; everything else is driver+gunner (or solo pilot).
      */
     private static boolean needsVesselCrew(Entity entity) {
-        if (entity instanceof SmallCraft || entity instanceof Jumpship || entity instanceof SpaceStation) {
+        // SpaceStation extends Jumpship and DropShip extends SmallCraft, so two checks cover all five.
+        if (entity instanceof SmallCraft || entity instanceof Jumpship) {
             return true;
         }
-        int ut = entity.getUnitType();
-        return ut == UnitType.SMALL_CRAFT || ut == UnitType.DROPSHIP || ut == UnitType.JUMPSHIP
-              || ut == UnitType.WARSHIP || ut == UnitType.SPACE_STATION;
+        int unitType = entity.getUnitType();
+        return unitType == UnitType.SMALL_CRAFT || unitType == UnitType.DROPSHIP
+              || unitType == UnitType.JUMPSHIP || unitType == UnitType.WARSHIP
+              || unitType == UnitType.SPACE_STATION;
     }
 }
