@@ -779,6 +779,10 @@ public final class CampaignOption<T> {
           of(Boolean.class, true, "useActiveNegotiators");
     public static final CampaignOption<Boolean> USE_RANDOM_CONTRACT_CHARACTERISTICS =
           of(Boolean.class, true, "useRandomContractCharacteristics");
+    public static final CampaignOption<Boolean> USE_OPERATION_CODENAMES =
+          of(Boolean.class, false, "useOperationCodenames");
+    public static final CampaignOption<Boolean> HIDE_CONTRACT_TYPE =
+          of(Boolean.class, false, "hideContractType");
     public static final CampaignOption<Double> CONTRACT_BASE_PAY_MULTIPLIER =
           of(Double.class, 1.0, "contractBasePayMultiplier");
     public static final CampaignOption<Double> CONTRACT_STRAIGHT_SUPPORT_MULTIPLIER =

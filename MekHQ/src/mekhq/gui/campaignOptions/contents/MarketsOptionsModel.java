@@ -71,6 +71,8 @@ class MarketsOptionsModel {
     boolean useNonNegotiableTerms;
     boolean useActiveNegotiators;
     boolean useRandomContractCharacteristics;
+    boolean useOperationCodenames;
+    boolean hideContractType;
     boolean contractMarketReportRefresh;
     int contractMaxSalvagePercentage;
     int dropShipBonusPercentage;
@@ -120,6 +122,8 @@ class MarketsOptionsModel {
         useNonNegotiableTerms = options.get(CampaignOption.USE_NON_NEGOTIABLE_TERMS);
         useActiveNegotiators = options.get(CampaignOption.USE_ACTIVE_NEGOTIATORS);
         useRandomContractCharacteristics = options.get(CampaignOption.USE_RANDOM_CONTRACT_CHARACTERISTICS);
+        useOperationCodenames = options.get(CampaignOption.USE_OPERATION_CODENAMES);
+        hideContractType = options.get(CampaignOption.HIDE_CONTRACT_TYPE);
         contractMarketReportRefresh = options.get(CampaignOption.CONTRACT_MARKET_REPORT_REFRESH);
         contractMaxSalvagePercentage = options.get(CampaignOption.CONTRACT_MAX_SALVAGE_PERCENTAGE);
         dropShipBonusPercentage = options.get(CampaignOption.DROP_SHIP_BONUS_PERCENTAGE);
@@ -184,6 +188,8 @@ class MarketsOptionsModel {
         options.set(CampaignOption.USE_NON_NEGOTIABLE_TERMS, useNonNegotiableTerms);
         options.set(CampaignOption.USE_ACTIVE_NEGOTIATORS, useActiveNegotiators);
         options.set(CampaignOption.USE_RANDOM_CONTRACT_CHARACTERISTICS, useRandomContractCharacteristics);
+        options.set(CampaignOption.USE_OPERATION_CODENAMES, useOperationCodenames);
+        options.set(CampaignOption.HIDE_CONTRACT_TYPE, hideContractType);
         options.set(CampaignOption.CONTRACT_MARKET_REPORT_REFRESH, contractMarketReportRefresh);
         options.set(CampaignOption.CONTRACT_MAX_SALVAGE_PERCENTAGE, contractMaxSalvagePercentage);
         options.set(CampaignOption.DROP_SHIP_BONUS_PERCENTAGE, dropShipBonusPercentage);

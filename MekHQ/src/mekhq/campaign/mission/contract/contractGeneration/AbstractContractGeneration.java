@@ -218,12 +218,20 @@ public class AbstractContractGeneration {
         String employerName = contract.isCovert()
                                     ? contract.getEmployerMarketDisplayName()
                                     : contract.getEmployerDisplayName();
-        String contractName = getFormattedTextAt(RESOURCE_BUNDLES,
-              "AbstractContractGeneration.contractName",
-              contract.getStartDate(),
-              contract.getObjectiveType().toString(),
-              employerName,
-              contract.getEnemyDisplayName());
+        String contractName;
+        if (campaign.getCampaignOptions().get(CampaignOption.USE_OPERATION_CODENAMES)) {
+            contractName = getFormattedTextAt(RESOURCE_BUNDLES,
+                  "AbstractContractGeneration.operationContractName",
+                  contract.getStartDate(),
+                  OperationNameController.generateOperationName(contract.getObjectiveType()));
+        } else {
+            contractName = getFormattedTextAt(RESOURCE_BUNDLES,
+                  "AbstractContractGeneration.contractName",
+                  contract.getStartDate(),
+                  contract.getObjectiveType().toString(),
+                  employerName,
+                  contract.getEnemyDisplayName());
+        }
         contract.setContractName(contractName);
 
         // Morale

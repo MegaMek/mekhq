@@ -84,6 +84,7 @@ public class ContractCardPanel extends JPanel {
     private static final int SUBTITLE_MAX_CHARS = 28;
 
     private final transient AbstractContract contract;
+    private final boolean hideContractType;
     private final Color accent;
     private boolean selected;
     private int forcedHeight = -1;
@@ -92,16 +93,18 @@ public class ContractCardPanel extends JPanel {
     /**
      * Creates a card for a single contract offer.
      *
-     * @param contract    the offer to summarize
-     * @param currentDate the campaign date, used to resolve time-sensitive planet names
-     * @param onSelected  callback invoked with this card's contract when the card is clicked
+     * @param contract         the offer to summarize
+     * @param currentDate      the campaign date, used to resolve time-sensitive planet names
+     * @param hideContractType when {@code true}, the offer's mission type is omitted from the card subtitle
+     * @param onSelected       callback invoked with this card's contract when the card is clicked
      *
      * @author Illiani
      * @since 0.51.01
      */
-    public ContractCardPanel(AbstractContract contract, LocalDate currentDate,
+    public ContractCardPanel(AbstractContract contract, LocalDate currentDate, boolean hideContractType,
           Consumer<AbstractContract> onSelected) {
         this.contract = contract;
+        this.hideContractType = hideContractType;
         this.accent = contract.getEmployerColor().getColour();
 
         setLayout(new BorderLayout());
@@ -161,8 +164,11 @@ public class ContractCardPanel extends JPanel {
                                ? getTextAt(RESOURCE_BUNDLE, "dossier.contractMarket.intel.obfuscated")
                                : contract.getName().replace('_', ' ');
         String name = wrapInner(escape(rawName), NAME_MAX_CHARS);
-        String subtitle = wrapInner(escape(contract.getEmployerMarketDisplayName()) + " &middot; "
-                                          + escape(contract.getObjectiveType().toString()), SUBTITLE_MAX_CHARS);
+        String rawSubtitle = hideContractType
+                                   ? escape(contract.getEmployerMarketDisplayName())
+                                   : escape(contract.getEmployerMarketDisplayName()) + " &middot; "
+                                           + escape(contract.getObjectiveType().toString());
+        String subtitle = wrapInner(rawSubtitle, SUBTITLE_MAX_CHARS);
         titlesLabel.setText("<html><b>" + name + "</b><br>"
                                   + "<span style='font-size:smaller'>" + subtitle + "</span></html>");
     }
