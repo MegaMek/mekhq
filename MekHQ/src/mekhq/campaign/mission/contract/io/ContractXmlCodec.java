@@ -118,6 +118,10 @@ public final class ContractXmlCodec {
             MHQXMLUtility.writeSimpleXMLTag(printWriter, indent, "obfuscatedIntel",
                   contract.getObfuscatedIntel().stream().map(Enum::name).collect(Collectors.joining(",")));
         }
+        if (!contract.getCharacteristics().isEmpty()) {
+            MHQXMLUtility.writeSimpleXMLTag(printWriter, indent, "characteristics",
+                  contract.getCharacteristics().stream().map(Enum::name).collect(Collectors.joining(",")));
+        }
         if (contract.getStatus() != null) {
             MHQXMLUtility.writeSimpleXMLTag(printWriter, indent, "missionStatus", contract.getStatus().name());
         }
@@ -443,6 +447,8 @@ public final class ContractXmlCodec {
               (contract, node, campaign, version) -> contract.setScheduleData(parseScheduleData(node)));
         readers.put("obfuscatedIntel",
               (contract, node, campaign, version) -> contract.setObfuscatedIntel(parseObfuscatedIntel(node)));
+        readers.put("characteristics",
+              (contract, node, campaign, version) -> contract.setCharacteristics(parseCharacteristics(node)));
         readers.put("systemsTargetData",
               (contract, node, campaign, version) -> contract.setSystemsTargetData(parseSystemsTargetData(node)));
         readers.put("rentedFacilitiesData",
@@ -780,6 +786,26 @@ public final class ContractXmlCodec {
             }
         }
         return fields;
+    }
+
+    /**
+     * Parses the comma-separated list of contract characteristics, skipping any name a newer save carried that this
+     * build no longer recognizes.
+     */
+    private static java.util.Set<ContractCharacteristic> parseCharacteristics(final Node wn) {
+        final java.util.Set<ContractCharacteristic> parsed = java.util.EnumSet.noneOf(ContractCharacteristic.class);
+        for (final String token : text(wn).split(",")) {
+            final String name = token.trim();
+            if (name.isEmpty()) {
+                continue;
+            }
+            try {
+                parsed.add(ContractCharacteristic.valueOf(name));
+            } catch (IllegalArgumentException ex) {
+                LOGGER.warn("Unknown contract characteristic '{}' ignored.", name);
+            }
+        }
+        return parsed;
     }
 
     private static final class SystemsTargetBuilder {

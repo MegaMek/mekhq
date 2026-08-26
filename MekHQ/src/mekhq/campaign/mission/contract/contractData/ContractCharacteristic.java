@@ -43,7 +43,7 @@ import static mekhq.utilities.MHQInternationalization.getTextAt;
  *
  * <p>Most characteristics come in a beneficial/adverse pair sharing a {@link Category}. The category doubles as a
  * mutual-exclusion group: a single contract carries at most one characteristic from any given category, so it can never
- * be handed, say, both {@link #PAY_BONUS} and {@link #PAY_CUT}.</p>
+ * be handed, say, both {@link #HIGH_PAY} and {@link #LOW_PAY}.</p>
  *
  * <p>{@code magnitude} is a general-purpose modifier whose meaning depends on the category (documented on each
  * constant and on {@link Category}); the application code interprets it per category. {@code weight} is the relative
@@ -51,45 +51,45 @@ import static mekhq.utilities.MHQInternationalization.getTextAt;
  */
 public enum ContractCharacteristic {
     /** The enemy faction-standing loss for taking this contract is amplified. */
-    BLOOD_FEUD(Category.ENEMY_STANDING, Polarity.ADVERSE, 6, 1.5),
-    /** The reputation gain on success is amplified (a breach is unaffected). */
-    CAREER_MAKER(Category.UNIT_REPUTATION, Polarity.BENEFICIAL, 6, 1.5),
+    ITS_PERSONAL(Category.ENEMY_STANDING, Polarity.ADVERSE, 6, 1.5),
+    /** The reputation gain on success is doubled (a breach is unaffected). */
+    CAREER_MAKER(Category.UNIT_REPUTATION, Polarity.BENEFICIAL, 6, 2.0),
     /** On successful completion, a lump equal to 5% of total pay is credited as a bonus on top of the contract. */
     COMPLETION_BONUS(Category.COMPLETION_PAYMENT, Polarity.BENEFICIAL, 6, 0.05),
     /** Combat pay is reduced by 5%. */
-    CUT_RATE_COMBAT(Category.COMBAT_PAY, Polarity.ADVERSE, 10, 0.95),
+    CUT_RATE(Category.COMBAT_PAY, Polarity.ADVERSE, 10, 0.95),
     /** Required victory points are raised, so the contract is harder to fulfill. */
-    DEMANDING_CLIENT(Category.OBJECTIVES, Polarity.ADVERSE, 10, 1.0),
+    DEMANDING(Category.OBJECTIVES, Polarity.ADVERSE, 10, 1.0),
     /** The enemy negotiator is Elite rather than the usual Veteran. */
     ELITE_NEGOTIATOR(Category.NEGOTIATOR, Polarity.ADVERSE, 6, 1.0),
     /** The employer faction-standing change is amplified. */
-    EMPLOYERS_FAVORITE(Category.EMPLOYER_STANDING, Polarity.BENEFICIAL, 6, 1.5),
+    MONITORED(Category.EMPLOYER_STANDING, Polarity.BENEFICIAL, 6, 1.5),
     /** Combat pay is boosted by 5%. */
     HAZARD_PAY(Category.COMBAT_PAY, Polarity.BENEFICIAL, 10, 1.05),
-    /** Reputation swings are amplified in both directions. */
-    HIGH_PROFILE(Category.UNIT_REPUTATION, Polarity.NEUTRAL, 6, 1.5),
+    /** The reputation gain on success is doubled (a breach is unaffected). */
+    HIGH_PROFILE(Category.UNIT_REPUTATION, Polarity.BENEFICIAL, 6, 2.0),
     /** Required victory points are lowered, so the contract is easier to fulfill. */
-    LENIENT_TERMS(Category.OBJECTIVES, Polarity.BENEFICIAL, 10, -1.0),
+    LENIENT(Category.OBJECTIVES, Polarity.BENEFICIAL, 10, -1.0),
     /** The contract runs longer than the rolled length. */
-    LONG_HAUL(Category.LENGTH, Polarity.NEUTRAL, 10, 1.5),
-    /** Reputation swings are dampened in both directions. */
-    MEDIA_BLACKOUT(Category.UNIT_REPUTATION, Polarity.NEUTRAL, 6, 0.5),
+    LENGTHY(Category.LENGTH, Polarity.NEUTRAL, 10, 1.5),
+    /** No reputation is gained on success (a breach is unaffected). */
+    MEDIA_BLACKOUT(Category.UNIT_REPUTATION, Polarity.ADVERSE, 6, 0.0),
     /** The enemy negotiator is only Regular rather than the usual Veteran, making negotiation easier for the player. */
     NOVICE_NEGOTIATOR(Category.NEGOTIATOR, Polarity.BENEFICIAL, 6, -1.0),
     /** The employer faction-standing change is amplified against you on failure. */
-    ON_PROBATION(Category.EMPLOYER_STANDING, Polarity.ADVERSE, 6, 0.5),
+    UNMONITORED(Category.EMPLOYER_STANDING, Polarity.ADVERSE, 6, 0.5),
     /** Monthly pay is boosted by 25%. */
-    PAY_BONUS(Category.PAY, Polarity.BENEFICIAL, 3, 1.25),
+    HIGH_PAY(Category.PAY, Polarity.BENEFICIAL, 3, 1.25),
     /** Monthly pay is reduced by 25%. */
-    PAY_CUT(Category.PAY, Polarity.ADVERSE, 3, 0.75),
+    LOW_PAY(Category.PAY, Polarity.ADVERSE, 3, 0.75),
     /** The enemy faction-standing loss for taking this contract is reduced. */
-    PROFESSIONAL_COURTESY(Category.ENEMY_STANDING, Polarity.BENEFICIAL, 6, 0.5),
+    JUST_BUSINESS(Category.ENEMY_STANDING, Polarity.BENEFICIAL, 6, 0.5),
     /** The contract runs shorter than the rolled length. */
-    QUICK_JOB(Category.LENGTH, Polarity.NEUTRAL, 10, 0.75),
+    QUICK(Category.LENGTH, Polarity.NEUTRAL, 10, 0.75),
     /** Total pay is unchanged, but 5% of it is paid up front on signing */
     SIGNING_BONUS(Category.PAY, Polarity.NEUTRAL, 6, 0.95),
-    /** The reputation gain on success is muted (a breach is unaffected). */
-    THANKLESS_TASK(Category.UNIT_REPUTATION, Polarity.ADVERSE, 6, 0.5);
+    /** No reputation is gained on success (a breach is unaffected). */
+    THANKLESS(Category.UNIT_REPUTATION, Polarity.ADVERSE, 6, 0.0);
 
     private final static String RESOURCE_BUNDLE = "mekhq.resources.Mission";
 

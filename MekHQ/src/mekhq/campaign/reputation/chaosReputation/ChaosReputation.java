@@ -571,12 +571,24 @@ public class ChaosReputation {
      *
      * @param personnel the personnel to reward
      */
-    private static void updatePersonnelForContractSuccess(List<Person> personnel) {
+    private static void updatePersonnelForContractSuccess(List<Person> personnel, int delta) {
         for (Person person : personnel) {
             if (person.isEmployed()) {
-                person.changeReputation(CONTRACT_SUCCESS_DELTA);
+                person.changeReputation(delta);
             }
         }
+    }
+
+    /**
+     * Scales a reputation delta by a contract characteristic's multiplier, rounding to the nearest whole point.
+     *
+     * @param baseDelta  the unscaled delta
+     * @param multiplier the multiplier ({@code 1.0} leaves the delta unchanged)
+     *
+     * @return the scaled delta
+     */
+    private static int scaleReputationDelta(int baseDelta, double multiplier) {
+        return (int) Math.round(baseDelta * multiplier);
     }
 
     /**
@@ -584,11 +596,11 @@ public class ChaosReputation {
      *
      * @param personnel the personnel to penalize
      */
-    private static void updatePersonnelForContractBreak(List<Person> personnel) {
+    private static void updatePersonnelForContractBreak(List<Person> personnel, double multiplier) {
         for (Person person : personnel) {
             if (person.isEmployed()) {
                 int baseReputation = person.getReputationDirect();
-                int delta = getContractBreakDelta(baseReputation);
+                int delta = scaleReputationDelta(getContractBreakDelta(baseReputation), multiplier);
                 person.changeReputation(delta);
             }
         }
@@ -622,6 +634,18 @@ public class ChaosReputation {
      * @param personnel the personnel whose reputation is adjusted in per-character mode
      */
     public static void processContractCompletion(Campaign campaign, MissionStatus status, List<Person> personnel) {
+        processContractCompletion(campaign, status, personnel, 1.0);
+    }
+
+    /**
+     * As {@link #processContractCompletion(Campaign, MissionStatus, List)}, but scales the reputation change by
+     * {@code reputationMultiplier}. A contract's unit-reputation characteristic (High-Profile, Media Blackout,
+     * Career-Maker, Thankless Task) supplies the multiplier so the swing from that contract is amplified or dampened.
+     *
+     * @param reputationMultiplier the multiplier applied to the reputation delta; {@code 1.0} leaves it unchanged
+     */
+    public static void processContractCompletion(Campaign campaign, MissionStatus status, List<Person> personnel,
+          double reputationMultiplier) {
         CampaignOptions campaignOptions = campaign.getCampaignOptions();
         boolean useChaosReputation = campaignOptions.get(CampaignOption.USE_CHAOS_REPUTATION);
         if (!useChaosReputation) {
@@ -641,20 +665,22 @@ public class ChaosReputation {
         int base = playerForce.getChaosCampaignReputation();
         boolean isCampaignLevelReputation = campaignOptions.get(CampaignOption.CAMPAIGN_LEVEL_CHAOS_REPUTATION);
         if (rewardsReputation) {
+            int successDelta = scaleReputationDelta(CONTRACT_SUCCESS_DELTA, reputationMultiplier);
             if (isCampaignLevelReputation) {
-                playerForce.changeChaosCampaignReputation(CONTRACT_SUCCESS_DELTA);
+                playerForce.changeChaosCampaignReputation(successDelta);
             } else {
-                updatePersonnelForContractSuccess(personnel);
+                updatePersonnelForContractSuccess(personnel, successDelta);
             }
 
             String report = getFormattedTextAt(RESOURCE_BUNDLE, "ChaosReputation.contractSuccess",
-                  spanOpeningWithCustomColor(getPositiveColor()), CLOSING_SPAN_TAG, CONTRACT_SUCCESS_DELTA);
+                  spanOpeningWithCustomColor(getPositiveColor()), CLOSING_SPAN_TAG, successDelta);
             campaign.addReport(DailyReportType.GENERAL, report);
         } else {
             if (isCampaignLevelReputation) {
-                playerForce.changeChaosCampaignReputation(getContractBreakDelta(base));
+                playerForce.changeChaosCampaignReputation(scaleReputationDelta(getContractBreakDelta(base),
+                      reputationMultiplier));
             } else {
-                updatePersonnelForContractBreak(personnel);
+                updatePersonnelForContractBreak(personnel, reputationMultiplier);
             }
 
             String report = getFormattedTextAt(RESOURCE_BUNDLE, "ChaosReputation.brokenContract",

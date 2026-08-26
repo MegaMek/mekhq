@@ -58,6 +58,7 @@ import megamek.logging.MMLogger;
 import mekhq.MHQConstants;
 import mekhq.campaign.mission.contract.AbstractContract;
 import mekhq.campaign.mission.contract.contractData.MissionStatus;
+import mekhq.campaign.mission.contract.utilities.ContractCharacteristics;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.universe.Faction;
 import mekhq.campaign.universe.Factions;
@@ -1693,10 +1694,12 @@ public class FactionStandings {
                 // A covert sponsor, if any, takes the standing change in the visible enemy's/employer's place.
                 Faction enemyFaction = mission.getStandingEnemyFaction();
 
+                // Honor the contract's standing characteristics (Professional Courtesy / Blood Feud for the enemy,
+                // Employer's Favorite / On Probation for the employer) so a rebuild from history matches live play.
                 String report = processContractAccept(campaignFactionCode,
                       enemyFaction,
                       today,
-                      regardMultiplier,
+                      regardMultiplier * ContractCharacteristics.getEnemyRegardMultiplier(mission),
                       contractLength);
                 if (report != null) {
                     reports.add(report);
@@ -1704,7 +1707,9 @@ public class FactionStandings {
 
                 if (missionStatus != MissionStatus.ACTIVE) {
                     reports.addAll(processContractCompletion(campaignFaction, mission.getStandingEmployerFaction(),
-                          today, missionStatus, regardMultiplier, contractLength));
+                          today, missionStatus,
+                          regardMultiplier * ContractCharacteristics.getEmployerRegardMultiplier(mission),
+                          contractLength));
                 }
             }
 

@@ -60,6 +60,7 @@ import mekhq.campaign.location.ILocation;
 import mekhq.campaign.mission.contract.AbstractContract;
 import mekhq.campaign.mission.contract.ChaosContract;
 import mekhq.campaign.mission.contract.contractData.*;
+import mekhq.campaign.mission.contract.utilities.ContractCharacteristics;
 import mekhq.campaign.mission.contract.utilities.MHQMorale;
 import mekhq.campaign.mission.utilities.ContractUtilities;
 import mekhq.campaign.personnel.Person;
@@ -183,6 +184,11 @@ public class AbstractContractGeneration {
 
         // Step 9: Final Tasks
         performFinalTasks(campaign, currentDate, contract, currentLocation);
+
+        // Rolled now that pay, length and objectives are set, so the generation-time effects bake onto their final
+        // base values. Lifecycle characteristics (negotiator, bonuses, standing) are stored and applied later at
+        // their own hooks.
+        ContractCharacteristics.rollAndApply(contract, campaign);
 
         // Step 10: Difficulty estimate (cached; enemy force and skill are finalized by this point)
         contract.setCachedContractDifficulty(
@@ -394,13 +400,17 @@ public class AbstractContractGeneration {
     }
 
     /**
-     * Determines a contract's start date from the travel time to its target, the way generation does: the player
-     * journeys from their current system to the contract's target world and the contract begins on arrival. The
-     * computed jump path is cached on the contract as a side effect, exactly as generation does. Exposed as public so
-     * the GM contract editor's "Automatic" start date follows the same rule.
+     * Determines a contract's length in months the way generation does: from the objective type, honoring the campaign's
+     * variable-contract-length option. Exposed as public so the GM contract editor's "Automatic" length follows the same
+     * rule.
      *
-     * @return the automatically determined start date, or the campaign date when no route can be measured
+     * @return the automatically determined contract length in months
      */
+    public static int determineLength(Campaign campaign, AbstractContract contract) {
+        boolean useVariableContractLength = campaign.getCampaignOptions().get(CampaignOption.VARIABLE_CONTRACT_LENGTH);
+        return contract.getObjectiveType().getChaosObjectiveType().calculateLength(useVariableContractLength);
+    }
+
     /**
      * Determines which planet within a target system a contract is fought over, the way generation does: a weighted
      * random draw over the system's worlds by strategic value, in the direction the contract's objective sets. Exposed
@@ -449,6 +459,14 @@ public class AbstractContractGeneration {
               campaign.getPlayerForce().getForceDetachment().getCurrentLocation());
     }
 
+    /**
+     * Determines a contract's start date from the travel time to its target, the way generation does: the player
+     * journeys from their current system to the contract's target world and the contract begins on arrival. The
+     * computed jump path is cached on the contract as a side effect, exactly as generation does. Exposed as public so
+     * the GM contract editor's "Automatic" start date follows the same rule.
+     *
+     * @return the automatically determined start date, or the campaign date when no route can be measured
+     */
     public static LocalDate determineStartDate(Campaign campaign, AbstractContract contract) {
         PlayerForce playerForce = campaign.getPlayerForce();
         return determineStartDate(campaign, campaign.getLocalDate(), campaign.getCurrentSystem(),
