@@ -77,9 +77,11 @@ class NegotiationStepMathTest {
           "TRANSPORT, 6, 5",         // 0.25 -> 0.0
           "TRANSPORT, 5, -1",        // 0.0 spans 1-5 and is the floor
           "TRANSPORT, 1, -1",
-          // Salvage pairs exchange flag with multiplier: percent-0(1), exchange-0.25(2-3), then percentages.
-          "SALVAGE, 3, 1",           // exchange 0.25 (2-3) -> percent 0.0 at step 1 (gap 2)
-          "SALVAGE, 2, 1",
+          // Salvage pairs exchange flag with multiplier: percent-0.0 spans 1-2, exchange-0.25 at step 3, then
+          // percentages from step 4.
+          "SALVAGE, 4, 3",           // percent 0.1 -> exchange 0.25 at step 3
+          "SALVAGE, 3, 2",           // exchange 0.25 (step 3) -> percent 0.0 (steps 1-2)
+          "SALVAGE, 2, -1",          // percent 0.0 spans 1-2 and is the floor
           "SALVAGE, 13, 12",         // 1.0 -> 0.9 (13-17 all read 1.0)
           "SALVAGE, 1, -1",
           // Support pairs straight-support with battlefield-loss; (1.0,1.0) spans 15-17.
@@ -107,8 +109,8 @@ class NegotiationStepMathTest {
           "COMMAND_RIGHTS, 11, -1", "COMMAND_RIGHTS, 15, -1",
           // Transport: 0.0(1-5) -> 0.25, and 1.0(9-17) is the top band.
           "TRANSPORT, 1, 6", "TRANSPORT, 5, 6", "TRANSPORT, 8, 9", "TRANSPORT, 9, -1",
-          // Salvage: percent-0(1) -> exchange(2-3) -> percentages, 1.0(13-17) top band.
-          "SALVAGE, 1, 2", "SALVAGE, 2, 4", "SALVAGE, 12, 13", "SALVAGE, 13, -1",
+          // Salvage: percent-0.0(1-2) -> exchange(3) -> percentages, 1.0(13-17) top band.
+          "SALVAGE, 1, 3", "SALVAGE, 3, 4", "SALVAGE, 12, 13", "SALVAGE, 13, -1",
           // Support: (1.0,1.0) spans 15-17.
           "SUPPORT, 1, 2", "SUPPORT, 8, 9", "SUPPORT, 14, 15", "SUPPORT, 15, -1" })
     void nextHigherDifferentStepCrossesPlateaus(final Term term, final int fromStep, final int expected) {
