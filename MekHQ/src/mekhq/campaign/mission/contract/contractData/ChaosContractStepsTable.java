@@ -39,7 +39,7 @@ import jakarta.annotation.Nullable;
 public enum ChaosContractStepsTable {
     // Hot Spots Draconis Reach pg 145 first printing
     STEP_ONE(1, 0.5, ContractCommandRights.INTEGRATED, 0.0, false, 0.0, 0.0, 0.0),
-    STEP_TWO(2, 0.55, ContractCommandRights.INTEGRATED, 0.25, true, 0.2, 0.0, 0.0),
+    STEP_TWO(2, 0.55, ContractCommandRights.INTEGRATED, 0.0, false, 0.2, 0.0, 0.0),
     STEP_THREE(3, 0.6, ContractCommandRights.INTEGRATED, 0.25, true, 0.4, 0.0, 0.0),
     STEP_FOUR(4, 0.7, ContractCommandRights.HOUSE, 0.1, false, 0.6, 0.0, 0.0),
     STEP_FIVE(5, 0.8, ContractCommandRights.HOUSE, 0.2, false, 0.7, 0.0, 0.0),
