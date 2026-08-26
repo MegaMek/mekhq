@@ -153,6 +153,7 @@ public final class SupportPersonnelToTOE {
         List<Person> maintenance = new ArrayList<>();
         List<Person> medical = new ArrayList<>();
         List<Person> command = new ArrayList<>();
+        List<PersonnelRole> unsectioned = new ArrayList<>();
         for (Person person : supportPersonnel) {
             if (person == null) {
                 continue;
@@ -164,11 +165,22 @@ public final class SupportPersonnelToTOE {
                 medical.add(person);
             } else if (role.isAdministrator()) {
                 command.add(person);
+            } else {
+                // Not a section this organizes. Counted rather than dropped in silence, because
+                // "my support staff are in the roster but not in the TOE" is otherwise impossible
+                // to diagnose from the log.
+                unsectioned.add(role);
             }
-            // Any other role is not a support section we organize; leave it in the roster untouched.
+        }
+        if (!unsectioned.isEmpty()) {
+            LOGGER.warn("[CompanyGen][SupportTOE] {} generated person(s) belong to no support section and stay"
+                        + " unfiled; roles: {}", unsectioned.size(), countByRole(unsectioned));
         }
 
         if (maintenance.isEmpty() && medical.isEmpty() && command.isEmpty()) {
+            LOGGER.warn("[CompanyGen][SupportTOE] nothing organized: none of the {} generated person(s) fell into"
+                        + " a maintenance, medical or command section; role histogram: {}",
+                  supportPersonnel.size(), roleHistogram(supportPersonnel));
             return;
         }
 
@@ -344,6 +356,19 @@ public final class SupportPersonnelToTOE {
         List<String> parts = new ArrayList<>();
         for (Map.Entry<PersonnelRole, List<Person>> entry : groupByPrimaryRole(people).entrySet()) {
             parts.add(entry.getKey().name() + "=" + entry.getValue().size());
+        }
+        return String.join(", ", parts);
+    }
+
+    /** Renders a {@code role=count} tally of the given roles for the generation log. */
+    private static String countByRole(List<PersonnelRole> roles) {
+        Map<PersonnelRole, Integer> counts = new LinkedHashMap<>();
+        for (PersonnelRole role : roles) {
+            counts.merge(role, 1, Integer::sum);
+        }
+        List<String> parts = new ArrayList<>();
+        for (Map.Entry<PersonnelRole, Integer> entry : counts.entrySet()) {
+            parts.add(entry.getKey().name() + "=" + entry.getValue());
         }
         return String.join(", ", parts);
     }
