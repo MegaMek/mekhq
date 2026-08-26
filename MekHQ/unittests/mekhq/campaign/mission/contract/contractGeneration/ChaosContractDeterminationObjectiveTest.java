@@ -41,7 +41,7 @@ import org.junit.jupiter.api.Test;
 import org.mockito.MockedStatic;
 
 /**
- * Tests {@link ChaosContractObjectiveDetermination#determineContractObjectiveType(int)} - which bracket the 2d6 roll
+ * Tests {@link ChaosContractDeterminationObjective#determineContractObjectiveType(int)} - which bracket the 2d6 roll
  * (plus a generation modifier, clamped to 1..13) lands in, and the follow-up roll that picks the opposing objective.
  *
  * <p>Each call rolls d6 more than once, so the stub feeds a sequence: the first value is the bracket roll and the rest
@@ -53,14 +53,14 @@ import org.mockito.MockedStatic;
  * map back to a category (e.g. RAID -> Recon Raid or Diversionary Raid), so the concrete variant is not deterministic
  * across two independent invocations.</p>
  */
-class ChaosContractObjectiveDeterminationTest {
+class ChaosContractDeterminationObjectiveTest {
 
     /** The first roll is the bracket; any further rolls feed the sub-objective picks in call order. */
     private static ContractObjectiveData determine(final int modifier, final Integer firstRoll,
           final Integer... furtherRolls) {
         try (MockedStatic<Compute> compute = mockStatic(Compute.class)) {
             compute.when(() -> Compute.d6(2)).thenReturn(firstRoll, furtherRolls);
-            return ChaosContractObjectiveDetermination.determineContractObjectiveType(modifier);
+            return ChaosContractDeterminationObjective.determineContractObjectiveType(modifier);
         }
     }
 

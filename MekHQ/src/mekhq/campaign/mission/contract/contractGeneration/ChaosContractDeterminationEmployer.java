@@ -63,8 +63,8 @@ import mekhq.campaign.universe.RandomFactionGenerator;
 import mekhq.campaign.universe.enums.HiringHallLevel;
 import org.jspecify.annotations.NonNull;
 
-public class ChaosContractEmployerDetermination {
-    private static final MMLogger LOGGER = MMLogger.create(ChaosContractEmployerDetermination.class);
+public class ChaosContractDeterminationEmployer {
+    private static final MMLogger LOGGER = MMLogger.create(ChaosContractDeterminationEmployer.class);
 
     private static final int COMSTAR_EMPLOYER_CHANCE = 100;
     private static final int WORD_OF_BLAKE_EMPLOYER_CHANCE = 40;
