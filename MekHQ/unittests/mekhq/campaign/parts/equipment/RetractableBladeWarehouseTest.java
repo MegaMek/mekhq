@@ -84,7 +84,7 @@ class RetractableBladeWarehouseTest {
 
     /**
      * A loose blade must carry the same sticker price as the same blade mounted on a unit. Before the fix MekHQ
-     * charged for the half-ton retraction mechanism twice, leaving every loose blade 10,000 C-bills too expensive.
+     * charged for the half-ton retraction mechanism twice, leaving every loose blade 5,000 C-bills too expensive.
      */
     @ParameterizedTest
     @ValueSource(doubles = { 20.0, 35.0, 55.0, 80.0, 100.0 })
