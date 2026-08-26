@@ -136,6 +136,8 @@ public final class CampaignOption<T> {
           of(Boolean.class, false, "chaosDebtPenaltiesStack");
     public static final CampaignOption<Boolean> CHAOS_NO_PARTIAL_SUCCESS_REPUTATION =
           of(Boolean.class, true, "chaosNoPartialSuccessReputation");
+    public static final CampaignOption<Boolean> USE_FAILED_CONTRACT_REPUTATION_LOSS =
+          of(Boolean.class, false, "useFailedContractReputationLoss");
     public static final CampaignOption<Boolean> CHAOS_PERSONALITY_AFFECTS_REPUTATION =
           of(Boolean.class, false, "chaosPersonalityAffectsReputation");
     public static final CampaignOption<Boolean> CHAOS_NEW_RECRUITS_HAVE_REPUTATION =
@@ -775,6 +777,8 @@ public final class CampaignOption<T> {
           of(Boolean.class, true, "useNonNegotiableTerms");
     public static final CampaignOption<Boolean> USE_ACTIVE_NEGOTIATORS =
           of(Boolean.class, true, "useActiveNegotiators");
+    public static final CampaignOption<Boolean> USE_RANDOM_CONTRACT_CHARACTERISTICS =
+          of(Boolean.class, true, "useRandomContractCharacteristics");
     public static final CampaignOption<Double> CONTRACT_BASE_PAY_MULTIPLIER =
           of(Double.class, 1.0, "contractBasePayMultiplier");
     public static final CampaignOption<Double> CONTRACT_STRAIGHT_SUPPORT_MULTIPLIER =

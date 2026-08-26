@@ -39,6 +39,7 @@ import static mekhq.utilities.MHQInternationalization.getTextAt;
 import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.EnumSet;
 import java.util.List;
@@ -107,47 +108,14 @@ public abstract class AbstractContract {
     private RentedFacilitiesData rentedFacilitiesData;
     private NonNegotiableTermsData nonNegotiableTermsData;
     private ActiveNegotiationData activeNegotiationData;
-    /**
-     * Seeded with neutral morale so a freshly-constructed contract is always well-formed: generation performs its first
-     * morale check (which reads the current level as its baseline) before any morale data is assigned.
-     */
+
     private @Nonnull MoraleData moraleData = new MoraleData(ContractMoraleLevel.STALEMATE);
     private NegotiationData negotiationData;
     private Person playerNegotiator;
-    /**
-     * The id of {@link #playerNegotiator} as read from a save, held until it can be resolved.
-     *
-     * <p>Contracts are written inside {@code <info>}, which the loader parses before the personnel roster exists, so
-     * the negotiator cannot be looked up while the contract itself is being read. The codec stashes the raw id here and
-     * the loader resolves it in a post-load pass once the whole save has been read. Never serialized - the negotiator
-     * is written from {@link #playerNegotiator}.</p>
-     */
-    private transient UUID pendingPlayerNegotiatorId;
 
-    /**
-     * The payment multiplier of a converted-active legacy contract awaiting settlement of its remaining balance, or
-     * {@code null} when nothing is pending. Transient; set during legacy conversion and cleared by the post-load
-     * settlement pass. See {@link #getPendingLegacySettlementMultiplier()}.
-     */
-    private transient Double pendingLegacySettlementMultiplier;
-
-    /**
-     * The active campaign options, injected so the term getters can apply the campaign's configured per-term
-     * multipliers (base pay, straight support, battlefield loss, transport, salvage). Transient and never serialized;
-     * set at generation, on load ({@link Campaign#importMission}), and on registration ({@link Campaign#addMission}).
-     * When absent the term multipliers fall back to no adjustment (x1.0).
-     */
-    private transient CampaignOptions campaignOptions;
-
-    /** Percentage of each monthly payment distributed to shareholding personnel. */
     private int sharesPercent = DEFAULT_SHARES_PERCENT;
-
-    /**
-     * The intel fields hidden from the player while this contract is an unaccepted market offer. Empty by default;
-     * populated automatically at generation (when the campaign opts in) or by the GM contract editor. Only consulted in
-     * the contract-market dossier - it has no effect once the contract is accepted.
-     */
     private final EnumSet<ObfuscatableIntel> obfuscatedIntel = EnumSet.noneOf(ObfuscatableIntel.class);
+    private final EnumSet<ContractCharacteristic> characteristics = EnumSet.noneOf(ContractCharacteristic.class);
 
     private StratConCampaignState stratConCampaignState;
     private int scale;
@@ -165,6 +133,18 @@ public abstract class AbstractContract {
      */
     private transient JumpPath cachedJumpPath;
     private transient int cachedContractDifficulty;
+
+    /**
+     * The id of {@link #playerNegotiator} as read from a save, held until it can be resolved.
+     *
+     * <p>Contracts are written inside {@code <info>}, which the loader parses before the personnel roster exists, so
+     * the negotiator cannot be looked up while the contract itself is being read. The codec stashes the raw id here and
+     * the loader resolves it in a post-load pass once the whole save has been read. Never serialized - the negotiator
+     * is written from {@link #playerNegotiator}.</p>
+     */
+    private transient UUID pendingPlayerNegotiatorId;
+    private transient Double pendingLegacySettlementMultiplier;
+    private transient CampaignOptions campaignOptions;
 
     public @Nonnull List<Scenario> getScenarios() {
         return scenarios;
@@ -303,6 +283,39 @@ public abstract class AbstractContract {
 
     public void setContractTerms(ContractTermsData contractTerms) {
         this.contractTerms = contractTerms;
+    }
+
+    /**
+     * @return the random flavor characteristics this contract carries (an at-most-one-per-category set). The returned
+     *       set is the contract's own, live {@link EnumSet}; callers must not mutate it - use
+     *       {@link #setCharacteristics(Collection)}.
+     */
+    public EnumSet<ContractCharacteristic> getCharacteristics() {
+        return characteristics;
+    }
+
+    /** Replaces this contract's characteristics with the supplied collection. */
+    public void setCharacteristics(Collection<ContractCharacteristic> newCharacteristics) {
+        characteristics.clear();
+        characteristics.addAll(newCharacteristics);
+    }
+
+    /** @return {@code true} if this contract carries the given characteristic */
+    public boolean hasCharacteristic(ContractCharacteristic characteristic) {
+        return characteristics.contains(characteristic);
+    }
+
+    /**
+     * @return the single characteristic this contract carries from the given category, or {@code null} if none. At most
+     *       one characteristic per category is ever present, so the first match is the only match.
+     */
+    public @Nullable ContractCharacteristic getCharacteristic(ContractCharacteristic.Category category) {
+        for (ContractCharacteristic characteristic : characteristics) {
+            if (characteristic.getCategory() == category) {
+                return characteristic;
+            }
+        }
+        return null;
     }
 
     public ContractObjectiveData getObjectiveData() {

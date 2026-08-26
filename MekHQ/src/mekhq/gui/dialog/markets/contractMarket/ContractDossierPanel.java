@@ -45,12 +45,15 @@ import static mekhq.utilities.MHQInternationalization.getTextAt;
 
 import java.awt.*;
 import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.List;
 import javax.swing.*;
 
 import jakarta.annotation.Nullable;
-import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.mission.contract.AbstractContract;
+import mekhq.campaign.mission.contract.contractData.ContractCharacteristic;
 import mekhq.campaign.mission.contract.contractData.ObfuscatableIntel;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.universe.Faction;
@@ -59,7 +62,9 @@ import mekhq.campaign.universe.PlanetarySystem;
 import mekhq.gui.baseComponents.roundedComponents.RoundedJButton;
 import mekhq.gui.baseComponents.roundedComponents.RoundedLineBorder;
 import mekhq.gui.utilities.MarkdownRenderer;
+import mekhq.gui.utilities.WrapLayout;
 import mekhq.gui.view.PlanetViewPanel;
+import mekhq.utilities.ReportingUtilities;
 import org.apache.commons.lang3.StringUtils;
 
 /**
@@ -321,6 +326,8 @@ public class ContractDossierPanel extends JPanel {
         addDetailRow(terms, "dossier.contractMarket.terms.salvage", salvage(contract), null);
         addDetailRow(terms, "dossier.contractMarket.terms.support", support(contract), null);
         addDetailRow(terms, "dossier.contractMarket.terms.transport", transport(contract), null);
+        // The contract's random characteristics ride along at the foot of the Terms column.
+        appendCharacteristics(terms);
         columns.add(terms);
 
         JPanel intel = section(getTextAt(RESOURCE_BUNDLE, "dossier.contractMarket.section.intel"));
@@ -337,7 +344,8 @@ public class ContractDossierPanel extends JPanel {
               intelValue(ObfuscatableIntel.MORALE, contract.getMoraleLevel().toString()), null);
         // Assessment is never obfuscated.
         int difficulty = assessmentDifficulty(contract);
-        Color assessmentColor = difficulty >= 8 ? dangerColor() : (difficulty <= 2 ? positiveColor() : null);
+        Color assessmentColor = difficulty >= 8 ? hexColor(dangerColor()) : (difficulty <= 2 ? hexColor(positiveColor())
+                                                                                   : null);
         addDetailRow(intel, "dossier.contractMarket.intel.assessment", assessmentLabel(contract), assessmentColor);
         // A muted, one-line advisory footnote for a contract with a special nature. The natures are mutually
         // exclusive, so at most one shows. For a false flag it is an understated, ambiguously-worded paper-trail tell
@@ -393,6 +401,48 @@ public class ContractDossierPanel extends JPanel {
         panel.add(descriptionPane, BorderLayout.CENTER);
 
         return panel;
+    }
+
+    /**
+     * A section listing this contract's random characteristics, or {@code null} when it has none. Each characteristic
+     * shows its name, colored by whether it helps or hurts the player, with its description on hover.
+     */
+    private void appendCharacteristics(JPanel section) {
+        if (contract.getCharacteristics().isEmpty()) {
+            return;
+        }
+
+        // Lay the characteristics out in a horizontal row that wraps to further lines when they do not all fit.
+        JPanel flow = new JPanel(new WrapLayout(FlowLayout.LEFT, scaleForGUI(14), scaleForGUI(2)));
+        flow.setOpaque(false);
+        List<ContractCharacteristic> ordered = new ArrayList<>(contract.getCharacteristics());
+        ordered.sort(Comparator.comparing(ContractCharacteristic::getName));
+        for (ContractCharacteristic characteristic : ordered) {
+            flow.add(characteristicLabel(characteristic));
+        }
+
+        GridBagConstraints constraints = new GridBagConstraints();
+        constraints.gridx = 0;
+        constraints.gridy = section.getComponentCount();
+        constraints.gridwidth = 2;
+        constraints.weightx = 1.0;
+        constraints.anchor = GridBagConstraints.WEST;
+        constraints.fill = GridBagConstraints.HORIZONTAL;
+        constraints.insets = new Insets(scaleForGUI(8), 0, 0, 0);
+        section.add(flow, constraints);
+    }
+
+    private JLabel characteristicLabel(ContractCharacteristic characteristic) {
+        JLabel label = new JLabel(characteristic.getName());
+        label.setToolTipText("<html><p style='width:" + scaleForGUI(300) + "'>"
+                                   + escape(characteristic.getToolTipText()) + "</p></html>");
+        Color color = switch (characteristic.getPolarity()) {
+            case BENEFICIAL -> hexColor(positiveColor());
+            case ADVERSE -> hexColor(dangerColor());
+            case NEUTRAL -> hexColor(neutralColor());
+        };
+        label.setForeground(color);
+        return label;
     }
 
     private JPanel section(String heading) {
@@ -482,15 +532,15 @@ public class ContractDossierPanel extends JPanel {
         panel.add(title, titleGbc);
 
         addProfitRow(panel, getTextAt(RESOURCE_BUNDLE, "dossier.contractMarket.profit.income"),
-              "+" + estimate.guaranteedIncome().toAmountAndSymbolString(), positiveColor(), false);
+              "+" + estimate.guaranteedIncome().toAmountAndSymbolString(), hexColor(positiveColor()), false);
         addProfitRow(panel, getFormattedTextAt(RESOURCE_BUNDLE,
                     "dossier.contractMarket.profit.expenses",
                     contract.getLengthInMonths(),
                     estimate.transitDays()),
-              "-" + estimate.operatingCosts().toAmountAndSymbolString(), dangerColor(), false);
+              "-" + estimate.operatingCosts().toAmountAndSymbolString(), hexColor(dangerColor()), false);
         addProfitRow(panel, getTextAt(RESOURCE_BUNDLE, "dossier.contractMarket.profit.net"),
               estimate.estimatedNet().toAmountAndSymbolString(),
-              estimate.estimatedNet().isPositive() ? positiveColor() : dangerColor(), true);
+              hexColor(estimate.estimatedNet().isPositive() ? positiveColor() : dangerColor()), true);
 
         // A JTextArea wraps to whatever width the layout gives it, so the caveat spans the full panel width instead of
         // being confined to a fixed HTML body width like a JLabel would be.
@@ -649,20 +699,21 @@ public class ContractDossierPanel extends JPanel {
               Math.round(foreground.getBlue() * fw + background.getBlue() * backgroundWeight));
     }
 
-    private static Color dangerColor() {
-        return decodeHex(MekHQ.getMHQOptions().getFontColorNegativeHexColor(), Color.RED);
+    private static String dangerColor() {
+        return ReportingUtilities.getNegativeColor();
     }
 
-    private static Color positiveColor() {
-        return decodeHex(MekHQ.getMHQOptions().getFontColorPositiveHexColor(), new Color(0, 128, 0));
+    private static String neutralColor() {
+        return ReportingUtilities.getWarningColor();
     }
 
-    private static Color decodeHex(String hex, Color fallback) {
-        try {
-            return Color.decode(hex.startsWith("#") ? hex : "#" + hex);
-        } catch (NumberFormatException ex) {
-            return fallback;
-        }
+    private static String positiveColor() {
+        return ReportingUtilities.getPositiveColor();
+    }
+
+    /** Decodes a {@code #RRGGBB} hex color (as the shared reporting colors return) into a {@link Color}. */
+    private static Color hexColor(String hex) {
+        return Color.decode(hex);
     }
 
     private static Color contrastingText(Color background) {
