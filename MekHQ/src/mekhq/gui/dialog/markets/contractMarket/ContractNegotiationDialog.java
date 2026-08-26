@@ -874,7 +874,7 @@ public class ContractNegotiationDialog extends JDialog {
         if (playerNegotiator == null) {
             // This shouldn't happen, so we go ahead and log it.
             LOGGER.warn("Contract {} has no player negotiator", contract.getName());
-            return DISASTROUS.getLowerBound();
+            return ActiveNegotiationMath.netMargin(DISASTROUS, MarginOfSuccess.BARELY_MADE_IT);
         }
         MarginOfSuccess playerMargin = reportedNegotiationCheck(playerNegotiator,
               "negotiate.contractMarket.renegotiate.roll.player");
