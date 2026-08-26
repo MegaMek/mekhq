@@ -51,9 +51,16 @@ public enum ContractNature {
     /**
      * A covert operation: the enemy is drawn under covert rules, where even the employer's allies can become rare,
      * low-chance targets rather than being excluded outright (espionage and sabotage don't respect alliances the way
-     * open warfare does).
+     * open warfare does). The employing faction is concealed from the player in the market.
      */
-    COVERT;
+    COVERT,
+    /**
+     * A false flag operation: a covert operation (it follows the same covert enemy rules) run under a cover story. A
+     * plausible but false <em>front</em> faction is presented as the visible employer instead of concealing the
+     * employer outright, while the real employer is preserved as the covert sponsor - so Faction Standing still accrues
+     * to it, but the front drives the visible and operational identity everywhere else.
+     */
+    FALSE_FLAG;
 
     private static final MMLogger LOGGER = MMLogger.create(ContractNature.class);
 
@@ -62,9 +69,22 @@ public enum ContractNature {
         return this == PROVING_GROUND;
     }
 
-    /** @return {@code true} if this is the {@link #COVERT} designation */
+    /** @return {@code true} if this is specifically the {@link #COVERT} designation (not {@link #FALSE_FLAG}) */
     public boolean isCovert() {
         return this == COVERT;
+    }
+
+    /** @return {@code true} if this is the {@link #FALSE_FLAG} designation */
+    public boolean isFalseFlag() {
+        return this == FALSE_FLAG;
+    }
+
+    /**
+     * @return {@code true} if this is any kind of covert operation - {@link #COVERT} or {@link #FALSE_FLAG} - which
+     *       share covert enemy selection and conceal the true employer from the market
+     */
+    public boolean isCovertOperation() {
+        return (this == COVERT) || (this == FALSE_FLAG);
     }
 
     /**

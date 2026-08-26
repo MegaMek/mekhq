@@ -122,7 +122,7 @@ class ChaosContractDeterminationEmployerTest {
             compute.when(() -> Compute.randomInt(anyInt())).thenReturn(0);
 
             EmployerFactions result = ChaosContractDeterminationEmployer.determineEmployerFactions(
-                  ChaosEmployerType.CIVILIAN_ORGANIZATION_REBELS, DATE, locationOwnedByHouse(), true);
+                  ChaosEmployerType.CIVILIAN_ORGANIZATION_REBELS, DATE, locationOwnedByHouse(), true, true);
 
             assertSame(rebels, result.flavor(), "rebels remain the visible employer");
             assertSame(house, result.anchor(), "the anchor is the local ruling power the rebels rise against");
@@ -144,7 +144,7 @@ class ChaosContractDeterminationEmployerTest {
             compute.when(() -> Compute.randomInt(anyInt())).thenReturn(1);
 
             EmployerFactions result = ChaosContractDeterminationEmployer.determineEmployerFactions(
-                  ChaosEmployerType.CIVILIAN_ORGANIZATION_REBELS, DATE, locationOwnedByHouse(), true);
+                  ChaosEmployerType.CIVILIAN_ORGANIZATION_REBELS, DATE, locationOwnedByHouse(), true, true);
 
             assertSame(rebels, result.flavor());
             assertSame(house, result.anchor());
@@ -163,7 +163,7 @@ class ChaosContractDeterminationEmployerTest {
             stubFactions(factionsStatic, rebels, house, comStar, wordOfBlake);
 
             EmployerFactions result = ChaosContractDeterminationEmployer.determineEmployerFactions(
-                  ChaosEmployerType.CIVILIAN_ORGANIZATION_REBELS, DATE, locationOwnedByHouse(), false);
+                  ChaosEmployerType.CIVILIAN_ORGANIZATION_REBELS, DATE, locationOwnedByHouse(), false, true);
 
             assertSame(rebels, result.flavor());
             assertSame(house, result.anchor());
@@ -182,7 +182,7 @@ class ChaosContractDeterminationEmployerTest {
             stubFactions(factionsStatic, rebels, house, comStar, wordOfBlake);
 
             EmployerFactions result = ChaosContractDeterminationEmployer.determineEmployerFactions(
-                  ChaosEmployerType.LOCAL_SYSTEM_OWNER, DATE, locationOwnedByHouse(), false);
+                  ChaosEmployerType.LOCAL_SYSTEM_OWNER, DATE, locationOwnedByHouse(), false, false);
 
             assertSame(house, result.flavor(), "a local system owner is the current system's controller");
             assertSame(house, result.anchor(), "a territorial employer anchors on itself");
@@ -210,7 +210,7 @@ class ChaosContractDeterminationEmployerTest {
             when(generator.getRandomEmployerFaction(eq(location), eq(DATE), eq(true), any())).thenReturn(house);
 
             EmployerFactions result = ChaosContractDeterminationEmployer.determineEmployerFactions(
-                  ChaosEmployerType.CORPORATION, DATE, location, true);
+                  ChaosEmployerType.CORPORATION, DATE, location, true, true);
 
             assertEquals(ChaosEmployerType.CORPORATION, result.type(),
                   "ComStar fronts a corporation, so the effective employer type is CORPORATION");
@@ -241,12 +241,40 @@ class ChaosContractDeterminationEmployerTest {
             when(generator.getRandomEmployerFaction(eq(location), eq(DATE), eq(true), any())).thenReturn(house);
 
             EmployerFactions result = ChaosContractDeterminationEmployer.determineEmployerFactions(
-                  ChaosEmployerType.CORPORATION, DATE, location, true);
+                  ChaosEmployerType.CORPORATION, DATE, location, true, true);
 
             assertEquals(ChaosEmployerType.CORPORATION, result.type(), "Word of Blake keeps the rolled employer type");
             assertSame(wordOfBlake, result.flavor(), "Word of Blake takes over as the visible employer outright");
             assertSame(house, result.anchor(), "the conflict still sits inside a landed power near the player");
             assertNull(result.sponsor(), "an openly-employing patron is not a covert sponsor");
+        }
+    }
+
+    @Test
+    void wordOfBlakeStillTakesOverANonCovertViableContract() {
+        Faction rebels = namedFaction("REB");
+        Faction house = namedFaction("HOUSE");
+        Faction comStar = namedFaction("CS");
+        Faction wordOfBlake = namedFaction("WOB");
+        ILocation location = locationOwnedByHouse();
+
+        try (MockedStatic<Factions> factionsStatic = mockStatic(Factions.class);
+              MockedStatic<Compute> compute = mockStatic(Compute.class);
+              MockedStatic<RandomFactionGenerator> generatorStatic = mockStatic(RandomFactionGenerator.class)) {
+            stubFactions(factionsStatic, rebels, house, comStar, wordOfBlake);
+            compute.when(() -> Compute.randomInt(anyInt())).thenReturn(0);
+
+            RandomFactionGenerator generator = mock(RandomFactionGenerator.class);
+            generatorStatic.when(RandomFactionGenerator::getInstance).thenReturn(generator);
+            when(generator.getRandomEmployerFaction(eq(location), eq(DATE), eq(true), any())).thenReturn(house);
+
+            // Not covert-viable: ComStar is barred, but the Word of Blake is under no such restriction.
+            EmployerFactions result = ChaosContractDeterminationEmployer.determineEmployerFactions(
+                  ChaosEmployerType.CORPORATION, DATE, location, true, false);
+
+            assertSame(wordOfBlake, result.flavor(), "the Word of Blake takes any contract, covert-viable or not");
+            assertSame(house, result.anchor(), "the conflict still sits inside a landed power near the player");
+            assertNull(result.sponsor());
         }
     }
 }

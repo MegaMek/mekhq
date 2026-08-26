@@ -618,11 +618,25 @@ public abstract class AbstractContract {
     }
 
     /**
-     * @return {@code true} if this is a covert operation, where the enemy is drawn under covert rules and even the
-     *       employer's allies can become rare, low-chance targets
+     * @return {@code true} if this is specifically a plain covert operation (not a false flag), where the employer is
+     *       concealed from the market outright
      */
     public boolean isCovert() {
         return nature.isCovert();
+    }
+
+    /** @return {@code true} if this is a false flag operation, presenting a front faction as its cover-story employer */
+    public boolean isFalseFlag() {
+        return nature.isFalseFlag();
+    }
+
+    /**
+     * @return {@code true} if this is any kind of covert operation ({@link ContractNature#COVERT} or
+     *       {@link ContractNature#FALSE_FLAG}), which share covert enemy selection and conceal the true employer from
+     *       the market
+     */
+    public boolean isCovertOperation() {
+        return nature.isCovertOperation();
     }
 
     public int getRequiredVictoryPoints() {
@@ -677,12 +691,14 @@ public abstract class AbstractContract {
      * <p>Employer types that keep their faction's own name (system owners, planetary governments, nobles) have no tag,
      * so this returns the plain display name unchanged.</p>
      *
-     * <p>A covert operation conceals its employing faction from the player, so this returns an "Undisclosed Employer"
-     * placeholder instead of the real name. Only the market display is hidden - {@link #getEmployerDisplayName()} still
-     * returns the true employer everywhere else.</p>
+     * <p>A plain covert operation conceals its employing faction from the player, returning an "Undisclosed Employer"
+     * placeholder; only the market display is affected, as {@link #getEmployerDisplayName()} still returns the true
+     * employer everywhere else. A false flag operation needs no special handling here: its visible employer is already
+     * the cover-story front (the real employer is preserved as the covert sponsor), so it displays like any normal
+     * contract.</p>
      *
      * @return the display name, with a {@code " (Tag)"} suffix when the employer type carries a market tag, or an
-     *       "Undisclosed Employer" placeholder for a covert operation
+     *       "Undisclosed Employer" placeholder for a plain covert operation
      */
     public String getEmployerMarketDisplayName() {
         if (isCovert()) {
