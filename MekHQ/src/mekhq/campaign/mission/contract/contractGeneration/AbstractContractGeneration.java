@@ -57,15 +57,7 @@ import mekhq.campaign.force.PlayerForce;
 import mekhq.campaign.location.ILocation;
 import mekhq.campaign.mission.contract.AbstractContract;
 import mekhq.campaign.mission.contract.ChaosContract;
-import mekhq.campaign.mission.contract.contractData.ContractObjectiveData;
-import mekhq.campaign.mission.contract.contractData.ContractScheduleData;
-import mekhq.campaign.mission.contract.contractData.ContractTermsData;
-import mekhq.campaign.mission.contract.contractData.EmployerData;
-import mekhq.campaign.mission.contract.contractData.EnemyData;
-import mekhq.campaign.mission.contract.contractData.NonNegotiableTermsData;
-import mekhq.campaign.mission.contract.contractData.ObfuscatableIntel;
-import mekhq.campaign.mission.contract.contractData.RentedFacilitiesData;
-import mekhq.campaign.mission.contract.contractData.SystemsTargetData;
+import mekhq.campaign.mission.contract.contractData.*;
 import mekhq.campaign.mission.contract.utilities.MHQMorale;
 import mekhq.campaign.mission.utilities.ContractUtilities;
 import mekhq.campaign.personnel.Person;
@@ -88,6 +80,8 @@ public class AbstractContractGeneration {
     private static final int INTEL_OBFUSCATION_ODDS = 4;
     /** Each contract term independently has a 1-in-this chance of being locked as non-negotiable at generation. */
     private static final int NON_NEGOTIABLE_TERM_ODDS = 4;
+    /** A covert-candidate objective has a 1-in-this chance of the contract actually being run as a covert operation. */
+    private static final int COVERT_CONTRACT_ODDS = 6;
 
     public static @Nullable AbstractContract createContract(Campaign campaign, CampaignOptions campaignOptions,
           LocalDate currentDate, Detachment detachment, int contractGenerationModifier, ContractSearchType searchType,
@@ -97,7 +91,9 @@ public class AbstractContractGeneration {
         // Inject the options so the contract's term getters apply the configured per-term multipliers even while the
         // offer is still in the market (before it is accepted and registered on the campaign).
         contract.setCampaignOptions(campaignOptions);
-        contract.setProvingGround(provingGround);
+        if (provingGround) {
+            contract.setNature(ContractNature.PROVING_GROUND);
+        }
 
         // Step 1: Employer
         AbstractLocation currentLocation = detachment.getCurrentLocation();
@@ -110,6 +106,8 @@ public class AbstractContractGeneration {
         ContractObjectiveData objectiveData = pickObjective(contractGenerationModifier, contract);
         ChaosObjectiveType chaosObjectiveType = objectiveData.playerObjectiveType().getChaosObjectiveType();
         boolean isDefensiveObjective = !objectiveData.playerObjectiveType().getChaosObjectiveType().isAttacker();
+        // Must be set before the enemy is picked, which draws under covert rules when this is true.
+        determineCovertStatus(chaosObjectiveType, contract);
 
         // Step 3: Scale & Intensity
         setAncillaryValues(campaign, detachment.getHangar(), contract);
@@ -188,12 +186,15 @@ public class AbstractContractGeneration {
         contract.setContractId(contractId);
         contract.setStatus(null);
 
-        // Contract Details
+        // Contract Details.
+        String employerName = contract.isCovert()
+                                    ? contract.getEmployerMarketDisplayName()
+                                    : contract.getEmployerDisplayName();
         String contractName = getFormattedTextAt(RESOURCE_BUNDLES,
               "AbstractContractGeneration.contractName",
               contract.getStartDate(),
               contract.getObjectiveType().toString(),
-              contract.getEmployerDisplayName(),
+              employerName,
               contract.getEnemyDisplayName());
         contract.setContractName(contractName);
 
@@ -230,6 +231,24 @@ public class AbstractContractGeneration {
             if (Compute.randomInt(INTEL_OBFUSCATION_ODDS) == 0) {
                 contract.setIntelObfuscated(field, true);
             }
+        }
+    }
+
+    /**
+     * Decides whether a freshly generated contract is a covert operation. Only objectives flagged as covert candidates
+     * are eligible, and even those turn covert only on a {@link #COVERT_CONTRACT_ODDS} chance roll; every other
+     * contract is left as-is. A contract that already has a special designation (a Proving Ground) is never overridden
+     * - the designations are mutually exclusive and the deliberate market top-up takes priority over the random covert
+     * roll. When covert, the enemy is later drawn under covert rules (see
+     * {@link ChaosContractDeterminationEnemy#generateEnemyFactionForObjective}), where even the employer's allies can
+     * become rare targets.
+     */
+    private static void determineCovertStatus(ChaosObjectiveType chaosObjectiveType, ChaosContract contract) {
+        if (contract.getNature() != ContractNature.NORMAL) {
+            return;
+        }
+        if (chaosObjectiveType.isCovertCandidate() && Compute.randomInt(COVERT_CONTRACT_ODDS) == 0) {
+            contract.setNature(ContractNature.COVERT);
         }
     }
 
@@ -530,7 +549,8 @@ public class AbstractContractGeneration {
                         currentLocation,
                         currentDate,
                         employerData.getAnchorFaction(),
-                        objectiveData.playerObjectiveType());
+                      objectiveData.playerObjectiveType(),
+                      contract.isCovert());
                 attempts++;
             } while (enemyData.factionCode().equals(employerFactionCode) && attempts < MAX_ENEMY_REDRAWS);
         }

@@ -51,25 +51,26 @@ import megamek.logging.MMLogger;
 import mekhq.campaign.mission.contract.contractData.ContractObjectiveType;
 
 public enum ChaosObjectiveType {
-    EXPEDITION(3, 1, 0, 1, 0, 0, 2, -1, true,
+    EXPEDITION(false, 3, 1, 0, 1, 0, 0, 2, -1, true,
           Collections.emptyList()),
-    PIRATE_HUNT(3, 1, 0, 0, 0, -1, 2, -1, true,
+    PIRATE_HUNT(false, 3, 1, 0, 0, 0, -1, 2, -1, true,
           List.of(END_CONTRACT_AFTER_TWO_CONSECUTIVE_TRACKS)),
-    GUERILLA_OPERATION(3, 3, 0, 0, 0, -1, 2, -1, true,
+    GUERILLA_OPERATION(true, 3, 3, 0, 0, 0, -1, 2, -1, true,
           List.of(DOUBLE_ALL_COSTS, NO_IN_CONTRACT_SUPPORT, DOUBLE_SUPPORT_PAYOUTS)),
-    GARRISON(6, -1, 1, 0, 1, -2, 0, 1, false,
+    GARRISON(false, 6, -1, 1, 0, 1, -2, 0, 1, false,
           Collections.emptyList()),
-    CADRE_DUTY(6, 0, 1, 0, 1, -2, 0, -2, false,
+    CADRE_DUTY(false, 6, 0, 1, 0, 1, -2, 0, -2, false,
           List.of(SIMULATED_DAMAGE)),
-    RAID(3, 2, 0, 0, 0, -1, 0, 0, true,
+    RAID(true, 3, 2, 0, 0, 0, -1, 0, 0, true,
           Collections.emptyList()),
-    INVASION(6, 2, -1, 2, -1, 1, -2, 3, true,
+    INVASION(false, 6, 2, -1, 2, -1, 1, -2, 3, true,
           Collections.emptyList()),
-    PIRATE_RAID(3, 1, 0, 0, 0, -1, 0, -2, true,
+    PIRATE_RAID(true, 3, 1, 0, 0, 0, -1, 0, -2, true,
           List.of(END_CONTRACT_AFTER_TWO_CONSECUTIVE_TRACKS, USE_PIRATE_LOOTING));
 
     private static final MMLogger LOGGER = MMLogger.create(ChaosObjectiveType.class);
 
+    private final boolean isCovertCandidate;
     private final int monthsLength; // Hot Spots Draconis Reach pg 144 first printing
     private final int procurementTargetNumberModifier;
     private final int payRateModifier; // Hot Spots Draconis Reach pg 144 first printing
@@ -83,10 +84,12 @@ public enum ChaosObjectiveType {
     private final boolean isAttacker;
     private final List<ChaosObjectiveSpecialRules> specialRules;  // Hot Spots Draconis Reach pg 146 first printing
 
-    ChaosObjectiveType(final int monthsLength, final int procurementTargetNumberModifier, final int payRateModifier,
-          final int supportModifier, final int transportModifier, final int salvageRightsModifier,
-          final int commandRightsModifier, final int forceCommitmentModifier, final boolean isAttacker,
+    ChaosObjectiveType(final boolean isCovertCandidate, final int monthsLength,
+          final int procurementTargetNumberModifier, final int payRateModifier, final int supportModifier,
+          final int transportModifier, final int salvageRightsModifier, final int commandRightsModifier,
+          final int forceCommitmentModifier, final boolean isAttacker,
           final List<ChaosObjectiveSpecialRules> specialRules) {
+        this.isCovertCandidate = isCovertCandidate;
         this.monthsLength = monthsLength;
         this.procurementTargetNumberModifier = procurementTargetNumberModifier;
         this.payRateModifier = payRateModifier;
@@ -99,10 +102,13 @@ public enum ChaosObjectiveType {
         this.specialRules = specialRules;
     }
 
+    public boolean isCovertCandidate() {
+        return isCovertCandidate;
+    }
+
     public int getMonthsLength() {
         return monthsLength;
     }
-
 
     /**
      * The returned value is a modifier added to the target number of procurement checks, so a higher value makes parts

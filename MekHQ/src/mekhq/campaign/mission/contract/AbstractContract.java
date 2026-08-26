@@ -34,6 +34,7 @@ package mekhq.campaign.mission.contract;
 
 import static mekhq.campaign.mission.contract.contractData.ContractMoraleLevel.MAXIMUM_MORALE_LEVEL;
 import static mekhq.campaign.mission.contract.contractData.ContractMoraleLevel.MINIMUM_MORALE_LEVEL;
+import static mekhq.utilities.MHQInternationalization.getTextAt;
 
 import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
@@ -153,8 +154,7 @@ public abstract class AbstractContract {
     private int requiredCombatElements;
     private int requiredVictoryPoints;
     private int trackCount; // TODO future proofing
-    /** A "pity" contract: an easy top-up offer, surfaced in the market as a Proving Ground. */
-    private boolean provingGround;
+    private ContractNature nature = ContractNature.NORMAL;
 
     private final List<Scenario> scenarios = new ArrayList<>();
 
@@ -603,13 +603,26 @@ public abstract class AbstractContract {
         this.trackCount = trackCount;
     }
 
-    /** @return {@code true} if this is a pity ("Proving Ground") contract - an easy top-up offer for a struggling force */
-    public boolean isProvingGround() {
-        return provingGround;
+    /** @return this contract's special designation ({@link ContractNature#NORMAL} if it has none) */
+    public ContractNature getNature() {
+        return nature;
     }
 
-    public void setProvingGround(boolean provingGround) {
-        this.provingGround = provingGround;
+    public void setNature(ContractNature nature) {
+        this.nature = (nature == null) ? ContractNature.NORMAL : nature;
+    }
+
+    /** @return {@code true} if this is a pity ("Proving Ground") contract - an easy top-up offer for a struggling force */
+    public boolean isProvingGround() {
+        return nature.isProvingGround();
+    }
+
+    /**
+     * @return {@code true} if this is a covert operation, where the enemy is drawn under covert rules and even the
+     *       employer's allies can become rare, low-chance targets
+     */
+    public boolean isCovert() {
+        return nature.isCovert();
     }
 
     public int getRequiredVictoryPoints() {
@@ -664,9 +677,17 @@ public abstract class AbstractContract {
      * <p>Employer types that keep their faction's own name (system owners, planetary governments, nobles) have no tag,
      * so this returns the plain display name unchanged.</p>
      *
-     * @return the display name, with a {@code " (Tag)"} suffix when the employer type carries a market tag
+     * <p>A covert operation conceals its employing faction from the player, so this returns an "Undisclosed Employer"
+     * placeholder instead of the real name. Only the market display is hidden - {@link #getEmployerDisplayName()} still
+     * returns the true employer everywhere else.</p>
+     *
+     * @return the display name, with a {@code " (Tag)"} suffix when the employer type carries a market tag, or an
+     *       "Undisclosed Employer" placeholder for a covert operation
      */
     public String getEmployerMarketDisplayName() {
+        if (isCovert()) {
+            return getTextAt("mekhq.resources.ChaosContractMarketDialog", "value.contractMarket.employer.hidden");
+        }
         String tag = employerData.type().getMarketDisplayTag();
         String displayName = employerData.displayName();
         return (tag == null) ? displayName : displayName + " (" + tag + ')';

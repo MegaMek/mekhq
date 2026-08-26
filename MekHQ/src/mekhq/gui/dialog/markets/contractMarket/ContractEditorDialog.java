@@ -142,6 +142,8 @@ public class ContractEditorDialog extends JDialog {
     private JTextArea descriptionArea;
     private JComboBox<MissionStatus> statusCombo;
     private boolean statusEditable;
+    private JComboBox<ContractNature> natureCombo;
+    private boolean natureEditable;
 
     // Parameters
     private JSpinner scaleSpinner;
@@ -455,6 +457,15 @@ public class ContractEditorDialog extends JDialog {
                   "edit.contractMarket.field.status.disabled.tooltip")));
         }
         rows.add(formRow("edit.contractMarket.field.status", statusCombo));
+
+        natureEditable = contract.getStatus() == null;
+        natureCombo = natureCombo(contract.getNature());
+        natureCombo.setEnabled(natureEditable);
+        if (!natureEditable) {
+            natureCombo.setToolTipText(wordWrap(getTextAt(RESOURCE_BUNDLE,
+                  "edit.contractMarket.field.nature.disabled.tooltip")));
+        }
+        rows.add(formRow("edit.contractMarket.field.nature", natureCombo));
 
         return card(rows);
     }
@@ -1042,6 +1053,10 @@ public class ContractEditorDialog extends JDialog {
             contract.setStatus(statusValue(statusCombo));
         }
 
+        if (natureEditable) {
+            contract.setNature(enumValue(natureCombo, contract.getNature()));
+        }
+
         // Parameters. The "Automatic" checkboxes exist only in create mode (see automaticToggle): a ticked box
         // (re)determines the value with the same rules the contract generator uses (AbstractContractGeneration),
         // while an unticked box writes the GM's manual spinner value. Scale is resolved before the required victory
@@ -1450,6 +1465,23 @@ public class ContractEditorDialog extends JDialog {
     private static <E> JComboBox<E> enumCombo(E[] values, E selected) {
         JComboBox<E> combo = new JComboBox<>(new DefaultComboBoxModel<>(values));
         combo.setSelectedItem(selected);
+        return combo;
+    }
+
+    /** The contract-type picker, rendering each {@link ContractNature} with its player-facing label. */
+    private JComboBox<ContractNature> natureCombo(ContractNature selected) {
+        JComboBox<ContractNature> combo = enumCombo(ContractNature.values(), selected);
+        combo.setRenderer(new DefaultListCellRenderer() {
+            @Override
+            public Component getListCellRendererComponent(JList<?> list, Object value, int index, boolean isSelected,
+                  boolean cellHasFocus) {
+                super.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);
+                if (value instanceof ContractNature nature) {
+                    setText(getTextAt(RESOURCE_BUNDLE, "contractNature." + nature.name()));
+                }
+                return this;
+            }
+        });
         return combo;
     }
 
