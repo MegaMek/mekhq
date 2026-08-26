@@ -146,7 +146,8 @@ public class RandomOperationNameGenerator {
             logger.warn("Attempted to generate an operation descriptor before the pools were initialized.");
             return null;
         }
-        return getWeightedDescriptor().randomItem();
+        WeightedIntMap<String> pool = getWeightedDescriptor();
+        return (pool == null) ? null : pool.randomItem();
     }
 
     /**
@@ -223,7 +224,7 @@ public class RandomOperationNameGenerator {
      *
      * @return a two-element array of {@code {basePath, userPath}}
      */
-    private static String[] nounFilePaths(final ContractObjectiveType objectiveType) {
+    static String[] nounFilePaths(final ContractObjectiveType objectiveType) {
         return switch (objectiveType) {
             case ASSASSINATION -> new String[] { MHQConstants.OPERATION_NAME_NOUN_ASSASSINATION,
                                                  MHQConstants.OPERATION_NAME_NOUN_ASSASSINATION_USER };
@@ -304,4 +305,41 @@ public class RandomOperationNameGenerator {
         }
     }
     //endregion Initialization
+
+    //region Testing
+
+    /**
+     * Test seam: installs pre-built word pools and publishes a ready singleton, bypassing the background file loaders
+     * so generation is deterministic and file-system independent. Pair with {@link #resetForTesting()} in test
+     * teardown.
+     *
+     * @param descriptor the descriptor pool to install (may be {@code null} to simulate an unavailable pool)
+     * @param nouns      the per-objective noun pools to install (missing keys behave like empty pools)
+     *
+     * @return the seeded singleton instance
+     */
+    static RandomOperationNameGenerator createForTesting(final @Nullable WeightedIntMap<String> descriptor,
+          final @Nullable Map<ContractObjectiveType, WeightedIntMap<String>> nouns) {
+        final RandomOperationNameGenerator instance = new RandomOperationNameGenerator();
+        weightedDescriptor = descriptor;
+        weightedNouns.clear();
+        if (nouns != null) {
+            weightedNouns.putAll(nouns);
+        }
+        initialized = true;
+        randomOperationNameGenerator = instance;
+        return instance;
+    }
+
+    /**
+     * Test seam: clears all singleton state so the next {@link #getInstance()} rebuilds from scratch. Call in test
+     * teardown to avoid leaking seeded pools into other tests.
+     */
+    static void resetForTesting() {
+        randomOperationNameGenerator = null;
+        weightedDescriptor = null;
+        weightedNouns.clear();
+        initialized = false;
+    }
+    //endregion Testing
 }
