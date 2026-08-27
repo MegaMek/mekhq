@@ -551,7 +551,13 @@ public class ChaosContractMarketDialog extends JDialog implements ContractMarket
         panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
         panel.setBorder(BorderFactory.createEmptyBorder(scaleForGUI(48), PADDING, scaleForGUI(48), PADDING));
 
-        JLabel title = new JLabel(getTextAt(RESOURCE_BUNDLE, "empty.contractMarket.title"), SwingConstants.CENTER);
+        // When the market is disabled advancing the calendar will never populate the board, so the standard
+        // "check back next month" advice would be misleading - point the player at the option instead.
+        boolean marketDisabled = campaign.getCampaignOptions().get(CampaignOption.CONTRACT_MARKET_METHOD).isNone();
+        String titleKey = marketDisabled ? "empty.contractMarket.disabled.title" : "empty.contractMarket.title";
+        String bodyKey = marketDisabled ? "empty.contractMarket.disabled.body" : "empty.contractMarket.body";
+
+        JLabel title = new JLabel(getTextAt(RESOURCE_BUNDLE, titleKey), SwingConstants.CENTER);
         title.setAlignmentX(JLabel.CENTER_ALIGNMENT);
         title.setFont(title.getFont().deriveFont(title.getFont().getSize2D() + 2f));
 
@@ -559,7 +565,7 @@ public class ChaosContractMarketDialog extends JDialog implements ContractMarket
                                        scaleForGUI(360)
                                        +
                                        "px; text-align:center'>" +
-                                       getTextAt(RESOURCE_BUNDLE, "empty.contractMarket.body") +
+                                       getTextAt(RESOURCE_BUNDLE, bodyKey) +
                                        "</body></html>",
               SwingConstants.CENTER);
         body.setAlignmentX(JLabel.CENTER_ALIGNMENT);

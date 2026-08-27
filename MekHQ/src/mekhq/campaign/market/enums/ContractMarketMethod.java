@@ -34,6 +34,7 @@ package mekhq.campaign.market.enums;
 
 import java.util.ResourceBundle;
 
+import megamek.logging.MMLogger;
 import mekhq.MekHQ;
 
 public enum ContractMarketMethod {
@@ -71,6 +72,32 @@ public enum ContractMarketMethod {
         return this == CHAOS_CAMPAIGN;
     }
     //endregion Boolean Comparison Methods
+
+    //region File I/O
+
+    /**
+     * Parses a {@link ContractMarketMethod} from its {@link Enum#name()}, falling back to {@link #CHAOS_CAMPAIGN} when
+     * the text cannot be matched. Unrecognized values default to the active market rather than a disabled one, so a bad
+     * or outdated save still loads with a working contract market.
+     *
+     * @param text the persisted enum name
+     *
+     * @return the matching method, or {@link #CHAOS_CAMPAIGN} if {@code text} does not match a known value
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    public static ContractMarketMethod fromString(final String text) {
+        try {
+            return valueOf(text);
+        } catch (Exception ignored) {
+        }
+
+        MMLogger.create(ContractMarketMethod.class)
+              .error("Unable to parse {} into a ContractMarketMethod. Returning CHAOS_CAMPAIGN.", text);
+        return CHAOS_CAMPAIGN;
+    }
+    //endregion File I/O
 
     @Override
     public String toString() {
