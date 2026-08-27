@@ -915,6 +915,8 @@ public final class CampaignOption<T> {
           of(StratConPlayType.class, StratConPlayType.DISABLED, "stratConPlayType");
     public static final CampaignOption<Boolean> USE_ADVANCED_SCOUTING =
           of(Boolean.class, false, "useAdvancedScouting");
+    public static final CampaignOption<Boolean> ESSENTIAL_SCENARIOS_ONLY =
+          of(Boolean.class, false, "essentialScenariosOnly");
     public static final CampaignOption<StratConSectorCountMethod> STRAT_CON_SECTOR_COUNT_METHOD =
           of(StratConSectorCountMethod.class,
                 StratConSectorCountMethod.ALTERNATE_REGIMENTAL,

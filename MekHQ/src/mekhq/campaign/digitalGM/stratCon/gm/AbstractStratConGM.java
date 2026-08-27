@@ -188,6 +188,9 @@ public abstract class AbstractStratConGM extends AbstractDigitalGM {
         boolean isMonday = today.getDayOfWeek() == DayOfWeek.MONDAY;
         boolean isStartOfMonth = today.getDayOfMonth() == 1;
         boolean singleDrop = isSingleDropMode();
+        // "Essential Scenarios Only" suppresses the ambient, over-time scenario stream, leaving just the contract's
+        // strategic-objective (Essential) scenarios, which are spawned separately below.
+        boolean essentialScenariosOnly = campaign.getCampaignOptions().get(CampaignOption.ESSENTIAL_SCENARIOS_ONLY);
 
         // run scenario generation routine for every track attached to an active contract
         for (AbstractContract contract : campaign.getActiveContracts()) {
@@ -224,8 +227,8 @@ public abstract class AbstractStratConGM extends AbstractDigitalGM {
                     }
                 }
 
-                // on monday, generate new scenario dates
-                if (isMonday && !hasAssignedSingleDropScenario) {
+                // on monday, generate new scenario dates - unless Essential-only play suppresses ambient scenarios
+                if (!essentialScenariosOnly && isMonday && !hasAssignedSingleDropScenario) {
                     getScenarioGenerationStrategy().generateWeeklyScenarioDates(campaign,
                           campaignState,
                           contract,
@@ -241,7 +244,7 @@ public abstract class AbstractStratConGM extends AbstractDigitalGM {
 
             List<LocalDate> weeklyScenarioDates = campaignState.getWeeklyScenarios();
 
-            if (weeklyScenarioDates.contains(today)) {
+            if (!essentialScenariosOnly && weeklyScenarioDates.contains(today)) {
                 int scenarioCount = 0;
                 for (LocalDate date : weeklyScenarioDates) {
                     if (date.equals(today)) {

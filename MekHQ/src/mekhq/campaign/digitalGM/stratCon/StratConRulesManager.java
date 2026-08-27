@@ -1261,7 +1261,10 @@ public class StratConRulesManager {
         boolean isNonAlliedFacility = (facility != null) && (facility.getOwner() != Allied);
 
         int targetNum = calculateScenarioOdds(track, contract, true);
-        boolean spawnScenario = (facility == null) && (randomInt(100) <= targetNum);
+        // Under "Essential Scenarios Only", deploying into an empty hex never rolls a random encounter - only the
+        // contract's Essential objective scenarios appear. Facility scenarios (below) are objective-tied and unaffected.
+        boolean essentialScenariosOnly = campaignOptions.get(CampaignOption.ESSENTIAL_SCENARIOS_ONLY);
+        boolean spawnScenario = !essentialScenariosOnly && (facility == null) && (randomInt(100) <= targetNum);
 
         if (isNonAlliedFacility || spawnScenario) {
             StratConScenario scenario;
