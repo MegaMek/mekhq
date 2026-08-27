@@ -523,14 +523,11 @@ public class UnitTableModel extends DataTableModel<Unit> {
                     Campaign campaign1 = getCampaign();
                     Formation formation = campaign1.getPlayerForce().getFormationFor(u);
                     if (formation != null) {
-                        StringBuilder desc = new StringBuilder("<html><b>").append(formation.getName()).append("</b>");
-                        Formation parent = formation.getParentFormation();
-                        // cut off after three lines and don't include the top level
-                        int lines = 1;
-                        while ((parent != null) && (parent.getParentFormation() != null) && (lines < 4)) {
-                            desc.append("<br>").append(parent.getName());
-                            lines++;
-                            parent = parent.getParentFormation();
+                        boolean includeTopLevel = getCampaign().getCampaignOptions().get(CampaignOption.USE_EXTENDED_TOE_FORCE_NAME);
+                        List<String> path = formation.getDisplayPath(includeTopLevel);
+                        StringBuilder desc = new StringBuilder("<html><b>").append(path.get(0)).append("</b>");
+                        for (int i = 1; i < path.size(); i++) {
+                            desc.append("<br>").append(path.get(i));
                         }
                         desc.append("</html>");
                         setHtmlText(desc.toString());

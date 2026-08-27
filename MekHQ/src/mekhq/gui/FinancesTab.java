@@ -497,6 +497,13 @@ public final class FinancesTab extends CampaignGuiTab {
 
     public void refreshFinancialReport() {
         SwingUtilities.invokeLater(() -> {
+            // While a bulk generation is adding personnel off the EDT, skip this refresh: the payroll
+            // walks the personnel roster, and copying that roster while the worker grows it threw
+            // ArrayIndexOutOfBoundsException out of ArrayList's constructor. The generation fires an
+            // event when it completes, which reschedules this against the finished campaign.
+            if (getCampaign().isBulkGenerationInProgress()) {
+                return;
+            }
             areaNetWorth.setText(getFormattedFinancialReport());
             areaNetWorth.setCaretPosition(0);
         });

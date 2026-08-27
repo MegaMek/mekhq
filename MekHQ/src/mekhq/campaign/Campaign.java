@@ -309,6 +309,13 @@ public class Campaign implements ITechManager {
 
     private final DailyReportLog dailyReportLog = new DailyReportLog();
 
+    // Set while a bulk operation (force generation) is adding many units/parts off the EDT. Guards
+    // event-driven GUI work from firing mid-operation and reading half-built campaign state off the
+    // EDT: addNewUnit skips its per-unit UnitNewEvent, and timer-driven tab refreshes (e.g. the
+    // Command Center cargo/summary computation, which walks the mutating location tree) skip while it
+    // is set. The operation fires one refresh event when it completes.
+    private transient boolean bulkGenerationInProgress;
+
     private Person genericAcquisitionPerson;
 
     // this is updated and used per gaming session, it is enabled/disabled via the Campaign options we're re-using
@@ -1421,9 +1428,38 @@ public class Campaign implements ITechManager {
 
         checkDuplicateNamesDuringAdd(en);
         addReport(ACQUISITIONS, unit.getHyperlinkedName() + " has been added to the unit roster.");
-        MekHQ.triggerEvent(new UnitNewEvent(unit));
+        if (!bulkGenerationInProgress) {
+            MekHQ.triggerEvent(new UnitNewEvent(unit));
+        }
 
         return unit;
+    }
+
+    /**
+     * Whether a bulk generation (for example the force generator) is currently adding units/parts off
+     * the Swing event dispatch thread. See {@link #setBulkGenerationInProgress(boolean)}.
+     *
+     * @return {@code true} while a bulk generation is in progress
+     */
+    public boolean isBulkGenerationInProgress() {
+        return bulkGenerationInProgress;
+    }
+
+    /**
+     * Marks that a bulk operation is adding many units/parts off the Swing event dispatch thread (for
+     * example force generation). A caller should set this to {@code true} for the operation's duration -
+     * always in a {@code try}/{@code finally} so it is cleared even on failure - so that event-driven
+     * GUI work does not fire mid-operation and read half-built campaign state off the EDT:
+     * {@link #addNewUnit(Entity, boolean, int, PartQuality)} skips its per-unit {@link UnitNewEvent},
+     * and timer-driven tab refreshes that walk the mutating campaign (such as the Command Center
+     * cargo/summary computation) skip while it is set. The operation is responsible for firing a single
+     * refresh event (such as {@link mekhq.campaign.events.OrganizationChangedEvent}) once it completes.
+     *
+     * @param bulkGenerationInProgress {@code true} while the bulk operation runs, {@code false} to restore
+     *                                 normal GUI updates
+     */
+    public void setBulkGenerationInProgress(boolean bulkGenerationInProgress) {
+        this.bulkGenerationInProgress = bulkGenerationInProgress;
     }
 
     /**
@@ -1845,7 +1881,7 @@ public class Campaign implements ITechManager {
      */
     public List<Unit> getServiceableUnits() {
         List<Unit> service = new ArrayList<>();
-        for (Unit u : getUnits()) {
+        for (Unit u : new ArrayList<>(getUnits())) {
             if (u.isAvailable() && u.isServiceable() && !StratConRulesManager.isUnitDeployedToStratCon(u)) {
                 service.add(u);
             }

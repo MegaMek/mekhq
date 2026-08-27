@@ -140,7 +140,11 @@ public enum PersonnelTableModelColumn implements MHQTableColumn {
     FORCE("Column.FORCE.title", Comparators.STRING_COMPARATOR,
           (person, campaign) -> {
               Formation formation = campaign.getPlayerForce().getFormationFor(person);
-              return (formation == null) ? "-" : formation.getName();
+              // Show the full TOE breadcrumb, honoring the same isUseExtendedTOEForceName toggle the
+              // cell renderer reads, rather than just the leaf formation name.
+              return (formation == null)
+                           ? "-"
+                           : formation.getDisplayPath(" / ", campaign.getCampaignOptions().get(CampaignOption.USE_EXTENDED_TOE_FORCE_NAME));
           }),
     FORCE_GRAPHICAL("Column.FORCE.title", Comparators.STRING_COMPARATOR,
           PersonnelTableModelColumn::getForceTextGraphical),
@@ -321,8 +325,10 @@ public enum PersonnelTableModelColumn implements MHQTableColumn {
           Fatigue::getEffectiveFatigue, Object::toString),
     SPA_COUNT("Column.SPA_COUNT.title", Comparators.INT_COMPARATOR,
           person -> person.countOptions(PersonnelOptions.LVL3_ADVANTAGES), Object::toString),
+    // Counts every implant, not only the Manei Domini group: enhanced imaging is held in a group of
+    // its own and would otherwise be missing from both the count and the list behind it.
     IMPLANT_COUNT("Column.IMPLANT_COUNT.title", Comparators.INT_COMPARATOR,
-          person -> person.countOptions(PersonnelOptions.MD_ADVANTAGES), Object::toString),
+          Person::countImplants, Object::toString),
     MANAGEMENT_MODIFIER("Column.MANAGEMENT_MODIFIER.title", Comparators.INT_COMPARATOR,
           (person, campaign) -> campaign.getPlayerForce()
                                       .getHumanResources()
@@ -899,7 +905,7 @@ public enum PersonnelTableModelColumn implements MHQTableColumn {
             case SPA_COUNT:
                 return person.getAbilityListAsString(PersonnelOptions.LVL3_ADVANTAGES);
             case IMPLANT_COUNT:
-                return person.getAbilityListAsString(PersonnelOptions.MD_ADVANTAGES);
+                return person.getImplantListAsString();
             case MODIFICATION_COUNT:
                 StringBuilder modificationCount = new StringBuilder("<html>");
                 for (Injury injury : person.getProstheticInjuries()) {

@@ -35,13 +35,16 @@ package mekhq.campaign.personnel.skills;
 import static mekhq.campaign.personnel.skills.enums.SkillAttribute.NO_ATTRIBUTE;
 import static mekhq.utilities.MHQInternationalization.isResourceKeyValid;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNotSame;
+import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.util.stream.Stream;
 
 import mekhq.campaign.personnel.skills.enums.SkillAttribute;
 import mekhq.campaign.personnel.skills.enums.SkillSubType;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 
@@ -49,6 +52,17 @@ class SkillTypeTest {
 
     static Stream<String> allSkillNames() {
         return Stream.of(SkillType.getSkillList());
+    }
+
+    @Test
+    void legacyAntiMekNameResolvesToClimbingSkill() {
+        SkillType.initializeTypes();
+
+        SkillType canonical = SkillType.getType(SkillType.S_ANTI_MEK);
+        SkillType legacy = SkillType.getType("Anti-Mek");
+
+        assertNotNull(legacy, "Legacy 'Anti-Mek' skill name must resolve after normalization");
+        assertSame(canonical, legacy, "Legacy 'Anti-Mek' must map to the canonical Anti-Mek (Climbing) skill");
     }
 
     @ParameterizedTest
