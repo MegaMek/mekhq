@@ -41,6 +41,7 @@ import mekhq.campaign.campaignOptions.CampaignOption;
 import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.digitalGM.*;
 import mekhq.campaign.digitalGM.stratCon.StratConCampaignState;
+import mekhq.campaign.digitalGM.stratCon.StratConContractInitializer;
 import mekhq.campaign.digitalGM.stratCon.StratConRulesManager;
 import mekhq.campaign.digitalGM.stratCon.StratConScenario;
 import mekhq.campaign.digitalGM.stratCon.StratConTrackState;
@@ -196,6 +197,10 @@ public abstract class AbstractStratConGM extends AbstractDigitalGM {
                 continue;
             }
 
+            // Strategic-objective scenarios trickle in over the contract's months, paced by its scenario schedule,
+            // rather than all being placed at contract start.
+            processScheduledStrategicScenarios(campaign, contract, campaignState, today);
+
             boolean hasAssignedSingleDropScenario = false;
             for (StratConTrackState track : campaignState.getTracks()) {
                 cleanupPhantomScenarios(track);
@@ -254,6 +259,31 @@ public abstract class AbstractStratConGM extends AbstractDigitalGM {
                           scenarioCount);
                 }
             }
+        }
+    }
+
+    /**
+     * Spawns the strategic-objective scenarios whose pre-rolled spawn day has arrived.
+     *
+     * <p>At contract start each strategic scenario is assigned a random day within its scheduled month (see
+     * {@code StratConContractInitializer#scheduleStrategicScenarioSpawnDates()}); those days are drained from
+     * {@link StratConCampaignState#getStrategicScenarioSpawnDates()} here. Every date on or before today is spawned and
+     * removed, so a skipped day or a save loaded past a date still catches up. Each due date is one scenario, placed
+     * across the tracks via {@link StratConContractInitializer#spawnScheduledStrategicScenarios}.</p>
+     */
+    private static void processScheduledStrategicScenarios(Campaign campaign, AbstractContract contract,
+          StratConCampaignState campaignState, LocalDate today) {
+        List<LocalDate> spawnDates = campaignState.getStrategicScenarioSpawnDates();
+        if (spawnDates.isEmpty()) {
+            return;
+        }
+
+        int before = spawnDates.size();
+        spawnDates.removeIf(spawnDate -> !spawnDate.isAfter(today));
+        int dueCount = before - spawnDates.size();
+
+        if (dueCount > 0) {
+            StratConContractInitializer.spawnScheduledStrategicScenarios(campaign, contract, dueCount);
         }
     }
 
