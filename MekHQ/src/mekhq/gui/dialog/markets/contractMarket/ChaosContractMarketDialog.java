@@ -508,9 +508,8 @@ public class ChaosContractMarketDialog extends JDialog implements ContractMarket
     }
 
     /**
-     * The search types a campaign may choose between. Mercenary and pirate bands may look for either mercenary or
-     * pirate work; government campaigns are limited to government contracts. Tournament circuits are open to every
-     * campaign.
+     * The search types a campaign may choose between. Mercenary and pirate bands may look for mercenary or pirate work,
+     * or the tournament circuit; government campaigns are limited to government orders and pirate actions.
      *
      * @author Illiani
      * @since 0.51.01
@@ -520,7 +519,7 @@ public class ChaosContractMarketDialog extends JDialog implements ContractMarket
         if (faction.isMercenary() || faction.isPirate()) {
             return List.of(ContractSearchType.MERCENARY, ContractSearchType.PIRATE, ContractSearchType.TOURNAMENT);
         }
-        return List.of(ContractSearchType.GOVERNMENT, ContractSearchType.TOURNAMENT);
+        return List.of(ContractSearchType.GOVERNMENT, ContractSearchType.PIRATE);
     }
 
     /**

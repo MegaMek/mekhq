@@ -727,11 +727,12 @@ public class AbstractContractGeneration {
 
     private static @Nullable EmployerData pickEmployer(Campaign campaign, LocalDate currentDate,
           ILocation currentLocation, ContractSearchType searchType, boolean covertViable, ChaosContract contract) {
-        EmployerData employerData = ChaosContractDeterminationEmployer.getEmployerGenerationData(currentDate,
-              currentLocation,
-              campaign,
-              searchType,
-              covertViable);
+        EmployerData employerData = AbstractContractDeterminationEmployer.forSearchType(searchType)
+                                          .getEmployerGenerationData(currentDate,
+                                                currentLocation,
+                                                campaign,
+                                                searchType,
+                                                covertViable);
         if (employerData == null) {
             // No employer means no contract
             return null;

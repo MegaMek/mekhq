@@ -48,7 +48,7 @@ import java.util.List;
 
 import megamek.common.compute.Compute;
 import mekhq.campaign.location.ILocation;
-import mekhq.campaign.mission.contract.contractGeneration.ChaosContractDeterminationEmployer.EmployerFactions;
+import mekhq.campaign.mission.contract.contractGeneration.AbstractContractDeterminationEmployer.EmployerFactions;
 import mekhq.campaign.universe.Faction;
 import mekhq.campaign.universe.Factions;
 import mekhq.campaign.universe.PlanetarySystem;
@@ -57,17 +57,24 @@ import org.junit.jupiter.api.Test;
 import org.mockito.MockedStatic;
 
 /**
- * Covers the flavor/anchor/sponsor resolution in {@link ChaosContractDeterminationEmployer#determineEmployerFactions}
+ * Covers the flavor/anchor/sponsor resolution in {@link ChaosContractDeterminationEmployerMercenary#determineEmployerFactions}
  * &mdash; in particular the rebel-sponsor rule: rebels always remain the visible employer, and a ComStar/Word of Blake
- * patron that would otherwise take over the contract instead becomes their covert backer on a mercenary search.
+ * patron that would otherwise take over the contract instead becomes their covert backer. Every search this class
+ * handles is a mercenary search; government contracts are covered by
+ * {@link ChaosContractDeterminationEmployerGovernmentTest}.
  *
  * <p>The faction singletons, the random faction generator, and the dice are all stubbed so these tests are fully
  * deterministic and need no loaded universe.</p>
  */
-class ChaosContractDeterminationEmployerTest {
+class ChaosContractDeterminationEmployerMercenaryTest {
 
     private static final int YEAR = 3050;
     private static final LocalDate DATE = LocalDate.of(YEAR, 1, 1);
+
+    /** The player's own faction is never consulted on a mercenary search, so a bare mock stands in for it. */
+    private static final Faction UNUSED_PLAYER_FACTION = mock(Faction.class);
+
+    private final ChaosContractDeterminationEmployerMercenary employer = new ChaosContractDeterminationEmployerMercenary();
 
     private static Faction namedFaction(String shortName) {
         Faction faction = mock(Faction.class);
@@ -121,8 +128,9 @@ class ChaosContractDeterminationEmployerTest {
             // A roll of 0 opens the ComStar override, which is checked before Word of Blake.
             compute.when(() -> Compute.randomInt(anyInt())).thenReturn(0);
 
-            EmployerFactions result = ChaosContractDeterminationEmployer.determineEmployerFactions(
-                  ChaosEmployerType.CIVILIAN_ORGANIZATION_REBELS, DATE, locationOwnedByHouse(), true, true);
+            EmployerFactions result = employer.determineEmployerFactions(
+                  ChaosEmployerType.CIVILIAN_ORGANIZATION_REBELS, DATE, locationOwnedByHouse(), true,
+                  UNUSED_PLAYER_FACTION);
 
             assertSame(rebels, result.flavor(), "rebels remain the visible employer");
             assertSame(house, result.anchor(), "the anchor is the local ruling power the rebels rise against");
@@ -143,31 +151,13 @@ class ChaosContractDeterminationEmployerTest {
             // A non-zero roll misses both the ComStar and Word of Blake override windows.
             compute.when(() -> Compute.randomInt(anyInt())).thenReturn(1);
 
-            EmployerFactions result = ChaosContractDeterminationEmployer.determineEmployerFactions(
-                  ChaosEmployerType.CIVILIAN_ORGANIZATION_REBELS, DATE, locationOwnedByHouse(), true, true);
+            EmployerFactions result = employer.determineEmployerFactions(
+                  ChaosEmployerType.CIVILIAN_ORGANIZATION_REBELS, DATE, locationOwnedByHouse(), true,
+                  UNUSED_PLAYER_FACTION);
 
             assertSame(rebels, result.flavor());
             assertSame(house, result.anchor());
             assertNull(result.sponsor(), "no patron rolled means no sponsor");
-        }
-    }
-
-    @Test
-    void rebelsOutsideAMercenarySearchAreNeverSponsored() {
-        Faction rebels = namedFaction("REB");
-        Faction house = namedFaction("HOUSE");
-        Faction comStar = namedFaction("CS");
-        Faction wordOfBlake = namedFaction("WOB");
-
-        try (MockedStatic<Factions> factionsStatic = mockStatic(Factions.class)) {
-            stubFactions(factionsStatic, rebels, house, comStar, wordOfBlake);
-
-            EmployerFactions result = ChaosContractDeterminationEmployer.determineEmployerFactions(
-                  ChaosEmployerType.CIVILIAN_ORGANIZATION_REBELS, DATE, locationOwnedByHouse(), false, true);
-
-            assertSame(rebels, result.flavor());
-            assertSame(house, result.anchor());
-            assertNull(result.sponsor(), "sponsorship is a mercenary-search-only interaction");
         }
     }
 
@@ -178,11 +168,14 @@ class ChaosContractDeterminationEmployerTest {
         Faction comStar = namedFaction("CS");
         Faction wordOfBlake = namedFaction("WOB");
 
-        try (MockedStatic<Factions> factionsStatic = mockStatic(Factions.class)) {
+        try (MockedStatic<Factions> factionsStatic = mockStatic(Factions.class);
+              MockedStatic<Compute> compute = mockStatic(Compute.class)) {
             stubFactions(factionsStatic, rebels, house, comStar, wordOfBlake);
+            // A non-zero roll keeps any ComStar/Word of Blake patron out, so pure territorial resolution is tested.
+            compute.when(() -> Compute.randomInt(anyInt())).thenReturn(1);
 
-            EmployerFactions result = ChaosContractDeterminationEmployer.determineEmployerFactions(
-                  ChaosEmployerType.LOCAL_SYSTEM_OWNER, DATE, locationOwnedByHouse(), false, false);
+            EmployerFactions result = employer.determineEmployerFactions(
+                  ChaosEmployerType.LOCAL_SYSTEM_OWNER, DATE, locationOwnedByHouse(), false, UNUSED_PLAYER_FACTION);
 
             assertSame(house, result.flavor(), "a local system owner is the current system's controller");
             assertSame(house, result.anchor(), "a territorial employer anchors on itself");
@@ -209,8 +202,8 @@ class ChaosContractDeterminationEmployerTest {
             // Resolves the fronting corporation's flavor faction.
             when(generator.getRandomEmployerFaction(eq(location), eq(DATE), eq(true), any())).thenReturn(house);
 
-            EmployerFactions result = ChaosContractDeterminationEmployer.determineEmployerFactions(
-                  ChaosEmployerType.CORPORATION, DATE, location, true, true);
+            EmployerFactions result = employer.determineEmployerFactions(
+                  ChaosEmployerType.CORPORATION, DATE, location, true, UNUSED_PLAYER_FACTION);
 
             assertEquals(ChaosEmployerType.CORPORATION, result.type(),
                   "ComStar fronts a corporation, so the effective employer type is CORPORATION");
@@ -240,8 +233,8 @@ class ChaosContractDeterminationEmployerTest {
             generatorStatic.when(RandomFactionGenerator::getInstance).thenReturn(generator);
             when(generator.getRandomEmployerFaction(eq(location), eq(DATE), eq(true), any())).thenReturn(house);
 
-            EmployerFactions result = ChaosContractDeterminationEmployer.determineEmployerFactions(
-                  ChaosEmployerType.CORPORATION, DATE, location, true, true);
+            EmployerFactions result = employer.determineEmployerFactions(
+                  ChaosEmployerType.CORPORATION, DATE, location, true, UNUSED_PLAYER_FACTION);
 
             assertEquals(ChaosEmployerType.CORPORATION, result.type(), "Word of Blake keeps the rolled employer type");
             assertSame(wordOfBlake, result.flavor(), "Word of Blake takes over as the visible employer outright");
@@ -269,8 +262,8 @@ class ChaosContractDeterminationEmployerTest {
             when(generator.getRandomEmployerFaction(eq(location), eq(DATE), eq(true), any())).thenReturn(house);
 
             // Not covert-viable: ComStar is barred, but the Word of Blake is under no such restriction.
-            EmployerFactions result = ChaosContractDeterminationEmployer.determineEmployerFactions(
-                  ChaosEmployerType.CORPORATION, DATE, location, true, false);
+            EmployerFactions result = employer.determineEmployerFactions(
+                  ChaosEmployerType.CORPORATION, DATE, location, false, UNUSED_PLAYER_FACTION);
 
             assertSame(wordOfBlake, result.flavor(), "the Word of Blake takes any contract, covert-viable or not");
             assertSame(house, result.anchor(), "the conflict still sits inside a landed power near the player");

@@ -260,6 +260,9 @@ public final class ChaosContractMarketAvailability {
             if ((type == ContractSearchType.GOVERNMENT) && !governmentForce) {
                 continue; // government orders are only offered to government (non-mercenary, non-pirate) forces
             }
+            if ((type == ContractSearchType.MERCENARY) && governmentForce) {
+                continue; // mercenary work is only offered to mercenary and pirate forces, never to a government force
+            }
             rolls.put(type, rollOffer(type, level, type == networkerType ? networkerBonus : 0));
         }
 
