@@ -271,20 +271,20 @@ public class SetupTab {
         constraints.insets = new Insets(UIUtil.scaleForGUI(3), UIUtil.scaleForGUI(6),
               UIUtil.scaleForGUI(3), UIUtil.scaleForGUI(6));
 
-        // Row 0: Temporary Crew on the left, Support Personnel on the right. The support section stacks
+        // Row 0: Naming & Ranks on the left, Support Personnel on the right. The support section stacks
         // its roles in one column so it fits half the width.
         constraints.gridx = 0;
         constraints.gridy = 0;
         constraints.gridwidth = 1;
         constraints.weightx = 0.5;
-        panel.add(buildTemporaryCrewSection(), constraints);
+        panel.add(buildNamingAndRanksSection(), constraints);
         constraints.gridx = 1;
         constraints.gridy = 0;
         constraints.gridwidth = 1;
         constraints.weightx = 0.5;
         panel.add(buildSupportPersonnelSection(), constraints);
 
-        // Row 1: left column stacks Assistants + Naming & Ranks; right column stacks Officer
+        // Row 1: left column stacks Assistants + Temporary Crew; right column stacks Officer
         // Selection + Tech Assignment. Officer Selection is the tallest single section in the tab,
         // and Tech Assignment is small (4 rows), so the right-column stack roughly matches the
         // height of the left-column pair.
@@ -292,7 +292,7 @@ public class SetupTab {
         leftColumn.setLayout(new BoxLayout(leftColumn, BoxLayout.Y_AXIS));
         leftColumn.add(buildAssistantsSection());
         leftColumn.add(Box.createVerticalStrut(UIUtil.scaleForGUI(6)));
-        leftColumn.add(buildNamingAndRanksSection());
+        leftColumn.add(buildTemporaryCrewSection());
         constraints.gridx = 0;
         constraints.gridy = 1;
         constraints.gridwidth = 1;
