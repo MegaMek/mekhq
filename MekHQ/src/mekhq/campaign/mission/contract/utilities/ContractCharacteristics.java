@@ -217,8 +217,8 @@ public final class ContractCharacteristics {
         if (negotiator == null) {
             return;
         }
-        // checkVeterancyEligibility is false so the exact rolled tier is applied rather than being clamped.
-        PersonUtility.overrideSkills(campaign, negotiator, negotiator.getPrimaryRole(), tier, false);
+
+        PersonUtility.overrideSkills(campaign, negotiator, negotiator.getPrimaryRole(), tier, true);
     }
 
     private static void applyPayMultiplier(final AbstractContract contract, final double multiplier) {
@@ -441,7 +441,7 @@ public final class ContractCharacteristics {
         }
         final SkillLevel override = getNegotiatorSkillOverride(contract);
         final SkillLevel tier = (override != null) ? override : SkillLevel.VETERAN;
-        PersonUtility.overrideSkills(campaign, negotiator, negotiator.getPrimaryRole(), tier, false);
+        PersonUtility.overrideSkills(campaign, negotiator, negotiator.getPrimaryRole(), tier, true);
     }
 
     // endregion GM editor helpers

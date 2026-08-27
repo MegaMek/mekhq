@@ -50,20 +50,13 @@ import java.awt.Font;
 import java.awt.Image;
 import java.util.ArrayList;
 import java.util.List;
-import javax.swing.BorderFactory;
-import javax.swing.BoxLayout;
-import javax.swing.ImageIcon;
-import javax.swing.JButton;
-import javax.swing.JDialog;
-import javax.swing.JLabel;
-import javax.swing.JOptionPane;
-import javax.swing.JPanel;
-import javax.swing.SwingConstants;
+import javax.swing.*;
 
 import megamek.client.ui.preferences.JWindowPreference;
 import megamek.client.ui.preferences.PreferencesNode;
 import megamek.common.compute.Compute;
 import megamek.common.icons.Portrait;
+import megamek.common.ui.EnhancedTabbedPane;
 import megamek.logging.MMLogger;
 import mekhq.MekHQ;
 import mekhq.campaign.AbstractLocation;
@@ -93,6 +86,7 @@ import mekhq.campaign.universe.Faction;
 import mekhq.gui.baseComponents.immersiveDialogs.ImmersiveDialogSimple;
 import mekhq.gui.baseComponents.roundedComponents.RoundedJButton;
 import mekhq.gui.baseComponents.roundedComponents.RoundedLineBorder;
+import mekhq.gui.view.PersonViewPanel;
 
 /**
  * The contract negotiation table. Lets the player improve a contract's terms - spending reputation or sacrificing steps
@@ -165,6 +159,7 @@ public class ContractNegotiationDialog extends JDialog {
 
     private JButton negotiatorButton;
     private JLabel negotiatorLabel;
+    private JScrollPane playerNegotiatorScroll;
     private JLabel reputationBudgetLabel;
     private JLabel swapsBudgetLabel;
     private JLabel bankBudgetLabel;
@@ -244,14 +239,23 @@ public class ContractNegotiationDialog extends JDialog {
         JPanel content = new JPanel(new BorderLayout());
         content.setBorder(BorderFactory.createEmptyBorder(PADDING, PADDING, PADDING, PADDING));
         content.add(buildHeader(), BorderLayout.NORTH);
-        content.add(buildBody(), BorderLayout.CENTER);
         content.add(buildFooter(), BorderLayout.SOUTH);
+
+        // The haggling controls and each negotiator's dossier live on their own tabs, so every view gets the full
+        // dialog width instead of being crammed into a narrow side column.
+        EnhancedTabbedPane tabs = new EnhancedTabbedPane();
+        tabs.addTab(getTextAt(RESOURCE_BUNDLE, "negotiate.contractMarket.tab.terms"), buildBody());
+        tabs.addTab(getTextAt(RESOURCE_BUNDLE, "negotiate.contractMarket.negotiator.employer.title"),
+              buildEmployerNegotiatorPane());
+        tabs.addTab(getTextAt(RESOURCE_BUNDLE, "negotiate.contractMarket.negotiator.player.title"),
+              buildPlayerNegotiatorPane());
+        content.add(tabs, BorderLayout.CENTER);
         getContentPane().add(content);
 
         refresh();
 
         pack();
-        setSize(scaleForGUI(540, 640)); // Default opening size; saved preferences (below) override it on later opens
+        setSize(scaleForGUI(560, 720)); // Default opening size; saved preferences (below) override it on later opens
         setLocationRelativeTo(getParent());
         setPreferences(); // Must be before setVisible
         setVisible(true);
@@ -376,8 +380,70 @@ public class ContractNegotiationDialog extends JDialog {
         if (picker.wasConfirmed()) {
             contract.setPlayerNegotiator(picker.getSelectedNegotiator());
             updateNegotiatorControl();
+            updatePlayerNegotiatorPane();
             recomputeNegotiatorCaps();
             refresh();
+        }
+    }
+
+    /**
+     * Builds the "Your Negotiator" tab: a scroll pane showing the player's chosen negotiator as a full
+     * {@link PersonViewPanel}, or a placeholder prompt until one is picked. Kept in {@link #playerNegotiatorScroll} so
+     * {@link #updatePlayerNegotiatorPane()} can swap its contents when the negotiator changes.
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    private JScrollPane buildPlayerNegotiatorPane() {
+        playerNegotiatorScroll = new JScrollPane();
+        playerNegotiatorScroll.setBorder(BorderFactory.createEmptyBorder());
+        playerNegotiatorScroll.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_AS_NEEDED);
+        playerNegotiatorScroll.getVerticalScrollBar().setUnitIncrement(scaleForGUI(16));
+        updatePlayerNegotiatorPane();
+        return playerNegotiatorScroll;
+    }
+
+    /**
+     * Builds the "Their Negotiator" tab: a scroll pane showing the employer's negotiator as a full
+     * {@link PersonViewPanel}. The employer's representative is fixed, so this pane never changes.
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    private JScrollPane buildEmployerNegotiatorPane() {
+        JScrollPane scroll = new JScrollPane(new PersonViewPanel(contract.getEmployerNegotiator(), campaign,
+              campaign.getGUI()));
+        scroll.setBorder(BorderFactory.createEmptyBorder());
+        scroll.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_AS_NEEDED);
+        scroll.getVerticalScrollBar().setUnitIncrement(scaleForGUI(16));
+        return scroll;
+    }
+
+    /**
+     * Swaps the "Your Negotiator" tab's contents to match the currently selected player negotiator: their full
+     * {@link PersonViewPanel} once chosen, or a muted placeholder prompt while none is set.
+     */
+    private void updatePlayerNegotiatorPane() {
+        if (playerNegotiatorScroll == null) {
+            return;
+        }
+        Person negotiator = contract.getPlayerNegotiator();
+        if (negotiator != null) {
+            playerNegotiatorScroll.setViewportView(new PersonViewPanel(negotiator, campaign, campaign.getGUI()));
+        } else {
+            JLabel placeholder = new JLabel("<html><div style='text-align:center; color:" +
+                                                  MUTED_HEX +
+                                                  "'>"
+                                                  +
+                                                  escape(getTextAt(RESOURCE_BUNDLE,
+                                                        "negotiate.contractMarket.negotiator.player.empty"))
+                                                  +
+                                                  "</div></html>", SwingConstants.CENTER);
+            placeholder.setVerticalAlignment(SwingConstants.CENTER);
+            JPanel wrapper = new JPanel(new BorderLayout());
+            wrapper.setBorder(BorderFactory.createEmptyBorder(PADDING, PADDING, PADDING, PADDING));
+            wrapper.add(placeholder, BorderLayout.CENTER);
+            playerNegotiatorScroll.setViewportView(wrapper);
         }
     }
 
