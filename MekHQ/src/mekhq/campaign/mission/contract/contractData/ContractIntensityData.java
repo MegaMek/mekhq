@@ -35,6 +35,8 @@ package mekhq.campaign.mission.contract.contractData;
 import java.util.Collections;
 import java.util.List;
 
+import mekhq.campaign.mission.contract.AbstractContract;
+
 /**
  * How large, hard, and demanding a contract's combat is, and how it is paced across the months it runs.
  *
@@ -59,7 +61,9 @@ public record ContractIntensityData(int scale, int requiredCombatElements, int r
         monthlyTrackCounts = List.copyOf(monthlyTrackCounts);
     }
 
-    /** @return a zeroed instance with an empty schedule, the starting state before any parameter is determined */
+    /**
+     * returns a zeroed instance with an empty schedule, the starting state before any parameter is determined
+     */
     public ContractIntensityData() {
         this(0, 0, 0, 0, List.of());
     }
