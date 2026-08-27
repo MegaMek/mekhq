@@ -43,7 +43,7 @@ import javax.swing.JTextField;
 import javax.swing.SpinnerNumberModel;
 
 /**
- * A specialized {@link JSpinner} for the Company Generation dialog.
+ * A specialized {@link JSpinner} for the Command Generation dialog.
  *
  * <p>Tooltip text comes from the {@code mekhq.resources.CommandGenerationDialog} bundle, indexed by
  * {@code "lbl" + name + ".tooltip"}. The spinner supports both integer and double-valued models;

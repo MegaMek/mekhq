@@ -43,7 +43,7 @@ import javax.swing.JCheckBox;
 import megamek.common.annotations.Nullable;
 
 /**
- * A specialized {@link JCheckBox} for the Company Generation dialog.
+ * A specialized {@link JCheckBox} for the Command Generation dialog.
  *
  * <p>Text and tooltip come from the {@code mekhq.resources.CommandGenerationDialog} bundle, indexed
  * by {@code "lbl" + name + ".text"} and {@code "lbl" + name + ".tooltip"}. The wrap-size and font-scale
@@ -52,7 +52,7 @@ import megamek.common.annotations.Nullable;
 public class CommandGenerationCheckBox extends JCheckBox {
 
     /**
-     * Constructs a checkbox whose text and tooltip are read from the Company Generation bundle.
+     * Constructs a checkbox whose text and tooltip are read from the Command Generation bundle.
      *
      * @param name the bundle-key suffix; final keys are {@code lbl<name>.text} / {@code lbl<name>.tooltip}
      */

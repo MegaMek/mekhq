@@ -74,6 +74,8 @@ public final class MHQConstants extends SuiteConstants {
     public static final String HISTORICAL_DAILY_LOG = "historicalDailyLog";
     public static final int MAX_HISTORICAL_LOG_DAYS = 120; // max number of days that will be stored in the history,
     // also used as a limit in the UI
+    // Keeps the key the setting was saved under when the dialog was the Company Generator, so an existing
+    // preferences file still applies; only the constant was renamed.
     public static final String SHOW_COMMAND_GENERATOR = "showCompanyGenerator";
     public static final String SHOW_UNIT_PICTURES_ON_TOE = "showUnitPicturesOnTOE";
     public static final String SHOW_WARRIORS_ALMANAC = "showWarriorsAlmanac";

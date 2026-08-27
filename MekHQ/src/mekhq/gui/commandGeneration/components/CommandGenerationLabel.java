@@ -43,7 +43,7 @@ import javax.swing.JLabel;
 import megamek.common.annotations.Nullable;
 
 /**
- * A specialized {@link JLabel} for the Company Generation dialog.
+ * A specialized {@link JLabel} for the Command Generation dialog.
  *
  * <p>Text and tooltip come from {@code mekhq.resources.CommandGenerationDialog}, indexed by
  * {@code "lbl" + name + ".text"} and {@code "lbl" + name + ".tooltip"}. Pass {@code noTooltip = true}
@@ -52,7 +52,7 @@ import megamek.common.annotations.Nullable;
 public class CommandGenerationLabel extends JLabel {
 
     /**
-     * Constructs a label with both text and tooltip pulled from the Company Generation bundle.
+     * Constructs a label with both text and tooltip pulled from the Command Generation bundle.
      *
      * @param name the bundle-key suffix
      */

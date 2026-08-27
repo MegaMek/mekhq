@@ -42,7 +42,7 @@ import javax.swing.JPanel;
 import mekhq.gui.baseComponents.roundedComponents.RoundedLineBorder;
 
 /**
- * A specialized {@link JPanel} used to group related controls inside Company Generation tabs.
+ * A specialized {@link JPanel} used to group related controls inside Command Generation tabs.
  *
  * <p>Mirrors {@code CampaignOptionsStandardPanel}: an optional rounded titled border whose title text
  * comes from the {@code mekhq.resources.CommandGenerationDialog} bundle. The layout itself is left to

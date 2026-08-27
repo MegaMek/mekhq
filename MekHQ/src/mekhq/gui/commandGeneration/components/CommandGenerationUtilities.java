@@ -33,9 +33,9 @@
 package mekhq.gui.commandGeneration.components;
 
 /**
- * Shared helpers for the Company Generation dialog's styled components.
+ * Shared helpers for the Command Generation dialog's styled components.
  *
- * <p>This is the Company Generation counterpart to {@code CampaignOptionsUtilities}. The two packages
+ * <p>This is the Command Generation counterpart to {@code CampaignOptionsUtilities}. The two packages
  * share their visual conventions but each reads from its own resource bundle, so a key like
  * {@code "lblSparesArmor.text"} lives next to the dialog that uses it instead of polluting the larger
  * Campaign Options bundle.</p>
