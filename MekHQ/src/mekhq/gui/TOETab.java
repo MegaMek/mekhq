@@ -52,6 +52,7 @@ import javax.swing.tree.TreeSelectionModel;
 
 import megamek.common.event.Subscribe;
 import megamek.common.ui.FastJScrollPane;
+import megamek.logging.MMLogger;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.campaignOptions.CampaignOption;
@@ -89,6 +90,8 @@ import mekhq.gui.view.UnitViewPanel;
  * Display organization tree (TO&amp;E) and force/unit summary
  */
 public final class TOETab extends CampaignGuiTab {
+    private static final MMLogger LOGGER = MMLogger.create(TOETab.class);
+
     private static final int UNIT_CREW_TAB_INDEX = 0;
     private static final int UNIT_STATS_TAB_INDEX_WITH_CREW = 1;
 
@@ -289,6 +292,7 @@ public final class TOETab extends CampaignGuiTab {
     }
 
     public void refreshOrganization() {
+        LOGGER.info("TOE-DEBUG: TOETab.refreshOrganization RUNNING (updateUI + refreshForceView)");
         SwingUtilities.invokeLater(() -> {
             // Preserve the tree's expansion and selection across the refresh so adding units (for
             // example committing a generated command) updates the tree in place rather than
@@ -467,6 +471,7 @@ public final class TOETab extends CampaignGuiTab {
 
     @Subscribe
     public void organizationChanged(OrganizationChangedEvent ev) {
+        LOGGER.info("TOE-DEBUG: TOETab.organizationChanged RECEIVED event; scheduling refresh");
         orgRefreshScheduler.schedule();
     }
 
