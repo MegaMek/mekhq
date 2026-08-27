@@ -399,5 +399,44 @@ class PlanetarySystemYamlIOTest {
         }
         return output.toString();
     }
+
+    @Test
+    void unknownEventPropertyIsSkippedRatherThanDroppingTheSystem() throws Exception {
+        // A data-ahead-of-code skew: an event carries a field the running build does not know. The system must still
+        // load with its known sibling fields intact rather than being dropped from the universe.
+        String yaml = """
+              id: Unknown Field Test
+              sucsId: 99
+              xcood: 0.0
+              ycood: 0.0
+              primarySlot: 1
+              planet:
+                - name: Unknown Field Prime
+                  type: TERRESTRIAL
+                  orbitalDist: 1.0
+                  sysPos: 1
+                  pressure: STANDARD
+                  atmosphere: BREATHABLE
+                  gravity: 1.0
+                  diameter: 12000
+                  density: 5.5
+                  dayLength: 24
+                  yearLength: 1.0
+                  temperature: 20
+                  water: 70
+                  event:
+                    - date: '3000-01-01'
+                      someFutureFieldTheCodeDoesNotKnow: 42
+                      temperature: 25
+              """;
+
+        PlanetarySystem system = readSystem(yaml);
+
+        assertNotNull(system);
+        LocalDate when = LocalDate.of(3000, 1, 1);
+        assertEquals("Unknown Field Prime", system.getPrimaryPlanet().getName(when));
+        // The known field that follows the unknown one in the same event must still be parsed.
+        assertEquals(25, system.getPrimaryPlanet().getTemperature(when));
+    }
 }
 

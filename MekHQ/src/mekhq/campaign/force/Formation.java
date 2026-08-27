@@ -399,7 +399,86 @@ public class Formation {
     }
 
     /**
-     * @return A String representation of the full hierarchical formation including ID for MM export
+     * Returns the display-path of this formation as a leaf-first list of names. Capped at four
+     * levels so deeply-nested structures don't produce unbounded output.
+     *
+     * <p>Example: a Lance under Company "A Company" under Battalion "First Battalion" under the
+     * campaign-root "Tidal Wave's Pioneers" produces {@code ["Lance Name", "A Company",
+     * "First Battalion", "Tidal Wave's Pioneers"]} when {@code includeTopLevel=true}; with
+     * {@code includeTopLevel=false} the campaign-root is omitted.</p>
+     *
+     * @param includeTopLevel whether the campaign-root formation (the one whose
+     *                        {@code parentFormation == null}) should appear in the returned list.
+     *                        Honors {@link mekhq.campaign.campaignOptions.CampaignOptions#get(CampaignOption.USE_EXTENDED_TOE_FORCE_NAME)}
+     *                        at the caller; renderers should pass that option through.
+     * @return formation names in leaf-first order, up to four entries
+     */
+    public List<String> getDisplayPath(boolean includeTopLevel) {
+        List<String> path = new ArrayList<>();
+        path.add(getName());
+        Formation parent = getParentFormation();
+        int levels = 1;
+        while (parent != null && levels < 4) {
+            // parent.getParentFormation() == null means parent is the campaign-root: include only
+            // when the caller asked for it. Without this guard the older 3-level-plus-root display
+            // would silently grow to 4 levels for users who hadn't opted in.
+            if (parent.getParentFormation() == null && !includeTopLevel) {
+                break;
+            }
+            path.add(parent.getName());
+            levels++;
+            parent = parent.getParentFormation();
+        }
+        return path;
+    }
+
+    /**
+     * Equivalent to {@code getDisplayPath(false)} — the abbreviated breadcrumb that omits the
+     * campaign-root formation. Kept for callers that don't have a {@link mekhq.campaign.Campaign}
+     * handle to read the campaign option from.
+     *
+     * @return formation names in leaf-first order, top-level excluded, up to four entries
+     */
+    public List<String> getDisplayPath() {
+        return getDisplayPath(false);
+    }
+
+    /**
+     * Joins {@link #getDisplayPath(boolean)} with the supplied separator. Used by plain-text consumers
+     * (e.g. AssignmentLogger) that can't render multi-line HTML.
+     *
+     * @param separator       the string inserted between adjacent names (e.g. {@code " > "})
+     * @param includeTopLevel whether the campaign-root formation should appear in the result
+     * @return joined leaf-first breadcrumb
+     */
+    public String getDisplayPath(String separator, boolean includeTopLevel) {
+        return String.join(separator, getDisplayPath(includeTopLevel));
+    }
+
+    /**
+     * Convenience overload joining {@link #getDisplayPath()} with the supplied separator. Used by
+     * plain-text consumers (e.g. AssignmentLogger) that can't render multi-line HTML.
+     *
+     * @param separator the string inserted between adjacent names (e.g. {@code " > "})
+     * @return joined leaf-first breadcrumb with the top-level formation omitted
+     */
+    public String getDisplayPath(String separator) {
+        return String.join(separator, getDisplayPath());
+    }
+
+    /**
+     * Returns the MegaMek force string for this formation: the chain of ancestor formations from the
+     * top-level formation down to and including this one, each rendered as {@code name|id} (plus the
+     * camouflage category/filename when non-default). MegaMek's server reconstructs its {@code Forces}
+     * tree from this string when units are added to a game.
+     *
+     * <p>Each segment uses the formation's own campaign-unique {@link #id} directly. A previous
+     * implementation derived the id from a {@code 17 * id + ancestor.id + 1} recurrence, but that
+     * accumulation collides — distinct formations produced the same id, so the server merged them and
+     * support detachments ended up inside the wrong formation. The campaign formation id is already
+     * unique, so it can be emitted as-is.</p>
+     *
+     * @return the full hierarchical force string for MegaMek export
      */
     public String getFullMMName() {
         var ancestors = new ArrayList<Formation>();
@@ -411,11 +490,9 @@ public class Formation {
         }
 
         StringBuilder result = new StringBuilder();
-        int id = 0;
         for (int i = ancestors.size() - 1; i >= 0; i--) {
             Formation ancestor = ancestors.get(i);
-            id = 17 * id + ancestor.id + 1;
-            result.append(ancestor.getName()).append('|').append(id);
+            result.append(ancestor.getName()).append('|').append(ancestor.id);
             if (!ancestor.getCamouflage().isDefault()) {
                 result.append('|')
                       .append(ancestor.getCamouflage().getCategory())

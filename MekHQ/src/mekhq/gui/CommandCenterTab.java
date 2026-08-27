@@ -72,6 +72,7 @@ import mekhq.campaign.enums.DailyReportType;
 import mekhq.campaign.events.AcquisitionEvent;
 import mekhq.campaign.events.NewDayEvent;
 import mekhq.campaign.events.OptionsChangedEvent;
+import mekhq.campaign.events.OrganizationChangedEvent;
 import mekhq.campaign.events.ProcurementEvent;
 import mekhq.campaign.events.ReportEvent;
 import mekhq.campaign.events.TransitCompleteEvent;
@@ -125,6 +126,7 @@ public final class CommandCenterTab extends CampaignGuiTab {
     private JPanel panInfo;
     private ClickableLabel lblRating;
     private JLabel lblExperience;
+    private JLabel lblUnitWeight;
     private ClickableLabel lblPersonnel;
     private JLabel lblHRCapacity;
     private JLabel lblMissionSuccess;
@@ -356,6 +358,20 @@ public final class CommandCenterTab extends CampaignGuiTab {
         gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
         gridBagConstraints.weightx = 1.0;
         panInfo.add(lblExperience, gridBagConstraints);
+
+        JLabel lblUnitWeightHead = new JLabel(resourceMap.getString("lblUnitWeight.text"));
+        gridBagConstraints = new GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = y++;
+        gridBagConstraints.fill = GridBagConstraints.NONE;
+        gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
+        gridBagConstraints.insets = new Insets(1, 5, 1, 5);
+        panInfo.add(lblUnitWeightHead, gridBagConstraints);
+        lblUnitWeight = new JLabel(getCampaign().getCampaignSummary().getUnitWeightReport());
+        lblUnitWeightHead.setLabelFor(lblUnitWeight);
+        gridBagConstraints.gridx = 1;
+        gridBagConstraints.weightx = 1.0;
+        panInfo.add(lblUnitWeight, gridBagConstraints);
 
         JLabel lblMissionSuccessHead = new JLabel(resourceMap.getString("lblMissionSuccess.text"));
         gridBagConstraints = new GridBagConstraints();
@@ -885,6 +901,16 @@ public final class CommandCenterTab extends CampaignGuiTab {
      */
     private void refreshBasicInfo() {
         final Campaign campaign = getCampaign();
+
+        // While a bulk generation is adding units/parts off the EDT, skip this refresh: the summary
+        // computation walks the campaign's hangar and location tree, which the worker is concurrently
+        // mutating - reading it here threw ConcurrentModificationException from the modal progress
+        // dialog's event pump. The generation fires an OrganizationChangedEvent when it completes,
+        // which reschedules this refresh against the finished, consistent campaign.
+        if (campaign.isBulkGenerationInProgress()) {
+            return;
+        }
+
         final CampaignOptions campaignOptions = campaign.getCampaignOptions();
         final CampaignSummary campaignSummary = campaign.getCampaignSummary();
 
@@ -908,6 +934,8 @@ public final class CommandCenterTab extends CampaignGuiTab {
         } else {
             lblRating.setToolTipText(null);
         }
+
+        lblUnitWeight.setText(campaignSummary.getUnitWeightReport());
         lblPersonnel.setText(campaignSummary.getPersonnelReport());
         lblMissionSuccess.setText(campaignSummary.getMissionSuccessReport());
         lblComposition.setText(campaignSummary.getForceCompositionReport());
@@ -1134,16 +1162,23 @@ public final class CommandCenterTab extends CampaignGuiTab {
 
     @Subscribe
     public void handle(ReportEvent ev) {
-        refreshGeneralLog();
-        refreshSkillLog();
-        refreshBattleLog();
-        refreshPoliticsLog();
-        refreshPersonnelLog();
-        refreshMedicalLog();
-        refreshFinancesLog();
-        refreshAcquisitionsLog();
-        refreshTechnicalLog();
-        refreshAggregateLog();
+        // Dispatch onto the EDT regardless of caller thread. The Daily Report log panels are
+        // HTML-bearing JTextPanes; their appendLog path mutates the HTMLDocument and the JTextPane
+        // caret. Off-EDT writes here deadlocked with a queued DefaultCaret repaint runnable when
+        // the worker fired ReportEvent during force generation (EDT held AWTTreeLock and wanted
+        // the document read-lock; worker held the document write-lock).
+        SwingUtilities.invokeLater(() -> {
+            refreshGeneralLog();
+            refreshSkillLog();
+            refreshBattleLog();
+            refreshPoliticsLog();
+            refreshPersonnelLog();
+            refreshMedicalLog();
+            refreshFinancesLog();
+            refreshAcquisitionsLog();
+            refreshTechnicalLog();
+            refreshAggregateLog();
+        });
     }
 
     @Subscribe
@@ -1177,6 +1212,13 @@ public final class CommandCenterTab extends CampaignGuiTab {
 
     @Subscribe
     public void handle(UnitEvent evt) {
+        basicInfoScheduler.schedule();
+    }
+
+    @Subscribe
+    public void handle(OrganizationChangedEvent evt) {
+        // Fired once after a bulk force generation completes (among other org changes); reschedules the
+        // basic-info/cargo refresh that refreshBasicInfo skipped while the generation was in progress.
         basicInfoScheduler.schedule();
     }
 

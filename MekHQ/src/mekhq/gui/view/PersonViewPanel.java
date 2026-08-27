@@ -38,6 +38,7 @@ import static java.lang.Math.ceil;
 import static java.lang.Math.max;
 import static java.lang.Math.round;
 import static megamek.client.ui.WrapLayout.wordWrap;
+import static megamek.common.options.PilotOptions.EI_ADVANTAGES;
 import static megamek.common.options.PilotOptions.LVL3_ADVANTAGES;
 import static megamek.common.options.PilotOptions.MD_ADVANTAGES;
 import static megamek.common.units.EntityWeightClass.WEIGHT_ULTRA_LIGHT;
@@ -58,6 +59,7 @@ import static mekhq.campaign.personnel.skills.enums.SkillSubType.*;
 import static mekhq.campaign.personnel.turnoverAndRetention.Fatigue.getEffectiveFatigue;
 import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
 import static mekhq.utilities.MHQInternationalization.getTextAt;
+import static mekhq.utilities.MHQInternationalization.isResourceKeyValid;
 import static mekhq.utilities.ReportingUtilities.CLOSING_SPAN_TAG;
 import static mekhq.utilities.ReportingUtilities.getAmazingColor;
 import static mekhq.utilities.ReportingUtilities.getNegativeColor;
@@ -119,6 +121,17 @@ import mekhq.campaign.finances.Money;
 import mekhq.campaign.log.LogEntry;
 import mekhq.campaign.personnel.Award;
 import mekhq.campaign.personnel.Injury;
+import megamek.utilities.ImageUtilities;
+import mekhq.campaign.universe.Factions;
+import javax.swing.SwingConstants;
+import mekhq.campaign.universe.Faction;
+import megamek.common.universe.BloodnameHolder;
+import megamek.common.universe.BloodnameHouse;
+import megamek.common.universe.BloodnameNote;
+import megamek.common.universe.BloodnameTransfer;
+import megamek.common.universe.Bloodnames2;
+import mekhq.campaign.personnel.Bloodname;
+import mekhq.campaign.personnel.Clan;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.PersonAwardController;
 import mekhq.campaign.personnel.PersonnelOptions;
@@ -128,6 +141,7 @@ import mekhq.campaign.personnel.education.EducationController;
 import mekhq.campaign.personnel.enums.BloodmarkLevel;
 import mekhq.campaign.personnel.enums.ExtraIncome;
 import mekhq.campaign.personnel.enums.GenderDescriptors;
+import mekhq.campaign.personnel.enums.GeneticLegacyRole;
 import mekhq.campaign.personnel.enums.PersonnelRole;
 import mekhq.campaign.personnel.enums.PersonnelStatus;
 import mekhq.campaign.personnel.enums.education.EducationLevel;
@@ -157,6 +171,40 @@ import mekhq.utilities.ReportingUtilities;
  * @author Jay Lawson (jaylawson39 at yahoo.com)
  */
 public class PersonViewPanel extends JScrollablePanel {
+    /** Width the Clan emblems are scaled to on the Bloodhouse tab. */
+    private static final int CLAN_EMBLEM_WIDTH = 100;
+
+    /**
+     * How many recorded holders a House lists before the rest are summarised. The Houses are very
+     * uneven - the median records one and Ward records sixty-nine - so an uncapped list would let a
+     * single House run off the panel.
+     */
+    private static final int MAX_NOTABLE_HOLDERS = 10;
+
+    /** The Wars of Reaving ended in 3075; used when a legacy does not record its own reaving year. */
+    private static final int WARS_OF_REAVING_END = 3075;
+
+    /** How many HTML sizes the Bloodname tab's headline is raised above the panel's ordinary text. */
+    private static final int HEADLINE_FONT_STEP = 2;
+
+    /**
+     * The width a Bloodname row's value wraps at, before GUI scaling.
+     *
+     * <p>Needed because some values are a paragraph - a House's Legacy runs to a couple of
+     * sentences. An unconstrained HTML label reports the whole sentence as its preferred width, which
+     * pushes the panel wider than the tab, and GridBagLayout answers by shrinking every column to its
+     * minimum instead. The minimum width of wrapping HTML is its longest word, so the panel ends up
+     * one word per line. Fixing the wrap point gives the layout a width it can honour.</p>
+     */
+    private static final int BLOODNAME_VALUE_WIDTH = 380;
+
+    /**
+     * The width the Heritage headline wraps at, before GUI scaling. Wider than a value row because
+     * the headline spans both columns, and needed for the same reason: without a width to work to,
+     * the layout falls back to the label's minimum and breaks it after every word.
+     */
+    private static final int BLOODNAME_HEADLINE_WIDTH = 500;
+
     private static final MMLogger LOGGER = MMLogger.create(PersonViewPanel.class);
 
     private static final int MAX_NUMBER_OF_RIBBON_AWARDS_PER_ROW = 5;
@@ -249,6 +297,20 @@ public class PersonViewPanel extends JScrollablePanel {
         pnlGenealogy.setLayout(new GridBagLayout());
         initializeGenealogy(pnlGenealogy);
         tabbedPane.addTab(getTextAt(RESOURCE_BUNDLE, "pnlGenealogy.title"), pnlGenealogy);
+
+        // The Clan counterpart to Genealogy, for whom descent runs through a Bloodname House rather
+        // than a family. Added alongside Genealogy rather than in place of it, because Clan characters
+        // can still carry ordinary family links.
+        //
+        // Also shown to anyone actually holding a Bloodname or a House even if they are not flagged as
+        // Clan personnel: that flag is user-toggleable and story arcs set Bloodnames without consulting
+        // it, so keying purely off it would hide descent the character demonstrably has.
+        if (person.isClanPersonnel() || holdsBloodname(person) || person.hasBloodhouse()) {
+            JPanel pnlBloodname = new JPanel();
+            pnlBloodname.setLayout(new GridBagLayout());
+            initializeBloodname(pnlBloodname);
+            tabbedPane.addTab(getTextAt(RESOURCE_BUNDLE, "pnlBloodname.title"), pnlBloodname);
+        }
 
         JPanel pnlPersonnelRecordTab = new JPanel();
         pnlPersonnelRecordTab.setLayout(new GridBagLayout());
@@ -560,6 +622,654 @@ public class PersonViewPanel extends JScrollablePanel {
 
         // use glue to fill up the remaining space so everything is aligned to the top
         addGlue(gridY, pnlGenealogy);
+    }
+
+    /**
+     * @return {@code true} if this person carries a Bloodname
+     */
+    private static boolean holdsBloodname(Person person) {
+        String bloodname = person.getBloodname();
+        return (bloodname != null) && !bloodname.isBlank();
+    }
+
+    /**
+     * Builds the Bloodname tab as stacked sections: what this warrior personally carries, the House
+     * the name belongs to and what is known of it, then the Clan emblems.
+     */
+    private void initializeBloodname(JPanel pnlBloodname) {
+        int gridY = addBloodnameSection(pnlBloodname, 0, fillWarriorHeritage());
+        gridY = addBloodnameSection(pnlBloodname, gridY, fillBloodnameHouse());
+        gridY = addBloodnameSection(pnlBloodname, gridY, fillBloodhouseEmblems());
+        addGlue(gridY, pnlBloodname);
+    }
+
+    /**
+     * Stacks one section onto the Bloodname tab, skipping sections that had nothing to show.
+     *
+     * @param pnlBloodname the tab to add to
+     * @param gridY        the row to place the section on
+     * @param section      the section, or {@code null} when it has nothing to show
+     *
+     * @return the next free row
+     */
+    private static int addBloodnameSection(JPanel pnlBloodname, int gridY, @Nullable JPanel section) {
+        if (section == null) {
+            return gridY;
+        }
+
+        GridBagConstraints gridBagConstraints = new GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = gridY;
+        gridBagConstraints.weightx = 1.0;
+        gridBagConstraints.insets = new Insets(0, 0, 10, 0);
+        gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
+        gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
+        pnlBloodname.add(section, gridBagConstraints);
+        return gridY + 1;
+    }
+
+    /**
+     * What this particular warrior carries: the Bloodname if they have won one, the House they were
+     * bred from, and their phenotype.
+     *
+     * <p>The name and the House are set larger and bold. They are the two facts the tab exists to
+     * answer, and everything in the section below them describes the second of the two.</p>
+     */
+    private JPanel fillWarriorHeritage() {
+        JPanel pnlHeritage = new JPanel(new GridBagLayout());
+        pnlHeritage.setBorder(RoundedLineBorder.createRoundedLineBorder(
+              getTextAt(RESOURCE_BUNDLE, "pnlBloodnameHeritage.title")));
+
+        int gridY = 0;
+        addBloodnameHeadline(pnlHeritage, gridY++, describeHeritage());
+        addBloodnameRow(pnlHeritage, gridY++, "lblPhenotype",
+              person.getPhenotype().getLabel());
+
+        // A legacy held against its origin Clan's exclusivity can only have arrived by capture, so
+        // the tab says so rather than leaving the House panel's "Exclusive to its origin Clan" to
+        // read as a contradiction.
+        Faction capturedFrom = isorlaOriginClanOf(person);
+        if (capturedFrom != null) {
+            addBloodnameRow(pnlHeritage, gridY++, "lblBloodnameIsorla",
+                  getFormattedTextAt(RESOURCE_BUNDLE, "lblBloodnameIsorla.value",
+                        capturedFrom.getFullName(campaign.getGameYear())));
+        }
+
+        GeneticLegacyRole legacyRole = person.getGeneticLegacyRole();
+        if (legacyRole.isInUse()) {
+            addBloodnameRow(pnlHeritage, gridY, "lblGeneticLegacyRole",
+                  legacyRole.getLabel());
+        }
+
+        return pnlHeritage;
+    }
+
+    /**
+     * The Clan a warrior's legacy was taken from, when they carry a Bloodname that Clan holds
+     * exclusively.
+     *
+     * <p>A Clan may not breed from a captured warrior's legacy - that needs a Trial of Possession -
+     * so an exclusive name in another Clan's ranks means the warrior themselves was taken, as isorla
+     * or as a bondsman later reinstated. Jal Steiner served Clan Nova Cat while the Steiner name
+     * stayed exclusive to the Cloud Cobras.</p>
+     *
+     * <p>Derived rather than recorded, so it holds for hand-built and imported characters too.</p>
+     *
+     * @param person the warrior
+     *
+     * @return the Clan the legacy belongs to, or {@code null} when the name is not held against
+     *       another Clan's exclusivity
+     */
+    private @Nullable Faction isorlaOriginClanOf(Person person) {
+        String houseName = houseNameOf(person);
+        if (houseName == null) {
+            return null;
+        }
+
+        Bloodname bloodname = Bloodname.getBloodname(houseName);
+        if ((bloodname == null) || !bloodname.isExclusive(campaign.getGameYear())) {
+            return null;
+        }
+
+        Faction originClan = bloodnameOriginClanOf(person);
+        Faction servingClan = servingClanOf(person);
+        if ((originClan == null) || (servingClan == null)) {
+            return null;
+        }
+        return originClan.getShortName().equals(servingClan.getShortName()) ? null : originClan;
+    }
+
+    /**
+     * The one line at the head of the tab, saying where this warrior stands with their House.
+     *
+     * <p>Four things it can say, and which one it says is the point of the tab:</p>
+     * <ul>
+     *   <li>they hold the name, and are addressed by it</li>
+     *   <li>they were bred from a House and may yet win its name, which is where most trueborns
+     *       stay</li>
+     *   <li>they are trueborn but no House was recorded against them</li>
+     *   <li>they are freeborn, so no House bred them at all</li>
+     * </ul>
+     *
+     * @return the headline text
+     */
+    private String describeHeritage() {
+        String houseName = houseNameOf(person);
+
+        if (holdsBloodname(person)) {
+            // The name a warrior wins is the House's own, so stating the two separately said the same
+            // word twice. Named as one line instead, the way the Clans say it.
+            return getFormattedTextAt(RESOURCE_BUNDLE, "lblBloodnameHeritage.bloodnamed",
+                  person.getFullName(), houseName);
+        }
+
+        if (houseName != null) {
+            return getFormattedTextAt(RESOURCE_BUNDLE, "lblBloodnameHeritage.eligible", houseName);
+        }
+
+        return person.getPhenotype().isTrueborn()
+              ? getTextAt(RESOURCE_BUNDLE, "lblBloodnameHeritage.unrecorded")
+              : getTextAt(RESOURCE_BUNDLE, "lblBloodnameHeritage.freeborn");
+    }
+
+    /**
+     * Adds the Bloodname tab's headline, spanning both columns and set larger and bold.
+     *
+     * <p>Sized in HTML steps rather than by deriving a font, so it still tracks whatever text size
+     * the user's GUI scaling settles on.</p>
+     *
+     * @param panel the panel to add to
+     * @param gridY the row to place it on
+     * @param text  the headline text
+     */
+    private static void addBloodnameHeadline(JPanel panel, int gridY, String text) {
+        JLabel headline = new JLabel(String.format(
+              "<html><div style='width:%dpx'><font size='+%d'><b>%s</b></font></div></html>",
+              UIUtil.scaleForGUI(BLOODNAME_HEADLINE_WIDTH), HEADLINE_FONT_STEP, text));
+        headline.setName("lblBloodnameHeadline" + gridY);
+        headline.setToolTipText(tooltipFor("lblBloodnameHeritage"));
+
+        GridBagConstraints gridBagConstraints = new GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = gridY;
+        gridBagConstraints.gridwidth = 2;
+        gridBagConstraints.weightx = 1.0;
+        gridBagConstraints.insets = new Insets(0, 0, 5, 0);
+        gridBagConstraints.fill = GridBagConstraints.NONE;
+        gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
+        panel.add(headline, gridBagConstraints);
+    }
+
+    /**
+     * The House this warrior descends from, by name.
+     *
+     * <p>A Bloodnamed warrior's House is the name they carry; an unbloodnamed trueborn's is the one
+     * recorded against them when they were bred.</p>
+     *
+     * @param person the warrior
+     *
+     * @return the House name, or {@code null} when none is recorded
+     */
+    private static @Nullable String houseNameOf(Person person) {
+        if (holdsBloodname(person)) {
+            return person.getBloodname();
+        }
+
+        String bloodhouse = person.getBloodhouse();
+        return isNullOrBlankText(bloodhouse) ? null : bloodhouse;
+    }
+
+    /**
+     * The House panel: the legacy behind the name, who founded it, and what became of it.
+     *
+     * <p>Shown for an unbloodnamed trueborn as well. They were bred from the House, so its history is
+     * theirs whether or not they ever win the right to its name.</p>
+     *
+     * @return the House panel, or {@code null} when no House is recorded for this warrior or the data
+     *       does not describe it
+     */
+    private @Nullable JPanel fillBloodnameHouse() {
+        String houseName = houseNameOf(person);
+        if (houseName == null) {
+            return null;
+        }
+
+        // The name is stored as free text, so it can be one the data does not describe - a hand-typed
+        // name, or one retired from the tables.
+        Bloodname bloodname = Bloodname.getBloodname(houseName);
+        if (bloodname == null) {
+            LOGGER.debug("[Bloodhouse] no House record for '{}', carried by '{}'",
+                  houseName, person.getFullName());
+            return null;
+        }
+
+        JPanel pnlBloodnameDetails = new JPanel(new GridBagLayout());
+        pnlBloodnameDetails.setBorder(RoundedLineBorder.createRoundedLineBorder(
+              getFormattedTextAt(RESOURCE_BUNDLE, "pnlBloodnameDetails.title", bloodname.getName())));
+
+        int gridY = 0;
+
+        BloodnameHouse houseRecord = houseRecordFor(bloodname, person);
+        if ((houseRecord != null) && !isNullOrBlankText(houseRecord.getSummary())) {
+            addBloodnameRow(pnlBloodnameDetails, gridY++, "lblBloodnameSummary", houseRecord.getSummary());
+        }
+
+        String founder = bloodname.getFounder();
+        if ((founder != null) && !founder.isBlank()) {
+            addBloodnameRow(pnlBloodnameDetails, gridY++, "lblBloodnameFounder",
+                  describeHolder(founderFullNameOf(houseRecord, founder, bloodname.getName()),
+                        (houseRecord == null) ? null : houseRecord.getFounderRank(),
+                        (houseRecord == null) ? null : houseRecord.getFounderAffiliation()));
+        }
+
+        Clan originClan = bloodname.getOriginClan();
+        if (originClan != null) {
+            addBloodnameRow(pnlBloodnameDetails, gridY++, "lblBloodnameOriginClan",
+                  originClan.getFullName(campaign.getGameYear()));
+        }
+
+        if (bloodname.getPhenotype() != null) {
+            addBloodnameRow(pnlBloodnameDetails, gridY++, "lblBloodnameHousePhenotype",
+                  bloodname.getPhenotype().getLabel());
+        }
+
+        addBloodnameRow(pnlBloodnameDetails, gridY++, "lblBloodnameStanding",
+              bloodnameStanding(bloodname));
+
+        Faction capturedFrom = isorlaOriginClanOf(person);
+        if (capturedFrom != null) {
+            addBloodnameRow(pnlBloodnameDetails, gridY++, "lblBloodnameExclusivity",
+                  getFormattedTextAt(RESOURCE_BUNDLE, "lblBloodnameExclusivity.value",
+                        capturedFrom.getFullName(campaign.getGameYear())));
+        }
+
+        gridY = addNotableHolders(pnlBloodnameDetails, gridY, houseRecord);
+        gridY = addLegacyFate(pnlBloodnameDetails, gridY, houseRecord);
+
+        // Placeholder until the house histories are written. Kept as its own resource string so
+        // filling them in later is a data change rather than a code change.
+        addBloodnameRow(pnlBloodnameDetails, gridY, "lblBloodnameHistory",
+              getTextAt(RESOURCE_BUNDLE, "lblBloodnameHistory.placeholder"));
+
+        return pnlBloodnameDetails;
+    }
+
+    /**
+     * Finds the House record behind a Bloodname, preferring the one this warrior descends from.
+     *
+     * <p>Sixteen Bloodnames descend from more than one founder, so a warrior of the Kerensky name is
+     * of Andery's House or Nicholas's, not both. Where the warrior's own House is not recorded the
+     * first is used, which is the only sensible guess.</p>
+     *
+     * @param bloodname the Bloodname as the game holds it
+     * @param person    the warrior, whose recorded House disambiguates
+     *
+     * @return the House record, or {@code null} when the data has none
+     */
+    private @Nullable BloodnameHouse houseRecordFor(Bloodname bloodname, Person person) {
+        List<BloodnameHouse> houses = Bloodnames2.getInstance().getHouses(bloodname.getName());
+        if (houses.isEmpty()) {
+            return null;
+        }
+        for (BloodnameHouse house : houses) {
+            if ((bloodname.getFounder() != null) && bloodname.getFounder().equals(house.getFounder())) {
+                return house;
+            }
+        }
+        return houses.get(0);
+    }
+
+    /**
+     * @return the founder's full name where the data records one, otherwise the given name joined to
+     *       the Bloodname
+     */
+    private static String founderFullNameOf(@Nullable BloodnameHouse house, String founder,
+          String bloodnameText) {
+        if ((house != null) && !isNullOrBlankText(house.getFounderFullName())) {
+            return house.getFounderFullName();
+        }
+        return founder + " " + bloodnameText;
+    }
+
+    /**
+     * Renders one warrior as "Khan Natasha Kerensky, Clan Wolf", omitting whichever parts the data
+     * does not record.
+     */
+    private static String describeHolder(String name, @Nullable String rank,
+          @Nullable String affiliation) {
+        StringBuilder description = new StringBuilder();
+        if (!isNullOrBlankText(rank)) {
+            description.append(rank).append(' ');
+        }
+        description.append(name);
+        if (!isNullOrBlankText(affiliation)) {
+            description.append(", ").append(affiliation);
+        }
+        return description.toString();
+    }
+
+    /**
+     * Lists the warriors recorded as having held this Bloodname, one per row beneath a single label -
+     * the same shape the family panel uses for children and siblings.
+     *
+     * <p>Capped, because the Houses are wildly uneven: the median records one holder and Ward records
+     * sixty-nine. The count of those left out is stated rather than silently dropped.</p>
+     *
+     * @return the next free row
+     */
+    private int addNotableHolders(JPanel panel, int gridY, @Nullable BloodnameHouse house) {
+        if (house == null) {
+            return gridY;
+        }
+        List<BloodnameHolder> holders = house.getNotableHolders();
+        if (holders.isEmpty()) {
+            return gridY;
+        }
+
+        int shown = Math.min(holders.size(), MAX_NOTABLE_HOLDERS);
+        for (int index = 0; index < shown; index++) {
+            BloodnameHolder holder = holders.get(index);
+            // Only the first row carries the label; the rest read as a list beneath it.
+            addBloodnameRow(panel, gridY++, "lblBloodnameHolders", (index != 0),
+                  describeHolder(holder.getName(), holder.getRank(), holder.getAffiliation()));
+        }
+        if (holders.size() > shown) {
+            addBloodnameRow(panel, gridY++, "lblBloodnameHolders", true,
+                  getFormattedTextAt(RESOURCE_BUNDLE, "lblBloodnameHolders.more",
+                        holders.size() - shown));
+        }
+        return gridY;
+    }
+
+    /**
+     * Things recorded about this House that only became true in a given year, each withheld until the
+     * campaign reaches it.
+     *
+     * <p>A warrior in 3050 should not read that their name was noted as Limited in 3085. The
+     * undated part of a House's description stays in its Legacy; anything that happened at a point in
+     * time is held here so it can be gated.</p>
+     *
+     * @return the next free row
+     */
+    private int addDatedNotes(JPanel panel, int gridY, @Nullable BloodnameHouse house) {
+        if (house == null) {
+            return gridY;
+        }
+
+        List<BloodnameNote> notes = house.getDatedNotesBy(campaign.getGameYear());
+        for (int index = 0; index < notes.size(); index++) {
+            addBloodnameRow(panel, gridY++, "lblBloodnameDatedNote", (index != 0),
+                  notes.get(index).getText());
+        }
+        return gridY;
+    }
+
+    /**
+     * What became of the legacy, shown only once the campaign has reached the year it happened.
+     *
+     * <p>A campaign in 3050 should not be reading about a Clan that inherits the name in 3075. Each
+     * entry carries its own year and is withheld until the campaign passes it; the post-Reaving
+     * inheritors are withheld until the legacy was actually reaved.</p>
+     *
+     * @return the next free row
+     */
+    private int addLegacyFate(JPanel panel, int gridY, @Nullable BloodnameHouse house) {
+        if (house == null) {
+            return gridY;
+        }
+        int year = campaign.getGameYear();
+
+        if (!house.getPostReaving().isEmpty() && hasReachedReaving(house, year)) {
+            List<String> clanNames = new ArrayList<>();
+            for (String clanCode : house.getPostReaving()) {
+                Faction inheritor = Factions.getInstance().getFaction(clanCode);
+                clanNames.add((inheritor == null) ? clanCode : inheritor.getFullName(year));
+            }
+            addBloodnameRow(panel, gridY++, "lblBloodnamePostReaving",
+                  String.join(", ", clanNames));
+        }
+
+        gridY = addTransfer(panel, gridY, house.getAbsorbed(), "lblBloodnameAbsorbed", year);
+        for (BloodnameTransfer transfer : house.getAcquired()) {
+            gridY = addTransfer(panel, gridY, transfer, "lblBloodnameAcquired", year);
+        }
+        for (BloodnameTransfer transfer : house.getShared()) {
+            gridY = addTransfer(panel, gridY, transfer, "lblBloodnameShared", year);
+        }
+        return gridY;
+    }
+
+    /**
+     * @return {@code true} once the campaign has reached the year this legacy was reaved, or the end
+     *       of the Wars of Reaving where the data does not say
+     */
+    private static boolean hasReachedReaving(BloodnameHouse house, int year) {
+        Integer reaved = house.getReaved();
+        return (reaved == null) ? (year >= WARS_OF_REAVING_END) : (year >= reaved);
+    }
+
+    /**
+     * Adds one Clan transfer row, if the campaign has reached the year it happened.
+     *
+     * @return the next free row
+     */
+    private int addTransfer(JPanel panel, int gridY, @Nullable BloodnameTransfer transfer,
+          String labelKey, int year) {
+        if ((transfer == null) || (transfer.getClan() == null)) {
+            return gridY;
+        }
+        Integer date = transfer.getDate();
+        if ((date != null) && (year < date)) {
+            return gridY;
+        }
+        Faction clan = Factions.getInstance().getFaction(transfer.getClan());
+        String clanName = (clan == null) ? transfer.getClan() : clan.getFullName(year);
+        String value = (date == null)
+              ? clanName
+              : getFormattedTextAt(RESOURCE_BUNDLE, "lblBloodnameTransfer.value", clanName, date);
+        addBloodnameRow(panel, gridY++, labelKey, value);
+        return gridY;
+    }
+
+    /**
+     * The helper text explaining a Bloodname field, wrapped so a long explanation does not run off
+     * the screen as a single line.
+     *
+     * @param labelKey the field's resource key, without a suffix
+     *
+     * @return the helper text, or {@code null} when the bundle has none for this field
+     */
+    private static @Nullable String tooltipFor(String labelKey) {
+        String tooltip = getTextAt(RESOURCE_BUNDLE, labelKey + ".tooltip");
+        return isResourceKeyValid(tooltip) ? wordWrap(tooltip) : null;
+    }
+
+    /**
+     * @return {@code true} when the text is absent or holds nothing but whitespace
+     */
+    private static boolean isNullOrBlankText(@Nullable String text) {
+        return (text == null) || text.isBlank();
+    }
+
+    /**
+     * How this Bloodname stands in the year the campaign has reached - whether it is still granted,
+     * held only by its own Clan, or no longer awarded at all.
+     */
+    private String bloodnameStanding(Bloodname bloodname) {
+        int year = campaign.getGameYear();
+        List<String> standings = new ArrayList<>();
+        if (bloodname.isInactive(year)) {
+            standings.add(getTextAt(RESOURCE_BUNDLE, "bloodnameStanding.inactive"));
+        }
+        if (bloodname.isAbjured(year)) {
+            standings.add(getTextAt(RESOURCE_BUNDLE, "bloodnameStanding.abjured"));
+        }
+        if (bloodname.isExclusive(year)) {
+            standings.add(getTextAt(RESOURCE_BUNDLE, "bloodnameStanding.exclusive"));
+        }
+        if (bloodname.isLimited(year)) {
+            standings.add(getTextAt(RESOURCE_BUNDLE, "bloodnameStanding.limited"));
+        }
+        return standings.isEmpty()
+              ? getTextAt(RESOURCE_BUNDLE, "bloodnameStanding.active")
+              : String.join(", ", standings);
+    }
+
+    /**
+     * Adds one label-and-value row to the Bloodname panel.
+     *
+     * @param panel    the panel to add to
+     * @param gridY    the row to place it on
+     * @param labelKey the field's resource key, without a suffix; {@code .text} names it and
+     *                 {@code .tooltip} explains it
+     * @param value    the field value
+     */
+    private static void addBloodnameRow(JPanel panel, int gridY, String labelKey, String value) {
+        addBloodnameRow(panel, gridY, labelKey, false, value);
+    }
+
+    /**
+     * Adds one label-and-value row to the Bloodname panel, optionally with the label left off.
+     *
+     * <p>A blank label continues the row above it, so a field with several values reads as a list
+     * under one heading rather than repeating the heading on every line. The helper text is attached
+     * either way, so hovering any line of the list explains the field.</p>
+     *
+     * @param panel        the panel to add to
+     * @param gridY        the row to place it on
+     * @param labelKey     the field's resource key, without a suffix
+     * @param continuesRow {@code true} to leave the label blank because the row above named the field
+     * @param value        the field value
+     */
+    private static void addBloodnameRow(JPanel panel, int gridY, String labelKey,
+          boolean continuesRow, String value) {
+        String tooltip = tooltipFor(labelKey);
+        JLabel fieldLabel = new JLabel(continuesRow ? "" : getTextAt(RESOURCE_BUNDLE, labelKey + ".text"));
+        fieldLabel.setToolTipText(tooltip);
+        fieldLabel.setName("lblBloodnameField" + gridY);
+        GridBagConstraints gridBagConstraints = new GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = gridY;
+        gridBagConstraints.fill = GridBagConstraints.NONE;
+        gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
+        panel.add(fieldLabel, gridBagConstraints);
+
+        JLabel fieldValue = new JLabel(String.format("<html><div style='width:%dpx'>%s</div></html>",
+              UIUtil.scaleForGUI(BLOODNAME_VALUE_WIDTH), value));
+        fieldValue.setName("lblBloodnameValue" + gridY);
+        fieldValue.setToolTipText(tooltip);
+        fieldLabel.setLabelFor(fieldValue);
+        gridBagConstraints.gridx = 1;
+        gridBagConstraints.weightx = 1.0;
+        gridBagConstraints.insets = new Insets(0, 10, 0, 0);
+        panel.add(fieldValue, gridBagConstraints);
+    }
+
+    /**
+     * The Clan emblems for this warrior: the Clan they serve, and beside it the Clan their Bloodname
+     * came from where that is a different Clan.
+     *
+     * <p>A warrior usually carries a legacy of their own Clan, so the second emblem appears only when
+     * the descent crosses Clans - the Wars of Reaving moved many legacies, and a warrior taken as
+     * isorla carries the name of the Clan they were taken from.</p>
+     *
+     * @return the emblem panel, or {@code null} when there is no Clan to show
+     */
+    private @Nullable JPanel fillBloodhouseEmblems() {
+        Faction servingClan = servingClanOf(person);
+        Faction originClan = bloodnameOriginClanOf(person);
+
+        boolean showOrigin = (originClan != null)
+              && ((servingClan == null) || !originClan.getShortName().equals(servingClan.getShortName()));
+        if ((servingClan == null) && !showOrigin) {
+            LOGGER.debug("[Bloodhouse][Emblem] none shown for '{}': no serving Clan and no differing "
+                        + "origin Clan (bloodhouse='{}')", person.getFullName(), person.getBloodhouse());
+            return null;
+        }
+        LOGGER.debug("[Bloodhouse][Emblem] '{}': serving={} origin={} showOrigin={}",
+              person.getFullName(),
+              servingClan == null ? "none" : servingClan.getShortName(),
+              originClan == null ? "none" : originClan.getShortName(), showOrigin);
+
+        JPanel pnlEmblems = new JPanel(new GridBagLayout());
+        int gridX = 0;
+        if (servingClan != null) {
+            addClanEmblem(pnlEmblems, gridX++, servingClan,
+                  getTextAt(RESOURCE_BUNDLE, "lblServingClan.text"));
+        }
+        if (showOrigin) {
+            addClanEmblem(pnlEmblems, gridX, originClan,
+                  getTextAt(RESOURCE_BUNDLE, "lblBloodnameOriginClan.text"));
+        }
+        return pnlEmblems;
+    }
+
+    /**
+     * Adds one captioned Clan emblem to the emblem row.
+     *
+     * @param panel   the row to add to
+     * @param gridX   the column to place it in
+     * @param faction the Clan whose emblem is shown
+     * @param caption the caption beneath it
+     */
+    private void addClanEmblem(JPanel panel, int gridX, Faction faction, String caption) {
+        GridBagConstraints gridBagConstraints = new GridBagConstraints();
+        gridBagConstraints.gridx = gridX;
+        gridBagConstraints.gridy = 0;
+        gridBagConstraints.insets = new Insets(0, 0, 0, 20);
+        gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
+
+        JLabel lblEmblem = new JLabel();
+        lblEmblem.setName("lblClanEmblem" + gridX);
+        // Matches how faction emblems are rendered elsewhere - fetch, then scale - rather than the
+        // combined call, which is not the path the rest of the GUI uses.
+        ImageIcon emblem = Factions.getFactionLogo(campaign.getGameYear(), faction.getShortName());
+        emblem = ImageUtilities.scaleImageIcon(emblem, CLAN_EMBLEM_WIDTH, true);
+        if ((emblem == null) || (emblem.getIconWidth() <= 0)) {
+            LOGGER.warn("[Bloodhouse][Emblem] no usable emblem image for {} in {}",
+                  faction.getShortName(), campaign.getGameYear());
+        }
+        lblEmblem.setIcon(emblem);
+        lblEmblem.setHorizontalAlignment(SwingConstants.CENTER);
+        lblEmblem.setVerticalTextPosition(SwingConstants.BOTTOM);
+        lblEmblem.setHorizontalTextPosition(SwingConstants.CENTER);
+        lblEmblem.setText(String.format("<html><div style=\'text-align: center;\'>%s<br>%s</div></html>",
+              caption, faction.getFullName(campaign.getGameYear())));
+        lblEmblem.setToolTipText(faction.getFullName(campaign.getGameYear()));
+        panel.add(lblEmblem, gridBagConstraints);
+    }
+
+    /**
+     * The Clan this warrior serves with, which is the campaign's own faction when that is a Clan and
+     * otherwise the Clan they came from - so a Clan warrior in a mercenary command still shows theirs.
+     *
+     * @param person the warrior
+     *
+     * @return the Clan, or {@code null} if neither is one
+     */
+    private @Nullable Faction servingClanOf(Person person) {
+        Faction campaignFaction = campaign.getPlayerForce().getFaction();
+        if ((campaignFaction != null) && campaignFaction.isClan()) {
+            return campaignFaction;
+        }
+        Faction originFaction = person.getOriginFaction();
+        return ((originFaction != null) && originFaction.isClan()) ? originFaction : null;
+    }
+
+    /**
+     * The Clan that founded this warrior's Bloodname House.
+     *
+     * @param person the warrior
+     *
+     * @return the founding Clan, or {@code null} when no House is recorded or its Clan is unknown
+     */
+    private @Nullable Faction bloodnameOriginClanOf(Person person) {
+        String houseName = person.hasBloodhouse() ? person.getBloodhouse() : person.getBloodname();
+        Bloodname house = Bloodname.getBloodname(houseName);
+        if ((house == null) || (house.getOriginClan() == null)) {
+            return null;
+        }
+        return Factions.getInstance().getFaction(house.getOriginClan().getGenerationCode());
     }
 
     private static void addGlue(int gridY, JPanel panel) {
@@ -934,6 +1644,19 @@ public class PersonViewPanel extends JScrollablePanel {
                 if (option.booleanValue()) {
                     IOption ability = options.getOption(option.getName());
                     relevantAbilities.put(ability, MD_ADVANTAGES);
+                }
+            }
+        }
+
+        // Enhanced imaging is an implant, but it sits in a group of its own rather than with the
+        // Manei Domini implants above, so reading only that group left an implanted Clan warrior
+        // showing nothing here.
+        if (campaignOptions.get(CampaignOption.USE_IMPLANTS) && (person.countOptions(EI_ADVANTAGES) > 0)) {
+            for (Enumeration<IOption> i = person.getOptions(EI_ADVANTAGES); i.hasMoreElements(); ) {
+                IOption option = i.nextElement();
+                if (option.booleanValue()) {
+                    IOption ability = options.getOption(option.getName());
+                    relevantAbilities.put(ability, EI_ADVANTAGES);
                 }
             }
         }
@@ -1358,8 +2081,14 @@ public class PersonViewPanel extends JScrollablePanel {
         }
 
         lblType.setName("lblType");
-        lblType.setText(String.format(resourceMap.getString("format.italic"), person.getRoleDesc()));
-        lblType.getAccessibleContext().setAccessibleName("Role: " + person.getRoleDesc());
+        // A senior post sits beside the role because it is a different fact about the person: the role
+        // is the job they do, the post is the position they hold within the command.
+        String appointmentTitles = person.getSeniorAppointmentTitles();
+        String roleAndAppointment = appointmentTitles.isEmpty()
+              ? person.getRoleDesc()
+              : person.getRoleDesc() + " - " + appointmentTitles;
+        lblType.setText(String.format(resourceMap.getString("format.italicNoWrap"), roleAndAppointment));
+        lblType.getAccessibleContext().setAccessibleName("Role: " + roleAndAppointment);
         gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = y;
