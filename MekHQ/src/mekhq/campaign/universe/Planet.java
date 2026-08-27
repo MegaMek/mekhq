@@ -588,7 +588,7 @@ public class Planet {
     }
 
     public SourceableValue<CapitalType> getSourcedCapitalType(LocalDate when) {
-        return getEventData(when, null, e -> e.capitalType);
+        return getEventData(when, null, planetaryEvent -> planetaryEvent.capitalType);
     }
 
     public @Nonnull HPGRating getHPG(LocalDate when) {

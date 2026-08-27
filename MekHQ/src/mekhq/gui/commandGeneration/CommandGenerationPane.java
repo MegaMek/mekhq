@@ -143,7 +143,7 @@ public class CommandGenerationPane extends AbstractMHQTabbedPane {
 
         // The starting-cash preview prices the Force Generator tab's current model, which can change
         // while this tab is hidden - recompute it whenever the user switches onto it.
-        addChangeListener(evt -> {
+        addChangeListener(event -> {
             if (getSelectedIndex() == indexOfTab(tabTitle("sparesAndFinancesTab"))) {
                 sparesAndFinancesTab.refreshStartingCashPreview();
             }

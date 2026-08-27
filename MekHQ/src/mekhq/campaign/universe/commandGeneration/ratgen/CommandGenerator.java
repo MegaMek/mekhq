@@ -182,12 +182,12 @@ public final class CommandGenerator {
         Thread.getAllStackTraces().forEach((thread, frames) -> {
             String name = thread.getName();
             if (name.startsWith("SwingWorker") || name.startsWith("AWT-EventQueue") || name.contains("Timer")) {
-                StringBuilder sb = new StringBuilder();
-                sb.append("\n--- Thread '").append(name).append("' state=").append(thread.getState()).append(" ---");
+                StringBuilder summary = new StringBuilder();
+                summary.append("\n--- Thread '").append(name).append("' state=").append(thread.getState()).append(" ---");
                 for (StackTraceElement frame : frames) {
-                    sb.append("\n    at ").append(frame);
+                    summary.append("\n    at ").append(frame);
                 }
-                LOGGER.warn("[CompanyGen][Watchdog]{}", sb);
+                LOGGER.warn("[CompanyGen][Watchdog]{}", summary);
             }
         });
     }

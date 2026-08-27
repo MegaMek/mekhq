@@ -57,7 +57,7 @@ import mekhq.campaign.unit.Unit;
  *
  * <p>Role assignment per seat is delegated to {@link PersonnelRoleResolver}. The commander (descriptor
  * from {@code ForceDescriptor.getCo()}) is the first Person; their name is overridden from the
- * descriptor when {@code overrideName} is true. All other crew are randomly named by MekHQ's standard
+ * descriptor when {@code overrideName} is {@code true}. All other crew are randomly named by MekHQ's standard
  * personnel generator.</p>
  */
 public final class MultiCrewAssembler {

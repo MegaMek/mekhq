@@ -150,7 +150,7 @@ public final class FormationIconBuilder {
 
     /**
      * Builds the LOGO / TYPE / BACKGROUND icon used for the campaign's root Formation. When
-     * {@code useLogo} is true and the faction has a logo, the LOGO layer is used; otherwise the
+     * {@code useLogo} is {@code true} and the faction has a logo, the LOGO layer is used; otherwise the
      * generic 'Mek-center silhouette goes into the TYPE layer as a fallback.
      */
     private static LayeredFormationIcon buildOriginIcon(Faction iconFaction, boolean useLogo,

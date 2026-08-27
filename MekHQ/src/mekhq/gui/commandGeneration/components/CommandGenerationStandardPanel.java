@@ -74,7 +74,7 @@ public class CommandGenerationStandardPanel extends JPanel {
      * @param name          the bundle-key suffix (used for the component name)
      * @param includeBorder when {@code true}, a rounded line border is applied
      * @param borderTitle   bundle-key suffix for the border title; final key is {@code lbl<borderTitle>.text}.
-     *                      Empty string yields an untitled border (when {@code includeBorder} is true).
+     *                      Empty string yields an untitled border (when {@code includeBorder} is {@code true}).
      */
     public CommandGenerationStandardPanel(String name, boolean includeBorder, String borderTitle) {
         String resolvedTitle = borderTitle.isBlank()

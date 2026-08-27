@@ -250,7 +250,7 @@ public class SparesAndFinancesTab {
 
         chkSelectStartingContract = new CommandGenerationCheckBox("SelectStartingContract");
         chkStartCourseToContractPlanet = new CommandGenerationCheckBox("StartCourseToContractPlanet");
-        chkSelectStartingContract.addActionListener(evt ->
+        chkSelectStartingContract.addActionListener(event ->
               chkStartCourseToContractPlanet.setEnabled(chkSelectStartingContract.isSelected()));
 
         constraints.gridy = 0;
@@ -280,12 +280,12 @@ public class SparesAndFinancesTab {
         spnMinimumStartingFloat.setName("spnMinimumStartingFloat");
         chkStartingLoan = new CommandGenerationCheckBox("StartingLoan");
 
-        chkProcessFinances.addActionListener(evt -> refreshFinanceEnablement());
-        chkRandomizeStartingCash.addActionListener(evt -> {
+        chkProcessFinances.addActionListener(event -> refreshFinanceEnablement());
+        chkRandomizeStartingCash.addActionListener(event -> {
             refreshFinanceEnablement();
             refreshStartingCashPreview();
         });
-        spnStartingCashPercent.addChangeListener(evt -> refreshStartingCashPreview());
+        spnStartingCashPercent.addChangeListener(event -> refreshStartingCashPreview());
 
         int row = 0;
         constraints.gridy = row++;
@@ -344,7 +344,7 @@ public class SparesAndFinancesTab {
             constraints.gridwidth = 2;
             section.add(chk, constraints);
         }
-        payForToggles.get("PayForSetup").addActionListener(evt -> refreshFinanceEnablement());
+        payForToggles.get("PayForSetup").addActionListener(event -> refreshFinanceEnablement());
 
         addFillers(section);
         return section;
@@ -411,7 +411,7 @@ public class SparesAndFinancesTab {
         chkSimulateRandomMarriages = new CommandGenerationCheckBox("SimulateRandomMarriages");
         chkSimulateRandomProcreation = new CommandGenerationCheckBox("SimulateRandomProcreation");
 
-        chkRunStartingSimulation.addActionListener(evt -> {
+        chkRunStartingSimulation.addActionListener(event -> {
             boolean sim = chkRunStartingSimulation.isSelected();
             spnSimulationDuration.setEnabled(sim);
             chkSimulateRandomMarriages.setEnabled(sim);

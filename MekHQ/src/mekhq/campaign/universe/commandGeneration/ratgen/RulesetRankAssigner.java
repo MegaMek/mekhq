@@ -382,7 +382,7 @@ public final class RulesetRankAssigner {
             case LANCE -> Rank.RWO_MAX + 3;       // Lieutenant
             case COMPANY -> Rank.RWO_MAX + 4;     // Captain
             case BATTALION -> Rank.RWO_MAX + 5;   // Major
-            case REGIMENT -> Rank.RWO_MAX + 8;    // Colonel (NOT O7 — O7 is empty in every IS rank XML)
+            case REGIMENT -> Rank.RWO_MAX + 8;    // Colonel (NOT O7 - O7 is empty in every IS rank XML)
             case BRIGADE -> Rank.RWO_MAX + 9;     // Brigadier General / Lieutenant General
             case DIVISION -> Rank.RWO_MAX + 10;   // Major General
             case CORPS -> Rank.RWO_MAX + 11;      // General
@@ -551,7 +551,7 @@ public final class RulesetRankAssigner {
                       person.getFullName(), targetRankSystem.getCode(), preferredIndex);
             }
         } else {
-            LOGGER.warn("[CompanyGen][RankAssign][RankSystem] targetRankSystem is null for person='{}' — leaving on existing system={} (this is the wrong-rank-names path)",
+            LOGGER.warn("[CompanyGen][RankAssign][RankSystem] targetRankSystem is null for person='{}' - leaving on existing system={} (this is the wrong-rank-names path)",
                   person.getFullName(),
                   person.getRankSystem() == null ? "null" : person.getRankSystem().getCode());
         }

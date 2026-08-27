@@ -32,6 +32,9 @@
  */
 package mekhq.gui.commandGeneration;
 
+import static mekhq.gui.commandGeneration.components.CommandGenerationUtilities.getCommandGenerationResourceBundle;
+import static mekhq.utilities.MHQInternationalization.getTextAt;
+
 import java.awt.BorderLayout;
 import java.awt.Dialog;
 import java.awt.Dimension;
@@ -76,7 +79,8 @@ public class GenerationProgressDialog extends JDialog {
         super(parent, "Generating Force", Dialog.ModalityType.APPLICATION_MODAL);
         LOGGER.info("[CompanyGen][Progress] constructed (thread={})", Thread.currentThread().getName());
 
-        statusLabel = new JLabel("Initializing...");
+        statusLabel = new JLabel(getTextAt(getCommandGenerationResourceBundle(),
+      "GenerationProgressDialog.initializing.text"));
         statusLabel.setBorder(BorderFactory.createEmptyBorder(0, 4, 8, 4));
 
         progressBar = new JProgressBar();

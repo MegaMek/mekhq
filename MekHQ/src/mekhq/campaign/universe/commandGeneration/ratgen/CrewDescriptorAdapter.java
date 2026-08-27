@@ -63,7 +63,7 @@ public final class CrewDescriptorAdapter {
     }
 
     /**
-     * Applies the descriptor's name (when {@code overrideName} is true) and its gunnery / piloting
+     * Applies the descriptor's name (when {@code overrideName} is {@code true}) and its gunnery / piloting
      * skill target numbers to the given Person. Skills are always applied; the name is gated by
      * {@code overrideName} so that only the commander on a multi-seat crew picks up the descriptor's
      * name while the rest share the descriptor's skill level but get random names.
@@ -123,7 +123,7 @@ public final class CrewDescriptorAdapter {
             LOGGER.info("[CompanyGen][Bloodname] applied bloodname='{}' to person='{}' (descriptor name='{}')",
                   descriptorBloodname, person.getFullName(), fullName);
         } else {
-            LOGGER.info("[CompanyGen][Bloodname] descriptor has no bloodname for person='{}' (descriptor name='{}' — Clan-only field, expected blank for IS forces)",
+            LOGGER.info("[CompanyGen][Bloodname] descriptor has no bloodname for person='{}' (descriptor name='{}' - Clan-only field, expected blank for IS forces)",
                   fullName, fullName);
         }
         person.setFullName();

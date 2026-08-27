@@ -401,12 +401,12 @@ public class SetupTab {
 
         // Enable/disable wiring: parent checkbox controls the radios + skill dropdown;
         // "as Personnel" radio controls whether the skill dropdown is live.
-        chkGenerateAstechs.addActionListener(evt -> refreshAstechEnablement());
-        rdoAstechsAsPool.addActionListener(evt -> refreshAstechEnablement());
-        rdoAstechsAsPersonnel.addActionListener(evt -> refreshAstechEnablement());
-        chkGenerateMedics.addActionListener(evt -> refreshMedicEnablement());
-        rdoMedicsAsPool.addActionListener(evt -> refreshMedicEnablement());
-        rdoMedicsAsPersonnel.addActionListener(evt -> refreshMedicEnablement());
+        chkGenerateAstechs.addActionListener(event -> refreshAstechEnablement());
+        rdoAstechsAsPool.addActionListener(event -> refreshAstechEnablement());
+        rdoAstechsAsPersonnel.addActionListener(event -> refreshAstechEnablement());
+        chkGenerateMedics.addActionListener(event -> refreshMedicEnablement());
+        rdoMedicsAsPool.addActionListener(event -> refreshMedicEnablement());
+        rdoMedicsAsPersonnel.addActionListener(event -> refreshMedicEnablement());
 
         // Layout
         constraints.gridy = 0;
@@ -446,7 +446,7 @@ public class SetupTab {
         chkGenerateMedicalReserve = new CommandGenerationCheckBox("GenerateMedicalReserve");
         spnMedicalReservePercent = new JSpinner(new SpinnerNumberModel(10, 0, 100, 5));
         spnMedicalReservePercent.setToolTipText(chkGenerateMedicalReserve.getToolTipText());
-        chkGenerateMedicalReserve.addActionListener(evt ->
+        chkGenerateMedicalReserve.addActionListener(event ->
               spnMedicalReservePercent.setEnabled(chkGenerateMedicalReserve.isSelected()));
         constraints.gridy = 6;
         constraints.gridx = 0;
@@ -504,11 +504,11 @@ public class SetupTab {
         cmbTechAssignmentSecondaryDirection = new MMComboBox<>("cmbTechAssignmentSecondaryDirection", SORT_DIRECTIONS);
         cmbTechAssignmentTertiaryDirection = new MMComboBox<>("cmbTechAssignmentTertiaryDirection", SORT_DIRECTIONS);
 
-        chkAssignTechsToUnits.addActionListener(evt -> refreshTechAssignmentEnablement());
+        chkAssignTechsToUnits.addActionListener(event -> refreshTechAssignmentEnablement());
         // Each factor combo toggles its own direction combo when set to NONE.
-        cmbTechAssignmentPrimary.addActionListener(evt -> refreshTechAssignmentEnablement());
-        cmbTechAssignmentSecondary.addActionListener(evt -> refreshTechAssignmentEnablement());
-        cmbTechAssignmentTertiary.addActionListener(evt -> refreshTechAssignmentEnablement());
+        cmbTechAssignmentPrimary.addActionListener(event -> refreshTechAssignmentEnablement());
+        cmbTechAssignmentSecondary.addActionListener(event -> refreshTechAssignmentEnablement());
+        cmbTechAssignmentTertiary.addActionListener(event -> refreshTechAssignmentEnablement());
 
         // Row 0: master enable checkbox spans all columns.
         constraints.gridy = 0;
@@ -577,14 +577,14 @@ public class SetupTab {
         chkPrioritizeCompanyCommanderCombatSkills =
               new CommandGenerationCheckBox("PrioritizeCompanyCommanderCombatSkills");
         indentAsSubOption(chkPrioritizeCompanyCommanderCombatSkills);
-        chkAssignBestCompanyCommander.addActionListener(evt ->
+        chkAssignBestCompanyCommander.addActionListener(event ->
               chkPrioritizeCompanyCommanderCombatSkills.setEnabled(chkAssignBestCompanyCommander.isSelected()));
 
         chkAssignBestOfficers = new CommandGenerationCheckBox("AssignBestOfficers");
         chkPrioritizeOfficerCombatSkills =
               new CommandGenerationCheckBox("PrioritizeOfficerCombatSkills");
         indentAsSubOption(chkPrioritizeOfficerCombatSkills);
-        chkAssignBestOfficers.addActionListener(evt ->
+        chkAssignBestOfficers.addActionListener(event ->
               chkPrioritizeOfficerCombatSkills.setEnabled(chkAssignBestOfficers.isSelected()));
 
         chkAssignMostSkilledToPrimaryLances = new CommandGenerationCheckBox("AssignMostSkilledToPrimaryLances");
@@ -617,7 +617,7 @@ public class SetupTab {
         chkAutomaticallyAssignRanks = new CommandGenerationCheckBox("AutomaticallyAssignRanks");
         chkUseSpecifiedFactionToAssignRanks = new CommandGenerationCheckBox("UseSpecifiedFactionToAssignRanks");
         indentAsSubOption(chkUseSpecifiedFactionToAssignRanks);
-        chkAutomaticallyAssignRanks.addActionListener(evt ->
+        chkAutomaticallyAssignRanks.addActionListener(event ->
               chkUseSpecifiedFactionToAssignRanks.setEnabled(chkAutomaticallyAssignRanks.isSelected()));
         chkAssignMekWarriorsCallSigns = new CommandGenerationCheckBox("AssignMekWarriorsCallSigns");
         chkAssignFounderFlag = new CommandGenerationCheckBox("AssignFounderFlag");
