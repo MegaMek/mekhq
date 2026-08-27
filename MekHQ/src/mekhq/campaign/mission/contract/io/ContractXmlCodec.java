@@ -113,10 +113,9 @@ public final class ContractXmlCodec {
         MHQXMLUtility.writeSimpleXMLTag(printWriter, indent, "scale", contract.getScale());
         MHQXMLUtility.writeSimpleXMLTag(printWriter, indent, "trackCount", contract.getTrackCount());
         // The scenario schedule carries a random roll's result, so it is persisted rather than re-derived on load.
-        if (contract.getScenarioSchedule() != null) {
+        if (!contract.getScenarioSchedule().isEmpty()) {
             MHQXMLUtility.writeSimpleXMLTag(printWriter, indent, "scenarioSchedule",
                   contract.getScenarioSchedule()
-                        .monthlyTrackCounts()
                         .stream()
                         .map(String::valueOf)
                         .collect(Collectors.joining(",")));
@@ -822,13 +821,13 @@ public final class ContractXmlCodec {
 
     /**
      * Parses the comma-separated per-month track counts of a scenario schedule. A blank or empty value yields an empty
-     * schedule; a non-numeric token aborts parsing and drops the schedule, since a partial one would misrepresent the
-     * contract's cadence.
+     * schedule; a non-numeric token aborts parsing and drops the schedule (returning empty), since a partial one would
+     * misrepresent the contract's cadence.
      */
-    private static @Nullable ContractScenarioSchedule parseScenarioSchedule(final Node wn) {
+    private static java.util.List<Integer> parseScenarioSchedule(final Node wn) {
         final String raw = text(wn).trim();
         if (raw.isEmpty()) {
-            return new ContractScenarioSchedule(java.util.List.of());
+            return java.util.List.of();
         }
 
         final java.util.List<Integer> monthlyTrackCounts = new java.util.ArrayList<>();
@@ -841,10 +840,10 @@ public final class ContractXmlCodec {
                 monthlyTrackCounts.add(Integer.parseInt(trimmed));
             } catch (NumberFormatException ex) {
                 LOGGER.warn("Malformed scenario schedule entry '{}' - dropping the schedule.", trimmed);
-                return null;
+                return java.util.List.of();
             }
         }
-        return new ContractScenarioSchedule(monthlyTrackCounts);
+        return monthlyTrackCounts;
     }
 
     private static final class SystemsTargetBuilder {

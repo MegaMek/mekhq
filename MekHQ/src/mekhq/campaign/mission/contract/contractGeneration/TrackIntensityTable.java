@@ -35,8 +35,9 @@ package mekhq.campaign.mission.contract.contractGeneration;
 import static megamek.common.compute.Compute.d6;
 
 import java.util.Arrays;
+import java.util.List;
 
-import mekhq.campaign.mission.contract.contractData.ContractScenarioSchedule;
+import mekhq.campaign.mission.contract.contractData.ContractIntensityData;
 
 /**
  * The Hot Spots Draconis Reach Track Intensity Tables (Hot Spots Draconis Reach, "Track Intensity Tables", pg 147),
@@ -116,19 +117,20 @@ public final class TrackIntensityTable {
      * @param lengthInMonths the contract's length in months, choosing which table applies
      * @param trackCount     the contract's StratCon track count, choosing the table column
      *
-     * @return a schedule distributing {@code trackCount} tracks across the chosen table's months
+     * @return the scenario schedule as per-month track counts, distributing {@code trackCount} tracks across the chosen
+     *       table's months
      */
-    public static ContractScenarioSchedule rollSchedule(int lengthInMonths, int trackCount) {
+    public static List<Integer> rollSchedule(int lengthInMonths, int trackCount) {
         final int[][][] table = (lengthInMonths <= SHORT_TABLE_MAX_MONTHS) ? THREE_MONTH_TABLE : SIX_MONTH_TABLE;
         final int nativeMonths = table[0][0].length;
 
         if (trackCount <= 0) {
-            return ContractScenarioSchedule.empty(nativeMonths);
+            return ContractIntensityData.emptySchedule(nativeMonths);
         }
 
         final int column = Math.min(trackCount, table[0].length);
         final int[] cell = table[d6() - 1][column - 1];
 
-        return new ContractScenarioSchedule(Arrays.stream(cell).boxed().toList());
+        return Arrays.stream(cell).boxed().toList();
     }
 }
