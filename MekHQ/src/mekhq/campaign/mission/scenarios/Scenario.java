@@ -78,6 +78,11 @@ import org.w3c.dom.NodeList;
 public class Scenario implements IPlayerSettings {
     private static final MMLogger LOGGER = MMLogger.create(Scenario.class);
 
+    // Package prefixes for remapping scenario class names persisted before the organization refactoring moved the
+    // scenario classes into the scenarios subpackage. See remapLegacyScenarioPackage.
+    private static final String LEGACY_SCENARIO_PACKAGE = "mekhq.campaign.mission.";
+    private static final String CURRENT_SCENARIO_PACKAGE = "mekhq.campaign.mission.scenarios.";
+
     // region Variable Declarations
     public static final int S_DEFAULT_ID = -1;
 
@@ -1158,7 +1163,7 @@ public class Scenario implements IPlayerSettings {
         Scenario retVal = null;
         NamedNodeMap attrs = wn.getAttributes();
         Node classNameNode = attrs.getNamedItem("type");
-        String className = classNameNode.getTextContent();
+        String className = remapLegacyScenarioPackage(classNameNode.getTextContent());
 
         try {
             // Instantiate the correct child class, and call its parsing function.
@@ -1367,6 +1372,26 @@ public class Scenario implements IPlayerSettings {
         }
 
         return retVal;
+    }
+
+    /**
+     * Rewrites a scenario's persisted {@code type} class name from its pre-refactoring package to the current one.
+     *
+     * <p>The scenario classes were relocated from {@code mekhq.campaign.mission} to
+     * {@code mekhq.campaign.mission.scenarios} during the organization refactoring. Saves written before that move
+     * store the old fully-qualified names, which no longer resolve via {@link Class#forName(String)} and would cause
+     * the scenario - StratCon scenarios included - to be dropped on load. Since every instantiable {@code Scenario}
+     * subtype now lives under the {@code scenarios} package, an already-current name is left untouched.</p>
+     *
+     * @param className the class name read from the {@code type} attribute
+     *
+     * @return the class name mapped into the current package, or the input unchanged if no remapping applies
+     */
+    private static String remapLegacyScenarioPackage(String className) {
+        if (className.startsWith(LEGACY_SCENARIO_PACKAGE) && !className.startsWith(CURRENT_SCENARIO_PACKAGE)) {
+            return CURRENT_SCENARIO_PACKAGE + className.substring(LEGACY_SCENARIO_PACKAGE.length());
+        }
+        return className;
     }
 
     protected static List<String> getEntityStub(Node wn) {
