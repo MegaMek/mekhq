@@ -2633,6 +2633,14 @@ public class StratConRulesManager {
         scenario.setBackingScenario(backingScenario);
         scenario.setCoords(coords);
 
+        // A scenario sitting on a strategic-objective facility - one the player must retain, capture, or destroy - is
+        // itself Essential: its outcome decides that facility's fate. Flag it so it is treated like any other
+        // strategic-objective scenario (Essential marker, combat bonus on victory, barred from being a Turning Point).
+        StratConFacility facilityAtCoords = (coords == null) ? null : track.getFacility(coords);
+        if ((facilityAtCoords != null) && facilityAtCoords.isStrategicObjective()) {
+            scenario.setStrategicObjective(true);
+        }
+
         // by default, certain conditions may make this bigger
         scenario.setRequiredPlayerLances(1);
 
