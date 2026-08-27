@@ -769,6 +769,8 @@ public final class CampaignOption<T> {
           of(Boolean.class, true, "useChaosSupportPointConversion");
     public static final CampaignOption<Boolean> USE_CHAOS_SCALE_SUPPORT_POINT_CONVERSION =
           of(Boolean.class, true, "useChaosScaleSupportPointConversion");
+    public static final CampaignOption<Boolean> MULTIPLY_TRACK_INTENSITY_BY_SCALE =
+          of(Boolean.class, true, "multiplyTrackIntensityByScale");
     public static final CampaignOption<Boolean> USE_CONTRACT_FACTION_MODIFIERS =
           of(Boolean.class, true, "useContractFactionModifiers");
     public static final CampaignOption<Boolean> USE_INTEL_OBFUSCATION =

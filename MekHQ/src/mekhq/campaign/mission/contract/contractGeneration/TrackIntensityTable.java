@@ -107,12 +107,9 @@ public final class TrackIntensityTable {
           };
 
     /**
-     * Rolls a scenario schedule for a contract from the Track Intensity Tables.
+     * Rolls a scenario schedule for a contract from the Track Intensity Tables with a single 1D6 roll.
      *
-     * <p>The contract's length picks the table, its track count picks the column, and a 1D6 roll picks the row. A
-     * contract with no tracks gets an empty schedule (every month zero) spanning the chosen table's native length. A
-     * track count above the table's widest column is clamped to it, so an unusually track-heavy short contract still
-     * resolves.</p>
+     * <p>Equivalent to {@link #rollSchedule(int, int, int)} with one roll.</p>
      *
      * @param lengthInMonths the contract's length in months, choosing which table applies
      * @param trackCount     the contract's StratCon track count, choosing the table column
@@ -121,16 +118,42 @@ public final class TrackIntensityTable {
      *       table's months
      */
     public static List<Integer> rollSchedule(int lengthInMonths, int trackCount) {
+        return rollSchedule(lengthInMonths, trackCount, 1);
+    }
+
+    /**
+     * Rolls a scenario schedule for a contract from the Track Intensity Tables, combining several rolls.
+     *
+     * <p>The contract's length picks the table and its track count picks the column. Each of {@code rollCount} rolls
+     * is an independent 1D6 that picks a row; the chosen rows are summed month by month, so {@code rollCount} rolls
+     * yield roughly {@code rollCount} times the intensity (each row for the column sums to the track count, so the
+     * combined schedule sums to {@code rollCount * trackCount}). A contract with no tracks - or no rolls - gets an
+     * empty schedule (every month zero) spanning the chosen table's native length. A track count above the table's
+     * widest column is clamped to it, so an unusually track-heavy short contract still resolves.</p>
+     *
+     * @param lengthInMonths the contract's length in months, choosing which table applies
+     * @param trackCount     the contract's StratCon track count, choosing the table column
+     * @param rollCount      how many 1D6 rolls to combine (e.g. the contract's scale)
+     *
+     * @return the scenario schedule as per-month track counts, summed across all rolls
+     */
+    public static List<Integer> rollSchedule(int lengthInMonths, int trackCount, int rollCount) {
         final int[][][] table = (lengthInMonths <= SHORT_TABLE_MAX_MONTHS) ? THREE_MONTH_TABLE : SIX_MONTH_TABLE;
         final int nativeMonths = table[0][0].length;
 
-        if (trackCount <= 0) {
+        if (trackCount <= 0 || rollCount <= 0) {
             return ContractIntensityData.emptySchedule(nativeMonths);
         }
 
         final int column = Math.min(trackCount, table[0].length);
-        final int[] cell = table[d6() - 1][column - 1];
+        final int[] monthlyTracks = new int[nativeMonths];
+        for (int roll = 0; roll < rollCount; roll++) {
+            final int[] cell = table[d6() - 1][column - 1];
+            for (int month = 0; month < nativeMonths; month++) {
+                monthlyTracks[month] += cell[month];
+            }
+        }
 
-        return Arrays.stream(cell).boxed().toList();
+        return Arrays.stream(monthlyTracks).boxed().toList();
     }
 }

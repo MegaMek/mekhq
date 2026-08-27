@@ -639,7 +639,16 @@ public class AbstractContractGeneration {
 
         // Scenario schedule - spread the (already determined) track count across the contract's months via the Track
         // Intensity Tables. Nothing consumes this yet; it is generated and stored for a later feature.
-        contract.setScenarioSchedule(TrackIntensityTable.rollSchedule(monthsLength, contract.getTrackCount()));
+        //
+        // Hot Spots Draconis Reach sizes each scenario by the contract's scale. When "Multiply Track Intensity by
+        // Scale" is set (the default MekHQ behavior), we instead roll the intensity table once per point of scale and
+        // sum the results, so the contract's combat volume grows with scale while each scenario keeps its rolled size -
+        // letting a player deploy smaller formations (e.g. lances). Otherwise, a single roll is made.
+        int rollCount = campaign.getCampaignOptions().get(CampaignOption.MULTIPLY_TRACK_INTENSITY_BY_SCALE)
+                              ? contract.getScale()
+                              : 1;
+        contract.setScenarioSchedule(TrackIntensityTable.rollSchedule(monthsLength, contract.getTrackCount(),
+              rollCount));
     }
 
     private static @Nonnull EnemyData pickEnemy(Campaign campaign, LocalDate currentDate, ILocation currentLocation,

@@ -109,6 +109,7 @@ class ContractMarketPage {
     private JCheckBox chkUseDynamicDifficulty;
     private JCheckBox chkUseBolsterContractSkill;
     private JCheckBox chkUseChaosScaleSupportPointConversion;
+    private JCheckBox chkMultiplyTrackIntensityByScale;
     private JCheckBox chkUseContractFactionModifiers;
     private JCheckBox chkUseIntelObfuscation;
     private JCheckBox chkUseNonNegotiableTerms;
@@ -262,6 +263,11 @@ class ContractMarketPage {
         chkUseChaosScaleSupportPointConversion.addMouseListener(
                 createTipPanelUpdater("UseChaosScaleSupportPointConversion"));
 
+        chkMultiplyTrackIntensityByScale = new CampaignOptionsCheckBox("MultiplyTrackIntensityByScale",
+              getMetadata(new Version(0, 51, 1), CUSTOM_SYSTEM));
+        chkMultiplyTrackIntensityByScale.addMouseListener(
+              createTipPanelUpdater("MultiplyTrackIntensityByScale"));
+
         chkUseContractFactionModifiers = new CampaignOptionsCheckBox("UseContractFactionModifiers",
               getMetadata(new Version(0, 51, 1), CUSTOM_SYSTEM));
         chkUseContractFactionModifiers.addMouseListener(createTipPanelUpdater("UseContractFactionModifiers"));
@@ -320,6 +326,7 @@ class ContractMarketPage {
               chkUseDynamicDifficulty,
                 chkUseBolsterContractSkill,
               chkUseChaosScaleSupportPointConversion,
+              chkMultiplyTrackIntensityByScale,
               chkUseContractFactionModifiers,
               chkUseIntelObfuscation,
               chkUseNonNegotiableTerms,
@@ -647,6 +654,7 @@ class ContractMarketPage {
         chkUseDynamicDifficulty.setSelected(model.useDynamicDifficulty);
         chkUseBolsterContractSkill.setSelected(model.useBolsterContractSkill);
         chkUseChaosScaleSupportPointConversion.setSelected(model.useChaosScaleSupportPointConversion);
+        chkMultiplyTrackIntensityByScale.setSelected(model.multiplyTrackIntensityByScale);
         chkUseContractFactionModifiers.setSelected(model.useContractFactionModifiers);
         chkUseIntelObfuscation.setSelected(model.useIntelObfuscation);
         chkUseNonNegotiableTerms.setSelected(model.useNonNegotiableTerms);
@@ -702,6 +710,7 @@ class ContractMarketPage {
         model.useDynamicDifficulty = chkUseDynamicDifficulty.isSelected();
         model.useBolsterContractSkill = chkUseBolsterContractSkill.isSelected();
         model.useChaosScaleSupportPointConversion = chkUseChaosScaleSupportPointConversion.isSelected();
+        model.multiplyTrackIntensityByScale = chkMultiplyTrackIntensityByScale.isSelected();
         model.useContractFactionModifiers = chkUseContractFactionModifiers.isSelected();
         model.useIntelObfuscation = chkUseIntelObfuscation.isSelected();
         model.useNonNegotiableTerms = chkUseNonNegotiableTerms.isSelected();
