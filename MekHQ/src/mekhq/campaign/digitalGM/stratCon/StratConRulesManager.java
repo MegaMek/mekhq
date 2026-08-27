@@ -67,6 +67,7 @@ import static mekhq.campaign.personnel.skills.SkillType.S_ADMIN;
 import static mekhq.campaign.personnel.skills.SkillType.S_TACTICS;
 import static mekhq.utilities.EntityUtilities.hasActiveProbe;
 import static mekhq.utilities.EntityUtilities.hasImprovedSensors;
+import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
 import static mekhq.utilities.MHQInternationalization.getTextAt;
 import static mekhq.utilities.ReportingUtilities.CLOSING_SPAN_TAG;
 import static mekhq.utilities.ReportingUtilities.spanOpeningWithCustomColor;
@@ -101,10 +102,13 @@ import mekhq.campaign.digitalGM.stratCon.sectorGeneration.StratConOceanPlacer;
 import mekhq.campaign.digitalGM.stratCon.sectorGeneration.StratConRoadPlacer;
 import mekhq.campaign.events.StratConDeploymentEvent;
 import mekhq.campaign.events.scenarios.ScenarioChangedEvent;
+import mekhq.campaign.finances.Money;
+import mekhq.campaign.finances.enums.TransactionType;
 import mekhq.campaign.force.CombatTeam;
 import mekhq.campaign.force.Formation;
 import mekhq.campaign.mission.contract.AbstractContract;
 import mekhq.campaign.mission.contract.contractData.ContractCommandRights;
+import mekhq.campaign.mission.contract.contractData.ContractFinanceData;
 import mekhq.campaign.mission.contract.contractData.ContractMoraleLevel;
 import mekhq.campaign.mission.scenarios.AtBDynamicScenario;
 import mekhq.campaign.mission.scenarios.AtBDynamicScenarioFactory;
@@ -3754,6 +3758,13 @@ public class StratConRulesManager {
                 // in case any objectives are linked to the scenario's coordinates
                 updateStrategicObjectives(victory, scenario, track);
 
+                // Winning an Essential (strategic-objective) scenario pays the contract's combat bonus. Combat pay is a
+                // per-battle figure set at negotiation (and divided by scale when track intensity is multiplied by
+                // scale), so the player earns it each time they secure one of these objectives.
+                if (victory && scenario.isStrategicObjective()) {
+                    awardCombatBonus(campaign, mission);
+                }
+
                 if ((facility != null) && (facility.getOwnershipChangeScore() > 0)) {
                     switchFacilityOwner(facility);
                 }
@@ -3816,6 +3827,30 @@ public class StratConRulesManager {
         }
     }
 
+
+    /**
+     * Credits the contract's combat bonus to the player for winning an Essential (strategic-objective) scenario.
+     *
+     * <p>Combat pay is the per-battle bonus agreed during contract negotiation; it is paid out here, once per secured
+     * Essential objective, rather than as a lump sum. Does nothing when the contract carries no positive combat
+     * pay.</p>
+     *
+     * @param campaign the campaign whose finances receive the bonus
+     * @param contract the contract supplying the combat-pay figure
+     */
+    private static void awardCombatBonus(Campaign campaign, AbstractContract contract) {
+        ContractFinanceData financeData = contract.getContractFinanceData();
+        Money combatPay = (financeData == null) ? null : financeData.combatPay();
+        if ((combatPay == null) || !combatPay.isPositive()) {
+            return;
+        }
+
+        campaign.getPlayerForce().getFinances().credit(TransactionType.CONTRACT_PAYMENT, campaign.getLocalDate(),
+              combatPay,
+              getFormattedTextAt(RESOURCE_BUNDLE, "StratConRulesManager.combatBonus.reason", contract.getName()));
+        campaign.addReport(BATTLE, getFormattedTextAt(RESOURCE_BUNDLE, "StratConRulesManager.combatBonus.report",
+              combatPay.toAmountAndSymbolString()));
+    }
 
     /**
      * Worker function that updates strategic objectives relevant to the passed in scenario, track and campaign state.
