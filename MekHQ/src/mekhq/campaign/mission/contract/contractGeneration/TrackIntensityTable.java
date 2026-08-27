@@ -50,8 +50,11 @@ import mekhq.campaign.mission.contract.contractData.ContractIntensityData;
  *
  * <p>The published tables assume contracts of exactly three or six months. When variable contract lengths yield
  * something else, the shorter table serves the shorter contracts and the longer table the rest (see
- * {@link #SHORT_TABLE_MAX_MONTHS}); the returned schedule then spans the table's native length rather than the
- * contract's, which is fine while nothing yet reads it against the calendar.</p>
+ * {@link #SHORT_TABLE_MAX_MONTHS}); the returned schedule therefore spans the chosen table's native length (three or
+ * six entries) rather than the contract's actual month count. Callers that read the schedule against the calendar must
+ * map it onto the real contract duration - a schedule longer than the contract has to fold its tail into the final
+ * month rather than dropping it, and a shorter one simply leaves the later months empty (see
+ * {@code StratConContractInitializer#scheduleStrategicScenarioSpawnDates}).</p>
  */
 public final class TrackIntensityTable {
     private TrackIntensityTable() {}

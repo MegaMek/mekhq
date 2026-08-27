@@ -51,8 +51,11 @@ import mekhq.campaign.mission.contract.AbstractContract;
  * @param monthlyTrackCounts     the scenario schedule: how those tracks are spread across the contract's months, rolled
  *                               from the Hot Spots Draconis Reach Track Intensity Tables. Entry {@code i} is the number
  *                               of tracks that fall in month {@code i} (zero-based), so the entries sum to
- *                               {@code trackCount}. Never {@code null}; empty until a schedule has been generated, and
- *                               nothing consumes it yet.
+ *                               {@code trackCount}. Never {@code null}; empty until a schedule has been generated.
+ *                               StratCon consumes it to stagger strategic-objective scenario spawns across the
+ *                               contract's run (see {@code StratConContractInitializer}); because the schedule spans
+ *                               the source table's native length rather than the contract's, that consumer folds any
+ *                               overflow tail into the final month.
  */
 public record ContractIntensityData(int scale, int requiredCombatElements, int requiredVictoryPoints, int trackCount,
       List<Integer> monthlyTrackCounts) {
