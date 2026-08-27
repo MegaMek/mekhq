@@ -154,8 +154,6 @@ public class SparesAndFinancesTab {
         // three stacked sections.
         JPanel leftColumn = new JPanel();
         leftColumn.setLayout(new BoxLayout(leftColumn, BoxLayout.Y_AXIS));
-        leftColumn.add(buildHelpSection());
-        leftColumn.add(Box.createVerticalStrut(UIUtil.scaleForGUI(6)));
         leftColumn.add(buildSparesSection());
         constraints.gridx = 0;
         constraints.gridy = 0;
@@ -205,8 +203,22 @@ public class SparesAndFinancesTab {
               "SparesOther"
         };
 
-        int row = 0;
-        for (String key : keys) {
+        // The explanation heads the section it explains. The bundle text carries a fixed HTML body width
+        // so the label wraps; an unconstrained HTML JLabel reports its whole text as one line of preferred
+        // width, which inflated this column until the finances column was pushed off-screen.
+        constraints.gridy = 0;
+        constraints.gridx = 0;
+        // Spans into the filler column too, so the text's width is absorbed there rather than spread across
+        // the four part columns, which stretched the right-hand spinners.
+        constraints.gridwidth = GridBagConstraints.REMAINDER;
+        section.add(new CommandGenerationLabel("SparesHelpBody", true), constraints);
+        constraints.gridwidth = 1;
+
+        // Two columns of part-and-spinner pairs: thirteen rows in one column made this the tallest thing
+        // on the tab, with the finances column finishing well above it.
+        int perColumn = (keys.length + 1) / 2;
+        for (int index = 0; index < keys.length; index++) {
+            String key = keys[index];
             JSpinner spinner = new JSpinner(new SpinnerNumberModel(100, MIN_PERCENT, MAX_PERCENT, STEP_PERCENT));
             spinner.setName("spn" + key);
             spinners.put(key, spinner);
@@ -214,29 +226,15 @@ public class SparesAndFinancesTab {
             JLabel label = new CommandGenerationLabel(key);
             label.setLabelFor(spinner);
 
-            constraints.gridy = row;
-            constraints.gridx = 0;
+            boolean leftColumn = index < perColumn;
+            constraints.gridy = 1 + (leftColumn ? index : index - perColumn);
+            constraints.gridx = leftColumn ? 0 : 2;
             section.add(label, constraints);
-            constraints.gridx = 1;
+            constraints.gridx = leftColumn ? 1 : 3;
             section.add(spinner, constraints);
-            row++;
         }
 
-        return section;
-    }
-
-    private JPanel buildHelpSection() {
-        CommandGenerationStandardPanel section = new CommandGenerationStandardPanel(
-              "SparesHelp", true, "SparesHelp");
-        section.setLayout(new GridBagLayout());
-        GridBagConstraints constraints = sectionConstraints();
-        constraints.gridy = 0;
-        constraints.gridwidth = 2;
-        constraints.fill = GridBagConstraints.HORIZONTAL;
-        // The bundle text carries a fixed HTML body width so the label wraps; an unconstrained HTML
-        // JLabel reports its whole text as one line of preferred width, which inflated this column
-        // until the finances column was pushed off-screen.
-        section.add(new CommandGenerationLabel("SparesHelpBody", true), constraints);
+        addFillers(section);
         return section;
     }
 
@@ -260,6 +258,7 @@ public class SparesAndFinancesTab {
         constraints.gridy = 1;
         section.add(chkStartCourseToContractPlanet, constraints);
 
+        addFillers(section);
         return section;
     }
 
@@ -347,6 +346,7 @@ public class SparesAndFinancesTab {
         }
         payForToggles.get("PayForSetup").addActionListener(evt -> refreshFinanceEnablement());
 
+        addFillers(section);
         return section;
     }
 
@@ -439,10 +439,34 @@ public class SparesAndFinancesTab {
         constraints.gridy = row;
         section.add(chkSimulateRandomProcreation, constraints);
 
+        addFillers(section);
         return section;
     }
 
     // endregion Finances column
+
+    /** A grid row and column no section reaches, so the fillers always land past the last control. */
+    private static final int FILLER_INDEX = 99;
+
+    /**
+     * Pins a section's controls to its top-left. Without fillers, GridBag centres the controls in whatever space
+     * the section is given: a column stretched to match its neighbour showed its rows floating mid-box, and a
+     * checkbox list sat centred under its title instead of against the margin.
+     */
+    private static void addFillers(JPanel section) {
+        GridBagConstraints slack = new GridBagConstraints();
+        slack.gridx = FILLER_INDEX;
+        slack.gridy = 0;
+        slack.weightx = 1.0;
+        slack.fill = GridBagConstraints.HORIZONTAL;
+        section.add(Box.createHorizontalGlue(), slack);
+        slack = new GridBagConstraints();
+        slack.gridx = 0;
+        slack.gridy = FILLER_INDEX;
+        slack.weighty = 1.0;
+        slack.fill = GridBagConstraints.VERTICAL;
+        section.add(Box.createVerticalGlue(), slack);
+    }
 
     private static GridBagConstraints sectionConstraints() {
         GridBagConstraints constraints = new GridBagConstraints();

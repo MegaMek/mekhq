@@ -114,6 +114,9 @@ public class SetupTab {
     private static final int COVERAGE_SPINNER_MIN = 0;
     private static final int COVERAGE_SPINNER_MAX = 300;
     private static final int COVERAGE_SPINNER_STEP = 5;
+    /** A grid row no section reaches, so the vertical filler always lands below the last control. */
+    private static final int BOTTOM_SLACK_ROW = 99;
+
     private static final int COVERAGE_SPINNER_DEFAULT = 100;
 
     /**
@@ -268,28 +271,20 @@ public class SetupTab {
         constraints.insets = new Insets(UIUtil.scaleForGUI(3), UIUtil.scaleForGUI(6),
               UIUtil.scaleForGUI(3), UIUtil.scaleForGUI(6));
 
-        // Row 0: Force Shape spans the full width — it's only two controls so giving it both
-        // columns avoids leaving an awkward gap on the right.
-        constraints.gridx = 0;
-        constraints.gridy = 0;
-        constraints.gridwidth = 2;
-        constraints.weightx = 1.0;
-        panel.add(buildForceShapeSection(), constraints);
-
-        // Row 1: Temporary Crew on the left, Support Personnel on the right. The support section stacks
+        // Row 0: Temporary Crew on the left, Support Personnel on the right. The support section stacks
         // its roles in one column so it fits half the width.
         constraints.gridx = 0;
-        constraints.gridy = 1;
+        constraints.gridy = 0;
         constraints.gridwidth = 1;
         constraints.weightx = 0.5;
         panel.add(buildTemporaryCrewSection(), constraints);
         constraints.gridx = 1;
-        constraints.gridy = 1;
+        constraints.gridy = 0;
         constraints.gridwidth = 1;
         constraints.weightx = 0.5;
         panel.add(buildSupportPersonnelSection(), constraints);
 
-        // Row 2: left column stacks Assistants + Naming & Ranks; right column stacks Officer
+        // Row 1: left column stacks Assistants + Naming & Ranks; right column stacks Officer
         // Selection + Tech Assignment. Officer Selection is the tallest single section in the tab,
         // and Tech Assignment is small (4 rows), so the right-column stack roughly matches the
         // height of the left-column pair.
@@ -299,7 +294,7 @@ public class SetupTab {
         leftColumn.add(Box.createVerticalStrut(UIUtil.scaleForGUI(6)));
         leftColumn.add(buildNamingAndRanksSection());
         constraints.gridx = 0;
-        constraints.gridy = 2;
+        constraints.gridy = 1;
         constraints.gridwidth = 1;
         constraints.weightx = 0.5;
         panel.add(leftColumn, constraints);
@@ -312,70 +307,20 @@ public class SetupTab {
         rightColumn.add(Box.createVerticalStrut(UIUtil.scaleForGUI(6)));
         rightColumn.add(buildAugmentationSection());
         constraints.gridx = 1;
-        constraints.gridy = 2;
+        constraints.gridy = 1;
         constraints.gridwidth = 1;
         constraints.weightx = 0.5;
         panel.add(rightColumn, constraints);
 
-        // Row 3: Random Origin spans full width — it's a dense sub-panel with its own internal
+        // Row 2: Random Origin spans full width — it's a dense sub-panel with its own internal
         // layout, so giving it the whole width keeps its controls from being cramped.
         constraints.gridx = 0;
-        constraints.gridy = 3;
+        constraints.gridy = 2;
         constraints.gridwidth = 2;
         constraints.weightx = 1.0;
         panel.add(buildRandomOriginSection(), constraints);
 
         return panel;
-    }
-
-    private JPanel buildForceShapeSection() {
-        CommandGenerationStandardPanel section = new CommandGenerationStandardPanel(
-              "ForceShape", true, "ForceShape");
-        section.setLayout(new GridBagLayout());
-        GridBagConstraints constraints = sectionConstraints();
-
-        comboForceNamingMethod = new MMComboBox<>("comboForceNamingMethod", ForceNamingMethod.values());
-        comboForceNamingMethod.setRenderer(new DefaultListCellRenderer() {
-            @Override
-            public java.awt.Component getListCellRendererComponent(javax.swing.JList<?> list, Object value,
-                  int index, boolean isSelected, boolean cellHasFocus) {
-                super.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);
-                if (value instanceof ForceNamingMethod namingMethod) {
-                    // Append the first-three preview inline so the user can see what each scheme
-                    // produces without hovering for the tooltip.
-                    setText(namingMethod.toString() + " - " + namingMethod.getExample());
-                    list.setToolTipText(namingMethod.getToolTipText());
-                }
-                return this;
-            }
-        });
-        comboForceNamingMethod.addActionListener(actionEvent -> {
-            if (namingMethodChangeListener != null) {
-                namingMethodChangeListener.run();
-            }
-        });
-
-        chkAlwaysNumberRegiments = new CommandGenerationCheckBox("AlwaysNumberRegiments");
-        chkAlwaysNumberRegiments.addActionListener(actionEvent -> {
-            if (namingMethodChangeListener != null) {
-                namingMethodChangeListener.run();
-            }
-        });
-
-        constraints.gridwidth = 1;
-        constraints.gridy = 1;
-        constraints.gridx = 0;
-        section.add(new CommandGenerationLabel("ForceNamingMethod"), constraints);
-        constraints.gridx = 1;
-        section.add(comboForceNamingMethod, constraints);
-
-        constraints.gridwidth = 2;
-        constraints.gridy = 2;
-        constraints.gridx = 0;
-        section.add(chkAlwaysNumberRegiments, constraints);
-
-        addLeftAlignFiller(section, 3);
-        return section;
     }
 
     private JPanel buildSupportPersonnelSection() {
@@ -690,13 +635,56 @@ public class SetupTab {
         chkAssignMekWarriorsCallSigns = new CommandGenerationCheckBox("AssignMekWarriorsCallSigns");
         chkAssignFounderFlag = new CommandGenerationCheckBox("AssignFounderFlag");
 
-        stack(section, constraints,
-              chkAutomaticallyAssignRanks,
-              chkUseSpecifiedFactionToAssignRanks,
-              chkAssignMekWarriorsCallSigns,
-              chkAssignFounderFlag);
+        // How formations are named sits with how people are named and ranked: the two together are
+        // everything about the command that is a matter of style rather than strength.
+        comboForceNamingMethod = new MMComboBox<>("comboForceNamingMethod", ForceNamingMethod.values());
+        comboForceNamingMethod.setRenderer(new DefaultListCellRenderer() {
+            @Override
+            public java.awt.Component getListCellRendererComponent(javax.swing.JList<?> list, Object value,
+                  int index, boolean isSelected, boolean cellHasFocus) {
+                super.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);
+                if (value instanceof ForceNamingMethod namingMethod) {
+                    // Append the first-three preview inline so the user can see what each scheme
+                    // produces without hovering for the tooltip.
+                    setText(namingMethod.toString() + " - " + namingMethod.getExample());
+                    list.setToolTipText(namingMethod.getToolTipText());
+                }
+                return this;
+            }
+        });
+        comboForceNamingMethod.addActionListener(actionEvent -> {
+            if (namingMethodChangeListener != null) {
+                namingMethodChangeListener.run();
+            }
+        });
 
-        addLeftAlignFiller(section, 1);
+        chkAlwaysNumberRegiments = new CommandGenerationCheckBox("AlwaysNumberRegiments");
+        chkAlwaysNumberRegiments.addActionListener(actionEvent -> {
+            if (namingMethodChangeListener != null) {
+                namingMethodChangeListener.run();
+            }
+        });
+
+        constraints.gridy = 0;
+        constraints.gridx = 0;
+        section.add(new CommandGenerationLabel("ForceNamingMethod"), constraints);
+        constraints.gridx = 1;
+        section.add(comboForceNamingMethod, constraints);
+
+        constraints.gridwidth = 2;
+        constraints.gridx = 0;
+        constraints.gridy = 1;
+        section.add(chkAlwaysNumberRegiments, constraints);
+        constraints.gridy = 2;
+        section.add(chkAutomaticallyAssignRanks, constraints);
+        constraints.gridy = 3;
+        section.add(chkUseSpecifiedFactionToAssignRanks, constraints);
+        constraints.gridy = 4;
+        section.add(chkAssignMekWarriorsCallSigns, constraints);
+        constraints.gridy = 5;
+        section.add(chkAssignFounderFlag, constraints);
+
+        addLeftAlignFiller(section, 2);
         return section;
     }
 
@@ -854,6 +842,14 @@ public class SetupTab {
         filler.weightx = 1.0;
         filler.fill = GridBagConstraints.HORIZONTAL;
         section.add(Box.createHorizontalGlue(), filler);
+        // A section stretched to its neighbour's height would otherwise centre its controls in the space,
+        // leaving a blank band above them; the vertical slack goes below the last row instead.
+        GridBagConstraints slack = new GridBagConstraints();
+        slack.gridx = 0;
+        slack.gridy = BOTTOM_SLACK_ROW;
+        slack.weighty = 1.0;
+        slack.fill = GridBagConstraints.VERTICAL;
+        section.add(Box.createVerticalGlue(), slack);
     }
 
     /**
