@@ -118,6 +118,15 @@ application {
     ]
 }
 
+// Forward mekhq.* system properties set on the Gradle daemon (e.g. via IDEA Run Config "VM options",
+// or `gradlew -Dmekhq.foo=bar :MekHQ:run`) into the forked application JVM. Without this, daemon-level
+// -D flags never reach the running MekHQ process. Used for dev-gated feature flags such as
+// mekhq.companyGenerator.ruleset.
+tasks.named('run', JavaExec) {
+    System.getProperties().findAll { k, v -> k.toString().startsWith('mekhq.') && v != null }
+            .each { k, v -> systemProperty k.toString(), v.toString() }
+}
+
 
 jar {
     archiveFileName = "MekHQ.jar"
@@ -610,6 +619,11 @@ run {
 test {
     useJUnitPlatform()
     dependsOn(checkstyleMain)
+    // Some tests read the shipped data set - rank systems, factions, formation naming - which lives
+    // in mm-data and is copied into place by stageDataFiles. Without this the data is present locally
+    // only if someone happened to stage it, and absent on CI, so such a test passes on a developer
+    // machine and fails in the pipeline.
+    dependsOn(stageDataFiles)
 
     minHeapSize = "1024m"
     maxHeapSize = "8192m"

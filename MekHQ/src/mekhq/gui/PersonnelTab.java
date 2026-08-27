@@ -364,7 +364,8 @@ public final class PersonnelTab extends CampaignGuiTab {
 
     private DefaultComboBoxModel<PersonnelFilter> createPersonGroupModel() {
         final DefaultComboBoxModel<PersonnelFilter> personGroupModel = new DefaultComboBoxModel<>();
-        for (PersonnelFilter filter : MekHQ.getMHQOptions().getPersonnelFilterStyle().getFilters(false)) {
+        for (PersonnelFilter filter : PersonnelFilter.applicableTo(
+              MekHQ.getMHQOptions().getPersonnelFilterStyle().getFilters(false), getCampaign())) {
             personGroupModel.addElement(filter);
         }
         return personGroupModel;

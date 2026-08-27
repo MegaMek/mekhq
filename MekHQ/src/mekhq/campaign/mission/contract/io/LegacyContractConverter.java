@@ -39,6 +39,7 @@ import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
 
 import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
+import java.util.List;
 import java.util.UUID;
 
 import jakarta.annotation.Nullable;
@@ -50,6 +51,7 @@ import megamek.common.enums.SkillLevel;
 import megamek.common.icons.Camouflage;
 import megamek.logging.MMLogger;
 import mekhq.campaign.Campaign;
+import mekhq.campaign.ForceHumanResources;
 import mekhq.campaign.digitalGM.stratCon.StratConCampaignState;
 import mekhq.campaign.finances.Money;
 import mekhq.campaign.finances.enums.TransactionType;
@@ -60,6 +62,7 @@ import mekhq.campaign.mission.contract.contractGeneration.ChaosEmployerType;
 import mekhq.campaign.mission.scenarios.Scenario;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.enums.PersonnelRole;
+import mekhq.campaign.personnel.enums.PersonnelStatus;
 import mekhq.campaign.universe.Faction;
 import mekhq.campaign.universe.Factions;
 import mekhq.campaign.universe.PlanetarySystem;
@@ -294,6 +297,9 @@ public final class LegacyContractConverter {
         // Only a contract that was still running needs settling and an advisory; one that had already concluded was
         // settled when it ended.
         if (wasActive) {
+            // Flag the force-closure so the post-load pass can auto-resolve any prisoners still held once the force is
+            // populated (prisoner ransom needs the same force data the deferred settlement does).
+            contract.setClosedOutActiveOnLoad(true);
             campaign.addReport(GENERAL,
                   getFormattedTextAt(RESOURCE_BUNDLE, "legacyContract.report", contract.getName()));
             if (routedPayout.isPositive()) {
@@ -327,12 +333,20 @@ public final class LegacyContractConverter {
      * {@code contractBase * paymentMultiplier}, written onto the contract's finance record (the legacy amounts were
      * never persisted, so it reads zero without this), and its remaining months are paid to the player as a lump sum.
      *
+     * <p>Once the closed-out contracts are settled, any prisoners the player is still holding are auto-resolved (see
+     * {@link #ransomHeldPrisoners(Campaign)}), but only when at least one contract was force-closed while active - a save
+     * whose contracts had all already concluded closed out nothing and leaves its prisoners alone.</p>
+     *
      * @param campaign the loaded campaign whose converted legacy contracts are settled
      */
     public static void settlePendingLegacyContracts(final Campaign campaign) {
         final Money contractBase = campaign.getAccountant().getContractBase();
 
+        boolean anyClosedOutActive = false;
         for (final AbstractContract contract : campaign.getContractHistoryAsMap().values()) {
+            anyClosedOutActive |= contract.wasClosedOutActiveOnLoad();
+            contract.setClosedOutActiveOnLoad(false);
+
             final Double paymentMultiplier = contract.getPendingLegacySettlementMultiplier();
             if (paymentMultiplier == null) {
                 continue;
@@ -355,6 +369,51 @@ public final class LegacyContractConverter {
                             settlementAmount,
                             getFormattedTextAt(RESOURCE_BUNDLE, "legacyContract.settlement", contract.getName()));
             }
+        }
+
+        if (anyClosedOutActive) {
+            ransomHeldPrisoners(campaign);
+        }
+    }
+
+    /**
+     * Auto-resolves every prisoner still held when the legacy handler force-closes an active contract on load.
+     *
+     * <p>Enemy prisoners the player is holding are ransomed back to the enemy: the player is credited their combined
+     * ransom value and they are released. The player's own captured personnel (friendly PoWs) are freed and restored to
+     * active duty at no cost.</p>
+     *
+     * @param campaign the loaded campaign whose held prisoners are resolved
+     */
+    private static void ransomHeldPrisoners(final Campaign campaign) {
+        final ForceHumanResources humanResources = campaign.getPlayerForce().getHumanResources();
+        final LocalDate today = campaign.getLocalDate();
+
+        // Enemy prisoners the player holds: ransom them back for money, then release them.
+        final List<Person> enemyPrisoners = humanResources.getCurrentPrisoners();
+        if (!enemyPrisoners.isEmpty()) {
+            Money ransom = Money.zero();
+            for (final Person prisoner : enemyPrisoners) {
+                ransom = ransom.plus(prisoner.getRansomValue(campaign));
+            }
+
+            if (ransom.isPositive()) {
+                campaign.getPlayerForce()
+                      .getFinances()
+                      .credit(TransactionType.RANSOM,
+                            today,
+                            ransom,
+                            getFormattedTextAt(RESOURCE_BUNDLE, "legacyContract.prisonerRansom"));
+            }
+
+            for (final Person prisoner : enemyPrisoners) {
+                humanResources.removePerson(campaign, prisoner);
+            }
+        }
+
+        // The player's own captured personnel: freed and returned to active duty at no cost.
+        for (final Person prisoner : humanResources.getFriendlyPrisoners()) {
+            prisoner.changeStatus(campaign, today, PersonnelStatus.ACTIVE);
         }
     }
 

@@ -39,7 +39,7 @@ import javax.swing.UIManager;
 
 import megamek.SuiteOptions;
 import megamek.common.annotations.Nullable;
-import mekhq.campaign.universe.enums.CompanyGenerationMethod;
+import megamek.common.enums.NeuralInterfaceMode;
 import mekhq.gui.enums.FormationIconOperationalStatusStyle;
 import mekhq.gui.enums.PersonnelFilterStyle;
 import mekhq.gui.utilities.ComponentColors;
@@ -95,21 +95,12 @@ public final class MHQOptions extends SuiteOptions {
         userPreferences.node(MHQConstants.DISPLAY_NODE).putBoolean(MHQConstants.HISTORICAL_DAILY_LOG, value);
     }
 
-    public boolean getCompanyGeneratorStartup() {
-        return userPreferences.node(MHQConstants.DISPLAY_NODE)
-                     .getBoolean(MHQConstants.COMPANY_GENERATOR_STARTUP, false);
+    public boolean getShowCommandGenerator() {
+        return userPreferences.node(MHQConstants.DISPLAY_NODE).getBoolean(MHQConstants.SHOW_COMMAND_GENERATOR, true);
     }
 
-    public void setCompanyGeneratorStartup(final boolean value) {
-        userPreferences.node(MHQConstants.DISPLAY_NODE).putBoolean(MHQConstants.COMPANY_GENERATOR_STARTUP, value);
-    }
-
-    public boolean getShowCompanyGenerator() {
-        return userPreferences.node(MHQConstants.DISPLAY_NODE).getBoolean(MHQConstants.SHOW_COMPANY_GENERATOR, true);
-    }
-
-    public void setShowCompanyGenerator(final boolean value) {
-        userPreferences.node(MHQConstants.DISPLAY_NODE).putBoolean(MHQConstants.SHOW_COMPANY_GENERATOR, value);
+    public void setShowCommandGenerator(final boolean value) {
+        userPreferences.node(MHQConstants.DISPLAY_NODE).putBoolean(MHQConstants.SHOW_COMMAND_GENERATOR, value);
     }
 
     public boolean getShowUnitPicturesOnTOE() {
@@ -1503,15 +1494,6 @@ public final class MHQOptions extends SuiteOptions {
     public void setLayeredFormationIconPath(final String value) {
         userPreferences.node(MHQConstants.FILE_PATH_NODE).put(MHQConstants.LAYERED_FORCE_ICON_DIRECTORY_PATH, value);
     }
-
-    public String getCompanyGenerationDirectoryPath() {
-        return userPreferences.node(MHQConstants.FILE_PATH_NODE)
-                     .get(MHQConstants.COMPANY_GENERATION_DIRECTORY_PATH, "mmconf/mhqCompanyGenerationPresets/");
-    }
-
-    public void setCompanyGenerationDirectoryPath(final String value) {
-        userPreferences.node(MHQConstants.FILE_PATH_NODE).put(MHQConstants.COMPANY_GENERATION_DIRECTORY_PATH, value);
-    }
     // endregion File Paths
 
     // region Nag Tab
@@ -1572,15 +1554,51 @@ public final class MHQOptions extends SuiteOptions {
               .putInt(MHQConstants.START_GAME_BOT_CLIENT_RETRY_COUNT, startGameBotClientRetryCount);
     }
 
-    public CompanyGenerationMethod getDefaultCompanyGenerationMethod() {
-        return CompanyGenerationMethod.valueOf(userPreferences.node(MHQConstants.MISCELLANEOUS_NODE)
-                                                     .get(MHQConstants.DEFAULT_COMPANY_GENERATION_METHOD,
-                                                           CompanyGenerationMethod.WINDCHILD.name()));
+    // region Command Generator augmentation
+
+    /**
+     * @return whether the Command Generator last had the campaign tracking cybernetic implants
+     */
+    public boolean getLastUseImplants() {
+        return userPreferences.node(MHQConstants.MISCELLANEOUS_NODE)
+                     .getBoolean(MHQConstants.LAST_USE_IMPLANTS, false);
     }
 
-    public void setDefaultCompanyGenerationMethod(final CompanyGenerationMethod value) {
+    public void setLastUseImplants(final boolean value) {
         userPreferences.node(MHQConstants.MISCELLANEOUS_NODE)
-              .put(MHQConstants.DEFAULT_COMPANY_GENERATION_METHOD, value.name());
+              .putBoolean(MHQConstants.LAST_USE_IMPLANTS, value);
     }
+
+    /**
+     * @return whether the Command Generator last had MegaMek's Manei Domini rules switched on
+     */
+    public boolean getLastUseManeiDomini() {
+        return userPreferences.node(MHQConstants.MISCELLANEOUS_NODE)
+                     .getBoolean(MHQConstants.LAST_USE_MANEI_DOMINI, false);
+    }
+
+    public void setLastUseManeiDomini(final boolean value) {
+        userPreferences.node(MHQConstants.MISCELLANEOUS_NODE)
+              .putBoolean(MHQConstants.LAST_USE_MANEI_DOMINI, value);
+    }
+
+    /**
+     * @return the neural interface setting the Command Generator was last used with, stored by its
+     *       option value so an unreadable entry settles on the rules being off
+     */
+    public NeuralInterfaceMode getLastNeuralInterfaceMode() {
+        return NeuralInterfaceMode.fromOptionValue(
+              userPreferences.node(MHQConstants.MISCELLANEOUS_NODE)
+                    .get(MHQConstants.LAST_NEURAL_INTERFACE_MODE,
+                          NeuralInterfaceMode.OFF.optionValue()));
+    }
+
+    public void setLastNeuralInterfaceMode(final NeuralInterfaceMode value) {
+        userPreferences.node(MHQConstants.MISCELLANEOUS_NODE)
+              .put(MHQConstants.LAST_NEURAL_INTERFACE_MODE,
+                    (value == null) ? NeuralInterfaceMode.OFF.optionValue() : value.optionValue());
+    }
+    // endregion Command Generator augmentation
+
     // endregion Miscellaneous Options
 }
