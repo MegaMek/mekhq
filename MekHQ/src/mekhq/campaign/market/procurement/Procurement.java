@@ -102,26 +102,23 @@ public class Procurement {
      * @return returns corresponding faction.
      */
     public static megamek.common.enums.Faction getTechFaction(Faction faction) {
-        megamek.common.enums.Faction result = megamek.common.enums.Faction.fromMMAbbr(faction.getShortName());
+        // faction.getShortName() is an IO-style code (e.g. MERC, FWL, LA), so try both the MM and IO lookup tables.
+        // Using fromMMAbbr alone misses every faction whose codeMM differs from its codeIO.
+        megamek.common.enums.Faction result = megamek.common.enums.Faction.fromAbbr(faction.getShortName());
         if (result != megamek.common.enums.Faction.NONE) {
             return result;
         }
 
-        // If the result faction is NONE, I check if I maybe got a not found in the ENUM.
-        if (result.getCodeMM().equalsIgnoreCase(faction.getShortName())) {
-            return result;
-        }
-
-        logger.info("Unable to retrieve Tech Faction. Using fallback.");
+        logger.debug("Unable to retrieve Tech Faction for {}. Using fallback.", faction.getShortName());
 
         if (faction.isClan()) {
-            logger.info("Returning: Clan");
+            logger.debug("Returning: Clan");
             return megamek.common.enums.Faction.CLAN;
         } else if (faction.isPeriphery()) {
-            logger.info("Returning: Periphery");
+            logger.debug("Returning: Periphery");
             return megamek.common.enums.Faction.PER;
         } else {
-            logger.info("Returning: Inner Sphere");
+            logger.debug("Returning: Inner Sphere");
             return megamek.common.enums.Faction.IS;
         }
     }

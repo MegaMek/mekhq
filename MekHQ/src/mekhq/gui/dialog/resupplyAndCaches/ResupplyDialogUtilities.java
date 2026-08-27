@@ -78,6 +78,8 @@ public class ResupplyDialogUtilities {
     static List<String> createPartsReport(Resupply resupply) {
         final Campaign campaign = resupply.getCampaign();
         Faction originFaction = campaign.getPlayerForce().getFaction();
+        boolean originIsClan = originFaction.isClan();
+        megamek.common.enums.Faction originTechFaction = getTechFaction(originFaction);
         int year = campaign.getGameYear();
 
         final List<Part> convoyContents = resupply.getConvoyContents();
@@ -90,7 +92,7 @@ public class ResupplyDialogUtilities {
                   String append = part.isClan() ? " (Clan)" : "";
                   append = part.isMixedTech() ? " (Mixed)" : append;
                   append += " (" + quality + ')';
-                  append += part.isExtinct(year, originFaction.isClan(), getTechFaction(originFaction)) ?
+                  append += part.isExtinct(year, originIsClan, originTechFaction) ?
                                   " (<b>EXTINCT!</b>)" : "";
 
                   if (part instanceof AmmoBin) {
