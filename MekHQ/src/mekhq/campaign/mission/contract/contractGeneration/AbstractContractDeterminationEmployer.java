@@ -63,11 +63,19 @@ import mekhq.campaign.universe.RandomFactionGenerator;
 import mekhq.campaign.universe.enums.HiringHallLevel;
 import org.jspecify.annotations.NonNull;
 
-public class ChaosContractDeterminationEmployer {
-    private static final MMLogger LOGGER = MMLogger.create(ChaosContractDeterminationEmployer.class);
-
-    private static final int COMSTAR_EMPLOYER_CHANCE = 100;
-    private static final int WORD_OF_BLAKE_EMPLOYER_CHANCE = 40;
+/**
+ * Determines the employer for a generated Chaos contract: who is paying the unit, whose territory the conflict sits in,
+ * and any covert backer. The shared work &mdash; rolling the employer type, assembling the {@link EmployerData} and its
+ * negotiator, liaison, and camouflage &mdash; lives here; the concrete faction selection differs by contract source and
+ * is deferred to {@link #determineEmployerFactions}.
+ *
+ * <p>{@link ChaosContractDeterminationEmployerMercenary} handles mercenary searches (themed flavor factions, borrowed
+ * territorial anchors, and ComStar/Word of Blake patrons); {@link ChaosContractDeterminationEmployerGovernment} handles
+ * government contracts, where the player's own faction is always the employer. Use {@link #forSearchType} to obtain the
+ * right one.</p>
+ */
+public abstract class AbstractContractDeterminationEmployer {
+    private static final MMLogger LOGGER = MMLogger.create(AbstractContractDeterminationEmployer.class);
 
     /**
      * Aggregate factions (pirates, the Bandit Caste, rebels, mercenaries) and Commands (whose short name carries a dot)
@@ -75,16 +83,29 @@ public class ChaosContractDeterminationEmployer {
      * deliberately fielded by such a faction (rebellions, mercenary subcontracts) assign it directly rather than
      * drawing from the pool, so they are unaffected.
      */
-    private static final Predicate<Faction> PLAUSIBLE_EMPLOYER =
+    protected static final Predicate<Faction> PLAUSIBLE_EMPLOYER =
           faction -> !faction.isAggregate() && !faction.isSubunit() && !faction.isMercenaryOrganization();
 
-    public static @Nullable EmployerData getEmployerGenerationData(LocalDate currentDate, ILocation currentLocation,
+    private static final int COMSTAR_EMPLOYER_CHANCE = 100;
+    private static final int WORD_OF_BLAKE_EMPLOYER_CHANCE = 40;
+
+    /**
+     * Returns the employer determination appropriate to the search: a mercenary search draws a themed employer, while
+     * anything else is a government contract issued by the player's own faction.
+     */
+    public static AbstractContractDeterminationEmployer forSearchType(ContractSearchType searchType) {
+        return searchType == ContractSearchType.MERCENARY
+                     ? new ChaosContractDeterminationEmployerMercenary()
+                     : new ChaosContractDeterminationEmployerGovernment();
+    }
+
+    public @Nullable EmployerData getEmployerGenerationData(LocalDate currentDate, ILocation currentLocation,
           Campaign campaign, ContractSearchType searchType, boolean covertViable) {
         ChaosEmployerType type = determineEmployerType();
 
-        boolean isMercenarySearch = searchType == ContractSearchType.MERCENARY;
-        EmployerFactions employerFactions = determineEmployerFactions(type, currentDate, currentLocation,
-              isMercenarySearch, covertViable);
+        Faction playerFaction = campaign.getPlayerForce().getFaction();
+        EmployerFactions employerFactions = determineEmployerFactions(type, currentDate, currentLocation, covertViable,
+              playerFaction);
         if (employerFactions == null) {
             LOGGER.info("Failed to select an employer for current location. Contract generation failed");
             return null;
@@ -130,7 +151,7 @@ public class ChaosContractDeterminationEmployer {
               camouflage);
     }
 
-    private static ChaosEmployerType determineEmployerType() {
+    protected ChaosEmployerType determineEmployerType() {
         // Hot Spots Draconis Reach, pg 143 first printing
         int roll = d6(2);
         return switch (roll) {
@@ -146,7 +167,7 @@ public class ChaosContractDeterminationEmployer {
         };
     }
 
-    private static @NonNull ChaosEmployerType getCivilianEmployer() {
+    protected @NonNull ChaosEmployerType getCivilianEmployer() {
         int roll = d6(1);
         return switch (roll) {
             case 1 -> ChaosEmployerType.CIVILIAN_ORGANIZATION_REBELS;
@@ -174,42 +195,44 @@ public class ChaosContractDeterminationEmployer {
      * Resolves the flavor (paying) faction, the territorial anchor faction, and any covert sponsor for the given
      * employer type.
      *
-     * <p>The flavor faction is chosen to match the {@link ChaosEmployerType} theme (a corporation for a corporation, a
-     * mercenary command for a subcontract, and so on), which may be a faction with no territory of its own. The anchor
-     * faction is always a faction that holds ground near the player, so the downstream enemy and target-system
-     * selection have real geography to work with even when the flavor faction is landless.</p>
+     * <p>This is the shared algorithm. Its per-faction decisions are delegated to the overridable hooks
+     * {@link #resolveFlavorFaction}, {@link #resolveAnchorFaction}, and {@link #checkForSpecialEmployer}: the default
+     * (mercenary) behavior draws themed flavor factions, borrows a territorial anchor, and lets a ComStar/Word of Blake
+     * patron front, take over, or covertly sponsor the work, while the government determination overrides those hooks to
+     * force the player's own faction and bar special employers.</p>
      *
-     * <p>On a mercenary search a ComStar/Word of Blake patron may step in. For rebels it does so covertly, bankrolling
-     * the uprising while the rebels remain the visible employer (mirroring an enemy fielding sponsored mercenaries);
-     * for every other type it openly takes over as the employer, as before.</p>
+     * @param employerType    the rolled employer type, whose theme guides flavor selection
+     * @param currentDate     the campaign date, for faction-operating windows and regional lookups
+     * @param currentLocation the player's location, whose neighborhood the anchor is drawn from
+     * @param covertViable    whether the contract's objective can be run covertly, which gates a ComStar patron
+     * @param playerFaction   the player's own faction, the employer for a government contract
      *
      * @return the flavor/anchor/sponsor factions, or {@code null} if no eligible employer could be found for the
      *       location
      */
-    static @Nullable EmployerFactions determineEmployerFactions(ChaosEmployerType employerType,
-          LocalDate currentDate, ILocation currentLocation, boolean isMercenarySearch, boolean covertViable) {
+    @Nullable
+    EmployerFactions determineEmployerFactions(ChaosEmployerType employerType, LocalDate currentDate,
+          ILocation currentLocation, boolean covertViable, Faction playerFaction) {
         if (employerType == ChaosEmployerType.CIVILIAN_ORGANIZATION_REBELS) {
-            Faction rebels = resolveFlavorFaction(employerType, currentDate, currentLocation, isMercenarySearch);
+            Faction rebels = resolveFlavorFaction(employerType, currentDate, currentLocation, playerFaction);
             if (rebels == null) {
                 return null;
             }
-            Faction anchor = resolveAnchorFaction(employerType, currentDate, currentLocation, isMercenarySearch,
-                  rebels);
+            Faction anchor = resolveAnchorFaction(employerType, currentDate, currentLocation, playerFaction, rebels);
             // A Blakist/ComStar patron does not replace the rebels as employer; it secretly funds them.
-            Faction sponsor = isMercenarySearch ? checkForSpecialEmployer(currentDate.getYear(), covertViable) : null;
+            Faction sponsor = checkForSpecialEmployer(currentDate.getYear(), covertViable);
             return new EmployerFactions(employerType, rebels, anchor, sponsor);
         }
 
-        Faction specialEmployer;
-        if (isMercenarySearch
-                  && (specialEmployer = checkForSpecialEmployer(currentDate.getYear(), covertViable)) != null) {
+        Faction specialEmployer = checkForSpecialEmployer(currentDate.getYear(), covertViable);
+        if (specialEmployer != null) {
             if (specialEmployer.getShortName().equals(COMSTAR_FACTION_CODE)) {
                 // ComStar works in the shadows: rather than take the contract openly it fronts a corporation as the
                 // visible employer while bankrolling (sponsor) and territorially anchoring the work itself. The
                 // employer type becomes CORPORATION, so the player sees a corporation with its own generated name,
                 // never ComStar.
                 Faction corporation = resolveFlavorFaction(ChaosEmployerType.CORPORATION, currentDate, currentLocation,
-                      isMercenarySearch);
+                      playerFaction);
                 if (corporation == null) {
                     return null;
                 }
@@ -219,16 +242,16 @@ public class ChaosContractDeterminationEmployer {
             // Word of Blake openly takes over as the employer, keeping the rolled type but anchoring on a regional
             // owner: in most eras it holds little or no territory, so the conflict still needs a landed power to sit
             // inside.
-            Faction anchor = pickRegionalOwner(currentDate, currentLocation, isMercenarySearch, specialEmployer);
+            Faction anchor = pickRegionalOwner(currentDate, currentLocation, specialEmployer);
             return new EmployerFactions(employerType, specialEmployer, anchor, null);
         }
 
-        Faction flavor = resolveFlavorFaction(employerType, currentDate, currentLocation, isMercenarySearch);
+        Faction flavor = resolveFlavorFaction(employerType, currentDate, currentLocation, playerFaction);
         if (flavor == null) {
             return null;
         }
 
-        Faction anchor = resolveAnchorFaction(employerType, currentDate, currentLocation, isMercenarySearch, flavor);
+        Faction anchor = resolveAnchorFaction(employerType, currentDate, currentLocation, playerFaction, flavor);
         // A mercenary subcontract is a merc command (the flavor) fighting on behalf of the power that actually hired
         // them - the anchor - so that power is the sponsor bankrolling the work. Only when the anchor is a real power
         // distinct from the merc command itself.
@@ -239,29 +262,29 @@ public class ChaosContractDeterminationEmployer {
     }
 
     /**
-     * Selects the flavor faction &mdash; who is paying the unit &mdash; matching the employer type's theme.
+     * Selects the flavor faction &mdash; who is paying the unit &mdash; matching the employer type's theme. This is an
+     * overridable hook: the government determination returns the player's own faction here instead, ignoring
+     * {@code employerType}. {@code playerFaction} is supplied for that override; the default themed resolution does not
+     * use it.
      */
-    private static @Nullable Faction resolveFlavorFaction(ChaosEmployerType employerType, LocalDate currentDate,
-          ILocation currentLocation, boolean isMercenarySearch) {
+    protected @Nullable Faction resolveFlavorFaction(ChaosEmployerType employerType, LocalDate currentDate,
+          ILocation currentLocation, Faction playerFaction) {
         Factions factions = Factions.getInstance();
         return switch (employerType) {
             // Owner of the world/system the player is standing on, falling back to any regional owner off-world.
             case LOCAL_SYSTEM_OWNER, LOCAL_PLANETARY_GOVERNMENT, CIVILIAN_ORGANIZATION_MILITIA ->
                   firstNonNull(getCurrentSystemEmployer(currentDate, currentLocation),
-                        () -> pickRegionalOwner(currentDate, currentLocation, isMercenarySearch, null));
+                        () -> pickRegionalOwner(currentDate, currentLocation, null));
             // Any landed government with a presence near the player.
-            case ANY_SYSTEM_OWNER, ANY_PLANETARY_GOVERNMENT ->
-                  pickRegionalOwner(currentDate, currentLocation, isMercenarySearch, null);
+            case ANY_SYSTEM_OWNER, ANY_PLANETARY_GOVERNMENT -> pickRegionalOwner(currentDate, currentLocation, null);
             // A noble house, a corporation, or a corporate business: prefer one operating near the player, otherwise
             // draw any active faction of that kind, and finally fall back to a regional owner so generation never fails
             // just because no themed faction is in range.
-            case NOBLE -> firstNonNull(pickThemedFaction(currentDate, currentLocation, isMercenarySearch,
-                        Faction::isNoble),
-                  () -> pickRegionalOwner(currentDate, currentLocation, isMercenarySearch, null));
+            case NOBLE -> firstNonNull(pickThemedFaction(currentDate, currentLocation, Faction::isNoble),
+                  () -> pickRegionalOwner(currentDate, currentLocation, null));
             case CORPORATION, CIVILIAN_ORGANIZATION_BUSINESS ->
-                  firstNonNull(pickThemedFaction(currentDate, currentLocation, isMercenarySearch,
-                              Faction::isCorporation),
-                        () -> pickRegionalOwner(currentDate, currentLocation, isMercenarySearch, null));
+                  firstNonNull(pickThemedFaction(currentDate, currentLocation, Faction::isCorporation),
+                        () -> pickRegionalOwner(currentDate, currentLocation, null));
             case CIVILIAN_ORGANIZATION_REBELS -> factions.getFaction(REBEL_FACTION_CODE);
             case MERCENARY_SUBCONTRACT -> factions.getFaction(MERCENARY_FACTION_CODE);
         };
@@ -271,14 +294,17 @@ public class ChaosContractDeterminationEmployer {
      * Selects the territorial anchor faction for the given type. Territorial employer types anchor on the flavor
      * faction itself; landless or stateless flavor types anchor on a nearby landed power whose war the contract sits
      * inside. Rebels are special: they fight their own local government, so the anchor is the current system's owner.
+     *
+     * <p>This is an overridable hook: the government determination returns the player's own faction here instead.
+     * {@code playerFaction} is supplied for that override; the default territorial resolution does not use it.</p>
      */
-    private static Faction resolveAnchorFaction(ChaosEmployerType employerType, LocalDate currentDate,
-          ILocation currentLocation, boolean isMercenarySearch, Faction flavor) {
+    protected Faction resolveAnchorFaction(ChaosEmployerType employerType, LocalDate currentDate,
+          ILocation currentLocation, Faction playerFaction, Faction flavor) {
         return switch (employerType) {
             case LOCAL_SYSTEM_OWNER, LOCAL_PLANETARY_GOVERNMENT, CIVILIAN_ORGANIZATION_MILITIA,
                  ANY_SYSTEM_OWNER, ANY_PLANETARY_GOVERNMENT -> flavor;
             case CIVILIAN_ORGANIZATION_REBELS -> firstNonNull(getCurrentSystemEmployer(currentDate, currentLocation),
-                  () -> pickRegionalOwner(currentDate, currentLocation, isMercenarySearch, flavor));
+                  () -> pickRegionalOwner(currentDate, currentLocation, flavor));
             case NOBLE, CORPORATION, CIVILIAN_ORGANIZATION_BUSINESS, MERCENARY_SUBCONTRACT ->
                 // These types usually field a landless flavor faction (a mercenary command, a corporation, a
                 // stateless noble), so the conflict anchors on a nearby landed power. When the flavor faction is
@@ -286,60 +312,19 @@ public class ChaosContractDeterminationEmployer {
                 // than borrowing an unrelated neighbor and risking an employer-versus-itself contract.
                   flavor.isGovernment()
                         ? flavor
-                        : pickRegionalOwner(currentDate, currentLocation, isMercenarySearch, flavor);
+                        : pickRegionalOwner(currentDate, currentLocation, flavor);
         };
-    }
-
-    /**
-     * Picks a landed government faction with a presence near the player, falling back to any regional employer and
-     * finally to {@code fallback} so a territorial anchor is always available.
-     */
-    private static Faction pickRegionalOwner(LocalDate currentDate, ILocation currentLocation,
-          boolean isMercenarySearch, @Nullable Faction fallback) {
-        RandomFactionGenerator generator = RandomFactionGenerator.getInstance();
-        Faction owner = generator.getRandomEmployerFaction(currentLocation, currentDate, isMercenarySearch,
-              PLAUSIBLE_EMPLOYER.and(Faction::isGovernment));
-        if (owner == null) {
-            owner = generator.getRandomEmployerFaction(currentLocation, currentDate, isMercenarySearch,
-                  PLAUSIBLE_EMPLOYER);
-        }
-        return owner != null ? owner : fallback;
-    }
-
-    /**
-     * Picks a faction matching {@code predicate}, preferring one with a regional presence near the player and otherwise
-     * drawing from all active factions of that kind. Returns {@code null} if no such faction exists at all.
-     */
-    private static @Nullable Faction pickThemedFaction(LocalDate currentDate, ILocation currentLocation,
-          boolean isMercenarySearch, Predicate<Faction> predicate) {
-        final Predicate<Faction> employerPredicate = predicate.and(PLAUSIBLE_EMPLOYER);
-        Faction regional = RandomFactionGenerator.getInstance()
-                                 .getRandomEmployerFaction(currentLocation, currentDate, isMercenarySearch,
-                                       employerPredicate);
-        if (regional != null) {
-            return regional;
-        }
-
-        List<Faction> candidates = Factions.getInstance()
-                                         .getActiveFactions(currentDate)
-                                         .stream()
-                                         .filter(employerPredicate)
-                                         .toList();
-        if (candidates.isEmpty()) {
-            return null;
-        }
-        return candidates.get(randomInt(candidates.size()));
     }
 
     /**
      * Returns {@code first} if it is non-null, otherwise the value produced by {@code fallback}. The fallback is a
      * supplier so its (potentially expensive) regional lookup is only performed when the primary faction is missing.
      */
-    private static @Nullable Faction firstNonNull(@Nullable Faction first, Supplier<Faction> fallback) {
+    protected static @Nullable Faction firstNonNull(@Nullable Faction first, Supplier<Faction> fallback) {
         return first != null ? first : fallback.get();
     }
 
-    private static @Nullable Faction getCurrentSystemEmployer(LocalDate currentDate, ILocation currentLocation) {
+    protected static @Nullable Faction getCurrentSystemEmployer(LocalDate currentDate, ILocation currentLocation) {
         PlanetarySystem currentSystem = currentLocation.getCurrentSystem();
         List<String> residentFactions = currentSystem.getFactions(currentDate);
 
@@ -362,17 +347,63 @@ public class ChaosContractDeterminationEmployer {
     }
 
     /**
-     * Rolls whether ComStar or the Word of Blake steps into this contract - either fronting/sponsoring it (see
-     * {@link #determineEmployerFactions}). ComStar only involves itself in covert-viable contracts, since its interest
-     * is in running them as deniable false flags; the Word of Blake is under no such restriction and will take any
-     * contract. ComStar is rolled first (it takes priority), then the Word of Blake.
+     * Picks a landed government faction with a presence near the player, falling back to any regional employer and
+     * finally to {@code fallback} so a territorial anchor is always available.
+     */
+    protected static Faction pickRegionalOwner(LocalDate currentDate, ILocation currentLocation,
+          @Nullable Faction fallback) {
+        RandomFactionGenerator generator = RandomFactionGenerator.getInstance();
+        // Only the mercenary employer determination reaches these regional lookups, so the pool is queried as a
+        // mercenary search.
+        Faction owner = generator.getRandomEmployerFaction(currentLocation, currentDate, true,
+              PLAUSIBLE_EMPLOYER.and(Faction::isGovernment));
+        if (owner == null) {
+            owner = generator.getRandomEmployerFaction(currentLocation, currentDate, true, PLAUSIBLE_EMPLOYER);
+        }
+        return owner != null ? owner : fallback;
+    }
+
+    /**
+     * Picks a faction matching {@code predicate}, preferring one with a regional presence near the player and otherwise
+     * drawing from all active factions of that kind. Returns {@code null} if no such faction exists at all.
+     */
+    protected static @Nullable Faction pickThemedFaction(LocalDate currentDate, ILocation currentLocation,
+          Predicate<Faction> predicate) {
+        final Predicate<Faction> employerPredicate = predicate.and(PLAUSIBLE_EMPLOYER);
+        // Only the mercenary employer determination reaches these regional lookups, so the pool is queried as a
+        // mercenary search.
+        Faction regional = RandomFactionGenerator.getInstance()
+                                 .getRandomEmployerFaction(currentLocation, currentDate, true, employerPredicate);
+        if (regional != null) {
+            return regional;
+        }
+
+        List<Faction> candidates = Factions.getInstance()
+                                         .getActiveFactions(currentDate)
+                                         .stream()
+                                         .filter(employerPredicate)
+                                         .toList();
+        if (candidates.isEmpty()) {
+            return null;
+        }
+        return candidates.get(randomInt(candidates.size()));
+    }
+
+    /**
+     * Rolls whether ComStar or the Word of Blake steps into this contract - either fronting, taking over, or covertly
+     * sponsoring it (see the subclass {@link #determineEmployerFactions}). ComStar only involves itself in covert-viable
+     * contracts, since its interest is in running them as deniable false flags; the Word of Blake is under no such
+     * restriction and will take any contract. ComStar is rolled first (it takes priority), then the Word of Blake.
+     *
+     * <p>This is the shared hook a subclass may override to bar special employers entirely; the government determination
+     * does so, since a state never fronts its own contracts through ComStar or the Word of Blake.</p>
      *
      * @param currentYear  the year, for each faction's operating window
      * @param covertViable whether this contract's objective can be run covertly, which gates ComStar's involvement
      *
      * @return ComStar or the Word of Blake if one steps in, otherwise {@code null}
      */
-    private static @Nullable Faction checkForSpecialEmployer(int currentYear, boolean covertViable) {
+    protected @Nullable Faction checkForSpecialEmployer(int currentYear, boolean covertViable) {
         if (covertViable) {
             Faction comStar = checkForEmployerOverride(currentYear,
                   COMSTAR_FACTION_CODE,
