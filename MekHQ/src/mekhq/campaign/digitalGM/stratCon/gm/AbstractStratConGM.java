@@ -285,7 +285,10 @@ public abstract class AbstractStratConGM extends AbstractDigitalGM {
         spawnDates.removeIf(spawnDate -> !spawnDate.isAfter(today));
         int dueCount = before - spawnDates.size();
 
-        if (dueCount > 0) {
+        // The due dates are consumed above whatever happens. If the OpFor is routed, those scenarios are simply
+        // skipped rather than spawned - clearly the enemy is in no state to contest the objective - matching how the
+        // ambient weekly scenarios are discarded while routed.
+        if ((dueCount > 0) && !contract.getMoraleLevel().isRouted()) {
             StratConContractInitializer.spawnScheduledStrategicScenarios(campaign, contract, dueCount);
         }
     }
