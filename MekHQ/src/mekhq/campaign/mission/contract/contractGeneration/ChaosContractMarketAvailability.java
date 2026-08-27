@@ -58,6 +58,8 @@ import mekhq.campaign.force.PlayerForce;
 import mekhq.campaign.mission.contract.AbstractContract;
 import mekhq.campaign.mission.contract.ContractMarket;
 import mekhq.campaign.mission.contract.utilities.PityContracts;
+import mekhq.campaign.personnel.Person;
+import mekhq.campaign.personnel.PersonnelOptions;
 import mekhq.campaign.universe.Faction;
 import mekhq.campaign.universe.PlanetarySystem;
 import mekhq.campaign.universe.enums.HiringHallLevel;
@@ -175,7 +177,23 @@ public final class ChaosContractMarketAvailability {
      * @return the full roll breakdown, before any post-roll cap
      */
     public static OfferRoll rollOffer(final ContractSearchType type, final HiringHallLevel level) {
-        final int slots = Math.max(0, baseOfferSlots(level) + offerSlotModifier(type, level));
+        return rollOffer(type, level, 0);
+    }
+
+    /**
+     * As {@link #rollOffer(ContractSearchType, HiringHallLevel)}, but with {@code bonusSlots} extra offer slots. Each
+     * bonus slot is an independent d6 that may still fail, so an extra slot may add nothing. Used to grant the
+     * Networker SPA its extra monthly chance at an offer.
+     *
+     * @param type       the search type being rolled
+     * @param level      the current system's hiring hall level
+     * @param bonusSlots additional offer slots to roll beyond the hiring hall's base
+     *
+     * @return the full roll breakdown, before any post-roll cap
+     */
+    public static OfferRoll rollOffer(final ContractSearchType type, final HiringHallLevel level,
+          final int bonusSlots) {
+        final int slots = Math.max(0, baseOfferSlots(level) + offerSlotModifier(type, level) + bonusSlots);
         final int typeModifier = successTargetModifier(type, level);
         final int baseTarget = baseSuccessTarget(level);
         final int finalTarget = Math.clamp(baseTarget + typeModifier, MIN_SUCCESS_TARGET,
@@ -227,6 +245,10 @@ public final class ChaosContractMarketAvailability {
         final boolean governmentForce = isGovernmentFaction(playerFaction);
         final boolean uninhabited = isUninhabitedSystem(campaign);
 
+        // The Networker SPA (senior-most Admin) grants one extra offer slot for the force's primary line of work.
+        final int networkerBonus = seniorAdminNetworkerBonus(campaign);
+        final ContractSearchType networkerType = primarySearchType(playerFaction);
+
         final Map<ContractSearchType, OfferRoll> rolls = new EnumMap<>(ContractSearchType.class);
         for (final ContractSearchType type : ContractSearchType.values()) {
             if (type == ContractSearchType.TOURNAMENT) {
@@ -238,7 +260,7 @@ public final class ChaosContractMarketAvailability {
             if ((type == ContractSearchType.GOVERNMENT) && !governmentForce) {
                 continue; // government orders are only offered to government (non-mercenary, non-pirate) forces
             }
-            rolls.put(type, rollOffer(type, level));
+            rolls.put(type, rollOffer(type, level, type == networkerType ? networkerBonus : 0));
         }
 
         // Government contracts concentrate on the player's own faction's worlds.
@@ -255,6 +277,35 @@ public final class ChaosContractMarketAvailability {
     /** A government campaign is any player force that is neither a mercenary command nor a pirate band. */
     static boolean isGovernmentFaction(final Faction faction) {
         return !faction.isMercenary() && !faction.isPirate();
+    }
+
+    /**
+     * One extra offer slot when the force's senior-most Admin carries the Networker SPA, otherwise zero. Mirrors how
+     * the other "senior-most Admin" abilities resolve their character.
+     */
+    private static int seniorAdminNetworkerBonus(final Campaign campaign) {
+        final Person seniorAdmin = campaign.getPlayerForce()
+                                         .getHumanResources()
+                                         .getSeniorAdminPerson(campaign.getCampaignOptions(),
+                                               campaign.getPlayerForce().isClanForce(),
+                                               campaign.getLocalDate());
+        return (seniorAdmin != null && seniorAdmin.getOptions().booleanOption(PersonnelOptions.ADMIN_NETWORKER)) ?
+                     1 :
+                     0;
+    }
+
+    /**
+     * The search type a force primarily seeks: pirates draw pirate work, governments government orders, else
+     * mercenary.
+     */
+    private static ContractSearchType primarySearchType(final Faction faction) {
+        if (faction.isPirate()) {
+            return ContractSearchType.PIRATE;
+        }
+        if (isGovernmentFaction(faction)) {
+            return ContractSearchType.GOVERNMENT;
+        }
+        return ContractSearchType.MERCENARY;
     }
 
     /**

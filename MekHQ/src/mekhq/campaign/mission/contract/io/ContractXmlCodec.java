@@ -112,11 +112,15 @@ public final class ContractXmlCodec {
         writeStringIfPresent(printWriter, indent, "description", contract.getDescription());
         MHQXMLUtility.writeSimpleXMLTag(printWriter, indent, "scale", contract.getScale());
         MHQXMLUtility.writeSimpleXMLTag(printWriter, indent, "trackCount", contract.getTrackCount());
-        MHQXMLUtility.writeSimpleXMLTag(printWriter, indent, "provingGround", contract.isProvingGround());
+        MHQXMLUtility.writeSimpleXMLTag(printWriter, indent, "contractNature", contract.getNature().name());
         MHQXMLUtility.writeSimpleXMLTag(printWriter, indent, "sharesPercent", contract.getSharesPercent());
         if (!contract.getObfuscatedIntel().isEmpty()) {
             MHQXMLUtility.writeSimpleXMLTag(printWriter, indent, "obfuscatedIntel",
                   contract.getObfuscatedIntel().stream().map(Enum::name).collect(Collectors.joining(",")));
+        }
+        if (!contract.getCharacteristics().isEmpty()) {
+            MHQXMLUtility.writeSimpleXMLTag(printWriter, indent, "characteristics",
+                  contract.getCharacteristics().stream().map(Enum::name).collect(Collectors.joining(",")));
         }
         if (contract.getStatus() != null) {
             MHQXMLUtility.writeSimpleXMLTag(printWriter, indent, "missionStatus", contract.getStatus().name());
@@ -141,6 +145,10 @@ public final class ContractXmlCodec {
         writeScheduleData(printWriter, indent, contract.getScheduleData());
         writeSystemsTargetData(printWriter, indent, contract.getSystemsTargetData());
         writeRentedFacilitiesData(printWriter, indent, contract.getRentedFacilitiesData());
+
+        writeNonNegotiableTermsData(printWriter, indent, contract.getNonNegotiableTermsData());
+
+        writeActiveNegotiationData(printWriter, indent, contract.getActiveNegotiationData());
         writeMoraleData(printWriter, indent, contract.getMoraleData());
         writeNegotiationData(printWriter, indent, contract.getNegotiationData());
 
@@ -275,6 +283,37 @@ public final class ContractXmlCodec {
         MHQXMLUtility.writeSimpleXMLCloseTag(pw, --indent, "rentedFacilitiesData");
     }
 
+    private static void writeNonNegotiableTermsData(final PrintWriter pw, int indent,
+          final @Nullable NonNegotiableTermsData data) {
+        if (data == null || !data.anyLocked()) {
+            return;
+        }
+        MHQXMLUtility.writeSimpleXMLOpenTag(pw, indent++, "nonNegotiableTermsData");
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "payLocked", data.payLocked());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "supportLocked", data.supportLocked());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "transportLocked", data.transportLocked());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "salvageLocked", data.salvageLocked());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "commandLocked", data.commandLocked());
+        MHQXMLUtility.writeSimpleXMLCloseTag(pw, --indent, "nonNegotiableTermsData");
+    }
+
+    private static void writeActiveNegotiationData(final PrintWriter pw, int indent,
+          final @Nullable ActiveNegotiationData data) {
+        if (data == null) {
+            return;
+        }
+        MHQXMLUtility.writeSimpleXMLOpenTag(pw, indent++, "activeNegotiationData");
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "kind", data.kind().name());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "netMargin", data.netMargin());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "payDelta", data.payDelta());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "supportDelta", data.supportDelta());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "transportDelta", data.transportDelta());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "salvageDelta", data.salvageDelta());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "commandDelta", data.commandDelta());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "attempts", data.attempts());
+        MHQXMLUtility.writeSimpleXMLCloseTag(pw, --indent, "activeNegotiationData");
+    }
+
     private static void writeMoraleData(final PrintWriter pw, int indent, final @Nullable MoraleData data) {
         if (data == null) {
             return;
@@ -371,8 +410,14 @@ public final class ContractXmlCodec {
         readers.put("description", (contract, node, campaign, version) -> contract.setDescription(text(node)));
         readers.put("scale", (contract, node, campaign, version) -> contract.setScale(parseInt(node)));
         readers.put("trackCount", (contract, node, campaign, version) -> contract.setTrackCount(parseInt(node)));
-        readers.put("provingGround",
-              (contract, node, campaign, version) -> contract.setProvingGround(Boolean.parseBoolean(text(node))));
+        readers.put("contractNature",
+              (contract, node, campaign, version) -> contract.setNature(ContractNature.fromString(text(node))));
+        // Legacy: pre-ContractNature saves stored the designation as a standalone boolean flag.
+        readers.put("provingGround", (contract, node, campaign, version) -> {
+            if (Boolean.parseBoolean(text(node))) {
+                contract.setNature(ContractNature.PROVING_GROUND);
+            }
+        });
         readers.put("sharesPercent",
               (contract, node, campaign, version) -> contract.setSharesPercent(parseInt(node)));
         readers.put("missionStatus",
@@ -403,10 +448,20 @@ public final class ContractXmlCodec {
               (contract, node, campaign, version) -> contract.setScheduleData(parseScheduleData(node)));
         readers.put("obfuscatedIntel",
               (contract, node, campaign, version) -> contract.setObfuscatedIntel(parseObfuscatedIntel(node)));
+        readers.put("characteristics",
+              (contract, node, campaign, version) -> contract.setCharacteristics(parseCharacteristics(node)));
         readers.put("systemsTargetData",
               (contract, node, campaign, version) -> contract.setSystemsTargetData(parseSystemsTargetData(node)));
         readers.put("rentedFacilitiesData",
               (contract, node, campaign, version) -> contract.setRentedFacilitiesData(parseRentedFacilitiesData(node)));
+
+        readers.put("nonNegotiableTermsData",
+              (contract, node, campaign, version) -> contract.setNonNegotiableTermsData(
+                    parseNonNegotiableTermsData(node)));
+
+        readers.put("activeNegotiationData",
+              (contract, node, campaign, version) -> contract.setActiveNegotiationData(
+                    parseActiveNegotiationData(node)));
         readers.put("moraleData", (contract, node, campaign, version) -> contract.setMoraleData(parseMoraleData(node)));
         readers.put("negotiationData",
               (contract, node, campaign, version) -> contract.setNegotiationData(parseNegotiationData(node)));
@@ -734,6 +789,26 @@ public final class ContractXmlCodec {
         return fields;
     }
 
+    /**
+     * Parses the comma-separated list of contract characteristics, skipping any name a newer save carried that this
+     * build no longer recognizes.
+     */
+    private static java.util.Set<ContractCharacteristic> parseCharacteristics(final Node wn) {
+        final java.util.Set<ContractCharacteristic> parsed = java.util.EnumSet.noneOf(ContractCharacteristic.class);
+        for (final String token : text(wn).split(",")) {
+            final String name = token.trim();
+            if (name.isEmpty()) {
+                continue;
+            }
+            try {
+                parsed.add(ContractCharacteristic.valueOf(name));
+            } catch (IllegalArgumentException ex) {
+                LOGGER.warn("Unknown contract characteristic '{}' ignored.", name);
+            }
+        }
+        return parsed;
+    }
+
     private static final class SystemsTargetBuilder {
         String systemId;
         String planetId;
@@ -776,6 +851,74 @@ public final class ContractXmlCodec {
         final RentedFacilitiesBuilder builder = readFields(wn, new RentedFacilitiesBuilder(),
               RENTED_FACILITIES_BINDERS, null, null, "rentedFacilitiesData");
         return new RentedFacilitiesData(builder.hospitalBeds, builder.kitchens, builder.holdingCells);
+    }
+
+    private static final class NonNegotiableTermsBuilder {
+        boolean payLocked;
+        boolean supportLocked;
+        boolean transportLocked;
+        boolean salvageLocked;
+        boolean commandLocked;
+    }
+
+    private static final Map<String, FieldBinder<NonNegotiableTermsBuilder>> NON_NEGOTIABLE_TERMS_BINDERS =
+          createNonNegotiableTermsBinders();
+
+    private static Map<String, FieldBinder<NonNegotiableTermsBuilder>> createNonNegotiableTermsBinders() {
+        final Map<String, FieldBinder<NonNegotiableTermsBuilder>> binders = new HashMap<>();
+        binders.put("payLocked",
+              (builder, node, campaign, version) -> builder.payLocked = Boolean.parseBoolean(text(node)));
+        binders.put("supportLocked",
+              (builder, node, campaign, version) -> builder.supportLocked = Boolean.parseBoolean(text(node)));
+        binders.put("transportLocked",
+              (builder, node, campaign, version) -> builder.transportLocked = Boolean.parseBoolean(text(node)));
+        binders.put("salvageLocked",
+              (builder, node, campaign, version) -> builder.salvageLocked = Boolean.parseBoolean(text(node)));
+        binders.put("commandLocked",
+              (builder, node, campaign, version) -> builder.commandLocked = Boolean.parseBoolean(text(node)));
+        return binders;
+    }
+
+    private static NonNegotiableTermsData parseNonNegotiableTermsData(final Node wn) {
+        final NonNegotiableTermsBuilder builder = readFields(wn, new NonNegotiableTermsBuilder(),
+              NON_NEGOTIABLE_TERMS_BINDERS, null, null, "nonNegotiableTermsData");
+        return new NonNegotiableTermsData(builder.payLocked, builder.supportLocked, builder.transportLocked,
+              builder.salvageLocked, builder.commandLocked);
+    }
+
+    private static final class ActiveNegotiationBuilder {
+        ActiveNegotiationData.Kind kind = ActiveNegotiationData.Kind.HAGGLE;
+        int netMargin;
+        int payDelta;
+        int supportDelta;
+        int transportDelta;
+        int salvageDelta;
+        int commandDelta;
+        int attempts = 1; // a stored record means at least one attempt was spent
+    }
+
+    private static final Map<String, FieldBinder<ActiveNegotiationBuilder>> ACTIVE_NEGOTIATION_BINDERS =
+          createActiveNegotiationBinders();
+
+    private static Map<String, FieldBinder<ActiveNegotiationBuilder>> createActiveNegotiationBinders() {
+        final Map<String, FieldBinder<ActiveNegotiationBuilder>> binders = new HashMap<>();
+        binders.put("kind",
+              (builder, node, campaign, version) -> builder.kind = ActiveNegotiationData.Kind.valueOf(text(node)));
+        binders.put("netMargin", (builder, node, campaign, version) -> builder.netMargin = parseInt(node));
+        binders.put("payDelta", (builder, node, campaign, version) -> builder.payDelta = parseInt(node));
+        binders.put("supportDelta", (builder, node, campaign, version) -> builder.supportDelta = parseInt(node));
+        binders.put("transportDelta", (builder, node, campaign, version) -> builder.transportDelta = parseInt(node));
+        binders.put("salvageDelta", (builder, node, campaign, version) -> builder.salvageDelta = parseInt(node));
+        binders.put("commandDelta", (builder, node, campaign, version) -> builder.commandDelta = parseInt(node));
+        binders.put("attempts", (builder, node, campaign, version) -> builder.attempts = parseInt(node));
+        return binders;
+    }
+
+    private static ActiveNegotiationData parseActiveNegotiationData(final Node wn) {
+        final ActiveNegotiationBuilder builder = readFields(wn, new ActiveNegotiationBuilder(),
+              ACTIVE_NEGOTIATION_BINDERS, null, null, "activeNegotiationData");
+        return new ActiveNegotiationData(builder.kind, builder.netMargin, builder.payDelta, builder.supportDelta,
+              builder.transportDelta, builder.salvageDelta, builder.commandDelta, builder.attempts);
     }
 
     private static final class MoraleDataBuilder {

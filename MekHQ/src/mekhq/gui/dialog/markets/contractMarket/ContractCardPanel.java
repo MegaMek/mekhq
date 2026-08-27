@@ -84,6 +84,7 @@ public class ContractCardPanel extends JPanel {
     private static final int SUBTITLE_MAX_CHARS = 28;
 
     private final transient AbstractContract contract;
+    private final boolean hideContractType;
     private final Color accent;
     private boolean selected;
     private int forcedHeight = -1;
@@ -92,16 +93,18 @@ public class ContractCardPanel extends JPanel {
     /**
      * Creates a card for a single contract offer.
      *
-     * @param contract    the offer to summarize
-     * @param currentDate the campaign date, used to resolve time-sensitive planet names
-     * @param onSelected  callback invoked with this card's contract when the card is clicked
+     * @param contract         the offer to summarize
+     * @param currentDate      the campaign date, used to resolve time-sensitive planet names
+     * @param hideContractType when {@code true}, the offer's mission type is omitted from the card subtitle
+     * @param onSelected       callback invoked with this card's contract when the card is clicked
      *
      * @author Illiani
      * @since 0.51.01
      */
-    public ContractCardPanel(AbstractContract contract, LocalDate currentDate,
+    public ContractCardPanel(AbstractContract contract, LocalDate currentDate, boolean hideContractType,
           Consumer<AbstractContract> onSelected) {
         this.contract = contract;
+        this.hideContractType = hideContractType;
         this.accent = contract.getEmployerColor().getColour();
 
         setLayout(new BorderLayout());
@@ -161,8 +164,11 @@ public class ContractCardPanel extends JPanel {
                                ? getTextAt(RESOURCE_BUNDLE, "dossier.contractMarket.intel.obfuscated")
                                : contract.getName().replace('_', ' ');
         String name = wrapInner(escape(rawName), NAME_MAX_CHARS);
-        String subtitle = wrapInner(escape(contract.getEmployerMarketDisplayName()) + " &middot; "
-                                          + escape(contract.getObjectiveType().toString()), SUBTITLE_MAX_CHARS);
+        String rawSubtitle = hideContractType
+                                   ? escape(contract.getEmployerMarketDisplayName())
+                                   : escape(contract.getEmployerMarketDisplayName()) + " &middot; "
+                                           + escape(contract.getObjectiveType().toString());
+        String subtitle = wrapInner(rawSubtitle, SUBTITLE_MAX_CHARS);
         titlesLabel.setText("<html><b>" + name + "</b><br>"
                                   + "<span style='font-size:smaller'>" + subtitle + "</span></html>");
     }
@@ -260,8 +266,19 @@ public class ContractCardPanel extends JPanel {
      * @since 0.51.01
      */
     private JComponent buildEmblemTile(LocalDate currentDate) {
-        JLabel emblem = new JLabel(Factions.getFactionLogoWithScaling(currentDate.getYear(),
-              contract.getEmployerFactionCode(), EMBLEM_SIZE));
+        JLabel emblem;
+        // A plain covert operation conceals its employer behind a neutral placeholder. A false flag shows its front's
+        // logo like any normal contract, because the front is already the visible employer; everything else shows the
+        // real employer's logo.
+        if (contract.isCovert()) {
+            emblem = new JLabel("?", SwingConstants.CENTER);
+            emblem.setForeground(contrastingText(accent));
+            emblem.setFont(emblem.getFont().deriveFont(Font.BOLD, EMBLEM_SIZE * 0.7f));
+            emblem.setPreferredSize(new Dimension(EMBLEM_SIZE, EMBLEM_SIZE));
+        } else {
+            emblem = new JLabel(Factions.getFactionLogoWithScaling(currentDate.getYear(),
+                  contract.getEmployerFactionCode(), EMBLEM_SIZE));
+        }
         emblem.setOpaque(false);
 
         final int arc = scaleForGUI(10);
@@ -281,6 +298,13 @@ public class ContractCardPanel extends JPanel {
         tile.setBorder(BorderFactory.createEmptyBorder(pad, pad, pad, pad));
         tile.add(emblem, BorderLayout.CENTER);
         return tile;
+    }
+
+    /** Black or white, whichever reads better on the given background, for text drawn over the accent tile. */
+    private static Color contrastingText(Color background) {
+        double luminance = (0.299 * background.getRed() + 0.587 * background.getGreen()
+                                  + 0.114 * background.getBlue()) / 255.0;
+        return luminance > 0.6 ? Color.BLACK : Color.WHITE;
     }
 
     private JPanel buildChipsRow(LocalDate currentDate) {

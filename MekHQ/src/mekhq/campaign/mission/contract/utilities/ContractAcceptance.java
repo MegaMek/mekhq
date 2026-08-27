@@ -118,6 +118,10 @@ public final class ContractAcceptance {
                   "acceptContract.transport.report", contract.getName()));
         }
 
+        // Pay the signing bonus if the contract carries one. The slice of pay the Signing Bonus characteristic shifts
+        // up front. Monthly pay was reduced to match at generation, so the total is unchanged.
+        ContractCharacteristics.paySigningBonus(campaign, contract);
+
         // Start the contract: dates it to the projected arrival day and (per the checkboxes) mothballs and/or jumps.
         ContractAutomation.performContractStart(campaign, contract, mothball, travel);
 

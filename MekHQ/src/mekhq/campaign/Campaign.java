@@ -2196,7 +2196,11 @@ public class Campaign implements ITechManager {
             return true;
         }
         int maxAcquisitions = getCampaignOptions().get(CampaignOption.MAX_ACQUISITIONS);
-        return maxAcquisitions <= 0 || person.getAcquisitions() < maxAcquisitions;
+        if (maxAcquisitions <= 0) {
+            return true;
+        }
+
+        return person.getAcquisitions() < ForceHumanResources.maxAcquisitionsFor(person, maxAcquisitions);
     }
 
     /***

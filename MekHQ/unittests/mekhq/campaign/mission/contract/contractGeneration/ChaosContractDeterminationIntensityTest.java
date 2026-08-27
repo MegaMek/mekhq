@@ -40,16 +40,16 @@ import org.junit.jupiter.api.Test;
 import org.mockito.MockedStatic;
 
 /**
- * Tests the roll-to-track-count tables in {@link ChaosContractDetermineIntensity}. The 2d6 roll is stubbed so each
+ * Tests the roll-to-track-count tables in {@link ChaosContractDeterminationIntensity}. The 2d6 roll is stubbed so each
  * branch of every objective family is pinned, including the boundary rolls (2 and 12) where an off-by-one in the switch
  * would show up.
  */
-class ChaosContractDetermineIntensityTest {
+class ChaosContractDeterminationIntensityTest {
 
     private static int trackCountForRoll(final ChaosObjectiveType objectiveType, final int roll) {
         try (MockedStatic<Compute> compute = mockStatic(Compute.class)) {
             compute.when(() -> Compute.d6(2)).thenReturn(roll);
-            return ChaosContractDetermineIntensity.determineTrackCount(objectiveType);
+            return ChaosContractDeterminationIntensity.determineTrackCount(objectiveType);
         }
     }
 

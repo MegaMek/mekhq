@@ -101,6 +101,13 @@ public class ChaosReputation {
 
     private static final int CONTRACT_SUCCESS_DELTA = 1; // Hot Spots Draconis Reach pg25 1st printing
 
+    /**
+     * Reputation lost for a failed (but not breached) contract when the Hinterlands
+     * {@code USE_FAILED_CONTRACT_REPUTATION_LOSS} option is enabled - a lighter penalty than a breach, mirroring the
+     * success gain.
+     */
+    private static final int CONTRACT_FAILURE_DELTA = -CONTRACT_SUCCESS_DELTA;
+
     private static final double BREAKING_CONTRACT_MULTIPLIER = 0.5; // Hot Spots Draconis Reach pg25 1st printing
     private static final int BREAKING_CONTRACT_MIN_DELTA = 3; // Hot Spots Draconis Reach pg25 1st printing
 
@@ -567,16 +574,30 @@ public class ChaosReputation {
     }
 
     /**
-     * Raises the reputation of every employed character by the contract-success delta.
+     * Changes the reputation of every employed character by {@code delta} (positive to reward a success, negative to
+     * penalize a failure).
      *
-     * @param personnel the personnel to reward
+     * @param personnel the personnel to adjust
+     * @param delta      the reputation change to apply to each employed character
      */
-    private static void updatePersonnelForContractSuccess(List<Person> personnel) {
+    private static void changeEmployedPersonnelReputation(List<Person> personnel, int delta) {
         for (Person person : personnel) {
             if (person.isEmployed()) {
-                person.changeReputation(CONTRACT_SUCCESS_DELTA);
+                person.changeReputation(delta);
             }
         }
+    }
+
+    /**
+     * Scales a reputation delta by a contract characteristic's multiplier, rounding to the nearest whole point.
+     *
+     * @param baseDelta  the unscaled delta
+     * @param multiplier the multiplier ({@code 1.0} leaves the delta unchanged)
+     *
+     * @return the scaled delta
+     */
+    private static int scaleReputationDelta(int baseDelta, double multiplier) {
+        return (int) Math.round(baseDelta * multiplier);
     }
 
     /**
@@ -584,11 +605,11 @@ public class ChaosReputation {
      *
      * @param personnel the personnel to penalize
      */
-    private static void updatePersonnelForContractBreak(List<Person> personnel) {
+    private static void updatePersonnelForContractBreak(List<Person> personnel, double multiplier) {
         for (Person person : personnel) {
             if (person.isEmployed()) {
                 int baseReputation = person.getReputationDirect();
-                int delta = getContractBreakDelta(baseReputation);
+                int delta = scaleReputationDelta(getContractBreakDelta(baseReputation), multiplier);
                 person.changeReputation(delta);
             }
         }
@@ -622,6 +643,18 @@ public class ChaosReputation {
      * @param personnel the personnel whose reputation is adjusted in per-character mode
      */
     public static void processContractCompletion(Campaign campaign, MissionStatus status, List<Person> personnel) {
+        processContractCompletion(campaign, status, personnel, 1.0);
+    }
+
+    /**
+     * As {@link #processContractCompletion(Campaign, MissionStatus, List)}, but scales the reputation change by
+     * {@code reputationMultiplier}. A contract's unit-reputation characteristic (High-Profile, Media Blackout,
+     * Career-Maker, Thankless Task) supplies the multiplier so the swing from that contract is amplified or dampened.
+     *
+     * @param reputationMultiplier the multiplier applied to the reputation delta; {@code 1.0} leaves it unchanged
+     */
+    public static void processContractCompletion(Campaign campaign, MissionStatus status, List<Person> personnel,
+          double reputationMultiplier) {
         CampaignOptions campaignOptions = campaign.getCampaignOptions();
         boolean useChaosReputation = campaignOptions.get(CampaignOption.USE_CHAOS_REPUTATION);
         if (!useChaosReputation) {
@@ -632,8 +665,12 @@ public class ChaosReputation {
                                           status.isOverallSuccess() :
                                           status.isSuccess();
         boolean penalizesReputation = status.isBreach();
+        // Hinterlands: a plain failed (non-breached) contract can also cost Reputation, when the option is enabled.
+        // The status is checked first so the option is only read for a failed contract.
+        boolean failsReputation = status.isFailed()
+                                        && campaignOptions.get(CampaignOption.USE_FAILED_CONTRACT_REPUTATION_LOSS);
 
-        if (!rewardsReputation && !penalizesReputation) {
+        if (!rewardsReputation && !penalizesReputation && !failsReputation) {
             return;
         }
 
@@ -641,24 +678,39 @@ public class ChaosReputation {
         int base = playerForce.getChaosCampaignReputation();
         boolean isCampaignLevelReputation = campaignOptions.get(CampaignOption.CAMPAIGN_LEVEL_CHAOS_REPUTATION);
         if (rewardsReputation) {
+            int successDelta = scaleReputationDelta(CONTRACT_SUCCESS_DELTA, reputationMultiplier);
             if (isCampaignLevelReputation) {
-                playerForce.changeChaosCampaignReputation(CONTRACT_SUCCESS_DELTA);
+                playerForce.changeChaosCampaignReputation(successDelta);
             } else {
-                updatePersonnelForContractSuccess(personnel);
+                changeEmployedPersonnelReputation(personnel, successDelta);
             }
 
             String report = getFormattedTextAt(RESOURCE_BUNDLE, "ChaosReputation.contractSuccess",
-                  spanOpeningWithCustomColor(getPositiveColor()), CLOSING_SPAN_TAG, CONTRACT_SUCCESS_DELTA);
+                  spanOpeningWithCustomColor(getPositiveColor()), CLOSING_SPAN_TAG, successDelta);
             campaign.addReport(DailyReportType.GENERAL, report);
-        } else {
+        } else if (penalizesReputation) {
             if (isCampaignLevelReputation) {
-                playerForce.changeChaosCampaignReputation(getContractBreakDelta(base));
+                playerForce.changeChaosCampaignReputation(scaleReputationDelta(getContractBreakDelta(base),
+                      reputationMultiplier));
             } else {
-                updatePersonnelForContractBreak(personnel);
+                updatePersonnelForContractBreak(personnel, reputationMultiplier);
             }
 
             String report = getFormattedTextAt(RESOURCE_BUNDLE, "ChaosReputation.brokenContract",
                   spanOpeningWithCustomColor(getNegativeColor()), CLOSING_SPAN_TAG, BREAKING_CONTRACT_MIN_DELTA);
+            campaign.addReport(DailyReportType.GENERAL, report);
+        } else {
+            // A failed (non-breached) contract: a lighter penalty than a breach. High-Profile / Media Blackout scale
+            // this loss (via the multiplier); Career-Maker / Thankless leave it, and a breach is handled above.
+            int failureDelta = scaleReputationDelta(CONTRACT_FAILURE_DELTA, reputationMultiplier);
+            if (isCampaignLevelReputation) {
+                playerForce.changeChaosCampaignReputation(failureDelta);
+            } else {
+                changeEmployedPersonnelReputation(personnel, failureDelta);
+            }
+
+            String report = getFormattedTextAt(RESOURCE_BUNDLE, "ChaosReputation.failedContract",
+                  spanOpeningWithCustomColor(getNegativeColor()), CLOSING_SPAN_TAG, Math.abs(failureDelta));
             campaign.addReport(DailyReportType.GENERAL, report);
         }
 

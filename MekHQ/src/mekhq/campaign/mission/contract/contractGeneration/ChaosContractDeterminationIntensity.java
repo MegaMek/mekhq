@@ -34,7 +34,7 @@ package mekhq.campaign.mission.contract.contractGeneration;
 
 import static megamek.common.compute.Compute.d6;
 
-public class ChaosContractDetermineIntensity {
+public class ChaosContractDeterminationIntensity {
     public static int determineTrackCount(ChaosObjectiveType objectiveType) {
         int roll = d6(2);
 

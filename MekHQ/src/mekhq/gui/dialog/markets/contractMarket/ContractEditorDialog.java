@@ -47,15 +47,7 @@ import java.awt.FlowLayout;
 import java.awt.event.ActionListener;
 import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
-import java.util.AbstractMap;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 import javax.swing.*;
 
 import jakarta.annotation.Nullable;
@@ -82,6 +74,7 @@ import mekhq.campaign.mission.contract.contractGeneration.ContractSearchType;
 import mekhq.campaign.mission.contract.contractGeneration.negotiationsAndNPCs.EmployerLiaison;
 import mekhq.campaign.mission.contract.contractGeneration.negotiationsAndNPCs.EmployerNegotiator;
 import mekhq.campaign.mission.contract.contractGeneration.negotiationsAndNPCs.OpposingCommander;
+import mekhq.campaign.mission.contract.utilities.ContractCharacteristics;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.enums.Profession;
 import mekhq.campaign.personnel.ranks.RankSystem;
@@ -142,6 +135,8 @@ public class ContractEditorDialog extends JDialog {
     private JTextArea descriptionArea;
     private JComboBox<MissionStatus> statusCombo;
     private boolean statusEditable;
+    private JComboBox<ContractNature> natureCombo;
+    private boolean natureEditable;
 
     // Parameters
     private JSpinner scaleSpinner;
@@ -161,6 +156,7 @@ public class ContractEditorDialog extends JDialog {
     private transient LocalDate startDate;
     private transient LocalDate endDate;
     private JSpinner lengthSpinner;
+    private JCheckBox lengthAutomatic;
 
     // Target
     private JSuggestField systemField;
@@ -196,6 +192,11 @@ public class ContractEditorDialog extends JDialog {
     private JComboBox<ChaosContractStepsTable> transportTermCombo;
     private JComboBox<ChaosContractStepsTable> salvageCombo;
     private JComboBox<ChaosContractStepsTable> commandCombo;
+    private JCheckBox payNonNegotiableCheck;
+    private JCheckBox supportNonNegotiableCheck;
+    private JCheckBox transportNonNegotiableCheck;
+    private JCheckBox salvageNonNegotiableCheck;
+    private JCheckBox commandNonNegotiableCheck;
 
     // Objectives
     private JComboBox<ContractObjectiveType> playerObjectiveCombo;
@@ -214,6 +215,9 @@ public class ContractEditorDialog extends JDialog {
     private JCheckBox obfuscateOppositionCheckbox;
     private JCheckBox obfuscateThreatCheckbox;
     private JCheckBox obfuscateMoraleCheckbox;
+
+    private final Map<ContractCharacteristic, JCheckBox> characteristicCheckboxes =
+          new EnumMap<>(ContractCharacteristic.class);
 
     // Facilities
     private JSpinner hospitalBedsSpinner;
@@ -369,6 +373,7 @@ public class ContractEditorDialog extends JDialog {
         addTab(tabs, "edit.contractMarket.section.employer", buildEmployerCard());
         addTab(tabs, "edit.contractMarket.section.enemy", buildEnemyCard());
         addTab(tabs, "edit.contractMarket.section.intel", buildIntelCard());
+        addTab(tabs, "edit.contractMarket.section.characteristics", buildCharacteristicsCard());
         addTab(tabs, "edit.contractMarket.section.terms", buildTermsCard());
         addTab(tabs, "edit.contractMarket.section.objectives", buildObjectivesCard());
         addTab(tabs, "edit.contractMarket.section.finance", buildFinanceCard());
@@ -451,6 +456,15 @@ public class ContractEditorDialog extends JDialog {
         }
         rows.add(formRow("edit.contractMarket.field.status", statusCombo));
 
+        natureEditable = contract.getStatus() == null;
+        natureCombo = natureCombo(contract.getNature());
+        natureCombo.setEnabled(natureEditable);
+        if (!natureEditable) {
+            natureCombo.setToolTipText(wordWrap(getTextAt(RESOURCE_BUNDLE,
+                  "edit.contractMarket.field.nature.disabled.tooltip")));
+        }
+        rows.add(formRow("edit.contractMarket.field.nature", natureCombo));
+
         return card(rows);
     }
 
@@ -498,22 +512,44 @@ public class ContractEditorDialog extends JDialog {
         rows.add(formRow("edit.contractMarket.field.endDate", withAutomatic(endDateButton, endAutomatic)));
 
         // The length is derived from the dates when the end date is set by hand, but becomes the GM's own input that
-        // drives the end date when the end date is automatic.
+        // drives the end date when the end date is automatic. Its own "Automatic" box instead (re)derives the length
+        // from the generator - and bakes any Quick Job / Long Haul characteristic - the way pay and objectives do.
         lengthSpinner = intSpinner(max(MINIMUM_CONTRACT_LENGTH_MONTHS, contract.getLengthInMonths()),
               MINIMUM_CONTRACT_LENGTH_MONTHS);
         lengthSpinner.setToolTipText(wordWrap(getTextAt(RESOURCE_BUNDLE, "edit.contractMarket.field.length.tooltip")));
         lengthSpinner.addChangeListener(e -> onLengthChanged());
-        rows.add(formRow("edit.contractMarket.field.length", lengthSpinner));
+        lengthAutomatic = scheduleAutomaticToggle(this::onLengthAutomaticToggled);
+        rows.add(formRow("edit.contractMarket.field.length", withAutomatic(lengthSpinner, lengthAutomatic)));
 
         // Seed the automatic values so the initial display already reflects the checkbox defaults.
         if (startAutomatic.isSelected()) {
             startDate = AbstractContractGeneration.determineStartDate(campaign, contract);
         }
-        if (endAutomatic.isSelected() && startDate != null) {
-            endDate = startDate.plusMonths(lengthValue());
+        if ((endAutomatic.isSelected() || lengthAutomatic.isSelected()) && startDate != null) {
+            endDate = startDate.plusMonths(effectiveLengthMonths());
         }
         refreshScheduleControls();
         return card(rows);
+    }
+
+    /** When the length's "Automatic" box is toggled, re-derive the length and (automatic) end date, and repaint. */
+    private void onLengthAutomaticToggled() {
+        if (startDate != null && (lengthAutomatic.isSelected() || endAutomatic.isSelected())) {
+            endDate = startDate.plusMonths(effectiveLengthMonths());
+        }
+        refreshScheduleControls();
+    }
+
+    /**
+     * The length in months to use for an automatic end date: the generator's length (with any Quick Job / Long Haul
+     * characteristic baked in) when the length is on "Automatic", otherwise the GM's spinner value.
+     */
+    private int effectiveLengthMonths() {
+        if (lengthAutomatic != null && lengthAutomatic.isSelected()) {
+            return ContractCharacteristics.bakeLength(AbstractContractGeneration.determineLength(campaign, contract),
+                  contract);
+        }
+        return lengthValue();
     }
 
     /** A button that shows a date (or "not set") and runs {@code onPick} - a {@link DateChooser} flow - when clicked. */
@@ -543,14 +579,15 @@ public class ContractEditorDialog extends JDialog {
 
     private void onEndAutomaticToggled() {
         if (endAutomatic.isSelected() && startDate != null) {
-            endDate = startDate.plusMonths(lengthValue());
+            endDate = startDate.plusMonths(effectiveLengthMonths());
         }
         refreshScheduleControls();
     }
 
     private void onLengthChanged() {
-        if (endAutomatic.isSelected() && startDate != null) {
-            endDate = startDate.plusMonths(lengthValue());
+        if ((endAutomatic.isSelected() || (lengthAutomatic != null && lengthAutomatic.isSelected()))
+                  && startDate != null) {
+            endDate = startDate.plusMonths(effectiveLengthMonths());
             endDateButton.setText(dateButtonLabel(endDate));
         }
     }
@@ -589,8 +626,8 @@ public class ContractEditorDialog extends JDialog {
         if (startDate == null) {
             return;
         }
-        if (endAutomatic.isSelected()) {
-            endDate = startDate.plusMonths(lengthValue());
+        if (endAutomatic.isSelected() || (lengthAutomatic != null && lengthAutomatic.isSelected())) {
+            endDate = startDate.plusMonths(effectiveLengthMonths());
             return;
         }
         LocalDate earliestEnd = startDate.plusMonths(MINIMUM_CONTRACT_LENGTH_MONTHS);
@@ -621,10 +658,14 @@ public class ContractEditorDialog extends JDialog {
     private void refreshScheduleControls() {
         startDateButton.setText(dateButtonLabel(startDate));
         endDateButton.setText(dateButtonLabel(endDate));
+        boolean lengthAuto = lengthAutomatic != null && lengthAutomatic.isSelected();
         startDateButton.setEnabled(!startAutomatic.isSelected());
-        endDateButton.setEnabled(!endAutomatic.isSelected());
-        lengthSpinner.setEnabled(endAutomatic.isSelected());
-        if (!endAutomatic.isSelected() && startDate != null && endDate != null) {
+        // An automatic length derives the end date, so it takes the end button (and the length spinner) out of play.
+        endDateButton.setEnabled(!endAutomatic.isSelected() && !lengthAuto);
+        lengthSpinner.setEnabled(endAutomatic.isSelected() && !lengthAuto);
+        if (lengthAuto) {
+            lengthSpinner.setValue(effectiveLengthMonths());
+        } else if (!endAutomatic.isSelected() && startDate != null && endDate != null) {
             lengthSpinner.setValue((int) max(MINIMUM_CONTRACT_LENGTH_MONTHS,
                   ChronoUnit.MONTHS.between(startDate, endDate)));
         }
@@ -774,6 +815,55 @@ public class ContractEditorDialog extends JDialog {
         return checkbox;
     }
 
+    /**
+     * The Characteristics tab: GM toggles for the random flavor characteristics a contract carries. A GM may pick any
+     * number, but not two that share a {@link ContractCharacteristic.Category} - those are mutually exclusive, so
+     * ticking one greys out the rest of its category. Characteristics are listed grouped by category for that reason.
+     */
+    private JPanel buildCharacteristicsCard() {
+        JPanel rows = rowsPanel();
+
+        JLabel note = new JLabel(wordWrap(getTextAt(RESOURCE_BUNDLE, "edit.contractMarket.characteristics.note")));
+        rows.add(note);
+        rows.add(Box.createVerticalStrut(scaleForGUI(6)));
+
+        for (ContractCharacteristic.Category category : ContractCharacteristic.Category.values()) {
+            for (ContractCharacteristic characteristic : ContractCharacteristic.values()) {
+                if (characteristic.getCategory() != category) {
+                    continue;
+                }
+                JCheckBox checkbox = new JCheckBox(characteristic.getName(),
+                      contract.hasCharacteristic(characteristic));
+                checkbox.setToolTipText(wordWrap(characteristic.getToolTipText()));
+                checkbox.setAlignmentX(Component.LEFT_ALIGNMENT);
+                checkbox.addActionListener(event -> syncCharacteristicExclusions());
+                characteristicCheckboxes.put(characteristic, checkbox);
+                rows.add(checkbox);
+            }
+        }
+
+        syncCharacteristicExclusions();
+        return card(rows);
+    }
+
+    /**
+     * Enforces the one-per-category rule in the Characteristics tab: within each category, once a characteristic is
+     * ticked the others are disabled; when none is ticked they are all available again. Selection is never changed
+     * here, so this is safe to call from each checkbox's action listener.
+     */
+    private void syncCharacteristicExclusions() {
+        for (ContractCharacteristic.Category category : ContractCharacteristic.Category.values()) {
+            boolean oneChosen = characteristicCheckboxes.entrySet().stream()
+                                      .anyMatch(entry -> entry.getKey().getCategory() == category
+                                                               && entry.getValue().isSelected());
+            characteristicCheckboxes.forEach((characteristic, checkbox) -> {
+                if (characteristic.getCategory() == category) {
+                    checkbox.setEnabled(!oneChosen || checkbox.isSelected());
+                }
+            });
+        }
+    }
+
     /** Whether the player's batchall acceptance is editable: an accepted contract fought against a Clan enemy. */
     private boolean batchallEditable() {
         return contract.getStatus() != null && isEnemyClan();
@@ -799,22 +889,52 @@ public class ContractEditorDialog extends JDialog {
     private JPanel buildTermsCard() {
         JPanel rows = rowsPanel();
 
+        NonNegotiableTermsData locks = contract.getNonNegotiableTermsData();
+        if (locks == null) {
+            locks = NonNegotiableTermsData.none();
+        }
+        // Which terms the employer has locked can only be set while the contract is still an offer; once it has been
+        // accepted the player has agreed to those terms, so the checkboxes show their state but are disabled.
+        boolean lockEditable = contract.getStatus() == null;
+
         payRateCombo = stepsCombo(contract.getBasePayRateStep(), TermEffect.PAY_RATE);
-        rows.add(formRow("edit.contractMarket.field.payRate", payRateCombo));
+        payNonNegotiableCheck = nonNegotiableCheckbox(locks.payLocked(), lockEditable);
+        rows.add(formRow("edit.contractMarket.field.payRate", withAutomatic(payRateCombo, payNonNegotiableCheck)));
 
         supportCombo = stepsCombo(contract.getSupportStep(), TermEffect.SUPPORT);
-        rows.add(formRow("edit.contractMarket.field.support", supportCombo));
+        supportNonNegotiableCheck = nonNegotiableCheckbox(locks.supportLocked(), lockEditable);
+        rows.add(formRow("edit.contractMarket.field.support", withAutomatic(supportCombo, supportNonNegotiableCheck)));
 
         transportTermCombo = stepsCombo(contract.getTransportStep(), TermEffect.TRANSPORT);
-        rows.add(formRow("edit.contractMarket.field.transport", transportTermCombo));
+        transportNonNegotiableCheck = nonNegotiableCheckbox(locks.transportLocked(), lockEditable);
+        rows.add(formRow("edit.contractMarket.field.transport",
+              withAutomatic(transportTermCombo, transportNonNegotiableCheck)));
 
         salvageCombo = stepsCombo(contract.getSalvageRightsStep(), TermEffect.SALVAGE);
-        rows.add(formRow("edit.contractMarket.field.salvage", salvageCombo));
+        salvageNonNegotiableCheck = nonNegotiableCheckbox(locks.salvageLocked(), lockEditable);
+        rows.add(formRow("edit.contractMarket.field.salvage", withAutomatic(salvageCombo, salvageNonNegotiableCheck)));
 
         commandCombo = stepsCombo(contract.getCommandRightsStep(), TermEffect.COMMAND);
-        rows.add(formRow("edit.contractMarket.field.command", commandCombo));
+        commandNonNegotiableCheck = nonNegotiableCheckbox(locks.commandLocked(), lockEditable);
+        rows.add(formRow("edit.contractMarket.field.command", withAutomatic(commandCombo, commandNonNegotiableCheck)));
 
         return card(rows);
+    }
+
+    /**
+     * A "non-negotiable" checkbox for a term: ticked when the employer has locked that term, disabled (but still
+     * showing its state) once the contract has been accepted, since the locks can no longer change at that point.
+     */
+    private JCheckBox nonNegotiableCheckbox(boolean locked, boolean editable) {
+        JCheckBox checkbox = new JCheckBox(getTextAt(RESOURCE_BUNDLE, "edit.contractMarket.field.nonNegotiable"),
+              locked);
+        checkbox.setToolTipText(wordWrap(getTextAt(RESOURCE_BUNDLE, editable
+                                                                          ?
+                                                                          "edit.contractMarket.field.nonNegotiable.tooltip"
+                                                                          :
+                                                                          "edit.contractMarket.field.nonNegotiable.disabled.tooltip")));
+        checkbox.setEnabled(editable);
+        return checkbox;
     }
 
     private JPanel buildObjectivesCard() {
@@ -1007,6 +1127,20 @@ public class ContractEditorDialog extends JDialog {
             contract.setStatus(statusValue(statusCombo));
         }
 
+        if (natureEditable) {
+            contract.setNature(enumValue(natureCombo, contract.getNature()));
+        }
+
+        // Characteristics - the GM's chosen set (one-per-category is enforced by the tab's checkboxes). Set before the
+        // numeric parameters below so their "Automatic" values can be baked from the selected characteristics.
+        EnumSet<ContractCharacteristic> selectedCharacteristics = EnumSet.noneOf(ContractCharacteristic.class);
+        characteristicCheckboxes.forEach((characteristic, checkbox) -> {
+            if (checkbox.isSelected()) {
+                selectedCharacteristics.add(characteristic);
+            }
+        });
+        contract.setCharacteristics(selectedCharacteristics);
+
         // Parameters. The "Automatic" checkboxes exist only in create mode (see automaticToggle): a ticked box
         // (re)determines the value with the same rules the contract generator uses (AbstractContractGeneration),
         // while an unticked box writes the GM's manual spinner value. Scale is resolved before the required victory
@@ -1023,11 +1157,13 @@ public class ContractEditorDialog extends JDialog {
                                                      :
                                                      intValue(combatElementsSpinner));
             contract.setTrackCount(trackCountAutomatic.isSelected()
-                                         ? AbstractContractGeneration.determineTrackCount(contract)
+                                         ? ContractCharacteristics.bakeTrackCount(
+                  AbstractContractGeneration.determineTrackCount(contract), contract)
                                          : intValue(trackCountSpinner));
             contract.setRequiredVictoryPoints(victoryPointsAutomatic.isSelected()
-                                                    ?
-                                                    AbstractContractGeneration.determineRequiredVictoryPoints(contract)
+                                                    ? ContractCharacteristics.bakeRequiredVictoryPoints(
+                  AbstractContractGeneration.determineRequiredVictoryPoints(
+                        contract), contract)
                                                     :
                                                     intValue(victoryPointsSpinner));
         } else {
@@ -1054,8 +1190,10 @@ public class ContractEditorDialog extends JDialog {
         LocalDate saveStart = startAutomatic.isSelected()
                                     ? AbstractContractGeneration.determineStartDate(campaign, contract)
                                     : startDate;
-        LocalDate saveEnd = endAutomatic.isSelected()
-                                  ? (saveStart == null ? null : saveStart.plusMonths(lengthValue()))
+        // An automatic length (Quick Job / Long Haul baked onto the generator's length) or an automatic end both derive
+        // the end date from the start; otherwise the GM's manual end date stands.
+        LocalDate saveEnd = (endAutomatic.isSelected() || lengthAutomatic.isSelected())
+                                  ? (saveStart == null ? null : saveStart.plusMonths(effectiveLengthMonths()))
                                   : endDate;
         if (saveStart != null && saveEnd != null) {
             LocalDate earliestEnd = saveStart.plusMonths(MINIMUM_CONTRACT_LENGTH_MONTHS);
@@ -1099,6 +1237,11 @@ public class ContractEditorDialog extends JDialog {
         // Terms
         contract.setContractTerms(new ContractTermsData(stepValue(payRateCombo), stepValue(supportCombo),
               stepValue(transportTermCombo), stepValue(salvageCombo), stepValue(commandCombo)));
+        // A disabled checkbox still reports its loaded state, so on an accepted contract this preserves the existing
+        // locks unchanged.
+        contract.setNonNegotiableTermsData(new NonNegotiableTermsData(payNonNegotiableCheck.isSelected(),
+              supportNonNegotiableCheck.isSelected(), transportNonNegotiableCheck.isSelected(),
+              salvageNonNegotiableCheck.isSelected(), commandNonNegotiableCheck.isSelected()));
 
         // Objectives
         contract.setObjectiveData(new ContractObjectiveData(objectiveValue(playerObjectiveCombo),
@@ -1110,11 +1253,15 @@ public class ContractEditorDialog extends JDialog {
         Money transportPay = transportPayAutomatic.isSelected()
                                    ? AbstractContractGeneration.determineTransportPay(campaign, contract)
                                    : moneyValue(transportPaySpinner);
+        // On "Automatic" the base is recomputed from the generator, then the pay / combat-pay characteristic is baked
+        // on top - recomputing each commit keeps the multiplier idempotent. A manual spinner value is left untouched.
         Money monthlyPayValue = monthlyPayAutomatic.isSelected()
-                                      ? AbstractContractGeneration.determineMonthlyPay(campaign, contract)
+                                      ? ContractCharacteristics.bakeMonthlyPay(
+              AbstractContractGeneration.determineMonthlyPay(campaign, contract), contract)
                                       : moneyValue(monthlyPaySpinner);
         Money combatPayValue = combatPayAutomatic.isSelected()
-                                     ? AbstractContractGeneration.determineCombatPay(campaign, contract)
+                                     ? ContractCharacteristics.bakeCombatPay(
+              AbstractContractGeneration.determineCombatPay(campaign, contract), contract)
                                      : moneyValue(combatPaySpinner);
         contract.setContractFinanceData(new ContractFinanceData(transportPay, monthlyPayValue, combatPayValue));
 
@@ -1146,6 +1293,10 @@ public class ContractEditorDialog extends JDialog {
             applyNpc(liaisonEditor);
             applyNpc(commanderEditor);
         }
+
+        // Tier the employer negotiator to match the Elite / Novice Negotiator characteristic (Veteran when neither).
+        // Done last, after the negotiator has been generated (create) or edited (edit).
+        ContractCharacteristics.syncNegotiatorTier(contract, campaign);
 
         LOGGER.info("GM {} contract: {}", createMode ? "created" : "edited", contract.getName());
         confirmed = true;
@@ -1410,6 +1561,23 @@ public class ContractEditorDialog extends JDialog {
     private static <E> JComboBox<E> enumCombo(E[] values, E selected) {
         JComboBox<E> combo = new JComboBox<>(new DefaultComboBoxModel<>(values));
         combo.setSelectedItem(selected);
+        return combo;
+    }
+
+    /** The contract-type picker, rendering each {@link ContractNature} with its player-facing label. */
+    private JComboBox<ContractNature> natureCombo(ContractNature selected) {
+        JComboBox<ContractNature> combo = enumCombo(ContractNature.values(), selected);
+        combo.setRenderer(new DefaultListCellRenderer() {
+            @Override
+            public Component getListCellRendererComponent(JList<?> list, Object value, int index, boolean isSelected,
+                  boolean cellHasFocus) {
+                super.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);
+                if (value instanceof ContractNature nature) {
+                    setText(getTextAt(RESOURCE_BUNDLE, "contractNature." + nature.name()));
+                }
+                return this;
+            }
+        });
         return combo;
     }
 

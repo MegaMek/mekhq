@@ -33,6 +33,7 @@
 package mekhq.gui.campaignOptions.contents;
 
 import static mekhq.gui.campaignOptions.CampaignOptionFlag.CUSTOM_SYSTEM;
+import static mekhq.gui.campaignOptions.CampaignOptionFlag.RECOMMENDED;
 import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.MILESTONE_BEFORE_METADATA;
 import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.createTipPanelUpdater;
 import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.getCampaignOptionsResourceBundle;
@@ -110,6 +111,11 @@ class ContractMarketPage {
     private JCheckBox chkUseChaosScaleSupportPointConversion;
     private JCheckBox chkUseContractFactionModifiers;
     private JCheckBox chkUseIntelObfuscation;
+    private JCheckBox chkUseNonNegotiableTerms;
+    private JCheckBox chkUseActiveNegotiators;
+    private JCheckBox chkUseRandomContractCharacteristics;
+    private JCheckBox chkUseOperationCodenames;
+    private JCheckBox chkHideContractType;
     private JLabel lblDropShipBonusPercentage;
     private JSpinner spnDropShipBonusPercentage;
     private JLabel lblPityContracts;
@@ -264,6 +270,27 @@ class ContractMarketPage {
               getMetadata(new Version(0, 51, 1), CUSTOM_SYSTEM));
         chkUseIntelObfuscation.addMouseListener(createTipPanelUpdater("UseIntelObfuscation"));
 
+        chkUseNonNegotiableTerms = new CampaignOptionsCheckBox("UseNonNegotiableTerms",
+              getMetadata(new Version(0, 51, 1), CUSTOM_SYSTEM));
+        chkUseNonNegotiableTerms.addMouseListener(createTipPanelUpdater("UseNonNegotiableTerms"));
+
+        chkUseActiveNegotiators = new CampaignOptionsCheckBox("UseActiveNegotiators",
+              getMetadata(new Version(0, 51, 1), CUSTOM_SYSTEM));
+        chkUseActiveNegotiators.addMouseListener(createTipPanelUpdater("UseActiveNegotiators"));
+
+        chkUseRandomContractCharacteristics = new CampaignOptionsCheckBox("UseRandomContractCharacteristics",
+              getMetadata(new Version(0, 51, 1), CUSTOM_SYSTEM));
+        chkUseRandomContractCharacteristics.addMouseListener(
+              createTipPanelUpdater("UseRandomContractCharacteristics"));
+
+        chkUseOperationCodenames = new CampaignOptionsCheckBox("UseOperationCodenames",
+              getMetadata(new Version(0, 51, 1), CUSTOM_SYSTEM));
+        chkUseOperationCodenames.addMouseListener(createTipPanelUpdater("UseOperationCodenames"));
+
+        chkHideContractType = new CampaignOptionsCheckBox("HideContractType",
+              getMetadata(new Version(0, 51, 1), CUSTOM_SYSTEM, RECOMMENDED));
+        chkHideContractType.addMouseListener(createTipPanelUpdater("HideContractType"));
+
         lblDropShipBonusPercentage = new CampaignOptionsLabel("DropShipBonusPercentage");
         lblDropShipBonusPercentage.addMouseListener(createTipPanelUpdater("DropShipBonusPercentage"));
         spnDropShipBonusPercentage = new CampaignOptionsSpinner("DropShipBonusPercentage", 0, 0, 20, 5);
@@ -295,6 +322,11 @@ class ContractMarketPage {
               chkUseChaosScaleSupportPointConversion,
               chkUseContractFactionModifiers,
               chkUseIntelObfuscation,
+              chkUseNonNegotiableTerms,
+              chkUseActiveNegotiators,
+              chkUseRandomContractCharacteristics,
+              chkUseOperationCodenames,
+              chkHideContractType,
               chkBLCSaleValue,
               chkOverageRepaymentInFinalPayment);
         panel.addRow(lblDropShipBonusPercentage, spnDropShipBonusPercentage);
@@ -617,6 +649,11 @@ class ContractMarketPage {
         chkUseChaosScaleSupportPointConversion.setSelected(model.useChaosScaleSupportPointConversion);
         chkUseContractFactionModifiers.setSelected(model.useContractFactionModifiers);
         chkUseIntelObfuscation.setSelected(model.useIntelObfuscation);
+        chkUseNonNegotiableTerms.setSelected(model.useNonNegotiableTerms);
+        chkUseActiveNegotiators.setSelected(model.useActiveNegotiators);
+        chkUseRandomContractCharacteristics.setSelected(model.useRandomContractCharacteristics);
+        chkUseOperationCodenames.setSelected(model.useOperationCodenames);
+        chkHideContractType.setSelected(model.hideContractType);
         spnDropShipBonusPercentage.setValue(model.dropShipBonusPercentage);
         spnPityContracts.setValue(model.pityContracts);
         spnContractBasePayMultiplier.setValue(model.contractBasePayMultiplier);
@@ -667,6 +704,11 @@ class ContractMarketPage {
         model.useChaosScaleSupportPointConversion = chkUseChaosScaleSupportPointConversion.isSelected();
         model.useContractFactionModifiers = chkUseContractFactionModifiers.isSelected();
         model.useIntelObfuscation = chkUseIntelObfuscation.isSelected();
+        model.useNonNegotiableTerms = chkUseNonNegotiableTerms.isSelected();
+        model.useActiveNegotiators = chkUseActiveNegotiators.isSelected();
+        model.useRandomContractCharacteristics = chkUseRandomContractCharacteristics.isSelected();
+        model.useOperationCodenames = chkUseOperationCodenames.isSelected();
+        model.hideContractType = chkHideContractType.isSelected();
         model.dropShipBonusPercentage = (int) spnDropShipBonusPercentage.getValue();
         model.pityContracts = (int) spnPityContracts.getValue();
         model.contractBasePayMultiplier = (double) spnContractBasePayMultiplier.getValue();
