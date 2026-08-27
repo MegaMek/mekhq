@@ -636,6 +636,10 @@ public class AbstractContractGeneration {
 
         ContractScheduleData contractScheduleData = new ContractScheduleData(startDate, endDate, monthsLength);
         contract.setScheduleData(contractScheduleData);
+
+        // Scenario schedule - spread the (already determined) track count across the contract's months via the Track
+        // Intensity Tables. Nothing consumes this yet; it is generated and stored for a later feature.
+        contract.setScenarioSchedule(TrackIntensityTable.rollSchedule(monthsLength, contract.getTrackCount()));
     }
 
     private static @Nonnull EnemyData pickEnemy(Campaign campaign, LocalDate currentDate, ILocation currentLocation,

@@ -112,6 +112,15 @@ public final class ContractXmlCodec {
         writeStringIfPresent(printWriter, indent, "description", contract.getDescription());
         MHQXMLUtility.writeSimpleXMLTag(printWriter, indent, "scale", contract.getScale());
         MHQXMLUtility.writeSimpleXMLTag(printWriter, indent, "trackCount", contract.getTrackCount());
+        // The scenario schedule carries a random roll's result, so it is persisted rather than re-derived on load.
+        if (contract.getScenarioSchedule() != null) {
+            MHQXMLUtility.writeSimpleXMLTag(printWriter, indent, "scenarioSchedule",
+                  contract.getScenarioSchedule()
+                        .monthlyTrackCounts()
+                        .stream()
+                        .map(String::valueOf)
+                        .collect(Collectors.joining(",")));
+        }
         MHQXMLUtility.writeSimpleXMLTag(printWriter, indent, "contractNature", contract.getNature().name());
         MHQXMLUtility.writeSimpleXMLTag(printWriter, indent, "sharesPercent", contract.getSharesPercent());
         if (!contract.getObfuscatedIntel().isEmpty()) {
@@ -410,6 +419,8 @@ public final class ContractXmlCodec {
         readers.put("description", (contract, node, campaign, version) -> contract.setDescription(text(node)));
         readers.put("scale", (contract, node, campaign, version) -> contract.setScale(parseInt(node)));
         readers.put("trackCount", (contract, node, campaign, version) -> contract.setTrackCount(parseInt(node)));
+        readers.put("scenarioSchedule",
+              (contract, node, campaign, version) -> contract.setScenarioSchedule(parseScenarioSchedule(node)));
         readers.put("contractNature",
               (contract, node, campaign, version) -> contract.setNature(ContractNature.fromString(text(node))));
         // Legacy: pre-ContractNature saves stored the designation as a standalone boolean flag.
@@ -807,6 +818,33 @@ public final class ContractXmlCodec {
             }
         }
         return parsed;
+    }
+
+    /**
+     * Parses the comma-separated per-month track counts of a scenario schedule. A blank or empty value yields an empty
+     * schedule; a non-numeric token aborts parsing and drops the schedule, since a partial one would misrepresent the
+     * contract's cadence.
+     */
+    private static @Nullable ContractScenarioSchedule parseScenarioSchedule(final Node wn) {
+        final String raw = text(wn).trim();
+        if (raw.isEmpty()) {
+            return new ContractScenarioSchedule(java.util.List.of());
+        }
+
+        final java.util.List<Integer> monthlyTrackCounts = new java.util.ArrayList<>();
+        for (final String token : raw.split(",")) {
+            final String trimmed = token.trim();
+            if (trimmed.isEmpty()) {
+                continue;
+            }
+            try {
+                monthlyTrackCounts.add(Integer.parseInt(trimmed));
+            } catch (NumberFormatException ex) {
+                LOGGER.warn("Malformed scenario schedule entry '{}' - dropping the schedule.", trimmed);
+                return null;
+            }
+        }
+        return new ContractScenarioSchedule(monthlyTrackCounts);
     }
 
     private static final class SystemsTargetBuilder {

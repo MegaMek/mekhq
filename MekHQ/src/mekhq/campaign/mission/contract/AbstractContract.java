@@ -118,10 +118,11 @@ public abstract class AbstractContract {
     private final EnumSet<ContractCharacteristic> characteristics = EnumSet.noneOf(ContractCharacteristic.class);
 
     private StratConCampaignState stratConCampaignState;
-    private int scale;
     private int requiredCombatElements;
     private int requiredVictoryPoints;
+    private int scale;
     private int trackCount; // TODO future proofing
+    private ContractScenarioSchedule scenarioSchedule;
     private ContractNature nature = ContractNature.NORMAL;
 
     private final List<Scenario> scenarios = new ArrayList<>();
@@ -614,6 +615,18 @@ public abstract class AbstractContract {
 
     public void setTrackCount(int trackCount) {
         this.trackCount = trackCount;
+    }
+
+    /**
+     * @return how this contract's tracks are spread across the months it runs, rolled from the Track Intensity Tables,
+     *       or {@code null} if none has been generated. Nothing consumes it yet.
+     */
+    public @Nullable ContractScenarioSchedule getScenarioSchedule() {
+        return scenarioSchedule;
+    }
+
+    public void setScenarioSchedule(ContractScenarioSchedule scenarioSchedule) {
+        this.scenarioSchedule = scenarioSchedule;
     }
 
     /** @return this contract's special designation ({@link ContractNature#NORMAL} if it has none) */
