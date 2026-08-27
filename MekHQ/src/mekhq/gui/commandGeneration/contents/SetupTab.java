@@ -271,55 +271,38 @@ public class SetupTab {
         constraints.insets = new Insets(UIUtil.scaleForGUI(3), UIUtil.scaleForGUI(6),
               UIUtil.scaleForGUI(3), UIUtil.scaleForGUI(6));
 
-        // Row 0: Naming & Ranks on the left, Support Personnel on the right. The support section stacks
-        // its roles in one column so it fits half the width.
-        constraints.gridx = 0;
-        constraints.gridy = 0;
-        constraints.gridwidth = 1;
-        constraints.weightx = 0.5;
-        panel.add(buildNamingAndRanksSection(), constraints);
-        constraints.gridx = 1;
-        constraints.gridy = 0;
-        constraints.gridwidth = 1;
-        constraints.weightx = 0.5;
-        panel.add(buildSupportPersonnelSection(), constraints);
-
-        // Row 1: left column stacks Assistants + Temporary Crew; right column stacks Officer
-        // Selection + Tech Assignment. Officer Selection is the tallest single section in the tab,
-        // and Tech Assignment is small (4 rows), so the right-column stack roughly matches the
-        // height of the left-column pair.
+        // Two columns. The left runs from how the command is named to who staffs it; the right holds the
+        // settings that shape individual people - where they are from, whether their seats are named or
+        // pooled, who maintains their units, and augmentation.
         JPanel leftColumn = new JPanel();
         leftColumn.setLayout(new BoxLayout(leftColumn, BoxLayout.Y_AXIS));
-        leftColumn.add(buildAssistantsSection());
+        leftColumn.add(buildNamingAndRanksSection());
         leftColumn.add(Box.createVerticalStrut(UIUtil.scaleForGUI(6)));
-        leftColumn.add(buildTemporaryCrewSection());
+        leftColumn.add(buildOfficerSelectionSection());
+        leftColumn.add(Box.createVerticalStrut(UIUtil.scaleForGUI(6)));
+        leftColumn.add(buildSupportPersonnelSection());
+        leftColumn.add(Box.createVerticalStrut(UIUtil.scaleForGUI(6)));
+        leftColumn.add(buildAssistantsSection());
         constraints.gridx = 0;
-        constraints.gridy = 1;
+        constraints.gridy = 0;
         constraints.gridwidth = 1;
         constraints.weightx = 0.5;
         panel.add(leftColumn, constraints);
 
         JPanel rightColumn = new JPanel();
         rightColumn.setLayout(new BoxLayout(rightColumn, BoxLayout.Y_AXIS));
-        rightColumn.add(buildOfficerSelectionSection());
+        rightColumn.add(buildRandomOriginSection());
+        rightColumn.add(Box.createVerticalStrut(UIUtil.scaleForGUI(6)));
+        rightColumn.add(buildTemporaryCrewSection());
         rightColumn.add(Box.createVerticalStrut(UIUtil.scaleForGUI(6)));
         rightColumn.add(buildTechAssignmentSection());
         rightColumn.add(Box.createVerticalStrut(UIUtil.scaleForGUI(6)));
         rightColumn.add(buildAugmentationSection());
         constraints.gridx = 1;
-        constraints.gridy = 1;
+        constraints.gridy = 0;
         constraints.gridwidth = 1;
         constraints.weightx = 0.5;
         panel.add(rightColumn, constraints);
-
-        // Row 2: Random Origin spans full width — it's a dense sub-panel with its own internal
-        // layout, so giving it the whole width keeps its controls from being cramped.
-        constraints.gridx = 0;
-        constraints.gridy = 2;
-        constraints.gridwidth = 2;
-        constraints.weightx = 1.0;
-        panel.add(buildRandomOriginSection(), constraints);
-
         return panel;
     }
 
@@ -462,6 +445,7 @@ public class SetupTab {
         // percentage of the generated combatants. The spinner is live only when the box is checked.
         chkGenerateMedicalReserve = new CommandGenerationCheckBox("GenerateMedicalReserve");
         spnMedicalReservePercent = new JSpinner(new SpinnerNumberModel(10, 0, 100, 5));
+        spnMedicalReservePercent.setToolTipText(chkGenerateMedicalReserve.getToolTipText());
         chkGenerateMedicalReserve.addActionListener(evt ->
               spnMedicalReservePercent.setEnabled(chkGenerateMedicalReserve.isSelected()));
         constraints.gridy = 6;
@@ -549,6 +533,9 @@ public class SetupTab {
           String labelName, MMComboBox<TechAssignmentSortFactor> factorCombo,
           MMComboBox<SortDirection> directionCombo) {
         CommandGenerationLabel label = new CommandGenerationLabel(labelName);
+        factorCombo.setToolTipText(label.getToolTipText());
+        directionCombo.setToolTipText(wordWrap(getTextAt(getCommandGenerationResourceBundle(),
+              "cmbTechAssignmentDirection.tooltip"), processWrapSize(null)));
         indentAsSubOption(label);
         constraints.gridy = row;
         constraints.gridx = 0;
@@ -667,7 +654,11 @@ public class SetupTab {
 
         constraints.gridy = 0;
         constraints.gridx = 0;
-        section.add(new CommandGenerationLabel("ForceNamingMethod"), constraints);
+        CommandGenerationLabel namingMethodLabel = new CommandGenerationLabel("ForceNamingMethod");
+        section.add(namingMethodLabel, constraints);
+        // The picker itself carries the label's explanation; the renderer's per-item tooltip only shows on
+        // the open list.
+        comboForceNamingMethod.setToolTipText(namingMethodLabel.getToolTipText());
         constraints.gridx = 1;
         section.add(comboForceNamingMethod, constraints);
 
@@ -704,6 +695,7 @@ public class SetupTab {
         randomOriginOptionsPanel.setBorder(BorderFactory.createEmptyBorder());
         section.add(randomOriginOptionsPanel, constraints);
 
+        addLeftAlignFiller(section, 1);
         return section;
     }
 
@@ -760,6 +752,7 @@ public class SetupTab {
 
         CommandGenerationLabel neuralInterfaceLabel = new CommandGenerationLabel("NeuralInterfaceMode");
         indentAsSubOption(neuralInterfaceLabel);
+        cmbNeuralInterfaceMode.setToolTipText(neuralInterfaceLabel.getToolTipText());
         constraints.gridy = 2;
         constraints.gridwidth = 1;
         constraints.gridx = 0;
