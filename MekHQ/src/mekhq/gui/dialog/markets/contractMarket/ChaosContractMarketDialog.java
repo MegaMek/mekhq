@@ -509,7 +509,7 @@ public class ChaosContractMarketDialog extends JDialog implements ContractMarket
 
     /**
      * The search types a campaign may choose between. Mercenary and pirate bands may look for mercenary or pirate work,
-     * or the tournament circuit; government campaigns are limited to government orders and pirate hunts.
+     * or the tournament circuit; government campaigns are limited to government orders and pirate actions.
      *
      * @author Illiani
      * @since 0.51.01
