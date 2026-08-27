@@ -286,6 +286,8 @@ class StratConRulesManagerTest {
         // CampaignOptions needed by scanNeighboringCoords
         when(options.get(CampaignOption.USE_FATIGUE)).thenReturn(false);
         when(options.get(CampaignOption.FATIGUE_RATE)).thenReturn(0);
+        // Read only when a deployment reaches an empty hex and may roll a random encounter; not every caller gets there.
+        lenient().when(options.get(CampaignOption.ESSENTIAL_SCENARIOS_ONLY)).thenReturn(false);
 
         // processForceDeployment needs LocalDate and Hangar
         when(campaign.getLocalDate()).thenReturn(LocalDate.of(3025, 1, 15));

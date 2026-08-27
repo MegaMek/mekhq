@@ -53,8 +53,13 @@ class ChaosContractDeterminationPayTest {
     private final ChaosContractDeterminationPay payScheme = new ChaosContractDeterminationPay();
 
     private static Campaign campaignWithConversion(boolean convertSupportPoints) {
+        return campaign(convertSupportPoints, false);
+    }
+
+    private static Campaign campaign(boolean convertSupportPoints, boolean multiplyTrackIntensityByScale) {
         CampaignOptions options = mock(CampaignOptions.class);
         when(options.get(CampaignOption.USE_CHAOS_SUPPORT_POINT_CONVERSION)).thenReturn(convertSupportPoints);
+        when(options.get(CampaignOption.MULTIPLY_TRACK_INTENSITY_BY_SCALE)).thenReturn(multiplyTrackIntensityByScale);
         Campaign campaign = mock(Campaign.class);
         when(campaign.getCampaignOptions()).thenReturn(options);
         return campaign;
@@ -99,5 +104,13 @@ class ChaosContractDeterminationPayTest {
     void combatPayConvertsSupportPointsToCBillsWhenEnabled() {
         assertEquals(Money.of(15_000_000),
               payScheme.getCombatPay(campaignWithConversion(true), contract(3, 1.0)));
+    }
+
+    @Test
+    void combatPayIsDividedByScaleWhenTrackIntensityIsMultipliedByScale() {
+        // With "Multiply Track Intensity by Scale" on, combat pay is divided by scale so the per-battle bonus stays
+        // flat across the extra scenarios: 500 * scale(3) / scale(3) = 500 support points, unconverted.
+        assertEquals(Money.of(500),
+              payScheme.getCombatPay(campaign(false, true), contract(3, 1.0)));
     }
 }

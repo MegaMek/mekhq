@@ -84,6 +84,7 @@ public class StratConCampaignState {
     private final List<StratConTrackState> tracks;
 
     private List<LocalDate> weeklyScenarios;
+    private final List<LocalDate> strategicScenarioSpawnDates;
 
     @XmlTransient
     public AbstractContract getContract() {
@@ -97,11 +98,13 @@ public class StratConCampaignState {
     public StratConCampaignState() {
         tracks = new ArrayList<>();
         weeklyScenarios = new ArrayList<>();
+        strategicScenarioSpawnDates = new ArrayList<>();
     }
 
     public StratConCampaignState(AbstractContract contract) {
         tracks = new ArrayList<>();
         weeklyScenarios = new ArrayList<>();
+        strategicScenarioSpawnDates = new ArrayList<>();
         setContract(contract);
     }
 
@@ -135,6 +138,18 @@ public class StratConCampaignState {
     @Deprecated(since = "0.51.0", forRemoval = true)
     public void setWeeklyScenarios(final List<LocalDate> weeklyScenarios) {
         this.weeklyScenarios = weeklyScenarios;
+    }
+
+    /** @return the still-to-come days on which strategic-objective scenarios appear (mutable; drained as they spawn) */
+    @XmlJavaTypeAdapter(value = LocalDateAdapter.class)
+    @XmlElementWrapper(name = "strategicScenarioSpawnDates")
+    @XmlElement(name = "strategicScenarioSpawnDate")
+    public List<LocalDate> getStrategicScenarioSpawnDates() {
+        return strategicScenarioSpawnDates;
+    }
+
+    public void addStrategicScenarioSpawnDate(LocalDate spawnDate) {
+        strategicScenarioSpawnDates.add(spawnDate);
     }
 
     public int getSupportPoints() {

@@ -80,6 +80,7 @@ class RulesetsOptionsModel {
     boolean autoResolveExperimentalPacarGuiEnabled;
     StratConPlayType stratConPlayType;
     boolean useAdvancedScouting;
+    boolean essentialScenariosOnly;
     boolean noSeedForces;
     boolean useGenericBattleValue;
     boolean useVerboseBidding;
@@ -126,6 +127,7 @@ class RulesetsOptionsModel {
         autoResolveExperimentalPacarGuiEnabled = options.get(CampaignOption.AUTO_RESOLVE_EXPERIMENTAL_PACAR_GUI_ENABLED);
         stratConPlayType = options.get(CampaignOption.STRAT_CON_PLAY_TYPE);
         useAdvancedScouting = options.get(CampaignOption.USE_ADVANCED_SCOUTING);
+        essentialScenariosOnly = options.get(CampaignOption.ESSENTIAL_SCENARIOS_ONLY);
         noSeedForces = options.get(CampaignOption.NO_SEED_FORCES);
         useGenericBattleValue = options.get(CampaignOption.USE_GENERIC_BATTLE_VALUE);
         useVerboseBidding = options.get(CampaignOption.USE_VERBOSE_BIDDING);
@@ -173,6 +175,7 @@ class RulesetsOptionsModel {
         options.set(CampaignOption.AUTO_RESOLVE_EXPERIMENTAL_PACAR_GUI_ENABLED, autoResolveExperimentalPacarGuiEnabled);
         options.set(CampaignOption.STRAT_CON_PLAY_TYPE, stratConPlayType);
         options.set(CampaignOption.USE_ADVANCED_SCOUTING, useAdvancedScouting);
+        options.set(CampaignOption.ESSENTIAL_SCENARIOS_ONLY, essentialScenariosOnly);
         options.set(CampaignOption.NO_SEED_FORCES, noSeedForces);
         options.set(CampaignOption.USE_GENERIC_BATTLE_VALUE, useGenericBattleValue);
         options.set(CampaignOption.USE_VERBOSE_BIDDING, useVerboseBidding);

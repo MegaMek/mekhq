@@ -37,6 +37,7 @@ import static java.lang.Math.min;
 import static mekhq.campaign.digitalGM.stratCon.SupportPointNegotiation.negotiateInitialSupportPoints;
 
 import java.time.LocalDate;
+import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -225,12 +226,9 @@ public class StratConContractInitializer {
 
                     switch (objectiveParams.objectiveType) {
                         case SpecificScenarioVictory:
-                            initializeObjectiveScenarios(campaign,
-                                  contract,
-                                  campaignState.getTrack(x),
-                                  numObjects,
-                                  objectiveParams.objectiveScenarios,
-                                  objectiveParams.objectiveScenarioModifiers);
+                            // Specific-scenario objectives are no longer all placed up front. They spawn over the
+                            // contract's months, driven by the contract's scenario schedule - see
+                            // spawnScheduledStrategicScenarios, called from the daily StratCon lifecycle.
                             break;
                         case AlliedFacilityControl:
                             initializeTrackFacilities(campaignState.getTrack(x),
@@ -327,8 +325,60 @@ public class StratConContractInitializer {
             }
         }
 
+        // Pre-roll the days on which each strategic-objective scenario appears over the contract's run.
+        if (!isUseMaplessMode) {
+            scheduleStrategicScenarioSpawnDates(contract, campaignState);
+        }
+
         // Determine starting Support Points
         negotiateInitialSupportPoints(campaign, contract);
+    }
+
+    /**
+     * Pre-rolls, at contract start, the calendar day each strategic-objective scenario will appear on.
+     *
+     * <p>The contract's scenario schedule ({@link mekhq.campaign.mission.contract.contractData.ContractIntensityData})
+     * gives, per contract month, how many strategic scenarios appear that month. Each such scenario is assigned an
+     * independent random day within that month's window, so they trickle in over the month rather than all landing on
+     * the first day. The dates are stored on the campaign state and drained by the daily StratCon lifecycle, which
+     * spawns whatever is due via {@link #spawnScheduledStrategicScenarios}.</p>
+     *
+     * <p>Schedule entries at or beyond the contract's final month are folded into that final month's window, so a
+     * schedule longer than the contract still delivers every scenario (its tail lands in the last month); a schedule
+     * shorter than the contract simply leaves the later months empty. Does nothing without a settled start date or a
+     * schedule.</p>
+     *
+     * @param contract      the contract whose schedule is being laid out
+     * @param campaignState the campaign state to store the rolled spawn dates on
+     */
+    private static void scheduleStrategicScenarioSpawnDates(AbstractContract contract,
+          StratConCampaignState campaignState) {
+        LocalDate startDate = contract.getStartDate();
+        List<Integer> schedule = contract.getScenarioSchedule();
+        if ((startDate == null) || schedule.isEmpty()) {
+            return;
+        }
+
+        int contractMonths = max(1, contract.getLengthInMonths());
+        for (int entry = 0; entry < schedule.size(); entry++) {
+            int scenariosThisMonth = schedule.get(entry);
+            if (scenariosThisMonth <= 0) {
+                continue;
+            }
+
+            // Entries past the final month share that month's window, so none are stranded by a short contract.
+            int month = min(entry, contractMonths - 1);
+            LocalDate windowStart = startDate.plusMonths(month);
+            LocalDate windowEnd = startDate.plusMonths(month + 1L);
+            int windowDays = (int) ChronoUnit.DAYS.between(windowStart, windowEnd);
+
+            for (int i = 0; i < scenariosThisMonth; i++) {
+                LocalDate spawnDate = (windowDays > 0) ?
+                                            windowStart.plusDays(Compute.randomInt(windowDays)) :
+                                            windowStart;
+                campaignState.addStrategicScenarioSpawnDate(spawnDate);
+            }
+        }
     }
 
     /**
@@ -1159,6 +1209,69 @@ public class StratConContractInitializer {
     }
 
     /**
+     * Spawns a batch of specific-scenario strategic objectives partway through a contract, distributing them across its
+     * StratCon tracks.
+     *
+     * <p>Specific-scenario objectives are not all placed at contract start; they appear over the contract's months,
+     * paced by its scenario schedule ({@link mekhq.campaign.mission.contract.contractData.ContractIntensityData}). The
+     * daily StratCon lifecycle calls this once per contract month with that month's scheduled count. The scenarios are
+     * drawn from the contract definition's {@link StrategicObjectiveType#SpecificScenarioVictory} template pool - the
+     * same pool the up-front placement used - and are placed cloaked and dateless, exactly as before, so the existing
+     * reveal-on-scouting flow is unchanged.</p>
+     *
+     * <p>Does nothing in mapless mode (there is no map to place on), when the contract has no campaign state, or when
+     * the contract definition has no specific-scenario objective.</p>
+     *
+     * @param campaign      the campaign managing overall gameplay
+     * @param contract      the contract whose strategic scenarios are being spawned
+     * @param scenarioCount how many strategic scenarios to spawn this batch (skipped when not positive)
+     */
+    public static void spawnScheduledStrategicScenarios(Campaign campaign, AbstractContract contract,
+          int scenarioCount) {
+        if (scenarioCount <= 0) {
+            return;
+        }
+
+        StratConCampaignState campaignState = contract.getStratConCampaignState();
+        if (campaignState == null) {
+            return;
+        }
+
+        // Objective scenarios are placed on a map; mapless play never placed them, so it spawns none here either.
+        if (campaign.getCampaignOptions().isUseStratConMaplessMode()) {
+            return;
+        }
+
+        StratConContractDefinition definition = StratConContractDefinition.getContractDefinition(
+              contract.getObjectiveType());
+        if (definition == null) {
+            return;
+        }
+
+        // Every shipped contract definition carries at most one specific-scenario objective; use its template pool.
+        ObjectiveParameters specificObjective = null;
+        for (ObjectiveParameters objectiveParams : definition.getObjectiveParameters()) {
+            if (objectiveParams.getObjectiveType() == StrategicObjectiveType.SpecificScenarioVictory) {
+                specificObjective = objectiveParams;
+                break;
+            }
+        }
+        if (specificObjective == null) {
+            return;
+        }
+
+        List<Integer> trackObjects = trackObjectDistribution(scenarioCount, campaignState.getTrackCount());
+        for (int x = 0; x < trackObjects.size(); x++) {
+            initializeObjectiveScenarios(campaign,
+                  contract,
+                  campaignState.getTrack(x),
+                  trackObjects.get(x),
+                  specificObjective.getObjectiveScenarios(),
+                  specificObjective.getObjectiveScenarioModifiers());
+        }
+    }
+
+    /**
      * Initializes and populates a StratCon track with a specified number of objective scenarios. This method selects
      * scenario templates, places them on the track in unoccupied coordinates, and optionally assigns facilities and
      * objectives based on predefined rules.
@@ -1170,12 +1283,15 @@ public class StratConContractInitializer {
      *   <li>Adding facilities if the scenario template requires them (hostile or allied).</li>
      *   <li>Generating and configuring scenarios with relevant attributes and modifiers:</li>
      *   <ul>
-     *     <li>Clearing scenario dates to maintain persistence.</li>
      *     <li>Marking scenarios as strategic objectives.</li>
      *     <li>Adding optional modifiers to provide additional effects or conditions.</li>
      *   </ul>
      *   <li>Tracking newly added scenarios as strategic objectives for gameplay purposes.</li>
      * </ul>
+     *
+     * <p>The scenarios keep the deployment dates {@code generateScenario} assigns and are left uncloaked, so each is
+     * ready to fight like a normal scenario as soon as it is placed - the player does not have to scout it out first.
+     * They are placed on their scheduled day by {@link #spawnScheduledStrategicScenarios}.</p>
      *
      * @param campaign           the {@link Campaign} managing the state of the overall gameplay
      * @param contract           the {@link AbstractContract} related to the current StratCon campaign
@@ -1240,13 +1356,11 @@ public class StratConContractInitializer {
                   null);
 
             if (scenario != null) {
-                // clear dates, because we don't want the scenario disappearing on us
-                scenario.setDeploymentDate(null);
-                scenario.setActionDate(null);
-                scenario.setReturnDate(null);
+                // These appear over the contract's run on their scheduled day and are meant to be fought like any
+                // normal scenario: keep the deployment dates generateScenario set and leave them uncloaked, so the
+                // player can engage immediately rather than having to scout them out first.
                 scenario.setStrategicObjective(true);
                 scenario.setTurningPoint(false);
-                scenario.getBackingScenario().setCloaked(true);
                 // apply objective mods
                 if (objectiveModifiers != null) {
                     for (String modifier : objectiveModifiers) {
@@ -1256,6 +1370,17 @@ public class StratConContractInitializer {
                 }
 
                 trackState.addScenario(scenario);
+
+                // Reveal the hex (and any facility placed with the scenario) so its location is known from the start,
+                // as befits a scenario that is already visible and fightable: the objectives list then shows its
+                // coordinates instead of the "Locate and..." wording used for hexes still to be scouted.
+                trackState.getRevealedCoords().add(coords);
+                if (addedFacility) {
+                    StratConFacility placedFacility = trackState.getFacility(coords);
+                    if (placedFacility != null) {
+                        placedFacility.setVisible(true);
+                    }
+                }
 
                 StratConStrategicObjective sso = new StratConStrategicObjective();
                 sso.setObjectiveCoords(coords);

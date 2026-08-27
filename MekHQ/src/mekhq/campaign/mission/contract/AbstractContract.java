@@ -118,10 +118,10 @@ public abstract class AbstractContract {
     private final EnumSet<ContractCharacteristic> characteristics = EnumSet.noneOf(ContractCharacteristic.class);
 
     private StratConCampaignState stratConCampaignState;
-    private int scale;
-    private int requiredCombatElements;
-    private int requiredVictoryPoints;
-    private int trackCount; // TODO future proofing
+    // Scale, required combat elements, required victory points, track count, and the scenario schedule - the contract's
+    // scenario-generation parameters, bundled together. Immutable like the other data records, so the scalar setters
+    // below replace it with a one-field-changed copy.
+    private ContractIntensityData intensityData = new ContractIntensityData();
     private ContractNature nature = ContractNature.NORMAL;
 
     private final List<Scenario> scenarios = new ArrayList<>();
@@ -618,28 +618,46 @@ public abstract class AbstractContract {
         this.stratConCampaignState = stratConCampaignState;
     }
 
+    /** @return the contract's scenario-generation parameters (scale, required forces, track count, and schedule) */
+    public ContractIntensityData getIntensityData() {
+        return intensityData;
+    }
+
     public int getScale() {
-        return scale;
+        return intensityData.scale();
     }
 
     public void setScale(int scale) {
-        this.scale = scale;
+        intensityData = intensityData.withScale(scale);
     }
 
     public int getRequiredCombatElements() {
-        return requiredCombatElements;
+        return intensityData.requiredCombatElements();
     }
 
     public void setRequiredCombatElements(int requiredCombatElements) {
-        this.requiredCombatElements = requiredCombatElements;
+        intensityData = intensityData.withRequiredCombatElements(requiredCombatElements);
     }
 
     public int getTrackCount() {
-        return trackCount;
+        return intensityData.trackCount();
     }
 
     public void setTrackCount(int trackCount) {
-        this.trackCount = trackCount;
+        intensityData = intensityData.withTrackCount(trackCount);
+    }
+
+    /**
+     * @return how this contract's tracks are spread across the months it runs, rolled from the Track Intensity Tables,
+     *       as per-month track counts. Never {@code null}; empty until a schedule has been generated. Nothing consumes
+     *       it yet.
+     */
+    public List<Integer> getScenarioSchedule() {
+        return intensityData.monthlyTrackCounts();
+    }
+
+    public void setScenarioSchedule(List<Integer> scenarioSchedule) {
+        intensityData = intensityData.withMonthlyTrackCounts(scenarioSchedule);
     }
 
     /** @return this contract's special designation ({@link ContractNature#NORMAL} if it has none) */
@@ -679,11 +697,11 @@ public abstract class AbstractContract {
     }
 
     public int getRequiredVictoryPoints() {
-        return requiredVictoryPoints;
+        return intensityData.requiredVictoryPoints();
     }
 
     public void setRequiredVictoryPoints(int requiredVictoryPoints) {
-        this.requiredVictoryPoints = requiredVictoryPoints;
+        intensityData = intensityData.withRequiredVictoryPoints(requiredVictoryPoints);
     }
 
     /**
@@ -1091,6 +1109,6 @@ public abstract class AbstractContract {
      * @return the maximum support points the contract can hold in reserve
      */
     public int getMaximumSupportPoints() {
-        return scale * INITIAL_SUPPORT_POINTS_PER_COMBAT_TEAM;
+        return getScale() * INITIAL_SUPPORT_POINTS_PER_COMBAT_TEAM;
     }
 }

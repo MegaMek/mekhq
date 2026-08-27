@@ -66,6 +66,7 @@ class MarketsOptionsModel {
     boolean useDynamicDifficulty;
     boolean useBolsterContractSkill;
     boolean useChaosScaleSupportPointConversion;
+    boolean multiplyTrackIntensityByScale;
     boolean useContractFactionModifiers;
     boolean useIntelObfuscation;
     boolean useNonNegotiableTerms;
@@ -117,6 +118,7 @@ class MarketsOptionsModel {
         useDynamicDifficulty = options.get(CampaignOption.USE_DYNAMIC_DIFFICULTY);
         useBolsterContractSkill = options.get(CampaignOption.USE_BOLSTER_CONTRACT_SKILL);
         useChaosScaleSupportPointConversion = options.get(CampaignOption.USE_CHAOS_SCALE_SUPPORT_POINT_CONVERSION);
+        multiplyTrackIntensityByScale = options.get(CampaignOption.MULTIPLY_TRACK_INTENSITY_BY_SCALE);
         useContractFactionModifiers = options.get(CampaignOption.USE_CONTRACT_FACTION_MODIFIERS);
         useIntelObfuscation = options.get(CampaignOption.USE_INTEL_OBFUSCATION);
         useNonNegotiableTerms = options.get(CampaignOption.USE_NON_NEGOTIABLE_TERMS);
@@ -183,6 +185,7 @@ class MarketsOptionsModel {
         options.set(CampaignOption.USE_DYNAMIC_DIFFICULTY, useDynamicDifficulty);
         options.set(CampaignOption.USE_BOLSTER_CONTRACT_SKILL, useBolsterContractSkill);
         options.set(CampaignOption.USE_CHAOS_SCALE_SUPPORT_POINT_CONVERSION, useChaosScaleSupportPointConversion);
+        options.set(CampaignOption.MULTIPLY_TRACK_INTENSITY_BY_SCALE, multiplyTrackIntensityByScale);
         options.set(CampaignOption.USE_CONTRACT_FACTION_MODIFIERS, useContractFactionModifiers);
         options.set(CampaignOption.USE_INTEL_OBFUSCATION, useIntelObfuscation);
         options.set(CampaignOption.USE_NON_NEGOTIABLE_TERMS, useNonNegotiableTerms);

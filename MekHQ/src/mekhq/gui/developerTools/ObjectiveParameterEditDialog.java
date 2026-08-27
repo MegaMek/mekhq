@@ -74,9 +74,23 @@ class ObjectiveParameterEditDialog extends JDialog {
         setLayout(new BorderLayout());
         add(buildForm(), BorderLayout.CENTER);
         add(buildButtons(), BorderLayout.SOUTH);
+        cboType.addActionListener(e -> syncCountEnablement());
         load();
         pack();
         setLocationRelativeTo(parent);
+    }
+
+    /**
+     * Enables or disables the objective-count field for the selected objective type. Specific-scenario objectives no
+     * longer take a count here: how many appear is driven by the contract's scenario schedule (the Track Intensity
+     * Table), so the field is disabled and pinned to zero for that type.
+     */
+    private void syncCountEnablement() {
+        boolean specificScenarioVictory = cboType.getSelectedItem() == StrategicObjectiveType.SpecificScenarioVictory;
+        if (specificScenarioVictory) {
+            spnCount.setValue(0.0);
+        }
+        spnCount.setEnabled(!specificScenarioVictory);
     }
 
     boolean showDialog() {
@@ -132,6 +146,8 @@ class ObjectiveParameterEditDialog extends JDialog {
         spnCount.setValue(objective.getObjectiveCount());
         txtScenarios.setText(String.join("\n", objective.getObjectiveScenarios()));
         txtModifiers.setText(String.join("\n", objective.getObjectiveScenarioModifiers()));
+        // Apply after loading the raw value so a specific-scenario objective is pinned to zero and disabled.
+        syncCountEnablement();
     }
 
     private void writeInto() {
