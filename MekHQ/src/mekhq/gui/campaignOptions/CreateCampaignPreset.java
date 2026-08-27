@@ -71,11 +71,9 @@ import mekhq.campaign.universe.Faction;
 import mekhq.campaign.universe.Factions;
 import mekhq.campaign.universe.Planet;
 import mekhq.campaign.universe.PlanetarySystem;
-import mekhq.campaign.universe.companyGeneration.CompanyGenerationOptions;
 import mekhq.gui.baseComponents.AbstractMHQValidationButtonDialog;
 import mekhq.gui.baseComponents.SortedComboBoxModel;
 import mekhq.gui.baseComponents.roundedComponents.RoundedLineBorder;
-import mekhq.gui.dialog.CompanyGenerationOptionsDialog;
 import mekhq.gui.dialog.DateChooser;
 import mekhq.gui.displayWrappers.FactionDisplay;
 
@@ -106,8 +104,6 @@ public class CreateCampaignPreset extends AbstractMHQValidationButtonDialog {
     private MMComboBox<RankSystem> comboRankSystem;
     private JSpinner spnContractCount;
     private JCheckBox chkGM;
-    private JCheckBox chkSpecifyCompanyGenerationOptions;
-    private @Nullable CompanyGenerationOptions companyGenerationOptions;
     //endregion Startup
 
     //region Continuous
@@ -128,7 +124,6 @@ public class CreateCampaignPreset extends AbstractMHQValidationButtonDialog {
         this.campaign = campaign;
         setPreset(preset);
         setDate(((preset == null) || (preset.getDate() == null)) ? campaign.getLocalDate() : preset.getDate());
-        setCompanyGenerationOptions((preset == null) ? null : preset.getCompanyGenerationOptions());
         this.gameOptions = ((preset == null) || (preset.getGameOptions() == null))
                                  ? campaign.getGameOptions() : preset.getGameOptions();
         this.campaignOptions = ((preset == null) || (preset.getCampaignOptions() == null))
@@ -285,22 +280,6 @@ public class CreateCampaignPreset extends AbstractMHQValidationButtonDialog {
 
     public void setChkGM(final JCheckBox chkGM) {
         this.chkGM = chkGM;
-    }
-
-    public JCheckBox getChkSpecifyCompanyGenerationOptions() {
-        return chkSpecifyCompanyGenerationOptions;
-    }
-
-    public void setChkSpecifyCompanyGenerationOptions(final JCheckBox chkSpecifyCompanyGenerationOptions) {
-        this.chkSpecifyCompanyGenerationOptions = chkSpecifyCompanyGenerationOptions;
-    }
-
-    public @Nullable CompanyGenerationOptions getCompanyGenerationOptions() {
-        return companyGenerationOptions;
-    }
-
-    public void setCompanyGenerationOptions(final @Nullable CompanyGenerationOptions companyGenerationOptions) {
-        this.companyGenerationOptions = companyGenerationOptions;
     }
     //endregion Startup
 
@@ -585,21 +564,6 @@ public class CreateCampaignPreset extends AbstractMHQValidationButtonDialog {
         getChkGM().setToolTipText(resources.getString("chkGM.toolTipText"));
         getChkGM().setName("chkGM");
 
-        setChkSpecifyCompanyGenerationOptions(new JCheckBox(resources.getString(
-              "chkSpecifyCompanyGenerationOptions.text")));
-        getChkSpecifyCompanyGenerationOptions().setToolTipText(resources.getString(
-              "chkSpecifyCompanyGenerationOptions.toolTipText"));
-        getChkSpecifyCompanyGenerationOptions().setName("chkSpecifyCompanyGenerationOptions");
-
-        final JButton btnCompanyGenerationOptions = new JButton(resources.getString(
-              "btnCompanyGenerationOptions.text"));
-        btnCompanyGenerationOptions.setName("btnCompanyGenerationOptions");
-        btnCompanyGenerationOptions.setToolTipText(resources.getString("btnCompanyGenerationOptions.toolTipText"));
-        btnCompanyGenerationOptions.addActionListener(evt -> setCompanyGenerationOptions(new CompanyGenerationOptionsDialog(
-              getFrame(),
-              getCampaign(),
-              getCompanyGenerationOptions()).getSelectedItem()));
-
         // Disable Panel Portions by Default
         getChkSpecifyDate().setSelected(true);
         getChkSpecifyDate().doClick();
@@ -693,16 +657,6 @@ public class CreateCampaignPreset extends AbstractMHQValidationButtonDialog {
         panel.add(getChkGM(), gbc);
         gbc.gridwidth = 1;
 
-        // Specify Company Generation Options
-        gbc.gridx = 0;
-        gbc.gridy++;
-        gbc.weightx = 0.0;
-        panel.add(getChkSpecifyCompanyGenerationOptions(), gbc);
-        gbc.gridx = 1;
-        gbc.weightx = 1.0;
-        gbc.fill = GridBagConstraints.HORIZONTAL;
-        panel.add(btnCompanyGenerationOptions, gbc);
-
         return panel;
     }
 
@@ -758,12 +712,15 @@ public class CreateCampaignPreset extends AbstractMHQValidationButtonDialog {
         gbc.gridwidth = 1;
 
         // Reserve the same first-column width as the Startup panel (whose column 0 is
-        // driven by its longest checkbox)
-        // so the Game Options button lines up with the Company Generation Options
-        // button above it. The Startup panel is
-        // built first, so this measures that checkbox's actual (font-scaled) rendered
-        // width rather than guessing.
-        final int startupFirstColumnWidth = getChkSpecifyCompanyGenerationOptions().getPreferredSize().width;
+        // driven by its longest checkbox) so this panel's buttons line up with the
+        // Startup panel's second column. The Startup panel is built first, so this
+        // measures the widest checkbox's actual (font-scaled) rendered width rather
+        // than guessing.
+        final int startupFirstColumnWidth = Math.max(
+              Math.max(getChkSpecifyDate().getPreferredSize().width,
+                    getChkSpecifyFaction().getPreferredSize().width),
+              Math.max(getChkSpecifyPlanet().getPreferredSize().width,
+                    getChkSpecifyRankSystem().getPreferredSize().width));
         final GridBagConstraints strutLayout = new GridBagConstraints();
         strutLayout.gridx = 0;
         strutLayout.gridy = gbc.gridy + 1;
@@ -844,7 +801,6 @@ public class CreateCampaignPreset extends AbstractMHQValidationButtonDialog {
         setSpecifyToggle(getChkSpecifyFaction(), preset.getFaction() != null);
         setSpecifyToggle(getChkSpecifyPlanet(), preset.getPlanet() != null);
         setSpecifyToggle(getChkSpecifyRankSystem(), preset.getRankSystem() != null);
-        setSpecifyToggle(getChkSpecifyCompanyGenerationOptions(), preset.getCompanyGenerationOptions() != null);
         setSpecifyToggle(getChkSpecifyGameOptions(), preset.getGameOptions() != null);
         setSpecifyToggle(getChkSpecifyCampaignOptions(), preset.getCampaignOptions() != null);
     }
@@ -870,7 +826,6 @@ public class CreateCampaignPreset extends AbstractMHQValidationButtonDialog {
         preferences.manage(new JToggleButtonPreference(getChkSpecifyPlanet()));
         preferences.manage(new JToggleButtonPreference(getChkSpecifyRankSystem()));
         preferences.manage(new JIntNumberSpinnerPreference(getSpnContractCount()));
-        preferences.manage(new JToggleButtonPreference(getChkSpecifyCompanyGenerationOptions()));
         preferences.manage(new JToggleButtonPreference(getChkSpecifyGameOptions()));
         preferences.manage(new JToggleButtonPreference(getChkSpecifyCampaignOptions()));
     }
@@ -932,10 +887,6 @@ public class CreateCampaignPreset extends AbstractMHQValidationButtonDialog {
             }
             getPreset().setContractCount((int) getSpnContractCount().getValue());
             getPreset().setGM(getChkGM().isSelected());
-            if (getChkSpecifyCompanyGenerationOptions().isSelected()) {
-                getPreset().setCompanyGenerationOptions(getCompanyGenerationOptions());
-            }
-
             if (getChkSpecifyGameOptions().isSelected()) {
                 getPreset().setGameOptions(getGameOptions());
             }

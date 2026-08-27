@@ -126,8 +126,9 @@ import mekhq.gui.baseComponents.roundedComponents.AccentRoundedJButton.Accent;
 import mekhq.gui.baseComponents.roundedComponents.RoundedJButton;
 import mekhq.gui.baseComponents.roundedComponents.RoundedLineBorder;
 import mekhq.gui.baseComponents.roundedComponents.RoundedMMToggleButton;
+import mekhq.gui.campaignOptions.CampaignOptionsDialog;
 import mekhq.gui.dialog.*;
-import mekhq.gui.dialog.CompanyGenerationDialog;
+import mekhq.gui.commandGeneration.CommandGenerationDialog;
 import mekhq.gui.dialog.glossary.GlossaryDialog;
 import mekhq.gui.dialog.markets.contractMarket.ChaosContractMarketDialog;
 import mekhq.gui.enums.MHQTabType;
@@ -204,7 +205,7 @@ public class CampaignGUI extends JPanel {
 
     /* Top Panel */
     private JPanel pnlTop;
-    private RoundedJButton btnCompanyGenerator;
+    private RoundedJButton btnCommandGenerator;
     private final RoundedJButton btnContractMarket =
           new RoundedJButton(resourceMap.getString("btnContractMarket.market"));
     private final RoundedJButton btnUnitMarket = new RoundedJButton(resourceMap.getString("btnUnitMarket.market"));
@@ -490,7 +491,7 @@ public class CampaignGUI extends JPanel {
         pnlTop.add(Box.createHorizontalGlue());
         AdvanceTimePanel advanceTimePanel = new AdvanceTimePanel(170, 240, getCampaign().getLocalDate(),
               getCampaignController()::advanceDay, () -> new AdvanceDaysDialog(getFrame(), this).setVisible(true));
-        pnlTop.add(createCompanyGeneratorButton());
+        pnlTop.add(createCommandGeneratorButton());
         pnlTop.add(Box.createHorizontalStrut(SMALL_GAP));
         pnlTop.add(advanceTimePanel);
         pnlTop.add(createCampaignControlPanel(140, 170));
@@ -498,27 +499,27 @@ public class CampaignGUI extends JPanel {
         // The box layout stretches every child to the panel's height, so the button is squared to that height,
         // measured once all the other children are in place.
         int side = pnlTop.getPreferredSize().height;
-        btnCompanyGenerator.setMinimumSize(new Dimension(side, side));
-        btnCompanyGenerator.setPreferredSize(new Dimension(side, side));
-        btnCompanyGenerator.setMaximumSize(new Dimension(side, side));
+        btnCommandGenerator.setMinimumSize(new Dimension(side, side));
+        btnCommandGenerator.setPreferredSize(new Dimension(side, side));
+        btnCommandGenerator.setMaximumSize(new Dimension(side, side));
     }
 
     /**
-     * Creates the Company Generator button that sits to the left of the Advance Day panel. It is squared to the
+     * Creates the Command Generator button that sits to the left of the Advance Day panel. It is squared to the
      * top panel's height by {@link #initTopPanel()}, and is only shown while the campaign has no units and no
      * personnel - the one time a player needs it. See {@link #refreshCampaignControlButtons()}.
      *
      * @return the button
      */
-    private RoundedJButton createCompanyGeneratorButton() {
-        btnCompanyGenerator = new RoundedJButton(resourceMap.getString("btnCompanyGenerator.text"));
-        btnCompanyGenerator.setToolTipText(resourceMap.getString("btnCompanyGenerator.toolTipText"));
-        btnCompanyGenerator.setHorizontalAlignment(SwingConstants.CENTER);
-        btnCompanyGenerator.addActionListener(event -> {
-            new CompanyGenerationDialog(getFrame(), getCampaign()).setVisible(true);
+    private RoundedJButton createCommandGeneratorButton() {
+        btnCommandGenerator = new RoundedJButton(resourceMap.getString("btnCommandGenerator.text"));
+        btnCommandGenerator.setToolTipText(resourceMap.getString("btnCommandGenerator.toolTipText"));
+        btnCommandGenerator.setHorizontalAlignment(SwingConstants.CENTER);
+        btnCommandGenerator.addActionListener(event -> {
+            new CommandGenerationDialog(getFrame(), getCampaign()).setVisible(true);
             refreshCampaignControlButtons();
         });
-        return btnCompanyGenerator;
+        return btnCommandGenerator;
     }
 
     private JPanel createMarketsPanel(int minWidth, int maxWidth) {
@@ -1693,11 +1694,11 @@ public class CampaignGUI extends JPanel {
     }
 
     /**
-     * Shows the Company Generator button only while the campaign is empty: no units anywhere, including base
+     * Shows the Command Generator button only while the campaign is empty: no units anywhere, including base
      * hangars, and no personnel.
      */
     private void refreshCampaignControlButtons() {
-        btnCompanyGenerator.setVisible(isHangarEmpty() && getPlayerPersonnel().isEmpty());
+        btnCommandGenerator.setVisible(isHangarEmpty() && getPlayerPersonnel().isEmpty());
     }
 
     private boolean isHangarEmpty() {

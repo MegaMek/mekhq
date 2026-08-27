@@ -764,8 +764,26 @@ public final class WarehouseTab extends CampaignGuiTab implements ITechWorkPanel
     }
 
     public void refreshPartsList() {
-        LocationFilterItem locationFilter = getCampaignGui().getActiveLocation();
+        // While a bulk generation is adding units/parts off the EDT, skip this refresh: the In Use
+        // computation walks every part in the warehouse and asks each one what it would cost to
+        // replace, which reads the part's owning unit. The worker is concurrently detaching parts
+        // from units, so a part could pass its own "do I have a unit" check here and have lost it a
+        // moment later, throwing NullPointerException out of the modal progress dialog's event pump.
+        // The generation fires an OrganizationChangedEvent when it completes, which reschedules this
+        // refresh against the finished, consistent campaign.
+        if (getCampaign().isBulkGenerationInProgress()) {
+            LOGGER.debug("[CompanyGen] warehouse refresh skipped - bulk generation in progress");
+            return;
+        }
 
+        // Recompute the In Use snapshot on every refresh. PartsTableModel renders the In Use column
+        // from a one-shot map; without this call it stays at whatever it was at construction time,
+        // so a campaign that adds units after the WarehouseTab exists (force-generated or imported)
+        // reads 0 across the board even when units clearly carry the parts.
+        PartsInUseManager partsInUseManager = new PartsInUseManager(getCampaign());
+        partsModel.setPartsInUse(partsInUseManager.getPartsInUse(true, false, QUALITY_A));
+
+        LocationFilterItem locationFilter = getCampaignGui().getActiveLocation();
         List<Part> parts = locationFilter.selectSpareParts(getCampaign());
         partsModel.setData(parts);
         getCampaign().getPlayerForce().getShoppingList().removeZeroQuantityFromList(); // To
@@ -874,7 +892,13 @@ public final class WarehouseTab extends CampaignGuiTab implements ITechWorkPanel
 
     @Subscribe
     public void handle(PartChangedEvent ev) {
-        filterParts();
+        // Dispatch onto the EDT regardless of caller thread. filterParts() rebuilds a RowFilter
+        // and applies it to the TableRowSorter; both are Swing operations and must run on the
+        // EDT. Off-EDT calls are possible whenever a worker thread (e.g. the ratgen pipeline's
+        // Stage 8 spare-parts stock-up) triggers a PartChangedEvent through Quartermaster.addPart,
+        // which would race the EDT for the underlying Document/table locks the same way the
+        // ReportEvent deadlock did.
+        SwingUtilities.invokeLater(this::filterParts);
     }
 
     @Subscribe

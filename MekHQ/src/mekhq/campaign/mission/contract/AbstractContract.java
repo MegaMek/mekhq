@@ -135,6 +135,14 @@ public abstract class AbstractContract {
     private transient int cachedContractDifficulty;
 
     /**
+     * Marks a legacy contract that was still active when converted on load, and therefore force-closed by the legacy
+     * handler. Transient; set during legacy conversion and consumed by the post-load pass, which uses it to
+     * auto-resolve any prisoners still held once the closed-out contracts are settled. See
+     * {@link #wasClosedOutActiveOnLoad()}.
+     */
+    private transient boolean closedOutActiveOnLoad;
+
+    /**
      * The id of {@link #playerNegotiator} as read from a save, held until it can be resolved.
      *
      * <p>Contracts are written inside {@code <info>}, which the loader parses before the personnel roster exists, so
@@ -539,6 +547,24 @@ public abstract class AbstractContract {
      */
     public void setPendingLegacySettlementMultiplier(final @Nullable Double pendingLegacySettlementMultiplier) {
         this.pendingLegacySettlementMultiplier = pendingLegacySettlementMultiplier;
+    }
+
+    /**
+     * @return {@code true} if this contract was still active when converted on load and was therefore force-closed by
+     *       the legacy handler. Used by the post-load pass to decide whether held prisoners should be auto-resolved.
+     */
+    public boolean wasClosedOutActiveOnLoad() {
+        return closedOutActiveOnLoad;
+    }
+
+    /**
+     * Marks whether this legacy contract was force-closed while active on load. Set during legacy conversion and read
+     * by the post-load pass; not for general use.
+     *
+     * @param closedOutActiveOnLoad {@code true} if the contract was still active when converted and was force-closed
+     */
+    public void setClosedOutActiveOnLoad(final boolean closedOutActiveOnLoad) {
+        this.closedOutActiveOnLoad = closedOutActiveOnLoad;
     }
 
     /**

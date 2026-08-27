@@ -56,6 +56,7 @@ import mekhq.campaign.campaignOptions.CampaignOption;
 import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.universe.PlanetarySystem.PlanetaryRating;
 import mekhq.campaign.universe.PlanetarySystem.PlanetarySophistication;
+import mekhq.campaign.universe.enums.CapitalType;
 import mekhq.campaign.universe.enums.HPGRating;
 import mekhq.campaign.universe.enums.HiringHallLevel;
 import mekhq.campaign.universe.enums.PlanetaryType;
@@ -576,6 +577,20 @@ public class Planet {
         return getEventData(when, null, e -> e.socioIndustrial);
     }
 
+    /**
+     * @param when the date to check
+     *
+     * @return this planet's administrative capital status on the given date, or {@link CapitalType#NONE} if it is not a
+     *       capital (never {@code null})
+     */
+    public CapitalType getCapitalType(LocalDate when) {
+        return (null == getSourcedCapitalType(when)) ? CapitalType.NONE : getSourcedCapitalType(when).getValue();
+    }
+
+    public SourceableValue<CapitalType> getSourcedCapitalType(LocalDate when) {
+        return getEventData(when, null, planetaryEvent -> planetaryEvent.capitalType);
+    }
+
     public @Nonnull HPGRating getHPG(LocalDate when) {
         return (null == getSourcedHPG(when)) ? HPGRating.X : getSourcedHPG(when).getValue();
     }
@@ -963,6 +978,8 @@ public class Planet {
         @JsonProperty("temperature")
         public SourceableValue<Integer> temperature;
         public SourceableValue<SocioIndustrialData> socioIndustrial;
+        @JsonProperty("capitalType")
+        public SourceableValue<CapitalType> capitalType;
         @JsonProperty("hpg")
         public SourceableValue<HPGRating> hpg;
         @JsonProperty("pressure")
@@ -994,6 +1011,7 @@ public class Planet {
             percentWater = ObjectUtility.nonNull(other.percentWater, percentWater);
             shortName = ObjectUtility.nonNull(other.shortName, shortName);
             socioIndustrial = ObjectUtility.nonNull(other.socioIndustrial, socioIndustrial);
+            capitalType = ObjectUtility.nonNull(other.capitalType, capitalType);
             hiringHall = ObjectUtility.nonNull(other.hiringHall, hiringHall);
             temperature = ObjectUtility.nonNull(other.temperature, temperature);
             pressure = ObjectUtility.nonNull(other.pressure, pressure);
@@ -1024,6 +1042,7 @@ public class Planet {
                          (null == name) &&
                          (null == shortName) &&
                          (null == socioIndustrial) &&
+                         (null == capitalType) &&
                          (null == temperature) &&
                          (null == pressure) &&
                          (null == atmosphere) &&
