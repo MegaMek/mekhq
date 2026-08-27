@@ -91,6 +91,7 @@ import mekhq.campaign.personnel.PersonnelOptions;
 import mekhq.campaign.personnel.divorce.AbstractDivorce;
 import mekhq.campaign.personnel.enums.PersonnelRole;
 import mekhq.campaign.personnel.enums.PersonnelStatus;
+import mekhq.campaign.personnel.enums.GeneticLegacyRole;
 import mekhq.campaign.personnel.enums.Phenotype;
 import mekhq.campaign.personnel.generator.AbstractPersonnelGenerator;
 import mekhq.campaign.personnel.generator.AbstractSpecialAbilityGenerator;
@@ -225,7 +226,13 @@ public class ForceHumanResources {
 
         List<Person> activePersonnel = new ArrayList<>();
 
-        for (Person person : getPersonnel()) {
+        // Snapshot the personnel collection before iterating: the Force Generator's SwingWorker
+        // mutates the personnel map (recruitPerson during support-personnel generation) while the EDT
+        // calls this method (e.g. through PartsAcquisitionService.generateSummaryCounts ->
+        // Campaign.getLogisticsPerson, triggered by Swing Timers in RepairTab.refreshPartsAcquisition).
+        // Without the snapshot the EDT trips ConcurrentModificationException on the iterator backing
+        // getPersonnel(). Matches the snapshot pattern applied to getServiceableUnits.
+        for (Person person : new ArrayList<>(getPersonnel())) {
             PersonnelStatus status = person.getStatus();
             PrisonerStatus prisonerStatus = person.getPrisonerStatus();
             boolean isActive = status.isActiveFlexible();
@@ -1924,7 +1931,44 @@ public class ForceHumanResources {
      * @param person     the bloodname candidate
      * @param ignoreDice if true, skips the random roll and assigns a bloodname automatically
      */
+    /**
+     * The hardest a Bloodname roll can get. 2d6 reaches 12, so a target above this could never be met
+     * and a warrior on it still has one chance in thirty-six.
+     */
+    static final int MAXIMUM_BLOODNAME_TARGET = 12;
+
+    /**
+     * One Bloodnamed warrior in this many has their genetic legacy in active use in the breeding
+     * program.
+     *
+     * <p>Winning a Bloodname makes a legacy eligible, not used. A House holds twenty-five Bloodrights
+     * and a Clan runs far fewer sibkos than it has Bloodnamed warriors, so most carry no role. The
+     * exact share is not given in any source; this is a judgement that keeps genefathers and
+     * genemothers uncommon enough to be worth remarking on.</p>
+     */
+    private static final int LEGACY_IN_USE_DENOMINATOR = 4;
+
     public void checkBloodnameAdd(Campaign campaign, Person person, boolean ignoreDice) {
+        checkBloodnameAdd(campaign, person, ignoreDice, 0);
+    }
+
+    /**
+     * As {@link #checkBloodnameAdd(Campaign, Person, boolean)}, with an adjustment to the target
+     * number the roll has to beat.
+     *
+     * <p>The roll is made on 2d6 against a target built from the warrior's skills, the unit's rating,
+     * the era and their rank, so a lower target means a better chance. A caller that knows something
+     * about the warrior's standing which those inputs do not capture can shift it here - the Force
+     * Generator uses this to reflect the calibre of the force as a whole, a veteran or front-line
+     * Cluster carrying more Bloodnamed warriors than a garrison unit of the same individual skills.
+     *
+     * @param campaign       the campaign the person belongs to
+     * @param person         the person who may earn a Bloodname
+     * @param ignoreDice     {@code true} to award one outright, bypassing the roll entirely
+     * @param targetModifier added to the target number; negative values make a Bloodname likelier
+     */
+    public void checkBloodnameAdd(Campaign campaign, Person person, boolean ignoreDice,
+          int targetModifier) {
         if (!person.isClanPersonnel() || person.getPhenotype().isNone()) {
             return;
         }
@@ -2071,21 +2115,94 @@ public class ForceHumanResources {
 
             bloodnameTarget += Math.min(0,
                   campaign.getPlayerForce().getRankSystem().getOfficerCut() - person.getRankNumeric());
+            // 2d6 cannot beat 12, so a higher target is not "hard", it is impossible - and the target
+            // starts at 6 plus two skill values, which puts every tier below Elite out of reach on
+            // skill alone. Winning a Trial of Bloodright is meant to be a long shot for an ordinary
+            // warrior, not something the dice forbid outright.
+            bloodnameTarget = Math.min(bloodnameTarget, MAXIMUM_BLOODNAME_TARGET);
+
+            // The caller's adjustment lands on the capped target rather than being absorbed by it, so
+            // a better force is genuinely better off instead of being levelled with a green one.
+            bloodnameTarget = Math.min(bloodnameTarget + targetModifier, MAXIMUM_BLOODNAME_TARGET);
         }
+
+        // Every trueborn descends from a House whether or not they ever win its name, so the descent is
+        // settled first and the roll only decides whether they may carry it.
+        assignBloodhouse(campaign, person);
 
         if (ignoreDice || (d6(2) >= bloodnameTarget)) {
-            final Phenotype phenotype = person.getPhenotype().isNone() ? Phenotype.GENERAL : person.getPhenotype();
-
-            final Bloodname bloodname = Bloodname.randomBloodname((campaign.getPlayerForce().getFaction().isClan() ?
-                                                                         campaign.getPlayerForce().getFaction() :
-                                                                         person.getOriginFaction()).getShortName(),
-                  phenotype,
-                  campaign.getGameYear());
-            if (bloodname != null) {
-                person.setBloodname(bloodname.getName());
-                personUpdated(campaign, person);
+            if (!person.hasBloodhouse()) {
+                LOGGER.debug("[Bloodname] {} won a Bloodright but has no House to take a name from",
+                      person.getFullName());
+                return;
             }
+            // A warrior competes for a Bloodright within their own House, so the name they win is that
+            // House's - not an unrelated legacy drawn afresh.
+            person.setBloodname(person.getBloodhouse());
+            assignGeneticLegacyRole(person);
+            personUpdated(campaign, person);
         }
+    }
+
+    /**
+     * Decides whether a newly Bloodnamed warrior's genetic legacy has been taken into their Clan's
+     * breeding program, and in which role.
+     *
+     * <p>Winning a Bloodname makes a warrior's legacy eligible; it does not put it to use. Only a
+     * minority are drawn on at any one time, so most Bloodnamed warriors carry no role.</p>
+     *
+     * <p>Neither role follows from the warrior's own sex. Clan scientists implant the DNA of either
+     * sex into either cell, so a woman may be a genefather and a man a genemother.</p>
+     *
+     * @param person the warrior who has just won their Bloodname
+     */
+    private static void assignGeneticLegacyRole(Person person) {
+        if (randomInt(LEGACY_IN_USE_DENOMINATOR) != 0) {
+            return;
+        }
+
+        GeneticLegacyRole role = (randomInt(2) == 0)
+              ? GeneticLegacyRole.GENEFATHER
+              : GeneticLegacyRole.GENEMOTHER;
+        person.setGeneticLegacyRole(role);
+        LOGGER.debug("[Bloodname] {}'s legacy taken into the breeding program as {}",
+              person.getFullName(), role);
+    }
+
+    /**
+     * Records which Bloodname House a trueborn warrior was bred from, if it is not already known.
+     *
+     * <p>Every trueborn comes out of a House's genetic legacy; only a minority ever win the right to
+     * carry its name. This is the first of those two facts, and it holds for a warrior who never wins a
+     * Trial of Bloodright at all.</p>
+     *
+     * <p>The House is drawn with the same weighting that decides which name a warrior could win, so a
+     * warrior descends from a legacy their Clan actually holds, of a phenotype it breeds for.</p>
+     *
+     * @param campaign the campaign the warrior belongs to, supplying the Clan and the year
+     * @param person   the warrior whose descent is being settled
+     */
+    public void assignBloodhouse(Campaign campaign, Person person) {
+        if (!person.isClanPersonnel() || !person.getPhenotype().isTrueborn()) {
+            return;
+        }
+        if (person.hasBloodhouse()) {
+            return;
+        }
+
+        Phenotype phenotype = person.getPhenotype().isNone() ? Phenotype.GENERAL : person.getPhenotype();
+        Faction bloodhouseFaction = campaign.getPlayerForce().getFaction().isClan()
+              ? campaign.getPlayerForce().getFaction()
+              : person.getOriginFaction();
+        Bloodname house = Bloodname.randomBloodname(bloodhouseFaction.getShortName(), phenotype,
+              campaign.getGameYear());
+        if (house == null) {
+            LOGGER.debug("[Bloodname] no House available for {} of {} in {}", person.getFullName(),
+                  bloodhouseFaction.getShortName(), campaign.getGameYear());
+            return;
+        }
+        person.setBloodhouse(house.getName());
+        personUpdated(campaign, person);
     }
 
     /**

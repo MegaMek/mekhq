@@ -41,7 +41,6 @@ import megamek.common.preference.PreferenceManager;
 import mekhq.MHQConstants;
 import mekhq.MHQOptions;
 import mekhq.MekHQ;
-import mekhq.campaign.universe.enums.CompanyGenerationMethod;
 import mekhq.gui.enums.FormationIconOperationalStatusStyle;
 import mekhq.gui.enums.PersonnelFilterStyle;
 
@@ -108,8 +107,7 @@ class MHQOptionsModel {
     boolean hideUnitFluff;
     boolean useAlternateStratConFogOfWarDisplay;
     boolean historicalDailyLog;
-    boolean companyGeneratorStartup;
-    boolean showCompanyGenerator;
+    boolean showCommandGenerator;
     boolean showUnitPicturesOnTOE;
     boolean showWarriorsAlmanac;
     // endregion Display - General
@@ -209,7 +207,6 @@ class MHQOptionsModel {
     int startGameClientRetryCount;
     int startGameBotClientDelay;
     int startGameBotClientRetryCount;
-    CompanyGenerationMethod defaultCompanyGenerationMethod;
     // endregion Advanced
 
     MHQOptionsModel(MHQOptions options) {
@@ -223,8 +220,7 @@ class MHQOptionsModel {
         hideUnitFluff = options.getHideUnitFluff();
         useAlternateStratConFogOfWarDisplay = options.getUseAlternateStratConFogOfWarDisplay();
         historicalDailyLog = options.getHistoricalDailyLog();
-        companyGeneratorStartup = options.getCompanyGeneratorStartup();
-        showCompanyGenerator = options.getShowCompanyGenerator();
+        showCommandGenerator = options.getShowCommandGenerator();
         showUnitPicturesOnTOE = options.getShowUnitPicturesOnTOE();
         showWarriorsAlmanac = options.getShowWarriorsAlmanac();
 
@@ -383,7 +379,6 @@ class MHQOptionsModel {
         startGameClientRetryCount = options.getStartGameClientRetryCount();
         startGameBotClientDelay = options.getStartGameBotClientDelay();
         startGameBotClientRetryCount = options.getStartGameBotClientRetryCount();
-        defaultCompanyGenerationMethod = options.getDefaultCompanyGenerationMethod();
     }
 
     /**
@@ -409,8 +404,7 @@ class MHQOptionsModel {
         options.setHideUnitFluff(hideUnitFluff);
         options.setUseAlternateStratConFogOfWarDisplay(useAlternateStratConFogOfWarDisplay);
         options.setHistoricalDailyLog(historicalDailyLog);
-        options.setCompanyGeneratorStartup(companyGeneratorStartup);
-        options.setShowCompanyGenerator(showCompanyGenerator);
+        options.setShowCommandGenerator(showCommandGenerator);
         options.setShowUnitPicturesOnTOE(showUnitPicturesOnTOE);
         options.setShowWarriorsAlmanac(showWarriorsAlmanac);
 
@@ -569,6 +563,5 @@ class MHQOptionsModel {
         options.setStartGameClientRetryCount(startGameClientRetryCount);
         options.setStartGameBotClientDelay(startGameBotClientDelay);
         options.setStartGameBotClientRetryCount(startGameBotClientRetryCount);
-        options.setDefaultCompanyGenerationMethod(defaultCompanyGenerationMethod);
     }
 }
