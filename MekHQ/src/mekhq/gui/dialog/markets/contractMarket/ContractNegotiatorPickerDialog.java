@@ -64,6 +64,7 @@ import mekhq.campaign.personnel.PersonnelOptions;
 import mekhq.campaign.personnel.skills.Skill;
 import mekhq.campaign.personnel.skills.SkillType;
 import mekhq.gui.baseComponents.roundedComponents.RoundedJButton;
+import org.apache.commons.text.StringEscapeUtils;
 
 /**
  * A modal dialog for choosing the officer who will represent the player at a contract's negotiation table.
@@ -311,7 +312,9 @@ public class ContractNegotiatorPickerDialog extends JDialog {
         // narrower width left beside it.
         StringBuilder header = new StringBuilder("<html><div style='width:")
                                      .append(scaleForGUI(DETAIL_HEADER_WIDTH)).append("px'>");
-        header.append("<b style='font-size:larger'>").append(person.getFullTitle()).append("</b><br>");
+        // The full title carries player-entered text (name/callsign), so escape it before it enters the HTML.
+        header.append("<b style='font-size:larger'>").append(StringEscapeUtils.escapeHtml4(person.getFullTitle()))
+              .append("</b><br>");
         header.append("<span style='color:").append(MUTED_HEX).append("'>")
               .append(person.getPrimaryRole().toString()).append("</span><br><br>");
         header.append(skillDetail(person));
@@ -341,10 +344,15 @@ public class ContractNegotiatorPickerDialog extends JDialog {
                 continue;
             }
             anyTrait = true;
-            String name = option.getDisplayableName().replaceAll("\\s*\\([^)]*\\)", "");
+            // These strings come from option data, so escape them before they enter the Swing HTML - an unescaped
+            // '&', '<', or '>' would otherwise break rendering or inject markup. Escape first, then turn the
+            // description's newlines into <br> so those tags survive the escape.
+            String name = StringEscapeUtils.escapeHtml4(
+                  option.getDisplayableName().replaceAll("\\s*\\([^)]*\\)", ""));
             String description = option.getDescription() == null ? "" : option.getDescription();
+            description = StringEscapeUtils.escapeHtml4(description).replace("\n\n", "<br>").replace("\n", "<br>");
             traits.append("&bull; <b>").append(name).append("</b><br><span style='color:").append(MUTED_HEX)
-                  .append("'>").append(description.replace("\n\n", "<br>").replace("\n", "<br>"))
+                  .append("'>").append(description)
                   .append("</span><br><br>");
         }
         if (!anyTrait) {
@@ -408,8 +416,8 @@ public class ContractNegotiatorPickerDialog extends JDialog {
               boolean cellHasFocus) {
             super.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);
             if (value instanceof Person person) {
-                setText("<html><b>" + person.getFullTitle() + "</b><br><span style='font-size:smaller'>"
-                              + skillLine(person) + "</span></html>");
+                setText("<html><b>" + StringEscapeUtils.escapeHtml4(person.getFullTitle())
+                              + "</b><br><span style='font-size:smaller'>" + skillLine(person) + "</span></html>");
                 ImageIcon icon = person.getPortraitImageIconWithFallback(true);
                 if (icon != null) {
                     Image scaled = icon.getImage().getScaledInstance(PORTRAIT_SIZE, PORTRAIT_SIZE, Image.SCALE_SMOOTH);
