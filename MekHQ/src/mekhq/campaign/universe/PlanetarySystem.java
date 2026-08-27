@@ -61,6 +61,7 @@ import megamek.codeUtilities.ObjectUtility;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.personnel.education.Academy;
 import mekhq.campaign.personnel.education.AcademyFactory;
+import mekhq.campaign.universe.enums.CapitalType;
 import mekhq.campaign.universe.enums.HPGRating;
 import mekhq.campaign.universe.enums.HiringHallLevel;
 import mekhq.campaign.campaignOptions.CampaignOption;
@@ -368,6 +369,23 @@ public class PlanetarySystem {
             }
         }
         return new SocioIndustrialData(tech, industry, rawMaterials, output, agriculture);
+    }
+
+    /**
+     * @param when the date to check
+     *
+     * @return the most significant administrative capital status among the planets of this system (national outranks
+     *       regional outranks district), or {@link CapitalType#NONE} if no planet is a capital
+     */
+    public CapitalType getCapitalType(LocalDate when) {
+        CapitalType mostSignificant = CapitalType.NONE;
+        for (Planet planet : planets.values()) {
+            CapitalType planetCapitalType = planet.getCapitalType(when);
+            if (planetCapitalType.significance() > mostSignificant.significance()) {
+                mostSignificant = planetCapitalType;
+            }
+        }
+        return mostSignificant;
     }
 
     /** @return the highest HPG rating among planets **/

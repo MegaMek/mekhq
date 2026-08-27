@@ -179,7 +179,8 @@ public class PersonnelMarketDialog extends JDialog {
         panelFilterButtons.add(lblPersonChoice, gridBagConstraints);
 
         DefaultComboBoxModel<PersonnelFilter> personTypeModel = new DefaultComboBoxModel<>();
-        for (PersonnelFilter filter : MekHQ.getMHQOptions().getPersonnelFilterStyle().getFilters(true)) {
+        for (PersonnelFilter filter : PersonnelFilter.applicableTo(
+              MekHQ.getMHQOptions().getPersonnelFilterStyle().getFilters(true), campaign)) {
             personTypeModel.addElement(filter);
         }
         comboPersonType.setSelectedItem(0);

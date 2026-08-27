@@ -299,7 +299,7 @@ public final class CampaignOption<T> {
     public static final CampaignOption<Boolean> USE_TRANSFERS =
           of(Boolean.class, true, "useTransfers");
     public static final CampaignOption<Boolean> USE_EXTENDED_TOE_FORCE_NAME =
-          of(Boolean.class, false, "useExtendedTOEForceName");
+          of(Boolean.class, true, "useExtendedTOEForceName");
     public static final CampaignOption<Boolean> PERSONNEL_LOG_SKILL_GAIN =
           of(Boolean.class, false, "personnelLogSkillGain");
     public static final CampaignOption<Boolean> PERSONNEL_LOG_ABILITY_GAIN =

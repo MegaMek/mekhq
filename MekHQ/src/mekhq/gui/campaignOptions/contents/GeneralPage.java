@@ -314,7 +314,8 @@ public class GeneralPage {
               FORM_CONTROL_COLUMN_WIDTH);
         panel.addRow(lblDate, createInlineControls(btnDate, btnRandomDate));
         panel.addRow(lblName, createInlineControls(createFixedWidthControl(txtName), btnNameGenerator));
-        panel.addRow(lblFaction, createInlineControls(createFixedWidthControl(comboFaction), btnRandomFaction));
+        panel.addRow(lblFaction,
+              createInlineControls(createFixedWidthControl(comboFaction), btnRandomFaction));
         panel.addRow(lblStartingLocation, startingLocationControl);
         panel.addRow(lblStartingLocationFaction, startingLocationFactionControl);
         panel.addRow(lblStartingWorld, startingWorldControl);

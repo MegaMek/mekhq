@@ -72,6 +72,7 @@ import static mekhq.campaign.randomEvents.personalities.PersonalityController.ge
 import static mekhq.campaign.reputation.chaosReputation.ChaosReputation.STARTING_REPUTATION_SCORE;
 import static mekhq.utilities.MHQInternationalization.getFormattedText;
 import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
+import static mekhq.utilities.MHQInternationalization.getTextAt;
 import static mekhq.utilities.ReportingUtilities.CLOSING_SPAN_TAG;
 import static mekhq.utilities.ReportingUtilities.getAmazingColor;
 import static mekhq.utilities.ReportingUtilities.getNegativeColor;
@@ -328,6 +329,17 @@ public class Person implements ILocatable {
     // phenotype and background
     private Phenotype phenotype;
     private String bloodname;
+    /**
+     * The Bloodname House this warrior was bred from. Every trueborn has one; only those who win a
+     * Trial of Bloodright earn the right to carry its name, which is what {@link #bloodname} records.
+     */
+    private String bloodhouse;
+
+    /**
+     * How this warrior's genetic legacy is used in their Clan's breeding program. Only a Bloodnamed
+     * trueborn's legacy is ever in use, and the role does not follow from the warrior's own sex.
+     */
+    private GeneticLegacyRole geneticLegacyRole;
     private Faction originFaction;
     private Planet originPlanet;
     private LocalDate becomingBondsmanEndDate;
@@ -441,6 +453,16 @@ public class Person implements ILocatable {
     private boolean immortal;
     private boolean quickTrainIgnore;
     private boolean salvageSupervisor;
+    // Senior appointments. Booleans in the same mould as secondInCommand and salvageSupervisor, so a
+    // caller can ask "who is the CMO?" as a predicate rather than matching a string. A post is a
+    // position within a command, distinct from rank (what someone is) and role (what they do).
+    private boolean chiefMedicalOfficer;
+    private boolean headTechnician;
+    private boolean chiefAdministrator;
+    // The head of one specific department, which their primary role identifies - a Mek Tech holding
+    // this is the head Mek Tech. One flag rather than one per department, so adding a personnel role
+    // does not mean adding a field here.
+    private boolean departmentHead;
     private boolean underProtection;
     private boolean neverAssignMaintenanceAutomatically;
     private boolean coverIllicitMedicalExpenses;
@@ -557,6 +579,8 @@ public class Person implements ILocatable {
         becomingBondsmanEndDate = null;
         phenotype = Phenotype.NONE;
         bloodname = "";
+        bloodhouse = "";
+        geneticLegacyRole = GeneticLegacyRole.NONE;
         biography = "";
         this.genealogy = new Genealogy(this);
         dueDate = null;
@@ -715,6 +739,45 @@ public class Person implements ILocatable {
     public void setBloodname(final String bloodname) {
         this.bloodname = bloodname;
         setFullName();
+    }
+
+    /**
+     * The Bloodname House this warrior descends from, which every trueborn has whether or not they
+     * have won the right to use its name.
+     *
+     * <p>Unlike {@link #getBloodname()} this does not form part of the warrior's name. A warrior of the
+     * Ward House is not called Ward until they win a Trial of Bloodright.</p>
+     *
+     * @return the House's Bloodname, or an empty string for a freeborn or an unrecorded descent
+     */
+    public @Nullable String getBloodhouse() {
+        return bloodhouse;
+    }
+
+    public void setBloodhouse(final String bloodhouse) {
+        this.bloodhouse = bloodhouse;
+    }
+
+    /**
+     * @return {@code true} if this person descends from a recorded Bloodname House
+     */
+    /**
+     * @return how this warrior's legacy is used in the breeding program; never {@code null}
+     */
+    public GeneticLegacyRole getGeneticLegacyRole() {
+        return geneticLegacyRole;
+    }
+
+    /**
+     * @param geneticLegacyRole the role to record; {@code null} is stored as
+     *                          {@link GeneticLegacyRole#NONE}
+     */
+    public void setGeneticLegacyRole(final @Nullable GeneticLegacyRole geneticLegacyRole) {
+        this.geneticLegacyRole = (geneticLegacyRole == null) ? GeneticLegacyRole.NONE : geneticLegacyRole;
+    }
+
+    public boolean hasBloodhouse() {
+        return (bloodhouse != null) && !bloodhouse.isBlank();
     }
 
     public Faction getOriginFaction() {
@@ -1296,6 +1359,73 @@ public class Person implements ILocatable {
             role += '/' + getSecondaryRoleDesc();
         }
         return role;
+    }
+
+    /**
+     * The senior posts this person holds, abbreviated for display alongside their name - "CMO", "HT",
+     * "CA". A person may hold more than one, in which case they are comma separated.
+     *
+     * @return the abbreviations, or an empty string if this person holds no senior post
+     */
+    public String getSeniorAppointmentAbbreviations() {
+        return joinSeniorAppointments("seniorAppointment.chiefMedicalOfficer.abbreviation",
+              "seniorAppointment.headTechnician.abbreviation",
+              "seniorAppointment.chiefAdministrator.abbreviation");
+    }
+
+    /**
+     * The senior posts this person holds, written out in full - "Chief Medical Officer", "Head
+     * Technician", "Chief Administrator". A person may hold more than one, in which case they are
+     * comma separated.
+     *
+     * @return the post names, or an empty string if this person holds no senior post
+     */
+    public String getSeniorAppointmentTitles() {
+        return joinSeniorAppointments("seniorAppointment.chiefMedicalOfficer.title",
+              "seniorAppointment.headTechnician.title",
+              "seniorAppointment.chiefAdministrator.title");
+    }
+
+    /**
+     * Joins the resource strings for whichever senior posts this person holds, in a fixed order so the
+     * display does not reorder itself between refreshes.
+     *
+     * @param chiefMedicalOfficerKey resource key used when this person is the chief medical officer
+     * @param headTechnicianKey      resource key used when this person is the head technician
+     * @param chiefAdministratorKey  resource key used when this person is the chief administrator
+     *
+     * @return the joined strings, or an empty string if this person holds no senior post
+     */
+    private String joinSeniorAppointments(String chiefMedicalOfficerKey, String headTechnicianKey,
+          String chiefAdministratorKey) {
+        StringJoiner joiner = new StringJoiner(", ");
+        if (isChiefMedicalOfficer()) {
+            joiner.add(getTextAt(RESOURCE_BUNDLE, chiefMedicalOfficerKey));
+        }
+        if (isHeadTechnician()) {
+            joiner.add(getTextAt(RESOURCE_BUNDLE, headTechnicianKey));
+        }
+        if (isChiefAdministrator()) {
+            joiner.add(getTextAt(RESOURCE_BUNDLE, chiefAdministratorKey));
+        }
+        if (isDepartmentHead()) {
+            joiner.add(getDepartmentHeadTitle());
+        }
+        return joiner.toString();
+    }
+
+    /**
+     * The department head title for this person, built from the department their primary role names -
+     * a Mek Tech becomes "Head Mek Tech".
+     *
+     * @return the derived title, or an empty string if this person heads no department
+     */
+    public String getDepartmentHeadTitle() {
+        if (!isDepartmentHead()) {
+            return "";
+        }
+        return getFormattedTextAt(RESOURCE_BUNDLE, "seniorAppointment.departmentHead.title",
+              getPrimaryRole().getLabel(isClanPersonnel()));
     }
 
     public String getPrimaryRoleDesc() {
@@ -3358,6 +3488,48 @@ public class Person implements ILocatable {
         this.salvageSupervisor = salvageSupervisor;
     }
 
+    /** @return whether this person is the command's chief medical officer */
+    public boolean isChiefMedicalOfficer() {
+        return chiefMedicalOfficer;
+    }
+
+    public void setChiefMedicalOfficer(final boolean chiefMedicalOfficer) {
+        this.chiefMedicalOfficer = chiefMedicalOfficer;
+    }
+
+    /** @return whether this person is the command's head technician */
+    public boolean isHeadTechnician() {
+        return headTechnician;
+    }
+
+    public void setHeadTechnician(final boolean headTechnician) {
+        this.headTechnician = headTechnician;
+    }
+
+    /** @return whether this person is the command's chief administrator */
+    public boolean isChiefAdministrator() {
+        return chiefAdministrator;
+    }
+
+    public void setChiefAdministrator(final boolean chiefAdministrator) {
+        this.chiefAdministrator = chiefAdministrator;
+    }
+
+    /**
+     * Whether this person heads the department their primary role names - the head Mek Tech, the head
+     * logistics administrator, and so on. Which department is not stored: it is whichever their primary
+     * role identifies, so the two can never disagree.
+     *
+     * @return {@code true} if this person heads their department
+     */
+    public boolean isDepartmentHead() {
+        return departmentHead;
+    }
+
+    public void setDepartmentHead(final boolean departmentHead) {
+        this.departmentHead = departmentHead;
+    }
+
     public boolean isUnderProtection() {
         return underProtection;
     }
@@ -3509,6 +3681,18 @@ public class Person implements ILocatable {
 
             if (!isNullOrBlank(bloodname)) {
                 MHQXMLUtility.writeSimpleXMLTag(pw, indent, "bloodname", bloodname);
+            }
+            // Written only when set, so a campaign with no Clan personnel writes the save it always did
+            // and one from an older build loads with no descent recorded rather than a wrong one.
+            if (!isNullOrBlank(bloodhouse)) {
+                MHQXMLUtility.writeSimpleXMLTag(pw, indent, "bloodhouse", bloodhouse);
+            }
+
+            // As above: written only when the legacy is actually in use, so nothing changes for a
+            // campaign without Clan personnel and an older save loads with no role rather than a
+            // wrong one.
+            if (geneticLegacyRole.isInUse()) {
+                MHQXMLUtility.writeSimpleXMLTag(pw, indent, "geneticLegacyRole", geneticLegacyRole.name());
             }
 
             if (!isNullOrBlank(biography)) {
@@ -3683,10 +3867,14 @@ public class Person implements ILocatable {
                 MHQXMLUtility.writeSimpleXMLTag(pw, indent, "edgeAvailable", getCurrentEdge());
             }
 
-            if (countOptions(PersonnelOptions.MD_ADVANTAGES) > 0) {
-                MHQXMLUtility.writeSimpleXMLTag(pw, indent,
-                      "implants",
-                      getOptionList(DELIMITER, PersonnelOptions.MD_ADVANTAGES));
+            // Enhanced imaging is an implant held in a group of its own rather than with the Manei
+            // Domini implants, and writing only that group dropped it: an implanted Clan warrior
+            // reloaded without their implant. It is written into the same tag because the reader
+            // restores each entry by looking its name up across every group, so both groups come back
+            // from one tag and a save written before this still loads.
+            String implantList = implantOptionList();
+            if (!implantList.isEmpty()) {
+                MHQXMLUtility.writeSimpleXMLTag(pw, indent, "implants", implantList);
             }
 
             if (!techUnits.isEmpty()) {
@@ -4010,6 +4198,18 @@ public class Person implements ILocatable {
             MHQXMLUtility.writeSimpleXMLTag(pw, indent, "immortal", immortal);
             MHQXMLUtility.writeSimpleXMLTag(pw, indent, "quickTrainIgnore", quickTrainIgnore);
             MHQXMLUtility.writeSimpleXMLTag(pw, indent, "salvageSupervisor", salvageSupervisor);
+            if (chiefMedicalOfficer) {
+                MHQXMLUtility.writeSimpleXMLTag(pw, indent, "chiefMedicalOfficer", true);
+            }
+            if (headTechnician) {
+                MHQXMLUtility.writeSimpleXMLTag(pw, indent, "headTechnician", true);
+            }
+            if (chiefAdministrator) {
+                MHQXMLUtility.writeSimpleXMLTag(pw, indent, "chiefAdministrator", true);
+            }
+            if (departmentHead) {
+                MHQXMLUtility.writeSimpleXMLTag(pw, indent, "departmentHead", true);
+            }
             MHQXMLUtility.writeSimpleXMLTag(pw, indent, "underProtection", underProtection);
             MHQXMLUtility.writeSimpleXMLTag(pw,
                   indent,
@@ -4093,6 +4293,10 @@ public class Person implements ILocatable {
                     person.phenotype = Phenotype.fromString(wn2.getTextContent().trim());
                 } else if (nodeName.equalsIgnoreCase("bloodname")) {
                     person.bloodname = wn2.getTextContent();
+                } else if (nodeName.equalsIgnoreCase("bloodhouse")) {
+                    person.bloodhouse = wn2.getTextContent();
+                } else if (nodeName.equalsIgnoreCase("geneticLegacyRole")) {
+                    person.geneticLegacyRole = GeneticLegacyRole.parseFromString(wn2.getTextContent());
                 } else if (nodeName.equalsIgnoreCase("biography")) {
                     person.biography = wn2.getTextContent();
                 } else if (nodeName.equalsIgnoreCase("primaryRole")) {
@@ -4679,6 +4883,14 @@ public class Person implements ILocatable {
                     person.setQuickTrainIgnore(Boolean.parseBoolean(wn2.getTextContent().trim()));
                 } else if (nodeName.equalsIgnoreCase("salvageSupervisor")) {
                     person.setSalvageSupervisor(Boolean.parseBoolean(wn2.getTextContent().trim()));
+                } else if (nodeName.equalsIgnoreCase("chiefMedicalOfficer")) {
+                    person.setChiefMedicalOfficer(Boolean.parseBoolean(wn2.getTextContent().trim()));
+                } else if (nodeName.equalsIgnoreCase("headTechnician")) {
+                    person.setHeadTechnician(Boolean.parseBoolean(wn2.getTextContent().trim()));
+                } else if (nodeName.equalsIgnoreCase("chiefAdministrator")) {
+                    person.setChiefAdministrator(Boolean.parseBoolean(wn2.getTextContent().trim()));
+                } else if (nodeName.equalsIgnoreCase("departmentHead")) {
+                    person.setDepartmentHead(Boolean.parseBoolean(wn2.getTextContent().trim()));
                 } else if (nodeName.equalsIgnoreCase("underProtection")) {
                     person.setUnderProtection(Boolean.parseBoolean(wn2.getTextContent().trim()));
                 } else if (nodeName.equalsIgnoreCase("neverAssignMaintenanceAutomatically")) {
@@ -5725,7 +5937,10 @@ public class Person implements ILocatable {
      *       among other places
      */
     public String getFullDesc(final Campaign campaign) {
-        return "<b>" + getFullTitle() + "</b><br/>" + getSkillLevel(campaign, false, true) + ' ' + getRoleDesc();
+        String appointments = getSeniorAppointmentAbbreviations();
+        String appointmentSuffix = appointments.isEmpty() ? "" : " (" + appointments + ')';
+        return "<b>" + getFullTitle() + appointmentSuffix + "</b><br/>"
+                     + getSkillLevel(campaign, false, true) + ' ' + getRoleDesc();
     }
 
     public String getHTMLTitle() {
@@ -6226,6 +6441,34 @@ public class Person implements ILocatable {
     /**
      * Returns a string of all the option "codes" for this pilot, for a given group, using sep as the separator
      */
+    /**
+     * Every implant this person carries, across the groups that hold them.
+     *
+     * <p>The Manei Domini implants and enhanced imaging sit in separate option groups but are one
+     * thing to a reader and to the save file alike, so they are gathered here rather than at each of
+     * the two call sites that would otherwise have to remember both.</p>
+     *
+     * @return the implants as a delimited list, empty if this person carries none
+     */
+    public String implantOptionList() {
+        String maneiDomini = getOptionList(DELIMITER, PersonnelOptions.MD_ADVANTAGES);
+        String enhancedImaging = getOptionList(DELIMITER, PilotOptions.EI_ADVANTAGES);
+        if (maneiDomini.isEmpty()) {
+            return enhancedImaging;
+        }
+        if (enhancedImaging.isEmpty()) {
+            return maneiDomini;
+        }
+        return maneiDomini + DELIMITER + enhancedImaging;
+    }
+
+    /**
+     * @return how many implants this person carries, across the groups that hold them
+     */
+    public int countImplants() {
+        return countOptions(PersonnelOptions.MD_ADVANTAGES) + countOptions(PilotOptions.EI_ADVANTAGES);
+    }
+
     public String getOptionList(@Nullable String sep, final String groupKey) {
         final StringBuilder adv = new StringBuilder();
 
@@ -6272,6 +6515,24 @@ public class Person implements ILocatable {
         }
 
         return (abilityString.isEmpty()) ? null : "<html>" + abilityString + "</html>";
+    }
+
+    /**
+     * Every implant this person carries, named for display, across the groups that hold them.
+     *
+     * @return the implants as displayable HTML, or {@code null} if this person carries none
+     */
+    public @Nullable String getImplantListAsString() {
+        String maneiDomini = getAbilityListAsString(PersonnelOptions.MD_ADVANTAGES);
+        String enhancedImaging = getAbilityListAsString(PilotOptions.EI_ADVANTAGES);
+        if (maneiDomini == null) {
+            return enhancedImaging;
+        }
+        if (enhancedImaging == null) {
+            return maneiDomini;
+        }
+        // Both arrive wrapped in their own <html> tags; splice them into one list.
+        return maneiDomini.replace("</html>", "") + enhancedImaging.replace("<html>", "");
     }
     // endregion Personnel Options
 
