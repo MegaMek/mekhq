@@ -32,6 +32,7 @@
  */
 package mekhq.gui;
 
+import static mekhq.gui.enums.PersonnelTableModelColumn.CALLSIGN;
 import static mekhq.gui.enums.PersonnelTableModelColumn.SURNAME;
 import static mekhq.gui.enums.PersonnelTableModelColumn.SURNAME_GROUPED_BY_UNIT;
 import static mekhq.utilities.MHQInternationalization.getTextAt;
@@ -452,13 +453,23 @@ public final class PersonnelTab extends CampaignGuiTab {
                 TableColumnModel columnModel = personnelTable.getColumnModel();
                 int visibleColumnCount = columnModel.getColumnCount();
 
+                boolean callsignSearched = false;
                 for (int i = 0; i < visibleColumnCount; i++) {
                     int modelIndex = columnModel.getColumn(i).getModelIndex();
                     PersonnelTableModelColumn column = getPersonnelTableModel().getAllColumns().get(modelIndex);
+                    if (column == CALLSIGN) {
+                        callsignSearched = true;
+                    }
                     String cellText = column.getText(column.getCellValue(getCampaign(), person));
                     if (cellText != null && cellText.toLowerCase(Locale.ROOT).contains(searchAsLowerCase)) {
                         return true;
                     }
+                }
+
+                // Callsign should always be searchable, even when its column is hidden.
+                if (!callsignSearched) {
+                    String callsignText = CALLSIGN.getText(CALLSIGN.getCellValue(getCampaign(), person));
+                    return callsignText != null && callsignText.toLowerCase(Locale.ROOT).contains(searchAsLowerCase);
                 }
                 return false;
             }
