@@ -638,7 +638,8 @@ public class AbstractContractGeneration {
         contract.setScheduleData(contractScheduleData);
 
         // Scenario schedule - spread the (already determined) track count across the contract's months via the Track
-        // Intensity Tables. Nothing consumes this yet; it is generated and stored for a later feature.
+        // Intensity Tables. This schedule is consumed by StratCon to stagger strategic-objective scenario spawns over
+        // the contract's run (see StratConContractInitializer).
         //
         // Hot Spots Draconis Reach sizes each scenario by the contract's scale. When "Multiply Track Intensity by
         // Scale" is set (the default MekHQ behavior), we instead roll the intensity table once per point of scale and
