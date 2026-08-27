@@ -209,7 +209,7 @@ public class CommandGenerationDialog extends AbstractMHQValidationButtonDialog {
         panel.add(leftButtons, BorderLayout.WEST);
 
         JPanel rightButtons = new JPanel(new FlowLayout(FlowLayout.RIGHT, 4, 0));
-        // "Discard Model" rather than a generic Cancel: the dialog is a design workspace, so closing
+        // "Close Without Building" rather than a generic Cancel: the dialog is a design workspace, so closing
         // it throws away an uncommitted model rather than cancelling a settings edit.
         rightButtons.add(new MMButton("btnCancel", resources, "CommandGenerationDialog.btnCancel.text",
               "CommandGenerationDialog.btnCancel.toolTipText", this::cancelActionPerformed));

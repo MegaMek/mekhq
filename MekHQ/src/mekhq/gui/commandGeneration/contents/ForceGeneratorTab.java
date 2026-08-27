@@ -32,6 +32,9 @@
  */
 package mekhq.gui.commandGeneration.contents;
 
+import static mekhq.gui.commandGeneration.components.CommandGenerationUtilities.getCommandGenerationResourceBundle;
+import static mekhq.utilities.MHQInternationalization.getTextAt;
+
 import java.awt.BorderLayout;
 import java.util.Collection;
 import java.util.List;
@@ -139,6 +142,14 @@ public class ForceGeneratorTab {
         optionsView.setOnFactionChanged(factionChangeListener);
         optionsView.addGenerateOption(chkGenerateMercenaryCompanyCommandLance);
         optionsView.setExportMULButtonVisible(false);
+        // The role filters restrict every draw in the tree to units that can fill the ticked role, which
+        // suits picking a lance of artillery carriers and not designing a command; the formation palette
+        // is the tool for shaping a command. Hidden here, kept for the Random Army dialog.
+        optionsView.setMissionRoleFiltersVisible(false);
+        // The model here is a set of accumulated rolls, so the button that empties it says so.
+        optionsView.setClearButtonLabel(
+              getTextAt(getCommandGenerationResourceBundle(), "btnClearRolls.text"),
+              getTextAt(getCommandGenerationResourceBundle(), "btnClearRolls.tooltip"));
         optionsView.setYearFieldEditable(false);
         if (campaign != null) {
             optionsView.setCurrentYear(campaign.getGameYear());
@@ -327,7 +338,7 @@ public class ForceGeneratorTab {
      * The Force Generator's own action controls, so the dialog can host them in its button bar rather than leaving a
      * second row of buttons in the middle of the tab.
      *
-     * @return Generate, its options, and Clear Force, or an empty list before the tab is built
+     * @return Generate, its options, and Clear Rolls, or an empty list before the tab is built
      */
     public List<JComponent> getGenerateControls() {
         return (viewUi == null) ? List.of() : viewUi.getOptionsView().getGenerateControls();
