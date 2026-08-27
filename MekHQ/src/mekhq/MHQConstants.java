@@ -74,8 +74,9 @@ public final class MHQConstants extends SuiteConstants {
     public static final String HISTORICAL_DAILY_LOG = "historicalDailyLog";
     public static final int MAX_HISTORICAL_LOG_DAYS = 120; // max number of days that will be stored in the history,
     // also used as a limit in the UI
-    public static final String COMPANY_GENERATOR_STARTUP = "companyGeneratorStartup";
-    public static final String SHOW_COMPANY_GENERATOR = "showCompanyGenerator";
+    // Keeps the key the setting was saved under when the dialog was the Company Generator, so an existing
+    // preferences file still applies; only the constant was renamed.
+    public static final String SHOW_COMMAND_GENERATOR = "showCompanyGenerator";
     public static final String SHOW_UNIT_PICTURES_ON_TOE = "showUnitPicturesOnTOE";
     public static final String SHOW_WARRIORS_ALMANAC = "showWarriorsAlmanac";
 
@@ -248,7 +249,6 @@ public final class MHQConstants extends SuiteConstants {
     public static final String INDIVIDUAL_RANK_SYSTEM_DIRECTORY_PATH = "individualRankSystemDirectoryPath";
     public static final String UNIT_SPRITE_EXPORT_DIRECTORY_PATH = "unitSpriteExportDirectoryPath";
     public static final String LAYERED_FORCE_ICON_DIRECTORY_PATH = "layeredFormationIconDirectoryPath";
-    public static final String COMPANY_GENERATION_DIRECTORY_PATH = "companyGenerationDirectoryPath";
     public static final String LAUNCHER_NEW_PLAYER_QUICKSTART_PATH = "campaigns/The Learning Ropes.cpnx.gz";
     // endregion File Paths
 
@@ -302,7 +302,12 @@ public final class MHQConstants extends SuiteConstants {
     public static final String START_GAME_CLIENT_RETRY_COUNT = "startGameClientRetryCount";
     public static final String START_GAME_BOT_CLIENT_DELAY = "startGameBotClientDelay";
     public static final String START_GAME_BOT_CLIENT_RETRY_COUNT = "startGameBotClientRetryCount";
-    public static final String DEFAULT_COMPANY_GENERATION_METHOD = "defaultCompanyGenerationMethod";
+
+    // The augmentation rules last chosen in the Command Generator, remembered so a new campaign
+    // starts from the player's own answer rather than from the all-off defaults every time.
+    public static final String LAST_USE_IMPLANTS = "lastUseImplants";
+    public static final String LAST_USE_MANEI_DOMINI = "lastUseManeiDomini";
+    public static final String LAST_NEURAL_INTERFACE_MODE = "lastNeuralInterfaceMode";
     // endregion Miscellaneous Options
     // endregion MHQOptions
 
@@ -315,14 +320,28 @@ public final class MHQConstants extends SuiteConstants {
     public static final String LAYERED_FORCE_ICON_BACKGROUND_PATH = "Pieces/Backgrounds/";
     public static final String LAYERED_FORCE_ICON_FORMATION_PATH = "Pieces/Formations/";
     public static final String LAYERED_FORCE_ICON_FORMATION_CLAN_PATH = "Clan/";
+    public static final String LAYERED_FORCE_ICON_FORMATION_POINT_FILENAME = "(01) Point.png";
     public static final String LAYERED_FORCE_ICON_FORMATION_STAR_FILENAME = "(02) Star.png";
+    public static final String LAYERED_FORCE_ICON_FORMATION_NOVA_FILENAME = "(03) Nova.png";
+    public static final String LAYERED_FORCE_ICON_FORMATION_BINARY_FILENAME = "(04) Binary.png";
     public static final String LAYERED_FORCE_ICON_FORMATION_TRINARY_FILENAME = "(06) Trinary.png";
+    public static final String LAYERED_FORCE_ICON_FORMATION_CLUSTER_FILENAME = "(08) Cluster.png";
+    public static final String LAYERED_FORCE_ICON_FORMATION_GALAXY_FILENAME = "(09) Galaxy.png";
     public static final String LAYERED_FORCE_ICON_FORMATION_COMSTAR_PATH = "ComStar/";
+    public static final String LAYERED_FORCE_ICON_FORMATION_LEVEL_I_FILENAME = "(01) Level I.png";
     public static final String LAYERED_FORCE_ICON_FORMATION_LEVEL_II_FILENAME = "(02) Level II.png";
+    public static final String LAYERED_FORCE_ICON_FORMATION_CHOIR_FILENAME = "(03) Choir.png";
     public static final String LAYERED_FORCE_ICON_FORMATION_LEVEL_III_FILENAME = "(04) Level III.png";
+    public static final String LAYERED_FORCE_ICON_FORMATION_LEVEL_IV_FILENAME = "(05) Level IV.png";
+    public static final String LAYERED_FORCE_ICON_FORMATION_LEVEL_V_FILENAME = "(06) Level V.png";
+    public static final String LAYERED_FORCE_ICON_FORMATION_LEVEL_VI_FILENAME = "(07) Level VI.png";
     public static final String LAYERED_FORCE_ICON_FORMATION_INNER_SPHERE_PATH = "Inner Sphere/";
+    public static final String LAYERED_FORCE_ICON_FORMATION_TEAM_FILENAME = "(03) Team.png";
     public static final String LAYERED_FORCE_ICON_FORMATION_LANCE_FILENAME = "(04) Lance.png";
     public static final String LAYERED_FORCE_ICON_FORMATION_COMPANY_FILENAME = "(05) Company.png";
+    public static final String LAYERED_FORCE_ICON_FORMATION_BATTALION_FILENAME = "(06) Battalion.png";
+    public static final String LAYERED_FORCE_ICON_FORMATION_REGIMENT_FILENAME = "(07) Regiment.png";
+    public static final String LAYERED_FORCE_ICON_FORMATION_BRIGADE_FILENAME = "(08) Brigade.png";
     public static final String LAYERED_FORCE_ICON_FRAME_PATH = "Pieces/Frames/";
     public static final String LAYERED_FORCE_ICON_DEFAULT_FRAME_FILENAME = "Frame.png";
     public static final String LAYERED_FORCE_ICON_LOGO_PATH = "Pieces/Logos/";
