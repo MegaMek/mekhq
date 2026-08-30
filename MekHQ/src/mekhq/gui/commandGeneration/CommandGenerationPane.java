@@ -43,6 +43,7 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 
 import megamek.client.ratgenerator.FactionRecord;
+import megamek.common.ui.FastJScrollPane;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.universe.enums.ForceNamingMethod;
 import mekhq.campaign.universe.commandGeneration.CommandGenerationOptions;
@@ -66,7 +67,7 @@ import mekhq.gui.commandGeneration.contents.SparesAndFinancesTab;
  * </ol>
  *
  * <p>This Pane is the spiritual counterpart of {@code CampaignOptionsPane}, scaled down to the three
- * tabs the Command Designer needs. The Tab classes themselves live in
+ * tabs the Command Generator needs. The Tab classes themselves live in
  * {@link mekhq.gui.commandGeneration.contents} and are plain Java classes following the same
  * "constructor + {@code createTab()} + {@code loadValuesFromOptions()}" convention used in the
  * Campaign Options package.</p>
@@ -231,8 +232,9 @@ public class CommandGenerationPane extends AbstractMHQTabbedPane {
     }
 
     private static JScrollPane wrap(JPanel content) {
-        JScrollPane scroll = new JScrollPane(content);
-        scroll.getVerticalScrollBar().setUnitIncrement(16);
+        // FastJScrollPane rather than a plain JScrollPane so the scroll step follows the UI scale,
+        // as it does everywhere else in the suite.
+        JScrollPane scroll = new FastJScrollPane(content);
         scroll.setBorder(null);
         return scroll;
     }

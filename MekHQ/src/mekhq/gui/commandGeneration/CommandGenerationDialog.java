@@ -75,7 +75,6 @@ import megamek.client.ui.preferences.PreferencesNode;
 import megamek.common.annotations.Nullable;
 import megamek.common.enums.Gender;
 import megamek.common.enums.SkillLevel;
-import megamek.common.ui.FastJScrollPane;
 import megamek.logging.MMLogger;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
@@ -98,7 +97,7 @@ import mekhq.gui.campaignOptions.optionChangeDialogs.AdvancedScoutingCampaignOpt
 import mekhq.gui.dialog.factionStanding.factionJudgment.FactionJudgmentDialog;
 
 /**
- * Top-level dialog for the Command Generator (Command Designer). Hosts a
+ * Top-level dialog for the Command Generator. Hosts a
  * {@link CommandGenerationPane} with three tabs (Personnel &amp; Officers, Force Generator,
  * Spares &amp; Finances) and runs the ratgen pipeline on Accept &amp; Build.
  *
@@ -185,7 +184,13 @@ public class CommandGenerationDialog extends AbstractMHQValidationButtonDialog {
               BorderFactory.createMatteBorder(0, 0, 1, 0, separatorColor),
               BorderFactory.createEmptyBorder(6, 10, 6, 10)));
         content.add(designBanner, BorderLayout.NORTH);
-        content.add(new FastJScrollPane(pane), BorderLayout.CENTER);
+        // The tabbed pane is added directly rather than inside a scroll pane of its own: each tab
+        // already scrolls its own content, and a scroll pane wrapped around them gave the inner ones
+        // all the height they asked for. They then had nothing to scroll but still swallowed every
+        // mouse-wheel event, so the wheel did nothing anywhere in the dialog. Adding it directly
+        // bounds each tab's viewport to the dialog and puts the wheel back to work, and keeps the tab
+        // strip in place instead of letting it scroll off the top.
+        content.add(pane, BorderLayout.CENTER);
         return content;
     }
 

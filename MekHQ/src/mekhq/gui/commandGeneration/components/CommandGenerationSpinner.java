@@ -32,9 +32,9 @@
  */
 package mekhq.gui.commandGeneration.components;
 
-import static megamek.client.ui.WrapLayout.wordWrap;
 import static megamek.client.ui.util.FlatLafStyleBuilder.setFontScaling;
 import static mekhq.gui.commandGeneration.components.CommandGenerationUtilities.getCommandGenerationResourceBundle;
+import static mekhq.gui.commandGeneration.components.CommandGenerationUtilities.wrapTooltip;
 import static mekhq.utilities.MHQInternationalization.getTextAt;
 
 import javax.swing.JComponent;
@@ -85,7 +85,7 @@ public class CommandGenerationSpinner extends JSpinner {
 
         String tooltipText = getTextAt(getCommandGenerationResourceBundle(), "lbl" + name + ".tooltip");
         if (!tooltipText.isEmpty()) {
-            setToolTipText(wordWrap(tooltipText));
+            setToolTipText(wrapTooltip(tooltipText, null));
         }
 
         setName("spn" + name);
