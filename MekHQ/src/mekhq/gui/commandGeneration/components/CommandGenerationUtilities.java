@@ -99,10 +99,12 @@ public final class CommandGenerationUtilities {
     }
 
     /**
-     * Removes a surrounding {@code <html>} / {@code </html>} pair, if the text has one.
+     * Removes the outer {@code <html>} wrapper from a tooltip, if it has one.
      *
-     * <p>Only the outermost pair is touched: markup inside the tooltip is left alone. Text without
-     * the wrapper is returned unchanged.</p>
+     * <p>The opening tag is removed when the text starts with it, and the closing tag when the text
+     * ends with it, so a tooltip its author left unclosed is still unwrapped rather than kept with a
+     * stray opening tag. Only the outermost tags are touched: markup inside the tooltip is left
+     * alone, and text carrying no wrapper is returned unchanged.</p>
      *
      * @param text the text to unwrap
      *

@@ -150,7 +150,7 @@ class CommandGenerationUtilitiesTest {
         if (text.toLowerCase(Locale.ROOT).startsWith(HTML_OPENING_TAG)) {
             text = text.substring(HTML_OPENING_TAG.length());
         }
-        return text.trim().split("\s+")[0];
+        return text.trim().split("\\s+")[0];
     }
 
     /**
