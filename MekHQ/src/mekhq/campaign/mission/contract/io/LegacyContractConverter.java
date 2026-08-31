@@ -55,6 +55,7 @@ import mekhq.campaign.ForceHumanResources;
 import mekhq.campaign.digitalGM.stratCon.StratConCampaignState;
 import mekhq.campaign.finances.Money;
 import mekhq.campaign.finances.enums.TransactionType;
+import mekhq.campaign.force.Formation;
 import mekhq.campaign.mission.contract.AbstractContract;
 import mekhq.campaign.mission.contract.ChaosContract;
 import mekhq.campaign.mission.contract.contractData.*;
@@ -63,6 +64,7 @@ import mekhq.campaign.mission.scenarios.Scenario;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.enums.PersonnelRole;
 import mekhq.campaign.personnel.enums.PersonnelStatus;
+import mekhq.campaign.unit.Unit;
 import mekhq.campaign.universe.Faction;
 import mekhq.campaign.universe.Factions;
 import mekhq.campaign.universe.PlanetarySystem;
@@ -333,9 +335,10 @@ public final class LegacyContractConverter {
      * {@code contractBase * paymentMultiplier}, written onto the contract's finance record (the legacy amounts were
      * never persisted, so it reads zero without this), and its remaining months are paid to the player as a lump sum.
      *
-     * <p>Once the closed-out contracts are settled, any prisoners the player is still holding are auto-resolved (see
+     * <p>Once the closed-out contracts are settled, every stale deployment is cleared (see
+     * {@link #undeployAllForces(Campaign)}) and any prisoners the player is still holding are auto-resolved (see
      * {@link #ransomHeldPrisoners(Campaign)}), but only when at least one contract was force-closed while active - a save
-     * whose contracts had all already concluded closed out nothing and leaves its prisoners alone.</p>
+     * whose contracts had all already concluded closed out nothing and leaves its deployments and prisoners alone.</p>
      *
      * @param campaign the loaded campaign whose converted legacy contracts are settled
      */
@@ -372,7 +375,26 @@ public final class LegacyContractConverter {
         }
 
         if (anyClosedOutActive) {
+            undeployAllForces(campaign);
             ransomHeldPrisoners(campaign);
+        }
+    }
+
+    /**
+     * Undeploys every unit and formation left assigned to a scenario when the legacy handler force-closes an active
+     * contract on load.
+     */
+    private static void undeployAllForces(final Campaign campaign) {
+        for (final Formation formation : campaign.getPlayerForce().getAllFormations()) {
+            if (formation.getScenarioId() != Formation.NO_ASSIGNED_SCENARIO) {
+                formation.setScenarioId(Formation.NO_ASSIGNED_SCENARIO, campaign);
+            }
+        }
+
+        for (final Unit unit : campaign.getUnits()) {
+            if (unit.isDeployed()) {
+                unit.undeploy();
+            }
         }
     }
 
