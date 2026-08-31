@@ -33,7 +33,11 @@
 package mekhq.campaign.mission.contract.contractGeneration;
 
 import static mekhq.campaign.digitalGM.stratCon.StratConRulesManager.INDEPENDENT_COMMAND_RIGHTS_REQUIRED_VICTORY_POINTS;
+import static mekhq.campaign.mission.contract.contractData.ContractCharacteristic.DEMANDING;
+import static mekhq.campaign.mission.contract.contractData.ContractCharacteristic.LENIENT;
+import static mekhq.campaign.mission.contract.utilities.ContractCharacteristics.bakeRequiredVictoryPoints;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -42,6 +46,7 @@ import java.util.List;
 import mekhq.campaign.digitalGM.stratCon.StratConCampaignState;
 import mekhq.campaign.digitalGM.stratCon.StratConTrackState;
 import mekhq.campaign.mission.contract.AbstractContract;
+import mekhq.campaign.mission.contract.contractData.ContractCharacteristic;
 import mekhq.campaign.mission.contract.contractData.ContractCommandRights;
 import mekhq.campaign.mission.contract.contractData.ContractObjectiveType;
 import org.junit.jupiter.api.Test;
@@ -51,6 +56,13 @@ import org.junit.jupiter.api.Test;
  * short-circuits (no StratCon state, and independent command rights), and the expected-turning-points formula
  * {@code ceil(scale * duration * meanScenarioOdds/100 * turningPointChance)} - where garrisons shorten the effective
  * duration to 75% and only integrated command earns the full turning-point chance.
+ *
+ * <p>The final block also covers the composition {@code StratConContractInitializer.initializeCampaignState} performs
+ * at contract acceptance - {@code bakeRequiredVictoryPoints(getRequiredVictoryPoints(contract), contract)} - which is
+ * what actually populates the contract's required-victory-point target now that the StratCon state exists. Driving the
+ * full initializer in a unit test is impractical (it needs a live campaign, planet profiles, a sector planner and
+ * faction data), so these lock the exact expression it runs: that the target resolves to the computed value rather
+ * than staying at the 0 it carried before acceptance, and that the OBJECTIVES characteristic steps it as expected.</p>
  */
 class ChaosContractDeterminationRequiredVictoryPointsTest {
 
@@ -124,5 +136,61 @@ class ChaosContractDeterminationRequiredVictoryPointsTest {
 
         // duration -> ceil(4 * 0.75) = 3; ceil(2 * 3 * 1.0 * 1.0) = 6
         assertEquals(6, ChaosContractDeterminationRequiredVictoryPoints.getRequiredVictoryPoints(contract));
+    }
+
+    /**
+     * A contract sized so the determined requirement is a clean 3: scale 2, length 3, integrated command, a single
+     * 50%-odds track -> {@code ceil(2 * 3 * 0.5 * 1.0) = 3}. The OBJECTIVES characteristic (if any) is applied on top
+     * by {@code bakeRequiredVictoryPoints}.
+     */
+    private static AbstractContract contractWithDeterminedRequirementOfThree(
+          final ContractCharacteristic objectivesCharacteristic) {
+        StratConCampaignState state = stateWithTracks(track(50));
+        AbstractContract contract = mock(AbstractContract.class);
+        when(contract.getStratConCampaignState()).thenReturn(state);
+        when(contract.getCommandRights()).thenReturn(ContractCommandRights.INTEGRATED);
+        when(contract.getObjectiveType()).thenReturn(ContractObjectiveType.OBJECTIVE_RAID);
+        when(contract.getScale()).thenReturn(2);
+        when(contract.getLengthInMonths()).thenReturn(3);
+        when(contract.getCharacteristic(ContractCharacteristic.Category.OBJECTIVES)).thenReturn(objectivesCharacteristic);
+        return contract;
+    }
+
+    /** The exact value the initializer writes onto the contract at acceptance. */
+    private static int initializedRequiredVictoryPoints(final AbstractContract contract) {
+        return bakeRequiredVictoryPoints(
+              ChaosContractDeterminationRequiredVictoryPoints.getRequiredVictoryPoints(contract), contract);
+    }
+
+    @Test
+    void initializerTargetMatchesTheDeterminedValueWithoutAnObjectivesCharacteristic() {
+        AbstractContract contract = contractWithDeterminedRequirementOfThree(null);
+
+        assertEquals(3, initializedRequiredVictoryPoints(contract));
+    }
+
+    @Test
+    void initializerTargetIsNeverZeroOnceStratConStateExists() {
+        // Regression guard: before acceptance the StratCon state is null and the target stays 0 (rendering as 0/0).
+        // Once the state exists the initializer must resolve it to the real computed requirement.
+        AbstractContract contract = contractWithDeterminedRequirementOfThree(null);
+
+        assertNotEquals(0, initializedRequiredVictoryPoints(contract));
+    }
+
+    @Test
+    void demandingObjectivesCharacteristicStepsTheInitializerTargetUp() {
+        AbstractContract contract = contractWithDeterminedRequirementOfThree(DEMANDING);
+
+        // 3 + round(1.0) = 4
+        assertEquals(4, initializedRequiredVictoryPoints(contract));
+    }
+
+    @Test
+    void lenientObjectivesCharacteristicStepsTheInitializerTargetDown() {
+        AbstractContract contract = contractWithDeterminedRequirementOfThree(LENIENT);
+
+        // max(1, 3 + round(-1.0)) = 2
+        assertEquals(2, initializedRequiredVictoryPoints(contract));
     }
 }
