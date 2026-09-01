@@ -39,6 +39,7 @@ import megamek.common.event.Subscribe;
 import mekhq.MekHQ;
 import mekhq.campaign.events.StoryFinishedEvent;
 import mekhq.campaign.market.PersonnelMarket;
+import mekhq.campaign.universe.commandGeneration.SupportCarrierReconciler;
 
 /**
  * Manages the timeline of a {@link Campaign}.
@@ -71,6 +72,11 @@ public class CampaignController {
         }
         MekHQ.registerHandler(campaignEventProcessor);
         MekHQ.registerHandler(this);
+
+        // Person events raised while the save was parsed reached no subscriber, because handlers are only registered
+        // here, after loading. One idempotent pass catches up anyone the events would have placed, and marks carriers
+        // in campaigns saved before carriers were tracked.
+        SupportCarrierReconciler.reconcileAll(localCampaign);
     }
 
     /**

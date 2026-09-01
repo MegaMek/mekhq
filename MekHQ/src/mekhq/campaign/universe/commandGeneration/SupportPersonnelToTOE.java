@@ -40,6 +40,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
+import megamek.common.annotations.Nullable;
 import megamek.common.loaders.MekSummary;
 import megamek.common.loaders.MekSummaryCache;
 import megamek.logging.MMLogger;
@@ -136,6 +137,60 @@ public final class SupportPersonnelToTOE {
     }
 
     /**
+     * The three segregated sections of Support Command. A role that maps to no section is not carried in the TOE at
+     * all.
+     */
+    public enum SupportSection {
+        MAINTENANCE, MEDICAL, COMMAND
+    }
+
+    /**
+     * Classifies a role into its Support Command section.
+     *
+     * <p>This is the single definition of "is this person support staff", shared by generation and by the carrier
+     * reconciler so the two can never disagree about who belongs in the TOE.</p>
+     *
+     * @param role the role to classify; may be {@code null}
+     *
+     * @return the section that carries this role, or {@code null} if the role is not carried
+     */
+    public static @Nullable SupportSection sectionFor(@Nullable PersonnelRole role) {
+        if (role == null) {
+            return null;
+        }
+        if (role.isTech() || role.isAstech()) {
+            return SupportSection.MAINTENANCE;
+        }
+        if (role.isMedicalStaff()) {
+            return SupportSection.MEDICAL;
+        }
+        if (role.isAdministrator()) {
+            return SupportSection.COMMAND;
+        }
+        return null;
+    }
+
+    /**
+     * Whether a chassis name is one of the carrier chassis this class builds.
+     *
+     * <p>Used only to identify carriers in campaigns saved before the carrier flag existed. New carriers are marked
+     * with {@link Unit#setCarrier(boolean)} at creation and are never identified by name.</p>
+     *
+     * @param chassis the entity chassis to test; may be {@code null}
+     *
+     * @return {@code true} if this chassis is a support carrier chassis
+     */
+    public static boolean isCarrierChassis(@Nullable String chassis) {
+        if (chassis == null) {
+            return false;
+        }
+        return chassis.equals(IS_PLATOON_CHASSIS)
+                     || chassis.equals(IS_SQUAD_CHASSIS)
+                     || chassis.equals(CLAN_POINT_CHASSIS)
+                     || chassis.equals(CLAN_SQUAD_CHASSIS);
+    }
+
+    /**
      * Organizes {@code supportPersonnel} into the campaign TOE. No-op when the list is empty or holds
      * no recognizable support roles.
      *
@@ -159,11 +214,12 @@ public final class SupportPersonnelToTOE {
                 continue;
             }
             PersonnelRole role = person.getPrimaryRole();
-            if (role.isTech() || role.isAstech()) {
+            SupportSection section = sectionFor(role);
+            if (section == SupportSection.MAINTENANCE) {
                 maintenance.add(person);
-            } else if (role.isMedicalStaff()) {
+            } else if (section == SupportSection.MEDICAL) {
                 medical.add(person);
-            } else if (role.isAdministrator()) {
+            } else if (section == SupportSection.COMMAND) {
                 command.add(person);
             } else {
                 // Not a section this organizes. Counted rather than dropped in silence, because
@@ -194,6 +250,9 @@ public final class SupportPersonnelToTOE {
         FormationLevel commandLevel = useClanStructure ? FormationLevel.CLUSTER : FormationLevel.REGIMENT;
         Formation supportCommand = createFormation(campaign, label("supportCommand"),
               FormationType.SUPPORT, hqFormation, commandLevel);
+        // Recorded so the carrier reconciler can find this formation again without matching on a localized,
+        // player-renameable display name. See SupportCarrierReconciler.
+        campaign.getPlayerForce().setSupportCommandFormationId(supportCommand.getId());
 
         EchelonProfile profile = useClanStructure ? clanProfile() : innerSphereProfile();
 
@@ -480,7 +539,7 @@ public final class SupportPersonnelToTOE {
      * assigns each crew Person as one of its soldiers, and fluff-names it after the profession it
      * carries. Returns {@code null} if the unit cannot be found or loaded.
      */
-    private static Unit createCarrierUnit(Campaign campaign, CarrierSpec spec) {
+    static Unit createCarrierUnit(Campaign campaign, CarrierSpec spec) {
         MekSummary mekSummary = MekSummaryCache.getInstance().getMek(spec.unitName());
         if (mekSummary == null) {
             LOGGER.error("Cannot find carrier unit entry for {}", spec.unitName());
@@ -490,6 +549,7 @@ public final class SupportPersonnelToTOE {
         try {
             // allowNewPilots = false: the carrier arrives crewless so the support staff fill it.
             Unit unit = campaign.addNewUnit(mekSummary.loadEntity(), false, 0);
+            unit.setCarrier(true);
             unit.setFluffName(spec.professionLabel());
             for (Person person : spec.crew()) {
                 ensureInfantrySkill(person);
@@ -508,7 +568,7 @@ public final class SupportPersonnelToTOE {
      * them as zero effective troopers (strength and BV of 0). Give each a baseline Small Arms skill
      * so the entity registers its full crew as troopers.
      */
-    private static void ensureInfantrySkill(Person person) {
+    static void ensureInfantrySkill(Person person) {
         if (!person.hasSkill(SkillType.S_SMALL_ARMS)) {
             person.addSkill(SkillType.S_SMALL_ARMS, 0, 0);
         }

@@ -33,11 +33,14 @@
 package mekhq.campaign;
 
 import megamek.common.event.Subscribe;
+import mekhq.campaign.events.persons.PersonChangedEvent;
 import mekhq.campaign.events.persons.PersonCrewAssignmentEvent;
 import mekhq.campaign.events.persons.PersonEvent;
+import mekhq.campaign.events.persons.PersonNewEvent;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.enums.PersonnelRole;
 import mekhq.campaign.unit.Unit;
+import mekhq.campaign.universe.commandGeneration.SupportCarrierReconciler;
 
 /**
  * For processing events that should trigger for any kind of campaign, AtB or otherwise.
@@ -75,9 +78,48 @@ public record CampaignEventProcessor(Campaign campaign) {
      *
      * @param personCrewAssignmentEvent the event containing the unit and crew assignment information
      */
+    /**
+     * Seats a newly arrived character in a support carrier when they belong in one.
+     *
+     * <p>Covers hiring, GM additions and story-arc characters. Retraining and returns to duty arrive as
+     * {@link PersonChangedEvent} instead and are handled by {@link #handleSupportRoleChange}.</p>
+     *
+     * <p><b>Important:</b> This method is not directly evoked, so IDEA will tell you it has no uses. IDEA is
+     * wrong.</p>
+     *
+     * @param personNewEvent the event carrying the character who joined the campaign
+     */
+    @Subscribe
+    public void handleNewPersonForCarrier(PersonNewEvent personNewEvent) {
+        SupportCarrierReconciler.seatIfEligible(campaign(), personNewEvent.getPerson());
+    }
+
+    /**
+     * Keeps a character's carrier seat matching their role and status.
+     *
+     * <p>{@link mekhq.campaign.events.persons.PersonStatusChangedEvent} extends {@link PersonChangedEvent}, so this
+     * one subscription covers retraining into and out of a support role, returning from leave, academy or MIA, and
+     * being freed from captivity. Deliberately not subscribed to the abstract {@code PersonEvent}, because
+     * {@code PersonLogEvent} extends that and fires on every personnel-log entry.</p>
+     *
+     * <p><b>Important:</b> This method is not directly evoked, so IDEA will tell you it has no uses. IDEA is
+     * wrong.</p>
+     *
+     * @param personChangedEvent the event carrying the character whose record changed
+     */
+    @Subscribe
+    public void handleSupportRoleChange(PersonChangedEvent personChangedEvent) {
+        Person person = personChangedEvent.getPerson();
+        SupportCarrierReconciler.releaseIfIneligible(campaign(), person);
+        SupportCarrierReconciler.seatIfEligible(campaign(), person);
+    }
+
     @Subscribe
     public void handlePersonUnitAssignmentEvent(PersonCrewAssignmentEvent personCrewAssignmentEvent) {
         Unit unit = personCrewAssignmentEvent.getUnit();
+        // Seating a character fires this event back into us. Safe because the reconciler only ever deletes a carrier
+        // that has reached zero crew, and seating moves crew the other way.
+        SupportCarrierReconciler.onCarrierCrewChanged(campaign(), unit);
 
         // If this unit has no commander, clear out any temporary crew assignments
         if (unit != null && !unit.hasCommander() && unit.getTotalTempCrew() > 0) {

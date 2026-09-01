@@ -197,6 +197,12 @@ public class Unit implements ITechnology, ILocatable {
     private UUID id;
     private final LocationNode locationNode = new LocationNode(this);
     private String fluffName;
+    /**
+     * {@code true} when this unit is a support carrier: an infantry unit that exists to hold support personnel in the
+     * TOE, not to fight. Carriers are created by {@code SupportPersonnelToTOE} and are excluded from scenario
+     * deployment. Absent from saves written before carriers were tracked, which read back as {@code false}.
+     */
+    private boolean carrier;
 
     // This is the large craft assigned to transport this unit
     private TransportShipAssignment transportShipAssignment;
@@ -2986,6 +2992,10 @@ public class Unit implements ITechnology, ILocatable {
             MHQXMLUtility.writeSimpleXMLTag(pw, indent, "salvaged", true);
         }
 
+        if (carrier) {
+            MHQXMLUtility.writeSimpleXMLTag(pw, indent, "carrier", true);
+        }
+
         if (site != SITE_FACILITY_BASIC) {
             MHQXMLUtility.writeSimpleXMLTag(pw, indent, "site", site);
         }
@@ -3249,6 +3259,8 @@ public class Unit implements ITechnology, ILocatable {
                     loadLogEntriesFromXML(wn2, retVal.deploymentLog, "deploymentLog");
                 } else if (wn2.getNodeName().equalsIgnoreCase("repairLog")) {
                     loadLogEntriesFromXML(wn2, retVal.repairLog, "repairLog");
+                } else if (wn2.getNodeName().equalsIgnoreCase("carrier")) {
+                    retVal.carrier = Boolean.parseBoolean(wn2.getTextContent().trim());
                 } else if (wn2.getNodeName().equalsIgnoreCase("fluffName")) {
                     retVal.fluffName = wn2.getTextContent();
                 } else if (wn2.getNodeName().equalsIgnoreCase("lastMaintenanceReport")) {
@@ -7544,6 +7556,18 @@ public class Unit implements ITechnology, ILocatable {
      */
     public void setFluffName(String fluffName) {
         this.fluffName = fluffName;
+    }
+
+    /**
+     * @return {@code true} if this unit is a support carrier holding support personnel in the TOE rather than a
+     *       fighting unit
+     */
+    public boolean isCarrier() {
+        return carrier;
+    }
+
+    public void setCarrier(boolean carrier) {
+        this.carrier = carrier;
     }
 
     /**
