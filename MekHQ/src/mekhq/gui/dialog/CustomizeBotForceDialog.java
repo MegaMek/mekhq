@@ -665,7 +665,7 @@ public class CustomizeBotForceDialog extends JDialog {
                 randomizer.setBaChance((int) spnBaChance.getValue());
                 randomizer.setLanceSize((int) spnLanceSize.getValue());
                 randomizer.setFocalWeightClass(choiceFocalWeightClass.getSelectedIndex());
-                randomizer.setSkill(SkillLevelPickerUtility.resolve(choiceSkillLevel.getSelectedItem()));
+                randomizer.setSkill(choiceSkillLevel.getSelectedItem());
                 randomizer.setQuality(choiceQuality.getSelectedIndex());
                 randomizer.setUnitType(choiceUnitType.getSelectedIndex());
                 randomizer.setBalancingMethod(choiceBalancingMethod.getSelectedItem());

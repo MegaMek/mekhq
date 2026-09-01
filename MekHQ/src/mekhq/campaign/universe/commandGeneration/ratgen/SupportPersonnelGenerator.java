@@ -443,7 +443,7 @@ public final class SupportPersonnelGenerator {
      * @return a concrete, non-{@code NONE} {@link SkillLevel}
      */
     static SkillLevel resolveRandom(SkillLevel configured) {
-        return (configured == null || configured == SkillLevel.NONE) ? rollRandomSkillLevel() : configured;
+        return Skills.resolveRandomSkillLevel(configured);
     }
 
     /**

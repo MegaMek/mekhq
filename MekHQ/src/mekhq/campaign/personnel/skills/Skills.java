@@ -73,6 +73,19 @@ public class Skills {
     }
 
     /**
+     * Resolves the "Random" skill-picker sentinel to a concrete level. {@link SkillLevel#NONE} (or {@code null}) rolls
+     * a fresh level via {@link #rollRandomSkillLevel()}; any other level is returned unchanged. Call once per generated
+     * unit or person so a Random selection varies each roll.
+     *
+     * @param level the picker's selected level, or the Random sentinel ({@link SkillLevel#NONE}/{@code null})
+     *
+     * @return a concrete, non-{@code NONE} {@link SkillLevel}
+     */
+    public static SkillLevel resolveRandomSkillLevel(final SkillLevel level) {
+        return (level == null || level == SkillLevel.NONE) ? rollRandomSkillLevel() : level;
+    }
+
+    /**
      * Gets the number of skills.
      *
      * @return The number of skills.
