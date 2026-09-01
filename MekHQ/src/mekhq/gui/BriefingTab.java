@@ -269,7 +269,7 @@ public final class BriefingTab extends CampaignGuiTab {
                 if (value instanceof AbstractContract contract) {
                     MissionStatus status = contract.getStatus();
                     if (status != null) {
-                        setText(getText() + " [" + status + "]");
+                        setText("[" + status + "] " + getText());
                     }
                 }
                 return this;
