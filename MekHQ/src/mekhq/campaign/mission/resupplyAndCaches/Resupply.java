@@ -568,6 +568,13 @@ public class Resupply {
 
         Set<PartInUse> partsToRemove = new HashSet<>();
         for (PartInUse partInUse : partsInUse) {
+            // Only resupply what the player actually fields. A use count of zero means the part is not
+            // mounted on any active unit and is only present as warehouse salvage.
+            if (partInUse.getUseCount() == 0) {
+                partsToRemove.add(partInUse);
+                continue;
+            }
+
             Part part = partInUse.getPartToBuy().getAcquisitionPart();
             if (removeClan && (part.isClan() || part.isMixedTech())) {
                 partsToRemove.add(partInUse);
