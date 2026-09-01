@@ -70,6 +70,8 @@ import mekhq.campaign.digitalGM.stratCon.sectorGeneration.StratConSectorPlanner;
 import mekhq.campaign.digitalGM.stratCon.sectorGeneration.StratConSectorShape;
 import mekhq.campaign.force.Formation;
 import mekhq.campaign.mission.contract.AbstractContract;
+import mekhq.campaign.mission.contract.contractGeneration.AbstractContractGeneration;
+import mekhq.campaign.mission.contract.utilities.ContractCharacteristics;
 import mekhq.campaign.mission.scenarios.AtBDynamicScenario;
 import mekhq.campaign.mission.scenarios.Scenario;
 import mekhq.campaign.mission.scenarios.ScenarioForceTemplate.ForceAlignment;
@@ -329,6 +331,10 @@ public class StratConContractInitializer {
         if (!isUseMaplessMode) {
             scheduleStrategicScenarioSpawnDates(contract, campaignState);
         }
+
+        // Required victory points depend on the StratCon state
+        contract.setRequiredVictoryPoints(ContractCharacteristics.bakeRequiredVictoryPoints(
+              AbstractContractGeneration.determineRequiredVictoryPoints(contract), contract));
 
         // Determine starting Support Points
         negotiateInitialSupportPoints(campaign, contract);

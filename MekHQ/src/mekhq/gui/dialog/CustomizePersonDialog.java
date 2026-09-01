@@ -73,6 +73,7 @@ import megamek.common.units.Entity;
 import megamek.logging.MMLogger;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
+import mekhq.campaign.campaignOptions.CampaignOption;
 import mekhq.campaign.personnel.Bloodname;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.PersonnelOptions;
@@ -101,7 +102,6 @@ import mekhq.gui.control.EditLogControl.LogType;
 import mekhq.gui.control.EditScenarioLogControl;
 import mekhq.gui.utilities.MarkdownEditorPanel;
 import mekhq.gui.utilities.OriginFactionPickerHelper;
-import mekhq.campaign.campaignOptions.CampaignOption;
 
 /**
  * This dialog is used to both hire new pilots and to edit existing ones
@@ -1266,7 +1266,11 @@ public class CustomizePersonDialog extends JDialog implements DialogOptionListen
             panDemographics.add(spnPersonalityQuirk, gridBagConstraints);
 
             y++;
+        }
+        // endregion random personality
 
+        // region random talent
+        if (campaign.getCampaignOptions().get(CampaignOption.USE_RANDOM_TALENT)) {
             JLabel labelReasoning = new JLabel();
             labelReasoning.setText("Talent:");
             labelReasoning.setName("labelReasoning");
@@ -1289,6 +1293,7 @@ public class CustomizePersonDialog extends JDialog implements DialogOptionListen
 
             y++;
         }
+        // endregion random talent
 
         if (person.hasDarkSecret()) {
             chkDarkSecretRevealed = new JCheckBox("Dark Secret Revealed");
@@ -1999,10 +2004,12 @@ public class CustomizePersonDialog extends JDialog implements DialogOptionListen
             person.setPersonalityQuirk(comboPersonalityQuirk.getSelectedItem());
             person.setPersonalityQuirkDescriptionIndex((int) spnPersonalityQuirk.getValue());
 
-            person.setReasoning(comboReasoning.getSelectedItem());
-
             writePersonalityDescription(person);
             writeInterviewersNotes(person);
+        }
+
+        if (campaign.getCampaignOptions().get(CampaignOption.USE_RANDOM_TALENT)) {
+            person.setReasoning(comboReasoning.getSelectedItem());
         }
 
         if (person.hasDarkSecret()) {

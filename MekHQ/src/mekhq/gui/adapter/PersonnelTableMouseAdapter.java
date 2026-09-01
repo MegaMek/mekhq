@@ -2425,14 +2425,16 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
 
         JMenu changeStatusMenu = new JMenu(resources.getString("changeStatus.text"));
 
-        if (StaticChecks.areAllEmployed(selected)) {
+        boolean areAllEmployed = StaticChecks.areAllEmployed(selected);
+        if (areAllEmployed) {
             menuItem = new JMenuItem(resources.getString("sack.text"));
             menuItem.setActionCommand(CMD_SACK);
             menuItem.addActionListener(this);
             changeStatusMenu.add(menuItem);
         }
 
-        if (!StaticChecks.areAllEmployed(selected)) {
+        boolean areAllFree = StaticChecks.areAllFreeOrBondsman(selected);
+        if (!areAllEmployed && areAllFree) {
             menuItem = new JMenuItem(resources.getString("employ.text"));
             menuItem.setActionCommand(CMD_EMPLOY);
             menuItem.addActionListener(this);
@@ -2445,7 +2447,6 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
 
         changeStatusMenu.addSeparator();
 
-        boolean areAllFree = Stream.of(selected).allMatch(p -> p.getPrisonerStatus().isFreeOrBondsman());
         for (final PersonnelStatus status : PersonnelStatus.getImplementedStatuses(areAllFree, false)) {
             cbMenuItem = new JCheckBoxMenuItem(status.toString());
             cbMenuItem.setToolTipText(status.getToolTipText());
@@ -4646,7 +4647,8 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
                 personalityMenu.add(menuItem);
             }
 
-            if (getCampaignOptions().get(CampaignOption.USE_RANDOM_PERSONALITIES)) {
+            if (getCampaignOptions().get(CampaignOption.USE_RANDOM_PERSONALITIES) ||
+                      getCampaignOptions().get(CampaignOption.USE_RANDOM_TALENT)) {
                 menuItem = new JMenuItem(resources.getString("regeneratePersonality.text"));
                 menuItem.setActionCommand(CMD_PERSONALITY);
                 menuItem.addActionListener(this);
