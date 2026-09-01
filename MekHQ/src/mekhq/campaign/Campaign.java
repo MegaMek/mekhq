@@ -1075,7 +1075,7 @@ public class Campaign implements ITechManager {
      * hasActiveContract based on that check. This value should not be set elsewhere
      */
     public void setHasActiveContract() {
-        hasActiveContract = getActiveContracts().size() > 0;
+        hasActiveContract = !getActiveContracts().isEmpty();
     }
     // endregion Missions/Contracts
 

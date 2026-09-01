@@ -69,6 +69,7 @@ import megamek.common.units.Entity;
 import megamek.utilities.ImageUtilities;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
+import mekhq.campaign.campaignOptions.CampaignOption;
 import mekhq.campaign.log.LogEntry;
 import mekhq.campaign.unit.Unit;
 import mekhq.gui.baseComponents.JScrollablePanel;
@@ -78,7 +79,6 @@ import mekhq.gui.model.UnitTableModel;
 import mekhq.gui.utilities.ImgLabel;
 import mekhq.gui.utilities.MarkdownRenderer;
 import mekhq.gui.utilities.MultiLineTooltip;
-import mekhq.campaign.campaignOptions.CampaignOption;
 
 /**
  * A custom panel that gets filled in with goodies from a unit record
@@ -194,8 +194,9 @@ public class UnitViewPanel extends JScrollablePanel {
         Image image = isSpritesOnly ? null : FluffImageHelper.getFluffImage(entity);
 
         if (null != image) {
-            // fluff image exists so use custom ImgLabel to get full mek porn
-            return new ImgLabel(image);
+            // fluff image exists so use custom ImgLabel to get full mek porn; cap it so it stays prominent without
+            // crowding out the stats panel beside it (the image label is laid out to its preferred size).
+            return new ImgLabel(image, UIUtil.scaleForGUI(240), UIUtil.scaleForGUI(360));
         }
 
         // no fluff image, so just use image icon from top-down view

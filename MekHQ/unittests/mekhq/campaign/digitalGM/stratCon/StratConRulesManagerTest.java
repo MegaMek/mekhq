@@ -63,6 +63,7 @@ import mekhq.campaign.digitalGM.stratCon.facility.StratConFacility;
 import mekhq.campaign.digitalGM.stratCon.facility.StratConFacilityFactory;
 import mekhq.campaign.force.CombatTeam;
 import mekhq.campaign.force.Formation;
+import mekhq.campaign.force.FormationType;
 import mekhq.campaign.mission.contract.AbstractContract;
 import mekhq.campaign.mission.scenarios.AtBDynamicScenario;
 import mekhq.campaign.mission.scenarios.AtBDynamicScenarioFactory;
@@ -90,6 +91,7 @@ import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
+import org.junit.jupiter.params.provider.ValueSource;
 import org.mockito.MockedConstruction;
 import org.mockito.MockedStatic;
 import testUtilities.MHQTestUtilities;
@@ -1391,6 +1393,342 @@ class StratConRulesManagerTest {
 
                 return StratConRulesManager.buildScoutMap(formation, hangar, campaign);
             }
+        }
+    }
+
+    // -- DropShip substitution (issue #9790) --
+
+    /**
+     * Coverage for <a href="https://github.com/MegaMek/mekhq/issues/9790">issue #9790</a> - "Isolated DropShip Defense
+     * only uses One DropShip".
+     *
+     * <p>A {@code PlayerOrFixedUnitCount} allied force (such as the defended DropShip in that scenario) is filled by
+     * swapping in one of the player's own units, drawn at random from every eligible unit in the TO&amp;E. Players
+     * reported the same hull being used every time. These tests pin two things:</p>
+     * <ul>
+     *   <li>the candidate pool contains every eligible DropShip, regardless of the combat role or formation type it is
+     *       parked in (the pool must not collapse to a single hull); and</li>
+     *   <li>the draw over that pool is genuinely random, so with two or more eligible DropShips the selection varies
+     *       across runs and never fixates on one - while correctly excluding units that cannot serve.</li>
+     * </ul>
+     */
+    @Nested
+    class DropShipSelection {
+
+        private static final String DROP_SHIP_FORCE = "DropShip";
+
+        private Method swapMethod;
+
+        private Method swapMethod() throws NoSuchMethodException {
+            if (swapMethod == null) {
+                swapMethod = StratConRulesManager.class.getDeclaredMethod("swapInPlayerUnits",
+                      StratConScenario.class, Campaign.class, int.class);
+                swapMethod.setAccessible(true);
+            }
+            return swapMethod;
+        }
+
+        /**
+         * Builds a mocked unit of the given type and status.
+         */
+        private Unit makeUnit(int unitType, boolean available, boolean functional) {
+            Entity entity = mock(Entity.class);
+            when(entity.getUnitType()).thenReturn(unitType);
+            lenient().when(entity.doomedOnGround()).thenReturn(false);
+            lenient().when(entity.doomedInAtmosphere()).thenReturn(false);
+            lenient().when(entity.doomedInSpace()).thenReturn(false);
+            lenient().when(entity.hasQuirk(OptionsConstants.QUIRK_NEG_UNSTREAMLINED)).thenReturn(false);
+
+            Unit unit = mock(Unit.class);
+            when(unit.getEntity()).thenReturn(entity);
+            when(unit.getId()).thenReturn(UUID.randomUUID());
+            lenient().when(unit.isAvailable()).thenReturn(available);
+            lenient().when(unit.isFunctional()).thenReturn(functional);
+            return unit;
+        }
+
+        private Unit availableDropShip() {
+            return makeUnit(UnitType.DROPSHIP, true, true);
+        }
+
+        /**
+         * A scenario whose template holds a single {@code PlayerOrFixedUnitCount} DropShip force, backed by one
+         * generated placeholder unit for that force (so exactly one player DropShip is swapped in per run). Every unit
+         * added to the DropShip force is recorded into {@code selectionSink}.
+         */
+        private StratConScenario buildScenario(List<Unit> selectionSink) {
+            ScenarioForceTemplate dropShipForce = new ScenarioForceTemplate();
+            dropShipForce.setForceName(DROP_SHIP_FORCE);
+            dropShipForce.setGenerationMethod(
+                  ScenarioForceTemplate.ForceGenerationMethod.PlayerOrFixedUnitCount.ordinal());
+            dropShipForce.setAllowedUnitType(UnitType.DROPSHIP);
+            dropShipForce.setForceAlignment(ScenarioForceTemplate.ForceAlignment.Allied.ordinal());
+
+            ScenarioTemplate template = new ScenarioTemplate();
+            template.mapParameters.setMapLocation(MapLocation.SpecificGroundTerrain);
+            template.getScenarioForces().put(DROP_SHIP_FORCE, dropShipForce);
+
+            // A single generated placeholder for the DropShip force means calculateUnitCount() == 1: one substitution.
+            Map<UUID, ScenarioForceTemplate> botUnitTemplates = new HashMap<>();
+            botUnitTemplates.put(UUID.randomUUID(), dropShipForce);
+
+            AtBDynamicScenario backingScenario = mock(AtBDynamicScenario.class);
+            when(backingScenario.getBotUnitTemplates()).thenReturn(botUnitTemplates);
+            when(backingScenario.getBotForceTemplates()).thenReturn(new HashMap<>());
+
+            StratConScenario scenario = mock(StratConScenario.class);
+            when(scenario.getScenarioTemplate()).thenReturn(template);
+            when(scenario.getBackingScenario()).thenReturn(backingScenario);
+            doAnswer(invocation -> {
+                selectionSink.add(invocation.getArgument(0));
+                return null;
+            }).when(scenario).addUnit(any(), eq(DROP_SHIP_FORCE), anyBoolean());
+            return scenario;
+        }
+
+        private Campaign buildCampaign(List<Unit> toe, boolean useDropShips) {
+            Campaign campaign = MHQTestUtilities.mockCampaign();
+            CampaignOptions options = mock(CampaignOptions.class);
+            when(campaign.getCampaignOptions()).thenReturn(options);
+            when(options.get(CampaignOption.USE_DROP_SHIPS)).thenReturn(useDropShips);
+            lenient().when(options.get(CampaignOption.USE_ADVANCED_SCOUTING)).thenReturn(false);
+            when(campaign.getLocalDate()).thenReturn(LocalDate.of(3061, 1, 1));
+
+            List<UUID> toeIds = new ArrayList<>();
+            for (Unit unit : toe) {
+                UUID id = unit.getId();
+                toeIds.add(id);
+                when(campaign.getUnit(id)).thenReturn(unit);
+            }
+            when(campaign.getPlayerForce().getAllUnitsInTheTOE(false)).thenReturn(toeIds);
+            return campaign;
+        }
+
+        /**
+         * Runs the substitution {@code iterations} times over one fresh scenario and campaign, returning every unit
+         * that was swapped into the DropShip force (one per run, unless nothing was eligible).
+         */
+        private List<Unit> runSelections(List<Unit> toe, boolean useDropShips, int iterations) throws Exception {
+            List<Unit> selections = new ArrayList<>();
+            StratConScenario scenario = buildScenario(selections);
+            Campaign campaign = buildCampaign(toe, useDropShips);
+            Method swap = swapMethod();
+            try (MockedStatic<AtBDynamicScenarioFactory> ignored = mockStatic(AtBDynamicScenarioFactory.class)) {
+                for (int i = 0; i < iterations; i++) {
+                    swap.invoke(null, scenario, campaign, Formation.FORMATION_NONE);
+                }
+            }
+            return selections;
+        }
+
+        private Map<Unit, Integer> tally(List<Unit> selections) {
+            Map<Unit, Integer> counts = new HashMap<>();
+            for (Unit unit : selections) {
+                counts.merge(unit, 1, Integer::sum);
+            }
+            return counts;
+        }
+
+        /**
+         * The reported fleet: four fully-eligible DropShips (one "support" hull plus three others). Over many runs
+         * every one must be chosen at least once - the selection must not fixate on a single hull.
+         */
+        @Test
+        void multipleAvailableDropShips_everyOneIsSelectedAcrossRuns() throws Exception {
+            List<Unit> fleet = new ArrayList<>();
+            for (int i = 0; i < 4; i++) {
+                fleet.add(availableDropShip());
+            }
+
+            int iterations = 3000;
+            List<Unit> selections = runSelections(fleet, true, iterations);
+
+            assertEquals(iterations, selections.size(), "exactly one DropShip should be swapped in per run");
+            Map<Unit, Integer> counts = tally(selections);
+            assertEquals(fleet.size(), counts.size(),
+                  "every available DropShip should be selected at least once, not just one");
+            for (Unit dropShip : fleet) {
+                assertTrue(counts.getOrDefault(dropShip, 0) > 0,
+                      "a DropShip was never selected across " + iterations + " runs");
+            }
+        }
+
+        /**
+         * The draw is not merely non-constant but roughly uniform: with four equally-eligible DropShips no hull should
+         * hog the rotation. Bounds are deliberately generous (half to 1.5x the fair share) so the test is not flaky.
+         */
+        @Test
+        void selectionIsApproximatelyUniformAcrossDropShips() throws Exception {
+            List<Unit> fleet = new ArrayList<>();
+            for (int i = 0; i < 4; i++) {
+                fleet.add(availableDropShip());
+            }
+
+            int iterations = 4000;
+            Map<Unit, Integer> counts = tally(runSelections(fleet, true, iterations));
+
+            int fairShare = iterations / fleet.size();
+            int low = fairShare / 2;
+            int high = fairShare * 3 / 2;
+            for (Unit dropShip : fleet) {
+                int seen = counts.getOrDefault(dropShip, 0);
+                assertTrue(seen >= low && seen <= high,
+                      "DropShip selected " + seen + " times, expected within [" + low + ", " + high + ']');
+            }
+        }
+
+        /**
+         * The guarantee holds regardless of how many DropShips the player fields: every eligible hull rotates in.
+         */
+        @ParameterizedTest
+        @ValueSource(ints = { 2, 3, 5, 8 })
+        void variedFleetSizes_everyAvailableDropShipRotatesIn(int fleetSize) throws Exception {
+            List<Unit> fleet = new ArrayList<>();
+            for (int i = 0; i < fleetSize; i++) {
+                fleet.add(availableDropShip());
+            }
+
+            int iterations = 400 * fleetSize;
+            Map<Unit, Integer> counts = tally(runSelections(fleet, true, iterations));
+
+            assertEquals(fleetSize, counts.size(),
+                  "every one of the " + fleetSize + " available DropShips should be selected");
+        }
+
+        /**
+         * Only DropShips are eligible for a DropShip force: Meks, tanks, fighters, and infantry in the same TO&amp;E
+         * are never swapped in, while both DropShips still rotate.
+         */
+        @Test
+        void mixedTableOfOrganization_onlyDropShipsAreSelected() throws Exception {
+            Unit dropShipA = availableDropShip();
+            Unit dropShipB = availableDropShip();
+            List<Unit> toe = new ArrayList<>(List.of(dropShipA,
+                  makeUnit(UnitType.MEK, true, true),
+                  makeUnit(UnitType.TANK, true, true),
+                  makeUnit(UnitType.AEROSPACE_FIGHTER, true, true),
+                  makeUnit(UnitType.INFANTRY, true, true),
+                  dropShipB));
+
+            Map<Unit, Integer> counts = tally(runSelections(toe, true, 2000));
+
+            assertEquals(2, counts.size(), "only the two DropShips are eligible");
+            assertTrue(counts.getOrDefault(dropShipA, 0) > 0);
+            assertTrue(counts.getOrDefault(dropShipB, 0) > 0);
+        }
+
+        /**
+         * DropShips that cannot serve - deployed, in transit, refitting, mothballed - are excluded ({@code isAvailable}
+         * is false), but the remaining available DropShips still rotate rather than the pool collapsing to one.
+         */
+        @Test
+        void unavailableDropShipsAreExcluded_availableOnesStillRotate() throws Exception {
+            Unit availableA = availableDropShip();
+            Unit availableB = availableDropShip();
+            Unit unavailableA = makeUnit(UnitType.DROPSHIP, false, true);
+            Unit unavailableB = makeUnit(UnitType.DROPSHIP, false, true);
+            List<Unit> toe = new ArrayList<>(List.of(availableA, unavailableA, unavailableB, availableB));
+
+            Map<Unit, Integer> counts = tally(runSelections(toe, true, 2000));
+
+            assertEquals(2, counts.size(), "only the two available DropShips are eligible");
+            assertTrue(counts.getOrDefault(availableA, 0) > 0);
+            assertTrue(counts.getOrDefault(availableB, 0) > 0);
+            assertEquals(0, counts.getOrDefault(unavailableA, 0));
+            assertEquals(0, counts.getOrDefault(unavailableB, 0));
+        }
+
+        /**
+         * A crippled (non-functional) DropShip is never chosen, even though it is a DropShip and available.
+         */
+        @Test
+        void nonFunctionalDropShipsAreExcluded() throws Exception {
+            Unit healthy = availableDropShip();
+            Unit wrecked = makeUnit(UnitType.DROPSHIP, true, false);
+            List<Unit> toe = new ArrayList<>(List.of(healthy, wrecked));
+
+            Map<Unit, Integer> counts = tally(runSelections(toe, true, 1000));
+
+            assertEquals(1, counts.size());
+            assertTrue(counts.getOrDefault(healthy, 0) > 0);
+            assertEquals(0, counts.getOrDefault(wrecked, 0));
+        }
+
+        /**
+         * When player DropShips are disabled in the campaign options, no player hull is substituted at all.
+         */
+        @Test
+        void playerDropShipsDisabled_nothingIsSubstituted() throws Exception {
+            List<Unit> fleet = new ArrayList<>(List.of(availableDropShip(), availableDropShip()));
+
+            List<Unit> selections = runSelections(fleet, false, 500);
+
+            assertTrue(selections.isEmpty(), "no player DropShip may be swapped in when DropShips are disabled");
+        }
+
+        /**
+         * The degenerate case at the heart of issue #9790: with exactly one eligible DropShip there is nothing to
+         * randomize over, so the same hull is returned every run. Variety requires the player to field two or more
+         * eligible DropShips - which the tests above confirm does produce variety.
+         */
+        @Test
+        void singleEligibleDropShip_isAlwaysSelected() throws Exception {
+            Unit onlyEligible = availableDropShip();
+            List<Unit> toe = new ArrayList<>(List.of(onlyEligible,
+                  makeUnit(UnitType.DROPSHIP, false, true),
+                  makeUnit(UnitType.MEK, true, true)));
+
+            int iterations = 500;
+            List<Unit> selections = runSelections(toe, true, iterations);
+
+            assertEquals(iterations, selections.size());
+            Map<Unit, Integer> counts = tally(selections);
+            assertEquals(1, counts.size());
+            assertEquals(iterations, counts.getOrDefault(onlyEligible, 0));
+        }
+
+        /**
+         * The candidate pool is built from {@code getAllUnitsInTheTOE(false)}, which flattens every formation
+         * regardless of its combat role or whether it is a support formation. This pins that a DropShip parked in a
+         * Reserve or Support bucket is just as much a candidate as one in a frontline formation - the root cause of
+         * issue #9790 was the pool narrowing to a single hull, not the random draw. The standard-only view (which the
+         * swap deliberately does not use) would drop the support hull; the swap must never narrow that way.
+         */
+        @Test
+        void candidatePool_includesDropShipsFromEveryCombatRoleAndFormationType() {
+            UUID frontlineDropShip = UUID.randomUUID();
+            UUID reserveDropShip = UUID.randomUUID();
+            UUID supportDropShip = UUID.randomUUID();
+
+            Formation reserve = new Formation("Reserve");
+            reserve.setFormationType(FormationType.STANDARD, false);
+            reserve.setCombatRoleInMemory(CombatRole.RESERVE);
+            reserve.addUnit(reserveDropShip);
+
+            Formation support = new Formation("Support");
+            support.setFormationType(FormationType.SUPPORT, false);
+            support.setCombatRoleInMemory(CombatRole.AUXILIARY);
+            support.addUnit(supportDropShip);
+
+            Formation topLevel = new Formation("TO&E");
+            topLevel.setFormationType(FormationType.STANDARD, false);
+            topLevel.setCombatRoleInMemory(CombatRole.FRONTLINE);
+            topLevel.addUnit(frontlineDropShip);
+            topLevel.addSubFormation(reserve, true);
+            topLevel.addSubFormation(support, true);
+
+            // The swap path passes false: frontline, reserve, and support DropShips are all candidates.
+            List<UUID> pool = topLevel.getAllUnits(false);
+            assertTrue(pool.contains(frontlineDropShip));
+            assertTrue(pool.contains(reserveDropShip));
+            assertTrue(pool.contains(supportDropShip));
+
+            // Sanity: the standard-only view (not used by the swap) drops the support hull - the exact kind of narrowing
+            // that must never reach DropShip selection.
+            List<UUID> standardOnly = topLevel.getAllUnits(true);
+            assertTrue(standardOnly.contains(frontlineDropShip));
+            assertTrue(standardOnly.contains(reserveDropShip));
+            assertFalse(standardOnly.contains(supportDropShip));
         }
     }
 }

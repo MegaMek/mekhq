@@ -442,6 +442,8 @@ public final class CampaignOption<T> {
           ofMutable(RandomOriginOptions.class, () -> new RandomOriginOptions(true), "randomOriginOptions");
     public static final CampaignOption<Boolean> USE_RANDOM_PERSONALITIES =
           of(Boolean.class, false, "useRandomPersonalities");
+    public static final CampaignOption<Boolean> USE_RANDOM_TALENT =
+          of(Boolean.class, false, "useRandomTalent");
     public static final CampaignOption<Boolean> USE_PERSONALITY_LABELS_ONLY =
           of(Boolean.class, false, "usePersonalityLabelsOnly");
     public static final CampaignOption<Boolean> USE_RANDOM_PERSONALITY_REPUTATION =

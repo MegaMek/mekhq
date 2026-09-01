@@ -33,6 +33,8 @@
  */
 package mekhq.campaign.parts.equipment;
 
+import static mekhq.utilities.MHQInternationalization.getTextAt;
+
 import java.io.PrintWriter;
 
 import jakarta.annotation.Nonnull;
@@ -51,13 +53,13 @@ import megamek.common.units.Entity;
 import megamek.common.weapons.bayWeapons.BayWeapon;
 import megamek.logging.MMLogger;
 import mekhq.campaign.Campaign;
+import mekhq.campaign.campaignOptions.CampaignOption;
 import mekhq.campaign.finances.Money;
 import mekhq.campaign.parts.Part;
 import mekhq.campaign.unit.Unit;
 import mekhq.utilities.MHQXMLUtility;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
-import mekhq.campaign.campaignOptions.CampaignOption;
 
 /**
  * This part covers most of the equipment types in WeaponType, AmmoType, and MiscType It can robustly handle all
@@ -83,6 +85,16 @@ public class EquipmentPart extends Part {
     protected int equipmentNum;
     protected double equipTonnage;
     protected double size;
+
+    /**
+     * Whether the weapon's Directional Torso Mount rotation mechanism has been destroyed in combat.
+     */
+    protected boolean directionalMountLocked = false;
+
+    /**
+     * Whether an autocannon has absorbed its first critical hit (Core rules only).
+     */
+    protected boolean autocannonHit = false;
 
     public EquipmentType getType() {
         return type;
@@ -145,6 +157,8 @@ public class EquipmentPart extends Part {
         EquipmentPart clone = new EquipmentPart(getUnitTonnage(), type, equipmentNum, size, omniPodded, campaign);
         clone.copyBaseData(this);
         clone.setEquipTonnage(equipTonnage);
+        clone.directionalMountLocked = directionalMountLocked;
+        clone.autocannonHit = autocannonHit;
         return clone;
     }
 
@@ -195,6 +209,12 @@ public class EquipmentPart extends Part {
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "typeName", type.getInternalName());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "size", size);
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "equipTonnage", equipTonnage);
+        if (directionalMountLocked) {
+            MHQXMLUtility.writeSimpleXMLTag(pw, indent, "directionalMountLocked", true);
+        }
+        if (autocannonHit) {
+            MHQXMLUtility.writeSimpleXMLTag(pw, indent, "autocannonHit", true);
+        }
         writeToXMLEnd(pw, indent);
     }
 
@@ -212,6 +232,10 @@ public class EquipmentPart extends Part {
                 size = Double.parseDouble(wn2.getTextContent());
             } else if (wn2.getNodeName().equalsIgnoreCase("equipTonnage")) {
                 equipTonnage = Double.parseDouble(wn2.getTextContent());
+            } else if (wn2.getNodeName().equalsIgnoreCase("directionalMountLocked")) {
+                directionalMountLocked = Boolean.parseBoolean(wn2.getTextContent());
+            } else if (wn2.getNodeName().equalsIgnoreCase("autocannonHit")) {
+                autocannonHit = Boolean.parseBoolean(wn2.getTextContent());
             }
         }
         restore();
@@ -231,11 +255,16 @@ public class EquipmentPart extends Part {
     public void fix() {
         super.fix();
 
+        directionalMountLocked = false;
+        autocannonHit = false;
+
         final Mounted<?> mounted = getMounted();
         if (mounted != null) {
             mounted.setHit(false);
             mounted.setMissing(false);
             mounted.setDestroyed(false);
+            mounted.setAutocannonHit(false);
+            mounted.setDirectionalMountLocked(false);
             unit.repairSystem(CriticalSlot.TYPE_EQUIPMENT, equipmentNum);
         }
 
@@ -317,6 +346,11 @@ public class EquipmentPart extends Part {
 
         setHits(newHits);
 
+        // These two states are combat damage that MegaMek does not model as a crit-slot hit, so they are tracked
+        // separately from hits
+        autocannonHit = mounted.isAutocannonHit();
+        directionalMountLocked = mounted.isDirectionalMountLocked();
+
         omniPodded = mounted.isOmniPodMounted();
 
         if (checkForDestruction &&
@@ -348,6 +382,10 @@ public class EquipmentPart extends Part {
             return 250;
         }
 
+        if (autocannonHit || directionalMountLocked) {
+            return 100;
+        }
+
         return 0;
     }
 
@@ -369,12 +407,16 @@ public class EquipmentPart extends Part {
         } else if (hits > 3) {
             return 2;
         }
+
+        if (autocannonHit || directionalMountLocked) {
+            return -3;
+        }
         return 0;
     }
 
     @Override
     public boolean needsFixing() {
-        return hits > 0;
+        return hits > 0 || directionalMountLocked || autocannonHit;
     }
 
     protected @Nullable Mounted<?> getMounted() {
@@ -406,6 +448,30 @@ public class EquipmentPart extends Part {
         return (mounted != null) && mounted.isRearMounted();
     }
 
+    public boolean isDirectionalMountLocked() {
+        return directionalMountLocked;
+    }
+
+    @Override
+    public String getDetails(boolean includeRepairDetails) {
+        StringBuilder details = new StringBuilder(super.getDetails(includeRepairDetails));
+
+        if (autocannonHit) {
+            appendDetail(details, getTextAt("mekhq.resources.Parts", "EquipmentPart.autocannonHit"));
+        }
+        if (directionalMountLocked) {
+            appendDetail(details, getTextAt("mekhq.resources.Parts", "EquipmentPart.directionalMountLocked"));
+        }
+        return details.toString();
+    }
+
+    private static void appendDetail(StringBuilder details, String note) {
+        if (!details.isEmpty()) {
+            details.append(", ");
+        }
+        details.append(note);
+    }
+
     @Override
     public void updateConditionFromPart() {
         final Unit unit = getUnit();
@@ -427,6 +493,9 @@ public class EquipmentPart extends Part {
                 mounted.setRepairable(true);
                 unit.repairSystem(CriticalSlot.TYPE_EQUIPMENT, getEquipmentNum());
             }
+
+            mounted.setAutocannonHit(autocannonHit);
+            mounted.setDirectionalMountLocked(directionalMountLocked);
 
             setOmniPodded(mounted.isOmniPodMounted());
         }
