@@ -35,7 +35,6 @@ package mekhq.campaign.universe.commandGeneration.ratgen;
 import java.util.ArrayList;
 import java.util.List;
 
-import megamek.common.compute.Compute;
 import megamek.common.enums.Gender;
 import megamek.common.enums.SkillLevel;
 import megamek.logging.MMLogger;
@@ -43,13 +42,14 @@ import mekhq.campaign.Campaign;
 import mekhq.campaign.campaignOptions.CampaignOption;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.enums.PersonnelRole;
-import mekhq.campaign.personnel.turnoverAndRetention.RetirementDefectionTracker;
-import mekhq.campaign.randomEvents.prisoners.PrisonerStatus;
 import mekhq.campaign.personnel.generator.AbstractSkillGenerator;
 import mekhq.campaign.personnel.generator.DefaultSkillGenerator;
 import mekhq.campaign.personnel.ranks.RankSystem;
 import mekhq.campaign.personnel.ranks.RankValidator;
 import mekhq.campaign.personnel.skills.SkillType;
+import mekhq.campaign.personnel.skills.Skills;
+import mekhq.campaign.personnel.turnoverAndRetention.RetirementDefectionTracker;
+import mekhq.campaign.randomEvents.prisoners.PrisonerStatus;
 import mekhq.campaign.universe.Faction;
 import mekhq.campaign.universe.commandGeneration.CommandGenerationOptions;
 import mekhq.campaign.universe.commandGeneration.ratgen.SupportPersonnelCalculator.SupportDemand;
@@ -442,19 +442,6 @@ public final class SupportPersonnelGenerator {
      * @return the rolled {@link SkillLevel}
      */
     static SkillLevel rollRandomSkillLevel() {
-        SkillLevel level = switch (Compute.d6(2)) {
-            case 2 -> SkillLevel.ULTRA_GREEN;
-            case 3, 4, 5 -> SkillLevel.GREEN;
-            case 6, 7, 8, 9 -> SkillLevel.REGULAR;
-            case 10, 11 -> SkillLevel.VETERAN;
-            default -> SkillLevel.ELITE; // 12
-        };
-        if (level == SkillLevel.ELITE && Compute.d6() == 6) {
-            level = SkillLevel.HEROIC;
-            if (Compute.d6() == 6) {
-                level = SkillLevel.LEGENDARY;
-            }
-        }
-        return level;
+        return Skills.rollRandomSkillLevel();
     }
 }
