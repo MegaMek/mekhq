@@ -46,11 +46,10 @@ import mekhq.campaign.personnel.skills.Skills;
  * Shared helpers for the standardized skill-level pickers used across MekHQ dialogs (Hire Bulk Personnel, the contract
  * editor, the Bot Force customizer, and StratCon options).
  *
- * <p>Every such picker offers the full {@link SkillLevel} range from Ultra-Green through Legendary plus a "Random"
- * entry. Rather than introduce a new enum constant, {@link SkillLevel#NONE} - which is meaningless as a generation or
- * force skill and was previously filtered out of these pickers - is reused as the "Random" sentinel and rendered with a
- * localized label. A Random selection is resolved to a concrete level via {@link Skills#rollRandomSkillLevel()} at the
- * point of use, so persisted skill fields never store the sentinel.</p>
+ * entry. Rather than introduce a new enum constant, {@link SkillLevel#NONE} - which is not a meaningful generated/force
+ * skill level in most contexts and was previously filtered out of these pickers - is reused as the "Random" sentinel and
+ * rendered with a localized label. Callers can either persist the sentinel (when they need per-entity rolls) or resolve a
+ * Random selection to a concrete level via {@link Skills#rollRandomSkillLevel()} at the point of use.
  *
  * @author Illiani
  * @since 0.51.01
