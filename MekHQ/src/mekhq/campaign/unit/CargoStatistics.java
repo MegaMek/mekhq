@@ -87,10 +87,16 @@ public record CargoStatistics(Campaign campaign) {
                      .sum();
     }
 
-    // Liquid not included
+    /**
+     * Returns the total cargo capacity across every bay type that can hold general cargo, plus livestock. Liquid cargo
+     * capacity is deliberately excluded.
+     *
+     * <p>Note that {@link #getTotalCargoCapacity()} already folds in refrigerated and insulated bay capacity - the
+     * convoy calculation treats both as usable general cargo space - so they must not be added again here. Only
+     * livestock capacity is added on top; adding refrigerated and insulated would double-count them.</p>
+     */
     public double getTotalCombinedCargoCapacity() {
-        return getTotalCargoCapacity() + getTotalLivestockCargoCapacity()
-                     + getTotalInsulatedCargoCapacity() + getTotalRefrigeratedCargoCapacity();
+        return getTotalCargoCapacity() + getTotalLivestockCargoCapacity();
     }
 
     public double getCargoTonnage(boolean inTransit) {
