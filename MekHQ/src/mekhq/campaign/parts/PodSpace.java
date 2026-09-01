@@ -189,11 +189,22 @@ public class PodSpace implements IPartWork {
                 return unit.getEntity().getLocationName(location) + " is destroyed.";
             }
             if (repairInPlace) {
+                boolean hasMissingPart = false;
                 for (int id : childPartIds) {
                     final Part p = unit.getCampaign().getPlayerForce().getWarehouse().getPart(id);
-                    if (p instanceof MissingPart) {
-                        return null;
+                    if (p instanceof MissingPart missing) {
+                        hasMissingPart = true;
+                        // Only fixable if a replacement is actually in stock. This check prevents an infinite loop
+                        // in MRMS
+                        if (missing.isReplacementAvailable()) {
+                            return null;
+                        }
                     }
+                }
+                if (hasMissingPart) {
+                    return "There are no replacement parts available for " +
+                                 unit.getEntity().getLocationName(location) +
+                                 '.';
                 }
                 return unit.getEntity().getLocationName(location) + " is not missing any pod-mounted equipment.";
             } else {
