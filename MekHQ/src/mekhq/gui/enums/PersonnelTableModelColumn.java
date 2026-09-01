@@ -91,53 +91,53 @@ import org.jspecify.annotations.NonNull;
 
 public enum PersonnelTableModelColumn implements MHQTableColumn {
 
-    PERSON_GRAPHICAL("Column.PERSON.title", Comparators.STRING_COMPARATOR,
+    PERSON_GRAPHICAL("Column.PERSON.title", Comparators.NATURAL_ORDER_STRING_COMPARATOR,
           (person, campaign) -> "<html>" + person.getFullDesc(campaign) + "</html>"),
     RANK("Column.RANK.title", PersonRankSorter.INSTANCE,
           person -> person, Person::getRankName),
-    FIRST_NAME("Column.FIRST_NAME.title", Comparators.STRING_COMPARATOR,
+    FIRST_NAME("Column.FIRST_NAME.title", Comparators.NATURAL_ORDER_STRING_COMPARATOR,
           Person::getFirstName),
-    LAST_NAME("Column.LAST_NAME.title", Comparators.STRING_COMPARATOR,
+    LAST_NAME("Column.LAST_NAME.title", Comparators.NATURAL_ORDER_STRING_COMPARATOR,
           Person::getLastName),
-    PRE_NOMINAL("Column.PRE_NOMINAL.title", Comparators.STRING_COMPARATOR,
+    PRE_NOMINAL("Column.PRE_NOMINAL.title", Comparators.NATURAL_ORDER_STRING_COMPARATOR,
           Person::getPreNominal),
-    GIVEN_NAME("Column.GIVEN_NAME.title", Comparators.STRING_COMPARATOR,
+    GIVEN_NAME("Column.GIVEN_NAME.title", Comparators.NATURAL_ORDER_STRING_COMPARATOR,
           Person::getGivenName),
-    SURNAME("Column.SURNAME.title", Comparators.STRING_COMPARATOR,
+    SURNAME("Column.SURNAME.title", Comparators.NATURAL_ORDER_STRING_COMPARATOR,
           person -> StringUtility.isNullOrBlank(person.getSurname()) ? "" : person.getSurname()),
-    SURNAME_GROUPED_BY_UNIT("Column.SURNAME.title", Comparators.STRING_COMPARATOR,
+    SURNAME_GROUPED_BY_UNIT("Column.SURNAME.title", Comparators.NATURAL_ORDER_STRING_COMPARATOR,
           PersonnelTableModelColumn::getSurnameGroupedByUnit),
-    BLOODNAME("Column.BLOODNAME.title", Comparators.STRING_COMPARATOR,
+    BLOODNAME("Column.BLOODNAME.title", Comparators.NATURAL_ORDER_STRING_COMPARATOR,
           Person::getBloodname),
-    POST_NOMINAL("Column.POST_NOMINAL.title", Comparators.STRING_COMPARATOR,
+    POST_NOMINAL("Column.POST_NOMINAL.title", Comparators.NATURAL_ORDER_STRING_COMPARATOR,
           Person::getPostNominal),
-    CALLSIGN("Column.CALLSIGN.title", Comparators.STRING_COMPARATOR,
+    CALLSIGN("Column.CALLSIGN.title", Comparators.NATURAL_ORDER_STRING_COMPARATOR,
           Person::getCallsign),
     AGE("Column.AGE.title", Comparators.INT_COMPARATOR,
           (person, campaign) -> person.getAge(campaign.getLocalDate()), Object::toString),
     PERSONNEL_STATUS("Column.PERSONNEL_STATUS.title", fieldBasedSorter(PersonnelStatus::getLabel),
           Person::getStatus, PersonnelStatus::getLabel),
-    GENDER("Column.GENDER.title", Comparators.STRING_COMPARATOR,
+    GENDER("Column.GENDER.title", Comparators.NATURAL_ORDER_STRING_COMPARATOR,
           person -> GenderDescriptors.MALE_FEMALE_OTHER.getDescriptorCapitalized(person.getGender())),
     SKILL_LEVEL("Column.SKILL_LEVEL.title", Comparators.INT_COMPARATOR,
           (person, campaign) -> person.getExperienceLevel(campaign.getCampaignOptions(),
                 campaign.getPlayerForce().isClanForce(), campaign.getLocalDate(), false, true),
           level -> "<html>" + SkillType.getColoredExperienceLevelName(level) + "</html>"),
-    PERSONNEL_ROLE("Column.PERSONNEL_ROLE.title", Comparators.STRING_COMPARATOR,
+    PERSONNEL_ROLE("Column.PERSONNEL_ROLE.title", Comparators.NATURAL_ORDER_STRING_COMPARATOR,
           (person, campaign) -> person.getFormatedRoleDescriptions(campaign.getLocalDate())),
-    UNIT_ASSIGNMENT("Column.UNIT_ASSIGNMENT.title", Comparators.STRING_COMPARATOR,
+    UNIT_ASSIGNMENT("Column.UNIT_ASSIGNMENT.title", Comparators.NATURAL_ORDER_STRING_COMPARATOR,
           PersonnelTableModelColumn::getUnitAssignment),
-    UNIT_ASSIGNMENT_GRAPHICAL("Column.UNIT_ASSIGNMENT.title", Comparators.STRING_COMPARATOR,
+    UNIT_ASSIGNMENT_GRAPHICAL("Column.UNIT_ASSIGNMENT.title", Comparators.NATURAL_ORDER_STRING_COMPARATOR,
           PersonnelTableModelColumn::getUnitAssignmentGraphical),
-    TECH_UNIT_ASSIGNMENT("Column.TECH_UNIT_ASSIGNMENT.title", Comparators.STRING_COMPARATOR,
+    TECH_UNIT_ASSIGNMENT("Column.TECH_UNIT_ASSIGNMENT.title", Comparators.NATURAL_ORDER_STRING_COMPARATOR,
           PersonnelTableModelColumn::getTechUnitAssignment),
-    MARKET_UNIT_ASSIGNMENT("Column.UNIT_ASSIGNMENT.title", Comparators.STRING_COMPARATOR,
+    MARKET_UNIT_ASSIGNMENT("Column.UNIT_ASSIGNMENT.title", Comparators.NATURAL_ORDER_STRING_COMPARATOR,
           (person, campaign) -> {
               PersonnelMarket market = campaign.getPlayerForce().getHumanResources().getPersonnelMarket();
               Entity entity = (market == null) ? null : market.getAttachedEntity(person);
               return (entity == null) ? "-" : entity.getDisplayName();
           }),
-    FORCE("Column.FORCE.title", Comparators.STRING_COMPARATOR,
+    FORCE("Column.FORCE.title", Comparators.NATURAL_ORDER_STRING_COMPARATOR,
           (person, campaign) -> {
               Formation formation = campaign.getPlayerForce().getFormationFor(person);
               // Show the full TOE breadcrumb, honoring the same isUseExtendedTOEForceName toggle the
@@ -146,9 +146,9 @@ public enum PersonnelTableModelColumn implements MHQTableColumn {
                            ? "-"
                            : formation.getDisplayPath(" / ", campaign.getCampaignOptions().get(CampaignOption.USE_EXTENDED_TOE_FORCE_NAME));
           }),
-    FORCE_GRAPHICAL("Column.FORCE.title", Comparators.STRING_COMPARATOR,
+    FORCE_GRAPHICAL("Column.FORCE.title", Comparators.NATURAL_ORDER_STRING_COMPARATOR,
           PersonnelTableModelColumn::getForceTextGraphical),
-    DEPLOYED("Column.DEPLOYED.title", Comparators.STRING_COMPARATOR,
+    DEPLOYED("Column.DEPLOYED.title", Comparators.NATURAL_ORDER_STRING_COMPARATOR,
           PersonnelTableModelColumn::getDeployedScenarioName),
     MEK("Column.MEK.title", SkillPair.COMPARATOR,
           skillPairModelExtractor(SkillType.S_GUN_MEK, SkillType.S_PILOT_MEK), SkillPair::toString),
@@ -244,7 +244,7 @@ public enum PersonnelTableModelColumn implements MHQTableColumn {
           Person::getSalary, Money::toAmountAndSymbolString),
     XP("Column.XP.title", Comparators.INT_COMPARATOR,
           Person::getXP, Object::toString),
-    ORIGIN("Column.ORIGIN.title", Comparators.STRING_COMPARATOR,
+    ORIGIN("Column.ORIGIN.title", Comparators.NATURAL_ORDER_STRING_COMPARATOR,
           PersonnelTableModelColumn::getOrigin),
     RECRUITMENT_DATE("Column.RECRUITMENT_DATE.title", Comparators.DATE_COMPARATOR,
           Person::getRecruitment, date -> MekHQ.getMHQOptions().getDisplayFormattedDate(date)),
@@ -354,13 +354,13 @@ public enum PersonnelTableModelColumn implements MHQTableColumn {
               return (academy == null) ? null : EducationLevel.fromLevel(academy.getEducationLevel(person));
           },
           level -> (level == null) ? "" : level.toString()),
-    ACADEMY("Column.ACADEMY.title", Comparators.STRING_COMPARATOR,
+    ACADEMY("Column.ACADEMY.title", Comparators.NATURAL_ORDER_STRING_COMPARATOR,
           person -> {
               Academy currentAcademy = EducationController.getAcademy(person.getEduAcademySet(),
                     person.getEduAcademyNameInSet());
               return currentAcademy == null ? "" : currentAcademy.getName();
           }),
-    COURSE("Column.COURSE.title", Comparators.STRING_COMPARATOR,
+    COURSE("Column.COURSE.title", Comparators.NATURAL_ORDER_STRING_COMPARATOR,
           person -> {
               Academy currentAcademy = EducationController.getAcademy(person.getEduAcademySet(),
                     person.getEduAcademyNameInSet());
@@ -398,27 +398,28 @@ public enum PersonnelTableModelColumn implements MHQTableColumn {
           attributeExtractor(SkillAttribute.CHARISMA), Object::toString),
     EDGE("Column.EDGE.title", SkillAttributeCell.COMPARATOR,
           attributeExtractor(SkillAttribute.EDGE), Object::toString),
-    SHIP_TRANSPORT("Column.SHIP_TRANSPORT.title", Comparators.STRING_COMPARATOR,
+    SHIP_TRANSPORT("Column.SHIP_TRANSPORT.title", Comparators.NATURAL_ORDER_STRING_COMPARATOR,
           person -> {
               if (person.getUnit() == null || person.getUnit().getTransportShipAssignment() == null) {
                   return "-";
               }
               return person.getUnit().getTransportShipAssignment().getTransportShip().getName();
           }),
-    TACTICAL_TRANSPORT("Column.TACTICAL_TRANSPORT.title", Comparators.STRING_COMPARATOR,
+    TACTICAL_TRANSPORT("Column.TACTICAL_TRANSPORT.title", Comparators.NATURAL_ORDER_STRING_COMPARATOR,
           person -> {
               if (person.getUnit() == null || person.getUnit().getTacticalTransportAssignment() == null) {
                   return "-";
               }
               return person.getUnit().getTacticalTransportAssignment().getTransport().getName();
           }),
-    LOCATION_SYSTEM_AND_PLANET("Column.LOCATION_SYSTEM_AND_PLANET.title", Comparators.STRING_COMPARATOR,
+    LOCATION_SYSTEM_AND_PLANET("Column.LOCATION_SYSTEM_AND_PLANET.title", Comparators.NATURAL_ORDER_STRING_COMPARATOR,
           PersonnelTableModelColumn::getLocationSystemAndPlanet),
-    LOCATION_NAME("Column.LOCATION_NAME.title", Comparators.STRING_COMPARATOR,
+    LOCATION_NAME("Column.LOCATION_NAME.title", Comparators.NATURAL_ORDER_STRING_COMPARATOR,
           (person, campaign) -> LocationDisplay.getLocationName(person, campaign, campaign.getLocalDate())),
-    DESTINATION_SYSTEM_AND_PLANET("Column.DESTINATION_SYSTEM_AND_PLANET.title", Comparators.STRING_COMPARATOR,
+    DESTINATION_SYSTEM_AND_PLANET("Column.DESTINATION_SYSTEM_AND_PLANET.title",
+          Comparators.NATURAL_ORDER_STRING_COMPARATOR,
           PersonnelTableModelColumn::getDestinationSystemAndPlanet),
-    DESTINATION_NAME("Column.DESTINATION_NAME.title", Comparators.STRING_COMPARATOR,
+    DESTINATION_NAME("Column.DESTINATION_NAME.title", Comparators.NATURAL_ORDER_STRING_COMPARATOR,
           (person, campaign) -> LocationDisplay.getDestinationName(person, campaign, campaign.getLocalDate())),
     IS_MARRIED("Column.IS_MARRIED.title", Comparators.YES_NO_NA_COMPARATOR,
           person -> person.getGenealogy().hasSpouse(), PersonnelTableModelColumn::convertBooleanToYesNoNA),
@@ -962,7 +963,7 @@ public enum PersonnelTableModelColumn implements MHQTableColumn {
             case RANK, SKILL_LEVEL -> SwingConstants.LEFT;
             case SALARY, MAX_TECH_MINUTES -> SwingConstants.RIGHT;
             default -> {
-                if (modelComparator.equals(Comparators.STRING_COMPARATOR)) {
+                if (modelComparator.equals(Comparators.NATURAL_ORDER_STRING_COMPARATOR)) {
                     yield SwingConstants.LEFT;
                 }
                 yield SwingConstants.CENTER;
@@ -987,7 +988,8 @@ public enum PersonnelTableModelColumn implements MHQTableColumn {
     private static class Comparators {
         private static final Comparator<Integer> SKILL_COMPARATOR = Comparator.reverseOrder();
         private static final Comparator<Integer> INT_COMPARATOR = Comparator.nullsLast(Comparator.naturalOrder());
-        private static final Comparator<String> STRING_COMPARATOR = Comparator.nullsLast(Comparator.naturalOrder());
+        private static final Comparator<String> NATURAL_ORDER_STRING_COMPARATOR =
+              Comparator.nullsLast(NaturalOrderComparator.INSTANCE);
         private static final Comparator<LocalDate> DATE_COMPARATOR = Comparator.nullsLast(Comparator.naturalOrder());
         private static final Comparator<Boolean> YES_NO_NA_COMPARATOR = Comparator.nullsLast(Comparator.naturalOrder());
         private static final Comparator<Person> WANTS_CHILDREN_COMPARATOR =
