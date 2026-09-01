@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2020-2025 The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2020-2026 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -41,6 +41,7 @@ import megamek.codeUtilities.MathUtility;
 import megamek.logging.MMLogger;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.skills.Attributes;
+import mekhq.campaign.personnel.skills.SkillType;
 import mekhq.campaign.personnel.skills.enums.SkillAttribute;
 
 /**
@@ -201,6 +202,39 @@ public enum Phenotype {
      */
     public List<String> getBonusTraits() {
         return bonusTraits;
+    }
+
+    /**
+     * Retrieves the profession skills that receive the Trueborn {@code +1} "Misc bonus" for this phenotype.
+     *
+     * <p>Each Clan Trueborn is bred for a specific profession and carries a {@code +1} bonus on the skills tied to
+     * that phenotype. This is the authoritative mapping of phenotype to bonused skills; a phenotype that grants no such
+     * bonus (for example {@link #NONE} or {@link #GENERAL}) returns an empty list.</p>
+     *
+     * @return the {@link SkillType} names that receive the phenotype bonus, or an empty list if none apply.
+     *
+     * @author Illiani
+     * @since 0.51.0
+     */
+    public List<String> getBonusSkills() {
+        return switch (this) {
+            case MEKWARRIOR -> List.of(SkillType.S_GUN_MEK, SkillType.S_PILOT_MEK);
+            case ELEMENTAL -> List.of(SkillType.S_GUN_BA, SkillType.S_ANTI_MEK);
+            case AEROSPACE -> List.of(SkillType.S_GUN_AERO,
+                  SkillType.S_PILOT_AERO,
+                  SkillType.S_GUN_JET,
+                  SkillType.S_PILOT_JET);
+            case VEHICLE -> List.of(SkillType.S_GUN_VEE,
+                  SkillType.S_PILOT_GVEE,
+                  SkillType.S_PILOT_NVEE,
+                  SkillType.S_PILOT_VTOL);
+            case PROTOMEK -> List.of(SkillType.S_GUN_PROTO);
+            case NAVAL -> List.of(SkillType.S_TECH_VESSEL,
+                  SkillType.S_GUN_SPACE,
+                  SkillType.S_PILOT_SPACE,
+                  SkillType.S_NAVIGATION);
+            case NONE, GENERAL -> List.of();
+        };
     }
 
     /**
