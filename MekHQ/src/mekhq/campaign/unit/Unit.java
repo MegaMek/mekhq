@@ -3659,25 +3659,33 @@ public class Unit implements ITechnology, ILocatable {
             } else if (part instanceof MissingJumpJet) {
                 jumpJets.put(((MissingJumpJet) part).getEquipmentNum(), part);
             } else if (part instanceof BattleArmorEquipmentPart) {
-                if (!(entity instanceof BattleArmor)) {
+                int trooperIndex = ((BattleArmorEquipmentPart) part).getTrooper() - BattleArmor.LOC_TROOPER_1;
+                if (!(entity instanceof BattleArmor) || (trooperIndex < 0) ||
+                          (trooperIndex >= ((BattleArmor) entity).getSquadSize())) {
+                    // A detached BA equipment part reports a trooper of -1, which would index the squad array
+                    // out of bounds. Drop it rather than crashing the load.
                     partsToRemove.add(part);
                 } else {
                     Part[] parts = baEquipParts.get(((BattleArmorEquipmentPart) part).getEquipmentNum());
                     if (null == parts) {
                         parts = new Part[((BattleArmor) entity).getSquadSize()];
                     }
-                    parts[((BattleArmorEquipmentPart) part).getTrooper() - BattleArmor.LOC_TROOPER_1] = part;
+                    parts[trooperIndex] = part;
                     baEquipParts.put(((BattleArmorEquipmentPart) part).getEquipmentNum(), parts);
                 }
             } else if (part instanceof MissingBattleArmorEquipmentPart) {
-                if (!(entity instanceof BattleArmor)) {
+                int trooperIndex = ((MissingBattleArmorEquipmentPart) part).getTrooper() - BattleArmor.LOC_TROOPER_1;
+                if (!(entity instanceof BattleArmor) || (trooperIndex < 0) ||
+                          (trooperIndex >= ((BattleArmor) entity).getSquadSize())) {
+                    // A detached BA equipment part reports a trooper of -1, which would index the squad array
+                    // out of bounds. Drop it rather than crashing the load.
                     partsToRemove.add(part);
                 } else {
                     Part[] parts = baEquipParts.get(((MissingBattleArmorEquipmentPart) part).getEquipmentNum());
                     if (null == parts) {
                         parts = new Part[((BattleArmor) entity).getSquadSize()];
                     }
-                    parts[((MissingBattleArmorEquipmentPart) part).getTrooper() - BattleArmor.LOC_TROOPER_1] = part;
+                    parts[trooperIndex] = part;
                     baEquipParts.put(((MissingBattleArmorEquipmentPart) part).getEquipmentNum(), parts);
                 }
             } else if (part instanceof EquipmentPart) {
