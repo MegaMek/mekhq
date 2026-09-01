@@ -32,6 +32,13 @@
  */
 package mekhq.gui.commandGeneration.components;
 
+import static megamek.client.ui.WrapLayout.wordWrap;
+import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.processWrapSize;
+
+import java.util.Locale;
+
+import megamek.common.annotations.Nullable;
+
 /**
  * Shared helpers for the Command Generation dialog's styled components.
  *
@@ -49,6 +56,9 @@ public final class CommandGenerationUtilities {
      */
     private static final String RESOURCE_BUNDLE = "mekhq.resources.CommandGenerationDialog";
 
+    private static final String HTML_OPENING_TAG = "<html>";
+    private static final String HTML_CLOSING_TAG = "</html>";
+
     private CommandGenerationUtilities() {
         // utility class
     }
@@ -61,5 +71,55 @@ public final class CommandGenerationUtilities {
      */
     public static String getCommandGenerationResourceBundle() {
         return RESOURCE_BUNDLE;
+    }
+
+    /**
+     * Word-wraps a bundle tooltip for display, tolerating text that is already wrapped in
+     * {@code <html>} tags.
+     *
+     * <p>{@link megamek.client.ui.WrapLayout#wordWrap(String, int)} adds its own {@code <html>}
+     * wrapper. Handing it a tooltip that already carries one - as any tooltip using {@code <br>} or
+     * {@code <b>} must - leaves a stray {@code <html>} tag inside the document, and Swing's renderer
+     * then silently drops everything from that tag to the next line break. The visible result is a
+     * tooltip missing its opening line, or opening with a blank one. Stripping the outer tags here
+     * keeps the markup inside the tooltip working while leaving exactly one wrapper on the result.</p>
+     *
+     * @param tooltipText    the tooltip text from the bundle, with or without surrounding
+     *                       {@code <html>} tags; {@code null} is returned unchanged
+     * @param customWrapSize maximum line length, or {@code null} for the default
+     *
+     * @return the wrapped tooltip, ready for {@code setToolTipText}
+     */
+    public static @Nullable String wrapTooltip(@Nullable String tooltipText,
+          @Nullable Integer customWrapSize) {
+        if (tooltipText == null) {
+            return null;
+        }
+        return wordWrap(stripHtmlWrapper(tooltipText), processWrapSize(customWrapSize));
+    }
+
+    /**
+     * Removes the outer {@code <html>} wrapper from a tooltip, if it has one.
+     *
+     * <p>The opening tag is removed when the text starts with it, and the closing tag when the text
+     * ends with it, so a tooltip its author left unclosed is still unwrapped rather than kept with a
+     * stray opening tag. Only the outermost tags are touched: markup inside the tooltip is left
+     * alone, and text carrying no wrapper is returned unchanged.</p>
+     *
+     * @param text the text to unwrap
+     *
+     * @return the text with its outer {@code <html>} tags removed
+     */
+    private static String stripHtmlWrapper(String text) {
+        String trimmed = text.trim();
+        String lowerCase = trimmed.toLowerCase(Locale.ROOT);
+        if (!lowerCase.startsWith(HTML_OPENING_TAG)) {
+            return text;
+        }
+        trimmed = trimmed.substring(HTML_OPENING_TAG.length());
+        if (lowerCase.endsWith(HTML_CLOSING_TAG)) {
+            trimmed = trimmed.substring(0, trimmed.length() - HTML_CLOSING_TAG.length());
+        }
+        return trimmed;
     }
 }

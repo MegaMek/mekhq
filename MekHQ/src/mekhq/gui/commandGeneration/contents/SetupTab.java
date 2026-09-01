@@ -35,9 +35,8 @@ package mekhq.gui.commandGeneration.contents;
 import java.util.EnumMap;
 import java.util.EnumSet;
 import megamek.client.ui.util.UIUtil;
-import static megamek.client.ui.WrapLayout.wordWrap;
-import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.processWrapSize;
 import static mekhq.gui.commandGeneration.components.CommandGenerationUtilities.getCommandGenerationResourceBundle;
+import static mekhq.gui.commandGeneration.components.CommandGenerationUtilities.wrapTooltip;
 import static mekhq.utilities.MHQInternationalization.getTextAt;
 
 import java.awt.Component;
@@ -471,7 +470,7 @@ public class SetupTab {
         button.setName("rdo" + name);
         String tooltip = getTextAt(getCommandGenerationResourceBundle(), "lbl" + name + ".tooltip");
         if (tooltip != null && !tooltip.isEmpty()) {
-            button.setToolTipText(wordWrap(tooltip, processWrapSize(null)));
+            button.setToolTipText(wrapTooltip(tooltip, null));
         }
         return button;
     }
@@ -534,8 +533,8 @@ public class SetupTab {
           MMComboBox<SortDirection> directionCombo) {
         CommandGenerationLabel label = new CommandGenerationLabel(labelName);
         factorCombo.setToolTipText(label.getToolTipText());
-        directionCombo.setToolTipText(wordWrap(getTextAt(getCommandGenerationResourceBundle(),
-              "cmbTechAssignmentDirection.tooltip"), processWrapSize(null)));
+        directionCombo.setToolTipText(wrapTooltip(getTextAt(getCommandGenerationResourceBundle(),
+              "cmbTechAssignmentDirection.tooltip"), null));
         indentAsSubOption(label);
         constraints.gridy = row;
         constraints.gridx = 0;

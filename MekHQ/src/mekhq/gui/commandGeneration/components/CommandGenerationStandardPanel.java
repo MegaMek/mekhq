@@ -32,9 +32,8 @@
  */
 package mekhq.gui.commandGeneration.components;
 
-import static megamek.client.ui.WrapLayout.wordWrap;
-import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.processWrapSize;
 import static mekhq.gui.commandGeneration.components.CommandGenerationUtilities.getCommandGenerationResourceBundle;
+import static mekhq.gui.commandGeneration.components.CommandGenerationUtilities.wrapTooltip;
 import static mekhq.utilities.MHQInternationalization.getTextAt;
 
 import javax.swing.JPanel;
@@ -90,7 +89,7 @@ public class CommandGenerationStandardPanel extends JPanel {
                 // controls inside keep their own tooltips.
                 String titleTooltip = getTextAt(getCommandGenerationResourceBundle(), "lbl" + borderTitle + ".tooltip");
                 if (!titleTooltip.isBlank()) {
-                    setToolTipText(wordWrap(titleTooltip, processWrapSize(null)));
+                    setToolTipText(wrapTooltip(titleTooltip, null));
                 }
             }
         }
