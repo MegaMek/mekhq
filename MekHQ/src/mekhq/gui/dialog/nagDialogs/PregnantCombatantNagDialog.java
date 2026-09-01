@@ -34,7 +34,9 @@ package mekhq.gui.dialog.nagDialogs;
 
 import static mekhq.MHQConstants.NAG_PREGNANT_COMBATANT;
 
+import static mekhq.gui.dialog.nagDialogs.nagLogic.PregnantCombatantNagLogic.getPregnantCombatants;
 import static mekhq.gui.dialog.nagDialogs.nagLogic.PregnantCombatantNagLogic.hasActivePregnantCombatant;
+import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
 
 import java.util.List;
 
@@ -65,6 +67,21 @@ public class PregnantCombatantNagDialog extends ImmersiveDialogNag {
      */
     public PregnantCombatantNagDialog(final Campaign campaign) {
         super(campaign, NAG_PREGNANT_COMBATANT, "PregnantCombatantNagDialog");
+    }
+
+    @Override
+    protected String getInCharacterMessage(Campaign campaign, String key, String commanderAddress) {
+        final String RESOURCE_BUNDLE = "mekhq.resources.NagDialogs";
+
+        List<Person> pregnantCombatants = getPregnantCombatants(campaign.hasActiveContract(),
+              campaign.getPlayerForce().getHumanResources().getActivePersonnel(false, false));
+
+        StringBuilder pregnantCombatantNames = new StringBuilder();
+        for (Person person : pregnantCombatants) {
+            pregnantCombatantNames.append("<p>- ").append(person.getHyperlinkedFullTitle()).append("</p>");
+        }
+
+        return getFormattedTextAt(RESOURCE_BUNDLE, key + ".ic", commanderAddress, pregnantCombatantNames.toString());
     }
 
     /**
