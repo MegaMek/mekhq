@@ -102,6 +102,7 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTable;
 import javax.swing.JTextPane;
+import javax.swing.SwingConstants;
 import javax.swing.table.TableColumn;
 
 import megamek.client.ui.util.UIUtil;
@@ -109,6 +110,11 @@ import megamek.common.annotations.Nullable;
 import megamek.common.options.IOption;
 import megamek.common.rolls.TargetRoll;
 import megamek.common.ui.EnhancedTabbedPane;
+import megamek.common.universe.BloodnameHolder;
+import megamek.common.universe.BloodnameHouse;
+import megamek.common.universe.BloodnameNote;
+import megamek.common.universe.BloodnameTransfer;
+import megamek.common.universe.Bloodnames2;
 import megamek.logging.MMLogger;
 import megamek.utilities.ImageUtilities;
 import mekhq.MHQStaticDirectoryManager;
@@ -120,18 +126,9 @@ import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.finances.Money;
 import mekhq.campaign.log.LogEntry;
 import mekhq.campaign.personnel.Award;
-import mekhq.campaign.personnel.Injury;
-import megamek.utilities.ImageUtilities;
-import mekhq.campaign.universe.Factions;
-import javax.swing.SwingConstants;
-import mekhq.campaign.universe.Faction;
-import megamek.common.universe.BloodnameHolder;
-import megamek.common.universe.BloodnameHouse;
-import megamek.common.universe.BloodnameNote;
-import megamek.common.universe.BloodnameTransfer;
-import megamek.common.universe.Bloodnames2;
 import mekhq.campaign.personnel.Bloodname;
 import mekhq.campaign.personnel.Clan;
+import mekhq.campaign.personnel.Injury;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.PersonAwardController;
 import mekhq.campaign.personnel.PersonnelOptions;
@@ -155,6 +152,8 @@ import mekhq.campaign.personnel.skills.Skill;
 import mekhq.campaign.personnel.skills.SkillModifierData;
 import mekhq.campaign.personnel.skills.enums.SkillAttribute;
 import mekhq.campaign.randomEvents.personalities.PersonalityController;
+import mekhq.campaign.universe.Faction;
+import mekhq.campaign.universe.Factions;
 import mekhq.campaign.universe.PlanetarySystem;
 import mekhq.gui.CampaignGUI;
 import mekhq.gui.baseComponents.JScrollablePanel;
@@ -2649,8 +2648,8 @@ public class PersonViewPanel extends JScrollablePanel {
             gridBagConstraints.weightx = 1.0;
             gridBagConstraints.insets = new Insets(0, 10, 0, 0);
 
-            List<FormerSpouse> formerSpouses = person.getGenealogy().getFormerSpouses();
-            Collections.reverse(person.getGenealogy().getFormerSpouses());
+            List<FormerSpouse> formerSpouses = new ArrayList<>(person.getGenealogy().getFormerSpouses());
+            Collections.reverse(formerSpouses);
 
             for (FormerSpouse formerSpouse : formerSpouses) {
                 Person ex = formerSpouse.getFormerSpouse();
@@ -3698,14 +3697,14 @@ public class PersonViewPanel extends JScrollablePanel {
     }
 
     private JPanel fillPersonalLog() {
-        List<LogEntry> logs = person.getPersonalLog();
+        List<LogEntry> logs = new ArrayList<>(person.getPersonalLog());
         Collections.reverse(logs);
 
         return getLogPanel(logs, "Event log for ", person.getFullName());
     }
 
     private JPanel fillPerformanceLog() {
-        List<LogEntry> logs = person.getPerformanceLog();
+        List<LogEntry> logs = new ArrayList<>(person.getPerformanceLog());
         Collections.reverse(logs);
 
         return getLogPanel(logs, "Performance report for ", person.getFullName());
@@ -3748,28 +3747,28 @@ public class PersonViewPanel extends JScrollablePanel {
     }
 
     private JPanel fillMedicalLog() {
-        List<LogEntry> logs = person.getMedicalLog();
+        List<LogEntry> logs = new ArrayList<>(person.getMedicalLog());
         Collections.reverse(logs);
 
         return getLogPanel(logs, "Medical log for ", person.getFullName());
     }
 
     private JPanel fillPatientLog() {
-        List<LogEntry> logs = person.getPatientLog();
+        List<LogEntry> logs = new ArrayList<>(person.getPatientLog());
         Collections.reverse(logs);
 
         return getLogPanel(logs, "Patient log for ", person.getFullName());
     }
 
     private JPanel fillAssignmentLog() {
-        List<LogEntry> logs = person.getAssignmentLog();
+        List<LogEntry> logs = new ArrayList<>(person.getAssignmentLog());
         Collections.reverse(logs);
 
         return getLogPanel(logs, "Assignment log for ", person.getFullTitle());
     }
 
     private JPanel fillScenarioLog() {
-        List<LogEntry> scenarioLog = person.getScenarioLog();
+        List<LogEntry> scenarioLog = new ArrayList<>(person.getScenarioLog());
         Collections.reverse(scenarioLog);
 
         JPanel pnlScenariosLog = new JPanel(new GridBagLayout());
@@ -4022,7 +4021,7 @@ public class PersonViewPanel extends JScrollablePanel {
     }
 
     private JPanel fillKillRecord() {
-        List<Kill> kills = campaign.getKillsFor(person.getId());
+        List<Kill> kills = new ArrayList<>(campaign.getKillsFor(person.getId()));
         Collections.reverse(kills);
 
         JPanel pnlKills = new JPanel(new GridBagLayout());
