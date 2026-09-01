@@ -6341,6 +6341,14 @@ public class Person implements ILocatable {
     }
     // endregion Awards
 
+    /**
+     * Retrieves the current number of Core-scale 'hits'.
+     *
+     * <p><b>Note:</b> Generally you want to use {@link #getTotalInjurySeverity()} as that will correctly factor in
+     * Hits from Advanced Medical injuries.</p>
+     *
+     * @return the total number of hits as an integer
+     */
     public int getHits() {
         return hits;
     }
@@ -8276,6 +8284,14 @@ public class Person implements ILocatable {
         return AdvancedMedicalAlternate.getAllActiveInjuryEffects(isAmbidextrous, injuries);
     }
 
+    /**
+     * Calculates the total injury severity based on the hits and the severity of individual injuries.
+     *
+     * <p>The method combines the base hit count with the cumulative severity of all injuries by iterating through
+     * the list of injuries and adding their respective hit values.</p>
+     *
+     * @return the total injury severity as an integer
+     */
     public int getTotalInjurySeverity() {
         int totalSeverity = hits; // Normal hits should be included here
         for (Injury injury : injuries) {

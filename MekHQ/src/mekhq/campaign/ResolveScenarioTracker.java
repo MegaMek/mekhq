@@ -881,7 +881,9 @@ public class ResolveScenarioTracker {
                                 int range = 6 - hits;
                                 hits = hits + Compute.randomInt(range);
                             }
-                            status.setHits(hits);
+                            // Store cumulative hits (this scenario's wound on top of any pre-existing injury
+                            // severity) so resolveScenario correctly derives the new hits taken.
+                            status.setHits(hits + p.getTotalInjurySeverity());
                         }
                     }
                     status.setXP(campaign.getCampaignOptions().get(CampaignOption.SCENARIO_XP));
@@ -1061,7 +1063,9 @@ public class ResolveScenarioTracker {
                     int range = 6 - hits;
                     hits = hits + Compute.randomInt(range);
                 }
-                status.setHits(hits);
+                // Store cumulative hits (this scenario's wound on top of any pre-existing injury severity)
+                // so resolveScenario correctly derives the new hits taken.
+                status.setHits(hits + p.getTotalInjurySeverity());
             }
             status.setXP(campaign.getCampaignOptions().get(CampaignOption.SCENARIO_XP));
             status.setDeployed(!en.wasNeverDeployed());
@@ -1108,7 +1112,9 @@ public class ResolveScenarioTracker {
                                     int range = 6 - hits;
                                     hits = hits + Compute.randomInt(range);
                                 }
-                                status.setHits(hits);
+                                // Store cumulative hits (this scenario's wound on top of any pre-existing
+                                // injury severity) so resolveScenario correctly derives the new hits taken.
+                                status.setHits(hits + p.getTotalInjurySeverity());
                             }
                         }
                         // Go ahead and add everyone to this master list, even if they're killed/wounded
@@ -1797,16 +1803,20 @@ public class ResolveScenarioTracker {
             }
 
             MekHQ.triggerEvent(new PersonBattleFinishedEvent(person, status));
-            if (status.getHits() > person.getHits()) {
-                int statusHits = status.getHits();
-                int priorHits = person.getHits();
-                int newHits = statusHits - priorHits;
-                // Note: adjustedHits modifies the newHits. It can increase or decrease the value.
-                int adjustedHits = InjurySPAUtility.adjustInjuriesAndFatigueForSPAs(person, isUseInjuryFatigue,
+            // status.getHits() reports the deployed crew's cumulative hits. Because injured crews now deploy with
+            // their existing injuries applied (see Unit#resetPilotAndEntity), that cumulative value already includes
+            // any pre-existing injury severity. Use the total injury severity - not just the base hit count, which is
+            // 0 under Advanced Medical - as the baseline so we only apply the hits actually suffered this scenario.
+            int priorSeverity = person.getTotalInjurySeverity();
+            int newInjuryHits = 0;
+            if (status.getHits() > priorSeverity) {
+                int newHits = status.getHits() - priorSeverity;
+                // Note: newInjuryHits modifies the newHits. It can increase or decrease the value.
+                newInjuryHits = InjurySPAUtility.adjustInjuriesAndFatigueForSPAs(person, isUseInjuryFatigue,
                       fatigueRate, newHits);
 
-                person.setHitsPrior(priorHits);
-                person.setHits(priorHits + adjustedHits);
+                person.setHitsPrior(priorSeverity);
+                person.setHits(priorSeverity + newInjuryHits);
             }
 
             if (status.wasDeployed()) {
@@ -1843,7 +1853,9 @@ public class ResolveScenarioTracker {
             }
 
             if (campaignOptions.isUseAdvancedMedical()) {
-                person.diagnose(getCampaign(), status.getHits());
+                // Pass only the hits suffered this scenario. status.getHits() is cumulative and would regenerate
+                // injuries for the pre-existing severity the person already carries, doubling their injuries.
+                person.diagnose(getCampaign(), newInjuryHits);
             }
 
             if (status.toRemove()) {
