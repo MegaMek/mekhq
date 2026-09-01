@@ -32,10 +32,9 @@
  */
 package mekhq.gui.commandGeneration.components;
 
-import static megamek.client.ui.WrapLayout.wordWrap;
 import static megamek.client.ui.util.FlatLafStyleBuilder.setFontScaling;
-import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.processWrapSize;
 import static mekhq.gui.commandGeneration.components.CommandGenerationUtilities.getCommandGenerationResourceBundle;
+import static mekhq.gui.commandGeneration.components.CommandGenerationUtilities.wrapTooltip;
 import static mekhq.utilities.MHQInternationalization.getTextAt;
 
 import javax.swing.JCheckBox;
@@ -75,7 +74,7 @@ public class CommandGenerationCheckBox extends JCheckBox {
 
         String tooltipText = getTextAt(getCommandGenerationResourceBundle(), "lbl" + name + ".tooltip");
         if (!tooltipText.isEmpty()) {
-            setToolTipText(wordWrap(tooltipText, processWrapSize(customWrapSize)));
+            setToolTipText(wrapTooltip(tooltipText, customWrapSize));
         }
 
         setFontScaling(this, false, 1);
