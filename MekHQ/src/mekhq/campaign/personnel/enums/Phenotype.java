@@ -208,10 +208,10 @@ public enum Phenotype {
      * Retrieves the profession skills that receive the Trueborn {@code +1} "Misc bonus" for this phenotype.
      *
      * <p>Each Clan Trueborn is bred for a specific profession and carries a {@code +1} bonus on the skills tied to
-     * that phenotype. This is the authoritative mapping of phenotype to bonused skills; a phenotype that grants no such
-     * bonus (for example {@link #NONE} or {@link #GENERAL}) returns an empty list.</p>
+     * that phenotype. This method centralizes the phenotype-to-skill mapping; phenotypes that grant no such bonus
+     * (for example {@link #NONE} or {@link #GENERAL}) return an empty list.</p>
      *
-     * @return the {@link SkillType} names that receive the phenotype bonus, or an empty list if none apply.
+     * @return the {@link SkillType} name strings that receive the phenotype bonus, or an empty list if none apply.
      *
      * @author Illiani
      * @since 0.51.0
