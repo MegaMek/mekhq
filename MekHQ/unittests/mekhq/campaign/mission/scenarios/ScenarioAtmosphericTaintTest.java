@@ -104,6 +104,19 @@ class ScenarioAtmosphericTaintTest {
     }
 
     @Test
+    @DisplayName("Clearing the air falls back to breathable rather than storing nothing")
+    void aNullTaintFallsBackToBreathable() {
+        // The getter promises non-null and writeToXML asks it for a name to save, so a null here would take the
+        // save down rather than the scenario simply having clean air.
+        Scenario scenario = new Scenario();
+        scenario.setAtmosphericTaint(AtmosphericTaint.TOXIC_POISON);
+
+        scenario.setAtmosphericTaint(null);
+
+        assertEquals(AtmosphericTaint.BREATHABLE, scenario.getAtmosphericTaint());
+    }
+
+    @Test
     @DisplayName("A scenario saved before tainted air existed loads as breathable rather than failing")
     void anAbsentSavedTaintReadsAsBreathable() {
         // Older saves carry no atmosphericTaint tag at all, so the field keeps the value the constructor gave it.

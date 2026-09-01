@@ -673,8 +673,9 @@ public class Planet {
      *       be breathed at all, and this method only what is wrong with the air where there is some.
      */
     public @Nonnull AtmosphericTaint getAtmosphere(LocalDate when) {
-        return (null == getSourcedAtmosphere(when)) ? AtmosphericTaint.BREATHABLE :
-                     getSourcedAtmosphere(when).getValue();
+        SourceableValue<AtmosphericTaint> sourced = getSourcedAtmosphere(when);
+        return ((sourced == null) || (sourced.getValue() == null)) ? AtmosphericTaint.BREATHABLE :
+                     sourced.getValue();
     }
 
     public @Nullable SourceableValue<AtmosphericTaint> getSourcedAtmosphere(LocalDate when) {

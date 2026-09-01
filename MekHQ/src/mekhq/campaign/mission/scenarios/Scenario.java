@@ -42,6 +42,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.UUID;
 import java.util.Vector;
 
@@ -515,8 +516,13 @@ public class Scenario implements IPlayerSettings {
         return atmosphericTaint;
     }
 
-    public void setAtmosphericTaint(AtmosphericTaint atmosphericTaint) {
-        this.atmosphericTaint = atmosphericTaint;
+    /**
+     * @param atmosphericTaint the air to fight this scenario in, or {@code null} for breathable air. A scenario
+     *       always has some air recorded, because {@link #writeToXML(java.io.PrintWriter, int)} asks it for the name
+     *       to save.
+     */
+    public void setAtmosphericTaint(@Nullable AtmosphericTaint atmosphericTaint) {
+        this.atmosphericTaint = Objects.requireNonNullElse(atmosphericTaint, AtmosphericTaint.BREATHABLE);
     }
 
     public int getTemperature() {
