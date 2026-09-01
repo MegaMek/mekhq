@@ -97,7 +97,7 @@ public class AltAdvancedMedicalCampaignOptionsChangedConfirmationDialog extends 
     private ImageIcon campaignIcon;
     private final Campaign campaign;
 
-    private JCheckBox chkInjuryTransferral;
+    private JCheckBox chkInjuryTransferal;
     private JCheckBox chkProtoMekPilots;
 
     public AltAdvancedMedicalCampaignOptionsChangedConfirmationDialog(Campaign campaign) {
@@ -188,17 +188,17 @@ public class AltAdvancedMedicalCampaignOptionsChangedConfirmationDialog extends 
 
         pnlCenter.add(Box.createVerticalStrut(PADDING));
 
-        chkInjuryTransferral = new JCheckBox(getTextAt(RESOURCE_BUNDLE,
+        chkInjuryTransferal = new JCheckBox(getTextAt(RESOURCE_BUNDLE,
               "AltAdvancedMedicalCampaignOptionsChangedConfirmationDialog.checkbox.injuries"));
-        chkInjuryTransferral.setAlignmentX(Component.LEFT_ALIGNMENT);
-        chkInjuryTransferral.setSelected(true);
+        chkInjuryTransferal.setAlignmentX(Component.LEFT_ALIGNMENT);
+        chkInjuryTransferal.setSelected(true);
 
         chkProtoMekPilots = new JCheckBox(getTextAt(RESOURCE_BUNDLE,
               "AltAdvancedMedicalCampaignOptionsChangedConfirmationDialog.checkbox.enhancedImaging"));
         chkProtoMekPilots.setAlignmentX(Component.LEFT_ALIGNMENT);
         chkProtoMekPilots.setSelected(true);
 
-        pnlCenter.add(chkInjuryTransferral);
+        pnlCenter.add(chkInjuryTransferal);
         pnlCenter.add(chkProtoMekPilots);
 
         pnlCenter.add(Box.createVerticalStrut(PADDING));
@@ -215,7 +215,7 @@ public class AltAdvancedMedicalCampaignOptionsChangedConfirmationDialog extends 
         RoundedJButton btnConfirm = new RoundedJButton(getTextAt(RESOURCE_BUNDLE,
               "AltAdvancedMedicalCampaignOptionsChangedConfirmationDialog.confirm"));
         btnConfirm.addActionListener(evt -> {
-            if (chkInjuryTransferral.isSelected()) {
+            if (chkInjuryTransferal.isSelected()) {
                 processInjuryTransferal(campaign);
             }
             if (chkProtoMekPilots.isSelected()) {

@@ -229,7 +229,7 @@ public class Fatigue {
         boolean isCampFollower = person.getStatus().isCampFollower();
         boolean isFree = !person.isBusy();
 
-        int hits = person.getTotalInjurySeverity();
+        int hits = person.getNonPermanentInjurySeverity();
         boolean isInjured = hits > 0;
 
         if (hasThreshold &&

@@ -1808,6 +1808,10 @@ public class ResolveScenarioTracker {
             // any pre-existing injury severity. Use the total injury severity - not just the base hit count, which is
             // 0 under Advanced Medical - as the baseline so we only apply the hits actually suffered this scenario.
             int priorSeverity = person.getTotalInjurySeverity();
+            // hitsPrior records the pre-scenario value of the `hits` field only, so that an aborted auto-resolve can
+            // restore it (see MekHQ#resetPersonsHits). It must not hold total injury severity: `hits` and Advanced
+            // Medical injuries are stored separately, so writing severity back into `hits` would double-count.
+            int priorHits = person.getHits();
             int newInjuryHits = 0;
             if (status.getHits() > priorSeverity) {
                 int newHits = status.getHits() - priorSeverity;
@@ -1815,9 +1819,14 @@ public class ResolveScenarioTracker {
                 newInjuryHits = InjurySPAUtility.adjustInjuriesAndFatigueForSPAs(person, isUseInjuryFatigue,
                       fatigueRate, newHits);
 
-                person.setHitsPrior(priorSeverity);
                 person.setHits(priorSeverity + newInjuryHits);
             }
+            // Always update, even when no new hits were suffered, so a stale value from an earlier scenario cannot
+            // leak into the abort restore.
+            person.setHitsPrior(priorHits);
+            // Publish the hits actually suffered this scenario. status.getHits() is cumulative, so downstream
+            // consumers (such as auto awards) cannot derive this themselves once the person's injuries are updated.
+            status.setNewHits(newInjuryHits);
 
             if (status.wasDeployed()) {
                 person.awardXP(campaign, status.getXP());
@@ -2205,6 +2214,7 @@ public class ResolveScenarioTracker {
         private final String name;
         private final String unitName;
         private int hits;
+        private int newHits;
         private boolean missing;
         private int xp;
         private final ArrayList<Kill> kills;
@@ -2259,6 +2269,29 @@ public class ResolveScenarioTracker {
         public void setHits(int h) {
             hits = h;
             setDead(hits >= 6);
+        }
+
+        /**
+         * Retrieves the hits suffered during this scenario alone, after any SPA adjustments.
+         *
+         * <p>Unlike {@link #getHits()}, which is cumulative and includes any injury severity the person was
+         * already carrying when they deployed, this value covers only the new wound. It is populated by
+         * {@link ResolveScenarioTracker#resolveScenario(ScenarioStatus, String)} and is therefore {@code 0} until the
+         * scenario has been resolved.</p>
+         *
+         * @return the number of hits suffered during this scenario
+         */
+        public int getNewHits() {
+            return newHits;
+        }
+
+        /**
+         * Sets the hits suffered during this scenario alone.
+         *
+         * @param newHits the number of hits suffered during this scenario
+         */
+        public void setNewHits(int newHits) {
+            this.newHits = newHits;
         }
 
         public boolean isDead() {

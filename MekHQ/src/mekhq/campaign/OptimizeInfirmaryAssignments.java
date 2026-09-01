@@ -210,7 +210,7 @@ public class OptimizeInfirmaryAssignments {
      * @return the severity score of the patient’s medical condition
      */
     private int getSeverity(Person patient) {
-        int severity = patient.getTotalInjurySeverity();
+        int severity = patient.getNonPermanentInjurySeverity();
 
         if (patient.getPrisonerStatus().isFreeOrBondsman()) {
             severity *= 10; // Prioritize Non-Prisoners
