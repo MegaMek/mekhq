@@ -110,11 +110,6 @@ public class SetupTab {
     private static final int COVERAGE_SPINNER_DEFAULT = 100;
 
     /**
-     * Skill-level options offered for support personnel. Five tiers — Ultra-Green through Elite.
-     * Heroic / Legendary are deliberately excluded since they're reserved for one-off Person
-     * customizations, not bulk generation.
-     */
-    /**
      * Direction toggle for one slot of the Tech Assignment sort grid. Localized via the
      * {@code lblTechAssignmentDirection.*} bundle keys; the assigner reads
      * {@link #isDescending()} when building its comparator chain.
