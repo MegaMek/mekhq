@@ -1050,7 +1050,7 @@ public class Utilities {
      * @param person    the person whose skills should receive the bonus
      * @param phenotype the phenotype determining which skills are bonused
      */
-    private static void applyPhenotypeSkillBonus(Person person, Phenotype phenotype) {
+    static void applyPhenotypeSkillBonus(Person person, Phenotype phenotype) {
         for (String skillName : phenotype.getBonusSkills()) {
             Skill skill = person.getSkill(skillName);
             if (skill != null) {
