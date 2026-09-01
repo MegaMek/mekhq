@@ -1079,7 +1079,7 @@ public class StratConRulesManager {
         // but they can operate on airless worlds (vacuum)
         if (isAtmospheric && entity.hasQuirk(OptionsConstants.QUIRK_NEG_UNSTREAMLINED)) {
             Planet planet = campaign.getPlayerForce().getForceDetachment().getCurrentLocation().getPlanet();
-            if (planet == null || !planet.getAtmosphere(campaign.getLocalDate()).isNone()) {
+            if (planet == null || !planet.getPressure(campaign.getLocalDate()).isVacuum()) {
                 return false;
             }
         }

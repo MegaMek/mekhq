@@ -55,6 +55,8 @@ import java.util.ResourceBundle;
 import java.util.stream.Collectors;
 
 import megamek.common.options.OptionsConstants;
+import megamek.common.planetaryConditions.Atmosphere;
+import megamek.common.planetaryConditions.AtmosphericTaint;
 import megamek.common.rolls.TargetRoll;
 import megamek.common.units.Entity;
 import megamek.logging.MMLogger;
@@ -70,7 +72,6 @@ import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.familiarity.Familiarity;
 import mekhq.campaign.personnel.skills.Skill;
 import mekhq.campaign.personnel.skills.SkillModifierData;
-import mekhq.campaign.universe.Atmosphere;
 import mekhq.campaign.universe.Planet;
 import mekhq.campaign.work.IPartWork;
 import mekhq.utilities.ReportingUtilities;
@@ -455,8 +456,8 @@ public class Maintenance {
             if (campaign.getPlayerForce().getForceDetachment().getCurrentLocation().isOnPlanet() &&
                       campaignOptions.get(CampaignOption.USE_PLANETARY_MODIFIERS)) {
                 Planet planet = campaign.getPlayerForce().getForceDetachment().getCurrentLocation().getPlanet();
-                Atmosphere atmosphere = planet.getAtmosphere(campaign.getLocalDate());
-                megamek.common.planetaryConditions.Atmosphere planetaryConditions = planet.getPressure(campaign.getLocalDate());
+                AtmosphericTaint atmosphere = planet.getAtmosphere(campaign.getLocalDate());
+                Atmosphere planetaryConditions = planet.getPressure(campaign.getLocalDate());
                 int temperature = planet.getTemperature(campaign.getLocalDate());
 
                 Skill zeroGSkill = tech == null ? null : tech.getSkill(S_ZERO_G_OPERATIONS);
