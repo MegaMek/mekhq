@@ -443,6 +443,10 @@ public class StaticChecks {
         return true;
     }
 
+    public static boolean areAllFreeOrBondsman(Person... people) {
+        return Stream.of(people).allMatch(p -> p.getPrisonerStatus().isFreeOrBondsman());
+    }
+
     public static boolean areAllStudents(Person... people) {
         return Arrays.stream(people).allMatch(p -> p.getStatus().isStudent());
     }
