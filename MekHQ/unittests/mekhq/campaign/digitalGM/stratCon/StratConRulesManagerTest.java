@@ -52,6 +52,7 @@ import java.util.*;
 
 import megamek.common.TargetRollModifier;
 import megamek.common.options.OptionsConstants;
+import megamek.common.planetaryConditions.Atmosphere;
 import megamek.common.units.Entity;
 import megamek.common.units.UnitType;
 import mekhq.campaign.Campaign;
@@ -82,7 +83,6 @@ import mekhq.campaign.personnel.skills.SkillCheck;
 import mekhq.campaign.personnel.skills.SkillModifierData;
 import mekhq.campaign.personnel.skills.SkillType;
 import mekhq.campaign.unit.Unit;
-import mekhq.campaign.universe.Atmosphere;
 import mekhq.campaign.universe.Planet;
 import mekhq.gui.dialog.StratConAmbushedDialog;
 import mekhq.utilities.EntityUtilities;
@@ -977,7 +977,7 @@ class StratConRulesManagerTest {
      * @return an Object array: [Unit, ScenarioForceTemplate, Campaign]
      */
     private Object[] setupIsValidUnitMocks(int unitType, boolean hasUnstreamlinedQuirk,
-          Atmosphere atmosphere, boolean isUseDropShips, int allowedUnitType) {
+          Atmosphere pressure, boolean isUseDropShips, int allowedUnitType) {
         Entity entity = mock(Entity.class);
         when(entity.getUnitType()).thenReturn(unitType);
         when(entity.hasQuirk(OptionsConstants.QUIRK_NEG_UNSTREAMLINED)).thenReturn(hasUnstreamlinedQuirk);
@@ -1004,9 +1004,9 @@ class StratConRulesManagerTest {
         CurrentLocation location = mock(CurrentLocation.class);
         when(campaign.getPlayerForce().getForceDetachment().getCurrentLocation()).thenReturn(location);
 
-        if (atmosphere != null) {
+        if (pressure != null) {
             Planet planet = mock(Planet.class);
-            when(planet.getAtmosphere(any())).thenReturn(atmosphere);
+            when(planet.getPressure(any())).thenReturn(pressure);
             when(location.getPlanet()).thenReturn(planet);
         } else {
             when(location.getPlanet()).thenReturn(null);
@@ -1018,7 +1018,7 @@ class StratConRulesManagerTest {
     @Test
     void isValidUnitForScenario_normalDropshipOnGround_allowed() {
         Object[] mocks = setupIsValidUnitMocks(UnitType.DROPSHIP, false,
-              Atmosphere.BREATHABLE, true, ScenarioForceTemplate.SPECIAL_UNIT_TYPE_ATB_MIX);
+              Atmosphere.STANDARD, true, ScenarioForceTemplate.SPECIAL_UNIT_TYPE_ATB_MIX);
 
         boolean result = StratConRulesManager.isValidUnitForScenario(
               (Unit) mocks[0], (ScenarioForceTemplate) mocks[1],
@@ -1030,7 +1030,7 @@ class StratConRulesManagerTest {
     @Test
     void isValidUnitForScenario_unstreamlinedDropshipOnGroundWithAtmosphere_rejected() {
         Object[] mocks = setupIsValidUnitMocks(UnitType.DROPSHIP, true,
-              Atmosphere.BREATHABLE, true, ScenarioForceTemplate.SPECIAL_UNIT_TYPE_ATB_MIX);
+              Atmosphere.STANDARD, true, ScenarioForceTemplate.SPECIAL_UNIT_TYPE_ATB_MIX);
 
         boolean result = StratConRulesManager.isValidUnitForScenario(
               (Unit) mocks[0], (ScenarioForceTemplate) mocks[1],
@@ -1042,7 +1042,7 @@ class StratConRulesManagerTest {
     @Test
     void isValidUnitForScenario_unstreamlinedDropshipOnGroundWithVacuum_allowed() {
         Object[] mocks = setupIsValidUnitMocks(UnitType.DROPSHIP, true,
-              Atmosphere.NONE, true, ScenarioForceTemplate.SPECIAL_UNIT_TYPE_ATB_MIX);
+              Atmosphere.VACUUM, true, ScenarioForceTemplate.SPECIAL_UNIT_TYPE_ATB_MIX);
 
         boolean result = StratConRulesManager.isValidUnitForScenario(
               (Unit) mocks[0], (ScenarioForceTemplate) mocks[1],
@@ -1054,7 +1054,7 @@ class StratConRulesManagerTest {
     @Test
     void isValidUnitForScenario_unstreamlinedDropshipInSpace_allowed() {
         Object[] mocks = setupIsValidUnitMocks(UnitType.DROPSHIP, true,
-              Atmosphere.BREATHABLE, true, ScenarioForceTemplate.SPECIAL_UNIT_TYPE_ATB_MIX);
+              Atmosphere.STANDARD, true, ScenarioForceTemplate.SPECIAL_UNIT_TYPE_ATB_MIX);
 
         boolean result = StratConRulesManager.isValidUnitForScenario(
               (Unit) mocks[0], (ScenarioForceTemplate) mocks[1],
@@ -1066,7 +1066,7 @@ class StratConRulesManagerTest {
     @Test
     void isValidUnitForScenario_unstreamlinedDropshipOnLowAtmosphereWithAtmosphere_rejected() {
         Object[] mocks = setupIsValidUnitMocks(UnitType.DROPSHIP, true,
-              Atmosphere.BREATHABLE, true, ScenarioForceTemplate.SPECIAL_UNIT_TYPE_ATB_MIX);
+              Atmosphere.STANDARD, true, ScenarioForceTemplate.SPECIAL_UNIT_TYPE_ATB_MIX);
 
         boolean result = StratConRulesManager.isValidUnitForScenario(
               (Unit) mocks[0], (ScenarioForceTemplate) mocks[1],
@@ -1090,7 +1090,7 @@ class StratConRulesManagerTest {
     @Test
     void isValidUnitForScenario_dropshipWhenDropShipsDisabled_rejected() {
         Object[] mocks = setupIsValidUnitMocks(UnitType.DROPSHIP, false,
-              Atmosphere.BREATHABLE, false, UnitType.DROPSHIP);
+              Atmosphere.STANDARD, false, UnitType.DROPSHIP);
 
         boolean result = StratConRulesManager.isValidUnitForScenario(
               (Unit) mocks[0], (ScenarioForceTemplate) mocks[1],
@@ -1102,7 +1102,7 @@ class StratConRulesManagerTest {
     @Test
     void isValidUnitForScenario_doomedOnGround_rejected() {
         Object[] mocks = setupIsValidUnitMocks(UnitType.JUMPSHIP, false,
-              Atmosphere.BREATHABLE, true, ScenarioForceTemplate.SPECIAL_UNIT_TYPE_ATB_MIX);
+              Atmosphere.STANDARD, true, ScenarioForceTemplate.SPECIAL_UNIT_TYPE_ATB_MIX);
         Entity entity = ((Unit) mocks[0]).getEntity();
         when(entity.doomedOnGround()).thenReturn(true);
 

@@ -33,6 +33,7 @@
 package mekhq.campaign.universe;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
@@ -41,7 +42,9 @@ import java.time.LocalDate;
 import java.util.List;
 import java.util.Set;
 
+import megamek.common.planetaryConditions.AtmosphericTaint;
 import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
 /**
@@ -113,5 +116,26 @@ public class PlanetTest {
         assertEquals(Set.of(earlyOwner), planet.getFactionSet(earlyDate),
               "A query for the early date again, after an intervening later-dated query, must still resolve to the "
                     + "early owner rather than the future state the prior query fast-forwarded past");
+    }
+    @Test
+    @DisplayName("A planet with no atmosphere recorded reports breathable air rather than nothing")
+    void anUnrecordedAtmosphereReadsAsBreathable() {
+        Planet planet = new Planet("Test System");
+
+        assertEquals(AtmosphericTaint.BREATHABLE, planet.getAtmosphere(LocalDate.of(3025, 1, 1)));
+    }
+
+    @Test
+    @DisplayName("An atmosphere entry that carries no value reports breathable air rather than nothing")
+    void anAtmosphereEntryWithoutAValueReadsAsBreathable() {
+        // The data can carry a sourced entry whose value is absent. getAtmosphere() is declared non-null and its
+        // result is switched on during force generation, so handing back null there would take the scenario down.
+        Planet planet = new Planet("Test System");
+        planet.setSourcedAtmosphere(SourceableValue.of(null));
+
+        AtmosphericTaint atmosphericTaint = planet.getAtmosphere(LocalDate.of(3025, 1, 1));
+
+        assertNotNull(atmosphericTaint, "a valueless atmosphere entry must not read back as null");
+        assertEquals(AtmosphericTaint.BREATHABLE, atmosphericTaint);
     }
 }
