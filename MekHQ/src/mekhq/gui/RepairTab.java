@@ -145,6 +145,7 @@ public final class RepairTab extends CampaignGuiTab implements ITechWorkPanel {
     private int selectedLocation = -1;
     private Unit selectedUnit = null;
     private Person selectedTech = getSelectedTech();
+    private Person tempTech = getTempTech();
     private boolean ignoreUnitTable = false; // Used to disable selection listener while data is updated.
 
     // region Constructors
@@ -614,6 +615,16 @@ public final class RepairTab extends CampaignGuiTab implements ITechWorkPanel {
         }
 
         return techsModel.getTechAt(techTable.convertRowIndexToModel(row));
+    }
+
+    @Override
+    public Person getTempTech() {
+        return tempTech;
+    }
+
+    @Override
+    public void setTempTech(Person tempTech) {
+        this.tempTech = tempTech;
     }
 
     @Override
