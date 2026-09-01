@@ -36,10 +36,11 @@ import java.time.LocalDate;
 import java.util.List;
 
 import megamek.common.annotations.Nullable;
+import megamek.common.planetaryConditions.Atmosphere;
+import megamek.common.planetaryConditions.AtmosphericTaint;
 import megamek.logging.MMLogger;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.mission.contract.AbstractContract;
-import mekhq.campaign.universe.Atmosphere;
 import mekhq.campaign.universe.LandMass;
 import mekhq.campaign.universe.Planet;
 import mekhq.campaign.universe.SourceableValue;
@@ -51,14 +52,14 @@ import mekhq.campaign.universe.enums.HPGRating;
  *
  * <p>All inputs are optional in the universe data. When a value is unknown the profile substitutes a neutral,
  * roughly Terra-like default so generation always has something sensible to work with. In particular, an unknown
- * atmosphere is treated as breathable rather than airless: a world is only considered airless when its data
- * <em>explicitly</em> records a vacuum or a "None" atmosphere.</p>
+ * atmosphere is treated as breathable rather than airless: a world is only considered airless when its recorded
+ * pressure is a vacuum.</p>
  *
  * @param temperatureCelsius equatorial temperature in degrees Celsius
  * @param diameterKm         planetary diameter in kilometres ({@code 0} when unknown; {@link #sizeFactor()} treats that
  *                           as Terra-sized)
  * @param waterPercent       surface water coverage, clamped to {@code 0..100}
- * @param airless            {@code true} when the planet explicitly has no breathable atmosphere (vacuum or "None")
+ * @param airless            {@code true} when the planet's recorded pressure is a vacuum
  * @param atmosphere         atmospheric composition, or {@code null} when unknown (treated as neutral/breathable)
  * @param composition        lower-cased surface composition string (e.g. {@code "ice"}, {@code "arid/rock"}), never
  *                           {@code null} but possibly empty
@@ -71,7 +72,7 @@ import mekhq.campaign.universe.enums.HPGRating;
  * @since 0.51.01
  */
 public record PlanetProfile(int temperatureCelsius, double diameterKm, int waterPercent, boolean airless,
-      @Nullable Atmosphere atmosphere, String composition, int landmassCount, double gravity,
+      @Nullable AtmosphericTaint atmosphere, String composition, int landmassCount, double gravity,
       @Nullable Long population, HPGRating hpg) {
     private static final MMLogger LOGGER = MMLogger.create(PlanetProfile.class);
 
@@ -90,7 +91,6 @@ public record PlanetProfile(int temperatureCelsius, double diameterKm, int water
 
     private static final int HABITABLE_TEMPERATURE_SPAN = 60;
     private static final double TAINTED_HABITABILITY_FACTOR = 0.4;
-    private static final double NON_BREATHABLE_HABITABILITY_FACTOR = 0.6;
 
     private static final double MIN_SIZE_FACTOR = 0.5;
     private static final double MAX_SIZE_FACTOR = 2.0;
@@ -125,7 +125,7 @@ public record PlanetProfile(int temperatureCelsius, double diameterKm, int water
      *       unknown atmosphere is treated as breathable.
      */
     public boolean breathable() {
-        return !airless && ((atmosphere == null) || (atmosphere == Atmosphere.BREATHABLE));
+        return !airless && ((atmosphere == null) || (atmosphere == AtmosphericTaint.BREATHABLE));
     }
 
     /**
@@ -165,7 +165,7 @@ public record PlanetProfile(int temperatureCelsius, double diameterKm, int water
     /**
      * @return how liveable the world is, {@code 0.0} (hostile) to {@code 1.0} (temperate and breathable). Airless
      *       worlds are {@code 0.0}; comfort peaks near {@link #HABITABLE_TEMPERATURE_CELSIUS} and falls off toward
-     *       extremes, reduced further on tainted/toxic or non-breathable atmospheres.
+     *       extremes, reduced further on a tainted or toxic atmosphere.
      */
     public double habitability() {
         if (airless) {
@@ -179,8 +179,6 @@ public record PlanetProfile(int temperatureCelsius, double diameterKm, int water
         double comfort = Math.max(0.0, 1.0 - (temperatureDistance / (double) HABITABLE_TEMPERATURE_SPAN));
         if (taintedOrToxic()) {
             comfort *= TAINTED_HABITABILITY_FACTOR;
-        } else if (!breathable()) {
-            comfort *= NON_BREATHABLE_HABITABILITY_FACTOR;
         }
         return comfort;
     }
@@ -234,17 +232,18 @@ public record PlanetProfile(int temperatureCelsius, double diameterKm, int water
             resolvedWater = Math.clamp(sourcedWater.getValue(), 0, 100);
         }
 
-        // getAtmosphere() collapses "unknown" and "None" onto NONE, so read the sourced value to tell them apart: a
-        // null source means the datum is simply absent (treated as neutral), not that the world is airless.
-        Atmosphere atmosphere = null;
-        SourceableValue<Atmosphere> sourcedAtmosphere = planet.getSourcedAtmosphere(date);
+        // getAtmosphere() reports breathable air both for genuinely clean air and for a datum that was never
+        // recorded, so read the sourced value to tell them apart: a null source means the datum is simply absent.
+        AtmosphericTaint atmosphere = null;
+        SourceableValue<AtmosphericTaint> sourcedAtmosphere = planet.getSourcedAtmosphere(date);
         if (sourcedAtmosphere != null) {
             atmosphere = sourcedAtmosphere.getValue();
         }
 
-        megamek.common.planetaryConditions.Atmosphere pressure = planet.getPressure(date);
-        boolean airless = (pressure == megamek.common.planetaryConditions.Atmosphere.VACUUM) ||
-                                ((atmosphere != null) && atmosphere.isNone());
+        // Airlessness is a pressure reading, not a taint. Every world whose atmosphere is recorded as absent also
+        // records a vacuum pressure, so the pressure alone settles it.
+        Atmosphere pressure = planet.getPressure(date);
+        boolean airless = (pressure == Atmosphere.VACUUM);
 
         String resolvedComposition = "";
         SourceableValue<String> sourcedComposition = planet.getSourcedComposition(date);

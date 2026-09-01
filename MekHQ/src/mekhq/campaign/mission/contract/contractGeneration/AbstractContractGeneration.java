@@ -121,7 +121,7 @@ public class AbstractContractGeneration {
 
         // Covert status - needs both the objective and the now-resolved employer/sponsor (its odds depend on the true
         // backer). Must be set before the enemy is picked, which draws under covert rules when this is true.
-        determineCovertStatus(chaosObjectiveType, contract);
+        determineCovertStatus(chaosObjectiveType, contract, searchType == ContractSearchType.GOVERNMENT);
 
         // Step 3: Scale & Intensity
         setAncillaryValues(campaign, detachment.getHangar(), contract);
@@ -281,9 +281,17 @@ public class AbstractContractGeneration {
      * {@link #FALSE_FLAG_ODDS}), since deniable false flags are their signature. Either way the enemy is later drawn
      * under covert rules (see {@link ChaosContractDeterminationEnemy#generateEnemyFactionForObjective}), where even the
      * employer's allies can become rare targets.
+     *
+     * <p>A government contract cannot be classified as Covert.</p>
      */
-    private static void determineCovertStatus(ChaosObjectiveType chaosObjectiveType, ChaosContract contract) {
+    private static void determineCovertStatus(ChaosObjectiveType chaosObjectiveType, ChaosContract contract,
+          boolean isGovernmentSearchType) {
         if (contract.getNature() != ContractNature.NORMAL) {
+            return;
+        }
+        // The employer of a government contract is the player's own faction, the single possible employer, so there is
+        // no point concealing it - leave the contract as a normal, openly-attributed operation.
+        if (isGovernmentSearchType) {
             return;
         }
         if (chaosObjectiveType.isCovertCandidate() && Compute.randomInt(COVERT_CONTRACT_ODDS) == 0) {

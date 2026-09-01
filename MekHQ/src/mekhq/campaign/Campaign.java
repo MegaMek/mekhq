@@ -1075,7 +1075,7 @@ public class Campaign implements ITechManager {
      * hasActiveContract based on that check. This value should not be set elsewhere
      */
     public void setHasActiveContract() {
-        hasActiveContract = getActiveContracts().size() > 0;
+        hasActiveContract = !getActiveContracts().isEmpty();
     }
     // endregion Missions/Contracts
 
@@ -4559,6 +4559,7 @@ public class Campaign implements ITechManager {
             }
             if (getCampaignOptions().get(CampaignOption.USE_PLANETARY_CONDITIONS)) {
                 planetaryConditions.setAtmosphere(atBScenario.getAtmosphere());
+                planetaryConditions.setAtmosphericTaint(atBScenario.getAtmosphericTaint());
                 planetaryConditions.setGravity(atBScenario.getGravity());
             }
         } else {

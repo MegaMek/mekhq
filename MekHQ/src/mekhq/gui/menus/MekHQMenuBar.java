@@ -79,8 +79,8 @@ import mekhq.MHQStaticDirectoryManager;
 import mekhq.MekHQ;
 import mekhq.Utilities;
 import mekhq.campaign.Campaign;
-import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.campaignOptions.CampaignOption;
+import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.events.OptionsChangedEvent;
 import mekhq.campaign.events.OrganizationChangedEvent;
 import mekhq.campaign.finances.Finances;
@@ -120,6 +120,7 @@ import mekhq.gui.developerTools.ScenarioModifierEditorDialog;
 import mekhq.gui.developerTools.StratConFacilityEditorDialog;
 import mekhq.gui.dialog.*;
 import mekhq.gui.dialog.reportDialogs.CargoReportDialog;
+import mekhq.gui.dialog.reportDialogs.ChaosReputationReportDialog;
 import mekhq.gui.dialog.reportDialogs.HangarReportDialog;
 import mekhq.gui.dialog.reportDialogs.PersonnelReportDialog;
 import mekhq.gui.dialog.reportDialogs.ReputationReportDialog;
@@ -508,8 +509,13 @@ public class MekHQMenuBar extends JMenuBar {
     private JMenu initReportsMenu() {
         JMenu menuReports = new JMenu(getTextAt("menuReports.text"));
         menuReports.setMnemonic(KeyEvent.VK_E);
-        menuReports.add(createMenuItem("miDragoonsRating.text", KeyEvent.VK_U,
-              event -> new ReputationReportDialog(getFrame(), getCampaign()).setVisible(true)));
+        menuReports.add(createMenuItem("miDragoonsRating.text", KeyEvent.VK_U, event -> {
+            if (getCampaign().getCampaignOptions().get(CampaignOption.USE_CHAOS_REPUTATION)) {
+                new ChaosReputationReportDialog(getFrame(), getCampaign()).setVisible(true);
+            } else {
+                new ReputationReportDialog(getFrame(), getCampaign()).setVisible(true);
+            }
+        }));
         menuReports.add(createMenuItem("miPersonnelReport.text", KeyEvent.VK_P,
               event -> new PersonnelReportDialog(getFrame(), new PersonnelReport(getCampaign())).setVisible(true)));
         menuReports.add(createMenuItem("miHangarBreakdown.text", KeyEvent.VK_H,

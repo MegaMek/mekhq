@@ -102,6 +102,7 @@ import megamek.common.loaders.MekFileParser;
 import megamek.common.loaders.MekSummary;
 import megamek.common.loaders.MekSummaryCache;
 import megamek.common.planetaryConditions.Atmosphere;
+import megamek.common.planetaryConditions.AtmosphericTaint;
 import megamek.common.planetaryConditions.Wind;
 import megamek.common.units.*;
 import megamek.common.universe.FactionTag;
@@ -612,17 +613,16 @@ public class AtBDynamicScenarioFactory {
                 isLowPressure = true;
                 allowsTanks = false;
             } else {
-                mekhq.campaign.universe.Atmosphere specific_atmosphere = contract.getTargetPlanet()
-                                                                               .getAtmosphere(currentDate);
+                AtmosphericTaint specificAtmosphere = contract.getTargetPlanet().getAtmosphere(currentDate);
 
-                switch (specific_atmosphere) {
-                    case TOXIC_POISON, TOXICPOISON, TOXIC_CAUSTIC, TOXICCAUSTIC -> {
-                        LOGGER.info("Atmosphere is {}, disallowing Tanks and Infantry", specific_atmosphere);
+                switch (specificAtmosphere) {
+                    case TOXIC_POISON, TOXIC_CAUSTIC -> {
+                        LOGGER.info("Atmosphere is {}, disallowing Tanks and Infantry", specificAtmosphere);
                         allowsConvInfantry = false;
                         allowsTanks = false;
                     }
-                    case TAINTED_POISON, TAINTEDPOISON, TAINTED_CAUSTIC, TAINTEDCAUSTIC -> {
-                        LOGGER.info("Atmosphere is {}, setting tainted flag", specific_atmosphere);
+                    case TAINTED_POISON, TAINTED_CAUSTIC -> {
+                        LOGGER.info("Atmosphere is {}, setting tainted flag", specificAtmosphere);
                         isTainted = true;
                     }
                     default -> {
@@ -1927,11 +1927,13 @@ public class AtBDynamicScenarioFactory {
             if (null != planet) {
                 Atmosphere atmosphere = ObjectUtility.nonNull(planet.getPressure(campaign.getLocalDate()),
                       scenario.getAtmosphere());
+                AtmosphericTaint atmosphericTaint = planet.getAtmosphere(campaign.getLocalDate());
                 float gravity = ObjectUtility.nonNull(planet.getGravity(), scenario.getGravity()).floatValue();
                 int temperature = ObjectUtility.nonNull(planet.getTemperature(campaign.getLocalDate()),
                       scenario.getTemperature());
 
                 scenario.setAtmosphere(atmosphere);
+                scenario.setAtmosphericTaint(atmosphericTaint);
                 scenario.setGravity(gravity);
                 scenario.setTemperature(temperature);
             }

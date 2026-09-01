@@ -249,12 +249,12 @@ public class CampaignSummary {
 
         // cargo capacity
         CargoStatistics cargoStats = campaign.getCargoStatistics();
-        cargoCapacity = cargoStats.getTotalCombinedCargoCapacity();
+        cargoCapacity = cargoStats.getTotalCargoCapacity();
 
         double tetrisMasterMultiplier = 1.0;
         for (Person person : campaign.getPlayerForce().getHumanResources().getActivePersonnel(false, false)) {
             PersonnelOptions options = person.getOptions();
-            if (options.booleanOption(ADMIN_TETRIS_MASTER)) {
+            if (person.isAdministrator() && options.booleanOption(ADMIN_TETRIS_MASTER)) {
                 tetrisMasterMultiplier += 0.05;
             }
         }

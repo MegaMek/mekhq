@@ -81,6 +81,7 @@ import megamek.common.units.Crew;
 import megamek.logging.MMLogger;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
+import mekhq.campaign.campaignOptions.CampaignOption;
 import mekhq.campaign.personnel.Bloodname;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.PersonnelOptions;
@@ -102,7 +103,6 @@ import mekhq.campaign.universe.PlanetarySystem;
 import mekhq.gui.utilities.MarkdownEditorPanel;
 import mekhq.gui.utilities.MarkdownRenderer;
 import mekhq.gui.utilities.OriginFactionPickerHelper;
-import mekhq.campaign.campaignOptions.CampaignOption;
 
 /**
  * This dialog is used to create a character in story arcs from a pool of XP
@@ -1016,7 +1016,11 @@ public class CreateCharacterDialog extends JDialog implements DialogOptionListen
             gridBagConstraints.anchor = GridBagConstraints.WEST;
             gridBagConstraints.insets = new Insets(0, 5, 0, 0);
             demographicPanel.add(spnPersonalityQuirk, gridBagConstraints);
+        }
+        //endregion random personality
 
+        //region random talent
+        if (campaign.getCampaignOptions().get(CampaignOption.USE_RANDOM_TALENT)) {
             JLabel labelReasoning = new JLabel();
             labelReasoning.setText("Talent:");
             labelReasoning.setName("labelReasoning");
@@ -1037,6 +1041,7 @@ public class CreateCharacterDialog extends JDialog implements DialogOptionListen
             gridBagConstraints.insets = new Insets(0, 5, 0, 0);
             demographicPanel.add(comboReasoning, gridBagConstraints);
         }
+        //endregion random talent
 
         y++;
 
@@ -1762,10 +1767,12 @@ public class CreateCharacterDialog extends JDialog implements DialogOptionListen
             person.setPersonalityQuirk(comboPersonalityQuirk.getSelectedItem());
             person.setPersonalityQuirkDescriptionIndex((int) spnPersonalityQuirk.getValue());
 
-            person.setReasoning(comboReasoning.getSelectedItem());
-
             writePersonalityDescription(person);
             writeInterviewersNotes(person);
+        }
+
+        if (campaign.getCampaignOptions().get(CampaignOption.USE_RANDOM_TALENT)) {
+            person.setReasoning(comboReasoning.getSelectedItem());
         }
 
         person.setPortrait(portrait);

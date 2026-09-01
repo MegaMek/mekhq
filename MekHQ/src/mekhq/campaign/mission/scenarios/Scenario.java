@@ -42,6 +42,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.UUID;
 import java.util.Vector;
 
@@ -52,6 +53,7 @@ import megamek.common.annotations.Nullable;
 import megamek.common.board.Board;
 import megamek.common.loaders.MapSettings;
 import megamek.common.planetaryConditions.Atmosphere;
+import megamek.common.planetaryConditions.AtmosphericTaint;
 import megamek.common.planetaryConditions.BlowingSand;
 import megamek.common.planetaryConditions.EMI;
 import megamek.common.planetaryConditions.Fog;
@@ -141,6 +143,7 @@ public class Scenario implements IPlayerSettings {
     protected Wind wind;
     protected Fog fog;
     protected Atmosphere atmosphere;
+    protected AtmosphericTaint atmosphericTaint;
     private int temperature;
     protected float gravity;
     private EMI emi;
@@ -219,6 +222,7 @@ public class Scenario implements IPlayerSettings {
         wind = Wind.CALM;
         fog = Fog.FOG_NONE;
         atmosphere = Atmosphere.STANDARD;
+        atmosphericTaint = AtmosphericTaint.BREATHABLE;
         temperature = 25;
         gravity = (float) 1.0;
         emi = EMI.EMI_NONE;
@@ -505,6 +509,22 @@ public class Scenario implements IPlayerSettings {
         this.atmosphere = atmosphere;
     }
 
+    /**
+     * @return how safe the air is to breathe where this scenario is fought, never {@code null}
+     */
+    public AtmosphericTaint getAtmosphericTaint() {
+        return atmosphericTaint;
+    }
+
+    /**
+     * @param atmosphericTaint the air to fight this scenario in, or {@code null} for breathable air. A scenario
+     *       always has some air recorded, because {@link #writeToXML(java.io.PrintWriter, int)} asks it for the name
+     *       to save.
+     */
+    public void setAtmosphericTaint(@Nullable AtmosphericTaint atmosphericTaint) {
+        this.atmosphericTaint = Objects.requireNonNullElse(atmosphericTaint, AtmosphericTaint.BREATHABLE);
+    }
+
     public int getTemperature() {
         return temperature;
     }
@@ -581,6 +601,7 @@ public class Scenario implements IPlayerSettings {
         planetaryConditions.setWind(getWind());
         planetaryConditions.setFog(getFog());
         planetaryConditions.setAtmosphere(getAtmosphere());
+        planetaryConditions.setAtmosphericTaint(getAtmosphericTaint());
         planetaryConditions.setTemperature(getTemperature());
         planetaryConditions.setGravity(getGravity());
         planetaryConditions.setEMI(getEMI());
@@ -605,6 +626,7 @@ public class Scenario implements IPlayerSettings {
         this.setWind(planetaryConditions.getWind());
         this.setFog(planetaryConditions.getFog());
         this.setAtmosphere(planetaryConditions.getAtmosphere());
+        this.setAtmosphericTaint(planetaryConditions.getAtmosphericTaint());
         this.setTemperature(planetaryConditions.getTemperature());
         this.setGravity(planetaryConditions.getGravity());
         this.setEMI(planetaryConditions.getEMI());
@@ -1140,6 +1162,9 @@ public class Scenario implements IPlayerSettings {
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "fog", fog.ordinal());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "temperature", temperature);
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "atmosphere", atmosphere.ordinal());
+        // Written by name rather than ordinal so that adding or reordering a taint cannot silently turn every
+        // saved scenario into a different atmosphere.
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "atmosphericTaint", atmosphericTaint.getExternalId());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "gravity", gravity);
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "emi", emi.isEMI());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "blowingSand", blowingSand.isBlowingSand());
@@ -1346,6 +1371,10 @@ public class Scenario implements IPlayerSettings {
                     retVal.fog = Fog.getFog(Integer.parseInt(wn2.getTextContent()));
                 } else if (wn2.getNodeName().equalsIgnoreCase("atmosphere")) {
                     retVal.atmosphere = Atmosphere.getAtmosphere(Integer.parseInt(wn2.getTextContent()));
+                } else if (wn2.getNodeName().equalsIgnoreCase("atmosphericTaint")) {
+                    // Absent from scenarios saved before tainted air existed; those default to breathable, which is
+                    // what getAtmosphericTaint() falls back to when the tag is not present at all.
+                    retVal.atmosphericTaint = AtmosphericTaint.getAtmosphericTaint(wn2.getTextContent().trim());
                 } else if (wn2.getNodeName().equalsIgnoreCase("temperature")) {
                     retVal.temperature = Integer.parseInt(wn2.getTextContent());
                 } else if (wn2.getNodeName().equalsIgnoreCase("gravity")) {

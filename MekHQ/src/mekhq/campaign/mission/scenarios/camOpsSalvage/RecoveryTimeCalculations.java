@@ -36,6 +36,7 @@ import static java.lang.Math.round;
 
 import megamek.common.annotations.Nullable;
 import megamek.common.planetaryConditions.Atmosphere;
+import megamek.common.planetaryConditions.AtmosphericTaint;
 import megamek.common.planetaryConditions.Light;
 import megamek.common.planetaryConditions.Weather;
 import megamek.common.planetaryConditions.Wind;
@@ -208,8 +209,7 @@ public class RecoveryTimeCalculations {
      * scenario's atmospheric setting.</p>
      *
      * @param scenarioAtmosphere  The {@link Atmosphere} condition in the scenario, or {@code null} if not specified.
-     * @param planetaryAtmosphere The planet's {@link mekhq.campaign.universe.Atmosphere}, used to check for tainted
-     *                            conditions.
+     * @param planetaryAtmosphere The planet's {@link AtmosphericTaint}, used to check for tainted conditions.
      *
      * @return The atmospheric multiplier to add to the total multiplier.
      *
@@ -217,7 +217,7 @@ public class RecoveryTimeCalculations {
      * @since 0.50.10
      */
     private static double getAtmosphereMultiplier(@Nullable Atmosphere scenarioAtmosphere,
-          @Nullable mekhq.campaign.universe.Atmosphere planetaryAtmosphere) {
+          @Nullable AtmosphericTaint planetaryAtmosphere) {
         double atmosphereMultiplier = DEFAULT_MULTIPLIER;
 
         if (scenarioAtmosphere != null) {
