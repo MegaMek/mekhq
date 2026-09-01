@@ -4646,7 +4646,8 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
                 personalityMenu.add(menuItem);
             }
 
-            if (getCampaignOptions().get(CampaignOption.USE_RANDOM_PERSONALITIES)) {
+            if (getCampaignOptions().get(CampaignOption.USE_RANDOM_PERSONALITIES) ||
+                      getCampaignOptions().get(CampaignOption.USE_RANDOM_TALENT)) {
                 menuItem = new JMenuItem(resources.getString("regeneratePersonality.text"));
                 menuItem.setActionCommand(CMD_PERSONALITY);
                 menuItem.addActionListener(this);

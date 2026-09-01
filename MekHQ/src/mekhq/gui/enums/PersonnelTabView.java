@@ -104,7 +104,7 @@ public enum PersonnelTabView {
                 AMBITION, options -> options.get(CampaignOption.USE_RANDOM_PERSONALITIES),
                 GREED, options -> options.get(CampaignOption.USE_RANDOM_PERSONALITIES),
                 SOCIAL, options -> options.get(CampaignOption.USE_RANDOM_PERSONALITIES),
-                REASONING, options -> options.get(CampaignOption.USE_RANDOM_PERSONALITIES))),
+                REASONING, options -> options.get(CampaignOption.USE_RANDOM_TALENT))),
     SERVICE_RECORD("PersonnelTabView.SERVICE_RECORD.text", "PersonnelTabView.SERVICE_RECORD.toolTipText",
           Set.of(RANK, FIRST_NAME, LAST_NAME, PERSONNEL_ROLE, COMMAND_STATUS, FOUNDER, RECRUITMENT_DATE,
                 RETIREMENT_DATE, SALARY, KILLS, REPUTATION),
