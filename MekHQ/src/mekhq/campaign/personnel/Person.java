@@ -150,6 +150,7 @@ import mekhq.campaign.personnel.medical.advancedMedicalAlternate.AdvancedMedical
 import mekhq.campaign.personnel.medical.advancedMedicalAlternate.AlternateInjuries;
 import mekhq.campaign.personnel.medical.advancedMedicalAlternate.InjuryEffect;
 import mekhq.campaign.personnel.medical.advancedMedicalAlternate.InjurySubType;
+import mekhq.campaign.personnel.quartermaster.ArmorKitCatalog;
 import mekhq.campaign.personnel.ranks.Rank;
 import mekhq.campaign.personnel.ranks.RankSystem;
 import mekhq.campaign.personnel.ranks.RankValidator;
@@ -299,6 +300,8 @@ public class Person implements ILocatable {
     private PersonnelOptions options;
     private boolean hasGainedVeterancySPA;
     private int toughness;
+    private String armorKitName;
+    private String intendedArmorKitName;
     private int chaosCampaignReputation;
     private int chaosCampaignCriminalRecord;
     private Attributes atowAttributes;
@@ -604,6 +607,7 @@ public class Person implements ILocatable {
         hits = 0;
         hitsPrior = 0;
         toughness = 0;
+        armorKitName = ArmorKitCatalog.DEFAULT_ARMOR_KIT_NAME;
         chaosCampaignReputation = STARTING_REPUTATION_SCORE;
         chaosCampaignCriminalRecord = 0;
         hasGainedVeterancySPA = false;
@@ -3780,6 +3784,14 @@ public class Person implements ILocatable {
                 MHQXMLUtility.writeSimpleXMLTag(pw, indent, "toughness", toughness);
             }
 
+            if ((armorKitName != null) && !armorKitName.equals(ArmorKitCatalog.DEFAULT_ARMOR_KIT_NAME)) {
+                MHQXMLUtility.writeSimpleXMLTag(pw, indent, "armorKitName", armorKitName);
+            }
+
+            if (intendedArmorKitName != null) {
+                MHQXMLUtility.writeSimpleXMLTag(pw, indent, "intendedArmorKitName", intendedArmorKitName);
+            }
+
             if (chaosCampaignReputation != STARTING_REPUTATION_SCORE) {
                 MHQXMLUtility.writeSimpleXMLTag(pw, indent, "chaosCampaignReputation", chaosCampaignReputation);
             }
@@ -4404,6 +4416,10 @@ public class Person implements ILocatable {
                     implants = wn2.getTextContent();
                 } else if (nodeName.equalsIgnoreCase("toughness")) {
                     person.toughness = MathUtility.parseInt(wn2.getTextContent().trim());
+                } else if (nodeName.equalsIgnoreCase("armorKitName")) {
+                    person.armorKitName = wn2.getTextContent().trim();
+                } else if (nodeName.equalsIgnoreCase("intendedArmorKitName")) {
+                    person.intendedArmorKitName = wn2.getTextContent().trim();
                 } else if (nodeName.equalsIgnoreCase("chaosCampaignReputation")) {
                     person.chaosCampaignReputation = MathUtility.parseInt(wn2.getTextContent().trim(),
                           STARTING_REPUTATION_SCORE);
@@ -7654,6 +7670,35 @@ public class Person implements ILocatable {
 
     public void setToughness(final int toughness) {
         this.toughness = toughness;
+    }
+
+    /**
+     * Returns the internal name of the armor kit this person wears, both in their machine and after they leave it. A
+     * person who has been issued nothing wears {@link ArmorKitCatalog#DEFAULT_ARMOR_KIT_NAME}.
+     *
+     * @return the person's armor kit internal name; never {@code null}
+     */
+    public String getArmorKitName() {
+        return armorKitName;
+    }
+
+    /**
+     * The armor kit this person is meant to wear but has not yet been issued, pending a kit arriving in their local
+     * stores; {@code null} once they have it or were never waiting on one. The quartermaster fulfills these as kits
+     * arrive.
+     *
+     * @return the internal name of the awaited kit, or {@code null}
+     */
+    public @Nullable String getIntendedArmorKitName() {
+        return intendedArmorKitName;
+    }
+
+    public void setIntendedArmorKitName(final @Nullable String intendedArmorKitName) {
+        this.intendedArmorKitName = intendedArmorKitName;
+    }
+
+    public void setArmorKitName(final String armorKitName) {
+        this.armorKitName = (armorKitName == null) ? ArmorKitCatalog.DEFAULT_ARMOR_KIT_NAME : armorKitName;
     }
 
     public int getAdjustedReputation(boolean isUseAgingEffects, boolean isClanCampaign, LocalDate currentDate) {

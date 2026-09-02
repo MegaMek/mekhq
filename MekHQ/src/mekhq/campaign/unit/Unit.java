@@ -55,6 +55,7 @@ import static mekhq.campaign.parts.enums.PartQuality.QUALITY_E;
 import static mekhq.campaign.parts.enums.PartQuality.QUALITY_F;
 import static mekhq.campaign.unit.enums.TransporterType.*;
 import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
+import static mekhq.utilities.MHQInternationalization.getTextAt;
 import static mekhq.utilities.ReportingUtilities.CLOSING_SPAN_TAG;
 import static mekhq.utilities.ReportingUtilities.getWarningColor;
 import static mekhq.utilities.ReportingUtilities.spanOpeningWithCustomColor;
@@ -155,6 +156,7 @@ import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.PersonnelOptions;
 import mekhq.campaign.personnel.enums.PersonnelRole;
 import mekhq.campaign.personnel.familiarity.Familiarity;
+import mekhq.campaign.personnel.quartermaster.ArmorKitCatalog;
 import mekhq.campaign.personnel.skills.InfantryGunnerySkills;
 import mekhq.campaign.personnel.skills.Skill;
 import mekhq.campaign.personnel.skills.SkillModifierData;
@@ -197,6 +199,9 @@ public class Unit implements ITechnology, ILocatable {
     private UUID id;
     private final LocationNode locationNode = new LocationNode(this);
     private String fluffName;
+    private String armorKitName;
+    private String designedInfantryKitName;
+    private String intendedArmorKitName;
 
     // This is the large craft assigned to transport this unit
     private TransportShipAssignment transportShipAssignment;
@@ -1411,6 +1416,16 @@ public class Unit implements ITechnology, ILocatable {
             for (int i = BattleArmor.LOC_TROOPER_1; i <= ((BattleArmor) entity).getSquadSize(); i++) {
                 if (entity.getInternal(i) == 0) {
                     return "This BattleArmor unit has empty suits. Fill them with pilots or salvage them.";
+                }
+            }
+        }
+        // When the campaign requires it, a Mek may not deploy unless every crew member wears one of the three
+        // MekWarrior kits (Basic, Advanced, or Clan): a MekWarrior without one is doesn't have a neurohelmet.
+        if ((entity instanceof Mek) &&
+                  getCampaign().getCampaignOptions().get(CampaignOption.REQUIRE_MEKWARRIOR_KIT_TO_DEPLOY)) {
+            for (Person crewMember : getCrew()) {
+                if (!ArmorKitCatalog.isMekWarriorKit(crewMember.getArmorKitName())) {
+                    return getTextAt(RESOURCE_BUNDLE, "Unit.checkDeployment.needsMekWarriorKit");
                 }
             }
         }
@@ -3028,6 +3043,18 @@ public class Unit implements ITechnology, ILocatable {
             MHQXMLUtility.writeSimpleXMLTag(pw, indent, "fluffName", fluffName);
         }
 
+        if (armorKitName != null) {
+            MHQXMLUtility.writeSimpleXMLTag(pw, indent, "armorKitName", armorKitName);
+        }
+
+        if (designedInfantryKitName != null) {
+            MHQXMLUtility.writeSimpleXMLTag(pw, indent, "designedInfantryKitName", designedInfantryKitName);
+        }
+
+        if (intendedArmorKitName != null) {
+            MHQXMLUtility.writeSimpleXMLTag(pw, indent, "intendedArmorKitName", intendedArmorKitName);
+        }
+
         if (!history.isEmpty()) {
             MHQXMLUtility.writeSimpleXMLTag(pw, indent, "history", history);
         }
@@ -3251,6 +3278,12 @@ public class Unit implements ITechnology, ILocatable {
                     loadLogEntriesFromXML(wn2, retVal.repairLog, "repairLog");
                 } else if (wn2.getNodeName().equalsIgnoreCase("fluffName")) {
                     retVal.fluffName = wn2.getTextContent();
+                } else if (wn2.getNodeName().equalsIgnoreCase("armorKitName")) {
+                    retVal.armorKitName = wn2.getTextContent();
+                } else if (wn2.getNodeName().equalsIgnoreCase("designedInfantryKitName")) {
+                    retVal.designedInfantryKitName = wn2.getTextContent();
+                } else if (wn2.getNodeName().equalsIgnoreCase("intendedArmorKitName")) {
+                    retVal.intendedArmorKitName = wn2.getTextContent();
                 } else if (wn2.getNodeName().equalsIgnoreCase("lastMaintenanceReport")) {
                     retVal.lastMaintenanceReport = wn2.getTextContent();
                 } else if (wn2.getNodeName().equalsIgnoreCase("mothballInfo")) {
@@ -5179,6 +5212,10 @@ public class Unit implements ITechnology, ILocatable {
         if (campaignOptions.get(CampaignOption.USE_ABILITIES) || campaignOptions.get(CampaignOption.USE_EDGE) || campaignOptions.get(CampaignOption.USE_IMPLANTS)) {
             processUnitSPAs(commander);
         }
+
+        if (isConventionalInfantry() && (armorKitName != null) && (entity instanceof ConvInfantry convInfantry)) {
+            convInfantry.setArmorKit(EquipmentType.get(armorKitName));
+        }
     }
 
     public boolean isOnlyCommandersMatter(CampaignOptions campaignOptions) {
@@ -5267,6 +5304,9 @@ public class Unit implements ITechnology, ILocatable {
             entity.getCrew().setNickname(commander.getCallsign(), 0);
             entity.getCrew().setGender(commander.getGender(), 0);
             entity.getCrew().setClanPilot(commander.isClanPersonnel(), 0);
+            if (ArmorKitCatalog.canWearIssuedKit(entity)) {
+                entity.getCrew().setArmorKitName(commander.getArmorKitName(), 0);
+            }
             entity.getCrew().setPortrait(commander.getPortrait().clone(), 0);
             entity.getCrew().setExternalIdAsString(commander.getId().toString(), 0);
             entity.getCrew().setToughness(commander.getAdjustedToughness(), 0);
@@ -5933,6 +5973,9 @@ public class Unit implements ITechnology, ILocatable {
         entity.getCrew().setNickname(person.getCallsign(), slot);
         entity.getCrew().setGender(person.getGender(), slot);
         entity.getCrew().setClanPilot(person.isClanPersonnel(), slot);
+        if (ArmorKitCatalog.canWearIssuedKit(entity)) {
+            entity.getCrew().setArmorKitName(person.getArmorKitName(), slot);
+        }
         entity.getCrew().setPortrait(person.getPortrait().clone(), slot);
         entity.getCrew().setHits(person.getTotalInjurySeverity(), slot);
         int gunnery = 7;
@@ -7544,6 +7587,48 @@ public class Unit implements ITechnology, ILocatable {
      */
     public void setFluffName(String fluffName) {
         this.fluffName = fluffName;
+    }
+
+    /**
+     * The armor kit issued to this unit where the kit belongs to the unit rather than a crew member — a conventional
+     * infantry platoon's field armor. {@code null} means no kit has been issued and the platoon's designed armor
+     * stands.
+     *
+     * @return the issued kit's internal name, or {@code null}
+     */
+    public @Nullable String getArmorKitName() {
+        return armorKitName;
+    }
+
+    public void setArmorKitName(@Nullable String armorKitName) {
+        this.armorKitName = armorKitName;
+    }
+
+    /**
+     * The platoon's designed (original) armor kit, captured before the first issued kit overrode it, so it can be
+     * restored. {@code null} until captured.
+     *
+     * @return the designed kit's internal name, or {@code null}
+     */
+    public @Nullable String getDesignedInfantryKitName() {
+        return designedInfantryKitName;
+    }
+
+    public void setDesignedInfantryKitName(@Nullable String designedInfantryKitName) {
+        this.designedInfantryKitName = designedInfantryKitName;
+    }
+
+    /**
+     * A kit the platoon is waiting on — ordered because local stores were short — to be issued once enough arrive.
+     *
+     * @return the awaited kit's internal name, or {@code null} if nothing is pending
+     */
+    public @Nullable String getIntendedArmorKitName() {
+        return intendedArmorKitName;
+    }
+
+    public void setIntendedArmorKitName(@Nullable String intendedArmorKitName) {
+        this.intendedArmorKitName = intendedArmorKitName;
     }
 
     /**

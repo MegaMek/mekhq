@@ -63,6 +63,7 @@ import mekhq.campaign.Campaign;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.enums.PersonnelRole;
 import mekhq.campaign.personnel.ranks.Ranks;
+import mekhq.campaign.randomEvents.prisoners.PrisonerStatus;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
@@ -1296,6 +1297,7 @@ public class UnitPersonTest {
         when(mockCommander.getCallsign()).thenReturn("TestPilot");
         when(mockCommander.getGender()).thenReturn(megamek.common.enums.Gender.MALE);
         when(mockCommander.isClanPersonnel()).thenReturn(false);
+        when(mockCommander.getPrisonerStatus()).thenReturn(PrisonerStatus.PRISONER); // Bypass armor kit distribution
 
         // Mock Portrait and make it cloneable
         megamek.common.icons.Portrait mockPortrait = mock(megamek.common.icons.Portrait.class);
@@ -1333,6 +1335,7 @@ public class UnitPersonTest {
         when(mockPlanet.getParentSystem()).thenReturn(mockSystem);
 
         when(mockCommander.getOriginPlanet()).thenReturn(mockPlanet);
+
         return mockCommander;
     }
 }
