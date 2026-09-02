@@ -173,9 +173,9 @@ class AcquisitionPage {
         cboProcurementPersonnelPick = new MMComboBox<>("procurementPersonnelPick",
               buildProcurementPersonnelPickComboOptions());
         choiceTransitTimeUnits = new MMComboBox<>("choiceTransitTimeUnits", getTransitUnitOptions());
-        cboMekWarriorDefaultKit = armorKitCombo("mekWarriorDefaultKit", Category.MECHWARRIOR);
+        cboMekWarriorDefaultKit = armorKitCombo("mekWarriorDefaultKit", Category.MEKWARRIOR);
         cboVehicleCrewDefaultKit = armorKitCombo("vehicleCrewDefaultKit", Category.INFANTRY);
-        cboAircraftDefaultKit = armorKitCombo("aircraftDefaultKit", Category.AEROSPACE);
+        cboAircraftDefaultKit = armorKitCombo("aircraftDefaultKit", Category.AIRCRAFT);
 
         // Header
         String imageAddress = getImageDirectory() + "logo_clan_cloud_cobra.png";

@@ -33,6 +33,7 @@
 package mekhq.campaign.personnel.quartermaster;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
@@ -89,7 +90,7 @@ public final class ArmorKitCatalog {
 
     /** The group a kit belongs to, deciding which crews may be issued it. */
     public enum Category {
-        MECHWARRIOR, AEROSPACE, INFANTRY, SOLDIER
+        MEKWARRIOR, AIRCRAFT, INFANTRY, SOLDIER
     }
 
     private ArmorKitCatalog() {
@@ -108,10 +109,10 @@ public final class ArmorKitCatalog {
      */
     public static Category categoryOf(@Nullable String kitInternalName) {
         if (MECHWARRIOR_KITS.contains(kitInternalName)) {
-            return Category.MECHWARRIOR;
+            return Category.MEKWARRIOR;
         }
         if (AEROSPACE_KITS.contains(kitInternalName)) {
-            return Category.AEROSPACE;
+            return Category.AIRCRAFT;
         }
         return Category.INFANTRY;
     }
@@ -119,8 +120,8 @@ public final class ArmorKitCatalog {
     /** The fixed kit sets used by the campaign-options dropdowns. Soldiers have no dropdown, so an empty set. */
     private static Set<String> kitsFor(Category category) {
         return switch (category) {
-            case MECHWARRIOR -> MECHWARRIOR_ISSUABLE_KITS;
-            case AEROSPACE -> AEROSPACE_KITS;
+            case MEKWARRIOR -> MECHWARRIOR_ISSUABLE_KITS;
+            case AIRCRAFT -> AEROSPACE_KITS;
             case INFANTRY -> VEHICLE_KITS;
             case SOLDIER -> Set.of();
         };
@@ -129,8 +130,8 @@ public final class ArmorKitCatalog {
     /** Whether a kit belongs to a group's issuable list: fixed sets for the crews, every infantry kit for soldiers. */
     private static boolean isInCategory(String kitInternalName, Category category) {
         return switch (category) {
-            case MECHWARRIOR -> MECHWARRIOR_ISSUABLE_KITS.contains(kitInternalName);
-            case AEROSPACE -> AEROSPACE_KITS.contains(kitInternalName);
+            case MEKWARRIOR -> MECHWARRIOR_ISSUABLE_KITS.contains(kitInternalName);
+            case AIRCRAFT -> AEROSPACE_KITS.contains(kitInternalName);
             case INFANTRY -> VEHICLE_KITS.contains(kitInternalName);
             case SOLDIER -> !MECHWARRIOR_KITS.contains(kitInternalName) && !AEROSPACE_KITS.contains(kitInternalName);
         };
@@ -174,6 +175,25 @@ public final class ArmorKitCatalog {
         List<String> categoryKits = new ArrayList<>(kitsFor(category));
         categoryKits.sort(String::compareTo);
         names.addAll(categoryKits);
+        return names;
+    }
+
+    /**
+     * Every kit internal name the catalog hardcodes and compares against — the union of the group name sets and the
+     * no-protection default. Exposed for a regression test that asserts each still resolves to a real kit, so a rename
+     * in MegaMek's equipment tables is caught rather than silently dropping a kit from its group.
+     *
+     * @return every referenced kit internal name
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    static Set<String> allReferencedKitNames() {
+        Set<String> names = new HashSet<>();
+        names.add(DEFAULT_ARMOR_KIT_NAME);
+        names.addAll(MECHWARRIOR_KITS);
+        names.addAll(AEROSPACE_KITS);
+        names.addAll(VEHICLE_KITS);
         return names;
     }
 
@@ -255,13 +275,13 @@ public final class ArmorKitCatalog {
         PersonnelRole secondary = person.getSecondaryRole();
 
         if (primary.isMekWarriorGrouping() || secondary.isMekWarriorGrouping()) {
-            return Category.MECHWARRIOR;
+            return Category.MEKWARRIOR;
         }
         if (primary.isAerospaceGrouping()
                   || primary.isConventionalAircraftPilot()
                   || secondary.isAerospaceGrouping()
                   || secondary.isConventionalAircraftPilot()) {
-            return Category.AEROSPACE;
+            return Category.AIRCRAFT;
         }
         if (primary.isSoldier() || secondary.isSoldier()) {
             return Category.SOLDIER;

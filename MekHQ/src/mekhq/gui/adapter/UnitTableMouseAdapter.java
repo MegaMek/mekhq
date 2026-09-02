@@ -1222,6 +1222,17 @@ public class UnitTableMouseAdapter extends JPopupMenuAdapter {
                         menu.add(menuItem);
                     }
                 }
+
+                if (!nonePresent && Arrays.stream(units).anyMatch(u ->
+                                                                        ArmorKitCatalog.canWearIssuedKit(u.getEntity()) ||
+                                                                              u.getEntity().isConventionalInfantry())) {
+                    JMenuItem issueArmorKits = new JMenuItem(getTextAt("mekhq.resources.IssueArmorKitsDialog",
+                          "menu.issueArmorKits"));
+                    issueArmorKits.addActionListener(evt -> IssueArmorKitsDialog.showFor(gui.getFrame(),
+                          gui.getCampaign(), null, Arrays.asList(units)));
+                    menu.add(issueArmorKits);
+                }
+
                 JMenuHelpers.addMenuIfNonEmpty(popup, menu);
             }
 
@@ -1505,17 +1516,6 @@ public class UnitTableMouseAdapter extends JPopupMenuAdapter {
                 JMenuHelpers.addMenuIfNonEmpty(popup, menu);
             }
             // endregion GM Mode
-        }
-
-        if (!nonePresent && Arrays.stream(units).anyMatch(u ->
-                                                                ArmorKitCatalog.canWearIssuedKit(u.getEntity()) ||
-                                                                      u.getEntity().isConventionalInfantry())) {
-            popup.addSeparator();
-            JMenuItem issueArmorKits = new JMenuItem(getTextAt("mekhq.resources.IssueArmorKitsDialog",
-                  "menu.issueArmorKits"));
-            issueArmorKits.addActionListener(evt -> IssueArmorKitsDialog.showFor(gui.getFrame(),
-                  gui.getCampaign(), null, Arrays.asList(units)));
-            popup.add(issueArmorKits);
         }
 
         return Optional.of(popup);

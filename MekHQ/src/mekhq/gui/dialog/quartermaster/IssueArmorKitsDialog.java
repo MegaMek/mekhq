@@ -204,8 +204,8 @@ public class IssueArmorKitsDialog extends JDialog {
 
     // region Sections
     /** Tab order by unit type: MekWarrior, Vehicle, Aircraft, Soldiers. */
-    private static final List<Category> TAB_ORDER = List.of(Category.MECHWARRIOR, Category.INFANTRY,
-          Category.AEROSPACE, Category.SOLDIER);
+    private static final List<Category> TAB_ORDER = List.of(Category.MEKWARRIOR, Category.INFANTRY,
+          Category.AIRCRAFT, Category.SOLDIER);
 
     private Component buildSections() {
         JTabbedPane tabs = new JTabbedPane();
@@ -560,8 +560,8 @@ public class IssueArmorKitsDialog extends JDialog {
 
     private static Color accentFor(Category category) {
         return switch (category) {
-            case MECHWARRIOR -> new Color(0xC0, 0x8A, 0x2A);
-            case AEROSPACE -> new Color(0x2E, 0x88, 0xAB);
+            case MEKWARRIOR -> new Color(0xC0, 0x8A, 0x2A);
+            case AIRCRAFT -> new Color(0x2E, 0x88, 0xAB);
             case INFANTRY -> new Color(0x4E, 0x8F, 0x3C);
             case SOLDIER -> new Color(0x9A, 0x6E, 0x4A);
         };

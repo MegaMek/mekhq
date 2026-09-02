@@ -458,8 +458,8 @@ public final class ArmorKitIssuer {
 
     private static String defaultKitFor(ArmorKitCatalog.Category category, Campaign campaign) {
         return switch (category) {
-            case MECHWARRIOR -> campaign.getCampaignOptions().get(CampaignOption.MEKWARRIOR_DEFAULT_KIT);
-            case AEROSPACE -> campaign.getCampaignOptions().get(CampaignOption.AIRCRAFT_DEFAULT_KIT);
+            case MEKWARRIOR -> campaign.getCampaignOptions().get(CampaignOption.MEKWARRIOR_DEFAULT_KIT);
+            case AIRCRAFT -> campaign.getCampaignOptions().get(CampaignOption.AIRCRAFT_DEFAULT_KIT);
             case INFANTRY -> campaign.getCampaignOptions().get(CampaignOption.VEHICLE_CREW_DEFAULT_KIT);
             // Soldiers have no per-recruit default kit; their platoon's kit is issued to the unit instead.
             case SOLDIER -> ArmorKitCatalog.DEFAULT_ARMOR_KIT_NAME;
