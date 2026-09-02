@@ -32,6 +32,8 @@
  */
 package mekhq.gui.model;
 
+import static mekhq.utilities.MHQInternationalization.getTextAt;
+
 import megamek.common.equipment.MiscType;
 import megamek.common.equipment.WeaponType;
 import mekhq.campaign.parts.*;
@@ -59,20 +61,20 @@ import mekhq.campaign.parts.protomeks.ProtoMekSensor;
  * remembered filter selections stable.</p>
  */
 public enum PartsFilterGroup {
-    ALL("All Parts") {
+    ALL("ALL") {
         @Override
         public boolean matches(Part part) {
             return true;
         }
     },
-    ARMOR("Armor") {
+    ARMOR("ARMOR") {
         @Override
         public boolean matches(Part part) {
             // ProtoMekArmor and BAArmor are derived from Armor
             return part instanceof Armor;
         }
     },
-    SYSTEM("System Components") {
+    SYSTEM("SYSTEM") {
         @Override
         public boolean matches(Part part) {
             return (part instanceof MekLifeSupport) ||
@@ -92,13 +94,13 @@ public enum PartsFilterGroup {
                          (part instanceof ProtoMekSensor);
         }
     },
-    EQUIP("Equipment") {
+    EQUIPMENT("EQUIPMENT") {
         @Override
         public boolean matches(Part part) {
             return (part instanceof EquipmentPart) || (part instanceof ProtoMekJumpJet);
         }
     },
-    LOC("Locations") {
+    LOCATIONS("LOCATIONS") {
         @Override
         public boolean matches(Part part) {
             return (part instanceof MekLocation) ||
@@ -106,38 +108,38 @@ public enum PartsFilterGroup {
                          (part instanceof ProtoMekLocation);
         }
     },
-    WEAPON("Weapons") {
+    WEAPON("WEAPON") {
         @Override
         public boolean matches(Part part) {
             return (part instanceof EquipmentPart) && (((EquipmentPart) part).getType() instanceof WeaponType);
         }
     },
-    AMMO("Ammunition") {
+    AMMO("AMMO") {
         @Override
         public boolean matches(Part part) {
             return part instanceof AmmoStorage;
         }
     },
-    MISC("Miscellaneous Equipment") {
+    MISC("MISC") {
         @Override
         public boolean matches(Part part) {
             return ((part instanceof EquipmentPart) && (((EquipmentPart) part).getType() instanceof MiscType)) ||
                          (part instanceof ProtoMekJumpJet);
         }
     },
-    ENGINE("Engines") {
+    ENGINE("ENGINE") {
         @Override
         public boolean matches(Part part) {
             return part instanceof EnginePart;
         }
     },
-    GYRO("Gyros") {
+    GYRO("GYRO") {
         @Override
         public boolean matches(Part part) {
             return part instanceof MekGyro;
         }
     },
-    ACT("Actuators") {
+    ACTUATORS("ACTUATORS") {
         @Override
         public boolean matches(Part part) {
             return (part instanceof MekActuator) ||
@@ -145,25 +147,25 @@ public enum PartsFilterGroup {
                          (part instanceof ProtoMekLegActuator);
         }
     },
-    COCKPIT("Cockpits") {
+    COCKPIT("COCKPIT") {
         @Override
         public boolean matches(Part part) {
             return part instanceof MekCockpit;
         }
     },
-    BA_SUIT("Battle Armor Suits") {
+    BA_SUIT("BA_SUIT") {
         @Override
         public boolean matches(Part part) {
             return part instanceof BattleArmorSuit;
         }
     },
-    OMNI_POD("Empty OmniPods") {
+    OMNI_POD("OMNI_POD") {
         @Override
         public boolean matches(Part part) {
             return part instanceof OmniPod;
         }
     },
-    ARMOR_KIT("Armor Kits") {
+    ARMOR_KIT("ARMOR_KIT") {
         @Override
         public boolean matches(Part part) {
             return (part instanceof EquipmentPart) &&
@@ -171,10 +173,12 @@ public enum PartsFilterGroup {
         }
     };
 
+    private final static String RESOURCE_BUNDLE = "mekhq.gui.model.PartsFilterGroup";
+
     private final String groupName;
 
-    PartsFilterGroup(String groupName) {
-        this.groupName = groupName;
+    PartsFilterGroup(String lookupName) {
+        this.groupName = getTextAt(RESOURCE_BUNDLE, lookupName + ".label");
     }
 
     /**
