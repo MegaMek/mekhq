@@ -5272,7 +5272,7 @@ public class Unit implements ITechnology, ILocatable {
             entity.getCrew().setToughness(commander.getAdjustedToughness(), 0);
 
             if (entity instanceof Tank) {
-                ((Tank) entity).setCommanderHit(commander.getHits() > 0);
+                ((Tank) entity).setCommanderHit(commander.getTotalInjurySeverity() > 0);
             }
             entity.getCrew().setMissing(false, 0);
         }
@@ -5454,7 +5454,7 @@ public class Unit implements ITechnology, ILocatable {
                     entity.getCrew().setMissing(true, 0);
                     return;
                 }
-                entity.getCrew().setHits(commander.getHits(), 0);
+                entity.getCrew().setHits(commander.getTotalInjurySeverity(), 0);
             }
 
             // Assign edge points to spacecraft and vehicle crews and infantry units. This overwrites the Edge value
@@ -5538,7 +5538,7 @@ public class Unit implements ITechnology, ILocatable {
         // For certain entities both drivers and gunners contribute to gunnery & piloting
         List<Person> relevantCrew = getCompositeCrew(isTank || entityIsConventionalInfantry, true);
         for (Person person : relevantCrew) {
-            if (person.getHits() > 0 && !usesSoloPilot()) {
+            if (person.getTotalInjurySeverity() > 0 && !usesSoloPilot()) {
                 continue;
             }
 
@@ -5569,7 +5569,7 @@ public class Unit implements ITechnology, ILocatable {
         relevantCrew = getCompositeCrew(isTank || entityIsConventionalInfantry, false);
         boolean smallArmsOnly = campaign.getCampaignOptions().get(CampaignOption.USE_SMALL_ARMS_ONLY);
         for (Person person : relevantCrew) {
-            if (person.getHits() > 0 && !usesSoloPilot()) {
+            if (person.getTotalInjurySeverity() > 0 && !usesSoloPilot()) {
                 continue;
             }
 
@@ -5601,11 +5601,11 @@ public class Unit implements ITechnology, ILocatable {
         }
 
         for (Person p : vesselCrew) {
-            if (p.getHits() == 0) {
+            if (p.getTotalInjurySeverity() == 0) {
                 nCrew++;
             }
         }
-        if ((getNavigator() != null) && (getNavigator().getHits() == 0)) {
+        if ((getNavigator() != null) && (getNavigator().getTotalInjurySeverity() == 0)) {
             nCrew++;
         }
         // Using the tech officer field for the secondary commander; if nobody assigned to the command
@@ -5613,7 +5613,7 @@ public class Unit implements ITechnology, ILocatable {
         // to a single commander. As the console commander is not counted against crew requirements, we do not
         // increase nCrew if present.
         if ((entity instanceof Tank) && entity.hasWorkingMisc(MiscType.F_COMMAND_CONSOLE)) {
-            if ((techOfficer == null) || (techOfficer.getHits() > 0)) {
+            if ((techOfficer == null) || (techOfficer.getTotalInjurySeverity() > 0)) {
                 ((Tank) entity).setUsingConsoleCommander(true);
             }
         }
@@ -5934,7 +5934,7 @@ public class Unit implements ITechnology, ILocatable {
         entity.getCrew().setGender(person.getGender(), slot);
         entity.getCrew().setClanPilot(person.isClanPersonnel(), slot);
         entity.getCrew().setPortrait(person.getPortrait().clone(), slot);
-        entity.getCrew().setHits(person.getHits(), slot);
+        entity.getCrew().setHits(person.getTotalInjurySeverity(), slot);
         int gunnery = 7;
         int artillery = 7;
         int piloting = 8;
@@ -6921,7 +6921,7 @@ public class Unit implements ITechnology, ILocatable {
     public List<Person> getActiveCrew() {
         List<Person> crew = new ArrayList<>();
         for (Person p : drivers) {
-            if ((p.getHits() > 0) && ((entity instanceof Tank) || (entity instanceof Infantry))) {
+            if ((p.getTotalInjurySeverity() > 0) && ((entity instanceof Tank) || (entity instanceof Infantry))) {
                 continue;
             }
             crew.add(p);
@@ -6929,7 +6929,7 @@ public class Unit implements ITechnology, ILocatable {
 
         if (!usesSoloPilot() && !usesSoldiers()) {
             for (Person p : gunners) {
-                if ((p.getHits() > 0) && ((entity instanceof Tank) || (entity instanceof Infantry))) {
+                if ((p.getTotalInjurySeverity() > 0) && ((entity instanceof Tank) || (entity instanceof Infantry))) {
                     continue;
                 }
                 crew.add(p);

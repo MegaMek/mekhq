@@ -53,6 +53,7 @@ import megamek.client.generator.RandomCallsignGenerator;
 import megamek.logging.MMLogger;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
+import mekhq.campaign.campaignOptions.CampaignOption;
 import mekhq.campaign.events.persons.PersonChangedEvent;
 import mekhq.campaign.finances.Money;
 import mekhq.campaign.finances.enums.TransactionType;
@@ -60,7 +61,6 @@ import mekhq.campaign.personnel.enums.BloodmarkLevel;
 import mekhq.campaign.personnel.enums.PersonnelStatus;
 import mekhq.campaign.personnel.medical.InjurySPAUtility;
 import mekhq.campaign.personnel.medical.advancedMedical.InjuryUtil;
-import mekhq.campaign.campaignOptions.CampaignOption;
 
 /**
  * Handles Bloodmark-related logic for characters, including assassination attempt scheduling and execution.
@@ -379,7 +379,7 @@ public class Bloodmark {
         } else {
             int currentWounds = person.getHits();
             int newWounds = currentWounds + wounds;
-            if (newWounds >= 6) {
+            if (newWounds >= DEATH) {
                 newWounds = 6;
                 person.changeStatus(campaign, today, PersonnelStatus.HOMICIDE);
             }

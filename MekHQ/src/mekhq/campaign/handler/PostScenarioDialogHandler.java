@@ -158,9 +158,9 @@ public class PostScenarioDialogHandler {
                 int injuryCount = 0;
 
                 if (!person.getStatus().isDead() || campaign.getCampaignOptions().get(CampaignOption.ISSUE_POSTHUMOUS_AWARDS)) {
-                    if (status.getHits() > person.getHitsPrior()) {
-                        injuryCount = status.getHits() - person.getHitsPrior();
-                    }
+                    // status.getHits() is cumulative and includes any injury severity the person deployed with, so
+                    // we use the hits recorded for this scenario alone.
+                    injuryCount = status.getNewHits();
                 }
 
                 personnel.put(personId, injuryCount);
