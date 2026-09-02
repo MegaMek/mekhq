@@ -50,32 +50,18 @@ import megamek.client.ui.preferences.JTablePreference;
 import megamek.client.ui.preferences.JWindowPreference;
 import megamek.client.ui.preferences.PreferencesNode;
 import megamek.common.enums.TechBase;
-import megamek.common.equipment.MiscType;
-import megamek.common.equipment.WeaponType;
 import megamek.common.rolls.TargetRoll;
 import megamek.common.ui.FastJScrollPane;
 import megamek.logging.MMLogger;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
-import mekhq.campaign.parts.*;
-import mekhq.campaign.parts.equipment.EquipmentPart;
-import mekhq.campaign.parts.kfs.KFBoom;
-import mekhq.campaign.parts.meks.MekActuator;
-import mekhq.campaign.parts.meks.MekCockpit;
-import mekhq.campaign.parts.meks.MekGyro;
-import mekhq.campaign.parts.meks.MekLifeSupport;
-import mekhq.campaign.parts.meks.MekLocation;
-import mekhq.campaign.parts.meks.MekSensor;
-import mekhq.campaign.parts.protomeks.ProtoMekArmActuator;
-import mekhq.campaign.parts.protomeks.ProtoMekJumpJet;
-import mekhq.campaign.parts.protomeks.ProtoMekLegActuator;
-import mekhq.campaign.parts.protomeks.ProtoMekLocation;
-import mekhq.campaign.parts.protomeks.ProtoMekSensor;
+import mekhq.campaign.campaignOptions.CampaignOption;
+import mekhq.campaign.parts.Part;
 import mekhq.gui.CampaignGUI;
+import mekhq.gui.model.PartsFilterGroup;
 import mekhq.gui.model.PartsStoreModel;
 import mekhq.gui.model.PartsStoreModel.PartProxy;
 import mekhq.gui.sorter.PartsDetailSorter;
-import mekhq.campaign.campaignOptions.CampaignOption;
 
 /**
  * @author Taharqa
@@ -84,23 +70,6 @@ public class PartsStoreDialog extends JDialog {
     private static final MMLogger LOGGER = MMLogger.create(PartsStoreDialog.class);
 
     // region Variable Declarations
-    // parts filter groups
-    private static final int SG_ALL = 0;
-    private static final int SG_ARMOR = 1;
-    private static final int SG_SYSTEM = 2;
-    private static final int SG_EQUIP = 3;
-    private static final int SG_LOC = 4;
-    private static final int SG_WEAPON = 5;
-    private static final int SG_AMMO = 6;
-    private static final int SG_MISC = 7;
-    private static final int SG_ENGINE = 8;
-    private static final int SG_GYRO = 9;
-    private static final int SG_ACT = 10;
-    private static final int SG_COCKPIT = 11;
-    private static final int SG_BA_SUIT = 12;
-    private static final int SG_OMNI_POD = 13;
-    private static final int SG_NUM = 14;
-
     private final Campaign campaign;
     private final CampaignGUI campaignGUI;
     private final PartsStoreModel partsModel;
@@ -165,8 +134,8 @@ public class PartsStoreDialog extends JDialog {
         JPanel panFilter = new JPanel();
         JLabel lblPartsChoice = new JLabel(resourceMap.getString("lblPartsChoice.text"));
         DefaultComboBoxModel<String> partsGroupModel = new DefaultComboBoxModel<>();
-        for (int i = 0; i < SG_NUM; i++) {
-            partsGroupModel.addElement(getPartsGroupName(i));
+        for (PartsFilterGroup group : PartsFilterGroup.values()) {
+            partsGroupModel.addElement(group.getGroupName());
         }
         choiceParts = new JComboBox<>(partsGroupModel);
         choiceParts.setName("choiceParts");
@@ -434,56 +403,7 @@ public class PartsStoreDialog extends JDialog {
                     return false;
                 }
 
-                if (nGroup == SG_ALL) {
-                    return true;
-                } else if (nGroup == SG_ARMOR) {
-                    return part instanceof Armor; // ProtoMekAmor and BAArmor are derived from Armor
-                } else if (nGroup == SG_SYSTEM) {
-                    return (part instanceof MekLifeSupport) ||
-                                 (part instanceof MekSensor) ||
-                                 (part instanceof LandingGear) ||
-                                 (part instanceof Avionics) ||
-                                 (part instanceof FireControlSystem) ||
-                                 (part instanceof AeroSensor) ||
-                                 (part instanceof KFBoom) ||
-                                 (part instanceof DropshipDockingCollar) ||
-                                 (part instanceof JumpshipDockingCollar) ||
-                                 (part instanceof BayDoor) ||
-                                 (part instanceof Cubicle) ||
-                                 (part instanceof GravDeck) ||
-                                 (part instanceof VeeSensor) ||
-                                 (part instanceof VeeStabilizer) ||
-                                 (part instanceof ProtoMekSensor);
-                } else if (nGroup == SG_EQUIP) {
-                    return (part instanceof EquipmentPart) || (part instanceof ProtoMekJumpJet);
-                } else if (nGroup == SG_LOC) {
-                    return (part instanceof MekLocation) ||
-                                 (part instanceof TankLocation) ||
-                                 (part instanceof ProtoMekLocation);
-                } else if (nGroup == SG_WEAPON) {
-                    return (part instanceof EquipmentPart) && (((EquipmentPart) part).getType() instanceof WeaponType);
-                } else if (nGroup == SG_AMMO) {
-                    return part instanceof AmmoStorage;
-                } else if (nGroup == SG_MISC) {
-                    return ((part instanceof EquipmentPart) && (((EquipmentPart) part).getType() instanceof MiscType) ||
-                                  (part instanceof ProtoMekJumpJet));
-                } else if (nGroup == SG_ENGINE) {
-                    return part instanceof EnginePart;
-                } else if (nGroup == SG_GYRO) {
-                    return part instanceof MekGyro;
-                } else if (nGroup == SG_ACT) {
-                    return ((part instanceof MekActuator) ||
-                                  (part instanceof ProtoMekArmActuator) ||
-                                  (part instanceof ProtoMekLegActuator));
-                } else if (nGroup == SG_COCKPIT) {
-                    return part instanceof MekCockpit;
-                } else if (nGroup == SG_BA_SUIT) {
-                    return part instanceof BattleArmorSuit;
-                } else if (nGroup == SG_OMNI_POD) {
-                    return part instanceof OmniPod;
-                } else {
-                    return false;
-                }
+                return PartsFilterGroup.matches(nGroup, part);
             }
         };
         partsSorter.setRowFilter(partsTypeFilter);
@@ -519,25 +439,5 @@ public class PartsStoreDialog extends JDialog {
 
     public Part getPart() {
         return selectedPart;
-    }
-
-    public static String getPartsGroupName(int group) {
-        return switch (group) {
-            case SG_ALL -> "All Parts";
-            case SG_ARMOR -> "Armor";
-            case SG_SYSTEM -> "System Components";
-            case SG_EQUIP -> "Equipment";
-            case SG_LOC -> "Locations";
-            case SG_WEAPON -> "Weapons";
-            case SG_AMMO -> "Ammunition";
-            case SG_MISC -> "Miscellaneous Equipment";
-            case SG_ENGINE -> "Engines";
-            case SG_GYRO -> "Gyros";
-            case SG_ACT -> "Actuators";
-            case SG_COCKPIT -> "Cockpits";
-            case SG_BA_SUIT -> "Battle Armor Suits";
-            case SG_OMNI_POD -> "Empty OmniPods";
-            default -> "?";
-        };
     }
 }

@@ -56,8 +56,6 @@ import megamek.client.ui.preferences.JComboBoxPreference;
 import megamek.client.ui.preferences.JTablePreference;
 import megamek.client.ui.preferences.PreferencesNode;
 import megamek.client.ui.util.UIUtil;
-import megamek.common.equipment.MiscType;
-import megamek.common.equipment.WeaponType;
 import megamek.common.event.Subscribe;
 import megamek.common.rolls.TargetRoll;
 import megamek.common.ui.FastJScrollPane;
@@ -80,18 +78,8 @@ import mekhq.campaign.events.units.UnitRemovedEvent;
 import mekhq.campaign.location.ILocation;
 import mekhq.campaign.location.LocationUtils;
 import mekhq.campaign.market.PartsInUseManager;
-import mekhq.campaign.parts.AmmoStorage;
-import mekhq.campaign.parts.Armor;
-import mekhq.campaign.parts.EnginePart;
 import mekhq.campaign.parts.Part;
 import mekhq.campaign.parts.PartInUse;
-import mekhq.campaign.parts.TankLocation;
-import mekhq.campaign.parts.equipment.EquipmentPart;
-import mekhq.campaign.parts.meks.MekActuator;
-import mekhq.campaign.parts.meks.MekGyro;
-import mekhq.campaign.parts.meks.MekLifeSupport;
-import mekhq.campaign.parts.meks.MekLocation;
-import mekhq.campaign.parts.meks.MekSensor;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.skills.Skill;
 import mekhq.campaign.personnel.skills.SkillModifierData;
@@ -105,6 +93,7 @@ import mekhq.gui.dialog.MRMSDialog;
 import mekhq.gui.dialog.PartsReportDialog;
 import mekhq.gui.enums.MHQTabType;
 import mekhq.gui.model.LocationFilterItem;
+import mekhq.gui.model.PartsFilterGroup;
 import mekhq.gui.model.PartsTableModel;
 import mekhq.gui.model.TechTableModel;
 import mekhq.gui.panels.TutorialHyperlinkPanel;
@@ -120,21 +109,6 @@ import mekhq.service.enums.MRMSMode;
 public final class WarehouseTab extends CampaignGuiTab implements ITechWorkPanel {
     private static final MMLogger LOGGER = MMLogger.create(WarehouseTab.class);
     private static final String RESOURCE_BUNDLE = "mekhq.resources.CampaignGUI";
-
-    // parts filter groups
-    private static final int SG_ALL = 0;
-    private static final int SG_ARMOR = 1;
-    private static final int SG_SYSTEM = 2;
-    private static final int SG_EQUIP = 3;
-    private static final int SG_LOC = 4;
-    private static final int SG_WEAPON = 5;
-    private static final int SG_AMMO = 6;
-    private static final int SG_MISC = 7;
-    private static final int SG_ENGINE = 8;
-    private static final int SG_GYRO = 9;
-    private static final int SG_ACT = 10;
-    private static final int SG_ARMOR_KIT = 11;
-    private static final int SG_NUM = 12;
 
     // parts views
     private static final int SV_ALL = 0;
@@ -211,8 +185,8 @@ public final class WarehouseTab extends CampaignGuiTab implements ITechWorkPanel
         panSupplies.add(new JLabel(resourceMap.getString("lblPartsChoice.text")), gridBagConstraints);
 
         DefaultComboBoxModel<String> partsGroupModel = new DefaultComboBoxModel<>();
-        for (int i = 0; i < SG_NUM; i++) {
-            partsGroupModel.addElement(getPartsGroupName(i));
+        for (PartsFilterGroup group : PartsFilterGroup.values()) {
+            partsGroupModel.addElement(group.getGroupName());
         }
         choiceParts = new JComboBox<>(partsGroupModel);
         choiceParts.setSelectedIndex(0);
@@ -542,40 +516,10 @@ public final class WarehouseTab extends CampaignGuiTab implements ITechWorkPanel
             public boolean include(Entry<? extends PartsTableModel, ? extends Integer> entry) {
                 PartsTableModel partsModel = entry.getModel();
                 Part part = partsModel.getPartAt(entry.getIdentifier());
-                boolean inGroup = false;
                 boolean inView = false;
 
                 // Check grouping
-                if (nGroup == SG_ALL) {
-                    inGroup = true;
-                } else if (nGroup == SG_ARMOR) {
-                    inGroup = (part instanceof Armor); // ProtoMekArmor and BAArmor are derived from Armor
-                } else if (nGroup == SG_SYSTEM) {
-                    inGroup = part instanceof MekGyro ||
-                                    part instanceof EnginePart ||
-                                    part instanceof MekActuator ||
-                                    part instanceof MekLifeSupport ||
-                                    part instanceof MekSensor;
-                } else if (nGroup == SG_EQUIP) {
-                    inGroup = part instanceof EquipmentPart;
-                } else if (nGroup == SG_LOC) {
-                    inGroup = part instanceof MekLocation || part instanceof TankLocation;
-                } else if (nGroup == SG_WEAPON) {
-                    inGroup = part instanceof EquipmentPart && ((EquipmentPart) part).getType() instanceof WeaponType;
-                } else if (nGroup == SG_AMMO) {
-                    inGroup = part instanceof AmmoStorage;
-                } else if (nGroup == SG_MISC) {
-                    inGroup = part instanceof EquipmentPart && ((EquipmentPart) part).getType() instanceof MiscType;
-                } else if (nGroup == SG_ENGINE) {
-                    inGroup = part instanceof EnginePart;
-                } else if (nGroup == SG_GYRO) {
-                    inGroup = part instanceof MekGyro;
-                } else if (nGroup == SG_ACT) {
-                    inGroup = part instanceof MekActuator;
-                } else if (nGroup == SG_ARMOR_KIT) {
-                    inGroup = part instanceof EquipmentPart
-                                    && ((EquipmentPart) part).getType().hasFlag(MiscType.F_ARMOR_KIT);
-                }
+                boolean inGroup = PartsFilterGroup.matches(nGroup, part);
 
                 // Check view
                 if (nGroupView == SV_ALL) {
@@ -603,24 +547,6 @@ public final class WarehouseTab extends CampaignGuiTab implements ITechWorkPanel
             }
         };
         partsSorter.setRowFilter(partsTypeFilter);
-    }
-
-    public static String getPartsGroupName(int group) {
-        return switch (group) {
-            case SG_ALL -> "All Parts";
-            case SG_ARMOR -> "Armor";
-            case SG_SYSTEM -> "System Components";
-            case SG_EQUIP -> "Equipment";
-            case SG_LOC -> "Locations";
-            case SG_WEAPON -> "Weapons";
-            case SG_AMMO -> "Ammunition";
-            case SG_MISC -> "Miscellaneous Equipment";
-            case SG_ENGINE -> "Engines";
-            case SG_GYRO -> "Gyros";
-            case SG_ACT -> "Actuators";
-            case SG_ARMOR_KIT -> "Armor Kits";
-            default -> "?";
-        };
     }
 
     public static String getPartsGroupViewName(int view) {

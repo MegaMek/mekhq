@@ -407,9 +407,9 @@ public final class ArmorKitIssuer {
         }
     }
 
-    private static int drawKits(LocalWarehouse warehouse, EquipmentType kit, int wanted) {
+    private static void drawKits(LocalWarehouse warehouse, EquipmentType kit, int wanted) {
         if (warehouse == null) {
-            return 0;
+            return;
         }
         int drawn = 0;
         while (drawn < wanted) {
@@ -420,7 +420,6 @@ public final class ArmorKitIssuer {
             warehouse.removePart(inStock, 1);
             drawn++;
         }
-        return drawn;
     }
 
     /**

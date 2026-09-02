@@ -176,18 +176,6 @@ public final class ArmorKitCatalog {
         return names;
     }
 
-    public static List<String> allKitInternalNames() {
-        List<String> names = new ArrayList<>();
-        names.add(DEFAULT_ARMOR_KIT_NAME);
-        for (EquipmentType kit : CrewArmorKitRules.availableArmorKits()) {
-            String internalName = kit.getInternalName();
-            if (!DEFAULT_ARMOR_KIT_NAME.equals(internalName)) {
-                names.add(internalName);
-            }
-        }
-        return names;
-    }
-
     public static List<EquipmentType> availableKits(Category category) {
         List<EquipmentType> result = new ArrayList<>();
         for (EquipmentType kit : CrewArmorKitRules.availableArmorKits()) {
