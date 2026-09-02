@@ -103,7 +103,7 @@ class ArmorKitCatalogTest {
               KIT_AEROSPACE_PILOT,
               KIT_SNOWSUIT,
               KIT_FLAK_STANDARD,
-              KIT_SNOWSUIT,
+              KIT_TANKERS_SMOCK,
               KIT_HEAT_SUIT,
               KIT_ENVIRONMENT_SUIT_LIGHT,
               DEFAULT_ARMOR_KIT_NAME)) {
@@ -133,7 +133,7 @@ class ArmorKitCatalogTest {
         Set<String> names = availableNames(Category.INFANTRY);
         assertTrue(names.contains(KIT_SNOWSUIT));
         assertTrue(names.contains(KIT_FLAK_STANDARD));
-        assertTrue(names.contains("Snowsuit"));
+        assertTrue(names.contains(KIT_SNOWSUIT));
         assertFalse(names.contains(KIT_MEKWARRIOR_BASIC));
         assertFalse(names.contains(KIT_AEROSPACE_PILOT));
     }
@@ -202,8 +202,8 @@ class ArmorKitCatalogTest {
     }
 
     @Test
-    void npcTankersTakeTheKIT_SNOWSUITAndPilotsTheAeroKit() {
-        assertEquals(KIT_SNOWSUIT, npcKitFor(new Tank(), false, 3067));
+    void npcTankersTakeTheSmockAndPilotsTheAeroKit() {
+        assertEquals(KIT_TANKERS_SMOCK, npcKitFor(new Tank(), false, 3067));
         assertEquals(KIT_AEROSPACE_PILOT, npcKitFor(new ConvFighter(), false, 3067));
     }
 
