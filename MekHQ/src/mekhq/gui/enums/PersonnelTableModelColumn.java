@@ -69,6 +69,7 @@ import mekhq.campaign.personnel.enums.PersonnelRole;
 import mekhq.campaign.personnel.enums.PersonnelStatus;
 import mekhq.campaign.personnel.enums.education.EducationLevel;
 import mekhq.campaign.personnel.familyTree.Genealogy;
+import mekhq.campaign.personnel.quartermaster.ArmorKitCatalog;
 import mekhq.campaign.personnel.skills.InfantryGunnerySkills;
 import mekhq.campaign.personnel.skills.ScoutingSkills;
 import mekhq.campaign.personnel.skills.Skill;
@@ -430,7 +431,11 @@ public enum PersonnelTableModelColumn implements MHQTableColumn {
     EXTENDED_FAMILY("Column.EXTENDED_FAMILY.title", Comparators.INT_COMPARATOR,
           person -> person.getGenealogy().getChildren().size(), Object::toString),
     TOTAL_RELATIVES("Column.TOTAL_RELATIVES.title", Comparators.INT_COMPARATOR,
-          person -> getImmediateFamilySize(person) + getExtendedFamilySize(person), Object::toString);
+          person -> getImmediateFamilySize(person) + getExtendedFamilySize(person), Object::toString),
+    ARMOR_KIT("Column.ARMOR_KIT.title", Comparators.NATURAL_ORDER_STRING_COMPARATOR,
+          PersonnelTableModelColumn::getArmorKit),
+    ARMOR_KIT_INTENDED("Column.ARMOR_KIT_INTENDED.title", Comparators.NATURAL_ORDER_STRING_COMPARATOR,
+          PersonnelTableModelColumn::getIntendedArmorKit);
 
     private static final String RESOURCE_BUNDLE = "mekhq.resources.PersonnelTable";
 
@@ -854,6 +859,39 @@ public enum PersonnelTableModelColumn implements MHQTableColumn {
     }
 
     /**
+     * The personal armor kit a person is wearing. Kit-ineligible personnel (foot infantry, battle armor, support, and
+     * civilians) show "N/A" rather than a value they can never carry; eligible crew show their current kit, with the
+     * default coveralls displayed as "None".
+     */
+    private static String getArmorKit(Person person) {
+        if (!ArmorKitCatalog.canBeIssuedKit(person)) {
+            return MHQInternationalization.getText("NA.text");
+        }
+        return armorKitDisplayName(person.getArmorKitName());
+    }
+
+    /**
+     * The armor kit a person is awaiting from a pending order, if any. Displays "-" when nothing is on order.
+     */
+    private static String getIntendedArmorKit(Person person) {
+        return armorKitDisplayName(person.getIntendedArmorKitName());
+    }
+
+    /**
+     * Renders an armor kit internal name for display: coveralls (the no-protection default) reads as "None", an absent
+     * kit as "-", and every other kit by its own name.
+     */
+    private static String armorKitDisplayName(@Nullable String internalName) {
+        if (internalName == null) {
+            return "-";
+        }
+        if (ArmorKitCatalog.DEFAULT_ARMOR_KIT_NAME.equals(internalName)) {
+            return getTextAt("Cell.ARMOR_KIT.none");
+        }
+        return internalName;
+    }
+
+    /**
      * Returns the tooltip text for this column, optionally including color reason explanations.
      *
      * @param person             the person for this row
@@ -950,7 +988,7 @@ public enum PersonnelTableModelColumn implements MHQTableColumn {
             case SKILL_LEVEL -> 45;
             case PERSONNEL_ROLE -> 120;
             case UNIT_ASSIGNMENT -> 140;
-            case ORIGIN -> 160;
+            case ORIGIN, ARMOR_KIT, ARMOR_KIT_INTENDED -> 160;
             case TECH_UNIT_ASSIGNMENT -> 280;
             default -> null;
         };
