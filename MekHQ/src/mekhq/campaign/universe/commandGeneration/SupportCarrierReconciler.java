@@ -73,11 +73,13 @@ import mekhq.campaign.universe.commandGeneration.SupportPersonnelToTOE.SupportSe
  *
  * <p><b>Cost.</b> Every entry point opens with a guard that rejects the common case in a handful of field reads with
  * no allocation and no iteration; the first test alone rejects everyone already crewing anything. The shape comparison
- * is a sort of a few unit names. A rebuild moves everyone in one profession, but it happens once per boundary - every
- * full squad, and the point where a remainder becomes a platoon - so a bulk hire of a hundred re-packs a handful of
- * times, not a hundred. Nothing here runs on the daily tick, and no index or cache is kept - the answer is derived
- * from the live object graph each time, which both avoids a new serialization surface and removes any possibility of
- * the cache going stale.</p>
+ * is a sort of a few unit names. Because the packer sizes the tail squad exactly, that shape changes on most hires
+ * while a squad is filling - so a reshape must be cheap, and it is: only carriers whose name is no longer wanted are
+ * touched, and only their crew move. Growing by one swaps at most the tail squad and moves at most six people; the
+ * platoons holding most of the profession are never rebuilt. The one expensive step is promotion, when a remainder
+ * becomes a platoon and roughly a platoon's worth of people move once. Nothing here runs on the daily tick, and no
+ * index or cache is kept - the answer is derived from the live object graph each time, which both avoids a new
+ * serialization surface and removes any possibility of the cache going stale.</p>
  *
  * @author Illiani
  * @since 0.51.0
@@ -323,7 +325,9 @@ public final class SupportCarrierReconciler {
 
         if (!shapesMatch(carriers, ideal)) {
             repack(campaign, profession, carriers, ideal, supportCommand);
-            return;
+            // The newcomer held no seat, so the reshape did not move them. The shape was sized for them, though, so
+            // a seat exists in the refreshed set.
+            carriers = carriersOf(campaign, supportCommand, profession);
         }
 
         for (Unit carrier : carriers) {
@@ -382,13 +386,19 @@ public final class SupportCarrierReconciler {
     }
 
     /**
-     * Rebuilds a profession's carriers to match {@code ideal}, moving everyone across.
+     * Reshapes a profession's carriers to match {@code ideal}, touching as little as possible.
      *
-     * <p>New carriers are built and filed first, each seating its crew as generation does. Only then is everyone removed
-     * from the old carriers. {@link Unit#remove} clears a character's unit only when it still points at the unit being
-     * left, so seating in the new carrier first means nobody is unit-less mid-move; and the old carriers empty out
-     * after the new ones already sit in the formation, so the crew event that removes each emptied carrier finds its
-     * formation still occupied and leaves it standing.</p>
+     * <p>The packer's output is used for its <em>shape</em> - which carrier names, how many of each - not for who sits
+     * where. Every existing carrier whose name is still wanted is kept with its crew untouched; only the mismatches are
+     * created or destroyed, and only the crew of a destroyed carrier move, into whatever free seats the kept and new
+     * carriers offer, platoons first. So growing a profession by one person swaps at most the tail squad and moves at
+     * most six people, and the platoons that hold most of the profession never churn.</p>
+     *
+     * <p>Order matters for the events this fires. New carriers are built empty and filed before anything moves, so the
+     * formation is never empty when old carriers go. Displaced crew are seated in their new carrier <em>before</em>
+     * being removed from the old one: {@link Unit#remove} clears a character's unit only when it still points at the
+     * unit being left, so nobody is unit-less mid-move. The crew event that follows each removal deletes the emptied
+     * carrier and finds its formation still occupied.</p>
      */
     private static void repack(Campaign campaign, PersonnelRole profession, List<Unit> oldCarriers,
           List<SupportPersonnelToTOE.CarrierSpec> ideal, Formation supportCommand) {
@@ -413,34 +423,91 @@ public final class SupportCarrierReconciler {
             }
         }
 
-        int built = 0;
-        int seated = 0;
+        // Pair each wanted carrier name with an existing carrier of that name. What is left over on the ideal side
+        // must be built; what is left over on the existing side must go.
+        List<Unit> unmatched = new ArrayList<>(oldCarriers);
+        List<Unit> kept = new ArrayList<>();
+        List<SupportPersonnelToTOE.CarrierSpec> toBuild = new ArrayList<>();
         for (SupportPersonnelToTOE.CarrierSpec spec : ideal) {
-            Unit carrier = SupportPersonnelToTOE.createCarrierUnit(campaign, spec);
+            Unit match = null;
+            for (Unit candidate : unmatched) {
+                if (spec.unitName().equals(candidate.getEntity().getShortNameRaw())) {
+                    match = candidate;
+                    break;
+                }
+            }
+            if (match != null) {
+                unmatched.remove(match);
+                kept.add(match);
+            } else {
+                toBuild.add(spec);
+            }
+        }
+        List<Unit> toDestroy = unmatched;
+
+        // Build the new carriers empty. Filing them before anything moves keeps the formation occupied throughout.
+        List<Unit> built = new ArrayList<>();
+        for (SupportPersonnelToTOE.CarrierSpec spec : toBuild) {
+            SupportPersonnelToTOE.CarrierSpec empty = new SupportPersonnelToTOE.CarrierSpec(spec.unitName(),
+                  List.of(), spec.topTier(), spec.professionLabel());
+            Unit carrier = SupportPersonnelToTOE.createCarrierUnit(campaign, empty);
             if (carrier == null) {
-                LOGGER.warn("Could not build a support carrier for {}; {} people stay in their old carriers",
-                      spec.unitName(), spec.crew().size());
-                continue;
+                LOGGER.warn("Could not build a support carrier {}; the profession keeps its current shape",
+                      spec.unitName());
+                return;
             }
             campaign.getPlayerForce().addUnitToFormation(carrier, parent.getId(), campaign);
-            built++;
-            seated += carrier.getCrew().size();
+            built.add(carrier);
         }
 
+        // Everyone whose carrier is going away needs a seat. Platoons first, so fill order matches generation.
+        List<Person> displaced = new ArrayList<>();
+        for (Unit doomed : toDestroy) {
+            displaced.addAll(doomed.getCrew());
+        }
+        List<Unit> targets = new ArrayList<>(kept);
+        targets.addAll(built);
+        targets.sort((first, second) -> Integer.compare(second.getFullCrewSize(), first.getFullCrewSize()));
+
         int moved = 0;
-        for (Unit old : oldCarriers) {
-            for (Person member : new ArrayList<>(old.getCrew())) {
-                if (member.getUnit() != old) {
-                    // Already seated in a new carrier; this just drops the stale membership.
-                    old.remove(member, false);
-                    moved++;
+        for (Person member : displaced) {
+            Unit target = firstWithSeat(targets, member);
+            if (target == null) {
+                LOGGER.warn("No seat for {} after reshaping {} carriers; they stay where they are",
+                      member.getFullName(), profession);
+                continue;
+            }
+            SupportPersonnelToTOE.ensureInfantrySkill(member);
+            target.addPilotOrSoldier(member, member.getUnit(), true);
+            moved++;
+        }
+
+        // Now drop the stale memberships. Anyone still pointing at a doomed carrier could not be reseated and is left.
+        for (Unit doomed : toDestroy) {
+            for (Person member : new ArrayList<>(doomed.getCrew())) {
+                if (member.getUnit() != doomed) {
+                    doomed.remove(member, false);
                 }
             }
         }
 
-        LOGGER.info("Re-packed {} carriers for {}: {} old -> {} new, {} seated, {} moved",
-              profession.getLabel(campaign.getPlayerForce().isClanForce()), profession, oldCarriers.size(), built,
-              seated, moved);
+        LOGGER.info("Re-packed {} carriers: kept {}, built {}, removed {}, moved {} people",
+              profession.getLabel(campaign.getPlayerForce().isClanForce()), kept.size(), built.size(),
+              toDestroy.size(), moved);
+    }
+
+    /** The first carrier with a free seat that the character can actually reach. */
+    private static @Nullable Unit firstWithSeat(List<Unit> carriers, Person person) {
+        for (Unit carrier : carriers) {
+            if (carrier.getTotalCrewSize() >= carrier.getFullCrewSize()) {
+                continue;
+            }
+            if (!LocationUtils.areSameEffectiveLocation(carrier, person)) {
+                continue;
+            }
+            return carrier;
+        }
+        return null;
     }
 
     /** Whether the carriers that exist are, by name and count, the carriers the packer wants. */

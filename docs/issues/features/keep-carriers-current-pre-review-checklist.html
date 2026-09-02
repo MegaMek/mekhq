@@ -99,7 +99,7 @@
     <p class="standfirst">Sixteen checks, roughly 45 minutes. The unit tests cover the guards and the release path; everything here covers what they cannot &mdash; seating against real TOE state, the two new persisted fields, and the deployment block.</p>
     <div class="meta-strip">
       <span class="chip">Branch: Implement-Keep-Carriers-Current</span>
-      <span class="chip">Commit 72101e5204</span>
+      <span class="chip">Commit 27c964e952</span>
       <span class="chip">~45 min</span>
     </div>
   </header>
@@ -248,7 +248,7 @@
         <div><span class="k">Do</span> Keep hiring that same role until every carrier of it is full, then hire one more.</div>
         <div class="expect">
           <span class="k">Expect</span>
-          <span>The profession is re-packed to what generation would build for the new total, under the same profession formation, and the newcomer is in it. Subsequent hires fill free seats until the next boundary. Log: one <code>Re-packed</code> line, then <code>Seated</code> lines for the follow-on hires.</span>
+          <span>The profession is re-packed to what generation would build for the new total, under the same profession formation, and the newcomer is in it. Log: a <code>Re-packed</code> line with <code>built 1</code> and a small <code>moved</code>, followed by a <code>Seated</code> line for the newcomer.</span>
           <span class="fail">Fails if: a carrier is created per recruit, or the new one lands outside the profession formation.</span>
         </div>
       </div>
@@ -266,8 +266,8 @@
         <div><span class="k">Do</span> Take a profession sitting at, say, 10 people in a <code>Support Squad (7 person)</code> plus a <code>Support Squad (3 person)</code>. Hire 32 more of that role in one bulk hire.</div>
         <div class="expect">
           <span class="k">Expect</span>
-          <span>42 people is exactly what generation would pack as one <code>Support Platoon (28 person)</code> plus two <code>Support Squad (7 person)</code> &mdash; so that is what the TOE shows at the end, and the 7+3 that were there are gone. Intermediate shapes along the way are fine; the final one must match. Log: several <code>Re-packed ... carriers</code> lines (one per packing boundary crossed, not one per hire), <code>Removing empty support carrier</code> for each replaced unit, and <code>Seated</code> lines between boundaries.</span>
-          <span class="fail">Fails if: the final shape is not 28 + 7 + 7, the old 3-person unit survives, the profession formation is deleted mid-rebuild, or there is one <code>Re-packed</code> line per hire (that would mean the shape check is not gating the rebuild).</span>
+          <span>42 people is exactly what generation would pack as one <code>Support Platoon (28 person)</code> plus two <code>Support Squad (7 person)</code> &mdash; so that is what the TOE shows at the end, and the 7+3 that were there are gone. Intermediate shapes along the way are fine; the final one must match. Log: a <code>Re-packed ... kept K, built B, removed R, moved M</code> line on most hires while the tail squad is filling &mdash; that is expected, the tail squad file changes size &mdash; but <strong>moved</strong> must stay small (at most six) on every one of them except the single promotion to a platoon, where about 25 move once. <code>kept</code> should equal the number of platoons already there.</span>
+          <span class="fail">Fails if: the final shape is not 28 + 7 + 7, the old 3-person unit survives, the profession formation is deleted mid-rebuild, or any <code>Re-packed</code> line reports <code>moved</code> in the dozens outside the platoon promotion &mdash; that means the platoons are being rebuilt instead of kept.</span>
         </div>
       </div>
     </div>
@@ -283,7 +283,7 @@
         <div><span class="k">Do</span> The issue #9880 repro: bulk hire 100 administrators in one go, then look at the TOE and the log.</div>
         <div class="expect">
           <span class="k">Expect</span>
-          <span>All 100 end up seated. Carrier count grows by roughly one per seven people, and no carrier holds more than its capacity. The hire completes without a visible stall. Log: a handful of <code>Re-packed</code> lines, one per packing boundary crossed, with <code>Seated</code> lines between them &mdash; if you see anywhere near 100 <code>Re-packed</code> lines, the shape check is not gating the rebuild.</span>
+          <span>All 100 end up seated. Carrier count grows by roughly one per seven people, and no carrier holds more than its capacity. The hire completes without a visible stall. Log: <code>Re-packed</code> lines on many of the hires are fine; what matters is that <code>kept</code> counts the existing platoons and <code>moved</code> stays under seven except at each platoon promotion. If <code>moved</code> is in the hundreds, whole platoons are being rebuilt.</span>
           <span class="fail">Fails if: the UI hangs, a carrier is overfilled, or 100 carriers appear.</span>
         </div>
       </div>
@@ -422,7 +422,7 @@
           <thead><tr><th>Look for</th><th>Means</th><th>Checks</th></tr></thead>
           <tbody>
             <tr><td><code>Seated NAME in support carrier UNIT (n/m)</code></td><td>Filled a free seat in an existing carrier</td><td>06, 09, 10, 13</td></tr>
-            <tr><td><code>Re-packed LABEL carriers for ROLE: n old -&gt; m new, x seated, y moved</code></td><td>The profession crossed a packing boundary and was rebuilt to what generation would make</td><td>07, 08, 09, 12</td></tr>
+            <tr><td><code>Re-packed LABEL carriers: kept K, built B, removed R, moved M people</code></td><td>The shape generation wants changed; only the mismatched carriers were touched. <code>moved</code> is the cost &mdash; small except at a platoon promotion</td><td>07, 08, 09, 12</td></tr>
             <tr><td><code>Could not seat NAME: no LABEL carrier with a free seat at their location</code></td><td>Shape is right but every free seat is at another base; retried on their next event</td><td>bases only</td></tr>
             <tr><td><code>Releasing NAME from carrier UNIT: no longer carried by this profession</code></td><td>Retrained out of a support role</td><td>11</td></tr>
             <tr><td><code>Removing empty support carrier UNIT</code></td><td>Last crew member left</td><td>08, 12</td></tr>
@@ -430,7 +430,7 @@
             <tr><td><code>Marked N pre-existing support carrier(s) during load</code></td><td>Migration recognised an older save&#39;s carriers</td><td>04</td></tr>
             <tr><td><code>Support carrier reconciliation: seated N, released N</code></td><td>The load sweep ran; always written, even at 0/0</td><td>04, 05</td></tr>
             <tr><td><code>Support carrier reconciliation: no Support Command formation, so carriers are not managed</code></td><td>Campaign never opted in; reconciler stays out</td><td>16</td></tr>
-            <tr><td><code>Could not build a support carrier for UNIT; n people stay in their old carriers</code></td><td>WARN &mdash; a carrier unit failed to load mid re-pack; nothing was moved for it</td><td>any</td></tr>
+            <tr><td><code>Could not build a support carrier UNIT; the profession keeps its current shape</code></td><td>WARN &mdash; a carrier unit failed to load; the reshape was abandoned before anything moved</td><td>any</td></tr>
             <tr><td>Any <code>ERROR</code> naming a support or carrier class</td><td>Stop and capture it</td><td>any</td></tr>
           </tbody>
         </table>
@@ -451,7 +451,7 @@
   </section>
 
   <footer>
-    <span>Feature branch <span class="path">Implement-Keep-Carriers-Current</span>, commit <span class="path">72101e5204</span>. Companion to the implementation plan and the support-carriers design note.</span>
+    <span>Feature branch <span class="path">Implement-Keep-Carriers-Current</span>, commit <span class="path">27c964e952</span>. Companion to the implementation plan and the support-carriers design note.</span>
     <span>Ticks are remembered in this browser only, so you can close the page between sessions.</span>
   </footer>
 
