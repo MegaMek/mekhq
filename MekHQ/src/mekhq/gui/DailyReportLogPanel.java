@@ -124,7 +124,14 @@ public class DailyReportLogPanel extends JPanel {
         SwingUtilities.invokeLater(() -> logPanel.getVerticalScrollBar().setValue(0));
     }
 
-    public void refreshLog(final String text, DailyReportType type) {
+    /**
+     * Re-renders the panel to show {@code text} in full. This is a redraw only: it deliberately does <em>not</em> raise
+     * a daily-report nag, because a full refresh (e.g. rebuilding the panel after a load, on a {@code NewDayEvent}, or
+     * when mirroring content into a preview dialog) is not new content arriving — it is the same reports being redrawn,
+     * and nagging here re-flashes tabs the player has already seen. Nags are raised only for genuinely new content, by
+     * {@link #appendLog(List, DailyReportType)} against its delta.
+     */
+    public void refreshLog(final String text) {
         if (text.equals(getLogText())) {
             return;
         }
@@ -141,11 +148,6 @@ public class DailyReportLogPanel extends JPanel {
         getTxtLog().setDocument(blank);
         getTxtLog().setCaretPosition(blank.getLength());
 
-        // If there is only one line in the log, it means it's just the date header, so we don't want to alert the
-        // player for no reason
-        if (!isDateOnly(List.of(text))) {
-            getGUI().checkDailyLogNag(type);
-        }
         SwingUtilities.invokeLater(() -> logPanel.getVerticalScrollBar().setValue(0));
     }
 
@@ -156,21 +158,22 @@ public class DailyReportLogPanel extends JPanel {
         }
 
         if (getLogText().isBlank()) {
-            refreshLog(addedText, type);
-            return;
+            refreshLog(addedText);
+        } else {
+            final HTMLDocument doc = (HTMLDocument) getTxtLog().getDocument();
+            try {
+                // Element 0 is <head>, Element 1 is <body>
+                doc.insertBeforeEnd(doc.getDefaultRootElement().getElement(1).getElement(0), addedText);
+                setLogText(getLogText() + addedText);
+            } catch (Exception ignored) {
+
+            }
+            getTxtLog().setCaretPosition(doc.getLength());
         }
 
-        final HTMLDocument doc = (HTMLDocument) getTxtLog().getDocument();
-        try {
-            // Element 0 is <head>, Element 1 is <body>
-            doc.insertBeforeEnd(doc.getDefaultRootElement().getElement(1).getElement(0), addedText);
-            setLogText(getLogText() + addedText);
-        } catch (Exception ignored) {
-
-        }
-        getTxtLog().setCaretPosition(doc.getLength());
-
-        // We only want to nag the player if there is something of value. So no nag occurs if we're just adding the date
+        // We only want to nag the player if there is something of value in the newly-added lines. So no nag occurs if
+        // we're just adding the date. This is checked against the delta (newReports), never the full body, so a redraw
+        // of already-seen content cannot flash a tab.
         if (!isDateOnly(newReports)) {
             getGUI().checkDailyLogNag(type);
         }
