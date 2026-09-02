@@ -65,16 +65,33 @@ import mekhq.campaign.universe.commandGeneration.SupportPersonnelToTOE.SupportSe
  * leave, capture and the rest need no work here. The one exception this class handles is retraining <em>out</em> of a
  * support role, which changes no status and so leaves the character sitting in a carrier they no longer belong in.</p>
  *
+ * <p><b>Mirror generation.</b> A profession's carriers are always the carriers {@link SupportPersonnelToTOE#packPool}
+ * would build for that many people, using the faction's echelon - so 42 Inner Sphere administrators are one platoon
+ * and two squads whether they were generated together or hired over a year. Each arrival and departure compares the
+ * carriers that exist against what the packer wants for the new total; when they match, the person simply takes or
+ * vacates a seat, and only when a packing boundary is crossed is the profession rebuilt.</p>
+ *
  * <p><b>Cost.</b> Every entry point opens with a guard that rejects the common case in a handful of field reads with
- * no allocation and no iteration; the first test alone rejects everyone already crewing anything. Nothing here runs on
- * the daily tick, and no index or cache is kept - the answer is derived from the live object graph each time, which
- * both avoids a new serialization surface and removes any possibility of the cache going stale.</p>
+ * no allocation and no iteration; the first test alone rejects everyone already crewing anything. The shape comparison
+ * is a sort of a few unit names. A rebuild moves everyone in one profession, but it happens once per boundary - every
+ * full squad, and the point where a remainder becomes a platoon - so a bulk hire of a hundred re-packs a handful of
+ * times, not a hundred. Nothing here runs on the daily tick, and no index or cache is kept - the answer is derived
+ * from the live object graph each time, which both avoids a new serialization surface and removes any possibility of
+ * the cache going stale.</p>
  *
  * @author Illiani
  * @since 0.51.0
  */
 public final class SupportCarrierReconciler {
     private static final MMLogger LOGGER = MMLogger.create(SupportCarrierReconciler.class);
+
+    /**
+     * Set while a re-pack is in progress. Seating and removing crew during a re-pack fires the same crew events this
+     * class subscribes to, and without this flag each of those would see a profession mid-rebuild - old and new
+     * carriers both present - and start another re-pack from inside the first. Campaign mutation is single-threaded
+     * on the EDT, so a plain static is sufficient.
+     */
+    private static boolean repacking = false;
 
     private SupportCarrierReconciler() {
         // utility class
@@ -92,6 +109,10 @@ public final class SupportCarrierReconciler {
      */
     public static void seatIfEligible(@Nullable Campaign campaign, @Nullable Person person) {
         if ((campaign == null) || (person == null)) {
+            return;
+        }
+
+        if (repacking) {
             return;
         }
 
@@ -148,9 +169,10 @@ public final class SupportCarrierReconciler {
      * Removes a carrier that has lost its last crew member, and the profession formation it leaves behind if that
      * formation is now empty too.
      *
-     * <p>Deliberately does only the cheap case. A mass-casualty event fires one crew-assignment event per character, so
-     * this must stay proportional to a single unit; rebalancing across carriers belongs on the arrival path, where the
-     * section is being walked anyway.</p>
+     * <p>A departure that leaves the carrier occupied re-checks the profession's shape against what generation would
+     * build, so shrinking mirrors generation as growth does. That check is one name comparison unless a packing
+     * boundary was crossed, so a mass-casualty event re-packs a profession a few times at most rather than once per
+     * casualty.</p>
      *
      * @param campaign the campaign that owns the TOE
      * @param unit     the unit whose crew changed
@@ -161,6 +183,9 @@ public final class SupportCarrierReconciler {
         }
 
         if (!unit.getCrew().isEmpty()) {
+            if (!repacking) {
+                repackIfMisshapen(campaign, unit);
+            }
             return;
         }
 
@@ -270,23 +295,39 @@ public final class SupportCarrierReconciler {
     }
 
     /**
-     * Puts the character in the first carrier of their profession with a free seat, or builds a new carrier when none
-     * has room.
+     * Seats a character, keeping the profession's carriers shaped exactly as generation would shape them.
+     *
+     * <p>The rule is "mirror generation": the carriers for a profession are whatever {@link SupportPersonnelToTOE#packPool}
+     * would build for that many people, using the faction's echelon. So the check is a comparison, not a search - pack
+     * the profession's current crew plus the newcomer, and compare the carrier names the packer wants against the
+     * carrier names that exist. When they match, the newcomer takes a free seat and nothing else moves. When they
+     * differ, the profession is re-packed.</p>
+     *
+     * <p>Because a single arrival only changes the ideal shape at a boundary - every full squad, and the point where a
+     * remainder becomes a platoon - a bulk hire re-packs a handful of times, not once per person.</p>
      */
     private static void seat(Campaign campaign, Person person, Formation supportCommand) {
         PersonnelRole profession = person.getPrimaryRole();
+        List<Unit> carriers = carriersOf(campaign, supportCommand, profession);
+
+        List<Person> people = new ArrayList<>();
+        for (Unit carrier : carriers) {
+            people.addAll(carrier.getCrew());
+        }
+        people.add(person);
+
         boolean isClan = campaign.getPlayerForce().isClanForce();
         EchelonProfile profile = isClan ? SupportPersonnelToTOE.clanProfile() : SupportPersonnelToTOE.innerSphereProfile();
+        String label = profession.getLabel(isClan);
+        List<SupportPersonnelToTOE.CarrierSpec> ideal = SupportPersonnelToTOE.packPool(people, profile, label);
 
-        Unit sibling = null;
-        Unit partialSquad = null;
+        if (!shapesMatch(carriers, ideal)) {
+            repack(campaign, profession, carriers, ideal, supportCommand);
+            return;
+        }
 
-        for (UUID unitId : supportCommand.getAllUnits(false)) {
-            Unit carrier = campaign.getUnit(unitId);
-            if ((carrier == null) || !carrier.isCarrier()) {
-                continue;
-            }
-            if (professionOf(carrier) != profession) {
+        for (Unit carrier : carriers) {
+            if (carrier.getTotalCrewSize() >= carrier.getFullCrewSize()) {
                 continue;
             }
             // Checked rather than left to the assignment, which writes a campaign report on every rejection. Only
@@ -294,114 +335,145 @@ public final class SupportCarrierReconciler {
             if (!LocationUtils.areSameEffectiveLocation(carrier, person)) {
                 continue;
             }
-
-            // Remembered even when full: a sibling tells us which formation a new carrier of this profession belongs
-            // under, without having to match on a localized formation name.
-            sibling = carrier;
-
-            if (carrier.getTotalCrewSize() < carrier.getFullCrewSize()) {
-                SupportPersonnelToTOE.ensureInfantrySkill(person);
-                carrier.addPilotOrSoldier(person);
-                LOGGER.info("Seated {} in support carrier {} ({}/{})", person.getFullName(), carrier.getName(),
-                      carrier.getTotalCrewSize(), carrier.getFullCrewSize());
-                return;
-            }
-
-            // A full carrier smaller than a full squad was built undersized at generation to fit a remainder. Now
-            // that the profession is growing it should be topped up to a full squad, not left as a tiny full unit
-            // beside a fresh one. Prefer the smallest such carrier so the fewest people move.
-            boolean isPartialSquad = carrier.getFullCrewSize() < profile.squadUnitSize();
-            if (isPartialSquad && ((partialSquad == null) || (carrier.getFullCrewSize() < partialSquad.getFullCrewSize()))) {
-                partialSquad = carrier;
-            }
-        }
-
-        if ((partialSquad != null) && upgradeAndSeat(campaign, partialSquad, person, profile)) {
+            SupportPersonnelToTOE.ensureInfantrySkill(person);
+            carrier.addPilotOrSoldier(person);
+            LOGGER.info("Seated {} in support carrier {} ({}/{})", person.getFullName(), carrier.getName(),
+                  carrier.getTotalCrewSize(), carrier.getFullCrewSize());
             return;
         }
 
-        createCarrierFor(campaign, person, supportCommand, sibling, profile);
+        // The shape is right but no seat could be taken - every free seat is at another location. Leave them loose;
+        // their next event tries again.
+        LOGGER.info("Could not seat {}: no {} carrier with a free seat at their location", person.getFullName(), label);
     }
 
     /**
-     * Replaces a full, undersized squad carrier with a full-size one, moving its crew across and seating the newcomer.
+     * Re-checks a profession's carrier shape after a departure, so shrinking mirrors generation as growth does.
      *
-     * <p>Generation builds a "Support Squad (2 person)" for a two-person remainder so the TOE does not show five empty
-     * seats. Once a third person of that profession arrives, the right container is a full squad holding all three,
-     * with room for the next four - not the two-seat unit kept beside a brand-new one.</p>
-     *
-     * <p>Order matters. Each crew member is seated in the bigger carrier <em>before</em> being removed from the small
-     * one: {@link Unit#remove} only clears a character's unit when it still points at the unit being left, so this
-     * sequence never leaves anyone unit-less mid-transfer, and the small carrier is still intact when the transfer is
-     * logged against it. When the last member leaves, the crew event removes the emptied small carrier; its formation
-     * survives because the bigger carrier already sits in it.</p>
-     *
-     * @return {@code true} if the newcomer was seated; {@code false} if the bigger carrier could not be built, in which
-     *       case nothing was moved
+     * <p>Guarded by the same shape comparison as arrival, so a departure that does not cross a packing boundary costs
+     * one comparison and nothing else. A mass-casualty event therefore re-packs a profession a few times at most.</p>
      */
-    private static boolean upgradeAndSeat(Campaign campaign, Unit small, Person person, EchelonProfile profile) {
-        boolean isClan = campaign.getPlayerForce().isClanForce();
-        String professionLabel = person.getPrimaryRole().getLabel(isClan);
-        Formation parent = campaign.getPlayerForce().getFormation(small.getFormationId());
+    private static void repackIfMisshapen(Campaign campaign, Unit carrier) {
+        PersonnelRole profession = professionOf(carrier);
+        if (profession == null) {
+            return;
+        }
+        Formation supportCommand = campaign.getPlayerForce().getSupportCommandFormation();
+        if (supportCommand == null) {
+            return;
+        }
 
-        SupportPersonnelToTOE.CarrierSpec spec = new SupportPersonnelToTOE.CarrierSpec(
-              profile.squadUnitNameFor(profile.squadUnitSize()), List.of(), false, professionLabel);
-        Unit bigger = SupportPersonnelToTOE.createCarrierUnit(campaign, spec);
-        if (bigger == null) {
+        List<Unit> carriers = carriersOf(campaign, supportCommand, profession);
+        List<Person> people = new ArrayList<>();
+        for (Unit existing : carriers) {
+            people.addAll(existing.getCrew());
+        }
+        if (people.isEmpty()) {
+            return;
+        }
+
+        boolean isClan = campaign.getPlayerForce().isClanForce();
+        EchelonProfile profile = isClan ? SupportPersonnelToTOE.clanProfile() : SupportPersonnelToTOE.innerSphereProfile();
+        List<SupportPersonnelToTOE.CarrierSpec> ideal = SupportPersonnelToTOE.packPool(people, profile,
+              profession.getLabel(isClan));
+        if (!shapesMatch(carriers, ideal)) {
+            repack(campaign, profession, carriers, ideal, supportCommand);
+        }
+    }
+
+    /**
+     * Rebuilds a profession's carriers to match {@code ideal}, moving everyone across.
+     *
+     * <p>New carriers are built and filed first, each seating its crew as generation does. Only then is everyone removed
+     * from the old carriers. {@link Unit#remove} clears a character's unit only when it still points at the unit being
+     * left, so seating in the new carrier first means nobody is unit-less mid-move; and the old carriers empty out
+     * after the new ones already sit in the formation, so the crew event that removes each emptied carrier finds its
+     * formation still occupied and leaves it standing.</p>
+     */
+    private static void repack(Campaign campaign, PersonnelRole profession, List<Unit> oldCarriers,
+          List<SupportPersonnelToTOE.CarrierSpec> ideal, Formation supportCommand) {
+        if (repacking) {
+            return;
+        }
+        repacking = true;
+        try {
+            repackUnguarded(campaign, profession, oldCarriers, ideal, supportCommand);
+        } finally {
+            repacking = false;
+        }
+    }
+
+    private static void repackUnguarded(Campaign campaign, PersonnelRole profession, List<Unit> oldCarriers,
+          List<SupportPersonnelToTOE.CarrierSpec> ideal, Formation supportCommand) {
+        Formation parent = supportCommand;
+        if (!oldCarriers.isEmpty()) {
+            Formation existing = campaign.getPlayerForce().getFormation(oldCarriers.get(0).getFormationId());
+            if (existing != null) {
+                parent = existing;
+            }
+        }
+
+        int built = 0;
+        int seated = 0;
+        for (SupportPersonnelToTOE.CarrierSpec spec : ideal) {
+            Unit carrier = SupportPersonnelToTOE.createCarrierUnit(campaign, spec);
+            if (carrier == null) {
+                LOGGER.warn("Could not build a support carrier for {}; {} people stay in their old carriers",
+                      spec.unitName(), spec.crew().size());
+                continue;
+            }
+            campaign.getPlayerForce().addUnitToFormation(carrier, parent.getId(), campaign);
+            built++;
+            seated += carrier.getCrew().size();
+        }
+
+        int moved = 0;
+        for (Unit old : oldCarriers) {
+            for (Person member : new ArrayList<>(old.getCrew())) {
+                if (member.getUnit() != old) {
+                    // Already seated in a new carrier; this just drops the stale membership.
+                    old.remove(member, false);
+                    moved++;
+                }
+            }
+        }
+
+        LOGGER.info("Re-packed {} carriers for {}: {} old -> {} new, {} seated, {} moved",
+              profession.getLabel(campaign.getPlayerForce().isClanForce()), profession, oldCarriers.size(), built,
+              seated, moved);
+    }
+
+    /** Whether the carriers that exist are, by name and count, the carriers the packer wants. */
+    private static boolean shapesMatch(List<Unit> carriers, List<SupportPersonnelToTOE.CarrierSpec> ideal) {
+        if (carriers.size() != ideal.size()) {
             return false;
         }
-        if (parent != null) {
-            campaign.getPlayerForce().addUnitToFormation(bigger, parent.getId(), campaign);
+        List<String> have = new ArrayList<>();
+        for (Unit carrier : carriers) {
+            have.add(carrier.getEntity().getShortNameRaw());
         }
-
-        List<Person> crew = new ArrayList<>(small.getCrew());
-        for (Person member : crew) {
-            SupportPersonnelToTOE.ensureInfantrySkill(member);
-            bigger.addPilotOrSoldier(member, small, true);
-            small.remove(member, false);
+        List<String> want = new ArrayList<>();
+        for (SupportPersonnelToTOE.CarrierSpec spec : ideal) {
+            want.add(spec.unitName());
         }
-
-        SupportPersonnelToTOE.ensureInfantrySkill(person);
-        bigger.addPilotOrSoldier(person);
-        LOGGER.info("Upgraded support carrier {} to {} for {} ({} moved, now {}/{})", small.getName(),
-              bigger.getName(), person.getFullName(), crew.size(), bigger.getTotalCrewSize(),
-              bigger.getFullCrewSize());
-        return true;
+        java.util.Collections.sort(have);
+        java.util.Collections.sort(want);
+        return have.equals(want);
     }
 
-    /**
-     * Builds a carrier for a character who could not be seated in an existing one.
-     *
-     * <p>A full-size squad is used rather than the top-tier platoon: it is the smallest carrier that still absorbs the
-     * hires that follow, so a growing campaign does not accumulate one tiny unit per recruit, and it wastes at most a
-     * squad's worth of seats. A force grown by hiring therefore ends up with more, smaller carriers than the same force
-     * would have had if generated in one go; squads are never promoted to platoons.</p>
-     */
-    private static void createCarrierFor(Campaign campaign, Person person, Formation supportCommand,
-          @Nullable Unit sibling, EchelonProfile profile) {
-        boolean isClan = campaign.getPlayerForce().isClanForce();
-        String professionLabel = person.getPrimaryRole().getLabel(isClan);
-
-        SupportPersonnelToTOE.CarrierSpec spec = new SupportPersonnelToTOE.CarrierSpec(profile.squadUnitNameFor(profile.squadUnitSize()),
-              List.of(person), false, professionLabel);
-
-        Unit carrier = SupportPersonnelToTOE.createCarrierUnit(campaign, spec);
-        if (carrier == null) {
-            LOGGER.warn("Could not build a support carrier for {}; they stay unfiled", person.getFullName());
-            return;
-        }
-
-        Formation parent = supportCommand;
-        if (sibling != null) {
-            Formation siblingFormation = campaign.getPlayerForce().getFormation(sibling.getFormationId());
-            if (siblingFormation != null) {
-                parent = siblingFormation;
+    /** The carriers under Support Command that hold this profession, in TOE order. */
+    private static List<Unit> carriersOf(Campaign campaign, Formation supportCommand, PersonnelRole profession) {
+        List<Unit> carriers = new ArrayList<>();
+        for (UUID unitId : supportCommand.getAllUnits(false)) {
+            Unit carrier = campaign.getUnit(unitId);
+            if ((carrier == null) || !carrier.isCarrier() || (carrier.getEntity() == null)) {
+                continue;
+            }
+            if (professionOf(carrier) == profession) {
+                carriers.add(carrier);
             }
         }
-
-        campaign.getPlayerForce().addUnitToFormation(carrier, parent.getId(), campaign);
-        LOGGER.info("Built support carrier {} for {} under {}", carrier.getName(), person.getFullName(),
-              parent.getName());
+        return carriers;
     }
 
     /**

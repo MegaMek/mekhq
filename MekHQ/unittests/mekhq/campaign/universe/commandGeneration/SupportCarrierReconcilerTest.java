@@ -246,6 +246,9 @@ class SupportCarrierReconcilerTest {
     @Test
     void onCarrierCrewChanged_carrierWithCrewIsKept() {
         Campaign campaign = mock(Campaign.class);
+        PlayerForce playerForce = mock(PlayerForce.class);
+        when(campaign.getPlayerForce()).thenReturn(playerForce);
+        when(playerForce.getSupportCommandFormation()).thenReturn(null);
         // Built before the stubbing below: creating a mock inside when(...) leaves the outer stubbing unfinished.
         Person crew = activePerson(PersonnelRole.MEK_TECH);
         Unit carrier = mock(Unit.class);
@@ -254,7 +257,9 @@ class SupportCarrierReconcilerTest {
 
         SupportCarrierReconciler.onCarrierCrewChanged(campaign, carrier);
 
+        // Still crewed, so not removed - and with no Support Command the departure-side re-pack check stays out too.
         verify(campaign, never()).removeUnit(any(UUID.class));
+        verify(playerForce, never()).isClanForce();
     }
 
     @Test
