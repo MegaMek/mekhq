@@ -34,16 +34,21 @@ package mekhq.campaign.market;
 
 import static mekhq.campaign.mission.resupplyAndCaches.Resupply.isProhibitedUnitType;
 
+import java.util.EnumMap;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
+import megamek.common.equipment.AmmoType;
 import megamek.common.equipment.EquipmentType;
 import megamek.common.equipment.MiscType;
 import megamek.common.equipment.WeaponType;
+import megamek.common.equipment.enums.BombType;
+import megamek.common.equipment.enums.BombType.BombTypeEnum;
 import megamek.common.units.Entity;
+import megamek.common.units.IBomber;
 import megamek.common.units.Mek;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.LocalWarehouse;
@@ -246,6 +251,9 @@ public class PartsInUseManager {
         } else if (part instanceof TankLocation) {
             return campaignOptions.get(CampaignOption.AUTO_LOGISTICS_NON_REPAIRABLE_LOCATION);
         } else if (part instanceof AmmoBin || part instanceof AmmoStorage) {
+            if (isBombPart(part)) {
+                return campaignOptions.get(CampaignOption.AUTO_LOGISTICS_BOMB);
+            }
             return campaignOptions.get(CampaignOption.AUTO_LOGISTICS_AMMUNITION);
         } else if (part instanceof Armor) {
             return campaignOptions.get(CampaignOption.AUTO_LOGISTICS_ARMOR);
@@ -380,6 +388,12 @@ public class PartsInUseManager {
                 partInUse.setUseCount(partInUse.getUseCount() + worn.getValue());
             }
         }
+        // Bombs loaded on aircraft leave the warehouse for the entity's loadout, so fold them in the same way.
+        for (Map.Entry<BombTypeEnum, Integer> loaded : loadedBombCounts(ignoreMothballedUnits).entrySet()) {
+            if (partInUse.equals(bombPartInUse(loaded.getKey()))) {
+                partInUse.setUseCount(partInUse.getUseCount() + loaded.getValue());
+            }
+        }
     }
 
     /**
@@ -484,6 +498,7 @@ public class PartsInUseManager {
         }
 
         addWornArmorKitsInUse(inUse, ignoreMothballedUnits);
+        addLoadedBombsInUse(inUse, ignoreMothballedUnits);
 
         return inUse.keySet()
                      .stream()
@@ -648,6 +663,91 @@ public class PartsInUseManager {
                 tracked = partInUse;
             }
             tracked.setUseCount(tracked.getUseCount() + worn.getValue());
+        }
+    }
+
+    /** Whether an ammo part holds bombs (external ordnance) rather than ordinary ammunition. */
+    private static boolean isBombPart(Part part) {
+        if (part instanceof AmmoStorage ammoStorage) {
+            return ammoStorage.getType() instanceof BombType;
+        }
+        if (part instanceof AmmoBin ammoBin) {
+            return ammoBin.getType() instanceof BombType;
+        }
+        return false;
+    }
+
+    /**
+     * The {@link PartInUse} record for a bomb type, built from a spare {@link AmmoStorage} template of that bomb so it
+     * matches the record the warehouse pass produces for the same bomb.
+     *
+     * @param bombType the bomb type
+     *
+     * @return the matching {@link PartInUse}, or {@code null} if the bomb type has no ammo equipment or isn't trackable
+     */
+    private PartInUse bombPartInUse(BombTypeEnum bombType) {
+        if ((bombType == null) || (bombType == BombTypeEnum.NONE)) {
+            return null;
+        }
+        if (!(EquipmentType.get(bombType.getInternalName()) instanceof AmmoType ammoType)) {
+            return null;
+        }
+        return getPartInUse(new AmmoStorage(0, ammoType, 1, campaign));
+    }
+
+    /**
+     * Counts the bombs currently loaded on aircraft at this place but not held as warehouse parts, keyed by bomb type.
+     * A loaded bomb has been drawn from stores into the entity's {@link megamek.common.equipment.BombLoadout}, so like
+     * a worn armor kit it is counted here rather than through the warehouse pass.
+     *
+     * <p>Aircraft honor the same mothballed and salvage exclusions the warehouse pass applies.</p>
+     *
+     * @param ignoreMothballedUnits if {@code true}, bombs on mothballed aircraft are excluded
+     *
+     * @return loaded-bomb counts by bomb type
+     */
+    private Map<BombTypeEnum, Integer> loadedBombCounts(boolean ignoreMothballedUnits) {
+        Map<BombTypeEnum, Integer> counts = new EnumMap<>(BombTypeEnum.class);
+        for (Unit unit : campaign.getUnits()) {
+            if (!(unit.getEntity() instanceof IBomber bomber) || (placeOf(unit) != place)) {
+                continue;
+            }
+            if ((ignoreMothballedUnits && unit.isMothballed()) || unit.isSalvage()) {
+                continue;
+            }
+            for (Map.Entry<BombTypeEnum, Integer> loaded : bomber.getBombChoices().entrySet()) {
+                BombTypeEnum bombType = loaded.getKey();
+                int count = loaded.getValue();
+                if ((bombType == null) || (bombType == BombTypeEnum.NONE) || (count <= 0)) {
+                    continue;
+                }
+                counts.merge(bombType, count, Integer::sum);
+            }
+        }
+        return counts;
+    }
+
+    /**
+     * Folds bombs loaded on aircraft into the parts-in-use map as use count, creating a record for any bomb type that
+     * has no warehouse stores (and so no record yet) with its requested stock resolved the same way the warehouse pass
+     * does.
+     */
+    private void addLoadedBombsInUse(Map<PartInUse, PartInUse> inUse, boolean ignoreMothballedUnits) {
+        for (Map.Entry<BombTypeEnum, Integer> loaded : loadedBombCounts(ignoreMothballedUnits).entrySet()) {
+            PartInUse partInUse = bombPartInUse(loaded.getKey());
+            if (partInUse == null) {
+                continue;
+            }
+            PartInUse tracked = inUse.get(partInUse);
+            if (tracked == null) {
+                String stockKey = getStockKey(partInUse);
+                if (partsInUseRequestedStockMap.containsKey(stockKey)) {
+                    partInUse.setRequestedStock(partsInUseRequestedStockMap.get(stockKey));
+                }
+                inUse.put(partInUse, partInUse);
+                tracked = partInUse;
+            }
+            tracked.setUseCount(tracked.getUseCount() + loaded.getValue());
         }
     }
 

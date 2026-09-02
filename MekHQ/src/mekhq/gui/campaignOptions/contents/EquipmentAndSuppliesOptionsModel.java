@@ -63,6 +63,7 @@ class EquipmentAndSuppliesOptionsModel {
     int autoLogisticsWeapons;
     int autoLogisticsOther;
     int autoLogisticsArmorKit;
+    int autoLogisticsBomb;
     int unitTransitTime;
     boolean noDeliveriesInTransit;
     boolean usePlanetaryAcquisition;
@@ -114,6 +115,7 @@ class EquipmentAndSuppliesOptionsModel {
         autoLogisticsWeapons = options.get(CampaignOption.AUTO_LOGISTICS_WEAPONS);
         autoLogisticsOther = options.get(CampaignOption.AUTO_LOGISTICS_OTHER);
         autoLogisticsArmorKit = options.get(CampaignOption.AUTO_LOGISTICS_ARMOR_KIT);
+        autoLogisticsBomb = options.get(CampaignOption.AUTO_LOGISTICS_BOMB);
         unitTransitTime = options.get(CampaignOption.UNIT_TRANSIT_TIME);
         noDeliveriesInTransit = options.get(CampaignOption.NO_DELIVERIES_IN_TRANSIT);
         usePlanetaryAcquisition = options.get(CampaignOption.USE_PLANETARY_ACQUISITION);
@@ -182,6 +184,7 @@ class EquipmentAndSuppliesOptionsModel {
         options.set(CampaignOption.AUTO_LOGISTICS_WEAPONS, autoLogisticsWeapons);
         options.set(CampaignOption.AUTO_LOGISTICS_OTHER, autoLogisticsOther);
         options.set(CampaignOption.AUTO_LOGISTICS_ARMOR_KIT, autoLogisticsArmorKit);
+        options.set(CampaignOption.AUTO_LOGISTICS_BOMB, autoLogisticsBomb);
         options.set(CampaignOption.UNIT_TRANSIT_TIME, unitTransitTime);
         options.set(CampaignOption.NO_DELIVERIES_IN_TRANSIT, noDeliveriesInTransit);
         options.set(CampaignOption.USE_PLANETARY_ACQUISITION, usePlanetaryAcquisition);
