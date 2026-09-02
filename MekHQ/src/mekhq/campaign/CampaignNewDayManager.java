@@ -330,7 +330,51 @@ public class CampaignNewDayManager {
         // clear previous retirement information
         campaign.getTurnoverRetirementInformation().clear();
 
-        // Refill Automated Pools, if the options are selected.
+        // Ensure we don't have anything that would prevent the new day
+        if (MekHQ.triggerEvent(new DayEndingEvent(campaign))) {
+            return false;
+        }
+
+        // Autosave based on the previous day's information
+        campaign.getAutosaveService().requestDayAdvanceAutosave(campaign);
+
+        // Advance the day by one
+        final LocalDate yesterday = campaign.getLocalDate();
+        today = yesterday.plusDays(1);
+        campaign.setLocalDate(today);
+        boolean isMonday = today.getDayOfWeek() == DayOfWeek.MONDAY;
+        boolean isFirstOfMonth = today.getDayOfMonth() == 1;
+        boolean isNewYear = today.getDayOfYear() == 1;
+
+        // Check for important dates
+        if (campaignOptions.get(CampaignOption.SHOW_LIFE_EVENT_DIALOG_CELEBRATIONS)) {
+            fetchCelebrationDialogs();
+        }
+
+        // Determine if we have an active contract or not, as campaign can get used
+        // elsewhere before we actually hit the AtB new day (e.g., personnel market)
+        if (campaignOptions.isUseStratCon()) {
+            campaign.setHasActiveContract();
+        }
+
+        // Clear the previous day's reports and their tab nags together, then write today's date header. Everything that
+        // posts reports for the new day (including the pool refills below) runs after this point, so its content lands
+        // in today's freshly-started log and can raise a genuine nag; nothing posts before the clear, so no stale nag
+        // can survive to flash a tab that only shows the date line.
+        campaign.getDailyReportLog().clear();
+
+        CommandCenterTab commandCenter = campaign.getGUI().getCommandCenterTab();
+        for (DailyReportType type : DailyReportType.values()) {
+            commandCenter.clearDailyReportNag(type);
+        }
+
+        campaign.beginReport("<b>" + MekHQ.getMHQOptions().getLongDisplayFormattedDate(today) + "</b>");
+
+        campaign.getPlayerForce().getHumanResources().getPersonnelWhoAdvancedInXP().clear();
+
+        // Refill automated personnel pools now that the new day has begun and its report header exists, so any
+        // hiring/firing these post lands in today's log under the date line (rather than being wiped by the
+        // clear above, as happened when this ran before the day was started).
         // When "no release" is also set, only hire to cover shortfalls (skip firing surplus).
         final MHQOptions mhqOptions = MekHQ.getMHQOptions();
         if (mhqOptions.getNewDayAsTechPoolFill()) {
@@ -460,49 +504,6 @@ public class CampaignNewDayManager {
                   .distributeTempCrewPoolToUnits(campaign, campaign.getCampaignOptions(),
                         PersonnelRole.VESSEL_CREW);
         }
-
-        // Ensure we don't have anything that would prevent the new day
-        if (MekHQ.triggerEvent(new DayEndingEvent(campaign))) {
-            return false;
-        }
-
-        // Autosave based on the previous day's information
-        campaign.getAutosaveService().requestDayAdvanceAutosave(campaign);
-
-        // Advance the day by one
-        final LocalDate yesterday = campaign.getLocalDate();
-        today = yesterday.plusDays(1);
-        campaign.setLocalDate(today);
-        boolean isMonday = today.getDayOfWeek() == DayOfWeek.MONDAY;
-        boolean isFirstOfMonth = today.getDayOfMonth() == 1;
-        boolean isNewYear = today.getDayOfYear() == 1;
-
-        // Check for important dates
-        if (campaignOptions.get(CampaignOption.SHOW_LIFE_EVENT_DIALOG_CELEBRATIONS)) {
-            fetchCelebrationDialogs();
-        }
-
-        // Determine if we have an active contract or not, as campaign can get used
-        // elsewhere before we actually hit the AtB new day (e.g., personnel market)
-        if (campaignOptions.isUseStratCon()) {
-            campaign.setHasActiveContract();
-        }
-
-        // Clear Reports. We also clear the daily report nags here, atomically with the report content: any report
-        // posted earlier in this newDay() (e.g. by pool refills that hire or fire) had its content wiped by the clear()
-        // below, so any nag it raised is stale. Clearing nags at the same moment leaves only genuine, post-beginReport
-        // reports able to flash a tab. (Doing this at the top of newDay() instead let those stale nags survive, so a
-        // tab would flash while showing only the date line.)
-        campaign.getDailyReportLog().clear();
-
-        CommandCenterTab commandCenter = campaign.getGUI().getCommandCenterTab();
-        for (DailyReportType type : DailyReportType.values()) {
-            commandCenter.clearDailyReportNag(type.getTabIndex());
-        }
-
-        campaign.beginReport("<b>" + MekHQ.getMHQOptions().getLongDisplayFormattedDate(today) + "</b>");
-
-        campaign.getPlayerForce().getHumanResources().getPersonnelWhoAdvancedInXP().clear();
 
         // New Year Changes
         if (isNewYear) {

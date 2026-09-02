@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2025 The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2025-2026 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -33,8 +33,6 @@
 package mekhq.campaign.enums;
 
 import static mekhq.utilities.MHQInternationalization.getTextAt;
-
-import megamek.common.annotations.Nullable;
 
 /**
  * Represents the various log categories available in the campaign interface.
@@ -128,18 +126,13 @@ public enum DailyReportType {
         return iconString;
     }
 
+    /**
+     * The tab's position when the log tabs are first built, in enum order. This is only a construction-time ordering
+     * hint; once the tabs exist the user may reorder or detach them, so never treat a live tab index as equal to this
+     * value. Resolve a tab's current position by identity instead (see {@code CommandCenterTab.getLogTabIndex}).
+     */
     public int getTabIndex() {
         return tabIndex;
-    }
-
-    public static @Nullable DailyReportType getTypeFromIndex(int tabIndex) {
-        for (DailyReportType type : DailyReportType.values()) {
-            if (tabIndex == type.getTabIndex()) {
-                return type;
-            }
-        }
-
-        return null;
     }
 }
 

@@ -89,6 +89,7 @@ import mekhq.gui.baseComponents.roundedComponents.RoundedLineBorder;
 import mekhq.gui.dialog.DateChooser;
 import mekhq.gui.displayWrappers.RankDisplay;
 import mekhq.gui.utilities.JSuggestField;
+import mekhq.gui.utilities.SkillLevelPickerUtility;
 
 /**
  * A GM-only editor for a single {@link AbstractContract} market offer. It surfaces essentially every field a game
@@ -730,7 +731,7 @@ public class ContractEditorDialog extends JDialog {
         employerDisplayNameField = new JTextField(orEmpty(contract.getEmployerDisplayName()), 24);
         rows.add(formRow("edit.contractMarket.field.displayName", employerDisplayNameField));
 
-        employerSkillCombo = enumCombo(SkillLevel.values(), contract.getEmployerForceSkill());
+        employerSkillCombo = forceSkillCombo(contract.getEmployerForceSkill());
         rows.add(formRow("edit.contractMarket.field.forceSkill", employerSkillCombo));
 
         employerEquipmentCombo = equipmentRatingCombo(contract.getEmployerEquipmentRating());
@@ -759,7 +760,7 @@ public class ContractEditorDialog extends JDialog {
         enemyDisplayNameField = new JTextField(orEmpty(contract.getEnemyDisplayName()), 24);
         rows.add(formRow("edit.contractMarket.field.displayName", enemyDisplayNameField));
 
-        enemySkillCombo = enumCombo(SkillLevel.values(), contract.getEnemyForceSkill());
+        enemySkillCombo = forceSkillCombo(contract.getEnemyForceSkill());
         rows.add(formRow("edit.contractMarket.field.forceSkill", enemySkillCombo));
 
         enemyEquipmentCombo = equipmentRatingCombo(contract.getEnemyEquipmentRating());
@@ -1218,7 +1219,8 @@ public class ContractEditorDialog extends JDialog {
               factionKey(employerAnchorCombo, employer == null ? null : employer.anchorFactionCode()),
               sponsorKey(employerSponsorCombo), text(employerDisplayNameField),
               employer == null ? null : employer.negotiator(), employer == null ? null : employer.liaison(),
-              enumValue(employerSkillCombo, SkillLevel.REGULAR), equipmentValue(employerEquipmentCombo),
+              SkillLevelPickerUtility.resolve(enumValue(employerSkillCombo, SkillLevel.REGULAR)),
+              equipmentValue(employerEquipmentCombo),
               employerCamouflage, enumValue(employerColorCombo, PlayerColour.BLUE)));
 
         // Enemy
@@ -1230,7 +1232,8 @@ public class ContractEditorDialog extends JDialog {
                                          : (enemy != null && enemy.batchallAccepted());
         contract.setEnemyData(new EnemyData(factionKey(enemyFactionCombo, contract.getEnemyFactionCode()),
               sponsorKey(enemySponsorCombo), text(enemyDisplayNameField),
-              enumValue(enemySkillCombo, SkillLevel.REGULAR), equipmentValue(enemyEquipmentCombo),
+              SkillLevelPickerUtility.resolve(enumValue(enemySkillCombo, SkillLevel.REGULAR)),
+              equipmentValue(enemyEquipmentCombo),
               enemy == null ? null : enemy.opposingCommander(), enemyCamouflage,
               enumValue(enemyColorCombo, PlayerColour.RED), batchallAccepted));
 
@@ -1561,6 +1564,17 @@ public class ContractEditorDialog extends JDialog {
     private static <E> JComboBox<E> enumCombo(E[] values, E selected) {
         JComboBox<E> combo = new JComboBox<>(new DefaultComboBoxModel<>(values));
         combo.setSelectedItem(selected);
+        return combo;
+    }
+
+    /**
+     * A force-skill picker offering the full Ultra-Green through Legendary range plus a "Random" entry (rendered from
+     * {@link SkillLevel#NONE}). The stored, concrete skill is shown on open; a Random selection is resolved to a single
+     * level when the edits are applied.
+     */
+    private static JComboBox<SkillLevel> forceSkillCombo(SkillLevel selected) {
+        JComboBox<SkillLevel> combo = enumCombo(SkillLevelPickerUtility.PICKER_LEVELS, selected);
+        SkillLevelPickerUtility.applyRandomRenderer(combo);
         return combo;
     }
 

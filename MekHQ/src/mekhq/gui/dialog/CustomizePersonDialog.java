@@ -2420,72 +2420,12 @@ public class CustomizePersonDialog extends JDialog implements DialogOptionListen
         final Phenotype newPhenotype = (Phenotype) choicePhenotype.getSelectedItem();
         if ((chkClan.isSelected()) || (Objects.requireNonNull(newPhenotype).isNone())) {
             if ((newPhenotype != null) && (newPhenotype != selectedPhenotype)) {
-                switch (selectedPhenotype) {
-                    case MEKWARRIOR:
-                        decreasePhenotypeBonus(SkillType.S_GUN_MEK);
-                        decreasePhenotypeBonus(SkillType.S_PILOT_MEK);
-                        break;
-                    case ELEMENTAL:
-                        decreasePhenotypeBonus(SkillType.S_GUN_BA);
-                        decreasePhenotypeBonus(SkillType.S_ANTI_MEK);
-                        break;
-                    case AEROSPACE:
-                        decreasePhenotypeBonus(SkillType.S_GUN_AERO);
-                        decreasePhenotypeBonus(SkillType.S_PILOT_AERO);
-                        decreasePhenotypeBonus(SkillType.S_GUN_JET);
-                        decreasePhenotypeBonus(SkillType.S_PILOT_JET);
-                        break;
-                    case VEHICLE:
-                        decreasePhenotypeBonus(SkillType.S_GUN_VEE);
-                        decreasePhenotypeBonus(SkillType.S_PILOT_GVEE);
-                        decreasePhenotypeBonus(SkillType.S_PILOT_NVEE);
-                        decreasePhenotypeBonus(SkillType.S_PILOT_VTOL);
-                        break;
-                    case PROTOMEK:
-                        decreasePhenotypeBonus(SkillType.S_GUN_PROTO);
-                        break;
-                    case NAVAL:
-                        decreasePhenotypeBonus(SkillType.S_TECH_VESSEL);
-                        decreasePhenotypeBonus(SkillType.S_GUN_SPACE);
-                        decreasePhenotypeBonus(SkillType.S_PILOT_SPACE);
-                        decreasePhenotypeBonus(SkillType.S_NAVIGATION);
-                        break;
-                    default:
-                        break;
+                for (String skillType : selectedPhenotype.getBonusSkills()) {
+                    decreasePhenotypeBonus(skillType);
                 }
 
-                switch (newPhenotype) {
-                    case MEKWARRIOR:
-                        increasePhenotypeBonus(SkillType.S_GUN_MEK);
-                        increasePhenotypeBonus(SkillType.S_PILOT_MEK);
-                        break;
-                    case ELEMENTAL:
-                        increasePhenotypeBonus(SkillType.S_GUN_BA);
-                        increasePhenotypeBonus(SkillType.S_ANTI_MEK);
-                        break;
-                    case AEROSPACE:
-                        increasePhenotypeBonus(SkillType.S_GUN_AERO);
-                        increasePhenotypeBonus(SkillType.S_PILOT_AERO);
-                        increasePhenotypeBonus(SkillType.S_GUN_JET);
-                        increasePhenotypeBonus(SkillType.S_PILOT_JET);
-                        break;
-                    case VEHICLE:
-                        increasePhenotypeBonus(SkillType.S_GUN_VEE);
-                        increasePhenotypeBonus(SkillType.S_PILOT_GVEE);
-                        increasePhenotypeBonus(SkillType.S_PILOT_NVEE);
-                        increasePhenotypeBonus(SkillType.S_PILOT_VTOL);
-                        break;
-                    case PROTOMEK:
-                        increasePhenotypeBonus(SkillType.S_GUN_PROTO);
-                        break;
-                    case NAVAL:
-                        increasePhenotypeBonus(SkillType.S_TECH_VESSEL);
-                        increasePhenotypeBonus(SkillType.S_GUN_SPACE);
-                        increasePhenotypeBonus(SkillType.S_PILOT_SPACE);
-                        increasePhenotypeBonus(SkillType.S_NAVIGATION);
-                        break;
-                    default:
-                        break;
+                for (String skillType : newPhenotype.getBonusSkills()) {
+                    increasePhenotypeBonus(skillType);
                 }
 
                 selectedPhenotype = newPhenotype;

@@ -34,6 +34,7 @@ package mekhq.gui.enums;
 
 import java.time.LocalDate;
 import java.util.Comparator;
+import java.util.Hashtable;
 import java.util.List;
 import java.util.function.BiFunction;
 import java.util.function.Function;
@@ -56,9 +57,11 @@ import mekhq.campaign.Campaign;
 import mekhq.campaign.campaignOptions.CampaignOption;
 import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.finances.Money;
+import mekhq.campaign.force.CombatTeam;
 import mekhq.campaign.force.Formation;
 import mekhq.campaign.market.PersonnelMarket;
 import mekhq.campaign.mission.scenarios.Scenario;
+import mekhq.campaign.mission.utilities.CombatRole;
 import mekhq.campaign.personnel.Injury;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.PersonnelOptions;
@@ -435,7 +438,9 @@ public enum PersonnelTableModelColumn implements MHQTableColumn {
     ARMOR_KIT("Column.ARMOR_KIT.title", Comparators.NATURAL_ORDER_STRING_COMPARATOR,
           PersonnelTableModelColumn::getArmorKit),
     ARMOR_KIT_INTENDED("Column.ARMOR_KIT_INTENDED.title", Comparators.NATURAL_ORDER_STRING_COMPARATOR,
-          PersonnelTableModelColumn::getIntendedArmorKit);
+          PersonnelTableModelColumn::getIntendedArmorKit),
+    COMBAT_ROLE("Column.COMBAT_ROLE.title", Comparators.NATURAL_ORDER_STRING_COMPARATOR,
+          PersonnelTableModelColumn::getCombatRole);
 
     private static final String RESOURCE_BUNDLE = "mekhq.resources.PersonnelTable";
 
@@ -892,6 +897,25 @@ public enum PersonnelTableModelColumn implements MHQTableColumn {
     }
 
     /**
+     * The combat role a person is assigned to: the {@link CombatRole} of the combat team their unit (or, for a tech,
+     * their maintained formation) belongs to. Walks up the TOE from the person's formation to the nearest ancestor that
+     * is a combat team and reports its role. People not in any active combat team show "-".
+     */
+    private static String getCombatRole(Person person, Campaign campaign) {
+        Formation formation = campaign.getPlayerForce().getFormationFor(person);
+        Hashtable<Integer, CombatTeam> combatTeams = campaign.getPlayerForce().getCombatTeamsMap();
+        while (formation != null) {
+            if (formation.isCombatTeam()) {
+                CombatTeam combatTeam = combatTeams.get(formation.getId());
+                CombatRole role = (combatTeam != null) ? combatTeam.getRole() : formation.getCombatRoleInMemory();
+                return role.toString();
+            }
+            formation = formation.getParentFormation();
+        }
+        return "-";
+    }
+
+    /**
      * Returns the tooltip text for this column, optionally including color reason explanations.
      *
      * @param person             the person for this row
@@ -990,6 +1014,7 @@ public enum PersonnelTableModelColumn implements MHQTableColumn {
             case UNIT_ASSIGNMENT -> 140;
             case ORIGIN, ARMOR_KIT, ARMOR_KIT_INTENDED -> 160;
             case TECH_UNIT_ASSIGNMENT -> 280;
+            case COMBAT_ROLE -> 100;
             default -> null;
         };
         return (preferredWidth == null) ? null : UIUtil.scaleForGUI(preferredWidth);

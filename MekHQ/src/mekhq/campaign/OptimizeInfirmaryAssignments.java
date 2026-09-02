@@ -35,8 +35,8 @@ package mekhq.campaign;
 import java.util.List;
 
 import mekhq.MekHQ;
-import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.campaignOptions.CampaignOption;
+import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.events.persons.PersonMedicalAssignmentEvent;
 import mekhq.campaign.personnel.Person;
 
@@ -210,13 +210,7 @@ public class OptimizeInfirmaryAssignments {
      * @return the severity score of the patient’s medical condition
      */
     private int getSeverity(Person patient) {
-        int severity = 0;
-
-        if (patient.needsAMFixing()) {
-            severity = patient.getInjuries().size(); // Severity based on number of injuries
-        } else if (patient.needsFixing()) {
-            severity = patient.getHits(); // Severity based on number of hits
-        }
+        int severity = patient.getNonPermanentInjurySeverity();
 
         if (patient.getPrisonerStatus().isFreeOrBondsman()) {
             severity *= 10; // Prioritize Non-Prisoners

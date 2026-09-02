@@ -43,22 +43,14 @@ import java.awt.Component;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
+import java.util.EnumMap;
+import java.util.EnumSet;
 import java.util.LinkedHashMap;
 import java.util.Map;
-import javax.swing.BorderFactory;
-import javax.swing.Box;
-import javax.swing.BoxLayout;
-import javax.swing.ButtonGroup;
-import javax.swing.DefaultListCellRenderer;
-import javax.swing.JComponent;
-import javax.swing.JLabel;
-import javax.swing.JList;
-import javax.swing.JPanel;
-import javax.swing.JRadioButton;
-import javax.swing.JSpinner;
-import javax.swing.SpinnerNumberModel;
+import javax.swing.*;
 
 import megamek.client.ui.comboBoxes.MMComboBox;
+import megamek.client.ui.util.UIUtil;
 import megamek.common.annotations.Nullable;
 import megamek.common.enums.NeuralInterfaceMode;
 import megamek.common.enums.SkillLevel;
@@ -77,6 +69,7 @@ import mekhq.gui.commandGeneration.components.CommandGenerationCheckBox;
 import mekhq.gui.commandGeneration.components.CommandGenerationLabel;
 import mekhq.gui.commandGeneration.components.CommandGenerationStandardPanel;
 import mekhq.gui.panels.RandomOriginOptionsPanel;
+import mekhq.gui.utilities.SkillLevelPickerUtility;
 
 /**
  * Pre-generation rules tab. Six titled sections, laid out across three rows:
@@ -117,24 +110,6 @@ public class SetupTab {
     private static final int BOTTOM_SLACK_ROW = 99;
 
     private static final int COVERAGE_SPINNER_DEFAULT = 100;
-
-    /**
-     * Skill-level options offered for support personnel. Five tiers — Ultra-Green through Elite.
-     * Heroic / Legendary are deliberately excluded since they're reserved for one-off Person
-     * customizations, not bulk generation.
-     */
-    // Skill-picker options: a leading null renders as "Random" (each person rolls their own level),
-    // followed by every fixed tier through Legendary.
-    private static final SkillLevel[] SUPPORT_SKILL_LEVELS = {
-          null,
-          SkillLevel.ULTRA_GREEN,
-          SkillLevel.GREEN,
-          SkillLevel.REGULAR,
-          SkillLevel.VETERAN,
-          SkillLevel.ELITE,
-          SkillLevel.HEROIC,
-          SkillLevel.LEGENDARY
-    };
 
     /**
      * Direction toggle for one slot of the Tech Assignment sort grid. Localized via the
@@ -854,8 +829,8 @@ public class SetupTab {
     }
 
     /**
-     * Builds a skill-level picker: the {@link #SUPPORT_SKILL_LEVELS} options (a leading {@code null}
-     * rendered as "Random", then Ultra-Green through Legendary) defaulted to Random. A {@code null}
+     * Builds a standardized skill-level picker: the shared {@link SkillLevelPickerUtility#PICKER_LEVELS} options
+     * ({@link SkillLevel#NONE} rendered as "Random", then Ultra-Green through Legendary) defaulted to Random. A NONE
      * selection tells the generator to roll each person's own level.
      *
      * @param name the component name (for preferences / test lookup)
@@ -863,20 +838,9 @@ public class SetupTab {
      * @return the configured combo box, defaulted to Random
      */
     private MMComboBox<SkillLevel> buildSkillLevelCombo(String name) {
-        MMComboBox<SkillLevel> combo = new MMComboBox<>(name, SUPPORT_SKILL_LEVELS);
-        final String randomLabel = getTextAt(getCommandGenerationResourceBundle(), "skillLevelRandom.text");
-        combo.setRenderer(new DefaultListCellRenderer() {
-            @Override
-            public Component getListCellRendererComponent(JList<?> list, Object value, int index,
-                  boolean isSelected, boolean cellHasFocus) {
-                super.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);
-                if (value == null) {
-                    setText(randomLabel);
-                }
-                return this;
-            }
-        });
-        combo.setSelectedItem(null);
+        MMComboBox<SkillLevel> combo = new MMComboBox<>(name, SkillLevelPickerUtility.PICKER_LEVELS);
+        SkillLevelPickerUtility.applyRandomRenderer(combo);
+        combo.setSelectedItem(SkillLevel.NONE);
         return combo;
     }
 
@@ -950,7 +914,7 @@ public class SetupTab {
             entry.getValue().setValue(percent == null ? COVERAGE_SPINNER_DEFAULT : percent);
         }
         for (Map.Entry<PersonnelRole, MMComboBox<SkillLevel>> entry : cmbSupportSkillLevels.entrySet()) {
-            // null selects the "Random" option.
+            // NONE selects the "Random" option.
             entry.getValue().setSelectedItem(sourceOptions.getSupportPersonnelSkillLevels().get(entry.getKey()));
         }
 
@@ -1083,14 +1047,14 @@ public class SetupTab {
         }
         Map<PersonnelRole, SkillLevel> skillMap = targetOptions.getSupportPersonnelSkillLevels();
         for (Map.Entry<PersonnelRole, MMComboBox<SkillLevel>> entry : cmbSupportSkillLevels.entrySet()) {
-            // A null selection is the "Random" option; store it as-is so the generator rolls per person.
+            // A NONE selection is the "Random" option; store it as-is so the generator rolls per person.
             skillMap.put(entry.getKey(), entry.getValue().getSelectedItem());
         }
 
         // Assistants
         targetOptions.setGenerateAstechs(chkGenerateAstechs.isSelected());
         targetOptions.setAstechsAsPersonnel(rdoAstechsAsPersonnel.isSelected());
-        // A null selection is the "Random" option; store it as-is.
+        // A NONE selection is the "Random" option; store it as-is.
         targetOptions.setAstechSkillLevel(cmbAstechSkillLevel.getSelectedItem());
         targetOptions.setGenerateMedics(chkGenerateMedics.isSelected());
         targetOptions.setMedicsAsPersonnel(rdoMedicsAsPersonnel.isSelected());
