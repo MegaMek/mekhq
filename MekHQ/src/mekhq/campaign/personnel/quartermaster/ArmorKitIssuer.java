@@ -455,6 +455,38 @@ public final class ArmorKitIssuer {
         }
     }
 
+    /**
+     * Equips every active player MekWarrior who is not already wearing the given kit with it, directly — a one-off
+     * convenience granted when the deployment requirement is first enabled, so the force is not immediately grounded.
+     * No stock is consumed and nothing is charged; the kit is simply set on each MekWarrior and pushed to their crew
+     * slot.
+     *
+     * @param campaign        the campaign whose player MekWarriors are equipped
+     * @param kitInternalName the internal name of the MekWarrior kit to issue
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    public static void equipAllMekWarriorsWithKit(Campaign campaign, String kitInternalName) {
+        if (EquipmentType.get(kitInternalName) == null) {
+            return;
+        }
+        int equipped = 0;
+        for (Person person : campaign.getPlayerForce().getPersonnel().values()) {
+            if (!person.getStatus().isActive()
+                      || (ArmorKitCatalog.categoryFor(person) != ArmorKitCatalog.Category.MEKWARRIOR)
+                      || kitInternalName.equals(person.getArmorKitName())) {
+                continue;
+            }
+            person.setArmorKitName(kitInternalName);
+            MekHQ.triggerEvent(new PersonChangedEvent(person));
+            if (person.getUnit() != null) {
+                person.getUnit().resetPilotAndEntity();
+            }
+            equipped++;
+        }
+    }
+
     private static String defaultKitFor(ArmorKitCatalog.Category category, Campaign campaign) {
         return switch (category) {
             case MEKWARRIOR -> campaign.getCampaignOptions().get(CampaignOption.MEKWARRIOR_DEFAULT_KIT);

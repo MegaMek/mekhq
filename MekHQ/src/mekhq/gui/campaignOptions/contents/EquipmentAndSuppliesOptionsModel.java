@@ -89,6 +89,7 @@ class EquipmentAndSuppliesOptionsModel {
     String aircraftDefaultKit;
     boolean addDefaultKitToProcurement;
     boolean npcFactionArmorKits;
+    boolean requireMekWarriorKitToDeploy;
 
     EquipmentAndSuppliesOptionsModel(@Nonnull CampaignOptions options) {
         acquisitionType = options.get(CampaignOption.ACQUISITIONS_TYPE);
@@ -138,6 +139,7 @@ class EquipmentAndSuppliesOptionsModel {
         aircraftDefaultKit = options.get(CampaignOption.AIRCRAFT_DEFAULT_KIT);
         addDefaultKitToProcurement = options.get(CampaignOption.ADD_DEFAULT_KIT_TO_PROCUREMENT);
         npcFactionArmorKits = options.get(CampaignOption.NPC_FACTION_ARMOR_KITS);
+        requireMekWarriorKitToDeploy = options.get(CampaignOption.REQUIRE_MEKWARRIOR_KIT_TO_DEPLOY);
         limitByYear = options.get(CampaignOption.LIMIT_BY_YEAR);
         disallowExtinctStuff = options.get(CampaignOption.DISALLOW_EXTINCT_STUFF);
         allowClanPurchases = options.get(CampaignOption.ALLOW_CLAN_PURCHASES);
@@ -158,6 +160,7 @@ class EquipmentAndSuppliesOptionsModel {
         options.set(CampaignOption.AIRCRAFT_DEFAULT_KIT, aircraftDefaultKit);
         options.set(CampaignOption.ADD_DEFAULT_KIT_TO_PROCUREMENT, addDefaultKitToProcurement);
         options.set(CampaignOption.NPC_FACTION_ARMOR_KITS, npcFactionArmorKits);
+        options.set(CampaignOption.REQUIRE_MEKWARRIOR_KIT_TO_DEPLOY, requireMekWarriorKitToDeploy);
         options.set(CampaignOption.ACQUISITION_PERSONNEL_CATEGORY, acquisitionPersonnelCategory);
         options.set(CampaignOption.CLAN_ACQUISITION_PENALTY, clanAcquisitionPenalty);
         options.set(CampaignOption.IS_ACQUISITION_PENALTY, isAcquisitionPenalty);

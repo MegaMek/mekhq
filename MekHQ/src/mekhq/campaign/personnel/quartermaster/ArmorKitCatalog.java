@@ -117,6 +117,21 @@ public final class ArmorKitCatalog {
         return Category.INFANTRY;
     }
 
+    /**
+     * Whether a kit is one of the three MekWarrior kits (Basic, Advanced, or Clan) — the kits a MekWarrior must wear to
+     * meet the deployment requirement.
+     *
+     * @param kitInternalName the internal name of the kit, or {@code null}
+     *
+     * @return {@code true} if the kit is a MekWarrior kit
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    public static boolean isMekWarriorKit(@Nullable String kitInternalName) {
+        return MEKWARRIOR_KITS.contains(kitInternalName);
+    }
+
     /** The fixed kit sets used by the campaign-options dropdowns. Soldiers have no dropdown, so an empty set. */
     private static Set<String> kitsFor(Category category) {
         return switch (category) {

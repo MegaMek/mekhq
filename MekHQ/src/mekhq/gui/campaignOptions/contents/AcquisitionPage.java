@@ -155,6 +155,7 @@ class AcquisitionPage {
     private MMComboBox<String> cboAircraftDefaultKit;
     private JCheckBox chkAddDefaultKitToProcurement;
     private JCheckBox chkNpcFactionArmorKits;
+    private JCheckBox chkRequireMekWarriorKitToDeploy;
 
     private boolean created;
 
@@ -325,6 +326,10 @@ class AcquisitionPage {
         chkNpcFactionArmorKits = new CampaignOptionsCheckBox("NpcFactionArmorKits", getMetadata(new Version(0, 51, 1)));
         chkNpcFactionArmorKits.addMouseListener(createTipPanelUpdater("NpcFactionArmorKits"));
 
+        chkRequireMekWarriorKitToDeploy = new CampaignOptionsCheckBox("RequireMekWarriorKitToDeploy",
+              getMetadata(new Version(0, 51, 1)));
+        chkRequireMekWarriorKitToDeploy.addMouseListener(createTipPanelUpdater("RequireMekWarriorKitToDeploy"));
+
         final SettingsFormPanel panel = new SettingsFormPanel("ArmorKitsPanel",
               acquisitionSectionLabelWidth,
               CONTROL_COLUMN_WIDTH);
@@ -333,6 +338,7 @@ class AcquisitionPage {
         panel.addRow(lblAircraftDefaultKit, cboAircraftDefaultKit);
         panel.addCheckBox(chkAddDefaultKitToProcurement);
         panel.addCheckBox(chkNpcFactionArmorKits);
+        panel.addCheckBox(chkRequireMekWarriorKitToDeploy);
 
         return panel;
     }
@@ -577,6 +583,7 @@ class AcquisitionPage {
         cboAircraftDefaultKit.setSelectedItem(model.aircraftDefaultKit);
         chkAddDefaultKitToProcurement.setSelected(model.addDefaultKitToProcurement);
         chkNpcFactionArmorKits.setSelected(model.npcFactionArmorKits);
+        chkRequireMekWarriorKitToDeploy.setSelected(model.requireMekWarriorKitToDeploy);
     }
 
     /**
@@ -617,5 +624,6 @@ class AcquisitionPage {
         model.aircraftDefaultKit = cboAircraftDefaultKit.getSelectedItem();
         model.addDefaultKitToProcurement = chkAddDefaultKitToProcurement.isSelected();
         model.npcFactionArmorKits = chkNpcFactionArmorKits.isSelected();
+        model.requireMekWarriorKitToDeploy = chkRequireMekWarriorKitToDeploy.isSelected();
     }
 }

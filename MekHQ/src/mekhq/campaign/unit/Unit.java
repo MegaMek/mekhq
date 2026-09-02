@@ -55,6 +55,7 @@ import static mekhq.campaign.parts.enums.PartQuality.QUALITY_E;
 import static mekhq.campaign.parts.enums.PartQuality.QUALITY_F;
 import static mekhq.campaign.unit.enums.TransporterType.*;
 import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
+import static mekhq.utilities.MHQInternationalization.getTextAt;
 import static mekhq.utilities.ReportingUtilities.CLOSING_SPAN_TAG;
 import static mekhq.utilities.ReportingUtilities.getWarningColor;
 import static mekhq.utilities.ReportingUtilities.spanOpeningWithCustomColor;
@@ -1415,6 +1416,16 @@ public class Unit implements ITechnology, ILocatable {
             for (int i = BattleArmor.LOC_TROOPER_1; i <= ((BattleArmor) entity).getSquadSize(); i++) {
                 if (entity.getInternal(i) == 0) {
                     return "This BattleArmor unit has empty suits. Fill them with pilots or salvage them.";
+                }
+            }
+        }
+        // When the campaign requires it, a Mek may not deploy unless every crew member wears one of the three
+        // MekWarrior kits (Basic, Advanced, or Clan): a MekWarrior without one is doesn't have a neurohelmet.
+        if ((entity instanceof Mek) &&
+                  getCampaign().getCampaignOptions().get(CampaignOption.REQUIRE_MEKWARRIOR_KIT_TO_DEPLOY)) {
+            for (Person crewMember : getCrew()) {
+                if (!ArmorKitCatalog.isMekWarriorKit(crewMember.getArmorKitName())) {
+                    return getTextAt(RESOURCE_BUNDLE, "Unit.checkDeployment.needsMekWarriorKit");
                 }
             }
         }
