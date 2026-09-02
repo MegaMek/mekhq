@@ -65,28 +65,28 @@ public final class ArmorKitCatalog {
      */
     public static final String DEFAULT_ARMOR_KIT_NAME = "Clothing, Fatigues/Civilian/Non-Armored";
 
-    private static final Set<String> MECHWARRIOR_KITS = Set.of("MechWarrior Combat Suit",
-          "MekWarrior Kit (Basic)",
-          "MekWarrior Kit (Advanced)",
-          "MekWarrior Kit (Clan)",
-          "MechWarrior Cooling Suit",
-          "MechWarrior Cooling Vest (Only)");
+    // The armor kits the catalog reasons about, by their MegaMek internal name.
+    public static final String KIT_MEKWARRIOR_BASIC = "MekWarrior Kit (Basic)";
+    public static final String KIT_MEKWARRIOR_ADVANCED = "MekWarrior Kit (Advanced)";
+    public static final String KIT_MEKWARRIOR_CLAN = "MekWarrior Kit (Clan)";
+    public static final String KIT_AEROSPACE_PILOT = "Aerospace Fighter Pilot Kit";
+    public static final String KIT_SNOWSUIT = "Snowsuit";
+    public static final String KIT_HEAT_SUIT = "Heat Suit";
+    public static final String KIT_TANKERS_SMOCK = "Tanker's Smock";
+    public static final String KIT_ENVIRONMENT_SUIT_LIGHT = "Environment Suit, Light";
+    public static final String KIT_FLAK_STANDARD = "Flak, Standard";
 
-    /**
-     * The MekWarrior kits the player may issue: the three graded kits. The combat suit and cooling gear are still
-     * MekWarrior kits for grouping (so other groups do not draw them), but are not offered as player choices.
-     */
-    private static final Set<String> MECHWARRIOR_ISSUABLE_KITS = Set.of("MekWarrior Kit (Basic)",
-          "MekWarrior Kit (Advanced)",
-          "MekWarrior Kit (Clan)");
+    private static final Set<String> MEKWARRIOR_KITS = Set.of(KIT_MEKWARRIOR_BASIC,
+          KIT_MEKWARRIOR_ADVANCED,
+          KIT_MEKWARRIOR_CLAN);
 
-    private static final Set<String> AEROSPACE_KITS = Set.of("Aerospace Fighter Pilot Kit");
+    private static final Set<String> AEROSPACE_KITS = Set.of(KIT_AEROSPACE_PILOT);
 
-    private static final Set<String> VEHICLE_KITS = Set.of("Snowsuit",
-          "Heat Suit",
-          "Tanker's Smock",
-          "Environment Suit, Light",
-          "Flak, Standard");
+    private static final Set<String> VEHICLE_KITS = Set.of(KIT_SNOWSUIT,
+          KIT_HEAT_SUIT,
+          KIT_TANKERS_SMOCK,
+          KIT_ENVIRONMENT_SUIT_LIGHT,
+          KIT_FLAK_STANDARD);
 
     /** The group a kit belongs to, deciding which crews may be issued it. */
     public enum Category {
@@ -108,7 +108,7 @@ public final class ArmorKitCatalog {
      * @since 0.51.01
      */
     public static Category categoryOf(@Nullable String kitInternalName) {
-        if (MECHWARRIOR_KITS.contains(kitInternalName)) {
+        if (MEKWARRIOR_KITS.contains(kitInternalName)) {
             return Category.MEKWARRIOR;
         }
         if (AEROSPACE_KITS.contains(kitInternalName)) {
@@ -120,7 +120,7 @@ public final class ArmorKitCatalog {
     /** The fixed kit sets used by the campaign-options dropdowns. Soldiers have no dropdown, so an empty set. */
     private static Set<String> kitsFor(Category category) {
         return switch (category) {
-            case MEKWARRIOR -> MECHWARRIOR_ISSUABLE_KITS;
+            case MEKWARRIOR -> MEKWARRIOR_KITS;
             case AIRCRAFT -> AEROSPACE_KITS;
             case INFANTRY -> VEHICLE_KITS;
             case SOLDIER -> Set.of();
@@ -130,34 +130,13 @@ public final class ArmorKitCatalog {
     /** Whether a kit belongs to a group's issuable list: fixed sets for the crews, every infantry kit for soldiers. */
     private static boolean isInCategory(String kitInternalName, Category category) {
         return switch (category) {
-            case MEKWARRIOR -> MECHWARRIOR_ISSUABLE_KITS.contains(kitInternalName);
+            case MEKWARRIOR -> MEKWARRIOR_KITS.contains(kitInternalName);
             case AIRCRAFT -> AEROSPACE_KITS.contains(kitInternalName);
             case INFANTRY -> VEHICLE_KITS.contains(kitInternalName);
-            case SOLDIER -> !MECHWARRIOR_KITS.contains(kitInternalName) && !AEROSPACE_KITS.contains(kitInternalName);
+            case SOLDIER -> !MEKWARRIOR_KITS.contains(kitInternalName) && !AEROSPACE_KITS.contains(kitInternalName);
         };
     }
 
-    /**
-     * Every kit in a group that can be had in the campaign's current year — the list a crew of that group may be
-     * issued from. The no-protection default is never listed, being issued rather than bought.
-     *
-     * @param category the group to list
-     * @param campaign the campaign, supplying the year and faction to gate availability against
-     *
-     * @return the available kits in that group, in the order MegaMek's tables hold them
-     *
-     * @author Illiani
-     * @since 0.51.01
-     */
-    /**
-     * The internal names of every armor kit, coveralls first, ungated by year or faction — the list a campaign-options
-     * default is chosen from.
-     *
-     * @return every kit's internal name, with the no-protection default at the head
-     *
-     * @author Illiani
-     * @since 0.51.01
-     */
     /**
      * The kit choices for a group's campaign-options default: coveralls (meaning "none") first, then that group's kits
      * by internal name, ungated by year. Used to populate the default-kit dropdowns.
@@ -191,7 +170,7 @@ public final class ArmorKitCatalog {
     static Set<String> allReferencedKitNames() {
         Set<String> names = new HashSet<>();
         names.add(DEFAULT_ARMOR_KIT_NAME);
-        names.addAll(MECHWARRIOR_KITS);
+        names.addAll(MEKWARRIOR_KITS);
         names.addAll(AEROSPACE_KITS);
         names.addAll(VEHICLE_KITS);
         return names;
@@ -326,20 +305,25 @@ public final class ArmorKitCatalog {
             return null;
         }
         if (entity instanceof Mek) {
-            if (clanFaction) {
-                String clanKit = availableOrNull("MekWarrior Kit (Clan)", year, true);
-                return (clanKit != null) ? clanKit : availableOrNull("MechWarrior Cooling Suit", year, true);
+            String advancedKit = availableOrNull(KIT_MEKWARRIOR_ADVANCED, year, false);
+            if (advancedKit != null) {
+                return advancedKit;
             }
-            String coolingSuit = availableOrNull("MechWarrior Cooling Suit", year, false);
-            return (coolingSuit != null) ?
-                         coolingSuit :
-                         availableOrNull("MechWarrior Cooling Vest (Only)", year, false);
+
+            if (clanFaction) {
+                String clanKit = availableOrNull(KIT_MEKWARRIOR_CLAN, year, true);
+                return (clanKit != null) ? clanKit : availableOrNull(KIT_MEKWARRIOR_BASIC, year, true);
+            }
+
+            return availableOrNull(KIT_MEKWARRIOR_BASIC, year, false);
         }
+
         if (entity instanceof Tank) {
-            return availableOrNull("Tanker's Smock", year, clanFaction);
+            return availableOrNull(KIT_TANKERS_SMOCK, year, clanFaction);
         }
+
         if (entity.isAero()) {
-            return availableOrNull("Aerospace Fighter Pilot Kit", year, clanFaction);
+            return availableOrNull(KIT_AEROSPACE_PILOT, year, clanFaction);
         }
         return null;
     }
