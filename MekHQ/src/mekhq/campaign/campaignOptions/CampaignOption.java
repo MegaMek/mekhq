@@ -55,6 +55,7 @@ import mekhq.campaign.market.enums.UnitMarketMethod;
 import mekhq.campaign.market.personnelMarket.enums.PersonnelMarketStyle;
 import mekhq.campaign.personnel.enums.*;
 import mekhq.campaign.personnel.familiarity.Familiarity;
+import mekhq.campaign.personnel.quartermaster.ArmorKitCatalog;
 import mekhq.campaign.randomEvents.prisoners.PrisonerCaptureStyle;
 import mekhq.campaign.universe.PlanetarySystem.PlanetaryRating;
 import mekhq.campaign.universe.PlanetarySystem.PlanetarySophistication;
@@ -298,6 +299,16 @@ public final class CampaignOption<T> {
           of(Boolean.class, false, "useAgeEffects");
     public static final CampaignOption<Boolean> USE_TRANSFERS =
           of(Boolean.class, true, "useTransfers");
+    public static final CampaignOption<String> MEKWARRIOR_DEFAULT_KIT =
+          of(String.class, ArmorKitCatalog.DEFAULT_ARMOR_KIT_NAME, "mekWarriorDefaultKit");
+    public static final CampaignOption<String> VEHICLE_CREW_DEFAULT_KIT =
+          of(String.class, ArmorKitCatalog.DEFAULT_ARMOR_KIT_NAME, "vehicleCrewDefaultKit");
+    public static final CampaignOption<String> AIRCRAFT_DEFAULT_KIT =
+          of(String.class, ArmorKitCatalog.DEFAULT_ARMOR_KIT_NAME, "aircraftDefaultKit");
+    public static final CampaignOption<Boolean> ADD_DEFAULT_KIT_TO_PROCUREMENT =
+          of(Boolean.class, false, "addDefaultKitToProcurement");
+    public static final CampaignOption<Boolean> NPC_FACTION_ARMOR_KITS =
+          of(Boolean.class, false, "npcFactionArmorKits");
     public static final CampaignOption<Boolean> USE_EXTENDED_TOE_FORCE_NAME =
           of(Boolean.class, true, "useExtendedTOEForceName");
     public static final CampaignOption<Boolean> PERSONNEL_LOG_SKILL_GAIN =

@@ -39,10 +39,13 @@ import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.getImageDirecto
 import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.getMetadata;
 import static mekhq.utilities.MHQInternationalization.getTextAt;
 
+import java.awt.Component;
 import javax.swing.DefaultComboBoxModel;
+import javax.swing.DefaultListCellRenderer;
 import javax.swing.JCheckBox;
 import javax.swing.JComponent;
 import javax.swing.JLabel;
+import javax.swing.JList;
 import javax.swing.JPanel;
 import javax.swing.JSpinner;
 
@@ -50,11 +53,13 @@ import jakarta.annotation.Nonnull;
 import jakarta.annotation.Nullable;
 import megamek.Version;
 import megamek.client.ui.comboBoxes.MMComboBox;
+import megamek.client.ui.settings.SettingsFormPanel;
 import megamek.client.ui.util.UIUtil;
 import mekhq.campaign.campaignOptions.AcquisitionsType;
+import mekhq.campaign.personnel.quartermaster.ArmorKitCatalog;
+import mekhq.campaign.personnel.quartermaster.ArmorKitCatalog.Category;
 import mekhq.gui.campaignOptions.CampaignOptionFlag;
 import mekhq.gui.campaignOptions.components.CampaignOptionsCheckBox;
-import megamek.client.ui.settings.SettingsFormPanel;
 import mekhq.gui.campaignOptions.components.CampaignOptionsHeaderPanel;
 import mekhq.gui.campaignOptions.components.CampaignOptionsLabel;
 import mekhq.gui.campaignOptions.components.CampaignOptionsPagePanel;
@@ -142,6 +147,15 @@ class AcquisitionPage {
     private static final int TRANSIT_UNIT_NUM = 3;
     private JCheckBox chkNoDeliveriesInTransit;
 
+    private JLabel lblMekWarriorDefaultKit;
+    private MMComboBox<String> cboMekWarriorDefaultKit;
+    private JLabel lblVehicleCrewDefaultKit;
+    private MMComboBox<String> cboVehicleCrewDefaultKit;
+    private JLabel lblAircraftDefaultKit;
+    private MMComboBox<String> cboAircraftDefaultKit;
+    private JCheckBox chkAddDefaultKitToProcurement;
+    private JCheckBox chkNpcFactionArmorKits;
+
     private boolean created;
 
     /**
@@ -159,6 +173,9 @@ class AcquisitionPage {
         cboProcurementPersonnelPick = new MMComboBox<>("procurementPersonnelPick",
               buildProcurementPersonnelPickComboOptions());
         choiceTransitTimeUnits = new MMComboBox<>("choiceTransitTimeUnits", getTransitUnitOptions());
+        cboMekWarriorDefaultKit = armorKitCombo("mekWarriorDefaultKit", Category.MECHWARRIOR);
+        cboVehicleCrewDefaultKit = armorKitCombo("vehicleCrewDefaultKit", Category.INFANTRY);
+        cboAircraftDefaultKit = armorKitCombo("aircraftDefaultKit", Category.AEROSPACE);
 
         // Header
         String imageAddress = getImageDirectory() + "logo_clan_cloud_cobra.png";
@@ -171,6 +188,7 @@ class AcquisitionPage {
         pnlAutoLogistics = createAutoLogisticsPanel();
         pnlAcquisitions = createAcquisitionPanel();
         JPanel pnlDelivery = createDeliveryPanel();
+        JPanel pnlArmorKits = createArmorKitsPanel();
 
         JPanel panel = CampaignOptionsPagePanel.builder("AcquisitionPage", "AcquisitionPage", imageAddress)
                 .header(acquisitionHeader)
@@ -181,6 +199,9 @@ class AcquisitionPage {
                 .section("lblDeliveryPanel.text",
                         "lblDeliveryPanel.summary",
                         pnlDelivery)
+                             .section("lblArmorKitsPanel.text",
+                                   "lblArmorKitsPanel.summary",
+                                   pnlArmorKits)
                 .section("lblAutoLogisticsPanel.text",
                         "lblAutoLogisticsPanel.summary",
                         pnlAutoLogistics)
@@ -260,6 +281,58 @@ class AcquisitionPage {
                 CONTROL_COLUMN_WIDTH);
         panel.addRow(lblTransitTimeUnits, choiceTransitTimeUnits);
         panel.addCheckBox(chkNoDeliveriesInTransit);
+
+        return panel;
+    }
+
+    private MMComboBox<String> armorKitCombo(String name, Category category) {
+        MMComboBox<String> combo = new MMComboBox<>(name,
+              ArmorKitCatalog.optionKitNames(category).toArray(new String[0]));
+        combo.setRenderer(new ArmorKitRenderer());
+        return combo;
+    }
+
+    /** Renders the coveralls entry as "None" and every other kit by its own name. */
+    private static class ArmorKitRenderer extends DefaultListCellRenderer {
+        @Override
+        public Component getListCellRendererComponent(JList<?> list, Object value, int index, boolean isSelected,
+              boolean cellHasFocus) {
+            Object display = ArmorKitCatalog.DEFAULT_ARMOR_KIT_NAME.equals(value)
+                                   ? getTextAt(getCampaignOptionsResourceBundle(), "armorKitNone.text")
+                                   : value;
+            return super.getListCellRendererComponent(list, display, index, isSelected, cellHasFocus);
+        }
+    }
+
+    private @Nonnull JPanel createArmorKitsPanel() {
+        lblMekWarriorDefaultKit = new CampaignOptionsLabel("MekWarriorDefaultKit", getMetadata(new Version(0, 51, 1)));
+        lblMekWarriorDefaultKit.addMouseListener(createTipPanelUpdater("MekWarriorDefaultKit"));
+        cboMekWarriorDefaultKit.addMouseListener(createTipPanelUpdater("MekWarriorDefaultKit"));
+
+        lblVehicleCrewDefaultKit = new CampaignOptionsLabel("VehicleCrewDefaultKit",
+              getMetadata(new Version(0, 51, 1)));
+        lblVehicleCrewDefaultKit.addMouseListener(createTipPanelUpdater("VehicleCrewDefaultKit"));
+        cboVehicleCrewDefaultKit.addMouseListener(createTipPanelUpdater("VehicleCrewDefaultKit"));
+
+        lblAircraftDefaultKit = new CampaignOptionsLabel("AircraftDefaultKit", getMetadata(new Version(0, 51, 1)));
+        lblAircraftDefaultKit.addMouseListener(createTipPanelUpdater("AircraftDefaultKit"));
+        cboAircraftDefaultKit.addMouseListener(createTipPanelUpdater("AircraftDefaultKit"));
+
+        chkAddDefaultKitToProcurement = new CampaignOptionsCheckBox("AddDefaultKitToProcurement",
+              getMetadata(new Version(0, 51, 1)));
+        chkAddDefaultKitToProcurement.addMouseListener(createTipPanelUpdater("AddDefaultKitToProcurement"));
+
+        chkNpcFactionArmorKits = new CampaignOptionsCheckBox("NpcFactionArmorKits", getMetadata(new Version(0, 51, 1)));
+        chkNpcFactionArmorKits.addMouseListener(createTipPanelUpdater("NpcFactionArmorKits"));
+
+        final SettingsFormPanel panel = new SettingsFormPanel("ArmorKitsPanel",
+              acquisitionSectionLabelWidth,
+              CONTROL_COLUMN_WIDTH);
+        panel.addRow(lblMekWarriorDefaultKit, cboMekWarriorDefaultKit);
+        panel.addRow(lblVehicleCrewDefaultKit, cboVehicleCrewDefaultKit);
+        panel.addRow(lblAircraftDefaultKit, cboAircraftDefaultKit);
+        panel.addCheckBox(chkAddDefaultKitToProcurement);
+        panel.addCheckBox(chkNpcFactionArmorKits);
 
         return panel;
     }
@@ -499,6 +572,11 @@ class AcquisitionPage {
         spnAutoLogisticsOther.setValue(model.autoLogisticsOther);
         choiceTransitTimeUnits.setSelectedIndex(model.unitTransitTime);
         chkNoDeliveriesInTransit.setSelected(model.noDeliveriesInTransit);
+        cboMekWarriorDefaultKit.setSelectedItem(model.mekWarriorDefaultKit);
+        cboVehicleCrewDefaultKit.setSelectedItem(model.vehicleCrewDefaultKit);
+        cboAircraftDefaultKit.setSelectedItem(model.aircraftDefaultKit);
+        chkAddDefaultKitToProcurement.setSelected(model.addDefaultKitToProcurement);
+        chkNpcFactionArmorKits.setSelected(model.npcFactionArmorKits);
     }
 
     /**
@@ -534,5 +612,10 @@ class AcquisitionPage {
         model.autoLogisticsOther = (int) spnAutoLogisticsOther.getValue();
         model.unitTransitTime = choiceTransitTimeUnits.getSelectedIndex();
         model.noDeliveriesInTransit = chkNoDeliveriesInTransit.isSelected();
+        model.mekWarriorDefaultKit = cboMekWarriorDefaultKit.getSelectedItem();
+        model.vehicleCrewDefaultKit = cboVehicleCrewDefaultKit.getSelectedItem();
+        model.aircraftDefaultKit = cboAircraftDefaultKit.getSelectedItem();
+        model.addDefaultKitToProcurement = chkAddDefaultKitToProcurement.isSelected();
+        model.npcFactionArmorKits = chkNpcFactionArmorKits.isSelected();
     }
 }

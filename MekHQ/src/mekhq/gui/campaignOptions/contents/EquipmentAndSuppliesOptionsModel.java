@@ -34,8 +34,8 @@ package mekhq.gui.campaignOptions.contents;
 
 import jakarta.annotation.Nonnull;
 import mekhq.campaign.campaignOptions.AcquisitionsType;
-import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.campaignOptions.CampaignOption;
+import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.enums.PlanetaryAcquisitionFactionLimit;
 import mekhq.campaign.universe.PlanetarySystem.PlanetaryRating;
 import mekhq.campaign.universe.PlanetarySystem.PlanetarySophistication;
@@ -84,6 +84,11 @@ class EquipmentAndSuppliesOptionsModel {
     boolean variableTechLevel;
     boolean useAmmoByType;
     boolean limitClanTech;
+    String mekWarriorDefaultKit;
+    String vehicleCrewDefaultKit;
+    String aircraftDefaultKit;
+    boolean addDefaultKitToProcurement;
+    boolean npcFactionArmorKits;
 
     EquipmentAndSuppliesOptionsModel(@Nonnull CampaignOptions options) {
         acquisitionType = options.get(CampaignOption.ACQUISITIONS_TYPE);
@@ -128,6 +133,11 @@ class EquipmentAndSuppliesOptionsModel {
             index++;
         }
 
+        mekWarriorDefaultKit = options.get(CampaignOption.MEKWARRIOR_DEFAULT_KIT);
+        vehicleCrewDefaultKit = options.get(CampaignOption.VEHICLE_CREW_DEFAULT_KIT);
+        aircraftDefaultKit = options.get(CampaignOption.AIRCRAFT_DEFAULT_KIT);
+        addDefaultKitToProcurement = options.get(CampaignOption.ADD_DEFAULT_KIT_TO_PROCUREMENT);
+        npcFactionArmorKits = options.get(CampaignOption.NPC_FACTION_ARMOR_KITS);
         limitByYear = options.get(CampaignOption.LIMIT_BY_YEAR);
         disallowExtinctStuff = options.get(CampaignOption.DISALLOW_EXTINCT_STUFF);
         allowClanPurchases = options.get(CampaignOption.ALLOW_CLAN_PURCHASES);
@@ -143,6 +153,11 @@ class EquipmentAndSuppliesOptionsModel {
     void applyTo(@Nonnull CampaignOptions options) {
         options.set(CampaignOption.ACQUISITIONS_TYPE, acquisitionType);
         options.set(CampaignOption.USE_FUNCTIONAL_APPRAISAL, useFunctionalAppraisal);
+        options.set(CampaignOption.MEKWARRIOR_DEFAULT_KIT, mekWarriorDefaultKit);
+        options.set(CampaignOption.VEHICLE_CREW_DEFAULT_KIT, vehicleCrewDefaultKit);
+        options.set(CampaignOption.AIRCRAFT_DEFAULT_KIT, aircraftDefaultKit);
+        options.set(CampaignOption.ADD_DEFAULT_KIT_TO_PROCUREMENT, addDefaultKitToProcurement);
+        options.set(CampaignOption.NPC_FACTION_ARMOR_KITS, npcFactionArmorKits);
         options.set(CampaignOption.ACQUISITION_PERSONNEL_CATEGORY, acquisitionPersonnelCategory);
         options.set(CampaignOption.CLAN_ACQUISITION_PENALTY, clanAcquisitionPenalty);
         options.set(CampaignOption.IS_ACQUISITION_PENALTY, isAcquisitionPenalty);

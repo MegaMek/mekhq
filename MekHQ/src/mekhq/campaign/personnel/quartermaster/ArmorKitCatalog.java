@@ -1,0 +1,331 @@
+/*
+ * Copyright (C) 2026 The MegaMek Team. All Rights Reserved.
+ *
+ * This file is part of MekHQ.
+ *
+ * MekHQ is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License (GPL),
+ * version 3 or (at your option) any later version,
+ * as published by the Free Software Foundation.
+ *
+ * MekHQ is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty
+ * of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+ * See the GNU General Public License for more details.
+ *
+ * A copy of the GPL should have been included with this project;
+ * if not, see <https://www.gnu.org/licenses/>.
+ *
+ * NOTICE: The MegaMek organization is a non-profit group of volunteers
+ * creating free software for the BattleTech community.
+ *
+ * MechWarrior, BattleMech, `Mech and AeroTech are registered trademarks
+ * of The Topps Company, Inc. All Rights Reserved.
+ *
+ * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
+ * InMediaRes Productions, LLC.
+ *
+ * MechWarrior Copyright Microsoft Corporation. MekHQ was created under
+ * Microsoft's "Game Content Usage Rules"
+ * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+ * affiliated with Microsoft.
+ */
+package mekhq.campaign.personnel.quartermaster;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Set;
+
+import megamek.common.annotations.Nullable;
+import megamek.common.equipment.EquipmentType;
+import megamek.common.units.CrewArmorKitRules;
+import megamek.common.units.Entity;
+import megamek.common.units.Mek;
+import megamek.common.units.Tank;
+import mekhq.campaign.personnel.Person;
+import mekhq.campaign.personnel.enums.PersonnelRole;
+
+/**
+ * Sorts the armor kits MegaMek defines into the three groups MekHQ issues from, and answers which kits a crew may be
+ * given this year.
+ *
+ * <p>MegaMek marks a kit only by its name and its survival flags, not by who is meant to wear it, so the grouping is
+ * kept here as a name set: the MekWarrior kits go to MekWarriors, the aerospace pilot kit to aerospace crews, and
+ * everything else — faction infantry kits, environment suits, the tanker's smock — is issued to everyone else.</p>
+ *
+ * @author Illiani
+ * @since 0.51.01
+ */
+public final class ArmorKitCatalog {
+    /**
+     * The internal name of the kit a person wears when they have been issued nothing: civilian clothing that provides
+     * no protection. This is the default every person starts in, what stripping a kit returns them to, and the one kit
+     * the stores do not sell.
+     */
+    public static final String DEFAULT_ARMOR_KIT_NAME = "Clothing, Fatigues/Civilian/Non-Armored";
+
+    private static final Set<String> MECHWARRIOR_KITS = Set.of("MechWarrior Combat Suit",
+          "MekWarrior Kit (Basic)",
+          "MekWarrior Kit (Advanced)",
+          "MekWarrior Kit (Clan)",
+          "MechWarrior Cooling Suit",
+          "MechWarrior Cooling Vest (Only)");
+
+    /**
+     * The MekWarrior kits the player may issue: the three graded kits. The combat suit and cooling gear are still
+     * MekWarrior kits for grouping (so other groups do not draw them), but are not offered as player choices.
+     */
+    private static final Set<String> MECHWARRIOR_ISSUABLE_KITS = Set.of("MekWarrior Kit (Basic)",
+          "MekWarrior Kit (Advanced)",
+          "MekWarrior Kit (Clan)");
+
+    private static final Set<String> AEROSPACE_KITS = Set.of("Aerospace Fighter Pilot Kit");
+
+    private static final Set<String> VEHICLE_KITS = Set.of("Snowsuit",
+          "Heat Suit",
+          "Tanker's Smock",
+          "Environment Suit, Light",
+          "Flak, Standard");
+
+    /** The group a kit belongs to, deciding which crews may be issued it. */
+    public enum Category {
+        MECHWARRIOR, AEROSPACE, INFANTRY, SOLDIER
+    }
+
+    private ArmorKitCatalog() {
+    }
+
+    /**
+     * The group a kit belongs to. Anything not named as a MekWarrior or aerospace kit is an infantry kit, the group
+     * every other crew draws from.
+     *
+     * @param kitInternalName the internal name of the kit
+     *
+     * @return the kit's {@link Category}
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    public static Category categoryOf(@Nullable String kitInternalName) {
+        if (MECHWARRIOR_KITS.contains(kitInternalName)) {
+            return Category.MECHWARRIOR;
+        }
+        if (AEROSPACE_KITS.contains(kitInternalName)) {
+            return Category.AEROSPACE;
+        }
+        return Category.INFANTRY;
+    }
+
+    /** The fixed kit sets used by the campaign-options dropdowns. Soldiers have no dropdown, so an empty set. */
+    private static Set<String> kitsFor(Category category) {
+        return switch (category) {
+            case MECHWARRIOR -> MECHWARRIOR_ISSUABLE_KITS;
+            case AEROSPACE -> AEROSPACE_KITS;
+            case INFANTRY -> VEHICLE_KITS;
+            case SOLDIER -> Set.of();
+        };
+    }
+
+    /** Whether a kit belongs to a group's issuable list: fixed sets for the crews, every infantry kit for soldiers. */
+    private static boolean isInCategory(String kitInternalName, Category category) {
+        return switch (category) {
+            case MECHWARRIOR -> MECHWARRIOR_ISSUABLE_KITS.contains(kitInternalName);
+            case AEROSPACE -> AEROSPACE_KITS.contains(kitInternalName);
+            case INFANTRY -> VEHICLE_KITS.contains(kitInternalName);
+            case SOLDIER -> !MECHWARRIOR_KITS.contains(kitInternalName) && !AEROSPACE_KITS.contains(kitInternalName);
+        };
+    }
+
+    /**
+     * Every kit in a group that can be had in the campaign's current year — the list a crew of that group may be
+     * issued from. The no-protection default is never listed, being issued rather than bought.
+     *
+     * @param category the group to list
+     * @param campaign the campaign, supplying the year and faction to gate availability against
+     *
+     * @return the available kits in that group, in the order MegaMek's tables hold them
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    /**
+     * The internal names of every armor kit, coveralls first, ungated by year or faction — the list a campaign-options
+     * default is chosen from.
+     *
+     * @return every kit's internal name, with the no-protection default at the head
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    /**
+     * The kit choices for a group's campaign-options default: coveralls (meaning "none") first, then that group's kits
+     * by internal name, ungated by year. Used to populate the default-kit dropdowns.
+     *
+     * @param category the group whose kits are offered
+     *
+     * @return the kit internal names to choose from, coveralls first
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    public static List<String> optionKitNames(Category category) {
+        List<String> names = new ArrayList<>();
+        names.add(DEFAULT_ARMOR_KIT_NAME);
+        List<String> categoryKits = new ArrayList<>(kitsFor(category));
+        categoryKits.sort(String::compareTo);
+        names.addAll(categoryKits);
+        return names;
+    }
+
+    public static List<String> allKitInternalNames() {
+        List<String> names = new ArrayList<>();
+        names.add(DEFAULT_ARMOR_KIT_NAME);
+        for (EquipmentType kit : CrewArmorKitRules.availableArmorKits()) {
+            String internalName = kit.getInternalName();
+            if (!DEFAULT_ARMOR_KIT_NAME.equals(internalName)) {
+                names.add(internalName);
+            }
+        }
+        return names;
+    }
+
+    public static List<EquipmentType> availableKits(Category category) {
+        List<EquipmentType> result = new ArrayList<>();
+        for (EquipmentType kit : CrewArmorKitRules.availableArmorKits()) {
+            String internalName = kit.getInternalName();
+            if (DEFAULT_ARMOR_KIT_NAME.equals(internalName)) {
+                continue;
+            }
+            // Every kit in the group is listed regardless of the year; ones not available now carry an impossible
+            // acquisition target so the player can still issue any they happen to hold in stores.
+            if (isInCategory(internalName, category)) {
+                result.add(kit);
+            }
+        }
+        return result;
+    }
+
+    /**
+     * Whether the player may buy and issue a kit for this person at all: a combat crew member who mans a unit that can
+     * wear a kit — a Mek, aerospace, vehicle, or large-craft crew. Foot infantry and battle armor (whose armor is the
+     * unit), ProtoMeks (no ejection), and support or civilian personnel are never issued a kit.
+     *
+     * @param person the person being considered, or {@code null}
+     *
+     * @return {@code true} if the player can buy and issue a kit for this person
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    public static boolean canBeIssuedKit(@Nullable Person person) {
+        if (person == null) {
+            return false;
+        }
+        return isKitCrewRole(person.getPrimaryRole()) || isKitCrewRole(person.getSecondaryRole());
+    }
+
+    private static boolean isKitCrewRole(PersonnelRole role) {
+        return role.isMekWarriorGrouping()
+                     || role.isAerospaceGrouping()
+                     || role.isConventionalAircraftPilot()
+                     || role.isSoldier()
+                     || role.isVehicleCrewGround()
+                     || role.isVehicleCrewNaval()
+                     || role.isVehicleCrewVTOL()
+                     || role.isVesselPilot()
+                     || role.isVesselGunner()
+                     || role.isVesselCrew()
+                     || role.isVesselNavigator();
+    }
+
+    /**
+     * The kit group this person draws from: MekWarriors (and LAM pilots) wear MekWarrior kits, aerospace and
+     * conventional fighter pilots wear aerospace kits, and everyone else — vehicle and large-craft crews — wears
+     * infantry kits. A person who is both (a LAM pilot) is treated as a MekWarrior.
+     *
+     * @param person the person whose kit group is wanted
+     *
+     * @return the {@link Category} of kit this person may be issued
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    public static Category categoryFor(Person person) {
+        PersonnelRole primary = person.getPrimaryRole();
+        PersonnelRole secondary = person.getSecondaryRole();
+
+        if (primary.isMekWarriorGrouping() || secondary.isMekWarriorGrouping()) {
+            return Category.MECHWARRIOR;
+        }
+        if (primary.isAerospaceGrouping()
+                  || primary.isConventionalAircraftPilot()
+                  || secondary.isAerospaceGrouping()
+                  || secondary.isConventionalAircraftPilot()) {
+            return Category.AEROSPACE;
+        }
+        if (primary.isSoldier() || secondary.isSoldier()) {
+            return Category.SOLDIER;
+        }
+        return Category.INFANTRY;
+    }
+
+    /**
+     * Whether a kit issued to this unit's crew reaches the board. This is MegaMek's
+     * {@link CrewArmorKitRules#canWearArmorKit} unchanged — Mek, vehicle, and aerospace crews, who might end up outside
+     * their unit on foot.
+     *
+     * @param entity the unit whose crew is being configured, or {@code null}
+     *
+     * @return {@code true} if the crew of this unit wears its issued kit
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    public static boolean canWearIssuedKit(@Nullable Entity entity) {
+        return CrewArmorKitRules.canWearArmorKit(entity);
+    }
+
+    /**
+     * The faction-appropriate kit to issue a generated (NPC) crew, by internal name, or {@code null} for none.
+     *
+     * <p>MekWarriors take the Clan kit when the faction is Clan and it exists in the year, falling back to the cooling
+     * suit; Inner Sphere MekWarriors take the cooling suit, or the cooling vest while the suit is extinct. Tankers take
+     * the smock, aircraft the aerospace kit. Anything unavailable in the year yields {@code null}.</p>
+     *
+     * @param entity      the generated unit whose crew is being kitted
+     * @param clanFaction whether the generating faction is Clan
+     * @param year        the campaign year
+     *
+     * @return the kit internal name, or {@code null} if none is available or the unit cannot wear one
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    public static @Nullable String npcKitFor(@Nullable Entity entity, boolean clanFaction, int year) {
+        if (!canWearIssuedKit(entity)) {
+            return null;
+        }
+        if (entity instanceof Mek) {
+            if (clanFaction) {
+                String clanKit = availableOrNull("MekWarrior Kit (Clan)", year, true);
+                return (clanKit != null) ? clanKit : availableOrNull("MechWarrior Cooling Suit", year, true);
+            }
+            String coolingSuit = availableOrNull("MechWarrior Cooling Suit", year, false);
+            return (coolingSuit != null) ?
+                         coolingSuit :
+                         availableOrNull("MechWarrior Cooling Vest (Only)", year, false);
+        }
+        if (entity instanceof Tank) {
+            return availableOrNull("Tanker's Smock", year, clanFaction);
+        }
+        if (entity.isAero()) {
+            return availableOrNull("Aerospace Fighter Pilot Kit", year, clanFaction);
+        }
+        return null;
+    }
+
+    private static @Nullable String availableOrNull(String kitInternalName, int year, boolean clan) {
+        EquipmentType kit = EquipmentType.get(kitInternalName);
+        return ((kit != null) && kit.isAvailableIn(year, clan, false)) ? kitInternalName : null;
+    }
+}

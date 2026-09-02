@@ -64,6 +64,7 @@ import megamek.common.ui.FastJScrollPane;
 import megamek.logging.MMLogger;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
+import mekhq.campaign.campaignOptions.CampaignOption;
 import mekhq.campaign.events.AcquisitionEvent;
 import mekhq.campaign.events.AsTechPoolChangedEvent;
 import mekhq.campaign.events.OvertimeModeEvent;
@@ -112,7 +113,6 @@ import mekhq.gui.sorter.PartsDetailSorter;
 import mekhq.gui.sorter.TechSorter;
 import mekhq.gui.sorter.WarehouseStatusSorter;
 import mekhq.service.enums.MRMSMode;
-import mekhq.campaign.campaignOptions.CampaignOption;
 
 /**
  * Displays all spare parts in stock, parts on order, and permits repair of damaged parts.
@@ -133,7 +133,8 @@ public final class WarehouseTab extends CampaignGuiTab implements ITechWorkPanel
     private static final int SG_ENGINE = 8;
     private static final int SG_GYRO = 9;
     private static final int SG_ACT = 10;
-    private static final int SG_NUM = 11;
+    private static final int SG_ARMOR_KIT = 11;
+    private static final int SG_NUM = 12;
 
     // parts views
     private static final int SV_ALL = 0;
@@ -571,6 +572,9 @@ public final class WarehouseTab extends CampaignGuiTab implements ITechWorkPanel
                     inGroup = part instanceof MekGyro;
                 } else if (nGroup == SG_ACT) {
                     inGroup = part instanceof MekActuator;
+                } else if (nGroup == SG_ARMOR_KIT) {
+                    inGroup = part instanceof EquipmentPart
+                                    && ((EquipmentPart) part).getType().hasFlag(MiscType.F_ARMOR_KIT);
                 }
 
                 // Check view
@@ -614,6 +618,7 @@ public final class WarehouseTab extends CampaignGuiTab implements ITechWorkPanel
             case SG_ENGINE -> "Engines";
             case SG_GYRO -> "Gyros";
             case SG_ACT -> "Actuators";
+            case SG_ARMOR_KIT -> "Armor Kits";
             default -> "?";
         };
     }
