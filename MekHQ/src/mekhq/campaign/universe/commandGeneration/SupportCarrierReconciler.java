@@ -139,7 +139,7 @@ public final class SupportCarrierReconciler {
             return;
         }
 
-        LOGGER.debug("Releasing {} from carrier {}: no longer carried by this profession",
+        LOGGER.info("Releasing {} from carrier {}: no longer carried by this profession",
               person.getFullName(), unit.getName());
         unit.remove(person, true);
     }
@@ -165,7 +165,7 @@ public final class SupportCarrierReconciler {
         }
 
         Formation parent = campaign.getPlayerForce().getFormation(unit.getFormationId());
-        LOGGER.debug("Removing empty support carrier {}", unit.getName());
+        LOGGER.info("Removing empty support carrier {}", unit.getName());
         campaign.removeUnit(unit.getId());
 
         removeIfEmptyProfessionFormation(campaign, parent);
@@ -191,6 +191,8 @@ public final class SupportCarrierReconciler {
 
         Formation supportCommand = campaign.getPlayerForce().getSupportCommandFormation();
         if (supportCommand == null) {
+            LOGGER.info("Support carrier reconciliation: no Support Command formation, so carriers are not managed"
+                              + " in this campaign");
             return;
         }
 
@@ -222,9 +224,9 @@ public final class SupportCarrierReconciler {
             }
         }
 
-        if ((seated > 0) || (released > 0)) {
-            LOGGER.info("Support carrier reconciliation: seated {}, released {}", seated, released);
-        }
+        // Always reported, even when nothing changed: a second load of the same save should say "seated 0, released
+        // 0", and that line is how a playtest confirms the sweep is idempotent.
+        LOGGER.info("Support carrier reconciliation: seated {}, released {}", seated, released);
     }
 
     /**
@@ -273,7 +275,11 @@ public final class SupportCarrierReconciler {
      */
     private static void seat(Campaign campaign, Person person, Formation supportCommand) {
         PersonnelRole profession = person.getPrimaryRole();
+        boolean isClan = campaign.getPlayerForce().isClanForce();
+        EchelonProfile profile = isClan ? SupportPersonnelToTOE.clanProfile() : SupportPersonnelToTOE.innerSphereProfile();
+
         Unit sibling = null;
+        Unit partialSquad = null;
 
         for (UUID unitId : supportCommand.getAllUnits(false)) {
             Unit carrier = campaign.getUnit(unitId);
@@ -283,26 +289,84 @@ public final class SupportCarrierReconciler {
             if (professionOf(carrier) != profession) {
                 continue;
             }
-
-            // Remembered even when full: a sibling tells us which formation a new carrier of this profession belongs
-            // under, without having to match on a localized formation name.
-            sibling = carrier;
-
-            if (carrier.getTotalCrewSize() >= carrier.getFullCrewSize()) {
-                continue;
-            }
             // Checked rather than left to the assignment, which writes a campaign report on every rejection. Only
             // campaigns using bases can fail this.
             if (!LocationUtils.areSameEffectiveLocation(carrier, person)) {
                 continue;
             }
 
-            SupportPersonnelToTOE.ensureInfantrySkill(person);
-            carrier.addPilotOrSoldier(person);
+            // Remembered even when full: a sibling tells us which formation a new carrier of this profession belongs
+            // under, without having to match on a localized formation name.
+            sibling = carrier;
+
+            if (carrier.getTotalCrewSize() < carrier.getFullCrewSize()) {
+                SupportPersonnelToTOE.ensureInfantrySkill(person);
+                carrier.addPilotOrSoldier(person);
+                LOGGER.info("Seated {} in support carrier {} ({}/{})", person.getFullName(), carrier.getName(),
+                      carrier.getTotalCrewSize(), carrier.getFullCrewSize());
+                return;
+            }
+
+            // A full carrier smaller than a full squad was built undersized at generation to fit a remainder. Now
+            // that the profession is growing it should be topped up to a full squad, not left as a tiny full unit
+            // beside a fresh one. Prefer the smallest such carrier so the fewest people move.
+            boolean isPartialSquad = carrier.getFullCrewSize() < profile.squadUnitSize();
+            if (isPartialSquad && ((partialSquad == null) || (carrier.getFullCrewSize() < partialSquad.getFullCrewSize()))) {
+                partialSquad = carrier;
+            }
+        }
+
+        if ((partialSquad != null) && upgradeAndSeat(campaign, partialSquad, person, profile)) {
             return;
         }
 
-        createCarrierFor(campaign, person, supportCommand, sibling);
+        createCarrierFor(campaign, person, supportCommand, sibling, profile);
+    }
+
+    /**
+     * Replaces a full, undersized squad carrier with a full-size one, moving its crew across and seating the newcomer.
+     *
+     * <p>Generation builds a "Support Squad (2 person)" for a two-person remainder so the TOE does not show five empty
+     * seats. Once a third person of that profession arrives, the right container is a full squad holding all three,
+     * with room for the next four - not the two-seat unit kept beside a brand-new one.</p>
+     *
+     * <p>Order matters. Each crew member is seated in the bigger carrier <em>before</em> being removed from the small
+     * one: {@link Unit#remove} only clears a character's unit when it still points at the unit being left, so this
+     * sequence never leaves anyone unit-less mid-transfer, and the small carrier is still intact when the transfer is
+     * logged against it. When the last member leaves, the crew event removes the emptied small carrier; its formation
+     * survives because the bigger carrier already sits in it.</p>
+     *
+     * @return {@code true} if the newcomer was seated; {@code false} if the bigger carrier could not be built, in which
+     *       case nothing was moved
+     */
+    private static boolean upgradeAndSeat(Campaign campaign, Unit small, Person person, EchelonProfile profile) {
+        boolean isClan = campaign.getPlayerForce().isClanForce();
+        String professionLabel = person.getPrimaryRole().getLabel(isClan);
+        Formation parent = campaign.getPlayerForce().getFormation(small.getFormationId());
+
+        SupportPersonnelToTOE.CarrierSpec spec = new SupportPersonnelToTOE.CarrierSpec(
+              profile.squadUnitNameFor(profile.squadUnitSize()), List.of(), false, professionLabel);
+        Unit bigger = SupportPersonnelToTOE.createCarrierUnit(campaign, spec);
+        if (bigger == null) {
+            return false;
+        }
+        if (parent != null) {
+            campaign.getPlayerForce().addUnitToFormation(bigger, parent.getId(), campaign);
+        }
+
+        List<Person> crew = new ArrayList<>(small.getCrew());
+        for (Person member : crew) {
+            SupportPersonnelToTOE.ensureInfantrySkill(member);
+            bigger.addPilotOrSoldier(member, small, true);
+            small.remove(member, false);
+        }
+
+        SupportPersonnelToTOE.ensureInfantrySkill(person);
+        bigger.addPilotOrSoldier(person);
+        LOGGER.info("Upgraded support carrier {} to {} for {} ({} moved, now {}/{})", small.getName(),
+              bigger.getName(), person.getFullName(), crew.size(), bigger.getTotalCrewSize(),
+              bigger.getFullCrewSize());
+        return true;
     }
 
     /**
@@ -314,9 +378,8 @@ public final class SupportCarrierReconciler {
      * would have had if generated in one go; squads are never promoted to platoons.</p>
      */
     private static void createCarrierFor(Campaign campaign, Person person, Formation supportCommand,
-          @Nullable Unit sibling) {
+          @Nullable Unit sibling, EchelonProfile profile) {
         boolean isClan = campaign.getPlayerForce().isClanForce();
-        EchelonProfile profile = isClan ? SupportPersonnelToTOE.clanProfile() : SupportPersonnelToTOE.innerSphereProfile();
         String professionLabel = person.getPrimaryRole().getLabel(isClan);
 
         SupportPersonnelToTOE.CarrierSpec spec = new SupportPersonnelToTOE.CarrierSpec(profile.squadUnitNameFor(profile.squadUnitSize()),
@@ -337,7 +400,7 @@ public final class SupportCarrierReconciler {
         }
 
         campaign.getPlayerForce().addUnitToFormation(carrier, parent.getId(), campaign);
-        LOGGER.debug("Built support carrier {} for {} under {}", carrier.getName(), person.getFullName(),
+        LOGGER.info("Built support carrier {} for {} under {}", carrier.getName(), person.getFullName(),
               parent.getName());
     }
 
@@ -360,7 +423,7 @@ public final class SupportCarrierReconciler {
             return;
         }
 
-        LOGGER.debug("Removing empty support formation {}", formation.getName());
+        LOGGER.info("Removing empty support formation {}", formation.getName());
         campaign.getPlayerForce().removeFormation(formation, campaign);
     }
 

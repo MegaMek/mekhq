@@ -1,0 +1,508 @@
+<title>Carrier Playtest Checklist</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans+Condensed:wght@400;500;600;700&family=Source+Serif+4:opsz,wght@8..60,400;8..60,600&display=swap">
+<style>
+  :root {
+    --ground:#E9ECF0; --surface:#FFFFFF; --surface-alt:#F3F5F8;
+    --line:#CFD6DF; --line-soft:#E1E6ED;
+    --ink:#171C24; --ink-soft:#4C5766; --ink-faint:#6E7A8A;
+    --steel:#3E6B9E; --steel-soft:#E4EDF6;
+    --critical:#A83E27; --critical-soft:#F7E7E2;
+    --clean:#256D5C; --clean-soft:#E0F0EA;
+    --amber:#8A6614; --amber-soft:#F6EEDB;
+    --shadow:0 1px 2px rgba(23,28,36,.06), 0 6px 18px rgba(23,28,36,.05);
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --ground:#12161C; --surface:#1A1F27; --surface-alt:#212832;
+      --line:#333C49; --line-soft:#272F3A;
+      --ink:#E4E9F0; --ink-soft:#A8B2C0; --ink-faint:#7C8798;
+      --steel:#7FAAD8; --steel-soft:#1E2C3C;
+      --critical:#E08769; --critical-soft:#33211B;
+      --clean:#6FC3AB; --clean-soft:#162B27;
+      --amber:#D6B25F; --amber-soft:#2B2416;
+      --shadow:0 1px 2px rgba(0,0,0,.3), 0 6px 18px rgba(0,0,0,.25);
+    }
+  }
+  :root[data-theme="dark"] {
+    --ground:#12161C; --surface:#1A1F27; --surface-alt:#212832;
+    --line:#333C49; --line-soft:#272F3A;
+    --ink:#E4E9F0; --ink-soft:#A8B2C0; --ink-faint:#7C8798;
+    --steel:#7FAAD8; --steel-soft:#1E2C3C;
+    --critical:#E08769; --critical-soft:#33211B;
+    --clean:#6FC3AB; --clean-soft:#162B27;
+    --amber:#D6B25F; --amber-soft:#2B2416;
+    --shadow:0 1px 2px rgba(0,0,0,.3), 0 6px 18px rgba(0,0,0,.25);
+  }
+  * { box-sizing:border-box; }
+  body { background:var(--ground); color:var(--ink); font-family:"Source Serif 4",Georgia,serif; font-size:16px; line-height:1.6; -webkit-font-smoothing:antialiased; }
+  .sheet { max-width:900px; margin:0 auto; padding:36px 24px 96px; display:flex; flex-direction:column; gap:30px; }
+  h1,h2,h3,.eyebrow,.chip,.pill,.tid,.btn,th { font-family:"IBM Plex Sans Condensed","Arial Narrow",Arial,sans-serif; }
+  code,.path { font-family:"IBM Plex Mono",ui-monospace,Consolas,monospace; font-size:.87em; background:var(--surface-alt); border:1px solid var(--line-soft); border-radius:2px; padding:1px 5px; }
+
+  .masthead { border-top:3px solid var(--ink); padding-top:16px; display:flex; flex-direction:column; gap:12px; }
+  .eyebrow { font-size:12px; font-weight:600; letter-spacing:.14em; text-transform:uppercase; color:var(--ink-faint); }
+  h1 { font-size:clamp(27px,4.6vw,38px); font-weight:700; line-height:1.1; letter-spacing:-.015em; margin:0; text-wrap:balance; }
+  .standfirst { font-size:17px; color:var(--ink-soft); margin:0; max-width:64ch; }
+  .meta-strip { display:flex; flex-wrap:wrap; gap:8px 10px; }
+  .chip { font-size:12px; font-weight:500; letter-spacing:.04em; padding:4px 10px; border:1px solid var(--line); border-radius:2px; color:var(--ink-soft); background:var(--surface); white-space:nowrap; }
+
+  /* progress bar */
+  .progress-wrap { position:sticky; top:0; z-index:5; background:var(--ground); padding:10px 0 12px; display:flex; flex-direction:column; gap:8px; border-bottom:1px solid var(--line); }
+  .progress-head { display:flex; justify-content:space-between; align-items:baseline; gap:12px; flex-wrap:wrap; }
+  .progress-count { font-family:"IBM Plex Mono",monospace; font-size:14px; font-variant-numeric:tabular-nums; color:var(--ink-soft); }
+  .bar { height:7px; border-radius:4px; background:var(--surface-alt); border:1px solid var(--line-soft); overflow:hidden; }
+  .bar span { display:block; height:100%; width:0%; background:var(--clean); transition:width .2s ease; }
+  .btn { font-size:12px; font-weight:600; letter-spacing:.06em; text-transform:uppercase; padding:5px 12px; border:1px solid var(--line); border-radius:2px; background:var(--surface); color:var(--ink-soft); cursor:pointer; }
+  .btn:hover { border-color:var(--steel); color:var(--steel); }
+  .btn:focus-visible { outline:2px solid var(--steel); outline-offset:2px; }
+
+  section { display:flex; flex-direction:column; gap:14px; }
+  h2 { font-size:13px; font-weight:700; letter-spacing:.15em; text-transform:uppercase; margin:0; padding-bottom:8px; border-bottom:1px solid var(--line); }
+  p { margin:0; max-width:68ch; }
+  .prose { display:flex; flex-direction:column; gap:12px; }
+  ul,ol { margin:0; padding-left:20px; display:flex; flex-direction:column; gap:6px; max-width:68ch; }
+
+  /* test cards */
+  .test { background:var(--surface); border:1px solid var(--line-soft); border-left:4px solid var(--line); border-radius:3px; box-shadow:var(--shadow); padding:14px 16px 16px; display:flex; flex-direction:column; gap:10px; }
+  .test.gate { border-left-color:var(--critical); }
+  .test.done { border-left-color:var(--clean); background:var(--clean-soft); }
+  .test-head { display:flex; align-items:flex-start; gap:11px; }
+  .test-head input[type=checkbox] { width:19px; height:19px; margin:2px 0 0; flex:none; accent-color:var(--clean); cursor:pointer; }
+  .test-head label { font-family:"IBM Plex Sans Condensed",Arial,sans-serif; font-size:17px; font-weight:600; line-height:1.32; cursor:pointer; flex:1; }
+  .tid { font-family:"IBM Plex Mono",monospace; font-size:12px; color:var(--ink-faint); flex:none; padding-top:4px; min-width:26px; }
+  .pill { font-size:10.5px; font-weight:700; letter-spacing:.08em; text-transform:uppercase; padding:2px 7px; border-radius:2px; white-space:nowrap; align-self:flex-start; margin-top:3px; }
+  .pill.gate { background:var(--critical-soft); color:var(--critical); }
+  .pill.reg { background:var(--steel-soft); color:var(--steel); }
+  .pill.new { background:var(--amber-soft); color:var(--amber); }
+  .body { padding-left:30px; display:flex; flex-direction:column; gap:9px; font-size:15px; }
+  .k { font-family:"IBM Plex Sans Condensed",Arial,sans-serif; font-size:11px; font-weight:700; letter-spacing:.1em; text-transform:uppercase; color:var(--ink-faint); }
+  .expect { background:var(--surface-alt); border-left:3px solid var(--steel); border-radius:0 2px 2px 0; padding:9px 12px; display:flex; flex-direction:column; gap:5px; }
+  .fail { color:var(--critical); }
+
+  .note { background:var(--surface); border:1px solid var(--line-soft); border-left:4px solid var(--amber); border-radius:3px; padding:15px 18px; display:flex; flex-direction:column; gap:9px; box-shadow:var(--shadow); }
+
+  table { width:100%; border-collapse:collapse; font-size:14px; background:var(--surface); }
+  .scroll { overflow-x:auto; border:1px solid var(--line-soft); border-radius:3px; }
+  th { text-align:left; font-size:11px; font-weight:700; letter-spacing:.1em; text-transform:uppercase; color:var(--ink-faint); padding:9px 13px; border-bottom:1px solid var(--line); background:var(--surface-alt); white-space:nowrap; }
+  td { padding:9px 13px; border-bottom:1px solid var(--line-soft); vertical-align:top; }
+  tbody tr:last-child td { border-bottom:none; }
+
+  footer { border-top:1px solid var(--line); padding-top:14px; font-size:13.5px; color:var(--ink-faint); display:flex; flex-direction:column; gap:5px; }
+  @media (max-width:560px){ .sheet{padding:24px 16px 72px; gap:24px;} .body{padding-left:0;} }
+</style>
+
+<div class="sheet">
+
+  <header class="masthead">
+    <div class="eyebrow">MekHQ &middot; Pre-review checklist &middot; Keep support carriers current</div>
+    <h1>Playtest before this PR opens</h1>
+    <p class="standfirst">Sixteen checks, roughly 45 minutes. The unit tests cover the guards and the release path; everything here covers what they cannot &mdash; seating against real TOE state, the two new persisted fields, and the deployment block.</p>
+    <div class="meta-strip">
+      <span class="chip">Branch: Implement-Keep-Carriers-Current</span>
+      <span class="chip">Commit d17ddf5a88</span>
+      <span class="chip">~45 min</span>
+    </div>
+  </header>
+
+  <div class="progress-wrap">
+    <div class="progress-head">
+      <span class="progress-count" id="count">0 of 15 complete</span>
+      <button class="btn" id="reset" type="button">Reset</button>
+    </div>
+    <div class="bar"><span id="fill"></span></div>
+  </div>
+
+  <section>
+    <h2>Before you start</h2>
+    <div class="prose">
+      <ul>
+        <li>Build from the branch, and keep <code>mekhq.log</code> open alongside &mdash; several checks are "and nothing was logged as an error".</li>
+        <li>Two saves are useful: a fresh command generated on this branch, and the <span class="path">Violence as a Service31510108_Cooker</span> save from issue #9880, which predates the carrier flag and exercises the migration path.</li>
+        <li>The TOE tab is where most of this is read. Support Command hangs off the campaign HQ formation.</li>
+        <li>Three checks are marked <span class="pill gate">gate</span> (03, 04, 14). If any of those fails, the PR does not open &mdash; they cover new persisted state and permanent data loss.</li>
+      </ul>
+    </div>
+  </section>
+
+  <section>
+    <h2>Generation still works</h2>
+
+    <div class="test" data-test>
+      <div class="test-head">
+        <span class="tid">01</span>
+        <input type="checkbox" id="t1">
+        <label for="t1">A freshly generated command still files support staff into the TOE</label>
+        <span class="pill reg">regression</span>
+      </div>
+      <div class="body">
+        <div><span class="k">Do</span> Start a new campaign, New Player Preset, and run the Command Generator through to Accept &amp; Build.</div>
+        <div class="expect">
+          <span class="k">Expect</span>
+          <span>Support Command appears under HQ with Maintenance, Medical and Command sections, profession companies beneath them, and carriers under those &mdash; exactly as on <code>main</code>.</span>
+          <span class="fail">Fails if: the structure is missing, duplicated, or staff are left loose in the roster.</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="test" data-test>
+      <div class="test-head">
+        <span class="tid">02</span>
+        <input type="checkbox" id="t2">
+        <label for="t2">Generation does not fight the reconciler</label>
+        <span class="pill new">new</span>
+      </div>
+      <div class="body">
+        <div><span class="k">Do</span> On the campaign from check 01, count the carriers and compare with a generation on <code>main</code> using the same preset and seed if you can hold it steady.</div>
+        <div class="expect">
+          <span class="k">Expect</span>
+          <span>The same carriers, at the same sizes. The generator recruits hundreds of people and each fires an event, so this is the check that the hook is not seating people one at a time ahead of <code>organize()</code>. Log: between <code>[SupportTOE] organize START</code> and <code>[SupportTOE] organized support staff</code> there must be <strong>no</strong> <code>Seated</code> or <code>Built support carrier</code> lines.</span>
+          <span class="fail">Fails if: there are noticeably more, smaller carriers than on main, or duplicate profession companies.</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <h2>The new persisted state</h2>
+
+    <div class="test gate" data-test>
+      <div class="test-head">
+        <span class="tid">03</span>
+        <input type="checkbox" id="t3">
+        <label for="t3">Carriers survive save and reload</label>
+        <span class="pill gate">gate</span>
+      </div>
+      <div class="body">
+        <div><span class="k">Do</span> Save the generated campaign, exit to the start screen, and load it again.</div>
+        <div class="expect">
+          <span class="k">Expect</span>
+          <span>Support Command and all its carriers come back unchanged, and no duplicate carriers or formations appear on load. Optionally unzip the save and confirm <code>&lt;carrier&gt;true&lt;/carrier&gt;</code> on the carrier units and one <code>&lt;supportCommandFormationId&gt;</code> on the campaign.</span>
+          <span class="fail">Fails if: carriers lose their flag, the structure duplicates, or the load throws.</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="test gate" data-test>
+      <div class="test-head">
+        <span class="tid">04</span>
+        <input type="checkbox" id="t4">
+        <label for="t4">An older save migrates cleanly</label>
+        <span class="pill gate">gate</span>
+      </div>
+      <div class="body">
+        <div><span class="k">Do</span> Load <span class="path">Violence as a Service31510108_Cooker</span>, which was saved before the carrier flag existed.</div>
+        <div class="expect">
+          <span class="k">Expect</span>
+          <span>It loads without error. Log: <code>Marked N pre-existing support carrier(s) during load</code>, then <code>Support carrier reconciliation: seated N, released N</code> with a seated count near 100 for the loose administrators in that save, preceded by the individual <code>Seated</code> / <code>Built support carrier</code> lines.</span>
+          <span class="fail">Fails if: the load throws, ordinary infantry gets marked as a carrier, or nothing is seated.</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="test" data-test>
+      <div class="test-head">
+        <span class="tid">05</span>
+        <input type="checkbox" id="t5">
+        <label for="t5">Loading twice changes nothing the second time</label>
+        <span class="pill new">new</span>
+      </div>
+      <div class="body">
+        <div><span class="k">Do</span> Save the migrated campaign from check 04, then load it again.</div>
+        <div class="expect">
+          <span class="k">Expect</span>
+          <span>The second load logs exactly <code>Support carrier reconciliation: seated 0, released 0</code> and no <code>Built support carrier</code> lines. The line is always written, so its absence is itself a failure.</span>
+          <span class="fail">Fails if: carriers keep being created on every load.</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <h2>Coming and going</h2>
+
+    <div class="test" data-test>
+      <div class="test-head">
+        <span class="tid">06</span>
+        <input type="checkbox" id="t6">
+        <label for="t6">A hire fills an existing carrier that has room</label>
+        <span class="pill new">new</span>
+      </div>
+      <div class="body">
+        <div><span class="k">Do</span> Find a profession carrier that is understrength, then hire one person of that exact role.</div>
+        <div class="expect">
+          <span class="k">Expect</span>
+          <span>They appear in that carrier in the TOE immediately, with no new unit created. Log: one <code>Seated NAME in support carrier UNIT (n/m)</code> line and no <code>Built support carrier</code>.</span>
+          <span class="fail">Fails if: a second carrier is built while one had a free seat.</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="test" data-test>
+      <div class="test-head">
+        <span class="tid">07</span>
+        <input type="checkbox" id="t7">
+        <label for="t7">A hire with nowhere to sit gets a new carrier</label>
+        <span class="pill new">new</span>
+      </div>
+      <div class="body">
+        <div><span class="k">Do</span> Keep hiring that same role until every carrier of it is full, then hire one more.</div>
+        <div class="expect">
+          <span class="k">Expect</span>
+          <span>A new full-size squad carrier appears alongside its siblings, under the same profession formation, holding the one new person. Subsequent hires of that role fill it rather than making more. Log: <code>Built support carrier UNIT for NAME under FORMATION</code>, then <code>Seated</code> lines for the follow-on hires.</span>
+          <span class="fail">Fails if: a carrier is created per recruit, or the new one lands outside the profession formation.</span>
+        </div>
+      </div>
+    </div>
+
+
+    <div class="test" data-test>
+      <div class="test-head">
+        <span class="tid">08</span>
+        <input type="checkbox" id="t8">
+        <label for="t8">A full undersized squad is topped up, not left beside a new one</label>
+        <span class="pill new">new</span>
+      </div>
+      <div class="body">
+        <div><span class="k">Do</span> Find a profession whose last carrier is a small full squad &mdash; generation makes a <code>Support Squad (2 person)</code> for a two-person remainder. Hire five more of that role.</div>
+        <div class="expect">
+          <span class="k">Expect</span>
+          <span>The first hire replaces the two-seat unit with a <code>Support Squad (7 person)</code> holding all three; the next four fill it to 7/7. One unit at the end, not a full two-seater beside a fresh seven-seater. Log: one <code>Upgraded support carrier ... (2 moved, now 3/7)</code> line, then four <code>Seated</code> lines, and a <code>Removing empty support carrier</code> for the old two-seater.</span>
+          <span class="fail">Fails if: the two-person unit survives, or the profession formation is deleted along with it.</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="test" data-test>
+      <div class="test-head">
+        <span class="tid">09</span>
+        <input type="checkbox" id="t9">
+        <label for="t9">Bulk hire of 100 administrators behaves</label>
+        <span class="pill new">new</span>
+      </div>
+      <div class="body">
+        <div><span class="k">Do</span> The issue #9880 repro: bulk hire 100 administrators in one go, then look at the TOE and the log.</div>
+        <div class="expect">
+          <span class="k">Expect</span>
+          <span>All 100 end up seated. Carrier count grows by roughly one per seven people, and no carrier holds more than its capacity. The hire completes without a visible stall. Log: 100 <code>Seated</code>/<code>Upgraded</code> lines in total, and roughly 14 <code>Built support carrier</code> lines &mdash; if you see anywhere near 100 of those, the packing is wrong.</span>
+          <span class="fail">Fails if: the UI hangs, a carrier is overfilled, or 100 carriers appear.</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="test" data-test>
+      <div class="test-head">
+        <span class="tid">10</span>
+        <input type="checkbox" id="t10">
+        <label for="t10">Retraining into a support role seats them</label>
+        <span class="pill new">new</span>
+      </div>
+      <div class="body">
+        <div><span class="k">Do</span> Take a MekWarrior with no unit assignment and change their primary role to Administrator.</div>
+        <div class="expect">
+          <span class="k">Expect</span>
+          <span>They appear in a Command section carrier without any further action. Log: a <code>Seated</code> or <code>Built support carrier</code> line naming them.</span>
+          <span class="fail">Fails if: nothing happens, or they are pulled out of a fighting unit to be seated.</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="test" data-test>
+      <div class="test-head">
+        <span class="tid">11</span>
+        <input type="checkbox" id="t11">
+        <label for="t11">Retraining out of a support role releases the seat</label>
+        <span class="pill new">new</span>
+      </div>
+      <div class="body">
+        <div><span class="k">Do</span> Take a technician sitting in a carrier and change their primary role to MekWarrior.</div>
+        <div class="expect">
+          <span class="k">Expect</span>
+          <span>They leave the carrier. This is the one departure the campaign engine did not already handle, so it is the check most likely to catch a regression later. Log: <code>Releasing NAME from carrier UNIT: no longer carried by this profession</code>.</span>
+          <span class="fail">Fails if: they stay listed in the MekTech carrier with a warrior's role.</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="test" data-test>
+      <div class="test-head">
+        <span class="tid">12</span>
+        <input type="checkbox" id="t12">
+        <label for="t12">Death or retirement empties and removes a carrier</label>
+        <span class="pill new">new</span>
+      </div>
+      <div class="body">
+        <div><span class="k">Do</span> Find or make a carrier with very few crew, then retire or GM-kill every one of them.</div>
+        <div class="expect">
+          <span class="k">Expect</span>
+          <span>Seats vacate as each person goes. When the last leaves, the carrier disappears, and if it was the only carrier in its profession formation that formation goes too. Support Command and its sections stay. Log: <code>Removing empty support carrier UNIT</code>, followed by <code>Removing empty support formation NAME</code> only when the formation was left empty.</span>
+          <span class="fail">Fails if: an empty carrier lingers, an empty profession formation lingers, or Support Command itself is deleted.</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="test" data-test>
+      <div class="test-head">
+        <span class="tid">13</span>
+        <input type="checkbox" id="t13">
+        <label for="t13">Returning to duty re-seats</label>
+        <span class="pill new">new</span>
+      </div>
+      <div class="body">
+        <div><span class="k">Do</span> Send a seated technician to an academy or set them On Leave, confirm the seat vacates, then return them to Active.</div>
+        <div class="expect">
+          <span class="k">Expect</span>
+          <span>They leave the carrier on departure and are seated again on return &mdash; not necessarily in the same carrier, which is expected. Log: a <code>Seated</code> line on return.</span>
+          <span class="fail">Fails if: they come back Active and stay outside the TOE.</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <h2>Not deployable, and duties untouched</h2>
+
+    <div class="test gate" data-test>
+      <div class="test-head">
+        <span class="tid">14</span>
+        <input type="checkbox" id="t14">
+        <label for="t14">Carriers cannot be sent to a scenario</label>
+        <span class="pill gate">gate</span>
+      </div>
+      <div class="body">
+        <div><span class="k">Do</span> Get a scenario and try to assign Support Command, a profession company, and a single carrier to it. Try this in both an AtB/StratCon campaign and a non-AtB one.</div>
+        <div class="expect">
+          <span class="k">Expect</span>
+          <span>Carriers are refused in both. The AtB path matters specifically &mdash; its <code>canDeploy</code> does not call <code>super</code>, so it needed its own guard and is the one most likely to have been missed.</span>
+          <span class="fail">Fails if: a MekTech Company reaches a scenario in either campaign type.</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="test" data-test>
+      <div class="test-head">
+        <span class="tid">15</span>
+        <input type="checkbox" id="t15">
+        <label for="t15">Seated staff still do their jobs</label>
+        <span class="pill reg">regression</span>
+      </div>
+      <div class="body">
+        <div><span class="k">Do</span> Note maintenance capacity, doctor capacity and the administrator count before and after a batch of hires get seated.</div>
+        <div class="expect">
+          <span class="k">Expect</span>
+          <span>All three rise by the full amount hired. Being in a carrier must not remove anyone from the maintenance pool, the medical pool or the admin headcount &mdash; this is the invariant the whole feature rests on.</span>
+          <span class="fail">Fails if: capacity does not move when support staff are seated.</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="test" data-test>
+      <div class="test-head">
+        <span class="tid">16</span>
+        <input type="checkbox" id="t16">
+        <label for="t16">A campaign with no Support Command is left alone</label>
+        <span class="pill new">new</span>
+      </div>
+      <div class="body">
+        <div><span class="k">Do</span> Start a campaign without running the Command Generator, or load an old save that never had one. Hire a technician and an administrator.</div>
+        <div class="expect">
+          <span class="k">Expect</span>
+          <span>Nothing is created. No Support Command appears, no carriers are built, and the hires sit in the roster as they always did. Log: on load, <code>Support carrier reconciliation: no Support Command formation, so carriers are not managed in this campaign</code>, and no <code>Seated</code> or <code>Built</code> lines after the hires.</span>
+          <span class="fail">Fails if: a support structure springs into existence in a campaign that never opted in.</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <h2>Watch the log throughout</h2>
+    <div class="note">
+      <p>Every check that leans on the log has a real INFO line behind it &mdash; <code>mekhq</code> logs at <code>info</code>, so nothing here depends on debug output. Grep <code>mekhq.log</code> for these while you work:</p>
+      <div class="scroll">
+        <table>
+          <thead><tr><th>Look for</th><th>Means</th><th>Checks</th></tr></thead>
+          <tbody>
+            <tr><td><code>Seated NAME in support carrier UNIT (n/m)</code></td><td>Filled a free seat in an existing carrier</td><td>06, 09, 10, 13</td></tr>
+            <tr><td><code>Built support carrier UNIT for NAME under FORMATION</code></td><td>No carrier had room, so one was made</td><td>07, 09</td></tr>
+            <tr><td><code>Upgraded support carrier SMALL to BIG for NAME (n moved, now x/y)</code></td><td>A full undersized squad was replaced by a full-size one</td><td>08</td></tr>
+            <tr><td><code>Releasing NAME from carrier UNIT: no longer carried by this profession</code></td><td>Retrained out of a support role</td><td>11</td></tr>
+            <tr><td><code>Removing empty support carrier UNIT</code></td><td>Last crew member left</td><td>08, 12</td></tr>
+            <tr><td><code>Removing empty support formation NAME</code></td><td>Its last carrier went with it</td><td>12</td></tr>
+            <tr><td><code>Marked N pre-existing support carrier(s) during load</code></td><td>Migration recognised an older save&#39;s carriers</td><td>04</td></tr>
+            <tr><td><code>Support carrier reconciliation: seated N, released N</code></td><td>The load sweep ran; always written, even at 0/0</td><td>04, 05</td></tr>
+            <tr><td><code>Support carrier reconciliation: no Support Command formation, so carriers are not managed</code></td><td>Campaign never opted in; reconciler stays out</td><td>16</td></tr>
+            <tr><td><code>Could not build a support carrier for NAME; they stay unfiled</code></td><td>WARN &mdash; a carrier unit failed to load</td><td>any</td></tr>
+            <tr><td>Any <code>ERROR</code> naming a support or carrier class</td><td>Stop and capture it</td><td>any</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <h2>Result</h2>
+    <div class="prose">
+      <p>Record the outcome here before opening the PR, and paste the summary into the PR's Testing section. The checklist result has to be reported in chat as well as ticked &mdash; a run nobody reported has not been run.</p>
+      <ul>
+        <li><strong>All sixteen passing?</strong> If yes, the PR can open with the checklist result in the Testing section.</li>
+        <li><strong>A gate failed?</strong> Do not open. Gates 03, 04 and 14 cover new persisted state and permanent data loss.</li>
+        <li><strong>A non-gate failed?</strong> Judgement call &mdash; fix it, or open with it named explicitly under "What is not proven yet".</li>
+      </ul>
+    </div>
+  </section>
+
+  <footer>
+    <span>Feature branch <span class="path">Implement-Keep-Carriers-Current</span>, commit <span class="path">d17ddf5a88</span>. Companion to the implementation plan and the support-carriers design note.</span>
+    <span>Ticks are remembered in this browser only, so you can close the page between sessions.</span>
+  </footer>
+
+</div>
+
+<script>
+  (function () {
+    var KEY = 'mekhq-carrier-checklist-v1';
+    var boxes = Array.prototype.slice.call(document.querySelectorAll('.test input[type=checkbox]'));
+    var fill = document.getElementById('fill');
+    var count = document.getElementById('count');
+
+    function load() {
+      try {
+        var raw = window.localStorage.getItem(KEY);
+        if (!raw) { return {}; }
+        return JSON.parse(raw) || {};
+      } catch (error) { return {}; }
+    }
+
+    function save(state) {
+      try { window.localStorage.setItem(KEY, JSON.stringify(state)); } catch (error) { /* private mode */ }
+    }
+
+    function render() {
+      var done = 0;
+      boxes.forEach(function (box) {
+        var card = box.closest('.test');
+        if (box.checked) { done++; card.classList.add('done'); } else { card.classList.remove('done'); }
+      });
+      count.textContent = done + ' of ' + boxes.length + ' complete';
+      fill.style.width = (boxes.length ? (done / boxes.length) * 100 : 0) + '%';
+    }
+
+    var state = load();
+    boxes.forEach(function (box) {
+      if (state[box.id]) { box.checked = true; }
+      box.addEventListener('change', function () {
+        var next = load();
+        next[box.id] = box.checked;
+        save(next);
+        render();
+      });
+    });
+
+    document.getElementById('reset').addEventListener('click', function () {
+      boxes.forEach(function (box) { box.checked = false; });
+      save({});
+      render();
+    });
+
+    render();
+  })();
+</script>
