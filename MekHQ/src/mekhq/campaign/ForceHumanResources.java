@@ -2535,7 +2535,7 @@ public class ForceHumanResources {
         }
 
         if (employ && prisonerStatus.isFreeOrBondsman()) {
-            ArmorKitIssuer.equipDefaultKitOnRecruitment(person, campaign);
+            ArmorKitIssuer.equipDefaultKitOnRecruitment(person, campaign, gmAdd);
         }
 
         MekHQ.triggerEvent(new PersonNewEvent(person));

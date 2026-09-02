@@ -226,6 +226,11 @@ public final class ArmorKitIssuer {
               .addShoppingItem(template(kit, campaign).getAcquisitionWork(), quantity, campaign);
     }
 
+
+    private static void add(EquipmentType kit, Person person) {
+        person.setArmorKitName(kit.getInternalName());
+    }
+
     /**
      * Issues any awaited kits that have since arrived in local stores. For each active person meant to wear a kit they
      * do not yet have, if their stores now hold it, the kit is drawn and issued; the intent is cleared once met (or
@@ -430,11 +435,12 @@ public final class ArmorKitIssuer {
      *
      * @param person   the freshly recruited character
      * @param campaign the campaign they joined
+     * @param gmAdd {@code true} if the character is being added by the GM
      *
      * @author Illiani
      * @since 0.51.01
      */
-    public static void equipDefaultKitOnRecruitment(Person person, Campaign campaign) {
+    public static void equipDefaultKitOnRecruitment(Person person, Campaign campaign, boolean gmAdd) {
         if (!ArmorKitCatalog.canBeIssuedKit(person)) {
             return;
         }
@@ -449,9 +455,14 @@ public final class ArmorKitIssuer {
         if (issueFromStock(person, kit, campaign)) {
             return; // equipped straight from local stores
         }
+
         if (campaign.getCampaignOptions().get(CampaignOption.ADD_DEFAULT_KIT_TO_PROCUREMENT)) {
-            order(kit, 1, campaign);
-            person.setIntendedArmorKitName(kit.getInternalName());
+            if (gmAdd) {
+                add(kit, person);
+            } else {
+                order(kit, 1, campaign);
+                person.setIntendedArmorKitName(kit.getInternalName());
+            }
         }
     }
 
