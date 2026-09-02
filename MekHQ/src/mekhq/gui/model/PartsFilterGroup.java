@@ -173,7 +173,7 @@ public enum PartsFilterGroup {
         }
     };
 
-    private final static String RESOURCE_BUNDLE = "mekhq.gui.model.PartsFilterGroup";
+    private final static String RESOURCE_BUNDLE = "mekhq.resources.PartsFilterGroup";
 
     private final String groupName;
 
