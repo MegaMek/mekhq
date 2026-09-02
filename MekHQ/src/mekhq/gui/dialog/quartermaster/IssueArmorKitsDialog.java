@@ -57,11 +57,14 @@ import java.util.Set;
 import javax.swing.*;
 import javax.swing.table.AbstractTableModel;
 
+import megamek.client.ui.preferences.JWindowPreference;
+import megamek.client.ui.preferences.PreferencesNode;
 import megamek.common.equipment.EquipmentType;
 import megamek.common.equipment.MiscType;
 import megamek.common.equipment.enums.MiscTypeFlag;
 import megamek.common.rolls.TargetRoll;
 import megamek.common.ui.FastJScrollPane;
+import megamek.logging.MMLogger;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.LocalWarehouse;
@@ -86,6 +89,7 @@ import mekhq.gui.baseComponents.roundedComponents.RoundedLineBorder;
  * @since 0.51.01
  */
 public class IssueArmorKitsDialog extends JDialog {
+    private static final MMLogger LOGGER = MMLogger.create(IssueArmorKitsDialog.class);
     private static final String RESOURCE_BUNDLE = "mekhq.resources.IssueArmorKitsDialog";
 
     private final transient Campaign campaign;
@@ -128,7 +132,9 @@ public class IssueArmorKitsDialog extends JDialog {
                   JOptionPane.INFORMATION_MESSAGE);
             return;
         }
-        new IssueArmorKitsDialog(parent, campaign, gathered).setVisible(true);
+        IssueArmorKitsDialog dialog = new IssueArmorKitsDialog(parent, campaign, gathered);
+        dialog.setPreferences(dialog); // Must be before setVisible
+        dialog.setVisible(true);
     }
 
     private IssueArmorKitsDialog(JFrame parent, Campaign campaign, List<Person> gathered) {
@@ -821,4 +827,17 @@ public class IssueArmorKitsDialog extends JDialog {
         }
     }
     // endregion Roster model
+
+    /**
+     * This override forces the preferences for this class to be tracked in MekHQ instead of MegaMek.
+     */
+    private void setPreferences(JDialog dialog) {
+        try {
+            PreferencesNode preferences = MekHQ.getMHQPreferences().forClass(IssueArmorKitsDialog.class);
+            dialog.setName("IssueArmorKitsDialog");
+            preferences.manage(new JWindowPreference(dialog));
+        } catch (Exception ex) {
+            LOGGER.error("Failed to set user preferences", ex);
+        }
+    }
 }
