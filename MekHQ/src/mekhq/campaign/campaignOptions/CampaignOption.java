@@ -225,6 +225,8 @@ public final class CampaignOption<T> {
           of(Integer.class, 15, "autoLogisticsHeadComponents");
     public static final CampaignOption<Integer> AUTO_LOGISTICS_OTHER =
           of(Integer.class, 0, "autoLogisticsOther");
+    public static final CampaignOption<Integer> AUTO_LOGISTICS_ARMOR_KIT =
+          of(Integer.class, 0, "autoLogisticsArmorKit");
     public static final CampaignOption<Integer> UNIT_TRANSIT_TIME =
           of(Integer.class, CampaignOptions.TRANSIT_UNIT_MONTH, "unitTransitTime");
     public static final CampaignOption<Boolean> NO_DELIVERIES_IN_TRANSIT =

@@ -138,6 +138,8 @@ class AcquisitionPage {
     private JSpinner spnAutoLogisticsGyros;
     private JLabel lblAutoLogisticsOther;
     private JSpinner spnAutoLogisticsOther;
+    private JLabel lblAutoLogisticsArmorKit;
+    private JSpinner spnAutoLogisticsArmorKit;
 
     private JLabel lblTransitTimeUnits;
     private MMComboBox<String> choiceTransitTimeUnits;
@@ -422,6 +424,12 @@ class AcquisitionPage {
         spnAutoLogisticsOther = new CampaignOptionsSpinner("AutoLogisticsOther", 50, 0, 10000, 1);
         spnAutoLogisticsOther.addMouseListener(createTipPanelUpdater("AutoLogisticsOther"));
 
+        lblAutoLogisticsArmorKit = new CampaignOptionsLabel("AutoLogisticsArmorKit",
+              getMetadata(new Version(0, 51, 1)));
+        lblAutoLogisticsArmorKit.addMouseListener(createTipPanelUpdater("AutoLogisticsArmorKit"));
+        spnAutoLogisticsArmorKit = new CampaignOptionsSpinner("AutoLogisticsArmorKit", 0, 0, 10000, 1);
+        spnAutoLogisticsArmorKit.addMouseListener(createTipPanelUpdater("AutoLogisticsArmorKit"));
+
         // Layout the Panel
         final SettingsFormPanel panel = new SettingsFormPanel("AutoLogisticsPanel",
               AUTO_LOGISTICS_LABEL_COLUMN_WIDTH,
@@ -439,7 +447,8 @@ class AcquisitionPage {
               lblAutoLogisticsEngines, spnAutoLogisticsEngines,
               lblAutoLogisticsGyros, spnAutoLogisticsGyros,
               lblAutoLogisticsWeapons, spnAutoLogisticsWeapons,
-              lblAutoLogisticsOther, spnAutoLogisticsOther);
+              lblAutoLogisticsOther, spnAutoLogisticsOther,
+              lblAutoLogisticsArmorKit, spnAutoLogisticsArmorKit);
 
         // Compute where this grid's second label column (the "third column") begins, so
         // the single-control sections
@@ -576,6 +585,7 @@ class AcquisitionPage {
         spnAutoLogisticsHeatSink.setValue(model.autoLogisticsHeatSink);
         spnAutoLogisticsWeapons.setValue(model.autoLogisticsWeapons);
         spnAutoLogisticsOther.setValue(model.autoLogisticsOther);
+        spnAutoLogisticsArmorKit.setValue(model.autoLogisticsArmorKit);
         choiceTransitTimeUnits.setSelectedIndex(model.unitTransitTime);
         chkNoDeliveriesInTransit.setSelected(model.noDeliveriesInTransit);
         cboMekWarriorDefaultKit.setSelectedItem(model.mekWarriorDefaultKit);
@@ -617,6 +627,7 @@ class AcquisitionPage {
         model.autoLogisticsHeatSink = (int) spnAutoLogisticsHeatSink.getValue();
         model.autoLogisticsWeapons = (int) spnAutoLogisticsWeapons.getValue();
         model.autoLogisticsOther = (int) spnAutoLogisticsOther.getValue();
+        model.autoLogisticsArmorKit = (int) spnAutoLogisticsArmorKit.getValue();
         model.unitTransitTime = choiceTransitTimeUnits.getSelectedIndex();
         model.noDeliveriesInTransit = chkNoDeliveriesInTransit.isSelected();
         model.mekWarriorDefaultKit = cboMekWarriorDefaultKit.getSelectedItem();
