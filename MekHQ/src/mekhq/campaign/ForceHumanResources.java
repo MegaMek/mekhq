@@ -2534,7 +2534,7 @@ public class ForceHumanResources {
             }
         }
 
-        if (employ && prisonerStatus.isFree()) {
+        if (employ && prisonerStatus.isFreeOrBondsman()) {
             ArmorKitIssuer.equipDefaultKitOnRecruitment(person, campaign);
         }
 
