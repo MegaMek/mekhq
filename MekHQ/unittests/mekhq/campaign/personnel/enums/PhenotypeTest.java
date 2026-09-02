@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2022-2025 The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2022-2026 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -40,6 +40,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import mekhq.campaign.personnel.skills.SkillType;
 import org.junit.jupiter.api.Test;
 
 class PhenotypeTest {
@@ -86,6 +87,38 @@ class PhenotypeTest {
             String shortName = phenotype.getShortName();
             boolean isValid = isResourceKeyValid(shortName);
             assertTrue(isValid, "Invalid resource key: " + shortName);
+        }
+    }
+
+    @Test
+    void testGetBonusSkills() {
+        assertEquals(List.of(SkillType.S_GUN_MEK, SkillType.S_PILOT_MEK), Phenotype.MEKWARRIOR.getBonusSkills());
+        assertEquals(List.of(SkillType.S_GUN_BA, SkillType.S_ANTI_MEK), Phenotype.ELEMENTAL.getBonusSkills());
+        assertEquals(List.of(SkillType.S_GUN_AERO, SkillType.S_PILOT_AERO, SkillType.S_GUN_JET, SkillType.S_PILOT_JET),
+              Phenotype.AEROSPACE.getBonusSkills());
+        assertEquals(List.of(SkillType.S_GUN_VEE,
+              SkillType.S_PILOT_GVEE,
+              SkillType.S_PILOT_NVEE,
+              SkillType.S_PILOT_VTOL), Phenotype.VEHICLE.getBonusSkills());
+        assertEquals(List.of(SkillType.S_GUN_PROTO), Phenotype.PROTOMEK.getBonusSkills());
+        assertEquals(List.of(SkillType.S_TECH_VESSEL,
+              SkillType.S_GUN_SPACE,
+              SkillType.S_PILOT_SPACE,
+              SkillType.S_NAVIGATION), Phenotype.NAVAL.getBonusSkills());
+    }
+
+    @Test
+    void testGetBonusSkillsInternalPhenotypesHaveNone() {
+        assertTrue(Phenotype.NONE.getBonusSkills().isEmpty());
+        assertTrue(Phenotype.GENERAL.getBonusSkills().isEmpty());
+    }
+
+    @Test
+    void testGetBonusSkillsOnlyExternalPhenotypesGrantBonus() {
+        for (final Phenotype phenotype : phenotypes) {
+            assertEquals(phenotype.isExternal(),
+                  !phenotype.getBonusSkills().isEmpty(),
+                  "Bonus skills should be present only for external phenotypes: " + phenotype);
         }
     }
 
