@@ -34,22 +34,28 @@ package mekhq.campaign.market;
 
 import static mekhq.campaign.mission.resupplyAndCaches.Resupply.isProhibitedUnitType;
 
+import java.util.EnumMap;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
+import megamek.common.equipment.AmmoType;
 import megamek.common.equipment.EquipmentType;
 import megamek.common.equipment.MiscType;
 import megamek.common.equipment.WeaponType;
+import megamek.common.equipment.enums.BombType;
+import megamek.common.equipment.enums.BombType.BombTypeEnum;
 import megamek.common.units.Entity;
+import megamek.common.units.IBomber;
 import megamek.common.units.Mek;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.LocalWarehouse;
 import mekhq.campaign.base.PlayerBase;
-import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.campaignOptions.CampaignOption;
+import mekhq.campaign.campaignOptions.CampaignOptions;
+import mekhq.campaign.location.ILocatable;
 import mekhq.campaign.location.IPlace;
 import mekhq.campaign.parts.AmmoStorage;
 import mekhq.campaign.parts.Armor;
@@ -70,6 +76,8 @@ import mekhq.campaign.parts.meks.MekLifeSupport;
 import mekhq.campaign.parts.meks.MekLocation;
 import mekhq.campaign.parts.meks.MekSensor;
 import mekhq.campaign.parts.missing.MissingPart;
+import mekhq.campaign.personnel.Person;
+import mekhq.campaign.personnel.quartermaster.ArmorKitCatalog;
 import mekhq.campaign.unit.Unit;
 import mekhq.campaign.work.IAcquisitionWork;
 
@@ -132,10 +140,13 @@ public class PartsInUseManager {
         this.partsInUseRequestedStockMap = place.getRequestedStockLevels().getStockMap();
     }
 
-    /** The place a part is located at — its unit's location for installed parts, its warehouse for spares. */
-    private IPlace placeOf(Part part) {
-        IPlace partPlace = part.getPlace();
-        return (partPlace != null) ? partPlace : campaign.getPlayerForce().getForceDetachment();
+    /**
+     * The place something is located at — a part's unit location (or warehouse for spares), or the place a person or
+     * unit resides at. Falls back to the main-force detachment when the location tree resolves no place.
+     */
+    private IPlace placeOf(ILocatable locatable) {
+        IPlace located = locatable.getPlace();
+        return (located != null) ? located : campaign.getPlayerForce().getForceDetachment();
     }
 
     /**
@@ -240,6 +251,9 @@ public class PartsInUseManager {
         } else if (part instanceof TankLocation) {
             return campaignOptions.get(CampaignOption.AUTO_LOGISTICS_NON_REPAIRABLE_LOCATION);
         } else if (part instanceof AmmoBin || part instanceof AmmoStorage) {
+            if (isBombPart(part)) {
+                return campaignOptions.get(CampaignOption.AUTO_LOGISTICS_BOMB);
+            }
             return campaignOptions.get(CampaignOption.AUTO_LOGISTICS_AMMUNITION);
         } else if (part instanceof Armor) {
             return campaignOptions.get(CampaignOption.AUTO_LOGISTICS_ARMOR);
@@ -256,6 +270,9 @@ public class PartsInUseManager {
         } else if (part instanceof EquipmentPart equipmentPart) {
             if (equipmentPart.getType() instanceof WeaponType) {
                 return campaignOptions.get(CampaignOption.AUTO_LOGISTICS_WEAPONS);
+            }
+            if ((equipmentPart.getType() instanceof MiscType miscType) && miscType.hasFlag(MiscType.F_ARMOR_KIT)) {
+                return campaignOptions.get(CampaignOption.AUTO_LOGISTICS_ARMOR_KIT);
             }
         }
 
@@ -365,6 +382,18 @@ public class PartsInUseManager {
                 );
             }
         }
+        // Armor kits worn by personnel and issued to infantry platoons aren't warehouse parts, so fold them in here.
+        for (Map.Entry<String, Integer> worn : wornArmorKitCounts(ignoreMothballedUnits).entrySet()) {
+            if (partInUse.equals(armorKitPartInUse(worn.getKey()))) {
+                partInUse.setUseCount(partInUse.getUseCount() + worn.getValue());
+            }
+        }
+        // Bombs loaded on aircraft leave the warehouse for the entity's loadout, so fold them in the same way.
+        for (Map.Entry<BombTypeEnum, Integer> loaded : loadedBombCounts(ignoreMothballedUnits).entrySet()) {
+            if (partInUse.equals(bombPartInUse(loaded.getKey()))) {
+                partInUse.setUseCount(partInUse.getUseCount() + loaded.getValue());
+            }
+        }
     }
 
     /**
@@ -467,6 +496,10 @@ public class PartsInUseManager {
                         newPart.getQuantityForPartsInUse() * maybePart.getQuantity()
             );
         }
+
+        addWornArmorKitsInUse(inUse, ignoreMothballedUnits);
+        addLoadedBombsInUse(inUse, ignoreMothballedUnits);
+
         return inUse.keySet()
                      .stream()
                      // Hacky but otherwise we end up with zero lines when filtering things out
@@ -552,6 +585,170 @@ public class PartsInUseManager {
         }
 
         return toBuy;
+    }
+
+    /**
+     * The {@link PartInUse} record for a worn armor kit, built from a spare {@link EquipmentPart} template of that kit
+     * so it matches the record the warehouse pass produces for the same kit.
+     *
+     * @param kitInternalName the internal name of the kit
+     *
+     * @return the matching {@link PartInUse}, or {@code null} if the kit is unknown or not trackable
+     */
+    private PartInUse armorKitPartInUse(String kitInternalName) {
+        EquipmentType kit = EquipmentType.get(kitInternalName);
+        if (kit == null) {
+            return null;
+        }
+        return getPartInUse(new EquipmentPart(0, kit, -1, 1.0, false, campaign));
+    }
+
+    /**
+     * Counts the armor kits currently worn at this place but not held as warehouse parts: one per active person wearing
+     * a real kit, and one per trooper for each conventional infantry platoon issued a kit. Keyed by kit internal name.
+     *
+     * <p>Coveralls (the no-protection default) and unknown kit names are skipped. Personnel are always counted while
+     * active; infantry platoons honor the same mothballed and salvage exclusions the warehouse pass applies.</p>
+     *
+     * @param ignoreMothballedUnits if {@code true}, platoons on mothballed units are excluded
+     *
+     * @return worn-kit counts by kit internal name
+     */
+    private Map<String, Integer> wornArmorKitCounts(boolean ignoreMothballedUnits) {
+        Map<String, Integer> counts = new HashMap<>();
+        for (Person person : campaign.getPlayerForce().getHumanResources().getActivePersonnel(false, false)) {
+            if (placeOf(person) == place) {
+                addWornKit(counts, person.getArmorKitName(), 1);
+            }
+        }
+        for (Unit unit : campaign.getUnits()) {
+            if (!unit.isConventionalInfantry() || (placeOf(unit) != place)) {
+                continue;
+            }
+            if ((ignoreMothballedUnits && unit.isMothballed()) || unit.isSalvage()) {
+                continue;
+            }
+            addWornKit(counts, unit.getArmorKitName(), Math.max(1, unit.getCrew().size()));
+        }
+        return counts;
+    }
+
+    /** Adds {@code quantity} of a worn kit to the tally, skipping coveralls and any name that isn't a real kit. */
+    private static void addWornKit(Map<String, Integer> counts, String kitInternalName, int quantity) {
+        if ((kitInternalName == null)
+                  || kitInternalName.equals(ArmorKitCatalog.DEFAULT_ARMOR_KIT_NAME)
+                  || (EquipmentType.get(kitInternalName) == null)) {
+            return;
+        }
+        counts.merge(kitInternalName, quantity, Integer::sum);
+    }
+
+    /**
+     * Folds worn armor kits into the parts-in-use map as use count, creating a record for any kit that has no warehouse
+     * spares (and so no record yet) with its requested stock resolved the same way the warehouse pass does.
+     */
+    private void addWornArmorKitsInUse(Map<PartInUse, PartInUse> inUse, boolean ignoreMothballedUnits) {
+        for (Map.Entry<String, Integer> worn : wornArmorKitCounts(ignoreMothballedUnits).entrySet()) {
+            PartInUse partInUse = armorKitPartInUse(worn.getKey());
+            if (partInUse == null) {
+                continue;
+            }
+            PartInUse tracked = inUse.get(partInUse);
+            if (tracked == null) {
+                String stockKey = getStockKey(partInUse);
+                if (partsInUseRequestedStockMap.containsKey(stockKey)) {
+                    partInUse.setRequestedStock(partsInUseRequestedStockMap.get(stockKey));
+                }
+                inUse.put(partInUse, partInUse);
+                tracked = partInUse;
+            }
+            tracked.setUseCount(tracked.getUseCount() + worn.getValue());
+        }
+    }
+
+    /** Whether an ammo part holds bombs (external ordnance) rather than ordinary ammunition. */
+    private static boolean isBombPart(Part part) {
+        if (part instanceof AmmoStorage ammoStorage) {
+            return ammoStorage.getType() instanceof BombType;
+        }
+        if (part instanceof AmmoBin ammoBin) {
+            return ammoBin.getType() instanceof BombType;
+        }
+        return false;
+    }
+
+    /**
+     * The {@link PartInUse} record for a bomb type, built from a spare {@link AmmoStorage} template of that bomb so it
+     * matches the record the warehouse pass produces for the same bomb.
+     *
+     * @param bombType the bomb type
+     *
+     * @return the matching {@link PartInUse}, or {@code null} if the bomb type has no ammo equipment or isn't trackable
+     */
+    private PartInUse bombPartInUse(BombTypeEnum bombType) {
+        if ((bombType == null) || (bombType == BombTypeEnum.NONE)) {
+            return null;
+        }
+        if (!(EquipmentType.get(bombType.getInternalName()) instanceof AmmoType ammoType)) {
+            return null;
+        }
+        return getPartInUse(new AmmoStorage(0, ammoType, 1, campaign));
+    }
+
+    /**
+     * Counts the bombs currently loaded on aircraft at this place but not held as warehouse parts, keyed by bomb type.
+     * A loaded bomb has been drawn from stores into the entity's {@link megamek.common.equipment.BombLoadout}, so like
+     * a worn armor kit it is counted here rather than through the warehouse pass.
+     *
+     * <p>Aircraft honor the same mothballed and salvage exclusions the warehouse pass applies.</p>
+     *
+     * @param ignoreMothballedUnits if {@code true}, bombs on mothballed aircraft are excluded
+     *
+     * @return loaded-bomb counts by bomb type
+     */
+    private Map<BombTypeEnum, Integer> loadedBombCounts(boolean ignoreMothballedUnits) {
+        Map<BombTypeEnum, Integer> counts = new EnumMap<>(BombTypeEnum.class);
+        for (Unit unit : campaign.getUnits()) {
+            if (!(unit.getEntity() instanceof IBomber bomber) || (placeOf(unit) != place)) {
+                continue;
+            }
+            if ((ignoreMothballedUnits && unit.isMothballed()) || unit.isSalvage()) {
+                continue;
+            }
+            for (Map.Entry<BombTypeEnum, Integer> loaded : bomber.getBombChoices().entrySet()) {
+                BombTypeEnum bombType = loaded.getKey();
+                int count = loaded.getValue();
+                if ((bombType == null) || (bombType == BombTypeEnum.NONE) || (count <= 0)) {
+                    continue;
+                }
+                counts.merge(bombType, count, Integer::sum);
+            }
+        }
+        return counts;
+    }
+
+    /**
+     * Folds bombs loaded on aircraft into the parts-in-use map as use count, creating a record for any bomb type that
+     * has no warehouse stores (and so no record yet) with its requested stock resolved the same way the warehouse pass
+     * does.
+     */
+    private void addLoadedBombsInUse(Map<PartInUse, PartInUse> inUse, boolean ignoreMothballedUnits) {
+        for (Map.Entry<BombTypeEnum, Integer> loaded : loadedBombCounts(ignoreMothballedUnits).entrySet()) {
+            PartInUse partInUse = bombPartInUse(loaded.getKey());
+            if (partInUse == null) {
+                continue;
+            }
+            PartInUse tracked = inUse.get(partInUse);
+            if (tracked == null) {
+                String stockKey = getStockKey(partInUse);
+                if (partsInUseRequestedStockMap.containsKey(stockKey)) {
+                    partInUse.setRequestedStock(partsInUseRequestedStockMap.get(stockKey));
+                }
+                inUse.put(partInUse, partInUse);
+                tracked = partInUse;
+            }
+            tracked.setUseCount(tracked.getUseCount() + loaded.getValue());
+        }
     }
 
     /**

@@ -72,6 +72,7 @@ import static mekhq.campaign.randomEvents.prisoners.PrisonerEventManager.checkFo
 import static mekhq.campaign.randomEvents.prisoners.PrisonerEventManager.processAdHocExecution;
 import static mekhq.utilities.MHQInternationalization.getFormattedText;
 import static mekhq.utilities.MHQInternationalization.getText;
+import static mekhq.utilities.MHQInternationalization.getTextAt;
 import static mekhq.utilities.ReportingUtilities.CLOSING_SPAN_TAG;
 import static mekhq.utilities.ReportingUtilities.getAmazingColor;
 import static mekhq.utilities.ReportingUtilities.getNegativeColor;
@@ -152,6 +153,7 @@ import mekhq.campaign.personnel.medical.BodyLocation;
 import mekhq.campaign.personnel.medical.advancedMedical.InjuryUtil;
 import mekhq.campaign.personnel.medical.advancedMedicalAlternate.DiseaseService;
 import mekhq.campaign.personnel.medical.advancedMedicalAlternate.Inoculations;
+import mekhq.campaign.personnel.quartermaster.ArmorKitCatalog;
 import mekhq.campaign.personnel.ranks.Rank;
 import mekhq.campaign.personnel.ranks.RankSystem;
 import mekhq.campaign.personnel.ranks.RankValidator;
@@ -175,6 +177,7 @@ import mekhq.gui.PersonnelTab;
 import mekhq.gui.baseComponents.JScrollableMenu;
 import mekhq.gui.control.EditLogControl.LogType;
 import mekhq.gui.dialog.*;
+import mekhq.gui.dialog.quartermaster.IssueArmorKitsDialog;
 import mekhq.gui.displayWrappers.RankDisplay;
 import mekhq.gui.menus.AssignPersonToUnitMenu;
 import mekhq.gui.menus.LocationMenu;
@@ -2558,7 +2561,7 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
                               selectedPerson.getHyperlinkedFullTitle());
                         getCampaign().addReport(MEDICAL, report);
                     } else {
-                        new AdvancedReplacementLimbDialog(getCampaign(), gui.getIconPackage(), selectedPerson, false);
+                        new AdvancedSurgeriesDialog(getCampaign(), gui, selectedPerson, false);
                     }
                 }
             });
@@ -2567,6 +2570,15 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
         JMenuHelpers.addMenuIfNonEmpty(popup, healthcareMenu);
 
         JMenuHelpers.addMenuIfNonEmpty(popup, new AssignPersonToUnitMenu(getCampaign(), selected));
+
+        if (Arrays.stream(selected).anyMatch(ArmorKitCatalog::canBeIssuedKit)) {
+            JMenuItem issueArmorKits = new JMenuItem(getTextAt("mekhq.resources.IssueArmorKitsDialog",
+                  "menu.issueArmorKits"));
+            issueArmorKits.addActionListener(ev -> IssueArmorKitsDialog.showFor(getFrame(),
+                  getCampaign(), Arrays.asList(selected), null));
+            popup.add(issueArmorKits);
+        }
+
         List<mekhq.campaign.personnel.Person> selectedPeople = Arrays.asList(selected);
         JMenuHelpers.addMenuIfNonEmpty(popup, new LocationMenu(getCampaign(), getFrame(), selectedPeople));
 

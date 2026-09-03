@@ -85,6 +85,7 @@ import mekhq.campaign.parts.protomeks.ProtoMekJumpJet;
 import mekhq.campaign.parts.protomeks.ProtoMekLegActuator;
 import mekhq.campaign.parts.protomeks.ProtoMekLocation;
 import mekhq.campaign.parts.protomeks.ProtoMekSensor;
+import mekhq.campaign.personnel.quartermaster.ArmorKitCatalog;
 
 /**
  * This is a parts store which will contain one copy of every possible part that might be needed as well as a variety of
@@ -178,6 +179,15 @@ public class PartsStore {
     protected void stockWeaponsAmmoAndEquipment(Campaign campaign) {
         for (Enumeration<EquipmentType> allTypes = EquipmentType.getAllTypes(); allTypes.hasMoreElements(); ) {
             EquipmentType equipmentType = allTypes.nextElement();
+            // Personal armor kits are non-hittable infantry equipment, so they are skipped by the check below; stock
+            // them here so the quartermaster can buy and issue them through normal procurement. The no-protection
+            // default is not sold.
+            if (equipmentType instanceof MiscType && equipmentType.hasFlag(MiscTypeFlag.F_ARMOR_KIT)) {
+                if (!ArmorKitCatalog.DEFAULT_ARMOR_KIT_NAME.equals(equipmentType.getInternalName())) {
+                    parts.add(new EquipmentPart(0, equipmentType, -1, 1.0, false, campaign));
+                }
+                continue;
+            }
             if (!equipmentType.isHittable() &&
                       !(equipmentType instanceof MiscType && equipmentType.hasFlag(MiscTypeFlag.F_BA_MANIPULATOR))) {
                 continue;

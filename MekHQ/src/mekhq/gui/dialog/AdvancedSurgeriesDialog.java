@@ -87,9 +87,10 @@ import megamek.logging.MMLogger;
 import mekhq.IconPackage;
 import mekhq.MekHQ;
 import mekhq.Utilities;
+import mekhq.campaign.AbstractLocation;
 import mekhq.campaign.Campaign;
-import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.campaignOptions.CampaignOption;
+import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.finances.Finances;
 import mekhq.campaign.finances.Money;
 import mekhq.campaign.finances.enums.TransactionType;
@@ -107,6 +108,7 @@ import mekhq.campaign.personnel.skills.Skill;
 import mekhq.campaign.personnel.skills.SkillModifierData;
 import mekhq.campaign.universe.Faction;
 import mekhq.campaign.utilities.glossary.GlossaryEntry;
+import mekhq.gui.CampaignGUI;
 import mekhq.gui.baseComponents.roundedComponents.RoundedJButton;
 import mekhq.gui.baseComponents.roundedComponents.RoundedLineBorder;
 import mekhq.gui.dialog.glossary.GlossaryEntryDialog;
@@ -125,9 +127,9 @@ import mekhq.gui.view.PaperDoll;
  * @author Illiani
  * @since 0.50.10
  */
-public class AdvancedReplacementLimbDialog extends JDialog {
-    private static final MMLogger LOGGER = MMLogger.create(AdvancedReplacementLimbDialog.class);
-    private static final String RESOURCE_BUNDLE = "mekhq.resources.AdvancedReplacementLimbDialog";
+public class AdvancedSurgeriesDialog extends JDialog {
+    private static final MMLogger LOGGER = MMLogger.create(AdvancedSurgeriesDialog.class);
+    private static final String RESOURCE_BUNDLE = "mekhq.resources.AdvancedSurgeriesDialog";
 
     private static final int PADDING = scaleForGUI(10);
     private static final String MALE_PAPER_DOLL = "default_male_paperdoll";
@@ -164,6 +166,7 @@ public class AdvancedReplacementLimbDialog extends JDialog {
     private final Campaign campaign;
     private final CampaignOptions campaignOptions;
     private final Person patient;
+    private final AbstractLocation currentLocation;
     private final boolean isGMMode;
     private Person surgeon; // can be null
     private int surgeryLevelNeeded = 0;
@@ -207,36 +210,45 @@ public class AdvancedReplacementLimbDialog extends JDialog {
     }
 
     /**
-     * Creates and displays a new {@link AdvancedReplacementLimbDialog} for the given patient.
+     * Creates and displays a new {@link AdvancedSurgeriesDialog} for the given patient.
      *
      * <p>If the patient is {@code null}, the dialog performs no initialization and returns without being shown.</p>
      *
      * @param campaign    the active campaign context
-     * @param iconPackage the {@link IconPackage} icon package to be used with the dialog
+     * @param campaignGUI the gui from which we fetch {@link IconPackage}
      * @param patient     the patient undergoing treatment, or {@code null}
      * @param isGMMode    whether the dialog has been launched in GM Mode (bypassing all restrictions)
      *
      * @author Illiani
      * @since 0.50.10
      */
-    public AdvancedReplacementLimbDialog(Campaign campaign, IconPackage iconPackage,
-          @Nullable Person patient, boolean isGMMode) {
+    public AdvancedSurgeriesDialog(Campaign campaign, CampaignGUI campaignGUI, @Nullable Person patient,
+          boolean isGMMode) {
         this.patient = patient;
         this.campaign = campaign;
+        this.currentLocation = patient == null ?
+                                     campaign.getPlayerForce().getForceDetachment().getCurrentLocation() :
+                                     patient.getCurrentLocation();
         this.campaignOptions = campaign.getCampaignOptions();
         this.isGMMode = isGMMode;
-        surgeon = getSurgeon(campaign.getPlayerForce().getHumanResources().getDoctors()); // can return null
 
         if (patient == null) {
             return;
         }
 
+        if (currentLocation == null) {
+            LOGGER.error("Failed to fetch a location for patient and player force fallback.");
+            return;
+        }
+
+        surgeon = getSurgeon(currentLocation); // can return null
+
         gatherRelevantInjuries(patient.getInjuries());
         gatherTreatmentOptions();
-        paperDoll(iconPackage);
+        paperDoll(campaignGUI.getIconPackage());
 
         setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
-        initializeUI(iconPackage);
+        initializeUI(campaignGUI);
         pack();
         setLocationRelativeTo(null);
         setModal(true);
@@ -251,7 +263,7 @@ public class AdvancedReplacementLimbDialog extends JDialog {
      * @author Illiani
      * @since 0.50.10
      */
-    private void initializeUI(IconPackage iconPackage) {
+    private void initializeUI(CampaignGUI gui) {
         setTitle(getText("accessingTerminal.title"));
         setLayout(new BorderLayout());
 
@@ -265,7 +277,7 @@ public class AdvancedReplacementLimbDialog extends JDialog {
         JPanel tutorialPanel = new JPanel(new BorderLayout());
         tutorialPanel.setBorder(RoundedLineBorder.createRoundedLineBorder());
         JTextArea tutorialText = new JTextArea(getTextAt(RESOURCE_BUNDLE,
-              "AdvancedReplacementLimbDialog.instructions"));
+              "AdvancedSurgeriesDialog.instructions"));
         tutorialText.setWrapStyleWord(true);
         tutorialText.setLineWrap(true);
         tutorialText.setEditable(false);
@@ -317,19 +329,19 @@ public class AdvancedReplacementLimbDialog extends JDialog {
         buttonPanel.setBorder(BorderFactory.createEmptyBorder(PADDING / 2, PADDING, PADDING, PADDING));
 
         RoundedJButton cancelButton = new RoundedJButton(getTextAt(
-              RESOURCE_BUNDLE, "AdvancedReplacementLimbDialog.button.cancel"));
+              RESOURCE_BUNDLE, "AdvancedSurgeriesDialog.button.cancel"));
         cancelButton.addActionListener(evt -> dispose());
 
         RoundedJButton documentationButton = new RoundedJButton(getTextAt(
-              RESOURCE_BUNDLE, "AdvancedReplacementLimbDialog.button.documentation"));
+              RESOURCE_BUNDLE, "AdvancedSurgeriesDialog.button.documentation"));
         documentationButton.addActionListener(this::onDocumentation);
 
         confirmButton = new RoundedJButton(getTextAt(
-              RESOURCE_BUNDLE, "AdvancedReplacementLimbDialog.button.confirm"));
+              RESOURCE_BUNDLE, "AdvancedSurgeriesDialog.button.confirm"));
         confirmButton.addActionListener(this::onConfirm);
 
         RoundedJButton gmButton = new RoundedJButton(getTextAt(
-              RESOURCE_BUNDLE, "AdvancedReplacementLimbDialog.button.gm"));
+              RESOURCE_BUNDLE, "AdvancedSurgeriesDialog.button.gm"));
         gmButton.setEnabled(campaign.isGM());
         gmButton.addActionListener(this::onGMConfirm);
 
@@ -340,19 +352,19 @@ public class AdvancedReplacementLimbDialog extends JDialog {
 
         if (isGMMode) {
             RoundedJButton normalModeButton = new RoundedJButton(getTextAt(
-                  RESOURCE_BUNDLE, "AdvancedReplacementLimbDialog.button.normalMode"));
+                  RESOURCE_BUNDLE, "AdvancedSurgeriesDialog.button.normalMode"));
             normalModeButton.addActionListener(evt -> {
                 dispose();
-                new AdvancedReplacementLimbDialog(campaign, iconPackage, patient, false);
+                new AdvancedSurgeriesDialog(campaign, gui, patient, false);
             });
             buttonPanel.add(normalModeButton);
         } else {
             RoundedJButton gmModeButton = new RoundedJButton(getTextAt(
-                  RESOURCE_BUNDLE, "AdvancedReplacementLimbDialog.button.gmMode"));
+                  RESOURCE_BUNDLE, "AdvancedSurgeriesDialog.button.gmMode"));
             gmModeButton.setEnabled(campaign.isGM());
             gmModeButton.addActionListener(evt -> {
                 dispose();
-                new AdvancedReplacementLimbDialog(campaign, iconPackage, patient, true);
+                new AdvancedSurgeriesDialog(campaign, gui, patient, true);
             });
             buttonPanel.add(gmModeButton);
         }
@@ -413,7 +425,7 @@ public class AdvancedReplacementLimbDialog extends JDialog {
     private JComboBox<ProstheticType> createTreatmentComboBox(List<ProstheticType> options) {
         Faction campaignFaction = campaign.getPlayerForce().getFaction();
         int currentYear = campaign.getGameYear();
-        boolean isOnPlanet = campaign.getPlayerForce().getForceDetachment().getCurrentLocation().isOnPlanet();
+        boolean isOnPlanet = currentLocation.isOnPlanet();
         double healingTimeMultiplier = campaignOptions.get(CampaignOption.ALTERNATIVE_ADVANCED_MEDICAL_HEALING_TIME_MULTIPLIER);
 
 
@@ -429,7 +441,7 @@ public class AdvancedReplacementLimbDialog extends JDialog {
 
         // Custom renderer to display "None" for null option and disable items
         // based on location
-        String defaultTooltip = getTextAt(RESOURCE_BUNDLE, "AdvancedReplacementLimbDialog.combo.none.tooltip");
+        String defaultTooltip = getTextAt(RESOURCE_BUNDLE, "AdvancedSurgeriesDialog.combo.none.tooltip");
         comboBox.setRenderer(new DefaultListCellRenderer() {
             @Override
             public Component getListCellRendererComponent(JList<?> list,
@@ -442,7 +454,7 @@ public class AdvancedReplacementLimbDialog extends JDialog {
 
                 if (value == null) {
                     setText(getTextAt(RESOURCE_BUNDLE,
-                          "AdvancedReplacementLimbDialog.combo.none.label"));
+                          "AdvancedSurgeriesDialog.combo.none.label"));
                     tooltip = defaultTooltip;
                 } else {
                     ProstheticType type = (ProstheticType) value;
@@ -516,20 +528,20 @@ public class AdvancedReplacementLimbDialog extends JDialog {
         List<String> summary = new ArrayList<>();
         if (selectedCount > 0) {
             summary.add(getFormattedTextAt(RESOURCE_BUNDLE,
-                  "AdvancedReplacementLimbDialog.status.selected",
+                  "AdvancedSurgeriesDialog.status.selected",
                   selectedCount));
 
             summary.add(getFormattedTextAt(RESOURCE_BUNDLE,
-                  "AdvancedReplacementLimbDialog.status.difficulty",
+                  "AdvancedSurgeriesDialog.status.difficulty",
                   surgeryLevelNeeded));
 
             if (isUseLocalSurgeon) {
-                if (campaign.getPlayerForce().getForceDetachment().getCurrentLocation().isOnPlanet()) {
+                if (currentLocation.isOnPlanet()) {
                     summary.add(getTextAt(RESOURCE_BUNDLE,
-                          "AdvancedReplacementLimbDialog.status.localSurgeon"));
+                          "AdvancedSurgeriesDialog.status.localSurgeon"));
                 } else {
                     summary.add(getTextAt(RESOURCE_BUNDLE,
-                          "AdvancedReplacementLimbDialog.status.localSurgeon.transit"));
+                          "AdvancedSurgeriesDialog.status.localSurgeon.transit"));
                 }
             } else {
                 Skill surgerySkill = surgeon.getSkill(S_SURGERY);
@@ -538,13 +550,13 @@ public class AdvancedReplacementLimbDialog extends JDialog {
                 int targetNumber = surgerySkill.getFinalSkillValue(modifierData);
 
                 summary.add(getFormattedTextAt(RESOURCE_BUNDLE,
-                      "AdvancedReplacementLimbDialog.status.surgeon",
+                      "AdvancedSurgeriesDialog.status.surgeon",
                       surgeon.getFullTitle(), surgeonSkillLevel, targetNumber));
             }
 
             if (totalCost.isPositive()) {
                 summary.add(getFormattedTextAt(RESOURCE_BUNDLE,
-                      "AdvancedReplacementLimbDialog.status.total",
+                      "AdvancedSurgeriesDialog.status.total",
                       totalCost.toAmountString()));
             }
         } else {
@@ -649,40 +661,38 @@ public class AdvancedReplacementLimbDialog extends JDialog {
             boolean hasHatredOfBionics = patient.getOptions().booleanOption(COMPULSION_BIONIC_HATE);
             if (hasHatredOfBionics && atowProstheticType > 2) {
                 tooltip += getFormattedTextAt(RESOURCE_BUNDLE,
-                      "AdvancedReplacementLimbDialog.exclusions.refused", exclusionColor, CLOSING_SPAN_TAG);
+                      "AdvancedSurgeriesDialog.exclusions.refused", exclusionColor, CLOSING_SPAN_TAG);
             }
 
             if (!isOnPlanet && atowProstheticType > 2) {
                 tooltip += getFormattedTextAt(RESOURCE_BUNDLE,
-                      "AdvancedReplacementLimbDialog.exclusions.planet", warningColor, CLOSING_SPAN_TAG);
+                      "AdvancedSurgeriesDialog.exclusions.planet", warningColor, CLOSING_SPAN_TAG);
             }
 
             if (!selected.isAvailableToFaction(campaign.getPlayerForce().getFaction(), campaign.getLocalDate())) {
                 if (selected.isClanOnly()) {
                     tooltip += getFormattedTextAt(RESOURCE_BUNDLE,
-                          "AdvancedReplacementLimbDialog.exclusions.faction.clan", exclusionColor, CLOSING_SPAN_TAG);
+                          "AdvancedSurgeriesDialog.exclusions.faction.clan", exclusionColor, CLOSING_SPAN_TAG);
                 } else if (selected.isComStarOnly()) {
                     tooltip += getFormattedTextAt(RESOURCE_BUNDLE,
-                          "AdvancedReplacementLimbDialog.exclusions.faction.comstar", exclusionColor, CLOSING_SPAN_TAG);
+                          "AdvancedSurgeriesDialog.exclusions.faction.comstar", exclusionColor, CLOSING_SPAN_TAG);
                 } else if (selected.isWordOfBlakeOnly()) {
                     tooltip += getFormattedTextAt(RESOURCE_BUNDLE,
-                          "AdvancedReplacementLimbDialog.exclusions.faction.wob", exclusionColor, CLOSING_SPAN_TAG);
+                          "AdvancedSurgeriesDialog.exclusions.faction.wob", exclusionColor, CLOSING_SPAN_TAG);
                 } else {
                     tooltip += getFormattedTextAt(RESOURCE_BUNDLE,
-                          "AdvancedReplacementLimbDialog.exclusions.faction.generic", exclusionColor, CLOSING_SPAN_TAG);
+                          "AdvancedSurgeriesDialog.exclusions.faction.generic", exclusionColor, CLOSING_SPAN_TAG);
                 }
             }
 
-            if (!selected.isAvailableInCurrentLocation(campaign.getPlayerForce()
-                                                             .getForceDetachment()
-                                                             .getCurrentLocation(), campaign.getLocalDate())) {
+            if (!selected.isAvailableInCurrentLocation(currentLocation, campaign.getLocalDate())) {
                 tooltip += getFormattedTextAt(RESOURCE_BUNDLE,
-                      "AdvancedReplacementLimbDialog.exclusions.tech", warningColor, CLOSING_SPAN_TAG);
+                      "AdvancedSurgeriesDialog.exclusions.tech", warningColor, CLOSING_SPAN_TAG);
             }
 
             if (selected.getCost(campaignFaction, currentYear) == null) {
                 tooltip += getFormattedTextAt(RESOURCE_BUNDLE,
-                      "AdvancedReplacementLimbDialog.exclusions.year", warningColor, CLOSING_SPAN_TAG);
+                      "AdvancedSurgeriesDialog.exclusions.year", warningColor, CLOSING_SPAN_TAG);
             }
         }
 
@@ -743,7 +753,7 @@ public class AdvancedReplacementLimbDialog extends JDialog {
         // Notify the player of the results
         if (!successfulSurgeries.isEmpty()) {
             campaign.addReport(MEDICAL, getFormattedTextAt(RESOURCE_BUNDLE,
-                  "AdvancedReplacementLimbDialog.report.successful",
+                  "AdvancedSurgeriesDialog.report.successful",
                   spanOpeningWithCustomColor(getPositiveColor()), CLOSING_SPAN_TAG,
                   String.join(", ",
                         successfulSurgeries.stream()
@@ -754,7 +764,7 @@ public class AdvancedReplacementLimbDialog extends JDialog {
 
         if (!unsuccessfulSurgeries.isEmpty()) {
             campaign.addReport(MEDICAL, getFormattedTextAt(RESOURCE_BUNDLE,
-                  "AdvancedReplacementLimbDialog.report.unsuccessful",
+                  "AdvancedSurgeriesDialog.report.unsuccessful",
                   spanOpeningWithCustomColor(getPositiveColor()), CLOSING_SPAN_TAG,
                   String.join(", ",
                         unsuccessfulSurgeries.stream()
@@ -807,7 +817,7 @@ public class AdvancedReplacementLimbDialog extends JDialog {
         Finances finances = campaign.getPlayerForce().getFinances();
         LocalDate today = campaign.getLocalDate();
         finances.debit(TransactionType.REPAIRS, today, totalCost,
-              getFormattedTextAt(RESOURCE_BUNDLE, "AdvancedReplacementLimbDialog.transaction",
+              getFormattedTextAt(RESOURCE_BUNDLE, "AdvancedSurgeriesDialog.transaction",
                     patient.getFullTitle()));
     }
 
@@ -1011,7 +1021,7 @@ public class AdvancedReplacementLimbDialog extends JDialog {
             ActionCheckResult actionCheckResult =
                   surgeon.checkSkill(S_SURGERY, campaign)
                         .withMiscModifier(spaModifier)
-                        .resolve(isUseEdge, getTextAt(RESOURCE_BUNDLE, "AdvancedReplacementLimbDialog.skillCheck"));
+                        .resolve(isUseEdge, getTextAt(RESOURCE_BUNDLE, "AdvancedSurgeriesDialog.skillCheck"));
             campaign.addReport(SKILL_CHECKS, actionCheckResult.getReport(false));
             if (actionCheckResult.isSuccess()) {
                 successfulSurgeries.add(surgery);
@@ -1035,22 +1045,36 @@ public class AdvancedReplacementLimbDialog extends JDialog {
     private List<PlannedSurgery> getPrioritizedSurgeries() {
         List<PlannedSurgery> prioritizedSurgeries = getPlannedSurgeries();
 
-        prioritizedSurgeries.sort(
-              Comparator.<PlannedSurgery>comparingInt(
-                          s -> s.type().getSurgeryLevel())
-                    .reversed() // highest surgery level first
-                    .thenComparing(
-                          // We shouldn't hit `null` at this point, as any null selections should have been filtered
-                          // out
-                          s -> {
-                              return Objects.requireNonNull(
-                                    s.type().getCost(campaign.getPlayerForce().getFaction(), campaign.getGameYear()));
-                          },
-                          Comparator.reverseOrder() // highest cost first
-                    )
-        );
+        prioritizedSurgeries.sort(this::compareCosts);
 
         return prioritizedSurgeries;
+    }
+
+    private int compareCosts(PlannedSurgery s1, PlannedSurgery s2) {
+        int surgeryLevelComparison = Integer.compare(
+              s2.type().getSurgeryLevel(),
+              s1.type().getSurgeryLevel()
+        );
+
+        if (surgeryLevelComparison != 0) {
+            return surgeryLevelComparison;
+        }
+
+        Money cost1 = Objects.requireNonNull(
+              s1.type().getCost(
+                    campaign.getPlayerForce().getFaction(),
+                    campaign.getGameYear()
+              )
+        );
+
+        Money cost2 = Objects.requireNonNull(
+              s2.type().getCost(
+                    campaign.getPlayerForce().getFaction(),
+                    campaign.getGameYear()
+              )
+        );
+
+        return cost2.compareTo(cost1);
     }
 
     /**
@@ -1075,17 +1099,18 @@ public class AdvancedReplacementLimbDialog extends JDialog {
      * Determines the senior surgeon from the supplied personnel list, based on doctor status and rank/skill
      * tiebreakers.
      *
-     * @param activePersonnel the list of active personnel to search
+     * @param currentLocation the current location
      *
      * @return the most senior surgeon, or {@code null} if none are available
      *
      * @author Illiani
      * @since 0.50.10
      */
-    private @Nullable Person getSurgeon(List<Person> activePersonnel) {
+    private @Nullable Person getSurgeon(AbstractLocation currentLocation) {
         Person seniorSurgeon = null;
-        for (Person person : activePersonnel) {
-            if (person.isDoctor()) {
+
+        for (Person person : currentLocation.fetchPersonnelAtLocation()) {
+            if (person.isActive() && person.isDoctor()) {
                 if (seniorSurgeon == null) {
                     seniorSurgeon = person;
                     continue;
@@ -1197,7 +1222,7 @@ public class AdvancedReplacementLimbDialog extends JDialog {
      */
     public Map<BodyLocation, ProstheticType> getSelectedTreatments() {
         Map<BodyLocation, ProstheticType> selections = new HashMap<>();
-        boolean isPlanetside = campaign.getPlayerForce().getForceDetachment().getCurrentLocation().isOnPlanet();
+        boolean isPlanetside = currentLocation.isOnPlanet();
         Faction campaignFaction = campaign.getPlayerForce().getFaction();
         int currentYear = campaign.getGameYear();
         for (Map.Entry<BodyLocation, JComboBox<ProstheticType>> entry :
@@ -1299,34 +1324,36 @@ public class AdvancedReplacementLimbDialog extends JDialog {
         doll.clearLocColors();
         doll.clearLocTags();
         doll.setHighlightColor(new Color(170, 170, 255));
-        PRIMARY_LOCATIONS.forEach(bodyLocation -> {
-            if (patient.isLocationMissing(bodyLocation)
-                      && !patient.isLocationMissing(bodyLocation.getParent())) {
-                doll.setLocTag(bodyLocation, "lost");
-            } else if (!patient.isLocationMissing(bodyLocation)) {
-                BodyLocation parentLocation = bodyLocation.getParent();
-                boolean parentHasProsthetic = patient.hasProstheticInjuryNoImplant(parentLocation);
-                BodyLocation location = parentHasProsthetic ? parentLocation : bodyLocation;
-                InjuryLevel level =
-                      MedicalViewDialog.getMaxInjuryLevel(location, injuriesMappedToPrimaryLocations);
-                Color color = switch (level) {
-                    case CHRONIC -> new Color(255, 204, 255, 128); // 50% alpha
-                    case DEADLY -> new Color(Color.RED.getRed(),
-                          Color.RED.getGreen(), Color.RED.getBlue(), 128);
-                    case MAJOR -> new Color(Color.ORANGE.getRed(),
-                          Color.ORANGE.getGreen(),
-                          Color.ORANGE.getBlue(), 128);
-                    case MINOR -> new Color(Color.YELLOW.getRed(),
-                          Color.YELLOW.getGreen(),
-                          Color.YELLOW.getBlue(), 128);
-                    default -> null;
-                };
-                doll.setLocColor(bodyLocation, color);
-            }
-        });
+        PRIMARY_LOCATIONS.forEach(this::updateImage);
 
         doll.addActionListener(dollActionListener);
         panel.add(doll);
+    }
+
+    private void updateImage(BodyLocation bodyLocation) {
+        if (patient.isLocationMissing(bodyLocation)
+                  && !patient.isLocationMissing(bodyLocation.getParent())) {
+            doll.setLocTag(bodyLocation, "lost");
+        } else if (!patient.isLocationMissing(bodyLocation)) {
+            BodyLocation parentLocation = bodyLocation.getParent();
+            boolean parentHasProsthetic = patient.hasProstheticInjuryNoImplant(parentLocation);
+            BodyLocation location = parentHasProsthetic ? parentLocation : bodyLocation;
+            InjuryLevel level =
+                  MedicalViewDialog.getMaxInjuryLevel(location, injuriesMappedToPrimaryLocations);
+            Color color = switch (level) {
+                case CHRONIC -> new Color(255, 204, 255, 128); // 50% alpha
+                case DEADLY -> new Color(Color.RED.getRed(),
+                      Color.RED.getGreen(), Color.RED.getBlue(), 128);
+                case MAJOR -> new Color(Color.ORANGE.getRed(),
+                      Color.ORANGE.getGreen(),
+                      Color.ORANGE.getBlue(), 128);
+                case MINOR -> new Color(Color.YELLOW.getRed(),
+                      Color.YELLOW.getGreen(),
+                      Color.YELLOW.getBlue(), 128);
+                default -> null;
+            };
+            doll.setLocColor(bodyLocation, color);
+        }
     }
 
     /**
@@ -1342,8 +1369,8 @@ public class AdvancedReplacementLimbDialog extends JDialog {
         try {
             PreferencesNode preferences =
                   MekHQ.getMHQPreferences()
-                        .forClass(AdvancedReplacementLimbDialog.class);
-            dialog.setName("AdvancedReplacementLimbDialog");
+                        .forClass(AdvancedSurgeriesDialog.class);
+            dialog.setName("AdvancedSurgeriesDialog");
             preferences.manage(new JWindowPreference(dialog));
         } catch (Exception ex) {
             LOGGER.error("Failed to set user preferences", ex);
