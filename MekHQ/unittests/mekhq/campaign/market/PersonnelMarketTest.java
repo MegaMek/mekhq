@@ -57,7 +57,6 @@ import mekhq.campaign.universe.Factions;
 import mekhq.campaign.universe.Systems;
 import mekhq.campaign.universe.TestSystems;
 import mekhq.utilities.MHQXMLUtility;
-import org.apache.logging.log4j.LogManager;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -76,15 +75,11 @@ class PersonnelMarketTest {
     private Campaign campaign;
 
     @BeforeAll
-    static void initSingletons() {
+    static void initSingletons() throws Exception {
         EquipmentType.initializeTypes();
         SkillType.initializeTypes();
-        try {
-            Factions.setInstance(Factions.loadDefault(true));
-            Systems.setInstance(TestSystems.loadDefault());
-        } catch (Exception exception) {
-            LogManager.getLogger().error("", exception);
-        }
+        Factions.setInstance(Factions.loadDefault(true));
+        Systems.setInstance(TestSystems.loadDefault());
     }
 
     @BeforeEach

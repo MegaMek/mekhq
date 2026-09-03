@@ -2278,7 +2278,9 @@ public record CampaignXmlParser(InputStream is, MekHQ app) {
                           campaign,
                           version);
                     campaign.getPlayerForce().setHumanResources(humanResources);
-                    foundPersonnelMarket = foundPersonnelMarket || (humanResources.getPersonnelMarket() != null);
+                    // The loaded object always carries a default market, so ask the save itself whether the block
+                    // held one; only then is a later top-level market node a duplicate rather than the real data.
+                    foundPersonnelMarket = foundPersonnelMarket || hasChildElement(workingNode, "personnelMarket");
                 } else if (nodeName.equalsIgnoreCase("parts")) {
                     processPartNodes(campaign, workingNode, version);
                 } else if (nodeName.equalsIgnoreCase("personnel")) {
