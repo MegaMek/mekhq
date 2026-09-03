@@ -509,6 +509,11 @@ public final class WarehouseTab extends CampaignGuiTab implements ITechWorkPanel
     }
 
     public void filterParts() {
+        if (getCampaign().isBulkGenerationInProgress()) {
+            LOGGER.debug("[CompanyGen] warehouse filter skipped. Bulk generation in progress");
+            return;
+        }
+
         final int nGroup = choiceParts.getSelectedIndex();
         final int nGroupView = choicePartsView.getSelectedIndex();
         RowFilter<PartsTableModel, Integer> partsTypeFilter = new RowFilter<>() {
