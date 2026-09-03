@@ -52,7 +52,12 @@ public enum SupportTOEFormationTypes {
     /** The JumpShips that berth the command's DropShips. */
     JUMPSHIP_COMMAND("JUMPSHIP_COMMAND", FormationType.CONVOY),
     /** The hulls that haul the command's own supplies. */
-    CARGO_COMMAND("CARGO_COMMAND", FormationType.CONVOY);
+    CARGO_COMMAND("CARGO_COMMAND", FormationType.CONVOY),
+    /**
+     * The DropShips added after the support sections exist, to berth what the command's ships could not
+     * already carry - the support platoons and squads, and anything else left without a bay.
+     */
+    TROOPSHIP_COMMAND("TROOPSHIP_COMMAND", FormationType.CONVOY);
     //endregion Enum Declarations
 
     //region Variable Declarations

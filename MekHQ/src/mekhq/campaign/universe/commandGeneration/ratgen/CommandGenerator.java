@@ -40,6 +40,7 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.EnumMap;
 import java.util.HashSet;
+import java.util.IdentityHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -84,6 +85,7 @@ import mekhq.campaign.universe.Faction;
 import mekhq.campaign.universe.commandGeneration.CargoShipGenerator;
 import mekhq.campaign.universe.commandGeneration.CommandGenerationOptions;
 import mekhq.campaign.universe.commandGeneration.EnhancedImagingAugmentor;
+import mekhq.campaign.universe.commandGeneration.LiftTopUp;
 import mekhq.campaign.universe.commandGeneration.ManeiDominiAugmentor;
 import mekhq.campaign.universe.commandGeneration.SupportPersonnelToTOE;
 import mekhq.campaign.universe.commandGeneration.SupportUnitGenerator;
@@ -302,12 +304,10 @@ public final class CommandGenerator {
     }
 
     private static void collectEntitiesInto(ForceDescriptor descriptor, List<Entity> entities) {
-        boolean hasChildren = !descriptor.getSubForces().isEmpty() || !descriptor.getAttached().isEmpty();
-        if (!hasChildren) {
-            if (descriptor.isIncluded() && descriptor.getEntity() != null) {
-                entities.add(descriptor.getEntity());
-            }
-            return;
+        // A descriptor with an entity is a unit whether or not anything is nested under it: a carrier is
+        // generated with the fighters it carries beneath it, and it is still a ship to harvest.
+        if (descriptor.isIncluded() && descriptor.getEntity() != null) {
+            entities.add(descriptor.getEntity());
         }
         for (ForceDescriptor child : descriptor.getSubForces()) {
             collectEntitiesInto(child, entities);
@@ -375,6 +375,9 @@ public final class CommandGenerator {
               .toList();
         FormationNamer namer = new FormationNamer(options.getForceNamingMethod(), existingFormationNames);
         namer.setAlwaysNumberRegiments(options.isAlwaysNumberRegiments());
+        // The Unit built for each unit descriptor, so stage 7a can put the units the tree nests under a ship
+        // aboard it once every unit exists.
+        Map<ForceDescriptor, Unit> unitsByDescriptor = new IdentityHashMap<>();
         ForceDescriptorWalker.walk(fd, campaign, root, namer, (leaf, parent) -> {
             long leafStart = System.nanoTime();
             String parentInfo = parent == null ? "null"
@@ -454,6 +457,7 @@ public final class CommandGenerator {
             }
             campaign.getPlayerForce().addUnitToFormation(unit, targetFormation.getId(), campaign);
             LOGGER.info("[CompanyGen][Leaf] AFTER addUnitToFormation unit.formationId={}", unit.getFormationId());
+            unitsByDescriptor.put(leaf, unit);
             leafCount[0]++;
             long leafTotalMs = (System.nanoTime() - leafStart) / 1_000_000;
             // Warn on individual leaves that take more than 500ms — that's usually the sign of a
@@ -481,6 +485,12 @@ public final class CommandGenerator {
 
         LOGGER.info("[CompanyGen][Pipeline]Stage 4-7 summary: {} leaves placed, {} skipped (no entity), {} skipped (addNewUnit failed)",
               leafCount[0], skippedNoEntity[0], skippedAddFailed[0]);
+
+        // 7a. Ship transport. Everything the tree nests under a ship - the fighter complement the Carried
+        // Fighter Complement option adds - is assigned to that ship, so the TO&E shows it aboard and the
+        // scenario launcher loads it in game.
+        LOGGER.info("[CompanyGen][Pipeline]Stage 7a: ship transport assignment");
+        ShipTransportAssigner.assign(fd, unitsByDescriptor);
 
         // 7b. Apply layered formation icons to every node in the campaign's Formation tree. Honors
         // the four formation-icon toggles on the options; bails cleanly if generation is disabled
@@ -653,12 +663,35 @@ public final class CommandGenerator {
         // vacant.
         SeniorAppointmentAssigner.assign(campaign, supportResult.generatedPersons());
 
+        // 7e2. The support sections are platoons and squads that need bays like any other unit, and no ship was
+        // sized for them. Check the whole hangar against the ships it owns and add DropShips only for what is
+        // still without a berth.
+        topUpLift(campaign, options);
+
         LOGGER.info("[CompanyGen][Pipeline]Stage 7e: applying formation icons to support formations");
         FormationIconBuilder.applyIcons(campaign.getPlayerForce().getFormations(), campaign, options);
 
         logOrphanAudit(campaign);
 
         return supportResult.generatedPersons();
+    }
+
+    /**
+     * Stage 7e2: adds the ships the command still needs once everything it will carry exists. Gated on the
+     * DropShip percentage like the cargo lift: a command generated without DropShips hires its lift.
+     */
+    private static void topUpLift(Campaign campaign, CommandGenerationOptions options) {
+        ForceDescriptorSnapshot snapshot = options.getForceDescriptorSnapshot();
+        if (snapshot == null) {
+            return;
+        }
+        LOGGER.info("[CompanyGen][Pipeline]Stage 7e2: lift top-up for the support sections");
+        try {
+            LiftTopUp.topUp(campaign, snapshot.getFaction(), snapshot.getYear(), snapshot.getRating(),
+                  snapshot.getDropshipPct(), snapshot.getJumpshipPct());
+        } catch (Exception exception) {
+            LOGGER.error(exception, "[CompanyGen][LiftTopUp] lift top-up failed; the command keeps the ships it had");
+        }
     }
 
     /**
