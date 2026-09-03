@@ -130,6 +130,8 @@ public enum PersonnelTabView {
     LOCATION("PersonnelTabView.LOCATION.text", "PersonnelTabView.LOCATION.toolTipText",
           Set.of(RANK, FIRST_NAME, LAST_NAME, PERSONNEL_ROLE, LOCATION_SYSTEM_AND_PLANET, LOCATION_NAME,
                 DESTINATION_SYSTEM_AND_PLANET, DESTINATION_NAME)),
+    ARMOR_KITS("PersonnelTabView.ARMOR_KITS.text", "PersonnelTabView.ARMOR_KITS.toolTipText",
+          Set.of(RANK, FIRST_NAME, LAST_NAME, PERSONNEL_ROLE, UNIT_ASSIGNMENT, ARMOR_KIT, ARMOR_KIT_INTENDED)),
     COMBAT_ROLES("PersonnelTabView.COMBAT_ROLES.text", "PersonnelTabView.COMBAT_ROLES.toolTipText",
           Set.of(RANK, FIRST_NAME, LAST_NAME, PERSONNEL_ROLE, UNIT_ASSIGNMENT, FORCE, COMBAT_ROLE)),
     OTHER("PersonnelTabView.OTHER.text", "PersonnelTabView.OTHER.toolTipText",

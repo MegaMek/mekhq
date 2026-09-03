@@ -939,6 +939,7 @@ public class CampaignOptionsPane extends JPanel {
         boolean oldUseNormalizedContractPayModel = oldOptions.useNormalizedContractPayModel();
         boolean oldIsDiminishReturnsContractPay = oldOptions.useDiminishingContractPay();
         boolean oldIsUseChaosReputation = oldOptions.useChaosReputation();
+        boolean oldRequireMekWarriorKitToDeploy = oldOptions.requireMekWarriorKitToDeploy();
 
         boolean newIsTrackFactionStandings = newOptions.trackFactionStanding();
         if (!isStartUp && (newIsTrackFactionStandings != oldIsTrackFactionStanding)) { // Has tracking changed?
@@ -1029,6 +1030,13 @@ public class CampaignOptionsPane extends JPanel {
                   campaign.getPlayerForce(),
                   campaign.getLocalDate());
             MekHQ.triggerEvent(new OptionsChangedEvent(campaign));
+        }
+
+        boolean newRequireMekWarriorKitToDeploy = newOptions.requireMekWarriorKitToDeploy();
+        if (!isStartUp &&
+                  newRequireMekWarriorKitToDeploy &&
+                  !oldRequireMekWarriorKitToDeploy) { // Has tracking changed?
+            new MekWarriorKitCampaignOptionsChangedConfirmationDialog(campaign);
         }
     }
 

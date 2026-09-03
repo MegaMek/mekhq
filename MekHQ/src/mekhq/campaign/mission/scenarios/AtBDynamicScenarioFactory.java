@@ -141,6 +141,7 @@ import mekhq.campaign.mission.utilities.CombatRole;
 import mekhq.campaign.personnel.Bloodname;
 import mekhq.campaign.personnel.SpecialAbility;
 import mekhq.campaign.personnel.enums.Phenotype;
+import mekhq.campaign.personnel.quartermaster.ArmorKitCatalog;
 import mekhq.campaign.personnel.skills.RandomSkillPreferences;
 import mekhq.campaign.personnel.skills.SkillType;
 import mekhq.campaign.unit.Unit;
@@ -1116,6 +1117,15 @@ public class AtBDynamicScenarioFactory {
                 if (faction.isClan() && !entity.isInfantry() && !entity.isProtoMek()) {
                     if (SpecialAbility.getSpecialAbilities().containsKey("clan_pilot_training")) {
                         entity.getCrew().getOptions().getOption("clan_pilot_training").setValue(true);
+                    }
+                }
+            }
+
+            if (campaign.getCampaignOptions().get(CampaignOption.NPC_FACTION_ARMOR_KITS)) {
+                String npcKit = ArmorKitCatalog.npcKitFor(entity, faction.isClan(), currentDate.getYear());
+                if (npcKit != null) {
+                    for (int slot = 0; slot < entity.getCrew().getSlotCount(); slot++) {
+                        entity.getCrew().setArmorKitName(npcKit, slot);
                     }
                 }
             }
