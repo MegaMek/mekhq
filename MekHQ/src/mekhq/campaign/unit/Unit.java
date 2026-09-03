@@ -199,8 +199,10 @@ public class Unit implements ITechnology, ILocatable {
     private String fluffName;
     /**
      * {@code true} when this unit is a support carrier: an infantry unit that exists to hold support personnel in the
-     * TOE, not to fight. Carriers are created by {@code SupportPersonnelToTOE} and are excluded from scenario
-     * deployment. Absent from saves written before carriers were tracked, which read back as {@code false}.
+     * TOE. Carriers are created by {@code SupportPersonnelToTOE} and kept current by
+     * {@code SupportCarrierReconciler}, which leaves a carrier alone while it is deployed. Carriers can deploy like any
+     * unit - a base attack may pull support staff into a fight. Absent from saves written before carriers were
+     * tracked, which read back as {@code false}.
      */
     private boolean carrier;
 

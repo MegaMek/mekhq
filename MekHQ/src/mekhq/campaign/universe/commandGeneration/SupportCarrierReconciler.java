@@ -71,6 +71,11 @@ import mekhq.campaign.universe.commandGeneration.SupportPersonnelToTOE.SupportSe
  * carriers that exist against what the packer wants for the new total; when they match, the person simply takes or
  * vacates a seat, and only when a packing boundary is crossed is the profession rebuilt.</p>
  *
+ * <p><b>Deployment.</b> Carriers can be deployed - a base attack may pull support staff into a fight - and while one
+ * is, nothing here seats into it, releases from it, reshapes its profession or prunes its formation. The status events
+ * casualties raise are handled by the engine as usual, and once the survivors come home a
+ * {@code DeploymentChangedEvent} triggers the shape check that the departure-side path declined while they were out.</p>
+ *
  * <p><b>Cost.</b> Every entry point opens with a guard that rejects the common case in a handful of field reads with
  * no allocation and no iteration; the first test alone rejects everyone already crewing anything. The shape comparison
  * is a sort of a few unit names. Because the packer sizes the tail squad exactly, that shape changes on most hires
@@ -154,7 +159,7 @@ public final class SupportCarrierReconciler {
         }
 
         Unit unit = person.getUnit();
-        if ((unit == null) || !unit.isCarrier()) {
+        if ((unit == null) || !unit.isCarrier() || unit.isDeployed()) {
             return;
         }
 
@@ -180,7 +185,7 @@ public final class SupportCarrierReconciler {
      * @param unit     the unit whose crew changed
      */
     public static void onCarrierCrewChanged(@Nullable Campaign campaign, @Nullable Unit unit) {
-        if ((campaign == null) || (unit == null) || !unit.isCarrier()) {
+        if ((campaign == null) || (unit == null) || !unit.isCarrier() || unit.isDeployed()) {
             return;
         }
 
@@ -267,26 +272,7 @@ public final class SupportCarrierReconciler {
         // Shape is normally kept by the arrival and departure events, but headcount can change with no event at all -
         // the loader drops crew whose roster entry is gone, for one. Check every profession's shape once here, so a
         // platoon that lost enough people to be squads again becomes squads, as generation would have built it.
-        int reshaped = 0;
-        List<PersonnelRole> checked = new ArrayList<>();
-        for (UUID unitId : supportCommand.getAllUnits(false)) {
-            Unit carrier = campaign.getUnit(unitId);
-            if ((carrier == null) || !carrier.isCarrier()) {
-                continue;
-            }
-            // The entity's trooper count is written from the crew on every seat and release, but not by the loader
-            // when it drops crew whose roster entry is gone. Resync here so a carrier never reports more troopers
-            // than it has people.
-            carrier.resetPilotAndEntity();
-            PersonnelRole profession = professionOf(carrier);
-            if ((profession == null) || checked.contains(profession)) {
-                continue;
-            }
-            checked.add(profession);
-            if (repackIfMisshapen(campaign, carrier)) {
-                reshaped++;
-            }
-        }
+        int reshaped = reshapeAllProfessions(campaign, supportCommand, true);
 
         // Always reported, even when nothing changed: a second load of the same save should say "seated 0, released
         // 0, removed 0, reshaped 0", and that line is how a playtest confirms the sweep is idempotent.
@@ -349,6 +335,13 @@ public final class SupportCarrierReconciler {
     private static void seat(Campaign campaign, Person person, Formation supportCommand) {
         PersonnelRole profession = person.getPrimaryRole();
         List<Unit> carriers = carriersOf(campaign, supportCommand, profession);
+        if (anyDeployed(carriers)) {
+            // Carriers should never be deployed, but a save written before that was enforced may hold one that is.
+            // Nothing is rebuilt around a unit that is in a battle; the next event after it returns catches up.
+            LOGGER.info("Not seating {}: a {} carrier is deployed", person.getFullName(),
+                  profession.getLabel(campaign.getPlayerForce().isClanForce()));
+            return;
+        }
 
         List<Person> people = new ArrayList<>();
         for (Unit carrier : carriers) {
@@ -398,6 +391,68 @@ public final class SupportCarrierReconciler {
     }
 
     /**
+     * Brings every profession's carriers back into line after something changed headcount without a person event.
+     *
+     * <p>Called from the load sweep, and whenever a deployment ends. A carrier can be deployed - a base attack may pull
+     * support staff into a fight - and while it is, nothing here touches it. Casualties in that fight fire the usual
+     * status events, but the departure-side check declines to reshape around a deployed carrier, so the profession's
+     * shape can be stale by the time the survivors come home. This catches that up.</p>
+     *
+     * @param campaign       the campaign
+     * @param supportCommand the Support Command formation, already resolved
+     * @param resyncEntities {@code true} to also rewrite each carrier's entity from its crew - needed after a load,
+     *                       where the loader may have dropped crew without doing so
+     *
+     * @return how many professions were reshaped
+     */
+    static int reshapeAllProfessions(Campaign campaign, Formation supportCommand, boolean resyncEntities) {
+        int reshaped = 0;
+        List<PersonnelRole> checked = new ArrayList<>();
+        for (UUID unitId : supportCommand.getAllUnits(false)) {
+            Unit carrier = campaign.getUnit(unitId);
+            if ((carrier == null) || !carrier.isCarrier()) {
+                continue;
+            }
+            if (resyncEntities && !carrier.isDeployed()) {
+                // The entity's trooper count is written from the crew on every seat and release, but not by the
+                // loader when it drops crew whose roster entry is gone.
+                carrier.resetPilotAndEntity();
+            }
+            PersonnelRole profession = professionOf(carrier);
+            if ((profession == null) || checked.contains(profession)) {
+                continue;
+            }
+            checked.add(profession);
+            if (repackIfMisshapen(campaign, carrier)) {
+                reshaped++;
+            }
+        }
+        return reshaped;
+    }
+
+    /**
+     * Catches carriers up after a deployment ends.
+     *
+     * <p>Cheap to call on every deployment change: it is one name comparison per profession, and any profession that
+     * still has a carrier in the field is skipped.</p>
+     *
+     * @param campaign the campaign
+     */
+    public static void onDeploymentChanged(@Nullable Campaign campaign) {
+        if ((campaign == null) || repacking) {
+            return;
+        }
+        Formation supportCommand = campaign.getPlayerForce().getSupportCommandFormation();
+        if (supportCommand == null) {
+            return;
+        }
+        int reshaped = reshapeAllProfessions(campaign, supportCommand, false);
+        if (reshaped > 0) {
+            LOGGER.info("Deployment changed: reshaped {} support profession(s)", reshaped);
+        }
+    }
+
+    /**
      * Re-checks a profession's carrier shape after a departure, so shrinking mirrors generation as growth does.
      *
      * <p>Guarded by the same shape comparison as arrival, so a departure that does not cross a packing boundary costs
@@ -416,6 +471,9 @@ public final class SupportCarrierReconciler {
         }
 
         List<Unit> carriers = carriersOf(campaign, supportCommand, profession);
+        if (anyDeployed(carriers)) {
+            return false;
+        }
         List<Person> people = new ArrayList<>();
         for (Unit existing : carriers) {
             people.addAll(existing.getCrew());
@@ -546,6 +604,16 @@ public final class SupportCarrierReconciler {
               toDestroy.size(), moved);
     }
 
+    /** Whether any of these carriers is currently assigned to a scenario. */
+    private static boolean anyDeployed(List<Unit> carriers) {
+        for (Unit carrier : carriers) {
+            if (carrier.isDeployed()) {
+                return true;
+            }
+        }
+        return false;
+    }
+
     /** The first carrier with a free seat that the character can actually reach. */
     private static @Nullable Unit firstWithSeat(List<Unit> carriers, Person person) {
         for (Unit carrier : carriers) {
@@ -620,6 +688,11 @@ public final class SupportCarrierReconciler {
             return;
         }
         if (!formation.getUnits().isEmpty() || !formation.getSubFormations().isEmpty()) {
+            return;
+        }
+        // removeFormation on a deployed formation looks its scenario up by the formation's own id, which is unset when
+        // only an ancestor is deployed. Leave it until the scenario resolves; the next prune catches it.
+        if (formation.isDeployed()) {
             return;
         }
 

@@ -913,11 +913,6 @@ public class Scenario implements IPlayerSettings {
      * @return true if the unit is eligible, otherwise false
      */
     public boolean canDeploy(Unit unit, Campaign campaign) {
-        // Support carriers hold technicians, doctors and administrators for the TOE. They are unarmoured civilians
-        // carrying knives, and every casualty is a real support character off the roster, so they never deploy.
-        if (unit.isCarrier()) {
-            return false;
-        }
         // first check to see if this unit is a traitor unit
         for (BotForce bf : botForces) {
             if (bf.isTraitor(unit)) {

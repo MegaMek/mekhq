@@ -33,6 +33,7 @@
 package mekhq.campaign;
 
 import megamek.common.event.Subscribe;
+import mekhq.campaign.events.DeploymentChangedEvent;
 import mekhq.campaign.events.persons.PersonChangedEvent;
 import mekhq.campaign.events.persons.PersonCrewAssignmentEvent;
 import mekhq.campaign.events.persons.PersonEvent;
@@ -119,6 +120,22 @@ public record CampaignEventProcessor(Campaign campaign) {
         Person person = personChangedEvent.getPerson();
         SupportCarrierReconciler.releaseIfIneligible(campaign(), person);
         SupportCarrierReconciler.seatIfEligible(campaign(), person);
+    }
+
+    /**
+     * Catches support carriers up when a deployment changes.
+     *
+     * <p>Carriers can be deployed, and while one is, the reconciler leaves its profession alone. When the deployment
+     * ends the profession may be misshapen from casualties; this brings it back to what generation would build.</p>
+     *
+     * <p><b>Important:</b> This method is not directly evoked, so IDEA will tell you it has no uses. IDEA is
+     * wrong.</p>
+     *
+     * @param deploymentChangedEvent the deployment that changed
+     */
+    @Subscribe
+    public void handleDeploymentChangeForCarriers(DeploymentChangedEvent deploymentChangedEvent) {
+        SupportCarrierReconciler.onDeploymentChanged(campaign());
     }
 
     @Subscribe
