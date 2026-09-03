@@ -264,10 +264,34 @@ public final class SupportCarrierReconciler {
             }
         }
 
+        // Shape is normally kept by the arrival and departure events, but headcount can change with no event at all -
+        // the loader drops crew whose roster entry is gone, for one. Check every profession's shape once here, so a
+        // platoon that lost enough people to be squads again becomes squads, as generation would have built it.
+        int reshaped = 0;
+        List<PersonnelRole> checked = new ArrayList<>();
+        for (UUID unitId : supportCommand.getAllUnits(false)) {
+            Unit carrier = campaign.getUnit(unitId);
+            if ((carrier == null) || !carrier.isCarrier()) {
+                continue;
+            }
+            // The entity's trooper count is written from the crew on every seat and release, but not by the loader
+            // when it drops crew whose roster entry is gone. Resync here so a carrier never reports more troopers
+            // than it has people.
+            carrier.resetPilotAndEntity();
+            PersonnelRole profession = professionOf(carrier);
+            if ((profession == null) || checked.contains(profession)) {
+                continue;
+            }
+            checked.add(profession);
+            if (repackIfMisshapen(campaign, carrier)) {
+                reshaped++;
+            }
+        }
+
         // Always reported, even when nothing changed: a second load of the same save should say "seated 0, released
-        // 0, removed 0", and that line is how a playtest confirms the sweep is idempotent.
-        LOGGER.info("Support carrier reconciliation: seated {}, released {}, removed {} empty carrier(s)", seated,
-              released, emptied);
+        // 0, removed 0, reshaped 0", and that line is how a playtest confirms the sweep is idempotent.
+        LOGGER.info("Support carrier reconciliation: seated {}, released {}, removed {} empty carrier(s), reshaped {}"
+                          + " profession(s)", seated, released, emptied, reshaped);
     }
 
     /**
@@ -378,15 +402,17 @@ public final class SupportCarrierReconciler {
      *
      * <p>Guarded by the same shape comparison as arrival, so a departure that does not cross a packing boundary costs
      * one comparison and nothing else. A mass-casualty event therefore re-packs a profession a few times at most.</p>
+     *
+     * @return {@code true} if the profession was reshaped
      */
-    private static void repackIfMisshapen(Campaign campaign, Unit carrier) {
+    private static boolean repackIfMisshapen(Campaign campaign, Unit carrier) {
         PersonnelRole profession = professionOf(carrier);
         if (profession == null) {
-            return;
+            return false;
         }
         Formation supportCommand = campaign.getPlayerForce().getSupportCommandFormation();
         if (supportCommand == null) {
-            return;
+            return false;
         }
 
         List<Unit> carriers = carriersOf(campaign, supportCommand, profession);
@@ -395,7 +421,7 @@ public final class SupportCarrierReconciler {
             people.addAll(existing.getCrew());
         }
         if (people.isEmpty()) {
-            return;
+            return false;
         }
 
         boolean isClan = campaign.getPlayerForce().isClanForce();
@@ -404,7 +430,9 @@ public final class SupportCarrierReconciler {
               profession.getLabel(isClan));
         if (!shapesMatch(carriers, ideal)) {
             repack(campaign, profession, carriers, ideal, supportCommand);
+            return true;
         }
+        return false;
     }
 
     /**

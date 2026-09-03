@@ -99,7 +99,7 @@
     <p class="standfirst">Eighteen checks, roughly 55 minutes. The unit tests cover the guards and the release path; everything here covers what they cannot &mdash; seating against real TOE state, the two new persisted fields, and the deployment block.</p>
     <div class="meta-strip">
       <span class="chip">Branch: Implement-Keep-Carriers-Current</span>
-      <span class="chip">Commit 344bb044db</span>
+      <span class="chip">Commit 357a7da671</span>
       <span class="chip">~55 min</span>
     </div>
   </header>
@@ -193,7 +193,7 @@
         <div><span class="k">Do</span> Load <span class="path">Violence as a Service31510108_Cooker</span>, which was saved before the carrier flag existed.</div>
         <div class="expect">
           <span class="k">Expect</span>
-          <span>It loads without error. Log: <code>Marked N pre-existing support carrier(s) during load</code>, then <code>Support carrier reconciliation: seated N, released N, removed N empty carrier(s)</code> with a seated count near 100 for the loose administrators in that save, preceded by the individual <code>Seated</code> / <code>Built support carrier</code> lines.</span>
+          <span>It loads without error. Log: <code>Marked N pre-existing support carrier(s) during load</code>, then <code>Support carrier reconciliation: seated N, released N, removed N empty carrier(s), reshaped N profession(s)</code> with a seated count near 100 for the loose administrators in that save, preceded by the individual <code>Seated</code> / <code>Built support carrier</code> lines.</span>
           <span class="fail">Fails if: the load throws, ordinary infantry gets marked as a carrier, or nothing is seated.</span>
         </div>
       </div>
@@ -210,7 +210,7 @@
         <div><span class="k">Do</span> Save the migrated campaign from check 04, then load it again.</div>
         <div class="expect">
           <span class="k">Expect</span>
-          <span>The second load logs exactly <code>Support carrier reconciliation: seated 0, released 0, removed 0 empty carrier(s)</code> and no <code>Re-packed</code> lines. The line is always written, so its absence is itself a failure.</span>
+          <span>The second load logs exactly <code>Support carrier reconciliation: seated 0, released 0, removed 0 empty carrier(s), reshaped 0 profession(s)</code> and no <code>Re-packed</code> lines. The line is always written, so its absence is itself a failure.</span>
           <span class="fail">Fails if: carriers keep being created on every load.</span>
         </div>
       </div>
@@ -465,7 +465,7 @@
             <tr><td><code>Removing empty support carrier UNIT</code></td><td>Last crew member left</td><td>08, 13</td></tr>
             <tr><td><code>Removing empty support formation NAME</code></td><td>Its last carrier went with it</td><td>13</td></tr>
             <tr><td><code>Marked N pre-existing support carrier(s) during load</code></td><td>Migration recognised an older save&#39;s carriers</td><td>04</td></tr>
-            <tr><td><code>Support carrier reconciliation: seated N, released N, removed N empty carrier(s)</code></td><td>The load sweep ran; always written, even at 0/0/0. A non-zero <code>removed</code> on a save from this branch means orphaned empty carriers were left behind earlier</td><td>04, 05</td></tr>
+            <tr><td><code>Support carrier reconciliation: seated N, released N, removed N empty carrier(s), reshaped N profession(s)</code></td><td>The load sweep ran; always written, even at 0/0/0/0. <code>reshaped</code> covers headcount that changed with no event, such as the loader dropping crew whose roster entry is gone</td><td>04, 05</td></tr>
             <tr><td><code>Support carrier reconciliation: no Support Command formation, so carriers are not managed</code></td><td>Campaign never opted in; reconciler stays out</td><td>18</td></tr>
             <tr><td><code>Could not build a support carrier UNIT; the profession keeps its current shape</code></td><td>WARN &mdash; a carrier unit failed to load; the reshape was abandoned before anything moved</td><td>any</td></tr>
             <tr><td><code>Unit ... references missing driver ...</code> on load</td><td>ERROR &mdash; a carrier holds a crew id for someone no longer in the roster. Should never appear on a save written by this branch</td><td>14</td></tr>
@@ -489,7 +489,7 @@
   </section>
 
   <footer>
-    <span>Feature branch <span class="path">Implement-Keep-Carriers-Current</span>, commit <span class="path">344bb044db</span>. Companion to the implementation plan and the support-carriers design note.</span>
+    <span>Feature branch <span class="path">Implement-Keep-Carriers-Current</span>, commit <span class="path">357a7da671</span>. Companion to the implementation plan and the support-carriers design note.</span>
     <span>Ticks are remembered in this browser only, so you can close the page between sessions.</span>
   </footer>
 
