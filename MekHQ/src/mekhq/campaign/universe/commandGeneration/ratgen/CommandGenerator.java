@@ -127,9 +127,12 @@ public final class CommandGenerator {
      *                         they were created (leaf order)
      * @param spareCosts       the value of the spare parts the build's warehouse stock-up added, for
      *                         the finance stage's pay-for debits
+     * @param rolledUnitIds    the ids of the units the rolls produced - the combat units and the ships rolled
+     *                         with them - which are the base of the percentage starting cash; what the build
+     *                         adds afterwards (support vehicles, staff carriers, top-up and cargo ships) is not
      */
     public record Result(@Nullable ForceDescriptor descriptor, List<Person> generatedPersons,
-          SpareCosts spareCosts) {
+          SpareCosts spareCosts, Set<UUID> rolledUnitIds) {
     }
 
     /**
@@ -492,6 +495,11 @@ public final class CommandGenerator {
         LOGGER.info("[CompanyGen][Pipeline]Stage 7a: ship transport assignment");
         ShipTransportAssigner.assign(fd, unitsByDescriptor);
 
+        // What the rolls produced, as the starting-cash stage prices it: the Spares and Finances tab shows the
+        // percentage of exactly these units, so the build credits the percentage of exactly these units.
+        Set<UUID> rolledUnitIds = snapshotHangarUnitIds(campaign);
+        rolledUnitIds.removeAll(preExistingUnitIds);
+
         // 7b. Apply layered formation icons to every node in the campaign's Formation tree. Honors
         // the four formation-icon toggles on the options; bails cleanly if generation is disabled
         // or the formation-icon image directory is unavailable.
@@ -597,11 +605,12 @@ public final class CommandGenerator {
         // Command Designer flow (generateSupport=false) instead snapshots before its combat phase
         // and calls processStartingCash itself after support generation.
         if (generateSupport) {
-            processStartingCash(campaign, options, preExistingUnitIds, generatedPersons, spareCosts);
+            processStartingCash(campaign, options, preExistingUnitIds, rolledUnitIds, generatedPersons,
+                  spareCosts);
         }
 
         LOGGER.info("[CompanyGen][Pipeline]CommandGenerator.applyToCampaign() DONE");
-        return new Result(fd, generatedPersons, spareCosts);
+        return new Result(fd, generatedPersons, spareCosts, rolledUnitIds);
     }
 
     /**
@@ -625,12 +634,11 @@ public final class CommandGenerator {
         }
         // What the hangar holds before support is generated: only what this stage adds gets lift sized for it.
         Set<UUID> unitsBeforeSupport = snapshotHangarUnitIds(campaign);
-        SupportPersonnelGenerator.Result supportResult = SupportPersonnelGenerator.generate(campaign, options);
-
-        // Assign techs to units using the Setup tab's three-slot sort grid (Pilot Rank / Unit Weight /
-        // Pilot Skill, each with its own direction). Gated on isAssignTechsToUnits; pulls only from the
-        // techs SupportPersonnelGenerator just created so we don't steal a pre-existing campaign tech.
-        SupportPersonnelAssigner.assign(campaign, options, supportResult);
+        // The stage's own vehicles - flatbeds, canteens, recovery and MASH trucks - are generated below, after
+        // the staff, but they need mechanics like any other vehicle. Count them into the demand now.
+        int vehiclesStillToCome = SupportUnitGenerator.vehiclesStillToGenerate(campaign);
+        SupportPersonnelGenerator.Result supportResult =
+              SupportPersonnelGenerator.generate(campaign, options, vehiclesStillToCome);
 
         // Organize the freshly generated support staff into the TOE. Each section (Maintenance /
         // Medical / Command) becomes infantry-style carrier units crewed by the staff, nested under a
@@ -653,6 +661,13 @@ public final class CommandGenerator {
         if (!campaignOptions.get(CampaignOption.PRISONER_CAPTURE_STYLE).isNone()) {
             SupportUnitGenerator.generateSecurityUnits(campaign, supportFaction, true);
         }
+
+        // Assign techs to units using the Setup tab's three-slot sort grid (Pilot Rank / Unit Weight /
+        // Pilot Skill, each with its own direction). Gated on isAssignTechsToUnits; pulls only from the
+        // techs SupportPersonnelGenerator just created so we don't steal a pre-existing campaign tech.
+        // Runs once every vehicle exists, the support stage's own included, so the flatbeds and the
+        // recovery vehicles get their mechanics too.
+        SupportPersonnelAssigner.assign(campaign, options, supportResult);
 
         // Decorate the support formations created above with layered TOE icons. This must happen here
         // (not only at the tail of applyToCampaign) because the two-phase Command Designer flow calls
@@ -717,8 +732,9 @@ public final class CommandGenerator {
 
     /**
      * Stage 9 - starting cash. When Process Finances is on, the base starting cash is either
-     * {@link CommandGenerationOptions#getStartingCashPercent()} percent of the generated units'
-     * total purchase cost, or - with Randomize Starting Cash - a roll of the configured number of
+     * {@link CommandGenerationOptions#getStartingCashPercent()} percent of the rolled units' total
+     * purchase cost - the same units the Spares and Finances tab previews, so the build credits the
+     * figure the tab showed - or - with Randomize Starting Cash - a roll of the configured number of
      * d6 in millions of C-Bills. If Pay for Initial Setup is on, the command's real generation costs
      * (personnel hiring at twice salary, unit purchase, and the stocked spare parts / armour /
      * ammunition, each gated by its own toggle) are then debited; cash floors at the Minimum
@@ -734,26 +750,38 @@ public final class CommandGenerator {
      * @param options            the generation options carrying the finance toggles
      * @param preExistingUnitIds hangar unit IDs captured by {@link #snapshotHangarUnitIds} before
      *                           the build; units with these IDs are not priced
+     * @param rolledUnitIds      the units the rolls produced, the base of the percentage; the support
+     *                           vehicles, staff carriers and ships the build added afterwards are priced
+     *                           only in the pay-for-units debit
      * @param generatedPersons   every Person this build created, for the hiring-cost debit
      * @param spareCosts         the stocked spares' value by category, from the build's
      *                           {@link Result#spareCosts()}; {@code null} is treated as zero
      */
     public static void processStartingCash(Campaign campaign, CommandGenerationOptions options,
-          Set<UUID> preExistingUnitIds, List<Person> generatedPersons, @Nullable SpareCosts spareCosts) {
+          Set<UUID> preExistingUnitIds, Set<UUID> rolledUnitIds, List<Person> generatedPersons,
+          @Nullable SpareCosts spareCosts) {
         if (!options.isProcessFinances()) {
             LOGGER.info("[CompanyGen][Pipeline]Stage 9: finances disabled; no starting cash granted");
             return;
         }
         SpareCosts spares = (spareCosts == null) ? SpareCosts.zero() : spareCosts;
 
-        // Price the units this build created: the base of the percentage model and the
-        // unit-purchase debit both use it.
+        // Price the units this build created. The rolled units are the base of the percentage model, as
+        // the tab previewed; everything the build added after the rolls counts in the unit-purchase debit
+        // only, so a top-up JumpShip does not double the starting cash.
         Money newUnitValue = Money.zero();
+        Money rolledUnitValue = Money.zero();
         int pricedUnits = 0;
+        int rolledUnits = 0;
         for (Unit unit : campaign.getUnits()) {
-            if (!preExistingUnitIds.contains(unit.getId())) {
-                newUnitValue = newUnitValue.plus(unit.getBuyCost());
-                pricedUnits++;
+            if (preExistingUnitIds.contains(unit.getId())) {
+                continue;
+            }
+            newUnitValue = newUnitValue.plus(unit.getBuyCost());
+            pricedUnits++;
+            if (rolledUnitIds.contains(unit.getId())) {
+                rolledUnitValue = rolledUnitValue.plus(unit.getBuyCost());
+                rolledUnits++;
             }
         }
 
@@ -766,10 +794,12 @@ public final class CommandGenerator {
             LOGGER.info("[CompanyGen][Pipeline]Stage 9: randomized starting cash {}d6 million -> {}",
                   options.getRandomStartingCashDiceCount(), startingCash.toAmountAndSymbolString());
         } else {
-            startingCash = newUnitValue.multipliedBy(percent).dividedBy(100).round();
-            LOGGER.info("[CompanyGen][Pipeline]Stage 9: starting cash = {}% of {} generated unit(s) worth {} -> {}",
-                  percent, pricedUnits, newUnitValue.toAmountAndSymbolString(),
-                  startingCash.toAmountAndSymbolString());
+            startingCash = rolledUnitValue.multipliedBy(percent).dividedBy(100).round();
+            LOGGER.info("[CompanyGen][Pipeline]Stage 9: starting cash = {}% of {} rolled unit(s) worth {} -> {};"
+                        + " {} unit(s) worth {} added by the build after the rolls are priced for setup costs only",
+                  percent, rolledUnits, rolledUnitValue.toAmountAndSymbolString(),
+                  startingCash.toAmountAndSymbolString(), pricedUnits - rolledUnits,
+                  newUnitValue.minus(rolledUnitValue).toAmountAndSymbolString());
         }
 
         Money minimumStartingFloat = Money.of(options.getMinimumStartingFloat());
