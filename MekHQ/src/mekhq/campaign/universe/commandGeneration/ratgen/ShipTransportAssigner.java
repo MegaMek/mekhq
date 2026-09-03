@@ -45,6 +45,7 @@ import megamek.common.units.Dropship;
 import megamek.common.units.Entity;
 import megamek.logging.MMLogger;
 import mekhq.MekHQ;
+import mekhq.campaign.enums.CampaignTransportType;
 import mekhq.campaign.events.units.UnitChangedEvent;
 import mekhq.campaign.unit.Unit;
 import mekhq.campaign.unit.enums.TransporterType;
@@ -85,8 +86,19 @@ public final class ShipTransportAssigner {
             return 0;
         }
         Set<Unit> shipsChanged = new LinkedHashSet<>();
-        int assigned = assignBeneath(root, null, unitsByDescriptor, shipsChanged);
-        assigned += dock(root, unitsByDescriptor, shipsChanged);
+        List<Unit> carried = new ArrayList<>();
+        int assigned = assignBeneath(root, null, unitsByDescriptor, shipsChanged, carried);
+        assigned += dock(root, unitsByDescriptor, shipsChanged, carried);
+        // The same announcements the TO&E's own assign-to-ship action makes: the campaign's tally of each ship's
+        // free space is refreshed, and every unit that moved is reported along with the ship that took it.
+        for (Unit ship : shipsChanged) {
+            if (ship.getCampaign() != null) {
+                ship.getCampaign().updateTransportInTransports(CampaignTransportType.SHIP_TRANSPORT, ship);
+            }
+        }
+        for (Unit unit : carried) {
+            MekHQ.triggerEvent(new UnitChangedEvent(unit));
+        }
         for (Unit ship : shipsChanged) {
             MekHQ.triggerEvent(new UnitChangedEvent(ship));
         }
@@ -106,11 +118,12 @@ public final class ShipTransportAssigner {
      * @param ship              the nearest ship above this node that was built, or {@code null} when there is none
      * @param unitsByDescriptor see {@link #assign(ForceDescriptor, Map)}
      * @param shipsChanged      receives every ship that took a unit
+     * @param carried           receives every unit put aboard a ship
      *
      * @return how many units beneath (and including) this node boarded a ship
      */
     private static int assignBeneath(ForceDescriptor node, @Nullable Unit ship,
-          Map<ForceDescriptor, Unit> unitsByDescriptor, Set<Unit> shipsChanged) {
+          Map<ForceDescriptor, Unit> unitsByDescriptor, Set<Unit> shipsChanged, List<Unit> carried) {
         Unit shipForChildren = ship;
         int assigned = 0;
 
@@ -118,6 +131,7 @@ public final class ShipTransportAssigner {
         if (unit != null) {
             if ((ship != null) && board(unit, ship)) {
                 shipsChanged.add(ship);
+                carried.add(unit);
                 assigned++;
             }
             // A unit with transporters of its own takes what the tree nests under it, whether or not it is
@@ -128,10 +142,10 @@ public final class ShipTransportAssigner {
         }
 
         for (ForceDescriptor child : node.getSubForces()) {
-            assigned += assignBeneath(child, shipForChildren, unitsByDescriptor, shipsChanged);
+            assigned += assignBeneath(child, shipForChildren, unitsByDescriptor, shipsChanged, carried);
         }
         for (ForceDescriptor child : node.getAttached()) {
-            assigned += assignBeneath(child, shipForChildren, unitsByDescriptor, shipsChanged);
+            assigned += assignBeneath(child, shipForChildren, unitsByDescriptor, shipsChanged, carried);
         }
         return assigned;
     }
@@ -141,10 +155,12 @@ public final class ShipTransportAssigner {
      * tree order. The tree lists JumpShips and DropShips as separate categories rather than nesting one under the
      * other, so this is where the collars the transport stage counted are taken.
      *
+     * @param carried receives every DropShip that was docked
+     *
      * @return how many DropShips were docked
      */
     private static int dock(ForceDescriptor root, Map<ForceDescriptor, Unit> unitsByDescriptor,
-          Set<Unit> shipsChanged) {
+          Set<Unit> shipsChanged, List<Unit> carried) {
         List<Unit> units = new ArrayList<>();
         collectUnits(root, unitsByDescriptor, units);
         List<Unit> collarShips = units.stream()
@@ -163,6 +179,7 @@ public final class ShipTransportAssigner {
                 if (ship.getCurrentShipTransportCapacity(TransporterType.DOCKING_COLLAR) >= 1) {
                     ship.loadShipTransport(TransporterType.DOCKING_COLLAR, Set.of(unit));
                     shipsChanged.add(ship);
+                    carried.add(unit);
                     docked++;
                     break;
                 }
