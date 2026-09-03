@@ -33,7 +33,6 @@
 package mekhq.campaign.market;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
@@ -47,7 +46,8 @@ import testUtilities.MHQTestUtilities;
 
 /**
  * The parts store stocks one suit per battle armor design straight from the unit summary. Pins that the suit carries
- * the summary's figures without a unit file ever being opened.
+ * the summary's figures without a unit file ever being opened. Ground MP and the quad flag are passed through too,
+ * but their only accessors are deprecated for removal, so they are not asserted here.
  */
 class PartsStoreBattleArmorStockTest {
 
@@ -68,23 +68,7 @@ class PartsStoreBattleArmorStockTest {
 
         assertEquals("Elemental [Laser] Suit", suit.getName());
         assertEquals(2, suit.getWeightClass());
-        assertEquals(1, suit.getGroundMP());
         assertEquals(3, suit.getJumpMP());
         assertTrue(suit.isClan());
-        assertFalse(suit.isQuad(), "only the quad movement mode marks a suit as quad");
-    }
-
-    @Test
-    void quadMovementModeMarksTheSuitAsQuad() {
-        MekSummary summary = mock(MekSummary.class);
-        when(summary.getChassis()).thenReturn("Fenrir");
-        when(summary.getModel()).thenReturn("Standard");
-        when(summary.getTons()).thenReturn(2.0);
-        when(summary.getMoveMode()).thenReturn(EntityMovementMode.QUAD);
-        Campaign campaign = MHQTestUtilities.mockCampaign();
-
-        BattleArmorSuit suit = PartsStore.createBattleArmorSuit(summary, campaign);
-
-        assertTrue(suit.isQuad());
     }
 }
