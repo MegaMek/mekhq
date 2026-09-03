@@ -154,6 +154,7 @@ import mekhq.campaign.finances.Loan;
 import mekhq.campaign.finances.Money;
 import mekhq.campaign.finances.enums.TransactionType;
 import mekhq.campaign.force.CombatTeam;
+import mekhq.campaign.force.Detachment;
 import mekhq.campaign.force.Formation;
 import mekhq.campaign.force.PlayerForce;
 import mekhq.campaign.icons.StandardFormationIcon;
@@ -3256,7 +3257,9 @@ public class Campaign implements ITechManager {
         }
 
         // remove from automatic mothballing
-        getPlayerForce().getAutomatedMothballUnits().remove(unit.getId());
+        for (Detachment detachment : getPlayerForce().getDetachments()) {
+            detachment.getAutomatedMothballUnits().remove(unit.getId());
+        }
 
         // finally, remove the unit
         getPlayerForce().getHangar().removeUnit(unit.getId());
@@ -3851,7 +3854,7 @@ public class Campaign implements ITechManager {
         }
 
         MHQXMLUtility.writeSimpleXMLOpenTag(writer, indent++, "automatedMothballUnits");
-        for (UUID unitId : getPlayerForce().getAutomatedMothballUnits()) {
+        for (UUID unitId : getPlayerForce().getForceDetachment().getAutomatedMothballUnits()) {
             MHQXMLUtility.writeSimpleXMLTag(writer, indent, "mothballedUnit", unitId);
         }
         MHQXMLUtility.writeSimpleXMLCloseTag(writer, --indent, "automatedMothballUnits");

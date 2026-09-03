@@ -39,6 +39,7 @@ import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
 import static mekhq.utilities.MHQInternationalization.getTextAt;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 import java.util.Objects;
 import java.util.UUID;
@@ -98,8 +99,7 @@ public class ContractAutomation {
         AbstractLocation currentLocation = playerForce.getForceDetachment().getCurrentLocation();
 
         if (mothball) {
-            List<UUID> automatedMothballUnits = performAutomatedMothballing(campaign);
-            playerForce.setAutomatedMothballUnits(automatedMothballUnits);
+            performAutomatedMothballing(campaign, playerForce.getForceDetachment());
         }
 
         // Work out the journey. If we are already in the target system there is no jump and travel time is zero.
@@ -158,16 +158,18 @@ public class ContractAutomation {
     }
 
     /**
-     * This method identifies all non-mothballed units within a campaign that are currently assigned to a
-     * {@link Formation}. Those units are then GM Mothballed.
+     * Identifies the non-mothballed units of the given {@link Detachment} that are currently assigned to a
+     * {@link Formation}, GM-mothballs them, and records them on that detachment for automated activation when it next
+     * arrives. Only units belonging to {@code detachment} are affected; other detachments of the same force are left
+     * untouched.
      *
-     * @param campaign The current campaign.
-     *
-     * @return A list of all newly mothballed units.
+     * @param campaign   The current campaign.
+     * @param detachment The detachment whose units are being mothballed.
      */
-    public static List<UUID> performAutomatedMothballing(Campaign campaign) {
+    public static void performAutomatedMothballing(Campaign campaign, Detachment detachment) {
         List<UUID> mothballTargets = new ArrayList<>();
         MothballUnitAction mothballUnitAction = new MothballUnitAction(null, true);
+        Collection<Unit> detachmentUnits = detachment.getHangar().getUnits();
 
         for (Formation formation : campaign.getPlayerForce().getAllFormations()) {
             List<UUID> iterationSafeUnitIds = new ArrayList<>(formation.getUnits());
@@ -176,6 +178,10 @@ public class ContractAutomation {
 
                 if (unit == null) {
                     logger.error("Failed to get unit for unit ID {}", unitId);
+                    continue;
+                }
+
+                if (!detachmentUnits.contains(unit)) {
                     continue;
                 }
 
@@ -203,20 +209,21 @@ public class ContractAutomation {
             }
         }
 
-        return mothballTargets;
+        detachment.setAutomatedMothballUnits(mothballTargets);
     }
 
     /**
-     * Perform automated activation of units. Identifies all units that were mothballed previously and are now needing
-     * activation. The activation action is executed for each unit, and they are returned to their prior Force if it
-     * still exists.
+     * Performs automated activation of the units the given {@link Detachment} previously auto-mothballed. The activation
+     * action is executed for each, and the detachment's pending list is cleared afterward. Only this detachment's units
+     * are affected.
      *
-     * @param campaign The current campaign.
+     * @param campaign   The current campaign.
+     * @param detachment The detachment whose mothballed units are being activated.
      */
-    public static void performAutomatedActivation(Campaign campaign) {
+    public static void performAutomatedActivation(Campaign campaign, Detachment detachment) {
         ActivateUnitAction activateUnitAction = new ActivateUnitAction(null, true);
 
-        List<UUID> unitIds = campaign.getPlayerForce().getAutomatedMothballUnits();
+        List<UUID> unitIds = detachment.getAutomatedMothballUnits();
         for (UUID unitId : unitIds) {
             Unit unit = campaign.getUnit(unitId);
 
@@ -238,7 +245,7 @@ public class ContractAutomation {
         }
 
         // We still want to clear out any units
-        campaign.getPlayerForce().setAutomatedMothballUnits(new ArrayList<UUID>());
+        detachment.setAutomatedMothballUnits(new ArrayList<UUID>());
     }
 
     public static void outOfContractMothballAutomation(Campaign campaign) {
@@ -268,8 +275,7 @@ public class ContractAutomation {
               false);
 
         if (mothballDialog.getDialogChoice() == DIALOG_CONFIRM_OPTION) {
-            List<UUID> automatedMothballUnits = performAutomatedMothballing(campaign);
-            campaign.getPlayerForce().setAutomatedMothballUnits(automatedMothballUnits);
+            performAutomatedMothballing(campaign, campaign.getPlayerForce().getForceDetachment());
         }
     }
 }

@@ -2346,7 +2346,7 @@ public record CampaignXmlParser(InputStream is, MekHQ app) {
                     campaign.getPlayerForce().getHumanResources().setPersonnelWhoAdvancedInXP(personnelWhoAdvancedInXP);
                 } else if (nodeName.equalsIgnoreCase("automatedMothballUnits")) {
                     List<UUID> automatedMothballUnits = processAutomatedMothballNodes(workingNode);
-                    campaign.getPlayerForce().setAutomatedMothballUnits(automatedMothballUnits);
+                    campaign.getPlayerForce().getForceDetachment().setAutomatedMothballUnits(automatedMothballUnits);
                 } else if (nodeName.equalsIgnoreCase("autoResolveBehaviorSettings")) {
                     campaign.setAutoResolveBehaviorSettings(firstNonNull(BehaviorSettingsFactory.getInstance()
                                                                                .getBehavior(workingNode.getTextContent()),
