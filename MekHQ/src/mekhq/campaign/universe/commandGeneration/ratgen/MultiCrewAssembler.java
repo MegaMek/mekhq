@@ -199,6 +199,12 @@ public final class MultiCrewAssembler {
      * has someone identifiable aboard: the first role to be filled contributes the commander, and later
      * roles on the same unit contribute none.</p>
      *
+     * <p>The vessel roles are the exception: a ship keeps one named person in each of pilots, gunners and
+     * vessel crew. MekHQ only counts a ship's temporary crew in a role once a real person holds that role
+     * ({@code Unit.hasRealCrewInVesselRole}), and the pool is sized the same way, so a DropShip with a
+     * named pilot and nobody else would never be given its gunners or crew. The engineer who maintains a
+     * ship is also drawn from its named vessel crew, so without one the ship has no one to maintain it.</p>
+     *
      * @param role             the role filling these seats
      * @param seats            how many seats the unit has in this role
      * @param unitHasNamedCrew whether a named crew member has already been attached to this unit
@@ -208,13 +214,37 @@ public final class MultiCrewAssembler {
      */
     private static int namedSeats(Campaign campaign, PersonnelRole role, int seats,
           boolean unitHasNamedCrew) {
+        return namedSeats(isTemporaryCrewEnabled(campaign, role), role, seats, unitHasNamedCrew);
+    }
+
+    /**
+     * The rule behind {@link #namedSeats(Campaign, PersonnelRole, int, boolean)}, with the campaign's
+     * answer already taken.
+     *
+     * @param temporaryCrew    whether the campaign fills this role from the temporary crew pool
+     * @param role             the role filling these seats
+     * @param seats            how many seats the unit has in this role
+     * @param unitHasNamedCrew whether a named crew member has already been attached to this unit
+     *
+     * @return the number of named personnel to create
+     */
+    static int namedSeats(boolean temporaryCrew, PersonnelRole role, int seats, boolean unitHasNamedCrew) {
         if (seats <= 0) {
             return 0;
         }
-        if (!isTemporaryCrewEnabled(campaign, role)) {
+        if (!temporaryCrew) {
             return seats;
         }
+        if (isVesselRole(role)) {
+            return 1;
+        }
         return unitHasNamedCrew ? 0 : 1;
+    }
+
+    /** The roles whose temporary crew MekHQ counts only once a real person holds the role. */
+    private static boolean isVesselRole(PersonnelRole role) {
+        return (role == PersonnelRole.VESSEL_PILOT) || (role == PersonnelRole.VESSEL_GUNNER)
+              || (role == PersonnelRole.VESSEL_CREW);
     }
 
     /** Whether the campaign fills this role from the temporary crew pool. */
