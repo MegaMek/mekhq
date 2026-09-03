@@ -226,11 +226,18 @@ public class AdvancedSurgeriesDialog extends JDialog {
           boolean isGMMode) {
         this.patient = patient;
         this.campaign = campaign;
-        this.currentLocation = patient == null ? null : patient.getCurrentLocation();
+        this.currentLocation = patient == null ?
+                                     campaign.getPlayerForce().getForceDetachment().getCurrentLocation() :
+                                     patient.getCurrentLocation();
         this.campaignOptions = campaign.getCampaignOptions();
         this.isGMMode = isGMMode;
 
         if (patient == null) {
+            return;
+        }
+
+        if (currentLocation == null) {
+            LOGGER.error("Failed to fetch a location for patient and player force fallback.");
             return;
         }
 
