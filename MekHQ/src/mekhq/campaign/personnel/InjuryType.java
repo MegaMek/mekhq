@@ -126,7 +126,7 @@ public class InjuryType {
     }
 
     /** Default injury type: reduction in hit points */
-    public static InjuryType BAD_HEALTH = new InjuryType();
+    public static final InjuryType BAD_HEALTH = new InjuryType();
 
     static {
         BAD_HEALTH.recoveryTime = 7;

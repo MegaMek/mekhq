@@ -94,11 +94,11 @@ public final class InjuryTypes {
     public static final InjuryType CATATONIA = new Catatonia();
 
     // Replacement Limbs
-    public static int REPLACEMENT_LIMB_MINIMUM_SKILL_REQUIRED_TYPES_3_4_5 = 5;
-    public static Money REPLACEMENT_LIMB_COST_ARM_TYPE_5 = Money.of(200000);
-    public static Money REPLACEMENT_LIMB_COST_HAND_TYPE_5 = Money.of(100000);
-    public static Money REPLACEMENT_LIMB_COST_LEG_TYPE_5 = Money.of(125000);
-    public static Money REPLACEMENT_LIMB_COST_FOOT_TYPE_5 = Money.of(50000);
+    public static final int REPLACEMENT_LIMB_MINIMUM_SKILL_REQUIRED_TYPES_3_4_5 = 5;
+    public static final Money REPLACEMENT_LIMB_COST_ARM_TYPE_5 = Money.of(200000);
+    public static final Money REPLACEMENT_LIMB_COST_HAND_TYPE_5 = Money.of(100000);
+    public static final Money REPLACEMENT_LIMB_COST_LEG_TYPE_5 = Money.of(125000);
+    public static final Money REPLACEMENT_LIMB_COST_FOOT_TYPE_5 = Money.of(50000);
 
     private static boolean registered = false;
 

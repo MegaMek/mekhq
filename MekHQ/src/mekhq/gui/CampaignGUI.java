@@ -144,9 +144,9 @@ public class CampaignGUI extends JPanel {
     private static final int MIN_WINDOW_WIDTH = 1024;
     private static final int MIN_WINDOW_HEIGHT = 768;
     private static final int TOP_PANEL_HEIGHT = 90;
-    public static int THIN_GAP = 2;
-    public static int SMALL_GAP = 4;
-    public static int MEDIUM_GAP = 8;
+    public static final int THIN_GAP = 2;
+    public static final int SMALL_GAP = 4;
+    public static final int MEDIUM_GAP = 8;
 
     // the max quantity when mass purchasing parts, hiring, etc. using the JSpinner
     public static final int MAX_QUANTITY_SPINNER = 10000;
