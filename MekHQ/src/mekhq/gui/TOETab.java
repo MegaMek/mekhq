@@ -45,7 +45,6 @@ import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 import java.util.Vector;
 import javax.swing.*;
 import javax.swing.tree.TreePath;
@@ -248,11 +247,6 @@ public final class TOETab extends CampaignGuiTab {
      * @since 0.50.10
      */
     private void deployToRegularScenario(Scenario selectedScenario) {
-        if (selectedScenario == null) {
-            LOGGER.warn("TOETab: Null selectedScenario in deployToRegularScenario()");
-            return;
-        }
-
         // Get available forces
         mekhq.campaign.Campaign campaign = getCampaign();
         List<Formation> formationOptions = campaign.getPlayerForce()
@@ -274,6 +268,13 @@ public final class TOETab extends CampaignGuiTab {
         }
 
         Formation selectedFormation = formationOptions.get(forcePicker.getComboBoxChoiceIndex());
+
+        if (selectedScenario == null) {
+            getCampaignGui().undeployForce(selectedFormation);
+            selectedFormation.clearScenarioIds(getCampaign(), true);
+            LOGGER.warn("TOETab: Null selectedScenario in deployToRegularScenario()");
+            return;
+        }
 
         // Deploy force to scenario
         if (selectedScenario instanceof AtBDynamicScenario dynamicScenario) {
