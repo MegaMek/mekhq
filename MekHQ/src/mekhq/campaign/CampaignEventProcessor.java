@@ -109,6 +109,13 @@ public record CampaignEventProcessor(Campaign campaign) {
      */
     @Subscribe
     public void handleSupportRoleChange(PersonChangedEvent personChangedEvent) {
+        // PersonCrewAssignmentEvent extends PersonChangedEvent, so it arrives here as well as at
+        // handlePersonUnitAssignmentEvent. A crew change is not a role or status change and must never seat anyone:
+        // the event that Unit.remove fires during removePerson would otherwise re-seat the character being deleted,
+        // leaving a ghost crew reference in the carrier once the roster entry is gone.
+        if (personChangedEvent instanceof PersonCrewAssignmentEvent) {
+            return;
+        }
         Person person = personChangedEvent.getPerson();
         SupportCarrierReconciler.releaseIfIneligible(campaign(), person);
         SupportCarrierReconciler.seatIfEligible(campaign(), person);

@@ -96,11 +96,11 @@
   <header class="masthead">
     <div class="eyebrow">MekHQ &middot; Pre-review checklist &middot; Keep support carriers current</div>
     <h1>Playtest before this PR opens</h1>
-    <p class="standfirst">Seventeen checks, roughly 50 minutes. The unit tests cover the guards and the release path; everything here covers what they cannot &mdash; seating against real TOE state, the two new persisted fields, and the deployment block.</p>
+    <p class="standfirst">Eighteen checks, roughly 55 minutes. The unit tests cover the guards and the release path; everything here covers what they cannot &mdash; seating against real TOE state, the two new persisted fields, and the deployment block.</p>
     <div class="meta-strip">
       <span class="chip">Branch: Implement-Keep-Carriers-Current</span>
-      <span class="chip">Commit 60aafffd7d</span>
-      <span class="chip">~50 min</span>
+      <span class="chip">Commit 344bb044db</span>
+      <span class="chip">~55 min</span>
     </div>
   </header>
 
@@ -119,7 +119,7 @@
         <li>Build from the branch, and keep <code>mekhq.log</code> open alongside &mdash; several checks are "and nothing was logged as an error".</li>
         <li>Two saves are useful: a fresh command generated on this branch, and the <span class="path">Violence as a Service31510108_Cooker</span> save from issue #9880, which predates the carrier flag and exercises the migration path.</li>
         <li>The TOE tab is where most of this is read. Support Command hangs off the campaign HQ formation.</li>
-        <li>Three checks are marked <span class="pill gate">gate</span> (03, 04, 15). If any of those fails, the PR does not open &mdash; they cover new persisted state and permanent data loss.</li>
+        <li>Four checks are marked <span class="pill gate">gate</span> (03, 04, 14, 16). If any of those fails, the PR does not open &mdash; they cover new persisted state and permanent data loss.</li>
       </ul>
     </div>
   </section>
@@ -358,11 +358,29 @@
       </div>
     </div>
 
-    <div class="test" data-test>
+
+    <div class="test gate" data-test>
       <div class="test-head">
         <span class="tid">14</span>
         <input type="checkbox" id="t14">
-        <label for="t14">Returning to duty re-seats</label>
+        <label for="t14">GM Remove takes someone out of a carrier for good</label>
+        <span class="pill gate">gate</span>
+      </div>
+      <div class="body">
+        <div><span class="k">Do</span> Pick a seated support character and use GM Remove from the personnel table to delete them from the roster. Do it to a few. Then save, exit, and reload.</div>
+        <div class="expect">
+          <span class="k">Expect</span>
+          <span>They vanish from the carrier and stay gone. Log: <strong>no</strong> <code>Seated</code> line for the removed name after the removal, and on the reload <strong>no</strong> <code>references missing driver</code> errors. This is a distinct code path from death or retirement &mdash; <code>removePerson</code> rather than <code>changeStatus</code> &mdash; and in play it re-seated the person being deleted and left a ghost crew reference in the save.</span>
+          <span class="fail">Fails if: a <code>Seated</code> line names the removed person, the carrier still counts them, or the reload logs <code>Unit ... references missing driver</code>.</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="test" data-test>
+      <div class="test-head">
+        <span class="tid">15</span>
+        <input type="checkbox" id="t15">
+        <label for="t15">Returning to duty re-seats</label>
         <span class="pill new">new</span>
       </div>
       <div class="body">
@@ -381,9 +399,9 @@
 
     <div class="test gate" data-test>
       <div class="test-head">
-        <span class="tid">15</span>
-        <input type="checkbox" id="t15">
-        <label for="t15">Carriers cannot be sent to a scenario</label>
+        <span class="tid">16</span>
+        <input type="checkbox" id="t16">
+        <label for="t16">Carriers cannot be sent to a scenario</label>
         <span class="pill gate">gate</span>
       </div>
       <div class="body">
@@ -398,9 +416,9 @@
 
     <div class="test" data-test>
       <div class="test-head">
-        <span class="tid">16</span>
-        <input type="checkbox" id="t16">
-        <label for="t16">Seated staff still do their jobs</label>
+        <span class="tid">17</span>
+        <input type="checkbox" id="t17">
+        <label for="t17">Seated staff still do their jobs</label>
         <span class="pill reg">regression</span>
       </div>
       <div class="body">
@@ -415,9 +433,9 @@
 
     <div class="test" data-test>
       <div class="test-head">
-        <span class="tid">17</span>
-        <input type="checkbox" id="t17">
-        <label for="t17">A campaign with no Support Command is left alone</label>
+        <span class="tid">18</span>
+        <input type="checkbox" id="t18">
+        <label for="t18">A campaign with no Support Command is left alone</label>
         <span class="pill new">new</span>
       </div>
       <div class="body">
@@ -439,7 +457,7 @@
         <table>
           <thead><tr><th>Look for</th><th>Means</th><th>Checks</th></tr></thead>
           <tbody>
-            <tr><td><code>Seated NAME in support carrier UNIT (n/m)</code></td><td>Filled a free seat in an existing carrier</td><td>06, 09, 10, 11, 14</td></tr>
+            <tr><td><code>Seated NAME in support carrier UNIT (n/m)</code></td><td>Filled a free seat in an existing carrier</td><td>06, 09, 10, 11, 15</td></tr>
             <tr><td><code>Re-packed LABEL carriers: kept K, built B, removed R, moved M people</code></td><td>The shape generation wants changed; only the mismatched carriers were touched. <code>moved</code> is the cost &mdash; small except at a platoon promotion</td><td>07, 08, 09, 10, 13</td></tr>
             <tr><td><code>Could not seat NAME: the only free LABEL seats are at another location</code></td><td>Base-using campaigns only; retried on their next event</td><td>bases only</td></tr>
             <tr><td><code>Could not seat NAME: no LABEL carrier has a free seat, although the shape was sized for them</code></td><td><strong>WARN &mdash; a bug.</strong> The reshape produced a carrier the seat loop cannot see. Stop and capture</td><td>any</td></tr>
@@ -448,8 +466,9 @@
             <tr><td><code>Removing empty support formation NAME</code></td><td>Its last carrier went with it</td><td>13</td></tr>
             <tr><td><code>Marked N pre-existing support carrier(s) during load</code></td><td>Migration recognised an older save&#39;s carriers</td><td>04</td></tr>
             <tr><td><code>Support carrier reconciliation: seated N, released N, removed N empty carrier(s)</code></td><td>The load sweep ran; always written, even at 0/0/0. A non-zero <code>removed</code> on a save from this branch means orphaned empty carriers were left behind earlier</td><td>04, 05</td></tr>
-            <tr><td><code>Support carrier reconciliation: no Support Command formation, so carriers are not managed</code></td><td>Campaign never opted in; reconciler stays out</td><td>17</td></tr>
+            <tr><td><code>Support carrier reconciliation: no Support Command formation, so carriers are not managed</code></td><td>Campaign never opted in; reconciler stays out</td><td>18</td></tr>
             <tr><td><code>Could not build a support carrier UNIT; the profession keeps its current shape</code></td><td>WARN &mdash; a carrier unit failed to load; the reshape was abandoned before anything moved</td><td>any</td></tr>
+            <tr><td><code>Unit ... references missing driver ...</code> on load</td><td>ERROR &mdash; a carrier holds a crew id for someone no longer in the roster. Should never appear on a save written by this branch</td><td>14</td></tr>
             <tr><td>Any <code>ERROR</code> naming a support or carrier class</td><td>Stop and capture it</td><td>any</td></tr>
           </tbody>
         </table>
@@ -462,15 +481,15 @@
     <div class="prose">
       <p>Record the outcome here before opening the PR, and paste the summary into the PR's Testing section. The checklist result has to be reported in chat as well as ticked &mdash; a run nobody reported has not been run.</p>
       <ul>
-        <li><strong>All seventeen passing?</strong> If yes, the PR can open with the checklist result in the Testing section.</li>
-        <li><strong>A gate failed?</strong> Do not open. Gates 03, 04 and 15 cover new persisted state and permanent data loss.</li>
+        <li><strong>All eighteen passing?</strong> If yes, the PR can open with the checklist result in the Testing section.</li>
+        <li><strong>A gate failed?</strong> Do not open. Gates 03, 04, 14 and 16 cover new persisted state and permanent data loss.</li>
         <li><strong>A non-gate failed?</strong> Judgement call &mdash; fix it, or open with it named explicitly under "What is not proven yet".</li>
       </ul>
     </div>
   </section>
 
   <footer>
-    <span>Feature branch <span class="path">Implement-Keep-Carriers-Current</span>, commit <span class="path">60aafffd7d</span>. Companion to the implementation plan and the support-carriers design note.</span>
+    <span>Feature branch <span class="path">Implement-Keep-Carriers-Current</span>, commit <span class="path">344bb044db</span>. Companion to the implementation plan and the support-carriers design note.</span>
     <span>Ticks are remembered in this browser only, so you can close the page between sessions.</span>
   </footer>
 
