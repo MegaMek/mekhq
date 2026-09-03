@@ -2561,7 +2561,7 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
                               selectedPerson.getHyperlinkedFullTitle());
                         getCampaign().addReport(MEDICAL, report);
                     } else {
-                        new AdvancedReplacementLimbDialog(getCampaign(), gui.getIconPackage(), selectedPerson, false);
+                        new AdvancedSurgeriesDialog(getCampaign(), gui, selectedPerson, false);
                     }
                 }
             });
