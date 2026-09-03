@@ -248,7 +248,10 @@ public final class TOETab extends CampaignGuiTab {
      * @since 0.50.10
      */
     private void deployToRegularScenario(Scenario selectedScenario) {
-        Objects.requireNonNull(selectedScenario, "selectedScenario");
+        if (selectedScenario == null) {
+            LOGGER.warn("TOETab: Null selectedScenario in deployToRegularScenario()");
+            return;
+        }
 
         // Get available forces
         mekhq.campaign.Campaign campaign = getCampaign();
