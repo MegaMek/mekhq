@@ -7032,9 +7032,9 @@ public class Unit implements ITechnology, ILocatable {
      */
     public boolean hasRealCrewInVesselRole(final PersonnelRole role) {
         return switch (role) {
-            case VESSEL_PILOT -> !drivers.isEmpty();
-            case VESSEL_GUNNER -> !gunners.isEmpty();
-            case VESSEL_CREW -> !vesselCrew.isEmpty();
+            case VESSEL_PILOT -> !getDrivers().isEmpty();
+            case VESSEL_GUNNER -> !getGunners().isEmpty();
+            case VESSEL_CREW -> !getVesselCrew().isEmpty();
             default -> true;
         };
     }
