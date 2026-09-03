@@ -33,10 +33,13 @@
 package mekhq.campaign.universe.commandGeneration;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 import java.util.List;
+import java.util.Set;
+import java.util.UUID;
 
 import megamek.client.ratgenerator.ExistingLift;
 import megamek.common.bays.ASFBay;
@@ -50,8 +53,8 @@ import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
 /**
- * Covers how the lift top-up reads the hangar: ships offer lift, everything else wants it, and a ship's bays are
- * offered whole even while the units they will carry sit beside them in the hangar.
+ * Covers how the lift top-up reads the hangar: only the units the build just created want lift, and everything
+ * already there - ships and the units they will carry - sets what is free.
  */
 class LiftTopUpTest {
 
@@ -61,31 +64,49 @@ class LiftTopUpTest {
     }
 
     @Test
-    void shipsOfferLiftAndEverythingElseWantsIt() {
+    void onlyTheNewUnitsWantLift() {
         Dropship leopard = new Dropship();
         leopard.addTransporter(new ASFBay(2, 1, 1));
-        AeroSpaceFighter fighter = new AeroSpaceFighter();
+        AeroSpaceFighter oldFighter = new AeroSpaceFighter();
+        AeroSpaceFighter newFighter = new AeroSpaceFighter();
+        Unit newUnit = unitOf(newFighter);
 
-        LiftTopUp.Hangar hangar = LiftTopUp.Hangar.of(List.of(unitOf(leopard), unitOf(fighter), unitOf(null)));
+        LiftTopUp.Hangar hangar = LiftTopUp.Hangar.of(
+              List.of(unitOf(leopard), unitOf(oldFighter), newUnit, unitOf(null)), Set.of(newUnit.getId()));
 
-        assertEquals(List.of(leopard), hangar.ships());
-        assertEquals(List.of(fighter), hangar.units());
+        assertEquals(List.of(newFighter), hangar.wantingLift());
+        assertEquals(List.of(leopard, oldFighter), hangar.alreadyThere());
     }
 
     @Test
-    void theShipsBaysAreOfferedWholeSoTheUnitsBesideThemClaimThemFirst() {
+    void aNewShipOffersLiftRatherThanWantingIt() {
         Dropship leopard = new Dropship();
         leopard.addTransporter(new ASFBay(2, 1, 1));
-        LiftTopUp.Hangar hangar = LiftTopUp.Hangar.of(List.of(unitOf(leopard), unitOf(new AeroSpaceFighter())));
+        Unit newShip = unitOf(leopard);
 
-        ExistingLift owned = ExistingLift.of(hangar.ships());
+        LiftTopUp.Hangar hangar = LiftTopUp.Hangar.of(List.of(newShip), Set.of(newShip.getId()));
 
-        assertEquals(2, owned.freeBays().get(UnitType.AEROSPACE_FIGHTER),
-              "the fighter beside the ship is demand for the calculator, not a deduction here");
+        assertTrue(hangar.wantingLift().isEmpty());
+        assertEquals(List.of(leopard), hangar.alreadyThere());
+    }
+
+    @Test
+    void whatIsAlreadyThereComesOffTheFreeLiftFirst() {
+        Dropship leopard = new Dropship();
+        leopard.addTransporter(new ASFBay(2, 1, 1));
+        Unit newUnit = unitOf(new AeroSpaceFighter());
+        LiftTopUp.Hangar hangar = LiftTopUp.Hangar.of(
+              List.of(unitOf(leopard), unitOf(new AeroSpaceFighter()), newUnit), Set.of(newUnit.getId()));
+
+        ExistingLift owned = ExistingLift.of(hangar.alreadyThere());
+
+        assertEquals(1, owned.freeBays().get(UnitType.AEROSPACE_FIGHTER),
+              "the fighter already in the hangar holds one of the two bays before the new one is considered");
     }
 
     private static Unit unitOf(Entity entity) {
         Unit unit = mock(Unit.class);
+        when(unit.getId()).thenReturn(UUID.randomUUID());
         when(unit.getEntity()).thenReturn(entity);
         return unit;
     }

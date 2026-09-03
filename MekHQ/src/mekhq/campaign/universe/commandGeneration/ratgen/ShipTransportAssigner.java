@@ -94,7 +94,7 @@ public final class ShipTransportAssigner {
             LOGGER.info("[CompanyGen][ShipTransport] {} unit(s) assigned aboard {} ship(s)", assigned,
                   shipsChanged.size());
         } else {
-            LOGGER.debug("[CompanyGen][ShipTransport] nothing is nested under a ship; no transport assigned");
+            LOGGER.info("[CompanyGen][ShipTransport] nothing is nested under a built ship; no transport assigned");
         }
         return assigned;
     }

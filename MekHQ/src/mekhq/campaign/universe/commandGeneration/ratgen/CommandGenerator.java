@@ -623,6 +623,8 @@ public final class CommandGenerator {
         if (listener != null) {
             listener.updateProgress(0.0, "Generating support personnel...");
         }
+        // What the hangar holds before support is generated: only what this stage adds gets lift sized for it.
+        Set<UUID> unitsBeforeSupport = snapshotHangarUnitIds(campaign);
         SupportPersonnelGenerator.Result supportResult = SupportPersonnelGenerator.generate(campaign, options);
 
         // Assign techs to units using the Setup tab's three-slot sort grid (Pilot Rank / Unit Weight /
@@ -664,9 +666,11 @@ public final class CommandGenerator {
         SeniorAppointmentAssigner.assign(campaign, supportResult.generatedPersons());
 
         // 7e2. The support sections are platoons and squads that need bays like any other unit, and no ship was
-        // sized for them. Check the whole hangar against the ships it owns and add DropShips only for what is
-        // still without a berth.
-        topUpLift(campaign, options);
+        // sized for them. Size lift for what this stage added, against the bays the hangar has free. Combat
+        // units without a ship are left alone: their ship was struck out of the preview, and that stands.
+        Set<UUID> unitsAddedBySupport = new HashSet<>(snapshotHangarUnitIds(campaign));
+        unitsAddedBySupport.removeAll(unitsBeforeSupport);
+        topUpLift(campaign, options, unitsAddedBySupport);
 
         LOGGER.info("[CompanyGen][Pipeline]Stage 7e: applying formation icons to support formations");
         FormationIconBuilder.applyIcons(campaign.getPlayerForce().getFormations(), campaign, options);
@@ -680,7 +684,7 @@ public final class CommandGenerator {
      * Stage 7e2: adds the ships the command still needs once everything it will carry exists. Gated on the
      * DropShip percentage like the cargo lift: a command generated without DropShips hires its lift.
      */
-    private static void topUpLift(Campaign campaign, CommandGenerationOptions options) {
+    private static void topUpLift(Campaign campaign, CommandGenerationOptions options, Set<UUID> newUnitIds) {
         ForceDescriptorSnapshot snapshot = options.getForceDescriptorSnapshot();
         if (snapshot == null) {
             return;
@@ -688,7 +692,7 @@ public final class CommandGenerator {
         LOGGER.info("[CompanyGen][Pipeline]Stage 7e2: lift top-up for the support sections");
         try {
             LiftTopUp.topUp(campaign, snapshot.getFaction(), snapshot.getYear(), snapshot.getRating(),
-                  snapshot.getDropshipPct(), snapshot.getJumpshipPct());
+                  snapshot.getDropshipPct(), snapshot.getJumpshipPct(), newUnitIds);
         } catch (Exception exception) {
             LOGGER.error(exception, "[CompanyGen][LiftTopUp] lift top-up failed; the command keeps the ships it had");
         }

@@ -412,7 +412,7 @@ public final class ForceDescriptorWalker {
         if (!descriptor.isIncluded()) {
             if (sink.verbose()) {
                 LOGGER.info("[CompanyGen][Walker] {}LEAF excluded by user, skipping '{}'",
-                      indent, descriptor.parseName());
+                      indent, unitLabel(descriptor));
             }
             return 0;
         }
@@ -426,6 +426,19 @@ public final class ForceDescriptorWalker {
         }
         sink.leaf(descriptor, parentHandle);
         return 1;
+    }
+
+    /**
+     * @return the unit's name for the log: a unit descriptor carries no formation name of its own, so the entity's
+     *       short name is what identifies it
+     */
+    private static String unitLabel(ForceDescriptor descriptor) {
+        String name = descriptor.parseName();
+        boolean hasName = (name != null) && !name.isBlank();
+        if (hasName || (descriptor.getEntity() == null)) {
+            return hasName ? name : "(no name)";
+        }
+        return descriptor.getEntity().getShortName();
     }
 
     /** Whether {@code descriptor} has any subforce or attached children. */

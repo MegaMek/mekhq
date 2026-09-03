@@ -35,6 +35,8 @@ package mekhq.campaign.universe.commandGeneration;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.Set;
+import java.util.UUID;
 
 import megamek.client.ratgenerator.ExistingLift;
 import megamek.client.ratgenerator.FactionRecord;
@@ -48,17 +50,17 @@ import mekhq.campaign.Campaign;
 import mekhq.campaign.unit.Unit;
 
 /**
- * Adds the DropShips and JumpShips a command still needs once everything it will carry exists.
+ * Adds the DropShips and JumpShips the units a build created after its rolls still need.
  *
  * <p>The transport stage sizes lift for the combat units it rolled. The support sections - the technicians,
- * medical and administrative staff organised into platoons and squads - are generated afterwards, so no ship was
- * ever sized for them. This runs after support generation and checks the whole hangar against the ships it owns:
- * every unit without a ship counts against the bays that could take it, most restrictive kind first, and a hull is
- * drawn only for what is left over. A command whose Overlord has spare bays gets no new hull; one whose support
- * platoons have nowhere to ride gets the smallest hull that takes them.</p>
+ * medical and administrative staff organised into platoons and squads, and the support vehicles - are generated
+ * afterwards, so no ship was ever sized for them. This runs after support generation and sizes lift for those
+ * units alone, against what the hangar already has free: every ship's bays and collars, less what the rest of the
+ * hangar would take. A command whose Overlord has spare bays gets no new hull; one whose support platoons have
+ * nowhere to ride gets the smallest hull that takes them.</p>
  *
- * <p>Ships already owned count for their bays and docking collars only; they are not units wanting lift, apart
- * from a DropShip with no JumpShip to dock to, which counts against the collars.</p>
+ * <p>Only the new units are lifted on purpose. A combat unit without a ship is one whose ship the player struck
+ * out of the preview, and that choice stands: excluding a ship means no ship, not a different one.</p>
  */
 public final class LiftTopUp {
 
@@ -79,28 +81,34 @@ public final class LiftTopUp {
     }
 
     /**
-     * The hangar sorted into the ships that offer lift and the units that want it.
+     * The hangar sorted into the units that want lift and everything already there, ships included.
      *
-     * @param ships the DropShips, JumpShips, WarShips and stations
-     * @param units everything else
+     * @param wantingLift  the units the build just created, which nothing was sized for
+     * @param alreadyThere every other unit, ships and all; what they need comes off the free lift first
      */
-    record Hangar(List<Entity> ships, List<Entity> units) {
+    record Hangar(List<Entity> wantingLift, List<Entity> alreadyThere) {
 
-        static Hangar of(Collection<Unit> hangarUnits) {
-            List<Entity> ships = new ArrayList<>();
-            List<Entity> units = new ArrayList<>();
+        /**
+         * @param hangarUnits every unit in the hangar
+         * @param newUnitIds  the ids of the units the build created after its rolls
+         */
+        static Hangar of(Collection<Unit> hangarUnits, Set<UUID> newUnitIds) {
+            List<Entity> wantingLift = new ArrayList<>();
+            List<Entity> alreadyThere = new ArrayList<>();
             for (Unit unit : hangarUnits) {
                 Entity entity = unit.getEntity();
                 if (entity == null) {
                     continue;
                 }
-                if (entity.isLargeCraft()) {
-                    ships.add(entity);
+                boolean isNew = newUnitIds.contains(unit.getId());
+                boolean isShip = entity.isLargeCraft();
+                if (isNew && !isShip) {
+                    wantingLift.add(entity);
                 } else {
-                    units.add(entity);
+                    alreadyThere.add(entity);
                 }
             }
-            return new Hangar(ships, units);
+            return new Hangar(wantingLift, alreadyThere);
         }
     }
 
@@ -108,7 +116,7 @@ public final class LiftTopUp {
     }
 
     /**
-     * Adds the ships the hangar's units still need.
+     * Adds the ships the units a build just created still need.
      *
      * @param campaign    the campaign whose hangar is checked and receives the ships
      * @param factionCode the faction whose ship tables are drawn from; {@code null} for the general tables
@@ -116,24 +124,31 @@ public final class LiftTopUp {
      * @param rating      the command's rating, or {@code null} for any
      * @param dropshipPct the share of the units to provide DropShip bays for, 1.0 being all of them
      * @param jumpshipPct the share of the DropShips to provide docking collars for
+     * @param newUnitIds  the ids of the units the build created after its rolls; only these are lifted
      *
      * @return the ships added; {@link Result#none()} when nothing was needed or DropShips are not wanted
      */
     public static Result topUp(Campaign campaign, @Nullable String factionCode, int year, @Nullable String rating,
-          double dropshipPct, double jumpshipPct) {
+          double dropshipPct, double jumpshipPct, Set<UUID> newUnitIds) {
         if (dropshipPct <= 0) {
             LOGGER.info("{} DropShip percentage is {}; the command hires its lift, so nothing is added",
                   LOG_TAG, dropshipPct);
             return Result.none();
         }
-        Hangar hangar = Hangar.of(campaign.getUnits());
-        ExistingLift owned = ExistingLift.of(hangar.ships());
-        LOGGER.info("{} {} unit(s) checked against {} ship(s) offering free bays {} and {} free docking collar(s)",
-              LOG_TAG, hangar.units().size(), hangar.ships().size(), owned.freeBays(), owned.freeDockingCollars());
+        Hangar hangar = Hangar.of(campaign.getUnits(), newUnitIds);
+        if (hangar.wantingLift().isEmpty()) {
+            LOGGER.info("{} the build added no units after its rolls; nothing to lift", LOG_TAG);
+            return Result.none();
+        }
+        ExistingLift owned = ExistingLift.of(hangar.alreadyThere());
+        LOGGER.info("{} {} new unit(s) checked against the hangar's free bays {} and {} free docking collar(s)"
+                    + " ({} unit(s) already there, ships included)",
+              LOG_TAG, hangar.wantingLift().size(), owned.freeBays(), owned.freeDockingCollars(),
+              hangar.alreadyThere().size());
 
         FactionRecord factionRecord = (factionCode == null) ? null : RATGenerator.getInstance().getFaction(factionCode);
         TransportCalculator calculator = new TransportCalculator(factionRecord, factionCode, year, rating,
-              hangar.units(), owned);
+              hangar.wantingLift(), owned);
         List<MekSummary> dropshipHulls = calculator.calcDropships(dropshipPct);
         List<MekSummary> jumpshipHulls = calculator.calcJumpShips(jumpshipPct, dropshipHulls.size());
         if (dropshipHulls.isEmpty() && jumpshipHulls.isEmpty()) {
