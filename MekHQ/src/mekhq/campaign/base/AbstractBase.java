@@ -144,11 +144,12 @@ public abstract class AbstractBase implements IPlace {
         return baseRequestedStockLevels;
     }
 
-    /**
-     * Returns {@code true} if this base holds no personnel, units, or spare parts.
-     *
-     * @param campaign the active campaign, used to check the pending-travel queue for travel bound for this base
-     */
+/**
+ * Returns {@code true} if this base holds no personnel, units, or spare parts, including anything currently in transit
+ * on this base’s travel nodes or queued as pending travel bound for this base.
+ *
+ * @param campaign the active campaign, used to check the pending-travel queue for travel bound for this base
+ */
     public boolean isEmpty(Campaign campaign) {
         // Personnel, units, and spare parts present at the base. getWarehouse().getParts() includes both present spares
         // and spares still in transit (marked not present), so a single spare-part scan covers both cases.
