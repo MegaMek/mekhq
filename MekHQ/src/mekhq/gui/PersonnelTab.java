@@ -543,25 +543,33 @@ public final class PersonnelTab extends CampaignGuiTab {
     public void refreshPersonnelList() {
         UUID selectedUUID = null;
         int selectedRow = personnelTable.getSelectedRow();
-        if (selectedRow != -1) {
+        if (selectedRow >= 0 && selectedRow < personnelTable.getRowCount()) {
             Person person = getPersonnelTableModel().getRow(personnelTable.convertRowIndexToModel(selectedRow));
             if (null != person) {
                 selectedUUID = person.getId();
             }
         }
 
+        personnelTable.clearSelection();
+
         LocationFilterItem locationFilter = getCampaignGui().getActiveLocation();
 
         List<Person> people = locationFilter.selectPersonnel(getCampaign());
         getPersonnelTableModel().setData(people);
 
+        boolean reselected = false;
         for (int row = 0; row < personnelTable.getRowCount(); row++) {
             Person person = getPersonnelTableModel().getRow(personnelTable.convertRowIndexToModel(row));
             if (person != null && person.getId().equals(selectedUUID)) {
                 personnelTable.setRowSelectionInterval(row, row);
                 refreshPersonnelView();
+                reselected = true;
                 break;
             }
+        }
+
+        if (!reselected) {
+            refreshPersonnelView();
         }
         filterPersonnel();
     }
