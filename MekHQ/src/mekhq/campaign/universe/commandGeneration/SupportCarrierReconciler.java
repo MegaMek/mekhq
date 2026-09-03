@@ -71,10 +71,12 @@ import mekhq.campaign.universe.commandGeneration.SupportPersonnelToTOE.SupportSe
  * carriers that exist against what the packer wants for the new total; when they match, the person simply takes or
  * vacates a seat, and only when a packing boundary is crossed is the profession rebuilt.</p>
  *
- * <p><b>Deployment.</b> Carriers can be deployed - a base attack may pull support staff into a fight - and while one
- * is, nothing here seats into it, releases from it, reshapes its profession or prunes its formation. The status events
- * casualties raise are handled by the engine as usual, and once the survivors come home a
- * {@code DeploymentChangedEvent} triggers the shape check that the departure-side path declined while they were out.</p>
+ * <p><b>Deployment.</b> Whether carriers may deploy is decided by {@link SupportCarrierDeployment} - closed today,
+ * to be opened by a future scenario type that pulls support staff into a fight. This class is already built for that
+ * day: while a carrier is deployed, nothing here seats into it, releases from it, reshapes its profession or prunes
+ * its formation. The status events casualties raise are handled by the engine as usual, and once the survivors come
+ * home a {@code DeploymentChangedEvent} triggers the shape check that the departure-side path declined while they
+ * were out. A carrier deployed by a save written before the gate existed gets the same treatment.</p>
  *
  * <p><b>Cost.</b> Every entry point opens with a guard that rejects the common case in a handful of field reads with
  * no allocation and no iteration; the first test alone rejects everyone already crewing anything. The shape comparison

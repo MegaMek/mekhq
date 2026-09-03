@@ -98,6 +98,7 @@ import mekhq.campaign.personnel.skills.Skill;
 import mekhq.campaign.personnel.skills.SkillModifierData;
 import mekhq.campaign.personnel.skills.SkillType;
 import mekhq.campaign.unit.Unit;
+import mekhq.campaign.universe.commandGeneration.SupportCarrierDeployment;
 import mekhq.campaign.universe.Faction;
 import mekhq.campaign.universe.Factions;
 import mekhq.campaign.universe.Planet;
@@ -592,6 +593,11 @@ public abstract class AtBScenario extends Scenario implements IAtBScenario {
      */
     @Override
     public boolean canDeploy(Unit unit, Campaign campaign) {
+        // Repeated from Scenario.canDeploy rather than inherited: this override does not delegate to super, and
+        // widening it to do so would also apply the traitor and deployment-limit checks that AtB deliberately skips.
+        if (unit.isCarrier() && !SupportCarrierDeployment.isAllowed(this)) {
+            return false;
+        }
         if (isBigBattle() && (getForces(campaign).getAllUnits(false).size() > 7)) {
             return false;
         } else {
@@ -659,7 +665,12 @@ public abstract class AtBScenario extends Scenario implements IAtBScenario {
                 return getForces(c).getAllUnits(false).size() + units.size() <= 0;
             }
             for (UUID id : units) {
-                if (!canDeploy(c.getUnit(id), c)) {
+                Unit unit = c.getUnit(id);
+                // A carrier under this formation is left behind rather than refusing the whole formation.
+                if ((unit != null) && unit.isCarrier() && !SupportCarrierDeployment.isAllowed(this)) {
+                    continue;
+                }
+                if (!canDeploy(unit, c)) {
                     return false;
                 }
             }

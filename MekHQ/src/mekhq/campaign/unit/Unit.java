@@ -200,9 +200,9 @@ public class Unit implements ITechnology, ILocatable {
     /**
      * {@code true} when this unit is a support carrier: an infantry unit that exists to hold support personnel in the
      * TOE. Carriers are created by {@code SupportPersonnelToTOE} and kept current by
-     * {@code SupportCarrierReconciler}, which leaves a carrier alone while it is deployed. Carriers can deploy like any
-     * unit - a base attack may pull support staff into a fight. Absent from saves written before carriers were
-     * tracked, which read back as {@code false}.
+     * {@code SupportCarrierReconciler}. Whether a carrier may deploy is decided in one place,
+     * {@code SupportCarrierDeployment} - closed today, to be opened by a future scenario type that pulls support staff
+     * into a fight. Absent from saves written before carriers were tracked, which read back as {@code false}.
      */
     private boolean carrier;
 

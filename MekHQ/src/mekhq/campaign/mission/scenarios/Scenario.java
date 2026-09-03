@@ -67,6 +67,7 @@ import mekhq.campaign.events.DeploymentChangedEvent;
 import mekhq.campaign.force.Formation;
 import mekhq.campaign.force.FormationStub;
 import mekhq.campaign.unit.Unit;
+import mekhq.campaign.universe.commandGeneration.SupportCarrierDeployment;
 import mekhq.utilities.MHQXMLUtility;
 import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
@@ -913,6 +914,9 @@ public class Scenario implements IPlayerSettings {
      * @return true if the unit is eligible, otherwise false
      */
     public boolean canDeploy(Unit unit, Campaign campaign) {
+        if (unit.isCarrier() && !SupportCarrierDeployment.isAllowed(this)) {
+            return false;
+        }
         // first check to see if this unit is a traitor unit
         for (BotForce bf : botForces) {
             if (bf.isTraitor(unit)) {
@@ -964,7 +968,12 @@ public class Scenario implements IPlayerSettings {
         for (Formation formation : formations) {
             Vector<UUID> units = formation.getAllUnits(false);
             for (UUID id : units) {
-                if (!canDeploy(c.getUnit(id), c)) {
+                Unit unit = c.getUnit(id);
+                // A carrier under this formation is left behind rather than refusing the whole formation.
+                if ((unit != null) && unit.isCarrier() && !SupportCarrierDeployment.isAllowed(this)) {
+                    continue;
+                }
+                if (!canDeploy(unit, c)) {
                     return false;
                 }
             }

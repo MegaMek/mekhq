@@ -61,6 +61,7 @@ import mekhq.campaign.mission.scenarios.Scenario;
 import mekhq.campaign.mission.utilities.CombatRole;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.unit.Unit;
+import mekhq.campaign.universe.commandGeneration.SupportCarrierDeployment;
 import mekhq.utilities.MHQXMLUtility;
 import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
@@ -288,9 +289,12 @@ public class Formation {
         for (Formation sub : getSubFormations()) {
             sub.setScenarioId(scenarioId, campaign);
         }
+        boolean carriersDeploy = SupportCarrierDeployment.isAllowed(campaign.getScenario(scenarioId));
         for (UUID uid : getUnits()) {
             Unit unit = campaign.getUnit(uid);
-            if (null != unit) {
+            // A support carrier under this formation stays home unless the scenario is one that pulls support staff
+            // into the fight. This is the path StratCon deploys by, so the gate has to be here as well as in canDeploy.
+            if ((null != unit) && (carriersDeploy || !unit.isCarrier())) {
                 unit.setScenarioId(scenarioId);
             }
         }

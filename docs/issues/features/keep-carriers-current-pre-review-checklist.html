@@ -96,10 +96,10 @@
   <header class="masthead">
     <div class="eyebrow">MekHQ &middot; Pre-review checklist &middot; Keep support carriers current</div>
     <h1>Playtest before this PR opens</h1>
-    <p class="standfirst">Eighteen checks, roughly 55 minutes. The unit tests cover the guards and the release path; everything here covers what they cannot &mdash; seating against real TOE state, the two new persisted fields, and behaviour around a deployed carrier.</p>
+    <p class="standfirst">Eighteen checks, roughly 55 minutes. The unit tests cover the guards and the release path; everything here covers what they cannot &mdash; seating against real TOE state, the two new persisted fields, and the deployment gate.</p>
     <div class="meta-strip">
       <span class="chip">Branch: Implement-Keep-Carriers-Current</span>
-      <span class="chip">Commit dc7b966520</span>
+      <span class="chip">Commit 7e7198f00d</span>
       <span class="chip">~55 min</span>
     </div>
   </header>
@@ -401,15 +401,15 @@
       <div class="test-head">
         <span class="tid">16</span>
         <input type="checkbox" id="t16">
-        <label for="t16">A deployed carrier is left alone, then caught up on return</label>
+        <label for="t16">Carriers stay home; HQ still deploys</label>
         <span class="pill gate">gate</span>
       </div>
       <div class="body">
-        <div><span class="k">Do</span> Assign a profession company (or HQ, which carries Support Command with it) to a scenario so its carriers show as deployed. While deployed: hire one of that profession, GM-remove a seated one, and retrain a seated one out. Then resolve or clear the deployment.</div>
+        <div><span class="k">Do</span> Three deployments. Right-click a single carrier and try to assign it to a scenario. Right-click HQ &mdash; which holds Support Command &mdash; and assign it. In a StratCon campaign, let StratCon place a formation that contains carriers. Then launch the HQ scenario.</div>
         <div class="expect">
           <span class="k">Expect</span>
-          <span>Carriers deploy like any other unit &mdash; that is deliberate; a base attack may pull support staff into a fight. While deployed, nothing moves: the hire logs <code>Not seating NAME: a LABEL carrier is deployed</code>, and the removal and retrain change nothing in the carrier. When the deployment ends, <code>Deployment changed: reshaped N support profession(s)</code> appears if the count crossed a boundary, and the loose hire is seated on their next event.</span>
-          <span class="fail">Fails if: a carrier is refused deployment, anything is seated into or reshaped around a deployed carrier, or the profession stays misshapen after the deployment ends.</span>
+          <span>The lone carrier is refused. HQ is <strong>accepted</strong> &mdash; its fighting units deploy and every carrier under it stays home, unmarked, with no carrier in the &ldquo;could not be deployed&rdquo; warning. StratCon likewise leaves carriers home. The gate is <code>SupportCarrierDeployment.isAllowed</code>, closed today; a future base-attack scenario opens it for itself, and the reconciler already leaves a deployed carrier alone and catches its profession up on return (<code>Not seating ... carrier is deployed</code>, <code>Deployment changed: reshaped N</code>), so nothing here changes when it does.</span>
+          <span class="fail">Fails if: HQ is refused because of its carriers, a carrier reaches the scenario by any of the three routes, or carriers pad the &ldquo;could not be deployed&rdquo; warning.</span>
         </div>
       </div>
     </div>
@@ -491,7 +491,7 @@
   </section>
 
   <footer>
-    <span>Feature branch <span class="path">Implement-Keep-Carriers-Current</span>, commit <span class="path">dc7b966520</span>. Companion to the implementation plan and the support-carriers design note.</span>
+    <span>Feature branch <span class="path">Implement-Keep-Carriers-Current</span>, commit <span class="path">7e7198f00d</span>. Companion to the implementation plan and the support-carriers design note.</span>
     <span>Ticks are remembered in this browser only, so you can close the page between sessions.</span>
   </footer>
 
