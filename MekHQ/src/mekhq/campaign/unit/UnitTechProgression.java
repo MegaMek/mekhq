@@ -32,11 +32,15 @@
  */
 package mekhq.campaign.unit;
 
+import java.io.File;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.FutureTask;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
 import megamek.common.enums.Faction;
 import megamek.common.interfaces.ITechnology;
@@ -165,14 +169,30 @@ public class UnitTechProgression {
      */
     private record BuildMapTask(Faction techFaction) implements Callable<Map<MekSummary, ITechnology>> {
 
-        // Load all the Entities in the MekSummaryCache and calculate the tech level for
-        // the given faction.
+        // Reuse the map kept on disk from an earlier session when it was built from the same unit data; otherwise
+        // load every entity in the MekSummaryCache, calculate the tech level for the given faction, and keep it.
         @Override
         public Map<MekSummary, ITechnology> call() {
+            MekSummary[] allUnits = MekSummaryCache.getInstance().getAllMeks();
+            UnitTechProgressionCache.Fingerprint fingerprint = UnitTechProgressionCache.currentFingerprint(allUnits);
+            File cacheFile = UnitTechProgressionCache.cacheFile(techFaction);
+            Map<String, MekSummary> unitsByName = Arrays.stream(allUnits)
+                                                        .collect(Collectors.toMap(MekSummary::getName,
+                                                              Function.identity(),
+                                                              (first, duplicate) -> first));
+            Map<MekSummary, ITechnology> cached = UnitTechProgressionCache.load(cacheFile, fingerprint, unitsByName);
+            if (cached != null) {
+                return cached;
+            }
+
+            long startMillis = System.currentTimeMillis();
             Map<MekSummary, ITechnology> map = new HashMap<>();
-            for (MekSummary mekSummary : MekSummaryCache.getInstance().getAllMeks()) {
+            for (MekSummary mekSummary : allUnits) {
                 map.put(mekSummary, calcTechProgression(mekSummary, techFaction));
             }
+            LOGGER.info("[TechProgression] Calculated {} units for {} in {} ms",
+                  map.size(), techFaction, System.currentTimeMillis() - startMillis);
+            UnitTechProgressionCache.save(cacheFile, fingerprint, map);
             return map;
         }
     }
