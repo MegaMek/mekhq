@@ -35,7 +35,6 @@ package mekhq.campaign.universe.commandGeneration.ratgen;
 import java.util.ArrayList;
 import java.util.List;
 
-import megamek.common.compute.Compute;
 import megamek.common.enums.Gender;
 import megamek.common.enums.SkillLevel;
 import megamek.logging.MMLogger;
@@ -43,13 +42,14 @@ import mekhq.campaign.Campaign;
 import mekhq.campaign.campaignOptions.CampaignOption;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.enums.PersonnelRole;
-import mekhq.campaign.personnel.turnoverAndRetention.RetirementDefectionTracker;
-import mekhq.campaign.randomEvents.prisoners.PrisonerStatus;
 import mekhq.campaign.personnel.generator.AbstractSkillGenerator;
 import mekhq.campaign.personnel.generator.DefaultSkillGenerator;
 import mekhq.campaign.personnel.ranks.RankSystem;
 import mekhq.campaign.personnel.ranks.RankValidator;
 import mekhq.campaign.personnel.skills.SkillType;
+import mekhq.campaign.personnel.skills.Skills;
+import mekhq.campaign.personnel.turnoverAndRetention.RetirementDefectionTracker;
+import mekhq.campaign.randomEvents.prisoners.PrisonerStatus;
 import mekhq.campaign.universe.Faction;
 import mekhq.campaign.universe.commandGeneration.CommandGenerationOptions;
 import mekhq.campaign.universe.commandGeneration.ratgen.SupportPersonnelCalculator.SupportDemand;
@@ -206,13 +206,13 @@ public final class SupportPersonnelGenerator {
         if (count <= 0) {
             return 0;
         }
-        // null = the "Random" picker option: roll each person's level individually (below).
+        // NONE (or null) = the "Random" picker option: roll each person's level individually (below).
         SkillLevel skillLevel = options.getSupportPersonnelSkillLevels().get(role);
 
         for (int i = 0; i < count; i++) {
             // Resolve the level here rather than inside experienceLevelFor, so the rank can follow the
             // level this person actually rolled. With the "Random" picker each one differs.
-            SkillLevel rolled = (skillLevel == null) ? rollRandomSkillLevel() : skillLevel;
+            SkillLevel rolled = resolveRandom(skillLevel);
             Person person = createAndRecruit(campaign, skillGen, role, toExperienceLevel(rolled),
                   RulesetRankAssigner.supportRankFor(role, rolled, campaign.getPlayerForce().getFaction()),
                   faction, targetRankSystem, rankValidator);
@@ -255,7 +255,7 @@ public final class SupportPersonnelGenerator {
         if (!campaign.getCampaignOptions().get(CampaignOption.USE_HR_STRAIN)) {
             return 0;
         }
-        // null = "Random": each administrator rolls its own level (below).
+        // NONE (or null) = "Random": each administrator rolls its own level (below).
         SkillLevel skillLevel = options.getSupportPersonnelSkillLevels().get(PersonnelRole.ADMINISTRATOR);
 
         int added = 0;
@@ -316,9 +316,9 @@ public final class SupportPersonnelGenerator {
             return 0;
         }
         if (asPersonnel) {
-            // null = "Random": roll each assistant's level individually.
+            // NONE (or null) = "Random": roll each assistant's level individually.
             for (int i = 0; i < needed; i++) {
-                SkillLevel rolled = (skillLevel == null) ? rollRandomSkillLevel() : skillLevel;
+                SkillLevel rolled = resolveRandom(skillLevel);
                 Person person = createAndRecruit(campaign, skillGen, role, toExperienceLevel(rolled),
                       RulesetRankAssigner.supportRankFor(role, rolled, campaign.getPlayerForce().getFaction()),
                       faction, targetRankSystem, rankValidator);
@@ -421,16 +421,29 @@ public final class SupportPersonnelGenerator {
     }
 
     /**
-     * The {@link SkillType} experience level for one generated person. When {@code configured} is
-     * {@code null} - the "Random" skill-picker option - each person rolls their own level via
+     * The {@link SkillType} experience level for one generated person. When {@code configured} is the "Random"
+     * skill-picker sentinel - {@link SkillLevel#NONE} (or {@code null}) - each person rolls their own level via
      * {@link #rollRandomSkillLevel()}; otherwise every person of the role shares the fixed level.
      *
-     * @param configured the picker's skill level, or {@code null} for a per-person random roll
+     * @param configured the picker's skill level, or the Random sentinel ({@link SkillLevel#NONE}/{@code null})
      *
      * @return the experience level to generate this person's skills at
      */
     static int experienceLevelFor(SkillLevel configured) {
-        return toExperienceLevel(configured == null ? rollRandomSkillLevel() : configured);
+        return toExperienceLevel(resolveRandom(configured));
+    }
+
+    /**
+     * Resolves the "Random" picker sentinel to a concrete level. {@link SkillLevel#NONE} (or {@code null}) rolls a
+     * fresh level via {@link #rollRandomSkillLevel()}; any other level is returned unchanged. Call once per generated
+     * person so a Random selection varies each roll.
+     *
+     * @param configured the picker's skill level, or the Random sentinel
+     *
+     * @return a concrete, non-{@code NONE} {@link SkillLevel}
+     */
+    static SkillLevel resolveRandom(SkillLevel configured) {
+        return Skills.resolveRandomSkillLevel(configured);
     }
 
     /**
@@ -442,19 +455,6 @@ public final class SupportPersonnelGenerator {
      * @return the rolled {@link SkillLevel}
      */
     static SkillLevel rollRandomSkillLevel() {
-        SkillLevel level = switch (Compute.d6(2)) {
-            case 2 -> SkillLevel.ULTRA_GREEN;
-            case 3, 4, 5 -> SkillLevel.GREEN;
-            case 6, 7, 8, 9 -> SkillLevel.REGULAR;
-            case 10, 11 -> SkillLevel.VETERAN;
-            default -> SkillLevel.ELITE; // 12
-        };
-        if (level == SkillLevel.ELITE && Compute.d6() == 6) {
-            level = SkillLevel.HEROIC;
-            if (Compute.d6() == 6) {
-                level = SkillLevel.LEGENDARY;
-            }
-        }
-        return level;
+        return Skills.rollRandomSkillLevel();
     }
 }

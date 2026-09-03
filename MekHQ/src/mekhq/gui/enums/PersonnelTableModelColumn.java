@@ -34,6 +34,7 @@ package mekhq.gui.enums;
 
 import java.time.LocalDate;
 import java.util.Comparator;
+import java.util.Hashtable;
 import java.util.List;
 import java.util.function.BiFunction;
 import java.util.function.Function;
@@ -56,9 +57,11 @@ import mekhq.campaign.Campaign;
 import mekhq.campaign.campaignOptions.CampaignOption;
 import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.finances.Money;
+import mekhq.campaign.force.CombatTeam;
 import mekhq.campaign.force.Formation;
 import mekhq.campaign.market.PersonnelMarket;
 import mekhq.campaign.mission.scenarios.Scenario;
+import mekhq.campaign.mission.utilities.CombatRole;
 import mekhq.campaign.personnel.Injury;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.PersonnelOptions;
@@ -69,6 +72,7 @@ import mekhq.campaign.personnel.enums.PersonnelRole;
 import mekhq.campaign.personnel.enums.PersonnelStatus;
 import mekhq.campaign.personnel.enums.education.EducationLevel;
 import mekhq.campaign.personnel.familyTree.Genealogy;
+import mekhq.campaign.personnel.quartermaster.ArmorKitCatalog;
 import mekhq.campaign.personnel.skills.InfantryGunnerySkills;
 import mekhq.campaign.personnel.skills.ScoutingSkills;
 import mekhq.campaign.personnel.skills.Skill;
@@ -430,7 +434,13 @@ public enum PersonnelTableModelColumn implements MHQTableColumn {
     EXTENDED_FAMILY("Column.EXTENDED_FAMILY.title", Comparators.INT_COMPARATOR,
           person -> person.getGenealogy().getChildren().size(), Object::toString),
     TOTAL_RELATIVES("Column.TOTAL_RELATIVES.title", Comparators.INT_COMPARATOR,
-          person -> getImmediateFamilySize(person) + getExtendedFamilySize(person), Object::toString);
+          person -> getImmediateFamilySize(person) + getExtendedFamilySize(person), Object::toString),
+    ARMOR_KIT("Column.ARMOR_KIT.title", Comparators.NATURAL_ORDER_STRING_COMPARATOR,
+          PersonnelTableModelColumn::getArmorKit),
+    ARMOR_KIT_INTENDED("Column.ARMOR_KIT_INTENDED.title", Comparators.NATURAL_ORDER_STRING_COMPARATOR,
+          PersonnelTableModelColumn::getIntendedArmorKit),
+    COMBAT_ROLE("Column.COMBAT_ROLE.title", Comparators.NATURAL_ORDER_STRING_COMPARATOR,
+          PersonnelTableModelColumn::getCombatRole);
 
     private static final String RESOURCE_BUNDLE = "mekhq.resources.PersonnelTable";
 
@@ -854,6 +864,58 @@ public enum PersonnelTableModelColumn implements MHQTableColumn {
     }
 
     /**
+     * The personal armor kit a person is wearing. Kit-ineligible personnel (foot infantry, battle armor, support, and
+     * civilians) show "N/A" rather than a value they can never carry; eligible crew show their current kit, with the
+     * default coveralls displayed as "None".
+     */
+    private static String getArmorKit(Person person) {
+        if (!ArmorKitCatalog.canBeIssuedKit(person)) {
+            return MHQInternationalization.getText("NA.text");
+        }
+        return armorKitDisplayName(person.getArmorKitName());
+    }
+
+    /**
+     * The armor kit a person is awaiting from a pending order, if any. Displays "-" when nothing is on order.
+     */
+    private static String getIntendedArmorKit(Person person) {
+        return armorKitDisplayName(person.getIntendedArmorKitName());
+    }
+
+    /**
+     * Renders an armor kit internal name for display: coveralls (the no-protection default) reads as "None", an absent
+     * kit as "-", and every other kit by its own name.
+     */
+    private static String armorKitDisplayName(@Nullable String internalName) {
+        if (internalName == null) {
+            return "-";
+        }
+        if (ArmorKitCatalog.DEFAULT_ARMOR_KIT_NAME.equals(internalName)) {
+            return getTextAt("Cell.ARMOR_KIT.none");
+        }
+        return internalName;
+    }
+
+    /**
+     * The combat role a person is assigned to: the {@link CombatRole} of the combat team their unit (or, for a tech,
+     * their maintained formation) belongs to. Walks up the TOE from the person's formation to the nearest ancestor that
+     * is a combat team and reports its role. People not in any active combat team show "-".
+     */
+    private static String getCombatRole(Person person, Campaign campaign) {
+        Formation formation = campaign.getPlayerForce().getFormationFor(person);
+        Hashtable<Integer, CombatTeam> combatTeams = campaign.getPlayerForce().getCombatTeamsMap();
+        while (formation != null) {
+            if (formation.isCombatTeam()) {
+                CombatTeam combatTeam = combatTeams.get(formation.getId());
+                CombatRole role = (combatTeam != null) ? combatTeam.getRole() : formation.getCombatRoleInMemory();
+                return role.toString();
+            }
+            formation = formation.getParentFormation();
+        }
+        return "-";
+    }
+
+    /**
      * Returns the tooltip text for this column, optionally including color reason explanations.
      *
      * @param person             the person for this row
@@ -950,8 +1012,9 @@ public enum PersonnelTableModelColumn implements MHQTableColumn {
             case SKILL_LEVEL -> 45;
             case PERSONNEL_ROLE -> 120;
             case UNIT_ASSIGNMENT -> 140;
-            case ORIGIN -> 160;
+            case ORIGIN, ARMOR_KIT, ARMOR_KIT_INTENDED -> 160;
             case TECH_UNIT_ASSIGNMENT -> 280;
+            case COMBAT_ROLE -> 100;
             default -> null;
         };
         return (preferredWidth == null) ? null : UIUtil.scaleForGUI(preferredWidth);

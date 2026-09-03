@@ -4561,6 +4561,7 @@ public class Campaign implements ITechManager {
             }
             if (getCampaignOptions().get(CampaignOption.USE_PLANETARY_CONDITIONS)) {
                 planetaryConditions.setAtmosphere(atBScenario.getAtmosphere());
+                planetaryConditions.setAtmosphericTaint(atBScenario.getAtmosphericTaint());
                 planetaryConditions.setGravity(atBScenario.getGravity());
             }
         } else {

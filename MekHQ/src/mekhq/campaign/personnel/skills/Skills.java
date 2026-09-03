@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2019-2025 The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2019-2026 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -37,6 +37,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import megamek.common.annotations.Nullable;
+import megamek.common.compute.Compute;
 import megamek.common.enums.SkillLevel;
 import mekhq.campaign.personnel.Person;
 
@@ -46,6 +47,43 @@ import mekhq.campaign.personnel.Person;
 public class Skills {
     public static final SkillLevel[] SKILL_LEVELS = SkillLevel.values();
     private final Map<String, Skill> skills = new HashMap<>();
+
+    /**
+     * Rolls a random {@link SkillLevel} on a 2d6 bell curve centered on Regular.
+     *
+     * @return the rolled {@link SkillLevel}
+     */
+    public static SkillLevel rollRandomSkillLevel() {
+        SkillLevel level = switch (Compute.d6(2)) {
+            case 2 -> SkillLevel.ULTRA_GREEN;
+            case 3, 4, 5 -> SkillLevel.GREEN;
+            case 6, 7, 8, 9 -> SkillLevel.REGULAR;
+            case 10, 11 -> SkillLevel.VETERAN;
+            default -> SkillLevel.ELITE; // 12
+        };
+
+        if (level == SkillLevel.ELITE && Compute.d6() == 6) {
+            level = SkillLevel.HEROIC;
+            if (Compute.d6() == 6) {
+                level = SkillLevel.LEGENDARY;
+            }
+        }
+
+        return level;
+    }
+
+    /**
+     * Resolves the "Random" skill-picker sentinel to a concrete level. {@link SkillLevel#NONE} (or {@code null}) rolls
+     * a fresh level via {@link #rollRandomSkillLevel()}; any other level is returned unchanged. Call once per generated
+     * unit or person so a Random selection varies each roll.
+     *
+     * @param level the picker's selected level, or the Random sentinel ({@link SkillLevel#NONE}/{@code null})
+     *
+     * @return a concrete, non-{@code NONE} {@link SkillLevel}
+     */
+    public static SkillLevel resolveRandomSkillLevel(final SkillLevel level) {
+        return (level == null || level == SkillLevel.NONE) ? rollRandomSkillLevel() : level;
+    }
 
     /**
      * Gets the number of skills.

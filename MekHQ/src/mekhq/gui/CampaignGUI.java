@@ -55,16 +55,8 @@ import java.io.PrintWriter;
 import java.io.Serial;
 import java.nio.charset.StandardCharsets;
 import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.LinkedHashMap;
+import java.util.*;
 import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-import java.util.ResourceBundle;
-import java.util.UUID;
 import java.util.stream.IntStream;
 import java.util.zip.GZIPOutputStream;
 import javax.swing.*;
@@ -126,9 +118,8 @@ import mekhq.gui.baseComponents.roundedComponents.AccentRoundedJButton.Accent;
 import mekhq.gui.baseComponents.roundedComponents.RoundedJButton;
 import mekhq.gui.baseComponents.roundedComponents.RoundedLineBorder;
 import mekhq.gui.baseComponents.roundedComponents.RoundedMMToggleButton;
-import mekhq.gui.campaignOptions.CampaignOptionsDialog;
-import mekhq.gui.dialog.*;
 import mekhq.gui.commandGeneration.CommandGenerationDialog;
+import mekhq.gui.dialog.*;
 import mekhq.gui.dialog.glossary.GlossaryDialog;
 import mekhq.gui.dialog.markets.contractMarket.ChaosContractMarketDialog;
 import mekhq.gui.enums.MHQTabType;
@@ -1397,7 +1388,8 @@ public class CampaignGUI extends JPanel {
 
         // If we're already nagging, no need to nag again
         boolean subTabNagActive = commandCenterTab.isLogNagActive(logType);
-        int relevantIndex = logType.getTabIndex();
+        // Resolve the log tab's live position by identity, so it stays correct after the user reorders or detaches tabs.
+        int relevantIndex = commandCenterTab.getLogTabIndex(logType);
 
         // We're already nagging
         if (logNagActive && subTabNagActive) {
@@ -1411,8 +1403,9 @@ public class CampaignGUI extends JPanel {
         EnhancedTabbedPane tabLogs = commandCenterTab.getTabLogs();
         int logsSelected = tabLogs.getSelectedIndex();
 
-        // If the player is already viewing the correct log tab, no nag needed.
-        if (commandCenterTab.isShowing() && (logsSelected == relevantIndex)) {
+        // If the player is already viewing the correct log tab, no nag needed. A negative relevantIndex means the tab is
+        // detached (not in the pane), so it can never be the selected tab.
+        if (commandCenterTab.isShowing() && (relevantIndex >= 0) && (logsSelected == relevantIndex)) {
             return;
         }
 
@@ -1438,7 +1431,7 @@ public class CampaignGUI extends JPanel {
             };
 
             if (!DailyReportLogPanel.isDateOnly(List.of(reportTab.getLogText()))) {
-                commandCenterTab.nagLogTab(relevantIndex);
+                commandCenterTab.nagLogTab(logType);
                 commandCenterTab.setLogNagActive(logType, true);
             }
         }

@@ -116,6 +116,7 @@ import mekhq.campaign.parts.enums.PartQuality;
 import mekhq.campaign.parts.equipment.AmmoBin;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.enums.PersonnelRole;
+import mekhq.campaign.personnel.quartermaster.ArmorKitCatalog;
 import mekhq.campaign.unit.Maintenance;
 import mekhq.campaign.unit.Unit;
 import mekhq.campaign.unit.actions.ActivateUnitAction;
@@ -139,6 +140,7 @@ import mekhq.gui.dialog.MarkdownEditorDialog;
 import mekhq.gui.dialog.MassMothballDialog;
 import mekhq.gui.dialog.QuirksDialog;
 import mekhq.gui.dialog.SmallSVAmmoSwapDialog;
+import mekhq.gui.dialog.quartermaster.IssueArmorKitsDialog;
 import mekhq.gui.dialog.reportDialogs.MaintenanceReportDialog;
 import mekhq.gui.dialog.reportDialogs.MonthlyUnitCostReportDialog;
 import mekhq.gui.dialog.reportDialogs.PartQualityReportDialog;
@@ -1220,6 +1222,17 @@ public class UnitTableMouseAdapter extends JPopupMenuAdapter {
                         menu.add(menuItem);
                     }
                 }
+
+                if (!nonePresent && Arrays.stream(units).anyMatch(u ->
+                                                                        ArmorKitCatalog.canWearIssuedKit(u.getEntity()) ||
+                                                                              u.getEntity().isConventionalInfantry())) {
+                    JMenuItem issueArmorKits = new JMenuItem(getTextAt("mekhq.resources.IssueArmorKitsDialog",
+                          "menu.issueArmorKits"));
+                    issueArmorKits.addActionListener(evt -> IssueArmorKitsDialog.showFor(gui.getFrame(),
+                          gui.getCampaign(), null, Arrays.asList(units)));
+                    menu.add(issueArmorKits);
+                }
+
                 JMenuHelpers.addMenuIfNonEmpty(popup, menu);
             }
 

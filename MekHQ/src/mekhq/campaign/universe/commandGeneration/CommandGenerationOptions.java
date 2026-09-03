@@ -35,14 +35,14 @@ package mekhq.campaign.universe.commandGeneration;
 import java.util.EnumSet;
 import java.util.HashMap;
 import java.util.Map;
-
 import java.util.Objects;
 import java.util.Set;
+
 import megamek.common.annotations.Nullable;
+import megamek.common.enums.NeuralInterfaceMode;
 import megamek.common.enums.SkillLevel;
 import mekhq.campaign.personnel.enums.PersonnelRole;
 import mekhq.campaign.universe.Faction;
-import megamek.common.enums.NeuralInterfaceMode;
 import mekhq.campaign.universe.Factions;
 import mekhq.campaign.universe.commandGeneration.ratgen.CommandGenerator;
 import mekhq.campaign.universe.commandGeneration.ratgen.ForceDescriptorSnapshot;
@@ -91,11 +91,11 @@ public class CommandGenerationOptions {
 
     // Support personnel - per-role coverage percentages and skill levels.
     // Coverage: 100 = full canonical coverage, 0 = generate none, >100 = redundancy.
-    // Skill level: a fixed SkillLevel, or null for "Random" (each person rolls their own level).
+    // Skill level: a fixed SkillLevel, or SkillLevel.NONE for "Random" (each person rolls their own level).
     private Map<PersonnelRole, Integer> supportPersonnelCoveragePercents;
     private Map<PersonnelRole, SkillLevel> supportPersonnelSkillLevels;
     // Astech / Medic generation - each auxiliary type can independently be skipped, pooled, or
-    // generated as named Persons. Skill level is a fixed SkillLevel, or null for "Random".
+    // generated as named Persons. Skill level is a fixed SkillLevel, or SkillLevel.NONE for "Random".
     private boolean generateAstechs;
     private boolean astechsAsPersonnel;
     private SkillLevel astechSkillLevel;
@@ -194,25 +194,25 @@ public class CommandGenerationOptions {
         setGenerateMercenaryCompanyCommandLance(false);
 
         // Support personnel: full canonical coverage for every support role, with skill level left at
-        // the "Random" default (null) so each generated person rolls their own level. The user opts
+        // the "Random" default (SkillLevel.NONE) so each generated person rolls their own level. The user opts
         // into full coverage changes or a fixed skill level via the SetupTab.
         final Map<PersonnelRole, Integer> coveragePercents = new HashMap<>();
         final Map<PersonnelRole, SkillLevel> skillLevels = new HashMap<>();
         for (final PersonnelRole role : SUPPORT_ROLES_FOR_COVERAGE) {
             coveragePercents.put(role, 100);
-            skillLevels.put(role, null);
+            skillLevels.put(role, SkillLevel.NONE);
         }
         setSupportPersonnelCoveragePercents(coveragePercents);
         setSupportPersonnelSkillLevels(skillLevels);
 
         // Astech / Medic generation defaults: generated as pools out-of-box; opting into
-        // named-Persons mode is explicit. Skill level defaults to Random (null).
+        // named-Persons mode is explicit. Skill level defaults to Random (SkillLevel.NONE).
         setGenerateAstechs(true);
         setAstechsAsPersonnel(false);
-        setAstechSkillLevel(null);
+        setAstechSkillLevel(SkillLevel.NONE);
         setGenerateMedics(true);
         setMedicsAsPersonnel(false);
-        setMedicSkillLevel(null);
+        setMedicSkillLevel(SkillLevel.NONE);
         setGenerateMedicalReserve(false);
         setMedicalReservePercent(10);
 

@@ -34,8 +34,8 @@ package mekhq.gui.campaignOptions.contents;
 
 import jakarta.annotation.Nonnull;
 import mekhq.campaign.campaignOptions.AcquisitionsType;
-import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.campaignOptions.CampaignOption;
+import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.enums.PlanetaryAcquisitionFactionLimit;
 import mekhq.campaign.universe.PlanetarySystem.PlanetaryRating;
 import mekhq.campaign.universe.PlanetarySystem.PlanetarySophistication;
@@ -62,6 +62,8 @@ class EquipmentAndSuppliesOptionsModel {
     int autoLogisticsHeatSink;
     int autoLogisticsWeapons;
     int autoLogisticsOther;
+    int autoLogisticsArmorKit;
+    int autoLogisticsBomb;
     int unitTransitTime;
     boolean noDeliveriesInTransit;
     boolean usePlanetaryAcquisition;
@@ -84,6 +86,12 @@ class EquipmentAndSuppliesOptionsModel {
     boolean variableTechLevel;
     boolean useAmmoByType;
     boolean limitClanTech;
+    String mekWarriorDefaultKit;
+    String vehicleCrewDefaultKit;
+    String aircraftDefaultKit;
+    boolean addDefaultKitToProcurement;
+    boolean npcFactionArmorKits;
+    boolean requireMekWarriorKitToDeploy;
 
     EquipmentAndSuppliesOptionsModel(@Nonnull CampaignOptions options) {
         acquisitionType = options.get(CampaignOption.ACQUISITIONS_TYPE);
@@ -106,6 +114,8 @@ class EquipmentAndSuppliesOptionsModel {
         autoLogisticsHeatSink = options.get(CampaignOption.AUTO_LOGISTICS_HEAT_SINK);
         autoLogisticsWeapons = options.get(CampaignOption.AUTO_LOGISTICS_WEAPONS);
         autoLogisticsOther = options.get(CampaignOption.AUTO_LOGISTICS_OTHER);
+        autoLogisticsArmorKit = options.get(CampaignOption.AUTO_LOGISTICS_ARMOR_KIT);
+        autoLogisticsBomb = options.get(CampaignOption.AUTO_LOGISTICS_BOMB);
         unitTransitTime = options.get(CampaignOption.UNIT_TRANSIT_TIME);
         noDeliveriesInTransit = options.get(CampaignOption.NO_DELIVERIES_IN_TRANSIT);
         usePlanetaryAcquisition = options.get(CampaignOption.USE_PLANETARY_ACQUISITION);
@@ -128,6 +138,12 @@ class EquipmentAndSuppliesOptionsModel {
             index++;
         }
 
+        mekWarriorDefaultKit = options.get(CampaignOption.MEKWARRIOR_DEFAULT_KIT);
+        vehicleCrewDefaultKit = options.get(CampaignOption.VEHICLE_CREW_DEFAULT_KIT);
+        aircraftDefaultKit = options.get(CampaignOption.AIRCRAFT_DEFAULT_KIT);
+        addDefaultKitToProcurement = options.get(CampaignOption.ADD_DEFAULT_KIT_TO_PROCUREMENT);
+        npcFactionArmorKits = options.get(CampaignOption.NPC_FACTION_ARMOR_KITS);
+        requireMekWarriorKitToDeploy = options.get(CampaignOption.REQUIRE_MEKWARRIOR_KIT_TO_DEPLOY);
         limitByYear = options.get(CampaignOption.LIMIT_BY_YEAR);
         disallowExtinctStuff = options.get(CampaignOption.DISALLOW_EXTINCT_STUFF);
         allowClanPurchases = options.get(CampaignOption.ALLOW_CLAN_PURCHASES);
@@ -143,6 +159,12 @@ class EquipmentAndSuppliesOptionsModel {
     void applyTo(@Nonnull CampaignOptions options) {
         options.set(CampaignOption.ACQUISITIONS_TYPE, acquisitionType);
         options.set(CampaignOption.USE_FUNCTIONAL_APPRAISAL, useFunctionalAppraisal);
+        options.set(CampaignOption.MEKWARRIOR_DEFAULT_KIT, mekWarriorDefaultKit);
+        options.set(CampaignOption.VEHICLE_CREW_DEFAULT_KIT, vehicleCrewDefaultKit);
+        options.set(CampaignOption.AIRCRAFT_DEFAULT_KIT, aircraftDefaultKit);
+        options.set(CampaignOption.ADD_DEFAULT_KIT_TO_PROCUREMENT, addDefaultKitToProcurement);
+        options.set(CampaignOption.NPC_FACTION_ARMOR_KITS, npcFactionArmorKits);
+        options.set(CampaignOption.REQUIRE_MEKWARRIOR_KIT_TO_DEPLOY, requireMekWarriorKitToDeploy);
         options.set(CampaignOption.ACQUISITION_PERSONNEL_CATEGORY, acquisitionPersonnelCategory);
         options.set(CampaignOption.CLAN_ACQUISITION_PENALTY, clanAcquisitionPenalty);
         options.set(CampaignOption.IS_ACQUISITION_PENALTY, isAcquisitionPenalty);
@@ -161,6 +183,8 @@ class EquipmentAndSuppliesOptionsModel {
         options.set(CampaignOption.AUTO_LOGISTICS_HEAT_SINK, autoLogisticsHeatSink);
         options.set(CampaignOption.AUTO_LOGISTICS_WEAPONS, autoLogisticsWeapons);
         options.set(CampaignOption.AUTO_LOGISTICS_OTHER, autoLogisticsOther);
+        options.set(CampaignOption.AUTO_LOGISTICS_ARMOR_KIT, autoLogisticsArmorKit);
+        options.set(CampaignOption.AUTO_LOGISTICS_BOMB, autoLogisticsBomb);
         options.set(CampaignOption.UNIT_TRANSIT_TIME, unitTransitTime);
         options.set(CampaignOption.NO_DELIVERIES_IN_TRANSIT, noDeliveriesInTransit);
         options.set(CampaignOption.USE_PLANETARY_ACQUISITION, usePlanetaryAcquisition);

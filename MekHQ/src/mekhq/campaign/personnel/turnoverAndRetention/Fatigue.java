@@ -48,8 +48,8 @@ import megamek.common.equipment.MiscMounted;
 import megamek.common.equipment.MiscType;
 import megamek.common.units.Entity;
 import mekhq.campaign.Campaign;
-import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.campaignOptions.CampaignOption;
+import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.digitalGM.stratCon.StratConRulesManager;
 import mekhq.campaign.digitalGM.stratCon.StratConTrackState;
 import mekhq.campaign.force.CombatTeam;
@@ -229,9 +229,8 @@ public class Fatigue {
         boolean isCampFollower = person.getStatus().isCampFollower();
         boolean isFree = !person.isBusy();
 
-        int nonPermanentInjuryCount = person.getNonPermanentInjuries().size();
-        int hits = person.getHits();
-        boolean isInjured = nonPermanentInjuryCount > 0 || hits > 0;
+        int hits = person.getNonPermanentInjurySeverity();
+        boolean isInjured = hits > 0;
 
         if (hasThreshold &&
                   isFatigued &&

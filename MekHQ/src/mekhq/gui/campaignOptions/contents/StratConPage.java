@@ -69,6 +69,7 @@ import mekhq.gui.campaignOptions.components.CampaignOptionsHeaderPanel;
 import mekhq.gui.campaignOptions.components.CampaignOptionsLabel;
 import mekhq.gui.campaignOptions.components.CampaignOptionsPagePanel;
 import mekhq.gui.campaignOptions.components.CampaignOptionsSpinner;
+import mekhq.gui.utilities.SkillLevelPickerUtility;
 
 /**
  * The {@code StratConPage} class builds and manages the StratCon leaf page of the Campaign Options dialog. It owns the
@@ -190,7 +191,8 @@ class StratConPage {
     @Nonnull
     JPanel createPanel(@Nullable RulesetsOptionsModel model) {
         // Combos (previously built during initialization)
-        comboSkillLevel = new MMComboBox<>("comboSkillLevel", getSkillLevelOptions());
+        comboSkillLevel = new MMComboBox<>("comboSkillLevel", SkillLevelPickerUtility.PICKER_LEVELS);
+        SkillLevelPickerUtility.applyRandomRenderer(comboSkillLevel);
         comboBoardScalingType = new MMComboBox<>("comboBoardScalingType", BoardScalingType.values());
         final DefaultComboBoxModel<AutoResolveMethod> autoResolveTypeModel = new DefaultComboBoxModel<>(
               AutoResolveMethod.values());
@@ -677,7 +679,7 @@ class StratConPage {
             return;
         }
 
-        model.skillLevel = comboSkillLevel.getSelectedItem();
+        model.skillLevel = SkillLevelPickerUtility.resolve(comboSkillLevel.getSelectedItem());
         model.boardScalingType = comboBoardScalingType.getSelectedItem();
         model.opForLanceTypeMeks = (int) spnOpForLanceTypeMeks.getValue();
         model.opForLanceTypeMixed = (int) spnOpForLanceTypeMixed.getValue();

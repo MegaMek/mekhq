@@ -102,6 +102,7 @@ import megamek.common.loaders.MekFileParser;
 import megamek.common.loaders.MekSummary;
 import megamek.common.loaders.MekSummaryCache;
 import megamek.common.planetaryConditions.Atmosphere;
+import megamek.common.planetaryConditions.AtmosphericTaint;
 import megamek.common.planetaryConditions.Wind;
 import megamek.common.units.*;
 import megamek.common.universe.FactionTag;
@@ -140,6 +141,7 @@ import mekhq.campaign.mission.utilities.CombatRole;
 import mekhq.campaign.personnel.Bloodname;
 import mekhq.campaign.personnel.SpecialAbility;
 import mekhq.campaign.personnel.enums.Phenotype;
+import mekhq.campaign.personnel.quartermaster.ArmorKitCatalog;
 import mekhq.campaign.personnel.skills.RandomSkillPreferences;
 import mekhq.campaign.personnel.skills.SkillType;
 import mekhq.campaign.unit.Unit;
@@ -612,17 +614,16 @@ public class AtBDynamicScenarioFactory {
                 isLowPressure = true;
                 allowsTanks = false;
             } else {
-                mekhq.campaign.universe.Atmosphere specific_atmosphere = contract.getTargetPlanet()
-                                                                               .getAtmosphere(currentDate);
+                AtmosphericTaint specificAtmosphere = contract.getTargetPlanet().getAtmosphere(currentDate);
 
-                switch (specific_atmosphere) {
-                    case TOXIC_POISON, TOXICPOISON, TOXIC_CAUSTIC, TOXICCAUSTIC -> {
-                        LOGGER.info("Atmosphere is {}, disallowing Tanks and Infantry", specific_atmosphere);
+                switch (specificAtmosphere) {
+                    case TOXIC_POISON, TOXIC_CAUSTIC -> {
+                        LOGGER.info("Atmosphere is {}, disallowing Tanks and Infantry", specificAtmosphere);
                         allowsConvInfantry = false;
                         allowsTanks = false;
                     }
-                    case TAINTED_POISON, TAINTEDPOISON, TAINTED_CAUSTIC, TAINTEDCAUSTIC -> {
-                        LOGGER.info("Atmosphere is {}, setting tainted flag", specific_atmosphere);
+                    case TAINTED_POISON, TAINTED_CAUSTIC -> {
+                        LOGGER.info("Atmosphere is {}, setting tainted flag", specificAtmosphere);
                         isTainted = true;
                     }
                     default -> {
@@ -1116,6 +1117,15 @@ public class AtBDynamicScenarioFactory {
                 if (faction.isClan() && !entity.isInfantry() && !entity.isProtoMek()) {
                     if (SpecialAbility.getSpecialAbilities().containsKey("clan_pilot_training")) {
                         entity.getCrew().getOptions().getOption("clan_pilot_training").setValue(true);
+                    }
+                }
+            }
+
+            if (campaign.getCampaignOptions().get(CampaignOption.NPC_FACTION_ARMOR_KITS)) {
+                String npcKit = ArmorKitCatalog.npcKitFor(entity, faction.isClan(), currentDate.getYear());
+                if (npcKit != null) {
+                    for (int slot = 0; slot < entity.getCrew().getSlotCount(); slot++) {
+                        entity.getCrew().setArmorKitName(npcKit, slot);
                     }
                 }
             }
@@ -1927,11 +1937,13 @@ public class AtBDynamicScenarioFactory {
             if (null != planet) {
                 Atmosphere atmosphere = ObjectUtility.nonNull(planet.getPressure(campaign.getLocalDate()),
                       scenario.getAtmosphere());
+                AtmosphericTaint atmosphericTaint = planet.getAtmosphere(campaign.getLocalDate());
                 float gravity = ObjectUtility.nonNull(planet.getGravity(), scenario.getGravity()).floatValue();
                 int temperature = ObjectUtility.nonNull(planet.getTemperature(campaign.getLocalDate()),
                       scenario.getTemperature());
 
                 scenario.setAtmosphere(atmosphere);
+                scenario.setAtmosphericTaint(atmosphericTaint);
                 scenario.setGravity(gravity);
                 scenario.setTemperature(temperature);
             }

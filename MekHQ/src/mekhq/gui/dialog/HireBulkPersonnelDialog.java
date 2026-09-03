@@ -67,6 +67,7 @@ import mekhq.campaign.personnel.enums.Profession;
 import mekhq.campaign.reputation.chaosReputation.ChaosReputation;
 import mekhq.gui.CampaignGUI;
 import mekhq.gui.displayWrappers.RankDisplay;
+import mekhq.gui.utilities.SkillLevelPickerUtility;
 
 /**
  * @author Jay Lawson
@@ -286,11 +287,10 @@ public class HireBulkPersonnelDialog extends JDialog {
             JPanel skillRangePanel = new JPanel(new GridBagLayout());
             getContentPane().add(skillRangePanel, gridBagConstraints);
 
-            skillLevel = new MMComboBox<>("comboSkillLevel", SkillLevel.values());
-            skillLevel.setSelectedItem(SkillLevel.REGULAR);
+            skillLevel = new MMComboBox<>("comboSkillLevel", SkillLevelPickerUtility.PICKER_LEVELS);
+            SkillLevelPickerUtility.applyRandomRenderer(skillLevel);
+            skillLevel.setSelectedItem(SkillLevel.NONE);
             skillLevel.setEnabled(false);
-
-            skillLevel.removeItem(SkillLevel.NONE);
 
             JLabel labelMinSkill = new JLabel("Minimum Skill:");
             labelMinSkill.setLabelFor(skillLevel);
@@ -359,14 +359,12 @@ public class HireBulkPersonnelDialog extends JDialog {
             // Dependents & 'None' don't have skills
             CampaignOptions campaignOptions = campaign.getCampaignOptions();
             if (useSkill && !selectedRole.isDependent() && !selectedRole.isNone()) {
-                if (skillLevel.getSelectedItem() != null) {
-                    boolean checkVeterancyEligibility = false;
-                    overrideSkills(campaign,
-                          person,
-                          selectedRole,
-                          skillLevel.getSelectedItem(),
-                          checkVeterancyEligibility);
-                }
+                boolean checkVeterancyEligibility = false;
+                overrideSkills(campaign,
+                      person,
+                      selectedRole,
+                      SkillLevelPickerUtility.resolve(skillLevel.getSelectedItem()),
+                      checkVeterancyEligibility);
             }
 
             person.setRank(((RankDisplay) Objects.requireNonNull(choiceRanks.getSelectedItem())).rankNumeric());

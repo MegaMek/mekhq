@@ -49,9 +49,10 @@ import static org.mockito.Mockito.when;
 import java.time.LocalDate;
 import java.util.List;
 
+import megamek.common.planetaryConditions.Atmosphere;
+import megamek.common.planetaryConditions.AtmosphericTaint;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.mission.contract.AbstractContract;
-import mekhq.campaign.universe.Atmosphere;
 import mekhq.campaign.universe.LandMass;
 import mekhq.campaign.universe.Planet;
 import mekhq.campaign.universe.PlanetarySystem;
@@ -74,7 +75,7 @@ class PlanetProfileTest {
      * Builds a profile that varies only in the fields a test cares about, keeping everything else Terra-like.
      */
     private static PlanetProfile profile(int temperatureCelsius, double diameterKm, boolean airless,
-          Atmosphere atmosphere, String composition, Long population, HPGRating hpg) {
+          AtmosphericTaint atmosphere, String composition, Long population, HPGRating hpg) {
         return new PlanetProfile(temperatureCelsius,
               diameterKm,
               NEUTRAL_WATER_PERCENT,
@@ -204,18 +205,19 @@ class PlanetProfileTest {
     }
 
     @Test
-    void habitability_taintedAtmosphere_isReducedMoreThanNonBreathable() {
+    void habitability_taintedAtmosphere_isReduced() {
         // Half a habitable span from ideal, so the base comfort is a clean 0.5 and the atmosphere factors are visible
         // in the result. It must stay inside one span: a full span away the base is 0.0 and every factor multiplies to
         // zero, which would make the comparison below vacuous.
         int uncomfortable = HABITABLE_TEMPERATURE_CELSIUS + 30;
         double base = temperate(uncomfortable).habitability();
 
-        PlanetProfile tainted = profile(uncomfortable, TERRA_DIAMETER_KM, false, Atmosphere.TAINTED_POISON, "", null,
+        PlanetProfile tainted = profile(uncomfortable, TERRA_DIAMETER_KM, false, AtmosphericTaint.TAINTED_POISON, "", null,
               HPGRating.X);
-        PlanetProfile toxic = profile(uncomfortable, TERRA_DIAMETER_KM, false, Atmosphere.TOXIC_CAUSTIC, "", null,
+        PlanetProfile toxic = profile(uncomfortable, TERRA_DIAMETER_KM, false, AtmosphericTaint.TOXIC_CAUSTIC, "", null,
               HPGRating.X);
-        PlanetProfile thin = profile(uncomfortable, TERRA_DIAMETER_KM, false, Atmosphere.NONE, "", null, HPGRating.X);
+        PlanetProfile clean = profile(uncomfortable, TERRA_DIAMETER_KM, false, AtmosphericTaint.BREATHABLE, "", null,
+              HPGRating.X);
 
         assertEquals(base * 0.4,
               tainted.habitability(),
@@ -225,12 +227,12 @@ class PlanetProfileTest {
               toxic.habitability(),
               TOLERANCE,
               "a toxic atmosphere should cut habitability to 40%, same as tainted");
-        assertEquals(base * 0.6,
-              thin.habitability(),
+        assertEquals(base,
+              clean.habitability(),
               TOLERANCE,
-              "a merely non-breathable atmosphere should cut habitability to 60%");
-        assertTrue(tainted.habitability() < thin.habitability(),
-              "a tainted atmosphere should be harsher than a simply non-breathable one");
+              "breathable air should carry no habitability penalty of its own");
+        assertTrue(tainted.habitability() < clean.habitability(),
+              "a tainted atmosphere should be harsher than breathable air");
     }
 
     @Test
@@ -238,7 +240,7 @@ class PlanetProfileTest {
         int uncomfortable = HABITABLE_TEMPERATURE_CELSIUS + 30;
 
         assertEquals(temperate(uncomfortable).habitability(),
-              profile(uncomfortable, TERRA_DIAMETER_KM, false, Atmosphere.BREATHABLE, "", null,
+              profile(uncomfortable, TERRA_DIAMETER_KM, false, AtmosphericTaint.BREATHABLE, "", null,
                     HPGRating.X).habitability(),
               TOLERANCE,
               "an explicitly breathable atmosphere should behave the same as an unknown (neutral) one");
@@ -341,7 +343,7 @@ class PlanetProfileTest {
 
     @Test
     void breathable_airlessWorldIsNeverBreathable() {
-        PlanetProfile airless = profile(25, TERRA_DIAMETER_KM, true, Atmosphere.BREATHABLE, "", null, HPGRating.X);
+        PlanetProfile airless = profile(25, TERRA_DIAMETER_KM, true, AtmosphericTaint.BREATHABLE, "", null, HPGRating.X);
 
         assertFalse(airless.breathable(),
               "an airless world must never be breathable, even if an atmosphere is somehow recorded");
@@ -349,22 +351,22 @@ class PlanetProfileTest {
 
     @Test
     void taintedOrToxic_coversBothTaintedAndToxicVariants() {
-        for (Atmosphere atmosphere : List.of(Atmosphere.TAINTED_POISON,
-              Atmosphere.TAINTED_CAUSTIC,
-              Atmosphere.TAINTED_FLAME,
-              Atmosphere.TOXIC_POISON,
-              Atmosphere.TOXIC_CAUSTIC,
-              Atmosphere.TOXIC_FLAME)) {
+        for (AtmosphericTaint atmosphere : List.of(AtmosphericTaint.TAINTED_POISON,
+              AtmosphericTaint.TAINTED_CAUSTIC,
+              AtmosphericTaint.TAINTED_FLAME,
+              AtmosphericTaint.TOXIC_POISON,
+              AtmosphericTaint.TOXIC_CAUSTIC,
+              AtmosphericTaint.TOXIC_FLAME)) {
             PlanetProfile hostile = profile(25, TERRA_DIAMETER_KM, false, atmosphere, "", null, HPGRating.X);
 
             assertTrue(hostile.taintedOrToxic(), atmosphere + " should read as tainted or toxic");
             assertFalse(hostile.breathable(), atmosphere + " must not read as breathable");
         }
 
-        assertFalse(profile(25, TERRA_DIAMETER_KM, false, Atmosphere.BREATHABLE, "", null, HPGRating.X)
+        assertFalse(profile(25, TERRA_DIAMETER_KM, false, AtmosphericTaint.BREATHABLE, "", null, HPGRating.X)
                           .taintedOrToxic(), "a breathable atmosphere must not read as tainted or toxic");
-        assertFalse(profile(25, TERRA_DIAMETER_KM, false, Atmosphere.NONE, "", null, HPGRating.X).taintedOrToxic(),
-              "a \"None\" atmosphere is absent, not tainted");
+        assertFalse(profile(25, TERRA_DIAMETER_KM, true, AtmosphericTaint.BREATHABLE, "", null, HPGRating.X)
+                          .taintedOrToxic(), "an airless world has no atmosphere to be tainted");
     }
 
     // endregion composition and atmosphere reads
@@ -434,8 +436,8 @@ class PlanetProfileTest {
 
     @Test
     void from_planetRecordingNoAtmosphere_isBreathableRatherThanAirless() {
-        // getAtmosphere() collapses "unknown" onto NONE; the profile deliberately reads the sourced value so that an
-        // absent datum does not turn an ordinary world into a vacuum.
+        // The profile reads the sourced value rather than getAtmosphere() so that an absent datum stays absent
+        // instead of being reported as ordinary breathable air.
         PlanetProfile resolved = PlanetProfile.from(emptyPlanet(), DATE);
 
         assertFalse(resolved.airless(), "a planet with no atmosphere datum must not be treated as airless");
@@ -445,7 +447,7 @@ class PlanetProfileTest {
     @Test
     void from_vacuumPressure_isAirless() {
         Planet planet = mock(Planet.class);
-        when(planet.getPressure(DATE)).thenReturn(megamek.common.planetaryConditions.Atmosphere.VACUUM);
+        when(planet.getPressure(DATE)).thenReturn(Atmosphere.VACUUM);
 
         PlanetProfile resolved = PlanetProfile.from(planet, DATE);
 
@@ -454,21 +456,12 @@ class PlanetProfileTest {
     }
 
     @Test
-    void from_explicitNoneAtmosphere_isAirless() {
-        Planet planet = mock(Planet.class);
-        when(planet.getSourcedAtmosphere(DATE)).thenReturn(SourceableValue.of(Atmosphere.NONE));
-
-        assertTrue(PlanetProfile.from(planet, DATE).airless(),
-              "an explicitly recorded \"None\" atmosphere should make the profile airless");
-    }
-
-    @Test
     void from_readsAndNormalizesEveryRecordedValue() {
         Planet planet = mock(Planet.class);
         when(planet.getTemperature(DATE)).thenReturn(-12);
         when(planet.getDiameter()).thenReturn(TERRA_DIAMETER_KM * 1.25);
         when(planet.getSourcedPercentWater(DATE)).thenReturn(SourceableValue.of(73));
-        when(planet.getSourcedAtmosphere(DATE)).thenReturn(SourceableValue.of(Atmosphere.BREATHABLE));
+        when(planet.getSourcedAtmosphere(DATE)).thenReturn(SourceableValue.of(AtmosphericTaint.BREATHABLE));
         when(planet.getSourcedComposition(DATE)).thenReturn(SourceableValue.of("Arid/ROCK"));
         when(planet.getLandMasses()).thenReturn(List.of(mock(LandMass.class), mock(LandMass.class)));
         when(planet.getGravity()).thenReturn(1.4);
@@ -480,7 +473,7 @@ class PlanetProfileTest {
         assertEquals(-12, resolved.temperatureCelsius(), "the recorded temperature should be used as-is");
         assertEquals(1.25, resolved.sizeFactor(), TOLERANCE, "the recorded diameter should drive the size factor");
         assertEquals(73, resolved.waterPercent(), "the recorded water coverage should be used as-is");
-        assertSame(Atmosphere.BREATHABLE, resolved.atmosphere(), "the recorded atmosphere should be used as-is");
+        assertSame(AtmosphericTaint.BREATHABLE, resolved.atmosphere(), "the recorded atmosphere should be used as-is");
         assertEquals("arid/rock",
               resolved.composition(),
               "the recorded composition should be lower-cased so the keyword predicates match");
