@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2025 The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2025-2025 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -66,5 +66,5 @@ public record SkillModifierData(PersonnelOptions characterOptions, Attributes at
      *
      * <p>The value {@code -1} is used as a sentinel and does not correspond to any valid chronological age.</p>
      */
-    public static int IGNORE_AGE = -1;
+    public static final int IGNORE_AGE = -1;
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2025 The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2025-2026 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -34,9 +34,18 @@ package mekhq.campaign.universe.factionStanding;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
+import java.time.LocalDate;
+import java.util.Collections;
+import java.util.List;
 import java.util.stream.Stream;
 
+import mekhq.campaign.universe.Faction;
+import mekhq.campaign.universe.PlanetarySystem;
+import mekhq.campaign.universe.factionHints.FactionHints;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -90,6 +99,33 @@ class FactionStandingUtilitiesTest {
         for (double regard : new double[] { Double.MIN_VALUE, 0.0, 1.0, -1.0, 100000, -100000, Double.NaN }) {
             assertNotNull(FactionStandingUtilities.calculateFactionStandingLevel(regard));
         }
+    }
+
+    @Test
+    @DisplayName("An empty system (no population) is always enterable")
+    void testCanEnterTargetSystem_emptySystem_grantsAccess() {
+        LocalDate when = LocalDate.of(3021, 4, 17);
+        PlanetarySystem targetSystem = mock(PlanetarySystem.class);
+        when(targetSystem.getPopulation(when)).thenReturn(0L);
+
+        assertTrue(FactionStandingUtilities.canEnterTargetSystem(mock(Faction.class),
+              mock(FactionStandings.class), null, targetSystem, when, List.of(), mock(FactionHints.class)));
+    }
+
+    @Test
+    @DisplayName("An uncolonized system with a residual population but no controlling faction is enterable")
+    void testCanEnterTargetSystem_uncolonizedWithResidualPopulation_grantsAccess() {
+        // Regression test for issue #9909: dying/uncolonized worlds (e.g. Nuncavoy, Sacromonte) still report a
+        // residual population but have no faction events, so getFactionSet() is empty. Previously the outlaw check
+        // (highest regard defaults to the minimum) and the at-war check (allMatch on an empty stream is vacuously
+        // true) both flagged such systems as inaccessible.
+        LocalDate when = LocalDate.of(3021, 4, 17);
+        PlanetarySystem targetSystem = mock(PlanetarySystem.class);
+        when(targetSystem.getPopulation(when)).thenReturn(88_154L);
+        when(targetSystem.getFactionSet(when)).thenReturn(Collections.emptySet());
+
+        assertTrue(FactionStandingUtilities.canEnterTargetSystem(mock(Faction.class),
+              mock(FactionStandings.class), null, targetSystem, when, List.of(), mock(FactionHints.class)));
     }
 
 }
