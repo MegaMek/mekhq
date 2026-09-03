@@ -2013,6 +2013,20 @@ public class CampaignGUI extends JPanel {
     }
 
     /**
+     * Rebuilds the Active Location dropdown when the set of player bases changes, so a newly added (or removed) base
+     * appears in the location filter picker without waiting for the next new day.
+     *
+     * <p><b>Important:</b> This method is not directly evoked, so IDEA will tell you it has no uses. IDEA is
+     * wrong.</p>
+     *
+     * @param locationEvent the event signalling that a tracked location (player base) was added or removed
+     */
+    @Subscribe
+    public void handleLocationSetChanged(LocationEvent locationEvent) {
+        refreshActiveLocation();
+    }
+
+    /**
      * Handles the transition to a new day in the campaign.
      *
      * <p>Refreshes the calendar, location, funds, parts availability, and all relevant UI tabs to ensure the user
