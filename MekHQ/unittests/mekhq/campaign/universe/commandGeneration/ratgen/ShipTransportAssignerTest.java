@@ -45,11 +45,13 @@ import java.util.UUID;
 import megamek.client.ratgenerator.ForceDescriptor;
 import megamek.common.bays.ASFBay;
 import megamek.common.enums.GamePhase;
+import megamek.common.equipment.DockingCollar;
 import megamek.common.equipment.EquipmentType;
 import megamek.common.game.Game;
 import megamek.common.units.AeroSpaceFighter;
 import megamek.common.units.Dropship;
 import megamek.common.units.Entity;
+import megamek.common.units.Jumpship;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.unit.Unit;
 import mekhq.campaign.unit.enums.TransporterType;
@@ -164,6 +166,31 @@ class ShipTransportAssignerTest {
     }
 
     @Test
+    void dropShipsDockToAJumpShipWithCollarsToSpare() {
+        Unit jumpShip = jumpShip(1);
+        Unit firstDropShip = ship(2);
+        Unit secondDropShip = ship(2);
+        ForceDescriptor root = node("Naval Units");
+        ForceDescriptor jumpShipNode = node("Invader");
+        ForceDescriptor firstNode = node("Leopard");
+        ForceDescriptor secondNode = node("Union");
+        root.addSubForce(jumpShipNode);
+        root.addSubForce(firstNode);
+        root.addSubForce(secondNode);
+        Map<ForceDescriptor, Unit> units = new IdentityHashMap<>();
+        units.put(jumpShipNode, jumpShip);
+        units.put(firstNode, firstDropShip);
+        units.put(secondNode, secondDropShip);
+
+        int assigned = ShipTransportAssigner.assign(root, units);
+
+        assertEquals(1, assigned, "one collar, one DropShip docked");
+        assertSame(jumpShip, firstDropShip.getTransportShipAssignment().getTransportShip());
+        assertEquals(TransporterType.DOCKING_COLLAR, firstDropShip.getTransportShipAssignment().getTransporterType());
+        assertFalse(secondDropShip.hasTransportShipAssignment(), "no collar left for the second");
+    }
+
+    @Test
     void aMissingTreeIsIgnored() {
         assertEquals(0, ShipTransportAssigner.assign(null, new IdentityHashMap<>()));
     }
@@ -172,6 +199,14 @@ class ShipTransportAssignerTest {
         Dropship dropship = new Dropship();
         dropship.addTransporter(new ASFBay(fighterBays, 1, 1));
         return unitFor(dropship);
+    }
+
+    private Unit jumpShip(int collars) {
+        Jumpship jumpship = new Jumpship();
+        for (int collar = 1; collar <= collars; collar++) {
+            jumpship.addTransporter(new DockingCollar(collar));
+        }
+        return unitFor(jumpship);
     }
 
     private Unit fighter() {

@@ -32,13 +32,16 @@
  */
 package mekhq.campaign.universe.commandGeneration.ratgen;
 
+import java.util.ArrayList;
 import java.util.LinkedHashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
 import megamek.client.ratgenerator.ForceDescriptor;
 import megamek.common.annotations.Nullable;
 import megamek.common.equipment.Transporter;
+import megamek.common.units.Dropship;
 import megamek.common.units.Entity;
 import megamek.logging.MMLogger;
 import mekhq.MekHQ;
@@ -57,8 +60,9 @@ import mekhq.campaign.utilities.CampaignTransportUtilities;
  * assignment the TO&amp;E's "Assign to ship" action makes, so the fighters show aboard and the scenario launcher
  * loads them in game.</p>
  *
- * <p>Only what the tree nests under a ship goes aboard. The troopships generated to lift the command are sized to
- * carry it, but the tree never says which Mek rides in which hull; assigning those stays with the player.</p>
+ * <p>What the tree nests under a ship goes aboard, and a DropShip with no ship of its own is docked to a JumpShip
+ * or WarShip in the command with a collar free. The troopships generated to lift the command are sized to carry
+ * it, but the tree never says which Mek rides in which hull; assigning those stays with the player.</p>
  */
 public final class ShipTransportAssigner {
 
@@ -82,6 +86,7 @@ public final class ShipTransportAssigner {
         }
         Set<Unit> shipsChanged = new LinkedHashSet<>();
         int assigned = assignBeneath(root, null, unitsByDescriptor, shipsChanged);
+        assigned += dock(root, unitsByDescriptor, shipsChanged);
         for (Unit ship : shipsChanged) {
             MekHQ.triggerEvent(new UnitChangedEvent(ship));
         }
@@ -129,6 +134,56 @@ public final class ShipTransportAssigner {
             assigned += assignBeneath(child, shipForChildren, unitsByDescriptor, shipsChanged);
         }
         return assigned;
+    }
+
+    /**
+     * Docks every DropShip still without a ship to a JumpShip or WarShip in the command with a collar to spare, in
+     * tree order. The tree lists JumpShips and DropShips as separate categories rather than nesting one under the
+     * other, so this is where the collars the transport stage counted are taken.
+     *
+     * @return how many DropShips were docked
+     */
+    private static int dock(ForceDescriptor root, Map<ForceDescriptor, Unit> unitsByDescriptor,
+          Set<Unit> shipsChanged) {
+        List<Unit> units = new ArrayList<>();
+        collectUnits(root, unitsByDescriptor, units);
+        List<Unit> collarShips = units.stream()
+              .filter(unit -> (unit.getEntity() != null) && !unit.getEntity().getDockingCollars().isEmpty())
+              .toList();
+        if (collarShips.isEmpty()) {
+            return 0;
+        }
+        int docked = 0;
+        for (Unit unit : units) {
+            boolean isUndockedDropship = (unit.getEntity() instanceof Dropship) && !unit.hasTransportShipAssignment();
+            if (!isUndockedDropship) {
+                continue;
+            }
+            for (Unit ship : collarShips) {
+                if (ship.getCurrentShipTransportCapacity(TransporterType.DOCKING_COLLAR) >= 1) {
+                    ship.loadShipTransport(TransporterType.DOCKING_COLLAR, Set.of(unit));
+                    shipsChanged.add(ship);
+                    docked++;
+                    break;
+                }
+            }
+        }
+        return docked;
+    }
+
+    /** The built units under {@code node}, in tree order. */
+    private static void collectUnits(ForceDescriptor node, Map<ForceDescriptor, Unit> unitsByDescriptor,
+          List<Unit> into) {
+        Unit unit = unitsByDescriptor.get(node);
+        if (unit != null) {
+            into.add(unit);
+        }
+        for (ForceDescriptor child : node.getSubForces()) {
+            collectUnits(child, unitsByDescriptor, into);
+        }
+        for (ForceDescriptor child : node.getAttached()) {
+            collectUnits(child, unitsByDescriptor, into);
+        }
     }
 
     private static boolean hasTransporters(Unit unit) {
