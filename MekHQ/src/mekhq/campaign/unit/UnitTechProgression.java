@@ -33,14 +33,11 @@
 package mekhq.campaign.unit;
 
 import java.io.File;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.FutureTask;
-import java.util.function.Function;
-import java.util.stream.Collectors;
 
 import megamek.common.enums.Faction;
 import megamek.common.interfaces.ITechnology;
@@ -176,10 +173,10 @@ public class UnitTechProgression {
             MekSummary[] allUnits = MekSummaryCache.getInstance().getAllMeks();
             UnitTechProgressionCache.Fingerprint fingerprint = UnitTechProgressionCache.currentFingerprint(allUnits);
             File cacheFile = UnitTechProgressionCache.cacheFile(techFaction);
-            Map<String, MekSummary> unitsByName = Arrays.stream(allUnits)
-                                                        .collect(Collectors.toMap(MekSummary::getName,
-                                                              Function.identity(),
-                                                              (first, duplicate) -> first));
+            Map<String, MekSummary> unitsByName = new HashMap<>(allUnits.length * 2);
+            for (MekSummary unit : allUnits) {
+                unitsByName.putIfAbsent(unit.getName(), unit);
+            }
             Map<MekSummary, ITechnology> cached = UnitTechProgressionCache.load(cacheFile, fingerprint, unitsByName);
             if (cached != null) {
                 return cached;

@@ -38,6 +38,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.ObjectInputFilter;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.Serializable;
@@ -67,6 +68,16 @@ final class UnitTechProgressionCache {
     private static final String CACHE_DIRECTORY = "cache";
     private static final String FILE_PREFIX = "techProgression-";
     private static final String FILE_SUFFIX = ".cache";
+
+    /**
+     * The only classes a cache file may contain: the fingerprint, MegaMek's tech level types and the JDK collections
+     * and enums they are built from. Everything else is rejected before it is instantiated.
+     */
+    private static final String ALLOWED_CLASSES = "mekhq.campaign.unit.UnitTechProgressionCache$Fingerprint;"
+          + "megamek.common.**;java.util.**;java.lang.**;maxdepth=24;maxarray=100000;!*";
+
+    /** Far more units than the game ships with; a stored count above this is a corrupt or hostile file. */
+    private static final int MAX_ENTRIES = 250_000;
 
     private UnitTechProgressionCache() {
     }
@@ -126,6 +137,9 @@ final class UnitTechProgressionCache {
         // The file stream is its own resource so it is closed even when the object stream refuses the file's header
         try (FileInputStream fileInput = new FileInputStream(cacheFile);
               ObjectInputStream input = new ObjectInputStream(new BufferedInputStream(fileInput))) {
+            // The file sits in the user's own data directory, but it is still untrusted input: only the classes a
+            // progression map is made of may be deserialized, and nothing deeply nested or oversized.
+            input.setObjectInputFilter(ObjectInputFilter.Config.createFilter(ALLOWED_CLASSES));
             Object storedFingerprint = input.readObject();
             if (!expected.equals(storedFingerprint)) {
                 LOGGER.info("[TechProgression] {} was built from other unit data or another version; recalculating",
@@ -134,6 +148,11 @@ final class UnitTechProgressionCache {
             }
 
             int entryCount = input.readInt();
+            if ((entryCount < 0) || (entryCount > MAX_ENTRIES)) {
+                LOGGER.warn("[TechProgression] {} claims {} entries, which is not a plausible count; recalculating",
+                      cacheFile.getName(), entryCount);
+                return null;
+            }
             Map<MekSummary, ITechnology> map = new HashMap<>(entryCount * 2);
             int unknownUnitCount = 0;
             for (int index = 0; index < entryCount; index++) {
@@ -156,8 +175,8 @@ final class UnitTechProgressionCache {
     }
 
     /**
-     * Writes a map out for the next session. Units whose progression could not be calculated are left out, so they
-     * are tried again next time.
+     * Writes a map out for the next session. Units whose progression could not be calculated, or is of a type that
+     * cannot be serialized, are left out, so they are calculated again next time.
      *
      * @param cacheFile   the file to write
      * @param fingerprint what the map was computed from

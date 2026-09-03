@@ -41,6 +41,8 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 import java.io.File;
+import java.io.FileOutputStream;
+import java.io.ObjectOutputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.HashMap;
@@ -134,6 +136,31 @@ class UnitTechProgressionCacheTest {
         File cacheFile = tempDir.resolve("techProgression-IS.cache").toFile();
 
         assertNull(UnitTechProgressionCache.load(cacheFile, FINGERPRINT, Map.of()));
+    }
+
+    @Test
+    void implausibleEntryCountIsRefusedBeforeAnythingIsAllocated() throws Exception {
+        File cacheFile = tempDir.resolve("techProgression-IS.cache").toFile();
+        try (ObjectOutputStream output = new ObjectOutputStream(new FileOutputStream(cacheFile))) {
+            output.writeObject(FINGERPRINT);
+            output.writeInt(Integer.MAX_VALUE);
+        }
+
+        assertNull(UnitTechProgressionCache.load(cacheFile, FINGERPRINT, Map.of()));
+    }
+
+    @Test
+    void entryOfAClassAProgressionIsNotMadeOfIsRefused() throws Exception {
+        MekSummary atlas = summary("Atlas AS7-D");
+        File cacheFile = tempDir.resolve("techProgression-IS.cache").toFile();
+        try (ObjectOutputStream output = new ObjectOutputStream(new FileOutputStream(cacheFile))) {
+            output.writeObject(FINGERPRINT);
+            output.writeInt(1);
+            output.writeUTF("Atlas AS7-D");
+            output.writeObject(new File("not a tech level"));
+        }
+
+        assertNull(UnitTechProgressionCache.load(cacheFile, FINGERPRINT, Map.of("Atlas AS7-D", atlas)));
     }
 
     @Test
