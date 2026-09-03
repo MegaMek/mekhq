@@ -120,8 +120,10 @@ public record CargoStatistics(Campaign campaign) {
 
         // if we're in transit or the part is present and has a meaningful tonnage, accumulate it
         // not sure what the "in transit" flag is for, but I'm leaving it to retain current behavior
+        // Double.isFinite also rejects Infinity (not just NaN); a single part reporting a non-finite
+        // tonnage must not be allowed to poison the whole cargo total (see MekHQ issue #9616).
         for (Part part : spareParts) {
-            if ((inTransit || part.isPresent()) && !Double.isNaN(part.getTonnage())) {
+            if ((inTransit || part.isPresent()) && Double.isFinite(part.getTonnage())) {
                 cargoTonnage += part.getQuantity() * part.getTonnage();
             }
         }
