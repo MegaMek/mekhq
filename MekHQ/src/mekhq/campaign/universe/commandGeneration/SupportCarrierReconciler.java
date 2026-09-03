@@ -251,9 +251,23 @@ public final class SupportCarrierReconciler {
             }
         }
 
+        // Empty carriers are normally removed by the crew event that empties them, but a carrier built for a newcomer
+        // who was then never seated has no such event. Sweep them here so a campaign that hit that state self-heals.
+        int emptied = 0;
+        for (Unit unit : new ArrayList<>(campaign.getUnits())) {
+            if (unit.isCarrier() && unit.getCrew().isEmpty()) {
+                Formation parent = campaign.getPlayerForce().getFormation(unit.getFormationId());
+                LOGGER.info("Removing empty support carrier {}", unit.getName());
+                campaign.removeUnit(unit.getId());
+                removeIfEmptyProfessionFormation(campaign, parent);
+                emptied++;
+            }
+        }
+
         // Always reported, even when nothing changed: a second load of the same save should say "seated 0, released
-        // 0", and that line is how a playtest confirms the sweep is idempotent.
-        LOGGER.info("Support carrier reconciliation: seated {}, released {}", seated, released);
+        // 0, removed 0", and that line is how a playtest confirms the sweep is idempotent.
+        LOGGER.info("Support carrier reconciliation: seated {}, released {}, removed {} empty carrier(s)", seated,
+              released, emptied);
     }
 
     /**
@@ -330,6 +344,7 @@ public final class SupportCarrierReconciler {
             carriers = carriersOf(campaign, supportCommand, profession);
         }
 
+        int freeSeatsElsewhere = 0;
         for (Unit carrier : carriers) {
             if (carrier.getTotalCrewSize() >= carrier.getFullCrewSize()) {
                 continue;
@@ -337,6 +352,7 @@ public final class SupportCarrierReconciler {
             // Checked rather than left to the assignment, which writes a campaign report on every rejection. Only
             // campaigns using bases can fail this.
             if (!LocationUtils.areSameEffectiveLocation(carrier, person)) {
+                freeSeatsElsewhere++;
                 continue;
             }
             SupportPersonnelToTOE.ensureInfantrySkill(person);
@@ -346,9 +362,15 @@ public final class SupportCarrierReconciler {
             return;
         }
 
-        // The shape is right but no seat could be taken - every free seat is at another location. Leave them loose;
-        // their next event tries again.
-        LOGGER.info("Could not seat {}: no {} carrier with a free seat at their location", person.getFullName(), label);
+        // Leave them loose; their next event tries again. Say which of the two possible reasons applied, because they
+        // point at different problems: a location mismatch is a base-using campaign, no free seat at all is a bug.
+        if (freeSeatsElsewhere > 0) {
+            LOGGER.info("Could not seat {}: the only free {} seats are at another location", person.getFullName(),
+                  label);
+        } else {
+            LOGGER.warn("Could not seat {}: no {} carrier has a free seat, although the shape was sized for them",
+                  person.getFullName(), label);
+        }
     }
 
     /**
@@ -528,15 +550,26 @@ public final class SupportCarrierReconciler {
         return have.equals(want);
     }
 
-    /** The carriers under Support Command that hold this profession, in TOE order. */
+    /**
+     * The carriers under Support Command that hold this profession, in TOE order.
+     *
+     * <p>A carrier's profession is read from its crew. A carrier standing empty - freshly built for a newcomer, or
+     * drained by departures - has no crew to read, so it falls back to the profession label generation stamped on it as
+     * a fluff name. Without that fallback an empty carrier is invisible: the newcomer it was built for cannot find it,
+     * and the next event builds another.</p>
+     */
     private static List<Unit> carriersOf(Campaign campaign, Formation supportCommand, PersonnelRole profession) {
+        String label = profession.getLabel(campaign.getPlayerForce().isClanForce());
         List<Unit> carriers = new ArrayList<>();
         for (UUID unitId : supportCommand.getAllUnits(false)) {
             Unit carrier = campaign.getUnit(unitId);
             if ((carrier == null) || !carrier.isCarrier() || (carrier.getEntity() == null)) {
                 continue;
             }
-            if (professionOf(carrier) == profession) {
+            PersonnelRole carried = professionOf(carrier);
+            boolean matches = (carried == profession)
+                                    || ((carried == null) && label.equals(carrier.getFluffName()));
+            if (matches) {
                 carriers.add(carrier);
             }
         }

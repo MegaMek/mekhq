@@ -96,11 +96,11 @@
   <header class="masthead">
     <div class="eyebrow">MekHQ &middot; Pre-review checklist &middot; Keep support carriers current</div>
     <h1>Playtest before this PR opens</h1>
-    <p class="standfirst">Sixteen checks, roughly 45 minutes. The unit tests cover the guards and the release path; everything here covers what they cannot &mdash; seating against real TOE state, the two new persisted fields, and the deployment block.</p>
+    <p class="standfirst">Seventeen checks, roughly 50 minutes. The unit tests cover the guards and the release path; everything here covers what they cannot &mdash; seating against real TOE state, the two new persisted fields, and the deployment block.</p>
     <div class="meta-strip">
       <span class="chip">Branch: Implement-Keep-Carriers-Current</span>
-      <span class="chip">Commit 27c964e952</span>
-      <span class="chip">~45 min</span>
+      <span class="chip">Commit 60aafffd7d</span>
+      <span class="chip">~50 min</span>
     </div>
   </header>
 
@@ -119,7 +119,7 @@
         <li>Build from the branch, and keep <code>mekhq.log</code> open alongside &mdash; several checks are "and nothing was logged as an error".</li>
         <li>Two saves are useful: a fresh command generated on this branch, and the <span class="path">Violence as a Service31510108_Cooker</span> save from issue #9880, which predates the carrier flag and exercises the migration path.</li>
         <li>The TOE tab is where most of this is read. Support Command hangs off the campaign HQ formation.</li>
-        <li>Three checks are marked <span class="pill gate">gate</span> (03, 04, 14). If any of those fails, the PR does not open &mdash; they cover new persisted state and permanent data loss.</li>
+        <li>Three checks are marked <span class="pill gate">gate</span> (03, 04, 15). If any of those fails, the PR does not open &mdash; they cover new persisted state and permanent data loss.</li>
       </ul>
     </div>
   </section>
@@ -193,7 +193,7 @@
         <div><span class="k">Do</span> Load <span class="path">Violence as a Service31510108_Cooker</span>, which was saved before the carrier flag existed.</div>
         <div class="expect">
           <span class="k">Expect</span>
-          <span>It loads without error. Log: <code>Marked N pre-existing support carrier(s) during load</code>, then <code>Support carrier reconciliation: seated N, released N</code> with a seated count near 100 for the loose administrators in that save, preceded by the individual <code>Seated</code> / <code>Built support carrier</code> lines.</span>
+          <span>It loads without error. Log: <code>Marked N pre-existing support carrier(s) during load</code>, then <code>Support carrier reconciliation: seated N, released N, removed N empty carrier(s)</code> with a seated count near 100 for the loose administrators in that save, preceded by the individual <code>Seated</code> / <code>Built support carrier</code> lines.</span>
           <span class="fail">Fails if: the load throws, ordinary infantry gets marked as a carrier, or nothing is seated.</span>
         </div>
       </div>
@@ -210,7 +210,7 @@
         <div><span class="k">Do</span> Save the migrated campaign from check 04, then load it again.</div>
         <div class="expect">
           <span class="k">Expect</span>
-          <span>The second load logs exactly <code>Support carrier reconciliation: seated 0, released 0</code> and no <code>Built support carrier</code> lines. The line is always written, so its absence is itself a failure.</span>
+          <span>The second load logs exactly <code>Support carrier reconciliation: seated 0, released 0, removed 0 empty carrier(s)</code> and no <code>Re-packed</code> lines. The line is always written, so its absence is itself a failure.</span>
           <span class="fail">Fails if: carriers keep being created on every load.</span>
         </div>
       </div>
@@ -289,11 +289,29 @@
       </div>
     </div>
 
+
     <div class="test" data-test>
       <div class="test-head">
         <span class="tid">10</span>
         <input type="checkbox" id="t10">
-        <label for="t10">Retraining into a support role seats them</label>
+        <label for="t10">A newcomer who needs a brand-new squad gets seated in it</label>
+        <span class="pill new">new</span>
+      </div>
+      <div class="body">
+        <div><span class="k">Do</span> Bring a profession to an exact multiple of seven &mdash; 14 doctors as two full <code>Support Squad (7 person)</code> &mdash; then hire one more, then a few more.</div>
+        <div class="expect">
+          <span class="k">Expect</span>
+          <span>The fifteenth person triggers <code>Re-packed ... kept 2, built 1, removed 0, moved 0</code> and is then <code>Seated</code> in the new <code>Support Squad (2 person)</code>. Each further hire seats or reshapes normally. This is the case that failed in play: a carrier built empty was invisible to the seat loop, so the newcomer stayed loose and every following event built another empty carrier.</span>
+          <span class="fail">Fails if: the newcomer is not seated, the WARN <code>no ... carrier has a free seat, although the shape was sized for them</code> appears, or empty <code>Support Squad (2 person)</code> units pile up in the TOE.</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="test" data-test>
+      <div class="test-head">
+        <span class="tid">11</span>
+        <input type="checkbox" id="t11">
+        <label for="t11">Retraining into a support role seats them</label>
         <span class="pill new">new</span>
       </div>
       <div class="body">
@@ -308,9 +326,9 @@
 
     <div class="test" data-test>
       <div class="test-head">
-        <span class="tid">11</span>
-        <input type="checkbox" id="t11">
-        <label for="t11">Retraining out of a support role releases the seat</label>
+        <span class="tid">12</span>
+        <input type="checkbox" id="t12">
+        <label for="t12">Retraining out of a support role releases the seat</label>
         <span class="pill new">new</span>
       </div>
       <div class="body">
@@ -325,9 +343,9 @@
 
     <div class="test" data-test>
       <div class="test-head">
-        <span class="tid">12</span>
-        <input type="checkbox" id="t12">
-        <label for="t12">Death or retirement empties and removes a carrier</label>
+        <span class="tid">13</span>
+        <input type="checkbox" id="t13">
+        <label for="t13">Death or retirement empties and removes a carrier</label>
         <span class="pill new">new</span>
       </div>
       <div class="body">
@@ -342,9 +360,9 @@
 
     <div class="test" data-test>
       <div class="test-head">
-        <span class="tid">13</span>
-        <input type="checkbox" id="t13">
-        <label for="t13">Returning to duty re-seats</label>
+        <span class="tid">14</span>
+        <input type="checkbox" id="t14">
+        <label for="t14">Returning to duty re-seats</label>
         <span class="pill new">new</span>
       </div>
       <div class="body">
@@ -363,9 +381,9 @@
 
     <div class="test gate" data-test>
       <div class="test-head">
-        <span class="tid">14</span>
-        <input type="checkbox" id="t14">
-        <label for="t14">Carriers cannot be sent to a scenario</label>
+        <span class="tid">15</span>
+        <input type="checkbox" id="t15">
+        <label for="t15">Carriers cannot be sent to a scenario</label>
         <span class="pill gate">gate</span>
       </div>
       <div class="body">
@@ -380,9 +398,9 @@
 
     <div class="test" data-test>
       <div class="test-head">
-        <span class="tid">15</span>
-        <input type="checkbox" id="t15">
-        <label for="t15">Seated staff still do their jobs</label>
+        <span class="tid">16</span>
+        <input type="checkbox" id="t16">
+        <label for="t16">Seated staff still do their jobs</label>
         <span class="pill reg">regression</span>
       </div>
       <div class="body">
@@ -397,9 +415,9 @@
 
     <div class="test" data-test>
       <div class="test-head">
-        <span class="tid">16</span>
-        <input type="checkbox" id="t16">
-        <label for="t16">A campaign with no Support Command is left alone</label>
+        <span class="tid">17</span>
+        <input type="checkbox" id="t17">
+        <label for="t17">A campaign with no Support Command is left alone</label>
         <span class="pill new">new</span>
       </div>
       <div class="body">
@@ -421,15 +439,16 @@
         <table>
           <thead><tr><th>Look for</th><th>Means</th><th>Checks</th></tr></thead>
           <tbody>
-            <tr><td><code>Seated NAME in support carrier UNIT (n/m)</code></td><td>Filled a free seat in an existing carrier</td><td>06, 09, 10, 13</td></tr>
-            <tr><td><code>Re-packed LABEL carriers: kept K, built B, removed R, moved M people</code></td><td>The shape generation wants changed; only the mismatched carriers were touched. <code>moved</code> is the cost &mdash; small except at a platoon promotion</td><td>07, 08, 09, 12</td></tr>
-            <tr><td><code>Could not seat NAME: no LABEL carrier with a free seat at their location</code></td><td>Shape is right but every free seat is at another base; retried on their next event</td><td>bases only</td></tr>
-            <tr><td><code>Releasing NAME from carrier UNIT: no longer carried by this profession</code></td><td>Retrained out of a support role</td><td>11</td></tr>
-            <tr><td><code>Removing empty support carrier UNIT</code></td><td>Last crew member left</td><td>08, 12</td></tr>
-            <tr><td><code>Removing empty support formation NAME</code></td><td>Its last carrier went with it</td><td>12</td></tr>
+            <tr><td><code>Seated NAME in support carrier UNIT (n/m)</code></td><td>Filled a free seat in an existing carrier</td><td>06, 09, 10, 11, 14</td></tr>
+            <tr><td><code>Re-packed LABEL carriers: kept K, built B, removed R, moved M people</code></td><td>The shape generation wants changed; only the mismatched carriers were touched. <code>moved</code> is the cost &mdash; small except at a platoon promotion</td><td>07, 08, 09, 10, 13</td></tr>
+            <tr><td><code>Could not seat NAME: the only free LABEL seats are at another location</code></td><td>Base-using campaigns only; retried on their next event</td><td>bases only</td></tr>
+            <tr><td><code>Could not seat NAME: no LABEL carrier has a free seat, although the shape was sized for them</code></td><td><strong>WARN &mdash; a bug.</strong> The reshape produced a carrier the seat loop cannot see. Stop and capture</td><td>any</td></tr>
+            <tr><td><code>Releasing NAME from carrier UNIT: no longer carried by this profession</code></td><td>Retrained out of a support role</td><td>12</td></tr>
+            <tr><td><code>Removing empty support carrier UNIT</code></td><td>Last crew member left</td><td>08, 13</td></tr>
+            <tr><td><code>Removing empty support formation NAME</code></td><td>Its last carrier went with it</td><td>13</td></tr>
             <tr><td><code>Marked N pre-existing support carrier(s) during load</code></td><td>Migration recognised an older save&#39;s carriers</td><td>04</td></tr>
-            <tr><td><code>Support carrier reconciliation: seated N, released N</code></td><td>The load sweep ran; always written, even at 0/0</td><td>04, 05</td></tr>
-            <tr><td><code>Support carrier reconciliation: no Support Command formation, so carriers are not managed</code></td><td>Campaign never opted in; reconciler stays out</td><td>16</td></tr>
+            <tr><td><code>Support carrier reconciliation: seated N, released N, removed N empty carrier(s)</code></td><td>The load sweep ran; always written, even at 0/0/0. A non-zero <code>removed</code> on a save from this branch means orphaned empty carriers were left behind earlier</td><td>04, 05</td></tr>
+            <tr><td><code>Support carrier reconciliation: no Support Command formation, so carriers are not managed</code></td><td>Campaign never opted in; reconciler stays out</td><td>17</td></tr>
             <tr><td><code>Could not build a support carrier UNIT; the profession keeps its current shape</code></td><td>WARN &mdash; a carrier unit failed to load; the reshape was abandoned before anything moved</td><td>any</td></tr>
             <tr><td>Any <code>ERROR</code> naming a support or carrier class</td><td>Stop and capture it</td><td>any</td></tr>
           </tbody>
@@ -443,15 +462,15 @@
     <div class="prose">
       <p>Record the outcome here before opening the PR, and paste the summary into the PR's Testing section. The checklist result has to be reported in chat as well as ticked &mdash; a run nobody reported has not been run.</p>
       <ul>
-        <li><strong>All sixteen passing?</strong> If yes, the PR can open with the checklist result in the Testing section.</li>
-        <li><strong>A gate failed?</strong> Do not open. Gates 03, 04 and 14 cover new persisted state and permanent data loss.</li>
+        <li><strong>All seventeen passing?</strong> If yes, the PR can open with the checklist result in the Testing section.</li>
+        <li><strong>A gate failed?</strong> Do not open. Gates 03, 04 and 15 cover new persisted state and permanent data loss.</li>
         <li><strong>A non-gate failed?</strong> Judgement call &mdash; fix it, or open with it named explicitly under "What is not proven yet".</li>
       </ul>
     </div>
   </section>
 
   <footer>
-    <span>Feature branch <span class="path">Implement-Keep-Carriers-Current</span>, commit <span class="path">27c964e952</span>. Companion to the implementation plan and the support-carriers design note.</span>
+    <span>Feature branch <span class="path">Implement-Keep-Carriers-Current</span>, commit <span class="path">60aafffd7d</span>. Companion to the implementation plan and the support-carriers design note.</span>
     <span>Ticks are remembered in this browser only, so you can close the page between sessions.</span>
   </footer>
 
