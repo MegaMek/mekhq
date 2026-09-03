@@ -53,6 +53,7 @@ import megamek.common.units.SmallCraft;
 import megamek.common.units.SpaceStation;
 import megamek.common.units.UnitType;
 import mekhq.campaign.Campaign;
+import mekhq.campaign.campaignOptions.CampaignOption;
 import mekhq.campaign.force.Formation;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.enums.PersonnelRole;
@@ -60,7 +61,6 @@ import mekhq.campaign.unit.Unit;
 import mekhq.gui.BasicInfo;
 import mekhq.gui.utilities.MekHqTableCellRenderer;
 import mekhq.utilities.ReportingUtilities;
-import mekhq.campaign.campaignOptions.CampaignOption;
 
 /**
  * A table Model for displaying information about units
@@ -398,7 +398,7 @@ public class UnitTableModel extends DataTableModel<Unit> {
                 int cycleLength = campaign.getCampaignOptions().get(CampaignOption.MAINTENANCE_CYCLE_DAYS);
                 yield (unit.getMaintenanceCycleDuration(cycleLength) - daysSinceLastMaintenance) + " days";
             }
-            case COL_BV -> entity.calculateBattleValue(true, unit.getEntity().getCrew() == null);
+            case COL_BV -> entity.calculateBattleValue(true, true, true);
             case COL_REPAIR -> unit.getPartsNeedingFixing().size();
             case COL_PARTS -> unit.getPartsNeeded().size();
             case COL_SITE -> Unit.getSiteName(unit.getSite());
