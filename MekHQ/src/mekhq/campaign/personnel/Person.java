@@ -1676,6 +1676,10 @@ public class Person implements ILocatable {
         return status;
     }
 
+    public boolean isActive() {
+        return status.isActive();
+    }
+
     /**
      * Applies a forced loyalty change to all eligible personnel in the campaign.
      *
