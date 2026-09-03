@@ -5811,16 +5811,18 @@ public class Unit implements ITechnology, ILocatable {
             nGunners += tempGunnersToAdd;
         }
 
-        // Add temp crew for large aero vessels
-        if ((entity instanceof SmallCraft || entity instanceof Jumpship) && !(entity instanceof SpaceStation)) {
+        // Add temp crew for aero vessels (small craft, dropships, jumpships, warships, and space stations). Each role
+        // must have at least one real crew member before its temp ("blob") crew counts, so
+        // getEffectiveTempCrewByPersonnelRole() returns 0 for a role with no real person.
+        if (entity instanceof SmallCraft || entity instanceof Jumpship) {
             if (getCampaign().getCampaignOptions().get(CampaignOption.USE_BLOB_VESSEL_CREW)) {
-                nCrew += getTempCrewByPersonnelRole(PersonnelRole.VESSEL_CREW);
+                nCrew += getEffectiveTempCrewByPersonnelRole(PersonnelRole.VESSEL_CREW);
             }
             if (getCampaign().getCampaignOptions().get(CampaignOption.USE_BLOB_VESSEL_GUNNER)) {
-                nGunners += getTempCrewByPersonnelRole(PersonnelRole.VESSEL_GUNNER);
+                nGunners += getEffectiveTempCrewByPersonnelRole(PersonnelRole.VESSEL_GUNNER);
             }
             if (getCampaign().getCampaignOptions().get(CampaignOption.USE_BLOB_VESSEL_PILOT)) {
-                nDrivers += getTempCrewByPersonnelRole(PersonnelRole.VESSEL_PILOT);
+                nDrivers += getEffectiveTempCrewByPersonnelRole(PersonnelRole.VESSEL_PILOT);
             }
         }
 
@@ -6252,6 +6254,26 @@ public class Unit implements ITechnology, ILocatable {
                     person.getHyperlinkedFullTitle(), role, getName()));
     }
 
+    /**
+     * Releases a single temporary ("blob") crew member of the given role when a real {@link Person} is assigned to fill
+     * that slot, then refreshes the unit's crew state.
+     *
+     * <p>This mirrors the temp crew handling already performed by {@link #addPilotOrSoldier(Person, Unit, boolean)}
+     * for infantry and solo-piloted units.</p>
+     *
+     * @param role the temp crew role to release; when {@code null} or when no temp crew of that role is present, the
+     *             crew state is simply refreshed
+     */
+    private void releaseTempCrewForAssignedRole(final @Nullable PersonnelRole role) {
+        final int currentTempCrew = (role == null) ? 0 : getTempCrewByPersonnelRole(role);
+        if (currentTempCrew > 0) {
+            // setTempCrew() also refreshes the unit's crew state via resetPilotAndEntity()
+            setTempCrew(role, currentTempCrew - 1);
+        } else {
+            resetPilotAndEntity();
+        }
+    }
+
     public void addDriver(Person p) {
         addDriver(p, false);
     }
@@ -6266,7 +6288,7 @@ public class Unit implements ITechnology, ILocatable {
         ensurePersonIsRegistered(person);
         drivers.add(person);
         person.setUnit(this);
-        resetPilotAndEntity();
+        releaseTempCrewForAssignedRole(getDriverRole());
         if (useTransfers) {
             AssignmentLogger.reassignedTo(person, getCampaign().getLocalDate(), getName());
         } else {
@@ -6290,7 +6312,7 @@ public class Unit implements ITechnology, ILocatable {
         ensurePersonIsRegistered(person);
         gunners.add(person);
         person.setUnit(this);
-        resetPilotAndEntity();
+        releaseTempCrewForAssignedRole(getGunnerRole());
         if (useTransfers) {
             AssignmentLogger.reassignedTo(person, getCampaign().getLocalDate(), getName());
         } else {
@@ -6314,7 +6336,10 @@ public class Unit implements ITechnology, ILocatable {
         ensurePersonIsRegistered(person);
         vesselCrew.add(person);
         person.setUnit(this);
-        resetPilotAndEntity();
+        final PersonnelRole crewRole = (entity instanceof Aero && !(entity instanceof ConvFighter)) ?
+                                             PersonnelRole.VESSEL_CREW :
+                                             getDriverRole();
+        releaseTempCrewForAssignedRole(crewRole);
         if (useTransfers) {
             AssignmentLogger.reassignedTo(person, getCampaign().getLocalDate(), getName());
         } else {
@@ -6990,6 +7015,44 @@ public class Unit implements ITechnology, ILocatable {
 
     public int getTempCrewByPersonnelRole(PersonnelRole personnelRole) {
         return tempPersonnelRoleMap.getOrDefault(personnelRole, 0);
+    }
+
+    /**
+     * Reports whether this unit has at least one real (non-temp) crew member filling the given vessel role.
+     *
+     * <p>Aero vessels (small craft, dropships, jumpships, warships, and space stations) require a real crew member in
+     * a role before temporary ("blob") crew may fill the remaining slots of that role. An assigned-but-injured person
+     * still counts as filling the role. The rule only covers the vessel blob roles ({@link PersonnelRole#VESSEL_PILOT},
+     * {@link PersonnelRole#VESSEL_GUNNER}, {@link PersonnelRole#VESSEL_CREW}); every other role returns {@code true} so
+     * callers are unaffected by it.</p>
+     *
+     * @param role the role to check
+     *
+     * @return {@code true} if the role is unaffected by the rule, or if it contains at least one real crew member
+     */
+    public boolean hasRealCrewInVesselRole(final PersonnelRole role) {
+        return switch (role) {
+            case VESSEL_PILOT -> !drivers.isEmpty();
+            case VESSEL_GUNNER -> !gunners.isEmpty();
+            case VESSEL_CREW -> !vesselCrew.isEmpty();
+            default -> true;
+        };
+    }
+
+    /**
+     * Returns the temp ("blob") crew count for the given role that is actually usable.
+     *
+     * <p>This honors the vessel rule that a role must contain at least one real crew member before its temp crew
+     * counts (see {@link #hasRealCrewInVesselRole(PersonnelRole)}): temp crew of a vessel role with no real crew member
+     * is reported as {@code 0}. For every other role this is identical to
+     * {@link #getTempCrewByPersonnelRole(PersonnelRole)}.</p>
+     *
+     * @param personnelRole the role to query
+     *
+     * @return the usable temp crew count for the role
+     */
+    public int getEffectiveTempCrewByPersonnelRole(final PersonnelRole personnelRole) {
+        return hasRealCrewInVesselRole(personnelRole) ? getTempCrewByPersonnelRole(personnelRole) : 0;
     }
 
     /**

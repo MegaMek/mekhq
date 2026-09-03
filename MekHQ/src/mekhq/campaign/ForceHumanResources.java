@@ -896,16 +896,23 @@ public class ForceHumanResources {
      * @return available slots (negative = surplus temp crew)
      */
     private int getRoleSpecificNeeds(Unit unit, PersonnelRole role) {
+        // Large vessels require at least one real crew member in a role before temp crew may fill the rest.
         return switch (role) {
-            case VESSEL_PILOT -> unit.getTotalDriverNeeds()
-                                       - unit.getDrivers().size()
-                                       - unit.getTempCrewByPersonnelRole(PersonnelRole.VESSEL_PILOT);
-            case VESSEL_GUNNER -> unit.getTotalGunnerNeeds()
-                                        - unit.getGunners().size()
-                                        - unit.getTempCrewByPersonnelRole(PersonnelRole.VESSEL_GUNNER);
-            case VESSEL_CREW -> unit.getTotalCrewNeeds()
-                                      - unit.getVesselCrew().size()
-                                      - unit.getTempCrewByPersonnelRole(PersonnelRole.VESSEL_CREW);
+            case VESSEL_PILOT -> unit.hasRealCrewInVesselRole(PersonnelRole.VESSEL_PILOT) ?
+                                       unit.getTotalDriverNeeds()
+                                             - unit.getDrivers().size()
+                                             - unit.getTempCrewByPersonnelRole(PersonnelRole.VESSEL_PILOT) :
+                                       -unit.getTempCrewByPersonnelRole(PersonnelRole.VESSEL_PILOT);
+            case VESSEL_GUNNER -> unit.hasRealCrewInVesselRole(PersonnelRole.VESSEL_GUNNER) ?
+                                        unit.getTotalGunnerNeeds()
+                                              - unit.getGunners().size()
+                                              - unit.getTempCrewByPersonnelRole(PersonnelRole.VESSEL_GUNNER) :
+                                        -unit.getTempCrewByPersonnelRole(PersonnelRole.VESSEL_GUNNER);
+            case VESSEL_CREW -> unit.hasRealCrewInVesselRole(PersonnelRole.VESSEL_CREW) ?
+                                      unit.getTotalCrewNeeds()
+                                            - unit.getVesselCrew().size()
+                                            - unit.getTempCrewByPersonnelRole(PersonnelRole.VESSEL_CREW) :
+                                      -unit.getTempCrewByPersonnelRole(PersonnelRole.VESSEL_CREW);
             default -> unit.getFullCrewSize()
                              - unit.getActiveCrew().size()
                              - unit.getTempCrewByPersonnelRole(role);
