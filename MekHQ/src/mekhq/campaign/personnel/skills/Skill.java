@@ -99,8 +99,8 @@ import org.w3c.dom.NodeList;
  * @author Jay Lawson (jaylawson39 at yahoo.com)
  */
 public class Skill {
-    public static int COUNT_UP_MAX_VALUE = 10;
-    public static int COUNT_DOWN_MIN_VALUE = 0;
+    public static final int COUNT_UP_MAX_VALUE = 10;
+    public static final int COUNT_DOWN_MIN_VALUE = 0;
 
     private static final String RESOURCE_BUNDLE = "mekhq.resources.Skill";
     private static final MMLogger logger = MMLogger.create(Skill.class);
