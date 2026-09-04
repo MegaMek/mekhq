@@ -141,7 +141,8 @@ class UnitTechProgressionCacheTest {
     @Test
     void implausibleEntryCountIsRefusedBeforeAnythingIsAllocated() throws Exception {
         File cacheFile = tempDir.resolve("techProgression-IS.cache").toFile();
-        try (ObjectOutputStream output = new ObjectOutputStream(new FileOutputStream(cacheFile))) {
+        try (FileOutputStream fileOutput = new FileOutputStream(cacheFile);
+              ObjectOutputStream output = new ObjectOutputStream(fileOutput)) {
             output.writeObject(FINGERPRINT);
             output.writeInt(Integer.MAX_VALUE);
         }
@@ -153,7 +154,8 @@ class UnitTechProgressionCacheTest {
     void entryOfAClassAProgressionIsNotMadeOfIsRefused() throws Exception {
         MekSummary atlas = summary("Atlas AS7-D");
         File cacheFile = tempDir.resolve("techProgression-IS.cache").toFile();
-        try (ObjectOutputStream output = new ObjectOutputStream(new FileOutputStream(cacheFile))) {
+        try (FileOutputStream fileOutput = new FileOutputStream(cacheFile);
+              ObjectOutputStream output = new ObjectOutputStream(fileOutput)) {
             output.writeObject(FINGERPRINT);
             output.writeInt(1);
             output.writeUTF("Atlas AS7-D");
