@@ -44,7 +44,7 @@ package mekhq.campaign.force;
  */
 public enum FleetAltitudeCapability {
     /**
-     * The force fields at least one ground-capable unit ('Mech, vehicle, infantry, and so on), or has no units to
+     * The force fields at least one ground-capable unit ('Mek, vehicle, infantry, and so on), or has no units to
      * reason about. No altitude restriction applies.
      */
     UNRESTRICTED,

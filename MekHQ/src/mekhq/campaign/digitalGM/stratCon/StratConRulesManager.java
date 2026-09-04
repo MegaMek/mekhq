@@ -2536,7 +2536,7 @@ public class StratConRulesManager {
      * outfit should not be handed ground battles it has no units to fight. The rules are:</p>
      *
      * <ul>
-     *   <li>If the option is disabled, the campaign has no units, or it fields any ground-capable unit (a 'Mech,
+     *   <li>If the option is disabled, the campaign has no units, or it fields any ground-capable unit (a 'Mek,
      *       vehicle, infantry, and so on), no restriction is applied and {@code null} is returned - the full range of
      *       ground, low-atmosphere, and space scenarios remains available.</li>
      *   <li>If every unit is airborne and at least one is space-capable (an aerospace fighter, small craft, DropShip,

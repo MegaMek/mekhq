@@ -634,7 +634,7 @@ public abstract class AbstractForce {
      * Determines the {@link FleetAltitudeCapability} of this force from the composition of its combat teams.
      *
      * <p>Only units organised into combat teams are considered, since those are the units that actually deploy to
-     * StratCon scenarios; unassigned or reserve units in the roster are ignored. A single ground-capable unit ('Mech,
+     * StratCon scenarios; unassigned or reserve units in the roster are ignored. A single ground-capable unit ('Mek,
      * vehicle, infantry, and so on) among the combat teams - or having no combat-team units at all - yields
      * {@link FleetAltitudeCapability#UNRESTRICTED}. An all-airborne set of combat teams yields
      * {@link FleetAltitudeCapability#SPACE_AND_ATMOSPHERE} if any unit is space-capable (aerospace fighter, small
