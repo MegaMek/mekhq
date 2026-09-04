@@ -36,6 +36,7 @@ import static mekhq.gui.commandGeneration.components.CommandGenerationUtilities.
 import static mekhq.utilities.MHQInternationalization.getTextAt;
 
 import java.awt.BorderLayout;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
@@ -47,15 +48,18 @@ import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.JSplitPane;
 
+import megamek.client.ratgenerator.ExistingLift;
 import megamek.client.ratgenerator.FactionRecord;
 import megamek.client.ratgenerator.ForceDescriptor;
 import megamek.client.ui.dialogs.randomArmy.ForceGeneratorOptionsView;
 import megamek.client.ui.dialogs.randomArmy.ForceGeneratorViewUi;
 import megamek.client.ui.util.UIUtil;
 import megamek.common.annotations.Nullable;
+import megamek.common.units.Entity;
 import megamek.logging.MMLogger;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.force.Formation;
+import mekhq.campaign.unit.Unit;
 import mekhq.campaign.universe.Faction;
 import mekhq.campaign.universe.Factions;
 import mekhq.campaign.universe.commandGeneration.CommandGenerationOptions;
@@ -109,6 +113,26 @@ public class ForceGeneratorTab {
         this.options = options;
     }
 
+    /**
+     * The free bays and docking collars on the ships already in the hangar, less what the hangar's other units still
+     * need carried. Ship assignments are not consulted: a unit assigned to a ship in the TO&amp;E counts as needing a
+     * berth and its ship's bay as free, which comes to the same thing.
+     *
+     * @return the lift the campaign already owns; none without a campaign
+     */
+    private ExistingLift liftAlreadyInHangar() {
+        if (campaign == null) {
+            return ExistingLift.NONE;
+        }
+        List<Entity> entities = new ArrayList<>();
+        for (Unit unit : campaign.getUnits()) {
+            if (unit.getEntity() != null) {
+                entities.add(unit.getEntity());
+            }
+        }
+        return ExistingLift.of(entities);
+    }
+
     public JPanel createTab() {
         // Embed MegaMek's full force-generator view: the options panel (left) plus the TO&amp;E tree
         // (right). The view's own Generate button rolls a preview and fills the TO&amp;E tree and the
@@ -116,6 +140,10 @@ public class ForceGeneratorTab {
         // Constructed lazily so we only pay the RATGenerator / Ruleset / MekSummaryCache init cost
         // when the dialog is actually shown.
         viewUi = new ForceGeneratorViewUi(frame, campaign == null ? null : campaign.getGameOptions());
+        // A command built in layers starts each roll from the ships the campaign already owns, so a
+        // second session's armour company rides in the spare bays of the first session's DropShips
+        // rather than drawing its own.
+        viewUi.setHostLiftSupplier(this::liftAlreadyInHangar);
         // The dialog commits the previewed tree into the campaign TOE, so let the user right-click to
         // include/exclude nodes; excluded units are struck out here and skipped by ForceDescriptorWalker.
         viewUi.setToeExclusionMode(true);

@@ -53,11 +53,8 @@ import megamek.common.units.EntityMovementMode;
 import megamek.common.units.UnitType;
 import megamek.logging.MMLogger;
 import mekhq.campaign.Campaign;
-import mekhq.campaign.campaignOptions.CampaignOption;
-import mekhq.campaign.parts.enums.PartQuality;
 import mekhq.campaign.unit.CargoStatistics;
 import mekhq.campaign.unit.Unit;
-import mekhq.campaign.unit.UnitOrder;
 
 /**
  * Generates the cargo DropShips a newly built command needs to haul its own supplies, and crews them.
@@ -549,23 +546,12 @@ public final class CargoShipGenerator {
     }
 
     /**
-     * Adds one hull to the hangar with a crew. Mirrors how support units are created so cargo ships are
-     * ordinary campaign units - owned, crewed and paid for.
+     * Adds one hull to the hangar with a crew, see {@link GeneratedShipUnits#addCrewedShip}.
      *
      * @return the new unit, or {@code null} when the design could not be loaded
      */
     private static @Nullable Unit addCrewedShip(Campaign campaign, MekSummary hull) {
-        try {
-            PartQuality quality = campaign.getCampaignOptions().get(CampaignOption.USE_RANDOM_UNIT_QUALITIES)
-                  ? UnitOrder.getRandomUnitQuality(0)
-                  : PartQuality.QUALITY_D;
-            // allowNewPilots = true: the ship arrives crewed, like every other generated unit.
-            return campaign.addNewUnit(hull.loadEntity(), true, 0, quality);
-        } catch (Exception exception) {
-            LOGGER.error(exception, "[CompanyGen][Cargo] could not load cargo DropShip '{}' from {}",
-                  hull.getName(), hull.getSourceFile());
-            return null;
-        }
+        return GeneratedShipUnits.addCrewedShip(campaign, hull, "[CompanyGen][Cargo]");
     }
 
     private static double round(double tons) {
