@@ -79,7 +79,6 @@ import mekhq.gui.commandGeneration.components.CommandGenerationStandardPanel;
  *
  * <p><b>Right column</b> - the post-generation rule sections:</p>
  * <ol>
- *   <li><b>Contracts</b> - Select Starting Contract, Start Course to Contract Planet</li>
  *   <li><b>Finances</b> - Process Finances toggle plus the starting-cash percentage: the command
  *       is granted free, and starting cash is working capital sized as a percentage of the
  *       generated units' total purchase cost (default 10%)</li>
@@ -100,10 +99,6 @@ public class SparesAndFinancesTab {
 
     /** Ordered map: bundle-key suffix (also the lbl{key}.text key) → spares spinner. */
     private final Map<String, JSpinner> spinners = new LinkedHashMap<>();
-
-    // Contracts
-    private CommandGenerationCheckBox chkSelectStartingContract;
-    private CommandGenerationCheckBox chkStartCourseToContractPlanet;
 
     // Finances
     private CommandGenerationCheckBox chkProcessFinances;
@@ -162,11 +157,10 @@ public class SparesAndFinancesTab {
         constraints.weighty = 1.0;
         panel.add(leftColumn, constraints);
 
-        // Right column: Contracts (2 rows) + Finances (the tallest section) + Starting Simulation.
+        // Right column: Finances (the tallest section) + Starting Simulation. The starting-contract options
+        // are not shown: the generator does not act on them yet, and a box that does nothing misleads.
         JPanel rightColumn = new JPanel();
         rightColumn.setLayout(new BoxLayout(rightColumn, BoxLayout.Y_AXIS));
-        rightColumn.add(buildContractsSection());
-        rightColumn.add(Box.createVerticalStrut(UIUtil.scaleForGUI(6)));
         rightColumn.add(buildFinancesSection());
         rightColumn.add(Box.createVerticalStrut(UIUtil.scaleForGUI(6)));
         rightColumn.add(buildStartingSimulationSection());
@@ -225,6 +219,7 @@ public class SparesAndFinancesTab {
 
             JLabel label = new CommandGenerationLabel(key);
             label.setLabelFor(spinner);
+            spinner.setToolTipText(label.getToolTipText());
 
             boolean leftColumn = index < perColumn;
             constraints.gridy = 1 + (leftColumn ? index : index - perColumn);
@@ -242,26 +237,6 @@ public class SparesAndFinancesTab {
 
     // region Finances column
 
-    private JPanel buildContractsSection() {
-        CommandGenerationStandardPanel section = new CommandGenerationStandardPanel(
-              "Contracts", true, "Contracts");
-        section.setLayout(new GridBagLayout());
-        GridBagConstraints constraints = sectionConstraints();
-
-        chkSelectStartingContract = new CommandGenerationCheckBox("SelectStartingContract");
-        chkStartCourseToContractPlanet = new CommandGenerationCheckBox("StartCourseToContractPlanet");
-        chkSelectStartingContract.addActionListener(event ->
-              chkStartCourseToContractPlanet.setEnabled(chkSelectStartingContract.isSelected()));
-
-        constraints.gridy = 0;
-        section.add(chkSelectStartingContract, constraints);
-        constraints.gridy = 1;
-        section.add(chkStartCourseToContractPlanet, constraints);
-
-        addFillers(section);
-        return section;
-    }
-
     private JPanel buildFinancesSection() {
         CommandGenerationStandardPanel section = new CommandGenerationStandardPanel(
               "Finances", true, "Finances");
@@ -269,15 +244,24 @@ public class SparesAndFinancesTab {
         GridBagConstraints constraints = sectionConstraints();
 
         chkProcessFinances = new CommandGenerationCheckBox("ProcessFinances");
+        // Each spinner shares the tooltip of the label beside it, so the help shows whichever is hovered.
+        CommandGenerationLabel startingCashPercentLabel = new CommandGenerationLabel("StartingCashPercent");
         spnStartingCashPercent = new JSpinner(new SpinnerNumberModel(10, 0, 1000, 1));
         spnStartingCashPercent.setName("spnStartingCashPercent");
+        spnStartingCashPercent.setToolTipText(startingCashPercentLabel.getToolTipText());
+        CommandGenerationLabel startingCashPreviewLabel = new CommandGenerationLabel("StartingCashPreview");
         lblStartingCashPreviewValue = new JLabel();
         lblStartingCashPreviewValue.setName("lblStartingCashPreviewValue");
+        lblStartingCashPreviewValue.setToolTipText(startingCashPreviewLabel.getToolTipText());
         chkRandomizeStartingCash = new CommandGenerationCheckBox("RandomizeStartingCash");
+        CommandGenerationLabel diceCountLabel = new CommandGenerationLabel("RandomStartingCashDiceCount");
         spnRandomStartingCashDiceCount = new JSpinner(new SpinnerNumberModel(18, 1, 100, 1));
         spnRandomStartingCashDiceCount.setName("spnRandomStartingCashDiceCount");
+        spnRandomStartingCashDiceCount.setToolTipText(diceCountLabel.getToolTipText());
+        CommandGenerationLabel minimumFloatLabel = new CommandGenerationLabel("MinimumStartingFloat");
         spnMinimumStartingFloat = new JSpinner(new SpinnerNumberModel(0, 0, 100_000_000, 100_000));
         spnMinimumStartingFloat.setName("spnMinimumStartingFloat");
+        spnMinimumStartingFloat.setToolTipText(minimumFloatLabel.getToolTipText());
         chkStartingLoan = new CommandGenerationCheckBox("StartingLoan");
 
         chkProcessFinances.addActionListener(event -> refreshFinanceEnablement());
@@ -295,14 +279,14 @@ public class SparesAndFinancesTab {
         constraints.gridwidth = 1;
         constraints.gridy = row;
         constraints.gridx = 0;
-        section.add(new CommandGenerationLabel("StartingCashPercent"), constraints);
+        section.add(startingCashPercentLabel, constraints);
         constraints.gridx = 1;
         section.add(spnStartingCashPercent, constraints);
         row++;
 
         constraints.gridy = row;
         constraints.gridx = 0;
-        section.add(new CommandGenerationLabel("StartingCashPreview"), constraints);
+        section.add(startingCashPreviewLabel, constraints);
         constraints.gridx = 1;
         section.add(lblStartingCashPreviewValue, constraints);
         row++;
@@ -315,14 +299,14 @@ public class SparesAndFinancesTab {
         constraints.gridwidth = 1;
         constraints.gridy = row;
         constraints.gridx = 0;
-        section.add(new CommandGenerationLabel("RandomStartingCashDiceCount"), constraints);
+        section.add(diceCountLabel, constraints);
         constraints.gridx = 1;
         section.add(spnRandomStartingCashDiceCount, constraints);
         row++;
 
         constraints.gridy = row;
         constraints.gridx = 0;
-        section.add(new CommandGenerationLabel("MinimumStartingFloat"), constraints);
+        section.add(minimumFloatLabel, constraints);
         constraints.gridx = 1;
         section.add(spnMinimumStartingFloat, constraints);
         row++;
@@ -406,8 +390,10 @@ public class SparesAndFinancesTab {
         GridBagConstraints constraints = sectionConstraints();
 
         chkRunStartingSimulation = new CommandGenerationCheckBox("RunStartingSimulation");
+        CommandGenerationLabel simulationDurationLabel = new CommandGenerationLabel("SimulationDuration");
         spnSimulationDuration = new JSpinner(new SpinnerNumberModel(12, 1, 600, 1));
         spnSimulationDuration.setName("spnSimulationDuration");
+        spnSimulationDuration.setToolTipText(simulationDurationLabel.getToolTipText());
         chkSimulateRandomMarriages = new CommandGenerationCheckBox("SimulateRandomMarriages");
         chkSimulateRandomProcreation = new CommandGenerationCheckBox("SimulateRandomProcreation");
 
@@ -426,7 +412,7 @@ public class SparesAndFinancesTab {
         constraints.gridwidth = 1;
         constraints.gridy = row;
         constraints.gridx = 0;
-        section.add(new CommandGenerationLabel("SimulationDuration"), constraints);
+        section.add(simulationDurationLabel, constraints);
         constraints.gridx = 1;
         section.add(spnSimulationDuration, constraints);
         row++;
@@ -482,7 +468,7 @@ public class SparesAndFinancesTab {
 
     /**
      * Reads values into the tab's controls. The spares spinners load from the campaign's
-     * {@link CampaignOptions} (their source of truth); the contract / finance / simulation controls
+     * {@link CampaignOptions} (their source of truth); the finance / simulation controls
      * load from the supplied {@code sourceOptions}.
      */
     public void loadValuesFromOptions(CommandGenerationOptions sourceOptions) {
@@ -493,10 +479,6 @@ public class SparesAndFinancesTab {
         if (sourceOptions == null) {
             return;
         }
-
-        chkSelectStartingContract.setSelected(sourceOptions.isSelectStartingContract());
-        chkStartCourseToContractPlanet.setSelected(sourceOptions.isStartCourseToContractPlanet());
-        chkStartCourseToContractPlanet.setEnabled(chkSelectStartingContract.isSelected());
 
         chkProcessFinances.setSelected(sourceOptions.isProcessFinances());
         spnStartingCashPercent.setValue(sourceOptions.getStartingCashPercent());
@@ -549,7 +531,7 @@ public class SparesAndFinancesTab {
     /**
      * Writes the tab's controls back out. The spares spinners write to the campaign's
      * {@link CampaignOptions} (making the dialog's selections effective immediately for both the
-     * initial spawn and ongoing resupply); the contract / finance / simulation controls write to the
+     * initial spawn and ongoing resupply); the finance / simulation controls write to the
      * supplied {@code targetOptions}.
      */
     public void writeValuesToOptions(CommandGenerationOptions targetOptions) {
@@ -559,9 +541,6 @@ public class SparesAndFinancesTab {
         if (targetOptions == null) {
             return;
         }
-
-        targetOptions.setSelectStartingContract(chkSelectStartingContract.isSelected());
-        targetOptions.setStartCourseToContractPlanet(chkStartCourseToContractPlanet.isSelected());
 
         targetOptions.setProcessFinances(chkProcessFinances.isSelected());
         targetOptions.setStartingCashPercent((Integer) spnStartingCashPercent.getValue());
