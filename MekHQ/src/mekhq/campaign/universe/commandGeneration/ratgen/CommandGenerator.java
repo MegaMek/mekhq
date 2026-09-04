@@ -152,12 +152,6 @@ public final class CommandGenerator {
     private static final MMLogger LOGGER = MMLogger.create(CommandGenerator.class);
     private static final String RESOURCE_BUNDLE = "mekhq.resources.CommandGenerator";
 
-    // Bloodname target shifts for the calibre of the force. Negative lowers the target a 2d6 roll has
-    // to beat, so these make a Bloodname likelier; kept small because the warrior's own skills
-    // already weigh on the same roll.
-    private static final int BLOODNAME_MODIFIER_VETERAN = -1;
-    private static final int BLOODNAME_MODIFIER_ELITE = -2;
-
     /** How many undercrewed units the diagnostic names before it summarises the rest. */
     private static final int UNDERCREWED_UNITS_NAMED_IN_LOG = 20;
 
@@ -1041,83 +1035,17 @@ public final class CommandGenerator {
     }
 
     /**
-     * Awards bloodnames to the Clan warriors this generation produced who earn one.
+     * Awards the force its Bloodnames, as a share of its Clan warriors set by the force's calibre. The rule
+     * and the numbers behind it are in {@link BloodnameQuota}; non-Clan personnel and anyone without a
+     * phenotype are passed over, so support staff and Inner Sphere commands are untouched.
      *
-     * <p>A generated Clan command previously had none at all. The ratgen layer carries a bloodname
-     * field on its crew descriptor, but the engine call that would fill it is commented out in
-     * {@code Ruleset.processRoot} and the method it referred to no longer exists, so the field is
-     * always empty - and nothing on this path asked MekHQ for one either. Hiring a Clan MekWarrior
-     * through the normal personnel generator has always rolled for a bloodname; generating a whole
-     * Galaxy did not.</p>
-     *
-     * <p>Every generated person is offered to
-     * {@link ForceHumanResources#checkBloodnameAdd(Campaign, Person, boolean)}, which applies the
-     * existing rules rather than a second set: non-Clan personnel and anyone without a phenotype are
-     * turned away, so support staff and Inner Sphere commands are untouched. The dice are rolled
-     * normally, so era, unit rating, rank and the warrior's own skills decide it exactly as they do
-     * for a hire.</p>
-     *
-     * <p>The calibre of the force shifts the target: a veteran or elite command carries more
-     * Bloodnamed warriors than a garrison unit whose members happen to have the same individual
-     * skills, because the Clans post their Bloodnamed to their better formations. The individual
-     * warrior's own skills already count towards the roll, so this is a modest thumb on the scale
-     * rather than a second helping of the same thing.</p>
-     *
-     * @param campaign         the campaign the warriors belong to, supplying era and unit rating
+     * @param campaign         the campaign the warriors belong to
      * @param options          the generation options, read for the force's experience level
      * @param generatedPersons every person this generation created
      */
     private static void assignBloodnames(Campaign campaign, CommandGenerationOptions options,
           List<Person> generatedPersons) {
-        ForceHumanResources humanResources = campaign.getPlayerForce().getHumanResources();
-        int targetModifier = bloodnameTargetModifier(options);
-        int awarded = 0;
-        int alreadyHeld = 0;
-        for (Person person : generatedPersons) {
-            if (person == null) {
-                continue;
-            }
-            if (holdsBloodname(person)) {
-                alreadyHeld++;
-                continue;
-            }
-            humanResources.checkBloodnameAdd(campaign, person, false, targetModifier);
-            if (holdsBloodname(person)) {
-                awarded++;
-            }
-        }
-        LOGGER.info("[CompanyGen][Pipeline][Bloodname] awarded {} bloodname(s) across {} generated "
-                    + "person(s); {} already held one (force calibre modifier {})",
-              awarded, generatedPersons.size(), alreadyHeld, targetModifier);
-    }
-
-    /**
-     * @return {@code true} if this person already carries a Bloodname
-     */
-    private static boolean holdsBloodname(Person person) {
-        String bloodname = person.getBloodname();
-        return (bloodname != null) && !bloodname.isBlank();
-    }
-
-    /**
-     * How much the force's own experience level shifts the Bloodname target. Negative makes a
-     * Bloodname likelier, and only the top two tiers get one so a green or regular command rolls
-     * exactly as it did before.
-     *
-     * @param options the generation options, read for the force's experience level
-     *
-     * @return the target modifier, or {@code 0} when the experience level was left to chance
-     */
-    static int bloodnameTargetModifier(CommandGenerationOptions options) {
-        ForceDescriptorSnapshot snapshot = options.getForceDescriptorSnapshot();
-        if ((snapshot == null) || (snapshot.getExperience() == null)) {
-            return 0;
-        }
-        return switch (snapshot.getExperience()) {
-            case ForceDescriptor.EXP_VETERAN -> BLOODNAME_MODIFIER_VETERAN;
-            case ForceDescriptor.EXP_ELITE -> BLOODNAME_MODIFIER_ELITE;
-            default -> 0;
-        };
+        BloodnameQuota.award(campaign, options, generatedPersons);
     }
 
     /**
