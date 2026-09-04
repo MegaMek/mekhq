@@ -52,7 +52,6 @@ class ContractIntensityDataTest {
         ContractIntensityData data = new ContractIntensityData();
 
         assertEquals(0, data.scale());
-        assertEquals(0, data.requiredCombatElements());
         assertEquals(0, data.requiredVictoryPoints());
         assertEquals(0, data.trackCount());
         assertTrue(data.monthlyTrackCounts().isEmpty());
@@ -60,20 +59,19 @@ class ContractIntensityDataTest {
 
     @Test
     void withMethodsEachReplaceExactlyOneField() {
-        ContractIntensityData base = new ContractIntensityData(1, 2, 3, 4, List.of(0, 1));
+        ContractIntensityData base = new ContractIntensityData(1, 2, 4, List.of(0, 1));
 
-        assertEquals(new ContractIntensityData(9, 2, 3, 4, List.of(0, 1)), base.withScale(9));
-        assertEquals(new ContractIntensityData(1, 9, 3, 4, List.of(0, 1)), base.withRequiredCombatElements(9));
-        assertEquals(new ContractIntensityData(1, 2, 9, 4, List.of(0, 1)), base.withRequiredVictoryPoints(9));
-        assertEquals(new ContractIntensityData(1, 2, 3, 9, List.of(0, 1)), base.withTrackCount(9));
-        assertEquals(new ContractIntensityData(1, 2, 3, 4, List.of(5, 6, 7)),
+        assertEquals(new ContractIntensityData(9, 2, 4, List.of(0, 1)), base.withScale(9));
+        assertEquals(new ContractIntensityData(1, 2, 4, List.of(0, 1)), base.withRequiredVictoryPoints(9));
+        assertEquals(new ContractIntensityData(1, 2, 9, List.of(0, 1)), base.withTrackCount(9));
+        assertEquals(new ContractIntensityData(1, 2, 4, List.of(5, 6, 7)),
               base.withMonthlyTrackCounts(List.of(5, 6, 7)));
     }
 
     @Test
     void scheduleIsDefensivelyCopiedFromTheConstructor() {
         List<Integer> source = new ArrayList<>(List.of(1, 2, 3));
-        ContractIntensityData data = new ContractIntensityData(0, 0, 0, 6, source);
+        ContractIntensityData data = new ContractIntensityData(0, 0, 6, source);
 
         // Mutating the caller's list must not reach into the record.
         source.set(0, 99);
@@ -82,14 +80,14 @@ class ContractIntensityDataTest {
 
     @Test
     void storedScheduleIsUnmodifiable() {
-        ContractIntensityData data = new ContractIntensityData(0, 0, 0, 3, List.of(0, 1, 2));
+        ContractIntensityData data = new ContractIntensityData(0, 0, 3, List.of(0, 1, 2));
 
         assertThrows(UnsupportedOperationException.class, () -> data.monthlyTrackCounts().add(3));
     }
 
     @Test
     void scheduleHelpersReportLengthPerMonthAndTotal() {
-        ContractIntensityData data = new ContractIntensityData(0, 0, 0, 3, List.of(0, 2, 1));
+        ContractIntensityData data = new ContractIntensityData(0, 0, 3, List.of(0, 2, 1));
 
         assertEquals(3, data.scheduleLengthInMonths());
         assertEquals(0, data.tracksInMonth(0));
