@@ -1541,8 +1541,8 @@ public class CustomizePersonDialog extends JDialog implements DialogOptionListen
                                                      // A world counts as a valid birth world if it either has a real
                                                      // owner faction at the birthdate OR still had a recorded
                                                      // population then.
-                                                     .filter(a -> isInhabitedAt(cachedOwnersAt(a)) ||
-                                                                        hadPopulationAt(a))
+                                                       .filter(a -> hadPopulationAt(a) ||
+                                                                            isInhabitedAt(cachedOwnersAt(a)))
                                                      .sorted(Comparator.comparing(a -> a.getName(birthDate)))
                                                      .toList();
         for (PlanetarySystem system : orderedSystems) {
