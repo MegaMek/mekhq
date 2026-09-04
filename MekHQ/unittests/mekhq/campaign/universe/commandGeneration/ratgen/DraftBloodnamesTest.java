@@ -39,7 +39,6 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import java.util.List;
 
 import megamek.client.ratgenerator.CrewDescriptor;
-import megamek.client.ratgenerator.ForceDescriptor;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.skills.SkillType;
@@ -101,10 +100,6 @@ class DraftBloodnamesTest {
     }
 
     private static CrewDescriptor crew(String name, int gunnery, int piloting) {
-        CrewDescriptor crew = new CrewDescriptor(new ForceDescriptor());
-        crew.setName(name);
-        crew.setGunnery(gunnery);
-        crew.setPiloting(piloting);
-        return crew;
+        return CrewDescriptorMocks.crew(name, gunnery, piloting);
     }
 }
