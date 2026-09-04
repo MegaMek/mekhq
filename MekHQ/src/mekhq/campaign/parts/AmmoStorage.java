@@ -90,18 +90,21 @@ public class AmmoStorage extends EquipmentPart implements IAcquisitionWork {
     @Override
     public double getTonnage() {
         AmmoType type = getType();
-        // Some ammo - notably infantry ammo - has no per-ton shot capacity defined (getShots() == 0).
-        // Both branches below divide by that value (getKgPerShot() falls back to 1000.0 / shots when no
-        // explicit weight is set), so an unguarded calculation returns a non-finite tonnage. That Infinity
-        // then poisons cargo/warehouse totals and, downstream, crashes the Command Center when the value is
-        // handed to BigDecimal (see MekHQ issue #9616). Treat such ammo as weightless instead.
-        if (type.getShots() <= 0) {
-            return 0.0;
+        // Prefer the per-shot weight when a real one is available. getKgPerShot() falls back to
+        // 1000.0 / getShots() when no explicit weight is set, so for ammo with no per-ton shot capacity
+        // (notably infantry ammo, getShots() == 0) it returns Infinity - guard against that non-finite
+        // value here rather than letting it propagate.
+        double kgPerShot = type.getKgPerShot();
+        if (Double.isFinite(kgPerShot) && kgPerShot > 0) {
+            return kgPerShot * (shots / 1000.0);
         }
-        if (type.getKgPerShot() > 0) {
-            return type.getKgPerShot() * (shots / 1000.0);
+        // Fall back to shots-per-ton, but only when there is a per-ton capacity to divide by. Otherwise a
+        // non-finite tonnage would poison cargo/warehouse totals and crash the Command Center when handed to
+        // BigDecimal (see MekHQ issue #9616). Treat such ammo as weightless.
+        if (type.getShots() > 0) {
+            return (double) shots / type.getShots();
         }
-        return ((double) shots / type.getShots());
+        return 0.0;
     }
 
     @Override
