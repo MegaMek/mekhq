@@ -34,13 +34,15 @@
 package mekhq.campaign.campaignOptions;
 
 import static megamek.common.TechConstants.getSimpleLevel;
+import static megamek.common.options.OptionsConstants.ADVANCED_NEURAL_INTERFACE_MODE;
 import static megamek.common.options.OptionsConstants.ADVANCED_STRATOPS_QUIRKS;
 import static megamek.common.options.OptionsConstants.ALLOWED_CANON_ONLY;
 import static megamek.common.options.OptionsConstants.ALLOWED_TECH_LEVEL;
 import static megamek.common.options.OptionsConstants.EDGE;
+import static megamek.common.options.OptionsConstants.NEURAL_INTERFACE_MODE_OFF;
+import static megamek.common.options.OptionsConstants.NEURAL_INTERFACE_MODE_PILOT_ONLY;
 import static megamek.common.options.OptionsConstants.RPG_ARTILLERY_SKILL;
 import static megamek.common.options.OptionsConstants.RPG_COMMAND_INIT;
-import static megamek.common.options.OptionsConstants.RPG_MANEI_DOMINI;
 import static megamek.common.options.OptionsConstants.RPG_PILOT_ADVANTAGES;
 import static megamek.common.options.OptionsConstants.RPG_TOUGHNESS;
 
@@ -51,6 +53,7 @@ import java.util.Objects;
 
 import jakarta.annotation.Nonnull;
 import megamek.common.TechConstants;
+import megamek.common.enums.NeuralInterfaceMode;
 import megamek.common.enums.SkillLevel;
 import megamek.common.options.GameOptions;
 import megamek.common.preference.ClientPreferences;
@@ -685,10 +688,26 @@ public class CampaignOptions {
         set(CampaignOption.USE_ARTILLERY, gameOptions.getOption(RPG_ARTILLERY_SKILL).booleanValue());
         set(CampaignOption.USE_ABILITIES, gameOptions.getOption(RPG_PILOT_ADVANTAGES).booleanValue());
         set(CampaignOption.USE_EDGE, gameOptions.getOption(EDGE).booleanValue());
-        set(CampaignOption.USE_IMPLANTS, gameOptions.getOption(RPG_MANEI_DOMINI).booleanValue());
+        set(CampaignOption.USE_IMPLANTS, NeuralInterfaceMode.from(gameOptions).allowsImplants());
         set(CampaignOption.USE_QUIRKS, gameOptions.getOption(ADVANCED_STRATOPS_QUIRKS).booleanValue());
         set(CampaignOption.ALLOW_CANON_ONLY, gameOptions.getOption(ALLOWED_CANON_ONLY).booleanValue());
         set(CampaignOption.TECH_LEVEL, getSimpleLevel(gameOptions.getOption(ALLOWED_TECH_LEVEL).stringValue()));
+    }
+
+    /**
+     * Writes Use Implants to MegaMek's pilot implants option, which is one three-way setting rather than a switch.
+     * With implants off the setting is written Off. With them on, an Off setting is raised to Pilot Abilities Only,
+     * and a setting that already allows implants is kept, so the campaign's choice between Pilot Abilities Only and
+     * Full Tracking survives the round trip.
+     *
+     * @param gameOptions the {@link GameOptions} to write to
+     */
+    private void writeImplantsToGameOptions(GameOptions gameOptions) {
+        if (!get(CampaignOption.USE_IMPLANTS)) {
+            gameOptions.getOption(ADVANCED_NEURAL_INTERFACE_MODE).setValue(NEURAL_INTERFACE_MODE_OFF);
+        } else if (!NeuralInterfaceMode.from(gameOptions).allowsImplants()) {
+            gameOptions.getOption(ADVANCED_NEURAL_INTERFACE_MODE).setValue(NEURAL_INTERFACE_MODE_PILOT_ONLY);
+        }
     }
 
     /**
@@ -710,7 +729,7 @@ public class CampaignOptions {
         gameOptions.getOption(RPG_ARTILLERY_SKILL).setValue(get(CampaignOption.USE_ARTILLERY));
         gameOptions.getOption(RPG_PILOT_ADVANTAGES).setValue(get(CampaignOption.USE_ABILITIES));
         gameOptions.getOption(EDGE).setValue(get(CampaignOption.USE_EDGE));
-        gameOptions.getOption(RPG_MANEI_DOMINI).setValue(get(CampaignOption.USE_IMPLANTS));
+        writeImplantsToGameOptions(gameOptions);
         gameOptions.getOption(ADVANCED_STRATOPS_QUIRKS).setValue(get(CampaignOption.USE_QUIRKS));
         gameOptions.getOption(ALLOWED_CANON_ONLY).setValue(get(CampaignOption.ALLOW_CANON_ONLY));
         gameOptions.getOption(ALLOWED_CANON_ONLY).setValue(get(CampaignOption.ALLOW_CANON_ONLY));

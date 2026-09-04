@@ -37,7 +37,6 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import megamek.common.enums.NeuralInterfaceMode;
-import megamek.common.options.OptionsConstants;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.campaignOptions.CampaignOption;
 import mekhq.campaign.universe.commandGeneration.CommandGenerationOptions;
@@ -47,7 +46,7 @@ import testUtilities.MHQTestUtilities;
 /**
  * Covers the augmentation rules chosen on the Setup tab reaching the campaign.
  *
- * <p>All three are off in a new campaign, and none can be applied to warriors after they are
+ * <p>Both are off in a new campaign, and neither can be applied to warriors after they are
  * generated, so a choice that did not reach the campaign before generation would be silently lost -
  * which is what a player reports as "I turned it on and nothing happened".</p>
  */
@@ -57,8 +56,8 @@ class CommandGeneratorAugmentationRulesTest {
         return NeuralInterfaceMode.from(campaign.getGameOptions());
     }
 
-    private static boolean maneiDominiOf(Campaign campaign) {
-        return campaign.getGameOptions().booleanOption(OptionsConstants.RPG_MANEI_DOMINI);
+    private static boolean implantsAllowedIn(Campaign campaign) {
+        return neuralInterfaceOf(campaign).allowsImplants();
     }
 
     /** The whole point: what is ticked on the tab is in force by the time generation reads it. */
@@ -70,13 +69,12 @@ class CommandGeneratorAugmentationRulesTest {
 
         CommandGenerationOptions options = new CommandGenerationOptions();
         options.setUseImplants(true);
-        options.setUseManeiDomini(true);
         options.setNeuralInterfaceMode(NeuralInterfaceMode.FULL_TRACKING);
 
         CommandGenerator.applyAugmentationRules(campaign, options);
 
         assertTrue(campaign.getCampaignOptions().get(CampaignOption.USE_IMPLANTS));
-        assertTrue(maneiDominiOf(campaign));
+        assertTrue(implantsAllowedIn(campaign));
         assertEquals(NeuralInterfaceMode.FULL_TRACKING, neuralInterfaceOf(campaign));
     }
 
@@ -89,13 +87,12 @@ class CommandGeneratorAugmentationRulesTest {
         Campaign campaign = MHQTestUtilities.getTestCampaign();
         CommandGenerationOptions options = new CommandGenerationOptions();
         options.setUseImplants(false);
-        options.setUseManeiDomini(true);
         options.setNeuralInterfaceMode(NeuralInterfaceMode.FULL_TRACKING);
 
         CommandGenerator.applyAugmentationRules(campaign, options);
 
         assertFalse(campaign.getCampaignOptions().get(CampaignOption.USE_IMPLANTS));
-        assertFalse(maneiDominiOf(campaign), "a rule with nothing to act on is not left switched on");
+        assertFalse(implantsAllowedIn(campaign), "a rule with nothing to act on is not left switched on");
         assertEquals(NeuralInterfaceMode.OFF, neuralInterfaceOf(campaign));
     }
 
@@ -105,16 +102,14 @@ class CommandGeneratorAugmentationRulesTest {
         Campaign campaign = MHQTestUtilities.getTestCampaign();
         CommandGenerationOptions options = new CommandGenerationOptions();
         options.setUseImplants(true);
-        options.setUseManeiDomini(true);
         options.setNeuralInterfaceMode(NeuralInterfaceMode.PILOT_ABILITIES_ONLY);
         CommandGenerator.applyAugmentationRules(campaign, options);
 
-        options.setUseManeiDomini(false);
         options.setNeuralInterfaceMode(NeuralInterfaceMode.OFF);
         CommandGenerator.applyAugmentationRules(campaign, options);
 
         assertTrue(campaign.getCampaignOptions().get(CampaignOption.USE_IMPLANTS));
-        assertFalse(maneiDominiOf(campaign));
+        assertFalse(implantsAllowedIn(campaign));
         assertEquals(NeuralInterfaceMode.OFF, neuralInterfaceOf(campaign));
     }
 }

@@ -1194,10 +1194,6 @@ public final class CommandGenerator {
         boolean tracksImplants = options.isUseImplants();
         campaignOptions.set(CampaignOption.USE_IMPLANTS, tracksImplants);
 
-        IOption maneiDomini = campaign.getGameOptions().getOption(OptionsConstants.RPG_MANEI_DOMINI);
-        if (maneiDomini != null) {
-            maneiDomini.setValue(tracksImplants && options.isUseManeiDomini());
-        }
         IOption neuralInterface = campaign.getGameOptions()
                                         .getOption(OptionsConstants.ADVANCED_NEURAL_INTERFACE_MODE);
         if (neuralInterface != null) {
@@ -1210,9 +1206,8 @@ public final class CommandGenerator {
                                            : mode.optionValue());
         }
         LOGGER.info("[CompanyGen][Pipeline] Stage 7e2: augmentation rules written to the campaign -"
-                    + " Use Implants={}, Manei Domini={}, Neural Interface='{}'",
+                    + " Use Implants={}, Pilot Implants='{}'",
               campaignOptions.get(CampaignOption.USE_IMPLANTS),
-              (maneiDomini == null) ? "unavailable" : maneiDomini.booleanValue(),
               (neuralInterface == null) ? "unavailable" : neuralInterface.stringValue());
     }
 
