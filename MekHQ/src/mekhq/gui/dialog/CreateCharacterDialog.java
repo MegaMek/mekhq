@@ -58,6 +58,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.ResourceBundle;
+import java.util.Set;
 import javax.swing.*;
 
 import megamek.client.generator.RandomCallsignGenerator;
@@ -1176,14 +1177,46 @@ public class CreateCharacterDialog extends JDialog implements DialogOptionListen
     private DefaultComboBoxModel<PlanetarySystem> getPlanetarySystemsComboBoxModel() {
         DefaultComboBoxModel<PlanetarySystem> model = new DefaultComboBoxModel<>();
 
+        // A world is a valid birthworld if it either has a real owner faction at the character's date of birth OR
+        // still had a recorded population then. The population fallback admits ABN (Abandoned) systems that retained
+        // inhabitants — a character can be born on a world that no faction claims, so long as someone lived there.
+        LocalDate birthDate = (person.getDateOfBirth() != null) ? person.getDateOfBirth() : campaign.getLocalDate();
         List<PlanetarySystem> orderedSystems = campaign.getSystems()
                                                      .stream()
+                                                     .filter(a -> !a.isConnector())
+                                                     .filter(a -> isSelectableBirthworld(a, birthDate))
                                                      .sorted(Comparator.comparing(a -> a.getName(campaign.getLocalDate())))
                                                      .toList();
         for (PlanetarySystem system : orderedSystems) {
             model.addElement(system);
         }
         return model;
+    }
+
+    /**
+     * @return {@code true} if {@code system} is a valid birthworld at {@code when} — it either has a real (non-ABN)
+     *       owner faction then, or still had a recorded population then. The population fallback admits abandoned
+     *       (ABN-only) worlds that retained inhabitants: a character can be born on a world no faction claims, so long
+     *       as people were living there. A {@code null} date is treated as selectable rather than over-filtering.
+     */
+    private static boolean isSelectableBirthworld(PlanetarySystem system, LocalDate when) {
+        if (when == null) {
+            return true;
+        }
+        if (system.getPopulation(when) > 0) {
+            return true;
+        }
+        // getFactionSet already drops the ABN marker when other factions are present, so an ABN-only world comes back
+        // as a single ABN entry; reject that case explicitly.
+        Set<Faction> owners = system.getFactionSet(when);
+        if (owners.isEmpty()) {
+            return false;
+        }
+        if (owners.size() == 1) {
+            Faction only = owners.iterator().next();
+            return only != null && !"ABN".equals(only.getShortName());
+        }
+        return true;
     }
 
     private DefaultComboBoxModel<PlanetarySystem> getPlanetarySystemsComboBoxModel(Faction faction) {
