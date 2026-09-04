@@ -151,6 +151,38 @@ public final class SupportUnitGenerator {
         generate(campaign, faction, autoAssignRanks, unitName, count, SupportTOEFormationTypes.SECURITY_FORMATION);
     }
 
+    /**
+     * How many support vehicles the pipeline will still add to this campaign, given its options: flatbed trucks
+     * under StratCon, canteens under fatigue, recovery vehicles under CamOps salvage and MASH trucks under MASH
+     * theatres, each less what the hangar already holds. Sized the way each generator sizes itself, so the
+     * personnel stage can count their mechanics before the vehicles exist.
+     *
+     * @param campaign the campaign the support is generated into
+     *
+     * @return the vehicles still to be generated
+     */
+    public static int vehiclesStillToGenerate(Campaign campaign) {
+        CampaignOptions campaignOptions = campaign.getCampaignOptions();
+        int planned = 0;
+        if (campaignOptions.isUseStratCon()) {
+            planned += shortfall(campaign, LOGISTICS_UNIT, scaledCount(campaign));
+        }
+        if (campaignOptions.get(CampaignOption.USE_FATIGUE)) {
+            planned += shortfall(campaign, COMMISSARY_UNIT, commissaryUnitCount(campaign));
+        }
+        if (campaignOptions.get(CampaignOption.IS_USE_CAM_OPS_SALVAGE)) {
+            planned += shortfall(campaign, SALVAGE_UNIT, scaledCount(campaign));
+        }
+        if (campaignOptions.get(CampaignOption.USE_MASH_THEATRES)) {
+            planned += shortfall(campaign, MEDICAL_UNIT, medicalUnitCount(campaign));
+        }
+        return planned;
+    }
+
+    private static int shortfall(Campaign campaign, String unitName, int targetCount) {
+        return Math.max(0, targetCount - countGeneratedUnitsNamed(campaign, unitName));
+    }
+
     /** Formation base size, doubled for a Clan command. */
     static int scaledCount(Campaign campaign) {
         int count = campaign.getPlayerForce().getFaction().getFormationBaseSize();
