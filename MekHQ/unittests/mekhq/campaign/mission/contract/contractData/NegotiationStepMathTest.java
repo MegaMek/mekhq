@@ -32,19 +32,20 @@
  */
 package mekhq.campaign.mission.contract.contractData;
 
-import static mekhq.campaign.mission.contract.contractData.NegotiationStepMath.distinctTermsSacrificed;
-import static mekhq.campaign.mission.contract.contractData.NegotiationStepMath.nextHigherDifferentStep;
-import static mekhq.campaign.mission.contract.contractData.NegotiationStepMath.nextLowerDifferentStep;
-import static mekhq.campaign.mission.contract.contractData.NegotiationStepMath.rawValue;
-import static mekhq.campaign.mission.contract.contractData.NegotiationStepMath.restoreStep;
-import static mekhq.campaign.mission.contract.contractData.NegotiationStepMath.sacrificeAllowed;
-import static mekhq.campaign.mission.contract.contractData.NegotiationStepMath.totalStepsSacrificed;
+import static mekhq.campaign.mission.contract.utilities.NegotiationStepMath.distinctTermsSacrificed;
+import static mekhq.campaign.mission.contract.utilities.NegotiationStepMath.nextHigherDifferentStep;
+import static mekhq.campaign.mission.contract.utilities.NegotiationStepMath.nextLowerDifferentStep;
+import static mekhq.campaign.mission.contract.utilities.NegotiationStepMath.rawValue;
+import static mekhq.campaign.mission.contract.utilities.NegotiationStepMath.restoreStep;
+import static mekhq.campaign.mission.contract.utilities.NegotiationStepMath.sacrificeAllowed;
+import static mekhq.campaign.mission.contract.utilities.NegotiationStepMath.totalStepsSacrificed;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-import mekhq.campaign.mission.contract.contractData.NegotiationStepMath.Term;
+import mekhq.campaign.mission.contract.utilities.NegotiationStepMath;
+import mekhq.campaign.mission.contract.utilities.NegotiationStepMath.Term;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;

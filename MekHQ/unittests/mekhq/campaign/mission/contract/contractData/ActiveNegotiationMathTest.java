@@ -32,11 +32,12 @@
  */
 package mekhq.campaign.mission.contract.contractData;
 
-import static mekhq.campaign.mission.contract.contractData.ActiveNegotiationMath.marginScore;
-import static mekhq.campaign.mission.contract.contractData.ActiveNegotiationMath.netMargin;
+import static mekhq.campaign.mission.contract.utilities.ActiveNegotiationMath.marginScore;
+import static mekhq.campaign.mission.contract.utilities.ActiveNegotiationMath.netMargin;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import mekhq.campaign.mission.contract.utilities.ActiveNegotiationMath;
 import mekhq.campaign.personnel.skills.enums.MarginOfSuccess;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;

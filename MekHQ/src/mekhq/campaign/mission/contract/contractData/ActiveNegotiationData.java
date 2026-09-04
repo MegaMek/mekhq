@@ -32,7 +32,7 @@
  */
 package mekhq.campaign.mission.contract.contractData;
 
-import mekhq.campaign.mission.contract.contractData.NegotiationStepMath.Term;
+import mekhq.campaign.mission.contract.utilities.NegotiationStepMath.Term;
 
 /**
  * The outcome of the latest active-negotiation attempt on a contract. Its presence records that at least one attempt
