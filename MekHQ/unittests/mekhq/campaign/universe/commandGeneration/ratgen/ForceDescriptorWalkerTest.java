@@ -43,6 +43,7 @@ import static org.mockito.Mockito.verify;
 
 import java.lang.reflect.Field;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -338,5 +339,64 @@ class ForceDescriptorWalkerTest {
               ForceDescriptorWalker.mapEchelonToFormationLevel(4, "   "));
         assertEquals(FormationLevel.COMPANY,
               ForceDescriptorWalker.mapEchelonToFormationLevel(4, "NOT_A_FACTION"));
+    }
+
+    /**
+     * A carrier is generated with the fighters it carries nested under it. The ship is still a unit: it
+     * is handed to the handler, and its fighters are walked under the same formation the ship is in.
+     */
+    @Test
+    void aShipWithFightersNestedUnderItIsStillAUnit() throws Exception {
+        ForceDescriptor root = group("Task Force");
+        ForceDescriptor lance = group("First Lance");
+        lance.addSubForce(unit("Unit A"));
+        root.addSubForce(lance);
+        ForceDescriptor transports = group("Naval Units");
+        ForceDescriptor ship = unit("Leopard");
+        ForceDescriptor flight = group("Flight 1");
+        flight.addSubForce(unit("Fighter A"));
+        flight.addSubForce(unit("Fighter B"));
+        ship.addAttached(flight);
+        transports.addSubForce(ship);
+        root.addAttached(transports);
+
+        Campaign campaign = mock(Campaign.class, RETURNS_DEEP_STUBS);
+        List<String> handledUnits = new ArrayList<>();
+        Map<String, Formation> parentOfUnit = new HashMap<>();
+        ForceDescriptorWalker.walk(root, campaign, new Formation("Headquarters"), namer(), (leaf, parent) -> {
+            handledUnits.add(leaf.parseName());
+            parentOfUnit.put(leaf.parseName(), parent);
+        });
+
+        assertEquals(List.of("Unit A", "Leopard", "Fighter A", "Fighter B"), handledUnits,
+              "the ship is handed over as a unit, followed by what it carries");
+        List<String> createdFormations = namesOfCreatedFormations(campaign);
+        assertFalse(createdFormations.contains("Leopard"), "the ship must not become a formation");
+        assertTrue(createdFormations.contains("Flight 1"), "the flight under the ship is a formation");
+        assertEquals("Flight 1", parentOfUnit.get("Fighter A").getName());
+        assertEquals(parentOfUnit.get("Leopard").getName(), createdFormations.get(createdFormations.indexOf("Flight 1") - 1),
+              "the flight hangs off the formation the ship is in");
+    }
+
+    @Test
+    void anExcludedShipStillLetsTheFightersUnderItThrough() throws Exception {
+        ForceDescriptor root = group("Task Force");
+        ForceDescriptor lance = group("First Lance");
+        lance.addSubForce(unit("Unit A"));
+        root.addSubForce(lance);
+        ForceDescriptor ship = unit("Leopard");
+        ForceDescriptor flight = group("Flight 1");
+        flight.addSubForce(unit("Fighter A"));
+        ship.addAttached(flight);
+        root.addAttached(ship);
+
+        ship.setIncluded(false);
+
+        Campaign campaign = mock(Campaign.class, RETURNS_DEEP_STUBS);
+        List<String> handledUnits = new ArrayList<>();
+        ForceDescriptorWalker.walk(root, campaign, new Formation("Headquarters"), namer(),
+              (leaf, parent) -> handledUnits.add(leaf.parseName()));
+
+        assertEquals(List.of("Unit A", "Fighter A"), handledUnits);
     }
 }

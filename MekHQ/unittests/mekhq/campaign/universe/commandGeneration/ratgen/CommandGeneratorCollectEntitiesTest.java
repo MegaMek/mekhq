@@ -131,4 +131,20 @@ class CommandGeneratorCollectEntitiesTest {
         assertEquals(1, collected.size());
         assertSame(loneEntity, collected.get(0));
     }
+
+    @Test
+    void collectEntities_includesAShipWithFightersNestedUnderIt() throws Exception {
+        // A carrier is generated with its fighter complement beneath it; it is still a unit to harvest.
+        ForceDescriptor root = group("Naval Units");
+        ForceDescriptor ship = group("Leopard");
+        Entity shipEntity = injectEntity(ship);
+        ForceDescriptor flight = group("Flight 1");
+        ForceDescriptor fighter = group("Fighter A");
+        Entity fighterEntity = injectEntity(fighter);
+        flight.addSubForce(fighter);
+        ship.addAttached(flight);
+        root.addSubForce(ship);
+
+        assertEquals(List.of(shipEntity, fighterEntity), CommandGenerator.collectEntities(root));
+    }
 }
