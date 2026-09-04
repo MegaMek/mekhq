@@ -61,6 +61,8 @@ public class PersonnelOptions extends PilotOptions {
     public static final String EDGE_ADVANCED_SURGERY = "edge_when_advanced_surgery_fail";
     public static final String EDGE_REPAIR_BREAK_PART = "edge_when_repair_break_part";
     public static final String EDGE_REPAIR_FAILED_REFIT = "edge_when_fail_refit_check";
+    /** The single admin acquisition trigger older saves carry; it maps onto the three triggers below on load. */
+    public static final String EDGE_ADMIN_ACQUIRE_FAIL_LEGACY = "edge_when_admin_acquire_fail";
     public static final String EDGE_ADMIN_ACQUIRE_FAIL_EIGHT = "edge_when_admin_acquire_fail_greater_than_eight";
     public static final String EDGE_ADMIN_ACQUIRE_FAIL_OTHER = "edge_when_admin_acquire_fail_other";
     public static final String EDGE_ADMIN_ACQUIRE_FAIL_ELEVEN = "edge_when_admin_acquire_fail_greater_than_eleven";
