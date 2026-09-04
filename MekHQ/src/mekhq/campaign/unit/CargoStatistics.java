@@ -123,8 +123,9 @@ public record CargoStatistics(Campaign campaign) {
         // Double.isFinite also rejects Infinity (not just NaN); a single part reporting a non-finite
         // tonnage must not be allowed to poison the whole cargo total (see MekHQ issue #9616).
         for (Part part : spareParts) {
-            if ((inTransit || part.isPresent()) && Double.isFinite(part.getTonnage())) {
-                cargoTonnage += part.getQuantity() * part.getTonnage();
+            double partTonnage = part.getTonnage();
+            if ((inTransit || part.isPresent()) && Double.isFinite(partTonnage)) {
+                cargoTonnage += part.getQuantity() * partTonnage;
             }
         }
 
