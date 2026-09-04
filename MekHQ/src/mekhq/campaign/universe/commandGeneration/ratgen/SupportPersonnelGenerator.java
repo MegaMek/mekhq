@@ -120,27 +120,50 @@ public final class SupportPersonnelGenerator {
     }
 
     public static Result generate(Campaign campaign, CommandGenerationOptions options) {
+        return generate(campaign, options, 0);
+    }
+
+    /**
+     * Generates the support staff for the campaign's force, counting in the vehicles the support stage is
+     * about to add so their mechanics are generated with everyone else.
+     *
+     * @param campaign            the campaign whose force is staffed
+     * @param options             the generation options
+     * @param vehiclesStillToCome support vehicles the caller will generate after this returns
+     *
+     * @return what was generated
+     */
+    public static Result generate(Campaign campaign, CommandGenerationOptions options, int vehiclesStillToCome) {
         if (campaign == null || options == null) {
             return new Result(0, 0, 0, 0, 0, 0, 0, 0, new ArrayList<>());
         }
         return generate(campaign, options,
-              new DefaultSkillGenerator(campaign.getRandomSkillPreferences()));
+              new DefaultSkillGenerator(campaign.getRandomSkillPreferences()), vehiclesStillToCome);
     }
 
     /**
      * Package-private overload that lets tests inject a no-op or stubbed
-     * {@link AbstractSkillGenerator}. Production callers should use the public single-arg form
+     * {@link AbstractSkillGenerator}. Production callers should use the public form
      * which constructs a {@link DefaultSkillGenerator} from the campaign's skill preferences.
      */
     static Result generate(Campaign campaign, CommandGenerationOptions options,
           AbstractSkillGenerator skillGen) {
+        return generate(campaign, options, skillGen, 0);
+    }
+
+    static Result generate(Campaign campaign, CommandGenerationOptions options,
+          AbstractSkillGenerator skillGen, int vehiclesStillToCome) {
         if (campaign == null || options == null) {
             return new Result(0, 0, 0, 0, 0, 0, 0, 0, new ArrayList<>());
         }
 
         long start = System.nanoTime();
 
-        SupportDemand demand = SupportPersonnelCalculator.compute(campaign);
+        SupportDemand demand = SupportPersonnelCalculator.compute(campaign, vehiclesStillToCome);
+        if (vehiclesStillToCome > 0) {
+            LOGGER.info("[CompanyGen][Pipeline][Support] {} support vehicle(s) the stage will add are counted"
+                        + " toward the mechanics", vehiclesStillToCome);
+        }
         Faction faction = resolveFaction(campaign, options);
         int supportRank = RulesetRankAssigner.supportRankForFaction(faction);
         // Resolve the rank system once so every Person we create renders rank names through the

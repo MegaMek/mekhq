@@ -44,9 +44,12 @@ import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 import megamek.Version;
+import megamek.common.annotations.Nullable;
 import megamek.common.event.Subscribe;
 import megamek.common.loaders.EntityLoadingException;
 import megamek.common.loaders.MekFileParser;
@@ -154,6 +157,9 @@ public class PersonnelMarket {
         boolean isCapital = location.getFactionSet(today)
                                   .stream()
                                   .anyMatch(faction -> location.equals(faction.getStartingPlanet(campaign, today)));
+
+        // Units left behind by recruits that are already gone would otherwise sit in the save forever
+        purgeOrphanedEntities();
 
         // Remove existing personnel for the day
         if (!personnel.isEmpty()) {
@@ -377,6 +383,10 @@ public class PersonnelMarket {
             // Okay, now load Part-specific fields!
             NodeList nl = wn.getChildNodes();
 
+            // A saved unit is only worth loading for a recruit who is still in the market, and the recruits may
+            // follow the units in the file, so the unit nodes are held back until every recruit is known.
+            List<Node> attachedEntityNodes = new ArrayList<>();
+
             // Loop through the nodes and load our personnel
             for (int x = 0; x < nl.getLength(); x++) {
                 Node wn2 = nl.item(x);
@@ -393,20 +403,7 @@ public class PersonnelMarket {
                         retVal.personnel.add(p);
                     }
                 } else if (wn2.getNodeName().equalsIgnoreCase("entity")) {
-                    UUID id = UUID.fromString(wn2.getAttributes().getNamedItem("id").getTextContent());
-                    MekSummary ms = MekSummaryCache.getInstance().getMek(wn2.getTextContent());
-                    Entity en = null;
-                    try {
-                        en = new MekFileParser(ms.getSourceFile(), ms.getEntryName()).getEntity();
-                    } catch (EntityLoadingException ex) {
-                        logger.error(ex, "Unable to load entity: {}: {}: {}",
-                              ms.getSourceFile(),
-                              ms.getEntryName(),
-                              ex.getMessage());
-                    }
-                    if (null != en) {
-                        retVal.attachedEntities.put(id, en);
-                    }
+                    attachedEntityNodes.add(wn2);
                 } else if (wn2.getNodeName().equalsIgnoreCase("paidRecruitment")) {
                     retVal.paidRecruitment = true;
                 } else if (wn2.getNodeName().equalsIgnoreCase("paidRecruitType")) {
@@ -419,6 +416,8 @@ public class PersonnelMarket {
                     logger.error("Unknown node type not loaded in Personnel nodes: {}", wn2.getNodeName());
                 }
             }
+
+            loadAttachedEntities(retVal, attachedEntityNodes);
 
             // All personnel need the rank reference fixed
             for (int x = 0; x < retVal.personnel.size(); x++) {
@@ -435,6 +434,74 @@ public class PersonnelMarket {
         }
 
         return retVal;
+    }
+
+    /**
+     * Loads the units saved alongside the market's recruits, skipping every unit whose recruit is no longer there.
+     *
+     * <p>Older versions left a unit behind each time a recruit was dropped, and a long campaign can carry tens of
+     * thousands of them. Each one costs a zip open and a unit-file parse, so an orphaned unit is not loaded at all and
+     * therefore never written back.</p>
+     *
+     * @param market              the market whose recruits have already been loaded
+     * @param attachedEntityNodes the {@code entity} nodes read from the save
+     */
+    private static void loadAttachedEntities(PersonnelMarket market, List<Node> attachedEntityNodes) {
+        Set<UUID> recruitIds = market.personnel.stream()
+                                     .map(Person::getId)
+                                     .collect(Collectors.toSet());
+        int orphanedUnitCount = 0;
+
+        for (Node entityNode : attachedEntityNodes) {
+            UUID recruitId = UUID.fromString(entityNode.getAttributes().getNamedItem("id").getTextContent());
+            if (!recruitIds.contains(recruitId)) {
+                orphanedUnitCount++;
+                continue;
+            }
+
+            Entity entity = loadAttachedEntity(entityNode.getTextContent());
+            if (entity != null) {
+                market.attachedEntities.put(recruitId, entity);
+            }
+        }
+
+        if (orphanedUnitCount > 0) {
+            logger.info("[PersonnelMarket] Skipped {} saved unit(s) with no matching recruit; they will not be kept",
+                  orphanedUnitCount);
+        }
+    }
+
+    /**
+     * @param unitName the unit's name as written in the save
+     *
+     * @return the loaded unit, or {@code null} if it is not in the unit cache or fails to load
+     */
+    private static @Nullable Entity loadAttachedEntity(String unitName) {
+        MekSummary summary = MekSummaryCache.getInstance().getMek(unitName);
+        if (summary == null) {
+            logger.error("[PersonnelMarket] Unit {} attached to a recruit is not in the unit cache", unitName);
+            return null;
+        }
+
+        try {
+            return new MekFileParser(summary.getSourceFile(), summary.getEntryName()).getEntity();
+        } catch (EntityLoadingException exception) {
+            logger.error(exception, "Unable to load entity: {}: {}: {}",
+                  summary.getSourceFile(),
+                  summary.getEntryName(),
+                  exception.getMessage());
+            return null;
+        }
+    }
+
+    /**
+     * Drops every attached unit whose recruit is no longer in the market.
+     */
+    public void purgeOrphanedEntities() {
+        Set<UUID> recruitIds = personnel.stream()
+                                     .map(Person::getId)
+                                     .collect(Collectors.toSet());
+        attachedEntities.keySet().removeIf(recruitId -> !recruitIds.contains(recruitId));
     }
 
     public static String getTypeName(int type) {

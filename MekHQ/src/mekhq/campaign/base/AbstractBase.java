@@ -39,6 +39,7 @@ import java.util.UUID;
 import jakarta.annotation.Nonnull;
 import megamek.common.annotations.Nullable;
 import megamek.logging.MMLogger;
+import mekhq.campaign.AbstractMobileLocation;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.LocalHangar;
 import mekhq.campaign.LocalPersonnel;
@@ -141,6 +142,41 @@ public abstract class AbstractBase implements IPlace {
     @Override
     public RequestedStockLevels getRequestedStockLevels() {
         return baseRequestedStockLevels;
+    }
+
+/**
+ * Returns {@code true} if this base holds no personnel, units, or spare parts, including anything currently in transit
+ * on this base’s travel nodes or queued as pending travel bound for this base.
+ *
+ * @param campaign the active campaign, used to check the pending-travel queue for travel bound for this base
+ */
+    public boolean isEmpty(Campaign campaign) {
+        // Personnel, units, and spare parts present at the base. getWarehouse().getParts() includes both present spares
+        // and spares still in transit (marked not present), so a single spare-part scan covers both cases.
+        if (getPersonnel() != null && !getPersonnel().isEmpty()) {
+            return false;
+        }
+
+        if (getHangar() != null && !getHangar().getUnits().isEmpty()) {
+            return false;
+        }
+
+        if (getWarehouse() != null && !getWarehouse().getParts().isEmpty()) {
+            return false;
+        }
+
+        // Personnel and units currently in transit on this base's travel nodes.
+        for (ILocation child : getChildLocations()) {
+            if (child instanceof AbstractMobileLocation travel
+                      && (!travel.fetchPersonnelAtLocation().isEmpty()
+                                || !travel.fetchUnitsAtLocation().isEmpty()
+                                || !travel.fetchPartsAtLocation().isEmpty())) {
+                return false;
+            }
+        }
+
+        // Travel queued elsewhere that is bound for this base and has not yet been dispatched.
+        return !campaign.getCampaignLocationManager().holdsPendingTravelDestination(this);
     }
 
     public UUID getId() {

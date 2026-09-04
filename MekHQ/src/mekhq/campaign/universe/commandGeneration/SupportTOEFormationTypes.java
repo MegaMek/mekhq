@@ -45,14 +45,19 @@ public enum SupportTOEFormationTypes {
     LOGISTICS_FORMATION("LOGISTICS_FORMATION", FormationType.CONVOY),
     /**
      * Umbrella for the command's own lift, holding {@link #JUMPSHIP_COMMAND} and
-     * {@link #CARGO_COMMAND}. Kept separate from the Troopships in the naval tree, which carry the
+     * {@link #CARGO_COMMAND}. Kept separate from the DropShips in the naval tree, which carry the
      * combat units, so the order of battle shows at a glance what lifts what.
      */
     TRANSPORT_COMMAND("TRANSPORT_COMMAND", FormationType.STANDARD),
     /** The JumpShips that berth the command's DropShips. */
     JUMPSHIP_COMMAND("JUMPSHIP_COMMAND", FormationType.CONVOY),
     /** The hulls that haul the command's own supplies. */
-    CARGO_COMMAND("CARGO_COMMAND", FormationType.CONVOY);
+    CARGO_COMMAND("CARGO_COMMAND", FormationType.CONVOY),
+    /**
+     * The DropShips added after the support sections exist, to berth what the command's ships could not
+     * already carry - the support platoons and squads, and anything else left without a bay.
+     */
+    TROOPSHIP_COMMAND("TROOPSHIP_COMMAND", FormationType.CONVOY);
     //endregion Enum Declarations
 
     //region Variable Declarations

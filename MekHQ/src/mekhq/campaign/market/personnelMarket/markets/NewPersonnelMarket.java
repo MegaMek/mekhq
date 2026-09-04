@@ -103,8 +103,8 @@ public class NewPersonnelMarket {
 
     @SuppressWarnings(value = "FieldCanBeLocal")
     private static final int RARE_PROFESSION_WEIGHT = 20;
-    private static int LOW_POPULATION_RECRUITMENT_DIVIDER = 1;
-    private static int UNIT_REPUTATION_RECRUITMENT_CUTOFF = Integer.MIN_VALUE;
+    private static int lowPopulationRecruitmentDivider = 1;
+    private static int unitReputationRecruitmentCutoff = Integer.MIN_VALUE;
     @SuppressWarnings(value = "FieldCanBeLocal")
     private static final int PROFESSION_EXTINCTION_IGNORE_VALUE = -1;
 
@@ -414,20 +414,20 @@ public class NewPersonnelMarket {
      * @author Illiani
      * @since 0.50.06
      */
-    public int getLowPopulationRecruitmentDivider() {
-        return LOW_POPULATION_RECRUITMENT_DIVIDER;
+    public static int getLowPopulationRecruitmentDivider() {
+        return lowPopulationRecruitmentDivider;
     }
 
     /**
      * Sets the recruitment divider for low population systems.
      *
-     * @param lowPopulationRecruitmentDivider recruitment divider to set
+     * @param divider recruitment divider to set
      *
      * @author Illiani
      * @since 0.50.06
      */
-    public void setLowPopulationRecruitmentDivider(int lowPopulationRecruitmentDivider) {
-        LOW_POPULATION_RECRUITMENT_DIVIDER = lowPopulationRecruitmentDivider;
+    public static void setLowPopulationRecruitmentDivider(int divider) {
+        lowPopulationRecruitmentDivider = divider;
     }
 
     /**
@@ -438,20 +438,20 @@ public class NewPersonnelMarket {
      * @author Illiani
      * @since 0.50.06
      */
-    public int getUnitReputationRecruitmentCutoff() {
-        return UNIT_REPUTATION_RECRUITMENT_CUTOFF;
+    public static int getUnitReputationRecruitmentCutoff() {
+        return unitReputationRecruitmentCutoff;
     }
 
     /**
      * Sets the cutoff value for unit reputation in recruitment eligibility.
      *
-     * @param unitReputationRecruitmentCutoff reputation cutoff to set
+     * @param cutoff reputation cutoff to set
      *
      * @author Illiani
      * @since 0.50.06
      */
-    public void setUnitReputationRecruitmentCutoff(int unitReputationRecruitmentCutoff) {
-        UNIT_REPUTATION_RECRUITMENT_CUTOFF = unitReputationRecruitmentCutoff;
+    public static void setUnitReputationRecruitmentCutoff(int cutoff) {
+        unitReputationRecruitmentCutoff = cutoff;
     }
 
     /**
