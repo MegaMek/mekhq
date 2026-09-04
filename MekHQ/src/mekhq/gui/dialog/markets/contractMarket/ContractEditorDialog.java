@@ -144,8 +144,6 @@ public class ContractEditorDialog extends JDialog {
     private JCheckBox scaleAutomatic;
     private JSpinner trackCountSpinner;
     private JCheckBox trackCountAutomatic;
-    private JSpinner combatElementsSpinner;
-    private JCheckBox combatElementsAutomatic;
     private JSpinner victoryPointsSpinner;
     private JCheckBox victoryPointsAutomatic;
 
@@ -480,11 +478,6 @@ public class ContractEditorDialog extends JDialog {
         trackCountAutomatic = automaticToggle(trackCountSpinner);
         rows.add(formRow("edit.contractMarket.field.trackCount",
               withAutomatic(trackCountSpinner, trackCountAutomatic)));
-
-        combatElementsSpinner = intSpinner(contract.getRequiredCombatElements(), 0);
-        combatElementsAutomatic = automaticToggle(combatElementsSpinner);
-        rows.add(formRow("edit.contractMarket.field.combatElements",
-              withAutomatic(combatElementsSpinner, combatElementsAutomatic)));
 
         victoryPointsSpinner = intSpinner(contract.getRequiredVictoryPoints(), 0);
         victoryPointsAutomatic = automaticToggle(victoryPointsSpinner);
@@ -1152,11 +1145,6 @@ public class ContractEditorDialog extends JDialog {
                                     ? AbstractContractGeneration.determineScale(campaign, campaign.getPlayerForce(),
                   campaign.getPlayerForce().getForceDetachment().getHangar(), contract)
                                     : intValue(scaleSpinner));
-            contract.setRequiredCombatElements(combatElementsAutomatic.isSelected()
-                                                     ?
-                                                     AbstractContractGeneration.determineRequiredCombatElements(campaign)
-                                                     :
-                                                     intValue(combatElementsSpinner));
             contract.setTrackCount(trackCountAutomatic.isSelected()
                                          ? ContractCharacteristics.bakeTrackCount(
                   AbstractContractGeneration.determineTrackCount(contract), contract)
@@ -1169,7 +1157,6 @@ public class ContractEditorDialog extends JDialog {
                                                     intValue(victoryPointsSpinner));
         } else {
             contract.setScale(intValue(scaleSpinner));
-            contract.setRequiredCombatElements(intValue(combatElementsSpinner));
             contract.setTrackCount(intValue(trackCountSpinner));
             contract.setRequiredVictoryPoints(intValue(victoryPointsSpinner));
         }
@@ -1422,7 +1409,7 @@ public class ContractEditorDialog extends JDialog {
 
     private static JSpinner moneySpinner(Money money) {
         double amount = money == null ? 0.0 : money.getAmount().doubleValue();
-        JSpinner spinner = new JSpinner(new SpinnerNumberModel(amount, 0.0, Double.MAX_VALUE, (double) MONEY_STEP));
+        JSpinner spinner = new JSpinner(new SpinnerNumberModel(amount, 0.0, Double.MAX_VALUE, MONEY_STEP));
         // Without this the editor sizes itself to fit Double.MAX_VALUE, blowing the row far past the viewport.
         if (spinner.getEditor() instanceof JSpinner.NumberEditor editor) {
             editor.getTextField().setColumns(12);
@@ -1555,12 +1542,12 @@ public class ContractEditorDialog extends JDialog {
                      || CUSTOM_CLAN_CODE.equals(code);
     }
 
-    /** A faction picker that also offers a leading "none" entry, for the optional covert sponsor. */
     /** The sponsor picker: a "None" entry, then the custom options, then the real active factions. */
     private FactionComboBox sponsorCombo(String selectedCode) {
         return factionComboWithCustoms(selectedCode, true);
     }
 
+    /** A faction picker that also offers a leading "none" entry, for the optional covert sponsor. */
     private static <E> JComboBox<E> enumCombo(E[] values, E selected) {
         JComboBox<E> combo = new JComboBox<>(new DefaultComboBoxModel<>(values));
         combo.setSelectedItem(selected);
