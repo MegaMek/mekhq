@@ -5370,16 +5370,37 @@ public class Person implements ILocatable {
 
         while (st.hasMoreTokens()) {
             String trigger = st.nextToken();
-            String triggerName = Crew.parseAdvantageName(trigger);
+            String savedTriggerName = Crew.parseAdvantageName(trigger);
             Object value = Crew.parseAdvantageValue(trigger);
 
-            try {
-                retVal.getOptions().getOption(triggerName).setValue(value);
-                edgeOptionList.remove(triggerName);
-            } catch (Exception e) {
-                LOGGER.error("Error restoring edge trigger: {}", trigger);
+            for (String triggerName : resolveEdgeTriggerNames(savedTriggerName)) {
+                try {
+                    retVal.getOptions().getOption(triggerName).setValue(value);
+                    edgeOptionList.remove(triggerName);
+                } catch (Exception exception) {
+                    LOGGER.error("Error restoring edge trigger: {}", trigger);
+                }
             }
         }
+    }
+
+    /**
+     * Maps an edge trigger name as it was saved to the option names it sets today.
+     *
+     * <p>The single "admin acquisition failed" trigger was split into three by how badly the roll missed. A save that
+     * still carries the old name applies its value to all three, which is what the old single switch did.</p>
+     *
+     * @param savedTriggerName the trigger name read from the save
+     *
+     * @return the current option names the saved value applies to
+     */
+    static List<String> resolveEdgeTriggerNames(String savedTriggerName) {
+        if (PersonnelOptions.EDGE_ADMIN_ACQUIRE_FAIL_LEGACY.equals(savedTriggerName)) {
+            return List.of(PersonnelOptions.EDGE_ADMIN_ACQUIRE_FAIL_OTHER,
+                  PersonnelOptions.EDGE_ADMIN_ACQUIRE_FAIL_EIGHT,
+                  PersonnelOptions.EDGE_ADMIN_ACQUIRE_FAIL_ELEVEN);
+        }
+        return List.of(savedTriggerName);
     }
 
     /**
