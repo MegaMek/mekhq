@@ -695,7 +695,7 @@ public class CampaignOptions {
     }
 
     /**
-     * Writes Use Implants to MegaMek's pilot implants option, which is one three-way setting rather than a switch.
+     * Writes Use Implants to MegaMek's pilot implants option, which is a three-way setting rather than a switch.
      * With implants off the setting is written Off. With them on, an Off setting is raised to Pilot Abilities Only,
      * and a setting that already allows implants is kept, so the campaign's choice between Pilot Abilities Only and
      * Full Tracking survives the round trip.
