@@ -53,6 +53,7 @@ import java.util.concurrent.TimeUnit;
 import megamek.client.generator.RandomCallsignGenerator;
 import megamek.client.ratgenerator.C3NetworkConfigurator;
 import megamek.client.ratgenerator.ForceDescriptor;
+import megamek.client.ratgenerator.CrewDescriptor;
 import megamek.client.ratgenerator.Ruleset;
 import megamek.common.annotations.Nullable;
 import megamek.common.enums.NeuralInterfaceMode;
@@ -67,6 +68,7 @@ import mekhq.campaign.ForceHumanResources;
 import mekhq.campaign.finances.Money;
 import mekhq.campaign.finances.enums.TransactionType;
 import mekhq.campaign.force.Formation;
+import mekhq.campaign.force.FormationLevel;
 import mekhq.campaign.finances.Loan;
 import mekhq.campaign.finances.enums.FinancialTerm;
 import mekhq.campaign.market.PartsInUseManager;
@@ -375,6 +377,9 @@ public final class CommandGenerator {
         // The Unit built for each unit descriptor, so stage 7a can put the units the tree nests under a ship
         // aboard it once every unit exists.
         Map<ForceDescriptor, Unit> unitsByDescriptor = new IdentityHashMap<>();
+        // Which descriptor each Formation mirrors, so the rank pass can read levels and commanders from the
+        // roll rather than guessing them from depth.
+        Map<Formation, ForceDescriptor> descriptorsByFormation = new IdentityHashMap<>();
         ForceDescriptorWalker.walk(fd, campaign, root, namer, (leaf, parent) -> {
             long leafStart = System.nanoTime();
             String parentInfo = parent == null ? "null"
@@ -478,7 +483,7 @@ public final class CommandGenerator {
             }
             LOGGER.info("[CompanyGen][Leaf] EXIT leaf #{} chassis='{}' model='{}' crew={} parent={} totalMs={}",
                   leafCount[0], entityChassis, entityModel, crew.size(), parentInfo, leafTotalMs);
-        });
+        }, (descriptor, formation) -> descriptorsByFormation.put(formation, descriptor));
 
         LOGGER.info("[CompanyGen][Pipeline]Stage 4-7 summary: {} leaves placed, {} skipped (no entity), {} skipped (addNewUnit failed)",
               leafCount[0], skippedNoEntity[0], skippedAddFailed[0]);
@@ -524,7 +529,8 @@ public final class CommandGenerator {
         if (listener != null) {
             listener.updateProgress(0.0, "Assigning ranks...");
         }
-        RulesetRankAssigner.Result ranks = RulesetRankAssigner.applyAndReport(campaign, options);
+        RulesetRankAssigner.Guidance guidance = rankGuidance(descriptorsByFormation, unitsByDescriptor);
+        RulesetRankAssigner.Result ranks = RulesetRankAssigner.applyAndReport(campaign, options, guidance);
         Person rootCommander = ranks.rootCommander();
 
         // 7c2. Officers get the skills that come with the post, when Generate Captains is on.
@@ -1032,6 +1038,70 @@ public final class CommandGenerator {
         secondInCommand.setSecondInCommand(true);
         LOGGER.info("[CompanyGen][Pipeline][Flags] second-in-command flag set on '{}'",
               secondInCommand.getFullName());
+    }
+
+    /**
+     * What the rank pass should know from the roll: each formation's level from its descriptor's echelon, and
+     * the commander the engine designated for it, resolved to the person built for that crew.
+     *
+     * @param descriptorsByFormation the descriptor each built Formation mirrors
+     * @param unitsByDescriptor      the unit built for each leaf descriptor
+     *
+     * @return the guidance for {@link RulesetRankAssigner#applyAndReport(Campaign, CommandGenerationOptions,
+     *       RulesetRankAssigner.Guidance)}
+     */
+    static RulesetRankAssigner.Guidance rankGuidance(Map<Formation, ForceDescriptor> descriptorsByFormation,
+          Map<ForceDescriptor, Unit> unitsByDescriptor) {
+        Map<Formation, FormationLevel> levels = new IdentityHashMap<>();
+        Map<Formation, Person> engineCommanders = new IdentityHashMap<>();
+        for (Map.Entry<Formation, ForceDescriptor> entry : descriptorsByFormation.entrySet()) {
+            Formation formation = entry.getKey();
+            ForceDescriptor descriptor = entry.getValue();
+            levels.put(formation, ForceDescriptorWalker.mapEchelonToFormationLevel(descriptor.getEchelon(),
+                  descriptor.getFaction()));
+            Person commander = builtCommanderOf(descriptor, unitsByDescriptor);
+            if (commander != null) {
+                engineCommanders.put(formation, commander);
+            }
+        }
+        LOGGER.info("[CompanyGen][RankAssign] guidance from the roll: {} formation level(s), {} engine commander(s)",
+              levels.size(), engineCommanders.size());
+        return new RulesetRankAssigner.Guidance(levels, engineCommanders);
+    }
+
+    /**
+     * The person built for the crew the engine designated as a formation's commander: the leaf beneath the
+     * formation whose crew descriptor is the formation's own, resolved to its unit's commander.
+     */
+    private static @Nullable Person builtCommanderOf(ForceDescriptor formation,
+          Map<ForceDescriptor, Unit> unitsByDescriptor) {
+        CrewDescriptor designated = formation.getCo();
+        if (designated == null) {
+            return null;
+        }
+        ForceDescriptor leaf = leafCrewedBy(formation, designated);
+        Unit unit = (leaf == null) ? null : unitsByDescriptor.get(leaf);
+        return (unit == null) ? null : unit.getCommander();
+    }
+
+    private static @Nullable ForceDescriptor leafCrewedBy(ForceDescriptor node, CrewDescriptor crew) {
+        boolean isLeaf = node.getSubForces().isEmpty() && node.getAttached().isEmpty();
+        if (isLeaf) {
+            return (node.getCo() == crew) ? node : null;
+        }
+        for (ForceDescriptor child : node.getSubForces()) {
+            ForceDescriptor found = leafCrewedBy(child, crew);
+            if (found != null) {
+                return found;
+            }
+        }
+        for (ForceDescriptor child : node.getAttached()) {
+            ForceDescriptor found = leafCrewedBy(child, crew);
+            if (found != null) {
+                return found;
+            }
+        }
+        return null;
     }
 
     /**

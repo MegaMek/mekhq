@@ -89,7 +89,8 @@ class RulesetRankAssignerSelectionTest {
         assertSame(elite, result.rootCommander(), "the best pilot in the command leads it");
         assertEquals(FormationLevel.COMPANY, result.officers().get(elite));
         assertEquals(FormationLevel.LANCE, result.officers().get(regular), "the best left in the first lance");
-        assertEquals(FormationLevel.LANCE, result.officers().get(veteran), "the best left in the second lance");
+        assertTrue(!result.officers().containsKey(veteran),
+              "the second lance is led by the commander sitting in it, so no separate officer");
         assertTrue(!result.officers().containsKey(green), "the green pilot leads nothing");
     }
 
@@ -104,19 +105,64 @@ class RulesetRankAssignerSelectionTest {
     }
 
     @Test
-    void withoutTheOptionsTheFirstPersonFoundLeads() {
+    void withoutTheOptionsTheFirstPersonFoundLeadsAndTheirLanceNeedsNoOfficer() {
+        Campaign campaign = MHQTestUtilities.getTestCampaign();
+        Formation firstLance = lance(campaign, "First Lance");
+        Formation secondLance = lance(campaign, "Second Lance");
+        Person green = pilot(campaign, mekIn(campaign, firstLance), 1);
+        pilot(campaign, mekIn(campaign, firstLance), 3);
+        Person veteran = pilot(campaign, mekIn(campaign, secondLance), 5);
+        Person elite = pilot(campaign, mekIn(campaign, secondLance), 7);
+
+        RulesetRankAssigner.Result result = RulesetRankAssigner.applyAndReport(campaign, companyOptions());
+
+        assertSame(green, result.rootCommander(), "first found, not best");
+        assertNotSame(elite, result.rootCommander());
+        assertEquals(FormationLevel.LANCE, result.officers().get(veteran), "the second lance takes its first pilot");
+        assertEquals(2, result.officers().size(), "the commander leads the first lance, so one lance leader");
+    }
+
+    @Test
+    void theEnginesDesignatedCommanderTakesThePostWhenNoOrderIsAsked() {
         Campaign campaign = MHQTestUtilities.getTestCampaign();
         Formation firstLance = lance(campaign, "First Lance");
         Formation secondLance = lance(campaign, "Second Lance");
         pilot(campaign, mekIn(campaign, firstLance), 1);
         pilot(campaign, mekIn(campaign, firstLance), 3);
-        pilot(campaign, mekIn(campaign, secondLance), 5);
-        Person elite = pilot(campaign, mekIn(campaign, secondLance), 7);
+        Person designated = pilot(campaign, mekIn(campaign, secondLance), 5);
+        pilot(campaign, mekIn(campaign, secondLance), 7);
+        Formation root = campaign.getPlayerForce().getFormations();
+        RulesetRankAssigner.Guidance guidance = new RulesetRankAssigner.Guidance(
+              java.util.Map.of(root, FormationLevel.COMPANY), java.util.Map.of(root, designated));
 
-        RulesetRankAssigner.Result result = RulesetRankAssigner.applyAndReport(campaign, companyOptions());
+        RulesetRankAssigner.Result result = RulesetRankAssigner.applyAndReport(campaign, companyOptions(), guidance);
 
-        assertNotSame(elite, result.rootCommander(), "first found, not best, so the elite pilot is not chosen");
-        assertEquals(3, result.officers().size(), "a commander and two lance leaders");
+        assertSame(designated, result.rootCommander(), "the engine's choice stands");
+        assertEquals(FormationLevel.COMPANY, result.officers().get(designated));
+        assertTrue(!result.officers().containsKey(secondLance),
+              "the designated commander's own lance is led by them");
+    }
+
+    @Test
+    void aRootThatIsOnlyAContainerHandsTheCommandToTheFormationBeneathIt() {
+        Campaign campaign = MHQTestUtilities.getTestCampaign();
+        Formation company = lance(campaign, "The Company");
+        Formation lance = new Formation("Its Lance");
+        campaign.getPlayerForce().addFormation(lance, company, campaign);
+        Person first = pilot(campaign, mekIn(campaign, lance), 3);
+        pilot(campaign, mekIn(campaign, lance), 5);
+        Formation root = campaign.getPlayerForce().getFormations();
+        java.util.Map<Formation, FormationLevel> levels = new java.util.IdentityHashMap<>();
+        levels.put(root, null);
+        levels.put(company, FormationLevel.COMPANY);
+        levels.put(lance, FormationLevel.LANCE);
+        RulesetRankAssigner.Guidance guidance = new RulesetRankAssigner.Guidance(levels, java.util.Map.of());
+
+        RulesetRankAssigner.Result result = RulesetRankAssigner.applyAndReport(campaign, companyOptions(), guidance);
+
+        assertSame(first, result.rootCommander(), "the company's commander commands, the root has no rank");
+        assertEquals(FormationLevel.COMPANY, result.officers().get(first));
+        assertEquals(1, result.officers().size(), "the company commander leads its only lance too");
     }
 
     private static CommandGenerationOptions companyOptions() {
