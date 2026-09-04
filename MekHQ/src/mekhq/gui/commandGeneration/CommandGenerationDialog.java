@@ -86,6 +86,7 @@ import mekhq.campaign.personnel.autoAwards.AutoAwardsController;
 import mekhq.campaign.personnel.enums.PersonnelRole;
 import mekhq.campaign.universe.Faction;
 import mekhq.campaign.universe.commandGeneration.CommandGenerationOptions;
+import mekhq.campaign.universe.commandGeneration.StartingSimulation;
 import mekhq.campaign.universe.commandGeneration.ratgen.CommandGenerator;
 import mekhq.campaign.universe.commandGeneration.ratgen.ForceDescriptorSnapshot;
 import mekhq.campaign.universe.commandGeneration.ratgen.RulesetEngineBootstrap;
@@ -451,9 +452,25 @@ public class CommandGenerationDialog extends AbstractMHQValidationButtonDialog {
                       generatedPersons.addAll(supportPersons);
                       CommandGenerator.processStartingCash(getCampaign(), options, preExistingUnitIds,
                             combatResult.rolledUnitIds(), generatedPersons, combatResult.spareCosts());
-                      applyPostGenerationExtras(options, generatedPersons);
+                      runStartingSimulationThen(options, generatedPersons);
                   });
         });
+    }
+
+    /**
+     * Runs the starting simulation as a background phase of its own when it was asked for, then the
+     * post-generation extras. Without it the extras run straight away.
+     */
+    private void runStartingSimulationThen(CommandGenerationOptions options, List<Person> generatedPersons) {
+        if (!options.isRunStartingSimulation()) {
+            LOGGER.info("[CompanyGen][Simulation] off; the command starts with no history");
+            applyPostGenerationExtras(options, generatedPersons);
+            return;
+        }
+        runGenerationPhase("Simulating the command's history...",
+              simulationListener -> StartingSimulation.run(getCampaign(), options, generatedPersons,
+                    simulationListener),
+              simulationResult -> applyPostGenerationExtras(options, generatedPersons));
     }
 
     /**

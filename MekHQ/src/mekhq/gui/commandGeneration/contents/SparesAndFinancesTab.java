@@ -391,7 +391,7 @@ public class SparesAndFinancesTab {
 
         chkRunStartingSimulation = new CommandGenerationCheckBox("RunStartingSimulation");
         CommandGenerationLabel simulationDurationLabel = new CommandGenerationLabel("SimulationDuration");
-        spnSimulationDuration = new JSpinner(new SpinnerNumberModel(12, 1, 600, 1));
+        spnSimulationDuration = new JSpinner(new SpinnerNumberModel(10, 1, 50, 1));
         spnSimulationDuration.setName("spnSimulationDuration");
         spnSimulationDuration.setToolTipText(simulationDurationLabel.getToolTipText());
         chkSimulateRandomMarriages = new CommandGenerationCheckBox("SimulateRandomMarriages");

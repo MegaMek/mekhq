@@ -157,7 +157,7 @@ public class CommandGenerationOptions {
 
     // Starting simulation
     private boolean runStartingSimulation;
-    private int simulationDuration;
+    private int simulationDuration = 10;
     private boolean simulateRandomMarriages;
     private boolean simulateRandomProcreation;
 
