@@ -130,7 +130,7 @@ class RulesetRankAssignerSelectionTest {
         pilot(campaign, mekIn(campaign, firstLance), 1);
         pilot(campaign, mekIn(campaign, firstLance), 3);
         Person designated = pilot(campaign, mekIn(campaign, secondLance), 5);
-        pilot(campaign, mekIn(campaign, secondLance), 7);
+        Person seatedBesideThem = pilot(campaign, mekIn(campaign, secondLance), 7);
         Formation root = campaign.getPlayerForce().getFormations();
         RulesetRankAssigner.Guidance guidance = new RulesetRankAssigner.Guidance(
               java.util.Map.of(root, FormationLevel.COMPANY), java.util.Map.of(root, designated));
@@ -139,8 +139,8 @@ class RulesetRankAssignerSelectionTest {
 
         assertSame(designated, result.rootCommander(), "the engine's choice stands");
         assertEquals(FormationLevel.COMPANY, result.officers().get(designated));
-        assertTrue(!result.officers().containsKey(secondLance),
-              "the designated commander's own lance is led by them");
+        assertTrue(!result.officers().containsKey(seatedBesideThem),
+              "the designated commander's own lance is led by them, so nobody else in it is promoted");
     }
 
     @Test

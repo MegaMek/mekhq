@@ -346,10 +346,10 @@ public final class RulesetRankAssigner {
      * no separate one. Otherwise it chooses before its sub-formations do: the best person in its subtree by
      * the selection's order, or the engine's designated commander when there is no order.</p>
      *
-     * @param level  the formation's level when the guidance does not name one: counted down from the requested
-     *               echelon
-     * @param isRoot {@code true} for the campaign-root formation, whose commander is chosen by the commander
-     *               order rather than the officer order
+     * @param fallbackLevel the formation's level when the guidance does not name one: counted down from the
+     *                      requested echelon
+     * @param isRoot        {@code true} for the campaign-root formation, whose commander is chosen by the
+     *                      commander order rather than the officer order
      *
      * @return the person who leads this formation, whether promoted here or above it; when the formation itself
      *       carries no rank, the leader of the first sub-formation that does, so the top-level call's return is
