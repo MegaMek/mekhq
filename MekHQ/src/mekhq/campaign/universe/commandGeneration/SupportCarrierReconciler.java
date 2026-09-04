@@ -222,6 +222,7 @@ public final class SupportCarrierReconciler {
         }
 
         markLegacyCarriers(campaign);
+        recoverSupportCommandId(campaign);
 
         Formation supportCommand = campaign.getPlayerForce().getSupportCommandFormation();
         if (supportCommand == null) {
@@ -288,6 +289,71 @@ public final class SupportCarrierReconciler {
      * <p>A unit qualifies only if it uses a carrier chassis <em>and</em> carries at least one support character, so a
      * support squad a player bought and crewed themselves is not mistaken for a generated carrier.</p>
      */
+    /**
+     * Recovers the Support Command formation id for a campaign saved before it was persisted.
+     *
+     * <p>The id is only written by generation. An older save has carriers but no id, and without this the reconciler
+     * would treat it as a campaign that never opted in. Support Command is found as the lowest common ancestor of
+     * every carrier's formation - the one formation that sits above all of Maintenance, Medical and Command - which
+     * needs no name matching and holds for any layout the generator produces. A campaign whose carriers all sit in
+     * one section resolves to that section instead, which files any later profession under it; acceptable, and rare.</p>
+     */
+    private static void recoverSupportCommandId(Campaign campaign) {
+        if (campaign.getPlayerForce().getSupportCommandFormationId() != Formation.FORMATION_NONE) {
+            return;
+        }
+
+        List<List<Integer>> chains = new ArrayList<>();
+        for (Unit unit : campaign.getUnits()) {
+            if (!unit.isCarrier()) {
+                continue;
+            }
+            Formation formation = campaign.getPlayerForce().getFormation(unit.getFormationId());
+            if (formation == null) {
+                continue;
+            }
+            // Root-to-leaf list of formation ids for this carrier.
+            List<Integer> chain = new ArrayList<>();
+            for (Formation node = formation; node != null; node = node.getParentFormation()) {
+                chain.add(0, node.getId());
+            }
+            chains.add(chain);
+        }
+        if (chains.isEmpty()) {
+            return;
+        }
+
+        // Walk the chains in step from the root; the last id they all share is the lowest common ancestor.
+        int common = Formation.FORMATION_NONE;
+        List<Integer> first = chains.get(0);
+        for (int depth = 0; depth < first.size(); depth++) {
+            int candidate = first.get(depth);
+            boolean shared = true;
+            for (List<Integer> chain : chains) {
+                if ((chain.size() <= depth) || (chain.get(depth) != candidate)) {
+                    shared = false;
+                    break;
+                }
+            }
+            if (!shared) {
+                break;
+            }
+            common = candidate;
+        }
+
+        // Never settle on the origin node: that would make every campaign look like it opted in.
+        if ((common == Formation.FORMATION_NONE) || (common == Formation.FORMATION_ORIGIN)) {
+            return;
+        }
+        Formation supportCommand = campaign.getPlayerForce().getFormation(common);
+        if (supportCommand == null) {
+            return;
+        }
+        campaign.getPlayerForce().setSupportCommandFormationId(common);
+        LOGGER.info("Recovered Support Command formation '{}' (id {}) from {} carrier(s) in a save that predates the"
+                          + " persisted id", supportCommand.getName(), common, chains.size());
+    }
+
     private static void markLegacyCarriers(Campaign campaign) {
         int marked = 0;
         for (Unit unit : new ArrayList<>(campaign.getUnits())) {
