@@ -32,6 +32,7 @@
  */
 package mekhq.gui;
 
+import static mekhq.utilities.MHQInternationalization.getFormattedText;
 import static mekhq.utilities.MHQInternationalization.getText;
 
 import java.awt.BorderLayout;
@@ -423,6 +424,10 @@ public class LocationsTab extends CampaignGuiTab {
                           getText("LocationsTab.menu.configureBase"));
                     configItem.addActionListener(ev -> openBaseConfig(base));
                     menu.add(configItem);
+                    JMenuItem deleteItem = new JMenuItem(
+                          getText("LocationsTab.menu.deleteBase"));
+                    deleteItem.addActionListener(ev -> deleteBase(base));
+                    menu.add(deleteItem);
                     menu.show(e.getComponent(), e.getX(), e.getY());
                 }
 
@@ -433,6 +438,34 @@ public class LocationsTab extends CampaignGuiTab {
                     }
                     JFrame frame = (JFrame) SwingUtilities.getWindowAncestor(view.getTable());
                     new BaseSettingsDialog(frame, campaign, base).setVisible(true);
+                }
+
+                private void deleteBase(PlayerBase base) {
+                    Campaign campaign = model.getCampaign();
+                    if (campaign == null) {
+                        return;
+                    }
+                    JFrame frame = (JFrame) SwingUtilities.getWindowAncestor(view.getTable());
+                    if (!base.isEmpty(campaign)) {
+                        JOptionPane.showMessageDialog(frame,
+                              getText("LocationsTab.deleteBase.notEmpty.message"),
+                              getText("LocationsTab.deleteBase.notEmpty.title"),
+                              JOptionPane.ERROR_MESSAGE);
+                        return;
+                    }
+                    int choice = JOptionPane.showConfirmDialog(frame,
+                          getFormattedText("LocationsTab.deleteBase.confirm.message", base.getDisplayName()),
+                          getText("LocationsTab.deleteBase.confirm.title"),
+                          JOptionPane.YES_NO_OPTION,
+                          JOptionPane.WARNING_MESSAGE);
+                    if (choice != JOptionPane.YES_OPTION) {
+                        return;
+                    }
+                    // Detach the base from its anchoring FixedLocation so the now-empty location can be pruned,
+                    // then drop it from the manager. Removal fires a LocationRemovedEvent, which refreshes the tab.
+                    base.setParent(null);
+                    campaign.getCampaignLocationManager().removePlayerBase(base);
+                    view.getDetailScrollPane().setViewportView(null);
                 }
             });
         }
