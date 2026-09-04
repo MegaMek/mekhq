@@ -39,10 +39,11 @@ import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
 import static mekhq.utilities.MHQInternationalization.getTextAt;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
 import java.util.Objects;
+import java.util.Set;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 import megamek.common.units.Entity;
 import megamek.logging.MMLogger;
@@ -169,19 +170,23 @@ public class ContractAutomation {
     public static void performAutomatedMothballing(Campaign campaign, Detachment detachment) {
         List<UUID> mothballTargets = new ArrayList<>();
         MothballUnitAction mothballUnitAction = new MothballUnitAction(null, true);
-        Collection<Unit> detachmentUnits = detachment.getHangar().getUnits();
+
+        Set<UUID> detachmentUnitIds = detachment.getHangar().getUnits().stream()
+                                            .map(Unit::getId)
+                                            .collect(Collectors.toSet());
 
         for (Formation formation : campaign.getPlayerForce().getAllFormations()) {
             List<UUID> iterationSafeUnitIds = new ArrayList<>(formation.getUnits());
+
             for (UUID unitId : iterationSafeUnitIds) {
+                if (!detachmentUnitIds.contains(unitId)) {
+                    continue;
+                }
+
                 Unit unit = campaign.getUnit(unitId);
 
                 if (unit == null) {
                     logger.error("Failed to get unit for unit ID {}", unitId);
-                    continue;
-                }
-
-                if (!detachmentUnits.contains(unit)) {
                     continue;
                 }
 
