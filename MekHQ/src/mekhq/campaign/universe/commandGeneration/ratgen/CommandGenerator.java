@@ -514,6 +514,13 @@ public final class CommandGenerator {
         LOGGER.info("[CompanyGen][Pipeline]Stage 7b2: seating the most skilled pilots in the leading lances");
         PilotSkillSorter.apply(campaign, options);
 
+        // 7b3. Bloodnames, for the Clan warriors who earn one. Before the ranks, so the picks that follow can
+        // put the Bloodnamed in command; the roll carries the force's calibre but no rank bonus, since nobody
+        // holds a rank yet. This is the force's only roll: the one MekHQ makes when it creates a Clan warrior
+        // is cleared by the crew adapter.
+        LOGGER.info("[CompanyGen][Pipeline]Stage 7b3: Bloodnames");
+        assignBloodnames(campaign, options, generatedPersons);
+
         // 7c. Tree-aware rank assignment. Walks the Formation tree and assigns each node's commander
         // the officer rank matching their FormationLevel (Lt -> Lance, Capt -> Company, Major ->
         // Battalion, ...), choosing by skill when the Officer Selection options ask for it. Non-officer
@@ -552,10 +559,6 @@ public final class CommandGenerator {
             listener.updateProgress(0.0, "Applying personnel flags...");
         }
         applyPersonnelFlags(campaign, options, generatedPersons, rootCommander);
-
-        // Bloodnames, for the Clan warriors who earn one. Runs here because the roll is made against
-        // the person's rank, which stage 7c has just assigned.
-        assignBloodnames(campaign, options, generatedPersons);
 
         // Manei Domini rank, class and cybernetics, for a Word of Blake Shadow Division. Runs here for
         // the same reason as bloodnames: implant availability is read off the person's rank.
