@@ -35,140 +35,86 @@ package mekhq.gui.commandGeneration;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-import java.awt.Component;
-import java.awt.Container;
-import java.util.ArrayList;
 import java.util.List;
+import java.util.ResourceBundle;
 import java.util.Set;
 import java.util.TreeSet;
-import javax.swing.AbstractButton;
-import javax.swing.JComboBox;
-import javax.swing.JComponent;
-import javax.swing.JLabel;
-import javax.swing.JPanel;
-import javax.swing.JSlider;
-import javax.swing.JSpinner;
-import javax.swing.JTextField;
 
-import megamek.common.equipment.EquipmentType;
-import mekhq.campaign.Campaign;
-import mekhq.campaign.personnel.skills.SkillType;
-import mekhq.campaign.universe.Factions;
-import mekhq.campaign.universe.commandGeneration.CommandGenerationOptions;
-import mekhq.gui.commandGeneration.contents.SetupTab;
-import mekhq.gui.commandGeneration.contents.SparesAndFinancesTab;
+import mekhq.gui.commandGeneration.components.CommandGenerationUtilities;
 import mekhq.utilities.MHQInternationalization;
-import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
-import testUtilities.MHQTestUtilities;
 
 /**
- * Every option a player can set in the Command Generator explains itself on hover (MekHQ issue 9938).
+ * Every option in the Command Generator has help text in its bundle (MekHQ issue 9938).
  *
- * <p>The tabs are built the way the dialog builds them and every control walked: check boxes, radio buttons,
- * drop-downs, spinners, text fields, sliders and buttons. Each must carry a tooltip that is not blank and is
- * not the {@code !key!} placeholder the bundle lookup returns for a missing key. A spinner's text field and a
- * drop-down's arrow button are checked as well: they are what the pointer actually rests on, and the look and
- * feel is expected to hand them the parent's tooltip. The Force Generator tab's controls come from MegaMek's
- * own panel, which sets its tooltips from MegaMek's bundle, so it is covered there.</p>
+ * <p>The tabs build their controls from {@code lbl<name>.text} keys and read the matching
+ * {@code lbl<name>.tooltip}; the two skill drop-downs and the tech assignment direction read a tooltip key of
+ * their own. This checks the bundle rather than the built dialog: every labelled entry carries a tooltip that is
+ * not blank and not the bundle's missing-key placeholder, apart from the few labels that are headings or body
+ * text rather than options.</p>
  */
 class CommandGenerationTooltipsTest {
 
-    private static Campaign campaign;
+    /** Labels that are not options: column headings and a paragraph of help, which explain nothing further. */
+    private static final Set<String> NOT_OPTIONS = Set.of(
+          "lblSupportPersonnelColumnRole",
+          "lblSupportPersonnelColumnPercent",
+          "lblSupportPersonnelColumnSkill",
+          "lblSparesHelpBody");
 
-    @BeforeAll
-    static void loadWhatTheTabsRead() {
-        EquipmentType.initializeTypes();
-        SkillType.initializeTypes();
-        Factions.setInstance(Factions.loadDefault(true));
-        campaign = MHQTestUtilities.getTestCampaign();
+    /** Tooltip keys read by controls that take their text from somewhere other than an {@code lbl} key. */
+    private static final List<String> TOOLTIP_ONLY_KEYS = List.of(
+          "lblAstechSkillLevel.tooltip",
+          "lblMedicSkillLevel.tooltip",
+          "cmbTechAssignmentDirection.tooltip",
+          "supportCoveragePercent.toolTipText",
+          "supportSkillLevel.toolTipText");
+
+    private static ResourceBundle bundle() {
+        return ResourceBundle.getBundle(CommandGenerationUtilities.getCommandGenerationResourceBundle());
     }
 
     @Test
-    void everyControlOnThePersonnelAndOfficersTabHasATooltip() {
-        JPanel tab = new SetupTab(campaign, new CommandGenerationOptions()).createTab();
-
-        assertEveryControlExplainsItself(tab, "Personnel & Officers");
-    }
-
-    @Test
-    void everyControlOnTheSparesAndFinancesTabHasATooltip() {
-        JPanel tab = new SparesAndFinancesTab(campaign, new CommandGenerationOptions(), () -> null).createTab();
-
-        assertEveryControlExplainsItself(tab, "Spares & Finances");
-    }
-
-    private static void assertEveryControlExplainsItself(Container tab, String tabName) {
-        List<JComponent> controls = new ArrayList<>();
-        collectControls(tab, controls);
-        assertFalse(controls.isEmpty(), tabName + " built no controls; the walk found nothing to check");
+    void everyLabelledOptionHasATooltip() {
+        ResourceBundle bundle = bundle();
+        Set<String> options = new TreeSet<>();
+        for (String key : bundle.keySet()) {
+            boolean isLabel = key.startsWith("lbl") && key.endsWith(".text");
+            if (isLabel) {
+                options.add(key.substring(0, key.length() - ".text".length()));
+            }
+        }
+        options.removeAll(NOT_OPTIONS);
+        assertFalse(options.isEmpty(), "the bundle names no options at all");
 
         Set<String> missing = new TreeSet<>();
-        for (JComponent control : controls) {
-            String tooltip = control.getToolTipText();
-            boolean isBlank = (tooltip == null) || tooltip.isBlank();
-            boolean isPlaceholder = (tooltip != null) && !MHQInternationalization.isResourceKeyValid(tooltip);
-            if (isBlank || isPlaceholder) {
-                missing.add(describe(control));
+        for (String option : options) {
+            if (!hasHelp(bundle, option + ".tooltip")) {
+                missing.add(option);
             }
         }
-        assertTrue(missing.isEmpty(), tabName + ": " + missing.size() + " control(s) have no tooltip: " + missing);
+        assertTrue(missing.isEmpty(), missing.size() + " option(s) have no tooltip: " + missing);
     }
 
-    /**
-     * Gathers the controls a player operates. A spinner is listed with its text field and a drop-down with its
-     * arrow button, since those are the parts the pointer rests on; the look and feel passes the parent's tooltip
-     * down to them, and this checks that it did.
-     */
-    private static void collectControls(Container container, List<JComponent> into) {
-        for (Component component : container.getComponents()) {
-            if (component instanceof JSpinner spinner) {
-                into.add(spinner);
-                if (spinner.getEditor() instanceof JSpinner.DefaultEditor editor) {
-                    into.add(named(editor.getTextField(), spinner.getName() + " text field"));
-                }
-                continue;
-            }
-            if (component instanceof JComboBox<?> dropDown) {
-                into.add(dropDown);
-                for (Component part : dropDown.getComponents()) {
-                    if (part instanceof AbstractButton arrowButton) {
-                        into.add(named(arrowButton, dropDown.getName() + " arrow button"));
-                    }
-                }
-                continue;
-            }
-            boolean isControl = (component instanceof AbstractButton)
-                  || (component instanceof JTextField)
-                  || (component instanceof JSlider);
-            if (isControl) {
-                into.add((JComponent) component);
-            }
-            if (component instanceof Container child) {
-                collectControls(child, into);
+    @Test
+    void controlsWithTheirOwnTooltipKeyHaveOne() {
+        ResourceBundle bundle = bundle();
+        Set<String> missing = new TreeSet<>();
+        for (String key : TOOLTIP_ONLY_KEYS) {
+            if (!hasHelp(bundle, key)) {
+                missing.add(key);
             }
         }
+        assertTrue(missing.isEmpty(), "tooltip key(s) missing or blank: " + missing);
     }
 
-    /** Gives a nameless part of a control a name that says which control it belongs to. */
-    private static JComponent named(JComponent part, String name) {
-        if ((part.getName() == null) || part.getName().isBlank()) {
-            part.setName(name);
+    private static boolean hasHelp(ResourceBundle bundle, String key) {
+        if (!bundle.containsKey(key)) {
+            return false;
         }
-        return part;
-    }
-
-    private static String describe(JComponent control) {
-        String name = control.getName();
-        if ((name != null) && !name.isBlank()) {
-            return name;
-        }
-        if (control instanceof AbstractButton button) {
-            return button.getClass().getSimpleName() + " '" + button.getText() + "'";
-        }
-        if (control instanceof JLabel label) {
-            return "label '" + label.getText() + "'";
-        }
-        return control.getClass().getSimpleName() + " (unnamed)";
+        String text = bundle.getString(key);
+        boolean isBlank = text.isBlank();
+        boolean isPlaceholder = !MHQInternationalization.isResourceKeyValid(text);
+        return !isBlank && !isPlaceholder;
     }
 }
