@@ -1538,7 +1538,11 @@ public class CustomizePersonDialog extends JDialog implements DialogOptionListen
         List<PlanetarySystem> orderedSystems = campaign.getSystems()
                                                      .stream()
                                                      .filter(a -> !a.isConnector())
-                                                     .filter(a -> isInhabitedAt(cachedOwnersAt(a)))
+                                                     // A world counts as a valid birth world if it either has a real
+                                                     // owner faction at the birthdate OR still had a recorded
+                                                     // population then.
+                                                     .filter(a -> isInhabitedAt(cachedOwnersAt(a)) ||
+                                                                        hadPopulationAt(a))
                                                      .sorted(Comparator.comparing(a -> a.getName(birthDate)))
                                                      .toList();
         for (PlanetarySystem system : orderedSystems) {
@@ -1865,6 +1869,17 @@ public class CustomizePersonDialog extends JDialog implements DialogOptionListen
             return only != null && !"ABN".equals(only.getShortName());
         }
         return true;
+    }
+
+    /**
+     * @return {@code true} if {@code system} had a recorded population greater than zero on the dialog's current
+     *       {@code birthdate}. Used as a fallback to {@link #isInhabitedAt(Set)} so an abandoned world (owner set is
+     *       {@code ABN}-only, which {@code isInhabitedAt} rejects) is still offered as a birthworld when people were
+     *       actually living there. Returns {@code false} when {@code birthdate} is unset, since population is
+     *       date-scoped.
+     */
+    private boolean hadPopulationAt(PlanetarySystem system) {
+        return birthdate != null && system.getPopulation(birthdate) > 0;
     }
 
     private void filterPlanetarySystemsForOurFaction(boolean onlyOurFaction) {
