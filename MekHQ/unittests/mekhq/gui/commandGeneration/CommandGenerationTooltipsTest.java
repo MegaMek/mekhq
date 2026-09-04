@@ -128,7 +128,6 @@ class CommandGenerationTooltipsTest {
                 continue;
             }
             boolean isControl = (component instanceof AbstractButton)
-                  || (component instanceof JComboBox<?>)
                   || (component instanceof JTextField)
                   || (component instanceof JSlider);
             if (isControl) {
