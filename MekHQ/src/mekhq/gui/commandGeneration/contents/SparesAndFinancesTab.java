@@ -371,9 +371,9 @@ public class SparesAndFinancesTab {
 
     /**
      * Recomputes the estimated starting cash from the Force Generator tab's current design model:
-     * the configured percentage of the rolled combat units' estimated purchase value. Support units
-     * are only generated at build time, so the estimate is a floor. Randomized cash shows the dice
-     * pool instead, and pay-for debits are not previewed (they depend on build-time costs).
+     * the configured percentage of the rolled units' purchase value, which is what the build credits.
+     * Randomized cash shows the dice pool instead, and pay-for debits are not previewed (they depend
+     * on build-time costs).
      */
     public void refreshStartingCashPreview() {
         if (lblStartingCashPreviewValue == null) {
