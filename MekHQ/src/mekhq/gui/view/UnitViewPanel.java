@@ -466,7 +466,7 @@ public class UnitViewPanel extends JScrollablePanel {
 
         JLabel txtBV = new JLabel();
         txtBV.setName("lblBV2");
-        txtBV.setText(Integer.toString(entity.calculateBattleValue(true, true)));
+        txtBV.setText(Integer.toString(entity.calculateBattleValue(true, true, true)));
         pnlStats.add(txtBV, valueConstraints);
 
         labelConstraints.gridy++;
