@@ -104,6 +104,13 @@ public final class CrewDescriptorAdapter {
             return;
         }
         String descriptorBloodname = descriptor.getBloodname();
+        // The draft appends the Bloodname to the crew's name so the preview shows it. The Bloodname is applied
+        // on its own below; the name must not carry it too or the person would be "Cao Pryde Pryde".
+        boolean nameCarriesBloodname = (descriptorBloodname != null) && !descriptorBloodname.isBlank()
+              && fullName.endsWith(" " + descriptorBloodname);
+        if (nameCarriesBloodname) {
+            fullName = fullName.substring(0, fullName.length() - descriptorBloodname.length() - 1).trim();
+        }
         int firstSpace = fullName.indexOf(' ');
         if (firstSpace > 0 && firstSpace < fullName.length() - 1) {
             person.setGivenName(fullName.substring(0, firstSpace));

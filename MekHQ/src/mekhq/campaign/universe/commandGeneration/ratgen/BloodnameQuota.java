@@ -121,6 +121,13 @@ public final class BloodnameQuota {
             return Result.none();
         }
 
+        if (alreadyHeld > 0) {
+            // The draft awarded the roll its share already, on the crews the preview showed, and the engine seeds
+            // none of its own; awarding more here would make the build differ from the draft.
+            LOGGER.info("{} {} of {} eligible warrior(s) hold a Bloodname from the draft; nothing more is awarded",
+                  LOG_TAG, alreadyHeld, eligible.size());
+            return new Result(eligible.size(), alreadyHeld, alreadyHeld, 0);
+        }
         double share = share(experienceOf(options));
         int quota = quota(eligible.size(), share);
         int toAward = Math.max(0, quota - alreadyHeld);
