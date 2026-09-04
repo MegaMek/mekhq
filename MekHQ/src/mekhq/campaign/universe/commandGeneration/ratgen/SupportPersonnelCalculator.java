@@ -118,6 +118,22 @@ public final class SupportPersonnelCalculator {
      * @return a non-{@code null} {@link SupportDemand}
      */
     public static SupportDemand compute(Campaign campaign) {
+        return compute(campaign, 0);
+    }
+
+    /**
+     * Computes the per-role demand snapshot from {@code campaign}'s current force composition, plus the vehicles
+     * the support stage is still going to add. The stage sizes its personnel before it generates its own
+     * vehicles - flatbed trucks, canteens, recovery and MASH vehicles - and those need mechanics like any other
+     * vehicle, so the caller says how many are coming.
+     *
+     * @param campaign            the campaign to read units / personnel / options / faction from; if
+     *                            {@code null}, returns an all-zero demand
+     * @param vehiclesStillToCome vehicles not yet in the hangar that the caller is about to generate
+     *
+     * @return a non-{@code null} {@link SupportDemand}
+     */
+    public static SupportDemand compute(Campaign campaign, int vehiclesStillToCome) {
         if (campaign == null) {
             return new SupportDemand(0, 0, 0, 0, 0, 0);
         }
@@ -156,6 +172,8 @@ public final class SupportPersonnelCalculator {
                 // organic VESSEL_CREW carries S_TECH_VESSEL and acts as the ship's own tech.
             }
         }
+
+        vehicleCount += Math.max(0, vehiclesStillToCome);
 
         int mekTechs = mekCount + ceilDiv(protoMekCrew, PROTOMEK_POINT_SIZE);
         int baTechs = ceilDiv(baSuits, BA_SQUAD_SIZE);
