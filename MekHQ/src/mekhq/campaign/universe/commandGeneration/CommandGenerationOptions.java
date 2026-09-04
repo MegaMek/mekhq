@@ -261,7 +261,7 @@ public class CommandGenerationOptions {
 
         // Starting simulation
         setRunStartingSimulation(false);
-        setSimulationDuration(5);
+        setSimulationDuration(10);
         setSimulateRandomMarriages(false);
         setSimulateRandomProcreation(false);
 
