@@ -33,11 +33,6 @@
  */
 package mekhq.gui.view;
 
-import static mekhq.campaign.mission.utilities.CombatRole.CADRE;
-import static mekhq.campaign.mission.utilities.CombatRole.FRONTLINE;
-import static mekhq.campaign.mission.utilities.CombatRole.MANEUVER;
-import static mekhq.campaign.mission.utilities.CombatRole.PATROL;
-
 import java.util.ArrayList;
 import java.util.List;
 import javax.swing.SwingConstants;
@@ -58,13 +53,6 @@ class RequiredLancesTableModel extends DataTableModel<AbstractContract> {
     public static final int COL_NUM = 6;
 
     private final Campaign campaign;
-
-    public RequiredLancesTableModel(final Campaign campaign) {
-        this.campaign = campaign;
-        data = new ArrayList<>();
-        columnNames = new String[] { "Contract", "Total", MANEUVER.toString(), FRONTLINE.toString(), PATROL.toString(),
-                                     CADRE.toString() };
-    }
 
     static int getAssignedCombatElementCount(Campaign campaign, AbstractContract contract) {
         int assignedCombatElements = 0;
