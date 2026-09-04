@@ -71,10 +71,12 @@ import mekhq.campaign.universe.commandGeneration.SupportPersonnelToTOE.SupportSe
  * carriers that exist against what the packer wants for the new total; when they match, the person simply takes or
  * vacates a seat, and only when a packing boundary is crossed is the profession rebuilt.</p>
  *
- * <p><b>Deployment.</b> Whether carriers may deploy is decided by {@link SupportCarrierDeployment} - closed today,
- * to be opened by a future scenario type that pulls support staff into a fight. This class is already built for that
- * day: while a carrier is deployed, nothing here seats into it, releases from it, reshapes its profession or prunes
- * its formation. The status events casualties raise are handled by the engine as usual, and once the survivors come
+ * <p><b>Parked carriers.</b> A carrier that is deployed, mothballed or mothballing is left exactly as it is: nothing
+ * here seats into it, releases from it, reshapes its profession, prunes its formation, or builds a new carrier beside
+ * it. Mothballing matters most in practice - a contract start mothballs the whole force for transit, stripping every
+ * carrier's crew and pulling it from the TOE, and {@code MothballInfo} restores both on arrival. Whether carriers may
+ * deploy at all is decided by {@link SupportCarrierDeployment} - closed today, to be opened by a future scenario type
+ * that pulls support staff into a fight; this class is already built for that day. The status events casualties raise are handled by the engine as usual, and once the survivors come
  * home a {@code DeploymentChangedEvent} triggers the shape check that the departure-side path declined while they
  * were out. A carrier deployed by a save written before the gate existed gets the same treatment.</p>
  *
@@ -161,7 +163,7 @@ public final class SupportCarrierReconciler {
         }
 
         Unit unit = person.getUnit();
-        if ((unit == null) || !unit.isCarrier() || unit.isDeployed()) {
+        if ((unit == null) || !unit.isCarrier() || isParked(unit)) {
             return;
         }
 
@@ -187,7 +189,9 @@ public final class SupportCarrierReconciler {
      * @param unit     the unit whose crew changed
      */
     public static void onCarrierCrewChanged(@Nullable Campaign campaign, @Nullable Unit unit) {
-        if ((campaign == null) || (unit == null) || !unit.isCarrier() || unit.isDeployed()) {
+        // isMothballed is already true while setMothballed strips the crew, so the last removal - the one that would
+        // otherwise read as "empty, delete it" - is correctly ignored here.
+        if ((campaign == null) || (unit == null) || !unit.isCarrier() || isParked(unit)) {
             return;
         }
 
@@ -263,7 +267,7 @@ public final class SupportCarrierReconciler {
         // who was then never seated has no such event. Sweep them here so a campaign that hit that state self-heals.
         int emptied = 0;
         for (Unit unit : new ArrayList<>(campaign.getUnits())) {
-            if (unit.isCarrier() && unit.getCrew().isEmpty()) {
+            if (unit.isCarrier() && unit.getCrew().isEmpty() && !isParked(unit)) {
                 Formation parent = campaign.getPlayerForce().getFormation(unit.getFormationId());
                 LOGGER.info("Removing empty support carrier {}", unit.getName());
                 campaign.removeUnit(unit.getId());
@@ -363,7 +367,9 @@ public final class SupportCarrierReconciler {
             if (!SupportPersonnelToTOE.isCarrierChassis(unit.getEntity().getChassis())) {
                 continue;
             }
-            if (professionOf(unit) == null) {
+            // Crewed by support staff, or - for one sitting empty in mothballs - carrying the profession label
+            // generation stamps on every carrier. A support squad a player bought themselves has neither.
+            if ((professionOf(unit) == null) && !isGenerationLabel(campaign, unit.getFluffName())) {
                 continue;
             }
             unit.setCarrier(true);
@@ -403,10 +409,10 @@ public final class SupportCarrierReconciler {
     private static void seat(Campaign campaign, Person person, Formation supportCommand) {
         PersonnelRole profession = person.getPrimaryRole();
         List<Unit> carriers = carriersOf(campaign, supportCommand, profession);
-        if (anyDeployed(carriers)) {
-            // Carriers should never be deployed, but a save written before that was enforced may hold one that is.
-            // Nothing is rebuilt around a unit that is in a battle; the next event after it returns catches up.
-            LOGGER.info("Not seating {}: a {} carrier is deployed", person.getFullName(),
+        if (anyParked(carriers) || hasParkedCarrier(campaign, profession)) {
+            // A carrier in a battle or in mothballs is left exactly as it is, and no new one is built beside it. The
+            // next event after it comes back catches this person up.
+            LOGGER.info("Not seating {}: a {} carrier is deployed or mothballed", person.getFullName(),
                   profession.getLabel(campaign.getPlayerForce().isClanForce()));
             return;
         }
@@ -481,7 +487,7 @@ public final class SupportCarrierReconciler {
             if ((carrier == null) || !carrier.isCarrier()) {
                 continue;
             }
-            if (resyncEntities && !carrier.isDeployed()) {
+            if (resyncEntities && !isParked(carrier)) {
                 // The entity's trooper count is written from the crew on every seat and release, but not by the
                 // loader when it drops crew whose roster entry is gone.
                 carrier.resetPilotAndEntity();
@@ -539,7 +545,7 @@ public final class SupportCarrierReconciler {
         }
 
         List<Unit> carriers = carriersOf(campaign, supportCommand, profession);
-        if (anyDeployed(carriers)) {
+        if (anyParked(carriers) || hasParkedCarrier(campaign, profession)) {
             return false;
         }
         List<Person> people = new ArrayList<>();
@@ -672,10 +678,43 @@ public final class SupportCarrierReconciler {
               toDestroy.size(), moved);
     }
 
-    /** Whether any of these carriers is currently assigned to a scenario. */
-    private static boolean anyDeployed(List<Unit> carriers) {
+    /**
+     * Whether a carrier is somewhere the reconciler must not touch it: assigned to a scenario, or mothballed.
+     *
+     * <p>Mothballing strips a unit's crew and pulls it out of its formation; {@code MothballInfo} keeps both and puts
+     * them back on activation. To the reconciler the mothballed carrier looks empty and orphaned, and without this
+     * guard it would delete the carrier and then build new ones for the loose crew - which is what happened when a
+     * contract start mothballed the whole force for transit.</p>
+     */
+    private static boolean isParked(Unit carrier) {
+        return carrier.isDeployed() || carrier.isMothballed() || carrier.isMothballing();
+    }
+
+    /** Whether any of these carriers is parked. */
+    private static boolean anyParked(List<Unit> carriers) {
         for (Unit carrier : carriers) {
-            if (carrier.isDeployed()) {
+            if (isParked(carrier)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    /**
+     * Whether this profession has a parked carrier anywhere in the hangar.
+     *
+     * <p>A mothballed carrier has left its formation, so the Support Command walk cannot see it; only a hangar scan
+     * can. It also has no crew, so its profession is read from the label generation stamped on it. Reached only on a
+     * genuine arrival or departure, never on the guarded fast path.</p>
+     */
+    private static boolean hasParkedCarrier(Campaign campaign, PersonnelRole profession) {
+        String label = profession.getLabel(campaign.getPlayerForce().isClanForce());
+        for (Unit unit : campaign.getUnits()) {
+            if (!unit.isCarrier() || !isParked(unit)) {
+                continue;
+            }
+            PersonnelRole carried = professionOf(unit);
+            if ((carried == profession) || ((carried == null) && label.equals(unit.getFluffName()))) {
                 return true;
             }
         }
@@ -766,6 +805,20 @@ public final class SupportCarrierReconciler {
 
         LOGGER.info("Removing empty support formation {}", formation.getName());
         campaign.getPlayerForce().removeFormation(formation, campaign);
+    }
+
+    /** Whether this fluff name is the label generation stamps on a carrier for one of the carried professions. */
+    private static boolean isGenerationLabel(Campaign campaign, @Nullable String fluffName) {
+        if (fluffName == null) {
+            return false;
+        }
+        boolean isClan = campaign.getPlayerForce().isClanForce();
+        for (PersonnelRole role : PersonnelRole.values()) {
+            if ((SupportPersonnelToTOE.sectionFor(role) != null) && fluffName.equals(role.getLabel(isClan))) {
+                return true;
+            }
+        }
+        return false;
     }
 
     /**

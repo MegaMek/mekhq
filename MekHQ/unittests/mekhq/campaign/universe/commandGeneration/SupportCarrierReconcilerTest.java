@@ -263,6 +263,35 @@ class SupportCarrierReconcilerTest {
     }
 
     @Test
+    void onCarrierCrewChanged_emptyMothballedCarrierIsKept() {
+        // setMothballed(true) strips every crew member, firing a crew event each; the last arrives with the crew
+        // already empty and isMothballed already true. MothballInfo restores the crew on activation - so the carrier
+        // must survive. This failed in play: a contract start mothballed the force and every carrier was deleted.
+        Campaign campaign = mock(Campaign.class);
+        Unit carrier = mock(Unit.class);
+        when(carrier.isCarrier()).thenReturn(true);
+        when(carrier.isMothballed()).thenReturn(true);
+        when(carrier.getCrew()).thenReturn(List.of());
+
+        SupportCarrierReconciler.onCarrierCrewChanged(campaign, carrier);
+
+        verify(campaign, never()).removeUnit(any(UUID.class));
+    }
+
+    @Test
+    void onCarrierCrewChanged_emptyMothballingCarrierIsKept() {
+        Campaign campaign = mock(Campaign.class);
+        Unit carrier = mock(Unit.class);
+        when(carrier.isCarrier()).thenReturn(true);
+        when(carrier.isMothballing()).thenReturn(true);
+        when(carrier.getCrew()).thenReturn(List.of());
+
+        SupportCarrierReconciler.onCarrierCrewChanged(campaign, carrier);
+
+        verify(campaign, never()).removeUnit(any(UUID.class));
+    }
+
+    @Test
     void onCarrierCrewChanged_emptyFightingUnitIsNotRemoved() {
         Campaign campaign = mock(Campaign.class);
         Unit fightingUnit = mock(Unit.class);
