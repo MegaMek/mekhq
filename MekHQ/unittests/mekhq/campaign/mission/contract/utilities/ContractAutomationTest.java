@@ -90,13 +90,20 @@ class ContractAutomationTest {
         void onlyMothballsUnitsBelongingToTheGivenDetachment() {
             UUID idInDetachment = UUID.randomUUID();
             UUID idOtherDetachment = UUID.randomUUID();
+
             Unit unitInDetachment = mothballableUnit();
             Unit unitOtherDetachment = mothballableUnit();
 
+            when(unitInDetachment.getId()).thenReturn(idInDetachment);
+            when(unitOtherDetachment.getId()).thenReturn(idOtherDetachment);
+
             PlayerForce force = mock(PlayerForce.class);
             Formation formation = mock(Formation.class);
+
             // Both units sit in the shared TO&E...
-            when(formation.getUnits()).thenReturn(new Vector<>(List.of(idInDetachment, idOtherDetachment)));
+            when(formation.getUnits())
+                  .thenReturn(new Vector<>(List.of(idInDetachment, idOtherDetachment)));
+
             Campaign campaign = campaignWithFormationUnits(force, formation);
             when(campaign.getUnit(idInDetachment)).thenReturn(unitInDetachment);
             when(campaign.getUnit(idOtherDetachment)).thenReturn(unitOtherDetachment);
@@ -111,9 +118,14 @@ class ContractAutomationTest {
                 ContractAutomation.performAutomatedMothballing(campaign, detachment);
 
                 // The list is recorded on the detachment, not force-wide.
-                assertIterableEquals(List.of(idInDetachment), detachment.getAutomatedMothballUnits());
-                // The unit from another detachment is never mothballed.
+                assertIterableEquals(
+                      List.of(idInDetachment),
+                      detachment.getAutomatedMothballUnits());
+
+                // The unit from this detachment is mothballed.
                 verify(unitInDetachment).startMothballing(null, true);
+
+                // The unit from another detachment is never mothballed.
                 verify(unitOtherDetachment, never()).startMothballing(null, true);
             }
         }
