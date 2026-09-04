@@ -38,6 +38,7 @@ import mekhq.campaign.events.persons.PersonChangedEvent;
 import mekhq.campaign.events.persons.PersonCrewAssignmentEvent;
 import mekhq.campaign.events.persons.PersonEvent;
 import mekhq.campaign.events.persons.PersonNewEvent;
+import mekhq.campaign.events.persons.PersonStatusChangedEvent;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.enums.PersonnelRole;
 import mekhq.campaign.unit.Unit;
@@ -110,11 +111,14 @@ public record CampaignEventProcessor(Campaign campaign) {
      */
     @Subscribe
     public void handleSupportRoleChange(PersonChangedEvent personChangedEvent) {
-        // PersonCrewAssignmentEvent extends PersonChangedEvent, so it arrives here as well as at
-        // handlePersonUnitAssignmentEvent. A crew change is not a role or status change and must never seat anyone:
-        // the event that Unit.remove fires during removePerson would otherwise re-seat the character being deleted,
-        // leaving a ghost crew reference in the carrier once the roster entry is gone.
-        if (personChangedEvent instanceof PersonCrewAssignmentEvent) {
+        // Only a genuine change to the character - the plain event, or a status change - can alter whether they belong
+        // in a carrier. Every other subclass (crew, tech, force, medical and battle assignment events) is a change to
+        // something else that happens to carry a person, and must never seat anyone: the crew event Unit.remove fires
+        // during removePerson would re-seat the character being deleted, and the tech event every mothballed unit
+        // fires would flood the reconciler once per unit during a contract transit.
+        boolean isRoleOrStatusChange = (personChangedEvent.getClass() == PersonChangedEvent.class)
+                                             || (personChangedEvent instanceof PersonStatusChangedEvent);
+        if (!isRoleOrStatusChange) {
             return;
         }
         Person person = personChangedEvent.getPerson();

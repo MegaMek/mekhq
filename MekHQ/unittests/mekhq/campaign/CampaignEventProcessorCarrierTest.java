@@ -40,6 +40,8 @@ import static org.mockito.Mockito.when;
 
 import mekhq.campaign.events.persons.PersonChangedEvent;
 import mekhq.campaign.events.persons.PersonCrewAssignmentEvent;
+import mekhq.campaign.events.persons.PersonStatusChangedEvent;
+import mekhq.campaign.events.persons.PersonTechAssignmentEvent;
 import mekhq.campaign.force.PlayerForce;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.enums.PersonnelRole;
@@ -72,6 +74,34 @@ class CampaignEventProcessorCarrierTest {
 
         // Reaching the reconciler's seating path would resolve the Support Command formation first.
         verify(playerForce, never()).getSupportCommandFormation();
+    }
+
+    @Test
+    void techAssignmentEvent_doesNotSeatAnUnassignedSupportCharacter() {
+        // Every mothballed unit drops its maintenance tech, firing this event; during a contract transit that is one
+        // per unit in the force. It is not a role or status change and must not reach the reconciler.
+        Campaign campaign = mock(Campaign.class);
+        PlayerForce playerForce = mock(PlayerForce.class);
+        when(campaign.getPlayerForce()).thenReturn(playerForce);
+        Person person = unseatedAdministrator();
+
+        new CampaignEventProcessor(campaign).handleSupportRoleChange(new PersonTechAssignmentEvent(person, null));
+
+        verify(playerForce, never()).getSupportCommandFormation();
+    }
+
+    @Test
+    void statusChangedEvent_stillReachesTheReconciler() {
+        Campaign campaign = mock(Campaign.class);
+        PlayerForce playerForce = mock(PlayerForce.class);
+        when(campaign.getPlayerForce()).thenReturn(playerForce);
+        when(playerForce.getSupportCommandFormation()).thenReturn(null);
+        Person person = unseatedAdministrator();
+
+        new CampaignEventProcessor(campaign).handleSupportRoleChange(new PersonStatusChangedEvent(person));
+
+        // A return to duty arrives as this subclass and must be consulted.
+        verify(playerForce, times(1)).getSupportCommandFormation();
     }
 
     @Test

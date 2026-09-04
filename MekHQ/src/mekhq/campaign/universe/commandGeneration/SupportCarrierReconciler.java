@@ -684,10 +684,15 @@ public final class SupportCarrierReconciler {
      * <p>Mothballing strips a unit's crew and pulls it out of its formation; {@code MothballInfo} keeps both and puts
      * them back on activation. To the reconciler the mothballed carrier looks empty and orphaned, and without this
      * guard it would delete the carrier and then build new ones for the loose crew - which is what happened when a
-     * contract start mothballed the whole force for transit.</p>
+     * contract start mothballed the whole force for transit. The restore itself is not atomic, so the guard also
+     * holds until it has finished.</p>
      */
     private static boolean isParked(Unit carrier) {
-        return carrier.isDeployed() || carrier.isMothballed() || carrier.isMothballing();
+        // hasPendingMothballRestore covers the activation window: mothballed is cleared first, then crew is put back
+        // one at a time and the formation last. Without it, an event landing mid-restore sees an un-parked carrier
+        // that is out of the TOE and half-crewed, and builds a duplicate beside it.
+        return carrier.isDeployed() || carrier.isMothballed() || carrier.isMothballing()
+                     || carrier.hasPendingMothballRestore();
     }
 
     /** Whether any of these carriers is parked. */

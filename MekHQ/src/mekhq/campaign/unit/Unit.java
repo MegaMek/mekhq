@@ -6725,6 +6725,19 @@ public class Unit implements ITechnology, ILocatable {
     }
 
     /**
+     * Whether this unit still holds the crew and formation it had before mothballing, waiting to be put back.
+     *
+     * <p>Set when mothballing starts and cleared only after activation has restored everything, so it stays
+     * {@code true} through the window where the unit is no longer mothballed but not yet re-crewed or re-filed.
+     * Always {@code false} when the save-mothball-state option is off.</p>
+     *
+     * @return {@code true} while a pre-mothball restore is pending
+     */
+    public boolean hasPendingMothballRestore() {
+        return mothballInfo != null;
+    }
+
+    /**
      * Gets the time (in minutes) remaining to mothball or activate the unit.
      *
      * @return The time (in minutes) remaining to mothball or activate the unit.
