@@ -57,6 +57,7 @@ import mekhq.campaign.universe.Factions;
 import mekhq.campaign.universe.commandGeneration.CommandGenerationOptions;
 import mekhq.gui.commandGeneration.contents.SetupTab;
 import mekhq.gui.commandGeneration.contents.SparesAndFinancesTab;
+import mekhq.utilities.MHQInternationalization;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import testUtilities.MHQTestUtilities;
@@ -66,9 +67,10 @@ import testUtilities.MHQTestUtilities;
  *
  * <p>The tabs are built the way the dialog builds them and every control walked: check boxes, radio buttons,
  * drop-downs, spinners, text fields, sliders and buttons. Each must carry a tooltip that is not blank and is
- * not the {@code !key!} placeholder the bundle lookup returns for a missing key. The Force Generator tab's
- * controls come from MegaMek's own panel, which sets its tooltips from MegaMek's bundle, so it is covered
- * there.</p>
+ * not the {@code !key!} placeholder the bundle lookup returns for a missing key. A spinner's text field and a
+ * drop-down's arrow button are checked as well: they are what the pointer actually rests on, and the look and
+ * feel is expected to hand them the parent's tooltip. The Force Generator tab's controls come from MegaMek's
+ * own panel, which sets its tooltips from MegaMek's bundle, so it is covered there.</p>
  */
 class CommandGenerationTooltipsTest {
 
@@ -105,7 +107,7 @@ class CommandGenerationTooltipsTest {
         for (JComponent control : controls) {
             String tooltip = control.getToolTipText();
             boolean isBlank = (tooltip == null) || tooltip.isBlank();
-            boolean isPlaceholder = (tooltip != null) && tooltip.startsWith("!");
+            boolean isPlaceholder = (tooltip != null) && !MHQInternationalization.isResourceKeyValid(tooltip);
             if (isBlank || isPlaceholder) {
                 missing.add(describe(control));
             }
@@ -114,17 +116,26 @@ class CommandGenerationTooltipsTest {
     }
 
     /**
-     * Gathers the controls a player operates. A spinner's own text field and a drop-down's arrow button are
-     * parts of their control and are not listed on their own; the spinner or drop-down carries the tooltip.
+     * Gathers the controls a player operates. A spinner is listed with its text field and a drop-down with its
+     * arrow button, since those are the parts the pointer rests on; the look and feel passes the parent's tooltip
+     * down to them, and this checks that it did.
      */
     private static void collectControls(Container container, List<JComponent> into) {
         for (Component component : container.getComponents()) {
             if (component instanceof JSpinner spinner) {
                 into.add(spinner);
+                if (spinner.getEditor() instanceof JSpinner.DefaultEditor editor) {
+                    into.add(named(editor.getTextField(), spinner.getName() + " text field"));
+                }
                 continue;
             }
             if (component instanceof JComboBox<?> dropDown) {
                 into.add(dropDown);
+                for (Component part : dropDown.getComponents()) {
+                    if (part instanceof AbstractButton arrowButton) {
+                        into.add(named(arrowButton, dropDown.getName() + " arrow button"));
+                    }
+                }
                 continue;
             }
             boolean isControl = (component instanceof AbstractButton)
@@ -137,6 +148,14 @@ class CommandGenerationTooltipsTest {
                 collectControls(child, into);
             }
         }
+    }
+
+    /** Gives a nameless part of a control a name that says which control it belongs to. */
+    private static JComponent named(JComponent part, String name) {
+        if ((part.getName() == null) || part.getName().isBlank()) {
+            part.setName(name);
+        }
+        return part;
     }
 
     private static String describe(JComponent control) {
