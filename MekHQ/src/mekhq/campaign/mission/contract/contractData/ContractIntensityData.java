@@ -45,7 +45,6 @@ import mekhq.campaign.mission.contract.AbstractContract;
  * without disturbing the rest (as {@link AbstractContract}'s scalar setters do).</p>
  *
  * @param scale                  the support-point/Battle-Value scale the contract is sized at
- * @param requiredCombatElements how many combat elements the contract expects the player to field
  * @param requiredVictoryPoints  the victory points needed to win the contract
  * @param trackCount             the number of StratCon tracks the contract runs
  * @param monthlyTrackCounts     the scenario schedule: how those tracks are spread across the contract's months, rolled
@@ -57,7 +56,7 @@ import mekhq.campaign.mission.contract.AbstractContract;
  *                               the source table's native length rather than the contract's, that consumer folds any
  *                               overflow tail into the final month.
  */
-public record ContractIntensityData(int scale, int requiredCombatElements, int requiredVictoryPoints, int trackCount,
+public record ContractIntensityData(int scale, int requiredVictoryPoints, int trackCount,
       List<Integer> monthlyTrackCounts) {
     public ContractIntensityData {
         // Defensive copy so the schedule is genuinely immutable regardless of the list the caller passed.
@@ -68,36 +67,30 @@ public record ContractIntensityData(int scale, int requiredCombatElements, int r
      * returns a zeroed instance with an empty schedule, the starting state before any parameter is determined
      */
     public ContractIntensityData() {
-        this(0, 0, 0, 0, List.of());
+        this(0, 0, 0, List.of());
     }
 
     /** @return a copy with {@code scale} replaced */
     public ContractIntensityData withScale(int scale) {
-        return new ContractIntensityData(scale, requiredCombatElements, requiredVictoryPoints, trackCount,
-              monthlyTrackCounts);
-    }
-
-    /** @return a copy with {@code requiredCombatElements} replaced */
-    public ContractIntensityData withRequiredCombatElements(int requiredCombatElements) {
-        return new ContractIntensityData(scale, requiredCombatElements, requiredVictoryPoints, trackCount,
+        return new ContractIntensityData(scale, requiredVictoryPoints, trackCount,
               monthlyTrackCounts);
     }
 
     /** @return a copy with {@code requiredVictoryPoints} replaced */
     public ContractIntensityData withRequiredVictoryPoints(int requiredVictoryPoints) {
-        return new ContractIntensityData(scale, requiredCombatElements, requiredVictoryPoints, trackCount,
+        return new ContractIntensityData(scale, requiredVictoryPoints, trackCount,
               monthlyTrackCounts);
     }
 
     /** @return a copy with {@code trackCount} replaced */
     public ContractIntensityData withTrackCount(int trackCount) {
-        return new ContractIntensityData(scale, requiredCombatElements, requiredVictoryPoints, trackCount,
+        return new ContractIntensityData(scale, requiredVictoryPoints, trackCount,
               monthlyTrackCounts);
     }
 
     /** @return a copy with the scenario schedule ({@code monthlyTrackCounts}) replaced */
     public ContractIntensityData withMonthlyTrackCounts(List<Integer> monthlyTrackCounts) {
-        return new ContractIntensityData(scale, requiredCombatElements, requiredVictoryPoints, trackCount,
+        return new ContractIntensityData(scale, requiredVictoryPoints, trackCount,
               monthlyTrackCounts);
     }
 
