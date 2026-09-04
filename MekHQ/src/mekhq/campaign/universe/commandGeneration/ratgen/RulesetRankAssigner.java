@@ -33,9 +33,12 @@
 package mekhq.campaign.universe.commandGeneration.ratgen;
 
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.HashSet;
+import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 
@@ -98,6 +101,22 @@ public final class RulesetRankAssigner {
     }
 
     /**
+     * What the rank passes promoted.
+     *
+     * @param rootCommander the commander promoted at the campaign-root formation, the one the dialog tags with
+     *                      the commander flag, or {@code null} when ranks are off, the campaign has no
+     *                      formations, or the root has no eligible person
+     * @param officers      every person promoted to an officer rank, the root commander included, with the level
+     *                      of the formation they were promoted at; in promotion order
+     */
+    public record Result(@Nullable Person rootCommander, Map<Person, FormationLevel> officers) {
+
+        public static Result none() {
+            return new Result(null, Map.of());
+        }
+    }
+
+    /**
      * Runs the rank-assignment passes on the campaign's formation tree.
      *
      * @return the commander promoted at the campaign-root formation (i.e. the top-echelon commander
@@ -107,19 +126,29 @@ public final class RulesetRankAssigner {
      */
     @Nullable
     public static Person apply(Campaign campaign, CommandGenerationOptions options) {
+        return applyAndReport(campaign, options).rootCommander();
+    }
+
+    /**
+     * Runs the rank-assignment passes on the campaign's formation tree and reports every promotion.
+     *
+     * @return the promotions made; {@link Result#none()} when ranks are disabled, the campaign has no formations,
+     *       or the root has no eligible Person to promote
+     */
+    public static Result applyAndReport(Campaign campaign, CommandGenerationOptions options) {
         long startNanos = System.nanoTime();
         if (campaign == null || options == null) {
             LOGGER.info("[CompanyGen][RankAssign] apply: campaign or options null, skipping");
-            return null;
+            return Result.none();
         }
         if (!options.isAutomaticallyAssignRanks()) {
             LOGGER.info("[CompanyGen][RankAssign] apply: disabled by isAutomaticallyAssignRanks");
-            return null;
+            return Result.none();
         }
         Formation root = campaign.getPlayerForce().getFormations();
         if (root == null) {
             LOGGER.info("[CompanyGen][RankAssign] apply: campaign has no root Formation, skipping");
-            return null;
+            return Result.none();
         }
 
         Faction specifiedFaction = options.getSpecifiedFaction();
@@ -158,15 +187,20 @@ public final class RulesetRankAssigner {
               enlistedRank, supportRank, root.getName(),
               Thread.currentThread().getName());
 
-        // Pass 1: walk the tree post-order so lance / star commanders claim their officer rank
-        // before their parent company / binary looks for ITS commander among remaining unranked
-        // crew. Each Formation promotes the first not-yet-promoted combat Person in its subtree.
+        // Pass 1: walk the tree. By default it is post-order, so lance / star commanders claim their
+        // officer rank before their parent company / binary looks for ITS commander among the remaining
+        // unranked crew, and each Formation promotes the first not-yet-promoted combat Person in its
+        // subtree. When the options ask for the best commander or the best officers, the walk goes
+        // top-down instead, so the best person in the whole command leads it, the best left in each
+        // company leads that company, and so on; see Selection.
         FormationLevel rootLevel = requestedRootLevel(campaign, options, root);
         LOGGER.info("[CompanyGen][RankAssign][Pass1] BEFORE walkPostOrder rootLevel={}", rootLevel);
         long pass1Start = System.nanoTime();
         Set<Person> promoted = new LinkedHashSet<>();
+        Map<Person, FormationLevel> officers = new LinkedHashMap<>();
         int[] officerCount = { 0 };
-        Person rootCommander = walkPostOrder(campaign, root, rootLevel, promoted, officerCount,
+        Selection selection = Selection.from(campaign, options);
+        Person rootCommander = walk(campaign, root, rootLevel, true, selection, promoted, officers, officerCount,
               targetRankSystem, rankValidator);
         int officersAssigned = officerCount[0];
         long pass1Ms = (System.nanoTime() - pass1Start) / 1_000_000;
@@ -212,13 +246,64 @@ public final class RulesetRankAssigner {
         long totalMs = (System.nanoTime() - startNanos) / 1_000_000;
         LOGGER.info("[CompanyGen][RankAssign] DONE; officers={} enlisted={} support={} totalMs={}",
               officersAssigned, enlistedAssigned, supportAssigned, totalMs);
-        return rootCommander;
+        return new Result(rootCommander, officers);
     }
 
     /**
-     * Walks the formation tree post-order, promoting one Person per Formation node to that
-     * Formation's officer rank.
+     * How commanders are chosen, from the Officer Selection options.
      *
+     * @param commanderOrder how the command's own commander is chosen from everyone, or {@code null} to take the
+     *                       first combat person found
+     * @param officerOrder   how every other formation's commander is chosen from its remaining crew, or
+     *                       {@code null} to take the first combat person found
+     */
+    record Selection(@Nullable Comparator<Person> commanderOrder, @Nullable Comparator<Person> officerOrder) {
+
+        static Selection from(Campaign campaign, CommandGenerationOptions options) {
+            Comparator<Person> commanderOrder = options.isAssignBestCompanyCommander()
+                  ? OfficerSelector.bestFirst(campaign, options.isPrioritizeCompanyCommanderCombatSkills())
+                  : null;
+            Comparator<Person> officerOrder = options.isAssignBestOfficers()
+                  ? OfficerSelector.bestFirst(campaign, options.isPrioritizeOfficerCombatSkills())
+                  : null;
+            LOGGER.info("[CompanyGen][RankAssign] commander chosen {}, other officers chosen {}",
+                  describeOrder(options.isAssignBestCompanyCommander(),
+                        options.isPrioritizeCompanyCommanderCombatSkills()),
+                  describeOrder(options.isAssignBestOfficers(), options.isPrioritizeOfficerCombatSkills()));
+            return new Selection(commanderOrder, officerOrder);
+        }
+
+        private static String describeOrder(boolean bestFirst, boolean combatFirst) {
+            if (!bestFirst) {
+                return "first found";
+            }
+            return combatFirst ? "best first (combat before command skills)" : "best first (command skills before combat)";
+        }
+
+        /**
+         * @return {@code true} when a formation must choose before its sub-formations do, so the best person is
+         *       still available to the higher post
+         */
+        boolean choosesTopDown() {
+            return (commanderOrder != null) || (officerOrder != null);
+        }
+
+        @Nullable
+        Comparator<Person> orderFor(boolean isRoot) {
+            return isRoot ? commanderOrder : officerOrder;
+        }
+    }
+
+    /**
+     * Walks the formation tree, promoting one Person per Formation node to that Formation's officer rank.
+     *
+     * <p>Post-order by default: sub-formations promote first and the parent takes the first combat person left.
+     * When the selection ranks people by skill the walk is top-down instead, each formation choosing the best
+     * person in its subtree before its sub-formations choose from the rest.</p>
+     *
+     * @param isRoot       {@code true} for the campaign-root formation, whose commander is chosen by the
+     *                     commander order rather than the officer order
+     * @param officers     receives every person promoted, with the level they were promoted at
      * @param officerCount single-element counter incremented for every Person promoted (the array
      *                     wrapping lets the recursive call accumulate while we return the actual
      *                     promoted Person for the caller's formation)
@@ -227,23 +312,46 @@ public final class RulesetRankAssigner {
      *         force commander.
      */
     @Nullable
-    private static Person walkPostOrder(Campaign campaign, Formation formation,
-          @Nullable FormationLevel level, Set<Person> promoted, int[] officerCount,
-          RankSystem targetRankSystem, RankValidator rankValidator) {
+    private static Person walk(Campaign campaign, Formation formation, @Nullable FormationLevel level,
+          boolean isRoot, Selection selection, Set<Person> promoted, Map<Person, FormationLevel> officers,
+          int[] officerCount, RankSystem targetRankSystem, RankValidator rankValidator) {
         FormationLevel subLevel = oneLevelBelow(campaign, level);
-        for (Formation sub : formation.getSubFormations()) {
-            walkPostOrder(campaign, sub, subLevel, promoted, officerCount, targetRankSystem, rankValidator);
+        Person commander = null;
+        if (selection.choosesTopDown()) {
+            commander = promoteCommander(campaign, formation, level, selection.orderFor(isRoot), promoted, officers,
+                  officerCount, targetRankSystem, rankValidator);
         }
+        for (Formation sub : formation.getSubFormations()) {
+            walk(campaign, sub, subLevel, false, selection, promoted, officers, officerCount, targetRankSystem,
+                  rankValidator);
+        }
+        if (!selection.choosesTopDown()) {
+            commander = promoteCommander(campaign, formation, level, null, promoted, officers, officerCount,
+                  targetRankSystem, rankValidator);
+        }
+        return commander;
+    }
+
+    /**
+     * Promotes one person to the formation's officer rank.
+     *
+     * @return the person promoted, or {@code null} when the level has no rank or nobody was left to promote
+     */
+    @Nullable
+    private static Person promoteCommander(Campaign campaign, Formation formation, @Nullable FormationLevel level,
+          @Nullable Comparator<Person> bestFirst, Set<Person> promoted, Map<Person, FormationLevel> officers,
+          int[] officerCount, RankSystem targetRankSystem, RankValidator rankValidator) {
         int rankIndex = rankIndexForLevel(level);
         if (rankIndex < 0) {
             LOGGER.info("[CompanyGen][RankAssign][Pass1]   formation '{}' (level={}) -> no rank mapping, skip",
                   formation.getName(), level);
             return null;
         }
-        Person commander = pickCommander(campaign, formation, promoted);
+        Person commander = pickCommander(campaign, formation, promoted, bestFirst);
         if (commander != null) {
             setRankWithFallback(commander, rankIndex, targetRankSystem, rankValidator);
             promoted.add(commander);
+            officers.put(commander, level);
             officerCount[0]++;
             LOGGER.info("[CompanyGen][RankAssign][Pass1]   formation '{}' (level={}) -> '{}' promoted to rank index {} (effective={})",
                   formation.getName(), level, commander.getFullName(), rankIndex,
@@ -309,11 +417,17 @@ public final class RulesetRankAssigner {
     }
 
     /**
-     * Finds the first combat Person in the formation's subtree who hasn't already been promoted by
-     * a deeper formation. For the MVP this is "first not-yet-promoted"; a future refinement can
-     * sort by skill (combat-weighted when isPrioritizeOfficerCombatSkills is on).
+     * Finds the combat Person in the formation's subtree to promote: the first not yet promoted, or the best of
+     * them when an order is given.
+     *
+     * @param bestFirst the order to choose by, best first, or {@code null} to take the first found
      */
-    private static Person pickCommander(Campaign campaign, Formation formation, Set<Person> promoted) {
+    @Nullable
+    private static Person pickCommander(Campaign campaign, Formation formation, Set<Person> promoted,
+          @Nullable Comparator<Person> bestFirst) {
+        // A single-seat pilot is listed as both driver and gunner of their unit, so the crew walk names them
+        // twice; a set keeps each candidate once.
+        Set<Person> candidates = new LinkedHashSet<>();
         for (UUID unitId : formation.getAllUnits(false)) {
             Unit unit = campaign.getUnit(unitId);
             if (unit == null) {
@@ -326,12 +440,25 @@ public final class RulesetRankAssigner {
                 if (promoted.contains(person)) {
                     continue;
                 }
-                if (person.isCombat()) {
+                if (!person.isCombat()) {
+                    continue;
+                }
+                if (bestFirst == null) {
                     return person;
                 }
+                candidates.add(person);
             }
         }
-        return null;
+        if (candidates.isEmpty()) {
+            return null;
+        }
+        List<Person> ranked = new ArrayList<>(candidates);
+        ranked.sort(bestFirst);
+        Person chosen = ranked.getFirst();
+        String runnerUp = (ranked.size() > 1) ? OfficerSelector.describe(campaign, ranked.get(1)) : "nobody";
+        LOGGER.info("[CompanyGen][RankAssign][Pick]   formation '{}': {} chosen over {} other(s); next best {}",
+              formation.getName(), OfficerSelector.describe(campaign, chosen), ranked.size() - 1, runnerUp);
+        return chosen;
     }
 
     /**

@@ -509,16 +509,26 @@ public final class CommandGenerator {
         }
         FormationIconBuilder.applyIcons(campaign.getPlayerForce().getFormations(), campaign, options);
 
-        // 7c. Tree-aware rank assignment. Walks the Formation tree post-order and assigns each
-        // node's commander the officer rank matching their FormationLevel (Lt → Lance, Capt →
-        // Company, Major → Battalion, …). Non-officer combat crew get Sergeant-equivalent; any
-        // support crew already attached to a Unit at this point get Corporal-equivalent. Gated on
-        // isAutomaticallyAssignRanks.
+        // 7b2. The most skilled pilots take the seats in the leading lances, when asked. Before ranks,
+        // so the commanders chosen next are chosen from where the pilots will actually sit.
+        LOGGER.info("[CompanyGen][Pipeline]Stage 7b2: seating the most skilled pilots in the leading lances");
+        PilotSkillSorter.apply(campaign, options);
+
+        // 7c. Tree-aware rank assignment. Walks the Formation tree and assigns each node's commander
+        // the officer rank matching their FormationLevel (Lt -> Lance, Capt -> Company, Major ->
+        // Battalion, ...), choosing by skill when the Officer Selection options ask for it. Non-officer
+        // combat crew get Sergeant-equivalent; any support crew already attached to a Unit at this
+        // point get Corporal-equivalent. Gated on isAutomaticallyAssignRanks.
         LOGGER.info("[CompanyGen][Pipeline]Stage 7c: tree-aware rank assignment");
         if (listener != null) {
             listener.updateProgress(0.0, "Assigning ranks...");
         }
-        Person rootCommander = RulesetRankAssigner.apply(campaign, options);
+        RulesetRankAssigner.Result ranks = RulesetRankAssigner.applyAndReport(campaign, options);
+        Person rootCommander = ranks.rootCommander();
+
+        // 7c2. Officers get the skills that come with the post, when Generate Captains is on.
+        LOGGER.info("[CompanyGen][Pipeline]Stage 7c2: officer skill increases");
+        OfficerSkillBooster.apply(options, ranks);
 
         // 7e. Support: generate support personnel and standalone support vehicles sized to the
         // campaign's current force, and organize the support staff into the TOE. Extracted into
