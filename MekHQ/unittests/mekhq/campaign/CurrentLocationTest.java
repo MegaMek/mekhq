@@ -359,7 +359,6 @@ public class CurrentLocationTest {
             when(campaign.getCampaignOptions()).thenReturn(new CampaignOptions());
             when(campaign.getLocalDate()).thenReturn(today);
             when(campaign.isUseCommandCircuit()).thenReturn(false);
-            when(campaign.getPlayerForce().getAutomatedMothballUnits()).thenReturn(Collections.emptyList());
             when(campaign.getFutureContracts()).thenReturn(Collections.emptyList());
 
             currentLocation = new CurrentLocation(system, 0.0);

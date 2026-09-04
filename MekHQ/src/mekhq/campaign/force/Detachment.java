@@ -34,7 +34,10 @@ package mekhq.campaign.force;
 
 import static mekhq.campaign.mission.contract.utilities.ContractAutomation.performAutomatedActivation;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Objects;
+import java.util.UUID;
 
 import jakarta.annotation.Nonnull;
 import megamek.common.annotations.Nullable;
@@ -79,6 +82,8 @@ public class Detachment implements IPlace {
     private final LocalPersonnel personnel = new LocalPersonnel();
     private final RequestedStockLevels requestedStockLevels = new RequestedStockLevels();
     private LocalWarehouse parts = new LocalWarehouse();
+
+    private List<UUID> automatedMothballUnits = new ArrayList<>();
 
     public Detachment() {
         // The manager owns the LocationNode; build it first so parenting the resources can resolve this node.
@@ -129,6 +134,16 @@ public class Detachment implements IPlace {
         return requestedStockLevels;
     }
 
+    public List<UUID> getAutomatedMothballUnits() {
+        return automatedMothballUnits;
+    }
+
+    public void setAutomatedMothballUnits(List<UUID> automatedMothballUnits) {
+        this.automatedMothballUnits = (automatedMothballUnits == null)
+              ? new ArrayList<>()
+              : new ArrayList<>(automatedMothballUnits);
+    }
+
     /**
      * Runs the detachment's arrival behavior when it finishes travelling to a location. The {@link Campaign} is
      * supplied as a parameter (a detachment holds no campaign reference) for the systems this drives: automated
@@ -137,8 +152,8 @@ public class Detachment implements IPlace {
     @Override
     public void onArrival(Campaign campaign, boolean isSilentProcessing) {
         // This should be before inoculations so that we can correctly read the TO&E.
-        if (!campaign.getPlayerForce().getAutomatedMothballUnits().isEmpty()) {
-            performAutomatedActivation(campaign);
+        if (!automatedMothballUnits.isEmpty()) {
+            performAutomatedActivation(campaign, this);
         }
 
         CampaignOptions campaignOptions = campaign.getCampaignOptions();
