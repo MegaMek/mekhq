@@ -96,11 +96,11 @@
   <header class="masthead">
     <div class="eyebrow">MekHQ &middot; Pre-review checklist &middot; Keep support carriers current</div>
     <h1>Playtest before this PR opens</h1>
-    <p class="standfirst">Eighteen checks, roughly 55 minutes. The unit tests cover the guards and the release path; everything here covers what they cannot &mdash; seating against real TOE state, the two new persisted fields, and the deployment gate.</p>
+    <p class="standfirst">Nineteen checks, roughly 60 minutes. The unit tests cover the guards and the release path; everything here covers what they cannot &mdash; seating against real TOE state, the two new persisted fields, and the deployment gate.</p>
     <div class="meta-strip">
       <span class="chip">Branch: Implement-Keep-Carriers-Current</span>
-      <span class="chip">Commit 5fc306c4bd</span>
-      <span class="chip">~55 min</span>
+      <span class="chip">Commit fed1519ab9</span>
+      <span class="chip">~60 min</span>
     </div>
   </header>
 
@@ -119,7 +119,7 @@
         <li>Build from the branch, and keep <code>mekhq.log</code> open alongside &mdash; several checks are "and nothing was logged as an error".</li>
         <li>Two saves are useful: a fresh command generated on this branch, and the <span class="path">Violence as a Service31510108_Cooker</span> save from issue #9880, which predates the carrier flag and exercises the migration path.</li>
         <li>The TOE tab is where most of this is read. Support Command hangs off the campaign HQ formation.</li>
-        <li>Four checks are marked <span class="pill gate">gate</span> (03, 04, 14, 16). If any of those fails, the PR does not open &mdash; they cover new persisted state and permanent data loss.</li>
+        <li>Five checks are marked <span class="pill gate">gate</span> (03, 04, 14, 16, 17). If any of those fails, the PR does not open &mdash; they cover new persisted state and permanent data loss.</li>
       </ul>
     </div>
   </section>
@@ -414,11 +414,29 @@
       </div>
     </div>
 
-    <div class="test" data-test>
+
+    <div class="test gate" data-test>
       <div class="test-head">
         <span class="tid">17</span>
         <input type="checkbox" id="t17">
-        <label for="t17">Seated staff still do their jobs</label>
+        <label for="t17">Contract transit mothballs the carriers and brings them back</label>
+        <span class="pill gate">gate</span>
+      </div>
+      <div class="body">
+        <div><span class="k">Do</span> Accept a contract on another system with the automated mothball-and-travel option on, so the whole force is GM-mothballed for the jump. While in transit, hire one technician. Advance days until arrival and automated activation.</div>
+        <div class="expect">
+          <span class="k">Expect</span>
+          <span>On mothballing: <strong>no</strong> <code>Removing empty support carrier</code> lines at all &mdash; every carrier survives, empty and out of the TOE, waiting. The transit hire logs <code>Not seating NAME: a MekTech carrier is deployed or mothballed</code> and stays loose. On arrival, activation restores each carrier&rsquo;s crew and puts it back in its formation, and the TOE reads as it did before departure. The loose hire is seated on their next event. This failed in play: mothballing stripped every crew and the reconciler deleted all 21 carriers in one second.</span>
+          <span class="fail">Fails if: any carrier is removed during mothballing, new carriers are built while the real ones are mothballed, or carriers come back on arrival without their crew or outside the TOE.</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="test" data-test>
+      <div class="test-head">
+        <span class="tid">18</span>
+        <input type="checkbox" id="t18">
+        <label for="t18">Seated staff still do their jobs</label>
         <span class="pill reg">regression</span>
       </div>
       <div class="body">
@@ -433,9 +451,9 @@
 
     <div class="test" data-test>
       <div class="test-head">
-        <span class="tid">18</span>
-        <input type="checkbox" id="t18">
-        <label for="t18">A campaign with no Support Command is left alone</label>
+        <span class="tid">19</span>
+        <input type="checkbox" id="t19">
+        <label for="t19">A campaign with no Support Command is left alone</label>
         <span class="pill new">new</span>
       </div>
       <div class="body">
@@ -466,9 +484,9 @@
             <tr><td><code>Removing empty support formation NAME</code></td><td>Its last carrier went with it</td><td>13</td></tr>
             <tr><td><code>Marked N pre-existing support carrier(s) during load</code></td><td>Migration recognised an older save&#39;s carriers</td><td>04</td></tr>
             <tr><td><code>Support carrier reconciliation: seated N, released N, removed N empty carrier(s), reshaped N profession(s)</code></td><td>The load sweep ran; always written, even at 0/0/0/0. <code>reshaped</code> covers headcount that changed with no event, such as the loader dropping crew whose roster entry is gone</td><td>04, 05</td></tr>
-            <tr><td><code>Not seating NAME: a LABEL carrier is deployed</code></td><td>Hire arrived while that profession has a carrier in the field; seated on their next event after it returns</td><td>16</td></tr>
+            <tr><td><code>Not seating NAME: a LABEL carrier is deployed or mothballed</code></td><td>Hire arrived while that profession has a carrier in a battle or in mothballs; seated on their next event after it returns</td><td>16, 17</td></tr>
             <tr><td><code>Deployment changed: reshaped N support profession(s)</code></td><td>A deployment ended and a profession was caught up</td><td>16</td></tr>
-            <tr><td><code>Support carrier reconciliation: no Support Command formation, so carriers are not managed</code></td><td>Campaign never opted in; reconciler stays out</td><td>18</td></tr>
+            <tr><td><code>Support carrier reconciliation: no Support Command formation, so carriers are not managed</code></td><td>Campaign never opted in; reconciler stays out</td><td>19</td></tr>
             <tr><td><code>Could not build a support carrier UNIT; the profession keeps its current shape</code></td><td>WARN &mdash; a carrier unit failed to load; the reshape was abandoned before anything moved</td><td>any</td></tr>
             <tr><td><code>Unit ... references missing driver ...</code> on load</td><td>ERROR &mdash; a carrier holds a crew id for someone no longer in the roster. Should never appear on a save written by this branch</td><td>14</td></tr>
             <tr><td>Any <code>ERROR</code> naming a support or carrier class</td><td>Stop and capture it</td><td>any</td></tr>
@@ -483,15 +501,15 @@
     <div class="prose">
       <p>Record the outcome here before opening the PR, and paste the summary into the PR's Testing section. The checklist result has to be reported in chat as well as ticked &mdash; a run nobody reported has not been run.</p>
       <ul>
-        <li><strong>All eighteen passing?</strong> If yes, the PR can open with the checklist result in the Testing section.</li>
-        <li><strong>A gate failed?</strong> Do not open. Gates 03, 04, 14 and 16 cover new persisted state and permanent data loss.</li>
+        <li><strong>All nineteen passing?</strong> If yes, the PR can open with the checklist result in the Testing section.</li>
+        <li><strong>A gate failed?</strong> Do not open. Gates 03, 04, 14, 16 and 17 cover new persisted state and permanent data loss.</li>
         <li><strong>A non-gate failed?</strong> Judgement call &mdash; fix it, or open with it named explicitly under "What is not proven yet".</li>
       </ul>
     </div>
   </section>
 
   <footer>
-    <span>Feature branch <span class="path">Implement-Keep-Carriers-Current</span>, commit <span class="path">5fc306c4bd</span>. Companion to the implementation plan and the support-carriers design note.</span>
+    <span>Feature branch <span class="path">Implement-Keep-Carriers-Current</span>, commit <span class="path">fed1519ab9</span>. Companion to the implementation plan and the support-carriers design note.</span>
     <span>Ticks are remembered in this browser only, so you can close the page between sessions.</span>
   </footer>
 
