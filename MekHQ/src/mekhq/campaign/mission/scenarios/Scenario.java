@@ -936,7 +936,8 @@ public class Scenario implements IPlayerSettings {
      * @return true if the unit is eligible, otherwise false
      */
     public boolean canDeploy(Unit unit, Campaign campaign) {
-        if (unit.isCarrier() && !SupportCarrierDeployment.isAllowed(this)) {
+        // Null-guarded so a stale formation entry behaves exactly as it did before this check existed.
+        if ((unit != null) && unit.isCarrier() && !SupportCarrierDeployment.isAllowed(this)) {
             return false;
         }
         // first check to see if this unit is a traitor unit

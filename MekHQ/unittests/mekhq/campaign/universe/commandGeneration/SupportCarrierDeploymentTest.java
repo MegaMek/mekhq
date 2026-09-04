@@ -63,6 +63,15 @@ class SupportCarrierDeploymentTest {
     }
 
     @Test
+    void canDeploy_nullUnitIsNotACarrier() {
+        // Callers pass campaign.getUnit(id), which is null for a stale formation entry. Before the carrier gate a
+        // bare scenario returned true for that; the gate must not turn it into an NPE.
+        Scenario scenario = new Scenario("gate test");
+
+        assertTrue(scenario.canDeploy(null, mock(Campaign.class)));
+    }
+
+    @Test
     void canDeploy_stillAcceptsAFightingUnit() {
         Scenario scenario = new Scenario("gate test");
         Unit mek = mock(Unit.class);

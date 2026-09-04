@@ -2336,6 +2336,9 @@ public final class BriefingTab extends CampaignGuiTab {
 
         for (UUID uid : uids) {
             Unit u = getCampaign().getUnit(uid);
+            if (u == null) {
+                continue;
+            }
             // A support carrier that stayed home is not a unit that failed to deploy; it is skipped rather than
             // listed in the warning below.
             if (u.isCarrier() && !SupportCarrierDeployment.isAllowed(scenario)) {

@@ -595,7 +595,8 @@ public abstract class AtBScenario extends Scenario implements IAtBScenario {
     public boolean canDeploy(Unit unit, Campaign campaign) {
         // Repeated from Scenario.canDeploy rather than inherited: this override does not delegate to super, and
         // widening it to do so would also apply the traitor and deployment-limit checks that AtB deliberately skips.
-        if (unit.isCarrier() && !SupportCarrierDeployment.isAllowed(this)) {
+        // Null-guarded: this override never dereferenced unit before, and a stale formation entry can hand it null.
+        if ((unit != null) && unit.isCarrier() && !SupportCarrierDeployment.isAllowed(this)) {
             return false;
         }
         if (isBigBattle() && (getForces(campaign).getAllUnits(false).size() > 7)) {
