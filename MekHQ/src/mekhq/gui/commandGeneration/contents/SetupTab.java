@@ -362,6 +362,8 @@ public class SetupTab {
         astechGroup.add(rdoAstechsAsPersonnel);
         rdoAstechsAsPool.setSelected(true);
         cmbAstechSkillLevel = buildSkillLevelCombo("cmbAstechSkillLevel");
+        cmbAstechSkillLevel.setToolTipText(wrapTooltip(
+              getTextAt(getCommandGenerationResourceBundle(), "lblAstechSkillLevel.tooltip"), null));
 
         // Medic block
         chkGenerateMedics = new CommandGenerationCheckBox("GenerateMedics");
@@ -372,6 +374,8 @@ public class SetupTab {
         medicGroup.add(rdoMedicsAsPersonnel);
         rdoMedicsAsPool.setSelected(true);
         cmbMedicSkillLevel = buildSkillLevelCombo("cmbMedicSkillLevel");
+        cmbMedicSkillLevel.setToolTipText(wrapTooltip(
+              getTextAt(getCommandGenerationResourceBundle(), "lblMedicSkillLevel.tooltip"), null));
 
         // Enable/disable wiring: parent checkbox controls the radios + skill dropdown;
         // "as Personnel" radio controls whether the skill dropdown is live.
