@@ -36,7 +36,6 @@ package mekhq.campaign.mission.utilities;
 import static java.lang.Math.ceil;
 import static java.lang.Math.floor;
 import static java.lang.Math.max;
-import static megamek.common.compute.Compute.d6;
 import static mekhq.campaign.force.FormationType.STANDARD;
 
 import java.time.LocalDate;
@@ -147,45 +146,6 @@ public class ContractUtilities {
     }
 
     /**
-     * Calculates the variance factor based on the given roll value and a fixed formation size divisor.
-     *
-     * <p>
-     * The variance factor is determined by applying a multiplier to the fixed formation size divisor. The multiplier
-     * varies based on the roll value:
-     * <ul>
-     *   <li><b>Roll 2:</b> Multiplier is 0.575.</li>
-     *   <li><b>Roll 3:</b> Multiplier is 0.6.</li>
-     *   <li><b>Roll 4:</b> Multiplier is 0.625</li>
-     *   <li><b>Roll 5:</b> Multiplier is 0.65.</li>
-     *   <li><b>Roll 6:</b> Multiplier is 0.675.</li>
-     *   <li><b>Roll 7:</b> Multiplier is 0.7.</li>
-     *   <li><b>Roll 8:</b> Multiplier is 0.725.</li>
-     *   <li><b>Roll 9:</b> Multiplier is 0.75.</li>
-     *   <li><b>Roll 10:</b> Multiplier is 0.775.</li>
-     *   <li><b>Roll 11:</b> Multiplier is 0.8.</li>
-     *   <li><b>Roll 12:</b> Multiplier is 0.825.</li>
-     * </ul>
-     *
-     * @return the calculated variance factor as a double
-     */
-    public static double calculateVarianceFactor() {
-        int roll = d6(2);
-        return switch (roll) {
-            case 2 -> BASE_VARIANCE_FACTOR - 0.125;
-            case 3 -> BASE_VARIANCE_FACTOR - 0.1;
-            case 4 -> BASE_VARIANCE_FACTOR - 0.075;
-            case 5 -> BASE_VARIANCE_FACTOR - 0.05;
-            case 6 -> BASE_VARIANCE_FACTOR - 0.025;
-            case 8 -> BASE_VARIANCE_FACTOR + 0.025;
-            case 9 -> BASE_VARIANCE_FACTOR + 0.05;
-            case 10 -> BASE_VARIANCE_FACTOR + 0.075;
-            case 11 -> BASE_VARIANCE_FACTOR + 0.1;
-            case 12 -> BASE_VARIANCE_FACTOR + 0.125;
-            default -> BASE_VARIANCE_FACTOR; // 0.7
-        };
-    }
-
-    /**
      * Whether a force at {@code location} has arrived at where {@code contract} is fought.
      *
      * <p>Arrival is judged on the system first, since that is what the location model has always tracked, and then on
@@ -264,48 +224,6 @@ public class ContractUtilities {
         abstractContract.setCachedJumpPath(jumpPath);
 
         return jumpPath;
-    }
-
-    /**
-     * @param contract an active AtBContract
-     *
-     * @return the current deployment deficit for the contract
-     */
-    public static int getDeploymentDeficit(Campaign campaign, AbstractContract contract) {
-        LocalDate currentDate = campaign.getLocalDate();
-        if (!contract.isActiveOn(currentDate) || currentDate.equals(contract.getStartDate())) {
-            // Do not check for deficits if the contract has not started, or
-            // it is the first day of the contract, as players won't have
-            // had time to assign forces to the contract yet
-            return 0;
-        }
-
-        int total = -contract.getRequiredCombatElements();
-        int role = -max(1, contract.getRequiredCombatElements() / 2);
-
-        final CombatRole requiredLanceRole = contract.getObjectiveType().getRequiredCombatRole();
-        for (CombatTeam combatTeam : campaign.getPlayerForce().getCombatTeamsMap().values()) {
-            CombatRole combatRole = combatTeam.getRole();
-
-            if (!combatRole.isReserve() && !combatRole.isAuxiliary()) {
-                if (Objects.equals(combatTeam.getMissionId(), contract.getId())) {
-                    if (!combatRole.isTraining()) {
-                        if (!combatRole.isCadre() || contract.getObjectiveType().isCadreDuty()) {
-                            total += combatTeam.getSize(campaign);
-                        }
-                    }
-                }
-
-                if (combatRole == requiredLanceRole) {
-                    role += combatTeam.getSize(campaign);
-                }
-            }
-        }
-
-        if (total >= 0 && role >= 0) {
-            return 0;
-        }
-        return Math.abs(Math.min(total, role));
     }
 
 
