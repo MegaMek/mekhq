@@ -117,7 +117,6 @@ class ContractXmlCodecTest {
         contract.setStatus(MissionStatus.ACTIVE);
         contract.setSalvagedByUnitValue(Money.of(1_250_000));
         contract.setSalvagedByEmployerValue(Money.of(750_000));
-        contract.setRequiredCombatElements(12);
         contract.setRequiredVictoryPoints(9);
         // A non-empty scenario schedule so the codec's scenarioSchedule tag is exercised by the round-trip and
         // idempotency checks; the six per-month entries sum to the track count, matching a six-month contract.
