@@ -113,6 +113,14 @@ class RulesetRankAssignerTest {
     }
 
     @Test
+    void aPointsLeaderRanksByThePointsPlaceInTheStar() {
+        assertEquals(RulesetRankAssigner.POINT_ONE_RANK_INDEX, RulesetRankAssigner.pointRankIndex(0));
+        assertEquals(RulesetRankAssigner.POINT_ONE_RANK_INDEX + 4, RulesetRankAssigner.pointRankIndex(4), "Point 5");
+        assertEquals(RulesetRankAssigner.POINT_ONE_RANK_INDEX + 4, RulesetRankAssigner.pointRankIndex(9),
+              "a Star has five Points, so the ladder stops at Point 5");
+    }
+
+    @Test
     void aStarIsANovaOnlyWhenMeksAndElementalsShareIt() {
         assertTrue(RulesetRankAssigner.isNova(java.util.Set.of(UnitType.MEK, UnitType.BATTLE_ARMOR)));
         assertTrue(RulesetRankAssigner.isNova(java.util.Set.of(UnitType.AEROSPACE_FIGHTER, UnitType.BATTLE_ARMOR)));

@@ -358,6 +358,16 @@ public final class RulesetRankAssigner {
     @Nullable
     private static Person walk(Pass pass, Formation formation, @Nullable FormationLevel fallbackLevel,
           boolean isRoot) {
+        return walk(pass, formation, fallbackLevel, isRoot, 0);
+    }
+
+    /**
+     * @param positionInParent the formation's place among its parent's sub-formations, from zero: a Clan Point's
+     *                         leader ranks by it, Point 2 to Point 5, the first Point being the Star Commander's own
+     */
+    @Nullable
+    private static Person walk(Pass pass, Formation formation, @Nullable FormationLevel fallbackLevel,
+          boolean isRoot, int positionInParent) {
         FormationLevel level = pass.guidance().levels().containsKey(formation)
               ? pass.guidance().levels().get(formation) : fallbackLevel;
         FormationLevel subLevel = oneLevelBelow(pass.campaign(), level);
@@ -367,15 +377,17 @@ public final class RulesetRankAssigner {
             LOGGER.info("[CompanyGen][RankAssign][Pass1]   formation '{}' (level={}) -> led by '{}', promoted above it; no separate officer",
                   formation.getName(), level, leader.getFullName());
         } else {
-            leader = promoteCommander(pass, formation, level, pass.selection().orderFor(isRoot));
+            leader = promoteCommander(pass, formation, level, pass.selection().orderFor(isRoot), positionInParent);
         }
 
         Person firstBelow = null;
+        int position = 0;
         for (Formation sub : formation.getSubFormations()) {
-            Person subLeader = walk(pass, sub, subLevel, false);
+            Person subLeader = walk(pass, sub, subLevel, false, position);
             if ((firstBelow == null) && (subLeader != null)) {
                 firstBelow = subLeader;
             }
+            position++;
         }
         return (leader != null) ? leader : firstBelow;
     }
@@ -424,8 +436,9 @@ public final class RulesetRankAssigner {
      */
     @Nullable
     private static Person promoteCommander(Pass pass, Formation formation, @Nullable FormationLevel level,
-          @Nullable Comparator<Person> bestFirst) {
-        int rankIndex = rankIndexFor(pass.campaign(), formation, level);
+          @Nullable Comparator<Person> bestFirst, int positionInParent) {
+        int rankIndex = rankIndexFor(pass.campaign(), formation, level, pass.selection().isClanCommand(),
+              positionInParent);
         if (rankIndex < 0) {
             LOGGER.info("[CompanyGen][RankAssign][Pass1]   formation '{}' (level={}) -> no rank mapping, skip",
                   formation.getName(), level);
@@ -587,25 +600,60 @@ public final class RulesetRankAssigner {
         return chosen;
     }
 
+    /** The CLAN ladder's slot for the leader of a Star's first Point; Point 2 to Point 5 follow it. */
+    static final int POINT_ONE_RANK_INDEX = 6;
+    /** A Star has five Points, so the Point ranks stop here. */
+    private static final int POINTS_IN_A_STAR = 5;
+
     /**
-     * The rank index for a formation's commander: the level's slot, except that a Clan Star or Binary/Trinary
-     * holding both Meks and Elementals is a Nova or Supernova, whose commander ranks one slot higher.
+     * The rank index for a formation's commander, on the Clan table (Sarna, Clans: Ranks and Organization): a
+     * Point's leader is a Point Commander, a Star's a Star Commander, a Nova's (a Mek Star and an Elemental Star)
+     * a Nova Commander, a Binary's or Trinary's a Star Captain, a Supernova's (Novas paired) a Nova Captain, a
+     * Cluster's a Star Colonel, a Galaxy's a Galaxy Commander. Other families take the level's slot as it is.
      *
-     * @param campaign  the campaign, to read the formation's units
-     * @param formation the formation
-     * @param level     its level, or {@code null} when unknown
+     * @param campaign         the campaign, to read the formation's units
+     * @param formation        the formation
+     * @param level            its level, or {@code null} when unknown
+     * @param isClanCommand    {@code true} when the command is a Clan one, so a Point's leader is ranked
+     * @param positionInParent the formation's place among its parent's sub-formations, from zero
      *
      * @return the rank index, or {@code -1} when the level has no officer slot
      */
-    static int rankIndexFor(Campaign campaign, Formation formation, @Nullable FormationLevel level) {
-        int rankIndex = rankIndexForLevel(level);
+    static int rankIndexFor(Campaign campaign, Formation formation, @Nullable FormationLevel level,
+          boolean isClanCommand, int positionInParent) {
+        if ((level == FormationLevel.TEAM) && isClanCommand) {
+            return pointRankIndex(positionInParent);
+        }
         if ((level == FormationLevel.STAR_OR_NOVA) && isNova(unitTypesIn(campaign, formation))) {
             return Rank.RWO_MAX + 3;   // Nova Commander
         }
-        if ((level == FormationLevel.BINARY_OR_TRINARY) && isNova(unitTypesIn(campaign, formation))) {
+        if ((level == FormationLevel.BINARY_OR_TRINARY) && holdsANova(campaign, formation)) {
             return Rank.RWO_MAX + 5;   // Nova Captain, for a Supernova
         }
-        return rankIndex;
+        return rankIndexForLevel(level);
+    }
+
+    /**
+     * @param positionInParent the Point's place in its Star, from zero
+     *
+     * @return the CLAN ladder slot for that Point's leader, Point 1 to Point 5
+     */
+    static int pointRankIndex(int positionInParent) {
+        int point = Math.min(Math.max(positionInParent, 0), POINTS_IN_A_STAR - 1);
+        return POINT_ONE_RANK_INDEX + point;
+    }
+
+    /**
+     * @return {@code true} when any of the formation's own sub-formations is a Nova, which makes a Binary or
+     *       Trinary a Supernova; a Binary of a Mek Star beside an Elemental Star is not one
+     */
+    private static boolean holdsANova(Campaign campaign, Formation formation) {
+        for (Formation sub : formation.getSubFormations()) {
+            if (isNova(unitTypesIn(campaign, sub))) {
+                return true;
+            }
+        }
+        return false;
     }
 
     /**
