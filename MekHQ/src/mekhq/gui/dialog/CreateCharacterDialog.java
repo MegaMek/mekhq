@@ -1180,7 +1180,7 @@ public class CreateCharacterDialog extends JDialog implements DialogOptionListen
         // A world is a valid birthworld if it either has a real owner faction at the character's date of birth OR
         // still had a recorded population then. The population fallback admits ABN (Abandoned) systems that retained
         // inhabitants — a character can be born on a world that no faction claims, so long as someone lived there.
-        LocalDate birthDate = (person.getDateOfBirth() != null) ? person.getDateOfBirth() : campaign.getLocalDate();
+        LocalDate birthDate = person.getDateOfBirth();
         List<PlanetarySystem> orderedSystems = campaign.getSystems()
                                                      .stream()
                                                      .filter(a -> !a.isConnector())
