@@ -139,7 +139,9 @@ public class Detachment implements IPlace {
     }
 
     public void setAutomatedMothballUnits(List<UUID> automatedMothballUnits) {
-        this.automatedMothballUnits = automatedMothballUnits;
+        this.automatedMothballUnits = (automatedMothballUnits == null)
+              ? new ArrayList<>()
+              : new ArrayList<>(automatedMothballUnits);
     }
 
     /**
