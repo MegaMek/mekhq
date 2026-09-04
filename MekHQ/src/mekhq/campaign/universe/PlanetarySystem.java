@@ -381,10 +381,8 @@ public class PlanetarySystem {
             weights.put(entry.getKey(), weight);
         }
 
-        // ignore cases where abandoned (ABN) is given in addition to real factions
-        if (weights.size() > 1) {
-            weights.remove(Factions.getInstance().getFaction(ABANDONED_FACTION_CODE));
-        }
+        // Abandoned (ABN) is a pseudo-faction; it must never be treated as a valid birth origin.
+        weights.remove(Factions.getInstance().getFaction(ABANDONED_FACTION_CODE));
         return weights;
     }
 
