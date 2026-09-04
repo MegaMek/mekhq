@@ -61,9 +61,12 @@ class ContractIntensityDataTest {
     void withMethodsEachReplaceExactlyOneField() {
         ContractIntensityData base = new ContractIntensityData(1, 2, 4, List.of(0, 1));
 
-        assertEquals(new ContractIntensityData(9, 2, 4, List.of(0, 1)), base.withScale(9));
-        assertEquals(new ContractIntensityData(1, 2, 4, List.of(0, 1)), base.withRequiredVictoryPoints(9));
-        assertEquals(new ContractIntensityData(1, 2, 9, List.of(0, 1)), base.withTrackCount(9));
+        assertEquals(new ContractIntensityData(9, 2, 4, List.of(0, 1)),
+              base.withScale(9));
+        assertEquals(new ContractIntensityData(1, 9, 4, List.of(0, 1)),
+              base.withRequiredVictoryPoints(9));
+        assertEquals(new ContractIntensityData(1, 2, 9, List.of(0, 1)),
+              base.withTrackCount(9));
         assertEquals(new ContractIntensityData(1, 2, 4, List.of(5, 6, 7)),
               base.withMonthlyTrackCounts(List.of(5, 6, 7)));
     }
