@@ -94,6 +94,16 @@ class RulesetRankAssignerSelectionTest {
     }
 
     @Test
+    void starColonelAndAboveNeedABloodnameOnlyInAClanCommand() {
+        assertTrue(RulesetRankAssigner.needsBloodname(RulesetRankAssigner.STAR_COLONEL_RANK_INDEX, true));
+        assertTrue(RulesetRankAssigner.needsBloodname(RulesetRankAssigner.STAR_COLONEL_RANK_INDEX + 1, true));
+        assertTrue(!RulesetRankAssigner.needsBloodname(RulesetRankAssigner.STAR_COLONEL_RANK_INDEX - 1, true),
+              "a Star Captain need not be Bloodnamed");
+        assertTrue(!RulesetRankAssigner.needsBloodname(RulesetRankAssigner.STAR_COLONEL_RANK_INDEX, false),
+              "an Inner Sphere colonel has no Bloodname to need");
+    }
+
+    @Test
     void withoutTheOptionsTheFirstPersonFoundLeads() {
         Campaign campaign = MHQTestUtilities.getTestCampaign();
         Formation firstLance = lance(campaign, "First Lance");

@@ -53,7 +53,8 @@ import mekhq.campaign.personnel.Person;
  * <p>The order is the one the retired AtB Company Generator used. Tactical Genius comes first: a person with
  * the ability outranks anyone without it. After that the caller chooses which matters more, the person's combat
  * experience level or the total of their Leadership, Strategy and Tactics skill levels; the other breaks ties.
- * The comparators here put the best person first.</p>
+ * In a Clan command a Bloodname comes before everything: the Bloodnamed are the warriors the Clans put in
+ * command. The comparators here put the best person first.</p>
  */
 public final class OfficerSelector {
 
@@ -63,7 +64,7 @@ public final class OfficerSelector {
     }
 
     /**
-     * Orders people best first for a leadership post.
+     * Orders people best first for a leadership post in a command of the campaign's own faction.
      *
      * @param campaign            the campaign, whose options and date decide how skills are read
      * @param prioritizeCombat    {@code true} to rank by combat experience before command skills, {@code false} to
@@ -72,6 +73,20 @@ public final class OfficerSelector {
      * @return a comparator placing the best candidate first
      */
     public static Comparator<Person> bestFirst(Campaign campaign, boolean prioritizeCombat) {
+        return bestFirst(campaign, prioritizeCombat, campaign.getPlayerForce().isClanForce());
+    }
+
+    /**
+     * Orders people best first for a leadership post.
+     *
+     * @param campaign            the campaign, whose options and date decide how skills are read
+     * @param prioritizeCombat    {@code true} to rank by combat experience before command skills, {@code false} to
+     *                            rank by command skills before combat experience; Tactical Genius leads either way
+     * @param isClanCommand       {@code true} when the command is a Clan one, so a Bloodname comes before all else
+     *
+     * @return a comparator placing the best candidate first
+     */
+    public static Comparator<Person> bestFirst(Campaign campaign, boolean prioritizeCombat, boolean isClanCommand) {
         CampaignOptions campaignOptions = campaign.getCampaignOptions();
         boolean isUseAgingEffects = campaignOptions.get(CampaignOption.USE_AGE_EFFECTS);
         boolean isClanCampaign = campaign.getPlayerForce().isClanForce();
@@ -86,7 +101,20 @@ public final class OfficerSelector {
         Comparator<Person> worstFirst = prioritizeCombat
               ? byTacticalGenius.thenComparing(byCombat).thenComparing(byCommand)
               : byTacticalGenius.thenComparing(byCommand).thenComparing(byCombat);
+        if (isClanCommand) {
+            worstFirst = Comparator.comparing(OfficerSelector::hasBloodname).thenComparing(worstFirst);
+        }
         return worstFirst.reversed();
+    }
+
+    /**
+     * Orders people so the Bloodnamed come first and the rest keep their order, for a post a Clan gives only to a
+     * Bloodnamed warrior when the options ask for no other order.
+     *
+     * @return a comparator placing Bloodnamed people first
+     */
+    public static Comparator<Person> bloodnamedFirst() {
+        return Comparator.comparing(OfficerSelector::hasBloodname).reversed();
     }
 
     /**
@@ -122,8 +150,9 @@ public final class OfficerSelector {
         boolean isClanCampaign = campaign.getPlayerForce().isClanForce();
         LocalDate today = campaign.getLocalDate();
         int combat = person.getExperienceLevel(campaignOptions, isClanCampaign, today, false, true);
+        String bloodname = hasBloodname(person) ? "Bloodname " + person.getBloodname() + ", " : "";
         String genius = hasTacticalGenius(person) ? "Tactical Genius, " : "";
-        return person.getFullName() + " (" + genius + "combat " + SkillLevel.parseFromInteger(combat)
+        return person.getFullName() + " (" + bloodname + genius + "combat " + SkillLevel.parseFromInteger(combat)
               + ", command " + commandSkillTotal(person, isUseAgingEffects, isClanCampaign, today) + ")";
     }
 
@@ -140,6 +169,14 @@ public final class OfficerSelector {
             }
         }
         return total;
+    }
+
+    /**
+     * @return {@code true} when the person carries a Bloodname
+     */
+    public static boolean hasBloodname(Person person) {
+        String bloodname = person.getBloodname();
+        return (bloodname != null) && !bloodname.isBlank();
     }
 
     static boolean hasTacticalGenius(Person person) {

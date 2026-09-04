@@ -199,7 +199,7 @@ public final class RulesetRankAssigner {
         Set<Person> promoted = new LinkedHashSet<>();
         Map<Person, FormationLevel> officers = new LinkedHashMap<>();
         int[] officerCount = { 0 };
-        Selection selection = Selection.from(campaign, options);
+        Selection selection = Selection.from(campaign, options, faction.isClan());
         Person rootCommander = walk(campaign, root, rootLevel, true, selection, promoted, officers, officerCount,
               targetRankSystem, rankValidator);
         int officersAssigned = officerCount[0];
@@ -257,20 +257,24 @@ public final class RulesetRankAssigner {
      * @param officerOrder   how every other formation's commander is chosen from its remaining crew, or
      *                       {@code null} to take the first combat person found
      */
-    record Selection(@Nullable Comparator<Person> commanderOrder, @Nullable Comparator<Person> officerOrder) {
+    record Selection(@Nullable Comparator<Person> commanderOrder, @Nullable Comparator<Person> officerOrder,
+          boolean isClanCommand) {
 
-        static Selection from(Campaign campaign, CommandGenerationOptions options) {
+        static Selection from(Campaign campaign, CommandGenerationOptions options, boolean isClanCommand) {
             Comparator<Person> commanderOrder = options.isAssignBestCompanyCommander()
-                  ? OfficerSelector.bestFirst(campaign, options.isPrioritizeCompanyCommanderCombatSkills())
+                  ? OfficerSelector.bestFirst(campaign, options.isPrioritizeCompanyCommanderCombatSkills(),
+                        isClanCommand)
                   : null;
             Comparator<Person> officerOrder = options.isAssignBestOfficers()
-                  ? OfficerSelector.bestFirst(campaign, options.isPrioritizeOfficerCombatSkills())
+                  ? OfficerSelector.bestFirst(campaign, options.isPrioritizeOfficerCombatSkills(), isClanCommand)
                   : null;
-            LOGGER.info("[CompanyGen][RankAssign] commander chosen {}, other officers chosen {}",
+            LOGGER.info("[CompanyGen][RankAssign] commander chosen {}, other officers chosen {}{}",
                   describeOrder(options.isAssignBestCompanyCommander(),
                         options.isPrioritizeCompanyCommanderCombatSkills()),
-                  describeOrder(options.isAssignBestOfficers(), options.isPrioritizeOfficerCombatSkills()));
-            return new Selection(commanderOrder, officerOrder);
+                  describeOrder(options.isAssignBestOfficers(), options.isPrioritizeOfficerCombatSkills()),
+                  isClanCommand ? "; a Clan command, so a Bloodname comes first and Star Colonel and above require one"
+                        : "");
+            return new Selection(commanderOrder, officerOrder, isClanCommand);
         }
 
         private static String describeOrder(boolean bestFirst, boolean combatFirst) {
@@ -281,13 +285,11 @@ public final class RulesetRankAssigner {
         }
 
         /**
-         * @return {@code true} when a formation must choose before its sub-formations do, so the best person is
-         *       still available to the higher post
+         * @param isRoot {@code true} for the campaign-root formation
+         *
+         * @return the order the formation chooses its commander by, best first, or {@code null} to take the first
+         *       combat person found
          */
-        boolean choosesTopDown() {
-            return (commanderOrder != null) || (officerOrder != null);
-        }
-
         @Nullable
         Comparator<Person> orderFor(boolean isRoot) {
             return isRoot ? commanderOrder : officerOrder;
@@ -297,9 +299,10 @@ public final class RulesetRankAssigner {
     /**
      * Walks the formation tree, promoting one Person per Formation node to that Formation's officer rank.
      *
-     * <p>Post-order by default: sub-formations promote first and the parent takes the first combat person left.
-     * When the selection ranks people by skill the walk is top-down instead, each formation choosing the best
-     * person in its subtree before its sub-formations choose from the rest.</p>
+     * <p>A formation that takes the first combat person found lets its sub-formations promote first, so a lance
+     * leader is not also the company's first pick. A formation that ranks people by skill chooses before its
+     * sub-formations do, so the best person in its subtree is still available to it. Each formation decides for
+     * itself from its own order, so turning on Assign Best Company Commander alone changes only the root's pick.</p>
      *
      * @param isRoot       {@code true} for the campaign-root formation, whose commander is chosen by the
      *                     commander order rather than the officer order
@@ -316,38 +319,71 @@ public final class RulesetRankAssigner {
           boolean isRoot, Selection selection, Set<Person> promoted, Map<Person, FormationLevel> officers,
           int[] officerCount, RankSystem targetRankSystem, RankValidator rankValidator) {
         FormationLevel subLevel = oneLevelBelow(campaign, level);
+        Comparator<Person> order = selection.orderFor(isRoot);
+        boolean choosesBeforeSubFormations = order != null;
         Person commander = null;
-        if (selection.choosesTopDown()) {
-            commander = promoteCommander(campaign, formation, level, selection.orderFor(isRoot), promoted, officers,
+        if (choosesBeforeSubFormations) {
+            commander = promoteCommander(campaign, formation, level, order, selection, promoted, officers,
                   officerCount, targetRankSystem, rankValidator);
         }
         for (Formation sub : formation.getSubFormations()) {
             walk(campaign, sub, subLevel, false, selection, promoted, officers, officerCount, targetRankSystem,
                   rankValidator);
         }
-        if (!selection.choosesTopDown()) {
-            commander = promoteCommander(campaign, formation, level, null, promoted, officers, officerCount,
-                  targetRankSystem, rankValidator);
+        if (!choosesBeforeSubFormations) {
+            commander = promoteCommander(campaign, formation, level, order, selection, promoted, officers,
+                  officerCount, targetRankSystem, rankValidator);
         }
         return commander;
     }
 
+    /** The rank index of a Star Colonel: from here up a Clan gives the post only to a Bloodnamed warrior. */
+    static final int STAR_COLONEL_RANK_INDEX = Rank.RWO_MAX + 8;
+
     /**
-     * Promotes one person to the formation's officer rank.
+     * @param rankIndex     the rank the post carries
+     * @param isClanCommand whether the command is a Clan one
+     *
+     * @return {@code true} when the post is one a Clan gives only to a Bloodnamed warrior: Star Colonel and above
+     *       in a Clan command
+     */
+    static boolean needsBloodname(int rankIndex, boolean isClanCommand) {
+        return isClanCommand && (rankIndex >= STAR_COLONEL_RANK_INDEX);
+    }
+
+    /**
+     * Promotes one person to the formation's officer rank. In a Clan command a post of Star Colonel or above goes
+     * to a Bloodnamed warrior; when none is left, the warrior who takes it is awarded one.
      *
      * @return the person promoted, or {@code null} when the level has no rank or nobody was left to promote
      */
     @Nullable
     private static Person promoteCommander(Campaign campaign, Formation formation, @Nullable FormationLevel level,
-          @Nullable Comparator<Person> bestFirst, Set<Person> promoted, Map<Person, FormationLevel> officers,
-          int[] officerCount, RankSystem targetRankSystem, RankValidator rankValidator) {
+          @Nullable Comparator<Person> bestFirst, Selection selection, Set<Person> promoted,
+          Map<Person, FormationLevel> officers, int[] officerCount, RankSystem targetRankSystem,
+          RankValidator rankValidator) {
         int rankIndex = rankIndexForLevel(level);
         if (rankIndex < 0) {
             LOGGER.info("[CompanyGen][RankAssign][Pass1]   formation '{}' (level={}) -> no rank mapping, skip",
                   formation.getName(), level);
             return null;
         }
-        Person commander = pickCommander(campaign, formation, promoted, bestFirst);
+        boolean needsBloodname = needsBloodname(rankIndex, selection.isClanCommand());
+        Comparator<Person> order = bestFirst;
+        if (needsBloodname && (order == null)) {
+            order = OfficerSelector.bloodnamedFirst();
+        }
+        Person commander = pickCommander(campaign, formation, promoted, order);
+        if ((commander != null) && needsBloodname && !OfficerSelector.hasBloodname(commander)) {
+            // Nobody left in the formation holds a Bloodname, and the post is one a Clan gives only to the
+            // Bloodnamed: the warrior taking it is held to have won one.
+            campaign.getPlayerForce().getHumanResources().checkBloodnameAdd(campaign, commander, true);
+            LOGGER.info("[CompanyGen][RankAssign][Pick]   formation '{}': no Bloodnamed warrior was left for a post"
+                        + " of Star Colonel or above; '{}' takes it and {}", formation.getName(),
+                  commander.getFullName(), OfficerSelector.hasBloodname(commander)
+                        ? "is awarded the Bloodname " + commander.getBloodname()
+                        : "could not be awarded a Bloodname (not Clan personnel, or no phenotype)");
+        }
         if (commander != null) {
             setRankWithFallback(commander, rankIndex, targetRankSystem, rankValidator);
             promoted.add(commander);

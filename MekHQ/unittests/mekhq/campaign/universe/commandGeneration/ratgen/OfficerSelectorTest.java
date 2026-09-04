@@ -84,6 +84,19 @@ class OfficerSelectorTest {
     }
 
     @Test
+    void aBloodnameComesFirstInAClanCommandAndCountsForNothingElsewhere() {
+        Person crackShot = mekWarrior(6, 6);
+        Person bloodnamed = mekWarrior(2, 2);
+        bloodnamed.setBloodname("Pryde");
+
+        assertSame(bloodnamed, best(List.of(crackShot, bloodnamed), OfficerSelector.bestFirst(campaign, true, true)),
+              "in a Clan command the Bloodnamed warrior leads");
+        assertSame(crackShot, best(List.of(crackShot, bloodnamed), OfficerSelector.bestFirst(campaign, true, false)),
+              "elsewhere a Bloodname counts for nothing");
+        assertSame(bloodnamed, best(List.of(crackShot, bloodnamed), OfficerSelector.bloodnamedFirst()));
+    }
+
+    @Test
     void theMostSkilledPilotComesFirstForALanceSeat() {
         Person green = mekWarrior(1, 1);
         Person veteran = mekWarrior(5, 5);
