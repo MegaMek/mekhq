@@ -225,8 +225,7 @@ public final class ForceDescriptorSnapshot {
         this.sizeMod = rawSizeMod == 0 ? null : rawSizeMod;
         this.dropshipPct = fd.getDropshipPct();
         this.cargoPct = fd.getCargoPct();
-        // ForceDescriptor.getJumpshipPct() doesn't exist on the engine type; the panel writes the value
-        // back into its own text field but the engine has no setter. Leave snapshot's jumpshipPct alone.
+        this.jumpshipPct = fd.getJumpshipPct();
         this.flags.clear();
         if (fd.getFlags() != null) {
             this.flags.addAll(fd.getFlags());

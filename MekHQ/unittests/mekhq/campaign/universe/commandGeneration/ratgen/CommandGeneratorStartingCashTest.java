@@ -79,6 +79,31 @@ class CommandGeneratorStartingCashTest {
         return campaign.getPlayerForce().getFinances().getBalance();
     }
 
+    /** The units added since the snapshot, as the rolls' output: every unit in the hangar that is not in it. */
+    private static Set<UUID> rolledSince(Campaign campaign, Set<UUID> preExisting) {
+        Set<UUID> rolled = CommandGenerator.snapshotHangarUnitIds(campaign);
+        rolled.removeAll(preExisting);
+        return rolled;
+    }
+
+    @Test
+    void unitsTheBuildAddsAfterTheRollsAreNotInThePercentageBase() {
+        Campaign campaign = MHQTestUtilities.getTestCampaign();
+        Set<UUID> preExisting = CommandGenerator.snapshotHangarUnitIds(campaign);
+        Unit rolled = campaign.addNewUnit(UnitTestUtilities.getLocustLCT1V(), false, 0, PartQuality.QUALITY_D);
+        Set<UUID> rolledUnitIds = rolledSince(campaign, preExisting);
+        // A ship the lift top-up or the cargo stage adds after the rolls.
+        campaign.addNewUnit(UnitTestUtilities.getLocustLCT1V(), false, 0, PartQuality.QUALITY_D);
+        Money balanceBefore = balance(campaign);
+
+        CommandGenerator.processStartingCash(campaign, optionsWithPercent(10), preExisting, rolledUnitIds,
+              List.of(), CommandGenerator.SpareCosts.zero());
+
+        Money expected = rolled.getBuyCost().multipliedBy(10).dividedBy(100).round();
+        assertEquals(expected, balance(campaign).minus(balanceBefore),
+              "the build credits the percentage of the rolled units the tab previewed, nothing more");
+    }
+
     @Test
     void creditsConfiguredPercentOfGeneratedUnitValue() {
         Campaign campaign = MHQTestUtilities.getTestCampaign();
@@ -89,7 +114,7 @@ class CommandGeneratorStartingCashTest {
         Money unitValue = first.getBuyCost().plus(second.getBuyCost());
         Money balanceBefore = campaign.getPlayerForce().getFinances().getBalance();
 
-        CommandGenerator.processStartingCash(campaign, optionsWithPercent(10), preExisting, List.of(),
+        CommandGenerator.processStartingCash(campaign, optionsWithPercent(10), preExisting, rolledSince(campaign, preExisting), List.of(),
               CommandGenerator.SpareCosts.zero());
 
         Money expected = unitValue.multipliedBy(10).dividedBy(100).round();
@@ -108,7 +133,7 @@ class CommandGeneratorStartingCashTest {
         Unit generated = campaign.addNewUnit(UnitTestUtilities.getLocustLCT1V(), false, 0, PartQuality.QUALITY_D);
         Money balanceBefore = campaign.getPlayerForce().getFinances().getBalance();
 
-        CommandGenerator.processStartingCash(campaign, optionsWithPercent(10), preExisting, List.of(),
+        CommandGenerator.processStartingCash(campaign, optionsWithPercent(10), preExisting, rolledSince(campaign, preExisting), List.of(),
               CommandGenerator.SpareCosts.zero());
 
         Money expected = generated.getBuyCost().multipliedBy(10).dividedBy(100).round();
@@ -136,7 +161,7 @@ class CommandGeneratorStartingCashTest {
         options.setPayForAmmunition(false);
         options.setStartingLoan(true);
         options.setMinimumStartingFloat(0);
-        CommandGenerator.processStartingCash(campaign, options, preExisting, List.of(),
+        CommandGenerator.processStartingCash(campaign, options, preExisting, rolledSince(campaign, preExisting), List.of(),
               CommandGenerator.SpareCosts.zero());
 
         assertEquals(Money.zero(), balance(campaign).minus(balanceBefore),
@@ -165,7 +190,7 @@ class CommandGeneratorStartingCashTest {
         options.setPayForParts(false);
         options.setPayForArmour(false);
         options.setPayForAmmunition(false);
-        CommandGenerator.processStartingCash(campaign, options, preExisting, List.of(),
+        CommandGenerator.processStartingCash(campaign, options, preExisting, rolledSince(campaign, preExisting), List.of(),
               CommandGenerator.SpareCosts.zero());
 
         Money base = generated.getBuyCost().multipliedBy(200).dividedBy(100).round();
@@ -183,7 +208,7 @@ class CommandGeneratorStartingCashTest {
 
         CommandGenerationOptions options = optionsWithPercent(10);
         options.setProcessFinances(false);
-        CommandGenerator.processStartingCash(campaign, options, preExisting, List.of(),
+        CommandGenerator.processStartingCash(campaign, options, preExisting, rolledSince(campaign, preExisting), List.of(),
               CommandGenerator.SpareCosts.zero());
 
         assertEquals(Money.zero(),
