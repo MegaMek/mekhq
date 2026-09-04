@@ -269,6 +269,13 @@ public final class TOETab extends CampaignGuiTab {
 
         Formation selectedFormation = formationOptions.get(forcePicker.getComboBoxChoiceIndex());
 
+        if (selectedScenario == null) {
+            getCampaignGui().undeployForce(selectedFormation);
+            selectedFormation.clearScenarioIds(getCampaign(), true);
+            LOGGER.warn("TOETab: Null selectedScenario in deployToRegularScenario()");
+            return;
+        }
+
         // Deploy force to scenario
         if (selectedScenario instanceof AtBDynamicScenario dynamicScenario) {
             new ForceTemplateAssignmentDialog(getCampaignGui(),
@@ -278,10 +285,8 @@ public final class TOETab extends CampaignGuiTab {
         } else {
             getCampaignGui().undeployForce(selectedFormation);
             selectedFormation.clearScenarioIds(getCampaign(), true);
-            if (selectedScenario != null) {
-                selectedScenario.addForces(selectedFormation.getId());
-                selectedFormation.setScenarioId(selectedScenario.getId(), getCampaign());
-            }
+            selectedScenario.addForces(selectedFormation.getId());
+            selectedFormation.setScenarioId(selectedScenario.getId(), getCampaign());
             MekHQ.triggerEvent(new DeploymentChangedEvent(selectedFormation, selectedScenario));
         }
     }

@@ -135,6 +135,9 @@ public class AtBMonthlyUnitMarket extends AbstractUnitMarket {
         addOffers(campaign, getMarketItemCount(campaign, UBIQUITOUS, rarityModifier),
               UnitMarketType.OPEN, UnitType.INFANTRY, faction, DragoonRating.DRAGOON_F.getRating(), 1);
 
+        addOffers(campaign, getMarketItemCount(campaign, RARE, rarityModifier),
+              UnitMarketType.OPEN, UnitType.SMALL_CRAFT, faction, DragoonRating.DRAGOON_F.getRating(), 2);
+
         addOffers(campaign, getMarketItemCount(campaign, VERY_RARE, rarityModifier),
               UnitMarketType.OPEN, UnitType.DROPSHIP, faction, DragoonRating.DRAGOON_F.getRating(), 4);
 
@@ -301,6 +304,9 @@ public class AtBMonthlyUnitMarket extends AbstractUnitMarket {
             addOffers(campaign, getMarketItemCount(campaign, UBIQUITOUS, rarityModifier),
                   UnitMarketType.FACTORY, UnitType.INFANTRY, faction, DragoonRating.DRAGOON_A.getRating(), -4);
 
+            addOffers(campaign, getMarketItemCount(campaign, RARE, rarityModifier),
+                  UnitMarketType.FACTORY, UnitType.SMALL_CRAFT, faction, DragoonRating.DRAGOON_A.getRating(), 0);
+
             addOffers(campaign, getMarketItemCount(campaign, VERY_RARE, rarityModifier),
                   UnitMarketType.FACTORY, UnitType.DROPSHIP, faction, DragoonRating.DRAGOON_A.getRating(), 0);
 
@@ -410,7 +416,12 @@ public class AtBMonthlyUnitMarket extends AbstractUnitMarket {
                   missionRoles,
                   getPricePercentage(priceModifier));
             if (unitName != null) {
-                if (unitType == UnitType.DROPSHIP) {
+                if (unitType == UnitType.SMALL_CRAFT) {
+                    String key = "AtBMonthlyUnitMarket.smallCraft.report";
+                    String report = getFormattedTextAt(RESOURCE_BUNDLE, key,
+                          spanOpeningWithCustomColor(getPositiveColor()), CLOSING_SPAN_TAG);
+                    campaign.addReport(GENERAL, report);
+                } else if (unitType == UnitType.DROPSHIP) {
                     String key = "AtBMonthlyUnitMarket.dropShip.report";
                     String report = getFormattedTextAt(RESOURCE_BUNDLE, key,
                           spanOpeningWithCustomColor(getPositiveColor()), CLOSING_SPAN_TAG);
