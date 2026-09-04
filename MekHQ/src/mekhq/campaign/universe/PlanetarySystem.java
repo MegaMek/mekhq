@@ -518,7 +518,6 @@ public class PlanetarySystem {
     public long getPopulation(LocalDate when) {
         long pop = 0L;
         for (Planet planet : planets.values()) {
-            planet.getPopulation(when);
             pop += planet.getPopulation(when);
         }
         return pop;
