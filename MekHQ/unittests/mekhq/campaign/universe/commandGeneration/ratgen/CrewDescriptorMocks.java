@@ -32,16 +32,15 @@
  */
 package mekhq.campaign.universe.commandGeneration.ratgen;
 
-import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.Mockito.doAnswer;
+import static org.mockito.Mockito.CALLS_REAL_METHODS;
 import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
 
 import megamek.client.ratgenerator.CrewDescriptor;
 
 /**
  * Crew descriptors for tests. A real one names itself from the faction tables on construction, which needs
- * the RAT generator loaded; these hold a name, a Bloodname and two skill targets and nothing else.
+ * the RAT generator loaded. These skip the constructor and keep the real getters and setters, so they hold a
+ * name, a Bloodname and two skill targets and nothing else.
  */
 final class CrewDescriptorMocks {
 
@@ -68,20 +67,11 @@ final class CrewDescriptorMocks {
      * @return a crew descriptor that remembers what is set on it
      */
     static CrewDescriptor crew(String name, String bloodname, int gunnery, int piloting) {
-        CrewDescriptor crew = mock(CrewDescriptor.class);
-        String[] state = { name, bloodname };
-        when(crew.getName()).thenAnswer(invocation -> state[0]);
-        doAnswer(invocation -> {
-            state[0] = invocation.getArgument(0);
-            return null;
-        }).when(crew).setName(anyString());
-        when(crew.getBloodname()).thenAnswer(invocation -> state[1]);
-        doAnswer(invocation -> {
-            state[1] = invocation.getArgument(0);
-            return null;
-        }).when(crew).setBloodname(anyString());
-        when(crew.getGunnery()).thenReturn(gunnery);
-        when(crew.getPiloting()).thenReturn(piloting);
+        CrewDescriptor crew = mock(CrewDescriptor.class, CALLS_REAL_METHODS);
+        crew.setName(name);
+        crew.setBloodname(bloodname);
+        crew.setGunnery(gunnery);
+        crew.setPiloting(piloting);
         return crew;
     }
 }
