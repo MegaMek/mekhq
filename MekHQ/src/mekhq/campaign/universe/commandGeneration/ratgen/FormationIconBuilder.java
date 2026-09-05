@@ -36,6 +36,7 @@ import java.util.ArrayList;
 import java.util.Map;
 import java.util.UUID;
 
+import megamek.common.annotations.Nullable;
 import megamek.common.units.Entity;
 import megamek.common.units.EntityWeightClass;
 import megamek.common.units.UnitType;
@@ -132,6 +133,47 @@ public final class FormationIconBuilder {
      * itself is NOT decorated by this method — the caller already handled the root in
      * {@link #applyIcons}. Returns the count of decorated Formations.
      */
+    /**
+     * Decorates one existing formation and everything under it, using the campaign's own faction.
+     *
+     * <p>The generation pass above needs {@link CommandGenerationOptions} because it also decides the origin node's
+     * icon. Support teams organized after generation - a campaign that switched the option on - have no generation
+     * options to consult, but their formations should look like the generated ones, so this is the same builder
+     * without the origin-node question.</p>
+     *
+     * @param root     the formation to decorate, along with its subtree
+     * @param campaign the campaign the formation belongs to
+     *
+     * @return the number of formations decorated
+     */
+    public static int applyIconsToSubtree(@Nullable Formation root, @Nullable Campaign campaign) {
+        if ((root == null) || (campaign == null)) {
+            return 0;
+        }
+        if (MHQStaticDirectoryManager.getFormationIcons() == null) {
+            LOGGER.warn("[SupportTOE] applyIconsToSubtree: formation-icon directory unavailable, skipping");
+            return 0;
+        }
+
+        Faction iconFaction = campaign.getPlayerForce().getFaction();
+        if (iconFaction == null) {
+            return 0;
+        }
+        FormationPieceIcon background = buildBackgroundPiece(iconFaction);
+
+        int applied = 0;
+        LayeredFormationIcon rootIcon = buildFormationIcon(root, campaign, iconFaction, background);
+        if (rootIcon != null) {
+            root.setFormationIcon(rootIcon);
+            applied++;
+        }
+        applied += applyToSubtree(root, campaign, iconFaction, background);
+
+        LOGGER.info("[SupportTOE] applyIconsToSubtree DONE for '{}'; {} formation(s) decorated", root.getName(),
+              applied);
+        return applied;
+    }
+
     private static int applyToSubtree(Formation parent, Campaign campaign, Faction iconFaction,
           FormationPieceIcon background) {
         int count = 0;

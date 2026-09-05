@@ -47,6 +47,7 @@ import mekhq.campaign.personnel.enums.PersonnelRole;
 import mekhq.campaign.unit.Unit;
 import mekhq.campaign.universe.commandGeneration.SupportPersonnelToTOE.EchelonProfile;
 import mekhq.campaign.universe.commandGeneration.SupportPersonnelToTOE.SupportSection;
+import mekhq.campaign.universe.commandGeneration.ratgen.FormationIconBuilder;
 
 /**
  * Keeps the Support Command section of the TOE matching the roster as a campaign runs.
@@ -382,6 +383,9 @@ public final class SupportCarrierReconciler {
         if (campaign.getPlayerForce().getSupportCommandFormation() == null) {
             LOGGER.info("Organizing {} loose support character(s) into new support teams", loose.size());
             SupportPersonnelToTOE.organize(campaign, loose, campaign.getPlayerForce().isClanForce());
+            // Generation decorates the whole TOE afterwards; a conversion has to decorate what it just built, or the
+            // support formations sit in the TOE without the icons every other formation has.
+            FormationIconBuilder.applyIconsToSubtree(campaign.getPlayerForce().getSupportCommandFormation(), campaign);
         } else {
             LOGGER.info("Seating {} loose support character(s) into the existing support teams", loose.size());
         }
