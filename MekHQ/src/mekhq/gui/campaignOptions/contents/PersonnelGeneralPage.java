@@ -105,6 +105,7 @@ class PersonnelGeneralPage {
     private JCheckBox chkUseRemovalExemptCemetery;
     private JCheckBox chkUseRemovalExemptRetirees;
 
+    private JCheckBox chkUseSupportTeams;
     private JCheckBox chkUseBlobInfantry;
     private JCheckBox chkUseBlobBattleArmor;
     private JCheckBox chkUseBlobVehicleCrewGround;
@@ -139,6 +140,7 @@ class PersonnelGeneralPage {
         JPanel pnlPersonnelGeneralOptions = createGeneralOptionsPanel();
         JPanel pnlAdministrators = createAdministratorsPanel();
         JPanel pnlPersonnelCleanup = createPersonnelCleanUpPanel();
+        JPanel pnlSupportTeams = createSupportTeamsPanel();
         JPanel pnlBlobCrew = createBlobCrewPanel();
         JPanel familiarityPanel = createChassisFamiliarityPanel();
         JPanel panel = CampaignOptionsPagePanel.builder("PersonnelGeneralPage", "PersonnelGeneralPage", imageAddress)
@@ -154,6 +156,10 @@ class PersonnelGeneralPage {
                                    "lblPersonnelCleanUpPanel.summary",
                                    pnlPersonnelCleanup,
                                    getMetadata(LEGACY_RULE_BEFORE_METADATA, CampaignOptionFlag.CUSTOM_SYSTEM))
+                             .section("lblSupportTeamsPanel.text",
+                                   "lblSupportTeamsPanel.summary",
+                                   pnlSupportTeams,
+                                   getMetadata(new Version(0, 51, 1), CampaignOptionFlag.CUSTOM_SYSTEM))
                              .section("lblBlobCrewPanel.text",
                                    "lblBlobCrewPanel.summary",
                                    pnlBlobCrew,
@@ -366,6 +372,22 @@ class PersonnelGeneralPage {
      *
      * @return a {@link JPanel} containing settings related to blob crews (temporary personnel pools)
      */
+    /**
+     * Builds the Support Teams section: whether support staff are organized into support carriers in the TOE.
+     */
+    private @Nonnull JPanel createSupportTeamsPanel() {
+        chkUseSupportTeams = new CampaignOptionsCheckBox("UseSupportTeams",
+              getMetadata(new Version(0, 51, 1), CampaignOptionFlag.CUSTOM_SYSTEM));
+        chkUseSupportTeams.addMouseListener(createTipPanelUpdater("UseSupportTeams"));
+
+        final SettingsFormPanel panel = new SettingsFormPanel("SupportTeamsPanel",
+              LABEL_COLUMN_WIDTH,
+              CONTROL_COLUMN_WIDTH);
+        panel.addCheckBoxGrid(1, chkUseSupportTeams);
+
+        return panel;
+    }
+
     private @Nonnull JPanel createBlobCrewPanel() {
         // Contents
         chkUseBlobInfantry = new CampaignOptionsCheckBox("UseBlobInfantry", getMetadata(new Version(0, 50, 12)));
@@ -445,6 +467,7 @@ class PersonnelGeneralPage {
         chkUsePersonnelRemoval.setSelected(model.usePersonnelRemoval);
         chkUseRemovalExemptCemetery.setSelected(model.useRemovalExemptCemetery);
         chkUseRemovalExemptRetirees.setSelected(model.useRemovalExemptRetirees);
+        chkUseSupportTeams.setSelected(model.useSupportTeams);
         chkUseBlobInfantry.setSelected(model.useBlobInfantry);
         chkUseBlobBattleArmor.setSelected(model.useBlobBattleArmor);
         chkUseBlobVehicleCrewGround.setSelected(model.useBlobVehicleCrewGround);
@@ -491,6 +514,7 @@ class PersonnelGeneralPage {
         model.usePersonnelRemoval = chkUsePersonnelRemoval.isSelected();
         model.useRemovalExemptCemetery = chkUseRemovalExemptCemetery.isSelected();
         model.useRemovalExemptRetirees = chkUseRemovalExemptRetirees.isSelected();
+        model.useSupportTeams = chkUseSupportTeams.isSelected();
         model.useBlobInfantry = chkUseBlobInfantry.isSelected();
         model.useBlobBattleArmor = chkUseBlobBattleArmor.isSelected();
         model.useBlobVehicleCrewGround = chkUseBlobVehicleCrewGround.isSelected();

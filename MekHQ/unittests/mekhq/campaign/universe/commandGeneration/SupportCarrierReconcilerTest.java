@@ -48,6 +48,9 @@ import java.util.List;
 import java.util.UUID;
 
 import mekhq.campaign.Campaign;
+import mekhq.campaign.campaignOptions.CampaignOption;
+import mekhq.campaign.campaignOptions.CampaignOptions;
+import mekhq.campaign.force.Formation;
 import mekhq.campaign.force.PlayerForce;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.enums.PersonnelRole;
@@ -178,6 +181,57 @@ class SupportCarrierReconcilerTest {
 
         // No support structure means the campaign never opted in. It must not be invented here.
         verify(playerForce, never()).isClanForce();
+    }
+
+    // --- The option: nothing happens in a campaign that has not asked for support teams ---
+
+    @Test
+    void reconcileAll_optionOffIsAFullStop() {
+        Campaign campaign = mock(Campaign.class);
+        CampaignOptions options = mock(CampaignOptions.class);
+        when(campaign.getCampaignOptions()).thenReturn(options);
+        when(options.get(CampaignOption.USE_SUPPORT_TEAMS)).thenReturn(false);
+
+        SupportCarrierReconciler.reconcileAll(campaign);
+
+        // Not even the legacy marking pass runs: with the option off the campaign's units are none of our business.
+        verify(campaign, never()).getUnits();
+    }
+
+    @Test
+    void hasStaffToOrganize_isFalseWhenTheOptionIsOff() {
+        Campaign campaign = mock(Campaign.class);
+        CampaignOptions options = mock(CampaignOptions.class);
+        when(campaign.getCampaignOptions()).thenReturn(options);
+        when(options.get(CampaignOption.USE_SUPPORT_TEAMS)).thenReturn(false);
+
+        assertFalse(SupportCarrierReconciler.hasStaffToOrganize(campaign));
+        assertFalse(SupportCarrierReconciler.hasStaffToOrganize(null));
+    }
+
+    @Test
+    void hasStaffToOrganize_isFalseWhenTheCampaignAlreadyHasSupportTeams() {
+        Campaign campaign = mock(Campaign.class);
+        CampaignOptions options = mock(CampaignOptions.class);
+        when(campaign.getCampaignOptions()).thenReturn(options);
+        when(options.get(CampaignOption.USE_SUPPORT_TEAMS)).thenReturn(true);
+        PlayerForce playerForce = mock(PlayerForce.class);
+        when(campaign.getPlayerForce()).thenReturn(playerForce);
+        when(playerForce.getSupportCommandFormation()).thenReturn(mock(Formation.class));
+
+        // A generated campaign is already organized; offering to organize it again would be nonsense.
+        assertFalse(SupportCarrierReconciler.hasStaffToOrganize(campaign));
+    }
+
+    @Test
+    void organizeLooseStaff_doesNothingWhenTheOptionIsOff() {
+        Campaign campaign = mock(Campaign.class);
+        CampaignOptions options = mock(CampaignOptions.class);
+        when(campaign.getCampaignOptions()).thenReturn(options);
+        when(options.get(CampaignOption.USE_SUPPORT_TEAMS)).thenReturn(false);
+
+        assertEquals(0, SupportCarrierReconciler.organizeLooseStaff(campaign));
+        assertEquals(0, SupportCarrierReconciler.organizeLooseStaff(null));
     }
 
     // --- Release: the one departure the campaign engine does not already handle ---

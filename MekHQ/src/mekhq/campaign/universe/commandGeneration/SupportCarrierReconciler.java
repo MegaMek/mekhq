@@ -39,6 +39,7 @@ import java.util.UUID;
 import megamek.common.annotations.Nullable;
 import megamek.logging.MMLogger;
 import mekhq.campaign.Campaign;
+import mekhq.campaign.campaignOptions.CampaignOption;
 import mekhq.campaign.force.Formation;
 import mekhq.campaign.location.LocationUtils;
 import mekhq.campaign.personnel.Person;
@@ -225,6 +226,11 @@ public final class SupportCarrierReconciler {
             return;
         }
 
+        // Turning the option off leaves existing carriers exactly where they are; they simply stop being managed.
+        if (!isEnabled(campaign)) {
+            return;
+        }
+
         markLegacyCarriers(campaign);
         recoverSupportCommandId(campaign);
 
@@ -302,6 +308,87 @@ public final class SupportCarrierReconciler {
      * needs no name matching and holds for any layout the generator produces. A campaign whose carriers all sit in
      * one section resolves to that section instead, which files any later profession under it; acceptable, and rare.</p>
      */
+    /**
+     * Whether support teams are switched on for this campaign.
+     *
+     * @param campaign the campaign
+     *
+     * @return the value of {@link CampaignOption#USE_SUPPORT_TEAMS}
+     */
+    public static boolean isEnabled(Campaign campaign) {
+        return campaign.getCampaignOptions().get(CampaignOption.USE_SUPPORT_TEAMS);
+    }
+
+    /**
+     * The support staff who are not in a support team, in roster order.
+     *
+     * <p>Used to decide whether a campaign has anything to convert, to show the player a count before they commit,
+     * and as the pool handed to generation when they accept.</p>
+     *
+     * @param campaign the campaign
+     *
+     * @return the eligible support characters who crew no unit; empty when there are none
+     */
+    public static List<Person> looseSupportStaff(Campaign campaign) {
+        List<Person> loose = new ArrayList<>();
+        for (Person person : campaign.getPlayerForce().getHumanResources().getActivePersonnel(false, false)) {
+            if ((person.getUnit() == null) && isEligibleForCarrier(person)) {
+                loose.add(person);
+            }
+        }
+        return loose;
+    }
+
+    /**
+     * Whether this campaign could be converted: support teams are on, none exist yet, and there is staff to put in
+     * them. This is the question the load-time offer asks.
+     *
+     * @param campaign the campaign
+     *
+     * @return {@code true} if there is something to offer
+     */
+    public static boolean hasStaffToOrganize(@Nullable Campaign campaign) {
+        if ((campaign == null) || !isEnabled(campaign)) {
+            return false;
+        }
+        if (campaign.getPlayerForce().getSupportCommandFormation() != null) {
+            return false;
+        }
+        return !looseSupportStaff(campaign).isEmpty();
+    }
+
+    /**
+     * Organizes a campaign's loose support staff into support teams, exactly as generation would have built them.
+     *
+     * <p>This is the conversion for a campaign that never generated a command: it creates the Support Command
+     * formation and packs the staff into carriers using the faction's echelon, then runs the normal sweep so the
+     * result is identical to a generated campaign's. A campaign that already has a Support Command is only swept -
+     * its loose staff are seated into the carriers that exist.</p>
+     *
+     * @param campaign the campaign to convert
+     *
+     * @return the number of support characters organized; 0 when there was nothing to do
+     */
+    public static int organizeLooseStaff(@Nullable Campaign campaign) {
+        if ((campaign == null) || !isEnabled(campaign)) {
+            return 0;
+        }
+
+        List<Person> loose = looseSupportStaff(campaign);
+        if (loose.isEmpty()) {
+            return 0;
+        }
+
+        if (campaign.getPlayerForce().getSupportCommandFormation() == null) {
+            LOGGER.info("Organizing {} loose support character(s) into new support teams", loose.size());
+            SupportPersonnelToTOE.organize(campaign, loose, campaign.getPlayerForce().isClanForce());
+        } else {
+            LOGGER.info("Seating {} loose support character(s) into the existing support teams", loose.size());
+        }
+        reconcileAll(campaign);
+        return loose.size();
+    }
+
     private static void recoverSupportCommandId(Campaign campaign) {
         if (campaign.getPlayerForce().getSupportCommandFormationId() != Formation.FORMATION_NONE) {
             return;
