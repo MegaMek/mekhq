@@ -48,14 +48,13 @@ import megamek.common.equipment.MiscType;
 import megamek.common.equipment.WeaponType;
 import megamek.common.equipment.enums.AmmoTypeFlag;
 import megamek.common.equipment.enums.MiscTypeFlag;
-import megamek.common.loaders.EntityLoadingException;
-import megamek.common.loaders.MekFileParser;
 import megamek.common.loaders.MekSummary;
 import megamek.common.loaders.MekSummaryCache;
 import megamek.common.units.Aero;
 import megamek.common.units.BipedMek;
 import megamek.common.units.Dropship;
 import megamek.common.units.Entity;
+import megamek.common.units.EntityMovementMode;
 import megamek.common.units.Jumpship;
 import megamek.common.units.Mek;
 import megamek.common.units.ProtoMek;
@@ -154,26 +153,29 @@ public class PartsStore {
     }
 
     protected void stockBattleArmorSuits(Campaign c) {
-        // this is just a test
+        // Everything the suit part needs is on the unit summary, so no unit file is opened here. Loading every
+        // battle armor unit out of the zip used to cost seconds on every campaign load.
         for (MekSummary summary : MekSummaryCache.getInstance().getAllMeks()) {
             if (!summary.getUnitType().equals("BattleArmor")) {
                 continue;
             }
-            // FIXME: I can't pull entity movement mode and quad shape off of MekSummary
-            // try loading the full entity, but this might take too long
-            Entity newEntity = null;
-            try {
-                newEntity = new MekFileParser(summary.getSourceFile(), summary.getEntryName()).getEntity();
-            } catch (EntityLoadingException e) {
-                LOGGER.error("", e);
-            }
-            if (null != newEntity) {
-                BattleArmorSuit ba = new BattleArmorSuit(summary.getChassis(), summary.getModel(),
-                      (int) summary.getTons(), 1, summary.getWeightClass(), summary.getWalkMp(), summary.getJumpMp(),
-                      newEntity.entityIsQuad(), summary.isClan(), newEntity.getMovementMode(), c);
-                parts.add(ba);
-            }
+            parts.add(createBattleArmorSuit(summary, c));
         }
+    }
+
+    /**
+     * Builds the store's stock suit for a battle armor unit from its summary alone.
+     *
+     * @param summary  the unit summary, which carries the movement mode the suit part needs
+     * @param campaign the campaign the part belongs to
+     *
+     * @return the suit part for one trooper of that unit
+     */
+    static BattleArmorSuit createBattleArmorSuit(MekSummary summary, Campaign campaign) {
+        boolean isQuad = summary.getMoveMode() == EntityMovementMode.QUAD;
+        return new BattleArmorSuit(summary.getChassis(), summary.getModel(), (int) summary.getTons(), 1,
+              summary.getWeightClass(), summary.getWalkMp(), summary.getJumpMp(), isQuad, summary.isClan(),
+              summary.getMoveMode(), campaign);
     }
 
     protected void stockWeaponsAmmoAndEquipment(Campaign campaign) {

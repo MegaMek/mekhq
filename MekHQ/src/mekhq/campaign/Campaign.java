@@ -3826,10 +3826,7 @@ public class Campaign implements ITechManager {
             storyArc.writeToXml(writer, indent);
         }
 
-        // Markets
-        if (getPlayerForce().getHumanResources().getPersonnelMarket() != null) {
-            getPlayerForce().getHumanResources().getPersonnelMarket().writeToXML(writer, indent, this);
-        }
+        // The personnel market is written inside <humanResources>; writing it here as well doubled the load time
 
         // Windchild: implicit DEPENDS-ON to the <campaignOptions> node, do not move
         // this above it

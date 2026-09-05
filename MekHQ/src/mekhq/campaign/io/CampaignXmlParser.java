@@ -2281,6 +2281,9 @@ public record CampaignXmlParser(InputStream is, MekHQ app) {
                           campaign,
                           version);
                     campaign.getPlayerForce().setHumanResources(humanResources);
+                    // The loaded object always carries a default market, so ask the save itself whether the block
+                    // held one; only then is a later top-level market node a duplicate rather than the real data.
+                    foundPersonnelMarket = foundPersonnelMarket || hasChildElement(workingNode, "personnelMarket");
                 } else if (nodeName.equalsIgnoreCase("parts")) {
                     processPartNodes(campaign, workingNode, version);
                 } else if (nodeName.equalsIgnoreCase("personnel")) {
@@ -2327,11 +2330,17 @@ public record CampaignXmlParser(InputStream is, MekHQ app) {
                     ForceShoppingList sl = ForceShoppingList.generateInstanceFromXML(workingNode, campaign, version);
                     campaign.getPlayerForce().setShoppingList(sl);
                 } else if (nodeName.equalsIgnoreCase("personnelMarket")) {
-                    final PersonnelMarket personnelMarket = PersonnelMarket.generateInstanceFromXML(workingNode,
-                          campaign,
-                          version);
-                    campaign.getPlayerForce().getHumanResources().setPersonnelMarket(personnelMarket);
-                    foundPersonnelMarket = true;
+                    if (foundPersonnelMarket) {
+                        // Saves written between the human-resources refactor and the fix that stopped the second
+                        // write carry the market twice; the copy inside <humanResources> has already been loaded.
+                        LOGGER.info("[PersonnelMarket] Skipping the duplicate top-level personnelMarket node");
+                    } else {
+                        final PersonnelMarket personnelMarket = PersonnelMarket.generateInstanceFromXML(workingNode,
+                              campaign,
+                              version);
+                        campaign.getPlayerForce().getHumanResources().setPersonnelMarket(personnelMarket);
+                        foundPersonnelMarket = true;
+                    }
                 } else if (nodeName.equalsIgnoreCase("unitMarket")) {
                     // Windchild: implicit DEPENDS ON to the <campaignOptions> nodes
                     campaign.setUnitMarket(campaign.getCampaignOptions().get(CampaignOption.UNIT_MARKET_METHOD).getUnitMarket());
