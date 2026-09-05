@@ -433,6 +433,10 @@ public final class FormationIconBuilder {
      * @return the StratOps type filename, or {@code null} when the formation has no single clear purpose
      */
     private static @Nullable String purposeIconFor(Formation formation, Campaign campaign) {
+        if (isHeadquarters(formation, campaign)) {
+            return HEADQUARTERS_TYPE_FILENAME;
+        }
+
         if (formation.isFormationType(FormationType.CONVOY)) {
             return SUPPLY_TYPE_FILENAME;
         }
@@ -479,6 +483,26 @@ public final class FormationIconBuilder {
             };
         }
         return null;
+    }
+
+    /**
+     * Whether this formation is the command's headquarters.
+     *
+     * <p>Asked of the structure rather than the name: the support tree hangs off the headquarters, so whatever the
+     * player has renamed it to, it is the formation the Support Command sits under.</p>
+     *
+     * @param formation the formation
+     * @param campaign  the campaign
+     *
+     * @return {@code true} if the Support Command formation is a direct child of this formation
+     */
+    private static boolean isHeadquarters(Formation formation, Campaign campaign) {
+        Formation supportCommand = campaign.getPlayerForce().getSupportCommandFormation();
+        if (supportCommand == null) {
+            return false;
+        }
+        Formation headquarters = supportCommand.getParentFormation();
+        return (headquarters != null) && (headquarters.getId() == formation.getId());
     }
 
     /**
