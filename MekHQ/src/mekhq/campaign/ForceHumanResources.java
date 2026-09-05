@@ -1026,12 +1026,11 @@ public class ForceHumanResources {
      *                               campaign start
      */
     public void refreshApplicants(Campaign campaign, boolean bypassDateRestrictions) {
-        CampaignOptions campaignOptions = campaign.getCampaignOptions();
         LocalDate currentDay = campaign.getLocalDate();
 
         if (currentDay.getDayOfMonth() == 1 || bypassDateRestrictions) {
                 newPersonnelMarket.gatherApplications();
-            }
+        }
     }
 
 
