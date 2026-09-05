@@ -43,7 +43,6 @@ import static mekhq.campaign.personnel.skills.SkillDeprecationTool.DEPRECATED_SK
 import static mekhq.campaign.reputation.chaosReputation.ChaosReputation.STARTING_REPUTATION_SCORE;
 import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
 import static mekhq.utilities.ReportingUtilities.CLOSING_SPAN_TAG;
-import static mekhq.utilities.ReportingUtilities.getNegativeColor;
 import static mekhq.utilities.ReportingUtilities.getWarningColor;
 import static mekhq.utilities.ReportingUtilities.spanOpeningWithCustomColor;
 import static org.apache.commons.lang3.ObjectUtils.firstNonNull;
@@ -148,6 +147,7 @@ import mekhq.campaign.personnel.procreation.AbstractProcreation;
 import mekhq.campaign.personnel.ranks.RankSystem;
 import mekhq.campaign.personnel.ranks.RankValidator;
 import mekhq.campaign.personnel.skills.RandomSkillPreferences;
+import mekhq.campaign.personnel.skills.Skill;
 import mekhq.campaign.personnel.skills.SkillDeprecationTool;
 import mekhq.campaign.personnel.skills.SkillType;
 import mekhq.campaign.personnel.skills.enums.SkillAttribute;
@@ -2546,21 +2546,10 @@ public record CampaignXmlParser(InputStream is, MekHQ app) {
             // This resolves a bug squashed in 2025 (50.03) but lurked in our codebase
             // potentially as far back as 2014. The next two handlers should never be removed.
             if (!person.canPerformRole(today, person.getSecondaryRole(), false)) {
-                person.setSecondaryRole(PersonnelRole.NONE);
-
-                campaign.addReport(GENERAL, getFormattedTextAt(RESOURCE_BUNDLE, "ineligibleForSecondaryRole",
-                      spanOpeningWithCustomColor(getWarningColor()),
-                      CLOSING_SPAN_TAG,
-                      person.getHyperlinkedFullTitle()));
+                resolveRolePerformability(person, campaign);
             }
 
             if (!person.canPerformRole(today, person.getPrimaryRole(), true)) {
-                person.setPrimaryRole(campaign.getLocalDate(), PersonnelRole.DEPENDENT);
-
-                campaign.addReport(GENERAL, getFormattedTextAt(RESOURCE_BUNDLE, "ineligibleForPrimaryRole",
-                      spanOpeningWithCustomColor(getNegativeColor()),
-                      CLOSING_SPAN_TAG,
-                      person.getHyperlinkedFullTitle()));
             }
         }
 
@@ -2789,6 +2778,48 @@ public record CampaignXmlParser(InputStream is, MekHQ app) {
         LOGGER.info("Load of campaign file complete!");
 
         return campaign;
+    }
+
+    private static void resolveRolePerformability(Person person, Campaign campaign) {
+        LocalDate today = campaign.getLocalDate();
+        resolveRolePerformability(person, campaign, today, person.getPrimaryRole(), true);
+        resolveRolePerformability(person, campaign, today, person.getSecondaryRole(), false);
+    }
+
+    private static void resolveRolePerformability(Person person, Campaign campaign, LocalDate today, PersonnelRole role,
+          boolean primary) {
+        if (person.canPerformRole(today, role, false)) {
+            return;
+        }
+
+        // <51.01 compatibility handler
+        if (role == PersonnelRole.PROTOMEK_PILOT) {
+            Skill skill = person.getSkill(SkillType.S_GUN_PROTO);
+            if (skill != null) {
+                person.addSkill(
+                      SkillType.S_PILOT_PROTO,
+                      skill.getLevel(),
+                      skill.getBonus()
+                );
+                return;
+            }
+        }
+
+        if (primary) {
+            person.setPrimaryRole(today, PersonnelRole.NONE);
+            reportInvalidProfession(person, campaign, "ineligibleForPrimaryRole");
+        } else {
+            person.setSecondaryRole(PersonnelRole.NONE);
+            reportInvalidProfession(person, campaign, "ineligibleForSecondaryRole");
+        }
+    }
+
+
+    private static void reportInvalidProfession(Person person, Campaign campaign, String key) {
+        campaign.addReport(GENERAL, getFormattedTextAt(RESOURCE_BUNDLE, key,
+              spanOpeningWithCustomColor(getWarningColor()),
+              CLOSING_SPAN_TAG,
+              person.getHyperlinkedFullTitle()));
     }
 
     //region Migration Methods

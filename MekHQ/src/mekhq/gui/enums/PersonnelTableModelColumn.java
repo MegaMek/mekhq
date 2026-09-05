@@ -168,8 +168,8 @@ public enum PersonnelTableModelColumn implements MHQTableColumn {
           skillPairModelExtractor(SkillType.S_GUN_JET, SkillType.S_PILOT_JET), SkillPair::toString),
     VESSEL("Column.VESSEL.title", SkillPair.COMPARATOR,
           skillPairModelExtractor(SkillType.S_GUN_SPACE, SkillType.S_PILOT_SPACE), SkillPair::toString),
-    PROTOMEK("Column.PROTOMEK.title", Comparators.SKILL_COMPARATOR,
-          skillModelExtractor(SkillType.S_GUN_PROTO), PersonnelTableModelColumn::skillToText),
+    PROTOMEK("Column.PROTOMEK.title", SkillPair.COMPARATOR,
+          skillPairModelExtractor(SkillType.S_GUN_PROTO, SkillType.S_PILOT_PROTO), SkillPair::toString),
     BATTLE_ARMOUR("Column.BATTLE_ARMOUR.title", Comparators.SKILL_COMPARATOR,
           skillModelExtractor(SkillType.S_GUN_BA), PersonnelTableModelColumn::skillToText),
     AGGREGATE_COMBAT("Column.AGGREGATE_COMBAT.title", NaturalOrderComparator.INSTANCE,
@@ -707,7 +707,8 @@ public enum PersonnelTableModelColumn implements MHQTableColumn {
                       campaignOptions.get(CampaignOption.USE_SMALL_ARMS_ONLY));
                 yield skillValue.apply(gunnerySkill) + '/' + skillValue.apply(SkillType.S_ANTI_MEK);
             }
-            case PersonnelRole.PROTOMEK_PILOT -> skillValue.apply(SkillType.S_GUN_PROTO);
+            case PersonnelRole.PROTOMEK_PILOT ->
+                  skillValue.apply(SkillType.S_GUN_PROTO) + '/' + skillValue.apply(SkillType.S_PILOT_PROTO);
             default -> "-/-";
         };
     }

@@ -166,7 +166,8 @@ public class DefaultSkillGenerator extends AbstractSkillGenerator {
                 // We're removing protomek from the pool as only actual protomek pilots should have access to this
                 // skill. Adding it randomly creates some lore inconsistencies. ProtoMek pilots will already have the
                 // skill at this stage
-                if (skillType.equalsIgnoreCase(SkillType.S_GUN_PROTO)) {
+                if (skillType.equalsIgnoreCase(SkillType.S_GUN_PROTO) ||
+                          skillType.equalsIgnoreCase(SkillType.S_PILOT_PROTO)) {
                     continue;
                 }
 

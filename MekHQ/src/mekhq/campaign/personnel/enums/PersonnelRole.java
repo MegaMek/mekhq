@@ -672,7 +672,7 @@ public enum PersonnelRole {
             }
             case AEROSPACE_PILOT -> List.of(SkillType.S_GUN_AERO, SkillType.S_PILOT_AERO);
             case CONVENTIONAL_AIRCRAFT_PILOT -> List.of(SkillType.S_GUN_JET, SkillType.S_PILOT_JET);
-            case PROTOMEK_PILOT -> List.of(SkillType.S_GUN_PROTO);
+            case PROTOMEK_PILOT -> List.of(SkillType.S_GUN_PROTO, SkillType.S_PILOT_PROTO);
             case BATTLE_ARMOUR -> List.of(SkillType.S_GUN_BA, SkillType.S_ANTI_MEK);
             case SOLDIER -> {
                 if (includeExpandedSkills) {

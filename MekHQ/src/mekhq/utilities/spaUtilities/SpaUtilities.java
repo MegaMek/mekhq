@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2025 The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2026 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -34,7 +34,6 @@ package mekhq.utilities.spaUtilities;
 
 import static mekhq.campaign.personnel.skills.SkillType.EXP_LEGENDARY;
 import static mekhq.campaign.personnel.skills.SkillType.S_GUN_BA;
-import static mekhq.campaign.personnel.skills.SkillType.S_GUN_PROTO;
 import static mekhq.campaign.personnel.skills.SkillType.getExperienceLevelName;
 import static mekhq.campaign.personnel.skills.enums.SkillSubType.COMBAT_GUNNERY;
 import static mekhq.campaign.personnel.skills.enums.SkillSubType.COMBAT_PILOTING;
@@ -137,7 +136,7 @@ public class SpaUtilities {
             String[] parts = skillPrerequisiteString.split("<br>");
 
             // Step 4: Test each part
-            List<String> specialAbilitySkills = List.of(S_GUN_PROTO, S_GUN_BA);
+            List<String> specialAbilitySkills = List.of(S_GUN_BA);
             for (String part : parts) {
                 SkillType skillType = SkillType.getType(part);
                 if (part == null || skillType == null) {

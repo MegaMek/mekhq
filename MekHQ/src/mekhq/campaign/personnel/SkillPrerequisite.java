@@ -1,6 +1,6 @@
 /*
  * Copyright (c) 2009 Jay Lawson (jaylawson39 at yahoo.com). All rights reserved.
- * Copyright (C) 2014-2025 The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2014-2026 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -168,7 +168,8 @@ public class SkillPrerequisite {
             }
             case UnitType.NAVAL ->
                   skillSet.containsKey(SkillType.S_PILOT_NVEE) || skillSet.containsKey(SkillType.S_GUN_VEE);
-            case UnitType.PROTOMEK -> skillSet.containsKey(SkillType.S_GUN_PROTO);
+            case UnitType.PROTOMEK ->
+                  skillSet.containsKey(SkillType.S_PILOT_PROTO) || skillSet.containsKey(SkillType.S_GUN_PROTO);
             case UnitType.VTOL ->
                   skillSet.containsKey(SkillType.S_PILOT_VTOL) || skillSet.containsKey(SkillType.S_GUN_VEE);
             case UnitType.MEK ->
