@@ -33,8 +33,10 @@
 package mekhq.campaign.universe.commandGeneration.ratgen;
 
 import java.util.ArrayList;
+import java.util.EnumSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.UUID;
 
 import megamek.common.annotations.Nullable;
@@ -48,12 +50,16 @@ import mekhq.MHQStaticDirectoryManager;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.force.Formation;
 import mekhq.campaign.force.FormationLevel;
+import mekhq.campaign.force.FormationType;
 import mekhq.campaign.icons.FormationPieceIcon;
 import mekhq.campaign.icons.LayeredFormationIcon;
 import mekhq.campaign.icons.enums.LayeredFormationIconLayer;
+import mekhq.campaign.personnel.Person;
 import mekhq.campaign.unit.Unit;
 import mekhq.campaign.universe.Faction;
 import mekhq.campaign.universe.commandGeneration.CommandGenerationOptions;
+import mekhq.campaign.universe.commandGeneration.SupportPersonnelToTOE;
+import mekhq.campaign.universe.commandGeneration.SupportPersonnelToTOE.SupportSection;
 
 /**
  * Builds layered formation icons for the Force Generator pipeline, covering every {@link FormationLevel}
@@ -80,10 +86,17 @@ public final class FormationIconBuilder {
 
     private static final MMLogger LOGGER = MMLogger.create(FormationIconBuilder.class);
 
-    /** StratOps type icon for a formation of MASH-equipped vehicles. */
+    // The rulebook's common symbology (Core Rulebook p.28): a support formation is drawn for the job it does, not
+    // for the machines it rides in. Carriers are conventional infantry, so without these every support formation in
+    // the TOE would show the same infantry symbol.
+    /** StratOps type icon for medical staff and MASH-equipped vehicles. */
     private static final String MEDICAL_TYPE_FILENAME = "Medical.png";
-    /** StratOps type icon for a formation of recovery vehicles. */
-    private static final String RECOVERY_TYPE_FILENAME = "Industrial.png";
+    /** StratOps type icon for technicians and recovery vehicles. */
+    private static final String MAINTENANCE_TYPE_FILENAME = "Maintenance.png";
+    /** StratOps type icon for administrative staff. */
+    private static final String HEADQUARTERS_TYPE_FILENAME = "Headquarters (Staff).png";
+    /** StratOps type icon for a logistics convoy. */
+    private static final String SUPPLY_TYPE_FILENAME = "Supply.png";
 
     private FormationIconBuilder() {
         // utility class
@@ -420,9 +433,14 @@ public final class FormationIconBuilder {
      * @return the StratOps type filename, or {@code null} when the formation has no single clear purpose
      */
     private static @Nullable String purposeIconFor(Formation formation, Campaign campaign) {
+        if (formation.isFormationType(FormationType.CONVOY)) {
+            return SUPPLY_TYPE_FILENAME;
+        }
+
         int units = 0;
         int medical = 0;
         int recovery = 0;
+        Set<SupportSection> sections = EnumSet.noneOf(SupportSection.class);
         for (UUID unitId : formation.getAllUnits(false)) {
             Unit unit = campaign.getUnit(unitId);
             if ((unit == null) || (unit.getEntity() == null)) {
@@ -435,6 +453,13 @@ public final class FormationIconBuilder {
                              || unit.getEntity().hasWorkingMisc(MiscTypeFlag.F_SALVAGE_ARM)) {
                 recovery++;
             }
+            if (unit.isCarrier()) {
+                SupportSection section = sectionOf(unit);
+                // EnumSet rejects null, and an empty carrier has no vote to cast anyway.
+                if (section != null) {
+                    sections.add(section);
+                }
+            }
         }
         if (units == 0) {
             return null;
@@ -443,7 +468,32 @@ public final class FormationIconBuilder {
             return MEDICAL_TYPE_FILENAME;
         }
         if (recovery == units) {
-            return RECOVERY_TYPE_FILENAME;
+            return MAINTENANCE_TYPE_FILENAME;
+        }
+        // A support team's job is its crew's job. One section only, so a mixed formation keeps the generic icon.
+        if (sections.size() == 1) {
+            return switch (sections.iterator().next()) {
+                case MAINTENANCE -> MAINTENANCE_TYPE_FILENAME;
+                case MEDICAL -> MEDICAL_TYPE_FILENAME;
+                case COMMAND -> HEADQUARTERS_TYPE_FILENAME;
+            };
+        }
+        return null;
+    }
+
+    /**
+     * The support section a carrier's crew belongs to.
+     *
+     * <p>Every seat on a carrier holds the same profession, so the first crew member answers for the unit. A carrier
+     * that has lost its crew answers for nothing, which keeps an empty one from claiming a section.</p>
+     *
+     * @param carrier the support carrier
+     *
+     * @return the section, or {@code null} when the carrier is empty or its crew is not support staff
+     */
+    private static @Nullable SupportSection sectionOf(Unit carrier) {
+        for (Person person : carrier.getCrew()) {
+            return SupportPersonnelToTOE.sectionFor(person.getPrimaryRole());
         }
         return null;
     }
