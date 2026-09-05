@@ -37,7 +37,6 @@ import static java.lang.Math.floor;
 import static java.lang.Math.max;
 import static megamek.common.compute.Compute.d6;
 import static megamek.common.compute.Compute.randomInt;
-import static mekhq.campaign.market.personnelMarket.enums.PersonnelMarketStyle.PERSONNEL_MARKET_DISABLED;
 import static mekhq.campaign.personnel.PersonUtility.setVeterancyAwardEligibility;
 import static mekhq.campaign.personnel.PersonnelOptions.UNOFFICIAL_ILL_DO_IT_MYSELF;
 import static mekhq.campaign.personnel.medical.advancedMedicalAlternate.AdvancedMedicalAlternateImplants.giveEIImplant;
@@ -82,7 +81,6 @@ import mekhq.campaign.finances.Finances;
 import mekhq.campaign.finances.enums.TransactionType;
 import mekhq.campaign.force.Formation;
 import mekhq.campaign.log.MedicalLogger;
-import mekhq.campaign.market.PersonnelMarket;
 import mekhq.campaign.market.personnelMarket.markets.NewPersonnelMarket;
 import mekhq.campaign.personnel.Bloodname;
 import mekhq.campaign.personnel.InjuryType;
@@ -157,9 +155,6 @@ public class ForceHumanResources {
     private RetirementDefectionTracker retirementDefectionTracker;
 
     private NewPersonnelMarket newPersonnelMarket;
-
-    @Deprecated(since = "0.50.06")
-    private PersonnelMarket personnelMarket;
 
     private transient AbstractDivorce divorce;
     private transient AbstractMarriage marriage;
@@ -1015,34 +1010,12 @@ public class ForceHumanResources {
         emptyTempCrewPoolForRole(campaign, role);
     }
 
-
-    @Deprecated(since = "0.50.06")
-    public PersonnelMarket getPersonnelMarket() {
-        return personnelMarket;
-    }
-
-    @Deprecated(since = "0.50.06")
-    public void setPersonnelMarket(final PersonnelMarket personnelMarket) {
-        this.personnelMarket = personnelMarket;
-    }
-
     public NewPersonnelMarket getNewPersonnelMarket() {
         return newPersonnelMarket;
     }
 
     public void setNewPersonnelMarket(final NewPersonnelMarket newPersonnelMarket) {
         this.newPersonnelMarket = newPersonnelMarket;
-    }
-
-    /**
-     * Returns {@code true} when campaign options select the legacy (deprecated) personnel market.
-     *
-     * <p>The market style named {@code PERSONNEL_MARKET_DISABLED} disables the <em>new</em> market
-     * and causes the legacy market to run instead — the name is counterintuitive, so this predicate makes the intent
-     * explicit at every call site.</p>
-     */
-    public static boolean isUsingLegacyPersonnelMarket(CampaignOptions options) {
-        return options.get(CampaignOption.PERSONNEL_MARKET_STYLE) == PERSONNEL_MARKET_DISABLED;
     }
 
     /**
@@ -1053,17 +1026,10 @@ public class ForceHumanResources {
      *                               campaign start
      */
     public void refreshApplicants(Campaign campaign, boolean bypassDateRestrictions) {
-        CampaignOptions campaignOptions = campaign.getCampaignOptions();
         LocalDate currentDay = campaign.getLocalDate();
 
-        if (isUsingLegacyPersonnelMarket(campaignOptions)) {
-            if (personnelMarket != null) {
-                personnelMarket.generatePersonnelForDay(campaign);
-            }
-        } else {
-            if (currentDay.getDayOfMonth() == 1 || bypassDateRestrictions) {
+        if (currentDay.getDayOfMonth() == 1 || bypassDateRestrictions) {
                 newPersonnelMarket.gatherApplications();
-            }
         }
     }
 
@@ -1551,8 +1517,6 @@ public class ForceHumanResources {
                 } else if (nodeName.equalsIgnoreCase("personnel")) {
                     InjuryTypes.registerAll();
                     LocalPersonnel.loadFromXML(childNode, campaign, version);
-                } else if (nodeName.equalsIgnoreCase("personnelMarket")) {
-                    hr.personnelMarket = PersonnelMarket.generateInstanceFromXML(childNode, campaign, version);
                 } else if (nodeName.equalsIgnoreCase("retirementDefectionTracker")) {
                     hr.retirementDefectionTracker = RetirementDefectionTracker.generateInstanceFromXML(childNode,
                           campaign);
@@ -2748,11 +2712,6 @@ public class ForceHumanResources {
             MHQXMLUtility.writeSimpleXMLTag(writer, indent, "personWhoAdvancedInXP", person.getId());
         }
         MHQXMLUtility.writeSimpleXMLCloseTag(writer, --indent, "personnelWhoAdvancedInXP");
-
-        // Personnel market (deprecated)
-        if (personnelMarket != null) {
-            personnelMarket.writeToXML(writer, indent, campaign);
-        }
 
         // New recruitment is managed at campaign level (newPersonnelMarket) — not written here
         // as it writes at campaign info level

@@ -45,7 +45,6 @@ import mekhq.campaign.AbstractLocation;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.CampaignNewDayManager;
 import mekhq.campaign.DetachmentLocationManager;
-import mekhq.campaign.ForceHumanResources;
 import mekhq.campaign.LocalHangar;
 import mekhq.campaign.LocalPersonnel;
 import mekhq.campaign.LocalWarehouse;
@@ -171,10 +170,8 @@ public class Detachment implements IPlace {
         }
 
         // We've just stopped traveling, so we should see if there are any local applicants.
-        if (!ForceHumanResources.isUsingLegacyPersonnelMarket(campaign.getCampaignOptions())) {
-            campaign.getPlayerForce().getHumanResources().refreshApplicants(campaign, true);
+        campaign.getPlayerForce().getHumanResources().refreshApplicants(campaign, true);
             CampaignNewDayManager.showRarePersonnelDialog(campaign, false);
-        }
     }
 
     @Override

@@ -59,7 +59,6 @@ import mekhq.campaign.force.Formation;
 import mekhq.campaign.io.CampaignXmlParseException;
 import mekhq.campaign.io.CampaignXmlParser;
 import mekhq.campaign.market.PartsStore;
-import mekhq.campaign.market.PersonnelMarket;
 import mekhq.campaign.market.personnelMarket.markets.NewPersonnelMarket;
 import mekhq.campaign.market.unitMarket.DisabledUnitMarket;
 import mekhq.campaign.personnel.death.RandomDeath;
@@ -191,8 +190,6 @@ public class CampaignFactory {
         BehaviorSettings behaviorSettings = BehaviorSettingsFactory.getInstance().DEFAULT_BEHAVIOR;
 
         // Set up markets
-        // TODO: Replace PersonnelMarket due to deprecation
-        PersonnelMarket personnelMarket = new PersonnelMarket();
         DisabledUnitMarket disabledUnitMarket = new DisabledUnitMarket();
 
         // Set up Randomizers based on campaignOptions
@@ -238,7 +235,6 @@ public class CampaignFactory {
                   retirementDefectionTracker,
                   autosave,
                   behaviorSettings,
-                  personnelMarket,
                   disabledUnitMarket,
                   disabledRandomDivorce,
                   disabledRandomMarriage,

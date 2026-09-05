@@ -109,7 +109,6 @@ import mekhq.campaign.location.AcademyCampusLocation;
 import mekhq.campaign.location.ILocation;
 import mekhq.campaign.location.LocationNode;
 import mekhq.campaign.market.ForceShoppingList;
-import mekhq.campaign.market.PersonnelMarket;
 import mekhq.campaign.market.RequestedStockLevels;
 import mekhq.campaign.mission.contract.AbstractContract;
 import mekhq.campaign.mission.contract.ContractMarket;
@@ -2242,7 +2241,6 @@ public record CampaignXmlParser(InputStream is, MekHQ app) {
             // We can safely ignore it even if it isn't, for now.
         }
 
-        boolean foundPersonnelMarket = false;
         boolean foundUnitMarket = false;
 
         // Saves made in 0.51.00 do not have a <location> but will have a <locations> with a single item.
@@ -2278,9 +2276,6 @@ public record CampaignXmlParser(InputStream is, MekHQ app) {
                           campaign,
                           version);
                     campaign.getPlayerForce().setHumanResources(humanResources);
-                    // The loaded object always carries a default market, so ask the save itself whether the block
-                    // held one; only then is a later top-level market node a duplicate rather than the real data.
-                    foundPersonnelMarket = foundPersonnelMarket || hasChildElement(workingNode, "personnelMarket");
                 } else if (nodeName.equalsIgnoreCase("parts")) {
                     processPartNodes(campaign, workingNode, version);
                 } else if (nodeName.equalsIgnoreCase("personnel")) {
@@ -2326,18 +2321,6 @@ public record CampaignXmlParser(InputStream is, MekHQ app) {
                 } else if (nodeName.equalsIgnoreCase("shoppingList")) {
                     ForceShoppingList sl = ForceShoppingList.generateInstanceFromXML(workingNode, campaign, version);
                     campaign.getPlayerForce().setShoppingList(sl);
-                } else if (nodeName.equalsIgnoreCase("personnelMarket")) {
-                    if (foundPersonnelMarket) {
-                        // Saves written between the human-resources refactor and the fix that stopped the second
-                        // write carry the market twice; the copy inside <humanResources> has already been loaded.
-                        LOGGER.info("[PersonnelMarket] Skipping the duplicate top-level personnelMarket node");
-                    } else {
-                        final PersonnelMarket personnelMarket = PersonnelMarket.generateInstanceFromXML(workingNode,
-                              campaign,
-                              version);
-                        campaign.getPlayerForce().getHumanResources().setPersonnelMarket(personnelMarket);
-                        foundPersonnelMarket = true;
-                    }
                 } else if (nodeName.equalsIgnoreCase("unitMarket")) {
                     // Windchild: implicit DEPENDS ON to the <campaignOptions> nodes
                     campaign.setUnitMarket(campaign.getCampaignOptions().get(CampaignOption.UNIT_MARKET_METHOD).getUnitMarket());
@@ -2642,12 +2625,6 @@ public record CampaignXmlParser(InputStream is, MekHQ app) {
 
         LOGGER.info("[Campaign Load] News loaded in {}ms", System.currentTimeMillis() - timestamp);
         timestamp = System.currentTimeMillis();
-
-        // If we don't have a personnel market, create one.
-        if (!foundPersonnelMarket) {
-            final PersonnelMarket personnelMarket = new PersonnelMarket(campaign);
-            campaign.getPlayerForce().getHumanResources().setPersonnelMarket(personnelMarket);
-        }
 
         if (!foundUnitMarket) {
             campaign.setUnitMarket(campaign.getCampaignOptions().get(CampaignOption.UNIT_MARKET_METHOD).getUnitMarket());

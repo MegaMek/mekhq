@@ -34,21 +34,10 @@
 package mekhq.campaign.campaignOptions;
 
 import static megamek.common.TechConstants.getSimpleLevel;
-import static megamek.common.options.OptionsConstants.ADVANCED_NEURAL_INTERFACE_MODE;
-import static megamek.common.options.OptionsConstants.ADVANCED_STRATOPS_QUIRKS;
-import static megamek.common.options.OptionsConstants.ALLOWED_CANON_ONLY;
-import static megamek.common.options.OptionsConstants.ALLOWED_TECH_LEVEL;
-import static megamek.common.options.OptionsConstants.EDGE;
-import static megamek.common.options.OptionsConstants.NEURAL_INTERFACE_MODE_OFF;
-import static megamek.common.options.OptionsConstants.NEURAL_INTERFACE_MODE_PILOT_ONLY;
-import static megamek.common.options.OptionsConstants.RPG_ARTILLERY_SKILL;
-import static megamek.common.options.OptionsConstants.RPG_COMMAND_INIT;
-import static megamek.common.options.OptionsConstants.RPG_PILOT_ADVANTAGES;
-import static megamek.common.options.OptionsConstants.RPG_TOUGHNESS;
+import static megamek.common.options.OptionsConstants.*;
 
 import java.io.File;
 import java.util.Arrays;
-import java.util.HashMap;
 import java.util.Objects;
 
 import jakarta.annotation.Nonnull;
@@ -61,7 +50,6 @@ import megamek.common.preference.PreferenceManager;
 import megamek.logging.MMLogger;
 import mekhq.campaign.digitalGM.stratCon.gm.StratConPlayType;
 import mekhq.campaign.finances.Money;
-import mekhq.campaign.market.PersonnelMarket;
 import mekhq.campaign.mission.utilities.CombatRole;
 import mekhq.campaign.parts.enums.PartRepairType;
 import mekhq.campaign.personnel.enums.AgeGroup;
@@ -236,17 +224,6 @@ public class CampaignOptions {
         set(CampaignOption.USE_PORTRAIT_FOR_ROLE, new boolean[personnelRoles.length]);
         Arrays.fill(get(CampaignOption.USE_PORTRAIT_FOR_ROLE), false);
         get(CampaignOption.USE_PORTRAIT_FOR_ROLE)[PersonnelRole.MEKWARRIOR.ordinal()] = true;
-
-        set(CampaignOption.PERSONNEL_MARKET_NAME, PersonnelMarket.getTypeName(PersonnelMarket.TYPE_NONE));
-        set(CampaignOption.PERSONNEL_MARKET_RANDOM_REMOVAL_TARGETS, new HashMap<>());
-        get(CampaignOption.PERSONNEL_MARKET_RANDOM_REMOVAL_TARGETS).put(SkillLevel.NONE, 3);
-        get(CampaignOption.PERSONNEL_MARKET_RANDOM_REMOVAL_TARGETS).put(SkillLevel.ULTRA_GREEN, 4);
-        get(CampaignOption.PERSONNEL_MARKET_RANDOM_REMOVAL_TARGETS).put(SkillLevel.GREEN, 4);
-        get(CampaignOption.PERSONNEL_MARKET_RANDOM_REMOVAL_TARGETS).put(SkillLevel.REGULAR, 6);
-        get(CampaignOption.PERSONNEL_MARKET_RANDOM_REMOVAL_TARGETS).put(SkillLevel.VETERAN, 8);
-        get(CampaignOption.PERSONNEL_MARKET_RANDOM_REMOVAL_TARGETS).put(SkillLevel.ELITE, 10);
-        get(CampaignOption.PERSONNEL_MARKET_RANDOM_REMOVAL_TARGETS).put(SkillLevel.HEROIC, 11);
-        get(CampaignOption.PERSONNEL_MARKET_RANDOM_REMOVAL_TARGETS).put(SkillLevel.LEGENDARY, 11);
 
         set(CampaignOption.STRATEGIC_VIEW_MINIMAP_THEME, "gbc green.theme");
 

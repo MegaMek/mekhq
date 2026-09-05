@@ -44,7 +44,6 @@ import mekhq.campaign.finances.CurrencyManager;
 import mekhq.campaign.finances.Finances;
 import mekhq.campaign.force.Formation;
 import mekhq.campaign.market.PartsStore;
-import mekhq.campaign.market.PersonnelMarket;
 import mekhq.campaign.market.personnelMarket.markets.NewPersonnelMarket;
 import mekhq.campaign.market.unitMarket.AbstractUnitMarket;
 import mekhq.campaign.personnel.death.RandomDeath;
@@ -89,9 +88,6 @@ public class CampaignConfiguration {
     private Systems systemsInstance;
     private CurrentLocation location;
     private CampaignOptions campaignOptions;
-
-    @Deprecated(since = "0.50.06")
-    private PersonnelMarket personnelMarket;
 
     private AbstractUnitMarket unitMarket;
 
@@ -140,7 +136,6 @@ public class CampaignConfiguration {
      * @param retDefTracker        RetirementDefectionTracker instance
      * @param autosave             Autosave service instance
      * @param behaviorSettings     Default behavior settings
-     * @param persMarket           Personnel Market (deprecated; replace with new market after refactoring)
      * @param unitMarket           Unit Market
      * @param divorce              AbstractDivorce instance, defaults to Disabled
      * @param marriage             AbstractMarriage instance, defaults to Disabled
@@ -163,7 +158,6 @@ public class CampaignConfiguration {
           RetirementDefectionTracker retDefTracker,
           AutosaveService autosave,
           BehaviorSettings behaviorSettings,
-          PersonnelMarket persMarket,
           AbstractUnitMarket unitMarket,
           AbstractDivorce divorce,
           AbstractMarriage marriage,
@@ -185,7 +179,6 @@ public class CampaignConfiguration {
         this.retirementDefectionTracker = retDefTracker;
         this.autosaveService = autosave;
         this.autoResolveBehaviorSettings = behaviorSettings;
-        this.personnelMarket = persMarket;
         this.unitMarket = unitMarket;
         this.divorce = divorce;
         this.marriage = marriage;
@@ -222,7 +215,6 @@ public class CampaignConfiguration {
      * @param retDefTracker        RetirementDefectionTracker instance
      * @param autosave             Autosave service instance
      * @param behaviorSettings     Default behavior settings
-     * @param persMarket           Personnel Market (deprecated; replace with new market after refactoring)
      * @param unitMarket           Unit Market
      * @param divorce              AbstractDivorce instance, defaults to Disabled
      * @param marriage             AbstractMarriage instance, defaults to Disabled
@@ -255,7 +247,6 @@ public class CampaignConfiguration {
           RetirementDefectionTracker retDefTracker,
           AutosaveService autosave,
           BehaviorSettings behaviorSettings,
-          PersonnelMarket persMarket,
           AbstractUnitMarket unitMarket,
           AbstractDivorce divorce,
           AbstractMarriage marriage,
@@ -286,7 +277,6 @@ public class CampaignConfiguration {
         this.retirementDefectionTracker = retDefTracker;
         this.autosaveService = autosave;
         this.autoResolveBehaviorSettings = behaviorSettings;
-        this.personnelMarket = persMarket;
         this.unitMarket = unitMarket;
         this.divorce = divorce;
         this.marriage = marriage;
@@ -391,10 +381,6 @@ public class CampaignConfiguration {
 
     public BehaviorSettings getBehaviorSettings() {
         return this.autoResolveBehaviorSettings;
-    }
-
-    public PersonnelMarket getPersonnelMarket() {
-        return this.personnelMarket;
     }
 
     public AbstractUnitMarket getUnitMarket() {
