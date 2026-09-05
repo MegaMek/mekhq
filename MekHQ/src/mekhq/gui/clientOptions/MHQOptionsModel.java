@@ -70,7 +70,6 @@ class MHQOptionsModel {
           MHQConstants.NAG_INSUFFICIENT_AS_TECHS,
           MHQConstants.NAG_INSUFFICIENT_AS_TECH_TIME,
           MHQConstants.NAG_INSUFFICIENT_MEDICS,
-          MHQConstants.NAG_SHORT_DEPLOYMENT,
           MHQConstants.NAG_COMBAT_CHALLENGE,
           MHQConstants.NAG_UNRESOLVED_STRAT_CON_CONTACTS,
           MHQConstants.NAG_OUTSTANDING_SCENARIOS,
