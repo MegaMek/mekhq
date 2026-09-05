@@ -32,11 +32,13 @@
  */
 package mekhq.campaign.universe.commandGeneration;
 
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
+import java.util.List;
 import java.util.UUID;
 import java.util.Vector;
 
@@ -123,6 +125,27 @@ class SupportCarrierDeploymentTest {
         formations.add(headquarters);
 
         assertTrue(new Scenario("gate test").canDeployForces(formations, campaign));
+    }
+
+    @Test
+    void dialogTextFillsInItsPlaceholders() {
+        // The bundle is read through MessageFormat, so a stray String.format placeholder shows the player "%s".
+        String nothing = SupportCarrierDeployment.nothingToDeployMessage("Support Command");
+        assertTrue(nothing.contains("Support Command is support staff"), nothing);
+        assertFalse(nothing.contains("%s") || nothing.contains("{0}"), nothing);
+
+        Campaign campaign = mock(Campaign.class);
+        Unit carrier = mock(Unit.class);
+        when(carrier.isCarrier()).thenReturn(true);
+        UUID carrierId = UUID.randomUUID();
+        when(campaign.getUnit(carrierId)).thenReturn(carrier);
+        Formation headquarters = new Formation("HQ");
+        headquarters.addUnit(carrierId);
+
+        String stayed = SupportCarrierDeployment.stayingHomeMessage(campaign, List.of(headquarters), null);
+        assertTrue(stayed.contains("1 carrier(s) under HQ"), stayed);
+        assertFalse(stayed.contains("%") || stayed.contains("{"), stayed);
+        assertNull(SupportCarrierDeployment.stayingHomeMessage(campaign, List.of(), null));
     }
 
     @Test
