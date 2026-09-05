@@ -3736,6 +3736,8 @@ public class Campaign implements ITechManager {
         MHQXMLUtility.writeSimpleXMLTag(writer, indent, "colour", getPlayerForce().getColour().name());
         getPlayerForce().getUnitIcon().writeToXML(writer, indent);
         MHQXMLUtility.writeSimpleXMLTag(writer, indent, "lastFormationId", playerForce.getLastFormationId());
+        MHQXMLUtility.writeSimpleXMLTag(writer, indent, "supportCommandFormationId",
+              playerForce.getSupportCommandFormationId());
         contractHistory.writeToXML(writer, indent, this);
         getPlayerForce().getContractMarket().writeToXML(writer, indent, this);
         MHQXMLUtility.writeSimpleXMLTag(writer, indent, "lastMissionId", lastMissionId);

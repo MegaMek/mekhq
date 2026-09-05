@@ -134,6 +134,7 @@ import mekhq.campaign.personnel.skills.SkillCheck;
 import mekhq.campaign.personnel.skills.SkillModifierData;
 import mekhq.campaign.personnel.turnoverAndRetention.Fatigue;
 import mekhq.campaign.unit.Unit;
+import mekhq.campaign.universe.commandGeneration.SupportCarrierDeployment;
 import mekhq.campaign.universe.Planet;
 import mekhq.gui.dialog.StratConAmbushedDialog;
 import mekhq.gui.dialog.nagDialogs.CombatChallengeNagDialog;
@@ -1315,7 +1316,14 @@ public class StratConRulesManager {
                 // If the player doesn't have any available forces, we grab a force at random to
                 // seed the scenario
                 if (availableForceIDs.isEmpty()) {
-                    List<CombatTeam> combatTeams = campaign.getPlayerForce().getCombatTeamsAsList(campaign);
+                    List<CombatTeam> combatTeams = new ArrayList<>();
+                    for (CombatTeam candidate : campaign.getPlayerForce().getCombatTeamsAsList(campaign)) {
+                        Formation candidateFormation = candidate.getFormation(campaign);
+                        if ((candidateFormation != null)
+                                  && !SupportCarrierDeployment.deploysNothing(campaign, candidateFormation, null)) {
+                            combatTeams.add(candidate);
+                        }
+                    }
                     if (!combatTeams.isEmpty()) {
                         combatTeam = getRandomItem(combatTeams);
 
@@ -3111,6 +3119,12 @@ public class StratConRulesManager {
                 continue;
             }
 
+            // A support company holds only carriers, which never deploy, so StratCon must not generate a scenario
+            // for it. It can sit in the combat-team list between a load and the next recalculation.
+            if (SupportCarrierDeployment.deploysNothing(campaign, formation, null)) {
+                continue;
+            }
+
             // So long as the combat team isn't In Reserve or Auxiliary, they are eligible to be deployed
             CombatRole combatRole = combatTeam.getRole();
             if (bypassRoleRestrictions) {
@@ -3199,6 +3213,13 @@ public class StratConRulesManager {
             }
 
             if (force.isDeployed()) {
+                continue;
+            }
+
+            // A support company holds only carriers, which stay home; offering it would assign a formation that
+            // sends nothing.
+            if (SupportCarrierDeployment.deploysNothing(campaign, force,
+                  (currentScenario == null) ? null : currentScenario.getBackingScenario())) {
                 continue;
             }
 
@@ -3293,6 +3314,10 @@ public class StratConRulesManager {
 
             // Validate the unit
             if (!isUnitValidForFrontlineDeployment(unit)) {
+                continue;
+            }
+
+            if (SupportCarrierDeployment.staysHome(unit, currentScenario.getBackingScenario())) {
                 continue;
             }
 
@@ -3432,6 +3457,10 @@ public class StratConRulesManager {
 
             // Validate the unit
             if (!isUnitValidForLeadershipDeployment(unit, generalUnitType, totalBudget)) {
+                continue;
+            }
+
+            if (SupportCarrierDeployment.staysHome(unit, currentScenario.getBackingScenario())) {
                 continue;
             }
 

@@ -196,6 +196,49 @@ public class AddSupportUnitsToTOE {
      * @author Illiani
      * @since 0.51.0
      */
+    /**
+     * The formation a campaign already keeps its support under, if it has one.
+     *
+     * <p>A campaign built by hand rarely has a formation called "Headquarters" - it has a Command Battalion, a
+     * Support Group, a Train, whatever the player named it - but that formation is recognisable by what hangs off it:
+     * the logistics, salvage, security and support formations. Adding a second headquarters beside it would leave the
+     * campaign with two support structures that neither the player nor the game can tell apart.</p>
+     *
+     * <p>The winner is the formation with the most support-typed formations under it, needing at least two so a
+     * single stray convoy does not claim the job. A tie goes to the first found, which keeps the answer stable across
+     * loads because the TOE is walked in order.</p>
+     *
+     * @param campaign the campaign whose TOE is searched
+     *
+     * @return the formation that already holds the campaign's support, or {@code null} if nothing qualifies
+     */
+    static @Nullable Formation findSupportHome(Campaign campaign) {
+        Formation best = null;
+        int bestCount = 0;
+        for (Formation candidate : campaign.getPlayerForce().getAllFormations()) {
+            int supportChildren = 0;
+            for (Formation child : candidate.getAllSubFormations()) {
+                if (isSupportType(child)) {
+                    supportChildren++;
+                }
+            }
+            // The root holds everything, so it always wins on count and never means anything.
+            if ((candidate.getParentFormation() != null) && (supportChildren > bestCount)) {
+                best = candidate;
+                bestCount = supportChildren;
+            }
+        }
+        return (bestCount >= 2) ? best : null;
+    }
+
+    /** @return {@code true} if this formation is one of the support kinds, rather than a fighting formation */
+    private static boolean isSupportType(Formation formation) {
+        return formation.isFormationType(FormationType.SUPPORT)
+                     || formation.isFormationType(FormationType.SALVAGE)
+                     || formation.isFormationType(FormationType.CONVOY)
+                     || formation.isFormationType(FormationType.SECURITY);
+    }
+
     static @NonNull Formation getHqFormation(Campaign campaign) {
         final Formation ORIGIN_FORMATION = campaign.getPlayerForce().getFormation(Formation.FORMATION_ORIGIN);
 

@@ -89,6 +89,7 @@ import mekhq.campaign.universe.commandGeneration.CommandGenerationOptions;
 import mekhq.campaign.universe.commandGeneration.EnhancedImagingAugmentor;
 import mekhq.campaign.universe.commandGeneration.LiftTopUp;
 import mekhq.campaign.universe.commandGeneration.ManeiDominiAugmentor;
+import mekhq.campaign.universe.commandGeneration.SupportCarrierReconciler;
 import mekhq.campaign.universe.commandGeneration.SupportPersonnelToTOE;
 import mekhq.campaign.universe.commandGeneration.SupportUnitGenerator;
 import mekhq.campaign.universe.commandGeneration.TemporaryCrewRole;
@@ -657,7 +658,15 @@ public final class CommandGenerator {
         // Medical / Command) becomes infantry-style carrier units crewed by the staff, nested under a
         // Support Command formation. Crewing a carrier is separate from the setTech maintenance
         // assignment above, so techs still maintain the combat units.
-        SupportPersonnelToTOE.organize(campaign, supportResult.generatedPersons(), campaign.getPlayerForce().isClanForce());
+        // Support teams are a campaign option: with it off the staff are still generated and hired, they simply stay
+        // on the roster instead of being organized into carriers.
+        if (SupportCarrierReconciler.isEnabled(campaign)) {
+            SupportPersonnelToTOE.organize(campaign, supportResult.generatedPersons(),
+                  campaign.getPlayerForce().isClanForce());
+        } else {
+            LOGGER.info("[CompanyGen][SupportTOE] support teams are switched off; {} support person(s) stay unorganized",
+                  supportResult.generatedPersons().size());
+        }
 
         // Grant the standalone support vehicles a command gets for each enabled capability that has no
         // matching personnel section (logistics convoy, canteen, security). Salvage and medical

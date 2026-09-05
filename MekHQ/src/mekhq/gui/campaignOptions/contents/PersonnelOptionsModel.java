@@ -68,6 +68,7 @@ class PersonnelOptionsModel {
     boolean usePersonnelRemoval;
     boolean useRemovalExemptCemetery;
     boolean useRemovalExemptRetirees;
+    boolean useSupportTeams;
     boolean useBlobInfantry;
     boolean useBlobBattleArmor;
     boolean useBlobVehicleCrewGround;
@@ -157,6 +158,7 @@ class PersonnelOptionsModel {
         usePersonnelRemoval = options.get(CampaignOption.USE_PERSONNEL_REMOVAL);
         useRemovalExemptCemetery = options.get(CampaignOption.USE_REMOVAL_EXEMPT_CEMETERY);
         useRemovalExemptRetirees = options.get(CampaignOption.USE_REMOVAL_EXEMPT_RETIREES);
+        useSupportTeams = options.get(CampaignOption.USE_SUPPORT_TEAMS);
         useBlobInfantry = options.get(CampaignOption.USE_BLOB_INFANTRY);
         useBlobBattleArmor = options.get(CampaignOption.USE_BLOB_BATTLE_ARMOR);
         useBlobVehicleCrewGround = options.get(CampaignOption.USE_BLOB_VEHICLE_CREW_GROUND);
@@ -247,6 +249,7 @@ class PersonnelOptionsModel {
         options.set(CampaignOption.USE_PERSONNEL_REMOVAL, usePersonnelRemoval);
         options.set(CampaignOption.USE_REMOVAL_EXEMPT_CEMETERY, useRemovalExemptCemetery);
         options.set(CampaignOption.USE_REMOVAL_EXEMPT_RETIREES, useRemovalExemptRetirees);
+        options.set(CampaignOption.USE_SUPPORT_TEAMS, useSupportTeams);
         options.set(CampaignOption.USE_BLOB_INFANTRY, useBlobInfantry);
         options.set(CampaignOption.USE_BLOB_BATTLE_ARMOR, useBlobBattleArmor);
         options.set(CampaignOption.USE_BLOB_VEHICLE_CREW_GROUND, useBlobVehicleCrewGround);

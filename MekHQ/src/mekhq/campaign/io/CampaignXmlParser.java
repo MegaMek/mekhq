@@ -366,6 +366,9 @@ public record CampaignXmlParser(InputStream is, MekHQ app) {
                 } else if (nodeName.equalsIgnoreCase("repairBaysRented")) {
                     int repairBaysRented = parseInt(childNode.getTextContent().trim());
                     playerForce.setRepairBaysRented(repairBaysRented);
+                } else if (nodeName.equalsIgnoreCase("supportCommandFormationId")) {
+                    playerForce.setSupportCommandFormationId(parseInt(childNode.getTextContent().trim(),
+                          FORMATION_NONE));
                 } else if (nodeName.equalsIgnoreCase("id")) {
                     campaign.setId(UUID.fromString(childNode.getTextContent().trim()));
                 }

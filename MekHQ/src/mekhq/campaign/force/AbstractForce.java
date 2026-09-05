@@ -152,6 +152,13 @@ public abstract class AbstractForce {
     // Table of Organisation & Equipment (TO&E) and StratCon combat teams
     private Formation formations;
     private int lastFormationId;
+    /**
+     * Id of the Support Command formation built by {@code SupportPersonnelToTOE}, or {@link Formation#FORMATION_NONE}
+     * when this campaign has no support structure. Held as an id rather than found by name because formation names are
+     * localized and players can rename them. A deleted formation simply resolves to {@code null}, which the carrier
+     * reconciler treats as "this campaign has no support structure" and leaves alone.
+     */
+    private int supportCommandFormationId = Formation.FORMATION_NONE;
     private Hashtable<Integer, CombatTeam> combatTeams = new Hashtable<>();
 
     protected AbstractForce(ForceOptions forceOptions, megamek.common.enums.Faction techFaction, RankSystem rankSystem,
@@ -653,6 +660,30 @@ public abstract class AbstractForce {
 
     public int getLastFormationId() {
         return lastFormationId;
+    }
+
+    /**
+     * @return the id of the Support Command formation, or {@link Formation#FORMATION_NONE} if this campaign has none
+     */
+    public int getSupportCommandFormationId() {
+        return supportCommandFormationId;
+    }
+
+    public void setSupportCommandFormationId(int supportCommandFormationId) {
+        this.supportCommandFormationId = supportCommandFormationId;
+    }
+
+    /**
+     * Resolves the Support Command formation, or {@code null} when this campaign has no support structure or the player
+     * has deleted the formation.
+     *
+     * @return the Support Command {@link Formation}, or {@code null}
+     */
+    public @Nullable Formation getSupportCommandFormation() {
+        if (supportCommandFormationId == Formation.FORMATION_NONE) {
+            return null;
+        }
+        return getFormation(supportCommandFormationId);
     }
 
     /** The raw, unsanitized combat-team table (keyed by formation id); used for serialization and iteration. */

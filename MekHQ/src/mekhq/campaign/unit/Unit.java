@@ -199,6 +199,14 @@ public class Unit implements ITechnology, ILocatable {
     private UUID id;
     private final LocationNode locationNode = new LocationNode(this);
     private String fluffName;
+    /**
+     * {@code true} when this unit is a support carrier: an infantry unit that exists to hold support personnel in the
+     * TOE. Carriers are created by {@code SupportPersonnelToTOE} and kept current by
+     * {@code SupportCarrierReconciler}. Whether a carrier may deploy is decided in one place,
+     * {@code SupportCarrierDeployment} - closed today, to be opened by a future scenario type that pulls support staff
+     * into a fight. Absent from saves written before carriers were tracked, which read back as {@code false}.
+     */
+    private boolean carrier;
     private String armorKitName;
     private String designedInfantryKitName;
     private String intendedArmorKitName;
@@ -3001,6 +3009,10 @@ public class Unit implements ITechnology, ILocatable {
             MHQXMLUtility.writeSimpleXMLTag(pw, indent, "salvaged", true);
         }
 
+        if (carrier) {
+            MHQXMLUtility.writeSimpleXMLTag(pw, indent, "carrier", true);
+        }
+
         if (site != SITE_FACILITY_BASIC) {
             MHQXMLUtility.writeSimpleXMLTag(pw, indent, "site", site);
         }
@@ -3276,6 +3288,8 @@ public class Unit implements ITechnology, ILocatable {
                     loadLogEntriesFromXML(wn2, retVal.deploymentLog, "deploymentLog");
                 } else if (wn2.getNodeName().equalsIgnoreCase("repairLog")) {
                     loadLogEntriesFromXML(wn2, retVal.repairLog, "repairLog");
+                } else if (wn2.getNodeName().equalsIgnoreCase("carrier")) {
+                    retVal.carrier = Boolean.parseBoolean(wn2.getTextContent().trim());
                 } else if (wn2.getNodeName().equalsIgnoreCase("fluffName")) {
                     retVal.fluffName = wn2.getTextContent();
                 } else if (wn2.getNodeName().equalsIgnoreCase("armorKitName")) {
@@ -6711,6 +6725,19 @@ public class Unit implements ITechnology, ILocatable {
     }
 
     /**
+     * Whether this unit still holds the crew and formation it had before mothballing, waiting to be put back.
+     *
+     * <p>Set when mothballing starts and cleared only after activation has restored everything, so it stays
+     * {@code true} through the window where the unit is no longer mothballed but not yet re-crewed or re-filed.
+     * Always {@code false} when the save-mothball-state option is off.</p>
+     *
+     * @return {@code true} while a pre-mothball restore is pending
+     */
+    public boolean hasPendingMothballRestore() {
+        return mothballInfo != null;
+    }
+
+    /**
      * Gets the time (in minutes) remaining to mothball or activate the unit.
      *
      * @return The time (in minutes) remaining to mothball or activate the unit.
@@ -7650,6 +7677,18 @@ public class Unit implements ITechnology, ILocatable {
      */
     public void setFluffName(String fluffName) {
         this.fluffName = fluffName;
+    }
+
+    /**
+     * @return {@code true} if this unit is a support carrier holding support personnel in the TOE rather than a
+     *       fighting unit
+     */
+    public boolean isCarrier() {
+        return carrier;
+    }
+
+    public void setCarrier(boolean carrier) {
+        this.carrier = carrier;
     }
 
     /**

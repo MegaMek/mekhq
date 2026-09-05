@@ -91,6 +91,7 @@ import mekhq.gui.CampaignGUI;
 import mekhq.gui.baseComponents.JScrollableMenu;
 import mekhq.gui.dialog.ForceTemplateAssignmentDialog;
 import mekhq.gui.dialog.MarkdownEditorDialog;
+import mekhq.gui.dialog.SupportCarrierDeploymentDialogs;
 import mekhq.gui.dialog.iconDialogs.LayeredFormationIconDialog;
 import mekhq.gui.menus.ExportUnitSpriteMenu;
 import mekhq.gui.menus.TransportAssignmentMenus;
@@ -405,6 +406,7 @@ public class TOEMouseAdapter extends JPopupMenuAdapter {
                     }
                     MekHQ.triggerEvent(new DeploymentChangedEvent(formation, scenario));
                 }
+                SupportCarrierDeploymentDialogs.showStayingHome(gui.getCampaign(), formations, scenario);
             }
         } else if (command.contains(CHANGE_ICON)) {
             if (singleFormation != null) {

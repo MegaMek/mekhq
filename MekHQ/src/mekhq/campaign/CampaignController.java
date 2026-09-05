@@ -39,6 +39,8 @@ import megamek.common.event.Subscribe;
 import mekhq.MekHQ;
 import mekhq.campaign.events.StoryFinishedEvent;
 import mekhq.campaign.market.PersonnelMarket;
+import mekhq.campaign.universe.commandGeneration.SupportCarrierReconciler;
+import mekhq.gui.campaignOptions.optionChangeDialogs.SupportTeamsCampaignOptionsChangedConfirmationDialog;
 
 /**
  * Manages the timeline of a {@link Campaign}.
@@ -71,6 +73,19 @@ public class CampaignController {
         }
         MekHQ.registerHandler(campaignEventProcessor);
         MekHQ.registerHandler(this);
+
+        // Person events raised while the save was parsed reached no subscriber, because handlers are only registered
+        // here, after loading. One idempotent pass catches up anyone the events would have placed, and marks carriers
+        // in campaigns saved before carriers were tracked.
+        SupportCarrierReconciler.reconcileAll(localCampaign);
+
+        // A campaign that predates support teams has its staff on the roster and no Support Command, so the sweep
+        // above found nothing to manage. Offer to organize them, once: declining switches the option off, which is
+        // also how the player says "not in this campaign".
+        if (SupportCarrierReconciler.hasStaffToOrganize(localCampaign)) {
+            SwingUtilities.invokeLater(
+                  () -> new SupportTeamsCampaignOptionsChangedConfirmationDialog(localCampaign, true));
+        }
     }
 
     /**
