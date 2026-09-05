@@ -159,6 +159,11 @@ public enum ChaosObjectiveType {
     public ContractObjectiveType getCamOpsObjectiveType() {
         List<ContractObjectiveType> candidates = new ArrayList<>();
         for (ContractObjectiveType type : ContractObjectiveType.values()) {
+            // UNDEFINED is a sentinel/placeholder tagged with RAID; it is not a real objective and has no StratCon
+            // contract definition, so it must never be produced by generation (it would crash on contract acceptance).
+            if (type.isUndefined()) {
+                continue;
+            }
             if (type.getChaosObjectiveType() == this) {
                 candidates.add(type);
             }

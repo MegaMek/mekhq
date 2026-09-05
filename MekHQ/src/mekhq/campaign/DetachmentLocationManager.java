@@ -118,7 +118,8 @@ public class DetachmentLocationManager {
      * <ul>
      *     <li>Updates the detachment's {@link CurrentLocation} to the given planetary system.</li>
      *     <li>Triggers a {@link LocationChangedEvent} to notify listeners of the move.</li>
-     *     <li>If there are no units in automated mothball mode, performs automated activation.</li>
+     *     <li>If any units are awaiting automated activation, unmothballs them (mirroring
+     *     {@link mekhq.campaign.force.Detachment#onArrival}).</li>
      *     <li>If enabled by campaign options, checks for possible inoculation prompts related to the Random Diseases
      *     and Alternative Advanced Medical systems.</li>
      * </ul>
@@ -129,8 +130,8 @@ public class DetachmentLocationManager {
         setLocation(campaign.getCampaignLocationManager(), new CurrentLocation(planetarySystem, 0.0));
         MekHQ.triggerEvent(new LocationChangedEvent(detachment.getCurrentLocation(), false));
 
-        if (campaign.getPlayerForce().getAutomatedMothballUnits().isEmpty()) {
-            performAutomatedActivation(campaign);
+        if (!detachment.getAutomatedMothballUnits().isEmpty()) {
+            performAutomatedActivation(campaign, detachment);
         }
 
         if (campaign.getCampaignOptions().get(CampaignOption.USE_RANDOM_DISEASES)
