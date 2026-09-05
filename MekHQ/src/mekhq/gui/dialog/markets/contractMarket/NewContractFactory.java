@@ -100,7 +100,6 @@ public final class NewContractFactory {
         contract.setStatus(null);
         contract.setScale(1);
         contract.setTrackCount(0);
-        contract.setRequiredCombatElements(0);
         contract.setRequiredVictoryPoints(0);
 
         contract.setScheduleData(new ContractScheduleData(today, today.plusMonths(DEFAULT_LENGTH_MONTHS),

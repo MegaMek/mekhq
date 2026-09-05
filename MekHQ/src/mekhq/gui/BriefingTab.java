@@ -432,7 +432,6 @@ public final class BriefingTab extends CampaignGuiTab {
         scrollScenarioView.setViewportView(null);
         scrollScenarioView.setMinimumSize(new Dimension(350, 220));
         panLanceAssignment = new LanceAssignmentView(getCampaign());
-        panLanceAssignment.setAssignmentChangeListener(this::updateMissionDeploymentCoverage);
 
         scenarioWorkTabs = new JTabbedPane();
         styleBriefingTabs(scenarioWorkTabs);
@@ -2609,13 +2608,6 @@ public final class BriefingTab extends CampaignGuiTab {
         panLanceAssignment.refresh();
         refreshSelectedScenarioActions(getSelectedScenario());
         refreshAssignmentsTabAvailability();
-        updateMissionDeploymentCoverage();
-    }
-
-    private void updateMissionDeploymentCoverage() {
-        if (missionViewPanel != null) {
-            missionViewPanel.updateDeploymentCoverage();
-        }
     }
 
     /*

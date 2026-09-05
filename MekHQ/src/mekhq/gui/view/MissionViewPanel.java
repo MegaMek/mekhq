@@ -115,38 +115,12 @@ public class MissionViewPanel extends JScrollablePanel {
     private JLabel txtSalvageValueMerc;
     private JLabel lblSalvageValueEmployer;
     private JLabel txtSalvageValueEmployer;
-    private JLabel txtDeploymentCoverage;
 
     public MissionViewPanel(AbstractContract mission, CampaignGUI gui) {
         super();
         this.mission = mission;
         this.gui = gui;
         initComponents();
-    }
-
-    /**
-     * Recomputes and updates the Deployment Coverage label so it reflects the current assignment state without needing
-     * to rebuild the whole panel. Has no effect when the panel does not display a deployment coverage value (e.g. for
-     * non-AtB contracts, when StratCon is disabled, or when the contract is not currently active).
-     */
-    public void updateDeploymentCoverage() {
-        if (txtDeploymentCoverage == null) {
-            return;
-        }
-
-        Campaign campaign = gui.getCampaign();
-        if (!campaign.getCampaignOptions().isUseStratCon() || !mission.isActiveOn(campaign.getLocalDate())) {
-            return;
-        }
-
-        int assignedCombatElements = RequiredLancesTableModel.getAssignedCombatElementCount(campaign, mission);
-        int requiredCombatElements = mission.getRequiredCombatElements();
-        txtDeploymentCoverage.setText(assignedCombatElements + " / " + requiredCombatElements);
-        if (RequiredLancesTableModel.hasDeploymentShortfall(campaign, mission)) {
-            txtDeploymentCoverage.setForeground(MekHQ.getMHQOptions().getBelowContractMinimumForeground());
-        } else {
-            txtDeploymentCoverage.setForeground(MekHQ.getMHQOptions().getFontColorPositive());
-        }
     }
 
     private void initComponents() {
@@ -196,8 +170,6 @@ public class MissionViewPanel extends JScrollablePanel {
         JLabel txtSharePct = new JLabel();
         JLabel lblCargoRequirement = new JLabel();
         JLabel txtCargoRequirement = new JLabel();
-        JLabel lblDeploymentCoverage = new JLabel();
-        txtDeploymentCoverage = new JLabel();
         JLabel lblScore = new JLabel();
         JLabel txtScore = new JLabel();
         JLabel lblSupportPoints = new JLabel();
@@ -387,26 +359,6 @@ public class MissionViewPanel extends JScrollablePanel {
             txtCargoRequirement.setName("txtCargoRequirement");
             txtCargoRequirement.setText("~" + estimateCargoRequirements(campaign, mission) + 't');
             addStatRow(lblCargoRequirement, txtCargoRequirement, y++);
-
-            if (mission.isActiveOn(campaign.getLocalDate())) {
-                String deploymentCoverageTooltip = wordWrap(getTextAt(RESOURCE_BUNDLE,
-                      "txtDeploymentCoverage.tooltip"));
-                lblDeploymentCoverage.setName("lblDeploymentCoverage");
-                lblDeploymentCoverage.setText(getTextAt(RESOURCE_BUNDLE, "lblDeploymentCoverage.text"));
-                lblDeploymentCoverage.setToolTipText(deploymentCoverageTooltip);
-
-                int assignedCombatElements = RequiredLancesTableModel.getAssignedCombatElementCount(campaign, mission);
-                int requiredCombatElements = mission.getRequiredCombatElements();
-                txtDeploymentCoverage.setName("txtDeploymentCoverage");
-                txtDeploymentCoverage.setText(assignedCombatElements + " / " + requiredCombatElements);
-                txtDeploymentCoverage.setToolTipText(deploymentCoverageTooltip);
-                if (RequiredLancesTableModel.hasDeploymentShortfall(campaign, mission)) {
-                    txtDeploymentCoverage.setForeground(MekHQ.getMHQOptions().getBelowContractMinimumForeground());
-                } else {
-                    txtDeploymentCoverage.setForeground(MekHQ.getMHQOptions().getFontColorPositive());
-                }
-                addStatRow(lblDeploymentCoverage, txtDeploymentCoverage, y++);
-            }
         }
 
         addDescriptionPane(mission.getDescription(), y++, 0.0);

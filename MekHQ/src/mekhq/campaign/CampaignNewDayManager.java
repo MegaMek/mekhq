@@ -2228,20 +2228,6 @@ public class CampaignNewDayManager {
                       .forEach(unit -> unit.setSite(ContractRepairLocation.getRepairLocation(contract.getObjectiveType())));
             }
 
-            if (today.getDayOfWeek() == DayOfWeek.MONDAY) {
-                int deficit = ContractUtilities.getDeploymentDeficit(campaign, contract);
-                StratConCampaignState campaignState = contract.getStratConCampaignState();
-
-                if (campaignState != null && deficit > 0) {
-                    campaign.addReport(GENERAL, String.format(resources.getString("contractBreach.text"),
-                          contract.getHyperlinkedName(),
-                          spanOpeningWithCustomColor(ReportingUtilities.getNegativeColor()),
-                          CLOSING_SPAN_TAG));
-
-                    campaignState.changeVictoryPoints(-1);
-                }
-            }
-
             for (final Scenario scenario : contract.getCurrentAtBScenarios()) {
                 if ((scenario.getDate() != null) && scenario.getDate().isBefore(today)) {
                     boolean hasForceDeployed = allScenariosWithAssignedStandardForces.contains(scenario.getId());

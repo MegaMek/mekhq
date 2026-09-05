@@ -154,7 +154,6 @@ public final class LegacyContractConverter {
         int holdingCells = 0;
 
         int scale = 1;
-        int requiredCombatElements = 0;
         int difficulty = 0;
 
         ContractMoraleLevel moraleLevel = ContractMoraleLevel.STALEMATE;
@@ -214,7 +213,6 @@ public final class LegacyContractConverter {
                     case "kitchensRented" -> kitchens = MathUtility.parseInt(value);
                     case "holdingCellsRented" -> holdingCells = MathUtility.parseInt(value);
                     case "requiredCombatTeams" -> scale = MathUtility.parseInt(value);
-                    case "requiredCombatElements" -> requiredCombatElements = MathUtility.parseInt(value);
                     case "difficulty" -> difficulty = MathUtility.parseInt(value);
                     case "moraleLevel" -> moraleLevel = ContractMoraleLevel.valueOf(value);
                     case "routEnd" -> routEndDate = MHQXMLUtility.parseDate(value);
@@ -272,7 +270,6 @@ public final class LegacyContractConverter {
         contract.setStatus(wasActive ? MissionStatus.SUCCESS : status);
         contract.setScale(max(1, scale));
         contract.setSharesPercent(sharesPercent);
-        contract.setRequiredCombatElements(requiredCombatElements);
         contract.setCachedContractDifficulty(difficulty);
 
         contract.setScheduleData(new ContractScheduleData(startDate, endDate, lengthInMonths));
