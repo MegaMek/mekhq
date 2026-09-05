@@ -183,6 +183,15 @@ public final class TOETab extends CampaignGuiTab {
      * @since 0.50.10
      */
     private void deploymentButton() {
+        // The button acts on the whole TOE, not the highlighted node, but a player who has a support carrier or a
+        // support company highlighted reads it as "deploy this". Say up front that it will not, rather than running
+        // the whole flow in silence.
+        if (isHighlightedSupportOnly()) {
+            JOptionPane.showMessageDialog(getFrame(), SupportCarrierDeployment.nothingToDeployMessage(
+                  highlightedName()), SupportCarrierDeployment.nothingToDeployTitle(), JOptionPane.WARNING_MESSAGE);
+            return;
+        }
+
         // Build scenario list with mission mapping
         Map<Scenario, AbstractContract> scenarioMissionMap = new HashMap<>();
         for (AbstractContract mission : getCampaign().getActiveContracts()) {
@@ -215,6 +224,32 @@ public final class TOETab extends CampaignGuiTab {
         } else {
             deployToRegularScenario(selectedScenario);
         }
+    }
+
+    /**
+     * @return {@code true} if the highlighted node is a support carrier, or a formation holding only support carriers
+     */
+    private boolean isHighlightedSupportOnly() {
+        Object node = orgTree.getLastSelectedPathComponent();
+        if (node instanceof Unit unit) {
+            return SupportCarrierDeployment.staysHome(unit, null);
+        }
+        if (node instanceof Formation formation) {
+            return SupportCarrierDeployment.deploysNothing(getCampaign(), formation, null);
+        }
+        return false;
+    }
+
+    /** @return the display name of the highlighted node, for the dialog */
+    private String highlightedName() {
+        Object node = orgTree.getLastSelectedPathComponent();
+        if (node instanceof Unit unit) {
+            return unit.getName();
+        }
+        if (node instanceof Formation formation) {
+            return formation.getName();
+        }
+        return "";
     }
 
     /**

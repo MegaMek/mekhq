@@ -175,8 +175,18 @@ public final class SupportCarrierDeployment {
      * @return the HTML body for an error dialog
      */
     public static String nothingToDeployMessage(Formation formation) {
-        return getFormattedTextAt(RESOURCE_BUNDLE, "SupportCarrierDeployment.nothingToDeploy.body",
-              formation.getName());
+        return nothingToDeployMessage(formation.getName());
+    }
+
+    /**
+     * The dialog text for a name that stands for only carriers - a formation or a single carrier.
+     *
+     * @param name the name shown to the player
+     *
+     * @return the HTML body for an error dialog
+     */
+    public static String nothingToDeployMessage(String name) {
+        return getFormattedTextAt(RESOURCE_BUNDLE, "SupportCarrierDeployment.nothingToDeploy.body", name);
     }
 
     /** @return the dialog title for {@link #nothingToDeployMessage} */

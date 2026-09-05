@@ -308,6 +308,8 @@ public class Formation {
         }
         // Every assignment path ends here, so this is where the player is told. The GUI adds a dialog on top.
         if ((stayedHome > 0) && (scenarioId != NO_ASSIGNED_SCENARIO)) {
+            LOGGER.info("Assigned {} to scenario {}: {} support carrier(s) stay home", getName(), scenarioId,
+                  stayedHome);
             campaign.addReport(DailyReportType.BATTLE, getFormattedTextAt("mekhq.resources.SupportPersonnelToTOE",
                   "SupportCarrierDeployment.stayHome.report", stayedHome, getName()));
         }
