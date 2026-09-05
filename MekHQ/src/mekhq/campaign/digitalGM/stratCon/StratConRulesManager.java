@@ -1316,7 +1316,14 @@ public class StratConRulesManager {
                 // If the player doesn't have any available forces, we grab a force at random to
                 // seed the scenario
                 if (availableForceIDs.isEmpty()) {
-                    List<CombatTeam> combatTeams = campaign.getPlayerForce().getCombatTeamsAsList(campaign);
+                    List<CombatTeam> combatTeams = new ArrayList<>();
+                    for (CombatTeam candidate : campaign.getPlayerForce().getCombatTeamsAsList(campaign)) {
+                        Formation candidateFormation = candidate.getFormation(campaign);
+                        if ((candidateFormation != null)
+                                  && !SupportCarrierDeployment.deploysNothing(campaign, candidateFormation, null)) {
+                            combatTeams.add(candidate);
+                        }
+                    }
                     if (!combatTeams.isEmpty()) {
                         combatTeam = getRandomItem(combatTeams);
 
@@ -3109,6 +3116,12 @@ public class StratConRulesManager {
 
             // Skip any that are already assigned to a scenario.
             if (formation.isDeployed()) {
+                continue;
+            }
+
+            // A support company holds only carriers, which never deploy, so StratCon must not generate a scenario
+            // for it. It can sit in the combat-team list between a load and the next recalculation.
+            if (SupportCarrierDeployment.deploysNothing(campaign, formation, null)) {
                 continue;
             }
 
