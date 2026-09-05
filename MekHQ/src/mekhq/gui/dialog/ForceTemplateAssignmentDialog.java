@@ -236,8 +236,7 @@ public class ForceTemplateAssignmentDialog extends JDialog {
         int forceID = forceList.getSelectedValue().getId();
 
         if (SupportCarrierDeployment.deploysNothing(campaignGUI.getCampaign(), formation, currentScenario)) {
-            JOptionPane.showMessageDialog(this, SupportCarrierDeployment.nothingToDeployMessage(formation),
-                  SupportCarrierDeployment.nothingToDeployTitle(), JOptionPane.WARNING_MESSAGE);
+            SupportCarrierDeploymentDialogs.showNothingToDeploy(campaignGUI.getCampaign(), formation.getName());
             return;
         }
 
@@ -246,15 +245,12 @@ public class ForceTemplateAssignmentDialog extends JDialog {
         formation.clearScenarioIds(campaignGUI.getCampaign(), true);
         formation.setScenarioId(currentScenario.getId(), campaignGUI.getCampaign());
         currentScenario.addForce(forceID, templateList.getSelectedValue().getForceName());
-        String stayedHome = SupportCarrierDeployment.stayingHomeMessage(campaignGUI.getCampaign(),
-              List.of(formation), currentScenario);
-        if (stayedHome != null) {
-            JOptionPane.showMessageDialog(this, stayedHome, SupportCarrierDeployment.stayingHomeTitle(),
-                  JOptionPane.INFORMATION_MESSAGE);
-        }
+        SupportCarrierDeploymentDialogs.showStayingHome(campaignGUI.getCampaign(), List.of(formation),
+              currentScenario);
         for (UUID uid : formation.getAllUnits(true)) {
             Unit u = campaignGUI.getCampaign().getUnit(uid);
-            if (null != u) {
+            // Carriers were left home by setScenarioId above; do not assign them here either.
+            if ((null != u) && !SupportCarrierDeployment.staysHome(u, currentScenario)) {
                 u.setScenarioId(currentScenario.getId());
                 // If your force includes transports with units assigned,
                 // prompt the player to also deploy any units transported by this one

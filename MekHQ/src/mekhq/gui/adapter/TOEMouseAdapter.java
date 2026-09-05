@@ -86,12 +86,12 @@ import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.enums.PersonnelRole;
 import mekhq.campaign.unit.HangarSorter;
 import mekhq.campaign.unit.Unit;
-import mekhq.campaign.universe.commandGeneration.SupportCarrierDeployment;
 import mekhq.campaign.universe.Faction;
 import mekhq.gui.CampaignGUI;
 import mekhq.gui.baseComponents.JScrollableMenu;
 import mekhq.gui.dialog.ForceTemplateAssignmentDialog;
 import mekhq.gui.dialog.MarkdownEditorDialog;
+import mekhq.gui.dialog.SupportCarrierDeploymentDialogs;
 import mekhq.gui.dialog.iconDialogs.LayeredFormationIconDialog;
 import mekhq.gui.menus.ExportUnitSpriteMenu;
 import mekhq.gui.menus.TransportAssignmentMenus;
@@ -406,12 +406,7 @@ public class TOEMouseAdapter extends JPopupMenuAdapter {
                     }
                     MekHQ.triggerEvent(new DeploymentChangedEvent(formation, scenario));
                 }
-                String stayedHome = SupportCarrierDeployment.stayingHomeMessage(gui.getCampaign(), formations,
-                      scenario);
-                if (stayedHome != null) {
-                    JOptionPane.showMessageDialog(gui.getFrame(), stayedHome,
-                          SupportCarrierDeployment.stayingHomeTitle(), JOptionPane.INFORMATION_MESSAGE);
-                }
+                SupportCarrierDeploymentDialogs.showStayingHome(gui.getCampaign(), formations, scenario);
             }
         } else if (command.contains(CHANGE_ICON)) {
             if (singleFormation != null) {

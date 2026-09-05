@@ -78,6 +78,7 @@ import mekhq.gui.baseComponents.roundedComponents.RoundedLineBorder;
 import mekhq.gui.dialog.ForceTemplateAssignmentDialog;
 import mekhq.gui.dialog.MaplessStratConForcePicker;
 import mekhq.gui.dialog.MaplessStratConScenarioPicker;
+import mekhq.gui.dialog.SupportCarrierDeploymentDialogs;
 import mekhq.gui.enums.MHQTabType;
 import mekhq.gui.handler.TOETransferHandler;
 import mekhq.gui.model.CrewListModel;
@@ -187,8 +188,7 @@ public final class TOETab extends CampaignGuiTab {
         // support company highlighted reads it as "deploy this". Say up front that it will not, rather than running
         // the whole flow in silence.
         if (isHighlightedSupportOnly()) {
-            JOptionPane.showMessageDialog(getFrame(), SupportCarrierDeployment.nothingToDeployMessage(
-                  highlightedName()), SupportCarrierDeployment.nothingToDeployTitle(), JOptionPane.WARNING_MESSAGE);
+            SupportCarrierDeploymentDialogs.showNothingToDeploy(getCampaign(), highlightedName());
             return;
         }
 
@@ -327,12 +327,7 @@ public final class TOETab extends CampaignGuiTab {
             selectedFormation.setScenarioId(selectedScenario.getId(), getCampaign());
             MekHQ.triggerEvent(new DeploymentChangedEvent(selectedFormation, selectedScenario));
 
-            String stayedHome = SupportCarrierDeployment.stayingHomeMessage(campaign, List.of(selectedFormation),
-                  selectedScenario);
-            if (stayedHome != null) {
-                JOptionPane.showMessageDialog(getFrame(), stayedHome, SupportCarrierDeployment.stayingHomeTitle(),
-                      JOptionPane.INFORMATION_MESSAGE);
-            }
+            SupportCarrierDeploymentDialogs.showStayingHome(campaign, List.of(selectedFormation), selectedScenario);
         }
     }
 

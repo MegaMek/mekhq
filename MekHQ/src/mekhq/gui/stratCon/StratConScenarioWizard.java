@@ -97,6 +97,7 @@ import mekhq.gui.baseComponents.immersiveDialogs.ImmersiveDialogNotification;
 import mekhq.gui.baseComponents.immersiveDialogs.ImmersiveDialogSimple;
 import mekhq.gui.dialog.StratConReinforcementsConfirmationDialog;
 import mekhq.gui.dialog.StratConSinglesReinforcementsDialog;
+import mekhq.gui.dialog.SupportCarrierDeploymentDialogs;
 import mekhq.utilities.MHQInternationalization;
 import mekhq.utilities.ReportingUtilities;
 import org.apache.commons.lang3.ArrayUtils;
@@ -1041,12 +1042,8 @@ public class StratConScenarioWizard extends JDialog {
             scaleObjectiveTimeLimits(currentScenario.getBackingScenario(), campaign);
         }
 
-        String stayedHome = SupportCarrierDeployment.stayingHomeMessage(campaign, committedFormations,
+        SupportCarrierDeploymentDialogs.showStayingHome(campaign, committedFormations,
               currentScenario.getBackingScenario());
-        if (stayedHome != null) {
-            JOptionPane.showMessageDialog(this, stayedHome, SupportCarrierDeployment.stayingHomeTitle(),
-                  JOptionPane.INFORMATION_MESSAGE);
-        }
 
         closeWizard();
     }

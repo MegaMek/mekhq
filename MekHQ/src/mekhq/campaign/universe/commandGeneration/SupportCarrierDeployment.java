@@ -33,7 +33,6 @@
 package mekhq.campaign.universe.commandGeneration;
 
 import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
-import static mekhq.utilities.MHQInternationalization.getTextAt;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -137,7 +136,7 @@ public final class SupportCarrierDeployment {
 
     /**
      * The dialog text explaining which carriers stayed home when these formations were assigned, or {@code null} when
-     * none did. Callers show it with a plain information dialog; the campaign report carries the same fact.
+     * none did. {@code SupportCarrierDeploymentDialogs} shows it; the campaign report carries the same fact.
      *
      * @param campaign   the campaign
      * @param formations the formations that were assigned
@@ -162,11 +161,6 @@ public final class SupportCarrierDeployment {
               String.join("<br>", lines));
     }
 
-    /** @return the dialog title for {@link #stayingHomeMessage} */
-    public static String stayingHomeTitle() {
-        return getTextAt(RESOURCE_BUNDLE, "SupportCarrierDeployment.stayHome.title");
-    }
-
     /**
      * The dialog text for a formation that holds only carriers.
      *
@@ -187,10 +181,5 @@ public final class SupportCarrierDeployment {
      */
     public static String nothingToDeployMessage(String name) {
         return getFormattedTextAt(RESOURCE_BUNDLE, "SupportCarrierDeployment.nothingToDeploy.body", name);
-    }
-
-    /** @return the dialog title for {@link #nothingToDeployMessage} */
-    public static String nothingToDeployTitle() {
-        return getTextAt(RESOURCE_BUNDLE, "SupportCarrierDeployment.nothingToDeploy.title");
     }
 }
