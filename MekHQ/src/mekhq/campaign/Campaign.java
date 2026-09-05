@@ -3173,8 +3173,6 @@ public class Campaign implements ITechManager {
                                                                  getLocalDate()),
                   "HELLO", chosenFaction,
                   FactionStandingJudgmentType.WELCOME, ImmersiveDialogWidth.MEDIUM, null, null);
-        } else if (chosenFaction == null) {
-            LOGGER.warn("Unable to find a suitable faction for a new mercenary organization start up");
         }
     }
 
