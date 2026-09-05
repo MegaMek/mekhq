@@ -290,6 +290,9 @@ public final class SupportCarrierReconciler {
         // platoon that lost enough people to be squads again becomes squads, as generation would have built it.
         int reshaped = reshapeAllProfessions(campaign, supportCommand, true);
 
+        // Headcount decides the support echelons, so re-size them once the shapes are settled.
+        SupportPersonnelToTOE.resizeSupportEchelons(campaign);
+
         // Always reported, even when nothing changed: a second load of the same save should say "seated 0, released
         // 0, removed 0, reshaped 0", and that line is how a playtest confirms the sweep is idempotent.
         LOGGER.info("Support carrier reconciliation: seated {}, released {}, removed {} empty carrier(s), reshaped {}"

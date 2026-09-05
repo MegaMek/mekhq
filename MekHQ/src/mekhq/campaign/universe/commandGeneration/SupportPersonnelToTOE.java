@@ -39,6 +39,7 @@ import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 
 import megamek.common.annotations.Nullable;
 import megamek.common.loaders.MekSummary;
@@ -281,8 +282,145 @@ public final class SupportPersonnelToTOE {
         organizeSection(campaign, supportCommand, label("command"), command, profile,
               useClanStructure, List.of(), label("command"));
 
+        collapseSingleChildLayers(campaign, supportCommand);
+        applyEchelonLevels(campaign, supportCommand, profile, useClanStructure);
+
         LOGGER.info("[CompanyGen][SupportTOE] organized support staff: maintenance={} medical={} command={} (clan={})",
               maintenance.size(), medical.size(), command.size(), useClanStructure);
+    }
+
+    /**
+     * Sizes every support formation by what it actually holds.
+     *
+     * <p>Left alone, a formation's echelon comes from how deep the tree is: the smallest thing is a lance, its parent
+     * a company, and so on up. That reads a three-deep support tree as a regiment however few people are in it, and
+     * pushes the rest of the TOE up with it. Support formations are sized from the count instead - how many squads
+     * and platoons are down there - so a support command of forty clerks and technicians is a company, not a
+     * regiment.</p>
+     *
+     * <p>Written as an override, which the campaign-wide level pass leaves alone. Combat formations are untouched.</p>
+     *
+     * @param campaign         the campaign that owns the TOE
+     * @param node             the formation to size, along with everything under it
+     * @param profile          the faction's echelon sizes
+     * @param useClanStructure {@code true} for the Clan ladder (Point / Star / Binary), {@code false} for the Inner
+     *                         Sphere one (platoon / lance / company)
+     *
+     * @return the squad-equivalents counted under {@code node}, so a parent can add up its children
+     */
+    static int applyEchelonLevels(Campaign campaign, Formation node, EchelonProfile profile,
+          boolean useClanStructure) {
+        int squadEquivalents = 0;
+        for (Formation child : node.getSubFormations()) {
+            squadEquivalents += applyEchelonLevels(campaign, child, profile, useClanStructure);
+        }
+        for (UUID unitId : node.getUnits()) {
+            squadEquivalents += squadEquivalentsOf(campaign.getUnit(unitId), profile);
+        }
+
+        node.setOverrideFormationLevel(echelonFor(squadEquivalents, profile, useClanStructure));
+        return squadEquivalents;
+    }
+
+    /**
+     * Re-sizes a campaign's support formations from what they now hold. Called after the roster changes the shape of
+     * the teams, so the echelons keep telling the truth as people come and go.
+     *
+     * @param campaign the campaign
+     */
+    static void resizeSupportEchelons(Campaign campaign) {
+        Formation supportCommand = campaign.getPlayerForce().getSupportCommandFormation();
+        if (supportCommand == null) {
+            return;
+        }
+        boolean useClanStructure = campaign.getPlayerForce().isClanForce();
+        applyEchelonLevels(campaign, supportCommand,
+              useClanStructure ? clanProfile() : innerSphereProfile(), useClanStructure);
+    }
+
+    /**
+     * What one unit is worth in squads. A platoon or Point carrier is worth the squads it replaces; everything else,
+     * a carrier squad or a support vehicle, counts as one.
+     *
+     * @param unit    the unit; {@code null} counts for nothing
+     * @param profile the faction's echelon sizes
+     *
+     * @return the unit's worth in squads
+     */
+    private static int squadEquivalentsOf(@Nullable Unit unit, EchelonProfile profile) {
+        if (unit == null) {
+            return 0;
+        }
+        // getShortNameRaw is chassis plus model, which is the form the carrier names take ("Support Platoon
+        // (28 person)"); the chassis alone would never match.
+        if ((unit.getEntity() != null) && profile.topUnitName().equals(unit.getEntity().getShortNameRaw())) {
+            return Math.max(1, profile.topUnitSize() / profile.squadUnitSize());
+        }
+        return 1;
+    }
+
+    /**
+     * The echelon a given number of squads adds up to: a platoon's worth is a platoon, three or four platoons a
+     * company, three companies a battalion.
+     *
+     * @param squadEquivalents how many squads are in the formation
+     * @param profile          the faction's echelon sizes
+     * @param useClanStructure {@code true} for the Clan ladder
+     *
+     * @return the formation level to display
+     */
+    private static FormationLevel echelonFor(int squadEquivalents, EchelonProfile profile, boolean useClanStructure) {
+        int squadsPerTopUnit = Math.max(1, profile.topUnitSize() / profile.squadUnitSize());
+        if (squadEquivalents <= 1) {
+            return FormationLevel.TEAM;
+        }
+        if (squadEquivalents <= squadsPerTopUnit) {
+            return useClanStructure ? FormationLevel.STAR_OR_NOVA : FormationLevel.LANCE;
+        }
+        if (squadEquivalents <= squadsPerTopUnit * 4) {
+            return useClanStructure ? FormationLevel.BINARY_OR_TRINARY : FormationLevel.COMPANY;
+        }
+        if (squadEquivalents <= squadsPerTopUnit * 12) {
+            return useClanStructure ? FormationLevel.CLUSTER : FormationLevel.BATTALION;
+        }
+        return useClanStructure ? FormationLevel.GALAXY : FormationLevel.REGIMENT;
+    }
+
+    /**
+     * Removes support layers that group nothing.
+     *
+     * <p>The sections and profession companies exist to tell one group of staff from another. A section holding a
+     * single company, or a Support Command holding a single section, tells the player nothing they cannot read from
+     * the one child's own name - and every layer of nesting pushes the whole TOE up an echelon, so a command with a
+     * few clerks starts calling itself a brigade. Such a layer is spliced out: its child's carriers and formations
+     * move up, and the empty child goes.</p>
+     *
+     * <p>Applied from Support Command down, so Support Command itself always survives - it is the anchor the
+     * reconciler and the deployment gate look for.</p>
+     *
+     * @param campaign the campaign that owns the TOE
+     * @param node     the formation to examine, along with everything under it
+     */
+    private static void collapseSingleChildLayers(Campaign campaign, Formation node) {
+        for (Formation child : new ArrayList<>(node.getSubFormations())) {
+            collapseSingleChildLayers(campaign, child);
+        }
+
+        if (!node.getUnits().isEmpty() || (node.getSubFormations().size() != 1)) {
+            return;
+        }
+
+        Formation child = node.getSubFormations().get(0);
+        LOGGER.info("[CompanyGen][SupportTOE] collapsing '{}' into '{}': it was the only thing there",
+              child.getName(), node.getName());
+
+        for (UUID unitId : new ArrayList<>(child.getUnits())) {
+            campaign.getPlayerForce().addUnitToFormation(campaign.getUnit(unitId), node.getId(), campaign);
+        }
+        for (Formation grandChild : new ArrayList<>(child.getSubFormations())) {
+            campaign.getPlayerForce().moveFormation(grandChild, node, campaign);
+        }
+        campaign.getPlayerForce().removeFormation(child, campaign);
     }
 
     static EchelonProfile innerSphereProfile() {
