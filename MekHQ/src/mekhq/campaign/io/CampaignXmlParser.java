@@ -2782,42 +2782,38 @@ public record CampaignXmlParser(InputStream is, MekHQ app) {
 
     private static void resolveRolePerformability(Person person, Campaign campaign) {
         LocalDate today = campaign.getLocalDate();
+        resolveRolePerformability(person, campaign, today, person.getPrimaryRole(), true);
+        resolveRolePerformability(person, campaign, today, person.getSecondaryRole(), false);
+    }
 
-        boolean canPerformPrimaryRole = person.canPerformRole(today, person.getPrimaryRole(), false);
-        boolean canPerformSecondaryRole = person.canPerformRole(today, person.getSecondaryRole(), false);
-
-        if (canPerformPrimaryRole && canPerformSecondaryRole) {
+    private static void resolveRolePerformability(Person person, Campaign campaign, LocalDate today, PersonnelRole role,
+          boolean primary) {
+        if (person.canPerformRole(today, role, false)) {
             return;
         }
 
-        if (!canPerformPrimaryRole) {
-            if (hasProtoMechPilotCompatibility(person)) {
-                copyProtoMechGunnerySkill(person); // <51.0 compatibility handler
-            } else {
-                person.setSecondaryRole(PersonnelRole.NONE);
-                reportInvalidProfession(person, campaign, "ineligibleForPrimaryRole");
+        // <51.01 compatibility handler
+        if (role == PersonnelRole.PROTOMEK_PILOT) {
+            Skill skill = person.getSkill(SkillType.S_GUN_PROTO);
+            if (skill != null) {
+                person.addSkill(
+                      SkillType.S_PILOT_PROTO,
+                      skill.getLevel(),
+                      skill.getBonus()
+                );
+                return;
             }
         }
 
-        if (!canPerformSecondaryRole) {
-            if (hasProtoMechPilotCompatibility(person)) {
-                copyProtoMechGunnerySkill(person); // <51.0 compatibility handler
-            } else {
-                person.setPrimaryRole(today, PersonnelRole.NONE);
-                reportInvalidProfession(person, campaign, "ineligibleForSecondaryRole");
-            }
+        if (primary) {
+            person.setPrimaryRole(today, PersonnelRole.NONE);
+            reportInvalidProfession(person, campaign, "ineligibleForPrimaryRole");
+        } else {
+            person.setSecondaryRole(PersonnelRole.NONE);
+            reportInvalidProfession(person, campaign, "ineligibleForSecondaryRole");
         }
     }
 
-    private static boolean hasProtoMechPilotCompatibility(Person person) {
-        return person.getPrimaryRole() == PersonnelRole.PROTOMEK_PILOT
-                     && person.getSkill(SkillType.S_GUN_PROTO) != null;
-    }
-
-    private static void copyProtoMechGunnerySkill(Person person) {
-        Skill skill = person.getSkill(SkillType.S_GUN_PROTO);
-        person.addSkill(SkillType.S_PILOT_PROTO, skill.getLevel(), skill.getBonus());
-    }
 
     private static void reportInvalidProfession(Person person, Campaign campaign, String key) {
         campaign.addReport(GENERAL, getFormattedTextAt(RESOURCE_BUNDLE, key,
@@ -2825,4 +2821,10 @@ public record CampaignXmlParser(InputStream is, MekHQ app) {
               CLOSING_SPAN_TAG,
               person.getHyperlinkedFullTitle()));
     }
+
+    //region Migration Methods
+    //region Ancestry Migration
+
+    // endregion Ancestry Migration
+    // endregion Migration Methods
 }
