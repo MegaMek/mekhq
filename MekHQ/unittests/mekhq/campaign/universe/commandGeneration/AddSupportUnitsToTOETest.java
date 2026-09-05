@@ -44,6 +44,7 @@ import mekhq.campaign.personnel.skills.SkillType;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.force.Formation;
 import mekhq.campaign.force.FormationLevel;
+import mekhq.campaign.force.FormationType;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.enums.PersonnelRole;
 import mekhq.campaign.unit.Unit;
@@ -108,6 +109,37 @@ class AddSupportUnitsToTOETest {
         // Two squads is a platoon's worth, so that is what it says. Depth-based levels called this a Battalion.
         assertEquals(FormationLevel.LANCE, supportCommand.getFormationLevel(),
               "a support command holding two squads must be sized as a platoon, not by how deep the tree is");
+    }
+
+    @Test
+    void organize_joinsTheCampaignsExistingSupportHome() {
+        // A hand-built campaign keeps its support under whatever the player named it - here a Command Battalion with
+        // a convoy and a salvage detachment. Support Command must join it rather than standing up a rival
+        // Headquarters, which would leave the TOE with two support structures.
+        Campaign campaign = MHQTestUtilities.getTestCampaign();
+        Formation origin = campaign.getPlayerForce().getFormation(Formation.FORMATION_ORIGIN);
+        Formation commandBattalion = new Formation("Command Battalion");
+        campaign.getPlayerForce().addFormation(commandBattalion, origin, campaign);
+        for (String name : List.of("Logistics", "Salvage")) {
+            Formation detachment = new Formation(name);
+            campaign.getPlayerForce().addFormation(detachment, commandBattalion, campaign);
+            detachment.setFormationType(name.equals("Salvage") ? FormationType.SALVAGE : FormationType.CONVOY, true);
+        }
+
+        List<Person> administrators = new ArrayList<>();
+        for (int index = 0; index < 12; index++) {
+            administrators.add(campaign.getPlayerForce().getHumanResources()
+                                     .newPerson(campaign, PersonnelRole.ADMINISTRATOR, PersonnelRole.NONE));
+        }
+        SupportPersonnelToTOE.organize(campaign, administrators, false);
+
+        Formation supportCommand = campaign.getPlayerForce().getSupportCommandFormation();
+        assertNotNull(supportCommand);
+        assertEquals(commandBattalion.getId(), supportCommand.getParentFormation().getId(),
+              "Support Command must join the existing support home");
+        assertTrue(campaign.getPlayerForce().getAllFormations().stream()
+                    .noneMatch(formation -> formation.getName().equalsIgnoreCase("Headquarters")),
+              "no rival Headquarters may be created when the campaign already has a support home");
     }
 
     @Test

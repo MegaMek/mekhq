@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2025-2026 The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2026 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -187,7 +187,7 @@ public class SupportTeamsCampaignOptionsChangedConfirmationDialog extends JDialo
 
         RoundedJButton btnCancel = new RoundedJButton(getTextAt(RESOURCE_BUNDLE,
               "SupportTeamsCampaignOptionsChangedConfirmationDialog.cancel"));
-        btnCancel.addActionListener(evt -> {
+        btnCancel.addActionListener(event -> {
             if (disableOnDecline) {
                 // The option doubles as the "do not ask again" flag: a campaign that declines is a campaign that does
                 // not want support teams, and ticking the box again is how the player changes their mind.
@@ -198,7 +198,7 @@ public class SupportTeamsCampaignOptionsChangedConfirmationDialog extends JDialo
 
         RoundedJButton btnConfirm = new RoundedJButton(getTextAt(RESOURCE_BUNDLE,
               "SupportTeamsCampaignOptionsChangedConfirmationDialog.confirm"));
-        btnConfirm.addActionListener(evt -> {
+        btnConfirm.addActionListener(event -> {
             organizeSupportStaff(campaign);
             dispose();
         });

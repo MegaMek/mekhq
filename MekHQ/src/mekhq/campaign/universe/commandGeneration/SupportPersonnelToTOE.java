@@ -246,8 +246,17 @@ public final class SupportPersonnelToTOE {
               roleHistogram(supportPersonnel));
 
         CampaignOptions campaignOptions = campaign.getCampaignOptions();
-        Formation hqFormation = AddSupportUnitsToTOE.getHqFormation(campaign);
-        LOGGER.info("[CompanyGen][SupportTOE] HQ formation '{}'(id={})", hqFormation.getName(), hqFormation.getId());
+        // Prefer wherever the campaign already keeps its support. Only a campaign with no such home gets a
+        // Headquarters created for it - otherwise the TOE ends up with two support structures side by side.
+        Formation hqFormation = AddSupportUnitsToTOE.findSupportHome(campaign);
+        if (hqFormation == null) {
+            hqFormation = AddSupportUnitsToTOE.getHqFormation(campaign);
+            LOGGER.info("[CompanyGen][SupportTOE] no existing support home; using HQ formation '{}'(id={})",
+                  hqFormation.getName(), hqFormation.getId());
+        } else {
+            LOGGER.info("[CompanyGen][SupportTOE] joining the campaign's existing support home '{}'(id={})",
+                  hqFormation.getName(), hqFormation.getId());
+        }
         FormationLevel commandLevel = useClanStructure ? FormationLevel.CLUSTER : FormationLevel.REGIMENT;
         Formation supportCommand = createFormation(campaign, label("supportCommand"),
               FormationType.SUPPORT, hqFormation, commandLevel);

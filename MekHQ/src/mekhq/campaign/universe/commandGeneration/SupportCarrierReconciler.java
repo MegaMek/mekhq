@@ -175,7 +175,7 @@ public final class SupportCarrierReconciler {
             return;
         }
 
-        LOGGER.info("Releasing {} from carrier {}: no longer carried by this profession",
+        LOGGER.info("[SupportTeams] Releasing {} from carrier {}: no longer carried by this profession",
               person.getFullName(), unit.getName());
         unit.remove(person, true);
     }
@@ -207,7 +207,7 @@ public final class SupportCarrierReconciler {
         }
 
         Formation parent = campaign.getPlayerForce().getFormation(unit.getFormationId());
-        LOGGER.info("Removing empty support carrier {}", unit.getName());
+        LOGGER.info("[SupportTeams] Removing empty support carrier {}", unit.getName());
         campaign.removeUnit(unit.getId());
 
         removeIfEmptyProfessionFormation(campaign, parent);
@@ -239,7 +239,7 @@ public final class SupportCarrierReconciler {
 
         Formation supportCommand = campaign.getPlayerForce().getSupportCommandFormation();
         if (supportCommand == null) {
-            LOGGER.info("Support carrier reconciliation: no Support Command formation, so carriers are not managed"
+            LOGGER.info("[SupportTeams] Support carrier reconciliation: no Support Command formation, so carriers are not managed"
                               + " in this campaign");
             return;
         }
@@ -278,7 +278,7 @@ public final class SupportCarrierReconciler {
         for (Unit unit : new ArrayList<>(campaign.getUnits())) {
             if (unit.isCarrier() && unit.getCrew().isEmpty() && !isParked(unit)) {
                 Formation parent = campaign.getPlayerForce().getFormation(unit.getFormationId());
-                LOGGER.info("Removing empty support carrier {}", unit.getName());
+                LOGGER.info("[SupportTeams] Removing empty support carrier {}", unit.getName());
                 campaign.removeUnit(unit.getId());
                 removeIfEmptyProfessionFormation(campaign, parent);
                 emptied++;
@@ -295,7 +295,7 @@ public final class SupportCarrierReconciler {
 
         // Always reported, even when nothing changed: a second load of the same save should say "seated 0, released
         // 0, removed 0, reshaped 0", and that line is how a playtest confirms the sweep is idempotent.
-        LOGGER.info("Support carrier reconciliation: seated {}, released {}, removed {} empty carrier(s), reshaped {}"
+        LOGGER.info("[SupportTeams] Support carrier reconciliation: seated {}, released {}, removed {} empty carrier(s), reshaped {}"
                           + " profession(s)", seated, released, emptied, reshaped);
     }
 
@@ -386,7 +386,7 @@ public final class SupportCarrierReconciler {
         }
 
         if (campaign.getPlayerForce().getSupportCommandFormation() == null) {
-            LOGGER.info("Organizing {} loose support character(s) into new support teams", loose.size());
+            LOGGER.info("[SupportTeams] Organizing {} loose support character(s) into new support teams", loose.size());
             // Generation decorates the whole TOE afterwards; a conversion has to decorate what it just built, or the
             // new formations sit in the TOE bare. Which ones those are is the difference between before and after -
             // the HQ formation is created too when the campaign never had one, and the player's own formations must
@@ -401,7 +401,7 @@ public final class SupportCarrierReconciler {
             }
             FormationIconBuilder.applyIconsToFormations(built, campaign);
         } else {
-            LOGGER.info("Seating {} loose support character(s) into the existing support teams", loose.size());
+            LOGGER.info("[SupportTeams] Seating {} loose support character(s) into the existing support teams", loose.size());
         }
         reconcileAll(campaign);
         return loose.size();
@@ -472,7 +472,7 @@ public final class SupportCarrierReconciler {
             return;
         }
         campaign.getPlayerForce().setSupportCommandFormationId(common);
-        LOGGER.info("Recovered Support Command formation '{}' (id {}) from {} carrier(s) in a save that predates the"
+        LOGGER.info("[SupportTeams] Recovered Support Command formation '{}' (id {}) from {} carrier(s) in a save that predates the"
                           + " persisted id", supportCommand.getName(), common, chains.size());
     }
 
@@ -494,7 +494,7 @@ public final class SupportCarrierReconciler {
             marked++;
         }
         if (marked > 0) {
-            LOGGER.info("Marked {} pre-existing support carrier(s) during load", marked);
+            LOGGER.info("[SupportTeams] Marked {} pre-existing support carrier(s) during load", marked);
         }
     }
 
@@ -530,7 +530,7 @@ public final class SupportCarrierReconciler {
         if (anyParked(carriers) || hasParkedCarrier(campaign, profession)) {
             // A carrier in a battle or in mothballs is left exactly as it is, and no new one is built beside it. The
             // next event after it comes back catches this person up.
-            LOGGER.info("Not seating {}: a {} carrier is deployed or mothballed", person.getFullName(),
+            LOGGER.info("[SupportTeams] Not seating {}: a {} carrier is deployed or mothballed", person.getFullName(),
                   profession.getLabel(campaign.getPlayerForce().isClanForce()));
             return;
         }
@@ -566,7 +566,7 @@ public final class SupportCarrierReconciler {
             }
             SupportPersonnelToTOE.ensureInfantrySkill(person);
             carrier.addPilotOrSoldier(person);
-            LOGGER.info("Seated {} in support carrier {} ({}/{})", person.getFullName(), carrier.getName(),
+            LOGGER.info("[SupportTeams] Seated {} in support carrier {} ({}/{})", person.getFullName(), carrier.getName(),
                   carrier.getTotalCrewSize(), carrier.getFullCrewSize());
             return;
         }
@@ -577,7 +577,7 @@ public final class SupportCarrierReconciler {
             LOGGER.info("Could not seat {}: the only free {} seats are at another location", person.getFullName(),
                   label);
         } else {
-            LOGGER.warn("Could not seat {}: no {} carrier has a free seat, although the shape was sized for them",
+            LOGGER.warn("[SupportTeams] Could not seat {}: no {} carrier has a free seat, although the shape was sized for them",
                   person.getFullName(), label);
         }
     }
@@ -640,7 +640,7 @@ public final class SupportCarrierReconciler {
         }
         int reshaped = reshapeAllProfessions(campaign, supportCommand, false);
         if (reshaped > 0) {
-            LOGGER.info("Deployment changed: reshaped {} support profession(s)", reshaped);
+            LOGGER.info("[SupportTeams] Deployment changed: reshaped {} support profession(s)", reshaped);
         }
     }
 
@@ -752,7 +752,7 @@ public final class SupportCarrierReconciler {
                   List.of(), spec.topTier(), spec.professionLabel());
             Unit carrier = SupportPersonnelToTOE.createCarrierUnit(campaign, empty);
             if (carrier == null) {
-                LOGGER.warn("Could not build a support carrier {}; the profession keeps its current shape",
+                LOGGER.warn("[SupportTeams] Could not build a support carrier {}; the profession keeps its current shape",
                       spec.unitName());
                 return;
             }
@@ -773,7 +773,7 @@ public final class SupportCarrierReconciler {
         for (Person member : displaced) {
             Unit target = firstWithSeat(targets, member);
             if (target == null) {
-                LOGGER.warn("No seat for {} after reshaping {} carriers; they stay where they are",
+                LOGGER.warn("[SupportTeams] No seat for {} after reshaping {} carriers; they stay where they are",
                       member.getFullName(), profession);
                 continue;
             }
@@ -791,7 +791,7 @@ public final class SupportCarrierReconciler {
             }
         }
 
-        LOGGER.info("Re-packed {} carriers: kept {}, built {}, removed {}, moved {} people",
+        LOGGER.info("[SupportTeams] Re-packed {} carriers: kept {}, built {}, removed {}, moved {} people",
               profession.getLabel(campaign.getPlayerForce().isClanForce()), kept.size(), built.size(),
               toDestroy.size(), moved);
     }
@@ -926,7 +926,7 @@ public final class SupportCarrierReconciler {
             return;
         }
 
-        LOGGER.info("Removing empty support formation {}", formation.getName());
+        LOGGER.info("[SupportTeams] Removing empty support formation {}", formation.getName());
         campaign.getPlayerForce().removeFormation(formation, campaign);
     }
 
