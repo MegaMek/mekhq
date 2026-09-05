@@ -452,7 +452,7 @@ public class Resupply {
     }
 
     private static double getDropSize(AbstractContract contract, double unitTonnage) {
-        final int INDIVIDUAL_TONNAGE_ALLOWANCE = 20; // This is how many tons the employer will budget per unit
+        final int INDIVIDUAL_TONNAGE_ALLOWANCE = 20; // Tons the employer will budget per contract scale point
         final int tonnageCap = contract.getScale() * INDIVIDUAL_TONNAGE_ALLOWANCE;
 
         // Then we determine the size of each individual 'drop'. This uses the lowest of
