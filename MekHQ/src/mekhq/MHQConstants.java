@@ -306,7 +306,6 @@ public final class MHQConstants extends SuiteConstants {
     // The augmentation rules last chosen in the Command Generator, remembered so a new campaign
     // starts from the player's own answer rather than from the all-off defaults every time.
     public static final String LAST_USE_IMPLANTS = "lastUseImplants";
-    public static final String LAST_USE_MANEI_DOMINI = "lastUseManeiDomini";
     public static final String LAST_NEURAL_INTERFACE_MODE = "lastNeuralInterfaceMode";
     // endregion Miscellaneous Options
     // endregion MHQOptions
