@@ -32,7 +32,7 @@
  */
 package mekhq.campaign.mission.contract.contractData;
 
-import mekhq.campaign.mission.contract.contractData.NegotiationStepMath.Term;
+import mekhq.campaign.mission.contract.utilities.NegotiationStepMath.Term;
 
 /**
  * Which of a contract's five terms the employer has locked as non-negotiable. A locked term is fixed at the value it

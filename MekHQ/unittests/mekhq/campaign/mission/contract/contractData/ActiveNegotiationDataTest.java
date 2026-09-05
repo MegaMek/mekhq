@@ -35,7 +35,7 @@ package mekhq.campaign.mission.contract.contractData;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import mekhq.campaign.mission.contract.contractData.ActiveNegotiationData.Kind;
-import mekhq.campaign.mission.contract.contractData.NegotiationStepMath.Term;
+import mekhq.campaign.mission.contract.utilities.NegotiationStepMath.Term;
 import org.junit.jupiter.api.Test;
 
 /**

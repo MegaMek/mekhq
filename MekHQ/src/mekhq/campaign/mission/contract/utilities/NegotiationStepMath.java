@@ -30,13 +30,15 @@
  * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
  * affiliated with Microsoft.
  */
-package mekhq.campaign.mission.contract.contractData;
+package mekhq.campaign.mission.contract.utilities;
 
 import static mekhq.campaign.mission.contract.contractData.ChaosContractStepsTable.CHAOS_CONTRACT_MAXIMUM_STEP_VALUE;
 import static mekhq.campaign.mission.contract.contractData.ChaosContractStepsTable.CHAOS_CONTRACT_MINIMUM_STEP_VALUE;
 
 import java.util.List;
 import java.util.Objects;
+
+import mekhq.campaign.mission.contract.contractData.ChaosContractStepsTable;
 
 /**
  * Pure arithmetic behind the contract negotiation table: crossing the plateaus on the {@link ChaosContractStepsTable}
