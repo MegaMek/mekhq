@@ -391,7 +391,8 @@ public class MekLabTab extends CampaignGuiTab {
         int heat = entity.getHeatCapacity();
 
         double totalHeat = calculateTotalHeat();
-        int bvDiff = entity.calculateBattleValue(true, true) - unit.getEntity().calculateBattleValue(true, true);
+        int bvDiff = entity.calculateBattleValue(true, true, true)
+                           - unit.getEntity().calculateBattleValue(true, true, true);
         double currentTonnage = testEntity.calculateWeight();
         currentTonnage += UnitUtil.getUnallocatedAmmoTonnage(entity);
         double tonnage = entity.getWeight();
@@ -435,15 +436,15 @@ public class MekLabTab extends CampaignGuiTab {
         lblCost.setText(refit.getCost().toAmountAndSymbolString());
         lblMove.setText("Movement: " + walk + "/" + run + "/" + jump);
         if (bvDiff > 0) {
-            lblBV.setText("<html>BV: " + entity.calculateBattleValue(true, true) + " (<font color='"
+            lblBV.setText("<html>BV: " + entity.calculateBattleValue(true, true, true) + " (<font color='"
                                 + ReportingUtilities.getPositiveColor() + "'>+"
                                 + bvDiff + "</font>)</html>");
         } else if (bvDiff < 0) {
-            lblBV.setText("<html>BV: " + entity.calculateBattleValue(true, true) + " (<font color='"
+            lblBV.setText("<html>BV: " + entity.calculateBattleValue(true, true, true) + " (<font color='"
                                 + ReportingUtilities.getNegativeColor() + "'>" + bvDiff
                                 + "</font>)</html>");
         } else {
-            lblBV.setText("<html>BV: " + entity.calculateBattleValue(true, true) + " (+" + bvDiff + ")</html>");
+            lblBV.setText("<html>BV: " + entity.calculateBattleValue(true, true, true) + " (+" + bvDiff + ")</html>");
         }
 
         if (currentTonnage != tonnage) {

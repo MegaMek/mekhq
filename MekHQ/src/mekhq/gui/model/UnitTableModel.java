@@ -401,7 +401,7 @@ public class UnitTableModel extends DataTableModel<Unit> {
                 int cycleLength = campaign.getCampaignOptions().get(CampaignOption.MAINTENANCE_CYCLE_DAYS);
                 yield (unit.getMaintenanceCycleDuration(cycleLength) - daysSinceLastMaintenance) + " days";
             }
-            case COL_BV -> entity.calculateBattleValue(true, unit.getEntity().getCrew() == null);
+            case COL_BV -> entity.calculateBattleValue(true, true, true);
             case COL_REPAIR -> unit.getPartsNeedingFixing().size();
             case COL_PARTS -> unit.getPartsNeeded().size();
             case COL_SITE -> Unit.getSiteName(unit.getSite());
