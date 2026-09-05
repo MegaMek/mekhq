@@ -84,6 +84,16 @@ class SupportPersonnelCalculatorTest {
     }
 
     @Test
+    void compute_vehiclesStillToCome_needMechanicsBeforeTheyExist() {
+        Campaign campaign = standardCampaign(List.of(), 0);
+
+        SupportDemand demand = SupportPersonnelCalculator.compute(campaign, 4);
+
+        assertEquals(4, demand.mechanicsNeeded(), "four flatbeds the stage will add need four mechanics");
+        assertEquals(0, demand.mekTechsNeeded());
+    }
+
+    @Test
     void compute_singleMek_oneMekTech() {
         Campaign campaign = standardCampaign(List.of(mek()), 1);
 

@@ -36,6 +36,7 @@ import static mekhq.gui.commandGeneration.components.CommandGenerationUtilities.
 import static mekhq.utilities.MHQInternationalization.getTextAt;
 
 import java.awt.BorderLayout;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
@@ -47,19 +48,23 @@ import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.JSplitPane;
 
+import megamek.client.ratgenerator.ExistingLift;
 import megamek.client.ratgenerator.FactionRecord;
 import megamek.client.ratgenerator.ForceDescriptor;
 import megamek.client.ui.dialogs.randomArmy.ForceGeneratorOptionsView;
 import megamek.client.ui.dialogs.randomArmy.ForceGeneratorViewUi;
 import megamek.client.ui.util.UIUtil;
 import megamek.common.annotations.Nullable;
+import megamek.common.units.Entity;
 import megamek.logging.MMLogger;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.force.Formation;
+import mekhq.campaign.unit.Unit;
 import mekhq.campaign.universe.Faction;
 import mekhq.campaign.universe.Factions;
 import mekhq.campaign.universe.commandGeneration.CommandGenerationOptions;
 import mekhq.campaign.universe.commandGeneration.ratgen.ForceDescriptorWalker;
+import mekhq.campaign.universe.commandGeneration.ratgen.DraftBloodnames;
 import mekhq.campaign.universe.commandGeneration.ratgen.FormationNamer;
 import mekhq.campaign.universe.enums.ForceNamingMethod;
 import mekhq.gui.commandGeneration.components.CommandGenerationCheckBox;
@@ -109,6 +114,26 @@ public class ForceGeneratorTab {
         this.options = options;
     }
 
+    /**
+     * The free bays and docking collars on the ships already in the hangar, less what the hangar's other units still
+     * need carried. Ship assignments are not consulted: a unit assigned to a ship in the TO&amp;E counts as needing a
+     * berth and its ship's bay as free, which comes to the same thing.
+     *
+     * @return the lift the campaign already owns; none without a campaign
+     */
+    private ExistingLift liftAlreadyInHangar() {
+        if (campaign == null) {
+            return ExistingLift.NONE;
+        }
+        List<Entity> entities = new ArrayList<>();
+        for (Unit unit : campaign.getUnits()) {
+            if (unit.getEntity() != null) {
+                entities.add(unit.getEntity());
+            }
+        }
+        return ExistingLift.of(entities);
+    }
+
     public JPanel createTab() {
         // Embed MegaMek's full force-generator view: the options panel (left) plus the TO&amp;E tree
         // (right). The view's own Generate button rolls a preview and fills the TO&amp;E tree and the
@@ -116,6 +141,10 @@ public class ForceGeneratorTab {
         // Constructed lazily so we only pay the RATGenerator / Ruleset / MekSummaryCache init cost
         // when the dialog is actually shown.
         viewUi = new ForceGeneratorViewUi(frame, campaign == null ? null : campaign.getGameOptions());
+        // A command built in layers starts each roll from the ships the campaign already owns, so a
+        // second session's armour company rides in the spare bays of the first session's DropShips
+        // rather than drawing its own.
+        viewUi.setHostLiftSupplier(this::liftAlreadyInHangar);
         // The dialog commits the previewed tree into the campaign TOE, so let the user right-click to
         // include/exclude nodes; excluded units are struck out here and skipped by ForceDescriptorWalker.
         viewUi.setToeExclusionMode(true);
@@ -127,6 +156,7 @@ public class ForceGeneratorTab {
         // changes so the tree always matches what Accept will commit.
         viewUi.setToeChangeListener(this::invalidatePreviewNames);
         viewUi.setFormationNameProvider(this::previewNameFor);
+        viewUi.setForceGeneratedListener(this::awardDraftBloodnames);
         // The chosen-units table below the controls is a Random Army concept - it collects units to add to a running
         // game - and the Command Designer never reads it, committing the preview tree instead. That inert panel
         // holds the formation mix editor here, so once a force has been generated the mix is on screen rather
@@ -210,7 +240,29 @@ public class ForceGeneratorTab {
      */
     public void setForceGeneratedListener(Consumer<ForceDescriptor> listener) {
         if (viewUi != null) {
-            viewUi.setForceGeneratedListener(listener);
+            viewUi.setForceGeneratedListener(rolled -> {
+                awardDraftBloodnames(rolled);
+                if (listener != null) {
+                    listener.accept(rolled);
+                }
+            });
+        }
+    }
+
+    /**
+     * Gives a rolled Clan force its Bloodnames as soon as it is rolled, so the draft shows the warriors who carry
+     * one and the build keeps them. Clear Force hands {@code null} and there is nothing to do.
+     *
+     * @param rolled the force just rolled, or {@code null} on Clear Force
+     */
+    private void awardDraftBloodnames(@Nullable ForceDescriptor rolled) {
+        if ((rolled == null) || (campaign == null) || (rolled.getFaction() == null)) {
+            return;
+        }
+        Faction faction = resolveRankAuthority(rolled.getFaction());
+        int awarded = DraftBloodnames.award(campaign, rolled, faction);
+        if (awarded > 0) {
+            invalidatePreviewNames();
         }
     }
 

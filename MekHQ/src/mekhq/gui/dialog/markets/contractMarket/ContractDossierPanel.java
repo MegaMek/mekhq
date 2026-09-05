@@ -347,6 +347,9 @@ public class ContractDossierPanel extends JPanel {
         Color assessmentColor = difficulty >= 8 ? hexColor(dangerColor()) : (difficulty <= 2 ? hexColor(positiveColor())
                                                                                    : null);
         addDetailRow(intel, "dossier.contractMarket.intel.assessment", assessmentLabel(contract), assessmentColor);
+
+        addDetailRow(intel, "dossier.contractMarket.intel.intensity", String.valueOf(contract.getTrackCount()), null);
+
         // A muted, one-line advisory footnote for a contract with a special nature. The natures are mutually
         // exclusive, so at most one shows. For a false flag it is an understated, ambiguously-worded paper-trail tell
         // that (with the deniability pay premium) an attentive player can learn to read; for a covert operation or a

@@ -34,6 +34,7 @@ package mekhq.campaign.universe.commandGeneration.ratgen;
 
 import java.util.ArrayList;
 import java.util.IdentityHashMap;
+import java.util.function.BiConsumer;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -144,6 +145,18 @@ public final class ForceDescriptorWalker {
      */
     public static int walk(ForceDescriptor root, Campaign campaign, Formation parentInCampaign,
           FormationNamer namer, LeafHandler onLeaf) {
+        return walk(root, campaign, parentInCampaign, namer, onLeaf, null);
+    }
+
+    /**
+     * As {@link #walk(ForceDescriptor, Campaign, Formation, FormationNamer, LeafHandler)}, also telling
+     * {@code onFormation} which descriptor each created Formation mirrors. The root descriptor, when it is merged
+     * into {@code parentInCampaign}, is reported against that Formation.
+     *
+     * @param onFormation told of each Formation and the descriptor it mirrors; {@code null} for none
+     */
+    public static int walk(ForceDescriptor root, Campaign campaign, Formation parentInCampaign,
+          FormationNamer namer, LeafHandler onLeaf, @Nullable BiConsumer<ForceDescriptor, Formation> onFormation) {
         if (root == null) {
             LOGGER.warn("[CompanyGen][Walker] walk called with null root; returning 0");
             return 0;
@@ -183,6 +196,9 @@ public final class ForceDescriptorWalker {
                 LOGGER.info("[CompanyGen][Walker]   Formation registered id={} name='{}' formationLevel={} parentId={}",
                       formation.getId(), named.name(), level,
                       parent == null ? "null" : parent.getId());
+                if ((descriptor != null) && (onFormation != null)) {
+                    onFormation.accept(descriptor, formation);
+                }
                 return formation;
             }
 
@@ -198,6 +214,9 @@ public final class ForceDescriptorWalker {
         };
 
         int leaves = traverse(root, namer, buildSink, parentInCampaign, mergeRoot);
+        if (mergeRoot && (onFormation != null)) {
+            onFormation.accept(root, parentInCampaign);
+        }
         LOGGER.info("[CompanyGen][Walker] walk DONE; {} leaves visited", leaves);
         return leaves;
     }
@@ -258,7 +277,7 @@ public final class ForceDescriptorWalker {
           @Nullable Object rootHandle, boolean mergeRoot) {
         if (!mergeRoot) {
             List<NamedFormation> rootName = namer.nameSiblings(List.of(requestFor(root)), null);
-            return walkNode(root, rootName.get(0), namer, sink, rootHandle, 0);
+            return walkNode(root, rootName.get(0), namer, sink, rootHandle, null, 0);
         }
 
         // RATGenerator often hands support/attachment forces in as loose platoons directly under the
@@ -302,12 +321,12 @@ public final class ForceDescriptorWalker {
     private static int walkChildren(List<ForceDescriptor> children, FormationNamer namer,
           FormationSink sink, @Nullable Object parentHandle, @Nullable String parentDesignator,
           int depth) {
-        // Only nodes that will actually become a Formation take part in naming: a leaf carries a unit
-        // label rather than a formation name, and a formation whose units were all excluded is dropped
-        // without ever spending a designator.
+        // Only nodes that will actually become a Formation take part in naming: a unit keeps its own
+        // label rather than taking a formation name, and a formation whose units were all excluded is
+        // dropped without ever spending a designator.
         List<ForceDescriptor> namedChildren = new ArrayList<>();
         for (ForceDescriptor child : children) {
-            if (!childrenOf(child).isEmpty() && hasIncludedLeaf(child)) {
+            if (isFormation(child) && hasIncludedLeaf(child)) {
                 namedChildren.add(child);
             }
         }
@@ -326,7 +345,7 @@ public final class ForceDescriptorWalker {
                 named = names.get(nameIndex);
                 nameIndex++;
             }
-            leaves += walkNode(child, named, namer, sink, parentHandle, depth);
+            leaves += walkNode(child, named, namer, sink, parentHandle, parentDesignator, depth);
         }
         return leaves;
     }
@@ -340,34 +359,26 @@ public final class ForceDescriptorWalker {
     }
 
     /**
-     * @param named the name the caller's sibling-group naming pass chose for this node, or
-     *              {@code null} when the node is a leaf or an empty formation and so was never named
+     * @param named            the name the caller's sibling-group naming pass chose for this node, or
+     *                         {@code null} when the node is a unit or an empty formation and so was never named
+     * @param parentDesignator the designator of the formation this node sits in, or {@code null} at the top of
+     *                         the command; a unit's nested units are named under it
      */
     private static int walkNode(ForceDescriptor descriptor, @Nullable NamedFormation named,
-          FormationNamer namer, FormationSink sink, @Nullable Object parentHandle, int depth) {
+          FormationNamer namer, FormationSink sink, @Nullable Object parentHandle,
+          @Nullable String parentDesignator, int depth) {
         String indent = "  ".repeat(depth);
         boolean hasChildren = hasChildDescriptors(descriptor);
 
-        if (!hasChildren) {
-            // Leaf — let the caller turn it into a Unit + crew, unless the user excluded it in the
-            // preview (right-click -> Exclude from TOE), in which case it is skipped entirely.
-            if (!descriptor.isIncluded()) {
-                if (sink.verbose()) {
-                    LOGGER.info("[CompanyGen][Walker] {}LEAF excluded by user, skipping '{}'",
-                          indent, descriptor.parseName());
-                }
-                return 0;
+        if (!isFormation(descriptor)) {
+            int leaves = walkUnit(descriptor, sink, parentHandle, indent);
+            if (hasChildren) {
+                // A unit with units nested under it: a DropShip and the fighters it carries. The ship is a unit,
+                // not a formation, so what it carries hangs off the same formation the ship is in.
+                leaves += walkChildren(childrenOf(descriptor), namer, sink, parentHandle, parentDesignator,
+                      depth + 1);
             }
-            if (sink.verbose()) {
-                String entityChassis = descriptor.getEntity() == null ? "n/a" : descriptor.getEntity().getChassis();
-                String entityModel = descriptor.getEntity() == null ? "n/a" : descriptor.getEntity().getModel();
-                LOGGER.info("[CompanyGen][Walker] {}LEAF parseName='{}' echelon={} unitType={} hasEntity={} hasCo={} chassis='{}' model='{}'",
-                      indent, descriptor.parseName(), descriptor.getEchelon(),
-                      descriptor.getUnitType(), descriptor.getEntity() != null,
-                      descriptor.getCo() != null, entityChassis, entityModel);
-            }
-            sink.leaf(descriptor, parentHandle);
-            return 1;
+            return leaves;
         }
 
         String engineName = descriptor.parseName();
@@ -409,10 +420,76 @@ public final class ForceDescriptorWalker {
         return walkChildren(childrenOf(descriptor), namer, sink, handle, named.designator(), depth + 1);
     }
 
+    /**
+     * Hands one unit to the sink, unless the user excluded it in the preview (right-click -> Exclude from TOE),
+     * in which case it is skipped.
+     *
+     * @return the number of units handed over: one or zero
+     */
+    private static int walkUnit(ForceDescriptor descriptor, FormationSink sink, @Nullable Object parentHandle,
+          String indent) {
+        if (!descriptor.isIncluded()) {
+            if (sink.verbose()) {
+                LOGGER.info("[CompanyGen][Walker] {}LEAF excluded by user, skipping '{}'",
+                      indent, unitLabel(descriptor));
+            }
+            return 0;
+        }
+        if (sink.verbose()) {
+            String entityChassis = descriptor.getEntity() == null ? "n/a" : descriptor.getEntity().getChassis();
+            String entityModel = descriptor.getEntity() == null ? "n/a" : descriptor.getEntity().getModel();
+            LOGGER.info("[CompanyGen][Walker] {}LEAF parseName='{}' echelon={} unitType={} hasEntity={} hasCo={} chassis='{}' model='{}'",
+                  indent, descriptor.parseName(), descriptor.getEchelon(),
+                  descriptor.getUnitType(), descriptor.getEntity() != null,
+                  descriptor.getCo() != null, entityChassis, entityModel);
+        }
+        sink.leaf(descriptor, parentHandle);
+        return 1;
+    }
+
+    /**
+     * @return the unit's name for the log: a unit descriptor carries no formation name of its own, so the entity's
+     *       short name is what identifies it
+     */
+    private static String unitLabel(ForceDescriptor descriptor) {
+        String name = descriptor.parseName();
+        boolean hasName = (name != null) && !name.isBlank();
+        if (hasName || (descriptor.getEntity() == null)) {
+            return hasName ? name : "(no name)";
+        }
+        return descriptor.getEntity().getShortName();
+    }
+
     /** Whether {@code descriptor} has any subforce or attached children. */
     private static boolean hasChildDescriptors(ForceDescriptor descriptor) {
         return (descriptor.getSubForces() != null && !descriptor.getSubForces().isEmpty())
               || (descriptor.getAttached() != null && !descriptor.getAttached().isEmpty());
+    }
+
+    /**
+     * Whether {@code descriptor} stands for a unit rather than a formation. Generation sets an entity on
+     * unit descriptors only, and a unit can have descriptors beneath it: a carrier is generated with the
+     * fighters it carries nested under it, and it is still the ship, not a formation of fighters.
+     *
+     * @param descriptor the descriptor to test
+     *
+     * @return {@code true} if the descriptor carries an entity
+     */
+    private static boolean carriesUnit(ForceDescriptor descriptor) {
+        return descriptor.getEntity() != null;
+    }
+
+    /**
+     * Whether {@code descriptor} is walked as a formation: it has children and is not itself a unit. A
+     * childless descriptor with no entity is a unit the engine failed to load, and is handed over as a
+     * unit so the handler can report it.
+     *
+     * @param descriptor the descriptor to test
+     *
+     * @return {@code true} if the descriptor becomes a Formation
+     */
+    private static boolean isFormation(ForceDescriptor descriptor) {
+        return hasChildDescriptors(descriptor) && !carriesUnit(descriptor);
     }
 
     /**
@@ -421,11 +498,14 @@ public final class ForceDescriptorWalker {
      * a single re-included unit inside an otherwise-excluded branch.
      *
      * @param descriptor the descriptor to test
-     * @return {@code true} if any leaf under {@code descriptor} is included and has an entity
+     * @return {@code true} if {@code descriptor} or any unit under it is included and has an entity
      */
     private static boolean hasIncludedLeaf(ForceDescriptor descriptor) {
+        if (carriesUnit(descriptor) && descriptor.isIncluded()) {
+            return true;
+        }
         if (!hasChildDescriptors(descriptor)) {
-            return descriptor.isIncluded() && descriptor.getEntity() != null;
+            return false;
         }
         if (descriptor.getSubForces() != null) {
             for (ForceDescriptor child : descriptor.getSubForces()) {

@@ -104,6 +104,13 @@ public final class CrewDescriptorAdapter {
             return;
         }
         String descriptorBloodname = descriptor.getBloodname();
+        // The draft appends the Bloodname to the crew's name so the preview shows it. The Bloodname is applied
+        // on its own below; the name must not carry it too or the person would be "Cao Pryde Pryde".
+        boolean nameCarriesBloodname = (descriptorBloodname != null) && !descriptorBloodname.isBlank()
+              && fullName.endsWith(" " + descriptorBloodname);
+        if (nameCarriesBloodname) {
+            fullName = fullName.substring(0, fullName.length() - descriptorBloodname.length() - 1).trim();
+        }
         int firstSpace = fullName.indexOf(' ');
         if (firstSpace > 0 && firstSpace < fullName.length() - 1) {
             person.setGivenName(fullName.substring(0, firstSpace));
@@ -114,17 +121,23 @@ public final class CrewDescriptorAdapter {
         }
         // The ratgen CrewDescriptor optionally carries a bloodname string for Clan-faction
         // generation. If present, set it on the Person so the Clan family of rank-rendering
-        // code paths can surface it (e.g., "Star Captain Aidan Pryde"). When absent — either
-        // because we're generating an IS force or because Clan ratgen didn't pick a bloodname
-        // for this Person — leave it null, but log so a Clan campaign still showing IS-style
-        // names is traceable to the bloodname being empty, not to a rank-system mismatch.
+        // code paths can surface it (e.g., "Star Captain Aidan Pryde"). When absent, the person
+        // starts without one: MekHQ's personnel generator rolls a Bloodname when it creates a Clan
+        // warrior, and the Command Generator rolls again for the whole force with its calibre in
+        // the balance, so a warrior rolled here would get two chances. That roll is cleared and
+        // the generator's single roll decides. Logged either way, so a Clan campaign still showing
+        // IS-style names is traceable to the bloodname being empty, not to a rank-system mismatch.
         if (descriptorBloodname != null && !descriptorBloodname.isBlank()) {
             person.setBloodname(descriptorBloodname);
             LOGGER.info("[CompanyGen][Bloodname] applied bloodname='{}' to person='{}' (descriptor name='{}')",
                   descriptorBloodname, person.getFullName(), fullName);
         } else {
-            LOGGER.info("[CompanyGen][Bloodname] descriptor has no bloodname for person='{}' (descriptor name='{}' - Clan-only field, expected blank for IS forces)",
-                  fullName, fullName);
+            boolean rolledAtCreation = (person.getBloodname() != null) && !person.getBloodname().isBlank();
+            if (rolledAtCreation) {
+                person.setBloodname("");
+            }
+            LOGGER.info("[CompanyGen][Bloodname] descriptor has no bloodname for person='{}'{} (Clan-only field, expected blank for IS forces)",
+                  fullName, rolledAtCreation ? "; the one rolled at creation is cleared for the force's single roll" : "");
         }
         person.setFullName();
         LOGGER.info("[CompanyGen]         CrewDescriptorAdapter renamed person to '{}' (gunnery={} piloting={} rank={})",

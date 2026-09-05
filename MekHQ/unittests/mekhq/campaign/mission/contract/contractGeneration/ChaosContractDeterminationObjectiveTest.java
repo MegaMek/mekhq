@@ -33,6 +33,7 @@
 package mekhq.campaign.mission.contract.contractGeneration;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.mockito.Mockito.mockStatic;
 
 import megamek.common.compute.Compute;
@@ -107,5 +108,19 @@ class ChaosContractDeterminationObjectiveTest {
 
         assertEquals(ChaosObjectiveType.EXPEDITION, data.playerObjectiveType().getChaosObjectiveType());
         assertEquals(ChaosObjectiveType.RAID, data.opposingObjectiveType().getChaosObjectiveType());
+    }
+
+    /**
+     * Regression test for issue #9921: UNDEFINED is tagged with the RAID chaos category but is a sentinel with no
+     * StratCon contract definition. Generation must never emit it - doing so crashed contract acceptance. The RAID
+     * category has the most concrete variants and is the only one UNDEFINED maps to, so drawing it many times exercises
+     * the exclusion.
+     */
+    @Test
+    void generationNeverProducesTheUndefinedSentinel() {
+        for (int i = 0; i < 1000; i++) {
+            assertFalse(ChaosObjectiveType.RAID.getCamOpsObjectiveType().isUndefined(),
+                  "RAID.getCamOpsObjectiveType() must never return the UNDEFINED sentinel");
+        }
     }
 }

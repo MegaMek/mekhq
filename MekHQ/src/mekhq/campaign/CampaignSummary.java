@@ -415,10 +415,14 @@ public class CampaignSummary {
      *       &lt;html&gt;
      */
     public String getCargoCapacityReport() {
-        BigDecimal roundedCargo = new BigDecimal(Double.toString(cargoTons));
+        // BigDecimal cannot parse "Infinity"/"NaN", so a non-finite figure here throws a
+        // NumberFormatException that repeats on every Command Center refresh and effectively bricks the
+        // save (see MekHQ issue #9616). Clamp non-finite values to 0 before formatting.
+        BigDecimal roundedCargo = new BigDecimal(Double.toString(Double.isFinite(cargoTons) ? cargoTons : 0.0));
         roundedCargo = roundedCargo.setScale(1, RoundingMode.HALF_UP);
 
-        BigDecimal roundedCapacity = new BigDecimal(Double.toString(cargoCapacity));
+        BigDecimal roundedCapacity = new BigDecimal(
+              Double.toString(Double.isFinite(cargoCapacity) ? cargoCapacity : 0.0));
         roundedCapacity = roundedCapacity.setScale(1, RoundingMode.HALF_UP);
 
         int comparison = roundedCargo.compareTo(roundedCapacity);

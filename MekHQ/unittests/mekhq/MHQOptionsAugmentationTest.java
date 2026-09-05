@@ -43,7 +43,7 @@ import org.junit.jupiter.api.Test;
 /**
  * Covers remembering the augmentation rules the Command Generator was last used with.
  *
- * <p>The Setup tab shows a campaign its own settings, but a new campaign has none - all three sit at
+ * <p>The Setup tab shows a campaign its own settings, but a new campaign has none - both sit at
  * their all-off defaults - so without a remembered answer the same question had to be answered again
  * for every new campaign, and a player who forgot got a command with no augmentation and no way to
  * add it afterwards.</p>
@@ -56,7 +56,6 @@ class MHQOptionsAugmentationTest {
     void restoreDefaults() {
         // These are real user preferences, so a test must not leave its answers behind.
         options.setLastUseImplants(false);
-        options.setLastUseManeiDomini(false);
         options.setLastNeuralInterfaceMode(NeuralInterfaceMode.OFF);
     }
 
@@ -64,18 +63,15 @@ class MHQOptionsAugmentationTest {
     @Test
     void nothingRememberedIsAllOff() {
         assertFalse(options.getLastUseImplants());
-        assertFalse(options.getLastUseManeiDomini());
         assertEquals(NeuralInterfaceMode.OFF, options.getLastNeuralInterfaceMode());
     }
 
     @Test
     void eachAnswerIsRemembered() {
         options.setLastUseImplants(true);
-        options.setLastUseManeiDomini(true);
         options.setLastNeuralInterfaceMode(NeuralInterfaceMode.FULL_TRACKING);
 
         assertTrue(options.getLastUseImplants());
-        assertTrue(options.getLastUseManeiDomini());
         assertEquals(NeuralInterfaceMode.FULL_TRACKING, options.getLastNeuralInterfaceMode());
     }
 

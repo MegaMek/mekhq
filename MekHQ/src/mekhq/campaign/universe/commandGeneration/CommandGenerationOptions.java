@@ -144,7 +144,6 @@ public class CommandGenerationOptions {
      * crewed, because the crew assembler reads the campaign options as it builds each unit.
      */
     private Set<TemporaryCrewRole> temporaryCrewRoles;
-    private boolean useManeiDomini;
     private NeuralInterfaceMode neuralInterfaceMode;
 
     // Force naming and formation icons
@@ -157,7 +156,7 @@ public class CommandGenerationOptions {
 
     // Starting simulation
     private boolean runStartingSimulation;
-    private int simulationDuration;
+    private int simulationDuration = 10;
     private boolean simulateRandomMarriages;
     private boolean simulateRandomProcreation;
 
@@ -244,7 +243,6 @@ public class CommandGenerationOptions {
         // Left off, matching a fresh campaign. The dialog replaces these with whatever the campaign
         // currently has, so the defaults here only matter to a caller that never opens it.
         setUseImplants(false);
-        setUseManeiDomini(false);
         setNeuralInterfaceMode(NeuralInterfaceMode.OFF);
         // None by default, matching a fresh campaign; the dialog replaces this with the campaign's own settings.
         setTemporaryCrewRoles(EnumSet.noneOf(TemporaryCrewRole.class));
@@ -261,7 +259,7 @@ public class CommandGenerationOptions {
 
         // Starting simulation
         setRunStartingSimulation(false);
-        setSimulationDuration(5);
+        setSimulationDuration(10);
         setSimulateRandomMarriages(false);
         setSimulateRandomProcreation(false);
 
@@ -582,18 +580,6 @@ public class CommandGenerationOptions {
     }
 
     /**
-     * @return whether MegaMek's Manei Domini rule is in play, without which a Shadow Division's
-     *       implants do nothing
-     */
-    public boolean isUseManeiDomini() {
-        return useManeiDomini;
-    }
-
-    public void setUseManeiDomini(final boolean useManeiDomini) {
-        this.useManeiDomini = useManeiDomini;
-    }
-
-    /**
      * @return which of MegaMek's neural interface rules is in play, which decides whether an enhanced
      *       imaging or direct neural implant does anything
      */
@@ -854,7 +840,6 @@ public class CommandGenerationOptions {
               && (assignFounderFlag == other.assignFounderFlag)
               && (useImplants == other.useImplants)
               && Objects.equals(temporaryCrewRoles, other.temporaryCrewRoles)
-              && (useManeiDomini == other.useManeiDomini)
               && Objects.equals(neuralInterfaceMode, other.neuralInterfaceMode)
               && Objects.equals(forceNamingMethod, other.forceNamingMethod)
               && (alwaysNumberRegiments == other.alwaysNumberRegiments)
@@ -918,7 +903,6 @@ public class CommandGenerationOptions {
               assignFounderFlag, 
               useImplants, 
               temporaryCrewRoles, 
-              useManeiDomini, 
               neuralInterfaceMode, 
               forceNamingMethod, 
               alwaysNumberRegiments, 

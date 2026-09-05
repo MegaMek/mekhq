@@ -1570,19 +1570,6 @@ public final class MHQOptions extends SuiteOptions {
     }
 
     /**
-     * @return whether the Command Generator last had MegaMek's Manei Domini rules switched on
-     */
-    public boolean getLastUseManeiDomini() {
-        return userPreferences.node(MHQConstants.MISCELLANEOUS_NODE)
-                     .getBoolean(MHQConstants.LAST_USE_MANEI_DOMINI, false);
-    }
-
-    public void setLastUseManeiDomini(final boolean value) {
-        userPreferences.node(MHQConstants.MISCELLANEOUS_NODE)
-              .putBoolean(MHQConstants.LAST_USE_MANEI_DOMINI, value);
-    }
-
-    /**
      * @return the neural interface setting the Command Generator was last used with, stored by its
      *       option value so an unreadable entry settles on the rules being off
      */
