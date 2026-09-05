@@ -99,7 +99,7 @@
     <p class="standfirst">Nineteen checks, roughly 60 minutes. The unit tests cover the guards and the release path; everything here covers what they cannot &mdash; seating against real TOE state, the two new persisted fields, and the deployment gate.</p>
     <div class="meta-strip">
       <span class="chip">Branch: Implement-Keep-Carriers-Current</span>
-      <span class="chip">Commit edff511494</span>
+      <span class="chip">Commit 22d75234e2</span>
       <span class="chip">~60 min</span>
     </div>
   </header>
@@ -405,11 +405,11 @@
         <span class="pill gate">gate</span>
       </div>
       <div class="body">
-        <div><span class="k">Do</span> Three deployments. Right-click a single carrier and try to assign it to a scenario. Right-click HQ &mdash; which holds Support Command &mdash; and assign it. In a StratCon campaign, let StratCon place a formation that contains carriers. Then launch the HQ scenario.</div>
+        <div><span class="k">Do</span> Four deployments. Open the StratCon scenario wizard and look for a support company (carriers only) in the force lists. Assign HQ &mdash; which holds Support Command &mdash; through the wizard. Right-click a single carrier in the TOE and try to deploy it. Right-click HQ in the TOE and deploy it. Then launch the HQ scenario.</div>
         <div class="expect">
           <span class="k">Expect</span>
-          <span>The lone carrier is refused. HQ is <strong>accepted</strong> &mdash; its fighting units deploy and every carrier under it stays home, unmarked, with no carrier in the &ldquo;could not be deployed&rdquo; warning. StratCon likewise leaves carriers home. The gate is <code>SupportCarrierDeployment.isAllowed</code>, closed today; a future base-attack scenario opens it for itself, and the reconciler already leaves a deployed carrier alone and catches its profession up on return (<code>Not seating ... carrier is deployed</code>, <code>Deployment changed: reshaped N</code>), so nothing here changes when it does.</span>
-          <span class="fail">Fails if: HQ is refused because of its carriers, a carrier reaches the scenario by any of the three routes, or carriers pad the &ldquo;could not be deployed&rdquo; warning.</span>
+          <span>A carriers-only company is <strong>not offered</strong> by the wizard, and its defensive-infantry and leadership pickers list no carrier. HQ is <strong>accepted</strong> &mdash; an information dialog titled &ldquo;Support carriers stay home&rdquo; names how many carriers under HQ stayed behind, the daily report carries the same line, its fighting units deploy and every carrier stays home, unmarked, with no carrier in the &ldquo;could not be deployed&rdquo; warning. The TOE Deploy menu refuses the lone carrier and shows the same dialog for HQ. The gate is <code>SupportCarrierDeployment.isAllowed</code>, closed today; a future base-attack scenario opens it for itself, and the reconciler already leaves a deployed carrier alone and catches its profession up on return (<code>Not seating ... carrier is deployed</code>, <code>Deployment changed: reshaped N</code>), so nothing here changes when it does.</span>
+          <span class="fail">Fails if: a deployment that leaves carriers home shows no dialog, a carriers-only company is offered anywhere, HQ is refused because of its carriers, a carrier reaches the scenario by any route, or carriers pad the &ldquo;could not be deployed&rdquo; warning.</span>
         </div>
       </div>
     </div>

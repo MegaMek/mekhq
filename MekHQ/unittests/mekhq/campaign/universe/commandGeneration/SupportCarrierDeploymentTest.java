@@ -37,7 +37,11 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
+import java.util.UUID;
+import java.util.Vector;
+
 import mekhq.campaign.Campaign;
+import mekhq.campaign.force.Formation;
 import mekhq.campaign.mission.scenarios.Scenario;
 import mekhq.campaign.unit.Unit;
 import org.junit.jupiter.api.Test;
@@ -82,6 +86,43 @@ class SupportCarrierDeploymentTest {
         Scenario scenario = new Scenario("gate test");
 
         assertTrue(scenario.canDeploy(null, mock(Campaign.class)));
+    }
+
+    @Test
+    void canDeployForces_carriersOnlyFormationIsNotOffered() {
+        // Every unit under a support company is skipped as staying home, so without this rule nothing was left to
+        // refuse and the TOE offered "Deploy Force" for a formation that would deploy nobody.
+        Campaign campaign = mock(Campaign.class);
+        Unit carrier = mock(Unit.class);
+        when(carrier.isCarrier()).thenReturn(true);
+        UUID carrierId = UUID.randomUUID();
+        when(campaign.getUnit(carrierId)).thenReturn(carrier);
+        Formation supportCompany = new Formation("Support Company");
+        supportCompany.addUnit(carrierId);
+        Vector<Formation> formations = new Vector<>();
+        formations.add(supportCompany);
+
+        assertFalse(new Scenario("gate test").canDeployForces(formations, campaign));
+    }
+
+    @Test
+    void canDeployForces_mixedFormationIsOfferedWithCarriersLeftBehind() {
+        Campaign campaign = mock(Campaign.class);
+        Unit carrier = mock(Unit.class);
+        when(carrier.isCarrier()).thenReturn(true);
+        Unit mek = mock(Unit.class);
+        when(mek.isCarrier()).thenReturn(false);
+        UUID carrierId = UUID.randomUUID();
+        UUID mekId = UUID.randomUUID();
+        when(campaign.getUnit(carrierId)).thenReturn(carrier);
+        when(campaign.getUnit(mekId)).thenReturn(mek);
+        Formation headquarters = new Formation("HQ");
+        headquarters.addUnit(carrierId);
+        headquarters.addUnit(mekId);
+        Vector<Formation> formations = new Vector<>();
+        formations.add(headquarters);
+
+        assertTrue(new Scenario("gate test").canDeployForces(formations, campaign));
     }
 
     @Test

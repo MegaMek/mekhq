@@ -989,6 +989,10 @@ public class Scenario implements IPlayerSettings {
     public boolean canDeployForces(Vector<Formation> formations, Campaign c) {
         int additionalQuantity = 0;
         for (Formation formation : formations) {
+            // A formation that holds only carriers would deploy nobody, so it is not offered at all.
+            if (SupportCarrierDeployment.deploysNothing(c, formation, this)) {
+                return false;
+            }
             Vector<UUID> units = formation.getAllUnits(false);
             for (UUID id : units) {
                 Unit unit = c.getUnit(id);
