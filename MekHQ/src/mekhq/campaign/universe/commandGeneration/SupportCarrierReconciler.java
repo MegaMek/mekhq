@@ -33,7 +33,9 @@
 package mekhq.campaign.universe.commandGeneration;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.UUID;
 
 import megamek.common.annotations.Nullable;
@@ -382,15 +384,37 @@ public final class SupportCarrierReconciler {
 
         if (campaign.getPlayerForce().getSupportCommandFormation() == null) {
             LOGGER.info("Organizing {} loose support character(s) into new support teams", loose.size());
-            SupportPersonnelToTOE.organize(campaign, loose, campaign.getPlayerForce().isClanForce());
             // Generation decorates the whole TOE afterwards; a conversion has to decorate what it just built, or the
-            // support formations sit in the TOE without the icons every other formation has.
-            FormationIconBuilder.applyIconsToSubtree(campaign.getPlayerForce().getSupportCommandFormation(), campaign);
+            // new formations sit in the TOE bare. Which ones those are is the difference between before and after -
+            // the HQ formation is created too when the campaign never had one, and the player's own formations must
+            // keep the icons they have.
+            Set<Integer> before = formationIds(campaign);
+            SupportPersonnelToTOE.organize(campaign, loose, campaign.getPlayerForce().isClanForce());
+            List<Formation> built = new ArrayList<>();
+            for (Formation formation : campaign.getPlayerForce().getAllFormations()) {
+                if (!before.contains(formation.getId())) {
+                    built.add(formation);
+                }
+            }
+            FormationIconBuilder.applyIconsToFormations(built, campaign);
         } else {
             LOGGER.info("Seating {} loose support character(s) into the existing support teams", loose.size());
         }
         reconcileAll(campaign);
         return loose.size();
+    }
+
+    /**
+     * @param campaign the campaign
+     *
+     * @return the ids of every formation in the TOE right now
+     */
+    private static Set<Integer> formationIds(Campaign campaign) {
+        Set<Integer> ids = new HashSet<>();
+        for (Formation formation : campaign.getPlayerForce().getAllFormations()) {
+            ids.add(formation.getId());
+        }
+        return ids;
     }
 
     private static void recoverSupportCommandId(Campaign campaign) {

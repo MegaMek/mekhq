@@ -33,10 +33,12 @@
 package mekhq.campaign.universe.commandGeneration.ratgen;
 
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
 import megamek.common.annotations.Nullable;
+import megamek.common.equipment.enums.MiscTypeFlag;
 import megamek.common.units.Entity;
 import megamek.common.units.EntityWeightClass;
 import megamek.common.units.UnitType;
@@ -77,6 +79,11 @@ import mekhq.campaign.universe.commandGeneration.CommandGenerationOptions;
 public final class FormationIconBuilder {
 
     private static final MMLogger LOGGER = MMLogger.create(FormationIconBuilder.class);
+
+    /** StratOps type icon for a formation of MASH-equipped vehicles. */
+    private static final String MEDICAL_TYPE_FILENAME = "Medical.png";
+    /** StratOps type icon for a formation of recovery vehicles. */
+    private static final String RECOVERY_TYPE_FILENAME = "Industrial.png";
 
     private FormationIconBuilder() {
         // utility class
@@ -147,7 +154,22 @@ public final class FormationIconBuilder {
      * @return the number of formations decorated
      */
     public static int applyIconsToSubtree(@Nullable Formation root, @Nullable Campaign campaign) {
-        if ((root == null) || (campaign == null)) {
+        return applyIconsToFormations(root == null ? List.of() : List.of(root), campaign);
+    }
+
+    /**
+     * Decorates the named formations and everything under them, using the campaign's own faction.
+     *
+     * <p>Used by the support-team conversion, which knows exactly which formations it created and must not touch the
+     * player's own - their icons are their business.</p>
+     *
+     * @param formations the formations to decorate, each along with its subtree
+     * @param campaign   the campaign the formations belong to
+     *
+     * @return the number of formations decorated
+     */
+    public static int applyIconsToFormations(List<Formation> formations, @Nullable Campaign campaign) {
+        if ((campaign == null) || formations.isEmpty()) {
             return 0;
         }
         if (MHQStaticDirectoryManager.getFormationIcons() == null) {
@@ -162,15 +184,19 @@ public final class FormationIconBuilder {
         FormationPieceIcon background = buildBackgroundPiece(iconFaction);
 
         int applied = 0;
-        LayeredFormationIcon rootIcon = buildFormationIcon(root, campaign, iconFaction, background);
-        if (rootIcon != null) {
-            root.setFormationIcon(rootIcon);
-            applied++;
+        for (Formation formation : formations) {
+            if (formation == null) {
+                continue;
+            }
+            LayeredFormationIcon icon = buildFormationIcon(formation, campaign, iconFaction, background);
+            if (icon != null) {
+                formation.setFormationIcon(icon);
+                applied++;
+            }
+            applied += applyToSubtree(formation, campaign, iconFaction, background);
         }
-        applied += applyToSubtree(root, campaign, iconFaction, background);
 
-        LOGGER.info("[SupportTOE] applyIconsToSubtree DONE for '{}'; {} formation(s) decorated", root.getName(),
-              applied);
+        LOGGER.info("[SupportTOE] applyIconsToFormations DONE; {} formation(s) decorated", applied);
         return applied;
     }
 
@@ -271,6 +297,23 @@ public final class FormationIconBuilder {
      */
     private static void appendTypePieces(LayeredFormationIcon icon, Formation formation, Campaign campaign) {
         icon.getPieces().putIfAbsent(LayeredFormationIconLayer.TYPE, new ArrayList<>());
+
+        // A field hospital or a recovery detachment is a formation of vehicles, and vehicles have no StratOps
+        // silhouette, so the generic path below would give them nothing but a weight-class letter. StratOps ships an
+        // icon for both jobs, so use it: what the formation is for reads better than how heavy it is.
+        String purposeIcon = purposeIconFor(formation, campaign);
+        if (purposeIcon != null) {
+            try {
+                appendSingle(icon, MHQConstants.LAYERED_FORCE_ICON_TYPE_STRAT_OPS_PATH, purposeIcon);
+                LOGGER.info("[CompanyGen][Icons] formation '{}' -> purpose icon {}", formation.getName(), purposeIcon);
+                return;
+            } catch (Exception exception) {
+                LOGGER.warn("[CompanyGen][Icons] cannot resolve purpose icon {} for '{}'; using the unit-type icon",
+                      purposeIcon, formation.getName());
+                icon.getPieces().get(LayeredFormationIconLayer.TYPE).clear();
+            }
+        }
+
         int dominantType = determineDominantUnitType(formation, campaign);
         int weightClass = determineWeightClass(formation, campaign);
         String weightFilename = EntityWeightClass.getClassName(weightClass) + ".png";
@@ -365,6 +408,46 @@ public final class FormationIconBuilder {
      * {@link UnitType#MEK} when the formation has no units or all units' entities are null. Used
      * by {@link #appendTypePieces} to pick the chassis silhouette.
      */
+    /**
+     * The icon for what a formation is <em>for</em>, when that is clear from the equipment its units carry.
+     *
+     * <p>Every unit has to agree, so a company of MASH trucks is a field hospital while a mixed formation that merely
+     * contains one is not.</p>
+     *
+     * @param formation the formation
+     * @param campaign  the campaign, to resolve the unit ids
+     *
+     * @return the StratOps type filename, or {@code null} when the formation has no single clear purpose
+     */
+    private static @Nullable String purposeIconFor(Formation formation, Campaign campaign) {
+        int units = 0;
+        int medical = 0;
+        int recovery = 0;
+        for (UUID unitId : formation.getAllUnits(false)) {
+            Unit unit = campaign.getUnit(unitId);
+            if ((unit == null) || (unit.getEntity() == null)) {
+                continue;
+            }
+            units++;
+            if (unit.getEntity().hasWorkingMisc(MiscTypeFlag.F_MASH)) {
+                medical++;
+            } else if (unit.getEntity().hasWorkingMisc(MiscTypeFlag.F_LIFT_HOIST)
+                             || unit.getEntity().hasWorkingMisc(MiscTypeFlag.F_SALVAGE_ARM)) {
+                recovery++;
+            }
+        }
+        if (units == 0) {
+            return null;
+        }
+        if (medical == units) {
+            return MEDICAL_TYPE_FILENAME;
+        }
+        if (recovery == units) {
+            return RECOVERY_TYPE_FILENAME;
+        }
+        return null;
+    }
+
     private static int determineDominantUnitType(Formation formation, Campaign campaign) {
         Map<Integer, Integer> counts = new java.util.HashMap<>();
         for (UUID unitId : formation.getAllUnits(false)) {
