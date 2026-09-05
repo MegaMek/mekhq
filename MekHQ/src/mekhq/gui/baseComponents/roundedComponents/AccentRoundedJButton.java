@@ -45,7 +45,8 @@ import javax.swing.border.Border;
  * <p>The {@link Accent#HAZARD} scheme is the MekHQ counterpart of MegaMek's {@code HazardButton}. MegaMek tints its
  * skinned button images; MekHQ buttons are drawn from plain colours, so this class sets the accent colours directly
  * and keeps the same rounded shape as every other {@link RoundedJButton}. Hover and pressed shades come from the
- * parent's painting, which brightens or darkens the face colour.</p>
+ * parent's painting, which brightens or darkens the face colour. The hazard face is the mid tone of MegaMek's
+ * tint ramp, so those shades land on MegaMek's own bevel highlight and shadow.</p>
  *
  * @author Illiani
  * @since 0.50.12
@@ -56,11 +57,18 @@ public class AccentRoundedJButton extends RoundedJButton {
      * The colour schemes an {@link AccentRoundedJButton} can wear.
      */
     public enum Accent {
-        /** Emergency-stop red and yellow, the same values as MegaMek's hazard widgets. Used for Report a Bug. */
-        HAZARD(new Color(204, 34, 34), new Color(255, 204, 0),
+        /**
+         * Emergency-stop red and yellow. The face is the red that MegaMek's {@code HazardButton} paints its brushed
+         * face in, and the frame is the yellow of its hazard stripes. Used for Report a Bug and for saving a campaign
+         * for a bug report.
+         */
+        HAZARD(new Color(117, 17, 8), new Color(255, 204, 0),
               new Color(255, 221, 0), new Color(255, 245, 150), new Color(160, 110, 40)),
-        /** Calm green, for reference material such as the Glossary. */
-        REFERENCE(new Color(34, 120, 60), new Color(150, 220, 120),
+        /**
+         * Deep green for reference material such as the Glossary: the hazard red's opposite on the painter's colour
+         * wheel, at the same saturation and depth, so the two buttons read as a matched pair.
+         */
+        REFERENCE(new Color(8, 117, 44), new Color(150, 220, 120),
               new Color(225, 255, 215), new Color(255, 255, 255), new Color(120, 160, 120));
 
         private final Color face;

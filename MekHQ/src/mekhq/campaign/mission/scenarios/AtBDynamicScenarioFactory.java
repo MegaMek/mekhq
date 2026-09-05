@@ -2701,28 +2701,26 @@ public class AtBDynamicScenarioFactory {
         }
 
         UnitGeneratorParameters newParams = params.clone();
-        if (newParams != null) {
-            newParams.setUnitType(BATTLE_ARMOR);
-            newParams.getMovementModes().addAll(IUnitGenerator.ALL_BATTLE_ARMOR_MODES);
+        newParams.setUnitType(BATTLE_ARMOR);
+        newParams.getMovementModes().addAll(IUnitGenerator.ALL_BATTLE_ARMOR_MODES);
 
-            // Set the parameters to filter out types that are too heavy for the provided
-            // bay space, or those that cannot use mechanized BA travel
-            if (bayCapacity != IUnitGenerator.NO_WEIGHT_LIMIT) {
-                if (filterOutClanTech(campaign, isFactionClan(params.getFaction()))) {
-                    params.setFilter(mekSummary -> !mekSummary.isClan() && mekSummary.getTons() <= bayCapacity);
-                } else {
-                    params.setFilter(mekSummary -> mekSummary.getTons() <= bayCapacity);
-                }
+        // Set the parameters to filter out types that are too heavy for the provided
+        // bay space, or those that cannot use mechanized BA travel
+        if (bayCapacity != IUnitGenerator.NO_WEIGHT_LIMIT) {
+            if (filterOutClanTech(campaign, isFactionClan(params.getFaction()))) {
+                params.setFilter(mekSummary -> !mekSummary.isClan() && mekSummary.getTons() <= bayCapacity);
             } else {
-                newParams.addMissionRole(MECHANIZED_BA);
+                params.setFilter(mekSummary -> mekSummary.getTons() <= bayCapacity);
             }
+        } else {
+            newParams.addMissionRole(MECHANIZED_BA);
         }
 
         MekSummary unitData = campaign.getUnitGenerator().generate(newParams);
 
         // If generating for an internal bay fails, try again as mechanized if the flag is set
         if (unitData == null) {
-            if (newParams != null && bayCapacity != IUnitGenerator.NO_WEIGHT_LIMIT && retryAsMechanized) {
+            if (bayCapacity != IUnitGenerator.NO_WEIGHT_LIMIT && retryAsMechanized) {
                 if (filterOutClanTech(campaign, isFactionClan(params.getFaction()))) {
                     params.setFilter(mekSummary -> !mekSummary.isClan());
                 } else {
@@ -2739,11 +2737,7 @@ public class AtBDynamicScenarioFactory {
         }
 
         // Add an appropriate crew
-        if (newParams != null) {
-            return createEntityWithCrew(newParams.getFaction(), skill, campaign, unitData);
-        } else {
-            return null;
-        }
+        return createEntityWithCrew(newParams.getFaction(), skill, campaign, unitData);
     }
 
     /**

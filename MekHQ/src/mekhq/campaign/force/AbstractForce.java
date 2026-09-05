@@ -150,7 +150,6 @@ public abstract class AbstractForce {
     private FleetAltitudeCapability fleetAltitudeCapability = FleetAltitudeCapability.UNRESTRICTED;
     private boolean fieldKitchenWithinCapacity = false;
     private int repairBaysRented = 0;
-    private List<UUID> automatedMothballUnits = new ArrayList<>();
     // Table of Organisation & Equipment (TO&E) and StratCon combat teams
     private Formation formations;
     private int lastFormationId;
@@ -704,14 +703,6 @@ public abstract class AbstractForce {
 
     public void changeRepairBaysRented(int delta) {
         repairBaysRented = max(0, repairBaysRented + delta);
-    }
-
-    public List<UUID> getAutomatedMothballUnits() {
-        return automatedMothballUnits;
-    }
-
-    public void setAutomatedMothballUnits(List<UUID> automatedMothballUnits) {
-        this.automatedMothballUnits = automatedMothballUnits;
     }
 
     public Formation getFormations() {

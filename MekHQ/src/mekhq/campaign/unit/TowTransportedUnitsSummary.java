@@ -221,7 +221,7 @@ public class TowTransportedUnitsSummary extends AbstractTransportedUnitsSummary 
 
         // Update Transport Capacities
         if (!Objects.equals(oldTractor, transport)) {
-            if (transport.getEntity() != null & !transport.getEntity().isTrailer() &&
+            if (transport.getEntity() != null && !transport.getEntity().isTrailer() &&
                       transport.getEntity() instanceof Tank tank) {
                 recalculateTransportCapacity(tank);
             } else {
