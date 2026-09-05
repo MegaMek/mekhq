@@ -32,8 +32,19 @@
  */
 package mekhq.campaign.universe.commandGeneration;
 
+import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
+import static mekhq.utilities.MHQInternationalization.getTextAt;
+
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
+import java.util.UUID;
+
 import megamek.common.annotations.Nullable;
+import mekhq.campaign.Campaign;
+import mekhq.campaign.force.Formation;
 import mekhq.campaign.mission.scenarios.Scenario;
+import mekhq.campaign.unit.Unit;
 
 /**
  * The single decision point for whether support carriers may deploy to a scenario.
@@ -43,16 +54,18 @@ import mekhq.campaign.mission.scenarios.Scenario;
  * context menu, not when a formation containing them - HQ, typically - is assigned, and not by StratCon. Deploying a
  * formation that holds carriers deploys its fighting units and leaves the carriers, and their people, at home.</p>
  *
- * <p>That is a rule for now, not forever. A base attack is the obvious case where support staff get pulled into a
- * fight, and when that scenario type exists it flips this gate for itself. Every site that decides whether a carrier
- * deploys asks here, so flipping it means changing one method, not hunting for five call sites. The reconciler is
- * already deployment-aware and needs no change when that happens: it leaves a deployed carrier alone and catches its
- * profession up when the deployment ends.</p>
+ * <p>That is a rule for now, not forever. The one situation in which support staff should ever be engaged is an attack
+ * on the player's own base, and when that scenario type exists it opens this gate for itself - behind a campaign
+ * option, so a player who does not want their technicians fighting for the motor pool never has to. Every site that
+ * decides whether a carrier deploys asks here, so opening it means changing one method, not hunting for the call
+ * sites. The reconciler is already deployment-aware and needs no change when that happens: it leaves a deployed
+ * carrier alone and catches its profession up when the deployment ends.</p>
  *
  * @author Illiani
  * @since 0.51.0
  */
 public final class SupportCarrierDeployment {
+    private static final String RESOURCE_BUNDLE = "mekhq.resources.SupportPersonnelToTOE";
 
     private SupportCarrierDeployment() {
         // utility class
@@ -69,5 +82,105 @@ public final class SupportCarrierDeployment {
      */
     public static boolean isAllowed(@Nullable Scenario scenario) {
         return false;
+    }
+
+    /**
+     * Whether this one unit is a carrier that stays home for this scenario.
+     *
+     * @param unit     the unit; {@code null} is not a carrier
+     * @param scenario the scenario, for the gate
+     *
+     * @return {@code true} if the unit is a carrier and the gate is closed
+     */
+    public static boolean staysHome(@Nullable Unit unit, @Nullable Scenario scenario) {
+        return (unit != null) && unit.isCarrier() && !isAllowed(scenario);
+    }
+
+    /**
+     * The carriers under a formation that will stay home if it is assigned to this scenario.
+     *
+     * @param campaign  the campaign
+     * @param formation the formation being assigned; its whole subtree is inspected
+     * @param scenario  the scenario, for the gate
+     *
+     * @return the carriers that would be left behind; empty when the gate is open or there are none
+     */
+    public static List<Unit> carriersStayingHome(Campaign campaign, Formation formation, @Nullable Scenario scenario) {
+        List<Unit> stayingHome = new ArrayList<>();
+        for (UUID unitId : formation.getAllUnits(false)) {
+            Unit unit = campaign.getUnit(unitId);
+            if (staysHome(unit, scenario)) {
+                stayingHome.add(unit);
+            }
+        }
+        return stayingHome;
+    }
+
+    /**
+     * Whether assigning this formation would send nothing at all, because every unit under it is a carrier that stays
+     * home. Such a formation should not be offered for deployment, and an attempt to assign it should be refused with
+     * an explanation rather than silently accepted.
+     *
+     * @param campaign  the campaign
+     * @param formation the formation
+     * @param scenario  the scenario, for the gate
+     *
+     * @return {@code true} if the formation has units and all of them would stay home
+     */
+    public static boolean deploysNothing(Campaign campaign, Formation formation, @Nullable Scenario scenario) {
+        List<UUID> unitIds = formation.getAllUnits(false);
+        if (unitIds.isEmpty()) {
+            return false;
+        }
+        return carriersStayingHome(campaign, formation, scenario).size() == unitIds.size();
+    }
+
+    /**
+     * The dialog text explaining which carriers stayed home when these formations were assigned, or {@code null} when
+     * none did. Callers show it with a plain information dialog; the campaign report carries the same fact.
+     *
+     * @param campaign   the campaign
+     * @param formations the formations that were assigned
+     * @param scenario   the scenario they were assigned to
+     *
+     * @return the HTML body for a dialog, or {@code null} if nothing stayed home
+     */
+    public static @Nullable String stayingHomeMessage(Campaign campaign, Collection<Formation> formations,
+          @Nullable Scenario scenario) {
+        List<String> lines = new ArrayList<>();
+        for (Formation formation : formations) {
+            int count = carriersStayingHome(campaign, formation, scenario).size();
+            if (count > 0) {
+                lines.add(getFormattedTextAt(RESOURCE_BUNDLE, "SupportCarrierDeployment.stayHome.line", count,
+                      formation.getName()));
+            }
+        }
+        if (lines.isEmpty()) {
+            return null;
+        }
+        return getFormattedTextAt(RESOURCE_BUNDLE, "SupportCarrierDeployment.stayHome.body",
+              String.join("<br>", lines));
+    }
+
+    /** @return the dialog title for {@link #stayingHomeMessage} */
+    public static String stayingHomeTitle() {
+        return getTextAt(RESOURCE_BUNDLE, "SupportCarrierDeployment.stayHome.title");
+    }
+
+    /**
+     * The dialog text for a formation that holds only carriers.
+     *
+     * @param formation the formation the player tried to assign
+     *
+     * @return the HTML body for an error dialog
+     */
+    public static String nothingToDeployMessage(Formation formation) {
+        return getFormattedTextAt(RESOURCE_BUNDLE, "SupportCarrierDeployment.nothingToDeploy.body",
+              formation.getName());
+    }
+
+    /** @return the dialog title for {@link #nothingToDeployMessage} */
+    public static String nothingToDeployTitle() {
+        return getTextAt(RESOURCE_BUNDLE, "SupportCarrierDeployment.nothingToDeploy.title");
     }
 }

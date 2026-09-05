@@ -38,6 +38,7 @@ import java.awt.Dimension;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.util.ResourceBundle;
+import java.util.List;
 import java.util.UUID;
 import java.util.Vector;
 import javax.swing.DefaultListCellRenderer;
@@ -58,6 +59,7 @@ import mekhq.campaign.mission.scenarios.AtBDynamicScenario;
 import mekhq.campaign.mission.scenarios.ScenarioForceTemplate;
 import mekhq.campaign.mission.scenarios.ScenarioForceTemplate.ForceGenerationMethod;
 import mekhq.campaign.unit.Unit;
+import mekhq.campaign.universe.commandGeneration.SupportCarrierDeployment;
 import mekhq.gui.CampaignGUI;
 
 /**
@@ -233,11 +235,23 @@ public class ForceTemplateAssignmentDialog extends JDialog {
         Formation formation = forceList.getSelectedValue();
         int forceID = forceList.getSelectedValue().getId();
 
+        if (SupportCarrierDeployment.deploysNothing(campaignGUI.getCampaign(), formation, currentScenario)) {
+            JOptionPane.showMessageDialog(this, SupportCarrierDeployment.nothingToDeployMessage(formation),
+                  SupportCarrierDeployment.nothingToDeployTitle(), JOptionPane.WARNING_MESSAGE);
+            return;
+        }
+
         // all this stuff apparently needs to happen when assigning a force to a scenario
         campaignGUI.undeployForce(formation);
         formation.clearScenarioIds(campaignGUI.getCampaign(), true);
         formation.setScenarioId(currentScenario.getId(), campaignGUI.getCampaign());
         currentScenario.addForce(forceID, templateList.getSelectedValue().getForceName());
+        String stayedHome = SupportCarrierDeployment.stayingHomeMessage(campaignGUI.getCampaign(),
+              List.of(formation), currentScenario);
+        if (stayedHome != null) {
+            JOptionPane.showMessageDialog(this, stayedHome, SupportCarrierDeployment.stayingHomeTitle(),
+                  JOptionPane.INFORMATION_MESSAGE);
+        }
         for (UUID uid : formation.getAllUnits(true)) {
             Unit u = campaignGUI.getCampaign().getUnit(uid);
             if (null != u) {

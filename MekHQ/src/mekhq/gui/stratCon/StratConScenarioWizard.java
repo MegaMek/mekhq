@@ -89,6 +89,7 @@ import mekhq.campaign.mission.scenarios.ScenarioTemplate;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.unit.Unit;
 import mekhq.campaign.universe.Faction;
+import mekhq.campaign.universe.commandGeneration.SupportCarrierDeployment;
 import mekhq.campaign.universe.factionStanding.FactionStandings;
 import mekhq.gui.StratConPanel;
 import mekhq.gui.baseComponents.immersiveDialogs.ImmersiveDialogConfirmation;
@@ -960,8 +961,10 @@ public class StratConScenarioWizard extends JDialog {
         // go through all the force lists and add the selected forces to the scenario
         List<UUID> delayedReinforcements = currentScenario.getBackingScenario().getFriendlyDelayedReinforcements();
         List<UUID> instantReinforcements = currentScenario.getBackingScenario().getFriendlyInstantReinforcements();
+        List<Formation> committedFormations = new ArrayList<>();
         for (String templateID : availableForceLists.keySet()) {
             for (Formation formation : availableForceLists.get(templateID).getSelectedValuesList()) {
+                committedFormations.add(formation);
                 if (currentScenario.getCurrentState() == PRIMARY_FORCES_COMMITTED) {
                     ReinforcementEligibilityType reinforcementType = getReinforcementType(formation.getId(),
                           currentTrackState,
@@ -986,14 +989,18 @@ public class StratConScenarioWizard extends JDialog {
 
                     if (reinforcementResults == DELAYED) {
                         for (UUID unitId : formation.getAllUnits(true)) {
-                            if (campaign.getUnit(unitId) != null) {
+                            Unit unit = campaign.getUnit(unitId);
+                            if ((unit != null) && !SupportCarrierDeployment.staysHome(unit,
+                                  currentScenario.getBackingScenario())) {
                                 delayedReinforcements.add(unitId);
                             }
                         }
                     } else if (reinforcementResults == INSTANT) {
 
                         for (UUID unitId : formation.getAllUnits(true)) {
-                            if (campaign.getUnit(unitId) != null) {
+                            Unit unit = campaign.getUnit(unitId);
+                            if ((unit != null) && !SupportCarrierDeployment.staysHome(unit,
+                                  currentScenario.getBackingScenario())) {
                                 instantReinforcements.add(unitId);
                             }
                         }
@@ -1032,6 +1039,13 @@ public class StratConScenarioWizard extends JDialog {
         if (currentScenario.getCurrentState().ordinal() < REINFORCEMENTS_COMMITTED.ordinal()) {
             translateTemplateObjectives(currentScenario.getBackingScenario(), campaign);
             scaleObjectiveTimeLimits(currentScenario.getBackingScenario(), campaign);
+        }
+
+        String stayedHome = SupportCarrierDeployment.stayingHomeMessage(campaign, committedFormations,
+              currentScenario.getBackingScenario());
+        if (stayedHome != null) {
+            JOptionPane.showMessageDialog(this, stayedHome, SupportCarrierDeployment.stayingHomeTitle(),
+                  JOptionPane.INFORMATION_MESSAGE);
         }
 
         closeWizard();

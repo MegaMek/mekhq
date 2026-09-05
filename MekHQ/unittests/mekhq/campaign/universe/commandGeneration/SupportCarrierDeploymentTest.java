@@ -54,6 +54,19 @@ class SupportCarrierDeploymentTest {
     }
 
     @Test
+    void staysHome_carrierStaysAndFighterGoes() {
+        Unit carrier = mock(Unit.class);
+        when(carrier.isCarrier()).thenReturn(true);
+        Unit mek = mock(Unit.class);
+        when(mek.isCarrier()).thenReturn(false);
+
+        assertTrue(SupportCarrierDeployment.staysHome(carrier, mock(Scenario.class)));
+        assertTrue(SupportCarrierDeployment.staysHome(carrier, null));
+        assertFalse(SupportCarrierDeployment.staysHome(mek, mock(Scenario.class)));
+        assertFalse(SupportCarrierDeployment.staysHome(null, mock(Scenario.class)));
+    }
+
+    @Test
     void canDeploy_refusesACarrierOnItsOwn() {
         Scenario scenario = new Scenario("gate test");
         Unit carrier = mock(Unit.class);

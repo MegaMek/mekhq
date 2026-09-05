@@ -36,6 +36,7 @@ package mekhq.campaign.force;
 import static java.lang.Math.floor;
 import static java.lang.Math.round;
 import static mekhq.utilities.EntityUtilities.getEntityFromUnitId;
+import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
 
 import java.io.PrintWriter;
 import java.util.*;
@@ -50,6 +51,7 @@ import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.LocalHangar;
 import mekhq.campaign.campaignOptions.CampaignOption;
+import mekhq.campaign.enums.DailyReportType;
 import mekhq.campaign.events.OrganizationChangedEvent;
 import mekhq.campaign.icons.FormationPieceIcon;
 import mekhq.campaign.icons.LayeredFormationIcon;
@@ -290,13 +292,24 @@ public class Formation {
             sub.setScenarioId(scenarioId, campaign);
         }
         boolean carriersDeploy = SupportCarrierDeployment.isAllowed(campaign.getScenario(scenarioId));
+        int stayedHome = 0;
         for (UUID uid : getUnits()) {
             Unit unit = campaign.getUnit(uid);
             // A support carrier under this formation stays home unless the scenario is one that pulls support staff
             // into the fight. This is the path StratCon deploys by, so the gate has to be here as well as in canDeploy.
-            if ((null != unit) && (carriersDeploy || !unit.isCarrier())) {
-                unit.setScenarioId(scenarioId);
+            if (null == unit) {
+                continue;
             }
+            if (carriersDeploy || !unit.isCarrier()) {
+                unit.setScenarioId(scenarioId);
+            } else {
+                stayedHome++;
+            }
+        }
+        // Every assignment path ends here, so this is where the player is told. The GUI adds a dialog on top.
+        if ((stayedHome > 0) && (scenarioId != NO_ASSIGNED_SCENARIO)) {
+            campaign.addReport(DailyReportType.BATTLE, getFormattedTextAt("mekhq.resources.SupportPersonnelToTOE",
+                  "SupportCarrierDeployment.stayHome.report", stayedHome, getName()));
         }
     }
 

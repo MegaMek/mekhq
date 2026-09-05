@@ -134,6 +134,7 @@ import mekhq.campaign.personnel.skills.SkillCheck;
 import mekhq.campaign.personnel.skills.SkillModifierData;
 import mekhq.campaign.personnel.turnoverAndRetention.Fatigue;
 import mekhq.campaign.unit.Unit;
+import mekhq.campaign.universe.commandGeneration.SupportCarrierDeployment;
 import mekhq.campaign.universe.Planet;
 import mekhq.gui.dialog.StratConAmbushedDialog;
 import mekhq.gui.dialog.nagDialogs.CombatChallengeNagDialog;
@@ -3202,6 +3203,13 @@ public class StratConRulesManager {
                 continue;
             }
 
+            // A support company holds only carriers, which stay home; offering it would assign a formation that
+            // sends nothing.
+            if (SupportCarrierDeployment.deploysNothing(campaign, force,
+                  (currentScenario == null) ? null : currentScenario.getBackingScenario())) {
+                continue;
+            }
+
             if (formation.getRole().isReserve()) {
                 continue;
             }
@@ -3293,6 +3301,10 @@ public class StratConRulesManager {
 
             // Validate the unit
             if (!isUnitValidForFrontlineDeployment(unit)) {
+                continue;
+            }
+
+            if (SupportCarrierDeployment.staysHome(unit, currentScenario.getBackingScenario())) {
                 continue;
             }
 
@@ -3432,6 +3444,10 @@ public class StratConRulesManager {
 
             // Validate the unit
             if (!isUnitValidForLeadershipDeployment(unit, generalUnitType, totalBudget)) {
+                continue;
+            }
+
+            if (SupportCarrierDeployment.staysHome(unit, currentScenario.getBackingScenario())) {
                 continue;
             }
 
