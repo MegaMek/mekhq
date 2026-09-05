@@ -48,7 +48,6 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 import megamek.common.compute.Compute;
 import megamek.common.enums.Gender;
@@ -154,7 +153,9 @@ public class PersonnelMarketMekHQ extends NewPersonnelMarket {
      */
     @Override
     public ArrayList<Faction> getApplicantOriginFactions() {
-        Set<Faction> systemFactions = getCurrentSystem().getFactionSet(getToday());
+        // Faction -> tenure weight (years the faction held a world here within living memory). Weighting recruits by
+        // tenure makes long-standing rulers the dominant birth origin while recent or departed rulers still appear.
+        Map<Faction, Integer> systemFactions = getCurrentSystem().getPopulationFactions(getToday());
         ArrayList<Faction> interestedFactions = new ArrayList<>();
 
         boolean filterOutLegalFactions = false;
@@ -180,7 +181,10 @@ public class PersonnelMarketMekHQ extends NewPersonnelMarket {
         Faction pirateFaction = factions.getFaction(PIRATE_FACTION_CODE);
         FactionStandings factionStandings = getCampaign().getPlayerForce().getFactionStandings();
 
-        for (Faction faction : systemFactions) {
+        for (Map.Entry<Faction, Integer> systemFaction : systemFactions.entrySet()) {
+            Faction faction = systemFaction.getKey();
+            int tenureWeight = systemFaction.getValue();
+
             if (filterOutLegalFactions) {
                 if (!faction.isPirate() && !faction.isMercenary()) {
                     continue;
@@ -203,7 +207,8 @@ public class PersonnelMarketMekHQ extends NewPersonnelMarket {
                 factionStandingMultiplier *= 3;
             }
 
-            for (int i = 0; i < factionStandingMultiplier; i++) {
+            // Weight the applicant pool by how long the faction held a world here, on top of the standing multiplier.
+            for (int i = 0; i < factionStandingMultiplier * tenureWeight; i++) {
                 interestedFactions.add(faction);
             }
         }

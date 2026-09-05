@@ -295,6 +295,16 @@ public enum ContractObjectiveType {
         return this == OBSERVATION_RAID;
     }
 
+    /**
+     * @return {@code true} if this is the {@link #UNDEFINED} sentinel value. UNDEFINED is a placeholder (used, for
+     *       example, as the opposing objective of a blank GM-created contract or when converting legacy saves) and is
+     *       never a real, playable objective. It must not be produced by contract generation, as it has no StratCon
+     *       contract definition and would crash on contract acceptance.
+     */
+    public boolean isUndefined() {
+        return this == UNDEFINED;
+    }
+
     public boolean isGarrisonType() {
         return isGarrisonDuty() || isCadreDuty() || isSecurityDuty() || isRiotDuty() || isRetainer();
     }
