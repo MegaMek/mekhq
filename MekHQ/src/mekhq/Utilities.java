@@ -544,6 +544,9 @@ public class Utilities {
                 person.addSkill(SkillType.S_GUN_PROTO,
                       SkillType.getType(SkillType.S_GUN_PROTO).getTarget() - oldCrew.getGunnery(),
                       0);
+                person.addSkill(SkillType.S_PILOT_PROTO,
+                      SkillType.getType(SkillType.S_PILOT_PROTO).getTarget() - oldCrew.getGunnery(),
+                      0);
             } else if (unit.getEntity() instanceof VTOL) {
                 final megamek.common.enums.Gender gender = oldCrew.getGender();
                 person = campaign.getPlayerForce()
@@ -1042,7 +1045,7 @@ public class Utilities {
     /**
      * Applies the Clan Trueborn {@code +1} "Misc bonus" to a person's phenotype-appropriate profession skills.
      *
-     * <p>Personnel converted from an {@link megamek.common.Crew} (such as captured enemy pilots) have their skills
+     * <p>Personnel converted from an {@link Crew} (such as captured enemy pilots) have their skills
      * seeded directly from the crew's gunnery and piloting, so they never pass through the skill generator that would
      * otherwise apply this bonus. Without this, Trueborn prisoners and bondsmen were missing the {@code +1} bonus that
      * hired and Ronin Trueborn personnel receive.</p>

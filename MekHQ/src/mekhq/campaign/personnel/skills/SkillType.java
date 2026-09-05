@@ -94,6 +94,7 @@ public class SkillType {
     public static final String S_PILOT_VTOL = "Piloting/VTOL";
     public static final String S_PILOT_NVEE = "Piloting/Naval";
     public static final String S_PILOT_SPACE = "Piloting/Spacecraft";
+    public static final String S_PILOT_PROTO = "Piloting/ProtoMek";
     public static final String S_GUN_MEK = "Gunnery/Mek";
     public static final String S_GUN_AERO = "Gunnery/Aerospace";
     public static final String S_GUN_JET = "Gunnery/Aircraft";
@@ -207,14 +208,14 @@ public class SkillType {
     public static final String[] skillList = { S_PILOT_MEK, S_GUN_MEK, S_PILOT_AERO, S_GUN_AERO, S_PILOT_GVEE,
                                                S_PILOT_VTOL, S_PILOT_NVEE, S_GUN_VEE, S_PILOT_JET, S_GUN_JET,
                                                S_PILOT_SPACE, S_GUN_SPACE, S_ARTILLERY, S_GUN_BA, S_GUN_PROTO,
-                                               S_SMALL_ARMS, S_ANTI_MEK, S_TECH_MEK, S_TECH_MECHANIC, S_TECH_AERO,
-                                               S_TECH_BA, S_TECH_VESSEL, S_ASTECH, S_SURGERY, S_MEDTECH, S_NAVIGATION,
-                                               S_ADMIN, S_TACTICS, S_STRATEGY, S_NEGOTIATION, S_LEADER, S_ACROBATICS,
-                                               S_ACTING, S_ANIMAL_HANDLING, S_APPRAISAL, S_ARCHERY, S_ART_COOKING,
-                                               S_ART_DANCING, S_ART_DRAWING, S_ART_PAINTING, S_ART_POETRY,
-                                               S_ART_SCULPTURE, S_ART_INSTRUMENT, S_ART_SINGING, S_ART_WRITING,
-                                               S_ART_OTHER, S_COMMUNICATIONS, S_COMPUTERS, S_CRYPTOGRAPHY,
-                                               S_DEMOLITIONS, S_DISGUISE, S_ESCAPE_ARTIST, S_FORGERY,
+                                               S_PILOT_PROTO, S_SMALL_ARMS, S_ANTI_MEK, S_TECH_MEK, S_TECH_MECHANIC,
+                                               S_TECH_AERO, S_TECH_BA, S_TECH_VESSEL, S_ASTECH, S_SURGERY, S_MEDTECH,
+                                               S_NAVIGATION, S_ADMIN, S_TACTICS, S_STRATEGY, S_NEGOTIATION, S_LEADER,
+                                               S_ACROBATICS, S_ACTING, S_ANIMAL_HANDLING, S_APPRAISAL, S_ARCHERY,
+                                               S_ART_COOKING, S_ART_DANCING, S_ART_DRAWING, S_ART_PAINTING,
+                                               S_ART_POETRY, S_ART_SCULPTURE, S_ART_INSTRUMENT, S_ART_SINGING,
+                                               S_ART_WRITING, S_ART_OTHER, S_COMMUNICATIONS, S_COMPUTERS,
+                                               S_CRYPTOGRAPHY, S_DEMOLITIONS, S_DISGUISE, S_ESCAPE_ARTIST, S_FORGERY,
                                                S_INTEREST_HISTORY, S_INTEREST_LITERATURE, S_INTEREST_HOLO_GAMES,
                                                S_INTEREST_SPORTS, S_INTEREST_FASHION, S_INTEREST_MUSIC,
                                                S_INTEREST_MILITARY, S_INTEREST_ANTIQUES, S_INTEREST_THEOLOGY,
@@ -232,7 +233,6 @@ public class SkillType {
                                                S_SENSOR_OPERATIONS, S_STEALTH, S_STREETWISE, S_SURVIVAL, S_TRACKING,
                                                S_CAREER_ANY, S_SWIMMING, S_ZERO_G_OPERATIONS, S_RUNNING, S_TRAINING,
                                                S_MELEE_WEAPONS, S_THROWN_WEAPONS, S_SUPPORT_WEAPONS };
-
 
     public static Map<String, SkillType> lookupHash;
 
@@ -972,6 +972,7 @@ public class SkillType {
         lookupHash.put(S_ARTILLERY, createArtillery());
         lookupHash.put(S_GUN_BA, createGunneryBA());
         lookupHash.put(S_GUN_PROTO, createGunneryProto());
+        lookupHash.put(S_PILOT_PROTO, createPilotingProto());
         lookupHash.put(S_SMALL_ARMS, createSmallArms());
         lookupHash.put(S_ANTI_MEK, createAntiMek());
         lookupHash.put(S_TECH_MEK, createTechMek());
@@ -1189,7 +1190,7 @@ public class SkillType {
         } else if (en instanceof Infantry) {
             return S_ANTI_MEK;
         } else if (en instanceof ProtoMek) {
-            return S_GUN_PROTO;
+            return S_PILOT_PROTO;
         } else {
             return S_PILOT_MEK;
         }
@@ -1594,6 +1595,23 @@ public class SkillType {
     public static SkillType createPilotingVTOL() {
         return new SkillType(S_PILOT_VTOL,
               8,
+              false,
+              COMBAT_PILOTING,
+              REFLEXES,
+              DEXTERITY,
+              2,
+              null,
+              null,
+              null,
+              null,
+              null,
+              new Integer[] { 8, 4, 4, 4, 4, 4, 4, 4, 4, DISABLED_SKILL_LEVEL, DISABLED_SKILL_LEVEL }
+        );
+    }
+
+    public static SkillType createPilotingProto() {
+        return new SkillType(S_PILOT_PROTO,
+              7, // Not a typo
               false,
               COMBAT_PILOTING,
               REFLEXES,

@@ -121,7 +121,8 @@ public class SkillAwards {
                       SkillType.S_PILOT_VTOL,
                       SkillType.S_PILOT_NVEE,
                       SkillType.S_PILOT_JET,
-                      SkillType.S_PILOT_SPACE);
+                      SkillType.S_PILOT_SPACE,
+                      SkillType.S_PILOT_PROTO);
                 break;
 
             case "accuracy":
@@ -199,6 +200,10 @@ public class SkillAwards {
 
             case "piloting/spacecraft":
                 relevantSkills = List.of(SkillType.S_PILOT_SPACE);
+                break;
+
+            case "piloting/protomek":
+                relevantSkills = List.of(SkillType.S_PILOT_PROTO);
                 break;
 
             case "gunnery/mek":

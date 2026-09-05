@@ -6830,7 +6830,7 @@ public class Person implements ILocatable {
             boolean hasEIImplant = !isUseImplants ||
                                          !isUseAltAdvancedMedical ||
                                          options.booleanOption(UNOFFICIAL_EI_IMPLANT);
-            return hasSkill(S_GUN_PROTO) && isRole(PersonnelRole.PROTOMEK_PILOT) && hasEIImplant;
+            return hasSkill(S_PILOT_PROTO) && isRole(PersonnelRole.PROTOMEK_PILOT) && hasEIImplant;
         } else {
             return false;
         }
