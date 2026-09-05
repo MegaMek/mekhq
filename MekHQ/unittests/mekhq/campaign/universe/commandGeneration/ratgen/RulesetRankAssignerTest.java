@@ -33,6 +33,9 @@
 package mekhq.campaign.universe.commandGeneration.ratgen;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import megamek.common.units.UnitType;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 
 import mekhq.campaign.force.FormationLevel;
 import mekhq.campaign.personnel.ranks.Rank;
@@ -103,12 +106,26 @@ class RulesetRankAssignerTest {
     // ===== Clan =====
 
     @Test
-    void rankIndex_starOrNova_isNovaCommanderSlot() {
-        // Star Commander is at O2 in the CLAN rank XML, Nova Commander at O3. FormationLevel
-        // collapses Stars and Novas; we use Nova Commander as the default because it covers the
-        // more elaborate "Nova" case and degrades cleanly to Star Commander semantics for pure
-        // Stars (the Nova-Commander rank in the XML covers both).
-        assertEquals(Rank.RWO_MAX + 3, RulesetRankAssigner.rankIndexForLevel(FormationLevel.STAR_OR_NOVA));
+    void rankIndex_starOrNova_isStarCommanderSlot() {
+        // Star Commander is at O2 in the CLAN rank XML, Nova Commander at O3. A Star of Meks alone is led by a
+        // Star Commander; rankIndexFor raises a Star that mixes Meks and Elementals, a Nova, to Nova Commander.
+        assertEquals(Rank.RWO_MAX + 2, RulesetRankAssigner.rankIndexForLevel(FormationLevel.STAR_OR_NOVA));
+    }
+
+    @Test
+    void aPointsLeaderRanksByThePointsPlaceInTheStar() {
+        assertEquals(RulesetRankAssigner.POINT_ONE_RANK_INDEX, RulesetRankAssigner.pointRankIndex(0));
+        assertEquals(RulesetRankAssigner.POINT_ONE_RANK_INDEX + 4, RulesetRankAssigner.pointRankIndex(4), "Point 5");
+        assertEquals(RulesetRankAssigner.POINT_ONE_RANK_INDEX + 4, RulesetRankAssigner.pointRankIndex(9),
+              "a Star has five Points, so the ladder stops at Point 5");
+    }
+
+    @Test
+    void aStarIsANovaOnlyWhenMeksAndElementalsShareIt() {
+        assertTrue(RulesetRankAssigner.isNova(java.util.Set.of(UnitType.MEK, UnitType.BATTLE_ARMOR)));
+        assertTrue(RulesetRankAssigner.isNova(java.util.Set.of(UnitType.AEROSPACE_FIGHTER, UnitType.BATTLE_ARMOR)));
+        assertFalse(RulesetRankAssigner.isNova(java.util.Set.of(UnitType.MEK)), "Meks alone are a Star");
+        assertFalse(RulesetRankAssigner.isNova(java.util.Set.of(UnitType.BATTLE_ARMOR)), "Elementals alone are a Star");
     }
 
     @Test

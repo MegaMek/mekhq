@@ -156,7 +156,7 @@ public class CommandGenerationOptions {
 
     // Starting simulation
     private boolean runStartingSimulation;
-    private int simulationDuration;
+    private int simulationDuration = 10;
     private boolean simulateRandomMarriages;
     private boolean simulateRandomProcreation;
 
@@ -259,7 +259,7 @@ public class CommandGenerationOptions {
 
         // Starting simulation
         setRunStartingSimulation(false);
-        setSimulationDuration(5);
+        setSimulationDuration(10);
         setSimulateRandomMarriages(false);
         setSimulateRandomProcreation(false);
 

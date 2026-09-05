@@ -64,6 +64,7 @@ import mekhq.campaign.universe.Faction;
 import mekhq.campaign.universe.Factions;
 import mekhq.campaign.universe.commandGeneration.CommandGenerationOptions;
 import mekhq.campaign.universe.commandGeneration.ratgen.ForceDescriptorWalker;
+import mekhq.campaign.universe.commandGeneration.ratgen.DraftBloodnames;
 import mekhq.campaign.universe.commandGeneration.ratgen.FormationNamer;
 import mekhq.campaign.universe.enums.ForceNamingMethod;
 import mekhq.gui.commandGeneration.components.CommandGenerationCheckBox;
@@ -155,6 +156,7 @@ public class ForceGeneratorTab {
         // changes so the tree always matches what Accept will commit.
         viewUi.setToeChangeListener(this::invalidatePreviewNames);
         viewUi.setFormationNameProvider(this::previewNameFor);
+        viewUi.setForceGeneratedListener(this::awardDraftBloodnames);
         // The chosen-units table below the controls is a Random Army concept - it collects units to add to a running
         // game - and the Command Designer never reads it, committing the preview tree instead. That inert panel
         // holds the formation mix editor here, so once a force has been generated the mix is on screen rather
@@ -238,7 +240,29 @@ public class ForceGeneratorTab {
      */
     public void setForceGeneratedListener(Consumer<ForceDescriptor> listener) {
         if (viewUi != null) {
-            viewUi.setForceGeneratedListener(listener);
+            viewUi.setForceGeneratedListener(rolled -> {
+                awardDraftBloodnames(rolled);
+                if (listener != null) {
+                    listener.accept(rolled);
+                }
+            });
+        }
+    }
+
+    /**
+     * Gives a rolled Clan force its Bloodnames as soon as it is rolled, so the draft shows the warriors who carry
+     * one and the build keeps them. Clear Force hands {@code null} and there is nothing to do.
+     *
+     * @param rolled the force just rolled, or {@code null} on Clear Force
+     */
+    private void awardDraftBloodnames(@Nullable ForceDescriptor rolled) {
+        if ((rolled == null) || (campaign == null) || (rolled.getFaction() == null)) {
+            return;
+        }
+        Faction faction = resolveRankAuthority(rolled.getFaction());
+        int awarded = DraftBloodnames.award(campaign, rolled, faction);
+        if (awarded > 0) {
+            invalidatePreviewNames();
         }
     }
 

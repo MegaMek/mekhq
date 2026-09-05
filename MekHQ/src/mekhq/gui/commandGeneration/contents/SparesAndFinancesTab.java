@@ -97,6 +97,11 @@ public class SparesAndFinancesTab {
     private final Campaign campaign;
     private CommandGenerationOptions options;
 
+    /** The starting simulation's length in years: what a fresh dialog offers and the range it accepts. */
+    private static final int DEFAULT_SIMULATION_YEARS = 10;
+    private static final int MIN_SIMULATION_YEARS = 1;
+    private static final int MAX_SIMULATION_YEARS = 50;
+
     /** Ordered map: bundle-key suffix (also the lbl{key}.text key) → spares spinner. */
     private final Map<String, JSpinner> spinners = new LinkedHashMap<>();
 
@@ -391,7 +396,8 @@ public class SparesAndFinancesTab {
 
         chkRunStartingSimulation = new CommandGenerationCheckBox("RunStartingSimulation");
         CommandGenerationLabel simulationDurationLabel = new CommandGenerationLabel("SimulationDuration");
-        spnSimulationDuration = new JSpinner(new SpinnerNumberModel(12, 1, 600, 1));
+        spnSimulationDuration = new JSpinner(new SpinnerNumberModel(DEFAULT_SIMULATION_YEARS,
+              MIN_SIMULATION_YEARS, MAX_SIMULATION_YEARS, 1));
         spnSimulationDuration.setName("spnSimulationDuration");
         spnSimulationDuration.setToolTipText(simulationDurationLabel.getToolTipText());
         chkSimulateRandomMarriages = new CommandGenerationCheckBox("SimulateRandomMarriages");
@@ -496,7 +502,10 @@ public class SparesAndFinancesTab {
         refreshStartingCashPreview();
 
         chkRunStartingSimulation.setSelected(sourceOptions.isRunStartingSimulation());
-        spnSimulationDuration.setValue(sourceOptions.getSimulationDuration());
+        // Saved options may hold a value from when the duration was counted in months, or one typed past the
+        // range; the spinner's model does not clamp on its own.
+        spnSimulationDuration.setValue(Math.max(MIN_SIMULATION_YEARS,
+              Math.min(MAX_SIMULATION_YEARS, sourceOptions.getSimulationDuration())));
         chkSimulateRandomMarriages.setSelected(sourceOptions.isSimulateRandomMarriages());
         chkSimulateRandomProcreation.setSelected(sourceOptions.isSimulateRandomProcreation());
         boolean sim = chkRunStartingSimulation.isSelected();
