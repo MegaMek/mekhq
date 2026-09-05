@@ -71,6 +71,7 @@ import mekhq.campaign.mission.scenarios.AtBDynamicScenario;
 import mekhq.campaign.mission.scenarios.Scenario;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.unit.Unit;
+import mekhq.campaign.universe.commandGeneration.SupportCarrierDeployment;
 import mekhq.gui.adapter.TOEMouseAdapter;
 import mekhq.gui.baseComponents.roundedComponents.RoundedJButton;
 import mekhq.gui.baseComponents.roundedComponents.RoundedLineBorder;
@@ -258,6 +259,8 @@ public final class TOETab extends CampaignGuiTab {
                                                      return campaign1.getPlayerForce().getFormation(id);
                                                  })
                                                  .filter(force -> force != null && !force.isDeployed())
+                                                 .filter(force -> !SupportCarrierDeployment.deploysNothing(campaign,
+                                                       force, selectedScenario))
                                                  .sorted(Comparator.comparing(Formation::getFullName))
                                                  .toList();
 
@@ -288,6 +291,13 @@ public final class TOETab extends CampaignGuiTab {
             selectedScenario.addForces(selectedFormation.getId());
             selectedFormation.setScenarioId(selectedScenario.getId(), getCampaign());
             MekHQ.triggerEvent(new DeploymentChangedEvent(selectedFormation, selectedScenario));
+
+            String stayedHome = SupportCarrierDeployment.stayingHomeMessage(campaign, List.of(selectedFormation),
+                  selectedScenario);
+            if (stayedHome != null) {
+                JOptionPane.showMessageDialog(getFrame(), stayedHome, SupportCarrierDeployment.stayingHomeTitle(),
+                      JOptionPane.INFORMATION_MESSAGE);
+            }
         }
     }
 
