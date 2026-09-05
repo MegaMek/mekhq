@@ -59,7 +59,6 @@ import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.finances.Money;
 import mekhq.campaign.force.CombatTeam;
 import mekhq.campaign.force.Formation;
-import mekhq.campaign.market.PersonnelMarket;
 import mekhq.campaign.mission.scenarios.Scenario;
 import mekhq.campaign.mission.utilities.CombatRole;
 import mekhq.campaign.personnel.Injury;
@@ -135,12 +134,6 @@ public enum PersonnelTableModelColumn implements MHQTableColumn {
           PersonnelTableModelColumn::getUnitAssignmentGraphical),
     TECH_UNIT_ASSIGNMENT("Column.TECH_UNIT_ASSIGNMENT.title", Comparators.NATURAL_ORDER_STRING_COMPARATOR,
           PersonnelTableModelColumn::getTechUnitAssignment),
-    MARKET_UNIT_ASSIGNMENT("Column.UNIT_ASSIGNMENT.title", Comparators.NATURAL_ORDER_STRING_COMPARATOR,
-          (person, campaign) -> {
-              PersonnelMarket market = campaign.getPlayerForce().getHumanResources().getPersonnelMarket();
-              Entity entity = (market == null) ? null : market.getAttachedEntity(person);
-              return (entity == null) ? "-" : entity.getDisplayName();
-          }),
     FORCE("Column.FORCE.title", Comparators.NATURAL_ORDER_STRING_COMPARATOR,
           (person, campaign) -> {
               Formation formation = campaign.getPlayerForce().getFormationFor(person);

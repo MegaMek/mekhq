@@ -33,7 +33,6 @@
 package mekhq.gui;
 
 import static megamek.client.ratgenerator.ForceDescriptor.RATING_5;
-import static mekhq.campaign.ForceHumanResources.isUsingLegacyPersonnelMarket;
 import static mekhq.campaign.digitalGM.stratCon.StratConRulesManager.generateDailyScenariosForTrack;
 import static mekhq.campaign.digitalGM.stratCon.StratConRulesManager.isForceDeployedToStratCon;
 import static mekhq.campaign.enums.DailyReportType.PERSONNEL;
@@ -988,7 +987,7 @@ public final class BriefingTab extends CampaignGuiTab {
         }
 
         // Refresh personnel market if it was previously disabled
-        if (!isUsingLegacyPersonnelMarket(campaignOptions) && marketPreviouslyDisabled) {
+        if (marketPreviouslyDisabled) {
             Campaign campaign = getCampaign();
             campaign.getPlayerForce().getHumanResources().refreshApplicants(campaign, true);
             CampaignNewDayManager.showRarePersonnelDialog(getCampaign(), false);
