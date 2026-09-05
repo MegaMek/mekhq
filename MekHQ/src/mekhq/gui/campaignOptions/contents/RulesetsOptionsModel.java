@@ -50,6 +50,7 @@ class RulesetsOptionsModel {
     boolean autoGenerateOpForCallSigns;
     SkillLevel minimumCallsignSkillLevel;
     boolean useDropShips;
+    boolean restrictScenariosToFleetCapability;
     boolean regionalMekVariations;
     boolean attachedPlayerCamouflage;
     boolean playerControlsAttachedUnits;
@@ -97,6 +98,7 @@ class RulesetsOptionsModel {
         autoGenerateOpForCallSigns = options.get(CampaignOption.AUTO_GENERATE_OP_FOR_CALL_SIGNS);
         minimumCallsignSkillLevel = options.get(CampaignOption.MINIMUM_CALLSIGN_SKILL_LEVEL);
         useDropShips = options.get(CampaignOption.USE_DROP_SHIPS);
+        restrictScenariosToFleetCapability = options.get(CampaignOption.RESTRICT_SCENARIOS_TO_FLEET_CAPABILITY);
         regionalMekVariations = options.get(CampaignOption.REGIONAL_MEK_VARIATIONS);
         attachedPlayerCamouflage = options.get(CampaignOption.ATTACHED_PLAYER_CAMOUFLAGE);
         playerControlsAttachedUnits = options.get(CampaignOption.PLAYER_CONTROLS_ATTACHED_UNITS);
@@ -145,6 +147,7 @@ class RulesetsOptionsModel {
         options.set(CampaignOption.AUTO_GENERATE_OP_FOR_CALL_SIGNS, autoGenerateOpForCallSigns);
         options.set(CampaignOption.MINIMUM_CALLSIGN_SKILL_LEVEL, minimumCallsignSkillLevel);
         options.set(CampaignOption.USE_DROP_SHIPS, useDropShips);
+        options.set(CampaignOption.RESTRICT_SCENARIOS_TO_FLEET_CAPABILITY, restrictScenariosToFleetCapability);
         options.set(CampaignOption.REGIONAL_MEK_VARIATIONS, regionalMekVariations);
         options.set(CampaignOption.ATTACHED_PLAYER_CAMOUFLAGE, attachedPlayerCamouflage);
         options.set(CampaignOption.PLAYER_CONTROLS_ATTACHED_UNITS, playerControlsAttachedUnits);
