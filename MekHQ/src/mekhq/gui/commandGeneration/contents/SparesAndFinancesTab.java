@@ -264,7 +264,7 @@ public class SparesAndFinancesTab {
         spnRandomStartingCashDiceCount.setName("spnRandomStartingCashDiceCount");
         spnRandomStartingCashDiceCount.setToolTipText(diceCountLabel.getToolTipText());
         CommandGenerationLabel minimumFloatLabel = new CommandGenerationLabel("MinimumStartingFloat");
-        spnMinimumStartingFloat = new JSpinner(new SpinnerNumberModel(0, 0, 100_000_000, 100_000));
+        spnMinimumStartingFloat = new JSpinner(new SpinnerNumberModel(0L, 0L, 100_000_000L, 100_000L));
         spnMinimumStartingFloat.setName("spnMinimumStartingFloat");
         spnMinimumStartingFloat.setToolTipText(minimumFloatLabel.getToolTipText());
         chkStartingLoan = new CommandGenerationCheckBox("StartingLoan");
@@ -555,7 +555,7 @@ public class SparesAndFinancesTab {
         targetOptions.setStartingCashPercent((Integer) spnStartingCashPercent.getValue());
         targetOptions.setRandomizeStartingCash(chkRandomizeStartingCash.isSelected());
         targetOptions.setRandomStartingCashDiceCount((Integer) spnRandomStartingCashDiceCount.getValue());
-        targetOptions.setMinimumStartingFloat((Integer) spnMinimumStartingFloat.getValue());
+        targetOptions.setMinimumStartingFloat(((Number) spnMinimumStartingFloat.getValue()).longValue());
         targetOptions.setStartingLoan(chkStartingLoan.isSelected());
         targetOptions.setPayForSetup(payForToggles.get("PayForSetup").isSelected());
         targetOptions.setPayForPersonnel(payForToggles.get("PayForPersonnel").isSelected());

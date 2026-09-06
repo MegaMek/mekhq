@@ -66,6 +66,13 @@ import mekhq.campaign.universe.enums.TechAssignmentSortFactor;
 public class CommandGenerationOptions {
 
     /**
+     * Working capital the command is guaranteed to keep once the pay-for toggles have taken their
+     * cut, in C-bills. A command that starts broke cannot pay its first month's wages, so generation
+     * floors the float here and takes a loan for the shortfall when one is allowed.
+     */
+    private static final long DEFAULT_MINIMUM_STARTING_FLOAT = 10_000_000L;
+
+    /**
      * Support roles seeded with default coverage percentages and skill levels: the four tech roles,
      * doctor, and administrators - matches the SetupTab spinner/dropdown layout.
      */
@@ -172,7 +179,7 @@ public class CommandGenerationOptions {
     private int startingCashPercent;
     private boolean randomizeStartingCash;
     private int randomStartingCashDiceCount;
-    private int minimumStartingFloat;
+    private long minimumStartingFloat;
     private boolean startingLoan;
     private boolean payForSetup;
     private boolean payForPersonnel;
@@ -212,7 +219,7 @@ public class CommandGenerationOptions {
         setGenerateMedics(true);
         setMedicsAsPersonnel(false);
         setMedicSkillLevel(SkillLevel.NONE);
-        setGenerateMedicalReserve(false);
+        setGenerateMedicalReserve(true);
         setMedicalReservePercent(10);
 
         // Tech-to-unit assignment grid defaults: officers first, then heaviest, then best pilot.
@@ -225,14 +232,14 @@ public class CommandGenerationOptions {
         setTechAssignmentTertiaryDescending(true);
 
         // Officer assignment and personnel flags
-        setGenerateCaptains(false);
+        setGenerateCaptains(true);
         setAssignCompanyCommanderFlag(true);
         setApplyOfficerStatBonusToWorstSkill(false);
-        setAssignBestCompanyCommander(false);
+        setAssignBestCompanyCommander(true);
         setPrioritizeCompanyCommanderCombatSkills(false);
-        setAssignBestOfficers(false);
+        setAssignBestOfficers(true);
         setPrioritizeOfficerCombatSkills(false);
-        setAssignMostSkilledToPrimaryLances(false);
+        setAssignMostSkilledToPrimaryLances(true);
         setAutomaticallyAssignRanks(true);
         // Default ON so the target faction's rank system (Clan ranks for a Clan target, ComStar
         // ranks for a CS target, etc.) drives the generated commanders' rank names.
@@ -258,10 +265,10 @@ public class CommandGenerationOptions {
         setUseOriginNodeFormationIconLogo(false);
 
         // Starting simulation
-        setRunStartingSimulation(false);
+        setRunStartingSimulation(true);
         setSimulationDuration(10);
-        setSimulateRandomMarriages(false);
-        setSimulateRandomProcreation(false);
+        setSimulateRandomMarriages(true);
+        setSimulateRandomProcreation(true);
 
         // Contracts
         setSelectStartingContract(true);
@@ -270,12 +277,13 @@ public class CommandGenerationOptions {
         // Finances. Pay for Initial Setup defaults OFF: with the percentage-of-unit-value cash base,
         // paying for the units would always dwarf the base (10% cash vs 100% cost) and floor every
         // default build into a maximum loan. Out of the box the command is granted free with its
-        // working capital; players opt into the pay-for accounting.
+        // working capital; players opt into the pay-for accounting. The minimum float leaves the
+        // command able to pay its first month's wages rather than starting broke.
         setProcessFinances(true);
         setStartingCashPercent(10);
         setRandomizeStartingCash(false);
         setRandomStartingCashDiceCount(18);
-        setMinimumStartingFloat(0);
+        setMinimumStartingFloat(DEFAULT_MINIMUM_STARTING_FLOAT);
         setStartingLoan(true);
         setPayForSetup(false);
         setPayForPersonnel(true);
@@ -729,11 +737,11 @@ public class CommandGenerationOptions {
         this.randomStartingCashDiceCount = randomStartingCashDiceCount;
     }
 
-    public int getMinimumStartingFloat() {
+    public long getMinimumStartingFloat() {
         return minimumStartingFloat;
     }
 
-    public void setMinimumStartingFloat(final int minimumStartingFloat) {
+    public void setMinimumStartingFloat(final long minimumStartingFloat) {
         this.minimumStartingFloat = minimumStartingFloat;
     }
 

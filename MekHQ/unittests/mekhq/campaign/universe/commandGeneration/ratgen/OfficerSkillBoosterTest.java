@@ -125,7 +125,10 @@ class OfficerSkillBoosterTest {
         Person commandingOfficer = seatedMekWarrior(4, 4);
         RulesetRankAssigner.Result ranks = ranks(commandingOfficer, Map.of(commandingOfficer, FormationLevel.COMPANY));
 
-        int improved = OfficerSkillBooster.apply(new CommandGenerationOptions(), ranks, bound -> 0);
+        CommandGenerationOptions off = new CommandGenerationOptions();
+        off.setGenerateCaptains(false);
+
+        int improved = OfficerSkillBooster.apply(off, ranks, bound -> 0);
 
         assertEquals(0, improved);
         assertEquals(4, commandingOfficer.getSkill(SkillType.S_GUN_MEK).getLevel());
