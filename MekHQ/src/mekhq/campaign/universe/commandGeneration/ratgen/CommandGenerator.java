@@ -1172,19 +1172,6 @@ public final class CommandGenerator {
      * makes the choice take effect for the generation that follows and, because both option sets are
      * saved with the campaign, hold for the saved game.</p>
      */
-    /**
-     * Stage 3b: writes the designer's temporary-crew choices to the campaign.
-     *
-     * <p>Whether a unit's seats are filled with named people or left for temporary crew is decided by
-     * {@link MultiCrewAssembler} as each unit is built, reading the campaign options at that moment. So the
-     * choices have to reach the campaign before the first unit is crewed; written any later, every unit would
-     * already hold named crew under the previous settings and the toggles would appear to do nothing.</p>
-     *
-     * @param campaign the campaign being generated into
-     * @param options  the designer's choices
-     */
-    // Package-private so the regression test can check the choices reach the campaign.
-
     // Package-private so the regression test can check the choice reaches the campaign.
     static void applyAugmentationRules(Campaign campaign, CommandGenerationOptions options) {
         CampaignOptions campaignOptions = campaign.getCampaignOptions();

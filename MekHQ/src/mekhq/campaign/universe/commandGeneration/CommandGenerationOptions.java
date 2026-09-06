@@ -556,9 +556,6 @@ public class CommandGenerationOptions {
     }
 
     /**
-     * @return the crew roles whose seats temporary crew fill instead of named people; never {@code null}
-     */
-    /**
      * @return which of MegaMek's neural interface rules is in play, which decides whether an enhanced
      *       imaging or direct neural implant does anything
      */

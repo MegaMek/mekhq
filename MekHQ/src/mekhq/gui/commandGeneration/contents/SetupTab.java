@@ -205,10 +205,6 @@ public class SetupTab {
     private CommandGenerationCheckBox chkUseImplants;
     private MMComboBox<NeuralInterfaceMode> cmbNeuralInterfaceMode;
 
-    // Temporary crew. Campaign settings, surfaced here for the same reason as the augmentation toggles: a
-    // player building a starting force decides here whether a tank's crew are named warriors or an
-    // anonymous pool, without going through the campaign options dialog first.
-
     // Random origin
     private RandomOriginOptionsPanel randomOriginOptionsPanel;
 
