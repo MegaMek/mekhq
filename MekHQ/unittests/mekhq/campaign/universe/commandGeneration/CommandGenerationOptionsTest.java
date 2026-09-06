@@ -39,7 +39,6 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-import java.util.EnumSet;
 import megamek.common.enums.SkillLevel;
 import mekhq.campaign.personnel.enums.PersonnelRole;
 import mekhq.campaign.universe.enums.TechAssignmentSortFactor;
@@ -144,8 +143,8 @@ class CommandGenerationOptionsTest {
     void aChangedSettingBreaksEquality() {
         CommandGenerationOptions options = new CommandGenerationOptions();
         CommandGenerationOptions changed = new CommandGenerationOptions();
-        changed.setTemporaryCrewRoles(EnumSet.of(TemporaryCrewRole.INFANTRY));
-        assertNotEquals(options, changed, "a temporary-crew choice is part of the settings");
+        changed.setGenerateCaptains(!options.isGenerateCaptains());
+        assertNotEquals(options, changed, "an officer toggle is part of the settings");
 
         changed = new CommandGenerationOptions();
         changed.getSupportPersonnelCoveragePercents().put(PersonnelRole.DOCTOR, 200);
