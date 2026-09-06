@@ -123,11 +123,15 @@ public class CommandGenerationDialog extends AbstractMHQValidationButtonDialog {
     /**
      * Whether the last press of Accept &amp; Build actually started a build.
      *
-     * <p>{@code okAction} gives up without building on three paths - the tab settings cannot be collected, no
-     * force has been previewed yet, or the player cancels at the build confirmation. None of those should close
-     * the designer or greet the player with a command they have not built, so the flag lets
-     * {@link #okButtonActionPerformed} and {@link #confirmationActionListener} tell a real commit from a
-     * change of mind.</p>
+     * <p>Set once the combat phase has put a force in the TOE, which is the point the build becomes real. Every
+     * way of not getting there leaves it {@code false}: the tab settings cannot be collected, no force has been
+     * previewed yet, the player cancels at the build confirmation, the phase throws, or it returns no result.
+     * None of those should close the designer or greet the player with a command they have not built, so the
+     * flag lets {@link #okButtonActionPerformed} and {@link #confirmationActionListener} tell a real commit from
+     * everything else.</p>
+     *
+     * <p>A later phase failing does not clear it. By then the combat force is committed to the campaign, so the
+     * designer has nothing left to go back to.</p>
      */
     private boolean buildStarted;
 
@@ -459,7 +463,6 @@ public class CommandGenerationDialog extends AbstractMHQValidationButtonDialog {
         if (!confirmBuildCommand(options, chosenEchelon, combatUnitCount)) {
             return;
         }
-        buildStarted = true;
 
         // Build the command in two background phases behind a modal progress dialog (long
         // generations would otherwise look frozen). Phase one commits the model's combat force to
@@ -482,6 +485,10 @@ public class CommandGenerationDialog extends AbstractMHQValidationButtonDialog {
                 LOGGER.info("[CompanyGen][Worker] combat phase produced no result; skipping support");
                 return;
             }
+            // The commit point: the combat force is in the TOE, so this counts as a build even if a later
+            // phase falls over. A phase that threw never reaches here, because runGenerationPhase reports the
+            // failure and skips this consumer entirely.
+            buildStarted = true;
             List<Person> generatedPersons = new ArrayList<>(combatResult.generatedPersons());
             runGenerationPhase("Generating support forces...",
                   supportListener -> CommandGenerator.generateSupportFromToe(getCampaign(), options,
