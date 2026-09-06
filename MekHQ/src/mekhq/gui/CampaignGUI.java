@@ -204,7 +204,7 @@ public class CampaignGUI extends JPanel {
 
     /* Top Panel */
     private JPanel pnlTop;
-    private RoundedJButton btnCommandGenerator;
+    private AccentRoundedJButton btnCommandGenerator;
     private final RoundedJButton btnContractMarket =
           new RoundedJButton(resourceMap.getString("btnContractMarket.market"));
     private final RoundedJButton btnUnitMarket = new RoundedJButton(resourceMap.getString("btnUnitMarket.market"));
@@ -510,8 +510,11 @@ public class CampaignGUI extends JPanel {
      *
      * @return the button
      */
-    private RoundedJButton createCommandGeneratorButton() {
-        btnCommandGenerator = new RoundedJButton(resourceMap.getString("btnCommandGenerator.text"));
+    private AccentRoundedJButton createCommandGeneratorButton() {
+        // Painted in hazard yellow and black: it is only on screen while the campaign is empty, and players
+        // regularly miss that they have to press something to get a starting force at all.
+        btnCommandGenerator = new AccentRoundedJButton(resourceMap.getString("btnCommandGenerator.text"),
+              Accent.CAUTION);
         btnCommandGenerator.setToolTipText(resourceMap.getString("btnCommandGenerator.toolTipText"));
         btnCommandGenerator.setHorizontalAlignment(SwingConstants.CENTER);
         btnCommandGenerator.addActionListener(event -> {

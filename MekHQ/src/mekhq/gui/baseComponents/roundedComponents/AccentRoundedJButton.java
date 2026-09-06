@@ -69,7 +69,14 @@ public class AccentRoundedJButton extends RoundedJButton {
          * wheel, at the same saturation and depth, so the two buttons read as a matched pair.
          */
         REFERENCE(new Color(8, 117, 44), new Color(150, 220, 120),
-              new Color(225, 255, 215), new Color(255, 255, 255), new Color(120, 160, 120));
+              new Color(225, 255, 215), new Color(255, 255, 255), new Color(120, 160, 120)),
+        /**
+         * Hazard-stripe yellow and black, the colours a warning sign is painted in. Where {@link #HAZARD} marks
+         * something that has gone wrong, this marks a step the player has to take and might otherwise walk past.
+         * The face is the same yellow as the hazard frame, so the two read as the same warning palette.
+         */
+        CAUTION(new Color(255, 204, 0), new Color(26, 26, 26),
+              new Color(26, 26, 26), new Color(0, 0, 0), new Color(130, 105, 30));
 
         private final Color face;
         private final Color frame;

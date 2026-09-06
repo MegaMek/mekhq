@@ -95,4 +95,41 @@ class AccentRoundedJButtonTest {
         // The middle of the top edge is the yellow frame.
         assertEquals(Accent.HAZARD.getFrame().getRGB(), image.getRGB(60, 1));
     }
+
+    @Test
+    void cautionAccentUsesItsOwnColours() {
+        AccentRoundedJButton button = new AccentRoundedJButton("Generate Starting Command", Accent.CAUTION);
+
+        assertEquals(Accent.CAUTION, button.getAccent());
+        assertEquals(Accent.CAUTION.getFace(), button.getBackground());
+        assertEquals(Accent.CAUTION.getLabel(), button.getForeground());
+    }
+
+    @Test
+    void cautionIsTheHazardYellowSoTheTwoReadAsOnePalette() {
+        assertEquals(Accent.HAZARD.getFrame(), Accent.CAUTION.getFace(),
+              "the caution face is the same yellow the hazard button is framed in");
+    }
+
+    @Test
+    void paintsYellowFaceInsideBlackFrame() {
+        // A short label, so the sampled face pixel cannot land on an antialiased glyph. The caution label is
+        // the same near-black as its frame, which would otherwise read as a frame hit.
+        AccentRoundedJButton button = new AccentRoundedJButton("Go", Accent.CAUTION);
+        button.setFont(button.getFont().deriveFont(Font.BOLD, 12f));
+        button.setSize(120, 40);
+
+        BufferedImage image = new BufferedImage(120, 40, BufferedImage.TYPE_INT_ARGB);
+        Graphics2D graphics = image.createGraphics();
+        try {
+            button.paint(graphics);
+        } finally {
+            graphics.dispose();
+        }
+
+        // A point well inside the face, away from the text, is the hazard yellow.
+        assertEquals(Accent.CAUTION.getFace().getRGB(), image.getRGB(12, 20));
+        // The middle of the top edge is the black frame.
+        assertEquals(Accent.CAUTION.getFrame().getRGB(), image.getRGB(60, 1));
+    }
 }
