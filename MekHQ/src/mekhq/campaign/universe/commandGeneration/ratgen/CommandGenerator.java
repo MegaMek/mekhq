@@ -38,6 +38,7 @@ import static mekhq.utilities.MHQInternationalization.getTextAt;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.EnumMap;
 import java.util.HashSet;
 import java.util.IdentityHashMap;
@@ -91,6 +92,7 @@ import mekhq.campaign.universe.commandGeneration.LiftTopUp;
 import mekhq.campaign.universe.commandGeneration.ManeiDominiAugmentor;
 import mekhq.campaign.universe.commandGeneration.SupportPersonnelToTOE;
 import mekhq.campaign.universe.commandGeneration.SupportUnitGenerator;
+import mekhq.campaign.utilities.AutomatedTechAssignments;
 
 /**
  * Single entry point for the ratgen-driven Command Generator pipeline.
@@ -670,12 +672,13 @@ public final class CommandGenerator {
             SupportUnitGenerator.generateSecurityUnits(campaign, supportFaction, true);
         }
 
-        // Assign techs to units using the Setup tab's three-slot sort grid (Pilot Rank / Unit Weight /
-        // Pilot Skill, each with its own direction). Gated on isAssignTechsToUnits; pulls only from the
-        // techs SupportPersonnelGenerator just created so we don't steal a pre-existing campaign tech.
-        // Runs once every vehicle exists, the support stage's own included, so the flatbeds and the
-        // recovery vehicles get their mechanics too.
-        SupportPersonnelAssigner.assign(campaign, options, supportResult);
+        // Assign techs to units with MekHQ's own assigner, the one the new day and the Hangar's quick-assign
+        // button use, ordered by the Setup tab's three-slot sort grid (Pilot Rank / Unit Weight / Pilot Skill,
+        // each with its own direction). Gated on isAssignTechsToUnits; drawn only from the techs
+        // SupportPersonnelGenerator just created, so a pre-existing campaign tech is never claimed. Runs once
+        // every vehicle exists, the support stage's own included, so the flatbeds and the recovery vehicles get
+        // their mechanics too.
+        assignTechsToGeneratedUnits(campaign, options, supportResult.generatedPersons());
 
         // Decorate the support formations created above with layered TOE icons. This must happen here
         // (not only at the tail of applyToCampaign) because the two-phase Command Designer flow calls
@@ -701,6 +704,40 @@ public final class CommandGenerator {
         logOrphanAudit(campaign);
 
         return supportResult.generatedPersons();
+    }
+
+    /**
+     * Stage 7e: hands the freshly generated techs to {@link AutomatedTechAssignments}, the assigner the rest of
+     * MekHQ uses, ordered by the Setup tab's sort grid.
+     *
+     * <p>Only the techs generated this run are offered, so a tech the campaign already had keeps the units they
+     * were already maintaining. Units are offered a tech in the player's chosen order; with every sort slot left
+     * unset the assigner uses its own battle value ordering.</p>
+     *
+     * @param campaign         the campaign whose units are being assigned techs
+     * @param options          the generation options holding the assignment toggle and the sort grid
+     * @param generatedPersons everyone this generation run produced; the techs among them form the pool
+     *
+     * @author Illiani
+     * @since 0.51.0
+     */
+    private static void assignTechsToGeneratedUnits(Campaign campaign, CommandGenerationOptions options,
+          Collection<Person> generatedPersons) {
+        if (!options.isAssignTechsToUnits()) {
+            LOGGER.info("[CompanyGen][Pipeline][Assign] disabled by isAssignTechsToUnits");
+            return;
+        }
+
+        List<Person> techs = TechAssignmentOrder.techsAmong(generatedPersons);
+        if (techs.isEmpty()) {
+            LOGGER.info("[CompanyGen][Pipeline][Assign] no support techs available to assign");
+            return;
+        }
+
+        AutomatedTechAssignments assignments = new AutomatedTechAssignments(techs, campaign.getUnits(),
+              TechAssignmentOrder.unitOrderFor(campaign, options));
+        LOGGER.info("[CompanyGen][Pipeline][Assign] {} tech(s) offered {} unit(s); assigner reported {} outcome(s)",
+              techs.size(), campaign.getUnits().size(), assignments.getReports().size());
     }
 
     /**

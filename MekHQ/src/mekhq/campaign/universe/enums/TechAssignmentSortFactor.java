@@ -37,9 +37,10 @@ import java.util.ResourceBundle;
 import mekhq.MekHQ;
 
 /**
- * Factor by which {@code SupportPersonnelAssigner} sorts units when picking which Unit gets the
- * next-best Tech. Three slots ({@code primary} / {@code secondary} / {@code tertiary}) each carry
- * one of these values; the assignment comparator chains them in slot order.
+ * Factor by which the Company Generator sorts units when picking which Unit gets the next-best
+ * Tech. Three slots ({@code primary} / {@code secondary} / {@code tertiary}) each carry one of
+ * these values; {@code TechAssignmentOrder} chains them in slot order into the ordering it hands
+ * {@code AutomatedTechAssignments}.
  *
  * <p>{@link #NONE} disables that slot, so a user who only cares about rank can leave the secondary
  * and tertiary slots empty without forcing a fallback.</p>
