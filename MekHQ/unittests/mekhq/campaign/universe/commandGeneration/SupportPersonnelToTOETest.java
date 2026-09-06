@@ -35,7 +35,10 @@ package mekhq.campaign.universe.commandGeneration;
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import java.util.ArrayList;
@@ -45,6 +48,7 @@ import java.util.Map;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.enums.PersonnelRole;
+import mekhq.campaign.unit.Unit;
 import mekhq.campaign.universe.commandGeneration.SupportPersonnelToTOE.CarrierSpec;
 import mekhq.campaign.universe.commandGeneration.SupportPersonnelToTOE.EchelonProfile;
 import org.junit.jupiter.api.Test;
@@ -190,6 +194,105 @@ class SupportPersonnelToTOETest {
         assertEquals(5, grouped.get(PersonnelRole.ASTECH).size());
     }
 
+    // --- Seating a capability vehicle's crew (issue #9937) ---
+    //
+    // A vehicle's pilot and gunner crew positions are the same position, so Unit.addPilotOrSoldier
+    // seats one person as a driver AND a gunner. Filling every seat that way over-crews the vehicle
+    // and Unit.checkForOverCrewing ejects the surplus on the next campaign load. Seats must be
+    // filled per role instead.
+
+    @Test
+    void seatVehicleCrew_recoveryVehicle_oneDriverThreeGunners() {
+        // BattleMek Recovery Vehicle, 50t: full crew 4 = 1 driver + 3 gunners.
+        Unit unit = vehicle(1, 3, 0);
+        List<Person> pool = people(4);
+
+        assertEquals(4, SupportPersonnelToTOE.seatVehicleCrew(unit, pool, 0));
+
+        verify(unit).addDriver(pool.get(0));
+        verify(unit).addGunner(pool.get(1));
+        verify(unit).addGunner(pool.get(2));
+        verify(unit).addGunner(pool.get(3));
+        verify(unit, never()).addVesselCrew(any());
+        verify(unit, never()).addPilotOrSoldier(any());
+    }
+
+    @Test
+    void seatVehicleCrew_mashTruck_oneDriverFiveVehicleCrew() {
+        // MASH Truck (Small), 15t with one theatre: full crew 6 = 1 driver + 0 gunners + 5 crew
+        // (one doctor seat and four medic seats).
+        Unit unit = vehicle(1, 0, 5);
+        List<Person> pool = people(6);
+
+        assertEquals(6, SupportPersonnelToTOE.seatVehicleCrew(unit, pool, 0));
+
+        verify(unit).addDriver(pool.get(0));
+        verify(unit, never()).addGunner(any());
+        for (int index = 1; index < 6; index++) {
+            verify(unit).addVesselCrew(pool.get(index));
+        }
+        verify(unit, never()).addPilotOrSoldier(any());
+    }
+
+    @Test
+    void seatVehicleCrew_shortPool_fillsDriverBeforeTheRest() {
+        // The medical section commonly has fewer staff than a MASH truck has seats, so an
+        // understaffed truck must still have someone at the controls.
+        Unit unit = vehicle(1, 0, 5);
+        List<Person> pool = people(3);
+
+        assertEquals(3, SupportPersonnelToTOE.seatVehicleCrew(unit, pool, 0));
+
+        verify(unit).addDriver(pool.get(0));
+        verify(unit).addVesselCrew(pool.get(1));
+        verify(unit).addVesselCrew(pool.get(2));
+    }
+
+    @Test
+    void seatVehicleCrew_shortPool_gunnerSeatsYieldToTheDriver() {
+        Unit unit = vehicle(1, 3, 0);
+        List<Person> pool = people(2);
+
+        assertEquals(2, SupportPersonnelToTOE.seatVehicleCrew(unit, pool, 0));
+
+        verify(unit).addDriver(pool.get(0));
+        verify(unit).addGunner(pool.get(1));
+    }
+
+    @Test
+    void seatVehicleCrew_offsetPool_seatsOnlyTheStaffStillFree() {
+        // The second recovery vehicle in a batch starts where the first one stopped.
+        Unit unit = vehicle(1, 3, 0);
+        List<Person> pool = people(8);
+
+        assertEquals(4, SupportPersonnelToTOE.seatVehicleCrew(unit, pool, 4));
+
+        verify(unit).addDriver(pool.get(4));
+        verify(unit).addGunner(pool.get(5));
+        verify(unit).addGunner(pool.get(6));
+        verify(unit).addGunner(pool.get(7));
+    }
+
+    @Test
+    void seatVehicleCrew_exhaustedPool_seatsNobody() {
+        Unit unit = vehicle(1, 3, 0);
+        List<Person> pool = people(4);
+
+        assertEquals(0, SupportPersonnelToTOE.seatVehicleCrew(unit, pool, 4));
+
+        verify(unit, never()).addDriver(any());
+        verify(unit, never()).addGunner(any());
+        verify(unit, never()).addVesselCrew(any());
+    }
+
+    @Test
+    void seatVehicleCrew_neverSeatsMoreThanTheVehicleHolds() {
+        Unit unit = vehicle(1, 3, 0);
+        List<Person> pool = people(40);
+
+        assertEquals(4, SupportPersonnelToTOE.seatVehicleCrew(unit, pool, 0));
+    }
+
     // --- Guards ---
 
     @Test
@@ -217,6 +320,15 @@ class SupportPersonnelToTOETest {
             total += spec.crew().size();
         }
         return total;
+    }
+
+    /** A vehicle Unit mock with the given driver, gunner and vehicle-crew seat counts. */
+    private static Unit vehicle(int driverSeats, int gunnerSeats, int vehicleCrewSeats) {
+        Unit unit = mock(Unit.class);
+        when(unit.getTotalDriverNeeds()).thenReturn(driverSeats);
+        when(unit.getTotalGunnerNeeds()).thenReturn(gunnerSeats);
+        when(unit.getTotalCrewNeeds()).thenReturn(vehicleCrewSeats);
+        return unit;
     }
 
     /** A list of {@code count} distinct Person mocks; packPool only slices, so no stubbing needed. */
