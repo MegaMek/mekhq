@@ -239,8 +239,9 @@ public class SparesAndFinancesTab {
         section.add(new CommandGenerationLabel("SparesHelpBody", true), constraints);
         constraints.gridwidth = 1;
 
-        // Two columns of part-and-spinner pairs: thirteen rows in one column made this the tallest thing
-        // on the tab, with the finances column finishing well above it.
+        // Two columns of part-and-spinner pairs: every category in one column made this the tallest thing
+        // on the tab, with the finances column finishing well above it. Counted from the enum rather than
+        // stated here, so adding a category cannot leave this comment behind.
         SparesCategory[] categories = SparesCategory.values();
         int perColumn = (categories.length + 1) / 2;
         for (int index = 0; index < categories.length; index++) {
