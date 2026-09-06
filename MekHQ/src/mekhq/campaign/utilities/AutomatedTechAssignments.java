@@ -146,8 +146,7 @@ public class AutomatedTechAssignments {
      * @param units             all units that may require a tech assignment
      * @param unitPriorityOrder the order to offer units a tech in, or {@code null} for battle value descending
      *
-     * @author Illiani
-     * @since 0.50.11
+     * @since 0.51.01
      */
     public AutomatedTechAssignments(List<Person> techs, Collection<Unit> units,
           @Nullable Comparator<Unit> unitPriorityOrder) {
@@ -371,8 +370,7 @@ public class AutomatedTechAssignments {
      *
      * @param units the unit list to sort in-place
      *
-     * @author Illiani
-     * @since 0.50.11
+     * @since 0.51.01
      */
     private void sortUnitBucket(List<Unit> units) {
         if (unitPriorityOrder == null) {
