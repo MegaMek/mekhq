@@ -303,8 +303,9 @@ public final class SupportPersonnelToTOE {
     /**
      * Creates each of {@code vehicle}'s crewless copies, crews it from the staff pool starting at
      * {@code startIndex} (up to the vehicle's full crew size, understaffed if the pool runs out), and
-     * files it under {@code parent} (the section's capability-vehicle company). Returns the number of
-     * people consumed as crew. Stops early once the pool is exhausted.
+     * files it under {@code parent} (the section's capability-vehicle company). The staff are seated
+     * into the vehicle's driver, gunner and vehicle-crew positions by {@link #seatVehicleCrew}.
+     * Returns the number of people consumed as crew. Stops early once the pool is exhausted.
      */
     private static int addCapabilityVehicles(Campaign campaign, Formation parent, VehicleSpec vehicle,
           List<Person> pool, int startIndex) {
@@ -319,22 +320,61 @@ public final class SupportPersonnelToTOE {
             try {
                 // allowNewPilots = false: crew comes from the generated staff, not fresh personnel.
                 Unit unit = campaign.addNewUnit(mekSummary.loadEntity(), false, 0);
-                int crewNeeded = Math.max(1, unit.getFullCrewSize());
-                int available = pool.size() - startIndex - consumed;
-                int crewSize = Math.min(crewNeeded, available);
-                for (int crewIndex = 0; crewIndex < crewSize; crewIndex++) {
-                    unit.addPilotOrSoldier(pool.get(startIndex + consumed + crewIndex));
-                }
+                int crewNeeded = unit.getFullCrewSize();
+                int crewSize = seatVehicleCrew(unit, pool, startIndex + consumed);
                 consumed += crewSize;
                 campaign.getPlayerForce().addUnitToFormation(unit, parent.getId(), campaign);
-                LOGGER.info("[CompanyGen][SupportTOE]     {} vehicle '{}' unitId={} crewed with {}/{} staff",
-                      parent.getName(), vehicle.unitName(), unit.getId(), crewSize, crewNeeded);
+                LOGGER.info("[CompanyGen][SupportTOE]     {} vehicle '{}' unitId={} crewed with {}/{} staff "
+                                  + "(drivers {}/{}, gunners {}/{}, vehicle crew {}/{})",
+                      parent.getName(), vehicle.unitName(), unit.getId(), crewSize, crewNeeded,
+                      unit.getDrivers().size(), unit.getTotalDriverNeeds(),
+                      unit.getGunners().size(), unit.getTotalGunnerNeeds(),
+                      unit.getVesselCrew().size(), unit.getTotalCrewNeeds());
             } catch (Exception exception) {
                 LOGGER.error(exception, "Unable to load capability vehicle {}: {}", vehicle.unitName(),
                       mekSummary.getSourceFile());
             }
         }
         return consumed;
+    }
+
+    /**
+     * Seats staff from {@code pool} into {@code unit}'s crew positions, filling drivers first, then
+     * gunners, then vehicle crew - the split MekHQ generates for a vehicle in
+     * {@code Utilities.genRandomCrewWithCombinedSkill}. Filling in that order leaves an understaffed
+     * vehicle with someone at the controls rather than a cabin full of gunners.
+     *
+     * <p>Seating every position through {@code Unit.addPilotOrSoldier} instead makes each person a
+     * driver <em>and</em> a gunner, because a vehicle's pilot and gunner crew positions are the same
+     * position. A four-seat recovery vehicle then holds four drivers where it has room for one, and
+     * {@code Unit.checkForOverCrewing} ejects the surplus the next time the campaign loads.</p>
+     *
+     * @param unit      the vehicle to crew
+     * @param pool      the section's staff, in the order they are handed out
+     * @param fromIndex the first person in {@code pool} still free to crew this vehicle
+     *
+     * @return the number of people seated, which is fewer than the vehicle's seats when the pool runs out
+     */
+    static int seatVehicleCrew(Unit unit, List<Person> pool, int fromIndex) {
+        int available = pool.size() - fromIndex;
+        int driverSeats = unit.getTotalDriverNeeds();
+        int gunnerSeats = unit.getTotalGunnerNeeds();
+        int vehicleCrewSeats = unit.getTotalCrewNeeds();
+        int seated = 0;
+
+        for (int seat = 0; (seat < driverSeats) && (seated < available); seat++) {
+            unit.addDriver(pool.get(fromIndex + seated));
+            seated++;
+        }
+        for (int seat = 0; (seat < gunnerSeats) && (seated < available); seat++) {
+            unit.addGunner(pool.get(fromIndex + seated));
+            seated++;
+        }
+        for (int seat = 0; (seat < vehicleCrewSeats) && (seated < available); seat++) {
+            unit.addVesselCrew(pool.get(fromIndex + seated));
+            seated++;
+        }
+        return seated;
     }
 
     /** A capability vehicle to place into a section, crewed from that section's staff. */
