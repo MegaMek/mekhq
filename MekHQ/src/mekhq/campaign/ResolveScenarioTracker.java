@@ -344,6 +344,10 @@ public class ResolveScenarioTracker {
                         }
                     }
 
+                    if (entity instanceof AbstractBuildingEntity) {
+                        continue;
+                    }
+
                     TestUnit newUnit = generateNewTestUnit(entity);
                     UnitStatus unitStatus = new UnitStatus(newUnit);
                     unitStatus.setTotalLoss(false);
@@ -512,7 +516,7 @@ public class ResolveScenarioTracker {
                     enemyEjections.put(UUID.fromString(wreck.getCrew().getExternalIdAsString()), (EjectedCrew) wreck);
                     continue;
                 }
-                if (control) {
+                if (control && !(wreck instanceof AbstractBuildingEntity)) {
                     TestUnit nu = generateNewTestUnit(wreck);
                     UnitStatus us = new UnitStatus(nu);
                     us.setTotalLoss(false);
@@ -1556,7 +1560,7 @@ public class ResolveScenarioTracker {
                     }
                     continue;
                 }
-                if (control) {
+                if (control && !(e instanceof AbstractBuildingEntity)) {
                     TestUnit nu = generateNewTestUnit(e);
                     UnitStatus us = new UnitStatus(nu);
                     us.setTotalLoss(false);
