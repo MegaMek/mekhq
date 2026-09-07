@@ -1564,13 +1564,17 @@ public final class MapTab extends CampaignGuiTab implements ActionListener,
     }
 
     private void showDossier(PlanetarySystem system, int planetPosition) {
-          DossierIdentity dossierIdentity = new DossierIdentity(system.getId(), planetPosition);
-        boolean animateReveal = presentedDossierIdentity != null &&
-                                      !presentedDossierIdentity.equals(dossierIdentity);
-            systemView.setViewportView(new PlanetViewPanel(system, getCampaign(), planetPosition, animateReveal));
+                DossierIdentity dossierIdentity = new DossierIdentity(system.getId(), planetPosition);
+                boolean animateReveal = shouldAnimateDossierReveal(presentedDossierIdentity, dossierIdentity);
+                systemView.getVerticalScrollBar().setValue(0);
+                systemView.setViewportView(new PlanetViewPanel(system, getCampaign(), planetPosition, animateReveal));
         presentedDossierIdentity = dossierIdentity;
-        SwingUtilities.invokeLater(() -> systemView.getVerticalScrollBar().setValue(0));
     }
+
+        static boolean shouldAnimateDossierReveal(DossierIdentity previous,
+                    DossierIdentity next) {
+                return !next.equals(previous);
+        }
 
     /**
      * Switch to the planetary system view, highlighting a specific {@link Planet}
@@ -1687,7 +1691,7 @@ public final class MapTab extends CampaignGuiTab implements ActionListener,
             boolean quickPlotEnabled, boolean beginTransitEnabled) {
     }
 
-        private record DossierIdentity(String systemId, int planetPosition) {
+    record DossierIdentity(String systemId, int planetPosition) {
         }
 
     private static final class RouteStripPanel extends JPanel {

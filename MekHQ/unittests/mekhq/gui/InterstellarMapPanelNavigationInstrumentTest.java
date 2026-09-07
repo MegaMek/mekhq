@@ -42,7 +42,6 @@ import java.awt.Graphics2D;
 import java.awt.geom.Rectangle2D;
 import java.awt.image.BufferedImage;
 
-import mekhq.MHQConstants;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
@@ -53,7 +52,7 @@ class InterstellarMapPanelNavigationInstrumentTest {
     private static final double DELTA = 0.000_001;
 
     @Test
-    void modelUsesBattleTechChartDirectionsAndMaximumJumpConstant() {
+    void modelUsesBattleTechChartDirections() {
         InterstellarMapPanel.NavigationInstrumentLayout layout =
               InterstellarMapPanel.createNavigationInstrumentLayout(VIEWPORT_WIDTH, VIEWPORT_HEIGHT, 1.0);
 
@@ -62,17 +61,15 @@ class InterstellarMapPanelNavigationInstrumentTest {
         assertEquals("RIMWARD", layout.rimwardLabel());
         assertEquals("ANTI-SPINWARD", layout.antiSpinwardLabel());
         assertEquals("SPINWARD", layout.spinwardLabel());
-        assertEquals(MHQConstants.MAX_JUMP_RADIUS, layout.maximumJumpLy());
-        assertEquals("MAX JUMP " + MHQConstants.MAX_JUMP_RADIUS + " LY", layout.jumpReferenceLabel());
     }
 
     @ParameterizedTest
     @CsvSource({
-      "0.5, 200, '200 LY'",
-      "1.0, 100, '100 LY'",
-      "2.0, 50, '50 LY'",
-      "3.0, 33.333333333333336, '~33.3 LY'",
-      "5.0, 20, '20 LY'"
+            "0.5, 340, '340 LY'",
+            "1.0, 170, '170 LY'",
+            "2.0, 85, '85 LY'",
+            "3.0, 56.666666666666664, '~56.7 LY'",
+            "5.0, 34, '34 LY'"
     })
     void fixedScaleBarUsesExactLightYearDistancesAndReadableLabels(double mapScale,
         double expectedDistanceLy, String expectedLabel) {

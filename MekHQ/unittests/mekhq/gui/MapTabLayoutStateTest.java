@@ -44,6 +44,16 @@ import org.junit.jupiter.api.Test;
 
 class MapTabLayoutStateTest {
     @Test
+    void dossierRevealRunsForFirstAndChangedSelectionsOnly() {
+        MapTab.DossierIdentity first = new MapTab.DossierIdentity("first", 0);
+        MapTab.DossierIdentity second = new MapTab.DossierIdentity("second", 0);
+
+        assertTrue(MapTab.shouldAnimateDossierReveal(null, first));
+        assertTrue(MapTab.shouldAnimateDossierReveal(first, second));
+        assertFalse(MapTab.shouldAnimateDossierReveal(first, first));
+    }
+
+    @Test
     void initializesAbsentLayoutStateWithoutReplacingExistingState() {
         MapTabLayoutState initializedState = MapTab.initializeLayoutState(null);
 

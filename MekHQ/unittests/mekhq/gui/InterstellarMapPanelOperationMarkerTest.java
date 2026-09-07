@@ -115,7 +115,14 @@ class InterstellarMapPanelOperationMarkerTest {
 
         assertEquals(1.0, atlas.systemContactAlpha(), DELTA);
           assertEquals(0.0, atlas.systemDetailAlpha(), DELTA);
-          assertEquals(0.0, navigation.systemDetailAlpha(), DELTA);
+                    assertEquals(0.0, navigation.systemDetailAlpha(), DELTA,
+                          "capital and operation symbols remain compact while strategic contacts are active");
+                      assertEquals(navigation.systemDetailAlpha(), navigation.currentLocationAlpha(), DELTA,
+                          "the ship appears with detailed system art");
+                      assertEquals(1.0 - navigation.systemDetailAlpha(), navigation.strategicContactAlpha(), DELTA,
+                          "the centered fleet beacon remains until the ship appears");
+                      assertEquals(1.0, navigation.detailedOverlayAlpha(), DELTA,
+                          "general overlays may expand before system-attached markers");
           assertEquals(0.0, navigation.ordinaryLabelAlpha(), DELTA);
           assertEquals(1.0, navigation.routeLabelAlpha(), DELTA,
               "route labels must remain independent from ordinary labels");

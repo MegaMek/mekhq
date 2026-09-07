@@ -44,6 +44,8 @@ import static org.mockito.Mockito.when;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Graphics2D;
+import java.awt.LinearGradientPaint;
+import java.awt.Paint;
 import java.awt.Point;
 import java.awt.Rectangle;
 import java.awt.geom.Line2D;
@@ -60,6 +62,7 @@ import java.util.concurrent.atomic.AtomicReference;
 import javax.swing.JPanel;
 import javax.swing.JViewport;
 
+import mekhq.campaign.universe.Faction;
 import mekhq.campaign.universe.PlanetarySystem;
 import mekhq.campaign.universe.PlanetarySystem;
 import org.junit.jupiter.api.Test;
@@ -116,10 +119,73 @@ class InterstellarMapPanelRenderLayerCacheTest {
 
     @Test
     void activeZoomKeepsSystemArtLiveUntilExactRenderingSettles() {
-        assertTrue(InterstellarMapPanel.canUseRetainedSystemArt(true, false, false));
-        assertFalse(InterstellarMapPanel.canUseRetainedSystemArt(true, false, true));
-        assertTrue(InterstellarMapPanel.canUseRetainedSystemArt(true, true, true));
-        assertFalse(InterstellarMapPanel.canUseRetainedSystemArt(false, false, false));
+        assertTrue(InterstellarMapPanel.canUseRetainedSystemArt(true, false, false, false));
+        assertFalse(InterstellarMapPanel.canUseRetainedSystemArt(true, false, false, true));
+        assertTrue(InterstellarMapPanel.canUseRetainedSystemArt(true, true, false, true));
+        assertFalse(InterstellarMapPanel.canUseRetainedSystemArt(false, false, false, false));
+    }
+
+    @Test
+    void supportingLayerFadeKeepsSystemArtRetained() {
+        assertTrue(InterstellarMapPanel.canUseRetainedSystemArt(false, false, true, false));
+        assertFalse(InterstellarMapPanel.canUseRetainedSystemArt(false, false, true, true));
+    }
+
+    @Test
+    void territoryOpacityRemainsStableAcrossSemanticZoomBands() {
+        double atlasAlpha = InterstellarMapPanel.SemanticZoomProfile.create(0.8, 3.0).territoryAlpha();
+        double navigationAlpha = InterstellarMapPanel.SemanticZoomProfile.create(2.4, 3.0).territoryAlpha();
+        double detailAlpha = InterstellarMapPanel.SemanticZoomProfile.create(5.6, 3.0).territoryAlpha();
+
+        assertEquals(atlasAlpha, navigationAlpha);
+        assertEquals(atlasAlpha, detailAlpha);
+    }
+
+    @Test
+    void factionLogoSizeTracksProjectedSizeWithoutFourPixelPulses() {
+        assertEquals(0, InterstellarMapPanel.resolveLogoSize(23.9, 24, 100));
+        assertEquals(43, InterstellarMapPanel.resolveLogoSize(43.4, 24, 100));
+        assertEquals(44, InterstellarMapPanel.resolveLogoSize(43.6, 24, 100));
+        assertEquals(100, InterstellarMapPanel.resolveLogoSize(120.0, 24, 100));
+    }
+
+        @Test
+        void factionLogoRemainsVisibleWhileItsBoundsCrossViewportEdge() {
+          assertTrue(InterstellarMapPanel.isFactionLogoVisible(
+              new Rectangle2D.Double(-40.0, 20.0, 50.0, 50.0), 2, 800, 600));
+          assertTrue(InterstellarMapPanel.isFactionLogoVisible(
+              new Rectangle2D.Double(795.0, 20.0, 50.0, 50.0), 2, 800, 600));
+          assertTrue(InterstellarMapPanel.isFactionLogoVisible(
+              new Rectangle2D.Double(-51.0, 20.0, 50.0, 50.0), 2, 800, 600));
+          assertFalse(InterstellarMapPanel.isFactionLogoVisible(
+              new Rectangle2D.Double(-53.0, 20.0, 50.0, 50.0), 2, 800, 600));
+        }
+
+    @Test
+    void disputedTerritoryUsesEqualContiguousOwnerBands() {
+        Faction firstFaction = mock(Faction.class);
+        Faction secondFaction = mock(Faction.class);
+        Faction thirdFaction = mock(Faction.class);
+        when(firstFaction.getColor()).thenReturn(Color.RED);
+        when(secondFaction.getColor()).thenReturn(Color.GREEN);
+        when(thirdFaction.getColor()).thenReturn(Color.BLUE);
+
+          Paint paint = InterstellarMapPanel.createDisputedTerritoryPaint(
+              List.of(firstFaction, secondFaction, thirdFaction), 1.0, 12.0);
+
+        LinearGradientPaint bands = (LinearGradientPaint) paint;
+        assertEquals(6, bands.getFractions().length);
+        assertEquals(bands.getColors()[0], bands.getColors()[1]);
+        assertEquals(bands.getColors()[2], bands.getColors()[3]);
+        assertEquals(bands.getColors()[4], bands.getColors()[5]);
+        assertEquals(18.0, bands.getEndPoint().getY(), 0.001);
+
+          double closeBandWidth = InterstellarMapPanel.TerritoryVisualProfile.create(5.6).disputedBandWidth();
+          LinearGradientPaint closeBands = (LinearGradientPaint) InterstellarMapPanel
+              .createDisputedTerritoryPaint(
+                  List.of(firstFaction, secondFaction, thirdFaction), 1.0, closeBandWidth);
+          assertEquals(22.0, closeBandWidth, 0.001);
+          assertEquals(33.0, closeBands.getEndPoint().getY(), 0.001);
     }
 
     @Test
@@ -165,6 +231,24 @@ class InterstellarMapPanelRenderLayerCacheTest {
         assertTrue(report.contains("full=1 avg=40.0ms max=40.0ms"));
         assertTrue(report.contains("none=1 avg=12.0ms max=12.0ms"));
     }
+
+        @Test
+        void renderPerformanceTrackerSeparatesZoomSnapshotFramePhases() {
+          InterstellarMapPanel.RenderPerformanceTracker tracker =
+              new InterstellarMapPanel.RenderPerformanceTracker(0L);
+
+          tracker.recordZoomSnapshotTransform(6_000_000L);
+          tracker.record(20_000_000L, 10_000_000L, 2_000_000L, 6_000_000L, 0,
+              1_000_000L, 4_000_000L, 3_000_000L, 100, 0, 0, 0, true, false);
+
+          String report = tracker.reportAndReset(5_000_000_000L);
+
+          assertTrue(report.contains("zoomSnapshots[count=1 frame=20.0ms max=20.0ms transform=6.0ms "
+              + "background=2.0ms liveSystems=4.0ms residual=8.0ms]"));
+
+          tracker.record(8_000_000L, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, true, true);
+          assertTrue(tracker.reportAndReset(10_000_000_000L).contains("zoomSnapshots[count=0"));
+        }
 
     @Test
     void renderPerformanceTrackerReportsNearestRankPercentiles() {
@@ -252,7 +336,7 @@ class InterstellarMapPanelRenderLayerCacheTest {
 
       assertEquals(0.1, InterstellarMapPanel.boundedMapScale(0.001), 0.000_001);
       assertEquals(4.7, InterstellarMapPanel.boundedMapScale(4.7), 0.000_001);
-      assertEquals(100.0, InterstellarMapPanel.boundedMapScale(1_000.0), 0.000_001);
+    assertEquals(10.0, InterstellarMapPanel.boundedMapScale(1_000.0), 0.000_001);
     }
 
     @Test
@@ -1026,7 +1110,7 @@ class InterstellarMapPanelRenderLayerCacheTest {
           InterstellarMapPanel.RenderViewKey view = viewKey(20, 20, 0.0, 0.0, 1.0);
           InterstellarMapPanel.RetainedCartographyRenderRequest request =
               new InterstellarMapPanel.RetainedCartographyRenderRequest(
-                  null, view, 2, atlas, null, 1.0, 0.0);
+                  null, view, 2, atlas, 1.0);
 
           BufferedImage rendered = InterstellarMapPanel.renderRetainedCartographyTerritory(request);
 
