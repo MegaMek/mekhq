@@ -99,16 +99,18 @@ public class ContractAutomation {
         PlayerForce playerForce = campaign.getPlayerForce();
         AbstractLocation currentLocation = playerForce.getForceDetachment().getCurrentLocation();
 
-        if (mothball) {
-            performAutomatedMothballing(campaign, playerForce.getForceDetachment());
-        }
-
         // Work out the journey. If we are already in the target system there is no jump and travel time is zero.
         boolean alreadyAtTarget = Objects.equals(campaign.getPlayerForce()
                                                        .getForceDetachment()
                                                        .getCurrentLocation()
-                                                       .getCurrentSystem(),
-              contract.getTargetSystem());
+                                                       .getCurrentPlanetDirect(),
+              contract.getTargetPlanet());
+
+        // Only mothball when there is actually a journey ahead.
+        if (mothball && !alreadyAtTarget) {
+            performAutomatedMothballing(campaign, playerForce.getForceDetachment());
+        }
+
         JumpPath jumpPath = alreadyAtTarget ? null : ContractUtilities.getJumpPath(campaign, contract, currentLocation);
         int travelDays = (jumpPath == null) ? 0
                                : ContractUtilities.getTravelDays(campaign, contract, currentLocation,
