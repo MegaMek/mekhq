@@ -114,6 +114,8 @@ class StratConPage {
 
     private JCheckBox chkUseDropShips;
 
+    private JCheckBox chkRestrictScenariosToFleetCapability;
+
     private JCheckBox chkRegionalMekVariations;
 
     private JCheckBox chkAttachedPlayerCamouflage;
@@ -408,6 +410,10 @@ class StratConPage {
         spnOpForLanceTypeVehicles = new CampaignOptionsSpinner("OpForLanceTypeVehicle", 0, 0, 10, 1);
 
         chkUseDropShips = new CampaignOptionsCheckBox("UseDropShips");
+        chkRestrictScenariosToFleetCapability = new CampaignOptionsCheckBox("RestrictScenariosToFleetCapability",
+              getMetadata(new Version(0, 51, 1)));
+        chkRestrictScenariosToFleetCapability.addMouseListener(
+              createTipPanelUpdater("RestrictScenariosToFleetCapability"));
         chkRegionalMekVariations = new CampaignOptionsCheckBox("RegionalMekVariations");
         chkAttachedPlayerCamouflage = new CampaignOptionsCheckBox("AttachedPlayerCamouflage");
         chkPlayerControlsAttachedUnits = new CampaignOptionsCheckBox("PlayerControlsAttachedUnits");
@@ -533,6 +539,7 @@ class StratConPage {
         panel.addRow(lblOpForLanceTypeVehicle, spnOpForLanceTypeVehicles);
         panel.addCheckBoxGrid(CHECKBOX_GRID_COLUMNS,
               chkUseDropShips,
+              chkRestrictScenariosToFleetCapability,
               chkRegionalMekVariations,
               chkAttachedPlayerCamouflage,
               chkPlayerControlsAttachedUnits,
@@ -629,6 +636,7 @@ class StratConPage {
         chkAutoGenerateOpForCallSigns.setSelected(model.autoGenerateOpForCallSigns);
         comboMinimumCallsignSkillLevel.setSelectedItem(model.minimumCallsignSkillLevel);
         chkUseDropShips.setSelected(model.useDropShips);
+        chkRestrictScenariosToFleetCapability.setSelected(model.restrictScenariosToFleetCapability);
         chkRegionalMekVariations.setSelected(model.regionalMekVariations);
         chkAttachedPlayerCamouflage.setSelected(model.attachedPlayerCamouflage);
         chkPlayerControlsAttachedUnits.setSelected(model.playerControlsAttachedUnits);
@@ -687,6 +695,7 @@ class StratConPage {
         model.autoGenerateOpForCallSigns = chkAutoGenerateOpForCallSigns.isSelected();
         model.minimumCallsignSkillLevel = comboMinimumCallsignSkillLevel.getSelectedItem();
         model.useDropShips = chkUseDropShips.isSelected();
+        model.restrictScenariosToFleetCapability = chkRestrictScenariosToFleetCapability.isSelected();
         model.regionalMekVariations = chkRegionalMekVariations.isSelected();
         model.attachedPlayerCamouflage = chkAttachedPlayerCamouflage.isSelected();
         model.playerControlsAttachedUnits = chkPlayerControlsAttachedUnits.isSelected();

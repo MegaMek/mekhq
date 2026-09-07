@@ -62,7 +62,6 @@ import mekhq.campaign.mission.contract.ChaosContract;
 import mekhq.campaign.mission.contract.contractData.*;
 import mekhq.campaign.mission.contract.utilities.ContractCharacteristics;
 import mekhq.campaign.mission.contract.utilities.MHQMorale;
-import mekhq.campaign.mission.utilities.ContractUtilities;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.reputation.chaosReputation.ChaosReputation;
 import mekhq.campaign.universe.Faction;
@@ -360,7 +359,6 @@ public class AbstractContractGeneration {
     private static void setAncillaryValues(Campaign campaign, LocalHangar detachmentHangar, ChaosContract contract) {
         // Scale must be set before the required victory points, which are derived from it.
         contract.setScale(determineScale(campaign, campaign.getPlayerForce(), detachmentHangar, contract));
-        contract.setRequiredCombatElements(determineRequiredCombatElements(campaign));
         contract.setTrackCount(determineTrackCount(contract));
         contract.setRequiredVictoryPoints(determineRequiredVictoryPoints(contract));
     }
@@ -382,17 +380,6 @@ public class AbstractContractGeneration {
                                                           .get(CampaignOption.USE_CHAOS_SCALE_SUPPORT_POINT_CONVERSION);
         return ChaosContractDeterminationScale.generateScaleForDetachment(playerForce, detachmentHangar,
               contract.getObjectiveType().isCadreDuty(), convertSupportPointsToBattleValue);
-    }
-
-    /**
-     * Determines a contract's required combat elements the way generation does. Note this includes a random variance
-     * factor, so repeated calls will not agree.
-     *
-     * @return the automatically determined required combat elements
-     */
-    public static int determineRequiredCombatElements(Campaign campaign) {
-        return RequiredCombatElements.calculateRequiredCombatElements(campaign, false,
-              ContractUtilities.calculateVarianceFactor());
     }
 
     /**

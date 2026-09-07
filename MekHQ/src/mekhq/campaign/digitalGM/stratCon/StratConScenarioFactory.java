@@ -174,6 +174,30 @@ public class StratConScenarioFactory {
      */
     public static @Nullable ScenarioTemplate getRandomScenario(int unitType, boolean isAmbushed,
           boolean isBungledPatrol) {
+        return getRandomScenario(unitType, isAmbushed, isBungledPatrol, null);
+    }
+
+    /**
+     * Retrieves a random scenario template based on the given unit type and additional parameters, optionally
+     * constrained to a set of allowed {@link MapLocation map locations}.
+     *
+     * <p>This overload behaves exactly like {@link #getRandomScenario(int, boolean, boolean)}, but if
+     * {@code allowedLocations} is non-{@code null} the candidate templates are further filtered so that only those
+     * whose map location is contained in the set survive. This is used to keep StratCon from generating, for example,
+     * ground scenarios for a campaign whose combat teams cannot fight on the ground (see
+     * {@link StratConRulesManager#getFleetRestrictedMapLocations}).</p>
+     *
+     * @param unitType         The specific unit type that the scenario should be associated with.
+     * @param isAmbushed       A boolean flag indicating whether the unit is ambushed.
+     * @param isBungledPatrol  A boolean flag indicating whether the scenario involves a bungled patrol.
+     * @param allowedLocations The set of {@link MapLocation}s the scenario is allowed to take place in, or {@code null}
+     *                         to impose no location restriction.
+     *
+     * @return A randomly selected {@code ScenarioTemplate} that fits the specified criteria, or {@code null} if no
+     *       suitable scenarios are configured.
+     */
+    public static @Nullable ScenarioTemplate getRandomScenario(int unitType, boolean isAmbushed,
+          boolean isBungledPatrol, @Nullable Set<MapLocation> allowedLocations) {
         int generalUnitType = convertSpecificUnitTypeToGeneral(unitType);
 
         // if the specific unit type doesn't have any scenario templates for it
@@ -196,6 +220,11 @@ public class StratConScenarioFactory {
 
         // We don't want facilities spawning mid-contract; this stops facility count getting out of control
         jointList.removeIf(ScenarioTemplate::isFacilityScenario);
+
+        // Restrict to fleet-appropriate altitudes (ground / low atmosphere / space) when requested.
+        if (allowedLocations != null) {
+            jointList.removeIf(template -> !allowedLocations.contains(template.mapParameters.getMapLocation()));
+        }
 
         if (jointList.isEmpty()) {
             logger.warn("No scenarios configured for unit type {}, ({}) and ambushed status {}", unitType,

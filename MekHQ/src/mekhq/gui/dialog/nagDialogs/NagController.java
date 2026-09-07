@@ -231,16 +231,6 @@ public class NagController {
             }
         }
 
-        // Deployment Shortfall
-        final boolean isUseAtB = campaignOptions.isUseStratCon();
-
-        if (DeploymentShortfallNagDialog.checkNag(isUseAtB, campaign)) {
-            DeploymentShortfallNagDialog deploymentShortfallNagDialog = new DeploymentShortfallNagDialog(campaign);
-            if (deploymentShortfallNagDialog.shouldCancelAdvanceDay()) {
-                return true;
-            }
-        }
-
         // Prisoners of War
         final boolean hasActiveContract = campaign.hasActiveContract();
         final boolean hasPrisoners = !campaign.getPlayerForce().getHumanResources().getCurrentPrisoners().isEmpty();
