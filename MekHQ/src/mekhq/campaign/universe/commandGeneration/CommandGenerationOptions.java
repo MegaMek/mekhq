@@ -145,12 +145,6 @@ public class CommandGenerationOptions {
     // off, and a player who has never opened either options dialog would otherwise have no way to
     // generate an augmented command.
     private boolean useImplants;
-    /**
-     * The crew roles whose seats temporary crew fill instead of named people. These live on the campaign: the
-     * dialog seeds them from the campaign's current settings and the generator writes them back before any unit is
-     * crewed, because the crew assembler reads the campaign options as it builds each unit.
-     */
-    private Set<TemporaryCrewRole> temporaryCrewRoles;
     private NeuralInterfaceMode neuralInterfaceMode;
 
     // Force naming and formation icons
@@ -251,8 +245,6 @@ public class CommandGenerationOptions {
         // currently has, so the defaults here only matter to a caller that never opens it.
         setUseImplants(false);
         setNeuralInterfaceMode(NeuralInterfaceMode.OFF);
-        // None by default, matching a fresh campaign; the dialog replaces this with the campaign's own settings.
-        setTemporaryCrewRoles(EnumSet.noneOf(TemporaryCrewRole.class));
 
         // Force naming and formation icons
         setForceNamingMethod(ForceNamingMethod.CCB_1943);
@@ -572,22 +564,6 @@ public class CommandGenerationOptions {
     }
 
     /**
-     * @return the crew roles whose seats temporary crew fill instead of named people; never {@code null}
-     */
-    public Set<TemporaryCrewRole> getTemporaryCrewRoles() {
-        return temporaryCrewRoles;
-    }
-
-    /**
-     * @param temporaryCrewRoles the crew roles whose seats temporary crew fill; {@code null} means none
-     */
-    public void setTemporaryCrewRoles(@Nullable final Set<TemporaryCrewRole> temporaryCrewRoles) {
-        this.temporaryCrewRoles = (temporaryCrewRoles == null)
-                                        ? EnumSet.noneOf(TemporaryCrewRole.class)
-                                        : EnumSet.copyOf(temporaryCrewRoles);
-    }
-
-    /**
      * @return which of MegaMek's neural interface rules is in play, which decides whether an enhanced
      *       imaging or direct neural implant does anything
      */
@@ -847,7 +823,6 @@ public class CommandGenerationOptions {
               && (assignMekWarriorsCallSigns == other.assignMekWarriorsCallSigns)
               && (assignFounderFlag == other.assignFounderFlag)
               && (useImplants == other.useImplants)
-              && Objects.equals(temporaryCrewRoles, other.temporaryCrewRoles)
               && Objects.equals(neuralInterfaceMode, other.neuralInterfaceMode)
               && Objects.equals(forceNamingMethod, other.forceNamingMethod)
               && (alwaysNumberRegiments == other.alwaysNumberRegiments)
@@ -910,7 +885,6 @@ public class CommandGenerationOptions {
               assignMekWarriorsCallSigns, 
               assignFounderFlag, 
               useImplants, 
-              temporaryCrewRoles, 
               neuralInterfaceMode, 
               forceNamingMethod, 
               alwaysNumberRegiments, 
