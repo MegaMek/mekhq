@@ -207,10 +207,6 @@ final class ImmersiveDialogStyle {
                     mix(panelColor, signalColor, 0.20f)));
     }
 
-    static ResponseButtonStateColors getTransmissionConfirmationColors() {
-        return getResponseButtonColors().pressed();
-    }
-
     private static JLabel createTechnicalLabel(String text, Color color, float sizeAdjustment) {
         JLabel label = new JLabel(text);
         Font baseFont = label.getFont();
