@@ -65,6 +65,7 @@ import mekhq.campaign.Campaign;
 import mekhq.campaign.campaignOptions.CampaignOption;
 import mekhq.campaign.events.AcquisitionEvent;
 import mekhq.campaign.events.AsTechPoolChangedEvent;
+import mekhq.campaign.events.OrganizationChangedEvent;
 import mekhq.campaign.events.OvertimeModeEvent;
 import mekhq.campaign.events.parts.PartChangedEvent;
 import mekhq.campaign.events.parts.PartModeChangedEvent;
@@ -835,6 +836,17 @@ public final class WarehouseTab extends CampaignGuiTab implements ITechWorkPanel
         // which would race the EDT for the underlying Document/table locks the same way the
         // ReportEvent deadlock did.
         SwingUtilities.invokeLater(this::filterParts);
+    }
+
+    /**
+     * A force generation adds its parts while {@link Campaign#isBulkGenerationInProgress()} is true, so every
+     * {@link PartNewEvent} it raises is dropped by the guard at the top of {@link #refreshPartsList()}. Generation ends
+     * by firing this event and nothing else, so without this handler no refresh ever runs against the finished
+     * campaign: the warehouse is full and the table still shows what it held before the build.
+     */
+    @Subscribe
+    public void handle(OrganizationChangedEvent ev) {
+        partsScheduler.schedule();
     }
 
     @Subscribe
