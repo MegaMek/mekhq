@@ -228,7 +228,8 @@ public enum Phenotype {
                   SkillType.S_PILOT_GVEE,
                   SkillType.S_PILOT_NVEE,
                   SkillType.S_PILOT_VTOL);
-            case PROTOMEK -> List.of(SkillType.S_GUN_PROTO);
+            case PROTOMEK -> List.of(SkillType.S_GUN_PROTO,
+                  SkillType.S_PILOT_PROTO);
             case NAVAL -> List.of(SkillType.S_TECH_VESSEL,
                   SkillType.S_GUN_SPACE,
                   SkillType.S_PILOT_SPACE,

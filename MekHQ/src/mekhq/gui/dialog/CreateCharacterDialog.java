@@ -1652,6 +1652,7 @@ public class CreateCharacterDialog extends JDialog implements DialogOptionListen
                         break;
                     case PROTOMEK:
                         decreasePhenotypeBonus(SkillType.S_GUN_PROTO);
+                        decreasePhenotypeBonus(SkillType.S_PILOT_PROTO);
                         break;
                     case NAVAL:
                         decreasePhenotypeBonus(SkillType.S_TECH_VESSEL);
@@ -1686,6 +1687,7 @@ public class CreateCharacterDialog extends JDialog implements DialogOptionListen
                         break;
                     case PROTOMEK:
                         increasePhenotypeBonus(SkillType.S_GUN_PROTO);
+                        increasePhenotypeBonus(SkillType.S_PILOT_PROTO);
                         break;
                     case NAVAL:
                         increasePhenotypeBonus(SkillType.S_TECH_VESSEL);
